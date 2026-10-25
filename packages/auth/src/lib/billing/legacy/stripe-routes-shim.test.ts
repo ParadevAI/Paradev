@@ -282,6 +282,22 @@ describe("upgrade", () => {
 		});
 		expect(calls.some((call) => call.method === "attach")).toBe(true);
 	});
+
+	test("an organization on Team is not switched to Pro by a released client", async () => {
+		live = liveSubscription();
+		await expect(
+			upgradeWithAutumn(
+				{ ...fakeDeps(), currentPlanId: async () => "team_annual" },
+				{
+					userId: "user_1",
+					referenceId: ORG,
+					baseURL: API,
+					body: { ...body, annual: true },
+				},
+			),
+		).rejects.toThrow("Update the app to change this plan.");
+		expect(calls).toEqual([]);
+	});
 });
 
 describe("cancel", () => {

@@ -1,3 +1,7 @@
+import {
+	AGENT_PRESET_FEATURE_FLAGS,
+	getPresetById,
+} from "@superset/shared/host-agent-presets";
 import { parse } from "shell-quote";
 import { joinCommandArgsWithEnv, parseLaunchCommandString } from "./argv";
 
@@ -83,4 +87,48 @@ export function resolvePresetLaunchCommands(
 		return [getAgentCommandText(linkedAgent)];
 	}
 	return preset.commands;
+}
+
+type IsAgentPresetEnabled = (presetId: string) => boolean;
+
+const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
+
+function commandPrograms(command: string): string[] {
+	const programs: string[] = [];
+	let atCommandStart = true;
+	for (const token of parse(command)) {
+		if (typeof token !== "string") {
+			atCommandStart = "op" in token && token.op !== "glob";
+			continue;
+		}
+		if (!atCommandStart || ENV_ASSIGNMENT.test(token)) continue;
+		programs.push(token.slice(token.lastIndexOf("/") + 1));
+		atCommandStart = false;
+	}
+	return programs;
+}
+
+export function runsGatedAgent(
+	commands: readonly string[],
+	isAgentPresetEnabled: IsAgentPresetEnabled,
+): boolean {
+	const programs = commands.flatMap(commandPrograms);
+	return [...AGENT_PRESET_FEATURE_FLAGS.keys()].some((presetId) => {
+		const binary = getPresetById(presetId)?.command;
+		return (
+			!isAgentPresetEnabled(presetId) &&
+			binary !== undefined &&
+			programs.includes(binary)
+		);
+	});
+}
+
+export function isTerminalPresetEnabled(
+	preset: { name: string; commands: readonly string[] },
+	isAgentPresetEnabled: IsAgentPresetEnabled,
+): boolean {
+	return (
+		isAgentPresetEnabled(preset.name) &&
+		!runsGatedAgent(preset.commands, isAgentPresetEnabled)
+	);
 }

@@ -14,12 +14,12 @@ import {
 	EditProvider,
 } from "@pierre/diffs/react";
 import { errorMessage } from "@superset/i18n/errors";
-
-import type { RendererContext } from "@superset/panes";
+import { type RendererContext, useIsTabVisible } from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import {
 	createPaneScrollStateKey,
@@ -28,10 +28,11 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/paneScrollStateCache";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
-import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
+import { changesPillStats } from "../../../../utils/changesPillStats";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
@@ -45,8 +46,9 @@ import { BinaryDiffPreview } from "./components/BinaryDiffPreview";
 import { CommentThread } from "./components/CommentThread";
 import { DeferredDiffPlaceholder } from "./components/DeferredDiffPlaceholder";
 import { DiffHeaderMetadata } from "./components/DiffHeaderMetadata";
-import { DiffSectionLabel } from "./components/DiffSectionLabel";
-import { useDiffActiveSection } from "./hooks/useDiffActiveSection";
+import { DiffPaneFileList } from "./components/DiffPaneFileList";
+import { DiffPaneHeaderActions } from "./components/DiffPaneHeaderActions";
+import { DiffPaneScope } from "./components/DiffPaneScope";
 import {
 	type DiffAnnotationMetadata,
 	useDiffAnnotationsByPath,
@@ -56,13 +58,21 @@ import { useDiffCodeViewScroll } from "./hooks/useDiffCodeViewScroll";
 import { useDiffCardCodeViewTheme } from "./hooks/useDiffCodeViewTheme";
 import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
 import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
+import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
+import { useElementWidth } from "./hooks/useElementWidth";
+import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
 	isDiffContentStale,
 	isDiffContentTooLarge,
 } from "./utils/diffLoadingGuards";
+import { fileListLayout, toggledFileListOpen } from "./utils/fileListLayout";
 import { getCharacterOffsetAtClientX } from "./utils/getCharacterOffsetAtClientX";
+import {
+	diffPaneActionsSlotId,
+	diffPaneTitleSlotId,
+} from "./utils/headerSlots";
 
 interface CreateNewAgentSessionInput {
 	configId: string;
@@ -101,6 +111,15 @@ export function DiffPane({
 	const codeViewRef = useRef<CodeViewHandle<DiffAnnotationMetadata>>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
 
+	const showFileList = useRightPaneLinkTarget() !== null;
+	const [rowElement, setRowElement] = useState<HTMLDivElement | null>(null);
+	const containerWidth = useElementWidth(rowElement);
+	const [fileListOpen, setFileListOpen] = useState<boolean | null>(null);
+	const listLayout = showFileList
+		? fileListLayout({ containerWidth, open: fileListOpen })
+		: "hidden";
+	const closeOverlayFileList = useCallback(() => setFileListOpen(null), []);
+
 	const ref = useSidebarDiffRef(workspaceId);
 	const scrollStateKey = useMemo(
 		() =>
@@ -116,7 +135,10 @@ export function DiffPane({
 		() => getPaneScrollState(scrollStateKey),
 		[scrollStateKey],
 	);
-	const { files, isLoading } = useChangeset({ workspaceId, ref });
+	const { files: currentFiles, isLoading } = useChangeset({ workspaceId, ref });
+	// Every git change re-lays out the diff; a hidden tab catches up when shown.
+	const files = useHeldWhileTabHidden(currentFiles);
+	const isTabVisible = useIsTabVisible();
 	const { viewedSet, setViewed } = useViewedFiles(workspaceId);
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const threadAnnotationsByPath = useDiffAnnotationsByPath({ workspaceId });
@@ -229,6 +251,7 @@ export function DiffPane({
 
 	const { items, fileByItemId, requestDiff } = useDiffCodeViewItems({
 		workspaceId,
+		enabled: isTabVisible,
 		files,
 		collapsedSet,
 		editingSet,
@@ -395,7 +418,7 @@ export function DiffPane({
 		paneId: context.pane.id,
 	});
 
-	const { targetItemId, notifyScroll } = useDiffCodeViewScroll({
+	const { targetItemId, notifyScroll, releaseScroll } = useDiffCodeViewScroll({
 		codeViewRef,
 		data,
 		fileByItemId,
@@ -431,19 +454,45 @@ export function DiffPane({
 	// The section label lives in the toolbar, outside the scroller: Pierre pins
 	// one header at a time within its own box, so a body-less in-flow section
 	// item couldn't stay pinned across its group.
-	const { currentSection, onScroll } = useDiffActiveSection({
-		codeViewRef,
-		items,
-		fileByItemId,
-		files,
-	});
+	const commentNavProps = useMemo(
+		() => ({
+			focusedIndex: commentNav.focusedThreadIndex,
+			total: commentNav.orderedThreads.length,
+			onPrev: commentNav.goToPrevComment,
+			onNext: commentNav.goToNextComment,
+		}),
+		[
+			commentNav.focusedThreadIndex,
+			commentNav.orderedThreads.length,
+			commentNav.goToPrevComment,
+			commentNav.goToNextComment,
+		],
+	);
+	// Same unique-path totals as the workspace's Changes control: a path in
+	// several sections counts once, its working-tree entry winning.
+	const totals = useMemo(
+		() =>
+			changesPillStats({
+				againstBase: files.filter(
+					(file) =>
+						file.source.kind === "against-base" ||
+						file.source.kind === "commit",
+				),
+				staged: files.filter((file) => file.source.kind === "staged"),
+				unstaged: files.filter((file) => file.source.kind === "unstaged"),
+			}),
+		[files],
+	);
+	const titleSlot = useDiffPaneHeaderSlot(diffPaneTitleSlotId(context.pane.id));
+	const actionsSlot = useDiffPaneHeaderSlot(
+		diffPaneActionsSlotId(context.pane.id),
+	);
 	const handleScroll = useCallback(
 		(scrollTop: number) => {
 			savePaneScrollState(scrollStateKey, { scrollTop, scrollLeft: 0 });
-			onScroll();
 			notifyScroll();
 		},
-		[scrollStateKey, onScroll, notifyScroll],
+		[scrollStateKey, notifyScroll],
 	);
 	const { options, style } = useDiffCardCodeViewTheme();
 
@@ -662,6 +711,7 @@ export function DiffPane({
 	const activeEditingItemId = items.find((item) => item.edit)?.id;
 	const handleEditorKeyDownCapture = useCallback(
 		(event: React.KeyboardEvent<HTMLDivElement>) => {
+			releaseScroll();
 			if (!activeEditingItemId) return;
 			if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
 				event.preventDefault();
@@ -675,7 +725,7 @@ export function DiffPane({
 				requestExitEditing(activeEditingItemId);
 			}
 		},
-		[activeEditingItemId, requestExitEditing, saveEditedItem],
+		[activeEditingItemId, releaseScroll, requestExitEditing, saveEditedItem],
 	);
 
 	const renderAnnotation = useCallback(
@@ -777,68 +827,103 @@ export function DiffPane({
 	);
 
 	return (
-		<div className="flex h-full min-h-0 w-full min-w-0 flex-col">
-			<DiffViewToolbar
-				areAllFilesCollapsed={areAllFilesCollapsed}
-				onToggleCollapseAll={handleToggleCollapseAll}
-				commentNav={{
-					focusedIndex: commentNav.focusedThreadIndex,
-					total: commentNav.orderedThreads.length,
-					onPrev: commentNav.goToPrevComment,
-					onNext: commentNav.goToNextComment,
-				}}
-			>
-				{currentSection ? (
-					<DiffSectionLabel
-						kind={currentSection.kind}
-						count={currentSection.count}
-					/>
-				) : null}
-			</DiffViewToolbar>
-			{files.length === 0 ? (
-				// The toolbar stays up while the current filter yields nothing;
-				// the sidebar's Changes tab holds the filter/branch controls.
-				<div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-					{isLoading
-						? t({ message: "Loading…" })
-						: t({
-								message: "No changes",
-							})}
-				</div>
-			) : (
-				<div
-					ref={searchContainerRef}
-					className="relative min-h-0 w-full flex-1"
-					onKeyDownCapture={handleEditorKeyDownCapture}
-				>
-					<MarkdownSearch
-						isOpen={search.isSearchOpen}
-						query={search.query}
-						caseSensitive={search.caseSensitive}
-						matchCount={search.matchCount}
-						activeMatchIndex={search.activeMatchIndex}
-						onQueryChange={search.setQuery}
-						onCaseSensitiveChange={search.setCaseSensitive}
-						onFindNext={search.findNext}
-						onFindPrevious={search.findPrevious}
-						onClose={search.closeSearch}
-					/>
-					<EditProvider<DiffAnnotationMetadata> createEditor={createEditor}>
-						<CodeView<DiffAnnotationMetadata>
-							ref={codeViewRef}
-							className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain px-3 [overflow-anchor:none]"
-							style={style}
-							items={items}
-							options={codeViewOptions}
-							onScroll={handleScroll}
-							renderHeaderPrefix={renderHeaderPrefix}
-							renderHeaderFilenameSuffix={renderHeaderFilenameSuffix}
-							renderHeaderMetadata={renderHeaderMetadata}
-							renderAnnotation={renderAnnotation}
-							onItemEditChange={handleItemEditChange}
+		<div
+			ref={setRowElement}
+			className="relative flex h-full min-h-0 w-full min-w-0"
+		>
+			{titleSlot &&
+				createPortal(
+					<DiffPaneScope
+						workspaceId={workspaceId}
+						additions={totals.additions}
+						deletions={totals.deletions}
+					/>,
+					titleSlot,
+				)}
+			{actionsSlot &&
+				createPortal(
+					<DiffPaneHeaderActions
+						prLink={
+							showFileList ? undefined : { workspaceId, store: context.store }
+						}
+						commentNav={commentNavProps}
+						files={
+							showFileList
+								? {
+										fileCount: totals.fileCount,
+										isCollapsed: listLayout === "hidden",
+										onToggle: () =>
+											setFileListOpen(
+												toggledFileListOpen({
+													containerWidth,
+													open: fileListOpen,
+												}),
+											),
+									}
+								: undefined
+						}
+						areAllFilesCollapsed={areAllFilesCollapsed}
+						onToggleCollapseAll={handleToggleCollapseAll}
+					/>,
+					actionsSlot,
+				)}
+			<div className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
+				{files.length === 0 ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+						{isLoading
+							? t({ message: "Loading…" })
+							: t({
+									message: "No changes",
+								})}
+					</div>
+				) : (
+					<div
+						ref={searchContainerRef}
+						className="relative min-h-0 w-full flex-1"
+						onKeyDownCapture={handleEditorKeyDownCapture}
+						onWheelCapture={releaseScroll}
+						onTouchStartCapture={releaseScroll}
+						onPointerDownCapture={releaseScroll}
+					>
+						<MarkdownSearch
+							isOpen={search.isSearchOpen}
+							query={search.query}
+							caseSensitive={search.caseSensitive}
+							matchCount={search.matchCount}
+							activeMatchIndex={search.activeMatchIndex}
+							onQueryChange={search.setQuery}
+							onCaseSensitiveChange={search.setCaseSensitive}
+							onFindNext={search.findNext}
+							onFindPrevious={search.findPrevious}
+							onClose={search.closeSearch}
 						/>
-					</EditProvider>
-				</div>
+						<EditProvider<DiffAnnotationMetadata> createEditor={createEditor}>
+							<CodeView<DiffAnnotationMetadata>
+								ref={codeViewRef}
+								className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
+								style={style}
+								items={items}
+								options={codeViewOptions}
+								onScroll={handleScroll}
+								renderHeaderPrefix={renderHeaderPrefix}
+								renderHeaderFilenameSuffix={renderHeaderFilenameSuffix}
+								renderHeaderMetadata={renderHeaderMetadata}
+								renderAnnotation={renderAnnotation}
+								onItemEditChange={handleItemEditChange}
+							/>
+						</EditProvider>
+					</div>
+				)}
+			</div>
+			{listLayout !== "hidden" && containerWidth !== null && (
+				<DiffPaneFileList
+					context={context}
+					layout={listLayout}
+					containerWidth={containerWidth}
+					onClose={closeOverlayFileList}
+					workspaceId={workspaceId}
+					onOpenFile={onOpenFile}
+				/>
 			)}
 		</div>
 	);

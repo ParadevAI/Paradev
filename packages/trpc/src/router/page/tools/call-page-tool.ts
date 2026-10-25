@@ -1,4 +1,4 @@
-import type { SelectPage } from "@superset/db/schema";
+import type { PageShareRole, SelectPage } from "@superset/db/schema";
 import type {
 	PageToolAccount,
 	PageToolServerReply,
@@ -56,8 +56,9 @@ export interface CallPageToolDeps {
 export function pageToolAccess(
 	page: SelectPage | undefined,
 	userId: string,
+	shareRole: PageShareRole | null = null,
 ): "ok" | "not_found" {
-	if (!page || page.takenDownAt || !isPageReadable(page, userId)) {
+	if (!page || page.takenDownAt || !isPageReadable(page, userId, shareRole)) {
 		return "not_found";
 	}
 	return "ok";

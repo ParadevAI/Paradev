@@ -24,16 +24,16 @@ export {
 	type PageHeaderActions,
 	type PageHeaderOwner,
 	type PageHeaderPage,
+	type PageHeaderSharing,
 	type PageHeaderVersion,
 	PageShareButton,
+	type PageShareRole,
 	PageTitleMenu,
 	PageVersionBanner,
 	type PageVisibility,
 	RenamePageDialog,
 } from "./components/PageHeader";
-export { PageViewers } from "./components/PageViewers";
 export { useFramePointerDown } from "./hooks/useFramePointerDown";
-export { useJoinPagePresence } from "./hooks/useJoinPagePresence";
 export { usePageStorageConnect } from "./hooks/usePageStorageConnect";
 export type { PageToolHost } from "./hooks/usePageTools";
 export { usePageToolsUnavailable } from "./hooks/usePageToolsUnavailable";

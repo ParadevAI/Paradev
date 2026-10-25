@@ -15,9 +15,9 @@ import {
 const currentYear = new Date().getFullYear();
 const author = pkg.author?.name ?? pkg.author;
 const productName = pkg.productName;
-// productName names the bundle, userData, logs and keychain entry, so it never
-// changes; launchers and the menu bar show displayName.
-const displayName = "Superset";
+// productName names the bundle, userData, logs and the keychain entry, so it
+// never changes; the menu bar, Dock and launchers show displayName.
+export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
 const macIconPath = join(pkg.resources, "build/icons/icon.icns");
 const linuxIconPath = join(pkg.resources, "build/icons");
 const winIconPath = join(pkg.resources, "build/icons/icon.ico");
@@ -131,16 +131,15 @@ const config: Configuration = {
 			CFBundleName: displayName,
 			CFBundleDisplayName: displayName,
 			// Required for macOS microphone permission prompt
-			NSMicrophoneUsageDescription:
-				"Superset needs microphone access so voice-enabled tools like Codex transcription can capture audio input.",
+			NSMicrophoneUsageDescription: `${displayName} needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.`,
+			// Required for on-device dictation on macOS 15 and older
+			NSSpeechRecognitionUsageDescription: `${displayName} uses on-device speech recognition to transcribe dictation in the chat composer.`,
 			// Required for macOS local network permission prompt
-			NSLocalNetworkUsageDescription:
-				"Superset needs access to your local network to discover and connect to development servers running on your network.",
+			NSLocalNetworkUsageDescription: `${displayName} needs access to your local network to discover and connect to development servers running on your network.`,
 			// Bonjour service types to browse for (triggers the permission prompt)
 			NSBonjourServices: ["_http._tcp", "_https._tcp"],
 			// Required for Apple Events / Automation permission prompt
-			NSAppleEventsUsageDescription:
-				"Superset needs to interact with other applications to run terminal commands and development tools.",
+			NSAppleEventsUsageDescription: `${displayName} needs to interact with other applications to run terminal commands and development tools.`,
 		},
 	},
 

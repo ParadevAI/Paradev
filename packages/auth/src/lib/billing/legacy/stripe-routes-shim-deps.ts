@@ -1,18 +1,23 @@
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
+import { planCatalogFromAutumn } from "@superset/shared/billing";
 import { APIError } from "better-auth/api";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { autumnClient } from "../../../autumn";
 import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { countBillableSeats } from "../../../utils/billing";
+import { catalogAutumnPlans } from "../autumn/catalog";
 import { ensureAutumnCustomer, paidAutumnPlanId } from "../autumn/customer";
+import { SEATS_FEATURE_ID } from "../autumn/features";
 import {
 	completeCheckout,
 	syncFromStripeEvent,
 	syncOrganizationSubscription,
 } from "../autumn/projection";
+import { seatPurchase } from "../autumn/seats";
 import { handleStripeBillingEvent } from "../stripe-billing-events";
+import { PRO_ANNUAL_PLAN_ID } from "./plan-ids";
 import { stripeFallback } from "./stripe-fallback";
 import type { AutumnBillingDeps } from "./stripe-routes-shim";
 
@@ -30,7 +35,21 @@ const SYNCED_STRIPE_EVENTS = new Set([
 export function autumnBillingDeps(): AutumnBillingDeps {
 	const autumn = autumnClient;
 	return {
-		attach: (params) => autumn.billing.attach(params),
+		attach: async ({ featureQuantities, ...params }) => {
+			const quantity = featureQuantities?.find(
+				(item) => item.featureId === SEATS_FEATURE_ID,
+			)?.quantity;
+			if (quantity === undefined)
+				throw new Error("Missing checkout seat quantity");
+			const pro = planCatalogFromAutumn(await catalogAutumnPlans()).find(
+				(family) => family.family === "pro",
+			);
+			const planId =
+				(params.planId === PRO_ANNUAL_PLAN_ID ? pro?.yearly : pro?.monthly)
+					?.id ?? params.planId;
+			const { quantities } = await seatPurchase(planId, quantity);
+			return autumn.billing.attach({ ...params, planId, ...quantities });
+		},
 		update: (params) => autumn.billing.update(params),
 		managedByAutumn: async (organizationId) =>
 			(await paidAutumnPlanId(organizationId).catch(() => null)) !== null,

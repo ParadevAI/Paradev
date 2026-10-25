@@ -1,5 +1,4 @@
 export {
-	invalidateHostServiceQuery,
 	useMaybeWorkspaceClient,
 	useWorkspaceClient,
 	useWorkspaceHostUrl,

@@ -173,7 +173,12 @@ function TerminalRichInputInner({
 
 			const text = prepareTerminalSubmission(message.text, attachmentPaths);
 			if (text === null) return;
-			await sendToTerminalAgent({ workspaceId, terminalId, text });
+			await sendToTerminalAgent({
+				workspaceId,
+				terminalId,
+				text,
+				submit: true,
+			});
 			terminalRuntimeRegistry.scrollToBottom(terminalId, terminalInstanceId);
 			controller.textInput.clear();
 			track("terminal_rich_input_submitted", {

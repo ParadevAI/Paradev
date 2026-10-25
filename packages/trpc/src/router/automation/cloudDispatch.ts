@@ -1,9 +1,15 @@
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, environments, members } from "@superset/db/schema";
+import {
+	automationRuns,
+	cloudWorkspaces,
+	environments,
+	members,
+} from "@superset/db/schema";
 import { CLOUD_AGENT_PROMPT_MAX_LENGTH } from "@superset/shared/cloud-agent-launch";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
+import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
 import {
 	environmentRepositoryRows,
@@ -18,11 +24,13 @@ import {
 	wakeCloudWorkspace,
 } from "../cloud-workspace/wake";
 import type { DispatchableAutomation } from "./dispatch";
-import { hostServiceMutation } from "./relay-client";
+import { launchAgentSession } from "./hostSession";
+import { hostServiceMutation, hostServiceQuery } from "./relay-client";
 import {
 	type AgentRunResult,
 	nonForkPullRequest,
-	previousRunTerminal,
+	type PreviousRunSession,
+	previousRunSession,
 	RunFailure,
 	type RunWorkspace,
 	replacePin,
@@ -36,6 +44,7 @@ type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
 type RunInCloudArgs = {
 	automation: DispatchableAutomation;
+	runId: string;
 	prompt: string;
 	event: {
 		provider: string;
@@ -51,7 +60,7 @@ type Launch =
 			row: CloudWorkspaceRow;
 			hostTarget: string;
 			headers: Record<string, string>;
-			continueTerminalId: string | undefined;
+			previous: PreviousRunSession | undefined;
 	  }
 	| { kind: "new"; environmentId: string; branch: string | undefined };
 
@@ -64,30 +73,29 @@ export async function runInCloud(
 ): Promise<AgentRunResult | null> {
 	// The deadline bounds getting ready; sending the agent or starting the box is never cut off.
 	const launch = await withDeadline(prepareLaunch(args));
-	const { automation, prompt, placed } = args;
+	const { automation, prompt, placed, runId } = args;
 
 	if (launch.kind === "pinned") {
-		const chatSurface =
+		// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
+		const chat =
 			automation.agent === "claude" &&
 			(await acpChatEnabled(automation.ownerUserId));
-		return hostServiceMutation<
+		const target = { baseUrl: launch.hostTarget, headers: launch.headers };
+		return launchAgentSession(
 			{
-				workspaceId: string;
-				agent: string;
-				prompt: string;
-				continueTerminalId?: string;
-				surface?: "chat";
+				mutation: <TOutput>(procedure: string, input: object) =>
+					hostServiceMutation<object, TOutput>(target, procedure, input),
+				query: <TOutput>(procedure: string, input: object) =>
+					hostServiceQuery<object, TOutput>(target, procedure, input),
 			},
-			AgentRunResult
-		>({ baseUrl: launch.hostTarget, headers: launch.headers }, "agents.run", {
-			workspaceId: launch.row.id,
-			agent: automation.agent,
-			prompt,
-			...(launch.continueTerminalId
-				? { continueTerminalId: launch.continueTerminalId }
-				: {}),
-			...(chatSurface ? { surface: "chat" as const } : {}),
-		});
+			{
+				workspaceId: launch.row.id,
+				agent: automation.agent,
+				prompt,
+				chat,
+				previous: launch.previous,
+			},
+		);
 	}
 
 	const created = await startCloudWorkspace({
@@ -96,7 +104,29 @@ export async function runInCloud(
 		environmentId: launch.environmentId,
 		name: automation.name.slice(0, 200),
 		branch: launch.branch,
-		launch: { agent: automation.agent, prompt },
+		launch: { agent: automation.agent, prompt, automationRunId: runId },
+		machineSize: (
+			await resolveMachineSize(
+				automation.organizationId,
+				automation.machineSize,
+			)
+		)?.name,
+		beforeProvision: async (workspaceId) => {
+			placed({ cloudWorkspaceId: workspaceId });
+			const bound = await db
+				.update(automationRuns)
+				.set({ cloudWorkspaceId: workspaceId })
+				.where(
+					and(
+						eq(automationRuns.id, runId),
+						eq(automationRuns.organizationId, automation.organizationId),
+						eq(automationRuns.status, "dispatching"),
+					),
+				)
+				.returning({ id: automationRuns.id });
+			if (bound.length === 0)
+				throw new RunFailure("automation run is no longer dispatching", null);
+		},
 	});
 	placed({ cloudWorkspaceId: created.id });
 	if (automation.cloudWorkspaceId) {
@@ -141,8 +171,8 @@ async function prepareLaunch({
 		? await reachablePin(automation.cloudWorkspaceId)
 		: null;
 	if (pinned) {
-		const continueTerminalId = automation.continueAgentSession
-			? await previousRunTerminal(automation.id, {
+		const previous = automation.continueAgentSession
+			? await previousRunSession(automation.id, {
 					cloudWorkspaceId: pinned.row.id,
 				})
 			: undefined;
@@ -156,7 +186,7 @@ async function prepareLaunch({
 			headers,
 			signal: AbortSignal.timeout(10_000),
 		});
-		return { kind: "pinned", ...pinned, headers, continueTerminalId };
+		return { kind: "pinned", ...pinned, headers, previous };
 	}
 
 	placed(null);
@@ -200,10 +230,10 @@ async function assertOwnerMayUseCloud(
 			"cloud_access_denied",
 		);
 	}
-	const { enabled } = await cloudAccess({
-		userId: automation.ownerUserId,
-		session: null,
-	});
+	const { enabled } = await cloudAccess(
+		{ userId: automation.ownerUserId, session: null },
+		automation.organizationId,
+	);
 	if (enabled === undefined) {
 		throw new RunFailure("could not check the owner's cloud access", null);
 	}
@@ -258,11 +288,11 @@ async function pullRequestBranch(
 	if (!pullRequest?.headRef || event.repositoryId === null) return undefined;
 	const environment = await db.query.environments.findFirst({
 		where: eq(environments.id, environmentId),
-		columns: { hooksRepositoryId: true },
+		columns: { primaryRepositoryId: true },
 	});
 	const primary = primaryRepository(
 		await environmentRepositoryRows(environmentId),
-		environment?.hooksRepositoryId,
+		environment?.primaryRepositoryId,
 	);
 	return primary?.repoId === event.repositoryId
 		? pullRequest.headRef

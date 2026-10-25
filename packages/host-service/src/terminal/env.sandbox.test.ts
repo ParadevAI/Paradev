@@ -13,7 +13,6 @@ const params = {
 	cwd: "/workspace",
 	terminalId: "term-1",
 	workspaceId: "ws-1",
-	workspaceName: "",
 	workspacePath: "/workspace",
 	rootPath: "/workspace",
 	supersetEnv: "production" as const,

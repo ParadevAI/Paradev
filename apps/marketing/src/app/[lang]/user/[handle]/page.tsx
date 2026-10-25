@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export async function generateMetadata({
 
 	const { profile } = lookup;
 	const who = profile.name ?? `@${profile.handle}`;
-	const title = `${who} · #${profile.rank} on the ${COMPANY.NAME} leaderboard`;
+	const title = `${who} · #${profile.rank} on the ${BRAND.NAME} leaderboard`;
 	const description = `${formatTokens(profile.allTime.tokens, lang)} tokens and ${formatUsd(
 		profile.allTime.usd,
 		lang,
@@ -74,7 +75,7 @@ export async function generateMetadata({
 			title,
 			description,
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			type: "profile",
 		},
 		twitter: {
@@ -101,7 +102,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 	const { profile } = lookup;
 	const colors = buildModelColors([profile.models]);
 	const shareUrl = `${COMPANY.MARKETING_URL.replace(/\/$/, "")}/${profile.handle}`;
-	const company = COMPANY.NAME;
+	const company = BRAND.NAME;
 	const profileHandle = profile.handle;
 	const rank = profile.rank;
 	const total = profile.total;

@@ -2,6 +2,7 @@
 title: "Best IDE for Mistral Vibe in 2026"
 description: "The best places to run Mistral Vibe in 2026, from the Vibe CLI and ACP in VS Code, JetBrains, and Zed to remote cloud agents and Superset for parallel worktree sessions next to other agents."
 date: 2026-10-13
+lastUpdated: 2026-10-15
 type: "roundup"
 competitors:
   - mistral-vibe
@@ -26,7 +27,7 @@ Facts were checked against Mistral's own docs on October 13, 2026.
 
 | Where you run Mistral Vibe | Best for | Parallel tasks on one repo? | Main tradeoff |
 |---|---|---|---|
-| **Superset** | Many Vibe tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Superset** | Many Vibe tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Built-in file editor, but not an editor-first IDE |
 | **Vibe CLI** | One focused task, scripts, and CI | `--worktree` and subagents | You manage separate tasks yourself |
 | **ACP in VS Code, JetBrains, or Zed** | Working with Vibe inside your editor | Limited | One working copy |
 | **Remote cloud agents** | Work that runs away from your machine | Through cloud agents | Vibe's agent only |
@@ -55,7 +56,7 @@ Vibe can run tasks as remote cloud agents, and you can "teleport" a session back
 
 Superset runs Mistral Vibe as a built-in agent. Each new local branch-based workspace gets its own Git worktree and persistent terminal, so several Vibe tasks can run on the same repository at once, locally or on your own remote hosts. Vibe uses your own Mistral plan or key, and Superset never proxies model calls. You can run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
 
-Where Vibe is stronger: its remote cloud agents run on Mistral's side, and Vibe works inside VS Code and JetBrains IDEs. Superset runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Vibe's own CLI also has `--worktree`, so for a single parallel task you may not need anything else.
+Where Vibe is stronger: its remote cloud agents come with the Pro plan and can teleport a session back to the CLI, and Vibe works inside VS Code and JetBrains IDEs. Superset runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Vibe's own CLI also has `--worktree`, so for a single parallel task you may not need anything else.
 
 ## How To Choose
 

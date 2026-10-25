@@ -10,7 +10,7 @@ import { posthog } from "renderer/lib/posthog";
 const displayName = (name: string) =>
 	getPluginByName(name)?.interface.displayName ?? name;
 
-/** Install/uninstall/toggle with shared toasts, analytics, and invalidation. */
+/** Install/uninstall with shared toasts, analytics, and invalidation. */
 export function usePluginMutations() {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
@@ -27,13 +27,22 @@ export function usePluginMutations() {
 		]);
 	};
 
-	const syncAccount = async (
-		name: string,
-		action: "install" | "uninstall",
-	): Promise<boolean> => {
+	const machineSetEnabled = electronTrpc.plugins.setEnabled.useMutation();
+
+	const wasDisabled = (name: string) =>
+		utils.plugins.list
+			.getData()
+			?.some((row) => row.name === name && row.installed && !row.enabled) ??
+		false;
+
+	const syncAccountInstall = async (name: string): Promise<boolean> => {
+		const reenable = wasDisabled(name);
 		try {
-			if (action === "install") await accountInstall.mutateAsync({ name });
-			else await accountUninstall.mutateAsync({ name });
+			await accountInstall.mutateAsync({ name });
+			if (reenable) {
+				await machineSetEnabled.mutateAsync({ name, enabled: true });
+				await accountSetEnabled.mutateAsync({ name, enabled: true });
+			}
 			return true;
 		} catch (error) {
 			toast.warning(
@@ -73,30 +82,12 @@ export function usePluginMutations() {
 	});
 	const uninstallMutation = electronTrpc.plugins.uninstall.useMutation({
 		onSuccess: async (_data, variables) => {
-			await syncAccount(variables.name, "uninstall");
-			posthog.capture("plugin_uninstalled", { plugin: variables.name });
-			toast.success(
-				t({
-					message: `${displayName(variables.name)} uninstalled`,
-				}),
-			);
-		},
-		onError: (error) => {
-			toast.error(
-				t({
-					message: "Uninstall failed",
-				}),
-				{ description: errorMessage(error) },
-			);
-		},
-	});
-	const setEnabledMutation = electronTrpc.plugins.setEnabled.useMutation({
-		onSuccess: async (_data, variables) => {
+			let disconnected = 0;
 			try {
-				await accountSetEnabled.mutateAsync({
+				const result = await accountUninstall.mutateAsync({
 					name: variables.name,
-					enabled: variables.enabled,
 				});
+				disconnected = result.disconnected;
 			} catch (error) {
 				toast.warning(
 					t({
@@ -107,33 +98,25 @@ export function usePluginMutations() {
 			} finally {
 				await invalidate();
 			}
-			posthog.capture(
-				variables.enabled ? "plugin_enabled" : "plugin_disabled",
-				{ plugin: variables.name },
-			);
-			toast.success(
-				variables.enabled
-					? t({
-							message: `${displayName(variables.name)} enabled`,
-						})
-					: t({
-							message: `${displayName(variables.name)} disabled`,
-						}),
+			posthog.capture("plugin_uninstalled", { plugin: variables.name });
+			toast.warning(
+				t({
+					message: `${displayName(variables.name)} uninstalled`,
+				}),
 				{
-					description: t({
-						message: "Takes effect in new agent sessions.",
-					}),
+					description:
+						disconnected > 0
+							? t({ message: "Its connected accounts were disconnected." })
+							: t({ message: "Takes effect in new agent sessions." }),
 				},
 			);
 		},
 		onError: (error) => {
 			toast.error(
 				t({
-					message: "Could not update plugin",
+					message: "Uninstall failed",
 				}),
-				{
-					description: errorMessage(error),
-				},
+				{ description: errorMessage(error) },
 			);
 		},
 	});
@@ -165,12 +148,12 @@ export function usePluginMutations() {
 	const add = async (name: string): Promise<boolean> => {
 		navigate({ to: "/plugins/$pluginName", params: { pluginName: name } });
 		await installMutation.mutateAsync({ name });
-		return await syncAccount(name, "install");
+		return await syncAccountInstall(name);
 	};
 
 	const update = async (name: string): Promise<boolean> => {
 		await updateMutation.mutateAsync({ name });
-		return await syncAccount(name, "install");
+		return await syncAccountInstall(name);
 	};
 
 	return {
@@ -178,16 +161,14 @@ export function usePluginMutations() {
 		update,
 		install: async (name: string) => {
 			await installMutation.mutateAsync({ name });
-			return await syncAccount(name, "install");
+			return await syncAccountInstall(name);
 		},
 		uninstall: (name: string) => uninstallMutation.mutate({ name }),
-		setEnabled: (name: string, enabled: boolean) =>
-			setEnabledMutation.mutate({ name, enabled }),
 		isBusy:
 			installMutation.isPending ||
 			updateMutation.isPending ||
 			uninstallMutation.isPending ||
-			setEnabledMutation.isPending ||
+			machineSetEnabled.isPending ||
 			accountInstall.isPending ||
 			accountUninstall.isPending ||
 			accountSetEnabled.isPending,

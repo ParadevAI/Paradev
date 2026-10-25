@@ -6,6 +6,7 @@ import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { declineAnalytics } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 
@@ -27,7 +28,7 @@ export function CookieConsent() {
 
 	const handleOptOut = () => {
 		localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
-		withPosthog((posthog) => posthog.opt_out_capturing());
+		withPosthog(declineAnalytics);
 		setShowBanner(false);
 	};
 

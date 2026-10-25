@@ -54,7 +54,7 @@ git worktree add ../repo-tests -b ai/tests
 git worktree add ../repo-refactor -b ai/refactor
 ```
 
-Then you `cd` into each directory and launch Claude Code there.
+Then you `cd` into each directory and launch Claude Code there. Claude Code can also do this step itself: `claude --worktree <name>` (or `-w`) creates a worktree under `.claude/worktrees/` on a new branch and starts the session in it. See the [Claude Code worktree docs](https://code.claude.com/docs/en/worktrees).
 
 This separates working files, but does not sandbox the agent or prevent merge conflicts. It is also repetitive. You still have to create branches, name directories, track which session maps to which task, and review each diff manually in your editor or Git UI.
 
@@ -66,6 +66,8 @@ Superset creates an isolated worktree per task, launches Claude Code inside it, 
 
 That is the key distinction: Claude Code is the agent; Superset is the workflow layer that lets you run many Claude Code sessions safely.
 
+Claude Code's own features keep working inside it. Superset launches the real `claude` CLI in a real terminal with your own login, so `/remote-control`, `/schedule`, `/loop`, subagents, and `--resume` behave as they do in any terminal.
+
 ## Quick Comparison
 
 | Approach | Parallel? | Isolated by default? | Review workflow | Ongoing overhead |
@@ -73,6 +75,7 @@ That is the key distinction: Claude Code is the agent; Superset is the workflow 
 | Terminal tabs | Yes | No | Manual | Low setup, high risk |
 | tmux | Yes | No | Manual | Good for power users, still no isolation |
 | Manual Git worktrees + Claude Code | Yes | Yes | Git-native, but manual | Safe, but repetitive |
+| `claude --worktree` | Yes | Yes | Git-native, but manual | Low for Claude Code alone |
 | Superset + Claude Code | Yes | Yes | Built-in diff review per task | Lowest overhead once installed |
 
 ## Recommended Workflow
@@ -174,9 +177,9 @@ If you want to run multiple Claude Code agents in parallel, the decision is not 
 
 The real choice is:
 
-- Claude Code alone, one task at a time
+- Claude Code alone, with `claude --worktree` per session and your own way of tracking them
 - Claude Code plus manual worktrees, with more setup overhead
-- Claude Code plus Superset, with the same isolation model but less operational friction
+- Claude Code plus Superset, with the same isolation model, all of Claude Code's own commands, and one place to track and review every session
 
 For most teams and solo developers, worktree-based orchestration is the difference between "parallel in theory" and "parallel every day."
 
@@ -184,7 +187,7 @@ For most teams and solo developers, worktree-based orchestration is the differen
 
 ### Can Claude Code itself run multiple agents?
 
-You can run multiple Claude Code sessions, but each session still needs its own safe workspace. Claude Code is the agent process. The missing piece is orchestration and isolation across sessions.
+Yes. `claude --worktree` starts each session in its own worktree, and subagents can run in parallel inside one session. What Claude Code does not give you is one view across many sessions, other agents, and other machines, with each session's diff and PR in one place. Superset adds that, and Claude Code's own features still work in each Superset session.
 
 ### Do I need Git worktrees to parallelize Claude Code?
 

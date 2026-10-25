@@ -84,25 +84,28 @@ export async function purgeAccount(userId: string): Promise<void> {
 					eq(subscriptions.status, "active"),
 				),
 			});
+
 			if (
 				subscription?.stripeSubscriptionId &&
 				subscription.plan !== "enterprise"
 			) {
-				const seatsSetInAutumn =
+				const seatsOwnedByAutumn =
 					billingUsesAutumn &&
 					(await setAutumnSeats(membership.organizationId, remainingSeats));
-				const stripeSub = await stripeClient.subscriptions.retrieve(
-					subscription.stripeSubscriptionId,
-				);
-				const itemId = seatItem(stripeSub)?.id;
-				if (!seatsSetInAutumn && itemId) {
-					await stripeClient.subscriptions.update(
+				if (!seatsOwnedByAutumn) {
+					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
-						{
-							items: [{ id: itemId, quantity: remainingSeats }],
-							proration_behavior: "create_prorations",
-						},
 					);
+					const itemId = seatItem(stripeSub)?.id;
+					if (itemId) {
+						await stripeClient.subscriptions.update(
+							subscription.stripeSubscriptionId,
+							{
+								items: [{ id: itemId, quantity: remainingSeats }],
+								proration_behavior: "create_prorations",
+							},
+						);
+					}
 				}
 			}
 			continue;

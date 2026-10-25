@@ -31,7 +31,7 @@ function $replaceText(text: string) {
 export function registerHistoryNavigation(
 	editor: LexicalEditor,
 	getHistory: () => readonly string[],
-): { reset: () => void; unregister: () => void } {
+): { recallOlder: () => void; reset: () => void; unregister: () => void } {
 	let index: number | null = null;
 	let recalled = "";
 	let draft: EditorState | null = null;
@@ -94,6 +94,14 @@ export function registerHistoryNavigation(
 	);
 
 	return {
+		recallOlder: () =>
+			editor.update(
+				() => {
+					if (!$isRangeSelection($getSelection())) $getRoot().selectStart();
+					navigate("older", null);
+				},
+				{ discrete: true },
+			),
 		reset: () => {
 			index = null;
 			recalled = "";

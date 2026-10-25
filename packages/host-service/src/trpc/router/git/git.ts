@@ -906,6 +906,13 @@ export const gitRouter = router({
 				)
 				.catch((error: unknown) => {
 					rethrowEnvironmentalGitError(error);
+					if (error instanceof Error && error.name === "BaseRefMissingError") {
+						throw new TRPCError({
+							code: "NOT_FOUND",
+							message: error.message,
+							cause: { kind: "BASE_REF_MISSING" },
+						});
+					}
 					throw error;
 				});
 		}),

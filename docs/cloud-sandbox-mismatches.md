@@ -15,6 +15,15 @@ context.
 
 ## Identity and ownership
 
+**An automation dispatch finishes before its cloud chat exists.** A machine-owned host returns the
+chat session ID during dispatch. A fresh sandbox creates that session only on first boot, after the
+API has queued provisioning. The run now binds its cloud workspace before provisioning and carries
+its run ID in the launch environment. Host-service reports the actual chat/terminal identity through
+a sandbox-scoped procedure; the API checks the run, workspace, organization, and creator before
+linking it. Failed reports stay in the launch marker for retry on restart, without relaunching the
+agent. **Open:** a process crash between session creation and writing the report can still lose the
+session link. Changes in this path require a published host-service/sandbox bundle.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the
@@ -76,6 +85,30 @@ carries it so open clients patch their cache rather than refetch the list.
 A closed box's dot is therefore at most a few seconds behind; the open box's
 own subscribers stay live as before. Reaches a box only through a
 host-service release.
+
+**A closed box's pull requests are not on its creation branch.**
+`cloud_workspaces.branch` is the branch the box was cut on, and an agent
+moves on from it: new branches, one PR each. Looking PRs up by that branch
+showed a stale or missing PR for every box but the open one, which the host
+fan-out reaches. The box's PR runtime already keeps every PR it has linked
+(`workspace_pull_requests` in host.db), so the box reports each one once to
+`cloudWorkspace.reportPullRequests` (`sandbox-pull-requests` in
+host-service: everything on boot, then each new link as the runtime records
+it), and the API records it in `cloud_workspace_pull_requests` for the
+repositories the workspace checked out. State still comes from
+`github_pull_requests`. After a successful send, a PR reaches the table at
+most a sweep of the PR runtime (5 minutes) after it is opened; a failed send
+retries with back-off up to 5 minutes more. Reaches a box only through a host-service release.
+`cloudWorkspace.pullRequests` is what desktop and mobile list, badge and
+hover-card a cloud workspace with: every linked PR, plus the PR on
+`cloud_workspaces.branch` for a box that has not reported yet, open ones first
+and then the newest link. It does not poll: a new link, and every GitHub
+webhook or sync write to a PR some cloud workspace shows, sends a
+`pull_requests` nudge that refetches only this query. Inside an open workspace
+both apps still ask the box itself.
+**Open:** a repository renamed or transferred
+after the box linked a PR is reported under its old name; the API answers with
+it in `ignored` and the link is lost.
 
 **Nobody on the box knows who is in it.** A host is one person's machine, so
 a workspace row implies its owner and the sidebar never had to say. A cloud
@@ -144,6 +177,26 @@ rewrite. An environment variable by a credential's name is ignored and never
 reaches the box; a cloud workspace has no way to carry an app's own provider
 key.
 
+**A ChatGPT sign-in is a file and a session, not a key.** Codex on a ChatGPT
+plan reads `~/.codex/auth.json`, and its refresh token works once: two holders
+of one session sign each other out ("refresh token was already used"). The API
+runs Codex's device-code sign-in itself, so the session is Superset's own and
+never the one on the person's laptop, and renews it under a row lock before
+the access token lapses. The box gets an `auth.json` of placeholders (an
+unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
+never tries to renew) written with the identity on every create and wake; the
+firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
+including a forced rotation while it ran.
+
+**The firewall refuses a WebSocket upgrade on a host whose headers it
+rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
+the bearer swap in place the upgrade fails ("Attack attempt detected") and
+Codex spends ~10 s on retries before it falls back to HTTPS, once per session.
+The built-in provider cannot be reconfigured, so the claim writes
+`/etc/codex/config.toml` (Codex's system layer, below the person's own config)
+with the same endpoint and `supports_websockets = false`. Measured: 13.3 s →
+3.6 s for one `codex exec`.
+
 **The firewall terminates TLS for the domains it rewrites, and the terminal
 must trust its CA.** The CA is in the image's system bundle, which curl, git,
 gh, python and bun read. Node does not read it, and the platform sets no CA
@@ -169,6 +222,23 @@ Archiving the box from inside it
 (`workspaces archive`) cuts off the box's API access at once and stops the box
 about a minute later: put the box's own id last when archiving several, and
 unarchive from a signed-in client.
+
+**pdev signs in to its router with the box's credential.** On a laptop pdev
+gets a token from `superset auth mcp-headers`, which a box refuses because it
+holds no token. The firewall adds the same `x-superset-sandbox-credential` to
+requests for `router.superset.sh`, and the router passes it to `user.me` and
+`user.myOrganization`, so pdev runs as the workspace's creator in the box's
+organization. The box sets `PDEV_TOKEN` to the placeholder only so pdev skips
+the CLI; the router ignores a key without the `pdev_` prefix.
+
+The same credential also names the box itself, which is what host-service's
+own calls about its workspace need: an automation's workspace has no creator,
+and a box keeps working after its creator leaves the organization. Those calls
+are the `sandbox` router, built on `sandboxProcedure`, which takes the
+workspace from the credential and never from the input and needs no creator
+or allowlist entry. Anything in the box can call them, so each must be safe
+for an agent to call on its own workspace. `agent-status` and `credentials`
+predate it and are still plain routes authenticated by the host secret.
 
 **Docker is installed but not started.** An environment whose repository needs
 containers starts it from its own `start` command, which is also where it
@@ -239,7 +309,7 @@ is frozen because its golden was built for it. host-service seeds one
 project and one workspace row per checkout; the primary's row carries the cloud workspace's
 id, the others get ids derived from it and the path, so anything keyed on the cloud id (the
 desktop route, the agent launch, the terminals) lands in the primary and the rest are
-siblings. The `start` hook runs in the hooks repository's checkout, not in `/workspace`.
+siblings. The `start` hook runs in the primary repository's checkout, not in `/workspace`.
 
 **The checkout is the workspace.** No worktrees and no base repo — anything
 assuming a worktree can be created or discarded next to a main checkout has
@@ -306,6 +376,14 @@ missing. The CLI bundle has the same gap.
 
 ## Lifecycle
 
+**A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
+reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
+session length. Vercel's server-side tag filter uses creation-order pagination
+even when that sort is requested. An old stopped entry therefore hid older
+workspaces that had resumed recently, leaving them running without meter records.
+`listActiveWorkspaceSandboxes` now lists without the tag filter and checks
+`kind: workspace` locally, so the status-time cutoff is safe.
+
 **Delete was not wired.** The generic delete routed to the owning host, which
 for a cloud workspace deleted the row *inside* the sandbox and left the
 sandbox running (and billing) plus the `cloud_workspaces` row intact — the
@@ -319,6 +397,14 @@ rows read the same collection as every other row.
 
 **Drag ordering isn't wired** — the cloud section sits outside the DnD
 containers. **Open.**
+
+**Sleep stops nothing a sandbox started on a third party.** On a machine
+someone owns, quitting the app disposes host-service, which stops what it
+started. A sandbox that goes to sleep is stopped from outside, so a remote
+resource started from it keeps running. Measured with an EAS simulator
+session: it stayed `IN_PROGRESS` (and billed) after `workspaces sleep`.
+**Open**; `apps/mobile/scripts/eas-dev.sh` starts its session with an idle
+timeout, which bounds it.
 
 **A sandbox's host-service is frozen at the version it was provisioned with,
 and nothing updates it. Open, and the most consequential item on this list.**
@@ -397,14 +483,24 @@ the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, four hours, extended while a workspace is open) or on
+(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
-an unattended agent run has to finish within a session, and the idle stop
-must not fire on a workspace someone is using — which is what the open
-workspace's `wake` on every token refresh is for. Sessions cap at 24 hours on
-the plan; past that the extension is refused and the next open resumes.
+the idle stop must not fire on a workspace someone is using — which is what
+the open workspace's `wake` on every token refresh is for — nor under an
+agent that is still working. For that the box itself asks: on agent activity
+(any hook event from a terminal agent or one of its subagents, any item of a
+chat turn), at most every fifteen minutes, `sandbox-keepalive` in host-service
+calls `sandbox.keepalive`, and the API tops the session up to a full timeout
+(`topUpSandboxSession`). The box then stops a
+session timeout after its agent last did anything. An agent waiting on a
+permission prompt, a hung one, and a background shell or dev server left
+running after the turn all count as idle. A single tool call that runs longer
+than the timeout without a hook event is also idle, and is stopped. Top-ups go
+through the session, never `Sandbox.extendTimeout`, which resumes a session
+that stopped meanwhile. Sessions cap at 24 hours on the plan; past that the
+extension is refused, the session ends and the next open resumes.
 
 **A fork starts from the source's snapshot, not its live filesystem.** A
 golden is therefore a *stopped* sandbox: `promoteSandboxToEnvironment` takes

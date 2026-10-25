@@ -1,4 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
@@ -16,16 +18,24 @@ interface WorkspaceStateGlyphProps {
 }
 
 /**
- * Row state glyph. Live agent states pulse; review uses the app-wide green
- * review dot (sidebar rows, tab accessories); everything else reuses the
- * section headers' icon set so the vocabulary matches at both levels.
+ * Row state glyph, by precedence: the sandbox's own state (nothing runs in a
+ * dead or unborn box), then live agent states (pulse), then the finished
+ * dot the sidebar rows and tab accessories use, then the section headers'
+ * icon set so the vocabulary matches at both levels.
  */
 export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
-	const { agentStatus } = workspace;
+	const { t } = useLingui();
+	const { agentStatus, sandboxStatus } = workspace;
 
 	let glyph: React.ReactNode;
 	let label: string;
-	if (
+	if (sandboxStatus === "failed") {
+		glyph = <StatusIndicator status="failed" />;
+		label = t({ message: "Sandbox stopped responding" });
+	} else if (sandboxStatus === "provisioning") {
+		glyph = <WaveSpinner className="text-muted-foreground/60" />;
+		label = t({ message: "Creating the sandbox" });
+	} else if (
 		agentStatus === "working" ||
 		agentStatus === "permission" ||
 		agentStatus === "failed"
@@ -34,7 +44,7 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 		label = getStatusTooltip(agentStatus);
 	} else {
 		const column = deriveBoardColumn(workspace);
-		if (column === "review") {
+		if (column === "finished") {
 			glyph = <StatusIndicator status="review" />;
 			label = getStatusTooltip("review");
 		} else {

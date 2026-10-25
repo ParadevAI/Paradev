@@ -8,7 +8,8 @@ import {
 } from "@superset/local-db";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { app, clipboard, shell } from "electron";
+import { app, clipboard, nativeImage, shell } from "electron";
+import { writeClipboardImage } from "main/lib/clipboard-image";
 import { localDb } from "main/lib/local-db";
 import { externalUrlLogLabel, isSafeExternalUrl } from "main/lib/safe-url";
 import { z } from "zod";
@@ -244,12 +245,27 @@ export const createExternalRouter = () => {
 				}
 			}),
 
+		copyImage: publicProcedure
+			.input(z.object({ pngBase64: z.string().min(1).max(70_000_000) }))
+			.mutation(async ({ input }) => {
+				const image = nativeImage.createFromBuffer(
+					Buffer.from(input.pngBase64, "base64"),
+				);
+				if (image.isEmpty()) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Not a decodable image",
+					});
+				}
+				await writeClipboardImage(image);
+			}),
+
 		copyPath: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-			clipboard.writeText(input);
+			await clipboard.writeText(input);
 		}),
 
 		copyText: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-			clipboard.writeText(input);
+			await clipboard.writeText(input);
 		}),
 
 		resolvePath: publicProcedure

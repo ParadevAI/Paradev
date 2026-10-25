@@ -35,6 +35,22 @@ describe("cloud agent launch", () => {
 		expect(readCloudAgentLaunch(env)?.surface).toBe("chat");
 	});
 
+	it("carries an automation run id and drops one that is not a uuid", () => {
+		const runId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+		const env = cloudAgentLaunchToEnv({
+			agent: "claude",
+			prompt: "triage",
+			automationRunId: runId,
+		});
+		expect(readCloudAgentLaunch(env)?.automationRunId).toBe(runId);
+		expect(
+			readCloudAgentLaunch({
+				...env,
+				SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID: "not-a-uuid",
+			})?.automationRunId,
+		).toBeUndefined();
+	});
+
 	it("refuses an agent the sandbox does not install", () => {
 		expect(
 			cloudAgentLaunchSchema.safeParse({ agent: "nope", prompt: "" }).success,

@@ -6,7 +6,7 @@ const NEAR_MARGIN = "800px 0px";
 
 function omittedBodyIds(row: TranscriptRow): string[] {
 	const items =
-		row.kind === "tool_run" ? row.items : row.kind === "item" ? [row.item] : [];
+		row.kind === "tool_run" ? row.steps : row.kind === "item" ? [row.item] : [];
 	return items.filter(hasOmittedBody).map((item) => item.id);
 }
 

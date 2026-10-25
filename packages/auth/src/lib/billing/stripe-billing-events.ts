@@ -175,6 +175,7 @@ export async function handleStripeBillingEvent(
 			| undefined;
 
 		if (!stripeSubId) return;
+		if (invoice.amount_due <= 0) return;
 
 		// Matched on the Stripe id, not the organization: an organization
 		// that resubscribed has several rows and the wrong one can win.
@@ -224,6 +225,7 @@ export async function handleStripeBillingEvent(
 
 	if (event.type === "invoice.paid") {
 		const invoice = event.data.object as Stripe.Invoice;
+		if (invoice.amount_paid <= 0) return;
 
 		const subscriptionDetails =
 			invoice.parent?.subscription_details ?? undefined;

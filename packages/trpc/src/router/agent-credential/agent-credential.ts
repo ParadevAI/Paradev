@@ -5,17 +5,58 @@ import {
 } from "@superset/db/schema";
 import {
 	agentCredentialToEnv,
+	CHATGPT_PROVIDER,
 	gatewayBaseUrl,
 } from "@superset/shared/agent-credentials";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { jwtProcedure, userError } from "../../trpc";
+import {
+	accessTokenExpiresAt,
+	CHATGPT_DEVICE_URL,
+	ChatgptSignInError,
+	type ChatgptTokens,
+	chatgptIdentity,
+	chatgptTokensSchema,
+	pollDeviceCode,
+	refreshChatgptTokens,
+	requestDeviceCode,
+} from "./utils/chatgpt";
 import { decryptAgentCredential, encryptAgentCredential } from "./utils/crypto";
 import { checkPublicEndpoint } from "./utils/public-endpoint";
 import { validateAgentCredential } from "./utils/validate";
 
 const agentId = z.string().min(1).max(64);
+
+/** Binds a pending device code to the person who started it. */
+const DEVICE_CODE_CONTEXT = "codex-device-code";
+
+const deviceCodeHandleSchema = z.object({
+	deviceAuthId: z.string(),
+	userCode: z.string(),
+});
+
+/** A ChatGPT access token lasts ten days; renew well before a box sees it lapse. */
+const CHATGPT_REFRESH_WINDOW_MS = 2 * 24 * 60 * 60 * 1000;
+
+function chatgptSignInError(error: unknown): never {
+	if (error instanceof ChatgptSignInError && error.reason === "unreachable") {
+		throw userError({
+			code: "BAD_GATEWAY",
+			message: "Could not reach the provider. Try again.",
+			i18nKey: "serverError.agentCredential.providerUnreachable",
+		});
+	}
+	if (error instanceof ChatgptSignInError) {
+		throw userError({
+			code: "BAD_REQUEST",
+			message: "OpenAI did not complete the sign-in. Start again.",
+			i18nKey: "serverError.agentCredential.chatgptSignInFailed",
+		});
+	}
+	throw error;
+}
 
 export const agentCredentialRouter = {
 	/** What settings shows: which agents are signed in, never the credential. */
@@ -147,6 +188,82 @@ export const agentCredentialRouter = {
 			return { agent: input.agent, kind: input.kind };
 		}),
 
+	/**
+	 * Starts Codex's ChatGPT device-code sign-in. The person approves the code
+	 * on OpenAI's page; the handle carries the pending code back to
+	 * `pollChatgptSignIn`, sealed to them so nobody else can finish it.
+	 */
+	startChatgptSignIn: jwtProcedure.mutation(async ({ ctx }) => {
+		const code = await requestDeviceCode().catch(chatgptSignInError);
+		return {
+			handle: encryptAgentCredential(
+				JSON.stringify({
+					deviceAuthId: code.deviceAuthId,
+					userCode: code.userCode,
+				}),
+				{ userId: ctx.userId, agent: DEVICE_CODE_CONTEXT },
+			),
+			userCode: code.userCode,
+			verificationUrl: CHATGPT_DEVICE_URL,
+			intervalSeconds: code.intervalSeconds,
+		};
+	}),
+
+	/** One check of a pending sign-in; stores the session once it is approved. */
+	pollChatgptSignIn: jwtProcedure
+		.input(z.object({ handle: z.string().min(1).max(4096) }))
+		.mutation(async ({ ctx, input }) => {
+			let pending: z.infer<typeof deviceCodeHandleSchema>;
+			try {
+				pending = deviceCodeHandleSchema.parse(
+					JSON.parse(
+						decryptAgentCredential(input.handle, {
+							userId: ctx.userId,
+							agent: DEVICE_CODE_CONTEXT,
+						}),
+					),
+				);
+			} catch {
+				throw userError({
+					code: "BAD_REQUEST",
+					message: "OpenAI did not complete the sign-in. Start again.",
+					i18nKey: "serverError.agentCredential.chatgptSignInFailed",
+				});
+			}
+			const tokens = await pollDeviceCode(pending).catch(chatgptSignInError);
+			if (!tokens) return { status: "pending" as const };
+
+			const accountLabel = chatgptIdentity(tokens.idToken).email;
+			const row = {
+				userId: ctx.userId,
+				agent: "codex",
+				kind: "subscription" as const,
+				encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
+					userId: ctx.userId,
+					agent: "codex",
+				}),
+				baseUrl: null,
+				provider: CHATGPT_PROVIDER,
+				accountLabel,
+				lastValidatedAt: new Date(),
+			};
+			await dbWs
+				.insert(agentCredentials)
+				.values(row)
+				.onConflictDoUpdate({
+					target: [agentCredentials.userId, agentCredentials.agent],
+					set: {
+						kind: row.kind,
+						encryptedValue: row.encryptedValue,
+						baseUrl: row.baseUrl,
+						provider: row.provider,
+						accountLabel: row.accountLabel,
+						lastValidatedAt: row.lastValidatedAt,
+					},
+				});
+			return { status: "connected" as const, accountLabel };
+		}),
+
 	remove: jwtProcedure
 		.input(z.object({ agent: agentId }))
 		.mutation(async ({ ctx, input }) => {
@@ -163,31 +280,138 @@ export const agentCredentialRouter = {
 } satisfies TRPCRouterRecord;
 
 /**
- * The env every agent a person has signed in contributes to a cloud workspace
+ * A ChatGPT sign-in as a box needs it: the access token for the firewall and
+ * who it is. Never the refresh token, and never the id token itself, which
+ * OpenAI would trade for more.
+ */
+export interface CodexChatgptSignIn {
+	accessToken: string;
+	accountId: string;
+	identity: ReturnType<typeof chatgptIdentity>;
+}
+
+export interface AgentSignIns {
+	/** What each signed-in agent reads from its environment. */
+	env: Record<string, string>;
+	codexChatgpt: CodexChatgptSignIn | null;
+}
+
+type AgentCredentialRow = typeof agentCredentials.$inferSelect;
+
+function decryptRow(row: AgentCredentialRow): string {
+	return decryptAgentCredential(row.encryptedValue, {
+		userId: row.userId,
+		agent: row.agent,
+	});
+}
+
+function isFresh(tokens: ChatgptTokens): boolean {
+	const expiresAt = accessTokenExpiresAt(tokens.accessToken);
+	return (
+		!!expiresAt && expiresAt.getTime() - Date.now() > CHATGPT_REFRESH_WINDOW_MS
+	);
+}
+
+/**
+ * The stored ChatGPT session, renewed first when its access token is close to
+ * expiring. The row is locked for the renewal: a refresh token works once, so
+ * two boxes renewing together would sign the person out. Null once OpenAI
+ * refuses the session: the row is removed so Settings asks for a new sign-in.
+ */
+async function currentChatgptTokens(
+	row: AgentCredentialRow,
+): Promise<ChatgptTokens | null> {
+	const stored = chatgptTokensSchema.parse(JSON.parse(decryptRow(row)));
+	if (isFresh(stored)) return stored;
+	const save = (tokens: ChatgptTokens) => ({
+		encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
+			userId: row.userId,
+			agent: row.agent,
+		}),
+		lastValidatedAt: new Date(),
+	});
+	let renewed: ChatgptTokens | null = null;
+	try {
+		return await dbWs.transaction(async (tx) => {
+			const [locked] = await tx
+				.select()
+				.from(agentCredentials)
+				.where(eq(agentCredentials.id, row.id))
+				.for("update");
+			if (!locked) return stored;
+			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
+			if (isFresh(current)) return current;
+			renewed = await refreshChatgptTokens(current);
+			await tx
+				.update(agentCredentials)
+				.set(save(renewed))
+				.where(eq(agentCredentials.id, locked.id));
+			return renewed;
+		});
+	} catch (error) {
+		if (renewed) {
+			await dbWs
+				.update(agentCredentials)
+				.set(save(renewed))
+				.where(eq(agentCredentials.id, row.id))
+				.catch((saveError) =>
+					console.error(
+						"[agent-credential] renewed ChatGPT sign-in was not saved",
+						saveError,
+					),
+				);
+			return renewed;
+		}
+		if (error instanceof ChatgptSignInError && error.reason === "rejected") {
+			console.warn(
+				"[agent-credential] OpenAI refused the ChatGPT sign-in; removing it",
+			);
+			await dbWs
+				.delete(agentCredentials)
+				.where(eq(agentCredentials.id, row.id));
+			return null;
+		}
+		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);
+		return stored;
+	}
+}
+
+/**
+ * What every agent a person has signed in contributes to a cloud workspace
  * they start — not only the one launched with it, since any of them can be
  * started from a terminal later. Server-side only: the plaintext never leaves
  * this process except on the sandbox it was fetched for.
  */
-export async function resolveAgentCredentialEnv(args: {
+export async function resolveAgentSignIns(args: {
 	userId: string;
-}): Promise<Record<string, string>> {
+}): Promise<AgentSignIns> {
 	const rows = await db
 		.select()
 		.from(agentCredentials)
 		.where(eq(agentCredentials.userId, args.userId));
-	return Object.assign(
-		{},
-		...rows.map((row) =>
+	const env: Record<string, string> = {};
+	let codexChatgpt: CodexChatgptSignIn | null = null;
+	for (const row of rows) {
+		if (row.agent === "codex" && row.provider === CHATGPT_PROVIDER) {
+			const tokens = await currentChatgptTokens(row);
+			if (!tokens) continue;
+			codexChatgpt = {
+				accessToken: tokens.accessToken,
+				accountId: tokens.accountId,
+				identity: chatgptIdentity(tokens.idToken),
+			};
+			continue;
+		}
+		Object.assign(
+			env,
 			agentCredentialToEnv({
 				agent: row.agent,
 				kind: row.kind,
-				value: decryptAgentCredential(row.encryptedValue, {
-					userId: row.userId,
-					agent: row.agent,
-				}),
+				value: decryptRow(row),
 				baseUrl: row.baseUrl,
 				provider: row.provider,
 			}),
-		),
-	);
+		);
+	}
+	return { env, codexChatgpt };
 }

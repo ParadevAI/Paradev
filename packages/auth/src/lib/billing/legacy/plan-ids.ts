@@ -9,6 +9,16 @@ export const PRO_MONTHLY_PLAN_ID = "pro";
 /** @deprecated See PRO_MONTHLY_PLAN_ID. */
 export const PRO_ANNUAL_PLAN_ID = "pro_annual";
 
+/**
+ * @deprecated The only plans released clients know. A client that sends no
+ * `currentPlanId` is one of them and must not change any other plan.
+ */
+// TODO(2027-01-31): drop with the desktops that predate currentPlanId.
+export const LEGACY_CLIENT_PLAN_IDS: readonly string[] = [
+	PRO_MONTHLY_PLAN_ID,
+	PRO_ANNUAL_PLAN_ID,
+];
+
 /** @deprecated See PRO_MONTHLY_PLAN_ID. */
 export function autumnPlanIdFor(annual: boolean): string {
 	return annual ? PRO_ANNUAL_PLAN_ID : PRO_MONTHLY_PLAN_ID;

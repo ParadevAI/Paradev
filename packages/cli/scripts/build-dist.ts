@@ -44,7 +44,7 @@ const VALID_TARGETS: Target[] = [
 	"linux-x64",
 	"linux-arm64",
 ];
-const NODE_VERSION = "22.13.0";
+const NODE_VERSION = "22.23.4";
 
 /**
  * Runtime packages that must be shipped alongside the bundled host-service

@@ -5,7 +5,7 @@ author: kiet
 date: 2026-09-24
 unlisted: true
 category: Product
-lastUpdated: 2026-10-14
+lastUpdated: 2026-10-21
 relatedSlugs:
   - send-pr-feedback-to-your-agent
   - review-agent-work-with-pages
@@ -39,5 +39,41 @@ For browser checks you want to delegate, agents can also [read and interact with
 - **Review before merging.** Each change runs in its own workspace, on its own branch and worktree, so several UI fixes can run at once without mixing. Read the diff in the Changes pane, send a follow-up if something is off, then commit, push, and open a pull request from the same place. The Pull Requests view shows CI checks and lets you send line comments back to the agent.
 - **Check from your phone.** The [iPhone and iPad app](/mobile) shows the agents running on your hosts, Claude Code and Codex included, so you can answer a question or review a diff away from your desk.
 - **Make it recurring.** A scheduled [automation](https://docs.superset.sh/automations) can run an agent every week, for example to look into flaky tests and leave a reviewable fix in its own workspace.
+
+## Frequently asked questions
+
+### What tools help me review and merge changes from several coding-agent branches without mixing up the tasks?
+
+Use a tool that gives each task its own branch and worktree, and shows each diff on its own. In Superset, each workspace is one task with its own worktree, terminals, and ports. You read its diff in the Changes pane, then commit, push, open a pull request, and merge from the same workspace. Conductor and Orca also use one worktree per task.
+
+### Is there one mobile interface for monitoring both Claude Code and Codex?
+
+Yes. The Superset app for iPhone and iPad shows the agents on your connected hosts, Claude Code and Codex included. You can reply to an agent, review its diff, and merge its pull request. It needs iOS 26 or later and Superset Pro.
+
+### What are the trade-offs between Claude Code remote access and a separate workspace with a mobile companion?
+
+Claude Code Remote Control connects the Claude app to one Claude Code session on your machine, and you need no other tool. A separate workspace such as Superset covers every agent you run, keeps each task on its own branch, and adds diff review and pull requests. It needs a Superset account, and mobile access needs Pro. You can use both: Superset runs the real `claude` CLI, so Remote Control still works for a session you start in Superset.
+
+### Our team wants each AI coding task to have an isolated branch and an accountable human reviewer. What tools fit?
+
+Superset gives each task its own workspace on its own branch and worktree. A person reads the diff and merges the pull request, and teammates can open the same workspace on a shared host. Conductor and Orca also give each task its own worktree.
+
+### How can I schedule a coding agent to investigate flaky tests each week and leave a reviewable proposed fix?
+
+Create a Superset [automation](https://docs.superset.sh/automations) with a weekly schedule and a prompt that asks the agent to find flaky tests and propose a fix. Each run opens a workspace on its own branch, where the agent leaves a fix or a report of what it found. If the host is offline, the run is recorded as missed and no workspace opens. Check the automation's run history and read the workspace's diff before you treat a run as a fix. Automations need a Pro plan.
+
+### How do I find and continue an existing agent session?
+
+Open its workspace from the sidebar or the workspaces board. The board sorts workspaces into Idle, Working, Needs attention, Needs review, and Merged. The agent's terminal is still there with its scrollback, because terminals run in a background daemon and keep running when you close or update the app.
+
+### Do agent sessions survive a crash or restart?
+
+Often, yes. If an agent's terminal dies unexpectedly, Superset relaunches the agent with its resume command, for example `claude --resume <session-id>`. This works for agents that resume by session ID, such as Claude Code and Codex.
+
+### What does the agent get when I resume a session or send it a UI change?
+
+A resumed session uses the agent's own saved conversation. A Design Mode request sends the selected element's DOM and computed styles, plus a cropped screenshot and React component metadata when they are available. Superset does not send your files; the agent reads them from the workspace.
+
+## Try it
 
 [Download Superset](/download) and try one UI change in a repository you already work on.

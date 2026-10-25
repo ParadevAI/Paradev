@@ -9,7 +9,7 @@ import {
 	buttonStyle,
 	frame,
 } from "@expo/ui/swift-ui/modifiers";
-import { useEffect, useRef } from "react";
+import { type ComponentProps, useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
 import { cn } from "@/lib/utils";
 
@@ -36,12 +36,14 @@ const OUT_MS = 160;
  * .glass is always available and needs no fallback.
  */
 export function ScrollToBottomButton({
+	systemName,
 	visible,
 	onPress,
 	bottomInset = 0,
 	className,
 	diameter,
 }: {
+	systemName: NonNullable<ComponentProps<typeof SwiftUIImage>["systemName"]>;
 	visible: boolean;
 	onPress: () => void;
 	bottomInset?: number;
@@ -88,7 +90,7 @@ export function ScrollToBottomButton({
 					]}
 				>
 					<SwiftUIImage
-						systemName="chevron.down"
+						systemName={systemName}
 						size={18}
 						color="#fafafa"
 						modifiers={

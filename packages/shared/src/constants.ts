@@ -1,5 +1,6 @@
 import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
+import { BRAND } from "./brand";
 
 export { CANONICAL_URLS, IOS_APP } from "./app-identity";
 
@@ -26,7 +27,8 @@ const MARKETING_URL =
 const APP_STORE_ID = "6788926383";
 
 export const COMPANY = {
-	NAME: "Superset",
+	NAME: BRAND.NAME,
+	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
 	GITHUB_URL: "https://github.com/superset-sh/superset",
@@ -52,6 +54,15 @@ export const COMPANY = {
 	/** The formal YC listing; product surfaces link here. `JOIN_US_URL` is our own marketing page. */
 	CAREERS_URL: "https://www.ycombinator.com/companies/superset/jobs",
 } as const;
+
+// Staff keep their @superset.sh accounts after the root domain changes.
+export const STAFF_EMAIL_DOMAINS = [
+	...new Set([COMPANY.EMAIL_DOMAIN, "@superset.sh"]),
+];
+
+export function isStaffEmail(email: string): boolean {
+	return STAFF_EMAIL_DOMAINS.some((domain) => email.endsWith(domain));
+}
 
 export const OPEN_ROLES = [
 	{
@@ -117,12 +128,8 @@ export const FEATURE_FLAGS = {
 	 * hash the site's single distinct id to one side.
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
-	/** Gates access to Cloud features (environment variables, sandboxes). */
-	CLOUD_ACCESS: "cloud-access",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
-	/** When enabled, blocks remote agent execution on the desktop (e.g., for enterprise orgs). */
-	DISABLE_REMOTE_AGENT: "disable-remote-agent",
 	/**
 	 * Paces the v1→v2 auto-migration rollout (percentage ramp + high-profile
 	 * org exclusions). Gates only NEW migrations on the v1 surface — post-flip
@@ -139,8 +146,6 @@ export const FEATURE_FLAGS = {
 	 * it to reach users who cross the threshold later.
 	 */
 	HIRING_BANNER: "hiring-banner",
-	/** Shows the "Star Superset on GitHub" sidebar card once a user crosses the workspace-count threshold. Lets us kill the nag instantly without a release if it reads as annoying. */
-	STAR_NAG_CARD: "star-nag-card",
 	/**
 	 * Which trigger providers the Add Trigger menu offers. Payload is a JSON
 	 * array of provider kinds, e.g. `["github", "slack"]`; Scheduled is always
@@ -155,38 +160,6 @@ export const FEATURE_FLAGS = {
 	 * when its triggers are.
 	 */
 	AUTOMATION_EVENT_TRIGGERS: "automation-event-triggers",
-	/**
-	 * Three-arm experiment flag nested inside the shipped new-workspace screen,
-	 * testing form factor only: `control` keeps the inline sample-prompt rows,
-	 * `cards2` shows two cards above the composer, `cards4` shows four in a 2x2
-	 * grid. Every arm slices a nested prefix of one fixed prompt pool and shares
-	 * the same selection rule, so content is identical and only layout and count
-	 * vary. Evaluated when the screen opens, so exposure matches the population
-	 * that sees it.
-	 *
-	 * Anything other than `cards2`/`cards4` renders control — which is why the
-	 * flag must not go live before a build carrying those arms ships, or older
-	 * builds would be assigned a card arm and shown rows.
-	 *
-	 * Eligibility (new accounts only) is a release condition on the flag, not
-	 * code: a `created_at` person property cutoff, which the renderer sends with
-	 * flag requests at identify time. Existing accounts get `false` back and
-	 * render the rows exactly as they do today, with no exposure recorded.
-	 */
-	NEW_WORKSPACE_PROMPT_CARDS: "new-workspace-prompt-cards",
-	/**
-	 * Boolean override that forces the `cards2` arm without evaluating the
-	 * experiment flag — no exposure event, so team and dev accounts can look at
-	 * the cards without entering the analysis. Checked before the experiment
-	 * flag.
-	 */
-	NEW_WORKSPACE_PROMPT_CARDS_OVERRIDE: "new-workspace-prompt-cards-override",
-	/**
-	 * Shows the rebuilt chat pane (ChatV3Pane). UI-only: host-service always
-	 * serves its `/chat-v3/*` routes, so this flag decides who sees the pane,
-	 * not what the host can do — flips take effect live, with no host restart.
-	 */
-	CHAT_V3: "chat-v3",
 	/**
 	 * Replaces the v2 workspace's right sidebar with a second pane area that
 	 * holds Files, Changes, Review, Browser and Chat panes.
@@ -226,6 +199,14 @@ export const FEATURE_FLAGS = {
 	 * release condition on the flag, so widening never needs a release.
 	 */
 	ACP_CHAT: "acp-chat",
+	MOBILE_PANE: "mobile-pane",
+	/**
+	 * Shows the `pdev` agent: in the agent catalog, agent pickers
+	 * and, with ACP_CHAT, as a chat harness (`pdev acp`). Off, unloaded or
+	 * offline all hide it. Hosts never seed it, so a user only gets it by
+	 * adding it while the flag is on.
+	 */
+	PDEV_AGENT: "pdev-agent",
 } as const;
 
 /**
@@ -286,15 +267,11 @@ export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
 
-export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
-	"00000000-0000-0000-0000-000000000000";
-
-export const SHARED_ENVIRONMENT_NAME = "Default";
-
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
 // amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
-// the terminal from its XTVERSION reply ("xterm.js") and the CSI-u probe.
+// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
+// desktop terminal-version-reply) and the CSI-u probe.
 export const TERMINAL_IDENTITY_ENV_KEYS = [
 	"TERM_PROGRAM",
 	"TERM_PROGRAM_VERSION",

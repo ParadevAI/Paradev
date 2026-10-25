@@ -1,5 +1,4 @@
 import {
-	mergePresenceByUser,
 	parseRealtimeNudgeMessage,
 	REALTIME_NUDGE_KINDS,
 	type RealtimeNudgeKind,
@@ -15,7 +14,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 /**
  * One socket per window to the realtime Worker. The API sends a nudge after
- * it writes hosts, cloud workspaces or automation runs: a kind refetches the matching query,
+ * it writes hosts, cloud workspaces, pull requests or automation runs: a kind refetches the matching query,
  * a patch is applied to the cache without one, which is why neither polls.
  * A reopen refetches everything once, since nudges sent while the socket
  * was down are gone. Rendered inside the providers: the subscription needs
@@ -45,6 +44,12 @@ export function RealtimeNudges() {
 						void utils.taskLabel.list.invalidate(undefined, options);
 						void utils.taskProject.list.invalidate(undefined, options);
 						break;
+					case "pull_requests":
+						void utils.cloudWorkspace.pullRequests.invalidate(
+							undefined,
+							options,
+						);
+						break;
 					case "automation_runs":
 						void utils.automation.latestRuns.invalidate(undefined, options);
 						void utils.automation.listRuns.invalidate(undefined, options);
@@ -63,20 +68,8 @@ export function RealtimeNudges() {
 					if (!update) return row;
 					return {
 						...row,
-						...(update.agentStatusAt !== undefined && {
-							agentStatus: update.agentStatus ?? null,
-							agentStatusAt: new Date(update.agentStatusAt),
-						}),
-						...(update.presence && {
-							presence: mergePresenceByUser(
-								row.presence,
-								update.presence.map((person) => ({
-									...person,
-									lastSeenAt: new Date(person.lastSeenAt),
-								})),
-								(person) => person.lastSeenAt.getTime(),
-							),
-						}),
+						agentStatus: update.agentStatus,
+						agentStatusAt: new Date(update.agentStatusAt),
 					};
 				}),
 			);

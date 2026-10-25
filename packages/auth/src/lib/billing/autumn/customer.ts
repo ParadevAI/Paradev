@@ -4,7 +4,6 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { autumnClient } from "../../../autumn";
 import { stripeClient } from "../../../stripe";
 import { paidPlanIdFromFlags } from "./entitlements";
-import { SEATS_FEATURE_ID } from "./features";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,11 +47,17 @@ export async function ensureAutumnCustomer(organizationId: string) {
 	return customer;
 }
 
-export function getAutumnCustomer(organizationId: string) {
-	return autumnClient.customers.get({
-		customerId: organizationId,
-		expand: ["flags.feature", "subscriptions.plan", "invoices"],
-	});
+export function getAutumnCustomer(
+	organizationId: string,
+	options?: { timeoutMs?: number },
+) {
+	return autumnClient.customers.get(
+		{
+			customerId: organizationId,
+			expand: ["flags.feature", "subscriptions.plan", "invoices"],
+		},
+		options,
+	);
 }
 
 export async function paidAutumnPlanId(
@@ -60,33 +65,6 @@ export async function paidAutumnPlanId(
 ): Promise<string | null> {
 	const customer = await getAutumnCustomer(organizationId);
 	return paidPlanIdFromFlags(customer.flags);
-}
-
-export async function setAutumnSeats(
-	organizationId: string,
-	quantity: number,
-): Promise<boolean> {
-	const planId = await paidAutumnPlanId(organizationId);
-	if (!planId) {
-		console.error(
-			`[billing/seats] ${organizationId} has no paid Autumn plan; seats not set through Autumn`,
-		);
-		return false;
-	}
-	try {
-		await autumnClient.billing.update({
-			customerId: organizationId,
-			planId,
-			featureQuantities: [{ featureId: SEATS_FEATURE_ID, quantity }],
-		});
-		return true;
-	} catch (error) {
-		console.error(
-			`[billing/seats] ${organizationId} seats not set through Autumn; falling back to Stripe`,
-			error,
-		);
-		return false;
-	}
 }
 
 export async function organizationForStripeCustomer(

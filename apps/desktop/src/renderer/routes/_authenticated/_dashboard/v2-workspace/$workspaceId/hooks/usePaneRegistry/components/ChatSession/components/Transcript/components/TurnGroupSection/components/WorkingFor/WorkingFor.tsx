@@ -43,6 +43,8 @@ export function WorkingFor({
 		return () => clearInterval(timer);
 	}, [startedAtMs, completedAtMs, running]);
 
+	if (!running && seconds === 0 && !onToggle) return null;
+
 	const label =
 		seconds < 60
 			? running

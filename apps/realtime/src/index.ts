@@ -18,6 +18,7 @@ import {
 	verifyPageConnectTicket,
 } from "@superset/shared/usercontent";
 import { verifyJWT } from "@superset/shared/verify-jwt";
+import { parseVersionedWorkspaceAccess } from "@superset/shared/workspace-access";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -26,6 +27,7 @@ import { OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
 import { readBodyWithin } from "./utils/readBodyWithin";
+import { WORKSPACE_CLAIMS_HEADER, WorkspaceHub } from "./workspace-hub";
 
 type AppContext = { Bindings: RealtimeEnv };
 
@@ -336,6 +338,64 @@ app.get("/v2/page/:pageId/presence", async (c) => {
 	return stub.fetch("https://realtime/presence", { headers });
 });
 
+app.get("/organization/:organizationId/workspace/:workspaceId", async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const organizationId = c.req.param("organizationId");
+	const workspaceId = c.req.param("workspaceId");
+	if (!UUID.test(workspaceId)) return acceptAndClose(4403, "Not found");
+	const token = extractToken(c);
+	if (!token) return acceptAndClose(4401, "Unauthorized");
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth) return acceptAndClose(4401, "Unauthorized");
+	if (!auth.organizationIds.includes(organizationId)) {
+		return acceptAndClose(4403, "Not a member of this organization");
+	}
+	const { success } = await c.env.WORKSPACE_PRESENCE_BY_USER.limit({
+		key: auth.sub,
+	});
+	if (!success) return acceptAndClose(4429, "Too many requests");
+	const stub = await getServerByName(
+		c.env.WorkspaceHub,
+		`${organizationId}:${workspaceId}`,
+	);
+	const headers = new Headers({ Upgrade: "websocket" });
+	headers.set(
+		WORKSPACE_CLAIMS_HEADER,
+		JSON.stringify({
+			userId: auth.sub,
+			name: auth.name ?? "Someone",
+			image: auth.image ?? null,
+			organizationIds: auth.organizationIds,
+			teamIds: auth.teamIds,
+			observer: c.req.query("observe") === "1",
+		}),
+	);
+	return stub.fetch("https://realtime/presence", { headers });
+});
+
+app.post(
+	"/organization/:organizationId/workspace/:workspaceId/access",
+	async (c) => {
+		const token = extractToken(c);
+		if (!token || token !== c.env.NUDGE_SECRET) {
+			return c.json({ error: "Unauthorized" }, 401);
+		}
+		const versioned = parseVersionedWorkspaceAccess(
+			await c.req.json().catch(() => null),
+		);
+		if (!versioned) return c.json({ error: "access required" }, 400);
+		const organizationId = c.req.param("organizationId");
+		const stub = await getServerByName(
+			c.env.WorkspaceHub,
+			`${organizationId}:${c.req.param("workspaceId")}`,
+		);
+		await stub.accessChanged(versioned);
+		return c.json({ ok: true });
+	},
+);
+
 // ── Emit: the API, after a write ────────────────────────────────────
 
 app.post("/v2/nudge", async (c) => {
@@ -393,7 +453,15 @@ const InstrumentedPageHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	PageHub,
 );
-export { InstrumentedOrgHub as OrgHub, InstrumentedPageHub as PageHub };
+const InstrumentedWorkspaceHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	WorkspaceHub,
+);
+export {
+	InstrumentedOrgHub as OrgHub,
+	InstrumentedPageHub as PageHub,
+	InstrumentedWorkspaceHub as WorkspaceHub,
+};
 
 export default Sentry.withSentry(sentryOptions, {
 	fetch: app.fetch,

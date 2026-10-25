@@ -16,6 +16,9 @@ interface ConnectConnectorDialogProps {
 	icon?: ReactNode;
 	author?: string | null;
 	organizationId?: string | null;
+	connectOnly?: boolean;
+	plugin?: string;
+	onConnected?: () => void;
 	onOpenChange: (open: boolean) => void;
 }
 
@@ -24,6 +27,9 @@ export function ConnectConnectorDialog({
 	icon,
 	author,
 	organizationId,
+	connectOnly = false,
+	plugin,
+	onConnected,
 	onOpenChange,
 }: ConnectConnectorDialogProps) {
 	return (
@@ -39,7 +45,12 @@ export function ConnectConnectorDialog({
 						icon={icon}
 						author={author}
 						organizationId={organizationId}
-						onConnected={() => onOpenChange(false)}
+						connectOnly={connectOnly}
+						plugin={plugin}
+						onConnected={() => {
+							onConnected?.();
+							onOpenChange(false);
+						}}
 					/>
 				)}
 			</DialogContent>
@@ -52,12 +63,16 @@ function DialogBody({
 	icon,
 	author,
 	organizationId,
+	connectOnly,
+	plugin,
 	onConnected,
 }: {
 	slug: string;
 	icon?: ReactNode;
 	author?: string | null;
 	organizationId?: string | null;
+	connectOnly: boolean;
+	plugin?: string;
 	onConnected: () => void;
 }) {
 	const { t } = useLingui();
@@ -67,7 +82,7 @@ function DialogBody({
 	// Already connected means this is a manage view. The trust copy answers
 	// "should I grant this?", which was decided the first time; repeating it
 	// above a list of live accounts buries the thing the person came for.
-	const managing = connections.length > 0;
+	const managing = !connectOnly && connections.length > 0;
 
 	return (
 		<>
@@ -138,6 +153,8 @@ function DialogBody({
 			<ConnectorSection
 				slug={slug}
 				organizationId={organizationId}
+				connectOnly={connectOnly}
+				plugin={plugin}
 				onConnected={onConnected}
 			/>
 		</>

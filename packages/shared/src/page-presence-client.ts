@@ -1,4 +1,9 @@
-import { type PagePresenceViewer, presenceViewersFrom } from "./page-presence";
+import {
+	type PagePresenceViewer,
+	type PresenceVisitor,
+	presenceViewersFrom,
+	presenceVisitorsFrom,
+} from "./page-presence";
 
 interface PresenceSocketEvent {
 	data?: unknown;
@@ -22,6 +27,7 @@ export interface PagePresenceClient {
 export function openPagePresence({
 	url,
 	onViewers,
+	onVisitors,
 	createSocket = (address) =>
 		new WebSocket(address) as unknown as PresenceSocket,
 	retryBaseMs = 1000,
@@ -30,6 +36,7 @@ export function openPagePresence({
 }: {
 	url: () => Promise<string | null>;
 	onViewers: (viewers: PagePresenceViewer[]) => void;
+	onVisitors?: (visitors: PresenceVisitor[]) => void;
 	createSocket?: (address: string) => PresenceSocket;
 	retryBaseMs?: number;
 	retryMaxMs?: number;
@@ -44,6 +51,7 @@ export function openPagePresence({
 	let beatTimer: ReturnType<typeof setTimeout> | null = null;
 	let awaitingPong = false;
 	let ponged = false;
+	let visitors: PresenceVisitor[] = [];
 
 	const lost = (ws: PresenceSocket, code?: number) => {
 		if (ws !== socket) return;
@@ -54,6 +62,10 @@ export function openPagePresence({
 		ponged = false;
 		if (code === 4403 || code === 4429) refused = true;
 		onViewers([]);
+		if (visitors.some((visitor) => visitor.active)) {
+			visitors = visitors.map((visitor) => ({ ...visitor, active: false }));
+			onVisitors?.(visitors);
+		}
 		retry();
 		try {
 			ws.close();
@@ -103,7 +115,7 @@ export function openPagePresence({
 				ponged = true;
 				return;
 			}
-			let message: { type?: unknown; viewers?: unknown };
+			let message: { type?: unknown; viewers?: unknown; visitors?: unknown };
 			try {
 				message = JSON.parse(String(event.data));
 			} catch {
@@ -111,6 +123,10 @@ export function openPagePresence({
 			}
 			if (message.type === "presence") {
 				onViewers(presenceViewersFrom(message.viewers));
+				if (message.visitors !== undefined) {
+					visitors = presenceVisitorsFrom(message.visitors);
+					onVisitors?.(visitors);
+				}
 			}
 		});
 		ws.addEventListener("close", (event) => lost(ws, event?.code));

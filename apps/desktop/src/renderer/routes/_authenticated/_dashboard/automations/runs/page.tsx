@@ -379,9 +379,7 @@ function AutomationRunsPage() {
 										{status === "failed" ? (
 											<Trans>No failed runs.</Trans>
 										) : status === "missed" ? (
-											<Trans>
-												Every scheduled run so far found a host online.
-											</Trans>
+											<Trans>Every run so far found a host online.</Trans>
 										) : (
 											<Trans>Runs appear here once an automation fires.</Trans>
 										)}

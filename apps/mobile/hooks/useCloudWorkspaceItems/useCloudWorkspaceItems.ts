@@ -44,8 +44,7 @@ export function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 		tags: [],
 		createdAt: cloud.createdAt,
 		updatedAt: cloud.updatedAt,
-		// Agent activity is stamped by the sandbox host; unknown until opened.
-		lastActivityAt: null,
+		lastActivityAt: (cloud.agentStatusAt ?? cloud.createdAt).getTime(),
 		worktreePath: "",
 		worktreeExists: true,
 		projectName: null,

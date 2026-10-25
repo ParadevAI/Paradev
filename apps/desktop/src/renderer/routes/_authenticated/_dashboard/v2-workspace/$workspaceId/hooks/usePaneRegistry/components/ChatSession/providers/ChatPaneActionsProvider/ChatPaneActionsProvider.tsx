@@ -16,6 +16,9 @@ export type ChatPaneActions = {
 	/** Absent where the chat has no workspace to open pages into. */
 	openPage?: OpenPage | undefined;
 	openLink?: OpenLink | undefined;
+	/** Absent where messages can't be edited, such as while the chat resumes. */
+	editMessage?: ((itemId: string, text: string) => void) | undefined;
+	editableMessageIds?: ReadonlySet<string> | undefined;
 };
 
 const ChatPaneActionsContext = createContext<ChatPaneActions>({});
@@ -31,10 +34,26 @@ export function ChatPaneActionsProvider({
 	workspaceId,
 	openPage,
 	openLink,
+	editMessage,
+	editableMessageIds,
 }: ChatPaneActions & { children: ReactNode }) {
 	const value = useMemo<ChatPaneActions>(
-		() => ({ openFile, workspaceId, openPage, openLink }),
-		[openFile, workspaceId, openPage, openLink],
+		() => ({
+			openFile,
+			workspaceId,
+			openPage,
+			openLink,
+			editMessage,
+			editableMessageIds,
+		}),
+		[
+			openFile,
+			workspaceId,
+			openPage,
+			openLink,
+			editMessage,
+			editableMessageIds,
+		],
 	);
 	return (
 		<ChatPaneActionsContext.Provider value={value}>

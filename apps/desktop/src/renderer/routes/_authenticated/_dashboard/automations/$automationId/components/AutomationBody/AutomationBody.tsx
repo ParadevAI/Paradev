@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import type { DraftTrigger } from "@superset/shared/automation-triggers";
+import { isMachineSize } from "@superset/shared/billing";
 import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import type { RouterOutputs } from "@superset/trpc";
@@ -13,7 +14,7 @@ import { useMemo, useState } from "react";
 import { LuTriangleAlert } from "react-icons/lu";
 import { EmojiTextInput } from "renderer/components/EmojiTextInput";
 import { RichText } from "renderer/components/RichText";
-import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
+import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions/useWorkspaceHostOptions";
 import { AgentPicker } from "../../../components/AgentPicker";
@@ -86,6 +87,9 @@ export function AutomationBody({
 			v2WorkspaceId: automation.v2WorkspaceId,
 			cloudWorkspaceId: automation.cloudWorkspaceId,
 			environmentId: automation.environmentId,
+			machineSize: isMachineSize(automation.machineSize)
+				? automation.machineSize
+				: null,
 			tags: automation.tags,
 			continueAgentSession: automation.continueAgentSession,
 			triggers: automation.triggers.map((trigger) => ({
@@ -149,6 +153,7 @@ export function AutomationBody({
 	const hostId = draft.targetHostId ?? localHostId ?? null;
 	const { agents: hostAgents, isFetched: hostAgentsFetched } =
 		useAutomationAgentChoices(hostId);
+	const cloudAgents = useCloudAgentChoices();
 	// Only warn once the host's terminal configs have loaded — the Superset
 	// chat entry is flag-gated, so list length alone can't tell "not loaded
 	// yet / host unreachable" apart from "agent missing".
@@ -291,6 +296,7 @@ export function AutomationBody({
 								v2WorkspaceId: draft.v2WorkspaceId,
 								cloudWorkspaceId: draft.cloudWorkspaceId,
 								environmentId: draft.environmentId,
+								machineSize: draft.machineSize,
 								tags: draft.tags,
 								continueAgentSession: draft.continueAgentSession,
 							}}
@@ -299,7 +305,7 @@ export function AutomationBody({
 									...patch,
 									...(patch.targetHostId === CLOUD_HOST_ID &&
 									!isCloudAgentId(draft.agent)
-										? { agent: CLOUD_AGENT_CHOICES[0]?.id ?? draft.agent }
+										? { agent: cloudAgents[0]?.id ?? draft.agent }
 										: {}),
 								})
 							}

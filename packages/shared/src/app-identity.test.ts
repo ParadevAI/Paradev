@@ -60,7 +60,8 @@ describe("root-domain constants", () => {
 			const { CANONICAL_URLS, COMPANY } = loadConstants({
 				[key]: "example.org",
 			});
-			expect(CANONICAL_URLS.API).toBe("https://api.example.org");
+			expect(CANONICAL_URLS.API).toBe("https://api.superset.sh");
+			expect(CANONICAL_URLS.APP).toBe("https://app.example.org");
 			expect(CANONICAL_URLS.MARKETING).toBe("https://example.org");
 			expect(COMPANY.MAIL_TO).toBe("mailto:support@example.org");
 		}
