@@ -14,14 +14,13 @@ import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unava
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
 import { DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
+import { useDashboardSidebarActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarActionsProvider";
 import {
 	useMarkSidebarWorkspaceTerminalsSeen,
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
-import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { applyFolderTagChange } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
@@ -67,24 +66,17 @@ export function useDashboardSidebarWorkspaceItemActions({
 	const { isUnread } = useSidebarWorkspaceStatus(workspaceId);
 	const workspaceHostUrl = useWorkspaceHostUrl(workspaceId);
 	const queryClient = useQueryClient();
-	const { workspaces: hostWorkspaces } = useHostWorkspaces();
-	const sessionGroupTags = new Set(
-		hostWorkspaces.flatMap((workspace) =>
-			workspace.projectId === null
-				? normalizeWorkspaceTags(workspace.tags)
-				: [],
-		),
-	);
-	const currentWorkspaceTags = normalizeWorkspaceTags(
-		hostWorkspaces.find((workspace) => workspace.id === workspaceId)?.tags,
-	);
 
 	const clearWorkspaceAttention = () => {
 		clearManualUnread(workspaceId);
 		markWorkspaceTerminalsSeen();
 	};
-	const { createSection, moveWorkspaceToSection, setWorkspacePinned } =
-		useDashboardSidebarState();
+	const {
+		createSection,
+		getHostWorkspaces,
+		moveWorkspaceToSection,
+		setWorkspacePinned,
+	} = useDashboardSidebarActions();
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [renameValue, setRenameValue] = useState(workspaceName);
@@ -171,6 +163,17 @@ export function useDashboardSidebarWorkspaceItemActions({
 			return;
 		}
 		if (!isSessionWorkspace) return;
+		const hostWorkspaces = getHostWorkspaces();
+		const sessionGroupTags = new Set(
+			hostWorkspaces.flatMap((workspace) =>
+				workspace.projectId === null
+					? normalizeWorkspaceTags(workspace.tags)
+					: [],
+			),
+		);
+		const currentWorkspaceTags = normalizeWorkspaceTags(
+			hostWorkspaces.find((workspace) => workspace.id === workspaceId)?.tags,
+		);
 		void workspaceActions.updateWorkspace(workspaceId, {
 			tags: applyFolderTagChange(
 				currentWorkspaceTags,
