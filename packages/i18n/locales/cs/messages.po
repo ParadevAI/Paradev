@@ -9609,9 +9609,6 @@ msgstr "Naposledy aktualizováno: {lastUpdated}"
 msgid "Last used"
 msgstr "Naposledy použito"
 
-msgid "Last used: {lastUsedProviderLabel}"
-msgstr "Naposledy použito: {lastUsedProviderLabel}"
-
 msgid "Late 2026"
 msgstr "Konec 2026"
 

@@ -33,7 +33,10 @@ interface SortableWorkspaceItemProps {
 	 */
 	isDragPlaceholder?: boolean;
 	isSelected?: boolean;
-	onSelectionClick?: (event: WorkspaceSelectionEvent) => boolean;
+	onSelectionClick?: (
+		event: WorkspaceSelectionEvent,
+		workspaceId: string,
+	) => boolean;
 	/** Set for rows rendered inside the top-level Pinned section. */
 	pinnedContext?: { projectName: string | null; projectIconUrl: string | null };
 }
@@ -66,6 +69,15 @@ export function SortableWorkspaceItem({
 		disabled: disabled || isChildDragDisabled,
 	});
 
+	const workspaceId = workspace.id;
+	const handleSelectionClick = useMemo(
+		() =>
+			onSelectionClick
+				? (event: WorkspaceSelectionEvent) =>
+						onSelectionClick(event, workspaceId)
+				: undefined,
+		[onSelectionClick, workspaceId],
+	);
 	// useSortable re-renders this wrapper on every pointer move of any drag in
 	// the sidebar's DndContext; the row body (query hooks, menus) is expensive,
 	// so keep it referentially stable while only the wrapper transform changes.
@@ -78,7 +90,7 @@ export function SortableWorkspaceItem({
 				isInSection={isInSection}
 				indentation={indentation}
 				isSelected={isSelected}
-				onSelectionClick={onSelectionClick}
+				onSelectionClick={handleSelectionClick}
 				pinnedContext={pinnedContext}
 			/>
 		),
@@ -89,7 +101,7 @@ export function SortableWorkspaceItem({
 			isInSection,
 			indentation,
 			isSelected,
-			onSelectionClick,
+			handleSelectionClick,
 			pinnedContext,
 		],
 	);
