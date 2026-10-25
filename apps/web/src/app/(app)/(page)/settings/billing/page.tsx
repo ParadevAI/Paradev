@@ -8,9 +8,14 @@ import { BillingSettings } from "./components/BillingSettings";
 export default async function BillingPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ success?: string; organization?: string }>;
+	searchParams: Promise<{
+		success?: string;
+		organization?: string;
+		plan?: string;
+		interval?: string;
+	}>;
 }) {
-	const { success, organization } = await searchParams;
+	const { success, organization, plan, interval } = await searchParams;
 
 	if (success === "true") {
 		const i18n = await initServerI18n();
@@ -24,7 +29,7 @@ export default async function BillingPage({
 					{i18n._(
 						msg({
 							message:
-								"Your subscription has been activated. You can now access all Pro features.",
+								"Your subscription is active. Your new plan's features are ready to use.",
 						}),
 					)}
 				</p>
@@ -37,5 +42,17 @@ export default async function BillingPage({
 		);
 	}
 
-	return <BillingSettings organizationId={organization} />;
+	return (
+		<BillingSettings
+			organizationId={organization}
+			selectedPlan={plan}
+			yearly={
+				interval === "yearly"
+					? true
+					: interval === "monthly"
+						? false
+						: undefined
+			}
+		/>
+	);
 }

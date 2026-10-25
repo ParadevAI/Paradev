@@ -11,6 +11,11 @@ export const AIR_CLIENT_META = {
 	},
 };
 
+/** Asks session/fork to keep the conversation only up to and including `messageId`. */
+export function airForkPointMeta(messageId: string) {
+	return { jetbrains: { air: { fork: { version: 1, messageId } } } };
+}
+
 export const AIR_ASYNC_TASK_STOP_METHOD = "_session/async_task/stop";
 
 export const airAsyncTaskSpawnedSchema = z.looseObject({

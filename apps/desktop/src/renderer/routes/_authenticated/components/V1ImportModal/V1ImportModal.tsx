@@ -40,6 +40,7 @@ export function V1ImportModal() {
 
 	return (
 		<Dialog
+			modal
 			open={isOpen}
 			onOpenChange={(open) => {
 				if (!open) close();

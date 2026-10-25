@@ -5,17 +5,19 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import {
 	SidebarCardSlot,
 	useHiringCard,
 	usePaymentFailedCard,
-	useStarNagCard,
+	useReleaseNotesCard,
 } from "renderer/components/SidebarCardSlot";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -31,6 +33,7 @@ import {
 import { isInCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import {
@@ -39,7 +42,6 @@ import {
 } from "./components/DashboardSidebarActiveWorkspaceSwitcher";
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
-import { DashboardSidebarCloudSection } from "./components/DashboardSidebarCloudSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
@@ -71,6 +73,10 @@ import type {
 	DashboardSidebarWorkspace,
 } from "./types";
 import { filterDashboardSidebarProjects } from "./utils/filterDashboardSidebarProjects";
+import {
+	filterDashboardSidebarProjectsByHost,
+	matchesHostFilter,
+} from "./utils/filterDashboardSidebarProjectsByHost";
 import { getProjectChildrenWorkspaces } from "./utils/projectChildren";
 import { sortDashboardSidebarProjects } from "./utils/sortDashboardSidebarProjects";
 
@@ -149,10 +155,12 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 	);
 });
 
-export function DashboardSidebar({
+export const DashboardSidebar = memo(function DashboardSidebar({
 	isCollapsed = false,
 }: DashboardSidebarProps) {
 	const { t } = useLingui();
+	const isCloudEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const {
 		groups,
 		hiddenProjects,
@@ -187,8 +195,17 @@ export function DashboardSidebar({
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.workspaces,
 	);
-	const { preferences, setSidebarProjectSortMode } = useV2UserPreferences();
+	const {
+		preferences,
+		setSidebarProjectSortMode,
+		setSidebarProjectHostFilter,
+	} = useV2UserPreferences();
 	const sortMode = preferences.sidebarProjectSortMode;
+	// The icon rail has no control for the filter, so it rests there.
+	const hostFilter =
+		isCloudEnabled && !isCollapsed
+			? preferences.sidebarProjectHostFilter
+			: "all";
 	const [projectFilterQuery, setProjectFilterQuery] = useState("");
 	// The icon rail hides the Projects header (and its filter input); a
 	// filter left active there would invisibly hide projects.
@@ -220,16 +237,39 @@ export function DashboardSidebar({
 				: sortDashboardSidebarProjects(orderedGroups, sortMode),
 		[sortMode, orderedGroups],
 	);
+	const hostFilteredGroups = useMemo(
+		() => filterDashboardSidebarProjectsByHost(sortedGroups, hostFilter),
+		[sortedGroups, hostFilter],
+	);
+	const displayedPinnedWorkspaces = useMemo(
+		() =>
+			hostFilter === "all"
+				? pinnedWorkspaces
+				: pinnedWorkspaces.filter((workspace) =>
+						matchesHostFilter(workspace, hostFilter),
+					),
+		[pinnedWorkspaces, hostFilter],
+	);
+	const displayedSessionWorkspaces = useMemo(
+		() =>
+			hostFilter === "all"
+				? sessionWorkspaces
+				: sessionWorkspaces.filter((workspace) =>
+						matchesHostFilter(workspace, hostFilter),
+					),
+		[sessionWorkspaces, hostFilter],
+	);
 	const displayedGroups = useMemo(
-		() => filterDashboardSidebarProjects(sortedGroups, projectFilterQuery),
-		[sortedGroups, projectFilterQuery],
+		() =>
+			filterDashboardSidebarProjects(hostFilteredGroups, projectFilterQuery),
+		[hostFilteredGroups, projectFilterQuery],
 	);
 	const displayedProjectIds = useMemo(
 		() => displayedGroups.map((project) => project.id),
 		[displayedGroups],
 	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
-	const isFilterActive = trimmedFilterQuery !== "";
+	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
 	// The sort modes only reorder rows inside a project, so the project list
 	// is still the manual order and stays draggable; only a filter, which
 	// hides projects outright, makes a project drop unsafe to commit.
@@ -238,7 +278,10 @@ export function DashboardSidebar({
 	useBlockedDragNotice({
 		reason: isFilterActive ? "filter" : sortMode !== "manual" ? "sort" : null,
 		onSwitchToManualOrder: () => setSidebarProjectSortMode("manual"),
-		onClearFilter: () => setProjectFilterQuery(""),
+		onClearFilter: () => {
+			setProjectFilterQuery("");
+			setSidebarProjectHostFilter("all");
+		},
 	});
 
 	// Sorted but unfiltered, so ⌘1–⌘9 targets stay put while typing a query.
@@ -408,7 +451,10 @@ export function DashboardSidebar({
 		projectName: activeV2Project?.name ?? null,
 	});
 	const gettingStartedCard = useGettingStartedCard();
-	const starNagCard = useStarNagCard({ isCollapsed });
+	const releaseNotesCard = useReleaseNotesCard();
+	const isPreviewingReleaseNotes = useReleaseNotesCardStore(
+		(s) => s.isPreviewing,
+	);
 	const hiringCard = useHiringCard({ surface: "v2" });
 
 	const handleReorderProjects = useCallback(
@@ -455,19 +501,19 @@ export function DashboardSidebar({
 										fadeEdges={["top", "bottom"]}
 										className="flex-1 overflow-y-auto hide-scrollbar"
 									>
+										<DashboardSidebarGithubNotice
+											status={githubStatus}
+											isCollapsed={isCollapsed}
+										/>
 										{(isCollapsed || !workspacesListCollapsed) && (
 											<DashboardSidebarPinnedSection
-												pinnedWorkspaces={pinnedWorkspaces}
+												pinnedWorkspaces={displayedPinnedWorkspaces}
 												isCollapsed={isCollapsed}
 												onWorkspaceHover={refreshWorkspacePullRequest}
 											/>
 										)}
-										<DashboardSidebarCloudSection
-											isCollapsed={isCollapsed}
-											onWorkspaceHover={refreshWorkspacePullRequest}
-										/>
 										<DashboardSidebarSessionsSection
-											sessionWorkspaces={sessionWorkspaces}
+											sessionWorkspaces={displayedSessionWorkspaces}
 											isCollapsed={isCollapsed}
 											workspaceShortcutLabels={workspaceShortcutLabels}
 											onWorkspaceHover={refreshWorkspacePullRequest}
@@ -481,14 +527,13 @@ export function DashboardSidebar({
 													<DashboardSidebarWorkspacesHeader
 														sortMode={sortMode}
 														onSortModeChange={setSidebarProjectSortMode}
+														hostFilter={isCloudEnabled ? hostFilter : null}
+														onHostFilterChange={setSidebarProjectHostFilter}
 														filterQuery={projectFilterQuery}
 														onFilterQueryChange={setProjectFilterQuery}
 													/>
 												</DashboardSidebarBulkActions>
 											</div>
-										)}
-										{!isCollapsed && !workspacesListCollapsed && (
-											<DashboardSidebarGithubNotice status={githubStatus} />
 										)}
 										{(isCollapsed || !workspacesListCollapsed) && (
 											<SortableContext
@@ -518,19 +563,24 @@ export function DashboardSidebar({
 											isFilterActive &&
 											displayedGroups.length === 0 && (
 												<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
-													{t({
-														message: `No projects match "${trimmedFilterQuery}"`,
-													})}
+													{trimmedFilterQuery !== ""
+														? t({
+																message: `No projects match "${trimmedFilterQuery}"`,
+															})
+														: hostFilter === "cloud"
+															? t({ message: "No cloud workspaces" })
+															: t({ message: "No local workspaces" })}
 												</div>
 											)}
 									</OverflowFadeContainer>
 									<SidebarCardSlot
 										isCollapsed={isCollapsed}
 										entries={[
+											isPreviewingReleaseNotes ? releaseNotesCard : null,
 											paymentFailedCard,
 											setupScriptCard,
 											gettingStartedCard,
-											starNagCard,
+											releaseNotesCard,
 											hiringCard,
 										]}
 									/>
@@ -587,4 +637,4 @@ export function DashboardSidebar({
 			</DashboardSidebarSectionRenameProvider>
 		</DashboardSidebarSelectionProvider>
 	);
-}
+});

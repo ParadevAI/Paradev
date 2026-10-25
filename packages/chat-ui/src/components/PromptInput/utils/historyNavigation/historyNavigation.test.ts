@@ -22,8 +22,8 @@ function setup(history: string[]) {
 			throw error;
 		},
 	});
-	registerHistoryNavigation(editor, () => history);
-	return editor;
+	const navigation = registerHistoryNavigation(editor, () => history);
+	return Object.assign(editor, { navigation });
 }
 
 async function setContent(
@@ -69,6 +69,16 @@ const read = (editor: LexicalEditor) =>
 	});
 
 describe("registerHistoryNavigation", () => {
+	it("recalls the previous prompt on request, even with no selection", async () => {
+		const editor = setup(["first", "second"]);
+		editor.update(() => $getRoot().clear(), { discrete: true });
+		await tick();
+
+		editor.navigation.recallOlder();
+		await tick();
+		expect(read(editor).text).toBe("second");
+	});
+
 	it("recalls newest first from an empty box and walks back to an empty box", async () => {
 		const editor = setup(["first", "second"]);
 		await setContent(editor, () => {}, "end");

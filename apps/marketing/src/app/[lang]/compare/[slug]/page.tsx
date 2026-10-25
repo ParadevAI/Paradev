@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -12,7 +13,8 @@ import {
 	FAQPageJsonLd,
 	ItemListJsonLd,
 } from "@/components/JsonLd";
-import { getComparisonPage, getComparisonPages } from "@/lib/compare";
+import { getComparisonPages } from "@/lib/compare";
+import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
 	extractComparisonFaqItems,
 	extractRoundupItems,
@@ -29,7 +31,7 @@ export default async function ComparePageRoute({ params }: PageProps) {
 	await initServerI18n();
 
 	const { slug } = await params;
-	const page = getComparisonPage(slug);
+	const page = await getPricedComparisonPage(slug);
 
 	if (!page) {
 		notFound();
@@ -94,7 +96,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const { slug } = await params;
-	const page = getComparisonPage(slug);
+	const page = await getPricedComparisonPage(slug);
 
 	if (!page) {
 		return {};
@@ -112,7 +114,7 @@ export async function generateMetadata({
 			description: page.description,
 			type: "article",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			publishedTime: page.date,
 			modifiedTime: page.lastUpdated ?? page.date,
 			...(page.image && { images: [page.image] }),

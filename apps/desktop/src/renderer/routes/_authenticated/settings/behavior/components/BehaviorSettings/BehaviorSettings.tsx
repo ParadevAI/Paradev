@@ -39,6 +39,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR,
 		visibleItems,
 	);
+	const showDictation = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_DICTATION,
+		visibleItems,
+	);
 	const showStarGithub = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		visibleItems,
@@ -46,6 +50,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 
 	const utils = electronTrpc.useUtils();
 	const changesOpenTarget = useSettings((s) => s.changesOpenTarget);
+	const dictationEnabled = useSettings((s) => s.dictationEnabled);
 	const updateSetting = useSettings((s) => s.update);
 
 	const { data: confirmOnQuit, isLoading: isConfirmLoading } =
@@ -199,6 +204,35 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 							}
 							disabled={
 								isResourceMonitorLoading || setShowResourceMonitor.isPending
+							}
+						/>
+					</div>
+				)}
+
+				{showDictation && (
+					<div className="flex items-center justify-between">
+						<div className="space-y-0.5">
+							<Label htmlFor="dictation" className="text-sm font-medium">
+								<HighlightText
+									text={t({
+										message: "Dictation",
+									})}
+									query={searchQuery}
+								/>
+							</Label>
+							<p className="text-xs text-muted-foreground">
+								<Trans>
+									Show a microphone in the chat composer. Speech is transcribed
+									by ChatGPT when Codex is signed in to it, otherwise on your
+									Mac when possible, and otherwise by Superset's servers.
+								</Trans>
+							</p>
+						</div>
+						<Switch
+							id="dictation"
+							checked={dictationEnabled}
+							onCheckedChange={(enabled) =>
+								updateSetting("dictationEnabled", enabled)
 							}
 						/>
 					</div>

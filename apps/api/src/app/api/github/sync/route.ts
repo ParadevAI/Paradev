@@ -4,6 +4,7 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { nudge } from "@superset/trpc/realtime";
 import { subDays } from "date-fns";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -220,6 +221,7 @@ export async function POST(request: Request) {
 			.set({ lastSyncedAt: new Date() })
 			.where(eq(githubInstallations.id, installation.id));
 
+		nudge(organizationId, "pull_requests");
 		console.log("[github/sync] Sync completed successfully");
 		return Response.json({
 			success: true,

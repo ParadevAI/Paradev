@@ -19,14 +19,6 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				workspace: {
 					id: "cloud-presence",
 					name: "Cloud presence",
-					presence: [
-						{
-							userId: "satya",
-							name: "Satya Patel",
-							image: "https://github.com/github.png",
-							lastSeenAt: new Date("2026-09-25T11:59:00Z"),
-						},
-					],
 					status: "ready",
 					agentStatus: "working",
 					agentStatusAt: new Date("2026-09-25T11:58:00Z"),
@@ -60,14 +52,12 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				],
 				isInSidebar: true,
 				isMine: true,
-				showsPresence: true,
 				isRead: true,
 			},
 			{
 				workspace: {
 					id: "region-picker",
 					name: "Environment region picker",
-					presence: [],
 					status: "ready",
 					agentStatus: "review",
 					agentStatusAt: new Date("2026-09-25T11:30:00Z"),
@@ -92,7 +82,6 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				],
 				isInSidebar: true,
 				isMine: true,
-				showsPresence: true,
 				isRead: false,
 			},
 		],
@@ -106,20 +95,6 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				workspace: {
 					id: "member-authz",
 					name: "P1-D github member authz",
-					presence: [
-						{
-							userId: "kiet",
-							name: "Kiet Ho",
-							image: null,
-							lastSeenAt: new Date("2026-09-25T11:57:00Z"),
-						},
-						{
-							userId: "avi",
-							name: "Avi Peltz",
-							image: null,
-							lastSeenAt: new Date("2026-09-25T09:00:00Z"),
-						},
-					],
 					status: "ready",
 					agentStatus: "permission",
 					agentStatusAt: new Date("2026-09-25T11:56:00Z"),
@@ -130,14 +105,12 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				pullRequests: [],
 				isInSidebar: false,
 				isMine: false,
-				showsPresence: true,
 				isRead: true,
 			},
 			{
 				workspace: {
 					id: "migration-sync",
 					name: "Workspace migration sync",
-					presence: [],
 					status: "failed",
 					agentStatus: null,
 					agentStatusAt: null,
@@ -158,7 +131,6 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				],
 				isInSidebar: false,
 				isMine: false,
-				showsPresence: true,
 				isRead: true,
 			},
 		],

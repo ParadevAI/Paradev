@@ -1,8 +1,37 @@
+diff --git a/ios/RNSPercentDrivenInteractiveTransition.h b/ios/RNSPercentDrivenInteractiveTransition.h
+index f993cc73b0f0c71632f62c75bca1a05cdf07188a..58e4cd96acfb6ed53b00dbb780cf75b77eb11404 100644
+--- a/ios/RNSPercentDrivenInteractiveTransition.h
++++ b/ios/RNSPercentDrivenInteractiveTransition.h
+@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
+ @interface RNSPercentDrivenInteractiveTransition : UIPercentDrivenInteractiveTransition
+ 
+ @property (nonatomic, nullable) RNSScreenStackAnimator *animationController;
++// Superset patch: runs once the animator exists, so progress can be applied.
++@property (nonatomic, copy, nullable) void (^onStart)(void);
+ 
+ @end
+ 
+diff --git a/ios/RNSPercentDrivenInteractiveTransition.mm b/ios/RNSPercentDrivenInteractiveTransition.mm
+index 459aa289d066d8ee93074d8897dc9d416b2746a4..b5594e9091b8c4091fb7e14f2606adb0a13728da 100644
+--- a/ios/RNSPercentDrivenInteractiveTransition.mm
++++ b/ios/RNSPercentDrivenInteractiveTransition.mm
+@@ -9,6 +9,11 @@
+ - (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext
+ {
+   [super startInteractiveTransition:transitionContext];
++  if (_onStart != nil) {
++    void (^onStart)(void) = _onStart;
++    _onStart = nil;
++    onStart();
++  }
+ }
+ 
+ #pragma mark - UIPercentDrivenInteractiveTransition
 diff --git a/ios/RNSScreen.mm b/ios/RNSScreen.mm
 index 9b66012dc8db1e3af0cb5457f8dad86e7f2fe5e3..b8e075934de53bee9326affb1d2d4a64550d30e3 100644
 --- a/ios/RNSScreen.mm
 +++ b/ios/RNSScreen.mm
-@@ -53,6 +53,7 @@ @interface RNSScreenView () <UIAdaptivePresentationControllerDelegate,
+@@ -53,6 +53,7 @@ struct ContentWrapperBox {
  
  @implementation RNSScreenView {
    __weak RCTScrollViewComponentView *_sheetsScrollView;
@@ -10,7 +39,7 @@ index 9b66012dc8db1e3af0cb5457f8dad86e7f2fe5e3..b8e075934de53bee9326affb1d2d4a64
  
    /// Up-to-date only when sheet is in `fitToContents` mode.
    CGFloat _sheetContentHeight;
-@@ -177,6 +178,12 @@ - (void)updateBounds
+@@ -177,6 +178,12 @@ RNS_IGNORE_SUPER_CALL_END
  
  - (void)applyFrameCorrectionForDescendantScrollView
  {
@@ -23,7 +52,7 @@ index 9b66012dc8db1e3af0cb5457f8dad86e7f2fe5e3..b8e075934de53bee9326affb1d2d4a64
    RCTScrollViewComponentView *scrollView = [self tryFindDescendantScrollView];
    if (_sheetsScrollView != scrollView) {
      [_sheetsScrollView removeObserver:self forKeyPath:@"bounds" context:nil];
-@@ -769,6 +776,7 @@ - (BOOL)isTransparentModal
+@@ -769,6 +776,7 @@ RNS_IGNORE_SUPER_CALL_END
  
  - (void)invalidateImpl
  {
@@ -31,3 +60,159 @@ index 9b66012dc8db1e3af0cb5457f8dad86e7f2fe5e3..b8e075934de53bee9326affb1d2d4a64
    // Since the scroll view might get immediately recycled we remove ourselves
    // immediately.
    if (_sheetsScrollView != nil) {
+diff --git a/ios/RNSScreenStack.h b/ios/RNSScreenStack.h
+index 9ae11c30f6aecae89b437d475c0d510e6b63b8c6..3902fec86925bbede81109bb221863796a069b8e 100644
+--- a/ios/RNSScreenStack.h
++++ b/ios/RNSScreenStack.h
+@@ -28,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
+ - (void)updateScreenTransition:(double)progress;
+ - (void)finishScreenTransition:(BOOL)canceled;
+ 
++// Superset patch: the next push follows a gesture that the caller drives.
++- (void)armInteractivePush;
++- (void)updateInteractivePush:(double)progress;
++- (void)endInteractivePush:(BOOL)finish;
++
+ @property (nonatomic) BOOL customAnimation;
+ @property (nonatomic) BOOL disableSwipeBack;
+ 
+diff --git a/ios/RNSScreenStack.mm b/ios/RNSScreenStack.mm
+index 192f5d2c77192f323844b0d11ee179081891e7a4..77fc0bda0f5dd1650f0babc84c8e15ea06b25670 100644
+--- a/ios/RNSScreenStack.mm
++++ b/ios/RNSScreenStack.mm
+@@ -175,6 +175,12 @@ namespace react = facebook::react;
+   RNSPercentDrivenInteractiveTransition *_interactionController;
+   __weak RNSScreenStackManager *_manager;
+   BOOL _updateScheduled;
++  BOOL _interactivePushArmed;
++  BOOL _interactivePushStarted;
++  BOOL _interactivePushRunning;
++  double _interactivePushProgress;
++  NSInteger _interactivePushOutcome;
++  NSUInteger _interactivePushGeneration;
+ }
+ 
+ - (instancetype)initWithFrame:(CGRect)frame
+@@ -768,9 +774,88 @@ RNS_IGNORE_SUPER_CALL_END
+        [RNSScreenStackAnimator isCustomAnimation:screen.stackAnimation] || _customAnimation)) {
+     return [[RNSScreenStackAnimator alloc] initWithOperation:operation];
+   }
++  if (screen != nil && operation == UINavigationControllerOperationPush && _interactivePushArmed) {
++    [self startInteractivePush];
++    return [[RNSScreenStackAnimator alloc] initWithOperation:operation];
++  }
+   return nil;
+ }
+ 
++#pragma mark - Superset interactive push
++
++- (void)armInteractivePush
++{
++  _interactivePushArmed = YES;
++  _interactivePushProgress = 0;
++  _interactivePushOutcome = 0;
++  NSUInteger generation = ++_interactivePushGeneration;
++  // The push comes from JS after this call. If it never comes, do not take over a later push.
++  __weak RNSScreenStackView *weakSelf = self;
++  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
++    RNSScreenStackView *strongSelf = weakSelf;
++    if (strongSelf != nil && strongSelf->_interactivePushGeneration == generation) {
++      strongSelf->_interactivePushArmed = NO;
++    }
++  });
++}
++
++- (void)updateInteractivePush:(double)progress
++{
++  _interactivePushProgress = progress;
++  if (_interactivePushRunning) {
++    [_interactionController updateInteractiveTransition:progress];
++  }
++}
++
++- (void)endInteractivePush:(BOOL)finish
++{
++  if (_interactivePushRunning) {
++    [self completeInteractivePush:finish];
++  } else if (_interactivePushArmed || _interactivePushStarted) {
++    _interactivePushOutcome = finish ? 1 : -1;
++  }
++}
++
++- (void)startInteractivePush
++{
++  _interactivePushArmed = NO;
++  _interactivePushStarted = YES;
++  _interactionController = [RNSPercentDrivenInteractiveTransition new];
++  __weak RNSScreenStackView *weakSelf = self;
++  // The finger moved before JS pushed the screen, so start where it is now.
++  _interactionController.onStart = ^{
++    RNSScreenStackView *strongSelf = weakSelf;
++    if (strongSelf == nil || !strongSelf->_interactivePushStarted) {
++      return;
++    }
++    strongSelf->_interactivePushRunning = YES;
++    [strongSelf->_interactionController updateInteractiveTransition:strongSelf->_interactivePushProgress];
++    if (strongSelf->_interactivePushOutcome != 0) {
++      BOOL finish = strongSelf->_interactivePushOutcome > 0;
++      dispatch_async(dispatch_get_main_queue(), ^{
++        [weakSelf completeInteractivePush:finish];
++      });
++    }
++  };
++}
++
++- (void)completeInteractivePush:(BOOL)finish
++{
++  if (!_interactivePushRunning) {
++    return;
++  }
++  // A cancelled push removes the screen from UIKit. RNSScreen then sends onDismissed, so JS drops the route.
++  if (finish) {
++    [_interactionController finishInteractiveTransition];
++  } else {
++    [_interactionController cancelInteractiveTransition];
++  }
++  _interactionController = nil;
++  _interactivePushStarted = NO;
++  _interactivePushRunning = NO;
++  _interactivePushOutcome = 0;
++}
++
+ - (void)cancelTouchesInParent
+ {
+   // cancel touches in parent, this is needed to cancel RN touch events. For example when Touchable
+diff --git a/ios/RNSScreenStackAnimator.mm b/ios/RNSScreenStackAnimator.mm
+index 90792c3dd5c231d65462e0051b1ee0dd93b4acc5..26e0117784007dc34e6de9ce526ea67e852f824d 100644
+--- a/ios/RNSScreenStackAnimator.mm
++++ b/ios/RNSScreenStackAnimator.mm
+@@ -152,9 +152,13 @@ static constexpr float RNSShadowViewMaxAlpha = 0.1;
+       shadowView.alpha = 0.0;
+     }
+ 
+-    UIViewPropertyAnimator *animator =
+-        [[UIViewPropertyAnimator alloc] initWithDuration:[self transitionDuration:transitionContext]
+-                                        timingParameters:[RNSScreenStackAnimator defaultSpringTimingParametersApprox]];
++    // Superset patch: an interactive push follows the finger linearly and starts paused, like the swipe back.
++    UIViewPropertyAnimator *animator = transitionContext.isInteractive
++        ? [[UIViewPropertyAnimator alloc] initWithDuration:[self transitionDuration:transitionContext]
++                                                    curve:UIViewAnimationCurveLinear
++                                               animations:nil]
++        : [[UIViewPropertyAnimator alloc] initWithDuration:[self transitionDuration:transitionContext]
++                                          timingParameters:[RNSScreenStackAnimator defaultSpringTimingParametersApprox]];
+ 
+     [animator addAnimations:^{
+       fromViewController.view.transform = leftTransform;
+@@ -173,7 +177,11 @@ static constexpr float RNSShadowViewMaxAlpha = 0.1;
+       [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+     }];
+     _inFlightAnimator = animator;
+-    [animator startAnimation];
++    if (transitionContext.isInteractive) {
++      [animator setUserInteractionEnabled:YES];
++    } else {
++      [animator startAnimation];
++    }
+   } else if (_operation == UINavigationControllerOperationPop) {
+     toViewController.view.transform = leftTransform;
+     [[transitionContext containerView] insertSubview:toViewController.view belowSubview:fromViewController.view];

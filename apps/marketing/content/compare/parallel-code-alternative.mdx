@@ -1,0 +1,119 @@
+---
+title: "Best Parallel Code Alternatives in 2026"
+description: "The best alternatives to Parallel Code for running AI coding agents in Git worktrees, including Superset, Orca, Emdash, Nimbalyst, and Claude Squad, compared by agents, review, automations, and license."
+date: 2026-10-20
+lastUpdated: 2026-10-20
+type: "roundup"
+competitors:
+  - parallel-code
+  - orca
+  - emdash
+  - nimbalyst
+  - claude-squad
+keywords:
+  - parallel code alternative
+  - parallel code alternatives
+  - parallel code app alternative
+  - parallel code vs superset
+  - run coding agents in parallel
+  - git worktrees for ai agents
+---
+
+Parallel Code is an MIT-licensed desktop app for macOS and Linux that gives each coding agent its own Git worktree, then lets you review the diff and merge back to main. It adds a Kanban board, Docker sandboxing, and an AI Arena mode that races agents on the same task. If you want the same loop with any CLI agent, scheduled automations, an MCP server and SDK, and remote and cloud workspaces you can reach from an iPhone, Superset wraps it in a broader workspace.
+
+**Our recommendation: choose Superset if you want the worktree loop plus automations, programmatic control, and remote and cloud workspaces.** The alternatives below cover other preferences, including open-source apps and Windows support.
+
+[Download Superset](/download) to try a small task, or read [Superset vs Parallel Code](/compare/superset-vs-parallel-code) for the direct comparison. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+
+---
+
+## The Short Version
+
+| Alternative | Best for | Platform | License |
+|---|---|---|---|
+| **Superset** | Any CLI agent, PR review, automations, MCP and SDK control, remote and cloud workspaces | macOS; experimental Linux AppImage; Windows unavailable; iPhone and iPad | Source-available (ELv2) |
+| **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Emdash** | Open-source ADE with issue-tracker intake | macOS, Windows, Linux | Open source (Apache-2.0) |
+| **Nimbalyst** | Visual workspace with markdown, mockups, and diagrams | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
+| **Claude Squad** | Parallel agents in worktrees over tmux | macOS, Linux | Open source (AGPL) |
+
+## Why Look for a Parallel Code Alternative?
+
+Parallel Code does the dispatch, review, and merge loop well and ships often. Common reasons to look elsewhere:
+
+- **More agents.** It supports Claude Code, Codex, Gemini CLI, Copilot CLI, and Antigravity CLI. You may need OpenCode, Amp, Cursor's agent, or a custom CLI agent.
+- **Unattended work.** You want agents to run on a schedule or from GitHub, Slack, Linear, or Sentry events.
+- **Programmatic control.** You want scripts and other agents to create workspaces through an MCP server, CLI, or SDK.
+- **Other machines.** You want agents on a remote host or in the cloud, and a released phone app.
+- **Windows.** Parallel Code runs on macOS and Linux.
+
+## The Best Alternatives
+
+### Superset
+
+Superset runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor's agent, Copilot CLI, Gemini CLI, and Amp, in persistent terminal sessions that survive app restarts, with a Git worktree and branch for every workspace. The Changes pane commits, pushes, and opens a PR, and the PR pane shows checks, review threads, and merge. It adds an in-app browser with Design Mode, port management for many dev servers, and a Tasks board for Linear and Superset tasks, plus a GitHub Issues list. Workspaces run on your machine, on hosts you add through Remote Access, or in cloud workspaces, and the [iPhone and iPad app](/mobile) reaches all of them. Pro adds remote access, the iPhone and iPad app, and automations, and an MCP server, CLI, and TypeScript SDK let agents run the fleet.
+
+For the direct comparison, see [Superset vs Parallel Code](/compare/superset-vs-parallel-code).
+
+### Orca
+
+Orca is a free, MIT-licensed desktop agent development environment for macOS, Windows, and Linux. It runs agents in parallel worktrees with per-task browser tabs, Design Mode, SSH worktrees, scheduled automations, and beta iOS and Android apps. Choose it if you want to stay open source and add Windows and mobile.
+
+See [Superset vs Orca](/compare/superset-vs-orca).
+
+### Emdash
+
+Emdash is an Apache-2.0 desktop app for macOS, Windows, and Linux that supports 34 CLI agents. It gives each task its own branch and worktree, pulls tasks from Linear, Jira, GitHub, Notion, and Asana, and runs scheduled tasks.
+
+See [Superset vs Emdash](/compare/superset-vs-emdash).
+
+### Nimbalyst
+
+Nimbalyst is an MIT-licensed visual workspace for Claude Code, Codex, and OpenCode on macOS, Windows, and Linux, with iOS and Android companions. It adds visual editing of markdown, mockups, and diagrams beside the agents.
+
+See [Superset vs Nimbalyst](/compare/superset-vs-nimbalyst).
+
+### Claude Squad
+
+Claude Squad manages multiple agents in separate worktrees inside tmux, driven from one terminal UI. Choose it if you want the worktree loop without a desktop app.
+
+See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+
+## How To Choose
+
+- For the worktree loop plus automations, MCP and SDK control, and remote and cloud workspaces, choose **Superset**.
+- For a free, open-source app with Windows and mobile, choose **Orca**.
+- For open source with issue-tracker intake, choose **Emdash**.
+- For an open-source visual workspace with document editing, choose **Nimbalyst**.
+- To stay in the terminal, choose **Claude Squad**.
+
+## Verdict
+
+Parallel Code is a strong, focused open-source tool, and its Docker sandboxing and AI Arena are real extras. Choose Superset when your agent use looks more like infrastructure: many agents, scheduled runs, scripts that start work, and machines beyond your laptop. Run the same task in both and compare the review step. For the wider landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+## What To Try First
+
+- **Keep your agent:** launch the CLI you already use in a Superset workspace.
+- **Race two agents:** give the same task to Claude Code and Codex in two workspaces and compare the diffs.
+- **Review in place:** inspect each diff, run your checks, and open a PR from the Changes pane.
+- **Schedule it:** turn a recurring task into an automation with the [maintenance guide](/blog/scheduled-agent-maintenance).
+
+[Download Superset](/download), then read [git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).
+
+## Frequently Asked Questions
+
+### What is the best Parallel Code alternative?
+
+For developers who want the worktree loop with automations, programmatic control, and remote and cloud workspaces, Superset is our recommendation. Orca is the strongest open-source alternative.
+
+### Does Superset sandbox agents in Docker like Parallel Code?
+
+No. Superset isolates working files with Git worktrees, which do not sandbox processes. Parallel Code can run a task inside a project Dockerfile.
+
+### Is there an open-source Parallel Code alternative?
+
+Yes. Orca (MIT), Nimbalyst (MIT), Emdash (Apache-2.0), and Claude Squad (AGPL) are open source. Superset is source-available under Elastic License 2.0.
+
+### Which alternatives run on Windows?
+
+Orca, Emdash, and Nimbalyst run on Windows. Superset and Parallel Code do not.

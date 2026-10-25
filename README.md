@@ -111,16 +111,16 @@ Jump to any workspace, action, or setting from one search box.
 
 Connect another machine to reach its workspaces remotely, or schedule an agent to work on a recurring task. The CLI, SDK, and MCP server also let agents and scripts manage workspaces.
 
-Mobile requires **Superset Pro**, **iOS 26 or later**, and a computer with **Remote Access enabled**.
+Mobile supports **iPhone and iPad** and requires **Superset Pro** and **iOS 26 or iPadOS 26 or later**. Use cloud workspaces without keeping your own computer connected. To reach workspaces on your own computer, enable **Remote Access** and keep that host awake and online.
 
-[Remote access](https://docs.superset.sh/remote-access) · [Automations](https://docs.superset.sh/automations) · [iPhone](https://superset.sh/mobile) · [CLI](https://docs.superset.sh/cli/getting-started)
+[Remote access](https://docs.superset.sh/remote-access) · [Automations](https://docs.superset.sh/automations) · [iPhone and iPad](https://superset.sh/mobile) · [CLI](https://docs.superset.sh/cli/getting-started)
 
 <details>
 <summary>See mobile, automations, remote access, and the CLI</summary>
 
-### Superset for iPhone
+### Superset for iPhone and iPad
 
-Remotely control Claude Code, Codex, and other terminal agents running on your connected computer. Pick up the same workspaces and terminal sessions, send follow-up prompts, review diffs, and merge PRs from your iPhone.
+Control Claude Code, Codex, and other terminal agents in cloud workspaces or on your connected computer. Pick up the same workspaces and terminal sessions, send follow-up prompts, review diffs, and merge PRs from your iPhone or iPad.
 
 [**Download on the App Store**](https://apps.apple.com/us/app/id6788926383) &nbsp;&bull;&nbsp; [Learn more →](https://superset.sh/mobile)
 
@@ -128,11 +128,11 @@ Remotely control Claude Code, Codex, and other terminal agents running on your c
 
 ### Automations
 
-Run agent sessions on a schedule: triage issues overnight, draft the weekly changelog, keep dependencies fresh.
+Run agent sessions on a schedule or when something happens: review a PR when you're asked, triage a new Sentry issue, pick up a bug report from Slack, draft the weekly changelog.
 
 [Docs →](https://docs.superset.sh/automations)
 
-<a href="https://docs.superset.sh/automations"><img src="apps/marketing/public/images/readme/automations.png" alt="Scheduled agent automations" width="100%" /></a>
+<a href="https://docs.superset.sh/automations"><img src="apps/marketing/public/images/readme/automations.png" alt="Agent automations on a schedule or an event" width="100%" /></a>
 
 ### Remote Access
 
@@ -251,7 +251,7 @@ No Neon account or third-party credentials are needed. `setup.local.sh` brings
 up a local Postgres + neon-proxy + Redis stack via Docker and seeds a dev account.
 Sign in with the **"Sign in as dev"** button (or `admin@local.test` / `supersetdev`).
 
-Prereqs for building from source (to use Superset, [install the app](#install) instead): [Bun](https://bun.sh/) v1.4.2+ (pinned in `.bun-version`), `docker`, `jq`, and [`gh`](https://cli.github.com/) (`brew install jq gh`).
+Prereqs for building from source (to use Superset, [install the app](#install) instead): [Bun](https://bun.sh/) v1.4.3+ (pinned in `.bun-version`), `docker`, `jq`, and [`gh`](https://cli.github.com/) (`brew install jq gh`).
 
 See [**DEVELOPMENT.md**](./DEVELOPMENT.md) for the full guide: what the setup script does, manual setup against real services, common commands, troubleshooting, and how to build the desktop app. Contribution process lives in [**CONTRIBUTING.md**](./CONTRIBUTING.md).
 

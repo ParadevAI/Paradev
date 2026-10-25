@@ -1,0 +1,31 @@
+---
+title: Codex in Superset
+description: Run OpenAI Codex in parallel workspaces, with status, resume, subagents, and multiple accounts
+---
+
+## Overview
+
+Codex is one of Superset's most deeply integrated agents. Each session runs in its own workspace, with its own Git worktree and terminal, on your ChatGPT plan or OpenAI API key. Superset never proxies model calls.
+
+## Launch
+
+Superset starts Codex with:
+
+```bash
+codex --dangerously-bypass-approvals-and-sandbox --dangerously-bypass-hook-trust
+```
+
+This turns off Codex's approval prompts and sandbox, so the agent can edit files and run commands in its worktree without asking. To keep them, open **Settings → Agents → Codex** and remove the flags from **Command**, **Resume args**, and **Fork args**. Worktrees separate files, but do not sandbox processes; see [Workspaces](/workspaces).
+
+## What Superset Adds
+
+- **Status and notifications** - The sidebar shows when Codex is working, needs input, or is done, and you get a notification. See [Agent Status](/agent-status).
+- **Resume and fork** - Superset restores a session after a restart with `codex resume`, and can fork one with `codex fork`. See [Agent Sessions](/agent-sessions).
+- **Subagents** - Subagents appear under their parent session in the terminal header's **Subagents** menu.
+- **Handoff** - Moving a conversation to another agent carries Codex's structured transcript.
+- **Model and effort** - Pick a GPT model and a reasoning effort when you launch. See [AI Agents](/agent-integration#models-and-reasoning-effort).
+- **Usage and accounts** - The [Usage](/usage) page shows quota meters and token costs, and lets you add several Codex accounts and choose the default.
+
+## Run Several Sessions
+
+Press **⌘N** for each task. Each workspace gets its own worktree, so sessions never edit the same files. To give the same task to Codex and another agent and keep the best result, see [Race Agents on One Task](/recipes/race-agents).

@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import {
 	V2_AGENT_CONFIGS_QUERY_KEY as QUERY_KEY,
 	useV2AgentConfigs,
@@ -87,6 +88,7 @@ export function V2AgentsSettings({
 	const navigate = useNavigate();
 
 	const configsQuery = useV2AgentConfigs(activeHostUrl);
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
 	const queryKey = [...QUERY_KEY, activeHostUrl] as const;
 	const queryFamily = { queryKey: QUERY_KEY };
 
@@ -286,7 +288,9 @@ export function V2AgentsSettings({
 	const configs = configsQuery.data ?? [];
 	const installedPresetIds = new Set(configs.map((row) => row.presetId));
 	const addablePresets = KNOWN_PRESETS.filter(
-		(preset) => !installedPresetIds.has(preset.presetId),
+		(preset) =>
+			!installedPresetIds.has(preset.presetId) &&
+			isAgentPresetEnabled(preset.presetId),
 	);
 	const hostServiceUnavailableMessage = getHostServiceUnavailableMessage(
 		hostService,

@@ -24,10 +24,12 @@ export function DisconnectMenu({
 	agentLabel,
 	credential,
 	disconnect,
+	onReconnect,
 }: {
 	agentLabel: string;
 	credential: string;
 	disconnect: () => Promise<unknown>;
+	onReconnect?: () => void;
 }) {
 	const { t } = useLingui();
 	const [confirming, setConfirming] = useState(false);
@@ -64,6 +66,11 @@ export function DisconnectMenu({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
+					{onReconnect ? (
+						<DropdownMenuItem onSelect={onReconnect}>
+							<Trans>Reconnect</Trans>
+						</DropdownMenuItem>
+					) : null}
 					<DropdownMenuItem
 						onSelect={() => setConfirming(true)}
 						variant="destructive"

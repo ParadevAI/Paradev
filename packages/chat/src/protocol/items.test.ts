@@ -139,3 +139,24 @@ describe("item attachments", () => {
 		).toBe(false);
 	});
 });
+
+describe("subagent fields", () => {
+	test("a status or sender this schema does not know parses as unset", () => {
+		const parsed = toolCallSchema.parse({
+			...toolCall,
+			subagent: true,
+			subagentStatus: "paused",
+		});
+		expect(parsed.subagentStatus).toBeUndefined();
+		const message = itemSchema.parse({
+			id: "user_message:1",
+			kind: "user_message",
+			content: [{ type: "text", text: "hi" }],
+			startedAtMs: 1,
+			from: "sibling",
+		});
+		expect(
+			message.kind === "user_message" ? message.from : "set",
+		).toBeUndefined();
+	});
+});

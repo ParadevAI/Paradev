@@ -1,0 +1,1 @@
+export { faqAnchor } from "./faqAnchor";

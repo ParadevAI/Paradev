@@ -1,0 +1,46 @@
+---
+title: Add Superset Support to Your Agent
+description: For agent makers - how your coding agent runs in Superset today, and what first-class support takes
+---
+
+## Overview
+
+If you build a terminal coding agent, it already runs in Superset: users can add any command as a custom agent, and it gets its own workspace, Git worktree, and terminal. First-class support adds status indicators, notifications, session resume, and usage tracking. This page explains what each one needs from your agent, so Superset users get the best experience with it.
+
+## Works Today: Custom Agents
+
+Users add your agent in **Settings → Agents → Add agent → Custom agent…** with:
+
+- **Command** - how to launch your agent
+- **Prompt-only args** and **Prompt transport** - how Superset passes a prompt: as an argument or on stdin
+- **Resume args** and **Fork args** - how to reopen or clone a session by its id, if your agent supports it
+
+To make this easy, document a single command that starts your agent, a way to pass the first prompt as an argument or on stdin, and, if you have them, resume and fork flags that take a session id.
+
+Inside a Superset terminal, your agent can read these environment variables:
+
+| Variable | Description |
+| --- | --- |
+| `SUPERSET_WORKSPACE_ID` | The workspace the terminal belongs to |
+| `SUPERSET_WORKSPACE_PATH` | Path to the workspace's worktree |
+| `SUPERSET_ROOT_PATH` | Path to the main checkout of the repository |
+| `SUPERSET_TERMINAL_ID` | The terminal the agent runs in |
+
+## First-Class Support
+
+Built-in agents get more than a terminal. Each feature below has a clear requirement:
+
+| Feature | What your agent needs |
+|---|---|
+| **Status** (working, needs input, done) and notifications | Lifecycle hooks that run a command on session start, prompt submit, tool use, permission request, stop, and session end. Hooks shaped like Claude Code's (`hook_event_name`, `session_id` in a JSON payload) are the easiest to support. |
+| **Resume after restart** | A stable session id reported in those hooks, and a flag that reopens a session by id. |
+| **Fork session** | A flag that clones a session by id. |
+| **Usage history** | Session logs on disk that record tokens per model, in a documented location and format. |
+| **Quota meter** | A documented way to read the subscription's usage windows. |
+| **Model and effort pickers** | Flags or environment variables that select a model and reasoning effort. |
+
+Built-in agent support lives in the Superset repository on GitHub. To request it, [open an issue](https://github.com/superset-sh/superset/issues) with your agent's install command, its hook and session-id documentation, and where it writes session logs. We review pull requests that add an agent too.
+
+## What Users See
+
+With first-class support, your agent appears in Superset's agent launcher with its icon, shows a live status in the sidebar, sends a notification when it needs input or finishes, and comes back with its session after a restart. See [Supported Agents](/supported-agents) for where each built-in agent stands today.

@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
@@ -13,6 +14,7 @@ import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 
 export function HostsSettingsScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const theme = useTheme();
 	const { hosts, query: hostsQuery } = useOrgHosts();
 
@@ -43,7 +45,7 @@ export function HostsSettingsScreen() {
 						style={{ color: theme.mutedForeground }}
 					>
 						<Trans>
-							In the Superset desktop app, open Settings → Remote Access and
+							In the {appName} desktop app, open Settings → Remote Access and
 							turn on “Allow remote access to this device via relay”.
 						</Trans>
 					</Text>

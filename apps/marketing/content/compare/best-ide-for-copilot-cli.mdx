@@ -1,0 +1,98 @@
+---
+title: "Best IDE for GitHub Copilot CLI in 2026: Where to Run It"
+description: "The best places to run GitHub Copilot CLI in 2026, from the terminal and VS Code to the Copilot cloud agent, GitHub.com, GitHub Mobile, and Superset for parallel worktree sessions next to other agents."
+date: 2026-10-13
+type: "roundup"
+competitors:
+  - github-copilot
+  - claude-code
+  - codex
+keywords:
+  - best ide for copilot cli
+  - where to run github copilot cli
+  - copilot cli worktree
+  - copilot cli parallel agents
+  - github copilot cli ide
+  - copilot cli delegate
+---
+
+GitHub Copilot CLI brings "the power of GitHub Copilot, now in your terminal." It runs models from several vendors, including Claude, GPT, Gemini, Grok, and Kimi, and it is part of every Copilot plan, Free included. It can also hand work to the Copilot cloud agent, and you can steer sessions from GitHub.com or GitHub Mobile. So the best "IDE for Copilot CLI" depends on where you want the work to run and whether you want several tasks, or several agents, at once.
+
+Facts were checked against GitHub's own docs on October 13, 2026.
+
+---
+
+## The Short Version
+
+| Where you run Copilot CLI | Best for | Parallel tasks on one repo? | Main tradeoff |
+|---|---|---|---|
+| **Superset** | Many Copilot CLI tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Copilot CLI in the terminal** | One focused task | `/fleet` and custom agents inside a session | Built-in worktree support is not documented |
+| **VS Code with Copilot** | Completions and chat while you edit | Limited | One working copy |
+| **Copilot cloud agent** | Work that runs off your machine | `/delegate` and `copilot --cloud` sandboxes | `--cloud` is in public preview |
+| **GitHub.com and GitHub Mobile** | Steering sessions away from your desk | Through the cloud agent | Copilot's agent only |
+
+## The Options
+
+### Copilot CLI in the terminal
+
+`copilot` is the core of the CLI. It runs on Linux, macOS, and Windows (PowerShell 6+ or WSL). `/fleet` and custom agents spread work inside a session, and `copilot -p` runs it headless for scripts. It supports MCP, with GitHub's own MCP server on by default, plus hooks, skills, and plugins with marketplaces. The Copilot SDK (MIT) lets other programs drive it. GitHub does not document built-in worktree support, so separate tasks on one repository are yours to manage. For one task at a time, start here.
+
+### VS Code with Copilot
+
+Copilot is also an editor extension for VS Code, JetBrains, Visual Studio, and Neovim, with inline completions, chat, and an agent mode. It suits editing alongside the agent, with the usual single-working-copy limit when you want several tasks at once. You can run the CLI in the editor's terminal as well.
+
+For the editor comparison, see [Superset vs GitHub Copilot](/compare/superset-vs-github-copilot).
+
+### Copilot cloud agent
+
+From the CLI, `/delegate` hands a task to the Copilot cloud agent, and `copilot --cloud` runs a session in a cloud sandbox (public preview). The work keeps going when your laptop is closed. On organization plans, admins can turn the CLI off.
+
+### GitHub.com and GitHub Mobile
+
+After you turn on remote control for a Copilot CLI session, you can steer it from GitHub.com or GitHub Mobile, so you can start a task at your desk and check on it from your phone. Without remote control, the synced session is view-only.
+
+### Superset
+
+Superset runs GitHub Copilot CLI as a built-in agent. Each new local branch-based workspace gets its own Git worktree and terminal, so several Copilot CLI tasks can run on the same repository at once, locally or on your own remote hosts. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Superset never proxies model calls. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+
+## How To Choose
+
+- For one task, use Copilot CLI in the terminal.
+- To edit with completions and chat, use VS Code with Copilot.
+- For work that keeps going without your machine, use `/delegate` or `copilot --cloud`.
+- To steer from your phone, turn on remote control for the session and use GitHub.com or GitHub Mobile.
+- For many Copilot CLI tasks next to other agents, with PRs and review in one place, use Superset.
+
+## Verdict
+
+GitHub's own surfaces are the best place for Copilot alone, and the cloud agent is its answer to work that runs while you are away. GitHub is stronger where the work lives on GitHub: cloud sandboxes, steering from GitHub Mobile, and admin controls for organizations. Once you want several local Copilot CLI tasks on one repository, or Copilot CLI next to Claude Code and Codex, run it in a workspace like Superset.
+
+For the agent head-to-head, see [Claude Code vs GitHub Copilot CLI](/compare/claude-code-vs-copilot-cli). For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
+
+## How To Run Copilot CLI in Superset
+
+1. Open your repository in Superset and create a workspace. Each new local branch-based workspace gets its own Git worktree.
+2. Pick GitHub Copilot CLI from the agent presets. It signs in with your own Copilot plan.
+3. To compare agents, create a second workspace with Claude Code or Codex and give it the same prompt.
+4. Compare the diffs in the Changes pane, then open a PR from the better one.
+
+Superset never proxies model calls. Each agent uses your own subscription or key, and the Usage page shows Copilot's token use.
+
+## Frequently Asked Questions
+
+### What is the best IDE for GitHub Copilot CLI?
+
+For one task, the terminal. For editing with completions, VS Code with Copilot. For work off your machine, the Copilot cloud agent. For several Copilot CLI tasks next to other agents on one repository, a worktree workspace like Superset.
+
+### Does Copilot CLI support Git worktrees?
+
+GitHub does not document built-in worktree support for the CLI. To run separate tasks on one repository, give each its own worktree; Superset does this for every new local branch-based workspace.
+
+### Is Copilot CLI free?
+
+The Copilot Free plan ($0) includes the CLI with limited use. Pro is $10, Pro+ is $39, and Max is $100 per month.
+
+### Can I run Copilot CLI and Claude Code at the same time?
+
+Yes. In Superset, each runs in its own workspace and worktree on the same repository, and you compare the diffs before you open a PR.

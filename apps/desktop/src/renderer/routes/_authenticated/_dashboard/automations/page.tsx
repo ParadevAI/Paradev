@@ -73,6 +73,7 @@ import { HostOfflineRunDialog } from "./components/HostOfflineRunDialog";
 import type { AutomationTemplate } from "./templates";
 import { matchAgentChoice, portableAgentValue } from "./utils/agentIdentity";
 import { dispatchErrorCode, runErrorHelp } from "./utils/runErrorHelp";
+import { RUN_STATUS_META } from "./utils/runStatus";
 
 export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	{
@@ -84,7 +85,19 @@ type Scope = "mine" | "team";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
 
-type AutomationSortField = "name" | "owner" | "schedule" | "status";
+type AutomationSortField = "name" | "owner" | "schedule" | "status" | "lastRun";
+
+type LastRunSortMode = "time" | "result";
+
+const LAST_RUN_SORT_CYCLE: {
+	mode: LastRunSortMode;
+	direction: SortDirection;
+}[] = [
+	{ mode: "time", direction: "desc" },
+	{ mode: "time", direction: "asc" },
+	{ mode: "result", direction: "asc" },
+	{ mode: "result", direction: "desc" },
+];
 
 // Seeds the "Create with AI" agent session. The skill is provisioned as
 // superset:automate; mentioning it by name loads it (it isn't in the chat
@@ -283,7 +296,24 @@ function AutomationsPage() {
 	const [sortField, setSortField] = useState<AutomationSortField | null>(null);
 	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
+	const [lastRunSortMode, setLastRunSortMode] =
+		useState<LastRunSortMode>("time");
+
 	const handleSort = (field: AutomationSortField) => {
+		if (field === "lastRun") {
+			const current = LAST_RUN_SORT_CYCLE.findIndex(
+				(step) =>
+					sortField === "lastRun" &&
+					step.mode === lastRunSortMode &&
+					step.direction === sortDirection,
+			);
+			const next =
+				LAST_RUN_SORT_CYCLE[(current + 1) % LAST_RUN_SORT_CYCLE.length];
+			setSortField("lastRun");
+			setLastRunSortMode(next.mode);
+			setSortDirection(next.direction);
+			return;
+		}
 		if (sortField === field) {
 			setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
 		} else {
@@ -302,6 +332,24 @@ function AutomationsPage() {
 
 	const sortedVisible = useMemo(() => {
 		if (!sortField) return visible;
+		if (sortField === "lastRun") {
+			// Never-run automations stay at the bottom in both directions.
+			return [...visible].sort((a, b) => {
+				const aRun = lastRunById.get(a.id);
+				const bRun = lastRunById.get(b.id);
+				if (!aRun || !bRun) return aRun === bRun ? 0 : aRun ? -1 : 1;
+				if (lastRunSortMode === "time") {
+					return sortDirection === "asc"
+						? aRun.at - bRun.at
+						: bRun.at - aRun.at;
+				}
+				const cmp =
+					RUN_STATUS_META[aRun.status].sortRank -
+					RUN_STATUS_META[bRun.status].sortRank;
+				if (cmp !== 0) return sortDirection === "asc" ? cmp : -cmp;
+				return bRun.at - aRun.at;
+			});
+		}
 		const sortValue = (automation: AutomationListItem): string => {
 			switch (sortField) {
 				case "name":
@@ -324,7 +372,14 @@ function AutomationsPage() {
 			const cmp = sortValue(a).localeCompare(sortValue(b));
 			return sortDirection === "asc" ? cmp : -cmp;
 		});
-	}, [visible, sortField, sortDirection, usersById]);
+	}, [
+		visible,
+		sortField,
+		sortDirection,
+		usersById,
+		lastRunById,
+		lastRunSortMode,
+	]);
 
 	const navigate = useNavigate();
 	const { machineId, activeHostUrl } = useLocalHostService();
@@ -726,11 +781,19 @@ function AutomationsPage() {
 											<TableHead
 												className={cn(DATA_TABLE_HEAD_CELL, lastRunWidth)}
 											>
-												{/* Sortable heads are buttons, which Chrome's UA sheet
-												    exempts from the header's `uppercase` — match them. */}
-												<span className="normal-case">
-													<Trans>Last run</Trans>
-												</span>
+												<SortableHeader
+													field="lastRun"
+													label={
+														sortField !== "lastRun"
+															? t({ message: "Last run" })
+															: lastRunSortMode === "time"
+																? t({ message: "Last run (time)" })
+																: t({ message: "Last run (result)" })
+													}
+													sortField={sortField}
+													sortDirection={sortDirection}
+													onSort={handleSort}
+												/>
 											</TableHead>
 											<TableHead
 												className={cn(DATA_TABLE_HEAD_CELL, "w-20 pr-4")}

@@ -14,6 +14,8 @@ import {
 	readPendingChatStops,
 	removePendingChatStop,
 } from "../../../../utils/pendingChatStops";
+import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
+import { useChatSubagentStore } from "../../stores/chatSubagentStore";
 import { ChatClosedToast } from "./components/ChatClosedToast";
 import { createClosedChatBatches } from "./utils/closedChatBatches";
 
@@ -30,13 +32,26 @@ interface ClosedChat {
 export function useUndoableChatClose({
 	workspaceId,
 	store,
-	stopChat,
 }: {
 	workspaceId: string;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
-	stopChat: (sessionId: string) => Promise<boolean>;
 }): (pane: Pane<PaneViewerData>) => void {
 	const { t } = useLingui();
+	const wiring = useChatWiring();
+	const stopChat = useCallback(
+		async (sessionId: string) => {
+			const reopen = markChatSessionClosed(sessionId);
+			try {
+				await wiring.transport.closeSession({ sessionId });
+				return true;
+			} catch (error) {
+				console.warn("[acp-chat] could not stop the chat session", error);
+				reopen();
+				return false;
+			}
+		},
+		[wiring.transport],
+	);
 	const latest = useRef({ store, stopChat, t });
 	latest.current = { store, stopChat, t };
 	const previousTabs = useRef(store.getState().tabs);
@@ -50,7 +65,8 @@ export function useUndoableChatClose({
 	);
 
 	const [batches] = useState(() => {
-		const stopSession = (sessionId: string) =>
+		const stopSession = (sessionId: string) => {
+			if (!isChatSessionClosed(sessionId)) return;
 			void latest.current
 				.stopChat(sessionId)
 				.then((stopped) => {
@@ -61,6 +77,7 @@ export function useUndoableChatClose({
 					}
 				})
 				.finally(() => removePendingChatStop(sessionId));
+		};
 		const { push, remove } = useUndoStack.getState();
 		const closed = createClosedChatBatches<ClosedChat>({
 			show: ({ id, chats }) => {
@@ -92,13 +109,19 @@ export function useUndoableChatClose({
 				toast.dismiss(id);
 			},
 			restore: (chat) => {
+				if (!isChatSessionClosed(chat.sessionId)) return;
 				removePendingChatStop(chat.sessionId);
 				chat.reopen();
 				const state = latest.current.store.getState();
 				if (chat.slot) state.insertTab(chat.slot);
 				else state.addTab({ panes: [chat.pane] });
 			},
-			stop: (chat) => stopSession(chat.sessionId),
+			stop: (chat) => {
+				stopSession(chat.sessionId);
+				useChatSubagentStore
+					.getState()
+					.forget((chat.pane.data as ChatPaneData).terminalId);
+			},
 		});
 		return { closed, stopSession };
 	});

@@ -11,9 +11,10 @@ import {
 import { Label } from "@superset/ui/label";
 import { RadioGroup, RadioGroupItem } from "@superset/ui/radio-group";
 import { toast } from "@superset/ui/sonner";
+import { ToggleGroup, ToggleGroupItem } from "@superset/ui/toggle-group";
 import { cn } from "@superset/ui/utils";
 import { Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { useId, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { SiVercel } from "react-icons/si";
 
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
@@ -23,6 +24,7 @@ import type {
 	CustomProvider,
 	SaveCredentialInput,
 } from "../../../../hooks/useAgentCredential";
+import { ChatgptSignIn } from "./components/ChatgptSignIn";
 import { CopyStateIcon } from "./components/CopyStateIcon";
 import { DisconnectMenu } from "./components/DisconnectMenu";
 import { ExternalTextLink } from "./components/ExternalTextLink";
@@ -33,14 +35,18 @@ import { SavedSecret } from "./components/SavedSecret";
 import { SecretField } from "./components/SecretField";
 import { FOCUS_RING } from "./constants";
 
+const CODEX_USAGE_SETTINGS = "https://chatgpt.com/codex/settings/usage";
+
 interface CloudAuthDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	presetId: string;
 	label: string;
 	state: CloudAuthState;
+	accountLabel: string | null;
 	chooseMethod: (method: CloudAuthMethod | null) => void;
 	save: (input: SaveCredentialInput) => Promise<unknown>;
+	signedIn: () => Promise<unknown>;
 	disconnect: () => Promise<unknown>;
 }
 
@@ -50,8 +56,10 @@ export function CloudAuthDialog({
 	presetId,
 	label,
 	state,
+	accountLabel,
 	chooseMethod,
 	save,
+	signedIn,
 	disconnect,
 }: CloudAuthDialogProps) {
 	const { t } = useLingui();
@@ -65,7 +73,23 @@ export function CloudAuthDialog({
 	const [apiKeyAdvanced, setApiKeyAdvanced] = useState(false);
 	const [replacing, setReplacing] = useState(false);
 	const [checking, setChecking] = useState<string | null>(null);
+	const [chatgptPlan, setChatgptPlan] = useState<"personal" | "business">(
+		"personal",
+	);
 	const advancedId = useId();
+
+	const handleChatgptConnected = useCallback(
+		(connectedAs: string | null) => {
+			setReplacing(false);
+			toast.success(
+				connectedAs
+					? t({ message: `Signed in to ChatGPT as ${connectedAs}` })
+					: t({ message: "Signed in to ChatGPT" }),
+			);
+			void signedIn();
+		},
+		[signedIn, t],
+	);
 
 	/**
 	 * One call does both: the server checks the credential against the
@@ -118,17 +142,15 @@ export function CloudAuthDialog({
 	const customLabel = providers.find(
 		(provider) => provider.id === state.customProvider,
 	)?.label;
-	const tokenCommand = isClaude ? "claude setup-token" : "codex login";
+	const tokenCommand = "claude setup-token";
 
-	const optionClass = (selected: boolean) =>
-		cn(
-			"rounded-lg border border-border text-sm transition-colors",
-			selected && "border-primary/60 bg-primary/[0.04] ring-1 ring-primary/40",
-		);
-	const optionRowClass = "flex min-h-14 items-center gap-3 pr-4";
+	const optionClass = "overflow-hidden rounded-lg border border-border text-sm";
+	const optionRowClass =
+		"flex min-h-12 items-center gap-3 pr-3 transition-colors hover:bg-accent/50";
 	const optionLabelClass =
-		"flex flex-1 cursor-pointer items-center gap-3 self-stretch py-3 pl-4";
-	const optionBodyClass = "space-y-2 border-t border-border px-4 py-3";
+		"flex flex-1 cursor-pointer items-center gap-3 self-stretch py-3 pl-3";
+	const optionBodyClass =
+		"space-y-3 border-t border-border bg-muted/30 px-3 py-3";
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
@@ -163,12 +185,12 @@ export function CloudAuthDialog({
 								const saved =
 									state.customSaved && state.customProvider === provider.id;
 								return (
-									<div className={optionClass(isOpen)} key={provider.id}>
+									<div className={optionClass} key={provider.id}>
 										<div className={optionRowClass}>
 											<button
 												aria-expanded={isOpen}
 												className={cn(
-													"flex flex-1 items-center gap-3 self-stretch rounded-lg py-3 pl-4 text-left",
+													"flex flex-1 items-center gap-3 self-stretch py-3 pl-3 text-left",
 													FOCUS_RING,
 												)}
 												onClick={() => setExpanded(isOpen ? null : provider.id)}
@@ -226,14 +248,10 @@ export function CloudAuthDialog({
 				) : (
 					<>
 						<DialogHeader>
-							<DialogTitle>
-								<Trans>{label} in cloud workspaces</Trans>
-							</DialogTitle>
+							<DialogTitle>{label}</DialogTitle>
 							<DialogDescription>
 								<Trans>
-									Pick how {label} signs in inside a sandbox. The credential is
-									handed to the agent process when it launches and is not stored
-									in the sandbox.
+									How {label} signs in when Superset runs it for you.
 								</Trans>
 							</DialogDescription>
 						</DialogHeader>
@@ -247,7 +265,7 @@ export function CloudAuthDialog({
 								}}
 								value={state.method === "custom" ? "" : state.method}
 							>
-								<div className={optionClass(state.method === "subscription")}>
+								<div className={optionClass}>
 									<div className={optionRowClass}>
 										<Label
 											className={optionLabelClass}
@@ -261,81 +279,143 @@ export function CloudAuthDialog({
 											{state.subscriptionConnected ? (
 												<Check className="size-4 text-emerald-500" />
 											) : null}
+											{state.subscriptionConnected && accountLabel ? (
+												<span className="truncate text-xs font-normal text-muted-foreground">
+													{accountLabel}
+												</span>
+											) : null}
 										</Label>
 										{state.subscriptionConnected ? (
 											<DisconnectMenu
 												agentLabel={label}
 												credential={t({ message: "subscription" })}
 												disconnect={disconnect}
+												onReconnect={
+													isClaude
+														? undefined
+														: () => {
+																chooseMethod("subscription");
+																setReplacing(true);
+															}
+												}
 											/>
 										) : null}
 									</div>
 									{state.method === "subscription" ? (
 										<div className={optionBodyClass}>
 											{state.subscriptionConnected && !replacing ? (
-												<SavedSecret
-													label={t({ message: "Token" })}
-													onReplace={() => setReplacing(true)}
-												/>
+												isClaude ? (
+													<SavedSecret
+														label={t({ message: "Token" })}
+														onReplace={() => setReplacing(true)}
+													/>
+												) : (
+													<ExternalTextLink href={CODEX_USAGE_SETTINGS}>
+														<Trans>Manage usage</Trans>
+													</ExternalTextLink>
+												)
 											) : (
 												<>
-													<p className="text-muted-foreground">
-														<Trans>
-															Run{" "}
-															<code className="rounded bg-muted px-1 py-0.5 font-mono">
-																{tokenCommand}
-															</code>
-															<button
-																aria-label={t({ message: "Copy command" })}
-																className={cn(
-																	"ml-1 inline-flex h-5 items-center rounded-sm align-top text-muted-foreground hover:text-foreground",
-																	FOCUS_RING,
-																)}
-																onClick={() =>
-																	void copyToClipboard(tokenCommand)
-																}
-																type="button"
+													{isClaude ? null : (
+														<div className="flex items-center gap-2">
+															<ToggleGroup
+																className="justify-start"
+																onValueChange={(value) => {
+																	if (
+																		value === "personal" ||
+																		value === "business"
+																	) {
+																		setChatgptPlan(value);
+																	}
+																}}
+																size="sm"
+																type="single"
+																value={chatgptPlan}
+																variant="outline"
 															>
-																<CopyStateIcon copied={copiedCommand} />
-															</button>{" "}
-															in a terminal and paste the token here.
-														</Trans>
-													</p>
-													<div className="flex items-center gap-2">
-														<SecretField
-															className="flex-1"
-															hideLabel
-															label={t({ message: "Token" })}
-															onChange={setTokenDraft}
-															placeholder={
-																isClaude
-																	? "CLAUDE_CODE_OAUTH_TOKEN"
-																	: "CODEX_ACCESS_TOKEN"
-															}
-															value={tokenDraft}
+																<ToggleGroupItem value="personal">
+																	<Trans>Personal plan</Trans>
+																</ToggleGroupItem>
+																<ToggleGroupItem value="business">
+																	<Trans>Business plan</Trans>
+																</ToggleGroupItem>
+															</ToggleGroup>
+															{replacing ? (
+																<Button
+																	className="ml-auto"
+																	onClick={() => setReplacing(false)}
+																	size="sm"
+																	variant="ghost"
+																>
+																	<Trans>Cancel</Trans>
+																</Button>
+															) : null}
+														</div>
+													)}
+													{isClaude ? (
+														<>
+															<p className="text-muted-foreground">
+																<Trans>
+																	Run{" "}
+																	<code className="rounded bg-muted px-1 py-0.5 font-mono">
+																		{tokenCommand}
+																	</code>
+																	<button
+																		aria-label={t({
+																			message: "Copy command",
+																		})}
+																		className={cn(
+																			"ml-1 inline-flex h-5 items-center rounded-sm align-top text-muted-foreground hover:text-foreground",
+																			FOCUS_RING,
+																		)}
+																		onClick={() =>
+																			void copyToClipboard(tokenCommand)
+																		}
+																		type="button"
+																	>
+																		<CopyStateIcon copied={copiedCommand} />
+																	</button>{" "}
+																	in a terminal and paste the token here.
+																</Trans>
+															</p>
+															<div className="flex items-center gap-2">
+																<SecretField
+																	className="flex-1"
+																	hideLabel
+																	label={t({ message: "Token" })}
+																	onChange={setTokenDraft}
+																	placeholder="CLAUDE_CODE_OAUTH_TOKEN"
+																	value={tokenDraft}
+																/>
+																<SaveButton
+																	checking={checking === "subscription"}
+																	disabled={!tokenDraft.trim()}
+																	onClick={() =>
+																		verifyAndSave(
+																			"subscription",
+																			{
+																				kind: "subscription",
+																				value: tokenDraft.trim(),
+																			},
+																			() => setTokenDraft(""),
+																		)
+																	}
+																/>
+															</div>
+														</>
+													) : (
+														<ChatgptSignIn
+															onConnected={handleChatgptConnected}
+															plan={chatgptPlan}
 														/>
-														<SaveButton
-															checking={checking === "subscription"}
-															disabled={!tokenDraft.trim()}
-															onClick={() =>
-																verifyAndSave(
-																	"subscription",
-																	{
-																		kind: "subscription",
-																		value: tokenDraft.trim(),
-																	},
-																	() => setTokenDraft(""),
-																)
-															}
-														/>
-													</div>
+													)}
 												</>
 											)}
 										</div>
 									) : null}
 								</div>
 
-								<div className={optionClass(state.method === "api_key")}>
+								<div className={optionClass}>
 									<div className={optionRowClass}>
 										<Label
 											className={optionLabelClass}
@@ -444,11 +524,11 @@ export function CloudAuthDialog({
 							</RadioGroup>
 
 							{/* Custom provider: a nested view, not a radio */}
-							<div className={optionClass(state.method === "custom")}>
+							<div className={optionClass}>
 								<button
 									className={cn(
 										optionRowClass,
-										"w-full rounded-lg pl-4 text-left font-medium",
+										"w-full pl-3 text-left font-medium",
 										FOCUS_RING,
 									)}
 									onClick={() => setView("custom")}

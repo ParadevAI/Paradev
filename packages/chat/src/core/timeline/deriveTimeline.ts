@@ -50,12 +50,24 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 	return entries;
 }
 
+export type DeriveTimelineOptions = {
+	nestChildItems?: boolean;
+};
+
 export function deriveTimeline(
 	snapshot: Pick<SessionSnapshot, "items" | "turns">,
+	options?: DeriveTimelineOptions,
 ): TurnGroup[] {
 	const itemsByTurn = new Map<string, Item[]>();
 	for (const stored of snapshot.items.values() as Iterable<StoredItem>) {
 		if (isQueuedPrompt(stored.item) || isDiscardedPrompt(stored.item)) continue;
+		if (
+			options?.nestChildItems &&
+			stored.item.parentItemId &&
+			snapshot.items.has(stored.item.parentItemId) &&
+			!isPendingApproval(stored.item)
+		)
+			continue;
 		const bucket = itemsByTurn.get(stored.turnId);
 		if (bucket) bucket.push(stored.item);
 		else itemsByTurn.set(stored.turnId, [stored.item]);
@@ -88,19 +100,50 @@ function firstItemStart(group: TurnGroup): number {
 		: (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER);
 }
 
+export function deriveChildrenByParent(
+	snapshot: Pick<SessionSnapshot, "items">,
+	previous?: ReadonlyMap<string, readonly Item[]>,
+): ReadonlyMap<string, readonly Item[]> {
+	const grouped = new Map<string, Item[]>();
+	for (const stored of snapshot.items.values() as Iterable<StoredItem>) {
+		const parentItemId = stored.item.parentItemId;
+		if (!parentItemId || !snapshot.items.has(parentItemId)) continue;
+		if (isQueuedPrompt(stored.item) || isDiscardedPrompt(stored.item)) continue;
+		const bucket = grouped.get(parentItemId);
+		if (bucket) bucket.push(stored.item);
+		else grouped.set(parentItemId, [stored.item]);
+	}
+	const result = new Map<string, readonly Item[]>();
+	for (const [parentItemId, children] of grouped) {
+		children.sort(byStartThenId);
+		const prior = previous?.get(parentItemId);
+		result.set(
+			parentItemId,
+			prior &&
+				prior.length === children.length &&
+				prior.every((item, index) => item === children[index])
+				? prior
+				: children,
+		);
+	}
+	return result;
+}
+
 export function derivePendingApprovals(
 	snapshot: Pick<SessionSnapshot, "items">,
 ): ApprovalRequest[] {
 	const pending: ApprovalRequest[] = [];
-	for (const stored of snapshot.items.values()) {
-		const item = stored.item;
-		if (item.kind === "approval_request") {
-			const approval = item as ApprovalRequest;
-			if (approval.status === "pending") pending.push(approval);
-		}
-	}
+	for (const { item } of snapshot.items.values())
+		if (isPendingApproval(item)) pending.push(item as ApprovalRequest);
 	pending.sort(byStartThenId);
 	return pending;
+}
+
+function isPendingApproval(item: Item): boolean {
+	return (
+		item.kind === "approval_request" &&
+		(item as ApprovalRequest).status === "pending"
+	);
 }
 
 function isQueuedPrompt(item: Item): item is UserMessage {
