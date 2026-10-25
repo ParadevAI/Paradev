@@ -12,8 +12,6 @@ import { assertCodexFileCredentialStore } from "./codex-quota-config";
 import { createCredentialQuotaCache } from "./credential-quota-cache";
 import { type CodexHome, discoverCodexHomes } from "./profiles";
 import { copyQuotaRetry, recordQuotaRetry } from "./quota-backoff";
-import { opaqueQuotaIdentity, type QuotaFetch, quotaRateLimits, resetMetadata } from "./quota-widget-metadata";
-import { parseCodexResetCredits } from "./reset-credits";
 import type { QuotaSnapshot } from "./quota-cache";
 import {
 	parseQuotaCredentialJson,
@@ -25,6 +23,13 @@ import {
 	createQuotaRequestBudget,
 	QUOTA_REQUEST_BUDGET_MS,
 } from "./quota-request";
+import {
+	opaqueQuotaIdentity,
+	type QuotaFetch,
+	quotaRateLimits,
+	resetMetadata,
+} from "./quota-widget-metadata";
+import { parseCodexResetCredits } from "./reset-credits";
 import type {
 	UsageAccount,
 	UsageAccountStatus,
@@ -53,9 +58,9 @@ interface CodexRateLimit {
 }
 
 interface CodexUsageResponse {
- account_id?: string;
- accountId?: string;
- rate_limit_reset_credits?: { available_count?: number } | null;
+	account_id?: string;
+	accountId?: string;
+	rate_limit_reset_credits?: { available_count?: number } | null;
 	email?: string;
 	plan_type?: string;
 	rate_limit?: CodexRateLimit;
@@ -259,8 +264,8 @@ export interface CodexSubscriptionQuota {
 	statusDetail: string | null;
 	windows: UsageQuotaWindow[];
 	creditsBalance: number | null;
- quotaIdentity?: string;
- resetCredits?: UsageAccount["resetCredits"];
+	quotaIdentity?: string;
+	resetCredits?: UsageAccount["resetCredits"];
 }
 
 export const CODEX_EXPIRED_TOKEN_DETAIL =
@@ -274,13 +279,18 @@ export async function fetchCodexSubscriptionQuota(
 	accessToken: string,
 	accountId?: string,
 	budgetOrFetcher: number | QuotaFetch = QUOTA_REQUEST_BUDGET_MS,
-	budget = createQuotaRequestBudget(typeof budgetOrFetcher === "number" ? budgetOrFetcher : QUOTA_REQUEST_BUDGET_MS),
+	budget = createQuotaRequestBudget(
+		typeof budgetOrFetcher === "number"
+			? budgetOrFetcher
+			: QUOTA_REQUEST_BUDGET_MS,
+	),
 	readResets = (token: string, id: string, signal: AbortSignal) =>
 		resetMetadata.codex(token, id, signal),
 	rateLimits = quotaRateLimits,
 ): Promise<CodexSubscriptionQuota> {
-	const fetcher = typeof budgetOrFetcher === "number" ? globalThis.fetch : budgetOrFetcher;
- const empty = { email: null, plan: null, windows: [], creditsBalance: null };
+	const fetcher =
+		typeof budgetOrFetcher === "number" ? globalThis.fetch : budgetOrFetcher;
+	const empty = { email: null, plan: null, windows: [], creditsBalance: null };
 	const scope = opaqueQuotaIdentity(
 		"codex-quota",
 		accessToken,
@@ -298,10 +308,15 @@ export async function fetchCodexSubscriptionQuota(
 		};
 		if (accountId) headers["chatgpt-account-id"] = accountId;
 		const response = await budget.run(async (signal) => {
-			const response = await fetcher(CODEX_USAGE_URL, { headers, signal, cache: "no-store", redirect: "error" });
+			const response = await fetcher(CODEX_USAGE_URL, {
+				headers,
+				signal,
+				cache: "no-store",
+				redirect: "error",
+			});
 			rateLimits.record(scope, response);
 			return {
- original: response,
+				original: response,
 				status: response.status,
 				ok: response.ok,
 				body: response.ok ? ((await response.json()) as unknown) : null,
@@ -316,11 +331,14 @@ export async function fetchCodexSubscriptionQuota(
 			};
 		}
 		if (!response.ok) {
-			return recordQuotaRetry({
-				...empty,
-				status: "unavailable",
-				statusDetail: `Usage endpoint returned ${response.status}.`,
-			}, response.original);
+			return recordQuotaRetry(
+				{
+					...empty,
+					status: "unavailable",
+					statusDetail: `Usage endpoint returned ${response.status}.`,
+				},
+				response.original,
+			);
 		}
 
 		const usage = response.body as CodexUsageResponse;
@@ -417,7 +435,10 @@ export function getCodexCredentialQuota(
 export async function fetchCodexAccountForHome(
 	home: CodexHome,
 	isDefaultHome: boolean,
-	capturedAuth?: CodexAuthFile | null | ((path: string) => Promise<string | null>),
+	capturedAuth?:
+		| CodexAuthFile
+		| null
+		| ((path: string) => Promise<string | null>),
 	fetchQuota = fetchCodexSubscriptionQuota,
 	forceRefresh = false,
 ): Promise<UsageAccount[]> {
@@ -452,17 +473,24 @@ export async function fetchCodexAccountForHome(
 		];
 	}
 
- const readCurrent = async (): Promise<CodexAuthFile | null> => {
-  if (typeof capturedAuth === "function") {
-   const raw = await capturedAuth(authPath);
-   return raw === null ? null : parseQuotaCredentialJson(raw) as CodexAuthFile;
-  }
-  return readCodexQuotaAuth(codexHome);
- };
- let auth: CodexAuthFile;
- try {
-  auth = capturedAuth === undefined || typeof capturedAuth === "function" ? (await readCurrent() ?? {}) : (capturedAuth ?? {});
- } catch { return [unavailableQuotaAccount({...base})]; }
+	const readCurrent = async (): Promise<CodexAuthFile | null> => {
+		if (typeof capturedAuth === "function") {
+			const raw = await capturedAuth(authPath);
+			return raw === null
+				? null
+				: (parseQuotaCredentialJson(raw) as CodexAuthFile);
+		}
+		return readCodexQuotaAuth(codexHome);
+	};
+	let auth: CodexAuthFile;
+	try {
+		auth =
+			capturedAuth === undefined || typeof capturedAuth === "function"
+				? ((await readCurrent()) ?? {})
+				: (capturedAuth ?? {});
+	} catch {
+		return [unavailableQuotaAccount({ ...base })];
+	}
 
 	const accessToken = auth.tokens?.access_token;
 	if (!accessToken) return [];
@@ -474,11 +502,40 @@ export async function fetchCodexAccountForHome(
 		forceRefresh,
 		fetchQuota,
 	);
- try {
-  const current = await readCurrent();
-  if (current?.tokens?.access_token !== accessToken || current.tokens?.account_id !== auth.tokens?.account_id)
-   return [{...base, email:null, plan:null, status:"unavailable", statusDetail:"Sign-in changed while reading usage.", windows:[], creditsBalance:null}];
- } catch { return [unavailableQuotaAccount({...base})]; }
+	try {
+		const current = await readCurrent();
+		if (
+			current?.tokens?.access_token !== accessToken ||
+			current.tokens?.account_id !== auth.tokens?.account_id
+		)
+			return [
+				{
+					...base,
+					email: null,
+					plan: null,
+					status: "unavailable",
+					statusDetail: "Sign-in changed while reading usage.",
+					windows: [],
+					creditsBalance: null,
+				},
+			];
+	} catch {
+		return [unavailableQuotaAccount({ ...base })];
+	}
 
-	return [copyQuotaRetry(quota, { ...base, ...quota, ...(quota.quotaIdentity ? {quotaIdentity: opaqueQuotaIdentity("codex", authPath, quota.quotaIdentity)} : {}) })];
+	return [
+		copyQuotaRetry(quota, {
+			...base,
+			...quota,
+			...(quota.quotaIdentity
+				? {
+						quotaIdentity: opaqueQuotaIdentity(
+							"codex",
+							authPath,
+							quota.quotaIdentity,
+						),
+					}
+				: {}),
+		}),
+	];
 }

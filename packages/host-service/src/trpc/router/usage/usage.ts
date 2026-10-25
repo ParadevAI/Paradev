@@ -39,11 +39,11 @@ import {
 	discoverCodexHomes,
 	readCodexProfileKind,
 } from "./profiles";
+import { createQuotaResetTracker } from "./quota-reset-tracker";
+import { resetMetadata } from "./quota-widget-metadata";
 import { validateSessionAccount } from "./session-account/session-account";
 import { createUsageQuotaReader } from "./usage-quota";
-import { createQuotaResetTracker } from "./quota-reset-tracker";
 import { projectWidgetQuotaMetadata } from "./widget-quota-metadata";
-import { resetMetadata } from "./quota-widget-metadata";
 
 const quotaResetTracker = createQuotaResetTracker();
 
@@ -95,8 +95,8 @@ export async function disposeUsageQuota() {
 	const retiring = quotaCache;
 	quotaCache = undefined;
 	await retiring?.dispose();
- quotaResetTracker.clear();
- resetMetadata.clear();
+	quotaResetTracker.clear();
+	resetMetadata.clear();
 }
 
 export const leaderboardPayloadInput = z.object({
@@ -104,7 +104,11 @@ export const leaderboardPayloadInput = z.object({
 });
 
 export const usageRouter = router({
- claimQuotaResetNotices: protectedProcedure.input(z.object({ids: z.array(z.string().regex(/^[a-f0-9]{64}$/)).max(512)})).mutation(({input}) => quotaResetTracker.claim(input.ids)),
+	claimQuotaResetNotices: protectedProcedure
+		.input(
+			z.object({ ids: z.array(z.string().regex(/^[a-f0-9]{64}$/)).max(512) }),
+		)
+		.mutation(({ input }) => quotaResetTracker.claim(input.ids)),
 	sessionAccount: queryProcedure
 		.input(
 			z.object({
@@ -142,15 +146,17 @@ export const usageRouter = router({
 			// isDefault is applied per query, not cached with the quota: changing
 			// the default must reflect immediately without re-hitting providers.
 			const defaults = getDefaultAccountSelections(ctx.db);
-			return quotaResetTracker.observe(accounts.map((account) => ({
-				...projectWidgetQuotaMetadata(account),
-				isDefault:
-					account.agent === "claude"
-						? account.selection === defaults.claudeConfigDir
-						: account.agent === "codex"
-							? account.selection === defaults.codexHome
-							: false,
-			})));
+			return quotaResetTracker.observe(
+				accounts.map((account) => ({
+					...projectWidgetQuotaMetadata(account),
+					isDefault:
+						account.agent === "claude"
+							? account.selection === defaults.claudeConfigDir
+							: account.agent === "codex"
+								? account.selection === defaults.codexHome
+								: false,
+				})),
+			);
 		}),
 
 	/**
@@ -303,8 +309,8 @@ export const usageRouter = router({
 			// The quota cache still lists the removed account; drop it so the
 			// next query re-discovers.
 			getQuotaReader().invalidate();
- quotaResetTracker.clear();
- resetMetadata.clear();
+			quotaResetTracker.clear();
+			resetMetadata.clear();
 			return { success: true as const };
 		}),
 
