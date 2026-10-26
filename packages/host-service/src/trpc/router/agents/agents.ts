@@ -561,17 +561,23 @@ async function runTerminalAgent(
 	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
 	input: AgentRunInput,
 ): Promise<AgentRunResult> {
-	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
+	const launch = buildTerminalAgentLaunch(ctx.db, input);
+	const label = launch.label;
+	let fullCommand = launch.fullCommand;
 
 	const terminalId = input.terminalLaunch?.terminalId ?? crypto.randomUUID();
 	if (
 		process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
-		!input.resumeSessionId &&
 		!input.forkSessionId
 	) {
-		await prepareNativeClaudeTerminalLaunch(terminalId, input.account).catch(
-			() => false,
-		);
+		const prepared = await prepareNativeClaudeTerminalLaunch(
+			terminalId,
+			input.account,
+		).catch(() => false);
+		if (prepared && input.resumeSessionId)
+			fullCommand = `${envOverlayPrefix({
+				SUPERSET_NATIVE_CLAUDE_OWNED_LAUNCH: "1",
+			})}${fullCommand}`;
 	}
 	const result = await createTerminalSessionInternal({
 		terminalId,

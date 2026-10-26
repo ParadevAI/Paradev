@@ -66,7 +66,7 @@ test("cold launches capture only a generation and recover after authenticated sh
 	expect(JSON.stringify({ generation, scope })).not.toContain(
 		credential.accessToken,
 	);
-	expect(reads).toBe(7);
+	expect(reads).toBe(6);
 });
 
 test("registration exactly matches the public tuple and fails closed on conflicting aliases", () => {
@@ -129,8 +129,8 @@ test("persisted display proof, foreign registration, rotated token, changed dire
 	expect(await resolver.resolve(null, "/fixture/profile", identity)).toBeNull();
 });
 
-test("credential and canonical-path replacement during either re-read is rejected", async () => {
-	for (const replacedAt of [2, 3]) {
+test("credential and canonical-path replacement at either proof boundary is rejected", async () => {
+	for (const replacedAt of [1, 2]) {
 		let reads = 0;
 		const quota = bindClaudeQuotaIdentity(
 			{},
@@ -156,6 +156,60 @@ test("credential and canonical-path replacement during either re-read is rejecte
 		readCurrent: async () => credential,
 		canonicalize: async () =>
 			++paths === 2 ? "/other/profile" : "/fixture/profile",
+		peekQuota: () =>
+			bindClaudeQuotaIdentity({}, credential.accessToken, profile, at),
+		now: () => at,
+	});
+	expect(await resolver.resolve(null, "/fixture/profile", identity)).toBeNull();
+});
+
+test("captured and legacy proof resolution each use exactly two fresh credential reads", async () => {
+	let reads = 0;
+	const quota = bindClaudeQuotaIdentity(
+		{},
+		credential.accessToken,
+		profile,
+		at,
+	);
+	const resolver = createNativeClaudeScopeResolver({
+		readCurrent: async () => {
+			reads++;
+			return credential;
+		},
+		canonicalize: async (value) => value,
+		peekQuota: () => quota,
+		now: () => at,
+	});
+	const captured = await resolver.captureGeneration(
+		null,
+		"/fixture/profile",
+		identity,
+	);
+	expect(reads).toBe(2);
+	reads = 0;
+	expect(
+		await resolver.resolve(null, "/fixture/profile", identity, captured ?? ""),
+	).toMatch(/^[a-f0-9]{64}$/);
+	expect(reads).toBe(2);
+	reads = 0;
+	expect(await resolver.resolve(null, "/fixture/profile", identity)).toMatch(
+		/^[a-f0-9]{64}$/,
+	);
+	expect(reads).toBe(2);
+	expect(
+		await resolver.resolve(null, "/fixture/profile", identity, "wrong"),
+	).toBeNull();
+});
+
+test("directory retargeting during the final proof read rejects the original credential", async () => {
+	let directory = "/fixture/profile";
+	let reads = 0;
+	const resolver = createNativeClaudeScopeResolver({
+		readCurrent: async () => {
+			if (++reads === 2) directory = "/other/profile";
+			return credential;
+		},
+		canonicalize: async () => directory,
 		peekQuota: () =>
 			bindClaudeQuotaIdentity({}, credential.accessToken, profile, at),
 		now: () => at,

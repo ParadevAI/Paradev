@@ -31,6 +31,21 @@ export function createNativeClaudeScopeResolver({
 	now?: () => number;
 }) {
 	const generation = nativeClaudeCredentialGeneration;
+	async function read(
+		selection: string | null,
+		expectedDirectory: string,
+		expectedIdentity: string,
+	) {
+		const directory = await canonicalize(expectedDirectory);
+		if (!directory) return null;
+		const current = await readCurrent(selection);
+		return current &&
+			current.canonicalProfile === directory &&
+			current.registrationHash === expectedIdentity &&
+			(await canonicalize(expectedDirectory)) === directory
+			? current
+			: null;
+	}
 	async function capture(
 		selection: string | null,
 		expectedDirectory: string,
@@ -38,21 +53,14 @@ export function createNativeClaudeScopeResolver({
 	) {
 		if (!/^[a-f0-9]{64}$/.test(expectedIdentity)) return null;
 		try {
-			const directory = await canonicalize(expectedDirectory);
-			if (!directory) return null;
-			const current = await readCurrent(selection);
-			if (
-				!current ||
-				current.canonicalProfile !== directory ||
-				current.registrationHash !== expectedIdentity
-			)
-				return null;
-			const next = await readCurrent(selection);
-			if (
-				!next ||
-				generation(current) !== generation(next) ||
-				(await canonicalize(expectedDirectory)) !== directory
-			)
+			const current = await read(
+				selection,
+				expectedDirectory,
+				expectedIdentity,
+			);
+			const next =
+				current && (await read(selection, expectedDirectory, expectedIdentity));
+			if (!current || !next || generation(current) !== generation(next))
 				return null;
 			return { credential: current, generation: generation(current) };
 		} catch {
@@ -76,18 +84,25 @@ export function createNativeClaudeScopeResolver({
 			expectedIdentity: string,
 			expectedGeneration?: string,
 		) {
-			const captured = await capture(
-				selection,
-				expectedDirectory,
-				expectedIdentity,
-			);
 			if (
-				!captured ||
+				!/^[a-f0-9]{64}$/.test(expectedIdentity) ||
 				(expectedGeneration !== undefined &&
-					captured.generation !== expectedGeneration)
+					!/^[a-f0-9]{64}$/.test(expectedGeneration))
 			)
 				return null;
-			const { credential } = captured;
+			let credential: NativeClaudeCredential | null;
+			try {
+				credential = await read(selection, expectedDirectory, expectedIdentity);
+			} catch {
+				return null;
+			}
+			if (!credential) return null;
+			const capturedGeneration = generation(credential);
+			if (
+				expectedGeneration !== undefined &&
+				capturedGeneration !== expectedGeneration
+			)
+				return null;
 			const quota = peekQuota(credential.accessToken);
 			const scope = quota
 				? verifiedNativeClaudeQuotaScope(
@@ -98,13 +113,12 @@ export function createNativeClaudeScopeResolver({
 						now(),
 					)
 				: null;
-			if (!scope) return null;
 			// The cached proof check is also fenced against a credential replacement during lookup.
 			try {
-				const next = await readCurrent(selection);
+				const next = await read(selection, expectedDirectory, expectedIdentity);
 				if (
 					!next ||
-					generation(next) !== captured.generation ||
+					generation(next) !== capturedGeneration ||
 					(await canonicalize(expectedDirectory)) !==
 						credential.canonicalProfile
 				)
@@ -112,10 +126,11 @@ export function createNativeClaudeScopeResolver({
 			} catch {
 				return null;
 			}
+			if (!scope) return null;
 			return hashQuotaScope([
 				"native-claude-scope-v1",
 				scope,
-				captured.generation,
+				capturedGeneration,
 			]);
 		},
 	};

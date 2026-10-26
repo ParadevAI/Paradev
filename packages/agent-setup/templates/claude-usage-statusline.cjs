@@ -36,10 +36,16 @@ function prepare(args) {
 		process.env.SUPERSET_AGENT_ID !== "claude"
 	)
 		return;
+	const ownedLaunch = process.env.SUPERSET_NATIVE_CLAUDE_OWNED_LAUNCH === "1";
 	for (const arg of args) {
 		if (arg === "--") break;
 		if (
-			/^(--settings|--setting-sources|--output-format|--input-format|--print|--bare|--help|--version|--resume|--continue|--fork-session|--remote|--teleport)(=|$)/.test(
+			!ownedLaunch &&
+			(/^(--resume|--continue)(=|$)/.test(arg) || ["-r", "-c"].includes(arg))
+		)
+			return;
+		if (
+			/^(--settings|--setting-sources|--output-format|--input-format|--print|--bare|--help|--version|--fork-session|--remote|--teleport)(=|$)/.test(
 				arg,
 			) ||
 			[
@@ -47,10 +53,8 @@ function prepare(args) {
 				"-h",
 				"-V",
 				"-v",
-				"-r",
-				"-c",
-				"attach",
 				"resume",
+				"attach",
 				"agents",
 				"sessions",
 				"background",

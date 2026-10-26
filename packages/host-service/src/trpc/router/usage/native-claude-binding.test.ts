@@ -226,3 +226,19 @@ test("proof that completes after receipt expiry cannot promote a queued reading"
 	expect(await replay).toBe(false);
 	expect(f.store.snapshot(f.scope)).toEqual([]);
 });
+
+test("healthy captured frames resolve proof without redundant credential capture", async () => {
+	const f = fixture();
+	f.warm();
+	let captures = 0;
+	const capture = f.deps.captureGeneration;
+	f.deps.captureGeneration = async (...args) => {
+		captures++;
+		return capture(...args);
+	};
+	await f.ingest(0);
+	f.advance();
+	expect(await f.ingest(1, 20)).toBe(true);
+	expect(captures).toBe(0);
+	expect(f.store.snapshot(f.scope)[0]?.usedPercent).toBe(20);
+});

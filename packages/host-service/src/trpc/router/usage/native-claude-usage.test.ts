@@ -662,3 +662,19 @@ test("same-second reset precision cannot freshen stale or equal-counter receipts
 	expect(f.store.snapshot(f.identity.scope)[0]?.resetsAt).toBe(reset + 213);
 	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).toBe(f.time());
 });
+
+test("captured generation lookup refuses expired or future-dated launch records", () => {
+	const f = fixture();
+	const launch = { launchId: "captured-launch", sessionId: "captured-session" };
+	expect(f.store.captureLaunch({ ...launch, generation: "b".repeat(64) })).toBe(
+		true,
+	);
+	expect(f.store.capturedGeneration(launch)).toBe("b".repeat(64));
+	f.advance(-1);
+	expect(f.store.capturedGeneration(launch)).toBeNull();
+	f.advance(14 * 24 * 60 * 60_000 + 2);
+	expect(f.store.capturedGeneration(launch)).toBeNull();
+	expect(
+		f.store.capturedGeneration({ ...launch, sessionId: "foreign" }),
+	).toBeNull();
+});

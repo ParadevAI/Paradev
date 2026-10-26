@@ -69,7 +69,8 @@ import {
 } from "./trpc/router/terminal-agents/terminal-agents";
 import { provisionSelectedAccounts } from "./trpc/router/usage/account-provisioning";
 import { claudeQuotaPolling } from "./trpc/router/usage/claude-quota-polling";
-import { disposeUsageQuota } from "./trpc/router/usage/usage";
+import { onNativeClaudeUsage } from "./trpc/router/usage/native-claude-usage";
+import { disposeUsageQuota, expireUsageQuota } from "./trpc/router/usage/usage";
 import {
 	execGh as defaultExecGh,
 	type ExecGh,
@@ -554,10 +555,18 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	const disposeQuotaActivity = claudeQuotaPolling.register(() =>
 		terminalAgentStore.list(),
 	);
+	const disposeNativeUsage = onNativeClaudeUsage(() => {
+		expireUsageQuota("claude");
+		eventBus.broadcastUsageChanged({
+			provider: "claude",
+			occurredAt: Date.now(),
+		});
+	});
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
 		disposeBackgroundSuccessorRefresh(db);
 		disposeQuotaActivity();
+		disposeNativeUsage();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		await disposeWorkspaceTitleJobs(db);
 		try {

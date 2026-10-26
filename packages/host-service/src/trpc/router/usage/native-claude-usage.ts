@@ -329,6 +329,22 @@ export function createNativeClaudeUsageStore(
 			save();
 			return true;
 		},
+		capturedGeneration(input: {
+			launchId: string;
+			sessionId: string;
+		}): string | null {
+			if (!validId(input.launchId) || !validId(input.sessionId)) return null;
+			const at = now();
+			const launch = load().launches.find(
+				(item) =>
+					item.key === hash(["launch", input.launchId, input.sessionId]),
+			);
+			return launch?.generation &&
+				launch.updatedAt <= at &&
+				at - launch.updatedAt <= MAX_AGE_MS
+				? launch.generation
+				: null;
+		},
 		activeScope(input: {
 			generation: string;
 			launchId: string;

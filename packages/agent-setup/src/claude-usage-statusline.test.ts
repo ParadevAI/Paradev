@@ -456,3 +456,37 @@ test("the custom command keeps the combined stdout/stderr buffer ceiling", async
 	expect(output.byteLength).toBeGreaterThan(0);
 	expect(errors.byteLength).toBeGreaterThan(0);
 });
+
+test("only a host-prepared resume marker permits resume capture; attachment and fork clients stay excluded", () => {
+	const f = fixture();
+	for (const args of [
+		["--resume", "owned-session"],
+		["-r", "owned-session"],
+		["--continue"],
+		["-c"],
+	]) {
+		const result = spawnSync("node", [bridge, "--prepare", ...args], {
+			cwd: f.cwd,
+			env: { ...f.env, SUPERSET_NATIVE_CLAUDE_OWNED_LAUNCH: "1" },
+			encoding: "utf8",
+		});
+		expect(result.status).toBe(0);
+		expect(JSON.parse(result.stdout).statusLine.command).toContain("--status");
+	}
+	for (const args of [
+		["attach", "owned-session"],
+		["resume", "owned-session"],
+		["agents"],
+		["sessions"],
+		["background"],
+		["--fork-session"],
+		["--settings", "{}"],
+	]) {
+		const result = spawnSync("node", [bridge, "--prepare", ...args], {
+			cwd: f.cwd,
+			env: { ...f.env, SUPERSET_NATIVE_CLAUDE_OWNED_LAUNCH: "1" },
+			encoding: "utf8",
+		});
+		expect(result.stdout).toBe("");
+	}
+});

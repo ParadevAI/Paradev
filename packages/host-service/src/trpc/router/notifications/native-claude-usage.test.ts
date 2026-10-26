@@ -176,3 +176,13 @@ test("terminal hook receipt precedes deferred account validation", async () => {
 	expect(await pending).toBe(true);
 	expect(f.store.snapshot("b".repeat(64))[0]?.observedAt).toBe(receivedAt);
 });
+
+test("a warm credential proof without a host launch permit cannot accept producer frames", async () => {
+	const f = fixture();
+	f.warm();
+	expect(f.feed.capture(f.identity, f.current)).toBe(false);
+	expect(await f.feed.ingest(f.identity, f.frame(0), f.current)).toBe(false);
+	f.advance();
+	expect(await f.feed.ingest(f.identity, f.frame(1), f.current)).toBe(false);
+	expect(f.store.snapshot("b".repeat(64))).toEqual([]);
+});

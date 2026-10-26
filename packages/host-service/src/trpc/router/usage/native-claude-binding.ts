@@ -59,11 +59,7 @@ export async function ingestNativeClaudeBinding(
 		!(await deps.validateAccount(account))
 	)
 		return false;
-	const generation = await deps.captureGeneration(
-		account.selection,
-		account.directory,
-		account.identity,
-	);
+	const generation = deps.store.capturedGeneration(launch);
 	if (!generation || !current()) return false;
 	let bound = deps.store.activeScope({ ...launch, generation });
 	if (!bound) return false;
@@ -82,6 +78,16 @@ export async function ingestNativeClaudeBinding(
 		if (!bound || bound.pending || bound.scope !== scope) return false;
 	} else if (!bound.pending) {
 		// Previously verified authority has expired or was invalidated; retain its original age.
+		return false;
+	} else if (
+		(await deps.captureGeneration(
+			account.selection,
+			account.directory,
+			account.identity,
+		)) !== generation ||
+		!current() ||
+		!deps.store.isCurrentReceipt(input.receivedAt)
+	) {
 		return false;
 	}
 	deps.store.ingest({
