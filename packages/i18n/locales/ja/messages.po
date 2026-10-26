@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "残り{remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} は、この組織の GitHub App がインストールされている {installedAccountLogin} にありません。"
 
@@ -3304,6 +3307,9 @@ msgstr "ディレクトリを参照"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "GitHub Dark Colorblind、Catppuccin、Ember、One Dark Proなど、コミュニティが共有するParadevのテーマファイルを閲覧できます。"
 
+msgid "Browse saved history"
+msgstr "保存済みの履歴を参照"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Paradev向けに共有されたテーマと今後のエージェント設定を閲覧できます。"
 
@@ -3607,6 +3613,9 @@ msgstr "証明書エラー"
 
 msgid "Chain of Thought"
 msgstr "思考プロセス"
+
+msgid "Change account"
+msgstr "アカウントを変更"
 
 msgid "Change assignee"
 msgstr "担当者を変更"
@@ -5135,6 +5144,9 @@ msgstr "プラグインを読み込めませんでした。接続を確認して
 msgid "Could not load presets from the host"
 msgstr "ホストからプリセットを読み込めませんでした"
 
+msgid "Could not load saved conversations"
+msgstr "保存済みの会話を読み込めませんでした"
+
 msgid "Could not load this diff"
 msgstr "この差分を読み込めませんでした"
 
@@ -5158,6 +5170,9 @@ msgstr "リンクを開けませんでした"
 
 msgid "Could not open Photos"
 msgstr "「写真」を開けませんでした"
+
+msgid "Could not open saved conversation"
+msgstr "保存済みの会話を開けませんでした"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5212,6 +5227,9 @@ msgstr "クラウドワークスペースを記録できませんでした"
 
 msgid "Could not record environment"
 msgstr "環境を保存できませんでした"
+
+msgid "Could not refresh usage"
+msgstr "使用量を更新できませんでした"
 
 msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
@@ -8854,6 +8872,9 @@ msgstr "スマートフォンから直接、自分のMacにローカルのワー
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "カフェでコーヒーを飲んでいる間も、作業は進み続けます。"
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "元のアプリでこの会話を終了しました。実行中のツールやバックグラウンドジョブはありません。"
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "朝の散歩をアイデアとともに始め、プルリクエストとともに終えます。"
 
@@ -10094,6 +10115,9 @@ msgstr "リポジトリを読み込み中..."
 msgid "Loading review..."
 msgstr "レビューを読み込み中..."
 
+msgid "Loading saved conversations…"
+msgstr "保存済みの会話を読み込み中…"
+
 msgid "Loading terminal scripts..."
 msgstr "ターミナルスクリプトを読み込み中..."
 
@@ -11162,6 +11186,9 @@ msgstr "チェックはありません。"
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Chrome、Brave、ArcなどのChromiumブラウザが見つかりませんでした。"
 
+msgid "No Claude agent is configured on this host."
+msgstr "このホストには Claude エージェントが設定されていません。"
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません。今参加すれば、エージェントを使い始めた時点で表示されます。"
 
@@ -11546,6 +11573,9 @@ msgstr "合うポジションがありません。それでも連絡してよい
 
 msgid "No runs yet"
 msgstr "実行はまだありません"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "現在のワークスペースに対応する保存済みの Claude の会話が、このアカウントに見つかりませんでした。"
 
 msgid "No screenshots yet"
 msgstr "スクリーンショットはまだありません"
@@ -12180,6 +12210,9 @@ msgstr "コマンドパレットを開く"
 msgid "Open comment on GitHub"
 msgstr "GitHubでコメントを開く"
 
+msgid "Open conversation"
+msgstr "会話を開く"
+
 msgid "Open device sign-in"
 msgstr "デバイスのサインインを開く"
 
@@ -12207,6 +12240,9 @@ msgstr "ドロワーを開く"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "既存のPRを開く、またはGitHubで新規作成する"
 
+msgid "Open existing terminal"
+msgstr "既存のターミナルを開く"
+
 msgid "open file"
 msgstr "ファイルを開く"
 
@@ -12227,6 +12263,9 @@ msgstr "フォルダから開く"
 
 msgid "Open full screen"
 msgstr "全画面で開く"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "このアカウントの履歴を現在のワークスペースで開きます。取り込み後は、開くたびに最新のローカル履歴を使用します。バックグラウンドの作業は引き継がれません。"
 
 msgid "Open host"
 msgstr "ホストを開く"
@@ -12431,6 +12470,12 @@ msgstr "最近使った項目を開く"
 
 msgid "Open roles"
 msgstr "募集中のポジション"
+
+msgid "Open saved Claude conversation"
+msgstr "保存済みの Claude の会話を開く"
+
+msgid "Open saved Claude conversation…"
+msgstr "保存済みの Claude の会話を開く…"
 
 msgid "Open session in"
 msgstr "セッションを開く場所"
@@ -15232,6 +15277,12 @@ msgstr "保存済み"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "「{0}」を環境として保存しました"
+
+msgid "Saved conversations"
+msgstr "保存済みの会話"
+
+msgid "Saved in Superset"
+msgstr "Superset に保存済み"
 
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
@@ -18195,6 +18246,9 @@ msgstr "ラベル、コマンド、引数、プロンプトと再開設定、環
 msgid "This repository does not allow merging from here."
 msgstr "このリポジトリはここからのマージを許可していません。"
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "この保存済みの履歴は変更されています。開く前にもう一度選択してください。"
+
 msgid "This screen doesn't exist"
 msgstr "この画面は存在しません"
 
@@ -18999,6 +19053,9 @@ msgstr "サブエージェントにメッセージを送るには、このホス
 
 msgid "Update this host to move subagents to the background"
 msgstr "サブエージェントをバックグラウンドに移動するには、このホストを更新してください"
+
+msgid "Update this host to open saved Claude history."
+msgstr "保存済みの Claude の履歴を開くには、このホストを更新してください。"
 
 msgid "Updated"
 msgstr "更新済み"
@@ -20287,61 +20344,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "使用量を更新できませんでした"
-
-msgid "{remainingPercent} remaining"
-msgstr "残り{remainingPercent}"
-
-
-msgid "Browse saved history"
-msgstr "保存済みの履歴を参照"
-
-msgid "Change account"
-msgstr "アカウントを変更"
-
-msgid "Could not load saved conversations"
-msgstr "保存済みの会話を読み込めませんでした"
-
-msgid "Could not open saved conversation"
-msgstr "保存済みの会話を開けませんでした"
-
-msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "元のアプリでこの会話を終了しました。実行中のツールやバックグラウンドジョブはありません。"
-
-msgid "Loading saved conversations…"
-msgstr "保存済みの会話を読み込み中…"
-
-msgid "No Claude agent is configured on this host."
-msgstr "このホストには Claude エージェントが設定されていません。"
-
-msgid "No saved Claude conversations were found in this account for the current workspace."
-msgstr "現在のワークスペースに対応する保存済みの Claude の会話が、このアカウントに見つかりませんでした。"
-
-msgid "Open conversation"
-msgstr "会話を開く"
-
-msgid "Open existing terminal"
-msgstr "既存のターミナルを開く"
-
-msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
-msgstr "このアカウントの履歴を現在のワークスペースで開きます。取り込み後は、開くたびに最新のローカル履歴を使用します。バックグラウンドの作業は引き継がれません。"
-
-msgid "Open saved Claude conversation"
-msgstr "保存済みの Claude の会話を開く"
-
-msgid "Open saved Claude conversation…"
-msgstr "保存済みの Claude の会話を開く…"
-
-msgid "Saved conversations"
-msgstr "保存済みの会話"
-
-msgid "Saved in Superset"
-msgstr "Superset に保存済み"
-
-msgid "This saved history changed. Select it again before opening."
-msgstr "この保存済みの履歴は変更されています。開く前にもう一度選択してください。"
-
-msgid "Update this host to open saved Claude history."
-msgstr "保存済みの Claude の履歴を開くには、このホストを更新してください。"

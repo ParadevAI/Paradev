@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} dari {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Sisa {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} tidak ada di {installedAccountLogin}, tempat GitHub App organisasi ini dipasang."
 
@@ -3304,6 +3307,9 @@ msgstr "Telusuri direktori"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Jelajahi berkas tema Paradev yang dibagikan komunitas, termasuk GitHub Dark Colorblind, Catppuccin, Ember, dan One Dark Pro."
 
+msgid "Browse saved history"
+msgstr "Jelajahi riwayat tersimpan"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Jelajahi tema bersama dan konfigurasi agen mendatang untuk Paradev."
 
@@ -3607,6 +3613,9 @@ msgstr "Kesalahan Sertifikat"
 
 msgid "Chain of Thought"
 msgstr "Rantai Pemikiran"
+
+msgid "Change account"
+msgstr "Ganti akun"
 
 msgid "Change assignee"
 msgstr "Ubah penerima tugas"
@@ -5135,6 +5144,9 @@ msgstr "Tidak dapat memuat plugin. Periksa koneksi Anda dan coba lagi."
 msgid "Could not load presets from the host"
 msgstr "Tidak bisa memuat preset dari host"
 
+msgid "Could not load saved conversations"
+msgstr "Percakapan tersimpan tidak dapat dimuat"
+
 msgid "Could not load this diff"
 msgstr "Tidak bisa memuat diff ini"
 
@@ -5158,6 +5170,9 @@ msgstr "Tidak bisa membuka tautan"
 
 msgid "Could not open Photos"
 msgstr "Tidak bisa membuka Photos"
+
+msgid "Could not open saved conversation"
+msgstr "Percakapan tersimpan tidak dapat dibuka"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5212,6 +5227,9 @@ msgstr "Tidak bisa mencatat workspace cloud"
 
 msgid "Could not record environment"
 msgstr "Tidak dapat menyimpan environment"
+
+msgid "Could not refresh usage"
+msgstr "Gagal memperbarui penggunaan"
 
 msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
@@ -8854,6 +8872,9 @@ msgstr "Saya juga senang bisa menjalankan lingkungan pohon kerja lokal di Mac la
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Saya bisa duduk di kafe sambil minum kopi sementara pekerjaan terus berjalan."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Saya telah keluar dari percakapan ini di aplikasi asal. Tidak ada alat atau tugas latar belakang yang masih berjalan."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Saya memulai jalan pagi dengan sebuah ide dan mengakhirinya dengan sebuah pull request."
 
@@ -10094,6 +10115,9 @@ msgstr "Memuat repositori..."
 msgid "Loading review..."
 msgstr "Memuat review..."
 
+msgid "Loading saved conversations…"
+msgstr "Memuat percakapan tersimpan…"
+
 msgid "Loading terminal scripts..."
 msgstr "Memuat skrip terminal..."
 
@@ -11162,6 +11186,9 @@ msgstr "Tidak ada check yang dilaporkan."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Tidak ditemukan Chrome, Brave, Arc, atau browser Chromium lainnya."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Tidak ada agen Claude yang dikonfigurasi pada host ini."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan Anda akan muncul setelah memakai agen."
 
@@ -11546,6 +11573,9 @@ msgstr "Tidak ada posisi yang cocok untuk saya. Apakah saya tetap boleh menghubu
 
 msgid "No runs yet"
 msgstr "Belum ada run"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Tidak ditemukan percakapan Claude tersimpan di akun ini untuk ruang kerja saat ini."
 
 msgid "No screenshots yet"
 msgstr "Belum ada tangkapan layar"
@@ -12180,6 +12210,9 @@ msgstr "Buka Command Palette"
 msgid "Open comment on GitHub"
 msgstr "Buka komentar di GitHub"
 
+msgid "Open conversation"
+msgstr "Buka percakapan"
+
 msgid "Open device sign-in"
 msgstr "Buka masuk perangkat"
 
@@ -12207,6 +12240,9 @@ msgstr "Buka drawer"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Buka PR yang ada atau buat yang baru di GitHub"
 
+msgid "Open existing terminal"
+msgstr "Buka terminal yang ada"
+
 msgid "open file"
 msgstr "buka file"
 
@@ -12227,6 +12263,9 @@ msgstr "Buka dari folder"
 
 msgid "Open full screen"
 msgstr "Buka layar penuh"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Buka riwayat akun ini di ruang kerja saat ini. Setelah diimpor, pembukaan berikutnya menggunakan riwayat lokal terkini. Tugas latar belakang tidak dipindahkan."
 
 msgid "Open host"
 msgstr "Buka host"
@@ -12431,6 +12470,12 @@ msgstr "Buka yang terbaru"
 
 msgid "Open roles"
 msgstr "Lowongan terbuka"
+
+msgid "Open saved Claude conversation"
+msgstr "Buka percakapan Claude tersimpan"
+
+msgid "Open saved Claude conversation…"
+msgstr "Buka percakapan Claude tersimpan…"
 
 msgid "Open session in"
 msgstr "Buka sesi di"
@@ -15232,6 +15277,12 @@ msgstr "Tersimpan"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" disimpan sebagai environment"
+
+msgid "Saved conversations"
+msgstr "Percakapan tersimpan"
+
+msgid "Saved in Superset"
+msgstr "Disimpan di Superset"
 
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
@@ -18195,6 +18246,9 @@ msgstr "Ini mengganti label, perintah, argumen, pengaturan prompt dan resume, va
 msgid "This repository does not allow merging from here."
 msgstr "Repositori ini tidak mengizinkan merge dari sini."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Riwayat tersimpan ini telah berubah. Pilih kembali sebelum membukanya."
+
 msgid "This screen doesn't exist"
 msgstr "Layar ini tidak ada"
 
@@ -18999,6 +19053,9 @@ msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"
+
+msgid "Update this host to open saved Claude history."
+msgstr "Perbarui host ini untuk membuka riwayat Claude tersimpan."
 
 msgid "Updated"
 msgstr "Diperbarui"
@@ -20287,61 +20344,3 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Gagal memperbarui penggunaan"
-
-msgid "{remainingPercent} remaining"
-msgstr "Sisa {remainingPercent}"
-
-
-msgid "Browse saved history"
-msgstr "Jelajahi riwayat tersimpan"
-
-msgid "Change account"
-msgstr "Ganti akun"
-
-msgid "Could not load saved conversations"
-msgstr "Percakapan tersimpan tidak dapat dimuat"
-
-msgid "Could not open saved conversation"
-msgstr "Percakapan tersimpan tidak dapat dibuka"
-
-msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "Saya telah keluar dari percakapan ini di aplikasi asal. Tidak ada alat atau tugas latar belakang yang masih berjalan."
-
-msgid "Loading saved conversations…"
-msgstr "Memuat percakapan tersimpan…"
-
-msgid "No Claude agent is configured on this host."
-msgstr "Tidak ada agen Claude yang dikonfigurasi pada host ini."
-
-msgid "No saved Claude conversations were found in this account for the current workspace."
-msgstr "Tidak ditemukan percakapan Claude tersimpan di akun ini untuk ruang kerja saat ini."
-
-msgid "Open conversation"
-msgstr "Buka percakapan"
-
-msgid "Open existing terminal"
-msgstr "Buka terminal yang ada"
-
-msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
-msgstr "Buka riwayat akun ini di ruang kerja saat ini. Setelah diimpor, pembukaan berikutnya menggunakan riwayat lokal terkini. Tugas latar belakang tidak dipindahkan."
-
-msgid "Open saved Claude conversation"
-msgstr "Buka percakapan Claude tersimpan"
-
-msgid "Open saved Claude conversation…"
-msgstr "Buka percakapan Claude tersimpan…"
-
-msgid "Saved conversations"
-msgstr "Percakapan tersimpan"
-
-msgid "Saved in Superset"
-msgstr "Disimpan di Superset"
-
-msgid "This saved history changed. Select it again before opening."
-msgstr "Riwayat tersimpan ini telah berubah. Pilih kembali sebelum membukanya."
-
-msgid "Update this host to open saved Claude history."
-msgstr "Perbarui host ini untuk membuka riwayat Claude tersimpan."

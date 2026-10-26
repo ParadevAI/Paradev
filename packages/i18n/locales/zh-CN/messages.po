@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "剩余 {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本组织的 GitHub App 安装在那里。"
 
@@ -3304,6 +3307,9 @@ msgstr "浏览目录"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "浏览社区共享的 Paradev 主题文件，包括 GitHub Dark Colorblind、Catppuccin、Ember 和 One Dark Pro。"
 
+msgid "Browse saved history"
+msgstr "浏览已保存的历史记录"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "浏览 Paradev 的共享主题与未来的智能体配置。"
 
@@ -3607,6 +3613,9 @@ msgstr "证书错误"
 
 msgid "Chain of Thought"
 msgstr "思维链"
+
+msgid "Change account"
+msgstr "更改账户"
 
 msgid "Change assignee"
 msgstr "更改负责人"
@@ -5135,6 +5144,9 @@ msgstr "无法加载插件。请检查网络连接后重试。"
 msgid "Could not load presets from the host"
 msgstr "无法从主机加载预设"
 
+msgid "Could not load saved conversations"
+msgstr "无法加载已保存的对话"
+
 msgid "Could not load this diff"
 msgstr "无法加载这个差异"
 
@@ -5158,6 +5170,9 @@ msgstr "无法打开链接"
 
 msgid "Could not open Photos"
 msgstr "无法打开“照片”"
+
+msgid "Could not open saved conversation"
+msgstr "无法打开已保存的对话"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5212,6 +5227,9 @@ msgstr "无法记录云端工作区"
 
 msgid "Could not record environment"
 msgstr "无法保存环境"
+
+msgid "Could not refresh usage"
+msgstr "无法刷新使用量"
 
 msgid "Could not remove access"
 msgstr "无法移除访问权限"
@@ -8854,6 +8872,9 @@ msgstr "我也很喜欢能直接用手机在 Mac 上启动本地工作树环境�
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "我可以在咖啡馆喝咖啡，工作也一直在推进。"
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "我已在原应用中退出此对话。没有工具或后台任务仍在运行。"
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "我带着一个想法开始晨间散步，结束时就有了一个拉取请求。"
 
@@ -10094,6 +10115,9 @@ msgstr "正在加载仓库..."
 msgid "Loading review..."
 msgstr "正在加载评审..."
 
+msgid "Loading saved conversations…"
+msgstr "正在加载已保存的对话…"
+
 msgid "Loading terminal scripts..."
 msgstr "正在加载终端脚本..."
 
@@ -11162,6 +11186,9 @@ msgstr "没有检查报告。"
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "未找到Chrome、Brave、Arc或其他Chromium浏览器。"
 
+msgid "No Claude agent is configured on this host."
+msgstr "此主机上未配置 Claude 智能体。"
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "这台机器上还没有发现Claude或Codex的用量。现在加入，用过智能体后你就会出现在榜单上。"
 
@@ -11546,6 +11573,9 @@ msgstr "没有适合我的职位，还可以联系你们吗？"
 
 msgid "No runs yet"
 msgstr "还没有运行过"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "此账户中未找到当前工作区的已保存 Claude 对话。"
 
 msgid "No screenshots yet"
 msgstr "暂无截图"
@@ -12180,6 +12210,9 @@ msgstr "打开命令面板"
 msgid "Open comment on GitHub"
 msgstr "在GitHub上打开评论"
 
+msgid "Open conversation"
+msgstr "打开对话"
+
 msgid "Open device sign-in"
 msgstr "打开设备登录"
 
@@ -12207,6 +12240,9 @@ msgstr "打开抽屉"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "打开现有PR，或在GitHub上创建新PR"
 
+msgid "Open existing terminal"
+msgstr "打开现有终端"
+
 msgid "open file"
 msgstr "打开文件"
 
@@ -12227,6 +12263,9 @@ msgstr "从文件夹打开"
 
 msgid "Open full screen"
 msgstr "全屏打开"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "在当前工作区中打开此账户的历史记录。导入后，再次打开时将使用其最新的本地历史记录。后台任务不会转移。"
 
 msgid "Open host"
 msgstr "打开主机"
@@ -12431,6 +12470,12 @@ msgstr "打开最近使用"
 
 msgid "Open roles"
 msgstr "空缺职位"
+
+msgid "Open saved Claude conversation"
+msgstr "打开已保存的 Claude 对话"
+
+msgid "Open saved Claude conversation…"
+msgstr "打开已保存的 Claude 对话…"
 
 msgid "Open session in"
 msgstr "会话打开位置"
@@ -15232,6 +15277,12 @@ msgstr "已保存"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "已将“{0}”保存为环境"
+
+msgid "Saved conversations"
+msgstr "已保存的对话"
+
+msgid "Saved in Superset"
+msgstr "已保存到 Superset"
 
 msgid "Saved to Downloads"
 msgstr "已保存到“下载”文件夹"
@@ -18195,6 +18246,9 @@ msgstr "这会用当前内置配置替换它的名称、命令、参数、提示
 msgid "This repository does not allow merging from here."
 msgstr "此仓库不允许从这里合并。"
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "此已保存的历史记录已更改。请在打开前重新选择。"
+
 msgid "This screen doesn't exist"
 msgstr "此页面不存在"
 
@@ -18999,6 +19053,9 @@ msgstr "请更新此主机以向子智能体发送消息"
 
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"
+
+msgid "Update this host to open saved Claude history."
+msgstr "请更新此主机以打开已保存的 Claude 历史记录。"
 
 msgid "Updated"
 msgstr "已更新"
@@ -20287,61 +20344,3 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "无法刷新使用量"
-
-msgid "{remainingPercent} remaining"
-msgstr "剩余 {remainingPercent}"
-
-
-msgid "Browse saved history"
-msgstr "浏览已保存的历史记录"
-
-msgid "Change account"
-msgstr "更改账户"
-
-msgid "Could not load saved conversations"
-msgstr "无法加载已保存的对话"
-
-msgid "Could not open saved conversation"
-msgstr "无法打开已保存的对话"
-
-msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "我已在原应用中退出此对话。没有工具或后台任务仍在运行。"
-
-msgid "Loading saved conversations…"
-msgstr "正在加载已保存的对话…"
-
-msgid "No Claude agent is configured on this host."
-msgstr "此主机上未配置 Claude 智能体。"
-
-msgid "No saved Claude conversations were found in this account for the current workspace."
-msgstr "此账户中未找到当前工作区的已保存 Claude 对话。"
-
-msgid "Open conversation"
-msgstr "打开对话"
-
-msgid "Open existing terminal"
-msgstr "打开现有终端"
-
-msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
-msgstr "在当前工作区中打开此账户的历史记录。导入后，再次打开时将使用其最新的本地历史记录。后台任务不会转移。"
-
-msgid "Open saved Claude conversation"
-msgstr "打开已保存的 Claude 对话"
-
-msgid "Open saved Claude conversation…"
-msgstr "打开已保存的 Claude 对话…"
-
-msgid "Saved conversations"
-msgstr "已保存的对话"
-
-msgid "Saved in Superset"
-msgstr "已保存到 Superset"
-
-msgid "This saved history changed. Select it again before opening."
-msgstr "此已保存的历史记录已更改。请在打开前重新选择。"
-
-msgid "Update this host to open saved Claude history."
-msgstr "请更新此主机以打开已保存的 Claude 历史记录。"

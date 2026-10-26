@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} van {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} resterend"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} staat niet op {installedAccountLogin}, waar de GitHub App van deze organisatie is geïnstalleerd."
 
@@ -3304,6 +3307,9 @@ msgstr "Map kiezen"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Bekijk Paradev-themabestanden die door de community zijn gedeeld, waaronder GitHub Dark Colorblind, Catppuccin, Ember en One Dark Pro."
 
+msgid "Browse saved history"
+msgstr "Opgeslagen geschiedenis bekijken"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Bekijk gedeelde thema's en toekomstige agentconfigs voor Paradev."
 
@@ -3607,6 +3613,9 @@ msgstr "Certificaatfout"
 
 msgid "Chain of Thought"
 msgstr "Gedachtegang"
+
+msgid "Change account"
+msgstr "Account wijzigen"
 
 msgid "Change assignee"
 msgstr "Toegewezen persoon wijzigen"
@@ -5135,6 +5144,9 @@ msgstr "Plugins konden niet worden geladen. Controleer je verbinding en probeer 
 msgid "Could not load presets from the host"
 msgstr "Kan presets van de host niet laden"
 
+msgid "Could not load saved conversations"
+msgstr "Opgeslagen gesprekken konden niet worden geladen"
+
 msgid "Could not load this diff"
 msgstr "Kan deze diff niet laden"
 
@@ -5158,6 +5170,9 @@ msgstr "Kan link niet openen"
 
 msgid "Could not open Photos"
 msgstr "Kan Foto's niet openen"
+
+msgid "Could not open saved conversation"
+msgstr "Opgeslagen gesprek kon niet worden geopend"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5212,6 +5227,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
+
+msgid "Could not refresh usage"
+msgstr "Gebruik kon niet worden vernieuwd"
 
 msgid "Could not remove access"
 msgstr "Kan toegang niet verwijderen"
@@ -8854,6 +8872,9 @@ msgstr "Ik vind het ook geweldig dat ik rechtstreeks vanaf mijn telefoon een lok
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Ik kan in een café zitten met mijn koffie terwijl het werk gewoon doorgaat."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Ik heb dit gesprek in de oorspronkelijke app afgesloten. Er zijn geen hulpmiddelen of achtergrondtaken meer actief."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Ik begin mijn ochtendwandelingen met een idee en eindig met een pull request."
 
@@ -10094,6 +10115,9 @@ msgstr "Repository's laden..."
 msgid "Loading review..."
 msgstr "Review laden..."
 
+msgid "Loading saved conversations…"
+msgstr "Opgeslagen gesprekken laden…"
+
 msgid "Loading terminal scripts..."
 msgstr "Terminalscripts laden..."
 
@@ -11162,6 +11186,9 @@ msgstr "Geen checks gerapporteerd."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Er zijn geen Chrome-, Brave-, Arc- of andere Chromium-browsers gevonden."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Er is geen Claude-agent geconfigureerd op deze host."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Nog geen Claude- of Codex-gebruik gevonden op deze machine. Doe nu mee, dan verschijn je zodra je een agent hebt gebruikt."
 
@@ -11546,6 +11573,9 @@ msgstr "Geen enkele vacature past bij mij. Moet ik toch contact opnemen?"
 
 msgid "No runs yet"
 msgstr "Nog geen runs"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Er zijn in dit account geen opgeslagen Claude-gesprekken gevonden voor de huidige werkruimte."
 
 msgid "No screenshots yet"
 msgstr "Nog geen screenshots"
@@ -12180,6 +12210,9 @@ msgstr "Opdrachtenpalet openen"
 msgid "Open comment on GitHub"
 msgstr "Opmerking openen op GitHub"
 
+msgid "Open conversation"
+msgstr "Gesprek openen"
+
 msgid "Open device sign-in"
 msgstr "Apparaataanmelding openen"
 
@@ -12207,6 +12240,9 @@ msgstr "Lade openen"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Bestaande PR openen of een nieuwe aanmaken op GitHub"
 
+msgid "Open existing terminal"
+msgstr "Bestaande terminal openen"
+
 msgid "open file"
 msgstr "bestand openen"
 
@@ -12227,6 +12263,9 @@ msgstr "Openen vanuit map"
 
 msgid "Open full screen"
 msgstr "Openen op volledig scherm"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Open de geschiedenis van dit account in de huidige werkruimte. Na het importeren wordt bij opnieuw openen de actuele lokale geschiedenis gebruikt. Achtergrondtaken worden niet overgedragen."
 
 msgid "Open host"
 msgstr "Host openen"
@@ -12431,6 +12470,12 @@ msgstr "Recent openen"
 
 msgid "Open roles"
 msgstr "Openstaande vacatures"
+
+msgid "Open saved Claude conversation"
+msgstr "Opgeslagen Claude-gesprek openen"
+
+msgid "Open saved Claude conversation…"
+msgstr "Opgeslagen Claude-gesprek openen…"
 
 msgid "Open session in"
 msgstr "Sessie openen in"
@@ -15232,6 +15277,12 @@ msgstr "Opgeslagen"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" opgeslagen als omgeving"
+
+msgid "Saved conversations"
+msgstr "Opgeslagen gesprekken"
+
+msgid "Saved in Superset"
+msgstr "Opgeslagen in Superset"
 
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
@@ -18195,6 +18246,9 @@ msgstr "Dit vervangt het label, het commando, de argumenten, de prompt- en resum
 msgid "This repository does not allow merging from here."
 msgstr "Deze repository staat mergen vanaf hier niet toe."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Deze opgeslagen geschiedenis is gewijzigd. Selecteer deze opnieuw voordat je hem opent."
+
 msgid "This screen doesn't exist"
 msgstr "Dit scherm bestaat niet"
 
@@ -18999,6 +19053,9 @@ msgstr "Werk deze host bij om subagents berichten te sturen"
 
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"
+
+msgid "Update this host to open saved Claude history."
+msgstr "Werk deze host bij om opgeslagen Claude-geschiedenis te openen."
 
 msgid "Updated"
 msgstr "Bijgewerkt"
@@ -20287,61 +20344,3 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Gebruik kon niet worden vernieuwd"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} resterend"
-
-
-msgid "Browse saved history"
-msgstr "Opgeslagen geschiedenis bekijken"
-
-msgid "Change account"
-msgstr "Account wijzigen"
-
-msgid "Could not load saved conversations"
-msgstr "Opgeslagen gesprekken konden niet worden geladen"
-
-msgid "Could not open saved conversation"
-msgstr "Opgeslagen gesprek kon niet worden geopend"
-
-msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "Ik heb dit gesprek in de oorspronkelijke app afgesloten. Er zijn geen hulpmiddelen of achtergrondtaken meer actief."
-
-msgid "Loading saved conversations…"
-msgstr "Opgeslagen gesprekken laden…"
-
-msgid "No Claude agent is configured on this host."
-msgstr "Er is geen Claude-agent geconfigureerd op deze host."
-
-msgid "No saved Claude conversations were found in this account for the current workspace."
-msgstr "Er zijn in dit account geen opgeslagen Claude-gesprekken gevonden voor de huidige werkruimte."
-
-msgid "Open conversation"
-msgstr "Gesprek openen"
-
-msgid "Open existing terminal"
-msgstr "Bestaande terminal openen"
-
-msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
-msgstr "Open de geschiedenis van dit account in de huidige werkruimte. Na het importeren wordt bij opnieuw openen de actuele lokale geschiedenis gebruikt. Achtergrondtaken worden niet overgedragen."
-
-msgid "Open saved Claude conversation"
-msgstr "Opgeslagen Claude-gesprek openen"
-
-msgid "Open saved Claude conversation…"
-msgstr "Opgeslagen Claude-gesprek openen…"
-
-msgid "Saved conversations"
-msgstr "Opgeslagen gesprekken"
-
-msgid "Saved in Superset"
-msgstr "Opgeslagen in Superset"
-
-msgid "This saved history changed. Select it again before opening."
-msgstr "Deze opgeslagen geschiedenis is gewijzigd. Selecteer deze opnieuw voordat je hem opent."
-
-msgid "Update this host to open saved Claude history."
-msgstr "Werk deze host bij om opgeslagen Claude-geschiedenis te openen."

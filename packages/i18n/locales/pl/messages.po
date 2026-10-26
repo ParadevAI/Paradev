@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} z {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Pozostało {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} nie należy do {installedAccountLogin}, gdzie zainstalowana jest GitHub App tej organizacji."
 
@@ -3304,6 +3307,9 @@ msgstr "Przeglądaj katalogi"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Przeglądaj pliki motywów Paradev udostępnione przez społeczność, w tym GitHub Dark Colorblind, Catppuccin, Ember i One Dark Pro."
 
+msgid "Browse saved history"
+msgstr "Przeglądaj zapisaną historię"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Przeglądaj udostępnione motywy i przyszłe konfiguracje agentów dla Paradev."
 
@@ -3607,6 +3613,9 @@ msgstr "Błąd certyfikatu"
 
 msgid "Chain of Thought"
 msgstr "Tok rozumowania"
+
+msgid "Change account"
+msgstr "Zmień konto"
 
 msgid "Change assignee"
 msgstr "Zmień osobę przypisaną"
@@ -5135,6 +5144,9 @@ msgstr "Nie udało się wczytać wtyczek. Sprawdź połączenie i spróbuj ponow
 msgid "Could not load presets from the host"
 msgstr "Nie udało się wczytać presetów z hosta"
 
+msgid "Could not load saved conversations"
+msgstr "Nie udało się wczytać zapisanych rozmów"
+
 msgid "Could not load this diff"
 msgstr "Nie udało się wczytać tych różnic"
 
@@ -5158,6 +5170,9 @@ msgstr "Nie udało się otworzyć linku"
 
 msgid "Could not open Photos"
 msgstr "Nie udało się otworzyć Zdjęć"
+
+msgid "Could not open saved conversation"
+msgstr "Nie udało się otworzyć zapisanej rozmowy"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5212,6 +5227,9 @@ msgstr "Nie udało się zapisać obszaru roboczego w chmurze"
 
 msgid "Could not record environment"
 msgstr "Nie udało się zapisać środowiska"
+
+msgid "Could not refresh usage"
+msgstr "Nie udało się odświeżyć wykorzystania"
 
 msgid "Could not remove access"
 msgstr "Nie udało się usunąć dostępu"
@@ -8854,6 +8872,9 @@ msgstr "Bardzo podoba mi się też to, że mogę uruchomić lokalne środowisko 
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Mogę siedzieć w kawiarni z kawą, a praca wciąż posuwa się naprzód."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Zamknięto tę rozmowę w oryginalnej aplikacji. Żadne narzędzia ani zadania w tle już nie działają."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Zaczynam poranne spacery z pomysłem, a kończę z pull requestem."
 
@@ -10094,6 +10115,9 @@ msgstr "Wczytywanie repozytoriów..."
 msgid "Loading review..."
 msgstr "Wczytywanie przeglądu..."
 
+msgid "Loading saved conversations…"
+msgstr "Wczytywanie zapisanych rozmów…"
+
 msgid "Loading terminal scripts..."
 msgstr "Wczytywanie skryptów terminala..."
 
@@ -11162,6 +11186,9 @@ msgstr "Brak zgłoszonych kontroli."
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Nie znaleziono przeglądarek Chrome, Brave, Arc ani innych opartych na Chromium."
 
+msgid "No Claude agent is configured on this host."
+msgstr "Na tym hoście nie skonfigurowano agenta Claude."
+
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Nie znaleziono jeszcze zużycia Claude ani Codex na tej maszynie. Dołącz teraz, a pojawisz się po pierwszym użyciu agenta."
 
@@ -11546,6 +11573,9 @@ msgstr "Żadne stanowisko do mnie nie pasuje. Czy mimo to warto się odezwać?"
 
 msgid "No runs yet"
 msgstr "Brak uruchomień"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Na tym koncie nie znaleziono zapisanych rozmów Claude dla bieżącego obszaru roboczego."
 
 msgid "No screenshots yet"
 msgstr "Brak zrzutów ekranu"
@@ -12180,6 +12210,9 @@ msgstr "Otwórz paletę poleceń"
 msgid "Open comment on GitHub"
 msgstr "Otwórz komentarz na GitHub"
 
+msgid "Open conversation"
+msgstr "Otwórz rozmowę"
+
 msgid "Open device sign-in"
 msgstr "Otwórz logowanie urządzenia"
 
@@ -12207,6 +12240,9 @@ msgstr "Otwórz szufladę"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Otwórz istniejący PR lub utwórz nowy na GitHub"
 
+msgid "Open existing terminal"
+msgstr "Otwórz istniejący terminal"
+
 msgid "open file"
 msgstr "otwórz plik"
 
@@ -12227,6 +12263,9 @@ msgstr "Otwórz z folderu"
 
 msgid "Open full screen"
 msgstr "Otwórz na pełnym ekranie"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Otwórz historię tego konta w bieżącym obszarze roboczym. Po zaimportowaniu kolejne otwarcia korzystają z aktualnej historii lokalnej. Zadania w tle nie są przenoszone."
 
 msgid "Open host"
 msgstr "Otwórz host"
@@ -12431,6 +12470,12 @@ msgstr "Otwórz ostatnie"
 
 msgid "Open roles"
 msgstr "Otwarte stanowiska"
+
+msgid "Open saved Claude conversation"
+msgstr "Otwórz zapisaną rozmowę Claude"
+
+msgid "Open saved Claude conversation…"
+msgstr "Otwórz zapisaną rozmowę Claude…"
 
 msgid "Open session in"
 msgstr "Otwórz sesję w"
@@ -15232,6 +15277,12 @@ msgstr "Zapisano"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "Zapisano \"{0}\" jako środowisko"
+
+msgid "Saved conversations"
+msgstr "Zapisane rozmowy"
+
+msgid "Saved in Superset"
+msgstr "Zapisano w Superset"
 
 msgid "Saved to Downloads"
 msgstr "Zapisano w Pobranych"
@@ -18195,6 +18246,9 @@ msgstr "Zastąpi to jego etykietę, polecenie, argumenty, ustawienia promptu i w
 msgid "This repository does not allow merging from here."
 msgstr "To repozytorium nie pozwala na scalanie z tego miejsca."
 
+msgid "This saved history changed. Select it again before opening."
+msgstr "Ta zapisana historia uległa zmianie. Wybierz ją ponownie przed otwarciem."
+
 msgid "This screen doesn't exist"
 msgstr "Ten ekran nie istnieje"
 
@@ -18999,6 +19053,9 @@ msgstr "Zaktualizuj tego hosta, aby wysyłać wiadomości do subagentów"
 
 msgid "Update this host to move subagents to the background"
 msgstr "Zaktualizuj tego hosta, aby przenosić subagentów w tło"
+
+msgid "Update this host to open saved Claude history."
+msgstr "Zaktualizuj ten host, aby otworzyć zapisaną historię Claude."
 
 msgid "Updated"
 msgstr "Zaktualizowano"
@@ -20287,61 +20344,3 @@ msgstr "Pomniejsz"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Nie udało się odświeżyć wykorzystania"
-
-msgid "{remainingPercent} remaining"
-msgstr "Pozostało {remainingPercent}"
-
-
-msgid "Browse saved history"
-msgstr "Przeglądaj zapisaną historię"
-
-msgid "Change account"
-msgstr "Zmień konto"
-
-msgid "Could not load saved conversations"
-msgstr "Nie udało się wczytać zapisanych rozmów"
-
-msgid "Could not open saved conversation"
-msgstr "Nie udało się otworzyć zapisanej rozmowy"
-
-msgid "I exited this conversation in the original app. No tools or background jobs are still running."
-msgstr "Zamknięto tę rozmowę w oryginalnej aplikacji. Żadne narzędzia ani zadania w tle już nie działają."
-
-msgid "Loading saved conversations…"
-msgstr "Wczytywanie zapisanych rozmów…"
-
-msgid "No Claude agent is configured on this host."
-msgstr "Na tym hoście nie skonfigurowano agenta Claude."
-
-msgid "No saved Claude conversations were found in this account for the current workspace."
-msgstr "Na tym koncie nie znaleziono zapisanych rozmów Claude dla bieżącego obszaru roboczego."
-
-msgid "Open conversation"
-msgstr "Otwórz rozmowę"
-
-msgid "Open existing terminal"
-msgstr "Otwórz istniejący terminal"
-
-msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
-msgstr "Otwórz historię tego konta w bieżącym obszarze roboczym. Po zaimportowaniu kolejne otwarcia korzystają z aktualnej historii lokalnej. Zadania w tle nie są przenoszone."
-
-msgid "Open saved Claude conversation"
-msgstr "Otwórz zapisaną rozmowę Claude"
-
-msgid "Open saved Claude conversation…"
-msgstr "Otwórz zapisaną rozmowę Claude…"
-
-msgid "Saved conversations"
-msgstr "Zapisane rozmowy"
-
-msgid "Saved in Superset"
-msgstr "Zapisano w Superset"
-
-msgid "This saved history changed. Select it again before opening."
-msgstr "Ta zapisana historia uległa zmianie. Wybierz ją ponownie przed otwarciem."
-
-msgid "Update this host to open saved Claude history."
-msgstr "Zaktualizuj ten host, aby otworzyć zapisaną historię Claude."
