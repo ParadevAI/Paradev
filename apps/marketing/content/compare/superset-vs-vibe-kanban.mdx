@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Vibe Kanban (2026): A Vibe Kanban Alternative for Parallel Agents"
-description: "Compare Superset and Vibe Kanban for orchestrating AI coding agents in Git worktrees. See why Superset is a natural home as Vibe Kanban sunsets."
+title: "Paradev vs Vibe Kanban (2026): A Vibe Kanban Alternative for Parallel Agents"
+description: "Compare Paradev and Vibe Kanban for orchestrating AI coding agents in Git worktrees. See why Paradev is a natural home as Vibe Kanban sunsets."
 date: 2026-07-13
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - worktree agent workspace
 ---
 
-Vibe Kanban put a Kanban board over AI coding agents: plan work as cards, then spin up workspaces where agents execute in parallel, each in its own Git worktree. It became one of the most popular tools in this category. Bloop has since announced that Vibe Kanban is sunsetting, with the project continuing as community open source, which makes "what do I move to?" a live question. Superset covers the same worktree-based parallel-agent model in an actively developed workspace, so it is a natural place to land.
+Vibe Kanban put a Kanban board over AI coding agents: plan work as cards, then spin up workspaces where agents execute in parallel, each in its own Git worktree. It became one of the most popular tools in this category. Bloop has since announced that Vibe Kanban is sunsetting, with the project continuing as community open source, which makes "what do I move to?" a live question. Paradev covers the same worktree-based parallel-agent model in an actively developed workspace, so it is a natural place to land.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Vibe Kanban** |
+| | **Paradev** | **Vibe Kanban** |
 |---|---|---|
 | **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Kanban board that runs coding agents in parallel workspaces |
 | **Interface** | Agent workspace with panes, diff review, and browser, plus Tasks and Workspaces board views | Kanban board of tasks mapped to agent runs |
@@ -34,9 +34,9 @@ Vibe Kanban put a Kanban board over AI coding agents: plan work as cards, then s
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and can schedule agent sessions as automations. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Vibe Kanban?
 
@@ -46,31 +46,31 @@ Vibe Kanban is an open-source app from Bloop that puts a Kanban board over AI co
 
 ### Actively Developed vs Sunsetting
 
-The most practical difference today is direction. Vibe Kanban is sunsetting as a maintained product, even though the open-source code remains. Superset is actively developed, with ongoing work on remote and cloud workspaces, automations, and its review and browser surfaces. If you are choosing where to invest your workflow now, ongoing maintenance matters.
+The most practical difference today is direction. Vibe Kanban is sunsetting as a maintained product, even though the open-source code remains. Paradev is actively developed, with ongoing work on remote and cloud workspaces, automations, and its review and browser surfaces. If you are choosing where to invest your workflow now, ongoing maintenance matters.
 
 ### Board-First vs Workspace-First
 
-Vibe Kanban is built around a Kanban board: the board is the main surface, and each card maps to an agent run. Superset is built around live agent sessions, each in its own pane and worktree, with review and an in-app browser alongside. Superset also has boards: the Tasks view shows Linear, GitHub Issues, and Superset tasks as a list or a kanban board, and **Run in workspace** starts a workspace with the agent already working. The Workspaces page has a board view with Working, Needs attention, Needs review, and Merged columns. Both run agents in parallel Git worktrees underneath. If you want the board to be the center of the app, Vibe Kanban is more focused on it; if you want boards next to a live workspace you drive directly, Superset fits better.
+Vibe Kanban is built around a Kanban board: the board is the main surface, and each card maps to an agent run. Paradev is built around live agent sessions, each in its own pane and worktree, with review and an in-app browser alongside. Paradev also has boards: the Tasks view shows Linear, GitHub Issues, and Paradev tasks as a list or a kanban board, and **Run in workspace** starts a workspace with the agent already working. The Workspaces page has a board view with Working, Needs attention, Needs review, and Merged columns. Both run agents in parallel Git worktrees underneath. If you want the board to be the center of the app, Vibe Kanban is more focused on it; if you want boards next to a live workspace you drive directly, Paradev fits better.
 
 ### Reach and Surfaces
 
-Superset extends past the local desktop with Remote Access to machines you own and cloud workspaces, plus CLI and MCP server surfaces and scheduled automations. Vibe Kanban runs locally as a cross-platform app. If you want the orchestration to move across machines or be scripted, Superset offers more of that.
+Paradev extends past the local desktop with Remote Access to machines you own and cloud workspaces, plus CLI and MCP server surfaces and scheduled automations. Vibe Kanban runs locally as a cross-platform app. If you want the orchestration to move across machines or be scripted, Paradev offers more of that.
 
 ### Shared Foundation
 
-Both are agent-agnostic and both support worktree-backed tasks; Superset uses worktrees for new local branch-based workspaces, so migrating mental models is easy: your agents, your branches, your review flow. The move from Vibe Kanban to Superset keeps a board view for tasks and workspaces, and adds a live workspace, active development, and remote and automation surfaces.
+Both are agent-agnostic and both support worktree-backed tasks; Paradev uses worktrees for new local branch-based workspaces, so migrating mental models is easy: your agents, your branches, your review flow. The move from Vibe Kanban to Paradev keeps a board view for tasks and workspaces, and adds a live workspace, active development, and remote and automation surfaces.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Vibe Kanban is free and open source (Apache-2.0). In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Vibe Kanban is free and open source (Apache-2.0). In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want an actively developed home for parallel agent work
 - Prefer a live agent workspace with built-in review and browser
@@ -83,7 +83,7 @@ Superset offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:
 - Are comfortable running a sunsetting project as community open source
 - Want a fully permissive Apache-2.0 tool and will self-maintain
 
-**Verdict:** Vibe Kanban popularized the board-over-agents approach, but its sunset makes long-term reliance a question. Superset offers the same worktree-based, agent-agnostic parallel model in an actively developed workspace, with review, browser, remote hosting, and automation built in -- a natural place to move as Vibe Kanban winds down.
+**Verdict:** Vibe Kanban popularized the board-over-agents approach, but its sunset makes long-term reliance a question. Paradev offers the same worktree-based, agent-agnostic parallel model in an actively developed workspace, with review, browser, remote hosting, and automation built in -- a natural place to move as Vibe Kanban winds down.
 
 ---
 
@@ -93,14 +93,14 @@ Superset offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:
 
 Bloop has announced that Vibe Kanban is sunsetting. The open-source code continues as a community project, but it is no longer positioned as an actively maintained product. Check its current state before adopting it.
 
-### Is Superset a good Vibe Kanban alternative?
+### Is Paradev a good Vibe Kanban alternative?
 
-Yes. Superset uses worktrees for local branch-based workspaces with support for CLI agents, and adds a live agent workspace with review, an in-app browser, remote and cloud workspaces, and automations, under active development.
+Yes. Paradev uses worktrees for local branch-based workspaces with support for CLI agents, and adds a live agent workspace with review, an in-app browser, remote and cloud workspaces, and automations, under active development.
 
 ### Do both use Git worktrees?
 
-Yes. Both support Git worktrees. Superset creates a worktree and branch for each new local branch-based workspace. The isolation model is shared; the interfaces and project direction differ.
+Yes. Both support Git worktrees. Paradev creates a worktree and branch for each new local branch-based workspace. The isolation model is shared; the interfaces and project direction differ.
 
-### Can Superset run the same agents Vibe Kanban did?
+### Can Paradev run the same agents Vibe Kanban did?
 
-Largely yes. Superset runs Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and custom terminal agents, covering the common agents Vibe Kanban supported.
+Largely yes. Paradev runs Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and custom terminal agents, covering the common agents Vibe Kanban supported.

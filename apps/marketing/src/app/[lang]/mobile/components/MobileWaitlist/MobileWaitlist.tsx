@@ -36,7 +36,7 @@ export function MobileWaitlist({ platform }: MobileWaitlistProps) {
 				</p>
 				{platform === "android" ? (
 					<p className="mt-1 text-muted-foreground text-sm">
-						<Trans>We'll email you when Superset for Android is ready.</Trans>
+						<Trans>We'll email you when Paradev for Android is ready.</Trans>
 					</p>
 				) : null}
 			</div>

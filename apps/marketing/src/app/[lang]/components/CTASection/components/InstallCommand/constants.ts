@@ -10,7 +10,7 @@ export interface InstallTab {
 export const DEFAULT_INSTALL_TAB: InstallTab = {
 	id: "brew",
 	label: "brew",
-	command: "brew install superset-sh/tap/superset",
+	command: "brew install paradevai/tap/superset",
 	shell: true,
 };
 
@@ -25,7 +25,7 @@ export const INSTALL_TABS: InstallTab[] = [
 	{
 		id: "agent",
 		label: "agent",
-		command: `Install the Superset CLI: ${CANONICAL_URLS.MARKETING}/llms.txt`,
+		command: `Install the Paradev CLI: ${CANONICAL_URLS.MARKETING}/llms.txt`,
 		shell: false,
 	},
 ];

@@ -329,8 +329,8 @@ msgid "{0, plural, one {Show # more line} other {Show # more lines}}"
 msgstr "{0, plural, one {Mostrar # línea más} other {Mostrar # líneas más}}"
 
 #. placeholder {0}: importableWorktrees.length
-msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
-msgstr "{0, plural, one {Se importará # worktree existente a Superset como espacio de trabajo. Cada worktree del disco quedará registrado y aparecerá en tu barra lateral. No se modificará ningún archivo.} other {Se importarán # worktrees existentes a Superset como espacios de trabajo. Cada worktree del disco quedará registrado y aparecerá en tu barra lateral. No se modificará ningún archivo.}}"
+msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
+msgstr "{0, plural, one {Se importará # worktree existente a Paradev como espacio de trabajo. Cada worktree del disco quedará registrado y aparecerá en tu barra lateral. No se modificará ningún archivo.} other {Se importarán # worktrees existentes a Paradev como espacios de trabajo. Cada worktree del disco quedará registrado y aparecerá en tu barra lateral. No se modificará ningún archivo.}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -350,8 +350,8 @@ msgid "{0} — device offline"
 msgstr "{0}: dispositivo sin conexión"
 
 #. placeholder {0}: error.message
-msgid "{0} — try the Superset tray menu > Host Service > Restart."
-msgstr "{0}: prueba con el menú de la bandeja de Superset > Servicio de host > Reiniciar."
+msgid "{0} — try the Paradev tray menu > Host Service > Restart."
+msgstr "{0}: prueba con el menú de la bandeja de Paradev > Servicio de host > Reiniciar."
 
 #. placeholder {0}: host.version
 msgid "{0} · behind"
@@ -739,6 +739,9 @@ msgstr "{closedCount} cerradas"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {# commit} other {# commits}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{companyName} desarrolla {productName}."
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "{completed} de {0} comprobaciones completadas"
@@ -896,6 +899,15 @@ msgstr "{focusShortcutText} para enfocar"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted} {count, plural, one {desarrollador} other {desarrolladores}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "{formerName} ahora es {productName}"
+
+msgid "{formerName} is now {productName}!"
+msgstr "¡{formerName} ahora es {productName}!"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "{formerName} ahora se llama {productName}. Es el mismo producto, creado por el mismo equipo, y solo ha cambiado el nombre. Los enlaces existentes a superset.sh redirigen y el comando superset sigue funcionando."
 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} fundadores que pasaron por YC"
@@ -1121,6 +1133,24 @@ msgstr "{price} por usuario/mes, {gbHours} GB-horas en la nube por puesto al mes
 msgid "{price}/user/mo"
 msgstr "{price}/usuario/mes"
 
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (antes {formerName}, YC P26) es el IDE con código fuente disponible para la era de los agentes de IA, donde los ingenieros ejecutan en paralelo cientos de agentes de programación como Claude Code y Codex."
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) es el IDE con código fuente disponible para la era de los agentes de IA, donde los ingenieros ejecutan en paralelo cientos de agentes de programación como Claude Code y Codex."
+
+msgid "{productName} for press"
+msgstr "{productName} para prensa"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "{productName} ha sido usado por una de cada ocho empresas de Fortune 500."
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "{productName} lo usan ingenieros de Netflix, Microsoft, NVIDIA, DoorDash, Wix y Mistral AI en todo el mundo y, en Asia, ingenieros de ByteDance, Toss, Kakao, Grab, LINE y Rakuten."
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."
+
 msgid "{provider} logo"
 msgstr "Logotipo de {provider}"
 
@@ -1147,14 +1177,11 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} de {total}"
 
-msgid "{remaining}% remaining"
-msgstr "{remaining}% restante"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} no está en {installedAccountLogin}, donde está instalada la GitHub App de esta organización."
 
-msgid "{repositoryFullName} isn't shared with the Superset GitHub App yet."
-msgstr "{repositoryFullName} aún no está compartido con la GitHub App de Superset."
+msgid "{repositoryFullName} isn't shared with the Paradev GitHub App yet."
+msgstr "{repositoryFullName} aún no está compartido con la GitHub App de Paradev."
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
@@ -1334,11 +1361,11 @@ msgid "<0>{0}</0> is not a git repository. Would you like to initialize one?"
 msgstr "<0>{0}</0> no es un repositorio de Git. ¿Inicializar uno?"
 
 #. placeholder {0}: remoteHost.name
-msgid "<0>{0}</0> isn't connected to the Superset relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
-msgstr "<0>{0}</0> no está conectado al relay de Superset, así que se omitirán sus ejecuciones. Revisa su <1>configuración de host</1> y comprueba que el acceso por relay esté activado en Configuración > Acceso remoto en ese dispositivo."
+msgid "<0>{0}</0> isn't connected to the Paradev relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
+msgstr "<0>{0}</0> no está conectado al relay de Paradev, así que se omitirán sus ejecuciones. Revisa su <1>configuración de host</1> y comprueba que el acceso por relay esté activado en Configuración > Acceso remoto en ese dispositivo."
 
-msgid "<0>{displayName}</0> is requesting access to your Superset account"
-msgstr "<0>{displayName}</0> solicita acceso a tu cuenta de Superset"
+msgid "<0>{displayName}</0> is requesting access to your Paradev account"
+msgstr "<0>{displayName}</0> solicita acceso a tu cuenta de Paradev"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "<0>{primaryFont}</0> no está instalada en este sistema. Se usará la siguiente fuente disponible."
@@ -1490,8 +1517,8 @@ msgstr "87,4K de 200K tokens usados en esta sesión."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Un navegador integrado mejor: previsualiza tus cambios y haz clic en cualquier elemento para enviarlo al agente como contexto."
 
-msgid "A better Superset is ready"
-msgstr "Una versión mejor de Superset está lista"
+msgid "A better Paradev is ready"
+msgstr "Una versión mejor de Paradev está lista"
 
 msgid "A CDP endpoint per pane"
 msgstr "Un endpoint CDP por panel"
@@ -1551,11 +1578,11 @@ msgstr "Un vistazo a lo que está en curso, lo que viene después y hacia dónde
 msgid "A majority of production changes merge without any human reading the diff."
 msgstr "La mayoría de los cambios en producción se fusionan sin que ninguna persona lea el diff."
 
-msgid "A manifest and a few skill files. Superset puts it where every agent looks."
-msgstr "Un manifiesto y unos pocos archivos de skills. Superset lo coloca donde cada agente busca."
+msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
+msgstr "Un manifiesto y unos pocos archivos de skills. Paradev lo coloca donde cada agente busca."
 
-msgid "A new version of Superset is required to continue. Please update to the latest version."
-msgstr "Se necesita una versión nueva de Superset para continuar. Actualiza a la última versión."
+msgid "A new version of Paradev is required to continue. Please update to the latest version."
+msgstr "Se necesita una versión nueva de Paradev para continuar. Actualiza a la última versión."
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Un nuevo espacio de trabajo desde esta rama, con la conversación entregada a un agente nuevo"
@@ -1615,14 +1642,17 @@ msgstr "Acerca de"
 msgid "About {displayName}"
 msgstr "Acerca de {displayName}"
 
-msgid "About Superset"
-msgstr "Acerca de Superset"
+msgid "About {productName}"
+msgstr "Acerca de {productName}"
+
+msgid "About Paradev"
+msgstr "Acerca de Paradev"
 
 msgid "About three weeks from first call to offer, ending with a paid work trial. Every step is with a founder, and you hear back within 48 hours."
 msgstr "Unas tres semanas desde la primera llamada hasta la oferta, con una prueba de trabajo remunerada al final. Cada paso es con un fundador, y recibes respuesta en un plazo de 48 horas."
 
-msgid "Absolutely. Superset doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
-msgstr "Por supuesto. Superset no hace de proxy de ninguna llamada a la API. Usas tus propias claves de API directamente con los proveedores de IA que elijas. Así tienes control total sobre los costes y el uso."
+msgid "Absolutely. Paradev doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
+msgstr "Por supuesto. Paradev no hace de proxy de ninguna llamada a la API. Usas tus propias claves de API directamente con los proveedores de IA que elijas. Así tienes control total sobre los costes y el uso."
 
 msgid "Accent"
 msgstr "Acento"
@@ -2070,8 +2100,8 @@ msgstr "Agentes en marcha a la vez"
 msgid "Agents use this account when they call Linear tools."
 msgstr "Los agentes usan esta cuenta cuando llaman a las herramientas de Linear."
 
-msgid "Aggregate agent usage across every developer on the Superset leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
-msgstr "Uso agregado de agentes de todos los desarrolladores de la clasificación de Superset: tokens, coste, comportamiento de la caché y qué modelos se usan realmente."
+msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
+msgstr "Uso agregado de agentes de todos los desarrolladores de la clasificación de Paradev: tokens, coste, comportamiento de la caché y qué modelos se usan realmente."
 
 msgid "AI · Agent activity"
 msgstr "IA · Actividad del agente"
@@ -2409,8 +2439,8 @@ msgstr "Anthropic rechazó este token."
 msgid "any account"
 msgstr "cualquier cuenta"
 
-msgid "Any agent you've set up in Superset, such as Claude Code or Codex."
-msgstr "Cualquier agente que hayas configurado en Superset, como Claude Code o Codex."
+msgid "Any agent you've set up in Paradev, such as Claude Code or Codex."
+msgstr "Cualquier agente que hayas configurado en Paradev, como Claude Code o Codex."
 
 msgid "Any channel"
 msgstr "Cualquier canal"
@@ -2835,11 +2865,11 @@ msgstr "Autorizar"
 msgid "Authorize {displayName}"
 msgstr "Autorizar {displayName}"
 
-msgid "Authorize Superset so your plugins, automations and triggers can act on your behalf."
-msgstr "Autoriza Superset para que tus plugins, automatizaciones y disparadores puedan actuar en tu nombre."
+msgid "Authorize Paradev so your plugins, automations and triggers can act on your behalf."
+msgstr "Autoriza Paradev para que tus plugins, automatizaciones y disparadores puedan actuar en tu nombre."
 
-msgid "Authorize Superset to act on your behalf."
-msgstr "Autoriza a Superset a actuar en tu nombre."
+msgid "Authorize Paradev to act on your behalf."
+msgstr "Autoriza a Paradev a actuar en tu nombre."
 
 msgid "Authorizing..."
 msgstr "Autorizando..."
@@ -3271,11 +3301,11 @@ msgstr "Explora e instala skills, servidores MCP y configuraciones de agentes co
 msgid "Browse for directory"
 msgstr "Examinar directorios"
 
-msgid "Browse shared themes and future agent configs for Superset."
-msgstr "Explora temas compartidos y las futuras configuraciones de agentes para Superset."
+msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
+msgstr "Explora los archivos de temas de Paradev compartidos por la comunidad, incluidos GitHub Dark Colorblind, Catppuccin, Ember y One Dark Pro."
 
-msgid "Browse Superset theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
-msgstr "Explora los archivos de temas de Superset compartidos por la comunidad, incluidos GitHub Dark Colorblind, Catppuccin, Ember y One Dark Pro."
+msgid "Browse shared themes and future agent configs for Paradev."
+msgstr "Explora temas compartidos y las futuras configuraciones de agentes para Paradev."
 
 msgid "Browse the repo ↗"
 msgstr "Explorar el repositorio ↗"
@@ -3313,8 +3343,8 @@ msgstr "Reportes de bugs"
 msgid "Build in public"
 msgstr "Construir en público"
 
-msgid "Build the future of Superset in the cloud"
-msgstr "Construye el futuro de Superset en la nube"
+msgid "Build the future of Paradev in the cloud"
+msgstr "Construye el futuro de Paradev en la nube"
 
 msgid "Build your own"
 msgstr "Crea el tuyo"
@@ -3325,8 +3355,8 @@ msgstr "Construyendo la última pieza de software"
 msgid "Building the last piece of software."
 msgstr "Construyendo el último software."
 
-msgid "Built in Superset"
-msgstr "Construido en Superset"
+msgid "Built in Paradev"
+msgstr "Construido en Paradev"
 
 msgid "builtin"
 msgstr "integrado"
@@ -3341,11 +3371,11 @@ msgstr "Lista con viñetas"
 msgid "bundled {0}"
 msgstr "incluido {0}"
 
-msgid "Bundled with the Superset app on this device."
-msgstr "Incluido con la app de Superset en este dispositivo."
+msgid "Bundled with the Paradev app on this device."
+msgstr "Incluido con la app de Paradev en este dispositivo."
 
-msgid "Bundled with the Superset app on this device. Updates with the app."
-msgstr "Incluido con la app de Superset en este dispositivo. Se actualiza con la app."
+msgid "Bundled with the Paradev app on this device. Updates with the app."
+msgstr "Incluido con la app de Paradev en este dispositivo. Se actualiza con la app."
 
 msgid "Business plan"
 msgstr "Plan Business"
@@ -3838,8 +3868,8 @@ msgstr "Elige servidores MCP para este mensaje"
 msgid "Choose what to clear from the in-app browser."
 msgstr "Elige qué borrar del navegador integrado."
 
-msgid "Choose when Superset pings you."
-msgstr "Elige cuándo te avisa Superset."
+msgid "Choose when Paradev pings you."
+msgstr "Elige cuándo te avisa Paradev."
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Elige dónde se abren los agentes iniciados desde comentarios, el modo de diseño y Pages."
@@ -3850,8 +3880,8 @@ msgstr "CI falló"
 msgid "Clarify this"
 msgstr "Aclara esto"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Superset is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex y OpenCode son los agentes; Superset es donde ejecutas muchos de ellos a la vez. Cada tarea recibe su propio worktree de Git aislado, así que diez agentes pueden trabajar en diez ramas al mismo tiempo mientras tú supervisas, revisas y fusionas desde un solo sitio."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex y OpenCode son los agentes; Paradev es donde ejecutas muchos de ellos a la vez. Cada tarea recibe su propio worktree de Git aislado, así que diez agentes pueden trabajar en diez ramas al mismo tiempo mientras tú supervisas, revisas y fusionas desde un solo sitio."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode y más. Sin configuración por agente."
@@ -4389,6 +4419,9 @@ msgstr "Commits"
 msgid "Committed"
 msgstr "Con commit"
 
+msgid "Committed with the repository and shared with everyone who works on it."
+msgstr "Se guarda con un commit en el repositorio y se comparte con todos los que trabajan en él."
+
 msgid "Committed, starting soon."
 msgstr "Comprometido, empieza pronto."
 
@@ -4404,8 +4437,11 @@ msgstr "Comunidad"
 msgid "Company"
 msgstr "Empresa"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Descripción de la empresa, últimas noticias, recursos de marca y contacto de prensa de Superset."
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "Descripción de la empresa, últimas noticias, recursos de marca y contacto de prensa de {productName} (antes {formerName})."
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "Descripción de la empresa, últimas noticias, recursos de marca y contacto de prensa de {productName}."
 
 msgid "Company email"
 msgstr "Correo de empresa"
@@ -4413,14 +4449,14 @@ msgstr "Correo de empresa"
 msgid "Compare"
 msgstr "Comparar"
 
+msgid "Compare Paradev | AI Coding Comparisons and Guides"
+msgstr "Comparar Paradev | Comparativas y guías de codificación con IA"
+
+msgid "Compare Paradev with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
+msgstr "Compara Paradev con Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot y más. Explora comparativas lado a lado, recopilaciones y guías de flujo de trabajo."
+
 msgid "Compare plans"
 msgstr "Comparar planes"
-
-msgid "Compare Superset | AI Coding Comparisons and Guides"
-msgstr "Comparar Superset | Comparativas y guías de codificación con IA"
-
-msgid "Compare Superset with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
-msgstr "Compara Superset con Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot y más. Explora comparativas lado a lado, recopilaciones y guías de flujo de trabajo."
 
 msgid "Compared against the default style"
 msgstr "Comparado con el estilo predeterminado"
@@ -4440,6 +4476,12 @@ msgstr "component-showcase"
 
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "Diseño de formulario componible: se combina con @superset/ui/form para react-hook-form"
+
+msgid "Config file contents"
+msgstr "Contenido del archivo de configuración"
+
+msgid "config.json must be a JSON object"
+msgstr "config.json debe ser un objeto JSON"
 
 msgid "Configure"
 msgstr "Configurar"
@@ -4462,8 +4504,8 @@ msgstr "Configurar GitHub App"
 msgid "Configure GitHub App…"
 msgstr "Configurar GitHub App…"
 
-msgid "Configure how tasks sync between Superset and Linear."
-msgstr "Configura cómo se sincronizan las tareas entre Superset y Linear."
+msgid "Configure how tasks sync between Paradev and Linear."
+msgstr "Configura cómo se sincronizan las tareas entre Paradev y Linear."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Configura el comportamiento de la terminal y los scripts de terminal reutilizables"
@@ -4580,8 +4622,8 @@ msgstr "Conecta tu cuenta de Linear antes de gestionar las tareas en Linear."
 msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
 msgstr "Conecta tu cuenta de Linear en Configuración → Integraciones para vincular issues de Linear."
 
-msgid "Connect your Linear account to browse, update and start work on Linear issues from Superset."
-msgstr "Conecta tu cuenta de Linear para explorar, actualizar y empezar a trabajar en issues de Linear desde Superset."
+msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
+msgstr "Conecta tu cuenta de Linear para explorar, actualizar y empezar a trabajar en issues de Linear desde Paradev."
 
 msgid "Connect your Linear account to use Linear here."
 msgstr "Conecta tu cuenta de Linear para usar Linear aquí."
@@ -4790,6 +4832,9 @@ msgstr "Conversación"
 msgid "Conversation · Message"
 msgstr "Conversación · Mensaje"
 
+msgid "Convert to config.toml"
+msgstr "Convertir a config.toml"
+
 msgid "Convert to draft"
 msgstr "Convertir en borrador"
 
@@ -4839,8 +4884,8 @@ msgstr "Copiar como Markdown"
 msgid "Copy Branch Name"
 msgstr "Copiar el nombre de la rama"
 
-msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Superset."
-msgstr "Copia a Superset el historial de navegación y los inicios de sesión de Chrome, Brave, Arc u otro navegador basado en Chromium."
+msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
+msgstr "Copia a Paradev el historial de navegación y los inicios de sesión de Chrome, Brave, Arc u otro navegador basado en Chromium."
 
 msgid "Copy code"
 msgstr "Copiar código"
@@ -4966,8 +5011,8 @@ msgstr "Copiar URL"
 msgid "Copy Workspace ID"
 msgstr "Copiar el ID del espacio de trabajo"
 
-msgid "Copy your browsing history and logins from another browser into Superset. Your original browser isn't changed."
-msgstr "Copiar el historial de navegación y los inicios de sesión de otro navegador a Superset. El navegador original no se modifica."
+msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
+msgstr "Copiar el historial de navegación y los inicios de sesión de otro navegador a Paradev. El navegador original no se modifica."
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Copia tu clave ahora: no podrás volver a verla."
@@ -5861,8 +5906,8 @@ msgstr "Temas personalizados"
 msgid "Customize commands"
 msgstr "Personalizar comandos"
 
-msgid "Customize how Superset looks on your device"
-msgstr "Personaliza el aspecto de Superset en tu dispositivo"
+msgid "Customize how Paradev looks on your device"
+msgstr "Personaliza el aspecto de Paradev en tu dispositivo"
 
 #. placeholder {0}: showHotkeysKeys.map((key) => ( <Kbd key={key}>{key}</Kbd> ))
 msgid "Customize keyboard shortcuts for your workflow. Press <0>{0}</0> to open this page anytime."
@@ -6234,8 +6279,8 @@ msgstr "Describe la tarea para el agente…"
 msgid "Describe the work to your agent"
 msgstr "Describe el trabajo a tu agente"
 
-msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
-msgstr "Describe lo que necesitas. Superset crea un espacio de trabajo aislado y una rama limpia para la tarea."
+msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
+msgstr "Describe lo que necesitas. Paradev crea un espacio de trabajo aislado y una rama limpia para la tarea."
 
 msgid "Describe what you'd like to see built…"
 msgstr "Describe lo que te gustaría que se construyera…"
@@ -6592,14 +6637,14 @@ msgstr "Descargar registros"
 msgid "Download Manually"
 msgstr "Descargar manualmente"
 
-msgid "Download our logos and product images for use in coverage of Superset."
-msgstr "Descarga nuestros logotipos e imágenes del producto para usarlos en tu cobertura de Superset."
+msgid "Download our logos and product images for use in coverage of Paradev."
+msgstr "Descarga nuestros logotipos e imágenes del producto para usarlos en tu cobertura de Paradev."
+
+msgid "Download Paradev"
+msgstr "Descargar Paradev"
 
 msgid "Download starter"
 msgstr "Descargar plantilla inicial"
-
-msgid "Download Superset"
-msgstr "Descargar Superset"
 
 msgid "Download the theme file above."
 msgstr "Descarga el archivo del tema de arriba."
@@ -6894,8 +6939,8 @@ msgstr "Habilitar el acceso por relay…"
 msgid "Enable remote access"
 msgstr "Activa el acceso remoto"
 
-msgid "Enable Remote Access and keep this computer awake with Superset running."
-msgstr "Activa el acceso remoto y mantén este ordenador activo con Superset en ejecución."
+msgid "Enable Remote Access and keep this computer awake with Paradev running."
+msgstr "Activa el acceso remoto y mantén este ordenador activo con Paradev en ejecución."
 
 msgid "Enable skill"
 msgstr "Activar skill"
@@ -7017,8 +7062,8 @@ msgstr "Cada minuto"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Todos los objetivos aportan lo suyo para el siguiente escalón. Medido en los últimos 30 días."
 
-msgid "Every paid plan includes Superset Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
-msgstr "Todos los planes de pago incluyen Superset Mobile, automatizaciones y soporte prioritario. Los planes con espacios de trabajo en la nube dan a tu equipo un fondo compartido de GB-horas."
+msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
+msgstr "Todos los planes de pago incluyen Paradev Mobile, automatizaciones y soporte prioritario. Los planes con espacios de trabajo en la nube dan a tu equipo un fondo compartido de GB-horas."
 
 msgid "Every publish is a version"
 msgstr "Cada publicación es una versión"
@@ -7050,6 +7095,9 @@ msgstr "Todo el mundo se queda en la v{sharedVersion} hasta que lo cambies"
 msgid "Everyone with access to this organization."
 msgstr "Todas las personas con acceso a esta organización."
 
+msgid "Everything carries over."
+msgstr "Todo se mantiene."
+
 msgid "Everything in {previousPlan}"
 msgstr "Todo lo de {previousPlan}"
 
@@ -7062,14 +7110,17 @@ msgstr "Todo lo de Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Todo lo de Ultra más GB-horas en la nube a medida, SSO y SAML, aprovisionamiento SCIM, restricciones de IP, registros de auditoría, un SLA personalizado, soporte dedicado y contratos personalizados. El precio se adapta a tu organización. Escríbenos y definiremos algo a tu medida."
 
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Todo se puede automatizar con scripts. Crea espacios de trabajo y agentes desde la CLI, conecta Superset a tu CI con el SDK o deja que tu agente lo maneje por MCP."
+msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
+msgstr "Todo se puede automatizar con scripts. Crea espacios de trabajo y agentes desde la CLI, conecta Paradev a tu CI con el SDK o deja que tu agente lo maneje por MCP."
 
-msgid "Everything we built on top of the primitives — Superset originals, the"
-msgstr "Todo lo que construimos sobre los primitivos: los originales de Superset, la suite"
+msgid "Everything we built on top of the primitives — Paradev originals, the"
+msgstr "Todo lo que construimos sobre los primitivos: los originales de Paradev, la suite"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "Todo lo que necesitas para escribir sobre Superset: descripción de la empresa, últimas noticias, logotipos, imágenes del producto y a quién contactar."
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "Todo lo que necesitas para escribir sobre {productName} (antes {formerName}): descripción de la empresa, últimas noticias, logotipos, imágenes del producto y a quién contactar."
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "Todo lo que necesitas para escribir sobre {productName}: descripción de la empresa, últimas noticias, logotipos, imágenes del producto y a quién contactar."
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "Todo lo que has publicado se elimina, no se oculta. Puedes volver a unirte más adelante y se reconstruirá a partir de las transcripciones que sigan en esta máquina."
@@ -7206,8 +7257,8 @@ msgstr "Meta F4 cruzada"
 msgid "Factory 2026"
 msgstr "Factory 2026"
 
-msgid "Factory 2026 | Superset"
-msgstr "Factory 2026 | Superset"
+msgid "Factory 2026 | Paradev"
+msgstr "Factory 2026 | Paradev"
 
 msgid "Factory tier {tier}"
 msgstr "Nivel de fábrica {tier}"
@@ -8031,8 +8082,8 @@ msgstr "Grosor de la fuente"
 msgid "For a project, open the importer to link it."
 msgstr "Para un proyecto, abre el importador para vincularlo."
 
-msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/superset-sh/superset</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
-msgstr "Para informes de errores y solicitudes de funciones, lo más rápido es abrir un issue en GitHub en <0>github.com/superset-sh/superset</0>. Nuestra comunidad vive en <1>Discord</1>, y publicamos novedades en <2>X (@superset_sh)</2> y <3>LinkedIn</3>."
+msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
+msgstr "Para informes de errores y solicitudes de funciones, lo más rápido es abrir un issue en GitHub en <0>{githubHandle}</0>. Nuestra comunidad vive en <1>Discord</1>, y publicamos novedades en <2>X ({xHandle})</2> y <3>LinkedIn</3>."
 
 msgid "For individuals getting started"
 msgstr "Para quienes empiezan"
@@ -8262,20 +8313,20 @@ msgstr "Ponte en contacto con el equipo de {companyName}."
 msgid "Get key"
 msgstr "Conseguir clave"
 
-msgid "Get more out of Superset"
-msgstr "Sacar más partido a Superset"
+msgid "Get more out of Paradev"
+msgstr "Sacar más partido a Paradev"
 
-msgid "Get notified when Superset is available on Windows & Linux."
-msgstr "Te avisamos cuando Superset esté disponible en Windows y Linux."
+msgid "Get notified when Paradev is available on Windows & Linux."
+msgstr "Te avisamos cuando Paradev esté disponible en Windows y Linux."
+
+msgid "Get Paradev on your Mac"
+msgstr "Consigue Paradev en tu Mac"
+
+msgid "Get Paradev Pro"
+msgstr "Obtener Paradev Pro"
 
 msgid "Get started"
 msgstr "Empezar"
-
-msgid "Get Superset on your Mac"
-msgstr "Consigue Superset en tu Mac"
-
-msgid "Get Superset Pro"
-msgstr "Obtener Superset Pro"
 
 msgid "Get the best out of Pro"
 msgstr "Aprovecha Pro al máximo"
@@ -8388,6 +8439,9 @@ msgstr "Ir al inicio"
 msgid "Go to next page"
 msgstr "Ir a la página siguiente"
 
+msgid "Go to Paradev"
+msgstr "Ir a Paradev"
+
 msgid "Go to previous page"
 msgstr "Ir a la página anterior"
 
@@ -8397,20 +8451,17 @@ msgstr "Ve a Configuración y luego a Acceso remoto"
 msgid "Go to Slack integration settings"
 msgstr "Ir a la configuración de la integración de Slack"
 
-msgid "Go to Superset"
-msgstr "Ir a Superset"
-
 msgid "Go to workspace"
 msgstr "Ir al espacio de trabajo"
 
-msgid "Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again."
-msgstr "Google no concedió un acceso duradero. Quita Superset del acceso de terceros de tu cuenta de Google y vuelve a intentarlo."
+msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
+msgstr "Google no concedió un acceso duradero. Quita Paradev del acceso de terceros de tu cuenta de Google y vuelve a intentarlo."
 
 msgid "Got it"
 msgstr "Entendido"
 
-msgid "Grant the OS permissions Superset needs."
-msgstr "Concede los permisos del sistema que Superset necesita."
+msgid "Grant the OS permissions Paradev needs."
+msgstr "Concede los permisos del sistema que Paradev necesita."
 
 msgid "Granted"
 msgstr "Concedido"
@@ -8698,8 +8749,8 @@ msgstr "Las horas se calculan con un espacio de trabajo estándar de {vcpus} vCP
 msgid "Hover Card"
 msgstr "Tarjeta al pasar el cursor"
 
-msgid "How {label} signs in when Superset runs it for you."
-msgstr "Cómo inicia sesión {label} cuando Superset lo ejecuta por ti."
+msgid "How {label} signs in when Paradev runs it for you."
+msgstr "Cómo inicia sesión {label} cuando Paradev lo ejecuta por ti."
 
 msgid "How 2026 plays out"
 msgstr "Cómo se desarrolla 2026"
@@ -8728,8 +8779,8 @@ msgstr "¿Cómo funciona el sistema de agentes en paralelo?"
 msgid "How grouped commands open."
 msgstr "Cómo se abren los comandos agrupados."
 
-msgid "How is Superset different from just running Claude Code in a terminal?"
-msgstr "¿En qué se diferencia Superset de ejecutar Claude Code en una terminal?"
+msgid "How is Paradev different from just running Claude Code in a terminal?"
+msgstr "¿En qué se diferencia Paradev de ejecutar Claude Code en una terminal?"
 
 msgid "How it works"
 msgstr "Cómo funciona"
@@ -8755,8 +8806,8 @@ msgstr "Cómo se entrega el prompt al proceso."
 msgid "How tiers work →"
 msgstr "Cómo funcionan los niveles →"
 
-msgid "How to install {name} in Superset"
-msgstr "Cómo instalar {name} en Superset"
+msgid "How to install {name} in Paradev"
+msgstr "Cómo instalar {name} en Paradev"
 
 msgid "How we build it, in long form."
 msgstr "Cómo lo construimos, en detalle."
@@ -8833,8 +8884,8 @@ msgstr "Inactivo"
 msgid "Idle · branch pushed"
 msgstr "Inactivo · rama subida"
 
-msgid "If you're enjoying Superset so far, a GitHub star helps other developers discover it."
-msgstr "Si Superset te está gustando, una estrella en GitHub ayuda a otros desarrolladores a descubrirlo."
+msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
+msgstr "Si Paradev te está gustando, una estrella en GitHub ayuda a otros desarrolladores a descubrirlo."
 
 msgid "Illegal content"
 msgstr "Contenido ilegal"
@@ -8978,8 +9029,8 @@ msgstr "en una terminal de este host."
 msgid "In all projects"
 msgstr "En todos los proyectos"
 
-msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
-msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Superset como su IDE principal, en empresas como Wix, DoorDash y Netflix."
+msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
+msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Paradev como su IDE principal, en empresas como Wix, DoorDash y Netflix."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Presencial en San Francisco, cinco días a la semana. Trabajas directamente con los fundadores."
@@ -9000,11 +9051,11 @@ msgstr "En revisión"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "En la app de escritorio de {appName}, abre Configuración → Acceso remoto y activa “Permitir el acceso remoto a este dispositivo a través del relay”."
 
-msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
-msgstr "En la app de escritorio de Superset, abre <0>Configuración → Apariencia → Tema</0>."
+msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
+msgstr "En la app de escritorio de Paradev, abre <0>Configuración → Apariencia → Tema</0>."
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "En menos de un año, más de 145.000 desarrolladores de 180 países han usado Superset y han creado más de 1,85 millones de espacios de trabajo de agentes."
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "En menos de un año, más de 145.000 desarrolladores de 180 países han usado {productName} y han creado más de 1,85 millones de espacios de trabajo de agentes."
 
 msgid "In your next chat"
 msgstr "En tu próximo chat"
@@ -9027,8 +9078,8 @@ msgstr "Incluido"
 msgid "Included in Enterprise"
 msgstr "Incluido en Enterprise"
 
-msgid "Includes the Superset-specific box variant"
-msgstr "Incluye la variante de caja propia de Superset"
+msgid "Includes the Paradev-specific box variant"
+msgstr "Incluye la variante de caja propia de Paradev"
 
 msgid "Incognito Operator"
 msgstr "Operario de incógnito"
@@ -9087,8 +9138,8 @@ msgstr "tokens de entrada, caché y salida"
 msgid "Inputs"
 msgstr "Entradas"
 
-msgid "Insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "Análisis del equipo de Superset sobre agentes de código en paralelo y productividad de desarrollo."
+msgid "Insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "Análisis del equipo de Paradev sobre agentes de código en paralelo y productividad de desarrollo."
 
 msgid "Inspect branches and run SQL"
 msgstr "Inspeccionar ramas y ejecutar SQL"
@@ -9124,17 +9175,17 @@ msgstr "Instálalo una vez. Todos los agentes lo reciben, en tus máquinas y en 
 msgid "Install once. Mention it in any prompt."
 msgstr "Instálalo una vez. Menciónalo en cualquier prompt."
 
+msgid "Install Paradev MCP in your client"
+msgstr "Instala Paradev MCP en tu cliente"
+
 msgid "Install plugin"
 msgstr "Instalar plugin"
-
-msgid "Install Superset MCP in your client"
-msgstr "Instala Superset MCP en tu cliente"
 
 msgid "Install the desktop app"
 msgstr "Instala la app de escritorio"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Instala la GitHub App de Superset para conectar tus repositorios."
+msgid "Install the Paradev GitHub App to connect your repositories."
+msgstr "Instala la GitHub App de Paradev para conectar tus repositorios."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Instala, autoriza y limita servidores MCP en todos tus espacios de trabajo desde un solo sitio, con OAuth centralizado."
@@ -9152,8 +9203,8 @@ msgstr "Instalado mediante"
 msgid "Installing..."
 msgstr "Instalando..."
 
-msgid "Installs Superset on a machine you can reach with ssh, signs Superset in to your account, and keeps it running as a service."
-msgstr "Instala Superset en una máquina a la que puedes acceder con ssh, conecta Superset a tu cuenta y lo mantiene en ejecución como servicio."
+msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
+msgstr "Instala Paradev en una máquina a la que puedes acceder con ssh, conecta Paradev a tu cuenta y lo mantiene en ejecución como servicio."
 
 msgid "Instructions"
 msgstr "Instrucciones"
@@ -9167,8 +9218,8 @@ msgstr "Terminal interactiva del agente."
 msgid "Interactive clients authorize over OAuth 2.1 in your browser, scoped to your active organization. For headless environments and CI, generate an API key from Settings → API Keys in the desktop app and pass it as a Bearer token instead. Full setup, including header config for Claude Code, is in the <0>authentication docs</0>."
 msgstr "Los clientes interactivos se autorizan mediante OAuth 2.1 en tu navegador, con alcance limitado a tu organización activa. Para entornos sin interfaz y CI, genera una clave de API en Configuración → Claves de API en la app de escritorio y pásala como token Bearer. La configuración completa, incluida la de cabeceras para Claude Code, está en la <0>documentación de autenticación</0>."
 
-msgid "Interested in bringing Superset to your organization? Reach out and we'll work with you to find the right setup for your team."
-msgstr "¿Te interesa llevar Superset a tu organización? Escríbenos y trabajaremos contigo para encontrar la configuración adecuada para tu equipo."
+msgid "Interested in bringing Paradev to your organization? Reach out and we'll work with you to find the right setup for your team."
+msgstr "¿Te interesa llevar Paradev a tu organización? Escríbenos y trabajaremos contigo para encontrar la configuración adecuada para tu equipo."
 
 msgid "Interface"
 msgstr "Interfaz"
@@ -9287,20 +9338,20 @@ msgstr "¿Están seguros mis datos?"
 msgid "is now signed in here."
 msgstr "tiene ahora la sesión iniciada aquí."
 
+msgid "Is Paradev free to use?"
+msgstr "¿Paradev es gratis?"
+
+msgid "Is Paradev just a wrapper around Claude Code?"
+msgstr "¿Paradev es solo un envoltorio de Claude Code?"
+
+msgid "Is Paradev open source?"
+msgstr "¿Paradev es de código abierto?"
+
+msgid "Is Paradev SOC 2 compliant?"
+msgstr "¿Paradev cumple con SOC 2?"
+
 msgid "is signed in."
 msgstr "tiene la sesión iniciada."
-
-msgid "Is Superset free to use?"
-msgstr "¿Superset es gratis?"
-
-msgid "Is Superset just a wrapper around Claude Code?"
-msgstr "¿Superset es solo un envoltorio de Claude Code?"
-
-msgid "Is Superset open source?"
-msgstr "¿Superset es de código abierto?"
-
-msgid "Is Superset SOC 2 compliant?"
-msgstr "¿Superset cumple con SOC 2?"
 
 msgid "Is there a free plan?"
 msgstr "¿Hay un plan gratuito?"
@@ -9384,8 +9435,8 @@ msgstr "Su propia rama y su propia copia de los archivos"
 msgid "Its replies go with it."
 msgstr "Sus respuestas también se eliminan."
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
-msgstr "Sus espacios de trabajo y terminales no estarán disponibles hasta que se reinicie: usa el menú de la bandeja de Superset > Host Service > Reiniciar."
+msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
+msgstr "Sus espacios de trabajo y terminales no estarán disponibles hasta que se reinicie: usa el menú de la bandeja de Paradev > Host Service > Reiniciar."
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "Sus espacios de trabajo y worktrees se eliminan del disco ahora en lugar de dentro de 30 días. La carpeta del repositorio y los worktrees con cambios sin confirmar se conservan."
@@ -9414,14 +9465,14 @@ msgstr "Únete a nuestro Discord"
 msgid "JOIN OUR DISCORD"
 msgstr "ÚNETE A NUESTRO DISCORD"
 
-msgid "Join the <0>Superset</0> community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "Únete a la comunidad de <0>Superset</0> para conseguir ayuda, compartir ideas y estar al día de las últimas noticias y novedades."
+msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "Únete a la comunidad de <0>Paradev</0> para conseguir ayuda, compartir ideas y estar al día de las últimas noticias y novedades."
 
 msgid "Join the leaderboard"
 msgstr "Unirse a la clasificación"
 
-msgid "Join the Superset community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "Únete a la comunidad de Superset para obtener ayuda, compartir ideas y estar al día de las últimas noticias y novedades."
+msgid "Join the Paradev community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "Únete a la comunidad de Paradev para obtener ayuda, compartir ideas y estar al día de las últimas noticias y novedades."
 
 msgid "Join the waitlist"
 msgstr "Únete a la lista de espera"
@@ -9429,8 +9480,8 @@ msgstr "Únete a la lista de espera"
 msgid "Join us"
 msgstr "Únete a nosotros"
 
-msgid "Join us at Superset"
-msgstr "Únete a Superset"
+msgid "Join us at Paradev"
+msgstr "Únete a Paradev"
 
 msgid "Join waitlist"
 msgstr "Unirse a la lista de espera"
@@ -9783,8 +9834,8 @@ msgstr "Claro"
 msgid "Light theme"
 msgstr "Tema claro"
 
-msgid "Like building with Superset?"
-msgstr "¿Te gusta crear con Superset?"
+msgid "Like building with Paradev?"
+msgstr "¿Te gusta crear con Paradev?"
 
 msgid "Lime"
 msgstr "Lima"
@@ -9802,6 +9853,11 @@ msgstr "¿Limitar a las personas invitadas?"
 #. placeholder {0}: metadata.startLine
 msgid "Line {0}"
 msgstr "Línea {0}"
+
+#. placeholder {0}: problem.line
+#. placeholder {1}: problem.message
+msgid "Line {0}: {1}"
+msgstr "Línea {0}: {1}"
 
 msgid "line changed"
 msgstr "línea modificada"
@@ -10178,8 +10234,8 @@ msgstr "Usar como predeterminada: las terminales y los agentes nuevos se lanzan 
 msgid "Make public"
 msgstr "Hacer pública"
 
-msgid "Make sure the device is awake, online, and running Superset."
-msgstr "Asegúrate de que el dispositivo esté activo, conectado y con Superset en ejecución."
+msgid "Make sure the device is awake, online, and running Paradev."
+msgstr "Asegúrate de que el dispositivo esté activo, conectado y con Paradev en ejecución."
 
 msgid "Make the chip style the TooltipContent default"
 msgstr "Hacer que el estilo de chip sea el predeterminado de TooltipContent"
@@ -10367,8 +10423,8 @@ msgstr "Gravedad media"
 msgid "Meet the team"
 msgstr "Conoce al equipo"
 
-msgid "Meet the team behind Superset, building parallel coding agents for developers."
-msgstr "Conoce al equipo detrás de Superset, que crea agentes de codificación en paralelo para desarrolladores."
+msgid "Meet the team behind Paradev, building parallel coding agents for developers."
+msgstr "Conoce al equipo detrás de Paradev, que crea agentes de codificación en paralelo para desarrolladores."
 
 msgid "Member"
 msgstr "Miembro"
@@ -10423,8 +10479,8 @@ msgstr "No se pudo fusionar: {0}"
 msgid "Merge pull request"
 msgstr "Fusionar la pull request"
 
-msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
-msgstr "Fusiona pull requests sin salir de Superset, además de una ronda de correcciones y pulido en el chat."
+msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
+msgstr "Fusiona pull requests sin salir de Paradev, además de una ronda de correcciones y pulido en el chat."
 
 msgid "Merge status"
 msgstr "Estado de fusión"
@@ -10938,8 +10994,8 @@ msgstr "Novedades y actualizaciones"
 msgid "News and deep dives"
 msgstr "Noticias y análisis a fondo"
 
-msgid "News, updates, and insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "Noticias, novedades y análisis del equipo de Superset sobre agentes de codificación en paralelo y productividad para desarrolladores."
+msgid "News, updates, and insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "Noticias, novedades y análisis del equipo de Paradev sobre agentes de codificación en paralelo y productividad para desarrolladores."
 
 msgid "Next"
 msgstr "Siguiente"
@@ -11620,8 +11676,8 @@ msgstr "Aún no hay espacios de trabajo"
 msgid "No-Prompt Launch"
 msgstr "Lanzamiento sin prompt"
 
-msgid "No. Your agents stay independent; Superset is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "No. Tus agentes siguen siendo independientes; Superset es la capa de orquestación a su alrededor. Cada tarea recibe un worktree de Git aislado, sesiones persistentes, revisión de diffs y automatizaciones que se ejecutan con eventos o según una programación, sin atar el flujo de trabajo a un solo proveedor."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "No. Tus agentes siguen siendo independientes; Paradev es la capa de orquestación a su alrededor. Cada tarea recibe un worktree de Git aislado, sesiones persistentes, revisión de diffs y automatizaciones que se ejecutan con eventos o según una programación, sin atar el flujo de trabajo a un solo proveedor."
 
 msgid "Nobody has joined the board yet."
 msgstr "Todavía nadie se ha unido a la clasificación."
@@ -11865,8 +11921,8 @@ msgstr "En esta página"
 msgid "On window change"
 msgstr "Al cambiar de ventana"
 
-msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset doesn't proxy any API calls."
-msgstr "En tu equipo. Los repositorios, los worktrees, la salida de la terminal y las sesiones de agente se quedan en local por defecto; la sincronización en la nube solo cubre los metadatos de cuenta y organización. Superset no hace de proxy de ninguna llamada a la API."
+msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Paradev doesn't proxy any API calls."
+msgstr "En tu equipo. Los repositorios, los worktrees, la salida de la terminal y las sesiones de agente se quedan en local por defecto; la sincronización en la nube solo cubre los metadatos de cuenta y organización. Paradev no hace de proxy de ninguna llamada a la API."
 
 msgid "On-screen Keyboard"
 msgstr "Teclado en pantalla"
@@ -11942,6 +11998,9 @@ msgstr "Solo los propietarios del host o los propietarios de la organización pu
 
 msgid "Only images can be attached to a comment"
 msgstr "Solo se pueden adjuntar imágenes a un comentario"
+
+msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
+msgstr "Solo en esta máquina: ignorado por git y aplicado a cada worktree de este repositorio. Cualquier clave definida aquí reemplaza la compartida."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Solo los propietarios de la organización pueden modificar esta configuración."
@@ -12257,6 +12316,9 @@ msgstr "Abrir en una pestaña nueva"
 msgid "Open in New Tab"
 msgstr "Abrir en una pestaña nueva"
 
+msgid "Open in Paradev"
+msgstr "Abrir en Paradev"
+
 msgid "Open in Pull Requests"
 msgstr "Abrir en Pull requests"
 
@@ -12268,9 +12330,6 @@ msgstr "Abrir en Scira AI"
 
 msgid "Open in split pane"
 msgstr "Abrir en un panel dividido"
-
-msgid "Open in Superset"
-msgstr "Abrir en Superset"
 
 msgid "Open in T3 Chat"
 msgstr "Abrir en T3 Chat"
@@ -12328,8 +12387,8 @@ msgstr "Abre la página de inicio de sesión de dispositivos de OpenAI."
 msgid "Open Page in Default Browser"
 msgstr "Abrir la página en el navegador predeterminado"
 
-msgid "Open pages and reply to comments from the Superset app on iPhone and iPad."
-msgstr "Abre páginas y responde comentarios desde la app de Superset en iPhone y iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
+msgstr "Abre páginas y responde comentarios desde la app de Paradev en iPhone y iPad."
 
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
@@ -12496,8 +12555,8 @@ msgstr "Se abre en"
 msgid "Operator"
 msgstr "Operario"
 
-msgid "Opt in from Superset under Settings → Account."
-msgstr "Actívalo en Superset, en Configuración → Cuenta."
+msgid "Opt in from Paradev under Settings → Account."
+msgstr "Actívalo en Paradev, en Configuración → Cuenta."
 
 msgid "Opt-out"
 msgstr "Rechazar"
@@ -12517,8 +12576,8 @@ msgstr "Flags opcionales añadidos después del contenido del prompt"
 msgid "Options"
 msgstr "Opciones"
 
-msgid "Or ask your coding agent to install the Superset CLI."
-msgstr "O pídele a tu agente de código que instale la CLI de Superset."
+msgid "Or ask your coding agent to install the Paradev CLI."
+msgstr "O pídele a tu agente de código que instale la CLI de Paradev."
 
 msgid "Orange"
 msgstr "Naranja"
@@ -12610,6 +12669,9 @@ msgstr "Otras formas de contactarnos"
 
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Nuestra ronda semilla de 11,5 M$ está liderada por Union Square Ventures, junto con Y Combinator, Paul Graham y fundadores a los que admiramos."
+
+msgid "Our investors"
+msgstr "Nuestros inversores"
 
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Nuestra lectura a agosto de 2026, basada en nuestro propio equipo y en los equipos que seguimos de cerca. F3 está casi todo abierto. F4 está casi todo cerrado. Ese hueco es el trabajo."
@@ -12750,6 +12812,181 @@ msgstr "Raíz del diseño de paneles: renderiza el árbol de paneles de un espac
 msgid "PaneHeaderActions.tsx"
 msgstr "PaneHeaderActions.tsx"
 
+msgid "Paradev"
+msgstr "Paradev"
+
+msgid "Paradev {version}"
+msgstr "Paradev {version}"
+
+msgid "Paradev Agent"
+msgstr "Paradev Agent"
+
+msgid "Paradev app"
+msgstr "App de Paradev"
+
+msgid "Paradev App"
+msgstr "App de Paradev"
+
+msgid "Paradev Automations"
+msgstr "Automatizaciones de Paradev"
+
+msgid "Paradev CLI"
+msgstr "CLI de Paradev"
+
+msgid "Paradev components"
+msgstr "Componentes de Paradev"
+
+msgid "Paradev Components"
+msgstr "Componentes de Paradev"
+
+msgid "Paradev could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
+msgstr "Paradev no pudo traer algunos de tus proyectos o espacios de trabajo de v1. Abre el importador para ver el motivo y reintentar cada uno."
+
+msgid "Paradev could not complete sign-in. Please try again."
+msgstr "Paradev no pudo completar el inicio de sesión. Inténtalo de nuevo."
+
+msgid "Paradev CPU"
+msgstr "CPU de Paradev"
+
+msgid "Paradev CPU · last 5 min"
+msgstr "CPU de Paradev · últimos 5 min"
+
+msgid "Paradev Design System"
+msgstr "Sistema de diseño de Paradev"
+
+msgid "Paradev desktop app"
+msgstr "App de escritorio de Paradev"
+
+msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
+msgstr "Paradev Enterprise es Paradev para equipos. Escríbenos para saber más sobre lo que incluye y cómo puede funcionar en tu organización."
+
+msgid "Paradev for iPhone and iPad"
+msgstr "Paradev para iPhone y iPad"
+
+msgid "Paradev for your team"
+msgstr "Paradev para tu equipo"
+
+msgid "Paradev forwards the ports a remote workspace opens while you have it selected."
+msgstr "Paradev reenvía los puertos que abre un espacio de trabajo remoto mientras lo tienes seleccionado."
+
+msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
+msgstr "Paradev tiene un plan gratuito. El código fuente está disponible en GitHub bajo la Elastic License 2.0 (ELv2), así que puedes inspeccionarlo y alojarlo tú mismo conforme a los términos de la licencia."
+
+msgid "Paradev hit an unexpected error. Reload to try again."
+msgstr "Paradev ha encontrado un error inesperado. Recargar para volver a intentarlo."
+
+msgid "Paradev holds the token and makes the calls. Agents never see it."
+msgstr "Paradev guarda el token y hace las llamadas. Los agentes nunca lo ven."
+
+msgid "Paradev hooks"
+msgstr "Hooks de Paradev"
+
+msgid "Paradev in-app browser"
+msgstr "Navegador integrado de Paradev"
+
+msgid "Paradev is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
+msgstr "Paradev es una app de escritorio. Introduce tu correo y te enviaremos un enlace de descarga para abrirlo en tu Mac."
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
+msgstr "Paradev construye software que se mejora a sí mismo. Empieza por dar a los ingenieros las mejores herramientas, que se adaptan a sus necesidades con el tiempo."
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "Paradev construye software que se mejora a sí mismo. Empieza por dar a los ingenieros las mejores herramientas, que se adaptan a sus necesidades con el tiempo. Somos 3 ex-CTO de YC construyendo una herramienta que nos encanta."
+
+msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Paradev lo desarrolla un equipo con sede en San Francisco, California. Para soporte del producto o dudas sobre tu cuenta, escribe a <0>{supportEmail}</0> y te responderemos en un día laborable. Para alianzas, prensa, enterprise o cualquier otro tema, escribe a <1>{teamEmail}</1>."
+
+msgid "Paradev is built in Paradev, so we're our own #1 users. You get paid to make your own life easier."
+msgstr "Paradev se desarrolla en Paradev, así que somos nuestros propios usuarios principales. Te pagan por hacerte la vida más fácil."
+
+msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
+msgstr "Paradev está pensado para funcionar con tu herramienta actual: admitimos de forma nativa los enlaces directos a IDE como Cursor, así que puedes abrir tus espacios de trabajo y archivos en tu IDE."
+
+msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Paradev es de código disponible: el código es público en GitHub bajo la Elastic License 2.0 (ELv2), que te permite inspeccionarlo y alojarlo tú mismo conforme a los términos de la licencia, pero no es código abierto aprobado por la OSI. Paradev no tiene relación con Apache Superset, la herramienta de inteligencia de negocio."
+
+msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev es de código fuente disponible. Cada pull request, revisión y bug es público en GitHub."
+
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev es el banco de trabajo para la transición de F3 a F4: agentes en paralelo en espacios de trabajo aislados, flotas que puedes supervisar de verdad y una superficie de revisión para código que no escribiste."
+
+msgid "Paradev isn't on Windows yet"
+msgstr "Por ahora, Paradev es solo para Mac"
+
+msgid "Paradev may sign you back in after restart. Please try signing out again."
+msgstr "Puede que Paradev vuelva a iniciar tu sesión tras reiniciar. Intenta cerrar sesión de nuevo."
+
+msgid "Paradev memory"
+msgstr "Memoria de Paradev"
+
+msgid "Paradev memory · last 5 min"
+msgstr "Memoria de Paradev · últimos 5 min"
+
+msgid "Paradev Mobile code diff on iPhone"
+msgstr "Diff de código de Paradev Mobile en iPhone"
+
+msgid "Paradev mobile gives me the power of my desktop anywhere I go."
+msgstr "Paradev móvil me da la potencia de mi ordenador vaya donde vaya."
+
+msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
+msgstr "Paradev Mobile permite a los desarrolladores continuar desde un iPhone los espacios de trabajo de Paradev que ya usan en su ordenador."
+
+msgid "Paradev Mobile page"
+msgstr "Página de Paradev Mobile"
+
+msgid "Paradev Mobile terminal on iPhone"
+msgstr "Terminal de Paradev Mobile en iPhone"
+
+msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
+msgstr "Paradev necesita Acceso a disco completo para leer los datos de otro navegador. Concederlo en Ajustes del Sistema y volver a comprobar."
+
+msgid "Paradev next to others"
+msgstr "Paradev junto a otros"
+
+msgid "Paradev on iPad, showing a pull request and a workspace list"
+msgstr "Paradev en iPad, con una pull request y una lista de workspaces"
+
+msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
+msgstr "Paradev solo recibe los permisos que pide este conector. Desconéctalo en cualquier momento para revocarlos."
+
+msgid "Paradev originals"
+msgstr "Originales de Paradev"
+
+msgid "Paradev Pages"
+msgstr "Paradev Páginas"
+
+msgid "Paradev Pages demo"
+msgstr "Demo de Paradev Páginas"
+
+msgid "Paradev Plugins"
+msgstr "Plugins de Paradev"
+
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
+msgstr "Paradev se ejecuta localmente en los equipos de tus desarrolladores. No almacenamos tu código ni tus conversaciones con la IA, y Paradev ha superado una auditoría SOC 2 Type II con un auditor independiente. Solicita el informe y consulta nuestra documentación de seguridad en trust.superset.sh."
+
+msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
+msgstr "Paradev empezó como un proyecto de hackathon en noviembre de 2025. Era una sencilla app de escritorio para gestionar worktrees."
+
+msgid "Paradev Teams"
+msgstr "Equipos de Paradev"
+
+msgid "Paradev UI"
+msgstr "Paradev UI"
+
+#. placeholder {0}: formatPercent(trackedMemorySharePercent)
+msgid "Paradev uses {0} of system RAM"
+msgstr "Paradev usa el {0} de la RAM del sistema"
+
+msgid "Paradev vs the Alternatives"
+msgstr "Paradev frente a las alternativas"
+
+msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
+msgstr "Paradev funciona con cualquier agente de código basado en CLI, incluidos Claude Code, OpenCode, OpenAI Codex y más. Elige un agente distinto para cada tarea sin cambiar tu espacio de trabajo ni tu flujo de revisión."
+
+msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
+msgstr "La aplicación móvil de Paradev me permite mantener a mis agentes trabajando y desbloquearlos desde cualquier lugar, incluso cuando estoy lejos de mi ordenador."
+
 msgid "Paragraph"
 msgstr "Párrafo"
 
@@ -12805,8 +13042,8 @@ msgstr "Contraseña de {email}"
 msgid "Paste"
 msgstr "Pegar"
 
-msgid "Paste this into Superset CLI:"
-msgstr "Pega esto en la CLI de Superset:"
+msgid "Paste this into Paradev CLI:"
+msgstr "Pega esto en la CLI de Paradev:"
 
 msgid "Path"
 msgstr "Ruta"
@@ -12887,8 +13124,8 @@ msgstr "por usuario/mes"
 msgid "Per-repo agent memory"
 msgstr "Memoria de agentes por repositorio"
 
-msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
-msgstr "Porcentaje de la RAM total del sistema que usan solo los recursos de Superset monitorizados (no todas las apps). Una proporción alta significa que Superset contribuye mucho a la presión de memoria del sistema; una baja indica que la presión viene de otro sitio."
+msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
+msgstr "Porcentaje de la RAM total del sistema que usan solo los recursos de Paradev monitorizados (no todas las apps). Una proporción alta significa que Paradev contribuye mucho a la presión de memoria del sistema; una baja indica que la presión viene de otro sitio."
 
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "¿Eliminar definitivamente \"{projectName}\"?"
@@ -12969,8 +13206,8 @@ msgstr "Elige un espacio de trabajo cuyo agente espera tu respuesta, terminó de
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Elige un icono y un color, o sube una imagen propia. Por defecto usa el avatar del propietario de GitHub enlazado."
 
-msgid "Pick one in the Superset app. It's saved to your account."
-msgstr "Elige uno en la app de Superset. Se guarda en tu cuenta."
+msgid "Pick one in the Paradev app. It's saved to your account."
+msgstr "Elige uno en la app de Paradev. Se guarda en tu cuenta."
 
 msgid "Pick the best agent."
 msgstr "Elige el mejor agente."
@@ -13053,8 +13290,8 @@ msgstr "Reproducir un sonido cuando terminen las tareas"
 msgid "Play the animation"
 msgstr "Reproducir la animación"
 
-msgid "Play the Superset Pages demo"
-msgstr "Reproducir la demo de Superset Páginas"
+msgid "Play the Paradev Pages demo"
+msgstr "Reproducir la demo de Paradev Páginas"
 
 msgid "Please check your internet connection and try again."
 msgstr "Comprueba tu conexión a internet e inténtalo de nuevo."
@@ -13071,8 +13308,8 @@ msgstr "Selecciona una ubicación para el proyecto"
 msgid "Please select an organization"
 msgstr "Selecciona una organización"
 
-msgid "Please try again, or restart Superset on that device."
-msgstr "Inténtalo de nuevo o reinicia Superset en ese dispositivo."
+msgid "Please try again, or restart Paradev on that device."
+msgstr "Inténtalo de nuevo o reinicia Paradev en ese dispositivo."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -13205,8 +13442,8 @@ msgstr "PresetsBar.tsx"
 msgid "Press <0>Esc</0> to close"
 msgstr "Pulsa <0>Esc</0> para cerrar"
 
-msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
-msgstr "Pulsa ⌘⇧B o abre un puerto que Superset haya detectado. Tu servidor de desarrollo se carga en un panel junto a tus terminales."
+msgid "Press ⌘⇧B or open a port Paradev detected. Your dev server loads in a pane beside your terminals."
+msgstr "Pulsa ⌘⇧B o abre un puerto que Paradev haya detectado. Tu servidor de desarrollo se carga en un panel junto a tus terminales."
 
 msgid "Press a key…"
 msgstr "Pulsa una tecla…"
@@ -13452,8 +13689,8 @@ msgstr "Promovido desde un espacio de trabajo, así que sus repositorios y regi�
 msgid "Prompt"
 msgstr "Prompt"
 
-msgid "Prompt a coding agent to build what you want to see in Superset. If we like your prompt, we'll run it and merge the result."
-msgstr "Pide a un agente de programación que construya lo que quieres ver en Superset. Si nos gusta tu prompt, lo ejecutaremos y fusionaremos el resultado."
+msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
+msgstr "Pide a un agente de programación que construya lo que quieres ver en Paradev. Si nos gusta tu prompt, lo ejecutaremos y fusionaremos el resultado."
 
 msgid "Prompt agents and answer their questions"
 msgstr "Envía prompts a los agentes y responde a sus preguntas"
@@ -13522,8 +13759,8 @@ msgstr "Clasificación pública"
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "Publica de nuevo y el enlace sigue igual. Las versiones anteriores se guardan en el historial."
 
-msgid "Publish from the Superset CLI or over MCP."
-msgstr "Publica desde la CLI de Superset o por MCP."
+msgid "Publish from the Paradev CLI or over MCP."
+msgstr "Publica desde la CLI de Paradev o por MCP."
 
 msgid "Publish from your own repo"
 msgstr "Publica desde tu propio repo"
@@ -13706,8 +13943,8 @@ msgstr "Valorar {appName}"
 msgid "Rate limit exceeded."
 msgstr "Se superó el límite de peticiones."
 
-msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
-msgstr "Llegar a este Mac desde cualquier lugar a través del relay de Superset, o crear espacios de trabajo en la nube. Conectarse desde cualquier cliente."
+msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
+msgstr "Llegar a este Mac desde cualquier lugar a través del relay de Paradev, o crear espacios de trabajo en la nube. Conectarse desde cualquier cliente."
 
 msgid "Reached"
 msgstr "Alcanzado"
@@ -13736,6 +13973,9 @@ msgstr "Leer y planificar sin cambiar nada"
 msgid "Read and send mail"
 msgstr "Leer y enviar correo"
 
+msgid "Read announcement"
+msgstr "Leer el anuncio"
+
 msgid "Read deployment and build logs"
 msgstr "Leer logs de despliegue y de build"
 
@@ -13744,6 +13984,9 @@ msgstr "Léela en tu teléfono"
 
 msgid "Read MCP servers again"
 msgstr "Volver a leer los servidores MCP"
+
+msgid "Read the announcement"
+msgstr "Leer el anuncio"
 
 msgid "Read the changelog"
 msgstr "Leer el registro de cambios"
@@ -13806,8 +14049,8 @@ msgstr "Listo en cada máquina donde inicies sesión y en cada espacio de trabaj
 msgid "Ready to Merge"
 msgstr "Lista para fusionar"
 
-msgid "Ready to try Superset?"
-msgstr "¿Listo para probar Superset?"
+msgid "Ready to try Paradev?"
+msgstr "¿Listo para probar Paradev?"
 
 msgid "Reapply all commits"
 msgstr "Reaplicar todos los commits"
@@ -13950,8 +14193,8 @@ msgstr "Regenerar"
 msgid "Region"
 msgstr "Región"
 
-msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
-msgstr "Registra hooks de ciclo de vida en la configuración global de este agente para que Superset pueda mostrar el estado y enviar notificaciones. Si lo desactivas, se quitan las entradas de Superset en todas partes: el estado y las notificaciones dejan de funcionar para este agente, incluso dentro de Superset."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
+msgstr "Registra hooks de ciclo de vida en la configuración global de este agente para que Paradev pueda mostrar el estado y enviar notificaciones. Si lo desactivas, se quitan las entradas de Paradev en todas partes: el estado y las notificaciones dejan de funcionar para este agente, incluso dentro de Paradev."
 
 msgid "Related Posts"
 msgstr "Publicaciones relacionadas"
@@ -13980,8 +14223,8 @@ msgstr "Recargar la aplicación"
 msgid "Reload from disk"
 msgstr "Recargar desde el disco"
 
-msgid "Reload Superset to refresh the workspace list."
-msgstr "Recarga Superset para actualizar la lista de espacios de trabajo."
+msgid "Reload Paradev to refresh the workspace list."
+msgstr "Recarga Paradev para actualizar la lista de espacios de trabajo."
 
 msgid "Reload window"
 msgstr "Recargar la ventana"
@@ -14317,8 +14560,8 @@ msgstr "Obligatorio"
 msgid "Required version: {minimumVersion}+"
 msgstr "Versión necesaria: {minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Superset Pro."
-msgstr "Requiere iOS 26 o iPadOS 26 o posterior. Incluido en Superset Pro."
+msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "Requiere iOS 26 o iPadOS 26 o posterior. Incluido en Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Reenviar invitación"
@@ -14383,8 +14626,8 @@ msgstr "Se reinicia en {countdown} · {absolute}"
 msgid "Resets now"
 msgstr "Se reinicia ahora"
 
-msgid "Resident memory used by Superset and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
-msgstr "Memoria residente que usan Superset y los árboles de procesos de terminal monitorizados. Si no deja de subir sin bajar, puede que un proceso del espacio de trabajo esté reteniendo memoria. Los valores altos aumentan el riesgo de swap y pueden causar tirones."
+msgid "Resident memory used by Paradev and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
+msgstr "Memoria residente que usan Paradev y los árboles de procesos de terminal monitorizados. Si no deja de subir sin bajar, puede que un proceso del espacio de trabajo esté reteniendo memoria. Los valores altos aumentan el riesgo de swap y pueden causar tirones."
 
 msgid "Resizable"
 msgstr "Redimensionable"
@@ -14590,8 +14833,8 @@ msgstr "Reinténtalo cuando se actualice la conexión."
 msgid "Retry dictation"
 msgstr "Reintentar el dictado"
 
-msgid "Retry in a few seconds; if it persists, restart Superset."
-msgstr "Reinténtalo en unos segundos; si persiste, reinicia Superset."
+msgid "Retry in a few seconds; if it persists, restart Paradev."
+msgstr "Reinténtalo en unos segundos; si persiste, reinicia Paradev."
 
 msgid "Retry in a few seconds."
 msgstr "Reinténtalo en unos segundos."
@@ -14663,8 +14906,8 @@ msgstr "Revisión pendiente"
 msgid "Review pending changes."
 msgstr "Revisa los cambios pendientes."
 
-msgid "Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly."
-msgstr "Revisa pull requests dentro de Superset: panel de diff, revisión asistida por agentes y respuesta directa a los comentarios."
+msgid "Review pull requests inside Paradev: diff pane, agent-assisted review, act on comments directly."
+msgstr "Revisa pull requests dentro de Paradev: panel de diff, revisión asistida por agentes y respuesta directa a los comentarios."
 
 msgid "Review requested"
 msgstr "Revisión solicitada"
@@ -14803,11 +15046,11 @@ msgstr "Ejecuta agentes en paralelo"
 msgid "Run an Army of"
 msgstr "Ejecuta un ejército de"
 
+msgid "Run an army of coding agents"
+msgstr "Ejecuta un ejército de agentes de programación"
+
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Ejecuta un simulador de iOS en un panel del espacio de trabajo para que tú y tus agentes podáis probar apps móviles."
-
-msgid "Run any coding agent"
-msgstr "Ejecuta cualquier agente de código"
 
 msgid "Run automations on data source and comment activity."
 msgstr "Ejecuta automatizaciones con la actividad de fuentes de datos y comentarios."
@@ -14908,8 +15151,8 @@ msgstr "Ejecuta un comando local en tu equipo"
 msgid "Runs appear here once an automation fires."
 msgstr "Las ejecuciones aparecen aquí cuando se activa una automatización."
 
-msgid "Runs inside the Superset app on that device, so updating it means updating the app there."
-msgstr "Se ejecuta dentro de la app de Superset en ese dispositivo, así que actualizarlo implica actualizar la app allí."
+msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
+msgstr "Se ejecuta dentro de la app de Paradev en ese dispositivo, así que actualizarlo implica actualizar la app allí."
 
 msgid "Runs land in a workspace. Review the diff, merge what's good."
 msgstr "Las ejecuciones llegan a un espacio de trabajo. Revisa el diff y fusiona lo que esté bien."
@@ -15005,11 +15248,11 @@ msgstr "Guardando…"
 msgid "Scale to 100+ agents"
 msgstr "Escala a más de 100 agentes"
 
-msgid "Scan the QR code, then sign in with the same Superset account and select this organization."
-msgstr "Escanea el código QR, inicia sesión con la misma cuenta de Superset y selecciona esta organización."
+msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
+msgstr "Escanea el código QR, inicia sesión con la misma cuenta de Paradev y selecciona esta organización."
 
-msgid "Scan to download Superset for iPhone"
-msgstr "Escanea para descargar Superset para iPhone"
+msgid "Scan to download Paradev for iPhone"
+msgstr "Escanea para descargar Paradev para iPhone"
 
 msgid "Scanning transcript logs…"
 msgstr "Analizando los logs de transcripción…"
@@ -15301,11 +15544,11 @@ msgstr "Ver los cambios"
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Descubre cómo han crecido las estrellas de {companyName} en GitHub a lo largo del tiempo."
 
-msgid "See how Superset compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
-msgstr "Descubre cómo se compara Superset con otras herramientas de código con IA, desde editores con IA hasta agentes de código e ingenieros de IA en la nube."
+msgid "See how Paradev compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
+msgstr "Descubre cómo se compara Paradev con otras herramientas de código con IA, desde editores con IA hasta agentes de código e ingenieros de IA en la nube."
 
-msgid "See how Superset compares to other tools"
-msgstr "Ver cómo se compara Superset con otras herramientas"
+msgid "See how Paradev compares to other tools"
+msgstr "Ver cómo se compara Paradev con otras herramientas"
 
 msgid "See how we work"
 msgstr "Mira cómo trabajamos"
@@ -15328,8 +15571,8 @@ msgstr "Consulta la <0>referencia de herramientas disponibles</0> para ver cada 
 msgid "See the <0>custom themes guide</0> to edit a theme or build your own."
 msgstr "Consulta la <0>guía de temas personalizados</0> para editar un tema o crear el tuyo."
 
-msgid "See the open roles, or try Superset first."
-msgstr "Mira las vacantes o prueba Superset primero."
+msgid "See the open roles, or try Paradev first."
+msgstr "Mira las vacantes o prueba Paradev primero."
 
 msgid "See this gate on the scorecard"
 msgstr "Ver esta meta en el cuadro de resultados"
@@ -15337,8 +15580,8 @@ msgstr "Ver esta meta en el cuadro de resultados"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Mira qué cambió, da tu opinión y fusiona el trabajo cuando esté listo."
 
-msgid "See what we're building now, what's coming next, and where Superset is headed."
-msgstr "Descubre qué estamos construyendo ahora, qué viene después y hacia dónde se dirige Superset."
+msgid "See what we're building now, what's coming next, and where Paradev is headed."
+msgstr "Descubre qué estamos construyendo ahora, qué viene después y hacia dónde se dirige Paradev."
 
 msgid "See what your teammates' agents are working on, shipping, and blocked on."
 msgstr "Mira en qué trabajan los agentes de tus compañeros, qué están entregando y dónde están bloqueados."
@@ -15526,8 +15769,8 @@ msgstr "Enviar denuncia"
 msgid "Send review"
 msgstr "Enviar revisión"
 
-msgid "Send the link. Your team opens it in a browser or in Superset."
-msgstr "Envía el enlace. Tu equipo lo abre en un navegador o en Superset."
+msgid "Send the link. Your team opens it in a browser or in Paradev."
+msgstr "Envía el enlace. Tu equipo lo abre en un navegador o en Paradev."
 
 msgid "Send to"
 msgstr "Enviar a"
@@ -15667,8 +15910,8 @@ msgstr "Configurar el proyecto en {hostName}"
 msgid "Set up project…"
 msgstr "Configurar el proyecto…"
 
-msgid "Set up this project for Superset"
-msgstr "Preparar este proyecto para Superset"
+msgid "Set up this project for Paradev"
+msgstr "Preparar este proyecto para Paradev"
 
 msgid "Set up with an agent"
 msgstr "Configurar con un agente"
@@ -15748,6 +15991,9 @@ msgstr "Compartir espacio de trabajo"
 msgid "Share."
 msgstr "Comparte."
 
+msgid "Shared"
+msgstr "Compartido"
+
 msgid "Shared across sessions using this login."
 msgstr "Compartido entre las sesiones que usan este inicio de sesión."
 
@@ -15757,11 +16003,11 @@ msgstr "Componentes compartidos de la app"
 msgid "Shared component library."
 msgstr "Biblioteca de componentes compartida."
 
-msgid "Shared settings and simpler membership for teams that work in Superset together."
-msgstr "Configuración compartida y gestión de miembros más sencilla para equipos que trabajan juntos en Superset."
+msgid "Shared settings and simpler membership for teams that work in Paradev together."
+msgstr "Configuración compartida y gestión de miembros más sencilla para equipos que trabajan juntos en Paradev."
 
-msgid "Shared theme JSON files you can import into Superset."
-msgstr "Archivos JSON de temas compartidos que puedes importar en Superset."
+msgid "Shared theme JSON files you can import into Paradev."
+msgstr "Archivos JSON de temas compartidos que puedes importar en Paradev."
 
 msgid "Shared version"
 msgstr "Versión compartida"
@@ -15805,8 +16051,8 @@ msgstr "Mostrar"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Mostrar un diálogo de confirmación al salir de la app"
 
-msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers."
-msgstr "Mostrar un micrófono en el editor del chat. ChatGPT transcribe la voz cuando Codex tiene la sesión iniciada en él; si no, se transcribe en tu Mac cuando es posible y, si no, en los servidores de Superset."
+msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
+msgstr "Mostrar un micrófono en el editor del chat. ChatGPT transcribe la voz cuando Codex tiene la sesión iniciada en él; si no, se transcribe en tu Mac cuando es posible y, si no, en los servidores de Paradev."
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Mostrar un botón de Uso en la barra lateral de inicio, debajo de Pull requests"
@@ -15995,15 +16241,15 @@ msgstr "Vuelve a iniciar sesión para usar el dictado"
 msgid "Sign in as Local Admin (dev)"
 msgstr "Iniciar sesión como Local Admin (dev)"
 
-msgid "Sign in once. Superset keeps the connection."
-msgstr "Inicia sesión una vez. Superset mantiene la conexión."
+msgid "Sign in once. Paradev keeps the connection."
+msgstr "Inicia sesión una vez. Paradev mantiene la conexión."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
 msgid "Sign in to {0}"
 msgstr "Inicia sesión en {0}"
 
-msgid "Sign in to continue to Superset"
-msgstr "Inicia sesión para continuar en Superset"
+msgid "Sign in to continue to Paradev"
+msgstr "Inicia sesión para continuar en Paradev"
 
 msgid "Sign in to get started"
 msgstr "Iniciar sesión para empezar"
@@ -16046,8 +16292,8 @@ msgstr "Inicia la sesión predeterminada del sistema de {0} en otra cuenta. Reem
 msgid "Sign up in one step"
 msgstr "Regístrate en un paso"
 
-msgid "Sign up to get started with Superset"
-msgstr "Regístrate para empezar con Superset"
+msgid "Sign up to get started with Paradev"
+msgstr "Regístrate para empezar con Paradev"
 
 msgid "Sign up with GitHub"
 msgstr "Registrarse con GitHub"
@@ -16151,8 +16397,8 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skills"
 
-msgid "Skills ship with the Superset plugin and are kept up to date automatically in every agent you use. Click one to preview it."
-msgstr "Las skills vienen con el plugin de Superset y se mantienen actualizadas automáticamente en cada agente que uses. Haz clic en una para verla."
+msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
+msgstr "Las skills vienen con el plugin de Paradev y se mantienen actualizadas automáticamente en cada agente que uses. Haz clic en una para verla."
 
 msgid "Skip"
 msgstr "Omitir"
@@ -16262,8 +16508,8 @@ msgstr "Alguien"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Otra persona ya publicó {entryPath} desde este workspace. Publica con un id de página explícito para añadir una versión a su página, o mueve el archivo."
 
-msgid "Someone on the Superset team will review this page. We only follow up if we need more from you."
-msgstr "Alguien del equipo de Superset revisará esta página. Solo te contactaremos si necesitamos más información."
+msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
+msgstr "Alguien del equipo de Paradev revisará esta página. Solo te contactaremos si necesitamos más información."
 
 msgid "Something else"
 msgstr "Otra cosa"
@@ -16469,8 +16715,8 @@ msgstr "Recordatorio de estrella restablecido: vuelve a estar disponible en el e
 msgid "Star on GitHub"
 msgstr "Destacar en GitHub"
 
-msgid "Star Superset on GitHub"
-msgstr "Destacar Superset en GitHub"
+msgid "Star Paradev on GitHub"
+msgstr "Destacar Paradev en GitHub"
 
 msgid "Starred"
 msgstr "Destacado"
@@ -16681,11 +16927,11 @@ msgstr "Detener el dictado"
 msgid "Stop local {0}"
 msgstr "Detener {0} local"
 
+msgid "Stop Paradev here to delete from another device."
+msgstr "Detén Paradev aquí para eliminarlo desde otro dispositivo."
+
 msgid "Stop response"
 msgstr "Detener la respuesta"
-
-msgid "Stop Superset here to delete from another device."
-msgstr "Detén Superset aquí para eliminarlo desde otro dispositivo."
 
 msgid "Stop the agent and send this now"
 msgstr "Detener el agente y enviar ahora"
@@ -16780,8 +17026,8 @@ msgstr "Sugerencias"
 msgid "suite for agent UIs, and shared app components. Click any import path to copy it."
 msgstr "para interfaces de agentes y los componentes compartidos de la app. Haz clic en cualquier ruta de importación para copiarla."
 
-msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
-msgstr "Suma de la CPU que usan Superset y los árboles de procesos de terminal monitorizados. Más del 100 % significa que hay varios núcleos ocupados. Los valores altos sostenidos suelen provocar lentitud en la interfaz y más consumo de batería."
+msgid "Sum of CPU used by Paradev and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
+msgstr "Suma de la CPU que usan Paradev y los árboles de procesos de terminal monitorizados. Más del 100 % significa que hay varios núcleos ocupados. Los valores altos sostenidos suelen provocar lentitud en la interfaz y más consumo de batería."
 
 msgid "Summarize the changes in this workspace"
 msgstr "Resume los cambios de este espacio de trabajo"
@@ -16801,207 +17047,17 @@ msgstr "reemplazada"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset"
-msgstr "Superset"
-
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset (YC P26) es el IDE con código fuente disponible para la era de los agentes de IA, donde los ingenieros ejecutan en paralelo cientos de agentes de programación como Claude Code y Codex."
-
-msgid "Superset {version}"
-msgstr "Superset {version}"
-
-msgid "Superset Agent"
-msgstr "Superset Agent"
-
-msgid "Superset app"
-msgstr "App de Superset"
-
-msgid "Superset App"
-msgstr "App de Superset"
-
-msgid "Superset Automations"
-msgstr "Automatizaciones de Superset"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp imprime un endpoint solo para ese panel. Apunta Playwright o browser-use hacia él."
 
-msgid "Superset CLI"
-msgstr "CLI de Superset"
-
-msgid "Superset components"
-msgstr "Componentes de Superset"
-
-msgid "Superset Components"
-msgstr "Componentes de Superset"
-
-msgid "Superset could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
-msgstr "Superset no pudo traer algunos de tus proyectos o espacios de trabajo de v1. Abre el importador para ver el motivo y reintentar cada uno."
-
-msgid "Superset could not complete sign-in. Please try again."
-msgstr "Superset no pudo completar el inicio de sesión. Inténtalo de nuevo."
-
-msgid "Superset CPU"
-msgstr "CPU de Superset"
-
-msgid "Superset CPU · last 5 min"
-msgstr "CPU de Superset · últimos 5 min"
-
-msgid "Superset Design System"
-msgstr "Sistema de diseño de Superset"
-
-msgid "Superset desktop app"
-msgstr "App de escritorio de Superset"
-
-msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
-msgstr "Superset Enterprise es Superset para equipos. Escríbenos para saber más sobre lo que incluye y cómo puede funcionar en tu organización."
-
-msgid "Superset for iPhone and iPad"
-msgstr "Superset para iPhone y iPad"
-
-msgid "Superset for press"
-msgstr "Superset para prensa"
-
-msgid "Superset for your team"
-msgstr "Superset para tu equipo"
-
-msgid "Superset forwards the ports a remote workspace opens while you have it selected."
-msgstr "Superset reenvía los puertos que abre un espacio de trabajo remoto mientras lo tienes seleccionado."
-
-msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Superset tiene un plan gratuito. El código fuente está disponible en GitHub bajo la Elastic License 2.0 (ELv2), así que puedes inspeccionarlo y alojarlo tú mismo conforme a los términos de la licencia."
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "Superset ha sido usado por una de cada ocho empresas de Fortune 500."
-
-msgid "Superset hit an unexpected error. Reload to try again."
-msgstr "Superset ha encontrado un error inesperado. Recargar para volver a intentarlo."
-
-msgid "Superset holds the token and makes the calls. Agents never see it."
-msgstr "Superset guarda el token y hace las llamadas. Los agentes nunca lo ven."
-
-msgid "Superset hooks"
-msgstr "Hooks de Superset"
-
-msgid "Superset in-app browser"
-msgstr "Navegador integrado de Superset"
-
-msgid "Superset is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
-msgstr "Superset es una app de escritorio. Introduce tu correo y te enviaremos un enlace de descarga para abrirlo en tu Mac."
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
-msgstr "Superset construye software que se mejora a sí mismo. Empieza por dar a los ingenieros las mejores herramientas, que se adaptan a sus necesidades con el tiempo."
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Superset construye software que se mejora a sí mismo. Empieza por dar a los ingenieros las mejores herramientas, que se adaptan a sus necesidades con el tiempo. Somos 3 ex-CTO de YC construyendo una herramienta que nos encanta."
-
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
-msgstr "Superset lo desarrolla un equipo con sede en San Francisco, California. Para soporte del producto o dudas sobre tu cuenta, escribe a <0>{supportEmail}</0> y te responderemos en un día laborable. Para alianzas, prensa, enterprise o cualquier otro tema, escribe a <1>{teamEmail}</1>."
-
-msgid "Superset is built in Superset, so we're our own #1 users. You get paid to make your own life easier."
-msgstr "Superset se desarrolla en Superset, así que somos nuestros propios usuarios principales. Te pagan por hacerte la vida más fácil."
-
-msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
-msgstr "Superset está pensado para funcionar con tu herramienta actual: admitimos de forma nativa los enlaces directos a IDE como Cursor, así que puedes abrir tus espacios de trabajo y archivos en tu IDE."
-
-msgid "Superset is getting a new name soon"
-msgstr "Superset pronto tendrá un nombre nuevo"
-
-msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Superset es de código disponible: el código es público en GitHub bajo la Elastic License 2.0 (ELv2), que te permite inspeccionarlo y alojarlo tú mismo conforme a los términos de la licencia, pero no es código abierto aprobado por la OSI. Superset no tiene relación con Apache Superset, la herramienta de inteligencia de negocio."
-
-msgid "Superset is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Superset es de código fuente disponible. Cada pull request, revisión y bug es público en GitHub."
-
-msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Superset es el banco de trabajo para la transición de F3 a F4: agentes en paralelo en espacios de trabajo aislados, flotas que puedes supervisar de verdad y una superficie de revisión para código que no escribiste."
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "Superset lo usan ingenieros de Netflix, Microsoft, NVIDIA, DoorDash, Wix y Mistral AI en todo el mundo y, en Asia, ingenieros de ByteDance, Toss, Kakao, Grab, LINE y Rakuten."
-
-msgid "Superset isn't on Windows yet"
-msgstr "Por ahora, Superset es solo para Mac"
-
-msgid "Superset may sign you back in after restart. Please try signing out again."
-msgstr "Puede que Superset vuelva a iniciar tu sesión tras reiniciar. Intenta cerrar sesión de nuevo."
-
-msgid "Superset memory"
-msgstr "Memoria de Superset"
-
-msgid "Superset memory · last 5 min"
-msgstr "Memoria de Superset · últimos 5 min"
-
-msgid "Superset Mobile code diff on iPhone"
-msgstr "Diff de código de Superset Mobile en iPhone"
-
-msgid "Superset mobile gives me the power of my desktop anywhere I go."
-msgstr "Superset móvil me da la potencia de mi ordenador vaya donde vaya."
+msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
+msgstr "Superset ahora es Paradev. Además, cerramos una ronda semilla de 11,5 M$"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile llega al iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile permite a los desarrolladores continuar desde un iPhone los espacios de trabajo de Superset que ya usan en su ordenador."
-
-msgid "Superset Mobile page"
-msgstr "Página de Superset Mobile"
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Terminal de Superset Mobile en iPhone"
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset necesita Acceso a disco completo para leer los datos de otro navegador. Concederlo en Ajustes del Sistema y volver a comprobar."
-
-msgid "Superset next to others"
-msgstr "Superset junto a otros"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset en iPad, con una pull request y una lista de workspaces"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset solo recibe los permisos que pide este conector. Desconéctalo en cualquier momento para revocarlos."
-
-msgid "Superset originals"
-msgstr "Originales de Superset"
-
-msgid "Superset Pages"
-msgstr "Superset Páginas"
-
-msgid "Superset Pages demo"
-msgstr "Demo de Superset Páginas"
-
-msgid "Superset Plugins"
-msgstr "Plugins de Superset"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset se ejecuta localmente en los equipos de tus desarrolladores. No almacenamos tu código ni tus conversaciones con la IA, y Superset ha superado una auditoría SOC 2 Type II con un auditor independiente. Solicita el informe y consulta nuestra documentación de seguridad en trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset empezó como un proyecto de hackathon en noviembre de 2025. Era una sencilla app de escritorio para gestionar worktrees."
-
-msgid "Superset Teams"
-msgstr "Equipos de Superset"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset usa el {0} de la RAM del sistema"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset frente a las alternativas"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset funciona con cualquier agente de código basado en CLI, incluidos Claude Code, OpenCode, OpenAI Codex y más. Elige un agente distinto para cada tarea sin cambiar tu espacio de trabajo ni tu flujo de revisión."
-
 msgid "superset.sh"
 msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "La aplicación móvil de Superset me permite mantener a mis agentes trabajando y desbloquearlos desde cualquier lugar, incluso cuando estoy lejos de mi ordenador."
 
 msgid "Supervised"
 msgstr "Supervisado"
@@ -17125,8 +17181,8 @@ msgstr "Error al sincronizar"
 msgid "Sync issues bidirectionally with Linear."
 msgstr "Sincroniza issues en ambos sentidos con Linear."
 
-msgid "Sync issues bidirectionally with Linear. Create tasks in Superset and have them appear in Linear, or import existing Linear issues."
-msgstr "Sincroniza issues en ambos sentidos con Linear. Crea tareas en Superset y haz que aparezcan en Linear, o importa issues de Linear que ya existan."
+msgid "Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues."
+msgstr "Sincroniza issues en ambos sentidos con Linear. Crea tareas en Paradev y haz que aparezcan en Linear, o importa issues de Linear que ya existan."
 
 msgid "Sync Repositories"
 msgstr "Sincronizar los repositorios"
@@ -17152,8 +17208,8 @@ msgstr "Proporción de RAM del sistema"
 #. placeholder {0}: formatMemory(snapshot.totalMemory)
 #. placeholder {1}: formatMemory(otherUsedMemory)
 #. placeholder {2}: formatMemory(freeMemory)
-msgid "System RAM: Superset {0}, other apps {1}, free {2}"
-msgstr "RAM del sistema: Superset {0}, otras apps {1}, libre {2}"
+msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
+msgstr "RAM del sistema: Paradev {0}, otras apps {1}, libre {2}"
 
 msgid "Tab"
 msgstr "Pestaña"
@@ -17200,8 +17256,8 @@ msgstr "Se aplica en las nuevas sesiones de agente."
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Está tardando más de lo normal. Sigue en marcha aunque salgas."
 
-msgid "Talk to Superset"
-msgstr "Habla con Superset"
+msgid "Talk to Paradev"
+msgstr "Habla con Paradev"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Toca cualquier elemento de la página para comentarlo"
@@ -17261,8 +17317,8 @@ msgstr "Gestor de tareas actualizado"
 msgid "Tasks"
 msgstr "Tareas"
 
-msgid "Tasks created in Superset will be synced to this Linear team."
-msgstr "Las tareas creadas en Superset se sincronizarán con este equipo de Linear."
+msgid "Tasks created in Paradev will be synced to this Linear team."
+msgstr "Las tareas creadas en Paradev se sincronizarán con este equipo de Linear."
 
 msgid "Tasks, the CLI and agents follow this. Each member uses their own Linear account."
 msgstr "Las tareas, la CLI y los agentes lo siguen. Cada miembro usa su propia cuenta de Linear."
@@ -17501,11 +17557,14 @@ msgstr "El agente usa sus skills y herramientas. El issue aparece en Linear."
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "El agente que sigue la página lee cada comentario. Actualiza la página y responde en el hilo."
 
-msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
-msgstr "La app se descarga gratis. Requiere iOS 26 o posterior y Superset Pro. Android llegará después."
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "El anuncio también presenta la ronda semilla de 11,5 M USD liderada por Union Square Ventures, con Y Combinator y Paul Graham."
 
-msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Superset build. Restarting replaces it with this app's copy."
-msgstr "La app está en {appVersion} pero conectada a un servicio de host iniciado por otra cosa, probablemente una CLI antigua u otra compilación de Superset. Reiniciar lo sustituye por la copia de esta app."
+msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
+msgstr "La app se descarga gratis. Requiere iOS 26 o posterior y Paradev Pro. Android llegará después."
+
+msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
+msgstr "La app está en {appVersion} pero conectada a un servicio de host iniciado por otra cosa, probablemente una CLI antigua u otra compilación de Paradev. Reiniciar lo sustituye por la copia de esta app."
 
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "El propietario de la automatización ya no puede usar espacios de trabajo en la nube en esta organización. Pídele que revise su acceso o ejecuta la automatización en un dispositivo."
@@ -17525,6 +17584,12 @@ msgstr "El espacio de trabajo en la nube debería haberse iniciado, pero no resp
 msgid "The code expired. Start again."
 msgstr "El código caducó. Empieza de nuevo."
 
+msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "Los comandos que Superset ejecuta para preparar, iniciar y archivar los espacios de trabajo de este proyecto, desde .superset/config.toml."
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "La empresa levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."
+
 msgid "The connection timed out"
 msgstr "Se agotó el tiempo de conexión"
 
@@ -17538,10 +17603,10 @@ msgid "The daemon couldn't hand off your live sessions to the new binary. Reason
 msgstr "El daemon no pudo traspasar tus sesiones activas al binario nuevo. Motivo:"
 
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
-msgstr "Estamos llevando Superset a Windows y Linux. Déjanos tu correo y te avisaremos en cuanto esté listo."
+msgstr "Estamos llevando Paradev a Windows y Linux. Déjanos tu correo y te avisaremos en cuanto esté listo."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Superset from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "La app de escritorio funciona en macOS, con un AppImage experimental para Linux; Windows todavía no está disponible. Además de la app de escritorio hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Superset desde scripts, terminales y otros agentes. Una app para iPhone y iPad en la App Store te permite consultar el estado de tus agentes y revisar sus diffs lejos de tu escritorio."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
+msgstr "La app de escritorio funciona en macOS, con un AppImage experimental para Linux; Windows todavía no está disponible. Además de la app de escritorio hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Paradev desde scripts, terminales y otros agentes. Una app para iPhone y iPad en la App Store te permite consultar el estado de tus agentes y revisar sus diffs lejos de tu escritorio."
 
 msgid "The device that hosts this project is unavailable."
 msgstr "El dispositivo que aloja este proyecto no está disponible."
@@ -17600,8 +17665,11 @@ msgstr "El ciclo básico completo (importar un repositorio, ejecutar un agente, 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "El espacio de trabajo completo. Ejecuta agentes en paralelo, mantén cada uno en su propio worktree y revisa cada cambio antes de que se integre."
 
-msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
-msgstr "El futuro hogar de configuraciones de agentes, prompts y guías de instalación reutilizables de Superset."
+msgid "The funds and angels who back our team."
+msgstr "Los fondos y business angels que respaldan a nuestro equipo."
+
+msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
+msgstr "El futuro hogar de configuraciones de agentes, prompts y guías de instalación reutilizables de Paradev."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -17638,11 +17706,11 @@ msgstr "La subida de la imagen expiró — adjúntala de nuevo"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "La descripción del puesto cambia. Los ingenieros dejan de ser mecanógrafos con criterio y pasan a ser despachadores con criterio: descomponen el trabajo, lo enrutan a flotas y arbitran conflictos entre agentes que tocaron el mismo módulo."
 
-msgid "The latest updates, improvements, and new features in Superset."
-msgstr "Las últimas novedades, mejoras y funciones nuevas de Superset."
+msgid "The latest updates, improvements, and new features in Paradev."
+msgstr "Las últimas novedades, mejoras y funciones nuevas de Paradev."
 
-msgid "The latest updates, improvements, and new features in Superset. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
-msgstr "Las últimas actualizaciones, mejoras y funciones nuevas de Superset. Se actualiza cada semana. Para ver notas de versión detalladas, consulta <0>GitHub Releases<1/></0>"
+msgid "The latest updates, improvements, and new features in Paradev. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
+msgstr "Las últimas actualizaciones, mejoras y funciones nuevas de Paradev. Se actualiza cada semana. Para ver notas de versión detalladas, consulta <0>GitHub Releases<1/></0>"
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "La automatización Launch watch con un desencadenante de Sentry y un horario diario, sus dos ejecuciones y el pull request en borrador que abrió el agente."
@@ -17662,8 +17730,8 @@ msgstr "El cambio local se revirtió."
 msgid "The local host service is unavailable for {organization} on {device}. Status: {status}. {recovery}"
 msgstr "El servicio de host local no está disponible para {organization} en {device}. Estado: {status}. {recovery}"
 
-msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Superset."
-msgstr "El servicio de host local no responde. Reiniciarlo suele bastar; si vuelve a pasar, reinicia Superset."
+msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
+msgstr "El servicio de host local no responde. Reiniciarlo suele bastar; si vuelve a pasar, reinicia Paradev."
 
 msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
 msgstr "El servicio de host local no está en marcha, así que nada de este dispositivo puede servir el espacio de trabajo. Al reiniciarlo se vuelven a conectar tus terminales y archivos; no se pierde nada del disco."
@@ -17707,6 +17775,15 @@ msgstr "La página solicitada no existe."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "El panel usa tus inicios de sesión reales. Los agentes te preguntan antes de realizar una acción importante."
 
+msgid "The Paradev desktop app is available for macOS and Linux."
+msgstr "La aplicación de escritorio de Paradev está disponible para macOS y Linux."
+
+msgid "The Paradev host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "El servicio del host de Paradev de {organization} se detuvo de forma inesperada ({cause}) y no se pudo reiniciar automáticamente."
+
+msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "El servicio del host de Paradev se detuvo de forma inesperada ({cause}) y no se pudo reiniciar automáticamente."
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "El fondo se renueva cada mes. El uso que lo supere se cobra por GB-hora a la tarifa indicada en cada plan."
 
@@ -17739,11 +17816,11 @@ msgid "The rubric"
 msgstr "La rúbrica"
 
 #. placeholder {0}: remoteHost?.name ?? t({ message: "the target host", })
-msgid "The run was skipped because <0>{0}</0> isn't connected to the Superset relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
-msgstr "La ejecución se omitió porque <0>{0}</0> no está conectado al relay de Superset. Comprueba que el acceso por relay esté activado en Configuración > Acceso remoto en ese dispositivo y vuelve a ejecutarla."
+msgid "The run was skipped because <0>{0}</0> isn't connected to the Paradev relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
+msgstr "La ejecución se omitió porque <0>{0}</0> no está conectado al relay de Paradev. Comprueba que el acceso por relay esté activado en Configuración > Acceso remoto en ese dispositivo y vuelve a ejecutarla."
 
-msgid "The run was skipped because this device isn't connected to the Superset relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
-msgstr "La ejecución se omitió porque este dispositivo no está conectado al relay de Superset. Las automatizaciones pasan por el relay incluso cuando se ejecutan en este dispositivo. Habilita el acceso por relay y vuelve a ejecutarla."
+msgid "The run was skipped because this device isn't connected to the Paradev relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
+msgstr "La ejecución se omitió porque este dispositivo no está conectado al relay de Paradev. Las automatizaciones pasan por el relay incluso cuando se ejecutan en este dispositivo. Habilita el acceso por relay y vuelve a ejecutarla."
 
 msgid "The same app runs natively on iPad, in portrait and landscape."
 msgstr "La misma app funciona de forma nativa en iPad, en vertical y en horizontal."
@@ -17774,15 +17851,6 @@ msgstr "El certificado del sitio no es válido"
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "El punto de partida desde el que arranca un espacio de trabajo en la nube: una imagen base o un sandbox que ya has configurado y quieres forkear."
-
-msgid "The Superset desktop app is available for macOS and Linux."
-msgstr "La aplicación de escritorio de Superset está disponible para macOS y Linux."
-
-msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "El servicio del host de Superset de {organization} se detuvo de forma inesperada ({cause}) y no se pudo reiniciar automáticamente."
-
-msgid "The Superset host service stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "El servicio del host de Superset se detuvo de forma inesperada ({cause}) y no se pudo reiniciar automáticamente."
 
 msgid "the target host"
 msgstr "el host de destino"
@@ -17838,8 +17906,8 @@ msgstr "Temas y agentes"
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Estos comandos se ejecutan automáticamente al crear un espacio de trabajo. <0>Consulta la documentación<1/></0>"
 
-msgid "These folders still have your files, but they did not come over to the new Superset on their own."
-msgstr "Estas carpetas aún tienen tus archivos, pero no se pasaron solas al nuevo Superset."
+msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
+msgstr "Estas carpetas aún tienen tus archivos, pero no se pasaron solas al nuevo Paradev."
 
 msgid "These ports are still in use"
 msgstr "Estos puertos siguen en uso"
@@ -17859,8 +17927,8 @@ msgstr "Treinta"
 msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
 msgstr "{owner} ya conectó esta cuenta de {plugin}. Pídele que la desconecte primero."
 
-msgid "This {plugin} account is already connected by another Superset organization."
-msgstr "Esta cuenta de {plugin} ya está conectada por otra organización de Superset."
+msgid "This {plugin} account is already connected by another Paradev organization."
+msgstr "Esta cuenta de {plugin} ya está conectada por otra organización de Paradev."
 
 msgid "This action is irreversible."
 msgstr "Esta acción es irreversible."
@@ -17880,8 +17948,8 @@ msgstr "Esta configuración de agente no permite seleccionar una cuenta."
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente ya no existe en el dispositivo seleccionado (puede que sus agentes se hayan restablecido). Las ejecuciones fallarán hasta que elijas uno nuevo."
 
-msgid "This agent only shows chats saved in Superset."
-msgstr "Este agente solo muestra chats guardados en Superset."
+msgid "This agent only shows chats saved in Paradev."
+msgstr "Este agente solo muestra chats guardados en Paradev."
 
 msgid "This also:"
 msgstr "Esto también:"
@@ -17953,8 +18021,8 @@ msgstr "Este dispositivo"
 msgid "this device ({id})"
 msgstr "este dispositivo ({id})"
 
-msgid "This device isn't connected to the Superset relay, so automation runs will be skipped."
-msgstr "Este dispositivo no está conectado al relay de Superset, así que se omitirán las ejecuciones de las automatizaciones."
+msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
+msgstr "Este dispositivo no está conectado al relay de Paradev, así que se omitirán las ejecuciones de las automatizaciones."
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Este directorio no existe. El script de terminal usará la raíz del espacio de trabajo."
@@ -17974,8 +18042,8 @@ msgstr "este archivo"
 msgid "This file is empty or was deleted."
 msgstr "Este archivo está vacío o fue eliminado."
 
-msgid "This GitHub installation is already connected to another Superset organization. Disconnect it there, or uninstall the Superset GitHub App, then try again."
-msgstr "Esta instalación de GitHub ya está conectada a otra organización de Superset. Desconéctala allí, o desinstala la GitHub App de Superset, y vuelve a intentarlo."
+msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
+msgstr "Esta instalación de GitHub ya está conectada a otra organización de Paradev. Desconéctala allí, o desinstala la GitHub App de Paradev, y vuelve a intentarlo."
 
 msgid "This host"
 msgstr "Este host"
@@ -18010,8 +18078,8 @@ msgstr "Este enlace de issue no es válido."
 msgid "This Linear workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Este espacio de trabajo de Linear ya está conectado por {owner}. Pídele que lo desconecte primero."
 
-msgid "This Linear workspace is already connected by another Superset organization."
-msgstr "Este espacio de trabajo de Linear ya está conectado por otra organización de Superset."
+msgid "This Linear workspace is already connected by another Paradev organization."
+msgstr "Este espacio de trabajo de Linear ya está conectado por otra organización de Paradev."
 
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Esto parece un archivo binario. Abrirlo como texto puede mostrar caracteres ilegibles o congelar el editor si es grande."
@@ -18028,8 +18096,8 @@ msgstr "Este tamaño de máquina no está disponible para tu organización. Elig
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Este tenant de Microsoft ya está conectado por {detail}. Pídele que lo desconecte primero."
 
-msgid "This Microsoft tenant is already connected by another Superset organization."
-msgstr "Este tenant de Microsoft ya está conectado por otra organización de Superset."
+msgid "This Microsoft tenant is already connected by another Paradev organization."
+msgstr "Este tenant de Microsoft ya está conectado por otra organización de Paradev."
 
 msgid "This month"
 msgstr "Este mes"
@@ -18061,8 +18129,8 @@ msgstr "Esta página no está aquí"
 msgid "This page no longer exists"
 msgstr "Esta página ya no existe"
 
-msgid "This page was published by a Superset user. Its contents are unverified."
-msgstr "Esta página la publicó un usuario de Superset. Su contenido no está verificado."
+msgid "This page was published by a Paradev user. Its contents are unverified."
+msgstr "Esta página la publicó un usuario de Paradev. Su contenido no está verificado."
 
 msgid "This page was taken down and can no longer be changed"
 msgstr "Esta página fue retirada y ya no se puede modificar"
@@ -18090,6 +18158,9 @@ msgstr "Este proyecto ya no está disponible en tus dispositivos."
 
 msgid "This project isn't linked to a GitHub repository."
 msgstr "Este proyecto no está vinculado a un repositorio de GitHub."
+
+msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
+msgstr "Este proyecto aún usa el antiguo config.json. Sigue funcionando; conviértelo a config.toml para usar las nuevas secciones."
 
 msgid "This project's host is offline"
 msgstr "El host de este proyecto está sin conexión"
@@ -18130,8 +18201,8 @@ msgstr "Esta pantalla no existe"
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Este espacio de trabajo de Slack ya está conectado por {owner}. Pídele que lo desconecte primero."
 
-msgid "This Slack workspace is already connected by another Superset organization."
-msgstr "Este espacio de trabajo de Slack ya está conectado por otra organización de Superset."
+msgid "This Slack workspace is already connected by another Paradev organization."
+msgstr "Este espacio de trabajo de Slack ya está conectado por otra organización de Paradev."
 
 msgid "This slug is already taken"
 msgstr "Este slug ya está en uso"
@@ -18362,8 +18433,8 @@ msgstr "Uso de tokens"
 msgid "Tokens"
 msgstr "Tokens"
 
-msgid "Tokens are held by Superset and attached to requests there. They are never written into your local agent config."
-msgstr "Superset guarda los tokens y los adjunta a las solicitudes en el servidor. Nunca se escriben en tu configuración local del agente."
+msgid "Tokens are held by Paradev and attached to requests there. They are never written into your local agent config."
+msgstr "Paradev guarda los tokens y los adjunta a las solicitudes en el servidor. Nunca se escriben en tu configuración local del agente."
 
 msgid "Tokens per session"
 msgstr "Tokens por sesión"
@@ -18407,8 +18478,8 @@ msgstr "Demasiados informes de soporte. Inténtalo más tarde."
 msgid "Too many untitled items here already."
 msgstr "Ya hay demasiados elementos sin título aquí."
 
-msgid "Too old for this app to talk to. Update the Superset app on that device to reconnect."
-msgstr "Demasiado antiguo para que esta app se comunique con él. Actualiza la app de Superset en ese dispositivo para reconectar."
+msgid "Too old for this app to talk to. Update the Paradev app on that device to reconnect."
+msgstr "Demasiado antiguo para que esta app se comunique con él. Actualiza la app de Paradev en ese dispositivo para reconectar."
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Demasiado antiguo para que esta app se comunique con él. Los espacios de trabajo de este host no se abrirán hasta que se actualice."
@@ -18461,8 +18532,8 @@ msgstr "Tokens publicados en total"
 msgid "Trace charges and subscriptions"
 msgstr "Rastrear cobros y suscripciones"
 
-msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Superset."
-msgstr "Seguir y gestionar las tareas sincronizadas desde Linear. Controlar el trabajo sin salir de Superset."
+msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Paradev."
+msgstr "Seguir y gestionar las tareas sincronizadas desde Linear. Controlar el trabajo sin salir de Paradev."
 
 msgid "Track budgets and spending"
 msgstr "Seguir presupuestos y gastos"
@@ -18539,11 +18610,11 @@ msgstr "Prueba con otro término de búsqueda u otro lugar."
 msgid "Try again"
 msgstr "Intentar de nuevo"
 
-msgid "Try again, or restart the host service from the Superset tray menu."
-msgstr "Inténtalo de nuevo o reinicia el servicio del host desde el menú de Superset en la bandeja del sistema."
+msgid "Try again, or restart the host service from the Paradev tray menu."
+msgstr "Inténtalo de nuevo o reinicia el servicio del host desde el menú de Paradev en la bandeja del sistema."
 
-msgid "Try again. If the problem continues, reload Superset."
-msgstr "Inténtalo de nuevo. Si el problema continúa, recarga Superset."
+msgid "Try again. If the problem continues, reload Paradev."
+msgstr "Inténtalo de nuevo. Si el problema continúa, recarga Paradev."
 
 msgid "Try early access features and previews."
 msgstr "Prueba funciones y adelantos en acceso anticipado."
@@ -18902,6 +18973,9 @@ msgstr "Actualizar las instrucciones de nombres"
 msgid "Update naming instructions for {0}"
 msgstr "Actualizar las instrucciones de nombres de {0}"
 
+msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
+msgstr "Actualiza Paradev en ese dispositivo. Las actualizaciones desde la aplicación requieren una instalación independiente compatible y una versión publicada de la aplicación."
+
 msgid "Update payment method"
 msgstr "Actualizar método de pago"
 
@@ -18911,8 +18985,8 @@ msgstr "Actualización lista"
 msgid "Update Required"
 msgstr "Actualización necesaria"
 
-msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
-msgstr "Actualiza Superset en ese dispositivo. Las actualizaciones desde la aplicación requieren una instalación independiente compatible y una versión publicada de la aplicación."
+msgid "Update Superset on this host to edit its workspace config."
+msgstr "Actualiza Superset en este host para editar la configuración del espacio de trabajo."
 
 msgid "update the branch prefix"
 msgstr "actualizar el prefijo de rama"
@@ -19048,17 +19122,17 @@ msgstr "Usar para los agentes nuevos"
 msgid "Use global default"
 msgstr "Usar el valor global predeterminado"
 
-msgid "Use Superset on mobile"
-msgstr "Usa Superset en el móvil"
+msgid "Use Paradev on mobile"
+msgstr "Usa Paradev en el móvil"
 
-msgid "Use Superset on your phone with Pro."
-msgstr "Usa Superset en tu teléfono con Pro."
+msgid "Use Paradev on your phone with Pro."
+msgstr "Usa Paradev en tu teléfono con Pro."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Usa la app de escritorio para empezar a ejecutar agentes de programación en paralelo."
 
-msgid "Use the Superset tray menu > Host Service > Restart, then retry."
-msgstr "Usa el menú de la bandeja de Superset > Servicio de host > Reiniciar y vuelve a intentarlo."
+msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
+msgstr "Usa el menú de la bandeja de Paradev > Servicio de host > Reiniciar y vuelve a intentarlo."
 
 msgid "Use this account"
 msgstr "Usar esta cuenta"
@@ -19072,14 +19146,14 @@ msgstr "Usar este repo"
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Úsalo para arreglar terminales atascadas o que no responden."
 
-msgid "Use this when calling the Superset API."
-msgstr "Úsalo al llamar a la API de Superset."
+msgid "Use this when calling the Paradev API."
+msgstr "Úsalo al llamar a la API de Paradev."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Usar la transcripción de voz y las funciones de pulsar para hablar."
 
-msgid "Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider."
-msgstr "Usa tus suscripciones de agentes y tus claves de API. Superset nunca hace de intermediario en las llamadas a los modelos ni ata tu flujo de trabajo a un solo proveedor."
+msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
+msgstr "Usa tus suscripciones de agentes y tus claves de API. Paradev nunca hace de intermediario en las llamadas a los modelos ni ata tu flujo de trabajo a un solo proveedor."
 
 msgid "Used in URLs and APIs."
 msgstr "Se usa en las URL y las API."
@@ -19254,6 +19328,9 @@ msgstr "Ver vacantes"
 msgid "View open roles on Y Combinator"
 msgstr "Ver las vacantes en Y Combinator"
 
+msgid "View Paradev repository on GitHub"
+msgstr "Ver el repositorio de Paradev en GitHub"
+
 msgid "View pull request"
 msgstr "Ver la pull request"
 
@@ -19262,9 +19339,6 @@ msgstr "Ver notas de la versión"
 
 msgid "View releases on GitHub"
 msgstr "Ver las versiones en GitHub"
-
-msgid "View Superset repository on GitHub"
-msgstr "Ver el repositorio de Superset en GitHub"
 
 msgid "View usage"
 msgstr "Ver uso"
@@ -19343,8 +19417,8 @@ msgstr "Se produjo una advertencia."
 msgid "Watch a design review go from comment to new version."
 msgstr "Mira cómo una revisión de diseño pasa de un comentario a una nueva versión."
 
-msgid "Watch the Superset Automations video on YouTube"
-msgstr "Mira el vídeo de Superset Automations en YouTube"
+msgid "Watch the Paradev Automations video on YouTube"
+msgstr "Mira el vídeo de Paradev Automations en YouTube"
 
 msgid "Wayfinding and disclosure"
 msgstr "Orientación y despliegue de contenido"
@@ -19382,6 +19456,9 @@ msgstr "Encontramos {hostName}. Activa allí el acceso remoto para terminar."
 msgid "We only collect analytics cookies so we can improve your experience."
 msgstr "Solo recopilamos cookies de analítica para mejorar tu experiencia."
 
+msgid "We raised an {amount} seed round to help you run an army of coding agents."
+msgstr "Cerramos una ronda semilla de {amount} para ayudarte a ejecutar un ejército de agentes de programación."
+
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Enviamos el enlace de descarga a {submittedEmail}."
 
@@ -19391,8 +19468,8 @@ msgstr "Nos pondremos en contacto en breve."
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Volverás a tu espacio en cuanto se restablezca la conexión."
 
-msgid "We'll email you when Superset for Android is ready."
-msgstr "Te enviaremos un correo cuando Superset para Android esté listo."
+msgid "We'll email you when Paradev for Android is ready."
+msgstr "Te enviaremos un correo cuando Paradev para Android esté listo."
 
 msgid "We'll get back to you shortly."
 msgstr "Te responderemos en breve."
@@ -19475,17 +19552,17 @@ msgstr "Hola de nuevo"
 msgid "Welcome to {appName}"
 msgstr "Te damos la bienvenida a {appName}"
 
-msgid "Welcome to Superset"
-msgstr "Te damos la bienvenida a Superset"
+msgid "Welcome to Paradev"
+msgstr "Te damos la bienvenida a Paradev"
 
-msgid "Welcome to the new Superset"
-msgstr "Te damos la bienvenida al nuevo Superset"
+msgid "Welcome to the new Paradev"
+msgstr "Te damos la bienvenida al nuevo Paradev"
 
 msgid "What are the benefits?"
 msgstr "¿Cuáles son los beneficios?"
 
-msgid "What builders say about Superset"
-msgstr "Lo que dicen los creadores sobre Superset"
+msgid "What builders say about Paradev"
+msgstr "Lo que dicen los creadores sobre Paradev"
 
 msgid "What did you see on the page?"
 msgstr "¿Qué viste en la página?"
@@ -19508,14 +19585,17 @@ msgstr "¿Qué pasa si mi Mac está desconectado cuando salta un desencadenante?
 msgid "What is a workspace?"
 msgstr "¿Qué es un espacio de trabajo?"
 
-msgid "What is Superset Enterprise?"
-msgstr "¿Qué es Superset Enterprise?"
+msgid "What is Paradev Enterprise?"
+msgstr "¿Qué es Paradev Enterprise?"
 
 msgid "What is wrong?"
 msgstr "¿Qué ocurre?"
 
-msgid "What platforms does Superset run on?"
-msgstr "¿En qué plataformas funciona Superset?"
+msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "Qué es Paradev, quién lo construye y para quién es. Un equipo de San Francisco liderado por tres ex-CTO de YC que construye el espacio de trabajo para agentes de codificación en paralelo."
+
+msgid "What platforms does Paradev run on?"
+msgstr "¿En qué plataformas funciona Paradev?"
 
 msgid "What problem are you trying to solve?"
 msgstr "¿Qué problema quieres resolver?"
@@ -19531,9 +19611,6 @@ msgstr "¿Qué debe mostrar la página?"
 
 msgid "What should we build next?"
 msgstr "¿Qué construimos ahora?"
-
-msgid "What Superset is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Qué es Superset, quién lo construye y para quién es. Un equipo de San Francisco liderado por tres ex-CTO de YC que construye el espacio de trabajo para agentes de codificación en paralelo."
 
 msgid "What teams automate"
 msgstr "Qué automatizan los equipos"
@@ -19553,8 +19630,8 @@ msgstr "Lo que estamos construyendo"
 msgid "What we've shipped"
 msgstr "Lo que hemos lanzado"
 
-msgid "What would you like to build with Superset in the cloud?"
-msgstr "¿Qué te gustaría crear con Superset en la nube?"
+msgid "What would you like to build with Paradev in the cloud?"
+msgstr "¿Qué te gustaría crear con Paradev en la nube?"
 
 msgid "What would you like to know?"
 msgstr "¿Qué te gustaría saber?"
@@ -19652,8 +19729,8 @@ msgstr "Con etiqueta"
 msgid "with or without attachments"
 msgstr "con o sin archivos adjuntos"
 
-msgid "With the Superset mobile app, I can address production issues from anywhere."
-msgstr "Con la aplicación móvil de Superset, puedo resolver problemas de producción desde cualquier lugar."
+msgid "With the Paradev mobile app, I can address production issues from anywhere."
+msgstr "Con la aplicación móvil de Paradev, puedo resolver problemas de producción desde cualquier lugar."
 
 msgid "Wordmark, black"
 msgstr "Logotipo, negro"
@@ -19737,6 +19814,9 @@ msgstr "Agentes del espacio de trabajo"
 
 msgid "Workspace archived"
 msgstr "Espacio de trabajo archivado"
+
+msgid "Workspace config"
+msgstr "Configuración del espacio de trabajo"
 
 msgid "Workspace created"
 msgstr "Espacio de trabajo creado"
@@ -19907,11 +19987,11 @@ msgstr "Sí. El plan Gratis cubre a personas individuales con 1 usuario, espacio
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Sí. En los planes con espacios de trabajo en la nube, los propietarios pueden comprar cualquier cantidad de GB-horas extra a {packPrice} por GB-hora en Configuración, Facturación. Las GB-horas compradas se usan después del fondo mensual y nunca caducan, y la recarga automática puede comprar más cuando se agotan."
 
-msgid "Yes. Superset has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Sí. Superset ha superado una auditoría SOC 2 Type II con un auditor independiente, que cubre nuestros controles de seguridad en funcionamiento a lo largo del tiempo. Solicita el informe y consulta nuestra documentación de seguridad en trust.superset.sh."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
+msgstr "Sí. Paradev ha superado una auditoría SOC 2 Type II con un auditor independiente, que cubre nuestros controles de seguridad en funcionamiento a lo largo del tiempo. Solicita el informe y consulta nuestra documentación de seguridad en trust.superset.sh."
 
-msgid "Yes. Superset is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
-msgstr "Sí. Superset es el espacio de trabajo en el que se ejecutan tus agentes, no un proveedor de modelos. Trae Claude Code, Codex, OpenCode o cualquier agente de CLI, y usa tus cuentas o claves de API en todos los planes."
+msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
+msgstr "Sí. Paradev es el espacio de trabajo en el que se ejecutan tus agentes, no un proveedor de modelos. Trae Claude Code, Codex, OpenCode o cualquier agente de CLI, y usa tus cuentas o claves de API en todos los planes."
 
 msgid "Yes. Use superset automations in the CLI to create, run, and pause them."
 msgstr "Sí. Usa superset automations en la CLI para crearlas, ejecutarlas y pausarlas."
@@ -20019,8 +20099,8 @@ msgstr "Serías el <0>#{0}</0> de {1}."
 msgid "You'd be one of the first on the board."
 msgstr "Serías de los primeros en la clasificación."
 
-msgid "You'll need to sign in again to use Superset on this device."
-msgstr "Tendrás que iniciar sesión de nuevo para usar Superset en este dispositivo."
+msgid "You'll need to sign in again to use Paradev on this device."
+msgstr "Tendrás que iniciar sesión de nuevo para usar Paradev en este dispositivo."
 
 msgid "You'll stop being a member of this team. You can be re-added by another team member."
 msgstr "Dejarás de ser miembro de este equipo. Otro miembro puede volver a añadirte."
@@ -20028,8 +20108,8 @@ msgstr "Dejarás de ser miembro de este equipo. Otro miembro puede volver a aña
 msgid "You're about to change your role from {currentRoleName} to {newRoleName}. Another owner will need to restore your permissions. Are you sure?"
 msgstr "Vas a cambiar tu rol de {currentRoleName} a {newRoleName}. Otro propietario tendrá que restaurar tus permisos. ¿Seguro que quieres continuar?"
 
-msgid "You're about to get Superset"
-msgstr "Estás a punto de tener Superset"
+msgid "You're about to get Paradev"
+msgstr "Estás a punto de tener Paradev"
 
 msgid "You're all set!"
 msgstr "¡Todo listo!"
@@ -20119,8 +20199,11 @@ msgstr "Tu organización alcanzó su límite de entornos ({0}). Archiva un entor
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tu organización alcanzó su límite de uso en la nube. Este espacio de trabajo se detendrá en unos minutos si no se aumenta el límite."
 
-msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
-msgstr "Tus propias cuentas. Las integraciones de tu organización permiten a Superset acceder a sus herramientas; conectar las tuyas hace que el trabajo que Superset hace por ti aparezca a tu nombre."
+msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
+msgstr "Tus propias cuentas. Las integraciones de tu organización permiten a Paradev acceder a sus herramientas; conectar las tuyas hace que el trabajo que Paradev hace por ti aparezca a tu nombre."
+
+msgid "Your Paradev download is starting."
+msgstr "Tu descarga de Paradev está comenzando."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Tu plan no incluye entornos en la nube."
@@ -20144,8 +20227,8 @@ msgstr "Tu app en ejecución, en un navegador que tus agentes pueden controlar."
 msgid "Your signed-in session"
 msgstr "Tu sesión iniciada"
 
-msgid "Your Slack account has been linked to Superset. You can close this tab and return to Slack."
-msgstr "Tu cuenta de Slack se ha enlazado con Superset. Puedes cerrar esta pestaña y volver a Slack."
+msgid "Your Slack account has been linked to Paradev. You can close this tab and return to Slack."
+msgstr "Tu cuenta de Slack se ha enlazado con Paradev. Puedes cerrar esta pestaña y volver a Slack."
 
 msgid "Your stats, settled in mortal combat"
 msgstr "Tus estadísticas se deciden en un combate a muerte"
@@ -20155,9 +20238,6 @@ msgstr "Tu suscripción está activa. Las funciones de tu nuevo plan ya están d
 
 msgid "Your subscription will be adjusted accordingly."
 msgstr "Tu suscripción se ajustará en consecuencia."
-
-msgid "Your Superset download is starting."
-msgstr "Tu descarga de Superset está comenzando."
 
 msgid "Your teammates can talk directly to your agent."
 msgstr "Tu equipo puede hablar directamente con tu agente."
@@ -20175,8 +20255,8 @@ msgstr "Tu nivel es una puntuación ponderada de los {0} ejes medidos para ti, a
 msgid "Your tokens"
 msgstr "Tus tokens"
 
-msgid "Your v1 projects and workspaces are moving to the new Superset. They appear in the sidebar as each one is ready."
-msgstr "Tus proyectos y espacios de trabajo de v1 se están pasando al nuevo Superset. Aparecen en la barra lateral a medida que cada uno está listo."
+msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
+msgstr "Tus proyectos y espacios de trabajo de v1 se están pasando al nuevo Paradev. Aparecen en la barra lateral a medida que cada uno está listo."
 
 msgid "Your version: {currentVersion}"
 msgstr "Tu versión: {currentVersion}"
@@ -20207,3 +20287,9 @@ msgstr "Alejar"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "No se pudo actualizar el uso"
+
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} restante"

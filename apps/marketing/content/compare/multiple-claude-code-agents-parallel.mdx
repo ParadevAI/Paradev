@@ -1,6 +1,6 @@
 ---
 title: "How to Run Multiple Claude Code Agents in Parallel"
-description: "Learn the safest way to run multiple Claude Code sessions at once. Compare terminal tabs, tmux, manual Git worktrees, and Superset's orchestration workflow."
+description: "Learn the safest way to run multiple Claude Code sessions at once. Compare terminal tabs, tmux, manual Git worktrees, and Paradev's orchestration workflow."
 date: 2026-03-20
 lastUpdated: 2026-10-14
 type: "tutorial"
@@ -58,15 +58,15 @@ Then you `cd` into each directory and launch Claude Code there. Claude Code can 
 
 This separates working files, but does not sandbox the agent or prevent merge conflicts. It is also repetitive. You still have to create branches, name directories, track which session maps to which task, and review each diff manually in your editor or Git UI.
 
-### 3. Superset + Claude Code
+### 3. Paradev + Claude Code
 
 This is the same worktree-based approach, but automated.
 
-Superset creates an isolated worktree per task, launches Claude Code inside it, keeps the sessions organized, and gives you one place to review the resulting diffs. Claude Code still does the coding. Superset handles the orchestration.
+Paradev creates an isolated worktree per task, launches Claude Code inside it, keeps the sessions organized, and gives you one place to review the resulting diffs. Claude Code still does the coding. Paradev handles the orchestration.
 
-That is the key distinction: Claude Code is the agent; Superset is the workflow layer that lets you run many Claude Code sessions safely.
+That is the key distinction: Claude Code is the agent; Paradev is the workflow layer that lets you run many Claude Code sessions safely.
 
-Claude Code's own features keep working inside it. Superset launches the real `claude` CLI in a real terminal with your own login, so `/remote-control`, `/schedule`, `/loop`, subagents, and `--resume` behave as they do in any terminal.
+Claude Code's own features keep working inside it. Paradev launches the real `claude` CLI in a real terminal with your own login, so `/remote-control`, `/schedule`, `/loop`, subagents, and `--resume` behave as they do in any terminal.
 
 ## Quick Comparison
 
@@ -76,7 +76,7 @@ Claude Code's own features keep working inside it. Superset launches the real `c
 | tmux | Yes | No | Manual | Good for power users, still no isolation |
 | Manual Git worktrees + Claude Code | Yes | Yes | Git-native, but manual | Safe, but repetitive |
 | `claude --worktree` | Yes | Yes | Git-native, but manual | Low for Claude Code alone |
-| Superset + Claude Code | Yes | Yes | Built-in diff review per task | Lowest overhead once installed |
+| Paradev + Claude Code | Yes | Yes | Built-in diff review per task | Lowest overhead once installed |
 
 ## Recommended Workflow
 
@@ -101,7 +101,7 @@ Parallelism works best when each agent can finish a reviewable unit of work on i
 
 This is the non-negotiable part.
 
-If you are doing it manually, use `git worktree add` for every task before launching Claude Code. If you are using Superset, create one task per job and let Superset provision the worktree and branch automatically.
+If you are doing it manually, use `git worktree add` for every task before launching Claude Code. If you are using Paradev, create one task per job and let Paradev provision the worktree and branch automatically.
 
 ### 3. Keep prompts narrow
 
@@ -142,11 +142,11 @@ Record the starting commit, agent version, model, prompt, test command, and resu
 
 Our [reproducible worktree check](/parallel-coding-agents#a-reproducible-isolation-check) demonstrates both independent edits and a deliberate merge conflict. Use the [three-task walkthrough](/blog/parallel-coding-agents-guide) to apply that review process to a real project.
 
-## Why Superset Fits This Workflow
+## Why Paradev Fits This Workflow
 
-![Claude streaming a billing migration in one Superset workspace while other Claude Code agents run in parallel workspaces](/images/readme/agents-working.gif)
+![Claude streaming a billing migration in one Paradev workspace while other Claude Code agents run in parallel workspaces](/images/readme/agents-working.gif)
 
-Superset is useful here because it removes the boring parts of manual parallelism:
+Paradev is useful here because it removes the boring parts of manual parallelism:
 
 - separate worktree per task
 - separate branch per task
@@ -157,9 +157,9 @@ Superset is useful here because it removes the boring parts of manual parallelis
 - an iPhone and iPad app for checking on sessions and reviewing diffs away from your desk
 - cleanup that previews dirty or unpushed work before a bulk delete
 
-If you already like Claude Code, Superset is not a replacement. It is the layer that makes multiple Claude Code sessions manageable.
+If you already like Claude Code, Paradev is not a replacement. It is the layer that makes multiple Claude Code sessions manageable.
 
-For a product comparison, see [Superset vs Claude Code](/compare/superset-vs-claude-code).
+For a product comparison, see [Paradev vs Claude Code](/compare/superset-vs-claude-code).
 
 ## When Manual Worktrees Are Enough
 
@@ -169,17 +169,17 @@ You do not need another tool if:
 - you are comfortable living in Git and tmux all day
 - you prefer assembling your own workflow from terminal tools
 
-Manual worktrees are still the correct primitive. Superset just packages that primitive into a faster operating model.
+Manual worktrees are still the correct primitive. Paradev just packages that primitive into a faster operating model.
 
 ## Verdict
 
-If you want to run multiple Claude Code agents in parallel, the decision is not really "Claude Code or Superset."
+If you want to run multiple Claude Code agents in parallel, the decision is not really "Claude Code or Paradev."
 
 The real choice is:
 
 - Claude Code alone, with `claude --worktree` per session and your own way of tracking them
 - Claude Code plus manual worktrees, with more setup overhead
-- Claude Code plus Superset, with the same isolation model, all of Claude Code's own commands, and one place to track and review every session
+- Claude Code plus Paradev, with the same isolation model, all of Claude Code's own commands, and one place to track and review every session
 
 For most teams and solo developers, worktree-based orchestration is the difference between "parallel in theory" and "parallel every day."
 
@@ -187,7 +187,7 @@ For most teams and solo developers, worktree-based orchestration is the differen
 
 ### Can Claude Code itself run multiple agents?
 
-Yes. `claude --worktree` starts each session in its own worktree, and subagents can run in parallel inside one session. What Claude Code does not give you is one view across many sessions, other agents, and other machines, with each session's diff and PR in one place. Superset adds that, and Claude Code's own features still work in each Superset session.
+Yes. `claude --worktree` starts each session in its own worktree, and subagents can run in parallel inside one session. What Claude Code does not give you is one view across many sessions, other agents, and other machines, with each session's diff and PR in one place. Paradev adds that, and Claude Code's own features still work in each Paradev session.
 
 ### Do I need Git worktrees to parallelize Claude Code?
 
@@ -197,6 +197,6 @@ If you care about safety, yes. Separate worktrees keep each session on its own b
 
 tmux is enough to manage panes and sessions. It is not enough to isolate file changes by itself. You still need a Git workflow, usually worktrees, underneath it.
 
-### Is Superset only for Claude Code?
+### Is Paradev only for Claude Code?
 
-No. Superset can orchestrate Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, and other CLI agents, including custom ones you add. Claude Code is just one of the strongest fits for the workflow.
+No. Paradev can orchestrate Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, and other CLI agents, including custom ones you add. Claude Code is just one of the strongest fits for the workflow.

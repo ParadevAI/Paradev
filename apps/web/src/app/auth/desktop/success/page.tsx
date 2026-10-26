@@ -68,7 +68,7 @@ export default async function DesktopSuccessPage({
 
 	// Desktop and web need independent sessions with separate activeOrganizationId
 	const headersObj = await headers();
-	const userAgent = headersObj.get("user-agent") || "Superset Desktop App";
+	const userAgent = headersObj.get("user-agent") || "Paradev Desktop App";
 	const ipAddress =
 		headersObj.get("x-forwarded-for")?.split(",")[0] ||
 		headersObj.get("x-real-ip") ||

@@ -13,19 +13,19 @@ export function DownloadLinkEmail({
 }: DownloadLinkEmailProps = {}) {
 	return (
 		<EmailLayout
-			preview="Your Superset desktop download link"
+			preview="Your Paradev desktop download link"
 			recipientEmail={recipientEmail}
 		>
 			<Heading className="m-0 mb-3 text-[22px] font-medium leading-8 text-foreground">
-				Get Superset on your Mac
+				Get Paradev on your Mac
 			</Heading>
 			<Text className="m-0 mb-6 text-[15px] leading-6 text-muted">
 				Open this email on your Mac, then use the button below to download the
-				Superset desktop app. The right version will be selected automatically.
+				Paradev desktop app. The right version will be selected automatically.
 			</Text>
 
 			<Section className="mb-8">
-				<Button href={DOWNLOAD_URL}>Download Superset</Button>
+				<Button href={DOWNLOAD_URL}>Download Paradev</Button>
 			</Section>
 
 			<Text className="m-0 text-[13px] leading-5 text-muted">

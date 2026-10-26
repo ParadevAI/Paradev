@@ -14,7 +14,7 @@ The sidebar now works like a file manager. Right-click any workspace and choose 
 
 ## Turn Your Agent into an Orchestrator <PRBadge url="https://github.com/superset-sh/superset/pull/6088" />
 
-The new `superset-orchestration` skill turns the agent you're already talking to into a coordinator. Ask it to parallelize work and it runs the whole job through the Superset CLI: an isolated workspace per worker, an agent launched in each, follow-ups over their terminals, results collected at the end. The coordinator can be Claude Code or Codex; the workers can be any mix of agents Superset runs.
+The new `superset-orchestration` skill turns the agent you're already talking to into a coordinator. Ask it to parallelize work and it runs the whole job through the Paradev CLI: an isolated workspace per worker, an agent launched in each, follow-ups over their terminals, results collected at the end. The coordinator can be Claude Code or Codex; the workers can be any mix of agents Paradev runs.
 
 Typical uses:
 
@@ -26,7 +26,7 @@ Typical uses:
 npx skills add superset-sh/skills
 ```
 
-Claude Code users can also get it from the Superset plugin: `/plugin marketplace add superset-sh/superset`.
+Claude Code users can also get it from the Paradev plugin: `/plugin marketplace add superset-sh/superset`.
 
 ## A Cleaner, Denser Sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/5944" /> <PRBadge url="https://github.com/superset-sh/superset/pull/5824" /> <PRBadge url="https://github.com/superset-sh/superset/pull/5887" />
 
@@ -40,7 +40,7 @@ The sidebar got a full restyle: denser rows, muted icons, keycap-style shortcut 
 
 ## Grok and Kimi Code Join the Agent Lineup <PRBadge url="https://github.com/superset-sh/superset/pull/5859" /> <PRBadge url="https://github.com/superset-sh/superset/pull/5780" />
 
-xAI's Grok Build and Moonshot's Kimi Code are now first-class Superset agents, with their own icons, launch presets, and live working/idle status in the sidebar.
+xAI's Grok Build and Moonshot's Kimi Code are now first-class Paradev agents, with their own icons, launch presets, and live working/idle status in the sidebar.
 
 - Grok permission prompts surface as desktop notifications, contributed by [@psinha40898](https://github.com/psinha40898) <PRBadge url="https://github.com/superset-sh/superset/pull/6025" />
 - Panes waiting on your input now show a yellow indicator instead of red <PRBadge url="https://github.com/superset-sh/superset/pull/6017" />
@@ -49,15 +49,15 @@ Add either one in **Settings → Agents → Add agent** and it appears in the ne
 
 ![Grok's agent settings page next to the Add agent picker, with Kimi Code highlighted among Amp, Gemini, Copilot, Mistral Vibe, and Cursor Agent](/changelog/2026-08-02-add-agent-picker.png)
 
-## Superset 2.0 Starts Rolling Out <PRBadge url="https://github.com/superset-sh/superset/pull/5821" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6118" />
+## Paradev 2.0 Starts Rolling Out <PRBadge url="https://github.com/superset-sh/superset/pull/5821" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6118" />
 
-For months Superset has shipped as two apps in one: the original interface and the new 2.0 experience behind an opt-in. We're consolidating on 2.0 so every fix and feature lands in one place, and the upgrade is rolling out gradually over the coming weeks. If you're still on the original interface, nothing to do: when it's your turn the upgrade happens automatically, and your next launch lands in 2.0, in your last active workspace.
+For months Paradev has shipped as two apps in one: the original interface and the new 2.0 experience behind an opt-in. We're consolidating on 2.0 so every fix and feature lands in one place, and the upgrade is rolling out gradually over the coming weeks. If you're still on the original interface, nothing to do: when it's your turn the upgrade happens automatically, and your next launch lands in 2.0, in your last active workspace.
 
 - Projects, workspaces, settings, and presets all come along
 - A heads-up card appears before the switch and a welcome card after
 - Running terminal sessions don't carry over; workspaces reopen with fresh terminals in their old folders
 
-![The welcome card shown on the first launch after migrating to the new Superset](/changelog/2026-08-02-v2-welcome.png)
+![The welcome card shown on the first launch after migrating to the new Paradev](/changelog/2026-08-02-v2-welcome.png)
 
 ## Improvements
 
@@ -69,8 +69,8 @@ For months Superset has shipped as two apps in one: the original interface and t
 - **Close confirmations** - closing a terminal with a running command or active ports asks first, and a workspace action closes all ports at once <PRBadge url="https://github.com/superset-sh/superset/pull/5517" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6007" /> <PRBadge url="https://github.com/superset-sh/superset/pull/5779" />
 - **Prompt history** - the new-workspace screen keeps your last 50 prompts; click the history icon to search and reuse one <PRBadge url="https://github.com/superset-sh/superset/pull/6083" />
 - **Diff review on iOS** - long-press a line in the mobile app to draft comments, then send the whole review to your agent <PRBadge url="https://github.com/superset-sh/superset/pull/5838" />
-- **Blank projects** - create a fresh git repo without leaving Superset, from the new-workspace picker or onboarding <PRBadge url="https://github.com/superset-sh/superset/pull/5906" />
-- **Import existing worktrees** - right-click a project to adopt worktrees created outside Superset as workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/6097" />
+- **Blank projects** - create a fresh git repo without leaving Paradev, from the new-workspace picker or onboarding <PRBadge url="https://github.com/superset-sh/superset/pull/5906" />
+- **Import existing worktrees** - right-click a project to adopt worktrees created outside Paradev as workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/6097" />
 - **Resource monitor in the command palette** - press ⌘⇧U for per-workspace CPU and memory <PRBadge url="https://github.com/superset-sh/superset/pull/6037" />
 - **Reveal in Finder** - from the file pane header and the project right-click menu <PRBadge url="https://github.com/superset-sh/superset/pull/6071" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6073" />
 - **CLI on Intel Macs** - the install script and Homebrew formula now ship Intel builds <PRBadge url="https://github.com/superset-sh/superset/pull/6059" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6057" />

@@ -62,7 +62,7 @@ describe("agentConfigsRouter", () => {
 			expect(result.map((row) => row.order)).toEqual(DEFAULT_PRESET_ORDERS);
 		});
 
-		it("does not seed Superset", async () => {
+		it("does not seed Paradev", async () => {
 			const caller = createCaller();
 			const result = await caller.list();
 			expect(result.find((row) => row.presetId === "superset")).toBeUndefined();

@@ -151,7 +151,7 @@ export function PageWatcherPopover({
 			const result = await onCreateNewAgentSession({
 				configId,
 				placement,
-				prompt: `Watch the Superset Page with ID ${page.id} for reader comments. Read it with superset pages get ${page.id}. Load the Superset Pages skill (superset-page or superset:page) and follow it when handling comments. The app will register this terminal as the page watcher. Do not republish or change the page until a reader requests a change. After reading, wait for comments to be delivered to this session.`,
+				prompt: `Watch the Paradev Page with ID ${page.id} for reader comments. Read it with superset pages get ${page.id}. Load the Paradev Pages skill (superset-page or superset:page) and follow it when handling comments. The app will register this terminal as the page watcher. Do not republish or change the page until a reader requests a change. After reading, wait for comments to be delivered to this session.`,
 			});
 			if (!result) return;
 			const binding = await waitForPageAgent({

@@ -15,7 +15,7 @@ export function DesktopAuthCard({
 			<div className="flex w-full max-w-xs flex-col items-center text-center">
 				<Image
 					src="/title.svg"
-					alt="Superset"
+					alt="Paradev"
 					width={140}
 					height={43}
 					priority

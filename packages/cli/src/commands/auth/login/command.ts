@@ -144,14 +144,14 @@ async function runApiKeyLogin({
 
 export default command({
 	sandbox: false,
-	description: "Authenticate with Superset. Re-run to switch organizations.",
+	description: "Authenticate with Paradev. Re-run to switch organizations.",
 	skipMiddleware: true,
 	options: {
 		organization: string().desc(
 			"Organization id or slug — required for non-TTY logins when you belong to multiple orgs",
 		),
 		apiKey: string().desc(
-			"Store a Superset API key (sk_live_…) at ~/.superset/config.json instead of running the OAuth flow. Pass --api-key=- to read it from stdin",
+			"Store a Paradev API key (sk_live_…) at ~/.superset/config.json instead of running the OAuth flow. Pass --api-key=- to read it from stdin",
 		),
 	},
 	run: async (opts) => {

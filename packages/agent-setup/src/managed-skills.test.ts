@@ -321,7 +321,7 @@ describe("createManagedSkills", () => {
 });
 
 describe("createManagedSkills with plugin sources", () => {
-	it("grafts a marketplace plugin into the one Superset plugin dir", async () => {
+	it("grafts a marketplace plugin into the one Paradev plugin dir", async () => {
 		const github = seedMarketplacePlugin("github", ["issue-triage"]);
 		await run(undefined, [github]);
 

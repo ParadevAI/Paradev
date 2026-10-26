@@ -1,14 +1,14 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "gmail",
-	"version": "1.1.5",
+	"version": "1.1.6",
 	"description": "Read, search, send, and organize mail in your Gmail account.",
 	"author": {
 		"name": "Superset",
 		"url": "https://superset.sh"
 	},
 	"homepage": "https://docs.superset.sh",
-	"repository": "https://github.com/superset-sh/superset",
+	"repository": "https://github.com/paradevai/paradev",
 	"license": "MIT",
 	"keywords": ["gmail", "email", "mail", "google", "inbox"],
 	"extensions": {

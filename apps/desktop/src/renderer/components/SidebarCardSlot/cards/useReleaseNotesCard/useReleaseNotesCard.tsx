@@ -46,7 +46,7 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 
 	return {
 		id: `release-notes-${version}`,
-		title: t({ message: `Superset ${version}` }),
+		title: t({ message: `Paradev ${version}` }),
 		description: formatReleaseDate(release.date, { withYear: false }),
 		media: release.image ? (
 			<img
