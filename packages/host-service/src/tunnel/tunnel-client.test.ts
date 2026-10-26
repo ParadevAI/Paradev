@@ -236,38 +236,46 @@ test("repeated forbidden closes back off before reconnecting", async () => {
 		hostServiceSecret: "test",
 		onForbidden,
 	});
-	const refuse = (index: number) => {
-		const socket = FakeSocket.at(index);
+	const refuse = (socket: FakeSocket) => {
 		socket.readyState = 3;
 		socket.dispatchEvent(
 			new CloseEvent("close", { code: 4403, reason: "Forbidden" }),
 		);
+	};
+	const openThenRefuse = (index: number) => {
+		const socket = FakeSocket.at(index);
+		socket.open();
+		refuse(socket);
 	};
 	try {
 		await client.connect();
 		await settle();
 		expect(FakeSocket.instances).toHaveLength(1);
 
-		refuse(0);
+		openThenRefuse(0);
 		await settle();
 		expect(onForbidden).toHaveBeenCalledTimes(1);
 		expect(FakeSocket.instances).toHaveLength(2);
 
-		refuse(1);
+		openThenRefuse(1);
 		await settle();
 		expect(onForbidden).toHaveBeenCalledTimes(2);
 		expect(FakeSocket.instances).toHaveLength(2);
 		await settle(30_000);
 		expect(FakeSocket.instances).toHaveLength(3);
 
-		refuse(2);
+		openThenRefuse(2);
 		await settle(30_000);
 		expect(FakeSocket.instances).toHaveLength(3);
 		await settle(30_000);
 		expect(FakeSocket.instances).toHaveLength(4);
 
-		FakeSocket.at(3).open();
-		refuse(3);
+		const accepted = FakeSocket.at(3);
+		accepted.open();
+		accepted.dispatchEvent(
+			new MessageEvent("message", { data: '{"type":"pong"}' }),
+		);
+		refuse(accepted);
 		await settle();
 		expect(onForbidden).toHaveBeenCalledTimes(4);
 		expect(FakeSocket.instances).toHaveLength(5);

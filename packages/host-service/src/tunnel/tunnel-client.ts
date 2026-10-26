@@ -28,9 +28,9 @@ const URL_PROVIDER_STEP_TIMEOUT_MS = 15_000;
 // each lookup is an API call; one per window is enough to follow a relay move.
 const RELAY_RESOLVE_INTERVAL_MS = 5 * 60_000;
 // A relay that cannot reach the API refuses a registered host with the same
-// 4403 as a missing registration, so a refusal straight after a successful
-// re-registration must not reconnect at once or it becomes a hot loop of
-// host.ensure calls. The first refusal after an open recovers immediately.
+// 4403 as a missing registration, so repeated refusals must back off or they
+// become a hot loop of host.ensure calls. A refused connect opens before it
+// closes, so only an inbound message shows the relay accepted this host.
 const FORBIDDEN_RETRY_BASE_MS = 30_000;
 const FORBIDDEN_RETRY_MAX_MS = 5 * 60_000;
 
@@ -129,7 +129,6 @@ export class TunnelClient {
 		control.addEventListener("open", () => {
 			this.lastInboundAt = Date.now();
 			this.connectedAt = this.lastInboundAt;
-			this.forbiddenCloses = 0;
 			this.markOpened();
 			console.log(
 				`[host-service:tunnel] control connected for ${this.options.hostId}`,
@@ -138,6 +137,7 @@ export class TunnelClient {
 
 		control.addEventListener("message", (event) => {
 			this.lastInboundAt = Date.now();
+			this.forbiddenCloses = 0;
 			let message: StreamDial | { type: "pong" };
 			try {
 				message = JSON.parse(String(event.data));

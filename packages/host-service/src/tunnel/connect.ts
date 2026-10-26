@@ -44,6 +44,7 @@ async function resolveRelayUrl(
 	return fallback;
 }
 
+const REGISTER_ATTEMPT_TIMEOUT_MS = 30_000;
 const REGISTER_RETRY_BASE_MS = 30_000;
 const REGISTER_RETRY_MAX_MS = 5 * 60_000;
 
@@ -52,10 +53,12 @@ const REGISTER_RETRY_MAX_MS = 5 * 60_000;
 // failure at boot permanently stranding the host as locally-healthy but
 // cloud-invisible (issue #6415) — so retry with backoff until it lands,
 // and record the outcome where health.check can report it.
-async function registerHost(
-	options: ConnectRelayOptions,
+export async function registerHost(
+	options: Pick<ConnectRelayOptions, "api" | "organizationId" | "signal">,
+	attemptTimeoutMs = REGISTER_ATTEMPT_TIMEOUT_MS,
 ): Promise<{ machineId: string } | null> {
 	for (let attempt = 0; !options.signal?.aborted; attempt++) {
+		const deadline = AbortSignal.timeout(attemptTimeoutMs);
 		try {
 			const host = await options.api.host.ensure.mutate(
 				{
@@ -66,7 +69,11 @@ async function registerHost(
 					platform: `${os.platform()}-${os.arch()}`,
 					installSource: getHostInstallSource(),
 				},
-				{ signal: options.signal },
+				{
+					signal: options.signal
+						? AbortSignal.any([options.signal, deadline])
+						: deadline,
+				},
 			);
 			if (options.signal?.aborted) return null;
 			recordRegistrationSuccess();
