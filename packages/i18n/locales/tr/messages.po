@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{total} içinden {received}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} kaldı"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName}, bu organizasyonun GitHub App'inin kurulu olduğu {installedAccountLogin} hesabında değil."
 
@@ -5212,6 +5215,9 @@ msgstr "Bulut çalışma alanı kaydedilemedi"
 
 msgid "Could not record environment"
 msgstr "Ortam kaydedilemedi"
+
+msgid "Could not refresh usage"
+msgstr "Kullanım yenilenemedi"
 
 msgid "Could not remove access"
 msgstr "Erişim kaldırılamadı"
@@ -20269,9 +20275,3 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Kullanım yenilenemedi"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} kaldı"

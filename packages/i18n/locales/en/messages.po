@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} of {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} remaining"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 
@@ -5212,6 +5215,9 @@ msgstr "Could not record cloud workspace"
 
 msgid "Could not record environment"
 msgstr "Could not record environment"
+
+msgid "Could not refresh usage"
+msgstr "Could not refresh usage"
 
 msgid "Could not remove access"
 msgstr "Could not remove access"
@@ -20269,9 +20275,3 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Could not refresh usage"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} remaining"

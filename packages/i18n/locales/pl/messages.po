@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} z {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Pozostało {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} nie należy do {installedAccountLogin}, gdzie zainstalowana jest GitHub App tej organizacji."
 
@@ -5212,6 +5215,9 @@ msgstr "Nie udało się zapisać obszaru roboczego w chmurze"
 
 msgid "Could not record environment"
 msgstr "Nie udało się zapisać środowiska"
+
+msgid "Could not refresh usage"
+msgstr "Nie udało się odświeżyć wykorzystania"
 
 msgid "Could not remove access"
 msgstr "Nie udało się usunąć dostępu"
@@ -20269,9 +20275,3 @@ msgstr "Pomniejsz"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Nie udało się odświeżyć wykorzystania"
-
-msgid "{remainingPercent} remaining"
-msgstr "Pozostało {remainingPercent}"

@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} de {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} restante"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} não está em {installedAccountLogin}, onde a GitHub App desta organização está instalada."
 
@@ -5212,6 +5215,9 @@ msgstr "Não foi possível registrar a área de trabalho na nuvem"
 
 msgid "Could not record environment"
 msgstr "Não foi possível salvar o ambiente"
+
+msgid "Could not refresh usage"
+msgstr "Não foi possível atualizar o uso"
 
 msgid "Could not remove access"
 msgstr "Não foi possível remover o acesso"
@@ -20269,9 +20275,3 @@ msgstr "Diminuir zoom"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Não foi possível atualizar o uso"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} restante"

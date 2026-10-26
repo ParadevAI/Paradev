@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "残り{remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} は、この組織の GitHub App がインストールされている {installedAccountLogin} にありません。"
 
@@ -5212,6 +5215,9 @@ msgstr "クラウドワークスペースを記録できませんでした"
 
 msgid "Could not record environment"
 msgstr "環境を保存できませんでした"
+
+msgid "Could not refresh usage"
+msgstr "使用量を更新できませんでした"
 
 msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
@@ -20269,9 +20275,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "使用量を更新できませんでした"
-
-msgid "{remainingPercent} remaining"
-msgstr "残り{remainingPercent}"

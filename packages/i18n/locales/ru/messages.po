@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} из {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Осталось {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} не находится в {installedAccountLogin}, где установлено GitHub App этой организации."
 
@@ -5212,6 +5215,9 @@ msgstr "Не удалось записать облачную рабочую о�
 
 msgid "Could not record environment"
 msgstr "Не удалось сохранить окружение"
+
+msgid "Could not refresh usage"
+msgstr "Не удалось обновить данные об использовании"
 
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
@@ -20269,9 +20275,3 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Не удалось обновить данные об использовании"
-
-msgid "{remainingPercent} remaining"
-msgstr "Осталось {remainingPercent}"
