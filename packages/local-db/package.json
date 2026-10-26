@@ -15,12 +15,17 @@
 		"./schema/zod": {
 			"types": "./src/schema/zod.ts",
 			"default": "./src/schema/zod.ts"
+		},
+		"./schema/usage-widget-appearances": {
+			"types": "./src/schema/usage-widget-appearances.ts",
+			"default": "./src/schema/usage-widget-appearances.ts"
 		}
 	},
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"generate": "drizzle-kit generate",
-		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
+		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
+		"test": "node --experimental-sqlite --experimental-strip-types --test src/schema/usage-widget-appearances.node-test.ts"
 	},
 	"dependencies": {
 		"@superset/shared": "workspace:*",

@@ -2,6 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
+import { formatRelativeTime } from "@superset/i18n/format";
 import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
@@ -28,16 +29,27 @@ import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
+import { AccountColorPicker } from "renderer/components/AccountColorPicker";
+import { ProviderIcon } from "renderer/components/ProviderIcon";
+import { UsageCreditBalance } from "renderer/components/UsageCreditBalance";
 import type {
 	UsageAccount,
 	UsageQuotaWindow,
 } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	formatResetIn,
 	formatResetLabel,
 } from "renderer/utils/usage/formatResetIn";
+import {
+	quotaWindowReading,
+	usageObservation,
+	usageReading,
+} from "shared/usage-reading";
+import { hasVerifiedWidgetIdentity } from "shared/usage-widget/appearance-identity";
+import { widgetAccountId } from "shared/usage-widget/model";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
 import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
@@ -78,10 +90,19 @@ function meterColor(usedPercent: number): string {
 }
 
 /** One line per window: label · bar · % · reset. Density over ceremony. */
-function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
+function QuotaWindowRow({
+	window,
+	readingState = "current",
+}: {
+	window: UsageQuotaWindow;
+	readingState?: "current" | "historical" | "awaiting_refresh" | "unavailable";
+}) {
 	const percent = Math.min(window.usedPercent, 100);
 	return (
-		<div className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem_5rem] items-center gap-2">
+		<div
+			className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem_5rem] items-center gap-2"
+			data-stale={readingState !== "current"}
+		>
 			<span className="truncate text-[11px] text-muted-foreground">
 				{window.label}
 			</span>
@@ -92,13 +113,20 @@ function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
 				/>
 			</div>
 			<span className="text-right text-[11px] tabular-nums">
+				{readingState !== "current" && "~"}
 				{window.usedPercent}%
 			</span>
 			<span
 				className="text-right text-[11px] text-muted-foreground tabular-nums"
 				title={window.resetsAt ? formatResetLabel(window.resetsAt) : undefined}
 			>
-				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt)}` : ""}
+				{readingState === "awaiting_refresh" ? (
+					<Trans>Awaiting refresh</Trans>
+				) : window.resetsAt ? (
+					`↺ ${formatResetIn(window.resetsAt)}`
+				) : (
+					""
+				)}
 			</span>
 		</div>
 	);
@@ -130,16 +158,24 @@ const DEFAULT_TITLE = msg({
 		"New agent launches use this account. Relaunch a running agent to switch it.",
 });
 
-function AccountCard({
+export function AccountCard({
 	account,
+	offline = false,
 	onMakeDefault,
 	onSwitchSignIn,
 	onRemove,
 	isSwitching,
 	selectable,
 	hideEmails,
+	color,
+	accountLabel,
+	onSaveColor,
 }: {
+	color?: string | null;
+	accountLabel?: string | null;
+	onSaveColor?: (color: string | null) => Promise<void>;
 	account: UsageAccount;
+	offline?: boolean;
 	onMakeDefault: (() => void) | null;
 	onSwitchSignIn: (() => void) | null;
 	/** Null on the system-default card — the main login is never removable. */
@@ -153,7 +189,14 @@ function AccountCard({
 	hideEmails: boolean;
 }) {
 	const { t } = useLingui();
-	const credits = creditsLine(account);
+	const reading = usageReading(usageObservation(account), offline);
+	const credits =
+		account.prepaidBalance || account.creditsBalance !== null
+			? account.extraUsage
+				? creditsLine({ ...account, creditsBalance: null })
+				: null
+			: creditsLine(account);
+	const isDark = useIsDarkTheme();
 	const { copyToClipboard, copied } = useCopyToClipboard();
 	const expiredCommand =
 		account.status === "token_expired"
@@ -171,6 +214,12 @@ function AccountCard({
 			)}
 		>
 			<div className="flex items-baseline gap-1.5">
+				<ProviderIcon
+					provider={account.agent}
+					color={color}
+					dark={isDark}
+					className="size-3.5 self-center"
+				/>
 				{selectable &&
 					(account.isDefault ? (
 						<span
@@ -202,7 +251,7 @@ function AccountCard({
 					{hideEmails && account.email ? (
 						<Trans>Email hidden</Trans>
 					) : (
-						(account.email ?? AGENT_LABELS[account.agent])
+						(accountLabel ?? account.email ?? AGENT_LABELS[account.agent])
 					)}
 				</span>
 				{account.plan && (
@@ -231,6 +280,14 @@ function AccountCard({
 					    profiles of the same account apart. */}
 					{account.sourceLabel}
 				</span>
+				{onSaveColor && (
+					<AccountColorPicker
+						color={color}
+						dark={isDark}
+						accountLabel={accountLabel ?? AGENT_LABELS[account.agent]}
+						onSave={onSaveColor}
+					/>
+				)}
 				{(onSwitchSignIn || onRemove) && (
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
@@ -276,11 +333,22 @@ function AccountCard({
 						</a>
 					)}
 				</div>
-			) : account.status === "ok" ? (
+			) : account.status === "ok" || reading.windows.length > 0 ? (
 				<div className="mt-2 flex flex-col gap-1.5">
-					{account.windows.map((window) => (
-						<QuotaWindowRow key={window.id} window={window} />
+					{reading.windows.map((window) => (
+						<QuotaWindowRow
+							key={window.id}
+							window={window}
+							readingState={quotaWindowReading(reading, window)}
+						/>
 					))}
+					{reading.freshness !== "fresh" && reading.checkedAt && (
+						<p className="text-[10px] text-muted-foreground">
+							<Trans>
+								Last checked {formatRelativeTime(reading.checkedAt)} · not live
+							</Trans>
+						</p>
+					)}
 				</div>
 			) : account.status === "token_stale" ? (
 				<div className="mt-1.5 text-[11px] text-muted-foreground">
@@ -328,6 +396,7 @@ function AccountCard({
 			)}
 			{/* The radio + accent border already mark the default when the cards
 			    read as a group; the footer label only carries it for a lone card. */}
+			<UsageCreditBalance account={account} offline={offline} />
 			{((!account.isDefault && onMakeDefault !== null) ||
 				(!selectable && account.isDefault) ||
 				credits) && (
@@ -378,6 +447,24 @@ export function UsageView({
 	const focusedOnce = useRef<string | null>(null);
 	const { t } = useLingui();
 	const quotaQuery = useHostUsageQuota(hostUrl);
+	const widgetUtils = electronTrpc.useUtils();
+	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
+	const widget = electronTrpc.usageWidget.get.useQuery(undefined, {
+		enabled: platform === "darwin",
+		staleTime: 60_000,
+	});
+	electronTrpc.usageWidget.onSnapshot.useSubscription(undefined, {
+		enabled: platform === "darwin",
+		onData: (snapshot) =>
+			widgetUtils.usageWidget.get.setData(undefined, snapshot),
+	});
+	const saveAppearance =
+		electronTrpc.usageWidget.setAccountAppearance.useMutation({
+			onSuccess: (snapshot) =>
+				widgetUtils.usageWidget.get.setData(undefined, snapshot),
+		});
+	const appearances =
+		widget.data?.hostUrl === hostUrl ? widget.data.accounts : [];
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
 	const removeAccount = useRemoveUsageAccount(hostUrl);
 	const isDark = useIsDarkTheme();
@@ -563,7 +650,10 @@ export function UsageView({
 			    reachable straight away; each shows its own placeholder meanwhile. */}
 			{visibleQuotaAgents(accounts).map((agent) => {
 				const agentAccounts = accounts.filter(
-					(account) => account.agent === agent,
+					(account) => account.agent === agent && !account.discoveryFailed,
+				);
+				const discoveryFailed = accounts.some(
+					(account) => account.agent === agent && account.discoveryFailed,
 				);
 				const icon = getPresetIcon(agent, isDark);
 				return (
@@ -588,6 +678,10 @@ export function UsageView({
 							<div className="flex items-center gap-1.5 rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
 								<LuRefreshCw className="size-3 animate-spin" />
 								<Trans>Reading usage…</Trans>
+							</div>
+						) : discoveryFailed ? (
+							<div className="rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
+								<Trans>Usage unavailable</Trans>
 							</div>
 						) : agentAccounts.length === 0 ? (
 							<div className="rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
@@ -617,6 +711,34 @@ export function UsageView({
 									>
 										<AccountCard
 											account={account}
+											offline={quotaQuery.isError}
+											color={
+												appearances.find(
+													(item) => item.id === widgetAccountId(account),
+												)?.color
+											}
+											accountLabel={
+												appearances.find(
+													(item) => item.id === widgetAccountId(account),
+												)?.label
+											}
+											onSaveColor={
+												!quotaQuery.isError &&
+												!widget.data?.offline &&
+												hasVerifiedWidgetIdentity({
+													id: widgetAccountId(account),
+													quotaIdentity: account.quotaIdentity,
+													status: account.status,
+												}) &&
+												widget.data?.hostUrl === hostUrl
+													? async (color) => {
+															await saveAppearance.mutateAsync({
+																accountId: widgetAccountId(account),
+																color,
+															});
+														}
+													: undefined
+											}
 											onMakeDefault={
 												isManagedAgent(account.agent)
 													? () => makeDefaultAccount(account)

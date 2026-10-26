@@ -102,21 +102,19 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		tempRoots.push(rootPath);
 
 		const manager = createManager({ debounceMs: 50 });
-		const events: string[] = [];
-		await manager.subscribe({ absolutePath: rootPath }, (batch) => {
-			for (const event of batch.events) {
-				if (event.kind !== "overflow") {
-					events.push(`${event.kind}:${event.absolutePath}`);
-				}
-			}
-		});
+		await manager.subscribe({ absolutePath: rootPath }, () => {});
 
 		const fileCount = 12;
 		for (let i = 0; i < fileCount; i++) {
 			await fs.writeFile(path.join(rootPath, `gen-${i}.log`), `${i}\n`);
 		}
 
-		await waitForCondition(() => events.length >= fileCount);
+		await waitForCondition(() => {
+			const tracked = getPathTypes(manager, rootPath);
+			return Array.from({ length: fileCount }, (_, index) =>
+				path.join(rootPath, `gen-${index}.log`),
+			).every((filePath) => tracked.has(filePath));
+		});
 
 		const pathTypes = getPathTypes(manager, rootPath);
 		expect(pathTypes.size).toBeGreaterThanOrEqual(fileCount);

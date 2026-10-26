@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# 个项目} other {# 个项目}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {#个仓库} other {#个仓库}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {可用重置 # 次} other {可用重置 # 次}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {云端#个结果} other {云端#个结果}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {#条评论} other {#条评论}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#个文件} other {#个文件}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {可用重置 # 次} other {可用重置 # 次}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#次搜索} other {#次搜索}}"
@@ -1696,6 +1703,12 @@ msgstr "手风琴"
 msgid "Account"
 msgstr "账户"
 
+msgid "Account appearance"
+msgstr "账户外观"
+
+msgid "Account color"
+msgstr "账户颜色"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "账户安装仅解析第一方清单，因此来自 {marketplace} 的 {plugin} 暂时无法安装到你的账户。它仍安装在本机上。"
@@ -1708,6 +1721,9 @@ msgstr "账户名称"
 
 msgid "Account pending deletion"
 msgstr "账户待删除"
+
+msgid "Account unavailable"
+msgstr "账户不可用"
 
 msgid "Account usage"
 msgstr "账户用量"
@@ -1756,6 +1772,9 @@ msgstr "创建API密钥需要有活动组织"
 
 msgid "Active sessions"
 msgstr "活动会话"
+
+msgid "Active window"
+msgstr "活动窗口"
 
 msgid "Activity"
 msgstr "动态"
@@ -1806,6 +1825,9 @@ msgstr "以后想发布智能体配置时，可以加到这里。"
 
 msgid "Add agents…"
 msgstr "添加智能体…"
+
+msgid "Add an account to see its usage here."
+msgstr "添加账户即可在此查看其用量。"
 
 msgid "add an agent"
 msgstr "添加智能体"
@@ -2112,6 +2134,9 @@ msgstr "AI · 状态"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AI认证失败。请检查你的AI设置。"
 
+msgid "AI usage"
+msgstr "AI 用量"
+
 msgid "Alert"
 msgstr "警告"
 
@@ -2158,6 +2183,12 @@ msgstr "全部 {0} 项目标都在为 {nextLabel} 出力。"
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "全部{versionCount}个版本及其内容都会被移除。持有链接的人将失去访问权限。"
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "除非您隐藏账户，否则所有账户都会显示在屏幕边缘。"
+
+msgid "All accounts are hidden."
+msgstr "所有账户均已隐藏。"
 
 msgid "All assignees"
 msgstr "全部负责人"
@@ -2971,6 +3002,9 @@ msgstr "头像已更新！"
 msgid "Awaiting {0}"
 msgstr "等待{0}"
 
+msgid "Awaiting refresh"
+msgstr "等待刷新"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "等待回复 — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "分类"
 msgid "Caution"
 msgstr "当心"
 
+msgid "Celebrate quota resets"
+msgstr "庆祝额度重置"
+
 msgid "Certificate Authority Invalid"
 msgstr "证书颁发机构无效"
 
@@ -3838,6 +3875,9 @@ msgstr "选择一个分区。"
 msgid "Choose agent"
 msgstr "选择智能体"
 
+msgid "Choose an account"
+msgstr "选择账户"
+
 msgid "Choose an existing repo folder"
 msgstr "选择已有的仓库文件夹"
 
@@ -3858,6 +3898,9 @@ msgstr "选择在终端中Cmd+点击文件路径时的打开方式"
 
 msgid "Choose MCP servers for this message"
 msgstr "为这条消息选择MCP服务器"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "为每个菜单栏图标选择一个账户。屏幕边缘面板会显示所有账户，除非你将其隐藏。缺失或过期的用量以短横线显示。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "选择要从应用内浏览器清除的内容。"
@@ -5104,6 +5147,9 @@ msgstr "无法移出队列"
 msgid "Could not list directory"
 msgstr "无法列出目录"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "无法加载账户。请刷新后重试。"
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "无法从{0}加载智能体"
@@ -5132,6 +5178,9 @@ msgstr "无法加载这个差异"
 msgid "Could not load this file."
 msgstr "无法加载这个文件。"
 
+msgid "Could not load usage display settings."
+msgstr "无法加载用量显示设置。"
+
 msgid "Could not load your machines"
 msgstr "无法加载你的机器"
 
@@ -5149,6 +5198,9 @@ msgstr "无法打开链接"
 
 msgid "Could not open Photos"
 msgstr "无法打开“照片”"
+
+msgid "Could not open usage."
+msgstr "无法打开用量。"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "无法继续"
 
 msgid "Could not resume the chat"
 msgstr "无法继续聊天"
+
+msgid "Could not save account color."
+msgstr "无法保存账户颜色。"
+
+msgid "Could not save usage display settings."
+msgstr "无法保存用量显示设置。"
 
 msgid "Could not send"
 msgstr "无法发送"
@@ -5816,6 +5874,12 @@ msgstr "创意经理，Valid"
 msgid "Credentials stay on the server"
 msgstr "凭据保留在服务器上"
 
+msgid "Credit balance"
+msgstr "额度余额"
+
+msgid "Credits"
+msgstr "额度"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "位于packages/ui之外的跨功能组件——新建组件之前先来这里看看"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "默认（{defaultWorktreePath}）"
 
+msgid "Default account"
+msgstr "默认账户"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "新工作区的默认基础分支。可在创建时为各工作区单独覆盖。"
+
+msgid "Default color"
+msgstr "默认颜色"
 
 msgid "Default effort"
 msgstr "默认推理强度"
@@ -6953,6 +7023,9 @@ msgstr "请输入{hostName}上的父目录"
 
 msgid "Enter a path on {hostName}"
 msgstr "请输入{hostName}上的路径"
+
+msgid "Enter a six-digit hex color."
+msgstr "请输入六位十六进制颜色。"
 
 msgid "Enter a URL into the search bar above."
 msgstr "在上方的搜索栏中输入URL。"
@@ -7986,6 +8059,9 @@ msgstr "火焰"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "成群的智能体规划、实现、审查并测试彼此的工作。人类定方向、裁决例外、把握品味。人类注意力的单位不再是拉取请求，而是决策。"
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "浮动在其他应用上方。显示快速视图中账户的会话和每周用量。"
+
 msgid "Focus Chat Input"
 msgstr "聚焦聊天输入框"
 
@@ -8556,6 +8632,9 @@ msgstr "帮助与文档"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "十六进制颜色"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "已从侧边栏隐藏“{0}”"
@@ -8571,6 +8650,9 @@ msgstr "隐藏"
 
 msgid "Hide {displayName}"
 msgstr "隐藏 {displayName}"
+
+msgid "Hide account"
+msgstr "隐藏账户"
 
 msgid "Hide checks"
 msgstr "隐藏检查"
@@ -9630,6 +9712,20 @@ msgstr "最近智能体活动{0}"
 msgid "Last attached"
 msgstr "上次连接"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "上次检查 {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "上次检查 {0} · 非实时"
+
+msgid "Last checked {relativeTime}"
+msgstr "上次检查 {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "上次检查 {relativeTime} · 非实时数据"
+
 msgid "Last day of each month"
 msgstr "每月最后一天"
 
@@ -9998,6 +10094,9 @@ msgstr "加载器 · 盲文加载动画"
 msgid "Loading"
 msgstr "加载中"
 
+msgid "Loading accounts…"
+msgstr "正在加载账户…"
+
 msgid "Loading agent settings..."
 msgstr "正在加载智能体设置..."
 
@@ -10240,6 +10339,9 @@ msgstr "管理"
 msgid "Manage {title}"
 msgstr "管理 {title}"
 
+msgid "Manage accounts"
+msgstr "管理账号"
+
 msgid "Manage accounts…"
 msgstr "管理账号…"
 
@@ -10434,6 +10536,15 @@ msgstr "内存占比"
 
 msgid "Mention."
 msgstr "提及。"
+
+msgid "Menu bar"
+msgstr "菜单栏"
+
+msgid "Menu bar accounts"
+msgstr "菜单栏账户"
+
+msgid "Menu bar quota window"
+msgstr "菜单栏额度周期"
 
 msgid "Menubar"
 msgstr "菜单栏"
@@ -10993,6 +11104,10 @@ msgstr "下次扣款：{nextDate} 扣 {nextTotal}，另加超出额度池的用�
 
 msgid "Next comment"
 msgstr "下一条评论"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "下次到期：{0}"
 
 msgid "Next file"
 msgstr "下一个文件"
@@ -12489,6 +12604,9 @@ msgstr "在“打开方式”菜单中选定的应用（VS Code、Cursor等）�
 msgid "Open this run's workspace"
 msgstr "打开此次运行的工作区"
 
+msgid "Open usage"
+msgstr "打开用量"
+
 msgid "Open workspace"
 msgstr "打开工作区"
 
@@ -13106,6 +13224,9 @@ msgstr "按仓库的智能体记忆"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "仅受监控的Paradev资源占系统总RAM的百分比（不含其他应用）。占比高说明Paradev是系统内存压力的主要来源；占比低说明压力可能来自别处。"
 
+msgid "Percentage"
+msgstr "百分比"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "永久删除“{projectName}”？"
 
@@ -13409,6 +13530,9 @@ msgstr "前缀"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "此团队任务 ID 的前缀。更改后，团队中所有任务都会重新命名。"
 
+msgid "Prepaid balance"
+msgstr "预付余额"
+
 msgid "Preparing"
 msgstr "正在准备"
 
@@ -13510,6 +13634,9 @@ msgstr "价格取决于你的团队规模和使用场景。联系我们，我们
 
 msgid "Primary"
 msgstr "主色"
+
+msgid "Primary display"
+msgstr "主显示器"
 
 msgid "Primary Key"
 msgstr "主键"
@@ -13719,6 +13846,9 @@ msgstr "属性"
 msgid "Provide either id or slug"
 msgstr "请提供id或slug"
 
+msgid "Provider icons and percentages"
+msgstr "提供商图标及百分比"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "提供方：{0}"
@@ -13891,6 +14021,12 @@ msgstr "完全退出"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "请先退出源浏览器，让它把登录信息写入磁盘。系统会请求你允许访问钥匙串。"
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "配额已耗尽。重置时间不可用"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "配额已耗尽。将在 {countdown} 后重置"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "刷新拉取请求"
 msgid "Refresh repositories"
 msgstr "刷新仓库"
 
+msgid "Refresh usage"
+msgstr "刷新用量"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "下次运行 Claude Code 时刷新。"
 
@@ -14219,6 +14358,12 @@ msgstr "迁移项目？"
 
 msgid "Relocating…"
 msgstr "正在迁移…"
+
+msgid "remaining"
+msgstr "剩余"
+
+msgid "Remaining"
+msgstr "剩余"
 
 msgid "rematch"
 msgstr "再来一局"
@@ -14590,6 +14735,11 @@ msgstr "重置缩放"
 msgid "Reset Zoom"
 msgstr "重置缩放"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "{0}重置"
+
 msgid "Resets {resetDate}"
 msgstr "{resetDate} 重置"
 
@@ -14935,6 +15085,9 @@ msgstr "右侧面板"
 
 msgid "Right pane area"
 msgstr "右侧面板区域"
+
+msgid "Right screen edge"
+msgstr "屏幕右侧边缘"
 
 msgid "Right-click here"
 msgstr "在这里右键点击"
@@ -15300,6 +15453,9 @@ msgstr "搜索{0}个站点…"
 
 msgid "Search a developer"
 msgstr "搜索开发者"
+
+msgid "Search accounts"
+msgstr "搜索账户"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜索所有文件内容和所有工作区。"
@@ -15807,6 +15963,12 @@ msgstr "会话"
 msgid "Session {0}"
 msgstr "会话{0}"
 
+msgid "Session allowance renewed"
+msgstr "会话额度已恢复"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "会话重置显示彩纸，周额度重置显示更盛大的庆祝效果。遵循减少动态效果设置。"
+
 msgid "Session details"
 msgstr "会话详情"
 
@@ -16027,8 +16189,14 @@ msgstr "在聊天输入框中显示麦克风。如果 Codex 已登录 ChatGPT，
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "在主页侧边栏的“拉取请求”下方显示“用量”按钮"
 
+msgid "Show account"
+msgstr "显示账户"
+
 msgid "Show all {count}"
 msgstr "显示全部{count}条"
+
+msgid "Show all accounts"
+msgstr "显示所有账户"
 
 msgid "Show all comments"
 msgstr "显示全部评论"
@@ -16080,6 +16248,9 @@ msgstr "收起"
 
 msgid "Show file tree"
 msgstr "显示文件树"
+
+msgid "Show hidden"
+msgstr "显示已隐藏账户"
 
 msgid "Show in bar"
 msgstr "在工具栏显示"
@@ -16204,6 +16375,9 @@ msgstr "应用更新可安装时显示在侧边栏的胶囊提示"
 
 msgid "Sign in"
 msgstr "登录"
+
+msgid "Sign in again"
+msgstr "重新登录"
 
 msgid "Sign in again to use dictation"
 msgstr "请重新登录以使用语音输入"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp 只会输出该窗格专属的端点。让 Playwrig
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset 现已更名为 Paradev。另外，我们完成了 1150 万美元种子轮融资"
+
+msgid "Superset logo"
+msgstr "Superset 标志"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登陆 iPhone"
@@ -19028,14 +19205,26 @@ msgstr "URL友好的标识符，在你的组织内唯一。"
 msgid "Usage"
 msgstr "用量"
 
+msgid "Usage at a glance"
+msgstr "用量概览"
+
+msgid "Usage display settings"
+msgstr "用量显示设置"
+
 msgid "Usage is out of date"
 msgstr "用量数据已过时"
 
 msgid "Usage sections"
 msgstr "用量分区"
 
+msgid "Usage unavailable"
+msgstr "用量信息不可用"
+
 msgid "Usage unavailable."
 msgstr "无法获取用量。"
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "用量不可用。打开 Superset 检查连接。"
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "使用语音转写和按住说话功能。"
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "使用你已有的智能体订阅和API密钥。Paradev从不代理模型调用，也不会把你的工作流锁死在某一家提供商上。"
+
+msgid "used"
+msgstr "已用"
+
+msgid "Used"
+msgstr "已用"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "用于菜单栏和浮动面板。"
 
 msgid "Used in URLs and APIs."
 msgstr "用于URL和API。"
@@ -19485,6 +19683,9 @@ msgstr "每周"
 
 msgid "Weekly"
 msgstr "每周"
+
+msgid "Weekly allowance renewed"
+msgstr "周额度已恢复"
 
 msgid "Weekly at {time}"
 msgstr "每周{time}"
@@ -20086,6 +20287,9 @@ msgstr "你的账户已停用，并将很快被永久删除。重新激活即可
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "你的账户由你所在的组织管理。请联系管理员来创建新组织。"
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "在菜单栏或屏幕右侧边缘查看账户和配额。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "你的智能体可以用 superset browser 命令打开任意页面并逐步操作。它使用你正在看的窗格，所以每一步你都能看到。"

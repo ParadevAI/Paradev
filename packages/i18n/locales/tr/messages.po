@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# proje} other {# proje}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# depo} other {# depo}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# sıfırlama kullanılabilir} other {# sıfırlama kullanılabilir}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {Bulutta # sonuç} other {Bulutta # sonuç}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# yorum} other {# yorum}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# dosya} other {# dosya}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# sıfırlama kullanılabilir} other {# sıfırlama kullanılabilir}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# arama} other {# arama}}"
@@ -1696,6 +1703,12 @@ msgstr "Akordeon"
 msgid "Account"
 msgstr "Hesap"
 
+msgid "Account appearance"
+msgstr "Hesap görünümü"
+
+msgid "Account color"
+msgstr "Hesap rengi"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Hesaba kurulum yalnızca birinci taraf manifestlerini çözer, bu yüzden {marketplace} kaynaklı {plugin} henüz hesabınıza kurulamaz. Bu makinede kurulu kalır."
@@ -1708,6 +1721,9 @@ msgstr "Hesap adı"
 
 msgid "Account pending deletion"
 msgstr "Hesap silinmeyi bekliyor"
+
+msgid "Account unavailable"
+msgstr "Hesap kullanılamıyor"
 
 msgid "Account usage"
 msgstr "Hesap kullanımı"
@@ -1756,6 +1772,9 @@ msgstr "API anahtarı oluşturmak için etkin bir kuruluş gerekir"
 
 msgid "Active sessions"
 msgstr "Etkin oturumlar"
+
+msgid "Active window"
+msgstr "Etkin pencere"
 
 msgid "Activity"
 msgstr "Etkinlik"
@@ -1806,6 +1825,9 @@ msgstr "Yayımlamak istediğinizde ajan yapılandırmalarını buraya ekleyin."
 
 msgid "Add agents…"
 msgstr "Ajan ekle…"
+
+msgid "Add an account to see its usage here."
+msgstr "Kullanımını burada görmek için bir hesap ekleyin."
 
 msgid "add an agent"
 msgstr "ajan ekleme"
@@ -2112,6 +2134,9 @@ msgstr "AI · Durum"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AI kimlik doğrulaması başarısız. Lütfen AI ayarlarınızı kontrol edin."
 
+msgid "AI usage"
+msgstr "Yapay zekâ kullanımı"
+
 msgid "Alert"
 msgstr "Uyarı"
 
@@ -2158,6 +2183,12 @@ msgstr "{0} hedefin tamamı {nextLabel} için üzerine düşeni yapıyor."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "{versionCount} sürümün tamamı ve içerikleri kaldırılır. Bağlantıya sahip herkes erişimini kaybeder."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Gizlemediğiniz tüm hesaplar ekranın kenarında görünür."
+
+msgid "All accounts are hidden."
+msgstr "Tüm hesaplar gizlendi."
 
 msgid "All assignees"
 msgstr "Tüm atananlar"
@@ -2971,6 +3002,9 @@ msgstr "Avatar güncellendi!"
 msgid "Awaiting {0}"
 msgstr "{0} bekleniyor"
 
+msgid "Awaiting refresh"
+msgstr "Yenileme bekleniyor"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Yanıt bekleniyor — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Kategori"
 msgid "Caution"
 msgstr "Dikkat"
 
+msgid "Celebrate quota resets"
+msgstr "Kota sıfırlamalarını kutla"
+
 msgid "Certificate Authority Invalid"
 msgstr "Sertifika yetkilisi geçersiz"
 
@@ -3838,6 +3875,9 @@ msgstr "Bir bölüm seçin."
 msgid "Choose agent"
 msgstr "Ajan seçin"
 
+msgid "Choose an account"
+msgstr "Hesap seçin"
+
 msgid "Choose an existing repo folder"
 msgstr "Mevcut bir depo klasörü seçin"
 
@@ -3858,6 +3898,9 @@ msgstr "Terminalde Cmd+tıkladığınızda dosya yollarının nasıl açılacağ
 
 msgid "Choose MCP servers for this message"
 msgstr "Bu ileti için MCP sunucularını seçin"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Her menü çubuğu simgesi için bir hesap seçin. Ekran kenarındaki panel, gizledikleriniz dışında tüm hesapları gösterir. Eksik veya güncel olmayan kullanım verileri tire ile gösterilir."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Uygulama içi tarayıcıdan neyin temizleneceğini seçin."
@@ -5104,6 +5147,9 @@ msgstr "Kuyruktan çıkılamadı"
 msgid "Could not list directory"
 msgstr "Dizin listelenemedi"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Hesaplar yüklenemedi. Tekrar denemek için yenileyin."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0} üzerinden ajanlar yüklenemedi"
@@ -5132,6 +5178,9 @@ msgstr "Bu fark yüklenemedi"
 msgid "Could not load this file."
 msgstr "Bu dosya yüklenemedi."
 
+msgid "Could not load usage display settings."
+msgstr "Kullanım görüntüleme ayarları yüklenemedi."
+
 msgid "Could not load your machines"
 msgstr "Makineleriniz yüklenemedi"
 
@@ -5149,6 +5198,9 @@ msgstr "Bağlantı açılamadı"
 
 msgid "Could not open Photos"
 msgstr "Fotoğraflar açılamadı"
+
+msgid "Could not open usage."
+msgstr "Kullanım açılamadı."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Devam ettirilemedi"
 
 msgid "Could not resume the chat"
 msgstr "Sohbete devam edilemedi"
+
+msgid "Could not save account color."
+msgstr "Hesap rengi kaydedilemedi."
+
+msgid "Could not save usage display settings."
+msgstr "Kullanım görüntüleme ayarları kaydedilemedi."
 
 msgid "Could not send"
 msgstr "Gönderilemedi"
@@ -5816,6 +5874,12 @@ msgstr "Kreatif Yönetici, Valid"
 msgid "Credentials stay on the server"
 msgstr "Kimlik bilgileri sunucuda kalır"
 
+msgid "Credit balance"
+msgstr "Kredi bakiyesi"
+
+msgid "Credits"
+msgstr "Krediler"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "packages/ui dışında yaşayan, özellikler arası bileşenler — yenisini geliştirmeden önce buraya bakın"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Varsayılan ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Varsayılan hesap"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Yeni çalışma alanları için varsayılan temel. Oluştururken her çalışma alanı için değiştirilebilir."
+
+msgid "Default color"
+msgstr "Varsayılan renk"
 
 msgid "Default effort"
 msgstr "Varsayılan çaba"
@@ -6953,6 +7023,9 @@ msgstr "{hostName} üzerinde bir üst dizin girin"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName} üzerinde bir yol girin"
+
+msgid "Enter a six-digit hex color."
+msgstr "Altı basamaklı onaltılık renk girin."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Yukarıdaki arama çubuğuna bir URL girin."
@@ -7986,6 +8059,9 @@ msgstr "Alev"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Ajan filoları planlar, uygular, birbirinin işini inceler ve test eder. İnsanlar yönü belirler, istisnalara hakemlik eder ve zevkin sahibi olur. İnsan dikkatinin birimi artık pull request değildir. Karardır."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Diğer uygulamaların üzerinde kalır. Hızlı görünümdeki hesapların oturumluk ve haftalık kullanımını gösterir."
+
 msgid "Focus Chat Input"
 msgstr "Sohbet girişine odaklan"
 
@@ -8556,6 +8632,9 @@ msgstr "Yardım ve belgeler"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Onaltılık renk"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" kenar çubuğundan gizlendi"
@@ -8571,6 +8650,9 @@ msgstr "Gizle"
 
 msgid "Hide {displayName}"
 msgstr "{displayName} Uygulamasını Gizle"
+
+msgid "Hide account"
+msgstr "Hesabı gizle"
 
 msgid "Hide checks"
 msgstr "Kontrolleri gizle"
@@ -9630,6 +9712,20 @@ msgstr "Son ajan etkinliği {0}"
 msgid "Last attached"
 msgstr "Son bağlanma"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Son kontrol {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Son kontrol {0} · canlı değil"
+
+msgid "Last checked {relativeTime}"
+msgstr "Son kontrol {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Son kontrol {relativeTime} · güncel değil"
+
 msgid "Last day of each month"
 msgstr "Her ayın son günü"
 
@@ -9998,6 +10094,9 @@ msgstr "Yükleyici · Braille spinner"
 msgid "Loading"
 msgstr "Yükleniyor"
 
+msgid "Loading accounts…"
+msgstr "Hesaplar yükleniyor…"
+
 msgid "Loading agent settings..."
 msgstr "Ajan ayarları yükleniyor..."
 
@@ -10240,6 +10339,9 @@ msgstr "Yönet"
 msgid "Manage {title}"
 msgstr "{title} yönet"
 
+msgid "Manage accounts"
+msgstr "Hesapları yönet"
+
 msgid "Manage accounts…"
 msgstr "Hesapları yönet…"
 
@@ -10434,6 +10536,15 @@ msgstr "Bellek payı"
 
 msgid "Mention."
 msgstr "Anın."
+
+msgid "Menu bar"
+msgstr "Menü çubuğu"
+
+msgid "Menu bar accounts"
+msgstr "Menü çubuğu hesapları"
+
+msgid "Menu bar quota window"
+msgstr "Menü çubuğu kota dönemi"
 
 msgid "Menubar"
 msgstr "Menü çubuğu"
@@ -10993,6 +11104,10 @@ msgstr "Sonraki ödeme: {nextDate} tarihinde {nextTotal}, artı havuzu aşan kul
 
 msgid "Next comment"
 msgstr "Sonraki yorum"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Bir sonraki sona erme: {0}"
 
 msgid "Next file"
 msgstr "Sonraki dosya"
@@ -12489,6 +12604,9 @@ msgstr "Çalışma alanını \"Şununla aç\" menüsünde seçilen uygulamada a�
 msgid "Open this run's workspace"
 msgstr "Bu çalıştırmanın çalışma alanını aç"
 
+msgid "Open usage"
+msgstr "Kullanımı aç"
+
 msgid "Open workspace"
 msgstr "Çalışma alanını aç"
 
@@ -13106,6 +13224,9 @@ msgstr "Depo başına ajan belleği"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Yalnızca izlenen Paradev kaynaklarının kullandığı toplam sistem RAM'i yüzdesi (tüm uygulamalar değil). Yüksek pay, Paradev'in sistem bellek baskısına önemli ölçüde katkıda bulunduğu anlamına gelir; düşük pay ise baskının büyük olasılıkla başka yerden geldiğini gösterir."
 
+msgid "Percentage"
+msgstr "Yüzde"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "\"{projectName}\" kalıcı olarak silinsin mi?"
 
@@ -13409,6 +13530,9 @@ msgstr "Ön ek"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Bu ekibin görev kimliklerinin ön eki. Değiştirmek ekipteki tüm görevleri yeniden adlandırır."
 
+msgid "Prepaid balance"
+msgstr "Ön ödemeli bakiye"
+
 msgid "Preparing"
 msgstr "Hazırlanıyor"
 
@@ -13510,6 +13634,9 @@ msgstr "Fiyatlandırma ekibinize ve kullanım senaryonuza bağlıdır. Bize ula�
 
 msgid "Primary"
 msgstr "Birincil"
+
+msgid "Primary display"
+msgstr "Birincil ekran"
 
 msgid "Primary Key"
 msgstr "Birincil anahtar"
@@ -13719,6 +13846,9 @@ msgstr "Özellikler"
 msgid "Provide either id or slug"
 msgstr "id veya slug değerlerinden birini sağlayın"
 
+msgid "Provider icons and percentages"
+msgstr "Sağlayıcı simgeleri ve yüzdeler"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Sağlayıcı: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Tamamen çık"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Oturum bilgilerinin diske kaydedilmesi için önce kaynak tarayıcıdan çıkın. Anahtar Zinciri erişimine izin vermeniz istenecek."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Kota tükendi. Sıfırlama zamanı bilinmiyor"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Kota tükendi. {countdown} sonra sıfırlanır"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Pull request'leri yenile"
 msgid "Refresh repositories"
 msgstr "Depoları yenile"
 
+msgid "Refresh usage"
+msgstr "Kullanımı yenile"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Claude Code bir sonraki çalıştığında yenilenir."
 
@@ -14219,6 +14358,12 @@ msgstr "Proje taşınsın mı?"
 
 msgid "Relocating…"
 msgstr "Taşınıyor…"
+
+msgid "remaining"
+msgstr "kalan"
+
+msgid "Remaining"
+msgstr "Kalan"
 
 msgid "rematch"
 msgstr "rövanş"
@@ -14590,6 +14735,11 @@ msgstr "Yakınlaştırmayı sıfırla"
 msgid "Reset Zoom"
 msgstr "Yakınlaştırmayı sıfırla"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Sıfırlanma zamanı: {0}"
+
 msgid "Resets {resetDate}"
 msgstr "{resetDate} tarihinde sıfırlanır"
 
@@ -14935,6 +15085,9 @@ msgstr "sağ panel"
 
 msgid "Right pane area"
 msgstr "Sağ panel alanı"
+
+msgid "Right screen edge"
+msgstr "Ekranın sağ kenarı"
 
 msgid "Right-click here"
 msgstr "Buraya sağ tıklayın"
@@ -15300,6 +15453,9 @@ msgstr "{0} sitede ara…"
 
 msgid "Search a developer"
 msgstr "Geliştirici ara"
+
+msgid "Search accounts"
+msgstr "Hesaplarda ara"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Dosya içeriklerinde ve tüm çalışma alanlarınızda aynı anda arama yapın."
@@ -15807,6 +15963,12 @@ msgstr "Oturum"
 msgid "Session {0}"
 msgstr "Oturum {0}"
 
+msgid "Session allowance renewed"
+msgstr "Oturum kotası yenilendi"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Oturum için konfeti, haftalık kota için daha büyük bir kutlama. Hareketi azalt ayarına uyar."
+
 msgid "Session details"
 msgstr "Oturum ayrıntıları"
 
@@ -16027,8 +16189,14 @@ msgstr "Sohbet giriş alanında bir mikrofon göster. Codex ChatGPT'de oturum a�
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Ana sayfa kenar çubuğunda, pull request'lerin altında bir Kullanım düğmesi göster"
 
+msgid "Show account"
+msgstr "Hesabı göster"
+
 msgid "Show all {count}"
 msgstr "Tümünü göster ({count})"
+
+msgid "Show all accounts"
+msgstr "Tüm hesapları göster"
 
 msgid "Show all comments"
 msgstr "Tüm yorumları göster"
@@ -16080,6 +16248,9 @@ msgstr "Daha az göster"
 
 msgid "Show file tree"
 msgstr "Dosya ağacını göster"
+
+msgid "Show hidden"
+msgstr "Gizlenenleri göster"
 
 msgid "Show in bar"
 msgstr "Çubukta göster"
@@ -16204,6 +16375,9 @@ msgstr "Bir uygulama güncellemesi kurulmaya hazır olduğunda gösterilen kenar
 
 msgid "Sign in"
 msgstr "Oturum aç"
+
+msgid "Sign in again"
+msgstr "Yeniden oturum aç"
 
 msgid "Sign in again to use dictation"
 msgstr "Sesle yazmayı kullanmak için yeniden oturum açın"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp yalnızca o bölme için bir uç nokta yazdırır. 
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset artık Paradev. Bir de 11,5 milyon dolarlık tohum yatırımı aldık"
+
+msgid "Superset logo"
+msgstr "Superset logosu"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
@@ -19028,14 +19205,26 @@ msgstr "Kuruluşunuz içinde benzersiz, URL dostu tanımlayıcı."
 msgid "Usage"
 msgstr "Kullanım"
 
+msgid "Usage at a glance"
+msgstr "Bir bakışta kullanım"
+
+msgid "Usage display settings"
+msgstr "Kullanım görüntüleme ayarları"
+
 msgid "Usage is out of date"
 msgstr "Kullanım verileri güncel değil"
 
 msgid "Usage sections"
 msgstr "Kullanım bölümleri"
 
+msgid "Usage unavailable"
+msgstr "Kullanım bilgisi yok"
+
 msgid "Usage unavailable."
 msgstr "Kullanım bilgisi yok."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Kullanım bilgisi alınamıyor. Bağlantıyı kontrol etmek için Superset’i açın."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Sesli yazıya dökme ve bas-konuş özelliklerini kullanın."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Mevcut ajan aboneliklerinizi ve API anahtarlarınızı kullanın. Paradev model çağrılarını asla vekil olarak iletmez ve iş akışınızı tek bir sağlayıcıya kilitlemez."
+
+msgid "used"
+msgstr "kullanılan"
+
+msgid "Used"
+msgstr "Kullanılan"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Menü çubuğunda ve yüzen panelde kullanılır."
 
 msgid "Used in URLs and APIs."
 msgstr "URL'lerde ve API'lerde kullanılır."
@@ -19485,6 +19683,9 @@ msgstr "haftalık"
 
 msgid "Weekly"
 msgstr "Haftalık"
+
+msgid "Weekly allowance renewed"
+msgstr "Haftalık kota yenilendi"
 
 msgid "Weekly at {time}"
 msgstr "Her hafta saat {time}"
@@ -20086,6 +20287,9 @@ msgstr "Hesabınız devre dışı bırakıldı ve yakında kalıcı olarak silin
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Hesabınız kuruluşunuz tarafından yönetiliyor. Yeni bir kuruluş oluşturmak için yöneticinizle iletişime geçin."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Hesaplarınız ve kotalarınız, menü çubuğunda veya ekranın sağ kenarında."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Ajanınız superset browser komutlarıyla herhangi bir sayfayı açıp içinde ilerleyebilir. İzlediğiniz bölmeyi kullandığı için her adımı görürsünüz."

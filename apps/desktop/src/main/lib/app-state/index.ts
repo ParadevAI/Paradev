@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { JSONFilePreset } from "lowdb/node";
+import { readWidgetPreferences } from "shared/usage-widget/model";
 import { APP_STATE_PATH } from "../app-environment";
 import { pruneV1AgentSessions } from "./prune-v1-agent-sessions";
 import type { AppState } from "./schemas";
@@ -31,6 +32,7 @@ function ensureValidShape(data: Partial<AppState>): AppState {
 		...Object.values(tabsStateByWindow),
 	]);
 	return {
+		usageWidget: readWidgetPreferences(data.usageWidget),
 		tabsState,
 		tabsStateByWindow,
 		v1AgentSessions,

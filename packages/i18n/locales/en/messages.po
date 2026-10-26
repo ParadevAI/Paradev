@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# project} other {# projects}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repositories}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# reset available} other {# resets available}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# comment} other {# comments}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# file} other {# files}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# reset available} other {# resets available}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# search} other {# searches}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "Account"
 
+msgid "Account appearance"
+msgstr "Account appearance"
+
+msgid "Account color"
+msgstr "Account color"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Account install resolves first-party manifests only, so {plugin} from {marketplace} cannot be installed to your account yet. It stays installed on this machine."
@@ -1708,6 +1721,9 @@ msgstr "Account name"
 
 msgid "Account pending deletion"
 msgstr "Account pending deletion"
+
+msgid "Account unavailable"
+msgstr "Account unavailable"
 
 msgid "Account usage"
 msgstr "Account usage"
@@ -1756,6 +1772,9 @@ msgstr "Active organization required to create an API key"
 
 msgid "Active sessions"
 msgstr "Active sessions"
+
+msgid "Active window"
+msgstr "Active window"
 
 msgid "Activity"
 msgstr "Activity"
@@ -1806,6 +1825,9 @@ msgstr "Add agent configs here later when you want to publish them."
 
 msgid "Add agents…"
 msgstr "Add agents…"
+
+msgid "Add an account to see its usage here."
+msgstr "Add an account to see its usage here."
 
 msgid "add an agent"
 msgstr "add an agent"
@@ -2112,6 +2134,9 @@ msgstr "AI · Status"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AI authentication failed. Please check your AI settings."
 
+msgid "AI usage"
+msgstr "AI usage"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "All {0} objectives are carrying their weight for {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "All {versionCount} versions and their content are removed. Anyone with the link loses access."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "All accounts appear on the edge unless you hide them."
+
+msgid "All accounts are hidden."
+msgstr "All accounts are hidden."
 
 msgid "All assignees"
 msgstr "All assignees"
@@ -2971,6 +3002,9 @@ msgstr "Avatar updated!"
 msgid "Awaiting {0}"
 msgstr "Awaiting {0}"
 
+msgid "Awaiting refresh"
+msgstr "Awaiting refresh"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Awaiting Response — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Category"
 msgid "Caution"
 msgstr "Caution"
 
+msgid "Celebrate quota resets"
+msgstr "Celebrate quota resets"
+
 msgid "Certificate Authority Invalid"
 msgstr "Certificate Authority Invalid"
 
@@ -3838,6 +3875,9 @@ msgstr "Choose a section."
 msgid "Choose agent"
 msgstr "Choose agent"
 
+msgid "Choose an account"
+msgstr "Choose an account"
+
 msgid "Choose an existing repo folder"
 msgstr "Choose an existing repo folder"
 
@@ -3858,6 +3898,9 @@ msgstr "Choose how to open file paths when Cmd+clicking in the terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Choose MCP servers for this message"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Choose what to clear from the in-app browser."
@@ -5104,6 +5147,9 @@ msgstr "Could not leave the queue"
 msgid "Could not list directory"
 msgstr "Could not list directory"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Could not load accounts. Refresh to try again."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Could not load agents from {0}"
@@ -5132,6 +5178,9 @@ msgstr "Could not load this diff"
 msgid "Could not load this file."
 msgstr "Could not load this file."
 
+msgid "Could not load usage display settings."
+msgstr "Could not load usage display settings."
+
 msgid "Could not load your machines"
 msgstr "Could not load your machines"
 
@@ -5149,6 +5198,9 @@ msgstr "Could not open link"
 
 msgid "Could not open Photos"
 msgstr "Could not open Photos"
+
+msgid "Could not open usage."
+msgstr "Could not open usage."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Could not resume"
 
 msgid "Could not resume the chat"
 msgstr "Could not resume the chat"
+
+msgid "Could not save account color."
+msgstr "Could not save account color."
+
+msgid "Could not save usage display settings."
+msgstr "Could not save usage display settings."
 
 msgid "Could not send"
 msgstr "Could not send"
@@ -5816,6 +5874,12 @@ msgstr "Creative Manager, Valid"
 msgid "Credentials stay on the server"
 msgstr "Credentials stay on the server"
 
+msgid "Credit balance"
+msgstr "Credit balance"
+
+msgid "Credits"
+msgstr "Credits"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Cross-feature components living outside packages/ui — check here before building a new one"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Default ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Default account"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Default base for new workspaces. Override per-workspace at creation."
+
+msgid "Default color"
+msgstr "Default color"
 
 msgid "Default effort"
 msgstr "Default effort"
@@ -6953,6 +7023,9 @@ msgstr "Enter a parent directory on {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Enter a path on {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Enter a six-digit hex color."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Enter a URL into the search bar above."
@@ -7986,6 +8059,9 @@ msgstr "Flame"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+
 msgid "Focus Chat Input"
 msgstr "Focus Chat Input"
 
@@ -8556,6 +8632,9 @@ msgstr "Help & Docs"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Hex color"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Hid \"{0}\" from the sidebar"
@@ -8571,6 +8650,9 @@ msgstr "Hide"
 
 msgid "Hide {displayName}"
 msgstr "Hide {displayName}"
+
+msgid "Hide account"
+msgstr "Hide account"
 
 msgid "Hide checks"
 msgstr "Hide checks"
@@ -9630,6 +9712,20 @@ msgstr "Last agent activity {0}"
 msgid "Last attached"
 msgstr "Last attached"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Last checked {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Last checked {0} · not live"
+
+msgid "Last checked {relativeTime}"
+msgstr "Last checked {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Last checked {relativeTime} · not live"
+
 msgid "Last day of each month"
 msgstr "Last day of each month"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Loading"
 
+msgid "Loading accounts…"
+msgstr "Loading accounts…"
+
 msgid "Loading agent settings..."
 msgstr "Loading agent settings..."
 
@@ -10240,6 +10339,9 @@ msgstr "Manage"
 msgid "Manage {title}"
 msgstr "Manage {title}"
 
+msgid "Manage accounts"
+msgstr "Manage accounts"
+
 msgid "Manage accounts…"
 msgstr "Manage accounts…"
 
@@ -10434,6 +10536,15 @@ msgstr "Memory share"
 
 msgid "Mention."
 msgstr "Mention."
+
+msgid "Menu bar"
+msgstr "Menu bar"
+
+msgid "Menu bar accounts"
+msgstr "Menu bar accounts"
+
+msgid "Menu bar quota window"
+msgstr "Menu bar quota window"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10993,6 +11104,10 @@ msgstr "Next charge: {nextTotal} on {nextDate}, plus any usage past the pool."
 
 msgid "Next comment"
 msgstr "Next comment"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Next expires {0}"
 
 msgid "Next file"
 msgstr "Next file"
@@ -12489,6 +12604,9 @@ msgstr "Open the workspace in the app picked in the Open In menu (VS Code, Curso
 msgid "Open this run's workspace"
 msgstr "Open this run's workspace"
 
+msgid "Open usage"
+msgstr "Open usage"
+
 msgid "Open workspace"
 msgstr "Open workspace"
 
@@ -13106,6 +13224,9 @@ msgstr "Per-repo agent memory"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 
+msgid "Percentage"
+msgstr "Percentage"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Permanently delete \"{projectName}\"?"
 
@@ -13409,6 +13530,9 @@ msgstr "Prefix"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Prefix of this team's task IDs. Changing it renames every task in the team."
 
+msgid "Prepaid balance"
+msgstr "Prepaid balance"
+
 msgid "Preparing"
 msgstr "Preparing"
 
@@ -13510,6 +13634,9 @@ msgstr "Pricing depends on your team and use case. Get in touch and we'll put to
 
 msgid "Primary"
 msgstr "Primary"
+
+msgid "Primary display"
+msgstr "Primary display"
 
 msgid "Primary Key"
 msgstr "Primary Key"
@@ -13719,6 +13846,9 @@ msgstr "Properties"
 msgid "Provide either id or slug"
 msgstr "Provide either id or slug"
 
+msgid "Provider icons and percentages"
+msgstr "Provider icons and percentages"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Provider: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Quit Completely"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Quota exhausted. Reset time unavailable"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Quota exhausted. Resets in {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Refresh pull requests"
 msgid "Refresh repositories"
 msgstr "Refresh repositories"
 
+msgid "Refresh usage"
+msgstr "Refresh usage"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Refreshes when Claude Code next runs."
 
@@ -14219,6 +14358,12 @@ msgstr "Relocate project?"
 
 msgid "Relocating…"
 msgstr "Relocating…"
+
+msgid "remaining"
+msgstr "remaining"
+
+msgid "Remaining"
+msgstr "Remaining"
 
 msgid "rematch"
 msgstr "rematch"
@@ -14590,6 +14735,11 @@ msgstr "Reset zoom"
 msgid "Reset Zoom"
 msgstr "Reset Zoom"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Resets {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Resets {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "right pane"
 
 msgid "Right pane area"
 msgstr "Right pane area"
+
+msgid "Right screen edge"
+msgstr "Right screen edge"
 
 msgid "Right-click here"
 msgstr "Right-click here"
@@ -15300,6 +15453,9 @@ msgstr "Search {0} sites…"
 
 msgid "Search a developer"
 msgstr "Search a developer"
+
+msgid "Search accounts"
+msgstr "Search accounts"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Search across file contents and across all your workspaces at once."
@@ -15807,6 +15963,12 @@ msgstr "Session"
 msgid "Session {0}"
 msgstr "Session {0}"
 
+msgid "Session allowance renewed"
+msgstr "Session allowance renewed"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Session confetti and a larger weekly celebration. Respects reduced motion."
+
 msgid "Session details"
 msgstr "Session details"
 
@@ -16027,8 +16189,14 @@ msgstr "Show a microphone in the chat composer. Speech is transcribed by ChatGPT
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Show a Usage button in the home sidebar, under Pull requests"
 
+msgid "Show account"
+msgstr "Show account"
+
 msgid "Show all {count}"
 msgstr "Show all {count}"
+
+msgid "Show all accounts"
+msgstr "Show all accounts"
 
 msgid "Show all comments"
 msgstr "Show all comments"
@@ -16080,6 +16248,9 @@ msgstr "Show fewer"
 
 msgid "Show file tree"
 msgstr "Show file tree"
+
+msgid "Show hidden"
+msgstr "Show hidden"
 
 msgid "Show in bar"
 msgstr "Show in bar"
@@ -16204,6 +16375,9 @@ msgstr "Sidebar pill shown when an app update is ready to install"
 
 msgid "Sign in"
 msgstr "Sign in"
+
+msgid "Sign in again"
+msgstr "Sign in again"
 
 msgid "Sign in again to use dictation"
 msgstr "Sign in again to use dictation"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp prints an endpoint for that pane only. Point Playwr
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset is now Paradev. Also, we raised an $11.5M seed"
+
+msgid "Superset logo"
+msgstr "Superset logo"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile launches on iPhone"
@@ -19028,14 +19205,26 @@ msgstr "URL-friendly identifier, unique within your organization."
 msgid "Usage"
 msgstr "Usage"
 
+msgid "Usage at a glance"
+msgstr "Usage at a glance"
+
+msgid "Usage display settings"
+msgstr "Usage display settings"
+
 msgid "Usage is out of date"
 msgstr "Usage is out of date"
 
 msgid "Usage sections"
 msgstr "Usage sections"
 
+msgid "Usage unavailable"
+msgstr "Usage unavailable"
+
 msgid "Usage unavailable."
 msgstr "Usage unavailable."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Usage unavailable. Open Superset to check the connection."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Use voice transcription and push-to-talk features."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
+
+msgid "used"
+msgstr "used"
+
+msgid "Used"
+msgstr "Used"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Used in the menu bar and floating panel."
 
 msgid "Used in URLs and APIs."
 msgstr "Used in URLs and APIs."
@@ -19485,6 +19683,9 @@ msgstr "weekly"
 
 msgid "Weekly"
 msgstr "Weekly"
+
+msgid "Weekly allowance renewed"
+msgstr "Weekly allowance renewed"
 
 msgid "Weekly at {time}"
 msgstr "Weekly at {time}"
@@ -20086,6 +20287,9 @@ msgstr "Your account is deactivated and will be permanently deleted soon. Reacti
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Your account is managed by your organization. Contact your admin to create a new organization."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Your accounts and quotas, in the menu bar or on the right screen edge."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."

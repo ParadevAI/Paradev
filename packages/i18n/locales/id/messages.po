@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# proyek} other {# proyek}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repositori} other {# repositori}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# reset tersedia} other {# reset tersedia}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# hasil di Cloud} other {# hasil di Cloud}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# komentar} other {# komentar}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# file} other {# file}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# reset tersedia} other {# reset tersedia}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# pencarian} other {# pencarian}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "Akun"
 
+msgid "Account appearance"
+msgstr "Tampilan akun"
+
+msgid "Account color"
+msgstr "Warna akun"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Instalasi ke akun hanya menangani manifes internal, jadi {plugin} dari {marketplace} belum dapat dipasang ke akun Anda. Plugin tetap terpasang di mesin ini."
@@ -1708,6 +1721,9 @@ msgstr "Nama akun"
 
 msgid "Account pending deletion"
 msgstr "Akun menunggu penghapusan"
+
+msgid "Account unavailable"
+msgstr "Akun tidak tersedia"
 
 msgid "Account usage"
 msgstr "Penggunaan akun"
@@ -1756,6 +1772,9 @@ msgstr "Organisasi aktif diperlukan untuk membuat kunci API"
 
 msgid "Active sessions"
 msgstr "Sesi aktif"
+
+msgid "Active window"
+msgstr "Jendela aktif"
 
 msgid "Activity"
 msgstr "Aktivitas"
@@ -1806,6 +1825,9 @@ msgstr "Tambahkan konfigurasi agen di sini nanti saat Anda ingin mempublikasikan
 
 msgid "Add agents…"
 msgstr "Tambah agen…"
+
+msgid "Add an account to see its usage here."
+msgstr "Tambahkan akun untuk melihat penggunaannya di sini."
 
 msgid "add an agent"
 msgstr "menambah agen"
@@ -2112,6 +2134,9 @@ msgstr "AI · Status"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Autentikasi AI gagal. Silakan periksa pengaturan AI Anda."
 
+msgid "AI usage"
+msgstr "Penggunaan AI"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "Semua {0} sasaran menopang untuk {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Semua {versionCount} versi beserta isinya dihapus. Siapa pun yang punya tautannya kehilangan akses."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Semua akun ditampilkan di tepi layar kecuali Anda menyembunyikannya."
+
+msgid "All accounts are hidden."
+msgstr "Semua akun disembunyikan."
 
 msgid "All assignees"
 msgstr "Semua penerima tugas"
@@ -2971,6 +3002,9 @@ msgstr "Avatar diperbarui!"
 msgid "Awaiting {0}"
 msgstr "Menunggu {0}"
 
+msgid "Awaiting refresh"
+msgstr "Menunggu penyegaran"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Menunggu Balasan — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Kategori"
 msgid "Caution"
 msgstr "Perhatian"
 
+msgid "Celebrate quota resets"
+msgstr "Rayakan penyetelan ulang kuota"
+
 msgid "Certificate Authority Invalid"
 msgstr "Certificate Authority Tidak Valid"
 
@@ -3838,6 +3875,9 @@ msgstr "Pilih sebuah bagian."
 msgid "Choose agent"
 msgstr "Pilih agen"
 
+msgid "Choose an account"
+msgstr "Pilih akun"
+
 msgid "Choose an existing repo folder"
 msgstr "Pilih folder repo yang sudah ada"
 
@@ -3858,6 +3898,9 @@ msgstr "Pilih cara membuka path file saat Cmd+klik di terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Pilih server MCP untuk pesan ini"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Pilih satu akun untuk setiap ikon bilah menu. Panel di tepi layar menampilkan semua akun kecuali yang Anda sembunyikan. Data penggunaan yang tidak tersedia atau kedaluwarsa ditampilkan sebagai tanda pisah."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Pilih apa yang ingin dibersihkan dari browser dalam aplikasi."
@@ -5104,6 +5147,9 @@ msgstr "Tidak bisa keluar dari antrean"
 msgid "Could not list directory"
 msgstr "Tidak bisa menampilkan isi direktori"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Akun tidak dapat dimuat. Segarkan untuk mencoba lagi."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Tidak bisa memuat agen dari {0}"
@@ -5132,6 +5178,9 @@ msgstr "Tidak bisa memuat diff ini"
 msgid "Could not load this file."
 msgstr "Tidak bisa memuat file ini."
 
+msgid "Could not load usage display settings."
+msgstr "Tidak dapat memuat pengaturan tampilan penggunaan."
+
 msgid "Could not load your machines"
 msgstr "Tidak bisa memuat mesin Anda"
 
@@ -5149,6 +5198,9 @@ msgstr "Tidak bisa membuka tautan"
 
 msgid "Could not open Photos"
 msgstr "Tidak bisa membuka Photos"
+
+msgid "Could not open usage."
+msgstr "Tidak dapat membuka penggunaan."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Tidak dapat melanjutkan"
 
 msgid "Could not resume the chat"
 msgstr "Tidak dapat melanjutkan obrolan"
+
+msgid "Could not save account color."
+msgstr "Warna akun tidak dapat disimpan."
+
+msgid "Could not save usage display settings."
+msgstr "Tidak dapat menyimpan pengaturan tampilan penggunaan."
 
 msgid "Could not send"
 msgstr "Tidak bisa mengirim"
@@ -5816,6 +5874,12 @@ msgstr "Manajer Kreatif, Valid"
 msgid "Credentials stay on the server"
 msgstr "Kredensial tetap di server"
 
+msgid "Credit balance"
+msgstr "Saldo kredit"
+
+msgid "Credits"
+msgstr "Kredit"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Komponen lintas fitur yang berada di luar packages/ui — cek di sini sebelum membuat yang baru"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Bawaan ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Akun default"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Dasar default untuk ruang kerja baru. Dapat diganti per ruang kerja saat dibuat."
+
+msgid "Default color"
+msgstr "Warna default"
 
 msgid "Default effort"
 msgstr "Effort bawaan"
@@ -6953,6 +7023,9 @@ msgstr "Masukkan direktori induk di {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Masukkan sebuah path di {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Masukkan warna heksadesimal enam digit."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Masukkan URL ke bilah pencarian di atas."
@@ -7986,6 +8059,9 @@ msgstr "Api"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Armada agen merencanakan, mengimplementasi, mereview, dan menguji pekerjaan satu sama lain. Manusia menetapkan arah, menengahi pengecualian, dan memegang selera. Satuan perhatian manusia bukan lagi pull request, melainkan keputusan."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Mengambang di atas aplikasi lain. Menampilkan penggunaan sesi dan mingguan akun di tampilan cepat."
+
 msgid "Focus Chat Input"
 msgstr "Fokus ke Input Chat"
 
@@ -8556,6 +8632,9 @@ msgstr "Bantuan & Dokumentasi"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Warna heksadesimal"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" disembunyikan dari sidebar"
@@ -8571,6 +8650,9 @@ msgstr "Sembunyikan"
 
 msgid "Hide {displayName}"
 msgstr "Sembunyikan {displayName}"
+
+msgid "Hide account"
+msgstr "Sembunyikan akun"
 
 msgid "Hide checks"
 msgstr "Sembunyikan check"
@@ -9630,6 +9712,20 @@ msgstr "Aktivitas agen terakhir {0}"
 msgid "Last attached"
 msgstr "Terakhir terhubung"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Terakhir diperiksa {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Terakhir diperiksa {0} · bukan data langsung"
+
+msgid "Last checked {relativeTime}"
+msgstr "Terakhir diperiksa {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Terakhir diperiksa {relativeTime} · bukan data terkini"
+
 msgid "Last day of each month"
 msgstr "Hari terakhir tiap bulan"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Memuat"
 
+msgid "Loading accounts…"
+msgstr "Memuat akun…"
+
 msgid "Loading agent settings..."
 msgstr "Memuat pengaturan agen..."
 
@@ -10240,6 +10339,9 @@ msgstr "Kelola"
 msgid "Manage {title}"
 msgstr "Kelola {title}"
 
+msgid "Manage accounts"
+msgstr "Kelola akun"
+
 msgid "Manage accounts…"
 msgstr "Kelola akun…"
 
@@ -10434,6 +10536,15 @@ msgstr "Porsi memori"
 
 msgid "Mention."
 msgstr "Sebut."
+
+msgid "Menu bar"
+msgstr "Bilah menu"
+
+msgid "Menu bar accounts"
+msgstr "Akun bilah menu"
+
+msgid "Menu bar quota window"
+msgstr "Periode kuota bilah menu"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10993,6 +11104,10 @@ msgstr "Tagihan berikutnya: {nextTotal} pada {nextDate}, ditambah pemakaian di l
 
 msgid "Next comment"
 msgstr "Komentar berikutnya"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Berikutnya kedaluwarsa {0}"
 
 msgid "Next file"
 msgstr "File berikutnya"
@@ -12489,6 +12604,9 @@ msgstr "Buka workspace di aplikasi yang dipilih di menu \"Buka di\" (VS Code, Cu
 msgid "Open this run's workspace"
 msgstr "Buka workspace run ini"
 
+msgid "Open usage"
+msgstr "Buka penggunaan"
+
 msgid "Open workspace"
 msgstr "Buka workspace"
 
@@ -13106,6 +13224,9 @@ msgstr "Memori agen per repositori"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Persentase total RAM sistem yang dipakai hanya oleh sumber daya Paradev yang dipantau (bukan semua aplikasi). Porsi tinggi berarti Paradev penyumbang utama tekanan memori sistem; porsi rendah berarti tekanannya kemungkinan dari tempat lain."
 
+msgid "Percentage"
+msgstr "Persentase"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Hapus \"{projectName}\" secara permanen?"
 
@@ -13409,6 +13530,9 @@ msgstr "Prefix"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Awalan ID tugas tim ini. Mengubahnya akan mengganti nama semua tugas dalam tim."
 
+msgid "Prepaid balance"
+msgstr "Saldo prabayar"
+
 msgid "Preparing"
 msgstr "Menyiapkan"
 
@@ -13510,6 +13634,9 @@ msgstr "Harga tergantung tim dan kasus penggunaan Anda. Hubungi kami dan kami ak
 
 msgid "Primary"
 msgstr "Primer"
+
+msgid "Primary display"
+msgstr "Layar utama"
 
 msgid "Primary Key"
 msgstr "Primary Key"
@@ -13719,6 +13846,9 @@ msgstr "Properti"
 msgid "Provide either id or slug"
 msgstr "Berikan id atau slug"
 
+msgid "Provider icons and percentages"
+msgstr "Ikon penyedia dan persentase"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Penyedia: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Keluar Sepenuhnya"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Tutup dulu browser sumbernya agar login-nya tersimpan ke disk. Anda akan diminta mengizinkan akses Keychain."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Kuota habis. Waktu reset tidak tersedia"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Kuota habis. Reset dalam {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Segarkan pull request"
 msgid "Refresh repositories"
 msgstr "Segarkan repositori"
 
+msgid "Refresh usage"
+msgstr "Segarkan penggunaan"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Diperbarui saat Claude Code berikutnya dijalankan."
 
@@ -14219,6 +14358,12 @@ msgstr "Pindahkan proyek?"
 
 msgid "Relocating…"
 msgstr "Memindahkan…"
+
+msgid "remaining"
+msgstr "tersisa"
+
+msgid "Remaining"
+msgstr "Tersisa"
 
 msgid "rematch"
 msgstr "tanding ulang"
@@ -14590,6 +14735,11 @@ msgstr "Reset zoom"
 msgid "Reset Zoom"
 msgstr "Reset zoom"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Direset {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Direset pada {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "panel kanan"
 
 msgid "Right pane area"
 msgstr "Area panel kanan"
+
+msgid "Right screen edge"
+msgstr "Tepi kanan layar"
 
 msgid "Right-click here"
 msgstr "Klik kanan di sini"
@@ -15300,6 +15453,9 @@ msgstr "Cari {0} situs…"
 
 msgid "Search a developer"
 msgstr "Cari pengembang"
+
+msgid "Search accounts"
+msgstr "Cari akun"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cari isi file dan seluruh workspace Anda sekaligus."
@@ -15807,6 +15963,12 @@ msgstr "Sesi"
 msgid "Session {0}"
 msgstr "Sesi {0}"
 
+msgid "Session allowance renewed"
+msgstr "Kuota sesi diperbarui"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Konfeti untuk sesi dan perayaan lebih besar untuk kuota mingguan. Mengikuti pengaturan kurangi gerakan."
+
 msgid "Session details"
 msgstr "Detail sesi"
 
@@ -16027,8 +16189,14 @@ msgstr "Tampilkan mikrofon di kolom chat. Ucapan ditranskripsi oleh ChatGPT jika
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Tampilkan tombol Penggunaan di sidebar beranda, di bawah Pull request"
 
+msgid "Show account"
+msgstr "Tampilkan akun"
+
 msgid "Show all {count}"
 msgstr "Tampilkan semua {count}"
+
+msgid "Show all accounts"
+msgstr "Tampilkan semua akun"
 
 msgid "Show all comments"
 msgstr "Tampilkan semua komentar"
@@ -16080,6 +16248,9 @@ msgstr "Tampilkan lebih sedikit"
 
 msgid "Show file tree"
 msgstr "Tampilkan pohon file"
+
+msgid "Show hidden"
+msgstr "Tampilkan yang tersembunyi"
 
 msgid "Show in bar"
 msgstr "Tampilkan di bilah"
@@ -16204,6 +16375,9 @@ msgstr "Pil sidebar yang muncul saat pembaruan aplikasi siap dipasang"
 
 msgid "Sign in"
 msgstr "Masuk"
+
+msgid "Sign in again"
+msgstr "Masuk lagi"
 
 msgid "Sign in again to use dictation"
 msgstr "Masuk lagi untuk menggunakan dikte"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp mencetak endpoint hanya untuk panel itu. Arahkan Pl
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset kini menjadi Paradev. Oh ya, kami juga meraih pendanaan awal senilai $11,5 juta"
+
+msgid "Superset logo"
+msgstr "Logo Superset"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile hadir di iPhone"
@@ -19028,14 +19205,26 @@ msgstr "Pengenal ramah URL, unik di dalam organisasi Anda."
 msgid "Usage"
 msgstr "Penggunaan"
 
+msgid "Usage at a glance"
+msgstr "Sekilas penggunaan"
+
+msgid "Usage display settings"
+msgstr "Pengaturan tampilan penggunaan"
+
 msgid "Usage is out of date"
 msgstr "Data penggunaan sudah tidak mutakhir"
 
 msgid "Usage sections"
 msgstr "Bagian penggunaan"
 
+msgid "Usage unavailable"
+msgstr "Penggunaan tidak tersedia"
+
 msgid "Usage unavailable."
 msgstr "Penggunaan tidak tersedia."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Penggunaan tidak tersedia. Buka Superset untuk memeriksa koneksi."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Memakai transkripsi suara dan fitur push-to-talk."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Pakai langganan agen dan kunci API Anda yang sudah ada. Paradev tidak pernah mem-proxy panggilan model atau mengunci alur kerja Anda ke satu penyedia."
+
+msgid "used"
+msgstr "terpakai"
+
+msgid "Used"
+msgstr "Terpakai"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Digunakan di bar menu dan panel mengambang."
 
 msgid "Used in URLs and APIs."
 msgstr "Dipakai di URL dan API."
@@ -19485,6 +19683,9 @@ msgstr "mingguan"
 
 msgid "Weekly"
 msgstr "Mingguan"
+
+msgid "Weekly allowance renewed"
+msgstr "Kuota mingguan diperbarui"
 
 msgid "Weekly at {time}"
 msgstr "Mingguan pukul {time}"
@@ -20086,6 +20287,9 @@ msgstr "Akun Anda dinonaktifkan dan akan segera dihapus permanen. Aktifkan kemba
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Akun Anda dikelola oleh organisasi Anda. Hubungi admin Anda untuk membuat organisasi baru."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Akun dan kuota Anda, di bilah menu atau tepi kanan layar."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agen Anda bisa membuka halaman apa pun dan menjelajahinya dengan perintah superset browser. Agen memakai panel yang sedang Anda lihat, jadi Anda melihat setiap langkah."

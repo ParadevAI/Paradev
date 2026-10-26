@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
-import { readFile, realpath, stat } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
+import { readProfileFile } from "../profile-file";
 import {
 	API_BILLING_MARKER,
 	discoverClaudeProfiles,
@@ -23,8 +24,8 @@ async function hasApiMarker(
 ): Promise<boolean> {
 	try {
 		const file = join(directory, API_BILLING_MARKER);
-		if ((await stat(file)).size > 64) return false;
-		return (await readFile(file, "utf8")).trim() === agent;
+		const record = await readProfileFile(file, 64);
+		return record?.content.trim() === agent;
 	} catch {
 		return false;
 	}
@@ -46,8 +47,9 @@ export async function readAccountIdentity(
 						(await canonical(join(homedir(), ".claude")))
 					? join(homedir(), ".claude.json")
 					: join(directory, ".claude.json");
-		if ((await stat(file)).size > 50 * 1024 * 1024) return null;
-		const data = JSON.parse(await readFile(file, "utf8"));
+		const record = await readProfileFile(file, 50 * 1024 * 1024);
+		if (!record) return null;
+		const data = JSON.parse(record.content);
 		const claims =
 			agent === "codex" && typeof data.tokens?.id_token === "string"
 				? JSON.parse(

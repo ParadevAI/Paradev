@@ -24,6 +24,7 @@ export const SETTING_ITEM_ID = {
 
 	TEAMS_LIST: "teams-list",
 
+	APPEARANCE_USAGE_WIDGET: "appearance-usage-widget",
 	APPEARANCE_THEME: "appearance-theme",
 	APPEARANCE_LANGUAGE: "appearance-language",
 	APPEARANCE_MARKDOWN: "appearance-markdown",
@@ -177,6 +178,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 
 	[SETTING_ITEM_ID.TEAMS_LIST]: "shared",
 
+	[SETTING_ITEM_ID.APPEARANCE_USAGE_WIDGET]: "shared",
 	[SETTING_ITEM_ID.APPEARANCE_THEME]: "shared",
 	[SETTING_ITEM_ID.APPEARANCE_LANGUAGE]: "shared",
 	[SETTING_ITEM_ID.APPEARANCE_MARKDOWN]: "shared",
@@ -693,6 +695,22 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"blink",
 			"custom",
 			"nerd",
+		],
+	},
+
+	{
+		id: SETTING_ITEM_ID.APPEARANCE_USAGE_WIDGET,
+		section: "appearance",
+		title: "Account usage display",
+		description:
+			"Menu bar, floating edge, per-account colors and usage privacy",
+		keywords: [
+			"menu bar",
+			"floating",
+			"usage",
+			"quota",
+			"notch",
+			"account color",
 		],
 	},
 	{

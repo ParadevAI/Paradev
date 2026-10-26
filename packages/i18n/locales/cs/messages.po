@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektu} other {# 
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repozitář} few {# repozitáře} many {# repozitáře} other {# repozitářů}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# obnovení dostupné} few {# obnovení dostupná} many {# obnovení dostupného} other {# obnovení dostupných}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# výsledek v Cloudu} few {# výsledky v Cloudu} many {# výsledku v Cloudu} other {# výsledků v Cloudu}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# komentář} few {# komentáře} many {# komentá�
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# obnovení dostupné} few {# obnovení dostupná} many {# obnovení dostupného} other {# obnovení dostupných}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# hledání} few {# hledání} many {# hledání} other {# hledání}}"
@@ -1696,6 +1703,12 @@ msgstr "Akordeon"
 msgid "Account"
 msgstr "Účet"
 
+msgid "Account appearance"
+msgstr "Vzhled účtu"
+
+msgid "Account color"
+msgstr "Barva účtu"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Instalace do účtu zpracovává jen manifesty první strany, takže {plugin} z {marketplace} zatím nelze nainstalovat do vašeho účtu. Zůstává nainstalován na tomto počítači."
@@ -1708,6 +1721,9 @@ msgstr "Název účtu"
 
 msgid "Account pending deletion"
 msgstr "Účet čeká na smazání"
+
+msgid "Account unavailable"
+msgstr "Účet není dostupný"
 
 msgid "Account usage"
 msgstr "Využití účtu"
@@ -1756,6 +1772,9 @@ msgstr "K vytvoření API klíče je potřeba aktivní organizace"
 
 msgid "Active sessions"
 msgstr "Aktivní relace"
+
+msgid "Active window"
+msgstr "Aktivní okno"
 
 msgid "Activity"
 msgstr "Aktivita"
@@ -1806,6 +1825,9 @@ msgstr "Konfigurace agentů sem přidejte později, až je budete chtít zveřej
 
 msgid "Add agents…"
 msgstr "Přidat agenty…"
+
+msgid "Add an account to see its usage here."
+msgstr "Přidejte účet a zobrazte zde jeho využití."
 
 msgid "add an agent"
 msgstr "přidat agenta"
@@ -2112,6 +2134,9 @@ msgstr "AI · Stav"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Ověření AI selhalo. Zkontrolujte prosím nastavení AI."
 
+msgid "AI usage"
+msgstr "Využití AI"
+
 msgid "Alert"
 msgstr "Upozornění"
 
@@ -2158,6 +2183,12 @@ msgstr "Všechny cíle ({0}) táhnou na {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Odstraní se všechny verze ({versionCount}) i jejich obsah. Kdokoli s odkazem ztratí přístup."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Všechny účty se zobrazují na okraji obrazovky, pokud je neskryjete."
+
+msgid "All accounts are hidden."
+msgstr "Všechny účty jsou skryté."
 
 msgid "All assignees"
 msgstr "Všichni řešitelé"
@@ -2971,6 +3002,9 @@ msgstr "Avatar aktualizován!"
 msgid "Awaiting {0}"
 msgstr "Čeká na {0}"
 
+msgid "Awaiting refresh"
+msgstr "Čeká na obnovení"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Čeká na odpověď — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Kategorie"
 msgid "Caution"
 msgstr "Pozor"
 
+msgid "Celebrate quota resets"
+msgstr "Oslavit obnovení limitů"
+
 msgid "Certificate Authority Invalid"
 msgstr "Neplatná certifikační autorita"
 
@@ -3838,6 +3875,9 @@ msgstr "Vyberte sekci."
 msgid "Choose agent"
 msgstr "Vyberte agenta"
 
+msgid "Choose an account"
+msgstr "Vyberte účet"
+
 msgid "Choose an existing repo folder"
 msgstr "Vyberte složku s existujícím repozitářem"
 
@@ -3858,6 +3898,9 @@ msgstr "Zvolte, jak se otevírají cesty k souborům při Cmd+kliknutí v termin
 
 msgid "Choose MCP servers for this message"
 msgstr "Vyberte MCP servery pro tuto zprávu"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Vyberte jeden účet pro každou ikonu v řádku nabídek. Boční panel zobrazuje všechny účty, pokud je neskryjete. Chybějící nebo zastaralé využití se zobrazuje jako pomlčka."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Vyberte, co se má z vestavěného prohlížeče vymazat."
@@ -5104,6 +5147,9 @@ msgstr "Nepodařilo se opustit frontu"
 msgid "Could not list directory"
 msgstr "Nepodařilo se vypsat adresář"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Účty se nepodařilo načíst. Obnovte zobrazení."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Nepodařilo se načíst agenty z {0}"
@@ -5132,6 +5178,9 @@ msgstr "Tento rozdíl se nepodařilo načíst"
 msgid "Could not load this file."
 msgstr "Tento soubor se nepodařilo načíst."
 
+msgid "Could not load usage display settings."
+msgstr "Nepodařilo se načíst nastavení zobrazení využití."
+
 msgid "Could not load your machines"
 msgstr "Nepodařilo se načíst vaše počítače"
 
@@ -5149,6 +5198,9 @@ msgstr "Odkaz se nepodařilo otevřít"
 
 msgid "Could not open Photos"
 msgstr "Nepodařilo se otevřít Fotky"
+
+msgid "Could not open usage."
+msgstr "Nepodařilo se otevřít využití."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Pokračování se nezdařilo"
 
 msgid "Could not resume the chat"
 msgstr "V chatu se nepodařilo pokračovat"
+
+msgid "Could not save account color."
+msgstr "Barvu účtu se nepodařilo uložit."
+
+msgid "Could not save usage display settings."
+msgstr "Nepodařilo se uložit nastavení zobrazení využití."
 
 msgid "Could not send"
 msgstr "Nepodařilo se odeslat"
@@ -5816,6 +5874,12 @@ msgstr "Kreativní manažer, Valid"
 msgid "Credentials stay on the server"
 msgstr "Přihlašovací údaje zůstávají na serveru"
 
+msgid "Credit balance"
+msgstr "Zůstatek kreditu"
+
+msgid "Credits"
+msgstr "Kredity"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Komponenty napříč funkcemi mimo packages/ui — podívejte se sem, než budete stavět novou"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Výchozí ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Výchozí účet"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Výchozí základ nových pracovních prostorů. Lze jej změnit při vytváření jednotlivých prostorů."
+
+msgid "Default color"
+msgstr "Výchozí barva"
 
 msgid "Default effort"
 msgstr "Výchozí úsilí"
@@ -6953,6 +7023,9 @@ msgstr "Zadejte nadřazený adresář na {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Zadejte cestu na {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Zadejte šestimístnou hexadecimální barvu."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Zadejte URL do vyhledávacího pole nahoře."
@@ -7986,6 +8059,9 @@ msgstr "Plamen"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Flotily agentů plánují, implementují, revidují a testují práci jeden druhého. Lidé určují směr, rozsuzují výjimky a vlastní vkus. Jednotkou lidské pozornosti už není pull request. Je jí rozhodnutí."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Plave nad ostatními aplikacemi. Zobrazuje využití relace a týdne pro účty v rychlém přehledu."
+
 msgid "Focus Chat Input"
 msgstr "Zaměřit vstup chatu"
 
@@ -8556,6 +8632,9 @@ msgstr "Nápověda a dokumentace"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Hexadecimální barva"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "„{0}“ skryto z postranního panelu"
@@ -8571,6 +8650,9 @@ msgstr "Skrýt"
 
 msgid "Hide {displayName}"
 msgstr "Skrýt {displayName}"
+
+msgid "Hide account"
+msgstr "Skrýt účet"
 
 msgid "Hide checks"
 msgstr "Skrýt kontroly"
@@ -9630,6 +9712,20 @@ msgstr "Poslední aktivita agenta {0}"
 msgid "Last attached"
 msgstr "Naposledy připojeno"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Naposledy zkontrolováno {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Naposledy zkontrolováno {0} · není aktuální"
+
+msgid "Last checked {relativeTime}"
+msgstr "Naposledy zkontrolováno {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Poslední kontrola {relativeTime} · neaktuální údaje"
+
 msgid "Last day of each month"
 msgstr "Poslední den v měsíci"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braillův spinner"
 msgid "Loading"
 msgstr "Načítání"
 
+msgid "Loading accounts…"
+msgstr "Načítání účtů…"
+
 msgid "Loading agent settings..."
 msgstr "Načítám nastavení agenta..."
 
@@ -10240,6 +10339,9 @@ msgstr "Spravovat"
 msgid "Manage {title}"
 msgstr "Spravovat {title}"
 
+msgid "Manage accounts"
+msgstr "Správa účtů"
+
 msgid "Manage accounts…"
 msgstr "Správa účtů…"
 
@@ -10434,6 +10536,15 @@ msgstr "Podíl paměti"
 
 msgid "Mention."
 msgstr "Zmiňte."
+
+msgid "Menu bar"
+msgstr "Řádek nabídek"
+
+msgid "Menu bar accounts"
+msgstr "Účty v řádku nabídek"
+
+msgid "Menu bar quota window"
+msgstr "Období kvóty v řádku nabídek"
 
 msgid "Menubar"
 msgstr "Panel nabídek"
@@ -10993,6 +11104,10 @@ msgstr "Další platba: {nextTotal} dne {nextDate}, plus využití nad fond."
 
 msgid "Next comment"
 msgstr "Další komentář"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Další vyprší {0}"
 
 msgid "Next file"
 msgstr "Další soubor"
@@ -12489,6 +12604,9 @@ msgstr "Otevřít pracovní prostor v aplikaci vybrané v nabídce „Otevřít 
 msgid "Open this run's workspace"
 msgstr "Otevřít pracovní prostor tohoto běhu"
 
+msgid "Open usage"
+msgstr "Otevřít využití"
+
 msgid "Open workspace"
 msgstr "Otevřít pracovní prostor"
 
@@ -13106,6 +13224,9 @@ msgstr "Paměť agentů pro každý repozitář"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Procento celkové systémové RAM využité jen sledovanými prostředky Paradev (ne všemi aplikacemi). Vysoký podíl znamená, že se Paradev zásadně podílí na tlaku na paměť; nízký podíl znamená, že tlak pochází nejspíš odjinud."
 
+msgid "Percentage"
+msgstr "Procento"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Trvale smazat „{projectName}“?"
 
@@ -13409,6 +13530,9 @@ msgstr "Prefix"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Předpona ID úkolů tohoto týmu. Změna přejmenuje všechny úkoly v týmu."
 
+msgid "Prepaid balance"
+msgstr "Předplacený zůstatek"
+
 msgid "Preparing"
 msgstr "Připravuji"
 
@@ -13510,6 +13634,9 @@ msgstr "Cena závisí na vašem týmu a způsobu použití. Ozvěte se nám a se
 
 msgid "Primary"
 msgstr "Primární"
+
+msgid "Primary display"
+msgstr "Hlavní displej"
 
 msgid "Primary Key"
 msgstr "Primární klíč"
@@ -13719,6 +13846,9 @@ msgstr "Vlastnosti"
 msgid "Provide either id or slug"
 msgstr "Zadejte buď id, nebo slug"
 
+msgid "Provider icons and percentages"
+msgstr "Ikony poskytovatelů a procenta"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Poskytovatel: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Úplně ukončit"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Nejprve zdrojový prohlížeč ukončete, aby se jeho přihlášení uložila na disk. Budete požádáni o povolení přístupu ke Klíčence."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Kvóta vyčerpána. Čas obnovení není znám"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Kvóta vyčerpána. Obnovení za {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Obnovit pull requesty"
 msgid "Refresh repositories"
 msgstr "Obnovit repozitáře"
 
+msgid "Refresh usage"
+msgstr "Obnovit využití"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Obnoví se při příštím spuštění Claude Code."
 
@@ -14219,6 +14358,12 @@ msgstr "Přesunout projekt?"
 
 msgid "Relocating…"
 msgstr "Přesouvám…"
+
+msgid "remaining"
+msgstr "zbývá"
+
+msgid "Remaining"
+msgstr "Zbývá"
 
 msgid "rematch"
 msgstr "odveta"
@@ -14590,6 +14735,11 @@ msgstr "Obnovit přiblížení"
 msgid "Reset Zoom"
 msgstr "Obnovit přiblížení"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Obnoví se {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Obnoví se {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "pravý panel"
 
 msgid "Right pane area"
 msgstr "Oblast pravého panelu"
+
+msgid "Right screen edge"
+msgstr "Pravý okraj obrazovky"
 
 msgid "Right-click here"
 msgstr "Klikněte sem pravým tlačítkem"
@@ -15300,6 +15453,9 @@ msgstr "Hledat mezi {0} weby…"
 
 msgid "Search a developer"
 msgstr "Vyhledat vývojáře"
+
+msgid "Search accounts"
+msgstr "Vyhledat účty"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Hledejte v obsahu souborů a napříč všemi pracovními prostory naráz."
@@ -15807,6 +15963,12 @@ msgstr "Relace"
 msgid "Session {0}"
 msgstr "Relace {0}"
 
+msgid "Session allowance renewed"
+msgstr "Limit relace obnoven"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Konfety pro relaci a větší oslava týdenního obnovení. Respektuje omezení pohybu."
+
 msgid "Session details"
 msgstr "Podrobnosti relace"
 
@@ -16027,8 +16189,14 @@ msgstr "Zobrazit v editoru chatu mikrofon. Řeč přepisuje ChatGPT, pokud je k 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Zobrazovat tlačítko Využití v postranním panelu domovské obrazovky pod pull requesty"
 
+msgid "Show account"
+msgstr "Zobrazit účet"
+
 msgid "Show all {count}"
 msgstr "Zobrazit všech {count}"
+
+msgid "Show all accounts"
+msgstr "Zobrazit všechny účty"
 
 msgid "Show all comments"
 msgstr "Zobrazit všechny komentáře"
@@ -16080,6 +16248,9 @@ msgstr "Zobrazit méně"
 
 msgid "Show file tree"
 msgstr "Zobrazit strom souborů"
+
+msgid "Show hidden"
+msgstr "Zobrazit skryté"
 
 msgid "Show in bar"
 msgstr "Zobrazit v liště"
@@ -16204,6 +16375,9 @@ msgstr "Štítek v postranním panelu, když je připravená aktualizace aplikac
 
 msgid "Sign in"
 msgstr "Přihlásit se"
+
+msgid "Sign in again"
+msgstr "Přihlásit se znovu"
 
 msgid "Sign in again to use dictation"
 msgstr "Pro diktování se znovu přihlaste"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp vypíše endpoint jen pro daný panel. Namiřte na 
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset je nyní Paradev. A také jsme získali seedové kolo ve výši 11,5 mil. $"
+
+msgid "Superset logo"
+msgstr "Logo Superset"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile přichází na iPhone"
@@ -19028,14 +19205,26 @@ msgstr "Identifikátor vhodný do URL, jedinečný v rámci vaší organizace."
 msgid "Usage"
 msgstr "Využití"
 
+msgid "Usage at a glance"
+msgstr "Využití na první pohled"
+
+msgid "Usage display settings"
+msgstr "Nastavení zobrazení využití"
+
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
 msgid "Usage sections"
 msgstr "Sekce využití"
 
+msgid "Usage unavailable"
+msgstr "Využití není dostupné"
+
 msgid "Usage unavailable."
 msgstr "Využití není dostupné."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Využití není dostupné. Otevřete Superset a zkontrolujte připojení."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Používat přepis řeči a funkce push-to-talk."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Používejte svá stávající předplatná agentů a API klíče. Paradev nikdy nepřeposílá volání modelů ani neváže vaše workflow na jednoho poskytovatele."
+
+msgid "used"
+msgstr "využito"
+
+msgid "Used"
+msgstr "Využito"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Používá se v řádku nabídek a plovoucím panelu."
 
 msgid "Used in URLs and APIs."
 msgstr "Používá se v URL a API."
@@ -19485,6 +19683,9 @@ msgstr "týdně"
 
 msgid "Weekly"
 msgstr "Týdně"
+
+msgid "Weekly allowance renewed"
+msgstr "Týdenní limit obnoven"
 
 msgid "Weekly at {time}"
 msgstr "Týdně v {time}"
@@ -20086,6 +20287,9 @@ msgstr "Váš účet je deaktivovaný a brzy bude trvale smazán. Obnovte ho a b
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Váš účet spravuje vaše organizace. O vytvoření nové organizace požádejte svého správce."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Vaše účty a kvóty v řádku nabídek nebo na pravém okraji obrazovky."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent může otevřít libovolnou stránku a projít ji pomocí příkazů superset browser. Používá panel, na který se díváte, takže vidíte každý krok."

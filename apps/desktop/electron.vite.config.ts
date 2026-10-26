@@ -189,6 +189,7 @@ export default defineConfig({
 			rollupOptions: {
 				input: {
 					index: resolve("src/preload/index.ts"),
+					"usage-widget": resolve("src/preload/usage-widget.ts"),
 				},
 			},
 		},
@@ -297,6 +298,7 @@ export default defineConfig({
 
 				input: {
 					index: resolve("src/renderer/index.html"),
+					"usage-widget": resolve("src/renderer/usage-widget.html"),
 				},
 			},
 		},

@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# project} other {# projecten}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository's}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# reset beschikbaar} other {# resets beschikbaar}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# resultaat in Cloud} other {# resultaten in Cloud}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# opmerking} other {# opmerkingen}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# bestand} other {# bestanden}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# reset beschikbaar} other {# resets beschikbaar}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# zoekopdracht} other {# zoekopdrachten}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "Account"
 
+msgid "Account appearance"
+msgstr "Accountweergave"
+
+msgid "Account color"
+msgstr "Accountkleur"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Installatie op het account werkt alleen met eigen manifests, dus {plugin} uit {marketplace} kan nog niet op je account worden geïnstalleerd. Hij blijft op deze machine geïnstalleerd."
@@ -1708,6 +1721,9 @@ msgstr "Accountnaam"
 
 msgid "Account pending deletion"
 msgstr "Account wordt verwijderd"
+
+msgid "Account unavailable"
+msgstr "Account niet beschikbaar"
 
 msgid "Account usage"
 msgstr "Accountgebruik"
@@ -1756,6 +1772,9 @@ msgstr "Actieve organisatie vereist om een API-sleutel aan te maken"
 
 msgid "Active sessions"
 msgstr "Actieve sessies"
+
+msgid "Active window"
+msgstr "Actief venster"
 
 msgid "Activity"
 msgstr "Activiteit"
@@ -1806,6 +1825,9 @@ msgstr "Voeg hier later agentconfiguraties toe als je ze wilt publiceren."
 
 msgid "Add agents…"
 msgstr "Agents toevoegen…"
+
+msgid "Add an account to see its usage here."
+msgstr "Voeg een account toe om het gebruik hier te zien."
 
 msgid "add an agent"
 msgstr "een agent toevoegen"
@@ -2112,6 +2134,9 @@ msgstr "AI · Status"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AI-authenticatie mislukt. Controleer je AI-instellingen."
 
+msgid "AI usage"
+msgstr "AI-gebruik"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "Alle {0} doelen dragen hun deel bij voor {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Alle {versionCount} versies en hun inhoud worden verwijderd. Iedereen met de link verliest toegang."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Alle accounts verschijnen aan de schermrand, tenzij je ze verbergt."
+
+msgid "All accounts are hidden."
+msgstr "Alle accounts zijn verborgen."
 
 msgid "All assignees"
 msgstr "Alle personen"
@@ -2971,6 +3002,9 @@ msgstr "Avatar bijgewerkt!"
 msgid "Awaiting {0}"
 msgstr "Wacht op {0}"
 
+msgid "Awaiting refresh"
+msgstr "Wachten op vernieuwen"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Wacht op antwoord — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Categorie"
 msgid "Caution"
 msgstr "Let op"
 
+msgid "Celebrate quota resets"
+msgstr "Vier quotumresets"
+
 msgid "Certificate Authority Invalid"
 msgstr "Certificaatautoriteit ongeldig"
 
@@ -3838,6 +3875,9 @@ msgstr "Kies een onderdeel."
 msgid "Choose agent"
 msgstr "Kies agent"
 
+msgid "Choose an account"
+msgstr "Kies een account"
+
 msgid "Choose an existing repo folder"
 msgstr "Kies een bestaande repo-map"
 
@@ -3858,6 +3898,9 @@ msgstr "Kies hoe bestandspaden openen bij Cmd+klik in de terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Kies MCP-servers voor dit bericht"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Kies één account per menubalkpictogram. Het paneel aan de schermrand toont alle accounts, behalve de accounts die je verbergt. Ontbrekend of verouderd gebruik wordt met een streepje weergegeven."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Kies wat je uit de ingebouwde browser wilt wissen."
@@ -5104,6 +5147,9 @@ msgstr "Kan de wachtrij niet verlaten"
 msgid "Could not list directory"
 msgstr "Kan map niet uitlezen"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Accounts konden niet worden geladen. Vernieuw om opnieuw te proberen."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Kan agents van {0} niet laden"
@@ -5132,6 +5178,9 @@ msgstr "Kan deze diff niet laden"
 msgid "Could not load this file."
 msgstr "Kan dit bestand niet laden."
 
+msgid "Could not load usage display settings."
+msgstr "De weergave-instellingen voor gebruik konden niet worden geladen."
+
 msgid "Could not load your machines"
 msgstr "Kan je machines niet laden"
 
@@ -5149,6 +5198,9 @@ msgstr "Kan link niet openen"
 
 msgid "Could not open Photos"
 msgstr "Kan Foto's niet openen"
+
+msgid "Could not open usage."
+msgstr "Het gebruik kon niet worden geopend."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Kan niet hervatten"
 
 msgid "Could not resume the chat"
 msgstr "Kan de chat niet hervatten"
+
+msgid "Could not save account color."
+msgstr "De accountkleur kon niet worden opgeslagen."
+
+msgid "Could not save usage display settings."
+msgstr "De weergave-instellingen voor gebruik konden niet worden opgeslagen."
 
 msgid "Could not send"
 msgstr "Versturen mislukt"
@@ -5816,6 +5874,12 @@ msgstr "Creatief manager, Valid"
 msgid "Credentials stay on the server"
 msgstr "Inloggegevens blijven op de server"
 
+msgid "Credit balance"
+msgstr "Kredietsaldo"
+
+msgid "Credits"
+msgstr "Credits"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Componenten die over features heen worden gebruikt en buiten packages/ui staan — kijk hier voordat je een nieuwe bouwt"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Standaard ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Standaardaccount"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Standaardbasis voor nieuwe werkruimten. Per werkruimte te wijzigen bij het aanmaken."
+
+msgid "Default color"
+msgstr "Standaardkleur"
 
 msgid "Default effort"
 msgstr "Standaard-effort"
@@ -6953,6 +7023,9 @@ msgstr "Voer een bovenliggende map op {hostName} in"
 
 msgid "Enter a path on {hostName}"
 msgstr "Voer een pad op {hostName} in"
+
+msgid "Enter a six-digit hex color."
+msgstr "Voer een hexkleur van zes cijfers in."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Voer hierboven een URL in de zoekbalk in."
@@ -7986,6 +8059,9 @@ msgstr "Vlam"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Vloten van agents plannen, bouwen, reviewen en testen elkaars werk. Mensen bepalen de richting, beslechten uitzonderingen en bewaken de smaak. De eenheid van menselijke aandacht is niet langer de pull request. Het is de beslissing."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Zweeft boven andere apps. Toont het sessie- en weekgebruik van je accounts in het snelle overzicht."
+
 msgid "Focus Chat Input"
 msgstr "Chatinvoer focussen"
 
@@ -8556,6 +8632,9 @@ msgstr "Help en docs"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Hexkleur"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" uit de zijbalk verborgen"
@@ -8571,6 +8650,9 @@ msgstr "Verbergen"
 
 msgid "Hide {displayName}"
 msgstr "Verberg {displayName}"
+
+msgid "Hide account"
+msgstr "Account verbergen"
 
 msgid "Hide checks"
 msgstr "Checks verbergen"
@@ -9630,6 +9712,20 @@ msgstr "Laatste agentactiviteit {0}"
 msgid "Last attached"
 msgstr "Laatst gekoppeld"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Laatst gecontroleerd {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Laatst gecontroleerd {0} · niet live"
+
+msgid "Last checked {relativeTime}"
+msgstr "Laatst gecontroleerd {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Laatst gecontroleerd {relativeTime} · niet actueel"
+
 msgid "Last day of each month"
 msgstr "Laatste dag van elke maand"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille-spinner"
 msgid "Loading"
 msgstr "Laden"
 
+msgid "Loading accounts…"
+msgstr "Accounts laden…"
+
 msgid "Loading agent settings..."
 msgstr "Agentinstellingen laden..."
 
@@ -10240,6 +10339,9 @@ msgstr "Beheren"
 msgid "Manage {title}"
 msgstr "{title} beheren"
 
+msgid "Manage accounts"
+msgstr "Accounts beheren"
+
 msgid "Manage accounts…"
 msgstr "Accounts beheren…"
 
@@ -10434,6 +10536,15 @@ msgstr "Geheugenaandeel"
 
 msgid "Mention."
 msgstr "Noem."
+
+msgid "Menu bar"
+msgstr "Menubalk"
+
+msgid "Menu bar accounts"
+msgstr "Menubalkaccounts"
+
+msgid "Menu bar quota window"
+msgstr "Quotumperiode in de menubalk"
 
 msgid "Menubar"
 msgstr "Menubalk"
@@ -10993,6 +11104,10 @@ msgstr "Volgende afschrijving: {nextTotal} op {nextDate}, plus gebruik boven de 
 
 msgid "Next comment"
 msgstr "Volgende opmerking"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "De volgende verloopt {0}"
 
 msgid "Next file"
 msgstr "Volgend bestand"
@@ -12489,6 +12604,9 @@ msgstr "De werkruimte openen in de app die is gekozen in het menu 'Openen in' (V
 msgid "Open this run's workspace"
 msgstr "Werkruimte van deze run openen"
 
+msgid "Open usage"
+msgstr "Gebruik openen"
+
 msgid "Open workspace"
 msgstr "Werkruimte openen"
 
@@ -13106,6 +13224,9 @@ msgstr "Agentgeheugen per repository"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Percentage van het totale systeem-RAM dat alleen door de gemonitorde Paradev-resources wordt gebruikt (niet door alle apps). Een hoog aandeel betekent dat Paradev flink bijdraagt aan de geheugendruk; een laag aandeel betekent dat de druk waarschijnlijk elders zit."
 
+msgid "Percentage"
+msgstr "Percentage"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "\"{projectName}\" definitief verwijderen?"
 
@@ -13409,6 +13530,9 @@ msgstr "Prefix"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Voorvoegsel van de taak-ID's van dit team. Als je het wijzigt, krijgen alle taken van het team een nieuwe naam."
 
+msgid "Prepaid balance"
+msgstr "Vooruitbetaald saldo"
+
 msgid "Preparing"
 msgstr "Voorbereiden"
 
@@ -13510,6 +13634,9 @@ msgstr "De prijs hangt af van je team en use case. Neem contact op, dan stellen 
 
 msgid "Primary"
 msgstr "Primair"
+
+msgid "Primary display"
+msgstr "Hoofdscherm"
 
 msgid "Primary Key"
 msgstr "Primary key"
@@ -13719,6 +13846,9 @@ msgstr "Eigenschappen"
 msgid "Provide either id or slug"
 msgstr "Geef een id of een slug op"
 
+msgid "Provider icons and percentages"
+msgstr "Providerpictogrammen en percentages"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Provider: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Volledig afsluiten"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Sluit eerst de bronbrowser af zodat de logins naar schijf worden weggeschreven. Er wordt om toegang tot de Sleutelhanger gevraagd."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Limiet bereikt. Resettijd onbekend"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Limiet bereikt. Reset over {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Pull requests vernieuwen"
 msgid "Refresh repositories"
 msgstr "Repositories vernieuwen"
 
+msgid "Refresh usage"
+msgstr "Gebruik vernieuwen"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Wordt vernieuwd zodra Claude Code opnieuw draait."
 
@@ -14219,6 +14358,12 @@ msgstr "Project verplaatsen?"
 
 msgid "Relocating…"
 msgstr "Verplaatsen…"
+
+msgid "remaining"
+msgstr "resterend"
+
+msgid "Remaining"
+msgstr "Resterend"
 
 msgid "rematch"
 msgstr "revanche"
@@ -14590,6 +14735,11 @@ msgstr "Zoom resetten"
 msgid "Reset Zoom"
 msgstr "Zoom resetten"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Wordt {0} gereset"
+
 msgid "Resets {resetDate}"
 msgstr "Wordt gereset op {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "rechterpaneel"
 
 msgid "Right pane area"
 msgstr "Rechterpaneelgebied"
+
+msgid "Right screen edge"
+msgstr "Rechter schermrand"
 
 msgid "Right-click here"
 msgstr "Klik hier met rechts"
@@ -15300,6 +15453,9 @@ msgstr "{0} sites doorzoeken…"
 
 msgid "Search a developer"
 msgstr "Een ontwikkelaar zoeken"
+
+msgid "Search accounts"
+msgstr "Accounts zoeken"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Zoek door bestandsinhoud en door al je werkruimtes tegelijk."
@@ -15807,6 +15963,12 @@ msgstr "Sessie"
 msgid "Session {0}"
 msgstr "Sessie {0}"
 
+msgid "Session allowance renewed"
+msgstr "Sessiequotum vernieuwd"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Confetti voor sessies en een groter feest voor weekresets. Houdt rekening met minder beweging."
+
 msgid "Session details"
 msgstr "Sessiedetails"
 
@@ -16027,8 +16189,14 @@ msgstr "Een microfoon in het chatinvoerveld tonen. Spraak wordt getranscribeerd 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Toon een knop Gebruik in de zijbalk van het startscherm, onder Pull requests"
 
+msgid "Show account"
+msgstr "Account tonen"
+
 msgid "Show all {count}"
 msgstr "Alle {count} tonen"
+
+msgid "Show all accounts"
+msgstr "Alle accounts tonen"
 
 msgid "Show all comments"
 msgstr "Alle opmerkingen tonen"
@@ -16080,6 +16248,9 @@ msgstr "Minder tonen"
 
 msgid "Show file tree"
 msgstr "Bestandsboom tonen"
+
+msgid "Show hidden"
+msgstr "Verborgen accounts tonen"
 
 msgid "Show in bar"
 msgstr "Tonen in balk"
@@ -16204,6 +16375,9 @@ msgstr "Zijbalkpil die verschijnt als een app-update klaarstaat"
 
 msgid "Sign in"
 msgstr "Inloggen"
+
+msgid "Sign in again"
+msgstr "Opnieuw aanmelden"
 
 msgid "Sign in again to use dictation"
 msgstr "Log opnieuw in om te dicteren"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp toont een endpoint voor alleen dat paneel. Richt Pl
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset heet nu Paradev. En we hebben ook een seedronde van $11,5M opgehaald"
+
+msgid "Superset logo"
+msgstr "Superset-logo"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile verschijnt op iPhone"
@@ -19028,14 +19205,26 @@ msgstr "URL-vriendelijke identifier, uniek binnen je organisatie."
 msgid "Usage"
 msgstr "Gebruik"
 
+msgid "Usage at a glance"
+msgstr "Gebruik in één oogopslag"
+
+msgid "Usage display settings"
+msgstr "Weergave-instellingen voor gebruik"
+
 msgid "Usage is out of date"
 msgstr "De gebruiksgegevens zijn verouderd"
 
 msgid "Usage sections"
 msgstr "Onderdelen van gebruik"
 
+msgid "Usage unavailable"
+msgstr "Gebruik niet beschikbaar"
+
 msgid "Usage unavailable."
 msgstr "Gebruik niet beschikbaar."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Gebruik niet beschikbaar. Open Superset om de verbinding te controleren."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Spraaktranscriptie en push-to-talk gebruiken."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Gebruik je bestaande agentabonnementen en API-sleutels. Paradev proxyt nooit modelaanroepen en zet je workflow niet vast op één provider."
+
+msgid "used"
+msgstr "gebruikt"
+
+msgid "Used"
+msgstr "Gebruikt"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Gebruikt in de menubalk en het zwevende paneel."
 
 msgid "Used in URLs and APIs."
 msgstr "Wordt gebruikt in URL's en API's."
@@ -19485,6 +19683,9 @@ msgstr "wekelijks"
 
 msgid "Weekly"
 msgstr "Wekelijks"
+
+msgid "Weekly allowance renewed"
+msgstr "Weekquotum vernieuwd"
 
 msgid "Weekly at {time}"
 msgstr "Wekelijks om {time}"
@@ -20086,6 +20287,9 @@ msgstr "Je account is gedeactiveerd en wordt binnenkort definitief verwijderd. R
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Je account wordt beheerd door je organisatie. Neem contact op met je beheerder om een nieuwe organisatie aan te maken."
+
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Je accounts en quota, in de menubalk of aan de rechter schermrand."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Je agent kan elke pagina openen en er doorheen werken met superset browser-commando's. Hij gebruikt het paneel dat je bekijkt, dus je ziet elke stap."

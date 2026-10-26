@@ -73,9 +73,26 @@ export interface UsageQuotaWindow {
 	label: string;
 	usedPercent: number;
 	resetsAt: Date | null;
+	windowSeconds?: number;
+	observedAt?: Date;
+	source?: "provider" | "claude_statusline" | "claude_sdk";
+}
+
+export interface UsageResetCredits {
+	availableCount: number | null;
+	expirations: Array<Date | null> | null;
+	checkedAt: Date;
+}
+
+export interface UsageResetNotice {
+	id: string;
+	kind: "session" | "weekly";
+	confirmedAt: Date;
 }
 
 export interface UsageAccount {
+	/** Inventory discovery failed; this placeholder is not a discovered account. */
+	discoveryFailed?: boolean;
 	agent: QuotaCapableAgent;
 	credentialKind: UsageAccountCredentialKind;
 	/** Stable key for the credential source (config path or keychain item),
@@ -89,6 +106,11 @@ export interface UsageAccount {
 	/** Human-readable detail for non-ok statuses. */
 	statusDetail: string | null;
 	windows: UsageQuotaWindow[];
+	retryAt?: Date;
+	/** Display history only; never evidence of currently available allowance. */
+	lastKnownUsage?: { fetchedAt: Date; windows: UsageQuotaWindow[] };
+	/** Actual prepaid funds in major currency units, separate from the spend cap. */
+	prepaidBalance?: { amount: number; currency: string | null; checkedAt: Date };
 	/** Codex prepaid credits balance, when present. */
 	creditsBalance: number | null;
 	/** Claude extra-usage spend, in cents, when present. */
@@ -100,4 +122,9 @@ export interface UsageAccount {
 	/** Whether newly launched agents use this account (host-wide default). */
 	isDefault: boolean;
 	fetchedAt: Date;
+	/** Opaque account scope verified by the provider response, never a credential. */
+	quotaIdentity?: string;
+	sourceId?: string;
+	resetCredits?: UsageResetCredits;
+	resetNotice?: UsageResetNotice;
 }

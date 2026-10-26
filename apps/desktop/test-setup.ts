@@ -319,6 +319,18 @@ const renderMessage = (descriptor: MessageDescriptor): string => {
 	return text;
 };
 
+const renderMacro = (
+	descriptor: MessageDescriptor | TemplateStringsArray,
+	...values: unknown[]
+): string =>
+	Array.isArray(descriptor)
+		? descriptor.reduce(
+				(text, part, index) =>
+					text + (index ? String(values[index - 1]) : "") + part,
+				"",
+			)
+		: renderMessage(descriptor as MessageDescriptor);
+
 const pickPluralBranch = (
 	value: number,
 	branches: Record<string, unknown>,
@@ -340,14 +352,14 @@ mock.module("@lingui/react/macro", () => ({
 	SelectOrdinal: ({ value, ...branches }: { value: number }) =>
 		pickPluralBranch(value, branches),
 	useLingui: () => ({
-		t: (descriptor: MessageDescriptor) => renderMessage(descriptor),
+		t: renderMacro,
 		i18n: { _: (descriptor: MessageDescriptor) => renderMessage(descriptor) },
 	}),
 }));
 
 mock.module("@lingui/core/macro", () => ({
 	msg: (descriptor: MessageDescriptor) => descriptor,
-	t: (descriptor: MessageDescriptor) => renderMessage(descriptor),
+	t: renderMacro,
 	plural: (value: number, branches: Record<string, string>) =>
 		String(pickPluralBranch(value, branches)),
 }));
