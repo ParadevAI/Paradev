@@ -95,10 +95,7 @@ export function AccountTerminalDialog({
 				onRefresh={async () => {
 					setRefreshing(true);
 					try {
-						await Promise.allSettled([
-							accounts.refetch(),
-							quota.refresh(),
-						]);
+						await Promise.allSettled([accounts.refetch(), quota.refresh()]);
 					} finally {
 						setRefreshing(false);
 					}
