@@ -751,9 +751,9 @@ test("one stalled account's history write cannot starve another account or queue
 	expect(healthy.status).toBe("ok");
 	expect(writes).toEqual([firstToken, secondToken]);
 	const persisted = await history.get(secondToken, profile);
-	expect(persisted).not.toBeNull();
-	expect(persisted?.fetchedAt).toEqual(new Date(initialAt));
-	expect(healthy.windows).toEqual(persisted?.windows);
+	if (!persisted) throw new Error("Healthy account history was not saved");
+	expect(persisted.fetchedAt).toEqual(new Date(initialAt));
+	expect(healthy.windows).toEqual(persisted.windows);
 	clock.advance(8_000);
 	const stalled = await first;
 	expect(stalled.status).toBe("ok");
