@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} из {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Осталось {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} не находится в {installedAccountLogin}, где установлено GitHub App этой организации."
 
@@ -5228,6 +5231,9 @@ msgstr "Не удалось записать облачную рабочую о�
 msgid "Could not record environment"
 msgstr "Не удалось сохранить окружение"
 
+msgid "Could not refresh usage"
+msgstr "Не удалось обновить данные об использовании"
+
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
 
@@ -5279,6 +5285,9 @@ msgstr "Не удалось запустить агента"
 msgid "Could not start agent terminal"
 msgstr "Не удалось запустить терминал агента"
 
+msgid "Could not start chat"
+msgstr "Не удалось начать чат"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Не удалось начать оформление. Попробуйте ещё раз."
 
@@ -5308,6 +5317,9 @@ msgstr "Не удалось прекратить отслеживание"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Не удалось отправить промпт. Повторите."
+
+msgid "Could not switch account"
+msgstr "Не удалось сменить аккаунт"
 
 msgid "Could not take a screenshot"
 msgstr "Не удалось сделать скриншот"
@@ -20344,15 +20356,3 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Не удалось обновить данные об использовании"
-
-msgid "{remainingPercent} remaining"
-msgstr "Осталось {remainingPercent}"
-
-msgid "Could not start chat"
-msgstr "Не удалось начать чат"
-
-msgid "Could not switch account"
-msgstr "Не удалось сменить аккаунт"

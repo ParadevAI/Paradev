@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} von {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} verbleibend"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} liegt nicht bei {installedAccountLogin}, wo die GitHub App dieser Organisation installiert ist."
 
@@ -5228,6 +5231,9 @@ msgstr "Cloud-Arbeitsbereich konnte nicht erfasst werden"
 msgid "Could not record environment"
 msgstr "Umgebung konnte nicht gespeichert werden"
 
+msgid "Could not refresh usage"
+msgstr "Nutzungsdaten konnten nicht aktualisiert werden"
+
 msgid "Could not remove access"
 msgstr "Zugriff konnte nicht entfernt werden"
 
@@ -5279,6 +5285,9 @@ msgstr "Agent konnte nicht gestartet werden"
 msgid "Could not start agent terminal"
 msgstr "Agent-Terminal konnte nicht gestartet werden"
 
+msgid "Could not start chat"
+msgstr "Chat konnte nicht gestartet werden"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Checkout konnte nicht gestartet werden. Bitte versuche es erneut."
 
@@ -5308,6 +5317,9 @@ msgstr "Beobachten ließ sich nicht beenden"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Prompt konnte nicht eingereicht werden. Versuche es erneut."
+
+msgid "Could not switch account"
+msgstr "Konto konnte nicht gewechselt werden"
 
 msgid "Could not take a screenshot"
 msgstr "Es konnte kein Screenshot erstellt werden"
@@ -20344,15 +20356,3 @@ msgstr "Verkleinern"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Nutzungsdaten konnten nicht aktualisiert werden"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} verbleibend"
-
-msgid "Could not start chat"
-msgstr "Chat konnte nicht gestartet werden"
-
-msgid "Could not switch account"
-msgstr "Konto konnte nicht gewechselt werden"

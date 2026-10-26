@@ -124,9 +124,9 @@ export function AccountTerminalForm({
 							launchFailureMessage ??
 								(mode === "resume"
 									? t({ message: "Could not resume this conversation" })
-										: mode === "chat"
-											? t({ message: "Could not start chat" })
-											: t({ message: "Could not start agent terminal" })),
+									: mode === "chat"
+										? t({ message: "Could not start chat" })
+										: t({ message: "Could not start agent terminal" })),
 						),
 					);
 				} finally {

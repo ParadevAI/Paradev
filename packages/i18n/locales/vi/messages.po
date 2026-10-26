@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} trên {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Còn lại {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} không nằm trong {installedAccountLogin}, nơi GitHub App của tổ chức này được cài đặt."
 
@@ -5228,6 +5231,9 @@ msgstr "Không thể ghi nhận workspace trên cloud"
 msgid "Could not record environment"
 msgstr "Không thể lưu environment"
 
+msgid "Could not refresh usage"
+msgstr "Không thể làm mới mức sử dụng"
+
 msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
 
@@ -5279,6 +5285,9 @@ msgstr "Không thể khởi động agent"
 msgid "Could not start agent terminal"
 msgstr "Không thể khởi động terminal của tác nhân"
 
+msgid "Could not start chat"
+msgstr "Không thể bắt đầu cuộc trò chuyện"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Không thể bắt đầu thanh toán. Vui lòng thử lại."
 
@@ -5308,6 +5317,9 @@ msgstr "Không thể ngừng theo dõi"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Không thể gửi prompt. Hãy thử lại."
+
+msgid "Could not switch account"
+msgstr "Không thể chuyển tài khoản"
 
 msgid "Could not take a screenshot"
 msgstr "Không thể chụp màn hình"
@@ -20344,15 +20356,3 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Không thể làm mới mức sử dụng"
-
-msgid "{remainingPercent} remaining"
-msgstr "Còn lại {remainingPercent}"
-
-msgid "Could not start chat"
-msgstr "Không thể bắt đầu cuộc trò chuyện"
-
-msgid "Could not switch account"
-msgstr "Không thể chuyển tài khoản"
