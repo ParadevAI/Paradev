@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} z {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Zbývá {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} není v účtu {installedAccountLogin}, kde je nainstalovaná GitHub App této organizace."
 
@@ -5228,6 +5231,9 @@ msgstr "Nepodařilo se zaznamenat cloudový pracovní prostor"
 msgid "Could not record environment"
 msgstr "Prostředí se nepodařilo uložit"
 
+msgid "Could not refresh usage"
+msgstr "Využití se nepodařilo obnovit"
+
 msgid "Could not remove access"
 msgstr "Přístup se nepodařilo odebrat"
 
@@ -5279,6 +5285,9 @@ msgstr "Nepodařilo se spustit agenta"
 msgid "Could not start agent terminal"
 msgstr "Terminál agenta se nepodařilo spustit"
 
+msgid "Could not start chat"
+msgstr "Chat se nepodařilo spustit"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Platbu se nepodařilo zahájit. Zkuste to znovu."
 
@@ -5308,6 +5317,9 @@ msgstr "Nepodařilo se přestat sledovat"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Prompt se nepodařilo odeslat. Zkuste to znovu."
+
+msgid "Could not switch account"
+msgstr "Účet se nepodařilo přepnout"
 
 msgid "Could not take a screenshot"
 msgstr "Nepodařilo se pořídit snímek obrazovky"
@@ -20344,15 +20356,3 @@ msgstr "Oddálit"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Využití se nepodařilo obnovit"
-
-msgid "{remainingPercent} remaining"
-msgstr "Zbývá {remainingPercent}"
-
-msgid "Could not start chat"
-msgstr "Chat se nepodařilo spustit"
-
-msgid "Could not switch account"
-msgstr "Účet se nepodařilo přepnout"

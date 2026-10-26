@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} van {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} resterend"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} staat niet op {installedAccountLogin}, waar de GitHub App van deze organisatie is geïnstalleerd."
 
@@ -5228,6 +5231,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
 
+msgid "Could not refresh usage"
+msgstr "Gebruik kon niet worden vernieuwd"
+
 msgid "Could not remove access"
 msgstr "Kan toegang niet verwijderen"
 
@@ -5279,6 +5285,9 @@ msgstr "Kan agent niet starten"
 msgid "Could not start agent terminal"
 msgstr "Agentterminal kon niet worden gestart"
 
+msgid "Could not start chat"
+msgstr "Chat kon niet worden gestart"
+
 msgid "Could not start checkout. Please try again."
 msgstr "Kon het afrekenen niet starten. Probeer het opnieuw."
 
@@ -5308,6 +5317,9 @@ msgstr "Kon niet stoppen met volgen"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Kan prompt niet insturen. Probeer het opnieuw."
+
+msgid "Could not switch account"
+msgstr "Account kon niet worden gewisseld"
 
 msgid "Could not take a screenshot"
 msgstr "Kan geen screenshot maken"
@@ -20344,15 +20356,3 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Gebruik kon niet worden vernieuwd"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} resterend"
-
-msgid "Could not start chat"
-msgstr "Chat kon niet worden gestart"
-
-msgid "Could not switch account"
-msgstr "Account kon niet worden gewisseld"

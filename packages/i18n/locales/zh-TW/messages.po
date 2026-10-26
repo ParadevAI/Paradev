@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "剩餘 {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本組織的 GitHub App 安裝在那裡。"
 
@@ -5228,6 +5231,9 @@ msgstr "無法記錄雲端工作區"
 msgid "Could not record environment"
 msgstr "無法儲存環境"
 
+msgid "Could not refresh usage"
+msgstr "無法重新整理用量"
+
 msgid "Could not remove access"
 msgstr "無法移除存取權限"
 
@@ -5279,6 +5285,9 @@ msgstr "無法啟動代理程式"
 msgid "Could not start agent terminal"
 msgstr "無法啟動代理終端機"
 
+msgid "Could not start chat"
+msgstr "無法開始聊天"
+
 msgid "Could not start checkout. Please try again."
 msgstr "無法開始結帳，請再試一次。"
 
@@ -5308,6 +5317,9 @@ msgstr "無法停止關注"
 
 msgid "Could not submit prompt. Try again."
 msgstr "無法提交提示詞。請重試。"
+
+msgid "Could not switch account"
+msgstr "無法切換帳戶"
 
 msgid "Could not take a screenshot"
 msgstr "無法截圖"
@@ -20344,15 +20356,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "無法重新整理用量"
-
-msgid "{remainingPercent} remaining"
-msgstr "剩餘 {remainingPercent}"
-
-msgid "Could not start chat"
-msgstr "無法開始聊天"
-
-msgid "Could not switch account"
-msgstr "無法切換帳戶"
