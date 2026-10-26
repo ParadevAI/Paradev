@@ -137,7 +137,12 @@ export function createClaudePrepaidReader({
 							},
 							canonicalProfile,
 						);
-						if (!response.ok || signal.aborted)
+						if (response.ok && signal.aborted)
+							return recordQuotaRetry(
+								{ balance: previous },
+								new Response(null, { status: 503 }),
+							);
+						if (!response.ok)
 							return recordQuotaRetry(
 								{
 									balance: [408, 429, 500, 502, 503, 504, 529].includes(
@@ -149,10 +154,13 @@ export function createClaudePrepaidReader({
 								response,
 							);
 						const body: unknown = await response.json();
+						if (signal.aborted)
+							return recordQuotaRetry(
+								{ balance: previous },
+								new Response(null, { status: 503 }),
+							);
 						return {
-							balance: signal.aborted
-								? undefined
-								: parseClaudePrepaidBalance(body, new Date(now())),
+							balance: parseClaudePrepaidBalance(body, new Date(now())),
 						};
 					},
 					false,

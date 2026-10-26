@@ -154,11 +154,16 @@ export function createClaudeSubscriptionReader({
 	now = () => Date.now(),
 	history = claudeLastKnown,
 	proofs = createClaudeProofStore(undefined, now),
+	createBudget = createQuotaRequestBudget,
 }: {
 	request?: Request;
 	now?: () => number;
 	history?: ReturnType<typeof createClaudeLastKnownStore>;
 	proofs?: ReturnType<typeof createClaudeProofStore>;
+	createBudget?: (
+		budgetMs: number,
+		now: () => number,
+	) => ReturnType<typeof createQuotaRequestBudget>;
 } = {}) {
 	const profiles = createCredentialQuotaCache<{
 		profile: ClaudeProfileResponse | null;
@@ -171,6 +176,24 @@ export function createClaudeSubscriptionReader({
 	const wallets = createClaudePrepaidReader({ request, now });
 	const usageWithResets = createClaudeResetEnvelope(request, now);
 	const pending = new Map<string, Promise<ClaudeSubscriptionQuota>>();
+	const revocations = new Map<string, { denied: boolean }>();
+	let quarantineOverflow = false;
+	let historyInFlight: Promise<unknown> | undefined;
+	function deny(token: string, canonical: string | null) {
+		const key = profileKey(token);
+		const previousProfile = cachedProfile(token);
+		const previousOwner = proofs.get(token, canonical);
+		if (revocations.has(key) || revocations.size < 1024)
+			revocations.set(key, { denied: true });
+		else quarantineOverflow = true;
+		proofs.forget(token);
+		profiles.invalidate(key);
+		return { profile: previousProfile, ownerHash: previousOwner?.ownerHash };
+	}
+	function historyQuarantined(token: string) {
+		return quarantineOverflow || revocations.has(profileKey(token));
+	}
+
 	function profileKey(token: string) {
 		return hashQuotaScope(["claude-profile-cache-v1", token]);
 	}
@@ -187,6 +210,7 @@ export function createClaudeSubscriptionReader({
 		signal: AbortSignal,
 		canonical?: string | null,
 	) {
+		signal.throwIfAborted();
 		const key = profileKey(token);
 		await profiles.get(key, async () => {
 			const previous = profiles.peek(key)?.value;
@@ -203,7 +227,9 @@ export function createClaudeSubscriptionReader({
 				canonical,
 			);
 			if (!response.ok) {
-				if (!TRANSIENT.has(response.status)) proofs.forget(token);
+				if (response.status === 401 || response.status === 403)
+					deny(token, canonical ?? null);
+				else if (!TRANSIENT.has(response.status)) proofs.forget(token);
 				return recordQuotaRetry(
 					{
 						profile: TRANSIENT.has(response.status)
@@ -214,7 +240,9 @@ export function createClaudeSubscriptionReader({
 					response,
 				);
 			}
+			signal.throwIfAborted();
 			const body: unknown = await response.json();
+			signal.throwIfAborted();
 			const profile =
 				body && typeof body === "object" && !Array.isArray(body)
 					? (body as ClaudeProfileResponse)
@@ -225,6 +253,7 @@ export function createClaudeSubscriptionReader({
 			else proofs.forget(token);
 			return { profile, checkedAt };
 		});
+		signal.throwIfAborted();
 		return cachedProfile(token);
 	}
 	async function acquire(
@@ -233,15 +262,51 @@ export function createClaudeSubscriptionReader({
 		context: Context,
 	): Promise<ClaudeSubscriptionQuota> {
 		let profile = cachedProfile(token);
-		const budget = createQuotaRequestBudget(budgets.primaryMs, now);
+		const budget = createBudget(budgets.primaryMs, now);
+		let deniedHistory: ReturnType<typeof deny> | undefined;
+		async function optionalHistory<T>(
+			load: (signal: AbortSignal) => Promise<T>,
+		): Promise<T | undefined> {
+			if (historyInFlight) return undefined;
+			try {
+				return await budget.run(async (signal) => {
+					signal.throwIfAborted();
+					context.signal?.throwIfAborted();
+					if (historyInFlight) return undefined;
+					const operation = Promise.resolve().then(() => {
+						signal.throwIfAborted();
+						context.signal?.throwIfAborted();
+						return load(signal);
+					});
+					historyInFlight = operation;
+					const clear = () => {
+						if (historyInFlight === operation) historyInFlight = undefined;
+					};
+					void operation.then(clear, clear);
+					return operation;
+				});
+			} catch {
+				return undefined;
+			}
+		}
 		const result = async (
 			quota: ClaudeSubscriptionQuota,
 			response?: Response,
 		) => {
 			const measuredAt = quota.fetchedAt ?? new Date(now());
-			const owner = profiles.peek(profileKey(token))?.value;
-			const persisted = proofs.get(token, context.canonicalProfile ?? null);
 			const bind = <T extends object>(value: T): T => {
+				if (
+					quarantineOverflow ||
+					revocations.get(profileKey(token))?.denied ||
+					quota.status === "token_expired"
+				)
+					return {
+						...value,
+						lastKnownUsage: undefined,
+						prepaidBalance: undefined,
+					};
+				const owner = profiles.peek(profileKey(token))?.value;
+				const persisted = proofs.get(token, context.canonicalProfile ?? null);
 				if (owner?.profile === profile && claudeProfileIdentity(profile))
 					return bindClaudeQuotaIdentity(
 						value,
@@ -249,17 +314,25 @@ export function createClaudeSubscriptionReader({
 						profile,
 						owner.checkedAt,
 					);
-				return persisted && quota.status !== "token_expired"
+				return persisted
 					? restoreClaudeQuotaIdentity(value, persisted, now())
 					: value;
 			};
 			const value = { ...quota, fetchedAt: measuredAt };
 			if (response && TRANSIENT.has(response.status)) {
-				const lastKnownUsage = profile
-					? await history.get(token, profile)
-					: persisted
-						? await history.getVerifiedOwner(token, persisted.ownerHash)
-						: undefined;
+				const persisted = proofs.get(token, context.canonicalProfile ?? null);
+				const historical = !historyQuarantined(token)
+					? await optionalHistory(() =>
+							profile
+								? history.get(token, profile)
+								: persisted
+									? history.getVerifiedOwner(token, persisted.ownerHash)
+									: Promise.resolve(undefined),
+						)
+					: undefined;
+				const lastKnownUsage = !historyQuarantined(token)
+					? historical
+					: undefined;
 				const prepaidBalance = wallets.peek(token, profile);
 				const withHistory = {
 					...value,
@@ -274,120 +347,151 @@ export function createClaudeSubscriptionReader({
 			return bind(value);
 		};
 		try {
-			return await budget.run(async (budgetSignal) => {
-				const signal = context.signal
-					? AbortSignal.any([budgetSignal, context.signal])
-					: budgetSignal;
-				const { response, resetCredits } = await usageWithResets(
-					token,
-					USAGE_URL,
-					{
-						cache: "no-store",
-						redirect: "error",
-						signal,
-						headers: {
-							Authorization: `Bearer ${token}`,
-							"anthropic-beta": BETA,
+			const { response, resetCredits, usage, observedAt } = await budget.run(
+				async (budgetSignal) => {
+					const signal = context.signal
+						? AbortSignal.any([budgetSignal, context.signal])
+						: budgetSignal;
+					const primary = await usageWithResets(
+						token,
+						USAGE_URL,
+						{
+							cache: "no-store",
+							redirect: "error",
+							signal,
+							headers: {
+								Authorization: `Bearer ${token}`,
+								"anthropic-beta": BETA,
+							},
 						},
-					},
-					context.canonicalProfile,
-				);
-				if (response.status === 401 || response.status === 403) {
-					const persisted = proofs.get(token, context.canonicalProfile ?? null);
-					await history.forget(token, profile);
-					if (persisted)
-						await history.forgetVerifiedOwner(token, persisted.ownerHash);
-					proofs.forget(token);
-					profiles.invalidate(profileKey(token));
-					profile = null;
-					return result({
-						email: null,
-						status: "token_expired",
-						statusDetail: "Sign-in expired — run /login in Claude Code.",
-						windows: [],
-						extraUsage: null,
-					});
-				}
-				let windows: UsageQuotaWindow[] = [];
-				let extraUsage: UsageAccount["extraUsage"] = null;
-				let observedAt = new Date(now());
-				if (response.ok) {
-					const usage = (await response.json()) as ClaudeUsageResponse;
-					observedAt = new Date(now());
-					windows = mapWindows(usage).map((window) => ({
-						...window,
-						observedAt,
-						source: "provider" as const,
-					}));
-					const used = usage.extra_usage?.used_credits,
-						limit = usage.extra_usage?.monthly_limit;
+						context.canonicalProfile,
+					);
 					if (
-						typeof used === "number" &&
-						Number.isFinite(used) &&
-						used >= 0 &&
-						typeof limit === "number" &&
-						Number.isFinite(limit) &&
-						limit >= 0
-					)
-						extraUsage = { usedCents: used, limitCents: limit };
-				}
-				let prepaidBalance: UsageAccount["prepaidBalance"];
-				try {
-					await budget.run(async (optionalSignal) => {
-						const combined = AbortSignal.any([signal, optionalSignal]);
-						profile = await fetchProfile(
+						primary.response.status === 401 ||
+						primary.response.status === 403
+					) {
+						deniedHistory = deny(token, context.canonicalProfile ?? null);
+						profile = null;
+						return { ...primary, usage: null, observedAt: new Date(now()) };
+					}
+					const usage = primary.response.ok
+						? ((await primary.response.json()) as ClaudeUsageResponse)
+						: null;
+					signal.throwIfAborted();
+					return { ...primary, usage, observedAt: new Date(now()) };
+				},
+			);
+			if (response.status === 401 || response.status === 403) {
+				const previous =
+					deniedHistory ?? deny(token, context.canonicalProfile ?? null);
+				profile = null;
+				await optionalHistory(async (signal) => {
+					await history.forget(token, previous.profile);
+					signal.throwIfAborted();
+					context.signal?.throwIfAborted();
+					if (previous.ownerHash)
+						await history.forgetVerifiedOwner(token, previous.ownerHash);
+				});
+				return result({
+					email: null,
+					status: "token_expired",
+					statusDetail: "Sign-in expired — run /login in Claude Code.",
+					windows: [],
+					extraUsage: null,
+				});
+			}
+			let windows: UsageQuotaWindow[] = [];
+			let extraUsage: UsageAccount["extraUsage"] = null;
+			if (usage) {
+				windows = mapWindows(usage).map((window) => ({
+					...window,
+					observedAt,
+					source: "provider" as const,
+				}));
+				const used = usage.extra_usage?.used_credits,
+					limit = usage.extra_usage?.monthly_limit;
+				if (
+					typeof used === "number" &&
+					Number.isFinite(used) &&
+					used >= 0 &&
+					typeof limit === "number" &&
+					Number.isFinite(limit) &&
+					limit >= 0
+				)
+					extraUsage = { usedCents: used, limitCents: limit };
+			}
+			let prepaidBalance: UsageAccount["prepaidBalance"];
+			try {
+				await budget.run(async (optionalSignal) => {
+					const combined = context.signal
+						? AbortSignal.any([context.signal, optionalSignal])
+						: optionalSignal;
+					profile = await fetchProfile(
+						token,
+						combined,
+						context.canonicalProfile,
+					);
+					if (response.ok)
+						prepaidBalance = await wallets.fetch(
 							token,
+							profile,
 							combined,
 							context.canonicalProfile,
 						);
-						if (response.ok)
-							prepaidBalance = await wallets.fetch(
-								token,
-								profile,
-								combined,
-								context.canonicalProfile,
-							);
-					}, budgets.profileMs);
-				} catch {
-					/* Optional identity/wallet latency cannot discard valid primary windows. */
-				}
-				const email =
-					[
-						profile?.account?.email,
-						profile?.account?.email_address,
-						profile?.account?.emailAddress,
-						profile?.email,
-					].find((value) => typeof value === "string" && value.trim()) ?? null;
-				if (!response.ok)
-					return result(
-						{
-							email,
-							status: "unavailable",
-							statusDetail: `Usage endpoint returned ${response.status}.`,
-							windows: [],
-							extraUsage: null,
-						},
-						response,
-					);
-				if (windows.length)
+				}, budgets.profileMs);
+			} catch {
+				/* Optional reads use only the original deadline's remaining time. */
+			}
+			prepaidBalance ??= wallets.peek(token, profile);
+			const email =
+				[
+					profile?.account?.email,
+					profile?.account?.email_address,
+					profile?.account?.emailAddress,
+					profile?.email,
+				].find((value) => typeof value === "string" && value.trim()) ?? null;
+			if (!response.ok)
+				return result(
+					{
+						email,
+						status: "unavailable",
+						statusDetail: `Usage endpoint returned ${response.status}.`,
+						windows: [],
+						extraUsage: null,
+					},
+					response,
+				);
+			const key = profileKey(token);
+			const revocation = revocations.get(key);
+			if (
+				profiles.peek(key)?.value.profile === profile &&
+				claudeProfileIdentity(profile) &&
+				revocation
+			)
+				revocation.denied = false;
+			if (windows.length) {
+				const saved = await optionalHistory(async () => {
 					await history.remember(token, profile, {
 						windows,
 						fetchedAt: observedAt,
 					});
-				else await history.forget(token, profile);
-				return result({
-					email,
-					status: windows.length || prepaidBalance ? "ok" : "unavailable",
-					statusDetail:
-						windows.length || prepaidBalance
-							? null
-							: "No quota data returned (org-managed and education plans do not expose limits).",
-					windows,
-					extraUsage,
-					fetchedAt: observedAt,
-					...(prepaidBalance ? { prepaidBalance } : {}),
-					...(resetCredits ? { resetCredits } : {}),
+					return true;
 				});
+				if (saved && revocations.get(key) === revocation && !revocation?.denied)
+					revocations.delete(key);
+			} else await optionalHistory(() => history.forget(token, profile));
+			return result({
+				email,
+				status: windows.length || prepaidBalance ? "ok" : "unavailable",
+				statusDetail:
+					windows.length || prepaidBalance
+						? null
+						: "No quota data returned (org-managed and education plans do not expose limits).",
+				windows,
+				extraUsage,
+				fetchedAt: observedAt,
+				...(prepaidBalance ? { prepaidBalance } : {}),
+				...(resetCredits ? { resetCredits } : {}),
 			});
 		} catch {
 			return result(

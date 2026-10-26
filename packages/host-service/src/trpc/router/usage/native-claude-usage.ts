@@ -395,19 +395,29 @@ export function createNativeClaudeUsageStore(
 				}
 				for (const window of pending.windows) {
 					const previous = target.windows.find((item) => item.id === window.id);
+					const previousEpoch = Math.floor(
+						(previous?.resetsAt ?? Number.NaN) / 1000,
+					);
+					const nextEpoch = Math.floor(window.resetsAt / 1000);
 					if (
 						window.observedAt > at ||
 						window.resetsAt <= at ||
 						(previous &&
 							(previous.observedAt > window.observedAt ||
-								previous.resetsAt > window.resetsAt ||
-								(previous.resetsAt === window.resetsAt &&
+								previousEpoch > nextEpoch ||
+								(previousEpoch === nextEpoch &&
 									previous.usedPercent > window.usedPercent)))
 					)
 						continue;
 					target.windows = [
 						...target.windows.filter((item) => item.id !== window.id),
-						{ ...window },
+						{
+							...window,
+							resetsAt:
+								previous && previousEpoch === nextEpoch
+									? Math.max(previous.resetsAt, window.resetsAt)
+									: window.resetsAt,
+						},
 					];
 					target.updatedAt = Math.max(target.updatedAt, pending.updatedAt);
 				}
@@ -550,18 +560,30 @@ export function createNativeClaudeUsageStore(
 				}
 				for (const window of windows) {
 					const existing = scope.windows.find((item) => item.id === window.id);
+					const existingEpoch = Math.floor(
+						(existing?.resetsAt ?? Number.NaN) / 1000,
+					);
+					const nextEpoch = Math.floor(window.resetsAt / 1000);
 					if (
 						existing &&
 						(existing.observedAt > input.receivedAt ||
-							existing.resetsAt > window.resetsAt ||
-							(existing.resetsAt === window.resetsAt &&
+							existingEpoch > nextEpoch ||
+							(existingEpoch === nextEpoch &&
 								existing.usedPercent > window.usedPercent))
 					)
 						continue;
 					applied = true;
 					scope.windows = [
 						...scope.windows.filter((item) => item.id !== window.id),
-						{ ...window, observedAt: input.receivedAt, source: input.source },
+						{
+							...window,
+							resetsAt:
+								existing && existingEpoch === nextEpoch
+									? Math.max(existing.resetsAt, window.resetsAt)
+									: window.resetsAt,
+							observedAt: input.receivedAt,
+							source: input.source,
+						},
 					];
 				}
 				if (applied)

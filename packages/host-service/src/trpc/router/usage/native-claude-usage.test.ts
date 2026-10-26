@@ -529,3 +529,136 @@ test("out-of-order receipt cannot overwrite newer quota or consume a later respo
 		}),
 	).toBe(true);
 });
+
+const resetPrecisionCases = [
+	["same second with 213ms HTTP precision", 213, 0, 30, true, 213],
+	["same second with higher usage", 213, 0, 31, true, 213],
+	["same second with lower usage", 0, 213, 29, false, 0],
+	["earlier second with higher usage", 0, -1000, 99, false, 0],
+	["later second with lower usage", 0, 1000, 1, true, 1000],
+	["one millisecond into a later second", 999, 1000, 1, true, 1000],
+	["one millisecond into the previous second", 1000, 999, 99, false, 1000],
+] as const;
+
+function precisionFrame(
+	counter: number,
+	usedPercent: number,
+	resetsAt: number,
+) {
+	return {
+		cost: { total_api_duration_ms: counter },
+		rate_limits: {
+			five_hour: { used_percentage: usedPercent, resets_at: resetsAt / 1000 },
+		},
+	};
+}
+test.each(
+	resetPrecisionCases,
+)("live native reset precision: %s", (_name, previousOffset, nextOffset, usedPercent, accepted, keptOffset) => {
+	const f = fixture();
+	const reset = f.time() + 120_000;
+	const ingest = (
+		counter: number,
+		used: number,
+		at: number,
+		receivedAt = f.time(),
+	) =>
+		f.store.ingest({
+			...f.identity,
+			receivedAt,
+			source: "claude_statusline",
+			payload: precisionFrame(counter, used, at),
+		});
+	ingest(0, 30, reset + previousOffset);
+	f.advance();
+	expect(ingest(1, 30, reset + previousOffset)).toBe(true);
+	const previousObservedAt = f.time();
+	f.advance();
+	expect(ingest(2, usedPercent, reset + nextOffset)).toBe(accepted);
+	const current = f.store.snapshot(f.identity.scope);
+	expect(current[0]?.resetsAt).toBe(reset + keptOffset);
+	expect(current[0]?.usedPercent).toBe(accepted ? usedPercent : 30);
+	expect(current[0]?.observedAt).toBe(accepted ? f.time() : previousObservedAt);
+	f.advance();
+	expect(ingest(2, usedPercent, reset + nextOffset)).toBe(false);
+	expect(f.store.snapshot(f.identity.scope)).toEqual(current);
+});
+test.each(
+	resetPrecisionCases,
+)("pending native promotion preserves reset precision and original age: %s", (_name, previousOffset, nextOffset, usedPercent, accepted, keptOffset) => {
+	const f = fixture();
+	const reset = f.time() + 120_000;
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: precisionFrame(0, 30, reset + previousOffset),
+	});
+	f.advance();
+	f.store.ingest({
+		...f.identity,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: precisionFrame(1, 30, reset + previousOffset),
+	});
+	const previousObservedAt = f.time();
+	const launch = {
+		launchId: "precision-pending",
+		sessionId: "pending-session",
+		generation: "c".repeat(64),
+	};
+	f.store.captureLaunch(launch);
+	const pending = f.store.activeScope(launch);
+	if (!pending) throw new Error("missing pending launch");
+	f.store.ingest({
+		...launch,
+		scope: pending.scope,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: precisionFrame(0, usedPercent, reset + nextOffset),
+	});
+	f.advance();
+	f.store.ingest({
+		...launch,
+		scope: pending.scope,
+		receivedAt: f.time(),
+		source: "claude_statusline",
+		payload: precisionFrame(1, usedPercent, reset + nextOffset),
+	});
+	const pendingObservedAt = f.time();
+	f.advance();
+	expect(f.store.promoteLaunch({ ...launch, scope: f.identity.scope })).toBe(
+		true,
+	);
+	const current = f.store.snapshot(f.identity.scope);
+	expect(current[0]?.resetsAt).toBe(reset + keptOffset);
+	expect(current[0]?.usedPercent).toBe(accepted ? usedPercent : 30);
+	expect(current[0]?.observedAt).toBe(
+		accepted ? pendingObservedAt : previousObservedAt,
+	);
+	expect(current[0]?.observedAt).not.toBe(f.time());
+	expect(current[0]?.source).toBe("claude_statusline");
+});
+test("same-second reset precision cannot freshen stale or equal-counter receipts", () => {
+	const f = fixture();
+	const reset = f.time() + 120_000;
+	const ingest = (counter: number, resetsAt: number, receivedAt = f.time()) =>
+		f.store.ingest({
+			...f.identity,
+			receivedAt,
+			source: "claude_statusline",
+			payload: precisionFrame(counter, 30, resetsAt),
+		});
+	ingest(0, reset + 213);
+	f.advance();
+	ingest(1, reset + 213);
+	const measured = f.store.snapshot(f.identity.scope);
+	const observedAt = f.time();
+	f.advance();
+	expect(ingest(2, reset, observedAt - 1)).toBe(false);
+	expect(ingest(1, reset, observedAt)).toBe(false);
+	expect(f.store.snapshot(f.identity.scope)).toEqual(measured);
+	expect(ingest(2, reset)).toBe(true);
+	expect(f.store.snapshot(f.identity.scope)[0]?.resetsAt).toBe(reset + 213);
+	expect(f.store.snapshot(f.identity.scope)[0]?.observedAt).toBe(f.time());
+});

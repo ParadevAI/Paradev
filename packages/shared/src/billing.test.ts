@@ -19,6 +19,7 @@ import {
 	planTierFromSubscription,
 	requiredPlanForTriggerKind,
 	resolveCurrentPlan,
+	seatPriceOf,
 	seatPricePerMonth,
 } from "./billing";
 import { LAUNCHED_TRIGGER_KINDS } from "./constants";
@@ -382,5 +383,21 @@ describe("machine sizes", () => {
 	test("memory scales with vCPUs", () => {
 		expect(machineSpec("small")).toEqual({ vcpus: 2, memoryGb: 4 });
 		expect(machineSpec("2xlarge")).toEqual({ vcpus: 32, memoryGb: 64 });
+	});
+});
+
+describe("seatPriceOf", () => {
+	test("reads the seat interval from a license or from the seats feature of a retired plan", () => {
+		const license = seatLicense("pro_seat_annual", 192, "year", 19200);
+		const current = parentPlan("pro_v2_annual", "pro_seat_annual", {});
+		const retired: AutumnCatalogPlan = {
+			id: "pro_annual",
+			name: "Pro (annual)",
+			metadata: { family: "pro" },
+			items: [{ featureId: "seats", price: { amount: 180, interval: "year" } }],
+		};
+		const plans = [license, current, retired];
+		expect(seatPriceOf(current, plans)?.interval).toBe("year");
+		expect(seatPriceOf(retired, plans)?.interval).toBe("year");
 	});
 });
