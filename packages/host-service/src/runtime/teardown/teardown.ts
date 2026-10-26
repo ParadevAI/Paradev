@@ -17,10 +17,7 @@ const OUTPUT_TAIL_BYTES = 4096;
 const CAPTURE_BYTES = 64 * 1024;
 const KILL_GRACE_MS = 2_000;
 
-/**
- * Printed by the teardown's `bash -c` before the command. Bytes before it are
- * the login shell's startup output and its line editor echoing the command.
- */
+// Everything before the marker is login-shell startup and line-editor echo.
 export const TEARDOWN_OUTPUT_MARKER = "\x1b]superset;teardown-output\x07";
 const PRINT_OUTPUT_MARKER = "printf '\\033]superset;teardown-output\\a'";
 
