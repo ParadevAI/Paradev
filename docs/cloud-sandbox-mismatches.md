@@ -279,6 +279,19 @@ terminals and agent launches inherit the pushed set; open terminals keep the
 one they started with; nothing is written to disk. A host-service restart
 comes up with an empty set until the next push, which every wake performs.
 
+**Cloud agent registration cannot depend on the first launch.** The creation picker knows which
+CLIs the image installs, but the chat picker reads the sandbox's persisted agent configurations.
+Flag-gated pdev was excluded from default configurations and only added when it was the initial
+launch agent, so Claude-created and idle boxes hid it. The cloud launch gate also allowed only
+Claude to chat, sending pdev to a terminal even when ACP chat was enabled. **Fixed:** every boot
+ensures configurations for all installed cloud agents and seeds pdev folder trust, including on
+existing boxes. Both new-workspace and pinned-automation dispatch allow pdev chat through the
+existing `acp-chat` flag; clients still apply `pdev-agent` visibility. Registration and trust repair
+require a published host-service/sandbox bundle, an updated environment bundle pin, and a box
+restart. Trust repair is best-effort: a failed pdev trust write must not prevent host-service from
+starting. This does not remove unrelated
+default agent configurations or make their CLIs available in the image.
+
 **Agent CLIs are pre-configured in the image.** A first run otherwise opens a
 theme picker, an API-key approval and a workspace trust dialog — three
 confirmations no one is there to answer. The bundle carries
@@ -390,6 +403,30 @@ sandbox running (and billing) plus the `cloud_workspaces` row intact — the
 workspace reappeared on the next refetch. **Fixed:** `useDestroyWorkspace`
 sends a cloud workspace to `cloudWorkspace.delete`.
 
+**Archive ran no teardown.** Locally, deleting a workspace runs the repository's
+teardown before the worktree goes. A cloud archive only stopped the box and
+deleted it seven days later, so anything `setup` created outside the box
+leaked: this repository's per-workspace Neon branches piled up until 383 were
+deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
+calls `sandbox.runArchiveHook` on the still-running box (direct with the host
+secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
+`.superset/config.toml` resolved for the cloud. A failing hook never blocks the
+stop, and an undo that lands during the hook re-runs setup (`runStartHook`
+with `force`) instead of stopping the box. A box whose host-service predates
+the procedure answers 404 and is stopped as before, so the fix reaches a box
+only after a sandbox release.
+
+The hook is best effort, not a guarantee. It runs only when the box is still
+running at the stop stage, and boxes stop on their own after four hours idle,
+which is exactly the state an archived workspace is usually in. So a resource
+must not depend on it: this repository's Neon branch is a lease
+(`NEON_BRANCH_LEASE_DAYS=7` in `setup.cloud.sh`), set when the branch is
+created and renewed on every boot, so a box that stops renewing releases its
+branch through Neon's own expiry. **Open:** running `[archive]` at least once,
+in a fresh short-lived box from the environment's image when the original is
+stopped or gone. That works because `[archive]` only releases outside
+resources: it needs the workspace's identity and secrets, not its disk.
+
 **Sidebar affordances are driven by local state, not by the row.** Visibility,
 pinning and ordering live in `v2WorkspaceLocalState`; a section that renders
 straight off an API list will show "Remove from sidebar" doing nothing. Cloud
@@ -467,6 +504,12 @@ directory instead of replacing it so a shell already sitting in it keeps a
 live cwd. An interrupted clone (a wake that ends the session mid-fetch)
 leaves a repository that can fetch nothing; the runner reclones rather than
 failing every boot.
+
+**GitHub names are case-insensitive; the release database lookup was not.** After the repository
+rename, production stored `ParadevAI/Paradev` while the release requested `paradevai/paradev`.
+An exact SQL comparison reported an installed repository as disconnected and stopped the release
+before environment pins advanced. **Fixed:** the release compares normalized names while retaining
+the organization constraint. No repository reconnection or production data rewrite is needed.
 
 **A freshly pushed image is not usable for a few minutes.** VCR reports the
 tag `Preparing` while it optimises a `linux/amd64` build (a gigabyte takes

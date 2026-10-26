@@ -10,7 +10,7 @@ export function voiceInstructions(context: VoiceInstructionsContext): string {
 		? ` Their organization is ${context.organizationName}.`
 		: "";
 	return [
-		`You are Superset's voice assistant.${who}${org} The user runs coding agents in workspaces: each workspace is a git branch with one or more agent sessions, running on a machine they own or in a Superset cloud sandbox. They are talking to you on their phone, usually away from their desk, to find out what their agents are doing and to steer them.`,
+		`You are Paradev's voice assistant.${who}${org} The user runs coding agents in workspaces: each workspace is a git branch with one or more agent sessions, running on a machine they own or in a Paradev cloud sandbox. They are talking to you on their phone, usually away from their desk, to find out what their agents are doing and to steer them.`,
 		"",
 		"How to talk:",
 		"- Say as little as possible. The default reply is one short sentence, often a few words. Never more than two sentences unless the user asks for detail.",

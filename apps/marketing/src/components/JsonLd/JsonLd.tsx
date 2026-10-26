@@ -42,6 +42,7 @@ export function OrganizationJsonLd() {
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
 		name: BRAND.INTRO_NAME,
+		legalName: COMPANY.LEGAL_NAME,
 		url: COMPANY.MARKETING_URL,
 		logo: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
 		description: "One workspace for orchestrating any coding agent",
@@ -62,7 +63,7 @@ export function OrganizationJsonLd() {
 		},
 		sameAs: [
 			COMPANY.GITHUB_URL,
-			"https://github.com/superset-sh",
+			"https://github.com/paradevai",
 			COMPANY.X_URL,
 			COMPANY.LINKEDIN_URL,
 			COMPANY.YOUTUBE_URL,
@@ -228,7 +229,7 @@ export function HomeWebPageJsonLd() {
 		"@type": "WebPage",
 		"@id": COMPANY.MARKETING_URL,
 		url: COMPANY.MARKETING_URL,
-		name: `${BRAND.INTRO_NAME}: Orchestrate any coding agent`,
+		name: `${BRAND.INTRO_NAME}: Run an army of coding agents`,
 		isPartOf: {
 			"@type": "WebSite",
 			name: BRAND.INTRO_NAME,

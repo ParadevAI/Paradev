@@ -69,7 +69,7 @@ afterAll(() => {
 });
 
 describe("auth token storage", () => {
-	test("atomically stores credentials only in the test Superset home", async () => {
+	test("atomically stores credentials only in the test Paradev home", async () => {
 		await saveToken({ token: "token", expiresAt: "2099-01-01" });
 
 		expect(fs.statSync(tokenFile).isFile()).toBe(true);

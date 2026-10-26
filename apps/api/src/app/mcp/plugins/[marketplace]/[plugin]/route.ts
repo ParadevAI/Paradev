@@ -47,9 +47,9 @@ function describeServer(
 			marketplace,
 			transport: "streamable-http",
 			url: `${origin}/mcp/plugins/${marketplace}/${plugin}`,
-			description: `Superset MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
+			description: `Paradev MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
 			usage:
-				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Superset API key). Add ?connection=<id> to pin a specific connected account.",
+				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Paradev API key). Add ?connection=<id> to pin a specific connected account.",
 			authentication: {
 				type: "oauth2",
 				resourceMetadataUrl: mcpProtectedResourceMetadataUrl(req),

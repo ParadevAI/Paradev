@@ -33,7 +33,7 @@ export function OrganizationInvitationEmail({
 			preview={`${inviterName} invited you to join ${organizationName}`}
 		>
 			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Join {organizationName} on Superset
+				Join {organizationName} on Paradev
 			</Heading>
 
 			{inviteeName && (
@@ -44,13 +44,13 @@ export function OrganizationInvitationEmail({
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				{inviterName} ({inviterEmail}) has invited you to join{" "}
-				<strong>{organizationName}</strong> on Superset as a{" "}
+				<strong>{organizationName}</strong> on Paradev as a{" "}
 				<strong>{roleDisplay}</strong>.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				Superset runs coding agents in parallel, each in an isolated copy of
-				your repo. Accept the invite to work alongside your team.
+				Paradev runs coding agents in parallel, each in an isolated copy of your
+				repo. Accept the invite to work alongside your team.
 			</Text>
 
 			<Section className="mb-6">

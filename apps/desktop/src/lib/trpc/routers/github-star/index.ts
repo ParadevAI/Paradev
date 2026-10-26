@@ -3,7 +3,7 @@ import { execWithShellEnv } from "../workspaces/utils/shell-env";
 
 export type GithubStarState = "starred" | "not_starred" | "unknown";
 
-const STARRED_REPO_PATH = "user/starred/superset-sh/superset";
+const STARRED_REPO_PATH = "user/starred/paradevai/paradev";
 // A hung `gh` process must not leave the query/mutation pending forever —
 // both callers already treat any failure as a safe "unknown"/false outcome.
 // This only bounds the `gh` call itself: execWithShellEnv resolves the shell
@@ -12,7 +12,7 @@ const STARRED_REPO_PATH = "user/starred/superset-sh/superset";
 const GH_CALL_TIMEOUT_MS = 10_000;
 
 /**
- * Checks whether the signed-in `gh` CLI user has starred superset-sh/superset.
+ * Checks whether the signed-in `gh` CLI user has starred paradevai/paradev.
  * GitHub returns 204 for "starred", 404 for "not starred". Every other
  * outcome (gh missing/unauthenticated, network error, rate limit) collapses
  * to "unknown" so callers always have a safe fallback value instead of an
@@ -40,7 +40,7 @@ export async function checkGithubStarred(): Promise<GithubStarState> {
 	}
 }
 
-/** Stars superset-sh/superset on behalf of the signed-in `gh` CLI user. Never throws. */
+/** Stars paradevai/paradev on behalf of the signed-in `gh` CLI user. Never throws. */
 export async function starGithubRepo(): Promise<boolean> {
 	try {
 		await execWithShellEnv("gh", ["api", "-X", "PUT", STARRED_REPO_PATH], {

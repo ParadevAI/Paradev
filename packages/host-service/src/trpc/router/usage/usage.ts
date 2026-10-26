@@ -18,6 +18,7 @@ import {
 } from "./account-provisioning";
 import { fetchAgyAccounts } from "./agy-quota";
 import {
+	CLAUDE_QUOTA_POLL_MS,
 	captureClaudeQuotaSnapshot,
 	disposeClaudeQuotaCollection,
 	onClaudeQuotaUpdate,
@@ -53,6 +54,7 @@ function getQuotaReader() {
 		quotaCache = createUsageQuotaReader([
 			{
 				agent: "claude",
+				ttlMs: CLAUDE_QUOTA_POLL_MS,
 				capture: captureClaudeQuotaSnapshot,
 				subscribe: (listener) => {
 					const stopHttp = onClaudeQuotaUpdate(listener);
@@ -91,6 +93,10 @@ function getQuotaReader() {
 	return quotaCache;
 }
 const getQuota = (forceRefresh: boolean) => getQuotaReader().get(forceRefresh);
+export function expireUsageQuota(agent: "claude" | "codex") {
+	quotaCache?.expire(agent);
+}
+
 export async function disposeUsageQuota() {
 	const retiring = quotaCache;
 	quotaCache = undefined;

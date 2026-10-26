@@ -14,7 +14,7 @@ function renderSettings({ isV2OnlyUser = false }: { isV2OnlyUser?: boolean }) {
 
 describe("ExperimentalSettings", () => {
 	test("never offers a v1/v2 switch", () => {
-		expect(renderSettings({})).not.toContain("Try Superset v2");
+		expect(renderSettings({})).not.toContain("Try Paradev v2");
 	});
 
 	test("pre-cutoff account sees an enabled Import from v1", () => {

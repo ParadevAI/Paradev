@@ -9,14 +9,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"github": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "github",
-		"version": "1.0.1",
+		"version": "1.0.2",
 		"description": "Work with issues, pull requests, and CI across your repositories.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"github",
@@ -55,14 +55,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"linear": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "linear",
-		"version": "1.5.3",
+		"version": "1.5.4",
 		"description": "Plan and build products: create, search, and update Linear issues.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"linear",
@@ -104,14 +104,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"notion": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "notion",
-		"version": "1.0.3",
+		"version": "1.0.4",
 		"description": "Search, read, and write your Notion workspace: pages, databases, and comments.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"notion",
@@ -150,14 +150,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"slack": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "slack",
-		"version": "1.2.3",
+		"version": "1.2.4",
 		"description": "Search, read, and post across your Slack workspace: channels, DMs, and threads.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"slack",
@@ -183,14 +183,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"sentry": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "sentry",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"sentry",
@@ -229,14 +229,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"gmail": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "gmail",
-		"version": "1.1.5",
+		"version": "1.1.6",
 		"description": "Read, search, send, and organize mail in your Gmail account.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"gmail",
@@ -262,14 +262,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"granola": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "granola",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Recall what was said in your meetings: search, read, and query Granola notes and transcripts.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"granola",
@@ -308,14 +308,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"circleback": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "circleback",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"circleback",
@@ -358,14 +358,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"ynab": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "ynab",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Track money in YNAB: accounts, categories, budgets, and transactions.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"ynab",
@@ -391,14 +391,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"autumn": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "autumn",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Work with billing in Autumn: customers, plans, balances, and subscriptions.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"autumn",
@@ -428,14 +428,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"stripe": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "stripe",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Work with payments in Stripe: trace charges and subscriptions, read billing data, and search Stripe's docs.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"stripe",
@@ -478,14 +478,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"superhuman": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "superhuman",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Work your inbox from Superhuman: find and read threads, triage what needs you, draft replies in your voice, and schedule from your calendar.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"superhuman",
@@ -532,14 +532,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"neon": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "neon",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Work with your Neon Postgres: inspect projects and branches, read schemas, and run SQL.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"neon",
@@ -574,14 +574,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"exa": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "exa",
-		"version": "1.0.1",
+		"version": "1.0.2",
 		"description": "Search the web, companies, and people with Exa.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"exa",
@@ -607,14 +607,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"posthog": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "posthog",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Ask PostHog about your product: query events and insights, look up people, and check feature flags.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"posthog",
@@ -649,14 +649,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"google-calendar": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "google-calendar",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Read and manage your Google Calendar: find events, check free time, and schedule meetings.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"google",
@@ -682,14 +682,14 @@ export const FIRST_PARTY_MANIFESTS = {
 	"vercel": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "vercel",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"description": "Work with Vercel: inspect projects and deployments, read build and runtime logs, and search Vercel's docs.",
 		"author": {
 			"name": "Superset",
 			"url": "https://superset.sh"
 		},
 		"homepage": "https://docs.superset.sh",
-		"repository": "https://github.com/superset-sh/superset",
+		"repository": "https://github.com/paradevai/paradev",
 		"license": "MIT",
 		"keywords": [
 			"vercel",

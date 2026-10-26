@@ -22,4 +22,5 @@ export type {
 	PortChangedMessage,
 	ServerMessage,
 	TerminalLifecycleMessage,
+	UsageChangedMessage,
 } from "./types.ts";

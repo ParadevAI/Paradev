@@ -9,7 +9,7 @@ import type { tasks } from "@superset/db/schema";
 
 import { env } from "@/env";
 
-const SUPERSET_PRODUCT_NAME = "Superset";
+const SUPERSET_PRODUCT_NAME = "Paradev";
 
 type TaskWithRelations = typeof tasks.$inferSelect & {
 	status?: { id: string; name: string } | null;
@@ -217,7 +217,7 @@ export function createTaskFlexpaneObject(
 			actions: {
 				primary_actions: [
 					{
-						text: "Open in Superset",
+						text: "Open in Paradev",
 						action_id: "open_task",
 						style: "primary",
 						url: taskUrl,

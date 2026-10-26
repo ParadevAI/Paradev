@@ -73,7 +73,7 @@ async function sendCode(email: string, payload: Payload): Promise<Outcome> {
 		from: NOREPLY_FROM,
 		replyTo: "kiet@superset.sh",
 		to: email,
-		subject: "Your Superset YC deal code",
+		subject: "Your Paradev YC deal code",
 		react: YcDealCodeEmail({
 			firstName: payload.first_name,
 			code: promotionCode.code,

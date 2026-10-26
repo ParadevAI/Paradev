@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { initServerI18n } from "@/lib/i18n-server";
 import "./global.css";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import { Inter } from "next/font/google";
 import { NavigationBar } from "@/app/components/NavigationBar";
 import { NavbarProvider } from "@/app/components/NavigationBar/components/NavigationMobile";
@@ -56,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
 					message: `Official documentation for ${BRAND.INTRO_NAME}, the app for running 100+ coding agents in parallel.`,
 				}),
 			),
-			creator: "@superset_sh",
+			creator: SOCIAL.X.handle,
 		},
 		robots: {
 			index: true,

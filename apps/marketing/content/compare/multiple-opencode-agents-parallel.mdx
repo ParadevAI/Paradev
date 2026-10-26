@@ -27,7 +27,7 @@ OpenCode's [agent documentation](https://opencode.ai/docs/agents/) distinguishes
 | Several sessions in one directory | Shared checkout | Overlapping edits and shared Git index |
 | Delegation to subagents | Depends on execution setup | Actual working directory and tool permissions |
 | One OpenCode process per Git worktree | Separate checkout per task | Branch, dependencies, preview ports, and integration tests |
-| Superset workspaces with OpenCode | Worktree and terminal per independent task | Same checks, with workspace management and diff review in the app |
+| Paradev workspaces with OpenCode | Worktree and terminal per independent task | Same checks, with workspace management and diff review in the app |
 
 Community plugins may add coordination. Evaluate the specific plugin's current documentation, permissions, and maintenance before relying on its isolation guarantees.
 
@@ -54,9 +54,9 @@ Change only documentation. List the commands you checked and anything
 you could not verify. Do not commit or merge.
 ```
 
-Check both sessions with `git rev-parse --show-toplevel` and `git branch --show-current`. Independent tasks should have different worktree paths and branches. If you use Superset, create a separate workspace for each task and select OpenCode as its agent.
+Check both sessions with `git rev-parse --show-toplevel` and `git branch --show-current`. Independent tasks should have different worktree paths and branches. If you use Paradev, create a separate workspace for each task and select OpenCode as its agent.
 
-![Separate tasks and branches in Superset's workspace board.](/changelog/2026-08-16-workspaces-board.png)
+![Separate tasks and branches in Paradev's workspace board.](/changelog/2026-08-16-workspaces-board.png)
 
 ## What worktrees do not isolate
 
@@ -68,7 +68,7 @@ Our [Git 2.52.0 isolation check](/parallel-coding-agents#a-reproducible-isolatio
 
 Inspect each task's diff and command output. Resolve dependencies between tasks before integrating them, then rerun the relevant checks on the combined branch. Record failures and manual corrections as well as successful runs.
 
-Manual worktrees can be enough for occasional parallel tasks. Superset adds persistent terminals, workspace organization, and built-in diff review when tracking those tasks becomes repetitive. See [Superset vs OpenCode](/compare/superset-vs-opencode) and the [three-task walkthrough](/blog/parallel-coding-agents-guide).
+Manual worktrees can be enough for occasional parallel tasks. Paradev adds persistent terminals, workspace organization, and built-in diff review when tracking those tasks becomes repetitive. See [Paradev vs OpenCode](/compare/superset-vs-opencode) and the [three-task walkthrough](/blog/parallel-coding-agents-guide).
 
 ## Frequently Asked Questions
 

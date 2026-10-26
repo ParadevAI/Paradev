@@ -19,6 +19,7 @@ import {
 import { extractComparisonFaqItems } from "@/lib/compare-utils";
 import { mdxComponents } from "../components/mdx-components";
 import { BlogPostLayout } from "./components/BlogPostLayout";
+import { faqAnswerText } from "./utils/faqSocialLinks";
 
 interface PageProps {
 	params: Promise<{ slug: string }>;
@@ -39,7 +40,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 		slug,
 		relatedSlugs: post.relatedSlugs,
 	});
-	const faqItems = post.faq ?? extractComparisonFaqItems(post.content);
+	const faqItems =
+		post.faq?.map((item) => ({
+			...item,
+			answer: faqAnswerText(item.answer),
+		})) ?? extractComparisonFaqItems(post.content);
 	const { author } = post;
 
 	const url = localeUrl(lang, `/blog/${slug}`);

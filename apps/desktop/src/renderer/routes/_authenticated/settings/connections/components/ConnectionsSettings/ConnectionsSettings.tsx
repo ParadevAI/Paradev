@@ -16,8 +16,8 @@ export function ConnectionsSettings() {
 				</h2>
 				<p className="mt-1 max-w-prose text-sm text-muted-foreground">
 					<Trans>
-						Your own accounts. Your organization's integrations let Superset
-						reach its tools; connecting yours makes the work Superset does for
+						Your own accounts. Your organization's integrations let Paradev
+						reach its tools; connecting yours makes the work Paradev does for
 						you show up as you.
 					</Trans>
 				</p>

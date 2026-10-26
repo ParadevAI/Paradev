@@ -16,13 +16,13 @@ export async function generateMetadata(): Promise<Metadata> {
 	const i18n = getI18nInstance(lang);
 	const title = i18n._(
 		msg({
-			message: "Compare Superset | AI Coding Comparisons and Guides",
+			message: "Compare Paradev | AI Coding Comparisons and Guides",
 		}),
 	);
 	const description = i18n._(
 		msg({
 			message:
-				"Compare Superset with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides.",
+				"Compare Paradev with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides.",
 		}),
 	);
 	return {
@@ -33,14 +33,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/compare").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			url: localeUrl(lang, "/compare"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			images: ["/og-image.png"],
 		},
@@ -78,12 +78,12 @@ export default async function ComparePage() {
 						<Trans>Compare</Trans>
 					</span>
 					<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-						<Trans>Superset vs the Alternatives</Trans>
+						<Trans>Paradev vs the Alternatives</Trans>
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>
-							See how Superset compares to other AI coding tools, from AI
-							editors to coding agents to cloud-based AI engineers.
+							See how Paradev compares to other AI coding tools, from AI editors
+							to coding agents to cloud-based AI engineers.
 						</Trans>
 					</p>
 

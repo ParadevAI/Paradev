@@ -147,10 +147,6 @@ export function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 	return listOrdered(db);
 }
 
-/**
- * A cloud workspace's launch agent may be a preset the defaults leave out (a
- * flag-gated one such as pdev); the API has already checked it may launch.
- */
 export function ensurePresetRow(db: HostDb, presetId: string): void {
 	const existing = seedDefaultsIfEmpty(db);
 	if (existing.some((row) => row.presetId === presetId)) return;

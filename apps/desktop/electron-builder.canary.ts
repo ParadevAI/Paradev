@@ -12,6 +12,7 @@ import { join } from "node:path";
 import type { Configuration } from "electron-builder";
 import baseConfig, { displayName as baseDisplayName } from "./electron-builder";
 import pkg from "./package.json";
+import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const productName = "Superset Canary";
 const displayName = `${baseDisplayName} Canary`;
@@ -23,11 +24,12 @@ const config: Configuration = {
 	...baseConfig,
 	appId: "com.superset.desktop.canary",
 	productName,
+	afterPack: localizeMacDisplayName(displayName),
 
 	publish: {
 		provider: "github",
-		owner: "superset-sh",
-		repo: "superset",
+		owner: "paradevai",
+		repo: "paradev",
 		releaseType: "prerelease",
 	},
 
@@ -37,8 +39,8 @@ const config: Configuration = {
 		artifactName: `Superset-Canary-\${version}-\${arch}.\${ext}`,
 		extendInfo: {
 			...baseConfig.mac?.extendInfo,
-			CFBundleName: displayName,
-			CFBundleDisplayName: displayName,
+			CFBundleName: productName,
+			CFBundleDisplayName: productName,
 		},
 	},
 
