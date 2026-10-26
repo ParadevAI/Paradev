@@ -54,8 +54,9 @@ function SignInPage() {
 		useSessionRecovery();
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
+	const isRestoring = isPending || isRecovering;
 	const pendingTimedOut = useDelayElapsed(
-		isPending,
+		isRestoring,
 		SESSION_PENDING_TIMEOUT_MS,
 	);
 
@@ -65,7 +66,7 @@ function SignInPage() {
 	}
 
 	// Show loading while session is being fetched
-	if ((isPending && !pendingTimedOut) || isRecovering) {
+	if (isRestoring && !pendingTimedOut) {
 		return (
 			<div className="flex h-screen w-screen items-center justify-center bg-background">
 				<Spinner className="size-8" />
