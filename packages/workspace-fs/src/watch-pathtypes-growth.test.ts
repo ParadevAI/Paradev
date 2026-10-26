@@ -137,27 +137,28 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		tempRoots.push(rootPath);
 
 		const manager = createManager({ debounceMs: 50 });
-		const events: string[] = [];
+		const observedPaths = new Set<string>();
 		await manager.subscribe({ absolutePath: rootPath }, (batch) => {
 			for (const event of batch.events) {
-				if (event.kind !== "overflow") events.push(event.kind);
+				if (event.kind !== "overflow") {
+					observedPaths.add(event.absolutePath);
+				}
 			}
 		});
 
 		// Create one file, wait for it to be tracked.
 		const filePath = path.join(rootPath, "stable.txt");
 		await fs.writeFile(filePath, "v1");
-		await waitForCondition(() => events.includes("create"));
+		await waitForCondition(() => observedPaths.has(filePath));
 
 		const sizeAfterCreate = getPathTypes(manager, rootPath).size;
+		observedPaths.clear();
 
 		// Now mutate the same file 10 times. pathTypes should not grow.
 		for (let i = 0; i < 10; i++) {
 			await fs.writeFile(filePath, `v${i + 2}`);
 		}
-		await waitForCondition(
-			() => events.filter((k) => k === "update").length >= 1,
-		);
+		await waitForCondition(() => observedPaths.has(filePath));
 
 		const sizeAfterUpdates = getPathTypes(manager, rootPath).size;
 		expect(sizeAfterUpdates).toBe(sizeAfterCreate);
@@ -168,35 +169,45 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		tempRoots.push(rootPath);
 
 		const manager = createManager({ debounceMs: 50 });
-		const events: string[] = [];
+		const observedPaths = new Set<string>();
+		const deletedPaths = new Set<string>();
 		await manager.subscribe({ absolutePath: rootPath }, (batch) => {
 			for (const event of batch.events) {
 				if (event.kind !== "overflow") {
-					events.push(`${event.kind}:${event.absolutePath}`);
+					observedPaths.add(event.absolutePath);
+					if (event.kind === "delete") deletedPaths.add(event.absolutePath);
+					if (event.kind === "rename" && event.oldAbsolutePath) {
+						deletedPaths.add(event.oldAbsolutePath);
+					}
 				}
 			}
 		});
 
 		// Phase 1: create 5 files.
-		for (let i = 0; i < 5; i++) {
-			await fs.writeFile(path.join(rootPath, `phase1-${i}.txt`), "x");
-		}
-		await waitForCondition(
-			() => events.filter((e) => e.startsWith("create:")).length >= 5,
+		const phase1Paths = Array.from({ length: 5 }, (_, i) =>
+			path.join(rootPath, `phase1-${i}.txt`),
+		);
+		for (const filePath of phase1Paths) await fs.writeFile(filePath, "x");
+		await waitForCondition(() =>
+			phase1Paths.every((filePath) => observedPaths.has(filePath)),
 		);
 
-		const sizeAfterPhase1 = getPathTypes(manager, rootPath).size;
+		const trackedAfterPhase1 = getPathTypes(manager, rootPath);
+		for (const filePath of phase1Paths)
+			expect(trackedAfterPhase1.has(filePath)).toBe(true);
+		const sizeAfterPhase1 = trackedAfterPhase1.size;
 		expect(sizeAfterPhase1).toBeGreaterThanOrEqual(5);
 
 		// Phase 2: delete those 5 files. pathTypes should shrink.
-		for (let i = 0; i < 5; i++) {
-			await fs.rm(path.join(rootPath, `phase1-${i}.txt`));
-		}
-		await waitForCondition(
-			() => events.filter((e) => e.startsWith("delete:")).length >= 5,
+		for (const filePath of phase1Paths) await fs.rm(filePath);
+		await waitForCondition(() =>
+			phase1Paths.every((filePath) => deletedPaths.has(filePath)),
 		);
 
-		const sizeAfterDeletes = getPathTypes(manager, rootPath).size;
+		const trackedAfterDeletes = getPathTypes(manager, rootPath);
+		for (const filePath of phase1Paths)
+			expect(trackedAfterDeletes.has(filePath)).toBe(false);
+		const sizeAfterDeletes = trackedAfterDeletes.size;
 		expect(sizeAfterDeletes).toBeLessThan(sizeAfterPhase1);
 
 		// Phase 3: create 5 NEW files with different names. pathTypes grows
@@ -204,14 +215,18 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		// hashed build artifacts produce a stream of unique paths whose
 		// older deletes happen sometime — but in the meantime pathTypes
 		// climbs and climbs.
-		for (let i = 0; i < 5; i++) {
-			await fs.writeFile(path.join(rootPath, `phase3-${i}.txt`), "x");
-		}
-		await waitForCondition(
-			() => events.filter((e) => e.startsWith("create:")).length >= 10,
+		const phase3Paths = Array.from({ length: 5 }, (_, i) =>
+			path.join(rootPath, `phase3-${i}.txt`),
+		);
+		for (const filePath of phase3Paths) await fs.writeFile(filePath, "x");
+		await waitForCondition(() =>
+			phase3Paths.every((filePath) => observedPaths.has(filePath)),
 		);
 
-		const sizeAfterPhase3 = getPathTypes(manager, rootPath).size;
+		const trackedAfterPhase3 = getPathTypes(manager, rootPath);
+		for (const filePath of phase3Paths)
+			expect(trackedAfterPhase3.has(filePath)).toBe(true);
+		const sizeAfterPhase3 = trackedAfterPhase3.size;
 		expect(sizeAfterPhase3).toBeGreaterThanOrEqual(sizeAfterDeletes + 5);
 	});
 
@@ -276,22 +291,29 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		tempRoots.push(rootPath);
 
 		const manager = createManager({ debounceMs: 50 });
-		let createCount = 0;
+		const observedPaths = new Set<string>();
 		await manager.subscribe({ absolutePath: rootPath }, (batch) => {
 			for (const event of batch.events) {
-				if (event.kind === "create") createCount++;
+				if (event.kind !== "overflow") observedPaths.add(event.absolutePath);
 			}
 		});
 
 		// Burst: create 30 unique paths before any delete fires. Without
 		// a cap, pathTypes holds all 30 simultaneously.
 		const totalUnique = 30;
-		for (let i = 0; i < totalUnique; i++) {
-			await fs.writeFile(path.join(rootPath, `unique-${i}.tmp`), `${i}`);
+		const filePaths = Array.from({ length: totalUnique }, (_, i) =>
+			path.join(rootPath, `unique-${i}.tmp`),
+		);
+		for (const [i, filePath] of filePaths.entries()) {
+			await fs.writeFile(filePath, `${i}`);
 		}
-		await waitForCondition(() => createCount >= totalUnique);
+		await waitForCondition(() =>
+			filePaths.every((filePath) => observedPaths.has(filePath)),
+		);
 
-		const peakSize = getPathTypes(manager, rootPath).size;
+		const tracked = getPathTypes(manager, rootPath);
+		for (const filePath of filePaths) expect(tracked.has(filePath)).toBe(true);
+		const peakSize = tracked.size;
 		expect(peakSize).toBeGreaterThanOrEqual(totalUnique);
 	});
 });
