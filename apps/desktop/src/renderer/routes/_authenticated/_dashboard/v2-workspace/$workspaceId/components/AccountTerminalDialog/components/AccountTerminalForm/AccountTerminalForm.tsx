@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import {
@@ -31,6 +32,7 @@ interface AccountTerminalFormProps {
 	loading: boolean;
 	refreshing: boolean;
 	error: string | null;
+	notice?: string | null;
 	launching: boolean;
 	submitLabel?: string;
 	launchDisabled?: boolean;
@@ -52,6 +54,7 @@ export function AccountTerminalForm({
 	loading,
 	refreshing,
 	error,
+	notice,
 	launching,
 	submitLabel,
 	launchDisabled = false,
@@ -60,6 +63,7 @@ export function AccountTerminalForm({
 	onLaunch,
 }: AccountTerminalFormProps) {
 	const { t } = useLingui();
+	const { formatPercent } = useFormat();
 	const agentId = useId();
 	const radioName = useId();
 	const [selected, setSelected] = useState<string | null>(null);
@@ -72,7 +76,7 @@ export function AccountTerminalForm({
 		return () => clearInterval(timer);
 	}, []);
 	const recommendation =
-		!error && !loading && !refreshing
+		!error && !notice && !loading && !refreshing
 			? bestRemainingAccount(accounts, provider, quotas, now)
 			: undefined;
 	const recommendedKey = recommendation ? accountKey(recommendation) : null;
@@ -199,6 +203,7 @@ export function AccountTerminalForm({
 											{quota.windows.map((window) => {
 												const remaining =
 													Math.round((100 - window.usedPercent) * 10) / 10;
+												const remainingPercent = formatPercent(remaining / 100);
 												return (
 													<span
 														key={window.id}
@@ -210,7 +215,7 @@ export function AccountTerminalForm({
 																remaining <= 10 ? "text-destructive" : undefined
 															}
 														>
-															<Trans>{remaining}% remaining</Trans>
+															<Trans>{remainingPercent} remaining</Trans>
 														</span>
 													</span>
 												);
@@ -227,6 +232,9 @@ export function AccountTerminalForm({
 					})}
 				</div>
 			</fieldset>
+			{notice && (
+				<output className="text-sm text-muted-foreground">{notice}</output>
+			)}
 			{failure && (
 				<p role="alert" className="text-sm text-destructive">
 					{failure}

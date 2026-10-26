@@ -16,8 +16,8 @@ Every cloud workspace starts from an **environment**: the repositories to clone,
 
 ## Requirements
 
-- **A paid plan.** Cloud workspaces need a paid Superset plan. Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
-- **GitHub.** Connect GitHub in **Integrations** and give the Superset GitHub App access to each repository you want to use. A cloud workspace clones its repositories through the app.
+- **A paid plan.** Cloud workspaces need a paid Paradev plan. Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
+- **GitHub.** Connect GitHub in **Integrations** and give the Paradev GitHub App access to each repository you want to use. A cloud workspace clones its repositories through the app.
 - **Agent sign-in.** Sign in to your agents under **Settings → Agents**. Cloud workspaces use that sign-in; see [Credentials](#credentials).
 
 ## Set Up
@@ -46,7 +46,7 @@ Cloud workspaces ignore `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `CLAUDE_COD
 
 1. Press **⌘N** and pick **Cloud** in the device picker.
 2. Pick a project. Only projects linked to a GitHub repository appear.
-3. Pick the base branch, the environment, and the [machine size](#machine-sizes). Superset creates a new working branch from the base branch.
+3. Pick the base branch, the environment, and the [machine size](#machine-sizes). Paradev creates a new working branch from the base branch.
 4. Write your prompt and start.
 
 ![The new-workspace screen with Cloud picked and the machine size menu open](/images/cloud-new-workspace.png)
@@ -84,7 +84,7 @@ Pick by what the workspace runs, not by repository size. Memory runs out first.
 | Size | Good for |
 | --- | --- |
 | Small | Editing code and quick checks: scripts, CLIs, libraries, code review, issue triage. No dev servers or browsers. |
-| Medium | Most web apps and monorepos, with one dev stack. Superset's own dev stack (API, web, realtime, Electron) uses about 6 GB. |
+| Medium | Most web apps and monorepos, with one dev stack. Paradev's own dev stack (API, web, realtime, Electron) uses about 6 GB. |
 | Large | Full typechecks of large TypeScript monorepos, native compiles (Rust, C++, Go, Java, Android), browser tests (Playwright, Cypress), or two or more dev stacks. |
 | X-Large, 2X-Large | The largest native builds and test suites. |
 
@@ -101,7 +101,7 @@ superset workspaces create --machine-size large \
   --agent claude --prompt "Fix the login redirect"
 ```
 
-If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--branch` sets the base branch (default: the repository's default branch), and Superset creates a new working branch from it.
+If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--branch` sets the base branch (default: the repository's default branch), and Paradev creates a new working branch from it.
 
 If more than one environment has repositories, also pass `--environment <id>`. Run the command without it to see each environment's ID and name.
 
@@ -111,7 +111,7 @@ Automations that target **Cloud** have a machine size picker too. Each run start
 
 Cloud usage is metered in **GB-hours**: the machine's memory multiplied by the time it runs. A stopped or sleeping workspace uses no GB-hours.
 
-**Settings → Billing** shows the GB-hours used this period, when it resets, and any usage over the plan. Superset checks the limit each time a workspace starts or wakes, and while it runs. A running workspace that reaches the limit stops about 10 minutes later.
+**Settings → Billing** shows the GB-hours used this period, when it resets, and any usage over the plan. Paradev checks the limit each time a workspace starts or wakes, and while it runs. A running workspace that reaches the limit stops about 10 minutes later.
 
 - Without a paid plan: "Cloud workspaces need a paid plan."
 - At the limit: "Your organization has reached its cloud usage limit." Raise the limit or upgrade in **Settings → Billing**.
@@ -126,7 +126,7 @@ Each plan limits how many environments an organization can hold. When you reach 
 
 ## Credentials
 
-No API key or token is copied into the sandbox. Agents and `gh` see a placeholder, and Superset adds the real credential to outgoing requests: your agent sign-in, and your GitHub token if you connected GitHub (otherwise the Superset GitHub App's token).
+No API key or token is copied into the sandbox. Agents and `gh` see a placeholder, and Paradev adds the real credential to outgoing requests: your agent sign-in, and your GitHub token if you connected GitHub (otherwise the Paradev GitHub App's token).
 
 ## Files
 
@@ -135,7 +135,7 @@ The checkout lives at `/workspace`. An environment with more than one repository
 ## Troubleshooting
 
 - **No Cloud option**, or "Cloud sandboxes are not enabled" from the CLI: your account does not have early access yet.
-- **The project is missing from the Cloud picker**: link the project to a GitHub repository, and make sure the Superset GitHub App can access it.
-- **The environment editor says a repository "isn't shared with the Superset GitHub App yet"**: click **Configure GitHub App** and add the repository.
+- **The project is missing from the Cloud picker**: link the project to a GitHub repository, and make sure the Paradev GitHub App can access it.
+- **The environment editor says a repository "isn't shared with the Paradev GitHub App yet"**: click **Configure GitHub App** and add the repository.
 - **"Your GitHub account cannot reach…"**: your connected GitHub account has no access to a repository in the environment. Ask for access, or pick another environment.
 - **"This machine size is not available for your organization"**: pick Small, Medium, or Large, or email [support@superset.sh](mailto:support@superset.sh) to turn on the larger sizes.

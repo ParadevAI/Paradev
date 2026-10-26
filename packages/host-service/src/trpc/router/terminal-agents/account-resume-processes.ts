@@ -7,6 +7,10 @@ import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../db";
 import { terminalSessions } from "../../../db/schema";
 import { getDaemonClient } from "../../../terminal/daemon-client-singleton";
+import {
+	processStartFingerprint,
+	readProcessStarts,
+} from "../../../terminal-agents/claude-session-writers";
 import { readProfileFile } from "../usage/profile-file";
 
 const execFileAsync = promisify(execFile);
@@ -30,7 +34,7 @@ const idleTerminalDeps: IdleTerminalDeps = {
 	foregroundGroups: async (pid) =>
 		(
 			await execFileAsync(
-				"ps",
+				"/bin/ps",
 				["-o", "tpgid=", "-o", "pgid=", "-p", String(pid)],
 				{ timeout: 2000, maxBuffer: 4096 },
 			)
@@ -77,44 +81,11 @@ export async function assertAccountResumeTerminalIdle(
 export async function readAccountResumeProcessStarts(
 	pids: number[],
 ): Promise<Map<number, string>> {
-	if (pids.length === 0) return new Map();
-	let output: string;
 	try {
-		output = (
-			await execFileAsync("ps", ["-p", pids.join(","), "-o", "pid=,lstart="], {
-				env: { ...process.env, TZ: "UTC", LC_ALL: "C" },
-				timeout: 2000,
-				maxBuffer: 256 * 1024,
-			})
-		).stdout;
-	} catch (error) {
-		const failed = error as {
-			code?: unknown;
-			stdout?: string;
-			stderr?: string;
-		};
-		if (failed.code === 1 && !failed.stdout?.trim() && !failed.stderr?.trim())
-			return new Map();
+		return await readProcessStarts(pids);
+	} catch {
 		refuse();
 	}
-	const starts = new Map<number, string>();
-	for (const line of output.split("\n")) {
-		if (!line.trim()) continue;
-		const match = /^\s*(\d+)\s+(.+)$/.exec(line);
-		if (!match || !processStart(match[2])) refuse();
-		starts.set(Number(match[1]), processStart(match[2]) as string);
-	}
-	return starts;
-}
-
-function processStart(value: unknown): string | null {
-	if (typeof value !== "string") return null;
-	const normalized = value.trim().replace(/\s+/g, " ");
-	return /^[A-Z][a-z]{2} [A-Z][a-z]{2} \d{1,2} \d{2}:\d{2}:\d{2} \d{4}$/.test(
-		normalized,
-	)
-		? normalized
-		: null;
 }
 
 /**
@@ -154,7 +125,7 @@ export async function assertNoRecordedClaudeWriter(
 			}
 			if (!record || typeof record.sessionId !== "string") refuse();
 			if (record.sessionId !== input.sessionId) continue;
-			const start = processStart(record.procStart);
+			const start = processStartFingerprint(record.procStart);
 			const pid = record.pid;
 			if (
 				typeof pid !== "number" ||

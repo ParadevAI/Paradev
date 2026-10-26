@@ -74,3 +74,10 @@ test("pricing Markdown compares the cloud rows from the catalog", async () => {
 		"| Cloud GB-hours per seat each month | No | No | 1,200 | 4,000 | Custom |\n| Cloud environments | No | No | 5 | 10 | Custom |\n| GB-hours past the pool | No | No | $0.06 per GB-hour | $0.06 per GB-hour | Custom |\n| Extra GB-hours, bought as needed | No | No | $0.06 per GB-hour | $0.06 per GB-hour | Custom |",
 	);
 });
+
+test("Markdown leaves out MDX comments", async () => {
+	const { stripMdxSyntax } = await import("@/lib/llms");
+	expect(stripMdxSyntax("Before\n\n{/* TODO\n<video>\n*/}\n\nAfter")).toBe(
+		"Before\n\nAfter",
+	);
+});

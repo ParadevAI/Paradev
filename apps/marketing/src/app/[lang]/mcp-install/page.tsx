@@ -47,7 +47,7 @@ export default async function McpPage() {
 						<Trans>MCP Server</Trans>
 					</span>
 					<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-						<Trans>Install Superset MCP in your client</Trans>
+						<Trans>Install Paradev MCP in your client</Trans>
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>

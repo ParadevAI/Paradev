@@ -329,8 +329,8 @@ msgid "{0, plural, one {Show # more line} other {Show # more lines}}"
 msgstr "{0, plural, one {再顯示#行} other {再顯示#行}}"
 
 #. placeholder {0}: importableWorktrees.length
-msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
-msgstr "{0, plural, one {這會把#個已有worktree作為工作區匯入Superset。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。} other {這會把#個已有worktree作為工作區匯入Superset。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。}}"
+msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
+msgstr "{0, plural, one {這會把#個已有worktree作為工作區匯入Paradev。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。} other {這會把#個已有worktree作為工作區匯入Paradev。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -350,8 +350,8 @@ msgid "{0} — device offline"
 msgstr "{0}，裝置離線"
 
 #. placeholder {0}: error.message
-msgid "{0} — try the Superset tray menu > Host Service > Restart."
-msgstr "{0} — 請嘗試Superset托盤選單 > 主機服務 > 重啟。"
+msgid "{0} — try the Paradev tray menu > Host Service > Restart."
+msgstr "{0} — 請嘗試Paradev托盤選單 > 主機服務 > 重啟。"
 
 #. placeholder {0}: host.version
 msgid "{0} · behind"
@@ -739,6 +739,9 @@ msgstr "{closedCount}項未開啟"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {#個提交} other {#個提交}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{productName} 由 {companyName} 開發。"
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "{0}項檢查中已完成{completed}項"
@@ -896,6 +899,15 @@ msgstr "{focusShortcutText}聚焦"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted}{count, plural, one {位開發者} other {位開發者}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "{formerName} 現已更名為 {productName}"
+
+msgid "{formerName} is now {productName}!"
+msgstr "{formerName} 現已更名為 {productName}！"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "{formerName} 現已更名為 {productName}。產品不變，團隊不變，只是換了名字。現有的 superset.sh 連結會自動轉址，superset 指令也會繼續可用。"
 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友創辦人"
@@ -1121,6 +1133,24 @@ msgstr "每使用者每月 {price},每席位每月 {gbHours} 雲端 GB 小時"
 msgid "{price}/user/mo"
 msgstr "{price}/使用者/月"
 
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（原 {formerName}，YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName}（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+
+msgid "{productName} for press"
+msgstr "給媒體的 {productName} 資訊"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "八分之一的 Fortune 500 公司使用過 {productName}。"
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "在全球，Netflix、Microsoft、NVIDIA、DoorDash、Wix 與 Mistral AI 的工程師都在使用 {productName}；在亞洲，ByteDance、Toss、Kakao、Grab、LINE 與 Rakuten 的工程師也在使用。"
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "{productName} 完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"
+
 msgid "{provider} logo"
 msgstr "{provider}標誌"
 
@@ -1147,14 +1177,11 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
-msgid "{remaining}% remaining"
-msgstr "剩餘 {remaining}%"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本組織的 GitHub App 安裝在那裡。"
 
-msgid "{repositoryFullName} isn't shared with the Superset GitHub App yet."
-msgstr "{repositoryFullName} 尚未與 Superset GitHub App 共用。"
+msgid "{repositoryFullName} isn't shared with the Paradev GitHub App yet."
+msgstr "{repositoryFullName} 尚未與 Paradev GitHub App 共用。"
 
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
@@ -1334,11 +1361,11 @@ msgid "<0>{0}</0> is not a git repository. Would you like to initialize one?"
 msgstr "<0>{0}</0>不是git儲存庫。要初始化一個嗎？"
 
 #. placeholder {0}: remoteHost.name
-msgid "<0>{0}</0> isn't connected to the Superset relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
-msgstr "<0>{0}</0>沒有連線到Superset中繼，它的執行會被跳過。請檢查它的<1>主機設定</1>，並確認該裝置的「設定>遠端存取」中開啟了中繼存取。"
+msgid "<0>{0}</0> isn't connected to the Paradev relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
+msgstr "<0>{0}</0>沒有連線到Paradev中繼，它的執行會被跳過。請檢查它的<1>主機設定</1>，並確認該裝置的「設定>遠端存取」中開啟了中繼存取。"
 
-msgid "<0>{displayName}</0> is requesting access to your Superset account"
-msgstr "<0>{displayName}</0>請求存取你的Superset帳戶"
+msgid "<0>{displayName}</0> is requesting access to your Paradev account"
+msgstr "<0>{displayName}</0>請求存取你的Paradev帳戶"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "此係統未安裝<0>{primaryFont}</0>。將回退到下一個可用字型。"
@@ -1490,8 +1517,8 @@ msgstr "本次會話已使用87.4K/200K個token。"
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "更好用的應用程式內瀏覽器：預覽改動，點選任意元素即可作為上下文發給代理程式。"
 
-msgid "A better Superset is ready"
-msgstr "更好的 Superset 已準備就緒"
+msgid "A better Paradev is ready"
+msgstr "更好的 Paradev 已準備就緒"
 
 msgid "A CDP endpoint per pane"
 msgstr "每個窗格一個 CDP 端點"
@@ -1551,11 +1578,11 @@ msgstr "看看有什麼正在進行、接下來做什麼，以及{company}要走
 msgid "A majority of production changes merge without any human reading the diff."
 msgstr "多數生產變更在無人閱讀差異的情況下合併。"
 
-msgid "A manifest and a few skill files. Superset puts it where every agent looks."
-msgstr "一個資訊清單檔加幾個技能檔案。Superset 會把它放到每個代理程式查找的位置。"
+msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
+msgstr "一個資訊清單檔加幾個技能檔案。Paradev 會把它放到每個代理程式查找的位置。"
 
-msgid "A new version of Superset is required to continue. Please update to the latest version."
-msgstr "需要新版本的Superset才能繼續。請更新到最新版本。"
+msgid "A new version of Paradev is required to continue. Please update to the latest version."
+msgstr "需要新版本的Paradev才能繼續。請更新到最新版本。"
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "以該分支建立新工作區，並將對話交給新的代理"
@@ -1615,14 +1642,17 @@ msgstr "關於"
 msgid "About {displayName}"
 msgstr "關於 {displayName}"
 
-msgid "About Superset"
-msgstr "關於Superset"
+msgid "About {productName}"
+msgstr "關於{productName}"
+
+msgid "About Paradev"
+msgstr "關於Paradev"
 
 msgid "About three weeks from first call to offer, ending with a paid work trial. Every step is with a founder, and you hear back within 48 hours."
 msgstr "從第一次通話到發出 offer 大約三週，最後是一次有薪工作試用。每一步都由創辦人參與，48 小時內給你回覆。"
 
-msgid "Absolutely. Superset doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
-msgstr "當然可以。Superset不代理任何API呼叫。你直接用自己的API金鑰對接所選的AI提供商，成本和用量完全由你掌控。"
+msgid "Absolutely. Paradev doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
+msgstr "當然可以。Paradev不代理任何API呼叫。你直接用自己的API金鑰對接所選的AI提供商，成本和用量完全由你掌控。"
 
 msgid "Accent"
 msgstr "強調色"
@@ -2070,8 +2100,8 @@ msgstr "同時執行的代理程式數"
 msgid "Agents use this account when they call Linear tools."
 msgstr "代理程式呼叫 Linear 工具時會使用此帳號。"
 
-msgid "Aggregate agent usage across every developer on the Superset leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
-msgstr "Superset 排行榜上所有開發者的彙總代理使用量 — tokens、成本、快取行為，以及大家實際選用的模型。"
+msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
+msgstr "Paradev 排行榜上所有開發者的彙總代理使用量 — tokens、成本、快取行為，以及大家實際選用的模型。"
 
 msgid "AI · Agent activity"
 msgstr "AI · 代理程式活動"
@@ -2409,8 +2439,8 @@ msgstr "Anthropic拒絕了此權杖。"
 msgid "any account"
 msgstr "任一帳號"
 
-msgid "Any agent you've set up in Superset, such as Claude Code or Codex."
-msgstr "你在 Superset 中設定的任何代理程式，例如 Claude Code 或 Codex。"
+msgid "Any agent you've set up in Paradev, such as Claude Code or Codex."
+msgstr "你在 Paradev 中設定的任何代理程式，例如 Claude Code 或 Codex。"
 
 msgid "Any channel"
 msgstr "任意頻道"
@@ -2835,11 +2865,11 @@ msgstr "授權"
 msgid "Authorize {displayName}"
 msgstr "授權{displayName}"
 
-msgid "Authorize Superset so your plugins, automations and triggers can act on your behalf."
-msgstr "授權 Superset，讓您的外掛、自動化與觸發器能代表您執行操作。"
+msgid "Authorize Paradev so your plugins, automations and triggers can act on your behalf."
+msgstr "授權 Paradev，讓您的外掛、自動化與觸發器能代表您執行操作。"
 
-msgid "Authorize Superset to act on your behalf."
-msgstr "授權 Superset 代表你執行操作。"
+msgid "Authorize Paradev to act on your behalf."
+msgstr "授權 Paradev 代表你執行操作。"
 
 msgid "Authorizing..."
 msgstr "正在授權..."
@@ -3271,11 +3301,11 @@ msgstr "瀏覽並安裝社群共享的技能、MCP伺服器和代理程式配置
 msgid "Browse for directory"
 msgstr "瀏覽目錄"
 
-msgid "Browse shared themes and future agent configs for Superset."
-msgstr "瀏覽 Superset 的共享佈景主題與未來的代理設定。"
+msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
+msgstr "瀏覽社群分享的 Paradev 佈景主題檔案，包含 GitHub Dark Colorblind、Catppuccin、Ember 與 One Dark Pro。"
 
-msgid "Browse Superset theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
-msgstr "瀏覽社群分享的 Superset 佈景主題檔案，包含 GitHub Dark Colorblind、Catppuccin、Ember 與 One Dark Pro。"
+msgid "Browse shared themes and future agent configs for Paradev."
+msgstr "瀏覽 Paradev 的共享佈景主題與未來的代理設定。"
 
 msgid "Browse the repo ↗"
 msgstr "瀏覽儲存庫 ↗"
@@ -3313,8 +3343,8 @@ msgstr "Bug 回報"
 msgid "Build in public"
 msgstr "公開建構"
 
-msgid "Build the future of Superset in the cloud"
-msgstr "共創 Superset 的雲端未來"
+msgid "Build the future of Paradev in the cloud"
+msgstr "共創 Paradev 的雲端未來"
 
 msgid "Build your own"
 msgstr "自己動手打造"
@@ -3325,8 +3355,8 @@ msgstr "打造最後一款軟體"
 msgid "Building the last piece of software."
 msgstr "打造最後一款軟體。"
 
-msgid "Built in Superset"
-msgstr "在 Superset 中建構"
+msgid "Built in Paradev"
+msgstr "在 Paradev 中建構"
 
 msgid "builtin"
 msgstr "內建"
@@ -3341,11 +3371,11 @@ msgstr "專案符號列表"
 msgid "bundled {0}"
 msgstr "內建{0}"
 
-msgid "Bundled with the Superset app on this device."
-msgstr "隨此裝置上的 Superset 應用程式一起提供。"
+msgid "Bundled with the Paradev app on this device."
+msgstr "隨此裝置上的 Paradev 應用程式一起提供。"
 
-msgid "Bundled with the Superset app on this device. Updates with the app."
-msgstr "隨此裝置上的 Superset 應用程式一起提供，並隨應用程式一起更新。"
+msgid "Bundled with the Paradev app on this device. Updates with the app."
+msgstr "隨此裝置上的 Paradev 應用程式一起提供，並隨應用程式一起更新。"
 
 msgid "Business plan"
 msgstr "Business 方案"
@@ -3841,8 +3871,8 @@ msgstr "為這則訊息選擇MCP伺服器"
 msgid "Choose what to clear from the in-app browser."
 msgstr "選擇要從應用程式內瀏覽器清除的內容。"
 
-msgid "Choose when Superset pings you."
-msgstr "選擇Superset在什麼時候通知你。"
+msgid "Choose when Paradev pings you."
+msgstr "選擇Paradev在什麼時候通知你。"
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "選擇從留言、設計模式和 Pages 啟動的代理程式的開啟位置。"
@@ -3853,8 +3883,8 @@ msgstr "CI失敗"
 msgid "Clarify this"
 msgstr "闡明這裡"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Superset is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code、Codex和OpenCode是代理程式；Superset是你同時執行它們的地方。每個任務都有自己隔離的Git worktree，十個代理程式可以同時在十個分支上工作，而你在一處監控、審查併合併。"
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code、Codex和OpenCode是代理程式；Paradev是你同時執行它們的地方。每個任務都有自己隔離的Git worktree，十個代理程式可以同時在十個分支上工作，而你在一處監控、審查併合併。"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code、Codex、Cursor、OpenCode 等。無需為每個代理程式個別設定。"
@@ -4395,6 +4425,9 @@ msgstr "提交"
 msgid "Committed"
 msgstr "已提交"
 
+msgid "Committed with the repository and shared with everyone who works on it."
+msgstr "隨儲存庫一起提交，與所有參與此儲存庫的人共享。"
+
 msgid "Committed, starting soon."
 msgstr "已確定，很快開始。"
 
@@ -4410,8 +4443,11 @@ msgstr "社群"
 msgid "Company"
 msgstr "公司"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Superset 的公司簡介、最新消息、品牌素材與媒體聯絡方式。"
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "{productName}（原 {formerName}）的公司簡介、最新消息、品牌素材與媒體聯絡方式。"
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "{productName} 的公司簡介、最新消息、品牌素材與媒體聯絡方式。"
 
 msgid "Company email"
 msgstr "公司電子郵件"
@@ -4419,14 +4455,14 @@ msgstr "公司電子郵件"
 msgid "Compare"
 msgstr "對比"
 
+msgid "Compare Paradev | AI Coding Comparisons and Guides"
+msgstr "比較 Paradev | AI 編碼對照與指南"
+
+msgid "Compare Paradev with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
+msgstr "將 Paradev 與 Cursor、Claude Code、Codex、Windsurf、Devin、GitHub Copilot 等進行比較。瀏覽並列對照、彙整與工作流程指南。"
+
 msgid "Compare plans"
 msgstr "方案對比"
-
-msgid "Compare Superset | AI Coding Comparisons and Guides"
-msgstr "比較 Superset | AI 編碼對照與指南"
-
-msgid "Compare Superset with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
-msgstr "將 Superset 與 Cursor、Claude Code、Codex、Windsurf、Devin、GitHub Copilot 等進行比較。瀏覽並列對照、彙整與工作流程指南。"
 
 msgid "Compared against the default style"
 msgstr "與預設樣式做了對比"
@@ -4446,6 +4482,12 @@ msgstr "component-showcase"
 
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "可組合的表單佈局——搭配@superset/ui/form用於react-hook-form"
+
+msgid "Config file contents"
+msgstr "設定檔內容"
+
+msgid "config.json must be a JSON object"
+msgstr "config.json 必須是 JSON 物件"
 
 msgid "Configure"
 msgstr "配置"
@@ -4468,8 +4510,8 @@ msgstr "設定 GitHub App"
 msgid "Configure GitHub App…"
 msgstr "設定 GitHub App…"
 
-msgid "Configure how tasks sync between Superset and Linear."
-msgstr "配置任務在Superset和Linear之間的同步方式。"
+msgid "Configure how tasks sync between Paradev and Linear."
+msgstr "配置任務在Paradev和Linear之間的同步方式。"
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "配置終端行為和可複用的終端指令碼"
@@ -4589,8 +4631,8 @@ msgstr "請先連接你的 Linear 帳戶，再於 Linear 中管理任務。"
 msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
 msgstr "請在 設定 → 整合 中連結你的Linear帳號，以連結Linear議題。"
 
-msgid "Connect your Linear account to browse, update and start work on Linear issues from Superset."
-msgstr "連結你的Linear帳號後，即可在Superset中瀏覽、更新Linear議題並開始工作。"
+msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
+msgstr "連結你的Linear帳號後，即可在Paradev中瀏覽、更新Linear議題並開始工作。"
 
 msgid "Connect your Linear account to use Linear here."
 msgstr "連結你的Linear帳號即可在此使用Linear。"
@@ -4799,6 +4841,9 @@ msgstr "對話"
 msgid "Conversation · Message"
 msgstr "對話 · 訊息"
 
+msgid "Convert to config.toml"
+msgstr "轉換為 config.toml"
+
 msgid "Convert to draft"
 msgstr "轉為草稿"
 
@@ -4848,8 +4893,8 @@ msgstr "複製為 Markdown"
 msgid "Copy Branch Name"
 msgstr "複製分支名"
 
-msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Superset."
-msgstr "將Chrome、Brave、Arc或其他Chromium瀏覽器的瀏覽歷史和登入資訊複製到Superset。"
+msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
+msgstr "將Chrome、Brave、Arc或其他Chromium瀏覽器的瀏覽歷史和登入資訊複製到Paradev。"
 
 msgid "Copy code"
 msgstr "複製程式碼"
@@ -4975,8 +5020,8 @@ msgstr "複製URL"
 msgid "Copy Workspace ID"
 msgstr "複製工作區ID"
 
-msgid "Copy your browsing history and logins from another browser into Superset. Your original browser isn't changed."
-msgstr "把其他瀏覽器的瀏覽歷史和登入資訊複製到Superset。原瀏覽器不會被修改。"
+msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
+msgstr "把其他瀏覽器的瀏覽歷史和登入資訊複製到Paradev。原瀏覽器不會被修改。"
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "請立即複製你的金鑰，之後將無法再次檢視。"
@@ -5879,8 +5924,8 @@ msgstr "自訂主題"
 msgid "Customize commands"
 msgstr "自訂命令"
 
-msgid "Customize how Superset looks on your device"
-msgstr "自訂Superset在你裝置上的外觀"
+msgid "Customize how Paradev looks on your device"
+msgstr "自訂Paradev在你裝置上的外觀"
 
 #. placeholder {0}: showHotkeysKeys.map((key) => ( <Kbd key={key}>{key}</Kbd> ))
 msgid "Customize keyboard shortcuts for your workflow. Press <0>{0}</0> to open this page anytime."
@@ -6252,8 +6297,8 @@ msgstr "描述交給代理程式的任務…"
 msgid "Describe the work to your agent"
 msgstr "向代理描述工作內容"
 
-msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
-msgstr "描述你的需求。Superset會為該任務建立隔離的工作區和乾淨的分支。"
+msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
+msgstr "描述你的需求。Paradev會為該任務建立隔離的工作區和乾淨的分支。"
 
 msgid "Describe what you'd like to see built…"
 msgstr "描述你希望實現的功能…"
@@ -6613,14 +6658,14 @@ msgstr "下載記錄"
 msgid "Download Manually"
 msgstr "手動下載"
 
-msgid "Download our logos and product images for use in coverage of Superset."
-msgstr "下載我們的標誌與產品圖片，用於報導 Superset。"
+msgid "Download our logos and product images for use in coverage of Paradev."
+msgstr "下載我們的標誌與產品圖片，用於報導 Paradev。"
+
+msgid "Download Paradev"
+msgstr "下載Paradev"
 
 msgid "Download starter"
 msgstr "下載模板"
-
-msgid "Download Superset"
-msgstr "下載Superset"
 
 msgid "Download the theme file above."
 msgstr "下載上面的主題檔案。"
@@ -6915,8 +6960,8 @@ msgstr "啟用中繼存取…"
 msgid "Enable remote access"
 msgstr "啟用遠端存取"
 
-msgid "Enable Remote Access and keep this computer awake with Superset running."
-msgstr "啟用遠端存取，並保持這台電腦喚醒且 Superset 持續執行。"
+msgid "Enable Remote Access and keep this computer awake with Paradev running."
+msgstr "啟用遠端存取，並保持這台電腦喚醒且 Paradev 持續執行。"
 
 msgid "Enable skill"
 msgstr "啟用技能"
@@ -7038,8 +7083,8 @@ msgstr "每分鐘"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "所有目標都在為下一階發力。以最近 30 天計算。"
 
-msgid "Every paid plan includes Superset Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
-msgstr "每個付費方案都包含 Superset Mobile、自動化和優先支援。附雲端工作區的方案會為團隊提供一個共用的 GB 小時額度池。"
+msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
+msgstr "每個付費方案都包含 Paradev Mobile、自動化和優先支援。附雲端工作區的方案會為團隊提供一個共用的 GB 小時額度池。"
 
 msgid "Every publish is a version"
 msgstr "每次發佈都是一個版本"
@@ -7071,6 +7116,9 @@ msgstr "在你更改之前，所有人都停留在v{sharedVersion}"
 msgid "Everyone with access to this organization."
 msgstr "有權存取此組織的所有人。"
 
+msgid "Everything carries over."
+msgstr "一切都會保留。"
+
 msgid "Everything in {previousPlan}"
 msgstr "包含 {previousPlan} 的所有功能"
 
@@ -7083,14 +7131,17 @@ msgstr "Ultra 的全部功能"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra 的全部功能，再加上客製雲端 GB 小時、SSO 與 SAML、SCIM 佈建、IP 限制、稽核記錄、客製 SLA、專屬支援和客製合約。價格依您的組織量身訂定。與我們聯絡，我們會為您規劃合適的方案。"
 
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP."
-msgstr "一切都能指令碼化。用CLI建立工作區和代理程式，用SDK把Superset接進CI，或者讓你的代理程式通過MCP來驅動它。"
+msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
+msgstr "一切都能指令碼化。用CLI建立工作區和代理程式，用SDK把Paradev接進CI，或者讓你的代理程式通過MCP來驅動它。"
 
-msgid "Everything we built on top of the primitives — Superset originals, the"
-msgstr "我們在基礎元件之上構建的一切——Superset原創元件、面向代理程式介面的"
+msgid "Everything we built on top of the primitives — Paradev originals, the"
+msgstr "我們在基礎元件之上構建的一切——Paradev原創元件、面向代理程式介面的"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "報導 Superset 所需的一切：公司簡介、最新消息、標誌、產品圖片以及聯絡方式。"
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "報導 {productName}（原 {formerName}）所需的一切：公司簡介、最新消息、標誌、產品圖片以及聯絡方式。"
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "報導 {productName} 所需的一切：公司簡介、最新消息、標誌、產品圖片以及聯絡方式。"
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "你釋出過的所有內容都會被刪除，而不是隱藏。你之後可以重新加入，屆時會根據此機器上仍保留的記錄重新生成。"
@@ -7227,8 +7278,8 @@ msgstr "已越過F4關卡"
 msgid "Factory 2026"
 msgstr "Factory 2026"
 
-msgid "Factory 2026 | Superset"
-msgstr "Factory 2026 | Superset"
+msgid "Factory 2026 | Paradev"
+msgstr "Factory 2026 | Paradev"
 
 msgid "Factory tier {tier}"
 msgstr "工廠等級{tier}"
@@ -8052,8 +8103,8 @@ msgstr "字重"
 msgid "For a project, open the importer to link it."
 msgstr "對於專案，請開啟匯入工具進行連結。"
 
-msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/superset-sh/superset</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
-msgstr "報告bug和提需求，最快的方式是在<0>github.com/superset-sh/superset</0>提一個GitHub議題。我們的社群在<1>Discord</1>，更新會發布在<2>X（@superset_sh）</2>和<3>LinkedIn</3>。"
+msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
+msgstr "報告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一個GitHub議題。我們的社群在<1>Discord</1>，更新會發布在<2>X（{xHandle}）</2>和<3>LinkedIn</3>。"
 
 msgid "For individuals getting started"
 msgstr "面向剛上手的個人使用者"
@@ -8283,20 +8334,20 @@ msgstr "與 {companyName} 團隊聯繫。"
 msgid "Get key"
 msgstr "取得金鑰"
 
-msgid "Get more out of Superset"
-msgstr "把Superset用得更好"
+msgid "Get more out of Paradev"
+msgstr "把Paradev用得更好"
 
-msgid "Get notified when Superset is available on Windows & Linux."
-msgstr "Superset支援Windows和Linux時通知我。"
+msgid "Get notified when Paradev is available on Windows & Linux."
+msgstr "Paradev支援Windows和Linux時通知我。"
+
+msgid "Get Paradev on your Mac"
+msgstr "在Mac上獲取Paradev"
+
+msgid "Get Paradev Pro"
+msgstr "獲取Paradev Pro"
 
 msgid "Get started"
 msgstr "開始使用"
-
-msgid "Get Superset on your Mac"
-msgstr "在Mac上獲取Superset"
-
-msgid "Get Superset Pro"
-msgstr "獲取Superset Pro"
 
 msgid "Get the best out of Pro"
 msgstr "充分運用 Pro"
@@ -8409,6 +8460,9 @@ msgstr "前往主頁"
 msgid "Go to next page"
 msgstr "轉到下一頁"
 
+msgid "Go to Paradev"
+msgstr "前往Paradev"
+
 msgid "Go to previous page"
 msgstr "轉到上一頁"
 
@@ -8418,20 +8472,17 @@ msgstr "前往「設定」，然後開啟「遠端存取」"
 msgid "Go to Slack integration settings"
 msgstr "前往Slack整合設定"
 
-msgid "Go to Superset"
-msgstr "前往Superset"
-
 msgid "Go to workspace"
 msgstr "前往工作區"
 
-msgid "Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again."
-msgstr "Google沒有授予持久存取權限。請在你的Google帳戶的第三方存取中移除Superset，然後重試。"
+msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
+msgstr "Google沒有授予持久存取權限。請在你的Google帳戶的第三方存取中移除Paradev，然後重試。"
 
 msgid "Got it"
 msgstr "知道了"
 
-msgid "Grant the OS permissions Superset needs."
-msgstr "授予Superset所需的系統權限。"
+msgid "Grant the OS permissions Paradev needs."
+msgstr "授予Paradev所需的系統權限。"
 
 msgid "Granted"
 msgstr "已授予"
@@ -8719,8 +8770,8 @@ msgstr "時數以標準 {vcpus} vCPU / {memoryGb} GB 工作區計算。我們按
 msgid "Hover Card"
 msgstr "懸浮卡片"
 
-msgid "How {label} signs in when Superset runs it for you."
-msgstr "Superset 為你執行 {label} 時它如何登入。"
+msgid "How {label} signs in when Paradev runs it for you."
+msgstr "Paradev 為你執行 {label} 時它如何登入。"
 
 msgid "How 2026 plays out"
 msgstr "2026年會怎麼走"
@@ -8749,8 +8800,8 @@ msgstr "並行代理程式系統是怎麼工作的？"
 msgid "How grouped commands open."
 msgstr "群組命令的開啟方式。"
 
-msgid "How is Superset different from just running Claude Code in a terminal?"
-msgstr "Superset和直接在終端裡跑Claude Code有什麼不同？"
+msgid "How is Paradev different from just running Claude Code in a terminal?"
+msgstr "Paradev和直接在終端裡跑Claude Code有什麼不同？"
 
 msgid "How it works"
 msgstr "工作方式"
@@ -8776,8 +8827,8 @@ msgstr "提示詞如何傳遞給處理程序。"
 msgid "How tiers work →"
 msgstr "等級如何計算 →"
 
-msgid "How to install {name} in Superset"
-msgstr "如何在Superset中安裝{name}"
+msgid "How to install {name} in Paradev"
+msgstr "如何在Paradev中安裝{name}"
 
 msgid "How we build it, in long form."
 msgstr "我們如何打造它，深入介紹。"
@@ -8854,8 +8905,8 @@ msgstr "空閒"
 msgid "Idle · branch pushed"
 msgstr "空閒 · 分支已推送"
 
-msgid "If you're enjoying Superset so far, a GitHub star helps other developers discover it."
-msgstr "如果你覺得Superset還不錯，一個GitHub星標能幫助更多開發者發現它。"
+msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
+msgstr "如果你覺得Paradev還不錯，一個GitHub星標能幫助更多開發者發現它。"
 
 msgid "Illegal content"
 msgstr "違法內容"
@@ -8999,8 +9050,8 @@ msgstr "（在此主機的終端中）。"
 msgid "In all projects"
 msgstr "全部專案"
 
-msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
-msgstr "短短幾個月，<0>數萬名工程師</0>把Superset當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
+msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
+msgstr "短短幾個月，<0>數萬名工程師</0>把Paradev當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "在舊金山辦公室實體上班，每週五天。你將直接與創辦人共事。"
@@ -9021,11 +9072,11 @@ msgstr "審查中"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "在{appName}桌面應用程式中開啟「設定 → 遠端存取」，開啟「允許遠端工作區通過中繼存取此裝置」。"
 
-msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
-msgstr "在Superset桌面應用程式中開啟<0>設定 → 外觀 → 主題</0>。"
+msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
+msgstr "在Paradev桌面應用程式中開啟<0>設定 → 外觀 → 主題</0>。"
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "不到一年，來自 180 個國家、超過 145,000 名開發者執行過 Superset，並建立了超過 185 萬個 agent 工作區。"
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "不到一年，來自 180 個國家、超過 145,000 名開發者執行過 {productName}，並建立了超過 185 萬個 agent 工作區。"
 
 msgid "In your next chat"
 msgstr "下一次聊天中"
@@ -9048,8 +9099,8 @@ msgstr "包含"
 msgid "Included in Enterprise"
 msgstr "企業版包含"
 
-msgid "Includes the Superset-specific box variant"
-msgstr "包含Superset特有的box變體"
+msgid "Includes the Paradev-specific box variant"
+msgstr "包含Paradev特有的box變體"
 
 msgid "Incognito Operator"
 msgstr "隱身操作員"
@@ -9108,8 +9159,8 @@ msgstr "輸入、快取和輸出token"
 msgid "Inputs"
 msgstr "輸入"
 
-msgid "Insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "來自Superset團隊的洞見，關於並行編碼代理程式與開發者效率。"
+msgid "Insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "來自Paradev團隊的洞見，關於並行編碼代理程式與開發者效率。"
 
 msgid "Inspect branches and run SQL"
 msgstr "檢視分支並執行 SQL"
@@ -9145,17 +9196,17 @@ msgstr "只需安裝一次，所有代理程式都能用，無論在你的裝置
 msgid "Install once. Mention it in any prompt."
 msgstr "只需安裝一次，在任何提示詞中提及即可。"
 
+msgid "Install Paradev MCP in your client"
+msgstr "在你的客戶端裡安裝Paradev MCP"
+
 msgid "Install plugin"
 msgstr "安裝外掛"
-
-msgid "Install Superset MCP in your client"
-msgstr "在你的客戶端裡安裝Superset MCP"
 
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "安裝Superset GitHub App以連線你的儲存庫。"
+msgid "Install the Paradev GitHub App to connect your repositories."
+msgstr "安裝Paradev GitHub App以連線你的儲存庫。"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限範圍，OAuth集中管理。"
@@ -9173,8 +9224,8 @@ msgstr "安裝方式"
 msgid "Installing..."
 msgstr "正在安裝..."
 
-msgid "Installs Superset on a machine you can reach with ssh, signs Superset in to your account, and keeps it running as a service."
-msgstr "在可透過 ssh 連線的機器上安裝 Superset，將 Superset 登入你的帳戶，並讓它以服務形式持續執行。"
+msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
+msgstr "在可透過 ssh 連線的機器上安裝 Paradev，將 Paradev 登入你的帳戶，並讓它以服務形式持續執行。"
 
 msgid "Instructions"
 msgstr "說明"
@@ -9188,8 +9239,8 @@ msgstr "可互動的代理程式終端。"
 msgid "Interactive clients authorize over OAuth 2.1 in your browser, scoped to your active organization. For headless environments and CI, generate an API key from Settings → API Keys in the desktop app and pass it as a Bearer token instead. Full setup, including header config for Claude Code, is in the <0>authentication docs</0>."
 msgstr "互動式客戶端通過瀏覽器中的OAuth 2.1授權，權限範圍限於你目前的組織。無介面環境和CI則可在桌面應用程式的「設定 → API金鑰」中生成API金鑰，並作為Bearer權杖傳入。完整配置（包括Claude Code的請求頭設定）見<0>認證文件</0>。"
 
-msgid "Interested in bringing Superset to your organization? Reach out and we'll work with you to find the right setup for your team."
-msgstr "想把Superset引入你的組織？聯絡我們，一起為你的團隊找到合適的方案。"
+msgid "Interested in bringing Paradev to your organization? Reach out and we'll work with you to find the right setup for your team."
+msgstr "想把Paradev引入你的組織？聯絡我們，一起為你的團隊找到合適的方案。"
 
 msgid "Interface"
 msgstr "介面"
@@ -9308,20 +9359,20 @@ msgstr "我的資料安全嗎？"
 msgid "is now signed in here."
 msgstr "現已在此登入。"
 
+msgid "Is Paradev free to use?"
+msgstr "Paradev免費嗎？"
+
+msgid "Is Paradev just a wrapper around Claude Code?"
+msgstr "Paradev只是Claude Code的一層封裝嗎？"
+
+msgid "Is Paradev open source?"
+msgstr "Paradev是開源的嗎？"
+
+msgid "Is Paradev SOC 2 compliant?"
+msgstr "Paradev符合SOC 2嗎？"
+
 msgid "is signed in."
 msgstr "已登入。"
-
-msgid "Is Superset free to use?"
-msgstr "Superset免費嗎？"
-
-msgid "Is Superset just a wrapper around Claude Code?"
-msgstr "Superset只是Claude Code的一層封裝嗎？"
-
-msgid "Is Superset open source?"
-msgstr "Superset是開源的嗎？"
-
-msgid "Is Superset SOC 2 compliant?"
-msgstr "Superset符合SOC 2嗎？"
 
 msgid "Is there a free plan?"
 msgstr "有免費方案嗎？"
@@ -9405,8 +9456,8 @@ msgstr "獨立的分支和檔案副本"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
-msgstr "在它重啟之前，其工作區和終端都不可用，請使用Superset托盤選單 > 主機服務 > 重啟。"
+msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
+msgstr "在它重啟之前，其工作區和終端都不可用，請使用Paradev托盤選單 > 主機服務 > 重啟。"
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "其工作區及工作樹將立即從磁碟移除，而不是在 30 天後。儲存庫資料夾和有未提交變更的工作樹會保留。"
@@ -9435,14 +9486,14 @@ msgstr "加入我們的Discord"
 msgid "JOIN OUR DISCORD"
 msgstr "加入我們的Discord"
 
-msgid "Join the <0>Superset</0> community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "加入<0>Superset</0>社群，獲取幫助、交流想法，並及時瞭解最新動態與更新。"
+msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "加入<0>Paradev</0>社群，獲取幫助、交流想法，並及時瞭解最新動態與更新。"
 
 msgid "Join the leaderboard"
 msgstr "加入排行榜"
 
-msgid "Join the Superset community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "加入 Superset 社群以獲得協助、分享想法，並掌握最新消息與更新。"
+msgid "Join the Paradev community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "加入 Paradev 社群以獲得協助、分享想法，並掌握最新消息與更新。"
 
 msgid "Join the waitlist"
 msgstr "加入等待名單"
@@ -9450,8 +9501,8 @@ msgstr "加入等待名單"
 msgid "Join us"
 msgstr "加入我們"
 
-msgid "Join us at Superset"
-msgstr "加入 Superset"
+msgid "Join us at Paradev"
+msgstr "加入 Paradev"
 
 msgid "Join waitlist"
 msgstr "加入等待名單"
@@ -9804,8 +9855,8 @@ msgstr "淺色"
 msgid "Light theme"
 msgstr "淺色主題"
 
-msgid "Like building with Superset?"
-msgstr "喜歡用Superset開發嗎？"
+msgid "Like building with Paradev?"
+msgstr "喜歡用Paradev開發嗎？"
 
 msgid "Lime"
 msgstr "萊姆綠"
@@ -9823,6 +9874,11 @@ msgstr "限制為僅受邀者？"
 #. placeholder {0}: metadata.startLine
 msgid "Line {0}"
 msgstr "第{0}行"
+
+#. placeholder {0}: problem.line
+#. placeholder {1}: problem.message
+msgid "Line {0}: {1}"
+msgstr "第 {0} 行：{1}"
 
 msgid "line changed"
 msgstr "行已更改"
@@ -10199,8 +10255,8 @@ msgstr "設為預設——新終端和代理程式將使用此帳戶啟動。"
 msgid "Make public"
 msgstr "公開"
 
-msgid "Make sure the device is awake, online, and running Superset."
-msgstr "請確認裝置未進入睡眠模式、已連上網路且正在執行 Superset。"
+msgid "Make sure the device is awake, online, and running Paradev."
+msgstr "請確認裝置未進入睡眠模式、已連上網路且正在執行 Paradev。"
 
 msgid "Make the chip style the TooltipContent default"
 msgstr "把chip樣式設為TooltipContent的預設樣式"
@@ -10388,8 +10444,8 @@ msgstr "中嚴重性"
 msgid "Meet the team"
 msgstr "認識團隊"
 
-msgid "Meet the team behind Superset, building parallel coding agents for developers."
-msgstr "認識 Superset 背後的團隊，為開發者打造平行編碼代理。"
+msgid "Meet the team behind Paradev, building parallel coding agents for developers."
+msgstr "認識 Paradev 背後的團隊，為開發者打造平行編碼代理。"
 
 msgid "Member"
 msgstr "成員"
@@ -10444,8 +10500,8 @@ msgstr "合併失敗：{0}"
 msgid "Merge pull request"
 msgstr "合併拉取請求"
 
-msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
-msgstr "不離開Superset就能合併拉取請求，另有一輪聊天修復與打磨。"
+msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
+msgstr "不離開Paradev就能合併拉取請求，另有一輪聊天修復與打磨。"
 
 msgid "Merge status"
 msgstr "合併狀態"
@@ -10959,8 +11015,8 @@ msgstr "新聞與更新"
 msgid "News and deep dives"
 msgstr "新聞與深度文章"
 
-msgid "News, updates, and insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "來自 Superset 團隊的新聞、更新與洞察，涵蓋平行編碼代理與開發者生產力。"
+msgid "News, updates, and insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "來自 Paradev 團隊的新聞、更新與洞察，涵蓋平行編碼代理與開發者生產力。"
 
 msgid "Next"
 msgstr "下一頁"
@@ -11641,8 +11697,8 @@ msgstr "暫無工作區"
 msgid "No-Prompt Launch"
 msgstr "無提示詞啟動"
 
-msgid "No. Your agents stay independent; Superset is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "不是。你的代理程式保持獨立，Superset是圍繞它們的編排層。每個任務都有隔離的Git worktree、持久會話、差異審查，以及依事件或計劃執行的自動化，工作流不繫結任何一家提供商。"
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "不是。你的代理程式保持獨立，Paradev是圍繞它們的編排層。每個任務都有隔離的Git worktree、持久會話、差異審查，以及依事件或計劃執行的自動化，工作流不繫結任何一家提供商。"
 
 msgid "Nobody has joined the board yet."
 msgstr "還沒有人加入榜單。"
@@ -11866,7 +11922,7 @@ msgid "On focus change"
 msgstr "焦點變更時"
 
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
-msgstr "Superset 在 GitHub 上擁有 15k+ 顆星、1,000+ 次 fork 與 100+ 位貢獻者，也曾登上 Product Hunt 第一名。"
+msgstr "Paradev 在 GitHub 上擁有 15k+ 顆星、1,000+ 次 fork 與 100+ 位貢獻者，也曾登上 Product Hunt 第一名。"
 
 msgid "On our radar. Order and scope may change."
 msgstr "在我們的視野內。順序和範圍可能會變。"
@@ -11886,8 +11942,8 @@ msgstr "本頁內容"
 msgid "On window change"
 msgstr "視窗變更時"
 
-msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset doesn't proxy any API calls."
-msgstr "在你自己的機器上。儲存庫、worktree、終端輸出和代理程式會話預設都留在本地；雲端同步只涉及帳戶和組織的後設資料。Superset不代理任何API呼叫。"
+msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Paradev doesn't proxy any API calls."
+msgstr "在你自己的機器上。儲存庫、worktree、終端輸出和代理程式會話預設都留在本地；雲端同步只涉及帳戶和組織的後設資料。Paradev不代理任何API呼叫。"
 
 msgid "On-screen Keyboard"
 msgstr "螢幕鍵盤"
@@ -11963,6 +12019,9 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
+
+msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
+msgstr "僅限本機：會被 git 忽略，並套用至此儲存庫的每個 worktree。在此設定的任何鍵都會取代共享的值。"
 
 msgid "Only organization owners can modify these settings."
 msgstr "只有組織擁有者可以修改這些設定。"
@@ -12278,6 +12337,9 @@ msgstr "在新分頁開啟"
 msgid "Open in New Tab"
 msgstr "在新分頁中開啟"
 
+msgid "Open in Paradev"
+msgstr "在 Paradev 中開啟"
+
 msgid "Open in Pull Requests"
 msgstr "在拉取請求中開啟"
 
@@ -12289,9 +12351,6 @@ msgstr "在Scira AI中開啟"
 
 msgid "Open in split pane"
 msgstr "在分屏窗格中開啟"
-
-msgid "Open in Superset"
-msgstr "在 Superset 中開啟"
 
 msgid "Open in T3 Chat"
 msgstr "在T3 Chat中開啟"
@@ -12349,8 +12408,8 @@ msgstr "開啟 OpenAI 的裝置登入頁面。"
 msgid "Open Page in Default Browser"
 msgstr "在預設瀏覽器中開啟頁面"
 
-msgid "Open pages and reply to comments from the Superset app on iPhone and iPad."
-msgstr "在 Superset 的 iPhone 和 iPad 應用程式中開啟頁面並回覆留言。"
+msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
+msgstr "在 Paradev 的 iPhone 和 iPad 應用程式中開啟頁面並回覆留言。"
 
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
@@ -12517,8 +12576,8 @@ msgstr "開啟於"
 msgid "Operator"
 msgstr "操作員"
 
-msgid "Opt in from Superset under Settings → Account."
-msgstr "在Superset的「設定 → 帳戶」中選擇加入。"
+msgid "Opt in from Paradev under Settings → Account."
+msgstr "在Paradev的「設定 → 帳戶」中選擇加入。"
 
 msgid "Opt-out"
 msgstr "拒絕"
@@ -12538,8 +12597,8 @@ msgstr "追加在提示詞內容之後的可選標誌"
 msgid "Options"
 msgstr "選項"
 
-msgid "Or ask your coding agent to install the Superset CLI."
-msgstr "或者讓你的編碼代理程式安裝Superset CLI。"
+msgid "Or ask your coding agent to install the Paradev CLI."
+msgstr "或者讓你的編碼代理程式安裝Paradev CLI。"
 
 msgid "Orange"
 msgstr "橙色"
@@ -12631,6 +12690,9 @@ msgstr "其他聯絡方式"
 
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "我們 1,150 萬美元的種子輪由 Union Square Ventures 領投，Y Combinator、Paul Graham 以及我們敬佩的創辦人參與投資。"
+
+msgid "Our investors"
+msgstr "我們的投資人"
 
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "這是我們截至2026年8月的判斷，依據是我們自己的團隊和我們密切關注的團隊。F3大多已開啟，F4大多還沒開啟。這道差距就是要做的事。"
@@ -12771,6 +12833,181 @@ msgstr "面板佈局根節點：渲染工作區的面板樹"
 msgid "PaneHeaderActions.tsx"
 msgstr "PaneHeaderActions.tsx"
 
+msgid "Paradev"
+msgstr "Paradev"
+
+msgid "Paradev {version}"
+msgstr "Paradev {version}"
+
+msgid "Paradev Agent"
+msgstr "Paradev代理程式"
+
+msgid "Paradev app"
+msgstr "Paradev應用程式"
+
+msgid "Paradev App"
+msgstr "Paradev應用程式"
+
+msgid "Paradev Automations"
+msgstr "Paradev 自動化"
+
+msgid "Paradev CLI"
+msgstr "Paradev CLI"
+
+msgid "Paradev components"
+msgstr "Paradev 元件"
+
+msgid "Paradev Components"
+msgstr "Paradev元件"
+
+msgid "Paradev could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
+msgstr "Paradev 無法移轉你的部分 v1 專案或工作區。開啟匯入工具查看原因並逐一重試。"
+
+msgid "Paradev could not complete sign-in. Please try again."
+msgstr "Paradev無法完成登入。請重試。"
+
+msgid "Paradev CPU"
+msgstr "Paradev CPU"
+
+msgid "Paradev CPU · last 5 min"
+msgstr "Paradev CPU · 最近5分鐘"
+
+msgid "Paradev Design System"
+msgstr "Paradev設計系統"
+
+msgid "Paradev desktop app"
+msgstr "Paradev 桌面 App"
+
+msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
+msgstr "Paradev Enterprise是面向團隊的Paradev。聯絡我們，瞭解它包含什麼，以及如何適配你的組織。"
+
+msgid "Paradev for iPhone and iPad"
+msgstr "iPhone 和 iPad 版 Paradev"
+
+msgid "Paradev for your team"
+msgstr "為你的團隊準備的Paradev"
+
+msgid "Paradev forwards the ports a remote workspace opens while you have it selected."
+msgstr "當你選取某個遠端工作區時，Paradev 會轉送它開啟的連接埠。"
+
+msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
+msgstr "Paradev有免費版。原始碼在GitHub上以Elastic License 2.0（ELv2）提供，你可以在許可條款範圍內查閱並自行部署。"
+
+msgid "Paradev hit an unexpected error. Reload to try again."
+msgstr "Paradev遇到意外錯誤。重新載入以重試。"
+
+msgid "Paradev holds the token and makes the calls. Agents never see it."
+msgstr "權杖由 Paradev 保管並代為呼叫，代理程式永遠看不到它。"
+
+msgid "Paradev hooks"
+msgstr "Paradev鉤子"
+
+msgid "Paradev in-app browser"
+msgstr "Paradev 應用程式內瀏覽器"
+
+msgid "Paradev is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
+msgstr "Paradev是桌面應用程式。留下電子郵件，我們會把下載連結發給你，在Mac上開啟即可。"
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
+msgstr "Paradev正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。"
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "Paradev正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。我們是3位YC出身的前CTO，在做一個自己喜歡的工具。"
+
+msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Paradev由一支位於加州舊金山的團隊打造。產品支援或帳戶問題，請發郵件至<0>{supportEmail}</0>，我們會在一個工作日內回覆。合作、媒體、企業版或其他任何事宜，請寫信至<1>{teamEmail}</1>。"
+
+msgid "Paradev is built in Paradev, so we're our own #1 users. You get paid to make your own life easier."
+msgstr "Paradev 就是在 Paradev 中建構的，因此我們自己就是它的頭號使用者。你可以透過讓自己的工作更輕鬆來獲得報酬。"
+
+msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
+msgstr "Paradev的設計就是配合你現有的工具。我們原生支援深度連結到Cursor這類IDE，你可以直接在自己的IDE裡開啟工作區和檔案。"
+
+msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Paradev是原始碼可見的：程式碼在GitHub上公開，採用Elastic License 2.0（ELv2），你可以在許可條款範圍內查閱並自行部署，但它不是OSI認可的開源許可。Paradev與商業智慧工具Apache Superset沒有任何關係。"
+
+msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev 原始碼可見。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
+
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev是F3到F4這段過渡期的工作臺：隔離工作區裡的並行代理程式、真正管得過來的代理程式叢集，以及一套用來審查非你所寫程式碼的介面。"
+
+msgid "Paradev isn't on Windows yet"
+msgstr "Paradev目前僅支援Mac"
+
+msgid "Paradev may sign you back in after restart. Please try signing out again."
+msgstr "重啟後Paradev可能會重新登入。請再次嘗試登出。"
+
+msgid "Paradev memory"
+msgstr "Paradev記憶體"
+
+msgid "Paradev memory · last 5 min"
+msgstr "Paradev記憶體 · 最近5分鐘"
+
+msgid "Paradev Mobile code diff on iPhone"
+msgstr "iPhone 上的 Paradev Mobile 程式碼差異"
+
+msgid "Paradev mobile gives me the power of my desktop anywhere I go."
+msgstr "無論走到哪裡，Paradev 手機版都讓我擁有桌上型電腦的能力。"
+
+msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
+msgstr "透過 Paradev Mobile，開發者可以在 iPhone 上繼續使用他們在電腦上已在使用的 Paradev 工作區。"
+
+msgid "Paradev Mobile page"
+msgstr "Paradev Mobile 頁面"
+
+msgid "Paradev Mobile terminal on iPhone"
+msgstr "iPhone 上的 Paradev Mobile 終端"
+
+msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
+msgstr "Paradev需要「完全磁碟存取權限」才能讀取其他瀏覽器的資料。請在系統設定中授予權限，然後重新檢查。"
+
+msgid "Paradev next to others"
+msgstr "Paradev 與其他工具比較"
+
+msgid "Paradev on iPad, showing a pull request and a workspace list"
+msgstr "iPad 上的 Paradev，顯示一個拉取請求和工作區清單"
+
+msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
+msgstr "Paradev 只取得此連接器請求的權限。你可以隨時中斷連線以撤銷。"
+
+msgid "Paradev originals"
+msgstr "Paradev原創元件"
+
+msgid "Paradev Pages"
+msgstr "Paradev 頁面"
+
+msgid "Paradev Pages demo"
+msgstr "Paradev 頁面示範"
+
+msgid "Paradev Plugins"
+msgstr "Paradev 外掛"
+
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
+msgstr "Paradev在你的開發者機器上本地執行。我們不儲存你的程式碼或AI對話，並且Paradev已通過獨立審計機構的SOC 2 Type II審計。可在trust.superset.sh索取報告並查閱我們的安全文件。"
+
+msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
+msgstr "Paradev起初是2025年11月的一個駭客松專案，一個用來管理worktree的簡單桌面應用程式。"
+
+msgid "Paradev Teams"
+msgstr "Paradev 團隊"
+
+msgid "Paradev UI"
+msgstr "Paradev UI"
+
+#. placeholder {0}: formatPercent(trackedMemorySharePercent)
+msgid "Paradev uses {0} of system RAM"
+msgstr "Paradev佔用了系統RAM的{0}"
+
+msgid "Paradev vs the Alternatives"
+msgstr "Paradev與同類方案對比"
+
+msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
+msgstr "Paradev支援任何基於CLI的編碼代理程式，包括Claude Code、OpenCode、OpenAI Codex等。每個任務都可以換用不同的代理程式，工作區和審查流程都不用變。"
+
+msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
+msgstr "Paradev 手機應用程式讓我可以隨時隨地推動代理程式工作、解決它們的阻礙，即使我離電腦很遠也沒問題。"
+
 msgid "Paragraph"
 msgstr "段落"
 
@@ -12826,8 +13063,8 @@ msgstr "{email}的密碼"
 msgid "Paste"
 msgstr "貼上"
 
-msgid "Paste this into Superset CLI:"
-msgstr "把它貼上到Superset CLI："
+msgid "Paste this into Paradev CLI:"
+msgstr "把它貼上到Paradev CLI："
 
 msgid "Path"
 msgstr "路徑"
@@ -12908,8 +13145,8 @@ msgstr "每使用者/月"
 msgid "Per-repo agent memory"
 msgstr "依儲存庫的代理程式記憶"
 
-msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
-msgstr "僅受監控的Superset資源佔系統總RAM的百分比（不含其他應用程式）。佔比高說明Superset是系統記憶體壓力的主要來源；佔比低說明壓力可能來自別處。"
+msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
+msgstr "僅受監控的Paradev資源佔系統總RAM的百分比（不含其他應用程式）。佔比高說明Paradev是系統記憶體壓力的主要來源；佔比低說明壓力可能來自別處。"
 
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "永久刪除「{projectName}」？"
@@ -12990,8 +13227,8 @@ msgstr "選擇一個工作區：其代理正在等待你的輸入、自你上次
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
 
-msgid "Pick one in the Superset app. It's saved to your account."
-msgstr "在 Superset 應用程式中選一個，它會儲存到你的帳號。"
+msgid "Pick one in the Paradev app. It's saved to your account."
+msgstr "在 Paradev 應用程式中選一個，它會儲存到你的帳號。"
 
 msgid "Pick the best agent."
 msgstr "挑選最合適的代理程式。"
@@ -13074,8 +13311,8 @@ msgstr "任務完成時播放聲音"
 msgid "Play the animation"
 msgstr "播放動畫"
 
-msgid "Play the Superset Pages demo"
-msgstr "播放 Superset 頁面示範"
+msgid "Play the Paradev Pages demo"
+msgstr "播放 Paradev 頁面示範"
 
 msgid "Please check your internet connection and try again."
 msgstr "請檢查網路連線後重試。"
@@ -13092,8 +13329,8 @@ msgstr "請選擇專案位置"
 msgid "Please select an organization"
 msgstr "請選擇一個組織"
 
-msgid "Please try again, or restart Superset on that device."
-msgstr "請重試，或在該裝置上重新啟動 Superset。"
+msgid "Please try again, or restart Paradev on that device."
+msgstr "請重試，或在該裝置上重新啟動 Paradev。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -13226,8 +13463,8 @@ msgstr "PresetsBar.tsx"
 msgid "Press <0>Esc</0> to close"
 msgstr "按<0>Esc</0>關閉"
 
-msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
-msgstr "按 ⌘⇧B，或開啟 Superset 偵測到的連接埠。開發伺服器會在終端旁的窗格中載入。"
+msgid "Press ⌘⇧B or open a port Paradev detected. Your dev server loads in a pane beside your terminals."
+msgstr "按 ⌘⇧B，或開啟 Paradev 偵測到的連接埠。開發伺服器會在終端旁的窗格中載入。"
 
 msgid "Press a key…"
 msgstr "請按一個鍵…"
@@ -13473,8 +13710,8 @@ msgstr "由工作區提升而來，因此儲存庫和區域固定。再次提升
 msgid "Prompt"
 msgstr "提示詞"
 
-msgid "Prompt a coding agent to build what you want to see in Superset. If we like your prompt, we'll run it and merge the result."
-msgstr "用提示詞讓編碼代理程式實現你想在Superset中看到的功能。如果我們喜歡你的提示詞，就會執行它併合併結果。"
+msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
+msgstr "用提示詞讓編碼代理程式實現你想在Paradev中看到的功能。如果我們喜歡你的提示詞，就會執行它併合併結果。"
 
 msgid "Prompt agents and answer their questions"
 msgstr "向 agent 下達提示並回答它們的問題"
@@ -13543,8 +13780,8 @@ msgstr "公開排行榜"
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "再次發布時連結不變。舊版本會保留在歷史紀錄中。"
 
-msgid "Publish from the Superset CLI or over MCP."
-msgstr "透過 Superset CLI 或 MCP 發布。"
+msgid "Publish from the Paradev CLI or over MCP."
+msgstr "透過 Paradev CLI 或 MCP 發布。"
 
 msgid "Publish from your own repo"
 msgstr "從你自己的儲存庫發布"
@@ -13727,8 +13964,8 @@ msgstr "為{appName}評分"
 msgid "Rate limit exceeded."
 msgstr "超出速率限制。"
 
-msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
-msgstr "通過Superset中繼從任何地方連上這臺Mac，或啟動雲端工作區。可從任意客戶端連線。"
+msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
+msgstr "通過Paradev中繼從任何地方連上這臺Mac，或啟動雲端工作區。可從任意客戶端連線。"
 
 msgid "Reached"
 msgstr "已達到"
@@ -13757,6 +13994,9 @@ msgstr "只讀取和規劃，不做任何變更"
 msgid "Read and send mail"
 msgstr "讀取和傳送郵件"
 
+msgid "Read announcement"
+msgstr "閱讀公告"
+
 msgid "Read deployment and build logs"
 msgstr "查看部署和建置日誌"
 
@@ -13765,6 +14005,9 @@ msgstr "在手機上閱讀"
 
 msgid "Read MCP servers again"
 msgstr "重新讀取MCP伺服器"
+
+msgid "Read the announcement"
+msgstr "閱讀公告"
 
 msgid "Read the changelog"
 msgstr "檢視更新日誌"
@@ -13827,8 +14070,8 @@ msgstr "在你登入的每台裝置上和每個雲端工作區中都已就緒。
 msgid "Ready to Merge"
 msgstr "可以合併"
 
-msgid "Ready to try Superset?"
-msgstr "準備好試試Superset了嗎？"
+msgid "Ready to try Paradev?"
+msgstr "準備好試試Paradev了嗎？"
 
 msgid "Reapply all commits"
 msgstr "重新套用所有提交"
@@ -13971,8 +14214,8 @@ msgstr "重新產生"
 msgid "Region"
 msgstr "區域"
 
-msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
-msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Superset顯示狀態併發送通知。關閉後會在所有位置移除Superset的條目，該代理程式的狀態和通知都會停止，包括在Superset內部。"
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
+msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Paradev顯示狀態併發送通知。關閉後會在所有位置移除Paradev的條目，該代理程式的狀態和通知都會停止，包括在Paradev內部。"
 
 msgid "Related Posts"
 msgstr "相關文章"
@@ -14001,8 +14244,8 @@ msgstr "重新載入應用"
 msgid "Reload from disk"
 msgstr "從磁碟重新載入"
 
-msgid "Reload Superset to refresh the workspace list."
-msgstr "重新載入Superset以重新整理工作區列表。"
+msgid "Reload Paradev to refresh the workspace list."
+msgstr "重新載入Paradev以重新整理工作區列表。"
 
 msgid "Reload window"
 msgstr "重新載入視窗"
@@ -14341,8 +14584,8 @@ msgstr "必填"
 msgid "Required version: {minimumVersion}+"
 msgstr "所需版本：{minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Superset Pro."
-msgstr "需要 iOS 26 或 iPadOS 26 或以上版本。包含在 Superset Pro 中。"
+msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "需要 iOS 26 或 iPadOS 26 或以上版本。包含在 Paradev Pro 中。"
 
 msgid "Resend invite"
 msgstr "重新傳送邀請"
@@ -14407,8 +14650,8 @@ msgstr "{countdown}後重置 · {absolute}"
 msgid "Resets now"
 msgstr "即將重置"
 
-msgid "Resident memory used by Superset and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
-msgstr "Superset與受監控的終端處理程序樹佔用的常駐記憶體。如果持續攀升且不回落，可能有工作區處理程序未釋放記憶體。數值過高會增加交換風險，並可能導致卡頓。"
+msgid "Resident memory used by Paradev and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
+msgstr "Paradev與受監控的終端處理程序樹佔用的常駐記憶體。如果持續攀升且不回落，可能有工作區處理程序未釋放記憶體。數值過高會增加交換風險，並可能導致卡頓。"
 
 msgid "Resizable"
 msgstr "可調整大小"
@@ -14614,8 +14857,8 @@ msgstr "請在連線重新整理後重試。"
 msgid "Retry dictation"
 msgstr "重試語音輸入"
 
-msgid "Retry in a few seconds; if it persists, restart Superset."
-msgstr "請在幾秒後重試；若問題持續，請重啟Superset。"
+msgid "Retry in a few seconds; if it persists, restart Paradev."
+msgstr "請在幾秒後重試；若問題持續，請重啟Paradev。"
 
 msgid "Retry in a few seconds."
 msgstr "請在幾秒後重試。"
@@ -14687,8 +14930,8 @@ msgstr "待審查"
 msgid "Review pending changes."
 msgstr "審查待處理的更改。"
 
-msgid "Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly."
-msgstr "在Superset裡審查拉取請求：差異面板、代理程式輔助審查、直接處理評論。"
+msgid "Review pull requests inside Paradev: diff pane, agent-assisted review, act on comments directly."
+msgstr "在Paradev裡審查拉取請求：差異面板、代理程式輔助審查、直接處理評論。"
 
 msgid "Review requested"
 msgstr "已請求審查"
@@ -14827,11 +15070,11 @@ msgstr "並排執行代理程式"
 msgid "Run an Army of"
 msgstr "調動一支"
 
+msgid "Run an army of coding agents"
+msgstr "調動一支程式代理程式大軍"
+
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "在工作區窗格中執行 iOS 模擬器，讓你和你的代理程式測試行動應用程式。"
-
-msgid "Run any coding agent"
-msgstr "執行任意程式碼代理程式"
 
 msgid "Run automations on data source and comment activity."
 msgstr "在資料來源和評論活動上執行自動化。"
@@ -14932,8 +15175,8 @@ msgstr "在你的機器上執行本地命令"
 msgid "Runs appear here once an automation fires."
 msgstr "自動化觸發後，執行會顯示在這裡。"
 
-msgid "Runs inside the Superset app on that device, so updating it means updating the app there."
-msgstr "在該裝置的 Superset 應用程式內執行，因此更新它就是更新該裝置上的應用程式。"
+msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
+msgstr "在該裝置的 Paradev 應用程式內執行，因此更新它就是更新該裝置上的應用程式。"
 
 msgid "Runs land in a workspace. Review the diff, merge what's good."
 msgstr "執行結果會落在一個工作區裡。審查差異，把合適的合併進去。"
@@ -15029,11 +15272,11 @@ msgstr "正在儲存…"
 msgid "Scale to 100+ agents"
 msgstr "擴展至 100 多個代理"
 
-msgid "Scan the QR code, then sign in with the same Superset account and select this organization."
-msgstr "掃描 QR 碼，然後使用同一個 Superset 帳號登入並選取此組織。"
+msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
+msgstr "掃描 QR 碼，然後使用同一個 Paradev 帳號登入並選取此組織。"
 
-msgid "Scan to download Superset for iPhone"
-msgstr "掃碼下載 iPhone 版 Superset"
+msgid "Scan to download Paradev for iPhone"
+msgstr "掃碼下載 iPhone 版 Paradev"
 
 msgid "Scanning transcript logs…"
 msgstr "正在掃描會話記錄日誌…"
@@ -15325,11 +15568,11 @@ msgstr "檢視改動"
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "瞭解 {companyName} 的 GitHub 星標隨時間的成長情況。"
 
-msgid "See how Superset compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
-msgstr "看看Superset與其他AI編碼工具的對比，涵蓋AI編輯器、編碼代理程式和雲端AI工程師。"
+msgid "See how Paradev compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
+msgstr "看看Paradev與其他AI編碼工具的對比，涵蓋AI編輯器、編碼代理程式和雲端AI工程師。"
 
-msgid "See how Superset compares to other tools"
-msgstr "看看Superset與其他工具的對比"
+msgid "See how Paradev compares to other tools"
+msgstr "看看Paradev與其他工具的對比"
 
 msgid "See how we work"
 msgstr "看看我們如何工作"
@@ -15352,8 +15595,8 @@ msgstr "所有工具名稱和引數見<0>可用工具參考</0>。"
 msgid "See the <0>custom themes guide</0> to edit a theme or build your own."
 msgstr "想修改主題或做一個自己的，請檢視<0>自訂主題指南</0>。"
 
-msgid "See the open roles, or try Superset first."
-msgstr "查看空缺職位，或先試用 Superset。"
+msgid "See the open roles, or try Paradev first."
+msgstr "查看空缺職位，或先試用 Paradev。"
 
 msgid "See this gate on the scorecard"
 msgstr "在評分表中檢視這道關卡"
@@ -15361,8 +15604,8 @@ msgstr "在評分表中檢視這道關卡"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "檢視改動、給出回饋，就緒後合併成果。"
 
-msgid "See what we're building now, what's coming next, and where Superset is headed."
-msgstr "瞭解我們正在打造什麼、接下來會推出什麼，以及 Superset 的發展方向。"
+msgid "See what we're building now, what's coming next, and where Paradev is headed."
+msgstr "瞭解我們正在打造什麼、接下來會推出什麼，以及 Paradev 的發展方向。"
 
 msgid "See what your teammates' agents are working on, shipping, and blocked on."
 msgstr "查看隊友的代理程式正在做什麼、交付了什麼，以及卡在哪裡。"
@@ -15550,8 +15793,8 @@ msgstr "送出檢舉"
 msgid "Send review"
 msgstr "傳送審查"
 
-msgid "Send the link. Your team opens it in a browser or in Superset."
-msgstr "傳送連結。團隊可以在瀏覽器或 Superset 中開啟。"
+msgid "Send the link. Your team opens it in a browser or in Paradev."
+msgstr "傳送連結。團隊可以在瀏覽器或 Paradev 中開啟。"
 
 msgid "Send to"
 msgstr "傳送給"
@@ -15691,8 +15934,8 @@ msgstr "在{hostName}上設定專案"
 msgid "Set up project…"
 msgstr "配置專案…"
 
-msgid "Set up this project for Superset"
-msgstr "為Superset配置這個專案"
+msgid "Set up this project for Paradev"
+msgstr "為Paradev配置這個專案"
 
 msgid "Set up with an agent"
 msgstr "用代理程式設定"
@@ -15772,6 +16015,9 @@ msgstr "共用工作區"
 msgid "Share."
 msgstr "分享。"
 
+msgid "Shared"
+msgstr "共享"
+
 msgid "Shared across sessions using this login."
 msgstr "使用此登入的所有工作階段共用此額度。"
 
@@ -15781,11 +16027,11 @@ msgstr "共享應用元件"
 msgid "Shared component library."
 msgstr "共享元件庫。"
 
-msgid "Shared settings and simpler membership for teams that work in Superset together."
-msgstr "為在 Superset 中協作的團隊提供共用設定與更簡單的成員管理。"
+msgid "Shared settings and simpler membership for teams that work in Paradev together."
+msgstr "為在 Paradev 中協作的團隊提供共用設定與更簡單的成員管理。"
 
-msgid "Shared theme JSON files you can import into Superset."
-msgstr "可匯入Superset的共享主題JSON檔案。"
+msgid "Shared theme JSON files you can import into Paradev."
+msgstr "可匯入Paradev的共享主題JSON檔案。"
 
 msgid "Shared version"
 msgstr "分享的版本"
@@ -15829,8 +16075,8 @@ msgstr "顯示"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出應用時顯示確認對話方塊"
 
-msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers."
-msgstr "在聊天輸入框中顯示麥克風。如果 Codex 已登入 ChatGPT，語音由 ChatGPT 轉寫；否則在可行時於你的 Mac 上轉寫，再不行則由 Superset 的伺服器轉寫。"
+msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
+msgstr "在聊天輸入框中顯示麥克風。如果 Codex 已登入 ChatGPT，語音由 ChatGPT 轉寫；否則在可行時於你的 Mac 上轉寫，再不行則由 Paradev 的伺服器轉寫。"
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "在首頁側邊欄的「拉取請求」下方顯示「用量」按鈕"
@@ -16019,15 +16265,15 @@ msgstr "請重新登入以使用語音輸入"
 msgid "Sign in as Local Admin (dev)"
 msgstr "以本地管理員身份登入（開發）"
 
-msgid "Sign in once. Superset keeps the connection."
-msgstr "登入一次，Superset 會保持連線。"
+msgid "Sign in once. Paradev keeps the connection."
+msgstr "登入一次，Paradev 會保持連線。"
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
 msgid "Sign in to {0}"
 msgstr "登入{0}"
 
-msgid "Sign in to continue to Superset"
-msgstr "登入以繼續使用Superset"
+msgid "Sign in to continue to Paradev"
+msgstr "登入以繼續使用Paradev"
 
 msgid "Sign in to get started"
 msgstr "登入即可開始"
@@ -16070,8 +16316,8 @@ msgstr "將系統預設的{0}登入切換到另一個帳戶。它會替換本機
 msgid "Sign up in one step"
 msgstr "一步完成註冊"
 
-msgid "Sign up to get started with Superset"
-msgstr "註冊以開始使用Superset"
+msgid "Sign up to get started with Paradev"
+msgstr "註冊以開始使用Paradev"
 
 msgid "Sign up with GitHub"
 msgstr "使用GitHub註冊"
@@ -16175,8 +16421,8 @@ msgstr "技能"
 msgid "Skills"
 msgstr "技能"
 
-msgid "Skills ship with the Superset plugin and are kept up to date automatically in every agent you use. Click one to preview it."
-msgstr "技能隨Superset外掛一起提供，並會在你使用的每個代理程式中自動保持最新。點選一個即可預覽。"
+msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
+msgstr "技能隨Paradev外掛一起提供，並會在你使用的每個代理程式中自動保持最新。點選一個即可預覽。"
 
 msgid "Skip"
 msgstr "跳過"
@@ -16286,8 +16532,8 @@ msgstr "某人"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "其他人已發佈此工作區中的 {entryPath}。使用明確的頁面 id 發佈以為其頁面新增版本，或移動該檔案。"
 
-msgid "Someone on the Superset team will review this page. We only follow up if we need more from you."
-msgstr "Superset 團隊會審核此頁面。只有在需要你補充資訊時我們才會聯絡你。"
+msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
+msgstr "Paradev 團隊會審核此頁面。只有在需要你補充資訊時我們才會聯絡你。"
 
 msgid "Something else"
 msgstr "其他問題"
@@ -16493,8 +16739,8 @@ msgstr "星號提醒已重設，可再次顯示於空白狀態及入門通知中
 msgid "Star on GitHub"
 msgstr "在GitHub上加星"
 
-msgid "Star Superset on GitHub"
-msgstr "在GitHub上為Superset加星"
+msgid "Star Paradev on GitHub"
+msgstr "在GitHub上為Paradev加星"
 
 msgid "Starred"
 msgstr "已加星"
@@ -16717,11 +16963,11 @@ msgstr "停止語音輸入"
 msgid "Stop local {0}"
 msgstr "停止本地 {0}"
 
+msgid "Stop Paradev here to delete from another device."
+msgstr "在此停止Paradev，然後從其他裝置刪除。"
+
 msgid "Stop response"
 msgstr "停止回覆"
-
-msgid "Stop Superset here to delete from another device."
-msgstr "在此停止Superset，然後從其他裝置刪除。"
 
 msgid "Stop the agent and send this now"
 msgstr "停止代理並立即傳送"
@@ -16819,8 +17065,8 @@ msgstr "建議"
 msgid "suite for agent UIs, and shared app components. Click any import path to copy it."
 msgstr "套件，以及共享應用元件。點選任意匯入路徑即可複製。"
 
-msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
-msgstr "Superset與受監控的終端處理程序樹佔用的CPU總和。超過100%表示有多個CPU核心處於繁忙狀態。持續偏高通常會導致介面卡頓和耗電增加。"
+msgid "Sum of CPU used by Paradev and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
+msgstr "Paradev與受監控的終端處理程序樹佔用的CPU總和。超過100%表示有多個CPU核心處於繁忙狀態。持續偏高通常會導致介面卡頓和耗電增加。"
 
 msgid "Summarize the changes in this workspace"
 msgstr "總結此工作區中的變更"
@@ -16840,207 +17086,17 @@ msgstr "已被取代"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset"
-msgstr "Superset"
-
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
-
-msgid "Superset {version}"
-msgstr "Superset {version}"
-
-msgid "Superset Agent"
-msgstr "Superset代理程式"
-
-msgid "Superset app"
-msgstr "Superset應用程式"
-
-msgid "Superset App"
-msgstr "Superset應用程式"
-
-msgid "Superset Automations"
-msgstr "Superset 自動化"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只會輸出該窗格專屬的端點。讓 Playwright 或 browser-use 連接它即可。"
 
-msgid "Superset CLI"
-msgstr "Superset CLI"
-
-msgid "Superset components"
-msgstr "Superset 元件"
-
-msgid "Superset Components"
-msgstr "Superset元件"
-
-msgid "Superset could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
-msgstr "Superset 無法移轉你的部分 v1 專案或工作區。開啟匯入工具查看原因並逐一重試。"
-
-msgid "Superset could not complete sign-in. Please try again."
-msgstr "Superset無法完成登入。請重試。"
-
-msgid "Superset CPU"
-msgstr "Superset CPU"
-
-msgid "Superset CPU · last 5 min"
-msgstr "Superset CPU · 最近5分鐘"
-
-msgid "Superset Design System"
-msgstr "Superset設計系統"
-
-msgid "Superset desktop app"
-msgstr "Superset 桌面 App"
-
-msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
-msgstr "Superset Enterprise是面向團隊的Superset。聯絡我們，瞭解它包含什麼，以及如何適配你的組織。"
-
-msgid "Superset for iPhone and iPad"
-msgstr "iPhone 和 iPad 版 Superset"
-
-msgid "Superset for press"
-msgstr "給媒體的 Superset 資訊"
-
-msgid "Superset for your team"
-msgstr "為你的團隊準備的Superset"
-
-msgid "Superset forwards the ports a remote workspace opens while you have it selected."
-msgstr "當你選取某個遠端工作區時，Superset 會轉送它開啟的連接埠。"
-
-msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Superset有免費版。原始碼在GitHub上以Elastic License 2.0（ELv2）提供，你可以在許可條款範圍內查閱並自行部署。"
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "八分之一的 Fortune 500 公司使用過 Superset。"
-
-msgid "Superset hit an unexpected error. Reload to try again."
-msgstr "Superset遇到意外錯誤。重新載入以重試。"
-
-msgid "Superset holds the token and makes the calls. Agents never see it."
-msgstr "權杖由 Superset 保管並代為呼叫，代理程式永遠看不到它。"
-
-msgid "Superset hooks"
-msgstr "Superset鉤子"
-
-msgid "Superset in-app browser"
-msgstr "Superset 應用程式內瀏覽器"
-
-msgid "Superset is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
-msgstr "Superset是桌面應用程式。留下電子郵件，我們會把下載連結發給你，在Mac上開啟即可。"
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
-msgstr "Superset正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。"
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Superset正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。我們是3位YC出身的前CTO，在做一個自己喜歡的工具。"
-
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
-msgstr "Superset由一支位於加州舊金山的團隊打造。產品支援或帳戶問題，請發郵件至<0>{supportEmail}</0>，我們會在一個工作日內回覆。合作、媒體、企業版或其他任何事宜，請寫信至<1>{teamEmail}</1>。"
-
-msgid "Superset is built in Superset, so we're our own #1 users. You get paid to make your own life easier."
-msgstr "Superset 就是在 Superset 中建構的，因此我們自己就是它的頭號使用者。你可以透過讓自己的工作更輕鬆來獲得報酬。"
-
-msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
-msgstr "Superset的設計就是配合你現有的工具。我們原生支援深度連結到Cursor這類IDE，你可以直接在自己的IDE裡開啟工作區和檔案。"
-
-msgid "Superset is getting a new name soon"
-msgstr "Superset 即將更名"
-
-msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Superset是原始碼可見的：程式碼在GitHub上公開，採用Elastic License 2.0（ELv2），你可以在許可條款範圍內查閱並自行部署，但它不是OSI認可的開源許可。Superset與商業智慧工具Apache Superset沒有任何關係。"
-
-msgid "Superset is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Superset 原始碼可見。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
-
-msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Superset是F3到F4這段過渡期的工作臺：隔離工作區裡的並行代理程式、真正管得過來的代理程式叢集，以及一套用來審查非你所寫程式碼的介面。"
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "在全球，Netflix、Microsoft、NVIDIA、DoorDash、Wix 與 Mistral AI 的工程師都在使用 Superset；在亞洲，ByteDance、Toss、Kakao、Grab、LINE 與 Rakuten 的工程師也在使用。"
-
-msgid "Superset isn't on Windows yet"
-msgstr "Superset目前僅支援Mac"
-
-msgid "Superset may sign you back in after restart. Please try signing out again."
-msgstr "重啟後Superset可能會重新登入。請再次嘗試登出。"
-
-msgid "Superset memory"
-msgstr "Superset記憶體"
-
-msgid "Superset memory · last 5 min"
-msgstr "Superset記憶體 · 最近5分鐘"
-
-msgid "Superset Mobile code diff on iPhone"
-msgstr "iPhone 上的 Superset Mobile 程式碼差異"
-
-msgid "Superset mobile gives me the power of my desktop anywhere I go."
-msgstr "無論走到哪裡，Superset 手機版都讓我擁有桌上型電腦的能力。"
+msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
+msgstr "Superset 現已更名為 Paradev。另外，我們完成了 1,150 萬美元種子輪融資"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登上 iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "透過 Superset Mobile，開發者可以在 iPhone 上繼續使用他們在電腦上已在使用的 Superset 工作區。"
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile 頁面"
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "iPhone 上的 Superset Mobile 終端"
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset需要「完全磁碟存取權限」才能讀取其他瀏覽器的資料。請在系統設定中授予權限，然後重新檢查。"
-
-msgid "Superset next to others"
-msgstr "Superset 與其他工具比較"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "iPad 上的 Superset，顯示一個拉取請求和工作區清單"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset 只取得此連接器請求的權限。你可以隨時中斷連線以撤銷。"
-
-msgid "Superset originals"
-msgstr "Superset原創元件"
-
-msgid "Superset Pages"
-msgstr "Superset 頁面"
-
-msgid "Superset Pages demo"
-msgstr "Superset 頁面示範"
-
-msgid "Superset Plugins"
-msgstr "Superset 外掛"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset 完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset在你的開發者機器上本地執行。我們不儲存你的程式碼或AI對話，並且Superset已通過獨立審計機構的SOC 2 Type II審計。可在trust.superset.sh索取報告並查閱我們的安全文件。"
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset起初是2025年11月的一個駭客松專案，一個用來管理worktree的簡單桌面應用程式。"
-
-msgid "Superset Teams"
-msgstr "Superset 團隊"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset佔用了系統RAM的{0}"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset與同類方案對比"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset支援任何基於CLI的編碼代理程式，包括Claude Code、OpenCode、OpenAI Codex等。每個任務都可以換用不同的代理程式，工作區和審查流程都不用變。"
-
 msgid "superset.sh"
 msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Superset 手機應用程式讓我可以隨時隨地推動代理程式工作、解決它們的阻礙，即使我離電腦很遠也沒問題。"
 
 msgid "Supervised"
 msgstr "監督"
@@ -17167,8 +17223,8 @@ msgstr "同步失敗"
 msgid "Sync issues bidirectionally with Linear."
 msgstr "與Linear雙向同步議題。"
 
-msgid "Sync issues bidirectionally with Linear. Create tasks in Superset and have them appear in Linear, or import existing Linear issues."
-msgstr "與Linear雙向同步議題。在Superset中建立任務並讓它們出現在Linear裡，也可以匯入已有的Linear議題。"
+msgid "Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues."
+msgstr "與Linear雙向同步議題。在Paradev中建立任務並讓它們出現在Linear裡，也可以匯入已有的Linear議題。"
 
 msgid "Sync Repositories"
 msgstr "同步儲存庫"
@@ -17194,8 +17250,8 @@ msgstr "系統RAM佔比"
 #. placeholder {0}: formatMemory(snapshot.totalMemory)
 #. placeholder {1}: formatMemory(otherUsedMemory)
 #. placeholder {2}: formatMemory(freeMemory)
-msgid "System RAM: Superset {0}, other apps {1}, free {2}"
-msgstr "系統RAM：Superset {0}，其他應用程式{1}，空閒{2}"
+msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
+msgstr "系統RAM：Paradev {0}，其他應用程式{1}，空閒{2}"
 
 msgid "Tab"
 msgstr "分頁"
@@ -17242,8 +17298,8 @@ msgstr "會在新的代理程式會話中生效。"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平時久一些。你離開後它也會繼續。"
 
-msgid "Talk to Superset"
-msgstr "聯絡Superset"
+msgid "Talk to Paradev"
+msgstr "聯絡Paradev"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "點按頁面上的任何元素即可留言"
@@ -17303,8 +17359,8 @@ msgstr "任務管理位置已更新"
 msgid "Tasks"
 msgstr "任務"
 
-msgid "Tasks created in Superset will be synced to this Linear team."
-msgstr "在Superset中建立的任務會同步到這個Linear團隊。"
+msgid "Tasks created in Paradev will be synced to this Linear team."
+msgstr "在Paradev中建立的任務會同步到這個Linear團隊。"
 
 msgid "Tasks, the CLI and agents follow this. Each member uses their own Linear account."
 msgstr "任務、CLI 與代理都會遵循此設定。每位成員使用自己的 Linear 帳戶。"
@@ -17543,11 +17599,14 @@ msgstr "代理程式使用其技能和工具，問題會出現在 Linear 中。"
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "關注該頁面的代理程式會讀取每則留言，更新頁面並在討論串中回覆。"
 
-msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
-msgstr "此 App 可免費下載。需要 iOS 26 或更新版本以及 Superset Pro。接下來將推出 Android 版。"
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "公告也介紹了由 Union Square Ventures 領投、Y Combinator 與 Paul Graham 參投的 1,150 萬美元種子輪融資。"
 
-msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Superset build. Restarting replaces it with this app's copy."
-msgstr "應用程式版本為 {appVersion}，但連接的是由其他程式（可能是舊版 CLI 或另一個 Superset 版本）啟動的主機服務。重新啟動會將其替換為此應用程式自帶的副本。"
+msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
+msgstr "此 App 可免費下載。需要 iOS 26 或更新版本以及 Paradev Pro。接下來將推出 Android 版。"
+
+msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
+msgstr "應用程式版本為 {appVersion}，但連接的是由其他程式（可能是舊版 CLI 或另一個 Paradev 版本）啟動的主機服務。重新啟動會將其替換為此應用程式自帶的副本。"
 
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "此自動化的擁有者已無法在此組織中使用雲端工作區。請對方檢查存取權限，或在裝置上執行此自動化。"
@@ -17567,6 +17626,12 @@ msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行
 msgid "The code expired. Start again."
 msgstr "代碼已過期。請重新開始。"
 
+msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "Superset 在設定、執行及封存此專案的工作區時執行的命令，來自 .superset/config.toml。"
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "公司完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"
+
 msgid "The connection timed out"
 msgstr "連線已逾時"
 
@@ -17580,10 +17645,10 @@ msgid "The daemon couldn't hand off your live sessions to the new binary. Reason
 msgstr "守護程式無法將你的活動會話移交給新的二進位檔案。原因："
 
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
-msgstr "我們正在把Superset帶到Windows和Linux。留下電子郵件，一上線就通知你。"
+msgstr "我們正在把Paradev帶到Windows和Linux。留下電子郵件，一上線就通知你。"
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Superset from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windows暫未提供。除了桌面應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Superset。App Store上的iPhone和iPad應用程式讓你離開座位時也能查看代理並審閱它們的差異。"
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
+msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windows暫未提供。除了桌面應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Paradev。App Store上的iPhone和iPad應用程式讓你離開座位時也能查看代理並審閱它們的差異。"
 
 msgid "The device that hosts this project is unavailable."
 msgstr "承載這個專案的裝置不可用。"
@@ -17642,8 +17707,11 @@ msgstr "完整的核心流程（匯入儲存庫、執行代理程式、審查差
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "完整的工作區。平行執行多個 agent，讓每個 agent 各自使用獨立的 worktree，並在變更合併前逐一審查。"
 
-msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
-msgstr "未來可重複使用的 Superset 代理設定、提示詞與設定指南的集散地。"
+msgid "The funds and angels who back our team."
+msgstr "支持我們團隊的基金與天使投資人。"
+
+msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
+msgstr "未來可重複使用的 Paradev 代理設定、提示詞與設定指南的集散地。"
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -17680,11 +17748,11 @@ msgstr "圖片上傳已過期 — 請重新附加"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "崗位描述變了。工程師不再是有品味的打字員，而成了有品味的排程員：拆解工作、分派給代理程式叢集、在兩個改了同一個模組的代理程式之間做裁決。"
 
-msgid "The latest updates, improvements, and new features in Superset."
-msgstr "Superset 的最新更新、改進與新功能。"
+msgid "The latest updates, improvements, and new features in Paradev."
+msgstr "Paradev 的最新更新、改進與新功能。"
 
-msgid "The latest updates, improvements, and new features in Superset. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
-msgstr "Superset的最新更新、改進和新功能，每週更新。詳細的釋出說明見<0>GitHub Releases<1/></0>"
+msgid "The latest updates, improvements, and new features in Paradev. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
+msgstr "Paradev的最新更新、改進和新功能，每週更新。詳細的釋出說明見<0>GitHub Releases<1/></0>"
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "帶有 Sentry 觸發器和每日排程的 Launch watch 自動化、它的兩次執行，以及代理程式開的草稿 pull request。"
@@ -17704,8 +17772,8 @@ msgstr "本機變更已復原。"
 msgid "The local host service is unavailable for {organization} on {device}. Status: {status}. {recovery}"
 msgstr "{device}上{organization}的本地主機服務不可用。狀態：{status}。{recovery}"
 
-msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Superset."
-msgstr "本地主機服務沒有響應。重啟它通常能解決；如果反覆出現，請重啟Superset。"
+msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
+msgstr "本地主機服務沒有響應。重啟它通常能解決；如果反覆出現，請重啟Paradev。"
 
 msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
 msgstr "本地主機服務未執行，因此此裝置上沒有任何服務能提供該工作區。重啟它會重新接上你的終端和檔案 — 磁碟上的內容不會丟失。"
@@ -17749,6 +17817,15 @@ msgstr "你要找的頁面不存在。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "窗格使用你真實的登入狀態。代理程式在執行重要操作前會先徵求你的同意。"
 
+msgid "The Paradev desktop app is available for macOS and Linux."
+msgstr "Paradev 桌面應用程式支援 macOS 與 Linux。"
+
+msgid "The Paradev host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "{organization}的Paradev主機服務意外停止（{cause}），且無法自動重啟。"
+
+msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "Paradev主機服務意外停止（{cause}），且無法自動重啟。"
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "時數池每月重置。超出部分按各方案標示的每 GB 小時價格計費。"
 
@@ -17781,11 +17858,11 @@ msgid "The rubric"
 msgstr "評分表"
 
 #. placeholder {0}: remoteHost?.name ?? t({ message: "the target host", })
-msgid "The run was skipped because <0>{0}</0> isn't connected to the Superset relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
-msgstr "這次執行被跳過了，因為<0>{0}</0>沒有連線到Superset中繼。請確認該裝置的「設定>遠端存取」中開啟了中繼存取，然後重新執行。"
+msgid "The run was skipped because <0>{0}</0> isn't connected to the Paradev relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
+msgstr "這次執行被跳過了，因為<0>{0}</0>沒有連線到Paradev中繼。請確認該裝置的「設定>遠端存取」中開啟了中繼存取，然後重新執行。"
 
-msgid "The run was skipped because this device isn't connected to the Superset relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
-msgstr "這次執行被跳過了，因為此裝置沒有連線到Superset中繼。即使自動化在本裝置上執行，也要經過中繼。請啟用中繼存取，然後重新執行。"
+msgid "The run was skipped because this device isn't connected to the Paradev relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
+msgstr "這次執行被跳過了，因為此裝置沒有連線到Paradev中繼。即使自動化在本裝置上執行，也要經過中繼。請啟用中繼存取，然後重新執行。"
 
 msgid "The same app runs natively on iPad, in portrait and landscape."
 msgstr "同一個應用程式在 iPad 上原生執行，支援直向和橫向。"
@@ -17819,15 +17896,6 @@ msgstr "該站點的證書無效"
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "雲端工作區啟動的起點 — 一個基礎映像檔，或你已設定好、想要分叉的沙箱。"
-
-msgid "The Superset desktop app is available for macOS and Linux."
-msgstr "Superset 桌面應用程式支援 macOS 與 Linux。"
-
-msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "{organization}的Superset主機服務意外停止（{cause}），且無法自動重啟。"
-
-msgid "The Superset host service stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "Superset主機服務意外停止（{cause}），且無法自動重啟。"
 
 msgid "the target host"
 msgstr "目標主機"
@@ -17883,8 +17951,8 @@ msgstr "主題與代理程式"
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "建立工作區時會自動執行這些命令。<0>閱讀文件<1/></0>"
 
-msgid "These folders still have your files, but they did not come over to the new Superset on their own."
-msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Superset。"
+msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
+msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Paradev。"
 
 msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
 msgstr "這些訊息尚未傳送。請複製需要的內容，然後在繼續前清空佇列。"
@@ -17907,8 +17975,8 @@ msgstr "三十天"
 msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
 msgstr "這個 {plugin} 帳戶已由 {owner} 連接。請先請對方中斷連接。"
 
-msgid "This {plugin} account is already connected by another Superset organization."
-msgstr "這個 {plugin} 帳戶已由另一個 Superset 組織連接。"
+msgid "This {plugin} account is already connected by another Paradev organization."
+msgstr "這個 {plugin} 帳戶已由另一個 Paradev 組織連接。"
 
 msgid "This action is irreversible."
 msgstr "此操作不可逆。"
@@ -17928,8 +17996,8 @@ msgstr "此代理設定不支援選擇帳戶。"
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"
 
-msgid "This agent only shows chats saved in Superset."
-msgstr "此代理僅顯示儲存在 Superset 中的聊天。"
+msgid "This agent only shows chats saved in Paradev."
+msgstr "此代理僅顯示儲存在 Paradev 中的聊天。"
 
 msgid "This also:"
 msgstr "同時還會："
@@ -18004,8 +18072,8 @@ msgstr "本裝置"
 msgid "this device ({id})"
 msgstr "此裝置（{id}）"
 
-msgid "This device isn't connected to the Superset relay, so automation runs will be skipped."
-msgstr "此裝置沒有連線到Superset中繼，自動化的執行會被跳過。"
+msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
+msgstr "此裝置沒有連線到Paradev中繼，自動化的執行會被跳過。"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
@@ -18025,8 +18093,8 @@ msgstr "該檔案"
 msgid "This file is empty or was deleted."
 msgstr "這個檔案為空或已被刪除。"
 
-msgid "This GitHub installation is already connected to another Superset organization. Disconnect it there, or uninstall the Superset GitHub App, then try again."
-msgstr "這個GitHub安裝已連線到另一個Superset組織。請先在那裡斷開連線，或解除安裝Superset GitHub App，然後重試。"
+msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
+msgstr "這個GitHub安裝已連線到另一個Paradev組織。請先在那裡斷開連線，或解除安裝Paradev GitHub App，然後重試。"
 
 msgid "This host"
 msgstr "此主機"
@@ -18064,8 +18132,8 @@ msgstr "此議題連結無效。"
 msgid "This Linear workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "這個Linear工作區已被{owner}連線。請讓對方先斷開連線。"
 
-msgid "This Linear workspace is already connected by another Superset organization."
-msgstr "這個Linear工作區已被另一個Superset組織連線。"
+msgid "This Linear workspace is already connected by another Paradev organization."
+msgstr "這個Linear工作區已被另一個Paradev組織連線。"
 
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "這看起來是二進位檔案。以文字方式開啟可能顯示亂碼，檔案較大時還可能讓編輯器卡死。"
@@ -18082,8 +18150,8 @@ msgstr "你的組織不提供此機器規格。請選擇其他規格"
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "這個Microsoft租戶已被{detail}連線。請讓對方先斷開連線。"
 
-msgid "This Microsoft tenant is already connected by another Superset organization."
-msgstr "這個Microsoft租戶已被另一個Superset組織連線。"
+msgid "This Microsoft tenant is already connected by another Paradev organization."
+msgstr "這個Microsoft租戶已被另一個Paradev組織連線。"
 
 msgid "This month"
 msgstr "本月"
@@ -18115,8 +18183,8 @@ msgstr "找不到這個頁面"
 msgid "This page no longer exists"
 msgstr "這個頁面已不存在"
 
-msgid "This page was published by a Superset user. Its contents are unverified."
-msgstr "此頁面由 Superset 使用者發布，內容未經查核。"
+msgid "This page was published by a Paradev user. Its contents are unverified."
+msgstr "此頁面由 Paradev 使用者發布，內容未經查核。"
 
 msgid "This page was taken down and can no longer be changed"
 msgstr "此頁面已下架，無法再修改"
@@ -18144,6 +18212,9 @@ msgstr "這個專案在你的裝置上已不可用。"
 
 msgid "This project isn't linked to a GitHub repository."
 msgstr "此專案未連結 GitHub 儲存庫。"
+
+msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
+msgstr "此專案仍在使用舊的 config.json。它仍可正常運作；轉換為 config.toml 即可使用新的區段。"
 
 msgid "This project's host is offline"
 msgstr "此專案的主機已離線"
@@ -18184,8 +18255,8 @@ msgstr "此頁面不存在"
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "這個Slack工作區已被{owner}連線。請讓對方先斷開連線。"
 
-msgid "This Slack workspace is already connected by another Superset organization."
-msgstr "這個Slack工作區已被另一個Superset組織連線。"
+msgid "This Slack workspace is already connected by another Paradev organization."
+msgstr "這個Slack工作區已被另一個Paradev組織連線。"
 
 msgid "This slug is already taken"
 msgstr "此slug已被佔用"
@@ -18419,8 +18490,8 @@ msgstr "Token用量"
 msgid "Tokens"
 msgstr "Token"
 
-msgid "Tokens are held by Superset and attached to requests there. They are never written into your local agent config."
-msgstr "權杖由 Superset 保管，並在伺服器端附加到請求中，絕不會寫入你本機的代理設定。"
+msgid "Tokens are held by Paradev and attached to requests there. They are never written into your local agent config."
+msgstr "權杖由 Paradev 保管，並在伺服器端附加到請求中，絕不會寫入你本機的代理設定。"
 
 msgid "Tokens per session"
 msgstr "每次會話的 Token"
@@ -18464,8 +18535,8 @@ msgstr "支援請求次數過多。請稍後重試。"
 msgid "Too many untitled items here already."
 msgstr "這裡未命名的項已經太多了。"
 
-msgid "Too old for this app to talk to. Update the Superset app on that device to reconnect."
-msgstr "版本太舊，此應用程式無法與其通訊。更新該裝置上的 Superset 應用程式以重新連線。"
+msgid "Too old for this app to talk to. Update the Paradev app on that device to reconnect."
+msgstr "版本太舊，此應用程式無法與其通訊。更新該裝置上的 Paradev 應用程式以重新連線。"
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "版本太舊，此應用程式無法與其通訊。更新之前，此主機上的工作區無法開啟。"
@@ -18518,8 +18589,8 @@ msgstr "已公開的 Token 總數"
 msgid "Trace charges and subscriptions"
 msgstr "追蹤扣款和訂閱"
 
-msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Superset."
-msgstr "追蹤和管理從Linear同步的任務。不用離開Superset就能掌控工作。"
+msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Paradev."
+msgstr "追蹤和管理從Linear同步的任務。不用離開Paradev就能掌控工作。"
 
 msgid "Track budgets and spending"
 msgstr "追蹤預算和支出"
@@ -18596,11 +18667,11 @@ msgstr "試試其他搜尋詞或其他位置。"
 msgid "Try again"
 msgstr "重試"
 
-msgid "Try again, or restart the host service from the Superset tray menu."
-msgstr "請重試，或從 Superset 系統匣選單重新啟動主機服務。"
+msgid "Try again, or restart the host service from the Paradev tray menu."
+msgstr "請重試，或從 Paradev 系統匣選單重新啟動主機服務。"
 
-msgid "Try again. If the problem continues, reload Superset."
-msgstr "請重試。如果問題持續，請重新載入Superset。"
+msgid "Try again. If the problem continues, reload Paradev."
+msgstr "請重試。如果問題持續，請重新載入Paradev。"
 
 msgid "Try early access features and previews."
 msgstr "試用搶先體驗功能和預覽版。"
@@ -18959,6 +19030,9 @@ msgstr "更新命名規則"
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名規則"
 
+msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
+msgstr "請在該裝置上更新 Paradev。應用程式內更新需要受支援的獨立安裝和已發佈的應用程式版本。"
+
 msgid "Update payment method"
 msgstr "更新支付方式"
 
@@ -18968,8 +19042,8 @@ msgstr "更新已就緒"
 msgid "Update Required"
 msgstr "需要更新"
 
-msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
-msgstr "請在該裝置上更新 Superset。應用程式內更新需要受支援的獨立安裝和已發佈的應用程式版本。"
+msgid "Update Superset on this host to edit its workspace config."
+msgstr "請更新此主機上的 Superset，以編輯其工作區設定。"
 
 msgid "update the branch prefix"
 msgstr "更新分支字首"
@@ -19105,17 +19179,17 @@ msgstr "用於新代理程式"
 msgid "Use global default"
 msgstr "使用全域性預設值"
 
-msgid "Use Superset on mobile"
-msgstr "在手機上使用 Superset"
+msgid "Use Paradev on mobile"
+msgstr "在手機上使用 Paradev"
 
-msgid "Use Superset on your phone with Pro."
-msgstr "透過 Pro 在手機上使用 Superset。"
+msgid "Use Paradev on your phone with Pro."
+msgstr "透過 Pro 在手機上使用 Paradev。"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "使用桌面應用程式開始並行執行編碼代理程式。"
 
-msgid "Use the Superset tray menu > Host Service > Restart, then retry."
-msgstr "請使用Superset托盤選單 > 主機服務 > 重啟，然後重試。"
+msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
+msgstr "請使用Paradev托盤選單 > 主機服務 > 重啟，然後重試。"
 
 msgid "Use this account"
 msgstr "使用此帳戶"
@@ -19129,14 +19203,14 @@ msgstr "使用此儲存庫"
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "用它修復卡住或無響應的終端。"
 
-msgid "Use this when calling the Superset API."
-msgstr "呼叫Superset API時使用。"
+msgid "Use this when calling the Paradev API."
+msgstr "呼叫Paradev API時使用。"
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "使用語音轉寫和按住說話功能。"
 
-msgid "Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider."
-msgstr "使用你已有的代理程式訂閱和API金鑰。Superset從不代理模型呼叫，也不會把你的工作流鎖死在某一家提供商上。"
+msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
+msgstr "使用你已有的代理程式訂閱和API金鑰。Paradev從不代理模型呼叫，也不會把你的工作流鎖死在某一家提供商上。"
 
 msgid "Used in URLs and APIs."
 msgstr "用於URL和API。"
@@ -19311,6 +19385,9 @@ msgstr "檢視空缺職位"
 msgid "View open roles on Y Combinator"
 msgstr "在Y Combinator上檢視空缺職位"
 
+msgid "View Paradev repository on GitHub"
+msgstr "在GitHub上檢視Paradev儲存庫"
+
 msgid "View pull request"
 msgstr "檢視拉取請求"
 
@@ -19319,9 +19396,6 @@ msgstr "查看版本說明"
 
 msgid "View releases on GitHub"
 msgstr "在GitHub上檢視釋出"
-
-msgid "View Superset repository on GitHub"
-msgstr "在GitHub上檢視Superset儲存庫"
 
 msgid "View usage"
 msgstr "檢視用量"
@@ -19400,8 +19474,8 @@ msgstr "出現了警告。"
 msgid "Watch a design review go from comment to new version."
 msgstr "看一次設計審查如何從留言變成新版本。"
 
-msgid "Watch the Superset Automations video on YouTube"
-msgstr "在 YouTube 上觀看 Superset 自動化影片"
+msgid "Watch the Paradev Automations video on YouTube"
+msgstr "在 YouTube 上觀看 Paradev 自動化影片"
 
 msgid "Wayfinding and disclosure"
 msgstr "導航定位與內容展開"
@@ -19439,6 +19513,9 @@ msgstr "已找到{hostName}。在那台電腦上開啟遠端存取即可完成�
 msgid "We only collect analytics cookies so we can improve your experience."
 msgstr "我們只收集分析類cookie，用於改進你的使用體驗。"
 
+msgid "We raised an {amount} seed round to help you run an army of coding agents."
+msgstr "我們完成了 {amount} 種子輪募資，幫你調動一支程式代理程式大軍。"
+
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下載連結已傳送至{submittedEmail}。"
 
@@ -19448,8 +19525,8 @@ msgstr "我們會盡快與你聯絡。"
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "連線恢復後，我們會立即帶你回到工作區。"
 
-msgid "We'll email you when Superset for Android is ready."
-msgstr "Superset Android 版準備就緒時，我們會寄電子郵件通知你。"
+msgid "We'll email you when Paradev for Android is ready."
+msgstr "Paradev Android 版準備就緒時，我們會寄電子郵件通知你。"
 
 msgid "We'll get back to you shortly."
 msgstr "我們會盡快回復你。"
@@ -19532,17 +19609,17 @@ msgstr "歡迎回來"
 msgid "Welcome to {appName}"
 msgstr "歡迎使用{appName}"
 
-msgid "Welcome to Superset"
-msgstr "歡迎使用Superset"
+msgid "Welcome to Paradev"
+msgstr "歡迎使用Paradev"
 
-msgid "Welcome to the new Superset"
-msgstr "歡迎使用全新的 Superset"
+msgid "Welcome to the new Paradev"
+msgstr "歡迎使用全新的 Paradev"
 
 msgid "What are the benefits?"
 msgstr "有哪些福利？"
 
-msgid "What builders say about Superset"
-msgstr "開發者怎麼評價Superset"
+msgid "What builders say about Paradev"
+msgstr "開發者怎麼評價Paradev"
 
 msgid "What did you see on the page?"
 msgstr "你在頁面上看到了什麼？"
@@ -19565,14 +19642,17 @@ msgstr "如果觸發器觸發時我的 Mac 離線怎麼辦？"
 msgid "What is a workspace?"
 msgstr "什麼是工作區？"
 
-msgid "What is Superset Enterprise?"
-msgstr "什麼是Superset Enterprise？"
+msgid "What is Paradev Enterprise?"
+msgstr "什麼是Paradev Enterprise？"
 
 msgid "What is wrong?"
 msgstr "哪裡有問題？"
 
-msgid "What platforms does Superset run on?"
-msgstr "Superset支援哪些平臺？"
+msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "Paradev 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
+
+msgid "What platforms does Paradev run on?"
+msgstr "Paradev支援哪些平臺？"
 
 msgid "What problem are you trying to solve?"
 msgstr "你想解決什麼問題？"
@@ -19588,9 +19668,6 @@ msgstr "頁面應顯示什麼?"
 
 msgid "What should we build next?"
 msgstr "接下來做點什麼？"
-
-msgid "What Superset is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Superset 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
 
 msgid "What teams automate"
 msgstr "團隊都在自動化什麼"
@@ -19610,8 +19687,8 @@ msgstr "我們正在構建什麼"
 msgid "What we've shipped"
 msgstr "我們發布了什麼"
 
-msgid "What would you like to build with Superset in the cloud?"
-msgstr "您想用雲端 Superset 建構什麼？"
+msgid "What would you like to build with Paradev in the cloud?"
+msgstr "您想用雲端 Paradev 建構什麼？"
 
 msgid "What would you like to know?"
 msgstr "你想了解什麼？"
@@ -19709,8 +19786,8 @@ msgstr "帶標籤"
 msgid "with or without attachments"
 msgstr "有無附件均可"
 
-msgid "With the Superset mobile app, I can address production issues from anywhere."
-msgstr "有了 Superset 手機應用程式，我可以隨時隨地處理正式環境問題。"
+msgid "With the Paradev mobile app, I can address production issues from anywhere."
+msgstr "有了 Paradev 手機應用程式，我可以隨時隨地處理正式環境問題。"
 
 msgid "Wordmark, black"
 msgstr "文字標誌，黑色"
@@ -19794,6 +19871,9 @@ msgstr "工作區代理程式"
 
 msgid "Workspace archived"
 msgstr "工作區已歸檔"
+
+msgid "Workspace config"
+msgstr "工作區設定"
 
 msgid "Workspace created"
 msgstr "工作區已建立"
@@ -19964,11 +20044,11 @@ msgstr "有。免費版面向個人，包含1個使用者、本地工作區、�
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "可以。在包含雲端工作區的方案中，擁有者可以在設定的帳單中以每 GB 小時 {packPrice} 的價格購買任意數量的額外 GB 小時。購買的 GB 小時在每月額度池之後使用，永不過期，餘量不足時自動加值可以繼續購買。"
 
-msgid "Yes. Superset has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "是的。Superset已通過獨立審計機構的SOC 2 Type II審計，覆蓋我們的安全控制在一段時間內的實際執行情況。可在trust.superset.sh索取報告並查閱我們的安全文件。"
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
+msgstr "是的。Paradev已通過獨立審計機構的SOC 2 Type II審計，覆蓋我們的安全控制在一段時間內的實際執行情況。可在trust.superset.sh索取報告並查閱我們的安全文件。"
 
-msgid "Yes. Superset is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
-msgstr "需要。Superset是代理程式執行的工作區，不是模型提供商。帶上Claude Code、Codex、OpenCode或任意CLI代理程式，在任何方案下都可以使用你已有的帳號或API金鑰。"
+msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
+msgstr "需要。Paradev是代理程式執行的工作區，不是模型提供商。帶上Claude Code、Codex、OpenCode或任意CLI代理程式，在任何方案下都可以使用你已有的帳號或API金鑰。"
 
 msgid "Yes. Use superset automations in the CLI to create, run, and pause them."
 msgstr "可以。在 CLI 中用 superset automations 建立、執行和暫停它們。"
@@ -20076,8 +20156,8 @@ msgstr "你將位列<0>#{0}</0>，共{1}人。"
 msgid "You'd be one of the first on the board."
 msgstr "你會是最早上榜的人之一。"
 
-msgid "You'll need to sign in again to use Superset on this device."
-msgstr "你需要重新登入才能在此裝置上使用Superset。"
+msgid "You'll need to sign in again to use Paradev on this device."
+msgstr "你需要重新登入才能在此裝置上使用Paradev。"
 
 msgid "You'll stop being a member of this team. You can be re-added by another team member."
 msgstr "你將不再是此團隊的成員。其他團隊成員可以重新把你加回來。"
@@ -20085,8 +20165,8 @@ msgstr "你將不再是此團隊的成員。其他團隊成員可以重新把你
 msgid "You're about to change your role from {currentRoleName} to {newRoleName}. Another owner will need to restore your permissions. Are you sure?"
 msgstr "你即將把自己的角色從{currentRoleName}改為{newRoleName}。恢復權限需要另一位擁有者操作。確定嗎？"
 
-msgid "You're about to get Superset"
-msgstr "馬上就能用上Superset"
+msgid "You're about to get Paradev"
+msgstr "馬上就能用上Paradev"
 
 msgid "You're all set!"
 msgstr "一切就緒！"
@@ -20176,8 +20256,11 @@ msgstr "你的組織已達到環境數量上限（{0}）。請封存一個環境
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "你的組織已達到雲端用量上限。除非提高上限，此工作區將在幾分鐘後停止。"
 
-msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
-msgstr "你自己的帳戶。組織的整合讓 Superset 存取其工具；連結你自己的帳戶後，Superset 為你完成的工作會以你的名義顯示。"
+msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
+msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"
+
+msgid "Your Paradev download is starting."
+msgstr "您的 Paradev 下載即將開始。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的方案不包含雲端環境。"
@@ -20201,8 +20284,8 @@ msgstr "你正在執行的應用程式，放進代理程式可操作的瀏覽器
 msgid "Your signed-in session"
 msgstr "你已登入的會話"
 
-msgid "Your Slack account has been linked to Superset. You can close this tab and return to Slack."
-msgstr "你的Slack帳戶已關聯到Superset。你可以關閉這個分頁並返回Slack。"
+msgid "Your Slack account has been linked to Paradev. You can close this tab and return to Slack."
+msgstr "你的Slack帳戶已關聯到Paradev。你可以關閉這個分頁並返回Slack。"
 
 msgid "Your stats, settled in mortal combat"
 msgstr "用你的數據，在生死對決中一決高下"
@@ -20212,9 +20295,6 @@ msgstr "你的訂閱已生效。新方案的功能現在可以使用。"
 
 msgid "Your subscription will be adjusted accordingly."
 msgstr "你的訂閱將相應調整。"
-
-msgid "Your Superset download is starting."
-msgstr "您的 Superset 下載即將開始。"
 
 msgid "Your teammates can talk directly to your agent."
 msgstr "你的隊友可以直接與你的代理程式對話。"
@@ -20232,8 +20312,8 @@ msgstr "你的等級是為你測得的 {0} 個面向的加權分數，強項可�
 msgid "Your tokens"
 msgstr "你的 token 數"
 
-msgid "Your v1 projects and workspaces are moving to the new Superset. They appear in the sidebar as each one is ready."
-msgstr "你的 v1 專案和工作區正在移轉到新版 Superset。每一項準備好後就會出現在側邊欄中。"
+msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
+msgstr "你的 v1 專案和工作區正在移轉到新版 Paradev。每一項準備好後就會出現在側邊欄中。"
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
@@ -20264,3 +20344,9 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "無法重新整理用量"
+
+msgid "{remainingPercent} remaining"
+msgstr "剩餘 {remainingPercent}"

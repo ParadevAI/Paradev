@@ -540,6 +540,22 @@ export function bindResumedSession(
 	});
 }
 
+export function commitTerminalAgentLaunch(
+	ctx: Pick<HostServiceContext, "db" | "terminalAgentStore">,
+	input: AgentRunInput,
+	terminalId: string,
+): void {
+	try {
+		ctx.db.transaction(() => {
+			bindResumedSession(ctx, input, terminalId);
+			input.terminalLaunch?.onInitialCommandReady();
+		});
+	} catch (error) {
+		ctx.terminalAgentStore.reloadBinding(terminalId);
+		throw error;
+	}
+}
+
 async function runTerminalAgent(
 	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
 	input: AgentRunInput,
@@ -557,12 +573,8 @@ async function runTerminalAgent(
 		...(input.terminalLaunch
 			? {
 					beforeInitialCommand: input.terminalLaunch.beforeInitialCommand,
-					onInitialCommandReady: () => {
-						ctx.db.transaction(() => {
-							bindResumedSession(ctx, input, terminalId);
-							input.terminalLaunch?.onInitialCommandReady();
-						});
-					},
+					onInitialCommandReady: () =>
+						commitTerminalAgentLaunch(ctx, input, terminalId),
 				}
 			: {}),
 	});

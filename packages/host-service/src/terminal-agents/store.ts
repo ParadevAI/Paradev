@@ -174,9 +174,10 @@ export class TerminalAgentStore extends EventEmitter {
 			ended &&
 			durable &&
 			(durable.endReason === "resumed" || durable.endReason === "disposed") &&
-			(!input.launchId ||
-				durable.launchId === input.launchId ||
-				durable.agentSessionId === agentSessionId)
+			((!input.launchId && !agentSessionId) ||
+				(input.launchId !== undefined && durable.launchId === input.launchId) ||
+				(agentSessionId !== undefined &&
+					durable.agentSessionId === agentSessionId))
 		)
 			return;
 		const existing = ended ? undefined : this.byTerminal.get(terminalId);
@@ -555,6 +556,16 @@ export class TerminalAgentStore extends EventEmitter {
 			changed = true;
 		}
 		if (changed) this.emit("change", workspaceId);
+	}
+
+	reloadBinding(terminalId: string): void {
+		const previous = this.byTerminal.get(terminalId);
+		const durable = this.persistence?.getProvenance?.(terminalId);
+		if (durable && durable.endedAt === undefined)
+			this.byTerminal.set(terminalId, durable);
+		else this.byTerminal.delete(terminalId);
+		const workspaceId = durable?.workspaceId ?? previous?.workspaceId;
+		if (workspaceId) this.emit("change", workspaceId);
 	}
 
 	getProvenance(terminalId: string): TerminalAgentBinding | undefined {

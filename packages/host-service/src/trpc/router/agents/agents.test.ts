@@ -9,7 +9,10 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
-import { TerminalAgentStore } from "../../../terminal-agents";
+import {
+	SqliteTerminalAgentBindingPersistence,
+	TerminalAgentStore,
+} from "../../../terminal-agents";
 import { claudeProjectDirName } from "../../../terminal-agents/harness-sessions/claude";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
@@ -18,6 +21,7 @@ import {
 	buildTerminalAgentLaunch,
 	chatContinuationTarget,
 	chatLaunchTarget,
+	commitTerminalAgentLaunch,
 	continuationTarget,
 	validateAgentEffortSelection,
 	validateAgentForkSelection,
@@ -687,13 +691,13 @@ describe("validateAgentModelSelection", () => {
 
 	it("rejects overrides for agents without model support", () => {
 		try {
-			validateAgentModelSelection("superset", "Superset", "claude-opus-5");
+			validateAgentModelSelection("superset", "Paradev", "claude-opus-5");
 			throw new Error("Expected validation to fail");
 		} catch (error) {
 			expect(error).toBeInstanceOf(TRPCError);
 			expect((error as TRPCError).code).toBe("BAD_REQUEST");
 			expect((error as Error).message).toBe(
-				"Superset does not support a model override. Omit model to use the agent default.",
+				"Paradev does not support a model override. Omit model to use the agent default.",
 			);
 		}
 	});
@@ -741,13 +745,13 @@ describe("validateAgentEffortSelection", () => {
 
 	it("rejects overrides for agents without effort support", () => {
 		try {
-			validateAgentEffortSelection("superset", "Superset", "high");
+			validateAgentEffortSelection("superset", "Paradev", "high");
 			throw new Error("Expected validation to fail");
 		} catch (error) {
 			expect(error).toBeInstanceOf(TRPCError);
 			expect((error as TRPCError).code).toBe("BAD_REQUEST");
 			expect((error as Error).message).toBe(
-				"Superset does not support a reasoning effort override. Omit effort to use the agent default.",
+				"Paradev does not support a reasoning effort override. Omit effort to use the agent default.",
 			);
 		}
 	});
@@ -842,6 +846,37 @@ describe("bindResumedSession", () => {
 
 	const WORKSPACE_ID = "11111111-1111-1111-1111-111111111111";
 	const TERMINAL_ID = "22222222-2222-2222-2222-222222222222";
+
+	it("a rejected launch authorization rolls back both durable and in-memory bindings", () => {
+		const db = createTestDb();
+		seedCodexConfig(db);
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		const input = {
+			workspaceId: WORKSPACE_ID,
+			agent: "codex",
+			prompt: "",
+			resumeSessionId: "requested-session",
+			terminalLaunch: {
+				terminalId: TERMINAL_ID,
+				beforeInitialCommand: async () => {},
+				onInitialCommandReady: () => {
+					throw new Error("history changed");
+				},
+			},
+		};
+		expect(() =>
+			commitTerminalAgentLaunch(
+				{ db, terminalAgentStore: store },
+				input,
+				TERMINAL_ID,
+			),
+		).toThrow("history changed");
+		expect(store.get(TERMINAL_ID)).toBeUndefined();
+		expect(store.getProvenance(TERMINAL_ID)).toBeUndefined();
+		expect(db.select().from(schema.terminalAgentBindings).all()).toEqual([]);
+	});
 
 	it("refuses pinned recovery when an early native ID conflicts before account metadata arrives", () => {
 		const db = createTestDb();

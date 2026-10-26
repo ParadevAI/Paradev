@@ -23,7 +23,7 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/",
 				label: <Trans>Desktop app</Trans>,
-				description: <Trans>Run any coding agent</Trans>,
+				description: <Trans>Run an army of coding agents</Trans>,
 			},
 			{
 				href: `${COMPANY.DOCS_URL}/cli/getting-started`,
@@ -100,7 +100,7 @@ export const PRODUCT_FEATURED: NavFeatured = {
 	href: "/pages",
 	image: "/pages/hero-poster.webp",
 	eyebrow: <Trans>New</Trans>,
-	title: <Trans>Superset Pages</Trans>,
+	title: <Trans>Paradev Pages</Trans>,
 	description: (
 		<Trans>
 			Your agent publishes designs and reports. Your team comments, and it gets
@@ -174,7 +174,7 @@ export const RESOURCE_SECTIONS: NavSection[] = [
 			{
 				href: "/compare",
 				label: <Trans>Compare</Trans>,
-				description: <Trans>Superset next to others</Trans>,
+				description: <Trans>Paradev next to others</Trans>,
 			},
 			{
 				href: "/community",

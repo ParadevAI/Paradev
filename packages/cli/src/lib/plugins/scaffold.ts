@@ -128,7 +128,7 @@ export function scaffoldPlugin(
 		name,
 		version: "0.1.0",
 		description,
-		author: { name: ctx.marketplace.owner?.name ?? "Superset" },
+		author: { name: ctx.marketplace.owner?.name ?? "Paradev" },
 		license: "MIT",
 		extensions: { [SUPERSET_EXTENSION]: extension },
 	};
@@ -158,7 +158,7 @@ export function scaffoldPlugin(
 	ctx.marketplace.plugins.push({
 		name,
 		description,
-		author: { name: ctx.marketplace.owner?.name ?? "Superset" },
+		author: { name: ctx.marketplace.owner?.name ?? "Paradev" },
 		category: (options.category ?? "development").toLowerCase(),
 		source: `./plugins/${name}`,
 	});

@@ -76,7 +76,7 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 
 	const env = typeof process === "undefined" ? {} : process.env ?? {};
 	if (!env.SUPERSET_TERMINAL_ID && !env.SUPERSET_TAB_ID) {
-		debugLog("disabled: missing Superset terminal env");
+		debugLog("disabled: missing Paradev terminal env");
 		return;
 	}
 

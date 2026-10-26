@@ -576,3 +576,77 @@ test("Continue retries an exited failed view and adopts the same live worker wit
 	).toBe(f.sessionId);
 	expect(f.events).toHaveLength(1);
 });
+
+test("an unmarked account-resume reservation is not offered as background attachment", () => {
+	for (const reason of ["detached", "terminal-exited", "disposed"]) {
+		const f = fixture();
+		f.db
+			.update(terminalAgentBindings)
+			.set({ endReason: `account-resume-preparing:${reason}` })
+			.where(eq(terminalAgentBindings.terminalId, "original"))
+			.run();
+		expect(backgroundReconnectSource(f.ctx, f.input)).toBeNull();
+		expect(() => f.adapter.read(f.input)).toThrow("could not be verified");
+	}
+});
+
+test("verified native admission adopts an early matching hook but refuses conflicting provenance", () => {
+	for (const kind of [
+		"unattributed-hook",
+		"matching-account",
+		"wrong-session",
+		"wrong-account",
+	]) {
+		const f = fixture();
+		const source = f.adapter.read(f.input);
+		if (!source) throw new Error("Missing fixture source");
+		const started = f.adapter.authorize(
+			f.adapter.reserve(source, "attachment"),
+		);
+		f.db
+			.insert(terminalSessions)
+			.values({
+				id: "attachment",
+				originWorkspaceId: "workspace",
+				status: "active",
+				createdAt: 4,
+			})
+			.run();
+		f.db
+			.insert(terminalAgentBindings)
+			.values({
+				terminalId: "attachment",
+				workspaceId: "workspace",
+				agentId: "claude",
+				agentSessionId:
+					kind === "wrong-session" ? "another-session" : f.sessionId,
+				accountJson:
+					kind === "unattributed-hook"
+						? null
+						: JSON.stringify(
+								kind === "wrong-account"
+									? { ...f.account, identity: "b".repeat(64) }
+									: f.account,
+							),
+				startedAt: 4,
+				lastEventAt: 5,
+				lastEventType: "SessionStart",
+			})
+			.run();
+		if (kind.startsWith("wrong")) {
+			expect(() => f.adapter.commit(started, f.proof, f.client)).toThrow(
+				"could not be verified",
+			);
+			expect(f.original()?.endReason).toStartWith("background-attach:started:");
+		} else {
+			expect(f.adapter.commit(started, f.proof, f.client)).toMatchObject({
+				reconnected: true,
+				terminalId: "attachment",
+			});
+			expect(
+				f.ctx.terminalAgentStore.get("attachment")?.account?.identity,
+			).toBe(f.account.identity);
+			expect(f.original()?.endReason).toBe("resumed");
+		}
+	}
+});

@@ -5,7 +5,7 @@ description: Create, search, and update Linear issues
 
 Create, search, and update Linear issues.
 
-This plugin gives a coding agent Linear tools. To open a Linear issue as a Superset workspace, see [Use with Linear](/use-with-linear).
+This plugin gives a coding agent Linear tools. To open a Linear issue as a Paradev workspace, see [Use with Linear](/use-with-linear).
 
 ## Skills
 
@@ -19,13 +19,13 @@ Skills are named `linear-<skill>`. In Claude Code they appear as `superset:linea
 
 ## MCP Server
 
-Tools come from Linear's own MCP server at `https://mcp.linear.app/mcp`. Superset proxies each call and adds your credentials. Linear decides which tools the server offers, so see Linear's documentation for the current list.
+Tools come from Linear's own MCP server at `https://mcp.linear.app/mcp`. Paradev proxies each call and adds your credentials. Linear decides which tools the server offers, so see Linear's documentation for the current list.
 
 ## Authentication
 
 | Method | Details |
 |:-------|:--------|
-| OAuth 2.0 | You sign in to Linear in your browser. Superset registers itself with Linear when you connect, so there is no app to set up first. Superset asks for `read` and `write`. |
+| OAuth 2.0 | You sign in to Linear in your browser. Paradev registers itself with Linear when you connect, so there is no app to set up first. Paradev asks for `read` and `write`. |
 | Personal API key | Paste a key from Linear's **Settings → Security & access**. |
 
-Connect from the plugin's page in **Plugins**. Superset keeps the credentials. The agent and your machine never see them.
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

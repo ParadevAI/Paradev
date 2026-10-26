@@ -10,7 +10,7 @@ const POLL_TIMEOUT_MS = 10 * 60_000;
 export default command({
 	sandbox: false,
 	description:
-		"Install the Superset GitHub App for the organization in the browser, so its repositories can back cloud environments",
+		"Install the Paradev GitHub App for the organization in the browser, so its repositories can back cloud environments",
 	options: {
 		noWait: boolean().desc("Print the install URL and exit without waiting"),
 	},
@@ -43,7 +43,7 @@ export default command({
 				() => true,
 				() => false,
 			));
-		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Superset in that browser, to install the GitHub App:\n  ${url}`;
+		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Paradev in that browser, to install the GitHub App:\n  ${url}`;
 		if (options.noWait) {
 			return { data: { url }, message: instructions };
 		}

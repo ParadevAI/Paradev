@@ -51,7 +51,7 @@ export function ResourceMetricsSummary({
 					value={formatCpu(snapshot.totalCpu)}
 					tooltip={t({
 						message:
-							"Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain.",
+							"Sum of CPU used by Paradev and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain.",
 					})}
 				/>
 				<MetricBadge
@@ -61,7 +61,7 @@ export function ResourceMetricsSummary({
 					value={formatMemory(snapshot.totalMemory)}
 					tooltip={t({
 						message:
-							"Resident memory used by Superset and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter.",
+							"Resident memory used by Paradev and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter.",
 					})}
 				/>
 				<MetricBadge
@@ -71,7 +71,7 @@ export function ResourceMetricsSummary({
 					value={formatPercent(trackedMemorySharePercent)}
 					tooltip={t({
 						message:
-							"Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere.",
+							"Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere.",
 					})}
 				/>
 			</div>
@@ -98,7 +98,7 @@ export function ResourceMetricsSummary({
 				</TooltipTrigger>
 				<TooltipContent side="bottom" sideOffset={6}>
 					<Trans>
-						Superset uses {formatPercent(trackedMemorySharePercent)} of system
+						Paradev uses {formatPercent(trackedMemorySharePercent)} of system
 						RAM
 					</Trans>
 				</TooltipContent>

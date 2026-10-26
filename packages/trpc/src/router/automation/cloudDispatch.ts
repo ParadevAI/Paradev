@@ -5,7 +5,10 @@ import {
 	environments,
 	members,
 } from "@superset/db/schema";
-import { CLOUD_AGENT_PROMPT_MAX_LENGTH } from "@superset/shared/cloud-agent-launch";
+import {
+	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	supportsCloudAgentChat,
+} from "@superset/shared/cloud-agent-launch";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
@@ -76,9 +79,8 @@ export async function runInCloud(
 	const { automation, prompt, placed, runId } = args;
 
 	if (launch.kind === "pinned") {
-		// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
 		const chat =
-			automation.agent === "claude" &&
+			supportsCloudAgentChat(automation.agent) &&
 			(await acpChatEnabled(automation.ownerUserId));
 		const target = { baseUrl: launch.hostTarget, headers: launch.headers };
 		return launchAgentSession(

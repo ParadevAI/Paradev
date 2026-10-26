@@ -3,8 +3,14 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BlogCard } from "@/app/[lang]/blog/components/BlogCard";
-import { type BlogPost, formatBlogDate, type TocItem } from "@/lib/blog-utils";
-
+import { FAQSection } from "@/app/[lang]/components/FAQSection";
+import {
+	type BlogPost,
+	formatBlogDate,
+	slugify,
+	type TocItem,
+} from "@/lib/blog-utils";
+import { renderFaqAnswer } from "../../utils/faqSocialLinks";
 import { BlogAuthor } from "./components/BlogAuthor";
 
 interface BlogPostLayoutProps {
@@ -65,6 +71,18 @@ export function BlogPostLayout({
 			<div className="relative max-w-3xl mx-auto px-6 pt-10 pb-16 md:pt-12 md:pb-20">
 				<div className="prose max-w-none">{children}</div>
 			</div>
+
+			{post.faq && post.faq.length > 0 && (
+				<div className="border-t border-border">
+					<FAQSection
+						items={post.faq.map((item) => ({
+							id: slugify(item.question),
+							question: item.question,
+							answer: renderFaqAnswer(item.answer),
+						}))}
+					/>
+				</div>
+			)}
 
 			{relatedPosts.length > 0 && (
 				<section className="relative border-t border-border">

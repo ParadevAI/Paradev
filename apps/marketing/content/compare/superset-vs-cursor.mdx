@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Cursor (2026): Any-Agent Workspace vs Cursor's Agent Platform"
-description: "Compare Superset and Cursor for parallel AI coding. A local-first workspace that runs any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, Projects, and iOS remote control."
+title: "Paradev vs Cursor (2026): Any-Agent Workspace vs Cursor's Agent Platform"
+description: "Compare Paradev and Cursor for parallel AI coding. A local-first workspace that runs any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, Projects, and iOS remote control."
 date: 2026-02-02
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -16,7 +16,7 @@ keywords:
   - ai coding editor comparison
 ---
 
-Cursor started as an AI editor and is now a full agent platform: an Agents Window that runs agents locally, in the cloud, or over SSH, cloud agents on their own VMs, self-hosted machines, a coordinator agent in Projects, code hosting with Origin, and an iOS app that, since October 2026, can see and reply to the agents running on your computer. Superset solves a narrower problem in a different way: it is a local-first workspace that runs any CLI agent, including Cursor's own, in parallel Git worktrees on your machines and subscriptions, independent of any editor.
+Cursor started as an AI editor and is now a full agent platform: an Agents Window that runs agents locally, in the cloud, or over SSH, cloud agents on their own VMs, self-hosted machines, a coordinator agent in Projects, code hosting with Origin, and an iOS app that, since October 2026, can see and reply to the agents running on your computer. Paradev solves a narrower problem in a different way: it is a local-first workspace that runs any CLI agent, including Cursor's own, in parallel Git worktrees on your machines and subscriptions, independent of any editor.
 
 Facts were checked against Cursor's changelog, docs, and pricing page on October 13, 2026.
 
@@ -24,7 +24,7 @@ Facts were checked against Cursor's changelog, docs, and pricing page on October
 
 ## At a Glance
 
-| | **Superset** | **Cursor** |
+| | **Paradev** | **Cursor** |
 |---|---|---|
 | **Category** | Agent workspace and orchestrator | AI editor and agent platform |
 | **Agents** | Any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors |
@@ -38,9 +38,9 @@ Facts were checked against Cursor's changelog, docs, and pricing page on October
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor's agent, Antigravity CLI, GitHub Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run in the cloud without your own computer connected, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor's agent, Antigravity CLI, GitHub Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, cloud workspaces run in the cloud without your own computer connected, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Cursor?
 
@@ -50,35 +50,35 @@ Cursor is an AI editor that has grown into an agent platform. The Agents Window 
 
 ### Any Agent vs Cursor's Agent
 
-Cursor's parallelism runs Cursor's agent, with your choice of model. Superset runs agents from every vendor in real terminals, so Claude Code, Codex, and Cursor's own agent can work on the same repository side by side, and you can continue a session with a different agent. If you like Cursor's agent, you can run it in Superset too.
+Cursor's parallelism runs Cursor's agent, with your choice of model. Paradev runs agents from every vendor in real terminals, so Claude Code, Codex, and Cursor's own agent can work on the same repository side by side, and you can continue a session with a different agent. If you like Cursor's agent, you can run it in Paradev too.
 
 ### Who Pays for the Models
 
-Superset never proxies model calls: each agent runs on your own subscription or key. Cursor bundles usage into its plans, bills third-party models at API list price, and refreshes usage weekly.
+Paradev never proxies model calls: each agent runs on your own subscription or key. Cursor bundles usage into its plans, bills third-party models at API list price, and refreshes usage weekly.
 
 ### Remote Agents and Mobile
 
-Both now let you check on agents running on your own machine from a phone. Cursor's iOS app pairs with one desktop and shows its local agents, alongside its cloud agents. Superset's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
+Both now let you check on agents running on your own machine from a phone. Cursor's iOS app pairs with one desktop and shows its local agents, alongside its cloud agents. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
 
 ### Cloud Infrastructure
 
-Cursor offers managed cloud agents on their own VMs, started from prepared snapshots, and worker pools on several clouds. Superset has cloud workspaces that run in the cloud and open from desktop, iPhone, and iPad, and it also runs agents on machines you own through Remote Access.
+Cursor offers managed cloud agents on their own VMs, started from prepared snapshots, and worker pools on several clouds. Paradev has cloud workspaces that run in the cloud and open from desktop, iPhone, and iPad, and it also runs agents on machines you own through Remote Access.
 
 ### Editor-Centered vs Editor-Independent
 
-Cursor's editor is the center of its product, and some CLI features work only in the editor. Superset works alongside whichever editor you use, and many Superset users run it next to Cursor.
+Cursor's editor is the center of its product, and some CLI features work only in the editor. Paradev works alongside whichever editor you use, and many Paradev users run it next to Cursor.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Model costs are on your own agent subscriptions. Cursor's pricing page lists Free, Plus at $8 a month, Premium at $30, Super at $100, Ultra at $200, Teams from $30 per user, and Enterprise on custom terms. Cloud agents, automations, Origin, and Bugbot start at Premium, and third-party models are billed at API list price on every tier. Prices as of October 2026.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Model costs are on your own agent subscriptions. Cursor's pricing page lists Free, Plus at $8 a month, Premium at $30, Super at $100, Ultra at $200, Teams from $30 per user, and Enterprise on custom terms. Cloud agents, automations, Origin, and Bugbot start at Premium, and third-party models are billed at API list price on every tier. Prices as of October 2026.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Run CLI agents from several vendors and want them side by side
 - Want model costs on your own subscriptions, with no proxy
@@ -92,24 +92,24 @@ Superset offers a free tier, Pro at {{price:pro}} per user per month ({{price:pr
 - Want a coordinator built into a Projects view that plans work for Cursor's own agents
 - Prefer Cursor's agent and editor as the center of your workflow
 
-The two also work together: use Cursor as your editor, and Superset to run Claude Code, Codex, and Cursor's agent in parallel worktrees around it.
+The two also work together: use Cursor as your editor, and Paradev to run Claude Code, Codex, and Cursor's agent in parallel worktrees around it.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Superset a Cursor replacement?
+### Is Paradev a Cursor replacement?
 
-Not as an editor. Superset does not offer Cursor-style inline completions. It is the workspace for running and reviewing many agents, and it opens any workspace in Cursor when you want to edit.
+Not as an editor. Paradev does not offer Cursor-style inline completions. It is the workspace for running and reviewing many agents, and it opens any workspace in Cursor when you want to edit.
 
 ### Does Cursor support parallel agents?
 
-Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with worktrees for local agents, and Projects has a coordinator agent in beta. Cursor's parallelism runs its own agent; Superset runs any CLI agent in worktrees on your machines.
+Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with worktrees for local agents, and Projects has a coordinator agent in beta. Cursor's parallelism runs its own agent; Paradev runs any CLI agent in worktrees on your machines.
 
 ### Can I control local Cursor agents from my phone?
 
-Yes, since October 6, 2026: pair Cursor's iOS app with your desktop to see and reply to its local agents. Superset's iPhone and iPad app does the same for any agent running on any macOS or Linux host you add.
+Yes, since October 6, 2026: pair Cursor's iOS app with your desktop to see and reply to its local agents. Paradev's iPhone and iPad app does the same for any agent running on any macOS or Linux host you add.
 
-### Can I run Cursor's agent in Superset?
+### Can I run Cursor's agent in Paradev?
 
-Yes. Cursor's agent is a built-in agent in Superset, and runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
+Yes. Cursor's agent is a built-in agent in Paradev, and runs in its own worktree next to Claude Code, Codex, and any other CLI agent.
