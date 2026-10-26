@@ -298,3 +298,19 @@ describe("EventBus fs:watch", () => {
 		}
 	});
 });
+
+it("broadcasts only an invalidation hint when usage changes", () => {
+	const eventBus = createEventBus();
+	const sent: string[] = [];
+	eventBus.handleOpen({
+		readyState: 1,
+		send: (message: string) => {
+			sent.push(message);
+		},
+		close() {},
+	});
+	eventBus.broadcastUsageChanged({ provider: "claude", occurredAt: 123 });
+	expect(sent.map((message) => JSON.parse(message))).toEqual([
+		{ type: "usage:changed", provider: "claude", occurredAt: 123 },
+	]);
+});

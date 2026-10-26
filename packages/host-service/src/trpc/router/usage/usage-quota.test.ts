@@ -345,3 +345,30 @@ test("native completion refreshes the shared snapshot without relabeling HTTP or
 	await reader.dispose();
 	expect(disposed).toBe(true);
 });
+
+test("per-provider inventory timing expires only the short-lived provider", async () => {
+	let now = 0;
+	const calls = { claude: 0, codex: 0 };
+	const reader = createUsageQuotaReader(
+		(["claude", "codex"] as const).map((agent) => ({
+			agent,
+			ttlMs: agent === "claude" ? 60_000 : 300_000,
+			capture: async () => ({
+				revision: agent,
+				load: async () => {
+					calls[agent]++;
+					return [{ ...account(agent), fetchedAt: new Date(now) }];
+				},
+			}),
+		})),
+		() => now,
+	);
+	await reader.get();
+	now = 60_000;
+	await reader.get();
+	expect(calls).toEqual({ claude: 2, codex: 1 });
+	reader.expire("claude");
+	await reader.get();
+	expect(calls).toEqual({ claude: 3, codex: 1 });
+	await reader.dispose();
+});
