@@ -203,7 +203,7 @@ msgstr "{0, plural, one {# repozytorium} few {# repozytoria} many {# repozytori�
 
 #. placeholder {0}: resets.count
 msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {# odnowienie dostępne} other {# odnowień dostępnych}}"
+msgstr "{0, plural, one {# odnowienie dostępne} few {# odnowienia dostępne} many {# odnowień dostępnych} other {# odnowień dostępnych}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -775,7 +775,7 @@ msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"
 
 msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {# odnowienie dostępne} other {# odnowień dostępnych}}"
+msgstr "{count, plural, one {# odnowienie dostępne} few {# odnowienia dostępne} many {# odnowień dostępnych} other {# odnowień dostępnych}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# wyszukiwanie} few {# wyszukiwania} many {# wyszukiwań} other {# wyszukiwania}}"

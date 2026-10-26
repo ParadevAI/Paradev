@@ -264,3 +264,36 @@ test("capacity fails closed instead of evicting an active Retry-After gate", () 
 	expect(gate.blocked("scope-0")).toBe(false);
 	expect(gate.blocked("another-new-scope")).toBe(false);
 });
+
+test("a reader created before a fetch replacement uses the active transport at request time", async () => {
+	const descriptor = Object.getOwnPropertyDescriptor(globalThis, "fetch");
+	let initialCalls = 0;
+	let activeCalls = 0;
+	try {
+		Object.defineProperty(globalThis, "fetch", {
+			configurable: true,
+			writable: true,
+			value: async () => {
+				initialCalls++;
+				return json({ available_count: 1 });
+			},
+		});
+		const reader = createResetMetadataReader(undefined, () => time);
+		Object.defineProperty(globalThis, "fetch", {
+			configurable: true,
+			writable: true,
+			value: async () => {
+				activeCalls++;
+				return json({ available_count: 3 });
+			},
+		});
+		expect(
+			(await reader.codex("fixture-lazy-fetch", "fixture-account"))
+				?.availableCount,
+		).toBe(3);
+		expect(initialCalls).toBe(0);
+		expect(activeCalls).toBe(1);
+	} finally {
+		if (descriptor) Object.defineProperty(globalThis, "fetch", descriptor);
+	}
+});

@@ -203,7 +203,7 @@ msgstr "{0, plural, one {# repozitář} few {# repozitáře} many {# repozitář
 
 #. placeholder {0}: resets.count
 msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {# obnovení dostupné} other {# obnovení dostupných}}"
+msgstr "{0, plural, one {# obnovení dostupné} few {# obnovení dostupná} many {# obnovení dostupného} other {# obnovení dostupných}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -775,7 +775,7 @@ msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
 
 msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {# obnovení dostupné} other {# obnovení dostupných}}"
+msgstr "{count, plural, one {# obnovení dostupné} few {# obnovení dostupná} many {# obnovení dostupného} other {# obnovení dostupných}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# hledání} few {# hledání} many {# hledání} other {# hledání}}"

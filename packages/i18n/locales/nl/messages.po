@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Kies MCP-servers voor dit bericht"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Kies één account per menubalkpictogram. Het zijtabblad toont alle accounts, behalve de accounts die je verbergt. Ontbrekend of verouderd gebruik wordt met een streepje weergegeven."
+msgstr "Kies één account per menubalkpictogram. Het paneel aan de schermrand toont alle accounts, behalve de accounts die je verbergt. Ontbrekend of verouderd gebruik wordt met een streepje weergegeven."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Kies wat je uit de ingebouwde browser wilt wissen."

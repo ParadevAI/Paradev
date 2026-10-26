@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Bu ileti için MCP sunucularını seçin"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Her menü çubuğu simgesi için bir hesap seçin. Yan sekme, gizledikleriniz dışında tüm hesapları gösterir. Eksik veya güncel olmayan kullanım verileri tire ile gösterilir."
+msgstr "Her menü çubuğu simgesi için bir hesap seçin. Ekran kenarındaki panel, gizledikleriniz dışında tüm hesapları gösterir. Eksik veya güncel olmayan kullanım verileri tire ile gösterilir."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Uygulama içi tarayıcıdan neyin temizleneceğini seçin."
@@ -11048,7 +11048,7 @@ msgstr "Sonraki yorum"
 
 #. placeholder {0}: formatRelativeTime(resets.nextExpiry)
 msgid "Next expires {0}"
-msgstr "Sonraki {0} sona eriyor"
+msgstr "Bir sonraki sona erme: {0}"
 
 msgid "Next file"
 msgstr "Sonraki dosya"
@@ -14492,7 +14492,7 @@ msgstr "Yakınlaştırmayı sıfırla"
 #. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
 #. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
 msgid "Resets {0}"
-msgstr "Sıfırlanma {0}"
+msgstr "Sıfırlanma zamanı: {0}"
 
 msgid "Resets {resetDate}"
 msgstr "{resetDate} tarihinde sıfırlanır"

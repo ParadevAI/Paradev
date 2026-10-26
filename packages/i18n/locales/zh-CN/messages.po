@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "为这条消息选择MCP服务器"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "为每个菜单栏图标选择一个账户。侧边标签默认显示所有账户，除非你将其隐藏。缺失或过期的用量以短横线显示。"
+msgstr "为每个菜单栏图标选择一个账户。屏幕边缘面板会显示所有账户，除非你将其隐藏。缺失或过期的用量以短横线显示。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "选择要从应用内浏览器清除的内容。"

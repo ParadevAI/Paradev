@@ -11,7 +11,8 @@ afterEach(cleanup);
 const accounts = Array.from(
 	{ length: 20 },
 	(_, index): WidgetAccount => ({
-		id: `account-${index}`,
+		id: `${index % 2 === 0 ? "claude" : "codex"}:${index.toString(16).padStart(64, "0")}`,
+		quotaIdentity: index.toString(16).padStart(64, "0"),
 		provider: index % 2 === 0 ? "claude" : "codex",
 		label: `Studio ${index + 1}`,
 		email: null,
@@ -31,7 +32,9 @@ test("every account remains editable and hide actions target its exact identity"
 	const view = render(
 		<WidgetAccountAppearance
 			accounts={accounts}
-			preferences={readWidgetPreferences({ hiddenAccountIds: ["account-19"] })}
+			preferences={readWidgetPreferences({
+				hiddenAccountIds: [accounts[19].id],
+			})}
 			dark
 			saving={false}
 			onColorChange={async () => {}}
@@ -49,8 +52,8 @@ test("every account remains editable and hide actions target its exact identity"
 		view.getByRole("button", { name: "Show account · Studio 20" }),
 	);
 	expect(hide.mock.calls).toEqual([
-		["account-0", true],
-		["account-19", false],
+		[accounts[0].id, true],
+		[accounts[19].id, false],
 	]);
 	view.rerender(
 		<WidgetAccountAppearance
@@ -67,4 +70,33 @@ test("every account remains editable and hide actions target its exact identity"
 			.getAllByRole("button")
 			.every((button) => (button as HTMLButtonElement).disabled),
 	).toBe(true);
+});
+
+test("unverified Grok and Antigravity identities remain visible and hideable without an unusable color control", () => {
+	const unverified = ["grok", "agy"].map((provider, index) => ({
+		...accounts[index],
+		id: `${provider}:unverified`,
+		provider: provider as "grok" | "agy",
+		quotaIdentity: undefined,
+		label: provider,
+	}));
+	const hide = mock((_id: string, _hidden: boolean) => {});
+	const view = render(
+		<WidgetAccountAppearance
+			accounts={unverified}
+			preferences={readWidgetPreferences({})}
+			dark
+			saving={false}
+			onColorChange={async () => {
+				throw new Error("unverified appearance write");
+			}}
+			onHiddenChange={hide}
+		/>,
+	);
+	expect(view.getAllByRole("listitem")).toHaveLength(2);
+	expect(view.queryAllByRole("button", { name: /Account color/ })).toHaveLength(
+		0,
+	);
+	fireEvent.click(view.getByRole("button", { name: "Hide account · grok" }));
+	expect(hide.mock.calls).toEqual([["grok:unverified", true]]);
 });

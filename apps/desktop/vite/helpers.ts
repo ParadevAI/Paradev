@@ -4,6 +4,7 @@ import { transformAsync } from "@babel/core";
 import type { Plugin } from "vite";
 
 import { main, resources } from "../package.json";
+import { usageWidgetDevelopmentCsp } from "./usage-widget-csp";
 
 export const devPath = normalize(dirname(main)).split(/\/|\\/g)[0];
 
@@ -127,8 +128,32 @@ function connectSrcOrigins(): string {
 export function htmlEnvTransformPlugin(): Plugin {
 	return {
 		name: "html-env-transform",
-		transformIndexHtml(html) {
-			return html.replace(/%CONNECT_SRC_ORIGINS%/g, connectSrcOrigins());
+		transformIndexHtml: {
+			order: "post",
+			handler(html, context) {
+				const expanded = html.replace(
+					/%CONNECT_SRC_ORIGINS%/g,
+					connectSrcOrigins(),
+				);
+				const server = context.server;
+				if (!server) return expanded;
+				const address = server.httpServer?.address();
+				const port =
+					address && typeof address === "object"
+						? address.port
+						: server.config.server.port;
+				return usageWidgetDevelopmentCsp(expanded, {
+					filename: context.filename,
+					serverUrls: server.resolvedUrls?.local.length
+						? server.resolvedUrls.local
+						: port
+							? [
+									`${server.config.server.https ? "https" : "http"}://localhost:${port}/`,
+								]
+							: [],
+					hmr: server.config.server.hmr,
+				});
+			},
 		},
 	};
 }

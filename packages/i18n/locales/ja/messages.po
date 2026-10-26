@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "このメッセージで使うMCPサーバーを選択"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "メニューバーの各アイコンに表示するアカウントを選択します。サイドタブには非表示にしたものを除くすべてのアカウントが表示されます。使用量が不明または古い場合はダッシュで表示されます。"
+msgstr "メニューバーの各アイコンに表示するアカウントを選択します。画面端のパネルには非表示にしたものを除くすべてのアカウントが表示されます。使用量が不明または古い場合はダッシュで表示されます。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "アプリ内ブラウザから消去する項目を選択してください。"
@@ -20206,7 +20206,7 @@ msgid "Your account is managed by your organization. Contact your admin to creat
 msgstr "アカウントは組織によって管理されています。新しい組織を作成するには管理者に連絡してください。"
 
 msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "アカウントと割り当てをメニューバーまたは画面の右端に表示します。"
+msgstr "アカウントと利用枠をメニューバーまたは画面の右端に表示します。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "エージェントは superset browser コマンドで任意のページを開いて操作できます。あなたが見ているペインを使うので、すべての手順が見えます。"

@@ -1,11 +1,10 @@
 import { usageWidgetAppearances } from "@superset/local-db/schema/usage-widget-appearances";
 import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import { hasVerifiedWidgetIdentity } from "shared/usage-widget/appearance-identity";
 import { z } from "zod";
 
 const MAX_APPEARANCES_PER_HOST = 5_000;
-const OPAQUE_IDENTITY = /^[a-f0-9]{64}$/;
-const ACCOUNT_ID = /^(?:claude|codex|grok|agy|opencode):[a-f0-9]{64}$/;
 const scopeSchema = z.string().min(1).max(200);
 export const widgetAppearancePatchSchema = z
 	.object({
@@ -72,12 +71,7 @@ export function createWidgetAppearanceStore({
 	};
 	const rows = (where: ReturnType<typeof and>) =>
 		db.select().from(usageWidgetAppearances).where(where).all();
-	const verified = (account: WidgetAppearanceInventory["accounts"][number]) =>
-		account.status === "ok" &&
-		typeof account.quotaIdentity === "string" &&
-		OPAQUE_IDENTITY.test(account.quotaIdentity) &&
-		ACCOUNT_ID.test(account.id) &&
-		account.id.endsWith(`:${account.quotaIdentity}`);
+	const verified = hasVerifiedWidgetIdentity;
 
 	return {
 		readWidgetAppearances(hostId: string): Record<string, WidgetAppearance> {

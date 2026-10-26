@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Scegli i server MCP per questo messaggio"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Scegli un account per ogni icona della barra dei menu. La scheda laterale mostra tutti gli account, tranne quelli che nascondi. Un trattino indica dati di utilizzo mancanti o non aggiornati."
+msgstr "Scegli un account per ogni icona della barra dei menu. Il pannello sul bordo dello schermo mostra tutti gli account, tranne quelli che nascondi. Un trattino indica dati di utilizzo mancanti o non aggiornati."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Scegli cosa cancellare dal browser interno."

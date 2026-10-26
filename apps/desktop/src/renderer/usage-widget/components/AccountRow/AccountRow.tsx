@@ -11,6 +11,7 @@ import {
 	liveResetCredits,
 	resetExpiryUrgency,
 } from "shared/usage-resets/model";
+import { hasVerifiedWidgetIdentity } from "shared/usage-widget/appearance-identity";
 import {
 	allUsageWindowsCurrent,
 	displayWindows,
@@ -79,16 +80,18 @@ export function AccountRow({
 					</span>
 				)}
 				<span className="usage-plan">{account.plan}</span>
-				{onColorChange && (
-					<AccountColorPicker
-						accountLabel={label}
-						color={account.color}
-						dark={state.surface === "edge" || state.dark}
-						saving={saving}
-						onSave={(color) => onColorChange(account.id, color)}
-						onOpenChange={onColorOpenChange}
-					/>
-				)}
+				{onColorChange &&
+					!state.offline &&
+					hasVerifiedWidgetIdentity(account) && (
+						<AccountColorPicker
+							accountLabel={label}
+							color={account.color}
+							dark={state.surface === "edge" || state.dark}
+							saving={saving}
+							onSave={(color) => onColorChange(account.id, color)}
+							onOpenChange={onColorOpenChange}
+						/>
+					)}
 				<button
 					type="button"
 					className="usage-visibility"

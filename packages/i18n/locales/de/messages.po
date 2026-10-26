@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "MCP-Server für diese Nachricht wählen"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Wähle ein Konto pro Menüleistensymbol. Die Seitenleiste zeigt alle Konten, sofern du sie nicht ausblendest. Fehlende oder veraltete Nutzungsdaten erscheinen als Strich."
+msgstr "Wähle ein Konto pro Menüleistensymbol. Die Anzeige am Bildschirmrand zeigt alle Konten, sofern du sie nicht ausblendest. Fehlende oder veraltete Nutzungsdaten erscheinen als Strich."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Wähle, was aus dem In-App-Browser gelöscht werden soll."
@@ -11048,7 +11048,7 @@ msgstr "Nächster Kommentar"
 
 #. placeholder {0}: formatRelativeTime(resets.nextExpiry)
 msgid "Next expires {0}"
-msgstr "Nächster verfällt {0}"
+msgstr "Läuft als Nächstes ab: {0}"
 
 msgid "Next file"
 msgstr "Nächste Datei"

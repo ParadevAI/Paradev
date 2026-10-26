@@ -203,7 +203,7 @@ msgstr "{0, plural, one {# репозиторий} few {# репозитория
 
 #. placeholder {0}: resets.count
 msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {Доступен # сброс} other {Доступно # сбросов}}"
+msgstr "{0, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -775,7 +775,7 @@ msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
 
 msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {Доступен # сброс} other {Доступно # сбросов}}"
+msgstr "{count, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# поиск} few {# поиска} many {# поисков} other {# поиска}}"
@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Выбрать серверы MCP для этого сообщения"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Выберите один аккаунт для каждого значка в строке меню. Боковая вкладка показывает все аккаунты, кроме скрытых. Отсутствующие или устаревшие данные об использовании отображаются прочерком."
+msgstr "Выберите один аккаунт для каждого значка в строке меню. Панель у края экрана показывает все аккаунты, кроме скрытых. Отсутствующие или устаревшие данные об использовании отображаются прочерком."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Выберите, что очистить во встроенном браузере."

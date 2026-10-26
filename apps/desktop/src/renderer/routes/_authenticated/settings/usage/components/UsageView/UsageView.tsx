@@ -48,6 +48,7 @@ import {
 	usageObservation,
 	usageReading,
 } from "shared/usage-reading";
+import { hasVerifiedWidgetIdentity } from "shared/usage-widget/appearance-identity";
 import { widgetAccountId } from "shared/usage-widget/model";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
 import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
@@ -157,8 +158,9 @@ const DEFAULT_TITLE = msg({
 		"New agent launches use this account. Relaunch a running agent to switch it.",
 });
 
-function AccountCard({
+export function AccountCard({
 	account,
+	offline = false,
 	onMakeDefault,
 	onSwitchSignIn,
 	onRemove,
@@ -173,6 +175,7 @@ function AccountCard({
 	accountLabel?: string | null;
 	onSaveColor?: (color: string | null) => Promise<void>;
 	account: UsageAccount;
+	offline?: boolean;
 	onMakeDefault: (() => void) | null;
 	onSwitchSignIn: (() => void) | null;
 	/** Null on the system-default card — the main login is never removable. */
@@ -186,7 +189,7 @@ function AccountCard({
 	hideEmails: boolean;
 }) {
 	const { t } = useLingui();
-	const reading = usageReading(usageObservation(account));
+	const reading = usageReading(usageObservation(account), offline);
 	const credits =
 		account.prepaidBalance || account.creditsBalance !== null
 			? account.extraUsage
@@ -393,7 +396,7 @@ function AccountCard({
 			)}
 			{/* The radio + accent border already mark the default when the cards
 			    read as a group; the footer label only carries it for a lone card. */}
-			<UsageCreditBalance account={account} />
+			<UsageCreditBalance account={account} offline={offline} />
 			{((!account.isDefault && onMakeDefault !== null) ||
 				(!selectable && account.isDefault) ||
 				credits) && (
@@ -708,6 +711,7 @@ export function UsageView({
 									>
 										<AccountCard
 											account={account}
+											offline={quotaQuery.isError}
 											color={
 												appearances.find(
 													(item) => item.id === widgetAccountId(account),
@@ -719,7 +723,13 @@ export function UsageView({
 												)?.label
 											}
 											onSaveColor={
-												account.quotaIdentity &&
+												!quotaQuery.isError &&
+												!widget.data?.offline &&
+												hasVerifiedWidgetIdentity({
+													id: widgetAccountId(account),
+													quotaIdentity: account.quotaIdentity,
+													status: account.status,
+												}) &&
 												widget.data?.hostUrl === hostUrl
 													? async (color) => {
 															await saveAppearance.mutateAsync({

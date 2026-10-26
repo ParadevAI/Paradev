@@ -62,10 +62,10 @@ test("Claude Retry-After cannot be bypassed through another profile alias or for
 });
 
 test("Codex account header isolates a paused organization while profile aliases share its pause", async () => {
-	const requests: string[] = [];
-	globalThis.fetch = (async (_input, init) => {
+	const requests: Array<{ path: string; account: string }> = [];
+	globalThis.fetch = (async (input, init) => {
 		const account = new Headers(init?.headers).get("chatgpt-account-id") ?? "";
-		requests.push(account);
+		requests.push({ path: new URL(String(input)).pathname, account });
 		if (account === "paused")
 			return new Response("limited", {
 				status: 429,
@@ -98,5 +98,18 @@ test("Codex account header isolates a paused organization while profile aliases 
 	expect(first.status).toBe("unavailable");
 	expect(alias).toBe(first);
 	expect(healthy.status).toBe("ok");
-	expect(requests).toEqual(["paused", "healthy"]);
+	expect(requests.filter((request) => request.path.endsWith("/usage"))).toEqual(
+		[
+			{ path: "/backend-api/wham/usage", account: "paused" },
+			{ path: "/backend-api/wham/usage", account: "healthy" },
+		],
+	);
+	expect(
+		requests.filter((request) => !request.path.endsWith("/usage")),
+	).toEqual([
+		{
+			path: "/backend-api/wham/rate-limit-reset-credits",
+			account: "healthy",
+		},
+	]);
 });

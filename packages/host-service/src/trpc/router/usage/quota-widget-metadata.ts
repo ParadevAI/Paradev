@@ -21,7 +21,7 @@ export function opaqueQuotaIdentity(
 }
 
 export function createResetMetadataReader(
-	fetcher: QuotaFetch = globalThis.fetch,
+	fetcher: QuotaFetch = (...args) => globalThis.fetch(...args),
 	now = Date.now,
 	deadline = (milliseconds: number) => AbortSignal.timeout(milliseconds),
 ) {

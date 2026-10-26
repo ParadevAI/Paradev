@@ -274,3 +274,62 @@ test("current quota cannot keep an expired wallet on any surface", () => {
 	expect(view.queryByText(/45.67/)).toBeNull();
 	expect(view.queryByText("Prepaid balance")).toBeNull();
 });
+
+test.each([
+	"grok",
+	"agy",
+] as const)("expanded %s quota without a verified owner has no color write control", (provider) => {
+	const { account, state } = fixture({
+		provider,
+		status: "ok",
+		historical: false,
+	});
+	const view = render(
+		<AccountRow
+			account={account}
+			state={state}
+			index={0}
+			hidden={false}
+			saving={false}
+			onVisibilityChange={async () => {}}
+			onColorChange={async () => {
+				throw new Error("unverified appearance write");
+			}}
+		/>,
+	);
+	expect(view.queryByRole("button", { name: /Account color/ })).toBeNull();
+	expect(view.getByRole("button", { name: /Hide account/ })).toBeTruthy();
+});
+
+test("a verified account loses only its edit control during a transport outage, retaining its color", () => {
+	const identity = "a".repeat(64);
+	const { account, state } = fixture({
+		id: `claude:${identity}`,
+		quotaIdentity: identity,
+		color: "#123456",
+		status: "ok",
+		historical: false,
+	});
+	const props = {
+		account,
+		state,
+		index: 0,
+		hidden: false,
+		saving: false,
+		onVisibilityChange: async () => {},
+		onColorChange: async () => {},
+	};
+	const view = render(<AccountRow {...props} />);
+	const originalIcon = view.container
+		.querySelector("[style*=background-color]")
+		?.getAttribute("style");
+	expect(originalIcon).toBeTruthy();
+	expect(view.getByRole("button", { name: /Account color/ })).toBeTruthy();
+	view.rerender(<AccountRow {...props} state={{ ...state, offline: true }} />);
+	expect(view.queryByRole("button", { name: /Account color/ })).toBeNull();
+	expect(
+		view.container
+			.querySelector("[style*=background-color]")
+			?.getAttribute("style"),
+	).toBe(originalIcon);
+});

@@ -672,8 +672,8 @@ if (!gotTheLock) {
 			restoreWindows,
 		);
 		setupAutoUpdater();
-		initTray();
 		startHostUsageObservations();
+		initTray();
 		startResourceJournal();
 
 		const coldStartUrl = findDeepLinkInArgv(process.argv);

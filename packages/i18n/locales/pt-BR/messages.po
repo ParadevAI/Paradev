@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Escolher servidores MCP para esta mensagem"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Escolha uma conta por ícone da barra de menus. A aba lateral mostra todas as contas, exceto as que você ocultar. Dados de uso ausentes ou desatualizados aparecem como um traço."
+msgstr "Escolha uma conta por ícone da barra de menus. O painel na borda da tela mostra todas as contas, exceto as que você ocultar. Dados de uso ausentes ou desatualizados aparecem como um traço."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Escolha o que limpar do navegador do app."
@@ -9664,13 +9664,13 @@ msgstr "Última verificação {0}"
 
 #. placeholder {0}: formatRelativeTime(reading.checkedAt)
 msgid "Last checked {0} · not live"
-msgstr "Última verificação {0} · não está ao vivo"
+msgstr "Última verificação {0} · dados não são em tempo real"
 
 msgid "Last checked {relativeTime}"
 msgstr "Última verificação {relativeTime}"
 
 msgid "Last checked {relativeTime} · not live"
-msgstr "Última verificação {relativeTime} · dados desatualizados"
+msgstr "Última verificação {relativeTime} · dados não são em tempo real"
 
 msgid "Last day of each month"
 msgstr "Último dia de cada mês"

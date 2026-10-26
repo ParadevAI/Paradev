@@ -3867,7 +3867,7 @@ msgid "Choose MCP servers for this message"
 msgstr "Pilih server MCP untuk pesan ini"
 
 msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Pilih satu akun untuk setiap ikon bilah menu. Tab samping menampilkan semua akun kecuali yang Anda sembunyikan. Data penggunaan yang tidak tersedia atau kedaluwarsa ditampilkan sebagai tanda pisah."
+msgstr "Pilih satu akun untuk setiap ikon bilah menu. Panel di tepi layar menampilkan semua akun kecuali yang Anda sembunyikan. Data penggunaan yang tidak tersedia atau kedaluwarsa ditampilkan sebagai tanda pisah."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Pilih apa yang ingin dibersihkan dari browser dalam aplikasi."

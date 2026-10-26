@@ -3,6 +3,7 @@ import type { AccountColor } from "@superset/shared/account-colors";
 import { Button } from "@superset/ui/button";
 import { AccountColorPicker } from "renderer/components/AccountColorPicker";
 import { ProviderIcon } from "renderer/components/ProviderIcon";
+import { hasVerifiedWidgetIdentity } from "shared/usage-widget/appearance-identity";
 import {
 	type WidgetAccount,
 	type WidgetPreferences,
@@ -58,13 +59,15 @@ export function WidgetAccountAppearance({
 							<span className="min-w-0 flex-1 truncate" title={label}>
 								{label}
 							</span>
-							<AccountColorPicker
-								accountLabel={label}
-								color={account.color}
-								dark={dark}
-								saving={saving}
-								onSave={(color) => onColorChange(account.id, color)}
-							/>
+							{hasVerifiedWidgetIdentity(account) && (
+								<AccountColorPicker
+									accountLabel={label}
+									color={account.color}
+									dark={dark}
+									saving={saving}
+									onSave={(color) => onColorChange(account.id, color)}
+								/>
+							)}
 							<Button
 								type="button"
 								variant="ghost"
