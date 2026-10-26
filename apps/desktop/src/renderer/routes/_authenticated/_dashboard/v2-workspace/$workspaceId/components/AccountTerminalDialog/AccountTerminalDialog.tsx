@@ -4,7 +4,7 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { useState } from "react";
-import { HOST_USAGE_QUOTA_QUERY_KEY } from "renderer/hooks/host-service/useHostUsageQuota";
+import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { CreateAccountTerminal } from "../../hooks/useAgentSessionLauncher";
@@ -25,6 +25,7 @@ export function AccountTerminalDialog({
 	const configs = useV2AgentConfigs(hostUrl);
 	const [configId, setConfigId] = useState("");
 	const [launching, setLaunching] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
 	const choices = (configs.data ?? []).filter(
 		(config) => config.presetId === "claude" || config.presetId === "codex",
 	);
@@ -47,16 +48,7 @@ export function AccountTerminalDialog({
 	const provider = choices.find(
 		(config) => config.id === selectedConfigId,
 	)?.presetId;
-	const quota = useQuery({
-		queryKey: [...HOST_USAGE_QUOTA_QUERY_KEY, hostUrl],
-		enabled: Boolean(hostUrl && accounts.data?.supported),
-		queryFn: () => {
-			if (!hostUrl) throw new Error("Host unavailable");
-			return getHostServiceClientByUrl(hostUrl).usage.quota.query();
-		},
-		staleTime: 5 * 60_000,
-		retry: false,
-	});
+	const quota = useHostUsageQuota(accounts.data?.supported ? hostUrl : null);
 	const unsupportedHost =
 		accounts.error instanceof TRPCClientError &&
 		accounts.error.data?.code === "NOT_FOUND" &&
@@ -97,11 +89,19 @@ export function AccountTerminalDialog({
 				loading={
 					configs.isPending || (selectedConfigExists && accounts.isPending)
 				}
-				refreshing={accounts.isFetching}
+				refreshing={refreshing || accounts.isFetching || quota.isFetching}
 				error={error}
 				launching={launching}
 				onRefresh={async () => {
-					await accounts.refetch();
+					setRefreshing(true);
+					try {
+						await Promise.allSettled([
+							accounts.refetch(),
+							quota.refresh(),
+						]);
+					} finally {
+						setRefreshing(false);
+					}
 				}}
 				onCancel={onClose}
 				onLaunch={async (account) => {
