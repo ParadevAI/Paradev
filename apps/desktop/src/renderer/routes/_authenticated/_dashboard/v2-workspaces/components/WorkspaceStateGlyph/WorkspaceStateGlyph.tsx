@@ -22,8 +22,7 @@ interface WorkspaceStateGlyphProps {
  * dead or unborn box), then live agent states (pulse), then the unread dot
  * the sidebar rows and tab accessories use, then the section headers' icon
  * set so the vocabulary matches at both levels. The dot follows the agent,
- * not the column: a row filed under In review by its PR alone has nothing
- * unread, and a session row with unread output is filed under Idle.
+ * not the column, so a session row filed under Idle still shows it.
  */
 export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	const { t } = useLingui();
