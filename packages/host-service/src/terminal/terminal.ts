@@ -52,6 +52,7 @@ import { matchesAgentBinding } from "../terminal-agents/matches-agent-binding.ts
 import { markTerminalAgentBindingEnded } from "../terminal-agents/persistence.ts";
 import type { TerminalAgentStore } from "../terminal-agents/store.ts";
 import type { TerminalAgentBinding } from "../terminal-agents/types.ts";
+import { getHostTerminalTheme } from "../trpc/router/settings/terminal-theme.ts";
 import { resolveDefaultAccountTerminalEnv } from "../trpc/router/usage/default-account.ts";
 import {
 	DaemonClient,
@@ -74,6 +75,7 @@ import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
+import { resolveTerminalTheme } from "./resolve-terminal-theme.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	getShellReadyMarkerEvidence,
@@ -2997,8 +2999,8 @@ export function createTerminalSessionInternal(
 async function createTerminalSessionUnlocked({
 	terminalId,
 	workspaceId,
-	themeType,
-	colors,
+	themeType: requestedThemeType,
+	colors: requestedColors,
 	db,
 	eventBus,
 	initialCommand,
@@ -3078,6 +3080,11 @@ async function createTerminalSessionUnlocked({
 	}
 
 	const cwd = resolveTerminalCwd(cwdOverride, workspace.worktreePath);
+	const { themeType, colors } = resolveTerminalTheme({
+		themeType: requestedThemeType,
+		colors: requestedColors,
+		hostTheme: getHostTerminalTheme(db),
+	});
 	// Adoption overrides these with the PTY's live dims below: the session's
 	// belief must match the kernel's, or the reanchor repaint logic misjudges
 	// whether a client resize will deliver a real SIGWINCH.
