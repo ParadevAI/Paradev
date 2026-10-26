@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} из {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Осталось {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} не находится в {installedAccountLogin}, где установлено GitHub App этой организации."
 
@@ -2063,6 +2066,12 @@ msgstr "Сессия агента запущена"
 
 msgid "agent settings"
 msgstr "настройки агента"
+
+msgid "Agent terminal with account"
+msgstr "Терминал агента с выбором аккаунта"
+
+msgid "Agent terminal with account…"
+msgstr "Терминал агента с выбором аккаунта…"
 
 msgid "Agent usage rankings"
 msgstr "Рейтинги использования агентов"
@@ -5104,6 +5113,9 @@ msgstr "Не удалось выйти из очереди"
 msgid "Could not list directory"
 msgstr "Не удалось прочитать содержимое папки"
 
+msgid "Could not load accounts"
+msgstr "Не удалось загрузить аккаунты"
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Не удалось загрузить агентов с {0}"
@@ -5204,6 +5216,9 @@ msgstr "Не удалось записать облачную рабочую о�
 msgid "Could not record environment"
 msgstr "Не удалось сохранить окружение"
 
+msgid "Could not refresh usage"
+msgstr "Не удалось обновить данные об использовании"
+
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
 
@@ -5248,6 +5263,9 @@ msgstr "Не удалось поделиться"
 
 msgid "Could not start agent"
 msgstr "Не удалось запустить агента"
+
+msgid "Could not start agent terminal"
+msgstr "Не удалось запустить терминал агента"
 
 msgid "Could not start checkout. Please try again."
 msgstr "Не удалось начать оформление. Попробуйте ещё раз."
@@ -9998,6 +10016,9 @@ msgstr "Загрузчик · брайлевский спиннер"
 msgid "Loading"
 msgstr "Загрузка"
 
+msgid "Loading accounts…"
+msgstr "Загрузка аккаунтов…"
+
 msgid "Loading agent settings..."
 msgstr "Загрузка настроек агента..."
 
@@ -11110,6 +11131,9 @@ msgstr "Авторы не найдены."
 
 msgid "No automations match"
 msgstr "Нет подходящих автоматизаций"
+
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "Нет доступных аккаунтов с подпиской. Добавьте аккаунт или войдите в разделе «Использование», затем обновите список."
 
 msgid "No branches found"
 msgstr "Ветки не найдены"
@@ -16725,6 +16749,9 @@ msgstr "Запускать новую сессию агента при кажд�
 msgid "Start a new chat"
 msgstr "Начать новый чат"
 
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "Запустите новый терминал с существующим входом. Другие чаты и аккаунт по умолчанию останутся без изменений."
+
 msgid "Start a session"
 msgstr "Запустить сессию"
 
@@ -16772,6 +16799,9 @@ msgstr "Запустите сессию кнопкой + в полосе вкл�
 
 msgid "Start or stop the workspace run command"
 msgstr "Запустить или остановить команду запуска рабочей области"
+
+msgid "Start terminal"
+msgstr "Запустить терминал"
 
 msgid "Start voice mode"
 msgstr "Запустить голосовой режим"
@@ -17792,6 +17822,9 @@ msgstr "То же приложение работает на iPad нативно
 msgid "The scorecard"
 msgstr "Таблица оценок"
 
+msgid "The selected login changed. Choose an account again."
+msgstr "Выбранный аккаунт изменился. Выберите аккаунт заново."
+
 msgid "The self-driving software factory"
 msgstr "Самоуправляемая софтверная фабрика"
 
@@ -17902,6 +17935,9 @@ msgstr "Этот агент не может ответвить разговор"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
+
+msgid "This agent configuration does not support account selection."
+msgstr "Эта конфигурация агента не поддерживает выбор аккаунта."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
@@ -18943,6 +18979,9 @@ msgstr "Обновите Superset на этом хосте, чтобы изме�
 msgid "update the branch prefix"
 msgstr "обновить префикс ветки"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "Обновите этот хост, чтобы выбрать аккаунт для нового терминала."
+
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
 
@@ -19033,6 +19072,9 @@ msgstr "Данные об использовании устарели"
 
 msgid "Usage sections"
 msgstr "Разделы использования"
+
+msgid "Usage unavailable"
+msgstr "Данные об использовании недоступны"
 
 msgid "Usage unavailable."
 msgstr "Данные об использовании недоступны."
