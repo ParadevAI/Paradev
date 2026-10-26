@@ -213,3 +213,65 @@ test("a failure after an opened connection looks the relay up again right away",
 	await buildControlUrl();
 	expect(resolveRelayUrl).toHaveBeenCalledTimes(2);
 });
+
+async function flush() {
+	for (let tick = 0; tick < 10; tick++) await Promise.resolve();
+}
+
+async function settle(ms = 0) {
+	await flush();
+	advance(ms);
+	await flush();
+	advance(0);
+	await flush();
+}
+
+test("repeated forbidden closes back off before reconnecting", async () => {
+	const onForbidden = mock(async () => {});
+	const client = new TunnelClient({
+		relayUrl: "https://relay.example",
+		hostId: "org:host",
+		getAuthToken: async () => "token",
+		localPort: 1234,
+		hostServiceSecret: "test",
+		onForbidden,
+	});
+	const refuse = (index: number) => {
+		const socket = FakeSocket.at(index);
+		socket.readyState = 3;
+		socket.dispatchEvent(
+			new CloseEvent("close", { code: 4403, reason: "Forbidden" }),
+		);
+	};
+	try {
+		await client.connect();
+		await settle();
+		expect(FakeSocket.instances).toHaveLength(1);
+
+		refuse(0);
+		await settle();
+		expect(onForbidden).toHaveBeenCalledTimes(1);
+		expect(FakeSocket.instances).toHaveLength(2);
+
+		refuse(1);
+		await settle();
+		expect(onForbidden).toHaveBeenCalledTimes(2);
+		expect(FakeSocket.instances).toHaveLength(2);
+		await settle(30_000);
+		expect(FakeSocket.instances).toHaveLength(3);
+
+		refuse(2);
+		await settle(30_000);
+		expect(FakeSocket.instances).toHaveLength(3);
+		await settle(30_000);
+		expect(FakeSocket.instances).toHaveLength(4);
+
+		FakeSocket.at(3).open();
+		refuse(3);
+		await settle();
+		expect(onForbidden).toHaveBeenCalledTimes(4);
+		expect(FakeSocket.instances).toHaveLength(5);
+	} finally {
+		client.close();
+	}
+});
