@@ -20,13 +20,17 @@ function persistDraft(draftKey: string, text: string): boolean {
 	}
 }
 
+function clearStoredDraft(draftKey: string, persisted: boolean) {
+	unsavedDrafts.set(draftKey, "");
+	if (!persisted || persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
+	for (const notify of clearedDraftListeners.get(draftKey) ?? []) notify();
+}
+
 export function discardComposerDraft(draftKey: string, persisted = true) {
 	pendingSubmissions.delete(draftKey);
 	recoveredAfterRead.delete(draftKey);
 	inFlightSubmissions.delete(draftKey);
-	unsavedDrafts.set(draftKey, "");
-	if (!persisted || persistDraft(draftKey, "")) unsavedDrafts.delete(draftKey);
-	for (const notify of clearedDraftListeners.get(draftKey) ?? []) notify();
+	clearStoredDraft(draftKey, persisted);
 }
 
 function readDraft(draftKey: string, fallback?: string): string | undefined {
@@ -149,7 +153,7 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 					(readDraft(draftKey) ?? "") !== submitted.text
 				)
 					return;
-				discardComposerDraft(draftKey, persisted);
+				clearStoredDraft(draftKey, persisted);
 			};
 		},
 		[draftKey, persisted],
@@ -162,7 +166,7 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 			draftTimer.current = null;
 			pendingDraftKey.current = null;
 		}
-		discardComposerDraft(draftKey, persisted);
+		clearStoredDraft(draftKey, persisted);
 	}, [draftKey, persisted]);
 
 	if (seed.draftKey !== draftKey) {
