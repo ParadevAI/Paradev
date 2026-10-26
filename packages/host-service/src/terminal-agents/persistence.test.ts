@@ -59,6 +59,96 @@ function seedSession(
 }
 
 describe("SqliteTerminalAgentBindingPersistence live reads", () => {
+	it("retains account selection and launch identity across a new store and resume read", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "pinned", status: "active", workspaceId: "ws-1" });
+		const account = {
+			agent: "claude" as const,
+			selection: "/fixture/profile",
+			directory: "/fixture/profile",
+			credentialKind: "subscription" as const,
+			identity: "a".repeat(64),
+			email: "fixture@example.test",
+			pinned: true as const,
+		};
+		const persistence = new SqliteTerminalAgentBindingPersistence(db);
+		const original = new TerminalAgentStore(persistence);
+		original.recordEvent({
+			terminalId: "pinned",
+			workspaceId: "ws-1",
+			agentId: "claude",
+			agentSessionId: "exact-native-id",
+			launchId: "launch-one",
+			account,
+			eventType: "Attached",
+			occurredAt: 3,
+		});
+		const recovered = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		expect(recovered.listByWorkspace("ws-1")[0]?.account).toEqual(account);
+		expect(recovered.get("pinned")?.launchId).toBe("launch-one");
+		markTerminalAgentBindingEnded(db, "pinned", "terminal-exited", 4);
+		expect(findResumeCandidateBinding(db, "ws-1", "pinned")?.account).toEqual(
+			account,
+		);
+	});
+
+	it("does not downgrade malformed saved account context to the default account", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "invalid", status: "active", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ accountJson: '{"pinned":true}' })
+			.where(eq(terminalAgentBindings.terminalId, "invalid"))
+			.run();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		expect(store.get("invalid")?.accountInvalid).toBe(true);
+		store.recordEvent({
+			terminalId: "invalid",
+			workspaceId: "ws-1",
+			agentId: "claude",
+			eventType: "Stop",
+			occurredAt: 3,
+		});
+		expect(
+			new SqliteTerminalAgentBindingPersistence(db).load()[0]?.accountInvalid,
+		).toBe(true);
+	});
+	it("persists a positively replaced account after restoring invalid context", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "replaced", status: "active", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ accountJson: '{"pinned":true}' })
+			.where(eq(terminalAgentBindings.terminalId, "replaced"))
+			.run();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		const account = {
+			agent: "claude" as const,
+			selection: "/fixture",
+			directory: "/fixture",
+			credentialKind: "subscription" as const,
+			identity: "alice",
+			pinned: true as const,
+		};
+		store.recordEvent({
+			terminalId: "replaced",
+			workspaceId: "ws-1",
+			agentId: "claude",
+			agentSessionId: "verified",
+			account,
+			eventType: "Attached",
+			occurredAt: 3,
+		});
+		const restored = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		).get("replaced");
+		expect(restored?.accountInvalid).toBeUndefined();
+		expect(restored?.account).toEqual(account);
+	});
 	it("hides bindings whose session is not active or workspace-less", () => {
 		const db = createTestDb();
 		// The workspaces FK on originWorkspaceId is nullable and unenforced in
@@ -651,5 +741,96 @@ describe("recordTerminalAgentTranscriptPath", () => {
 		expect(transcriptPathOf(db, "t-1")).toBe(
 			"/home/a/.claude/projects/x/s-1.jsonl",
 		);
+	});
+});
+
+describe("durable account provenance after ended-row recreation", () => {
+	const account = {
+		agent: "claude" as const,
+		selection: "/fixture/profile",
+		directory: "/fixture/profile",
+		credentialKind: "subscription" as const,
+		identity: "a".repeat(64),
+		pinned: true as const,
+	};
+	const attach = {
+		terminalId: "durable",
+		workspaceId: "ws-1",
+		agentId: "claude" as const,
+		agentSessionId: "native-session",
+		launchId: "native-launch",
+		eventType: "Attached",
+		occurredAt: 3,
+	};
+	function seeded(
+		reason: "detached" | "terminal-exited" | "resumed" | "disposed",
+	) {
+		const db = createTestDb();
+		seedSession(db, { id: "durable", status: "active", workspaceId: "ws-1" });
+		new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		).recordEvent({ ...attach, account });
+		markTerminalAgentBindingEnded(db, "durable", reason, 4);
+		const original = db.query.terminalAgentBindings.findFirst().sync();
+		if (!original) throw new Error("Missing synthetic binding");
+		return {
+			db,
+			startedAt: original.startedAt,
+			store: new TerminalAgentStore(
+				new SqliteTerminalAgentBindingPersistence(db),
+			),
+		};
+	}
+	it("preserves exact native-launch account and start time after detached or terminal-exited recreation", () => {
+		for (const reason of ["detached", "terminal-exited"] as const) {
+			const { db, store, startedAt } = seeded(reason);
+			store.recordEvent({ ...attach, occurredAt: 5 });
+			expect(store.get("durable")?.account).toEqual(account);
+			expect(store.get("durable")?.startedAt).toBe(startedAt);
+			expect(
+				new SqliteTerminalAgentBindingPersistence(db).load()[0]?.account,
+			).toEqual(account);
+		}
+	});
+	it("does not revive consumed or deliberately disposed native launches", () => {
+		for (const reason of ["resumed", "disposed"] as const) {
+			const { db, store } = seeded(reason);
+			store.recordEvent({ ...attach, occurredAt: 5 });
+			expect(store.get("durable")).toBeUndefined();
+			expect(db.query.terminalAgentBindings.findFirst().sync()?.endReason).toBe(
+				reason,
+			);
+		}
+	});
+	it("permits a fresh launch-less native session after a consumed launch without inheriting its account", () => {
+		for (const reason of ["resumed", "disposed"] as const) {
+			const { db, store } = seeded(reason);
+			store.recordEvent({ ...attach, launchId: undefined, occurredAt: 5 });
+			expect(store.get("durable")).toBeUndefined();
+			store.recordEvent({
+				...attach,
+				launchId: undefined,
+				agentSessionId: "fresh-native-session",
+				occurredAt: 6,
+			});
+			expect(store.get("durable")?.agentSessionId).toBe("fresh-native-session");
+			expect(store.get("durable")?.account).toBeUndefined();
+			expect(
+				db.query.terminalAgentBindings.findFirst().sync()?.endReason,
+			).toBeNull();
+		}
+	});
+	it("does not transfer saved account provenance to a different workspace, provider, native session or launch", () => {
+		for (const change of [
+			{ workspaceId: "ws-2" },
+			{ agentId: "codex" as const },
+			{ agentSessionId: "other-native" },
+			{ launchId: "other-launch" },
+			{ launchId: undefined },
+		]) {
+			const { store } = seeded("detached");
+			store.recordEvent({ ...attach, ...change, occurredAt: 5 });
+			expect(store.get("durable")?.account).toBeUndefined();
+		}
 	});
 });

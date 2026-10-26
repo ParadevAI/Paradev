@@ -23,6 +23,12 @@ import {
 import { HOST_CHAT_RESUME_MARKER_FILE } from "@superset/shared/host-version";
 import type { Hono, MiddlewareHandler } from "hono";
 import type { HostDb } from "../db";
+import {
+	ACCOUNT_CHAT_HARNESSES,
+	prepareChatAccount,
+	validateChatAccount,
+} from "./accountLaunch";
+import { prepareChatAccountSwitch } from "./accountSwitch";
 import { cliFloor } from "./acpCatalogue";
 import { acpHarnessEntries } from "./acpHarnesses";
 import { resolveAgentCli } from "./agentCli";
@@ -138,6 +144,8 @@ export function createChatV3Mount(options: {
 			harnesses: harnessRegistry(options.db, options.agents),
 			observer: options.agents,
 			onSessionChanged: options.onSessionChanged,
+			validateAccountLaunch: (context, harness, scopeId) =>
+				validateChatAccount(options.db, context, harness, scopeId),
 		});
 		return built;
 	};
@@ -184,7 +192,13 @@ export function registerChatV3Routes(options: {
 	options.app.use(`${endpoint}/*`, (c, next) => {
 		handler ??= trpcServer({
 			endpoint,
-			router: createChatRouter(options.mount.runtime(), { resolveCwd }),
+			router: createChatRouter(options.mount.runtime(), {
+				resolveCwd,
+				accountHarnesses: ACCOUNT_CHAT_HARNESSES,
+				prepareAccount: prepareChatAccount,
+				prepareAccountSwitch: (input) =>
+					prepareChatAccountSwitch(options.db, input),
+			}),
 		});
 		return handler(c, next);
 	});

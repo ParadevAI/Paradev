@@ -9,6 +9,7 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { AcpChatPane } from "./components/AcpChatPane";
+import { adoptAccountChatSession } from "./components/AcpChatPane/utils/accountPaneState";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
 import { openChatHistory } from "./utils/chatHistoryOpen";
@@ -61,6 +62,17 @@ export function ChatPane({
 			<AcpChatPane
 				key={`${data.terminalId}:${data.agent?.id}`}
 				agent={data.agent}
+				accountBound={data.accountBound}
+				accountDraftId={data.accountDraftId}
+				accountLaunch={data.accountLaunch}
+				onAccountBound={() => {
+					if (!latest.current.accountBound)
+						ctx.actions.updateData({ ...latest.current, accountBound: true });
+				}}
+				onAccountSessionCreated={(result) => {
+					latest.current = adoptAccountChatSession(latest.current, result);
+					ctx.actions.updateData(latest.current);
+				}}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={() => {
 					const {
@@ -86,7 +98,7 @@ export function ChatPane({
 					const retitled = title !== undefined && title !== data.chatTitle;
 					if (!rebound && !retitled) return;
 					ctx.actions.updateData({
-						...data,
+						...latest.current,
 						...(rebound
 							? { agent: { ...rebound, sessionId: harnessSessionId } }
 							: {}),
@@ -94,6 +106,7 @@ export function ChatPane({
 					});
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
+					if (latest.current.accountBound) return;
 					ctx.actions.setTitle(label);
 					ctx.actions.updateData({
 						terminalId: data.terminalId,
@@ -161,7 +174,7 @@ export function ChatPane({
 				}}
 				onModeChange={(chatModeId) => {
 					if (data.agent) saveChatMode(data.agent.id, chatModeId);
-					ctx.actions.updateData({ ...data, chatModeId });
+					ctx.actions.updateData({ ...latest.current, chatModeId });
 				}}
 				onSessionCreated={(sessionId, pendingPrompt) =>
 					ctx.actions.updateData({

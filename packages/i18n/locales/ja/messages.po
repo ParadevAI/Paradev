@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "残り{remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} は、この組織の GitHub App がインストールされている {installedAccountLogin} にありません。"
 
@@ -2063,6 +2066,12 @@ msgstr "エージェントセッションを開始しました"
 
 msgid "agent settings"
 msgstr "エージェント設定"
+
+msgid "Agent terminal with account"
+msgstr "アカウントを指定してエージェントターミナルを起動"
+
+msgid "Agent terminal with account…"
+msgstr "アカウントを指定してエージェントターミナルを起動…"
 
 msgid "Agent usage rankings"
 msgstr "エージェント使用量ランキング"
@@ -3715,6 +3724,9 @@ msgstr "チャットセッションが見つかりません"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "チャットの構成要素: メッセージ、推論、提案"
 
+msgid "Chat with account"
+msgstr "アカウントを指定してチャット"
+
 msgid "Check again"
 msgstr "再確認"
 
@@ -4115,6 +4127,9 @@ msgstr "モーダルを閉じる"
 
 msgid "Close modal backdrop"
 msgstr "モーダルの背景を閉じる"
+
+msgid "Close only this idle agent and switch. Finish background work and save any unsent draft first."
+msgstr "この待機中のエージェントだけを終了してアカウントを切り替えます。先にバックグラウンド作業を完了し、未送信の下書きを保存してください。"
 
 msgid "Close or delete the current workspace"
 msgstr "現在のワークスペースを閉じるか削除する"
@@ -4521,6 +4536,9 @@ msgstr "終了前に確認"
 
 msgid "Confirm switch"
 msgstr "変更を確定"
+
+msgid "Confirm that this agent can close safely before switching."
+msgstr "切り替える前に、このエージェントを安全に終了できることを確認してください。"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -5089,6 +5107,9 @@ msgstr "ファイルを削除できませんでした"
 msgid "Could not delete this page"
 msgstr "このページを削除できませんでした"
 
+msgid "Could not discard the queued message."
+msgstr "キュー内のメッセージを破棄できませんでした。"
+
 msgid "Could not disconnect."
 msgstr "接続を解除できませんでした。"
 
@@ -5103,6 +5124,9 @@ msgstr "キューから抜けられませんでした"
 
 msgid "Could not list directory"
 msgstr "ディレクトリを一覧表示できませんでした"
+
+msgid "Could not load accounts"
+msgstr "アカウントを読み込めませんでした"
 
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
@@ -5189,6 +5213,9 @@ msgstr "再有効化できませんでした"
 msgid "Could not read MCP servers."
 msgstr "MCPサーバーを読み込めませんでした。"
 
+msgid "Could not read queued messages."
+msgstr "キュー内のメッセージを読み取れませんでした。"
+
 msgid "Could not read selected file"
 msgstr "選択したファイルを読み取れませんでした"
 
@@ -5203,6 +5230,9 @@ msgstr "クラウドワークスペースを記録できませんでした"
 
 msgid "Could not record environment"
 msgstr "環境を保存できませんでした"
+
+msgid "Could not refresh usage"
+msgstr "使用量を更新できませんでした"
 
 msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
@@ -5234,6 +5264,9 @@ msgstr "再開できませんでした"
 msgid "Could not resume the chat"
 msgstr "チャットを再開できませんでした"
 
+msgid "Could not resume this conversation"
+msgstr "この会話を再開できませんでした"
+
 msgid "Could not send"
 msgstr "送信できませんでした"
 
@@ -5248,6 +5281,12 @@ msgstr "共有できませんでした"
 
 msgid "Could not start agent"
 msgstr "エージェントを起動できませんでした"
+
+msgid "Could not start agent terminal"
+msgstr "エージェントターミナルを起動できませんでした"
+
+msgid "Could not start chat"
+msgstr "チャットを開始できませんでした"
 
 msgid "Could not start checkout. Please try again."
 msgstr "チェックアウトを開始できませんでした。もう一度お試しください。"
@@ -5270,11 +5309,17 @@ msgstr "停止できませんでした"
 msgid "Could not stop the agent"
 msgstr "エージェントを停止できませんでした"
 
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "エージェントを停止できませんでした。キュー内のメッセージを確認するか、このホストを更新してから再試行してください。"
+
 msgid "Could not stop watching"
 msgstr "監視を停止できませんでした"
 
 msgid "Could not submit prompt. Try again."
 msgstr "プロンプトを送信できませんでした。もう一度お試しください。"
+
+msgid "Could not switch account"
+msgstr "アカウントを切り替えられませんでした"
 
 msgid "Could not take a screenshot"
 msgstr "スクリーンショットを撮れませんでした"
@@ -6441,6 +6486,9 @@ msgstr "「{discardBasename}」への変更を破棄しますか?"
 
 msgid "Discard changes?"
 msgstr "変更を破棄しますか?"
+
+msgid "Discard queued message"
+msgstr "キュー内のメッセージを破棄"
 
 msgid "Discard recording"
 msgstr "録音を破棄"
@@ -9998,6 +10046,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "読み込み中"
 
+msgid "Loading accounts…"
+msgstr "アカウントを読み込み中…"
+
 msgid "Loading agent settings..."
 msgstr "エージェント設定を読み込み中..."
 
@@ -11110,6 +11161,9 @@ msgstr "作成者が見つかりません。"
 
 msgid "No automations match"
 msgstr "一致するオートメーションがありません"
+
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "利用可能なサブスクリプションアカウントがありません。「使用量」でアカウントを追加するかログインしてから、更新してください。"
 
 msgid "No branches found"
 msgstr "ブランチが見つかりません"
@@ -14431,6 +14485,12 @@ msgstr "閉じたタブを再度開く"
 msgid "Reopen PR"
 msgstr "PRを再オープン"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "同じワークスペースで保存済みの会話を再度開きます。メッセージは送信されません。バックグラウンドの作業は引き継がれません。"
+
+msgid "Reopen this exact saved conversation with another account. Other chats stay running. No message is sent."
+msgstr "保存されたこの会話を別のアカウントで再度開きます。他のチャットは実行を継続します。メッセージは送信されません。"
+
 msgid "Reopen thread"
 msgstr "スレッドを再開"
 
@@ -14786,6 +14846,12 @@ msgstr "再開時の引数"
 
 msgid "Resume automation"
 msgstr "オートメーションを再開"
+
+msgid "Resume conversation"
+msgstr "会話を再開"
+
+msgid "Resume with another account"
+msgstr "別のアカウントで再開"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -16719,11 +16785,17 @@ msgstr "会話を始めるとここにメッセージが表示されます"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "このターミナルの直近のコンテキストを引き継いで、新しいエージェントセッションを開始します。ワークスペースのファイルが引き続き信頼できる情報源です。"
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "既存のログインを使ってネイティブチャットを開始します。復旧時もこのアカウントと作業フォルダを維持します。"
+
 msgid "Start a new agent session each run"
 msgstr "実行ごとに新しいエージェントセッションを開始"
 
 msgid "Start a new chat"
 msgstr "新しいチャットを開始"
+
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "既存のログインを使って新しいターミナルを起動します。他のチャットと既定のアカウントは変更されません。"
 
 msgid "Start a session"
 msgstr "セッションを開始"
@@ -16745,6 +16817,9 @@ msgstr "ブラウジングを開始"
 
 msgid "Start building in two."
 msgstr "ツーステップで開発を始めよう。"
+
+msgid "Start chat"
+msgstr "チャットを開始"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "iPhone や iPad からコーディングエージェントを起動し、ライブで見守り、差分をレビュー。App Store で配信中。Android 版は近日公開。"
@@ -16772,6 +16847,9 @@ msgstr "タブバーの+から開始できます。"
 
 msgid "Start or stop the workspace run command"
 msgstr "ワークスペースの実行コマンドを開始または停止する"
+
+msgid "Start terminal"
+msgstr "ターミナルを起動"
 
 msgid "Start voice mode"
 msgstr "音声モードを開始"
@@ -16884,6 +16962,12 @@ msgstr "{label} を停止"
 msgid "Stop {name}"
 msgstr "{name} を停止"
 
+msgid "Stop agent"
+msgstr "エージェントを停止"
+
+msgid "Stop agent and background work"
+msgstr "エージェントとバックグラウンド作業を停止"
+
 msgid "Stop dictation"
 msgstr "音声入力を停止"
 
@@ -16902,6 +16986,9 @@ msgstr "エージェントを停止して今すぐ送信"
 
 msgid "Stop the agent before you edit a message"
 msgstr "メッセージを編集する前にエージェントを停止してください"
+
+msgid "Stop this agent and its background work?"
+msgstr "このエージェントとバックグラウンド作業を停止しますか？"
 
 msgid "Stop watching"
 msgstr "監視を停止"
@@ -17043,6 +17130,9 @@ msgstr "継続"
 
 msgid "Sustain · active days in 30"
 msgstr "継続 · 30日間のアクティブ日数"
+
+msgid "Switch account"
+msgstr "アカウントを切り替え"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "エージェントは替える。ワークフローはそのまま"
@@ -17792,6 +17882,12 @@ msgstr "同じアプリが iPad でネイティブに動作し、縦向きにも
 msgid "The scorecard"
 msgstr "スコアカード"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "選択したアカウントのチャットを、保存済みのレイアウトデータで確認できませんでした。今回の試行では何も起動していません。ストレージがいっぱいの場合は空き容量を確保し、このタブの名前を変更してレイアウトを保存してから再試行してください。それでも失敗する場合は、このタブを開いたままにしてください。"
+
+msgid "The selected login changed. Choose an account again."
+msgstr "選択したログインが変更されました。アカウントを選び直してください。"
+
 msgid "The self-driving software factory"
 msgstr "自動運転するソフトウェア工場"
 
@@ -17870,6 +17966,9 @@ msgstr "これらのコマンドはワークスペース作成時に自動的に
 msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
 msgstr "これらのフォルダにはファイルが残っていますが、新しい Paradev に自動では移行されませんでした。"
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "これらのメッセージは送信されていません。必要な内容をコピーし、再開する前にキューを破棄してください。"
+
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
 
@@ -17903,6 +18002,9 @@ msgstr "このエージェントは会話を分岐できません"
 msgid "This agent can't run in a cloud workspace"
 msgstr "このエージェントはクラウドワークスペースで実行できません"
 
+msgid "This agent configuration does not support account selection."
+msgstr "このエージェント設定ではアカウントを選択できません。"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"
 
@@ -17931,6 +18033,9 @@ msgstr "このオートメーションは別の組織にあります"
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
 
+msgid "This chat could not be opened with its saved account."
+msgstr "保存されたアカウントでこのチャットを開けませんでした。"
+
 msgid "This chat has ended."
 msgstr "このチャットは終了しました。"
 
@@ -17957,6 +18062,12 @@ msgstr "このクラウドワークスペースを起動できません"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "この会話は別のアカウントでは再開できません。"
+
+msgid "This conversation is no longer available to resume."
+msgstr "この会話は再開できなくなりました。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "再起動やクラッシュからの復旧に使う保存済みスクロールバックを削除します。"
@@ -17999,6 +18110,9 @@ msgstr "このGitHubインストールは別のParadev組織にすでに接続�
 
 msgid "This host"
 msgstr "このホスト"
+
+msgid "This host does not support account selection for native chats."
+msgstr "このホストはネイティブチャットのアカウント選択に対応していません。"
 
 msgid "This host has not reported a version yet."
 msgstr "このホストはまだバージョンを報告していません。"
@@ -18161,6 +18275,9 @@ msgstr "このスラッグは使用済みです"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "組織内のすべてのTeamsトリガーが停止し、テナントから通知サブスクリプションが削除されます。いつでも再接続できます。"
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "エージェントのプロセスと、そのプロセスが管理するバックグラウンド作業を停止します。保存済みの会話は引き続き利用できます。まずキュー内のメッセージを確認して破棄してください。その後で「再開」を選択できます。"
 
 msgid "This subagent can't move to the background now"
 msgstr "このサブエージェントは今はバックグラウンドに移動できません"
@@ -18943,6 +19060,9 @@ msgstr "ワークスペースの設定を編集するには、このホストの
 msgid "update the branch prefix"
 msgstr "ブランチのプレフィックスを更新する"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "新しいターミナルのアカウントを選択するには、このホストを更新してください。"
+
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"
 
@@ -19033,6 +19153,9 @@ msgstr "使用状況が古くなっています"
 
 msgid "Usage sections"
 msgstr "使用量セクション"
+
+msgid "Usage unavailable"
+msgstr "使用状況を取得できません"
 
 msgid "Usage unavailable."
 msgstr "使用量を取得できません。"

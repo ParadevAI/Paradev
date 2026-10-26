@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} de {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} restante"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} no está en {installedAccountLogin}, donde está instalada la GitHub App de esta organización."
 
@@ -2063,6 +2066,12 @@ msgstr "Sesión de agente iniciada"
 
 msgid "agent settings"
 msgstr "configuración del agente"
+
+msgid "Agent terminal with account"
+msgstr "Terminal de agente con cuenta"
+
+msgid "Agent terminal with account…"
+msgstr "Terminal de agente con cuenta…"
 
 msgid "Agent usage rankings"
 msgstr "Rankings de uso de agentes"
@@ -3715,6 +3724,9 @@ msgstr "Sesión de chat no encontrada"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Superficies de chat: mensajes, razonamiento, sugerencias"
 
+msgid "Chat with account"
+msgstr "Chat con cuenta"
+
 msgid "Check again"
 msgstr "Volver a comprobar"
 
@@ -4115,6 +4127,9 @@ msgstr "Cerrar el modal"
 
 msgid "Close modal backdrop"
 msgstr "Cerrar el fondo del modal"
+
+msgid "Close only this idle agent and switch. Finish background work and save any unsent draft first."
+msgstr "Cerrar solo este agente inactivo y cambiar de cuenta. Primero termina el trabajo en segundo plano y guarda los borradores sin enviar."
 
 msgid "Close or delete the current workspace"
 msgstr "Cerrar o eliminar el espacio de trabajo actual"
@@ -4521,6 +4536,9 @@ msgstr "Confirmar antes de salir"
 
 msgid "Confirm switch"
 msgstr "Confirmar cambio"
+
+msgid "Confirm that this agent can close safely before switching."
+msgstr "Confirma que este agente se puede cerrar de forma segura antes de cambiar."
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -5089,6 +5107,9 @@ msgstr "No se pudo eliminar el archivo"
 msgid "Could not delete this page"
 msgstr "No se pudo eliminar esta página"
 
+msgid "Could not discard the queued message."
+msgstr "No se pudo descartar el mensaje en cola."
+
 msgid "Could not disconnect."
 msgstr "No se pudo desconectar."
 
@@ -5103,6 +5124,9 @@ msgstr "No se pudo salir de la cola"
 
 msgid "Could not list directory"
 msgstr "No se pudo listar el directorio"
+
+msgid "Could not load accounts"
+msgstr "No se pudieron cargar las cuentas"
 
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
@@ -5189,6 +5213,9 @@ msgstr "No se pudo reactivar"
 msgid "Could not read MCP servers."
 msgstr "No se pudieron leer los servidores MCP."
 
+msgid "Could not read queued messages."
+msgstr "No se pudieron leer los mensajes en cola."
+
 msgid "Could not read selected file"
 msgstr "No se pudo leer el archivo seleccionado"
 
@@ -5203,6 +5230,9 @@ msgstr "No se pudo registrar el espacio de trabajo en la nube"
 
 msgid "Could not record environment"
 msgstr "No se pudo guardar el entorno"
+
+msgid "Could not refresh usage"
+msgstr "No se pudo actualizar el uso"
 
 msgid "Could not remove access"
 msgstr "No se pudo quitar el acceso"
@@ -5234,6 +5264,9 @@ msgstr "No se pudo reanudar"
 msgid "Could not resume the chat"
 msgstr "No se pudo reanudar el chat"
 
+msgid "Could not resume this conversation"
+msgstr "No se pudo reanudar esta conversación"
+
 msgid "Could not send"
 msgstr "No se pudo enviar"
 
@@ -5248,6 +5281,12 @@ msgstr "No se pudo compartir"
 
 msgid "Could not start agent"
 msgstr "No se pudo iniciar el agente"
+
+msgid "Could not start agent terminal"
+msgstr "No se pudo iniciar el terminal del agente"
+
+msgid "Could not start chat"
+msgstr "No se pudo iniciar el chat"
 
 msgid "Could not start checkout. Please try again."
 msgstr "No se pudo iniciar el pago. Inténtalo de nuevo."
@@ -5270,11 +5309,17 @@ msgstr "No se pudo detener"
 msgid "Could not stop the agent"
 msgstr "No se pudo detener el agente"
 
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "No se pudo detener el agente. Revisa los mensajes en cola o actualiza este host y vuelve a intentarlo."
+
 msgid "Could not stop watching"
 msgstr "No se pudo dejar de observar"
 
 msgid "Could not submit prompt. Try again."
 msgstr "No se pudo enviar el prompt. Inténtalo de nuevo."
+
+msgid "Could not switch account"
+msgstr "No se pudo cambiar de cuenta"
 
 msgid "Could not take a screenshot"
 msgstr "No se pudo hacer la captura"
@@ -6441,6 +6486,9 @@ msgstr "¿Descartar los cambios de \"{discardBasename}\"?"
 
 msgid "Discard changes?"
 msgstr "¿Descartar los cambios?"
+
+msgid "Discard queued message"
+msgstr "Descartar mensaje en cola"
 
 msgid "Discard recording"
 msgstr "Descartar la grabación"
@@ -9998,6 +10046,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Cargando"
 
+msgid "Loading accounts…"
+msgstr "Cargando cuentas…"
+
 msgid "Loading agent settings..."
 msgstr "Cargando la configuración del agente..."
 
@@ -11110,6 +11161,9 @@ msgstr "No se encontraron autores."
 
 msgid "No automations match"
 msgstr "Ninguna automatización coincide"
+
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "No hay cuentas de suscripción disponibles. Ve a Uso para añadir una cuenta o iniciar sesión en ella y luego actualiza."
 
 msgid "No branches found"
 msgstr "No se encontraron ramas"
@@ -14431,6 +14485,12 @@ msgstr "Reabrir pestaña cerrada"
 msgid "Reopen PR"
 msgstr "Reabrir PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Vuelve a abrir la conversación guardada en el mismo espacio de trabajo. No se envía ningún mensaje. El trabajo en segundo plano no se transfiere."
+
+msgid "Reopen this exact saved conversation with another account. Other chats stay running. No message is sent."
+msgstr "Reabrir esta misma conversación guardada con otra cuenta. Los demás chats siguen funcionando. No se envía ningún mensaje."
+
 msgid "Reopen thread"
 msgstr "Reabrir el hilo"
 
@@ -14786,6 +14846,12 @@ msgstr "Argumentos de reanudación"
 
 msgid "Resume automation"
 msgstr "Reanudar la automatización"
+
+msgid "Resume conversation"
+msgstr "Reanudar conversación"
+
+msgid "Resume with another account"
+msgstr "Reanudar con otra cuenta"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -16719,11 +16785,17 @@ msgstr "Inicia una conversación para ver los mensajes aquí"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "Inicia una nueva sesión de agente con el contexto reciente de este terminal. Los archivos del espacio de trabajo siguen siendo la fuente de verdad."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "Inicia un chat nativo usando una cuenta ya conectada. La recuperación mantiene esta cuenta y carpeta de trabajo."
+
 msgid "Start a new agent session each run"
 msgstr "Iniciar una nueva sesión de agente en cada ejecución"
 
 msgid "Start a new chat"
 msgstr "Iniciar un chat nuevo"
+
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "Inicia un nuevo terminal usando una cuenta ya conectada. Los demás chats y tu cuenta predeterminada no cambiarán."
 
 msgid "Start a session"
 msgstr "Iniciar una sesión"
@@ -16745,6 +16817,9 @@ msgstr "Empezar a navegar"
 
 msgid "Start building in two."
 msgstr "Empieza a construir en dos."
+
+msgid "Start chat"
+msgstr "Iniciar chat"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "Inicia agentes de código, síguelos en directo y revisa el diff desde tu iPhone o iPad. Disponible en la App Store; Android llegará pronto."
@@ -16772,6 +16847,9 @@ msgstr "Inicia una con + en la barra de pestañas."
 
 msgid "Start or stop the workspace run command"
 msgstr "Iniciar o detener el comando de ejecución del espacio de trabajo"
+
+msgid "Start terminal"
+msgstr "Iniciar terminal"
 
 msgid "Start voice mode"
 msgstr "Iniciar el modo de voz"
@@ -16884,6 +16962,12 @@ msgstr "Detener {label}"
 msgid "Stop {name}"
 msgstr "Detener {name}"
 
+msgid "Stop agent"
+msgstr "Detener agente"
+
+msgid "Stop agent and background work"
+msgstr "Detener agente y tareas en segundo plano"
+
 msgid "Stop dictation"
 msgstr "Detener el dictado"
 
@@ -16902,6 +16986,9 @@ msgstr "Detener el agente y enviar ahora"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Detén el agente antes de editar un mensaje"
+
+msgid "Stop this agent and its background work?"
+msgstr "¿Detener este agente y sus tareas en segundo plano?"
 
 msgid "Stop watching"
 msgstr "Dejar de observar"
@@ -17043,6 +17130,9 @@ msgstr "Constancia"
 
 msgid "Sustain · active days in 30"
 msgstr "Constancia · días activos de 30"
+
+msgid "Switch account"
+msgstr "Cambiar de cuenta"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Cambia de agente. Conserva tu flujo de trabajo"
@@ -17792,6 +17882,12 @@ msgstr "La misma app funciona de forma nativa en iPad, en vertical y en horizont
 msgid "The scorecard"
 msgstr "El cuadro de resultados"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "No se pudo verificar el chat de la cuenta seleccionada en los datos de diseño guardados. Este intento no inició nada. Si el almacenamiento está lleno, libera espacio y cambia el nombre de esta pestaña para guardar su diseño antes de volver a intentarlo. Mantén esta pestaña abierta si el problema persiste."
+
+msgid "The selected login changed. Choose an account again."
+msgstr "El inicio de sesión seleccionado ha cambiado. Vuelve a elegir una cuenta."
+
 msgid "The self-driving software factory"
 msgstr "La fábrica de software autónoma"
 
@@ -17870,6 +17966,9 @@ msgstr "Estos comandos se ejecutan automáticamente al crear un espacio de traba
 msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
 msgstr "Estas carpetas aún tienen tus archivos, pero no se pasaron solas al nuevo Paradev."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "Estos mensajes no se enviaron. Copia lo que necesites y luego vacía la cola antes de reanudar."
+
 msgid "These ports are still in use"
 msgstr "Estos puertos siguen en uso"
 
@@ -17903,6 +18002,9 @@ msgstr "Este agente no puede bifurcar una conversación"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Este agente no puede ejecutarse en un espacio de trabajo en la nube"
 
+msgid "This agent configuration does not support account selection."
+msgstr "Esta configuración de agente no permite seleccionar una cuenta."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente ya no existe en el dispositivo seleccionado (puede que sus agentes se hayan restablecido). Las ejecuciones fallarán hasta que elijas uno nuevo."
 
@@ -17931,6 +18033,9 @@ msgstr "Esta automatización está en otra organización"
 msgid "This cannot be undone."
 msgstr "Esto no se puede deshacer."
 
+msgid "This chat could not be opened with its saved account."
+msgstr "No se pudo abrir este chat con su cuenta guardada."
+
 msgid "This chat has ended."
 msgstr "Este chat ha terminado."
 
@@ -17957,6 +18062,12 @@ msgstr "No se puede iniciar este espacio de trabajo en la nube"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este espacio de trabajo en la nube se está reactivando, lo que puede tardar hasta 30 segundos tras un periodo de inactividad."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Esta conversación no se puede reanudar con otra cuenta."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Esta conversación ya no está disponible para reanudarla."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Esto elimina el historial guardado que se usa para recuperarse tras un reinicio o un cierre inesperado."
@@ -17999,6 +18110,9 @@ msgstr "Esta instalación de GitHub ya está conectada a otra organización de P
 
 msgid "This host"
 msgstr "Este host"
+
+msgid "This host does not support account selection for native chats."
+msgstr "Este host no admite la selección de cuentas para chats nativos."
 
 msgid "This host has not reported a version yet."
 msgstr "Este host aún no ha informado de una versión."
@@ -18161,6 +18275,9 @@ msgstr "Este slug ya está en uso"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "Esto detiene todos los disparadores de Teams de tu organización y quita las suscripciones de notificaciones de tu tenant. Puedes volver a conectarlo cuando quieras."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "Esto detiene el proceso del agente y sus tareas en segundo plano. La conversación guardada seguirá disponible. Primero revisa y descarta los mensajes en cola. Después puedes elegir Reanudar."
 
 msgid "This subagent can't move to the background now"
 msgstr "Este subagente no se puede mover a segundo plano ahora"
@@ -18943,6 +19060,9 @@ msgstr "Actualiza Superset en este host para editar la configuración del espaci
 msgid "update the branch prefix"
 msgstr "actualizar el prefijo de rama"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "Actualiza este host para elegir una cuenta para un nuevo terminal."
+
 msgid "Update this host to message subagents"
 msgstr "Actualiza este host para enviar mensajes a los subagentes"
 
@@ -19033,6 +19153,9 @@ msgstr "Los datos de uso están desactualizados"
 
 msgid "Usage sections"
 msgstr "Secciones de uso"
+
+msgid "Usage unavailable"
+msgstr "Uso no disponible"
 
 msgid "Usage unavailable."
 msgstr "Uso no disponible."

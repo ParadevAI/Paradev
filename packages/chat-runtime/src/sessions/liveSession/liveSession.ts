@@ -23,6 +23,7 @@ export type LiveSessionOptions = {
 	scopeId: string;
 	harness: string;
 	terminalId?: string;
+	retainQueuedOnStop?: boolean;
 	journal: ChatJournal;
 	publish: (envelope: Envelope) => void;
 	adapter: HarnessAdapter;
@@ -392,7 +393,7 @@ export class LiveSession {
 
 	async dispose(): Promise<void> {
 		this.stopped = true;
-		this.discardPending();
+		this.settlePendingOnStop();
 		await this.options.adapter.dispose();
 		await this.pump;
 	}
@@ -426,6 +427,13 @@ export class LiveSession {
 					if (steered && this.queue[0]?.item.id === steered) {
 						this.options.adapter.cancelTurn();
 					}
+				} else if (
+					this.options.retainQueuedOnStop &&
+					event.turn.status === "failed" &&
+					this.steerTarget === null &&
+					this.queue.length > 0
+				) {
+					this.pauseQueue();
 				} else {
 					this.noteSilentTurn(event.turn);
 					this.deliverNextQueued();
@@ -433,7 +441,7 @@ export class LiveSession {
 				return;
 			}
 			case "session":
-				if (event.session.status === "dead") this.discardPending();
+				if (event.session.status === "dead") this.settlePendingOnStop();
 				this.emitSession(event.session);
 				this.releaseHeldPrompts();
 				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
@@ -606,7 +614,7 @@ export class LiveSession {
 			};
 			this.appendDurable({ type: "turn", turn: this.currentTurn });
 		}
-		this.discardPending();
+		this.settlePendingOnStop();
 		this.appendDurable({
 			type: "item",
 			item: {
@@ -628,6 +636,16 @@ export class LiveSession {
 			item: { ...withoutQueued(prompt.item), discarded: true },
 			turnId: prompt.turnId,
 		});
+	}
+
+	private settlePendingOnStop(): void {
+		const retained = this.options.retainQueuedOnStop
+			? this.queue.splice(0)
+			: [];
+		this.discardPending();
+		this.queue.push(...retained);
+		if (this.options.retainQueuedOnStop && this.queue.length > 0)
+			this.pauseQueue();
 	}
 
 	private discardPending(): void {
@@ -654,6 +672,12 @@ export class LiveSession {
 		const next = this.queue.shift();
 		if (!next) return;
 		this.deliver(next);
+	}
+
+	private pauseQueue(): void {
+		if (this.queuePaused) return;
+		this.queuePaused = true;
+		this.emitSession({ queuePaused: true });
 	}
 
 	private unpauseIfEmpty(): void {

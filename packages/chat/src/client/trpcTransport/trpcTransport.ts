@@ -2,6 +2,9 @@ import type { ChatTransport } from "../sessionClient";
 
 type Mutation =
 	| "createSession"
+	| "createAccountSession"
+	| "recoverAccountSession"
+	| "switchAccountSession"
 	| "prompt"
 	| "removeQueuedPrompt"
 	| "steerQueuedPrompt"
@@ -14,10 +17,13 @@ type Mutation =
 	| "setMode"
 	| "setConfigOption"
 	| "closeSession"
+	| "closeStoppedAccountSession"
 	| "forkSession"
 	| "rewindSession";
 
 type Query =
+	| "accountCapabilities"
+	| "accountSessionByCommand"
 	| "getSession"
 	| "getQueue"
 	| "listSessions"
@@ -36,6 +42,13 @@ export type ChatTrpcClient = {
 /** Each app builds its own client (auth, links); the mapping is the same. */
 export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 	return {
+		accountCapabilities: (input) => client.accountCapabilities.query(input),
+		accountSessionByCommand: (input) =>
+			client.accountSessionByCommand.query(input),
+		switchAccountSession: (input) => client.switchAccountSession.mutate(input),
+		createAccountSession: (input) => client.createAccountSession.mutate(input),
+		recoverAccountSession: (input) =>
+			client.recoverAccountSession.mutate(input),
 		createSession: (input) => client.createSession.mutate(input),
 		prompt: (input) => client.prompt.mutate(input),
 		removeQueuedPrompt: (input) => client.removeQueuedPrompt.mutate(input),
@@ -49,6 +62,8 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		setMode: (input) => client.setMode.mutate(input),
 		setConfigOption: (input) => client.setConfigOption.mutate(input),
 		closeSession: (input) => client.closeSession.mutate(input),
+		closeStoppedAccountSession: (input) =>
+			client.closeStoppedAccountSession.mutate(input),
 		forkSession: (input) => client.forkSession.mutate(input),
 		rewindSession: (input) => client.rewindSession.mutate(input),
 		getSession: (input) => client.getSession.query(input),

@@ -205,6 +205,7 @@ function sessionMissing(error: unknown): boolean {
 }
 
 export type AcpAdapterOptions = SpawnAcpOptions & {
+	beforePrompt?: () => Promise<void>;
 	launch?: () => Promise<Pick<SpawnAcpOptions, "command" | "args" | "env">>;
 	/** Selected for a new session that asks for no mode, when the agent offers it. */
 	defaultModeId?: string;
@@ -237,6 +238,7 @@ type SubagentRun = {
 	parentSessionId: string;
 	parentTaskId?: string;
 	steers: Set<{ echoes: Set<string>; shared: boolean }>;
+	cancelGeneration: number;
 };
 
 type SubagentControls = {
@@ -436,6 +438,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private queuedPrompts: UserContent[][] = [];
 	private disposed = false;
 	private dead = false;
+	private startupStatus: SessionState["status"] | null = null;
 	private stderrTail = "";
 	private customAnswer: string | null = null;
 	private heldTurnId: string | null = null;
@@ -512,11 +515,23 @@ export class AcpAdapter implements HarnessAdapter {
 		const client = this.client;
 		const sessionId = this.sessionId;
 		if (!client || !sessionId || !this.canSteer()) return false;
+		const turnId = this.currentTurn?.id;
+		const prompt = await this.toAcpPrompt(content);
+		if (this.options.beforePrompt) await this.options.beforePrompt();
+		if (
+			this.disposed ||
+			this.dead ||
+			this.client !== client ||
+			this.sessionId !== sessionId ||
+			this.currentTurn?.id !== turnId ||
+			!this.canSteer()
+		)
+			return false;
 		const v2TurnId = this.v2TurnIsCurrent() ? this.v2Turn?.id : undefined;
 		if (v2TurnId) {
 			const response = await client.request("session/prompt", {
 				sessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (parsed?.messageId !== undefined && parsed.stopReason === undefined) {
@@ -527,7 +542,7 @@ export class AcpAdapter implements HarnessAdapter {
 		}
 		const response = await client.request(ACP_STEERING_METHOD, {
 			sessionId,
-			prompt: await this.toAcpPrompt(content),
+			prompt,
 			_meta: { steering: { idleBehavior: "promptRequired" } },
 		});
 		const outcome = acpSteeringResponseSchema.safeParse(response).data?.outcome;
@@ -701,6 +716,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const run = subagentSessionId && this.subagents.get(subagentSessionId);
 		if (subagentSessionId) {
 			if (!run || run.item.canStop !== true) return false;
+			run.cancelGeneration++;
 			this.client.notify("session/cancel", { sessionId: subagentSessionId });
 			this.cancelSubagentApprovals(subagentSessionId, run);
 			return true;
@@ -723,13 +739,44 @@ export class AcpAdapter implements HarnessAdapter {
 		const run = subagentSessionId && this.subagents.get(subagentSessionId);
 		if (!client || !subagentSessionId || !run || run.item.canSteer !== true)
 			return false;
+		const cancelGeneration = run.cancelGeneration;
+		const prompt = await this.toAcpPrompt(content);
+		if (this.options.beforePrompt) await this.options.beforePrompt();
+		if (
+			this.disposed ||
+			this.dead ||
+			this.client !== client ||
+			this.subagents.get(subagentSessionId) !== run ||
+			run.cancelGeneration !== cancelGeneration ||
+			run.item.canSteer !== true
+		)
+			return false;
 		const steer = { echoes: new Set<string>(), shared: run.steers.size > 0 };
 		for (const other of run.steers) other.shared = true;
 		run.steers.add(steer);
 		try {
+			if (this.negotiatedVersion < 2 && this.supportsSteering) {
+				const response = await client.request(ACP_STEERING_METHOD, {
+					sessionId: subagentSessionId,
+					prompt,
+					_meta: { steering: { idleBehavior: "promptRequired" } },
+				});
+				const outcome =
+					acpSteeringResponseSchema.safeParse(response).data?.outcome;
+				if (outcome === "injected" || outcome === "startedNewTurn") return true;
+				if (outcome !== "promptRequired") return false;
+				if (this.options.beforePrompt) await this.options.beforePrompt();
+				if (
+					this.client !== client ||
+					this.subagents.get(subagentSessionId) !== run ||
+					run.cancelGeneration !== cancelGeneration ||
+					run.item.canSteer !== true
+				)
+					return false;
+			}
 			await client.request("session/prompt", {
 				sessionId: subagentSessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			return true;
 		} catch (error) {
@@ -796,6 +843,15 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 		const parsed = acpNewSessionResponseSchema.safeParse(response);
 		return parsed.success ? parsed.data.sessionId : null;
+	}
+
+	private supportsExactResume(): boolean {
+		if (this.negotiatedVersion < 2)
+			return this.agentCapabilities.loadSession === true;
+		const session = this.agentCapabilities.session;
+		return (
+			session !== null && typeof session === "object" && !Array.isArray(session)
+		);
 	}
 
 	/** What `initialize` said this agent can do to a session. */
@@ -948,6 +1004,10 @@ export class AcpAdapter implements HarnessAdapter {
 			let response: unknown;
 			let resumed = false;
 			if (startOptions.resume) {
+				if (startOptions.resume.requireExact && !this.supportsExactResume())
+					throw new Error(
+						"This agent cannot load the saved conversation. No new conversation was created.",
+					);
 				this.replaying = true;
 				this.quietReplay = startOptions.resume.quiet === true;
 				this.loadingSessionId = startOptions.resume.harnessSessionId;
@@ -968,6 +1028,7 @@ export class AcpAdapter implements HarnessAdapter {
 					);
 					resumed = true;
 				} catch (loadError) {
+					if (startOptions.resume.requireExact) throw loadError;
 					// A session that was started but never prompted has no transcript,
 					// so the agent answers "not found". Any other failure keeps the
 					// conversation, and a new session would hide it from the agent.
@@ -1003,11 +1064,35 @@ export class AcpAdapter implements HarnessAdapter {
 				);
 			}
 
+			// Validate identity separately: malformed optional response metadata must
+			// never conceal a different session ID during an exact load.
+			if (startOptions.resume?.requireExact && response !== null) {
+				const returnedId =
+					typeof response === "object" &&
+					response !== null &&
+					"sessionId" in response
+						? response.sessionId
+						: undefined;
+				if (
+					returnedId !== undefined &&
+					returnedId !== startOptions.resume.harnessSessionId
+				)
+					throw new Error(
+						"The agent returned a different conversation. No messages were sent.",
+					);
+			}
 			// session/load returns null after replaying history via session/update.
 			const parsed = acpNewSessionResponseSchema.safeParse(response);
 			this.sessionId = parsed.success
 				? parsed.data.sessionId
 				: (startOptions.resume?.harnessSessionId ?? null);
+			if (
+				startOptions.resume?.requireExact &&
+				this.sessionId !== startOptions.resume.harnessSessionId
+			)
+				throw new Error(
+					"The agent returned a different conversation. No messages were sent.",
+				);
 
 			if (!this.sessionId) {
 				this.emitNotice("error", "acp agent returned no session id");
@@ -1019,8 +1104,9 @@ export class AcpAdapter implements HarnessAdapter {
 			}
 
 			this.emitSession({
-				status: "idle",
+				status: this.startupStatus ?? "idle",
 				harnessSessionId: this.sessionId,
+				exactResumeSupported: this.supportsExactResume(),
 				...(this.options.clientApprovalModes
 					? {
 							modeId:
@@ -1075,15 +1161,29 @@ export class AcpAdapter implements HarnessAdapter {
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
 		if (this.heldTurnId !== turnId) return;
-		this.heldTurnId = null;
 		const client = this.client;
-		if (!client || !this.sessionId || this.currentTurn?.id !== turnId) return;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId || this.currentTurn?.id !== turnId) return;
 		const v2 = this.negotiatedVersion >= 2;
-		if (v2) this.v2Turn = { id: turnId, inserted: false };
+		const mayDispatch = () =>
+			!this.disposed &&
+			!this.dead &&
+			this.client === client &&
+			this.sessionId === sessionId &&
+			this.heldTurnId === turnId &&
+			this.currentTurn?.id === turnId &&
+			this.currentTurn.status === "running";
 		try {
+			const prompt = await this.toAcpPrompt(content);
+			if (!mayDispatch()) return;
+			if (this.options.beforePrompt) await this.options.beforePrompt();
+			if (!mayDispatch()) return;
+			// Keep cancellation local until all asynchronous preparation is complete.
+			this.heldTurnId = null;
+			if (v2) this.v2Turn = { id: turnId, inserted: false };
 			const response = await client.request("session/prompt", {
-				sessionId: this.sessionId,
-				prompt: await this.toAcpPrompt(content),
+				sessionId,
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (
@@ -1097,6 +1197,14 @@ export class AcpAdapter implements HarnessAdapter {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.finishTurn(turnId, parsed?.stopReason);
 		} catch (error) {
+			if (this.heldTurnId === turnId) this.heldTurnId = null;
+			if (
+				this.disposed ||
+				this.dead ||
+				this.currentTurn?.id !== turnId ||
+				this.currentTurn.status !== "running"
+			)
+				return;
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.failTurn(turnId, (error as Error).message);
 		}
@@ -1192,6 +1300,12 @@ export class AcpAdapter implements HarnessAdapter {
 		// this session has never seen them, so dropping them starts the transcript
 		// at the agent's first reply. Each one opens a turn of its own, or the
 		// whole replay lands in one group whose order comes down to item id.
+		if (
+			this.replaying &&
+			this.isForeignSession(outer.data.sessionId) &&
+			(variant === "user_message_chunk" || variant === "user_message")
+		)
+			return;
 		const childSession =
 			this.subagents.has(outer.data.sessionId) ||
 			this.finishedSubagents.has(outer.data.sessionId);
@@ -1702,6 +1816,7 @@ export class AcpAdapter implements HarnessAdapter {
 			parentSessionId,
 			...(parent ? { parentTaskId: parent.item.id } : {}),
 			steers: new Set(),
+			cancelGeneration: 0,
 		};
 		this.subagents.set(sessionId, run);
 		this.emitItem(item, turnId);
@@ -2424,6 +2539,9 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private emitSession(session: Partial<SessionState>): void {
+		// v2 resume synchronizes live state before its response; do not reset it.
+		if (!this.sessionId && session.status && session.status !== "starting")
+			this.startupStatus = session.status;
 		if (session.modeId) this.modeId = session.modeId;
 		this.emit({ kind: "session", session });
 	}

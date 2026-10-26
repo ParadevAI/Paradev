@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{total} 중 {received}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} 남음"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName}은(는) 이 조직의 GitHub App이 설치된 {installedAccountLogin}에 없습니다."
 
@@ -2063,6 +2066,12 @@ msgstr "에이전트 세션을 시작했습니다"
 
 msgid "agent settings"
 msgstr "에이전트 설정"
+
+msgid "Agent terminal with account"
+msgstr "계정을 선택해 에이전트 터미널 시작"
+
+msgid "Agent terminal with account…"
+msgstr "계정을 선택해 에이전트 터미널 시작…"
 
 msgid "Agent usage rankings"
 msgstr "에이전트 사용량 순위"
@@ -3715,6 +3724,9 @@ msgstr "채팅 세션을 찾을 수 없습니다"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "채팅 화면: 메시지, 추론, 제안"
 
+msgid "Chat with account"
+msgstr "계정을 선택해 채팅"
+
 msgid "Check again"
 msgstr "다시 확인"
 
@@ -4115,6 +4127,9 @@ msgstr "모달 닫기"
 
 msgid "Close modal backdrop"
 msgstr "모달 배경 닫기"
+
+msgid "Close only this idle agent and switch. Finish background work and save any unsent draft first."
+msgstr "대기 중인 이 에이전트만 종료하고 계정을 전환합니다. 먼저 백그라운드 작업을 마치고 보내지 않은 초안을 저장하세요."
 
 msgid "Close or delete the current workspace"
 msgstr "현재 워크스페이스를 닫거나 삭제합니다"
@@ -4521,6 +4536,9 @@ msgstr "종료 전 확인"
 
 msgid "Confirm switch"
 msgstr "변경 확인"
+
+msgid "Confirm that this agent can close safely before switching."
+msgstr "전환하기 전에 이 에이전트를 안전하게 종료할 수 있는지 확인하세요."
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -5089,6 +5107,9 @@ msgstr "파일을 삭제할 수 없습니다"
 msgid "Could not delete this page"
 msgstr "이 페이지를 삭제할 수 없습니다"
 
+msgid "Could not discard the queued message."
+msgstr "대기 중인 메시지를 삭제하지 못했습니다."
+
 msgid "Could not disconnect."
 msgstr "연결을 해제하지 못했습니다."
 
@@ -5103,6 +5124,9 @@ msgstr "대기열에서 나갈 수 없습니다"
 
 msgid "Could not list directory"
 msgstr "디렉터리를 나열할 수 없습니다"
+
+msgid "Could not load accounts"
+msgstr "계정을 불러오지 못했습니다"
 
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
@@ -5189,6 +5213,9 @@ msgstr "다시 활성화하지 못했습니다"
 msgid "Could not read MCP servers."
 msgstr "MCP 서버를 읽을 수 없습니다."
 
+msgid "Could not read queued messages."
+msgstr "대기 중인 메시지를 읽지 못했습니다."
+
 msgid "Could not read selected file"
 msgstr "선택한 파일을 읽을 수 없습니다"
 
@@ -5203,6 +5230,9 @@ msgstr "클라우드 워크스페이스를 기록할 수 없습니다"
 
 msgid "Could not record environment"
 msgstr "환경을 저장할 수 없습니다"
+
+msgid "Could not refresh usage"
+msgstr "사용량을 새로고침하지 못했습니다"
 
 msgid "Could not remove access"
 msgstr "접근 권한을 제거할 수 없습니다"
@@ -5234,6 +5264,9 @@ msgstr "재개할 수 없습니다"
 msgid "Could not resume the chat"
 msgstr "채팅을 재개할 수 없습니다"
 
+msgid "Could not resume this conversation"
+msgstr "이 대화를 재개할 수 없습니다"
+
 msgid "Could not send"
 msgstr "보낼 수 없습니다"
 
@@ -5248,6 +5281,12 @@ msgstr "공유할 수 없습니다"
 
 msgid "Could not start agent"
 msgstr "에이전트를 시작하지 못했습니다"
+
+msgid "Could not start agent terminal"
+msgstr "에이전트 터미널을 시작하지 못했습니다"
+
+msgid "Could not start chat"
+msgstr "채팅을 시작하지 못했습니다"
 
 msgid "Could not start checkout. Please try again."
 msgstr "결제를 시작할 수 없습니다. 다시 시도해 주세요."
@@ -5270,11 +5309,17 @@ msgstr "중지할 수 없습니다"
 msgid "Could not stop the agent"
 msgstr "에이전트를 중지할 수 없습니다"
 
+msgid "Could not stop the agent. Review queued messages or update this host, then try again."
+msgstr "에이전트를 중지하지 못했습니다. 대기 중인 메시지를 확인하거나 이 호스트를 업데이트한 후 다시 시도하세요."
+
 msgid "Could not stop watching"
 msgstr "감시를 중지할 수 없습니다"
 
 msgid "Could not submit prompt. Try again."
 msgstr "프롬프트를 제출할 수 없습니다. 다시 시도하세요."
+
+msgid "Could not switch account"
+msgstr "계정을 전환하지 못했습니다"
 
 msgid "Could not take a screenshot"
 msgstr "스크린샷을 찍을 수 없습니다"
@@ -6441,6 +6486,9 @@ msgstr "\"{discardBasename}\"의 변경 사항을 버릴까요?"
 
 msgid "Discard changes?"
 msgstr "변경 사항을 버릴까요?"
+
+msgid "Discard queued message"
+msgstr "대기 중인 메시지 삭제"
 
 msgid "Discard recording"
 msgstr "녹음 버리기"
@@ -9998,6 +10046,9 @@ msgstr "로더 · 브라유 스피너"
 msgid "Loading"
 msgstr "불러오는 중"
 
+msgid "Loading accounts…"
+msgstr "계정 불러오는 중…"
+
 msgid "Loading agent settings..."
 msgstr "에이전트 설정을 불러오는 중..."
 
@@ -11110,6 +11161,9 @@ msgstr "작성자를 찾을 수 없습니다."
 
 msgid "No automations match"
 msgstr "일치하는 자동화가 없습니다"
+
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "사용 가능한 구독 계정이 없습니다. 사용량에서 계정을 추가하거나 로그인한 후 새로고침하세요."
 
 msgid "No branches found"
 msgstr "브랜치를 찾을 수 없습니다"
@@ -14431,6 +14485,12 @@ msgstr "닫은 탭 다시 열기"
 msgid "Reopen PR"
 msgstr "PR 다시 열기"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "같은 워크스페이스에서 저장된 대화를 다시 엽니다. 메시지는 전송되지 않습니다. 백그라운드 작업은 이전되지 않습니다."
+
+msgid "Reopen this exact saved conversation with another account. Other chats stay running. No message is sent."
+msgstr "저장된 이 대화를 다른 계정으로 다시 엽니다. 다른 채팅은 계속 실행됩니다. 메시지는 전송되지 않습니다."
+
 msgid "Reopen thread"
 msgstr "스레드 다시 열기"
 
@@ -14786,6 +14846,12 @@ msgstr "재개 인수"
 
 msgid "Resume automation"
 msgstr "자동화 재개"
+
+msgid "Resume conversation"
+msgstr "대화 재개"
+
+msgid "Resume with another account"
+msgstr "다른 계정으로 재개"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -16719,11 +16785,17 @@ msgstr "대화를 시작하면 메시지가 여기에 표시됩니다"
 msgid "Start a fresh agent session seeded with this terminal's recent context. Workspace files remain the source of truth."
 msgstr "이 터미널의 최근 컨텍스트를 넘겨받아 새 에이전트 세션을 시작합니다. 워크스페이스의 파일이 여전히 기준입니다."
 
+msgid "Start a native chat using an existing login. Recovery keeps this account and working folder."
+msgstr "기존 로그인을 사용해 네이티브 채팅을 시작합니다. 복구 시 이 계정과 작업 폴더가 유지됩니다."
+
 msgid "Start a new agent session each run"
 msgstr "실행할 때마다 새 에이전트 세션 시작"
 
 msgid "Start a new chat"
 msgstr "새 채팅 시작"
+
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "기존 로그인으로 새 터미널을 시작합니다. 다른 채팅과 기본 계정은 변경되지 않습니다."
 
 msgid "Start a session"
 msgstr "세션 시작"
@@ -16745,6 +16817,9 @@ msgstr "탐색 시작"
 
 msgid "Start building in two."
 msgstr "두 단계로 빌드를 시작하세요."
+
+msgid "Start chat"
+msgstr "채팅 시작"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
 msgstr "iPhone이나 iPad에서 코딩 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. App Store에서 이용할 수 있으며 Android는 곧 출시됩니다."
@@ -16772,6 +16847,9 @@ msgstr "탭 막대의 +로 시작하세요."
 
 msgid "Start or stop the workspace run command"
 msgstr "워크스페이스 실행 명령을 시작하거나 중지합니다"
+
+msgid "Start terminal"
+msgstr "터미널 시작"
 
 msgid "Start voice mode"
 msgstr "음성 모드 시작"
@@ -16884,6 +16962,12 @@ msgstr "{label} 중지"
 msgid "Stop {name}"
 msgstr "{name} 중지"
 
+msgid "Stop agent"
+msgstr "에이전트 중지"
+
+msgid "Stop agent and background work"
+msgstr "에이전트 및 백그라운드 작업 중지"
+
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"
 
@@ -16902,6 +16986,9 @@ msgstr "에이전트를 중지하고 지금 보내기"
 
 msgid "Stop the agent before you edit a message"
 msgstr "메시지를 편집하기 전에 에이전트를 중지하세요"
+
+msgid "Stop this agent and its background work?"
+msgstr "이 에이전트와 백그라운드 작업을 중지할까요?"
 
 msgid "Stop watching"
 msgstr "감시 중지"
@@ -17043,6 +17130,9 @@ msgstr "지속"
 
 msgid "Sustain · active days in 30"
 msgstr "지속성 · 30일 중 활동 일수"
+
+msgid "Switch account"
+msgstr "계정 전환"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "에이전트는 바꾸고, 워크플로는 그대로"
@@ -17792,6 +17882,12 @@ msgstr "같은 앱이 iPad에서 네이티브로 실행되며 세로와 가로 �
 msgid "The scorecard"
 msgstr "성적표"
 
+msgid "The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails."
+msgstr "저장된 레이아웃 데이터에서 선택한 계정의 채팅을 확인하지 못했습니다. 이번 시도에서는 아무것도 실행되지 않았습니다. 저장 공간이 가득 찼다면 공간을 확보한 다음 이 탭의 이름을 바꿔 레이아웃을 저장하고 다시 시도하세요. 계속 실패하면 이 탭을 열어 두세요."
+
+msgid "The selected login changed. Choose an account again."
+msgstr "선택한 로그인이 변경되었습니다. 계정을 다시 선택하세요."
+
 msgid "The self-driving software factory"
 msgstr "자율 주행 소프트웨어 공장"
 
@@ -17870,6 +17966,9 @@ msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니
 msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
 msgstr "이 폴더들에는 아직 파일이 있지만 새 Paradev로 자동으로 옮겨지지 않았습니다."
 
+msgid "These messages were not sent. Copy anything you need, then discard the queue before resuming."
+msgstr "이 메시지들은 전송되지 않았습니다. 필요한 내용을 복사한 다음 재개하기 전에 대기열을 비우세요."
+
 msgid "These ports are still in use"
 msgstr "이 포트들은 아직 사용 중입니다"
 
@@ -17903,6 +18002,9 @@ msgstr "이 에이전트는 대화를 분기할 수 없습니다"
 msgid "This agent can't run in a cloud workspace"
 msgstr "이 에이전트는 클라우드 워크스페이스에서 실행할 수 없습니다"
 
+msgid "This agent configuration does not support account selection."
+msgstr "이 에이전트 구성은 계정 선택을 지원하지 않습니다."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "이 에이전트는 선택한 기기에 더 이상 존재하지 않습니다 (에이전트가 초기화되었을 수 있습니다). 새 에이전트를 선택할 때까지 실행이 실패합니다."
 
@@ -17931,6 +18033,9 @@ msgstr "이 자동화는 다른 조직에 있습니다"
 msgid "This cannot be undone."
 msgstr "되돌릴 수 없습니다."
 
+msgid "This chat could not be opened with its saved account."
+msgstr "저장된 계정으로 이 채팅을 열지 못했습니다."
+
 msgid "This chat has ended."
 msgstr "이 채팅은 종료되었습니다."
 
@@ -17957,6 +18062,12 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "이 대화는 다른 계정으로 재개할 수 없습니다."
+
+msgid "This conversation is no longer available to resume."
+msgstr "이 대화는 더 이상 재개할 수 없습니다."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "재부팅/충돌 복구에 사용하는 저장된 스크롤백을 삭제합니다."
@@ -17999,6 +18110,9 @@ msgstr "이 GitHub 설치는 이미 다른 Paradev 조직에 연결되어 있습
 
 msgid "This host"
 msgstr "이 호스트"
+
+msgid "This host does not support account selection for native chats."
+msgstr "이 호스트는 네이티브 채팅의 계정 선택을 지원하지 않습니다."
 
 msgid "This host has not reported a version yet."
 msgstr "이 호스트는 아직 버전을 보고하지 않았습니다."
@@ -18161,6 +18275,9 @@ msgstr "이미 사용 중인 슬러그입니다"
 
 msgid "This stops every Teams trigger in your organization and removes the notification subscriptions from your tenant. You can reconnect at any time."
 msgstr "조직의 모든 Teams 트리거가 중지되고 테넌트에서 알림 구독이 제거됩니다. 언제든지 다시 연결할 수 있습니다."
+
+msgid "This stops the agent process and any background work it owns. Your saved conversation stays available. Review and discard any queued messages first. You can then choose Resume."
+msgstr "에이전트 프로세스와 해당 프로세스가 관리하는 모든 백그라운드 작업이 중지됩니다. 저장된 대화는 계속 사용할 수 있습니다. 먼저 대기 중인 메시지를 검토하고 삭제하세요. 그런 다음 재개를 선택할 수 있습니다."
 
 msgid "This subagent can't move to the background now"
 msgstr "이 서브 에이전트는 지금 백그라운드로 옮길 수 없습니다"
@@ -18943,6 +19060,9 @@ msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Superset�
 msgid "update the branch prefix"
 msgstr "브랜치 접두사를 업데이트할"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "새 터미널의 계정을 선택하려면 이 호스트를 업데이트하세요."
+
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
@@ -19033,6 +19153,9 @@ msgstr "사용량 정보가 오래되었습니다"
 
 msgid "Usage sections"
 msgstr "사용량 섹션"
+
+msgid "Usage unavailable"
+msgstr "사용량을 확인할 수 없음"
 
 msgid "Usage unavailable."
 msgstr "사용량을 볼 수 없습니다."

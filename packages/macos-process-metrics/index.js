@@ -25,4 +25,10 @@ function getPhysFootprints(pids) {
 	return native.getPhysFootprints(pids);
 }
 
-module.exports = { getPhysFootprints };
+/** Kernel main executable path; null when unavailable. No ps/launcher fallback. */
+function getExecutablePath(pid) {
+	if (!native || typeof native.getExecutablePath !== "function") return null;
+	return native.getExecutablePath(pid);
+}
+
+module.exports = { getPhysFootprints, getExecutablePath };
