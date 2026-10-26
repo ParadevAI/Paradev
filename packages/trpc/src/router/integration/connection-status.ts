@@ -1,10 +1,11 @@
 import { db } from "@superset/db/client";
-import { connections, githubInstallations } from "@superset/db/schema";
+import { connections } from "@superset/db/schema";
 import { getConnector } from "@superset/shared/connectors";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { NEEDS_REAUTH } from "../../lib/connectors";
 import { protectedProcedure } from "../../trpc";
+import { findOrganizationInstallations } from "./github/personal-installation";
 import { verifyOrgMembership } from "./utils";
 
 /**
@@ -44,34 +45,34 @@ export const connectionStatusProcedure = protectedProcedure
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const [connectorRows, installation] = await Promise.all([
-				db.query.connections.findMany({
-					// Oldest first, and stable: the editor pins a new trigger to the
-					// first account, and an unordered read returns heap order, which
-					// moves every time a row is updated — a token refresh is an update.
-					orderBy: (row, { asc }) => [asc(row.createdAt), asc(row.id)],
-					where: and(
-						eq(connections.organizationId, input.organizationId),
-						or(
-							isNull(connections.disconnectedAt),
-							eq(connections.disconnectReason, NEEDS_REAUTH),
+			const [connectorRows, { organizationInstallation: installation }] =
+				await Promise.all([
+					db.query.connections.findMany({
+						// Oldest first, and stable: the editor pins a new trigger to the
+						// first account, and an unordered read returns heap order, which
+						// moves every time a row is updated — a token refresh is an update.
+						orderBy: (row, { asc }) => [asc(row.createdAt), asc(row.id)],
+						where: and(
+							eq(connections.organizationId, input.organizationId),
+							or(
+								isNull(connections.disconnectedAt),
+								eq(connections.disconnectReason, NEEDS_REAUTH),
+							),
 						),
-					),
-					columns: {
-						id: true,
-						connector: true,
-						connectedByUserId: true,
-						disconnectedAt: true,
-						externalAccountLabel: true,
-						externalUserLabel: true,
-						nickname: true,
-					},
-				}),
-				db.query.githubInstallations.findFirst({
-					where: eq(githubInstallations.organizationId, input.organizationId),
-					columns: { suspended: true },
-				}),
-			]);
+						columns: {
+							id: true,
+							connector: true,
+							connectedByUserId: true,
+							disconnectedAt: true,
+							externalAccountLabel: true,
+							externalUserLabel: true,
+							nickname: true,
+						},
+					}),
+					findOrganizationInstallations({
+						organizationId: input.organizationId,
+					}),
+				]);
 
 			const connected: Record<string, ProviderConnection> = {};
 			for (const row of connectorRows) {
@@ -103,7 +104,7 @@ export const connectionStatusProcedure = protectedProcedure
 
 			// A suspended installation still has a row, and delivers nothing.
 			connected.github = {
-				connected: installation !== undefined && !installation.suspended,
+				connected: Boolean(installation && !installation.suspended),
 				needsReauth: false,
 				accounts: [],
 			};

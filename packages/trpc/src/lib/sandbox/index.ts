@@ -24,6 +24,7 @@ export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
 	environmentRepositoryRows,
+	hasPersonalRepository,
 	installationTokenFor,
 	loadRepositories,
 	primaryRepository,

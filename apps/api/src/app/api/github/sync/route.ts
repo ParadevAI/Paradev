@@ -37,11 +37,12 @@ export async function POST(request: Request) {
 
 	const { organizationId } = parsed.data;
 
-	const [installation] = await db
+	const installations = await db
 		.select()
 		.from(githubInstallations)
-		.where(eq(githubInstallations.organizationId, organizationId))
-		.limit(1);
+		.where(eq(githubInstallations.organizationId, organizationId));
+	const installation =
+		installations.find((row) => row.accountType !== "User") ?? installations[0];
 
 	if (!installation) {
 		return Response.json({ error: "Installation not found" }, { status: 404 });

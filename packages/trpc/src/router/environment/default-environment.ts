@@ -2,12 +2,17 @@ import { dbWs } from "@superset/db/client";
 import {
 	environmentRepositories,
 	environments,
+	githubInstallations,
 	githubRepositories,
 } from "@superset/db/schema";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import type { SandboxRegionId } from "@superset/shared/sandbox-regions";
 import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import { userError } from "../../trpc";
+import {
+	findOrganizationInstallations,
+	isRepositoryVisibleToUser,
+} from "../integration/github/personal-installation";
 import { currentBundleSha } from "./current-bundle";
 
 interface CarryingEnvironment {
@@ -73,23 +78,50 @@ export async function ensureDefaultEnvironment(args: {
 		const existing = pickDefaultEnvironment(carrying, args.repositoryId);
 		if (existing) return { id: existing.id, created: false };
 
-		const [repository] = await tx
-			.select({ id: githubRepositories.id, name: githubRepositories.name })
-			.from(githubRepositories)
-			.where(
-				and(
-					eq(githubRepositories.id, args.repositoryId),
-					eq(githubRepositories.organizationId, args.organizationId),
-				),
-			)
-			.limit(1);
-		if (!repository) {
+		const [[repository], { organizationInstallation }] = await Promise.all([
+			tx
+				.select({
+					id: githubRepositories.id,
+					name: githubRepositories.name,
+					organizationId: githubRepositories.organizationId,
+					installationId: githubInstallations.id,
+					accountType: githubInstallations.accountType,
+					connectedByUserId: githubInstallations.connectedByUserId,
+				})
+				.from(githubRepositories)
+				.innerJoin(
+					githubInstallations,
+					eq(githubRepositories.installationId, githubInstallations.id),
+				)
+				.where(eq(githubRepositories.id, args.repositoryId))
+				.limit(1),
+			findOrganizationInstallations({ organizationId: args.organizationId }),
+		]);
+		const isLegacySharedUserInstallation =
+			organizationInstallation?.accountType === "User" &&
+			repository?.installationId === organizationInstallation.id;
+		if (
+			!repository ||
+			!isRepositoryVisibleToUser({
+				repository: { organizationId: repository.organizationId },
+				installation: {
+					id: repository.installationId,
+					accountType: repository.accountType,
+					connectedByUserId: repository.connectedByUserId,
+				},
+				organizationId: args.organizationId,
+				userId: args.userId,
+				isLegacySharedUserInstallation,
+			})
+		) {
 			throw userError({
 				code: "NOT_FOUND",
 				message: "The repository is not connected to this organization",
 				i18nKey: "serverError.environment.repositoryNotConnected",
 			});
 		}
+		const isPersonal =
+			repository.accountType === "User" && !isLegacySharedUserInstallation;
 		const [row] = await tx
 			.insert(environments)
 			.values({
@@ -100,7 +132,7 @@ export async function ensureDefaultEnvironment(args: {
 				sourceRef: SANDBOX_IMAGE_NAME,
 				region: args.region,
 				bundleSha: await currentBundleSha(),
-				scope: "organization",
+				scope: isPersonal ? "personal" : "organization",
 				primaryRepositoryId: repository.id,
 				createdByUserId: args.userId,
 			})

@@ -22,6 +22,7 @@ export const getPullRequestDiff = protectedProcedure
 		const { installation, repo } = await findInstalledRepository(
 			input.organizationId,
 			input.repoFullName,
+			ctx.session.user.id,
 		);
 		const [owner, name] = repo.fullName.split("/");
 		const octokit = await installationOctokit(installation.installationId);

@@ -1,4 +1,11 @@
 export {
+	doesGithubAccountBelongToUser,
+	githubAppInstallUrl,
+	readGithubAppInstallState,
+	syncInstallationRepositories,
+	syncPersonalGithubInstallation,
+} from "../../router/integration/github/personal-installation";
+export {
 	completeGithubUserConnection,
 	disconnectGithubUser,
 	GithubUserConnectionError,

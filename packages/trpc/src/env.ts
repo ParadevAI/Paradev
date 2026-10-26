@@ -78,6 +78,7 @@ export const env = createEnv({
 		GH_APP_ID: z.string().min(1),
 		GH_APP_PRIVATE_KEY: z.string().min(1),
 		GH_WEBHOOK_SECRET: z.string().min(1),
+		GH_APP_SLUG: z.string().min(1).optional(),
 		// The same App's OAuth client, for a person's own GitHub connection;
 		// without them nobody can connect and workspaces use the App's token.
 		GH_APP_CLIENT_ID: z.string().min(1).optional(),

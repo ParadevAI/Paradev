@@ -148,9 +148,6 @@ export function EnvironmentEditorDialog({
 			{ enabled: open && !fromWorkspaceId },
 		);
 	const installation = installationQuery.data;
-	const appSettingsUrl = installation?.installationId
-		? githubAppSettingsUrl(installation)
-		: null;
 	const missingRepositoryFullName =
 		initialRepositoryFullName &&
 		repositoriesQuery.isSuccess &&
@@ -158,12 +155,44 @@ export function EnvironmentEditorDialog({
 		repositoryIdsDraft === null
 			? initialRepositoryFullName
 			: null;
+	const missingOwner =
+		missingRepositoryFullName?.split("/")[0]?.toLowerCase() ?? null;
+	const matchingMissingInstallation =
+		missingOwner && installation?.accountLogin.toLowerCase() === missingOwner
+			? installation
+			: missingOwner &&
+					installation?.personalInstallation?.accountLogin.toLowerCase() ===
+						missingOwner
+				? installation.personalInstallation
+				: null;
+	const appSettingsUrl =
+		installation?.installUrl ??
+		(installation?.installationId ? githubAppSettingsUrl(installation) : null);
+	const missingRepoConfigureUrl = matchingMissingInstallation
+		? githubAppSettingsUrl(matchingMissingInstallation)
+		: appSettingsUrl;
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const [isAwaitingGitHub, setIsAwaitingGitHub] = useState(false);
+	const openFreshInstallUrl = async (fallbackUrl: string) => {
+		const fresh = await utils.integration.github.getInstallation
+			.fetch({ organizationId }, { staleTime: 0 })
+			.catch(() => null);
+		openUrl.mutate(fresh?.installUrl ?? fallbackUrl);
+		setIsAwaitingGitHub(true);
+	};
 	const configureGitHubApp = appSettingsUrl
 		? () => {
-				openUrl.mutate(appSettingsUrl);
-				setIsAwaitingGitHub(true);
+				void openFreshInstallUrl(appSettingsUrl);
+			}
+		: null;
+	const configureMissingRepoGitHubApp = missingRepoConfigureUrl
+		? () => {
+				if (matchingMissingInstallation) {
+					openUrl.mutate(missingRepoConfigureUrl);
+					setIsAwaitingGitHub(true);
+				} else {
+					void openFreshInstallUrl(missingRepoConfigureUrl);
+				}
 			}
 		: null;
 	// Access granted on GitHub reaches the list by webhook; look again when the
@@ -172,6 +201,9 @@ export function EnvironmentEditorDialog({
 		if (!isAwaitingGitHub || !open) return;
 		const refetch = () => {
 			void utils.integration.github.listRepositories.invalidate({
+				organizationId,
+			});
+			void utils.integration.github.getInstallation.invalidate({
 				organizationId,
 			});
 		};
@@ -483,8 +515,12 @@ export function EnvironmentEditorDialog({
 
 					{missingRepositoryFullName && (
 						<EnvironmentMissingRepositoryNotice
-							installedAccountLogin={installation?.accountLogin ?? null}
-							onConfigureGitHubApp={configureGitHubApp}
+							installedAccountLogin={
+								matchingMissingInstallation?.accountLogin ??
+								installation?.accountLogin ??
+								null
+							}
+							onConfigureGitHubApp={configureMissingRepoGitHubApp}
 							repositoryFullName={missingRepositoryFullName}
 						/>
 					)}

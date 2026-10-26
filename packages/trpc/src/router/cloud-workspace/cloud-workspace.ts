@@ -333,6 +333,7 @@ export const cloudWorkspaceRouter = {
 			const [repo] = await loadRepositories({
 				organizationId: input.organizationId,
 				repositoryIds: [input.repositoryId],
+				userId: ctx.userId,
 			}).catch(() => []);
 			if (!repo) return { defaultBranch: null, items: [] };
 			return listRemoteBranches(repo, input.query);

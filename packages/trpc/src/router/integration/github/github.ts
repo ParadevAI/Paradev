@@ -20,6 +20,12 @@ import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
 import { findInstalledRepository } from "./find-installed-repository";
 import { getPullRequestDiff } from "./get-pull-request-diff";
 import {
+	findOrganizationInstallations,
+	githubAppInstallUrl,
+	syncPersonalGithubInstallation,
+	visibleGithubInstallations,
+} from "./personal-installation";
+import {
 	type PullRequestDetail,
 	toChecks,
 	toChecksStatus,
@@ -37,20 +43,34 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: {
-					id: true,
-					installationId: true,
-					accountLogin: true,
-					accountType: true,
-					suspended: true,
-					lastSyncedAt: true,
-					createdAt: true,
-				},
-			});
+			const { primary, personalInstallation } =
+				await findOrganizationInstallations({
+					organizationId: input.organizationId,
+					userId: ctx.session.user.id,
+				});
 
-			return installation ?? null;
+			if (!primary) return null;
+
+			return {
+				id: primary.id,
+				installationId: primary.installationId,
+				accountLogin: primary.accountLogin,
+				accountType: primary.accountType,
+				suspended: primary.suspended,
+				lastSyncedAt: primary.lastSyncedAt,
+				createdAt: primary.createdAt,
+				installUrl: githubAppInstallUrl({
+					organizationId: input.organizationId,
+					userId: ctx.session.user.id,
+				}),
+				personalInstallation: personalInstallation
+					? {
+							installationId: personalInstallation.installationId,
+							accountLogin: personalInstallation.accountLogin,
+							accountType: personalInstallation.accountType,
+						}
+					: null,
+			};
 		}),
 
 	disconnect: protectedProcedure
@@ -58,9 +78,18 @@ export const githubRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
+			const { organizationInstallation } = await findOrganizationInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.session.user.id,
+			});
+
+			if (!organizationInstallation) {
+				return { success: false, error: "No installation found" };
+			}
+
 			const result = await db
 				.delete(githubInstallations)
-				.where(eq(githubInstallations.organizationId, input.organizationId))
+				.where(eq(githubInstallations.id, organizationInstallation.id))
 				.returning({ id: githubInstallations.id });
 
 			if (result.length === 0) {
@@ -75,19 +104,6 @@ export const githubRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
-
-			if (!installation) {
-				throw userError({
-					code: "NOT_FOUND",
-					message: "GitHub installation not found",
-					i18nKey: "serverError.integration.githubInstallationNotFound",
-				});
-			}
-
 			// The webhook drops this organization's deliveries, so a backfill here
 			// would go stale the moment it finished.
 			if (!(await organizationSyncsNow(input.organizationId))) {
@@ -98,27 +114,54 @@ export const githubRouter = {
 				});
 			}
 
-			const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
-			const syncBody = {
-				installationDbId: installation.id,
+			const personal = await syncPersonalGithubInstallation({
 				organizationId: input.organizationId,
-			};
+				userId: ctx.session.user.id,
+				force: true,
+			}).catch((error) => {
+				console.warn(
+					`[github/triggerSync] personal installation sync failed for ${ctx.session.user.id}:`,
+					error instanceof Error ? error.message : error,
+				);
+				return null;
+			});
 
-			// In development, call the sync endpoint directly (QStash can't reach localhost)
-			if (env.NODE_ENV === "development") {
-				fetch(syncUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(syncBody),
-				}).catch((error) => {
-					console.error("[github/triggerSync] Dev sync failed:", error);
+			const { organizationInstallation } = await findOrganizationInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.session.user.id,
+			});
+
+			if (!organizationInstallation && !personal) {
+				throw userError({
+					code: "NOT_FOUND",
+					message: "GitHub installation not found",
+					i18nKey: "serverError.integration.githubInstallationNotFound",
 				});
-			} else {
-				await qstash.publishJSON({
-					url: syncUrl,
-					body: syncBody,
-					retries: 3,
-				});
+			}
+
+			if (organizationInstallation) {
+				const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
+				const syncBody = {
+					installationDbId: organizationInstallation.id,
+					organizationId: input.organizationId,
+				};
+
+				// In development, call the sync endpoint directly (QStash can't reach localhost)
+				if (env.NODE_ENV === "development") {
+					fetch(syncUrl, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(syncBody),
+					}).catch((error) => {
+						console.error("[github/triggerSync] Dev sync failed:", error);
+					});
+				} else {
+					await qstash.publishJSON({
+						url: syncUrl,
+						body: syncBody,
+						retries: 3,
+					});
+				}
 			}
 
 			return { success: true };
@@ -128,7 +171,7 @@ export const githubRouter = {
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
-			return listGithubRepositories(input.organizationId);
+			return listGithubRepositories(input.organizationId, ctx.session.user.id);
 		}),
 
 	listPullRequests: protectedProcedure
@@ -142,23 +185,25 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
+			const installations = await visibleGithubInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.session.user.id,
 			});
 
-			if (!installation) {
+			if (installations.length === 0) {
 				return [];
 			}
 
-			// Get repository IDs for this installation
+			const installationIds = installations.map((row) => row.id);
+
+			// Get repository IDs for visible installations
 			const repos = await db.query.githubRepositories.findMany({
 				where: input.repositoryId
 					? and(
-							eq(githubRepositories.installationId, installation.id),
+							inArray(githubRepositories.installationId, installationIds),
 							eq(githubRepositories.id, input.repositoryId),
 						)
-					: eq(githubRepositories.installationId, installation.id),
+					: inArray(githubRepositories.installationId, installationIds),
 				columns: { id: true },
 			});
 
@@ -200,8 +245,26 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
+			const installations = await visibleGithubInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.session.user.id,
+			});
+			if (installations.length === 0) return [];
+
+			const repos = await db.query.githubRepositories.findMany({
+				where: inArray(
+					githubRepositories.installationId,
+					installations.map((row) => row.id),
+				),
+				columns: { id: true },
+			});
+			if (repos.length === 0) return [];
+
 			return db.query.githubPullRequests.findMany({
-				where: eq(githubPullRequests.organizationId, input.organizationId),
+				where: inArray(
+					githubPullRequests.repositoryId,
+					repos.map((row) => row.id),
+				),
 				orderBy: [desc(githubPullRequests.updatedAt)],
 				limit: 100,
 			});
@@ -230,11 +293,11 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
+			const installations = await visibleGithubInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.session.user.id,
 			});
-			if (!installation) {
+			if (installations.length === 0) {
 				return { hasInstallation: false, pullRequests: [] };
 			}
 			if (input.refs.length === 0) {
@@ -242,7 +305,10 @@ export const githubRouter = {
 			}
 
 			const repos = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
+				where: inArray(
+					githubRepositories.installationId,
+					installations.map((row) => row.id),
+				),
 				columns: { id: true, fullName: true, defaultBranch: true },
 			});
 			const repoByFullName = new Map(
@@ -287,17 +353,14 @@ export const githubRouter = {
 				})
 				.from(githubPullRequests)
 				.where(
-					and(
-						eq(githubPullRequests.organizationId, input.organizationId),
-						// Exact pairs, so no requested ref can be crowded out of the
-						// limit by another ref's rows.
-						sql`(${githubPullRequests.repositoryId}, ${githubPullRequests.headBranch}) IN (${sql.join(
-							[...pairs.values()].map(
-								(pair) => sql`(${pair.repoId}::uuid, ${pair.headBranch})`,
-							),
-							sql`, `,
-						)})`,
-					),
+					// Exact pairs, so no requested ref can be crowded out of the
+					// limit by another ref's rows.
+					sql`(${githubPullRequests.repositoryId}, ${githubPullRequests.headBranch}) IN (${sql.join(
+						[...pairs.values()].map(
+							(pair) => sql`(${pair.repoId}::uuid, ${pair.headBranch})`,
+						),
+						sql`, `,
+					)})`,
 				)
 				.orderBy(desc(githubPullRequests.updatedAt))
 				.limit(2_000);
@@ -352,6 +415,7 @@ export const githubRouter = {
 			const { installation, repo } = await findInstalledRepository(
 				input.organizationId,
 				input.repoFullName,
+				ctx.session.user.id,
 			);
 			const [owner, name] = repo.fullName.split("/");
 			const [row, octokit] = await Promise.all([
@@ -396,10 +460,11 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
+			const { organizationInstallation: installation } =
+				await findOrganizationInstallations({
+					organizationId: input.organizationId,
+					userId: ctx.session.user.id,
+				});
 
 			if (!installation) {
 				return {

@@ -15,7 +15,9 @@ import {
 import { nudge } from "../../lib/realtime";
 import {
 	environmentRepositoryRows,
+	loadRepositories,
 	primaryRepository,
+	RepositoryError,
 	recordWorkspaceRepositories,
 	workspaceBranchName,
 } from "../../lib/sandbox";
@@ -125,6 +127,20 @@ export async function startCloudWorkspace(args: {
 			message:
 				"This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it",
 			i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
+		});
+	}
+	try {
+		await loadRepositories({
+			organizationId: args.organizationId,
+			repositoryIds: repositories.map((repo) => repo.id),
+			userId: args.userId,
+		});
+	} catch (error) {
+		if (!(error instanceof RepositoryError)) throw error;
+		throw userError({
+			code: "FORBIDDEN",
+			message: error.message,
+			i18nKey: "serverError.environment.repositoryNotConnected",
 		});
 	}
 	const primary = primaryRepository(

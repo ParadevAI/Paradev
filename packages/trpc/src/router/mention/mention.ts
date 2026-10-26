@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import {
 	githubPullRequests,
+	githubRepositories,
 	members,
 	taskStatuses,
 	tasks,
@@ -9,10 +10,11 @@ import {
 import { retiredTaskColumns } from "@superset/db/task-list-query";
 import { escapeLikePattern } from "@superset/db/utils";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, ilike, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { assertMember } from "../../lib/cloud-guards";
 import { jwtProcedure } from "../../trpc";
+import { visibleGithubInstallations } from "../integration/github/personal-installation";
 
 const PER_GROUP = 5;
 
@@ -29,6 +31,11 @@ export const mentionRouter = {
 			assertMember(ctx.organizationIds, input.organizationId);
 			const pattern = `%${escapeLikePattern(input.query)}%`;
 			const number = /^#?(\d+)$/.exec(input.query)?.[1];
+
+			const visibleInstallations = await visibleGithubInstallations({
+				organizationId: input.organizationId,
+				userId: ctx.userId,
+			});
 
 			const [people, taskRows, pullRequests] = await Promise.all([
 				db
@@ -72,31 +79,40 @@ export const mentionRouter = {
 					// Not created_at: its global index sends Postgres through every org's tasks to find this one's newest.
 					.orderBy(desc(tasks.updatedAt))
 					.limit(PER_GROUP),
-				db
-					.select({
-						id: githubPullRequests.id,
-						number: githubPullRequests.prNumber,
-						title: githubPullRequests.title,
-						url: githubPullRequests.url,
-						state: githubPullRequests.state,
-						isDraft: githubPullRequests.isDraft,
-					})
-					.from(githubPullRequests)
-					.where(
-						and(
-							eq(githubPullRequests.organizationId, input.organizationId),
-							input.query
-								? or(
-										ilike(githubPullRequests.title, pattern),
-										number
-											? eq(githubPullRequests.prNumber, Number(number))
-											: undefined,
-									)
-								: undefined,
-						),
-					)
-					.orderBy(desc(githubPullRequests.updatedAt))
-					.limit(PER_GROUP),
+				visibleInstallations.length === 0
+					? Promise.resolve([])
+					: db
+							.select({
+								id: githubPullRequests.id,
+								number: githubPullRequests.prNumber,
+								title: githubPullRequests.title,
+								url: githubPullRequests.url,
+								state: githubPullRequests.state,
+								isDraft: githubPullRequests.isDraft,
+							})
+							.from(githubPullRequests)
+							.innerJoin(
+								githubRepositories,
+								eq(githubPullRequests.repositoryId, githubRepositories.id),
+							)
+							.where(
+								and(
+									inArray(
+										githubRepositories.installationId,
+										visibleInstallations.map((row) => row.id),
+									),
+									input.query
+										? or(
+												ilike(githubPullRequests.title, pattern),
+												number
+													? eq(githubPullRequests.prNumber, Number(number))
+													: undefined,
+											)
+										: undefined,
+								),
+							)
+							.orderBy(desc(githubPullRequests.updatedAt))
+							.limit(PER_GROUP),
 			]);
 
 			return { people, tasks: taskRows, pullRequests };
