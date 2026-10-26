@@ -2,6 +2,7 @@ import { SUPERSET_RELAYED_HEADER } from "@superset/shared/host-routing";
 import {
 	describeRelayClose,
 	type HttpDialFrame,
+	RELAY_CLOSE,
 	RELAY_CONNECT_TIMEOUT_MS,
 	type StreamDial,
 	type StreamDialFailed,
@@ -62,6 +63,10 @@ export interface TunnelClientOptions {
 	 * while an ordinary reconnect costs no API call. On failure the last known
 	 * URL is reused. */
 	resolveRelayUrl?: () => Promise<string>;
+	/** The relay refused this host's control connect (4403). Reconnects pause
+	 * until this settles, so the caller can re-register the host before the
+	 * next attempt instead of being refused every few seconds. */
+	onForbidden?: (reason: string) => Promise<void>;
 }
 
 function toWs(url: string): string {
@@ -82,6 +87,7 @@ export class TunnelClient {
 	private relayUrl: string;
 	private lastAttemptOpened = true;
 	private lastRelayResolveAt = Number.NEGATIVE_INFINITY;
+	private forbiddenRecovery: Promise<void> | null = null;
 	private closed = false;
 
 	constructor(options: TunnelClientOptions) {
@@ -100,6 +106,8 @@ export class TunnelClient {
 				maxReconnectionDelay: 5_000,
 				minReconnectionDelay: 1_000,
 				connectionTimeout: RELAY_CONNECT_TIMEOUT_MS,
+				shouldReconnectOnClose: (event) =>
+					event.code !== RELAY_CLOSE.forbidden || !this.options.onForbidden,
 			},
 		);
 		this.control = control;
@@ -140,6 +148,9 @@ export class TunnelClient {
 				retrying: !this.closed,
 			});
 			this.connectedAt = 0;
+			if (event.code === RELAY_CLOSE.forbidden) {
+				this.recoverFromForbidden(event.reason);
+			}
 		});
 
 		this.pingTimer = setInterval(() => {
@@ -157,6 +168,10 @@ export class TunnelClient {
 					);
 					control.reconnect();
 				}
+				return;
+			}
+			if (this.forbiddenRecovery) {
+				this.notOpenSince = null;
 				return;
 			}
 			this.notOpenSince ??= Date.now();
@@ -182,6 +197,22 @@ export class TunnelClient {
 	private markOpened(): void {
 		this.lastAttemptOpened = true;
 		this.lastRelayResolveAt = Number.NEGATIVE_INFINITY;
+	}
+
+	private recoverFromForbidden(reason: string): void {
+		const { onForbidden } = this.options;
+		if (!onForbidden || this.forbiddenRecovery || this.closed) return;
+		this.forbiddenRecovery = onForbidden(reason)
+			.catch((error) => {
+				console.warn(
+					"[host-service:tunnel] forbidden recovery failed; reconnecting anyway:",
+					error instanceof Error ? error.message : error,
+				);
+			})
+			.then(() => {
+				this.forbiddenRecovery = null;
+				if (!this.closed) this.control?.reconnect();
+			});
 	}
 
 	private async buildControlUrl(): Promise<string> {
