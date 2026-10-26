@@ -30,7 +30,7 @@ function isProcessAlive(pid: number): boolean {
 
 const NOT_RUNNING = new CLIError(
 	"The host service isn't running on this machine",
-	"Launch the Superset desktop app or run: superset start",
+	"Launch the Paradev desktop app or run: superset start",
 );
 
 /** Find a live host-service manifest, preferring the configured org. */
@@ -106,7 +106,7 @@ async function callHost<T>(run: () => Promise<T>): Promise<T> {
 		}
 		throw new CLIError(
 			`Could not reach the host service (${message.slice(0, 80)})`,
-			"Launch the Superset desktop app or run: superset start",
+			"Launch the Paradev desktop app or run: superset start",
 		);
 	}
 }

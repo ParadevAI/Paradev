@@ -16,7 +16,7 @@ export default command({
 		agent: string()
 			.required()
 			.desc(
-				"Agent preset id (e.g. `claude`), HostAgentConfig instance UUID, or `superset` for a Superset session",
+				"Agent preset id (e.g. `claude`), HostAgentConfig instance UUID, or `superset` for a Paradev session",
 			),
 		prompt: string().desc(
 			"Prompt sent to the agent (required unless resuming, forking, or handing off a session)",

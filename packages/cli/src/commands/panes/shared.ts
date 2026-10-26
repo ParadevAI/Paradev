@@ -25,7 +25,7 @@ export async function callPanes<T>(call: () => Promise<T>): Promise<T> {
 		) {
 			throw new CLIError(
 				"This host is too old for `superset panes`",
-				"Update the Superset desktop app on that host",
+				"Update the Paradev desktop app on that host",
 			);
 		}
 		throw error;

@@ -1,6 +1,9 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
-import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
+import {
+	type CloudAgentLaunch,
+	supportsCloudAgentChat,
+} from "@superset/shared/cloud-agent-launch";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
 import { anchorAttachments } from "../../lib/attachments";
@@ -104,11 +107,9 @@ export async function startCloudWorkspace(args: {
 	machineSize?: string;
 	beforeProvision?: (workspaceId: string) => Promise<void>;
 }) {
-	// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
-	const openAsChat =
-		args.launch?.agent === "claude"
-			? acpChatEnabled(args.userId)
-			: Promise.resolve(false);
+	const openAsChat = supportsCloudAgentChat(args.launch?.agent)
+		? acpChatEnabled(args.userId)
+		: Promise.resolve(false);
 	const environment = await loadUsableEnvironment(args);
 	const size = await resolveMachineSize(args.organizationId, args.machineSize);
 	if (!size) throw machineSizeNotAvailable(args.machineSize);

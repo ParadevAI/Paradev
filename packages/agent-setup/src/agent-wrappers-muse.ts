@@ -200,7 +200,7 @@ export function removeMuseManagedHooks(): void {
 	const content = getMuseSettingsJsonWithoutManagedHooks(raw);
 	if (content === null) return;
 	fs.writeFileSync(settingsPath, content, { mode: 0o644 });
-	console.log("[agent-setup] Removed Superset hooks from Muse settings.json");
+	console.log("[agent-setup] Removed Paradev hooks from Muse settings.json");
 }
 
 /** Forwards SUPERSET_* env into the agent process tree; hooks live in the

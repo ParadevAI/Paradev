@@ -1,10 +1,10 @@
 {
 	"$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
 	"name": "io.github.superset-sh/superset",
-	"title": "Superset",
+	"title": "Paradev",
 	"description": "Run parallel coding agents: Git-worktree workspaces, agent sessions, automations, tasks.",
 	"repository": {
-		"url": "https://github.com/superset-sh/superset",
+		"url": "https://github.com/paradevai/paradev",
 		"source": "github",
 		"subfolder": "packages/mcp"
 	},

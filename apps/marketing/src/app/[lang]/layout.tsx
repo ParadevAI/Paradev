@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE, getLocaleMessages } from "@superset/i18n";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
@@ -51,7 +51,7 @@ const siteDescription =
 export const metadata: Metadata = {
 	metadataBase: new URL(COMPANY.MARKETING_URL),
 	title: {
-		default: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
+		default: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
 		template: `%s | ${BRAND.NAME}`,
 	},
 	description: siteDescription,
@@ -73,23 +73,23 @@ export const metadata: Metadata = {
 		locale: "en_US",
 		url: COMPANY.MARKETING_URL,
 		siteName: BRAND.NAME,
-		title: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
+		title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
 		description: siteDescription,
 		images: [
 			{
 				url: "/og-image.png",
 				width: 2400,
 				height: 1260,
-				alt: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
+				alt: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: `${BRAND.INTRO_NAME} - Orchestrate any coding agent`,
+		title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
 		description: siteDescription,
 		images: ["/og-image.png"],
-		creator: "@superset_sh",
+		creator: SOCIAL.X.handle,
 	},
 	robots: {
 		index: true,

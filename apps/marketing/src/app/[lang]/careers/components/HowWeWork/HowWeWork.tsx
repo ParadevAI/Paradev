@@ -16,10 +16,10 @@ export function HowWeWork({ className = "" }: { className?: string }) {
 				<Trans>You can see how we work before you talk to us.</Trans>
 			</p>
 			<div className="grid grid-cols-1 sm:grid-cols-3 sm:border-border sm:border-t">
-				<Principle number="01" title={<Trans>Built in Superset</Trans>}>
+				<Principle number="01" title={<Trans>Built in Paradev</Trans>}>
 					<Trans>
-						Superset is built in Superset, so we're our own #1 users. You get
-						paid to make your own life easier.
+						Paradev is built in Paradev, so we're our own #1 users. You get paid
+						to make your own life easier.
 					</Trans>
 				</Principle>
 				<Principle
@@ -51,7 +51,7 @@ export function HowWeWork({ className = "" }: { className?: string }) {
 					}
 				>
 					<Trans>
-						Superset is source-available. Every pull request, review and bug is
+						Paradev is source-available. Every pull request, review and bug is
 						public on GitHub.
 					</Trans>
 				</Principle>

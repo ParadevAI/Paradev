@@ -1,3 +1,4 @@
+import { isOwnOriginTwin } from "@superset/shared/own-domains";
 import { parseSupersetPageUrl } from "renderer/lib/parseSupersetPageUrl";
 
 export type SupersetAppLink =
@@ -40,7 +41,7 @@ export function parseSupersetAppLink(
 	} catch {
 		return null;
 	}
-	if (url.origin !== web.origin) return null;
+	if (!isOwnOriginTwin(url.origin, web.origin)) return null;
 	const slug = parseSupersetPageUrl(href, webUrl);
 	if (slug) return { kind: "page", slug };
 	for (const [pattern, build] of ROUTES) {

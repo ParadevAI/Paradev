@@ -224,7 +224,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 								<Trans>
 									Show a microphone in the chat composer. Speech is transcribed
 									by ChatGPT when Codex is signed in to it, otherwise on your
-									Mac when possible, and otherwise by Superset's servers.
+									Mac when possible, and otherwise by Paradev's servers.
 								</Trans>
 							</p>
 						</div>

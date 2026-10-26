@@ -1,15 +1,15 @@
 {
 	"name": "@superset/sdk",
 	"version": "0.0.1-alpha.12",
-	"description": "TypeScript SDK for the Superset API",
+	"description": "TypeScript SDK for the Paradev API",
 	"homepage": "https://superset.sh",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/superset-sh/superset.git",
+		"url": "git+https://github.com/paradevai/paradev.git",
 		"directory": "packages/sdk"
 	},
 	"bugs": {
-		"url": "https://github.com/superset-sh/superset/issues"
+		"url": "https://github.com/paradevai/paradev/issues"
 	},
 	"keywords": [
 		"superset",

@@ -108,7 +108,7 @@ describe("a row that will run but stay silent", () => {
 				"pro",
 			),
 		).toEqual([
-			"This trigger will not run for messages in #secret until @Superset is invited.",
+			"This trigger will not run for messages in #secret until @Paradev is invited.",
 		]);
 	});
 });
@@ -145,7 +145,7 @@ describe("several rows at once", () => {
 		);
 		expect(warnings).toEqual([
 			"Slack triggers require the Pro plan.",
-			"This trigger will not run for messages in #secret until @Superset is invited.",
+			"This trigger will not run for messages in #secret until @Paradev is invited.",
 		]);
 	});
 });

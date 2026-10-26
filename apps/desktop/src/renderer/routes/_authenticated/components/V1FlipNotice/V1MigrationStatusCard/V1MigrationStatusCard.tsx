@@ -119,7 +119,7 @@ export function V1MigrationStatusCard({
 				body={translate(
 					msg({
 						message:
-							"Your v1 projects and workspaces are moving to the new Superset. They appear in the sidebar as each one is ready.",
+							"Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready.",
 					}),
 				)}
 				ctaLabel={translate(msg({ message: "Hide" }))}
@@ -135,7 +135,7 @@ export function V1MigrationStatusCard({
 				body={translate(
 					msg({
 						message:
-							"Superset could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one.",
+							"Paradev could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one.",
 					}),
 				)}
 				ctaLabel={translate(msg({ message: "Open importer" }))}
@@ -156,7 +156,7 @@ export function V1MigrationStatusCard({
 				translate(
 					msg({
 						message:
-							"These folders still have your files, but they did not come over to the new Superset on their own.",
+							"These folders still have your files, but they did not come over to the new Paradev on their own.",
 					}),
 				),
 				hasWorktrees
