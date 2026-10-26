@@ -175,7 +175,7 @@ export function createClaudeSubscriptionReader({
 	const pending = new Map<string, Promise<ClaudeSubscriptionQuota>>();
 	const revocations = new Map<string, { denied: boolean }>();
 	let quarantineOverflow = false;
-	let historyInFlight: Promise<unknown> | undefined;
+	const historyInFlight = new Map<string, Promise<unknown>>();
 	function deny(token: string, canonical: string | null) {
 		const key = profileKey(token);
 		const previousProfile = cachedProfile(token);
@@ -264,20 +264,24 @@ export function createClaudeSubscriptionReader({
 		async function optionalHistory<T>(
 			load: (signal: AbortSignal) => Promise<T>,
 		): Promise<T | undefined> {
-			if (historyInFlight) return undefined;
+			const key = profileKey(token);
+			if (historyInFlight.has(key) || historyInFlight.size >= 1024)
+				return undefined;
 			try {
 				return await budget.run(async (signal) => {
 					signal.throwIfAborted();
 					context.signal?.throwIfAborted();
-					if (historyInFlight) return undefined;
+					if (historyInFlight.has(key) || historyInFlight.size >= 1024)
+						return undefined;
 					const operation = Promise.resolve().then(() => {
 						signal.throwIfAborted();
 						context.signal?.throwIfAborted();
 						return load(signal);
 					});
-					historyInFlight = operation;
+					historyInFlight.set(key, operation);
 					const clear = () => {
-						if (historyInFlight === operation) historyInFlight = undefined;
+						if (historyInFlight.get(key) === operation)
+							historyInFlight.delete(key);
 					};
 					void operation.then(clear, clear);
 					return operation;
