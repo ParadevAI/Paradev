@@ -42,7 +42,7 @@ export async function GET() {
 		"- **Diff review**: review every change from one dashboard before merging.",
 		"- **Persistent terminals**: sessions survive app restarts.",
 		"- **Automations** (Pro): run an agent with a prompt on a schedule or when an event happens.",
-		"- **MCP server**: drive Superset from other AI agents over the Model Context Protocol.",
+		`- **MCP server**: drive ${BRAND.NAME} from other AI agents over the Model Context Protocol.`,
 		"",
 		"## Get started",
 		"",

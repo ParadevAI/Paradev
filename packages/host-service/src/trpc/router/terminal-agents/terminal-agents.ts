@@ -417,6 +417,10 @@ const GET_OR_CREATE_TIMEOUT_MS = 10_000;
 const MAX_AGENT_TRANSCRIPT_CHARS = 400_000;
 
 export const terminalAgentsRouter = router({
+	accountRecoveryCapabilities: protectedProcedure.query(() => ({
+		version: 1 as const,
+		exactAccountResume: true as const,
+	})),
 	accountResumeSource: protectedProcedure
 		.input(
 			z.object({ workspaceId: z.string(), terminalId: z.string() }).strict(),

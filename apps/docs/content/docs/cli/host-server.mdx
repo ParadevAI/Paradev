@@ -3,12 +3,12 @@ title: Host Server
 description: Set up the daemon the CLI and desktop app talk to when targeting the local machine.
 ---
 
-The `superset start` command runs a headless HTTP server that any Superset desktop app or CLI can communicate with.
+The `superset start` command runs a headless HTTP server that any Paradev desktop app or CLI can communicate with.
 
 It manages workspaces, ports, and agent runs on the machine it's running on. The desktop app starts it automatically; on a CLI-only or headless machine you start it yourself.
 
 If you installed the desktop app, it already includes the CLI and installs a
-`~/.superset/bin/superset` shim on app launch. Superset terminals prepend
+`~/.superset/bin/superset` shim on app launch. Paradev terminals prepend
 that directory to `PATH` automatically. On a headless machine, use the
 standalone installer from [Getting Started](/cli/getting-started).
 
@@ -37,9 +37,9 @@ If you plan to run AI agents inside workspaces, install whichever agent CLIs you
 
 None are required to start the host server or create workspaces. Install only what you plan to run.
 
-## Authenticate the Superset CLI
+## Authenticate the Paradev CLI
 
-The host server starts under your Superset session. If you haven't already:
+The host server starts under your Paradev session. If you haven't already:
 
 ```bash
 superset auth login
@@ -96,7 +96,7 @@ process:
 ```ini
 # /etc/systemd/system/superset-host.service
 [Unit]
-Description=Superset host server
+Description=Paradev host server
 After=network-online.target
 Wants=network-online.target
 
@@ -137,7 +137,7 @@ superset stop --terminals
 
 ### Create or adopt a project
 
-A workspace branches off a project: a repo registered with Superset.
+A workspace branches off a project: a repo registered with Paradev.
 
 Each repo gets one cloud project record, shared across the organization.
 The first machine to register the repo runs `projects create`; every

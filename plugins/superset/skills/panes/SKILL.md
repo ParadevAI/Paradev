@@ -1,11 +1,13 @@
 ---
 name: panes
-description: Arrange the tabs and split panes of a Superset workspace in the desktop app from an agent. Use when the user asks to split a pane, open a tab, run a command in a new pane, resize, swap, move, focus, close, or even out panes, lay out a dashboard of terminals, or show them something side by side, including "split this and run the tests on the right", "open the logs in a new tab", "make this pane bigger", "put the server and the tests side by side", "close those extra panes". Not for coordinating worker agents (use superset:orchestrate) or driving web pages (use superset:browser).
+description: Arrange the tabs and split panes of a Paradev (formerly Superset) workspace in the desktop app from an agent. Use when the user asks to split a pane, open a tab, run a command in a new pane, resize, swap, move, focus, close, or even out panes, lay out a dashboard of terminals, or show them something side by side, including "split this and run the tests on the right", "open the logs in a new tab", "make this pane bigger", "put the server and the tests side by side", "close those extra panes". Not for coordinating worker agents (use superset:orchestrate) or driving web pages (use superset:browser).
 argument-hint: the layout to build, or the pane change to make
-allowed-tools: Bash(superset:*) Bash(jq:*)
+allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(jq:*)
 ---
 
 # Superset Pane Layout
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 Script the tabs and split panes of a workspace with `superset panes`. Commands go
 to the host, then to the desktop app, which applies them to the live layout the

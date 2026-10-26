@@ -1,0 +1,1 @@
+export { InvestorItem } from "./InvestorItem";

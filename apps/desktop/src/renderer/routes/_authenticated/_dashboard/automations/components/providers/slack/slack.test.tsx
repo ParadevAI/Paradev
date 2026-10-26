@@ -282,7 +282,7 @@ describe("a Slack row watching a channel the bot is not in", () => {
 		expect(
 			warningsFor(message({ channels: { mode: "list", ids: ["C1", "C2"] } })),
 		).toEqual([
-			"This trigger will not run for messages in #secret until @Superset is invited.",
+			"This trigger will not run for messages in #secret until @Paradev is invited.",
 		]);
 	});
 

@@ -1,10 +1,19 @@
+import type { ReactNode } from "react";
+import { HiMiniArrowDownTray } from "react-icons/hi2";
 import type { BundledLanguage } from "shiki";
+import { Investors } from "@/app/[lang]/components/Investors";
+import { LogoMarquee } from "@/app/[lang]/components/LogoMarquee";
+import { PhotoFan } from "@/app/[lang]/components/PhotoFan";
 import { StoreBadges } from "@/app/[lang]/components/StoreBadges";
+import { StoryPhoto } from "@/app/[lang]/components/StoryPhoto";
+import { getAbout } from "@/lib/about";
 import { slugify } from "@/lib/blog-utils";
 import { getPublicImageSize } from "@/lib/public-image-size";
 import { BlogCodeBlock } from "./BlogCodeBlock";
 import { Testimonial } from "./Testimonial";
 import { TestimonialGrid } from "./TestimonialGrid";
+
+const BLOG_PHOTO_FAN_SPACING_PX = 60;
 
 function extractCodeFromChildren(children: React.ReactNode): {
 	code: string;
@@ -112,6 +121,52 @@ export const mdxComponents = {
 	Video,
 	Testimonial,
 	TestimonialGrid,
+	Investors: () => {
+		const { investors, moreInvestors } = getAbout();
+		return (
+			<div className="not-prose my-10">
+				<Investors investors={investors} moreInvestors={moreInvestors} />
+			</div>
+		);
+	},
+	CTAButton: ({ href, children }: { href: string; children: ReactNode }) => (
+		<div className="not-prose my-10 flex">
+			<a
+				href={href}
+				className="group flex items-center gap-2 bg-foreground px-6 py-3 text-base text-background transition-colors hover:bg-brand hover:text-white"
+			>
+				{children}
+				<span className="relative size-4 overflow-hidden">
+					<HiMiniArrowDownTray className="size-4 transition-transform duration-300 ease-out group-hover:translate-y-full" />
+					<HiMiniArrowDownTray className="absolute inset-0 size-4 -translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0" />
+				</span>
+			</a>
+		</div>
+	),
+	LogoMarquee: () => (
+		<div className="not-prose my-8">
+			<LogoMarquee />
+		</div>
+	),
+	TeamPhotos: () => {
+		const photos = getAbout().photos.filter((photo) => !photo.story);
+		return (
+			<div className="not-prose my-10">
+				<PhotoFan photos={photos} cardSpacingPx={BLOG_PHOTO_FAN_SPACING_PX} />
+			</div>
+		);
+	},
+	StoryPhoto: () => {
+		const photo = getAbout().photos.find((candidate) => candidate.story);
+		if (!photo) return null;
+		return (
+			<StoryPhoto
+				photo={photo}
+				sizes="(max-width: 768px) 100vw, 768px"
+				className="not-prose my-8"
+			/>
+		);
+	},
 	StoreBadges: (props: React.ComponentProps<typeof StoreBadges>) => (
 		<div className="not-prose my-6">
 			<StoreBadges {...props} />

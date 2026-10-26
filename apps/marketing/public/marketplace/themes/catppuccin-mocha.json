@@ -3,7 +3,7 @@
 	"name": "Catppuccin Mocha",
 	"type": "dark",
 	"author": "Catppuccin",
-	"description": "Catppuccin Mocha theme for Superset",
+	"description": "Catppuccin Mocha theme for Paradev",
 	"ui": {
 		"background": "#1e1e2e",
 		"foreground": "#cdd6f4",

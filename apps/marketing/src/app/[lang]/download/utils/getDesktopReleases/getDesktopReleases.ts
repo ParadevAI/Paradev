@@ -1,5 +1,6 @@
 import "server-only";
 import { githubRepoSlug } from "@superset/shared/github-stars";
+import { cacheLife } from "next/cache";
 import { env } from "@/env";
 import {
 	type ReleaseAssetInput,
@@ -39,6 +40,8 @@ interface GitHubRelease {
 // list and the page falls back to the always-current `/releases/latest` links
 // rather than rendering a broken catalog.
 export async function getDesktopReleases(): Promise<DesktopRelease[]> {
+	"use cache";
+	cacheLife({ revalidate: REVALIDATE_SECONDS });
 	const slug = githubRepoSlug();
 	const headers: Record<string, string> = {
 		Accept: "application/vnd.github+json",

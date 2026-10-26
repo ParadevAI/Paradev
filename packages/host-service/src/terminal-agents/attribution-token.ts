@@ -208,11 +208,16 @@ export function configureAttributionTokensForDatabase(
 	if (temporaryDirectory === directory) return;
 	try {
 		configureAttributionTokens(directory);
-	} catch {
+	} catch (error) {
 		authority = new AttributionTokenAuthority(randomBytes(32), directory);
 		temporaryDirectory = directory;
 		console.warn(
 			"[native-attribution] Private storage is unavailable; using a host-scoped temporary authority. Existing launch tokens cannot be restored.",
+			{
+				code:
+					(error as NodeJS.ErrnoException | null)?.code ?? "INVALID_STORAGE",
+				directory,
+			},
 		);
 	}
 }

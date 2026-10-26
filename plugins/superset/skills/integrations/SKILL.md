@@ -1,11 +1,13 @@
 ---
 name: integrations
-description: Discover and call the tools a connected integration exposes, such as Linear, GitHub, Sentry, or Notion, through `superset mcp`. Use when the user wants something done in a connected service, asks what an integration can do or which tools it has, wants a specific tool called, asks why an integration's tools are failing, or when another skill expects `mcp__linear__*`-style tools that are not in your tool list.
+description: Discover and call the tools a connected integration exposes, such as Linear, GitHub, Sentry, or Notion, through `superset mcp` (or its alias `paradev mcp`). Use when the user wants something done in a connected service, asks what an integration can do or which tools it has, wants a specific tool called, asks why an integration's tools are failing, or when another skill expects `mcp__linear__*`-style tools that are not in your tool list.
 argument-hint: what you want done in a connected service
-allowed-tools: Bash(superset mcp:*) Bash(superset plugins:*) Bash(superset skills:*)
+allowed-tools: Bash(superset mcp:*) Bash(paradev mcp:*) Bash(superset plugins:*) Bash(paradev plugins:*) Bash(superset skills:*) Bash(paradev skills:*)
 ---
 
 # Calling an integration's tools
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 An integration is an installed plugin with a connected account. Its tools do not run here.
 `superset mcp` hands the call to Superset's API, which attaches the stored credential and

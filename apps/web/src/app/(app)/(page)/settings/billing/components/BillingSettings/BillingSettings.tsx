@@ -295,7 +295,7 @@ export function BillingSettings({
 							</div>
 							<div className="mt-1 text-sm text-muted-foreground">
 								<Trans>
-									Every paid plan includes Superset Mobile, automations, and
+									Every paid plan includes Paradev Mobile, automations, and
 									priority support. Plans with cloud workspaces give your team
 									one shared pool of GB-hours.
 								</Trans>

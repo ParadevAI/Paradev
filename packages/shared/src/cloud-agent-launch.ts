@@ -19,6 +19,10 @@ export function isCloudAgentId(id: string): boolean {
 	return CLOUD_AGENT_IDS.includes(id);
 }
 
+export function supportsCloudAgentChat(agent: string | undefined): boolean {
+	return agent === "claude" || agent === "pdev";
+}
+
 /**
  * What a cloud workspace launches on first boot: a built-in agent and its
  * prompt. The API validates it, provisioning hands it to the sandbox as

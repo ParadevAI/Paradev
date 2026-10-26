@@ -124,8 +124,8 @@ export function SetUpOverSshDialog({
 					</DialogTitle>
 					<DialogDescription>
 						<Trans>
-							Installs Superset on a machine you can reach with ssh, signs
-							Superset in to your account, and keeps it running as a service.
+							Installs Paradev on a machine you can reach with ssh, signs
+							Paradev in to your account, and keeps it running as a service.
 						</Trans>
 					</DialogDescription>
 				</DialogHeader>

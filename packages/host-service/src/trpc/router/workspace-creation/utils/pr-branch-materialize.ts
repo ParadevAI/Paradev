@@ -224,7 +224,7 @@ async function fetchSyntheticPrBranch(args: {
 		warning:
 			args.warning ??
 			(args.pr.isCrossRepository && !forkRemoteUrl
-				? `Superset checked out PR #${args.pr.number} through ${syntheticRef}, but GitHub did not return the fork repository. Plain git push may require manual remote configuration.`
+				? `Paradev checked out PR #${args.pr.number} through ${syntheticRef}, but GitHub did not return the fork repository. Plain git push may require manual remote configuration.`
 				: undefined),
 	};
 }
@@ -324,7 +324,7 @@ async function resolvePrBranchSource(args: {
 			git: args.git,
 			remoteName: args.remoteName,
 			pr: args.pr,
-			warning: `The PR head branch "${args.pr.headRefName}" was unavailable from ${args.remoteName}, so Superset fetched ${getSyntheticPrHeadRef(args.pr.number)} instead. Original error: ${err.originalError instanceof Error ? err.originalError.message : String(err.originalError)}`,
+			warning: `The PR head branch "${args.pr.headRefName}" was unavailable from ${args.remoteName}, so Paradev fetched ${getSyntheticPrHeadRef(args.pr.number)} instead. Original error: ${err.originalError instanceof Error ? err.originalError.message : String(err.originalError)}`,
 		});
 	}
 }

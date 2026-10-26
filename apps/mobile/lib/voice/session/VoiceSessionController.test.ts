@@ -89,7 +89,7 @@ const data: VoiceData = {
 	restartWorkspace: async () => {},
 	readPage: async () => "",
 	listEnvironments: async () => [
-		{ id: "env-1", name: "Superset" },
+		{ id: "env-1", name: "Paradev" },
 		{ id: "env-2", name: "Docs site" },
 	],
 	createWorkspace: async () => ({ id: "ws-new", name: "Fix login" }),
