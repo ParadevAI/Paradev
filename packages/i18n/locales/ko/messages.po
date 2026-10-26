@@ -20350,3 +20350,9 @@ msgstr "사용량을 새로고침하지 못했습니다"
 
 msgid "{remainingPercent} remaining"
 msgstr "{remainingPercent} 남음"
+
+msgid "Could not start chat"
+msgstr "채팅을 시작하지 못했습니다"
+
+msgid "Could not switch account"
+msgstr "계정을 전환하지 못했습니다"

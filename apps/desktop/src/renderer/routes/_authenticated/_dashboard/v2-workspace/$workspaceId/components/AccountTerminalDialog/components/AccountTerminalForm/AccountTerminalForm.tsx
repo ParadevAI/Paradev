@@ -22,7 +22,7 @@ import {
 } from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "resume" | "chat";
+	mode?: "start" | "resume" | "chat" | "browse";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -35,6 +35,7 @@ interface AccountTerminalFormProps {
 	notice?: string | null;
 	launching: boolean;
 	submitLabel?: string;
+	launchFailureMessage?: string;
 	launchDisabled?: boolean;
 	onRefresh: () => Promise<void>;
 	onCancel: () => void;
@@ -57,6 +58,7 @@ export function AccountTerminalForm({
 	notice,
 	launching,
 	submitLabel,
+	launchFailureMessage,
 	launchDisabled = false,
 	onRefresh,
 	onCancel,
@@ -119,9 +121,14 @@ export function AccountTerminalForm({
 					setLaunchError(
 						errorMessage(
 							cause,
-							mode === "resume"
-								? t({ message: "Could not resume this conversation" })
-								: t({ message: "Could not start agent terminal" }),
+							launchFailureMessage ??
+								(mode === "resume"
+									? t({ message: "Could not resume this conversation" })
+									: mode === "browse"
+										? t({ message: "Could not load saved conversations" })
+										: mode === "chat"
+											? t({ message: "Could not start chat" })
+											: t({ message: "Could not start agent terminal" })),
 						),
 					);
 				} finally {
@@ -267,6 +274,8 @@ export function AccountTerminalForm({
 							<Trans>Resume conversation</Trans>
 						) : mode === "chat" ? (
 							<Trans>Start chat</Trans>
+						) : mode === "browse" ? (
+							<Trans>Browse saved history</Trans>
 						) : (
 							(submitLabel ?? <Trans>Start terminal</Trans>)
 						)}

@@ -20350,3 +20350,9 @@ msgstr "Không thể làm mới mức sử dụng"
 
 msgid "{remainingPercent} remaining"
 msgstr "Còn lại {remainingPercent}"
+
+msgid "Could not start chat"
+msgstr "Không thể bắt đầu cuộc trò chuyện"
+
+msgid "Could not switch account"
+msgstr "Không thể chuyển tài khoản"

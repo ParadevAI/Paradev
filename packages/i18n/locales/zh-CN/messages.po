@@ -4126,7 +4126,7 @@ msgid "Close modal backdrop"
 msgstr "关闭弹窗背景"
 
 msgid "Close only this idle agent and switch. Finish background work and save any unsent draft first."
-msgstr "仅关闭此空闲代理并切换账户。请先完成后台工作并保存尚未发送的草稿。"
+msgstr "仅关闭此空闲智能体并切换账户。请先完成后台工作并保存尚未发送的草稿。"
 
 msgid "Close or delete the current workspace"
 msgstr "关闭或删除当前工作区"
@@ -4535,7 +4535,7 @@ msgid "Confirm switch"
 msgstr "确认切换"
 
 msgid "Confirm that this agent can close safely before switching."
-msgstr "切换前，请确认可以安全关闭此代理。"
+msgstr "切换前，请确认可以安全关闭此智能体。"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -20350,3 +20350,9 @@ msgstr "无法刷新使用量"
 
 msgid "{remainingPercent} remaining"
 msgstr "剩余 {remainingPercent}"
+
+msgid "Could not start chat"
+msgstr "无法开始聊天"
+
+msgid "Could not switch account"
+msgstr "无法切换账户"

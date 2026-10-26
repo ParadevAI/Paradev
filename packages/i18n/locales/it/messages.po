@@ -20350,3 +20350,9 @@ msgstr "Impossibile aggiornare l’utilizzo"
 
 msgid "{remainingPercent} remaining"
 msgstr "{remainingPercent} rimanente"
+
+msgid "Could not start chat"
+msgstr "Impossibile avviare la chat"
+
+msgid "Could not switch account"
+msgstr "Impossibile cambiare account"

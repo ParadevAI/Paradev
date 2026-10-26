@@ -20350,3 +20350,9 @@ msgstr "Využití se nepodařilo obnovit"
 
 msgid "{remainingPercent} remaining"
 msgstr "Zbývá {remainingPercent}"
+
+msgid "Could not start chat"
+msgstr "Chat se nepodařilo spustit"
+
+msgid "Could not switch account"
+msgstr "Účet se nepodařilo přepnout"

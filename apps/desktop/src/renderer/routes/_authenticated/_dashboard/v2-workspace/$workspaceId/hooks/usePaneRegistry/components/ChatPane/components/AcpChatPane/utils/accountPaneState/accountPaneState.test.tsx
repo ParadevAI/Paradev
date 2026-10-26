@@ -6,7 +6,7 @@ import {
 } from "./accountPaneState";
 
 const { act, cleanup, renderHook } = await import("@testing-library/react");
-const { useComposerDraft } = await import(
+const { discardComposerDraft, useComposerDraft } = await import(
 	"../../../../../ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft"
 );
 
@@ -115,4 +115,14 @@ test("recovery preserves the draft key of an older account pane without a draft 
 	expect(resumed.result.current.storedDraft).toBe("keep this recovery draft");
 	expect(draftKey(recovered)).toBe(draftKey(pending));
 	expect(recovered.accountBound).toBe(true);
+});
+
+test("discarding a closed account draft prevents a pending debounce from recreating its key", () => {
+	const pending = data();
+	const key = draftKey(pending);
+	const composer = renderHook(() => useComposerDraft(key));
+	act(() => composer.result.current.onChange("closed draft"));
+	act(() => discardComposerDraft(key));
+	composer.unmount();
+	expect(window.localStorage.getItem(key)).toBeNull();
 });

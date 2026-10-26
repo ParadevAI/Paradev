@@ -20350,3 +20350,9 @@ msgstr "無法重新整理用量"
 
 msgid "{remainingPercent} remaining"
 msgstr "剩餘 {remainingPercent}"
+
+msgid "Could not start chat"
+msgstr "無法開始聊天"
+
+msgid "Could not switch account"
+msgstr "無法切換帳戶"

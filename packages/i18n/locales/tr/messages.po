@@ -4126,7 +4126,7 @@ msgid "Close modal backdrop"
 msgstr "Pencere arka planını kapat"
 
 msgid "Close only this idle agent and switch. Finish background work and save any unsent draft first."
-msgstr "Yalnızca bu boşta olan aracıyı kapatıp hesap değiştirin. Önce arka plan işlerini bitirin ve gönderilmemiş taslakları kaydedin."
+msgstr "Yalnızca bu boşta olan ajanı kapatıp hesap değiştirin. Önce arka plan işlerini bitirin ve gönderilmemiş taslakları kaydedin."
 
 msgid "Close or delete the current workspace"
 msgstr "Geçerli çalışma alanını kapat veya sil"
@@ -4535,7 +4535,7 @@ msgid "Confirm switch"
 msgstr "Geçişi onayla"
 
 msgid "Confirm that this agent can close safely before switching."
-msgstr "Geçiş yapmadan önce bu aracının güvenle kapatılabileceğini onaylayın."
+msgstr "Geçiş yapmadan önce bu ajanın güvenle kapatılabileceğini onaylayın."
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -20350,3 +20350,9 @@ msgstr "Kullanım yenilenemedi"
 
 msgid "{remainingPercent} remaining"
 msgstr "{remainingPercent} kaldı"
+
+msgid "Could not start chat"
+msgstr "Sohbet başlatılamadı"
+
+msgid "Could not switch account"
+msgstr "Hesap değiştirilemedi"

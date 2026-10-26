@@ -178,6 +178,7 @@ export function AccountChatSwitch({
 						launching={switching}
 						launchDisabled={!confirmed || disabled}
 						submitLabel={t({ message: "Switch account" })}
+						launchFailureMessage={t({ message: "Could not switch account" })}
 						onRefresh={async () => {
 							await accounts.refetch();
 						}}

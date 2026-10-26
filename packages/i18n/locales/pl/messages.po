@@ -20350,3 +20350,9 @@ msgstr "Nie udało się odświeżyć wykorzystania"
 
 msgid "{remainingPercent} remaining"
 msgstr "Pozostało {remainingPercent}"
+
+msgid "Could not start chat"
+msgstr "Nie udało się rozpocząć czatu"
+
+msgid "Could not switch account"
+msgstr "Nie udało się zmienić konta"
