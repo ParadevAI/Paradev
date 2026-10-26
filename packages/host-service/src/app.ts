@@ -66,6 +66,8 @@ import {
 	resumeSessionDepsFor,
 } from "./trpc/router/terminal-agents/terminal-agents";
 import { provisionSelectedAccounts } from "./trpc/router/usage/account-provisioning";
+import { claudeQuotaPolling } from "./trpc/router/usage/claude-quota-polling";
+import { disposeUsageQuota } from "./trpc/router/usage/usage";
 import {
 	execGh as defaultExecGh,
 	type ExecGh,
@@ -543,10 +545,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		}),
 	);
 
+	const disposeQuotaActivity = claudeQuotaPolling.register(() =>
+		terminalAgentStore.list(),
+	);
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		disposeQuotaActivity();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		await disposeWorkspaceTitleJobs(db);
+		try {
+			await disposeUsageQuota();
+		} catch (err) {
+			console.warn("[host-service] usage quota disposal failed:", err);
+		}
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the
 		// open SQLite handle for the rest of the process lifetime.
