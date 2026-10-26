@@ -10,12 +10,14 @@ export function createCredentialQuotaCache<T extends object>(
 	now = () => Date.now(),
 	random = Math.random,
 ) {
-	const freshFor = (value: T) =>
+	const freshFor = (value: T, pollingMs?: number) =>
 		readQuotaRetryHint(value)
 			? 0
-			: typeof ttlMs === "function"
-				? ttlMs(value)
-				: ttlMs;
+			: pollingMs !== undefined && Number.isFinite(pollingMs) && pollingMs > 0
+				? pollingMs
+				: typeof ttlMs === "function"
+					? ttlMs(value)
+					: ttlMs;
 	const entries = new Map<
 		string,
 		{ value?: T; fetchedAt: number; retryAt: number; pending?: Promise<T> }
@@ -41,12 +43,12 @@ export function createCredentialQuotaCache<T extends object>(
 		peek(transportKey: string) {
 			return transports.get(transportKey);
 		},
-		fresh(transportKey: string) {
+		fresh(transportKey: string, pollingMs?: number) {
 			const value = transports.get(transportKey);
 			return (
 				!!value &&
 				(now() < value.retryAt ||
-					now() - value.fetchedAt < freshFor(value.value))
+					now() - value.fetchedAt < freshFor(value.value, pollingMs))
 			);
 		},
 		retryAt(transportKey: string): number {
@@ -57,13 +59,14 @@ export function createCredentialQuotaCache<T extends object>(
 			load: () => Promise<T>,
 			forceRefresh = false,
 			transportKey = key,
+			pollingMs?: number,
 		): Promise<T> {
 			const transport = transports.get(transportKey);
 			if (
 				transport &&
 				(now() < transport.retryAt ||
 					(!forceRefresh &&
-						now() - transport.fetchedAt < freshFor(transport.value)))
+						now() - transport.fetchedAt < freshFor(transport.value, pollingMs)))
 			)
 				return Promise.resolve(transport.value);
 			let entry = entries.get(key);
@@ -71,7 +74,8 @@ export function createCredentialQuotaCache<T extends object>(
 			if (
 				entry?.value &&
 				(now() < entry.retryAt ||
-					(!forceRefresh && now() - entry.fetchedAt < freshFor(entry.value)))
+					(!forceRefresh &&
+						now() - entry.fetchedAt < freshFor(entry.value, pollingMs)))
 			)
 				return Promise.resolve(entry.value);
 			if (!entry) {

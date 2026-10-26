@@ -8,6 +8,7 @@ export const QUOTA_FORCE_COOLDOWN_MS = 30_000;
 
 export interface UsageQuotaProvider {
 	agent: UsageAccount["agent"];
+	ttlMs?: number;
 	capture: () => Promise<QuotaSnapshot<UsageAccount[]>>;
 	subscribe?: (listener: () => void) => () => void;
 	dispose?: () => Promise<void>;
@@ -19,52 +20,53 @@ export function createUsageQuotaReader(
 	providers: UsageQuotaProvider[],
 	now = Date.now,
 ) {
-	const readers = providers.map(({ agent, capture, subscribe, dispose }) => {
-		const cache = createQuotaCache(capture, QUOTA_CACHE_TTL_MS, now, {
-			forceCooldownMs: QUOTA_FORCE_COOLDOWN_MS,
-			retryOnFailure: true,
-			freshUntil: (accounts) =>
-				Math.min(
-					now() + QUOTA_CACHE_TTL_MS,
-					...accounts.map((account) => {
-						const observedAt = Math.max(
-							new Date(account.fetchedAt).getTime(),
-							...account.windows.flatMap((window) => {
-								if (
-									window.source !== "claude_statusline" &&
-									window.source !== "claude_sdk"
-								)
-									return [];
-								const at = window.observedAt?.getTime();
-								return at !== undefined &&
-									Number.isFinite(at) &&
-									at <= now() &&
-									window.resetsAt !== null &&
-									window.resetsAt.getTime() > now() &&
-									Number.isFinite(window.usedPercent) &&
-									window.usedPercent >= 0 &&
-									window.usedPercent <= 100
-									? [at]
-									: [];
-							}),
-						);
-						return Number.isFinite(observedAt) && observedAt <= now()
-							? observedAt +
-									Math.max(QUOTA_CACHE_TTL_MS, readQuotaRetry(account))
-							: now() + QUOTA_CACHE_TTL_MS;
-					}),
-				),
-			isFailure: (accounts) =>
-				accounts.length > 0 &&
-				accounts.every((account) => account.status === "unavailable"),
-		});
-		return {
-			agent,
-			cache,
-			unsubscribe: subscribe?.(() => cache.expire()),
-			dispose,
-		};
-	});
+	const readers = providers.map(
+		({ agent, capture, subscribe, dispose, ttlMs = QUOTA_CACHE_TTL_MS }) => {
+			const cache = createQuotaCache(capture, ttlMs, now, {
+				forceCooldownMs: QUOTA_FORCE_COOLDOWN_MS,
+				retryOnFailure: true,
+				freshUntil: (accounts) =>
+					Math.min(
+						now() + ttlMs,
+						...accounts.map((account) => {
+							const observedAt = Math.max(
+								new Date(account.fetchedAt).getTime(),
+								...account.windows.flatMap((window) => {
+									if (
+										window.source !== "claude_statusline" &&
+										window.source !== "claude_sdk"
+									)
+										return [];
+									const at = window.observedAt?.getTime();
+									return at !== undefined &&
+										Number.isFinite(at) &&
+										at <= now() &&
+										window.resetsAt !== null &&
+										window.resetsAt.getTime() > now() &&
+										Number.isFinite(window.usedPercent) &&
+										window.usedPercent >= 0 &&
+										window.usedPercent <= 100
+										? [at]
+										: [];
+								}),
+							);
+							return Number.isFinite(observedAt) && observedAt <= now()
+								? observedAt + Math.max(ttlMs, readQuotaRetry(account))
+								: now() + ttlMs;
+						}),
+					),
+				isFailure: (accounts) =>
+					accounts.length > 0 &&
+					accounts.every((account) => account.status === "unavailable"),
+			});
+			return {
+				agent,
+				cache,
+				unsubscribe: subscribe?.(() => cache.expire()),
+				dispose,
+			};
+		},
+	);
 	return {
 		async get(forceRefresh = false): Promise<UsageAccount[]> {
 			return (
@@ -92,6 +94,10 @@ export function createUsageQuotaReader(
 		async dispose() {
 			for (const reader of readers) reader.unsubscribe?.();
 			await Promise.all(readers.map((reader) => reader.dispose?.()));
+		},
+		expire(agent: UsageAccount["agent"]) {
+			for (const reader of readers)
+				if (reader.agent === agent) reader.cache.expire();
 		},
 		invalidate() {
 			for (const { cache } of readers) cache.invalidate();

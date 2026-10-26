@@ -2,6 +2,35 @@ import { expect, test } from "bun:test";
 import { createCredentialQuotaCache } from "./credential-quota-cache";
 import { recordQuotaRetry } from "./quota-backoff";
 
+test("active cadence refreshes earlier, idle cadence reuses readings, and aliases keep server cooldowns", async () => {
+	let now = 0,
+		loads = 0;
+	const cache = createCredentialQuotaCache<{ observedAt: number }>(
+		600_000,
+		() => now,
+	);
+	const load = async () => ({ observedAt: ++loads });
+	const first = await cache.get("idle", load, false, "token", 600_000);
+	now = 120_000;
+	expect(await cache.get("idle", load, false, "token", 600_000)).toBe(first);
+	expect(cache.fresh("token", 120_000)).toBe(false);
+	expect(await cache.get("active", load, false, "token", 120_000)).toEqual({
+		observedAt: 2,
+	});
+	const limited = recordQuotaRetry(
+		{ observedAt: 3 },
+		new Response("", { status: 429, headers: { "retry-after": "600" } }),
+	);
+	await cache.get("active", async () => limited, true, "token", 120_000);
+	now += 599_999;
+	expect(await cache.get("alias", load, true, "token", 1)).toBe(limited);
+	expect(loads).toBe(2);
+	expect(cache.fresh("token", 1)).toBe(true);
+	now++;
+	await cache.get("alias", load, false, "token", 120_000);
+	expect(loads).toBe(3);
+});
+
 test("profile aliases cannot bypass one transport credential's absolute Retry-After", async () => {
 	let now = 0,
 		loads = 0;

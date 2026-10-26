@@ -252,6 +252,12 @@ export interface ChatSessionsChangedMessage {
 	occurredAt: number;
 }
 
+export interface UsageChangedMessage {
+	type: "usage:changed";
+	provider: "claude";
+	occurredAt: number;
+}
+
 export type ServerMessage =
 	| FsEventsMessage
 	| GitChangedMessage
@@ -266,6 +272,7 @@ export type ServerMessage =
 	| TagFoldersChangedMessage
 	| PageWatchChangedMessage
 	| ChatSessionsChangedMessage
+	| UsageChangedMessage
 	| EventBusErrorMessage;
 
 /**

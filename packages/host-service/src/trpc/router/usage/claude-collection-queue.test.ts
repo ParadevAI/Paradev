@@ -4,6 +4,26 @@ import {
 	createRestartableClaudeCollectionQueue,
 } from "./claude-collection-queue";
 
+test("default automatic collection spaces account starts by one second", async () => {
+	let at = 0;
+	const starts: number[] = [];
+	const queue = createClaudeCollectionQueue({
+		now: () => at,
+		sleep: async (ms) => {
+			at += ms;
+		},
+	});
+	await Promise.all(
+		Array.from({ length: 4 }, (_, index) =>
+			queue.enqueue(String(index), async () => {
+				starts.push(at);
+			}),
+		),
+	);
+	expect(starts).toEqual([0, 1_000, 2_000, 3_000]);
+	await queue.dispose();
+});
+
 test("twenty slow accounts enqueue without blocking inventory, serialize, coalesce and prioritize a selected account", async () => {
 	let at = 0,
 		running = 0,

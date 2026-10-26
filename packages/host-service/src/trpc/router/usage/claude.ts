@@ -16,6 +16,10 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { createRestartableClaudeCollectionQueue } from "./claude-collection-queue";
 import {
+	CLAUDE_IDLE_QUOTA_POLL_MS,
+	claudeQuotaPolling,
+} from "./claude-quota-polling";
+import {
 	type ClaudeSubscriptionQuota,
 	fetchClaudeSubscriptionQuota,
 } from "./claude-subscription";
@@ -530,10 +534,10 @@ async function discoverClaudeCredentials(
 export type { ClaudeSubscriptionQuota } from "./claude-subscription";
 export { fetchClaudeSubscriptionQuota } from "./claude-subscription";
 
-export const CLAUDE_QUOTA_POLL_MS = 15 * 60_000;
+export const CLAUDE_QUOTA_POLL_MS = 60_000;
 const accountQuotaCache = createCredentialQuotaCache<
 	ClaudeSubscriptionQuota & { fetchedAt: Date }
->(CLAUDE_QUOTA_POLL_MS);
+>(CLAUDE_IDLE_QUOTA_POLL_MS);
 const collectionQueue = createRestartableClaudeCollectionQueue();
 export const onClaudeQuotaUpdate = collectionQueue.subscribe;
 export const disposeClaudeQuotaCollection = collectionQueue.dispose;
@@ -645,6 +649,7 @@ export async function getCredentialQuota(
 	const transport = createHash("sha256")
 		.update(JSON.stringify(["claude", accessToken]))
 		.digest("hex");
+	const pollingMs = claudeQuotaPolling.interval(credential.selection ?? null);
 	const cached = accountQuotaCache.peek(transport)?.value;
 	const projectNative = async (
 		quota: ClaudeSubscriptionQuota & { fetchedAt: Date },
@@ -696,12 +701,16 @@ export async function getCredentialQuota(
 			},
 			forceRefresh,
 			transport,
+			pollingMs,
 		);
 	if (mode === "blocking") {
 		const loaded = await load();
 		return (await projectNative(loaded)) ?? loaded;
 	}
-	if (mode !== "skip" && (forceRefresh || !accountQuotaCache.fresh(transport)))
+	if (
+		mode !== "skip" &&
+		(forceRefresh || !accountQuotaCache.fresh(transport, pollingMs))
+	)
 		void collectionQueue.enqueue(transport, load, forceRefresh).catch(() => {});
 	return (
 		passive ??

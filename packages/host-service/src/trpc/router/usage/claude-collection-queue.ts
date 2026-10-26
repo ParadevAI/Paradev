@@ -2,7 +2,7 @@ export function createClaudeCollectionQueue({
 	now = Date.now,
 	sleep = (ms: number) =>
 		new Promise<void>((resolve) => setTimeout(resolve, ms)),
-	staggerMs = 150,
+	staggerMs = 1_000,
 	capacity = 1024,
 }: {
 	now?: () => number;
