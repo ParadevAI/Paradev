@@ -237,6 +237,7 @@ type SubagentRun = {
 	parentSessionId: string;
 	parentTaskId?: string;
 	steers: Set<{ echoes: Set<string>; shared: boolean }>;
+	cancelGeneration: number;
 };
 
 type SubagentControls = {
@@ -701,6 +702,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const run = subagentSessionId && this.subagents.get(subagentSessionId);
 		if (subagentSessionId) {
 			if (!run || run.item.canStop !== true) return false;
+			run.cancelGeneration++;
 			this.client.notify("session/cancel", { sessionId: subagentSessionId });
 			this.cancelSubagentApprovals(subagentSessionId, run);
 			return true;
@@ -723,13 +725,42 @@ export class AcpAdapter implements HarnessAdapter {
 		const run = subagentSessionId && this.subagents.get(subagentSessionId);
 		if (!client || !subagentSessionId || !run || run.item.canSteer !== true)
 			return false;
+		const cancelGeneration = run.cancelGeneration;
+		const prompt = await this.toAcpPrompt(content);
+		if (
+			this.disposed ||
+			this.dead ||
+			this.client !== client ||
+			this.subagents.get(subagentSessionId) !== run ||
+			run.cancelGeneration !== cancelGeneration ||
+			run.item.canSteer !== true
+		)
+			return false;
 		const steer = { echoes: new Set<string>(), shared: run.steers.size > 0 };
 		for (const other of run.steers) other.shared = true;
 		run.steers.add(steer);
 		try {
+			if (this.negotiatedVersion < 2 && this.supportsSteering) {
+				const response = await client.request(ACP_STEERING_METHOD, {
+					sessionId: subagentSessionId,
+					prompt,
+					_meta: { steering: { idleBehavior: "promptRequired" } },
+				});
+				const outcome =
+					acpSteeringResponseSchema.safeParse(response).data?.outcome;
+				if (outcome === "injected" || outcome === "startedNewTurn") return true;
+				if (outcome !== "promptRequired") return false;
+				if (
+					this.client !== client ||
+					this.subagents.get(subagentSessionId) !== run ||
+					run.cancelGeneration !== cancelGeneration ||
+					run.item.canSteer !== true
+				)
+					return false;
+			}
 			await client.request("session/prompt", {
 				sessionId: subagentSessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			return true;
 		} catch (error) {
@@ -1702,6 +1733,7 @@ export class AcpAdapter implements HarnessAdapter {
 			parentSessionId,
 			...(parent ? { parentTaskId: parent.item.id } : {}),
 			steers: new Set(),
+			cancelGeneration: 0,
 		};
 		this.subagents.set(sessionId, run);
 		this.emitItem(item, turnId);
