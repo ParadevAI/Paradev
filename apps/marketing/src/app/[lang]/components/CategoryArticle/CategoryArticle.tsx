@@ -102,7 +102,7 @@ export function CategoryArticle({ page }: CategoryArticleProps) {
 					</div>
 					<div className="max-w-3xl mx-auto px-6 py-10 text-center">
 						<p className="text-muted-foreground mb-4">
-							<Trans>Ready to try Superset?</Trans>
+							<Trans>Ready to try Paradev?</Trans>
 						</p>
 						<Link
 							href="/"

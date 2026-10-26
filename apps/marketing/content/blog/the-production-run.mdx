@@ -36,7 +36,7 @@ Six variables come off your machine. Five are recorded per day, one is measured 
 | `tokens` | per day | All tokens across every session |
 | `sessions` | per day | Distinct sessions with activity |
 | `parallelSessions` | per day | Median distinct sessions active in the same 15-minute bucket |
-| `agentPrsMerged` | per day | PRs merged from a Superset workspace that ran an agent |
+| `agentPrsMerged` | per day | PRs merged from a Paradev workspace that ran an agent |
 | `activeDays` | window | Days in the trailing 30 with any activity |
 | `usd` | per day | API-equivalent cost of those tokens |
 
@@ -46,7 +46,7 @@ Five of them get graded, as five axes:
 
 **Depth**, from `tokens / sessions`, never tokens on their own. A supervised back-and-forth burns a fraction of what a session that runs a whole task alone does. Because it's a ratio, spending more inside one session raises Depth but not Width, and opening more sessions raises Width but dilutes Depth. You have to change how you work to move either one.
 
-**Output**, from `agentPrsMerged`. Whether the work lands, counted from PRs merged out of a Superset workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.
+**Output**, from `agentPrsMerged`. Whether the work lands, counted from PRs merged out of a Paradev workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.
 
 **Sustain**, from `activeDays`. Whether it's your normal mode or a good week.
 
@@ -58,7 +58,7 @@ Cost is graded on dollars per merged PR rather than on spend, because spend is a
 
 The leaderboard payload contains five aggregate numbers a day and your chosen handle. It does not include prompts, file paths, repo or branch names, or PR titles or numbers.
 
-> **A note on this being wrong.** These thresholds are calibration guesses. The parallelism numbers are quoted from Factory 2026, but the token and PR floors are our best estimates and they will move as we see real data. The Output axis is the weakest of them today: PR sync is GitHub-only, it sees work inside Superset workspaces and nothing outside them, and a merge observed while the app is closed can go unrecorded. We'd rather ship an instrument that undercounts and fix it in public than wait for a perfect one. Expect this to change. We'll say so when it does.
+> **A note on this being wrong.** These thresholds are calibration guesses. The parallelism numbers are quoted from Factory 2026, but the token and PR floors are our best estimates and they will move as we see real data. The Output axis is the weakest of them today: PR sync is GitHub-only, it sees work inside Paradev workspaces and nothing outside them, and a merge observed while the app is closed can go unrecorded. We'd rather ship an instrument that undercounts and fix it in public than wait for a perfect one. Expect this to change. We'll say so when it does.
 
 # The four tiers
 

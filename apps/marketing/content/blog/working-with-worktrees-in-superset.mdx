@@ -1,5 +1,5 @@
 ---
-title: "Working with Git Worktrees in Superset"
+title: "Working with Git Worktrees in Paradev"
 description: "Create separate workspaces for coding agents, review their diffs, and merge changes. Learn what Git worktrees isolate and which resources remain shared."
 author: kiet
 date: 2026-02-18
@@ -11,7 +11,7 @@ relatedSlugs:
 
 When two agents edit the same checkout, they can overwrite each other's files or mix changes in the staging area. Give each independent task a Git worktree so you can review and merge it separately.
 
-Superset creates workspaces around that workflow. Each worktree has its own working directory and index, with a branch for the task. The repository's Git history is shared.
+Paradev creates workspaces around that workflow. Each worktree has its own working directory and index, with a branch for the task. The repository's Git history is shared.
 
 ## What a worktree separates
 
@@ -21,7 +21,7 @@ Creating a worktree checks out another copy of the files without downloading the
 
 ## Create a workspace for each task
 
-Open your project in Superset and create a workspace for a task such as “add input validation to the signup form.” Choose a branch, then start your agent in that workspace.
+Open your project in Paradev and create a workspace for a task such as “add input validation to the signup form.” Choose a branch, then start your agent in that workspace.
 
 ```text
 ~/my-project/                          # Main working tree
@@ -37,7 +37,7 @@ Worktrees aren't a security boundary. An agent with permission to access other d
 
 ## Run independent tasks in parallel
 
-![Claude working in one Superset workspace while other agents run in separate workspaces.](/images/readme/agents-working.gif)
+![Claude working in one Paradev workspace while other agents run in separate workspaces.](/images/readme/agents-working.gif)
 
 Start with two or three tasks that don't depend on each other. For example:
 
@@ -51,7 +51,7 @@ Use whichever agent works for your project. Keep the scope small enough that you
 
 ## Review the change in context
 
-Open the workspace's diff in Superset. Check for unexpected files, read the changed code, and confirm that the relevant tests ran. Open the worktree in your editor when you need to trace a caller or understand surrounding behavior.
+Open the workspace's diff in Paradev. Check for unexpected files, read the changed code, and confirm that the relevant tests ran. Open the worktree in your editor when you need to trace a caller or understand surrounding behavior.
 
 Ask for corrections in the same workspace. Once the change is ready, commit it and follow your normal pull-request process.
 
@@ -63,11 +63,11 @@ Two dev servers may try to use the same port. Two tests may write to the same da
 
 Give previews distinct ports and use separate test data where tasks write to shared services. If a task needs stronger runtime isolation, use an appropriate container or separate host alongside the worktree.
 
-Superset's terminal daemon keeps sessions separate from the desktop UI, so an app restart can reconnect to running processes. The host and daemon must remain running. If a reboot or crash ends an agent session, Superset resumes it in the same pane with the agent's own resume command, for agents with an ID-based resume command set under **Settings → Agents**. See the [terminal daemon design](/blog/terminal-daemon-deep-dive) for the difference between reconnecting and restoring saved history.
+Paradev's terminal daemon keeps sessions separate from the desktop UI, so an app restart can reconnect to running processes. The host and daemon must remain running. If a reboot or crash ends an agent session, Paradev resumes it in the same pane with the agent's own resume command, for agents with an ID-based resume command set under **Settings → Agents**. See the [terminal daemon design](/blog/terminal-daemon-deep-dive) for the difference between reconnecting and restoring saved history.
 
 ## Clean up finished work
 
-After a change is merged, stop its agent and dev server, then remove the workspace when you no longer need it. Check for uncommitted work before deleting it. When you delete several workspaces at once, Superset previews each one and flags dirty or unpushed work first. Deleting a workspace also runs the teardown commands in the project's `.superset/config.json`.
+After a change is merged, stop its agent and dev server, then remove the workspace when you no longer need it. Check for uncommitted work before deleting it. When you delete several workspaces at once, Paradev previews each one and flags dirty or unpushed work first. Deleting a workspace also runs the teardown commands in the project's `.superset/config.json`.
 
 For a worktree you created manually, use:
 

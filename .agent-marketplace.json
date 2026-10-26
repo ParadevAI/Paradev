@@ -15,7 +15,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/github",
-			"version": "1.0.1"
+			"version": "1.0.2"
 		},
 		{
 			"name": "linear",
@@ -25,7 +25,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/linear",
-			"version": "1.5.3"
+			"version": "1.5.4"
 		},
 		{
 			"name": "notion",
@@ -35,7 +35,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/notion",
-			"version": "1.0.3"
+			"version": "1.0.4"
 		},
 		{
 			"name": "slack",
@@ -45,7 +45,7 @@
 			},
 			"category": "communication",
 			"source": "./plugins/slack",
-			"version": "1.2.3"
+			"version": "1.2.4"
 		},
 		{
 			"name": "sentry",
@@ -55,7 +55,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/sentry",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "gmail",
@@ -65,7 +65,7 @@
 			},
 			"category": "communication",
 			"source": "./plugins/gmail",
-			"version": "1.1.5"
+			"version": "1.1.6"
 		},
 		{
 			"name": "granola",
@@ -75,7 +75,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/granola",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "circleback",
@@ -85,7 +85,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/circleback",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "ynab",
@@ -95,7 +95,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/ynab",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "autumn",
@@ -105,7 +105,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/autumn",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "stripe",
@@ -115,7 +115,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/stripe",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "superhuman",
@@ -125,7 +125,7 @@
 			},
 			"category": "communication",
 			"source": "./plugins/superhuman",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "neon",
@@ -135,7 +135,7 @@
 			},
 			"category": "data & apis",
 			"source": "./plugins/neon",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "exa",
@@ -145,7 +145,7 @@
 			},
 			"category": "data & apis",
 			"source": "./plugins/exa",
-			"version": "1.0.1"
+			"version": "1.0.2"
 		},
 		{
 			"name": "posthog",
@@ -155,7 +155,7 @@
 			},
 			"category": "data & apis",
 			"source": "./plugins/posthog",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "google-calendar",
@@ -165,7 +165,7 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/google-calendar",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		},
 		{
 			"name": "vercel",
@@ -175,7 +175,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/vercel",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		}
 	],
 	"featured": ["github", "linear"],

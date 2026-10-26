@@ -52,7 +52,7 @@ export function CTASection({ showInstallCommand = true }: CTASectionProps) {
 						<>
 							<p className="mt-10 mb-4 text-sm text-muted-foreground">
 								<Trans>
-									Or ask your coding agent to install the Superset CLI.
+									Or ask your coding agent to install the Paradev CLI.
 								</Trans>
 							</p>
 							<InstallCommand />

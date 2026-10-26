@@ -134,7 +134,7 @@ async function main() {
 		console.log(
 			`${provider}: ${tally.copy} to copy, ${tally["already-copied"]} already copied, ${tally.reconnected} reconnected since` +
 				(source
-					? ` | external user id from identity ${source.identity}, from Superset user ${source["superset-user"]}, not required ${source["not-required"]}`
+					? ` | external user id from identity ${source.identity}, from Paradev user ${source["superset-user"]}, not required ${source["not-required"]}`
 					: ""),
 		);
 	}

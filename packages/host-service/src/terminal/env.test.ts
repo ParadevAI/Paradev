@@ -224,7 +224,7 @@ describe("stripTerminalRuntimeEnv", () => {
 		expect(result.EDITOR).toBe("vim");
 	});
 
-	test("explicit Superset support keys are kept", () => {
+	test("explicit Paradev support keys are kept", () => {
 		const result = stripTerminalRuntimeEnv(secretsEnv);
 		expect(result.SUPERSET_HOME_DIR).toBe("/Users/test/.superset");
 		expect(result.SUPERSET_AGENT_HOOK_PORT).toBe("51741");
@@ -540,7 +540,7 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.SHELL).toBe("/opt/homebrew/bin/fish");
 	});
 
-	test("allows empty root path and alternate Superset env without breaking the contract", () => {
+	test("allows empty root path and alternate Paradev env without breaking the contract", () => {
 		const env = buildV2TerminalEnv({ ...baseParams, rootPath: "" });
 		expect(env.SUPERSET_ROOT_PATH).toBe("");
 

@@ -26,7 +26,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          path-to-document: https://github.com/superset-sh/superset/blob/main/CLA.md
+          path-to-document: https://github.com/paradevai/paradev/blob/main/CLA.md
           path-to-signatures: signatures/v1/cla.json
           branch: cla-signatures
           allowlist: AviPeltz,Kitenite,saddlepaddle,harshithmullapudi,superset-home,*[bot]

@@ -21,11 +21,11 @@ keywords:
   - opencode vs codex
 ---
 
-OpenCode is the most popular open-source coding agent with free choice of provider. It is MIT-licensed and free, with a terminal UI, a desktop app, an IDE extension, built-in subagents, and a server with an SDK. If you want other open-source agents, or the labs' own agents for their models, the list below covers the best options. Superset lets you keep OpenCode and run any of them beside it, each in its own Git worktree, so you can compare the diffs on your own code.
+OpenCode is the most popular open-source coding agent with free choice of provider. It is MIT-licensed and free, with a terminal UI, a desktop app, an IDE extension, built-in subagents, and a server with an SDK. If you want other open-source agents, or the labs' own agents for their models, the list below covers the best options. Paradev lets you keep OpenCode and run any of them beside it, each in its own Git worktree, so you can compare the diffs on your own code.
 
-**Our recommendation: keep OpenCode, and use Superset to try the alternatives side by side on the same task.** The list below covers open-source agents and the major labs' agents.
+**Our recommendation: keep OpenCode, and use Paradev to try the alternatives side by side on the same task.** The list below covers open-source agents and the major labs' agents.
 
-[Download Superset](/download) to run two agents on one task, or read [Superset vs OpenCode](/compare/superset-vs-opencode) for how the two fit together. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+[Download Paradev](/download) to run two agents on one task, or read [Paradev vs OpenCode](/compare/superset-vs-opencode) for how the two fit together. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
 
 ---
 
@@ -39,7 +39,7 @@ OpenCode is the most popular open-source coding agent with free choice of provid
 | **Goose** | General-purpose agent with a desktop app | 15+ providers | Free; your own keys | Open source (Apache-2.0) |
 | **Qwen Code** | Open models, local models, agent teams | Qwen, other APIs, or local | Coding Plan Pro $50/mo or pay-as-you-go | Open source (Apache-2.0) |
 | **Antigravity CLI** | Free start with strong models | Gemini, plus Claude and gpt-oss | Free with weekly limits; Google AI Pro and Ultra; API key | Proprietary |
-| **Superset** | Running OpenCode and these agents side by side | Whatever each agent uses | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | Source-available (ELv2) |
+| **Paradev** | Running OpenCode and these agents side by side | Whatever each agent uses | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | Source-available (ELv2) |
 
 ## Why Look for an OpenCode Alternative?
 
@@ -56,13 +56,13 @@ OpenCode is a strong default. Common reasons to look further:
 
 OpenAI's agent is open source under Apache-2.0 and comes with ChatGPT plans. It has subagents, worktrees, `codex exec` for CI, an SDK, a GitHub Action, and cloud tasks. Choose it if you want an open-source agent with a major lab behind it.
 
-See [Codex vs OpenCode](/compare/codex-vs-opencode) and [Superset vs Codex](/compare/superset-vs-codex).
+See [Codex vs OpenCode](/compare/codex-vs-opencode) and [Paradev vs Codex](/compare/superset-vs-codex).
 
 ### Claude Code
 
 Anthropic's agent has the widest range of parallel modes: subagents, `/batch` runs across worktrees, cloud sessions, and Remote Control, plus plugins, skills, and hooks. It is proprietary and needs a paid Claude plan or an API key.
 
-See [Claude Code vs OpenCode](/compare/claude-code-vs-opencode) and [Superset vs Claude Code](/compare/superset-vs-claude-code).
+See [Claude Code vs OpenCode](/compare/claude-code-vs-opencode) and [Paradev vs Claude Code](/compare/superset-vs-claude-code).
 
 ### Pi
 
@@ -80,13 +80,13 @@ Qwen Code is Alibaba's Apache-2.0 agent. It runs Qwen, other APIs, or local mode
 
 Google's `agy` runs async subagents that can each take a worktree and is free with weekly limits, with Gemini, Claude, and gpt-oss models. It is proprietary, but it is the most generous free option from a major lab.
 
-See [Superset vs Google Antigravity](/compare/superset-vs-antigravity).
+See [Paradev vs Google Antigravity](/compare/superset-vs-antigravity).
 
-### Superset (to run them all)
+### Paradev (to run them all)
 
-Superset is not an agent. It is a desktop workspace that runs OpenCode and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Superset never proxies model calls. OpenCode, Codex, Claude Code, Antigravity CLI, and Pi are built-in presets; Goose and Qwen Code run as custom commands. Give the same prompt to OpenCode and Codex in two workspaces, review both diffs in the Changes pane, and open a PR from the better one.
+Paradev is not an agent. It is a desktop workspace that runs OpenCode and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Paradev never proxies model calls. OpenCode, Codex, Claude Code, Antigravity CLI, and Pi are built-in presets; Goose and Qwen Code run as custom commands. Give the same prompt to OpenCode and Codex in two workspaces, review both diffs in the Changes pane, and open a PR from the better one.
 
-See [Superset vs OpenCode](/compare/superset-vs-opencode).
+See [Paradev vs OpenCode](/compare/superset-vs-opencode).
 
 ## How To Choose
 
@@ -96,20 +96,20 @@ See [Superset vs OpenCode](/compare/superset-vs-opencode).
 - For a general-purpose agent with a desktop app, choose **Goose**.
 - For open and local models, choose **Qwen Code**.
 - For a free start with strong models, choose **Antigravity CLI**.
-- To compare any of them with OpenCode on your own repository, use **Superset**.
+- To compare any of them with OpenCode on your own repository, use **Paradev**.
 
 ## Verdict
 
-OpenCode is the best open-source agent for any model, and many developers will keep it. Run OpenCode and one alternative on the same task in Superset, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
+OpenCode is the best open-source agent for any model, and many developers will keep it. Run OpenCode and one alternative on the same task in Paradev, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
 
 ## What To Try First
 
-- **Keep OpenCode:** launch it in a Superset workspace.
+- **Keep OpenCode:** launch it in a Paradev workspace.
 - **Add an alternative:** start a second workspace from the same branch with Codex or Claude Code.
 - **Give both the same prompt:** each agent works in its own worktree.
 - **Compare:** review both diffs, run your checks, and open a PR from the better one.
 
-[Download Superset](/download), then see [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
+[Download Paradev](/download), then see [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
 
 ## Frequently Asked Questions
 
@@ -123,8 +123,8 @@ Yes. Codex CLI (Apache-2.0), Pi (MIT), Goose (Apache-2.0), and Qwen Code (Apache
 
 ### Can I run OpenCode in parallel?
 
-Yes. In Superset, each OpenCode session gets its own workspace and Git worktree, so several sessions can work on one repository without overwriting each other's files.
+Yes. In Paradev, each OpenCode session gets its own workspace and Git worktree, so several sessions can work on one repository without overwriting each other's files.
 
 ### Can I use OpenCode and Claude Code together?
 
-Yes. Superset runs both side by side, each in its own worktree. You pay each provider for its own usage.
+Yes. Paradev runs both side by side, each in its own worktree. You pay each provider for its own usage.

@@ -30,4 +30,4 @@ type Story = StoryObj<typeof meta>;
 
 export const Person: Story = {};
 
-export const Superset: Story = { args: { actor: { kind: "system" } } };
+export const Paradev: Story = { args: { actor: { kind: "system" } } };

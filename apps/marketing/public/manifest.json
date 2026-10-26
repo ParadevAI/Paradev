@@ -1,6 +1,6 @@
 {
-	"name": "Superset",
-	"short_name": "Superset",
+	"name": "Paradev",
+	"short_name": "Paradev",
 	"description": "Run 10+ parallel coding agents on your machine",
 	"start_url": "/",
 	"display": "standalone",

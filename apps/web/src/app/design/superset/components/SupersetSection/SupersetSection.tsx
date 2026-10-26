@@ -36,7 +36,7 @@ export function SupersetSection() {
 			index="01"
 			title={i18n._(
 				msg({
-					message: "Superset originals",
+					message: "Paradev originals",
 				}),
 			)}
 			description={i18n._(
@@ -76,7 +76,7 @@ export function SupersetSection() {
 				importPath="@superset/ui/theme-preview-card"
 			>
 				<ThemePreviewCard
-					name="Superset Dark"
+					name="Paradev Dark"
 					subtitle={i18n._(
 						msg({
 							message: "Default terminal theme",

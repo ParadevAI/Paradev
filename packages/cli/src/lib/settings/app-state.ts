@@ -44,8 +44,8 @@ function readAppState(): AppState {
 	const path = getAppStatePath();
 	if (!existsSync(path)) {
 		throw new CLIError(
-			`Superset app state not found at ${path}`,
-			"Launch the Superset desktop app once on this machine first.",
+			`Paradev app state not found at ${path}`,
+			"Launch the Paradev desktop app once on this machine first.",
 		);
 	}
 	let parsed: unknown;
@@ -53,12 +53,12 @@ function readAppState(): AppState {
 		parsed = JSON.parse(readFileSync(path, "utf-8"));
 	} catch {
 		throw new CLIError(
-			`Superset app state at ${path} is not valid JSON`,
+			`Paradev app state at ${path} is not valid JSON`,
 			"The desktop app rewrites it on next launch; retry after opening the app.",
 		);
 	}
 	if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-		throw new CLIError(`Superset app state at ${path} is not a JSON object`);
+		throw new CLIError(`Paradev app state at ${path} is not a JSON object`);
 	}
 	return parsed as AppState;
 }

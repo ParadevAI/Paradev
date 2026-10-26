@@ -76,7 +76,7 @@ export function PublicPageView({
 
 			<footer className="shrink-0 border-t px-3 py-1.5 text-center text-[11px] text-muted-foreground">
 				<Trans>
-					This page was published by a Superset user. Its contents are
+					This page was published by a Paradev user. Its contents are
 					unverified.
 				</Trans>
 			</footer>

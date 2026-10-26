@@ -115,7 +115,7 @@ export function PermissionsSettings({
 					<Trans>Permissions</Trans>
 				</h2>
 				<p className="text-sm text-muted-foreground mt-1">
-					<Trans>Grant the OS permissions Superset needs.</Trans>
+					<Trans>Grant the OS permissions Paradev needs.</Trans>
 				</p>
 			</div>
 

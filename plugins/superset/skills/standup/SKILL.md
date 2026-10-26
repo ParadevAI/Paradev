@@ -1,11 +1,13 @@
 ---
 name: standup
-description: Digest of what the user's Superset agents did while they were away, sweeping workspaces, tasks, and agent terminals to report what finished, what needs review, and what's blocked. Use when the user asks "what did my agents do", "what happened while I was away", wants a standup or summary of agent work, or returns after a break.
+description: Digest of what the user's Paradev (formerly Superset) agents did while they were away, sweeping workspaces, tasks, and agent terminals to report what finished, what needs review, and what's blocked. Use when the user asks "what did my agents do", "what happened while I was away", wants a standup or summary of agent work, or returns after a break.
 argument-hint: optional timeframe or project
-allowed-tools: Bash(superset:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh *)
+allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh *)
 ---
 
 # Superset Standup
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 Answer "what happened while I was away?" from real state, not guesses. Entirely read-only.
 

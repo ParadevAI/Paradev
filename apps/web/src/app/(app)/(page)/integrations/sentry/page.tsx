@@ -22,11 +22,11 @@ import { ConnectionControls } from "./components/ConnectionControls";
  * its own installation), so the messages for those failures have to say what
  * the only way back is.
  */
-const RECONNECT = "Uninstall Superset in Sentry, then connect again.";
+const RECONNECT = "Uninstall Paradev in Sentry, then connect again.";
 
 const CALLBACK_MESSAGES = {
 	not_configured:
-		"Sentry isn't available yet — the Superset app hasn't been registered with Sentry.",
+		"Sentry isn't available yet — the Paradev app hasn't been registered with Sentry.",
 	oauth_denied: "The install was cancelled. Please try again.",
 	missing_params: `Invalid response from Sentry. ${RECONNECT}`,
 	invalid_state: `Your session expired. ${RECONNECT}`,
@@ -38,7 +38,7 @@ const CALLBACK_MESSAGES = {
 		withParam:
 			"This Sentry organization is already connected by {owner}. Ask them to disconnect first.",
 		withoutParam:
-			"This Sentry organization is already connected by another Superset organization.",
+			"This Sentry organization is already connected by another Paradev organization.",
 	},
 };
 
@@ -101,7 +101,7 @@ export default async function SentryIntegrationPage() {
 				<CardHeader>
 					<CardTitle>Connection</CardTitle>
 					<CardDescription>
-						Install the Superset app in your Sentry organization.
+						Install the Paradev app in your Sentry organization.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
