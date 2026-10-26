@@ -4,6 +4,7 @@ import {
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
+	safeRedirectPath,
 } from "./proxy-routes";
 
 describe("isPublicRoute", () => {
@@ -81,5 +82,30 @@ describe("isInternalRoute", () => {
 		"/dashboard",
 	])("keeps sibling routes out of the internal gate: %s", (pathname: string) => {
 		expect(isInternalRoute(pathname)).toBe(false);
+	});
+});
+
+describe("safeRedirectPath", () => {
+	test("keeps a same-origin path with its query", () => {
+		expect(safeRedirectPath("/settings?tab=billing")).toBe(
+			"/settings?tab=billing",
+		);
+	});
+
+	test("rejects other origins and missing values", () => {
+		for (const value of [
+			null,
+			"",
+			"https://evil.example",
+			"//evil.example",
+			"/\\evil.example",
+		]) {
+			expect(safeRedirectPath(value)).toBeNull();
+		}
+	});
+
+	test("rejects auth pages so a signed-in redirect cannot loop", () => {
+		expect(safeRedirectPath("/sign-in?redirect=/x")).toBeNull();
+		expect(safeRedirectPath("/sign-up")).toBeNull();
 	});
 });

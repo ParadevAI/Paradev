@@ -7,6 +7,7 @@ import {
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
+	safeRedirectPath,
 } from "./proxy-routes";
 
 export default async function proxy(req: NextRequest) {
@@ -32,7 +33,10 @@ export default async function proxy(req: NextRequest) {
 		pathname.startsWith("/trpc/");
 
 	if (session && isAuthPageRoute(pathname)) {
-		return NextResponse.redirect(new URL("/", req.url));
+		const redirectPath = safeRedirectPath(
+			req.nextUrl.searchParams.get("redirect"),
+		);
+		return NextResponse.redirect(new URL(redirectPath ?? "/", req.url));
 	}
 
 	// Public API routes (e.g. `/api/auth/desktop`, the desktop OAuth start)

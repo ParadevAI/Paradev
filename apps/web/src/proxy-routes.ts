@@ -31,6 +31,13 @@ export function isAuthPageRoute(pathname: string): boolean {
 	return authPageRoutes.some((route) => matchesRouteOrChild(pathname, route));
 }
 
+/** `redirect` comes from the query string, so only same-origin paths pass; `//host` and `/\host` are other origins to a browser. */
+export function safeRedirectPath(redirect: string | null): string | null {
+	if (!redirect?.startsWith("/") || /^\/[/\\]/.test(redirect)) return null;
+	const pathname = redirect.split(/[?#]/)[0] ?? "";
+	return isAuthPageRoute(pathname) ? null : redirect;
+}
+
 export function isInternalRoute(pathname: string): boolean {
 	return internalRoutes.some((route) => matchesRouteOrChild(pathname, route));
 }
