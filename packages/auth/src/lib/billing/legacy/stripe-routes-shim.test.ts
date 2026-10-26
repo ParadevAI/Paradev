@@ -75,6 +75,7 @@ function fakeDeps(): AutumnBillingDeps {
 			calls.push({ method: "ensureCustomer", params: id });
 		},
 		currentPlanId: async () => (live ? "pro" : null),
+		isProFamilyPlan: async (planId) => planId.startsWith("pro"),
 		findLiveSubscription: async () => live,
 		countBillableSeats: async () => 3,
 		sync: async (id) => {
@@ -297,6 +298,20 @@ describe("upgrade", () => {
 			),
 		).rejects.toThrow("Update the app to change this plan.");
 		expect(calls).toEqual([]);
+	});
+
+	test("an organization on the current Pro plan can switch its interval from a released client", async () => {
+		live = liveSubscription();
+		await upgradeWithAutumn(
+			{ ...fakeDeps(), currentPlanId: async () => "pro_v2" },
+			{
+				userId: "user_1",
+				referenceId: ORG,
+				baseURL: API,
+				body: { ...body, annual: true },
+			},
+		);
+		expect(calls.some((call) => call.method === "attach")).toBe(true);
 	});
 });
 

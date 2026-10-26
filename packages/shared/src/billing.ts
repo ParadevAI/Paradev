@@ -165,7 +165,7 @@ export const PLAN_METADATA = {
 	displayOrder: "display_order",
 } as const;
 
-interface CatalogPrice {
+export interface CatalogPrice {
 	amount?: number | null;
 	interval?: string | null;
 	billingUnits?: number | null;
@@ -295,14 +295,22 @@ function positiveNumber(value: unknown): number | null {
 		: null;
 }
 
+/** The seat price a plan bills, whether seats are licenses or a feature quantity. */
+export function seatPriceOf(
+	plan: AutumnCatalogPlan,
+	plans: AutumnCatalogPlan[],
+): CatalogPrice | null | undefined {
+	const license = seatLicensePlan(plan, plans);
+	return license
+		? license.price
+		: plan.items.find((item) => item.featureId === "seats")?.price;
+}
+
 function catalogPlan(
 	plan: AutumnCatalogPlan,
 	plans: AutumnCatalogPlan[],
 ): CatalogPlan | null {
-	const license = seatLicensePlan(plan, plans);
-	const price = license
-		? license.price
-		: plan.items.find((item) => item.featureId === "seats")?.price;
+	const price = seatPriceOf(plan, plans);
 	const interval = price?.interval;
 	if (price?.amount == null || (interval !== "month" && interval !== "year")) {
 		return null;
