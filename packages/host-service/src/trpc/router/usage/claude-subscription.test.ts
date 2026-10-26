@@ -713,3 +713,54 @@ test("denial quarantines provenance before a stalled history deletion and never 
 	expect(clock.pending()).toBe(0);
 	deleted.resolve();
 });
+
+test("one stalled account's history write cannot starve another account or queue duplicate writes", async () => {
+	const clock = deadlineClock();
+	const started = deferred<void>();
+	const saved = deferred<void>();
+	const finished = deferred<void>();
+	const firstToken = "fixture-history-scope-stalled";
+	const secondToken = "fixture-history-scope-healthy";
+	const writes: string[] = [];
+	const history = createClaudeLastKnownStore(undefined, clock.now);
+	const reader = createClaudeSubscriptionReader({
+		now: clock.now,
+		createBudget: clock.createBudget,
+		history: {
+			...history,
+			remember: async (token, account, quota) => {
+				writes.push(token);
+				if (token === firstToken) {
+					started.resolve();
+					await saved.promise;
+				}
+				await history.remember(token, account, quota);
+				if (token === firstToken) finished.resolve();
+			},
+		},
+		request: async (endpoint) =>
+			endpoint === "usage"
+				? Response.json(usage())
+				: endpoint === "profile"
+					? Response.json(profile)
+					: new Response(null, { status: 403 }),
+	});
+	const first = reader.read(firstToken);
+	await started.promise;
+	const healthy = await reader.read(secondToken);
+	expect(healthy.status).toBe("ok");
+	expect(writes).toEqual([firstToken, secondToken]);
+	expect(await history.get(secondToken, profile)).toEqual({
+		fetchedAt: new Date(initialAt),
+		windows: healthy.windows,
+	});
+	clock.advance(8_000);
+	const stalled = await first;
+	expect(stalled.status).toBe("ok");
+	expect(stalled.fetchedAt).toEqual(new Date(initialAt));
+	expect((await reader.read(firstToken)).status).toBe("ok");
+	expect(writes).toEqual([firstToken, secondToken]);
+	expect(clock.pending()).toBe(0);
+	saved.resolve();
+	await finished.promise;
+});
