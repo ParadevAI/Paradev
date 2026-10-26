@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { ChannelDetailsTab } from "./components/ChannelDetailsDialog";
 import { ChannelScreen } from "./components/ChannelScreen";
 
-export type ChannelSearch = { thread?: string };
+const DETAILS_TABS: readonly ChannelDetailsTab[] = [
+	"about",
+	"members",
+	"settings",
+];
+
+export type ChannelSearch = { thread?: string; details?: ChannelDetailsTab };
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/channels/$channelId/",
@@ -12,13 +19,19 @@ export const Route = createFileRoute(
 			typeof search.thread === "string" && search.thread
 				? search.thread
 				: undefined,
+		details: DETAILS_TABS.find((tab) => tab === search.details),
 	}),
 });
 
 function ChannelPage() {
 	const { channelId } = Route.useParams();
-	const { thread } = Route.useSearch();
+	const { thread, details } = Route.useSearch();
 	return (
-		<ChannelScreen key={channelId} channelId={channelId} thread={thread} />
+		<ChannelScreen
+			key={channelId}
+			channelId={channelId}
+			thread={thread}
+			details={details}
+		/>
 	);
 }

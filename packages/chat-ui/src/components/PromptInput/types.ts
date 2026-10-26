@@ -163,8 +163,6 @@ export type PromptInputProps = {
 	stopOnEscape?: boolean;
 	header?: ReactNode;
 	onAddFiles?: (files: File[]) => void;
-	/** False drops files from the picker, drag and drop, and paste. */
-	allowAttachments?: boolean;
 	allowEmptySubmit?: boolean;
 	clearOnSubmit?: boolean;
 	hideSubmit?: boolean;

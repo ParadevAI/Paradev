@@ -11,6 +11,7 @@ import {
 import { type ReactNode, useEffect } from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import type { StoreApi } from "zustand/vanilla";
@@ -19,7 +20,6 @@ import type { PaneViewerData } from "../../types";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
 import { RightPaneAddMenu } from "./components/RightPaneAddMenu";
 import { RightPaneEmptyState } from "./components/RightPaneEmptyState";
-import { RightPaneHeaderButton } from "./components/RightPaneHeaderButton";
 import type { RightPaneGates } from "./paneOptions";
 import type { RightPaneKind } from "./types";
 

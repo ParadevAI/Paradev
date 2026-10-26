@@ -85,7 +85,7 @@ export async function loadChannelAccess(
 	};
 }
 
-export function assertCanPost(access: ChannelAccess): void {
+export function assertNotArchived(access: ChannelAccess): void {
 	if (access.channel.archivedAt !== null) {
 		throw userError({
 			code: "FORBIDDEN",
@@ -93,6 +93,10 @@ export function assertCanPost(access: ChannelAccess): void {
 			i18nKey: "serverError.channel.archived",
 		});
 	}
+}
+
+export function assertCanPost(access: ChannelAccess): void {
+	assertNotArchived(access);
 	if (!access.membership) {
 		throw userError({
 			code: "FORBIDDEN",

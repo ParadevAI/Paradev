@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
 	bigint,
+	boolean,
 	index,
 	integer,
 	pgEnum,
@@ -19,7 +20,7 @@ import {
 	channelNotifyValues,
 	channelVisibilityValues,
 } from "./enums";
-import { taskProjects } from "./schema";
+import { tasks } from "./schema";
 
 export const channelVisibility = pgEnum(
 	"channel_visibility",
@@ -48,9 +49,6 @@ export const channels = pgTable(
 		name: text().notNull(),
 		description: text(),
 		visibility: channelVisibility().notNull().default("public"),
-		taskProjectId: uuid("task_project_id").references(() => taskProjects.id, {
-			onDelete: "set null",
-		}),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -87,6 +85,7 @@ export const channelMembers = pgTable(
 			.references(() => users.id, { onDelete: "cascade" }),
 		role: channelMemberRole().notNull().default("member"),
 		notify: channelNotify().notNull().default("mentions"),
+		muted: boolean().notNull().default(false),
 		lastReadSeq: bigint("last_read_seq", { mode: "number" })
 			.notNull()
 			.default(0),
@@ -149,3 +148,77 @@ export const channelMessages = pgTable(
 
 export type InsertChannelMessage = typeof channelMessages.$inferInsert;
 export type SelectChannelMessage = typeof channelMessages.$inferSelect;
+
+/** One person's emoji reaction to a message, by Slack shortcode (`+1::skin-tone-3`). */
+export const channelMessageReactions = pgTable(
+	"channel_message_reactions",
+	{
+		messageId: uuid("message_id")
+			.notNull()
+			.references(() => channelMessages.id, { onDelete: "cascade" }),
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		emoji: text().notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [primaryKey({ columns: [t.messageId, t.userId, t.emoji] })],
+);
+
+export type SelectChannelMessageReaction =
+	typeof channelMessageReactions.$inferSelect;
+
+/**
+ * A person following a thread, and how far they have read it. Rows are
+ * written when someone replies or is mentioned in a reply, and for the root's
+ * author on the first reply. `following = false` keeps an unfollow: the
+ * root's author is not followed again by later replies.
+ */
+export const channelThreadFollows = pgTable(
+	"channel_thread_follows",
+	{
+		rootId: uuid("root_id")
+			.notNull()
+			.references(() => channelMessages.id, { onDelete: "cascade" }),
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		channelId: uuid("channel_id")
+			.notNull()
+			.references(() => channels.id, { onDelete: "cascade" }),
+		following: boolean().notNull().default(true),
+		lastReadSeq: bigint("last_read_seq", { mode: "number" })
+			.notNull()
+			.default(0),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(t) => [
+		primaryKey({ columns: [t.rootId, t.userId] }),
+		index("channel_thread_follows_user_idx").on(t.userId, t.channelId),
+	],
+);
+
+export type SelectChannelThreadFollow =
+	typeof channelThreadFollows.$inferSelect;
+
+/** A task's channel: at most one, so adding a task to a channel moves it from any other. */
+export const channelTasks = pgTable(
+	"channel_tasks",
+	{
+		taskId: uuid("task_id")
+			.primaryKey()
+			.references(() => tasks.id, { onDelete: "cascade" }),
+		channelId: uuid("channel_id")
+			.notNull()
+			.references(() => channels.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [index("channel_tasks_channel_id_idx").on(t.channelId)],
+);

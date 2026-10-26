@@ -9,7 +9,7 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { createRelaySocket } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { ensureFreshJwt } from "renderer/lib/auth-client";
@@ -18,6 +18,10 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import { applyChannelMessage } from "../../hooks/useApplyChannelMessage";
+import {
+	applyChannelRead,
+	applyThreadRead,
+} from "../../hooks/useChannelReadState";
 import { useViewedChannelStore } from "../../stores/viewedChannelStore";
 import { fromWire } from "../../utils/channelMessageCache";
 
@@ -25,7 +29,8 @@ const LIST_BACKSTOP_MS = 60_000;
 
 /**
  * The signed-in user's channel events. Messages are written into the open
- * caches; the sidebar list is refetched for unread counts; mentions and
+ * caches; the sidebar lists are refetched for unread state, which the open
+ * channel then clears once its new messages are seen; mentions and
  * replies become native notifications unless that channel is on screen. A
  * reopen refetches every channel query, since events sent while the socket
  * was down are gone.
@@ -35,9 +40,6 @@ export function ChannelsRealtime() {
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
 	const navigate = useNavigate();
-	const markRead = cloudTrpc.channel.markRead.useMutation();
-	const markReadRef = useRef(markRead.mutate);
-	markReadRef.current = markRead.mutate;
 
 	electronTrpc.notifications.subscribe.useSubscription(undefined, {
 		enabled,
@@ -58,6 +60,7 @@ export function ChannelsRealtime() {
 		const refreshAll = () => {
 			void utils.channel.invalidate();
 			void utils.channelMessage.invalidate();
+			void utils.channelThread.invalidate();
 		};
 
 		const handle = (event: ChannelRealtimeEvent) => {
@@ -65,29 +68,28 @@ export function ChannelsRealtime() {
 				case "channel.message": {
 					const message = fromWire(event.message);
 					applyChannelMessage(utils, message);
-					if (isViewing(message.channelId)) {
-						markReadRef.current({ channelId: message.channelId });
+					if (message.threadRootId) {
+						void utils.channelThread.list.invalidate();
 					} else {
 						void utils.channel.list.invalidate();
 					}
 					break;
 				}
 				case "channel.read":
-					utils.channel.list.setData({ organizationId }, (rows) =>
-						rows?.map((row) =>
-							row.id === event.channelId
-								? {
-										...row,
-										lastReadSeq: event.lastReadSeq,
-										unreadCount: 0,
-										mentionCount: 0,
-									}
-								: row,
-						),
-					);
+					applyChannelRead(utils, organizationId, event.channelId, event);
+					break;
+				case "channel.thread.read":
+					applyThreadRead(utils, event.rootId, event);
+					break;
+				case "channel.tasks":
+					void utils.channelTask.list.invalidate({
+						channelId: event.channelId,
+					});
+					void utils.channelTask.forTask.invalidate();
 					break;
 				case "channels.changed":
 					void utils.channel.invalidate();
+					void utils.channelThread.invalidate();
 					break;
 				case "channel.notify": {
 					if (event.organizationId !== organizationId) break;

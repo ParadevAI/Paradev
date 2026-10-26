@@ -294,6 +294,8 @@ export const serverErrorMessages: Record<
 				message: "Only channel admins can do that",
 			}),
 		),
+	"serverError.channel.taskInHiddenChannel": () =>
+		i18n._(msg({ message: "This task is in a channel you can't see" })),
 	"serverError.channel.archived": () =>
 		i18n._(
 			msg({

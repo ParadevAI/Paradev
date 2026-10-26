@@ -1,9 +1,11 @@
 import { Trans } from "@lingui/react/macro";
+import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import {
 	LuBox,
 	LuCircleDot,
+	LuHash,
 	LuLink2,
 	LuPencil,
 	LuPlus,
@@ -28,6 +30,7 @@ import {
 import { usePriorityLabels } from "renderer/routes/_authenticated/_dashboard/tasks/hooks/usePriorityLabels";
 import type {
 	TaskTimelineEvent as Event,
+	TaskChannelValue,
 	TaskProjectValue,
 } from "../../../../../../types";
 
@@ -50,6 +53,7 @@ const SYSTEM_ICON: Record<Event["kind"], IconType> = {
 	priority: LuSignal,
 	assignee: LuUserRound,
 	project: ProjectGlyph,
+	channel: LuHash,
 	workspace_linked: LuLink2,
 	workspace_unlinked: LuUnlink2,
 };
@@ -63,6 +67,7 @@ export function TaskTimelineEvent({
 	onOpenWorkspace,
 }: TaskTimelineEventProps) {
 	const priorityLabels = usePriorityLabels();
+	const navigate = useNavigate();
 	const actor = (
 		<TimelineActor actor={event.actor} onOpenPerson={onOpenPerson} />
 	);
@@ -97,6 +102,20 @@ export function TaskTimelineEvent({
 		<RecordInlineLink
 			icon={<TaskProjectIcon icon={value.icon} color={value.color} />}
 			onClick={() => onOpenProject(value.id)}
+		>
+			{value.name}
+		</RecordInlineLink>
+	);
+
+	const channel = (value: TaskChannelValue) => (
+		<RecordInlineLink
+			icon={<LuHash className="size-3.5 text-muted-foreground" />}
+			onClick={() =>
+				void navigate({
+					to: "/channels/$channelId",
+					params: { channelId: value.id },
+				})
+			}
 		>
 			{value.name}
 		</RecordInlineLink>
@@ -224,6 +243,35 @@ export function TaskTimelineEvent({
 				break;
 			}
 			const to = project(event.to);
+			sentence = (
+				<Trans>
+					{actor} added the task to {to}
+				</Trans>
+			);
+			break;
+		}
+		case "channel": {
+			if (!event.to) {
+				const from = event.from ? channel(event.from) : null;
+				sentence = from ? (
+					<Trans>
+						{actor} removed the task from {from}
+					</Trans>
+				) : (
+					<Trans>{actor} removed the channel</Trans>
+				);
+				break;
+			}
+			const to = channel(event.to);
+			if (event.from) {
+				const from = channel(event.from);
+				sentence = (
+					<Trans>
+						{actor} moved the task from {from} to {to}
+					</Trans>
+				);
+				break;
+			}
 			sentence = (
 				<Trans>
 					{actor} added the task to {to}

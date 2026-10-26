@@ -115,6 +115,21 @@ async function loadLabels(cloudWorkspaceId: string) {
 		.orderBy(asc(taskLabels.name));
 }
 
+export function toAssignee(task: {
+	assigneeId: string | null;
+	assigneeName: string | null;
+	assigneeImage: string | null;
+}) {
+	if (task.assigneeId && task.assigneeName) {
+		return {
+			id: task.assigneeId,
+			name: task.assigneeName,
+			image: task.assigneeImage,
+		};
+	}
+	return null;
+}
+
 export async function assertTaskInOrganization(
 	taskId: string,
 	organizationId: string,

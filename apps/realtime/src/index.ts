@@ -28,7 +28,7 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getServerByName } from "partyserver";
-import { OrgHub } from "./org-hub";
+import { ORG_USER_HEADER, OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
 import { UserHub } from "./user-hub";
@@ -79,13 +79,13 @@ app.get("/v2/org/:organizationId/nudges", async (c) => {
 	if (!token) return acceptAndClose(4401, "Unauthorized");
 	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
 	if (!auth) return acceptAndClose(4401, "Unauthorized");
-	// Nudges carry no data, so organization membership is the whole check.
+	// Nudges carry no data and presence is org-wide, so membership is the whole check.
 	if (!auth.organizationIds.includes(organizationId)) {
 		return acceptAndClose(4403, "Not a member of this organization");
 	}
 	const stub = await getServerByName(c.env.OrgHub, organizationId);
 	return stub.fetch("https://realtime/subscribe", {
-		headers: { Upgrade: "websocket" },
+		headers: { Upgrade: "websocket", [ORG_USER_HEADER]: auth.sub },
 	});
 });
 
@@ -420,9 +420,19 @@ app.get(USER_EVENTS_PATH, async (c) => {
 
 const MAX_PUBLISH_RECIPIENTS = 500;
 
+function secretMatches(token: string, secret: string): boolean {
+	const encoder = new TextEncoder();
+	const given = encoder.encode(token);
+	const expected = encoder.encode(secret);
+	return (
+		given.byteLength === expected.byteLength &&
+		crypto.subtle.timingSafeEqual(given, expected)
+	);
+}
+
 app.post(USERS_PUBLISH_PATH, async (c) => {
 	const token = extractToken(c);
-	if (!token || token !== c.env.NUDGE_SECRET) {
+	if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
 		return c.json({ error: "Unauthorized" }, 401);
 	}
 	const body = (await c.req.json().catch(() => null)) as {
@@ -439,12 +449,18 @@ app.post(USERS_PUBLISH_PATH, async (c) => {
 	}
 	const event = parseChannelRealtimeEvent(body?.event);
 	if (!event) return c.json({ error: "unknown event" }, 400);
-	await Promise.all(
+	const results = await Promise.allSettled(
 		userIds.map(async (userId) => {
 			const stub = await getServerByName(c.env.UserHub, userId);
 			await stub.publish(event);
 		}),
 	);
+	const failed = results.filter((result) => result.status === "rejected");
+	if (failed.length > 0) {
+		console.warn(
+			`[user-events] ${event.type} failed for ${failed.length} of ${userIds.length}`,
+		);
+	}
 	return c.json({ ok: true });
 });
 

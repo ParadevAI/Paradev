@@ -1,12 +1,31 @@
 import { db } from "@superset/db/client";
-import { channelMembers, members } from "@superset/db/schema";
+import { channelMembers, channels, members } from "@superset/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 
+/** The channel's members who still belong to its organization. */
 export async function channelMemberIds(channelId: string): Promise<string[]> {
 	const rows = await db
 		.select({ userId: channelMembers.userId })
 		.from(channelMembers)
+		.innerJoin(channels, eq(channels.id, channelMembers.channelId))
+		.innerJoin(
+			members,
+			and(
+				eq(members.organizationId, channels.organizationId),
+				eq(members.userId, channelMembers.userId),
+			),
+		)
 		.where(eq(channelMembers.channelId, channelId));
+	return rows.map((row) => row.userId);
+}
+
+export async function allOrgMemberIds(
+	organizationId: string,
+): Promise<string[]> {
+	const rows = await db
+		.select({ userId: members.userId })
+		.from(members)
+		.where(eq(members.organizationId, organizationId));
 	return rows.map((row) => row.userId);
 }
 

@@ -21,6 +21,7 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 import { invitations, organizations, teams, users } from "./auth";
+import { channels } from "./channels";
 import type { PageReportReason } from "./enums";
 import {
 	actorKindValues,
@@ -335,6 +336,12 @@ export const taskActivity = pgTable(
 		toProjectId: uuid("to_project_id").references(() => taskProjects.id, {
 			onDelete: "set null",
 		}),
+		fromChannelId: uuid("from_channel_id").references(() => channels.id, {
+			onDelete: "set null",
+		}),
+		toChannelId: uuid("to_channel_id").references(() => channels.id, {
+			onDelete: "set null",
+		}),
 		descriptionEdited: boolean("description_edited").notNull().default(false),
 		addedLabelIds: uuid("added_label_ids").array(),
 		removedLabelIds: uuid("removed_label_ids").array(),
@@ -351,6 +358,8 @@ export const taskActivity = pgTable(
 		index("task_activity_to_assignee_id_idx").on(table.toAssigneeId),
 		index("task_activity_from_project_id_idx").on(table.fromProjectId),
 		index("task_activity_to_project_id_idx").on(table.toProjectId),
+		index("task_activity_from_channel_id_idx").on(table.fromChannelId),
+		index("task_activity_to_channel_id_idx").on(table.toChannelId),
 	],
 );
 
@@ -2285,6 +2294,8 @@ export const attachmentParentKind = pgEnum("attachment_parent_kind", [
 	"task_comment",
 	// A file in a project's description; the parent id is the project's.
 	"project_description",
+	// A file sent in a channel; the parent id is the channel_messages row's.
+	"channel_message",
 ]);
 
 /**

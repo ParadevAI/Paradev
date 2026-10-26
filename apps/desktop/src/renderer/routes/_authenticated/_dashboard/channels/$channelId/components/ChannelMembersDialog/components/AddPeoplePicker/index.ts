@@ -1,1 +1,0 @@
-export { AddPeoplePicker } from "./AddPeoplePicker";

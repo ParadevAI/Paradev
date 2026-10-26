@@ -173,9 +173,9 @@ msgstr "{0, plural, other {# 個標籤}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#項登入資訊} other {#項登入資訊}}"
 
-#. placeholder {0}: channel.memberCount
-msgid "{0, plural, one {# member} other {# members}}"
-msgstr "{0, plural, other {# 位成員}}"
+#. placeholder {0}: thread.unreadCount
+msgid "{0, plural, one {# new reply} other {# new replies}}"
+msgstr "{0, plural, other {# 則新回覆}}"
 
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
@@ -396,6 +396,10 @@ msgstr "{0} 分支"
 msgid "{0} cannot be signed in this way yet."
 msgstr "{0}還不能用這種方式登入。"
 
+#. placeholder {0}: creator.name
+msgid "{0} created this channel on {created}."
+msgstr "{0} 於 {created} 建立了此頻道。"
+
 #. placeholder {0}: formatNumber(participants)
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "已有 {0} 位開發者依 agent 用量排名。你最近 30 天的資料已計入，只是尚未公開。僅包含 token 數量與模型名稱，不含儲存庫名稱、檔案路徑或提示詞。"
@@ -499,6 +503,10 @@ msgstr "{1}項檢查中有{0}項在執行"
 #. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{0}/{totalCount}"
+
+#. placeholder {0}: creator.name
+msgid "{0} on {created}"
+msgstr "{0}，{created}"
 
 #. placeholder {0}: plugin.interface.displayName
 msgid "{0} options"
@@ -669,6 +677,9 @@ msgstr "{actor} 移除了 {target} 的存取權限"
 msgid "{actor} removed the assignee"
 msgstr "{actor} 移除了負責人"
 
+msgid "{actor} removed the channel"
+msgstr "{actor} 移除了頻道"
+
 msgid "{actor} removed the label {label}"
 msgstr "{actor} 移除了標籤 {label}"
 
@@ -790,6 +801,9 @@ msgstr "{count, plural, one {#條評論} other {#條評論}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#個檔案} other {#個檔案}}"
+
+msgid "{count, plural, one {# new message} other {# new messages}}"
+msgstr "{count, plural, other {# 則新訊息}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#次搜尋} other {#次搜尋}}"
@@ -941,6 +955,9 @@ msgstr "{hidden, plural, one {#行已隱藏} other {#行已隱藏}}"
 
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {顯示#行隱藏內容} other {顯示#行隱藏內容}}"
+
+msgid "{hidden, plural, one {Show # more reply} other {Show # more replies}}"
+msgstr "{hidden, plural, other {再顯示 # 則回覆}}"
 
 msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
 msgstr "{hidden, plural, one {顯示 # 則回覆} other {顯示 # 則回覆}}"
@@ -1388,6 +1405,9 @@ msgstr "<0>{displayName}</0>請求存取你的Paradev帳戶"
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "此係統未安裝<0>{primaryFont}</0>。將回退到下一個可用字型。"
 
+msgid "<0>{who}</0> reacted with {shortcode}"
+msgstr "<0>{who}</0> 以 {shortcode} 回應"
+
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
@@ -1781,6 +1801,9 @@ msgstr "建立API金鑰需要有活動組織"
 msgid "Active sessions"
 msgstr "活動會話"
 
+msgid "Activities"
+msgstr "活動"
+
 msgid "Activity"
 msgstr "動態"
 
@@ -1800,6 +1823,9 @@ msgstr "將{0}新增到工作區"
 
 msgid "Add a comment…"
 msgstr "新增留言…"
+
+msgid "Add a description"
+msgstr "新增說明"
 
 msgid "Add a description…"
 msgstr "新增描述…"
@@ -1861,6 +1887,9 @@ msgstr "新增評論"
 msgid "Add custom audio"
 msgstr "新增自訂音訊"
 
+msgid "Add Description"
+msgstr "新增說明"
+
 msgid "Add description..."
 msgstr "新增描述..."
 
@@ -1898,6 +1927,9 @@ msgstr "新增人員"
 msgid "Add people or teams by name or email"
 msgstr "依名稱或電子郵件新增人員或團隊"
 
+msgid "Add People to Channel"
+msgstr "新增成員至頻道"
+
 msgid "Add photos or files"
 msgstr "新增照片或檔案"
 
@@ -1912,6 +1944,9 @@ msgstr "從資料夾新增專案..."
 
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "新增提示詞，例如：在$sentry中查詢崩潰"
+
+msgid "Add reaction…"
+msgstr "新增回應…"
 
 msgid "Add repository"
 msgstr "新增儲存庫"
@@ -1945,6 +1980,9 @@ msgstr "給缺測試的地方補測試"
 
 msgid "Add this label"
 msgstr "新增此標籤"
+
+msgid "Add to channel"
+msgstr "加入頻道"
 
 msgid "Add to Dictionary"
 msgstr "新增到詞典"
@@ -2367,6 +2405,9 @@ msgstr "同時刪除本地分支"
 msgid "Also delete the local git branch when deleting a worktree workspace"
 msgstr "刪除worktree工作區時一併刪除本地git分支"
 
+msgid "Also edit the channel and its members"
+msgstr "也可以編輯頻道及其成員"
+
 msgid "Also viewing this page"
 msgstr "也在檢視此頁面的人"
 
@@ -2411,6 +2452,9 @@ msgstr "更新已準備好安裝。"
 
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版即將推出。發布時第一時間通知你。"
+
+msgid "Animals & Nature"
+msgstr "動物與自然"
 
 msgid "Animate the active terminal cursor."
 msgstr "讓目前終端游標閃爍。"
@@ -3017,6 +3061,9 @@ msgstr "等待你的審查"
 msgid "Awaiting review from you or your team"
 msgstr "等待你或你團隊的審查"
 
+msgid "Away"
+msgstr "離開"
+
 msgid "Back"
 msgstr "返回"
 
@@ -3329,9 +3376,6 @@ msgstr "正在移轉你的 v1 專案"
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "瀏覽並安裝社群共享的技能、MCP伺服器和代理程式配置。"
 
-msgid "Browse channels"
-msgstr "瀏覽頻道"
-
 msgid "Browse for directory"
 msgstr "瀏覽目錄"
 
@@ -3527,6 +3571,9 @@ msgstr "我可以用自己的API金鑰嗎？"
 
 msgid "Can merge without conflicts"
 msgstr "可以在無衝突的情況下合併"
+
+msgid "Can only be viewed or joined by invitation"
+msgstr "僅受邀者可檢視或加入"
 
 msgid "Can the headline say what happens after sign-up?"
 msgstr "標題能說明註冊之後會發生什麼嗎？"
@@ -3728,17 +3775,26 @@ msgstr "更改已儲存"
 msgid "Changing..."
 msgstr "正在更改..."
 
+msgid "Channel"
+msgstr "頻道"
+
 msgid "Channel created"
 msgstr "頻道已建立"
+
+msgid "Channel details"
+msgstr "頻道詳細資料"
+
+msgid "Channel Manager"
+msgstr "頻道管理員"
+
+msgid "Channel name"
+msgstr "頻道名稱"
 
 msgid "Channel not found"
 msgstr "找不到頻道"
 
 msgid "Channel options"
 msgstr "頻道選項"
-
-msgid "Channel settings"
-msgstr "頻道設定"
 
 msgid "Channels"
 msgstr "頻道"
@@ -3919,6 +3975,9 @@ msgstr "選擇Paradev在什麼時候通知你。"
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "選擇從留言、設計模式和 Pages 啟動的代理程式的開啟位置。"
+
+msgid "Choose your default skin tone"
+msgstr "選擇預設膚色"
 
 msgid "CI failed"
 msgstr "CI失敗"
@@ -4112,6 +4171,9 @@ msgstr "關閉{0}"
 msgid "Close {displayName}"
 msgstr "關閉{displayName}"
 
+msgid "Close {label} tab"
+msgstr "關閉 {label} 分頁"
+
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "關閉#{0}？"
@@ -4174,6 +4236,9 @@ msgstr "關閉或刪除目前工作區"
 msgid "Close other apps using the microphone"
 msgstr "請關閉其他正在使用麥克風的應用"
 
+msgid "Close other tabs"
+msgstr "關閉其他分頁"
+
 msgid "Close Others"
 msgstr "關閉其他"
 
@@ -4185,9 +4250,6 @@ msgstr "關閉窗格"
 
 msgid "Close Pane"
 msgstr "關閉窗格"
-
-msgid "Close panel"
-msgstr "關閉面板"
 
 msgid "Close port"
 msgstr "關閉埠"
@@ -4219,6 +4281,9 @@ msgstr "關閉分頁"
 
 msgid "Close Tab"
 msgstr "關閉分頁"
+
+msgid "Close tabs to the right"
+msgstr "關閉右側分頁"
 
 msgid "Close terminal"
 msgstr "關閉終端"
@@ -4801,6 +4866,9 @@ msgstr "約束"
 msgid "Contact"
 msgstr "聯絡我們"
 
+msgid "Contact information"
+msgstr "聯絡資訊"
+
 msgid "Contact sales"
 msgstr "聯絡銷售"
 
@@ -4990,6 +5058,9 @@ msgstr "複製連結"
 msgid "Copy Link"
 msgstr "複製連結"
 
+msgid "Copy link address"
+msgstr "複製連結網址"
+
 msgid "Copy Link Address"
 msgstr "複製連結地址"
 
@@ -5011,6 +5082,9 @@ msgstr "複製Markdown"
 
 msgid "Copy message"
 msgstr "複製訊息"
+
+msgid "Copy name"
+msgstr "複製名稱"
 
 msgid "Copy on select"
 msgstr "選取即複製"
@@ -5546,6 +5620,9 @@ msgstr "無法傳送回覆"
 
 msgid "Couldn't send the message"
 msgstr "無法傳送訊息"
+
+msgid "Couldn't send the message. Attach the files again."
+msgstr "無法傳送訊息。請重新附加檔案。"
 
 msgid "Couldn't send to agent"
 msgstr "無法傳送給代理程式"
@@ -6799,9 +6876,6 @@ msgstr "例如：bun run dev"
 msgid "e.g. Claude Desktop"
 msgstr "例如 Claude Desktop"
 
-msgid "e.g. design-review"
-msgstr "例如 design-review"
-
 msgid "e.g. Dev server"
 msgstr "例如：開發伺服器"
 
@@ -6813,6 +6887,9 @@ msgstr "例如：engineering"
 
 msgid "e.g. Engineering"
 msgstr "例如：工程"
+
+msgid "e.g. plan-budget"
+msgstr "例如 plan-budget"
 
 msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
 msgstr "每個代理程式都跑在自己隔離的Git worktree裡。互不覆蓋彼此的檔案。等你準備好了再審查和合併。"
@@ -6864,8 +6941,17 @@ msgstr "已獲得「{name}」×{tier}"
 msgid "Edit"
 msgstr "編輯"
 
+msgid "Edit Channel Name"
+msgstr "編輯頻道名稱"
+
 msgid "Edit comment"
 msgstr "編輯評論"
+
+msgid "Edit description"
+msgstr "編輯說明"
+
+msgid "Edit Description"
+msgstr "編輯說明"
 
 msgid "Edit environment"
 msgstr "編輯環境"
@@ -7104,6 +7190,9 @@ msgstr "每個代理都在各自的 Git worktree 和分支中執行，讓工作�
 
 msgid "Every axis is carrying its weight for the next tier. Hold it and the tier follows."
 msgstr "每個維度都在為下一等級出力。保持住，等級自然會來。"
+
+msgid "Every channel and thread you follow."
+msgstr "你追蹤的所有頻道和討論串。"
 
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "每天 <0>上午 9:00</0>"
@@ -7987,6 +8076,9 @@ msgstr "尋找團隊…"
 msgid "Find and fix a small bug"
 msgstr "找一個小bug並修好"
 
+msgid "Find another reaction"
+msgstr "尋找其他回應"
+
 msgid "Find in Changes"
 msgstr "在更改中查詢"
 
@@ -8001,6 +8093,9 @@ msgstr "在頁面中查詢"
 
 msgid "Find in Terminal"
 msgstr "在終端中查詢"
+
+msgid "Find people"
+msgstr "尋找成員"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8049,6 +8144,9 @@ msgstr "FK"
 
 msgid "Flag"
 msgstr "標誌"
+
+msgid "Flags"
+msgstr "旗幟"
 
 msgid "Flame"
 msgstr "火焰"
@@ -8116,6 +8214,9 @@ msgstr "在X上關注"
 msgid "Follow terminal sessions live"
 msgstr "即時追蹤終端工作階段"
 
+msgid "Follow thread"
+msgstr "追蹤討論串"
+
 msgid "FOLLOW US"
 msgstr "關注我們"
 
@@ -8133,6 +8234,9 @@ msgstr "字型大小"
 
 msgid "Font weight"
 msgstr "字重"
+
+msgid "Food & Drink"
+msgstr "食物與飲料"
 
 msgid "For a project, open the importer to link it."
 msgstr "對於專案，請開啟匯入工具進行連結。"
@@ -8248,6 +8352,9 @@ msgstr "免費版"
 msgid "Free for everyone"
 msgstr "對所有人免費"
 
+msgid "Frequently Used"
+msgstr "常用"
+
 msgid "Frequently<0/>asked questions"
 msgstr "常見<0/>問題"
 
@@ -8362,6 +8469,9 @@ msgstr "取得 {plan}"
 msgid "Get an API key"
 msgstr "取得API金鑰"
 
+msgid "Get channel details"
+msgstr "查看頻道詳細資料"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "與 {companyName} 團隊聯繫。"
 
@@ -8391,6 +8501,9 @@ msgstr "取得 iPhone 和 iPad 應用程式"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "將收到加入 {organizationName} 的邀請"
+
+msgid "Getting Work Done"
+msgstr "工作常用"
 
 msgid "Ghost"
 msgstr "幽靈"
@@ -8674,6 +8787,9 @@ msgstr "從側邊欄隱藏"
 
 msgid "Hide log"
 msgstr "隱藏日誌"
+
+msgid "Hide panel"
+msgstr "隱藏面板"
 
 msgid "Hide Preview"
 msgstr "隱藏預覽"
@@ -9469,6 +9585,9 @@ msgstr "網路恢復後會自動開啟。"
 msgid "It will reconnect on its own once the machine is back. Pull to check again."
 msgstr "機器恢復後它會自動重新連線。下拉可再次檢查。"
 
+msgid "It's private, so you'll need an invitation to rejoin."
+msgstr "這是私人頻道，重新加入需要邀請。"
+
 msgid "Italic"
 msgstr "斜體"
 
@@ -9553,11 +9672,21 @@ msgstr "加入等待名單"
 msgid "Joined"
 msgstr "加入時間"
 
+#. placeholder {0}: formatDate(member.createdAt, { month: "long", year: "numeric" })
+msgid "Joined {0}"
+msgstr "{0} 加入"
+
 msgid "Joining…"
 msgstr "正在加入…"
 
+msgid "Jump"
+msgstr "跳至"
+
 msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
 msgstr "一鍵跳進你喜歡的編輯器。VS Code、Cursor、Xcode、JetBrains系列IDE或任意終端：在你需要的地方開啟worktree。"
+
+msgid "Jump to a specific date"
+msgstr "跳至特定日期"
 
 msgid "Jump to file"
 msgstr "跳轉到檔案"
@@ -9565,11 +9694,17 @@ msgstr "跳轉到檔案"
 msgid "Jump to user message {position}"
 msgstr "跳轉到使用者訊息{position}"
 
+msgid "Jump to…"
+msgstr "跳至…"
+
 msgid "Just ask"
 msgstr "直接問就行"
 
 msgid "Just me"
 msgstr "僅我的"
+
+msgid "Just mentions"
+msgstr "僅限提及"
 
 msgid "just now"
 msgstr "剛剛"
@@ -9712,6 +9847,9 @@ msgstr "每月最後一天"
 msgid "Last day of each month at {time}"
 msgstr "每月最後一天{time}"
 
+msgid "Last month"
+msgstr "上個月"
+
 #. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
 msgid "Last reply {0}"
 msgstr "最後回覆 {0}"
@@ -9742,6 +9880,9 @@ msgstr "最後更新：{lastUpdated}"
 
 msgid "Last used"
 msgstr "上次使用"
+
+msgid "Last week"
+msgstr "上週"
 
 msgid "Late 2026"
 msgstr "2026年末"
@@ -9805,6 +9946,13 @@ msgstr "瞭解如何使用指令碼"
 
 msgid "Learn more"
 msgstr "了解更多"
+
+msgid "Leave"
+msgstr "離開"
+
+#. placeholder {0}: channel.name
+msgid "Leave #{0}?"
+msgstr "離開 #{0}？"
 
 msgid "Leave a comment"
 msgstr "留下留言"
@@ -9969,9 +10117,6 @@ msgstr "關聯 ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "請先為專案關聯GitHub儲存庫才能克隆。"
-
-msgid "Link a project"
-msgstr "連結專案"
 
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
@@ -10290,9 +10435,6 @@ msgstr "品紅"
 msgid "Main"
 msgstr "主處理程序"
 
-msgid "Make admin"
-msgstr "設為管理員"
-
 msgid "Make all panes equal size"
 msgstr "使所有窗格大小相同"
 
@@ -10301,9 +10443,6 @@ msgstr "設為預設"
 
 msgid "Make default — launch new terminals and agents on this account."
 msgstr "設為預設——新終端和代理程式將使用此帳戶啟動。"
-
-msgid "Make private"
-msgstr "設為私人"
 
 msgid "Make public"
 msgstr "公開"
@@ -10381,6 +10520,9 @@ msgstr "管理組織的品牌形象和成員。"
 msgid "Managed"
 msgstr "託管"
 
+msgid "Managed by"
+msgstr "管理者"
+
 msgid "Managed by your organization admin."
 msgstr "由你所在組織的管理員管理。"
 
@@ -10390,8 +10532,14 @@ msgstr "手動"
 msgid "Manual order"
 msgstr "手動排序"
 
+msgid "Mark all read"
+msgstr "全部標示為已讀"
+
 msgid "Mark as not viewed"
 msgstr "標記為未檢視"
+
+msgid "Mark as read"
+msgstr "標示為已讀"
 
 msgid "Mark as Read"
 msgstr "標為已讀"
@@ -10402,8 +10550,14 @@ msgstr "標為未讀"
 msgid "Mark as viewed"
 msgstr "標記為已檢視"
 
+msgid "Mark everything as read?"
+msgstr "將所有內容標示為已讀？"
+
 msgid "Mark Ready"
 msgstr "標記為待審查"
+
+msgid "Mark unread"
+msgstr "標示為未讀"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -10509,9 +10663,6 @@ msgstr "已新增成員"
 msgid "Member not found"
 msgstr "未找到成員"
 
-msgid "Member options"
-msgstr "成員選項"
-
 msgid "Member removed"
 msgstr "已移除成員"
 
@@ -10521,9 +10672,6 @@ msgstr "成員"
 msgid "Members cannot modify roles"
 msgstr "成員不能修改角色"
 
-msgid "Members of #{channelName}"
-msgstr "#{channelName} 的成員"
-
 msgid "Memory"
 msgstr "記憶體"
 
@@ -10532,9 +10680,6 @@ msgstr "記憶體佔比"
 
 msgid "Mention."
 msgstr "提及。"
-
-msgid "Mentions and replies"
-msgstr "提及與回覆"
 
 msgid "Menubar"
 msgstr "選單欄"
@@ -10839,6 +10984,9 @@ msgstr "有多個專案使用此儲存庫（{0}）。請在設定中開啟你想
 msgid "Mute"
 msgstr "靜音"
 
+msgid "Mute channel"
+msgstr "將頻道設為靜音"
+
 msgid "Mute notifications"
 msgstr "靜音通知"
 
@@ -11012,6 +11160,9 @@ msgstr "以此工作區新建群組"
 msgid "New issue"
 msgstr "新建議題"
 
+msgid "New messages"
+msgstr "新訊息"
+
 msgid "New page"
 msgstr "新增頁面"
 
@@ -11145,6 +11296,9 @@ msgstr "想法不錯"
 msgid "Nice, open a PR when ready."
 msgstr "不錯，準備好就開個PR。"
 
+msgid "Nicely done"
+msgstr "做得好"
+
 msgid "Nightly audit"
 msgstr "夜間稽核"
 
@@ -11234,8 +11388,11 @@ msgstr "此分支上還沒有改動。"
 msgid "No changes to display."
 msgstr "沒有可顯示的改動。"
 
-msgid "No channels found"
-msgstr "找不到任何頻道"
+msgid "No channel"
+msgstr "無頻道"
+
+msgid "No channels"
+msgstr "沒有頻道"
 
 msgid "No chats found"
 msgstr "找不到聊天"
@@ -11492,8 +11649,8 @@ msgstr "任何人都無法再在其中發文，且它會從所有人的側邊欄
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "{organizationName} 中沒有相符的人。輸入完整電子郵件地址即可邀請新成員。"
 
-msgid "No one to add"
-msgstr "沒有可新增的人"
+msgid "No one matches"
+msgstr "沒有符合的成員"
 
 msgid "No open issues found."
 msgstr "未找到開啟的議題。"
@@ -11558,9 +11715,6 @@ msgstr "無專案"
 
 msgid "No project available"
 msgstr "沒有可用的專案"
-
-msgid "No project linked"
-msgstr "未連結專案"
 
 msgid "No project selected"
 msgstr "未選擇專案"
@@ -11685,6 +11839,9 @@ msgstr "未找到任務"
 msgid "No tasks found."
 msgstr "未找到任務。"
 
+msgid "No tasks in this channel yet."
+msgstr "此頻道還沒有任務。"
+
 msgid "No tasks in this project yet."
 msgstr "此專案尚無任務。"
 
@@ -11717,6 +11874,15 @@ msgstr "未找到主題。"
 
 msgid "No themes were imported"
 msgstr "沒有匯入任何主題"
+
+msgid "No threads or tasks match"
+msgstr "沒有符合的討論串或任務"
+
+msgid "No threads or tasks yet"
+msgstr "尚無討論串或任務"
+
+msgid "No threads yet"
+msgstr "還沒有討論串"
 
 msgid "No triggers"
 msgstr "沒有觸發器"
@@ -11834,6 +12000,9 @@ msgstr "未找到"
 
 msgid "Not granted"
 msgstr "未授予"
+
+msgid "Not in channel"
+msgstr "不在頻道中"
 
 msgid "Not included"
 msgstr "不包含"
@@ -11953,6 +12122,9 @@ msgstr "OAuth 2.0"
 
 msgid "OAuth by default, API keys for CI"
 msgstr "預設用OAuth，CI用API金鑰"
+
+msgid "Objects"
+msgstr "物品"
 
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
@@ -12270,6 +12442,12 @@ msgstr "開啟更改"
 msgid "Open Changes"
 msgstr "開啟更改"
 
+msgid "Open channel"
+msgstr "開啟頻道"
+
+msgid "Open channel details"
+msgstr "開啟頻道詳細資料"
+
 msgid "Open Chat"
 msgstr "開啟聊天"
 
@@ -12445,6 +12623,9 @@ msgstr "在T3 Chat中開啟"
 msgid "Open in tab"
 msgstr "在分頁中開啟"
 
+msgid "Open in Tasks"
+msgstr "在任務中開啟"
+
 msgid "Open in…"
 msgstr "開啟方式…"
 
@@ -12463,6 +12644,9 @@ msgstr "開啟的議題"
 
 msgid "Open leaderboard"
 msgstr "開啟排行榜"
+
+msgid "Open link"
+msgstr "開啟連結"
 
 msgid "Open Link as New Split"
 msgstr "在新拆分中開啟連結"
@@ -13150,6 +13334,9 @@ msgstr "{email}的密碼"
 msgid "Paste"
 msgstr "貼上"
 
+msgid "Paste a link"
+msgstr "貼上連結"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "把它貼上到Paradev CLI："
 
@@ -13667,6 +13854,9 @@ msgstr "隱私政策"
 msgid "Private"
 msgstr "私有"
 
+msgid "Private — only specific people"
+msgstr "私人 — 僅限特定成員"
+
 msgid "Private by default.<0/>You're in control."
 msgstr "預設私密。<0/>掌控權在你。"
 
@@ -13864,6 +14054,9 @@ msgstr "PR/週"
 msgid "Public"
 msgstr "公開"
 
+msgid "Public — anyone in <0>{organizationName}</0>"
+msgstr "公開 — <0>{organizationName}</0> 中的任何人"
+
 msgid "Public leaderboard"
 msgstr "公開排行榜"
 
@@ -14024,6 +14217,9 @@ msgstr "完全退出"
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "請先退出源瀏覽器，讓它把登入資訊寫入磁碟。系統會請求你允許存取鑰匙圈。"
 
+msgid "Quote"
+msgstr "引用"
+
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
 
@@ -14066,6 +14262,9 @@ msgstr "共享面板/工作區佈局引擎的React層"
 msgid "React Native"
 msgstr "React Native"
 
+msgid "React with {name}"
+msgstr "以 {name} 回應"
+
 msgid "Reaction added"
 msgstr "添加了回應"
 
@@ -14080,6 +14279,9 @@ msgstr "已讀取"
 
 msgid "Read and plan without changing anything"
 msgstr "只讀取和規劃，不做任何變更"
+
+msgid "Read and post messages"
+msgstr "閱讀和發布訊息"
 
 msgid "Read and send mail"
 msgstr "讀取和傳送郵件"
@@ -14395,9 +14597,6 @@ msgstr "移除{label}？"
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
 
-msgid "Remove admin"
-msgstr "移除管理員"
-
 msgid "Remove attachment"
 msgstr "移除附件"
 
@@ -14421,6 +14620,9 @@ msgstr "移除圖示"
 
 msgid "Remove image"
 msgstr "移除圖片"
+
+msgid "Remove link"
+msgstr "移除連結"
 
 msgid "Remove linked issue"
 msgstr "移除關聯的議題"
@@ -14527,6 +14729,9 @@ msgstr "重新命名會話"
 
 msgid "rename the branch"
 msgstr "重新命名分支"
+
+msgid "Rename this channel"
+msgstr "重新命名此頻道"
 
 msgid "Rename workspace"
 msgstr "重新命名工作區"
@@ -14754,6 +14959,9 @@ msgstr "可調整大小"
 
 msgid "Resize left edge"
 msgstr "調整左邊緣"
+
+msgid "Resize panel"
+msgstr "調整面板大小"
 
 msgid "Resize right edge"
 msgstr "調整右邊緣"
@@ -15098,6 +15306,10 @@ msgstr "角色"
 msgid "Role changed to {newRoleName}"
 msgstr "角色已更改為{newRoleName}"
 
+#. placeholder {0}: member.name
+msgid "Role for {0}"
+msgstr "{0} 的角色"
+
 msgid "Role updated"
 msgstr "角色已更新"
 
@@ -15310,6 +15522,9 @@ msgstr "全部儲存"
 msgid "Save as environment"
 msgstr "儲存為環境"
 
+msgid "Save Changes"
+msgstr "儲存變更"
+
 msgid "Save edits"
 msgstr "儲存編輯"
 
@@ -15448,6 +15663,9 @@ msgstr "搜尋開發者"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜尋所有檔案內容和所有工作區。"
 
+msgid "Search all emoji"
+msgstr "搜尋所有表情符號"
+
 msgid "Search and open files in the current workspace"
 msgstr "在目前工作區中搜尋並開啟檔案"
 
@@ -15471,9 +15689,6 @@ msgstr "依鍵名搜尋..."
 
 msgid "Search changed files"
 msgstr "搜尋更改的檔案"
-
-msgid "Search channels"
-msgstr "搜尋頻道"
 
 msgid "Search chats..."
 msgstr "搜尋聊天..."
@@ -15538,9 +15753,6 @@ msgstr "搜尋模型"
 msgid "Search pages"
 msgstr "搜尋頁面"
 
-msgid "Search people"
-msgstr "搜尋成員"
-
 msgid "Search people..."
 msgstr "搜尋成員..."
 
@@ -15574,6 +15786,9 @@ msgstr "搜尋拉取請求…"
 msgid "Search repositories..."
 msgstr "搜尋儲存庫..."
 
+msgid "Search results"
+msgstr "搜尋結果"
+
 msgid "Search settings..."
 msgstr "搜尋設定..."
 
@@ -15603,6 +15818,9 @@ msgstr "在排行榜中搜尋對手"
 
 msgid "Search the web"
 msgstr "搜尋網頁"
+
+msgid "Search threads and tasks"
+msgstr "搜尋討論串和任務"
 
 msgid "Search triggers..."
 msgstr "搜尋觸發條件..."
@@ -15984,6 +16202,9 @@ msgstr "會話"
 #. placeholder {0}: detail.sessions.length
 msgid "Sessions · top {0} by cost"
 msgstr "會話 · 按費用排名前{0}"
+
+msgid "Set channel…"
+msgstr "設定頻道…"
 
 #. placeholder {0}: color.name
 msgid "Set color to {0}"
@@ -16520,6 +16741,9 @@ msgstr "技能"
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能隨Paradev外掛一起提供，並會在你使用的每個代理程式中自動保持最新。點選一個即可預覽。"
 
+msgid "Skin Tone"
+msgstr "膚色"
+
 msgid "Skip"
 msgstr "跳過"
 
@@ -16565,6 +16789,9 @@ msgstr "小"
 msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
+
+msgid "Smileys & People"
+msgstr "表情與人物"
 
 msgid "Smoother onboarding"
 msgstr "更順暢的上手流程"
@@ -16621,6 +16848,10 @@ msgstr "部分 v1 項目未能移轉"
 msgid "Some v1 work needs your attention"
 msgstr "部分 v1 工作需要你處理"
 
+msgid "Someone"
+msgstr "某人"
+
+msgctxt "reaction tooltip"
 msgid "Someone"
 msgstr "某人"
 
@@ -17006,6 +17237,12 @@ msgstr "引導"
 msgid "Step {0} of 2"
 msgstr "第{0}步，共2步"
 
+msgid "Step 1 of 2"
+msgstr "第 1 步，共 2 步"
+
+msgid "Step 2 of 2"
+msgstr "第 2 步，共 2 步"
+
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "步驟 3 和 4 會重複，直到頁面滿意為止。"
 
@@ -17286,6 +17523,9 @@ msgstr "將於 {0} 切換至 {nextPlanName}。"
 msgid "Symbol, light"
 msgstr "圖形標誌，淺色"
 
+msgid "Symbols"
+msgstr "符號"
+
 msgid "Sync"
 msgstr "同步"
 
@@ -17366,6 +17606,9 @@ msgstr "已被佔用"
 
 msgid "Takes effect in new agent sessions."
 msgstr "會在新的代理程式會話中生效。"
+
+msgid "Taking a look…"
+msgstr "正在查看…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平時久一些。你離開後它也會繼續。"
@@ -17978,6 +18221,9 @@ msgstr "標題會顯示在此頁面列出的所有位置以及連結預覽中。
 msgid "The turn failed"
 msgstr "本輪失敗"
 
+msgid "The very beginning"
+msgstr "最開始"
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "工作區尚未就緒。請重試。"
 
@@ -18177,8 +18423,8 @@ msgstr "這比平時耗時更久。會話可能已經就緒 — 重新載入即�
 msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
 msgstr "這比平時耗時更久。工作區可能已經就緒 — 重新載入即可接上。"
 
-msgid "This is the start of #{channelName}."
-msgstr "這是 #{channelName} 的開端。"
+msgid "This is the very beginning of the {name} channel."
+msgstr "這是 {name} 頻道的開端。"
 
 msgid "This issue link is invalid."
 msgstr "此議題連結無效。"
@@ -18330,6 +18576,9 @@ msgstr "此子代理程式目前無法移到背景"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主機已不再追蹤此子代理程式。其逐字稿仍保留在磁碟上的代理程式工作階段目錄中。"
 
+msgid "This task is in a channel you can't see"
+msgstr "此任務位於你看不到的頻道中"
+
 msgid "This terminal has no output to hand over yet."
 msgstr "這個終端還沒有可交接的輸出。"
 
@@ -18432,6 +18681,9 @@ msgstr "討論串"
 
 msgid "Thread not found"
 msgstr "未找到討論串"
+
+msgid "Threads"
+msgstr "討論串"
 
 msgid "Three steps · touches packages/ui and apps/desktop"
 msgstr "三個步驟 · 涉及packages/ui和apps/desktop"
@@ -18673,6 +18925,9 @@ msgstr "正在轉寫…"
 msgid "Translated"
 msgstr "已翻譯"
 
+msgid "Travel & Places"
+msgstr "旅遊與地點"
+
 msgid "Tree view"
 msgstr "樹狀檢視"
 
@@ -18895,6 +19150,9 @@ msgstr "撤銷"
 msgid "Undo the last archived workspace or closed chats"
 msgstr "復原上次歸檔的工作區或關閉的聊天"
 
+msgid "Unfollow thread"
+msgstr "取消追蹤討論串"
+
 msgid "Ungroup"
 msgstr "取消群組"
 
@@ -18977,6 +19235,9 @@ msgstr "取消連結任務"
 
 msgid "Unmute"
 msgstr "取消靜音"
+
+msgid "Unmute channel"
+msgstr "取消頻道靜音"
 
 msgid "Unmute notifications"
 msgstr "取消靜音通知"
@@ -19233,14 +19494,11 @@ msgstr "用於新代理程式"
 msgid "Use global default"
 msgstr "使用全域性預設值"
 
-msgid "Use Paradev on mobile"
-msgstr "在手機上使用 Paradev"
-
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "請使用小寫字母、數字、連字號和底線"
 
-msgid "Use Superset on mobile"
-msgstr "在手機上使用 Superset"
+msgid "Use Paradev on mobile"
+msgstr "在手機上使用 Paradev"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "透過 Pro 在手機上使用 Paradev。"
@@ -19408,6 +19666,9 @@ msgstr "檢視全部"
 msgid "View all (+{moreCount} more)"
 msgstr "查看全部（另有 {moreCount} 項）"
 
+msgid "View all members of this channel"
+msgstr "查看此頻道的所有成員"
+
 #. placeholder {0}: comment.authorLogin
 msgid "View comment by {0}"
 msgstr "檢視{0}的評論"
@@ -19447,6 +19708,9 @@ msgstr "在Y Combinator上檢視空缺職位"
 
 msgid "View Paradev repository on GitHub"
 msgstr "在GitHub上檢視Paradev儲存庫"
+
+msgid "View profile"
+msgstr "查看個人檔案"
 
 msgid "View pull request"
 msgstr "檢視拉取請求"
@@ -20134,6 +20398,10 @@ msgstr "你"
 msgid "You"
 msgstr "你"
 
+msgctxt "reaction tooltip"
+msgid "You"
+msgstr "你"
+
 msgid "YOU"
 msgstr "你"
 
@@ -20198,6 +20466,9 @@ msgstr "此操作無法復原。終端窗格會顯示「處理程序已退出」
 
 msgid "You control the access"
 msgstr "存取權限由你掌控"
+
+msgid "You created this channel on {created}."
+msgstr "你於 {created} 建立了此頻道。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "你拒絕了 {plugin} 的授權請求。"

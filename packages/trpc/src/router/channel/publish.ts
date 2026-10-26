@@ -1,4 +1,3 @@
-import type { SelectChannelMessage } from "@superset/db/schema";
 import {
 	type ChannelMessageWire,
 	type ChannelRealtimeEvent,
@@ -6,6 +5,7 @@ import {
 } from "@superset/shared/channels";
 import { waitUntil } from "@vercel/functions";
 import { env } from "../../env";
+import type { EnrichedMessage } from "./enrich";
 
 const ATTEMPTS = 2;
 const BATCH = 500;
@@ -26,6 +26,7 @@ async function post(userIds: string[], event: ChannelRealtimeEvent) {
 			console.warn(
 				`[channels] publish ${event.type} rejected: ${response.status}`,
 			);
+			if (response.status < 500) return;
 		} catch (error) {
 			console.warn(
 				`[channels] publish ${event.type} failed:`,
@@ -53,7 +54,7 @@ export function publishToUsers(
 	waitUntil(Promise.all(batches.map((batch) => post(batch, event))));
 }
 
-export function toWire(message: SelectChannelMessage): ChannelMessageWire {
+export function toWire(message: EnrichedMessage): ChannelMessageWire {
 	return {
 		id: message.id,
 		channelId: message.channelId,
@@ -68,5 +69,7 @@ export function toWire(message: SelectChannelMessage): ChannelMessageWire {
 		editedAt: message.editedAt?.toISOString() ?? null,
 		deletedAt: message.deletedAt?.toISOString() ?? null,
 		createdAt: message.createdAt.toISOString(),
+		reactions: message.reactions,
+		attachments: message.attachments,
 	};
 }

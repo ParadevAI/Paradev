@@ -188,6 +188,7 @@
 		"drizzle-orm": "0.45.2",
 		"electron-log": "5.4.3",
 		"electron-updater": "6.8.3",
+		"emojibase-data": "17.0.0",
 		"execa": "9.6.1",
 		"expo-device-hub": "0.18.0",
 		"express": "5.2.1",

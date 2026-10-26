@@ -1,4 +1,7 @@
-import type { ChannelMessageWire } from "@superset/shared/channels";
+import type {
+	ChannelAttachment,
+	ChannelMessageWire,
+} from "@superset/shared/channels";
 import type { RouterOutputs } from "@superset/trpc";
 
 export type ChannelMessage =
@@ -26,6 +29,8 @@ export function pendingMessage(input: {
 	clientId: string;
 	threadRootId: string | null;
 	mentionedUserIds: string[];
+	/** Local previews of the files on their way up. */
+	attachments?: ChannelAttachment[];
 }): ChannelMessage {
 	return {
 		id: input.clientId,
@@ -41,6 +46,8 @@ export function pendingMessage(input: {
 		editedAt: null,
 		deletedAt: null,
 		createdAt: new Date(),
+		reactions: [],
+		attachments: input.attachments ?? [],
 	};
 }
 

@@ -1,3 +1,12 @@
+import { FEATURE_FLAGS } from "@superset/shared/constants";
+import {
+	ORG_PRESENCE_AWAY_AFTER_MS,
+	ORG_PRESENCE_PING,
+	ORG_PRESENCE_PING_MS,
+	type OrgPresenceReport,
+	type OrgPresenceStatus,
+	parseOrgPresenceMessage,
+} from "@superset/shared/org-presence";
 import {
 	parseRealtimeNudgeMessage,
 	REALTIME_NUDGE_KINDS,
@@ -6,11 +15,13 @@ import {
 	realtimeNudgesPath,
 } from "@superset/shared/realtime";
 import { createRelaySocket } from "@superset/workspace-client";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect } from "react";
 import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { ensureFreshJwt } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useOrgPresenceStore } from "renderer/stores/org-presence";
 
 /**
  * One socket per window to the realtime Worker. The API sends a nudge after
@@ -19,10 +30,17 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
  * A reopen refetches everything once, since nudges sent while the socket
  * was down are gone. Rendered inside the providers: the subscription needs
  * the active organization.
+ *
+ * With channels on, the same socket carries presence: the window pings so
+ * the hub can drop it if it goes silent, reports away after ten minutes
+ * without input, and hears who else in the organization has a window open.
+ * The hub only sends presence to windows that report it.
  */
 export function RealtimeNudges() {
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
+	const reportsPresence =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 
 	useEffect(() => {
 		if (!organizationId) return;
@@ -82,21 +100,65 @@ export function RealtimeNudges() {
 			minReconnectionDelay: 1_000,
 			maxReconnectionDelay: 30_000,
 		});
+		let status: OrgPresenceStatus = "active";
+		let lastInput = Date.now();
+		const report = () => {
+			if (!reportsPresence) return;
+			const message: OrgPresenceReport = { type: "presence", status };
+			socket.send(JSON.stringify(message));
+		};
+		const onInput = () => {
+			lastInput = Date.now();
+			if (status === "active") return;
+			status = "active";
+			report();
+		};
+		const checkAway = () => {
+			if (status === "away") return;
+			if (Date.now() - lastInput < ORG_PRESENCE_AWAY_AFTER_MS) return;
+			status = "away";
+			report();
+		};
+		const inputEvents = reportsPresence
+			? ["pointerdown", "pointermove", "keydown", "focus"]
+			: [];
+		for (const name of inputEvents) {
+			window.addEventListener(name, onInput, { passive: true });
+		}
+		const ping = reportsPresence
+			? setInterval(() => socket.send(ORG_PRESENCE_PING), ORG_PRESENCE_PING_MS)
+			: undefined;
+		const awayCheck = reportsPresence
+			? setInterval(checkAway, ORG_PRESENCE_PING_MS)
+			: undefined;
+
 		// The first open follows the queries' own initial fetch; only a reopen
 		// can have missed something.
 		let opened = false;
 		socket.addEventListener("open", () => {
+			report();
 			if (opened) invalidate(REALTIME_NUDGE_KINDS);
 			opened = true;
 		});
 		socket.addEventListener("message", (event) => {
+			const presence = parseOrgPresenceMessage(event.data);
+			if (presence) {
+				useOrgPresenceStore.getState().setUsers(presence.users);
+				return;
+			}
 			const message = parseRealtimeNudgeMessage(event.data);
 			if (!message) return;
 			patch(message.updates);
 			invalidate(message.kinds);
 		});
-		return () => socket.close(1000, "unsubscribed");
-	}, [organizationId, utils]);
+		return () => {
+			for (const name of inputEvents) window.removeEventListener(name, onInput);
+			clearInterval(ping);
+			clearInterval(awayCheck);
+			useOrgPresenceStore.getState().setUsers({});
+			socket.close(1000, "unsubscribed");
+		};
+	}, [organizationId, utils, reportsPresence]);
 
 	return null;
 }

@@ -1,21 +1,40 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { ChatMarkdown } from "@superset/chat-ui/ChatMarkdown";
+import {
+	ChatMarkdown,
+	type ChatMarkdownProps,
+	chatMarkdownComponents,
+} from "@superset/chat-ui/ChatMarkdown";
 import { errorMessage } from "@superset/i18n/errors";
-import { formatDateTime, formatRelativeTime } from "@superset/i18n/format";
-import { Avatar } from "@superset/ui/atoms/Avatar";
+import {
+	formatClockTime,
+	formatDateTime,
+	formatRelativeTime,
+} from "@superset/i18n/format";
 import { toast } from "@superset/ui/sonner";
-import { Textarea } from "@superset/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useState } from "react";
-import { LuMessageSquare, LuPencil, LuTrash2 } from "react-icons/lu";
+import { type ComponentProps, useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
-import { RowAction } from "./components/RowAction";
+import { EDITED_HREF, remarkEditedMark } from "../../utils/remarkEditedMark";
+import {
+	MENTION_HREF_PREFIX,
+	remarkMentions,
+} from "../../utils/remarkMentions";
+import { PersonAvatar } from "../PersonAvatar";
+import { PersonHoverCard } from "../PersonHoverCard";
+import { MentionChip } from "./components/MentionChip";
+import { MessageActions } from "./components/MessageActions";
+import { MessageAttachments } from "./components/MessageAttachments";
+import { MessageEditor } from "./components/MessageEditor";
+import { MessageMenu } from "./components/MessageMenu";
+import { MessageReactions } from "./components/MessageReactions";
+import { useMessageMenuItems } from "./hooks/useMessageMenuItems";
+import { toggleReaction } from "./utils/toggleReaction";
 
 export interface ChannelPerson {
 	id: string;
@@ -30,7 +49,12 @@ interface ChannelMessageRowProps {
 	now: Date;
 	currentUserId: string | null;
 	canModerate: boolean;
+	canReact: boolean;
+	peopleById: Map<string, ChannelPerson>;
 	onOpenThread?: (message: ChannelMessage) => void;
+	/** Also on Option+click, as in Slack. */
+	onMarkUnread?: () => void;
+	follow?: { following: boolean; onToggle: () => void };
 }
 
 export function ChannelMessageRow({
@@ -40,11 +64,16 @@ export function ChannelMessageRow({
 	now,
 	currentUserId,
 	canModerate,
+	canReact,
+	peopleById,
 	onOpenThread,
+	onMarkUnread,
+	follow,
 }: ChannelMessageRowProps) {
 	const { t } = useLingui();
 	const { apply } = useApplyChannelMessage();
-	const [draft, setDraft] = useState<string | null>(null);
+	const [editing, setEditing] = useState(false);
+	const [menuOpen, setMenuOpen] = useState(false);
 	const isPending = message.seq === PENDING_SEQ;
 	const isDeleted = message.deletedAt !== null;
 	const isOwn = message.authorUserId === currentUserId;
@@ -53,58 +82,188 @@ export function ChannelMessageRow({
 			errorMessage(error, t({ message: "Couldn't save the change" })),
 		);
 	const edit = cloudTrpc.channelMessage.edit.useMutation({
-		onSuccess: (updated) => {
-			apply(updated);
-			setDraft(null);
+		onSuccess: apply,
+		onError: (error) => {
+			apply(message);
+			onError(error);
 		},
-		onError,
 	});
 	const remove = cloudTrpc.channelMessage.delete.useMutation({
 		onSuccess: apply,
 		onError,
 	});
+	const utils = cloudTrpc.useUtils();
+	const reactMutation = cloudTrpc.channelMessage.react.useMutation({
+		onSuccess: apply,
+		onError: (error) => {
+			void utils.channelMessage.list.invalidate({
+				channelId: message.channelId,
+			});
+			const rootId = message.threadRootId ?? message.id;
+			void utils.channelMessage.thread.invalidate({ messageId: rootId });
+			onError(error);
+		},
+	});
+	const react =
+		canReact && currentUserId && !isPending && !isDeleted
+			? (emoji: string, reacted: boolean) => {
+					apply({
+						...message,
+						reactions: toggleReaction(
+							message.reactions,
+							emoji,
+							currentUserId,
+							reacted,
+						),
+					});
+					reactMutation.mutate({ messageId: message.id, emoji, reacted });
+				}
+			: undefined;
+	const reactWith =
+		react &&
+		((emoji: string) =>
+			react(
+				emoji,
+				!message.reactions.some(
+					(reaction) =>
+						reaction.emoji === emoji &&
+						reaction.userIds.includes(currentUserId ?? ""),
+				),
+			));
+	const menu = useMessageMenuItems({
+		message,
+		onMarkUnread,
+		follow,
+		onEdit: isOwn ? () => setEditing(true) : undefined,
+		onDelete:
+			isOwn || canModerate
+				? () => remove.mutate({ messageId: message.id })
+				: undefined,
+	});
 
-	const saveEdit = () => {
-		if (draft === null) return;
-		const body = draft.trim();
-		if (!body || body === message.body) {
-			setDraft(null);
-			return;
-		}
-		edit.mutate({
-			messageId: message.id,
-			body,
-			mentionedUserIds: message.mentionedUserIds,
-		});
+	const saveEdit = (next: { body: string; mentionedUserIds: string[] }) => {
+		setEditing(false);
+		if (next.body === message.body) return;
+		apply({ ...message, ...next, editedAt: new Date() });
+		edit.mutate({ messageId: message.id, ...next });
 	};
+
+	const markdown = useMemo(() => {
+		const mentioned = message.mentionedUserIds.flatMap((id) => {
+			const person = peopleById.get(id);
+			return person ? [person] : [];
+		});
+		const DefaultLink = chatMarkdownComponents.a;
+		const components: ChatMarkdownProps["components"] = {
+			a: (props: ComponentProps<typeof DefaultLink>) => {
+				if (props.href === EDITED_HREF) {
+					return (
+						<span className="text-[11px] text-muted-foreground">
+							<Trans>(edited)</Trans>
+						</span>
+					);
+				}
+				const id = props.href?.startsWith(MENTION_HREF_PREFIX)
+					? props.href.slice(MENTION_HREF_PREFIX.length)
+					: null;
+				const person = id ? peopleById.get(id) : undefined;
+				if (!person) return <DefaultLink {...props} />;
+				return (
+					<MentionChip
+						channelId={message.channelId}
+						person={person}
+						isSelf={person.id === currentUserId}
+					>
+						{props.children}
+					</MentionChip>
+				);
+			},
+		};
+		const remarkPlugins = [
+			...(mentioned.length > 0 ? [remarkMentions(mentioned)] : []),
+			...(message.editedAt ? [remarkEditedMark] : []),
+		];
+		return {
+			components,
+			remarkPlugins: remarkPlugins.length > 0 ? remarkPlugins : undefined,
+		};
+	}, [
+		message.mentionedUserIds,
+		message.channelId,
+		message.editedAt,
+		peopleById,
+		currentUserId,
+	]);
 
 	const authorName = author?.name ?? t({ message: "Unknown" });
 	const time = formatDateTime(message.createdAt, { timeStyle: "short" });
 
-	return (
+	const interactive = !isPending && !isDeleted && !editing;
+	const row = (
+		// biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: Option+click is a pointer shortcut; the menu offers the same action
 		<div
+			data-message-id={message.id}
+			onClick={(event) => {
+				if (!event.altKey || !onMarkUnread || !interactive) return;
+				event.preventDefault();
+				onMarkUnread();
+			}}
 			className={cn(
-				"group relative flex gap-2.5 px-4 hover:bg-fill-hover/40",
+				"group group/msg relative flex gap-2.5 px-4 hover:bg-fill-hover/40",
 				compact ? "py-0.5" : "pt-2 pb-0.5",
 				isPending && "opacity-60",
+				menuOpen && "bg-fill-hover/40",
 			)}
 		>
-			<div className="w-8 shrink-0">
+			<div className="w-9 shrink-0">
 				{compact ? (
-					<span className="invisible block pt-1 text-right text-[10px] text-muted-foreground tabular-nums group-hover:visible">
-						{time}
-					</span>
+					<Tooltip delayDuration={500}>
+						<TooltipTrigger asChild>
+							<span className="invisible block pt-[3px] text-right text-[11px] whitespace-nowrap text-muted-foreground tabular-nums group-hover:visible">
+								{formatClockTime(message.createdAt)}
+							</span>
+						</TooltipTrigger>
+						<TooltipContent>{formatDateTime(message.createdAt)}</TooltipContent>
+					</Tooltip>
+				) : author ? (
+					<PersonHoverCard
+						channelId={message.channelId}
+						person={author}
+						isSelf={author.id === currentUserId}
+					>
+						<PersonAvatar
+							name={authorName}
+							image={author.image}
+							className="mt-0.5 size-9"
+						/>
+					</PersonHoverCard>
 				) : (
-					<Avatar size="md" fullName={authorName} image={author?.image} />
+					<PersonAvatar
+						name={authorName}
+						image={null}
+						className="mt-0.5 size-9"
+					/>
 				)}
 			</div>
 			<div className="min-w-0 flex-1">
 				{!compact && (
 					<div className="flex items-baseline gap-2">
-						<span className="text-sm font-semibold">{authorName}</span>
+						{author ? (
+							<PersonHoverCard
+								channelId={message.channelId}
+								person={author}
+								isSelf={author.id === currentUserId}
+							>
+								<span className="text-[15px] font-bold hover:underline">
+									{authorName}
+								</span>
+							</PersonHoverCard>
+						) : (
+							<span className="text-[15px] font-bold">{authorName}</span>
+						)}
 						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
-								<span className="text-[11px] text-muted-foreground tabular-nums">
+								<span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
 									{time}
 								</span>
 							</TooltipTrigger>
@@ -118,31 +277,36 @@ export function ChannelMessageRow({
 					<p className="text-sm text-muted-foreground italic">
 						<Trans>This message was deleted</Trans>
 					</p>
-				) : draft !== null ? (
-					<div className="flex flex-col gap-1 py-1">
-						<Textarea
-							autoFocus
-							value={draft}
-							onChange={(event) => setDraft(event.target.value)}
-							onKeyDown={(event) => {
-								if (event.key === "Enter" && !event.shiftKey) {
-									event.preventDefault();
-									saveEdit();
-								}
-								if (event.key === "Escape") setDraft(null);
-							}}
-							className="min-h-16 text-sm"
-						/>
-					</div>
+				) : editing ? (
+					<MessageEditor
+						channelId={message.channelId}
+						body={message.body}
+						mentionedUserIds={message.mentionedUserIds}
+						people={[...peopleById.values()]}
+						currentUserId={currentUserId}
+						onSave={saveEdit}
+						onCancel={() => setEditing(false)}
+					/>
 				) : (
-					<div className="text-sm [&_p]:my-0.5">
-						<ChatMarkdown>{message.body}</ChatMarkdown>
-						{message.editedAt && (
-							<span className="text-[11px] text-muted-foreground">
-								<Trans>(edited)</Trans>
-							</span>
+					<div className="text-[15px] leading-[1.4667] [&_p]:my-0.5">
+						{message.body && (
+							<ChatMarkdown
+								components={markdown.components}
+								remarkPlugins={markdown.remarkPlugins}
+							>
+								{message.body}
+							</ChatMarkdown>
 						)}
+						<MessageAttachments attachments={message.attachments} />
 					</div>
+				)}
+				{!isDeleted && (
+					<MessageReactions
+						reactions={message.reactions}
+						currentUserId={currentUserId}
+						peopleById={peopleById}
+						onReact={react}
+					/>
 				)}
 				{onOpenThread && message.replyCount > 0 && (
 					<button
@@ -171,34 +335,22 @@ export function ChannelMessageRow({
 					</button>
 				)}
 			</div>
-			{!isPending && !isDeleted && draft === null && (
-				<div className="absolute -top-3 right-4 hidden items-center rounded-md border border-border bg-popover shadow-sm group-hover:flex">
-					{onOpenThread && (
-						<RowAction
-							label={t({ message: "Reply in thread" })}
-							onClick={() => onOpenThread(message)}
-						>
-							<LuMessageSquare className="size-3.5" />
-						</RowAction>
-					)}
-					{isOwn && (
-						<RowAction
-							label={t({ message: "Edit message" })}
-							onClick={() => setDraft(message.body)}
-						>
-							<LuPencil className="size-3.5" />
-						</RowAction>
-					)}
-					{(isOwn || canModerate) && (
-						<RowAction
-							label={t({ message: "Delete message" })}
-							onClick={() => remove.mutate({ messageId: message.id })}
-						>
-							<LuTrash2 className="size-3.5" />
-						</RowAction>
-					)}
-				</div>
+			{interactive && (
+				<MessageActions
+					menu={menu}
+					onReact={reactWith}
+					onReply={onOpenThread && (() => onOpenThread(message))}
+					open={menuOpen}
+					onOpenChange={setMenuOpen}
+				/>
 			)}
 		</div>
+	);
+	return interactive ? (
+		<MessageMenu menu={menu} onOpenChange={setMenuOpen}>
+			{row}
+		</MessageMenu>
+	) : (
+		row
 	);
 }

@@ -4,42 +4,52 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { LuEllipsis, LuHash, LuLock, LuUsers } from "react-icons/lu";
+import {
+	LuArchive,
+	LuBell,
+	LuBellOff,
+	LuEllipsisVertical,
+	LuHash,
+	LuInfo,
+	LuLock,
+	LuLogOut,
+	LuUser,
+} from "react-icons/lu";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
+import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
+import type { ChannelDetailsTab } from "../ChannelDetailsDialog";
 
 export type ChannelTab = "messages" | "tasks";
 type ChannelSummary = RouterOutputs["channel"]["get"];
-type Notify = "all" | "mentions" | "none";
 
 interface ChannelHeaderProps {
 	channel: ChannelSummary;
+	isPanelOpen: boolean;
+	onTogglePanel: () => void;
 	tab: ChannelTab;
 	onTabChange: (tab: ChannelTab) => void;
-	onOpenMembers: () => void;
-	onOpenSettings: () => void;
-	onArchive: () => void;
+	onOpenDetails: (tab: ChannelDetailsTab) => void;
 	onLeave: () => void;
-	onSetNotify: (notify: Notify) => void;
+	onToggleMute: () => void;
+	onArchive: () => void;
 }
 
+/** Slack's channel header: the title opens channel details; members, bell and more on the right. */
 export function ChannelHeader({
 	channel,
+	isPanelOpen,
+	onTogglePanel,
 	tab,
 	onTabChange,
-	onOpenMembers,
-	onOpenSettings,
-	onArchive,
+	onOpenDetails,
 	onLeave,
-	onSetNotify,
+	onToggleMute,
+	onArchive,
 }: ChannelHeaderProps) {
 	const { t } = useLingui();
 	const Icon = channel.visibility === "private" ? LuLock : LuHash;
@@ -50,19 +60,26 @@ export function ChannelHeader({
 	return (
 		<PageHeader
 			className="border-b border-border"
+			reservesWindowControls={!isPanelOpen}
 			start={
 				<div className="flex min-w-0 items-center gap-3">
-					<div className="flex min-w-0 items-center gap-1">
-						<Icon className="size-4 shrink-0 text-muted-foreground" />
-						<span className="truncate text-sm font-semibold">
-							{channel.name}
-						</span>
-					</div>
-					{channel.description && (
-						<span className="hidden max-w-80 truncate text-xs text-muted-foreground lg:block">
-							{channel.description}
-						</span>
-					)}
+					<Tooltip delayDuration={500}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={() => onOpenDetails("about")}
+								className="flex min-w-0 items-center gap-1 rounded-md px-1.5 py-1 hover:bg-fill-hover"
+							>
+								<Icon className="size-4 shrink-0" />
+								<span className="truncate text-[15px] font-bold">
+									{channel.name}
+								</span>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<Trans>Get channel details</Trans>
+						</TooltipContent>
+					</Tooltip>
 					<div className="flex items-center gap-0.5">
 						{tabs.map((entry) => (
 							<button
@@ -84,14 +101,21 @@ export function ChannelHeader({
 			}
 			end={
 				<div className="flex items-center gap-1">
-					<button
-						type="button"
-						onClick={onOpenMembers}
-						className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs text-muted-foreground hover:bg-fill-hover hover:text-foreground"
-					>
-						<LuUsers className="size-3.5" />
-						<span className="tabular-nums">{channel.memberCount}</span>
-					</button>
+					<Tooltip delayDuration={500}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={() => onOpenDetails("members")}
+								className="flex h-7 items-center gap-1 rounded-md px-1.5 text-sm text-muted-foreground hover:bg-fill-hover hover:text-foreground"
+							>
+								<LuUser className="size-4" />
+								<span className="tabular-nums">{channel.memberCount}</span>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<Trans>View all members of this channel</Trans>
+						</TooltipContent>
+					</Tooltip>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<button
@@ -99,53 +123,54 @@ export function ChannelHeader({
 								aria-label={t({ message: "Channel options" })}
 								className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-fill-hover hover:text-foreground"
 							>
-								<LuEllipsis className="size-4" />
+								<LuEllipsisVertical className="size-4" />
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-52">
+							<DropdownMenuItem onSelect={() => onOpenDetails("about")}>
+								<LuInfo className="size-4" />
+								<Trans>Channel details</Trans>
+							</DropdownMenuItem>
 							{channel.membership && (
-								<DropdownMenuSub>
-									<DropdownMenuSubTrigger>
-										<Trans>Notifications</Trans>
-									</DropdownMenuSubTrigger>
-									<DropdownMenuSubContent>
-										<DropdownMenuRadioGroup
-											value={channel.membership.notify}
-											onValueChange={(value) => onSetNotify(value as Notify)}
-										>
-											<DropdownMenuRadioItem value="all">
-												<Trans>All messages</Trans>
-											</DropdownMenuRadioItem>
-											<DropdownMenuRadioItem value="mentions">
-												<Trans>Mentions and replies</Trans>
-											</DropdownMenuRadioItem>
-											<DropdownMenuRadioItem value="none">
-												<Trans>Nothing</Trans>
-											</DropdownMenuRadioItem>
-										</DropdownMenuRadioGroup>
-									</DropdownMenuSubContent>
-								</DropdownMenuSub>
+								<>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem onSelect={onToggleMute}>
+										{channel.membership.muted ? (
+											<>
+												<LuBell className="size-4" />
+												<Trans>Unmute channel</Trans>
+											</>
+										) : (
+											<>
+												<LuBellOff className="size-4" />
+												<Trans>Mute channel</Trans>
+											</>
+										)}
+									</DropdownMenuItem>
+									<DropdownMenuItem onSelect={onLeave}>
+										<LuLogOut className="size-4" />
+										<Trans>Leave channel</Trans>
+									</DropdownMenuItem>
+								</>
 							)}
 							{channel.canManage && (
-								<DropdownMenuItem onSelect={onOpenSettings}>
-									<Trans>Channel settings</Trans>
-								</DropdownMenuItem>
-							)}
-							{(channel.membership || channel.canManage) && (
-								<DropdownMenuSeparator />
-							)}
-							{channel.membership && (
-								<DropdownMenuItem onSelect={onLeave}>
-									<Trans>Leave channel</Trans>
-								</DropdownMenuItem>
-							)}
-							{channel.canManage && (
-								<DropdownMenuItem variant="destructive" onSelect={onArchive}>
-									<Trans>Archive channel</Trans>
-								</DropdownMenuItem>
+								<>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem variant="destructive" onSelect={onArchive}>
+										<LuArchive className="size-4" />
+										<Trans>Archive channel</Trans>
+									</DropdownMenuItem>
+								</>
 							)}
 						</DropdownMenuContent>
 					</DropdownMenu>
+					{!isPanelOpen && (
+						<RightSidebarToggle
+							isOpen={false}
+							onToggle={onTogglePanel}
+							compact
+						/>
+					)}
 				</div>
 			}
 		/>

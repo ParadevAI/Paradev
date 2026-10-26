@@ -18,6 +18,20 @@ export function normalizeChannelName(input: string): string {
 }
 
 /** A message as it crosses the realtime socket: dates as ISO strings. */
+export interface ChannelReaction {
+	/** Slack shortcode, `+1::skin-tone-3` for a toned one. */
+	emoji: string;
+	userIds: string[];
+}
+
+export interface ChannelAttachment {
+	id: string;
+	name: string;
+	contentType: string;
+	/** A short-lived signed link. */
+	url: string;
+}
+
 export interface ChannelMessageWire {
 	id: string;
 	channelId: string;
@@ -32,6 +46,8 @@ export interface ChannelMessageWire {
 	editedAt: string | null;
 	deletedAt: string | null;
 	createdAt: string;
+	reactions: ChannelReaction[];
+	attachments: ChannelAttachment[];
 }
 
 export type ChannelNotifyReason = "mention" | "reply" | "message";
@@ -39,7 +55,21 @@ export type ChannelNotifyReason = "mention" | "reply" | "message";
 export type ChannelRealtimeEvent =
 	| { type: "channel.message"; channelId: string; message: ChannelMessageWire }
 	| { type: "channels.changed"; organizationId: string }
-	| { type: "channel.read"; channelId: string; lastReadSeq: number }
+	| { type: "channel.tasks"; channelId: string }
+	| {
+			type: "channel.read";
+			channelId: string;
+			lastReadSeq: number;
+			hasUnread: boolean;
+			mentionCount: number;
+	  }
+	| {
+			type: "channel.thread.read";
+			channelId: string;
+			rootId: string;
+			lastReadSeq: number;
+			following: boolean;
+	  }
 	| {
 			type: "channel.notify";
 			organizationId: string;
@@ -55,7 +85,9 @@ export type ChannelRealtimeEvent =
 const EVENT_TYPES = new Set([
 	"channel.message",
 	"channels.changed",
+	"channel.tasks",
 	"channel.read",
+	"channel.thread.read",
 	"channel.notify",
 ]);
 

@@ -7,7 +7,12 @@ import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
 import { billingRouter } from "./router/billing";
-import { channelMessageRouter, channelRouter } from "./router/channel";
+import {
+	channelMessageRouter,
+	channelRouter,
+	channelTaskRouter,
+	channelThreadRouter,
+} from "./router/channel";
 import { chatRouter } from "./router/chat";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
@@ -62,6 +67,8 @@ export const appRouter = createTRPCRouter({
 	taskProject: taskProjectRouter,
 	channel: channelRouter,
 	channelMessage: channelMessageRouter,
+	channelTask: channelTaskRouter,
+	channelThread: channelThreadRouter,
 	taskRecord: taskRecordRouter,
 	team: teamRouter,
 	agentCredential: agentCredentialRouter,
