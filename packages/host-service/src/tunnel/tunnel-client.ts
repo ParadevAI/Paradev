@@ -27,6 +27,12 @@ const URL_PROVIDER_STEP_TIMEOUT_MS = 15_000;
 // Partysocket retries every few seconds while the relay is unreachable, and
 // each lookup is an API call; one per window is enough to follow a relay move.
 const RELAY_RESOLVE_INTERVAL_MS = 5 * 60_000;
+// A relay that cannot reach the API refuses a registered host with the same
+// 4403 as a missing registration, so a refusal straight after a successful
+// re-registration must not reconnect at once or it becomes a hot loop of
+// host.ensure calls. The first refusal after an open recovers immediately.
+const FORBIDDEN_RETRY_BASE_MS = 30_000;
+const FORBIDDEN_RETRY_MAX_MS = 5 * 60_000;
 
 function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 	return Promise.race([
@@ -38,6 +44,13 @@ function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 			).unref?.();
 		}),
 	]);
+}
+
+function sleep(ms: number): Promise<void> {
+	if (ms <= 0) return Promise.resolve();
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms).unref?.();
+	});
 }
 const DIAL_ATTEMPTS = 2;
 const MAX_BUFFERED_FRAMES = 256;
@@ -88,6 +101,7 @@ export class TunnelClient {
 	private lastAttemptOpened = true;
 	private lastRelayResolveAt = Number.NEGATIVE_INFINITY;
 	private forbiddenRecovery: Promise<void> | null = null;
+	private forbiddenCloses = 0;
 	private closed = false;
 
 	constructor(options: TunnelClientOptions) {
@@ -115,6 +129,7 @@ export class TunnelClient {
 		control.addEventListener("open", () => {
 			this.lastInboundAt = Date.now();
 			this.connectedAt = this.lastInboundAt;
+			this.forbiddenCloses = 0;
 			this.markOpened();
 			console.log(
 				`[host-service:tunnel] control connected for ${this.options.hostId}`,
@@ -202,6 +217,14 @@ export class TunnelClient {
 	private recoverFromForbidden(reason: string): void {
 		const { onForbidden } = this.options;
 		if (!onForbidden || this.forbiddenRecovery || this.closed) return;
+		const delay =
+			this.forbiddenCloses === 0
+				? 0
+				: Math.min(
+						FORBIDDEN_RETRY_BASE_MS * 2 ** (this.forbiddenCloses - 1),
+						FORBIDDEN_RETRY_MAX_MS,
+					);
+		this.forbiddenCloses++;
 		this.forbiddenRecovery = onForbidden(reason)
 			.catch((error) => {
 				console.warn(
@@ -209,6 +232,7 @@ export class TunnelClient {
 					error instanceof Error ? error.message : error,
 				);
 			})
+			.then(() => sleep(delay))
 			.then(() => {
 				this.forbiddenRecovery = null;
 				if (!this.closed) this.control?.reconnect();
