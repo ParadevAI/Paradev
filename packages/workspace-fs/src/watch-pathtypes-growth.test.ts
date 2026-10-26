@@ -151,6 +151,7 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		await fs.writeFile(filePath, "v1");
 		await waitForCondition(() => observedPaths.has(filePath));
 
+		expect(getPathTypes(manager, rootPath).has(filePath)).toBe(true);
 		const sizeAfterCreate = getPathTypes(manager, rootPath).size;
 		observedPaths.clear();
 
@@ -160,6 +161,7 @@ describe("FsWatcherManager.pathTypes — monotonic growth", () => {
 		}
 		await waitForCondition(() => observedPaths.has(filePath));
 
+		expect(getPathTypes(manager, rootPath).has(filePath)).toBe(true);
 		const sizeAfterUpdates = getPathTypes(manager, rootPath).size;
 		expect(sizeAfterUpdates).toBe(sizeAfterCreate);
 	});
