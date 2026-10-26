@@ -1177,9 +1177,6 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
-msgid "{remaining}% remaining"
-msgstr "剩餘 {remaining}%"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本組織的 GitHub App 安裝在那裡。"
 
@@ -20272,3 +20269,9 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "無法重新整理用量"
+
+msgid "{remainingPercent} remaining"
+msgstr "剩餘 {remainingPercent}"

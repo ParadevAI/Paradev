@@ -1177,9 +1177,6 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} de {total}"
 
-msgid "{remaining}% remaining"
-msgstr "{remaining}% restante"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} não está em {installedAccountLogin}, onde a GitHub App desta organização está instalada."
 
@@ -20272,3 +20269,9 @@ msgstr "Diminuir zoom"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "Não foi possível atualizar o uso"
+
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} restante"

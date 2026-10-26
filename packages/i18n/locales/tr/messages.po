@@ -1177,9 +1177,6 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{total} içinden {received}"
 
-msgid "{remaining}% remaining"
-msgstr "%{remaining} kaldı"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName}, bu organizasyonun GitHub App'inin kurulu olduğu {installedAccountLogin} hesabında değil."
 
@@ -20272,3 +20269,9 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "Kullanım yenilenemedi"
+
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} kaldı"

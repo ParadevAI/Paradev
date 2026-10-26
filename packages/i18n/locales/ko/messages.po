@@ -1177,9 +1177,6 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{total} 중 {received}"
 
-msgid "{remaining}% remaining"
-msgstr "{remaining}% 남음"
-
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName}은(는) 이 조직의 GitHub App이 설치된 {installedAccountLogin}에 없습니다."
 
@@ -20272,3 +20269,9 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not refresh usage"
+msgstr "사용량을 새로고침하지 못했습니다"
+
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} 남음"
