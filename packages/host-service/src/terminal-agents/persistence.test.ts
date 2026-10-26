@@ -802,6 +802,24 @@ describe("durable account provenance after ended-row recreation", () => {
 			);
 		}
 	});
+	it("permits a fresh launch-less native session after a consumed launch without inheriting its account", () => {
+		for (const reason of ["resumed", "disposed"] as const) {
+			const { db, store } = seeded(reason);
+			store.recordEvent({ ...attach, launchId: undefined, occurredAt: 5 });
+			expect(store.get("durable")).toBeUndefined();
+			store.recordEvent({
+				...attach,
+				launchId: undefined,
+				agentSessionId: "fresh-native-session",
+				occurredAt: 6,
+			});
+			expect(store.get("durable")?.agentSessionId).toBe("fresh-native-session");
+			expect(store.get("durable")?.account).toBeUndefined();
+			expect(
+				db.query.terminalAgentBindings.findFirst().sync()?.endReason,
+			).toBeNull();
+		}
+	});
 	it("does not transfer saved account provenance to a different workspace, provider, native session or launch", () => {
 		for (const change of [
 			{ workspaceId: "ws-2" },

@@ -35,7 +35,7 @@ function missing(error: unknown) {
 	return (error as NodeJS.ErrnoException)?.code === "ENOENT";
 }
 
-function fingerprint(value: unknown): string | null {
+export function processStartFingerprint(value: unknown): string | null {
 	if (typeof value !== "string") return null;
 	const normalized = value.trim().replace(/\s+/g, " ");
 	return /^[A-Z][a-z]{2} [A-Z][a-z]{2} \d{1,2} \d{2}:\d{2}:\d{2} \d{4}$/.test(
@@ -74,7 +74,7 @@ export async function readProcessStarts(
 	for (const line of stdout.split("\n")) {
 		if (!line.trim()) continue;
 		const match = /^\s*(\d+)\s+(.+)$/.exec(line);
-		const start = fingerprint(match?.[2]);
+		const start = processStartFingerprint(match?.[2]);
 		if (!match || !start)
 			throw new Error("The native session process format was not recognized.");
 		result.set(Number(match[1]), start);
@@ -149,7 +149,7 @@ async function liveWriterRecords(
 				);
 			if (record.sessionId !== input.sessionId) continue;
 			const pid = record.pid;
-			const start = fingerprint(record.procStart);
+			const start = processStartFingerprint(record.procStart);
 			if (
 				!Number.isSafeInteger(pid) ||
 				typeof pid !== "number" ||
@@ -229,7 +229,7 @@ async function ownerProcess(pid: number, run: OwnerRun): Promise<OwnerProcess> {
 		return {
 			pid,
 			parentPid: Number(match[2]),
-			procStart: fingerprint(match[3]) ?? "",
+			procStart: processStartFingerprint(match[3]) ?? "",
 			executable: match[4]?.trim() ?? "",
 		};
 	};

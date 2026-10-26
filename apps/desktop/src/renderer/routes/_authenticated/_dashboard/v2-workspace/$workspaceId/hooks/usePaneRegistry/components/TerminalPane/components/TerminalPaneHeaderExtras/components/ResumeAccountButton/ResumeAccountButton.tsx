@@ -33,10 +33,25 @@ export function ResumeAccountButton({
 	const queryClient = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const [resuming, setResuming] = useState(false);
+	const capability = useQuery({
+		queryKey: ["account-recovery-capability", hostUrl],
+		enabled: Boolean(hostUrl && !binding),
+		retry: false,
+		staleTime: 60_000,
+		queryFn: () =>
+			hostUrl
+				? getHostServiceClientByUrl(hostUrl)
+						.terminalAgents.accountRecoveryCapabilities.query()
+						.catch(() => null)
+				: null,
+	});
+	const supported =
+		capability.data?.version === 1 &&
+		capability.data.exactAccountResume === true;
 	const sourceKey = ["account-resume-source", hostUrl, workspaceId, terminalId];
 	const source = useQuery({
 		queryKey: sourceKey,
-		enabled: Boolean(hostUrl && !binding),
+		enabled: Boolean(hostUrl && !binding && supported),
 		queryFn: ({ signal }) => {
 			if (!hostUrl) return null;
 			return getHostServiceClientByUrl(
@@ -59,7 +74,9 @@ export function ResumeAccountButton({
 	const candidate = source.data;
 	const accounts = useQuery({
 		queryKey: ["agent-launch-accounts", hostUrl, candidate?.agent],
-		enabled: Boolean(open && hostUrl && candidate?.ready && !binding),
+		enabled: Boolean(
+			open && hostUrl && candidate?.ready && !binding && supported,
+		),
 		queryFn: ({ signal }) => {
 			if (!hostUrl || !candidate) throw new Error("Host unavailable");
 			return getHostServiceClientByUrl(hostUrl).agents.launchAccounts.query(
@@ -71,10 +88,11 @@ export function ResumeAccountButton({
 		staleTime: 0,
 	});
 	// Older hosts do not expose this capability. Never fall back to a default-account resume.
+	if (!supported && !open) return null;
 	if (!candidate && !open) return null;
 	if (binding && !open) return null;
 	const error =
-		binding || !candidate || source.isError
+		binding || !supported || !candidate || source.isError
 			? t({ message: "This conversation is no longer available to resume." })
 			: !candidate.ready
 				? (candidate.reason ??
@@ -161,7 +179,8 @@ export function ResumeAccountButton({
 							await accounts.refetch();
 						}}
 						onLaunch={async (account) => {
-							if (!candidate?.ready || !hostUrl || binding) return;
+							if (!supported || !candidate?.ready || !hostUrl || binding)
+								return;
 							setResuming(true);
 							try {
 								const client = getHostServiceClientByUrl(hostUrl);

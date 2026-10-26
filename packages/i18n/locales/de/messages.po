@@ -14453,7 +14453,7 @@ msgid "Reopen PR"
 msgstr "PR wieder öffnen"
 
 msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
-msgstr "Die gespeicherte Unterhaltung im selben Workspace erneut öffnen. Es wird keine Nachricht gesendet. Hintergrundaufgaben werden nicht übertragen."
+msgstr "Die gespeicherte Unterhaltung im selben Arbeitsbereich erneut öffnen. Es wird keine Nachricht gesendet. Hintergrundaufgaben werden nicht übertragen."
 
 msgid "Reopen thread"
 msgstr "Thread wieder öffnen"

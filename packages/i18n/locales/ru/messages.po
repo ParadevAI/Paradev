@@ -14453,7 +14453,7 @@ msgid "Reopen PR"
 msgstr "Открыть PR заново"
 
 msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
-msgstr "Открыть сохранённый разговор в том же рабочем пространстве. Сообщение не отправляется. Фоновые задачи не переносятся."
+msgstr "Открыть сохранённый разговор в той же рабочей области. Сообщение не отправляется. Фоновые задачи не переносятся."
 
 msgid "Reopen thread"
 msgstr "Снова открыть ветку"

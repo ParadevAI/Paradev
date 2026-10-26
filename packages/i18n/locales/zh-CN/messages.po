@@ -2065,10 +2065,10 @@ msgid "agent settings"
 msgstr "智能体设置"
 
 msgid "Agent terminal with account"
-msgstr "使用指定账户启动代理终端"
+msgstr "使用指定账户启动智能体终端"
 
 msgid "Agent terminal with account…"
-msgstr "使用指定账户启动代理终端…"
+msgstr "使用指定账户启动智能体终端…"
 
 msgid "Agent usage rankings"
 msgstr "智能体使用量排行"
@@ -5262,7 +5262,7 @@ msgid "Could not start agent"
 msgstr "无法启动智能体"
 
 msgid "Could not start agent terminal"
-msgstr "无法启动代理终端"
+msgstr "无法启动智能体终端"
 
 msgid "Could not start checkout. Please try again."
 msgstr "无法开始结账，请重试。"
@@ -17943,7 +17943,7 @@ msgid "This agent can't run in a cloud workspace"
 msgstr "此智能体无法在云端工作区中运行"
 
 msgid "This agent configuration does not support account selection."
-msgstr "此代理配置不支持选择账户。"
+msgstr "此智能体配置不支持选择账户。"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"
