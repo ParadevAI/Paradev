@@ -4,7 +4,7 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
@@ -25,11 +25,13 @@ import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import { useStore } from "zustand";
 import { useWorkspace } from "../providers/WorkspaceProvider";
+import { AccountTerminalDialog } from "./components/AccountTerminalDialog";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { RightPaneArea, type RightPaneKind } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
+import { SavedConversationsDialog } from "./components/SavedConversationsDialog";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceOpenInButton } from "./components/V2WorkspaceOpenInButton";
@@ -263,6 +265,13 @@ function V2WorkspaceContent() {
 		[viewerTarget],
 	);
 	const linkedPaneStores = useMemo(() => [rightStore], [rightStore]);
+	const linkedTerminalStores = useMemo(
+		() =>
+			isRightPaneAreaEnabled
+				? [{ store: rightStore, reveal: () => setRightSidebarOpen(true) }]
+				: [],
+		[isRightPaneAreaEnabled, rightStore, setRightSidebarOpen],
+	);
 	const fileDocumentStores = useMemo(
 		() => [store, rightStore],
 		[store, rightStore],
@@ -273,12 +282,20 @@ function V2WorkspaceContent() {
 		close: closeRightSidebar,
 	});
 	const launcher = useV2TerminalLauncher();
+	const [accountTerminalOpen, setAccountTerminalOpen] = useState(false);
+	const [savedConversationsOpen, setSavedConversationsOpen] = useState(false);
+	const accountTerminalReturnFocus = useRef<HTMLElement | null>(null);
 	const {
 		createNewAgentSession,
+		createAccountTerminal,
 		openAgentChat,
 		openNewChat,
 		focusAgentTerminal,
-	} = useAgentSessionLauncher({ workspaceId, store });
+	} = useAgentSessionLauncher({
+		workspaceId,
+		store,
+		linkedStores: linkedTerminalStores,
+	});
 	const acpChat = useAcpChatEnabled();
 	const addChatTab = useCallback(() => {
 		void openNewChat();
@@ -696,7 +713,20 @@ function V2WorkspaceContent() {
 									renderAddTabMenu={({ runAfterClose }) => (
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
+											onOpenSavedConversation={
+												isSandbox
+													? undefined
+													: () => setSavedConversationsOpen(true)
+											}
 											runAfterClose={runAfterClose}
+											onAddAccountTerminal={
+												isSandbox
+													? undefined
+													: (returnFocus) => {
+															accountTerminalReturnFocus.current = returnFocus;
+															setAccountTerminalOpen(true);
+														}
+											}
 											onAddChat={onAddChat}
 											onAddBrowser={
 												isRightPaneAreaEnabled ? undefined : addBrowserTab
@@ -776,6 +806,22 @@ function V2WorkspaceContent() {
 				recentlyViewedFiles={recentFiles}
 				openFilePaths={openFilePaths}
 			/>
+			{savedConversationsOpen && (
+				<SavedConversationsDialog
+					key={workspaceId}
+					workspaceId={workspaceId}
+					onClose={() => setSavedConversationsOpen(false)}
+					onOpenTerminal={focusAgentTerminal}
+				/>
+			)}
+			{accountTerminalOpen && (
+				<AccountTerminalDialog
+					key={workspaceId}
+					onClose={() => setAccountTerminalOpen(false)}
+					onLaunch={createAccountTerminal}
+					returnFocus={accountTerminalReturnFocus.current}
+				/>
+			)}
 		</FileDocumentStoreProvider>
 	);
 }

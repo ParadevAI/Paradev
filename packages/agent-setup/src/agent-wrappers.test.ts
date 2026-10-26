@@ -857,6 +857,8 @@ exit 0
 				SUPERSET_DEBUG_HOOKS: "1",
 				SUPERSET_HOOK_DEBUG_LOG: debugLogPath,
 				SUPERSET_TERMINAL_ID: "terminal-1",
+				// The generic delayed launch report is tested separately.
+				SUPERSET_AGENT_ID: "codex",
 			},
 			encoding: "utf-8",
 		});
@@ -898,6 +900,8 @@ exit 0
 					NOTIFY_CAPTURE_PATH: notifyCapturePath,
 					PATH: `${TEST_BIN_DIR}:${realBinDir}:${process.env.PATH || ""}`,
 					SUPERSET_TERMINAL_ID: "terminal-1",
+					// The generic delayed launch report is tested separately.
+					SUPERSET_AGENT_ID: "codex",
 				},
 				encoding: "utf-8",
 			});

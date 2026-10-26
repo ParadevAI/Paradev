@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} dari {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Sisa {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} tidak ada di {installedAccountLogin}, tempat GitHub App organisasi ini dipasang."
 
@@ -2063,6 +2066,12 @@ msgstr "Sesi agen dimulai"
 
 msgid "agent settings"
 msgstr "pengaturan agen"
+
+msgid "Agent terminal with account"
+msgstr "Terminal agen dengan akun"
+
+msgid "Agent terminal with account…"
+msgstr "Terminal agen dengan akun…"
 
 msgid "Agent usage rankings"
 msgstr "Peringkat penggunaan agen"
@@ -3298,6 +3307,9 @@ msgstr "Telusuri direktori"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Jelajahi berkas tema Paradev yang dibagikan komunitas, termasuk GitHub Dark Colorblind, Catppuccin, Ember, dan One Dark Pro."
 
+msgid "Browse saved history"
+msgstr "Jelajahi riwayat tersimpan"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Jelajahi tema bersama dan konfigurasi agen mendatang untuk Paradev."
 
@@ -3601,6 +3613,9 @@ msgstr "Kesalahan Sertifikat"
 
 msgid "Chain of Thought"
 msgstr "Rantai Pemikiran"
+
+msgid "Change account"
+msgstr "Ganti akun"
 
 msgid "Change assignee"
 msgstr "Ubah penerima tugas"
@@ -5104,6 +5119,9 @@ msgstr "Tidak bisa keluar dari antrean"
 msgid "Could not list directory"
 msgstr "Tidak bisa menampilkan isi direktori"
 
+msgid "Could not load accounts"
+msgstr "Tidak dapat memuat akun"
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Tidak bisa memuat agen dari {0}"
@@ -5125,6 +5143,9 @@ msgstr "Tidak dapat memuat plugin. Periksa koneksi Anda dan coba lagi."
 
 msgid "Could not load presets from the host"
 msgstr "Tidak bisa memuat preset dari host"
+
+msgid "Could not load saved conversations"
+msgstr "Percakapan tersimpan tidak dapat dimuat"
 
 msgid "Could not load this diff"
 msgstr "Tidak bisa memuat diff ini"
@@ -5149,6 +5170,9 @@ msgstr "Tidak bisa membuka tautan"
 
 msgid "Could not open Photos"
 msgstr "Tidak bisa membuka Photos"
+
+msgid "Could not open saved conversation"
+msgstr "Percakapan tersimpan tidak dapat dibuka"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5204,6 +5228,9 @@ msgstr "Tidak bisa mencatat workspace cloud"
 msgid "Could not record environment"
 msgstr "Tidak dapat menyimpan environment"
 
+msgid "Could not refresh usage"
+msgstr "Gagal memperbarui penggunaan"
+
 msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
 
@@ -5234,6 +5261,9 @@ msgstr "Tidak dapat melanjutkan"
 msgid "Could not resume the chat"
 msgstr "Tidak dapat melanjutkan obrolan"
 
+msgid "Could not resume this conversation"
+msgstr "Tidak dapat melanjutkan percakapan ini"
+
 msgid "Could not send"
 msgstr "Tidak bisa mengirim"
 
@@ -5248,6 +5278,9 @@ msgstr "Tidak bisa membagikan"
 
 msgid "Could not start agent"
 msgstr "Tidak bisa memulai agen"
+
+msgid "Could not start agent terminal"
+msgstr "Tidak dapat memulai terminal agen"
 
 msgid "Could not start checkout. Please try again."
 msgstr "Tidak dapat memulai checkout. Coba lagi."
@@ -8839,6 +8872,9 @@ msgstr "Saya juga senang bisa menjalankan lingkungan pohon kerja lokal di Mac la
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Saya bisa duduk di kafe sambil minum kopi sementara pekerjaan terus berjalan."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "Saya telah keluar dari percakapan ini di aplikasi asal. Tidak ada alat atau tugas latar belakang yang masih berjalan."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Saya memulai jalan pagi dengan sebuah ide dan mengakhirinya dengan sebuah pull request."
 
@@ -9998,6 +10034,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Memuat"
 
+msgid "Loading accounts…"
+msgstr "Memuat akun…"
+
 msgid "Loading agent settings..."
 msgstr "Memuat pengaturan agen..."
 
@@ -10075,6 +10114,9 @@ msgstr "Memuat repositori..."
 
 msgid "Loading review..."
 msgstr "Memuat review..."
+
+msgid "Loading saved conversations…"
+msgstr "Memuat percakapan tersimpan…"
 
 msgid "Loading terminal scripts..."
 msgstr "Memuat skrip terminal..."
@@ -11111,6 +11153,9 @@ msgstr "Tidak ada penulis ditemukan."
 msgid "No automations match"
 msgstr "Tidak ada otomatisasi yang cocok"
 
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "Tidak ada akun langganan yang tersedia. Tambahkan akun atau masuk di Penggunaan, lalu muat ulang."
+
 msgid "No branches found"
 msgstr "Tidak ada branch ditemukan"
 
@@ -11140,6 +11185,9 @@ msgstr "Tidak ada check yang dilaporkan."
 
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "Tidak ditemukan Chrome, Brave, Arc, atau browser Chromium lainnya."
+
+msgid "No Claude agent is configured on this host."
+msgstr "Tidak ada agen Claude yang dikonfigurasi pada host ini."
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan Anda akan muncul setelah memakai agen."
@@ -11525,6 +11573,9 @@ msgstr "Tidak ada posisi yang cocok untuk saya. Apakah saya tetap boleh menghubu
 
 msgid "No runs yet"
 msgstr "Belum ada run"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "Tidak ditemukan percakapan Claude tersimpan di akun ini untuk ruang kerja saat ini."
 
 msgid "No screenshots yet"
 msgstr "Belum ada tangkapan layar"
@@ -12159,6 +12210,9 @@ msgstr "Buka Command Palette"
 msgid "Open comment on GitHub"
 msgstr "Buka komentar di GitHub"
 
+msgid "Open conversation"
+msgstr "Buka percakapan"
+
 msgid "Open device sign-in"
 msgstr "Buka masuk perangkat"
 
@@ -12186,6 +12240,9 @@ msgstr "Buka drawer"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Buka PR yang ada atau buat yang baru di GitHub"
 
+msgid "Open existing terminal"
+msgstr "Buka terminal yang ada"
+
 msgid "open file"
 msgstr "buka file"
 
@@ -12206,6 +12263,9 @@ msgstr "Buka dari folder"
 
 msgid "Open full screen"
 msgstr "Buka layar penuh"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Buka riwayat akun ini di ruang kerja saat ini. Setelah diimpor, pembukaan berikutnya menggunakan riwayat lokal terkini. Tugas latar belakang tidak dipindahkan."
 
 msgid "Open host"
 msgstr "Buka host"
@@ -12410,6 +12470,12 @@ msgstr "Buka yang terbaru"
 
 msgid "Open roles"
 msgstr "Lowongan terbuka"
+
+msgid "Open saved Claude conversation"
+msgstr "Buka percakapan Claude tersimpan"
+
+msgid "Open saved Claude conversation…"
+msgstr "Buka percakapan Claude tersimpan…"
 
 msgid "Open session in"
 msgstr "Buka sesi di"
@@ -14431,6 +14497,9 @@ msgstr "Buka Lagi Tab yang Ditutup"
 msgid "Reopen PR"
 msgstr "Buka Lagi PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Buka kembali percakapan tersimpan di ruang kerja yang sama. Tidak ada pesan yang dikirim. Pekerjaan latar belakang tidak dipindahkan."
+
 msgid "Reopen thread"
 msgstr "Buka lagi thread"
 
@@ -14786,6 +14855,12 @@ msgstr "Argumen resume"
 
 msgid "Resume automation"
 msgstr "Lanjutkan otomatisasi"
+
+msgid "Resume conversation"
+msgstr "Lanjutkan percakapan"
+
+msgid "Resume with another account"
+msgstr "Lanjutkan dengan akun lain"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -15202,6 +15277,12 @@ msgstr "Tersimpan"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" disimpan sebagai environment"
+
+msgid "Saved conversations"
+msgstr "Percakapan tersimpan"
+
+msgid "Saved in Superset"
+msgstr "Disimpan di Superset"
 
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
@@ -16725,6 +16806,9 @@ msgstr "Mulai sesi agen baru setiap kali dijalankan"
 msgid "Start a new chat"
 msgstr "Mulai chat baru"
 
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "Mulai terminal baru menggunakan login yang sudah ada. Chat lain dan akun default Anda tidak berubah."
+
 msgid "Start a session"
 msgstr "Mulai sesi"
 
@@ -16772,6 +16856,9 @@ msgstr "Mulai satu dengan + di bilah tab."
 
 msgid "Start or stop the workspace run command"
 msgstr "Mulai atau hentikan perintah run workspace"
+
+msgid "Start terminal"
+msgstr "Mulai terminal"
 
 msgid "Start voice mode"
 msgstr "Mulai mode suara"
@@ -17792,6 +17879,9 @@ msgstr "Aplikasi yang sama berjalan native di iPad, dalam mode potret dan lanska
 msgid "The scorecard"
 msgstr "Kartu skor"
 
+msgid "The selected login changed. Choose an account again."
+msgstr "Login yang dipilih telah berubah. Pilih akun lagi."
+
 msgid "The self-driving software factory"
 msgstr "Pabrik perangkat lunak yang menyetir sendiri"
 
@@ -17903,6 +17993,9 @@ msgstr "Agen ini tidak dapat mencabangkan percakapan"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agen ini tidak bisa berjalan di workspace cloud"
 
+msgid "This agent configuration does not support account selection."
+msgstr "Konfigurasi agen ini tidak mendukung pemilihan akun."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."
 
@@ -17957,6 +18050,12 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Percakapan ini tidak dapat dilanjutkan dengan akun lain."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Percakapan ini tidak lagi tersedia untuk dilanjutkan."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Ini menghapus scrollback tersimpan yang dipakai untuk pemulihan setelah reboot/crash."
@@ -18146,6 +18245,9 @@ msgstr "Ini mengganti label, perintah, argumen, pengaturan prompt dan resume, va
 
 msgid "This repository does not allow merging from here."
 msgstr "Repositori ini tidak mengizinkan merge dari sini."
+
+msgid "This saved history changed. Select it again before opening."
+msgstr "Riwayat tersimpan ini telah berubah. Pilih kembali sebelum membukanya."
 
 msgid "This screen doesn't exist"
 msgstr "Layar ini tidak ada"
@@ -18943,11 +19045,17 @@ msgstr "Perbarui Superset di host ini untuk mengedit konfigurasi workspace-nya."
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "Perbarui host ini untuk memilih akun bagi terminal baru."
+
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"
+
+msgid "Update this host to open saved Claude history."
+msgstr "Perbarui host ini untuk membuka riwayat Claude tersimpan."
 
 msgid "Updated"
 msgstr "Diperbarui"
@@ -19033,6 +19141,9 @@ msgstr "Data penggunaan sudah tidak mutakhir"
 
 msgid "Usage sections"
 msgstr "Bagian penggunaan"
+
+msgid "Usage unavailable"
+msgstr "Data penggunaan tidak tersedia"
 
 msgid "Usage unavailable."
 msgstr "Penggunaan tidak tersedia."

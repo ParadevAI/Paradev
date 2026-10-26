@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} de {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} restante"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} no está en {installedAccountLogin}, donde está instalada la GitHub App de esta organización."
 
@@ -2063,6 +2066,12 @@ msgstr "Sesión de agente iniciada"
 
 msgid "agent settings"
 msgstr "configuración del agente"
+
+msgid "Agent terminal with account"
+msgstr "Terminal de agente con cuenta"
+
+msgid "Agent terminal with account…"
+msgstr "Terminal de agente con cuenta…"
 
 msgid "Agent usage rankings"
 msgstr "Rankings de uso de agentes"
@@ -3298,6 +3307,9 @@ msgstr "Examinar directorios"
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Explora los archivos de temas de Paradev compartidos por la comunidad, incluidos GitHub Dark Colorblind, Catppuccin, Ember y One Dark Pro."
 
+msgid "Browse saved history"
+msgstr "Explorar el historial guardado"
+
 msgid "Browse shared themes and future agent configs for Paradev."
 msgstr "Explora temas compartidos y las futuras configuraciones de agentes para Paradev."
 
@@ -3601,6 +3613,9 @@ msgstr "Error de certificado"
 
 msgid "Chain of Thought"
 msgstr "Cadena de razonamiento"
+
+msgid "Change account"
+msgstr "Cambiar de cuenta"
 
 msgid "Change assignee"
 msgstr "Cambiar responsable"
@@ -5104,6 +5119,9 @@ msgstr "No se pudo salir de la cola"
 msgid "Could not list directory"
 msgstr "No se pudo listar el directorio"
 
+msgid "Could not load accounts"
+msgstr "No se pudieron cargar las cuentas"
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "No se pudieron cargar los agentes de {0}"
@@ -5125,6 +5143,9 @@ msgstr "No se pudieron cargar los plugins. Comprueba tu conexión e inténtalo d
 
 msgid "Could not load presets from the host"
 msgstr "No se pudieron cargar los preajustes del host"
+
+msgid "Could not load saved conversations"
+msgstr "No se pudieron cargar las conversaciones guardadas"
 
 msgid "Could not load this diff"
 msgstr "No se pudo cargar este diff"
@@ -5149,6 +5170,9 @@ msgstr "No se pudo abrir el enlace"
 
 msgid "Could not open Photos"
 msgstr "No se pudo abrir Fotos"
+
+msgid "Could not open saved conversation"
+msgstr "No se pudo abrir la conversación guardada"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5204,6 +5228,9 @@ msgstr "No se pudo registrar el espacio de trabajo en la nube"
 msgid "Could not record environment"
 msgstr "No se pudo guardar el entorno"
 
+msgid "Could not refresh usage"
+msgstr "No se pudo actualizar el uso"
+
 msgid "Could not remove access"
 msgstr "No se pudo quitar el acceso"
 
@@ -5234,6 +5261,9 @@ msgstr "No se pudo reanudar"
 msgid "Could not resume the chat"
 msgstr "No se pudo reanudar el chat"
 
+msgid "Could not resume this conversation"
+msgstr "No se pudo reanudar esta conversación"
+
 msgid "Could not send"
 msgstr "No se pudo enviar"
 
@@ -5248,6 +5278,9 @@ msgstr "No se pudo compartir"
 
 msgid "Could not start agent"
 msgstr "No se pudo iniciar el agente"
+
+msgid "Could not start agent terminal"
+msgstr "No se pudo iniciar el terminal del agente"
 
 msgid "Could not start checkout. Please try again."
 msgstr "No se pudo iniciar el pago. Inténtalo de nuevo."
@@ -8839,6 +8872,9 @@ msgstr "También me encanta poder crear un entorno local con un árbol de trabaj
 msgid "I can be in a café with my coffee while the work keeps moving forward."
 msgstr "Puedo estar en una cafetería tomando un café mientras el trabajo sigue avanzando."
 
+msgid "I exited this conversation in the original app. No tools or background jobs are still running."
+msgstr "He salido de esta conversación en la aplicación original. No quedan herramientas ni tareas en segundo plano en ejecución."
+
 msgid "I start my morning walks with an idea, and end with a pull request."
 msgstr "Empiezo mis paseos matutinos con una idea y los termino con una pull request."
 
@@ -9998,6 +10034,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Cargando"
 
+msgid "Loading accounts…"
+msgstr "Cargando cuentas…"
+
 msgid "Loading agent settings..."
 msgstr "Cargando la configuración del agente..."
 
@@ -10075,6 +10114,9 @@ msgstr "Cargando los repositorios..."
 
 msgid "Loading review..."
 msgstr "Cargando la revisión..."
+
+msgid "Loading saved conversations…"
+msgstr "Cargando conversaciones guardadas…"
 
 msgid "Loading terminal scripts..."
 msgstr "Cargando los scripts de terminal..."
@@ -11111,6 +11153,9 @@ msgstr "No se encontraron autores."
 msgid "No automations match"
 msgstr "Ninguna automatización coincide"
 
+msgid "No available subscription accounts. Add or sign in to an account in Usage, then refresh."
+msgstr "No hay cuentas de suscripción disponibles. Ve a Uso para añadir una cuenta o iniciar sesión en ella y luego actualiza."
+
 msgid "No branches found"
 msgstr "No se encontraron ramas"
 
@@ -11140,6 +11185,9 @@ msgstr "Sin comprobaciones."
 
 msgid "No Chrome, Brave, Arc, or other Chromium browsers were found."
 msgstr "No se encontraron Chrome, Brave, Arc ni otros navegadores basados en Chromium."
+
+msgid "No Claude agent is configured on this host."
+msgstr "No hay ningún agente Claude configurado en este host."
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Todavía no se ha encontrado uso de Claude ni de Codex en este equipo. Únete ahora y aparecerás en cuanto uses un agente."
@@ -11525,6 +11573,9 @@ msgstr "Ningún puesto encaja conmigo. ¿Debería escribirles igualmente?"
 
 msgid "No runs yet"
 msgstr "Aún no hay ejecuciones"
+
+msgid "No saved Claude conversations were found in this account for the current workspace."
+msgstr "No se encontraron conversaciones de Claude guardadas en esta cuenta para el espacio de trabajo actual."
 
 msgid "No screenshots yet"
 msgstr "Aún no hay capturas"
@@ -12159,6 +12210,9 @@ msgstr "Abrir la paleta de comandos"
 msgid "Open comment on GitHub"
 msgstr "Abrir el comentario en GitHub"
 
+msgid "Open conversation"
+msgstr "Abrir conversación"
+
 msgid "Open device sign-in"
 msgstr "Abrir inicio de sesión del dispositivo"
 
@@ -12186,6 +12240,9 @@ msgstr "Abrir el panel"
 msgid "Open existing PR or create a new one on GitHub"
 msgstr "Abrir la PR existente o crear una nueva en GitHub"
 
+msgid "Open existing terminal"
+msgstr "Abrir terminal existente"
+
 msgid "open file"
 msgstr "abrir archivo"
 
@@ -12206,6 +12263,9 @@ msgstr "Abrir desde una carpeta"
 
 msgid "Open full screen"
 msgstr "Abrir en pantalla completa"
+
+msgid "Open history from this account in the current workspace. After adoption, later opens use its current local history. Background work is not transferred."
+msgstr "Abre el historial de esta cuenta en el espacio de trabajo actual. Después de la adopción, las siguientes aperturas usarán su historial local actualizado. No se transfieren las tareas en segundo plano."
 
 msgid "Open host"
 msgstr "Abrir host"
@@ -12410,6 +12470,12 @@ msgstr "Abrir reciente"
 
 msgid "Open roles"
 msgstr "Vacantes"
+
+msgid "Open saved Claude conversation"
+msgstr "Abrir conversación guardada de Claude"
+
+msgid "Open saved Claude conversation…"
+msgstr "Abrir conversación guardada de Claude…"
 
 msgid "Open session in"
 msgstr "Abrir sesión en"
@@ -14431,6 +14497,9 @@ msgstr "Reabrir pestaña cerrada"
 msgid "Reopen PR"
 msgstr "Reabrir PR"
 
+msgid "Reopen the saved conversation in the same workspace. No message is sent. Background work is not transferred."
+msgstr "Vuelve a abrir la conversación guardada en el mismo espacio de trabajo. No se envía ningún mensaje. El trabajo en segundo plano no se transfiere."
+
 msgid "Reopen thread"
 msgstr "Reabrir el hilo"
 
@@ -14786,6 +14855,12 @@ msgstr "Argumentos de reanudación"
 
 msgid "Resume automation"
 msgstr "Reanudar la automatización"
+
+msgid "Resume conversation"
+msgstr "Reanudar conversación"
+
+msgid "Resume with another account"
+msgstr "Reanudar con otra cuenta"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -15202,6 +15277,12 @@ msgstr "Guardado"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "Se guardó \"{0}\" como entorno"
+
+msgid "Saved conversations"
+msgstr "Conversaciones guardadas"
+
+msgid "Saved in Superset"
+msgstr "Guardado en Superset"
 
 msgid "Saved to Downloads"
 msgstr "Guardada en Descargas"
@@ -16725,6 +16806,9 @@ msgstr "Iniciar una nueva sesión de agente en cada ejecución"
 msgid "Start a new chat"
 msgstr "Iniciar un chat nuevo"
 
+msgid "Start a new terminal using an existing login. Other chats and your default account stay unchanged."
+msgstr "Inicia un nuevo terminal usando una cuenta ya conectada. Los demás chats y tu cuenta predeterminada no cambiarán."
+
 msgid "Start a session"
 msgstr "Iniciar una sesión"
 
@@ -16772,6 +16856,9 @@ msgstr "Inicia una con + en la barra de pestañas."
 
 msgid "Start or stop the workspace run command"
 msgstr "Iniciar o detener el comando de ejecución del espacio de trabajo"
+
+msgid "Start terminal"
+msgstr "Iniciar terminal"
 
 msgid "Start voice mode"
 msgstr "Iniciar el modo de voz"
@@ -17792,6 +17879,9 @@ msgstr "La misma app funciona de forma nativa en iPad, en vertical y en horizont
 msgid "The scorecard"
 msgstr "El cuadro de resultados"
 
+msgid "The selected login changed. Choose an account again."
+msgstr "El inicio de sesión seleccionado ha cambiado. Vuelve a elegir una cuenta."
+
 msgid "The self-driving software factory"
 msgstr "La fábrica de software autónoma"
 
@@ -17903,6 +17993,9 @@ msgstr "Este agente no puede bifurcar una conversación"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Este agente no puede ejecutarse en un espacio de trabajo en la nube"
 
+msgid "This agent configuration does not support account selection."
+msgstr "Esta configuración de agente no permite seleccionar una cuenta."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente ya no existe en el dispositivo seleccionado (puede que sus agentes se hayan restablecido). Las ejecuciones fallarán hasta que elijas uno nuevo."
 
@@ -17957,6 +18050,12 @@ msgstr "No se puede iniciar este espacio de trabajo en la nube"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este espacio de trabajo en la nube se está reactivando, lo que puede tardar hasta 30 segundos tras un periodo de inactividad."
+
+msgid "This conversation cannot be resumed with another account."
+msgstr "Esta conversación no se puede reanudar con otra cuenta."
+
+msgid "This conversation is no longer available to resume."
+msgstr "Esta conversación ya no está disponible para reanudarla."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Esto elimina el historial guardado que se usa para recuperarse tras un reinicio o un cierre inesperado."
@@ -18146,6 +18245,9 @@ msgstr "Esto sustituye su etiqueta, comando, argumentos, ajustes de prompt y rea
 
 msgid "This repository does not allow merging from here."
 msgstr "Este repositorio no permite fusionar desde aquí."
+
+msgid "This saved history changed. Select it again before opening."
+msgstr "Este historial guardado ha cambiado. Vuelve a seleccionarlo antes de abrirlo."
 
 msgid "This screen doesn't exist"
 msgstr "Esta pantalla no existe"
@@ -18943,11 +19045,17 @@ msgstr "Actualiza Superset en este host para editar la configuración del espaci
 msgid "update the branch prefix"
 msgstr "actualizar el prefijo de rama"
 
+msgid "Update this host to choose an account for a new terminal."
+msgstr "Actualiza este host para elegir una cuenta para un nuevo terminal."
+
 msgid "Update this host to message subagents"
 msgstr "Actualiza este host para enviar mensajes a los subagentes"
 
 msgid "Update this host to move subagents to the background"
 msgstr "Actualiza este host para mover subagentes a segundo plano"
+
+msgid "Update this host to open saved Claude history."
+msgstr "Actualiza este host para abrir el historial guardado de Claude."
 
 msgid "Updated"
 msgstr "Actualizado"
@@ -19033,6 +19141,9 @@ msgstr "Los datos de uso están desactualizados"
 
 msgid "Usage sections"
 msgstr "Secciones de uso"
+
+msgid "Usage unavailable"
+msgstr "Uso no disponible"
 
 msgid "Usage unavailable."
 msgstr "Uso no disponible."

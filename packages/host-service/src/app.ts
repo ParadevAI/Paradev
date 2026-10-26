@@ -54,6 +54,7 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
+import { configureAttributionTokensForDatabase } from "./terminal-agents/attribution-token";
 import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
@@ -61,6 +62,7 @@ import {
 	disposeLocalMobileDevices,
 	startLocalMobileDeviceCleanup,
 } from "./trpc/router/mobile";
+import { disposeBackgroundSuccessorRefresh } from "./trpc/router/notifications/background-successor-adapter";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -142,6 +144,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	configureAttributionTokensForDatabase(
+		config.dbPath,
+		options.db !== undefined,
+	);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.
@@ -545,6 +551,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		disposeBackgroundSuccessorRefresh(db);
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
