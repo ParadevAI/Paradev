@@ -4,6 +4,9 @@ import {
 } from "./agent-setup-targets";
 import {
 	cleanupGlobalOpenCodePlugin,
+	createAgyHookScript,
+	createAgyHooksJson,
+	createAgyWrapper,
 	createAmpPlugin,
 	createAmpWrapper,
 	createClaudeSettingsJson,
@@ -39,6 +42,7 @@ import {
 	createUfoWrapper,
 	createVibeHooksToml,
 	createVibeWrapper,
+	removeAgyManagedHooks,
 	removeAmpPlugin,
 	removeClaudeManagedHooks,
 	removeCodexManagedHooks,
@@ -161,6 +165,10 @@ const AGENT_SETUP_DEFINITIONS: Record<
 	},
 	ufo: {
 		setup: [createUfoWrapper],
+	},
+	agy: {
+		setup: [createAgyHookScript, createAgyWrapper, createAgyHooksJson],
+		teardown: [removeAgyManagedHooks],
 	},
 };
 

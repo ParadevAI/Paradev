@@ -1,4 +1,18 @@
 export {
+	AGY_HOOK_MARKER,
+	AGY_HOOK_NAMESPACE,
+	AGY_HOOK_SCRIPT_NAME,
+	createAgyHookScript,
+	createAgyHooksJson,
+	createAgyWrapper,
+	getAgyHookScriptContent,
+	getAgyHookScriptPath,
+	getAgyHooksJsonContent,
+	getAgyHooksJsonPath,
+	getAgyManagedHookCommand,
+	removeAgyManagedHooks,
+} from "./agent-wrappers-agy";
+export {
 	AMP_PLUGIN_FILE,
 	AMP_PLUGIN_MARKER,
 	createAmpPlugin,
