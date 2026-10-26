@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} trên {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "Còn lại {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} không nằm trong {installedAccountLogin}, nơi GitHub App của tổ chức này được cài đặt."
 
@@ -5212,6 +5215,9 @@ msgstr "Không thể ghi nhận workspace trên cloud"
 
 msgid "Could not record environment"
 msgstr "Không thể lưu environment"
+
+msgid "Could not refresh usage"
+msgstr "Không thể làm mới mức sử dụng"
 
 msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
@@ -20287,9 +20293,3 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Không thể làm mới mức sử dụng"
-
-msgid "{remainingPercent} remaining"
-msgstr "Còn lại {remainingPercent}"

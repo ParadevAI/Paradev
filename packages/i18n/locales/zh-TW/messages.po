@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "剩餘 {remainingPercent}"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本組織的 GitHub App 安裝在那裡。"
 
@@ -5212,6 +5215,9 @@ msgstr "無法記錄雲端工作區"
 
 msgid "Could not record environment"
 msgstr "無法儲存環境"
+
+msgid "Could not refresh usage"
+msgstr "無法重新整理用量"
 
 msgid "Could not remove access"
 msgstr "無法移除存取權限"
@@ -20287,9 +20293,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "無法重新整理用量"
-
-msgid "{remainingPercent} remaining"
-msgstr "剩餘 {remainingPercent}"

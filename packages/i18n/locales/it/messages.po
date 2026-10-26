@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} di {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} rimanente"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} non è su {installedAccountLogin}, dove è installata la GitHub App di questa organizzazione."
 
@@ -5212,6 +5215,9 @@ msgstr "Impossibile registrare il workspace cloud"
 
 msgid "Could not record environment"
 msgstr "Impossibile salvare l'ambiente"
+
+msgid "Could not refresh usage"
+msgstr "Impossibile aggiornare l’utilizzo"
 
 msgid "Could not remove access"
 msgstr "Impossibile rimuovere l’accesso"
@@ -20287,9 +20293,3 @@ msgstr "Zoom indietro"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Impossibile aggiornare l’utilizzo"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} rimanente"

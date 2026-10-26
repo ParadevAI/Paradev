@@ -1177,6 +1177,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} van {total}"
 
+msgid "{remainingPercent} remaining"
+msgstr "{remainingPercent} resterend"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} staat niet op {installedAccountLogin}, waar de GitHub App van deze organisatie is geïnstalleerd."
 
@@ -5212,6 +5215,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
+
+msgid "Could not refresh usage"
+msgstr "Gebruik kon niet worden vernieuwd"
 
 msgid "Could not remove access"
 msgstr "Kan toegang niet verwijderen"
@@ -20287,9 +20293,3 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not refresh usage"
-msgstr "Gebruik kon niet worden vernieuwd"
-
-msgid "{remainingPercent} remaining"
-msgstr "{remainingPercent} resterend"
