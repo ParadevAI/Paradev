@@ -27,10 +27,8 @@ const URL_PROVIDER_STEP_TIMEOUT_MS = 15_000;
 // Partysocket retries every few seconds while the relay is unreachable, and
 // each lookup is an API call; one per window is enough to follow a relay move.
 const RELAY_RESOLVE_INTERVAL_MS = 5 * 60_000;
-// A relay that cannot reach the API refuses a registered host with the same
-// 4403 as a missing registration, so repeated refusals must back off or they
-// become a hot loop of host.ensure calls. A refused connect opens before it
-// closes, so only an inbound message shows the relay accepted this host.
+// The relay also answers 4403 when it cannot reach the API, and a refused
+// connect opens before it closes.
 const FORBIDDEN_RETRY_BASE_MS = 30_000;
 const FORBIDDEN_RETRY_MAX_MS = 5 * 60_000;
 
@@ -76,9 +74,6 @@ export interface TunnelClientOptions {
 	 * while an ordinary reconnect costs no API call. On failure the last known
 	 * URL is reused. */
 	resolveRelayUrl?: () => Promise<string>;
-	/** The relay refused this host's control connect (4403). Reconnects pause
-	 * until this settles, so the caller can re-register the host before the
-	 * next attempt instead of being refused every few seconds. */
 	onForbidden?: (reason: string) => Promise<void>;
 }
 
