@@ -17,10 +17,9 @@ import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
+import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { useSettingsExternalChangeListener } from "renderer/hooks/useSettingsExternalChangeListener";
 import { useSignOut } from "renderer/hooks/useSignOut";
-import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -85,13 +84,14 @@ const SESSION_PENDING_TIMEOUT_MS = 15_000;
 
 function AuthenticatedLayout() {
 	const {
-		data: session,
+		session,
+		hasLocalToken,
+		isOnline,
 		isPending,
+		isRecovering,
 		isRefetching,
 		refetch,
-	} = authClient.useSession();
-	const hasLocalToken = !!getAuthToken();
-	const isOnline = useOnlineStatus();
+	} = useSessionRecovery();
 	const navigate = useNavigate();
 	const location = useLocation();
 	// The onboarding gate below must key off the route being RENDERED, not
@@ -114,7 +114,9 @@ function AuthenticatedLayout() {
 		: session?.session?.activeOrganizationId;
 
 	const isAuthPending =
-		(isPending || (isRefetching && !session?.user && hasLocalToken)) &&
+		(isPending ||
+			isRecovering ||
+			(isRefetching && !session?.user && hasLocalToken)) &&
 		!env.SKIP_ENV_VALIDATION;
 	const authPendingTimedOut = useDelayElapsed(
 		isAuthPending,
