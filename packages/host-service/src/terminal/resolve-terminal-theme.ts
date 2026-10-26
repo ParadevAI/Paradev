@@ -16,12 +16,6 @@ export function themeTypeForColors(colors: TerminalColors): TerminalThemeType {
 	return relativeLuminance(colors.background) > 0.5 ? "light" : "dark";
 }
 
-/**
- * What a new PTY gets: the caller's explicit theme first, then the theme its
- * colors imply, then the host's stored theme. Stored colors apply only when
- * they belong to the resolved theme type, so an explicit `--theme dark` never
- * answers OSC 11 with a light background.
- */
 export function resolveTerminalTheme(params: {
 	themeType?: TerminalThemeType;
 	colors?: TerminalColors;

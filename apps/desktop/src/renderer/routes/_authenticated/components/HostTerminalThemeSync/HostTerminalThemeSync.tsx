@@ -9,8 +9,6 @@ import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 
 const fallbackTheme = getDefaultTerminalAppearance().theme;
 
-// Separate requests can reach the host out of order; chain them per host so
-// the last appearance is the one stored.
 const pushChains = new Map<string, Promise<void>>();
 
 function pushTerminalTheme(
@@ -26,7 +24,6 @@ function pushTerminalTheme(
 		.then(
 			() => {},
 			(error) => {
-				// Hosts older than this procedure keep their dark default.
 				console.warn(
 					"[HostTerminalThemeSync] Failed to push terminal theme to host:",
 					error,

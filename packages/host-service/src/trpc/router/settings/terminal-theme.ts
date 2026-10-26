@@ -16,8 +16,7 @@ export const terminalThemeRouter = router({
 			}),
 		)
 		.mutation(({ ctx, input }) => {
-			// The legacy worktree dir is seeded only when no settings row exists,
-			// so create the row through it before this write does.
+			// Seeds the settings row (and the legacy worktree dir) before this write creates it.
 			getHostWorktreeBaseDir(ctx);
 			setHostTerminalTheme(ctx.db, input);
 			return { success: true as const };
