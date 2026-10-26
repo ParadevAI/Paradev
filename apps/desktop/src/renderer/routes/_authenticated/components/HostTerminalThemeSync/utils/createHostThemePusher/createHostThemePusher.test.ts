@@ -74,3 +74,21 @@ test("a host gets the theme again only when the theme changes or the host reconn
 		["b", "dark"],
 	]);
 });
+
+test("a failed push is retried on the next sync with the same theme; a successful one is not re-sent", async () => {
+	let unreachable = true;
+	const { pusher, sent, failed } = recordingPusher(async (hostUrl) => {
+		if (unreachable && hostUrl === "a") throw new Error("host unreachable");
+	});
+
+	await pusher.sync(["a", "b"], "light");
+	expect(failed).toEqual(["a"]);
+
+	unreachable = false;
+	await pusher.sync(["a", "b"], "light");
+	expect(sent.slice(2)).toEqual([["a", "light"]]);
+
+	await pusher.sync(["a", "b"], "light");
+	expect(sent).toHaveLength(3);
+	expect(failed).toEqual(["a"]);
+});
