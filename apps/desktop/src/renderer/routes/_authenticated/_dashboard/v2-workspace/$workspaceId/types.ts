@@ -1,4 +1,7 @@
-import type { UserContent } from "@superset/chat/protocol";
+import type {
+	CreateAccountSessionInput,
+	UserContent,
+} from "@superset/chat/protocol";
 import type { WorkspaceStore } from "@superset/panes";
 import type { AgentIdentityId } from "@superset/shared/agent-catalog";
 import type { StoreApi } from "zustand/vanilla";
@@ -80,6 +83,12 @@ export interface PagePaneData {
 }
 
 export interface ChatPaneData {
+	accountBound?: true;
+	accountDraftId?: string;
+	accountLaunch?: {
+		hostUrl: string;
+		request: CreateAccountSessionInput;
+	};
 	terminalId: string;
 	sessionId: string | null;
 	agent?: {

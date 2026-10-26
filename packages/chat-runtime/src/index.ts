@@ -1,4 +1,4 @@
-import type { ChatCommands } from "./commands";
+import type { ChatCommands, CommandsOptions } from "./commands";
 import { CommandDedupe, createCommands } from "./commands";
 import type { ChatDb, OpenChatDb } from "./db";
 import { createChatDb } from "./db";
@@ -30,6 +30,7 @@ export type ChatRuntimeOptions = {
 	bootstrapLimit?: number;
 	dedupeCapacity?: number;
 	onSessionChanged?: ChatJournalOptions["onSessionChanged"];
+	validateAccountLaunch?: CommandsOptions["validateAccountLaunch"];
 };
 
 export type ChatRuntime = {
@@ -75,6 +76,7 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 		live,
 		dedupe: new CommandDedupe(options.dedupeCapacity),
 		subagentItems,
+		validateAccountLaunch: options.validateAccountLaunch,
 	});
 
 	return {

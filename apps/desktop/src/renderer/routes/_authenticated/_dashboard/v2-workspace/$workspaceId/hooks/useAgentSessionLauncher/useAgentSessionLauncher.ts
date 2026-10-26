@@ -38,6 +38,11 @@ export type CreateNewAgentSession = (
 
 type OpenNewChat = () => Promise<{ terminalId: string } | null>;
 
+export type CreateAccountTerminal = (input: {
+	configId: string;
+	account: { selection: string | null; identity: string };
+}) => Promise<void>;
+
 export type OpenAgentChat = (
 	input: Omit<CreateNewAgentSessionInput, "forkSessionId" | "prompt"> & {
 		prompt?: string;
@@ -55,17 +60,47 @@ export function useAgentSessionLauncher({
 	store,
 }: UseAgentSessionLauncherOptions): {
 	createNewAgentSession: CreateNewAgentSession;
+	createAccountTerminal: CreateAccountTerminal;
 	openAgentChat: OpenAgentChat;
 	openNewChat: OpenNewChat;
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
 	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runWithAccount } =
+		workspaceTrpc.agents.runWithAccount.useMutation();
 	const appearance = useTerminalAppearance();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const queryClient = useQueryClient();
+	const createAccountTerminal = useCallback<CreateAccountTerminal>(
+		async ({ configId, account }) => {
+			const result = await runWithAccount({
+				workspaceId,
+				agent: configId,
+				account,
+				prompt: "",
+				surface: "terminal",
+				colors: terminalQueryColors(appearance.theme),
+			});
+			if (result.kind !== "terminal") {
+				throw new Error(
+					t({ message: "Selected agent isn't a terminal agent" }),
+				);
+			}
+			store.getState().addTab({
+				panes: [
+					{
+						kind: "terminal",
+						titleOverride: result.label,
+						data: { terminalId: result.sessionId } satisfies TerminalPaneData,
+					},
+				],
+			});
+		},
+		[runWithAccount, workspaceId, appearance.theme, store, t],
+	);
 
 	const openAgentChat = useCallback<OpenAgentChat>(
 		async (input) => {
@@ -201,6 +236,7 @@ export function useAgentSessionLauncher({
 
 	return {
 		createNewAgentSession,
+		createAccountTerminal,
 		openAgentChat,
 		openNewChat,
 		focusAgentTerminal,

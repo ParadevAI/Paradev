@@ -54,6 +54,7 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
+import { configureAttributionTokensForDatabase } from "./terminal-agents/attribution-token";
 import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
@@ -61,11 +62,15 @@ import {
 	disposeLocalMobileDevices,
 	startLocalMobileDeviceCleanup,
 } from "./trpc/router/mobile";
+import { disposeBackgroundSuccessorRefresh } from "./trpc/router/notifications/background-successor-adapter";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
 } from "./trpc/router/terminal-agents/terminal-agents";
 import { provisionSelectedAccounts } from "./trpc/router/usage/account-provisioning";
+import { claudeQuotaPolling } from "./trpc/router/usage/claude-quota-polling";
+import { onNativeClaudeUsage } from "./trpc/router/usage/native-claude-usage";
+import { disposeUsageQuota, expireUsageQuota } from "./trpc/router/usage/usage";
 import {
 	execGh as defaultExecGh,
 	type ExecGh,
@@ -142,6 +147,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	configureAttributionTokensForDatabase(
+		config.dbPath,
+		options.db !== undefined,
+	);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.
@@ -543,10 +552,28 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		}),
 	);
 
+	const disposeQuotaActivity = claudeQuotaPolling.register(() =>
+		terminalAgentStore.list(),
+	);
+	const disposeNativeUsage = onNativeClaudeUsage(() => {
+		expireUsageQuota("claude");
+		eventBus.broadcastUsageChanged({
+			provider: "claude",
+			occurredAt: Date.now(),
+		});
+	});
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		disposeBackgroundSuccessorRefresh(db);
+		disposeQuotaActivity();
+		disposeNativeUsage();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		await disposeWorkspaceTitleJobs(db);
+		try {
+			await disposeUsageQuota();
+		} catch (err) {
+			console.warn("[host-service] usage quota disposal failed:", err);
+		}
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the
 		// open SQLite handle for the rest of the process lifetime.

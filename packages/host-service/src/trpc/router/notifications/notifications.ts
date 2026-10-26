@@ -8,8 +8,16 @@ import { verifyAttributionToken } from "../../../terminal-agents/attribution-tok
 import { recordTerminalAgentTranscriptPath } from "../../../terminal-agents/persistence";
 import { isTrustedTranscriptPath } from "../../../terminal-agents/transcript-path";
 import { protectedProcedure, publicProcedure, router } from "../../index";
-import { captureSessionAccount } from "../usage/session-account/session-account";
+import {
+	captureSessionAccount,
+	sameSessionAccountContext,
+} from "../usage/session-account/session-account";
+import { queueBackgroundSuccessorRefresh } from "./background-successor-adapter";
 import { fanOutAgentLifecycle } from "./fan-out-agent-lifecycle";
+import {
+	captureNativeClaudeLaunch,
+	ingestNativeClaudeHook,
+} from "./native-claude-usage";
 import { showDesktopNotification } from "./show-desktop-notification";
 
 // Hook scripts emit "" for unset env vars; we coerce to undefined so the
@@ -35,7 +43,28 @@ const subagentInput = z
 	})
 	.optional();
 
+const nativeClaudeUsageInput = z.object({
+	session_id: z.string().min(1).max(256),
+	cost: z.object({
+		total_api_duration_ms: z.number().finite().nonnegative().nullable(),
+	}),
+	rate_limits: z.object({
+		five_hour: z
+			.object({
+				used_percentage: z.number().finite().min(0).max(100),
+				resets_at: z.number().finite(),
+			})
+			.optional(),
+		seven_day: z
+			.object({
+				used_percentage: z.number().finite().min(0).max(100),
+				resets_at: z.number().finite(),
+			})
+			.optional(),
+	}),
+});
 const hookInput = z.object({
+	nativeClaudeUsage: nativeClaudeUsageInput.optional(),
 	terminalId: z.string().optional(),
 	eventType: z.string().optional(),
 	agent: agentIdentityInput,
@@ -72,131 +101,338 @@ function normalizeAgentIdentity(
 	};
 }
 
-export const notificationsRouter = router({
-	/** A notification sent with `superset notifications show`, shown by the attached desktop app. */
-	show: protectedProcedure
-		.input(desktopNotificationSchema)
-		.mutation(({ ctx, input }) => showDesktopNotification(ctx, input)),
+export function createNotificationsRouter(
+	captureAccount = captureSessionAccount,
+	backgroundRefresh = queueBackgroundSuccessorRefresh,
+) {
+	return router({
+		/** A notification sent with `superset notifications show`, shown by the attached desktop app. */
+		show: protectedProcedure
+			.input(desktopNotificationSchema)
+			.mutation(({ ctx, input }) => showDesktopNotification(ctx, input)),
 
-	/**
-	 * Agent lifecycle hook. The shell hook POSTs here; we normalize, resolve
-	 * the terminal's workspace, and fan out over the WS event bus.
-	 *
-	 * Intentionally unauthenticated: a caller can only trigger a chime, a
-	 * sidebar indicator, and the idempotent forward-only "linked task →
-	 * In Progress" nudge for a real workspace. Reusing the host-service PSK
-	 * would leak it into every agent shell's env for zero practical gain.
-	 */
-	hook: publicProcedure.input(hookInput).mutation(async ({ ctx, input }) => {
-		const subagentId = trimOrUndefined(input.subagent?.id);
-		const eventType = subagentId ? undefined : mapEventType(input.eventType);
-		if (!subagentId && !eventType) {
-			return { success: true, ignored: true as const };
-		}
-
-		if (!input.terminalId || ctx.terminalAgentStore.hasChat(input.terminalId)) {
-			return { success: true, ignored: true as const };
-		}
-
-		const terminalSession = ctx.db.query.terminalSessions
-			.findFirst({
-				where: eq(terminalSessions.id, input.terminalId),
-				columns: { originWorkspaceId: true },
-			})
-			.sync();
-		if (!terminalSession?.originWorkspaceId) {
-			return { success: true, ignored: true as const };
-		}
-
-		const occurredAt = Date.now();
-
-		// Subagent activity is not the terminal's lifecycle: no chime, no
-		// status change, no session id capture. The roster change is fanned
-		// out as an invalidation so the sidebar refetches bindings.
-		if (subagentId) {
-			const agentType = trimOrUndefined(input.subagent?.type);
-			const recorded = ctx.terminalAgentStore.recordSubagentHook({
-				terminalId: input.terminalId,
-				workspaceId: terminalSession.originWorkspaceId,
-				eventType: input.eventType ?? "",
-				subagentId,
-				...(agentType ? { agentType } : {}),
-				hint: {
-					subagentId,
-					sessionId: trimOrUndefined(input.subagent?.sessionId),
-					transcriptPath: trimOrUndefined(input.subagent?.transcriptPath),
-					agentTranscriptPath: trimOrUndefined(
-						input.subagent?.agentTranscriptPath,
-					),
-				},
-				occurredAt,
-			});
-			if (!recorded) {
+		/**
+		 * Agent lifecycle hook. The shell hook POSTs here; we normalize, resolve
+		 * the terminal's workspace, and fan out over the WS event bus.
+		 *
+		 * Intentionally unauthenticated: a caller can only trigger a chime, a
+		 * sidebar indicator, and the idempotent forward-only "linked task →
+		 * In Progress" nudge for a real workspace. Reusing the host-service PSK
+		 * would leak it into every agent shell's env for zero practical gain.
+		 */
+		hook: publicProcedure.input(hookInput).mutation(async ({ ctx, input }) => {
+			if (input.nativeClaudeUsage) {
+				const terminalId = input.terminalId;
+				const sessionId = input.nativeClaudeUsage.session_id;
+				const launchId = trimOrUndefined(input.launchId);
+				if (
+					process.env.SUPERSET_NATIVE_CLAUDE_USAGE !== "1" ||
+					!terminalId ||
+					!launchId ||
+					input.subagent ||
+					input.agent?.agentId !== "claude" ||
+					input.agent.sessionId !== sessionId ||
+					ctx.terminalAgentStore.hasChat(terminalId) ||
+					!verifyAttributionToken(terminalId, input.attributionToken)
+				)
+					return { success: true, ignored: true as const };
+				const terminal = ctx.db.query.terminalSessions
+					.findFirst({
+						where: eq(terminalSessions.id, terminalId),
+						columns: { originWorkspaceId: true },
+					})
+					.sync();
+				const current = () => {
+					const binding = ctx.terminalAgentStore.getProvenance(terminalId);
+					return terminal?.originWorkspaceId &&
+						binding?.workspaceId === terminal.originWorkspaceId
+						? binding
+						: undefined;
+				};
+				const accepted = await ingestNativeClaudeHook(
+					{ terminalId, launchId, sessionId },
+					input.nativeClaudeUsage,
+					current,
+				).catch(() => false);
+				return { success: true, ignored: !accepted };
+			}
+			const subagentId = trimOrUndefined(input.subagent?.id);
+			const eventType = subagentId ? undefined : mapEventType(input.eventType);
+			if (!subagentId && !eventType) {
 				return { success: true, ignored: true as const };
 			}
-			ctx.eventBus.broadcastAgentBindingsChanged({
-				workspaceId: terminalSession.originWorkspaceId,
-				occurredAt,
-			});
-			return { success: true, ignored: false as const };
-		}
-		if (!eventType) {
-			return { success: true, ignored: true as const };
-		}
 
-		const agent = normalizeAgentIdentity(input.agent);
-		const preview = trimOrUndefined(input.preview);
+			if (
+				!input.terminalId ||
+				ctx.terminalAgentStore.hasChat(input.terminalId)
+			) {
+				return { success: true, ignored: true as const };
+			}
 
-		const prior = ctx.terminalAgentStore.get(input.terminalId);
-		const account =
-			verifyAttributionToken(input.terminalId, input.attributionToken) &&
-			eventType === "Attached" &&
-			input.accountProfile !== undefined &&
-			(!prior?.account ||
-				prior.agentId !== agent?.agentId ||
-				(input.launchId && input.launchId !== prior.launchId) ||
-				(agent?.sessionId &&
-					prior.agentSessionId &&
-					agent.sessionId !== prior.agentSessionId))
-				? await captureSessionAccount(
+			const terminalSession = ctx.db.query.terminalSessions
+				.findFirst({
+					where: eq(terminalSessions.id, input.terminalId),
+					columns: { originWorkspaceId: true },
+				})
+				.sync();
+			if (!terminalSession?.originWorkspaceId) {
+				return { success: true, ignored: true as const };
+			}
+
+			// An authenticated predecessor hook only triggers a fresh native read.
+			// Its old event, preview and receipt timestamp never become successor data.
+			const predecessor = ctx.terminalAgentStore.getProvenance(
+				input.terminalId,
+			);
+			const predecessorAgent = normalizeAgentIdentity(input.agent);
+			if (
+				predecessor?.endReason === "resumed" &&
+				predecessor.agentId === "claude" &&
+				predecessor.endedAt !== undefined &&
+				predecessorAgent?.agentId === "claude" &&
+				predecessorAgent.sessionId === predecessor.agentSessionId &&
+				input.launchId === predecessor.launchId &&
+				input.launchId &&
+				predecessorAgent.sessionId &&
+				verifyAttributionToken(input.terminalId, input.attributionToken)
+			) {
+				const accepted = await backgroundRefresh(ctx, {
+					terminalId: input.terminalId,
+					launchId: input.launchId,
+					sessionId: predecessorAgent.sessionId,
+					attributionToken: input.attributionToken,
+				}).catch(() => false);
+				if (accepted) return { success: true, ignored: false as const };
+			}
+
+			const occurredAt = Date.now();
+
+			// Subagent activity is not the terminal's lifecycle: no chime, no
+			// status change, no session id capture. The roster change is fanned
+			// out as an invalidation so the sidebar refetches bindings.
+			if (subagentId) {
+				const agentType = trimOrUndefined(input.subagent?.type);
+				const recorded = ctx.terminalAgentStore.recordSubagentHook({
+					terminalId: input.terminalId,
+					workspaceId: terminalSession.originWorkspaceId,
+					eventType: input.eventType ?? "",
+					subagentId,
+					...(agentType ? { agentType } : {}),
+					hint: {
+						subagentId,
+						sessionId: trimOrUndefined(input.subagent?.sessionId),
+						transcriptPath: trimOrUndefined(input.subagent?.transcriptPath),
+						agentTranscriptPath: trimOrUndefined(
+							input.subagent?.agentTranscriptPath,
+						),
+					},
+					occurredAt,
+				});
+				if (!recorded) {
+					return { success: true, ignored: true as const };
+				}
+				ctx.eventBus.broadcastAgentBindingsChanged({
+					workspaceId: terminalSession.originWorkspaceId,
+					occurredAt,
+				});
+				return { success: true, ignored: false as const };
+			}
+			if (!eventType) {
+				return { success: true, ignored: true as const };
+			}
+
+			const agent = normalizeAgentIdentity(input.agent);
+			const preview = trimOrUndefined(input.preview);
+
+			const prior = ctx.terminalAgentStore.getProvenance(input.terminalId);
+			const verifiedAttribution = verifyAttributionToken(
+				input.terminalId,
+				input.attributionToken,
+			);
+			if (
+				(prior?.account?.pinned || prior?.accountInvalid) &&
+				!verifiedAttribution &&
+				(eventType === "Detached" ||
+					(agent?.agentId && agent.agentId !== prior.agentId) ||
+					(input.launchId && input.launchId !== prior.launchId) ||
+					(agent?.sessionId && agent.sessionId !== prior.agentSessionId))
+			)
+				return { success: true, ignored: true as const };
+			if (
+				prior?.endedAt !== undefined &&
+				(prior.account?.pinned || prior.accountInvalid) &&
+				(!verifiedAttribution ||
+					!agent?.sessionId ||
+					!trimOrUndefined(input.launchId) ||
+					((prior.endReason === "resumed" || prior.endReason === "disposed") &&
+						(prior.launchId === input.launchId ||
+							prior.agentSessionId === agent?.sessionId)))
+			)
+				return { success: true, ignored: true as const };
+			const shouldCaptureAccount =
+				verifiedAttribution &&
+				eventType === "Attached" &&
+				input.accountProfile !== undefined &&
+				(prior?.account?.pinned ||
+					!prior?.account ||
+					prior.agentId !== agent?.agentId ||
+					(input.launchId && input.launchId !== prior.launchId) ||
+					(agent?.sessionId &&
+						prior.agentSessionId &&
+						agent.sessionId !== prior.agentSessionId));
+			let account = shouldCaptureAccount
+				? await captureAccount(
 						agent?.agentId,
-						input.accountProfile,
+						input.accountProfile as string,
 						input.apiKey ?? false,
 					).catch(() => undefined)
 				: undefined;
-		ctx.terminalAgentStore.recordEvent({
-			account,
-			launchId: trimOrUndefined(input.launchId),
-			terminalId: input.terminalId,
-			workspaceId: terminalSession.originWorkspaceId,
-			eventType,
-			...(agent?.agentId ? { agentId: agent.agentId } : {}),
-			...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
-			...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
-			occurredAt,
-		});
-		const transcriptPath = trimOrUndefined(input.transcriptPath);
-		if (
-			agent?.sessionId &&
-			transcriptPath &&
-			isTrustedTranscriptPath(transcriptPath)
-		) {
-			recordTerminalAgentTranscriptPath(ctx.db, {
+			let binding = prior;
+			let metadataOnly = false;
+			if (shouldCaptureAccount) {
+				const current = ctx.terminalAgentStore.getProvenance(input.terminalId);
+				const sameOwner = prior
+					? current &&
+						current.workspaceId === prior.workspaceId &&
+						current.endedAt === prior.endedAt &&
+						current.endReason === prior.endReason &&
+						current.agentId === prior.agentId &&
+						current.launchId === prior.launchId &&
+						current.definitionId === prior.definitionId &&
+						current.startedAt === prior.startedAt &&
+						(current.agentSessionId === prior.agentSessionId ||
+							(prior.agentSessionId === undefined &&
+								(!agent?.sessionId ||
+									current.agentSessionId === agent.sessionId)))
+					: !current ||
+						(input.launchId &&
+							current.launchId === input.launchId &&
+							current.agentId === agent?.agentId &&
+							(!agent?.sessionId ||
+								!current.agentSessionId ||
+								current.agentSessionId === agent.sessionId));
+				const unchangedAccount =
+					(!current?.account && !prior?.account) ||
+					sameSessionAccountContext(current?.account, prior?.account) ||
+					(!prior?.account &&
+						sameSessionAccountContext(current?.account, account)) ||
+					(prior?.account?.pinned &&
+						current?.account?.pinned &&
+						sameSessionAccountContext(
+							{ ...current.account, conflict: prior.account.conflict },
+							prior.account,
+						));
+				if (
+					!sameOwner ||
+					!unchangedAccount ||
+					current?.accountInvalid !== prior?.accountInvalid
+				)
+					return { success: true, ignored: true as const };
+				binding = current;
+				metadataOnly =
+					current !== undefined &&
+					(current.lastEventAt !== prior?.lastEventAt ||
+						current.lastEventType !== prior?.lastEventType ||
+						current.agentSessionId !== prior?.agentSessionId);
+				if (
+					metadataOnly &&
+					((agent?.agentId && agent.agentId !== current?.agentId) ||
+						(input.launchId && input.launchId !== current?.launchId) ||
+						(agent?.sessionId &&
+							current?.agentSessionId &&
+							agent.sessionId !== current.agentSessionId))
+				)
+					return { success: true, ignored: true as const };
+			}
+			// A same-launch mismatch cannot downgrade a pin to default-account
+			// recovery. Retain the requested identity with a conflict marker instead.
+			// A genuinely new CLI in the shell gets its own unpinned attribution.
+			if (
+				shouldCaptureAccount &&
+				binding?.account?.pinned &&
+				(!binding.launchId || binding.launchId === input.launchId)
+			) {
+				const matches =
+					account &&
+					binding.account.agent === account.agent &&
+					binding.account.identity === account.identity &&
+					binding.account.directory === account.directory;
+				account =
+					!account || matches
+						? binding.account
+						: { ...binding.account, conflict: true };
+			}
+			if (metadataOnly) {
+				ctx.terminalAgentStore.updateMetadata(input.terminalId, {
+					account,
+					agentSessionId: agent?.sessionId,
+					definitionId: agent?.definitionId,
+				});
+			} else {
+				ctx.terminalAgentStore.recordEvent({
+					account,
+					launchId: trimOrUndefined(input.launchId),
+					terminalId: input.terminalId,
+					workspaceId: terminalSession.originWorkspaceId,
+					eventType,
+					...(agent?.agentId ? { agentId: agent.agentId } : {}),
+					...(agent?.sessionId ? { agentSessionId: agent.sessionId } : {}),
+					...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
+					occurredAt,
+				});
+			}
+
+			if (
+				process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
+				verifiedAttribution &&
+				eventType === "Attached" &&
+				agent?.agentId === "claude" &&
+				agent.sessionId &&
+				input.launchId
+			) {
+				captureNativeClaudeLaunch(
+					{
+						terminalId: input.terminalId,
+						launchId: input.launchId,
+						sessionId: agent.sessionId,
+					},
+					() =>
+						ctx.terminalAgentStore.getProvenance(input.terminalId as string),
+				);
+			}
+			const transcriptPath = trimOrUndefined(input.transcriptPath);
+			if (
+				agent?.sessionId &&
+				transcriptPath &&
+				isTrustedTranscriptPath(transcriptPath)
+			) {
+				recordTerminalAgentTranscriptPath(ctx.db, {
+					terminalId: input.terminalId,
+					agentSessionId: agent.sessionId,
+					transcriptPath,
+				});
+			}
+
+			if (metadataOnly) {
+				ctx.eventBus.broadcastAgentBindingsChanged({
+					workspaceId: terminalSession.originWorkspaceId,
+					occurredAt,
+				});
+				return { success: true, ignored: false as const };
+			}
+
+			fanOutAgentLifecycle(ctx, {
+				workspaceId: terminalSession.originWorkspaceId,
+				eventType,
 				terminalId: input.terminalId,
-				agentSessionId: agent.sessionId,
-				transcriptPath,
+				...(agent ? { agent } : {}),
+				...(preview ? { preview } : {}),
+				occurredAt,
 			});
-		}
 
-		fanOutAgentLifecycle(ctx, {
-			workspaceId: terminalSession.originWorkspaceId,
-			eventType,
-			terminalId: input.terminalId,
-			...(agent ? { agent } : {}),
-			...(preview ? { preview } : {}),
-			occurredAt,
-		});
+			return { success: true, ignored: false as const };
+		}),
+	});
+}
 
-		return { success: true, ignored: false as const };
-	}),
-});
+export const notificationsRouter = createNotificationsRouter();

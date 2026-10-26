@@ -1,5 +1,11 @@
-import { describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
+import { afterEach, describe, expect, test } from "bun:test";
+import {
+	existsSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type {
@@ -26,9 +32,13 @@ const UNFINISHED: UnfinishedSession = {
 	pausedPrompts: [],
 };
 
-function fakeRuntime(unfinished: UnfinishedSession[]) {
+function fakeRuntime(unfinished: UnfinishedSession[], accountBound = false) {
 	const resumed: ResumeSessionInput[] = [];
 	const runtime = {
+		sessions: {
+			get: () => (accountBound ? { launchContextJson: "saved-account" } : null),
+			list: () => [],
+		},
 		live: { unfinished: () => unfinished, supports: () => true },
 		commands: {
 			resumeSession: (input: ResumeSessionInput) => {
@@ -40,11 +50,15 @@ function fakeRuntime(unfinished: UnfinishedSession[]) {
 	return { runtime, resumed };
 }
 
+const roots: string[] = [];
+afterEach(() => {
+	for (const root of roots.splice(0))
+		rmSync(root, { recursive: true, force: true });
+});
 function markerIn(contents?: object): string {
-	const markerPath = join(
-		mkdtempSync(join(tmpdir(), "chat-resume-")),
-		"m.json",
-	);
+	const root = mkdtempSync(join(tmpdir(), "chat-resume-"));
+	roots.push(root);
+	const markerPath = join(root, "m.json");
 	if (contents) writeFileSync(markerPath, JSON.stringify(contents));
 	return markerPath;
 }
@@ -117,4 +131,20 @@ describe("resuming chats after an update", () => {
 		expect(resumed).toEqual([]);
 		expect(existsSync(markerPath)).toBe(false);
 	});
+});
+
+test("an account-bound unfinished chat retains its replay marker for account-aware recovery", () => {
+	const marker = { requestedAt: 1_000, sessions: [UNFINISHED] };
+	const markerPath = markerIn(marker);
+	const { runtime, resumed } = fakeRuntime([], true);
+	resumeUnfinishedChats({
+		markerPath,
+		runtime: () => runtime,
+		resolveCwd: () => {
+			throw new Error("must not launch");
+		},
+		now: 2_000,
+	});
+	expect(resumed).toEqual([]);
+	expect(JSON.parse(readFileSync(markerPath, "utf8"))).toEqual(marker);
 });

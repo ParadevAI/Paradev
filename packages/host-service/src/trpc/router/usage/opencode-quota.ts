@@ -8,8 +8,8 @@
 import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { fetchClaudeSubscriptionQuota } from "./claude";
-import { fetchCodexSubscriptionQuota } from "./codex";
+import { getCredentialQuota } from "./claude";
+import { getCodexCredentialQuota } from "./codex";
 import { opencodeDataDir } from "./history/opencode";
 import type { UsageAccount, UsageAccountCredentialKind } from "./types";
 
@@ -100,6 +100,7 @@ export function opencodeAuthPath(dataDir: string = opencodeDataDir()): string {
 async function fetchOpencodeAccount(
 	login: OpencodeLogin,
 	authPath: string,
+	forceRefresh: boolean,
 ): Promise<UsageAccount> {
 	const dataDir = join(authPath, "..").replace(homedir(), "~");
 	const base = {
@@ -137,7 +138,18 @@ async function fetchOpencodeAccount(
 	}
 
 	if (login.provider === "anthropic") {
-		const quota = await fetchClaudeSubscriptionQuota(login.accessToken);
+		const quota = await getCredentialQuota(
+			{
+				accessToken: login.accessToken,
+				expiresAt: null,
+				refreshTokenExpiresAt: null,
+				subscriptionType: null,
+				accountKey: base.accountKey,
+				sourceLabel: base.sourceLabel,
+				selection: base.accountKey,
+			},
+			forceRefresh,
+		);
 		return {
 			...base,
 			...quota,
@@ -147,9 +159,11 @@ async function fetchOpencodeAccount(
 					: quota.statusDetail,
 		};
 	}
-	const quota = await fetchCodexSubscriptionQuota(
+	const quota = await getCodexCredentialQuota(
 		login.accessToken,
 		login.accountId ?? undefined,
+		base.accountKey,
+		forceRefresh,
 	);
 	return {
 		...base,
@@ -163,6 +177,7 @@ async function fetchOpencodeAccount(
 
 export async function fetchOpencodeAccounts(
 	authPath: string = opencodeAuthPath(),
+	forceRefresh = false,
 ): Promise<UsageAccount[]> {
 	let raw: string;
 	try {
@@ -172,7 +187,7 @@ export async function fetchOpencodeAccounts(
 	}
 	return Promise.all(
 		parseOpencodeLogins(raw).map((login) =>
-			fetchOpencodeAccount(login, authPath),
+			fetchOpencodeAccount(login, authPath, forceRefresh),
 		),
 	);
 }

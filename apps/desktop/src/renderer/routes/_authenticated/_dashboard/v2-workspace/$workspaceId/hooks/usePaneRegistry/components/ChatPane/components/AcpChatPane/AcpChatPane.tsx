@@ -17,7 +17,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
-import type { OpenFile } from "../../../../../../types";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import type { ChatPaneData, OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
@@ -32,8 +33,17 @@ import type {
 import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
 import { useForkChat } from "../../hooks/useForkChat";
 import { readSavedChatMode } from "../../utils/savedChatMode";
+import { AccountChatSwitch } from "./components/AccountChatSwitch/AccountChatSwitch";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
+import { StopAccountAgent } from "./components/StopAccountAgent";
+import { StoppedAccountQueue } from "./components/StoppedAccountQueue";
+import { useRecoveryRetries } from "./hooks/useRecoveryRetries";
+import { accountChatDraftKey } from "./utils/accountPaneState";
+import {
+	AccountChatPersistenceError,
+	createPersistedAccountChat,
+} from "./utils/createPersistedAccountChat";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import {
 	isChatCreateWatched,
@@ -58,6 +68,11 @@ export interface AgentSwitchTarget {
 
 export function AcpChatPane({
 	agent,
+	accountBound,
+	accountDraftId,
+	accountLaunch,
+	onAccountBound,
+	onAccountSessionCreated,
 	isActive,
 	onSessionInfo,
 	onPendingPromptsSent,
@@ -80,6 +95,14 @@ export function AcpChatPane({
 	modelLabel,
 	modeId,
 }: {
+	accountBound?: true;
+	accountDraftId?: string;
+	accountLaunch?: ChatPaneData["accountLaunch"];
+	onAccountBound: () => void;
+	onAccountSessionCreated: (result: {
+		sessionId: string;
+		terminalId: string;
+	}) => void;
 	workspaceId: string;
 	terminalId: string;
 	/** `sessionId` is absent until the agent has run a turn to report one. */
@@ -109,32 +132,44 @@ export function AcpChatPane({
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
+	const { activeOrganizationId } = useCollections();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
 	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
+	const [completedRecoveries, setCompletedRecoveries] = useState(0);
+	const [accountRecoveryPaused, setAccountRecoveryPaused] = useState(false);
+	const [accountStopRequested, setAccountStopRequested] = useState(false);
 	const [replacement, setReplacement] = useState<string | null>(null);
 
 	// The stored session outlives its process — after a host restart the row
 	// still reads "idle" and only the send fails. Ask who is actually running.
 	const { data: stored } = useQuery({
 		enabled: sessionId !== null,
-		queryKey: ["acp-chat-session", sessionId],
+		queryKey: ["acp-chat-session", hostUrl, sessionId],
 		queryFn: () =>
 			sessionId
 				? wiring.transport.getSession({ sessionId })
 				: Promise.resolve(null),
 		staleTime: 5_000,
 	});
+	const bound = useRef(Boolean(accountBound || accountLaunch));
+	bound.current ||= Boolean(
+		accountBound || accountLaunch || stored?.accountBound,
+	);
+	const isAccountBound = bound.current;
+	useEffect(() => {
+		if (isAccountBound && !accountBound) onAccountBound();
+	}, [isAccountBound, accountBound, onAccountBound]);
 	const queryClient = useQueryClient();
 	useWorkspaceEvent(
 		"chat:sessions-changed",
 		workspaceId,
 		() => {
 			void queryClient.invalidateQueries({
-				queryKey: ["acp-chat-session", sessionId],
+				queryKey: ["acp-chat-session", hostUrl, sessionId],
 			});
 			void queryClient.invalidateQueries({
 				queryKey: ["acp-chat-replacement"],
@@ -156,8 +191,55 @@ export function AcpChatPane({
 			mounted.current = false;
 		};
 	}, []);
+	const startAccount = useCallback(async () => {
+		if (
+			!accountLaunch ||
+			(harness !== "claude-acp" && harness !== "codex-acp") ||
+			attaching.current
+		)
+			return;
+		attaching.current = true;
+		setFailure(null);
+		try {
+			const created = await createPersistedAccountChat({
+				storage: window.localStorage,
+				organizationId: activeOrganizationId,
+				hostUrl: hostUrl ?? "",
+				workspaceId,
+				terminalId,
+				launch: accountLaunch,
+				create: (request) => wiring.transport.createAccountSession(request),
+			});
+			if (mounted.current) onAccountSessionCreated(created);
+		} catch (error) {
+			if (mounted.current) {
+				attaching.current = false;
+				setFailure(
+					error instanceof AccountChatPersistenceError
+						? t({
+								message:
+									"The selected account chat could not be verified in saved layout data. Nothing was launched by this attempt. If storage is full, free space, then rename this tab to save its layout before retrying. Keep this tab open if it still fails.",
+							})
+						: error instanceof Error
+							? error.message
+							: String(error),
+				);
+			}
+		}
+	}, [
+		t,
+		accountLaunch,
+		harness,
+		wiring.transport,
+		workspaceId,
+		terminalId,
+		hostUrl,
+		activeOrganizationId,
+		onAccountSessionCreated,
+	]);
 	const start = useCallback(
 		async (resumeHarness: string, resume?: string, replacing = false) => {
+			if (bound.current) return;
 			attaching.current = true;
 			setFailure(null);
 			try {
@@ -196,7 +278,10 @@ export function AcpChatPane({
 				else onSessionCreated(createdId);
 			} catch (error) {
 				attaching.current = false;
-				if (replacing) recoveryInFlight.current = false;
+				if (replacing) {
+					recoveryInFlight.current = false;
+					if (mounted.current) setCompletedRecoveries((count) => count + 1);
+				}
 				setFailure(error instanceof Error ? error.message : String(error));
 			}
 		},
@@ -220,13 +305,25 @@ export function AcpChatPane({
 	// pane was opened straight onto the chat and no agent has run yet.
 	useEffect(() => {
 		if (sessionId || attaching.current || !harness) return;
+		if (isAccountBound) {
+			if (!failure) void startAccount();
+			return;
+		}
 		void start(harness, agentSessionId);
-	}, [sessionId, harness, agentSessionId, start]);
+	}, [
+		sessionId,
+		harness,
+		agentSessionId,
+		start,
+		isAccountBound,
+		startAccount,
+		failure,
+	]);
 
 	// The agent copies the session whole — `session/fork` takes no truncation
 	// point — so where it was clicked from makes no difference to the branch.
 	const forkHere = useCallback(() => {
-		if (!sessionId) return;
+		if (!sessionId || bound.current) return;
 		const terminalId = crypto.randomUUID();
 		void wiring.transport
 			.forkSession({
@@ -267,7 +364,7 @@ export function AcpChatPane({
 				forkHere();
 				return;
 			}
-			if (!agent) return;
+			if (!agent || bound.current) return;
 			void forkToWorktree({
 				agentId: agent.id,
 				agentLabel: agentLabel ?? agent.id,
@@ -284,7 +381,13 @@ export function AcpChatPane({
 	}, [harness, start]);
 
 	const agentSwitch = useMemo(() => {
-		if (!agent || !onSwitchAgent) return undefined;
+		if (
+			!agent ||
+			!onSwitchAgent ||
+			isAccountBound ||
+			(sessionId && stored === undefined)
+		)
+			return undefined;
 		const presetIds = [
 			...new Set((agentConfigs ?? []).map((config) => config.presetId)),
 		].filter((presetId) => acpHarnessForPreset(presetId));
@@ -306,6 +409,7 @@ export function AcpChatPane({
 				transcript: string,
 				currentModeId: string | undefined,
 			) => {
+				if (bound.current) return;
 				const label =
 					agentConfigs?.find((config) => config.presetId === presetId)?.label ??
 					presetId;
@@ -375,6 +479,8 @@ export function AcpChatPane({
 		sessionId,
 		t,
 		wiring.transport,
+		isAccountBound,
+		stored,
 	]);
 
 	const sessionDead = stored?.session?.status === "dead";
@@ -401,11 +507,34 @@ export function AcpChatPane({
 	const recover = useCallback(() => {
 		if (!harness || !sessionId || recoveryInFlight.current) return;
 		recoveryInFlight.current = true;
+		if (bound.current) {
+			void wiring.transport
+				.recoverAccountSession({ commandId: crypto.randomUUID(), sessionId })
+				.then((result) => {
+					if (mounted.current) onAccountSessionCreated(result);
+				})
+				.catch((error: unknown) => {
+					if (mounted.current)
+						setFailure(error instanceof Error ? error.message : String(error));
+				})
+				.finally(() => {
+					recoveryInFlight.current = false;
+					if (mounted.current) setCompletedRecoveries((count) => count + 1);
+				});
+			return;
+		}
 		void wiring.transport
 			.closeSession({ sessionId })
 			.catch(() => undefined)
 			.then(() => start(harness, agentSessionId, true));
-	}, [harness, agentSessionId, sessionId, start, wiring.transport]);
+	}, [
+		harness,
+		agentSessionId,
+		sessionId,
+		start,
+		wiring.transport,
+		onAccountSessionCreated,
+	]);
 	const { data: replacementState } = useQuery({
 		enabled: replacement !== null,
 		queryKey: ["acp-chat-replacement", replacement],
@@ -440,32 +569,29 @@ export function AcpChatPane({
 		const timer = setTimeout(commit, REPLACEMENT_TIMEOUT_MS);
 		return () => clearTimeout(timer);
 	}, [replacement, replacementState, onSessionCreated, t]);
-	const recovering =
-		replacement !== null ||
-		(recoverable && recoveries.current < MAX_RECOVERIES);
-	useEffect(() => {
-		if (!recovering || recoveryInFlight.current) return;
-		const delayMs =
-			recoveries.current === 0 && failure === null
-				? 0
-				: 1_000 * 2 ** Math.max(recoveries.current - 1, 0);
-		const timer = setTimeout(() => {
-			recoveries.current += 1;
-			recover();
-		}, delayMs);
-		return () => clearTimeout(timer);
-	}, [recovering, recover, failure]);
+	const recovering = useRecoveryRetries({
+		recoverable: recoverable && !accountRecoveryPaused,
+		replacementPending: replacement !== null,
+		attempts: recoveries,
+		inFlight: recoveryInFlight,
+		completion: completedRecoveries,
+		failure,
+		recover,
+		limit: MAX_RECOVERIES,
+	});
 	const retryRecovery = useCallback(() => {
-		recoveries.current = 0;
+		if (recoveryInFlight.current) return;
+		setAccountRecoveryPaused(false);
+		recoveries.current = 1;
 		setFailure(null);
 		recover();
 	}, [recover]);
 
-	const draftKey = `chat-v3-draft:${terminalId}`;
+	const draftKey = accountChatDraftKey({ accountDraftId, terminalId });
 
 	const editMessage = useCallback(
 		async (request: ChatEditRequest) => {
-			if (!sessionId || !onRewound) return;
+			if (!sessionId || !onRewound || bound.current) return;
 			const handoffPrompt = request.transcript.trim()
 				? buildChatRewindPrompt({
 						transcript: request.transcript,
@@ -551,10 +677,43 @@ export function AcpChatPane({
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}
-				onStartNew={startFresh}
+				onStartNew={isAccountBound ? undefined : startFresh}
 				{...(continuedInTerminal ? {} : { onResume: retryRecovery })}
-				reason={continuedInTerminal ? "in-terminal" : "stopped"}
-			/>
+				reason={
+					continuedInTerminal
+						? "in-terminal"
+						: isAccountBound
+							? "account"
+							: "stopped"
+				}
+			>
+				{isAccountBound &&
+				hostUrl &&
+				((stored?.live && sessionDead) || accountStopRequested) ? (
+					<StopAccountAgent
+						key={`${hostUrl}:${sessionId}`}
+						hostUrl={hostUrl}
+						sessionId={sessionId}
+						closeStoppedAccountSession={(input) =>
+							wiring.transport.closeStoppedAccountSession(input)
+						}
+						onConfirmed={() => {
+							setAccountRecoveryPaused(true);
+							setAccountStopRequested(true);
+							setFailure(null);
+						}}
+						onStopped={() => setAccountStopRequested(false)}
+					/>
+				) : null}
+				{isAccountBound && hostUrl ? (
+					<StoppedAccountQueue
+						hostUrl={hostUrl}
+						sessionId={sessionId}
+						transport={wiring.transport}
+						allowRegisteredDead={Boolean(stored?.live && sessionDead)}
+					/>
+				) : null}
+			</AcpRecovery>
 		);
 	}
 
@@ -563,8 +722,15 @@ export function AcpChatPane({
 			return (
 				<AcpRecovery
 					detail={failure}
-					onStartNew={startFresh}
-					reason="no-transcript"
+					onStartNew={isAccountBound ? undefined : startFresh}
+					onResume={
+						isAccountBound && accountLaunch
+							? () => {
+									void startAccount();
+								}
+							: undefined
+					}
+					reason={isAccountBound ? "account" : "no-transcript"}
 				/>
 			);
 		}
@@ -586,6 +752,7 @@ export function AcpChatPane({
 
 	return (
 		<SessionView
+			key={sessionId}
 			chatKey={terminalId}
 			presetId={agent?.id}
 			client={client}
@@ -599,15 +766,30 @@ export function AcpChatPane({
 						},
 					}
 				: {})}
-			key={sessionId}
 			onPendingPromptsSent={onPendingPromptsSent}
+			headerLeft={
+				isAccountBound && sessionId && stored?.account ? (
+					<AccountChatSwitch
+						key={sessionId}
+						hostUrl={hostUrl}
+						provider={stored.account.agent}
+						current={stored.account}
+						sessionId={sessionId}
+						transport={wiring.transport}
+						disabled={!stored.live || pendingPrompts.length > 0 || recovering}
+						onSwitched={onAccountSessionCreated}
+					/>
+				) : undefined
+			}
 			agentLabel={agentLabel}
 			agentSwitch={agentSwitch}
 			onModeChange={onModeChange}
-			canForkToWorktree={canForkToWorktree}
+			canForkToWorktree={
+				canForkToWorktree && !isAccountBound && stored !== undefined
+			}
 			isActive={isActive}
-			onFork={fork}
-			onEditMessage={onRewound ? onEditMessage : undefined}
+			onFork={isAccountBound || stored === undefined ? undefined : fork}
+			onEditMessage={!isAccountBound && onRewound ? onEditMessage : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
 			openFile={onOpenFile}
 			openPage={onOpenPage}

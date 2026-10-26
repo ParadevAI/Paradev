@@ -6,11 +6,13 @@ import { createAcpAdapter } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
 import { resolveAttachmentPath } from "../trpc/router/attachments/storage";
 import { captureSessionAccount } from "../trpc/router/usage/session-account/session-account";
+import { sessionAccountForChat, validateChatAccount } from "./accountLaunch";
 import { ACP_HARNESSES } from "./acpCatalogue";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import { storeAgentImage } from "./agentImages";
 import type { ChatAgentBridge } from "./chatAgentBridge";
+import { createNativeClaudeChatFeed } from "./nativeClaudeUsage";
 
 async function resolveAttachment(attachmentId: string) {
 	const resolved = resolveAttachmentPath(attachmentId);
@@ -45,18 +47,39 @@ export function acpHarnessFactory(
 		}
 	}
 
-	return (options) =>
-		createAcpAdapter({
+	return (options) => {
+		const launchContext = options.launchContext;
+		const nativeUsage =
+			process.env.SUPERSET_NATIVE_CLAUDE_USAGE === "1" &&
+			entry.binary === "claude" &&
+			launchContext
+				? createNativeClaudeChatFeed()
+				: null;
+		return createAcpAdapter({
 			command: entry.binary,
 			cwd: options.cwd,
 			resolveAttachment,
 			storeImage: storeAgentImage,
+			...(launchContext
+				? {
+						beforePrompt: () =>
+							validateChatAccount(
+								db,
+								launchContext,
+								options.harness,
+								options.scopeId,
+							),
+					}
+				: {}),
 			...(entry.fullAccessModeId
 				? { defaultModeId: entry.fullAccessModeId }
 				: {}),
 			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
 			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
 			onSpawn: (pid) => agents?.spawned(options.sessionId, pid),
+			onSessionId: (sessionId) => nativeUsage?.session(sessionId),
+			onClaudeRateLimit: (event) => nativeUsage?.event(event),
+			onDisposed: () => nativeUsage?.dispose(),
 			launch: async () => {
 				const cli = await resolveAgentCli({
 					binary: entry.binary,
@@ -68,9 +91,22 @@ export function acpHarnessFactory(
 							cwd: options.cwd,
 							workspaceId: options.scopeId,
 							terminalId: options.terminalId,
+							launchContext: options.launchContext,
+							harness: options.harness,
 						}),
 				});
 				const env = cli.env;
+				if (options.launchContext)
+					await validateChatAccount(
+						db,
+						options.launchContext,
+						options.harness,
+						options.scopeId,
+					);
+				if (nativeUsage && launchContext)
+					await nativeUsage.launched(
+						sessionAccountForChat(launchContext.account),
+					);
 				void captureSessionAccount(
 					entry.binary,
 					(entry.binary === "codex" ? env.CODEX_HOME : env.CLAUDE_CONFIG_DIR) ??
@@ -104,6 +140,7 @@ export function acpHarnessFactory(
 				};
 			},
 		});
+	};
 }
 
 export function acpHarnessEntries(

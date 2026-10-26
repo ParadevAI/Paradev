@@ -14,6 +14,8 @@ import {
 	readPendingChatStops,
 	removePendingChatStop,
 } from "../../../../utils/pendingChatStops";
+import { accountChatDraftKey } from "../../components/ChatPane/components/AcpChatPane/utils/accountPaneState";
+import { discardComposerDraft } from "../../components/ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 import { useChatSubagentStore } from "../../stores/chatSubagentStore";
 import { ChatClosedToast } from "./components/ChatClosedToast";
@@ -117,6 +119,9 @@ export function useUndoableChatClose({
 				else state.addTab({ panes: [chat.pane] });
 			},
 			stop: (chat) => {
+				const data = chat.pane.data as ChatPaneData;
+				if (data.accountBound || data.accountLaunch)
+					discardComposerDraft(accountChatDraftKey(data));
 				stopSession(chat.sessionId);
 				useChatSubagentStore
 					.getState()
@@ -138,7 +143,12 @@ export function useUndoableChatClose({
 		(pane) => {
 			const data = pane.data as ChatPaneData;
 			const { sessionId } = data;
-			if (!sessionId || isChatSessionClosed(sessionId)) return;
+			if (!sessionId) {
+				if (data.accountBound || data.accountLaunch)
+					discardComposerDraft(accountChatDraftKey(data));
+				return;
+			}
+			if (isChatSessionClosed(sessionId)) return;
 			const index = previousTabs.current.findIndex(
 				(tab) => tab.panes[pane.id] !== undefined,
 			);

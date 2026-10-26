@@ -19,7 +19,11 @@ export type HarnessStartOptions = {
 	modeId?: string;
 	modelId?: string;
 	/** `quiet` loads the agent's history without replaying it as items. */
-	resume?: { harnessSessionId: string; quiet?: boolean };
+	resume?: {
+		harnessSessionId: string;
+		quiet?: boolean;
+		requireExact?: boolean;
+	};
 };
 
 /** Asks a harness for its own history. Must not open a session. */

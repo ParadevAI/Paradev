@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import type { DiscoverSessionsResult, Envelope } from "@superset/chat/protocol";
+import type {
+	ChatLaunchContext,
+	DiscoverSessionsResult,
+	Envelope,
+} from "@superset/chat/protocol";
 import type {
 	DiscoverNativeSessionsInput,
 	HarnessAdapter,
@@ -15,8 +19,13 @@ export type HarnessFactoryOptions = {
 	cwd: string;
 	modeId?: string;
 	modelId?: string;
-	resume?: { harnessSessionId: string; quiet?: boolean };
+	resume?: {
+		harnessSessionId: string;
+		quiet?: boolean;
+		requireExact?: boolean;
+	};
 	terminalId?: string;
+	launchContext?: ChatLaunchContext;
 };
 
 export type HarnessFactory = (options: HarnessFactoryOptions) => HarnessAdapter;
@@ -40,6 +49,7 @@ export type LiveSessionRegistryOptions = {
 
 export class LiveSessionRegistry {
 	private readonly live = new Map<string, LiveSession>();
+	private readonly closing = new Set<string>();
 
 	constructor(private readonly options: LiveSessionRegistryOptions) {}
 
@@ -108,6 +118,7 @@ export class LiveSessionRegistry {
 			scopeId: options.scopeId,
 			harness: options.harness,
 			terminalId: options.terminalId,
+			retainQueuedOnStop: options.launchContext !== undefined,
 			journal: this.options.journal,
 			publish: (envelope) => {
 				this.options.publish(envelope);
@@ -147,6 +158,10 @@ export class LiveSessionRegistry {
 		return this.live.get(sessionId) ?? null;
 	}
 
+	isClosing(sessionId: string): boolean {
+		return this.closing.has(sessionId);
+	}
+
 	require(sessionId: string): LiveSession {
 		const session = this.live.get(sessionId);
 		if (!session) throw new Error(`chat session ${sessionId} is not running`);
@@ -163,9 +178,11 @@ export class LiveSessionRegistry {
 	async dispose(sessionId: string): Promise<void> {
 		const session = this.live.get(sessionId);
 		if (!session) return;
+		this.closing.add(sessionId);
 		this.live.delete(sessionId);
 		this.observe(() => this.options.observer?.stopped(sessionId));
 		await session.dispose();
+		this.closing.delete(sessionId);
 	}
 
 	async disposeAll(): Promise<void> {
@@ -180,12 +197,18 @@ export class LiveSessionRegistry {
 		matches: (session: LiveSession) => boolean,
 	): Promise<string[]> {
 		const sessions = [...this.live.values()].filter(matches);
-		for (const session of sessions) this.live.delete(session.sessionId);
+		for (const session of sessions) {
+			this.closing.add(session.sessionId);
+			this.live.delete(session.sessionId);
+		}
 		for (const session of sessions) {
 			this.observe(() => this.options.observer?.stopped(session.sessionId));
 		}
 		const results = await Promise.allSettled(
-			sessions.map((session) => session.dispose()),
+			sessions.map(async (session) => {
+				await session.dispose();
+				this.closing.delete(session.sessionId);
+			}),
 		);
 		const failure = results.find((result) => result.status === "rejected");
 		if (failure?.status === "rejected") throw failure.reason;
