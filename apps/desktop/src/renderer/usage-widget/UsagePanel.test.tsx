@@ -9,6 +9,8 @@ import { UsagePanel } from "./UsagePanel";
 afterEach(cleanup);
 
 test("color editing reserves panel space and save restores measured content height", async () => {
+	const identity = "a".repeat(64);
+	const accountId = `claude:${identity}`;
 	const previous = window.UsageWidget;
 	const resize = mock((_height: number) => {});
 	const setAppearance = mock(
@@ -21,7 +23,8 @@ test("color editing reserves panel space and save restores measured content heig
 		preferences: readWidgetPreferences({}),
 		accounts: [
 			{
-				id: "studio",
+				id: accountId,
+				quotaIdentity: identity,
 				provider: "claude",
 				label: "Studio",
 				email: null,
@@ -78,7 +81,7 @@ test("color editing reserves panel space and save restores measured content heig
 		await act(async () => {
 			fireEvent.click(view.getByRole("button", { name: "Save" }));
 		});
-		expect(setAppearance).toHaveBeenCalledWith("studio", { color: "#17bbcc" });
+		expect(setAppearance).toHaveBeenCalledWith(accountId, { color: "#17bbcc" });
 		expect(resize.mock.calls.at(-1)).toEqual([182]);
 		expect(view.queryByLabelText("Hex color")).toBeNull();
 	} finally {
