@@ -6,7 +6,6 @@ interface CreatePrFormIntentState {
 	consume: (workspaceId: string) => boolean;
 }
 
-/** Consumed by whichever form owner the layout mounts: ShipControl or WorkspaceActivityMenu. */
 export const useCreatePrFormIntent = create<CreatePrFormIntentState>(
 	(set, get) => ({
 		workspaceId: null,
