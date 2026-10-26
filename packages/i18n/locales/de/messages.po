@@ -12587,6 +12587,9 @@ msgstr "Weitere Wege zu uns"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Unsere Seed-Runde über 11,5 Mio. $ wird von Union Square Ventures angeführt, zusammen mit Y Combinator, Paul Graham und Gründern, die wir bewundern."
 
+msgid "Our investors"
+msgstr "Unsere Investoren"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Unsere Einschätzung im August 2026, basierend auf unserem eigenen Team und den Teams, die wir genau beobachten. F3 ist größtenteils offen. F4 ist größtenteils geschlossen. Diese Lücke ist die Arbeit."
 
@@ -17560,6 +17563,9 @@ msgstr "Die komplette Kernschleife (Repo importieren, Agenten laufen lassen, Dif
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "Der vollständige Arbeitsbereich. Agents parallel ausführen, jeden in einem eigenen Worktree halten und jede Änderung prüfen, bevor sie übernommen wird."
+
+msgid "The funds and angels who back our team."
+msgstr "Die Fonds und Business Angels, die unser Team unterstützen."
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Der künftige Ort für wiederverwendbare Superset-Agent-Konfigurationen, Prompts und Setup-Anleitungen."

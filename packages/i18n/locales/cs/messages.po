@@ -12587,6 +12587,9 @@ msgstr "Další způsoby, jak nás zastihnout"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Naše seedové kolo ve výši 11,5 mil. $ vede Union Square Ventures, spolu s Y Combinator, Paulem Grahamem a zakladateli, kterých si vážíme."
 
+msgid "Our investors"
+msgstr "Naši investoři"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Náš pohled k srpnu 2026, na základě vlastního týmu a týmů, které sledujeme zblízka. F3 je z větší části otevřená. F4 je z větší části zavřená. Ta mezera je práce, která nás čeká."
 
@@ -17560,6 +17563,9 @@ msgstr "Celá základní smyčka (import repozitáře, spuštění agenta, reviz
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "Kompletní pracovní prostor. Spouštějte agenty paralelně, každého ve vlastním worktree, a zkontrolujte každou změnu, než se začlení."
+
+msgid "The funds and angels who back our team."
+msgstr "Fondy a andělští investoři, kteří podporují náš tým."
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Budoucí domov pro znovupoužitelné konfigurace agentů, prompty a průvodce nastavením pro Superset."

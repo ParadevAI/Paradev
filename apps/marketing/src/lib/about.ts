@@ -27,6 +27,15 @@ export const aboutSchema = z.object({
 			featured: z.boolean().optional(),
 		}),
 	),
+	moreInvestors: z
+		.array(
+			z.object({
+				name: z.string().min(1),
+				detail: z.string().optional(),
+				logo: z.string().optional(),
+			}),
+		)
+		.default([]),
 	belief: z.string().min(1),
 	timeline: z.array(
 		z.object({

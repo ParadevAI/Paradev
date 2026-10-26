@@ -12587,6 +12587,9 @@ msgstr "その他の連絡方法"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "1,150万ドルのシードラウンドは Union Square Ventures が主導し、Y Combinator、Paul Graham、そして私たちが尊敬する創業者たちが参加しています。"
 
+msgid "Our investors"
+msgstr "投資家一覧"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "2026年8月時点の当社の見立てです。自チームと、近くで見ているチームの実態にもとづいています。F3はほぼ通過済み、F4はほぼ未通過。この差が、これからの仕事です。"
 
@@ -17560,6 +17563,9 @@ msgstr "中核のループ(リポジトリのインポート、エージェン�
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "フル機能のワークスペース。エージェントを並列実行し、それぞれを個別のworktreeに保ち、すべての変更を反映前にレビューできます。"
+
+msgid "The funds and angels who back our team."
+msgstr "私たちのチームを支援するファンドとエンジェル投資家。"
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "再利用可能なSupersetエージェント設定、プロンプト、セットアップガイドの今後の公開場所。"

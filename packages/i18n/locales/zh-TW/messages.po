@@ -12587,6 +12587,9 @@ msgstr "其他聯絡方式"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "我們 1,150 萬美元的種子輪由 Union Square Ventures 領投，Y Combinator、Paul Graham 以及我們敬佩的創辦人參與投資。"
 
+msgid "Our investors"
+msgstr "我們的投資人"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "這是我們截至2026年8月的判斷，依據是我們自己的團隊和我們密切關注的團隊。F3大多已開啟，F4大多還沒開啟。這道差距就是要做的事。"
 
@@ -17560,6 +17563,9 @@ msgstr "完整的核心流程（匯入儲存庫、執行代理程式、審查差
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "完整的工作區。平行執行多個 agent，讓每個 agent 各自使用獨立的 worktree，並在變更合併前逐一審查。"
+
+msgid "The funds and angels who back our team."
+msgstr "支持我們團隊的基金與天使投資人。"
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "未來可重複使用的 Superset 代理設定、提示詞與設定指南的集散地。"

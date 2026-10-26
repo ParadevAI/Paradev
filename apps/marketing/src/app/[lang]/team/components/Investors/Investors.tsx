@@ -1,13 +1,14 @@
-import { Trans } from "@lingui/react/macro";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import type { About } from "@/lib/about";
+import { AllInvestorsDialog } from "./components/AllInvestorsDialog";
 
 interface InvestorsProps {
 	investors: About["investors"];
+	moreInvestors: About["moreInvestors"];
 }
 
-export function Investors({ investors }: InvestorsProps) {
+export function Investors({ investors, moreInvestors }: InvestorsProps) {
 	const featured = investors.filter((investor) => investor.featured);
 	const others = investors.filter((investor) => !investor.featured);
 
@@ -69,9 +70,9 @@ export function Investors({ investors }: InvestorsProps) {
 					</li>
 				))}
 			</ul>
-			<p className="mt-8 text-right text-sm text-muted-foreground">
-				<Trans>...and many more!</Trans>
-			</p>
+			<div className="mt-8 flex justify-end">
+				<AllInvestorsDialog investors={[...investors, ...moreInvestors]} />
+			</div>
 		</div>
 	);
 }

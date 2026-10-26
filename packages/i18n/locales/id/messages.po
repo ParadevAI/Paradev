@@ -12587,6 +12587,9 @@ msgstr "Cara lain menghubungi kami"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Putaran pendanaan awal kami senilai $11,5 juta dipimpin oleh Union Square Ventures, bersama Y Combinator, Paul Graham, dan para pendiri yang kami kagumi."
 
+msgid "Our investors"
+msgstr "Investor kami"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Pembacaan kami per Agustus 2026, berdasarkan tim kami sendiri dan tim yang kami amati dari dekat. F3 sebagian besar terbuka. F4 sebagian besar tertutup. Jarak itulah pekerjaannya."
 
@@ -17560,6 +17563,9 @@ msgstr "Alur inti lengkap (impor repo, jalankan agen, review diff) kini bekerja 
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "Workspace lengkap. Jalankan agen secara paralel, simpan masing-masing di worktree-nya sendiri, dan tinjau setiap perubahan sebelum diterapkan."
+
+msgid "The funds and angels who back our team."
+msgstr "Dana ventura dan angel investor yang mendukung tim kami."
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Rumah masa depan untuk konfigurasi agen Superset, prompt, dan panduan penyiapan yang dapat digunakan ulang."

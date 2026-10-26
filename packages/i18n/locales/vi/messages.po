@@ -12587,6 +12587,9 @@ msgstr "Các cách khác để liên hệ"
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Vòng gọi vốn hạt giống 11,5 triệu USD của chúng tôi do Union Square Ventures dẫn dắt, cùng Y Combinator, Paul Graham và những nhà sáng lập mà chúng tôi ngưỡng mộ."
 
+msgid "Our investors"
+msgstr "Nhà đầu tư của chúng tôi"
+
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Nhận định của chúng tôi tính đến tháng 8 năm 2026, dựa trên đội của chính chúng tôi và những đội chúng tôi theo dõi sát. F3 phần lớn đã mở. F4 phần lớn còn đóng. Khoảng cách đó chính là phần việc phải làm."
 
@@ -17560,6 +17563,9 @@ msgstr "Toàn bộ vòng lặp cốt lõi (nhập repo, chạy agent, review dif
 
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "Toàn bộ workspace. Chạy nhiều agent song song, giữ mỗi agent trong worktree riêng và xem lại mọi thay đổi trước khi áp dụng."
+
+msgid "The funds and angels who back our team."
+msgstr "Các quỹ và nhà đầu tư thiên thần đồng hành cùng đội ngũ chúng tôi."
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Superset có thể tái sử dụng."
