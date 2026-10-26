@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# progetto} other {# progetti}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# ripristino disponibile} other {# ripristini disponibili}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# risultato nel Cloud} other {# risultati nel Cloud}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# commento} other {# commenti}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# file} other {# file}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# ripristino disponibile} other {# ripristini disponibili}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# ricerca} other {# ricerche}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "Account"
 
+msgid "Account appearance"
+msgstr "Aspetto dell’account"
+
+msgid "Account color"
+msgstr "Colore account"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "L'installazione sull'account risolve solo i manifest interni, quindi {plugin} da {marketplace} non può ancora essere installato sul tuo account. Resta installato su questa macchina."
@@ -1708,6 +1721,9 @@ msgstr "Nome account"
 
 msgid "Account pending deletion"
 msgstr "Account in attesa di eliminazione"
+
+msgid "Account unavailable"
+msgstr "Account non disponibile"
 
 msgid "Account usage"
 msgstr "Utilizzo dell’account"
@@ -1756,6 +1772,9 @@ msgstr "È necessaria un'organizzazione attiva per creare una chiave API"
 
 msgid "Active sessions"
 msgstr "Sessioni attive"
+
+msgid "Active window"
+msgstr "Finestra attiva"
 
 msgid "Activity"
 msgstr "Attività"
@@ -1806,6 +1825,9 @@ msgstr "Aggiungi qui le configurazioni degli agenti quando vorrai pubblicarle."
 
 msgid "Add agents…"
 msgstr "Aggiungi agenti…"
+
+msgid "Add an account to see its usage here."
+msgstr "Aggiungi un account per visualizzarne l’utilizzo qui."
 
 msgid "add an agent"
 msgstr "aggiungere un agente"
@@ -2112,6 +2134,9 @@ msgstr "AI · Stato"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Autenticazione AI non riuscita. Controlla le impostazioni AI."
 
+msgid "AI usage"
+msgstr "Utilizzo IA"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "Tutti i {0} obiettivi stanno facendo la loro parte per {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Tutte le {versionCount} versioni e i loro contenuti vengono rimossi. Chi ha il link perde l'accesso."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Tutti gli account appaiono sul bordo dello schermo, a meno che non li nascondi."
+
+msgid "All accounts are hidden."
+msgstr "Tutti gli account sono nascosti."
 
 msgid "All assignees"
 msgstr "Tutti gli assegnatari"
@@ -2971,6 +3002,9 @@ msgstr "Avatar aggiornato!"
 msgid "Awaiting {0}"
 msgstr "In attesa di {0}"
 
+msgid "Awaiting refresh"
+msgstr "In attesa di aggiornamento"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "In attesa di risposta — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Categoria"
 msgid "Caution"
 msgstr "Attenzione"
 
+msgid "Celebrate quota resets"
+msgstr "Festeggia i ripristini della quota"
+
 msgid "Certificate Authority Invalid"
 msgstr "Autorità di certificazione non valida"
 
@@ -3838,6 +3875,9 @@ msgstr "Scegli una sezione."
 msgid "Choose agent"
 msgstr "Scegli l'agente"
 
+msgid "Choose an account"
+msgstr "Scegli un account"
+
 msgid "Choose an existing repo folder"
 msgstr "Scegli una cartella di repo esistente"
 
@@ -3858,6 +3898,9 @@ msgstr "Scegli come aprire i percorsi dei file con Cmd+clic nel terminale"
 
 msgid "Choose MCP servers for this message"
 msgstr "Scegli i server MCP per questo messaggio"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Scegli un account per ogni icona della barra dei menu. Il pannello sul bordo dello schermo mostra tutti gli account, tranne quelli che nascondi. Un trattino indica dati di utilizzo mancanti o non aggiornati."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Scegli cosa cancellare dal browser interno."
@@ -5104,6 +5147,9 @@ msgstr "Impossibile uscire dalla coda"
 msgid "Could not list directory"
 msgstr "Impossibile elencare la directory"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Impossibile caricare gli account. Aggiorna per riprovare."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Impossibile caricare gli agenti da {0}"
@@ -5132,6 +5178,9 @@ msgstr "Impossibile caricare questo diff"
 msgid "Could not load this file."
 msgstr "Impossibile caricare questo file."
 
+msgid "Could not load usage display settings."
+msgstr "Impossibile caricare le impostazioni di visualizzazione dell’utilizzo."
+
 msgid "Could not load your machines"
 msgstr "Impossibile caricare le tue macchine"
 
@@ -5149,6 +5198,9 @@ msgstr "Impossibile aprire il link"
 
 msgid "Could not open Photos"
 msgstr "Impossibile aprire Foto"
+
+msgid "Could not open usage."
+msgstr "Impossibile aprire l’utilizzo."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Impossibile riprendere"
 
 msgid "Could not resume the chat"
 msgstr "Impossibile riprendere la chat"
+
+msgid "Could not save account color."
+msgstr "Impossibile salvare il colore dell’account."
+
+msgid "Could not save usage display settings."
+msgstr "Impossibile salvare le impostazioni di visualizzazione dell’utilizzo."
 
 msgid "Could not send"
 msgstr "Impossibile inviare"
@@ -5816,6 +5874,12 @@ msgstr "Responsabile creativo, Valid"
 msgid "Credentials stay on the server"
 msgstr "Le credenziali restano sul server"
 
+msgid "Credit balance"
+msgstr "Saldo crediti"
+
+msgid "Credits"
+msgstr "Crediti"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Componenti trasversali che vivono fuori da packages/ui — controlla qui prima di crearne uno nuovo"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Predefinita ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Account predefinito"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Base predefinita dei nuovi spazi di lavoro. Modificabile singolarmente alla creazione."
+
+msgid "Default color"
+msgstr "Colore predefinito"
 
 msgid "Default effort"
 msgstr "Effort predefinito"
@@ -6953,6 +7023,9 @@ msgstr "Inserisci una directory padre su {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Inserisci un percorso su {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Inserisci un colore esadecimale di sei cifre."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Inserisci un URL nella barra di ricerca qui sopra."
@@ -7986,6 +8059,9 @@ msgstr "Fiamma"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Flotte di agenti pianificano, implementano, rivedono e testano il lavoro l'una dell'altra. Gli umani danno la direzione, arbitrano le eccezioni e sono responsabili del gusto. L'unità dell'attenzione umana non è più la pull request. È la decisione."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Rimane sopra le altre app. Mostra l’utilizzo della sessione e settimanale degli account nella vista rapida."
+
 msgid "Focus Chat Input"
 msgstr "Attiva il campo della chat"
 
@@ -8556,6 +8632,9 @@ msgstr "Aiuto e documentazione"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Colore esadecimale"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" nascosto dalla barra laterale"
@@ -8571,6 +8650,9 @@ msgstr "Nascondi"
 
 msgid "Hide {displayName}"
 msgstr "Nascondi {displayName}"
+
+msgid "Hide account"
+msgstr "Nascondi account"
 
 msgid "Hide checks"
 msgstr "Nascondi i controlli"
@@ -9630,6 +9712,20 @@ msgstr "Ultima attività dell'agente {0}"
 msgid "Last attached"
 msgstr "Ultimo collegamento"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Ultimo controllo {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Ultimo controllo {0} · non in tempo reale"
+
+msgid "Last checked {relativeTime}"
+msgstr "Ultimo controllo {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Ultimo controllo {relativeTime} · dati non aggiornati"
+
 msgid "Last day of each month"
 msgstr "L'ultimo giorno di ogni mese"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Caricamento"
 
+msgid "Loading accounts…"
+msgstr "Caricamento degli account…"
+
 msgid "Loading agent settings..."
 msgstr "Caricamento delle impostazioni degli agenti..."
 
@@ -10240,6 +10339,9 @@ msgstr "Gestisci"
 msgid "Manage {title}"
 msgstr "Gestisci {title}"
 
+msgid "Manage accounts"
+msgstr "Gestisci account"
+
 msgid "Manage accounts…"
 msgstr "Gestisci account…"
 
@@ -10434,6 +10536,15 @@ msgstr "Quota di memoria"
 
 msgid "Mention."
 msgstr "Menziona."
+
+msgid "Menu bar"
+msgstr "Barra dei menu"
+
+msgid "Menu bar accounts"
+msgstr "Account nella barra dei menu"
+
+msgid "Menu bar quota window"
+msgstr "Periodo quota nella barra dei menu"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10993,6 +11104,10 @@ msgstr "Prossimo addebito: {nextTotal} il {nextDate}, più l'utilizzo oltre il p
 
 msgid "Next comment"
 msgstr "Commento successivo"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Il prossimo scade {0}"
 
 msgid "Next file"
 msgstr "File successivo"
@@ -12489,6 +12604,9 @@ msgstr "Apri il workspace nell'app scelta nel menu \"Apri in\" (VS Code, Cursor,
 msgid "Open this run's workspace"
 msgstr "Apri il workspace di questa esecuzione"
 
+msgid "Open usage"
+msgstr "Apri utilizzo"
+
 msgid "Open workspace"
 msgstr "Apri il workspace"
 
@@ -13106,6 +13224,9 @@ msgstr "Memoria degli agenti per repository"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Percentuale della RAM totale di sistema usata solo dalle risorse Paradev monitorate (non da tutte le app). Una quota alta significa che Paradev contribuisce molto alla pressione sulla memoria di sistema; una quota bassa significa che la pressione arriva probabilmente da altro."
 
+msgid "Percentage"
+msgstr "Percentuale"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Eliminare definitivamente \"{projectName}\"?"
 
@@ -13409,6 +13530,9 @@ msgstr "Prefisso"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Prefisso degli ID attività di questo team. Modificandolo si rinominano tutte le attività del team."
 
+msgid "Prepaid balance"
+msgstr "Saldo prepagato"
+
 msgid "Preparing"
 msgstr "Preparazione"
 
@@ -13510,6 +13634,9 @@ msgstr "Il prezzo dipende dal tuo team e dal caso d'uso. Contattaci e preparerem
 
 msgid "Primary"
 msgstr "Primario"
+
+msgid "Primary display"
+msgstr "Schermo principale"
 
 msgid "Primary Key"
 msgstr "Chiave primaria"
@@ -13719,6 +13846,9 @@ msgstr "Proprietà"
 msgid "Provide either id or slug"
 msgstr "Fornisci un id oppure uno slug"
 
+msgid "Provider icons and percentages"
+msgstr "Icone dei provider e percentuali"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Provider: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Esci completamente"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Chiudi prima il browser di origine, così i suoi accessi vengono salvati su disco. Ti verrà chiesto di consentire l'accesso al Portachiavi."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Quota esaurita. Orario di ripristino non disponibile"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Quota esaurita. Ripristino tra {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Aggiorna le pull request"
 msgid "Refresh repositories"
 msgstr "Aggiorna repository"
 
+msgid "Refresh usage"
+msgstr "Aggiorna utilizzo"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Si aggiorna alla prossima esecuzione di Claude Code."
 
@@ -14219,6 +14358,12 @@ msgstr "Spostare il progetto?"
 
 msgid "Relocating…"
 msgstr "Spostamento…"
+
+msgid "remaining"
+msgstr "rimanente"
+
+msgid "Remaining"
+msgstr "Rimanente"
 
 msgid "rematch"
 msgstr "rivincita"
@@ -14590,6 +14735,11 @@ msgstr "Reimposta lo zoom"
 msgid "Reset Zoom"
 msgstr "Reimposta lo zoom"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Si azzera {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Si azzera il {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "riquadro destro"
 
 msgid "Right pane area"
 msgstr "Area del riquadro destro"
+
+msgid "Right screen edge"
+msgstr "Bordo destro dello schermo"
 
 msgid "Right-click here"
 msgstr "Clicca qui con il tasto destro"
@@ -15300,6 +15453,9 @@ msgstr "Cerca in {0} siti…"
 
 msgid "Search a developer"
 msgstr "Cerca uno sviluppatore"
+
+msgid "Search accounts"
+msgstr "Cerca account"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cerca nel contenuto dei file e in tutti i tuoi workspace insieme."
@@ -15807,6 +15963,12 @@ msgstr "Sessione"
 msgid "Session {0}"
 msgstr "Sessione {0}"
 
+msgid "Session allowance renewed"
+msgstr "Quota della sessione rinnovata"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Coriandoli per la sessione e una festa più grande per la quota settimanale. Rispetta la riduzione del movimento."
+
 msgid "Session details"
 msgstr "Dettagli della sessione"
 
@@ -16027,8 +16189,14 @@ msgstr "Mostra un microfono nel campo della chat. Il parlato viene trascritto da
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Mostra un pulsante Utilizzo nella barra laterale della home, sotto Pull request"
 
+msgid "Show account"
+msgstr "Mostra account"
+
 msgid "Show all {count}"
 msgstr "Mostra tutti i {count}"
+
+msgid "Show all accounts"
+msgstr "Mostra tutti gli account"
 
 msgid "Show all comments"
 msgstr "Mostra tutti i commenti"
@@ -16080,6 +16248,9 @@ msgstr "Mostra meno"
 
 msgid "Show file tree"
 msgstr "Mostra l'albero dei file"
+
+msgid "Show hidden"
+msgstr "Mostra nascosti"
 
 msgid "Show in bar"
 msgstr "Mostra nella barra"
@@ -16204,6 +16375,9 @@ msgstr "Pillola nella barra laterale mostrata quando un aggiornamento dell'app �
 
 msgid "Sign in"
 msgstr "Accedi"
+
+msgid "Sign in again"
+msgstr "Accedi di nuovo"
 
 msgid "Sign in again to use dictation"
 msgstr "Accedi di nuovo per usare la dettatura"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp stampa un endpoint solo per quel riquadro. Punta Pl
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset ora si chiama Paradev. E abbiamo anche chiuso un round seed da 11,5 M$"
+
+msgid "Superset logo"
+msgstr "Logo Superset"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile arriva su iPhone"
@@ -19028,14 +19205,26 @@ msgstr "Identificatore adatto agli URL, univoco all'interno della tua organizzaz
 msgid "Usage"
 msgstr "Utilizzo"
 
+msgid "Usage at a glance"
+msgstr "Utilizzo a colpo d’occhio"
+
+msgid "Usage display settings"
+msgstr "Impostazioni di visualizzazione dell’utilizzo"
+
 msgid "Usage is out of date"
 msgstr "I dati di utilizzo non sono aggiornati"
 
 msgid "Usage sections"
 msgstr "Sezioni di utilizzo"
 
+msgid "Usage unavailable"
+msgstr "Utilizzo non disponibile"
+
 msgid "Usage unavailable."
 msgstr "Utilizzo non disponibile."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Utilizzo non disponibile. Apri Superset per verificare la connessione."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Usare la trascrizione vocale e le funzioni push-to-talk."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Usa i tuoi abbonamenti agli agenti e le tue chiavi API. Paradev non fa mai da proxy per le chiamate ai modelli e non lega il tuo flusso di lavoro a un solo provider."
+
+msgid "used"
+msgstr "utilizzato"
+
+msgid "Used"
+msgstr "Utilizzato"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Usato nella barra dei menu e nel pannello flottante."
 
 msgid "Used in URLs and APIs."
 msgstr "Usato negli URL e nelle API."
@@ -19485,6 +19683,9 @@ msgstr "ogni settimana"
 
 msgid "Weekly"
 msgstr "Settimanale"
+
+msgid "Weekly allowance renewed"
+msgstr "Quota settimanale rinnovata"
 
 msgid "Weekly at {time}"
 msgstr "Ogni settimana alle {time}"
@@ -20087,6 +20288,9 @@ msgstr "Il tuo account è disattivato e sarà eliminato definitivamente a breve.
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Il tuo account è gestito dalla tua organizzazione. Contatta l'amministratore per creare una nuova organizzazione."
 
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "I tuoi account e le quote, nella barra dei menu o sul bordo destro dello schermo."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Il tuo agente può aprire qualsiasi pagina e percorrerla con i comandi superset browser. Usa il riquadro che stai guardando, quindi vedi ogni passaggio."
 
@@ -20233,208 +20437,3 @@ msgstr "Zoom indietro"
 
 msgid "zsh"
 msgstr "zsh"
-
-
-#. placeholder {0}: resets.count
-msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {# ripristino disponibile} other {# ripristini disponibili}}"
-
-msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {# ripristino disponibile} other {# ripristini disponibili}}"
-
-msgid "Account appearance"
-msgstr "Aspetto dell’account"
-
-msgid "Account color"
-msgstr "Colore account"
-
-msgid "Account unavailable"
-msgstr "Account non disponibile"
-
-msgid "Active window"
-msgstr "Finestra attiva"
-
-msgid "Add an account to see its usage here."
-msgstr "Aggiungi un account per visualizzarne l’utilizzo qui."
-
-msgid "AI usage"
-msgstr "Utilizzo IA"
-
-msgid "All accounts appear on the edge unless you hide them."
-msgstr "Tutti gli account appaiono sul bordo dello schermo, a meno che non li nascondi."
-
-msgid "All accounts are hidden."
-msgstr "Tutti gli account sono nascosti."
-
-msgid "Awaiting refresh"
-msgstr "In attesa di aggiornamento"
-
-msgid "Celebrate quota resets"
-msgstr "Festeggia i ripristini della quota"
-
-msgid "Choose an account"
-msgstr "Scegli un account"
-
-msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Scegli un account per ogni icona della barra dei menu. Il pannello sul bordo dello schermo mostra tutti gli account, tranne quelli che nascondi. Un trattino indica dati di utilizzo mancanti o non aggiornati."
-
-msgid "Could not load accounts. Refresh to try again."
-msgstr "Impossibile caricare gli account. Aggiorna per riprovare."
-
-msgid "Could not load usage display settings."
-msgstr "Impossibile caricare le impostazioni di visualizzazione dell’utilizzo."
-
-msgid "Could not open usage."
-msgstr "Impossibile aprire l’utilizzo."
-
-msgid "Could not save account color."
-msgstr "Impossibile salvare il colore dell’account."
-
-msgid "Could not save usage display settings."
-msgstr "Impossibile salvare le impostazioni di visualizzazione dell’utilizzo."
-
-msgid "Credit balance"
-msgstr "Saldo crediti"
-
-msgid "Credits"
-msgstr "Crediti"
-
-msgid "Default account"
-msgstr "Account predefinito"
-
-msgid "Default color"
-msgstr "Colore predefinito"
-
-msgid "Enter a six-digit hex color."
-msgstr "Inserisci un colore esadecimale di sei cifre."
-
-msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
-msgstr "Rimane sopra le altre app. Mostra l’utilizzo della sessione e settimanale degli account nella vista rapida."
-
-msgid "Hex color"
-msgstr "Colore esadecimale"
-
-msgid "Hide account"
-msgstr "Nascondi account"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0}"
-msgstr "Ultimo controllo {0}"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0} · not live"
-msgstr "Ultimo controllo {0} · non in tempo reale"
-
-msgid "Last checked {relativeTime}"
-msgstr "Ultimo controllo {relativeTime}"
-
-msgid "Last checked {relativeTime} · not live"
-msgstr "Ultimo controllo {relativeTime} · dati non aggiornati"
-
-msgid "Loading accounts…"
-msgstr "Caricamento degli account…"
-
-msgid "Manage accounts"
-msgstr "Gestisci account"
-
-msgid "Menu bar"
-msgstr "Barra dei menu"
-
-msgid "Menu bar accounts"
-msgstr "Account nella barra dei menu"
-
-msgid "Menu bar quota window"
-msgstr "Periodo quota nella barra dei menu"
-
-#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
-msgid "Next expires {0}"
-msgstr "Il prossimo scade {0}"
-
-msgid "Open usage"
-msgstr "Apri utilizzo"
-
-msgid "Percentage"
-msgstr "Percentuale"
-
-msgid "Prepaid balance"
-msgstr "Saldo prepagato"
-
-msgid "Primary display"
-msgstr "Schermo principale"
-
-msgid "Provider icons and percentages"
-msgstr "Icone dei provider e percentuali"
-
-msgid "Quota exhausted. Reset time unavailable"
-msgstr "Quota esaurita. Orario di ripristino non disponibile"
-
-msgid "Quota exhausted. Resets in {countdown}"
-msgstr "Quota esaurita. Ripristino tra {countdown}"
-
-msgid "Refresh usage"
-msgstr "Aggiorna utilizzo"
-
-msgid "remaining"
-msgstr "rimanente"
-
-msgid "Remaining"
-msgstr "Rimanente"
-
-#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
-#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
-msgid "Resets {0}"
-msgstr "Si azzera {0}"
-
-msgid "Right screen edge"
-msgstr "Bordo destro dello schermo"
-
-msgid "Search accounts"
-msgstr "Cerca account"
-
-msgid "Session allowance renewed"
-msgstr "Quota della sessione rinnovata"
-
-msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
-msgstr "Coriandoli per la sessione e una festa più grande per la quota settimanale. Rispetta la riduzione del movimento."
-
-msgid "Show account"
-msgstr "Mostra account"
-
-msgid "Show all accounts"
-msgstr "Mostra tutti gli account"
-
-msgid "Show hidden"
-msgstr "Mostra nascosti"
-
-msgid "Sign in again"
-msgstr "Accedi di nuovo"
-
-msgid "Superset logo"
-msgstr "Logo Superset"
-
-msgid "Usage at a glance"
-msgstr "Utilizzo a colpo d’occhio"
-
-msgid "Usage display settings"
-msgstr "Impostazioni di visualizzazione dell’utilizzo"
-
-msgid "Usage unavailable"
-msgstr "Utilizzo non disponibile"
-
-msgid "Usage unavailable. Open Superset to check the connection."
-msgstr "Utilizzo non disponibile. Apri Superset per verificare la connessione."
-
-msgid "used"
-msgstr "utilizzato"
-
-msgid "Used"
-msgstr "Utilizzato"
-
-msgid "Used in the menu bar and floating panel."
-msgstr "Usato nella barra dei menu e nel pannello flottante."
-
-msgid "Weekly allowance renewed"
-msgstr "Quota settimanale rinnovata"
-
-msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "I tuoi account e le quote, nella barra dei menu o sul bordo destro dello schermo."

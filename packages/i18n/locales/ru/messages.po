@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# проект} few {# проекта} many {# прое
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# репозиторий} few {# репозитория} many {# репозиториев} other {# репозитория}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# результат в облаке} few {# результата в облаке} many {# результатов в облаке} other {# результата в облаке}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# комментарий} few {# комментар
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# поиск} few {# поиска} many {# поисков} other {# поиска}}"
@@ -1696,6 +1703,12 @@ msgstr "Аккордеон"
 msgid "Account"
 msgstr "Аккаунт"
 
+msgid "Account appearance"
+msgstr "Оформление аккаунта"
+
+msgid "Account color"
+msgstr "Цвет аккаунта"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Установка в аккаунт работает только с собственными манифестами, поэтому {plugin} из {marketplace} пока нельзя установить в ваш аккаунт. Он остаётся установленным на этом компьютере."
@@ -1708,6 +1721,9 @@ msgstr "Имя аккаунта"
 
 msgid "Account pending deletion"
 msgstr "Аккаунт ожидает удаления"
+
+msgid "Account unavailable"
+msgstr "Аккаунт недоступен"
 
 msgid "Account usage"
 msgstr "Использование аккаунта"
@@ -1756,6 +1772,9 @@ msgstr "Для создания ключа API нужна активная ор�
 
 msgid "Active sessions"
 msgstr "Активные сессии"
+
+msgid "Active window"
+msgstr "Активное окно"
 
 msgid "Activity"
 msgstr "Активность"
@@ -1806,6 +1825,9 @@ msgstr "Добавляйте сюда конфигурации агентов п
 
 msgid "Add agents…"
 msgstr "Добавить агентов…"
+
+msgid "Add an account to see its usage here."
+msgstr "Добавьте аккаунт, чтобы видеть его использование здесь."
 
 msgid "add an agent"
 msgstr "добавить агента"
@@ -2112,6 +2134,9 @@ msgstr "AI · статус"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Не удалось выполнить аутентификацию AI. Проверьте настройки AI."
 
+msgid "AI usage"
+msgstr "Использование ИИ"
+
 msgid "Alert"
 msgstr "Оповещение"
 
@@ -2158,6 +2183,12 @@ msgstr "Все цели ({0}) работают на {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Все {versionCount} версий и их содержимое будут удалены. Все, у кого есть ссылка, потеряют доступ."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Все аккаунты отображаются у края экрана, если вы их не скрыли."
+
+msgid "All accounts are hidden."
+msgstr "Все аккаунты скрыты."
 
 msgid "All assignees"
 msgstr "Все исполнители"
@@ -2971,6 +3002,9 @@ msgstr "Аватар обновлён!"
 msgid "Awaiting {0}"
 msgstr "Ожидает {0}"
 
+msgid "Awaiting refresh"
+msgstr "Ожидание обновления"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Ожидает ответа — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Категория"
 msgid "Caution"
 msgstr "Осторожно"
 
+msgid "Celebrate quota resets"
+msgstr "Отмечать обновление лимитов"
+
 msgid "Certificate Authority Invalid"
 msgstr "Недействительный удостоверяющий центр"
 
@@ -3838,6 +3875,9 @@ msgstr "Выберите раздел."
 msgid "Choose agent"
 msgstr "Выберите агента"
 
+msgid "Choose an account"
+msgstr "Выберите аккаунт"
+
 msgid "Choose an existing repo folder"
 msgstr "Выберите папку существующего репозитория"
 
@@ -3858,6 +3898,9 @@ msgstr "Выберите, как открывать пути файлов при
 
 msgid "Choose MCP servers for this message"
 msgstr "Выбрать серверы MCP для этого сообщения"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Выберите один аккаунт для каждого значка в строке меню. Панель у края экрана показывает все аккаунты, кроме скрытых. Отсутствующие или устаревшие данные об использовании отображаются прочерком."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Выберите, что очистить во встроенном браузере."
@@ -5104,6 +5147,9 @@ msgstr "Не удалось выйти из очереди"
 msgid "Could not list directory"
 msgstr "Не удалось прочитать содержимое папки"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Не удалось загрузить аккаунты. Обновите, чтобы повторить."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Не удалось загрузить агентов с {0}"
@@ -5132,6 +5178,9 @@ msgstr "Не удалось загрузить этот diff"
 msgid "Could not load this file."
 msgstr "Не удалось загрузить этот файл."
 
+msgid "Could not load usage display settings."
+msgstr "Не удалось загрузить настройки отображения использования."
+
 msgid "Could not load your machines"
 msgstr "Не удалось загрузить ваши машины"
 
@@ -5149,6 +5198,9 @@ msgstr "Не удалось открыть ссылку"
 
 msgid "Could not open Photos"
 msgstr "Не удалось открыть «Фото»"
+
+msgid "Could not open usage."
+msgstr "Не удалось открыть использование."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Не удалось возобновить"
 
 msgid "Could not resume the chat"
 msgstr "Не удалось продолжить чат"
+
+msgid "Could not save account color."
+msgstr "Не удалось сохранить цвет аккаунта."
+
+msgid "Could not save usage display settings."
+msgstr "Не удалось сохранить настройки отображения использования."
 
 msgid "Could not send"
 msgstr "Не удалось отправить"
@@ -5816,6 +5874,12 @@ msgstr "Креативный менеджер, Valid"
 msgid "Credentials stay on the server"
 msgstr "Учётные данные остаются на сервере"
 
+msgid "Credit balance"
+msgstr "Баланс кредитов"
+
+msgid "Credits"
+msgstr "Кредиты"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Кросс-функциональные компоненты вне packages/ui — загляните сюда, прежде чем делать новый"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "По умолчанию ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Аккаунт по умолчанию"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "База по умолчанию для новых рабочих пространств. Можно изменить при создании каждого пространства."
+
+msgid "Default color"
+msgstr "Цвет по умолчанию"
 
 msgid "Default effort"
 msgstr "Уровень усилий по умолчанию"
@@ -6953,6 +7023,9 @@ msgstr "Введите родительскую папку на {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Введите путь на {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Введите шестизначный шестнадцатеричный код цвета."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Введите URL в строку поиска выше."
@@ -7986,6 +8059,9 @@ msgstr "Пламя"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Флоты агентов планируют, реализуют, проверяют и тестируют работу друг друга. Люди задают направление, разбирают исключения и отвечают за вкус. Единица человеческого внимания — уже не пул-реквест, а решение."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Поверх других приложений. Показывает расход за сеанс и неделю для аккаунтов быстрого просмотра."
+
 msgid "Focus Chat Input"
 msgstr "Фокус на поле чата"
 
@@ -8556,6 +8632,9 @@ msgstr "Помощь и документация"
 msgid "Henry Ford"
 msgstr "Генри Форд"
 
+msgid "Hex color"
+msgstr "Шестнадцатеричный цвет"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "«{0}» скрыт с боковой панели"
@@ -8571,6 +8650,9 @@ msgstr "Скрыть"
 
 msgid "Hide {displayName}"
 msgstr "Скрыть {displayName}"
+
+msgid "Hide account"
+msgstr "Скрыть аккаунт"
 
 msgid "Hide checks"
 msgstr "Скрыть проверки"
@@ -9630,6 +9712,20 @@ msgstr "Последняя активность агента {0}"
 msgid "Last attached"
 msgstr "Последнее подключение"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Последняя проверка {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Последняя проверка {0} · неактуальные данные"
+
+msgid "Last checked {relativeTime}"
+msgstr "Последняя проверка {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Последняя проверка {relativeTime} · данные неактуальны"
+
 msgid "Last day of each month"
 msgstr "В последний день каждого месяца"
 
@@ -9998,6 +10094,9 @@ msgstr "Загрузчик · брайлевский спиннер"
 msgid "Loading"
 msgstr "Загрузка"
 
+msgid "Loading accounts…"
+msgstr "Загрузка аккаунтов…"
+
 msgid "Loading agent settings..."
 msgstr "Загрузка настроек агента..."
 
@@ -10240,6 +10339,9 @@ msgstr "Управлять"
 msgid "Manage {title}"
 msgstr "Управление {title}"
 
+msgid "Manage accounts"
+msgstr "Управление аккаунтами"
+
 msgid "Manage accounts…"
 msgstr "Управление аккаунтами…"
 
@@ -10434,6 +10536,15 @@ msgstr "Доля памяти"
 
 msgid "Mention."
 msgstr "Упомяните."
+
+msgid "Menu bar"
+msgstr "Строка меню"
+
+msgid "Menu bar accounts"
+msgstr "Аккаунты в строке меню"
+
+msgid "Menu bar quota window"
+msgstr "Период квоты в строке меню"
 
 msgid "Menubar"
 msgstr "Строка меню"
@@ -10993,6 +11104,10 @@ msgstr "Следующее списание: {nextTotal} {nextDate}, плюс и
 
 msgid "Next comment"
 msgstr "Следующий комментарий"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Следующий истекает {0}"
 
 msgid "Next file"
 msgstr "Следующий файл"
@@ -12489,6 +12604,9 @@ msgstr "Открыть рабочую область в приложении, в
 msgid "Open this run's workspace"
 msgstr "Открыть рабочую область этого запуска"
 
+msgid "Open usage"
+msgstr "Открыть использование"
+
 msgid "Open workspace"
 msgstr "Открыть рабочую область"
 
@@ -13106,6 +13224,9 @@ msgstr "Память агентов для каждого репозитория
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Процент от всей системной RAM, занятый только отслеживаемыми ресурсами Paradev (не всеми приложениями). Высокая доля означает, что Paradev заметно нагружает память системы; низкая — что нагрузка идёт откуда-то ещё."
 
+msgid "Percentage"
+msgstr "Процент"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Удалить «{projectName}» навсегда?"
 
@@ -13409,6 +13530,9 @@ msgstr "Префикс"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Префикс идентификаторов задач этой команды. При изменении все задачи команды будут переименованы."
 
+msgid "Prepaid balance"
+msgstr "Предоплаченный баланс"
+
 msgid "Preparing"
 msgstr "Подготовка"
 
@@ -13510,6 +13634,9 @@ msgstr "Цена зависит от команды и сценария испо
 
 msgid "Primary"
 msgstr "Основной"
+
+msgid "Primary display"
+msgstr "Основной дисплей"
 
 msgid "Primary Key"
 msgstr "Первичный ключ"
@@ -13719,6 +13846,9 @@ msgstr "Свойства"
 msgid "Provide either id or slug"
 msgstr "Укажите id или slug"
 
+msgid "Provider icons and percentages"
+msgstr "Значки провайдеров и проценты"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Провайдер: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Выйти полностью"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Сначала закройте исходный браузер, чтобы его логины сохранились на диск. Потребуется разрешить доступ к Keychain."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Лимит исчерпан. Время сброса неизвестно"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Лимит исчерпан. Сброс через {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Обновить пул-реквесты"
 msgid "Refresh repositories"
 msgstr "Обновить репозитории"
 
+msgid "Refresh usage"
+msgstr "Обновить использование"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Обновится при следующем запуске Claude Code."
 
@@ -14219,6 +14358,12 @@ msgstr "Переместить проект?"
 
 msgid "Relocating…"
 msgstr "Перемещение…"
+
+msgid "remaining"
+msgstr "осталось"
+
+msgid "Remaining"
+msgstr "Осталось"
 
 msgid "rematch"
 msgstr "реванш"
@@ -14590,6 +14735,11 @@ msgstr "Сбросить масштаб"
 msgid "Reset Zoom"
 msgstr "Сбросить масштаб"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Сброс {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Сброс {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "правая панель"
 
 msgid "Right pane area"
 msgstr "Область правой панели"
+
+msgid "Right screen edge"
+msgstr "Правый край экрана"
 
 msgid "Right-click here"
 msgstr "Кликните здесь правой кнопкой"
@@ -15300,6 +15453,9 @@ msgstr "Поиск среди {0} сайтов…"
 
 msgid "Search a developer"
 msgstr "Найти разработчика"
+
+msgid "Search accounts"
+msgstr "Поиск аккаунтов"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Ищите по содержимому файлов и сразу по всем своим рабочим областям."
@@ -15807,6 +15963,12 @@ msgstr "Сессия"
 msgid "Session {0}"
 msgstr "Сессия {0}"
 
+msgid "Session allowance renewed"
+msgstr "Лимит сессии обновлён"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Конфетти для сессий и более яркий эффект для недельного лимита. Учитывает уменьшение движения."
+
 msgid "Session details"
 msgstr "Детали сессии"
 
@@ -16027,8 +16189,14 @@ msgstr "Показывать микрофон в поле ввода чата. �
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Показывать кнопку «Использование» в боковой панели главного экрана под пул-реквестами"
 
+msgid "Show account"
+msgstr "Показать аккаунт"
+
 msgid "Show all {count}"
 msgstr "Показать все {count}"
+
+msgid "Show all accounts"
+msgstr "Показать все аккаунты"
 
 msgid "Show all comments"
 msgstr "Показать все комментарии"
@@ -16080,6 +16248,9 @@ msgstr "Показать меньше"
 
 msgid "Show file tree"
 msgstr "Показать дерево файлов"
+
+msgid "Show hidden"
+msgstr "Показать скрытые"
 
 msgid "Show in bar"
 msgstr "Показать на панели"
@@ -16204,6 +16375,9 @@ msgstr "Плашка в боковой панели, появляется, ко�
 
 msgid "Sign in"
 msgstr "Войти"
+
+msgid "Sign in again"
+msgstr "Войти снова"
 
 msgid "Sign in again to use dictation"
 msgstr "Войдите снова, чтобы пользоваться диктовкой"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp выводит эндпоинт только для
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset теперь называется Paradev. А ещё мы привлекли посевной раунд на 11,5 млн $"
+
+msgid "Superset logo"
+msgstr "Логотип Superset"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile вышел на iPhone"
@@ -19028,14 +19205,26 @@ msgstr "Идентификатор для URL, уникальный внутри
 msgid "Usage"
 msgstr "Использование"
 
+msgid "Usage at a glance"
+msgstr "Использование с первого взгляда"
+
+msgid "Usage display settings"
+msgstr "Настройки отображения использования"
+
 msgid "Usage is out of date"
 msgstr "Данные об использовании устарели"
 
 msgid "Usage sections"
 msgstr "Разделы использования"
 
+msgid "Usage unavailable"
+msgstr "Данные об использовании недоступны"
+
 msgid "Usage unavailable."
 msgstr "Данные об использовании недоступны."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Использование недоступно. Откройте Superset, чтобы проверить подключение."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Использовать голосовую расшифровку и р
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Используйте свои подписки на агентов и ключи API. Paradev никогда не проксирует вызовы моделей и не привязывает ваш процесс к одному провайдеру."
+
+msgid "used"
+msgstr "использовано"
+
+msgid "Used"
+msgstr "Использовано"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Используется в строке меню и плавающей панели."
 
 msgid "Used in URLs and APIs."
 msgstr "Используется в URL и API."
@@ -19485,6 +19683,9 @@ msgstr "еженедельно"
 
 msgid "Weekly"
 msgstr "Еженедельно"
+
+msgid "Weekly allowance renewed"
+msgstr "Недельный лимит обновлён"
 
 msgid "Weekly at {time}"
 msgstr "Еженедельно в {time}"
@@ -20087,6 +20288,9 @@ msgstr "Аккаунт деактивирован и скоро будет бе�
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Вашим аккаунтом управляет ваша организация. Обратитесь к администратору, чтобы создать новую организацию."
 
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Ваши аккаунты и квоты в строке меню или у правого края экрана."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Агент может открыть любую страницу и пройтись по ней с помощью команд superset browser. Он использует панель, на которую вы смотрите, поэтому вы видите каждый шаг."
 
@@ -20233,208 +20437,3 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
-
-
-#. placeholder {0}: resets.count
-msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
-
-msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {Доступен # сброс} few {Доступно # сброса} many {Доступно # сбросов} other {Доступно # сбросов}}"
-
-msgid "Account appearance"
-msgstr "Оформление аккаунта"
-
-msgid "Account color"
-msgstr "Цвет аккаунта"
-
-msgid "Account unavailable"
-msgstr "Аккаунт недоступен"
-
-msgid "Active window"
-msgstr "Активное окно"
-
-msgid "Add an account to see its usage here."
-msgstr "Добавьте аккаунт, чтобы видеть его использование здесь."
-
-msgid "AI usage"
-msgstr "Использование ИИ"
-
-msgid "All accounts appear on the edge unless you hide them."
-msgstr "Все аккаунты отображаются у края экрана, если вы их не скрыли."
-
-msgid "All accounts are hidden."
-msgstr "Все аккаунты скрыты."
-
-msgid "Awaiting refresh"
-msgstr "Ожидание обновления"
-
-msgid "Celebrate quota resets"
-msgstr "Отмечать обновление лимитов"
-
-msgid "Choose an account"
-msgstr "Выберите аккаунт"
-
-msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Выберите один аккаунт для каждого значка в строке меню. Панель у края экрана показывает все аккаунты, кроме скрытых. Отсутствующие или устаревшие данные об использовании отображаются прочерком."
-
-msgid "Could not load accounts. Refresh to try again."
-msgstr "Не удалось загрузить аккаунты. Обновите, чтобы повторить."
-
-msgid "Could not load usage display settings."
-msgstr "Не удалось загрузить настройки отображения использования."
-
-msgid "Could not open usage."
-msgstr "Не удалось открыть использование."
-
-msgid "Could not save account color."
-msgstr "Не удалось сохранить цвет аккаунта."
-
-msgid "Could not save usage display settings."
-msgstr "Не удалось сохранить настройки отображения использования."
-
-msgid "Credit balance"
-msgstr "Баланс кредитов"
-
-msgid "Credits"
-msgstr "Кредиты"
-
-msgid "Default account"
-msgstr "Аккаунт по умолчанию"
-
-msgid "Default color"
-msgstr "Цвет по умолчанию"
-
-msgid "Enter a six-digit hex color."
-msgstr "Введите шестизначный шестнадцатеричный код цвета."
-
-msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
-msgstr "Поверх других приложений. Показывает расход за сеанс и неделю для аккаунтов быстрого просмотра."
-
-msgid "Hex color"
-msgstr "Шестнадцатеричный цвет"
-
-msgid "Hide account"
-msgstr "Скрыть аккаунт"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0}"
-msgstr "Последняя проверка {0}"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0} · not live"
-msgstr "Последняя проверка {0} · неактуальные данные"
-
-msgid "Last checked {relativeTime}"
-msgstr "Последняя проверка {relativeTime}"
-
-msgid "Last checked {relativeTime} · not live"
-msgstr "Последняя проверка {relativeTime} · данные неактуальны"
-
-msgid "Loading accounts…"
-msgstr "Загрузка аккаунтов…"
-
-msgid "Manage accounts"
-msgstr "Управление аккаунтами"
-
-msgid "Menu bar"
-msgstr "Строка меню"
-
-msgid "Menu bar accounts"
-msgstr "Аккаунты в строке меню"
-
-msgid "Menu bar quota window"
-msgstr "Период квоты в строке меню"
-
-#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
-msgid "Next expires {0}"
-msgstr "Следующий истекает {0}"
-
-msgid "Open usage"
-msgstr "Открыть использование"
-
-msgid "Percentage"
-msgstr "Процент"
-
-msgid "Prepaid balance"
-msgstr "Предоплаченный баланс"
-
-msgid "Primary display"
-msgstr "Основной дисплей"
-
-msgid "Provider icons and percentages"
-msgstr "Значки провайдеров и проценты"
-
-msgid "Quota exhausted. Reset time unavailable"
-msgstr "Лимит исчерпан. Время сброса неизвестно"
-
-msgid "Quota exhausted. Resets in {countdown}"
-msgstr "Лимит исчерпан. Сброс через {countdown}"
-
-msgid "Refresh usage"
-msgstr "Обновить использование"
-
-msgid "remaining"
-msgstr "осталось"
-
-msgid "Remaining"
-msgstr "Осталось"
-
-#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
-#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
-msgid "Resets {0}"
-msgstr "Сброс {0}"
-
-msgid "Right screen edge"
-msgstr "Правый край экрана"
-
-msgid "Search accounts"
-msgstr "Поиск аккаунтов"
-
-msgid "Session allowance renewed"
-msgstr "Лимит сессии обновлён"
-
-msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
-msgstr "Конфетти для сессий и более яркий эффект для недельного лимита. Учитывает уменьшение движения."
-
-msgid "Show account"
-msgstr "Показать аккаунт"
-
-msgid "Show all accounts"
-msgstr "Показать все аккаунты"
-
-msgid "Show hidden"
-msgstr "Показать скрытые"
-
-msgid "Sign in again"
-msgstr "Войти снова"
-
-msgid "Superset logo"
-msgstr "Логотип Superset"
-
-msgid "Usage at a glance"
-msgstr "Использование с первого взгляда"
-
-msgid "Usage display settings"
-msgstr "Настройки отображения использования"
-
-msgid "Usage unavailable"
-msgstr "Данные об использовании недоступны"
-
-msgid "Usage unavailable. Open Superset to check the connection."
-msgstr "Использование недоступно. Откройте Superset, чтобы проверить подключение."
-
-msgid "used"
-msgstr "использовано"
-
-msgid "Used"
-msgstr "Использовано"
-
-msgid "Used in the menu bar and floating panel."
-msgstr "Используется в строке меню и плавающей панели."
-
-msgid "Weekly allowance renewed"
-msgstr "Недельный лимит обновлён"
-
-msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "Ваши аккаунты и квоты в строке меню или у правого края экрана."

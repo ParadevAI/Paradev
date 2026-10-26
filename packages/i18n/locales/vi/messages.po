@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# dự án} other {# dự án}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {Có # lượt đặt lại} other {Có # lượt đặt lại}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {# kết quả trên Cloud} other {# kết quả trên Cloud}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {# bình luận} other {# bình luận}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# tệp} other {# tệp}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {Có # lượt đặt lại} other {Có # lượt đặt lại}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {# lượt tìm} other {# lượt tìm}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "Tài khoản"
 
+msgid "Account appearance"
+msgstr "Giao diện tài khoản"
+
+msgid "Account color"
+msgstr "Màu tài khoản"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "Cài đặt lên tài khoản chỉ xử lý manifest nội bộ, nên {plugin} từ {marketplace} chưa thể cài lên tài khoản của bạn. Nó vẫn được cài trên máy này."
@@ -1708,6 +1721,9 @@ msgstr "Tên tài khoản"
 
 msgid "Account pending deletion"
 msgstr "Tài khoản đang chờ xóa"
+
+msgid "Account unavailable"
+msgstr "Tài khoản không khả dụng"
 
 msgid "Account usage"
 msgstr "Mức sử dụng tài khoản"
@@ -1756,6 +1772,9 @@ msgstr "Cần có tổ chức đang hoạt động để tạo khóa API"
 
 msgid "Active sessions"
 msgstr "Phiên đang hoạt động"
+
+msgid "Active window"
+msgstr "Cửa sổ đang hoạt động"
 
 msgid "Activity"
 msgstr "Hoạt động"
@@ -1806,6 +1825,9 @@ msgstr "Thêm cấu hình agent vào đây khi bạn muốn công bố chúng."
 
 msgid "Add agents…"
 msgstr "Thêm agent…"
+
+msgid "Add an account to see its usage here."
+msgstr "Thêm tài khoản để xem mức sử dụng tại đây."
 
 msgid "add an agent"
 msgstr "thêm một agent"
@@ -2112,6 +2134,9 @@ msgstr "AI · Trạng thái"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "Xác thực AI thất bại. Vui lòng kiểm tra cài đặt AI của bạn."
 
+msgid "AI usage"
+msgstr "Mức sử dụng AI"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "Cả {0} mục tiêu đều đang góp sức cho {nextLabel}."
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "Toàn bộ {versionCount} phiên bản và nội dung của chúng sẽ bị gỡ. Bất kỳ ai có liên kết đều mất quyền truy cập."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "Tất cả tài khoản đều hiển thị ở cạnh màn hình trừ khi bạn ẩn chúng."
+
+msgid "All accounts are hidden."
+msgstr "Tất cả tài khoản đều bị ẩn."
 
 msgid "All assignees"
 msgstr "Tất cả người phụ trách"
@@ -2971,6 +3002,9 @@ msgstr "Đã cập nhật ảnh đại diện!"
 msgid "Awaiting {0}"
 msgstr "Đang chờ {0}"
 
+msgid "Awaiting refresh"
+msgstr "Đang chờ làm mới"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "Đang chờ phản hồi — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "Danh mục"
 msgid "Caution"
 msgstr "Thận trọng"
 
+msgid "Celebrate quota resets"
+msgstr "Ăn mừng khi hạn mức được đặt lại"
+
 msgid "Certificate Authority Invalid"
 msgstr "Tổ chức cấp chứng chỉ không hợp lệ"
 
@@ -3838,6 +3875,9 @@ msgstr "Chọn một mục."
 msgid "Choose agent"
 msgstr "Chọn agent"
 
+msgid "Choose an account"
+msgstr "Chọn tài khoản"
+
 msgid "Choose an existing repo folder"
 msgstr "Chọn một thư mục repo có sẵn"
 
@@ -3858,6 +3898,9 @@ msgstr "Chọn cách mở đường dẫn tệp khi Cmd+nhấp trong terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Chọn server MCP cho tin nhắn này"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "Chọn một tài khoản cho mỗi biểu tượng trên thanh menu. Thẻ bên hiển thị tất cả tài khoản trừ những tài khoản bạn ẩn. Dữ liệu sử dụng bị thiếu hoặc đã cũ được hiển thị bằng dấu gạch ngang."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
@@ -5104,6 +5147,9 @@ msgstr "Không thể rời hàng đợi"
 msgid "Could not list directory"
 msgstr "Không thể liệt kê thư mục"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "Không thể tải tài khoản. Hãy làm mới để thử lại."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Không thể tải agent từ {0}"
@@ -5132,6 +5178,9 @@ msgstr "Không thể tải diff này"
 msgid "Could not load this file."
 msgstr "Không thể tải tệp này."
 
+msgid "Could not load usage display settings."
+msgstr "Không thể tải cài đặt hiển thị mức sử dụng."
+
 msgid "Could not load your machines"
 msgstr "Không thể tải danh sách máy của bạn"
 
@@ -5149,6 +5198,9 @@ msgstr "Không thể mở liên kết"
 
 msgid "Could not open Photos"
 msgstr "Không thể mở Photos"
+
+msgid "Could not open usage."
+msgstr "Không thể mở mức sử dụng."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "Không thể tiếp tục"
 
 msgid "Could not resume the chat"
 msgstr "Không thể tiếp tục cuộc trò chuyện"
+
+msgid "Could not save account color."
+msgstr "Không thể lưu màu tài khoản."
+
+msgid "Could not save usage display settings."
+msgstr "Không thể lưu cài đặt hiển thị mức sử dụng."
 
 msgid "Could not send"
 msgstr "Không thể gửi"
@@ -5816,6 +5874,12 @@ msgstr "Quản lý sáng tạo, Valid"
 msgid "Credentials stay on the server"
 msgstr "Thông tin xác thực được giữ trên máy chủ"
 
+msgid "Credit balance"
+msgstr "Số dư tín dụng"
+
+msgid "Credits"
+msgstr "Tín dụng"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Các component dùng chung nhiều tính năng, nằm ngoài packages/ui — hãy xem ở đây trước khi dựng cái mới"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "Mặc định ({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "Tài khoản mặc định"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Nhánh cơ sở mặc định cho không gian làm việc mới. Có thể ghi đè riêng khi tạo."
+
+msgid "Default color"
+msgstr "Màu mặc định"
 
 msgid "Default effort"
 msgstr "Mức nỗ lực mặc định"
@@ -6953,6 +7023,9 @@ msgstr "Hãy nhập một thư mục cha trên {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Hãy nhập một đường dẫn trên {hostName}"
+
+msgid "Enter a six-digit hex color."
+msgstr "Nhập màu thập lục phân gồm sáu chữ số."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Nhập một URL vào thanh tìm kiếm phía trên."
@@ -7986,6 +8059,9 @@ msgstr "Ngọn lửa"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "Các đội agent lên kế hoạch, triển khai, review và kiểm thử công việc của nhau. Con người định hướng, phân xử ngoại lệ và giữ gu thẩm mỹ. Đơn vị chú ý của con người không còn là pull request. Đó là quyết định."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "Nổi trên các ứng dụng khác. Hiển thị mức sử dụng theo phiên và tuần của tài khoản trong chế độ xem nhanh."
+
 msgid "Focus Chat Input"
 msgstr "Focus ô nhập chat"
 
@@ -8556,6 +8632,9 @@ msgstr "Trợ giúp & Tài liệu"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "Màu thập lục phân"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Đã ẩn \"{0}\" khỏi thanh bên"
@@ -8571,6 +8650,9 @@ msgstr "Ẩn"
 
 msgid "Hide {displayName}"
 msgstr "Ẩn {displayName}"
+
+msgid "Hide account"
+msgstr "Ẩn tài khoản"
 
 msgid "Hide checks"
 msgstr "Ẩn check"
@@ -9630,6 +9712,20 @@ msgstr "Agent hoạt động gần nhất {0}"
 msgid "Last attached"
 msgstr "Lần gắn cuối"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "Kiểm tra lần cuối {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "Kiểm tra lần cuối {0} · không trực tiếp"
+
+msgid "Last checked {relativeTime}"
+msgstr "Kiểm tra lần cuối {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "Kiểm tra lần cuối {relativeTime} · dữ liệu chưa cập nhật"
+
 msgid "Last day of each month"
 msgstr "Ngày cuối mỗi tháng"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Đang tải"
 
+msgid "Loading accounts…"
+msgstr "Đang tải tài khoản…"
+
 msgid "Loading agent settings..."
 msgstr "Đang tải cài đặt agent..."
 
@@ -10240,6 +10339,9 @@ msgstr "Quản lý"
 msgid "Manage {title}"
 msgstr "Quản lý {title}"
 
+msgid "Manage accounts"
+msgstr "Quản lý tài khoản"
+
 msgid "Manage accounts…"
 msgstr "Quản lý tài khoản…"
 
@@ -10434,6 +10536,15 @@ msgstr "Tỷ lệ bộ nhớ"
 
 msgid "Mention."
 msgstr "Nhắc đến."
+
+msgid "Menu bar"
+msgstr "Thanh menu"
+
+msgid "Menu bar accounts"
+msgstr "Tài khoản trên thanh menu"
+
+msgid "Menu bar quota window"
+msgstr "Kỳ hạn mức trên thanh menu"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10993,6 +11104,10 @@ msgstr "Lần thu tiếp theo: {nextTotal} vào {nextDate}, cộng phần sử d
 
 msgid "Next comment"
 msgstr "Bình luận tiếp theo"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "Lượt tiếp theo hết hạn {0}"
 
 msgid "Next file"
 msgstr "Tệp tiếp theo"
@@ -12489,6 +12604,9 @@ msgstr "Mở workspace trong ứng dụng đã chọn ở menu \"Mở trong\" (V
 msgid "Open this run's workspace"
 msgstr "Mở workspace của lần chạy này"
 
+msgid "Open usage"
+msgstr "Mở mức sử dụng"
+
 msgid "Open workspace"
 msgstr "Mở workspace"
 
@@ -13106,6 +13224,9 @@ msgstr "Bộ nhớ agent theo từng repository"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "Phần trăm tổng RAM hệ thống chỉ do các tài nguyên Paradev được theo dõi sử dụng (không tính mọi ứng dụng). Tỷ lệ cao nghĩa là Paradev góp phần lớn gây áp lực bộ nhớ; tỷ lệ thấp nghĩa là áp lực có thể đến từ nơi khác."
 
+msgid "Percentage"
+msgstr "Phần trăm"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Xóa vĩnh viễn \"{projectName}\"?"
 
@@ -13409,6 +13530,9 @@ msgstr "Tiền tố"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "Tiền tố của ID nhiệm vụ trong nhóm này. Thay đổi sẽ đổi tên mọi nhiệm vụ trong nhóm."
 
+msgid "Prepaid balance"
+msgstr "Số dư trả trước"
+
 msgid "Preparing"
 msgstr "Đang chuẩn bị"
 
@@ -13510,6 +13634,9 @@ msgstr "Giá phụ thuộc vào đội ngũ và nhu cầu của bạn. Hãy liê
 
 msgid "Primary"
 msgstr "Chính"
+
+msgid "Primary display"
+msgstr "Màn hình chính"
 
 msgid "Primary Key"
 msgstr "Khóa chính"
@@ -13719,6 +13846,9 @@ msgstr "Thuộc tính"
 msgid "Provide either id or slug"
 msgstr "Hãy cung cấp id hoặc slug"
 
+msgid "Provider icons and percentages"
+msgstr "Biểu tượng nhà cung cấp và phần trăm"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "Nhà cung cấp: {0}"
@@ -13891,6 +14021,12 @@ msgstr "Thoát hẳn"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "Thoát trình duyệt nguồn trước để thông tin đăng nhập được lưu xuống đĩa. Bạn sẽ được hỏi cho phép truy cập Keychain."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "Đã hết hạn mức. Chưa rõ thời gian đặt lại"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "Đã hết hạn mức. Đặt lại sau {countdown}"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "Làm mới pull request"
 msgid "Refresh repositories"
 msgstr "Làm mới repository"
 
+msgid "Refresh usage"
+msgstr "Làm mới mức sử dụng"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Làm mới khi Claude Code chạy lần tiếp theo."
 
@@ -14219,6 +14358,12 @@ msgstr "Chuyển vị trí dự án?"
 
 msgid "Relocating…"
 msgstr "Đang chuyển…"
+
+msgid "remaining"
+msgstr "còn lại"
+
+msgid "Remaining"
+msgstr "Còn lại"
 
 msgid "rematch"
 msgstr "tái đấu"
@@ -14590,6 +14735,11 @@ msgstr "Đặt lại thu phóng"
 msgid "Reset Zoom"
 msgstr "Đặt lại thu phóng"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "Đặt lại {0}"
+
 msgid "Resets {resetDate}"
 msgstr "Đặt lại vào {resetDate}"
 
@@ -14935,6 +15085,9 @@ msgstr "ngăn bên phải"
 
 msgid "Right pane area"
 msgstr "Khu vực ngăn bên phải"
+
+msgid "Right screen edge"
+msgstr "Cạnh phải màn hình"
 
 msgid "Right-click here"
 msgstr "Nhấp chuột phải ở đây"
@@ -15300,6 +15453,9 @@ msgstr "Tìm trong {0} trang…"
 
 msgid "Search a developer"
 msgstr "Tìm nhà phát triển"
+
+msgid "Search accounts"
+msgstr "Tìm tài khoản"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Tìm trong nội dung tệp và trên mọi workspace cùng lúc."
@@ -15807,6 +15963,12 @@ msgstr "Phiên"
 msgid "Session {0}"
 msgstr "Phiên {0}"
 
+msgid "Session allowance renewed"
+msgstr "Hạn mức phiên đã được làm mới"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "Pháo giấy cho phiên và hiệu ứng lớn hơn cho hạn mức tuần. Tuân theo cài đặt giảm chuyển động."
+
 msgid "Session details"
 msgstr "Chi tiết phiên"
 
@@ -16027,8 +16189,14 @@ msgstr "Hiển thị micrô trong ô soạn chat. Giọng nói được ChatGPT 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Hiện nút Mức sử dụng trong thanh bên trang chủ, bên dưới Pull request"
 
+msgid "Show account"
+msgstr "Hiện tài khoản"
+
 msgid "Show all {count}"
 msgstr "Hiện tất cả {count}"
+
+msgid "Show all accounts"
+msgstr "Hiện tất cả tài khoản"
 
 msgid "Show all comments"
 msgstr "Hiển thị tất cả bình luận"
@@ -16080,6 +16248,9 @@ msgstr "Hiện ít hơn"
 
 msgid "Show file tree"
 msgstr "Hiện cây tệp"
+
+msgid "Show hidden"
+msgstr "Hiện tài khoản bị ẩn"
 
 msgid "Show in bar"
 msgstr "Hiện trên thanh"
@@ -16204,6 +16375,9 @@ msgstr "Pill ở thanh bên hiện khi có bản cập nhật ứng dụng sẵn
 
 msgid "Sign in"
 msgstr "Đăng nhập"
+
+msgid "Sign in again"
+msgstr "Đăng nhập lại"
 
 msgid "Sign in again to use dictation"
 msgstr "Đăng nhập lại để dùng đọc chính tả"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp in ra endpoint chỉ cho ngăn đó. Trỏ Playwrig
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi được vòng hạt giống 11,5 triệu USD"
+
+msgid "Superset logo"
+msgstr "Logo Superset"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
@@ -19028,14 +19205,26 @@ msgstr "Định danh thân thiện với URL, duy nhất trong tổ chức của
 msgid "Usage"
 msgstr "Mức sử dụng"
 
+msgid "Usage at a glance"
+msgstr "Tổng quan mức sử dụng"
+
+msgid "Usage display settings"
+msgstr "Cài đặt hiển thị mức sử dụng"
+
 msgid "Usage is out of date"
 msgstr "Dữ liệu sử dụng đã cũ"
 
 msgid "Usage sections"
 msgstr "Các mục mức sử dụng"
 
+msgid "Usage unavailable"
+msgstr "Không có dữ liệu sử dụng"
+
 msgid "Usage unavailable."
 msgstr "Không có dữ liệu sử dụng."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "Mức sử dụng không khả dụng. Mở Superset để kiểm tra kết nối."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "Dùng tính năng chuyển giọng nói thành văn bản và nhấn đ�
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Dùng gói đăng ký agent và khóa API sẵn có của bạn. Paradev không bao giờ proxy lệnh gọi mô hình hay trói quy trình của bạn vào một nhà cung cấp."
+
+msgid "used"
+msgstr "đã dùng"
+
+msgid "Used"
+msgstr "Đã dùng"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "Được dùng trên thanh menu và bảng nổi."
 
 msgid "Used in URLs and APIs."
 msgstr "Dùng trong URL và API."
@@ -19485,6 +19683,9 @@ msgstr "hằng tuần"
 
 msgid "Weekly"
 msgstr "Hằng tuần"
+
+msgid "Weekly allowance renewed"
+msgstr "Hạn mức tuần đã được làm mới"
 
 msgid "Weekly at {time}"
 msgstr "Hằng tuần lúc {time}"
@@ -20087,6 +20288,9 @@ msgstr "Tài khoản của bạn đã bị vô hiệu hóa và sẽ sớm bị x
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Tài khoản của bạn do tổ chức quản lý. Hãy liên hệ admin để tạo tổ chức mới."
 
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "Tài khoản và hạn mức của bạn, trên thanh menu hoặc cạnh phải màn hình."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent của bạn có thể mở bất kỳ trang nào và thao tác trên đó bằng lệnh superset browser. Nó dùng ngăn bạn đang xem, nên bạn thấy từng bước."
 
@@ -20233,208 +20437,3 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
-
-
-#. placeholder {0}: resets.count
-msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {Có # lượt đặt lại} other {Có # lượt đặt lại}}"
-
-msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {Có # lượt đặt lại} other {Có # lượt đặt lại}}"
-
-msgid "Account appearance"
-msgstr "Giao diện tài khoản"
-
-msgid "Account color"
-msgstr "Màu tài khoản"
-
-msgid "Account unavailable"
-msgstr "Tài khoản không khả dụng"
-
-msgid "Active window"
-msgstr "Cửa sổ đang hoạt động"
-
-msgid "Add an account to see its usage here."
-msgstr "Thêm tài khoản để xem mức sử dụng tại đây."
-
-msgid "AI usage"
-msgstr "Mức sử dụng AI"
-
-msgid "All accounts appear on the edge unless you hide them."
-msgstr "Tất cả tài khoản đều hiển thị ở cạnh màn hình trừ khi bạn ẩn chúng."
-
-msgid "All accounts are hidden."
-msgstr "Tất cả tài khoản đều bị ẩn."
-
-msgid "Awaiting refresh"
-msgstr "Đang chờ làm mới"
-
-msgid "Celebrate quota resets"
-msgstr "Ăn mừng khi hạn mức được đặt lại"
-
-msgid "Choose an account"
-msgstr "Chọn tài khoản"
-
-msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "Chọn một tài khoản cho mỗi biểu tượng trên thanh menu. Thẻ bên hiển thị tất cả tài khoản trừ những tài khoản bạn ẩn. Dữ liệu sử dụng bị thiếu hoặc đã cũ được hiển thị bằng dấu gạch ngang."
-
-msgid "Could not load accounts. Refresh to try again."
-msgstr "Không thể tải tài khoản. Hãy làm mới để thử lại."
-
-msgid "Could not load usage display settings."
-msgstr "Không thể tải cài đặt hiển thị mức sử dụng."
-
-msgid "Could not open usage."
-msgstr "Không thể mở mức sử dụng."
-
-msgid "Could not save account color."
-msgstr "Không thể lưu màu tài khoản."
-
-msgid "Could not save usage display settings."
-msgstr "Không thể lưu cài đặt hiển thị mức sử dụng."
-
-msgid "Credit balance"
-msgstr "Số dư tín dụng"
-
-msgid "Credits"
-msgstr "Tín dụng"
-
-msgid "Default account"
-msgstr "Tài khoản mặc định"
-
-msgid "Default color"
-msgstr "Màu mặc định"
-
-msgid "Enter a six-digit hex color."
-msgstr "Nhập màu thập lục phân gồm sáu chữ số."
-
-msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
-msgstr "Nổi trên các ứng dụng khác. Hiển thị mức sử dụng theo phiên và tuần của tài khoản trong chế độ xem nhanh."
-
-msgid "Hex color"
-msgstr "Màu thập lục phân"
-
-msgid "Hide account"
-msgstr "Ẩn tài khoản"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0}"
-msgstr "Kiểm tra lần cuối {0}"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0} · not live"
-msgstr "Kiểm tra lần cuối {0} · không trực tiếp"
-
-msgid "Last checked {relativeTime}"
-msgstr "Kiểm tra lần cuối {relativeTime}"
-
-msgid "Last checked {relativeTime} · not live"
-msgstr "Kiểm tra lần cuối {relativeTime} · dữ liệu chưa cập nhật"
-
-msgid "Loading accounts…"
-msgstr "Đang tải tài khoản…"
-
-msgid "Manage accounts"
-msgstr "Quản lý tài khoản"
-
-msgid "Menu bar"
-msgstr "Thanh menu"
-
-msgid "Menu bar accounts"
-msgstr "Tài khoản trên thanh menu"
-
-msgid "Menu bar quota window"
-msgstr "Kỳ hạn mức trên thanh menu"
-
-#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
-msgid "Next expires {0}"
-msgstr "Lượt tiếp theo hết hạn {0}"
-
-msgid "Open usage"
-msgstr "Mở mức sử dụng"
-
-msgid "Percentage"
-msgstr "Phần trăm"
-
-msgid "Prepaid balance"
-msgstr "Số dư trả trước"
-
-msgid "Primary display"
-msgstr "Màn hình chính"
-
-msgid "Provider icons and percentages"
-msgstr "Biểu tượng nhà cung cấp và phần trăm"
-
-msgid "Quota exhausted. Reset time unavailable"
-msgstr "Đã hết hạn mức. Chưa rõ thời gian đặt lại"
-
-msgid "Quota exhausted. Resets in {countdown}"
-msgstr "Đã hết hạn mức. Đặt lại sau {countdown}"
-
-msgid "Refresh usage"
-msgstr "Làm mới mức sử dụng"
-
-msgid "remaining"
-msgstr "còn lại"
-
-msgid "Remaining"
-msgstr "Còn lại"
-
-#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
-#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
-msgid "Resets {0}"
-msgstr "Đặt lại {0}"
-
-msgid "Right screen edge"
-msgstr "Cạnh phải màn hình"
-
-msgid "Search accounts"
-msgstr "Tìm tài khoản"
-
-msgid "Session allowance renewed"
-msgstr "Hạn mức phiên đã được làm mới"
-
-msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
-msgstr "Pháo giấy cho phiên và hiệu ứng lớn hơn cho hạn mức tuần. Tuân theo cài đặt giảm chuyển động."
-
-msgid "Show account"
-msgstr "Hiện tài khoản"
-
-msgid "Show all accounts"
-msgstr "Hiện tất cả tài khoản"
-
-msgid "Show hidden"
-msgstr "Hiện tài khoản bị ẩn"
-
-msgid "Sign in again"
-msgstr "Đăng nhập lại"
-
-msgid "Superset logo"
-msgstr "Logo Superset"
-
-msgid "Usage at a glance"
-msgstr "Tổng quan mức sử dụng"
-
-msgid "Usage display settings"
-msgstr "Cài đặt hiển thị mức sử dụng"
-
-msgid "Usage unavailable"
-msgstr "Không có dữ liệu sử dụng"
-
-msgid "Usage unavailable. Open Superset to check the connection."
-msgstr "Mức sử dụng không khả dụng. Mở Superset để kiểm tra kết nối."
-
-msgid "used"
-msgstr "đã dùng"
-
-msgid "Used"
-msgstr "Đã dùng"
-
-msgid "Used in the menu bar and floating panel."
-msgstr "Được dùng trên thanh menu và bảng nổi."
-
-msgid "Weekly allowance renewed"
-msgstr "Hạn mức tuần đã được làm mới"
-
-msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "Tài khoản và hạn mức của bạn, trên thanh menu hoặc cạnh phải màn hình."

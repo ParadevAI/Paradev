@@ -201,6 +201,10 @@ msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {리포지토리 #개} other {리포지토리 #개}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {초기화 #회 사용 가능} other {초기화 #회 사용 가능}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {클라우드에서 결과 #개} other {클라우드에서 결과 #개}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {댓글 #개} other {댓글 #개}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {파일 #개} other {파일 #개}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {초기화 #회 사용 가능} other {초기화 #회 사용 가능}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {검색 #회} other {검색 #회}}"
@@ -1696,6 +1703,12 @@ msgstr "아코디언"
 msgid "Account"
 msgstr "계정"
 
+msgid "Account appearance"
+msgstr "계정 표시"
+
+msgid "Account color"
+msgstr "계정 색상"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "계정 설치는 자체 매니페스트만 해석하므로 {marketplace}의 {plugin}은(는) 아직 계정에 설치할 수 없습니다. 이 컴퓨터에는 설치된 상태로 남습니다."
@@ -1708,6 +1721,9 @@ msgstr "계정 이름"
 
 msgid "Account pending deletion"
 msgstr "삭제 예정 계정"
+
+msgid "Account unavailable"
+msgstr "계정을 사용할 수 없음"
 
 msgid "Account usage"
 msgstr "계정 사용량"
@@ -1756,6 +1772,9 @@ msgstr "API 키를 만들려면 활성 조직이 필요합니다"
 
 msgid "Active sessions"
 msgstr "활성 세션"
+
+msgid "Active window"
+msgstr "활성 창"
 
 msgid "Activity"
 msgstr "활동"
@@ -1806,6 +1825,9 @@ msgstr "나중에 공개하고 싶은 에이전트 설정을 여기에 추가하
 
 msgid "Add agents…"
 msgstr "에이전트 추가…"
+
+msgid "Add an account to see its usage here."
+msgstr "계정을 추가하면 여기에 사용량이 표시됩니다."
 
 msgid "add an agent"
 msgstr "에이전트를 추가할"
@@ -2112,6 +2134,9 @@ msgstr "AI · 상태"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AI 인증에 실패했습니다. AI 설정을 확인해 주세요."
 
+msgid "AI usage"
+msgstr "AI 사용량"
+
 msgid "Alert"
 msgstr "경고"
 
@@ -2158,6 +2183,12 @@ msgstr "{0}개 목표 모두가 {nextLabel}을(를) 향해 제 몫을 하고 있
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "버전 {versionCount}개와 그 내용이 모두 삭제됩니다. 링크가 있는 사람도 접근할 수 없게 됩니다."
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "숨기지 않은 모든 계정이 화면 가장자리에 표시됩니다."
+
+msgid "All accounts are hidden."
+msgstr "모든 계정이 숨겨져 있습니다."
 
 msgid "All assignees"
 msgstr "모든 담당자"
@@ -2971,6 +3002,9 @@ msgstr "아바타가 업데이트되었습니다!"
 msgid "Awaiting {0}"
 msgstr "{0} 대기 중"
 
+msgid "Awaiting refresh"
+msgstr "새로고침 대기 중"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "응답 대기 중 — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "카테고리"
 msgid "Caution"
 msgstr "주의"
 
+msgid "Celebrate quota resets"
+msgstr "한도 초기화 축하 효과"
+
 msgid "Certificate Authority Invalid"
 msgstr "인증 기관이 올바르지 않음"
 
@@ -3838,6 +3875,9 @@ msgstr "섹션을 선택하세요."
 msgid "Choose agent"
 msgstr "에이전트 선택"
 
+msgid "Choose an account"
+msgstr "계정 선택"
+
 msgid "Choose an existing repo folder"
 msgstr "기존 리포지토리 폴더 선택"
 
@@ -3858,6 +3898,9 @@ msgstr "터미널에서 Cmd+클릭할 때 파일 경로를 여는 방식을 선�
 
 msgid "Choose MCP servers for this message"
 msgstr "이 메시지에 사용할 MCP 서버 선택"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "메뉴 막대 아이콘마다 계정 하나를 선택하세요. 화면 가장자리 패널에는 숨긴 계정을 제외한 모든 계정이 표시됩니다. 사용량이 없거나 오래된 경우 대시가 표시됩니다."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "인앱 브라우저에서 삭제할 항목을 선택하세요."
@@ -5104,6 +5147,9 @@ msgstr "대기열에서 나갈 수 없습니다"
 msgid "Could not list directory"
 msgstr "디렉터리를 나열할 수 없습니다"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "계정을 불러오지 못했습니다. 새로고침하여 다시 시도하세요."
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0}에서 에이전트를 불러오지 못했습니다"
@@ -5132,6 +5178,9 @@ msgstr "이 차이를 불러올 수 없습니다"
 msgid "Could not load this file."
 msgstr "이 파일을 불러올 수 없습니다."
 
+msgid "Could not load usage display settings."
+msgstr "사용량 표시 설정을 불러오지 못했습니다."
+
 msgid "Could not load your machines"
 msgstr "머신을 불러오지 못했습니다"
 
@@ -5149,6 +5198,9 @@ msgstr "링크를 열 수 없습니다"
 
 msgid "Could not open Photos"
 msgstr "사진 앱을 열지 못했습니다"
+
+msgid "Could not open usage."
+msgstr "사용량을 열지 못했습니다."
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "재개할 수 없습니다"
 
 msgid "Could not resume the chat"
 msgstr "채팅을 재개할 수 없습니다"
+
+msgid "Could not save account color."
+msgstr "계정 색상을 저장하지 못했습니다."
+
+msgid "Could not save usage display settings."
+msgstr "사용량 표시 설정을 저장하지 못했습니다."
 
 msgid "Could not send"
 msgstr "보낼 수 없습니다"
@@ -5816,6 +5874,12 @@ msgstr "크리에이티브 매니저, Valid"
 msgid "Credentials stay on the server"
 msgstr "자격 증명은 서버에 보관됩니다"
 
+msgid "Credit balance"
+msgstr "크레딧 잔액"
+
+msgid "Credits"
+msgstr "크레딧"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "packages/ui 밖에 있는 기능 공통 컴포넌트 — 새로 만들기 전에 여기를 확인하세요"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "기본값({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "기본 계정"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "새 작업 공간의 기본 기준 브랜치입니다. 생성 시 작업 공간별로 변경할 수 있습니다."
+
+msgid "Default color"
+msgstr "기본 색상"
 
 msgid "Default effort"
 msgstr "기본 강도"
@@ -6953,6 +7023,9 @@ msgstr "{hostName}의 상위 디렉터리를 입력하세요"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName}의 경로를 입력하세요"
+
+msgid "Enter a six-digit hex color."
+msgstr "6자리 16진수 색상을 입력하세요."
 
 msgid "Enter a URL into the search bar above."
 msgstr "위 검색 바에 URL을 입력하세요."
@@ -7986,6 +8059,9 @@ msgstr "불꽃"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "에이전트 플릿이 서로의 작업을 계획하고, 구현하고, 리뷰하고, 테스트합니다. 사람은 방향을 정하고, 예외를 중재하고, 안목을 책임집니다. 사람이 주의를 기울이는 단위는 더 이상 풀 리퀘스트가 아니라 의사 결정입니다."
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "다른 앱 위에 표시됩니다. 빠른 보기에 선택한 계정의 세션 및 주간 사용량을 표시합니다."
+
 msgid "Focus Chat Input"
 msgstr "채팅 입력창 포커스"
 
@@ -8556,6 +8632,9 @@ msgstr "도움말 및 문서"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "16진수 색상"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\"을(를) 사이드바에서 숨겼습니다"
@@ -8571,6 +8650,9 @@ msgstr "숨기기"
 
 msgid "Hide {displayName}"
 msgstr "{displayName} 가리기"
+
+msgid "Hide account"
+msgstr "계정 숨기기"
 
 msgid "Hide checks"
 msgstr "검사 숨기기"
@@ -9630,6 +9712,20 @@ msgstr "마지막 에이전트 활동 {0}"
 msgid "Last attached"
 msgstr "마지막 연결"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "마지막 확인 {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "마지막 확인 {0} · 실시간 아님"
+
+msgid "Last checked {relativeTime}"
+msgstr "마지막 확인 {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "마지막 확인 {relativeTime} · 최신 정보 아님"
+
 msgid "Last day of each month"
 msgstr "매월 마지막 날"
 
@@ -9998,6 +10094,9 @@ msgstr "로더 · 브라유 스피너"
 msgid "Loading"
 msgstr "불러오는 중"
 
+msgid "Loading accounts…"
+msgstr "계정 불러오는 중…"
+
 msgid "Loading agent settings..."
 msgstr "에이전트 설정을 불러오는 중..."
 
@@ -10240,6 +10339,9 @@ msgstr "관리"
 msgid "Manage {title}"
 msgstr "{title} 관리"
 
+msgid "Manage accounts"
+msgstr "계정 관리"
+
 msgid "Manage accounts…"
 msgstr "계정 관리…"
 
@@ -10434,6 +10536,15 @@ msgstr "메모리 점유율"
 
 msgid "Mention."
 msgstr "멘션."
+
+msgid "Menu bar"
+msgstr "메뉴 막대"
+
+msgid "Menu bar accounts"
+msgstr "메뉴 막대 계정"
+
+msgid "Menu bar quota window"
+msgstr "메뉴 막대 사용량 기간"
 
 msgid "Menubar"
 msgstr "메뉴 바"
@@ -10993,6 +11104,10 @@ msgstr "다음 결제: {nextDate}에 {nextTotal}, 풀을 넘는 사용량 추가
 
 msgid "Next comment"
 msgstr "다음 코멘트"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "다음 만료: {0}"
 
 msgid "Next file"
 msgstr "다음 파일"
@@ -12489,6 +12604,9 @@ msgstr "'다음에서 열기' 메뉴에서 선택한 앱(VS Code, Cursor 등)에
 msgid "Open this run's workspace"
 msgstr "이 실행의 워크스페이스 열기"
 
+msgid "Open usage"
+msgstr "사용량 열기"
+
 msgid "Open workspace"
 msgstr "워크스페이스 열기"
 
@@ -13106,6 +13224,9 @@ msgstr "리포지토리별 에이전트 메모리"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "모니터링 중인 Paradev 리소스만 사용하는 전체 시스템 RAM의 비율입니다(모든 앱이 아님). 점유율이 높으면 Paradev가 시스템 메모리 압박의 주요 원인이고, 낮으면 원인이 다른 곳에 있을 가능성이 큽니다."
 
+msgid "Percentage"
+msgstr "백분율"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "\"{projectName}\"을(를) 영구 삭제할까요?"
 
@@ -13409,6 +13530,9 @@ msgstr "접두사"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "이 팀 작업 ID의 접두사입니다. 변경하면 팀의 모든 작업 ID가 바뀝니다."
 
+msgid "Prepaid balance"
+msgstr "선불 잔액"
+
 msgid "Preparing"
 msgstr "준비 중"
 
@@ -13510,6 +13634,9 @@ msgstr "가격은 팀 규모와 사용 사례에 따라 다릅니다. 문의해 
 
 msgid "Primary"
 msgstr "기본"
+
+msgid "Primary display"
+msgstr "기본 디스플레이"
 
 msgid "Primary Key"
 msgstr "기본 키"
@@ -13719,6 +13846,9 @@ msgstr "속성"
 msgid "Provide either id or slug"
 msgstr "id 또는 슬러그 중 하나를 제공하세요"
 
+msgid "Provider icons and percentages"
+msgstr "공급자 아이콘 및 백분율"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "제공자: {0}"
@@ -13891,6 +14021,12 @@ msgstr "완전히 종료"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "로그인 정보가 디스크에 저장되도록 원본 브라우저를 먼저 종료하세요. 키체인 접근 허용을 요청받게 됩니다."
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "할당량 소진. 초기화 시간 확인 불가"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "할당량 소진. {countdown} 후 초기화"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "풀 리퀘스트 새로 고침"
 msgid "Refresh repositories"
 msgstr "리포지토리 새로 고침"
 
+msgid "Refresh usage"
+msgstr "사용량 새로고침"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "다음에 Claude Code를 실행하면 갱신됩니다."
 
@@ -14219,6 +14358,12 @@ msgstr "프로젝트를 이동할까요?"
 
 msgid "Relocating…"
 msgstr "이동하는 중…"
+
+msgid "remaining"
+msgstr "남음"
+
+msgid "Remaining"
+msgstr "남음"
 
 msgid "rematch"
 msgstr "재대결"
@@ -14590,6 +14735,11 @@ msgstr "확대/축소 초기화"
 msgid "Reset Zoom"
 msgstr "확대/축소 초기화"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "{0} 초기화"
+
 msgid "Resets {resetDate}"
 msgstr "{resetDate}에 초기화"
 
@@ -14935,6 +15085,9 @@ msgstr "오른쪽 패널"
 
 msgid "Right pane area"
 msgstr "오른쪽 패널 영역"
+
+msgid "Right screen edge"
+msgstr "화면 오른쪽 가장자리"
 
 msgid "Right-click here"
 msgstr "여기를 오른쪽 클릭"
@@ -15300,6 +15453,9 @@ msgstr "사이트 {0}개 검색…"
 
 msgid "Search a developer"
 msgstr "개발자 검색"
+
+msgid "Search accounts"
+msgstr "계정 검색"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "파일 내용과 모든 워크스페이스를 한 번에 검색하세요."
@@ -15807,6 +15963,12 @@ msgstr "세션"
 msgid "Session {0}"
 msgstr "세션 {0}"
 
+msgid "Session allowance renewed"
+msgstr "세션 한도 갱신됨"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "세션에는 색종이 효과, 주간 갱신에는 더 큰 축하 효과를 표시합니다. 동작 줄이기 설정을 따릅니다."
+
 msgid "Session details"
 msgstr "세션 상세"
 
@@ -16027,8 +16189,14 @@ msgstr "채팅 입력창에 마이크를 표시합니다. Codex가 ChatGPT에 �
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "홈 사이드바의 풀 리퀘스트 아래에 사용량 버튼을 표시합니다"
 
+msgid "Show account"
+msgstr "계정 표시"
+
 msgid "Show all {count}"
 msgstr "{count}개 모두 보기"
+
+msgid "Show all accounts"
+msgstr "모든 계정 표시"
 
 msgid "Show all comments"
 msgstr "모든 댓글 표시"
@@ -16080,6 +16248,9 @@ msgstr "간략히 보기"
 
 msgid "Show file tree"
 msgstr "파일 트리 표시"
+
+msgid "Show hidden"
+msgstr "숨긴 계정 표시"
 
 msgid "Show in bar"
 msgstr "바에 표시"
@@ -16204,6 +16375,9 @@ msgstr "앱 업데이트를 설치할 수 있을 때 사이드바에 표시되�
 
 msgid "Sign in"
 msgstr "로그인"
+
+msgid "Sign in again"
+msgstr "다시 로그인"
 
 msgid "Sign in again to use dictation"
 msgstr "받아쓰기를 사용하려면 다시 로그인하세요"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp는 해당 패널 전용 엔드포인트만 출력�
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모의 시드 투자도 유치했습니다"
+
+msgid "Superset logo"
+msgstr "Superset 로고"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
@@ -19028,14 +19205,26 @@ msgstr "URL에 쓰기 좋은 식별자로, 조직 안에서 고유해야 합니�
 msgid "Usage"
 msgstr "사용량"
 
+msgid "Usage at a glance"
+msgstr "사용량 한눈에 보기"
+
+msgid "Usage display settings"
+msgstr "사용량 표시 설정"
+
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
 
 msgid "Usage sections"
 msgstr "사용량 섹션"
 
+msgid "Usage unavailable"
+msgstr "사용량 정보 없음"
+
 msgid "Usage unavailable."
 msgstr "사용량을 볼 수 없습니다."
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "사용량을 확인할 수 없습니다. Superset을 열어 연결을 확인하세요."
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "기존 에이전트 구독과 API 키를 그대로 쓰세요. Paradev는 모델 호출을 중계하지 않고, 워크플로를 한 제공사에 묶어 두지 않습니다."
+
+msgid "used"
+msgstr "사용됨"
+
+msgid "Used"
+msgstr "사용됨"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "메뉴 막대와 플로팅 패널에 사용됩니다."
 
 msgid "Used in URLs and APIs."
 msgstr "URL과 API에서 사용됩니다."
@@ -19485,6 +19683,9 @@ msgstr "매주"
 
 msgid "Weekly"
 msgstr "매주"
+
+msgid "Weekly allowance renewed"
+msgstr "주간 한도 갱신됨"
 
 msgid "Weekly at {time}"
 msgstr "매주 {time}"
@@ -20087,6 +20288,9 @@ msgstr "계정이 비활성화되었으며 곧 영구적으로 삭제됩니다. 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "계정이 조직에서 관리됩니다. 새 조직을 만들려면 관리자에게 문의하세요."
 
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "계정과 할당량을 메뉴 막대 또는 화면 오른쪽 가장자리에서 확인하세요."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "에이전트는 superset browser 명령으로 어떤 페이지든 열고 조작할 수 있습니다. 보고 있는 패널을 사용하므로 모든 단계를 볼 수 있습니다."
 
@@ -20233,208 +20437,3 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
-
-
-#. placeholder {0}: resets.count
-msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {초기화 #회 사용 가능} other {초기화 #회 사용 가능}}"
-
-msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {초기화 #회 사용 가능} other {초기화 #회 사용 가능}}"
-
-msgid "Account appearance"
-msgstr "계정 표시"
-
-msgid "Account color"
-msgstr "계정 색상"
-
-msgid "Account unavailable"
-msgstr "계정을 사용할 수 없음"
-
-msgid "Active window"
-msgstr "활성 창"
-
-msgid "Add an account to see its usage here."
-msgstr "계정을 추가하면 여기에 사용량이 표시됩니다."
-
-msgid "AI usage"
-msgstr "AI 사용량"
-
-msgid "All accounts appear on the edge unless you hide them."
-msgstr "숨기지 않은 모든 계정이 화면 가장자리에 표시됩니다."
-
-msgid "All accounts are hidden."
-msgstr "모든 계정이 숨겨져 있습니다."
-
-msgid "Awaiting refresh"
-msgstr "새로고침 대기 중"
-
-msgid "Celebrate quota resets"
-msgstr "한도 초기화 축하 효과"
-
-msgid "Choose an account"
-msgstr "계정 선택"
-
-msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "메뉴 막대 아이콘마다 계정 하나를 선택하세요. 화면 가장자리 패널에는 숨긴 계정을 제외한 모든 계정이 표시됩니다. 사용량이 없거나 오래된 경우 대시가 표시됩니다."
-
-msgid "Could not load accounts. Refresh to try again."
-msgstr "계정을 불러오지 못했습니다. 새로고침하여 다시 시도하세요."
-
-msgid "Could not load usage display settings."
-msgstr "사용량 표시 설정을 불러오지 못했습니다."
-
-msgid "Could not open usage."
-msgstr "사용량을 열지 못했습니다."
-
-msgid "Could not save account color."
-msgstr "계정 색상을 저장하지 못했습니다."
-
-msgid "Could not save usage display settings."
-msgstr "사용량 표시 설정을 저장하지 못했습니다."
-
-msgid "Credit balance"
-msgstr "크레딧 잔액"
-
-msgid "Credits"
-msgstr "크레딧"
-
-msgid "Default account"
-msgstr "기본 계정"
-
-msgid "Default color"
-msgstr "기본 색상"
-
-msgid "Enter a six-digit hex color."
-msgstr "6자리 16진수 색상을 입력하세요."
-
-msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
-msgstr "다른 앱 위에 표시됩니다. 빠른 보기에 선택한 계정의 세션 및 주간 사용량을 표시합니다."
-
-msgid "Hex color"
-msgstr "16진수 색상"
-
-msgid "Hide account"
-msgstr "계정 숨기기"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0}"
-msgstr "마지막 확인 {0}"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0} · not live"
-msgstr "마지막 확인 {0} · 실시간 아님"
-
-msgid "Last checked {relativeTime}"
-msgstr "마지막 확인 {relativeTime}"
-
-msgid "Last checked {relativeTime} · not live"
-msgstr "마지막 확인 {relativeTime} · 최신 정보 아님"
-
-msgid "Loading accounts…"
-msgstr "계정 불러오는 중…"
-
-msgid "Manage accounts"
-msgstr "계정 관리"
-
-msgid "Menu bar"
-msgstr "메뉴 막대"
-
-msgid "Menu bar accounts"
-msgstr "메뉴 막대 계정"
-
-msgid "Menu bar quota window"
-msgstr "메뉴 막대 사용량 기간"
-
-#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
-msgid "Next expires {0}"
-msgstr "다음 만료: {0}"
-
-msgid "Open usage"
-msgstr "사용량 열기"
-
-msgid "Percentage"
-msgstr "백분율"
-
-msgid "Prepaid balance"
-msgstr "선불 잔액"
-
-msgid "Primary display"
-msgstr "기본 디스플레이"
-
-msgid "Provider icons and percentages"
-msgstr "공급자 아이콘 및 백분율"
-
-msgid "Quota exhausted. Reset time unavailable"
-msgstr "할당량 소진. 초기화 시간 확인 불가"
-
-msgid "Quota exhausted. Resets in {countdown}"
-msgstr "할당량 소진. {countdown} 후 초기화"
-
-msgid "Refresh usage"
-msgstr "사용량 새로고침"
-
-msgid "remaining"
-msgstr "남음"
-
-msgid "Remaining"
-msgstr "남음"
-
-#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
-#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
-msgid "Resets {0}"
-msgstr "{0} 초기화"
-
-msgid "Right screen edge"
-msgstr "화면 오른쪽 가장자리"
-
-msgid "Search accounts"
-msgstr "계정 검색"
-
-msgid "Session allowance renewed"
-msgstr "세션 한도 갱신됨"
-
-msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
-msgstr "세션에는 색종이 효과, 주간 갱신에는 더 큰 축하 효과를 표시합니다. 동작 줄이기 설정을 따릅니다."
-
-msgid "Show account"
-msgstr "계정 표시"
-
-msgid "Show all accounts"
-msgstr "모든 계정 표시"
-
-msgid "Show hidden"
-msgstr "숨긴 계정 표시"
-
-msgid "Sign in again"
-msgstr "다시 로그인"
-
-msgid "Superset logo"
-msgstr "Superset 로고"
-
-msgid "Usage at a glance"
-msgstr "사용량 한눈에 보기"
-
-msgid "Usage display settings"
-msgstr "사용량 표시 설정"
-
-msgid "Usage unavailable"
-msgstr "사용량 정보 없음"
-
-msgid "Usage unavailable. Open Superset to check the connection."
-msgstr "사용량을 확인할 수 없습니다. Superset을 열어 연결을 확인하세요."
-
-msgid "used"
-msgstr "사용됨"
-
-msgid "Used"
-msgstr "사용됨"
-
-msgid "Used in the menu bar and floating panel."
-msgstr "메뉴 막대와 플로팅 패널에 사용됩니다."
-
-msgid "Weekly allowance renewed"
-msgstr "주간 한도 갱신됨"
-
-msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "계정과 할당량을 메뉴 막대 또는 화면 오른쪽 가장자리에서 확인하세요."

@@ -201,6 +201,10 @@ msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェ
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {#件のリポジトリ} other {#件のリポジトリ}}"
 
+#. placeholder {0}: resets.count
+msgid "{0, plural, one {# reset available} other {# resets available}}"
+msgstr "{0, plural, one {# 回のリセットが利用可能} other {# 回のリセットが利用可能}}"
+
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
 msgstr "{0, plural, one {クラウドで#件} other {クラウドで#件}}"
@@ -772,6 +776,9 @@ msgstr "{count, plural, one {#件のコメント} other {#件のコメント}}"
 
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#件のファイル} other {#件のファイル}}"
+
+msgid "{count, plural, one {# reset available} other {# resets available}}"
+msgstr "{count, plural, one {# 回のリセットが利用可能} other {# 回のリセットが利用可能}}"
 
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#件の検索} other {#件の検索}}"
@@ -1696,6 +1703,12 @@ msgstr "Accordion"
 msgid "Account"
 msgstr "アカウント"
 
+msgid "Account appearance"
+msgstr "アカウントの表示"
+
+msgid "Account color"
+msgstr "アカウントの色"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotResolvable"
 msgstr "アカウントへのインストールはファーストパーティのマニフェストのみを解決するため、{marketplace} の {plugin} はまだアカウントにインストールできません。このマシンにはインストールされたままです。"
@@ -1708,6 +1721,9 @@ msgstr "アカウント名"
 
 msgid "Account pending deletion"
 msgstr "アカウントは削除待ちです"
+
+msgid "Account unavailable"
+msgstr "アカウントを利用できません"
 
 msgid "Account usage"
 msgstr "アカウントの使用状況"
@@ -1756,6 +1772,9 @@ msgstr "APIキーの作成にはアクティブな組織が必要です"
 
 msgid "Active sessions"
 msgstr "アクティブなセッション"
+
+msgid "Active window"
+msgstr "アクティブなウィンドウ"
 
 msgid "Activity"
 msgstr "アクティビティ"
@@ -1806,6 +1825,9 @@ msgstr "公開したいエージェント設定ができたら、ここに追加
 
 msgid "Add agents…"
 msgstr "エージェントを追加…"
+
+msgid "Add an account to see its usage here."
+msgstr "アカウントを追加すると、ここに使用状況が表示されます。"
 
 msgid "add an agent"
 msgstr "エージェントを追加する"
@@ -2112,6 +2134,9 @@ msgstr "AI · ステータス"
 msgid "AI authentication failed. Please check your AI settings."
 msgstr "AIの認証に失敗しました。AI設定を確認してください。"
 
+msgid "AI usage"
+msgstr "AIの使用状況"
+
 msgid "Alert"
 msgstr "Alert"
 
@@ -2158,6 +2183,12 @@ msgstr "{0} 個すべての目標が {nextLabel} に向けて働いています�
 
 msgid "All {versionCount} versions and their content are removed. Anyone with the link loses access."
 msgstr "{versionCount}件すべてのバージョンとその内容が削除されます。リンクを知っている人もアクセスできなくなります。"
+
+msgid "All accounts appear on the edge unless you hide them."
+msgstr "非表示にしない限り、すべてのアカウントが画面端に表示されます。"
+
+msgid "All accounts are hidden."
+msgstr "すべてのアカウントが非表示です。"
 
 msgid "All assignees"
 msgstr "すべての担当者"
@@ -2971,6 +3002,9 @@ msgstr "アバターを更新しました!"
 msgid "Awaiting {0}"
 msgstr "{0}を待機中"
 
+msgid "Awaiting refresh"
+msgstr "更新待ち"
+
 msgid "Awaiting Response — {workspaceName}"
 msgstr "返信待ち — {workspaceName}"
 
@@ -3590,6 +3624,9 @@ msgstr "カテゴリ"
 msgid "Caution"
 msgstr "警告"
 
+msgid "Celebrate quota resets"
+msgstr "上限のリセットをお祝いする"
+
 msgid "Certificate Authority Invalid"
 msgstr "認証局が無効です"
 
@@ -3838,6 +3875,9 @@ msgstr "セクションを選んでください。"
 msgid "Choose agent"
 msgstr "エージェントを選択"
 
+msgid "Choose an account"
+msgstr "アカウントを選択"
+
 msgid "Choose an existing repo folder"
 msgstr "既存のリポジトリフォルダを選択"
 
@@ -3858,6 +3898,9 @@ msgstr "ターミナルでCmd+クリックしたときのファイルパスの�
 
 msgid "Choose MCP servers for this message"
 msgstr "このメッセージで使うMCPサーバーを選択"
+
+msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
+msgstr "メニューバーの各アイコンに表示するアカウントを選択します。画面端のパネルには非表示にしたものを除くすべてのアカウントが表示されます。使用量が不明または古い場合はダッシュで表示されます。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "アプリ内ブラウザから消去する項目を選択してください。"
@@ -5104,6 +5147,9 @@ msgstr "キューから抜けられませんでした"
 msgid "Could not list directory"
 msgstr "ディレクトリを一覧表示できませんでした"
 
+msgid "Could not load accounts. Refresh to try again."
+msgstr "アカウントを読み込めませんでした。更新して再試行してください。"
+
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0}からエージェントを読み込めませんでした"
@@ -5132,6 +5178,9 @@ msgstr "この差分を読み込めませんでした"
 msgid "Could not load this file."
 msgstr "このファイルを読み込めませんでした。"
 
+msgid "Could not load usage display settings."
+msgstr "使用状況の表示設定を読み込めませんでした。"
+
 msgid "Could not load your machines"
 msgstr "マシンを読み込めませんでした"
 
@@ -5149,6 +5198,9 @@ msgstr "リンクを開けませんでした"
 
 msgid "Could not open Photos"
 msgstr "「写真」を開けませんでした"
+
+msgid "Could not open usage."
+msgstr "使用状況を開けませんでした。"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -5233,6 +5285,12 @@ msgstr "再開できませんでした"
 
 msgid "Could not resume the chat"
 msgstr "チャットを再開できませんでした"
+
+msgid "Could not save account color."
+msgstr "アカウントの色を保存できませんでした。"
+
+msgid "Could not save usage display settings."
+msgstr "使用状況の表示設定を保存できませんでした。"
 
 msgid "Could not send"
 msgstr "送信できませんでした"
@@ -5816,6 +5874,12 @@ msgstr "クリエイティブマネージャー、Valid"
 msgid "Credentials stay on the server"
 msgstr "認証情報はサーバー上に保持されます"
 
+msgid "Credit balance"
+msgstr "クレジット残高"
+
+msgid "Credits"
+msgstr "クレジット"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "packages/uiの外にある機能横断のコンポーネント — 新しく作る前にここを確認してください"
 
@@ -5995,8 +6059,14 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 msgid "Default ({defaultWorktreePath})"
 msgstr "デフォルト({defaultWorktreePath})"
 
+msgid "Default account"
+msgstr "既定のアカウント"
+
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "新しいワークスペースの既定のベース。作成時に個別に変更できます。"
+
+msgid "Default color"
+msgstr "既定の色"
 
 msgid "Default effort"
 msgstr "デフォルトのエフォート"
@@ -6953,6 +7023,9 @@ msgstr "{hostName}の親ディレクトリを入力してください"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName}のパスを入力してください"
+
+msgid "Enter a six-digit hex color."
+msgstr "6桁の16進数の色を入力してください。"
 
 msgid "Enter a URL into the search bar above."
 msgstr "上の検索バーにURLを入力してください。"
@@ -7986,6 +8059,9 @@ msgstr "炎"
 msgid "Fleets of agents plan, implement, review, and test each other's work. Humans set direction, arbitrate exceptions, and own taste. The unit of human attention is no longer the pull request. It is the decision."
 msgstr "エージェントのフリートが計画し、実装し、互いの仕事をレビューしテストします。人間は方向を定め、例外を裁定し、審美眼を担います。人間の注意の単位はもうプルリクエストではありません。意思決定です。"
 
+msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
+msgstr "他のアプリの上に表示します。クイックビューのアカウントのセッションと週間使用量を表示します。"
+
 msgid "Focus Chat Input"
 msgstr "チャット入力にフォーカス"
 
@@ -8556,6 +8632,9 @@ msgstr "ヘルプとドキュメント"
 msgid "Henry Ford"
 msgstr "Henry Ford"
 
+msgid "Hex color"
+msgstr "16進数の色"
+
 #. placeholder {0}: project.name
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "「{0}」をサイドバーから非表示にしました"
@@ -8571,6 +8650,9 @@ msgstr "隠す"
 
 msgid "Hide {displayName}"
 msgstr "{displayName}を非表示"
+
+msgid "Hide account"
+msgstr "アカウントを非表示"
 
 msgid "Hide checks"
 msgstr "チェックを隠す"
@@ -9630,6 +9712,20 @@ msgstr "エージェントの最終アクティビティ {0}"
 msgid "Last attached"
 msgstr "最終接続"
 
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0}"
+msgstr "最終確認 {0}"
+
+#. placeholder {0}: formatRelativeTime(reading.checkedAt)
+msgid "Last checked {0} · not live"
+msgstr "最終確認 {0} · 最新ではありません"
+
+msgid "Last checked {relativeTime}"
+msgstr "最終確認 {relativeTime}"
+
+msgid "Last checked {relativeTime} · not live"
+msgstr "最終確認 {relativeTime} · 最新ではありません"
+
 msgid "Last day of each month"
 msgstr "毎月末日"
 
@@ -9998,6 +10094,9 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "読み込み中"
 
+msgid "Loading accounts…"
+msgstr "アカウントを読み込み中…"
+
 msgid "Loading agent settings..."
 msgstr "エージェント設定を読み込み中..."
 
@@ -10240,6 +10339,9 @@ msgstr "管理"
 msgid "Manage {title}"
 msgstr "{title} を管理"
 
+msgid "Manage accounts"
+msgstr "アカウントを管理"
+
 msgid "Manage accounts…"
 msgstr "アカウントを管理…"
 
@@ -10434,6 +10536,15 @@ msgstr "メモリシェア"
 
 msgid "Mention."
 msgstr "メンション。"
+
+msgid "Menu bar"
+msgstr "メニューバー"
+
+msgid "Menu bar accounts"
+msgstr "メニューバーのアカウント"
+
+msgid "Menu bar quota window"
+msgstr "メニューバーの使用量の期間"
 
 msgid "Menubar"
 msgstr "Menubar"
@@ -10993,6 +11104,10 @@ msgstr "次回の請求: {nextDate} に {nextTotal}、プールを超えた利�
 
 msgid "Next comment"
 msgstr "次のコメント"
+
+#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
+msgid "Next expires {0}"
+msgstr "次の有効期限：{0}"
 
 msgid "Next file"
 msgstr "次のファイル"
@@ -12489,6 +12604,9 @@ msgstr "「開く」メニューで選んだアプリ (VS Code、Cursorなど) �
 msgid "Open this run's workspace"
 msgstr "この実行のワークスペースを開く"
 
+msgid "Open usage"
+msgstr "使用状況を開く"
+
 msgid "Open workspace"
 msgstr "ワークスペースを開く"
 
@@ -13106,6 +13224,9 @@ msgstr "リポジトリごとのエージェントメモリ"
 msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
 msgstr "監視対象のParadevリソースのみが使用する、システムRAM全体に対する割合です(すべてのアプリではありません)。割合が高い場合はParadevがシステムのメモリ圧迫の主な要因であり、低い場合は原因は他にあります。"
 
+msgid "Percentage"
+msgstr "パーセント"
+
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "「{projectName}」を完全に削除しますか？"
 
@@ -13409,6 +13530,9 @@ msgstr "プレフィックス"
 msgid "Prefix of this team's task IDs. Changing it renames every task in the team."
 msgstr "このチームのタスク ID の接頭辞です。変更すると、チーム内のすべてのタスクの ID が変わります。"
 
+msgid "Prepaid balance"
+msgstr "前払い残高"
+
 msgid "Preparing"
 msgstr "準備中"
 
@@ -13510,6 +13634,9 @@ msgstr "料金はチームの規模と用途によって異なります。ご連
 
 msgid "Primary"
 msgstr "プライマリ"
+
+msgid "Primary display"
+msgstr "メインディスプレイ"
 
 msgid "Primary Key"
 msgstr "主キー"
@@ -13719,6 +13846,9 @@ msgstr "プロパティ"
 msgid "Provide either id or slug"
 msgstr "idまたはslugのいずれかを指定してください"
 
+msgid "Provider icons and percentages"
+msgstr "プロバイダーのアイコンとパーセント"
+
 #. placeholder {0}: sourceConfig?.label ?? binding.agentId
 msgid "Provider: {0}"
 msgstr "プロバイダー: {0}"
@@ -13891,6 +14021,12 @@ msgstr "完全に終了"
 
 msgid "Quit the source browser first so its logins are saved to disk. You'll be asked to allow Keychain access."
 msgstr "ログイン情報をディスクに保存させるため、先に元のブラウザを終了してください。キーチェーンへのアクセス許可を求められます。"
+
+msgid "Quota exhausted. Reset time unavailable"
+msgstr "利用枠を使い切りました。リセット時刻は不明です"
+
+msgid "Quota exhausted. Resets in {countdown}"
+msgstr "利用枠を使い切りました。{countdown}後にリセット"
 
 msgid "Radix Primitives"
 msgstr "Radix Primitives"
@@ -14160,6 +14296,9 @@ msgstr "プルリクエストを更新"
 msgid "Refresh repositories"
 msgstr "リポジトリを更新"
 
+msgid "Refresh usage"
+msgstr "使用状況を更新"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "次に Claude Code を実行すると更新されます。"
 
@@ -14219,6 +14358,12 @@ msgstr "プロジェクトを移動しますか?"
 
 msgid "Relocating…"
 msgstr "移動中…"
+
+msgid "remaining"
+msgstr "残り"
+
+msgid "Remaining"
+msgstr "残り"
 
 msgid "rematch"
 msgstr "再戦"
@@ -14590,6 +14735,11 @@ msgstr "ズームをリセット"
 msgid "Reset Zoom"
 msgstr "ズームをリセット"
 
+#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
+#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
+msgid "Resets {0}"
+msgstr "{0}にリセット"
+
 msgid "Resets {resetDate}"
 msgstr "{resetDate} にリセット"
 
@@ -14935,6 +15085,9 @@ msgstr "右ペイン"
 
 msgid "Right pane area"
 msgstr "右ペインエリア"
+
+msgid "Right screen edge"
+msgstr "画面の右端"
 
 msgid "Right-click here"
 msgstr "ここを右クリック"
@@ -15300,6 +15453,9 @@ msgstr "{0}件のサイトを検索…"
 
 msgid "Search a developer"
 msgstr "開発者を検索"
+
+msgid "Search accounts"
+msgstr "アカウントを検索"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "ファイルの中身も、すべてのワークスペースも、まとめて横断検索できます。"
@@ -15807,6 +15963,12 @@ msgstr "セッション"
 msgid "Session {0}"
 msgstr "セッション {0}"
 
+msgid "Session allowance renewed"
+msgstr "セッションの利用枠が回復しました"
+
+msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
+msgstr "セッションには紙吹雪、週間リセットにはより華やかな演出。視差効果を減らす設定に従います。"
+
 msgid "Session details"
 msgstr "セッションの詳細"
 
@@ -16027,8 +16189,14 @@ msgstr "チャットの入力欄にマイクを表示します。Codex が ChatG
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "ホームのサイドバーの「プルリクエスト」の下に「使用量」ボタンを表示"
 
+msgid "Show account"
+msgstr "アカウントを表示"
+
 msgid "Show all {count}"
 msgstr "{count}件すべて表示"
+
+msgid "Show all accounts"
+msgstr "すべてのアカウントを表示"
 
 msgid "Show all comments"
 msgstr "すべてのコメントを表示"
@@ -16080,6 +16248,9 @@ msgstr "表示を減らす"
 
 msgid "Show file tree"
 msgstr "ファイルツリーを表示"
+
+msgid "Show hidden"
+msgstr "非表示のアカウントを表示"
 
 msgid "Show in bar"
 msgstr "バーに表示"
@@ -16204,6 +16375,9 @@ msgstr "アプリの更新をインストールできるときにサイドバー
 
 msgid "Sign in"
 msgstr "サインイン"
+
+msgid "Sign in again"
+msgstr "再ログイン"
 
 msgid "Sign in again to use dictation"
 msgstr "音声入力を使うには再度サインインしてください"
@@ -17016,6 +17190,9 @@ msgstr "superset browser cdp は、そのペイン専用のエンドポイント
 
 msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgstr "Superset は Paradev になりました。あと、1,150万ドルのシードラウンドで資金を調達しました"
+
+msgid "Superset logo"
+msgstr "Supersetロゴ"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile が iPhone で登場"
@@ -19028,14 +19205,26 @@ msgstr "組織内で一意のURLフレンドリーな識別子。"
 msgid "Usage"
 msgstr "使用量"
 
+msgid "Usage at a glance"
+msgstr "使用状況をひと目で確認"
+
+msgid "Usage display settings"
+msgstr "使用状況の表示設定"
+
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
 msgid "Usage sections"
 msgstr "使用量セクション"
 
+msgid "Usage unavailable"
+msgstr "使用状況を取得できません"
+
 msgid "Usage unavailable."
 msgstr "使用量を取得できません。"
+
+msgid "Usage unavailable. Open Superset to check the connection."
+msgstr "使用状況を取得できません。Supersetを開いて接続を確認してください。"
 
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
@@ -19100,6 +19289,15 @@ msgstr "音声文字起こしとプッシュトゥトーク機能を使用しま
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "既存のエージェントの契約とAPIキーをそのまま使えます。Paradevがモデルの呼び出しを中継したり、ワークフローを特定のプロバイダーに縛ったりすることはありません。"
+
+msgid "used"
+msgstr "使用済み"
+
+msgid "Used"
+msgstr "使用済み"
+
+msgid "Used in the menu bar and floating panel."
+msgstr "メニューバーとフローティングパネルで使用します。"
 
 msgid "Used in URLs and APIs."
 msgstr "URLとAPIで使用されます。"
@@ -19485,6 +19683,9 @@ msgstr "毎週"
 
 msgid "Weekly"
 msgstr "毎週"
+
+msgid "Weekly allowance renewed"
+msgstr "週間の利用枠が回復しました"
 
 msgid "Weekly at {time}"
 msgstr "毎週 {time}"
@@ -20087,6 +20288,9 @@ msgstr "アカウントは無効化されており、まもなく完全に削除
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "アカウントは組織によって管理されています。新しい組織を作成するには管理者に連絡してください。"
 
+msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
+msgstr "アカウントと利用枠をメニューバーまたは画面の右端に表示します。"
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "エージェントは superset browser コマンドで任意のページを開いて操作できます。あなたが見ているペインを使うので、すべての手順が見えます。"
 
@@ -20233,208 +20437,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-
-#. placeholder {0}: resets.count
-msgid "{0, plural, one {# reset available} other {# resets available}}"
-msgstr "{0, plural, one {# 回のリセットが利用可能} other {# 回のリセットが利用可能}}"
-
-msgid "{count, plural, one {# reset available} other {# resets available}}"
-msgstr "{count, plural, one {# 回のリセットが利用可能} other {# 回のリセットが利用可能}}"
-
-msgid "Account appearance"
-msgstr "アカウントの表示"
-
-msgid "Account color"
-msgstr "アカウントの色"
-
-msgid "Account unavailable"
-msgstr "アカウントを利用できません"
-
-msgid "Active window"
-msgstr "アクティブなウィンドウ"
-
-msgid "Add an account to see its usage here."
-msgstr "アカウントを追加すると、ここに使用状況が表示されます。"
-
-msgid "AI usage"
-msgstr "AIの使用状況"
-
-msgid "All accounts appear on the edge unless you hide them."
-msgstr "非表示にしない限り、すべてのアカウントが画面端に表示されます。"
-
-msgid "All accounts are hidden."
-msgstr "すべてのアカウントが非表示です。"
-
-msgid "Awaiting refresh"
-msgstr "更新待ち"
-
-msgid "Celebrate quota resets"
-msgstr "上限のリセットをお祝いする"
-
-msgid "Choose an account"
-msgstr "アカウントを選択"
-
-msgid "Choose one account per menu bar icon. The notch shows all accounts unless you hide them. Missing or stale usage shows a dash."
-msgstr "メニューバーの各アイコンに表示するアカウントを選択します。画面端のパネルには非表示にしたものを除くすべてのアカウントが表示されます。使用量が不明または古い場合はダッシュで表示されます。"
-
-msgid "Could not load accounts. Refresh to try again."
-msgstr "アカウントを読み込めませんでした。更新して再試行してください。"
-
-msgid "Could not load usage display settings."
-msgstr "使用状況の表示設定を読み込めませんでした。"
-
-msgid "Could not open usage."
-msgstr "使用状況を開けませんでした。"
-
-msgid "Could not save account color."
-msgstr "アカウントの色を保存できませんでした。"
-
-msgid "Could not save usage display settings."
-msgstr "使用状況の表示設定を保存できませんでした。"
-
-msgid "Credit balance"
-msgstr "クレジット残高"
-
-msgid "Credits"
-msgstr "クレジット"
-
-msgid "Default account"
-msgstr "既定のアカウント"
-
-msgid "Default color"
-msgstr "既定の色"
-
-msgid "Enter a six-digit hex color."
-msgstr "6桁の16進数の色を入力してください。"
-
-msgid "Floats above other apps. Shows session and weekly usage for your quick-view accounts."
-msgstr "他のアプリの上に表示します。クイックビューのアカウントのセッションと週間使用量を表示します。"
-
-msgid "Hex color"
-msgstr "16進数の色"
-
-msgid "Hide account"
-msgstr "アカウントを非表示"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0}"
-msgstr "最終確認 {0}"
-
-#. placeholder {0}: formatRelativeTime(reading.checkedAt)
-msgid "Last checked {0} · not live"
-msgstr "最終確認 {0} · 最新ではありません"
-
-msgid "Last checked {relativeTime}"
-msgstr "最終確認 {relativeTime}"
-
-msgid "Last checked {relativeTime} · not live"
-msgstr "最終確認 {relativeTime} · 最新ではありません"
-
-msgid "Loading accounts…"
-msgstr "アカウントを読み込み中…"
-
-msgid "Manage accounts"
-msgstr "アカウントを管理"
-
-msgid "Menu bar"
-msgstr "メニューバー"
-
-msgid "Menu bar accounts"
-msgstr "メニューバーのアカウント"
-
-msgid "Menu bar quota window"
-msgstr "メニューバーの使用量の期間"
-
-#. placeholder {0}: formatRelativeTime(resets.nextExpiry)
-msgid "Next expires {0}"
-msgstr "次の有効期限：{0}"
-
-msgid "Open usage"
-msgstr "使用状況を開く"
-
-msgid "Percentage"
-msgstr "パーセント"
-
-msgid "Prepaid balance"
-msgstr "前払い残高"
-
-msgid "Primary display"
-msgstr "メインディスプレイ"
-
-msgid "Provider icons and percentages"
-msgstr "プロバイダーのアイコンとパーセント"
-
-msgid "Quota exhausted. Reset time unavailable"
-msgstr "利用枠を使い切りました。リセット時刻は不明です"
-
-msgid "Quota exhausted. Resets in {countdown}"
-msgstr "利用枠を使い切りました。{countdown}後にリセット"
-
-msgid "Refresh usage"
-msgstr "使用状況を更新"
-
-msgid "remaining"
-msgstr "残り"
-
-msgid "Remaining"
-msgstr "残り"
-
-#. placeholder {0}: formatRelativeTime(new Date(quota.resetsAt))
-#. placeholder {0}: formatRelativeTime(new Date(w.resetsAt))
-msgid "Resets {0}"
-msgstr "{0}にリセット"
-
-msgid "Right screen edge"
-msgstr "画面の右端"
-
-msgid "Search accounts"
-msgstr "アカウントを検索"
-
-msgid "Session allowance renewed"
-msgstr "セッションの利用枠が回復しました"
-
-msgid "Session confetti and a larger weekly celebration. Respects reduced motion."
-msgstr "セッションには紙吹雪、週間リセットにはより華やかな演出。視差効果を減らす設定に従います。"
-
-msgid "Show account"
-msgstr "アカウントを表示"
-
-msgid "Show all accounts"
-msgstr "すべてのアカウントを表示"
-
-msgid "Show hidden"
-msgstr "非表示のアカウントを表示"
-
-msgid "Sign in again"
-msgstr "再ログイン"
-
-msgid "Superset logo"
-msgstr "Supersetロゴ"
-
-msgid "Usage at a glance"
-msgstr "使用状況をひと目で確認"
-
-msgid "Usage display settings"
-msgstr "使用状況の表示設定"
-
-msgid "Usage unavailable"
-msgstr "使用状況を取得できません"
-
-msgid "Usage unavailable. Open Superset to check the connection."
-msgstr "使用状況を取得できません。Supersetを開いて接続を確認してください。"
-
-msgid "used"
-msgstr "使用済み"
-
-msgid "Used"
-msgstr "使用済み"
-
-msgid "Used in the menu bar and floating panel."
-msgstr "メニューバーとフローティングパネルで使用します。"
-
-msgid "Weekly allowance renewed"
-msgstr "週間の利用枠が回復しました"
-
-msgid "Your accounts and quotas, in the menu bar or on the right screen edge."
-msgstr "アカウントと利用枠をメニューバーまたは画面の右端に表示します。"
