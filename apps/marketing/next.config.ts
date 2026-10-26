@@ -4,6 +4,7 @@ import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { readRootDomain } from "@superset/shared/app-identity";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 import { buildLegacyRedirects } from "./src/lib/legacy-redirects";
@@ -47,7 +48,7 @@ const contentSecurityPolicy = [
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
+		...withOwnDomainTwins([apiOrigin]),
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.posthog.com",

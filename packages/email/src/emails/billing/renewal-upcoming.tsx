@@ -65,7 +65,7 @@ export function RenewalUpcomingEmail({
 				{isOwner ? (
 					<>
 						update it before {formattedRenewalDate} so the renewal doesn't fail
-						— open Superset and go to <strong>Settings → Billing</strong>.
+						— open Paradev and go to <strong>Settings → Billing</strong>.
 					</>
 				) : (
 					<>

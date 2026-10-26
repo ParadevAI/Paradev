@@ -36,6 +36,7 @@ export function AccountTerminalDialog({
 	const [configId, setConfigId] = useState("");
 	const [launching, setLaunching] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
+	const [refreshError, setRefreshError] = useState<string | null>(null);
 	const choices = (configs.data ?? []).filter(
 		(config) => config.presetId === "claude" || config.presetId === "codex",
 	);
@@ -114,7 +115,7 @@ export function AccountTerminalDialog({
 				onConfigChange={setConfigId}
 				accounts={accounts.data?.supported ? accounts.data.accounts : []}
 				provider={provider}
-				quotas={quota.isError ? [] : (quota.data ?? [])}
+				quotas={quota.isError || refreshError ? [] : (quota.data ?? [])}
 				loading={
 					configs.isPending ||
 					(selectedConfigExists && accounts.isPending) ||
@@ -122,15 +123,24 @@ export function AccountTerminalDialog({
 				}
 				refreshing={refreshing || accounts.isFetching || quota.isFetching}
 				error={error}
+				notice={refreshError}
 				launching={launching}
 				onRefresh={async () => {
 					setRefreshing(true);
+					setRefreshError(null);
 					try {
-						await Promise.allSettled([
+						const [, usageResult] = await Promise.allSettled([
 							accounts.refetch(),
 							quota.refresh(),
 							...(surface === "chat" ? [capabilities.refetch()] : []),
 						]);
+						if (usageResult?.status === "rejected")
+							setRefreshError(
+								errorMessage(
+									usageResult.reason,
+									t({ message: "Could not refresh usage" }),
+								),
+							);
 					} finally {
 						setRefreshing(false);
 					}

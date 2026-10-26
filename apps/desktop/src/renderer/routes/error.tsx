@@ -44,7 +44,7 @@ export function ErrorPage({ error, info }: ErrorComponentProps) {
 						</h1>
 						<p className="text-sm text-muted-foreground">
 							<Trans>
-								Superset hit an unexpected error. Reload to try again.
+								Paradev hit an unexpected error. Reload to try again.
 							</Trans>
 						</p>
 					</div>

@@ -21,11 +21,11 @@ keywords:
   - claude code vs codex
 ---
 
-Claude Code is Anthropic's coding agent. It has the widest range of parallel modes of any agent, with subagents, `/batch` runs across worktrees, cloud sessions, and Remote Control, but it needs a paid Claude plan or an API key and runs only Anthropic's models. Other strong agents now exist, and the best one for a task can change from one release to the next. Superset lets you keep Claude Code and run any of these alternatives beside it, each in its own Git worktree, so you can compare the diffs on your own code.
+Claude Code is Anthropic's coding agent. It has the widest range of parallel modes of any agent, with subagents, `/batch` runs across worktrees, cloud sessions, and Remote Control, but it needs a paid Claude plan or an API key and runs only Anthropic's models. Other strong agents now exist, and the best one for a task can change from one release to the next. Paradev lets you keep Claude Code and run any of these alternatives beside it, each in its own Git worktree, so you can compare the diffs on your own code.
 
-**Our recommendation: keep Claude Code, and use Superset to try the alternatives side by side on the same task.** The list below covers the agents worth trying, from free and open-source options to other labs' agents.
+**Our recommendation: keep Claude Code, and use Paradev to try the alternatives side by side on the same task.** The list below covers the agents worth trying, from free and open-source options to other labs' agents.
 
-[Download Superset](/download) to run two agents on one task, or read [Superset vs Claude Code](/compare/superset-vs-claude-code) for how the two fit together. This guide is published by Superset; recommendations describe workflow fit rather than benchmark results.
+[Download Paradev](/download) to run two agents on one task, or read [Paradev vs Claude Code](/compare/superset-vs-claude-code) for how the two fit together. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
 
 ---
 
@@ -39,7 +39,7 @@ Claude Code is Anthropic's coding agent. It has the widest range of parallel mod
 | **GitHub Copilot CLI** | GitHub-centric teams, several vendors' models | Claude, GPT, Gemini, Grok, Kimi | Free tier; Pro $10, Pro+ $39, Max $100/mo | Proprietary |
 | **Amp** | Letting the vendor pick the model | Several, chosen by mode | Free with your own compute and keys; Individual $20/mo | Proprietary |
 | **Cursor CLI** | Cursor users who want a terminal agent | Cursor's model list | Cursor plans, free tier included | Proprietary |
-| **Superset** | Running Claude Code and these agents side by side | Whatever each agent uses | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | Source-available (ELv2) |
+| **Paradev** | Running Claude Code and these agents side by side | Whatever each agent uses | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | Source-available (ELv2) |
 
 ## Why Look for a Claude Code Alternative?
 
@@ -57,43 +57,43 @@ Claude Code is strong for deep, multi-step work. Common reasons to look further:
 
 OpenAI's agent is open source under Apache-2.0 and comes with ChatGPT plans, so one subscription covers the CLI, the IDE extension, the ChatGPT desktop app, cloud tasks, and code review. It has subagents, worktrees, `codex exec` for CI, an SDK, and a GitHub Action. It is the closest like-for-like alternative to Claude Code.
 
-See [Claude Code vs Codex](/compare/claude-code-vs-codex) and [Superset vs Codex](/compare/superset-vs-codex).
+See [Claude Code vs Codex](/compare/claude-code-vs-codex) and [Paradev vs Codex](/compare/superset-vs-codex).
 
 ### Antigravity CLI
 
 Google's `agy` shares its agent harness with the Antigravity desktop app, runs async subagents that can each take a worktree, and is free with weekly limits. It includes Gemini, Claude, and gpt-oss models, so it is the cheapest way to keep using Claude models in a different agent.
 
-See [Claude Code vs Antigravity CLI](/compare/claude-code-vs-antigravity-cli) and [Superset vs Google Antigravity](/compare/superset-vs-antigravity).
+See [Claude Code vs Antigravity CLI](/compare/claude-code-vs-antigravity-cli) and [Paradev vs Google Antigravity](/compare/superset-vs-antigravity).
 
 ### OpenCode
 
 OpenCode is the most popular open-source agent with free choice of provider. It has a terminal UI, a desktop app, an IDE extension, built-in subagents, and a server with an SDK. It is MIT-licensed and free; you pay only for the models.
 
-See [Claude Code vs OpenCode](/compare/claude-code-vs-opencode) and [Superset vs OpenCode](/compare/superset-vs-opencode).
+See [Claude Code vs OpenCode](/compare/claude-code-vs-opencode) and [Paradev vs OpenCode](/compare/superset-vs-opencode).
 
 ### GitHub Copilot CLI
 
 Copilot's terminal agent offers models from several vendors, including Claude, on one plan, starting with a free tier. Issues, pull requests, and the GitHub MCP server are built in, and `/delegate` hands work to Copilot's cloud agent.
 
-See [Claude Code vs Copilot CLI](/compare/claude-code-vs-copilot-cli) and [Superset vs GitHub Copilot](/compare/superset-vs-github-copilot).
+See [Claude Code vs Copilot CLI](/compare/claude-code-vs-copilot-cli) and [Paradev vs GitHub Copilot](/compare/superset-vs-github-copilot).
 
 ### Amp
 
 Amp picks models for you by mode, runs work on "orbs," cloud machines that keep going after you close your laptop, and runners that create Git worktrees. It is free with your own compute and keys, and since October 2026 it can use a Claude Pro or Max plan.
 
-See [Claude Code vs Amp](/compare/claude-code-vs-amp) and [Superset vs Amp](/compare/superset-vs-amp).
+See [Claude Code vs Amp](/compare/claude-code-vs-amp) and [Paradev vs Amp](/compare/superset-vs-amp).
 
 ### Cursor CLI
 
 Cursor's terminal agent shares worktrees, rules, and MCP config with the Cursor editor and its Cloud Agents. Choose it if you already pay for Cursor.
 
-See [Claude Code vs Cursor CLI](/compare/claude-code-vs-cursor-cli) and [Superset vs Cursor](/compare/superset-vs-cursor).
+See [Claude Code vs Cursor CLI](/compare/claude-code-vs-cursor-cli) and [Paradev vs Cursor](/compare/superset-vs-cursor).
 
-### Superset (to run them all)
+### Paradev (to run them all)
 
-Superset is not an agent. It is a desktop workspace that runs Claude Code and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Superset never proxies model calls. Give the same prompt to Claude Code and Codex in two workspaces, review both diffs in the Changes pane, preview the result in the in-app browser, and open a PR from the better one. You can also continue a stuck session with a different agent, schedule agents as automations, and check on them from the [iPhone and iPad app](/mobile).
+Paradev is not an agent. It is a desktop workspace that runs Claude Code and every agent above, each in its own Git worktree and terminal, on your own subscriptions and keys; Paradev never proxies model calls. Give the same prompt to Claude Code and Codex in two workspaces, review both diffs in the Changes pane, preview the result in the in-app browser, and open a PR from the better one. You can also continue a stuck session with a different agent, schedule agents as automations, and check on them from the [iPhone and iPad app](/mobile).
 
-See [Superset vs Claude Code](/compare/superset-vs-claude-code).
+See [Paradev vs Claude Code](/compare/superset-vs-claude-code).
 
 ## How To Choose
 
@@ -102,20 +102,20 @@ See [Superset vs Claude Code](/compare/superset-vs-claude-code).
 - For open source with any model, choose **OpenCode**.
 - For GitHub-centric teams on one low-cost plan, choose **Copilot CLI**.
 - To let the vendor pick the model, choose **Amp**.
-- To compare any of them with Claude Code on your own repository, use **Superset**.
+- To compare any of them with Claude Code on your own repository, use **Paradev**.
 
 ## Verdict
 
-There is no single best agent; each one is strongest on its own vendor's models. You do not have to give up Claude Code to try another. Run Claude Code and one alternative on the same task in Superset, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
+There is no single best agent; each one is strongest on its own vendor's models. You do not have to give up Claude Code to try another. Run Claude Code and one alternative on the same task in Paradev, compare the diffs, and keep whichever works best for each kind of task. For the full agent comparison, see [Best Coding Agents](/compare/best-coding-agents).
 
 ## What To Try First
 
-- **Keep Claude Code:** launch it in a Superset workspace.
+- **Keep Claude Code:** launch it in a Paradev workspace.
 - **Add an alternative:** start a second workspace from the same branch with Codex or OpenCode.
 - **Give both the same prompt:** each agent works in its own worktree.
 - **Compare:** review both diffs, run your checks, and open a PR from the better one.
 
-[Download Superset](/download), then follow [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
+[Download Paradev](/download), then follow [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
 
 ## Frequently Asked Questions
 
@@ -133,4 +133,4 @@ Yes. Codex CLI (Apache-2.0) and OpenCode (MIT) are open source. Claude Code is p
 
 ### Can I use Claude Code and an alternative together?
 
-Yes. Superset runs Claude Code and other CLI agents side by side, each in its own Git worktree, so they cannot overwrite each other's files. You pay each provider for its own usage.
+Yes. Paradev runs Claude Code and other CLI agents side by side, each in its own Git worktree, so they cannot overwrite each other's files. You pay each provider for its own usage.

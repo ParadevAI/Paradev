@@ -3,7 +3,7 @@ import { isSupportedLocale } from "@superset/i18n";
 import { getI18nInstance, preloadServerLocale } from "@superset/i18n/server";
 import type { PlanFamily } from "@superset/shared/billing";
 import { BRAND } from "@superset/shared/brand";
-import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
+import { COMPANY } from "@superset/shared/constants";
 import { MCP_CAPABILITIES } from "@/app/[lang]/mcp-install/components/McpCapabilities/constants";
 import {
 	COMPARISON_SECTIONS,
@@ -26,6 +26,7 @@ import {
 	planPriceValues,
 } from "@/app/[lang]/pricing/utils/planPriceValues";
 import { fetchParticipant } from "@/app/[lang]/utils/fetchLeaderboard";
+import { env } from "@/env";
 import { getBlogPost } from "@/lib/blog";
 import { getCategoryPage } from "@/lib/category";
 import { getChangelogEntry } from "@/lib/changelog";
@@ -101,7 +102,7 @@ function pricingPage(i18n: I18n, catalog: PlanFamily[]): MarkdownPage {
 								`  - ${i18n._({ ...line, values: featureValues(set) })}`,
 						),
 				]),
-			`- [${i18n._({ ...tier.cta.label, values: { plan: tierName(tier) } })}](${tier.price.kind === "seat" ? checkoutHref(CANONICAL_URLS.APP, tier.id, Boolean(set?.hasYearlyDiscount)) : tier.cta.href.startsWith("/") ? baseUrl + tier.cta.href : tier.cta.href})`,
+			`- [${i18n._({ ...tier.cta.label, values: { plan: tierName(tier) } })}](${tier.price.kind === "seat" ? checkoutHref(env.NEXT_PUBLIC_WEB_URL, tier.id, Boolean(set?.hasYearlyDiscount)) : tier.cta.href.startsWith("/") ? baseUrl + tier.cta.href : tier.cta.href})`,
 			"",
 		];
 	});
@@ -158,7 +159,7 @@ function mcpInstallPage(i18n: I18n): MarkdownPage {
 		url: `${baseUrl}/mcp-install`,
 		description: `Connect Claude, Codex, Cursor, or any MCP client to ${BRAND.NAME}. Create tasks, spin up workspaces, launch agents, and run automations straight from your AI agent.`,
 		content: [
-			`Server URL: ${MCP_SERVER_URL} (Streamable HTTP). Authentication: OAuth 2.1 + PKCE with dynamic client registration, or a Superset API key as a Bearer token. Walkthrough: ${baseUrl}/auth.md`,
+			`Server URL: ${MCP_SERVER_URL} (Streamable HTTP). Authentication: OAuth 2.1 + PKCE with dynamic client registration, or a ${BRAND.NAME} API key as a Bearer token. Walkthrough: ${baseUrl}/auth.md`,
 			"",
 			"## Generic MCP client config",
 			"",
@@ -198,8 +199,7 @@ function teamPage(): MarkdownPage {
 	return {
 		title: `About ${BRAND.NAME}`,
 		url: `${baseUrl}/team`,
-		description:
-			"What Superset is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.",
+		description: `What ${BRAND.NAME} is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.`,
 		content: [
 			"## Team",
 			"",
@@ -237,7 +237,7 @@ function enterprisePage(i18n: I18n): MarkdownPage {
 			"",
 			"## Where your code runs",
 			"",
-			"On your machines. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset never proxies model API calls.",
+			`On your machines. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. ${BRAND.NAME} never proxies model API calls.`,
 			"",
 			"## Get in touch",
 			"",

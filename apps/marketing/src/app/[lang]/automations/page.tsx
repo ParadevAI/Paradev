@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import { CTASection } from "@/app/[lang]/components/CTASection";
@@ -18,7 +18,7 @@ const VIDEO_URL = "https://www.youtube.com/watch?v=ixe-PiRJTag";
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
-	const title = i18n._(msg({ message: "Superset Automations" }));
+	const title = i18n._(msg({ message: "Paradev Automations" }));
 	const description = i18n._(
 		msg({
 			message:
@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			title,
 			description,
 			images: [image.url],
-			creator: "@superset_sh",
+			creator: SOCIAL.X.handle,
 		},
 	};
 }
@@ -62,7 +62,7 @@ export default async function AutomationsPage() {
 				<section>
 					<div className="max-w-3xl">
 						<p className="font-mono text-brand text-xs uppercase tracking-wider">
-							<Trans>Superset Automations</Trans>
+							<Trans>Paradev Automations</Trans>
 						</p>
 						<h1 className="mt-4 font-medium text-balance text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>Run agents on a schedule or when something happens.</Trans>
@@ -82,7 +82,7 @@ export default async function AutomationsPage() {
 						rel="noopener noreferrer"
 						className="mt-4 inline-flex items-center gap-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground"
 					>
-						<Trans>Watch the Superset Automations video on YouTube</Trans>
+						<Trans>Watch the Paradev Automations video on YouTube</Trans>
 						<ArrowUpRight className="size-3.5" />
 					</a>
 				</section>

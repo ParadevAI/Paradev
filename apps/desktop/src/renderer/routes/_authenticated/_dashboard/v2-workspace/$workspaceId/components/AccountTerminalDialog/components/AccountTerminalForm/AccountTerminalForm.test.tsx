@@ -331,3 +331,36 @@ test("a response received after mount stays visible immediately without waiting 
 		clock.mockRestore();
 	}
 });
+
+test("a usage refresh notice keeps manual account selection available", async () => {
+	const input = props();
+	const view = render(
+		<AccountTerminalForm {...input} notice="Could not refresh usage" />,
+	);
+	expect(view.getByRole("status").textContent).toBe("Could not refresh usage");
+	fireEvent.click(view.getByRole("radio"));
+	await act(async () => {
+		fireEvent.submit(view.container.querySelector("form") as HTMLFormElement);
+	});
+	expect(input.onLaunch).toHaveBeenCalledTimes(1);
+});
+
+test("an unknown launch failure uses the caller-specific account-switch message", async () => {
+	const input = props();
+	input.onLaunch = mock(async () => {
+		throw null;
+	});
+	const view = render(
+		<AccountTerminalForm
+			{...input}
+			submitLabel="Switch account"
+			launchFailureMessage="Could not switch account"
+		/>,
+	);
+	fireEvent.click(view.getByRole("radio"));
+	await act(async () => {
+		fireEvent.submit(view.container.querySelector("form") as HTMLFormElement);
+	});
+	expect(view.getByRole("alert").textContent).toBe("Could not switch account");
+	expect(input.onLaunch).toHaveBeenCalledTimes(1);
+});

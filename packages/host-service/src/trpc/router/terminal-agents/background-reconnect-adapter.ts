@@ -148,8 +148,10 @@ function context(
 	if (
 		originalReason !== null &&
 		!["detached", "terminal-exited", "disposed"].includes(originalReason)
-	)
+	) {
+		if (discovery && !marker) return null;
 		return refuse();
+	}
 	const original = marker
 		? { ...binding, endReason: originalReason, resumedIntoTerminalId: null }
 		: binding;
@@ -578,21 +580,48 @@ export function backgroundReconnectAdapter(
 					client.cwd !== proof.target.worktreePath
 				)
 					return refuse();
-				ctx.db
-					.insert(terminalAgentBindings)
-					.values({
-						terminalId,
-						workspaceId: source.workspaceId,
-						agentId: "claude",
-						agentSessionId: source.sessionId,
-						definitionId: requireSource(source).binding.definitionId,
-						launchId,
-						accountJson: JSON.stringify(source.account),
-						startedAt: now,
-						lastEventAt: now,
-						lastEventType: "Attached",
-					})
-					.run();
+				const existing = ctx.db
+					.select()
+					.from(terminalAgentBindings)
+					.where(eq(terminalAgentBindings.terminalId, terminalId))
+					.get();
+				if (
+					existing &&
+					(existing.workspaceId !== source.workspaceId ||
+						existing.agentId !== "claude" ||
+						existing.agentSessionId !== source.sessionId ||
+						existing.endedAt !== null ||
+						existing.endReason !== null ||
+						existing.resumedIntoTerminalId !== null ||
+						(existing.definitionId !== null &&
+							existing.definitionId !== current.binding.definitionId) ||
+						(existing.launchId !== null && existing.launchId !== launchId) ||
+						(existing.accountJson !== null &&
+							!isDeepStrictEqual(
+								parsePersistedSessionAccount(existing.accountJson),
+								source.account,
+							)))
+				)
+					return refuse();
+				const adopted = {
+					terminalId,
+					workspaceId: source.workspaceId,
+					agentId: "claude" as const,
+					agentSessionId: source.sessionId,
+					definitionId: current.binding.definitionId,
+					launchId,
+					accountJson: JSON.stringify(source.account),
+					startedAt: existing?.startedAt ?? now,
+					lastEventAt: now,
+					lastEventType: "Attached",
+				};
+				if (existing)
+					ctx.db
+						.update(terminalAgentBindings)
+						.set(adopted)
+						.where(eq(terminalAgentBindings.terminalId, terminalId))
+						.run();
+				else ctx.db.insert(terminalAgentBindings).values(adopted).run();
 				ctx.db
 					.update(terminalAgentBindings)
 					.set({

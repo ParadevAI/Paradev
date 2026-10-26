@@ -4,7 +4,7 @@ import { WebFetchTool } from "@/components/ai-elements/web-fetch-tool";
 
 const FETCHED_CONTENT = `# Workspaces
 
-Superset workspaces are isolated git worktrees. Each workspace gets:
+Paradev workspaces are isolated git worktrees. Each workspace gets:
 
 - Its own branch, checked out from the repo default branch
 - An isolated working directory under ~/.superset/worktrees

@@ -251,7 +251,7 @@ export function CloudAuthDialog({
 							<DialogTitle>{label}</DialogTitle>
 							<DialogDescription>
 								<Trans>
-									How {label} signs in when Superset runs it for you.
+									How {label} signs in when Paradev runs it for you.
 								</Trans>
 							</DialogDescription>
 						</DialogHeader>

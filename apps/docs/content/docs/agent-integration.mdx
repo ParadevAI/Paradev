@@ -36,7 +36,7 @@ Run AI coding agents in isolated workspaces. Each agent works independently with
 
 ## Chat
 
-Superset includes a built-in chat panel for AI interactions without leaving the app.
+Paradev includes a built-in chat panel for AI interactions without leaving the app.
 
 - Use the model picker to choose supported models and connect providers
 - Chat session titles are generated automatically from the conversation
@@ -46,7 +46,7 @@ Superset includes a built-in chat panel for AI interactions without leaving the 
 
 The model pickers include **GPT-6 Astra**, **GPT-6 Sol**, and **GPT-6 Luna**,
 and **Opus 5.5** and **Sonnet 5.5**, wherever the agent supports them: Claude
-Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Superset
+Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Paradev
 Chat. In the Codex picker, **GPT-5.5** is under **Retiring 2026-10-14**, and
 the retired GPT-5.4 and GPT-5.3 Codex are gone. Available reasoning levels depend on the agent and model; see the [launch options](/cli/cli-reference#agent-effort-levels).
 
@@ -56,11 +56,11 @@ Go to **Settings → Agents** to change how each agent launches, reorder agents,
 
 - **Label** and **Icon** - How the agent appears in launchers and the list
 - **Command** - The command used to launch the agent
-- **Prompt-only args** - Arguments added only when Superset launches the agent with a prompt
+- **Prompt-only args** - Arguments added only when Paradev launches the agent with a prompt
 - **Prompt transport** - How the prompt is delivered to the process (as an argument or on stdin)
 - **Resume args** - Arguments used to restore a session by its id (e.g. `--resume`)
 - **Fork args** - Arguments used to clone a session by its id. Put `{sessionId}` where the id belongs (e.g. `--resume {sessionId} --fork-session`); leave empty if the agent cannot fork
-- **Superset hooks** - Whether Superset installs its status hooks for the agent
+- **Paradev hooks** - Whether Paradev installs its status hooks for the agent
 - **Restore defaults** - Restore the shipped configuration for a built-in agent
 
 To add an agent that isn't built in, choose **Add agent → Custom agent…**. A custom agent runs in its own worktree like any other. To see which features each built-in agent supports, see [Supported Agents](/supported-agents).
@@ -77,8 +77,8 @@ claude "Add error handling to fetchUser"
 
 When launching an agent from a task, the **Auto-run command** toggle controls whether it executes immediately.
 
-- **On** - Terminal agents run their command right away, and Superset Chat sends the task prompt immediately
-- **Off** - Terminal agents stage the command without pressing Enter, and Superset Chat opens as a draft instead
+- **On** - Terminal agents run their command right away, and Paradev Chat sends the task prompt immediately
+- **Off** - Terminal agents stage the command without pressing Enter, and Paradev Chat opens as a draft instead
 
 The setting is remembered between sessions.
 
@@ -106,8 +106,8 @@ Get notified when agents finish. Configure sounds in Settings.
 
 ## Agent Skills
 
-Teach any agent to drive Superset itself with the official [skills](https://github.com/superset-sh/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
+Teach any agent to drive Paradev itself with the official [skills](https://github.com/paradevai/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
 
 ```bash
-npx skills add superset-sh/skills
+npx skills add paradevai/skills
 ```

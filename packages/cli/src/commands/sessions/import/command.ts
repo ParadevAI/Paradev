@@ -7,7 +7,7 @@ import {
 
 export default command({
 	description:
-		"Adopt a session the agent started outside Superset into a new chat session",
+		"Adopt a session the agent started outside Paradev into a new chat session",
 	options: {
 		...sessionWorkspaceOptions,
 		agent: string()

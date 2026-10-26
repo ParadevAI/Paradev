@@ -10,7 +10,7 @@ const YOUTUBE_ID = "KHEDsIHKcu4";
 export function PagesDemoVideo() {
 	const { t } = useLingui();
 	const [isPlaying, setIsPlaying] = useState(false);
-	const title = t({ message: "Superset Pages demo" });
+	const title = t({ message: "Paradev Pages demo" });
 
 	return (
 		<div className="relative aspect-video w-full overflow-hidden border border-border bg-card">
@@ -26,7 +26,7 @@ export function PagesDemoVideo() {
 				<button
 					type="button"
 					onClick={() => setIsPlaying(true)}
-					aria-label={t({ message: "Play the Superset Pages demo" })}
+					aria-label={t({ message: "Play the Paradev Pages demo" })}
 					className="group absolute inset-0 size-full"
 				>
 					<Image

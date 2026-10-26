@@ -69,7 +69,7 @@ export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
 						})}
 						description={t({
 							message:
-								"Get notified when Superset is available on Windows & Linux.",
+								"Get notified when Paradev is available on Windows & Linux.",
 						})}
 					/>
 				</div>

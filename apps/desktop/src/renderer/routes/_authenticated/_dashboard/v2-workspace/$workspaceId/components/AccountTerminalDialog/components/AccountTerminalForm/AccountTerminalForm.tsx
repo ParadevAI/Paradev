@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import {
@@ -21,7 +22,7 @@ import {
 } from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "resume" | "chat";
+	mode?: "start" | "resume" | "chat" | "browse";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -31,8 +32,10 @@ interface AccountTerminalFormProps {
 	loading: boolean;
 	refreshing: boolean;
 	error: string | null;
+	notice?: string | null;
 	launching: boolean;
 	submitLabel?: string;
+	launchFailureMessage?: string;
 	launchDisabled?: boolean;
 	onRefresh: () => Promise<void>;
 	onCancel: () => void;
@@ -52,14 +55,17 @@ export function AccountTerminalForm({
 	loading,
 	refreshing,
 	error,
+	notice,
 	launching,
 	submitLabel,
+	launchFailureMessage,
 	launchDisabled = false,
 	onRefresh,
 	onCancel,
 	onLaunch,
 }: AccountTerminalFormProps) {
 	const { t } = useLingui();
+	const { formatPercent } = useFormat();
 	const agentId = useId();
 	const radioName = useId();
 	const [selected, setSelected] = useState<string | null>(null);
@@ -72,7 +78,7 @@ export function AccountTerminalForm({
 		return () => clearInterval(timer);
 	}, []);
 	const recommendation =
-		!error && !loading && !refreshing
+		!error && !notice && !loading && !refreshing
 			? bestRemainingAccount(accounts, provider, quotas, now)
 			: undefined;
 	const recommendedKey = recommendation ? accountKey(recommendation) : null;
@@ -115,9 +121,14 @@ export function AccountTerminalForm({
 					setLaunchError(
 						errorMessage(
 							cause,
-							mode === "resume"
-								? t({ message: "Could not resume this conversation" })
-								: t({ message: "Could not start agent terminal" }),
+							launchFailureMessage ??
+								(mode === "resume"
+									? t({ message: "Could not resume this conversation" })
+									: mode === "browse"
+										? t({ message: "Could not load saved conversations" })
+										: mode === "chat"
+											? t({ message: "Could not start chat" })
+											: t({ message: "Could not start agent terminal" })),
 						),
 					);
 				} finally {
@@ -199,6 +210,7 @@ export function AccountTerminalForm({
 											{quota.windows.map((window) => {
 												const remaining =
 													Math.round((100 - window.usedPercent) * 10) / 10;
+												const remainingPercent = formatPercent(remaining / 100);
 												return (
 													<span
 														key={window.id}
@@ -210,7 +222,7 @@ export function AccountTerminalForm({
 																remaining <= 10 ? "text-destructive" : undefined
 															}
 														>
-															<Trans>{remaining}% remaining</Trans>
+															<Trans>{remainingPercent} remaining</Trans>
 														</span>
 													</span>
 												);
@@ -227,6 +239,9 @@ export function AccountTerminalForm({
 					})}
 				</div>
 			</fieldset>
+			{notice && (
+				<output className="text-sm text-muted-foreground">{notice}</output>
+			)}
 			{failure && (
 				<p role="alert" className="text-sm text-destructive">
 					{failure}
@@ -259,6 +274,8 @@ export function AccountTerminalForm({
 							<Trans>Resume conversation</Trans>
 						) : mode === "chat" ? (
 							<Trans>Start chat</Trans>
+						) : mode === "browse" ? (
+							<Trans>Browse saved history</Trans>
 						) : (
 							(submitLabel ?? <Trans>Start terminal</Trans>)
 						)}

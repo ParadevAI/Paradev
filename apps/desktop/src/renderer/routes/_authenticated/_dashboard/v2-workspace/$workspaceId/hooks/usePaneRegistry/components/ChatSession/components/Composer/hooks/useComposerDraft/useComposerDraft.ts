@@ -26,6 +26,13 @@ function clearStoredDraft(draftKey: string, persisted: boolean) {
 	for (const notify of clearedDraftListeners.get(draftKey) ?? []) notify();
 }
 
+export function discardComposerDraft(draftKey: string, persisted = true) {
+	pendingSubmissions.delete(draftKey);
+	recoveredAfterRead.delete(draftKey);
+	inFlightSubmissions.delete(draftKey);
+	clearStoredDraft(draftKey, persisted);
+}
+
 function readDraft(draftKey: string, fallback?: string): string | undefined {
 	const unsaved = unsavedDrafts.get(draftKey);
 	if (unsaved !== undefined) return unsaved;

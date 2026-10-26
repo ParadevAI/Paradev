@@ -12,9 +12,9 @@ export function YcDealCodeEmail({
 	code = "YC-XXXXXXXX",
 }: YcDealCodeEmailProps) {
 	return (
-		<EmailLayout preview="Your code for 6 months of Superset Pro free">
+		<EmailLayout preview="Your code for 6 months of Paradev Pro free">
 			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Your Superset YC deal
+				Your Paradev YC deal
 			</Heading>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
@@ -23,7 +23,7 @@ export function YcDealCodeEmail({
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Thanks for redeeming our deal on Bookface. Here is your code for 6
-				months of Superset Pro free:
+				months of Paradev Pro free:
 			</Text>
 
 			<Section className="bg-surface border border-solid border-border rounded-md px-4 py-3 mb-4 text-center">
@@ -49,8 +49,7 @@ export function YcDealCodeEmail({
 			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				You're receiving this because you redeemed the Superset deal on
-				Bookface.
+				You're receiving this because you redeemed the Paradev deal on Bookface.
 			</Text>
 		</EmailLayout>
 	);

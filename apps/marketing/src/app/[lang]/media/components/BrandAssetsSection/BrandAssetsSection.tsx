@@ -11,7 +11,7 @@ export function BrandAssetsSection() {
 			</SectionHeading>
 			<p className="mt-6 text-muted-foreground leading-relaxed">
 				<Trans>
-					Download our logos and product images for use in coverage of Superset.
+					Download our logos and product images for use in coverage of Paradev.
 				</Trans>
 			</p>
 			<h3 className="mt-8 font-medium text-foreground">
