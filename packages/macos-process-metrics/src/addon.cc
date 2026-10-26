@@ -1,4 +1,6 @@
 #include <napi.h>
+#include <cmath>
+#include <limits>
 
 #ifdef __APPLE__
 #include <libproc.h>
@@ -47,7 +49,31 @@ Napi::Value GetPhysFootprints(const Napi::CallbackInfo& info) {
     return result;
 }
 
+// proc_pidpath is derived from the process text vnode, independent of launcher updates.
+Napi::Value GetExecutablePath(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() != 1 || !info[0].IsNumber()) {
+        Napi::TypeError::New(env, "Expected one positive PID").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const double value = info[0].As<Napi::Number>().DoubleValue();
+    if (!std::isfinite(value) || value != std::floor(value) || value <= 0 ||
+        value > std::numeric_limits<int>::max()) {
+        Napi::TypeError::New(env, "Expected one positive PID").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+#ifdef __APPLE__
+    char path[PROC_PIDPATHINFO_MAXSIZE] = {};
+    const int length = proc_pidpath(static_cast<pid_t>(value), path, sizeof(path));
+    if (length > 0 && static_cast<size_t>(length) < sizeof(path)) {
+        return Napi::String::New(env, path, static_cast<size_t>(length));
+    }
+#endif
+    return env.Null();
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set("getExecutablePath", Napi::Function::New(env, GetExecutablePath));
     exports.Set("getPhysFootprints",
                 Napi::Function::New(env, GetPhysFootprints));
     return exports;

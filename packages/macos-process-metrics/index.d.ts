@@ -10,3 +10,6 @@
  *          PIDs are silently omitted.
  */
 export function getPhysFootprints(pids: number[]): Record<number, number>;
+
+/** macOS process text-vnode path, or null on unsupported/unavailable observations. */
+export function getExecutablePath(pid: number): string | null;

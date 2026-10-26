@@ -9,6 +9,8 @@ import {
 	terminalRichInputOpenStore,
 	useTerminalRichInputOpen,
 } from "../../richInputOpenStore";
+import { ContinueBackgroundButton } from "./components/ContinueBackgroundButton";
+import { ResumeAccountButton } from "./components/ResumeAccountButton";
 import { TerminalConnectionIndicator } from "./components/TerminalConnectionIndicator";
 import { TerminalIdCopyMenu } from "./components/TerminalIdCopyMenu";
 import { TerminalPageWatchChip } from "./components/TerminalPageWatchChip";
@@ -58,6 +60,16 @@ export function TerminalPaneHeaderExtras({
 
 	return (
 		<div className="flex items-center gap-1">
+			<ContinueBackgroundButton
+				key={`continue-background:${workspaceId}:${terminalId}`}
+				workspaceId={workspaceId}
+				terminalId={terminalId}
+			/>
+			<ResumeAccountButton
+				key={`resume-account:${workspaceId}:${terminalId}`}
+				workspaceId={workspaceId}
+				terminalId={terminalId}
+			/>
 			<AccountUsage
 				key={`${workspaceId}:${terminalId}`}
 				workspaceId={workspaceId}

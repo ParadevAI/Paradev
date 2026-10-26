@@ -4,7 +4,7 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
@@ -25,6 +25,7 @@ import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import { useStore } from "zustand";
 import { useWorkspace } from "../providers/WorkspaceProvider";
+import { AccountTerminalDialog } from "./components/AccountTerminalDialog";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
@@ -273,8 +274,11 @@ function V2WorkspaceContent() {
 		close: closeRightSidebar,
 	});
 	const launcher = useV2TerminalLauncher();
+	const [accountTerminalOpen, setAccountTerminalOpen] = useState(false);
+	const accountTerminalReturnFocus = useRef<HTMLElement | null>(null);
 	const {
 		createNewAgentSession,
+		createAccountTerminal,
 		openAgentChat,
 		openNewChat,
 		focusAgentTerminal,
@@ -697,6 +701,14 @@ function V2WorkspaceContent() {
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
 											runAfterClose={runAfterClose}
+											onAddAccountTerminal={
+												isSandbox
+													? undefined
+													: (returnFocus) => {
+															accountTerminalReturnFocus.current = returnFocus;
+															setAccountTerminalOpen(true);
+														}
+											}
 											onAddChat={onAddChat}
 											onAddBrowser={
 												isRightPaneAreaEnabled ? undefined : addBrowserTab
@@ -776,6 +788,14 @@ function V2WorkspaceContent() {
 				recentlyViewedFiles={recentFiles}
 				openFilePaths={openFilePaths}
 			/>
+			{accountTerminalOpen && (
+				<AccountTerminalDialog
+					key={workspaceId}
+					onClose={() => setAccountTerminalOpen(false)}
+					onLaunch={createAccountTerminal}
+					returnFocus={accountTerminalReturnFocus.current}
+				/>
+			)}
 		</FileDocumentStoreProvider>
 	);
 }

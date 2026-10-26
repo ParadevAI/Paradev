@@ -81,6 +81,11 @@ jobs:
             sleep "$((attempt * 10))"
           done
 
+      - name: Build macOS executable verifier
+        if: startsWith(matrix.target, 'darwin-')
+        working-directory: packages/macos-process-metrics
+        run: npx --yes node-gyp@12.4.0 rebuild
+
       - name: Build distribution
         working-directory: packages/cli
         env:
