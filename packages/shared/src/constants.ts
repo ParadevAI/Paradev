@@ -1,6 +1,7 @@
 import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
 import { BRAND } from "./brand";
+import { OWN_ROOT_DOMAINS } from "./own-domains";
 
 export { CANONICAL_URLS, IOS_APP } from "./app-identity";
 
@@ -26,26 +27,44 @@ const MARKETING_URL =
 	process.env.NEXT_PUBLIC_MARKETING_URL || `https://${ROOT_DOMAIN}`;
 const APP_STORE_ID = "6788926383";
 
+export const SOCIAL = {
+	GITHUB: {
+		handle: "github.com/paradevai/paradev",
+		url: "https://github.com/paradevai/paradev",
+	},
+	X: { handle: "@paradevai", url: "https://x.com/paradevai" },
+	X_FORMER: { handle: "@superset_sh", url: "https://x.com/superset_sh" },
+	LINKEDIN: {
+		handle: "linkedin.com/company/paradevai",
+		url: "https://www.linkedin.com/company/paradevai",
+	},
+	YOUTUBE: { handle: "@paradevai", url: "https://www.youtube.com/@paradevai" },
+	DISCORD: {
+		handle: "discord.gg/cZeD9WYcV7",
+		url: "https://discord.gg/cZeD9WYcV7",
+	},
+} as const;
+
 export const COMPANY = {
 	NAME: BRAND.NAME,
 	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
-	GITHUB_URL: "https://github.com/superset-sh/superset",
+	GITHUB_URL: SOCIAL.GITHUB.url,
 	DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL || `https://docs.${ROOT_DOMAIN}`,
 	MARKETING_URL,
 	TERMS_URL: `${MARKETING_URL}/terms`,
 	PRIVACY_URL: `${MARKETING_URL}/privacy`,
 	CHANGELOG_URL: `${MARKETING_URL}/changelog`,
-	X_URL: "https://x.com/superset_sh",
-	LINKEDIN_URL: "https://www.linkedin.com/company/superset-sh",
-	YOUTUBE_URL: "https://www.youtube.com/@superset-sh",
+	X_URL: SOCIAL.X.url,
+	LINKEDIN_URL: SOCIAL.LINKEDIN.url,
+	YOUTUBE_URL: SOCIAL.YOUTUBE.url,
 	SUPPORT_EMAIL,
 	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
-	REPORT_ISSUE_URL: "https://github.com/superset-sh/superset/issues/new",
-	DISCORD_URL: "https://discord.gg/cZeD9WYcV7",
+	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
+	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,
 	APP_STORE_URL: `https://apps.apple.com/app/id${APP_STORE_ID}`,
 	STATUS_URL: `https://status.${ROOT_DOMAIN}`,
@@ -57,7 +76,10 @@ export const COMPANY = {
 
 // Staff keep their @superset.sh accounts after the root domain changes.
 export const STAFF_EMAIL_DOMAINS = [
-	...new Set([COMPANY.EMAIL_DOMAIN, "@superset.sh"]),
+	...new Set([
+		COMPANY.EMAIL_DOMAIN,
+		...OWN_ROOT_DOMAINS.map((domain) => `@${domain}`),
+	]),
 ];
 
 export function isStaffEmail(email: string): boolean {

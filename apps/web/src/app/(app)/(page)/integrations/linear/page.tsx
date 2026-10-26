@@ -62,7 +62,7 @@ export default async function LinearIntegrationPage({
 			withoutParam: i18n._(
 				msg({
 					message:
-						"This Linear workspace is already connected by another Superset organization.",
+						"This Linear workspace is already connected by another Paradev organization.",
 				}),
 			),
 		},
@@ -174,7 +174,7 @@ export default async function LinearIntegrationPage({
 						{i18n._(
 							msg({
 								message:
-									"Sync issues bidirectionally with Linear. Create tasks in Superset and have them appear in Linear, or import existing Linear issues.",
+									"Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues.",
 							}),
 						)}
 					</p>
@@ -222,7 +222,7 @@ export default async function LinearIntegrationPage({
 							{i18n._(
 								msg({
 									message:
-										"Configure how tasks sync between Superset and Linear.",
+										"Configure how tasks sync between Paradev and Linear.",
 								}),
 							)}
 						</CardDescription>
@@ -241,7 +241,7 @@ export default async function LinearIntegrationPage({
 								{i18n._(
 									msg({
 										message:
-											"Tasks created in Superset will be synced to this Linear team.",
+											"Tasks created in Paradev will be synced to this Linear team.",
 									}),
 								)}
 							</p>

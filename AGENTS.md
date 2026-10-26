@@ -116,7 +116,8 @@ Details: `docs/plugins.md`.
 
 When work wants a fresh isolated environment, a parallel agent, or a long-running job, reach for the
 `superset` CLI instead of hand-rolling git worktrees or doing it all serially in this one. It's
-already on `PATH` in Superset terminals, and we dogfood it.
+already on `PATH` in Superset terminals, and we dogfood it. `paradev` is an alias for the same
+binary; write `superset` in code and docs here.
 
 Replace the capitalized placeholders before running these:
 

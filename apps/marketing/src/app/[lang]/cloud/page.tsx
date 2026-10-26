@@ -11,9 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	return {
-		title: i18n._(
-			msg({ message: "Build the future of Superset in the cloud" }),
-		),
+		title: i18n._(msg({ message: "Build the future of Paradev in the cloud" })),
 		description: i18n._(
 			msg({ message: "Cloud is coming. Become a design partner" }),
 		),
@@ -35,7 +33,7 @@ export default async function CloudPage() {
 						</span>
 					</div>
 					<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-						<Trans>Build the future of Superset in the cloud</Trans>
+						<Trans>Build the future of Paradev in the cloud</Trans>
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-xl">
 						<Trans>

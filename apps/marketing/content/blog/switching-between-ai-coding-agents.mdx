@@ -102,7 +102,7 @@ The fix is to read the raw pty output rather than the rendered screen, which mea
 
 ## How we handle it
 
-We ship this in [Superset](https://superset.sh) because we kept hitting it ourselves. Any agent terminal has two actions behind the fork icon: **Continue with another agent**, which starts a different harness seeded with the source session's recent output, and **Fork session**, which asks the agent for a native clone of its own session and leaves the original running.
+We ship this in [Paradev](https://superset.sh) because we kept hitting it ourselves. Any agent terminal has two actions behind the fork icon: **Continue with another agent**, which starts a different harness seeded with the source session's recent output, and **Fork session**, which asks the agent for a native clone of its own session and leaves the original running.
 
 Both work from the CLI:
 

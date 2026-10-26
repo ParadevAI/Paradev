@@ -119,7 +119,7 @@ export async function notifySubscriptionStarted({
 		owners.map((owner) => ({
 			from: NOREPLY_FROM,
 			to: owner.email,
-			subject: `Welcome to Superset ${planName}!`,
+			subject: `Welcome to Paradev ${planName}!`,
 			react: SubscriptionStartedEmail({
 				ownerName: owner.name,
 				organizationName: org.name,

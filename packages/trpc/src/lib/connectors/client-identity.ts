@@ -34,7 +34,7 @@ function pickAuthMethod(
 	// public client whose token requests it will reject, far from here.
 	if (!methods.includes("none")) {
 		throw new Error(
-			`${issuer} supports none of the client authentication methods Superset can use (it advertises ${methods.join(", ")}).`,
+			`${issuer} supports none of the client authentication methods Paradev can use (it advertises ${methods.join(", ")}).`,
 		);
 	}
 	return "none";
@@ -111,7 +111,7 @@ async function register(
 				accept: "application/json",
 			},
 			body: JSON.stringify({
-				client_name: "Superset",
+				client_name: "Paradev",
 				client_uri: CANONICAL_URLS.MARKETING,
 				redirect_uris: [redirectUri],
 				grant_types: pickGrantTypes(server.metadata.grant_types_supported),

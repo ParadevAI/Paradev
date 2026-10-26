@@ -133,6 +133,10 @@
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
 		},
+		"./own-domains": {
+			"types": "./src/own-domains.ts",
+			"default": "./src/own-domains.ts"
+		},
 		"./legacy-host-redirects": {
 			"types": "./src/legacy-host-redirects.ts",
 			"default": "./src/legacy-host-redirects.ts"

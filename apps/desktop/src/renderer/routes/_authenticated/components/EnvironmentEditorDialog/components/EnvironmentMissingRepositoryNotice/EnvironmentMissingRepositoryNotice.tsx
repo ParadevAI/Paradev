@@ -29,7 +29,7 @@ export function EnvironmentMissingRepositoryNotice({
 					</Trans>
 				) : isOnInstalledAccount ? (
 					<Trans>
-						{repositoryFullName} isn't shared with the Superset GitHub App yet.
+						{repositoryFullName} isn't shared with the Paradev GitHub App yet.
 					</Trans>
 				) : (
 					<Trans>

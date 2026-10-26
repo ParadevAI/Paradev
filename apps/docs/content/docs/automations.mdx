@@ -62,8 +62,8 @@ GitHub triggers skip pull request events from forks (opened, pushed, reviews, re
 
 If the provider isn't connected, the trigger shows **Requires connection** with a **Connect** button; an expired connection shows **Connection expired** with a **Reconnect** button. A few providers need one extra step:
 
-- **Slack**: the Superset bot joins the public channels you pick when you save. For a private channel, invite **@Superset** to it first.
-- **Notion**: share the pages and data sources the automation should watch with the Superset integration.
+- **Slack**: the Paradev bot joins the public channels you pick when you save. For a private channel, invite **@Paradev** to it first.
+- **Notion**: share the pages and data sources the automation should watch with the Paradev integration.
 - **Microsoft Teams**: a tenant administrator grants consent once for the whole tenant.
 - **GitHub**: a trigger that filters by **Me** needs your personal GitHub account connected, or it won't fire.
 
@@ -135,7 +135,7 @@ On the **Mine** tab, **Retry all** appears in the header when any of your automa
 - **At-least-once delivery**: Automations may dispatch more than once in rare cases (e.g. dispatcher retries). Design prompts that are safe to re-run.
 - **No agent-outcome tracking**: a successful run means its workspace was created; the detail page doesn't show whether the agent's work succeeded. Open the workspace to see what happened.
 - **Offline hosts miss the run**: if the target device is offline when the automation fires, the run is recorded as missed and the next occurrence or event is handled normally. Keep the target device online for automations that should catch every event.
-- **Watch for loops**: an agent's own activity can match its trigger, for example a review comment on a PR that a "Comment added" trigger watches. Narrow the trigger with its people filter (for example, comments by specific teammates) so the agent's own activity doesn't start new runs. Slack triggers already ignore the Superset bot's own messages and reactions.
+- **Watch for loops**: an agent's own activity can match its trigger, for example a review comment on a PR that a "Comment added" trigger watches. Narrow the trigger with its people filter (for example, comments by specific teammates) so the agent's own activity doesn't start new runs. Slack triggers already ignore the Paradev bot's own messages and reactions.
 - **One prompt per automation**: Each automation has one prompt (though it can have up to 25 triggers). To run different prompts, create multiple automations.
 
 ## CLI

@@ -13,12 +13,12 @@ export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: i18n._(
 			msg({
-				message: "Download Superset",
+				message: "Download Paradev",
 			}),
 		),
 		description: i18n._(
 			msg({
-				message: "Your Superset download is starting.",
+				message: "Your Paradev download is starting.",
 			}),
 		),
 		// The page fires the download on arrival, so it must not be a search

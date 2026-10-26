@@ -90,7 +90,7 @@ function refreshFailureToCLIError(error: unknown): CLIError {
 	}
 	if (error instanceof ServerUnreachableError) {
 		return new CLIError(
-			"Could not reach Superset to renew the login",
+			"Could not reach Paradev to renew the login",
 			"Check your connection and retry",
 		);
 	}

@@ -17,6 +17,7 @@ Two-binary bundle: the CLI is a Bun-compiled binary (pure JS), the host service 
 superset-darwin-arm64/
   bin/
     superset                # Bun-compiled CLI (single binary, no deps)
+    paradev -> superset     # Alias symlink
     superset-host           # Shell wrapper → exec node ../lib/host-service.js "$@"
   lib/
     node                    # Standalone Node.js 22 binary (~40MB)

@@ -4,6 +4,7 @@ import {
 	introspectCli,
 	positional,
 } from "@superset/cli-framework";
+import { CLI_BIN_ALIASES } from "../../lib/bin-aliases";
 import { command } from "../../lib/command";
 
 export default command({
@@ -19,6 +20,8 @@ export default command({
 	run: async ({ args }) => {
 		const generate =
 			args.shell === "zsh" ? generateZshCompletion : generateBashCompletion;
-		return { raw: generate(introspectCli()) };
+		return {
+			raw: generate({ ...introspectCli(), binAliases: [...CLI_BIN_ALIASES] }),
+		};
 	},
 });

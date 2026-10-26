@@ -1,7 +1,6 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useFormat } from "@superset/i18n/react";
-import { CANONICAL_URLS } from "@superset/shared/constants";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -23,6 +22,7 @@ import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
@@ -624,7 +624,9 @@ export function FilesChangedScreen() {
 
 	const shareUrl =
 		pullRequest?.url ??
-		(workspaceId ? `${CANONICAL_URLS.APP}/workspaces/${workspaceId}` : null);
+		(workspaceId
+			? `${env.EXPO_PUBLIC_WEB_URL}/workspaces/${workspaceId}`
+			: null);
 
 	return (
 		<View className="bg-background flex-1">

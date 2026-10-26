@@ -687,13 +687,13 @@ describe("validateAgentModelSelection", () => {
 
 	it("rejects overrides for agents without model support", () => {
 		try {
-			validateAgentModelSelection("superset", "Superset", "claude-opus-5");
+			validateAgentModelSelection("superset", "Paradev", "claude-opus-5");
 			throw new Error("Expected validation to fail");
 		} catch (error) {
 			expect(error).toBeInstanceOf(TRPCError);
 			expect((error as TRPCError).code).toBe("BAD_REQUEST");
 			expect((error as Error).message).toBe(
-				"Superset does not support a model override. Omit model to use the agent default.",
+				"Paradev does not support a model override. Omit model to use the agent default.",
 			);
 		}
 	});
@@ -741,13 +741,13 @@ describe("validateAgentEffortSelection", () => {
 
 	it("rejects overrides for agents without effort support", () => {
 		try {
-			validateAgentEffortSelection("superset", "Superset", "high");
+			validateAgentEffortSelection("superset", "Paradev", "high");
 			throw new Error("Expected validation to fail");
 		} catch (error) {
 			expect(error).toBeInstanceOf(TRPCError);
 			expect((error as TRPCError).code).toBe("BAD_REQUEST");
 			expect((error as Error).message).toBe(
-				"Superset does not support a reasoning effort override. Omit effort to use the agent default.",
+				"Paradev does not support a reasoning effort override. Omit effort to use the agent default.",
 			);
 		}
 	});

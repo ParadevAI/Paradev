@@ -142,6 +142,6 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             release-artifacts/* \
-            --title "Superset Desktop ${{ github.ref_name }}" \
+            --title "Paradev Desktop ${{ github.ref_name }}" \
             --notes-file release_notes.md \
             --draft
