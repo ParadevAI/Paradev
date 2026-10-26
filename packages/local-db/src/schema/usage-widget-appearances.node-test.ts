@@ -7,6 +7,24 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const migrations = fileURLToPath(new URL("../../drizzle", import.meta.url));
+const appearanceMigration = "0060_usage_widget_appearances.sql";
+const migrationsBeforeAppearance = (files: string[]) =>
+	files
+		.filter((name) => name.endsWith(".sql") && name < appearanceMigration)
+		.sort();
+
+test("appearance migration setup excludes the target and future migrations", () => {
+	assert.deepEqual(
+		migrationsBeforeAppearance([
+			"0061_future.sql",
+			appearanceMigration,
+			"0059_previous.sql",
+			"_journal.json",
+		]),
+		["0059_previous.sql"],
+	);
+});
+
 test("appearance migration preserves existing projects and scopes account colors to their organization and host", () => {
 	const db = new DatabaseSync(":memory:");
 	try {
@@ -19,10 +37,7 @@ test("appearance migration preserves existing projects and scopes account colors
 				? 1
 				: 0,
 		);
-		for (const file of readdirSync(migrations)
-			.filter((name) => name.endsWith(".sql"))
-			.sort()) {
-			if (file.startsWith("0060_")) continue;
+		for (const file of migrationsBeforeAppearance(readdirSync(migrations))) {
 			db.exec(readFileSync(join(migrations, file), "utf8"));
 		}
 		db.prepare(
@@ -31,12 +46,7 @@ test("appearance migration preserves existing projects and scopes account colors
 		const before = db
 			.prepare("SELECT * FROM projects WHERE id = ?")
 			.get("project");
-		db.exec(
-			readFileSync(
-				join(migrations, "0060_usage_widget_appearances.sql"),
-				"utf8",
-			),
-		);
+		db.exec(readFileSync(join(migrations, appearanceMigration), "utf8"));
 		assert.deepEqual(
 			db.prepare("SELECT * FROM projects WHERE id = ?").get("project"),
 			before,
