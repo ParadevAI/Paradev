@@ -4339,6 +4339,214 @@ describe("AcpAdapter on protocol v2", () => {
 			await adapter.dispose();
 		});
 
+		it.each([
+			"injected",
+			"startedNewTurn",
+		])("acknowledges a v1 child steer as %s without a second prompt", async (outcome) => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = outcome;
+			const { adapter } = startAdapter(agent);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				expect(
+					await adapter.steerSubagent("subagent:child-1", [
+						{ type: "text", text: "check the tests too" },
+					]),
+				).toBe(true);
+				expect(
+					agent.sent.filter((frame) => frame.method === "_session/steering"),
+				).toMatchObject([
+					{
+						params: {
+							sessionId: "child-1",
+							prompt: [{ type: "text", text: "check the tests too" }],
+							_meta: { steering: { idleBehavior: "promptRequired" } },
+						},
+					},
+				]);
+				expect(
+					agent.sent.some((frame) => frame.method === "session/prompt"),
+				).toBe(false);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
+		it.each([
+			"promptRequired",
+			"unsupported",
+		])("handles the v1 child steer outcome %s without duplicating accepted input", async (outcome) => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = outcome;
+			const { adapter } = startAdapter(agent);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				expect(
+					await adapter.steerSubagent("subagent:child-1", [
+						{ type: "text", text: "continue" },
+					]),
+				).toBe(outcome === "promptRequired");
+				const requests = agent.sent.filter((frame) =>
+					["_session/steering", "session/prompt"].includes(
+						String(frame.method),
+					),
+				);
+				expect(requests.map((frame) => frame.method)).toEqual(
+					outcome === "promptRequired"
+						? ["_session/steering", "session/prompt"]
+						: ["_session/steering"],
+				);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
+		it.each([
+			1, 2,
+		])("keeps the normal child prompt path for protocol %s without v1 steering", async (version) => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = version;
+			agent.steeringOutcome = version === 2 ? "injected" : null;
+			const { adapter } = startAdapter(agent);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				expect(
+					await adapter.steerSubagent("subagent:child-1", [
+						{ type: "text", text: "continue" },
+					]),
+				).toBe(true);
+				expect(
+					agent.sent.some((frame) => frame.method === "_session/steering"),
+				).toBe(false);
+				expect(
+					agent.sent.filter((frame) => frame.method === "session/prompt"),
+				).toHaveLength(1);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
+		it("a child closed while its attachment resolves cannot receive steering", async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = "injected";
+			let release!: (value: {
+				path: string;
+				mimeType: string;
+				data: string;
+			}) => void;
+			let attachmentStarted!: () => void;
+			const started = new Promise<void>((resolve) => {
+				attachmentStarted = resolve;
+			});
+			const adapter = new AcpAdapter({
+				command: "fake",
+				createTransport: (_opts, handlers) => agent.transport(handlers),
+				resolveAttachment: () =>
+					new Promise((resolve) => {
+						release = resolve;
+						attachmentStarted();
+					}),
+				now: () => 1,
+				mintId: () => "fixture-id",
+			});
+			void collect(adapter.start({ cwd: "/work" }), []);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				const pending = adapter.steerSubagent("subagent:child-1", [
+					{
+						type: "attachment",
+						attachmentId: "fixture",
+						name: "fixture.png",
+						mimeType: "image/png",
+					},
+				]);
+				await started;
+				agent.notify("sess-1", {
+					sessionUpdate: "subagent_update",
+					sessionId: "child-1",
+					state: { state: "idle", stopReason: "end_turn" },
+				});
+				await flush();
+				release({
+					path: "/fixture/image.png",
+					mimeType: "image/png",
+					data: "aW1hZ2U=",
+				});
+				await expect(pending).resolves.toBe(false);
+				expect(
+					agent.sent.filter((frame) =>
+						["_session/steering", "session/prompt"].includes(
+							String(frame.method),
+						),
+					),
+				).toEqual([]);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
+		it.each([
+			"promptRequired",
+			"injected",
+		])("Stop before the v1 child %s reply prevents only new input", async (outcome) => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = outcome;
+			let responseSeen!: () => void;
+			let releaseResponse!: () => void;
+			const held = new Promise<void>((resolve) => {
+				responseSeen = resolve;
+			});
+			const adapter = new AcpAdapter({
+				command: "fake",
+				now: () => 1,
+				mintId: () => "fixture-id",
+				createTransport: (_opts, handlers) =>
+					agent.transport({
+						...handlers,
+						onLine(line) {
+							const frame = JSON.parse(line);
+							if (frame.result?.outcome === outcome) {
+								releaseResponse = () => handlers.onLine(line);
+								responseSeen();
+							} else handlers.onLine(line);
+						},
+					}),
+			});
+			void collect(adapter.start({ cwd: "/work" }), []);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				const pending = adapter.steerSubagent("subagent:child-1", [
+					{ type: "text", text: "continue" },
+				]);
+				await held;
+				expect(await adapter.stopBackgroundTask("subagent:child-1")).toBe(true);
+				releaseResponse();
+				await expect(pending).resolves.toBe(outcome === "injected");
+				expect(
+					agent.sent.filter((frame) => frame.method === "session/prompt"),
+				).toEqual([]);
+				expect(
+					agent.sent.filter((frame) => frame.method === "session/cancel"),
+				).toHaveLength(1);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
 		it("renders a steer echo in the child", async () => {
 			const agent = new FakeAcpAgent();
 			const { adapter, events } = startAdapter(agent);
