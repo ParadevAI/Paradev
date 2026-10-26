@@ -14,7 +14,17 @@ import {
 export { TEARDOWN_TIMEOUT_MS };
 
 const OUTPUT_TAIL_BYTES = 4096;
+const CAPTURE_BYTES = 64 * 1024;
 const KILL_GRACE_MS = 2_000;
+
+/**
+ * Printed by the teardown's own `bash -c` right before the command. The
+ * hidden PTY also carries the login shell's startup output and its line
+ * editor echoing the typed command (fish redraws it per keystroke, with the
+ * right prompt), so only bytes after this marker are the command's output.
+ */
+export const TEARDOWN_OUTPUT_MARKER = "\x1b]superset;teardown-output\x07";
+const PRINT_OUTPUT_MARKER = "printf '\\033]superset;teardown-output\\a'";
 
 export type TeardownResult =
 	| { status: "ok"; output?: string }
@@ -92,14 +102,14 @@ export async function runTeardown({
 		};
 	}
 
-	let tail = "";
-	const appendTail = (chunk: string) => {
-		tail += chunk;
-		if (tail.length > OUTPUT_TAIL_BYTES) {
-			tail = tail.slice(-OUTPUT_TAIL_BYTES);
+	let captured = "";
+	const capture = (chunk: string) => {
+		captured += chunk;
+		if (captured.length > CAPTURE_BYTES) {
+			captured = captured.slice(-CAPTURE_BYTES);
 		}
 	};
-	const dataDisposer = session.pty.onData(appendTail);
+	const dataDisposer = session.pty.onData(capture);
 
 	return new Promise<TeardownResult>((resolve) => {
 		let settled = false;
@@ -119,6 +129,7 @@ export async function runTeardown({
 		};
 
 		session.pty.onExit(({ exitCode, signal }) => {
+			const tail = commandOutputTail(captured);
 			if (exitCode === 0 && !timedOut) {
 				settle({ status: "ok", output: tail || undefined });
 				return;
@@ -135,7 +146,7 @@ export async function runTeardown({
 		const timer = setTimeout(() => {
 			if (settled) return;
 			timedOut = true;
-			appendTail(`\n[teardown timed out after ${timeoutMs}ms]\n`);
+			capture(`\n[teardown timed out after ${timeoutMs}ms]\n`);
 			try {
 				void session.pty.kill().catch(() => {});
 			} catch {
@@ -149,7 +160,7 @@ export async function runTeardown({
 					exitCode: null,
 					signal: null,
 					timedOut: true,
-					outputTail: tail,
+					outputTail: commandOutputTail(captured),
 				});
 			}, KILL_GRACE_MS).unref();
 		}, timeoutMs);
@@ -187,5 +198,19 @@ export function resolveTeardownCommand(args: {
  * hidden PTY exits with the teardown status (no fish `$?` breakage).
  */
 export function buildTeardownCommandFromShell(shellCommand: string): string {
-	return `exec bash -c ${shellSingleQuote(shellCommand)}`;
+	return `exec bash -c ${shellSingleQuote(`${PRINT_OUTPUT_MARKER}; ${shellCommand}`)}`;
+}
+
+/**
+ * Keeps the last {@link OUTPUT_TAIL_BYTES} of what the command itself wrote.
+ * Without the marker (shell never reached the command, or the capture window
+ * already rolled past it) the whole capture is the best available output.
+ */
+export function commandOutputTail(captured: string): string {
+	const markerStart = captured.indexOf(TEARDOWN_OUTPUT_MARKER);
+	const output =
+		markerStart === -1
+			? captured
+			: captured.slice(markerStart + TEARDOWN_OUTPUT_MARKER.length);
+	return output.slice(-OUTPUT_TAIL_BYTES);
 }
