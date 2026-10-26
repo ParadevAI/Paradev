@@ -34,10 +34,20 @@ describe("resolveOpenPrAction", () => {
 		).toEqual({ kind: "open", url: pr.url });
 	});
 
-	test("asks for the create-PR form when the branch has no pull request", () => {
+	test("asks for the create-PR form when a clean branch has no pull request", () => {
 		expect(resolveOpenPrAction({ kind: "no-pr", sync })).toEqual({
-			kind: "create",
+			kind: "ship",
+			view: "pr",
 		});
+	});
+
+	test("asks for the commit form first when the branch has uncommitted changes", () => {
+		expect(
+			resolveOpenPrAction({
+				kind: "no-pr",
+				sync: { ...sync, hasUncommitted: true },
+			}),
+		).toEqual({ kind: "ship", view: "commit" });
 	});
 
 	test("does nothing while loading, unavailable, or errored without a PR", () => {

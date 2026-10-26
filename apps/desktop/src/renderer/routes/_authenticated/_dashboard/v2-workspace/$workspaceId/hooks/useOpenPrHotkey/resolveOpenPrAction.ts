@@ -1,8 +1,9 @@
+import type { ShipFormView } from "../../state/shipFormIntent";
 import type { PRFlowState } from "../../utils/getPRFlowState";
 
 export type OpenPrAction =
 	| { kind: "open"; url: string }
-	| { kind: "create" }
+	| { kind: "ship"; view: ShipFormView }
 	| { kind: "none" };
 
 export function resolveOpenPrAction(flowState: PRFlowState): OpenPrAction {
@@ -15,7 +16,10 @@ export function resolveOpenPrAction(flowState: PRFlowState): OpenPrAction {
 				? { kind: "open", url: flowState.pr.url }
 				: { kind: "none" };
 		case "no-pr":
-			return { kind: "create" };
+			return {
+				kind: "ship",
+				view: flowState.sync.hasUncommitted ? "commit" : "pr",
+			};
 		case "loading":
 		case "unavailable":
 			return { kind: "none" };

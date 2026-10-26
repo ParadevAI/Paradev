@@ -3,7 +3,7 @@ import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
-import { useCreatePrFormIntent } from "../../state/createPrFormIntent";
+import { useShipFormIntent } from "../../state/shipFormIntent";
 import { usePRFlowState } from "../usePRFlowState";
 import { resolveOpenPrAction } from "./resolveOpenPrAction";
 
@@ -24,8 +24,10 @@ export function useOpenPrHotkey({
 			const action = resolveOpenPrAction(flowState);
 			if (action.kind === "open") {
 				openPullRequestLink(action.url, null, openPullRequestPane);
-			} else if (action.kind === "create") {
-				useCreatePrFormIntent.getState().request(workspaceId);
+			} else if (action.kind === "ship") {
+				useShipFormIntent
+					.getState()
+					.request({ workspaceId, view: action.view });
 			}
 		},
 		{ enabled },
