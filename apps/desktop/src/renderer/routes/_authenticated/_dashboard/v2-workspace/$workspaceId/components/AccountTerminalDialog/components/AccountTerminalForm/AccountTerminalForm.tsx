@@ -22,7 +22,7 @@ import {
 } from "./launchAccountQuota";
 
 interface AccountTerminalFormProps {
-	mode?: "start" | "resume" | "chat" | "browse";
+	mode?: "start" | "resume" | "chat";
 	configs: Array<{ id: string; label: string }>;
 	configId: string;
 	onConfigChange: (id: string) => void;
@@ -124,8 +124,6 @@ export function AccountTerminalForm({
 							launchFailureMessage ??
 								(mode === "resume"
 									? t({ message: "Could not resume this conversation" })
-									: mode === "browse"
-										? t({ message: "Could not load saved conversations" })
 										: mode === "chat"
 											? t({ message: "Could not start chat" })
 											: t({ message: "Could not start agent terminal" })),
@@ -274,8 +272,6 @@ export function AccountTerminalForm({
 							<Trans>Resume conversation</Trans>
 						) : mode === "chat" ? (
 							<Trans>Start chat</Trans>
-						) : mode === "browse" ? (
-							<Trans>Browse saved history</Trans>
 						) : (
 							(submitLabel ?? <Trans>Start terminal</Trans>)
 						)}
