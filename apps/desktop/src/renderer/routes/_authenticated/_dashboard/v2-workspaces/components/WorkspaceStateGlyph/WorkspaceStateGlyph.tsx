@@ -19,9 +19,11 @@ interface WorkspaceStateGlyphProps {
 
 /**
  * Row state glyph, by precedence: the sandbox's own state (nothing runs in a
- * dead or unborn box), then live agent states (pulse), then the finished
- * dot the sidebar rows and tab accessories use, then the section headers'
- * icon set so the vocabulary matches at both levels.
+ * dead or unborn box), then live agent states (pulse), then the unread dot
+ * the sidebar rows and tab accessories use, then the section headers' icon
+ * set so the vocabulary matches at both levels. The dot follows the agent,
+ * not the column: a row filed under In review by its PR alone has nothing
+ * unread, and a session row with unread output is filed under Idle.
  */
 export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	const { t } = useLingui();
@@ -42,15 +44,13 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	) {
 		glyph = <StatusIndicator status={agentStatus} />;
 		label = getStatusTooltip(agentStatus);
+	} else if (agentStatus === "review") {
+		glyph = <StatusIndicator status="review" />;
+		label = getStatusTooltip("review");
 	} else {
 		const column = deriveBoardColumn(workspace);
-		if (column === "finished") {
-			glyph = <StatusIndicator status="review" />;
-			label = getStatusTooltip("review");
-		} else {
-			glyph = <BoardColumnIcon column={column} />;
-			label = i18n._(BOARD_COLUMN_LABELS[column]);
-		}
+		glyph = <BoardColumnIcon column={column} />;
+		label = i18n._(BOARD_COLUMN_LABELS[column]);
 	}
 
 	return (
