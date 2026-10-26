@@ -217,7 +217,7 @@ function SignInPage() {
 								{hasLocalToken ? (
 									<Trans>Restoring your session</Trans>
 								) : (
-									<Trans>Welcome to Superset</Trans>
+									<Trans>Welcome to Paradev</Trans>
 								)}
 							</p>
 

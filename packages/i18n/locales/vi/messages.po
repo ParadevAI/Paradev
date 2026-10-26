@@ -329,8 +329,8 @@ msgid "{0, plural, one {Show # more line} other {Show # more lines}}"
 msgstr "{0, plural, one {Hiện thêm # dòng} other {Hiện thêm # dòng}}"
 
 #. placeholder {0}: importableWorktrees.length
-msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
-msgstr "{0, plural, one {Thao tác này sẽ nhập # worktree có sẵn vào Superset thành workspace. Mỗi worktree trên đĩa sẽ được theo dõi và xuất hiện trong thanh bên. Không tệp nào bị thay đổi.} other {Thao tác này sẽ nhập # worktree có sẵn vào Superset thành workspace. Mỗi worktree trên đĩa sẽ được theo dõi và xuất hiện trong thanh bên. Không tệp nào bị thay đổi.}}"
+msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
+msgstr "{0, plural, one {Thao tác này sẽ nhập # worktree có sẵn vào Paradev thành workspace. Mỗi worktree trên đĩa sẽ được theo dõi và xuất hiện trong thanh bên. Không tệp nào bị thay đổi.} other {Thao tác này sẽ nhập # worktree có sẵn vào Paradev thành workspace. Mỗi worktree trên đĩa sẽ được theo dõi và xuất hiện trong thanh bên. Không tệp nào bị thay đổi.}}"
 
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
@@ -350,8 +350,8 @@ msgid "{0} — device offline"
 msgstr "{0} — thiết bị ngoại tuyến"
 
 #. placeholder {0}: error.message
-msgid "{0} — try the Superset tray menu > Host Service > Restart."
-msgstr "{0} — hãy thử menu khay Superset > Dịch vụ host > Khởi động lại."
+msgid "{0} — try the Paradev tray menu > Host Service > Restart."
+msgstr "{0} — hãy thử menu khay Paradev > Dịch vụ host > Khởi động lại."
 
 #. placeholder {0}: host.version
 msgid "{0} · behind"
@@ -739,6 +739,9 @@ msgstr "{closedCount} đã đóng"
 msgid "{commitCount, plural, one {# commit} other {# commits}}"
 msgstr "{commitCount, plural, one {# commit} other {# commit}}"
 
+msgid "{companyName} makes {productName}."
+msgstr "{productName} do {companyName} phát triển."
+
 #. placeholder {0}: relevant.length
 msgid "{completed} of {0} checks complete"
 msgstr "{completed} trong {0} check đã xong"
@@ -896,6 +899,15 @@ msgstr "{focusShortcutText} để focus"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted} {count, plural, one {dev} other {dev}}"
+
+msgid "{formerName} is now {productName}"
+msgstr "{formerName} nay là {productName}"
+
+msgid "{formerName} is now {productName}!"
+msgstr "{formerName} nay là {productName}!"
+
+msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
+msgstr "{formerName} nay đã đổi tên thành {productName}. Vẫn là sản phẩm đó, vẫn đội ngũ đó, chỉ có tên là thay đổi. Các liên kết superset.sh hiện có sẽ được chuyển hướng và lệnh superset vẫn hoạt động bình thường."
 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} nhà sáng lập từng tham gia YC"
@@ -1121,6 +1133,24 @@ msgstr "{price} mỗi người/tháng, {gbHours} GB-giờ đám mây cho mỗi n
 msgid "{price}/user/mo"
 msgstr "{price}/người/tháng"
 
+msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+
+msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "{productName} (YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+
+msgid "{productName} for press"
+msgstr "{productName} dành cho báo chí"
+
+msgid "{productName} has been used by one in eight Fortune 500 companies."
+msgstr "{productName} đã được một trong tám công ty Fortune 500 sử dụng."
+
+msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
+msgstr "{productName} được các kỹ sư tại Netflix, Microsoft, NVIDIA, DoorDash, Wix và Mistral AI sử dụng trên toàn cầu, và tại châu Á là ByteDance, Toss, Kakao, Grab, LINE và Rakuten."
+
+msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn {productName} là một trong những startup nổi bật tại YC Demo Day."
+
 msgid "{provider} logo"
 msgstr "Logo {provider}"
 
@@ -1153,8 +1183,8 @@ msgstr "Còn lại {remaining}%"
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} không nằm trong {installedAccountLogin}, nơi GitHub App của tổ chức này được cài đặt."
 
-msgid "{repositoryFullName} isn't shared with the Superset GitHub App yet."
-msgstr "{repositoryFullName} chưa được chia sẻ với GitHub App của Superset."
+msgid "{repositoryFullName} isn't shared with the Paradev GitHub App yet."
+msgstr "{repositoryFullName} chưa được chia sẻ với GitHub App của Paradev."
 
 msgid "{seconds}s"
 msgstr "{seconds} giây"
@@ -1334,11 +1364,11 @@ msgid "<0>{0}</0> is not a git repository. Would you like to initialize one?"
 msgstr "<0>{0}</0> không phải là repository git. Bạn có muốn khởi tạo một repository không?"
 
 #. placeholder {0}: remoteHost.name
-msgid "<0>{0}</0> isn't connected to the Superset relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
-msgstr "<0>{0}</0> chưa kết nối tới relay của Superset nên các lần chạy sẽ bị bỏ qua. Kiểm tra <1>cài đặt host</1> và đảm bảo đã bật truy cập relay trong Cài đặt > Truy cập từ xa trên thiết bị đó."
+msgid "<0>{0}</0> isn't connected to the Paradev relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
+msgstr "<0>{0}</0> chưa kết nối tới relay của Paradev nên các lần chạy sẽ bị bỏ qua. Kiểm tra <1>cài đặt host</1> và đảm bảo đã bật truy cập relay trong Cài đặt > Truy cập từ xa trên thiết bị đó."
 
-msgid "<0>{displayName}</0> is requesting access to your Superset account"
-msgstr "<0>{displayName}</0> đang yêu cầu truy cập tài khoản Superset của bạn"
+msgid "<0>{displayName}</0> is requesting access to your Paradev account"
+msgstr "<0>{displayName}</0> đang yêu cầu truy cập tài khoản Paradev của bạn"
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "<0>{primaryFont}</0> chưa được cài trên hệ thống này. Đang dùng font khả dụng kế tiếp."
@@ -1490,8 +1520,8 @@ msgstr "Đã dùng 87.4K trên 200K token trong phiên này."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Trình duyệt trong ứng dụng tốt hơn: xem trước thay đổi và nhấp vào bất kỳ phần tử nào để gửi cho agent làm ngữ cảnh."
 
-msgid "A better Superset is ready"
-msgstr "Phiên bản Superset tốt hơn đã sẵn sàng"
+msgid "A better Paradev is ready"
+msgstr "Phiên bản Paradev tốt hơn đã sẵn sàng"
 
 msgid "A CDP endpoint per pane"
 msgstr "Một endpoint CDP cho mỗi ngăn"
@@ -1551,11 +1581,11 @@ msgstr "Một cái nhìn về những gì đang làm, những gì sắp tới v�
 msgid "A majority of production changes merge without any human reading the diff."
 msgstr "Phần lớn thay đổi lên production được merge mà không ai đọc diff."
 
-msgid "A manifest and a few skill files. Superset puts it where every agent looks."
-msgstr "Một manifest và vài file skill. Superset đặt nó ở nơi mỗi agent tìm đến."
+msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
+msgstr "Một manifest và vài file skill. Paradev đặt nó ở nơi mỗi agent tìm đến."
 
-msgid "A new version of Superset is required to continue. Please update to the latest version."
-msgstr "Cần phiên bản Superset mới để tiếp tục. Vui lòng cập nhật lên phiên bản mới nhất."
+msgid "A new version of Paradev is required to continue. Please update to the latest version."
+msgstr "Cần phiên bản Paradev mới để tiếp tục. Vui lòng cập nhật lên phiên bản mới nhất."
 
 msgid "A new workspace off this branch, with the conversation handed to a fresh agent"
 msgstr "Một workspace mới từ nhánh này, hội thoại được bàn giao cho tác nhân mới"
@@ -1615,14 +1645,17 @@ msgstr "Giới thiệu"
 msgid "About {displayName}"
 msgstr "Giới thiệu về {displayName}"
 
-msgid "About Superset"
-msgstr "Về Superset"
+msgid "About {productName}"
+msgstr "Về {productName}"
+
+msgid "About Paradev"
+msgstr "Về Paradev"
 
 msgid "About three weeks from first call to offer, ending with a paid work trial. Every step is with a founder, and you hear back within 48 hours."
 msgstr "Khoảng ba tuần từ cuộc gọi đầu tiên đến khi nhận offer, kết thúc bằng một đợt làm thử có trả lương. Mọi bước đều có nhà sáng lập tham gia, và bạn sẽ nhận phản hồi trong vòng 48 giờ."
 
-msgid "Absolutely. Superset doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
-msgstr "Hoàn toàn được. Superset không proxy bất kỳ lệnh gọi API nào. Bạn dùng khóa API của chính mình trực tiếp với nhà cung cấp AI bạn chọn. Nghĩa là bạn hoàn toàn kiểm soát chi phí và mức sử dụng."
+msgid "Absolutely. Paradev doesn't proxy any API calls. You use your own API keys directly with whatever AI providers you choose. This means you have full control over costs and usage."
+msgstr "Hoàn toàn được. Paradev không proxy bất kỳ lệnh gọi API nào. Bạn dùng khóa API của chính mình trực tiếp với nhà cung cấp AI bạn chọn. Nghĩa là bạn hoàn toàn kiểm soát chi phí và mức sử dụng."
 
 msgid "Accent"
 msgstr "Nhấn"
@@ -2070,8 +2103,8 @@ msgstr "Số agent chạy cùng lúc"
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agent dùng tài khoản này khi gọi các công cụ Linear."
 
-msgid "Aggregate agent usage across every developer on the Superset leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
-msgstr "Tổng hợp mức sử dụng agent của mọi lập trình viên trên bảng xếp hạng Superset — token, chi phí, hành vi cache và những mô hình mọi người thực sự dùng."
+msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
+msgstr "Tổng hợp mức sử dụng agent của mọi lập trình viên trên bảng xếp hạng Paradev — token, chi phí, hành vi cache và những mô hình mọi người thực sự dùng."
 
 msgid "AI · Agent activity"
 msgstr "AI · Hoạt động agent"
@@ -2409,8 +2442,8 @@ msgstr "Anthropic đã từ chối token này."
 msgid "any account"
 msgstr "bất kỳ tài khoản nào"
 
-msgid "Any agent you've set up in Superset, such as Claude Code or Codex."
-msgstr "Bất kỳ agent nào bạn đã thiết lập trong Superset, như Claude Code hoặc Codex."
+msgid "Any agent you've set up in Paradev, such as Claude Code or Codex."
+msgstr "Bất kỳ agent nào bạn đã thiết lập trong Paradev, như Claude Code hoặc Codex."
 
 msgid "Any channel"
 msgstr "Kênh bất kỳ"
@@ -2835,11 +2868,11 @@ msgstr "Cấp quyền"
 msgid "Authorize {displayName}"
 msgstr "Cấp quyền cho {displayName}"
 
-msgid "Authorize Superset so your plugins, automations and triggers can act on your behalf."
-msgstr "Ủy quyền cho Superset để các plugin, tự động hóa và trình kích hoạt có thể hành động thay bạn."
+msgid "Authorize Paradev so your plugins, automations and triggers can act on your behalf."
+msgstr "Ủy quyền cho Paradev để các plugin, tự động hóa và trình kích hoạt có thể hành động thay bạn."
 
-msgid "Authorize Superset to act on your behalf."
-msgstr "Cho phép Superset thay mặt bạn thực hiện thao tác."
+msgid "Authorize Paradev to act on your behalf."
+msgstr "Cho phép Paradev thay mặt bạn thực hiện thao tác."
 
 msgid "Authorizing..."
 msgstr "Đang cấp quyền..."
@@ -3271,11 +3304,11 @@ msgstr "Duyệt và cài skill, server MCP và cấu hình agent do cộng đồ
 msgid "Browse for directory"
 msgstr "Duyệt thư mục"
 
-msgid "Browse shared themes and future agent configs for Superset."
-msgstr "Duyệt các theme được chia sẻ và những cấu hình agent sắp tới cho Superset."
+msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
+msgstr "Duyệt các file theme Paradev do cộng đồng chia sẻ, gồm GitHub Dark Colorblind, Catppuccin, Ember và One Dark Pro."
 
-msgid "Browse Superset theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
-msgstr "Duyệt các file theme Superset do cộng đồng chia sẻ, gồm GitHub Dark Colorblind, Catppuccin, Ember và One Dark Pro."
+msgid "Browse shared themes and future agent configs for Paradev."
+msgstr "Duyệt các theme được chia sẻ và những cấu hình agent sắp tới cho Paradev."
 
 msgid "Browse the repo ↗"
 msgstr "Xem repo ↗"
@@ -3313,8 +3346,8 @@ msgstr "Báo cáo lỗi"
 msgid "Build in public"
 msgstr "Xây dựng công khai"
 
-msgid "Build the future of Superset in the cloud"
-msgstr "Xây dựng tương lai của Superset trên đám mây"
+msgid "Build the future of Paradev in the cloud"
+msgstr "Xây dựng tương lai của Paradev trên đám mây"
 
 msgid "Build your own"
 msgstr "Tự tạo plugin"
@@ -3325,8 +3358,8 @@ msgstr "Xây phần mềm cuối cùng"
 msgid "Building the last piece of software."
 msgstr "Xây phần mềm cuối cùng."
 
-msgid "Built in Superset"
-msgstr "Được xây dựng trong Superset"
+msgid "Built in Paradev"
+msgstr "Được xây dựng trong Paradev"
 
 msgid "builtin"
 msgstr "tích hợp sẵn"
@@ -3341,11 +3374,11 @@ msgstr "Danh sách dấu đầu dòng"
 msgid "bundled {0}"
 msgstr "đi kèm {0}"
 
-msgid "Bundled with the Superset app on this device."
-msgstr "Đi kèm với ứng dụng Superset trên thiết bị này."
+msgid "Bundled with the Paradev app on this device."
+msgstr "Đi kèm với ứng dụng Paradev trên thiết bị này."
 
-msgid "Bundled with the Superset app on this device. Updates with the app."
-msgstr "Đi kèm với ứng dụng Superset trên thiết bị này. Cập nhật cùng với ứng dụng."
+msgid "Bundled with the Paradev app on this device. Updates with the app."
+msgstr "Đi kèm với ứng dụng Paradev trên thiết bị này. Cập nhật cùng với ứng dụng."
 
 msgid "Business plan"
 msgstr "Gói Business"
@@ -3838,8 +3871,8 @@ msgstr "Chọn server MCP cho tin nhắn này"
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
 
-msgid "Choose when Superset pings you."
-msgstr "Chọn khi nào Superset báo cho bạn."
+msgid "Choose when Paradev pings you."
+msgstr "Chọn khi nào Paradev báo cho bạn."
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, chế độ thiết kế và Pages."
@@ -3850,8 +3883,8 @@ msgstr "CI thất bại"
 msgid "Clarify this"
 msgstr "Làm rõ điều này"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Superset is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex và OpenCode là các agent; Superset là nơi bạn chạy nhiều agent cùng lúc. Mỗi tác vụ có git worktree tách biệt riêng, nên mười agent có thể làm trên mười nhánh đồng thời trong khi bạn theo dõi, review và merge từ một chỗ."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex và OpenCode là các agent; Paradev là nơi bạn chạy nhiều agent cùng lúc. Mỗi tác vụ có git worktree tách biệt riêng, nên mười agent có thể làm trên mười nhánh đồng thời trong khi bạn theo dõi, review và merge từ một chỗ."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều hơn nữa. Không cần cài đặt riêng cho từng agent."
@@ -4389,6 +4422,9 @@ msgstr "Commit"
 msgid "Committed"
 msgstr "Đã commit"
 
+msgid "Committed with the repository and shared with everyone who works on it."
+msgstr "Được commit cùng repository và chia sẻ với mọi người cùng làm việc trên đó."
+
 msgid "Committed, starting soon."
 msgstr "Đã cam kết, sắp bắt đầu."
 
@@ -4404,8 +4440,11 @@ msgstr "Cộng đồng"
 msgid "Company"
 msgstr "Công ty"
 
-msgid "Company boilerplate, latest news, brand assets, and press contact for Superset."
-msgstr "Giới thiệu công ty, tin tức mới nhất, tài nguyên thương hiệu và liên hệ báo chí của Superset."
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName} (formerly {formerName})."
+msgstr "Giới thiệu công ty, tin tức mới nhất, tài nguyên thương hiệu và liên hệ báo chí của {productName} (trước đây là {formerName})."
+
+msgid "Company boilerplate, latest news, brand assets, and press contact for {productName}."
+msgstr "Giới thiệu công ty, tin tức mới nhất, tài nguyên thương hiệu và liên hệ báo chí của {productName}."
 
 msgid "Company email"
 msgstr "Email công ty"
@@ -4413,14 +4452,14 @@ msgstr "Email công ty"
 msgid "Compare"
 msgstr "So sánh"
 
+msgid "Compare Paradev | AI Coding Comparisons and Guides"
+msgstr "So sánh Paradev | So sánh và hướng dẫn lập trình AI"
+
+msgid "Compare Paradev with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
+msgstr "So sánh Paradev với Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot và nhiều công cụ khác. Xem các so sánh song song, bài tổng hợp và hướng dẫn quy trình làm việc."
+
 msgid "Compare plans"
 msgstr "So sánh gói"
-
-msgid "Compare Superset | AI Coding Comparisons and Guides"
-msgstr "So sánh Superset | So sánh và hướng dẫn lập trình AI"
-
-msgid "Compare Superset with Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot, and more. Browse side-by-side comparisons, roundups, and workflow guides."
-msgstr "So sánh Superset với Cursor, Claude Code, Codex, Windsurf, Devin, GitHub Copilot và nhiều công cụ khác. Xem các so sánh song song, bài tổng hợp và hướng dẫn quy trình làm việc."
 
 msgid "Compared against the default style"
 msgstr "So sánh với kiểu mặc định"
@@ -4440,6 +4479,12 @@ msgstr "component-showcase"
 
 msgid "Composable form layout — pairs with @superset/ui/form for react-hook-form"
 msgstr "Bố cục form ghép được — dùng chung với @superset/ui/form cho react-hook-form"
+
+msgid "Config file contents"
+msgstr "Nội dung tệp cấu hình"
+
+msgid "config.json must be a JSON object"
+msgstr "config.json phải là một đối tượng JSON"
 
 msgid "Configure"
 msgstr "Cấu hình"
@@ -4462,8 +4507,8 @@ msgstr "Cấu hình GitHub App"
 msgid "Configure GitHub App…"
 msgstr "Cấu hình GitHub App…"
 
-msgid "Configure how tasks sync between Superset and Linear."
-msgstr "Cấu hình cách tác vụ đồng bộ giữa Superset và Linear."
+msgid "Configure how tasks sync between Paradev and Linear."
+msgstr "Cấu hình cách tác vụ đồng bộ giữa Paradev và Linear."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Cấu hình hành vi terminal và các script terminal dùng lại được"
@@ -4580,8 +4625,8 @@ msgstr "Hãy kết nối tài khoản Linear của bạn trước khi theo dõi 
 msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
 msgstr "Kết nối tài khoản Linear của bạn trong Cài đặt → Tích hợp để liên kết issue Linear."
 
-msgid "Connect your Linear account to browse, update and start work on Linear issues from Superset."
-msgstr "Kết nối tài khoản Linear của bạn để duyệt, cập nhật và bắt đầu làm việc trên issue Linear ngay trong Superset."
+msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
+msgstr "Kết nối tài khoản Linear của bạn để duyệt, cập nhật và bắt đầu làm việc trên issue Linear ngay trong Paradev."
 
 msgid "Connect your Linear account to use Linear here."
 msgstr "Kết nối tài khoản Linear của bạn để dùng Linear tại đây."
@@ -4790,6 +4835,9 @@ msgstr "Cuộc thảo luận"
 msgid "Conversation · Message"
 msgstr "Hội thoại · Tin nhắn"
 
+msgid "Convert to config.toml"
+msgstr "Chuyển sang config.toml"
+
 msgid "Convert to draft"
 msgstr "Chuyển thành bản nháp"
 
@@ -4839,8 +4887,8 @@ msgstr "Sao chép dưới dạng Markdown"
 msgid "Copy Branch Name"
 msgstr "Sao chép tên nhánh"
 
-msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Superset."
-msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ Chrome, Brave, Arc hoặc trình duyệt Chromium khác vào Superset."
+msgid "Copy browsing history and logins from Chrome, Brave, Arc, or another Chromium browser into Paradev."
+msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ Chrome, Brave, Arc hoặc trình duyệt Chromium khác vào Paradev."
 
 msgid "Copy code"
 msgstr "Sao chép mã"
@@ -4966,8 +5014,8 @@ msgstr "Sao chép URL"
 msgid "Copy Workspace ID"
 msgstr "Sao chép ID workspace"
 
-msgid "Copy your browsing history and logins from another browser into Superset. Your original browser isn't changed."
-msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ trình duyệt khác vào Superset. Trình duyệt gốc của bạn không bị thay đổi."
+msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
+msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ trình duyệt khác vào Paradev. Trình duyệt gốc của bạn không bị thay đổi."
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Hãy sao chép khóa ngay — bạn sẽ không xem lại được nữa."
@@ -5858,8 +5906,8 @@ msgstr "Theme tùy chỉnh"
 msgid "Customize commands"
 msgstr "Tùy chỉnh lệnh"
 
-msgid "Customize how Superset looks on your device"
-msgstr "Tùy chỉnh giao diện Superset trên thiết bị của bạn"
+msgid "Customize how Paradev looks on your device"
+msgstr "Tùy chỉnh giao diện Paradev trên thiết bị của bạn"
 
 #. placeholder {0}: showHotkeysKeys.map((key) => ( <Kbd key={key}>{key}</Kbd> ))
 msgid "Customize keyboard shortcuts for your workflow. Press <0>{0}</0> to open this page anytime."
@@ -6231,8 +6279,8 @@ msgstr "Mô tả tác vụ cho agent…"
 msgid "Describe the work to your agent"
 msgstr "Mô tả công việc cho tác tử của bạn"
 
-msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
-msgstr "Mô tả điều bạn cần. Superset tạo một workspace tách biệt và một nhánh sạch cho tác vụ đó."
+msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
+msgstr "Mô tả điều bạn cần. Paradev tạo một workspace tách biệt và một nhánh sạch cho tác vụ đó."
 
 msgid "Describe what you'd like to see built…"
 msgstr "Mô tả điều bạn muốn được xây dựng…"
@@ -6589,14 +6637,14 @@ msgstr "Tải nhật ký xuống"
 msgid "Download Manually"
 msgstr "Tải xuống thủ công"
 
-msgid "Download our logos and product images for use in coverage of Superset."
-msgstr "Tải logo và hình ảnh sản phẩm của chúng tôi để dùng trong các bài viết về Superset."
+msgid "Download our logos and product images for use in coverage of Paradev."
+msgstr "Tải logo và hình ảnh sản phẩm của chúng tôi để dùng trong các bài viết về Paradev."
+
+msgid "Download Paradev"
+msgstr "Tải Paradev"
 
 msgid "Download starter"
 msgstr "Tải bản mẫu"
-
-msgid "Download Superset"
-msgstr "Tải Superset"
 
 msgid "Download the theme file above."
 msgstr "Tải tệp chủ đề ở trên."
@@ -6891,8 +6939,8 @@ msgstr "Bật truy cập relay…"
 msgid "Enable remote access"
 msgstr "Bật truy cập từ xa"
 
-msgid "Enable Remote Access and keep this computer awake with Superset running."
-msgstr "Bật truy cập từ xa và giữ máy tính này hoạt động với Superset đang chạy."
+msgid "Enable Remote Access and keep this computer awake with Paradev running."
+msgstr "Bật truy cập từ xa và giữ máy tính này hoạt động với Paradev đang chạy."
 
 msgid "Enable skill"
 msgstr "Bật skill"
@@ -7014,8 +7062,8 @@ msgstr "Mỗi phút"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Mọi mục tiêu đều đang đóng góp cho bậc kế tiếp. Đo trong 30 ngày gần nhất."
 
-msgid "Every paid plan includes Superset Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
-msgstr "Mọi gói trả phí đều có Superset Mobile, tự động hóa và hỗ trợ ưu tiên. Các gói có không gian làm việc đám mây cho nhóm bạn một quỹ GB-giờ dùng chung."
+msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
+msgstr "Mọi gói trả phí đều có Paradev Mobile, tự động hóa và hỗ trợ ưu tiên. Các gói có không gian làm việc đám mây cho nhóm bạn một quỹ GB-giờ dùng chung."
 
 msgid "Every publish is a version"
 msgstr "Mỗi lần xuất bản là một phiên bản"
@@ -7047,6 +7095,9 @@ msgstr "Mọi người vẫn ở v{sharedVersion} cho đến khi bạn đổi"
 msgid "Everyone with access to this organization."
 msgstr "Tất cả những người có quyền truy cập tổ chức này."
 
+msgid "Everything carries over."
+msgstr "Mọi thứ vẫn được giữ nguyên."
+
 msgid "Everything in {previousPlan}"
 msgstr "Mọi thứ trong {previousPlan}"
 
@@ -7059,14 +7110,17 @@ msgstr "Mọi thứ trong Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Mọi thứ trong Ultra, cùng GB-giờ đám mây tùy chỉnh, SSO và SAML, cấp phát SCIM, giới hạn IP, nhật ký kiểm tra, SLA tùy chỉnh, hỗ trợ riêng và hợp đồng tùy chỉnh. Giá được điều chỉnh theo tổ chức của bạn. Hãy liên hệ để chúng tôi đề xuất gói phù hợp."
 
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Mọi thứ đều viết script được. Tạo workspace và agent từ CLI, nối Superset vào CI bằng SDK, hoặc để agent của bạn điều khiển qua MCP."
+msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
+msgstr "Mọi thứ đều viết script được. Tạo workspace và agent từ CLI, nối Paradev vào CI bằng SDK, hoặc để agent của bạn điều khiển qua MCP."
 
-msgid "Everything we built on top of the primitives — Superset originals, the"
-msgstr "Mọi thứ chúng tôi dựng trên nền các primitive — thành phần riêng của Superset, bộ"
+msgid "Everything we built on top of the primitives — Paradev originals, the"
+msgstr "Mọi thứ chúng tôi dựng trên nền các primitive — thành phần riêng của Paradev, bộ"
 
-msgid "Everything you need to write about Superset: our company description, latest news, logos, product images, and who to contact."
-msgstr "Mọi thứ bạn cần để viết về Superset: giới thiệu công ty, tin tức mới nhất, logo, hình ảnh sản phẩm và thông tin liên hệ."
+msgid "Everything you need to write about {productName} (formerly {formerName}): our company description, latest news, logos, product images, and who to contact."
+msgstr "Mọi thứ bạn cần để viết về {productName} (trước đây là {formerName}): giới thiệu công ty, tin tức mới nhất, logo, hình ảnh sản phẩm và thông tin liên hệ."
+
+msgid "Everything you need to write about {productName}: our company description, latest news, logos, product images, and who to contact."
+msgstr "Mọi thứ bạn cần để viết về {productName}: giới thiệu công ty, tin tức mới nhất, logo, hình ảnh sản phẩm và thông tin liên hệ."
 
 msgid "Everything you've published is deleted, not hidden. You can rejoin later and it will rebuild from the transcripts still on this machine."
 msgstr "Mọi thứ bạn đã đăng sẽ bị xóa, không phải ẩn đi. Bạn có thể tham gia lại sau và dữ liệu sẽ được dựng lại từ các transcript còn trên máy này."
@@ -7203,8 +7257,8 @@ msgstr "Cổng F4 đã vượt"
 msgid "Factory 2026"
 msgstr "Factory 2026"
 
-msgid "Factory 2026 | Superset"
-msgstr "Factory 2026 | Superset"
+msgid "Factory 2026 | Paradev"
+msgstr "Factory 2026 | Paradev"
 
 msgid "Factory tier {tier}"
 msgstr "Hạng nhà máy {tier}"
@@ -8028,8 +8082,8 @@ msgstr "Độ đậm chữ"
 msgid "For a project, open the importer to link it."
 msgstr "Với dự án, hãy mở trình nhập để liên kết."
 
-msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>github.com/superset-sh/superset</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X (@superset_sh)</2> and <3>LinkedIn</3>."
-msgstr "Với báo lỗi và đề xuất tính năng, cách nhanh nhất là mở issue trên GitHub tại <0>github.com/superset-sh/superset</0>. Cộng đồng của chúng tôi ở <1>Discord</1>, và chúng tôi đăng cập nhật trên <2>X (@superset_sh)</2> và <3>LinkedIn</3>."
+msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
+msgstr "Với báo lỗi và đề xuất tính năng, cách nhanh nhất là mở issue trên GitHub tại <0>{githubHandle}</0>. Cộng đồng của chúng tôi ở <1>Discord</1>, và chúng tôi đăng cập nhật trên <2>X ({xHandle})</2> và <3>LinkedIn</3>."
 
 msgid "For individuals getting started"
 msgstr "Dành cho cá nhân mới bắt đầu"
@@ -8259,20 +8313,20 @@ msgstr "Liên hệ với đội ngũ {companyName}."
 msgid "Get key"
 msgstr "Lấy khóa"
 
-msgid "Get more out of Superset"
-msgstr "Khai thác Superset nhiều hơn"
+msgid "Get more out of Paradev"
+msgstr "Khai thác Paradev nhiều hơn"
 
-msgid "Get notified when Superset is available on Windows & Linux."
-msgstr "Nhận thông báo khi Superset có trên Windows & Linux."
+msgid "Get notified when Paradev is available on Windows & Linux."
+msgstr "Nhận thông báo khi Paradev có trên Windows & Linux."
+
+msgid "Get Paradev on your Mac"
+msgstr "Cài Paradev trên máy Mac"
+
+msgid "Get Paradev Pro"
+msgstr "Mua Paradev Pro"
 
 msgid "Get started"
 msgstr "Bắt đầu"
-
-msgid "Get Superset on your Mac"
-msgstr "Cài Superset trên máy Mac"
-
-msgid "Get Superset Pro"
-msgstr "Mua Superset Pro"
 
 msgid "Get the best out of Pro"
 msgstr "Tận dụng tối đa Pro"
@@ -8385,6 +8439,9 @@ msgstr "Về trang chủ"
 msgid "Go to next page"
 msgstr "Tới trang sau"
 
+msgid "Go to Paradev"
+msgstr "Tới Paradev"
+
 msgid "Go to previous page"
 msgstr "Tới trang trước"
 
@@ -8394,20 +8451,17 @@ msgstr "Vào Cài đặt, rồi Truy cập từ xa"
 msgid "Go to Slack integration settings"
 msgstr "Tới cài đặt tích hợp Slack"
 
-msgid "Go to Superset"
-msgstr "Tới Superset"
-
 msgid "Go to workspace"
 msgstr "Đi tới workspace"
 
-msgid "Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again."
-msgstr "Google không cấp quyền truy cập lâu dài. Hãy gỡ Superset khỏi phần truy cập của bên thứ ba trong tài khoản Google của bạn rồi thử lại."
+msgid "Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again."
+msgstr "Google không cấp quyền truy cập lâu dài. Hãy gỡ Paradev khỏi phần truy cập của bên thứ ba trong tài khoản Google của bạn rồi thử lại."
 
 msgid "Got it"
 msgstr "Đã hiểu"
 
-msgid "Grant the OS permissions Superset needs."
-msgstr "Cấp các quyền hệ điều hành mà Superset cần."
+msgid "Grant the OS permissions Paradev needs."
+msgstr "Cấp các quyền hệ điều hành mà Paradev cần."
 
 msgid "Granted"
 msgstr "Đã cấp"
@@ -8695,8 +8749,8 @@ msgstr "Số giờ được tính trên không gian làm việc tiêu chuẩn {v
 msgid "Hover Card"
 msgstr "Hover Card"
 
-msgid "How {label} signs in when Superset runs it for you."
-msgstr "Cách {label} đăng nhập khi Superset chạy nó cho bạn."
+msgid "How {label} signs in when Paradev runs it for you."
+msgstr "Cách {label} đăng nhập khi Paradev chạy nó cho bạn."
 
 msgid "How 2026 plays out"
 msgstr "Năm 2026 diễn ra thế nào"
@@ -8725,8 +8779,8 @@ msgstr "Hệ thống agent song song hoạt động thế nào?"
 msgid "How grouped commands open."
 msgstr "Cách mở các lệnh theo nhóm."
 
-msgid "How is Superset different from just running Claude Code in a terminal?"
-msgstr "Superset khác gì so với chỉ chạy Claude Code trong terminal?"
+msgid "How is Paradev different from just running Claude Code in a terminal?"
+msgstr "Paradev khác gì so với chỉ chạy Claude Code trong terminal?"
 
 msgid "How it works"
 msgstr "Cách hoạt động"
@@ -8752,8 +8806,8 @@ msgstr "Cách prompt được đưa tới tiến trình."
 msgid "How tiers work →"
 msgstr "Cách tính hạng →"
 
-msgid "How to install {name} in Superset"
-msgstr "Cách cài {name} trong Superset"
+msgid "How to install {name} in Paradev"
+msgstr "Cách cài {name} trong Paradev"
 
 msgid "How we build it, in long form."
 msgstr "Cách chúng tôi xây dựng, chi tiết."
@@ -8792,7 +8846,7 @@ msgid "Humans write every line. Tools compile, lint, and complain. The keyboard 
 msgstr "Con người viết từng dòng. Công cụ biên dịch, lint và phàn nàn. Bàn phím chính là nhà máy."
 
 msgid "I already use an IDE like Cursor, is this for me?"
-msgstr "Tôi đã dùng IDE như Cursor, Superset có hợp với tôi không?"
+msgstr "Tôi đã dùng IDE như Cursor, Paradev có hợp với tôi không?"
 
 msgid "I also love being able to spin up a local worktree environment on my Mac directly from my phone."
 msgstr "Tôi cũng rất thích việc có thể khởi tạo môi trường cây làm việc cục bộ trên máy Mac ngay từ điện thoại."
@@ -8830,8 +8884,8 @@ msgstr "Rảnh"
 msgid "Idle · branch pushed"
 msgstr "Rảnh · đã push nhánh"
 
-msgid "If you're enjoying Superset so far, a GitHub star helps other developers discover it."
-msgstr "Nếu đến giờ bạn thấy Superset hữu ích, một star trên GitHub sẽ giúp các lập trình viên khác biết đến nó."
+msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
+msgstr "Nếu đến giờ bạn thấy Paradev hữu ích, một star trên GitHub sẽ giúp các lập trình viên khác biết đến nó."
 
 msgid "Illegal content"
 msgstr "Nội dung bất hợp pháp"
@@ -8975,8 +9029,8 @@ msgstr "trong một terminal trên host này."
 msgid "In all projects"
 msgstr "Trong tất cả dự án"
 
-msgid "In just a few months, <0>tens of thousands of engineers</0> run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix."
-msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Superset làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
+msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
+msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
 
 msgid "In person in San Francisco, five days a week. You work directly with the founders."
 msgstr "Làm việc trực tiếp tại văn phòng San Francisco, năm ngày mỗi tuần. Bạn làm việc trực tiếp với các nhà sáng lập."
@@ -8997,11 +9051,11 @@ msgstr "Đang xem xét"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "Trong ứng dụng {appName} trên máy tính, mở Cài đặt → Truy cập từ xa và bật “Cho phép truy cập từ xa vào thiết bị này qua relay”."
 
-msgid "In the Superset desktop app, open <0>Settings → Appearance → Theme</0>."
-msgstr "Trong ứng dụng Superset trên máy tính, mở <0>Cài đặt → Giao diện → Chủ đề</0>."
+msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
+msgstr "Trong ứng dụng Paradev trên máy tính, mở <0>Cài đặt → Giao diện → Chủ đề</0>."
 
-msgid "In under a year, more than 145,000 developers across 180 countries have run Superset and created over 1.85 million agent workspaces."
-msgstr "Chưa đầy một năm, hơn 145.000 nhà phát triển tại 180 quốc gia đã chạy Superset và tạo hơn 1,85 triệu workspace agent."
+msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
+msgstr "Chưa đầy một năm, hơn 145.000 nhà phát triển tại 180 quốc gia đã chạy {productName} và tạo hơn 1,85 triệu workspace agent."
 
 msgid "In your next chat"
 msgstr "Trong cuộc trò chuyện sau"
@@ -9024,8 +9078,8 @@ msgstr "Có"
 msgid "Included in Enterprise"
 msgstr "Có trong Enterprise"
 
-msgid "Includes the Superset-specific box variant"
-msgstr "Bao gồm biến thể box riêng của Superset"
+msgid "Includes the Paradev-specific box variant"
+msgstr "Bao gồm biến thể box riêng của Paradev"
 
 msgid "Incognito Operator"
 msgstr "Vận hành viên ẩn danh"
@@ -9084,8 +9138,8 @@ msgstr "token đầu vào, cache và đầu ra"
 msgid "Inputs"
 msgstr "Đầu vào"
 
-msgid "Insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "Góc nhìn từ đội ngũ Superset về coding agent chạy song song và năng suất của lập trình viên."
+msgid "Insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "Góc nhìn từ đội ngũ Paradev về coding agent chạy song song và năng suất của lập trình viên."
 
 msgid "Inspect branches and run SQL"
 msgstr "Xem branch và chạy SQL"
@@ -9121,17 +9175,17 @@ msgstr "Cài một lần. Mọi agent đều có, trên máy của bạn và tr�
 msgid "Install once. Mention it in any prompt."
 msgstr "Cài một lần. Nhắc đến nó trong bất kỳ prompt nào."
 
+msgid "Install Paradev MCP in your client"
+msgstr "Cài Paradev MCP vào client của bạn"
+
 msgid "Install plugin"
 msgstr "Cài đặt plugin"
-
-msgid "Install Superset MCP in your client"
-msgstr "Cài Superset MCP vào client của bạn"
 
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
-msgid "Install the Superset GitHub App to connect your repositories."
-msgstr "Hãy cài Superset GitHub App để kết nối các repository của bạn."
+msgid "Install the Paradev GitHub App to connect your repositories."
+msgstr "Hãy cài Paradev GitHub App để kết nối các repository của bạn."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên mọi workspace từ một chỗ, với OAuth tập trung."
@@ -9149,8 +9203,8 @@ msgstr "Cài đặt qua"
 msgid "Installing..."
 msgstr "Đang cài đặt..."
 
-msgid "Installs Superset on a machine you can reach with ssh, signs Superset in to your account, and keeps it running as a service."
-msgstr "Cài Superset lên một máy bạn truy cập được bằng ssh, đăng nhập Superset vào tài khoản của bạn và giữ Superset chạy như một dịch vụ."
+msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
+msgstr "Cài Paradev lên một máy bạn truy cập được bằng ssh, đăng nhập Paradev vào tài khoản của bạn và giữ Paradev chạy như một dịch vụ."
 
 msgid "Instructions"
 msgstr "Hướng dẫn"
@@ -9164,8 +9218,8 @@ msgstr "Terminal agent tương tác."
 msgid "Interactive clients authorize over OAuth 2.1 in your browser, scoped to your active organization. For headless environments and CI, generate an API key from Settings → API Keys in the desktop app and pass it as a Bearer token instead. Full setup, including header config for Claude Code, is in the <0>authentication docs</0>."
 msgstr "Client tương tác sẽ ủy quyền qua OAuth 2.1 trong trình duyệt, giới hạn theo tổ chức đang hoạt động của bạn. Với môi trường không giao diện và CI, hãy tạo khóa API trong Cài đặt → Khóa API ở ứng dụng máy tính và truyền nó dưới dạng Bearer token. Hướng dẫn thiết lập đầy đủ, kể cả cấu hình header cho Claude Code, có trong <0>tài liệu xác thực</0>."
 
-msgid "Interested in bringing Superset to your organization? Reach out and we'll work with you to find the right setup for your team."
-msgstr "Muốn đưa Superset vào tổ chức của bạn? Hãy liên hệ và chúng tôi sẽ cùng bạn tìm thiết lập phù hợp cho đội ngũ."
+msgid "Interested in bringing Paradev to your organization? Reach out and we'll work with you to find the right setup for your team."
+msgstr "Muốn đưa Paradev vào tổ chức của bạn? Hãy liên hệ và chúng tôi sẽ cùng bạn tìm thiết lập phù hợp cho đội ngũ."
 
 msgid "Interface"
 msgstr "Giao diện"
@@ -9284,20 +9338,20 @@ msgstr "Dữ liệu của tôi có an toàn không?"
 msgid "is now signed in here."
 msgstr "hiện đã đăng nhập ở đây."
 
+msgid "Is Paradev free to use?"
+msgstr "Paradev có miễn phí không?"
+
+msgid "Is Paradev just a wrapper around Claude Code?"
+msgstr "Paradev chỉ là lớp bọc quanh Claude Code thôi à?"
+
+msgid "Is Paradev open source?"
+msgstr "Paradev có phải mã nguồn mở không?"
+
+msgid "Is Paradev SOC 2 compliant?"
+msgstr "Paradev có tuân thủ SOC 2 không?"
+
 msgid "is signed in."
 msgstr "đã đăng nhập."
-
-msgid "Is Superset free to use?"
-msgstr "Superset có miễn phí không?"
-
-msgid "Is Superset just a wrapper around Claude Code?"
-msgstr "Superset chỉ là lớp bọc quanh Claude Code thôi à?"
-
-msgid "Is Superset open source?"
-msgstr "Superset có phải mã nguồn mở không?"
-
-msgid "Is Superset SOC 2 compliant?"
-msgstr "Superset có tuân thủ SOC 2 không?"
 
 msgid "Is there a free plan?"
 msgstr "Có gói miễn phí không?"
@@ -9381,8 +9435,8 @@ msgstr "Nhánh riêng và bản sao tệp riêng"
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
-msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Superset > Host Service > Restart."
+msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
+msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Paradev > Host Service > Restart."
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "Các workspace và worktree của nó sẽ bị xóa khỏi ổ đĩa ngay bây giờ thay vì sau 30 ngày. Thư mục repository và các worktree có thay đổi chưa commit vẫn được giữ lại."
@@ -9411,14 +9465,14 @@ msgstr "Tham gia Discord của chúng tôi"
 msgid "JOIN OUR DISCORD"
 msgstr "THAM GIA DISCORD"
 
-msgid "Join the <0>Superset</0> community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "Tham gia cộng đồng <0>Superset</0> để được hỗ trợ, chia sẻ ý tưởng và cập nhật tin tức mới nhất."
+msgid "Join the <0>Paradev</0> community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "Tham gia cộng đồng <0>Paradev</0> để được hỗ trợ, chia sẻ ý tưởng và cập nhật tin tức mới nhất."
 
 msgid "Join the leaderboard"
 msgstr "Tham gia bảng xếp hạng"
 
-msgid "Join the Superset community to get help, share ideas, and stay up to date with the latest news and updates."
-msgstr "Tham gia cộng đồng Superset để được hỗ trợ, chia sẻ ý tưởng và cập nhật tin tức mới nhất."
+msgid "Join the Paradev community to get help, share ideas, and stay up to date with the latest news and updates."
+msgstr "Tham gia cộng đồng Paradev để được hỗ trợ, chia sẻ ý tưởng và cập nhật tin tức mới nhất."
 
 msgid "Join the waitlist"
 msgstr "Tham gia danh sách chờ"
@@ -9426,8 +9480,8 @@ msgstr "Tham gia danh sách chờ"
 msgid "Join us"
 msgstr "Gia nhập chúng tôi"
 
-msgid "Join us at Superset"
-msgstr "Gia nhập Superset"
+msgid "Join us at Paradev"
+msgstr "Gia nhập Paradev"
 
 msgid "Join waitlist"
 msgstr "Tham gia danh sách chờ"
@@ -9780,8 +9834,8 @@ msgstr "Sáng"
 msgid "Light theme"
 msgstr "Theme sáng"
 
-msgid "Like building with Superset?"
-msgstr "Thích xây dựng cùng Superset?"
+msgid "Like building with Paradev?"
+msgstr "Thích xây dựng cùng Paradev?"
 
 msgid "Lime"
 msgstr "Xanh chanh"
@@ -9799,6 +9853,11 @@ msgstr "Chỉ cho những người được mời?"
 #. placeholder {0}: metadata.startLine
 msgid "Line {0}"
 msgstr "Dòng {0}"
+
+#. placeholder {0}: problem.line
+#. placeholder {1}: problem.message
+msgid "Line {0}: {1}"
+msgstr "Dòng {0}: {1}"
 
 msgid "line changed"
 msgstr "dòng đã thay đổi"
@@ -10175,8 +10234,8 @@ msgstr "Đặt làm mặc định — mở terminal và agent mới trên tài k
 msgid "Make public"
 msgstr "Công khai"
 
-msgid "Make sure the device is awake, online, and running Superset."
-msgstr "Đảm bảo thiết bị không ở chế độ ngủ, có kết nối mạng và đang chạy Superset."
+msgid "Make sure the device is awake, online, and running Paradev."
+msgstr "Đảm bảo thiết bị không ở chế độ ngủ, có kết nối mạng và đang chạy Paradev."
 
 msgid "Make the chip style the TooltipContent default"
 msgstr "Đặt kiểu chip làm mặc định cho TooltipContent"
@@ -10364,8 +10423,8 @@ msgstr "Mức độ nghiêm trọng trung bình"
 msgid "Meet the team"
 msgstr "Gặp gỡ đội ngũ"
 
-msgid "Meet the team behind Superset, building parallel coding agents for developers."
-msgstr "Gặp gỡ đội ngũ đứng sau Superset, xây dựng các agent lập trình song song cho lập trình viên."
+msgid "Meet the team behind Paradev, building parallel coding agents for developers."
+msgstr "Gặp gỡ đội ngũ đứng sau Paradev, xây dựng các agent lập trình song song cho lập trình viên."
 
 msgid "Member"
 msgstr "Thành viên"
@@ -10420,8 +10479,8 @@ msgstr "Merge thất bại: {0}"
 msgid "Merge pull request"
 msgstr "Merge pull request"
 
-msgid "Merge pull requests without leaving Superset, plus a round of chat fixes and polish."
-msgstr "Merge pull request mà không cần rời Superset, kèm một đợt sửa lỗi và trau chuốt chat."
+msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
+msgstr "Merge pull request mà không cần rời Paradev, kèm một đợt sửa lỗi và trau chuốt chat."
 
 msgid "Merge status"
 msgstr "Trạng thái merge"
@@ -10935,8 +10994,8 @@ msgstr "Tin tức & Cập nhật"
 msgid "News and deep dives"
 msgstr "Tin tức và bài phân tích chuyên sâu"
 
-msgid "News, updates, and insights from the Superset team about parallel coding agents and developer productivity."
-msgstr "Tin tức, cập nhật và góc nhìn từ đội ngũ Superset về các agent lập trình song song và năng suất của lập trình viên."
+msgid "News, updates, and insights from the Paradev team about parallel coding agents and developer productivity."
+msgstr "Tin tức, cập nhật và góc nhìn từ đội ngũ Paradev về các agent lập trình song song và năng suất của lập trình viên."
 
 msgid "Next"
 msgstr "Tiếp"
@@ -11617,8 +11676,8 @@ msgstr "Chưa có workspace nào"
 msgid "No-Prompt Launch"
 msgstr "Khởi chạy không prompt"
 
-msgid "No. Your agents stay independent; Superset is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "Không. Các agent của bạn vẫn độc lập; Superset là lớp điều phối bao quanh chúng. Mỗi tác vụ có git worktree tách biệt, phiên bền vững, review diff và các automation chạy theo sự kiện hoặc theo lịch mà không trói quy trình vào một nhà cung cấp."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có git worktree tách biệt, phiên bền vững, review diff và các automation chạy theo sự kiện hoặc theo lịch mà không trói quy trình vào một nhà cung cấp."
 
 msgid "Nobody has joined the board yet."
 msgstr "Chưa ai tham gia bảng xếp hạng."
@@ -11842,7 +11901,7 @@ msgid "On focus change"
 msgstr "Khi thay đổi tiêu điểm"
 
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
-msgstr "Trên GitHub, Superset có hơn 15k sao, hơn 1.000 fork và hơn 100 người đóng góp. Superset cũng từng đứng #1 trên Product Hunt."
+msgstr "Trên GitHub, Paradev có hơn 15k sao, hơn 1.000 fork và hơn 100 người đóng góp. Paradev cũng từng đứng #1 trên Product Hunt."
 
 msgid "On our radar. Order and scope may change."
 msgstr "Đang trong tầm ngắm. Thứ tự và phạm vi có thể thay đổi."
@@ -11862,8 +11921,8 @@ msgstr "Trên trang này"
 msgid "On window change"
 msgstr "Khi thay đổi cửa sổ"
 
-msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset doesn't proxy any API calls."
-msgstr "Trên máy của bạn. Repo, worktree, output terminal và phiên agent mặc định vẫn ở cục bộ; đồng bộ cloud chỉ gồm metadata tài khoản và tổ chức. Superset không proxy bất kỳ lệnh gọi API nào."
+msgid "On your machine. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Paradev doesn't proxy any API calls."
+msgstr "Trên máy của bạn. Repo, worktree, output terminal và phiên agent mặc định vẫn ở cục bộ; đồng bộ cloud chỉ gồm metadata tài khoản và tổ chức. Paradev không proxy bất kỳ lệnh gọi API nào."
 
 msgid "On-screen Keyboard"
 msgstr "Bàn phím ảo"
@@ -11939,6 +11998,9 @@ msgstr "Chỉ chủ sở hữu host hoặc chủ sở hữu tổ chức mới x�
 
 msgid "Only images can be attached to a comment"
 msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
+
+msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
+msgstr "Chỉ trên máy này: được git bỏ qua và áp dụng cho mọi worktree của repository này. Mọi khóa đặt ở đây sẽ thay thế khóa dùng chung."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Chỉ chủ sở hữu tổ chức mới sửa được các cài đặt này."
@@ -12254,6 +12316,9 @@ msgstr "Mở ở tab mới"
 msgid "Open in New Tab"
 msgstr "Mở ở tab mới"
 
+msgid "Open in Paradev"
+msgstr "Mở trong Paradev"
+
 msgid "Open in Pull Requests"
 msgstr "Mở trong Pull request"
 
@@ -12265,9 +12330,6 @@ msgstr "Mở trong Scira AI"
 
 msgid "Open in split pane"
 msgstr "Mở ở khung chia đôi"
-
-msgid "Open in Superset"
-msgstr "Mở trong Superset"
 
 msgid "Open in T3 Chat"
 msgstr "Mở trong T3 Chat"
@@ -12325,8 +12387,8 @@ msgstr "Mở trang đăng nhập thiết bị của OpenAI."
 msgid "Open Page in Default Browser"
 msgstr "Mở trang trong trình duyệt mặc định"
 
-msgid "Open pages and reply to comments from the Superset app on iPhone and iPad."
-msgstr "Mở trang và trả lời bình luận từ ứng dụng Superset trên iPhone và iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
+msgstr "Mở trang và trả lời bình luận từ ứng dụng Paradev trên iPhone và iPad."
 
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
@@ -12493,8 +12555,8 @@ msgstr "Mở tại"
 msgid "Operator"
 msgstr "Người vận hành"
 
-msgid "Opt in from Superset under Settings → Account."
-msgstr "Tham gia từ Superset trong Cài đặt → Tài khoản."
+msgid "Opt in from Paradev under Settings → Account."
+msgstr "Tham gia từ Paradev trong Cài đặt → Tài khoản."
 
 msgid "Opt-out"
 msgstr "Từ chối"
@@ -12514,8 +12576,8 @@ msgstr "Cờ tùy chọn thêm vào sau phần prompt"
 msgid "Options"
 msgstr "Tùy chọn"
 
-msgid "Or ask your coding agent to install the Superset CLI."
-msgstr "Hoặc bảo coding agent của bạn cài CLI Superset."
+msgid "Or ask your coding agent to install the Paradev CLI."
+msgstr "Hoặc bảo coding agent của bạn cài CLI Paradev."
 
 msgid "Orange"
 msgstr "Cam"
@@ -12582,7 +12644,7 @@ msgid "Organize your work into teams. Tasks and integrations can sync per-team."
 msgstr "Sắp xếp công việc theo nhóm. Tác vụ và tích hợp có thể đồng bộ riêng cho từng nhóm."
 
 msgid "Originals"
-msgstr "Riêng của Superset"
+msgstr "Riêng của Paradev"
 
 msgid "Other"
 msgstr "Khác"
@@ -12607,6 +12669,9 @@ msgstr "Các cách khác để liên hệ"
 
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Vòng gọi vốn hạt giống 11,5 triệu USD của chúng tôi do Union Square Ventures dẫn dắt, cùng Y Combinator, Paul Graham và những nhà sáng lập mà chúng tôi ngưỡng mộ."
+
+msgid "Our investors"
+msgstr "Nhà đầu tư của chúng tôi"
 
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Nhận định của chúng tôi tính đến tháng 8 năm 2026, dựa trên đội của chính chúng tôi và những đội chúng tôi theo dõi sát. F3 phần lớn đã mở. F4 phần lớn còn đóng. Khoảng cách đó chính là phần việc phải làm."
@@ -12747,6 +12812,181 @@ msgstr "Gốc bố cục khung: dựng cây khung của một workspace"
 msgid "PaneHeaderActions.tsx"
 msgstr "PaneHeaderActions.tsx"
 
+msgid "Paradev"
+msgstr "Paradev"
+
+msgid "Paradev {version}"
+msgstr "Paradev {version}"
+
+msgid "Paradev Agent"
+msgstr "Paradev Agent"
+
+msgid "Paradev app"
+msgstr "Ứng dụng Paradev"
+
+msgid "Paradev App"
+msgstr "Ứng dụng Paradev"
+
+msgid "Paradev Automations"
+msgstr "Tự động hóa Paradev"
+
+msgid "Paradev CLI"
+msgstr "Paradev CLI"
+
+msgid "Paradev components"
+msgstr "Các thành phần Paradev"
+
+msgid "Paradev Components"
+msgstr "Component của Paradev"
+
+msgid "Paradev could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
+msgstr "Paradev không thể chuyển một số dự án hoặc workspace v1 của bạn. Mở trình nhập để xem lý do và thử lại từng mục."
+
+msgid "Paradev could not complete sign-in. Please try again."
+msgstr "Paradev không hoàn tất được việc đăng nhập. Vui lòng thử lại."
+
+msgid "Paradev CPU"
+msgstr "CPU của Paradev"
+
+msgid "Paradev CPU · last 5 min"
+msgstr "CPU của Paradev · 5 phút gần nhất"
+
+msgid "Paradev Design System"
+msgstr "Hệ thống thiết kế Paradev"
+
+msgid "Paradev desktop app"
+msgstr "Ứng dụng Paradev cho máy tính"
+
+msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
+msgstr "Paradev Enterprise là Paradev dành cho đội nhóm. Hãy liên hệ để biết thêm về những gì được bao gồm và cách nó phù hợp với tổ chức của bạn."
+
+msgid "Paradev for iPhone and iPad"
+msgstr "Paradev cho iPhone và iPad"
+
+msgid "Paradev for your team"
+msgstr "Paradev cho đội ngũ của bạn"
+
+msgid "Paradev forwards the ports a remote workspace opens while you have it selected."
+msgstr "Paradev chuyển tiếp các cổng mà workspace từ xa mở trong lúc bạn chọn nó."
+
+msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
+msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2), nên bạn có thể xem và tự host theo các điều khoản của giấy phép."
+
+msgid "Paradev hit an unexpected error. Reload to try again."
+msgstr "Paradev gặp lỗi không mong muốn. Tải lại để thử lại."
+
+msgid "Paradev holds the token and makes the calls. Agents never see it."
+msgstr "Paradev giữ token và thực hiện các lệnh gọi. Agent không bao giờ thấy nó."
+
+msgid "Paradev hooks"
+msgstr "Hook của Paradev"
+
+msgid "Paradev in-app browser"
+msgstr "Trình duyệt trong ứng dụng Paradev"
+
+msgid "Paradev is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
+msgstr "Paradev là ứng dụng máy tính. Nhập email và chúng tôi sẽ gửi liên kết tải để bạn mở trên máy Mac."
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
+msgstr "Paradev đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian."
+
+msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "Paradev đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian. Chúng tôi là 3 cựu CTO của YC đang xây một công cụ mà chính mình yêu thích."
+
+msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Paradev được xây dựng bởi một đội ngũ tại San Francisco, California. Với hỗ trợ sản phẩm hoặc câu hỏi về tài khoản, hãy gửi email tới <0>{supportEmail}</0> và chúng tôi sẽ phản hồi trong vòng một ngày làm việc. Với hợp tác, báo chí, doanh nghiệp hoặc bất cứ điều gì khác, hãy viết tới <1>{teamEmail}</1>."
+
+msgid "Paradev is built in Paradev, so we're our own #1 users. You get paid to make your own life easier."
+msgstr "Paradev được xây dựng ngay trong Paradev, nên chúng tôi chính là những người dùng hàng đầu. Bạn được trả lương để giúp công việc của mình dễ dàng hơn."
+
+msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
+msgstr "Paradev được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
+
+msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "Paradev là source-available: mã nguồn công khai trên GitHub theo Elastic License 2.0 (ELv2), cho phép bạn xem và tự host theo các điều khoản của giấy phép, nhưng không phải mã nguồn mở được OSI công nhận. Paradev không liên quan tới Apache Superset, công cụ business intelligence."
+
+msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev là source-available. Mọi pull request, review và bug đều công khai trên GitHub."
+
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev là bàn làm việc cho bước chuyển F3 sang F4: agent chạy song song trong các workspace tách biệt, đội agent bạn thực sự giám sát được, và một nơi để review code bạn không viết."
+
+msgid "Paradev isn't on Windows yet"
+msgstr "Hiện Paradev chỉ có trên Mac"
+
+msgid "Paradev may sign you back in after restart. Please try signing out again."
+msgstr "Paradev có thể đăng nhập lại cho bạn sau khi khởi động lại. Vui lòng thử đăng xuất lần nữa."
+
+msgid "Paradev memory"
+msgstr "Bộ nhớ của Paradev"
+
+msgid "Paradev memory · last 5 min"
+msgstr "Bộ nhớ của Paradev · 5 phút gần nhất"
+
+msgid "Paradev Mobile code diff on iPhone"
+msgstr "Diff mã của Paradev Mobile trên iPhone"
+
+msgid "Paradev mobile gives me the power of my desktop anywhere I go."
+msgstr "Paradev mobile mang sức mạnh của máy tính để bàn đến bất cứ đâu tôi đi."
+
+msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
+msgstr "Paradev Mobile giúp nhà phát triển tiếp tục từ iPhone các workspace Paradev mà họ đang dùng trên máy tính."
+
+msgid "Paradev Mobile page"
+msgstr "Trang Paradev Mobile"
+
+msgid "Paradev Mobile terminal on iPhone"
+msgstr "Terminal của Paradev Mobile trên iPhone"
+
+msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
+msgstr "Paradev cần quyền Full Disk Access để đọc dữ liệu của trình duyệt khác. Cấp quyền trong System Settings rồi kiểm tra lại."
+
+msgid "Paradev next to others"
+msgstr "Paradev so với các công cụ khác"
+
+msgid "Paradev on iPad, showing a pull request and a workspace list"
+msgstr "Paradev trên iPad, hiển thị một pull request và danh sách workspace"
+
+msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
+msgstr "Paradev chỉ nhận các quyền mà trình kết nối này yêu cầu. Ngắt kết nối bất cứ lúc nào để thu hồi."
+
+msgid "Paradev originals"
+msgstr "Thành phần riêng của Paradev"
+
+msgid "Paradev Pages"
+msgstr "Paradev Trang"
+
+msgid "Paradev Pages demo"
+msgstr "Bản demo Paradev Trang"
+
+msgid "Paradev Plugins"
+msgstr "Plugin Paradev"
+
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
+msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
+
+msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
+msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
+
+msgid "Paradev Teams"
+msgstr "Nhóm Paradev"
+
+msgid "Paradev UI"
+msgstr "Paradev UI"
+
+#. placeholder {0}: formatPercent(trackedMemorySharePercent)
+msgid "Paradev uses {0} of system RAM"
+msgstr "Paradev dùng {0} RAM hệ thống"
+
+msgid "Paradev vs the Alternatives"
+msgstr "Paradev và các lựa chọn khác"
+
+msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
+msgstr "Paradev làm việc với mọi coding agent dạng CLI, gồm Claude Code, OpenCode, OpenAI Codex và nhiều agent khác. Chọn agent khác nhau cho từng tác vụ mà không phải đổi workspace hay quy trình review."
+
+msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
+msgstr "Ứng dụng di động Paradev giúp tôi duy trì công việc của các agent và gỡ vướng cho chúng từ bất cứ đâu, ngay cả khi tôi ở xa máy tính."
+
 msgid "Paragraph"
 msgstr "Đoạn văn"
 
@@ -12802,8 +13042,8 @@ msgstr "Mật khẩu cho {email}"
 msgid "Paste"
 msgstr "Dán"
 
-msgid "Paste this into Superset CLI:"
-msgstr "Dán mã này vào Superset CLI:"
+msgid "Paste this into Paradev CLI:"
+msgstr "Dán mã này vào Paradev CLI:"
 
 msgid "Path"
 msgstr "Đường dẫn"
@@ -12884,8 +13124,8 @@ msgstr "mỗi người/tháng"
 msgid "Per-repo agent memory"
 msgstr "Bộ nhớ agent theo từng repository"
 
-msgid "Percent of total system RAM used by monitored Superset resources only (not all apps). A high share means Superset is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
-msgstr "Phần trăm tổng RAM hệ thống chỉ do các tài nguyên Superset được theo dõi sử dụng (không tính mọi ứng dụng). Tỷ lệ cao nghĩa là Superset góp phần lớn gây áp lực bộ nhớ; tỷ lệ thấp nghĩa là áp lực có thể đến từ nơi khác."
+msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
+msgstr "Phần trăm tổng RAM hệ thống chỉ do các tài nguyên Paradev được theo dõi sử dụng (không tính mọi ứng dụng). Tỷ lệ cao nghĩa là Paradev góp phần lớn gây áp lực bộ nhớ; tỷ lệ thấp nghĩa là áp lực có thể đến từ nơi khác."
 
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Xóa vĩnh viễn \"{projectName}\"?"
@@ -12966,8 +13206,8 @@ msgstr "Chọn workspace có agent đang chờ bạn nhập, đã hoàn tất k�
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
 
-msgid "Pick one in the Superset app. It's saved to your account."
-msgstr "Chọn một plugin trong ứng dụng Superset. Plugin được lưu vào tài khoản của bạn."
+msgid "Pick one in the Paradev app. It's saved to your account."
+msgstr "Chọn một plugin trong ứng dụng Paradev. Plugin được lưu vào tài khoản của bạn."
 
 msgid "Pick the best agent."
 msgstr "Chọn agent tốt nhất."
@@ -13050,8 +13290,8 @@ msgstr "Phát âm thanh khi tác vụ hoàn tất"
 msgid "Play the animation"
 msgstr "Phát hoạt ảnh"
 
-msgid "Play the Superset Pages demo"
-msgstr "Phát bản demo Superset Trang"
+msgid "Play the Paradev Pages demo"
+msgstr "Phát bản demo Paradev Trang"
 
 msgid "Please check your internet connection and try again."
 msgstr "Vui lòng kiểm tra kết nối internet rồi thử lại."
@@ -13068,8 +13308,8 @@ msgstr "Vui lòng chọn vị trí dự án"
 msgid "Please select an organization"
 msgstr "Vui lòng chọn một tổ chức"
 
-msgid "Please try again, or restart Superset on that device."
-msgstr "Vui lòng thử lại hoặc khởi động lại Superset trên thiết bị đó."
+msgid "Please try again, or restart Paradev on that device."
+msgstr "Vui lòng thử lại hoặc khởi động lại Paradev trên thiết bị đó."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -13202,8 +13442,8 @@ msgstr "PresetsBar.tsx"
 msgid "Press <0>Esc</0> to close"
 msgstr "Nhấn <0>Esc</0> để đóng"
 
-msgid "Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals."
-msgstr "Nhấn ⌘⇧B hoặc mở một cổng mà Superset đã phát hiện. Dev server của bạn sẽ tải trong một ngăn cạnh các terminal."
+msgid "Press ⌘⇧B or open a port Paradev detected. Your dev server loads in a pane beside your terminals."
+msgstr "Nhấn ⌘⇧B hoặc mở một cổng mà Paradev đã phát hiện. Dev server của bạn sẽ tải trong một ngăn cạnh các terminal."
 
 msgid "Press a key…"
 msgstr "Nhấn một phím…"
@@ -13449,8 +13689,8 @@ msgstr "Được promote từ một workspace nên repository và khu vực là 
 msgid "Prompt"
 msgstr "Prompt"
 
-msgid "Prompt a coding agent to build what you want to see in Superset. If we like your prompt, we'll run it and merge the result."
-msgstr "Ra prompt cho một coding agent để xây điều bạn muốn thấy trong Superset. Nếu chúng tôi thích prompt của bạn, chúng tôi sẽ chạy nó và merge kết quả."
+msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
+msgstr "Ra prompt cho một coding agent để xây điều bạn muốn thấy trong Paradev. Nếu chúng tôi thích prompt của bạn, chúng tôi sẽ chạy nó và merge kết quả."
 
 msgid "Prompt agents and answer their questions"
 msgstr "Gửi prompt cho agent và trả lời câu hỏi của chúng"
@@ -13519,8 +13759,8 @@ msgstr "Bảng xếp hạng công khai"
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "Xuất bản lại và liên kết vẫn giữ nguyên. Các phiên bản trước được lưu trong lịch sử."
 
-msgid "Publish from the Superset CLI or over MCP."
-msgstr "Xuất bản từ Superset CLI hoặc qua MCP."
+msgid "Publish from the Paradev CLI or over MCP."
+msgstr "Xuất bản từ Paradev CLI hoặc qua MCP."
 
 msgid "Publish from your own repo"
 msgstr "Xuất bản từ repo của bạn"
@@ -13703,8 +13943,8 @@ msgstr "Đánh giá {appName}"
 msgid "Rate limit exceeded."
 msgstr "Đã vượt giới hạn tần suất."
 
-msgid "Reach this Mac from anywhere via the Superset relay, or spin up cloud workspaces. Connect from any client."
-msgstr "Truy cập chiếc Mac này từ bất cứ đâu qua relay của Superset, hoặc khởi tạo workspace trên cloud. Kết nối từ mọi thiết bị."
+msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
+msgstr "Truy cập chiếc Mac này từ bất cứ đâu qua relay của Paradev, hoặc khởi tạo workspace trên cloud. Kết nối từ mọi thiết bị."
 
 msgid "Reached"
 msgstr "Đã đạt"
@@ -13733,6 +13973,9 @@ msgstr "Đọc và lập kế hoạch mà không thay đổi gì"
 msgid "Read and send mail"
 msgstr "Đọc và gửi thư"
 
+msgid "Read announcement"
+msgstr "Đọc thông báo"
+
 msgid "Read deployment and build logs"
 msgstr "Đọc log deployment và build"
 
@@ -13741,6 +13984,9 @@ msgstr "Đọc trên điện thoại"
 
 msgid "Read MCP servers again"
 msgstr "Đọc lại các server MCP"
+
+msgid "Read the announcement"
+msgstr "Đọc thông báo"
 
 msgid "Read the changelog"
 msgstr "Đọc changelog"
@@ -13803,8 +14049,8 @@ msgstr "Sẵn sàng trên mọi máy bạn đăng nhập và trong mọi workspa
 msgid "Ready to Merge"
 msgstr "Sẵn sàng merge"
 
-msgid "Ready to try Superset?"
-msgstr "Sẵn sàng thử Superset?"
+msgid "Ready to try Paradev?"
+msgstr "Sẵn sàng thử Paradev?"
 
 msgid "Reapply all commits"
 msgstr "Áp dụng lại toàn bộ commit"
@@ -13947,8 +14193,8 @@ msgstr "Tạo lại"
 msgid "Region"
 msgstr "Region"
 
-msgid "Registers lifecycle hooks in this agent's global config so Superset can show status and send notifications. Turning this off removes Superset's entries everywhere — status and notifications stop for this agent, including inside Superset."
-msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Superset hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Superset ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Superset."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
+msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
 
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
@@ -13977,8 +14223,8 @@ msgstr "Tải lại ứng dụng"
 msgid "Reload from disk"
 msgstr "Tải lại từ đĩa"
 
-msgid "Reload Superset to refresh the workspace list."
-msgstr "Tải lại Superset để làm mới danh sách workspace."
+msgid "Reload Paradev to refresh the workspace list."
+msgstr "Tải lại Paradev để làm mới danh sách workspace."
 
 msgid "Reload window"
 msgstr "Tải lại cửa sổ"
@@ -14311,8 +14557,8 @@ msgstr "Bắt buộc"
 msgid "Required version: {minimumVersion}+"
 msgstr "Phiên bản yêu cầu: {minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Superset Pro."
-msgstr "Yêu cầu iOS 26 hoặc iPadOS 26 trở lên. Đã bao gồm trong Superset Pro."
+msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "Yêu cầu iOS 26 hoặc iPadOS 26 trở lên. Đã bao gồm trong Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Gửi lại lời mời"
@@ -14377,8 +14623,8 @@ msgstr "Đặt lại sau {countdown} · {absolute}"
 msgid "Resets now"
 msgstr "Đặt lại ngay bây giờ"
 
-msgid "Resident memory used by Superset and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
-msgstr "Bộ nhớ thường trú mà Superset và các cây tiến trình terminal được theo dõi sử dụng. Nếu con số này cứ tăng mà không giảm, có thể một tiến trình workspace đang giữ bộ nhớ. Giá trị cao làm tăng nguy cơ swap và có thể gây giật."
+msgid "Resident memory used by Paradev and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
+msgstr "Bộ nhớ thường trú mà Paradev và các cây tiến trình terminal được theo dõi sử dụng. Nếu con số này cứ tăng mà không giảm, có thể một tiến trình workspace đang giữ bộ nhớ. Giá trị cao làm tăng nguy cơ swap và có thể gây giật."
 
 msgid "Resizable"
 msgstr "Resizable"
@@ -14578,8 +14824,8 @@ msgstr "Thử lại sau khi kết nối được làm mới."
 msgid "Retry dictation"
 msgstr "Thử đọc lại"
 
-msgid "Retry in a few seconds; if it persists, restart Superset."
-msgstr "Thử lại sau vài giây; nếu vẫn lỗi, khởi động lại Superset."
+msgid "Retry in a few seconds; if it persists, restart Paradev."
+msgstr "Thử lại sau vài giây; nếu vẫn lỗi, khởi động lại Paradev."
 
 msgid "Retry in a few seconds."
 msgstr "Thử lại sau vài giây."
@@ -14651,8 +14897,8 @@ msgstr "Chờ review"
 msgid "Review pending changes."
 msgstr "Xem lại các thay đổi đang chờ."
 
-msgid "Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly."
-msgstr "Review pull request ngay trong Superset: khung diff, review có agent hỗ trợ, xử lý bình luận trực tiếp."
+msgid "Review pull requests inside Paradev: diff pane, agent-assisted review, act on comments directly."
+msgstr "Review pull request ngay trong Paradev: khung diff, review có agent hỗ trợ, xử lý bình luận trực tiếp."
 
 msgid "Review requested"
 msgstr "Yêu cầu review"
@@ -14791,11 +15037,11 @@ msgstr "Chạy các agent cạnh nhau"
 msgid "Run an Army of"
 msgstr "Chạy cả một đội quân"
 
+msgid "Run an army of coding agents"
+msgstr "Vận hành cả một đội quân agent lập trình"
+
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Chạy trình mô phỏng iOS trong một ngăn của workspace để bạn và các agent có thể kiểm thử ứng dụng di động."
-
-msgid "Run any coding agent"
-msgstr "Chạy bất kỳ agent lập trình nào"
 
 msgid "Run automations on data source and comment activity."
 msgstr "Chạy tự động hóa theo hoạt động của nguồn dữ liệu và bình luận."
@@ -14896,8 +15142,8 @@ msgstr "Chạy một lệnh cục bộ trên máy bạn"
 msgid "Runs appear here once an automation fires."
 msgstr "Các lần chạy sẽ xuất hiện ở đây khi một tự động hóa được kích hoạt."
 
-msgid "Runs inside the Superset app on that device, so updating it means updating the app there."
-msgstr "Chạy bên trong ứng dụng Superset trên thiết bị đó, nên cập nhật nó nghĩa là cập nhật ứng dụng ở đó."
+msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
+msgstr "Chạy bên trong ứng dụng Paradev trên thiết bị đó, nên cập nhật nó nghĩa là cập nhật ứng dụng ở đó."
 
 msgid "Runs land in a workspace. Review the diff, merge what's good."
 msgstr "Kết quả chạy nằm trong một workspace. Xem diff, merge những gì tốt."
@@ -14993,11 +15239,11 @@ msgstr "Đang lưu…"
 msgid "Scale to 100+ agents"
 msgstr "Mở rộng lên hơn 100 tác nhân"
 
-msgid "Scan the QR code, then sign in with the same Superset account and select this organization."
-msgstr "Quét mã QR, sau đó đăng nhập bằng cùng tài khoản Superset và chọn tổ chức này."
+msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
+msgstr "Quét mã QR, sau đó đăng nhập bằng cùng tài khoản Paradev và chọn tổ chức này."
 
-msgid "Scan to download Superset for iPhone"
-msgstr "Quét để tải Superset cho iPhone"
+msgid "Scan to download Paradev for iPhone"
+msgstr "Quét để tải Paradev cho iPhone"
 
 msgid "Scanning transcript logs…"
 msgstr "Đang quét log transcript…"
@@ -15289,11 +15535,11 @@ msgstr "Xem thay đổi"
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Xem số sao GitHub của {companyName} đã tăng trưởng theo thời gian như thế nào."
 
-msgid "See how Superset compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
-msgstr "Xem Superset so với các công cụ lập trình AI khác, từ editor AI đến coding agent và kỹ sư AI trên cloud."
+msgid "See how Paradev compares to other AI coding tools, from AI editors to coding agents to cloud-based AI engineers."
+msgstr "Xem Paradev so với các công cụ lập trình AI khác, từ editor AI đến coding agent và kỹ sư AI trên cloud."
 
-msgid "See how Superset compares to other tools"
-msgstr "Xem Superset so với các công cụ khác"
+msgid "See how Paradev compares to other tools"
+msgstr "Xem Paradev so với các công cụ khác"
 
 msgid "See how we work"
 msgstr "Xem cách chúng tôi làm việc"
@@ -15316,8 +15562,8 @@ msgstr "Xem <0>tài liệu tham khảo các tool khả dụng</0> để biết t
 msgid "See the <0>custom themes guide</0> to edit a theme or build your own."
 msgstr "Xem <0>hướng dẫn chủ đề tùy chỉnh</0> để sửa một chủ đề hoặc tự tạo chủ đề riêng."
 
-msgid "See the open roles, or try Superset first."
-msgstr "Xem các vị trí đang tuyển, hoặc dùng thử Superset trước."
+msgid "See the open roles, or try Paradev first."
+msgstr "Xem các vị trí đang tuyển, hoặc dùng thử Paradev trước."
 
 msgid "See this gate on the scorecard"
 msgstr "Xem cổng này trên bảng điểm"
@@ -15325,8 +15571,8 @@ msgstr "Xem cổng này trên bảng điểm"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Xem những gì đã thay đổi, góp ý, và merge khi đã sẵn sàng."
 
-msgid "See what we're building now, what's coming next, and where Superset is headed."
-msgstr "Xem chúng tôi đang xây dựng gì, sắp tới có gì và Superset đang hướng tới đâu."
+msgid "See what we're building now, what's coming next, and where Paradev is headed."
+msgstr "Xem chúng tôi đang xây dựng gì, sắp tới có gì và Paradev đang hướng tới đâu."
 
 msgid "See what your teammates' agents are working on, shipping, and blocked on."
 msgstr "Xem agent của đồng đội đang làm gì, đang phát hành gì và đang bị chặn ở đâu."
@@ -15514,8 +15760,8 @@ msgstr "Gửi báo cáo"
 msgid "Send review"
 msgstr "Gửi review"
 
-msgid "Send the link. Your team opens it in a browser or in Superset."
-msgstr "Gửi liên kết. Nhóm bạn mở nó trong trình duyệt hoặc trong Superset."
+msgid "Send the link. Your team opens it in a browser or in Paradev."
+msgstr "Gửi liên kết. Nhóm bạn mở nó trong trình duyệt hoặc trong Paradev."
 
 msgid "Send to"
 msgstr "Gửi tới"
@@ -15655,8 +15901,8 @@ msgstr "Thiết lập dự án trên {hostName}"
 msgid "Set up project…"
 msgstr "Thiết lập dự án…"
 
-msgid "Set up this project for Superset"
-msgstr "Thiết lập dự án này cho Superset"
+msgid "Set up this project for Paradev"
+msgstr "Thiết lập dự án này cho Paradev"
 
 msgid "Set up with an agent"
 msgstr "Thiết lập bằng agent"
@@ -15736,6 +15982,9 @@ msgstr "Chia sẻ workspace"
 msgid "Share."
 msgstr "Chia sẻ."
 
+msgid "Shared"
+msgstr "Dùng chung"
+
 msgid "Shared across sessions using this login."
 msgstr "Dùng chung giữa các phiên sử dụng tài khoản đăng nhập này."
 
@@ -15745,11 +15994,11 @@ msgstr "Component dùng chung của ứng dụng"
 msgid "Shared component library."
 msgstr "Thư viện component dùng chung."
 
-msgid "Shared settings and simpler membership for teams that work in Superset together."
-msgstr "Cài đặt dùng chung và quản lý thành viên đơn giản hơn cho các nhóm cùng làm việc trong Superset."
+msgid "Shared settings and simpler membership for teams that work in Paradev together."
+msgstr "Cài đặt dùng chung và quản lý thành viên đơn giản hơn cho các nhóm cùng làm việc trong Paradev."
 
-msgid "Shared theme JSON files you can import into Superset."
-msgstr "Các tệp JSON chủ đề được chia sẻ, bạn có thể nhập vào Superset."
+msgid "Shared theme JSON files you can import into Paradev."
+msgstr "Các tệp JSON chủ đề được chia sẻ, bạn có thể nhập vào Paradev."
 
 msgid "Shared version"
 msgstr "Phiên bản được chia sẻ"
@@ -15793,8 +16042,8 @@ msgstr "Hiện"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Hiện hộp thoại xác nhận khi thoát ứng dụng"
 
-msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers."
-msgstr "Hiển thị micrô trong ô soạn chat. Giọng nói được ChatGPT chuyển thành văn bản khi Codex đã đăng nhập vào đó, nếu không thì trên máy Mac của bạn khi có thể, và nếu không nữa thì trên máy chủ của Superset."
+msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
+msgstr "Hiển thị micrô trong ô soạn chat. Giọng nói được ChatGPT chuyển thành văn bản khi Codex đã đăng nhập vào đó, nếu không thì trên máy Mac của bạn khi có thể, và nếu không nữa thì trên máy chủ của Paradev."
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Hiện nút Mức sử dụng trong thanh bên trang chủ, bên dưới Pull request"
@@ -15983,15 +16232,15 @@ msgstr "Đăng nhập lại để dùng đọc chính tả"
 msgid "Sign in as Local Admin (dev)"
 msgstr "Đăng nhập với quyền Local Admin (dev)"
 
-msgid "Sign in once. Superset keeps the connection."
-msgstr "Đăng nhập một lần. Superset giữ kết nối."
+msgid "Sign in once. Paradev keeps the connection."
+msgstr "Đăng nhập một lần. Paradev giữ kết nối."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
 msgid "Sign in to {0}"
 msgstr "Đăng nhập vào {0}"
 
-msgid "Sign in to continue to Superset"
-msgstr "Đăng nhập để tiếp tục vào Superset"
+msgid "Sign in to continue to Paradev"
+msgstr "Đăng nhập để tiếp tục vào Paradev"
 
 msgid "Sign in to get started"
 msgstr "Đăng nhập để bắt đầu"
@@ -16034,8 +16283,8 @@ msgstr "Đăng nhập lần đăng nhập {0} mặc định của hệ thống b
 msgid "Sign up in one step"
 msgstr "Đăng ký trong một bước"
 
-msgid "Sign up to get started with Superset"
-msgstr "Đăng ký để bắt đầu với Superset"
+msgid "Sign up to get started with Paradev"
+msgstr "Đăng ký để bắt đầu với Paradev"
 
 msgid "Sign up with GitHub"
 msgstr "Đăng ký bằng GitHub"
@@ -16139,8 +16388,8 @@ msgstr "Skill"
 msgid "Skills"
 msgstr "Skill"
 
-msgid "Skills ship with the Superset plugin and are kept up to date automatically in every agent you use. Click one to preview it."
-msgstr "Skill đi kèm plugin Superset và được tự động cập nhật trong mọi agent bạn dùng. Nhấp vào một skill để xem trước."
+msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
+msgstr "Skill đi kèm plugin Paradev và được tự động cập nhật trong mọi agent bạn dùng. Nhấp vào một skill để xem trước."
 
 msgid "Skip"
 msgstr "Bỏ qua"
@@ -16250,8 +16499,8 @@ msgstr "Ai đó"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Người khác đã xuất bản {entryPath} từ workspace này. Hãy xuất bản kèm id trang cụ thể để thêm phiên bản vào trang của họ, hoặc di chuyển tệp."
 
-msgid "Someone on the Superset team will review this page. We only follow up if we need more from you."
-msgstr "Một thành viên của nhóm Superset sẽ xem xét trang này. Chúng tôi chỉ liên hệ lại nếu cần thêm thông tin từ bạn."
+msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
+msgstr "Một thành viên của nhóm Paradev sẽ xem xét trang này. Chúng tôi chỉ liên hệ lại nếu cần thêm thông tin từ bạn."
 
 msgid "Something else"
 msgstr "Vấn đề khác"
@@ -16457,8 +16706,8 @@ msgstr "Đã đặt lại lời nhắc gắn sao: có thể xuất hiện lại 
 msgid "Star on GitHub"
 msgstr "Star trên GitHub"
 
-msgid "Star Superset on GitHub"
-msgstr "Gắn sao cho Superset trên GitHub"
+msgid "Star Paradev on GitHub"
+msgstr "Gắn sao cho Paradev trên GitHub"
 
 msgid "Starred"
 msgstr "Đã star"
@@ -16669,11 +16918,11 @@ msgstr "Dừng đọc chính tả"
 msgid "Stop local {0}"
 msgstr "Dừng {0} cục bộ"
 
+msgid "Stop Paradev here to delete from another device."
+msgstr "Hãy dừng Paradev ở đây để xóa từ thiết bị khác."
+
 msgid "Stop response"
 msgstr "Dừng phản hồi"
-
-msgid "Stop Superset here to delete from another device."
-msgstr "Hãy dừng Superset ở đây để xóa từ thiết bị khác."
 
 msgid "Stop the agent and send this now"
 msgstr "Dừng tác tử và gửi ngay"
@@ -16768,8 +17017,8 @@ msgstr "Gợi ý"
 msgid "suite for agent UIs, and shared app components. Click any import path to copy it."
 msgstr "cho giao diện agent, và các component dùng chung của ứng dụng. Nhấp vào đường dẫn import bất kỳ để sao chép."
 
-msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
-msgstr "Tổng CPU mà Superset và các cây tiến trình terminal được theo dõi sử dụng. Trên 100% nghĩa là nhiều nhân CPU đang bận. Giá trị cao kéo dài thường làm giao diện chậm và hao pin hơn."
+msgid "Sum of CPU used by Paradev and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
+msgstr "Tổng CPU mà Paradev và các cây tiến trình terminal được theo dõi sử dụng. Trên 100% nghĩa là nhiều nhân CPU đang bận. Giá trị cao kéo dài thường làm giao diện chậm và hao pin hơn."
 
 msgid "Summarize the changes in this workspace"
 msgstr "Tóm tắt các thay đổi trong workspace này"
@@ -16789,207 +17038,17 @@ msgstr "bị thay thế"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset"
-msgstr "Superset"
-
-msgid "Superset (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "Superset (YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
-
-msgid "Superset {version}"
-msgstr "Superset {version}"
-
-msgid "Superset Agent"
-msgstr "Superset Agent"
-
-msgid "Superset app"
-msgstr "Ứng dụng Superset"
-
-msgid "Superset App"
-msgstr "Ứng dụng Superset"
-
-msgid "Superset Automations"
-msgstr "Tự động hóa Superset"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp in ra endpoint chỉ cho ngăn đó. Trỏ Playwright hoặc browser-use vào đó."
 
-msgid "Superset CLI"
-msgstr "Superset CLI"
-
-msgid "Superset components"
-msgstr "Các thành phần Superset"
-
-msgid "Superset Components"
-msgstr "Component của Superset"
-
-msgid "Superset could not bring over some of your v1 projects or workspaces. Open the importer to see why and retry each one."
-msgstr "Superset không thể chuyển một số dự án hoặc workspace v1 của bạn. Mở trình nhập để xem lý do và thử lại từng mục."
-
-msgid "Superset could not complete sign-in. Please try again."
-msgstr "Superset không hoàn tất được việc đăng nhập. Vui lòng thử lại."
-
-msgid "Superset CPU"
-msgstr "CPU của Superset"
-
-msgid "Superset CPU · last 5 min"
-msgstr "CPU của Superset · 5 phút gần nhất"
-
-msgid "Superset Design System"
-msgstr "Hệ thống thiết kế Superset"
-
-msgid "Superset desktop app"
-msgstr "Ứng dụng Superset cho máy tính"
-
-msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
-msgstr "Superset Enterprise là Superset dành cho đội nhóm. Hãy liên hệ để biết thêm về những gì được bao gồm và cách nó phù hợp với tổ chức của bạn."
-
-msgid "Superset for iPhone and iPad"
-msgstr "Superset cho iPhone và iPad"
-
-msgid "Superset for press"
-msgstr "Superset dành cho báo chí"
-
-msgid "Superset for your team"
-msgstr "Superset cho đội ngũ của bạn"
-
-msgid "Superset forwards the ports a remote workspace opens while you have it selected."
-msgstr "Superset chuyển tiếp các cổng mà workspace từ xa mở trong lúc bạn chọn nó."
-
-msgid "Superset has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Superset có gói miễn phí. Mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2), nên bạn có thể xem và tự host theo các điều khoản của giấy phép."
-
-msgid "Superset has been used by one in eight Fortune 500 companies."
-msgstr "Superset đã được một trong tám công ty Fortune 500 sử dụng."
-
-msgid "Superset hit an unexpected error. Reload to try again."
-msgstr "Superset gặp lỗi không mong muốn. Tải lại để thử lại."
-
-msgid "Superset holds the token and makes the calls. Agents never see it."
-msgstr "Superset giữ token và thực hiện các lệnh gọi. Agent không bao giờ thấy nó."
-
-msgid "Superset hooks"
-msgstr "Hook của Superset"
-
-msgid "Superset in-app browser"
-msgstr "Trình duyệt trong ứng dụng Superset"
-
-msgid "Superset is a desktop app. Enter your email and we'll send you a download link to open on your Mac."
-msgstr "Superset là ứng dụng máy tính. Nhập email và chúng tôi sẽ gửi liên kết tải để bạn mở trên máy Mac."
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
-msgstr "Superset đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian."
-
-msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Superset đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian. Chúng tôi là 3 cựu CTO của YC đang xây một công cụ mà chính mình yêu thích."
-
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
-msgstr "Superset được xây dựng bởi một đội ngũ tại San Francisco, California. Với hỗ trợ sản phẩm hoặc câu hỏi về tài khoản, hãy gửi email tới <0>{supportEmail}</0> và chúng tôi sẽ phản hồi trong vòng một ngày làm việc. Với hợp tác, báo chí, doanh nghiệp hoặc bất cứ điều gì khác, hãy viết tới <1>{teamEmail}</1>."
-
-msgid "Superset is built in Superset, so we're our own #1 users. You get paid to make your own life easier."
-msgstr "Superset được xây dựng ngay trong Superset, nên chúng tôi chính là những người dùng hàng đầu. Bạn được trả lương để giúp công việc của mình dễ dàng hơn."
-
-msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
-msgstr "Superset được thiết kế để làm việc cùng công cụ sẵn có của bạn, chúng tôi hỗ trợ sẵn deep-link tới các IDE như Cursor để bạn mở workspace và tệp ngay trong IDE của mình."
-
-msgid "Superset is getting a new name soon"
-msgstr "Superset sắp có tên mới"
-
-msgid "Superset is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Superset is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Superset là source-available: mã nguồn công khai trên GitHub theo Elastic License 2.0 (ELv2), cho phép bạn xem và tự host theo các điều khoản của giấy phép, nhưng không phải mã nguồn mở được OSI công nhận. Superset không liên quan tới Apache Superset, công cụ business intelligence."
-
-msgid "Superset is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Superset là source-available. Mọi pull request, review và bug đều công khai trên GitHub."
-
-msgid "Superset is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Superset là bàn làm việc cho bước chuyển F3 sang F4: agent chạy song song trong các workspace tách biệt, đội agent bạn thực sự giám sát được, và một nơi để review code bạn không viết."
-
-msgid "Superset is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
-msgstr "Superset được các kỹ sư tại Netflix, Microsoft, NVIDIA, DoorDash, Wix và Mistral AI sử dụng trên toàn cầu, và tại châu Á là ByteDance, Toss, Kakao, Grab, LINE và Rakuten."
-
-msgid "Superset isn't on Windows yet"
-msgstr "Hiện Superset chỉ có trên Mac"
-
-msgid "Superset may sign you back in after restart. Please try signing out again."
-msgstr "Superset có thể đăng nhập lại cho bạn sau khi khởi động lại. Vui lòng thử đăng xuất lần nữa."
-
-msgid "Superset memory"
-msgstr "Bộ nhớ của Superset"
-
-msgid "Superset memory · last 5 min"
-msgstr "Bộ nhớ của Superset · 5 phút gần nhất"
-
-msgid "Superset Mobile code diff on iPhone"
-msgstr "Diff mã của Superset Mobile trên iPhone"
-
-msgid "Superset mobile gives me the power of my desktop anywhere I go."
-msgstr "Superset mobile mang sức mạnh của máy tính để bàn đến bất cứ đâu tôi đi."
+msgid "Superset is now Paradev. Also, we raised an $11.5M seed"
+msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi được vòng hạt giống 11,5 triệu USD"
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile giúp nhà phát triển tiếp tục từ iPhone các workspace Superset mà họ đang dùng trên máy tính."
-
-msgid "Superset Mobile page"
-msgstr "Trang Superset Mobile"
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Terminal của Superset Mobile trên iPhone"
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset cần quyền Full Disk Access để đọc dữ liệu của trình duyệt khác. Cấp quyền trong System Settings rồi kiểm tra lại."
-
-msgid "Superset next to others"
-msgstr "Superset so với các công cụ khác"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset trên iPad, hiển thị một pull request và danh sách workspace"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset chỉ nhận các quyền mà trình kết nối này yêu cầu. Ngắt kết nối bất cứ lúc nào để thu hồi."
-
-msgid "Superset originals"
-msgstr "Thành phần riêng của Superset"
-
-msgid "Superset Pages"
-msgstr "Superset Trang"
-
-msgid "Superset Pages demo"
-msgstr "Bản demo Superset Trang"
-
-msgid "Superset Plugins"
-msgstr "Plugin Superset"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn Superset là một trong những startup nổi bật tại YC Demo Day."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Superset đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
-
-msgid "Superset Teams"
-msgstr "Nhóm Superset"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset dùng {0} RAM hệ thống"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset và các lựa chọn khác"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset làm việc với mọi coding agent dạng CLI, gồm Claude Code, OpenCode, OpenAI Codex và nhiều agent khác. Chọn agent khác nhau cho từng tác vụ mà không phải đổi workspace hay quy trình review."
-
 msgid "superset.sh"
 msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Ứng dụng di động Superset giúp tôi duy trì công việc của các agent và gỡ vướng cho chúng từ bất cứ đâu, ngay cả khi tôi ở xa máy tính."
 
 msgid "Supervised"
 msgstr "Có giám sát"
@@ -17113,8 +17172,8 @@ msgstr "Đồng bộ thất bại"
 msgid "Sync issues bidirectionally with Linear."
 msgstr "Đồng bộ issue hai chiều với Linear."
 
-msgid "Sync issues bidirectionally with Linear. Create tasks in Superset and have them appear in Linear, or import existing Linear issues."
-msgstr "Đồng bộ issue hai chiều với Linear. Tạo tác vụ trong Superset để chúng xuất hiện trong Linear, hoặc nhập issue Linear có sẵn."
+msgid "Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues."
+msgstr "Đồng bộ issue hai chiều với Linear. Tạo tác vụ trong Paradev để chúng xuất hiện trong Linear, hoặc nhập issue Linear có sẵn."
 
 msgid "Sync Repositories"
 msgstr "Đồng bộ repository"
@@ -17140,8 +17199,8 @@ msgstr "Tỷ lệ RAM hệ thống"
 #. placeholder {0}: formatMemory(snapshot.totalMemory)
 #. placeholder {1}: formatMemory(otherUsedMemory)
 #. placeholder {2}: formatMemory(freeMemory)
-msgid "System RAM: Superset {0}, other apps {1}, free {2}"
-msgstr "RAM hệ thống: Superset {0}, ứng dụng khác {1}, trống {2}"
+msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
+msgstr "RAM hệ thống: Paradev {0}, ứng dụng khác {1}, trống {2}"
 
 msgid "Tab"
 msgstr "Tab"
@@ -17188,8 +17247,8 @@ msgstr "Có hiệu lực ở các phiên agent mới."
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Lâu hơn bình thường. Nó vẫn tiếp tục nếu bạn rời đi."
 
-msgid "Talk to Superset"
-msgstr "Trò chuyện với Superset"
+msgid "Talk to Paradev"
+msgstr "Trò chuyện với Paradev"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Chạm vào bất kỳ đâu trên trang để bình luận"
@@ -17249,8 +17308,8 @@ msgstr "Đã cập nhật nơi theo dõi công việc"
 msgid "Tasks"
 msgstr "Tác vụ"
 
-msgid "Tasks created in Superset will be synced to this Linear team."
-msgstr "Tác vụ tạo trong Superset sẽ được đồng bộ sang nhóm Linear này."
+msgid "Tasks created in Paradev will be synced to this Linear team."
+msgstr "Tác vụ tạo trong Paradev sẽ được đồng bộ sang nhóm Linear này."
 
 msgid "Tasks, the CLI and agents follow this. Each member uses their own Linear account."
 msgstr "Công việc, CLI và agent làm theo thiết lập này. Mỗi thành viên dùng tài khoản Linear của riêng mình."
@@ -17489,11 +17548,14 @@ msgstr "Agent dùng skill và công cụ của nó. Issue xuất hiện trong Li
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "Agent theo dõi trang sẽ đọc từng bình luận. Agent cập nhật trang và trả lời trong luồng."
 
-msgid "The app is free to download. It requires iOS 26 or later and Superset Pro. Android is next."
-msgstr "Ứng dụng được tải miễn phí. Yêu cầu iOS 26 trở lên và Superset Pro. Tiếp theo sẽ là Android."
+msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
+msgstr "Thông báo cũng chia sẻ vòng gọi vốn hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham."
 
-msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Superset build. Restarting replaces it with this app's copy."
-msgstr "Ứng dụng đang ở {appVersion} nhưng kết nối với dịch vụ máy chủ do thứ khác khởi động, có thể là CLI cũ hoặc bản dựng Superset khác. Khởi động lại sẽ thay thế nó bằng bản của ứng dụng này."
+msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
+msgstr "Ứng dụng được tải miễn phí. Yêu cầu iOS 26 trở lên và Paradev Pro. Tiếp theo sẽ là Android."
+
+msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
+msgstr "Ứng dụng đang ở {appVersion} nhưng kết nối với dịch vụ máy chủ do thứ khác khởi động, có thể là CLI cũ hoặc bản dựng Paradev khác. Khởi động lại sẽ thay thế nó bằng bản của ứng dụng này."
 
 msgid "The automation's owner can't use cloud workspaces in this organization anymore. Ask them to check their access, or run the automation on a device."
 msgstr "Chủ sở hữu của tự động hóa không còn dùng được workspace cloud trong tổ chức này. Hãy nhờ họ kiểm tra quyền truy cập, hoặc chạy tự động hóa trên một thiết bị."
@@ -17513,6 +17575,12 @@ msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi k
 msgid "The code expired. Start again."
 msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
 
+msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "Các lệnh Superset chạy để thiết lập, chạy và lưu trữ các workspace của dự án này, từ .superset/config.toml."
+
+msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
+msgstr "Công ty đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn công ty là một trong những startup nổi bật tại YC Demo Day."
+
 msgid "The connection timed out"
 msgstr "Kết nối đã quá thời gian"
 
@@ -17526,10 +17594,10 @@ msgid "The daemon couldn't hand off your live sessions to the new binary. Reason
 msgstr "Daemon không chuyển được các phiên đang chạy sang bản binary mới. Lý do:"
 
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
-msgstr "Chúng tôi đang đưa Superset lên Windows & Linux. Để lại email và chúng tôi sẽ báo ngay khi sẵn sàng."
+msgstr "Chúng tôi đang đưa Paradev lên Windows & Linux. Để lại email và chúng tôi sẽ báo ngay khi sẵn sàng."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Superset from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Superset từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
+msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Paradev từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
 
 msgid "The device that hosts this project is unavailable."
 msgstr "Thiết bị chứa dự án này không khả dụng."
@@ -17588,8 +17656,11 @@ msgstr "Toàn bộ vòng lặp cốt lõi (nhập repo, chạy agent, review dif
 msgid "The full workspace. Run agents in parallel, keep each one in its own worktree, and review every change before it lands."
 msgstr "Toàn bộ workspace. Chạy nhiều agent song song, giữ mỗi agent trong worktree riêng và xem lại mọi thay đổi trước khi áp dụng."
 
-msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
-msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Superset có thể tái sử dụng."
+msgid "The funds and angels who back our team."
+msgstr "Các quỹ và nhà đầu tư thiên thần đồng hành cùng đội ngũ chúng tôi."
+
+msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
+msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Paradev có thể tái sử dụng."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -17626,11 +17697,11 @@ msgstr "Lượt tải lên hình ảnh đã hết hạn — hãy đính kèm l�
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Mô tả công việc thay đổi. Kỹ sư thôi làm thợ gõ phím có gu và trở thành người điều phối có gu: chia nhỏ công việc, phân về các đội agent, phân xử xung đột giữa những agent cùng chạm vào một module."
 
-msgid "The latest updates, improvements, and new features in Superset."
-msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Superset."
+msgid "The latest updates, improvements, and new features in Paradev."
+msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Paradev."
 
-msgid "The latest updates, improvements, and new features in Superset. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
-msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Superset. Cập nhật hằng tuần. Xem ghi chú phát hành chi tiết tại <0>GitHub Releases<1/></0>"
+msgid "The latest updates, improvements, and new features in Paradev. Updated weekly. For detailed release notes, see <0>GitHub Releases<1/></0>"
+msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Paradev. Cập nhật hằng tuần. Xem ghi chú phát hành chi tiết tại <0>GitHub Releases<1/></0>"
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Automation Launch watch với trigger Sentry và lịch hằng ngày, hai lượt chạy của nó và pull request nháp mà agent đã mở."
@@ -17650,8 +17721,8 @@ msgstr "Thay đổi cục bộ đã được hoàn tác."
 msgid "The local host service is unavailable for {organization} on {device}. Status: {status}. {recovery}"
 msgstr "Dịch vụ host cục bộ không khả dụng cho {organization} trên {device}. Trạng thái: {status}. {recovery}"
 
-msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Superset."
-msgstr "Dịch vụ host cục bộ không phản hồi. Khởi động lại thường xử lý được; nếu vẫn lặp lại, hãy khởi động lại Superset."
+msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
+msgstr "Dịch vụ host cục bộ không phản hồi. Khởi động lại thường xử lý được; nếu vẫn lặp lại, hãy khởi động lại Paradev."
 
 msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
 msgstr "Dịch vụ host cục bộ không chạy nên không có gì trên thiết bị này phục vụ được workspace. Khởi động lại sẽ gắn lại terminal và tệp của bạn — không mất gì trên đĩa."
@@ -17695,6 +17766,15 @@ msgstr "Trang bạn tìm không tồn tại."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Ngăn dùng thông tin đăng nhập thật của bạn. Agent sẽ hỏi bạn trước khi thực hiện hành động quan trọng."
 
+msgid "The Paradev desktop app is available for macOS and Linux."
+msgstr "Ứng dụng desktop Paradev có sẵn cho macOS và Linux."
+
+msgid "The Paradev host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "Dịch vụ host Paradev cho {organization} đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
+
+msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
+msgstr "Dịch vụ host Paradev đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
+
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ được tính theo GB-giờ với mức giá hiển thị ở từng gói."
 
@@ -17727,11 +17807,11 @@ msgid "The rubric"
 msgstr "Thang chấm"
 
 #. placeholder {0}: remoteHost?.name ?? t({ message: "the target host", })
-msgid "The run was skipped because <0>{0}</0> isn't connected to the Superset relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
-msgstr "Lần chạy bị bỏ qua vì <0>{0}</0> chưa kết nối tới relay của Superset. Hãy đảm bảo đã bật truy cập relay trong Cài đặt > Truy cập từ xa trên thiết bị đó, rồi chạy lại."
+msgid "The run was skipped because <0>{0}</0> isn't connected to the Paradev relay. Make sure relay access is on in Settings > Remote Access on that device, then run it again."
+msgstr "Lần chạy bị bỏ qua vì <0>{0}</0> chưa kết nối tới relay của Paradev. Hãy đảm bảo đã bật truy cập relay trong Cài đặt > Truy cập từ xa trên thiết bị đó, rồi chạy lại."
 
-msgid "The run was skipped because this device isn't connected to the Superset relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
-msgstr "Lần chạy bị bỏ qua vì thiết bị này chưa kết nối tới relay của Superset. Tự động hóa luôn đi qua relay kể cả khi chạy trên chính thiết bị này. Hãy bật truy cập relay rồi chạy lại."
+msgid "The run was skipped because this device isn't connected to the Paradev relay. Automations go through the relay even when they run on this device. Enable relay access, then run it again."
+msgstr "Lần chạy bị bỏ qua vì thiết bị này chưa kết nối tới relay của Paradev. Tự động hóa luôn đi qua relay kể cả khi chạy trên chính thiết bị này. Hãy bật truy cập relay rồi chạy lại."
 
 msgid "The same app runs natively on iPad, in portrait and landscape."
 msgstr "Cùng một ứng dụng chạy native trên iPad, ở cả chế độ dọc và ngang."
@@ -17762,15 +17842,6 @@ msgstr "Chứng chỉ của trang không hợp lệ"
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Điểm khởi đầu mà một workspace cloud boot lên — một base image, hoặc một sandbox bạn đã cấu hình và muốn fork."
-
-msgid "The Superset desktop app is available for macOS and Linux."
-msgstr "Ứng dụng desktop Superset có sẵn cho macOS và Linux."
-
-msgid "The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "Dịch vụ host Superset cho {organization} đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
-
-msgid "The Superset host service stopped unexpectedly ({cause}) and could not be restarted automatically."
-msgstr "Dịch vụ host Superset đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
 
 msgid "the target host"
 msgstr "host đích"
@@ -17826,8 +17897,8 @@ msgstr "Giao diện và agent"
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Các lệnh này chạy tự động khi một workspace được tạo. <0>Đọc tài liệu<1/></0>"
 
-msgid "These folders still have your files, but they did not come over to the new Superset on their own."
-msgstr "Các thư mục này vẫn còn tệp của bạn, nhưng chưa tự chuyển sang Superset mới."
+msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
+msgstr "Các thư mục này vẫn còn tệp của bạn, nhưng chưa tự chuyển sang Paradev mới."
 
 msgid "These ports are still in use"
 msgstr "Các cổng này vẫn đang được dùng"
@@ -17847,8 +17918,8 @@ msgstr "Ba mươi"
 msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
 msgstr "Tài khoản {plugin} này đã được {owner} kết nối. Hãy đề nghị họ ngắt kết nối trước."
 
-msgid "This {plugin} account is already connected by another Superset organization."
-msgstr "Tài khoản {plugin} này đã được một tổ chức Superset khác kết nối."
+msgid "This {plugin} account is already connected by another Paradev organization."
+msgstr "Tài khoản {plugin} này đã được một tổ chức Paradev khác kết nối."
 
 msgid "This action is irreversible."
 msgstr "Không thể hoàn tác thao tác này."
@@ -17868,8 +17939,8 @@ msgstr "Cấu hình tác nhân này không hỗ trợ chọn tài khoản."
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."
 
-msgid "This agent only shows chats saved in Superset."
-msgstr "Tác tử này chỉ hiển thị các cuộc trò chuyện được lưu trong Superset."
+msgid "This agent only shows chats saved in Paradev."
+msgstr "Tác tử này chỉ hiển thị các cuộc trò chuyện được lưu trong Paradev."
 
 msgid "This also:"
 msgstr "Thao tác này cũng sẽ:"
@@ -17935,8 +18006,8 @@ msgstr "Thiết bị này"
 msgid "this device ({id})"
 msgstr "thiết bị này ({id})"
 
-msgid "This device isn't connected to the Superset relay, so automation runs will be skipped."
-msgstr "Thiết bị này chưa kết nối tới relay của Superset nên các lần chạy tự động hóa sẽ bị bỏ qua."
+msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
+msgstr "Thiết bị này chưa kết nối tới relay của Paradev nên các lần chạy tự động hóa sẽ bị bỏ qua."
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư mục gốc của workspace."
@@ -17956,8 +18027,8 @@ msgstr "tệp này"
 msgid "This file is empty or was deleted."
 msgstr "Tệp này rỗng hoặc đã bị xóa."
 
-msgid "This GitHub installation is already connected to another Superset organization. Disconnect it there, or uninstall the Superset GitHub App, then try again."
-msgstr "Bản cài đặt GitHub này đã kết nối với một tổ chức Superset khác. Hãy ngắt kết nối ở đó, hoặc gỡ Superset GitHub App, rồi thử lại."
+msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
+msgstr "Bản cài đặt GitHub này đã kết nối với một tổ chức Paradev khác. Hãy ngắt kết nối ở đó, hoặc gỡ Paradev GitHub App, rồi thử lại."
 
 msgid "This host"
 msgstr "Host này"
@@ -17992,8 +18063,8 @@ msgstr "Liên kết issue này không hợp lệ."
 msgid "This Linear workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Workspace Linear này đã được {owner} kết nối. Hãy nhờ họ ngắt kết nối trước."
 
-msgid "This Linear workspace is already connected by another Superset organization."
-msgstr "Workspace Linear này đã được một tổ chức Superset khác kết nối."
+msgid "This Linear workspace is already connected by another Paradev organization."
+msgstr "Workspace Linear này đã được một tổ chức Paradev khác kết nối."
 
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Đây có vẻ là tệp nhị phân. Mở dưới dạng văn bản có thể hiện ra ký tự lỗi hoặc làm treo trình soạn thảo với tệp lớn."
@@ -18010,8 +18081,8 @@ msgstr "Kích thước máy này không có cho tổ chức của bạn. Hãy ch
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "Tenant Microsoft này đã được {detail} kết nối. Hãy nhờ họ ngắt kết nối trước."
 
-msgid "This Microsoft tenant is already connected by another Superset organization."
-msgstr "Tenant Microsoft này đã được một tổ chức Superset khác kết nối."
+msgid "This Microsoft tenant is already connected by another Paradev organization."
+msgstr "Tenant Microsoft này đã được một tổ chức Paradev khác kết nối."
 
 msgid "This month"
 msgstr "Tháng này"
@@ -18043,8 +18114,8 @@ msgstr "Trang này không có ở đây"
 msgid "This page no longer exists"
 msgstr "Trang này không còn tồn tại"
 
-msgid "This page was published by a Superset user. Its contents are unverified."
-msgstr "Trang này do một người dùng Superset đăng. Nội dung chưa được xác minh."
+msgid "This page was published by a Paradev user. Its contents are unverified."
+msgstr "Trang này do một người dùng Paradev đăng. Nội dung chưa được xác minh."
 
 msgid "This page was taken down and can no longer be changed"
 msgstr "Trang này đã bị gỡ và không thể chỉnh sửa nữa"
@@ -18072,6 +18143,9 @@ msgstr "Dự án này không còn khả dụng trên các thiết bị của b�
 
 msgid "This project isn't linked to a GitHub repository."
 msgstr "Dự án này chưa được liên kết với kho lưu trữ GitHub."
+
+msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
+msgstr "Dự án này vẫn dùng config.json cũ. Nó vẫn hoạt động; hãy chuyển sang config.toml để dùng các phần mới."
 
 msgid "This project's host is offline"
 msgstr "Host của dự án này đang ngoại tuyến"
@@ -18112,8 +18186,8 @@ msgstr "Màn hình này không tồn tại"
 msgid "This Slack workspace is already connected by {owner}. Ask them to disconnect first."
 msgstr "Workspace Slack này đã được {owner} kết nối. Hãy nhờ họ ngắt kết nối trước."
 
-msgid "This Slack workspace is already connected by another Superset organization."
-msgstr "Workspace Slack này đã được một tổ chức Superset khác kết nối."
+msgid "This Slack workspace is already connected by another Paradev organization."
+msgstr "Workspace Slack này đã được một tổ chức Paradev khác kết nối."
 
 msgid "This slug is already taken"
 msgstr "Slug này đã có người dùng"
@@ -18344,8 +18418,8 @@ msgstr "Mức dùng token"
 msgid "Tokens"
 msgstr "Token"
 
-msgid "Tokens are held by Superset and attached to requests there. They are never written into your local agent config."
-msgstr "Superset giữ các token và đính kèm chúng vào yêu cầu tại máy chủ. Chúng không bao giờ được ghi vào cấu hình tác nhân cục bộ của bạn."
+msgid "Tokens are held by Paradev and attached to requests there. They are never written into your local agent config."
+msgstr "Paradev giữ các token và đính kèm chúng vào yêu cầu tại máy chủ. Chúng không bao giờ được ghi vào cấu hình tác nhân cục bộ của bạn."
 
 msgid "Tokens per session"
 msgstr "Token mỗi phiên"
@@ -18389,8 +18463,8 @@ msgstr "Quá nhiều báo cáo hỗ trợ. Hãy thử lại sau."
 msgid "Too many untitled items here already."
 msgstr "Đã có quá nhiều mục chưa đặt tên ở đây."
 
-msgid "Too old for this app to talk to. Update the Superset app on that device to reconnect."
-msgstr "Quá cũ để ứng dụng này giao tiếp. Hãy cập nhật ứng dụng Superset trên thiết bị đó để kết nối lại."
+msgid "Too old for this app to talk to. Update the Paradev app on that device to reconnect."
+msgstr "Quá cũ để ứng dụng này giao tiếp. Hãy cập nhật ứng dụng Paradev trên thiết bị đó để kết nối lại."
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Quá cũ để ứng dụng này giao tiếp. Các workspace trên máy chủ này sẽ không mở cho đến khi được cập nhật."
@@ -18443,8 +18517,8 @@ msgstr "Tổng số token đã công bố"
 msgid "Trace charges and subscriptions"
 msgstr "Theo dõi khoản thu và gói đăng ký"
 
-msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Superset."
-msgstr "Theo dõi và quản lý tác vụ được đồng bộ từ Linear. Nắm bắt công việc mà không cần rời Superset."
+msgid "Track and manage tasks synced from Linear. Stay on top of your work without leaving Paradev."
+msgstr "Theo dõi và quản lý tác vụ được đồng bộ từ Linear. Nắm bắt công việc mà không cần rời Paradev."
 
 msgid "Track budgets and spending"
 msgstr "Theo dõi ngân sách và chi tiêu"
@@ -18521,11 +18595,11 @@ msgstr "Hãy thử từ khóa khác hoặc nơi khác."
 msgid "Try again"
 msgstr "Thử lại"
 
-msgid "Try again, or restart the host service from the Superset tray menu."
-msgstr "Thử lại hoặc khởi động lại dịch vụ máy chủ từ menu Superset ở khay hệ thống."
+msgid "Try again, or restart the host service from the Paradev tray menu."
+msgstr "Thử lại hoặc khởi động lại dịch vụ máy chủ từ menu Paradev ở khay hệ thống."
 
-msgid "Try again. If the problem continues, reload Superset."
-msgstr "Hãy thử lại. Nếu vẫn lỗi, tải lại Superset."
+msgid "Try again. If the problem continues, reload Paradev."
+msgstr "Hãy thử lại. Nếu vẫn lỗi, tải lại Paradev."
 
 msgid "Try early access features and previews."
 msgstr "Dùng thử các tính năng và bản xem trước sớm."
@@ -18884,6 +18958,9 @@ msgstr "Cập nhật quy tắc đặt tên"
 msgid "Update naming instructions for {0}"
 msgstr "Cập nhật quy tắc đặt tên cho {0}"
 
+msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
+msgstr "Cập nhật Paradev trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."
+
 msgid "Update payment method"
 msgstr "Cập nhật phương thức thanh toán"
 
@@ -18893,8 +18970,8 @@ msgstr "Bản cập nhật đã sẵn sàng"
 msgid "Update Required"
 msgstr "Cần cập nhật"
 
-msgid "Update Superset on that device. In-app updates require a supported standalone install and a released app version."
-msgstr "Cập nhật Superset trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."
+msgid "Update Superset on this host to edit its workspace config."
+msgstr "Hãy cập nhật Superset trên máy chủ này để chỉnh sửa cấu hình workspace."
 
 msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
@@ -19030,17 +19107,17 @@ msgstr "Dùng cho agent mới"
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"
 
-msgid "Use Superset on mobile"
-msgstr "Dùng Superset trên điện thoại"
+msgid "Use Paradev on mobile"
+msgstr "Dùng Paradev trên điện thoại"
 
-msgid "Use Superset on your phone with Pro."
-msgstr "Dùng Superset trên điện thoại với Pro."
+msgid "Use Paradev on your phone with Pro."
+msgstr "Dùng Paradev trên điện thoại với Pro."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập trình."
 
-msgid "Use the Superset tray menu > Host Service > Restart, then retry."
-msgstr "Dùng menu khay Superset > Host Service > Restart, rồi thử lại."
+msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
+msgstr "Dùng menu khay Paradev > Host Service > Restart, rồi thử lại."
 
 msgid "Use this account"
 msgstr "Dùng tài khoản này"
@@ -19054,14 +19131,14 @@ msgstr "Dùng repo này"
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Dùng cách này để sửa các terminal bị kẹt hoặc không phản hồi."
 
-msgid "Use this when calling the Superset API."
-msgstr "Dùng ID này khi gọi API của Superset."
+msgid "Use this when calling the Paradev API."
+msgstr "Dùng ID này khi gọi API của Paradev."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Dùng tính năng chuyển giọng nói thành văn bản và nhấn để nói."
 
-msgid "Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider."
-msgstr "Dùng gói đăng ký agent và khóa API sẵn có của bạn. Superset không bao giờ proxy lệnh gọi mô hình hay trói quy trình của bạn vào một nhà cung cấp."
+msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
+msgstr "Dùng gói đăng ký agent và khóa API sẵn có của bạn. Paradev không bao giờ proxy lệnh gọi mô hình hay trói quy trình của bạn vào một nhà cung cấp."
 
 msgid "Used in URLs and APIs."
 msgstr "Dùng trong URL và API."
@@ -19236,6 +19313,9 @@ msgstr "Xem vị trí đang tuyển"
 msgid "View open roles on Y Combinator"
 msgstr "Xem các vị trí đang tuyển trên Y Combinator"
 
+msgid "View Paradev repository on GitHub"
+msgstr "Xem repository Paradev trên GitHub"
+
 msgid "View pull request"
 msgstr "Xem pull request"
 
@@ -19244,9 +19324,6 @@ msgstr "Xem ghi chú phát hành"
 
 msgid "View releases on GitHub"
 msgstr "Xem bản phát hành trên GitHub"
-
-msgid "View Superset repository on GitHub"
-msgstr "Xem repository Superset trên GitHub"
 
 msgid "View usage"
 msgstr "Xem mức sử dụng"
@@ -19325,8 +19402,8 @@ msgstr "Có cảnh báo."
 msgid "Watch a design review go from comment to new version."
 msgstr "Xem một buổi duyệt thiết kế đi từ bình luận đến phiên bản mới."
 
-msgid "Watch the Superset Automations video on YouTube"
-msgstr "Xem video Tự động hóa Superset trên YouTube"
+msgid "Watch the Paradev Automations video on YouTube"
+msgstr "Xem video Tự động hóa Paradev trên YouTube"
 
 msgid "Wayfinding and disclosure"
 msgstr "Định hướng và mở rộng nội dung"
@@ -19364,6 +19441,9 @@ msgstr "Đã tìm thấy {hostName}. Bật Truy cập từ xa trên máy đó đ
 msgid "We only collect analytics cookies so we can improve your experience."
 msgstr "Chúng tôi chỉ thu thập cookie phân tích để cải thiện trải nghiệm của bạn."
 
+msgid "We raised an {amount} seed round to help you run an army of coding agents."
+msgstr "Chúng tôi đã gọi vốn hạt giống {amount} để giúp bạn vận hành cả một đội quân agent lập trình."
+
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Chúng tôi đã gửi liên kết tải tới {submittedEmail}."
 
@@ -19373,8 +19453,8 @@ msgstr "Chúng tôi sẽ liên hệ sớm."
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Bạn sẽ quay lại ngay khi kết nối được khôi phục."
 
-msgid "We'll email you when Superset for Android is ready."
-msgstr "Chúng tôi sẽ gửi email cho bạn khi Superset cho Android sẵn sàng."
+msgid "We'll email you when Paradev for Android is ready."
+msgstr "Chúng tôi sẽ gửi email cho bạn khi Paradev cho Android sẵn sàng."
 
 msgid "We'll get back to you shortly."
 msgstr "Chúng tôi sẽ phản hồi sớm."
@@ -19457,17 +19537,17 @@ msgstr "Chào mừng trở lại"
 msgid "Welcome to {appName}"
 msgstr "Chào mừng đến với {appName}"
 
-msgid "Welcome to Superset"
-msgstr "Chào mừng đến với Superset"
+msgid "Welcome to Paradev"
+msgstr "Chào mừng đến với Paradev"
 
-msgid "Welcome to the new Superset"
-msgstr "Chào mừng đến với Superset mới"
+msgid "Welcome to the new Paradev"
+msgstr "Chào mừng đến với Paradev mới"
 
 msgid "What are the benefits?"
 msgstr "Phúc lợi gồm những gì?"
 
-msgid "What builders say about Superset"
-msgstr "Các nhà phát triển nói gì về Superset"
+msgid "What builders say about Paradev"
+msgstr "Các nhà phát triển nói gì về Paradev"
 
 msgid "What did you see on the page?"
 msgstr "Bạn đã thấy gì trên trang này?"
@@ -19490,14 +19570,17 @@ msgstr "Nếu Mac của tôi ngoại tuyến khi trigger kích hoạt thì sao?"
 msgid "What is a workspace?"
 msgstr "Workspace là gì?"
 
-msgid "What is Superset Enterprise?"
-msgstr "Superset Enterprise là gì?"
+msgid "What is Paradev Enterprise?"
+msgstr "Paradev Enterprise là gì?"
 
 msgid "What is wrong?"
 msgstr "Vấn đề là gì?"
 
-msgid "What platforms does Superset run on?"
-msgstr "Superset chạy trên những nền tảng nào?"
+msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "Paradev là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng workspace cho các agent lập trình song song."
+
+msgid "What platforms does Paradev run on?"
+msgstr "Paradev chạy trên những nền tảng nào?"
 
 msgid "What problem are you trying to solve?"
 msgstr "Bạn đang muốn giải quyết vấn đề gì?"
@@ -19513,9 +19596,6 @@ msgstr "Trang nên hiển thị gì?"
 
 msgid "What should we build next?"
 msgstr "Chúng ta xây dựng gì tiếp theo?"
-
-msgid "What Superset is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Superset là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng workspace cho các agent lập trình song song."
 
 msgid "What teams automate"
 msgstr "Các nhóm tự động hóa những gì"
@@ -19535,8 +19615,8 @@ msgstr "Chúng tôi đang xây gì"
 msgid "What we've shipped"
 msgstr "Những gì chúng tôi đã ra mắt"
 
-msgid "What would you like to build with Superset in the cloud?"
-msgstr "Bạn muốn xây dựng gì với Superset trên đám mây?"
+msgid "What would you like to build with Paradev in the cloud?"
+msgstr "Bạn muốn xây dựng gì với Paradev trên đám mây?"
 
 msgid "What would you like to know?"
 msgstr "Bạn muốn biết điều gì?"
@@ -19634,8 +19714,8 @@ msgstr "Có nhãn"
 msgid "with or without attachments"
 msgstr "có hoặc không có tệp đính kèm"
 
-msgid "With the Superset mobile app, I can address production issues from anywhere."
-msgstr "Với ứng dụng di động Superset, tôi có thể xử lý sự cố trên môi trường production từ bất cứ đâu."
+msgid "With the Paradev mobile app, I can address production issues from anywhere."
+msgstr "Với ứng dụng di động Paradev, tôi có thể xử lý sự cố trên môi trường production từ bất cứ đâu."
 
 msgid "Wordmark, black"
 msgstr "Wordmark, đen"
@@ -19719,6 +19799,9 @@ msgstr "Agent của workspace"
 
 msgid "Workspace archived"
 msgstr "Đã lưu trữ workspace"
+
+msgid "Workspace config"
+msgstr "Cấu hình workspace"
 
 msgid "Workspace created"
 msgstr "Đã tạo workspace"
@@ -19889,11 +19972,11 @@ msgstr "Có. Gói Free dành cho cá nhân với 1 người dùng, workspace c�
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Có. Với các gói có không gian làm việc trên đám mây, chủ sở hữu có thể mua thêm GB-giờ với số lượng bất kỳ, giá {packPrice} cho mỗi GB-giờ, trong Cài đặt, Thanh toán. GB-giờ đã mua được dùng sau quỹ hằng tháng và không bao giờ hết hạn, và tự động nạp thêm có thể mua thêm khi sắp hết."
 
-msgid "Yes. Superset has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Có. Superset đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập, bao quát các biện pháp bảo mật vận hành theo thời gian. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
+msgstr "Có. Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập, bao quát các biện pháp bảo mật vận hành theo thời gian. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
 
-msgid "Yes. Superset is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
-msgstr "Có. Superset là nơi các agent của bạn chạy, không phải nhà cung cấp mô hình. Hãy mang Claude Code, Codex, OpenCode hay bất kỳ agent CLI nào, và dùng tài khoản hoặc khóa API sẵn có ở mọi gói."
+msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
+msgstr "Có. Paradev là nơi các agent của bạn chạy, không phải nhà cung cấp mô hình. Hãy mang Claude Code, Codex, OpenCode hay bất kỳ agent CLI nào, và dùng tài khoản hoặc khóa API sẵn có ở mọi gói."
 
 msgid "Yes. Use superset automations in the CLI to create, run, and pause them."
 msgstr "Có. Dùng superset automations trong CLI để tạo, chạy và tạm dừng chúng."
@@ -20001,8 +20084,8 @@ msgstr "Bạn sẽ đứng <0>#{0}</0> trong {1}."
 msgid "You'd be one of the first on the board."
 msgstr "Bạn sẽ là một trong những người đầu tiên trên bảng."
 
-msgid "You'll need to sign in again to use Superset on this device."
-msgstr "Bạn sẽ phải đăng nhập lại để dùng Superset trên thiết bị này."
+msgid "You'll need to sign in again to use Paradev on this device."
+msgstr "Bạn sẽ phải đăng nhập lại để dùng Paradev trên thiết bị này."
 
 msgid "You'll stop being a member of this team. You can be re-added by another team member."
 msgstr "Bạn sẽ không còn là thành viên của nhóm này. Một thành viên khác có thể thêm bạn lại."
@@ -20010,8 +20093,8 @@ msgstr "Bạn sẽ không còn là thành viên của nhóm này. Một thành v
 msgid "You're about to change your role from {currentRoleName} to {newRoleName}. Another owner will need to restore your permissions. Are you sure?"
 msgstr "Bạn sắp đổi vai trò của mình từ {currentRoleName} sang {newRoleName}. Một chủ sở hữu khác sẽ phải khôi phục quyền cho bạn. Bạn chắc chứ?"
 
-msgid "You're about to get Superset"
-msgstr "Bạn sắp có Superset"
+msgid "You're about to get Paradev"
+msgstr "Bạn sắp có Paradev"
 
 msgid "You're all set!"
 msgstr "Bạn đã sẵn sàng!"
@@ -20101,8 +20184,11 @@ msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). H
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Workspace này sẽ dừng sau vài phút nếu giới hạn không được tăng."
 
-msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
-msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Superset truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Superset làm cho bạn hiển thị dưới tên bạn."
+msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
+msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Paradev truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Paradev làm cho bạn hiển thị dưới tên bạn."
+
+msgid "Your Paradev download is starting."
+msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Gói của bạn không bao gồm môi trường đám mây."
@@ -20126,8 +20212,8 @@ msgstr "Ứng dụng đang chạy của bạn, trong một trình duyệt mà c�
 msgid "Your signed-in session"
 msgstr "Phiên đã đăng nhập của bạn"
 
-msgid "Your Slack account has been linked to Superset. You can close this tab and return to Slack."
-msgstr "Tài khoản Slack của bạn đã được liên kết với Superset. Bạn có thể đóng tab này và quay lại Slack."
+msgid "Your Slack account has been linked to Paradev. You can close this tab and return to Slack."
+msgstr "Tài khoản Slack của bạn đã được liên kết với Paradev. Bạn có thể đóng tab này và quay lại Slack."
 
 msgid "Your stats, settled in mortal combat"
 msgstr "Chỉ số của bạn phân thắng bại trong trận tử chiến"
@@ -20137,9 +20223,6 @@ msgstr "Gói đăng ký của bạn đang hoạt động. Các tính năng của
 
 msgid "Your subscription will be adjusted accordingly."
 msgstr "Gói đăng ký của bạn sẽ được điều chỉnh tương ứng."
-
-msgid "Your Superset download is starting."
-msgstr "Bản tải xuống Superset của bạn đang bắt đầu."
 
 msgid "Your teammates can talk directly to your agent."
 msgstr "Đồng đội có thể trao đổi trực tiếp với agent của bạn."
@@ -20157,8 +20240,8 @@ msgstr "Hạng của bạn là điểm số có trọng số trên {0} trục đ
 msgid "Your tokens"
 msgstr "Token của bạn"
 
-msgid "Your v1 projects and workspaces are moving to the new Superset. They appear in the sidebar as each one is ready."
-msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang Superset mới. Chúng sẽ xuất hiện trong thanh bên khi từng mục sẵn sàng."
+msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
+msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang Paradev mới. Chúng sẽ xuất hiện trong thanh bên khi từng mục sẵn sàng."
 
 msgid "Your version: {currentVersion}"
 msgstr "Phiên bản của bạn: {currentVersion}"

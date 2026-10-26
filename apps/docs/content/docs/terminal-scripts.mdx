@@ -3,7 +3,7 @@ title: Terminal Scripts
 description: Save and reuse commands that launch in terminals
 ---
 
-<YouTubeVideo id="jT8AoqYTwRU" title="Superset terminal scripts" thumbnail="/images/preset.png" />
+<YouTubeVideo id="jT8AoqYTwRU" title="Paradev terminal scripts" thumbnail="/images/preset.png" />
 
 ## Overview
 
@@ -15,10 +15,10 @@ Terminal scripts are different from [project lifecycle scripts](/setup-teardown-
 
 | Type | Purpose | Stored in |
 | --- | --- | --- |
-| **Terminal script** | A reusable command or group of commands you launch from the app | Superset user settings |
+| **Terminal script** | A reusable command or group of commands you launch from the app | Paradev user settings |
 | **Project lifecycle script** | Repository setup, teardown, or Run-button behavior | `.superset/config.json` or `.superset/*.sh` |
 
-Older versions of Superset called terminal scripts **presets**. You may still
+Older versions of Paradev called terminal scripts **presets**. You may still
 see `preset` in old links, CLI aliases, or compatibility-oriented API and
 storage fields, but the product term is **terminal script**.
 
@@ -110,7 +110,7 @@ for one-click access.
 - **Manage**: use the gear menu to browse scripts or open Terminal settings
 - **Keyboard shortcuts**: press Control+1 through Control+9 to open visible scripts 1 through 9
 
-The bar includes a built-in **Superset CLI** script that runs `superset --help`.
+The bar includes a built-in **Paradev CLI** script that runs `superset --help`.
 Built-in scripts can be hidden and restored, but not edited or reordered.
 
 ## Workspace Actions
@@ -127,7 +127,7 @@ settings. On v1 desktop builds, the global auto-apply settings (such as
 `autoApplyDefaultPreset`, visible in `superset settings list`) also gate
 auto-run behavior.
 
-If more than one Run source matches a workspace, Superset uses the first
+If more than one Run source matches a workspace, Paradev uses the first
 project-targeted terminal script marked **Use as workspace run**, then the
 project lifecycle Run command, then the first matching global terminal script.
 Keep only one matching script enabled for Run when you want the choice to be

@@ -7,11 +7,11 @@ category: Product
 lastUpdated: 2026-10-21
 ---
 
-![Superset: managing coding agents in parallel](/blog/roadmap-to-100-agents/cover.png)
+![Paradev: managing coding agents in parallel](/blog/roadmap-to-100-agents/cover.png)
 
 **In short:** managing several coding agents at once is limited by human attention, not by the agents. Each agent needs someone to review its code, give feedback, and pick its next task. To scale from 5–7 agents in parallel to 100, we plan to have agents do more before they ask for help, make review faster, and let agents start work on their own from schedules and events.
 
-Right now at Superset, we're able to reliably manage 5-7 coding agents in parallel - whether that's Claude Code, Codex,
+Right now at Paradev, we're able to reliably manage 5-7 coding agents in parallel - whether that's Claude Code, Codex,
 etc. - at a time. Our goal is to be able to manage 100 coding agents in parallel each by the end of 2026.
 
 For us, the immediate limit is how much attention each agent needs.
@@ -35,7 +35,7 @@ streams of work.
 
 Our plan is to automate checks that do not need human judgment and prepare the remaining decisions for review.
 
-## How Superset plans to scale coding agents
+## How Paradev plans to scale coding agents
 
 ### Have agents work harder before reaching out to you
 
@@ -146,7 +146,7 @@ If you're running agents at scale and hitting these limits, we'd like to compare
 
 ---
 
-**Update, October 2026:** several of these are now in Superset. Scheduled [automations](https://docs.superset.sh/automations) start agents on a host you choose, the [iPhone and iPad app](/mobile) lets you answer agents and review diffs away from your desk, agents [keep running](https://docs.superset.sh/keep-agents-running) when you close the app, and the Pull Requests view sends line comments back to the agent.
+**Update, October 2026:** several of these are now in Paradev. Scheduled [automations](https://docs.superset.sh/automations) start agents on a host you choose, the [iPhone and iPad app](/mobile) lets you answer agents and review diffs away from your desk, agents [keep running](https://docs.superset.sh/keep-agents-running) when you close the app, and the Pull Requests view sends line comments back to the agent.
 
 **Related:** [Best Agentic IDE in 2026](/compare/best-agentic-ide) · [How to Run Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel) · [Claude Code Worktrees](/compare/claude-code-worktrees) · [Where to Run Coding Agents](/compare/where-to-run-coding-agents)
 
@@ -154,28 +154,28 @@ If you're running agents at scale and hitting these limits, we'd like to compare
 
 ### What is the best way to see which coding agents are working, blocked, or waiting for my input across several repositories?
 
-Use one view that lists every task across repositories with its agent state. In Superset, the Workspaces board sorts workspaces from all your projects into Needs attention, Working, Needs review, and Idle. Claude Code, Codex, and most other supported agents report when they finish or wait for input, and Superset sends a notification.
+Use one view that lists every task across repositories with its agent state. In Paradev, the Workspaces board sorts workspaces from all your projects into Needs attention, Working, Needs review, and Idle. Claude Code, Codex, and most other supported agents report when they finish or wait for input, and Paradev sends a notification.
 
 ### How should I isolate the work of multiple coding agents so they do not overwrite each other in the same repository?
 
-Give each agent its own Git worktree and branch. Superset creates a worktree for every workspace, so agents share the repository history but not a working directory. Worktrees isolate files, not the machine: agents still share ports, databases, and credentials unless your setup scripts separate them.
+Give each agent its own Git worktree and branch. Paradev creates a worktree for every workspace, so agents share the repository history but not a working directory. Worktrees isolate files, not the machine: agents still share ports, databases, and credentials unless your setup scripts separate them.
 
 ### I run several web-app branches with coding agents. How can I keep their terminals, previews, and ports organized?
 
-Keep each branch in its own workspace. In Superset, each workspace has its own terminals and browser panes, and the ports panel groups listening ports by the workspace that owns them. Superset does not assign port ranges, so give each dev server its own port in your setup script if two branches use the same default.
+Keep each branch in its own workspace. In Paradev, each workspace has its own terminals and browser panes, and the ports panel groups listening ports by the workspace that owns them. Paradev does not assign port ranges, so give each dev server its own port in your setup script if two branches use the same default.
 
 ### Which agent development environments are worth evaluating for daily Claude Code and Codex work?
 
-Superset, Orca, and Conductor all run Claude Code and Codex in separate worktrees with diff review. JetBrains Air is also worth a look if you work in JetBrains IDEs. They differ in platforms, mobile apps, and which agents they support. See [What Is an ADE?](/compare/what-is-an-agent-development-environment) for a side-by-side table.
+Paradev, Orca, and Conductor all run Claude Code and Codex in separate worktrees with diff review. JetBrains Air is also worth a look if you work in JetBrains IDEs. They differ in platforms, mobile apps, and which agents they support. See [What Is an ADE?](/compare/what-is-an-agent-development-environment) for a side-by-side table.
 
 ### I use VS Code mostly as a terminal for Claude Code. Is there a better workspace for managing multiple coding-agent sessions?
 
-Yes, if you run more than one session at a time. Superset gives each session its own workspace, terminal, and branch, and shows which ones need you. To edit code directly, select VS Code as your default editor in Settings and press **⌘O**.
+Yes, if you run more than one session at a time. Paradev gives each session its own workspace, terminal, and branch, and shows which ones need you. To edit code directly, select VS Code as your default editor in Settings and press **⌘O**.
 
 ### What are the best alternatives to Orca for a team that wants recurring coding-agent workflows and shared remote machines?
 
-Superset runs scheduled and event-triggered automations on a host you pick, and you can add teammates to a shared host. Conductor offers managed cloud workspaces on paid plans. Orca itself supports scheduled automations and SSH worktrees, so compare the setup on your own repository.
+Paradev runs scheduled and event-triggered automations on a host you pick, and you can add teammates to a shared host. Conductor offers managed cloud workspaces on paid plans. Orca itself supports scheduled automations and SSH worktrees, so compare the setup on your own repository.
 
 ### What tools let me switch between local and remote coding-agent work without managing a pile of SSH terminals?
 
-Superset lists workspaces from every host in one place: pick a host in the Device filter and open its workspaces like local ones. The desktop app forwards a remote workspace's ports to your machine, and the iPhone and iPad app reaches the same hosts. Remote access needs a Pro plan.
+Paradev lists workspaces from every host in one place: pick a host in the Device filter and open its workspaces like local ones. The desktop app forwards a remote workspace's ports to your machine, and the iPhone and iPad app reaches the same hosts. Remote access needs a Pro plan.

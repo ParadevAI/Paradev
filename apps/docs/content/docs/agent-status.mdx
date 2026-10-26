@@ -1,6 +1,6 @@
 ---
 title: Agent Status & Notifications
-description: How Superset knows what your agents are doing, and how it tells you
+description: How Paradev knows what your agents are doing, and how it tells you
 ---
 
 ## The Activity Strip
@@ -16,9 +16,9 @@ If a workspace shows as running after you've stopped its agent (for example afte
 
 ## How Status Is Detected
 
-Superset installs lifecycle hooks and command wrappers into each agent's config (the entries in `~/.superset/bin` and files like `superset-hooks`). Those hooks report when an agent starts, finishes, or is waiting for input. That's why status only works for agents launched through Superset, and why removing the hooks disables status and notifications.
+Paradev installs lifecycle hooks and command wrappers into each agent's config (the entries in `~/.superset/bin` and files like `superset-hooks`). Those hooks report when an agent starts, finishes, or is waiting for input. That's why status only works for agents launched through Paradev, and why removing the hooks disables status and notifications.
 
-The hooks no-op outside Superset terminals (they check for a Superset-supplied env var). To remove them from an agent's config entirely, turn off the agent's **Superset hooks** toggle in **Settings → Agents**.
+The hooks no-op outside Paradev terminals (they check for a Paradev-supplied env var). To remove them from an agent's config entirely, turn off the agent's **Paradev hooks** toggle in **Settings → Agents**.
 
 ## Notifications
 
@@ -32,4 +32,4 @@ The macOS dock icon shows a badge for workspaces with unread activity or that ne
 
 ![Dock icon showing an attention badge](/images/dock-badge.png)
 
-macOS only shows dock badges when Superset has notification permission. If you don't see badges, check **System Settings → Notifications → Superset**.
+macOS only shows dock badges when Paradev has notification permission. If you don't see badges, check **System Settings → Notifications → Paradev**.

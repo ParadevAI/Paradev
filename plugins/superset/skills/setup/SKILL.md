@@ -1,11 +1,13 @@
 ---
 name: setup
-description: Make a repository Superset-ready by authoring .superset/config.json with setup, teardown, and run scripts so every new workspace boots configured, then verifying with a real workspace. Use when the user wants to set up a project or repo for Superset, configure workspace setup scripts, or fix a failing workspace setup ("new workspaces don't have node_modules", "my .env is missing in workspaces", "setup script isn't running").
+description: Make a repository Paradev (formerly Superset)-ready by authoring .superset/config.json with setup, teardown, and run scripts so every new workspace boots configured, then verifying with a real workspace. Use when the user wants to set up a project or repo for Superset, configure workspace setup scripts, or fix a failing workspace setup ("new workspaces don't have node_modules", "my .env is missing in workspaces", "setup script isn't running").
 argument-hint: optional notes about the project's setup needs
-allowed-tools: Bash(superset:*)
+allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
 # Superset Project Setup
+
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 Goal: every new workspace (isolated git worktree) for this repo comes up ready, with dependencies installed, env present, and services reachable, without manual steps.
 

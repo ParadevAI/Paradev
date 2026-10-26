@@ -5,9 +5,9 @@ export const revalidate = false;
 
 export function GET() {
 	const lines = [
-		"# Superset Documentation",
+		"# Paradev Documentation",
 		"",
-		"> Official documentation for Superset — run parallel AI coding agents in isolated Git worktrees on your machine.",
+		"> Official documentation for Paradev — run parallel AI coding agents in isolated Git worktrees on your machine.",
 		"",
 		"Fetch the relevant Markdown pages linked below. Each page includes its source URL and description, followed by the full documentation content.",
 		"",

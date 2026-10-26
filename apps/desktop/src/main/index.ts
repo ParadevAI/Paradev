@@ -160,7 +160,7 @@ async function processDeepLink(url: string): Promise<void> {
 							i18n._(
 								msg({
 									message:
-										"Superset could not complete sign-in. Please try again.",
+										"Paradev could not complete sign-in. Please try again.",
 								}),
 							))
 					: i18n._(

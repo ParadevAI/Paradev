@@ -12,7 +12,7 @@ const RESULTS = [
 		url: "https://electric-sql.com/docs/intro",
 	},
 	{
-		title: "Superset — Orchestrate coding agents",
+		title: "Paradev — Orchestrate coding agents",
 		url: "https://superset.sh/docs/workspaces",
 	},
 	{

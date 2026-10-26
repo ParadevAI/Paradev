@@ -9,7 +9,7 @@
 
 set -eu
 
-REPO="superset-sh/superset"
+REPO="paradevai/paradev"
 INSTALL_DIR="${SUPERSET_HOME:-$HOME/superset}"
 TAG="${SUPERSET_VERSION:-latest}"
 
@@ -121,13 +121,13 @@ update_path() {
     info "Adding $bin_dir to PATH in $profile"
     mkdir -p "$(dirname "$profile")"
     {
-        printf "\n# Superset CLI\n"
+        printf "\n# Paradev CLI\n"
         printf "%s\n" "$export_line"
     } >> "$profile"
 }
 
 main() {
-    printf "${BOLD}Installing Superset CLI${RESET}\n\n"
+    printf "${BOLD}Installing Paradev CLI${RESET}\n\n"
 
     target="$(detect_target)"
     info "Platform: $target"
@@ -143,6 +143,8 @@ main() {
             error "Expected executable file not found: $path"
         fi
     done
+    # `paradev` is an alias. Releases before the rename ship without the link.
+    [ -e "$INSTALL_DIR/bin/paradev" ] || ln -s superset "$INSTALL_DIR/bin/paradev"
 
     update_path
 
@@ -152,7 +154,7 @@ main() {
         return
     fi
     printf "Run ${BOLD}exec \$SHELL${RESET} (or open a new terminal) to load the updated PATH.\n"
-    printf "Then run ${BOLD}superset auth login${RESET} to get started.\n"
+    printf "Then run ${BOLD}superset auth login${RESET} to get started. ${BOLD}paradev${RESET} works as an alias for ${BOLD}superset${RESET}.\n"
 }
 
 main "$@"

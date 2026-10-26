@@ -89,7 +89,7 @@ describe("buildDefaultAccountResolver", () => {
 			).toBe(selected ?? "<unset>");
 		}
 	});
-	it("adopts the pointer in a Superset terminal with no spawn-time value", () => {
+	it("adopts the pointer in a Paradev terminal with no spawn-time value", () => {
 		const { home, profile } = makeHome("");
 		writeFileSync(join(home, "state", "default-claude-config-dir"), profile);
 		expect(
@@ -97,7 +97,7 @@ describe("buildDefaultAccountResolver", () => {
 		).toBe(profile);
 	});
 
-	it("re-resolves over a stale Superset-injected value", () => {
+	it("re-resolves over a stale Paradev-injected value", () => {
 		const { home, profile } = makeHome(null);
 		writeFileSync(join(home, "state", "default-claude-config-dir"), profile);
 		expect(
@@ -190,7 +190,7 @@ describe("buildDefaultAccountResolver", () => {
 		).toBe("/tmp/user-picked-this");
 	});
 
-	it("does nothing outside Superset terminals", () => {
+	it("does nothing outside Paradev terminals", () => {
 		const { home, profile } = makeHome(null);
 		writeFileSync(join(home, "state", "default-claude-config-dir"), profile);
 		expect(resolve({ SUPERSET_HOME_DIR: home })).toBe("<unset>");

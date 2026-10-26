@@ -16,6 +16,7 @@ import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
@@ -124,11 +125,13 @@ export const auth = betterAuth({
 		schema: { ...authSchema, subscriptions },
 	}),
 	trustedOrigins: async (request) => [
-		env.NEXT_PUBLIC_WEB_URL,
-		env.NEXT_PUBLIC_API_URL,
-		env.NEXT_PUBLIC_MARKETING_URL,
-		env.NEXT_PUBLIC_ADMIN_URL,
-		...(env.NEXT_PUBLIC_DESKTOP_URL ? [env.NEXT_PUBLIC_DESKTOP_URL] : []),
+		...withOwnDomainTwins([
+			env.NEXT_PUBLIC_WEB_URL,
+			env.NEXT_PUBLIC_API_URL,
+			env.NEXT_PUBLIC_MARKETING_URL,
+			env.NEXT_PUBLIC_ADMIN_URL,
+			env.NEXT_PUBLIC_DESKTOP_URL,
+		]),
 		...getTrustedVercelPreviewOrigins(request?.url ?? env.NEXT_PUBLIC_API_URL),
 		...desktopDevOrigins,
 		"superset://app",

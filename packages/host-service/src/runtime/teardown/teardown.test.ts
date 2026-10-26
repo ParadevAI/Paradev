@@ -12,10 +12,10 @@ import {
 import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
 import { workspaceDevAppProfileDirName } from "@superset/shared/dev-app-profile";
+import { shellSingleQuote } from "../setup/config";
 import { removeDevAppProfile } from "./dev-app-profile";
 import {
 	buildTeardownCommandFromShell,
-	buildTeardownInitialCommand,
 	resolveTeardownCommand,
 } from "./teardown";
 
@@ -25,15 +25,6 @@ function isFishAvailable(): boolean {
 }
 
 describe("teardown initial command", () => {
-	test("uses exec instead of shell-specific exit status syntax", () => {
-		const command = buildTeardownInitialCommand(
-			"/tmp/worktree/.superset/teardown.sh",
-		);
-
-		expect(command).toBe("exec bash '/tmp/worktree/.superset/teardown.sh'");
-		expect(command).not.toContain("$?");
-	});
-
 	test("shell-command form runs via `bash -c` and avoids $?", () => {
 		const command = buildTeardownCommandFromShell(
 			"docker compose down && rm -rf .cache",
@@ -65,7 +56,7 @@ describe("teardown initial command", () => {
 
 			const result = spawnSync("fish", [
 				"-c",
-				buildTeardownInitialCommand(scriptPath),
+				buildTeardownCommandFromShell(`bash ${shellSingleQuote(scriptPath)}`),
 			]);
 
 			expect(result.status).toBe(7);
@@ -168,7 +159,11 @@ describe("resolveTeardownCommand", () => {
 				homeDir: sb.homeDir,
 			});
 
-			expect(resolved).toEqual({ initialCommand: `exec bash '${scriptPath}'` });
+			expect(resolved).toEqual({
+				initialCommand: buildTeardownCommandFromShell(
+					`bash ${shellSingleQuote(scriptPath)}`,
+				),
+			});
 		} finally {
 			sb.cleanup();
 		}
@@ -194,7 +189,9 @@ describe("resolveTeardownCommand", () => {
 			});
 
 			expect(resolved).toEqual({
-				initialCommand: `exec bash '${worktreeScript}'`,
+				initialCommand: buildTeardownCommandFromShell(
+					`bash ${shellSingleQuote(worktreeScript)}`,
+				),
 			});
 		} finally {
 			sb.cleanup();

@@ -504,7 +504,7 @@ async function pdev(version?: string): Promise<void> {
 	const tag = version ? `tags/v${version}` : "latest";
 	const release = JSON.parse(
 		await fetchText(
-			`https://api.github.com/repos/superset-sh/pdev/releases/${tag}`,
+			`https://api.github.com/repos/paradevai/pdev/releases/${tag}`,
 		),
 	) as {
 		tag_name: string;

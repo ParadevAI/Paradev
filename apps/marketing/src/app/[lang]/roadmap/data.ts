@@ -111,11 +111,11 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 	{
 		id: "superset-teams",
 		title: msg({
-			message: "Superset Teams",
+			message: "Paradev Teams",
 		}),
 		description: msg({
 			message:
-				"Shared settings and simpler membership for teams that work in Superset together.",
+				"Shared settings and simpler membership for teams that work in Paradev together.",
 		}),
 		category: "Platform",
 		status: "next",
@@ -349,7 +349,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		}),
 		description: msg({
 			message:
-				"Merge pull requests without leaving Superset, plus a round of chat fixes and polish.",
+				"Merge pull requests without leaving Paradev, plus a round of chat fixes and polish.",
 		}),
 		category: "Desktop",
 		status: "shipped",
@@ -364,7 +364,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		}),
 		description: msg({
 			message:
-				"Review pull requests inside Superset: diff pane, agent-assisted review, act on comments directly.",
+				"Review pull requests inside Paradev: diff pane, agent-assisted review, act on comments directly.",
 		}),
 		category: "Desktop",
 		status: "shipped",

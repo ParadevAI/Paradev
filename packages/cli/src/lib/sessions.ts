@@ -36,7 +36,7 @@ export async function callSessions<T>(call: () => Promise<T>): Promise<T> {
 		) {
 			throw new CLIError(
 				"This host is too old for `superset sessions` — update host-service",
-				"Update host-service or the Superset desktop app on that host",
+				"Update host-service or the Paradev desktop app on that host",
 			);
 		}
 		throw error;

@@ -1,6 +1,6 @@
 ---
-title: Superset CLI Reference
-description: Complete reference for Superset command-line interface, including commands and flags.
+title: Paradev CLI Reference
+description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
 <Callout type="warn">
@@ -160,7 +160,7 @@ Authentication and session inspection.
 		},
 		{
 			flag: "--api-key <key>",
-			description: "Store a Superset API key (`sk_live_…`) at `~/.superset/config.json` instead of running the OAuth flow.",
+			description: "Store a Paradev API key (`sk_live_…`) at `~/.superset/config.json` instead of running the OAuth flow.",
 		},
 	]}
 >
@@ -415,7 +415,7 @@ The host server state. Three shapes depending on what's running.
 
 ### update
 
-Update the Superset CLI and host server binary.
+Update the Paradev CLI and host server binary.
 
 <Command
 	name="superset update"
@@ -837,7 +837,7 @@ requires either `--project <id>` or `--session`; omitting both is an error.
 
 Without `--host` or `--local`, the command creates a [cloud workspace](/cloud-workspaces)
 if your account has cloud workspaces. A cloud workspace takes no project: it starts from an
-environment, and Superset creates a new working branch from `--branch`. `--project`,
+environment, and Paradev creates a new working branch from `--branch`. `--project`,
 `--session`, `--checkout`, `--pr`, `--task`, `--base-branch`, `--skip-branch-prefix`,
 `--tag`, `--attachment`, and `--command` are rejected for a cloud workspace. The command
 returns while the workspace is still provisioning.
@@ -986,7 +986,7 @@ superset workspaces update ws_… --clear-task
   url: string;
 }`}
 >
-Open a workspace in the Superset desktop app.
+Open a workspace in the Paradev desktop app.
 
 ```bash
 superset workspaces open ws_…
@@ -1002,7 +1002,7 @@ panes while their workspace is open. Opening the workspace later also creates
 panes for running terminal sessions that aren't already attached, without
 stealing focus from the active tab. `workspaces open` can't focus a specific
 session, so use a session deep link when focus matters. The same deep link
-creates or focuses the pane for a Superset chat session. Choose the query param
+creates or focuses the pane for a Paradev chat session. Choose the query param
 from the session `kind` returned by `agents create`:
 
 | `kind` | Example agents | Query param |
@@ -1077,7 +1077,7 @@ superset agents list --host host_…
 		{ flag: "--prompt <text>", description: "Prompt sent to the agent. Required unless `--resume-session`, `--fork-session`, or `--from-terminal` is set. Not allowed with `--from-terminal`." },
 		{ flag: "--resume-session <id>", description: "Agent session id of a previous run to restore instead of starting fresh (e.g. `claude --resume <id>`). Fails for agents without an id-based resume." },
 		{ flag: "--fork-session <id>", description: "Agent session id to clone into a new session of the same agent. The source session stays unchanged. Fails for agents without a fork command, or when the agent no longer has that session." },
-		{ flag: "--from-terminal <terminalId>", description: "Terminal whose recent output seeds the new session, so a different agent can continue the work. Superset builds the prompt." },
+		{ flag: "--from-terminal <terminalId>", description: "Terminal whose recent output seeds the new session, so a different agent can continue the work. Paradev builds the prompt." },
 		{ flag: "--context-chars <n>", description: "With `--from-terminal`, cap the handed-over context at 1-36000 characters. Default 36000 (roughly 9-12k tokens)." },
 		{ flag: "--model <id>", description: "Model for this launch. Supported values depend on the agent; omit to use its default." },
 		{ flag: "--effort <level>", description: "Reasoning effort for this launch. Omit to use the agent default." },
@@ -1124,7 +1124,7 @@ for which agents can fork and what a handoff sends.
 Read the agent's saved transcript, beyond the visible screen returned by
 `terminals read`. Without `--host` or `--local`, the target defaults to cloud
 when your account has cloud workspaces, otherwise this machine. The command
-fails if Superset cannot read a transcript for that terminal.
+fails if Paradev cannot read a transcript for that terminal.
 
 ```bash
 superset agents read --local --workspace <workspace-id> --terminal <terminal-id>
@@ -1178,7 +1178,7 @@ superset agents wait --workspace ws_… --terminal "$T"
 	]}
 >
 Explain why an agent shows its state: its last hook event and when it arrived,
-how an ended session ended, or that no hook has arrived (an agent Superset
+how an ended session ended, or that no hook has arrived (an agent Paradev
 can't see). Useful when `agents wait` or `panes list` shows something
 unexpected.
 
@@ -1206,18 +1206,18 @@ The last hook arrived 1 second ago; the session started 2 seconds ago.
 
 #### Agent models
 
-Model is an explicit override for one launch. If you omit `--model`, Superset
+Model is an explicit override for one launch. If you omit `--model`, Paradev
 passes no model flag and the agent uses its own configured default. Ids match
 the desktop model picker: Claude takes a family alias (`fable`, `opus`,
 `sonnet`, `haiku`) that tracks the newest release, or a pinned id such as
 `claude-opus-5-5` or `claude-sonnet-5-5`. Codex includes `gpt-6-astra`, `gpt-6-sol`, and `gpt-6-luna`. The host rejects an unknown id before launching the agent,
 and the error names every id that agent accepts. Agents without a model
-picker, including Superset chat, reject an explicit model override.
+picker, including Paradev chat, reject an explicit model override.
 
 #### Agent effort levels
 
 Effort is an explicit override for one launch. If you omit `--effort`,
-Superset passes no effort flag and the agent uses its own configured default.
+Paradev passes no effort flag and the agent uses its own configured default.
 The host rejects unsupported values before launching the agent.
 
 | Agent | Supported levels |
@@ -1231,7 +1231,7 @@ The host rejects unsupported values before launching the agent.
 
 GPT-6 Astra and GPT-6 Sol support `max` and `ultra`; GPT-6 Luna supports `max`.
 
-Other agents, including Superset chat, currently use their own default and
+Other agents, including Paradev chat, currently use their own default and
 reject an explicit effort override.
 
 ---
@@ -1551,7 +1551,7 @@ Close a pane and end its terminal, as the close button in the app does.
 		{ flag: "--host <id>", description: "Host whose desktop app shows it (default: this machine)." },
 	]}
 >
-Show a desktop notification. Run from a Superset terminal, clicking it opens
+Show a desktop notification. Run from a Paradev terminal, clicking it opens
 that terminal, so an agent can say "tests pass" and take you straight back.
 With `--host`, pass `--workspace` and `--terminal` for a click target; without
 them the click only brings the app forward.
@@ -1781,13 +1781,209 @@ superset pages storage weekly-report --key votes --json
 
 ---
 
+### plugins (alias: `plugin`)
+
+Install and connect plugins on this machine, and author them in a marketplace
+repo. Installing records the plugin on your account and writes its skills and
+MCP servers to Claude, Codex, and pdev.
+
+<Command
+	name="superset plugins list"
+	options={[
+		{ flag: "--available", description: "Include plugins you have not installed." },
+	]}
+>
+List installed plugins, or everything available with `--available`.
+</Command>
+
+<Command
+	name="superset plugins install <plugin>"
+	args={[
+		{ name: "plugin", required: true, description: "Plugin name." },
+	]}
+	options={[
+		{ flag: "--marketplace <name>", description: "Marketplace to install from, when several offer this name." },
+		{ flag: "--method <name>", description: "Auth method to use, when a plugin offers several." },
+		{ flag: "--inputs <json|->", description: "Credential inputs as JSON, or - to read them from stdin." },
+		{ flag: "--no-wait", description: "Print the authorize URL and exit without waiting; run install again once it is authorized." },
+		{ flag: "--update", description: "Replace an existing install with the marketplace's current version and re-sync its skills." },
+	]}
+>
+Connects the plugin's account first if it needs one, then writes its skills
+locally and records the install on your account.
+
+```bash
+superset plugins install google-calendar
+```
+</Command>
+
+<Command
+	name="superset plugins connect <plugin>"
+	args={[
+		{ name: "plugin", required: true, description: "Installed plugin name." },
+	]}
+	options={[
+		{ flag: "--marketplace <name>", description: "Marketplace of the install to connect, when several offer this name." },
+		{ flag: "--method <name>", description: "Auth method to use, when a plugin offers several." },
+		{ flag: "--inputs <json|->", description: "Credential inputs as JSON, or - to read them from stdin." },
+	]}
+>
+Connect an account to an installed plugin.
+</Command>
+
+<Command
+	name="superset plugins enable <plugin>"
+	args={[
+		{ name: "plugin", required: true, description: "Installed plugin name." },
+	]}
+	options={[
+		{ flag: "--marketplace <name>", description: "Marketplace of the install to change, when several offer this name." },
+	]}
+>
+Enable an installed plugin.
+</Command>
+
+<Command
+	name="superset plugins disable <plugin>"
+	args={[
+		{ name: "plugin", required: true, description: "Installed plugin name." },
+	]}
+	options={[
+		{ flag: "--marketplace <name>", description: "Marketplace of the install to change, when several offer this name." },
+	]}
+>
+Disable an installed plugin without dropping it.
+</Command>
+
+<Command
+	name="superset plugins uninstall <plugin>"
+	args={[
+		{ name: "plugin", required: true, description: "Installed plugin name." },
+	]}
+	options={[
+		{ flag: "--marketplace <name>", description: "Marketplace of the install to remove, when several offer this name." },
+	]}
+>
+Uninstall a plugin and drop its skills.
+</Command>
+
+<Command name="superset plugins sync">
+Reconcile installed plugins with the skill directories agents read and the MCP
+entries Claude, Codex, and pdev read, adding, refreshing, and reaping both.
+</Command>
+
+<Command
+	name="superset plugins marketplace <add|list|remove>"
+>
+`add <source> [--name <name>]` adds a marketplace from a GitHub repo or local
+path. `list` shows the marketplaces on your account. `remove <name>` removes
+one.
+</Command>
+
+<Command
+	name="superset plugins create <name>"
+	args={[
+		{ name: "name", required: true, description: "Plugin name." },
+	]}
+	options={[
+		{ flag: "--display-name <text>", description: "Name shown in the UI. Defaults to a name derived from the plugin name." },
+		{ flag: "--description <text>", description: "One-line description." },
+		{ flag: "--category <text>", description: "Category shown in the UI." },
+		{ flag: "--kind <url|none>", description: "Where tools come from: url (remote MCP server) or none (skills only)." },
+		{ flag: "--url <url>", description: "MCP server URL. Required when --kind is url." },
+		{ flag: "--connector <slug>", description: "Slug of the connector this plugin needs a connection to." },
+		{ flag: "--skills", description: "Scaffold a skills/ folder with a starter skill." },
+	]}
+>
+Scaffold a new plugin and add it to the marketplace.
+</Command>
+
+<Command
+	name="superset plugins validate [path]"
+	options={[
+		{ flag: "--strict", description: "Also require every plugin's current version to be released." },
+	]}
+>
+Validate a plugin or a whole marketplace: manifest, release tag, and whether
+the built server matches its source.
+</Command>
+
+<Command
+	name="superset plugins publish <names...>"
+	options={[
+		{ flag: "--bump <major|minor|patch>", description: "Bump the version before publishing." },
+		{ flag: "--force", description: "Overwrite an already-published version." },
+	]}
+>
+Cut a version of a plugin: build, record it in the marketplace and the
+generated bundle, and name the tag to publish it at.
+</Command>
+
+---
+
+### mcp
+
+Call the tools of a plugin you have connected. The call goes through Superset's
+API, which attaches the stored credential, so no token is written to this
+machine.
+
+<Command
+	name="superset mcp tools"
+	options={[
+		{ flag: "--plugin <name>", required: true, description: "Plugin name, e.g. `slack` or `google-calendar`." },
+		{ flag: "--account <id>", description: "Connection id. Needed only when the plugin has more than one connected account." },
+	]}
+	output="Array<{ plugin, tool, description }>"
+>
+List the tools a connected plugin exposes (PLUGIN, TOOL, DESCRIPTION).
+
+```bash
+superset mcp tools --plugin slack
+```
+</Command>
+
+<Command
+	name="superset mcp call-tool <tool> [arguments]"
+	args={[
+		{ name: "tool", required: true, description: "Tool name, from `superset mcp tools`." },
+		{ name: "arguments", description: "Tool arguments as JSON (default `{}`)." },
+	]}
+	options={[
+		{ flag: "--plugin <name>", required: true, description: "Plugin name, e.g. `slack` or `google-calendar`." },
+		{ flag: "--account <id>", description: "Connection id. Needed only when the plugin has more than one connected account." },
+	]}
+	output="The MCP tool result: { content: Array<{ type, text }>, isError? }"
+>
+Call a tool on a connected plugin and print its result.
+
+```bash
+superset mcp call-tool search_messages --plugin slack '{"query":"deploy"}'
+```
+</Command>
+
+---
+
+### skills
+
+<Command
+	name="superset skills list"
+	options={[
+		{ flag: "--paths", description: "Print only the paths, one per line." },
+	]}
+	output="Array<{ directory, plugin, skill, marketplace, path, description }>"
+>
+List the skills installed from plugins on this machine (SKILL, PLUGIN, PATH).
+</Command>
+
+---
+
 ### tasks (alias: `t`)
 
 Tasks are units of work in your organization's task tracker. When the
 organization tracks tasks in Linear (an owner's setting), these commands work on
-its Linear issues through your own Linear connection; otherwise on Superset
+its Linear issues through your own Linear connection; otherwise on Paradev
 tasks. A command works on one tracker only: in an organization that tracks in
-Linear, Superset tasks are not listed or resolved, and the reverse. Pass
+Linear, Paradev tasks are not listed or resolved, and the reverse. Pass
 `--tracker superset|linear` to reach the other one for a single command.
 
 <Command
@@ -1801,7 +1997,7 @@ Linear, Superset tasks are not listed or resolved, and the reverse. Pass
 		{ flag: "--assignee-me, -m", description: "Tasks assigned to the current user." },
 		{ flag: "--creator-me", description: "Tasks created by the current user." },
 		{ flag: "--search <query>, -s", description: "Substring search on title or description." },
-		{ flag: "--labels <a,b>", description: "Comma-separated labels. A task must have all of them. A label also matches its sub-labels: `acme` matches `acme/web`. Superset only." },
+		{ flag: "--labels <a,b>", description: "Comma-separated labels. A task must have all of them. A label also matches its sub-labels: `acme` matches `acme/web`. Paradev only." },
 		{ flag: "--due-from <date>", description: "Tasks due on or after this date (YYYY-MM-DD)." },
 		{ flag: "--due-to <date>", description: "Tasks due on or before this date (YYYY-MM-DD)." },
 		{ flag: "--sort-by <field>", description: "createdAt | updatedAt | dueDate | priority. Default: createdAt." },
@@ -1843,7 +2039,7 @@ superset tasks get fix-login-bug
 	name="superset tasks create"
 	options={[
 		{ flag: "--tracker <superset|linear>", description: "Override the organization's task tracker." },
-		{ flag: "--team <key>", description: "Team key or name. Superset tasks go to the default team without it; Linear needs it when the workspace has several teams." },
+		{ flag: "--team <key>", description: "Team key or name. Paradev tasks go to the default team without it; Linear needs it when the workspace has several teams." },
 		{ flag: "--title <title>", required: true, description: "Task title." },
 		{ flag: "--description <text>", description: "Task description." },
 		{ flag: "--priority <urgent|high|medium|low|none>", description: "Priority." },
@@ -1920,7 +2116,7 @@ superset tasks delete tsk_a tsk_b
 	humanColumns={["TEAM", "NAME", "TYPE", "POS", "ID"]}
 	quiet="status IDs"
 >
-List task statuses in the active organization. Superset status IDs work with
+List task statuses in the active organization. Paradev status IDs work with
 `tasks list --status`, `tasks create --status-id` and `tasks update --status-id`.
 Linear statuses belong to a team: pass their names or IDs to `--status-id` on
 create and update; `tasks list --status` takes a category (`active`, `started`, …)
@@ -2181,7 +2377,7 @@ superset automations logs aut_…
 
 ### settings
 
-Read and update the Superset desktop app's settings on this machine:
+Read and update the Paradev desktop app's settings on this machine:
 behavior, git, notifications, terminal, terminal/editor appearance, and the
 app theme. These commands work offline and don't require login.
 

@@ -106,9 +106,9 @@ export function HostServiceSection({
 
 	const installedVia =
 		installSource === "desktop"
-			? t({ message: "Superset app" })
+			? t({ message: "Paradev app" })
 			: installSource === "cli"
-				? t({ message: "Superset CLI" })
+				? t({ message: "Paradev CLI" })
 				: installSource === "dev"
 					? t({ message: "Development build" })
 					: t({ message: "Unknown" });
@@ -132,16 +132,16 @@ export function HostServiceSection({
 				}
 				return t({
 					message:
-						"Bundled with the Superset app on this device. Updates with the app.",
+						"Bundled with the Paradev app on this device. Updates with the app.",
 				});
 			}
 			if (state === "unknown") {
 				return installSource === "desktop"
-					? t({ message: "Bundled with the Superset app on this device." })
+					? t({ message: "Bundled with the Paradev app on this device." })
 					: t({ message: "This host has not reported a version yet." });
 			}
 			return t({
-				message: `The app is on ${appVersion} but attached to a host service started by something else, likely an older CLI or another Superset build. Restarting replaces it with this app's copy.`,
+				message: `The app is on ${appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy.`,
 			});
 		}
 		if (
@@ -151,7 +151,7 @@ export function HostServiceSection({
 		) {
 			return t({
 				message:
-					"Update Superset on that device. In-app updates require a supported standalone install and a released app version.",
+					"Update Paradev on that device. In-app updates require a supported standalone install and a released app version.",
 			});
 		}
 		switch (state) {
@@ -161,7 +161,7 @@ export function HostServiceSection({
 				return installSource === "desktop"
 					? t({
 							message:
-								"Runs inside the Superset app on that device, so updating it means updating the app there.",
+								"Runs inside the Paradev app on that device, so updating it means updating the app there.",
 						})
 					: t({
 							message:
@@ -171,7 +171,7 @@ export function HostServiceSection({
 				return installSource === "desktop"
 					? t({
 							message:
-								"Too old for this app to talk to. Update the Superset app on that device to reconnect.",
+								"Too old for this app to talk to. Update the Paradev app on that device to reconnect.",
 						})
 					: t({
 							message:

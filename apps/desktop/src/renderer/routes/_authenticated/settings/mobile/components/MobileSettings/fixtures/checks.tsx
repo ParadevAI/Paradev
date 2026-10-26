@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 test("shows the download QR and remote access switch for paid users", () => {
 	const html = renderToStaticMarkup(<MobileSettings />);
-	expect(html).toContain("Scan to download Superset for iPhone");
+	expect(html).toContain("Scan to download Paradev for iPhone");
 	expect(html).toContain('id="mobile-remote-access"');
 	expect(html).toContain('aria-checked="false"');
 	expect(html.match(/target="_blank"/g)).toHaveLength(1);
@@ -63,12 +63,12 @@ test("withholds QR and remote access switch from free and unresolved plans", () 
 	paid = false;
 	let html = renderToStaticMarkup(<MobileSettings />);
 	expect(html).toContain("Upgrade to Pro");
-	expect(html).not.toContain("Scan to download Superset for iPhone");
+	expect(html).not.toContain("Scan to download Paradev for iPhone");
 	expect(html).not.toContain('id="mobile-remote-access"');
 	paid = true;
 	ready = false;
 	html = renderToStaticMarkup(<MobileSettings />);
-	expect(html).not.toContain("Scan to download Superset for iPhone");
+	expect(html).not.toContain("Scan to download Paradev for iPhone");
 	expect(html).not.toContain('id="mobile-remote-access"');
 });
 test("reflects the saved remote access state and disables the switch while busy", () => {

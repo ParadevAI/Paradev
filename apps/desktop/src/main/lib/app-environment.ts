@@ -25,7 +25,7 @@ export function ensureSupersetHomeDirExists(): void {
 		chmodSync(SUPERSET_HOME_DIR, SUPERSET_HOME_DIR_MODE);
 	} catch (error) {
 		console.warn(
-			"[app-environment] Failed to chmod Superset home dir (best-effort):",
+			"[app-environment] Failed to chmod Paradev home dir (best-effort):",
 			SUPERSET_HOME_DIR,
 			error,
 		);

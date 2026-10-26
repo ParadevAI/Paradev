@@ -68,7 +68,7 @@ jobs:
           # desktop-latest rolling pointer.
           gh release create "${{ github.ref_name }}" \
             release-artifacts/*.tar.gz \
-            --title "Superset CLI ${{ github.ref_name }}" \
+            --title "Paradev CLI ${{ github.ref_name }}" \
             --notes-file release-notes.md \
             --prerelease
 
@@ -117,7 +117,7 @@ jobs:
           gh release create cli-latest \
             release-artifacts/*.tar.gz \
             release-artifacts/version.txt \
-            --title "Latest Superset CLI" \
+            --title "Latest Paradev CLI" \
             --notes "Rolling pointer to the latest published CLI release. See [${VERSION_TAG}](https://github.com/${{ github.repository }}/releases/tag/${VERSION_TAG}) for changelog." \
             --target "${{ github.sha }}" \
             --prerelease
