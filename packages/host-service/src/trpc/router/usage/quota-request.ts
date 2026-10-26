@@ -6,6 +6,13 @@ export const QUOTA_CAPTURE_BUDGET_MS = 2_000;
 export function createQuotaRequestBudget(
 	budgetMs = QUOTA_REQUEST_BUDGET_MS,
 	now = Date.now,
+	timers: {
+		set: (
+			callback: () => void,
+			milliseconds: number,
+		) => ReturnType<typeof setTimeout>;
+		clear: (timer: ReturnType<typeof setTimeout>) => void;
+	} = { set: setTimeout, clear: clearTimeout },
 ) {
 	const deadline = now() + budgetMs;
 	return {
@@ -21,14 +28,14 @@ export function createQuotaRequestBudget(
 				return await Promise.race([
 					Promise.resolve().then(() => operation(controller.signal)),
 					new Promise<never>((_, reject) => {
-						timer = setTimeout(() => {
+						timer = timers.set(() => {
 							controller.abort();
 							reject(new Error("Usage request timed out."));
 						}, remaining);
 					}),
 				]);
 			} finally {
-				if (timer !== undefined) clearTimeout(timer);
+				if (timer !== undefined) timers.clear(timer);
 				controller.abort();
 			}
 		},
