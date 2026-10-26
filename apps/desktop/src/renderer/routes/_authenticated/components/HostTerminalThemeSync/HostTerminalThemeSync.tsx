@@ -1,3 +1,4 @@
+import type { TerminalColors } from "@superset/shared/terminal-colors";
 import { useEffect, useMemo } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getDefaultTerminalAppearance } from "renderer/lib/terminal/appearance";
@@ -8,12 +9,33 @@ import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 
 const fallbackTheme = getDefaultTerminalAppearance().theme;
 
-/**
- * Pushes the resolved terminal theme to the local host-service so terminals
- * it creates without one (CLI, automations, setup and teardown) match the
- * app. Re-pushed on every appearance change and host (re)connect; an older
- * host without the procedure keeps its dark default.
- */
+// Separate requests can reach the host out of order; chain them per host so
+// the last appearance is the one stored.
+const pushChains = new Map<string, Promise<void>>();
+
+function pushTerminalTheme(
+	hostUrl: string,
+	theme: { themeType: "dark" | "light"; colors: TerminalColors },
+): void {
+	const push = (pushChains.get(hostUrl) ?? Promise.resolve())
+		.then(() =>
+			getHostServiceClientByUrl(hostUrl).settings.terminalTheme.set.mutate(
+				theme,
+			),
+		)
+		.then(
+			() => {},
+			(error) => {
+				// Hosts older than this procedure keep their dark default.
+				console.warn(
+					"[HostTerminalThemeSync] Failed to push terminal theme to host:",
+					error,
+				);
+			},
+		);
+	pushChains.set(hostUrl, push);
+}
+
 export function HostTerminalThemeSync() {
 	const { activeHostUrl } = useLocalHostService();
 	const activeTheme = useTheme();
@@ -28,14 +50,7 @@ export function HostTerminalThemeSync() {
 
 	useEffect(() => {
 		if (!activeHostUrl) return;
-		getHostServiceClientByUrl(activeHostUrl)
-			.settings.terminalTheme.set.mutate({ themeType, colors })
-			.catch((error) => {
-				console.warn(
-					"[HostTerminalThemeSync] Failed to push terminal theme to host:",
-					error,
-				);
-			});
+		pushTerminalTheme(activeHostUrl, { themeType, colors });
 	}, [activeHostUrl, themeType, colors]);
 
 	return null;

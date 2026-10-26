@@ -52,7 +52,6 @@ import { matchesAgentBinding } from "../terminal-agents/matches-agent-binding.ts
 import { markTerminalAgentBindingEnded } from "../terminal-agents/persistence.ts";
 import type { TerminalAgentStore } from "../terminal-agents/store.ts";
 import type { TerminalAgentBinding } from "../terminal-agents/types.ts";
-import { getHostTerminalTheme } from "../trpc/router/settings/terminal-theme.ts";
 import { resolveDefaultAccountTerminalEnv } from "../trpc/router/usage/default-account.ts";
 import {
 	DaemonClient,
@@ -71,6 +70,7 @@ import {
 	shellLaunchExpectsReadyMarker,
 	waitForTerminalBaseEnv,
 } from "./env.ts";
+import { getHostTerminalTheme } from "./host-terminal-theme.ts";
 import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,

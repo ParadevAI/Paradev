@@ -12,5 +12,4 @@ export const settingsRouter = router({
 });
 
 export type { HostAgentConfig } from "./agent-configs";
-export type { HostTerminalTheme } from "./terminal-theme";
 export type { HostWorktreeLocationSettings } from "./worktree-location";

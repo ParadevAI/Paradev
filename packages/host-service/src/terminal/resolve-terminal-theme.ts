@@ -2,7 +2,7 @@ import type { TerminalColors } from "@superset/shared/terminal-colors";
 import type {
 	HostTerminalTheme,
 	TerminalThemeType,
-} from "../trpc/router/settings/terminal-theme.ts";
+} from "./host-terminal-theme.ts";
 
 function relativeLuminance(hex: string): number {
 	const channel = (offset: number) => {
