@@ -7,6 +7,7 @@ import { collectKeychainSecrets } from "./profiles";
 import {
 	parseQuotaCredentialJson,
 	readQuotaCredentialFile,
+	unavailableQuotaAccount,
 } from "./quota-credentials";
 
 const directories: string[] = [];
@@ -22,6 +23,41 @@ async function directory() {
 	directories.push(dir);
 	return dir;
 }
+
+test("unavailable quota rows discard credential and private runtime fields", () => {
+	const credential = {
+		agent: "claude" as const,
+		accountKey: "fixture-account",
+		sourceLabel: "Fixture profile",
+		selection: "/fixture/profile",
+		accessToken: "synthetic-credential-secret",
+		expiresAt: 123,
+		refreshTokenExpiresAt: 456,
+		hasRefreshToken: true,
+		subscriptionType: "max",
+		privateExtension: "synthetic-private-extension",
+	};
+	const row = unavailableQuotaAccount(credential);
+	expect(row).toMatchObject({
+		agent: "claude",
+		accountKey: credential.accountKey,
+		sourceLabel: credential.sourceLabel,
+		selection: credential.selection,
+		status: "unavailable",
+		email: null,
+	});
+	for (const key of [
+		"accessToken",
+		"expiresAt",
+		"refreshTokenExpiresAt",
+		"hasRefreshToken",
+		"subscriptionType",
+		"privateExtension",
+	])
+		expect(row).not.toHaveProperty(key);
+	expect(JSON.stringify(row)).not.toContain("synthetic-credential-secret");
+	expect(JSON.stringify(row)).not.toContain("synthetic-private-extension");
+});
 
 test("missing credential files differ from unreadable paths", async () => {
 	const dir = await directory();

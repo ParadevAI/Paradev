@@ -11,7 +11,10 @@ export function unavailableQuotaAccount(
 	slot: UnavailableQuotaSlot,
 ): UsageAccount {
 	return {
-		...slot,
+		agent: slot.agent,
+		accountKey: slot.accountKey,
+		sourceLabel: slot.sourceLabel,
+		selection: slot.selection,
 		credentialKind: "subscription",
 		email: null,
 		plan: null,

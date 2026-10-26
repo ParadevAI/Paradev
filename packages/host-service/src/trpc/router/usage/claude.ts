@@ -825,7 +825,12 @@ async function fetchClaudeSnapshot(
 		...(await Promise.all(
 			credentials.map((credential) =>
 				fetchAccount(credential, false, "background").catch(() =>
-					unavailableQuotaAccount({ agent: "claude", ...credential }),
+					unavailableQuotaAccount({
+						agent: "claude",
+						accountKey: credential.accountKey,
+						sourceLabel: credential.sourceLabel,
+						selection: credential.selection,
+					}),
 				),
 			),
 		)),

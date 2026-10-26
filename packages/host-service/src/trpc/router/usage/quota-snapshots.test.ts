@@ -578,6 +578,15 @@ test("failed Claude request remains anonymous while a healthy sibling loads", as
 	expect(rows.map((row) => row.status)).toEqual(["unavailable", "ok"]);
 	expect(rows[0]?.email).toBeNull();
 	expect(JSON.stringify(rows)).not.toContain("synthetic-secret-not-for-output");
+	expect(JSON.stringify(rows)).not.toContain("synthetic-slot-unavailable");
+	for (const key of [
+		"accessToken",
+		"expiresAt",
+		"refreshTokenExpiresAt",
+		"hasRefreshToken",
+		"subscriptionType",
+	])
+		expect(rows[0]).not.toHaveProperty(key);
 });
 
 test("strict Keychain scope reads start together and preserve missing-item/error semantics", async () => {

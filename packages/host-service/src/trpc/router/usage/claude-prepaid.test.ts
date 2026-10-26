@@ -141,3 +141,45 @@ test("wallet denial and explicit currencyless zero remain distinct", async () =>
 		else expect(result).toBeUndefined();
 	}
 });
+
+test("cancelled optional refresh retains the exact dated wallet without accepting its late body or renewing its age", async () => {
+	let at = Date.parse("2026-10-25T20:00:00Z");
+	const measuredAt = new Date(at);
+	const controller = new AbortController();
+	let calls = 0;
+	const profile = {
+		account: { uuid: "11111111-1111-4111-8111-111111111111" },
+		organization: { uuid: "22222222-2222-4222-8222-222222222222" },
+	};
+	const reader = createClaudePrepaidReader({
+		now: () => at,
+		request: async () => {
+			calls++;
+			if (calls === 2) controller.abort();
+			return Response.json({ amount: calls === 1 ? 8871 : 0, currency: "USD" });
+		},
+	});
+	const original = await reader.fetch(
+		"fixture-aborted-wallet",
+		profile,
+		new AbortController().signal,
+	);
+	at += 30 * 60_000;
+	const cancelled = await reader.fetch(
+		"fixture-aborted-wallet",
+		profile,
+		controller.signal,
+	);
+	expect(cancelled).toEqual(original);
+	expect(cancelled?.amount).toBe(88.71);
+	expect(cancelled?.checkedAt).toEqual(measuredAt);
+	at += 1;
+	expect(
+		await reader.fetch(
+			"fixture-aborted-wallet",
+			profile,
+			new AbortController().signal,
+		),
+	).toEqual(original);
+	expect(calls).toBe(2);
+});
