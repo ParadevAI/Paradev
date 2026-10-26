@@ -57,6 +57,10 @@ export interface BackgroundReconnectIO {
 	assertReserved(source: BackgroundReconnectSource): void;
 	authorize(source: BackgroundReconnectSource): BackgroundReconnectSource;
 	unclaim(source: BackgroundReconnectSource): void;
+	reconcileExitedReservation?(
+		source: BackgroundReconnectSource,
+		signal?: AbortSignal,
+	): Promise<BackgroundReconnectSource>;
 	create(input: {
 		source: BackgroundReconnectSource;
 		terminalId: string;
@@ -243,6 +247,13 @@ export function createBackgroundReconnect(io: BackgroundReconnectIO) {
 				if (!isDeepStrictEqual(current, source)) return refuse();
 			};
 			await check();
+			if (source.reservation?.authorized && io.reconcileExitedReservation) {
+				source = await io.reconcileExitedReservation(source, signal);
+				guard();
+				authorized = source.reservation?.authorized ?? false;
+				update(source, authorized);
+				await check();
+			}
 			await io.assertIdle(source, signal);
 			guard();
 			let proof = await io.prove(source, signal);

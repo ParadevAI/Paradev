@@ -347,3 +347,45 @@ test("normal UI output growth cannot invalidate the same fresh native admission"
 	});
 	expect(f.counts().commits).toBe(1);
 });
+
+test("a retry replaces only a failed attachment after verified exit, without closing the worker", async () => {
+	const f = fixture();
+	f.setBytes("");
+	const reconnect = createBackgroundReconnect(f.io);
+	await expect(reconnect(f.input)).resolves.toMatchObject({
+		attachmentPending: true,
+	});
+	let reconciled = 0;
+	f.io.reconcileExitedReservation = async (source) => {
+		reconciled++;
+		if (!source.reservation?.authorized)
+			throw new Error("Expected authorized view");
+		f.io.unclaim(source);
+		const replacement = f.io.read(f.input);
+		if (!replacement) throw new Error("Expected original source");
+		return replacement;
+	};
+	f.setBytes("Session aabbccdd · Exact worker\n");
+	await expect(reconnect(f.input)).resolves.toMatchObject({
+		reconnected: true,
+		confirmed: true,
+	});
+	expect(reconciled).toBe(1);
+	expect(f.counts()).toEqual({ creates: 2, commits: 1, unclaims: 1 });
+	expect(f.commands).toEqual([
+		["attach", "Exact worker"],
+		["attach", "Exact worker"],
+	]);
+});
+
+test("an unknown attachment exit keeps the same authorized view pending", async () => {
+	const f = fixture();
+	f.setBytes("");
+	const reconnect = createBackgroundReconnect(f.io);
+	await reconnect(f.input);
+	f.io.reconcileExitedReservation = async (source) => source;
+	await expect(reconnect(f.input)).resolves.toMatchObject({
+		attachmentPending: true,
+	});
+	expect(f.counts()).toEqual({ creates: 1, commits: 0, unclaims: 0 });
+});
