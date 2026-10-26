@@ -27,6 +27,7 @@ import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hook
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { useCreatePrFormIntent } from "renderer/stores/create-pr-form-intent";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
@@ -263,6 +264,16 @@ export function WorkspaceActivityMenu({
 		setShipView(null);
 		markSeen(workspaceId, workspace[0]?.publishedAtMs ?? 0);
 	};
+
+	const pendingCreatePr = useCreatePrFormIntent((state) => state.workspaceId);
+	const canCreatePr = shipActions.canCreatePr;
+	useEffect(() => {
+		if (!paneAreaStyle || pendingCreatePr !== workspaceId) return;
+		if (!useCreatePrFormIntent.getState().consume(workspaceId)) return;
+		if (!canCreatePr) return;
+		setOpen(true);
+		setShipView("pr");
+	}, [paneAreaStyle, pendingCreatePr, workspaceId, canCreatePr]);
 
 	const handleOpenPage = (page: MenuPage, event: MouseEvent) => {
 		handleOpenChange(false);

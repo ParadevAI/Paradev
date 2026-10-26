@@ -51,11 +51,13 @@ import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhe
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
 import { useConsumeSubagentLink } from "./hooks/useConsumeSubagentLink";
+import { useCopyPathHotkey } from "./hooks/useCopyPathHotkey";
 import { useCreatePendingMigratedTerminals } from "./hooks/useCreatePendingMigratedTerminals";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
 import { useIsChatTabActive } from "./hooks/useIsChatTabActive";
+import { useOpenPrHotkey } from "./hooks/useOpenPrHotkey";
 import { usePaneAreaMoveActions } from "./hooks/usePaneAreaMoveActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
 import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/BrowserPane";
@@ -556,6 +558,12 @@ function V2WorkspaceContent() {
 	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat !== "disabled" });
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
+	});
+	useCopyPathHotkey(workspaceId);
+	useOpenPrHotkey({
+		workspaceId,
+		enabled: isLayoutReady,
+		openPullRequestPane,
 	});
 
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
