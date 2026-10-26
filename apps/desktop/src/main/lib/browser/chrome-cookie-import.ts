@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { COMPANY } from "@superset/shared/constants";
+import { OWN_ROOT_DOMAINS } from "@superset/shared/own-domains";
 import Database from "better-sqlite3";
 import type { Session } from "electron";
 import { browserLocations } from "./chromium-profiles";
@@ -308,7 +309,7 @@ export interface CookieImportResult {
 
 // Session cookies on the old domain outlive a root-domain change.
 export const PROTECTED_COOKIE_DOMAINS = [
-	...new Set([COMPANY.DOMAIN, "superset.sh"]),
+	...new Set([COMPANY.DOMAIN, ...OWN_ROOT_DOMAINS]),
 ];
 
 /**

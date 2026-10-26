@@ -68,8 +68,8 @@ export function HeroSection() {
 						<Link
 							href={
 								i18n.locale === "en"
-									? "/blog/a-new-name"
-									: `/${i18n.locale}/blog/a-new-name`
+									? "/blog/superset-is-now-paradev"
+									: `/${i18n.locale}/blog/superset-is-now-paradev`
 							}
 							className="group mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
@@ -78,7 +78,9 @@ export function HeroSection() {
 								className="size-1.5 shrink-0 rounded-full bg-brand"
 							/>
 							<span>
-								<Trans>Superset is getting a new name soon</Trans>
+								<Trans>
+									Superset is now Paradev. Also, we raised an $11.5M seed
+								</Trans>
 							</span>
 							<span
 								aria-hidden="true"
@@ -132,7 +134,7 @@ export function HeroSection() {
 											})
 										: track("mobile_page_clicked", { source: "hero" })
 								}
-								aria-label={t({ message: "Superset for iPhone and iPad" })}
+								aria-label={t({ message: "Paradev for iPhone and iPad" })}
 								className="flex size-11 shrink-0 items-center justify-center border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:size-12"
 							>
 								<FaApple aria-hidden="true" className="size-5" />

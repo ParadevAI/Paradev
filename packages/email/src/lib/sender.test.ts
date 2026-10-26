@@ -21,9 +21,11 @@ function loadNoreplyFrom(overrides: Record<string, string> = {}): string {
 
 describe("NOREPLY_FROM", () => {
 	test("equals the production sender when no env var is set", () => {
-		expect(loadNoreplyFrom()).toBe("Superset <noreply@superset.sh>");
+		expect(loadNoreplyFrom()).toBe(
+			"Paradev (formerly Superset) <noreply@superset.sh>",
+		);
 		expect(loadNoreplyFrom({ EMAIL_SENDING_DOMAIN: "" })).toBe(
-			"Superset <noreply@superset.sh>",
+			"Paradev (formerly Superset) <noreply@superset.sh>",
 		);
 	});
 
@@ -33,6 +35,6 @@ describe("NOREPLY_FROM", () => {
 				EMAIL_SENDING_DOMAIN: "mail.example.org",
 				NEXT_PUBLIC_ROOT_DOMAIN: "example.com",
 			}),
-		).toBe("Superset <noreply@mail.example.org>");
+		).toBe("Paradev (formerly Superset) <noreply@mail.example.org>");
 	});
 });

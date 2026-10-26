@@ -11,9 +11,9 @@ import {
 	packagedAsarUnpackGlobs,
 	packagedNodeModuleCopies,
 } from "./runtime-dependencies";
+import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const currentYear = new Date().getFullYear();
-const author = pkg.author?.name ?? pkg.author;
 const productName = pkg.productName;
 // productName names the bundle, userData, logs and the keychain entry, so it
 // never changes; the menu bar, Dock and launchers show displayName.
@@ -29,7 +29,8 @@ const dmgBackgroundPath = join(
 const config: Configuration = {
 	appId: "com.superset.desktop",
 	productName,
-	copyright: `Copyright © ${currentYear} — ${author}`,
+	afterPack: localizeMacDisplayName(displayName),
+	copyright: `Copyright © ${currentYear} Superset Inc.`,
 	electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
 
 	// Generate update manifests for all channels (latest.yml, canary.yml, etc.)
@@ -39,8 +40,8 @@ const config: Configuration = {
 	// Generate latest-mac.yml for auto-update (workflow handles actual upload)
 	publish: {
 		provider: "github",
-		owner: "superset-sh",
-		repo: "superset",
+		owner: "paradevai",
+		repo: "paradev",
 	},
 
 	// Directories
@@ -128,8 +129,12 @@ const config: Configuration = {
 			"build/entitlements.mac.inherit.plist",
 		),
 		extendInfo: {
-			CFBundleName: displayName,
-			CFBundleDisplayName: displayName,
+			// Electron finds "<CFBundleName> Helper.app" by this name and aborts at
+			// launch when it is not productName. The shown name is localized in
+			// afterPack.
+			CFBundleName: productName,
+			CFBundleDisplayName: productName,
+			LSHasLocalizedDisplayName: true,
 			// Required for macOS microphone permission prompt
 			NSMicrophoneUsageDescription: `${displayName} needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.`,
 			// Required for on-device dictation on macOS 15 and older

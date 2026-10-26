@@ -1,14 +1,14 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "posthog",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Ask PostHog about your product: query events and insights, look up people, and check feature flags.",
 	"author": {
 		"name": "Superset",
 		"url": "https://superset.sh"
 	},
 	"homepage": "https://docs.superset.sh",
-	"repository": "https://github.com/superset-sh/superset",
+	"repository": "https://github.com/paradevai/paradev",
 	"license": "MIT",
 	"keywords": ["posthog", "analytics", "events", "feature-flags", "product"],
 	"extensions": {

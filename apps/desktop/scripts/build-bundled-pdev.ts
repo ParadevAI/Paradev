@@ -15,7 +15,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { config } from "dotenv";
 
 export const PDEV_VERSION = "0.2.1";
-const PDEV_DOWNLOAD_URL = `https://github.com/superset-sh/pdev/releases/download/v${PDEV_VERSION}`;
+const PDEV_DOWNLOAD_URL = `https://github.com/paradevai/pdev/releases/download/v${PDEV_VERSION}`;
 export const PDEV_SHA256: Record<string, string> = {
 	"pdev-0.2.1-darwin-arm64.tar.gz":
 		"27cc0f2f5fedd98b4945eea8a4cd2d169c2f91c9e02d99e6a8f5a04004a67a01",

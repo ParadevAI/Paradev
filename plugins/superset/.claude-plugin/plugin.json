@@ -8,7 +8,7 @@
 		"url": "https://superset.sh"
 	},
 	"homepage": "https://docs.superset.sh",
-	"repository": "https://github.com/superset-sh/superset",
+	"repository": "https://github.com/paradevai/paradev",
 	"license": "MIT",
 	"keywords": [
 		"superset",

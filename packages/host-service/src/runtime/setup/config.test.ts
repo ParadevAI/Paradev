@@ -2,11 +2,12 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { getDefaultTerminal } from "@superset/shared/project-config";
 import {
 	getProjectConfigPath,
 	hasConfiguredScripts,
+	loadProjectConfig,
 	loadSetupConfig,
-	resolveScript,
 	shellSingleQuote,
 } from "./config";
 
@@ -415,7 +416,7 @@ describe("hasConfiguredScripts", () => {
 	});
 });
 
-describe("resolveScript", () => {
+describe("loadProjectConfig with v1 sources", () => {
 	let sandbox: Sandbox;
 
 	beforeEach(() => {
@@ -426,16 +427,28 @@ describe("resolveScript", () => {
 		sandbox.cleanup();
 	});
 
-	function resolve(key: "setup" | "teardown" | "run") {
-		return resolveScript(key, {
+	function load(worktreePath?: string) {
+		const config = loadProjectConfig({
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			homeDir: sandbox.homeDir,
+			...(worktreePath && { worktreePath }),
 		});
+		if (config?.kind !== "ok") return null;
+		const terminal = getDefaultTerminal(config.resolved);
+		return {
+			setup: config.resolved.setup,
+			archive: config.resolved.archive,
+			run: terminal
+				? { commands: terminal.commands, cwd: terminal.cwd }
+				: { commands: [] },
+		};
 	}
 
-	function writeFallbackScript(key: string) {
-		const dir = join(sandbox.repoPath, ".superset");
+	const bash = (scriptPath: string) => `bash ${shellSingleQuote(scriptPath)}`;
+
+	function writeFallbackScript(key: string, root = sandbox.repoPath) {
+		const dir = join(root, ".superset");
 		mkdirSync(dir, { recursive: true });
 		const scriptPath = join(dir, `${key}.sh`);
 		writeFileSync(scriptPath, "#!/usr/bin/env bash\n", "utf-8");
@@ -443,109 +456,74 @@ describe("resolveScript", () => {
 	}
 
 	it("returns null when no config and no fallback script exist", () => {
-		expect(resolve("setup")).toBeNull();
-		expect(resolve("teardown")).toBeNull();
-		expect(resolve("run")).toBeNull();
+		expect(load()).toBeNull();
 	});
 
 	it("returns configured commands, filtering empty entries", () => {
 		writeRepoConfig(sandbox.repoPath, {
 			teardown: ["docker compose down", "", "   ", "rm -rf .cache"],
 		});
-		expect(resolve("teardown")).toEqual({
-			kind: "commands",
-			commands: ["docker compose down", "rm -rf .cache"],
-		});
+		expect(load()?.archive.commands).toEqual([
+			"docker compose down",
+			"rm -rf .cache",
+		]);
 	});
 
-	it("only resolves the requested key", () => {
+	it("maps each key to its own section", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["bun install"] });
-		expect(resolve("setup")).toEqual({
-			kind: "commands",
-			commands: ["bun install"],
+		expect(load()).toEqual({
+			setup: { commands: ["bun install"] },
+			archive: { commands: [] },
+			run: { commands: [] },
 		});
-		expect(resolve("teardown")).toBeNull();
-		expect(resolve("run")).toBeNull();
 	});
 
 	it("falls back to <repoPath>/.superset/<key>.sh per key", () => {
 		const setupScript = writeFallbackScript("setup");
 		const teardownScript = writeFallbackScript("teardown");
-		expect(resolve("setup")).toEqual({
-			kind: "script",
-			scriptPath: setupScript,
+		expect(load()).toEqual({
+			setup: { commands: [bash(setupScript)] },
+			archive: { commands: [bash(teardownScript)] },
+			run: { commands: [] },
 		});
-		expect(resolve("teardown")).toEqual({
-			kind: "script",
-			scriptPath: teardownScript,
-		});
-		expect(resolve("run")).toBeNull();
 	});
 
 	it("prefers the worktree script when worktreePath is in scope", () => {
 		writeFallbackScript("teardown");
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
-		mkdirSync(join(worktreePath, ".superset"), { recursive: true });
-		const worktreeScript = join(worktreePath, ".superset", "teardown.sh");
-		writeFileSync(worktreeScript, "#!/usr/bin/env bash\n", "utf-8");
-
-		expect(
-			resolveScript("teardown", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath,
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "script", scriptPath: worktreeScript });
+		const worktreeScript = writeFallbackScript("teardown", worktreePath);
+		expect(load(worktreePath)?.archive.commands).toEqual([
+			bash(worktreeScript),
+		]);
 	});
 
 	it("falls back to the main repo script when the worktree has none", () => {
 		const teardownScript = writeFallbackScript("teardown");
-		expect(
-			resolveScript("teardown", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath: join(sandbox.repoPath, ".worktrees", "feature"),
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "script", scriptPath: teardownScript });
+		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
+		expect(load(worktreePath)?.archive.commands).toEqual([
+			bash(teardownScript),
+		]);
 	});
 
 	it("worktree config commands override the main repo's", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
 		writeRepoConfig(worktreePath, { setup: ["from-worktree"] });
-
-		expect(
-			resolveScript("setup", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath,
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "commands", commands: ["from-worktree"] });
+		expect(load(worktreePath)?.setup.commands).toEqual(["from-worktree"]);
 	});
 
 	it("configured commands win over the fallback script", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["bun install"] });
 		writeFallbackScript("setup");
-		expect(resolve("setup")).toEqual({
-			kind: "commands",
-			commands: ["bun install"],
-		});
+		expect(load()?.setup.commands).toEqual(["bun install"]);
 	});
 
-	it("carries cwd on both command and script resolutions", () => {
+	it("carries cwd on both command and script sections", () => {
 		writeRepoConfig(sandbox.repoPath, { cwd: "apps/web", run: ["bun dev"] });
 		const teardownScript = writeFallbackScript("teardown");
-		expect(resolve("run")).toEqual({
-			kind: "commands",
-			commands: ["bun dev"],
-			cwd: "apps/web",
-		});
-		expect(resolve("teardown")).toEqual({
-			kind: "script",
-			scriptPath: teardownScript,
+		expect(load()?.run).toEqual({ commands: ["bun dev"], cwd: "apps/web" });
+		expect(load()?.archive).toEqual({
+			commands: [bash(teardownScript)],
 			cwd: "apps/web",
 		});
 	});

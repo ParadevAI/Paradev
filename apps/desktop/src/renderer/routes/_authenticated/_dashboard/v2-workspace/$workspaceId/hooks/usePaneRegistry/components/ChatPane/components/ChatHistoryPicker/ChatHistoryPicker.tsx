@@ -156,7 +156,7 @@ export function ChatHistoryPicker({
 					) : null}
 					{native.data?.pages[0]?.supported === false ? (
 						<p className="p-2 text-xs text-muted-foreground">
-							<Trans>This agent only shows chats saved in Superset.</Trans>
+							<Trans>This agent only shows chats saved in Paradev.</Trans>
 						</p>
 					) : null}
 					{visible.map((entry) => (

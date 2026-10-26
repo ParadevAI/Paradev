@@ -63,10 +63,10 @@ const INTERNAL_NAME =
 const ORGANIZATION_ID = process.env.SUPERSET_INTERNAL_ORGANIZATION_ID;
 const ENV_FILE = process.env.SUPERSET_INTERNAL_ENV_FILE;
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-const REPO_URL = "https://github.com/superset-sh/superset.git";
+const REPO_URL = "https://github.com/paradevai/paradev.git";
 const REPO_PATH = SANDBOX_ROOT_CHECKOUT;
 const REPO_DIR = sandboxCheckoutDir(SANDBOX_PATHS.workspace, REPO_PATH);
-const REPO_FULL_NAME = "superset-sh/superset";
+const REPO_FULL_NAME = "paradevai/paradev";
 /** The monorepo branch the golden is built from; its `.superset/config.json` supplies `start`. */
 const BRANCH = process.env.SUPERSET_INTERNAL_BRANCH ?? "main";
 const REGION = DEFAULT_SANDBOX_REGION;
@@ -303,7 +303,7 @@ if (setup.code !== 0)
 	fail(`setup hook exited ${setup.code}; ${golden} left for inspection`);
 
 const checks: Array<[label: string, command: string, expect: RegExp]> = [
-	["repo", `git -C ${REPO_DIR} remote get-url origin`, /superset-sh\/superset/],
+	["repo", `git -C ${REPO_DIR} remote get-url origin`, /paradevai\/paradev/],
 	["dependencies", `test -d ${REPO_DIR}/node_modules && echo ok`, /ok/],
 	[
 		"turbo",
@@ -476,18 +476,19 @@ if (!SKIP_IMAGE) {
 
 // 5. rows
 const { db, dbWs } = await import("@superset/db/client");
-const { environments, environmentRepositories, githubRepositories } =
-	await import("@superset/db/schema");
-const { and, eq, isNull } = await import("drizzle-orm");
+const { environments, environmentRepositories } = await import(
+	"@superset/db/schema"
+);
+const { eq, isNull } = await import("drizzle-orm");
+const { releaseRepositoryWhere } = await import(
+	"./utils/releaseRepositoryWhere"
+);
 const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
 // the box acts on the monorepo's own .superset/config.json.
 const monorepo = await db.query.githubRepositories.findFirst({
-	where: and(
-		eq(githubRepositories.organizationId, ORGANIZATION_ID as string),
-		eq(githubRepositories.fullName, REPO_FULL_NAME),
-	),
+	where: releaseRepositoryWhere(ORGANIZATION_ID as string, REPO_FULL_NAME),
 });
 if (!monorepo)
 	fail(

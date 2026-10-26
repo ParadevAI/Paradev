@@ -32,7 +32,7 @@ async function warnings(list: string[]) {
 describe("standing warnings", () => {
 	test("say what will not run, and what to do about it", async () => {
 		const text =
-			"This trigger will not run for messages in #access-requests until @Superset is invited.";
+			"This trigger will not run for messages in #access-requests until @Paradev is invited.";
 		const { ui } = await warnings([text]);
 		expect(ui.getByText(text)).toBeDefined();
 	});

@@ -64,7 +64,7 @@ export default function SignUpPage() {
 					<Trans>Create an account</Trans>
 				</h1>
 				<p className="text-muted-foreground text-sm">
-					<Trans>Sign up to get started with Superset</Trans>
+					<Trans>Sign up to get started with Paradev</Trans>
 				</p>
 			</div>
 			<div className="grid gap-4">

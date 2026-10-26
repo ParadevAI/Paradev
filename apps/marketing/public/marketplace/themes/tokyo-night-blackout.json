@@ -3,7 +3,7 @@
 	"name": "Tokyo Night Blackout",
 	"type": "dark",
 	"author": "Enkia (port: Baris Can Sayin); adapted by Michael Talarczyk",
-	"description": "Tokyo Night with the main content area and terminal forced to pure black for OLED displays; the sidebar keeps Tokyo Night's original navy tone. Terminal foreground and ANSI black are brightened slightly for legibility against pure black, informed by Edmund Yong's community 'Tokyo Night Blackout' VS Code theme — every other color is unchanged from Superset's stock Tokyo Night theme.",
+	"description": "Tokyo Night with the main content area and terminal forced to pure black for OLED displays; the sidebar keeps Tokyo Night's original navy tone. Terminal foreground and ANSI black are brightened slightly for legibility against pure black, informed by Edmund Yong's community 'Tokyo Night Blackout' VS Code theme — every other color is unchanged from Paradev's stock Tokyo Night theme.",
 	"ui": {
 		"background": "#000000",
 		"foreground": "#c0caf5",

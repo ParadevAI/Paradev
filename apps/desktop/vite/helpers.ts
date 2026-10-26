@@ -1,6 +1,7 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, normalize, resolve } from "node:path";
 import { transformAsync } from "@babel/core";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import type { Plugin } from "vite";
 
 import { main, resources } from "../package.json";
@@ -119,9 +120,9 @@ function connectSrcOrigins(): string {
 			"https://*.sandbox.supersetusercontent.com",
 		process.env.R2_ENDPOINT || "https://*.r2.cloudflarestorage.com",
 	];
-	return [
-		...new Set(origins.flatMap((url) => [url, url.replace(/^http/, "ws")])),
-	].join(" ");
+	return withOwnDomainTwins(
+		origins.flatMap((url) => [url, url.replace(/^http/, "ws")]),
+	).join(" ");
 }
 
 export function htmlEnvTransformPlugin(): Plugin {

@@ -59,7 +59,7 @@ export function ConnectorCallbackToast({
 							message: `This ${plugin} account is already connected by ${owner}. Ask them to disconnect first.`,
 						})
 					: t({
-							message: `This ${plugin} account is already connected by another Superset organization.`,
+							message: `This ${plugin} account is already connected by another Paradev organization.`,
 						}),
 			);
 		} else {
