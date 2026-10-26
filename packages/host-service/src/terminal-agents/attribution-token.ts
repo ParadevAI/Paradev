@@ -178,11 +178,13 @@ export function openAttributionTokenAuthority(
 	);
 }
 let authority = new AttributionTokenAuthority(randomBytes(32));
+let temporaryDirectory: string | undefined;
 export function configureAttributionTokens(directory: string): void {
 	const next = resolve(directory);
 	if (authority.directory && authority.directory !== next)
 		throw new Error("Native attribution host scope changed");
 	authority = openAttributionTokenAuthority(next);
+	temporaryDirectory = undefined;
 }
 export function issueAttributionToken(terminalId: string): string {
 	return authority.issue(terminalId);
@@ -200,7 +202,17 @@ export function configureAttributionTokensForDatabase(
 ): void {
 	const filename = dbPath.trim();
 	if (injectedDatabase || filename === "" || filename === ":memory:") return;
-	configureAttributionTokens(
-		join(dirname(resolve(filename)), ".native-attribution"),
-	);
+	const directory = join(dirname(resolve(filename)), ".native-attribution");
+	if (authority.directory && authority.directory !== directory)
+		throw new Error("Native attribution host scope changed");
+	if (temporaryDirectory === directory) return;
+	try {
+		configureAttributionTokens(directory);
+	} catch {
+		authority = new AttributionTokenAuthority(randomBytes(32), directory);
+		temporaryDirectory = directory;
+		console.warn(
+			"[native-attribution] Private storage is unavailable; using a host-scoped temporary authority. Existing launch tokens cannot be restored.",
+		);
+	}
 }

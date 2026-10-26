@@ -6,7 +6,6 @@ import type {
 	UserContent,
 } from "@superset/chat/protocol";
 import type {
-	ComposerChip,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	PromptInputCommand,
@@ -38,7 +37,6 @@ import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
 import { mcpContextLine } from "../../utils/mcpServerChips";
-import { elementsForChips } from "../../utils/messageElements";
 import { type AgentSwitcher, ModelPicker } from "./components/ModelPicker";
 import { ModePicker, type SessionMode } from "./components/ModePicker";
 import { useAttachmentPreview } from "./hooks/useAttachmentPreview";
@@ -50,6 +48,7 @@ import { useDrawerEntry } from "./hooks/useDrawerEntry";
 import { useFooterTier } from "./hooks/useFooterTier";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
+import { submitMessage } from "./utils/submitMessage";
 
 export type ComposerTarget = {
 	name: string;
@@ -151,7 +150,7 @@ export const Composer = memo(function Composer({
 	const cloudUtils = cloudTrpc.useUtils();
 	const uploadAttachments = useUploadAttachments(workspaceId);
 	const attachmentPreview = useAttachmentPreview();
-	const { storedDraft, onChange, clearDraft } = useComposerDraft(
+	const { storedDraft, onChange, beginSubmission } = useComposerDraft(
 		draftKey,
 		draftPersisted,
 	);
@@ -352,58 +351,20 @@ export const Composer = memo(function Composer({
 		return [...local, ...agentCommands];
 	}, [availableCommands, mcpCommand, resumeCommand, t]);
 
-	const send = useCallback(
-		async (
-			text: string,
-			files: File[],
-			mentions: ComposerChip[],
-			pastedTexts: string[],
-			steer: boolean,
-		) => {
-			const tags = await uploadAttachments(files);
-			if (!tags) {
-				promptInputRef.current?.appendText(appendPastedText(text, pastedTexts));
-				return;
-			}
-			const message = text.trim();
-			const elements = elementsForChips(message, mentions);
-			const mcpContext = mcpContextLine(
-				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
-			);
-			onSend(
-				[
-					{
-						type: "text",
-						text: appendPastedText(
-							[message, ...tags].filter(Boolean).join("\n"),
-							pastedTexts,
-						),
-						...(elements.length > 0 ? { elements } : {}),
-					},
-					...(mcpContext
-						? [{ type: "text" as const, text: mcpContext, hidden: true }]
-						: []),
-				],
-				{ steer },
-			);
-			clearDraft();
-		},
-		[onSend, uploadAttachments, clearDraft, mcpPicker.serverNameOf],
-	);
-
 	const handleSubmit = useCallback(
-		({
+		async ({
 			text,
 			files,
 			mentions,
 			pastedTexts,
 			steer,
+			isDraftUnchanged,
 		}: PromptInputSubmitPayload) => {
 			if (
 				blocked ||
 				(text.trim() === "" && files.length === 0 && pastedTexts.length === 0)
 			)
-				return;
+				return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			const input = promptInputRef.current;
 			if (text.trim() === "/mcp" && mcpPicker.command && input) {
@@ -438,9 +399,40 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return send(text, files, mentions, pastedTexts, steer);
+			const finishSubmission = beginSubmission(
+				appendPastedText(text, pastedTexts),
+				isDraftUnchanged,
+			);
+			if (!finishSubmission) return false;
+			try {
+				const result = await submitMessage(
+					{ text, files, mentions, pastedTexts, steer },
+					{
+						uploadAttachments,
+						onSend,
+						mcpContext: mcpContextLine(
+							mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
+						),
+					},
+				);
+				finishSubmission(result !== false);
+				return result;
+			} catch (error) {
+				finishSubmission(false);
+				throw error;
+			}
 		},
-		[availableCommands, blocked, send, t, target, mcpPicker, onOpenHistory],
+		[
+			availableCommands,
+			blocked,
+			onSend,
+			uploadAttachments,
+			t,
+			beginSubmission,
+			target,
+			mcpPicker,
+			onOpenHistory,
+		],
 	);
 
 	return (

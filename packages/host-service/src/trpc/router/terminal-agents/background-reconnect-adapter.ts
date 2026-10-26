@@ -40,7 +40,10 @@ import {
 	pinnedAccountEnv,
 	resolveLaunchAccount,
 } from "../agents/launch-account";
-import { parsePersistedSessionAccount } from "../usage/session-account/session-account";
+import {
+	parsePersistedSessionAccount,
+	type SessionAccount,
+} from "../usage/session-account/session-account";
 import { assertAccountResumeTerminalIdle } from "./account-resume-processes";
 import {
 	type BackgroundReconnectInput,
@@ -79,7 +82,11 @@ function refuse(): never {
 function hash(value: unknown) {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
-function context(ctx: Context, input: BackgroundReconnectInput) {
+function context(
+	ctx: Context,
+	input: BackgroundReconnectInput,
+	discovery = false,
+) {
 	const binding = ctx.db
 		.select()
 		.from(terminalAgentBindings)
@@ -118,8 +125,10 @@ function context(ctx: Context, input: BackgroundReconnectInput) {
 		account.agent !== "claude" ||
 		account.conflict ||
 		account.credentialKind !== "subscription"
-	)
+	) {
+		if (discovery && !binding.endReason?.startsWith(PREFIX)) return null;
 		return refuse();
+	}
 	const marker = binding.endReason?.startsWith(PREFIX)
 		? binding.endReason.slice(PREFIX.length).split(":")
 		: null;
@@ -213,15 +222,30 @@ export function backgroundReconnectSource(
 	ctx: Context,
 	input: { workspaceId: string; terminalId: string },
 ) {
-	const source = context(ctx, { ...input, expectedRevision: "" })?.source;
+	const source = context(ctx, { ...input, expectedRevision: "" }, true)?.source;
 	return source
 		? { provider: "claude" as const, revision: source.expectedRevision }
 		: null;
 }
 
+export function backgroundAttachmentCommand(
+	account: SessionAccount,
+	executable: string,
+	args: readonly ["attach", string],
+): string {
+	const command = `${buildArgvCommand([executable, ...args])}; exit "$?"`;
+	return `exec ${pinnedAccountCommandPrefix(account, {})}${buildArgvCommand(["/bin/sh", "-c", command])}`;
+}
+
 export function backgroundReconnectAdapter(
 	ctx: Context,
+	dependencies: {
+		listSessions?: () => Promise<Array<{ id: string; alive: boolean }> | null>;
+	} = {},
 ): BackgroundReconnectIO {
+	const listSessions =
+		dependencies.listSessions ??
+		(() => getSupervisor().listSessions(ctx.organizationId, 1_500));
 	const requireSource = (source: BackgroundReconnectSource) => {
 		const current = context(ctx, source);
 		if (!current || !isDeepStrictEqual(current.source, source)) return refuse();
@@ -434,13 +458,64 @@ export function backgroundReconnectAdapter(
 				.where(eq(terminalAgentBindings.terminalId, source.terminalId))
 				.run();
 		},
+		async reconcileExitedReservation(source, signal) {
+			const current = requireSource(source);
+			const terminalId = source.reservation?.terminalId;
+			if (!terminalId || !source.reservation?.authorized || signal?.aborted)
+				return source;
+			const terminal = ctx.db
+				.select()
+				.from(terminalSessions)
+				.where(eq(terminalSessions.id, terminalId))
+				.get();
+			if (
+				!terminal ||
+				terminal.originWorkspaceId !== source.workspaceId ||
+				!["exited", "disposed"].includes(terminal.status)
+			)
+				return source;
+			const sessions = await listSessions();
+			if (
+				signal?.aborted ||
+				!sessions ||
+				sessions.some((row) => row.id === terminalId && row.alive)
+			)
+				return source;
+			ctx.db.transaction(() => {
+				requireSource(source);
+				const latest = ctx.db
+					.select()
+					.from(terminalSessions)
+					.where(eq(terminalSessions.id, terminalId))
+					.get();
+				const bound = ctx.db
+					.select({ terminalId: terminalAgentBindings.terminalId })
+					.from(terminalAgentBindings)
+					.where(eq(terminalAgentBindings.terminalId, terminalId))
+					.get();
+				if (!isDeepStrictEqual(latest, terminal) || bound) return refuse();
+				ctx.db
+					.update(terminalAgentBindings)
+					.set({
+						endReason: current.originalReason,
+						resumedIntoTerminalId: null,
+					})
+					.where(eq(terminalAgentBindings.terminalId, source.terminalId))
+					.run();
+			});
+			return context(ctx, source)?.source ?? refuse();
+		},
 		async create(input) {
 			const result = await createTerminalSessionInternal({
 				terminalId: input.terminalId,
 				workspaceId: input.source.workspaceId,
 				db: ctx.db,
 				eventBus: ctx.eventBus,
-				initialCommand: `${pinnedAccountCommandPrefix(input.source.account, {})}${buildArgvCommand([input.executable, ...input.args])}`,
+				initialCommand: backgroundAttachmentCommand(
+					input.source.account,
+					input.executable,
+					input.args,
+				),
 				beforeInitialCommand: input.beforeInitialCommand,
 				onInitialCommandReady: input.onInitialCommandReady,
 			});
