@@ -3,9 +3,10 @@ import type { ServerOptions } from "@superset/pty-daemon";
 
 /**
  * In-process PTY spawner for teardown/lifecycle tests: emits the
- * shell-integration prompt marker, then executes each written command
- * synchronously via `/bin/sh -c` and exits with its status. Mimics fish's
- * `$?` rejection so shell-portability regressions stay covered.
+ * shell-integration prompt marker, then echoes each written command like a
+ * line editor, executes it synchronously via `/bin/sh -c` and exits with its
+ * status. Mimics fish's `$?` rejection so shell-portability regressions stay
+ * covered.
  */
 export function createFishLikePtySpawner(
 	writes: string[],
@@ -28,6 +29,7 @@ export function createFishLikePtySpawner(
 			write(data) {
 				const command = data.toString("utf8").trim();
 				writes.push(command);
+				dataCallback?.(Buffer.from(`${command}\r\n`));
 				if (command.includes("$?")) {
 					dataCallback?.(
 						Buffer.from(

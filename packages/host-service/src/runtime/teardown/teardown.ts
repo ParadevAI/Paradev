@@ -18,10 +18,8 @@ const CAPTURE_BYTES = 64 * 1024;
 const KILL_GRACE_MS = 2_000;
 
 /**
- * Printed by the teardown's own `bash -c` right before the command. The
- * hidden PTY also carries the login shell's startup output and its line
- * editor echoing the typed command (fish redraws it per keystroke, with the
- * right prompt), so only bytes after this marker are the command's output.
+ * Printed by the teardown's `bash -c` before the command. Bytes before it are
+ * the login shell's startup output and its line editor echoing the command.
  */
 export const TEARDOWN_OUTPUT_MARKER = "\x1b]superset;teardown-output\x07";
 const PRINT_OUTPUT_MARKER = "printf '\\033]superset;teardown-output\\a'";
@@ -201,11 +199,6 @@ export function buildTeardownCommandFromShell(shellCommand: string): string {
 	return `exec bash -c ${shellSingleQuote(`${PRINT_OUTPUT_MARKER}; ${shellCommand}`)}`;
 }
 
-/**
- * Keeps the last {@link OUTPUT_TAIL_BYTES} of what the command itself wrote.
- * Without the marker (shell never reached the command, or the capture window
- * already rolled past it) the whole capture is the best available output.
- */
 export function commandOutputTail(captured: string): string {
 	const markerStart = captured.indexOf(TEARDOWN_OUTPUT_MARKER);
 	const output =

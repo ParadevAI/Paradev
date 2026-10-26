@@ -59,9 +59,6 @@ describe("teardown initial command", () => {
 		);
 	});
 
-	// Reproduces #8806: fish redraws the typed command per keystroke (with the
-	// right prompt) and toggles modifyOtherKeys, so the raw PTY tail was
-	// mostly line-editor noise with the real error only on the last line.
 	test("output tail starts after the marker, dropping shell echo and redraws", () => {
 		const error =
 			"bash: ./.superset/teardown.sh: No such file or directory\r\n";
