@@ -1,6 +1,9 @@
 import { Database } from "bun:sqlite";
 import { afterEach, expect, test } from "bun:test";
-import { resolve } from "node:path";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
@@ -20,6 +23,7 @@ import type { ClaudeBackgroundAttachProof } from "../../../terminal-agents/claud
 import type { NativeClaudeTerminalClient } from "../../../terminal-agents/native-claude-process";
 import { createBackgroundReconnect } from "./background-reconnect";
 import {
+	backgroundAttachmentCommand,
 	backgroundReconnectAdapter,
 	backgroundReconnectSource,
 } from "./background-reconnect-adapter";
@@ -309,4 +313,266 @@ test("background and exact saved-history recovery share the unreserved source re
 	expect(accountResumeSource(f.db, f.input)?.revision).toBe(
 		f.input.expectedRevision,
 	);
+});
+
+test("ordinary Claude configurations outside attachment scope keep normal Continue available", () => {
+	const custom = fixture();
+	custom.db
+		.update(hostAgentConfigs)
+		.set({ argsJson: '["--model","custom-model"]' })
+		.where(eq(hostAgentConfigs.id, "custom:fixture"))
+		.run();
+	expect(backgroundReconnectSource(custom.ctx, custom.input)).toBeNull();
+	expect(() => custom.adapter.read(custom.input)).toThrow(
+		"could not be verified",
+	);
+
+	const api = fixture();
+	api.db
+		.update(terminalAgentBindings)
+		.set({
+			accountJson: JSON.stringify({
+				...api.account,
+				pinned: undefined,
+				credentialKind: "api_key",
+			}),
+		})
+		.where(eq(terminalAgentBindings.terminalId, "original"))
+		.run();
+	expect(backgroundReconnectSource(api.ctx, api.input)).toBeNull();
+	expect(() => api.adapter.read(api.input)).toThrow("could not be verified");
+});
+
+test("discovery never hides an invalid or now-unsupported pending attachment", () => {
+	const f = fixture();
+	const source = f.adapter.read(f.input);
+	if (!source) throw new Error("Missing source");
+	f.adapter.authorize(f.adapter.reserve(source, "attachment"));
+	f.db
+		.update(hostAgentConfigs)
+		.set({ argsJson: '["--model","changed"]' })
+		.where(eq(hostAgentConfigs.id, "custom:fixture"))
+		.run();
+	expect(() => backgroundReconnectSource(f.ctx, f.input)).toThrow(
+		"could not be verified",
+	);
+});
+
+test("a failed owned attachment's known terminal exit restores the original recovery revision", async () => {
+	const f = fixture();
+	const source = f.adapter.read(f.input);
+	if (!source) throw new Error("Missing source");
+	const started = f.adapter.authorize(f.adapter.reserve(source, "attachment"));
+	f.db
+		.insert(terminalSessions)
+		.values({
+			id: "attachment",
+			originWorkspaceId: "workspace",
+			status: "exited",
+			createdAt: 4,
+			endedAt: 5,
+		})
+		.run();
+	const restarted = backgroundReconnectAdapter(f.ctx, {
+		listSessions: async () => [],
+	});
+	const recovered = await restarted.reconcileExitedReservation?.(started);
+	expect(recovered).toEqual(source);
+	expect(f.original()?.endReason).toBe("terminal-exited");
+	expect(f.original()?.resumedIntoTerminalId).toBeNull();
+	expect(accountResumeSource(f.db, f.input)?.ready).toBe(true);
+	expect(f.events).toEqual([]);
+});
+
+test("unknown daemon state or a live attachment never releases an authorized reservation", async () => {
+	for (const live of [null, [{ id: "attachment", alive: true }]]) {
+		const f = fixture();
+		const source = f.adapter.read(f.input);
+		if (!source) throw new Error("Missing source");
+		const started = f.adapter.authorize(
+			f.adapter.reserve(source, "attachment"),
+		);
+		f.db
+			.insert(terminalSessions)
+			.values({
+				id: "attachment",
+				originWorkspaceId: "workspace",
+				status: "exited",
+				createdAt: 4,
+				endedAt: 5,
+			})
+			.run();
+		const adapter = backgroundReconnectAdapter(f.ctx, {
+			listSessions: async () => live,
+		});
+		expect(await adapter.reconcileExitedReservation?.(started)).toEqual(
+			started,
+		);
+		expect(f.original()?.endReason).toStartWith("background-attach:started:");
+	}
+});
+
+test("an alive or differently owned terminal cannot be treated as an exited attachment", async () => {
+	for (const destination of [
+		{ status: "active", originWorkspaceId: "workspace" },
+		{ status: "exited", originWorkspaceId: "different-workspace" },
+	]) {
+		const f = fixture();
+		const source = f.adapter.read(f.input);
+		if (!source) throw new Error("Missing source");
+		const started = f.adapter.authorize(
+			f.adapter.reserve(source, "attachment"),
+		);
+		f.db
+			.insert(terminalSessions)
+			.values({ id: "attachment", ...destination, createdAt: 4 })
+			.run();
+		const adapter = backgroundReconnectAdapter(f.ctx, {
+			listSessions: async () => [],
+		});
+		expect(await adapter.reconcileExitedReservation?.(started)).toEqual(
+			started,
+		);
+		expect(f.original()?.resumedIntoTerminalId).toBe("attachment");
+	}
+});
+
+test("a source or terminal changed during the exit probe cannot be reclaimed", async () => {
+	const f = fixture();
+	const source = f.adapter.read(f.input);
+	if (!source) throw new Error("Missing source");
+	const started = f.adapter.authorize(f.adapter.reserve(source, "attachment"));
+	f.db
+		.insert(terminalSessions)
+		.values({
+			id: "attachment",
+			originWorkspaceId: "workspace",
+			status: "exited",
+			createdAt: 4,
+			endedAt: 5,
+		})
+		.run();
+	const adapter = backgroundReconnectAdapter(f.ctx, {
+		listSessions: async () => {
+			f.db
+				.update(terminalSessions)
+				.set({ status: "active" })
+				.where(eq(terminalSessions.id, "attachment"))
+				.run();
+			return [];
+		},
+	});
+	await expect(adapter.reconcileExitedReservation?.(started)).rejects.toThrow(
+		"could not be verified",
+	);
+	expect(f.original()?.endReason).toStartWith("background-attach:started:");
+});
+
+test("a dedicated attachment exits its view with the child's status and quoted argv", () => {
+	const root = mkdtempSync(join(tmpdir(), "attachment-view-exit-"));
+	try {
+		const cli = join(root, "fixture cli's");
+		writeFileSync(
+			cli,
+			'#!/bin/sh\nprintf "%s|%s|%s" "$1" "$2" "$CLAUDE_CONFIG_DIR"\nexit 23\n',
+			{ mode: 0o700 },
+		);
+		const f = fixture();
+		const name = "worker's exact name; no shell expansion";
+		const command = backgroundAttachmentCommand(f.account, cli, [
+			"attach",
+			name,
+		]);
+		for (const shell of ["/bin/sh", "/bin/bash", "/bin/zsh"]) {
+			if (!existsSync(shell)) continue;
+			const result = spawnSync(
+				shell,
+				["-c", `${command}\nprintf SHOULD_NOT_RUN`],
+				{
+					encoding: "utf8",
+					env: { PATH: process.env.PATH, HOME: root },
+				},
+			);
+			expect(result.error).toBeUndefined();
+			expect(result.status).toBe(23);
+			expect(result.stdout).toBe(`attach|${name}|${f.account.directory}`);
+		}
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
+
+test("Continue retries an exited failed view and adopts the same live worker without manual shell closure", async () => {
+	const f = fixture();
+	const adapter = backgroundReconnectAdapter(f.ctx, {
+		listSessions: async () => [],
+	});
+	let creates = 0;
+	let now = 0;
+	adapter.verifyAccount = async () => f.account;
+	adapter.assertIdle = async () => {};
+	adapter.prove = async () => f.proof;
+	adapter.attachArgs = async () => ["attach", "Fixture exact worker"];
+	adapter.uuid = () => (creates === 0 ? "failed-view" : "working-view");
+	adapter.now = () => now;
+	adapter.wait = async () => {
+		now += 100;
+	};
+	adapter.create = async (request) => {
+		creates++;
+		await request.beforeInitialCommand();
+		f.db
+			.insert(terminalSessions)
+			.values({
+				id: request.terminalId,
+				originWorkspaceId: "workspace",
+				status: "active",
+				createdAt: 4,
+			})
+			.run();
+		request.onInitialCommandReady();
+		if (creates === 1)
+			f.db
+				.update(terminalSessions)
+				.set({ status: "exited", endedAt: 5 })
+				.where(eq(terminalSessions.id, request.terminalId))
+				.run();
+	};
+	adapter.admission = async () =>
+		creates === 1
+			? null
+			: {
+					rootPid: 500,
+					client: f.client,
+					bytes: new TextEncoder().encode(
+						"Session aabbccdd · Fixture exact worker\n",
+					),
+				};
+	const reconnect = createBackgroundReconnect(adapter);
+	await expect(reconnect(f.input)).resolves.toMatchObject({
+		attachmentPending: true,
+		terminalId: "failed-view",
+	});
+	await expect(reconnect(f.input)).resolves.toMatchObject({
+		reconnected: true,
+		confirmed: true,
+		terminalId: "working-view",
+	});
+	expect(creates).toBe(2);
+	expect(f.original()?.resumedIntoTerminalId).toBe("working-view");
+	expect(
+		f.db
+			.select()
+			.from(terminalSessions)
+			.where(eq(terminalSessions.id, "failed-view"))
+			.get()?.status,
+	).toBe("exited");
+	expect(
+		f.db
+			.select()
+			.from(terminalAgentBindings)
+			.where(eq(terminalAgentBindings.terminalId, "working-view"))
+			.get()?.agentSessionId,
+	).toBe(f.sessionId);
+	expect(f.events).toHaveLength(1);
 });

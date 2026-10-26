@@ -214,3 +214,55 @@ test("relative database filenames select the same persisted authority on a child
 		rmSync(root, { recursive: true, force: true });
 	}
 });
+
+test("unsafe attribution storage uses an isolated temporary authority without rotating the stored key", () => {
+	const root = mkdtempSync(join(tmpdir(), "native-unavailable-authority-"));
+	try {
+		const moduleUrl = new URL("./attribution-token.ts", import.meta.url).href;
+		const child = spawnSync(
+			"node",
+			[
+				"--import",
+				import.meta.resolve("tsx"),
+				"--input-type=module",
+				"-e",
+				`
+			import assert from "node:assert/strict";
+			import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+			import { join } from "node:path";
+			const { configureAttributionTokensForDatabase, issueAttributionToken, verifyAttributionToken } = await import(${JSON.stringify(moduleUrl)});
+			const root = ${JSON.stringify(root)};
+			const database = join(root, "host.db");
+			configureAttributionTokensForDatabase(database);
+			const prior = issueAttributionToken("owned");
+			const key = join(root, ".native-attribution", "key");
+			writeFileSync(key, "malformed");
+			configureAttributionTokensForDatabase(database);
+			const temporary = issueAttributionToken("owned");
+			assert.equal(verifyAttributionToken("owned", prior), false);
+			assert.equal(verifyAttributionToken("owned", temporary), true);
+			assert.equal(verifyAttributionToken("other", temporary), false);
+			assert.equal(readFileSync(key, "utf8"), "malformed");
+			configureAttributionTokensForDatabase(database);
+			assert.equal(verifyAttributionToken("owned", temporary), true);
+			assert.throws(() => configureAttributionTokensForDatabase(join(root, "other", "host.db")), /scope changed/);
+			assert.equal(verifyAttributionToken("owned", temporary), true);
+			`,
+			],
+			{
+				encoding: "utf8",
+				env: {
+					PATH: process.env.PATH,
+					HOME: root,
+					CFFIXED_USER_HOME: root,
+					TMPDIR: root,
+				},
+			},
+		);
+		expect(child.error).toBeUndefined();
+		expect(child.status).toBe(0);
+		expect(child.stderr).toContain("host-scoped temporary authority");
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
