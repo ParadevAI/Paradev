@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
+import { AutumnError } from "autumn-js";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { autumnClient } from "../../../autumn";
 import { stripeClient } from "../../../stripe";
@@ -65,6 +66,16 @@ export async function paidAutumnPlanId(
 ): Promise<string | null> {
 	const customer = await getAutumnCustomer(organizationId);
 	return paidPlanIdFromFlags(customer.flags);
+}
+
+/** The paid plan, or null when the organization has no Autumn customer yet. */
+export async function heldAutumnPlanId(
+	organizationId: string,
+): Promise<string | null> {
+	return paidAutumnPlanId(organizationId).catch((error: unknown) => {
+		if (error instanceof AutumnError && error.statusCode === 404) return null;
+		throw error;
+	});
 }
 
 export async function organizationForStripeCustomer(
