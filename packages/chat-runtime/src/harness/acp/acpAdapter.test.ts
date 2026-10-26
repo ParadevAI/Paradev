@@ -533,6 +533,7 @@ function startAdapter(
 	adapterOptions: Pick<
 		AcpAdapterOptions,
 		| "beforePrompt"
+		| "resolveAttachment"
 		| "defaultModeId"
 		| "requestTimeoutMs"
 		| "clientApprovalModes"
@@ -4337,6 +4338,158 @@ describe("AcpAdapter on protocol v2", () => {
 			).toBe(false);
 
 			await adapter.dispose();
+		});
+
+		it.each([
+			"account changed",
+			"child closed",
+		])("does not steer a child when %s while an attachment resolves", async (change) => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = "injected";
+			let valid = true;
+			let release:
+				| ((value: { path: string; mimeType: string; data: string }) => void)
+				| undefined;
+			const { adapter } = startAdapter(
+				agent,
+				undefined,
+				{},
+				{
+					resolveAttachment: () =>
+						new Promise((resolve) => {
+							release = resolve;
+						}),
+					beforePrompt: async () => {
+						if (!valid) throw new Error("account changed");
+					},
+				},
+			);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				const pending = adapter.steerSubagent("subagent:child-1", [
+					{
+						type: "attachment",
+						attachmentId: "owned-fixture",
+						name: "fixture.png",
+						mimeType: "image/png",
+					},
+				]);
+				await flush();
+				if (!release) throw new Error("Expected deferred attachment");
+				if (change === "account changed") valid = false;
+				else {
+					agent.notify("sess-1", {
+						sessionUpdate: "subagent_update",
+						sessionId: "child-1",
+						state: { state: "idle", stopReason: "end_turn" },
+					});
+					await flush();
+				}
+				release({
+					path: "/fixture/image.png",
+					mimeType: "image/png",
+					data: "aW1hZ2U=",
+				});
+				if (change === "account changed")
+					await expect(pending).rejects.toThrow("account changed");
+				else await expect(pending).resolves.toBe(false);
+				expect(
+					agent.sent.filter((frame) =>
+						["_session/steering", "session/prompt"].includes(
+							String(frame.method),
+						),
+					),
+				).toEqual([]);
+			} finally {
+				await adapter.dispose();
+			}
+		});
+
+		it("Stop during the v1 child fallback validation cannot restart the child", async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = "promptRequired";
+			let calls = 0;
+			let validationStarted!: () => void;
+			let releaseValidation!: () => void;
+			const started = new Promise<void>((resolve) => {
+				validationStarted = resolve;
+			});
+			const blocked = new Promise<void>((resolve) => {
+				releaseValidation = resolve;
+			});
+			const { adapter } = startAdapter(
+				agent,
+				undefined,
+				{},
+				{
+					beforePrompt: async () => {
+						if (++calls === 2) {
+							validationStarted();
+							await blocked;
+						}
+					},
+				},
+			);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				const pending = adapter.steerSubagent("subagent:child-1", [
+					{ type: "text", text: "continue" },
+				]);
+				await started;
+				expect(await adapter.stopBackgroundTask("subagent:child-1")).toBe(true);
+				releaseValidation();
+				await expect(pending).resolves.toBe(false);
+				expect(
+					agent.sent.filter((frame) => frame.method === "_session/steering"),
+				).toHaveLength(1);
+				expect(
+					agent.sent.filter((frame) => frame.method === "session/cancel"),
+				).toMatchObject([{ params: { sessionId: "child-1" } }]);
+				expect(
+					agent.sent.filter((frame) => frame.method === "session/prompt"),
+				).toEqual([]);
+			} finally {
+				releaseValidation();
+				await adapter.dispose();
+			}
+		});
+
+		it("revalidates before the v1 child promptRequired fallback", async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.steeringOutcome = "promptRequired";
+			let calls = 0;
+			const { adapter } = startAdapter(
+				agent,
+				undefined,
+				{},
+				{
+					beforePrompt: async () => {
+						if (++calls === 2) throw new Error("account changed");
+					},
+				},
+			);
+			await flush();
+			agent.notify("sess-1", announce("child-1"));
+			await flush();
+			try {
+				await expect(
+					adapter.steerSubagent("subagent:child-1", [
+						{ type: "text", text: "continue" },
+					]),
+				).rejects.toThrow("account changed");
+				expect(
+					agent.sent.some((frame) => frame.method === "session/prompt"),
+				).toBe(false);
+			} finally {
+				await adapter.dispose();
+			}
 		});
 
 		it.each([
