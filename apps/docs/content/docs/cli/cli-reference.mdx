@@ -1781,6 +1781,62 @@ superset pages storage weekly-report --key votes --json
 
 ---
 
+### mcp
+
+Call the tools of a plugin you have connected. The call goes through Superset's
+API, which attaches the stored credential, so no token is written to this
+machine.
+
+<Command
+	name="superset mcp tools"
+	options={[
+		{ flag: "--plugin <name>", description: "Plugin name, as shown on the Plugins page." },
+		{ flag: "--account <id>", description: "Connection id, when the plugin has more than one connected account." },
+	]}
+	output="Array<{ plugin, tool, description }>"
+>
+List the tools a connected plugin exposes (PLUGIN, TOOL, DESCRIPTION).
+
+```bash
+superset mcp tools --plugin slack
+```
+</Command>
+
+<Command
+	name="superset mcp call-tool <tool> [arguments]"
+	args={[
+		{ name: "tool", required: true, description: "Tool name, from `superset mcp tools`." },
+		{ name: "arguments", description: "Tool arguments as JSON (default `{}`)." },
+	]}
+	options={[
+		{ flag: "--plugin <name>", description: "Plugin name, as shown on the Plugins page." },
+		{ flag: "--account <id>", description: "Connection id, when the plugin has more than one connected account." },
+	]}
+	output="The MCP tool result: { content: Array<{ type, text }>, isError? }"
+>
+Call a tool on a connected plugin and print its result.
+
+```bash
+superset mcp call-tool search_messages --plugin slack '{"query":"deploy"}'
+```
+</Command>
+
+---
+
+### skills
+
+<Command
+	name="superset skills list"
+	options={[
+		{ flag: "--paths", description: "Print only the paths, one per line." },
+	]}
+	output="Array<{ directory, plugin, skill, marketplace, path, description }>"
+>
+List the skills installed from plugins on this machine (SKILL, PLUGIN, PATH).
+</Command>
+
+---
+
 ### tasks (alias: `t`)
 
 Tasks are units of work in your organization's task tracker. When the
