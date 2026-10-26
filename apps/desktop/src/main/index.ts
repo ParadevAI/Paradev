@@ -59,6 +59,10 @@ import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
 import { loadWebviewBrowserExtension } from "./lib/extensions";
 import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
+import {
+	startHostUsageObservations,
+	stopHostUsageObservations,
+} from "./lib/host-usage";
 import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
@@ -377,7 +381,10 @@ app.on("before-quit", async (event) => {
 		teardownTerminalHost,
 		stopPtyDaemons,
 		disposeTerminalHostClient,
-		disposeTray,
+		disposeTray: () => {
+			stopHostUsageObservations();
+			disposeTray();
+		},
 		forceExit: (code) => app.exit(code),
 	});
 	if (holdingQuitForCleanup) {
@@ -666,6 +673,7 @@ if (!gotTheLock) {
 		);
 		setupAutoUpdater();
 		initTray();
+		startHostUsageObservations();
 		startResourceJournal();
 
 		const coldStartUrl = findDeepLinkInArgv(process.argv);
