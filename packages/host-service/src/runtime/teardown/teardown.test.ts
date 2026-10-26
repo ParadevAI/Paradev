@@ -47,16 +47,25 @@ describe("teardown initial command", () => {
 	});
 
 	test("bash prints the output marker before the command's own output", () => {
-		const result = spawnSync("bash", [
-			"-c",
-			buildTeardownCommandFromShell("echo hi && ./.superset/teardown.sh"),
-		]);
+		const emptyDir = mkdtempSync(join(tmpdir(), "host-service-teardown-"));
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"-c",
+					buildTeardownCommandFromShell("echo hi && ./.superset/teardown.sh"),
+				],
+				{ cwd: emptyDir },
+			);
 
-		expect(result.status).toBe(127);
-		expect(result.stdout.toString()).toBe(`${TEARDOWN_OUTPUT_MARKER}hi\n`);
-		expect(result.stderr.toString()).toContain(
-			"./.superset/teardown.sh: No such file or directory",
-		);
+			expect(result.status).toBe(127);
+			expect(result.stdout.toString()).toBe(`${TEARDOWN_OUTPUT_MARKER}hi\n`);
+			expect(result.stderr.toString()).toContain(
+				"./.superset/teardown.sh: No such file or directory",
+			);
+		} finally {
+			rmSync(emptyDir, { recursive: true, force: true });
+		}
 	});
 
 	test("output tail starts after the marker, dropping shell echo and redraws", () => {
