@@ -27,13 +27,13 @@ import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hook
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import { useCreatePrFormIntent } from "renderer/stores/create-pr-form-intent";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useCreatePrFormIntent } from "../../state/createPrFormIntent";
 import type { PagePaneData, PaneViewerData } from "../../types";
 import {
 	BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,
@@ -271,6 +271,7 @@ export function WorkspaceActivityMenu({
 		if (!paneAreaStyle || pendingCreatePr !== workspaceId) return;
 		if (!useCreatePrFormIntent.getState().consume(workspaceId)) return;
 		if (!canCreatePr) return;
+		setComposing(false);
 		setOpen(true);
 		setShipView("pr");
 	}, [paneAreaStyle, pendingCreatePr, workspaceId, canCreatePr]);

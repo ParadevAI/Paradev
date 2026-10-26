@@ -3,7 +3,7 @@ import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
-import { useCreatePrFormIntent } from "renderer/stores/create-pr-form-intent";
+import { useCreatePrFormIntent } from "../../state/createPrFormIntent";
 import { usePRFlowState } from "../usePRFlowState";
 import { resolveOpenPrAction } from "./resolveOpenPrAction";
 

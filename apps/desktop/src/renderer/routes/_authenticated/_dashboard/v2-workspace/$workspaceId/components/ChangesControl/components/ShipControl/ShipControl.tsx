@@ -7,7 +7,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
 	VscChevronDown,
 	VscGitCommit,
@@ -15,8 +15,8 @@ import {
 	VscLoading,
 	VscRepoPush,
 } from "react-icons/vsc";
-import { useCreatePrFormIntent } from "renderer/stores/create-pr-form-intent";
 import { useShipActions } from "../../../../hooks/useShipActions";
+import { useCreatePrFormIntent } from "../../../../state/createPrFormIntent";
 import type { BranchSyncStatus } from "../../../../utils/getPRFlowState";
 import { CommitForm } from "../../../CommitForm";
 import { CreatePrForm } from "../../../CreatePrForm";
@@ -75,14 +75,13 @@ export function ShipControl({
 		actions.seedPrTitle();
 		setView("pr");
 	};
-	const openPrViewRef = useRef(openPrView);
-	openPrViewRef.current = openPrView;
+	const openRequestedPrView = useEffectEvent(openPrView);
 
 	const pendingCreatePr = useCreatePrFormIntent((state) => state.workspaceId);
 	useEffect(() => {
 		if (pendingCreatePr !== workspaceId) return;
 		if (!useCreatePrFormIntent.getState().consume(workspaceId)) return;
-		if (canCreatePr) openPrViewRef.current();
+		if (canCreatePr) openRequestedPrView();
 	}, [pendingCreatePr, workspaceId, canCreatePr]);
 
 	const showCreatePr = !needsCommit && canCreatePr;
