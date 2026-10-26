@@ -341,3 +341,57 @@ test("an ordinary settled read still checks the host without a desktop freshness
 	expect((await store.read(host))?.data?.[0]?.accountKey).toBe("reading-2");
 	expect(calls).toBe(2);
 });
+
+test("a native update during a pending read publishes one trailing reading to both displays", async () => {
+	const older = deferred<UsageAccount[]>();
+	let calls = 0;
+	const store = createHostUsageStore(() => ({
+		key: "identity-a",
+		load: async (force) => {
+			expect(force).toBe(false);
+			return ++calls === 1 ? older.promise : quota("native");
+		},
+	}));
+	const left: string[] = [],
+		right: string[] = [];
+	store.subscribe((value) => {
+		if (!value.loading && value.data)
+			left.push(value.data[0]?.accountKey ?? "");
+	});
+	store.subscribe((value) => {
+		if (!value.loading && value.data)
+			right.push(value.data[0]?.accountKey ?? "");
+	});
+	const pending = store.read(host);
+	await Promise.resolve();
+	const first = store.readAfterPending(host);
+	const coalesced = store.readAfterPending(host);
+	older.resolve(quota("older"));
+	await Promise.all([pending, first, coalesced]);
+	expect(calls).toBe(2);
+	expect(left).toEqual(["older", "native"]);
+	expect(right).toEqual(left);
+});
+
+test("a retired source waiting on its old read does not load the replacement", async () => {
+	const older = deferred<UsageAccount[]>();
+	let key = "old",
+		replacementLoads = 0;
+	const store = createHostUsageStore(() => ({
+		key,
+		load: async () => {
+			if (key === "old") return older.promise;
+			replacementLoads++;
+			return quota("new");
+		},
+	}));
+	const pending = store.read(host);
+	await Promise.resolve();
+	const trailing = store.readAfterPending(host);
+	key = "new";
+	store.invalidate(host);
+	older.resolve(quota("old"));
+	await Promise.all([pending, trailing]);
+	expect(replacementLoads).toBe(0);
+	expect(store.peek(host)?.data).toBeNull();
+});

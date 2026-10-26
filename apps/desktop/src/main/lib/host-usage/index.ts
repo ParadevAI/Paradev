@@ -6,12 +6,16 @@ import {
 	type HostServiceStatusEvent,
 } from "main/lib/host-service-coordinator";
 import superjson from "superjson";
+import { createNativeUsageUpdates } from "./native-updates";
 import { createHostUsageStore } from "./store";
 
 let epoch = 0;
 const hostEpochs = new Map<string, number>();
 const hostUrls = new Map<string, Set<string>>();
 let started = false;
+const nativeUpdates = createNativeUsageUpdates({
+	read: (hostUrl) => hostUsageObservations.readAfterPending(hostUrl),
+});
 
 export const hostUsageObservations = createHostUsageStore((hostUrl) => {
 	if (!started) return null;
@@ -42,15 +46,37 @@ export const hostUsageObservations = createHostUsageStore((hostUrl) => {
 				}),
 			],
 		});
+		const sourceEpoch = epoch;
+		const hostEpoch = hostEpochs.get(organizationId) ?? 0;
+		const key = JSON.stringify([
+			sourceEpoch,
+			hostEpoch,
+			organizationId,
+			connection.machineId,
+			connection.port,
+			connection.secret,
+		]);
+		nativeUpdates.observe({
+			hostUrl,
+			key,
+			getToken: () => {
+				if (
+					!started ||
+					epoch !== sourceEpoch ||
+					(hostEpochs.get(organizationId) ?? 0) !== hostEpoch
+				)
+					return null;
+				const current = coordinator.getConnection(organizationId);
+				return current?.port === connection.port &&
+					current.machineId === connection.machineId &&
+					current.secret === connection.secret
+					? current.secret
+					: null;
+			},
+		});
 		return {
 			scope: JSON.stringify([organizationId, connection.machineId]),
-			key: JSON.stringify([
-				epoch,
-				hostEpochs.get(organizationId) ?? 0,
-				organizationId,
-				connection.port,
-				connection.secret,
-			]),
+			key,
 			load: (force: boolean) =>
 				client.usage.quota.query(
 					{ forceRefresh: force },
@@ -62,6 +88,7 @@ export const hostUsageObservations = createHostUsageStore((hostUrl) => {
 });
 
 const reset = () => {
+	nativeUpdates.clear();
 	epoch++;
 	hostEpochs.clear();
 	hostUrls.clear();
@@ -69,8 +96,10 @@ const reset = () => {
 };
 const statusChanged = ({ organizationId }: HostServiceStatusEvent) => {
 	hostEpochs.set(organizationId, (hostEpochs.get(organizationId) ?? 0) + 1);
-	for (const url of hostUrls.get(organizationId) ?? [])
+	for (const url of hostUrls.get(organizationId) ?? []) {
+		nativeUpdates.close(url);
 		hostUsageObservations.invalidate(url);
+	}
 	hostUrls.delete(organizationId);
 };
 export function startHostUsageObservations() {

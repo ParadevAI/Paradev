@@ -192,6 +192,18 @@ export function createHostUsageStore(
 			return current(hostUrl)?.entry.observation ?? null;
 		},
 		read,
+		async readAfterPending(
+			hostUrl: string,
+		): Promise<HostUsageObservation | null> {
+			const active = current(hostUrl);
+			if (!active?.source) return active?.entry.observation ?? null;
+			const { entry, source } = active;
+			if (entry.pending) await entry.pending;
+			const latest = current(hostUrl);
+			if (latest?.entry !== entry || latest.source?.key !== source.key)
+				return latest?.entry.observation ?? null;
+			return read(hostUrl, false);
+		},
 		invalidate(onlyHostUrl?: string) {
 			const invalidated = [...entries].filter(
 				([url]) => !onlyHostUrl || url === onlyHostUrl,
