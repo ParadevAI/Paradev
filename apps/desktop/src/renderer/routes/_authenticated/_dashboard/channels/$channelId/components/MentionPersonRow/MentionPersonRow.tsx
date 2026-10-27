@@ -23,7 +23,7 @@ export function MentionPersonRow({
 	const presence = useUserPresence(userId);
 	return (
 		<>
-			<PersonAvatar size="sm" name={name} image={image} />
+			<PersonAvatar size="xs" name={name} image={image} />
 			<span className="truncate font-semibold">{name}</span>
 			{isSelf && (
 				<span className="-ml-1 shrink-0 font-semibold">
