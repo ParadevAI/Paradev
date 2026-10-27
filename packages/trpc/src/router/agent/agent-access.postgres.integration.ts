@@ -52,6 +52,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		const turn = await person(userId).agent.startDirectTurn({
 			agentId: agent.id,
+			promptId: "kickoff",
 		});
 		const { token } = await worker().agentWorker.turnToken({
 			turnId: turn.turnId,
@@ -141,15 +142,30 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Channel not found");
 	});
 
-	test("a session runs one turn, and a settled turn's token stops working", async () => {
+	test("a message mid-turn joins it, and the turn settles only after the worker read it", async () => {
 		const { agent, turn, token } = await agentWithChannel(admin);
-		const again = await person(admin).agent.startDirectTurn({
-			agentId: agent.id,
+		const steer = { agentId: agent.id, promptId: "steer-1" };
+		const joined = await person(admin).agent.startDirectTurn(steer);
+		expect(joined).toEqual({
+			sessionId: turn.sessionId,
+			turnId: turn.turnId,
+			outcome: "joined",
+			steerSeq: 1,
 		});
-		expect(again).toEqual({ ...turn, started: false });
+		expect((await person(admin).agent.startDirectTurn(steer)).outcome).toBe(
+			"duplicate",
+		);
+		await expect(
+			worker().agentWorker.settleTurn({
+				turnId: turn.turnId,
+				status: "completed",
+				steersConsumed: 0,
+			}),
+		).rejects.toThrow("STEER_PENDING");
 		await worker().agentWorker.settleTurn({
 			turnId: turn.turnId,
 			status: "completed",
+			steersConsumed: 1,
 		});
 		await expect(asAgent(token).agentApi.me()).rejects.toThrow(
 			"Turn is not running.",
@@ -161,33 +177,25 @@ suite("agent access against a migrated PostgreSQL", () => {
 		await worker().agentWorker.settleTurn({
 			turnId: turn.turnId,
 			status: "completed",
-		});
-		const first = await person(admin).agent.startDirectTurn({
-			agentId: agent.id,
-			promptId: "prompt-1",
-		});
-		expect(first.started).toBe(true);
-		await worker().agentWorker.settleTurn({
-			turnId: first.turnId,
-			status: "completed",
+			steersConsumed: 0,
 			reply: "done",
 			inputTokens: 10,
 		});
 		const resent = await person(admin).agent.startDirectTurn({
 			agentId: agent.id,
-			promptId: "prompt-1",
+			promptId: "kickoff",
 		});
-		expect(resent).toEqual({ ...first, started: false });
+		expect(resent).toEqual({ ...turn, outcome: "duplicate" });
 		const [row] = await db
 			.select()
 			.from(schema.agentTurns)
-			.where(eq(schema.agentTurns.id, first.turnId));
+			.where(eq(schema.agentTurns.id, turn.turnId));
 		expect(row).toMatchObject({ reply: "done", inputTokens: 10 });
 		const next = await person(admin).agent.startDirectTurn({
 			agentId: agent.id,
 			promptId: "prompt-2",
 		});
-		expect(next.started).toBe(true);
+		expect(next.outcome).toBe("started");
 	});
 
 	test("archiving an agent revokes it at once", async () => {

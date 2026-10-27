@@ -139,9 +139,7 @@ export const agentRouter = {
 	 * between the insert and the join.
 	 */
 	startDirectTurn: protectedProcedure
-		.input(
-			agentIdSchema.extend({ promptId: z.string().min(1).max(200) }),
-		)
+		.input(agentIdSchema.extend({ promptId: z.string().min(1).max(200) }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const [agent] = await db
@@ -194,7 +192,11 @@ export const agentRouter = {
 					)
 					.limit(1);
 				if (duplicate) {
-					return { sessionId: session.id, turnId: duplicate.id, outcome: "duplicate" as const };
+					return {
+						sessionId: session.id,
+						turnId: duplicate.id,
+						outcome: "duplicate" as const,
+					};
 				}
 				const [started] = await db
 					.insert(agentTurns)
@@ -209,7 +211,11 @@ export const agentRouter = {
 					.onConflictDoNothing()
 					.returning({ id: agentTurns.id });
 				if (started) {
-					return { sessionId: session.id, turnId: started.id, outcome: "started" as const };
+					return {
+						sessionId: session.id,
+						turnId: started.id,
+						outcome: "started" as const,
+					};
 				}
 				const [joined] = await db
 					.update(agentTurns)

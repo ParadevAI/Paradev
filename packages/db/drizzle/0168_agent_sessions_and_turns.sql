@@ -26,7 +26,7 @@ CREATE TABLE "agent_turns" (
 	"trigger_message_id" uuid,
 	"started_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"prompt_id" text,
-	"steer_count" integer DEFAULT 0 NOT NULL,
+	"steer_prompt_ids" text[] DEFAULT '{}' NOT NULL,
 	"settled_at" timestamp with time zone,
 	"reply" text,
 	"tool_calls" jsonb,

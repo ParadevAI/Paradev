@@ -1,5 +1,5 @@
 {
-  "id": "165af799-35fa-4636-b12a-5736a9ef641e",
+  "id": "b343bd33-c9c2-4045-8f25-dc17004ca872",
   "prevId": "b4012122-8b61-4fe6-919e-9ae6878a43f0",
   "version": "7",
   "dialect": "postgresql",
@@ -332,12 +332,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "steer_count": {
-          "name": "steer_count",
-          "type": "integer",
+        "steer_prompt_ids": {
+          "name": "steer_prompt_ids",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": true,
-          "default": 0
+          "default": "'{}'"
         },
         "settled_at": {
           "name": "settled_at",
