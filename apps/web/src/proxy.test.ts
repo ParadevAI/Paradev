@@ -139,4 +139,13 @@ describe("proxy: signed-in visits to auth pages", () => {
 
 		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
 	});
+
+	it("ignores a redirect that a tab turns into another origin", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2F%09%2Fevil.example",
+			signedIn,
+		);
+
+		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
+	});
 });

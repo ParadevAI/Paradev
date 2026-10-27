@@ -4,7 +4,7 @@ import {
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
-	safeRedirectPath,
+	safeRedirectUrl,
 } from "./proxy-routes";
 
 describe("isPublicRoute", () => {
@@ -85,27 +85,32 @@ describe("isInternalRoute", () => {
 	});
 });
 
-describe("safeRedirectPath", () => {
+describe("safeRedirectUrl", () => {
+	const origin = "https://app.superset.sh";
+
 	test("keeps a same-origin path with its query", () => {
-		expect(safeRedirectPath("/settings?tab=billing")).toBe(
-			"/settings?tab=billing",
+		expect(safeRedirectUrl("/settings?tab=billing", origin)?.href).toBe(
+			"https://app.superset.sh/settings?tab=billing",
 		);
 	});
 
-	test("rejects other origins and missing values", () => {
+	test("rejects other origins, including ones URL parsing creates", () => {
 		for (const value of [
 			null,
 			"",
 			"https://evil.example",
 			"//evil.example",
 			"/\\evil.example",
+			"/\t/evil.example",
+			"/\n/evil.example",
+			"/\r\\evil.example",
 		]) {
-			expect(safeRedirectPath(value)).toBeNull();
+			expect(safeRedirectUrl(value, origin)).toBeNull();
 		}
 	});
 
 	test("rejects auth pages so a signed-in redirect cannot loop", () => {
-		expect(safeRedirectPath("/sign-in?redirect=/x")).toBeNull();
-		expect(safeRedirectPath("/sign-up")).toBeNull();
+		expect(safeRedirectUrl("/sign-in?redirect=/x", origin)).toBeNull();
+		expect(safeRedirectUrl("/sign-up", origin)).toBeNull();
 	});
 });
