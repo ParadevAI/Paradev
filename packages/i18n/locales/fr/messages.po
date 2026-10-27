@@ -16790,6 +16790,12 @@ msgstr "Lancements de terminal réutilisables. Cliquez sur un script pour le mod
 msgid "Reusing {keptName}"
 msgstr "Réutilise {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Afficher dans l'Explorateur de fichiers"
+
+msgid "Reveal in File Manager"
+msgstr "Afficher dans le gestionnaire de fichiers"
+
 msgid "Reveal in Finder"
 msgstr "Afficher dans le Finder"
 

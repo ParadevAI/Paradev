@@ -16790,6 +16790,12 @@ msgstr "可复用的终端启动项。点击脚本可编辑，拖动可重新排
 msgid "Reusing {keptName}"
 msgstr "正在复用 {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "在文件资源管理器中显示"
+
+msgid "Reveal in File Manager"
+msgstr "在文件管理器中显示"
+
 msgid "Reveal in Finder"
 msgstr "在Finder中显示"
 

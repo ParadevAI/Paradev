@@ -16790,6 +16790,12 @@ msgstr "Herbruikbare terminalstarts. Klik op een script om het te bewerken of sl
 msgid "Reusing {keptName}"
 msgstr "Hergebruikt {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Tonen in Verkenner"
+
+msgid "Reveal in File Manager"
+msgstr "Tonen in bestandsbeheer"
+
 msgid "Reveal in Finder"
 msgstr "Tonen in Finder"
 

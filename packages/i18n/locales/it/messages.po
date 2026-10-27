@@ -16790,6 +16790,12 @@ msgstr "Avvii del terminale riutilizzabili. Clicca su uno script per modificarlo
 msgid "Reusing {keptName}"
 msgstr "Riutilizza {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Mostra in Esplora file"
+
+msgid "Reveal in File Manager"
+msgstr "Mostra nel file manager"
+
 msgid "Reveal in Finder"
 msgstr "Mostra nel Finder"
 
