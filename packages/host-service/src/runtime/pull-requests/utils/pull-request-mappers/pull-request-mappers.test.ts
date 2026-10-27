@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import type { GitHubCheckContextNode } from "../github-query";
 import {
 	coercePullRequestState,
 	computeChecksStatus,
 	mapPullRequestState,
 	type PullRequestCheck,
+	parseCheckContexts,
 } from "./pull-request-mappers";
 
 describe("mapPullRequestState", () => {
@@ -83,5 +85,32 @@ describe("computeChecksStatus", () => {
 		expect(computeChecksStatus([check("success"), check("skipped")])).toBe(
 			"success",
 		);
+	});
+});
+
+function checkRun(conclusion: string | null): GitHubCheckContextNode {
+	return {
+		__typename: "CheckRun",
+		name: "build",
+		conclusion,
+		detailsUrl: null,
+		status: "COMPLETED",
+		startedAt: null,
+		completedAt: null,
+		checkSuite: null,
+	};
+}
+
+describe("parseCheckContexts", () => {
+	test("a completed run that failed to start is a failure", () => {
+		expect(parseCheckContexts([checkRun("STARTUP_FAILURE")])).toEqual([
+			{ name: "build", status: "failure", url: null },
+		]);
+	});
+
+	test("a completed run that failed to start fails the aggregate", () => {
+		expect(
+			computeChecksStatus(parseCheckContexts([checkRun("STARTUP_FAILURE")])),
+		).toBe("failure");
 	});
 });
