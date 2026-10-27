@@ -231,7 +231,7 @@ export const agentRouter = {
 	listSessions: protectedProcedure
 		.input(
 			z.object({
-				organizationId: z.string().uuid(),
+				organizationId: z.string().uuid().optional(),
 				cloudWorkspaceId: z.string().uuid().optional(),
 			}),
 		)
@@ -250,7 +250,9 @@ export const agentRouter = {
 				.innerJoin(agents, eq(agents.id, agentSessions.agentId))
 				.where(
 					and(
-						eq(agentSessions.organizationId, input.organizationId),
+						input.organizationId
+							? eq(agentSessions.organizationId, input.organizationId)
+							: undefined,
 						eq(agentSessions.kind, "dm"),
 						eq(agentSessions.userId, userId),
 						isNull(agents.archivedAt),
