@@ -1,19 +1,9 @@
 import type { ReactNode, Ref } from "react";
-import type { ComposerChip, PromptInputDictation } from "../PromptInput/types";
-
-export type MessageMentionEntry = {
-	id: string;
-	/** What the chip shows once picked. */
-	chip: ComposerChip;
-	/** The menu row; the composer only adds the highlight around it. */
-	row: ReactNode;
-};
-
-export type MessageMentionGroup = {
-	id: string;
-	title?: ReactNode;
-	entries: MessageMentionEntry[];
-};
+import type {
+	ComposerChip,
+	ComposerMentionProvider,
+	PromptInputDictation,
+} from "../PromptInput/types";
 
 export type MessageComposerSubmitPayload = {
 	text: string;
@@ -35,8 +25,9 @@ export type MessageComposerHandle = {
 export type MessageComposerProps = {
 	ref?: Ref<MessageComposerHandle>;
 	placeholder: string;
-	/** Groups for the @ menu, already filtered and ordered for `query`. */
-	getMentionGroups: (query: string) => MessageMentionGroup[];
+	mentionProviders: ComposerMentionProvider[];
+	/** Draws a picked mention in place of the default chip; return null to keep the default. */
+	renderChip?: (chip: ComposerChip) => ReactNode;
 	/** Returning `false` keeps the draft in the editor. */
 	onSubmit: (payload: MessageComposerSubmitPayload) => boolean | undefined;
 	dictation?: PromptInputDictation;

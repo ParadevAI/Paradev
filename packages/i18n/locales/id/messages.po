@@ -11688,6 +11688,9 @@ msgstr "Tidak ada yang cocok di {organizationName}. Ketik email lengkap untuk me
 msgid "No one matches"
 msgstr "Tidak ada yang cocok"
 
+msgid "No one to mention"
+msgstr "Tidak ada yang bisa disebut"
+
 msgid "No open issues found."
 msgstr "Tidak ada issue terbuka."
 

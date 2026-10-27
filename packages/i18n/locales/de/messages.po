@@ -11688,6 +11688,9 @@ msgstr "Niemand in {organizationName} passt. Gib eine vollständige E-Mail-Adres
 msgid "No one matches"
 msgstr "Keine Treffer"
 
+msgid "No one to mention"
+msgstr "Niemand zum Erwähnen"
+
 msgid "No open issues found."
 msgstr "Keine offenen Issues gefunden."
 

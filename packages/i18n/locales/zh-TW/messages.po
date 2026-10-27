@@ -11688,6 +11688,9 @@ msgstr "{organizationName} 中沒有相符的人。輸入完整電子郵件地�
 msgid "No one matches"
 msgstr "沒有符合的成員"
 
+msgid "No one to mention"
+msgstr "沒有可提及的人"
+
 msgid "No open issues found."
 msgstr "未找到開啟的議題。"
 

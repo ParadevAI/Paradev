@@ -11688,6 +11688,9 @@ msgstr "{organizationName}に一致するユーザーはいません。新しい
 msgid "No one matches"
 msgstr "一致するメンバーはいません"
 
+msgid "No one to mention"
+msgstr "メンションできる人がいません"
+
 msgid "No open issues found."
 msgstr "オープンなIssueが見つかりません。"
 

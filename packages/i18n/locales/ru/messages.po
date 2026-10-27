@@ -11688,6 +11688,9 @@ msgstr "В {organizationName} никто не найден. Введите по�
 msgid "No one matches"
 msgstr "Никого не найдено"
 
+msgid "No one to mention"
+msgstr "Некого упомянуть"
+
 msgid "No open issues found."
 msgstr "Открытых задач не найдено."
 

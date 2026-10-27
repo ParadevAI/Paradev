@@ -10,7 +10,10 @@ import {
 } from "@lexical/react/LexicalComposer";
 import { QuoteNode } from "@lexical/rich-text";
 import { useState } from "react";
-import { MentionChipNode } from "../PromptInput/nodes/mentionChipNode";
+import {
+	ChipRendererContext,
+	MentionChipNode,
+} from "../PromptInput/nodes/mentionChipNode";
 import { MessageComposerBody } from "./components/MessageComposerBody";
 import { MESSAGE_COMPOSER_THEME } from "./theme";
 import type { MessageComposerProps } from "./types";
@@ -22,13 +25,12 @@ export type {
 	MessageComposerProps,
 	MessageComposerSubmitPayload,
 	MessageEmojiSuggestion,
-	MessageMentionEntry,
-	MessageMentionGroup,
 } from "./types";
 
 export function MessageComposer({
 	className,
 	initialMarkdown,
+	renderChip,
 	...props
 }: MessageComposerProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
@@ -57,9 +59,11 @@ export function MessageComposer({
 	}));
 	return (
 		<div className={className}>
-			<LexicalRoot initialConfig={initialConfig}>
-				<MessageComposerBody {...props} />
-			</LexicalRoot>
+			<ChipRendererContext.Provider value={renderChip}>
+				<LexicalRoot initialConfig={initialConfig}>
+					<MessageComposerBody {...props} />
+				</LexicalRoot>
+			</ChipRendererContext.Provider>
 		</div>
 	);
 }

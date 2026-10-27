@@ -10,8 +10,8 @@ import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/use
 import { pendingMessage } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import {
 	mentionedUserIds,
-	useChannelMentionGroups,
-} from "../../hooks/useChannelMentionGroups";
+	useChannelMentions,
+} from "../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../hooks/useEmojiSuggestions";
 import { strongestBroadcast } from "../../utils/mentionGroups";
 import type { ChannelPerson } from "../ChannelMessageRow";
@@ -39,7 +39,7 @@ export function ChannelComposer({
 	const { apply, discard } = useApplyChannelMessage();
 	const send = cloudTrpc.channelMessage.send.useMutation();
 	const dictation = useComposerDictation();
-	const getMentionGroups = useChannelMentionGroups({
+	const { mentionProviders, renderChip } = useChannelMentions({
 		channelId,
 		people,
 		currentUserId,
@@ -138,7 +138,8 @@ export function ChannelComposer({
 				key={draft.key}
 				initialMarkdown={draft.markdown || undefined}
 				placeholder={placeholder}
-				getMentionGroups={getMentionGroups}
+				mentionProviders={mentionProviders}
+				renderChip={renderChip}
 				getEmojiSuggestions={getEmojiSuggestions}
 				allowAttachments
 				onSubmit={onSubmit}

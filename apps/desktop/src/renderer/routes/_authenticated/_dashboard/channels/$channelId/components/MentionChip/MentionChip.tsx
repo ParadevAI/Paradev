@@ -1,7 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import type { ReactNode } from "react";
-import { PersonHoverCard } from "../../../PersonHoverCard";
-import type { ChannelPerson } from "../../ChannelMessageRow";
+import type { ChannelPerson } from "../ChannelMessageRow";
+import { PersonHoverCard } from "../PersonHoverCard";
 
 interface MentionChipProps {
 	channelId: string;

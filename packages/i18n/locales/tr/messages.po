@@ -11688,6 +11688,9 @@ msgstr "{organizationName} içinde eşleşen kimse yok. Yeni birini davet etmek 
 msgid "No one matches"
 msgstr "Eşleşen kimse yok"
 
+msgid "No one to mention"
+msgstr "Bahsedilecek kimse yok"
+
 msgid "No open issues found."
 msgstr "Açık issue bulunamadı."
 

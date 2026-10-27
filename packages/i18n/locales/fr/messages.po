@@ -11688,6 +11688,9 @@ msgstr "Personne dans {organizationName} ne correspond. Saisissez une adresse e-
 msgid "No one matches"
 msgstr "Aucune correspondance"
 
+msgid "No one to mention"
+msgstr "Personne à mentionner"
+
 msgid "No open issues found."
 msgstr "Aucune issue ouverte trouvée."
 

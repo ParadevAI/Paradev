@@ -80,16 +80,22 @@ export function MentionMenu({
 									onMouseDown={(event) => event.preventDefault()}
 									onClick={() => onSelect(entry)}
 								>
-									{entry.icon && (
-										<span className="flex size-5 shrink-0 items-center justify-center text-muted-foreground">
-											{entry.icon}
-										</span>
-									)}
-									<span className="shrink-0 font-medium">{entry.label}</span>
-									{entry.description && (
-										<span className="min-w-0 truncate text-muted-foreground">
-											{entry.description}
-										</span>
+									{entry.row ?? (
+										<>
+											{entry.icon && (
+												<span className="flex size-5 shrink-0 items-center justify-center text-muted-foreground">
+													{entry.icon}
+												</span>
+											)}
+											<span className="shrink-0 font-medium">
+												{entry.label}
+											</span>
+											{entry.description && (
+												<span className="min-w-0 truncate text-muted-foreground">
+													{entry.description}
+												</span>
+											)}
+										</>
 									)}
 								</div>
 							);

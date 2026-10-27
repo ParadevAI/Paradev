@@ -11688,6 +11688,9 @@ msgstr "No one in {organizationName} matches. Type a full email to invite someon
 msgid "No one matches"
 msgstr "No one matches"
 
+msgid "No one to mention"
+msgstr "No one to mention"
+
 msgid "No open issues found."
 msgstr "No open issues found."
 

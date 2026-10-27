@@ -11688,6 +11688,9 @@ msgstr "Không có ai trong {organizationName} khớp. Nhập đầy đủ email
 msgid "No one matches"
 msgstr "Không có ai khớp"
 
+msgid "No one to mention"
+msgstr "Không có ai để nhắc đến"
+
 msgid "No open issues found."
 msgstr "Không có issue nào đang mở."
 

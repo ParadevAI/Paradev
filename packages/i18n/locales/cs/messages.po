@@ -11688,6 +11688,9 @@ msgstr "V {organizationName} nikdo neodpovídá. Zadejte celou e-mailovou adresu
 msgid "No one matches"
 msgstr "Nikdo neodpovídá"
 
+msgid "No one to mention"
+msgstr "Není koho zmínit"
+
 msgid "No open issues found."
 msgstr "Nenalezeny žádné otevřené issues."
 

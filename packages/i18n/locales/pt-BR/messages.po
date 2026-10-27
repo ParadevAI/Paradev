@@ -11688,6 +11688,9 @@ msgstr "Ninguém em {organizationName} corresponde. Digite um e-mail completo pa
 msgid "No one matches"
 msgstr "Ninguém corresponde"
 
+msgid "No one to mention"
+msgstr "Ninguém para mencionar"
+
 msgid "No open issues found."
 msgstr "Nenhuma issue aberta encontrada."
 

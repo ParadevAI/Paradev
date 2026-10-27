@@ -13,6 +13,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useNavigate } from "@tanstack/react-router";
 import { type ComponentProps, useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
@@ -20,14 +21,19 @@ import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
+import { useOrgChannels } from "../../hooks/useOrgChannels";
 import { EDITED_HREF, remarkEditedMark } from "../../utils/remarkEditedMark";
 import {
+	CHANNEL_HREF_PREFIX,
 	MENTION_HREF_PREFIX,
+	remarkChannelRefs,
 	remarkMentions,
 } from "../../utils/remarkMentions";
+import { BroadcastChip } from "../BroadcastChip";
+import { ChannelRefChip } from "../ChannelRefChip";
+import { MentionChip } from "../MentionChip";
 import { PersonAvatar } from "../PersonAvatar";
 import { PersonHoverCard } from "../PersonHoverCard";
-import { MentionChip } from "./components/MentionChip";
 import { MessageActions } from "./components/MessageActions";
 import { MessageAttachments } from "./components/MessageAttachments";
 import { MessageEditor } from "./components/MessageEditor";
@@ -149,6 +155,8 @@ export function ChannelMessageRow({
 		edit.mutate({ messageId: message.id, ...next });
 	};
 
+	const navigate = useNavigate();
+	const channels = useOrgChannels();
 	const markdown = useMemo(() => {
 		const mentioned = [
 			...message.mentionedUserIds.flatMap((id) => {
@@ -174,15 +182,26 @@ export function ChannelMessageRow({
 						</span>
 					);
 				}
+				if (props.href?.startsWith(CHANNEL_HREF_PREFIX)) {
+					const channelId = props.href.slice(CHANNEL_HREF_PREFIX.length);
+					return (
+						<ChannelRefChip
+							onClick={() =>
+								void navigate({
+									to: "/channels/$channelId",
+									params: { channelId },
+								})
+							}
+						>
+							{props.children}
+						</ChannelRefChip>
+					);
+				}
 				const id = props.href?.startsWith(MENTION_HREF_PREFIX)
 					? props.href.slice(MENTION_HREF_PREFIX.length)
 					: null;
 				if (id?.startsWith(BROADCAST_ID_PREFIX)) {
-					return (
-						<span className="rounded bg-primary/15 px-0.5 font-medium text-foreground">
-							{props.children}
-						</span>
-					);
+					return <BroadcastChip>{props.children}</BroadcastChip>;
 				}
 				const person = id ? peopleById.get(id) : undefined;
 				if (!person) return <DefaultLink {...props} />;
@@ -201,12 +220,21 @@ export function ChannelMessageRow({
 		if (mentioned.length > 0) {
 			remarkPlugins.push([remarkMentions, { people: mentioned }]);
 		}
+		if (channels?.length && message.body.includes("#")) {
+			remarkPlugins.push([
+				remarkChannelRefs,
+				{ channels: channelRefs(channels) },
+			]);
+		}
 		if (message.editedAt) remarkPlugins.push(remarkEditedMark);
 		return {
 			components,
 			remarkPlugins: remarkPlugins.length > 0 ? remarkPlugins : undefined,
 		};
 	}, [
+		message.body,
+		channels,
+		navigate,
 		message.mentionedUserIds,
 		message.broadcast,
 		message.channelId,
@@ -373,4 +401,8 @@ export function ChannelMessageRow({
 	) : (
 		row
 	);
+}
+
+function channelRefs(channels: readonly { id: string; name: string }[]) {
+	return channels.map(({ id, name }) => ({ id, name }));
 }
