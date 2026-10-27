@@ -243,6 +243,15 @@ export function createActivities(deps: ActivityDeps) {
 					if (/usage limit|quota|insufficient/i.test(text)) {
 						throw ApplicationFailure.nonRetryable(text, "UsageLimitError");
 					}
+					const status = Number(/^(\d{3})\b/.exec(text)?.[1]);
+					if (
+						status >= 400 &&
+						status < 500 &&
+						status !== 408 &&
+						status !== 429
+					) {
+						throw ApplicationFailure.nonRetryable(text, "ModelRequestError");
+					}
 					throw new Error(text);
 				}
 				await store.append({
