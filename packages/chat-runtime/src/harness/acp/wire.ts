@@ -68,13 +68,29 @@ export const acpNewSessionResponseSchema = z.looseObject({
 		.optional(),
 });
 
+export const acpPromptUsageSchema = z.looseObject({
+	inputTokens: z.number().nonnegative(),
+	outputTokens: z.number().nonnegative(),
+	cachedReadTokens: z.number().nonnegative().nullish(),
+});
+export type AcpPromptUsage = z.infer<typeof acpPromptUsageSchema>;
+
 export const acpPromptResponseSchema = z.looseObject({
 	stopReason: z.string().optional(),
 	messageId: z.string().optional(),
+	usage: acpPromptUsageSchema.optional().catch(undefined),
 });
 
 export const acpUsageUpdateSchema = z.looseObject({
+	used: z.number().nonnegative().optional().catch(undefined),
+	size: z.number().positive().optional().catch(undefined),
 	cost: z.unknown().optional(),
+});
+export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
+
+export const acpUsdCostSchema = z.looseObject({
+	amount: z.number().nonnegative(),
+	currency: z.literal("USD"),
 });
 
 export const ACP_STEERING_METHOD = "_session/steering";

@@ -3,11 +3,9 @@ import type {
 	ComposerActionContext,
 	ComposerChip,
 	ComposerChipMatch,
-	PromptInputCommand,
 } from "@superset/chat-ui/PromptInput";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
-import { ServerIcon } from "lucide-react";
 import {
 	type ReactNode,
 	type RefObject,
@@ -34,7 +32,7 @@ import { mcpPickerPlugins } from "../../utils/mcpPickerPlugins";
 import { mcpServerIconUrl } from "../../utils/mcpServerIconUrl";
 
 type McpServerPickerControls = {
-	command: PromptInputCommand | null;
+	available: boolean;
 	findChips: (text: string) => ComposerChipMatch[];
 	serverNameOf: (chip: ComposerChip) => string | null;
 	dialog: ReactNode;
@@ -133,21 +131,6 @@ export function useMcpServerPicker({
 		});
 	};
 
-	const command = useMemo<PromptInputCommand | null>(
-		() =>
-			pickerAgent
-				? {
-						id: "superset:mcp",
-						title: "/mcp",
-						description: t({ message: "Choose MCP servers for this message" }),
-						icon: <ServerIcon className="size-4" />,
-						group: t({ message: "Commands" }),
-						onSelect: (ctx) => openRef.current(ctx),
-					}
-				: null,
-		[pickerAgent, t],
-	);
-
 	const findChips = useCallback(
 		(text: string): ComposerChipMatch[] =>
 			findMcpServerTokens(text).map(({ start, end, token, name }) => {
@@ -208,5 +191,11 @@ export function useMcpServerPicker({
 		[cached, presetId],
 	);
 
-	return { command, findChips, serverNameOf, dialog, open: openRef };
+	return {
+		available: pickerAgent !== undefined,
+		findChips,
+		serverNameOf,
+		dialog,
+		open: openRef,
+	};
 }

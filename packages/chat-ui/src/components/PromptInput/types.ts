@@ -84,6 +84,8 @@ export type PromptInputCommand = {
 	rightIcon?: ReactNode;
 	group?: string;
 	searchAliases?: string[];
+	// Tab inserts this chip in place of the typed command instead of selecting.
+	completion?: ComposerChip;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -126,6 +128,7 @@ export type PromptInputDictation = {
 
 export type PromptInputHandle = {
 	appendText(text: string): void;
+	isEmpty(): boolean;
 	addFiles(files: File[]): void;
 	insertChip(chip: ComposerChip): void;
 	openFileDialog(): void;

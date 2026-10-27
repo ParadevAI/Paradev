@@ -94,6 +94,11 @@ export class LiveSession {
 	private heldUntilStarted: UserContent[][] = [];
 	private heldPaused: UserContent[][] = [];
 	private onHeldReleased: (() => void) | null = null;
+	private carriedFailure: Turn | null = null;
+	private carriedAtMs: number | null = null;
+	private readonly turnStarts = new Map<string, number>();
+	/** Replays stamp items ahead of the clock to keep their order. */
+	private latestStartMs = 0;
 	/** Turns a user prompt started, and those of them that have shown anything yet. */
 	private readonly promptedTurns = new Set<string>();
 	private readonly turnsWithOutput = new Set<string>();
@@ -184,6 +189,16 @@ export class LiveSession {
 		this.heldPaused.push(...pausedPrompts);
 		this.onHeldReleased = onReleased ?? null;
 		this.releaseHeldPrompts();
+	}
+
+	/**
+	 * Shows `turn`, a failure that ended the chat this one replaces, once the
+	 * agent has started: after any history it replays, so it reads as the
+	 * latest turn.
+	 */
+	carryFailedTurn(turn: Turn): void {
+		this.carriedFailure = turn;
+		this.releaseCarriedFailure();
 	}
 
 	start(startOptions: HarnessStartOptions): void {
@@ -356,11 +371,11 @@ export class LiveSession {
 		this.options.adapter.setMode(modeId);
 	}
 
-	setConfigOption(configId: string, value: string): void {
+	setConfigOption(configId: string, value: string): Promise<boolean> {
 		if (!this.options.adapter.setConfigOption) {
 			throw new Error("this agent has no settings to change");
 		}
-		this.options.adapter.setConfigOption(configId, value);
+		return this.options.adapter.setConfigOption(configId, value);
 	}
 
 	stopBackgroundTask(taskId: string): Promise<boolean> {
@@ -417,8 +432,14 @@ export class LiveSession {
 				});
 				return;
 			case "turn": {
-				this.currentTurn = event.turn;
-				this.appendDurable({ type: "turn", turn: event.turn });
+				const previous = this.currentTurn;
+				this.currentTurn = this.afterCarriedFailure(event.turn);
+				this.appendDurable({ type: "turn", turn: this.currentTurn });
+				if (
+					previous?.id === event.turn.id &&
+					previous.status === event.turn.status
+				)
+					return;
 				if (event.turn.status === "running") {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
@@ -435,6 +456,7 @@ export class LiveSession {
 			case "session":
 				if (event.session.status === "dead") this.discardPending();
 				this.emitSession(event.session);
+				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
 				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
 				return;
@@ -447,6 +469,45 @@ export class LiveSession {
 				});
 				return;
 		}
+	}
+
+	private releaseCarriedFailure(): void {
+		const turn = this.carriedFailure;
+		if (!turn || this.sessionState.status === "starting") return;
+		this.carriedFailure = null;
+		const at = Math.max(this.now(), this.latestStartMs + 1);
+		this.carriedAtMs = at;
+		this.appendDurable({
+			type: "turn",
+			turn: { ...turn, startedAtMs: at, completedAtMs: at },
+		});
+		this.appendDurable({
+			type: "item",
+			item: {
+				id: this.mintId(),
+				kind: "notice",
+				noticeKind: "error",
+				text: turn.error?.message ?? "",
+				startedAtMs: at,
+				completedAtMs: at,
+			},
+			turnId: turn.id,
+		});
+	}
+
+	/**
+	 * After a long replay the agent's clock gives new turns starts at or before
+	 * the carried failure's, and a tie sorts at random. Each new turn starts
+	 * after everything written so far, decided once so its later events agree.
+	 */
+	private afterCarriedFailure(turn: Turn): Turn {
+		if (this.carriedAtMs === null) return turn;
+		let startedAtMs = this.turnStarts.get(turn.id);
+		if (startedAtMs === undefined) {
+			startedAtMs = Math.max(turn.startedAtMs, this.latestStartMs + 1);
+			this.turnStarts.set(turn.id, startedAtMs);
+		}
+		return startedAtMs === turn.startedAtMs ? turn : { ...turn, startedAtMs };
 	}
 
 	private releaseHeldPrompts(): void {
@@ -670,6 +731,13 @@ export class LiveSession {
 	}
 
 	private appendDurable(event: DurableEvent): void {
+		const startedAtMs =
+			event.type === "item"
+				? event.item.startedAtMs
+				: event.type === "turn"
+					? event.turn.startedAtMs
+					: 0;
+		this.latestStartMs = Math.max(this.latestStartMs, startedAtMs);
 		this.options.publish(
 			this.options.journal.appendEnvelope(this.options.sessionId, event),
 		);

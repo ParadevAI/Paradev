@@ -92,6 +92,9 @@ msgstr "(출력 없음)"
 msgid "(you)"
 msgstr "(나)"
 
+msgid "[prompt]"
+msgstr "[프롬프트]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {활성 포트 #개 — 세부 정보 숨기기} other {활성 포트 #개 — 세부 정보 숨기기}}"
@@ -447,6 +450,10 @@ msgstr "{0}은(는) 이미 \"{1}\"에 지정되어 있습니다."
 #. placeholder {0}: params?.key
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0}은(는) 이 조직의 작업에 이미 사용 중입니다."
+
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0}는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다. 우리는 우리가 사랑하는 도구를 만드는 YC 출신 CTO 3인입니다."
 
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
@@ -1203,6 +1210,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{total} 중 {received}"
 
+msgid "{remaining} tokens left"
+msgstr "{remaining} 토큰 남음"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName}은(는) 이 조직의 GitHub App이 설치된 {installedAccountLogin}에 없습니다."
 
@@ -1301,6 +1311,9 @@ msgstr "{uploading, plural, other {파일 #개 업로드 중…}}"
 msgid "{used} of {limit} environments"
 msgstr "환경 {limit}개 중 {used}개"
 
+msgid "{used} of {size} tokens"
+msgstr "{size} 토큰 중 {used}"
+
 msgid "{used} used"
 msgstr "{used} 사용됨"
 
@@ -1309,6 +1322,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}명 대기 중"
+
+msgid "{windowLabel} limit {percent} used"
+msgstr "{windowLabel} 한도: {percent} 사용됨"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: 호스트를 사용할 수 없습니다"
@@ -1331,6 +1347,12 @@ msgstr "@superset"
 
 msgid "* if billed at full API rate"
 msgstr "* 전액 API 요금으로 청구될 경우"
+
+msgid "/{name} doesn't take arguments"
+msgstr "/{name}은(는) 인수를 받지 않습니다"
+
+msgid "/{name} doesn't take attachments"
+msgstr "/{name}은(는) 첨부 파일을 받지 않습니다"
 
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
@@ -1869,6 +1891,9 @@ msgstr "첨부 추가"
 msgid "Add Attachment"
 msgstr "첨부 파일 추가"
 
+msgid "Add back"
+msgstr "다시 추가"
+
 msgid "Add command"
 msgstr "명령 추가"
 
@@ -1974,6 +1999,9 @@ msgstr "테스트가 없는 가장 위험한 코드에 테스트 추가…"
 
 msgid "Add tests where they're missing"
 msgstr "빠진 테스트 추가하기"
+
+msgid "Add the /automation prompt back to your message?"
+msgstr "/automation 프롬프트를 메시지에 다시 추가할까요?"
 
 msgid "Add them"
 msgstr "추가"
@@ -3051,6 +3079,9 @@ msgstr "자율 티켓-투-PR 파이프라인"
 msgid "Available"
 msgstr "사용 가능"
 
+msgid "Available when the agent is idle."
+msgstr "에이전트가 대기 중일 때 사용할 수 있습니다."
+
 msgid "Avatar"
 msgstr "아바타"
 
@@ -3716,6 +3747,9 @@ msgstr "아이콘 변경"
 msgid "Change location"
 msgstr "위치 변경"
 
+msgid "Change model"
+msgstr "모델 변경"
+
 msgid "Change or add labels…"
 msgstr "라벨 변경 또는 추가…"
 
@@ -3981,6 +4015,9 @@ msgstr "터미널에서 Cmd+클릭할 때 파일 경로를 여는 방식을 선�
 
 msgid "Choose MCP servers for this message"
 msgstr "이 메시지에 사용할 MCP 서버 선택"
+
+msgid "Choose the model"
+msgstr "모델 선택"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "인앱 브라우저에서 삭제할 항목을 선택하세요."
@@ -4563,6 +4600,9 @@ msgstr "커뮤니케이션"
 msgid "Community"
 msgstr "커뮤니티"
 
+msgid "Compact now"
+msgstr "지금 압축"
+
 msgid "Company"
 msgstr "회사"
 
@@ -4905,6 +4945,12 @@ msgstr "컨텍스트"
 msgid "Context Menu"
 msgstr "컨텍스트 메뉴"
 
+msgid "Context window"
+msgstr "컨텍스트 창"
+
+msgid "Context window: {percent} used"
+msgstr "컨텍스트 창: {percent} 사용됨"
+
 msgid "Continue"
 msgstr "계속"
 
@@ -4948,6 +4994,9 @@ msgstr "에이전트 세션을 계속하려면 고정된 워크스페이스가 �
 
 msgid "continuing the last session"
 msgstr "마지막 세션을 계속"
+
+msgid "Continuing…"
+msgstr "계속하는 중…"
 
 msgid "Contributions"
 msgstr "기여"
@@ -5033,6 +5082,9 @@ msgstr "코멘트 복사"
 
 msgid "Copy comments"
 msgstr "코멘트 복사"
+
+msgid "Copy error"
+msgstr "오류 복사"
 
 msgid "Copy error details"
 msgstr "오류 상세 정보 복사"
@@ -5584,6 +5636,9 @@ msgstr "답글을 게시하지 못했습니다"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}에 대해 클라우드에 연결할 수 없습니다: {1}"
 
+msgid "Couldn't reach the model provider"
+msgstr "모델 제공자에 연결할 수 없습니다"
+
 msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
 msgstr "이 클라우드 워크스페이스에 연결하지 못했습니다. 아직 깨어나는 중일 수 있습니다 — 다시 시도해 주세요."
 
@@ -5665,6 +5720,9 @@ msgstr "파일을 스테이징하지 못했습니다"
 
 msgid "Couldn't start a new agent session"
 msgstr "새 에이전트 세션을 시작할 수 없습니다"
+
+msgid "Couldn't start a new chat."
+msgstr "새 채팅을 시작할 수 없습니다."
 
 msgid "Couldn't start agent session"
 msgstr "에이전트 세션을 시작하지 못했습니다"
@@ -5770,6 +5828,9 @@ msgstr "다시 생성"
 
 msgid "Create an account"
 msgstr "계정 만들기"
+
+msgid "Create an automation from this prompt"
+msgstr "이 프롬프트로 자동화 만들기"
 
 msgid "Create environment"
 msgstr "환경 만들기"
@@ -7959,6 +8020,12 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "빠름"
 
+msgid "Fast mode off"
+msgstr "빠른 모드 꺼짐"
+
+msgid "Fast mode on"
+msgstr "빠른 모드 켜짐"
+
 msgid "Fatal"
 msgstr "치명적"
 
@@ -8150,6 +8217,9 @@ msgstr "페이지에서 찾기"
 
 msgid "Find in Terminal"
 msgstr "터미널에서 찾기"
+
+msgid "Find in this chat"
+msgstr "이 채팅에서 찾기"
 
 msgid "Find people and Devs"
 msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
@@ -9476,9 +9546,6 @@ msgstr "인터넷 연결 끊김"
 msgid "Interrupt"
 msgstr "중단"
 
-msgid "Interrupted"
-msgstr "중단됨"
-
 msgid "Intro call"
 msgstr "첫 통화"
 
@@ -10067,6 +10134,9 @@ msgstr "조직에서 나갈까요?"
 
 msgid "Leave organization..."
 msgstr "조직 나가기..."
+
+msgid "Leave plan mode"
+msgstr "계획 모드 종료"
 
 msgid "Leave team"
 msgstr "팀 나가기"
@@ -10924,6 +10994,9 @@ msgstr "모바일 앱"
 
 msgid "Mobile App"
 msgstr "모바일 앱"
+
+msgid "Mode"
+msgstr "모드"
 
 msgid "model"
 msgstr "모델"
@@ -12115,6 +12188,9 @@ msgstr "이 버전에는 없음"
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "아직 이벤트를 받지 못하고 있습니다. Microsoft Graph가 알림 구독을 거부했습니다. 앱의 관리자 동의와 보호된 API 승인을 확인한 뒤 다시 연결하세요."
 
+msgid "Not reported yet"
+msgstr "아직 보고되지 않음"
+
 msgid "Not reviewed by you"
 msgstr "내가 리뷰하지 않음"
 
@@ -12275,6 +12351,9 @@ msgstr "오프라인 / 로컬 우선 모드"
 
 msgid "Older"
 msgstr "이전"
+
+msgid "On"
+msgstr "켬"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName}에 있음 — 여기서는 실행되지 않습니다"
@@ -13304,9 +13383,6 @@ msgstr "Paradev는 데스크톱 앱입니다. 이메일을 입력하시면 Mac�
 
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다."
-
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다. 우리는 우리가 사랑하는 도구를 만드는 YC 출신 CTO 3인입니다."
 
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev는 캘리포니아 샌프란시스코에 있는 팀이 만듭니다. 제품 지원이나 계정 문의는 <0>{supportEmail}</0>으로 메일을 보내 주시면 영업일 기준 하루 안에 회신드립니다. 파트너십, 언론, 엔터프라이즈 문의나 그 밖의 내용은 <1>{teamEmail}</1>으로 보내 주세요."
@@ -14383,6 +14459,9 @@ msgstr "{appName} 평가하기"
 msgid "Rate limit exceeded."
 msgstr "요청 한도를 초과했습니다."
 
+msgid "Rate limits"
+msgstr "사용량 한도"
+
 msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Paradev 릴레이를 통해 어디서든 이 Mac에 접속하거나 클라우드 워크스페이스를 띄우세요. 어떤 클라이언트에서도 연결할 수 있습니다."
 
@@ -14692,6 +14771,9 @@ msgstr "프로젝트를 이동할까요?"
 
 msgid "Relocating…"
 msgstr "이동하는 중…"
+
+msgid "Remaining"
+msgstr "남음"
 
 msgid "rematch"
 msgstr "재대결"
@@ -15211,6 +15293,9 @@ msgstr "{accountLabel}에서 에이전트를 다시 시작하는 중입니다."
 msgid "Restarting host services…"
 msgstr "호스트 서비스를 재시작하는 중…"
 
+msgid "Restarting the agent…"
+msgstr "에이전트를 다시 시작하는 중…"
+
 msgid "Restarting…"
 msgstr "다시 시작 중…"
 
@@ -15576,6 +15661,9 @@ msgstr "터미널을 하나 더 띄우는 대신, 설정이 끝난 뒤 워크스
 
 msgid "Run this command?"
 msgstr "이 명령을 실행할까요?"
+
+msgid "Run this in a terminal, then continue:"
+msgstr "터미널에서 이 명령을 실행한 후 계속하세요:"
 
 msgid "Run workspace command"
 msgstr "워크스페이스 명령 실행"
@@ -16320,6 +16408,12 @@ msgstr "세션"
 msgid "Session {0}"
 msgstr "세션 {0}"
 
+msgid "Session cost"
+msgstr "세션 비용"
+
+msgid "Session cost: {cost}"
+msgstr "세션 비용: {cost}"
+
 msgid "Session details"
 msgstr "세션 상세"
 
@@ -16340,6 +16434,9 @@ msgstr "세션 이름을 {trimmed}(으)로 변경했습니다"
 
 msgid "Session snapshots & revert"
 msgstr "세션 스냅샷 및 되돌리기"
+
+msgid "Session status"
+msgstr "세션 상태"
 
 msgid "Sessions"
 msgstr "세션"
@@ -16740,11 +16837,17 @@ msgstr "한 번만 로그인하세요. 연결은 Paradev가 유지합니다."
 msgid "Sign in to {0}"
 msgstr "{0}에 로그인"
 
+msgid "Sign in to continue"
+msgstr "계속하려면 로그인하세요"
+
 msgid "Sign in to continue to Paradev"
 msgstr "Paradev를 계속 사용하려면 로그인하세요"
 
 msgid "Sign in to get started"
 msgstr "로그인하고 시작하세요"
+
+msgid "Sign in to the agent in a terminal, then continue."
+msgstr "터미널에서 에이전트에 로그인한 후 계속하세요."
 
 msgid "Sign in to view this page"
 msgstr "이 페이지를 보려면 로그인하세요"
@@ -17329,6 +17432,9 @@ msgstr "시작 중"
 msgid "Starting {agentLabel}"
 msgstr "{agentLabel} 시작 중"
 
+msgid "Starting a new chat…"
+msgstr "새 채팅을 시작하는 중…"
+
 msgid "Starting a workspace on this pull request"
 msgstr "이 풀 리퀘스트로 워크스페이스를 시작하는 중"
 
@@ -17533,6 +17639,9 @@ msgstr "Paradev와 모니터링 중인 터미널 프로세스 트리가 사용�
 
 msgid "Summarize the changes in this workspace"
 msgstr "이 워크스페이스의 변경 사항을 요약해 줘"
+
+msgid "Summarizes the chat to free up context."
+msgstr "채팅을 요약해 컨텍스트를 확보합니다."
 
 msgid "Summary"
 msgstr "요약"
@@ -17798,6 +17907,9 @@ msgstr "작업"
 msgid "Task ID copied"
 msgstr "작업 ID를 복사했습니다"
 
+msgid "Task interrupted"
+msgstr "작업이 중단되었습니다"
+
 msgid "Task key"
 msgstr "작업 키"
 
@@ -18056,8 +18168,17 @@ msgstr "에이전트가 같은 패널에서 클릭하고 입력하며 변경 사
 msgid "The agent copies the conversation; the branch opens in a new tab"
 msgstr "에이전트가 대화를 복사하고 분기는 새 탭에서 열립니다"
 
+msgid "The agent crashed"
+msgstr "에이전트가 비정상 종료되었습니다"
+
+msgid "The agent lost this conversation"
+msgstr "에이전트가 이 대화를 잃어버렸습니다"
+
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "에이전트가 티켓부터 차이까지 작업을 맡습니다. 사람은 키 입력이 아니라 결과를 리뷰합니다. 관심은 코드를 쓰는 데서 일을 명세하고 판단하는 데로 옮겨 갑니다. 엔지니어 한 명이 격리된 워크스페이스에서 여러 에이전트를 동시에 돌립니다."
+
+msgid "The agent stopped responding"
+msgstr "에이전트가 응답하지 않습니다"
 
 msgid "The agent stopped while resuming the conversation."
 msgstr "대화를 재개하는 중에 에이전트가 중지되었습니다."
@@ -18255,6 +18376,9 @@ msgstr "로컬 호스트 서비스가 방금 올라왔습니다. 지금 다시 �
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "머지된 에이전트 PR의 대부분이 사람의 수정 없이 리뷰만으로 끝납니다."
+
+msgid "The model declined to continue"
+msgstr "모델이 계속하기를 거부했습니다"
 
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
@@ -18514,6 +18638,9 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
 
+msgid "This conversation is too long for the model"
+msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
+
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "재부팅/충돌 복구에 사용하는 저장된 스크롤백을 삭제합니다."
 
@@ -18615,6 +18742,9 @@ msgstr "이 Microsoft 테넌트는 이미 {detail}이(가) 연결했습니다. �
 
 msgid "This Microsoft tenant is already connected by another Paradev organization."
 msgstr "이 Microsoft 테넌트는 이미 다른 Paradev 조직이 연결했습니다."
+
+msgid "This model isn't available"
+msgstr "이 모델은 사용할 수 없습니다"
 
 msgid "This month"
 msgstr "이번 달"
@@ -19172,11 +19302,8 @@ msgstr "터널 연결됨"
 msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
 msgstr "반복 작업을 일정에 따라 또는 이벤트가 발생할 때 실행되는 에이전트로 바꾸세요. 이슈 분류, 변경 로그 초안, 의존성 업데이트 등. 에이전트가 알아서 실행하고 검토할 PR을 엽니다."
 
-msgid "Turn failed"
-msgstr "턴 실패"
-
-msgid "Turn failed: {message}"
-msgstr "턴 실패: {message}"
+msgid "Turn Fast mode on or off"
+msgstr "빠른 모드 켜기 또는 끄기"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "“릴레이를 통해 이 기기에 원격 액세스 허용” 켜기"
@@ -19635,6 +19762,9 @@ msgstr "사용량 섹션"
 msgid "Usage unavailable."
 msgstr "사용량을 볼 수 없습니다."
 
+msgid "Usage: /{name} {hint}"
+msgstr "사용법: /{name} {hint}"
+
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
 msgstr "“{0}” 사용"
@@ -19701,6 +19831,9 @@ msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "기존 에이전트 구독과 API 키를 그대로 쓰세요. Paradev는 모델 호출을 중계하지 않고, 워크플로를 한 제공사에 묶어 두지 않습니다."
+
+msgid "Used"
+msgstr "사용됨"
 
 msgid "Used in URLs and APIs."
 msgstr "URL과 API에서 사용됩니다."
@@ -20114,6 +20247,10 @@ msgstr "Paradev에 오신 것을 환영합니다"
 msgid "Welcome to the new Paradev"
 msgstr "새로운 Paradev에 오신 것을 환영합니다"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "{0}가 무엇이고, 누가 만들며, 누구를 위한 것인지. 병렬 코딩 에이전트를 위한 워크스페이스를 만드는, 전 YC CTO 3인이 이끄는 샌프란시스코 팀입니다."
+
 msgid "What are the benefits?"
 msgstr "복리후생은 어떤가요?"
 
@@ -20149,9 +20286,6 @@ msgstr "무엇이 문제인가요?"
 
 msgid "What it does"
 msgstr "하는 일"
-
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Paradev가 무엇이고, 누가 만들며, 누구를 위한 것인지. 병렬 코딩 에이전트를 위한 워크스페이스를 만드는, 전 YC CTO 3인이 이끄는 샌프란시스코 팀입니다."
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev는 어떤 플랫폼에서 실행되나요?"
@@ -20272,6 +20406,10 @@ msgstr "너비 · 병렬 세션"
 
 msgid "Window"
 msgstr "창"
+
+msgctxt "context window size"
+msgid "Window"
+msgstr "크기"
 
 msgid "With action"
 msgstr "동작 포함"

@@ -682,6 +682,37 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a turn reported again does not deliver the next queued prompt early", async () => {
+		const quick = (id: string, completedAtMs: number) => [
+			{ kind: "turn" as const, turn: turn(id) },
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+				delayMs: 30,
+			},
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+			},
+			{ kind: "session" as const, session: { status: "idle" as const } },
+		];
+		const { runtime, sessionId } = startSession({
+			turns: [quick("t1", 2), quick("t2", 4), quick("t3", 6)],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t3")?.status === "completed",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t2");
+		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t3");
+		await runtime.dispose();
+	});
+
 	test("steerQueuedPrompt interrupts the turn and delivers that prompt next", async () => {
 		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
 		sendPrompt(runtime, sessionId, "first");

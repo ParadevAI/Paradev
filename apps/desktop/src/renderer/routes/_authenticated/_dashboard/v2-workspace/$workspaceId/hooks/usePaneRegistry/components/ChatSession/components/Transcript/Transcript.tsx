@@ -22,9 +22,11 @@ import {
 	type CSSProperties,
 	type KeyboardEvent,
 	type PointerEvent,
+	type Ref,
 	useCallback,
 	useDeferredValue,
 	useEffect,
+	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -91,7 +93,10 @@ export type TranscriptProps = {
 	isActive?: boolean;
 	/** The reader closed the find bar; focus belongs back in the composer. */
 	onCloseFind?: (() => void) | undefined;
+	ref?: Ref<TranscriptHandle>;
 };
+
+export type TranscriptHandle = { openFind: () => void };
 
 function isWork(row: TranscriptRow | undefined): boolean {
 	if (!row) return false;
@@ -125,6 +130,7 @@ export function Transcript({
 	onRetryPrompt,
 	onMessageRevealed,
 	outbox,
+	ref,
 	revealMessageId = null,
 	sessionId,
 	snapshot,
@@ -276,6 +282,7 @@ export function Transcript({
 		scrollToMessage: scroller.scrollToMessage,
 		onClose: onCloseFind,
 	});
+	useImperativeHandle(ref, () => ({ openFind: find.show }), [find.show]);
 	// A search covers the whole conversation, so it pages every turn in.
 	const olderPages = useLoadOlderOnReach({
 		hasOlder,

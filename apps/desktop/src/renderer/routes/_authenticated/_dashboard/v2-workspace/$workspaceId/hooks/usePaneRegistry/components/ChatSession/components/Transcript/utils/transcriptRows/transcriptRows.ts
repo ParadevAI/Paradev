@@ -8,7 +8,10 @@ import type {
 	AgentMessage,
 	ApprovalRequest,
 	Item,
+	Notice,
 	ToolCall,
+	Turn,
+	TurnError,
 	UserMessage,
 } from "@superset/chat/protocol";
 import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
@@ -52,8 +55,11 @@ export type TranscriptRow =
 			kind: "turn_status";
 			key: string;
 			groupStart: boolean;
+			turnId: string;
 			status: "failed" | "interrupted";
-			message: string | undefined;
+			error: TurnError | undefined;
+			/** No turn came after it, so its failure can still be acted on. */
+			latest: boolean;
 	  }
 	| {
 			kind: "reply_footer";
@@ -61,6 +67,33 @@ export type TranscriptRow =
 			groupStart: false;
 			item: AgentMessage;
 	  };
+
+/**
+ * The agent reports a failure both as an error notice and on the turn; the
+ * turn's row says it once. What the notice adds past the turn's message is the
+ * stderr an older host kept only there, so the row keeps it.
+ */
+function repeatedTurnFailure(
+	item: Item,
+	turn: Turn | null,
+): { extra: string } | null {
+	if (turn?.status !== "failed" || item.kind !== "notice") return null;
+	const notice = item as Notice;
+	if (notice.noticeKind !== "error") return null;
+	const text = notice.text ?? "";
+	const message = turn.error?.message ?? "";
+	if (text === message) return { extra: "" };
+	if (message === "" || !text.startsWith(`${message}\n`)) return null;
+	return { extra: text.slice(message.length).trim() };
+}
+
+function withNoticeDetail(
+	error: TurnError | undefined,
+	noticeDetail: string,
+): TurnError | undefined {
+	if (!error || error.kind || error.detail || !noticeDetail) return error;
+	return { ...error, detail: noticeDetail };
+}
 
 export function transcriptRows(
 	groups: readonly TurnGroup[],
@@ -98,6 +131,7 @@ export function transcriptRows(
 		const lastPrompt = group.entries.findLastIndex(
 			(entry) => entry.kind === "item" && entry.item.kind === "user_message",
 		);
+		let noticeDetail = "";
 		let run = null as Extract<TranscriptRow, { kind: "tool_run" }> | null;
 		let runAt = -1;
 		const unwrapLoneCall = () => {
@@ -177,6 +211,11 @@ export function transcriptRows(
 						: null;
 			if (entry.kind === "item" && !tools) {
 				if (hiddenToolIds.has(entry.item.id)) continue;
+				const repeated = repeatedTurnFailure(entry.item, turn);
+				if (repeated) {
+					noticeDetail ||= repeated.extra;
+					continue;
+				}
 				if (run && entry.item.kind === "reasoning") {
 					run.steps.push(entry.item);
 					continue;
@@ -212,8 +251,10 @@ export function transcriptRows(
 				kind: "turn_status",
 				key: `status:${group.turnId}`,
 				groupStart,
+				turnId: group.turnId,
 				status: turn.status,
-				message: turn.error?.message,
+				error: withNoticeDetail(turn.error, noticeDetail),
+				latest: group === groups.at(-1),
 			});
 		}
 	}

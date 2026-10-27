@@ -92,6 +92,9 @@ msgstr "（無輸出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[prompt]"
+msgstr "[提示詞]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個活動埠 — 隱藏詳情} other {#個活動埠 — 隱藏詳情}}"
@@ -447,6 +450,10 @@ msgstr "{0}已分配給「{1}」。"
 #. placeholder {0}: params?.key
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0} 已在此組織的任務中使用。"
+
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0}正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。我們是3位YC出身的前CTO，在做一個自己喜歡的工具。"
 
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
@@ -1203,6 +1210,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received}/{total}"
 
+msgid "{remaining} tokens left"
+msgstr "剩餘 {remaining} 個 token"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} 不在 {installedAccountLogin} 上，而本組織的 GitHub App 安裝在那裡。"
 
@@ -1301,6 +1311,9 @@ msgstr "{uploading, plural, other {正在上傳 # 個檔案…}}"
 msgid "{used} of {limit} environments"
 msgstr "已用 {used}/{limit} 個環境"
 
+msgid "{used} of {size} tokens"
+msgstr "{used} / {size} 個 token"
+
 msgid "{used} used"
 msgstr "已使用 {used}"
 
@@ -1309,6 +1322,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
+
+msgid "{windowLabel} limit {percent} used"
+msgstr "{windowLabel} 額度：已使用 {percent}"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}：主機不可用"
@@ -1331,6 +1347,12 @@ msgstr "@superset"
 
 msgid "* if billed at full API rate"
 msgstr "* 如按API全價計費"
+
+msgid "/{name} doesn't take arguments"
+msgstr "/{name} 不接受參數"
+
+msgid "/{name} doesn't take attachments"
+msgstr "/{name} 不接受附件"
 
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
@@ -1869,6 +1891,9 @@ msgstr "新增附件"
 msgid "Add Attachment"
 msgstr "新增附件"
 
+msgid "Add back"
+msgstr "加回"
+
 msgid "Add command"
 msgstr "新增命令"
 
@@ -1974,6 +1999,9 @@ msgstr "給風險最高又沒測試的程式碼補上測試…"
 
 msgid "Add tests where they're missing"
 msgstr "給缺測試的地方補測試"
+
+msgid "Add the /automation prompt back to your message?"
+msgstr "要把 /automation 提示詞加回你的訊息嗎？"
 
 msgid "Add them"
 msgstr "加入"
@@ -3051,6 +3079,9 @@ msgstr "工單到PR的自主流水線"
 msgid "Available"
 msgstr "可用"
 
+msgid "Available when the agent is idle."
+msgstr "代理程式閒置時可用。"
+
 msgid "Avatar"
 msgstr "頭像"
 
@@ -3716,6 +3747,9 @@ msgstr "變更圖示"
 msgid "Change location"
 msgstr "更改位置"
 
+msgid "Change model"
+msgstr "更換模型"
+
 msgid "Change or add labels…"
 msgstr "變更或新增標籤…"
 
@@ -3981,6 +4015,9 @@ msgstr "選擇在終端中Cmd+點選檔案路徑時的開啟方式"
 
 msgid "Choose MCP servers for this message"
 msgstr "為這則訊息選擇MCP伺服器"
+
+msgid "Choose the model"
+msgstr "選擇模型"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "選擇要從應用程式內瀏覽器清除的內容。"
@@ -4563,6 +4600,9 @@ msgstr "溝通"
 msgid "Community"
 msgstr "社群"
 
+msgid "Compact now"
+msgstr "立即壓縮"
+
 msgid "Company"
 msgstr "公司"
 
@@ -4905,6 +4945,12 @@ msgstr "上下文"
 msgid "Context Menu"
 msgstr "右鍵選單"
 
+msgid "Context window"
+msgstr "上下文視窗"
+
+msgid "Context window: {percent} used"
+msgstr "上下文視窗：已使用 {percent}"
+
 msgid "Continue"
 msgstr "繼續"
 
@@ -4948,6 +4994,9 @@ msgstr "繼續代理程式工作階段需要已釘選的工作區"
 
 msgid "continuing the last session"
 msgstr "繼續上一個工作階段"
+
+msgid "Continuing…"
+msgstr "正在繼續…"
 
 msgid "Contributions"
 msgstr "貢獻"
@@ -5033,6 +5082,9 @@ msgstr "複製評論"
 
 msgid "Copy comments"
 msgstr "複製評論"
+
+msgid "Copy error"
+msgstr "複製錯誤"
 
 msgid "Copy error details"
 msgstr "複製錯誤詳情"
@@ -5584,6 +5636,9 @@ msgstr "無法釋出回覆"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "無法為{0}連線雲端：{1}"
 
+msgid "Couldn't reach the model provider"
+msgstr "無法連線到模型供應商"
+
 msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
 msgstr "無法連線到此雲端工作區。它可能仍在喚醒中——請重試。"
 
@@ -5665,6 +5720,9 @@ msgstr "無法暫存檔案"
 
 msgid "Couldn't start a new agent session"
 msgstr "無法啟動新的代理程式會話"
+
+msgid "Couldn't start a new chat."
+msgstr "無法開始新的聊天。"
 
 msgid "Couldn't start agent session"
 msgstr "無法啟動代理程式會話"
@@ -5770,6 +5828,9 @@ msgstr "再次建立"
 
 msgid "Create an account"
 msgstr "建立帳戶"
+
+msgid "Create an automation from this prompt"
+msgstr "根據此提示詞建立自動化"
 
 msgid "Create environment"
 msgstr "建立環境"
@@ -7959,6 +8020,12 @@ msgstr "常見問題"
 msgid "Fast"
 msgstr "快速"
 
+msgid "Fast mode off"
+msgstr "快速模式已關閉"
+
+msgid "Fast mode on"
+msgstr "快速模式已開啟"
+
 msgid "Fatal"
 msgstr "致命"
 
@@ -8150,6 +8217,9 @@ msgstr "在頁面中查詢"
 
 msgid "Find in Terminal"
 msgstr "在終端中查詢"
+
+msgid "Find in this chat"
+msgstr "在此聊天中查詢"
 
 msgid "Find people and Devs"
 msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
@@ -9476,9 +9546,6 @@ msgstr "網路已斷開"
 msgid "Interrupt"
 msgstr "打斷"
 
-msgid "Interrupted"
-msgstr "已中斷"
-
 msgid "Intro call"
 msgstr "初步通話"
 
@@ -10067,6 +10134,9 @@ msgstr "退出組織？"
 
 msgid "Leave organization..."
 msgstr "退出組織..."
+
+msgid "Leave plan mode"
+msgstr "退出計劃模式"
 
 msgid "Leave team"
 msgstr "退出團隊"
@@ -10924,6 +10994,9 @@ msgstr "行動應用程式"
 
 msgid "Mobile App"
 msgstr "行動應用程式"
+
+msgid "Mode"
+msgstr "模式"
 
 msgid "model"
 msgstr "模型"
@@ -12115,6 +12188,9 @@ msgstr "不在此版本中"
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒絕了通知訂閱。請檢查應用的管理員同意和受保護API的審批，然後重新連線。"
 
+msgid "Not reported yet"
+msgstr "尚未回報"
+
 msgid "Not reviewed by you"
 msgstr "你還沒有審查"
 
@@ -12275,6 +12351,9 @@ msgstr "離線/本地優先模式"
 
 msgid "Older"
 msgstr "更早"
+
+msgid "On"
+msgstr "開啟"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "在{offScopeHostName}上，不會在這裡執行"
@@ -13304,9 +13383,6 @@ msgstr "Paradev是桌面應用程式。留下電子郵件，我們會把下載�
 
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。"
-
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。我們是3位YC出身的前CTO，在做一個自己喜歡的工具。"
 
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev由一支位於加州舊金山的團隊打造。產品支援或帳戶問題，請發郵件至<0>{supportEmail}</0>，我們會在一個工作日內回覆。合作、媒體、企業版或其他任何事宜，請寫信至<1>{teamEmail}</1>。"
@@ -14383,6 +14459,9 @@ msgstr "為{appName}評分"
 msgid "Rate limit exceeded."
 msgstr "超出速率限制。"
 
+msgid "Rate limits"
+msgstr "用量限制"
+
 msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
 msgstr "通過Paradev中繼從任何地方連上這臺Mac，或啟動雲端工作區。可從任意客戶端連線。"
 
@@ -14692,6 +14771,9 @@ msgstr "遷移專案？"
 
 msgid "Relocating…"
 msgstr "正在遷移…"
+
+msgid "Remaining"
+msgstr "剩餘"
 
 msgid "rematch"
 msgstr "再來一局"
@@ -15211,6 +15293,9 @@ msgstr "正在{accountLabel}上重新啟動代理程式。"
 msgid "Restarting host services…"
 msgstr "正在重啟主機服務…"
 
+msgid "Restarting the agent…"
+msgstr "正在重新啟動代理…"
+
 msgid "Restarting…"
 msgstr "正在重新啟動…"
 
@@ -15576,6 +15661,9 @@ msgstr "設定完成後在「工作區設定」終端中執行代理程式，而
 
 msgid "Run this command?"
 msgstr "執行此指令？"
+
+msgid "Run this in a terminal, then continue:"
+msgstr "在終端機中執行以下命令，然後繼續："
 
 msgid "Run workspace command"
 msgstr "執行工作區命令"
@@ -16320,6 +16408,12 @@ msgstr "會話"
 msgid "Session {0}"
 msgstr "會話{0}"
 
+msgid "Session cost"
+msgstr "工作階段費用"
+
+msgid "Session cost: {cost}"
+msgstr "工作階段費用：{cost}"
+
 msgid "Session details"
 msgstr "會話詳情"
 
@@ -16340,6 +16434,9 @@ msgstr "會話已重新命名為 {trimmed}"
 
 msgid "Session snapshots & revert"
 msgstr "會話快照與回退"
+
+msgid "Session status"
+msgstr "工作階段狀態"
 
 msgid "Sessions"
 msgstr "會話"
@@ -16740,11 +16837,17 @@ msgstr "登入一次，Paradev 會保持連線。"
 msgid "Sign in to {0}"
 msgstr "登入{0}"
 
+msgid "Sign in to continue"
+msgstr "登入以繼續"
+
 msgid "Sign in to continue to Paradev"
 msgstr "登入以繼續使用Paradev"
 
 msgid "Sign in to get started"
 msgstr "登入即可開始"
+
+msgid "Sign in to the agent in a terminal, then continue."
+msgstr "在終端機中登入代理，然後繼續。"
 
 msgid "Sign in to view this page"
 msgstr "登入以檢視此頁面"
@@ -17329,6 +17432,9 @@ msgstr "啟動中"
 msgid "Starting {agentLabel}"
 msgstr "正在啟動{agentLabel}"
 
+msgid "Starting a new chat…"
+msgstr "正在開始新的聊天…"
+
 msgid "Starting a workspace on this pull request"
 msgstr "正在為此拉取請求啟動工作區"
 
@@ -17533,6 +17639,9 @@ msgstr "Paradev與受監控的終端處理程序樹佔用的CPU總和。超過10
 
 msgid "Summarize the changes in this workspace"
 msgstr "總結此工作區中的變更"
+
+msgid "Summarizes the chat to free up context."
+msgstr "摘要對話以騰出上下文空間。"
 
 msgid "Summary"
 msgstr "摘要"
@@ -17798,6 +17907,9 @@ msgstr "任務"
 msgid "Task ID copied"
 msgstr "已複製任務 ID"
 
+msgid "Task interrupted"
+msgstr "任務已中斷"
+
 msgid "Task key"
 msgstr "任務鍵"
 
@@ -18056,8 +18168,17 @@ msgstr "代理程式在同一個窗格中點擊和輸入來測試修改。你可
 msgid "The agent copies the conversation; the branch opens in a new tab"
 msgstr "代理複製該對話，分支在新分頁中開啟"
 
+msgid "The agent crashed"
+msgstr "代理當機了"
+
+msgid "The agent lost this conversation"
+msgstr "代理遺失了此對話"
+
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "代理程式從工單一路負責到差異。人類審查結果，而不是擊鍵過程。注意力從寫程式碼轉向定義工作和判斷成果。一名工程師在隔離工作區裡同時跑好幾個代理程式。"
+
+msgid "The agent stopped responding"
+msgstr "代理已停止回應"
 
 msgid "The agent stopped while resuming the conversation."
 msgstr "恢復對話時代理已停止。"
@@ -18255,6 +18376,9 @@ msgstr "本地主機服務剛剛啟動。正在重新連線。"
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改。"
+
+msgid "The model declined to continue"
+msgstr "模型拒絕繼續"
 
 msgid "The name of your organization or team"
 msgstr "你的組織或團隊的名稱"
@@ -18514,6 +18638,9 @@ msgstr "無法啟動此雲端工作區"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
 
+msgid "This conversation is too long for the model"
+msgstr "此對話對模型來說太長了"
+
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "這將刪除用於重啟/崩潰恢復的已儲存回滾緩衝。"
 
@@ -18615,6 +18742,9 @@ msgstr "這個Microsoft租戶已被{detail}連線。請讓對方先斷開連線�
 
 msgid "This Microsoft tenant is already connected by another Paradev organization."
 msgstr "這個Microsoft租戶已被另一個Paradev組織連線。"
+
+msgid "This model isn't available"
+msgstr "此模型無法使用"
 
 msgid "This month"
 msgstr "本月"
@@ -19172,11 +19302,8 @@ msgstr "通道已建立"
 msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
 msgstr "把例行雜務交給依排程或在事件發生時執行的代理程式：議題分類、更新日誌草稿、相依套件更新。它們會自行執行，並建立 PR 供你審查。"
 
-msgid "Turn failed"
-msgstr "本輪失敗"
-
-msgid "Turn failed: {message}"
-msgstr "本輪失敗：{message}"
+msgid "Turn Fast mode on or off"
+msgstr "開啟或關閉快速模式"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "開啟「允許透過中繼遠端存取此裝置」"
@@ -19635,6 +19762,9 @@ msgstr "用量分區"
 msgid "Usage unavailable."
 msgstr "無法獲取用量。"
 
+msgid "Usage: /{name} {hint}"
+msgstr "用法：/{name} {hint}"
+
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
 msgstr "使用「{0}」"
@@ -19701,6 +19831,9 @@ msgstr "使用語音轉寫和按住說話功能。"
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "使用你已有的代理程式訂閱和API金鑰。Paradev從不代理模型呼叫，也不會把你的工作流鎖死在某一家提供商上。"
+
+msgid "Used"
+msgstr "已使用"
 
 msgid "Used in URLs and APIs."
 msgstr "用於URL和API。"
@@ -20114,6 +20247,10 @@ msgstr "歡迎使用Paradev"
 msgid "Welcome to the new Paradev"
 msgstr "歡迎使用全新的 Paradev"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "{0} 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
+
 msgid "What are the benefits?"
 msgstr "有哪些福利？"
 
@@ -20149,9 +20286,6 @@ msgstr "哪裡有問題？"
 
 msgid "What it does"
 msgstr "它做什麼"
-
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Paradev 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev支援哪些平臺？"
@@ -20272,6 +20406,10 @@ msgstr "寬度 · 並行工作階段數"
 
 msgid "Window"
 msgstr "視窗"
+
+msgctxt "context window size"
+msgid "Window"
+msgstr "大小"
 
 msgid "With action"
 msgstr "帶操作"
