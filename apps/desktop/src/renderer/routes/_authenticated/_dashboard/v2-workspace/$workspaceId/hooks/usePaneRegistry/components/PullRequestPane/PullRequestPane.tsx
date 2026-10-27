@@ -47,11 +47,6 @@ export function PullRequestPane({
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
 	const { workspace, hostUrl: workspaceHostUrl } = useWorkspace();
 	const detail = usePullRequestPaneDetail(data);
-	const stack = usePullRequestStack({
-		projectId: detail.projectId,
-		hostUrl: workspaceHostUrl,
-		prNumber: data.number,
-	});
 	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
 
 	// Review threads and the header's actions still go through the host that
@@ -112,6 +107,13 @@ export function PullRequestPane({
 	const projectId = isLinkedPR ? workspace.projectId : null;
 	const hostId = isLinkedPR ? workspace.hostId : null;
 	const hostUrl = isLinkedPR ? workspaceHostUrl : null;
+	// The workspace's own PR is in the workspace's project, whatever repo name
+	// the PR's URL carries; the stack read must use the project a merge uses.
+	const stack = usePullRequestStack({
+		projectId: projectId ?? detail.projectId,
+		hostUrl: workspaceHostUrl,
+		prNumber: data.number,
+	});
 	const diffStat =
 		detail.data?.additions !== undefined && detail.data.deletions !== undefined
 			? { additions: detail.data.additions, deletions: detail.data.deletions }
