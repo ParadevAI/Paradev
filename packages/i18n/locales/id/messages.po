@@ -3872,6 +3872,9 @@ msgstr "Sesi chat tidak ditemukan"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Permukaan chat: pesan, penalaran, saran"
 
+msgid "Chats"
+msgstr "Obrolan"
+
 msgid "Check again"
 msgstr "Periksa lagi"
 
@@ -10386,6 +10389,9 @@ msgstr "Indikator pemuatan dan aktivitas yang sedang berjalan"
 msgid "Loading changes..."
 msgstr "Memuat perubahan..."
 
+msgid "Loading chat"
+msgstr "Memuat obrolan"
+
 msgid "Loading comments…"
 msgstr "Memuat komentar…"
 
@@ -10421,6 +10427,9 @@ msgstr "Memuat issue..."
 
 msgid "Loading issues…"
 msgstr "Memuat issue…"
+
+msgid "Loading link preview"
+msgstr "Memuat pratinjau tautan"
 
 msgid "Loading members..."
 msgstr "Memuat anggota..."
@@ -11835,6 +11844,9 @@ msgstr "Tidak ada komentar review yang terbuka."
 
 msgid "No organization selected"
 msgstr "Tidak ada organisasi yang dipilih"
+
+msgid "No other chats here"
+msgstr "Tidak ada obrolan lain di sini"
 
 msgid "No pages match"
 msgstr "Tidak ada halaman yang cocok"
@@ -18613,6 +18625,12 @@ msgstr "Kanal ini diarsipkan"
 
 msgid "This chat has ended."
 msgstr "Chat ini telah berakhir."
+
+msgid "This chat is empty."
+msgstr "Obrolan ini kosong."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Obrolan ini mungkin telah dihapus atau Anda tidak memiliki akses."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Chat ini berhenti karena percakapan dilanjutkan di terminal."

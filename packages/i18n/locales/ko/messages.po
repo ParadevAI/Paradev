@@ -3872,6 +3872,9 @@ msgstr "채팅 세션을 찾을 수 없습니다"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "채팅 화면: 메시지, 추론, 제안"
 
+msgid "Chats"
+msgstr "채팅"
+
 msgid "Check again"
 msgstr "다시 확인"
 
@@ -10386,6 +10389,9 @@ msgstr "로딩 및 진행 중 활동 표시기"
 msgid "Loading changes..."
 msgstr "변경 사항을 불러오는 중..."
 
+msgid "Loading chat"
+msgstr "채팅 불러오는 중"
+
 msgid "Loading comments…"
 msgstr "댓글 불러오는 중…"
 
@@ -10421,6 +10427,9 @@ msgstr "이슈를 불러오는 중..."
 
 msgid "Loading issues…"
 msgstr "이슈 불러오는 중…"
+
+msgid "Loading link preview"
+msgstr "링크 미리보기 불러오는 중"
 
 msgid "Loading members..."
 msgstr "멤버 불러오는 중..."
@@ -11835,6 +11844,9 @@ msgstr "열린 리뷰 코멘트가 없습니다."
 
 msgid "No organization selected"
 msgstr "선택된 조직이 없습니다"
+
+msgid "No other chats here"
+msgstr "다른 채팅이 없습니다"
 
 msgid "No pages match"
 msgstr "일치하는 페이지 없음"
@@ -18613,6 +18625,12 @@ msgstr "이 채널은 보관되었습니다"
 
 msgid "This chat has ended."
 msgstr "이 채팅은 종료되었습니다."
+
+msgid "This chat is empty."
+msgstr "이 채팅은 비어 있습니다."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "대화가 터미널에서 계속되어 이 채팅이 중지되었습니다."

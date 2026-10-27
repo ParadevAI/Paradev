@@ -12,7 +12,7 @@ import {
 	GitPullRequestDraft,
 	type LucideIcon,
 } from "lucide-react";
-import type { GithubWorkItemLink } from "../../../../../../../../../../utils/githubWorkItem";
+import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
 
 /** What `github.getWorkItem` answers, as the card reads it. */
 export type GithubWorkItemGlance = {
@@ -126,9 +126,11 @@ function Avatar({
 export function GithubWorkItemCard({
 	link,
 	load,
+	openHint = false,
 }: {
 	link: GithubWorkItemLink;
 	load: GithubWorkItemLoad;
+	openHint?: boolean;
 }) {
 	const { i18n, t } = useLingui();
 	const item = load.status === "ready" ? load.item : null;
@@ -260,13 +262,15 @@ export function GithubWorkItemCard({
 				</div>
 			)}
 
-			<div className="mt-3 border-foreground/[0.07] border-t pt-2 text-[10px] text-foreground/35">
-				{link.kind === "pr" ? (
-					<Trans>Click the chip to open the pull request</Trans>
-				) : (
-					<Trans>Click the chip to open the issue</Trans>
-				)}
-			</div>
+			{openHint && (
+				<div className="mt-3 border-foreground/[0.07] border-t pt-2 text-[10px] text-foreground/35">
+					{link.kind === "pr" ? (
+						<Trans>Click the chip to open the pull request</Trans>
+					) : (
+						<Trans>Click the chip to open the issue</Trans>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

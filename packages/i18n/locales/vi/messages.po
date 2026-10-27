@@ -3872,6 +3872,9 @@ msgstr "Không tìm thấy phiên chat"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Các bề mặt chat: tin nhắn, suy luận, gợi ý"
 
+msgid "Chats"
+msgstr "Cuộc trò chuyện"
+
 msgid "Check again"
 msgstr "Kiểm tra lại"
 
@@ -10386,6 +10389,9 @@ msgstr "Chỉ báo đang tải và hoạt động đang diễn ra"
 msgid "Loading changes..."
 msgstr "Đang tải thay đổi..."
 
+msgid "Loading chat"
+msgstr "Đang tải cuộc trò chuyện"
+
 msgid "Loading comments…"
 msgstr "Đang tải bình luận…"
 
@@ -10421,6 +10427,9 @@ msgstr "Đang tải issue..."
 
 msgid "Loading issues…"
 msgstr "Đang tải issue…"
+
+msgid "Loading link preview"
+msgstr "Đang tải bản xem trước liên kết"
 
 msgid "Loading members..."
 msgstr "Đang tải thành viên..."
@@ -11835,6 +11844,9 @@ msgstr "Không có bình luận review nào đang mở."
 
 msgid "No organization selected"
 msgstr "Chưa chọn tổ chức nào"
+
+msgid "No other chats here"
+msgstr "Không có cuộc trò chuyện nào khác ở đây"
 
 msgid "No pages match"
 msgstr "Không có trang nào khớp"
@@ -18613,6 +18625,12 @@ msgstr "Kênh này đã được lưu trữ"
 
 msgid "This chat has ended."
 msgstr "Chat này đã kết thúc."
+
+msgid "This chat is empty."
+msgstr "Cuộc trò chuyện này trống."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Cuộc trò chuyện này có thể đã bị xóa hoặc bạn không có quyền truy cập."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Cuộc trò chuyện này đã dừng vì nó được tiếp tục trong một terminal."

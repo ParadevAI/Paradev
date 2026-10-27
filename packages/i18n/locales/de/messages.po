@@ -3872,6 +3872,9 @@ msgstr "Chat-Sitzung nicht gefunden"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chat-Oberflächen: Nachrichten, Reasoning, Vorschläge"
 
+msgid "Chats"
+msgstr "Chats"
+
 msgid "Check again"
 msgstr "Erneut prüfen"
 
@@ -10386,6 +10389,9 @@ msgstr "Lade- und Aktivitätsanzeigen"
 msgid "Loading changes..."
 msgstr "Änderungen werden geladen..."
 
+msgid "Loading chat"
+msgstr "Chat wird geladen"
+
 msgid "Loading comments…"
 msgstr "Kommentare werden geladen…"
 
@@ -10421,6 +10427,9 @@ msgstr "Issues werden geladen..."
 
 msgid "Loading issues…"
 msgstr "Issues werden geladen…"
+
+msgid "Loading link preview"
+msgstr "Linkvorschau wird geladen"
 
 msgid "Loading members..."
 msgstr "Mitglieder werden geladen..."
@@ -11835,6 +11844,9 @@ msgstr "Keine offenen Review-Kommentare."
 
 msgid "No organization selected"
 msgstr "Keine Organisation ausgewählt"
+
+msgid "No other chats here"
+msgstr "Keine weiteren Chats hier"
 
 msgid "No pages match"
 msgstr "Keine passenden Seiten"
@@ -18613,6 +18625,12 @@ msgstr "Dieser Kanal ist archiviert"
 
 msgid "This chat has ended."
 msgstr "Dieser Chat ist beendet."
+
+msgid "This chat is empty."
+msgstr "Dieser Chat ist leer."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Dieser Chat wurde möglicherweise entfernt oder du hast keinen Zugriff."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Dieser Chat wurde beendet, weil die Unterhaltung in einem Terminal fortgesetzt wurde."

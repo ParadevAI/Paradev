@@ -3872,6 +3872,9 @@ msgstr "Sohbet oturumu bulunamadı"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Sohbet yüzeyleri: mesajlar, akıl yürütme, öneriler"
 
+msgid "Chats"
+msgstr "Sohbetler"
+
 msgid "Check again"
 msgstr "Yeniden denetle"
 
@@ -10386,6 +10389,9 @@ msgstr "Yükleme ve devam eden etkinlik göstergeleri"
 msgid "Loading changes..."
 msgstr "Değişiklikler yükleniyor..."
 
+msgid "Loading chat"
+msgstr "Sohbet yükleniyor"
+
 msgid "Loading comments…"
 msgstr "Yorumlar yükleniyor…"
 
@@ -10421,6 +10427,9 @@ msgstr "Issue'lar yükleniyor..."
 
 msgid "Loading issues…"
 msgstr "Issue'lar yükleniyor…"
+
+msgid "Loading link preview"
+msgstr "Bağlantı önizlemesi yükleniyor"
 
 msgid "Loading members..."
 msgstr "Üyeler yükleniyor..."
@@ -11835,6 +11844,9 @@ msgstr "Açık inceleme yorumu yok."
 
 msgid "No organization selected"
 msgstr "Kuruluş seçilmedi"
+
+msgid "No other chats here"
+msgstr "Burada başka sohbet yok"
 
 msgid "No pages match"
 msgstr "Eşleşen sayfa yok"
@@ -18613,6 +18625,12 @@ msgstr "Bu kanal arşivlendi"
 
 msgid "This chat has ended."
 msgstr "Bu sohbet sona erdi."
+
+msgid "This chat is empty."
+msgstr "Bu sohbet boş."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Bu sohbet kaldırılmış olabilir veya erişiminiz olmayabilir."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Konuşma bir terminalde devam ettiği için bu sohbet durdu."

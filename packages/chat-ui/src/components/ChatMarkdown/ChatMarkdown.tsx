@@ -117,6 +117,10 @@ export const chatMarkdownComponents = {
 	hr: Rule,
 } satisfies Components;
 
+// The default placeholder href is blocked by Streamdown's URL filter, which
+// shows a half-written link as "label [blocked]" until its URL closes.
+const REMEND_OPTIONS = { linkMode: "text-only" } as const;
+
 /** For the root that opens a message: nothing above it to make room for. */
 export const chatMarkdownFirstBlock = "[&>:first-child]:pt-0";
 
@@ -159,6 +163,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 			linkSafety={{ enabled: false }}
 			mode="streaming"
 			remarkPlugins={mergedRemarkPlugins}
+			remend={REMEND_OPTIONS}
 		>
 			{children}
 		</Streamdown>

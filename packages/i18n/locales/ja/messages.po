@@ -3872,6 +3872,9 @@ msgstr "チャットセッションが見つかりません"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "チャットの構成要素: メッセージ、推論、提案"
 
+msgid "Chats"
+msgstr "チャット"
+
 msgid "Check again"
 msgstr "再確認"
 
@@ -10386,6 +10389,9 @@ msgstr "読み込みと実行中の活動を示すインジケーター"
 msgid "Loading changes..."
 msgstr "変更を読み込み中..."
 
+msgid "Loading chat"
+msgstr "チャットを読み込み中"
+
 msgid "Loading comments…"
 msgstr "コメントを読み込み中…"
 
@@ -10421,6 +10427,9 @@ msgstr "Issueを読み込み中..."
 
 msgid "Loading issues…"
 msgstr "Issueを読み込み中…"
+
+msgid "Loading link preview"
+msgstr "リンクのプレビューを読み込み中"
 
 msgid "Loading members..."
 msgstr "メンバーを読み込み中..."
@@ -11835,6 +11844,9 @@ msgstr "未解決のレビューコメントはありません。"
 
 msgid "No organization selected"
 msgstr "組織が選択されていません"
+
+msgid "No other chats here"
+msgstr "ほかのチャットはありません"
 
 msgid "No pages match"
 msgstr "一致するページがありません"
@@ -18613,6 +18625,12 @@ msgstr "このチャンネルはアーカイブされています"
 
 msgid "This chat has ended."
 msgstr "このチャットは終了しました。"
+
+msgid "This chat is empty."
+msgstr "このチャットは空です。"
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "このチャットは削除されたか、アクセス権がない可能性があります。"
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "会話がターミナルで続行されたため、このチャットは停止しました。"

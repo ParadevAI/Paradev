@@ -13,6 +13,10 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./slack-links": {
+			"types": "./src/slack-links.ts",
+			"default": "./src/slack-links.ts"
+		},
 		"./voice": {
 			"types": "./src/voice/index.ts",
 			"default": "./src/voice/index.ts"

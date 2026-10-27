@@ -3872,6 +3872,9 @@ msgstr "Chat session not found"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chat surfaces: messages, reasoning, suggestions"
 
+msgid "Chats"
+msgstr "Chats"
+
 msgid "Check again"
 msgstr "Check again"
 
@@ -10386,6 +10389,9 @@ msgstr "Loading and in-flight activity indicators"
 msgid "Loading changes..."
 msgstr "Loading changes..."
 
+msgid "Loading chat"
+msgstr "Loading chat"
+
 msgid "Loading comments…"
 msgstr "Loading comments…"
 
@@ -10421,6 +10427,9 @@ msgstr "Loading issues..."
 
 msgid "Loading issues…"
 msgstr "Loading issues…"
+
+msgid "Loading link preview"
+msgstr "Loading link preview"
 
 msgid "Loading members..."
 msgstr "Loading members..."
@@ -11835,6 +11844,9 @@ msgstr "No open review comments."
 
 msgid "No organization selected"
 msgstr "No organization selected"
+
+msgid "No other chats here"
+msgstr "No other chats here"
 
 msgid "No pages match"
 msgstr "No pages match"
@@ -18613,6 +18625,12 @@ msgstr "This channel is archived"
 
 msgid "This chat has ended."
 msgstr "This chat has ended."
+
+msgid "This chat is empty."
+msgstr "This chat is empty."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "This chat may have been removed or you may not have access."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "This chat stopped because the conversation continued in a terminal."

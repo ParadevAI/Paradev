@@ -128,6 +128,7 @@ export function ChatPane({
 					})
 				}
 				pendingPrompts={pendingPrompts}
+				launchPrompt={data.launchPrompt}
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}

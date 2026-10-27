@@ -139,6 +139,17 @@ function transcriptBefore(
 	return null;
 }
 
+/** Rows whose title contains `query`, case-insensitively; all rows without one. */
+export function sessionsTitled<Row extends { title: string | null }>(
+	rows: readonly Row[],
+	query: string | undefined,
+): readonly Row[] {
+	const needle = query?.trim().toLowerCase();
+	return needle
+		? rows.filter((row) => row.title?.toLowerCase().includes(needle))
+		: rows;
+}
+
 function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
 	const last = deriveTimeline(snapshot).at(-1)?.turn;
 	return last?.status === "failed" ? last : null;
@@ -360,14 +371,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		const rows = parsed.scopeId
 			? options.sessions.listByScope(parsed.scopeId)
 			: options.sessions.list();
-		return rows.slice(0, parsed.limit).map((row) => {
-			const live = options.live.get(row.sessionId);
-			return {
-				...row,
-				live: live !== null,
-				terminalId: live?.terminalId ?? null,
-			};
-		});
+		return sessionsTitled(rows, parsed.query)
+			.slice(0, parsed.limit)
+			.map((row) => {
+				const live = options.live.get(row.sessionId);
+				return {
+					...row,
+					live: live !== null,
+					terminalId: live?.terminalId ?? null,
+				};
+			});
 	};
 
 	return {

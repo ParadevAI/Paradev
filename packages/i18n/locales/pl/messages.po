@@ -3872,6 +3872,9 @@ msgstr "Nie znaleziono sesji czatu"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Powierzchnie czatu: wiadomości, rozumowanie, sugestie"
 
+msgid "Chats"
+msgstr "Czaty"
+
 msgid "Check again"
 msgstr "Sprawdź ponownie"
 
@@ -10386,6 +10389,9 @@ msgstr "Wskaźniki ładowania i trwającej aktywności"
 msgid "Loading changes..."
 msgstr "Wczytywanie zmian..."
 
+msgid "Loading chat"
+msgstr "Wczytywanie czatu"
+
 msgid "Loading comments…"
 msgstr "Wczytywanie komentarzy…"
 
@@ -10421,6 +10427,9 @@ msgstr "Wczytywanie zgłoszeń..."
 
 msgid "Loading issues…"
 msgstr "Wczytywanie zgłoszeń…"
+
+msgid "Loading link preview"
+msgstr "Wczytywanie podglądu linku"
 
 msgid "Loading members..."
 msgstr "Wczytywanie członków..."
@@ -11835,6 +11844,9 @@ msgstr "Brak otwartych komentarzy przeglądu."
 
 msgid "No organization selected"
 msgstr "Nie wybrano organizacji"
+
+msgid "No other chats here"
+msgstr "Brak innych czatów"
 
 msgid "No pages match"
 msgstr "Brak pasujących stron"
@@ -18613,6 +18625,12 @@ msgstr "Ten kanał jest zarchiwizowany"
 
 msgid "This chat has ended."
 msgstr "Ten czat się zakończył."
+
+msgid "This chat is empty."
+msgstr "Ten czat jest pusty."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Ten czat mógł zostać usunięty lub nie masz do niego dostępu."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Ten czat został zatrzymany, ponieważ rozmowa była kontynuowana w terminalu."

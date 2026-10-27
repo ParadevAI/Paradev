@@ -3872,6 +3872,9 @@ msgstr "未找到聊天會話"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天介面：訊息、推理、建議"
 
+msgid "Chats"
+msgstr "聊天"
+
 msgid "Check again"
 msgstr "重新檢查"
 
@@ -10386,6 +10389,9 @@ msgstr "載入狀態與進行中活動的指示器"
 msgid "Loading changes..."
 msgstr "正在載入更改..."
 
+msgid "Loading chat"
+msgstr "正在載入聊天"
+
 msgid "Loading comments…"
 msgstr "正在載入評論…"
 
@@ -10421,6 +10427,9 @@ msgstr "正在載入議題..."
 
 msgid "Loading issues…"
 msgstr "正在載入議題…"
+
+msgid "Loading link preview"
+msgstr "正在載入連結預覽"
 
 msgid "Loading members..."
 msgstr "正在載入成員..."
@@ -11835,6 +11844,9 @@ msgstr "沒有未解決的審查評論。"
 
 msgid "No organization selected"
 msgstr "未選擇組織"
+
+msgid "No other chats here"
+msgstr "這裡沒有其他聊天"
 
 msgid "No pages match"
 msgstr "沒有匹配的頁面"
@@ -18613,6 +18625,12 @@ msgstr "此頻道已封存"
 
 msgid "This chat has ended."
 msgstr "此聊天已結束。"
+
+msgid "This chat is empty."
+msgstr "此聊天為空。"
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "此聊天可能已被移除，或你沒有存取權限。"
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由於對話已在終端機中繼續，此聊天已停止。"

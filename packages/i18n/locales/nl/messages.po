@@ -3872,6 +3872,9 @@ msgstr "Chatsessie niet gevonden"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chatoppervlakken: berichten, redeneren, suggesties"
 
+msgid "Chats"
+msgstr "Chats"
+
 msgid "Check again"
 msgstr "Opnieuw controleren"
 
@@ -10386,6 +10389,9 @@ msgstr "Laad- en activiteitsindicatoren"
 msgid "Loading changes..."
 msgstr "Wijzigingen laden..."
 
+msgid "Loading chat"
+msgstr "Chat laden"
+
 msgid "Loading comments…"
 msgstr "Opmerkingen laden…"
 
@@ -10421,6 +10427,9 @@ msgstr "Issues laden..."
 
 msgid "Loading issues…"
 msgstr "Issues laden…"
+
+msgid "Loading link preview"
+msgstr "Linkvoorbeeld laden"
 
 msgid "Loading members..."
 msgstr "Leden laden..."
@@ -11835,6 +11844,9 @@ msgstr "Geen open reviewopmerkingen."
 
 msgid "No organization selected"
 msgstr "Geen organisatie geselecteerd"
+
+msgid "No other chats here"
+msgstr "Geen andere chats hier"
 
 msgid "No pages match"
 msgstr "Geen overeenkomende pagina's"
@@ -18613,6 +18625,12 @@ msgstr "Dit kanaal is gearchiveerd"
 
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
+
+msgid "This chat is empty."
+msgstr "Deze chat is leeg."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Deze chat is gestopt omdat het gesprek in een terminal verderging."

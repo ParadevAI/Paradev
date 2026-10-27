@@ -3872,6 +3872,9 @@ msgstr "未找到聊天会话"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
 
+msgid "Chats"
+msgstr "聊天"
+
 msgid "Check again"
 msgstr "重新检查"
 
@@ -10386,6 +10389,9 @@ msgstr "加载状态与进行中活动的指示器"
 msgid "Loading changes..."
 msgstr "正在加载更改..."
 
+msgid "Loading chat"
+msgstr "正在加载聊天"
+
 msgid "Loading comments…"
 msgstr "正在加载评论…"
 
@@ -10421,6 +10427,9 @@ msgstr "正在加载议题..."
 
 msgid "Loading issues…"
 msgstr "正在加载议题…"
+
+msgid "Loading link preview"
+msgstr "正在加载链接预览"
 
 msgid "Loading members..."
 msgstr "正在加载成员..."
@@ -11835,6 +11844,9 @@ msgstr "没有未解决的审查评论。"
 
 msgid "No organization selected"
 msgstr "未选择组织"
+
+msgid "No other chats here"
+msgstr "这里没有其他聊天"
 
 msgid "No pages match"
 msgstr "没有匹配的页面"
@@ -18613,6 +18625,12 @@ msgstr "此频道已归档"
 
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
+
+msgid "This chat is empty."
+msgstr "此聊天为空。"
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "此聊天可能已被删除，或你没有访问权限。"
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由于对话已在终端中继续，此聊天已停止。"

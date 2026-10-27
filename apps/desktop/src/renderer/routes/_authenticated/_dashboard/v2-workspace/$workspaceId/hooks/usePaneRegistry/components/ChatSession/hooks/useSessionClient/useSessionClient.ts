@@ -19,19 +19,25 @@ export type ChatWiring = {
 	createSocket: (url: string) => StreamSocket;
 };
 
-export function useChatWiring(): ChatWiring {
-	const { getWsToken, hostUrl } = useWorkspaceClient();
-
-	return useMemo(() => {
-		const client = createTRPCClient<ChatRouter>({
+/** The chat API of one host, which need not be the current workspace's. */
+export function chatTransportFor(hostUrl: string): ChatTransport {
+	return chatTransportFromTrpc(
+		createTRPCClient<ChatRouter>({
 			links: [
 				httpBatchLink({
 					url: `${hostUrl}/chat-v3/trpc`,
 					headers: () => getHostServiceHeaders(hostUrl),
 				}),
 			],
-		});
-		const transport = chatTransportFromTrpc(client);
+		}),
+	);
+}
+
+export function useChatWiring(): ChatWiring {
+	const { getWsToken, hostUrl } = useWorkspaceClient();
+
+	return useMemo(() => {
+		const transport = chatTransportFor(hostUrl);
 		const createSocket = (url: string): StreamSocket => {
 			const wsUrl = new URL(url);
 			wsUrl.protocol = wsUrl.protocol === "https:" ? "wss:" : "ws:";

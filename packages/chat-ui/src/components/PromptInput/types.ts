@@ -181,6 +181,13 @@ export type PromptInputProps = {
 		attachments: readonly PromptInputAttachment[],
 	) => void;
 	onChipClick?: (chip: ComposerChip) => void;
+	/** A chip for pasted plain text, such as a link; null keeps the text. */
+	chipForPaste?: (text: string) => ComposerChip | null;
+	/**
+	 * Wraps a chip as the composer draws it, for example in a hover card.
+	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
+	 */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
 	history?: string[];
 	className?: string;
 };

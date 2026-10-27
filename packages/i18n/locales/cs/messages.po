@@ -3872,6 +3872,9 @@ msgstr "Relace chatu nenalezena"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Plochy chatu: zprávy, uvažování, návrhy"
 
+msgid "Chats"
+msgstr "Chaty"
+
 msgid "Check again"
 msgstr "Zkontrolovat znovu"
 
@@ -10386,6 +10389,9 @@ msgstr "Indikátory načítání a probíhající aktivity"
 msgid "Loading changes..."
 msgstr "Načítám změny..."
 
+msgid "Loading chat"
+msgstr "Načítání chatu"
+
 msgid "Loading comments…"
 msgstr "Načítání komentářů…"
 
@@ -10421,6 +10427,9 @@ msgstr "Načítám issues..."
 
 msgid "Loading issues…"
 msgstr "Načítám issues…"
+
+msgid "Loading link preview"
+msgstr "Načítání náhledu odkazu"
 
 msgid "Loading members..."
 msgstr "Načítám členy..."
@@ -11835,6 +11844,9 @@ msgstr "Žádné otevřené komentáře z revize."
 
 msgid "No organization selected"
 msgstr "Není vybraná žádná organizace"
+
+msgid "No other chats here"
+msgstr "Žádné další chaty"
 
 msgid "No pages match"
 msgstr "Žádná stránka neodpovídá"
@@ -18613,6 +18625,12 @@ msgstr "Tento kanál je archivovaný"
 
 msgid "This chat has ended."
 msgstr "Tento chat skončil."
+
+msgid "This chat is empty."
+msgstr "Tento chat je prázdný."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Tento chat mohl být odstraněn, nebo k němu nemáte přístup."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Tento chat se zastavil, protože konverzace pokračovala v terminálu."
