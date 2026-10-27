@@ -63,11 +63,14 @@ import {
 	type FilePaneData,
 	type PagePaneData,
 	type PaneViewerData,
+	PENDING_CLOUD_CHAT_PANE_KIND,
+	type PendingCloudChatPaneData,
 	type PullRequestPaneData,
 	SUBAGENT_PANE_KIND,
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
+import { markCloudChatLaunchClosed } from "../../utils/closedChatSessions";
 import {
 	findTerminalPaneLocation,
 	focusOrAddTerminalPane,
@@ -102,6 +105,7 @@ import { PagePane } from "./components/PagePane";
 import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
 import { PagePaneTitle } from "./components/PagePaneTitle";
 import { PagesListPane } from "./components/PagesListPane";
+import { PendingCloudChatPane } from "./components/PendingCloudChatPane";
 import { PullRequestPane } from "./components/PullRequestPane";
 import { PullRequestPaneHeaderExtras } from "./components/PullRequestPane/components/PullRequestPaneHeaderExtras";
 import { ReviewPane } from "./components/ReviewPane";
@@ -182,7 +186,11 @@ export function usePaneRegistry({
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const closeChatWithUndo = useUndoableChatClose({ workspaceId, store });
+	const closeChatWithUndo = useUndoableChatClose({
+		workspaceId,
+		store,
+		linkedStores,
+	});
 	const host = useWorkspaceHostTarget(workspaceId);
 	const desktopUrl =
 		host.status === "ready" && host.kind === "sandbox" ? host.desktopUrl : null;
@@ -799,6 +807,24 @@ export function usePaneRegistry({
 						message: "Mobile",
 					}),
 				renderPane: () => <MobilePane workspaceId={workspaceId} />,
+			},
+			[PENDING_CLOUD_CHAT_PANE_KIND]: {
+				getIcon: (ctx) => {
+					const data = ctx.pane.data as PendingCloudChatPaneData;
+					return chatPaneIcon({
+						terminalId: data.draftId,
+						sessionId: null,
+						agent: { id: data.agentId },
+					});
+				},
+				getTitle: () => t({ message: "Chat" }),
+				onAfterClose: (pane) => {
+					const data = pane.data as PendingCloudChatPaneData;
+					markCloudChatLaunchClosed(workspaceId, data.promptHash);
+				},
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<PendingCloudChatPane ctx={ctx} workspaceId={workspaceId} />
+				),
 			},
 			"chat-v3": {
 				getIcon: (ctx) => chatPaneIcon(ctx.pane.data as ChatPaneData),

@@ -1,3 +1,5 @@
+import type { ChannelBroadcast } from "@superset/shared/channels";
+
 export interface MentionCandidate {
 	id: string;
 	name: string;
@@ -33,4 +35,27 @@ export function rankMentionCandidates(
 		members: members.slice(0, MENTION_LIMIT),
 		others: others.slice(0, Math.max(0, MENTION_LIMIT - members.length)),
 	};
+}
+
+/** The broadcasts Slack offers outside #general, in its menu order. */
+const OFFERED_BROADCASTS: readonly ChannelBroadcast[] = ["channel", "here"];
+
+export function matchingBroadcasts(query: string): ChannelBroadcast[] {
+	const needle = query.trim().toLowerCase();
+	return OFFERED_BROADCASTS.filter((name) => name.startsWith(needle));
+}
+
+/** The widest broadcast among a composer's chips: @channel or @everyone over @here. */
+export function strongestBroadcast(
+	mentions: readonly { data?: unknown }[],
+): ChannelBroadcast | null {
+	const found = new Set(
+		mentions.flatMap((chip) => {
+			const data = chip.data as { broadcast?: ChannelBroadcast } | undefined;
+			return data?.broadcast ? [data.broadcast] : [];
+		}),
+	);
+	if (found.has("everyone")) return "everyone";
+	if (found.has("channel")) return "channel";
+	return found.has("here") ? "here" : null;
 }

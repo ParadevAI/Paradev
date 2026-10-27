@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { rankMentionCandidates } from "./mentionGroups";
+import {
+	matchingBroadcasts,
+	rankMentionCandidates,
+	strongestBroadcast,
+} from "./mentionGroups";
 
 const person = (id: string, name: string) => ({ id, name, image: null });
 const people = [
@@ -28,4 +32,17 @@ test("matches the start of any name", () => {
 	expect(rankMentionCandidates(people, new Set(), "mull").others).toHaveLength(
 		1,
 	);
+});
+
+test("offers @channel and @here by prefix", () => {
+	expect(matchingBroadcasts("")).toEqual(["channel", "here"]);
+	expect(matchingBroadcasts("he")).toEqual(["here"]);
+	expect(matchingBroadcasts("kiet")).toEqual([]);
+});
+
+test("a message carries its widest broadcast", () => {
+	const chip = (broadcast?: string) => ({ data: { broadcast } });
+	expect(strongestBroadcast([chip("here"), chip("channel")])).toBe("channel");
+	expect(strongestBroadcast([chip("here")])).toBe("here");
+	expect(strongestBroadcast([{ data: { userId: "1" } }])).toBeNull();
 });

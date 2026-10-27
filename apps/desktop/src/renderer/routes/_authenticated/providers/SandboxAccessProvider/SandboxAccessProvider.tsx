@@ -14,6 +14,7 @@ import { setHostServiceSecret } from "renderer/lib/host-service-auth";
 import {
 	accessRefetchInterval,
 	createFailureStreak,
+	wakeRefetchInterval,
 } from "./utils/accessRefetchInterval";
 
 /**
@@ -145,7 +146,14 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			queryClient.setQueryData(sandboxAccessQueryKey(openWorkspace.id), access);
 			return access;
 		},
-		refetchInterval: OPEN_WORKSPACE_KEEPALIVE_MS,
+		refetchInterval: (query) =>
+			wakeRefetchInterval(
+				{
+					error: query.state.error,
+					consecutiveFailures: failureStreak(query.queryHash, query.state),
+				},
+				OPEN_WORKSPACE_KEEPALIVE_MS,
+			),
 		refetchIntervalInBackground: true,
 		gcTime: 0,
 	});

@@ -2,7 +2,14 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -35,14 +42,28 @@ const NOW_TICK_MS = 30_000;
 interface ChannelScreenProps {
 	channelId: string;
 	thread?: string;
+	/** Scrolls to this message, then clears itself from the URL. */
+	message?: string;
 	/** Opens the details dialog on this tab, then clears itself from the URL. */
 	details?: ChannelDetailsTab;
+	/** Replaces the channel header, for a DM drawn as its Dev's page. */
+	renderHeader?: (panel: { isOpen: boolean; toggle: () => void }) => ReactNode;
+	/** Replaces the channel intro at the top of the timeline. */
+	intro?: ReactNode;
+	/** Replaces the tabbed panel with one view, and turns off threads. */
+	renderPanel?: (panel: { hide: () => void }) => ReactNode;
+	composerPlaceholder?: string;
 }
 
 export function ChannelScreen({
 	channelId,
 	thread,
+	message: messageParam,
 	details: detailsParam,
+	renderHeader,
+	intro,
+	renderPanel,
+	composerPlaceholder,
 }: ChannelScreenProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -83,11 +104,25 @@ export function ChannelScreen({
 		return () => observer.disconnect();
 	}, [container]);
 	const setViewedChannel = useViewedChannelStore((state) => state.setChannelId);
+	const setViewedThread = useViewedChannelStore(
+		(state) => state.setThreadRootId,
+	);
+	const openThreadKey = useChannelPanelStore((state) => {
+		const channelPanel = state.panels[channelId];
+		return channelPanel?.isOpen && channelPanel.activeKey?.startsWith("thread:")
+			? channelPanel.activeKey
+			: null;
+	});
 
 	useEffect(() => {
 		setViewedChannel(channelId);
 		return () => setViewedChannel(null);
 	}, [channelId, setViewedChannel]);
+
+	useEffect(() => {
+		setViewedThread(openThreadKey?.slice("thread:".length) ?? null);
+		return () => setViewedThread(null);
+	}, [openThreadKey, setViewedThread]);
 
 	const lastReadSeq = channel?.membership?.lastReadSeq ?? null;
 	if (ghost === undefined && channel && !query.isFetching) {
@@ -105,6 +140,20 @@ export function ChannelScreen({
 			replace: true,
 		});
 	}, [thread, channelId, openPanelTab, navigate, threadLabel]);
+
+	const [focusMessageId, setFocusMessageId] = useState<string | null>(null);
+	useEffect(() => {
+		if (!messageParam) return;
+		setTab("messages");
+		setFocusMessageId(messageParam);
+		void navigate({
+			to: "/channels/$channelId",
+			params: { channelId },
+			search: {},
+			replace: true,
+		});
+	}, [messageParam, channelId, navigate]);
+	const clearFocusMessage = useCallback(() => setFocusMessageId(null), []);
 
 	useEffect(() => {
 		if (!detailsParam) return;
@@ -173,6 +222,11 @@ export function ChannelScreen({
 		onSuccess: refresh,
 		onError,
 	});
+	const setSuppressBroadcasts =
+		cloudTrpc.channel.setSuppressBroadcasts.useMutation({
+			onSuccess: refresh,
+			onError,
+		});
 	const update = cloudTrpc.channel.update.useMutation({
 		onSuccess: refresh,
 		onError,
@@ -291,22 +345,26 @@ export function ChannelScreen({
 				ref={mainRef}
 				className="flex min-w-0 flex-1 flex-col overflow-hidden"
 			>
-				<ChannelHeader
-					channel={channel}
-					isPanelOpen={panel.isOpen}
-					onTogglePanel={panel.toggle}
-					tab={tab}
-					onTabChange={setTab}
-					onOpenDetails={setDetails}
-					onArchive={() => setArchiving(true)}
-					onLeave={requestLeave}
-					onToggleMute={() =>
-						setMuted.mutate({
-							channelId,
-							muted: !channel.membership?.muted,
-						})
-					}
-				/>
+				{renderHeader ? (
+					renderHeader({ isOpen: panel.isOpen, toggle: panel.toggle })
+				) : (
+					<ChannelHeader
+						channel={channel}
+						isPanelOpen={panel.isOpen}
+						onTogglePanel={panel.toggle}
+						tab={tab}
+						onTabChange={setTab}
+						onOpenDetails={setDetails}
+						onArchive={() => setArchiving(true)}
+						onLeave={requestLeave}
+						onToggleMute={() =>
+							setMuted.mutate({
+								channelId,
+								muted: !channel.membership?.muted,
+							})
+						}
+					/>
+				)}
 				{tab === "messages" ? (
 					<>
 						<ChannelTimeline
@@ -335,7 +393,10 @@ export function ChannelScreen({
 							canModerate={channel.canManage}
 							canReact={canPost}
 							now={now}
-							onOpenThread={openThread}
+							onOpenThread={renderPanel ? undefined : openThread}
+							intro={intro}
+							focusMessageId={focusMessageId}
+							onFocusedMessage={clearFocusMessage}
 						/>
 						{canPost && currentUserId ? (
 							<div className="shrink-0 px-4 pb-4">
@@ -344,7 +405,10 @@ export function ChannelScreen({
 									threadRootId={null}
 									people={people}
 									currentUserId={currentUserId}
-									placeholder={t({ message: `Message #${channel.name}` })}
+									placeholder={
+										composerPlaceholder ??
+										t({ message: `Message #${channel.name}` })
+									}
 									autoFocus
 								/>
 							</div>
@@ -370,20 +434,24 @@ export function ChannelScreen({
 				onWidthChange={setPanelWidth}
 				onCollapse={panel.hide}
 			>
-				<ChannelPanel
-					channelId={channelId}
-					isFullScreen={panel.mode === "expanded"}
-					onToggleFullScreen={panel.toggleFullScreen}
-					onHide={panel.hide}
-					onOpenThread={openThread}
-					onOpenTask={openTask}
-					peopleById={peopleById}
-					people={people}
-					currentUserId={currentUserId}
-					canModerate={channel.canManage}
-					canPost={canPost}
-					now={now}
-				/>
+				{renderPanel ? (
+					renderPanel({ hide: panel.hide })
+				) : (
+					<ChannelPanel
+						channelId={channelId}
+						isFullScreen={panel.mode === "expanded"}
+						onToggleFullScreen={panel.toggleFullScreen}
+						onHide={panel.hide}
+						onOpenThread={openThread}
+						onOpenTask={openTask}
+						peopleById={peopleById}
+						people={people}
+						currentUserId={currentUserId}
+						canModerate={channel.canManage}
+						canPost={canPost}
+						now={now}
+					/>
+				)}
 			</ChannelPanelFrame>
 			<ChannelDetailsDialog
 				open={details !== null}
@@ -396,6 +464,9 @@ export function ChannelScreen({
 				peopleById={peopleById}
 				currentUserId={currentUserId}
 				onSetNotify={(notify) => setNotify.mutate({ channelId, notify })}
+				onSetSuppressBroadcasts={(suppressBroadcasts) =>
+					setSuppressBroadcasts.mutate({ channelId, suppressBroadcasts })
+				}
 				onLeave={() => {
 					setDetails(null);
 					requestLeave();

@@ -154,6 +154,7 @@ let renders = 0;
 
 function Probe(props: {
 	client: SessionClient;
+	sendEnabled?: boolean;
 	scheduler?: FrameScheduler;
 	pageSize?: number;
 	wait?: ReturnType<typeof createManualWait>["wait"];
@@ -161,6 +162,7 @@ function Probe(props: {
 	renders += 1;
 	latest = useChatSession({
 		client: props.client,
+		sendEnabled: props.sendEnabled,
 		deltas: [],
 		scheduler: props.scheduler,
 		pageSize: props.pageSize,
@@ -280,6 +282,36 @@ describe("useChatSession", () => {
 			act(() => manual.flush());
 			expect(session().connection).toBe("open");
 		});
+		await domWaitFor(() => expect(session().outbox).toHaveLength(0));
+		expect(host.prompts()).toBe(1);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("a held outbox waits for sending permission even after the transcript connects", async () => {
+		const stack = await startStack();
+		let up = false;
+		const host = unreachableUntil(stack.transport, () => up);
+		const manual = createManualWait();
+		const client = stack.makeClient({
+			transport: host.transport,
+			wait: manual.wait,
+		});
+		const view = render(<Probe client={client} wait={manual.wait} />);
+		act(() => session().sendPrompt([{ type: "text", text: "hello" }]));
+		view.rerender(
+			<Probe client={client} wait={manual.wait} sendEnabled={false} />,
+		);
+		up = true;
+		await domWaitFor(() => {
+			act(() => manual.flush());
+			expect(session().connection).toBe("open");
+		});
+		act(() => session().retryPrompt(session().outbox[0]?.clientId ?? ""));
+		expect(host.prompts()).toBe(0);
+		expect(session().outbox).toMatchObject([{ state: "queued", attempts: 0 }]);
+		view.rerender(<Probe client={client} wait={manual.wait} sendEnabled />);
 		await domWaitFor(() => expect(session().outbox).toHaveLength(0));
 		expect(host.prompts()).toBe(1);
 		view.unmount();

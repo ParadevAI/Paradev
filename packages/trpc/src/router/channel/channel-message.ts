@@ -1,20 +1,28 @@
 import { db, dbWs } from "@superset/db/client";
 import {
 	attachments,
+	type ChannelBroadcast,
+	type ChannelNotify,
 	channelMembers,
 	channelMessageReactions,
 	channelMessages,
 	channels,
 	channelThreadFollows,
+	organizations,
 	members as orgMembers,
+	type SelectChannel,
 	type SelectChannelMessage,
 } from "@superset/db/schema";
-import { previewOf } from "@superset/shared/channels";
+import {
+	type ChannelNotifyReason,
+	notificationTextOf,
+} from "@superset/shared/channels";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
 import { protectedProcedure } from "../../trpc";
+import { startTurnsForMessage } from "../agent/turns";
 import {
 	assertCanPost,
 	type ChannelAccess,
@@ -22,7 +30,14 @@ import {
 	loadChannelAccess,
 } from "./access";
 import { type EnrichedMessage, enrichMessage, enrichMessages } from "./enrich";
-import { isUniqueViolation, orgMemberIds } from "./members";
+import {
+	channelDevs,
+	isUniqueViolation,
+	orgMemberIds,
+	peopleAmong,
+} from "./members";
+import { loadNotifyPrefs } from "./notification-prefs";
+import { DEFAULT_NOTIFY_PREFS, notifyReason } from "./notify-rules";
 import { publishToUsers, toWire } from "./publish";
 import { publishThreadRead } from "./read-state";
 import {
@@ -70,17 +85,19 @@ async function loadMessage(userId: string, messageId: string) {
 
 interface Recipient {
 	userId: string;
-	notify: string;
+	notify: ChannelNotify | null;
 	muted: boolean;
+	suppressBroadcasts: boolean;
 }
 
 /** The channel's members who still belong to its organization. */
 async function recipients(channelId: string): Promise<Recipient[]> {
 	return db
 		.select({
-			userId: channelMembers.userId,
+			userId: orgMembers.userId,
 			notify: channelMembers.notify,
 			muted: channelMembers.muted,
+			suppressBroadcasts: channelMembers.suppressBroadcasts,
 		})
 		.from(channelMembers)
 		.innerJoin(channels, eq(channels.id, channelMembers.channelId))
@@ -88,23 +105,32 @@ async function recipients(channelId: string): Promise<Recipient[]> {
 			orgMembers,
 			and(
 				eq(orgMembers.organizationId, channels.organizationId),
-				eq(orgMembers.userId, channelMembers.userId),
+				eq(orgMembers.userId, channelMembers.actorId),
 			),
 		)
 		.where(eq(channelMembers.channelId, channelId));
 }
 
-/** Members a message may mention: the channel's for private, the org's for public. */
+/**
+ * Whom a message may mention: people (the channel's members if it is
+ * private, anyone in the organization if public) and the channel's Devs.
+ */
 async function validMentions(
 	access: ChannelAccess,
 	members: Recipient[],
 	ids: readonly string[],
 ): Promise<string[]> {
-	if (access.channel.visibility === "private") {
-		const memberIds = new Set(members.map((m) => m.userId));
-		return [...new Set(ids)].filter((id) => memberIds.has(id));
-	}
-	return orgMemberIds(access.channel.organizationId, ids);
+	const unique = [...new Set(ids)];
+	if (unique.length === 0) return [];
+	const people = new Set(
+		access.channel.visibility === "private"
+			? members.map((m) => m.userId)
+			: await orgMemberIds(access.channel.organizationId, unique),
+	);
+	const devs = new Set(
+		(await channelDevs(access.channel.id)).map((dev) => dev.agentId),
+	);
+	return unique.filter((id) => people.has(id) || devs.has(id));
 }
 
 async function threadFollowers(
@@ -112,13 +138,13 @@ async function threadFollowers(
 	organizationId: string,
 ): Promise<Set<string>> {
 	const rows = await db
-		.select({ userId: channelThreadFollows.userId })
+		.select({ userId: channelThreadFollows.actorId })
 		.from(channelThreadFollows)
 		.innerJoin(
 			orgMembers,
 			and(
 				eq(orgMembers.organizationId, organizationId),
-				eq(orgMembers.userId, channelThreadFollows.userId),
+				eq(orgMembers.userId, channelThreadFollows.actorId),
 			),
 		)
 		.where(
@@ -141,12 +167,22 @@ async function followOnReply(
 	reply: SelectChannelMessage,
 ) {
 	const base = { rootId: root.id, channelId: root.channelId };
-	const target = [channelThreadFollows.rootId, channelThreadFollows.userId];
+	const target = [channelThreadFollows.rootId, channelThreadFollows.actorId];
 	const unreadFrom = reply.seq - 1;
-	if (reply.authorUserId) {
+	const people = new Set(
+		await peopleAmong([
+			reply.authorId,
+			...reply.mentionedIds,
+			root.authorId,
+			...root.mentionedIds,
+		]),
+	);
+	const author =
+		reply.authorId && people.has(reply.authorId) ? reply.authorId : null;
+	if (author) {
 		await db
 			.insert(channelThreadFollows)
-			.values({ ...base, userId: reply.authorUserId, lastReadSeq: reply.seq })
+			.values({ ...base, actorId: author, lastReadSeq: reply.seq })
 			.onConflictDoUpdate({
 				target,
 				set: {
@@ -157,42 +193,39 @@ async function followOnReply(
 	}
 	const others = (ids: (string | null)[]) =>
 		[...new Set(ids)].filter(
-			(id): id is string => id !== null && id !== reply.authorUserId,
+			(id): id is string =>
+				id !== null && id !== reply.authorId && people.has(id),
 		);
-	const mentioned = others(reply.mentionedUserIds);
+	const mentioned = others(reply.mentionedIds);
 	if (mentioned.length > 0) {
 		await db
 			.insert(channelThreadFollows)
 			.values(
-				mentioned.map((userId) => ({
+				mentioned.map((actorId) => ({
 					...base,
-					userId,
+					actorId,
 					lastReadSeq: unreadFrom,
 				})),
 			)
 			.onConflictDoUpdate({ target, set: { following: true } });
 	}
-	const rootPeople = others([root.authorUserId, ...root.mentionedUserIds]);
+	const rootPeople = others([root.authorId, ...root.mentionedIds]);
 	if (rootPeople.length > 0) {
 		await db
 			.insert(channelThreadFollows)
 			.values(
-				rootPeople.map((userId) => ({
+				rootPeople.map((actorId) => ({
 					...base,
-					userId,
+					actorId,
 					lastReadSeq: unreadFrom,
 				})),
 			)
 			.onConflictDoNothing();
 	}
-	const affected = [
-		...(reply.authorUserId ? [reply.authorUserId] : []),
-		...mentioned,
-		...rootPeople,
-	];
+	const affected = [...(author ? [author] : []), ...mentioned, ...rootPeople];
 	const follows = await db
 		.select({
-			userId: channelThreadFollows.userId,
+			userId: channelThreadFollows.actorId,
 			lastReadSeq: channelThreadFollows.lastReadSeq,
 			following: channelThreadFollows.following,
 		})
@@ -200,7 +233,7 @@ async function followOnReply(
 		.where(
 			and(
 				eq(channelThreadFollows.rootId, root.id),
-				inArray(channelThreadFollows.userId, affected),
+				inArray(channelThreadFollows.actorId, affected),
 			),
 		);
 	for (const { userId, ...follow } of follows) {
@@ -210,9 +243,8 @@ async function followOnReply(
 
 /**
  * Sends the message to the channel's members and, in a public channel, to
- * people it mentions and thread followers who are not members. Members'
- * mute and notify settings decide their notifications; outsiders are only
- * told about mentions and replies.
+ * people it mentions and thread followers who are not members, so their
+ * open views update. Only members are notified, as in Slack.
  */
 async function announce(
 	access: ChannelAccess,
@@ -225,13 +257,15 @@ async function announce(
 	const followers = root
 		? await threadFollowers(root.id, access.channel.organizationId)
 		: new Set<string>();
-	const mentioned = new Set(message.mentionedUserIds);
-	const isPublic = access.channel.visibility === "public";
-	const outsiders = isPublic
-		? [...new Set([...mentioned, ...followers])].filter(
-				(id) => !memberIds.has(id),
-			)
-		: [];
+	const outsiders =
+		access.channel.visibility === "public"
+			? await orgMemberIds(
+					access.channel.organizationId,
+					[...new Set([...message.mentionedIds, ...followers])].filter(
+						(id) => !memberIds.has(id),
+					),
+				)
+			: [];
 	const audience = [...memberIds, ...outsiders];
 	publishToUsers(audience, {
 		type: "channel.message",
@@ -246,43 +280,58 @@ async function announce(
 		});
 	}
 
-	const byReason = {
-		mention: [] as string[],
-		reply: [] as string[],
-		message: [] as string[],
-	};
+	const prefs = await loadNotifyPrefs([...memberIds]);
+	const now = new Date();
+	const preview =
+		notificationTextOf(message.body) ||
+		message.attachments.map((file) => file.name).join(", ");
+	const groups = new Map<
+		string,
+		{ reason: ChannelNotifyReason; showPreview: boolean; userIds: string[] }
+	>();
 	for (const member of members) {
-		if (
-			member.userId === message.authorUserId ||
-			member.muted ||
-			member.notify === "none"
-		) {
-			continue;
-		}
-		if (mentioned.has(member.userId)) byReason.mention.push(member.userId);
-		else if (followers.has(member.userId)) byReason.reply.push(member.userId);
-		else if (member.notify === "all" && !root) {
-			byReason.message.push(member.userId);
-		}
+		const memberPrefs = prefs.get(member.userId) ?? DEFAULT_NOTIFY_PREFS;
+		const reason = notifyReason(
+			{ ...member, followsThread: followers.has(member.userId) },
+			memberPrefs,
+			{
+				authorId: message.authorId,
+				body: message.body,
+				mentionedIds: message.mentionedIds,
+				broadcast: message.broadcast,
+				isReply: root !== null,
+			},
+			now,
+		);
+		if (!reason) continue;
+		const key = `${reason}:${memberPrefs.showPreview}`;
+		const group = groups.get(key) ?? {
+			reason,
+			showPreview: memberPrefs.showPreview,
+			userIds: [],
+		};
+		group.userIds.push(member.userId);
+		groups.set(key, group);
 	}
-	for (const userId of outsiders) {
-		if (userId === message.authorUserId) continue;
-		if (mentioned.has(userId)) byReason.mention.push(userId);
-		else byReason.reply.push(userId);
-	}
-	for (const reason of ["mention", "reply", "message"] as const) {
-		publishToUsers(byReason[reason], {
+	if (groups.size === 0) return;
+	const [organization] = await db
+		.select({ name: organizations.name })
+		.from(organizations)
+		.where(eq(organizations.id, access.channel.organizationId))
+		.limit(1);
+	for (const { reason, showPreview, userIds } of groups.values()) {
+		publishToUsers(userIds, {
 			type: "channel.notify",
 			organizationId: access.channel.organizationId,
+			organizationName: organization?.name ?? "",
 			channelId: access.channel.id,
 			channelName: access.channel.name,
 			messageId: message.id,
 			threadRootId: message.threadRootId,
 			reason,
 			authorName,
-			preview:
-				previewOf(message.body) ||
-				message.attachments.map((file) => file.name).join(", "),
+			preview: showPreview ? preview : "",
+			showPreview,
 		});
 	}
 }
@@ -311,6 +360,122 @@ export async function listTopLevelMessages(input: {
 		messages: await enrichMessages(oldestFirst),
 		nextCursor: hasMore ? (oldestFirst[0]?.seq ?? null) : null,
 	};
+}
+
+interface AppendedMessage {
+	message: SelectChannelMessage;
+	root: SelectChannelMessage | null;
+}
+
+/** Numbers and stores a message, and counts it on its thread root. */
+async function appendMessage(input: {
+	channelId: string;
+	threadRootId: string | null;
+	authorId: string;
+	body: string;
+	mentionedIds: string[];
+	broadcast?: ChannelBroadcast | null;
+	clientId?: string | null;
+}): Promise<AppendedMessage> {
+	return dbWs.transaction(async (tx) => {
+		const now = new Date();
+		const [counter] = await tx
+			.update(channels)
+			.set({ lastSeq: sql`${channels.lastSeq} + 1`, lastMessageAt: now })
+			.where(and(eq(channels.id, input.channelId), isNull(channels.archivedAt)))
+			.returning({ seq: channels.lastSeq });
+		if (!counter) {
+			throw userError({
+				code: "FORBIDDEN",
+				message: "This channel is archived",
+				i18nKey: "serverError.channel.archived",
+			});
+		}
+		let root: SelectChannelMessage | null = null;
+		if (input.threadRootId) {
+			const [updated] = await tx
+				.update(channelMessages)
+				.set({
+					replyCount: sql`${channelMessages.replyCount} + 1`,
+					lastReplyAt: now,
+				})
+				.where(
+					and(
+						eq(channelMessages.id, input.threadRootId),
+						eq(channelMessages.channelId, input.channelId),
+						isNull(channelMessages.threadRootId),
+					),
+				)
+				.returning();
+			if (!updated) throw messageNotFound();
+			root = updated;
+		}
+		const [message] = await tx
+			.insert(channelMessages)
+			.values({
+				channelId: input.channelId,
+				seq: counter.seq,
+				threadRootId: root?.id ?? null,
+				authorId: input.authorId,
+				body: input.body,
+				mentionedIds: input.mentionedIds,
+				broadcast: input.broadcast ?? null,
+				clientId: input.clientId ?? null,
+				createdAt: now,
+			})
+			.returning();
+		if (!message) throw new Error("message insert returned no row");
+		return { message, root };
+	});
+}
+
+/** A Dev's post: stored like anyone's, announced to the room's members. */
+export async function postAgentMessage(input: {
+	channel: SelectChannel;
+	agentId: string;
+	agentName: string;
+	body: string;
+	threadRootId: string | null;
+	/** A retried post with the same key returns the first message. */
+	idempotencyKey?: string;
+}): Promise<EnrichedMessage> {
+	const body = assertBody(input.body);
+	const key = input.idempotencyKey;
+	const earlier = () =>
+		key ? findByClientId(input.agentId, input.channel.id, key) : null;
+	const existing = await earlier();
+	if (existing) return enrichMessage(existing);
+	let result: AppendedMessage;
+	try {
+		result = await appendMessage({
+			channelId: input.channel.id,
+			threadRootId: input.threadRootId,
+			authorId: input.agentId,
+			body,
+			mentionedIds: [],
+			clientId: key ?? null,
+		});
+	} catch (error) {
+		const raced = isUniqueViolation(error) ? await earlier() : null;
+		if (raced) return enrichMessage(raced);
+		throw error;
+	}
+	if (result.root) await followOnReply(result.root, result.message);
+	const message = await enrichMessage(result.message);
+	const root = result.root ? await enrichMessage(result.root) : null;
+	const access: ChannelAccess = {
+		channel: input.channel,
+		membership: null,
+		orgRole: "member",
+	};
+	await announce(
+		access,
+		await recipients(input.channel.id),
+		message,
+		root,
+		input.agentName,
+	);
+	return message;
 }
 
 export const channelMessageRouter = {
@@ -344,7 +509,7 @@ export const channelMessageRouter = {
 					.where(
 						and(
 							eq(channelThreadFollows.rootId, root.id),
-							eq(channelThreadFollows.userId, ctx.session.user.id),
+							eq(channelThreadFollows.actorId, ctx.session.user.id),
 						),
 					)
 					.limit(1),
@@ -372,73 +537,20 @@ export const channelMessageRouter = {
 			if (existing) return enrichMessage(existing);
 
 			const members = await recipients(access.channel.id);
-			const mentionedUserIds = (
-				await validMentions(access, members, input.mentionedUserIds)
+			const mentionedIds = (
+				await validMentions(access, members, input.mentionedIds)
 			).filter((id) => id !== userId);
 
-			let result: {
-				message: SelectChannelMessage;
-				root: SelectChannelMessage | null;
-			};
+			let result: AppendedMessage;
 			try {
-				result = await dbWs.transaction(async (tx) => {
-					const now = new Date();
-					const [counter] = await tx
-						.update(channels)
-						.set({
-							lastSeq: sql`${channels.lastSeq} + 1`,
-							lastMessageAt: now,
-						})
-						.where(
-							and(
-								eq(channels.id, access.channel.id),
-								isNull(channels.archivedAt),
-							),
-						)
-						.returning({ seq: channels.lastSeq });
-					if (!counter) {
-						throw userError({
-							code: "FORBIDDEN",
-							message: "This channel is archived",
-							i18nKey: "serverError.channel.archived",
-						});
-					}
-
-					let root: SelectChannelMessage | null = null;
-					if (input.threadRootId) {
-						const [updated] = await tx
-							.update(channelMessages)
-							.set({
-								replyCount: sql`${channelMessages.replyCount} + 1`,
-								lastReplyAt: now,
-							})
-							.where(
-								and(
-									eq(channelMessages.id, input.threadRootId),
-									eq(channelMessages.channelId, access.channel.id),
-									isNull(channelMessages.threadRootId),
-								),
-							)
-							.returning();
-						if (!updated) throw messageNotFound();
-						root = updated;
-					}
-
-					const [message] = await tx
-						.insert(channelMessages)
-						.values({
-							channelId: access.channel.id,
-							seq: counter.seq,
-							threadRootId: root?.id ?? null,
-							authorUserId: userId,
-							body,
-							mentionedUserIds,
-							clientId: input.clientId,
-							createdAt: now,
-						})
-						.returning();
-					if (!message) throw new Error("message insert returned no row");
-					return { message, root };
+				result = await appendMessage({
+					channelId: access.channel.id,
+					threadRootId: input.threadRootId ?? null,
+					authorId: userId,
+					body,
+					mentionedIds,
+					broadcast: input.broadcast ?? null,
+					clientId: input.clientId,
 				});
 			} catch (error) {
 				if (isUniqueViolation(error)) {
@@ -462,6 +574,7 @@ export const channelMessageRouter = {
 			const message = await enrichMessage(result.message);
 			const root = result.root ? await enrichMessage(result.root) : null;
 			await announce(access, members, message, root, ctx.session.user.name);
+			await startTurnsForMessage(access.channel, result.message, userId);
 			return message;
 		}),
 
@@ -471,7 +584,7 @@ export const channelMessageRouter = {
 			const userId = ctx.session.user.id;
 			const body = assertBody(input.body);
 			const { message, access } = await loadMessage(userId, input.messageId);
-			if (message.authorUserId !== userId || message.deletedAt) {
+			if (message.authorId !== userId || message.deletedAt) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "You can only edit your own messages",
@@ -480,12 +593,18 @@ export const channelMessageRouter = {
 			}
 			assertCanPost(access);
 			const members = await recipients(access.channel.id);
-			const mentionedUserIds = (
-				await validMentions(access, members, input.mentionedUserIds)
+			const mentionedIds = (
+				await validMentions(access, members, input.mentionedIds)
 			).filter((id) => id !== userId);
 			const [updated] = await db
 				.update(channelMessages)
-				.set({ body, mentionedUserIds, editedAt: new Date() })
+				.set({
+					body,
+					mentionedIds,
+					broadcast:
+						input.broadcast === undefined ? message.broadcast : input.broadcast,
+					editedAt: new Date(),
+				})
 				.where(eq(channelMessages.id, message.id))
 				.returning();
 			if (!updated) throw messageNotFound();
@@ -506,7 +625,7 @@ export const channelMessageRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const { message, access } = await loadMessage(userId, input.messageId);
-			if (!canRemoveMessage(access, message.authorUserId, userId)) {
+			if (!canRemoveMessage(access, message.authorId, userId)) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "You can only delete your own messages",
@@ -525,7 +644,12 @@ export const channelMessageRouter = {
 					);
 				const [row] = await tx
 					.update(channelMessages)
-					.set({ body: "", mentionedUserIds: [], deletedAt: new Date() })
+					.set({
+						body: "",
+						mentionedIds: [],
+						broadcast: null,
+						deletedAt: new Date(),
+					})
 					.where(eq(channelMessages.id, message.id))
 					.returning();
 				if (!row?.threadRootId) return { row, root: null };
@@ -572,7 +696,11 @@ export const channelMessageRouter = {
 			if (input.reacted) {
 				await db
 					.insert(channelMessageReactions)
-					.values({ messageId: message.id, userId, emoji: input.emoji })
+					.values({
+						messageId: message.id,
+						actorId: userId,
+						emoji: input.emoji,
+					})
 					.onConflictDoNothing();
 			} else {
 				await db
@@ -580,7 +708,7 @@ export const channelMessageRouter = {
 					.where(
 						and(
 							eq(channelMessageReactions.messageId, message.id),
-							eq(channelMessageReactions.userId, userId),
+							eq(channelMessageReactions.actorId, userId),
 							eq(channelMessageReactions.emoji, input.emoji),
 						),
 					);
@@ -600,7 +728,7 @@ export const channelMessageRouter = {
 } satisfies TRPCRouterRecord;
 
 async function findByClientId(
-	userId: string,
+	authorId: string,
 	channelId: string,
 	clientId: string,
 ) {
@@ -609,7 +737,7 @@ async function findByClientId(
 		.from(channelMessages)
 		.where(
 			and(
-				eq(channelMessages.authorUserId, userId),
+				eq(channelMessages.authorId, authorId),
 				eq(channelMessages.channelId, channelId),
 				eq(channelMessages.clientId, clientId),
 			),

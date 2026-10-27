@@ -50,6 +50,7 @@ export async function GET(request: Request) {
 		body: {
 			provider,
 			callbackURL: successUrl.toString(),
+			errorCallbackURL: `${env.NEXT_PUBLIC_WEB_URL}/auth/desktop/success`,
 		},
 		asResponse: true,
 	});

@@ -744,15 +744,6 @@ msgstr "{appName} Mobile uruchamia agentów na komputerach, które podłączysz.
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, one {# wymaga zatwierdzenia} few {# wymagają zatwierdzenia} many {# wymaga zatwierdzenia} other {# wymaga zatwierdzenia}}"
 
-msgid "{authorName} in #{channelName}"
-msgstr "{authorName} w #{channelName}"
-
-msgid "{authorName} mentioned you in #{channelName}"
-msgstr "{authorName} wspomniał(a) o Tobie w #{channelName}"
-
-msgid "{authorName} replied in #{channelName}"
-msgstr "{authorName} odpowiedział(a) w #{channelName}"
-
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Za main o # commit, wymaga rebase} few {Za main o # commity, wymaga rebase} many {Za main o # commitów, wymaga rebase} other {Za main o # commita, wymaga rebase}}"
 
@@ -1625,6 +1616,9 @@ msgstr "Większość zmian produkcyjnych scala się bez czytania diffa przez cz�
 msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
 msgstr "Manifest i kilka plików umiejętności. Paradev umieszcza wtyczkę tam, gdzie szuka każdy agent."
 
+msgid "a message from {authorName}"
+msgstr "wiadomość od {authorName}"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Do kontynuowania wymagana jest nowa wersja Paradev. Zaktualizuj do najnowszej wersji."
 
@@ -1902,6 +1896,9 @@ msgstr "Dodaj pliki, aplikacje i inne"
 msgid "Add files, apps, and more (@)"
 msgstr "Dodaj pliki, aplikacje i inne (@)"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "Dodaj zgłoszenie #{0} do obszaru roboczego"
@@ -1978,6 +1975,9 @@ msgstr "Dodaj testy do najbardziej ryzykownego nieprzetestowanego kodu…"
 msgid "Add tests where they're missing"
 msgstr "Dodaj testy tam, gdzie ich brakuje"
 
+msgid "Add them"
+msgstr "Dodaj ich"
+
 msgid "Add this label"
 msgstr "Dodaj tę etykietę"
 
@@ -1998,6 +1998,9 @@ msgstr "Dodaj do paska bocznego"
 
 msgid "Add to workspace"
 msgstr "Dodaj do obszaru roboczego"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "Dodaj własnego agenta terminalowego na tym urządzeniu."
@@ -2272,6 +2275,9 @@ msgstr "Wszystkie wiadomości"
 
 msgid "All models"
 msgstr "Wszystkie modele"
+
+msgid "All new messages"
+msgstr "Wszystkie nowe wiadomości"
 
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "Wszystkie cele osiągnięte. Najwyższy szczebel, nie ma po co sięgać wyżej."
@@ -2710,6 +2716,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "Archiwizuj"
+
+msgid "Archive {name}?"
+msgstr "Zarchiwizować {name}?"
 
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
@@ -3276,6 +3285,9 @@ msgstr "Dolna szuflada, przyjazna gestom na urządzeniach dotykowych."
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Pozostałe kupione GB-godziny: {prepaid}"
+
+msgid "Bounce the Dock icon"
+msgstr "Podskakująca ikona w Docku"
 
 msgid "Box"
 msgstr "Box"
@@ -5427,6 +5439,9 @@ msgstr "Nie udało się zaktualizować gałęzi"
 msgid "serverError.plugins.credentialUnverified"
 msgstr "Nie udało się zweryfikować poświadczeń: {reason}"
 
+msgid "Couldn't add them to the channel"
+msgstr "Nie udało się dodać ich do kanału"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "Nie udało się poprosić obszaru roboczego o opis"
 
@@ -5615,6 +5630,9 @@ msgstr "Nie udało się zapisać zmian"
 msgid "Couldn't save the change"
 msgstr "Nie udało się zapisać zmiany"
 
+msgid "Couldn't save the Dev"
+msgstr "Nie udało się zapisać Deva"
+
 msgid "Couldn't send comment"
 msgstr "Nie udało się wysłać komentarza"
 
@@ -5626,6 +5644,9 @@ msgstr "Nie udało się wysłać wiadomości"
 
 msgid "Couldn't send the message. Attach the files again."
 msgstr "Nie udało się wysłać wiadomości. Dołącz pliki ponownie."
+
+msgid "Couldn't send the reply"
+msgstr "Nie udało się wysłać odpowiedzi"
 
 msgid "Couldn't send to agent"
 msgstr "Nie udało się wysłać do agenta"
@@ -5704,6 +5725,9 @@ msgstr "Utwórz „{newLabel}”"
 
 msgid "Create a channel"
 msgstr "Utwórz kanał"
+
+msgid "Create a Dev"
+msgstr "Utwórz Deva"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Tworzy natywnego forka u dostawcy z tym samym kontekstem rozmowy. Pierwotna sesja pozostaje bez zmian."
@@ -5867,6 +5891,9 @@ msgstr "Utworzono {0} · Ostatnio użyty {1}"
 
 msgid "Created {ago}"
 msgstr "Utworzono {ago}"
+
+msgid "Created {created}"
+msgstr "Utworzono {created}"
 
 msgid "Created {createdAgo}"
 msgstr "Utworzono {createdAgo}"
@@ -6032,6 +6059,12 @@ msgstr "Własny dostawca"
 msgid "Custom themes"
 msgstr "Własne motywy"
 
+msgid "Customize"
+msgstr "Dostosuj"
+
+msgid "Customize {devName}"
+msgstr "Dostosuj {devName}"
+
 msgid "Customize commands"
 msgstr "Dostosuj polecenia"
 
@@ -6138,6 +6171,9 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 
 msgid "Default ({defaultWorktreePath})"
 msgstr "Domyślny ({defaultWorktreePath})"
+
+msgid "Default ({fallback})"
+msgstr "Domyślnie ({fallback})"
 
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "Domyślna baza nowych obszarów roboczych. Można zmienić ją osobno podczas tworzenia."
@@ -6465,6 +6501,9 @@ msgstr "Szczegóły nie są tu dostępne, ale link nadal się otwiera."
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev options"
+msgstr "Opcje Deva"
+
 msgid "Dev sign in"
 msgstr "Logowanie deweloperskie"
 
@@ -6491,6 +6530,9 @@ msgstr "Urządzenie: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Urządzenia"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6578,12 @@ msgstr "różnice w nowej karcie"
 
 msgid "Digital Product Designer"
 msgstr "Projektant produktów cyfrowych"
+
+msgid "Direct message"
+msgstr "Wiadomość bezpośrednia"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "Tryb bezpośredni"
@@ -7197,6 +7245,9 @@ msgstr "Każda oś pracuje na następny poziom. Utrzymaj to, a poziom przyjdzie 
 msgid "Every channel and thread you follow."
 msgstr "Wszystkie kanały i wątki, które obserwujesz."
 
+msgid "Every day"
+msgstr "Codziennie"
+
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Codziennie o <0>9:00</0>"
 
@@ -7394,6 +7445,9 @@ msgstr "Bardzo wysoki"
 
 msgid "Extra small"
 msgstr "Bardzo mały"
+
+msgid "Eyes"
+msgstr "Oczy"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Bramka F4 · {F4_GATE_SHARE}%"
@@ -8097,8 +8151,8 @@ msgstr "Znajdź na stronie"
 msgid "Find in Terminal"
 msgstr "Znajdź w terminalu"
 
-msgid "Find people"
-msgstr "Znajdź osoby"
+msgid "Find people and Devs"
+msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8240,6 +8294,15 @@ msgstr "Grubość czcionki"
 
 msgid "Food & Drink"
 msgstr "Jedzenie i napoje"
+
+msgid "For 1 hour"
+msgstr "Na 1 godzinę"
+
+msgid "For 2 hours"
+msgstr "Na 2 godziny"
+
+msgid "For 30 minutes"
+msgstr "Na 30 minut"
 
 msgid "For a project, open the importer to link it."
 msgstr "W przypadku projektu otwórz importer, aby go połączyć."
@@ -8956,6 +9019,9 @@ msgstr "Jak otwierają się zgrupowane polecenia."
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Czym Paradev różni się od zwykłego uruchomienia Claude Code w terminalu?"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "Jak to działa"
 
@@ -9060,6 +9126,9 @@ msgstr "Bezczynny · gałąź wypchnięta"
 
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Jeśli Paradev przypadł Ci do gustu, gwiazdka na GitHub pomoże innym programistom go odkryć."
+
+msgid "Ignore @channel and @here"
+msgstr "Ignoruj @channel i @here"
 
 msgid "Illegal content"
 msgstr "Nielegalne treści"
@@ -9242,6 +9311,9 @@ msgstr "Wbudowana przeglądarka"
 
 msgid "In-app PR merge"
 msgstr "Scalanie PR w aplikacji"
+
+msgid "Include a preview of the message"
+msgstr "Dołącz podgląd wiadomości"
 
 msgid "Include the Linear ticket id from the prompt in the branch name (e.g. bin-344-fix-login). Prefix branches with fix/ or feat/ based on the task."
 msgstr "Umieść id ticketu Linear z promptu w nazwie gałęzi (np. bin-344-fix-login). Dodawaj do gałęzi prefiks fix/ lub feat/ zależnie od zadania."
@@ -9575,6 +9647,9 @@ msgstr "Nie będzie można go przywrócić."
 
 msgid "It keeps the title from your prompt."
 msgstr "Zachowa tytuł z Twojego polecenia."
+
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Od razu traci cały dostęp. Jego czaty i wykonana praca zostają zachowane."
 
 msgid "It may be asleep"
 msgstr "Może być uśpiony"
@@ -10684,6 +10759,9 @@ msgstr "Udział pamięci"
 msgid "Mention."
 msgstr "Wspomnij."
 
+msgid "Mentioned in a channel"
+msgstr "Wspomniany na kanale"
+
 msgid "Menubar"
 msgstr "Pasek menu"
 
@@ -10745,6 +10823,9 @@ msgstr "Scalanie…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message {name}"
+msgstr "Napisz do {name}"
+
 msgid "Message {name}…"
 msgstr "Wiadomość do {name}…"
 
@@ -10763,6 +10844,9 @@ msgstr "Wiadomość..."
 
 msgid "Messages"
 msgstr "Wiadomości"
+
+msgid "Messages with these words notify you like a mention. Separate them with commas."
+msgstr "Wiadomości z tymi słowami powiadamiają cię jak wzmianka. Oddziel je przecinkami."
 
 msgid "Microphone"
 msgstr "Mikrofon"
@@ -10998,6 +11082,9 @@ msgstr "Wyciszono"
 
 msgid "My Agent"
 msgstr "Mój agent"
+
+msgid "My keywords"
+msgstr "Moje słowa kluczowe"
 
 msgid "My Tasks"
 msgstr "Moje zadania"
@@ -11655,6 +11742,9 @@ msgstr "Nikt w {organizationName} nie pasuje. Wpisz pełny adres e-mail, aby zap
 msgid "No one matches"
 msgstr "Brak dopasowań"
 
+msgid "No one to mention"
+msgstr "Nie ma kogo wspomnieć"
+
 msgid "No open issues found."
 msgstr "Nie znaleziono otwartych zgłoszeń."
 
@@ -12080,8 +12170,14 @@ msgstr "Nic nie jest uruchomione"
 msgid "Nothing was missed"
 msgstr "Nic nie zostało pominięte"
 
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
+
 msgid "Notice"
 msgstr "Powiadomienie"
+
+msgid "Notification schedule"
+msgstr "Harmonogram powiadomień"
 
 msgid "Notification sound"
 msgstr "Dźwięk powiadomienia"
@@ -12091,6 +12187,15 @@ msgstr "Dźwięki powiadomień"
 
 msgid "Notifications"
 msgstr "Powiadomienia"
+
+msgid "Notify every online member in this channel"
+msgstr "Powiadom wszystkich członków tego kanału, którzy są online"
+
+msgid "Notify everyone in this channel"
+msgstr "Powiadom wszystkich w tym kanale"
+
+msgid "Notify me about"
+msgstr "Powiadamiaj mnie o"
 
 msgid "Notion is not configured for this environment."
 msgstr "Notion nie jest skonfigurowany w tym środowisku."
@@ -12207,6 +12312,9 @@ msgstr "Klawiatura ekranowa"
 msgid "Onboarding redesign"
 msgstr "Przeprojektowanie onboardingu"
 
+msgid "Once"
+msgstr "Raz"
+
 msgid "One chat that plans a task, fans out parallel agents across worktrees, and brings the results back together."
 msgstr "Jeden czat, który planuje zadanie, rozsyła równoległych agentów po worktree i zbiera wyniki z powrotem."
 
@@ -12279,11 +12387,11 @@ msgstr "Tylko właściciele hosta lub właściciele organizacji mogą usunąć t
 msgid "Only images can be attached to a comment"
 msgstr "Do komentarza można załączać tylko obrazy"
 
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Tego agenta może zmienić tylko jego twórca lub administrator organizacji"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Tylko na tym komputerze: ignorowany przez git i stosowany do każdego worktree tego repozytorium. Każdy ustawiony tu klucz zastępuje wspólny."
-
-msgid "Only organization admins can manage agents"
-msgstr "Tylko administratorzy organizacji mogą zarządzać agentami"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Tylko właściciele organizacji mogą zmieniać te ustawienia."
@@ -12302,6 +12410,9 @@ msgstr "Tylko właściciele mogą zarządzać rozliczeniami"
 
 msgid "Only owners can update organization settings"
 msgstr "Tylko właściciele mogą zmieniać ustawienia organizacji"
+
+msgid "Only people can manage a channel"
+msgstr "Kanałem mogą zarządzać tylko osoby"
 
 msgid "Only people in this organization can join"
 msgstr "Dołączyć mogą tylko osoby z tej organizacji"
@@ -12350,6 +12461,9 @@ msgstr "Zmienić to może tylko osoba, która utworzyła ten obszar roboczy."
 
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Tylko autor wątku lub właściciel strony może go usunąć"
+
+msgid "Only visible to you"
+msgstr "Widoczne tylko dla ciebie"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "Chcesz tylko usunąć go z paska bocznego? Ukryj go. Nikogo innego to nie dotyczy."
@@ -12998,6 +13112,9 @@ msgstr "Schemat wyjścia"
 msgid "Output truncated"
 msgstr "Wyjście skrócone"
 
+msgid "Outside these hours, channels do not notify you."
+msgstr "Poza tymi godzinami kanały nie wysyłają ci powiadomień."
+
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -13364,6 +13481,9 @@ msgstr "Wstrzymaj"
 msgid "Pause automation"
 msgstr "Wstrzymaj automatyzację"
 
+msgid "Pause notifications"
+msgstr "Wstrzymaj powiadomienia"
+
 msgid "Pause the animation"
 msgstr "Wstrzymaj animację"
 
@@ -13376,6 +13496,10 @@ msgstr "Wstrzymana"
 msgctxt "project state"
 msgid "Paused"
 msgstr "Wstrzymany"
+
+#. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
+msgid "Paused until {0}"
+msgstr "Wstrzymane do {0}"
 
 msgid "Pay {total}"
 msgstr "Zapłać {total}"
@@ -13524,6 +13648,9 @@ msgstr "Wybierz folder worktree na {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Wybierz swojego agenta, aby zainstalować jedną linijką, albo skopiuj konfigurację ręcznie. Każdy klient, w tym konfiguracja OAuth i kluczy API, jest opisany w <0>pełnej dokumentacji serwera MCP</0>."
+
+msgid "Picked by the channel"
+msgstr "Wybrany przez kanał"
 
 msgid "PID"
 msgstr "PID"
@@ -14349,6 +14476,12 @@ msgstr "Odczyt zużycia…"
 msgid "Reading your local usage…"
 msgstr "Odczytywanie lokalnego zużycia…"
 
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
+
 msgid "Ready for review"
 msgstr "Gotowe do przeglądu"
 
@@ -14599,6 +14732,9 @@ msgstr "Usuń {label}"
 
 msgid "Remove {label}?"
 msgstr "Usunąć {label}?"
+
+msgid "Remove {name}"
+msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
 
 msgid "Remove {repositoryName}"
 msgstr "Usuń {repositoryName}"
@@ -15144,6 +15280,9 @@ msgstr "Argumenty wznawiania"
 
 msgid "Resume automation"
 msgstr "Wznów automatyzację"
+
+msgid "Resume notifications"
+msgstr "Wznów powiadomienia"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -16209,6 +16348,9 @@ msgstr "Sesje"
 msgid "Sessions · top {0} by cost"
 msgstr "Sesje · top {0} wg kosztu"
 
+msgid "Set a notification schedule"
+msgstr "Ustaw harmonogram powiadomień"
+
 msgid "Set channel…"
 msgstr "Ustaw kanał…"
 
@@ -16307,6 +16449,9 @@ msgstr "przepis na tooltip z shadcn/ui"
 
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Nasycenie koloru odnosi się do najbardziej pracowitego dnia tego programisty"
+
+msgid "Shape"
+msgstr "Kształt"
 
 msgid "Share"
 msgstr "Udostępnij"
@@ -17428,6 +17573,9 @@ msgstr "Limitowanie zgłoszeń do pomocy nie jest skonfigurowane"
 msgid "Support the project with a GitHub star"
 msgstr "Wesprzyj projekt gwiazdką na GitHub"
 
+msgid "Surprise me"
+msgstr "Zaskocz mnie"
+
 msgid "Suspended"
 msgstr "Zawieszona"
 
@@ -17618,6 +17766,9 @@ msgstr "Sprawdzam…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Trwa dłużej niż zwykle. Będzie działać dalej, nawet jeśli wyjdziesz."
+
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
 
 msgid "Talk to Paradev"
 msgstr "Napisz do Paradev"
@@ -18685,8 +18836,14 @@ msgstr "Myślał przez kilka sekund"
 msgid "Thread"
 msgstr "Wątek"
 
+msgid "Thread in #{channelName}"
+msgstr "Wątek w #{channelName}"
+
 msgid "Thread not found"
 msgstr "Nie znaleziono wątku"
+
+msgid "Thread reply"
+msgstr "Odpowiedź w wątku"
 
 msgid "Threads"
 msgstr "Wątki"
@@ -18714,6 +18871,9 @@ msgstr "Wskazówka"
 
 msgid "Title"
 msgstr "Tytuł"
+
+msgid "to"
+msgstr "do"
 
 msgid "To"
 msgstr "Do"
@@ -19292,6 +19452,12 @@ msgstr "Niezaindeksowane"
 #. placeholder {0}: item.kind
 msgid "Unsupported item \"{0}\""
 msgstr "Nieobsługiwany element „{0}”"
+
+msgid "Until I open the app"
+msgstr "Dopóki nie otworzę aplikacji"
+
+msgid "Until tomorrow"
+msgstr "Do jutra"
 
 msgid "Untitled"
 msgstr "Bez tytułu"
@@ -19981,6 +20147,9 @@ msgstr "Czym jest Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Co jest nie tak?"
 
+msgid "What it does"
+msgstr "Czym się zajmuje"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Czym jest Paradev, kto go tworzy i dla kogo jest. Zespół z San Francisco prowadzony przez trzech byłych CTO z YC, budujący obszar roboczy dla równoległych agentów kodujących."
 
@@ -20037,6 +20206,9 @@ msgstr "Co nowego"
 
 msgid "What's next"
 msgstr "Co dalej"
+
+msgid "When a channel notifies you"
+msgstr "Gdy kanał cię powiadamia"
 
 msgid "When a trigger fires, the Mac you picked opens a new workspace and the agent starts on your prompt. Event runs include the event, so the agent knows what to look at. Reply to the run to keep going."
 msgstr "Gdy wyzwalacz zadziała, wybrany Mac otwiera nowy obszar roboczy, a agent zaczyna pracę nad Twoim promptem. Uruchomienia ze zdarzeń zawierają to zdarzenie, więc agent wie, na co spojrzeć. Odpowiedz w uruchomieniu, aby kontynuować."
@@ -20122,6 +20294,9 @@ msgstr "z załącznikami lub bez"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Dzięki aplikacji mobilnej Paradev mogę rozwiązywać problemy produkcyjne z dowolnego miejsca."
 
+msgid "Woke itself"
+msgstr "Obudził się sam"
+
 msgid "Wordmark, black"
 msgstr "Logotyp, czarny"
 
@@ -20168,6 +20343,9 @@ msgstr "Pracuje od {0} min {1} s"
 
 msgid "Working for {seconds}s"
 msgstr "Pracuje od {seconds} s"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "Pracuje…"
@@ -20490,6 +20668,9 @@ msgstr "Nie masz uprawnień, aby usunąć tego członka"
 
 msgid "You install and connect once per account."
 msgstr "Instalujesz i łączysz raz na konto."
+
+msgid "You mentioned {names}, but they're not in #{channelName}. Add them to the channel?"
+msgstr "Wspomniano {names}, ale nie ma ich w #{channelName}. Dodać ich do kanału?"
 
 msgid "You need to be part of an organization to connect accounts."
 msgstr "Aby łączyć konta, musisz należeć do organizacji."

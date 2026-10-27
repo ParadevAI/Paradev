@@ -1,1 +1,6 @@
-export { type MentionCandidate, rankMentionCandidates } from "./mentionGroups";
+export {
+	type MentionCandidate,
+	matchingBroadcasts,
+	rankMentionCandidates,
+	strongestBroadcast,
+} from "./mentionGroups";

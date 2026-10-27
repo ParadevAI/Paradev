@@ -301,6 +301,9 @@ export type HandleOwnerType = z.infer<typeof handleOwnerTypeEnum>;
 export const agentCredentialKindValues = ["subscription", "api_key"] as const;
 export type AgentCredentialKind = (typeof agentCredentialKindValues)[number];
 
+export const channelKindValues = ["channel", "dm"] as const;
+export const channelKindEnum = z.enum(channelKindValues);
+
 export const channelVisibilityValues = ["public", "private"] as const;
 export const channelVisibilityEnum = z.enum(channelVisibilityValues);
 export type ChannelVisibility = z.infer<typeof channelVisibilityEnum>;
@@ -313,13 +316,8 @@ export const channelNotifyValues = ["all", "mentions", "none"] as const;
 export const channelNotifyEnum = z.enum(channelNotifyValues);
 export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
 
-/** Where an agent works: a person's DM, a channel timeline, or one thread. */
-export const agentSessionKindValues = [
-	"dm",
-	"channel",
-	"thread",
-	"task",
-] as const;
+/** Where a Dev works: its DM with a person, or a thread it was mentioned in. */
+export const agentSessionKindValues = ["dm", "thread"] as const;
 export const agentSessionKindEnum = z.enum(agentSessionKindValues);
 export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
 
@@ -337,10 +335,13 @@ export const agentTurnReasonValues = [
 	"direct_message",
 	"mention",
 	"thread_reply",
-	"dispatch",
-	"automation",
-	"schedule",
-	"wake",
 ] as const;
 export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
 export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
+export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
+export const channelBroadcastEnum = z.enum(channelBroadcastValues);
+export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;
+
+export const dockBounceValues = ["off", "once", "until_focused"] as const;
+export const dockBounceEnum = z.enum(dockBounceValues);
+export type DockBounce = z.infer<typeof dockBounceEnum>;

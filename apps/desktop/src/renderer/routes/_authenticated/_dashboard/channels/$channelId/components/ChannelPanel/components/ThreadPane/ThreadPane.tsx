@@ -153,7 +153,7 @@ export function ThreadPane({
 			<div className="min-h-0 flex-1 overflow-y-auto pb-2">
 				<ChannelMessageRow
 					message={data.root}
-					author={authorOf(data.root.authorUserId)}
+					author={authorOf(data.root.authorId)}
 					compact={false}
 					now={now}
 					currentUserId={currentUserId}
@@ -189,10 +189,8 @@ export function ThreadPane({
 							{isFirstNew && <NewMessagesLine />}
 							<ChannelMessageRow
 								message={reply}
-								author={authorOf(reply.authorUserId)}
-								compact={
-									!isFirstNew && previous?.authorUserId === reply.authorUserId
-								}
+								author={authorOf(reply.authorId)}
+								compact={!isFirstNew && previous?.authorId === reply.authorId}
 								now={now}
 								currentUserId={currentUserId}
 								canModerate={canModerate}

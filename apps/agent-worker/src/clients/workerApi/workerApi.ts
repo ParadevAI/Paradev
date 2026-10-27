@@ -1,3 +1,4 @@
+import type { RoomPoster } from "@superset/agent-harness";
 import { ApplicationFailure } from "@temporalio/common";
 import type { CredentialsProvider, TurnCredentials } from "../credentials";
 import type { HostTarget } from "../hostJobs";
@@ -9,6 +10,7 @@ import type {
 import { TrpcCallError, type TrpcCallOptions, trpcMutation } from "../trpcCall";
 
 const WORKER_SECRET_HEADER = "x-agent-worker-secret";
+const TURN_TOKEN_HEADER = "x-agent-turn-token";
 
 /** API answers that a retry cannot change. */
 const NON_RETRYABLE: Record<string, string> = {
@@ -34,12 +36,15 @@ interface TurnCredentialsResponse {
 	sessionStore: { baseUrl: string; writeTicket: string };
 	host: (HostTarget & { workspaceId: string }) | null;
 	model: { headers: Record<string, string> } | null;
+	room: { channelId: string; threadRootId: string | null } | null;
+	agentToken: string;
 }
 
-/** The API's `agentWorker` routes: per-turn credentials and settling. */
+/** The API's `agentWorker` routes (per-turn credentials and settling) and the Dev's room posts. */
 export function workerApi(options: WorkerApiOptions): {
 	credentials: CredentialsProvider;
 	settler: TurnSettler;
+	roomPoster: (credentials: TurnCredentials) => RoomPoster | null;
 } {
 	const call = <T>(procedure: string, input: unknown) =>
 		trpcMutation<T>(
@@ -77,10 +82,29 @@ export function workerApi(options: WorkerApiOptions): {
 				return {
 					sessionStore: granted.sessionStore,
 					host,
+					room: granted.room,
+					agentToken: granted.agentToken,
 					model: { ...options.model, headers },
 				};
 			},
 		},
+		roomPoster: ({ room, agentToken }) =>
+			room && agentToken
+				? {
+						post: (input) =>
+							trpcMutation<{ id: string }>(
+								`${options.apiUrl}/api/trpc/agentApi.postMessage`,
+								{ [TURN_TOKEN_HEADER]: agentToken },
+								{
+									channelId: room.channelId,
+									body: input.body,
+									threadRootId: input.threadRootId ?? room.threadRootId,
+									idempotencyKey: input.idempotencyKey,
+								},
+								options,
+							).then((message) => ({ messageId: message.id })),
+					}
+				: null,
 		settler: {
 			async settle(input: SettleTurnInput) {
 				try {

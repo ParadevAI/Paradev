@@ -29,9 +29,9 @@ export function MessageReactions({
 		<div className="mt-1 flex flex-wrap items-center gap-1">
 			{reactions.map((reaction) => {
 				const mine =
-					currentUserId !== null && reaction.userIds.includes(currentUserId);
+					currentUserId !== null && reaction.actorIds.includes(currentUserId);
 				const who = formatList(
-					reaction.userIds.map((id) =>
+					reaction.actorIds.map((id) =>
 						id === currentUserId
 							? t({ message: "You", context: "reaction tooltip" })
 							: (peopleById.get(id)?.name ??

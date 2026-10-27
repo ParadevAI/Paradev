@@ -56,17 +56,24 @@ export const agentWorkerRouter = {
 		};
 	}),
 
-	/** What a running turn may touch: its session log, its box, and the model as the box. */
+	/**
+	 * What a running turn may touch: its session log, its box, the model as
+	 * the box, and the room people read it in, with the Dev's token for
+	 * posting there.
+	 */
 	turnCredentials: workerProcedure
 		.input(turnIdSchema)
 		.mutation(async ({ input }) => {
 			const [turn] = await db
 				.select({
+					turnId: agentTurns.id,
 					sessionId: agentTurns.sessionId,
 					agentId: agentTurns.agentId,
 					organizationId: agentTurns.organizationId,
 					actingUserId: agentTurns.actingUserId,
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
+					channelId: agentSessions.channelId,
+					threadRootId: agentSessions.threadRootId,
 				})
 				.from(agentTurns)
 				.innerJoin(agents, eq(agents.id, agentTurns.agentId))
@@ -86,10 +93,21 @@ export const agentWorkerRouter = {
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
+			const {
+				channelId,
+				threadRootId,
+				cloudWorkspaceId: _,
+				...identity
+			} = turn;
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),
 				host: access?.host ?? null,
 				model: access ? { headers: access.modelHeaders } : null,
+				room: channelId ? { channelId, threadRootId } : null,
+				agentToken: await signTurnToken(
+					env.AGENT_TURN_SIGNING_SECRET,
+					identity,
+				),
 				expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
 			};
 		}),

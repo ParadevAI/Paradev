@@ -43,6 +43,7 @@ import {
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
 import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
+import { DashboardSidebarDevsSection } from "./components/DashboardSidebarDevsSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
@@ -509,6 +510,12 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											status={githubStatus}
 											isCollapsed={isCollapsed}
 										/>
+										{isChannelsEnabled && !isCollapsed && (
+											<>
+												<DashboardSidebarChannelsSection />
+												<DashboardSidebarDevsSection />
+											</>
+										)}
 										{(isCollapsed || !workspacesListCollapsed) && (
 											<DashboardSidebarPinnedSection
 												pinnedWorkspaces={displayedPinnedWorkspaces}
@@ -525,9 +532,6 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											onRenameSection={renameSection}
 											onToggleSectionCollapse={toggleSectionCollapsed}
 										/>
-										{isChannelsEnabled && !isCollapsed && (
-											<DashboardSidebarChannelsSection />
-										)}
 										{!isCollapsed && (
 											<div className="mt-3 first:mt-0">
 												<DashboardSidebarBulkActions projects={orderedGroups}>

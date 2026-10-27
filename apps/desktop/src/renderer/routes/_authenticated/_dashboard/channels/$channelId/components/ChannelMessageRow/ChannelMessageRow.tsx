@@ -13,29 +13,42 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useNavigate } from "@tanstack/react-router";
 import { type ComponentProps, useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
+import { useOrgChannels } from "../../hooks/useOrgChannels";
+import { useOrgDevs } from "../../hooks/useOrgDevs";
 import { EDITED_HREF, remarkEditedMark } from "../../utils/remarkEditedMark";
 import {
+	CHANNEL_HREF_PREFIX,
 	MENTION_HREF_PREFIX,
+	remarkChannelRefs,
 	remarkMentions,
 } from "../../utils/remarkMentions";
+import { BroadcastChip } from "../BroadcastChip";
+import { ChannelRefChip } from "../ChannelRefChip";
+import { DevBadge } from "../DevBadge";
+import { DevMentionChip } from "../DevMentionChip";
+import { MentionChip } from "../MentionChip";
 import { PersonAvatar } from "../PersonAvatar";
 import { PersonHoverCard } from "../PersonHoverCard";
-import { MentionChip } from "./components/MentionChip";
 import { MessageActions } from "./components/MessageActions";
 import { MessageAttachments } from "./components/MessageAttachments";
-import { MessageEditor } from "./components/MessageEditor";
+import { type MessageEdit, MessageEditor } from "./components/MessageEditor";
 import { MessageMenu } from "./components/MessageMenu";
 import { MessageReactions } from "./components/MessageReactions";
+import { useMessageDev } from "./hooks/useMessageDev";
 import { useMessageMenuItems } from "./hooks/useMessageMenuItems";
 import { toggleReaction } from "./utils/toggleReaction";
 
+const BROADCAST_ID_PREFIX = "broadcast:";
+const DEV_ID_PREFIX = "dev:";
 export interface ChannelPerson {
 	id: string;
 	name: string;
@@ -76,7 +89,7 @@ export function ChannelMessageRow({
 	const [menuOpen, setMenuOpen] = useState(false);
 	const isPending = message.seq === PENDING_SEQ;
 	const isDeleted = message.deletedAt !== null;
-	const isOwn = message.authorUserId === currentUserId;
+	const isOwn = message.authorId === currentUserId;
 	const onError = (error: unknown) =>
 		toast.error(
 			errorMessage(error, t({ message: "Couldn't save the change" })),
@@ -127,7 +140,7 @@ export function ChannelMessageRow({
 				!message.reactions.some(
 					(reaction) =>
 						reaction.emoji === emoji &&
-						reaction.userIds.includes(currentUserId ?? ""),
+						reaction.actorIds.includes(currentUserId ?? ""),
 				),
 			));
 	const menu = useMessageMenuItems({
@@ -141,18 +154,33 @@ export function ChannelMessageRow({
 				: undefined,
 	});
 
-	const saveEdit = (next: { body: string; mentionedUserIds: string[] }) => {
+	const saveEdit = (next: MessageEdit) => {
 		setEditing(false);
 		if (next.body === message.body) return;
 		apply({ ...message, ...next, editedAt: new Date() });
 		edit.mutate({ messageId: message.id, ...next });
 	};
 
+	const navigate = useNavigate();
+	const channels = useOrgChannels();
+	const devs = useOrgDevs();
 	const markdown = useMemo(() => {
-		const mentioned = message.mentionedUserIds.flatMap((id) => {
-			const person = peopleById.get(id);
-			return person ? [person] : [];
-		});
+		const mentioned = [
+			...message.mentionedIds.flatMap((id) => {
+				const person = peopleById.get(id);
+				if (person) return [person];
+				const dev = devs?.find((candidate) => candidate.id === id);
+				return dev ? [{ id: `${DEV_ID_PREFIX}${id}`, name: dev.name }] : [];
+			}),
+			...(message.broadcast
+				? [
+						{
+							id: `${BROADCAST_ID_PREFIX}${message.broadcast}`,
+							name: message.broadcast,
+						},
+					]
+				: []),
+		];
 		const DefaultLink = chatMarkdownComponents.a;
 		const components: ChatMarkdownProps["components"] = {
 			a: (props: ComponentProps<typeof DefaultLink>) => {
@@ -163,9 +191,34 @@ export function ChannelMessageRow({
 						</span>
 					);
 				}
+				if (props.href?.startsWith(CHANNEL_HREF_PREFIX)) {
+					const channelId = props.href.slice(CHANNEL_HREF_PREFIX.length);
+					return (
+						<ChannelRefChip
+							onClick={() =>
+								void navigate({
+									to: "/channels/$channelId",
+									params: { channelId },
+								})
+							}
+						>
+							{props.children}
+						</ChannelRefChip>
+					);
+				}
 				const id = props.href?.startsWith(MENTION_HREF_PREFIX)
 					? props.href.slice(MENTION_HREF_PREFIX.length)
 					: null;
+				if (id?.startsWith(DEV_ID_PREFIX)) {
+					return (
+						<DevMentionChip agentId={id.slice(DEV_ID_PREFIX.length)}>
+							{props.children}
+						</DevMentionChip>
+					);
+				}
+				if (id?.startsWith(BROADCAST_ID_PREFIX)) {
+					return <BroadcastChip>{props.children}</BroadcastChip>;
+				}
 				const person = id ? peopleById.get(id) : undefined;
 				if (!person) return <DefaultLink {...props} />;
 				return (
@@ -179,23 +232,36 @@ export function ChannelMessageRow({
 				);
 			},
 		};
-		const remarkPlugins = [
-			...(mentioned.length > 0 ? [remarkMentions(mentioned)] : []),
-			...(message.editedAt ? [remarkEditedMark] : []),
-		];
+		const remarkPlugins: NonNullable<ChatMarkdownProps["remarkPlugins"]> = [];
+		if (mentioned.length > 0) {
+			remarkPlugins.push([remarkMentions, { people: mentioned }]);
+		}
+		if (channels?.length && message.body.includes("#")) {
+			remarkPlugins.push([
+				remarkChannelRefs,
+				{ channels: channelRefs(channels) },
+			]);
+		}
+		if (message.editedAt) remarkPlugins.push(remarkEditedMark);
 		return {
 			components,
 			remarkPlugins: remarkPlugins.length > 0 ? remarkPlugins : undefined,
 		};
 	}, [
-		message.mentionedUserIds,
+		message.body,
+		channels,
+		navigate,
+		message.mentionedIds,
+		devs,
+		message.broadcast,
 		message.channelId,
 		message.editedAt,
 		peopleById,
 		currentUserId,
 	]);
 
-	const authorName = author?.name ?? t({ message: "Unknown" });
+	const dev = useMessageDev(message.authorId);
+	const authorName = dev?.name ?? author?.name ?? t({ message: "Unknown" });
 	const time = formatDateTime(message.createdAt, { timeStyle: "short" });
 
 	const interactive = !isPending && !isDeleted && !editing;
@@ -225,6 +291,8 @@ export function ChannelMessageRow({
 						</TooltipTrigger>
 						<TooltipContent>{formatDateTime(message.createdAt)}</TooltipContent>
 					</Tooltip>
+				) : dev ? (
+					<DevAvatar avatar={dev.avatar} size={36} className="mt-0.5" />
 				) : author ? (
 					<PersonHoverCard
 						channelId={message.channelId}
@@ -248,7 +316,12 @@ export function ChannelMessageRow({
 			<div className="min-w-0 flex-1">
 				{!compact && (
 					<div className="flex items-baseline gap-2">
-						{author ? (
+						{dev ? (
+							<span className="flex items-baseline gap-1.5">
+								<span className="text-[15px] font-bold">{authorName}</span>
+								<DevBadge />
+							</span>
+						) : author ? (
 							<PersonHoverCard
 								channelId={message.channelId}
 								person={author}
@@ -281,7 +354,7 @@ export function ChannelMessageRow({
 					<MessageEditor
 						channelId={message.channelId}
 						body={message.body}
-						mentionedUserIds={message.mentionedUserIds}
+						mentionedIds={message.mentionedIds}
 						people={[...peopleById.values()]}
 						currentUserId={currentUserId}
 						onSave={saveEdit}
@@ -353,4 +426,8 @@ export function ChannelMessageRow({
 	) : (
 		row
 	);
+}
+
+function channelRefs(channels: readonly { id: string; name: string }[]) {
+	return channels.map(({ id, name }) => ({ id, name }));
 }

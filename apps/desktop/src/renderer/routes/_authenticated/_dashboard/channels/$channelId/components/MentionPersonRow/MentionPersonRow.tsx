@@ -1,5 +1,7 @@
-import { Trans } from "@lingui/react/macro";
-import { PresenceAvatar } from "../PresenceAvatar";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { cn } from "@superset/ui/utils";
+import { useUserPresence } from "renderer/stores/org-presence";
+import { PersonAvatar } from "../PersonAvatar";
 
 interface MentionPersonRowProps {
 	userId: string;
@@ -17,23 +19,38 @@ export function MentionPersonRow({
 	isSelf,
 	isMember,
 }: MentionPersonRowProps) {
+	const { t } = useLingui();
+	const presence = useUserPresence(userId);
 	return (
-		<div className="flex min-w-0 flex-1 items-center gap-2.5">
-			<PresenceAvatar userId={userId} name={name} image={image} size="sm" />
-			<span className="min-w-0 truncate font-semibold">
-				{name}
-				{isSelf && (
-					<span className="font-normal">
-						{" "}
-						<Trans>(you)</Trans>
-					</span>
-				)}
-			</span>
+		<>
+			<PersonAvatar size="xs" name={name} image={image} />
+			<span className="truncate font-semibold">{name}</span>
+			{isSelf && (
+				<span className="-ml-1 shrink-0 font-semibold">
+					<Trans>(you)</Trans>
+				</span>
+			)}
+			{presence !== "offline" && (
+				<span
+					role="img"
+					aria-label={
+						presence === "active"
+							? t({ message: "Active" })
+							: t({ message: "Away" })
+					}
+					className={cn(
+						"size-[9px] shrink-0 rounded-full",
+						presence === "active"
+							? "bg-emerald-500"
+							: "border-2 border-muted-foreground",
+					)}
+				/>
+			)}
 			{!isMember && (
-				<span className="ms-auto shrink-0 ps-3 text-xs text-muted-foreground">
+				<span className="ml-auto shrink-0 pl-4 text-muted-foreground">
 					<Trans>Not in channel</Trans>
 				</span>
 			)}
-		</div>
+		</>
 	);
 }

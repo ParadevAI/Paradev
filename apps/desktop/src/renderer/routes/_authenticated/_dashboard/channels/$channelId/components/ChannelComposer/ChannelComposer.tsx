@@ -3,17 +3,19 @@ import type { MessageComposerSubmitPayload } from "@superset/chat-ui/MessageComp
 import { MessageComposer } from "@superset/chat-ui/MessageComposer";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useComposerDictation } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useComposerDictation";
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import { pendingMessage } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import {
-	mentionedUserIds,
-	useChannelMentionGroups,
-} from "../../hooks/useChannelMentionGroups";
+	mentionedIds,
+	useChannelMentions,
+} from "../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../hooks/useEmojiSuggestions";
+import { strongestBroadcast } from "../../utils/mentionGroups";
 import type { ChannelPerson } from "../ChannelMessageRow";
+import { MentionInvitePrompt } from "./components/MentionInvitePrompt";
 import { uploadChannelFile } from "./utils/uploadChannelFile";
 
 interface ChannelComposerProps {
@@ -37,12 +39,21 @@ export function ChannelComposer({
 	const { apply, discard } = useApplyChannelMessage();
 	const send = cloudTrpc.channelMessage.send.useMutation();
 	const dictation = useComposerDictation();
-	const getMentionGroups = useChannelMentionGroups({
+	const { mentionProviders, renderChip } = useChannelMentions({
 		channelId,
 		people,
 		currentUserId,
 	});
 	const getEmojiSuggestions = useEmojiSuggestions();
+	const { data: channel } = cloudTrpc.channel.get.useQuery({ channelId });
+	const { data: members } = cloudTrpc.channel.members.useQuery({ channelId });
+	const [outsiderIds, setOutsiderIds] = useState<string[]>([]);
+	const outsiders = useMemo(() => {
+		const memberIds = new Set((members ?? []).map((m) => m.actorId));
+		return people.filter(
+			(person) => outsiderIds.includes(person.id) && !memberIds.has(person.id),
+		);
+	}, [people, members, outsiderIds]);
 	/** A failed message's text, put back in a fresh composer. */
 	const [draft, setDraft] = useState<{ key: number; markdown: string }>({
 		key: 0,
@@ -60,11 +71,12 @@ export function ChannelComposer({
 		}));
 		const pending = pendingMessage({
 			channelId,
-			authorUserId: currentUserId,
+			authorId: currentUserId,
 			body,
 			clientId: crypto.randomUUID(),
 			threadRootId,
-			mentionedUserIds: mentionedUserIds(payload.mentions),
+			mentionedIds: mentionedIds(payload.mentions),
+			broadcast: strongestBroadcast(payload.mentions),
 			attachments: previews,
 		});
 		const release = () => {
@@ -95,27 +107,45 @@ export function ChannelComposer({
 					body,
 					threadRootId,
 					clientId: pending.id,
-					mentionedUserIds: pending.mentionedUserIds,
+					mentionedIds: pending.mentionedIds,
+					broadcast: pending.broadcast,
 					fileIds,
 				}),
 			)
 			.then((sent) => {
 				apply(sent);
 				release();
+				const memberIds = new Set((members ?? []).map((m) => m.actorId));
+				setOutsiderIds(
+					[...new Set(pending.mentionedIds)].filter(
+						(id) => id !== currentUserId && !memberIds.has(id),
+					),
+				);
 			}, fail);
 	};
 
 	return (
-		<MessageComposer
-			key={draft.key}
-			initialMarkdown={draft.markdown || undefined}
-			placeholder={placeholder}
-			getMentionGroups={getMentionGroups}
-			getEmojiSuggestions={getEmojiSuggestions}
-			allowAttachments
-			onSubmit={onSubmit}
-			dictation={dictation}
-			autoFocus={autoFocus}
-		/>
+		<>
+			{channel && outsiders.length > 0 && (
+				<MentionInvitePrompt
+					channelId={channelId}
+					channelName={channel.name}
+					people={outsiders}
+					onDone={() => setOutsiderIds([])}
+				/>
+			)}
+			<MessageComposer
+				key={draft.key}
+				initialMarkdown={draft.markdown || undefined}
+				placeholder={placeholder}
+				mentionProviders={mentionProviders}
+				renderChip={renderChip}
+				getEmojiSuggestions={getEmojiSuggestions}
+				allowAttachments
+				onSubmit={onSubmit}
+				dictation={dictation}
+				autoFocus={autoFocus}
+			/>
+		</>
 	);
 }

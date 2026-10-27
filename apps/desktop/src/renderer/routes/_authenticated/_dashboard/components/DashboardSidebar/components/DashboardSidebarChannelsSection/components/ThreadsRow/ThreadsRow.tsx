@@ -34,11 +34,6 @@ export function ThreadsRow({
 			<span className="min-w-0 flex-1 truncate text-left">
 				<Trans>Threads</Trans>
 			</span>
-			{mentionCount > 0 && (
-				<span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white tabular-nums">
-					{mentionCount}
-				</span>
-			)}
 		</button>
 	);
 }

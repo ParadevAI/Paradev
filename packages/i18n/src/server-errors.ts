@@ -95,7 +95,12 @@ export const serverErrorMessages: Record<
 	"serverError.agent.notFound": () =>
 		i18n._(msg({ message: "Agent not found" })),
 	"serverError.agent.adminRequired": () =>
-		i18n._(msg({ message: "Only organization admins can manage agents" })),
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -328,6 +333,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
 			}),
 		),
 	"serverError.channelMessage.notFound": () =>

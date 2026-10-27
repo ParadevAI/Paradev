@@ -25,7 +25,7 @@ export function unreadState(
 		if (latestSeq === null || message.seq > latestSeq) latestSeq = message.seq;
 		if (
 			message.seq > lastReadSeq &&
-			message.authorUserId !== currentUserId &&
+			message.authorId !== currentUserId &&
 			message.deletedAt === null
 		) {
 			unreadCount += 1;

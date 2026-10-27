@@ -42,6 +42,7 @@ const worker = await Worker.create({
 	activities: createActivities({
 		credentials: api.credentials,
 		settler: api.settler,
+		roomPoster: api.roomPoster,
 		stream: streamSimple,
 	}),
 	shutdownGraceTime: "60 seconds",

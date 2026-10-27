@@ -10,6 +10,7 @@ import { automationRouter } from "./router/automation";
 import { billingRouter } from "./router/billing";
 import {
 	channelMessageRouter,
+	channelNotificationPrefsRouter,
 	channelRouter,
 	channelTaskRouter,
 	channelThreadRouter,
@@ -71,6 +72,7 @@ export const appRouter = createTRPCRouter({
 	taskProject: taskProjectRouter,
 	channel: channelRouter,
 	channelMessage: channelMessageRouter,
+	channelNotificationPrefs: channelNotificationPrefsRouter,
 	channelTask: channelTaskRouter,
 	channelThread: channelThreadRouter,
 	taskRecord: taskRecordRouter,

@@ -27,10 +27,10 @@ import {
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
+import { useChannelNotifyOptions } from "renderer/routes/_authenticated/_dashboard/hooks/useChannelNotifyOptions";
 import { PROTOCOL_SCHEME } from "shared/constants";
 
 type SidebarChannel = RouterOutputs["channel"]["list"][number];
-type Notify = NonNullable<SidebarChannel["notify"]>;
 
 interface ChannelContextMenuProps {
 	channel: SidebarChannel;
@@ -71,11 +71,7 @@ export function ChannelContextMenu({
 	});
 	const [confirmingLeave, setConfirmingLeave] = useState(false);
 	const channelId = channel.id;
-	const notifyOptions: { value: Notify; label: string }[] = [
-		{ value: "all", label: t({ message: "All messages" }) },
-		{ value: "mentions", label: t({ message: "Just mentions" }) },
-		{ value: "none", label: t({ message: "Nothing" }) },
-	];
+	const notify = useChannelNotifyOptions();
 
 	return (
 		<ContextMenu>
@@ -133,15 +129,18 @@ export function ChannelContextMenu({
 								<Trans>Notifications</Trans>
 							</ContextMenuSubTrigger>
 							<ContextMenuSubContent>
-								{notifyOptions.map((option) => (
+								{notify.options.map((option) => (
 									<ContextMenuItem
 										key={option.value}
 										onSelect={() =>
-											setNotify.mutate({ channelId, notify: option.value })
+											setNotify.mutate({
+												channelId,
+												notify: notify.fromOption(option.value),
+											})
 										}
 									>
 										<span className="flex size-4 items-center justify-center">
-											{channel.notify === option.value && (
+											{notify.toOption(channel.notify) === option.value && (
 												<LuCheck className="size-3.5" />
 											)}
 										</span>

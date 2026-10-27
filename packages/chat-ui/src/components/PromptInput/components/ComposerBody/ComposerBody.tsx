@@ -55,6 +55,7 @@ import {
 	type MentionSection,
 	useMentionSources,
 } from "../../hooks/useMentionSources";
+import { useMentionTrigger } from "../../hooks/useMentionTrigger";
 import { usePastedTexts } from "../../hooks/usePastedTexts";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type {
@@ -68,7 +69,6 @@ import type {
 import { registerDraftEdit } from "../../utils/draftEdit";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { $insertTranscript } from "../../utils/insertTranscript";
-import { matchToken } from "../../utils/matchToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { $restoreChips } from "../../utils/restoreChips";
 import {
@@ -417,8 +417,12 @@ export function ComposerBody({
 	const actionContextRef = useRef(actionContext);
 	actionContextRef.current = actionContext;
 
-	const sections = useMentionSources(
+	const { matchTrigger, activeProviders } = useMentionTrigger(
 		mentionProviders ?? [],
+		mentionQuery,
+	);
+	const sections = useMentionSources(
+		activeProviders,
 		mentionQuery != null || browseOpen,
 		mentionQuery ?? "",
 	);
@@ -943,7 +947,7 @@ export function ComposerBody({
 						selectMentionEntry(option.entry, nodeToReplace, closeMenu)
 					}
 					options={mentionOptions}
-					triggerFn={(text) => matchToken(text, "@")}
+					triggerFn={matchTrigger}
 					commandPriority={COMMAND_PRIORITY_HIGH}
 					onClose={() => setMentionQuery(null)}
 					menuRenderFn={(

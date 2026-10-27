@@ -1,118 +1,9 @@
 {
-  "id": "696f5f1c-29f6-4368-a35f-3284c9b44b96",
+  "id": "5736916b-0985-4ca8-8c22-7f1989306090",
   "prevId": "5c2bc7f8-88b8-4307-a8d9-2b9b0a52c938",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.agents": {
-      "name": "agents",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_by_user_id": {
-          "name": "created_by_user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "archived_at": {
-          "name": "archived_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "agents_organization_idx": {
-          "name": "agents_organization_idx",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "agents_organization_id_organizations_id_fk": {
-          "name": "agents_organization_id_organizations_id_fk",
-          "tableFrom": "agents",
-          "tableTo": "organizations",
-          "schemaTo": "auth",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "agents_created_by_user_id_users_id_fk": {
-          "name": "agents_created_by_user_id_users_id_fk",
-          "tableFrom": "agents",
-          "tableTo": "users",
-          "schemaTo": "auth",
-          "columnsFrom": [
-            "created_by_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "auth.accounts": {
       "name": "accounts",
       "schema": "auth",
@@ -2091,74 +1982,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "authz.agent_relations": {
-      "name": "agent_relations",
-      "schema": "authz",
-      "columns": {
-        "agent_id": {
-          "name": "agent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "relation": {
-          "name": "relation",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_type": {
-          "name": "object_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_id": {
-          "name": "object_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "agent_relations_agent_id_agents_id_fk": {
-          "name": "agent_relations_agent_id_agents_id_fk",
-          "tableFrom": "agent_relations",
-          "tableTo": "agents",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "agent_relations_agent_id_relation_object_type_object_id_pk": {
-          "name": "agent_relations_agent_id_relation_object_type_object_id_pk",
-          "columns": [
-            "agent_id",
-            "relation",
-            "object_type",
-            "object_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.channel_members": {
       "name": "channel_members",
       "schema": "",
@@ -2188,11 +2011,17 @@
           "type": "channel_notify",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'mentions'"
+          "notNull": false
         },
         "muted": {
           "name": "muted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "suppress_broadcasts": {
+          "name": "suppress_broadcasts",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -2396,6 +2225,13 @@
           "notNull": true,
           "default": "'{}'::uuid[]"
         },
+        "broadcast": {
+          "name": "broadcast",
+          "type": "channel_broadcast",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
         "client_id": {
           "name": "client_id",
           "type": "text",
@@ -2540,6 +2376,117 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.channel_notification_prefs": {
+      "name": "channel_notification_prefs",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "notify": {
+          "name": "notify",
+          "type": "channel_notify",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'mentions'"
+        },
+        "show_preview": {
+          "name": "show_preview",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "keywords": {
+          "name": "keywords",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "paused_until": {
+          "name": "paused_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "schedule_enabled": {
+          "name": "schedule_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "schedule_days": {
+          "name": "schedule_days",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{0,1,2,3,4,5,6}'::integer[]"
+        },
+        "schedule_start_minute": {
+          "name": "schedule_start_minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 480
+        },
+        "schedule_end_minute": {
+          "name": "schedule_end_minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1320
+        },
+        "time_zone": {
+          "name": "time_zone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dock_bounce": {
+          "name": "dock_bounce",
+          "type": "dock_bounce",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'off'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "channel_notification_prefs_user_id_users_id_fk": {
+          "name": "channel_notification_prefs_user_id_users_id_fk",
+          "tableFrom": "channel_notification_prefs",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -15234,6 +15181,15 @@
         "linear"
       ]
     },
+    "public.channel_broadcast": {
+      "name": "channel_broadcast",
+      "schema": "public",
+      "values": [
+        "here",
+        "channel",
+        "everyone"
+      ]
+    },
     "public.channel_member_role": {
       "name": "channel_member_role",
       "schema": "public",
@@ -15257,6 +15213,15 @@
       "values": [
         "public",
         "private"
+      ]
+    },
+    "public.dock_bounce": {
+      "name": "dock_bounce",
+      "schema": "public",
+      "values": [
+        "off",
+        "once",
+        "until_focused"
       ]
     },
     "public.handle_owner_type": {
@@ -15630,53 +15595,12 @@
   },
   "schemas": {
     "auth": "auth",
-    "authz": "authz",
     "ingest": "ingest"
   },
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {
-    "authz.melange_tuples": {
-      "columns": {
-        "subject_type": {
-          "name": "subject_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "subject_id": {
-          "name": "subject_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "relation": {
-          "name": "relation",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_type": {
-          "name": "object_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_id": {
-          "name": "object_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "definition": "\n\t\tselect 'agent'::text as subject_type, r.agent_id::text as subject_id, r.relation,\n\t\t\tr.object_type, r.object_id::text as object_id\n\t\tfrom authz.agent_relations r\n\t\tjoin public.agents a on a.id = r.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'organization', a.organization_id::text\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t\tunion all\n\t\tselect 'channel', ct.channel_id::text, 'channel', 'task', ct.task_id::text\n\t\tfrom public.channel_tasks ct\n\t\tunion all\n\t\tselect 'organization', t.organization_id::text, 'organization', 'task', t.id::text\n\t\tfrom public.tasks t where t.deleted_at is null\n\t\tunion all\n\t\tselect 'user', w.created_by_user_id::text, 'creator', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w where w.created_by_user_id is not null\n\t\tunion all\n\t\tselect 'organization', w.organization_id::text, 'organization', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w\n\t",
-      "name": "melange_tuples",
-      "schema": "authz",
-      "isExisting": false,
-      "materialized": false
-    }
-  },
+  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

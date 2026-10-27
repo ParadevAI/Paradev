@@ -41,11 +41,19 @@ async function mutate<T>(procedure: string, input: unknown): Promise<T> {
 	return SuperJSON.deserialize<T>(JSON.parse(body).result.data);
 }
 
+const dm = await mutate<{ sessionId: string; channelId: string }>(
+	"agent.openDirectMessage",
+	{ agentId },
+);
 const turn = await mutate<{
 	sessionId: string;
 	turnId: string;
 	outcome: string;
-}>("agent.startDirectTurn", { agentId, promptId: randomUUID(), text });
+}>("agent.promptSession", {
+	sessionId: dm.sessionId,
+	promptId: randomUUID(),
+	text,
+});
 console.log(`turn ${turn.turnId} ${turn.outcome} in session ${turn.sessionId}`);
 
 const stream = await mutate<{ url: string; ticket: string }>(

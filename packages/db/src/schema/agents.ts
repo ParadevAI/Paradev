@@ -1,6 +1,6 @@
+import type { DevAvatar } from "@superset/shared/dev-avatar";
 import { sql } from "drizzle-orm";
 import {
-	type AnyPgColumn,
 	bigint,
 	index,
 	integer,
@@ -12,7 +12,6 @@ import {
 	uniqueIndex,
 	uuid,
 } from "drizzle-orm/pg-core";
-
 import { organizations, users } from "./auth";
 import { channelMessages, channels } from "./channels";
 import {
@@ -23,8 +22,9 @@ import {
 import { cloudWorkspaces } from "./schema";
 
 /**
- * An agent that works in an organization under its own identity. What it may
- * touch is granted in `authz.agent_relations`; archiving it revokes all of it.
+ * A Dev: an agent that works in an organization under its own identity, as
+ * an `actors` row. It reaches a channel by being a member; archiving it
+ * revokes all of it.
  */
 export const agents = pgTable(
 	"agents",
@@ -35,6 +35,12 @@ export const agents = pgTable(
 			.references(() => organizations.id, { onDelete: "cascade" }),
 		name: text().notNull(),
 		description: text(),
+		avatar: jsonb()
+			.$type<DevAvatar>()
+			.notNull()
+			.default({ shape: "pebble", eyes: "dots", color: "#7aa7ff" }),
+		instructions: text(),
+		pausedAt: timestamp("paused_at", { withTimezone: true }),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -67,9 +73,9 @@ export const agentTurnReason = pgEnum(
 );
 
 /**
- * One place an agent works and keeps context: a person's DM, a channel's
- * timeline, a single thread, or a task another session started. Turns happen
- * inside it. Its run state lives in Temporal and the session store.
+ * One place a Dev works and keeps context: its DM with a person, or a thread
+ * it was mentioned in. Turns happen inside it. Its run state lives in
+ * Temporal and the session store.
  */
 export const agentSessions = pgTable(
 	"agent_sessions",
@@ -90,10 +96,6 @@ export const agentSessions = pgTable(
 		}),
 		/** The person a DM is with. */
 		userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
-		parentSessionId: uuid("parent_session_id").references(
-			(): AnyPgColumn => agentSessions.id,
-			{ onDelete: "set null" },
-		),
 		/** The box the session's tools run on. */
 		cloudWorkspaceId: uuid("cloud_workspace_id").references(
 			() => cloudWorkspaces.id,
@@ -110,13 +112,9 @@ export const agentSessions = pgTable(
 		uniqueIndex("agent_sessions_dm_unique")
 			.on(t.agentId, t.userId)
 			.where(sql`${t.kind} = 'dm'`),
-		uniqueIndex("agent_sessions_channel_unique")
-			.on(t.agentId, t.channelId)
-			.where(sql`${t.kind} = 'channel'`),
 		uniqueIndex("agent_sessions_thread_unique")
 			.on(t.agentId, t.threadRootId)
 			.where(sql`${t.kind} = 'thread'`),
-		index("agent_sessions_parent_idx").on(t.parentSessionId),
 	],
 );
 

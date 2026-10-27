@@ -2,7 +2,7 @@ export const CHANNEL_NAME_MAX_LENGTH = 80;
 export const CHANNEL_DESCRIPTION_MAX_LENGTH = 250;
 export const CHANNEL_MESSAGE_MAX_LENGTH = 16_000;
 export const CHANNEL_MESSAGES_PAGE_SIZE = 50;
-export const CHANNEL_PREVIEW_MAX_LENGTH = 140;
+export const CHANNEL_NOTIFICATION_TEXT_MAX_LENGTH = 2_000;
 
 /** Lowercase letters, digits, dashes and underscores, as Slack names channels. */
 export const CHANNEL_NAME_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
@@ -21,7 +21,8 @@ export function normalizeChannelName(input: string): string {
 export interface ChannelReaction {
 	/** Slack shortcode, `+1::skin-tone-3` for a toned one. */
 	emoji: string;
-	userIds: string[];
+	/** People and Devs who reacted. */
+	actorIds: string[];
 }
 
 export interface ChannelAttachment {
@@ -32,14 +33,25 @@ export interface ChannelAttachment {
 	url: string;
 }
 
+export type ChannelBroadcast = "here" | "channel" | "everyone";
+
+export const CHANNEL_BROADCASTS: readonly ChannelBroadcast[] = [
+	"here",
+	"channel",
+	"everyone",
+];
+
 export interface ChannelMessageWire {
 	id: string;
 	channelId: string;
 	seq: number;
 	threadRootId: string | null;
-	authorUserId: string | null;
+	/** A person's user id or a Dev's agent id. */
+	authorId: string | null;
 	body: string;
-	mentionedUserIds: string[];
+	/** The people and Devs the message mentions. */
+	mentionedIds: string[];
+	broadcast: ChannelBroadcast | null;
 	clientId: string | null;
 	replyCount: number;
 	lastReplyAt: string | null;
@@ -50,7 +62,8 @@ export interface ChannelMessageWire {
 	attachments: ChannelAttachment[];
 }
 
-export type ChannelNotifyReason = "mention" | "reply" | "message";
+/** `here` is an @here: the client drops it while its person is away. */
+export type ChannelNotifyReason = "mention" | "here" | "reply" | "message";
 
 export type ChannelRealtimeEvent =
 	| { type: "channel.message"; channelId: string; message: ChannelMessageWire }
@@ -73,13 +86,16 @@ export type ChannelRealtimeEvent =
 	| {
 			type: "channel.notify";
 			organizationId: string;
+			organizationName: string;
 			channelId: string;
 			channelName: string;
 			messageId: string;
 			threadRootId: string | null;
 			reason: ChannelNotifyReason;
 			authorName: string;
+			/** Empty when `showPreview` is off. */
 			preview: string;
+			showPreview: boolean;
 	  };
 
 const EVENT_TYPES = new Set([
@@ -116,9 +132,34 @@ export const USER_EVENTS_PATH = "/v2/user/events";
 /** Where the API publishes events for a set of users. */
 export const USERS_PUBLISH_PATH = "/v2/users/publish";
 
-export function previewOf(body: string): string {
-	const flat = body.replace(/\s+/g, " ").trim();
-	return flat.length > CHANNEL_PREVIEW_MAX_LENGTH
-		? `${flat.slice(0, CHANNEL_PREVIEW_MAX_LENGTH - 1)}…`
-		: flat;
+const MARKDOWN_TO_TEXT: [RegExp, string][] = [
+	[/^```[^\n]*\n?|\n?```$/gm, ""],
+	[/!\[([^\]]*)\]\([^)]*\)/g, "$1"],
+	[/\[([^\]]+)\]\([^)]*\)/g, "$1"],
+	[/<(https?:\/\/[^>]+)>/g, "$1"],
+	[/`([^`\n]+)`/g, "$1"],
+	[/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, "$2"],
+	[/~~(?=\S)([\s\S]*?\S)~~/g, "$1"],
+	[/(^|[^\w*])\*(?=\S)([^*\n]*?\S)\*(?!\w)/g, "$1$2"],
+	[/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, "$1$2"],
+	[/^#{1,6}\s+/gm, ""],
+	[/^\s*>\s?/gm, ""],
+	[/^(\s*)[-*+]\s+(\[[ x]\]\s+)?/gm, "$1• "],
+	[/\\([\\`*_{}[\]()#+\-.!~>|])/g, "$1"],
+	[/\n{3,}/g, "\n\n"],
+];
+
+/**
+ * A message as plain text for a notification, the way Slack's banners show
+ * it: formatting marks and link targets removed, line breaks kept.
+ */
+export function notificationTextOf(body: string): string {
+	let text = body;
+	for (const [pattern, replacement] of MARKDOWN_TO_TEXT) {
+		text = text.replace(pattern, replacement);
+	}
+	text = text.trim();
+	return text.length > CHANNEL_NOTIFICATION_TEXT_MAX_LENGTH
+		? `${text.slice(0, CHANNEL_NOTIFICATION_TEXT_MAX_LENGTH - 1)}…`
+		: text;
 }

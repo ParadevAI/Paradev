@@ -55,15 +55,21 @@ import { isDropHandled, markDropHandled } from "../../../../utils/handledDrops";
 import { AttachmentPills } from "../../../PromptInput/components/AttachmentPills";
 import { ContextButton } from "../../../PromptInput/components/ContextButton";
 import { DictationBar } from "../../../PromptInput/components/DictationBar";
+import { MentionMenu } from "../../../PromptInput/components/MentionMenu";
 import { useDictation } from "../../../PromptInput/hooks/useDictation";
+import { useMentionSources } from "../../../PromptInput/hooks/useMentionSources";
+import { useMentionTrigger } from "../../../PromptInput/hooks/useMentionTrigger";
 import { MentionChipNode } from "../../../PromptInput/nodes/mentionChipNode";
-import type { ComposerChip } from "../../../PromptInput/types";
+import type {
+	ComposerActionContext,
+	ComposerChip,
+	ComposerMentionEntry,
+} from "../../../PromptInput/types";
 import { $insertTranscript } from "../../../PromptInput/utils/insertTranscript";
-import { matchToken } from "../../../PromptInput/utils/matchToken";
+import { MentionTypeaheadOption } from "../../../PromptInput/utils/typeaheadOptions";
 import { useMessageAttachments } from "../../hooks/useMessageAttachments";
-import type { MessageComposerProps, MessageMentionEntry } from "../../types";
+import type { MessageComposerProps } from "../../types";
 import { $isInCode } from "../../utils/isInCode";
-import { MessageMentionOption } from "../../utils/mentionOption";
 import {
 	$messageMarkdown,
 	MESSAGE_SHORTCUTS,
@@ -71,7 +77,6 @@ import {
 import { CodeFencePlugin } from "../CodeFencePlugin";
 import { EmojiTypeahead } from "../EmojiTypeahead";
 import { FormatToolbar } from "../FormatToolbar";
-import { MessageMentionMenu } from "../MessageMentionMenu";
 
 const FOOTER_BUTTON_CLASS =
 	"flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors";
@@ -116,17 +121,17 @@ function $collectChips(): ComposerChip[] {
 
 type MessageComposerBodyProps = Omit<
 	MessageComposerProps,
-	"className" | "initialMarkdown"
+	"className" | "initialMarkdown" | "renderChip"
 >;
 
 /**
  * A channel message composer, copied from PromptInput's body and cut down to
- * what a channel needs: @ mentions with host-drawn rows, dictation and send.
+ * what a channel needs: @ mentions, dictation and send.
  */
 export function MessageComposerBody({
 	ref,
 	placeholder,
-	getMentionGroups,
+	mentionProviders,
 	onSubmit,
 	dictation,
 	allowAttachments = false,
@@ -164,42 +169,56 @@ export function MessageComposerBody({
 	}, [editor]);
 	useImperativeHandle(ref, () => ({ focus: focusAtEnd }), [focusAtEnd]);
 
-	const groups = useMemo(
-		() => (mentionQuery == null ? [] : getMentionGroups(mentionQuery)),
-		[getMentionGroups, mentionQuery],
+	const actionContext: ComposerActionContext = {
+		insertChip: (chip) => editor.update(() => $insertChipAtSelection(chip)),
+		attachFiles: () => fileInputRef.current?.click(),
+		openPanel: () => {},
+		query: mentionQuery ?? "",
+	};
+	const actionContextRef = useRef(actionContext);
+	actionContextRef.current = actionContext;
+
+	const { matchTrigger, activeProviders } = useMentionTrigger(
+		mentionProviders,
+		mentionQuery,
 	);
-	const browseGroups = useMemo(
-		() => (browseOpen ? getMentionGroups("") : []),
-		[browseOpen, getMentionGroups],
+	const sections = useMentionSources(
+		activeProviders,
+		mentionQuery != null || browseOpen,
+		mentionQuery ?? "",
+	);
+	const browseSections = useMemo(
+		() => sections.filter((section) => section.entries.length > 0),
+		[sections],
 	);
 	const browseEntries = useMemo(
-		() => browseGroups.flatMap((group) => group.entries),
-		[browseGroups],
+		() => browseSections.flatMap((section) => section.entries),
+		[browseSections],
 	);
 	const options = useMemo(
 		() =>
-			groups.flatMap((group) =>
-				group.entries.map((entry) => new MessageMentionOption(entry)),
+			sections.flatMap((section) =>
+				section.entries.map((entry) => new MentionTypeaheadOption(entry)),
 			),
-		[groups],
+		[sections],
 	);
 
 	const selectEntry = (
-		entry: MessageMentionEntry,
+		entry: ComposerMentionEntry,
 		nodeToReplace: LexicalNode | null,
 		closeMenu: () => void,
 	) => {
 		editor.update(() => {
 			nodeToReplace?.remove();
-			$insertChipAtSelection(entry.chip);
 			closeMenu();
 		});
+		void entry.select(actionContextRef.current);
 	};
 
-	const selectBrowseEntry = (entry: MessageMentionEntry) => {
+	const selectBrowseEntry = (entry: ComposerMentionEntry) => {
 		setBrowseOpen(false);
 		editor.focus();
-		editor.update(() => $insertChipAtSelection(entry.chip));
+		void entry.select(actionContextRef.current);
 	};
 
 	// Typing "@" replaces browsing; the two menus never show together.
@@ -476,8 +495,8 @@ export function MessageComposerBody({
 				className="pointer-events-none absolute inset-x-0 bottom-full pb-2 [&>*]:pointer-events-auto"
 			>
 				{browseOpen && mentionQuery == null && (
-					<MessageMentionMenu
-						groups={browseGroups}
+					<MentionMenu
+						sections={browseSections}
 						selectedIndex={browseIndex}
 						onHighlight={setBrowseIndex}
 						onSelect={selectBrowseEntry}
@@ -507,13 +526,13 @@ export function MessageComposerBody({
 				<LinkPlugin />
 				<MarkdownShortcutPlugin transformers={MESSAGE_SHORTCUTS} />
 				<CodeFencePlugin />
-				<LexicalTypeaheadMenuPlugin<MessageMentionOption>
+				<LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
 					onQueryChange={setMentionQuery}
 					onSelectOption={(option, nodeToReplace, closeMenu) =>
 						selectEntry(option.entry, nodeToReplace, closeMenu)
 					}
 					options={options}
-					triggerFn={(text) => ($isInCode() ? null : matchToken(text, "@"))}
+					triggerFn={(text) => ($isInCode() ? null : matchTrigger(text))}
 					commandPriority={COMMAND_PRIORITY_HIGH}
 					onClose={() => setMentionQuery(null)}
 					menuRenderFn={(
@@ -522,8 +541,8 @@ export function MessageComposerBody({
 					) =>
 						anchorElementRef.current && menuSlot
 							? createPortal(
-									<MessageMentionMenu
-										groups={groups}
+									<MentionMenu
+										sections={sections}
 										selectedIndex={selectedIndex}
 										onHighlight={setHighlightedIndex}
 										onSelect={(entry) => {

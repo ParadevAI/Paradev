@@ -26,7 +26,8 @@ interface ChannelDetailsDialogProps {
 	channel: ChannelSummary;
 	peopleById: Map<string, ChannelPerson>;
 	currentUserId: string | null;
-	onSetNotify: (notify: ChannelNotify) => void;
+	onSetNotify: (notify: ChannelNotify | null) => void;
+	onSetSuppressBroadcasts: (suppress: boolean) => void;
 	onLeave: () => void;
 	onArchive: () => void;
 }
@@ -41,6 +42,7 @@ export function ChannelDetailsDialog({
 	peopleById,
 	currentUserId,
 	onSetNotify,
+	onSetSuppressBroadcasts,
 	onLeave,
 	onArchive,
 }: ChannelDetailsDialogProps) {
@@ -79,6 +81,8 @@ export function ChannelDetailsDialog({
 							<ChannelNotifyMenu
 								value={channel.membership.notify}
 								onChange={onSetNotify}
+								suppressBroadcasts={channel.membership.suppressBroadcasts}
+								onSuppressBroadcastsChange={onSetSuppressBroadcasts}
 							/>
 						</div>
 					)}

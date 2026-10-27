@@ -174,13 +174,13 @@ export const taskRecordRouter = {
 						id: fromChannel.id,
 						name: fromChannel.name,
 						visibility: fromChannel.visibility,
-						viewerIsMember: fromChannelMember.userId,
+						viewerIsMember: fromChannelMember.actorId,
 					},
 					toChannel: {
 						id: toChannel.id,
 						name: toChannel.name,
 						visibility: toChannel.visibility,
-						viewerIsMember: toChannelMember.userId,
+						viewerIsMember: toChannelMember.actorId,
 					},
 				})
 				.from(taskActivity)
@@ -200,14 +200,14 @@ export const taskRecordRouter = {
 					fromChannelMember,
 					and(
 						eq(fromChannelMember.channelId, taskActivity.fromChannelId),
-						eq(fromChannelMember.userId, ctx.userId),
+						eq(fromChannelMember.actorId, ctx.userId),
 					),
 				)
 				.leftJoin(
 					toChannelMember,
 					and(
 						eq(toChannelMember.channelId, taskActivity.toChannelId),
-						eq(toChannelMember.userId, ctx.userId),
+						eq(toChannelMember.actorId, ctx.userId),
 					),
 				)
 				.where(eq(taskActivity.taskId, task.id))

@@ -744,15 +744,6 @@ msgstr "{appName} Mobile在你連線的電腦上執行代理程式。"
 msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
 msgstr "{approvalCount, plural, other {# 個需要核准}}"
 
-msgid "{authorName} in #{channelName}"
-msgstr "{authorName} 在 #{channelName}"
-
-msgid "{authorName} mentioned you in #{channelName}"
-msgstr "{authorName} 在 #{channelName} 中提及了你"
-
-msgid "{authorName} replied in #{channelName}"
-msgstr "{authorName} 在 #{channelName} 中回覆了"
-
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落後main #個提交，需要變基} other {落後main #個提交，需要變基}}"
 
@@ -1625,6 +1616,9 @@ msgstr "多數生產變更在無人閱讀差異的情況下合併。"
 msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
 msgstr "一個資訊清單檔加幾個技能檔案。Paradev 會把它放到每個代理程式查找的位置。"
 
+msgid "a message from {authorName}"
+msgstr "來自 {authorName} 的訊息"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "需要新版本的Paradev才能繼續。請更新到最新版本。"
 
@@ -1902,6 +1896,9 @@ msgstr "新增檔案、應用等"
 msgid "Add files, apps, and more (@)"
 msgstr "新增檔案、應用等（@）"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "將議題#{0}新增到工作區"
@@ -1978,6 +1975,9 @@ msgstr "給風險最高又沒測試的程式碼補上測試…"
 msgid "Add tests where they're missing"
 msgstr "給缺測試的地方補測試"
 
+msgid "Add them"
+msgstr "加入"
+
 msgid "Add this label"
 msgstr "新增此標籤"
 
@@ -1998,6 +1998,9 @@ msgstr "新增到側邊欄"
 
 msgid "Add to workspace"
 msgstr "新增到工作區"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "向此裝置新增你自己的終端代理程式。"
@@ -2272,6 +2275,9 @@ msgstr "所有訊息"
 
 msgid "All models"
 msgstr "所有模型"
+
+msgid "All new messages"
+msgstr "所有新訊息"
 
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "所有目標均已達成。已在最高一級，沒有更高可追。"
@@ -2710,6 +2716,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "歸檔"
+
+msgid "Archive {name}?"
+msgstr "要封存 {name} 嗎？"
 
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
@@ -3276,6 +3285,9 @@ msgstr "底部抽屜，在觸控螢幕裝置上便於滑動操作。"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "已購 GB 小時剩餘：{prepaid}"
+
+msgid "Bounce the Dock icon"
+msgstr "彈跳 Dock 圖示"
 
 msgid "Box"
 msgstr "Box"
@@ -5427,6 +5439,9 @@ msgstr "無法更新分支"
 msgid "serverError.plugins.credentialUnverified"
 msgstr "無法驗證憑證：{reason}"
 
+msgid "Couldn't add them to the channel"
+msgstr "無法將他們加入頻道"
+
 msgid "Couldn't ask the workspace for a description"
 msgstr "無法請求工作區產生描述"
 
@@ -5615,6 +5630,9 @@ msgstr "無法儲存編輯"
 msgid "Couldn't save the change"
 msgstr "無法儲存變更"
 
+msgid "Couldn't save the Dev"
+msgstr "無法儲存 Dev"
+
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
 
@@ -5626,6 +5644,9 @@ msgstr "無法傳送訊息"
 
 msgid "Couldn't send the message. Attach the files again."
 msgstr "無法傳送訊息。請重新附加檔案。"
+
+msgid "Couldn't send the reply"
+msgstr "無法傳送回覆"
 
 msgid "Couldn't send to agent"
 msgstr "無法傳送給代理程式"
@@ -5704,6 +5725,9 @@ msgstr "建立「{newLabel}」"
 
 msgid "Create a channel"
 msgstr "建立頻道"
+
+msgid "Create a Dev"
+msgstr "建立 Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "在供應商端建立具有相同對話上下文的原生分支。原本的會話維持不變。"
@@ -5867,6 +5891,9 @@ msgstr "創建於{0} · 最後使用{1}"
 
 msgid "Created {ago}"
 msgstr "建立於{ago}"
+
+msgid "Created {created}"
+msgstr "建立於 {created}"
 
 msgid "Created {createdAgo}"
 msgstr "建立於{createdAgo}"
@@ -6032,6 +6059,12 @@ msgstr "自訂提供商"
 msgid "Custom themes"
 msgstr "自訂主題"
 
+msgid "Customize"
+msgstr "自訂"
+
+msgid "Customize {devName}"
+msgstr "自訂 {devName}"
+
 msgid "Customize commands"
 msgstr "自訂命令"
 
@@ -6138,6 +6171,9 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 
 msgid "Default ({defaultWorktreePath})"
 msgstr "預設（{defaultWorktreePath}）"
+
+msgid "Default ({fallback})"
+msgstr "預設（{fallback}）"
 
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "新工作區的預設基底分支。可在建立時為各工作區個別覆寫。"
@@ -6465,6 +6501,9 @@ msgstr "此處無法顯示詳細資料，但連結仍可開啟。"
 msgid "Dev"
 msgstr "開發"
 
+msgid "Dev options"
+msgstr "Dev 選項"
+
 msgid "Dev sign in"
 msgstr "開發登入"
 
@@ -6491,6 +6530,9 @@ msgstr "裝置：{selectedLabel}"
 
 msgid "Devices"
 msgstr "裝置"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6578,12 @@ msgstr "在新分頁看差異"
 
 msgid "Digital Product Designer"
 msgstr "數位產品設計師"
+
+msgid "Direct message"
+msgstr "私人訊息"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "直接模式"
@@ -7197,6 +7245,9 @@ msgstr "每個維度都在為下一等級出力。保持住，等級自然會來
 msgid "Every channel and thread you follow."
 msgstr "你追蹤的所有頻道和討論串。"
 
+msgid "Every day"
+msgstr "每天"
+
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "每天 <0>上午 9:00</0>"
 
@@ -7394,6 +7445,9 @@ msgstr "極高"
 
 msgid "Extra small"
 msgstr "超小"
+
+msgid "Eyes"
+msgstr "眼睛"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4關卡 · {F4_GATE_SHARE}%"
@@ -8097,8 +8151,8 @@ msgstr "在頁面中查詢"
 msgid "Find in Terminal"
 msgstr "在終端中查詢"
 
-msgid "Find people"
-msgstr "尋找成員"
+msgid "Find people and Devs"
+msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8240,6 +8294,15 @@ msgstr "字重"
 
 msgid "Food & Drink"
 msgstr "食物與飲料"
+
+msgid "For 1 hour"
+msgstr "1 小時"
+
+msgid "For 2 hours"
+msgstr "2 小時"
+
+msgid "For 30 minutes"
+msgstr "30 分鐘"
 
 msgid "For a project, open the importer to link it."
 msgstr "對於專案，請開啟匯入工具進行連結。"
@@ -8956,6 +9019,9 @@ msgstr "群組命令的開啟方式。"
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev和直接在終端裡跑Claude Code有什麼不同？"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "工作方式"
 
@@ -9060,6 +9126,9 @@ msgstr "空閒 · 分支已推送"
 
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "如果你覺得Paradev還不錯，一個GitHub星標能幫助更多開發者發現它。"
+
+msgid "Ignore @channel and @here"
+msgstr "忽略 @channel 和 @here"
 
 msgid "Illegal content"
 msgstr "違法內容"
@@ -9242,6 +9311,9 @@ msgstr "應用程式內瀏覽器"
 
 msgid "In-app PR merge"
 msgstr "應用程式內合併PR"
+
+msgid "Include a preview of the message"
+msgstr "包含訊息預覽"
 
 msgid "Include the Linear ticket id from the prompt in the branch name (e.g. bin-344-fix-login). Prefix branches with fix/ or feat/ based on the task."
 msgstr "在分支名中包含提示詞裡的Linear工單ID（例如bin-344-fix-login）。根據任務為分支加上fix/或feat/字首。"
@@ -9575,6 +9647,9 @@ msgstr "刪除後無法復原。"
 
 msgid "It keeps the title from your prompt."
 msgstr "將保留根據你的提示產生的標題。"
+
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "它會立即失去所有存取權限。它的聊天和產出的工作會保留。"
 
 msgid "It may be asleep"
 msgstr "裝置可能處於睡眠狀態"
@@ -10684,6 +10759,9 @@ msgstr "記憶體佔比"
 msgid "Mention."
 msgstr "提及。"
 
+msgid "Mentioned in a channel"
+msgstr "在頻道中被提及"
+
 msgid "Menubar"
 msgstr "選單欄"
 
@@ -10745,6 +10823,9 @@ msgstr "正在合併…"
 msgid "Mesh Gradient"
 msgstr "網格漸變"
 
+msgid "Message {name}"
+msgstr "傳訊息給 {name}"
+
 msgid "Message {name}…"
 msgstr "傳訊息給 {name}…"
 
@@ -10763,6 +10844,9 @@ msgstr "訊息..."
 
 msgid "Messages"
 msgstr "訊息"
+
+msgid "Messages with these words notify you like a mention. Separate them with commas."
+msgstr "包含這些字詞的訊息會像提及一樣通知你。請以逗號分隔。"
 
 msgid "Microphone"
 msgstr "麥克風"
@@ -10998,6 +11082,9 @@ msgstr "已靜音"
 
 msgid "My Agent"
 msgstr "我的代理程式"
+
+msgid "My keywords"
+msgstr "我的關鍵字"
 
 msgid "My Tasks"
 msgstr "我的任務"
@@ -11655,6 +11742,9 @@ msgstr "{organizationName} 中沒有相符的人。輸入完整電子郵件地�
 msgid "No one matches"
 msgstr "沒有符合的成員"
 
+msgid "No one to mention"
+msgstr "沒有可提及的人"
+
 msgid "No open issues found."
 msgstr "未找到開啟的議題。"
 
@@ -12080,8 +12170,14 @@ msgstr "沒有正在執行的項目"
 msgid "Nothing was missed"
 msgstr "沒有錯過的執行"
 
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
+
 msgid "Notice"
 msgstr "提示"
+
+msgid "Notification schedule"
+msgstr "通知時間表"
 
 msgid "Notification sound"
 msgstr "通知聲音"
@@ -12091,6 +12187,15 @@ msgstr "通知聲音"
 
 msgid "Notifications"
 msgstr "通知"
+
+msgid "Notify every online member in this channel"
+msgstr "通知此頻道中所有線上成員"
+
+msgid "Notify everyone in this channel"
+msgstr "通知此頻道中的所有人"
+
+msgid "Notify me about"
+msgstr "通知我"
 
 msgid "Notion is not configured for this environment."
 msgstr "目前環境未配置Notion。"
@@ -12207,6 +12312,9 @@ msgstr "螢幕鍵盤"
 msgid "Onboarding redesign"
 msgstr "新手引導改版"
 
+msgid "Once"
+msgstr "一次"
+
 msgid "One chat that plans a task, fans out parallel agents across worktrees, and brings the results back together."
 msgstr "一個聊天視窗規劃任務，把並行代理程式分派到各個worktree，再把結果彙總回來。"
 
@@ -12279,11 +12387,11 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
 
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "只有建立者或組織管理員可以變更此代理程式"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "僅限本機：會被 git 忽略，並套用至此儲存庫的每個 worktree。在此設定的任何鍵都會取代共享的值。"
-
-msgid "Only organization admins can manage agents"
-msgstr "只有組織管理員可以管理代理程式"
 
 msgid "Only organization owners can modify these settings."
 msgstr "只有組織擁有者可以修改這些設定。"
@@ -12302,6 +12410,9 @@ msgstr "只有擁有者才能管理帳單"
 
 msgid "Only owners can update organization settings"
 msgstr "只有擁有者才能更新組織設定"
+
+msgid "Only people can manage a channel"
+msgstr "只有成員本人可以管理頻道"
 
 msgid "Only people in this organization can join"
 msgstr "只有此組織中的成員可以加入"
@@ -12350,6 +12461,9 @@ msgstr "只有建立此工作區的人可以變更這些設定。"
 
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "只有討論串的作者或頁面擁有者才能刪除它"
+
+msgid "Only visible to you"
+msgstr "只有你看得到"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "只是想把它從側邊欄移除？請改為隱藏。不會影響其他人。"
@@ -12998,6 +13112,9 @@ msgstr "輸出結構"
 msgid "Output truncated"
 msgstr "輸出已截斷"
 
+msgid "Outside these hours, channels do not notify you."
+msgstr "在這些時段以外，頻道不會通知你。"
+
 msgid "Overflow Fade"
 msgstr "溢位漸隱"
 
@@ -13364,6 +13481,9 @@ msgstr "暫停"
 msgid "Pause automation"
 msgstr "暫停自動化"
 
+msgid "Pause notifications"
+msgstr "暫停通知"
+
 msgid "Pause the animation"
 msgstr "暫停動畫"
 
@@ -13376,6 +13496,10 @@ msgstr "已暫停"
 msgctxt "project state"
 msgid "Paused"
 msgstr "已暫停"
+
+#. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
+msgid "Paused until {0}"
+msgstr "已暫停至 {0}"
 
 msgid "Pay {total}"
 msgstr "支付 {total}"
@@ -13524,6 +13648,9 @@ msgstr "在{hostName}上選擇worktree資料夾。"
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "選擇你的代理程式獲取一行安裝命令，或者手動複製配置。所有客戶端（含OAuth和API金鑰設定）都在<0>完整的MCP伺服器文件</0>裡。"
+
+msgid "Picked by the channel"
+msgstr "由頻道選中"
 
 msgid "PID"
 msgstr "PID"
@@ -14349,6 +14476,12 @@ msgstr "正在讀取用量…"
 msgid "Reading your local usage…"
 msgstr "正在讀取本地用量…"
 
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
+
 msgid "Ready for review"
 msgstr "待審查"
 
@@ -14599,6 +14732,9 @@ msgstr "移除 {label}"
 
 msgid "Remove {label}?"
 msgstr "移除{label}？"
+
+msgid "Remove {name}"
+msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
 
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
@@ -15144,6 +15280,9 @@ msgstr "恢復引數"
 
 msgid "Resume automation"
 msgstr "恢復自動化"
+
+msgid "Resume notifications"
+msgstr "恢復通知"
 
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
@@ -16209,6 +16348,9 @@ msgstr "會話"
 msgid "Sessions · top {0} by cost"
 msgstr "會話 · 按費用排名前{0}"
 
+msgid "Set a notification schedule"
+msgstr "設定通知時間表"
+
 msgid "Set channel…"
 msgstr "設定頻道…"
 
@@ -16307,6 +16449,9 @@ msgstr "shadcn/ui的tooltip方案"
 
 msgid "Shade is relative to this developer's busiest day"
 msgstr "深淺以該開發者最忙的一天為基準"
+
+msgid "Shape"
+msgstr "形狀"
 
 msgid "Share"
 msgstr "分享"
@@ -17428,6 +17573,9 @@ msgstr "未配置支援請求速率限制"
 msgid "Support the project with a GitHub star"
 msgstr "在GitHub上點個star來支援這個專案"
 
+msgid "Surprise me"
+msgstr "隨機一下"
+
 msgid "Suspended"
 msgstr "已暫停"
 
@@ -17618,6 +17766,9 @@ msgstr "正在查看…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平時久一些。你離開後它也會繼續。"
+
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
 
 msgid "Talk to Paradev"
 msgstr "聯絡Paradev"
@@ -18685,8 +18836,14 @@ msgstr "思考了幾秒"
 msgid "Thread"
 msgstr "討論串"
 
+msgid "Thread in #{channelName}"
+msgstr "#{channelName} 中的討論串"
+
 msgid "Thread not found"
 msgstr "未找到討論串"
+
+msgid "Thread reply"
+msgstr "討論串回覆"
 
 msgid "Threads"
 msgstr "討論串"
@@ -18714,6 +18871,9 @@ msgstr "提示"
 
 msgid "Title"
 msgstr "標題"
+
+msgid "to"
+msgstr "至"
 
 msgid "To"
 msgstr "到"
@@ -19292,6 +19452,12 @@ msgstr "未暫存"
 #. placeholder {0}: item.kind
 msgid "Unsupported item \"{0}\""
 msgstr "不支援的專案「{0}」"
+
+msgid "Until I open the app"
+msgstr "直到我開啟應用程式"
+
+msgid "Until tomorrow"
+msgstr "直到明天"
 
 msgid "Untitled"
 msgstr "未命名"
@@ -19981,6 +20147,9 @@ msgstr "什麼是Paradev Enterprise？"
 msgid "What is wrong?"
 msgstr "哪裡有問題？"
 
+msgid "What it does"
+msgstr "它做什麼"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Paradev 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
 
@@ -20037,6 +20206,9 @@ msgstr "最新動態"
 
 msgid "What's next"
 msgstr "接下來"
+
+msgid "When a channel notifies you"
+msgstr "當頻道通知你時"
 
 msgid "When a trigger fires, the Mac you picked opens a new workspace and the agent starts on your prompt. Event runs include the event, so the agent knows what to look at. Reply to the run to keep going."
 msgstr "觸發器觸發時，你選的 Mac 會開啟一個新工作區，代理程式開始執行你的提示詞。由事件觸發的執行會帶上該事件，所以代理程式知道要看什麼。在執行中回覆即可繼續。"
@@ -20122,6 +20294,9 @@ msgstr "有無附件均可"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "有了 Paradev 手機應用程式，我可以隨時隨地處理正式環境問題。"
 
+msgid "Woke itself"
+msgstr "自行喚醒"
+
 msgid "Wordmark, black"
 msgstr "文字標誌，黑色"
 
@@ -20168,6 +20343,9 @@ msgstr "已執行 {0} 分 {1} 秒"
 
 msgid "Working for {seconds}s"
 msgstr "已執行 {seconds} 秒"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "處理中…"
@@ -20490,6 +20668,9 @@ msgstr "你沒有移除該成員的權限"
 
 msgid "You install and connect once per account."
 msgstr "每個帳號只需安裝和連接一次。"
+
+msgid "You mentioned {names}, but they're not in #{channelName}. Add them to the channel?"
+msgstr "你提及了 {names}，但他們不在 #{channelName} 中。要將他們加入頻道嗎？"
 
 msgid "You need to be part of an organization to connect accounts."
 msgstr "您需要加入組織才能連接帳戶。"
