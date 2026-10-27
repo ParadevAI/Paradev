@@ -35,7 +35,15 @@ function Composer() {
 		<PromptInput
 			chipForPaste={chipForPaste}
 			commands={[]}
-			defaultValue="Draft about https://github.com/acme/widgets/issues/7 here"
+			draft={{
+				segments: [
+					{
+						type: "text",
+						text: "Draft about https://github.com/acme/widgets/issues/7 here",
+					},
+				],
+				attachments: [],
+			}}
 			mentionProviders={mentionProviders}
 			ref={(instance) => {
 				handle.current = instance;

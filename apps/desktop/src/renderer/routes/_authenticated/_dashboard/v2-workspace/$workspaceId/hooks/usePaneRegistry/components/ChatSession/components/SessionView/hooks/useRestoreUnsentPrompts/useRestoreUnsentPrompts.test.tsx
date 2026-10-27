@@ -1,7 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
 import type { SessionClient, StreamStatus } from "@superset/chat/client";
-import type { OutboxEntry } from "@superset/chat/core";
+import { type OutboxEntry, userMessageText } from "@superset/chat/core";
 import { type ChatSession, useChatSession } from "@superset/chat/react";
+import { type ComposerDraft, draftText } from "@superset/chat-ui/PromptInput";
 import {
 	act,
 	cleanup,
@@ -13,6 +14,12 @@ import { useComposerDraft } from "../../../Composer/hooks/useComposerDraft";
 import { useRestoreUnsentPrompts } from "./useRestoreUnsentPrompts";
 
 const DRAFT_KEY = "chat-v3-draft:stopped-outbox";
+const draftOf = (entry: OutboxEntry): ComposerDraft => ({
+	segments: [
+		{ type: "text", text: userMessageText({ content: entry.content }) },
+	],
+	attachments: [],
+});
 let current: ChatSession;
 
 function Probe({
@@ -23,7 +30,7 @@ function Probe({
 	sendEnabled: boolean;
 }) {
 	current = useChatSession({ client, sendEnabled });
-	useRestoreUnsentPrompts(DRAFT_KEY, current.outbox);
+	useRestoreUnsentPrompts(DRAFT_KEY, current.outbox, draftOf);
 	return null;
 }
 
@@ -52,6 +59,7 @@ test("stopped-session replacement preserves unsent text without flushing on tran
 		},
 		removeQueuedPrompt: async () => {},
 		steerQueuedPrompt: async () => {},
+		updateQueuedPrompt: async () => {},
 		resumeQueue: async () => {},
 		cancelTurn: async () => {},
 		stopBackgroundTask: async () => false,
@@ -90,14 +98,14 @@ test("stopped-session replacement preserves unsent text without flushing on tran
 	);
 	await waitFor(() => expect(current.connection).toBe("open"));
 	const draft = renderHook(() => useComposerDraft(DRAFT_KEY));
-	expect(draft.result.current.storedDraft).toBe(
+	expect(draftText(draft.result.current.storedDraft?.segments ?? [])).toBe(
 		"unsent message\n\nunfinished draft",
 	);
 	expect(prompts).toBe(0);
 	view.unmount();
-	expect(window.localStorage.getItem(DRAFT_KEY)).toBe(
-		"unsent message\n\nunfinished draft",
-	);
+	expect(
+		draftText(JSON.parse(window.localStorage.getItem(DRAFT_KEY) ?? "[]")),
+	).toBe("unsent message\n\nunfinished draft");
 });
 
 test("replacement does not restore a prompt whose delivery is uncertain", () => {
@@ -111,7 +119,7 @@ test("replacement does not restore a prompt whose delivery is uncertain", () => 
 	};
 	const key = "chat-v3-draft:uncertain-outbox";
 	const hook = renderHook(
-		({ outbox }) => useRestoreUnsentPrompts(key, outbox),
+		({ outbox }) => useRestoreUnsentPrompts(key, outbox, draftOf),
 		{ initialProps: { outbox: [entry] } },
 	);
 	hook.rerender({ outbox: [{ ...entry, state: "queued" }] });

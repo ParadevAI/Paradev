@@ -439,7 +439,9 @@ test("a terminal launch keeps what was typed by releasing the pane as a chat", a
 	);
 	cleanup();
 	const drafted = await waitingPane(false, "typed-draft");
-	prependToDraft("chat-v3-draft:typed-draft", ["half a sentence"]);
+	prependToDraft("chat-v3-draft:typed-draft", [
+		{ segments: [{ type: "text", text: "half a sentence" }], attachments: [] },
+	]);
 	show(drafted.store, "terminal-draft-workspace");
 	await waitFor(() =>
 		expect(drafted.store.getState().tabs[0]?.panes[drafted.paneId]?.kind).toBe(

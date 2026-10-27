@@ -586,6 +586,7 @@ export function NewWorkspaceScreen({
 			}),
 		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
 	);
+	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const selectLaunchOption = useCallback(
 		(configId: string, value: string) => {
 			const picked = launchOptionValue(value);
@@ -942,7 +943,9 @@ export function NewWorkspaceScreen({
 								<ModelPicker
 									agentSwitcher={agentSwitcher}
 									configOptions={launchOptions}
+									onOpenChange={setModelPickerOpen}
 									onSelect={selectLaunchOption}
+									open={modelPickerOpen}
 								/>
 							)
 						}

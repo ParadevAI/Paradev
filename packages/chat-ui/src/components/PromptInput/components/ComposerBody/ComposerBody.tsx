@@ -120,10 +120,7 @@ function matchCommandToken(text: string) {
 }
 
 export type ComposerBodyProps = Required<
-	Pick<
-		PromptInputProps,
-		"placeholder" | "status"
-	>
+	Pick<PromptInputProps, "placeholder" | "status">
 > &
 	Pick<
 		PromptInputProps,
