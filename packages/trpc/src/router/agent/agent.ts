@@ -14,7 +14,7 @@ import {
 import { findOrgMembership } from "@superset/db/utils";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
@@ -164,6 +164,7 @@ export const agentRouter = {
 			});
 			return {
 				url: `${env.REALTIME_URL}/v2/agent-runtime/sessions/${session.id}/stream`,
+				baseUrl: `${env.REALTIME_URL}/v2/agent-runtime`,
 				ticket,
 				expiresInSeconds,
 			};
@@ -223,19 +224,63 @@ export const agentRouter = {
 				.limit(1);
 			if (!session) throw agentNotFound();
 
-			const { promptId, text } = input;
-			const turn = await recordDirectTurn(session.id, agent, userId, promptId);
-			try {
-				await dispatchTurn(session.id, turn, {
-					promptId,
-					text,
-					actingUserId: userId,
-				});
-			} catch (error) {
-				await forgetUndelivered(turn, promptId);
-				throw error;
-			}
-			return turn;
+			return sendDirect(session.id, agent, userId, input);
+		}),
+
+	/** The person's DM sessions, newest first; a cloud workspace narrows them to that box. */
+	listSessions: protectedProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				cloudWorkspaceId: z.string().uuid().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			return db
+				.select({
+					sessionId: agentSessions.id,
+					agentId: agents.id,
+					agentName: agents.name,
+					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
+					lastActivityAt: agentSessions.lastActivityAt,
+					running: sql<boolean>`exists (select 1 from ${agentTurns} where ${agentTurns.sessionId} = ${agentSessions.id} and ${agentTurns.status} = 'running')`,
+				})
+				.from(agentSessions)
+				.innerJoin(agents, eq(agents.id, agentSessions.agentId))
+				.where(
+					and(
+						eq(agentSessions.organizationId, input.organizationId),
+						eq(agentSessions.kind, "dm"),
+						eq(agentSessions.userId, userId),
+						isNull(agents.archivedAt),
+						input.cloudWorkspaceId
+							? eq(agentSessions.cloudWorkspaceId, input.cloudWorkspaceId)
+							: undefined,
+					),
+				)
+				.orderBy(desc(agentSessions.lastActivityAt));
+		}),
+
+	/** A message in a session the person already has open, as chat sends it. */
+	promptSession: protectedProcedure
+		.input(
+			z.object({
+				sessionId: z.string().uuid(),
+				promptId: z.string().min(1).max(200),
+				text: z.string().trim().min(1).max(MAX_PROMPT_CHARS),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const session = await loadOwnSession(userId, input.sessionId);
+			const [agent] = await db
+				.select({ id: agents.id, organizationId: agents.organizationId })
+				.from(agents)
+				.where(eq(agents.id, session.agentId))
+				.limit(1);
+			if (!agent) throw agentNotFound();
+			return sendDirect(session.id, agent, userId, input);
 		}),
 } satisfies TRPCRouterRecord;
 
@@ -324,6 +369,26 @@ async function recordDirectTurn(
 	throw agentNotFound();
 }
 
+async function sendDirect(
+	sessionId: string,
+	agent: { id: string; organizationId: string },
+	userId: string,
+	{ promptId, text }: { promptId: string; text: string },
+): Promise<DirectTurn> {
+	const turn = await recordDirectTurn(sessionId, agent, userId, promptId);
+	try {
+		await dispatchTurn(sessionId, turn, {
+			promptId,
+			text,
+			actingUserId: userId,
+		});
+	} catch (error) {
+		await forgetUndelivered(turn, promptId);
+		throw error;
+	}
+	return turn;
+}
+
 /**
  * A prompt the workflow never got must not hold a turn open: a new turn is
  * removed, and a steer is taken off its turn so settling does not wait for it.
@@ -372,7 +437,7 @@ async function dispatchTurn(
 /** A DM session belongs to the person it is with; anything else reads as not found. */
 async function loadOwnSession(userId: string, sessionId: string) {
 	const [session] = await db
-		.select({ id: agentSessions.id })
+		.select({ id: agentSessions.id, agentId: agentSessions.agentId })
 		.from(agentSessions)
 		.innerJoin(agents, eq(agents.id, agentSessions.agentId))
 		.where(

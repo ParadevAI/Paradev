@@ -20,11 +20,13 @@ export class PiToAcp {
 
 	constructor(private readonly cwd: string) {}
 
-	userMessage(messageId: string, text: string): AcpUpdate {
+	/** `clientId` is the sender's prompt id; the chat client confirms its send when the echo carries it. */
+	userMessage(messageId: string, text: string, clientId?: string): AcpUpdate {
 		return {
 			sessionUpdate: "user_message",
 			messageId,
 			content: [{ type: "text", text }],
+			...(clientId ? { clientId } : {}),
 		};
 	}
 

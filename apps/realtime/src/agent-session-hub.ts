@@ -3,7 +3,9 @@ import { type Connection, type ConnectionContext, Server } from "partyserver";
 import {
 	AgentSessionLog,
 	type AppendInput,
+	type EventsBefore,
 	type EventsSince,
+	type SessionHead,
 	type SqlCursor,
 	type TranscriptRow,
 } from "./agent-session/AgentSessionLog";
@@ -49,6 +51,19 @@ export class AgentSessionHub extends Server<RealtimeEnv> {
 		const cursor = parseOptionalCursor(since);
 		if (cursor === "invalid") return { reset: "invalid_cursor" };
 		return this.sessionLog().eventsSince(cursor, limit);
+	}
+
+	async eventsBefore(
+		before: string | null,
+		limit: number,
+	): Promise<EventsBefore> {
+		const cursor = parseOptionalCursor(before);
+		if (cursor === "invalid") return { reset: "invalid_cursor" };
+		return this.sessionLog().eventsBefore(cursor, limit);
+	}
+
+	async head(): Promise<SessionHead> {
+		return this.sessionLog().head();
 	}
 
 	async transcript(query: {

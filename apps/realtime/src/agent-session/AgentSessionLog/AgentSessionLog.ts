@@ -7,6 +7,7 @@ import type {
 	DeltaEnvelope,
 	DurableEnvelope,
 	DurableEvent,
+	SessionState,
 	Turn,
 } from "@superset/chat/protocol";
 
@@ -48,6 +49,17 @@ export interface TranscriptRow {
 export type EventsSince =
 	| { reset: "epoch_changed" | "invalid_cursor" }
 	| { envelopes: DurableEnvelope[]; more: boolean };
+
+/** Newest first by page, oldest first within one, as chat-v3's `getItems` pages. */
+export type EventsBefore =
+	| { reset: "epoch_changed" | "invalid_cursor" }
+	| { envelopes: DurableEnvelope[]; nextBefore: Cursor | null };
+
+export interface SessionHead {
+	cursor: Cursor | null;
+	session: SessionState | null;
+	updatedAt: number | null;
+}
 
 const HARNESS = "agent-harness";
 const MAX_VALUE_CHARS = 1_500_000;
@@ -174,6 +186,55 @@ export class AgentSessionLog {
 						JSON.parse(row.event_json) as DurableEvent,
 					),
 				),
+		};
+	}
+
+	eventsBefore(before: Cursor | null, limit = 200): EventsBefore {
+		const epoch = this.epoch();
+		if (before && before.epoch !== epoch) return { reset: "epoch_changed" };
+		const rows = this.sql
+			.exec<{ seq: number; ts: number; event_json: string }>(
+				"SELECT seq, ts, event_json FROM events WHERE epoch = ? AND seq < ? ORDER BY seq DESC LIMIT ?",
+				epoch,
+				before?.seq ?? Number.MAX_SAFE_INTEGER,
+				limit + 1,
+			)
+			.toArray();
+		const page = rows.slice(0, limit).reverse();
+		const oldest = page[0];
+		return {
+			envelopes: page.map((row) =>
+				this.envelope(
+					{ epoch, seq: row.seq },
+					row.ts,
+					JSON.parse(row.event_json) as DurableEvent,
+				),
+			),
+			nextBefore:
+				rows.length > limit && oldest ? { epoch, seq: oldest.seq } : null,
+		};
+	}
+
+	head(): SessionHead {
+		const epoch = this.epoch();
+		const [last] = this.sql
+			.exec<{ seq: number; ts: number }>(
+				"SELECT seq, ts FROM events WHERE epoch = ? ORDER BY seq DESC LIMIT 1",
+				epoch,
+			)
+			.toArray();
+		const [state] = this.sql
+			.exec<{ event_json: string }>(
+				`SELECT event_json FROM events WHERE epoch = ? AND event_json LIKE '{"type":"session"%' ORDER BY seq DESC LIMIT 1`,
+				epoch,
+			)
+			.toArray();
+		return {
+			cursor: last ? { epoch, seq: last.seq } : null,
+			session: state
+				? (JSON.parse(state.event_json) as { session: SessionState }).session
+				: null,
+			updatedAt: last?.ts ?? null,
 		};
 	}
 

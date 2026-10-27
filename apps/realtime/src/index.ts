@@ -542,7 +542,18 @@ app.get("/v2/agent-runtime/sessions/:sessionId/events", async (c) => {
 		1_000,
 	);
 	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	const before = c.req.query("before");
+	if (before !== undefined) {
+		return c.json(await stub.eventsBefore(before || null, limit));
+	}
 	return c.json(await stub.eventsSince(c.req.query("since") ?? null, limit));
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/head", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "read");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json(await stub.head());
 });
 
 app.get("/v2/agent-runtime/sessions/:sessionId/transcript", async (c) => {

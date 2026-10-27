@@ -160,7 +160,11 @@ export function createActivities(deps: ActivityDeps) {
 				turnStart: { startedAtMs: now() },
 				acp: [
 					toAcp.running(),
-					toAcp.userMessage(`user-${input.promptId}`, input.text),
+					toAcp.userMessage(
+						`user-${input.promptId}`,
+						input.text,
+						input.promptId,
+					),
 				],
 				transcript: [userMessage(input.text, now())],
 			});
@@ -175,7 +179,13 @@ export function createActivities(deps: ActivityDeps) {
 				await store.append({
 					stepKey: `steer/${steer.promptId}`,
 					turnId: input.turnId,
-					acp: [toAcp.userMessage(`user-${steer.promptId}`, steer.text)],
+					acp: [
+						toAcp.userMessage(
+							`user-${steer.promptId}`,
+							steer.text,
+							steer.promptId,
+						),
+					],
 					transcript: [userMessage(steer.text, now())],
 				});
 			}

@@ -52,7 +52,7 @@ describe("pi events through ACP into chat-v3 events", () => {
 		};
 
 		run(mapper.startTurn(turnId, 1_000));
-		run(mapper.apply(toAcp.userMessage("u-1", "run the tests"), turnId));
+		run(mapper.apply(toAcp.userMessage("u-1", "run the tests", "p-1"), turnId));
 
 		const toolCall = {
 			type: "toolCall" as const,
@@ -106,6 +106,7 @@ describe("pi events through ACP into chat-v3 events", () => {
 		const tool = items.find((item) => item.kind === "tool_call");
 		expect(user).toMatchObject({
 			content: [{ type: "text", text: "run the tests" }],
+			clientId: "p-1",
 		});
 		expect(reply && "text" in reply ? reply.text : null).toBe("Running");
 		expect(deltas.join("")).toBe("Running");

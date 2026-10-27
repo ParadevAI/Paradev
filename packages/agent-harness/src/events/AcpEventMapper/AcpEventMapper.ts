@@ -24,6 +24,7 @@ export class AcpEventMapper {
 	private readonly now: () => number;
 	private readonly stream: SessionStream;
 	private pending: MappedOutput = { events: [], deltas: [] };
+	private clientId: string | undefined;
 	private lastStartMs = 0;
 
 	constructor(private readonly options: AcpEventMapperOptions) {
@@ -34,7 +35,14 @@ export class AcpEventMapper {
 			scopeIdsByTurn: true,
 			streamUserMessages: true,
 			emitItem: (item, turnId) =>
-				this.pending.events.push({ type: "item", item, turnId }),
+				this.pending.events.push({
+					type: "item",
+					item:
+						item.kind === "user_message" && this.clientId
+							? { ...item, clientId: this.clientId }
+							: item,
+					turnId,
+				}),
 			emitTextDelta: (itemId, append) =>
 				this.pending.deltas.push({ type: "text", itemId, append }),
 			attachmentOf: () => null,
@@ -59,7 +67,7 @@ export class AcpEventMapper {
 				{ type: "turn", turn },
 				{
 					type: "session",
-					session: { status: "running", harness: this.options.harness },
+					session: this.sessionState("running"),
 				},
 			],
 			deltas: [],
@@ -68,7 +76,10 @@ export class AcpEventMapper {
 
 	apply(update: AcpUpdate, turnId: string): MappedOutput {
 		if (update.sessionUpdate !== "state_update") {
+			this.clientId =
+				typeof update.clientId === "string" ? update.clientId : undefined;
 			this.stream.handleUpdate(update.sessionUpdate, update, turnId);
+			this.clientId = undefined;
 		}
 		return this.take();
 	}
@@ -80,10 +91,15 @@ export class AcpEventMapper {
 			{ type: "turn", turn },
 			{
 				type: "session",
-				session: { status: "idle", harness: this.options.harness },
+				session: this.sessionState("idle"),
 			},
 		);
 		return out;
+	}
+
+	/** The host's prompt queue does not exist here: a message sent mid-turn joins the turn. */
+	private sessionState(status: "running" | "idle") {
+		return { status, harness: this.options.harness, queueControls: false };
 	}
 
 	private take(): MappedOutput {

@@ -121,4 +121,28 @@ describe("AgentSessionLog", () => {
 			reset: "epoch_changed",
 		});
 	});
+
+	it("pages backwards from the newest event and reports the session head", () => {
+		const { log } = newLog();
+		expect(log.head()).toMatchObject({ cursor: null, session: null });
+		log.append({
+			stepKey: "a",
+			turnId: "t1",
+			turnStart: { startedAtMs: 1_000 },
+			acp: [toolStart],
+		});
+		log.append({ stepKey: "b", turnId: "t1", acp: [toolEnd] });
+		const newest = log.eventsBefore(null, 2);
+		if ("reset" in newest) throw new Error("unexpected reset");
+		expect(newest.envelopes.map((e) => e.cursor.seq)).toEqual([3, 4]);
+		expect(newest.nextBefore?.seq).toBe(3);
+		const older = log.eventsBefore(newest.nextBefore, 2);
+		if ("reset" in older) throw new Error("unexpected reset");
+		expect(older.envelopes.map((e) => e.cursor.seq)).toEqual([1, 2]);
+		expect(older.nextBefore).toBeNull();
+		expect(log.head()).toMatchObject({
+			cursor: { seq: 4 },
+			session: { status: "running", queueControls: false },
+		});
+	});
 });
