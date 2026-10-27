@@ -12387,9 +12387,6 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
 
-msgid "Only its creator"
-msgstr "僅建立者"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有建立者或組織管理員可以變更此代理程式"
 
@@ -12413,6 +12410,9 @@ msgstr "只有擁有者才能管理帳單"
 
 msgid "Only owners can update organization settings"
 msgstr "只有擁有者才能更新組織設定"
+
+msgid "Only people can manage a channel"
+msgstr "只有成員本人可以管理頻道"
 
 msgid "Only people in this organization can join"
 msgstr "只有此組織中的成員可以加入"
@@ -18455,9 +18455,6 @@ msgstr "此代理無法分叉對話"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "此代理程式無法在雲端工作區中執行"
-
-msgid "This agent is paused"
-msgstr "此代理程式已暫停"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"

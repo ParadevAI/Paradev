@@ -510,6 +510,12 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											status={githubStatus}
 											isCollapsed={isCollapsed}
 										/>
+										{isChannelsEnabled && !isCollapsed && (
+											<>
+												<DashboardSidebarChannelsSection />
+												<DashboardSidebarDevsSection />
+											</>
+										)}
 										{(isCollapsed || !workspacesListCollapsed) && (
 											<DashboardSidebarPinnedSection
 												pinnedWorkspaces={displayedPinnedWorkspaces}
@@ -526,12 +532,6 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											onRenameSection={renameSection}
 											onToggleSectionCollapse={toggleSectionCollapsed}
 										/>
-										{isChannelsEnabled && !isCollapsed && (
-											<>
-												<DashboardSidebarChannelsSection />
-												<DashboardSidebarDevsSection />
-											</>
-										)}
 										{!isCollapsed && (
 											<div className="mt-3 first:mt-0">
 												<DashboardSidebarBulkActions projects={orderedGroups}>

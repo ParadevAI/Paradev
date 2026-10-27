@@ -54,7 +54,7 @@ export const channelTaskRouter = {
 					name: channels.name,
 					visibility: channels.visibility,
 					organizationId: channels.organizationId,
-					isMember: channelMembers.userId,
+					isMember: channelMembers.actorId,
 				})
 				.from(channelTasks)
 				.innerJoin(channels, eq(channels.id, channelTasks.channelId))
@@ -62,7 +62,7 @@ export const channelTaskRouter = {
 					channelMembers,
 					and(
 						eq(channelMembers.channelId, channels.id),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				)
 				.where(eq(channelTasks.taskId, input.taskId))

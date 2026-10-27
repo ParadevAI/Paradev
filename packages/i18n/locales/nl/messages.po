@@ -12387,9 +12387,6 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
-msgid "Only its creator"
-msgstr "Alleen de maker"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
 
@@ -12413,6 +12410,9 @@ msgstr "Alleen eigenaren kunnen de facturering beheren"
 
 msgid "Only owners can update organization settings"
 msgstr "Alleen eigenaren kunnen organisatie-instellingen bijwerken"
+
+msgid "Only people can manage a channel"
+msgstr "Alleen mensen kunnen een kanaal beheren"
 
 msgid "Only people in this organization can join"
 msgstr "Alleen mensen in deze organisatie kunnen deelnemen"
@@ -18455,9 +18455,6 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
-
-msgid "This agent is paused"
-msgstr "Deze agent is gepauzeerd"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."

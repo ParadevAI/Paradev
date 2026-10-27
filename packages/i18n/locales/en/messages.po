@@ -12387,9 +12387,6 @@ msgstr "Only host owners or organization owners can delete this host"
 msgid "Only images can be attached to a comment"
 msgstr "Only images can be attached to a comment"
 
-msgid "Only its creator"
-msgstr "Only its creator"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Only its creator or an organization admin can change this agent"
 
@@ -12413,6 +12410,9 @@ msgstr "Only owners can manage billing"
 
 msgid "Only owners can update organization settings"
 msgstr "Only owners can update organization settings"
+
+msgid "Only people can manage a channel"
+msgstr "Only people can manage a channel"
 
 msgid "Only people in this organization can join"
 msgstr "Only people in this organization can join"
@@ -18455,9 +18455,6 @@ msgstr "This agent can't branch a conversation"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "This agent can't run in a cloud workspace"
-
-msgid "This agent is paused"
-msgstr "This agent is paused"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."

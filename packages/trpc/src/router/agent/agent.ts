@@ -12,13 +12,11 @@ import {
 	randomDevAvatar,
 } from "@superset/shared/dev-avatar";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, exists, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
-import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
 import { ensureDirectMessage } from "./direct-message";
-import { startOrJoinTurn } from "./turns";
 
 const agentIdSchema = z.object({ agentId: z.string().uuid() });
 const avatarSchema = z.custom<DevAvatar>(isDevAvatar, "Invalid avatar");
@@ -29,7 +27,6 @@ const listColumns = {
 	name: agents.name,
 	description: agents.description,
 	avatar: agents.avatar,
-	messageAccess: agents.messageAccess,
 	pausedAt: agents.pausedAt,
 	createdByUserId: agents.createdByUserId,
 	createdAt: agents.createdAt,
@@ -63,10 +60,6 @@ export const agentRouter = {
 					and(
 						eq(agents.organizationId, input.organizationId),
 						isNull(agents.archivedAt),
-						or(
-							eq(agents.messageAccess, "organization"),
-							eq(agents.createdByUserId, ctx.session.user.id),
-						),
 					),
 				)
 				.orderBy(asc(agents.createdAt));
@@ -86,7 +79,7 @@ export const agentRouter = {
 				.innerJoin(channels, eq(channels.id, channelMembers.channelId))
 				.where(
 					and(
-						eq(channelMembers.agentId, agent.id),
+						eq(channelMembers.actorId, agent.id),
 						eq(channels.kind, "channel"),
 						isNull(channels.archivedAt),
 					),
@@ -109,7 +102,6 @@ export const agentRouter = {
 		return {
 			...row,
 			instructions: agent.instructions,
-			model: agent.model,
 			canManage,
 			channels: grants,
 			recentTurns,
@@ -152,8 +144,6 @@ export const agentRouter = {
 				description: z.string().trim().max(500).nullish(),
 				avatar: avatarSchema.optional(),
 				instructions: z.string().max(8000).nullish(),
-				model: z.string().max(100).nullish(),
-				messageAccess: z.enum(["organization", "creator"]).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input: { agentId, ...changes } }) => {
@@ -211,36 +201,6 @@ export const agentRouter = {
 					);
 			});
 			return { archived: true };
-		}),
-
-	/**
-	 * Sends a prompt to the caller's DM with the agent, acting as the caller:
-	 * starts a turn, or joins the running one as its `steerSeq`-th steer.
-	 * A resent prompt changes nothing. Retries when the running turn settles
-	 * between the insert and the join.
-	 */
-	startDirectTurn: protectedProcedure
-		.input(agentIdSchema.extend({ promptId: z.string().min(1).max(200) }))
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
-			const { agent } = await loadAgentAccess(userId, input.agentId);
-			if (agent.pausedAt) {
-				throw userError({
-					code: "PRECONDITION_FAILED",
-					message: "This agent is paused",
-					i18nKey: "serverError.agent.paused",
-				});
-			}
-
-			const { sessionId } = await ensureDirectMessage(agent, userId);
-			const turn = await startOrJoinTurn({
-				agent,
-				sessionId,
-				actingUserId: userId,
-				promptId: input.promptId,
-				reason: "direct_message",
-			});
-			return { sessionId, ...turn };
 		}),
 
 	/** The caller's DM room with a Dev, made on first open. */

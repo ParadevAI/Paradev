@@ -73,7 +73,7 @@ export async function loadChannelAccess(
 		.where(
 			and(
 				eq(channelMembers.channelId, channelId),
-				eq(channelMembers.userId, userId),
+				eq(channelMembers.actorId, userId),
 			),
 		)
 		.limit(1);

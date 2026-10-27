@@ -199,7 +199,7 @@ export function ChannelTimeline({
 				(message) =>
 					message.seq > line &&
 					message.seq !== PENDING_SEQ &&
-					message.authorUserId !== currentUserId,
+					message.authorId !== currentUserId,
 			);
 		const oldest = messages[0];
 		if (
@@ -478,8 +478,8 @@ export function ChannelTimeline({
 							key={entry.key}
 							message={message}
 							author={
-								message.authorUserId
-									? (peopleById.get(message.authorUserId) ?? null)
+								message.authorId
+									? (peopleById.get(message.authorId) ?? null)
 									: null
 							}
 							compact={entry.compact}

@@ -1,9 +1,92 @@
 {
-  "id": "48242313-9788-415c-b00d-07e252a4e428",
-  "prevId": "b6b7b9ba-c3d8-4360-8fcf-138931b319f2",
+  "id": "c1d17ec0-c4d7-4937-a145-05ee4675ddee",
+  "prevId": "1c5cbdd8-a1b7-40a8-bb36-10f704b24cd3",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.actors": {
+      "name": "actors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actors_user_id_users_id_fk": {
+          "name": "actors_user_id_users_id_fk",
+          "tableFrom": "actors",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "actors_agent_id_agents_id_fk": {
+          "name": "actors_agent_id_agents_id_fk",
+          "tableFrom": "actors",
+          "columnsFrom": [
+            "agent_id"
+          ],
+          "tableTo": "agents",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "actors_user_id_unique": {
+          "name": "actors_user_id_unique",
+          "columns": [
+            "user_id"
+          ],
+          "nullsNotDistinct": false
+        },
+        "actors_agent_id_unique": {
+          "name": "actors_agent_id_unique",
+          "columns": [
+            "agent_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "actors_one_kind": {
+          "name": "actors_one_kind",
+          "value": "(\"actors\".\"user_id\" IS NULL) <> (\"actors\".\"agent_id\" IS NULL)"
+        },
+        "actors_id_matches": {
+          "name": "actors_id_matches",
+          "value": "\"actors\".\"id\" = coalesce(\"actors\".\"user_id\", \"actors\".\"agent_id\")"
+        }
+      },
+      "isRLSEnabled": false
+    },
     "public.agent_sessions": {
       "name": "agent_sessions",
       "schema": "",
@@ -52,12 +135,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "parent_session_id": {
-          "name": "parent_session_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "cloud_workspace_id": {
           "name": "cloud_workspace_id",
           "type": "uuid",
@@ -102,28 +179,6 @@
           "where": "\"agent_sessions\".\"kind\" = 'dm'",
           "concurrently": false
         },
-        "agent_sessions_channel_unique": {
-          "name": "agent_sessions_channel_unique",
-          "columns": [
-            {
-              "expression": "agent_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "channel_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "with": {},
-          "method": "btree",
-          "where": "\"agent_sessions\".\"kind\" = 'channel'",
-          "concurrently": false
-        },
         "agent_sessions_thread_unique": {
           "name": "agent_sessions_thread_unique",
           "columns": [
@@ -144,21 +199,6 @@
           "with": {},
           "method": "btree",
           "where": "\"agent_sessions\".\"kind\" = 'thread'",
-          "concurrently": false
-        },
-        "agent_sessions_parent_idx": {
-          "name": "agent_sessions_parent_idx",
-          "columns": [
-            {
-              "expression": "parent_session_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "with": {},
-          "method": "btree",
           "concurrently": false
         }
       },
@@ -229,19 +269,6 @@
           ],
           "onUpdate": "no action",
           "onDelete": "cascade"
-        },
-        "agent_sessions_parent_session_id_agent_sessions_id_fk": {
-          "name": "agent_sessions_parent_session_id_agent_sessions_id_fk",
-          "tableFrom": "agent_sessions",
-          "columnsFrom": [
-            "parent_session_id"
-          ],
-          "tableTo": "agent_sessions",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
         },
         "agent_sessions_cloud_workspace_id_cloud_workspaces_id_fk": {
           "name": "agent_sessions_cloud_workspace_id_cloud_workspaces_id_fk",
@@ -580,20 +607,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "model": {
-          "name": "model",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "message_access": {
-          "name": "message_access",
-          "type": "agent_message_access",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'organization'"
         },
         "paused_at": {
           "name": "paused_at",
@@ -2659,85 +2672,10 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "authz.agent_relations": {
-      "name": "agent_relations",
-      "schema": "authz",
-      "columns": {
-        "agent_id": {
-          "name": "agent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "relation": {
-          "name": "relation",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_type": {
-          "name": "object_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "object_id": {
-          "name": "object_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "agent_relations_agent_id_agents_id_fk": {
-          "name": "agent_relations_agent_id_agents_id_fk",
-          "tableFrom": "agent_relations",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "tableTo": "agents",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "agent_relations_agent_id_relation_object_type_object_id_pk": {
-          "name": "agent_relations_agent_id_relation_object_type_object_id_pk",
-          "columns": [
-            "agent_id",
-            "relation",
-            "object_type",
-            "object_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.channel_members": {
       "name": "channel_members",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
         "channel_id": {
           "name": "channel_id",
           "type": "uuid",
@@ -2748,13 +2686,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
-        },
-        "agent_id": {
-          "name": "agent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "role": {
           "name": "role",
@@ -2801,70 +2733,11 @@
         }
       },
       "indexes": {
-        "channel_members_channel_user_unique": {
-          "name": "channel_members_channel_user_unique",
-          "columns": [
-            {
-              "expression": "channel_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "with": {},
-          "method": "btree",
-          "where": "\"channel_members\".\"user_id\" IS NOT NULL",
-          "concurrently": false
-        },
-        "channel_members_channel_agent_unique": {
-          "name": "channel_members_channel_agent_unique",
-          "columns": [
-            {
-              "expression": "channel_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "agent_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "with": {},
-          "method": "btree",
-          "where": "\"channel_members\".\"agent_id\" IS NOT NULL",
-          "concurrently": false
-        },
         "channel_members_user_idx": {
           "name": "channel_members_user_idx",
           "columns": [
             {
               "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "with": {},
-          "method": "btree",
-          "concurrently": false
-        },
-        "channel_members_agent_idx": {
-          "name": "channel_members_agent_idx",
-          "columns": [
-            {
-              "expression": "agent_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2903,30 +2776,20 @@
           ],
           "onUpdate": "no action",
           "onDelete": "cascade"
-        },
-        "channel_members_agent_id_agents_id_fk": {
-          "name": "channel_members_agent_id_agents_id_fk",
-          "tableFrom": "channel_members",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "tableTo": "agents",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "channel_members_channel_id_user_id_pk": {
+          "name": "channel_members_channel_id_user_id_pk",
+          "columns": [
+            "channel_id",
+            "user_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "channel_members_one_member": {
-          "name": "channel_members_one_member",
-          "value": "(\"channel_members\".\"user_id\" IS NULL) <> (\"channel_members\".\"agent_id\" IS NULL)"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.channel_message_reactions": {
@@ -3039,12 +2902,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "author_agent_id": {
-          "name": "author_agent_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "body": {
           "name": "body",
           "type": "text",
@@ -3053,13 +2910,6 @@
         },
         "mentioned_user_ids": {
           "name": "mentioned_user_ids",
-          "type": "uuid[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::uuid[]"
-        },
-        "mentioned_agent_ids": {
-          "name": "mentioned_agent_ids",
           "type": "uuid[]",
           "primaryKey": false,
           "notNull": true,
@@ -3175,34 +3025,6 @@
           "method": "btree",
           "where": "\"channel_messages\".\"client_id\" IS NOT NULL",
           "concurrently": false
-        },
-        "channel_messages_agent_client_unique": {
-          "name": "channel_messages_agent_client_unique",
-          "columns": [
-            {
-              "expression": "author_agent_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "channel_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "client_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "with": {},
-          "method": "btree",
-          "where": "\"channel_messages\".\"client_id\" IS NOT NULL AND \"channel_messages\".\"author_agent_id\" IS NOT NULL",
-          "concurrently": false
         }
       },
       "foreignKeys": {
@@ -3240,19 +3062,6 @@
           ],
           "tableTo": "users",
           "schemaTo": "auth",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
-        },
-        "channel_messages_author_agent_id_agents_id_fk": {
-          "name": "channel_messages_author_agent_id_agents_id_fk",
-          "tableFrom": "channel_messages",
-          "columnsFrom": [
-            "author_agent_id"
-          ],
-          "tableTo": "agents",
           "columnsTo": [
             "id"
           ],
@@ -3612,14 +3421,6 @@
           "notNull": true,
           "default": "'public'"
         },
-        "kind": {
-          "name": "kind",
-          "type": "channel_kind",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'channel'"
-        },
         "created_by_user_id": {
           "name": "created_by_user_id",
           "type": "uuid",
@@ -3680,7 +3481,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"channels\".\"archived_at\" IS NULL AND \"channels\".\"kind\" = 'channel'",
+          "where": "\"channels\".\"archived_at\" IS NULL",
           "concurrently": false
         },
         "channels_organization_idx": {
@@ -16062,22 +15863,12 @@
     }
   },
   "enums": {
-    "public.agent_message_access": {
-      "name": "agent_message_access",
-      "schema": "public",
-      "values": [
-        "organization",
-        "creator"
-      ]
-    },
     "public.agent_session_kind": {
       "name": "agent_session_kind",
       "schema": "public",
       "values": [
         "dm",
-        "channel",
-        "thread",
-        "task"
+        "thread"
       ]
     },
     "public.agent_turn_reason": {
@@ -16086,11 +15877,7 @@
       "values": [
         "direct_message",
         "mention",
-        "thread_reply",
-        "dispatch",
-        "automation",
-        "schedule",
-        "wake"
+        "thread_reply"
       ]
     },
     "public.agent_turn_status": {
@@ -16118,14 +15905,6 @@
         "here",
         "channel",
         "everyone"
-      ]
-    },
-    "public.channel_kind": {
-      "name": "channel_kind",
-      "schema": "public",
-      "values": [
-        "channel",
-        "dm"
       ]
     },
     "public.channel_member_role": {
@@ -16572,7 +16351,7 @@
           "notNull": true
         }
       },
-      "definition": "\n\t\tselect 'agent'::text as subject_type, r.agent_id::text as subject_id, r.relation,\n\t\t\tr.object_type, r.object_id::text as object_id\n\t\tfrom authz.agent_relations r\n\t\tjoin public.agents a on a.id = r.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'organization', a.organization_id::text\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', m.agent_id::text, 'member', 'channel', m.channel_id::text\n\t\tfrom public.channel_members m\n\t\tjoin public.agents a on a.id = m.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t\tunion all\n\t\tselect 'channel', ct.channel_id::text, 'channel', 'task', ct.task_id::text\n\t\tfrom public.channel_tasks ct\n\t\tunion all\n\t\tselect 'organization', t.organization_id::text, 'organization', 'task', t.id::text\n\t\tfrom public.tasks t where t.deleted_at is null\n\t\tunion all\n\t\tselect 'user', w.created_by_user_id::text, 'creator', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w where w.created_by_user_id is not null\n\t\tunion all\n\t\tselect 'organization', w.organization_id::text, 'organization', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w\n\t",
+      "definition": "\n\t\tselect 'agent'::text as subject_type, a.id::text as subject_id, 'member'::text as relation,\n\t\t\t'organization'::text as object_type, a.organization_id::text as object_id\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t",
       "materialized": false,
       "isExisting": false
     }

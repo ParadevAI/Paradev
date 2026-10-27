@@ -12387,9 +12387,6 @@ msgstr "Solo i proprietari dell'host o i proprietari dell'organizzazione possono
 msgid "Only images can be attached to a comment"
 msgstr "A un commento si possono allegare solo immagini"
 
-msgid "Only its creator"
-msgstr "Solo chi l'ha creato"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Solo chi l'ha creato o un amministratore dell'organizzazione può modificare questo agente"
 
@@ -12413,6 +12410,9 @@ msgstr "Solo i proprietari possono gestire la fatturazione"
 
 msgid "Only owners can update organization settings"
 msgstr "Solo i proprietari possono aggiornare le impostazioni dell'organizzazione"
+
+msgid "Only people can manage a channel"
+msgstr "Solo le persone possono gestire un canale"
 
 msgid "Only people in this organization can join"
 msgstr "Solo le persone di questa organizzazione possono unirsi"
@@ -18455,9 +18455,6 @@ msgstr "Questo agente non può diramare una conversazione"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Questo agente non può essere eseguito in un workspace cloud"
-
-msgid "This agent is paused"
-msgstr "Questo agente è in pausa"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Questo agente non esiste più sul dispositivo selezionato (i suoi agenti potrebbero essere stati reimpostati). Le esecuzioni falliranno finché non ne scegli uno nuovo."

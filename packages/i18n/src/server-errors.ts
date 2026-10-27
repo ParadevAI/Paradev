@@ -101,8 +101,6 @@ export const serverErrorMessages: Record<
 					"Only its creator or an organization admin can change this agent",
 			}),
 		),
-	"serverError.agent.paused": () =>
-		i18n._(msg({ message: "This agent is paused" })),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -335,6 +333,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
 			}),
 		),
 	"serverError.channelMessage.notFound": () =>

@@ -89,7 +89,7 @@ export function ChannelMessageRow({
 	const [menuOpen, setMenuOpen] = useState(false);
 	const isPending = message.seq === PENDING_SEQ;
 	const isDeleted = message.deletedAt !== null;
-	const isOwn = message.authorUserId === currentUserId;
+	const isOwn = message.authorId === currentUserId;
 	const onError = (error: unknown) =>
 		toast.error(
 			errorMessage(error, t({ message: "Couldn't save the change" })),
@@ -140,7 +140,7 @@ export function ChannelMessageRow({
 				!message.reactions.some(
 					(reaction) =>
 						reaction.emoji === emoji &&
-						reaction.userIds.includes(currentUserId ?? ""),
+						reaction.actorIds.includes(currentUserId ?? ""),
 				),
 			));
 	const menu = useMessageMenuItems({
@@ -166,11 +166,9 @@ export function ChannelMessageRow({
 	const devs = useOrgDevs();
 	const markdown = useMemo(() => {
 		const mentioned = [
-			...message.mentionedUserIds.flatMap((id) => {
+			...message.mentionedIds.flatMap((id) => {
 				const person = peopleById.get(id);
-				return person ? [person] : [];
-			}),
-			...message.mentionedAgentIds.flatMap((id) => {
+				if (person) return [person];
 				const dev = devs?.find((candidate) => candidate.id === id);
 				return dev ? [{ id: `${DEV_ID_PREFIX}${id}`, name: dev.name }] : [];
 			}),
@@ -253,8 +251,7 @@ export function ChannelMessageRow({
 		message.body,
 		channels,
 		navigate,
-		message.mentionedUserIds,
-		message.mentionedAgentIds,
+		message.mentionedIds,
 		devs,
 		message.broadcast,
 		message.channelId,
@@ -263,7 +260,7 @@ export function ChannelMessageRow({
 		currentUserId,
 	]);
 
-	const dev = useMessageDev(message.authorAgentId);
+	const dev = useMessageDev(message.authorId);
 	const authorName = dev?.name ?? author?.name ?? t({ message: "Unknown" });
 	const time = formatDateTime(message.createdAt, { timeStyle: "short" });
 
@@ -357,8 +354,7 @@ export function ChannelMessageRow({
 					<MessageEditor
 						channelId={message.channelId}
 						body={message.body}
-						mentionedUserIds={message.mentionedUserIds}
-						mentionedAgentIds={message.mentionedAgentIds}
+						mentionedIds={message.mentionedIds}
 						people={[...peopleById.values()]}
 						currentUserId={currentUserId}
 						onSave={saveEdit}

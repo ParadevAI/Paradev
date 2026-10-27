@@ -40,13 +40,16 @@ export function useChannelMentions({
 }) {
 	const { t } = useLingui();
 	const { data: members } = cloudTrpc.channel.members.useQuery({ channelId });
-	const { data: devs } = cloudTrpc.channel.devMembers.useQuery({ channelId });
+	const devs = useMemo(
+		() => (members ?? []).filter((member) => member.kind === "dev"),
+		[members],
+	);
 	const { data: tasks } = cloudTrpc.channelTask.list.useQuery({ channelId });
 	const channels = useOrgChannels();
 	const { provider: pluginProvider } = usePluginMentionProvider();
 
 	const mentionProviders = useMemo((): ComposerMentionProvider[] => {
-		const memberIds = new Set((members ?? []).map((member) => member.userId));
+		const memberIds = new Set((members ?? []).map((member) => member.actorId));
 		const searchPeople = async (query: string) => {
 			const ranked = rankMentionCandidates(people, memberIds, query);
 			const personEntries = [
@@ -69,7 +72,7 @@ export function useChannelMentions({
 						ctx.insertChip({
 							label: person.name,
 							serialized: `@${person.name}`,
-							data: { userId: person.id },
+							data: { actorId: person.id },
 						}),
 				}),
 			);
@@ -88,16 +91,16 @@ export function useChannelMentions({
 			);
 			return [...personEntries, ...broadcastEntries];
 		};
-		const devEntries = (devs ?? []).map(
+		const devEntries = devs.map(
 			(dev): ComposerMentionEntry => ({
-				id: `dev:${dev.agentId}`,
+				id: `dev:${dev.actorId}`,
 				label: dev.name,
 				row: <MentionDevRow name={dev.name} avatar={dev.avatar} />,
 				select: (ctx) =>
 					ctx.insertChip({
 						label: dev.name,
 						serialized: `@${dev.name}`,
-						data: { agentId: dev.agentId },
+						data: { actorId: dev.actorId },
 					}),
 			}),
 		);
@@ -181,15 +184,14 @@ export function useChannelMentions({
 				chip.data as { broadcast?: ChannelBroadcast } | undefined
 			)?.broadcast;
 			if (broadcast) return <BroadcastChip>@{broadcast}</BroadcastChip>;
-			const [agentId] = mentionedAgentIds([chip]);
-			if (agentId) {
-				return <DevMentionChip agentId={agentId}>@{chip.label}</DevMentionChip>;
+			const [actorId] = mentionedIds([chip]);
+			if (devs.some((dev) => dev.actorId === actorId) && actorId) {
+				return <DevMentionChip agentId={actorId}>@{chip.label}</DevMentionChip>;
 			}
 			if (isChannelChip(chip)) {
 				return <ChannelRefChip>{chip.label}</ChannelRefChip>;
 			}
-			const [userId] = mentionedUserIds([chip]);
-			const person = people.find((candidate) => candidate.id === userId);
+			const person = people.find((candidate) => candidate.id === actorId);
 			if (!person) return null;
 			return (
 				<MentionChip
@@ -201,29 +203,20 @@ export function useChannelMentions({
 				</MentionChip>
 			);
 		},
-		[channelId, people, currentUserId],
+		[channelId, people, devs, currentUserId],
 	);
 
 	return { mentionProviders, renderChip };
 }
 
 /** The user ids of the people a composer's chips mention. */
-export function mentionedUserIds(
+/** The people and Devs a composer's chips mention. */
+export function mentionedIds(
 	mentions: readonly { data?: unknown }[],
 ): string[] {
 	return mentions.flatMap((chip) => {
-		const data = chip.data as { userId?: unknown } | undefined;
-		return typeof data?.userId === "string" ? [data.userId] : [];
-	});
-}
-
-/** The ids of the Devs a composer's chips mention. */
-export function mentionedAgentIds(
-	mentions: readonly { data?: unknown }[],
-): string[] {
-	return mentions.flatMap((chip) => {
-		const data = chip.data as { agentId?: unknown } | undefined;
-		return typeof data?.agentId === "string" ? [data.agentId] : [];
+		const data = chip.data as { actorId?: unknown } | undefined;
+		return typeof data?.actorId === "string" ? [data.actorId] : [];
 	});
 }
 

@@ -113,7 +113,8 @@ async function startTurnForDirectMessage(
 
 /**
  * Starts the turns a person's message asks for. In a DM, its Dev answers.
- * In a channel, each mentioned Dev works in the message's thread, and a
+ * In a channel, each mentioned Dev works in the message's thread (mentioned
+ * people match no agent), and a
  * reply in a thread a Dev already works in continues that work.
  */
 export async function startTurnsForMessage(
@@ -121,7 +122,7 @@ export async function startTurnsForMessage(
 	message: {
 		id: string;
 		threadRootId: string | null;
-		mentionedAgentIds: string[];
+		mentionedIds: string[];
 	},
 	userId: string,
 ) {
@@ -130,13 +131,13 @@ export async function startTurnsForMessage(
 		return;
 	}
 	const threadRootId = message.threadRootId ?? message.id;
-	const mentioned = message.mentionedAgentIds.length
+	const mentioned = message.mentionedIds.length
 		? await db
 				.select()
 				.from(agents)
 				.where(
 					and(
-						inArray(agents.id, message.mentionedAgentIds),
+						inArray(agents.id, message.mentionedIds),
 						isNull(agents.archivedAt),
 						isNull(agents.pausedAt),
 					),

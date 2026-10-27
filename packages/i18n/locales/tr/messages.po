@@ -12387,9 +12387,6 @@ msgstr "Bu host'u yalnızca host sahipleri veya kuruluş sahipleri silebilir"
 msgid "Only images can be attached to a comment"
 msgstr "Bir yoruma yalnızca görsel eklenebilir"
 
-msgid "Only its creator"
-msgstr "Yalnızca oluşturan kişi"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi değiştirebilir"
 
@@ -12413,6 +12410,9 @@ msgstr "Faturalandırmayı yalnızca sahipler yönetebilir"
 
 msgid "Only owners can update organization settings"
 msgstr "Kuruluş ayarlarını yalnızca sahipler güncelleyebilir"
+
+msgid "Only people can manage a channel"
+msgstr "Kanalı yalnızca kişiler yönetebilir"
 
 msgid "Only people in this organization can join"
 msgstr "Yalnızca bu kuruluştaki kişiler katılabilir"
@@ -18455,9 +18455,6 @@ msgstr "Bu aracı bir konuşmayı çatallayamaz"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Bu ajan bir bulut çalışma alanında çalışamaz"
-
-msgid "This agent is paused"
-msgstr "Bu ajan duraklatıldı"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir). Yeni bir tane seçene kadar çalıştırmalar başarısız olacak."

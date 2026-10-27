@@ -29,10 +29,7 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 	const [query, setQuery] = useState("");
 	const { directory } = useShareDirectory();
 	const utils = cloudTrpc.useUtils();
-	const { data: members = [] } = cloudTrpc.channel.members.useQuery({
-		channelId: channel.id,
-	});
-	const { data: devs = [] } = cloudTrpc.channel.devMembers.useQuery({
+	const { data: everyone = [] } = cloudTrpc.channel.members.useQuery({
 		channelId: channel.id,
 	});
 	const { data: orgDevs = [] } = cloudTrpc.agent.list.useQuery({
@@ -47,24 +44,27 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 	};
 	const addMembers = cloudTrpc.channel.addMembers.useMutation(options);
 	const removeMember = cloudTrpc.channel.removeMember.useMutation(options);
-	const removeDev = cloudTrpc.channel.removeDev.useMutation(options);
 	const setRole = cloudTrpc.channel.setRole.useMutation(options);
 
 	const needle = query.trim().toLowerCase();
-	const memberIds = new Set(members.map((member) => member.userId));
+	const memberIds = new Set(everyone.map((member) => member.actorId));
 	const canAdd = channel.membership !== null || channel.canManage;
-	const shownMembers = members.filter((member) => matches(member, needle));
+	const shown = everyone.filter((member) => matches(member, needle));
+	const shownMembers = shown.flatMap((member) =>
+		member.kind === "person" ? [member] : [],
+	);
+	const shownDevs = shown.flatMap((member) =>
+		member.kind === "dev" ? [member] : [],
+	);
 	const candidates = canAdd
 		? directory.members
 				.filter((person) => !memberIds.has(person.userId))
 				.filter((person) => matches(person, needle))
 				.sort((a, b) => a.name.localeCompare(b.name))
 		: [];
-	const devIds = new Set(devs.map((dev) => dev.agentId));
-	const shownDevs = devs.filter((dev) => matches(dev, needle));
 	const candidateDevs = canAdd
 		? orgDevs
-				.filter((dev) => !devIds.has(dev.id) && dev.pausedAt === null)
+				.filter((dev) => !memberIds.has(dev.id) && dev.pausedAt === null)
 				.filter((dev) => matches(dev, needle))
 		: [];
 
@@ -82,28 +82,28 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 			<div className="space-y-1">
 				{shownMembers.map((member) => (
 					<MemberRow
-						key={member.userId}
+						key={member.actorId}
 						member={member}
-						isSelf={member.userId === currentUserId}
+						isSelf={member.actorId === currentUserId}
 						canManage={channel.canManage}
 						onSetRole={(role) =>
 							setRole.mutate({
 								channelId: channel.id,
-								userId: member.userId,
+								actorId: member.actorId,
 								role,
 							})
 						}
 						onRemove={() =>
 							removeMember.mutate({
 								channelId: channel.id,
-								userId: member.userId,
+								actorId: member.actorId,
 							})
 						}
 					/>
 				))}
-				{shownDevs.map(({ agentId, name, avatar }) => (
+				{shownDevs.map(({ actorId, name, avatar }) => (
 					<DevMemberRow
-						key={agentId}
+						key={actorId}
 						name={name}
 						avatar={avatar}
 						trailing={
@@ -113,9 +113,9 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 									variant="ghost"
 									aria-label={t({ message: `Remove ${name}` })}
 									onClick={() =>
-										removeDev.mutate({
+										removeMember.mutate({
 											channelId: channel.id,
-											agentId: agentId,
+											actorId,
 										})
 									}
 								>
@@ -139,13 +139,13 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 								isSelf={person.userId === currentUserId}
 								isAdding={
 									addMembers.isPending &&
-									addMembers.variables?.userIds?.includes(person.userId) ===
+									addMembers.variables?.actorIds.includes(person.userId) ===
 										true
 								}
 								onAdd={() =>
 									addMembers.mutate({
 										channelId: channel.id,
-										userIds: [person.userId],
+										actorIds: [person.userId],
 									})
 								}
 							/>
@@ -161,12 +161,12 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 										variant="outline"
 										disabled={
 											addMembers.isPending &&
-											addMembers.variables?.agentIds?.includes(dev.id) === true
+											addMembers.variables?.actorIds.includes(dev.id) === true
 										}
 										onClick={() =>
 											addMembers.mutate({
 												channelId: channel.id,
-												agentIds: [dev.id],
+												actorIds: [dev.id],
 											})
 										}
 									>

@@ -25,7 +25,8 @@ export const createChannelSchema = z.object({
 	name: z.string().trim().min(1).max(CHANNEL_NAME_MAX_LENGTH),
 	description: z.string().trim().max(CHANNEL_DESCRIPTION_MAX_LENGTH).nullish(),
 	visibility: z.enum(channelVisibilityValues).default("public"),
-	memberUserIds: z.array(z.string().uuid()).max(200).default([]),
+	/** People and Devs to add besides the creator. */
+	memberIds: z.array(z.string().uuid()).max(200).default([]),
 });
 
 export const updateChannelSchema = z.object({
@@ -37,22 +38,15 @@ export const updateChannelSchema = z.object({
 
 export const channelIdSchema = z.object({ channelId });
 
-export const addMembersSchema = z
-	.object({
-		channelId,
-		userIds: z.array(z.string().uuid()).max(200).default([]),
-		agentIds: z.array(z.string().uuid()).max(50).default([]),
-	})
-	.refine((input) => input.userIds.length + input.agentIds.length > 0);
-
-export const devMemberSchema = z.object({
+/** `actorIds` are people's user ids and Devs' agent ids. */
+export const addMembersSchema = z.object({
 	channelId,
-	agentId: z.string().uuid(),
+	actorIds: z.array(z.string().uuid()).min(1).max(200),
 });
 
 export const memberSchema = z.object({
 	channelId,
-	userId: z.string().uuid(),
+	actorId: z.string().uuid(),
 });
 
 export const setRoleSchema = memberSchema.extend({
@@ -138,8 +132,8 @@ export const sendMessageSchema = z.object({
 	body: z.string().max(CHANNEL_MESSAGE_MAX_LENGTH),
 	threadRootId: z.string().uuid().nullish(),
 	clientId: z.string().min(1).max(64),
-	mentionedUserIds: z.array(z.string().uuid()).max(50).default([]),
-	mentionedAgentIds: z.array(z.string().uuid()).max(20).default([]),
+	/** People and Devs. */
+	mentionedIds: z.array(z.string().uuid()).max(50).default([]),
 	broadcast: z.enum(channelBroadcastValues).nullish(),
 	fileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).default([]),
 });
@@ -147,9 +141,8 @@ export const sendMessageSchema = z.object({
 export const editMessageSchema = z.object({
 	messageId: z.string().uuid(),
 	body: z.string().max(CHANNEL_MESSAGE_MAX_LENGTH),
-	mentionedUserIds: z.array(z.string().uuid()).max(50).default([]),
-	/** Absent keeps the message's Dev mentions. */
-	mentionedAgentIds: z.array(z.string().uuid()).max(20).optional(),
+	/** People and Devs. */
+	mentionedIds: z.array(z.string().uuid()).max(50).default([]),
 	broadcast: z.enum(channelBroadcastValues).nullish(),
 });
 

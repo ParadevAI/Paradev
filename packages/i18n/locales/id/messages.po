@@ -12387,9 +12387,6 @@ msgstr "Hanya pemilik host atau pemilik organisasi yang bisa menghapus host ini"
 msgid "Only images can be attached to a comment"
 msgstr "Hanya gambar yang dapat dilampirkan ke komentar"
 
-msgid "Only its creator"
-msgstr "Hanya pembuatnya"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Hanya pembuatnya atau admin organisasi yang dapat mengubah agen ini"
 
@@ -12413,6 +12410,9 @@ msgstr "Hanya pemilik yang bisa mengelola penagihan"
 
 msgid "Only owners can update organization settings"
 msgstr "Hanya pemilik yang bisa memperbarui pengaturan organisasi"
+
+msgid "Only people can manage a channel"
+msgstr "Hanya orang yang dapat mengelola kanal"
 
 msgid "Only people in this organization can join"
 msgstr "Hanya orang di organisasi ini yang dapat bergabung"
@@ -18455,9 +18455,6 @@ msgstr "Agen ini tidak dapat mencabangkan percakapan"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agen ini tidak bisa berjalan di workspace cloud"
-
-msgid "This agent is paused"
-msgstr "Agen ini dijeda"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."

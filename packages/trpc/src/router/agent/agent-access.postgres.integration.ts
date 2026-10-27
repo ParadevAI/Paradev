@@ -41,6 +41,19 @@ suite("agent access against a migrated PostgreSQL", () => {
 	const asAgent = (token: string) =>
 		withHeaders({ "x-agent-turn-token": token });
 
+	const sendTo = (userId: string, channelId: string, body: string) =>
+		person(userId).channelMessage.send({
+			channelId,
+			body,
+			clientId: crypto.randomUUID(),
+		});
+	const turnsOf = (agentId: string) =>
+		db
+			.select()
+			.from(schema.agentTurns)
+			.where(eq(schema.agentTurns.agentId, agentId));
+
+	/** A Dev in the private channel, working on a DM from `userId`. */
 	async function agentWithChannel(userId: string) {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,
@@ -48,16 +61,18 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		await person(admin).channel.addMembers({
 			channelId: privateChannel,
-			agentIds: [agent.id],
+			actorIds: [agent.id],
 		});
-		const turn = await person(userId).agent.startDirectTurn({
+		const dm = await person(userId).agent.openDirectMessage({
 			agentId: agent.id,
-			promptId: "kickoff",
 		});
+		await sendTo(userId, dm.channelId, "kickoff");
+		const [turn] = await turnsOf(agent.id);
+		if (!turn) throw Error("No turn");
 		const { token } = await worker().agentWorker.turnToken({
-			turnId: turn.turnId,
+			turnId: turn.id,
 		});
-		return { agent, turn, token };
+		return { agent, dm, turn, token };
 	}
 
 	beforeAll(async () => {
@@ -94,7 +109,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		otherChannel = created[1]?.id ?? "";
 		await db
 			.insert(schema.channelMembers)
-			.values({ channelId: privateChannel, userId: admin, role: "admin" });
+			.values({ channelId: privateChannel, actorId: admin, role: "admin" });
 		await db.insert(schema.channelMessages).values({
 			channelId: privateChannel,
 			seq: 1,
@@ -143,27 +158,20 @@ suite("agent access against a migrated PostgreSQL", () => {
 	});
 
 	test("a message mid-turn joins it, and the turn settles only after the worker read it", async () => {
-		const { agent, turn, token } = await agentWithChannel(admin);
-		const steer = { agentId: agent.id, promptId: "steer-1" };
-		const joined = await person(admin).agent.startDirectTurn(steer);
-		expect(joined).toEqual({
-			sessionId: turn.sessionId,
-			turnId: turn.turnId,
-			outcome: "joined",
-			steerSeq: 1,
-		});
-		expect((await person(admin).agent.startDirectTurn(steer)).outcome).toBe(
-			"duplicate",
-		);
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const steer = await sendTo(admin, dm.channelId, "also this");
+		expect(await turnsOf(agent.id)).toMatchObject([
+			{ id: turn.id, steerPromptIds: [steer.id] },
+		]);
 		await expect(
 			worker().agentWorker.settleTurn({
-				turnId: turn.turnId,
+				turnId: turn.id,
 				status: "completed",
 				steersConsumed: 0,
 			}),
 		).rejects.toThrow("STEER_PENDING");
 		await worker().agentWorker.settleTurn({
-			turnId: turn.turnId,
+			turnId: turn.id,
 			status: "completed",
 			steersConsumed: 1,
 		});
@@ -172,30 +180,28 @@ suite("agent access against a migrated PostgreSQL", () => {
 		);
 	});
 
-	test("a resent prompt runs once, even after its turn settled", async () => {
-		const { agent, turn } = await agentWithChannel(admin);
+	test("a resent message runs once; the next one starts a new turn", async () => {
+		const { agent, dm, turn } = await agentWithChannel(admin);
 		await worker().agentWorker.settleTurn({
-			turnId: turn.turnId,
+			turnId: turn.id,
 			status: "completed",
 			steersConsumed: 0,
 			reply: "done",
 			inputTokens: 10,
 		});
-		const resent = await person(admin).agent.startDirectTurn({
-			agentId: agent.id,
-			promptId: "kickoff",
+		const message = {
+			channelId: dm.channelId,
+			body: "again",
+			clientId: crypto.randomUUID(),
+		};
+		await person(admin).channelMessage.send(message);
+		await person(admin).channelMessage.send(message);
+		const turns = await turnsOf(agent.id);
+		expect(turns).toHaveLength(2);
+		expect(turns.find((row) => row.id === turn.id)).toMatchObject({
+			reply: "done",
+			inputTokens: 10,
 		});
-		expect(resent).toEqual({ ...turn, outcome: "duplicate" });
-		const [row] = await db
-			.select()
-			.from(schema.agentTurns)
-			.where(eq(schema.agentTurns.id, turn.turnId));
-		expect(row).toMatchObject({ reply: "done", inputTokens: 10 });
-		const next = await person(admin).agent.startDirectTurn({
-			agentId: agent.id,
-			promptId: "prompt-2",
-		});
-		expect(next.outcome).toBe("started");
 	});
 
 	test("a DM is a private room: a person's message starts a turn and the Dev's reply lands in it", async () => {
@@ -216,8 +222,6 @@ suite("agent access against a migrated PostgreSQL", () => {
 			channelId,
 			body: "hello",
 			clientId: crypto.randomUUID(),
-			fileIds: [],
-			mentionedUserIds: [],
 		});
 		const [turn] = await db
 			.select()
@@ -233,14 +237,14 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		const post = { channelId, body: "hi there", idempotencyKey: "call-1" };
 		const reply = await asAgent(token).agentApi.postMessage(post);
-		expect(reply.authorAgentId).toBe(agent.id);
+		expect(reply.authorId).toBe(agent.id);
 		expect((await asAgent(token).agentApi.postMessage(post)).id).toBe(reply.id);
 		const page = await person(admin).channelMessage.list({
 			channelId,
 			limit: 20,
 		});
-		expect(page.messages.map((m) => [m.body, m.authorAgentId])).toEqual([
-			["hello", null],
+		expect(page.messages.map((m) => [m.body, m.authorId])).toEqual([
+			["hello", admin],
 			["hi there", agent.id],
 		]);
 		await expect(
@@ -250,17 +254,25 @@ suite("agent access against a migrated PostgreSQL", () => {
 
 	test("a Dev added to a channel is a member until it is removed", async () => {
 		const { agent, token } = await agentWithChannel(admin);
-		const devs = await person(admin).channel.devMembers({
-			channelId: privateChannel,
-		});
-		expect(devs.map((dev) => dev.agentId)).toContain(agent.id);
 		const members = await person(admin).channel.members({
 			channelId: privateChannel,
 		});
-		expect(members.map((member) => member.userId)).toEqual([admin]);
-		await person(admin).channel.removeDev({
+		expect(
+			members.map((member) => [member.actorId, member.kind]),
+		).toContainEqual([agent.id, "dev"]);
+		expect(members.find((member) => member.actorId === admin)?.kind).toBe(
+			"person",
+		);
+		await expect(
+			person(admin).channel.setRole({
+				channelId: privateChannel,
+				actorId: agent.id,
+				role: "admin",
+			}),
+		).rejects.toThrow("Only people can manage a channel");
+		await person(admin).channel.removeMember({
 			channelId: privateChannel,
-			agentId: agent.id,
+			actorId: agent.id,
 		});
 		expect(await asAgent(token).agentApi.channels()).toEqual([]);
 	});
@@ -274,11 +286,11 @@ suite("agent access against a migrated PostgreSQL", () => {
 			organizationId: orgId,
 			name: `lonely-${crypto.randomUUID().slice(0, 6)}`,
 			visibility: "private",
-			memberUserIds: [],
+			memberIds: [],
 		});
 		await person(admin).channel.addMembers({
 			channelId: id,
-			agentIds: [agent.id],
+			actorIds: [agent.id],
 		});
 		await person(admin).channel.leave({ channelId: id });
 		const [row] = await db
@@ -301,19 +313,19 @@ suite("agent access against a migrated PostgreSQL", () => {
 			organizationId: orgId,
 			name: `mentions-${crypto.randomUUID().slice(0, 6)}`,
 			visibility: "private",
-			memberUserIds: [],
+			memberIds: [],
 		});
 		await person(admin).channel.addMembers({
 			channelId,
-			agentIds: [agent.id],
+			actorIds: [agent.id],
 		});
 		const root = await person(admin).channelMessage.send({
 			channelId,
 			body: "@Mentioned @Outside look at this",
 			clientId: crypto.randomUUID(),
-			mentionedAgentIds: [agent.id, outside.id],
+			mentionedIds: [agent.id, outside.id, admin],
 		});
-		expect(root.mentionedAgentIds).toEqual([agent.id]);
+		expect(root.mentionedIds).toEqual([agent.id]);
 		const turns = () =>
 			db
 				.select({
@@ -373,25 +385,16 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Unknown worker.");
 	});
 
-	test("a paused agent starts no turns, and a creator-only agent is hidden from others", async () => {
+	test("a paused agent starts no turns", async () => {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,
 			name: "Private",
 		});
 		await person(admin).agent.pause({ agentId: agent.id });
-		await expect(
-			person(admin).agent.startDirectTurn({ agentId: agent.id, promptId: "p" }),
-		).rejects.toThrow("This agent is paused");
-		await person(admin).agent.update({
+		const dm = await person(admin).agent.openDirectMessage({
 			agentId: agent.id,
-			messageAccess: "creator",
 		});
-		const visible = await person(outsider).agent.list({
-			organizationId: orgId,
-		});
-		expect(visible.map((a) => a.id)).not.toContain(agent.id);
-		await expect(
-			person(outsider).agent.get({ agentId: agent.id }),
-		).rejects.toThrow("Agent not found");
+		await sendTo(admin, dm.channelId, "anyone there?");
+		expect(await turnsOf(agent.id)).toEqual([]);
 	});
 });

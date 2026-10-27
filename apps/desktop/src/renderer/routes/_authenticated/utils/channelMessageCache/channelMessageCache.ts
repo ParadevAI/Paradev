@@ -25,12 +25,11 @@ export function fromWire(wire: ChannelMessageWire): ChannelMessage {
 
 export function pendingMessage(input: {
 	channelId: string;
-	authorUserId: string;
+	authorId: string;
 	body: string;
 	clientId: string;
 	threadRootId: string | null;
-	mentionedUserIds: string[];
-	mentionedAgentIds?: string[];
+	mentionedIds: string[];
 	broadcast?: ChannelBroadcast | null;
 	/** Local previews of the files on their way up. */
 	attachments?: ChannelAttachment[];
@@ -40,11 +39,9 @@ export function pendingMessage(input: {
 		channelId: input.channelId,
 		seq: PENDING_SEQ,
 		threadRootId: input.threadRootId,
-		authorUserId: input.authorUserId,
-		authorAgentId: null,
+		authorId: input.authorId,
 		body: input.body,
-		mentionedUserIds: input.mentionedUserIds,
-		mentionedAgentIds: input.mentionedAgentIds ?? [],
+		mentionedIds: input.mentionedIds,
 		broadcast: input.broadcast ?? null,
 		clientId: input.clientId,
 		replyCount: 0,

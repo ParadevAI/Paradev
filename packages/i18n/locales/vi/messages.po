@@ -12387,9 +12387,6 @@ msgstr "Chỉ chủ sở hữu host hoặc chủ sở hữu tổ chức mới x�
 msgid "Only images can be attached to a comment"
 msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
 
-msgid "Only its creator"
-msgstr "Chỉ người tạo"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Chỉ người tạo hoặc quản trị viên tổ chức mới có thể thay đổi agent này"
 
@@ -12413,6 +12410,9 @@ msgstr "Chỉ chủ sở hữu mới quản lý được thanh toán"
 
 msgid "Only owners can update organization settings"
 msgstr "Chỉ chủ sở hữu mới cập nhật được cài đặt tổ chức"
+
+msgid "Only people can manage a channel"
+msgstr "Chỉ người mới có thể quản lý kênh"
 
 msgid "Only people in this organization can join"
 msgstr "Chỉ những người trong tổ chức này mới có thể tham gia"
@@ -18455,9 +18455,6 @@ msgstr "Tác nhân này không thể tạo nhánh hội thoại"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agent này không thể chạy trong workspace cloud"
-
-msgid "This agent is paused"
-msgstr "Agent này đang tạm dừng"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."

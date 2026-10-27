@@ -12387,9 +12387,6 @@ msgstr "このホストを削除できるのはホストのオーナーまたは
 msgid "Only images can be attached to a comment"
 msgstr "コメントに添付できるのは画像のみです"
 
-msgid "Only its creator"
-msgstr "作成者のみ"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "このエージェントを変更できるのは、作成者または組織の管理者のみです"
 
@@ -12413,6 +12410,9 @@ msgstr "請求を管理できるのはオーナーのみです"
 
 msgid "Only owners can update organization settings"
 msgstr "組織の設定を更新できるのはオーナーのみです"
+
+msgid "Only people can manage a channel"
+msgstr "チャンネルを管理できるのは人だけです"
 
 msgid "Only people in this organization can join"
 msgstr "この組織のメンバーのみ参加できます"
@@ -18455,9 +18455,6 @@ msgstr "このエージェントは会話を分岐できません"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "このエージェントはクラウドワークスペースで実行できません"
-
-msgid "This agent is paused"
-msgstr "このエージェントは一時停止中です"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"

@@ -1,8 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { MessageComposer } from "@superset/chat-ui/MessageComposer";
 import {
-	mentionedAgentIds,
-	mentionedUserIds,
+	mentionedIds,
 	useChannelMentions,
 } from "../../../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../../../hooks/useEmojiSuggestions";
@@ -10,15 +9,13 @@ import type { ChannelPerson } from "../../ChannelMessageRow";
 
 export interface MessageEdit {
 	body: string;
-	mentionedUserIds: string[];
-	mentionedAgentIds: string[];
+	mentionedIds: string[];
 }
 
 interface MessageEditorProps {
 	channelId: string;
 	body: string;
-	mentionedUserIds: string[];
-	mentionedAgentIds: string[];
+	mentionedIds: string[];
 	people: ChannelPerson[];
 	currentUserId: string | null;
 	onSave: (edit: MessageEdit) => void;
@@ -29,8 +26,7 @@ interface MessageEditorProps {
 export function MessageEditor({
 	channelId,
 	body,
-	mentionedUserIds: existingMentions,
-	mentionedAgentIds: existingDevMentions,
+	mentionedIds: existingMentions,
 	people,
 	currentUserId,
 	onSave,
@@ -57,16 +53,10 @@ export function MessageEditor({
 				if (!text) return false;
 				onSave({
 					body: text,
-					mentionedUserIds: [
+					mentionedIds: [
 						...new Set([
 							...existingMentions,
-							...mentionedUserIds(payload.mentions),
-						]),
-					],
-					mentionedAgentIds: [
-						...new Set([
-							...existingDevMentions,
-							...mentionedAgentIds(payload.mentions),
+							...mentionedIds(payload.mentions),
 						]),
 					],
 				});

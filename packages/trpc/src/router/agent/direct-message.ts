@@ -53,8 +53,8 @@ export async function ensureDirectMessage(
 			.returning({ id: channels.id });
 		if (!room) throw new Error("DM room insert returned no row");
 		await tx.insert(channelMembers).values([
-			{ channelId: room.id, userId, notify: "all" },
-			{ channelId: room.id, agentId: agent.id },
+			{ channelId: room.id, actorId: userId, notify: "all" },
+			{ channelId: room.id, actorId: agent.id },
 		]);
 		await tx
 			.update(agentSessions)

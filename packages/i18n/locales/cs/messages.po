@@ -12387,9 +12387,6 @@ msgstr "Tohoto hosta mohou smazat jen jeho vlastníci nebo vlastníci organizace
 msgid "Only images can be attached to a comment"
 msgstr "Ke komentáři lze připojit pouze obrázky"
 
-msgid "Only its creator"
-msgstr "Pouze jeho tvůrce"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Tohoto agenta může změnit jen jeho tvůrce nebo správce organizace"
 
@@ -12413,6 +12410,9 @@ msgstr "Fakturaci mohou spravovat jen vlastníci"
 
 msgid "Only owners can update organization settings"
 msgstr "Nastavení organizace mohou měnit jen vlastníci"
+
+msgid "Only people can manage a channel"
+msgstr "Kanál mohou spravovat jen lidé"
 
 msgid "Only people in this organization can join"
 msgstr "Připojit se mohou jen lidé z této organizace"
@@ -18455,9 +18455,6 @@ msgstr "Tento agent neumí rozvětvit konverzaci"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Tento agent nemůže běžet v cloudovém pracovním prostoru"
-
-msgid "This agent is paused"
-msgstr "Tento agent je pozastaven"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli být resetováni). Běhy budou selhávat, dokud nevyberete jiného."

@@ -124,7 +124,7 @@ export function cleanupRemovedMember(
 			.delete(channelMembers)
 			.where(
 				and(
-					eq(channelMembers.userId, member.userId),
+					eq(channelMembers.actorId, member.userId),
 					inArray(channelMembers.channelId, orgChannels),
 				),
 			);
@@ -132,7 +132,7 @@ export function cleanupRemovedMember(
 			.delete(channelThreadFollows)
 			.where(
 				and(
-					eq(channelThreadFollows.userId, member.userId),
+					eq(channelThreadFollows.actorId, member.userId),
 					inArray(channelThreadFollows.channelId, orgChannels),
 				),
 			);

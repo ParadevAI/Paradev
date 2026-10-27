@@ -12387,9 +12387,6 @@ msgstr "Удалить этот хост могут только владель�
 msgid "Only images can be attached to a comment"
 msgstr "К комментарию можно прикреплять только изображения"
 
-msgid "Only its creator"
-msgstr "Только создатель"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Изменить этого агента может только его создатель или администратор организации"
 
@@ -12413,6 +12410,9 @@ msgstr "Управлять оплатой могут только владель
 
 msgid "Only owners can update organization settings"
 msgstr "Изменять настройки организации могут только владельцы"
+
+msgid "Only people can manage a channel"
+msgstr "Управлять каналом могут только люди"
 
 msgid "Only people in this organization can join"
 msgstr "Присоединиться могут только участники этой организации"
@@ -18455,9 +18455,6 @@ msgstr "Этот агент не может ответвить разговор"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
-
-msgid "This agent is paused"
-msgstr "Этот агент приостановлен"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."

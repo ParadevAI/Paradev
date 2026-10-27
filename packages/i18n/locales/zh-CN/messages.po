@@ -12387,9 +12387,6 @@ msgstr "只有主机所有者或组织所有者才能删除此主机"
 msgid "Only images can be attached to a comment"
 msgstr "评论只能附加图片"
 
-msgid "Only its creator"
-msgstr "仅创建者"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有创建者或组织管理员可以更改此智能体"
 
@@ -12413,6 +12410,9 @@ msgstr "只有所有者才能管理账单"
 
 msgid "Only owners can update organization settings"
 msgstr "只有所有者才能更新组织设置"
+
+msgid "Only people can manage a channel"
+msgstr "只有成员本人可以管理频道"
 
 msgid "Only people in this organization can join"
 msgstr "只有此组织中的人员可以加入"
@@ -18455,9 +18455,6 @@ msgstr "该智能体无法分叉对话"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "此智能体无法在云端工作区中运行"
-
-msgid "This agent is paused"
-msgstr "此智能体已暂停"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"

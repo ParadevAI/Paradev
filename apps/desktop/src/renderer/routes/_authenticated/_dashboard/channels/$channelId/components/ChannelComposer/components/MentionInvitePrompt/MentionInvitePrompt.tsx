@@ -51,7 +51,7 @@ export function MentionInvitePrompt({
 					onClick={() =>
 						addMembers.mutate({
 							channelId,
-							userIds: people.map((person) => person.id),
+							actorIds: people.map((person) => person.id),
 						})
 					}
 				>

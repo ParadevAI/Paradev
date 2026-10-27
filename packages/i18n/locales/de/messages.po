@@ -12387,9 +12387,6 @@ msgstr "Nur Host-Inhaber oder Organisations-Inhaber können diesen Host löschen
 msgid "Only images can be attached to a comment"
 msgstr "An einen Kommentar können nur Bilder angehängt werden"
 
-msgid "Only its creator"
-msgstr "Nur sein Ersteller"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Nur sein Ersteller oder ein Organisations-Admin kann diesen Agent ändern"
 
@@ -12413,6 +12410,9 @@ msgstr "Nur Inhaber können die Abrechnung verwalten"
 
 msgid "Only owners can update organization settings"
 msgstr "Nur Inhaber können die Organisationseinstellungen ändern"
+
+msgid "Only people can manage a channel"
+msgstr "Nur Personen können einen Kanal verwalten"
 
 msgid "Only people in this organization can join"
 msgstr "Nur Personen in dieser Organisation können beitreten"
@@ -18455,9 +18455,6 @@ msgstr "Dieser Agent kann keine Unterhaltung verzweigen"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Dieser Agent kann nicht in einem Cloud-Arbeitsbereich laufen"
-
-msgid "This agent is paused"
-msgstr "Dieser Agent ist pausiert"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Diesen Agenten gibt es auf dem gewählten Gerät nicht mehr (seine Agenten wurden möglicherweise zurückgesetzt). Läufe schlagen fehl, bis du einen neuen auswählst."

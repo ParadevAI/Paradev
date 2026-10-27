@@ -17,13 +17,7 @@ export interface AgentAccess {
 	canManage: boolean;
 }
 
-export function canSeeAgent(agent: SelectAgent, userId: string): boolean {
-	return (
-		agent.messageAccess === "organization" || agent.createdByUserId === userId
-	);
-}
-
-/** A live agent the caller may see; anything else reads as not found. */
+/** A live agent in one of the caller's organizations; anything else reads as not found. */
 export async function loadAgentAccess(
 	userId: string,
 	agentId: string,
@@ -38,34 +32,30 @@ export async function loadAgentAccess(
 		userId,
 		organizationId: agent.organizationId,
 	});
-	if (!membership || !canSeeAgent(agent, userId)) throw agentNotFound();
+	if (!membership) throw agentNotFound();
 	return {
 		agent,
 		canManage: agent.createdByUserId === userId || isOrgAdmin(membership.role),
 	};
 }
 
-/** The Devs `userId` may add to a channel in `organizationId`; any other id fails. */
-export async function addableDevs(
-	userId: string,
+/** The subset of `agentIds` that are live Devs in the organization. */
+export async function orgDevIds(
 	organizationId: string,
 	agentIds: readonly string[],
 ): Promise<string[]> {
-	const unique = [...new Set(agentIds)];
-	if (unique.length === 0) return [];
+	if (agentIds.length === 0) return [];
 	const rows = await db
-		.select()
+		.select({ id: agents.id })
 		.from(agents)
 		.where(
 			and(
-				inArray(agents.id, unique),
+				inArray(agents.id, [...agentIds]),
 				eq(agents.organizationId, organizationId),
 				isNull(agents.archivedAt),
 			),
 		);
-	const visible = rows.filter((agent) => canSeeAgent(agent, userId));
-	if (visible.length !== unique.length) throw agentNotFound();
-	return visible.map((agent) => agent.id);
+	return rows.map((row) => row.id);
 }
 
 /** Its creator or an org admin may change an agent. */

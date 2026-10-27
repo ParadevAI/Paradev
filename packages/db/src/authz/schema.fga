@@ -4,9 +4,6 @@ model
 type user
 
 type agent
-  relations
-    define organization: [organization]
-    define owner: [user]
 
 type organization
   relations
@@ -18,33 +15,3 @@ type channel
     define member: [user, agent]
     define can_read: member
     define can_post: member
-
-type task
-  relations
-    define organization: [organization]
-    define channel: [channel]
-    define can_read: member from channel
-    define can_write: member from channel
-
-type environment
-  relations
-    define organization: [organization]
-    define runner: [agent]
-    define can_create_workspace: runner
-
-type cloud_workspace
-  relations
-    define organization: [organization]
-    define environment: [environment]
-    define creator: [user, agent]
-    define shared_channel: [channel]
-    define can_read: creator or member from shared_channel
-    define can_operate: creator
-
-type page
-  relations
-    define organization: [organization]
-    define creator: [user, agent]
-    define shared_channel: [channel]
-    define can_read: creator or member from shared_channel
-    define can_edit: creator

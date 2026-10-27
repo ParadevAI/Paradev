@@ -12387,9 +12387,6 @@ msgstr "Tylko właściciele hosta lub właściciele organizacji mogą usunąć t
 msgid "Only images can be attached to a comment"
 msgstr "Do komentarza można załączać tylko obrazy"
 
-msgid "Only its creator"
-msgstr "Tylko twórca"
-
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Tego agenta może zmienić tylko jego twórca lub administrator organizacji"
 
@@ -12413,6 +12410,9 @@ msgstr "Tylko właściciele mogą zarządzać rozliczeniami"
 
 msgid "Only owners can update organization settings"
 msgstr "Tylko właściciele mogą zmieniać ustawienia organizacji"
+
+msgid "Only people can manage a channel"
+msgstr "Kanałem mogą zarządzać tylko osoby"
 
 msgid "Only people in this organization can join"
 msgstr "Dołączyć mogą tylko osoby z tej organizacji"
@@ -18455,9 +18455,6 @@ msgstr "Ten agent nie może rozgałęzić rozmowy"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Ten agent nie może działać w obszarze roboczym w chmurze"
-
-msgid "This agent is paused"
-msgstr "Ten agent jest wstrzymany"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Ten agent już nie istnieje na wybranym urządzeniu (jego agenci mogli zostać zresetowani). Uruchomienia będą kończyć się błędem, dopóki nie wybierzesz nowego."
