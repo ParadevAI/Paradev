@@ -11150,9 +11150,6 @@ msgstr "Mobiele app"
 msgid "Mobile App"
 msgstr "Mobiele app"
 
-msgid "Mode"
-msgstr "Modus"
-
 msgid "model"
 msgstr "model"
 

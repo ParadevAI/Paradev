@@ -16,12 +16,14 @@ import {
 } from "../../../PastedTextCard";
 import type { PromptInputAttachment } from "../../types";
 import { RemoveButton } from "./components/RemoveButton";
+import { RevealButton } from "./components/RevealButton";
 
 export type AttachmentPillsProps = {
 	attachments: PromptInputAttachment[];
 	onRemove: (id: string) => void;
 	onShowPastedText?: (id: string) => void;
 	onPreviewError?: (id: string) => void;
+	onReveal?: (attachment: PromptInputAttachment) => void;
 	onAttachmentClick?: (
 		attachment: PromptInputAttachment,
 		attachments: readonly PromptInputAttachment[],
@@ -67,6 +69,7 @@ export function AttachmentPills({
 	onRemove,
 	onShowPastedText,
 	onPreviewError,
+	onReveal,
 	onAttachmentClick,
 }: AttachmentPillsProps) {
 	if (attachments.length === 0) return null;
@@ -95,9 +98,13 @@ export function AttachmentPills({
 				const dotIndex = filename.lastIndexOf(".");
 				const extension =
 					dotIndex > 0 ? filename.slice(dotIndex + 1).toUpperCase() : "";
+				const reveal =
+					onReveal && attachment.sourcePath ? (
+						<RevealButton onClick={() => onReveal(attachment)} />
+					) : null;
 				if (attachment.previewUrl) {
 					return (
-						<div key={attachment.id} className="relative shrink-0">
+						<div key={attachment.id} className="group/pill relative shrink-0">
 							<button
 								type="button"
 								aria-label={filename}
@@ -123,11 +130,12 @@ export function AttachmentPills({
 								<span className="pointer-events-none absolute inset-0 bg-foreground/[0.02] opacity-0 transition-opacity duration-150 group-hover/attachment:opacity-100" />
 							</button>
 							<RemoveButton onClick={() => onRemove(attachment.id)} />
+							{reveal}
 						</div>
 					);
 				}
 				return (
-					<div key={attachment.id} className="relative shrink-0">
+					<div key={attachment.id} className="group/pill relative shrink-0">
 						<button
 							type="button"
 							onClick={() => onAttachmentClick?.(attachment, attachments)}
@@ -149,6 +157,7 @@ export function AttachmentPills({
 							</div>
 						</button>
 						<RemoveButton onClick={() => onRemove(attachment.id)} />
+						{reveal}
 					</div>
 				);
 			})}

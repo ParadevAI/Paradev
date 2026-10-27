@@ -11150,9 +11150,6 @@ msgstr "行動應用程式"
 msgid "Mobile App"
 msgstr "行動應用程式"
 
-msgid "Mode"
-msgstr "模式"
-
 msgid "model"
 msgstr "模型"
 

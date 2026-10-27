@@ -90,6 +90,14 @@ export type PromptInputAttachment = {
 	previewUrl?: string;
 	// A large paste held as a text file; "Show in text field" puts it back.
 	pastedText?: string;
+	// Where the file lives on disk, when it came from there.
+	sourcePath?: string;
+};
+
+/** The host's view of the filesystem; the composer itself has none. */
+export type PromptInputLocalFiles = {
+	pathOf(file: File): string | undefined;
+	reveal(path: string): void;
 };
 
 export type ComposerDraftSegment =
@@ -100,6 +108,8 @@ export type ComposerDraftSegment =
 export type ComposerDraft = {
 	segments: ComposerDraftSegment[];
 	attachments: PromptInputAttachment[];
+	// Dictation put text into this draft; for analytics.
+	usedDictation?: boolean;
 };
 
 export type PromptInputSubmitPayload = {
@@ -182,6 +192,7 @@ export type PromptInputProps = {
 	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
 	 */
 	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
+	localFiles?: PromptInputLocalFiles;
 	history?: string[];
 	className?: string;
 };

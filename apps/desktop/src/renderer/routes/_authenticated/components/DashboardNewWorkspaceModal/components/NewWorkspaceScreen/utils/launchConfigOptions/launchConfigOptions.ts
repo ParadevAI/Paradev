@@ -2,22 +2,18 @@ import type { SessionConfigOption } from "@superset/chat/protocol";
 import type {
 	AgentEffortOption,
 	AgentModelSupport,
-	AgentModeSupport,
 } from "@superset/shared/agent-models";
 
 /** Picking this option launches with the agent's own default. */
 export const AGENT_DEFAULT_OPTION_ID = "__agent_default__";
 export const LAUNCH_MODEL_OPTION_ID = "model";
 export const LAUNCH_EFFORT_OPTION_ID = "effort";
-export const LAUNCH_MODE_OPTION_ID = "mode";
 
 export type LaunchConfigLabels = {
 	model: string;
 	defaultModel: string;
 	effort: string;
 	defaultEffort: string;
-	mode: string;
-	directMode: string;
 };
 
 type Entry = { id: string; label: string };
@@ -48,8 +44,6 @@ export function launchConfigOptions(input: {
 	selectedModel: string | null;
 	efforts: readonly AgentEffortOption[];
 	selectedEffort: string | null;
-	modeSupport: AgentModeSupport | undefined;
-	selectedMode: string | null;
 	labels: LaunchConfigLabels;
 }): SessionConfigOption[] {
 	const { labels } = input;
@@ -72,18 +66,6 @@ export function launchConfigOptions(input: {
 			label: labels.effort,
 			category: "thought_level",
 			...withDefault(labels.defaultEffort, input.efforts, input.selectedEffort),
-		});
-	}
-	if (input.modeSupport) {
-		options.push({
-			id: LAUNCH_MODE_OPTION_ID,
-			label: labels.mode,
-			category: "launch_mode",
-			...withDefault(
-				labels.directMode,
-				input.modeSupport.modes,
-				input.selectedMode,
-			),
 		});
 	}
 	return options;

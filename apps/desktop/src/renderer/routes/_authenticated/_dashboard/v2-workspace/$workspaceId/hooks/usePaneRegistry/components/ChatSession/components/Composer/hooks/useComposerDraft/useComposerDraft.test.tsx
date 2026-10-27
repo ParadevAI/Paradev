@@ -157,3 +157,12 @@ test("text restored to a subagent's draft stays in memory and reaches its compos
 	);
 	expect(reopened.result.current.storedDraft).toEqual(text("for the subagent"));
 });
+
+test("a recovered draft remembers that dictation wrote part of it", () => {
+	prependToDraft("chat-v3-draft:dictated", [
+		{ ...text("said aloud"), usedDictation: true },
+	]);
+	expect(takeRecoveredDraft("chat-v3-draft:dictated")?.usedDictation).toBe(
+		true,
+	);
+});

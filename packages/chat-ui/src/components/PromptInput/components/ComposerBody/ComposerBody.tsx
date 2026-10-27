@@ -139,6 +139,7 @@ export type ComposerBodyProps = Required<
 		| "stopOnEscape"
 		| "onAttachmentClick"
 		| "chipForPaste"
+		| "localFiles"
 		| "ref"
 		| "allowEmptySubmit"
 		| "disabled"
@@ -195,6 +196,7 @@ export function ComposerBody({
 	stopOnEscape = true,
 	onAttachmentClick,
 	chipForPaste,
+	localFiles,
 	ref,
 	allowEmptySubmit,
 	disabled,
@@ -213,6 +215,7 @@ export function ComposerBody({
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const attachmentsRef = useRef(attachments);
 	attachmentsRef.current = attachments;
+	const usedDictationRef = useRef(false);
 	const addAttachments = useCallback(
 		(incoming: readonly Omit<PromptInputAttachment, "previewUrl">[]) => {
 			if (incoming.length === 0) return;
@@ -245,6 +248,7 @@ export function ComposerBody({
 					);
 				});
 				addAttachments(restored.attachments);
+				if (restored.usedDictation) usedDictationRef.current = true;
 				editor.focus();
 			},
 			isEmpty() {
@@ -337,6 +341,7 @@ export function ComposerBody({
 			});
 		}
 		addAttachments(draft.attachments);
+		if (draft.usedDictation) usedDictationRef.current = true;
 	}, [addAttachments, draft, editor]);
 
 	useEffect(
@@ -345,6 +350,7 @@ export function ComposerBody({
 				onDraftChangeRef.current?.({
 					segments: editorState.read($readDraftSegments),
 					attachments: attachmentsRef.current,
+					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				});
 			}),
 		[editor],
@@ -353,13 +359,23 @@ export function ComposerBody({
 		onDraftChangeRef.current?.({
 			segments: editor.getEditorState().read($readDraftSegments),
 			attachments,
+			...(usedDictationRef.current ? { usedDictation: true } : {}),
 		});
 	}, [attachments, editor]);
 
 	const addFiles = (files: FileList | File[]) => {
 		const incoming = Array.from(files);
 		if (incoming.length === 0) return;
-		addAttachments(incoming.map((file) => ({ id: crypto.randomUUID(), file })));
+		addAttachments(
+			incoming.map((file) => {
+				const sourcePath = localFiles?.pathOf(file);
+				return {
+					id: crypto.randomUUID(),
+					file,
+					...(sourcePath ? { sourcePath } : {}),
+				};
+			}),
+		);
 	};
 	const addPastedText = (text: string) => {
 		const ordinal =
@@ -547,11 +563,16 @@ export function ComposerBody({
 				files,
 				mentions,
 				steer,
-				draft: { segments, attachments: sent },
+				draft: {
+					segments,
+					attachments: sent,
+					...(usedDictationRef.current ? { usedDictation: true } : {}),
+				},
 			}) === false
 		)
 			return;
 		historyNavigationRef.current?.reset();
+		usedDictationRef.current = false;
 		editor.update(() => $getRoot().clear());
 		setAttachments((previous) => {
 			for (const attachment of previous) releaseAttachment(attachment);
@@ -577,6 +598,7 @@ export function ComposerBody({
 		maxSeconds: dictation?.maxSeconds,
 		audioBitsPerSecond: dictation?.audioBitsPerSecond,
 		onTranscript: (text) => {
+			if (text.trim()) usedDictationRef.current = true;
 			editor.update(() => $insertTranscript(text));
 			if (isFocusUnclaimed()) editor.focus();
 		},
@@ -925,6 +947,13 @@ export function ComposerBody({
 					attachments={attachments}
 					onShowPastedText={showPastedText}
 					onAttachmentClick={onAttachmentClick}
+					onReveal={
+						localFiles
+							? (attachment) =>
+									attachment.sourcePath &&
+									localFiles.reveal(attachment.sourcePath)
+							: undefined
+					}
 					onPreviewError={(id) =>
 						setAttachments((previous) =>
 							previous.map((entry) => {

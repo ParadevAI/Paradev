@@ -39,19 +39,21 @@ const UNRESTRICTED_TINT = "text-highlight";
 
 export function ModePicker({
 	currentModeId,
+	hiddenModeIds = HIDDEN_MODE_IDS,
 	iconOnly,
 	modes,
 	onSelect,
 }: {
-	modes: SessionMode[];
+	modes: readonly SessionMode[];
 	currentModeId: string | undefined;
+	hiddenModeIds?: ReadonlySet<string>;
 	iconOnly?: boolean;
 	onSelect: (modeId: string) => void;
 }) {
 	const { i18n, t } = useLingui();
 	const { shown, select } = useOptimisticSelections({ mode: currentModeId });
 	const shownModeId = shown("mode");
-	const offeredModes = modes.filter((mode) => !HIDDEN_MODE_IDS.has(mode.id));
+	const offeredModes = modes.filter((mode) => !hiddenModeIds.has(mode.id));
 	if (offeredModes.length < 2) return null;
 
 	const copyFor = (mode: SessionMode): ModeCopy => {

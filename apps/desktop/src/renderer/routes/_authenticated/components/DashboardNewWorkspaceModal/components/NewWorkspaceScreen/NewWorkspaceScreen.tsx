@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { acpStartModes } from "@superset/chat/core";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { draftText } from "@superset/chat-ui/PromptInput";
 import {
@@ -22,6 +23,7 @@ import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
@@ -40,6 +42,7 @@ import {
 	type AgentSwitcher,
 	ModelPicker,
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
+import { ModePicker } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
@@ -91,13 +94,15 @@ import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import {
+	AGENT_DEFAULT_OPTION_ID,
 	LAUNCH_EFFORT_OPTION_ID,
-	LAUNCH_MODE_OPTION_ID,
 	LAUNCH_MODEL_OPTION_ID,
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
 import { resolveCloudChoices } from "./utils/resolveCloudChoices";
+
+const NO_HIDDEN_MODES: ReadonlySet<string> = new Set();
 
 const SAMPLE_PROMPT_COUNT = 3;
 
@@ -537,10 +542,34 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
+	const acpChatEnabled = useAcpChatEnabled() === "enabled";
+	const startModes = acpChatEnabled
+		? acpStartModes(selectedPresetId)
+		: undefined;
+	const pickerModes = useMemo(
+		() =>
+			startModes?.modes ??
+			(modeSupport
+				? [
+						{
+							id: AGENT_DEFAULT_OPTION_ID,
+							label: t({ message: "Direct mode" }),
+						},
+						...modeSupport.modes.map(({ id, label }) => ({ id, label })),
+					]
+				: undefined),
+		[startModes, modeSupport, t],
+	);
+	const validModeIds = useMemo(
+		() => (startModes ?? modeSupport)?.modes.map((mode) => mode.id),
+		[startModes, modeSupport],
+	);
 	const { selectedMode, setSelectedMode } = useAgentModePreference(
 		MODE_STORAGE_KEY,
-		modeSupport ? selectedPresetId : null,
+		pickerModes ? selectedPresetId : null,
+		validModeIds,
 	);
+	const modeForLaunch = pickerModes ? selectedMode : null;
 	const launchOptions = useMemo(
 		() =>
 			launchConfigOptions({
@@ -548,35 +577,22 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
-				modeSupport,
-				selectedMode,
 				labels: {
 					model: t({ message: "Model" }),
 					defaultModel: t({ message: "Default model" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
-					mode: t({ message: "Mode" }),
-					directMode: t({ message: "Direct mode" }),
 				},
 			}),
-		[
-			effortOptions,
-			modeSupport,
-			modelSupport,
-			selectedEffort,
-			selectedMode,
-			selectedModel,
-			t,
-		],
+		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
 	);
 	const selectLaunchOption = useCallback(
 		(configId: string, value: string) => {
 			const picked = launchOptionValue(value);
 			if (configId === LAUNCH_MODEL_OPTION_ID) setSelectedModel(picked);
 			else if (configId === LAUNCH_EFFORT_OPTION_ID) setSelectedEffort(picked);
-			else if (configId === LAUNCH_MODE_OPTION_ID) setSelectedMode(picked);
 		},
-		[setSelectedEffort, setSelectedMode, setSelectedModel],
+		[setSelectedEffort, setSelectedModel],
 	);
 	// A model picked under another agent's tab lands once that agent's
 	// preference hook has re-keyed to it.
@@ -667,7 +683,7 @@ export function NewWorkspaceScreen({
 		selectedPresetId,
 		modelSupport ? selectedModel : null,
 		effortForLaunch,
-		modeSupport ? selectedMode : null,
+		modeForLaunch,
 		uploadAttachments,
 		promptContext,
 		resolvedEnvironment?.id ?? null,
@@ -900,6 +916,27 @@ export function NewWorkspaceScreen({
 						mentionProviders={githubProviders}
 						pending={isCreating}
 						placeholder={promptPlaceholder}
+						toolbar={
+							pickerModes && (
+								<ModePicker
+									currentModeId={
+										selectedMode ??
+										startModes?.defaultModeId ??
+										AGENT_DEFAULT_OPTION_ID
+									}
+									hiddenModeIds={startModes ? undefined : NO_HIDDEN_MODES}
+									modes={pickerModes}
+									onSelect={(modeId) =>
+										setSelectedMode(
+											modeId === AGENT_DEFAULT_OPTION_ID ||
+												modeId === startModes?.defaultModeId
+												? null
+												: modeId,
+										)
+									}
+								/>
+							)
+						}
 						toolbarEnd={
 							agentSwitcher && (
 								<ModelPicker

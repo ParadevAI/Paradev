@@ -65,6 +65,9 @@ export function joinDrafts(drafts: readonly ComposerDraft[]): ComposerDraft {
 	return {
 		segments,
 		attachments: drafts.flatMap((draft) => draft.attachments),
+		...(drafts.some((draft) => draft.usedDictation)
+			? { usedDictation: true }
+			: {}),
 	};
 }
 

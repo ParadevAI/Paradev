@@ -14,6 +14,7 @@ export {
 	type PromptInputDictation,
 	type PromptInputDictationError,
 	type PromptInputHandle,
+	type PromptInputLocalFiles,
 	type PromptInputProps,
 	type PromptInputSubmitPayload,
 } from "./PromptInput";

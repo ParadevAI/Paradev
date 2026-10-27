@@ -11150,9 +11150,6 @@ msgstr "Ứng dụng di động"
 msgid "Mobile App"
 msgstr "Ứng dụng di động"
 
-msgid "Mode"
-msgstr "Chế độ"
-
 msgid "model"
 msgstr "mô hình"
 

@@ -28,6 +28,7 @@ export type {
 	PromptInputDictation,
 	PromptInputDictationError,
 	PromptInputHandle,
+	PromptInputLocalFiles,
 	PromptInputProps,
 	PromptInputSubmitPayload,
 } from "./types";
@@ -57,6 +58,7 @@ export function PromptInput({
 	onAttachmentClick,
 	chipForPaste,
 	renderChip,
+	localFiles,
 	history,
 	className,
 }: PromptInputProps) {
@@ -92,6 +94,7 @@ export function PromptInput({
 						autoFocus={autoFocus}
 						onAttachmentClick={onAttachmentClick}
 						chipForPaste={chipForPaste}
+						localFiles={localFiles}
 						history={history}
 					/>
 				</ChipRenderProvider>

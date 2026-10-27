@@ -10,8 +10,6 @@ const labels = {
 	defaultModel: "Default model",
 	effort: "Effort",
 	defaultEffort: "Default effort",
-	mode: "Mode",
-	directMode: "Direct",
 };
 
 describe("launchConfigOptions", () => {
@@ -28,17 +26,11 @@ describe("launchConfigOptions", () => {
 				{ id: "high", label: "High" },
 			],
 			selectedEffort: null,
-			modeSupport: {
-				presetId: "omp",
-				modes: [{ id: "plan", label: "Plan first", args: ["--plan-yolo"] }],
-			},
-			selectedMode: "plan",
 			labels,
 		});
 		expect(options.map((option) => option.category)).toEqual([
 			"model",
 			"thought_level",
-			"launch_mode",
 		]);
 		expect(options[0]?.currentValue).toBe("opus");
 		expect(options[0]?.options.map((entry) => entry.id)).toEqual([
@@ -46,7 +38,6 @@ describe("launchConfigOptions", () => {
 			"opus",
 		]);
 		expect(options[1]?.currentValue).toBe(AGENT_DEFAULT_OPTION_ID);
-		expect(options[2]?.currentValue).toBe("plan");
 	});
 
 	test("a remembered pick the catalog no longer offers shows as the default", () => {
@@ -55,8 +46,6 @@ describe("launchConfigOptions", () => {
 			selectedModel: null,
 			efforts: [{ id: "low", label: "Low" }],
 			selectedEffort: "xhigh",
-			modeSupport: undefined,
-			selectedMode: null,
 			labels,
 		});
 		expect(effort?.currentValue).toBe(AGENT_DEFAULT_OPTION_ID);
@@ -69,8 +58,6 @@ describe("launchConfigOptions", () => {
 				selectedModel: null,
 				efforts: [],
 				selectedEffort: null,
-				modeSupport: undefined,
-				selectedMode: null,
 				labels,
 			}),
 		).toEqual([]);

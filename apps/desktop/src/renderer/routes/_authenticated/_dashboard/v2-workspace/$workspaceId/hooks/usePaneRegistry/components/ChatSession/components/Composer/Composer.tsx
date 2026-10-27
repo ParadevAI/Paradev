@@ -59,7 +59,11 @@ import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
 import { useAppCommands } from "./hooks/useAppCommands";
-import { takeRecoveredDraft, useComposerDraft } from "./hooks/useComposerDraft";
+import {
+	prependToDraft,
+	takeRecoveredDraft,
+	useComposerDraft,
+} from "./hooks/useComposerDraft";
 import { useDrawerEntry } from "./hooks/useDrawerEntry";
 import { useLinkChips } from "./hooks/useLinkChips";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
@@ -507,7 +511,9 @@ export const Composer = memo(function Composer({
 		) => {
 			const tags = await uploadAttachments(files);
 			if (!tags) {
-				promptInputRef.current?.restoreDraft(draft);
+				const input = promptInputRef.current;
+				if (input) input.restoreDraft(draft);
+				else prependToDraft(draftKey, [draft]);
 				return;
 			}
 			const message = text.trim();
@@ -541,6 +547,7 @@ export const Composer = memo(function Composer({
 			onSend,
 			uploadAttachments,
 			clearDraft,
+			draftKey,
 			mcpPicker.serverNameOf,
 			otherHostOf,
 		],
