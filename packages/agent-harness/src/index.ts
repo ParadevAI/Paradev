@@ -7,6 +7,11 @@ export {
 	type HostJobs,
 } from "./tools/hostJobs";
 export {
+	createPostMessageTool,
+	POST_MESSAGE_TOOL,
+	type RoomPoster,
+} from "./tools/postMessage";
+export {
 	createRemoteTools,
 	type RemoteTool,
 	type RemoteToolsOptions,

@@ -136,6 +136,7 @@ function setup(
 	replies: AssistantMessage[],
 	creds: TurnCredentials = credentials,
 ) {
+	const posts: Array<{ body: string; idempotencyKey: string }> = [];
 	const memory = memoryStore();
 	const host = fakeHost();
 	const model = scriptedModel(replies);
@@ -167,13 +168,19 @@ function setup(
 			cacheRead: 0,
 			cacheWrite: 0,
 		}),
+		roomPoster: () => ({
+			post: async (input) => {
+				posts.push(input);
+				return { messageId: `m${posts.length}` };
+			},
+		}),
 		sessionStore: () => memory.store,
 		hostJobs: () => host,
 		workspaceContext: async () => ({ cwd: "/repo" }),
 		readAgentsMd: async () => null,
 		flushEveryMs: 0,
 	});
-	return { activities, memory, host, model, settled, turn };
+	return { activities, memory, host, model, settled, turn, posts };
 }
 
 const ref = { sessionId: "s1", turnId: "t1" };
@@ -308,5 +315,52 @@ describe("agent activities", () => {
 			errorCode: "Agent may not use this workspace.",
 		});
 		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("failed");
+	});
+
+	test("in a room, the reply is posted once when the model did not post it", async () => {
+		const room = { ...credentials, room: { channelId: "c1" } };
+		const { activities, model, posts } = setup(
+			[assistant([{ type: "text", text: "All good." }])],
+			room,
+		);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "status?" });
+		await activities.modelStep({ ...ref, step: 0 });
+		const offered = (model.contexts[0]?.tools ?? []) as Array<{ name: string }>;
+		expect(offered.map((tool) => tool.name)).toContain("post_message");
+		expect(model.contexts[0]?.systemPrompt).toContain("post_message");
+		await activities.settleTurn({
+			...ref,
+			outcome: "completed",
+			steersConsumed: 0,
+		});
+		expect(posts).toEqual([{ body: "All good.", idempotencyKey: "t1:reply" }]);
+	});
+
+	test("in a room, a turn that posted is not posted again", async () => {
+		const room = { ...credentials, room: { channelId: "c1" } };
+		const { activities, posts } = setup(
+			[
+				assistant([
+					{
+						type: "toolCall",
+						id: "c1",
+						name: "post_message",
+						arguments: { body: "Done." },
+					},
+				]),
+				assistant([{ type: "text", text: "Posted the answer." }]),
+			],
+			room,
+		);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "status?" });
+		await activities.modelStep({ ...ref, step: 0 });
+		await activities.toolStep({ ...ref, step: 0, toolCallId: "c1" });
+		await activities.modelStep({ ...ref, step: 1 });
+		await activities.settleTurn({
+			...ref,
+			outcome: "completed",
+			steersConsumed: 0,
+		});
+		expect(posts).toEqual([{ body: "Done.", idempotencyKey: "c1" }]);
 	});
 });

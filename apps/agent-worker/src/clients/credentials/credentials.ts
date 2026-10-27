@@ -4,6 +4,8 @@ export interface TurnCredentials {
 	sessionStore: { baseUrl: string; writeTicket: string };
 	/** Null when the session has no workspace: the turn runs with no tools. */
 	host: (HostTarget & { workspaceId: string }) | null;
+	/** The room people read the session in; replies go there through post_message. */
+	room?: { channelId: string } | null;
 	model: { baseUrl: string; modelId: string; headers: Record<string, string> };
 }
 

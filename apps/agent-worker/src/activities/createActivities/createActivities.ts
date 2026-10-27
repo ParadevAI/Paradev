@@ -12,11 +12,14 @@ import type {
 } from "@earendil-works/pi-ai";
 import {
 	type AcpUpdate,
+	createPostMessageTool,
 	createRemoteTools,
 	type FileChange,
 	type HostJobs,
 	PiToAcp,
+	POST_MESSAGE_TOOL,
 	type RemoteTool,
+	type RoomPoster,
 } from "@superset/agent-harness";
 import { Context as ActivityContext } from "@temporalio/activity";
 import { ApplicationFailure } from "@temporalio/common";
@@ -58,6 +61,7 @@ export interface ActivityDeps {
 	flushEveryMs?: number;
 	heartbeatEveryMs?: number;
 	modelPrice?: (model: TurnCredentials["model"]) => Promise<ModelPrice>;
+	roomPoster?: (credentials: TurnCredentials) => RoomPoster | null;
 }
 
 interface TurnRef {
@@ -113,17 +117,25 @@ export function createActivities(deps: ActivityDeps) {
 		let cached = promptCache.get(ref.turnId);
 		if (!cached) {
 			cached = (async () => {
+				const inRoom = Boolean(credentials.room);
 				if (!host) {
 					return {
 						cwd: null,
-						systemPrompt: buildSystemPrompt({ cwd: null, agentsMd: null }),
+						systemPrompt: buildSystemPrompt({
+							cwd: null,
+							agentsMd: null,
+							inRoom,
+						}),
 					};
 				}
 				const { cwd } = await (deps.workspaceContext ?? defaultContext)(
 					credentials,
 				);
 				const agentsMd = await (deps.readAgentsMd ?? readAgentsMd)(host, cwd);
-				return { cwd, systemPrompt: buildSystemPrompt({ cwd, agentsMd }) };
+				return {
+					cwd,
+					systemPrompt: buildSystemPrompt({ cwd, agentsMd, inRoom }),
+				};
 			})();
 			promptCache.set(ref.turnId, cached);
 			cached.catch(() => promptCache.delete(ref.turnId));
@@ -147,6 +159,39 @@ export function createActivities(deps: ActivityDeps) {
 					...(onFileChange ? { onFileChange } : {}),
 				})
 			: [];
+
+	const posterFor = (credentials: TurnCredentials) =>
+		credentials.room ? (deps.roomPoster?.(credentials) ?? null) : null;
+
+	const turnTools = (
+		ref: TurnRef,
+		credentials: TurnCredentials,
+		host: HostJobs | null,
+		cwd: string | null,
+		onFileChange?: (toolCallId: string, change: FileChange) => void,
+	): RemoteTool[] => {
+		const poster = posterFor(credentials);
+		return [
+			...remoteTools(ref, credentials, host, cwd, onFileChange),
+			...(poster
+				? [createPostMessageTool(poster) as unknown as RemoteTool]
+				: []),
+		];
+	};
+
+	/** A turn that answered without post_message would leave the room silent. */
+	const postUnpostedReply = async (
+		ref: TurnRef & { outcome: SettleTurnInput["status"] },
+		credentials: TurnCredentials,
+		summary: ReturnType<typeof summarizeTurn>,
+	) => {
+		const poster = posterFor(credentials);
+		const reply = summary.reply?.trim();
+		if (!poster || ref.outcome !== "completed" || !reply) return;
+		if (summary.toolCalls?.some((call) => call.name === POST_MESSAGE_TOOL))
+			return;
+		await poster.post({ body: reply, idempotencyKey: `${ref.turnId}:reply` });
+	};
 
 	return {
 		async beginTurn(
@@ -204,7 +249,7 @@ export function createActivities(deps: ActivityDeps) {
 				store.transcript(),
 				workspace(input, credentials, host),
 			]);
-			const tools = remoteTools(input, credentials, host, cwd);
+			const tools = turnTools(input, credentials, host, cwd);
 			const toAcp = new PiToAcp(cwd ?? "/");
 			const messageId = `${input.turnId}-s${input.step}`;
 			const flusher = createFlusher(
@@ -304,7 +349,7 @@ export function createActivities(deps: ActivityDeps) {
 
 			const { cwd } = await workspace(input, credentials, host);
 			let fileChange: FileChange | undefined;
-			const tools = remoteTools(input, credentials, host, cwd, (id, change) => {
+			const tools = turnTools(input, credentials, host, cwd, (id, change) => {
 				if (id === call.id) fileChange = change;
 			});
 			const toAcp = new PiToAcp(cwd ?? "/");
@@ -389,6 +434,7 @@ export function createActivities(deps: ActivityDeps) {
 			if (running) {
 				rows = await turnRows(running.store);
 				const summary = summarizeTurn(rows);
+				await postUnpostedReply(input, running.credentials, summary);
 				settled = await deps.settler.settle({
 					...base,
 					...summary,
