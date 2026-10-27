@@ -219,7 +219,7 @@ export function createActivities(deps: ActivityDeps) {
 					},
 					{
 						systemPrompt,
-						messages: messagesOf(rows),
+						messages: messagesOf(rows, tools.length > 0),
 						tools: tools.map(declaration),
 					},
 					{
@@ -466,8 +466,8 @@ function userMessage(text: string, timestamp: number): Message {
 	return { role: "user", content: text, timestamp };
 }
 
-function messagesOf(rows: TranscriptRow[]): Message[] {
-	return rows
+function messagesOf(rows: TranscriptRow[], withTools: boolean): Message[] {
+	const messages = rows
 		.map((row) => row.entry as Message)
 		.filter(
 			(entry) =>
@@ -475,6 +475,33 @@ function messagesOf(rows: TranscriptRow[]): Message[] {
 				entry.role === "assistant" ||
 				entry.role === "toolResult",
 		);
+	return withTools ? messages : messages.map(withoutToolBlocks);
+}
+
+/** A session that lost its workspace offers no tools, and the model answers nothing to tool history it cannot match. */
+function withoutToolBlocks(message: Message): Message {
+	if (message.role === "toolResult") {
+		const output = message.content
+			.map((block) => (block.type === "text" ? block.text : `[${block.type}]`))
+			.join("\n");
+		return {
+			role: "user",
+			content: `[Result of ${message.toolName}${message.isError ? ", failed" : ""}]\n${output}`,
+			timestamp: message.timestamp,
+		};
+	}
+	if (message.role !== "assistant") return message;
+	return {
+		...message,
+		content: message.content.map((block) =>
+			block.type === "toolCall"
+				? {
+						type: "text" as const,
+						text: `[Called ${block.name} with ${JSON.stringify(block.arguments)}]`,
+					}
+				: block,
+		),
+	};
 }
 
 function declaration(tool: RemoteTool) {
