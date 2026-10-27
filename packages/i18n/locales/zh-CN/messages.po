@@ -4498,6 +4498,9 @@ msgstr "关闭当前窗格"
 msgid "Close the current tab"
 msgstr "关闭当前标签页"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "设置命令无错误完成时关闭标签页。设置失败时，标签页会保持打开，方便你查看错误"
+
 msgid "Close Window"
 msgstr "关闭窗口"
 
@@ -4506,6 +4509,9 @@ msgstr "关闭工作区"
 
 msgid "Close Workspace"
 msgstr "关闭工作区"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "设置成功后关闭 Workspace Setup 标签页"
 
 msgid "Closed"
 msgstr "已关闭"

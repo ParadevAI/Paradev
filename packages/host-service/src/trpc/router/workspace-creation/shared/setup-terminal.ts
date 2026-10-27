@@ -6,9 +6,18 @@ import {
 	loadProjectConfig,
 } from "../../../../runtime/setup/config";
 import { trackConfigResolved } from "../../../../runtime/setup/track-config-resolved";
+import { SETUP_SUCCEEDED_COMMAND } from "../../../../terminal/setup-succeeded-marker";
 import { createTerminalSessionInternal } from "../../../../terminal/terminal";
 import type { HostServiceContext } from "../../../../types";
+import { createCallerFactory } from "../../../index";
+import { panesRouter } from "../../panes";
+import { closeSetupPane } from "./close-setup-pane";
 import type { TerminalDescriptor } from "./types";
+
+const createPanesCaller = createCallerFactory(panesRouter);
+
+const CLOSE_SETUP_PANE_ATTEMPTS = 30;
+const CLOSE_SETUP_PANE_RETRY_DELAY_MS = 1_000;
 
 interface StartSetupTerminalArgs {
 	ctx: HostServiceContext;
@@ -19,6 +28,11 @@ interface StartSetupTerminalArgs {
 	 * resolves — the caller must then dispatch it separately.
 	 */
 	chainCommand?: string;
+	/**
+	 * Close the setup pane once setup exits 0. Ignored when `chainCommand` is
+	 * set, because the agent then runs in that terminal.
+	 */
+	closeOnSuccess?: boolean;
 }
 
 interface StartSetupTerminalResult {
@@ -76,9 +90,15 @@ export async function startSetupTerminalIfPresent(
 		return { terminal: null, warning: null, chained: false };
 	}
 
-	const initialCommand = args.chainCommand
-		? `${resolved.initialCommand} && ${args.chainCommand}`
-		: resolved.initialCommand;
+	const closeOnSuccess =
+		Boolean(args.closeOnSuccess) &&
+		!args.chainCommand &&
+		Boolean(args.ctx.browserBridge);
+	const initialCommand = buildSetupCommand({
+		setupCommand: resolved.initialCommand,
+		chainCommand: args.chainCommand,
+		closeOnSuccess,
+	});
 
 	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
@@ -88,6 +108,17 @@ export async function startSetupTerminalIfPresent(
 		eventBus: args.ctx.eventBus,
 		initialCommand,
 		...(resolved.cwd && { cwd: resolved.cwd }),
+		...(closeOnSuccess && {
+			onSetupSucceeded: () => {
+				void closeSetupPane({
+					panes: createPanesCaller(args.ctx),
+					workspaceId: args.workspaceId,
+					terminalId,
+					attempts: CLOSE_SETUP_PANE_ATTEMPTS,
+					retryDelayMs: CLOSE_SETUP_PANE_RETRY_DELAY_MS,
+				});
+			},
+		}),
 	});
 	if ("error" in result) {
 		return {
@@ -106,6 +137,19 @@ export async function startSetupTerminalIfPresent(
 		warning: null,
 		chained: Boolean(args.chainCommand),
 	};
+}
+
+/** Exported for tests. */
+export function buildSetupCommand(args: {
+	setupCommand: string;
+	chainCommand?: string;
+	closeOnSuccess: boolean;
+}): string {
+	if (args.chainCommand) return `${args.setupCommand} && ${args.chainCommand}`;
+	if (args.closeOnSuccess) {
+		return `${args.setupCommand} && ${SETUP_SUCCEEDED_COMMAND}`;
+	}
+	return args.setupCommand;
 }
 
 /** Exported for tests. Resolves the initial command for the setup terminal. */

@@ -4498,6 +4498,9 @@ msgstr "Close the current pane"
 msgid "Close the current tab"
 msgstr "Close the current tab"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+
 msgid "Close Window"
 msgstr "Close Window"
 
@@ -4506,6 +4509,9 @@ msgstr "Close workspace"
 
 msgid "Close Workspace"
 msgstr "Close Workspace"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Close Workspace Setup tab when setup succeeds"
 
 msgid "Closed"
 msgstr "Closed"

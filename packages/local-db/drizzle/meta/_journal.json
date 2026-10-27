@@ -421,6 +421,13 @@
       "when": 1792642705763,
       "tag": "0059_screenshot_url_optional",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "6",
+      "when": 1793127223456,
+      "tag": "0060_add_close_setup_on_success_setting",
+      "breakpoints": true
     }
   ]
 }

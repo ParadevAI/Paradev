@@ -4498,6 +4498,9 @@ msgstr "Zamknij bieżący panel"
 msgid "Close the current tab"
 msgstr "Zamknij bieżącą kartę"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Zamyka kartę, gdy polecenia konfiguracji zakończą się bez błędów. Gdy konfiguracja się nie powiedzie, karta pozostaje otwarta, aby można było zobaczyć błąd"
+
 msgid "Close Window"
 msgstr "Zamknij okno"
 
@@ -4506,6 +4509,9 @@ msgstr "Zamknij obszar roboczy"
 
 msgid "Close Workspace"
 msgstr "Zamknij obszar roboczy"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Zamknij kartę Workspace Setup po udanej konfiguracji"
 
 msgid "Closed"
 msgstr "Zamknięty"

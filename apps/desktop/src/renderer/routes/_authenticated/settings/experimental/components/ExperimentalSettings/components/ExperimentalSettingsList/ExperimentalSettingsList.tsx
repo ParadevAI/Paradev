@@ -20,6 +20,7 @@ import {
 } from "../../../../../utils/settings-search";
 import { AcpChatSetting } from "../AcpChatSetting";
 import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
+import { CloseSetupOnSuccessSetting } from "../CloseSetupOnSuccessSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -55,6 +56,10 @@ export function ExperimentalSettingsList({
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
+		visibleItems,
+	);
+	const showCloseSetupOnSuccess = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CLOSE_SETUP_ON_SUCCESS,
 		visibleItems,
 	);
 	const openV1ImportModal = useOpenV1ImportModal();
@@ -175,6 +180,7 @@ export function ExperimentalSettingsList({
 				{showAcpChat && <AcpChatSetting />}
 				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
+				{showCloseSetupOnSuccess && <CloseSetupOnSuccessSetting />}
 			</div>
 		</div>
 	);

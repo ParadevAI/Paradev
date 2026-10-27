@@ -4498,6 +4498,9 @@ msgstr "Het huidige paneel sluiten"
 msgid "Close the current tab"
 msgstr "Het huidige tabblad sluiten"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Sluit het tabblad als de setup-commando's zonder fouten eindigen. Als de setup mislukt, blijft het tabblad open zodat je de fout kunt zien"
+
 msgid "Close Window"
 msgstr "Venster sluiten"
 
@@ -4506,6 +4509,9 @@ msgstr "Werkruimte sluiten"
 
 msgid "Close Workspace"
 msgstr "Werkruimte sluiten"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Tabblad Workspace Setup sluiten als de setup slaagt"
 
 msgid "Closed"
 msgstr "Gesloten"

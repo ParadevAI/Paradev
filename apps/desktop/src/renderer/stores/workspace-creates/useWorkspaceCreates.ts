@@ -247,6 +247,8 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 	);
 	const { data: waitForSetupBeforeAgent } =
 		electronTrpc.settings.getWaitForSetupBeforeAgent.useQuery();
+	const { data: closeSetupOnSuccess } =
+		electronTrpc.settings.getCloseSetupOnSuccess.useQuery();
 
 	const submit = useCallback(
 		(args: SubmitArgs): SubmitHandle => {
@@ -340,11 +342,11 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 				worktreeExists: true,
 			});
 
-			// The wait-for-setup gate is a desktop setting the host can't read;
-			// send it with every agent-carrying create so the host chains the
-			// agent behind the setup commands. On a cold cache the hook value is
-			// still undefined — resolve it directly so an early create can't
-			// silently skip the gate (failures fall back to default-off).
+			// The wait-for-setup gate and close-setup-on-success are desktop
+			// settings the host can't read, so send them with the create (the
+			// gate only with agent-carrying creates). On a cold cache the hook
+			// values are still undefined — resolve them directly so an early
+			// create can't silently skip them (failures fall back to default-off).
 			const createPromise: Promise<CreateOutcome> = (async () => {
 				const client = getHostServiceClientByUrl(hostUrl);
 				if (snapshot.projectId === null) {
@@ -384,10 +386,17 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							.query()
 							.catch(() => false);
 				}
-				const payload: WorkspacesCreateInput =
-					snapshot.agents?.length && waitForSetup
-						? { ...snapshot, waitForSetupBeforeAgents: true }
-						: snapshot;
+				const closeSetup =
+					closeSetupOnSuccess ??
+					(await electronTrpcClient.settings.getCloseSetupOnSuccess
+						.query()
+						.catch(() => false));
+				const payload: WorkspacesCreateInput = {
+					...snapshot,
+					...(Boolean(snapshot.agents?.length) &&
+						waitForSetup && { waitForSetupBeforeAgents: true }),
+					...(closeSetup && { closeSetupOnSuccess: true }),
+				};
 				return createViaEnqueue(client, hostUrl, workspaceId, payload);
 			})();
 
@@ -474,6 +483,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			hostService,
 			trackWorkspaceTransaction,
 			waitForSetupBeforeAgent,
+			closeSetupOnSuccess,
 		],
 	);
 

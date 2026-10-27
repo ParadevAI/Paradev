@@ -64,6 +64,7 @@ export const DEFAULT_FILE_OPEN_MODE = "split-pane" as const;
 export const DEFAULT_FILE_AUTO_SAVE = "off" as const;
 export const DEFAULT_AUTO_APPLY_DEFAULT_PRESET = true;
 export const DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT = false;
+export const DEFAULT_CLOSE_SETUP_ON_SUCCESS = false;
 export const DEFAULT_SHOW_PRESETS_BAR = true;
 export const DEFAULT_USE_COMPACT_TERMINAL_ADD_BUTTON = true;
 export const DEFAULT_TELEMETRY_ENABLED = true;
