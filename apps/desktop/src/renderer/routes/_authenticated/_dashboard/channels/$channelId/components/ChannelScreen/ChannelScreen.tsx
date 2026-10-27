@@ -42,6 +42,8 @@ const NOW_TICK_MS = 30_000;
 interface ChannelScreenProps {
 	channelId: string;
 	thread?: string;
+	/** Scrolls to this message, then clears itself from the URL. */
+	message?: string;
 	/** Opens the details dialog on this tab, then clears itself from the URL. */
 	details?: ChannelDetailsTab;
 	/** Replaces the channel header, for a DM drawn as its Dev's page. */
@@ -54,6 +56,7 @@ interface ChannelScreenProps {
 export function ChannelScreen({
 	channelId,
 	thread,
+	message: messageParam,
 	details: detailsParam,
 	renderHeader,
 	intro,
@@ -98,11 +101,25 @@ export function ChannelScreen({
 		return () => observer.disconnect();
 	}, [container]);
 	const setViewedChannel = useViewedChannelStore((state) => state.setChannelId);
+	const setViewedThread = useViewedChannelStore(
+		(state) => state.setThreadRootId,
+	);
+	const openThreadKey = useChannelPanelStore((state) => {
+		const channelPanel = state.panels[channelId];
+		return channelPanel?.isOpen && channelPanel.activeKey?.startsWith("thread:")
+			? channelPanel.activeKey
+			: null;
+	});
 
 	useEffect(() => {
 		setViewedChannel(channelId);
 		return () => setViewedChannel(null);
 	}, [channelId, setViewedChannel]);
+
+	useEffect(() => {
+		setViewedThread(openThreadKey?.slice("thread:".length) ?? null);
+		return () => setViewedThread(null);
+	}, [openThreadKey, setViewedThread]);
 
 	const lastReadSeq = channel?.membership?.lastReadSeq ?? null;
 	if (ghost === undefined && channel && !query.isFetching) {
@@ -120,6 +137,20 @@ export function ChannelScreen({
 			replace: true,
 		});
 	}, [thread, channelId, openPanelTab, navigate, threadLabel]);
+
+	const [focusMessageId, setFocusMessageId] = useState<string | null>(null);
+	useEffect(() => {
+		if (!messageParam) return;
+		setTab("messages");
+		setFocusMessageId(messageParam);
+		void navigate({
+			to: "/channels/$channelId",
+			params: { channelId },
+			search: {},
+			replace: true,
+		});
+	}, [messageParam, channelId, navigate]);
+	const clearFocusMessage = useCallback(() => setFocusMessageId(null), []);
 
 	useEffect(() => {
 		if (!detailsParam) return;
@@ -188,6 +219,11 @@ export function ChannelScreen({
 		onSuccess: refresh,
 		onError,
 	});
+	const setSuppressBroadcasts =
+		cloudTrpc.channel.setSuppressBroadcasts.useMutation({
+			onSuccess: refresh,
+			onError,
+		});
 	const update = cloudTrpc.channel.update.useMutation({
 		onSuccess: refresh,
 		onError,
@@ -356,6 +392,8 @@ export function ChannelScreen({
 							now={now}
 							onOpenThread={openThread}
 							intro={intro}
+							focusMessageId={focusMessageId}
+							onFocusedMessage={clearFocusMessage}
 						/>
 						{canPost && currentUserId ? (
 							<div className="shrink-0 px-4 pb-4">
@@ -419,6 +457,9 @@ export function ChannelScreen({
 				peopleById={peopleById}
 				currentUserId={currentUserId}
 				onSetNotify={(notify) => setNotify.mutate({ channelId, notify })}
+				onSetSuppressBroadcasts={(suppressBroadcasts) =>
+					setSuppressBroadcasts.mutate({ channelId, suppressBroadcasts })
+				}
 				onLeave={() => {
 					setDetails(null);
 					requestLeave();

@@ -1,5 +1,6 @@
 import type {
 	ChannelAttachment,
+	ChannelBroadcast,
 	ChannelMessageWire,
 } from "@superset/shared/channels";
 import type { RouterOutputs } from "@superset/trpc";
@@ -29,6 +30,7 @@ export function pendingMessage(input: {
 	clientId: string;
 	threadRootId: string | null;
 	mentionedUserIds: string[];
+	broadcast?: ChannelBroadcast | null;
 	/** Local previews of the files on their way up. */
 	attachments?: ChannelAttachment[];
 }): ChannelMessage {
@@ -41,6 +43,7 @@ export function pendingMessage(input: {
 		authorAgentId: null,
 		body: input.body,
 		mentionedUserIds: input.mentionedUserIds,
+		broadcast: input.broadcast ?? null,
 		clientId: input.clientId,
 		replyCount: 0,
 		lastReplyAt: null,

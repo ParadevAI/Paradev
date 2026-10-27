@@ -350,3 +350,10 @@ export const agentTurnReasonValues = [
 ] as const;
 export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
 export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
+export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
+export const channelBroadcastEnum = z.enum(channelBroadcastValues);
+export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;
+
+export const dockBounceValues = ["off", "once", "until_focused"] as const;
+export const dockBounceEnum = z.enum(dockBounceValues);
+export type DockBounce = z.infer<typeof dockBounceEnum>;

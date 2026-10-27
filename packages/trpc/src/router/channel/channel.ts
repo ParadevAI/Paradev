@@ -52,6 +52,7 @@ import {
 	setMutedSchema,
 	setNotifySchema,
 	setRoleSchema,
+	setSuppressBroadcastsSchema,
 	updateChannelSchema,
 } from "./schema";
 
@@ -163,6 +164,7 @@ function summary(access: ChannelAccess, memberCount: number) {
 					role: membership.role,
 					notify: membership.notify,
 					muted: membership.muted,
+					suppressBroadcasts: membership.suppressBroadcasts,
 					lastReadSeq: membership.lastReadSeq,
 				}
 			: null,
@@ -495,6 +497,21 @@ export const channelRouter = {
 					),
 				);
 			return { notify: input.notify };
+		}),
+
+	setSuppressBroadcasts: protectedProcedure
+		.input(setSuppressBroadcastsSchema)
+		.mutation(async ({ ctx, input }) => {
+			await db
+				.update(channelMembers)
+				.set({ suppressBroadcasts: input.suppressBroadcasts })
+				.where(
+					and(
+						eq(channelMembers.channelId, input.channelId),
+						eq(channelMembers.userId, ctx.session.user.id),
+					),
+				);
+			return { suppressBroadcasts: input.suppressBroadcasts };
 		}),
 
 	setMuted: protectedProcedure

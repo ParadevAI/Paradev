@@ -1,6 +1,9 @@
 import { describe, expect, it } from "bun:test";
 import { createWorkspaceStore } from "@superset/panes";
-import type { PaneViewerData } from "../../../../types";
+import {
+	type PaneViewerData,
+	PENDING_CLOUD_CHAT_PANE_KIND,
+} from "../../../../types";
 import { moveViewerPanesToRight } from "./moveViewerPanesToRight";
 
 function pane(id: string, kind: string) {
@@ -30,6 +33,22 @@ describe("moveViewerPanesToRight", () => {
 				.getState()
 				.tabs.map((tab) => Object.values(tab.panes).map((p) => p.id)),
 		).toEqual([["file"], ["web"]]);
+	});
+
+	it("keeps a cloud chat that is still starting in the center", () => {
+		const center = createWorkspaceStore<PaneViewerData>();
+		const right = createWorkspaceStore<PaneViewerData>();
+		center.getState().addTab({
+			id: "c1",
+			panes: [pane("waiting", PENDING_CLOUD_CHAT_PANE_KIND)],
+		});
+
+		moveViewerPanesToRight({ center, right });
+
+		expect(Object.keys(center.getState().tabs[0]?.panes ?? {})).toEqual([
+			"waiting",
+		]);
+		expect(right.getState().tabs).toHaveLength(0);
 	});
 
 	it("folds a center Changes pane into the right area's, keeping the file it showed", () => {

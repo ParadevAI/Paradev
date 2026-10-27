@@ -1,1 +1,0 @@
-export { MessageMentionOption } from "./mentionOption";

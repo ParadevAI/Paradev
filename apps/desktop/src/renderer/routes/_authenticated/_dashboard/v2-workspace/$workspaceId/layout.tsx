@@ -20,10 +20,12 @@ import { useSandboxAccess } from "renderer/routes/_authenticated/providers/Sandb
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
 import { CloudWorkspaceArchivedState } from "../components/CloudWorkspaceArchivedState";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
+import { PendingCloudChatPreview } from "../components/PendingCloudChatPreview";
 import { WorkspaceCreateErrorState } from "../components/WorkspaceCreateErrorState";
 import { WorkspaceCreatingState } from "../components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "../components/WorkspaceHostIncompatibleState";
 import { useArchivedCloudWorkspace } from "../hooks/useArchivedCloudWorkspace";
+import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
@@ -42,6 +44,7 @@ function V2WorkspaceLayout() {
 	// could always reach and this one cannot.
 	const { workspaceId } = Route.useParams();
 	const collections = useCollections();
+	const pendingCloudChat = usePendingCloudChat(workspaceId);
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
 		workspaceId ? (state.byWorkspaceId[workspaceId] ?? null) : null,
@@ -159,6 +162,17 @@ function V2WorkspaceLayout() {
 	// provisioning there is no box to open, and once it has failed there never
 	// will be; a ready one only waits for its address to be minted.
 	if (!workspace && cloudWorkspace) {
+		if (cloudWorkspace.status === "ready" && pendingCloudChat) {
+			return (
+				<StateScreenShell>
+					<PendingCloudChatPreview
+						label={
+							pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
+						}
+					/>
+				</StateScreenShell>
+			);
+		}
 		if (cloudWorkspace.status === "ready") {
 			return <StateScreenShell>{null}</StateScreenShell>;
 		}

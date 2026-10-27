@@ -8,7 +8,11 @@ const DETAILS_TABS: readonly ChannelDetailsTab[] = [
 	"settings",
 ];
 
-export type ChannelSearch = { thread?: string; details?: ChannelDetailsTab };
+export type ChannelSearch = {
+	thread?: string;
+	message?: string;
+	details?: ChannelDetailsTab;
+};
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/channels/$channelId/",
@@ -19,18 +23,23 @@ export const Route = createFileRoute(
 			typeof search.thread === "string" && search.thread
 				? search.thread
 				: undefined,
+		message:
+			typeof search.message === "string" && search.message
+				? search.message
+				: undefined,
 		details: DETAILS_TABS.find((tab) => tab === search.details),
 	}),
 });
 
 function ChannelPage() {
 	const { channelId } = Route.useParams();
-	const { thread, details } = Route.useSearch();
+	const { thread, message, details } = Route.useSearch();
 	return (
 		<ChannelScreen
 			key={channelId}
 			channelId={channelId}
 			thread={thread}
+			message={message}
 			details={details}
 		/>
 	);

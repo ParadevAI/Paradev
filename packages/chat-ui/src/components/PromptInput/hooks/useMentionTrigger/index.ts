@@ -1,0 +1,1 @@
+export { useMentionTrigger } from "./useMentionTrigger";

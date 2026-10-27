@@ -41,6 +41,8 @@ export type ComposerMentionEntry = {
 	description?: string;
 	icon?: ReactNode;
 	keywords?: string[];
+	// Drawn in place of icon, label and description; label still drives matching.
+	row?: ReactNode;
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
@@ -68,6 +70,8 @@ export type ComposerMentionProvider = {
 	id: string;
 	title: string;
 	priority: number;
+	// The character that opens this provider's menu; "@" when unset.
+	trigger?: string;
 	source: ComposerMentionSource;
 };
 

@@ -2,6 +2,7 @@ import { db } from "@superset/db/client";
 import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
 import {
 	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
 import { and, eq, inArray, isNull } from "drizzle-orm";
@@ -240,7 +241,10 @@ export async function startCloudWorkspace(args: {
 	}
 	nudge(row.organizationId, "cloud_workspaces");
 	await queueProvision(job);
-	return row;
+	return {
+		...row,
+		initialLaunch: await describeCloudAgentLaunch(job.launch),
+	};
 }
 
 /**

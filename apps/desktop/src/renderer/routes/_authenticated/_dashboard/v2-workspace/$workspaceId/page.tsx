@@ -24,6 +24,7 @@ import { CommandPalette } from "renderer/screens/main/components/CommandPalette"
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import { useStore } from "zustand";
+import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useWorkspace } from "../providers/WorkspaceProvider";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
@@ -84,6 +85,7 @@ import type {
 	PaneViewerData,
 	SubagentPaneData,
 } from "./types";
+import { isWorktreeMissing } from "./utils/isWorktreeMissing";
 import {
 	closeVisibleChangesPane,
 	findVisibleChangesPane,
@@ -140,14 +142,17 @@ export const Route = createFileRoute(
 
 function V2WorkspacePage() {
 	const { workspace } = useWorkspace();
+	const pendingCloudChat = usePendingCloudChat(workspace.id);
 	const workspaceStatusQuery = workspaceTrpc.workspace.get.useQuery(
 		{ id: workspace.id },
 		{
+			enabled: !pendingCloudChat,
+			staleTime: 0,
 			refetchOnWindowFocus: true,
 		},
 	);
 
-	if (workspaceStatusQuery.data?.worktreeExists === false) {
+	if (isWorktreeMissing(workspaceStatusQuery, !!pendingCloudChat)) {
 		return (
 			<StateScreenShell>
 				<WorkspaceMissingWorktreeState

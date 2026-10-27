@@ -79,8 +79,20 @@ export interface PagePaneData {
 	title?: string;
 }
 
+export const PENDING_CLOUD_CHAT_PANE_KIND = "pending-cloud-chat";
+
+export interface PendingCloudChatPaneData {
+	draftId: string;
+	agentId: string;
+	promptHash: string;
+	queuedPrompts?: UserContent[][];
+	chatModelId?: string;
+	chatModeId?: string;
+}
+
 export interface ChatPaneData {
 	terminalId: string;
+	draftId?: string;
 	sessionId: string | null;
 	agent?: {
 		id: string;
@@ -165,6 +177,7 @@ export type PaneViewerData =
 	| FilePaneData
 	| TerminalPaneData
 	| ChatPaneData
+	| PendingCloudChatPaneData
 	| BrowserPaneData
 	| DevtoolsPaneData
 	| DiffPaneData

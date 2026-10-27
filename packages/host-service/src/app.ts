@@ -40,6 +40,7 @@ import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
+import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
@@ -622,6 +623,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	/** Same context the launcher above builds: a resume runs an agent. */
 	const resumeCrashedAgents = async () => {
+		await waitForSandboxManagedEnv();
 		const ctx = {
 			git,
 			credentials: providers.credentials,

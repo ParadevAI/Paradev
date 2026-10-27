@@ -13,6 +13,7 @@ const at = (seq: number, author: string, iso: string): ChannelMessage => ({
 		clientId: `k${seq}`,
 		threadRootId: null,
 		mentionedUserIds: [],
+		broadcast: null,
 	}),
 	id: `m${seq}`,
 	seq,

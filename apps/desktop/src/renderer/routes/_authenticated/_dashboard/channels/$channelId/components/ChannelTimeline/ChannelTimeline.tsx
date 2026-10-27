@@ -58,6 +58,8 @@ interface ChannelTimelineProps {
 	now: Date;
 	onOpenThread: (message: ChannelMessage) => void;
 	intro?: ReactNode;
+	focusMessageId: string | null;
+	onFocusedMessage: () => void;
 }
 
 export function ChannelTimeline({
@@ -80,6 +82,8 @@ export function ChannelTimeline({
 	now,
 	onOpenThread,
 	intro,
+	focusMessageId,
+	onFocusedMessage,
 }: ChannelTimelineProps) {
 	const query = cloudTrpc.channelMessage.list.useInfiniteQuery(
 		{ channelId },
@@ -282,6 +286,20 @@ export function ChannelTimeline({
 		observer.observe(sentinel);
 		return () => observer.disconnect();
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage, firstId]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: retries as messages load until placed
+	useLayoutEffect(() => {
+		const scroller = scrollerRef.current;
+		if (!focusMessageId || !scroller || !positioned.current) return;
+		const element = scroller.querySelector(
+			`[data-message-id="${CSS.escape(focusMessageId)}"]`,
+		);
+		if (element) {
+			pinnedToLine.current = false;
+			element.scrollIntoView({ block: "center" });
+		}
+		onFocusedMessage();
+	}, [focusMessageId, messages, onFocusedMessage]);
 
 	const [jump, setJump] = useState<Jump | null>(null);
 	const isJumping = useRef(false);

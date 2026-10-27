@@ -13,6 +13,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useNavigate } from "@tanstack/react-router";
 import { type ComponentProps, useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
@@ -21,14 +22,19 @@ import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
+import { useOrgChannels } from "../../hooks/useOrgChannels";
 import { EDITED_HREF, remarkEditedMark } from "../../utils/remarkEditedMark";
 import {
+	CHANNEL_HREF_PREFIX,
 	MENTION_HREF_PREFIX,
+	remarkChannelRefs,
 	remarkMentions,
 } from "../../utils/remarkMentions";
+import { BroadcastChip } from "../BroadcastChip";
+import { ChannelRefChip } from "../ChannelRefChip";
+import { MentionChip } from "../MentionChip";
 import { PersonAvatar } from "../PersonAvatar";
 import { PersonHoverCard } from "../PersonHoverCard";
-import { MentionChip } from "./components/MentionChip";
 import { MessageActions } from "./components/MessageActions";
 import { MessageAttachments } from "./components/MessageAttachments";
 import { MessageEditor } from "./components/MessageEditor";
@@ -38,6 +44,7 @@ import { useMessageDev } from "./hooks/useMessageDev";
 import { useMessageMenuItems } from "./hooks/useMessageMenuItems";
 import { toggleReaction } from "./utils/toggleReaction";
 
+const BROADCAST_ID_PREFIX = "broadcast:";
 export interface ChannelPerson {
 	id: string;
 	name: string;
@@ -150,11 +157,23 @@ export function ChannelMessageRow({
 		edit.mutate({ messageId: message.id, ...next });
 	};
 
+	const navigate = useNavigate();
+	const channels = useOrgChannels();
 	const markdown = useMemo(() => {
-		const mentioned = message.mentionedUserIds.flatMap((id) => {
-			const person = peopleById.get(id);
-			return person ? [person] : [];
-		});
+		const mentioned = [
+			...message.mentionedUserIds.flatMap((id) => {
+				const person = peopleById.get(id);
+				return person ? [person] : [];
+			}),
+			...(message.broadcast
+				? [
+						{
+							id: `${BROADCAST_ID_PREFIX}${message.broadcast}`,
+							name: message.broadcast,
+						},
+					]
+				: []),
+		];
 		const DefaultLink = chatMarkdownComponents.a;
 		const components: ChatMarkdownProps["components"] = {
 			a: (props: ComponentProps<typeof DefaultLink>) => {
@@ -165,9 +184,27 @@ export function ChannelMessageRow({
 						</span>
 					);
 				}
+				if (props.href?.startsWith(CHANNEL_HREF_PREFIX)) {
+					const channelId = props.href.slice(CHANNEL_HREF_PREFIX.length);
+					return (
+						<ChannelRefChip
+							onClick={() =>
+								void navigate({
+									to: "/channels/$channelId",
+									params: { channelId },
+								})
+							}
+						>
+							{props.children}
+						</ChannelRefChip>
+					);
+				}
 				const id = props.href?.startsWith(MENTION_HREF_PREFIX)
 					? props.href.slice(MENTION_HREF_PREFIX.length)
 					: null;
+				if (id?.startsWith(BROADCAST_ID_PREFIX)) {
+					return <BroadcastChip>{props.children}</BroadcastChip>;
+				}
 				const person = id ? peopleById.get(id) : undefined;
 				if (!person) return <DefaultLink {...props} />;
 				return (
@@ -181,16 +218,27 @@ export function ChannelMessageRow({
 				);
 			},
 		};
-		const remarkPlugins = [
-			...(mentioned.length > 0 ? [remarkMentions(mentioned)] : []),
-			...(message.editedAt ? [remarkEditedMark] : []),
-		];
+		const remarkPlugins: NonNullable<ChatMarkdownProps["remarkPlugins"]> = [];
+		if (mentioned.length > 0) {
+			remarkPlugins.push([remarkMentions, { people: mentioned }]);
+		}
+		if (channels?.length && message.body.includes("#")) {
+			remarkPlugins.push([
+				remarkChannelRefs,
+				{ channels: channelRefs(channels) },
+			]);
+		}
+		if (message.editedAt) remarkPlugins.push(remarkEditedMark);
 		return {
 			components,
 			remarkPlugins: remarkPlugins.length > 0 ? remarkPlugins : undefined,
 		};
 	}, [
+		message.body,
+		channels,
+		navigate,
 		message.mentionedUserIds,
+		message.broadcast,
 		message.channelId,
 		message.editedAt,
 		peopleById,
@@ -365,4 +413,8 @@ export function ChannelMessageRow({
 	) : (
 		row
 	);
+}
+
+function channelRefs(channels: readonly { id: string; name: string }[]) {
+	return channels.map(({ id, name }) => ({ id, name }));
 }

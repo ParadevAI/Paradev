@@ -10,10 +10,12 @@ import { useCallback, useRef, useState } from "react";
 import { useAwaitAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
+import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
@@ -46,6 +48,7 @@ export function useSubmitWorkspace(
 	const matchRoute = useMatchRoute();
 	const { closeAndResetDraft, draft } = useDashboardNewWorkspaceDraft();
 	const { submit } = useWorkspaceCreates();
+	const collections = useCollections();
 	const { machineId } = useLocalHostService();
 	const activeOrganizationId = useActiveOrganizationId();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
@@ -171,7 +174,7 @@ export function useSubmitWorkspace(
 							timeoutMs: 2000,
 						})
 					: null;
-				const created = await createCloudWorkspace.mutateAsync({
+				const createdResult = await createCloudWorkspace.mutateAsync({
 					organizationId: activeOrganizationId,
 					environmentId,
 					name: workspaceName ?? undefined,
@@ -199,6 +202,17 @@ export function useSubmitWorkspace(
 							}
 						: {}),
 				});
+				const { initialLaunch, ...created } = createdResult;
+				if (initialLaunch?.surface === "chat") {
+					seedPendingCloudChat({
+						collections,
+						workspaceId: created.id,
+						launch: initialLaunch,
+						chatEnabled: await awaitAcpChatEnabled(),
+						modelId: selectedModel,
+						modeId: selectedMode,
+					});
+				}
 				closeAndResetDraft();
 				// The cloud list is what both the sidebar and the workspace route
 				// read, and nothing used to tell it a workspace had been created —
@@ -391,6 +405,7 @@ export function useSubmitWorkspace(
 		awaitAcpChatEnabled,
 		selectedPresetId,
 		closeAndResetDraft,
+		collections,
 		createCloudWorkspace,
 		draft,
 		isSession,

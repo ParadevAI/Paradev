@@ -64,6 +64,7 @@ export function toWire(message: EnrichedMessage): ChannelMessageWire {
 		authorAgentId: message.authorAgentId,
 		body: message.body,
 		mentionedUserIds: message.mentionedUserIds,
+		broadcast: message.broadcast,
 		clientId: message.clientId,
 		replyCount: message.replyCount,
 		lastReplyAt: message.lastReplyAt?.toISOString() ?? null,

@@ -2,8 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { MessageComposer } from "@superset/chat-ui/MessageComposer";
 import {
 	mentionedUserIds,
-	useChannelMentionGroups,
-} from "../../../../hooks/useChannelMentionGroups";
+	useChannelMentions,
+} from "../../../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../../../hooks/useEmojiSuggestions";
 import type { ChannelPerson } from "../../ChannelMessageRow";
 
@@ -28,7 +28,7 @@ export function MessageEditor({
 	onCancel,
 }: MessageEditorProps) {
 	const { t } = useLingui();
-	const getMentionGroups = useChannelMentionGroups({
+	const { mentionProviders, renderChip } = useChannelMentions({
 		channelId,
 		people,
 		currentUserId,
@@ -39,7 +39,8 @@ export function MessageEditor({
 			className="py-1"
 			initialMarkdown={body}
 			placeholder={t({ message: "Edit message" })}
-			getMentionGroups={getMentionGroups}
+			mentionProviders={mentionProviders}
+			renderChip={renderChip}
 			getEmojiSuggestions={getEmojiSuggestions}
 			onCancel={onCancel}
 			onSubmit={(payload) => {

@@ -138,6 +138,21 @@ reconnects, the lost session is reported gone, and the agent is resumed into
 a fresh terminal with its scrollback (the cold-restore path), about 15–20 s
 after opening.
 
+**A stored chat survives a stop, but its agent process does not.** A cached
+`getSession` result can still say `live: true` when a resumed box has no chat
+process. The transcript socket can reconnect and replay that stored session
+before recovery checks its liveness, so an immediate prompt fails with
+"Couldn't send your message. It's back in the composer." Switching tabs or
+workspaces remounts the chat and used to be what reran a liveness check that
+failed during boot, so the resume notice could appear only after returning.
+The desktop now rechecks liveness on mount, host reconnect and address change,
+and holds prompts in the pane's pending queue until that check finishes and
+recovery resumes the agent. The client's existing outbox stays paused too; if recovery
+replaces the session, never-attempted text returns to the same composer draft
+rather than being sent to the stopped process. Failed liveness checks retry
+even if the connection stays open, and never reuse the cached live flag. This
+is a client change; existing boxes do not need a new host-service bundle.
+
 **Two gates sit between the renderer and a sandbox**, and both fail as a bare
 `TypeError: Failed to fetch`: the renderer's CSP `connect-src` allowlist
 (`https://*.vercel.run`), and the WebSocket, which can't carry a header from a
@@ -278,6 +293,18 @@ boot, host-service holds them in memory (`sandbox-managed-env`) and
 terminals and agent launches inherit the pushed set; open terminals keep the
 one they started with; nothing is written to disk. A host-service restart
 comes up with an empty set until the next push, which every wake performs.
+
+**Listening precedes the managed environment push.** Chat launches and boot-time
+agent resumes used to build their environment as soon as the listener opened,
+before the control plane supplied credential placeholders. They now use the
+same bounded 120-second environment wait as the initial sandbox agent launch;
+local hosts do not wait. This part requires a published host-service bundle.
+A slow bundle update can also exceed the control plane's 60-second health wait,
+so that wake never reaches the environment push. The desktop now retries failed
+wakes after 30 seconds with bounded backoff, rather than waiting for the normal
+ten-minute keepalive. Successful wakes keep that normal interval. These are
+code-level startup gaps, not a verified explanation of any particular user's
+delay.
 
 **Cloud agent registration cannot depend on the first launch.** The creation picker knows which
 CLIs the image installs, but the chat picker reads the sandbox's persisted agent configurations.

@@ -26,7 +26,14 @@ export function mentionCountSql(userId: string) {
 			and m.seq > ${channelMembers.lastReadSeq}
 			and m.thread_root_id is null
 			and m.deleted_at is null
-			and ${userId}::uuid = any(m.mentioned_user_ids)
+			and (
+				${userId}::uuid = any(m.mentioned_user_ids)
+				or (
+					m.broadcast is not null
+					and not ${channelMembers.suppressBroadcasts}
+					and m.author_user_id is distinct from ${userId}
+				)
+			)
 	)`;
 }
 
@@ -46,7 +53,13 @@ export function threadMentionCountSql(userId: string) {
 		where m.thread_root_id = ${channelThreadFollows.rootId}
 			and m.seq > ${channelThreadFollows.lastReadSeq}
 			and m.deleted_at is null
-			and ${userId}::uuid = any(m.mentioned_user_ids)
+			and (
+				${userId}::uuid = any(m.mentioned_user_ids)
+				or (
+					m.broadcast = 'here'
+					and m.author_user_id is distinct from ${userId}
+				)
+			)
 	)`;
 }
 

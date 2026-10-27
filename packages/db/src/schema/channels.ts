@@ -17,10 +17,12 @@ import {
 import { agents } from "./agents";
 import { organizations, users } from "./auth";
 import {
+	channelBroadcastValues,
 	channelKindValues,
 	channelMemberRoleValues,
 	channelNotifyValues,
 	channelVisibilityValues,
+	dockBounceValues,
 } from "./enums";
 import { tasks } from "./schema";
 
@@ -34,6 +36,11 @@ export const channelMemberRole = pgEnum(
 );
 export const channelNotify = pgEnum("channel_notify", channelNotifyValues);
 export const channelKind = pgEnum("channel_kind", channelKindValues);
+export const channelBroadcast = pgEnum(
+	"channel_broadcast",
+	channelBroadcastValues,
+);
+export const dockBounce = pgEnum("dock_bounce", dockBounceValues);
 
 /**
  * A conversation for a group of people in an organization. Public channels
@@ -89,8 +96,10 @@ export const channelMembers = pgTable(
 			.notNull()
 			.references(() => users.id, { onDelete: "cascade" }),
 		role: channelMemberRole().notNull().default("member"),
-		notify: channelNotify().notNull().default("mentions"),
+		/** Null follows the person's default in `channel_notification_prefs`. */
+		notify: channelNotify(),
 		muted: boolean().notNull().default(false),
+		suppressBroadcasts: boolean("suppress_broadcasts").notNull().default(false),
 		lastReadSeq: bigint("last_read_seq", { mode: "number" })
 			.notNull()
 			.default(0),
@@ -138,6 +147,7 @@ export const channelMessages = pgTable(
 			.array()
 			.notNull()
 			.default(sql`'{}'::uuid[]`),
+		broadcast: channelBroadcast(),
 		clientId: text("client_id"),
 		replyCount: integer("reply_count").notNull().default(0),
 		lastReplyAt: timestamp("last_reply_at", { withTimezone: true }),
@@ -235,3 +245,34 @@ export const channelTasks = pgTable(
 	},
 	(t) => [index("channel_tasks_channel_id_idx").on(t.channelId)],
 );
+
+/**
+ * A person's channel notification settings, the ones Slack keeps in
+ * Preferences → Notifications. No row means the defaults. The schedule is in
+ * minutes after midnight in `timeZone`; an end before the start crosses midnight.
+ */
+export const channelNotificationPrefs = pgTable("channel_notification_prefs", {
+	userId: uuid("user_id")
+		.primaryKey()
+		.references(() => users.id, { onDelete: "cascade" }),
+	notify: channelNotify().notNull().default("mentions"),
+	showPreview: boolean("show_preview").notNull().default(true),
+	keywords: text().array().notNull().default(sql`'{}'::text[]`),
+	pausedUntil: timestamp("paused_until", { withTimezone: true }),
+	scheduleEnabled: boolean("schedule_enabled").notNull().default(false),
+	scheduleDays: integer("schedule_days")
+		.array()
+		.notNull()
+		.default(sql`'{0,1,2,3,4,5,6}'::integer[]`),
+	scheduleStartMinute: integer("schedule_start_minute").notNull().default(480),
+	scheduleEndMinute: integer("schedule_end_minute").notNull().default(1320),
+	timeZone: text("time_zone"),
+	dockBounce: dockBounce("dock_bounce").notNull().default("off"),
+	updatedAt: timestamp("updated_at", { withTimezone: true })
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
+});
+
+export type SelectChannelNotificationPrefs =
+	typeof channelNotificationPrefs.$inferSelect;

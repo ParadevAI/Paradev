@@ -144,7 +144,7 @@ step_setup_neon_branch() {
     if ! neon_output=$(neonctl branches create \
         --project-id "$NEON_PROJECT_ID" \
         --name "$WORKSPACE_NAME" \
-        "${lease_args[@]}" \
+        ${lease_args[@]+"${lease_args[@]}"} \
         --output json); then
       error "Failed to create Neon branch (check output above)"
       return 1

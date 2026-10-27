@@ -60,6 +60,8 @@ import {
 } from "../WorkDrawer";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
+import { usePendingPrompts } from "./hooks/usePendingPrompts";
+import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
@@ -149,7 +151,7 @@ export function SessionView({
 	onOpenHistory?: () => void;
 }) {
 	const { t } = useLingui();
-	const session = useChatSession({ client });
+	const session = useChatSession({ client, sendEnabled: held === undefined });
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
 	const paneRef = useRef<HTMLDivElement>(null);
@@ -181,22 +183,7 @@ export function SessionView({
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
 	}, [outbox, discardPrompt, restoreText, draftKey, t]);
-	const outboxRef = useRef(outbox);
-	outboxRef.current = outbox;
-	useEffect(
-		() => () => {
-			const unsent = outboxRef.current
-				.filter(
-					(entry) =>
-						entry.state === "failed" ||
-						(entry.state === "queued" && entry.attempts === 0),
-				)
-				.map((entry) => contentText(entry.content))
-				.filter(Boolean);
-			if (unsent.length > 0) prependToDraft(draftKey, unsent);
-		},
-		[draftKey],
-	);
+	useRestoreUnsentPrompts(draftKey, outbox);
 	const timeline = useTimeline(session.snapshot, { nestChildItems: true });
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
@@ -243,14 +230,13 @@ export function SessionView({
 			.finally(() => setModelSettled(true));
 	}, [agentStatus, configOptions, modelSettled, preferredModelLabel, session]);
 
-	const pendingSentRef = useRef(false);
-	useEffect(() => {
-		if (held || pendingPrompts.length === 0 || pendingSentRef.current) return;
-		if (session.status !== "ready" || !modelSettled) return;
-		pendingSentRef.current = true;
-		for (const prompt of pendingPrompts) session.sendPrompt(prompt);
-		onPendingPromptsSent();
-	}, [held, pendingPrompts, session, onPendingPromptsSent, modelSettled]);
+	usePendingPrompts({
+		held: held !== undefined,
+		onSent: onPendingPromptsSent,
+		prompts: pendingPrompts,
+		ready: session.status === "ready" && modelSettled,
+		sendPrompt: session.sendPrompt,
+	});
 
 	const sessionState = session.snapshot.session;
 	useEffect(() => {
