@@ -225,11 +225,16 @@ export const agentRouter = {
 
 			const { promptId, text } = input;
 			const turn = await recordDirectTurn(session.id, agent, userId, promptId);
-			await dispatchTurn(session.id, turn, {
-				promptId,
-				text,
-				actingUserId: userId,
-			});
+			try {
+				await dispatchTurn(session.id, turn, {
+					promptId,
+					text,
+					actingUserId: userId,
+				});
+			} catch (error) {
+				await forgetUndelivered(turn, promptId);
+				throw error;
+			}
 			return turn;
 		}),
 } satisfies TRPCRouterRecord;
@@ -317,6 +322,28 @@ async function recordDirectTurn(
 		}
 	}
 	throw agentNotFound();
+}
+
+/**
+ * A prompt the workflow never got must not hold a turn open: a new turn is
+ * removed, and a steer is taken off its turn so settling does not wait for it.
+ * The client can then send the same prompt id again.
+ */
+async function forgetUndelivered(turn: DirectTurn, promptId: string) {
+	if (turn.outcome === "started") {
+		await db
+			.delete(agentTurns)
+			.where(
+				and(eq(agentTurns.id, turn.turnId), eq(agentTurns.status, "running")),
+			);
+	} else if (turn.outcome === "joined") {
+		await db
+			.update(agentTurns)
+			.set({
+				steerPromptIds: sql`array_remove(${agentTurns.steerPromptIds}, ${promptId})`,
+			})
+			.where(eq(agentTurns.id, turn.turnId));
+	}
 }
 
 /**
