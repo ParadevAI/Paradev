@@ -4,7 +4,7 @@ import { useStore } from "zustand";
 import { FilesTab } from "../../../../components/WorkspaceSidebar/components/FilesTab";
 import { useWorkspaceGitStatus } from "../../../../providers/WorkspaceGitStatusProvider";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
-import { openBesidePane } from "../../../../utils/openBesidePane";
+import { openFileInFilesTab } from "./utils/openFileInFilesTab";
 
 interface FilesTreePaneProps {
 	context: RendererContext<PaneViewerData>;
@@ -35,33 +35,38 @@ export function FilesTreePane({
 
 	const handleSelectFile = useCallback(
 		(filePath: string, openInNewTab?: boolean) => {
-			const state = store.getState();
-			const tab = state.getTab(tabId);
-			const open = tab
-				? Object.values(tab.panes).find(
-						(pane) =>
-							pane.kind === "file" &&
-							(pane.data as FilePaneData).filePath === filePath,
-					)
-				: undefined;
-			if (open && !openInNewTab) {
-				state.setPanePinned({ paneId: open.id, pinned: true });
-				state.setActivePane({ tabId, paneId: open.id });
+			if (openInNewTab) {
+				store.getState().addTab({
+					panes: [
+						{
+							kind: "file",
+							data: { filePath, mode: "editor" } as FilePaneData,
+						},
+					],
+				});
 				return;
 			}
-			openBesidePane(
-				store,
-				paneId,
-				{ kind: "file", data: { filePath, mode: "editor" } as FilePaneData },
-				openInNewTab,
-			);
+			openFileInFilesTab({ store, tabId, treePaneId: paneId, filePath });
 		},
+		[store, tabId, paneId],
+	);
+
+	const handlePinFile = useCallback(
+		(filePath: string) =>
+			openFileInFilesTab({
+				store,
+				tabId,
+				treePaneId: paneId,
+				filePath,
+				pin: true,
+			}),
 		[store, tabId, paneId],
 	);
 
 	return (
 		<FilesTab
 			onSelectFile={handleSelectFile}
+			onPinFile={handlePinFile}
 			selectedFilePath={selectedFilePath}
 			workspaceId={workspaceId}
 			gitStatus={gitStatus.data}

@@ -64,6 +64,8 @@ type GitStatusData = inferRouterOutputs<AppRouter>["git"]["getStatus"];
 
 interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
+	/** Double-clicking a file pins it instead of renaming it. */
+	onPinFile?: (absolutePath: string) => void;
 	selectedFilePath?: string;
 	pendingReveal?: {
 		path: string;
@@ -76,6 +78,7 @@ interface FilesTabProps {
 
 export function FilesTab({
 	onSelectFile,
+	onPinFile,
 	selectedFilePath,
 	pendingReveal,
 	workspaceId,
@@ -256,6 +259,9 @@ export function FilesTab({
 			onSelectFile: (rel, openInNewTab) =>
 				onSelectFile(toAbs(rootPath, rel), openInNewTab),
 			onRename: (rel) => model.startRenaming(rel),
+			onDoubleClickFile: onPinFile
+				? (rel) => onPinFile(toAbs(rootPath, rel))
+				: undefined,
 			openInExternalEditor: (rel) => openInExternalEditor(toAbs(rootPath, rel)),
 		});
 

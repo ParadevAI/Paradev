@@ -12,6 +12,8 @@ interface UsePierreRowClickPolicyOptions {
 	 */
 	onSelectFile: (relativePath: string, openInNewTab?: boolean) => void;
 	onRename: (relativePath: string) => void;
+	/** When set, double-clicking a file row calls this instead of renaming it. */
+	onDoubleClickFile?: (relativePath: string) => void;
 	/**
 	 * Open the path (file or folder) in the user's external editor. Receives
 	 * the row's relative path with any trailing slash stripped.
@@ -46,6 +48,7 @@ export function usePierreRowClickPolicy({
 	filePolicy,
 	onSelectFile,
 	onRename,
+	onDoubleClickFile,
 	openInExternalEditor,
 }: UsePierreRowClickPolicyOptions): UsePierreRowClickPolicyResult {
 	const findRow = useCallback((e: React.MouseEvent): HTMLElement | null => {
@@ -75,7 +78,11 @@ export function usePierreRowClickPolicy({
 			if (e.detail === 2 && e.button === 0) {
 				e.preventDefault();
 				e.stopPropagation();
-				onRename(treePath);
+				if (onDoubleClickFile && !treePath.endsWith("/")) {
+					onDoubleClickFile(trimmed);
+				} else {
+					onRename(treePath);
+				}
 				return;
 			}
 
@@ -101,7 +108,14 @@ export function usePierreRowClickPolicy({
 			else if (action === "newTab") onSelectFile(trimmed, true);
 			else if (action === "pane") onSelectFile(trimmed, false);
 		},
-		[filePolicy, onSelectFile, onRename, openInExternalEditor, findRow],
+		[
+			filePolicy,
+			onSelectFile,
+			onRename,
+			onDoubleClickFile,
+			openInExternalEditor,
+			findRow,
+		],
 	);
 
 	return { onClickCapture, findFileRow };

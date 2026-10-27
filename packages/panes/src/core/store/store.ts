@@ -92,6 +92,88 @@ function getActivePaneIdAfterRemoval(
 	);
 }
 
+function isStacked<TData>(tab: Tab<TData>, paneId: string): boolean {
+	return Boolean(tab.panes[paneId]) && !findPaneInLayout(tab.layout, paneId);
+}
+
+function showStackedPane<TData>(tab: Tab<TData>, paneId: string): LayoutNode {
+	const pane = tab.panes[paneId];
+	if (!pane || !isStacked(tab, paneId)) return tab.layout;
+	const visibleId = getPaneIdsInLayout(tab.layout).find(
+		(id) => tab.panes[id]?.kind === pane.kind,
+	);
+	return visibleId
+		? replacePaneIdInLayout(tab.layout, visibleId, paneId)
+		: tab.layout;
+}
+
+function withPaneShown<TData>(tab: Tab<TData>, paneId: string): Tab<TData> {
+	const layout = showStackedPane(tab, paneId);
+	return layout === tab.layout && tab.activePaneId === paneId
+		? tab
+		: { ...tab, layout, activePaneId: paneId };
+}
+
+function withPaneAt<TData>(
+	panes: Record<string, Pane<TData>>,
+	afterPaneId: string,
+	pane: Pane<TData>,
+	replace: boolean,
+): Record<string, Pane<TData>> {
+	const next: Record<string, Pane<TData>> = {};
+	for (const [id, existing] of Object.entries(panes)) {
+		if (id === afterPaneId) {
+			if (!replace) next[id] = existing;
+			next[pane.id] = pane;
+		} else if (id !== pane.id) {
+			next[id] = existing;
+		}
+	}
+	return next;
+}
+
+/** Removes a pane; a visible pane with stacked siblings hands its slot to the nearest one. */
+function removePaneFromTab<TData>(
+	tab: Tab<TData>,
+	paneId: string,
+): Tab<TData> | null {
+	const pane = tab.panes[paneId];
+	const { [paneId]: _, ...panes } = tab.panes;
+	if (!pane) return tab;
+	if (isStacked(tab, paneId)) return { ...tab, panes };
+
+	const stack = Object.keys(tab.panes).filter(
+		(id) =>
+			id === paneId ||
+			(tab.panes[id]?.kind === pane.kind && isStacked(tab, id)),
+	);
+	const nextShownId =
+		stack.length > 1 ? getActiveIdAfterRemoval(stack, paneId, paneId) : null;
+	if (nextShownId) {
+		return {
+			...tab,
+			layout: replacePaneIdInLayout(tab.layout, paneId, nextShownId),
+			panes,
+			activePaneId:
+				tab.activePaneId === paneId ? nextShownId : tab.activePaneId,
+		};
+	}
+
+	const layout = removePaneFromLayout(tab.layout, paneId);
+	if (!layout) return null;
+	return {
+		...tab,
+		layout,
+		panes,
+		activePaneId: getActivePaneIdAfterRemoval(
+			tab.layout,
+			layout,
+			tab.activePaneId,
+			paneId,
+		),
+	};
+}
+
 // --- Public types ---
 
 export type CreatePaneInput<TData> = {
@@ -176,6 +258,17 @@ export interface WorkspaceStore<TData> extends WorkspaceState<TData> {
 		tabId: string;
 		paneId: string;
 		newPane: CreatePaneInput<TData>;
+	}) => void;
+	/**
+	 * Show a new pane in `paneId`'s slot and keep `paneId` stacked behind it.
+	 * Stacked panes stay in `tab.panes` but out of the layout; activating one
+	 * swaps it back into view.
+	 */
+	stackPane: (args: {
+		tabId: string;
+		paneId: string;
+		newPane: CreatePaneInput<TData>;
+		focus?: boolean;
 	}) => void;
 
 	openPane: (args: OpenPaneArgs<TData>) => void;
@@ -358,14 +451,13 @@ export function createWorkspaceStore<TData>(
 			set((s) => {
 				const tab = s.tabs.find((t) => t.panes[paneId]);
 				if (!tab) return s;
+				const shown = withPaneShown(tab, paneId);
 				return {
 					activeTabId: tab.id,
 					tabs:
-						tab.activePaneId === paneId
+						shown === tab
 							? s.tabs
-							: s.tabs.map((t) =>
-									t.id === tab.id ? { ...t, activePaneId: paneId } : t,
-								),
+							: s.tabs.map((t) => (t.id === tab.id ? shown : t)),
 					focusRequest: requestFocus(paneId),
 				};
 			});
@@ -479,7 +571,7 @@ export function createWorkspaceStore<TData>(
 				return {
 					activeTabId: args.tabId,
 					tabs: s.tabs.map((t) =>
-						t.id === args.tabId ? { ...t, activePaneId: args.paneId } : t,
+						t.id === args.tabId ? withPaneShown(t, args.paneId) : t,
 					),
 				};
 			});
@@ -512,10 +604,9 @@ export function createWorkspaceStore<TData>(
 				const tab = s.tabs.find((t) => t.id === args.tabId);
 				if (!tab || !tab.panes[args.paneId] || !tab.layout) return s;
 
-				const nextLayout = removePaneFromLayout(tab.layout, args.paneId);
-				const { [args.paneId]: _, ...nextPanes } = tab.panes;
+				const nextTab = removePaneFromTab(tab, args.paneId);
 
-				if (!nextLayout) {
+				if (!nextTab) {
 					const nextTabs = s.tabs.filter((t) => t.id !== args.tabId);
 					return {
 						tabs: nextTabs,
@@ -528,21 +619,7 @@ export function createWorkspaceStore<TData>(
 				}
 
 				return {
-					tabs: s.tabs.map((t) =>
-						t.id === args.tabId
-							? {
-									...tab,
-									layout: nextLayout,
-									panes: nextPanes,
-									activePaneId: getActivePaneIdAfterRemoval(
-										tab.layout,
-										nextLayout,
-										tab.activePaneId,
-										args.paneId,
-									),
-								}
-							: t,
-					),
+					tabs: s.tabs.map((t) => (t.id === args.tabId ? nextTab : t)),
 				};
 			});
 			if (pane && !get().getPane(pane.id) && args.intent !== "remove")
@@ -630,28 +707,48 @@ export function createWorkspaceStore<TData>(
 				if (!tab || !pane || !tab.layout) return s;
 				if (pane.pinned) return s;
 
-				const { layout } = tab;
 				const newPane = buildPane(args.newPane);
-				const { [args.paneId]: _, ...restPanes } = tab.panes;
+				const replacedTab: Tab<TData> = {
+					...tab,
+					layout: replacePaneIdInLayout(tab.layout, args.paneId, newPane.id),
+					panes: withPaneAt(tab.panes, args.paneId, newPane, true),
+				};
 
 				return {
 					tabs: s.tabs.map((t) =>
-						t.id === args.tabId
-							? {
-									...tab,
-									layout: replacePaneIdInLayout(
-										layout,
-										args.paneId,
-										newPane.id,
-									),
-									panes: { ...restPanes, [newPane.id]: newPane },
-									activePaneId: newPane.id,
-								}
-							: t,
+						t.id === args.tabId ? withPaneShown(replacedTab, newPane.id) : t,
 					),
 				};
 			});
 			if (replaced && !get().getPane(replaced.id)) notifyClosed([replaced]);
+		},
+
+		stackPane: (args) => {
+			const newPane = buildPane(args.newPane);
+			set((s) => {
+				const tab = s.tabs.find((t) => t.id === args.tabId);
+				if (!tab || !findPaneInLayout(tab.layout, args.paneId)) return s;
+				return {
+					activeTabId: tab.id,
+					tabs: s.tabs.map((t) =>
+						t.id === tab.id
+							? {
+									...tab,
+									layout: replacePaneIdInLayout(
+										tab.layout,
+										args.paneId,
+										newPane.id,
+									),
+									panes: withPaneAt(tab.panes, args.paneId, newPane, false),
+									activePaneId: newPane.id,
+								}
+							: t,
+					),
+					...(args.focus !== false
+						? { focusRequest: requestFocus(newPane.id) }
+						: {}),
+				};
+			});
 		},
 
 		openPane: (args) => {
@@ -876,15 +973,11 @@ export function createWorkspaceStore<TData>(
 				if (!findPaneInLayout(targetTab.layout, args.targetPaneId)) return s;
 				if (args.sourcePaneId === args.targetPaneId) return s;
 
-				const nextSourceLayout = removePaneFromLayout(
-					sourceTab.layout,
-					args.sourcePaneId,
-				);
-				const { [args.sourcePaneId]: _, ...nextSourcePanes } = sourceTab.panes;
+				const nextSourceTab = removePaneFromTab(sourceTab, args.sourcePaneId);
 
 				const nextTargetLayout = splitPaneInLayout(
-					sourceTab.id === targetTab.id && nextSourceLayout
-						? nextSourceLayout
+					sourceTab.id === targetTab.id && nextSourceTab
+						? nextSourceTab.layout
 						: targetTab.layout,
 					args.targetPaneId,
 					sourcePane.id,
@@ -894,28 +987,15 @@ export function createWorkspaceStore<TData>(
 				const nextTabs = s.tabs
 					.map((t) => {
 						if (sourceTab.id === targetTab.id && t.id === sourceTab.id) {
-							if (!nextSourceLayout) return null;
+							if (!nextSourceTab) return null;
 							return {
-								...t,
+								...nextSourceTab,
 								layout: nextTargetLayout,
-								panes: { ...nextSourcePanes, [sourcePane.id]: sourcePane },
+								panes: { ...nextSourceTab.panes, [sourcePane.id]: sourcePane },
 								activePaneId: sourcePane.id,
 							};
 						}
-						if (t.id === sourceTab.id) {
-							if (!nextSourceLayout) return null;
-							return {
-								...t,
-								layout: nextSourceLayout,
-								panes: nextSourcePanes,
-								activePaneId: getActivePaneIdAfterRemoval(
-									sourceTab.layout,
-									nextSourceLayout,
-									t.activePaneId,
-									args.sourcePaneId,
-								),
-							};
-						}
+						if (t.id === sourceTab.id) return nextSourceTab;
 						if (t.id === targetTab.id) {
 							return {
 								...t,
@@ -949,11 +1029,7 @@ export function createWorkspaceStore<TData>(
 				if (!targetTab || !targetTab.layout) return s;
 				if (sourceTab.id === targetTab.id) return s;
 
-				const nextSourceLayout = removePaneFromLayout(
-					sourceTab.layout,
-					args.paneId,
-				);
-				const { [args.paneId]: _, ...nextSourcePanes } = sourceTab.panes;
+				const nextSourceTab = removePaneFromTab(sourceTab, args.paneId);
 
 				const paneLeaf: LayoutNode = { type: "pane", paneId: pane.id };
 				const nextTargetLayout: LayoutNode = {
@@ -965,20 +1041,7 @@ export function createWorkspaceStore<TData>(
 
 				const nextTabs = s.tabs
 					.map((t) => {
-						if (t.id === sourceTab.id) {
-							if (!nextSourceLayout) return null;
-							return {
-								...t,
-								layout: nextSourceLayout,
-								panes: nextSourcePanes,
-								activePaneId: getActivePaneIdAfterRemoval(
-									sourceTab.layout,
-									nextSourceLayout,
-									t.activePaneId,
-									args.paneId,
-								),
-							};
-						}
+						if (t.id === sourceTab.id) return nextSourceTab;
 						if (t.id === targetTab.id) {
 							return {
 								...t,
@@ -1010,11 +1073,7 @@ export function createWorkspaceStore<TData>(
 				}
 				if (!sourceTab || !pane || !sourceTab.layout) return s;
 
-				const nextSourceLayout = removePaneFromLayout(
-					sourceTab.layout,
-					args.paneId,
-				);
-				const { [args.paneId]: _, ...nextSourcePanes } = sourceTab.panes;
+				const nextSourceTab = removePaneFromTab(sourceTab, args.paneId);
 
 				const newTab = buildTab({
 					panes: [pane],
@@ -1023,20 +1082,7 @@ export function createWorkspaceStore<TData>(
 
 				const nextTabs = s.tabs
 					.map((t) => {
-						if (t.id === sourceTab.id) {
-							if (!nextSourceLayout) return null;
-							return {
-								...t,
-								layout: nextSourceLayout,
-								panes: nextSourcePanes,
-								activePaneId: getActivePaneIdAfterRemoval(
-									sourceTab.layout,
-									nextSourceLayout,
-									t.activePaneId,
-									args.paneId,
-								),
-							};
-						}
+						if (t.id === sourceTab.id) return nextSourceTab;
 						return t;
 					})
 					.filter((t): t is Tab<TData> => t !== null);
@@ -1044,7 +1090,7 @@ export function createWorkspaceStore<TData>(
 				const requestedIndex = args.toIndex ?? nextTabs.length;
 				const adjustedIndex =
 					args.toIndex !== undefined &&
-					!nextSourceLayout &&
+					!nextSourceTab &&
 					sourceTabIndex < args.toIndex
 						? args.toIndex - 1
 						: requestedIndex;
