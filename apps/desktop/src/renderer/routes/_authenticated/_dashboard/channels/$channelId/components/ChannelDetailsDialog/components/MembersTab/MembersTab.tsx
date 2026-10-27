@@ -1,13 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import type { RouterOutputs } from "@superset/trpc";
+import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
-import { LuSearch } from "react-icons/lu";
+import { LuSearch, LuX } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useShareDirectory } from "renderer/routes/_authenticated/_dashboard/hooks/useShareDirectory";
 import { CandidateRow } from "./components/CandidateRow";
+import { DevMemberRow } from "./components/DevMemberRow";
 import { MemberRow } from "./components/MemberRow";
 
 type ChannelSummary = RouterOutputs["channel"]["get"];
@@ -17,10 +19,10 @@ interface MembersTabProps {
 	currentUserId: string | null;
 }
 
-const matches = (person: { name: string; email: string }, needle: string) =>
+const matches = (person: { name: string; email?: string }, needle: string) =>
 	!needle ||
 	person.name.toLowerCase().includes(needle) ||
-	person.email.toLowerCase().includes(needle);
+	(person.email?.toLowerCase().includes(needle) ?? false);
 
 export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 	const { t } = useLingui();
@@ -29,6 +31,12 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 	const utils = cloudTrpc.useUtils();
 	const { data: members = [] } = cloudTrpc.channel.members.useQuery({
 		channelId: channel.id,
+	});
+	const { data: devs = [] } = cloudTrpc.channel.devMembers.useQuery({
+		channelId: channel.id,
+	});
+	const { data: orgDevs = [] } = cloudTrpc.agent.list.useQuery({
+		organizationId: channel.organizationId,
 	});
 	const options = {
 		onSuccess: () => void utils.channel.invalidate(),
@@ -39,6 +47,7 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 	};
 	const addMembers = cloudTrpc.channel.addMembers.useMutation(options);
 	const removeMember = cloudTrpc.channel.removeMember.useMutation(options);
+	const removeDev = cloudTrpc.channel.removeDev.useMutation(options);
 	const setRole = cloudTrpc.channel.setRole.useMutation(options);
 
 	const needle = query.trim().toLowerCase();
@@ -51,6 +60,13 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 				.filter((person) => matches(person, needle))
 				.sort((a, b) => a.name.localeCompare(b.name))
 		: [];
+	const devIds = new Set(devs.map((dev) => dev.agentId));
+	const shownDevs = devs.filter((dev) => matches(dev, needle));
+	const candidateDevs = canAdd
+		? orgDevs
+				.filter((dev) => !devIds.has(dev.id) && dev.pausedAt === null)
+				.filter((dev) => matches(dev, needle))
+		: [];
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -59,7 +75,7 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 				<Input
 					value={query}
 					onChange={(event) => setQuery(event.target.value)}
-					placeholder={t({ message: "Find people" })}
+					placeholder={t({ message: "Find people and Devs" })}
 					className="h-9 bg-background pl-9"
 				/>
 			</div>
@@ -85,8 +101,32 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 						}
 					/>
 				))}
+				{shownDevs.map(({ agentId, name, avatar }) => (
+					<DevMemberRow
+						key={agentId}
+						name={name}
+						avatar={avatar}
+						trailing={
+							channel.canManage && (
+								<Button
+									size="icon-xs"
+									variant="ghost"
+									aria-label={t({ message: `Remove ${name}` })}
+									onClick={() =>
+										removeDev.mutate({
+											channelId: channel.id,
+											agentId: agentId,
+										})
+									}
+								>
+									<LuX className="size-3.5" />
+								</Button>
+							)
+						}
+					/>
+				))}
 			</div>
-			{candidates.length > 0 && (
+			{(candidates.length > 0 || candidateDevs.length > 0) && (
 				<div className="space-y-1.5">
 					<p className="text-xs text-muted-foreground">
 						<Trans>Not in channel</Trans>
@@ -99,7 +139,8 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 								isSelf={person.userId === currentUserId}
 								isAdding={
 									addMembers.isPending &&
-									addMembers.variables?.userIds.includes(person.userId) === true
+									addMembers.variables?.userIds?.includes(person.userId) ===
+										true
 								}
 								onAdd={() =>
 									addMembers.mutate({
@@ -109,14 +150,43 @@ export function MembersTab({ channel, currentUserId }: MembersTabProps) {
 								}
 							/>
 						))}
+						{candidateDevs.map((dev) => (
+							<DevMemberRow
+								key={dev.id}
+								name={dev.name}
+								avatar={dev.avatar}
+								trailing={
+									<Button
+										size="xs"
+										variant="outline"
+										disabled={
+											addMembers.isPending &&
+											addMembers.variables?.agentIds?.includes(dev.id) === true
+										}
+										onClick={() =>
+											addMembers.mutate({
+												channelId: channel.id,
+												agentIds: [dev.id],
+											})
+										}
+									>
+										<Trans>Add</Trans>
+									</Button>
+								}
+							/>
+						))}
 					</div>
 				</div>
 			)}
-			{needle && !shownMembers.length && !candidates.length && (
-				<p className="text-sm text-muted-foreground">
-					<Trans>No one matches</Trans>
-				</p>
-			)}
+			{needle &&
+				!shownMembers.length &&
+				!candidates.length &&
+				!shownDevs.length &&
+				!candidateDevs.length && (
+					<p className="text-sm text-muted-foreground">
+						<Trans>No one matches</Trans>
+					</p>
+				)}
 		</div>
 	);
 }

@@ -19,6 +19,7 @@ function message(
 		authorAgentId: null,
 		body: "hi",
 		mentionedUserIds: [],
+		mentionedAgentIds: [],
 		broadcast: null,
 		clientId: null,
 		replyCount: 0,

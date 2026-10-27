@@ -1,8 +1,8 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	agentRelations,
 	agents,
 	agentTurns,
+	channelMembers,
 	channels,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
@@ -16,7 +16,6 @@ import { and, asc, desc, eq, exists, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
-import { channelNotFound, loadChannelAccess } from "../channel/access";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
 import { ensureDirectMessage } from "./direct-message";
 import { startOrJoinTurn } from "./turns";
@@ -46,10 +45,6 @@ const listColumns = {
 			),
 	).mapWith(Boolean),
 };
-const channelGrantSchema = z.object({
-	agentId: z.string().uuid(),
-	channelId: z.string().uuid(),
-});
 
 /** People managing and talking to agents. Agents themselves use `agentApi`. */
 export const agentRouter = {
@@ -87,12 +82,11 @@ export const agentRouter = {
 			db.select(listColumns).from(agents).where(eq(agents.id, agent.id)),
 			db
 				.select({ id: channels.id, name: channels.name })
-				.from(agentRelations)
-				.innerJoin(channels, eq(channels.id, agentRelations.objectId))
+				.from(channelMembers)
+				.innerJoin(channels, eq(channels.id, channelMembers.channelId))
 				.where(
 					and(
-						eq(agentRelations.agentId, agent.id),
-						eq(agentRelations.objectType, "channel"),
+						eq(channelMembers.agentId, agent.id),
 						eq(channels.kind, "channel"),
 						isNull(channels.archivedAt),
 					),
@@ -217,46 +211,6 @@ export const agentRouter = {
 					);
 			});
 			return { archived: true };
-		}),
-
-	grantChannel: protectedProcedure
-		.input(channelGrantSchema)
-		.mutation(async ({ ctx, input }) => {
-			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
-			const access = await loadChannelAccess(
-				ctx.session.user.id,
-				input.channelId,
-			);
-			if (access.channel.organizationId !== agent.organizationId) {
-				throw channelNotFound();
-			}
-			await db
-				.insert(agentRelations)
-				.values({
-					agentId: agent.id,
-					relation: "member",
-					objectType: "channel",
-					objectId: input.channelId,
-				})
-				.onConflictDoNothing();
-			return { granted: true };
-		}),
-
-	revokeChannel: protectedProcedure
-		.input(channelGrantSchema)
-		.mutation(async ({ ctx, input }) => {
-			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
-			await db
-				.delete(agentRelations)
-				.where(
-					and(
-						eq(agentRelations.agentId, agent.id),
-						eq(agentRelations.relation, "member"),
-						eq(agentRelations.objectType, "channel"),
-						eq(agentRelations.objectId, input.channelId),
-					),
-				);
-			return { revoked: true };
 		}),
 
 	/**

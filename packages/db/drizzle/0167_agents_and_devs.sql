@@ -66,7 +66,12 @@ CREATE TABLE "authz"."agent_relations" (
 );
 --> statement-breakpoint
 DROP INDEX "channels_org_name_unique";--> statement-breakpoint
+ALTER TABLE "channel_members" DROP CONSTRAINT "channel_members_channel_id_user_id_pk";--> statement-breakpoint
+ALTER TABLE "channel_members" ALTER COLUMN "user_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "channel_members" ADD COLUMN "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "channel_members" ADD COLUMN "agent_id" uuid;--> statement-breakpoint
 ALTER TABLE "channel_messages" ADD COLUMN "author_agent_id" uuid;--> statement-breakpoint
+ALTER TABLE "channel_messages" ADD COLUMN "mentioned_agent_ids" uuid[] DEFAULT '{}'::uuid[] NOT NULL;--> statement-breakpoint
 ALTER TABLE "channels" ADD COLUMN "kind" "channel_kind" DEFAULT 'channel' NOT NULL;--> statement-breakpoint
 ALTER TABLE "agent_sessions" ADD CONSTRAINT "agent_sessions_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "agent_sessions" ADD CONSTRAINT "agent_sessions_agent_id_agents_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."agents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -92,9 +97,14 @@ CREATE INDEX "agent_turns_agent_status_idx" ON "agent_turns" USING btree ("agent
 CREATE UNIQUE INDEX "agent_turns_one_running_per_session_idx" ON "agent_turns" USING btree ("session_id") WHERE "agent_turns"."status" = 'running';--> statement-breakpoint
 CREATE UNIQUE INDEX "agent_turns_prompt_idx" ON "agent_turns" USING btree ("session_id","prompt_id") WHERE "agent_turns"."prompt_id" is not null;--> statement-breakpoint
 CREATE INDEX "agents_organization_idx" ON "agents" USING btree ("organization_id");--> statement-breakpoint
+ALTER TABLE "channel_members" ADD CONSTRAINT "channel_members_agent_id_agents_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."agents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel_messages" ADD CONSTRAINT "channel_messages_author_agent_id_agents_id_fk" FOREIGN KEY ("author_agent_id") REFERENCES "public"."agents"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "channel_members_channel_user_unique" ON "channel_members" USING btree ("channel_id","user_id") WHERE "channel_members"."user_id" IS NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "channel_members_channel_agent_unique" ON "channel_members" USING btree ("channel_id","agent_id") WHERE "channel_members"."agent_id" IS NOT NULL;--> statement-breakpoint
+CREATE INDEX "channel_members_agent_idx" ON "channel_members" USING btree ("agent_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "channel_messages_agent_client_unique" ON "channel_messages" USING btree ("author_agent_id","channel_id","client_id") WHERE "channel_messages"."client_id" IS NOT NULL AND "channel_messages"."author_agent_id" IS NOT NULL;--> statement-breakpoint
 CREATE UNIQUE INDEX "channels_org_name_unique" ON "channels" USING btree ("organization_id",lower("name")) WHERE "channels"."archived_at" IS NULL AND "channels"."kind" = 'channel';--> statement-breakpoint
+ALTER TABLE "channel_members" ADD CONSTRAINT "channel_members_one_member" CHECK (("channel_members"."user_id" IS NULL) <> ("channel_members"."agent_id" IS NULL));--> statement-breakpoint
 CREATE VIEW "authz"."melange_tuples" AS (
 		select 'agent'::text as subject_type, r.agent_id::text as subject_id, r.relation,
 			r.object_type, r.object_id::text as object_id
@@ -103,6 +113,10 @@ CREATE VIEW "authz"."melange_tuples" AS (
 		union all
 		select 'agent', a.id::text, 'member', 'organization', a.organization_id::text
 		from public.agents a where a.archived_at is null
+		union all
+		select 'agent', m.agent_id::text, 'member', 'channel', m.channel_id::text
+		from public.channel_members m
+		join public.agents a on a.id = m.agent_id and a.archived_at is null
 		union all
 		select 'organization', c.organization_id::text, 'organization', 'channel', c.id::text
 		from public.channels c where c.archived_at is null

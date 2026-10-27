@@ -37,7 +37,7 @@ export const agentRelations = authzSchema.table(
 	],
 );
 
-/** Every relationship Melange can see: agent grants plus links our tables already hold. */
+/** Every relationship Melange can see: agent grants plus links our tables already hold, such as a Dev's channel memberships. */
 export const melangeTuples = authzSchema
 	.view("melange_tuples", {
 		subjectType: text("subject_type").notNull(),
@@ -54,6 +54,10 @@ export const melangeTuples = authzSchema
 		union all
 		select 'agent', a.id::text, 'member', 'organization', a.organization_id::text
 		from public.agents a where a.archived_at is null
+		union all
+		select 'agent', m.agent_id::text, 'member', 'channel', m.channel_id::text
+		from public.channel_members m
+		join public.agents a on a.id = m.agent_id and a.archived_at is null
 		union all
 		select 'organization', c.organization_id::text, 'organization', 'channel', c.id::text
 		from public.channels c where c.archived_at is null

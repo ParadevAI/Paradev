@@ -26,6 +26,7 @@ import {
 } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
+import { addableDevs } from "../agent/access";
 import {
 	assertCanManage,
 	assertNotArchived,
@@ -35,6 +36,7 @@ import {
 } from "./access";
 import {
 	allOrgMemberIds,
+	channelDevs,
 	channelMemberIds,
 	isUniqueViolation,
 	orgMemberIds,
@@ -45,6 +47,7 @@ import {
 	addMembersSchema,
 	channelIdSchema,
 	createChannelSchema,
+	devMemberSchema,
 	listChannelsSchema,
 	markReadSchema,
 	memberSchema,
@@ -221,8 +224,11 @@ export const channelRouter = {
 				ctx.session.user.id,
 				input.channelId,
 			);
-			const memberCount = (await channelMemberIds(access.channel.id)).length;
-			return summary(access, memberCount);
+			const [people, devs] = await Promise.all([
+				channelMemberIds(access.channel.id),
+				channelDevs(access.channel.id),
+			]);
+			return summary(access, people.length + devs.length);
 		}),
 
 	members: protectedProcedure
@@ -231,7 +237,7 @@ export const channelRouter = {
 			await loadChannelAccess(ctx.session.user.id, input.channelId);
 			return db
 				.select({
-					userId: channelMembers.userId,
+					userId: users.id,
 					role: channelMembers.role,
 					joinedAt: channelMembers.joinedAt,
 					name: users.name,
@@ -242,6 +248,13 @@ export const channelRouter = {
 				.innerJoin(users, eq(users.id, channelMembers.userId))
 				.where(eq(channelMembers.channelId, input.channelId))
 				.orderBy(asc(users.name));
+		}),
+
+	devMembers: protectedProcedure
+		.input(channelIdSchema)
+		.query(async ({ ctx, input }) => {
+			await loadChannelAccess(ctx.session.user.id, input.channelId);
+			return channelDevs(input.channelId);
 		}),
 
 	create: protectedProcedure
@@ -381,7 +394,12 @@ export const channelRouter = {
 			const [remaining] = await db
 				.select({ value: count() })
 				.from(channelMembers)
-				.where(eq(channelMembers.channelId, access.channel.id));
+				.where(
+					and(
+						eq(channelMembers.channelId, access.channel.id),
+						isNotNull(channelMembers.userId),
+					),
+				);
 			if (
 				access.channel.visibility === "private" &&
 				access.channel.archivedAt === null &&
@@ -422,18 +440,29 @@ export const channelRouter = {
 					i18nKey: "serverError.channel.notInOrganization",
 				});
 			}
-			await db
-				.insert(channelMembers)
-				.values(
-					valid.map((userId) => ({
-						channelId: access.channel.id,
-						userId,
-						lastReadSeq: access.channel.lastSeq,
-					})),
-				)
-				.onConflictDoNothing();
+			const devs = await addableDevs(
+				ctx.session.user.id,
+				access.channel.organizationId,
+				input.agentIds,
+			);
+			const rows = [
+				...valid.map((userId) => ({ userId })),
+				...devs.map((agentId) => ({ agentId })),
+			];
+			if (rows.length > 0) {
+				await db
+					.insert(channelMembers)
+					.values(
+						rows.map((row) => ({
+							...row,
+							channelId: access.channel.id,
+							lastReadSeq: access.channel.lastSeq,
+						})),
+					)
+					.onConflictDoNothing();
+			}
 			await notifyMembers(access);
-			return { added: valid.length };
+			return { added: rows.length };
 		}),
 
 	removeMember: protectedProcedure
@@ -456,6 +485,26 @@ export const channelRouter = {
 				);
 			await notifyMembers(access, [input.userId]);
 			return { userId: input.userId };
+		}),
+
+	removeDev: protectedProcedure
+		.input(devMemberSchema)
+		.mutation(async ({ ctx, input }) => {
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			assertCanManage(access);
+			await db
+				.delete(channelMembers)
+				.where(
+					and(
+						eq(channelMembers.channelId, access.channel.id),
+						eq(channelMembers.agentId, input.agentId),
+					),
+				);
+			await notifyMembers(access);
+			return { agentId: input.agentId };
 		}),
 
 	setRole: protectedProcedure

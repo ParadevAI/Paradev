@@ -3,6 +3,7 @@ import {
 	type AnyPgColumn,
 	bigint,
 	boolean,
+	check,
 	index,
 	integer,
 	pgEnum,
@@ -89,12 +90,17 @@ export type SelectChannel = typeof channels.$inferSelect;
 export const channelMembers = pgTable(
 	"channel_members",
 	{
+		id: uuid().primaryKey().defaultRandom(),
 		channelId: uuid("channel_id")
 			.notNull()
 			.references(() => channels.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
-			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+		/** Exactly one of `userId` and `agentId` is set. */
+		userId: uuid("user_id").references(() => users.id, {
+			onDelete: "cascade",
+		}),
+		agentId: uuid("agent_id").references((): AnyPgColumn => agents.id, {
+			onDelete: "cascade",
+		}),
 		role: channelMemberRole().notNull().default("member"),
 		/** Null follows the person's default in `channel_notification_prefs`. */
 		notify: channelNotify(),
@@ -108,8 +114,18 @@ export const channelMembers = pgTable(
 			.defaultNow(),
 	},
 	(t) => [
-		primaryKey({ columns: [t.channelId, t.userId] }),
+		uniqueIndex("channel_members_channel_user_unique")
+			.on(t.channelId, t.userId)
+			.where(sql`${t.userId} IS NOT NULL`),
+		uniqueIndex("channel_members_channel_agent_unique")
+			.on(t.channelId, t.agentId)
+			.where(sql`${t.agentId} IS NOT NULL`),
 		index("channel_members_user_idx").on(t.userId),
+		index("channel_members_agent_idx").on(t.agentId),
+		check(
+			"channel_members_one_member",
+			sql`(${t.userId} IS NULL) <> (${t.agentId} IS NULL)`,
+		),
 	],
 );
 
@@ -144,6 +160,10 @@ export const channelMessages = pgTable(
 		),
 		body: text().notNull(),
 		mentionedUserIds: uuid("mentioned_user_ids")
+			.array()
+			.notNull()
+			.default(sql`'{}'::uuid[]`),
+		mentionedAgentIds: uuid("mentioned_agent_ids")
 			.array()
 			.notNull()
 			.default(sql`'{}'::uuid[]`),

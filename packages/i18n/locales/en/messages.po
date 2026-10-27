@@ -8151,8 +8151,8 @@ msgstr "Find in page"
 msgid "Find in Terminal"
 msgstr "Find in Terminal"
 
-msgid "Find people"
-msgstr "Find people"
+msgid "Find people and Devs"
+msgstr "Find people and Devs"
 
 msgid "Finder"
 msgstr "Finder"
@@ -14732,6 +14732,9 @@ msgstr "Remove {label}"
 
 msgid "Remove {label}?"
 msgstr "Remove {label}?"
+
+msgid "Remove {name}"
+msgstr "Remove {name}"
 
 msgid "Remove {repositoryName}"
 msgstr "Remove {repositoryName}"

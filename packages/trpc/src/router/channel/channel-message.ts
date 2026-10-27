@@ -22,7 +22,7 @@ import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
 import { protectedProcedure } from "../../trpc";
-import { startTurnForDirectMessage } from "../agent/turns";
+import { startTurnsForMessage } from "../agent/turns";
 import {
 	assertCanPost,
 	type ChannelAccess,
@@ -30,7 +30,7 @@ import {
 	loadChannelAccess,
 } from "./access";
 import { type EnrichedMessage, enrichMessage, enrichMessages } from "./enrich";
-import { isUniqueViolation, orgMemberIds } from "./members";
+import { channelDevs, isUniqueViolation, orgMemberIds } from "./members";
 import { loadNotifyPrefs } from "./notification-prefs";
 import { DEFAULT_NOTIFY_PREFS, notifyReason } from "./notify-rules";
 import { publishToUsers, toWire } from "./publish";
@@ -89,7 +89,7 @@ interface Recipient {
 async function recipients(channelId: string): Promise<Recipient[]> {
 	return db
 		.select({
-			userId: channelMembers.userId,
+			userId: orgMembers.userId,
 			notify: channelMembers.notify,
 			muted: channelMembers.muted,
 			suppressBroadcasts: channelMembers.suppressBroadcasts,
@@ -117,6 +117,18 @@ async function validMentions(
 		return [...new Set(ids)].filter((id) => memberIds.has(id));
 	}
 	return orgMemberIds(access.channel.organizationId, ids);
+}
+
+/** The mentioned Devs that are in the channel; mentions of anything else are dropped. */
+async function memberDevMentions(
+	channelId: string,
+	ids: readonly string[],
+): Promise<string[]> {
+	if (ids.length === 0) return [];
+	const devIds = new Set(
+		(await channelDevs(channelId)).map((dev) => dev.agentId),
+	);
+	return [...new Set(ids)].filter((id) => devIds.has(id));
 }
 
 async function threadFollowers(
@@ -350,6 +362,7 @@ async function appendMessage(input: {
 	author: { userId: string } | { agentId: string };
 	body: string;
 	mentionedUserIds: string[];
+	mentionedAgentIds?: string[];
 	broadcast?: ChannelBroadcast | null;
 	clientId?: string | null;
 }): Promise<AppendedMessage> {
@@ -396,6 +409,7 @@ async function appendMessage(input: {
 				authorAgentId: "agentId" in input.author ? input.author.agentId : null,
 				body: input.body,
 				mentionedUserIds: input.mentionedUserIds,
+				mentionedAgentIds: input.mentionedAgentIds ?? [],
 				broadcast: input.broadcast ?? null,
 				clientId: input.clientId ?? null,
 				createdAt: now,
@@ -517,6 +531,10 @@ export const channelMessageRouter = {
 			const mentionedUserIds = (
 				await validMentions(access, members, input.mentionedUserIds)
 			).filter((id) => id !== userId);
+			const mentionedAgentIds = await memberDevMentions(
+				access.channel.id,
+				input.mentionedAgentIds,
+			);
 
 			let result: AppendedMessage;
 			try {
@@ -526,6 +544,7 @@ export const channelMessageRouter = {
 					author: { userId },
 					body,
 					mentionedUserIds,
+					mentionedAgentIds,
 					broadcast: input.broadcast ?? null,
 					clientId: input.clientId,
 				});
@@ -551,9 +570,7 @@ export const channelMessageRouter = {
 			const message = await enrichMessage(result.message);
 			const root = result.root ? await enrichMessage(result.root) : null;
 			await announce(access, members, message, root, ctx.session.user.name);
-			if (access.channel.kind === "dm") {
-				await startTurnForDirectMessage(access.channel.id, userId, message.id);
-			}
+			await startTurnsForMessage(access.channel, result.message, userId);
 			return message;
 		}),
 
@@ -575,11 +592,16 @@ export const channelMessageRouter = {
 			const mentionedUserIds = (
 				await validMentions(access, members, input.mentionedUserIds)
 			).filter((id) => id !== userId);
+			const mentionedAgentIds =
+				input.mentionedAgentIds === undefined
+					? message.mentionedAgentIds
+					: await memberDevMentions(access.channel.id, input.mentionedAgentIds);
 			const [updated] = await db
 				.update(channelMessages)
 				.set({
 					body,
 					mentionedUserIds,
+					mentionedAgentIds,
 					broadcast:
 						input.broadcast === undefined ? message.broadcast : input.broadcast,
 					editedAt: new Date(),

@@ -23,6 +23,7 @@ import {
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import { useOrgChannels } from "../../hooks/useOrgChannels";
+import { useOrgDevs } from "../../hooks/useOrgDevs";
 import { EDITED_HREF, remarkEditedMark } from "../../utils/remarkEditedMark";
 import {
 	CHANNEL_HREF_PREFIX,
@@ -32,12 +33,14 @@ import {
 } from "../../utils/remarkMentions";
 import { BroadcastChip } from "../BroadcastChip";
 import { ChannelRefChip } from "../ChannelRefChip";
+import { DevBadge } from "../DevBadge";
+import { DevMentionChip } from "../DevMentionChip";
 import { MentionChip } from "../MentionChip";
 import { PersonAvatar } from "../PersonAvatar";
 import { PersonHoverCard } from "../PersonHoverCard";
 import { MessageActions } from "./components/MessageActions";
 import { MessageAttachments } from "./components/MessageAttachments";
-import { MessageEditor } from "./components/MessageEditor";
+import { type MessageEdit, MessageEditor } from "./components/MessageEditor";
 import { MessageMenu } from "./components/MessageMenu";
 import { MessageReactions } from "./components/MessageReactions";
 import { useMessageDev } from "./hooks/useMessageDev";
@@ -45,6 +48,7 @@ import { useMessageMenuItems } from "./hooks/useMessageMenuItems";
 import { toggleReaction } from "./utils/toggleReaction";
 
 const BROADCAST_ID_PREFIX = "broadcast:";
+const DEV_ID_PREFIX = "dev:";
 export interface ChannelPerson {
 	id: string;
 	name: string;
@@ -150,7 +154,7 @@ export function ChannelMessageRow({
 				: undefined,
 	});
 
-	const saveEdit = (next: { body: string; mentionedUserIds: string[] }) => {
+	const saveEdit = (next: MessageEdit) => {
 		setEditing(false);
 		if (next.body === message.body) return;
 		apply({ ...message, ...next, editedAt: new Date() });
@@ -159,11 +163,16 @@ export function ChannelMessageRow({
 
 	const navigate = useNavigate();
 	const channels = useOrgChannels();
+	const devs = useOrgDevs();
 	const markdown = useMemo(() => {
 		const mentioned = [
 			...message.mentionedUserIds.flatMap((id) => {
 				const person = peopleById.get(id);
 				return person ? [person] : [];
+			}),
+			...message.mentionedAgentIds.flatMap((id) => {
+				const dev = devs?.find((candidate) => candidate.id === id);
+				return dev ? [{ id: `${DEV_ID_PREFIX}${id}`, name: dev.name }] : [];
 			}),
 			...(message.broadcast
 				? [
@@ -202,6 +211,13 @@ export function ChannelMessageRow({
 				const id = props.href?.startsWith(MENTION_HREF_PREFIX)
 					? props.href.slice(MENTION_HREF_PREFIX.length)
 					: null;
+				if (id?.startsWith(DEV_ID_PREFIX)) {
+					return (
+						<DevMentionChip agentId={id.slice(DEV_ID_PREFIX.length)}>
+							{props.children}
+						</DevMentionChip>
+					);
+				}
 				if (id?.startsWith(BROADCAST_ID_PREFIX)) {
 					return <BroadcastChip>{props.children}</BroadcastChip>;
 				}
@@ -238,6 +254,8 @@ export function ChannelMessageRow({
 		channels,
 		navigate,
 		message.mentionedUserIds,
+		message.mentionedAgentIds,
+		devs,
 		message.broadcast,
 		message.channelId,
 		message.editedAt,
@@ -304,9 +322,7 @@ export function ChannelMessageRow({
 						{dev ? (
 							<span className="flex items-baseline gap-1.5">
 								<span className="text-[15px] font-bold">{authorName}</span>
-								<span className="rounded-[4px] bg-muted px-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-									<Trans>Dev</Trans>
-								</span>
+								<DevBadge />
 							</span>
 						) : author ? (
 							<PersonHoverCard
@@ -342,6 +358,7 @@ export function ChannelMessageRow({
 						channelId={message.channelId}
 						body={message.body}
 						mentionedUserIds={message.mentionedUserIds}
+						mentionedAgentIds={message.mentionedAgentIds}
 						people={[...peopleById.values()]}
 						currentUserId={currentUserId}
 						onSave={saveEdit}

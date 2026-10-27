@@ -37,9 +37,17 @@ export const updateChannelSchema = z.object({
 
 export const channelIdSchema = z.object({ channelId });
 
-export const addMembersSchema = z.object({
+export const addMembersSchema = z
+	.object({
+		channelId,
+		userIds: z.array(z.string().uuid()).max(200).default([]),
+		agentIds: z.array(z.string().uuid()).max(50).default([]),
+	})
+	.refine((input) => input.userIds.length + input.agentIds.length > 0);
+
+export const devMemberSchema = z.object({
 	channelId,
-	userIds: z.array(z.string().uuid()).min(1).max(200),
+	agentId: z.string().uuid(),
 });
 
 export const memberSchema = z.object({
@@ -131,6 +139,7 @@ export const sendMessageSchema = z.object({
 	threadRootId: z.string().uuid().nullish(),
 	clientId: z.string().min(1).max(64),
 	mentionedUserIds: z.array(z.string().uuid()).max(50).default([]),
+	mentionedAgentIds: z.array(z.string().uuid()).max(20).default([]),
 	broadcast: z.enum(channelBroadcastValues).nullish(),
 	fileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).default([]),
 });
@@ -139,6 +148,8 @@ export const editMessageSchema = z.object({
 	messageId: z.string().uuid(),
 	body: z.string().max(CHANNEL_MESSAGE_MAX_LENGTH),
 	mentionedUserIds: z.array(z.string().uuid()).max(50).default([]),
+	/** Absent keeps the message's Dev mentions. */
+	mentionedAgentIds: z.array(z.string().uuid()).max(20).optional(),
 	broadcast: z.enum(channelBroadcastValues).nullish(),
 });
 

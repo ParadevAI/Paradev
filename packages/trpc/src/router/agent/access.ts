@@ -1,7 +1,7 @@
 import { db } from "@superset/db/client";
 import { agents, type SelectAgent } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { isOrgAdmin } from "../channel/access";
 
@@ -43,6 +43,29 @@ export async function loadAgentAccess(
 		agent,
 		canManage: agent.createdByUserId === userId || isOrgAdmin(membership.role),
 	};
+}
+
+/** The Devs `userId` may add to a channel in `organizationId`; any other id fails. */
+export async function addableDevs(
+	userId: string,
+	organizationId: string,
+	agentIds: readonly string[],
+): Promise<string[]> {
+	const unique = [...new Set(agentIds)];
+	if (unique.length === 0) return [];
+	const rows = await db
+		.select()
+		.from(agents)
+		.where(
+			and(
+				inArray(agents.id, unique),
+				eq(agents.organizationId, organizationId),
+				isNull(agents.archivedAt),
+			),
+		);
+	const visible = rows.filter((agent) => canSeeAgent(agent, userId));
+	if (visible.length !== unique.length) throw agentNotFound();
+	return visible.map((agent) => agent.id);
 }
 
 /** Its creator or an org admin may change an agent. */

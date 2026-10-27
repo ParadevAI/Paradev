@@ -46,9 +46,9 @@ suite("agent access against a migrated PostgreSQL", () => {
 			organizationId: orgId,
 			name: `Agent ${crypto.randomUUID().slice(0, 6)}`,
 		});
-		await person(admin).agent.grantChannel({
-			agentId: agent.id,
+		await person(admin).channel.addMembers({
 			channelId: privateChannel,
+			agentIds: [agent.id],
 		});
 		const turn = await person(userId).agent.startDirectTurn({
 			agentId: agent.id,
@@ -246,6 +246,99 @@ suite("agent access against a migrated PostgreSQL", () => {
 		await expect(
 			person(outsider).channelMessage.list({ channelId, limit: 20 }),
 		).rejects.toThrow("Channel not found");
+	});
+
+	test("a Dev added to a channel is a member until it is removed", async () => {
+		const { agent, token } = await agentWithChannel(admin);
+		const devs = await person(admin).channel.devMembers({
+			channelId: privateChannel,
+		});
+		expect(devs.map((dev) => dev.agentId)).toContain(agent.id);
+		const members = await person(admin).channel.members({
+			channelId: privateChannel,
+		});
+		expect(members.map((member) => member.userId)).toEqual([admin]);
+		await person(admin).channel.removeDev({
+			channelId: privateChannel,
+			agentId: agent.id,
+		});
+		expect(await asAgent(token).agentApi.channels()).toEqual([]);
+	});
+
+	test("a private channel left with only a Dev is archived", async () => {
+		const agent = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Lonely",
+		});
+		const { id } = await person(admin).channel.create({
+			organizationId: orgId,
+			name: `lonely-${crypto.randomUUID().slice(0, 6)}`,
+			visibility: "private",
+			memberUserIds: [],
+		});
+		await person(admin).channel.addMembers({
+			channelId: id,
+			agentIds: [agent.id],
+		});
+		await person(admin).channel.leave({ channelId: id });
+		const [row] = await db
+			.select({ archivedAt: schema.channels.archivedAt })
+			.from(schema.channels)
+			.where(eq(schema.channels.id, id));
+		expect(row?.archivedAt).not.toBeNull();
+	});
+
+	test("mentioning a Dev starts its work in the message's thread; replies there continue it", async () => {
+		const agent = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Mentioned",
+		});
+		const outside = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Outside",
+		});
+		const { id: channelId } = await person(admin).channel.create({
+			organizationId: orgId,
+			name: `mentions-${crypto.randomUUID().slice(0, 6)}`,
+			visibility: "private",
+			memberUserIds: [],
+		});
+		await person(admin).channel.addMembers({
+			channelId,
+			agentIds: [agent.id],
+		});
+		const root = await person(admin).channelMessage.send({
+			channelId,
+			body: "@Mentioned @Outside look at this",
+			clientId: crypto.randomUUID(),
+			mentionedAgentIds: [agent.id, outside.id],
+		});
+		expect(root.mentionedAgentIds).toEqual([agent.id]);
+		const turns = () =>
+			db
+				.select({
+					reason: schema.agentTurns.reason,
+					steers: schema.agentTurns.steerPromptIds,
+					threadRootId: schema.agentSessions.threadRootId,
+				})
+				.from(schema.agentTurns)
+				.innerJoin(
+					schema.agentSessions,
+					eq(schema.agentSessions.id, schema.agentTurns.sessionId),
+				)
+				.where(eq(schema.agentTurns.agentId, agent.id));
+		expect(await turns()).toEqual([
+			{ reason: "mention", steers: [], threadRootId: root.id },
+		]);
+		const reply = await person(admin).channelMessage.send({
+			channelId,
+			body: "and this",
+			threadRootId: root.id,
+			clientId: crypto.randomUUID(),
+		});
+		expect(await turns()).toEqual([
+			{ reason: "mention", steers: [reply.id], threadRootId: root.id },
+		]);
 	});
 
 	test("archiving an agent revokes it at once", async () => {

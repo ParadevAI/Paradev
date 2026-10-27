@@ -1,5 +1,5 @@
 {
-  "id": "dbd9f2e7-8ade-4d2a-8cfd-8911f1c7fa31",
+  "id": "b6b7b9ba-c3d8-4360-8fcf-138931b319f2",
   "prevId": "5736916b-0985-4ca8-8c22-7f1989306090",
   "version": "7",
   "dialect": "postgresql",
@@ -2731,6 +2731,13 @@
       "name": "channel_members",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
         "channel_id": {
           "name": "channel_id",
           "type": "uuid",
@@ -2741,7 +2748,13 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "role": {
           "name": "role",
@@ -2788,11 +2801,70 @@
         }
       },
       "indexes": {
+        "channel_members_channel_user_unique": {
+          "name": "channel_members_channel_user_unique",
+          "columns": [
+            {
+              "expression": "channel_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"channel_members\".\"user_id\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "channel_members_channel_agent_unique": {
+          "name": "channel_members_channel_agent_unique",
+          "columns": [
+            {
+              "expression": "channel_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "agent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"channel_members\".\"agent_id\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "channel_members_user_idx": {
           "name": "channel_members_user_idx",
           "columns": [
             {
               "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "channel_members_agent_idx": {
+          "name": "channel_members_agent_idx",
+          "columns": [
+            {
+              "expression": "agent_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2831,20 +2903,30 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "channel_members_agent_id_agents_id_fk": {
+          "name": "channel_members_agent_id_agents_id_fk",
+          "tableFrom": "channel_members",
+          "tableTo": "agents",
+          "columnsFrom": [
+            "agent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "channel_members_channel_id_user_id_pk": {
-          "name": "channel_members_channel_id_user_id_pk",
-          "columns": [
-            "channel_id",
-            "user_id"
-          ]
-        }
-      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "channel_members_one_member": {
+          "name": "channel_members_one_member",
+          "value": "(\"channel_members\".\"user_id\" IS NULL) <> (\"channel_members\".\"agent_id\" IS NULL)"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.channel_message_reactions": {
@@ -2971,6 +3053,13 @@
         },
         "mentioned_user_ids": {
           "name": "mentioned_user_ids",
+          "type": "uuid[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::uuid[]"
+        },
+        "mentioned_agent_ids": {
+          "name": "mentioned_agent_ids",
           "type": "uuid[]",
           "primaryKey": false,
           "notNull": true,
@@ -16484,7 +16573,7 @@
           "notNull": true
         }
       },
-      "definition": "\n\t\tselect 'agent'::text as subject_type, r.agent_id::text as subject_id, r.relation,\n\t\t\tr.object_type, r.object_id::text as object_id\n\t\tfrom authz.agent_relations r\n\t\tjoin public.agents a on a.id = r.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'organization', a.organization_id::text\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t\tunion all\n\t\tselect 'channel', ct.channel_id::text, 'channel', 'task', ct.task_id::text\n\t\tfrom public.channel_tasks ct\n\t\tunion all\n\t\tselect 'organization', t.organization_id::text, 'organization', 'task', t.id::text\n\t\tfrom public.tasks t where t.deleted_at is null\n\t\tunion all\n\t\tselect 'user', w.created_by_user_id::text, 'creator', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w where w.created_by_user_id is not null\n\t\tunion all\n\t\tselect 'organization', w.organization_id::text, 'organization', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w\n\t",
+      "definition": "\n\t\tselect 'agent'::text as subject_type, r.agent_id::text as subject_id, r.relation,\n\t\t\tr.object_type, r.object_id::text as object_id\n\t\tfrom authz.agent_relations r\n\t\tjoin public.agents a on a.id = r.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'organization', a.organization_id::text\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', m.agent_id::text, 'member', 'channel', m.channel_id::text\n\t\tfrom public.channel_members m\n\t\tjoin public.agents a on a.id = m.agent_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t\tunion all\n\t\tselect 'channel', ct.channel_id::text, 'channel', 'task', ct.task_id::text\n\t\tfrom public.channel_tasks ct\n\t\tunion all\n\t\tselect 'organization', t.organization_id::text, 'organization', 'task', t.id::text\n\t\tfrom public.tasks t where t.deleted_at is null\n\t\tunion all\n\t\tselect 'user', w.created_by_user_id::text, 'creator', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w where w.created_by_user_id is not null\n\t\tunion all\n\t\tselect 'organization', w.organization_id::text, 'organization', 'cloud_workspace', w.id::text\n\t\tfrom public.cloud_workspaces w\n\t",
       "name": "melange_tuples",
       "schema": "authz",
       "isExisting": false,

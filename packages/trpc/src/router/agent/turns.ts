@@ -5,7 +5,7 @@ import {
 	agentTurns,
 	type SelectAgent,
 } from "@superset/db/schema";
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { agentNotFound } from "./access";
 
 type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
@@ -81,7 +81,7 @@ export async function startOrJoinTurn(input: {
 }
 
 /** A person wrote in their DM with a Dev: the Dev takes it as a turn, unless paused. */
-export async function startTurnForDirectMessage(
+async function startTurnForDirectMessage(
 	channelId: string,
 	userId: string,
 	messageId: string,
@@ -109,4 +109,110 @@ export async function startTurnForDirectMessage(
 		reason: "direct_message",
 		triggerMessageId: messageId,
 	});
+}
+
+/**
+ * Starts the turns a person's message asks for. In a DM, its Dev answers.
+ * In a channel, each mentioned Dev works in the message's thread, and a
+ * reply in a thread a Dev already works in continues that work.
+ */
+export async function startTurnsForMessage(
+	channel: { id: string; kind: "channel" | "dm" },
+	message: {
+		id: string;
+		threadRootId: string | null;
+		mentionedAgentIds: string[];
+	},
+	userId: string,
+) {
+	if (channel.kind === "dm") {
+		await startTurnForDirectMessage(channel.id, userId, message.id);
+		return;
+	}
+	const threadRootId = message.threadRootId ?? message.id;
+	const mentioned = message.mentionedAgentIds.length
+		? await db
+				.select()
+				.from(agents)
+				.where(
+					and(
+						inArray(agents.id, message.mentionedAgentIds),
+						isNull(agents.archivedAt),
+						isNull(agents.pausedAt),
+					),
+				)
+		: [];
+	const following = message.threadRootId
+		? await db
+				.select({ session: agentSessions, agent: agents })
+				.from(agentSessions)
+				.innerJoin(agents, eq(agents.id, agentSessions.agentId))
+				.where(
+					and(
+						eq(agentSessions.kind, "thread"),
+						eq(agentSessions.threadRootId, message.threadRootId),
+						isNull(agents.archivedAt),
+						isNull(agents.pausedAt),
+					),
+				)
+		: [];
+	const mentionedIds = new Set(mentioned.map((agent) => agent.id));
+	const work = [
+		...mentioned.map((agent) => ({ agent, reason: "mention" as const })),
+		...following
+			.filter(({ agent }) => !mentionedIds.has(agent.id))
+			.map(({ agent }) => ({ agent, reason: "thread_reply" as const })),
+	];
+	const results = await Promise.allSettled(
+		work.map(async ({ agent, reason }) => {
+			const sessionId = await ensureThreadSession(
+				agent,
+				channel.id,
+				threadRootId,
+			);
+			return startOrJoinTurn({
+				agent,
+				sessionId,
+				actingUserId: userId,
+				promptId: message.id,
+				reason,
+				triggerMessageId: message.id,
+			});
+		}),
+	);
+	for (const result of results) {
+		if (result.status === "rejected") {
+			console.error("[agent-turns] couldn't start a turn", result.reason);
+		}
+	}
+}
+
+async function ensureThreadSession(
+	agent: SelectAgent,
+	channelId: string,
+	threadRootId: string,
+): Promise<string> {
+	await db
+		.insert(agentSessions)
+		.values({
+			organizationId: agent.organizationId,
+			agentId: agent.id,
+			kind: "thread",
+			channelId,
+			threadRootId,
+		})
+		.onConflictDoNothing();
+	const [session] = await db
+		.select({ id: agentSessions.id })
+		.from(agentSessions)
+		.where(
+			and(
+				eq(agentSessions.agentId, agent.id),
+				eq(agentSessions.kind, "thread"),
+				eq(agentSessions.threadRootId, threadRootId),
+			),
+		)
+		.limit(1);
+	if (!session) throw new Error("thread session missing after insert");
+	return session.id;
 }

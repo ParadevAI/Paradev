@@ -30,6 +30,7 @@ export function pendingMessage(input: {
 	clientId: string;
 	threadRootId: string | null;
 	mentionedUserIds: string[];
+	mentionedAgentIds?: string[];
 	broadcast?: ChannelBroadcast | null;
 	/** Local previews of the files on their way up. */
 	attachments?: ChannelAttachment[];
@@ -43,6 +44,7 @@ export function pendingMessage(input: {
 		authorAgentId: null,
 		body: input.body,
 		mentionedUserIds: input.mentionedUserIds,
+		mentionedAgentIds: input.mentionedAgentIds ?? [],
 		broadcast: input.broadcast ?? null,
 		clientId: input.clientId,
 		replyCount: 0,

@@ -1,11 +1,11 @@
 import { db } from "@superset/db/client";
-import { channelMembers, channels, members } from "@superset/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { agents, channelMembers, channels, members } from "@superset/db/schema";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
-/** The channel's members who still belong to its organization. */
+/** The people in the channel who still belong to its organization. */
 export async function channelMemberIds(channelId: string): Promise<string[]> {
 	const rows = await db
-		.select({ userId: channelMembers.userId })
+		.select({ userId: members.userId })
 		.from(channelMembers)
 		.innerJoin(channels, eq(channels.id, channelMembers.channelId))
 		.innerJoin(
@@ -17,6 +17,23 @@ export async function channelMemberIds(channelId: string): Promise<string[]> {
 		)
 		.where(eq(channelMembers.channelId, channelId));
 	return rows.map((row) => row.userId);
+}
+
+/** The live Devs in the channel. */
+export async function channelDevs(channelId: string) {
+	return db
+		.select({
+			agentId: agents.id,
+			name: agents.name,
+			avatar: agents.avatar,
+			joinedAt: channelMembers.joinedAt,
+		})
+		.from(channelMembers)
+		.innerJoin(agents, eq(agents.id, channelMembers.agentId))
+		.where(
+			and(eq(channelMembers.channelId, channelId), isNull(agents.archivedAt)),
+		)
+		.orderBy(asc(agents.name));
 }
 
 export async function allOrgMemberIds(

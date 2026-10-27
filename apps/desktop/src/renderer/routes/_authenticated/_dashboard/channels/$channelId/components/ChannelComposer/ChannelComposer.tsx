@@ -9,6 +9,7 @@ import { useComposerDictation } from "renderer/routes/_authenticated/components/
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import { pendingMessage } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import {
+	mentionedAgentIds,
 	mentionedUserIds,
 	useChannelMentions,
 } from "../../hooks/useChannelMentions";
@@ -76,6 +77,7 @@ export function ChannelComposer({
 			clientId: crypto.randomUUID(),
 			threadRootId,
 			mentionedUserIds: mentionedUserIds(payload.mentions),
+			mentionedAgentIds: mentionedAgentIds(payload.mentions),
 			broadcast: strongestBroadcast(payload.mentions),
 			attachments: previews,
 		});
@@ -108,6 +110,7 @@ export function ChannelComposer({
 					threadRootId,
 					clientId: pending.id,
 					mentionedUserIds: pending.mentionedUserIds,
+					mentionedAgentIds: pending.mentionedAgentIds,
 					broadcast: pending.broadcast,
 					fileIds,
 				}),

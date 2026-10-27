@@ -11,9 +11,11 @@ import { usePluginMentionProvider } from "renderer/routes/_authenticated/compone
 import { BroadcastChip } from "../../components/BroadcastChip";
 import type { ChannelPerson } from "../../components/ChannelMessageRow";
 import { ChannelRefChip } from "../../components/ChannelRefChip";
+import { DevMentionChip } from "../../components/DevMentionChip";
 import { MentionBroadcastRow } from "../../components/MentionBroadcastRow";
 import { MentionChannelRow } from "../../components/MentionChannelRow";
 import { MentionChip } from "../../components/MentionChip";
+import { MentionDevRow } from "../../components/MentionDevRow";
 import { MentionPersonRow } from "../../components/MentionPersonRow";
 import { MentionTaskRow } from "../../components/MentionTaskRow";
 import {
@@ -24,7 +26,7 @@ import { useOrgChannels } from "../useOrgChannels";
 
 /**
  * A channel composer's mentions: the @ menu (people with members first, then
- * @channel and @here; the channel's tasks; plugins), the # menu of channels,
+ * @channel and @here; the channel's Devs; its tasks; plugins), the # menu of channels,
  * and chips drawn as in sent messages.
  */
 export function useChannelMentions({
@@ -38,6 +40,7 @@ export function useChannelMentions({
 }) {
 	const { t } = useLingui();
 	const { data: members } = cloudTrpc.channel.members.useQuery({ channelId });
+	const { data: devs } = cloudTrpc.channel.devMembers.useQuery({ channelId });
 	const { data: tasks } = cloudTrpc.channelTask.list.useQuery({ channelId });
 	const channels = useOrgChannels();
 	const { provider: pluginProvider } = usePluginMentionProvider();
@@ -85,6 +88,19 @@ export function useChannelMentions({
 			);
 			return [...personEntries, ...broadcastEntries];
 		};
+		const devEntries = (devs ?? []).map(
+			(dev): ComposerMentionEntry => ({
+				id: `dev:${dev.agentId}`,
+				label: dev.name,
+				row: <MentionDevRow name={dev.name} avatar={dev.avatar} />,
+				select: (ctx) =>
+					ctx.insertChip({
+						label: dev.name,
+						serialized: `@${dev.name}`,
+						data: { agentId: dev.agentId },
+					}),
+			}),
+		);
 		const taskEntries = (tasks ?? []).map(
 			(task): ComposerMentionEntry => ({
 				id: `task:${task.id}`,
@@ -128,6 +144,12 @@ export function useChannelMentions({
 				},
 			},
 			{
+				id: "devs",
+				title: t({ message: "Devs" }),
+				priority: 1,
+				source: { kind: "static", load: () => devEntries },
+			},
+			{
 				id: "tasks",
 				title: t({ message: "Tasks" }),
 				priority: 1,
@@ -142,7 +164,16 @@ export function useChannelMentions({
 				source: { kind: "static", load: () => channelEntries },
 			},
 		];
-	}, [members, tasks, channels, people, currentUserId, pluginProvider, t]);
+	}, [
+		members,
+		devs,
+		tasks,
+		channels,
+		people,
+		currentUserId,
+		pluginProvider,
+		t,
+	]);
 
 	const renderChip = useCallback(
 		(chip: ComposerChip) => {
@@ -150,6 +181,10 @@ export function useChannelMentions({
 				chip.data as { broadcast?: ChannelBroadcast } | undefined
 			)?.broadcast;
 			if (broadcast) return <BroadcastChip>@{broadcast}</BroadcastChip>;
+			const [agentId] = mentionedAgentIds([chip]);
+			if (agentId) {
+				return <DevMentionChip agentId={agentId}>@{chip.label}</DevMentionChip>;
+			}
 			if (isChannelChip(chip)) {
 				return <ChannelRefChip>{chip.label}</ChannelRefChip>;
 			}
@@ -179,6 +214,16 @@ export function mentionedUserIds(
 	return mentions.flatMap((chip) => {
 		const data = chip.data as { userId?: unknown } | undefined;
 		return typeof data?.userId === "string" ? [data.userId] : [];
+	});
+}
+
+/** The ids of the Devs a composer's chips mention. */
+export function mentionedAgentIds(
+	mentions: readonly { data?: unknown }[],
+): string[] {
+	return mentions.flatMap((chip) => {
+		const data = chip.data as { agentId?: unknown } | undefined;
+		return typeof data?.agentId === "string" ? [data.agentId] : [];
 	});
 }
 

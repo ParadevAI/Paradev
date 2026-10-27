@@ -29,8 +29,9 @@ export const agentMessageAccess = pgEnum(
 );
 
 /**
- * An agent that works in an organization under its own identity. What it may
- * touch is granted in `authz.agent_relations`; archiving it revokes all of it.
+ * An agent that works in an organization under its own identity. It reaches
+ * channels as a `channel_members` row and anything else through
+ * `authz.agent_relations`; archiving it revokes all of it.
  */
 export const agents = pgTable(
 	"agents",

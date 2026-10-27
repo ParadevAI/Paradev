@@ -1,6 +1,5 @@
 import { dbWs } from "@superset/db/client";
 import {
-	agentRelations,
 	agentSessions,
 	channelMembers,
 	channels,
@@ -53,18 +52,10 @@ export async function ensureDirectMessage(
 			})
 			.returning({ id: channels.id });
 		if (!room) throw new Error("DM room insert returned no row");
-		await tx
-			.insert(channelMembers)
-			.values({ channelId: room.id, userId, notify: "all" });
-		await tx
-			.insert(agentRelations)
-			.values({
-				agentId: agent.id,
-				relation: "member",
-				objectType: "channel",
-				objectId: room.id,
-			})
-			.onConflictDoNothing();
+		await tx.insert(channelMembers).values([
+			{ channelId: room.id, userId, notify: "all" },
+			{ channelId: room.id, agentId: agent.id },
+		]);
 		await tx
 			.update(agentSessions)
 			.set({ channelId: room.id })

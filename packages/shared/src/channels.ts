@@ -49,6 +49,7 @@ export interface ChannelMessageWire {
 	authorAgentId: string | null;
 	body: string;
 	mentionedUserIds: string[];
+	mentionedAgentIds: string[];
 	broadcast: ChannelBroadcast | null;
 	clientId: string | null;
 	replyCount: number;
