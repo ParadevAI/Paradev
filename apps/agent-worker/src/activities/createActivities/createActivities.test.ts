@@ -3,7 +3,11 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SteerInput } from "@superset/agent-harness/session/definitions";
-import { CancelledFailure } from "@temporalio/common";
+import {
+	ActivityCancellationDetails,
+	ApplicationFailure,
+	CancelledFailure,
+} from "@temporalio/common";
 import { MockActivityEnvironment } from "@temporalio/testing";
 import type { TurnCredentials } from "../../clients/credentials";
 import type {
@@ -272,6 +276,25 @@ describe("runTurn", () => {
 			steersConsumed: 0,
 		});
 		expect(settled[0]?.reply).toBe("subagent finished");
+	});
+	test("a worker shutdown fails the attempt for a retry, without stopping the turn", async () => {
+		const { activities } = setup();
+		await activities.beginTurn({ ...turn, promptId: "p1", text: "hang on" });
+		const env = new MockActivityEnvironment();
+		const running = env.run(activities.runTurn, {
+			...turn,
+			prompts: [{ promptId: "p1", text: "hang on" }],
+			steersFrom: 0,
+		});
+		for (let i = 0; i < 100 && !prompts().length; i++) await Bun.sleep(20);
+		env.cancel(
+			"WORKER_SHUTDOWN",
+			new ActivityCancellationDetails({ workerShutdown: true }),
+		);
+		const error = await running.catch((e: unknown) => e);
+		expect(error).toBeInstanceOf(ApplicationFailure);
+		expect((error as ApplicationFailure).nonRetryable).toBe(false);
+		expect(pdevLog().some((e) => e.method === "session/cancel")).toBe(false);
 	});
 });
 

@@ -276,10 +276,15 @@ export function createActivities(deps: ActivityDeps) {
 				let idleSince: number | null = null;
 				for (;;) {
 					if (signal?.aborted) {
-						await session.cancel();
+						const stopped = cancelRequested();
+						if (stopped) await session.cancel();
 						await flusher.flush();
 						await syncFile();
-						throw new CancelledFailure("Turn interrupted");
+						if (stopped) throw new CancelledFailure("Turn interrupted");
+						throw ApplicationFailure.retryable(
+							"This worker stopped; another one resumes the turn.",
+							"WorkerStopped",
+						);
 					}
 					const steers = info
 						? await deps.turnSteers(
@@ -595,6 +600,17 @@ function activityInfo() {
 		return ActivityContext.current().info;
 	} catch {
 		return undefined;
+	}
+}
+
+/** A stop someone asked for, as opposed to this worker shutting down or the activity timing out. */
+function cancelRequested(): boolean {
+	try {
+		return (
+			ActivityContext.current().cancellationDetails?.cancelRequested ?? true
+		);
+	} catch {
+		return true;
 	}
 }
 

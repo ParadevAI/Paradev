@@ -60,7 +60,7 @@ const worker = await Worker.create({
 		turnSteers: (workflowId, turnId) =>
 			client.workflow.getHandle(workflowId).query(turnSteersQuery, turnId),
 	}),
-	shutdownGraceTime: "60 seconds",
+	shutdownGraceTime: "10 seconds",
 });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
