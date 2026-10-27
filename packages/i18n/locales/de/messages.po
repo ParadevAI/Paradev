@@ -16533,6 +16533,12 @@ msgstr "Wiederverwendbare Terminal-Starts. Klicke ein Skript zum Bearbeiten an o
 msgid "Reusing {keptName}"
 msgstr "Verwendet {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Im Datei-Explorer anzeigen"
+
+msgid "Reveal in File Manager"
+msgstr "Im Dateimanager anzeigen"
+
 msgid "Reveal in Finder"
 msgstr "Im Finder anzeigen"
 

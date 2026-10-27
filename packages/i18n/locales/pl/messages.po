@@ -16533,6 +16533,12 @@ msgstr "Uruchomienia terminala wielokrotnego użytku. Kliknij skrypt, aby go edy
 msgid "Reusing {keptName}"
 msgstr "Używa ponownie: {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Pokaż w Eksploratorze plików"
+
+msgid "Reveal in File Manager"
+msgstr "Pokaż w menedżerze plików"
+
 msgid "Reveal in Finder"
 msgstr "Pokaż w Finderze"
 

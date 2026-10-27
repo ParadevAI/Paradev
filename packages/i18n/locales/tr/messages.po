@@ -16533,6 +16533,12 @@ msgstr "Yeniden kullanılabilir terminal başlatmaları. Düzenlemek için bir b
 msgid "Reusing {keptName}"
 msgstr "{keptName} yeniden kullanılıyor"
 
+msgid "Reveal in File Explorer"
+msgstr "Dosya Gezgini'nde göster"
+
+msgid "Reveal in File Manager"
+msgstr "Dosya yöneticisinde göster"
+
 msgid "Reveal in Finder"
 msgstr "Finder'da göster"
 

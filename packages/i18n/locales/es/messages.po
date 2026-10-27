@@ -16533,6 +16533,12 @@ msgstr "Lanzamientos de terminal reutilizables. Haz clic en un script para edita
 msgid "Reusing {keptName}"
 msgstr "Reutilizando {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Mostrar en el Explorador de archivos"
+
+msgid "Reveal in File Manager"
+msgstr "Mostrar en el gestor de archivos"
+
 msgid "Reveal in Finder"
 msgstr "Mostrar en Finder"
 

@@ -16533,6 +16533,12 @@ msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau s
 msgid "Reusing {keptName}"
 msgstr "Memakai ulang {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Tampilkan di File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Tampilkan di pengelola file"
+
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"
 

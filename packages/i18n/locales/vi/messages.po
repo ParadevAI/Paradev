@@ -16533,6 +16533,12 @@ msgstr "Các lệnh terminal dùng lại được. Nhấp vào một script đ�
 msgid "Reusing {keptName}"
 msgstr "Đang dùng lại {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Hiện trong File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Hiện trong trình quản lý tệp"
+
 msgid "Reveal in Finder"
 msgstr "Hiện trong Finder"
 

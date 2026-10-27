@@ -16533,6 +16533,12 @@ msgstr "Znovupoužitelná spuštění terminálu. Kliknutím skript upravíte, p
 msgid "Reusing {keptName}"
 msgstr "Znovu použito: {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Zobrazit v Průzkumníku souborů"
+
+msgid "Reveal in File Manager"
+msgstr "Zobrazit ve správci souborů"
+
 msgid "Reveal in Finder"
 msgstr "Zobrazit ve Finderu"
 

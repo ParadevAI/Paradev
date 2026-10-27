@@ -16533,6 +16533,12 @@ msgstr "可複用的終端啟動項。點選指令碼可編輯，拖曳可重新
 msgid "Reusing {keptName}"
 msgstr "正在重複使用 {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "在檔案總管中顯示"
+
+msgid "Reveal in File Manager"
+msgstr "在檔案管理員中顯示"
+
 msgid "Reveal in Finder"
 msgstr "在Finder中顯示"
 

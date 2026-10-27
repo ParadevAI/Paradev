@@ -16533,6 +16533,12 @@ msgstr "Переиспользуемые запуски терминала. На
 msgid "Reusing {keptName}"
 msgstr "Используется {keptName}"
 
+msgid "Reveal in File Explorer"
+msgstr "Показать в Проводнике"
+
+msgid "Reveal in File Manager"
+msgstr "Показать в файловом менеджере"
+
 msgid "Reveal in Finder"
 msgstr "Показать в Finder"
 
