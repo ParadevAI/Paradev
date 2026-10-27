@@ -938,6 +938,9 @@ msgstr "{formerName} は {productName} に名称を変更しました。製品�
 msgid "{founderCount} ex-YC founders"
 msgstr "YC出身の創業者{founderCount}人"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} トークン"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "コミュニティ"
 msgid "Compact now"
 msgstr "今すぐ圧縮"
 
+msgid "Compacting context…"
+msgstr "コンテキストを圧縮中…"
+
+msgid "Compaction failed"
+msgstr "圧縮に失敗しました"
+
+msgid "Compaction stopped"
+msgstr "圧縮を停止しました"
+
 msgid "Company"
 msgstr "会社"
 
@@ -4925,6 +4937,12 @@ msgstr "このテキストを含む..."
 
 msgid "Context"
 msgstr "Context"
+
+msgid "Context compacted"
+msgstr "コンテキストを圧縮しました"
+
+msgid "Context compacted automatically"
+msgstr "コンテキストを自動で圧縮しました"
 
 msgid "Context Menu"
 msgstr "Context Menu"
@@ -16695,6 +16713,9 @@ msgstr "このエージェントのステータス表示と通知を有効にし
 
 msgid "Show text"
 msgstr "テキストを表示"
+
+msgid "Show the summary"
+msgstr "要約を表示"
 
 msgid "Show the triggering payload"
 msgstr "トリガーのペイロードを表示"

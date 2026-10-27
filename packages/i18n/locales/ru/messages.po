@@ -938,6 +938,9 @@ msgstr "{formerName} теперь называется {productName}. Это т�
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} основателя — выпускника YC"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} токенов"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Сообщество"
 msgid "Compact now"
 msgstr "Сжать сейчас"
 
+msgid "Compacting context…"
+msgstr "Сжатие контекста…"
+
+msgid "Compaction failed"
+msgstr "Не удалось сжать контекст"
+
+msgid "Compaction stopped"
+msgstr "Сжатие остановлено"
+
 msgid "Company"
 msgstr "Компания"
 
@@ -4925,6 +4937,12 @@ msgstr "Содержит этот текст..."
 
 msgid "Context"
 msgstr "Контекст"
+
+msgid "Context compacted"
+msgstr "Контекст сжат"
+
+msgid "Context compacted automatically"
+msgstr "Контекст сжат автоматически"
 
 msgid "Context Menu"
 msgstr "Контекстное меню"
@@ -16695,6 +16713,9 @@ msgstr "Показывать статус и отправлять уведомл
 
 msgid "Show text"
 msgstr "Показать текст"
+
+msgid "Show the summary"
+msgstr "Показать сводку"
 
 msgid "Show the triggering payload"
 msgstr "Показать полезную нагрузку триггера"

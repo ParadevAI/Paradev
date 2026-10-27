@@ -88,6 +88,18 @@ export const acpUsageUpdateSchema = z.looseObject({
 });
 export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
 
+export const acpCompactionUpdateSchema = z.looseObject({
+	compactionId: z.string().min(1),
+	status: z.string(),
+	summary: z.array(acpContentBlockSchema).optional().catch(undefined),
+	error: z.unknown().optional(),
+});
+
+export const acpCompactionSummaryChunkSchema = z.looseObject({
+	compactionId: z.string().min(1),
+	content: acpContentBlockSchema.optional().catch(undefined),
+});
+
 export const acpUsdCostSchema = z.looseObject({
 	amount: z.number().nonnegative(),
 	currency: z.literal("USD"),

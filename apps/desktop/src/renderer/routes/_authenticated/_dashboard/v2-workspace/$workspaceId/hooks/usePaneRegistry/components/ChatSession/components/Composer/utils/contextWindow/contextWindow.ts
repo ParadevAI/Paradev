@@ -1,9 +1,6 @@
 import type { SessionUsage } from "@superset/chat/protocol";
-import {
-	formatCompactNumber,
-	formatCurrency,
-	formatPercent,
-} from "@superset/i18n/format";
+import { formatCurrency, formatPercent } from "@superset/i18n/format";
+import { formatTokens } from "../../../../utils/formatTokens";
 
 export type ContextWindowLevel = "normal" | "warning" | "critical";
 
@@ -11,10 +8,6 @@ export function contextWindowLevel(usedPercent: number): ContextWindowLevel {
 	if (usedPercent > 90) return "critical";
 	if (usedPercent >= 75) return "warning";
 	return "normal";
-}
-
-function formatTokens(tokens: number): string {
-	return formatCompactNumber(tokens, { maximumFractionDigits: 1 });
 }
 
 export function contextWindow(usage: SessionUsage) {

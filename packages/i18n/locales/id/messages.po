@@ -938,6 +938,9 @@ msgstr "{formerName} kini bernama {productName}. Produknya sama, dibuat oleh tim
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} pendiri alumni YC"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Komunitas"
 msgid "Compact now"
 msgstr "Padatkan sekarang"
 
+msgid "Compacting context…"
+msgstr "Memadatkan konteks…"
+
+msgid "Compaction failed"
+msgstr "Pemadatan gagal"
+
+msgid "Compaction stopped"
+msgstr "Pemadatan dihentikan"
+
 msgid "Company"
 msgstr "Perusahaan"
 
@@ -4925,6 +4937,12 @@ msgstr "Mengandung teks ini..."
 
 msgid "Context"
 msgstr "Konteks"
+
+msgid "Context compacted"
+msgstr "Konteks dipadatkan"
+
+msgid "Context compacted automatically"
+msgstr "Konteks dipadatkan otomatis"
 
 msgid "Context Menu"
 msgstr "Menu Konteks"
@@ -16695,6 +16713,9 @@ msgstr "Tampilkan status dan kirim notifikasi untuk agen ini."
 
 msgid "Show text"
 msgstr "Tampilkan teks"
+
+msgid "Show the summary"
+msgstr "Tampilkan ringkasan"
 
 msgid "Show the triggering payload"
 msgstr "Tampilkan payload pemicu"

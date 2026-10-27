@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "bun:test";
 import { spawn } from "node:child_process";
-import type { Item } from "@superset/chat/protocol";
+import type { Item, Notice } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
 import type { AdapterEvent } from "../types";
 import {
@@ -3422,6 +3422,285 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("asks agents to report compaction as compaction updates", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		const initialize = agent.sent.find(
+			(frame) => frame.method === "initialize",
+		);
+		expect(initialize?.params).toMatchObject({
+			clientCapabilities: { session: { compaction: {} } },
+			capabilities: { session: { compaction: {} } },
+		});
+		await adapter.dispose();
+	});
+
+	it("shows a compaction as one notice that resolves with its token counts and summary", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "/compact" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_summary_chunk",
+			compactionId: "c1",
+			content: { type: "text", text: "Read the readme. " },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_summary_chunk",
+			compactionId: "c1",
+			content: { type: "text", text: "Nothing changed." },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
+			_meta: {
+				jetbrains: {
+					air: {
+						contextCompaction: {
+							version: 1,
+							trigger: "manual",
+							preTokens: 61_043,
+							postTokens: 9_120,
+						},
+					},
+				},
+			},
+		});
+		await flush();
+
+		const notices = itemsOf(events).filter((item) => item.kind === "notice");
+		expect(new Set(notices.map((item) => item.id)).size).toBe(1);
+		expect(notices.map((item) => (item as Notice).compaction?.status)).toEqual([
+			"running",
+			"completed",
+		]);
+		expect(notices.at(-1)).toMatchObject({
+			noticeKind: "compaction",
+			text: "Context compacted",
+			compaction: {
+				status: "completed",
+				trigger: "manual",
+				tokensBefore: 61_043,
+				tokensAfter: 9_120,
+				summary: "Read the readme. Nothing changed.",
+			},
+		});
+		await adapter.dispose();
+	});
+
+	it("takes a compaction's size after from the next usage report when the agent sends none", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "/compact" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 30_818,
+			size: 258_400,
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 17_218,
+			size: 258_400,
+		});
+		await flush();
+
+		const notices = itemsOf(events).filter((item) => item.kind === "notice");
+		expect((notices.at(-1) as Notice).compaction).toEqual({
+			status: "completed",
+			tokensBefore: 30_818,
+			tokensAfter: 17_218,
+		});
+		await adapter.dispose();
+	});
+
+	it("takes a compaction's size after from usage the agent reported while it ran", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "/compact" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 20_722,
+			size: 258_400,
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 13_910,
+			size: 258_400,
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
+		});
+		await flush();
+
+		const notices = itemsOf(events).filter((item) => item.kind === "notice");
+		expect((notices.at(-1) as Notice).compaction).toEqual({
+			status: "completed",
+			tokensBefore: 20_722,
+			tokensAfter: 13_910,
+		});
+		await adapter.dispose();
+	});
+
+	it("settles a running compaction when the agent exits", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "/compact" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		await flush();
+
+		agent.exit(1);
+		await flush();
+
+		const notices = itemsOf(events).filter((item) => item.kind === "notice");
+		const compactions = notices.filter(
+			(item) => (item as Notice).noticeKind === "compaction",
+		);
+		expect((compactions.at(-1) as Notice).compaction?.status).toBe("failed");
+		await adapter.dispose();
+	});
+
+	it("does not take the next turn's usage as a compaction's size after", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "/compact" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 30_818,
+			size: 258_400,
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
+		});
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		adapter.prompt([{ type: "text", text: "next" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 41_000,
+			size: 258_400,
+		});
+		await flush();
+
+		const notices = itemsOf(events).filter((item) => item.kind === "notice");
+		expect((notices.at(-1) as Notice).compaction?.tokensAfter).toBeUndefined();
+		await adapter.dispose();
+	});
+
+	it("keeps a replayed summary that arrives in several chunks in one compaction", async () => {
+		const agent = new FakeAcpAgent();
+		agent.replayUpdates = [
+			{
+				sessionUpdate: "user_message_chunk",
+				messageId: "summary-1",
+				content: {
+					type: "text",
+					text: "This session is being continued from a previous conversation that ran out of context.\n\nSummary:\n1. Read the readme.",
+				},
+			},
+			{
+				sessionUpdate: "user_message_chunk",
+				messageId: "summary-1",
+				content: {
+					type: "text",
+					text: "\n2. Nothing changed.\n\nContinue the conversation from where it left off.",
+				},
+			},
+		];
+		const { adapter, events } = startAdapter(agent, "sess-1");
+		await flush(40);
+
+		const items = itemsOf(events);
+		expect(items.some((item) => item.kind === "user_message")).toBe(false);
+		expect((items.at(-1) as Notice).compaction?.summary).toBe(
+			"1. Read the readme.\n2. Nothing changed.",
+		);
+		await adapter.dispose();
+	});
+
+	it("replays Claude's post-compaction summary as a compaction, not a user message", async () => {
+		const agent = new FakeAcpAgent();
+		agent.replayUpdates = [
+			{
+				sessionUpdate: "user_message_chunk",
+				messageId: "summary-1",
+				content: {
+					type: "text",
+					text: "This session is being continued from a previous conversation that ran out of context.\n\nSummary:\n1. Read the readme.\n\nContinue the conversation from where it left off.",
+				},
+			},
+			{
+				sessionUpdate: "agent_message_chunk",
+				messageId: "msg_2",
+				content: { type: "text", text: "Hi again." },
+			},
+		];
+		const { adapter, events } = startAdapter(agent, "sess-1");
+		await flush(40);
+
+		const items = itemsOf(events);
+		expect(items.some((item) => item.kind === "user_message")).toBe(false);
+		expect(items.find((item) => item.kind === "notice")).toMatchObject({
+			noticeKind: "compaction",
+			compaction: { status: "completed", summary: "1. Read the readme." },
+		});
+		await adapter.dispose();
+	});
+
 	it("treats a steered turn as working until the steered reply streams", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
@@ -5262,6 +5541,7 @@ describe("AcpAdapter on protocol v2", () => {
 		// v2 renamed the field; v1 agents still read the old name.
 		expect(params.capabilities).toEqual({
 			elicitation: { form: {} },
+			session: { compaction: {} },
 			_meta: AIR_CLIENT_META,
 		});
 		expect(params.clientCapabilities).toBeDefined();

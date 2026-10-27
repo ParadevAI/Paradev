@@ -938,6 +938,9 @@ msgstr "{formerName} heißt jetzt {productName}. Es ist dasselbe Produkt vom sel
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} Gründer aus dem YC-Netzwerk"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} Tokens"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Community"
 msgid "Compact now"
 msgstr "Jetzt komprimieren"
 
+msgid "Compacting context…"
+msgstr "Kontext wird komprimiert…"
+
+msgid "Compaction failed"
+msgstr "Komprimierung fehlgeschlagen"
+
+msgid "Compaction stopped"
+msgstr "Komprimierung abgebrochen"
+
 msgid "Company"
 msgstr "Unternehmen"
 
@@ -4925,6 +4937,12 @@ msgstr "Enthält diesen Text..."
 
 msgid "Context"
 msgstr "Kontext"
+
+msgid "Context compacted"
+msgstr "Kontext komprimiert"
+
+msgid "Context compacted automatically"
+msgstr "Kontext automatisch komprimiert"
 
 msgid "Context Menu"
 msgstr "Kontextmenü"
@@ -16695,6 +16713,9 @@ msgstr "Status anzeigen und Benachrichtigungen für diesen Agenten senden."
 
 msgid "Show text"
 msgstr "Text anzeigen"
+
+msgid "Show the summary"
+msgstr "Zusammenfassung anzeigen"
 
 msgid "Show the triggering payload"
 msgstr "Auslösende Nutzlast anzeigen"

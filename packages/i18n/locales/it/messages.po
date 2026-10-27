@@ -938,6 +938,9 @@ msgstr "{formerName} ora si chiama {productName}. È lo stesso prodotto, creato 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} fondatori ex YC"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Community"
 msgid "Compact now"
 msgstr "Compatta ora"
 
+msgid "Compacting context…"
+msgstr "Compattazione del contesto…"
+
+msgid "Compaction failed"
+msgstr "Compattazione non riuscita"
+
+msgid "Compaction stopped"
+msgstr "Compattazione interrotta"
+
 msgid "Company"
 msgstr "Azienda"
 
@@ -4925,6 +4937,12 @@ msgstr "Contiene questo testo..."
 
 msgid "Context"
 msgstr "Context"
+
+msgid "Context compacted"
+msgstr "Contesto compattato"
+
+msgid "Context compacted automatically"
+msgstr "Contesto compattato automaticamente"
 
 msgid "Context Menu"
 msgstr "Context Menu"
@@ -16695,6 +16713,9 @@ msgstr "Mostra lo stato e invia notifiche per questo agente."
 
 msgid "Show text"
 msgstr "Mostra testo"
+
+msgid "Show the summary"
+msgstr "Mostra il riepilogo"
 
 msgid "Show the triggering payload"
 msgstr "Mostra il payload che ha attivato questa esecuzione"

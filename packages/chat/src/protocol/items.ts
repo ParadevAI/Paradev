@@ -255,11 +255,22 @@ export const approvalRequestSchema = z.looseObject({
 });
 export type ApprovalRequest = z.infer<typeof approvalRequestSchema>;
 
+export const noticeCompactionSchema = z.looseObject({
+	status: z.enum(["running", "completed", "failed", "cancelled"]),
+	trigger: z.enum(["manual", "automatic"]).optional().catch(undefined),
+	tokensBefore: z.number().nonnegative().optional().catch(undefined),
+	tokensAfter: z.number().nonnegative().optional().catch(undefined),
+	summary: z.string().optional().catch(undefined),
+	error: z.string().optional().catch(undefined),
+});
+export type NoticeCompaction = z.infer<typeof noticeCompactionSchema>;
+
 export const noticeSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("notice"),
 	noticeKind: z.enum(["compaction", "config_change", "error", "info"]),
 	text: z.string().optional(),
+	compaction: noticeCompactionSchema.optional().catch(undefined),
 });
 export type Notice = z.infer<typeof noticeSchema>;
 

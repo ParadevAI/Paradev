@@ -938,6 +938,9 @@ msgstr "{formerName} 現已更名為 {productName}。產品不變，團隊不變
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友創辦人"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} 個 token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "社群"
 msgid "Compact now"
 msgstr "立即壓縮"
 
+msgid "Compacting context…"
+msgstr "正在壓縮上下文…"
+
+msgid "Compaction failed"
+msgstr "壓縮失敗"
+
+msgid "Compaction stopped"
+msgstr "壓縮已停止"
+
 msgid "Company"
 msgstr "公司"
 
@@ -4925,6 +4937,12 @@ msgstr "包含此文字..."
 
 msgid "Context"
 msgstr "上下文"
+
+msgid "Context compacted"
+msgstr "上下文已壓縮"
+
+msgid "Context compacted automatically"
+msgstr "上下文已自動壓縮"
 
 msgid "Context Menu"
 msgstr "右鍵選單"
@@ -16695,6 +16713,9 @@ msgstr "為此代理程式顯示狀態併發送通知。"
 
 msgid "Show text"
 msgstr "顯示文字"
+
+msgid "Show the summary"
+msgstr "顯示摘要"
 
 msgid "Show the triggering payload"
 msgstr "顯示觸發酬載"

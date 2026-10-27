@@ -938,6 +938,9 @@ msgstr "{formerName} 现已更名为 {productName}。产品不变，团队不变
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友创始人"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} 个 token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "社区"
 msgid "Compact now"
 msgstr "立即压缩"
 
+msgid "Compacting context…"
+msgstr "正在压缩上下文…"
+
+msgid "Compaction failed"
+msgstr "压缩失败"
+
+msgid "Compaction stopped"
+msgstr "压缩已停止"
+
 msgid "Company"
 msgstr "公司"
 
@@ -4925,6 +4937,12 @@ msgstr "包含此文本..."
 
 msgid "Context"
 msgstr "上下文"
+
+msgid "Context compacted"
+msgstr "上下文已压缩"
+
+msgid "Context compacted automatically"
+msgstr "上下文已自动压缩"
 
 msgid "Context Menu"
 msgstr "右键菜单"
@@ -16695,6 +16713,9 @@ msgstr "为此智能体显示状态并发送通知。"
 
 msgid "Show text"
 msgstr "显示文本"
+
+msgid "Show the summary"
+msgstr "显示摘要"
 
 msgid "Show the triggering payload"
 msgstr "显示触发负载"

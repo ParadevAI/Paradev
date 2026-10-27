@@ -938,6 +938,9 @@ msgstr "{formerName}'in adı artık {productName}. Aynı ürün, aynı ekip; yal
 msgid "{founderCount} ex-YC founders"
 msgstr "YC mezunu {founderCount} kurucu"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Topluluk"
 msgid "Compact now"
 msgstr "Şimdi sıkıştır"
 
+msgid "Compacting context…"
+msgstr "Bağlam sıkıştırılıyor…"
+
+msgid "Compaction failed"
+msgstr "Sıkıştırma başarısız oldu"
+
+msgid "Compaction stopped"
+msgstr "Sıkıştırma durduruldu"
+
 msgid "Company"
 msgstr "Şirket"
 
@@ -4925,6 +4937,12 @@ msgstr "Şu metni içerir..."
 
 msgid "Context"
 msgstr "Bağlam"
+
+msgid "Context compacted"
+msgstr "Bağlam sıkıştırıldı"
+
+msgid "Context compacted automatically"
+msgstr "Bağlam otomatik olarak sıkıştırıldı"
 
 msgid "Context Menu"
 msgstr "Bağlam menüsü"
@@ -16695,6 +16713,9 @@ msgstr "Bu ajan için durum göster ve bildirim gönder."
 
 msgid "Show text"
 msgstr "Metni göster"
+
+msgid "Show the summary"
+msgstr "Özeti göster"
 
 msgid "Show the triggering payload"
 msgstr "Tetikleyen yükü göster"

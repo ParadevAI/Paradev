@@ -938,6 +938,9 @@ msgstr "{formerName} heet nu {productName}. Het is hetzelfde product van hetzelf
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} oprichters uit het YC-netwerk"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} tokens"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Community"
 msgid "Compact now"
 msgstr "Nu comprimeren"
 
+msgid "Compacting context…"
+msgstr "Context wordt gecomprimeerd…"
+
+msgid "Compaction failed"
+msgstr "Comprimeren mislukt"
+
+msgid "Compaction stopped"
+msgstr "Comprimeren gestopt"
+
 msgid "Company"
 msgstr "Bedrijf"
 
@@ -4925,6 +4937,12 @@ msgstr "Bevat deze tekst..."
 
 msgid "Context"
 msgstr "Context"
+
+msgid "Context compacted"
+msgstr "Context gecomprimeerd"
+
+msgid "Context compacted automatically"
+msgstr "Context automatisch gecomprimeerd"
 
 msgid "Context Menu"
 msgstr "Contextmenu"
@@ -16695,6 +16713,9 @@ msgstr "Status tonen en meldingen sturen voor deze agent."
 
 msgid "Show text"
 msgstr "Tekst tonen"
+
+msgid "Show the summary"
+msgstr "Samenvatting tonen"
 
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"

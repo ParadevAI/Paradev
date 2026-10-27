@@ -74,3 +74,30 @@ export function isSubagentControlCall(raw: unknown): boolean {
 		SUBAGENT_CONTROL_TOOLS.has(claudeCode?.toolName ?? "")
 	);
 }
+
+const contextCompactionMetaSchema = z.looseObject({
+	_meta: z.looseObject({
+		jetbrains: z
+			.looseObject({
+				air: z
+					.looseObject({
+						contextCompaction: z
+							.looseObject({
+								trigger: z.string().optional(),
+								preTokens: z.number().nonnegative().optional(),
+								postTokens: z.number().nonnegative().optional(),
+							})
+							.optional()
+							.catch(undefined),
+					})
+					.optional(),
+			})
+			.optional(),
+	}),
+});
+
+/** The token counts and trigger claude-agent-acp attaches to a finished compaction. */
+export function airContextCompaction(raw: unknown) {
+	return contextCompactionMetaSchema.safeParse(raw).data?._meta.jetbrains?.air
+		?.contextCompaction;
+}

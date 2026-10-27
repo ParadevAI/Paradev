@@ -938,6 +938,9 @@ msgstr "{formerName} nay đã đổi tên thành {productName}. Vẫn là sản 
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} nhà sáng lập từng tham gia YC"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} token"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "Cộng đồng"
 msgid "Compact now"
 msgstr "Nén ngay"
 
+msgid "Compacting context…"
+msgstr "Đang nén ngữ cảnh…"
+
+msgid "Compaction failed"
+msgstr "Nén thất bại"
+
+msgid "Compaction stopped"
+msgstr "Đã dừng nén"
+
 msgid "Company"
 msgstr "Công ty"
 
@@ -4925,6 +4937,12 @@ msgstr "Chứa văn bản này..."
 
 msgid "Context"
 msgstr "Ngữ cảnh"
+
+msgid "Context compacted"
+msgstr "Đã nén ngữ cảnh"
+
+msgid "Context compacted automatically"
+msgstr "Đã tự động nén ngữ cảnh"
 
 msgid "Context Menu"
 msgstr "Context Menu"
@@ -16695,6 +16713,9 @@ msgstr "Hiển thị trạng thái và gửi thông báo cho agent này."
 
 msgid "Show text"
 msgstr "Hiện văn bản"
+
+msgid "Show the summary"
+msgstr "Hiện bản tóm tắt"
 
 msgid "Show the triggering payload"
 msgstr "Hiển thị payload kích hoạt"

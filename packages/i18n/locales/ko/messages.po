@@ -938,6 +938,9 @@ msgstr "{formerName}의 새 이름은 {productName}입니다. 같은 제품, 같
 msgid "{founderCount} ex-YC founders"
 msgstr "YC 출신 창업자 {founderCount}명"
 
+msgid "{from} → {to} tokens"
+msgstr "{from} → {to} 토큰"
+
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
 
@@ -4587,6 +4590,15 @@ msgstr "커뮤니티"
 msgid "Compact now"
 msgstr "지금 압축"
 
+msgid "Compacting context…"
+msgstr "컨텍스트 압축 중…"
+
+msgid "Compaction failed"
+msgstr "압축 실패"
+
+msgid "Compaction stopped"
+msgstr "압축 중단됨"
+
 msgid "Company"
 msgstr "회사"
 
@@ -4925,6 +4937,12 @@ msgstr "이 텍스트를 포함..."
 
 msgid "Context"
 msgstr "컨텍스트"
+
+msgid "Context compacted"
+msgstr "컨텍스트 압축됨"
+
+msgid "Context compacted automatically"
+msgstr "컨텍스트 자동 압축됨"
 
 msgid "Context Menu"
 msgstr "컨텍스트 메뉴"
@@ -16695,6 +16713,9 @@ msgstr "이 에이전트의 상태를 표시하고 알림을 보냅니다."
 
 msgid "Show text"
 msgstr "텍스트 보기"
+
+msgid "Show the summary"
+msgstr "요약 보기"
 
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"

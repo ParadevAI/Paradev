@@ -7,6 +7,7 @@ import type {
 	FormField,
 	Item,
 	ItemAttachment,
+	NoticeCompaction,
 	SessionConfigOption,
 	SessionState,
 	SessionUsage,
@@ -32,12 +33,14 @@ import {
 	airAsyncTaskProgressSchema,
 	airAsyncTaskSpawnedSchema,
 	airAsyncTaskStateSchema,
+	airContextCompaction,
 	airForkPointMeta,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
 	isSubagentControlCall,
 	isTerminalAirState,
 } from "./air";
+import { continuationSummary } from "./continuationSummary";
 import { type AcpImageSource, imageSourceOf } from "./imageBlocks";
 import { imageDimensions } from "./imageDimensions";
 import type {
@@ -65,6 +68,8 @@ import {
 	type AcpContentBlock,
 	type AcpSubagentUpdate,
 	acpAvailableCommandsUpdateSchema,
+	acpCompactionSummaryChunkSchema,
+	acpCompactionUpdateSchema,
 	acpConfigOptionUpdateSchema,
 	acpContentBlockSchema,
 	acpCreateElicitationParamsSchema,
@@ -167,6 +172,36 @@ function resolvedModelOf(raw: unknown): string | undefined {
 }
 
 type AcpStateUpdate = z.infer<typeof acpStateUpdateSchema>;
+
+type Compaction = {
+	itemId: string;
+	turnId: string;
+	startedAtMs: number;
+	streamedSummary: string;
+	usageAtStart: SessionUsage | undefined;
+	completedAtMs?: number;
+	notice: NoticeCompaction;
+};
+
+const COMPACTION_STATUS: Record<string, NoticeCompaction["status"]> = {
+	in_progress: "running",
+	completed: "completed",
+	failed: "failed",
+	cancelled: "cancelled",
+};
+
+const COMPACTION_TEXT: Record<NoticeCompaction["status"], string> = {
+	running: "Compacting context",
+	completed: "Context compacted",
+	failed: "Context compaction failed",
+	cancelled: "Context compaction stopped",
+};
+
+function compactionError(error: unknown): string | undefined {
+	if (typeof error === "string") return error || undefined;
+	const message = (error as { message?: unknown } | null)?.message;
+	return typeof message === "string" && message ? message : undefined;
+}
 
 type V2Turn = {
 	id: string;
@@ -437,6 +472,13 @@ export class AcpAdapter implements HarnessAdapter {
 	private steeredCyclePending = false;
 	private sessionUsage: SessionUsage | undefined;
 	private reportedCostUsd: number | undefined;
+	private readonly compactions = new Map<string, Compaction>();
+	private compactionAwaitingUsage: Compaction | null = null;
+	private replaySummary: {
+		messageId: string | null;
+		compaction: Compaction;
+		text: string;
+	} | null = null;
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
 	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
@@ -934,13 +976,19 @@ export class AcpAdapter implements HarnessAdapter {
 				info: CLIENT_INFO,
 				// v2 moved fs and terminal out of client capabilities entirely.
 				// Without form elicitation, claude-agent-acp drops AskUserQuestion.
-				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
+				capabilities: {
+					elicitation: { form: {} },
+					session: { compaction: {} },
+					_meta: AIR_CLIENT_META,
+				},
 				// Do not advertise fs/terminal: the agent falls back to its own
 				// Read/Edit/Bash tools, which run headless in the workspace.
 				clientCapabilities: {
 					fs: { readTextFile: false, writeTextFile: false },
 					terminal: false,
 					elicitation: { form: {} },
+					// Agents then report compaction as compaction_update, not a tool call.
+					session: { compaction: {} },
 					_meta: AIR_CLIENT_META,
 				},
 			},
@@ -1219,6 +1267,8 @@ export class AcpAdapter implements HarnessAdapter {
 		const update = acpSessionUpdateSchema.safeParse(outer.data.update);
 		if (!update.success) return;
 		const variant = update.data.sessionUpdate;
+		if (variant !== "user_message_chunk" && variant !== "user_message")
+			this.replaySummary = null;
 
 		// Live, a user message echoes a prompt the runtime already recorded. In a
 		// session/load replay it does not: those turns were typed at the CLI and
@@ -1244,6 +1294,7 @@ export class AcpAdapter implements HarnessAdapter {
 				return;
 			}
 			if (isHiddenUserMessage(outer.data.update)) return;
+			if (this.appendReplaySummary(outer.data.update)) return;
 			if (this.main.openKind() !== "user_message") {
 				this.main.flush();
 				// emitTurn leaves the history turn as `currentTurn`, which
@@ -1252,6 +1303,7 @@ export class AcpAdapter implements HarnessAdapter {
 				this.currentTurn = null;
 				this.historyTurnId = null;
 			}
+			if (this.replayContinuationSummary(outer.data.update)) return;
 			this.main.handleUpdate(variant, outer.data.update, this.resolveTurnId());
 			return;
 		}
@@ -1333,6 +1385,12 @@ export class AcpAdapter implements HarnessAdapter {
 				return;
 			case "available_commands_update":
 				this.handleAvailableCommands(outer.data.update);
+				return;
+			case "compaction_update":
+				this.handleCompactionUpdate(outer.data.update);
+				return;
+			case "compaction_summary_chunk":
+				this.handleCompactionSummaryChunk(outer.data.update);
 				return;
 			case "current_mode_update":
 				if (update.data.currentModeId && !this.options.clientApprovalModes)
@@ -2424,6 +2482,7 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private emitTurn(turn: Turn): void {
+		if (turn.status !== "running") this.settleCompactions(turn);
 		if (turn.status !== "running" || turn.id !== this.currentTurn?.id) {
 			this.cycleEnded = false;
 			this.steeredCyclePending = false;
@@ -2456,6 +2515,139 @@ export class AcpAdapter implements HarnessAdapter {
 			...(costUsd === undefined ? {} : { costUsd }),
 		};
 		if (this.currentTurn) this.emitTurn(this.currentTurn);
+		const compaction = this.compactionAwaitingUsage;
+		this.compactionAwaitingUsage = null;
+		if (compaction && compaction.turnId === this.currentTurn?.id) {
+			compaction.notice = { ...compaction.notice, tokensAfter: contextUsed };
+			this.emitCompaction(compaction);
+		}
+	}
+
+	private handleCompactionUpdate(raw: unknown): void {
+		const parsed = acpCompactionUpdateSchema.safeParse(raw);
+		const status = parsed.data && COMPACTION_STATUS[parsed.data.status];
+		if (!parsed.data || !status) return;
+		const compaction = this.compaction(parsed.data.compactionId);
+		const facts = airContextCompaction(raw);
+		const trigger =
+			facts?.trigger === "automatic" || facts?.trigger === "manual"
+				? facts.trigger
+				: compaction.notice.trigger;
+		const tokensBefore = facts?.preTokens ?? compaction.notice.tokensBefore;
+		const usageSinceStart =
+			this.sessionUsage === compaction.usageAtStart
+				? undefined
+				: this.sessionUsage;
+		const tokensAfter =
+			facts?.postTokens ??
+			compaction.notice.tokensAfter ??
+			(status === "completed" ? usageSinceStart?.contextUsed : undefined);
+		const summary =
+			parsed.data.summary
+				?.flatMap((block) => (block.text ? [block.text] : []))
+				.join("") ||
+			compaction.notice.summary ||
+			compaction.streamedSummary;
+		const error = compactionError(parsed.data.error);
+		compaction.notice = {
+			status,
+			...(trigger ? { trigger } : {}),
+			...(tokensBefore === undefined ? {} : { tokensBefore }),
+			...(tokensAfter === undefined ? {} : { tokensAfter }),
+			...(summary ? { summary } : {}),
+			...(error ? { error } : {}),
+		};
+		this.compactionAwaitingUsage =
+			status === "completed" && tokensAfter === undefined ? compaction : null;
+		this.emitCompaction(compaction);
+	}
+
+	private replayContinuationSummary(raw: unknown): boolean {
+		const text = firstTextOf(raw);
+		const summary = text === undefined ? undefined : continuationSummary(text);
+		if (text === undefined || !summary) return false;
+		const messageId = messageIdOf(raw);
+		const compaction = this.compaction(messageId ?? this.mintId());
+		compaction.notice = { status: "completed", summary };
+		this.replaySummary = { messageId, compaction, text };
+		this.emitCompaction(compaction);
+		return true;
+	}
+
+	private appendReplaySummary(raw: unknown): boolean {
+		const open = this.replaySummary;
+		const text = firstTextOf(raw);
+		if (!open || text === undefined || messageIdOf(raw) !== open.messageId)
+			return false;
+		open.text += text;
+		const summary = continuationSummary(open.text);
+		if (summary) {
+			open.compaction.notice = { ...open.compaction.notice, summary };
+			this.emitCompaction(open.compaction);
+		}
+		return true;
+	}
+
+	private settleCompactions(turn: Turn): void {
+		for (const compaction of this.compactions.values()) {
+			if (
+				compaction.turnId !== turn.id ||
+				compaction.notice.status !== "running"
+			)
+				continue;
+			compaction.notice = {
+				...compaction.notice,
+				status: turn.status === "failed" ? "failed" : "cancelled",
+			};
+			this.emitCompaction(compaction);
+		}
+	}
+
+	private handleCompactionSummaryChunk(raw: unknown): void {
+		const parsed = acpCompactionSummaryChunkSchema.safeParse(raw).data;
+		const compaction = parsed && this.compactions.get(parsed.compactionId);
+		if (!compaction || !parsed.content?.text) return;
+		compaction.streamedSummary += parsed.content.text;
+	}
+
+	private compaction(compactionId: string): Compaction {
+		const existing = this.compactions.get(compactionId);
+		if (existing) return existing;
+		this.main.flush();
+		const compaction: Compaction = {
+			itemId: this.mintId(),
+			turnId: this.resolveTurnId(),
+			startedAtMs: this.nextStartMs(),
+			streamedSummary: "",
+			usageAtStart: this.sessionUsage,
+			notice: {
+				status: "running",
+				...(this.sessionUsage
+					? { tokensBefore: this.sessionUsage.contextUsed }
+					: {}),
+			},
+		};
+		this.compactions.set(compactionId, compaction);
+		return compaction;
+	}
+
+	private emitCompaction(compaction: Compaction): void {
+		const { notice } = compaction;
+		if (notice.status !== "running") compaction.completedAtMs ??= this.now();
+		this.emitItem(
+			{
+				id: compaction.itemId,
+				kind: "notice",
+				noticeKind: "compaction",
+				text: COMPACTION_TEXT[notice.status],
+				startedAtMs: compaction.startedAtMs,
+				...(compaction.completedAtMs === undefined
+					? {}
+					: { completedAtMs: compaction.completedAtMs }),
+				compaction: notice,
+			},
+			compaction.turnId,
+		);
 	}
 
 	private turnUsage(usage: AcpPromptUsage): NonNullable<Turn["usage"]> {
@@ -2593,16 +2785,17 @@ export function createAcpAdapter(options: AcpAdapterOptions): HarnessAdapter {
 	return new AcpAdapter(options);
 }
 
-function isHiddenUserMessage(raw: unknown): boolean {
+function firstTextOf(raw: unknown): string | undefined {
 	const content = (raw as { content?: unknown } | null)?.content;
 	const block = acpContentBlockSchema.safeParse(
 		Array.isArray(content) ? content[0] : content,
 	);
-	return (
-		block.success &&
-		block.data.text !== undefined &&
-		isHiddenText(block.data.text)
-	);
+	return block.success ? block.data.text : undefined;
+}
+
+function isHiddenUserMessage(raw: unknown): boolean {
+	const text = firstTextOf(raw);
+	return text !== undefined && isHiddenText(text);
 }
 
 function listedSessions(response: unknown): DiscoverSessionsResult {
