@@ -360,8 +360,9 @@ export function createActivities(deps: ActivityDeps) {
 				status: input.outcome,
 				steersConsumed: input.steersConsumed,
 			};
+			// Settling must not need the workspace: a turn that lost it still has to end.
 			const running = await handles(input).catch((error: unknown) => {
-				if (isTurnNotRunning(error)) return null;
+				if (isPermanent(error)) return null;
 				throw error;
 			});
 			let rows: TranscriptRow[] | null = null;
@@ -377,8 +378,12 @@ export function createActivities(deps: ActivityDeps) {
 						: {}),
 				});
 			} else {
-				// An earlier attempt settled it; this one only owes the end marker.
-				settled = await deps.settler.settle(base);
+				settled = await deps.settler.settle({
+					...base,
+					...(input.outcome === "failed"
+						? { errorCode: input.errorMessage ?? "failed" }
+						: {}),
+				});
 			}
 			if (settled.steerPending) return { steerPending: true };
 			credentialCache.delete(input.turnId);
@@ -530,8 +535,8 @@ function defaultContext(credentials: TurnCredentials) {
 	return hostContext(credentials.host, credentials.host.workspaceId);
 }
 
-function isTurnNotRunning(error: unknown): boolean {
-	return error instanceof ApplicationFailure && error.type === "TurnNotRunning";
+function isPermanent(error: unknown): boolean {
+	return error instanceof ApplicationFailure && error.nonRetryable === true;
 }
 
 function summarizeTurn(rows: TranscriptRow[]) {

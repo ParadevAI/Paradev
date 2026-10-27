@@ -18,6 +18,7 @@ import {
 	condition,
 	continueAsNew,
 	isCancellation,
+	log,
 	proxyActivities,
 	setHandler,
 	workflowInfo,
@@ -224,10 +225,16 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 			await scope.run(() => runTurn(turn));
 		} catch (error) {
 			const cancelled = isCancellation(error);
+			// One turn that cannot be settled must not end the session for every later turn.
 			await CancellationScope.nonCancellable(() =>
 				settleUnfinished(turn.turnId, {
 					outcome: cancelled ? "interrupted" : "failed",
 					...(cancelled ? {} : { errorMessage: failureMessage(error) }),
+				}),
+			).catch((settleError: unknown) =>
+				log.error("Could not settle turn", {
+					turnId: turn.turnId,
+					error: failureMessage(settleError),
 				}),
 			);
 		} finally {

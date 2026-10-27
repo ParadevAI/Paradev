@@ -293,4 +293,20 @@ describe("agent activities", () => {
 		expect(model.contexts[0]?.tools).toEqual([]);
 		expect(model.contexts[0]?.systemPrompt).toContain("no workspace");
 	});
+
+	test("a turn that lost its workspace access still settles as failed", async () => {
+		const { activities, settled, memory, turn } = setup([]);
+		turn.running = false;
+		await activities.settleTurn({
+			...ref,
+			outcome: "failed",
+			errorMessage: "Agent may not use this workspace.",
+			steersConsumed: 0,
+		});
+		expect(settled[0]).toMatchObject({
+			status: "failed",
+			errorCode: "Agent may not use this workspace.",
+		});
+		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("failed");
+	});
 });
