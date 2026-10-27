@@ -282,6 +282,7 @@ export function useDashboardSidebarData() {
 					tabOrder: sidebarSections.tabOrder,
 					color: sidebarSections.color,
 					tag: sidebarSections.tag,
+					materializedByInteraction: sidebarSections.materializedByInteraction,
 				})),
 		[collections],
 	);
