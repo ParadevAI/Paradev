@@ -13967,6 +13967,9 @@ msgstr "Premi un tasto…"
 msgid "Press contact"
 msgstr "Contatto stampa"
 
+msgid "Press coverage"
+msgstr "Rassegna stampa"
+
 msgid "Press esc to pick a different element."
 msgstr "Premi esc per scegliere un altro elemento."
 

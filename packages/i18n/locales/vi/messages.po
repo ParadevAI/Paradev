@@ -13967,6 +13967,9 @@ msgstr "Nhấn một phím…"
 msgid "Press contact"
 msgstr "Liên hệ báo chí"
 
+msgid "Press coverage"
+msgstr "Báo chí đưa tin"
+
 msgid "Press esc to pick a different element."
 msgstr "Nhấn esc để chọn phần tử khác."
 

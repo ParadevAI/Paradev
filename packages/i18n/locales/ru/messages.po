@@ -13967,6 +13967,9 @@ msgstr "Нажмите клавишу…"
 msgid "Press contact"
 msgstr "Контакты для прессы"
 
+msgid "Press coverage"
+msgstr "Публикации в прессе"
+
 msgid "Press esc to pick a different element."
 msgstr "Нажмите esc, чтобы выбрать другой элемент."
 

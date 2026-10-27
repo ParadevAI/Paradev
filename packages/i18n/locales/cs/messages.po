@@ -13967,6 +13967,9 @@ msgstr "Stiskněte klávesu…"
 msgid "Press contact"
 msgstr "Kontakt pro média"
 
+msgid "Press coverage"
+msgstr "Ohlasy v médiích"
+
 msgid "Press esc to pick a different element."
 msgstr "Stisknutím esc vyberete jiný prvek."
 

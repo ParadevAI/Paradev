@@ -13967,6 +13967,9 @@ msgstr "請按一個鍵…"
 msgid "Press contact"
 msgstr "媒體聯絡"
 
+msgid "Press coverage"
+msgstr "媒體報導"
+
 msgid "Press esc to pick a different element."
 msgstr "按 esc 可重新選擇其他元素。"
 

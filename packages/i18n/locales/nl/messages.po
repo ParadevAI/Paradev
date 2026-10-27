@@ -13967,6 +13967,9 @@ msgstr "Druk op een toets…"
 msgid "Press contact"
 msgstr "Perscontact"
 
+msgid "Press coverage"
+msgstr "In de pers"
+
 msgid "Press esc to pick a different element."
 msgstr "Druk op esc om een ander element te kiezen."
 

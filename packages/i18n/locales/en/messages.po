@@ -13967,6 +13967,9 @@ msgstr "Press a key…"
 msgid "Press contact"
 msgstr "Press contact"
 
+msgid "Press coverage"
+msgstr "Press coverage"
+
 msgid "Press esc to pick a different element."
 msgstr "Press esc to pick a different element."
 

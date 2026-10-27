@@ -13967,6 +13967,9 @@ msgstr "키를 누르세요…"
 msgid "Press contact"
 msgstr "언론 문의"
 
+msgid "Press coverage"
+msgstr "언론 보도"
+
 msgid "Press esc to pick a different element."
 msgstr "esc를 누르면 다른 요소를 다시 고를 수 있습니다."
 

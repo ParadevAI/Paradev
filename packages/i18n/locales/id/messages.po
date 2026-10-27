@@ -13967,6 +13967,9 @@ msgstr "Tekan sebuah tombol…"
 msgid "Press contact"
 msgstr "Kontak pers"
 
+msgid "Press coverage"
+msgstr "Liputan media"
+
 msgid "Press esc to pick a different element."
 msgstr "Tekan esc untuk memilih elemen lain."
 

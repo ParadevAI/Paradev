@@ -13967,6 +13967,9 @@ msgstr "Bir tuşa basın…"
 msgid "Press contact"
 msgstr "Basın iletişimi"
 
+msgid "Press coverage"
+msgstr "Basında biz"
+
 msgid "Press esc to pick a different element."
 msgstr "Farklı bir öğe seçmek için esc tuşuna basın."
 
