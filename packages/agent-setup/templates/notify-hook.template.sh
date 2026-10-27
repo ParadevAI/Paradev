@@ -5,9 +5,6 @@
 # terminal stacks are supported.
 #
 # Parsing sticks to bash builtins (read, [[ =~ ]], parameter expansion).
-# Agents fire this hook on every tool call, and the grep/sed/tr pipelines it
-# used to run started about 60 processes per event; on machines with
-# endpoint security agents each process start costs tens of milliseconds.
 
 # Codex passes JSON as argv; Claude/Mastra/Droid/Kimi/Grok pipe via stdin.
 if [ -n "$1" ]; then

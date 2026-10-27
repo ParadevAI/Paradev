@@ -925,8 +925,6 @@ describe("session login metadata", () => {
 
 describe("process starts", () => {
 	it("parses the payload and org manifests without starting text tools", async () => {
-		// The hook runs on every tool call, so each grep/sed/tr it starts is
-		// paid per event. Shims that fail loudly stand in for those tools.
 		const shimDir = mkdtempSync(path.join(tmpdir(), "notify-hook-shims-"));
 		const callLog = path.join(shimDir, "calls.log");
 		writeFileSync(callLog, "");
