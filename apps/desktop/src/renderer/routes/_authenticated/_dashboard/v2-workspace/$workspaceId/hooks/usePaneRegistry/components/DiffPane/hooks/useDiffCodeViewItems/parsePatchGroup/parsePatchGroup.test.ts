@@ -71,3 +71,38 @@ describe("parsePatchGroup", () => {
 		);
 	});
 });
+
+describe("parsePatchGroup fallback files", () => {
+	const files = [
+		{
+			path: "indent.ts",
+			oldFile: { name: "indent.ts", contents: "if (a) {\nb();\n}\n" },
+			newFile: { name: "indent.ts", contents: "if (a) {\n  b();\n}\n" },
+		},
+		{
+			path: "edit.ts",
+			oldFile: { name: "edit.ts", contents: "const a = 1;\n" },
+			newFile: { name: "edit.ts", contents: "const a = 2;\n" },
+		},
+	];
+	const result = {
+		kind: "files" as const,
+		files,
+		requestedPaths: ["indent.ts", "edit.ts"],
+		requestedUntrackedPaths: [],
+	};
+
+	test("keeps whitespace-only files by default", () => {
+		const parsed = parsePatchGroup("unstaged", result);
+		expect(parsed.byPath.has("indent.ts")).toBe(true);
+		expect(parsed.byPath.has("edit.ts")).toBe(true);
+	});
+
+	test("drops whitespace-only files when whitespace is ignored", () => {
+		const parsed = parsePatchGroup("unstaged", result, undefined, {
+			ignoreWhitespace: true,
+		});
+		expect(parsed.byPath.has("indent.ts")).toBe(false);
+		expect(parsed.byPath.has("edit.ts")).toBe(true);
+	});
+});

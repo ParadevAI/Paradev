@@ -177,6 +177,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		category: DiffCategory;
 		paths?: string[];
 		untrackedPaths?: string[];
+		ignoreWhitespace?: boolean;
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
@@ -190,6 +191,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		category,
 		paths,
 		untrackedPaths,
+		ignoreWhitespace,
 		baseBranch,
 		commitHash,
 		fromHash,
@@ -208,6 +210,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 			refs,
 			paths,
 			untrackedPaths,
+			ignoreWhitespace,
 		});
 		return { patch };
 	},

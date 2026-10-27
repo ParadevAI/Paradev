@@ -87,23 +87,22 @@ const CONFIG_ARGS = [
 function diffArgsForCategory(
 	category: DiffCategory,
 	refs: DiffCategoryRefs,
+	ignoreWhitespace: boolean,
 ): string[] {
+	const args = ignoreWhitespace
+		? [...BASE_ARGS, "--ignore-all-space"]
+		: BASE_ARGS;
 	if (category === "against-base") {
-		return ["diff", ...BASE_ARGS, refs.originRef ?? "HEAD", "HEAD"];
+		return ["diff", ...args, refs.originRef ?? "HEAD", "HEAD"];
 	}
 	if (category === "commit") {
-		return [
-			"diff",
-			...BASE_ARGS,
-			refs.fromRef ?? "HEAD^",
-			refs.toRef ?? "HEAD",
-		];
+		return ["diff", ...args, refs.fromRef ?? "HEAD^", refs.toRef ?? "HEAD"];
 	}
 	if (category === "staged") {
-		return ["diff", ...BASE_ARGS, "--cached"];
+		return ["diff", ...args, "--cached"];
 	}
 	// Unstaged: index against working tree.
-	return ["diff", ...BASE_ARGS];
+	return ["diff", ...args];
 }
 
 /** One request's shared byte allowance. The category diff and every
@@ -278,6 +277,9 @@ export interface DiffPatchRequest extends GitSpawnOptions {
 	paths?: string[];
 	/** Paths git won't diff on its own — see `untrackedPatches`. */
 	untrackedPaths?: string[];
+	/** Leaves out lines whose only change is whitespace, so a file changed
+	 * only in whitespace gets no section. */
+	ignoreWhitespace?: boolean;
 	/** Overridable so a test can reach the bound without a huge repository. */
 	maxBytes?: number;
 }
@@ -294,11 +296,12 @@ export async function buildDiffPatch({
 	refs,
 	paths,
 	untrackedPaths,
+	ignoreWhitespace = false,
 	maxBytes = MAX_PATCH_BYTES,
 }: DiffPatchRequest): Promise<string> {
 	const budget = new PatchBudget(maxBytes);
 	const options = { cwd, env };
-	const args = diffArgsForCategory(category, refs);
+	const args = diffArgsForCategory(category, refs, ignoreWhitespace);
 	if (paths?.length) args.push("--", ...paths);
 
 	// Rejects rather than returning an empty patch, which the renderer can't
