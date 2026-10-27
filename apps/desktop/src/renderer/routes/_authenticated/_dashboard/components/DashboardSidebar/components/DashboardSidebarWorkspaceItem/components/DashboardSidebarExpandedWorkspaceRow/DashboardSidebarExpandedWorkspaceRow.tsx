@@ -39,6 +39,7 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
+import { getV2WorkspaceBranchSubtitle } from "./utils/getV2WorkspaceBranchSubtitle";
 
 const PR_STATE_LABEL: Record<
 	DashboardSidebarWorkspacePullRequest["state"],
@@ -353,6 +354,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<>
 								<WorkspaceNameMarquee
 									name={name || branch}
+									suffix={getV2WorkspaceBranchSubtitle(workspace)}
 									prefix={
 										pinnedContext
 											? (pinnedContext.projectName ??
