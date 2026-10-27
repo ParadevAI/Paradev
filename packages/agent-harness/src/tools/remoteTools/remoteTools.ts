@@ -45,6 +45,20 @@ export interface RemoteToolsOptions {
  * `bash` and `grep` are ours: pi's versions spawn processes on the machine
  * running the loop.
  */
+const IMAGE_SIGNATURES = [
+	[0x89, 0x50, 0x4e, 0x47],
+	[0xff, 0xd8, 0xff],
+	[0x47, 0x49, 0x46, 0x38],
+	[0x52, 0x49, 0x46, 0x46],
+];
+
+/** Images go to the model as images; any other file with a NUL byte near its start is binary. */
+function isBinary(bytes: Buffer): boolean {
+	if (IMAGE_SIGNATURES.some((sig) => sig.every((byte, i) => bytes[i] === byte)))
+		return false;
+	return bytes.subarray(0, 8_192).includes(0);
+}
+
 export function createRemoteTools(options: RemoteToolsOptions): RemoteTool[] {
 	const { host, cwd } = options;
 	const readBuffer = async (path: string) =>
@@ -99,8 +113,18 @@ export function createRemoteTools(options: RemoteToolsOptions): RemoteTool[] {
 		} as RemoteTool;
 	};
 
+	const readText = async (path: string) => {
+		const bytes = await readBuffer(path);
+		if (isBinary(bytes)) {
+			throw new Error(
+				`${path} is a binary file (${bytes.length} bytes). Inspect it with bash instead, for example \`file\` or \`xxd | head\`.`,
+			);
+		}
+		return bytes;
+	};
+
 	return [
-		createReadTool(cwd, { operations: { readFile: readBuffer, access } }),
+		createReadTool(cwd, { operations: { readFile: readText, access } }),
 		tracked("write"),
 		tracked("edit"),
 		createLsTool(cwd, {

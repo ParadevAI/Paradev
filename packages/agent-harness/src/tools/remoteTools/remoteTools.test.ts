@@ -190,6 +190,13 @@ describe("remote tools", () => {
 		]);
 	});
 
+	it("refuses to read a binary file", async () => {
+		writeFileSync(join(cwd, "blob.bin"), Buffer.from([1, 0, 2, 3]));
+		await expect(run("read", { path: "blob.bin" })).rejects.toThrow(
+			"binary file",
+		);
+	});
+
 	it("runs a command once per tool call and reports a failing exit code", async () => {
 		expect(await run("bash", { command: "echo hi" }, "c1")).toBe("hi\n");
 		await run("bash", { command: "echo hi" }, "c1");

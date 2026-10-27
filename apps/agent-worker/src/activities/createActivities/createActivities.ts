@@ -597,7 +597,12 @@ function summarizeTurn(rows: TranscriptRow[]) {
 function callSummary(call: ToolCall): string {
 	const args = call.arguments as Record<string, unknown>;
 	const value =
-		args.command ?? args.path ?? args.pattern ?? args.description ?? "";
+		args.command ??
+		args.path ??
+		args.pattern ??
+		args.job_id ??
+		args.description ??
+		(call.name === "ls" ? "." : "");
 	return String(value).slice(0, 200);
 }
 
