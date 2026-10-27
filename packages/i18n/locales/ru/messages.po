@@ -1634,6 +1634,9 @@ msgstr "Новое рабочее пространство от этой вет�
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Страница может сохранять ответ каждого читателя, поэтому опрос работает без бэкенда."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Приостановленный Dev не начинает работу. Его чаты остаются открытыми."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Практическая задача на TypeScript, вроде тех, что мы решаем каждый день. Никаких алгоритмических головоломок."
 
@@ -1709,6 +1712,9 @@ msgstr "Принять приглашение"
 
 msgid "Accept terms"
 msgstr "Принять условия"
+
+msgid "Access"
+msgstr "Доступ"
 
 msgid "Access denied"
 msgstr "Доступ запрещён"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Архивировать"
 
+msgid "Archive {name}?"
+msgstr "Архивировать {name}?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "Архивировать #{0}?"
 
 msgid "Archive channel"
 msgstr "Архивировать канал"
+
+msgid "Archive Dev"
+msgstr "Архивировать Dev"
 
 msgid "Archive environment"
 msgstr "Архивировать окружение"
@@ -3801,6 +3813,9 @@ msgstr "Параметры канала"
 
 msgid "Channels"
 msgstr "Каналы"
+
+msgid "Channels it can read and post in"
+msgstr "Каналы, где он может читать и писать"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Списывает с сохранённой карты оплату за новые ГБ-часы, когда купленные ГБ-часы заканчиваются."
@@ -5615,6 +5630,9 @@ msgstr "Не удалось сохранить правки"
 msgid "Couldn't save the change"
 msgstr "Не удалось сохранить изменение"
 
+msgid "Couldn't save the Dev"
+msgstr "Не удалось сохранить Dev"
+
 msgid "Couldn't send comment"
 msgstr "Не удалось отправить комментарий"
 
@@ -5704,6 +5722,9 @@ msgstr "Создать «{newLabel}»"
 
 msgid "Create a channel"
 msgstr "Создать канал"
+
+msgid "Create a Dev"
+msgstr "Создать Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Создаёт нативный форк на стороне провайдера с тем же контекстом разговора. Исходная сессия остаётся без изменений."
@@ -5868,6 +5889,9 @@ msgstr "Создан {0} · использован {1}"
 msgid "Created {ago}"
 msgstr "Создано {ago}"
 
+msgid "Created {created}"
+msgstr "Создан {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Создано {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Свой провайдер"
 
 msgid "Custom themes"
 msgstr "Свои темы"
+
+msgid "Customize"
+msgstr "Настроить"
+
+msgid "Customize {devName}"
+msgstr "Настроить {devName}"
 
 msgid "Customize commands"
 msgstr "Настроить команды"
@@ -6465,6 +6495,12 @@ msgstr "Сведения здесь недоступны, но ссылка вс
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev details"
+msgstr "Сведения о Dev"
+
+msgid "Dev options"
+msgstr "Параметры Dev"
+
 msgid "Dev sign in"
 msgstr "Dev-вход"
 
@@ -6491,6 +6527,9 @@ msgstr "Устройство: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Устройства"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "diff в новой вкладке"
 
 msgid "Digital Product Designer"
 msgstr "Дизайнер цифровых продуктов"
+
+msgid "Direct message"
+msgstr "Личное сообщение"
 
 msgid "Direct mode"
 msgstr "Прямой режим"
@@ -7394,6 +7436,9 @@ msgstr "Очень высокий"
 
 msgid "Extra small"
 msgstr "Очень маленький"
+
+msgid "Eyes"
+msgstr "Глаза"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Шлюз F4 · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "Его нельзя будет вернуть."
 msgid "It keeps the title from your prompt."
 msgstr "Останется название из вашего запроса."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Он сразу теряет весь доступ. Его чаты и сделанная работа сохраняются."
+
 msgid "It may be asleep"
 msgstr "Возможно, компьютер в режиме сна"
 
@@ -10392,6 +10440,9 @@ msgstr "Надёжность на длинной дистанции перехо
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Подсказка только с сочетанием клавиш при долгом наведении; её стиль чипа теперь по умолчанию для TooltipContent"
 
+msgid "Look"
+msgstr "Внешний вид"
+
 msgid "Looking at {what}"
 msgstr "Смотрю {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "Доля памяти"
 msgid "Mention."
 msgstr "Упомяните."
 
+msgid "Mentioned in a channel"
+msgstr "Упомянут в канале"
+
 msgid "Menubar"
 msgstr "Строка меню"
 
@@ -10744,6 +10798,9 @@ msgstr "Объединение…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh-градиент"
+
+msgid "Message {name}"
+msgstr "Написать {name}"
 
 msgid "Message {name}…"
 msgstr "Сообщение для {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Версий пока нет"
 msgid "No versions yet."
 msgstr "Версий пока нет."
 
+msgid "No work yet"
+msgstr "Работы пока нет"
+
 msgid "No workspace run command configured"
 msgstr "Команда запуска рабочей области не настроена"
 
@@ -11961,6 +12021,9 @@ msgstr "Из-за этого никто не проверяет код инач�
 
 msgid "None"
 msgstr "Нет"
+
+msgid "None yet"
+msgstr "Пока нет"
 
 msgid "None. This is the floor."
 msgstr "Нет. Это нижняя граница."
@@ -12279,11 +12342,14 @@ msgstr "Удалить этот хост могут только владель�
 msgid "Only images can be attached to a comment"
 msgstr "К комментарию можно прикреплять только изображения"
 
+msgid "Only its creator"
+msgstr "Только создатель"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Изменить этого агента может только его создатель или администратор организации"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Только на этом компьютере: игнорируется git и применяется к каждому worktree этого репозитория. Любой заданный здесь ключ заменяет общий."
-
-msgid "Only organization admins can manage agents"
-msgstr "Управлять агентами могут только администраторы организации"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Изменять эти настройки могут только владельцы организации."
@@ -13524,6 +13590,9 @@ msgstr "Выберите папку worktree на {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Выберите агента для установки одной строкой или скопируйте конфигурацию вручную. Все клиенты, включая настройку OAuth и ключей API, описаны в <0>полной документации сервера MCP</0>."
+
+msgid "Picked by the channel"
+msgstr "Выбран каналом"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "Рецепт tooltip из shadcn/ui"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Насыщенность цвета отсчитывается от самого напряжённого дня этого разработчика"
 
+msgid "Shape"
+msgstr "Форма"
+
 msgid "Share"
 msgstr "Поделиться"
 
@@ -17428,6 +17500,9 @@ msgstr "Ограничение частоты обращений в поддер
 msgid "Support the project with a GitHub star"
 msgstr "Поддержите проект звездой на GitHub"
 
+msgid "Surprise me"
+msgstr "Удиви меня"
+
 msgid "Suspended"
 msgstr "Приостановлено"
 
@@ -18305,6 +18380,9 @@ msgstr "Этот агент не может ответвить разговор"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
 
+msgid "This agent is paused"
+msgstr "Этот агент приостановлен"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
 
@@ -18687,6 +18765,9 @@ msgstr "Ветка"
 
 msgid "Thread not found"
 msgstr "Ветка обсуждения не найдена"
+
+msgid "Thread reply"
+msgstr "Ответ в треде"
 
 msgid "Threads"
 msgstr "Ветки"
@@ -19981,6 +20062,9 @@ msgstr "Что такое Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Что не так?"
 
+msgid "What it does"
+msgstr "Чем занимается"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Что такое Paradev, кто его создаёт и для кого он. Команда из Сан-Франциско во главе с тремя бывшими CTO из YC, строящая рабочую среду для параллельных кодинг-агентов."
 
@@ -20086,6 +20170,9 @@ msgstr "Какие AI-агенты для кода поддерживаются?
 msgid "Which plans include automations?"
 msgstr "В какие планы входят автоматизации?"
 
+msgid "Who can message it"
+msgstr "Кто может ему писать"
+
 msgid "Who can open it"
 msgstr "Кто может открыть"
 
@@ -20122,11 +20209,17 @@ msgstr "с вложениями или без"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "С мобильным приложением Paradev я могу решать проблемы в продакшене откуда угодно."
 
+msgid "Woke itself"
+msgstr "Проснулся сам"
+
 msgid "Wordmark, black"
 msgstr "Логотип-надпись, чёрный"
 
 msgid "Wordmark, white"
 msgstr "Логотип-надпись, белый"
+
+msgid "Work"
+msgstr "Работа"
 
 msgid "Work email"
 msgstr "Рабочая электронная почта"

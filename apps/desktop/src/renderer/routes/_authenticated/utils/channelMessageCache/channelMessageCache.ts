@@ -38,6 +38,7 @@ export function pendingMessage(input: {
 		seq: PENDING_SEQ,
 		threadRootId: input.threadRootId,
 		authorUserId: input.authorUserId,
+		authorAgentId: null,
 		body: input.body,
 		mentionedUserIds: input.mentionedUserIds,
 		clientId: input.clientId,

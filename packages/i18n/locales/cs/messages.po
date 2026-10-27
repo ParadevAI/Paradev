@@ -1634,6 +1634,9 @@ msgstr "Nový pracovní prostor z této větve; konverzace se předá novému ag
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Stránka umí uložit odpověď každého čtenáře, takže anketa funguje bez backendu."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Pozastavený Dev nezačne žádnou práci. Jeho chaty zůstanou otevřené."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Praktická úloha v TypeScriptu, jaké řešíme každý den. Žádné algoritmické hádanky."
 
@@ -1709,6 +1712,9 @@ msgstr "Přijmout pozvánku"
 
 msgid "Accept terms"
 msgstr "Přijmout podmínky"
+
+msgid "Access"
+msgstr "Přístup"
 
 msgid "Access denied"
 msgstr "Přístup odepřen"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Archivovat"
 
+msgid "Archive {name}?"
+msgstr "Archivovat {name}?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "Archivovat #{0}?"
 
 msgid "Archive channel"
 msgstr "Archivovat kanál"
+
+msgid "Archive Dev"
+msgstr "Archivovat Deva"
 
 msgid "Archive environment"
 msgstr "Archivovat prostředí"
@@ -3801,6 +3813,9 @@ msgstr "Možnosti kanálu"
 
 msgid "Channels"
 msgstr "Kanály"
+
+msgid "Channels it can read and post in"
+msgstr "Kanály, kde může číst a psát"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Strhne z uložené karty další GB-hodiny, když koupené GB-hodiny docházejí."
@@ -5615,6 +5630,9 @@ msgstr "Nepodařilo se uložit úpravy"
 msgid "Couldn't save the change"
 msgstr "Změnu se nepodařilo uložit"
 
+msgid "Couldn't save the Dev"
+msgstr "Dev se nepodařilo uložit"
+
 msgid "Couldn't send comment"
 msgstr "Nepodařilo se odeslat komentář"
 
@@ -5704,6 +5722,9 @@ msgstr "Vytvořit „{newLabel}“"
 
 msgid "Create a channel"
 msgstr "Vytvořit kanál"
+
+msgid "Create a Dev"
+msgstr "Vytvořit Deva"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Vytvoří nativní fork u poskytovatele se stejným kontextem konverzace. Původní relace zůstane beze změny."
@@ -5868,6 +5889,9 @@ msgstr "Vytvořeno {0} · Naposledy použito {1}"
 msgid "Created {ago}"
 msgstr "Vytvořeno {ago}"
 
+msgid "Created {created}"
+msgstr "Vytvořeno {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Vytvořeno {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Vlastní poskytovatel"
 
 msgid "Custom themes"
 msgstr "Vlastní motivy"
+
+msgid "Customize"
+msgstr "Přizpůsobit"
+
+msgid "Customize {devName}"
+msgstr "Přizpůsobit {devName}"
 
 msgid "Customize commands"
 msgstr "Upravit příkazy"
@@ -6465,6 +6495,12 @@ msgstr "Podrobnosti zde nejsou k dispozici, ale odkaz se přesto otevře."
 msgid "Dev"
 msgstr "Vývoj"
 
+msgid "Dev details"
+msgstr "Podrobnosti Deva"
+
+msgid "Dev options"
+msgstr "Možnosti Deva"
+
 msgid "Dev sign in"
 msgstr "Vývojářské přihlášení"
 
@@ -6491,6 +6527,9 @@ msgstr "Zařízení: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Zařízení"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "rozdíl na nové kartě"
 
 msgid "Digital Product Designer"
 msgstr "Designér digitálních produktů"
+
+msgid "Direct message"
+msgstr "Přímá zpráva"
 
 msgid "Direct mode"
 msgstr "Přímý režim"
@@ -7394,6 +7436,9 @@ msgstr "Velmi vysoké"
 
 msgid "Extra small"
 msgstr "Velmi malé"
+
+msgid "Eyes"
+msgstr "Oči"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Brána F4 · {F4_GATE_SHARE} %"
@@ -9576,6 +9621,9 @@ msgstr "Nepůjde ho obnovit."
 msgid "It keeps the title from your prompt."
 msgstr "Zůstane mu název z vašeho zadání."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Okamžitě ztratí veškerý přístup. Jeho chaty a vytvořená práce zůstanou zachovány."
+
 msgid "It may be asleep"
 msgstr "Možná je uspaný"
 
@@ -10392,6 +10440,9 @@ msgstr "Spolehlivost na dlouhém horizontu překročí práh. Práce zadaná v 1
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip jen se zkratkou při dlouhém najetí; jeho styl čipu je nyní výchozí pro TooltipContent"
 
+msgid "Look"
+msgstr "Vzhled"
+
 msgid "Looking at {what}"
 msgstr "Prohlížím {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "Podíl paměti"
 msgid "Mention."
 msgstr "Zmiňte."
 
+msgid "Mentioned in a channel"
+msgstr "Zmíněn v kanálu"
+
 msgid "Menubar"
 msgstr "Panel nabídek"
 
@@ -10744,6 +10798,9 @@ msgstr "Slučování…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Napsat {name}"
 
 msgid "Message {name}…"
 msgstr "Zpráva pro {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Zatím žádné verze"
 msgid "No versions yet."
 msgstr "Zatím žádné verze."
 
+msgid "No work yet"
+msgstr "Zatím žádná práce"
+
 msgid "No workspace run command configured"
 msgstr "Není nastavený žádný spouštěcí příkaz pracovního prostoru"
 
@@ -11961,6 +12021,9 @@ msgstr "Nikdo kvůli tomu nereviduje jinak."
 
 msgid "None"
 msgstr "Žádný"
+
+msgid "None yet"
+msgstr "Zatím žádné"
 
 msgid "None. This is the floor."
 msgstr "Žádná. Tohle je základ."
@@ -12279,11 +12342,14 @@ msgstr "Tohoto hosta mohou smazat jen jeho vlastníci nebo vlastníci organizace
 msgid "Only images can be attached to a comment"
 msgstr "Ke komentáři lze připojit pouze obrázky"
 
+msgid "Only its creator"
+msgstr "Pouze jeho tvůrce"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Tohoto agenta může změnit jen jeho tvůrce nebo správce organizace"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Jen na tomto počítači: ignorováno gitem a použito pro každý worktree tohoto repozitáře. Každý zde nastavený klíč nahradí sdílený."
-
-msgid "Only organization admins can manage agents"
-msgstr "Agenty mohou spravovat pouze správci organizace"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Toto nastavení mohou měnit jen vlastníci organizace."
@@ -13524,6 +13590,9 @@ msgstr "Vyberte složku pro worktree na {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Vyberte svého agenta pro instalaci na jeden řádek, nebo konfiguraci zkopírujte ručně. Všechny klienty, včetně nastavení OAuth a API klíčů, pokrývá <0>kompletní dokumentace MCP serveru</0>."
+
+msgid "Picked by the channel"
+msgstr "Vybrán kanálem"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "recept na tooltip v shadcn/ui"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Sytost barvy se vztahuje k nejrušnějšímu dni tohoto vývojáře"
 
+msgid "Shape"
+msgstr "Tvar"
+
 msgid "Share"
 msgstr "Sdílet"
 
@@ -17428,6 +17500,9 @@ msgstr "Omezení počtu požadavků na podporu není nastavené"
 msgid "Support the project with a GitHub star"
 msgstr "Podpořte projekt hvězdou na GitHubu"
 
+msgid "Surprise me"
+msgstr "Překvap mě"
+
 msgid "Suspended"
 msgstr "Pozastaveno"
 
@@ -18305,6 +18380,9 @@ msgstr "Tento agent neumí rozvětvit konverzaci"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Tento agent nemůže běžet v cloudovém pracovním prostoru"
 
+msgid "This agent is paused"
+msgstr "Tento agent je pozastaven"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli být resetováni). Běhy budou selhávat, dokud nevyberete jiného."
 
@@ -18687,6 +18765,9 @@ msgstr "Vlákno"
 
 msgid "Thread not found"
 msgstr "Vlákno nenalezeno"
+
+msgid "Thread reply"
+msgstr "Odpověď ve vlákně"
 
 msgid "Threads"
 msgstr "Vlákna"
@@ -19981,6 +20062,9 @@ msgstr "Co je Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Co je špatně?"
 
+msgid "What it does"
+msgstr "Co dělá"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Co je Paradev, kdo ho staví a pro koho je. Sanfranciský tým vedený třemi bývalými YC CTO, který staví pracovní prostor pro paralelní kódovací agenty."
 
@@ -20086,6 +20170,9 @@ msgstr "Kteří AI kódovací agenti jsou podporovaní?"
 msgid "Which plans include automations?"
 msgstr "Které plány zahrnují automatizace?"
 
+msgid "Who can message it"
+msgstr "Kdo mu může psát"
+
 msgid "Who can open it"
 msgstr "Kdo to může otevřít"
 
@@ -20122,11 +20209,17 @@ msgstr "s přílohou i bez ní"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "S mobilní aplikací Paradev mohu řešit problémy v produkci odkudkoli."
 
+msgid "Woke itself"
+msgstr "Probudil se sám"
+
 msgid "Wordmark, black"
 msgstr "Logotyp, černý"
 
 msgid "Wordmark, white"
 msgstr "Logotyp, bílý"
+
+msgid "Work"
+msgstr "Práce"
 
 msgid "Work email"
 msgstr "Pracovní e-mail"

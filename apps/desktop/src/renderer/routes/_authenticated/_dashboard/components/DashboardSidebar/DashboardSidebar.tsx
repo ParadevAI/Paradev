@@ -43,6 +43,7 @@ import {
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
 import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
+import { DashboardSidebarDevsSection } from "./components/DashboardSidebarDevsSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
@@ -526,7 +527,10 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											onToggleSectionCollapse={toggleSectionCollapsed}
 										/>
 										{isChannelsEnabled && !isCollapsed && (
-											<DashboardSidebarChannelsSection />
+											<>
+												<DashboardSidebarChannelsSection />
+												<DashboardSidebarDevsSection />
+											</>
 										)}
 										{!isCollapsed && (
 											<div className="mt-3 first:mt-0">

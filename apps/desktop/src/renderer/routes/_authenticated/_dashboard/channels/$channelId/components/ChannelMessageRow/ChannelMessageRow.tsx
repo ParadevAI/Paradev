@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { type ComponentProps, useMemo, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import {
 	type ChannelMessage,
@@ -33,6 +34,7 @@ import { MessageAttachments } from "./components/MessageAttachments";
 import { MessageEditor } from "./components/MessageEditor";
 import { MessageMenu } from "./components/MessageMenu";
 import { MessageReactions } from "./components/MessageReactions";
+import { useMessageDev } from "./hooks/useMessageDev";
 import { useMessageMenuItems } from "./hooks/useMessageMenuItems";
 import { toggleReaction } from "./utils/toggleReaction";
 
@@ -195,7 +197,8 @@ export function ChannelMessageRow({
 		currentUserId,
 	]);
 
-	const authorName = author?.name ?? t({ message: "Unknown" });
+	const dev = useMessageDev(message.authorAgentId);
+	const authorName = dev?.name ?? author?.name ?? t({ message: "Unknown" });
 	const time = formatDateTime(message.createdAt, { timeStyle: "short" });
 
 	const interactive = !isPending && !isDeleted && !editing;
@@ -225,6 +228,8 @@ export function ChannelMessageRow({
 						</TooltipTrigger>
 						<TooltipContent>{formatDateTime(message.createdAt)}</TooltipContent>
 					</Tooltip>
+				) : dev ? (
+					<DevAvatar avatar={dev.avatar} size={36} className="mt-0.5" />
 				) : author ? (
 					<PersonHoverCard
 						channelId={message.channelId}
@@ -248,7 +253,14 @@ export function ChannelMessageRow({
 			<div className="min-w-0 flex-1">
 				{!compact && (
 					<div className="flex items-baseline gap-2">
-						{author ? (
+						{dev ? (
+							<span className="flex items-baseline gap-1.5">
+								<span className="text-[15px] font-bold">{authorName}</span>
+								<span className="rounded-[4px] bg-muted px-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+									<Trans>Dev</Trans>
+								</span>
+							</span>
+						) : author ? (
 							<PersonHoverCard
 								channelId={message.channelId}
 								person={author}

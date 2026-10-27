@@ -201,6 +201,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channels.organizationId, input.organizationId),
+						eq(channels.kind, "channel"),
 						isNull(channels.archivedAt),
 						or(
 							isNotNull(channelMembers.userId),

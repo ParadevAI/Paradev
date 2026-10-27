@@ -1634,6 +1634,9 @@ msgstr "このブランチから新しいワークスペースを作り、会話
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "ページは読み手ごとの回答を保存できるので、バックエンドなしでアンケートが作れます。"
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "一時停止中のDevは作業を始めません。チャットは開いたままです。"
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "普段私たちが取り組んでいるような、実践的なTypeScriptの課題です。アルゴリズムパズルは出しません。"
 
@@ -1709,6 +1712,9 @@ msgstr "招待を承諾"
 
 msgid "Accept terms"
 msgstr "利用規約に同意する"
+
+msgid "Access"
+msgstr "アクセス"
 
 msgid "Access denied"
 msgstr "アクセスが拒否されました"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "アーカイブ"
 
+msgid "Archive {name}?"
+msgstr "{name} をアーカイブしますか？"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "#{0} をアーカイブしますか？"
 
 msgid "Archive channel"
 msgstr "チャンネルをアーカイブ"
+
+msgid "Archive Dev"
+msgstr "Devをアーカイブ"
 
 msgid "Archive environment"
 msgstr "環境をアーカイブ"
@@ -3801,6 +3813,9 @@ msgstr "チャンネルのオプション"
 
 msgid "Channels"
 msgstr "チャンネル"
+
+msgid "Channels it can read and post in"
+msgstr "読み取りと投稿ができるチャンネル"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "購入した GB 時間が少なくなると、保存済みのカードに追加の GB 時間を請求します。"
@@ -5615,6 +5630,9 @@ msgstr "編集を保存できませんでした"
 msgid "Couldn't save the change"
 msgstr "変更を保存できませんでした"
 
+msgid "Couldn't save the Dev"
+msgstr "Devを保存できませんでした"
+
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 
@@ -5704,6 +5722,9 @@ msgstr "「{newLabel}」を作成"
 
 msgid "Create a channel"
 msgstr "チャンネルを作成"
+
+msgid "Create a Dev"
+msgstr "Devを作成"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "同じ会話コンテキストを持つネイティブのフォークをプロバイダー側に作成します。元のセッションは変更されません。"
@@ -5868,6 +5889,9 @@ msgstr "作成 {0} · 最終使用 {1}"
 msgid "Created {ago}"
 msgstr "{ago}に作成"
 
+msgid "Created {created}"
+msgstr "{created} に作成"
+
 msgid "Created {createdAgo}"
 msgstr "{createdAgo}に作成"
 
@@ -6031,6 +6055,12 @@ msgstr "カスタムプロバイダー"
 
 msgid "Custom themes"
 msgstr "カスタムテーマ"
+
+msgid "Customize"
+msgstr "カスタマイズ"
+
+msgid "Customize {devName}"
+msgstr "{devName} をカスタマイズ"
 
 msgid "Customize commands"
 msgstr "コマンドをカスタマイズ"
@@ -6465,6 +6495,12 @@ msgstr "ここでは詳細を表示できませんが、リンクは開けます
 msgid "Dev"
 msgstr "開発"
 
+msgid "Dev details"
+msgstr "Devの詳細"
+
+msgid "Dev options"
+msgstr "Devのオプション"
+
 msgid "Dev sign in"
 msgstr "開発用サインイン"
 
@@ -6491,6 +6527,9 @@ msgstr "デバイス: {selectedLabel}"
 
 msgid "Devices"
 msgstr "デバイス"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "新しいタブで差分"
 
 msgid "Digital Product Designer"
 msgstr "デジタルプロダクトデザイナー"
+
+msgid "Direct message"
+msgstr "ダイレクトメッセージ"
 
 msgid "Direct mode"
 msgstr "ダイレクトモード"
@@ -7394,6 +7436,9 @@ msgstr "最高"
 
 msgid "Extra small"
 msgstr "極小"
+
+msgid "Eyes"
+msgstr "目"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4ゲート · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "元に戻すことはできません。"
 msgid "It keeps the title from your prompt."
 msgstr "プロンプトから付けたタイトルのままになります。"
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "すべてのアクセス権がただちに失われます。チャットと作成した成果物は残ります。"
+
 msgid "It may be asleep"
 msgstr "スリープ中かもしれません"
 
@@ -10392,6 +10440,9 @@ msgstr "長時間にわたる信頼性がしきい値を超えます。18時に�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "長めのホバーでショートカットだけを出すtooltip。そのチップスタイルが現在のTooltipContentのデフォルトです"
 
+msgid "Look"
+msgstr "見た目"
+
 msgid "Looking at {what}"
 msgstr "{what} を確認中"
 
@@ -10684,6 +10735,9 @@ msgstr "メモリシェア"
 msgid "Mention."
 msgstr "メンション。"
 
+msgid "Mentioned in a channel"
+msgstr "チャンネルでメンションされた"
+
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -10744,6 +10798,9 @@ msgstr "マージ中…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "{name} にメッセージを送信"
 
 msgid "Message {name}…"
 msgstr "{name} へのメッセージ…"
@@ -11917,6 +11974,9 @@ msgstr "バージョンはまだありません"
 msgid "No versions yet."
 msgstr "バージョンはまだありません。"
 
+msgid "No work yet"
+msgstr "まだ作業はありません"
+
 msgid "No workspace run command configured"
 msgstr "ワークスペース実行コマンドが設定されていません"
 
@@ -11961,6 +12021,9 @@ msgstr "それによってレビューのやり方が変わることはない。
 
 msgid "None"
 msgstr "なし"
+
+msgid "None yet"
+msgstr "まだありません"
 
 msgid "None. This is the floor."
 msgstr "なし。ここが出発点です。"
@@ -12279,11 +12342,14 @@ msgstr "このホストを削除できるのはホストのオーナーまたは
 msgid "Only images can be attached to a comment"
 msgstr "コメントに添付できるのは画像のみです"
 
+msgid "Only its creator"
+msgstr "作成者のみ"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "このエージェントを変更できるのは、作成者または組織の管理者のみです"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "このマシンのみ: git で無視され、このリポジトリのすべてのワークツリーに適用されます。ここで設定したキーは共有の値を置き換えます。"
-
-msgid "Only organization admins can manage agents"
-msgstr "エージェントを管理できるのは組織の管理者のみです"
 
 msgid "Only organization owners can modify these settings."
 msgstr "これらの設定を変更できるのは組織のオーナーのみです。"
@@ -13524,6 +13590,9 @@ msgstr "{hostName}のワークツリーフォルダを選択してください�
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "エージェントを選べば1行でインストールできます。設定を手でコピーしても構いません。OAuthやAPIキーの設定を含む各クライアントの手順は<0>MCPサーバーの完全なドキュメント</0>にあります。"
+
+msgid "Picked by the channel"
+msgstr "チャンネルが選択"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "shadcn/uiのtooltipレシピ"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "濃さはこの開発者の最も活動量が多い日を基準にしています"
 
+msgid "Shape"
+msgstr "形"
+
 msgid "Share"
 msgstr "共有"
 
@@ -17428,6 +17500,9 @@ msgstr "サポートのレート制限が設定されていません"
 msgid "Support the project with a GitHub star"
 msgstr "GitHubスターでプロジェクトを応援"
 
+msgid "Surprise me"
+msgstr "おまかせ"
+
 msgid "Suspended"
 msgstr "停止中"
 
@@ -18305,6 +18380,9 @@ msgstr "このエージェントは会話を分岐できません"
 msgid "This agent can't run in a cloud workspace"
 msgstr "このエージェントはクラウドワークスペースで実行できません"
 
+msgid "This agent is paused"
+msgstr "このエージェントは一時停止中です"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"
 
@@ -18687,6 +18765,9 @@ msgstr "スレッド"
 
 msgid "Thread not found"
 msgstr "スレッドが見つかりません"
+
+msgid "Thread reply"
+msgstr "スレッドへの返信"
 
 msgid "Threads"
 msgstr "スレッド"
@@ -19981,6 +20062,9 @@ msgstr "Paradev Enterpriseとは何ですか?"
 msgid "What is wrong?"
 msgstr "何が問題ですか？"
 
+msgid "What it does"
+msgstr "役割"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Paradevとは何か、誰が作っていて、誰のためのものか。並列コーディングエージェントのためのワークスペースを作る、元YCのCTO3人が率いるサンフランシスコのチーム。"
 
@@ -20086,6 +20170,9 @@ msgstr "どのAIコーディングエージェントに対応していますか?
 msgid "Which plans include automations?"
 msgstr "オートメーションはどのプランに含まれますか？"
 
+msgid "Who can message it"
+msgstr "メッセージを送れる人"
+
 msgid "Who can open it"
 msgstr "開ける人"
 
@@ -20122,11 +20209,17 @@ msgstr "添付の有無を問わず"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Paradevのモバイルアプリがあれば、どこからでも本番環境の問題に対応できます。"
 
+msgid "Woke itself"
+msgstr "自分で起動"
+
 msgid "Wordmark, black"
 msgstr "ワードマーク（黒）"
 
 msgid "Wordmark, white"
 msgstr "ワードマーク（白）"
+
+msgid "Work"
+msgstr "作業"
 
 msgid "Work email"
 msgstr "勤務先のメールアドレス"

@@ -95,7 +95,14 @@ export const serverErrorMessages: Record<
 	"serverError.agent.notFound": () =>
 		i18n._(msg({ message: "Agent not found" })),
 	"serverError.agent.adminRequired": () =>
-		i18n._(msg({ message: "Only organization admins can manage agents" })),
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
+	"serverError.agent.paused": () =>
+		i18n._(msg({ message: "This agent is paused" })),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({

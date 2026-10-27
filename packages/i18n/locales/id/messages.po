@@ -1634,6 +1634,9 @@ msgstr "Ruang kerja baru dari cabang ini, dengan percakapan diserahkan ke agen b
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Halaman bisa menyimpan jawaban setiap pembaca, jadi polling berjalan tanpa backend."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Dev yang dijeda tidak memulai pekerjaan. Obrolannya tetap terbuka."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Soal TypeScript yang praktis, seperti yang kami selesaikan setiap hari. Tanpa teka-teki algoritma."
 
@@ -1709,6 +1712,9 @@ msgstr "Terima undangan"
 
 msgid "Accept terms"
 msgstr "Terima ketentuan"
+
+msgid "Access"
+msgstr "Akses"
 
 msgid "Access denied"
 msgstr "Akses ditolak"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Arsipkan"
 
+msgid "Archive {name}?"
+msgstr "Arsipkan {name}?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "Arsipkan #{0}?"
 
 msgid "Archive channel"
 msgstr "Arsipkan kanal"
+
+msgid "Archive Dev"
+msgstr "Arsipkan Dev"
 
 msgid "Archive environment"
 msgstr "Arsipkan environment"
@@ -3801,6 +3813,9 @@ msgstr "Opsi kanal"
 
 msgid "Channels"
 msgstr "Kanal"
+
+msgid "Channels it can read and post in"
+msgstr "Kanal yang bisa dibaca dan diposting"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Menagih kartu tersimpan untuk GB-jam tambahan saat GB-jam yang dibeli hampir habis."
@@ -5615,6 +5630,9 @@ msgstr "Tidak bisa menyimpan suntingan"
 msgid "Couldn't save the change"
 msgstr "Tidak dapat menyimpan perubahan"
 
+msgid "Couldn't save the Dev"
+msgstr "Tidak dapat menyimpan Dev"
+
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
 
@@ -5704,6 +5722,9 @@ msgstr "Buat \"{newLabel}\""
 
 msgid "Create a channel"
 msgstr "Buat kanal"
+
+msgid "Create a Dev"
+msgstr "Buat Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Membuat fork asli di penyedia dengan konteks percakapan yang sama. Sesi aslinya tidak berubah."
@@ -5868,6 +5889,9 @@ msgstr "Dibuat {0} · Terakhir dipakai {1}"
 msgid "Created {ago}"
 msgstr "Dibuat {ago}"
 
+msgid "Created {created}"
+msgstr "Dibuat {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Dibuat {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Penyedia kustom"
 
 msgid "Custom themes"
 msgstr "Tema kustom"
+
+msgid "Customize"
+msgstr "Sesuaikan"
+
+msgid "Customize {devName}"
+msgstr "Sesuaikan {devName}"
 
 msgid "Customize commands"
 msgstr "Sesuaikan perintah"
@@ -6465,6 +6495,12 @@ msgstr "Detail tidak tersedia di sini, tetapi tautan tetap bisa dibuka."
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev details"
+msgstr "Detail Dev"
+
+msgid "Dev options"
+msgstr "Opsi Dev"
+
 msgid "Dev sign in"
 msgstr "Masuk dev"
 
@@ -6491,6 +6527,9 @@ msgstr "Perangkat: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Perangkat"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "diff di tab baru"
 
 msgid "Digital Product Designer"
 msgstr "Desainer Produk Digital"
+
+msgid "Direct message"
+msgstr "Pesan langsung"
 
 msgid "Direct mode"
 msgstr "Mode langsung"
@@ -7394,6 +7436,9 @@ msgstr "Sangat tinggi"
 
 msgid "Extra small"
 msgstr "Ekstra kecil"
+
+msgid "Eyes"
+msgstr "Mata"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Gerbang F4 · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "Komentar ini tidak bisa dikembalikan."
 msgid "It keeps the title from your prompt."
 msgstr "Judul dari prompt Anda tetap dipakai."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Semua aksesnya langsung dicabut. Obrolan dan hasil kerjanya tetap disimpan."
+
 msgid "It may be asleep"
 msgstr "Mungkin sedang tidur"
 
@@ -10392,6 +10440,9 @@ msgstr "Keandalan jangka panjang melewati ambang batas. Pekerjaan yang diberikan
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip khusus pintasan saat hover lama; gaya chip-nya kini menjadi bawaan TooltipContent"
 
+msgid "Look"
+msgstr "Tampilan"
+
 msgid "Looking at {what}"
 msgstr "Melihat {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "Porsi memori"
 msgid "Mention."
 msgstr "Sebut."
 
+msgid "Mentioned in a channel"
+msgstr "Disebut di kanal"
+
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -10744,6 +10798,9 @@ msgstr "Melakukan merge…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Kirim pesan ke {name}"
 
 msgid "Message {name}…"
 msgstr "Pesan untuk {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Belum ada versi"
 msgid "No versions yet."
 msgstr "Belum ada versi."
 
+msgid "No work yet"
+msgstr "Belum ada pekerjaan"
+
 msgid "No workspace run command configured"
 msgstr "Tidak ada perintah run workspace yang dikonfigurasi"
 
@@ -11961,6 +12021,9 @@ msgstr "Tidak ada yang mereview secara berbeda karenanya."
 
 msgid "None"
 msgstr "Tidak ada"
+
+msgid "None yet"
+msgstr "Belum ada"
 
 msgid "None. This is the floor."
 msgstr "Tidak ada. Ini adalah lantai dasarnya."
@@ -12279,11 +12342,14 @@ msgstr "Hanya pemilik host atau pemilik organisasi yang bisa menghapus host ini"
 msgid "Only images can be attached to a comment"
 msgstr "Hanya gambar yang dapat dilampirkan ke komentar"
 
+msgid "Only its creator"
+msgstr "Hanya pembuatnya"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Hanya pembuatnya atau admin organisasi yang dapat mengubah agen ini"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Hanya di mesin ini: diabaikan git dan diterapkan ke setiap worktree repositori ini. Setiap kunci yang diatur di sini menggantikan yang dibagikan."
-
-msgid "Only organization admins can manage agents"
-msgstr "Hanya admin organisasi yang dapat mengelola agen"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Hanya pemilik organisasi yang bisa mengubah pengaturan ini."
@@ -13524,6 +13590,9 @@ msgstr "Pilih folder worktree di {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Pilih agen Anda untuk pemasangan satu baris, atau salin konfigurasinya secara manual. Semua klien, termasuk penyiapan OAuth dan kunci API, dibahas di <0>dokumentasi lengkap server MCP</0>."
+
+msgid "Picked by the channel"
+msgstr "Dipilih oleh kanal"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "Resep tooltip shadcn/ui"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Kepekatan warna relatif terhadap hari tersibuk pengembang ini"
 
+msgid "Shape"
+msgstr "Bentuk"
+
 msgid "Share"
 msgstr "Bagikan"
 
@@ -17428,6 +17500,9 @@ msgstr "Pembatasan laju dukungan belum dikonfigurasi"
 msgid "Support the project with a GitHub star"
 msgstr "Dukung proyek ini dengan star GitHub"
 
+msgid "Surprise me"
+msgstr "Kejutkan aku"
+
 msgid "Suspended"
 msgstr "Ditangguhkan"
 
@@ -18305,6 +18380,9 @@ msgstr "Agen ini tidak dapat mencabangkan percakapan"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agen ini tidak bisa berjalan di workspace cloud"
 
+msgid "This agent is paused"
+msgstr "Agen ini dijeda"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."
 
@@ -18687,6 +18765,9 @@ msgstr "Utas"
 
 msgid "Thread not found"
 msgstr "Thread tidak ditemukan"
+
+msgid "Thread reply"
+msgstr "Balasan utas"
 
 msgid "Threads"
 msgstr "Utas"
@@ -19981,6 +20062,9 @@ msgstr "Apa itu Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Apa masalahnya?"
 
+msgid "What it does"
+msgstr "Apa yang dikerjakan"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Apa itu Paradev, siapa yang membangunnya, dan untuk siapa. Tim San Francisco yang dipimpin tiga mantan CTO YC, membangun workspace untuk agen coding paralel."
 
@@ -20086,6 +20170,9 @@ msgstr "Agen coding AI mana saja yang didukung?"
 msgid "Which plans include automations?"
 msgstr "Paket mana yang menyertakan otomatisasi?"
 
+msgid "Who can message it"
+msgstr "Siapa yang bisa mengirim pesan"
+
 msgid "Who can open it"
 msgstr "Siapa yang bisa membuka"
 
@@ -20122,11 +20209,17 @@ msgstr "dengan atau tanpa lampiran"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Dengan aplikasi seluler Paradev, saya bisa menangani masalah produksi dari mana saja."
 
+msgid "Woke itself"
+msgstr "Bangun sendiri"
+
 msgid "Wordmark, black"
 msgstr "Wordmark, hitam"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, putih"
+
+msgid "Work"
+msgstr "Pekerjaan"
 
 msgid "Work email"
 msgstr "Email kerja"

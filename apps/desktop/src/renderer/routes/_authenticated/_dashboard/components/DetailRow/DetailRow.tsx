@@ -14,7 +14,7 @@ interface DetailRowProps {
 	onEdit?: () => void;
 }
 
-/** One line of Slack's channel details: a label, its value, and Edit on the right. */
+/** One line of a details dialog: a label, its value, and Edit on the right. */
 export function DetailRow({
 	label,
 	value,

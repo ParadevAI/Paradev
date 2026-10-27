@@ -7,6 +7,7 @@ import {
 	channels,
 	channelThreadFollows,
 	members as orgMembers,
+	type SelectChannel,
 	type SelectChannelMessage,
 } from "@superset/db/schema";
 import { previewOf } from "@superset/shared/channels";
@@ -15,6 +16,7 @@ import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
 import { protectedProcedure } from "../../trpc";
+import { startTurnForDirectMessage } from "../agent/turns";
 import {
 	assertCanPost,
 	type ChannelAccess,
@@ -313,6 +315,121 @@ export async function listTopLevelMessages(input: {
 	};
 }
 
+interface AppendedMessage {
+	message: SelectChannelMessage;
+	root: SelectChannelMessage | null;
+}
+
+/** Numbers and stores a message, and counts it on its thread root. */
+async function appendMessage(input: {
+	channelId: string;
+	threadRootId: string | null;
+	author: { userId: string } | { agentId: string };
+	body: string;
+	mentionedUserIds: string[];
+	clientId?: string | null;
+}): Promise<AppendedMessage> {
+	return dbWs.transaction(async (tx) => {
+		const now = new Date();
+		const [counter] = await tx
+			.update(channels)
+			.set({ lastSeq: sql`${channels.lastSeq} + 1`, lastMessageAt: now })
+			.where(and(eq(channels.id, input.channelId), isNull(channels.archivedAt)))
+			.returning({ seq: channels.lastSeq });
+		if (!counter) {
+			throw userError({
+				code: "FORBIDDEN",
+				message: "This channel is archived",
+				i18nKey: "serverError.channel.archived",
+			});
+		}
+		let root: SelectChannelMessage | null = null;
+		if (input.threadRootId) {
+			const [updated] = await tx
+				.update(channelMessages)
+				.set({
+					replyCount: sql`${channelMessages.replyCount} + 1`,
+					lastReplyAt: now,
+				})
+				.where(
+					and(
+						eq(channelMessages.id, input.threadRootId),
+						eq(channelMessages.channelId, input.channelId),
+						isNull(channelMessages.threadRootId),
+					),
+				)
+				.returning();
+			if (!updated) throw messageNotFound();
+			root = updated;
+		}
+		const [message] = await tx
+			.insert(channelMessages)
+			.values({
+				channelId: input.channelId,
+				seq: counter.seq,
+				threadRootId: root?.id ?? null,
+				authorUserId: "userId" in input.author ? input.author.userId : null,
+				authorAgentId: "agentId" in input.author ? input.author.agentId : null,
+				body: input.body,
+				mentionedUserIds: input.mentionedUserIds,
+				clientId: input.clientId ?? null,
+				createdAt: now,
+			})
+			.returning();
+		if (!message) throw new Error("message insert returned no row");
+		return { message, root };
+	});
+}
+
+/** A Dev's post: stored like anyone's, announced to the room's members. */
+export async function postAgentMessage(input: {
+	channel: SelectChannel;
+	agentId: string;
+	agentName: string;
+	body: string;
+	threadRootId: string | null;
+	/** A retried post with the same key returns the first message. */
+	idempotencyKey?: string;
+}): Promise<EnrichedMessage> {
+	const body = assertBody(input.body);
+	const key = input.idempotencyKey;
+	const earlier = () =>
+		key ? findAgentPost(input.agentId, input.channel.id, key) : null;
+	const existing = await earlier();
+	if (existing) return enrichMessage(existing);
+	let result: AppendedMessage;
+	try {
+		result = await appendMessage({
+			channelId: input.channel.id,
+			threadRootId: input.threadRootId,
+			author: { agentId: input.agentId },
+			body,
+			mentionedUserIds: [],
+			clientId: key ?? null,
+		});
+	} catch (error) {
+		const raced = isUniqueViolation(error) ? await earlier() : null;
+		if (raced) return enrichMessage(raced);
+		throw error;
+	}
+	if (result.root) await followOnReply(result.root, result.message);
+	const message = await enrichMessage(result.message);
+	const root = result.root ? await enrichMessage(result.root) : null;
+	const access: ChannelAccess = {
+		channel: input.channel,
+		membership: null,
+		orgRole: "member",
+	};
+	await announce(
+		access,
+		await recipients(input.channel.id),
+		message,
+		root,
+		input.agentName,
+	);
+	return message;
+}
+
 export const channelMessageRouter = {
 	list: protectedProcedure
 		.input(listMessagesSchema)
@@ -376,69 +493,15 @@ export const channelMessageRouter = {
 				await validMentions(access, members, input.mentionedUserIds)
 			).filter((id) => id !== userId);
 
-			let result: {
-				message: SelectChannelMessage;
-				root: SelectChannelMessage | null;
-			};
+			let result: AppendedMessage;
 			try {
-				result = await dbWs.transaction(async (tx) => {
-					const now = new Date();
-					const [counter] = await tx
-						.update(channels)
-						.set({
-							lastSeq: sql`${channels.lastSeq} + 1`,
-							lastMessageAt: now,
-						})
-						.where(
-							and(
-								eq(channels.id, access.channel.id),
-								isNull(channels.archivedAt),
-							),
-						)
-						.returning({ seq: channels.lastSeq });
-					if (!counter) {
-						throw userError({
-							code: "FORBIDDEN",
-							message: "This channel is archived",
-							i18nKey: "serverError.channel.archived",
-						});
-					}
-
-					let root: SelectChannelMessage | null = null;
-					if (input.threadRootId) {
-						const [updated] = await tx
-							.update(channelMessages)
-							.set({
-								replyCount: sql`${channelMessages.replyCount} + 1`,
-								lastReplyAt: now,
-							})
-							.where(
-								and(
-									eq(channelMessages.id, input.threadRootId),
-									eq(channelMessages.channelId, access.channel.id),
-									isNull(channelMessages.threadRootId),
-								),
-							)
-							.returning();
-						if (!updated) throw messageNotFound();
-						root = updated;
-					}
-
-					const [message] = await tx
-						.insert(channelMessages)
-						.values({
-							channelId: access.channel.id,
-							seq: counter.seq,
-							threadRootId: root?.id ?? null,
-							authorUserId: userId,
-							body,
-							mentionedUserIds,
-							clientId: input.clientId,
-							createdAt: now,
-						})
-						.returning();
-					if (!message) throw new Error("message insert returned no row");
-					return { message, root };
+				result = await appendMessage({
+					channelId: access.channel.id,
+					threadRootId: input.threadRootId ?? null,
+					author: { userId },
+					body,
+					mentionedUserIds,
+					clientId: input.clientId,
 				});
 			} catch (error) {
 				if (isUniqueViolation(error)) {
@@ -462,6 +525,9 @@ export const channelMessageRouter = {
 			const message = await enrichMessage(result.message);
 			const root = result.root ? await enrichMessage(result.root) : null;
 			await announce(access, members, message, root, ctx.session.user.name);
+			if (access.channel.kind === "dm") {
+				await startTurnForDirectMessage(access.channel.id, userId, message.id);
+			}
 			return message;
 		}),
 
@@ -598,6 +664,25 @@ export const channelMessageRouter = {
 			return reacted;
 		}),
 } satisfies TRPCRouterRecord;
+
+async function findAgentPost(
+	agentId: string,
+	channelId: string,
+	clientId: string,
+) {
+	const [row] = await db
+		.select()
+		.from(channelMessages)
+		.where(
+			and(
+				eq(channelMessages.authorAgentId, agentId),
+				eq(channelMessages.channelId, channelId),
+				eq(channelMessages.clientId, clientId),
+			),
+		)
+		.limit(1);
+	return row ?? null;
+}
 
 async function findByClientId(
 	userId: string,

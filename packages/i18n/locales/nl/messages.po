@@ -1634,6 +1634,9 @@ msgstr "Een nieuwe workspace vanaf deze branch, met het gesprek overgedragen aan
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Een pagina kan het antwoord van elke lezer opslaan, dus een poll werkt zonder backend."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Een gepauzeerde Dev begint geen werk. Zijn chats blijven open."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Een praktisch TypeScript-probleem, zoals we ze elke dag oplossen. Geen algoritmepuzzels."
 
@@ -1709,6 +1712,9 @@ msgstr "Uitnodiging accepteren"
 
 msgid "Accept terms"
 msgstr "Voorwaarden accepteren"
+
+msgid "Access"
+msgstr "Toegang"
 
 msgid "Access denied"
 msgstr "Toegang geweigerd"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Archiveren"
 
+msgid "Archive {name}?"
+msgstr "{name} archiveren?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "#{0} archiveren?"
 
 msgid "Archive channel"
 msgstr "Kanaal archiveren"
+
+msgid "Archive Dev"
+msgstr "Dev archiveren"
 
 msgid "Archive environment"
 msgstr "Omgeving archiveren"
@@ -3801,6 +3813,9 @@ msgstr "Kanaalopties"
 
 msgid "Channels"
 msgstr "Kanalen"
+
+msgid "Channels it can read and post in"
+msgstr "Kanalen waarin hij kan lezen en posten"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-uren opraken."
@@ -5615,6 +5630,9 @@ msgstr "Kan bewerkingen niet opslaan"
 msgid "Couldn't save the change"
 msgstr "Kon de wijziging niet opslaan"
 
+msgid "Couldn't save the Dev"
+msgstr "Kan de Dev niet opslaan"
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 
@@ -5704,6 +5722,9 @@ msgstr "\"{newLabel}\" maken"
 
 msgid "Create a channel"
 msgstr "Kanaal maken"
+
+msgid "Create a Dev"
+msgstr "Een Dev maken"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Maakt bij de provider een native fork met dezelfde gesprekscontext. De oorspronkelijke sessie blijft ongewijzigd."
@@ -5868,6 +5889,9 @@ msgstr "Aangemaakt {0} · Laatst gebruikt {1}"
 msgid "Created {ago}"
 msgstr "Aangemaakt {ago}"
 
+msgid "Created {created}"
+msgstr "Gemaakt op {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Aangemaakt {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Eigen provider"
 
 msgid "Custom themes"
 msgstr "Eigen thema's"
+
+msgid "Customize"
+msgstr "Aanpassen"
+
+msgid "Customize {devName}"
+msgstr "{devName} aanpassen"
 
 msgid "Customize commands"
 msgstr "Commando's aanpassen"
@@ -6465,6 +6495,12 @@ msgstr "Details zijn hier niet beschikbaar, maar de link opent nog steeds."
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev details"
+msgstr "Dev-details"
+
+msgid "Dev options"
+msgstr "Dev-opties"
+
 msgid "Dev sign in"
 msgstr "Dev-login"
 
@@ -6491,6 +6527,9 @@ msgstr "Apparaat: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Apparaten"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "diff in nieuw tabblad"
 
 msgid "Digital Product Designer"
 msgstr "Ontwerper van digitale producten"
+
+msgid "Direct message"
+msgstr "Direct bericht"
 
 msgid "Direct mode"
 msgstr "Directe modus"
@@ -7394,6 +7436,9 @@ msgstr "Zeer hoog"
 
 msgid "Extra small"
 msgstr "Extra klein"
+
+msgid "Eyes"
+msgstr "Ogen"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4-drempel · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Hij verliest meteen alle toegang. Zijn chats en het werk dat hij maakte blijven bewaard."
+
 msgid "It may be asleep"
 msgstr "Hij staat mogelijk in sluimerstand"
 
@@ -10392,6 +10440,9 @@ msgstr "Betrouwbaarheid over lange horizon overschrijdt een drempel. Werk dat om
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip met alleen de sneltoets bij lang hoveren; de chipstijl is nu de standaard voor TooltipContent"
 
+msgid "Look"
+msgstr "Uiterlijk"
+
 msgid "Looking at {what}"
 msgstr "{what} bekijken"
 
@@ -10684,6 +10735,9 @@ msgstr "Geheugenaandeel"
 msgid "Mention."
 msgstr "Noem."
 
+msgid "Mentioned in a channel"
+msgstr "Genoemd in een kanaal"
+
 msgid "Menubar"
 msgstr "Menubalk"
 
@@ -10744,6 +10798,9 @@ msgstr "Bezig met mergen…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Bericht aan {name}"
 
 msgid "Message {name}…"
 msgstr "Bericht aan {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Nog geen versies"
 msgid "No versions yet."
 msgstr "Nog geen versies."
 
+msgid "No work yet"
+msgstr "Nog geen werk"
+
 msgid "No workspace run command configured"
 msgstr "Geen run-commando voor de werkruimte geconfigureerd"
 
@@ -11961,6 +12021,9 @@ msgstr "Niemand reviewt er anders door."
 
 msgid "None"
 msgstr "Geen"
+
+msgid "None yet"
+msgstr "Nog geen"
 
 msgid "None. This is the floor."
 msgstr "Geen. Dit is de bodem."
@@ -12279,11 +12342,14 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
+msgid "Only its creator"
+msgstr "Alleen de maker"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Alleen op deze machine: genegeerd door git en toegepast op elke worktree van deze repository. Elke sleutel die je hier instelt, vervangt de gedeelde."
-
-msgid "Only organization admins can manage agents"
-msgstr "Alleen organisatiebeheerders kunnen agents beheren"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Alleen eigenaren van de organisatie kunnen deze instellingen wijzigen."
@@ -13524,6 +13590,9 @@ msgstr "Kies de worktree-map op {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Kies je agent voor een installatie in één regel, of kopieer de configuratie handmatig. Elke client, inclusief OAuth en API-sleutels, staat in de <0>volledige MCP-serverdocumentatie</0>."
+
+msgid "Picked by the channel"
+msgstr "Gekozen door het kanaal"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "shadcn/ui tooltip-recept"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "De kleurintensiteit is relatief aan de drukste dag van deze ontwikkelaar"
 
+msgid "Shape"
+msgstr "Vorm"
+
 msgid "Share"
 msgstr "Delen"
 
@@ -17428,6 +17500,9 @@ msgstr "Rate limiting voor support is niet geconfigureerd"
 msgid "Support the project with a GitHub star"
 msgstr "Steun het project met een GitHub-ster"
 
+msgid "Surprise me"
+msgstr "Verras me"
+
 msgid "Suspended"
 msgstr "Opgeschort"
 
@@ -18305,6 +18380,9 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
 
+msgid "This agent is paused"
+msgstr "Deze agent is gepauzeerd"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
 
@@ -18687,6 +18765,9 @@ msgstr "Thread"
 
 msgid "Thread not found"
 msgstr "Thread niet gevonden"
+
+msgid "Thread reply"
+msgstr "Antwoord in thread"
 
 msgid "Threads"
 msgstr "Threads"
@@ -19981,6 +20062,9 @@ msgstr "Wat is Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Wat is er mis?"
 
+msgid "What it does"
+msgstr "Wat hij doet"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Wat Paradev is, wie het bouwt en voor wie het bedoeld is. Een team uit San Francisco onder leiding van drie ex-YC-CTO's dat de werkruimte voor parallelle coding agents bouwt."
 
@@ -20086,6 +20170,9 @@ msgstr "Welke AI-coding agents worden ondersteund?"
 msgid "Which plans include automations?"
 msgstr "Welke abonnementen bevatten automatiseringen?"
 
+msgid "Who can message it"
+msgstr "Wie hem berichten mag sturen"
+
 msgid "Who can open it"
 msgstr "Wie het kan openen"
 
@@ -20122,11 +20209,17 @@ msgstr "met of zonder bijlagen"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Met de mobiele app van Paradev kan ik overal productieproblemen aanpakken."
 
+msgid "Woke itself"
+msgstr "Zelf ontwaakt"
+
 msgid "Wordmark, black"
 msgstr "Woordmerk, zwart"
 
 msgid "Wordmark, white"
 msgstr "Woordmerk, wit"
+
+msgid "Work"
+msgstr "Werk"
 
 msgid "Work email"
 msgstr "Zakelijk e-mailadres"

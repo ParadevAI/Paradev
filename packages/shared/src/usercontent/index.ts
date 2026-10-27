@@ -42,9 +42,9 @@ export {
 	signFileTicket,
 	signPageConnectTicket,
 	signPageTicket,
+	verifyClaims,
 	verifyFileTicket,
 	verifyPageConnectTicket,
-	verifyClaims,
 	verifyPageTicket,
 } from "./ticket";
 export {

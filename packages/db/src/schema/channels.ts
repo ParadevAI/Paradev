@@ -14,8 +14,10 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 
+import { agents } from "./agents";
 import { organizations, users } from "./auth";
 import {
+	channelKindValues,
 	channelMemberRoleValues,
 	channelNotifyValues,
 	channelVisibilityValues,
@@ -31,6 +33,7 @@ export const channelMemberRole = pgEnum(
 	channelMemberRoleValues,
 );
 export const channelNotify = pgEnum("channel_notify", channelNotifyValues);
+export const channelKind = pgEnum("channel_kind", channelKindValues);
 
 /**
  * A conversation for a group of people in an organization. Public channels
@@ -49,6 +52,8 @@ export const channels = pgTable(
 		name: text().notNull(),
 		description: text(),
 		visibility: channelVisibility().notNull().default("public"),
+		/** A `dm` is the private room between one person and one Dev. */
+		kind: channelKind().notNull().default("channel"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -66,7 +71,7 @@ export const channels = pgTable(
 	(t) => [
 		uniqueIndex("channels_org_name_unique")
 			.on(t.organizationId, sql`lower(${t.name})`)
-			.where(sql`${t.archivedAt} IS NULL`),
+			.where(sql`${t.archivedAt} IS NULL AND ${t.kind} = 'channel'`),
 		index("channels_organization_idx").on(t.organizationId),
 	],
 );
@@ -123,6 +128,11 @@ export const channelMessages = pgTable(
 		authorUserId: uuid("author_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
+		/** Set instead of `authorUserId` when a Dev wrote the message. */
+		authorAgentId: uuid("author_agent_id").references(
+			(): AnyPgColumn => agents.id,
+			{ onDelete: "set null" },
+		),
 		body: text().notNull(),
 		mentionedUserIds: uuid("mentioned_user_ids")
 			.array()
@@ -143,6 +153,9 @@ export const channelMessages = pgTable(
 		uniqueIndex("channel_messages_author_client_unique")
 			.on(t.authorUserId, t.clientId)
 			.where(sql`${t.clientId} IS NOT NULL`),
+		uniqueIndex("channel_messages_agent_client_unique")
+			.on(t.authorAgentId, t.channelId, t.clientId)
+			.where(sql`${t.clientId} IS NOT NULL AND ${t.authorAgentId} IS NOT NULL`),
 	],
 );
 

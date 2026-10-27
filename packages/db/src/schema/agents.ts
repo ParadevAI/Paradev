@@ -1,3 +1,4 @@
+import type { DevAvatar } from "@superset/shared/dev-avatar";
 import { sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
@@ -12,15 +13,20 @@ import {
 	uniqueIndex,
 	uuid,
 } from "drizzle-orm/pg-core";
-
 import { organizations, users } from "./auth";
 import { channelMessages, channels } from "./channels";
 import {
+	agentMessageAccessValues,
 	agentSessionKindValues,
 	agentTurnReasonValues,
 	agentTurnStatusValues,
 } from "./enums";
 import { cloudWorkspaces } from "./schema";
+
+export const agentMessageAccess = pgEnum(
+	"agent_message_access",
+	agentMessageAccessValues,
+);
 
 /**
  * An agent that works in an organization under its own identity. What it may
@@ -35,6 +41,16 @@ export const agents = pgTable(
 			.references(() => organizations.id, { onDelete: "cascade" }),
 		name: text().notNull(),
 		description: text(),
+		avatar: jsonb()
+			.$type<DevAvatar>()
+			.notNull()
+			.default({ shape: "pebble", eyes: "dots", color: "#7aa7ff" }),
+		instructions: text(),
+		model: text(),
+		messageAccess: agentMessageAccess("message_access")
+			.notNull()
+			.default("organization"),
+		pausedAt: timestamp("paused_at", { withTimezone: true }),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),

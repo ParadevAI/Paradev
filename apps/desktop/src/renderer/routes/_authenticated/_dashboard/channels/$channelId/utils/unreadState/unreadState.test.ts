@@ -16,6 +16,7 @@ function message(
 		seq,
 		threadRootId: null,
 		authorUserId,
+		authorAgentId: null,
 		body: "hi",
 		mentionedUserIds: [],
 		clientId: null,

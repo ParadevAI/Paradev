@@ -301,6 +301,9 @@ export type HandleOwnerType = z.infer<typeof handleOwnerTypeEnum>;
 export const agentCredentialKindValues = ["subscription", "api_key"] as const;
 export type AgentCredentialKind = (typeof agentCredentialKindValues)[number];
 
+export const channelKindValues = ["channel", "dm"] as const;
+export const channelKindEnum = z.enum(channelKindValues);
+
 export const channelVisibilityValues = ["public", "private"] as const;
 export const channelVisibilityEnum = z.enum(channelVisibilityValues);
 export type ChannelVisibility = z.infer<typeof channelVisibilityEnum>;
@@ -314,6 +317,9 @@ export const channelNotifyEnum = z.enum(channelNotifyValues);
 export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
 
 /** Where an agent works: a person's DM, a channel timeline, or one thread. */
+export const agentMessageAccessValues = ["organization", "creator"] as const;
+export const agentMessageAccessEnum = z.enum(agentMessageAccessValues);
+
 export const agentSessionKindValues = [
 	"dm",
 	"channel",

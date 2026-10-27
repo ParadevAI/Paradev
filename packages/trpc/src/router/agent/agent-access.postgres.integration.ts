@@ -113,7 +113,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		await db
 			.delete(schema.users)
 			.where(inArray(schema.users.id, [admin, outsider]));
-	});
+	}, 30000);
 
 	test("a granted agent reads the channel for a person who can", async () => {
 		const { token } = await agentWithChannel(admin);
@@ -198,6 +198,56 @@ suite("agent access against a migrated PostgreSQL", () => {
 		expect(next.outcome).toBe("started");
 	});
 
+	test("a DM is a private room: a person's message starts a turn and the Dev's reply lands in it", async () => {
+		const agent = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Chatty",
+		});
+		const { channelId, sessionId } = await person(
+			admin,
+		).agent.openDirectMessage({ agentId: agent.id });
+		expect(
+			(await person(admin).agent.openDirectMessage({ agentId: agent.id }))
+				.channelId,
+		).toBe(channelId);
+		const listed = await person(admin).channel.list({ organizationId: orgId });
+		expect(listed.map((c) => c.id)).not.toContain(channelId);
+		const sent = await person(admin).channelMessage.send({
+			channelId,
+			body: "hello",
+			clientId: crypto.randomUUID(),
+			fileIds: [],
+			mentionedUserIds: [],
+		});
+		const [turn] = await db
+			.select()
+			.from(schema.agentTurns)
+			.where(eq(schema.agentTurns.sessionId, sessionId));
+		expect(turn).toMatchObject({
+			status: "running",
+			promptId: sent.id,
+			triggerMessageId: sent.id,
+		});
+		const { token } = await worker().agentWorker.turnToken({
+			turnId: turn?.id ?? "",
+		});
+		const post = { channelId, body: "hi there", idempotencyKey: "call-1" };
+		const reply = await asAgent(token).agentApi.postMessage(post);
+		expect(reply.authorAgentId).toBe(agent.id);
+		expect((await asAgent(token).agentApi.postMessage(post)).id).toBe(reply.id);
+		const page = await person(admin).channelMessage.list({
+			channelId,
+			limit: 20,
+		});
+		expect(page.messages.map((m) => [m.body, m.authorAgentId])).toEqual([
+			["hello", null],
+			["hi there", agent.id],
+		]);
+		await expect(
+			person(outsider).channelMessage.list({ channelId, limit: 20 }),
+		).rejects.toThrow("Channel not found");
+	});
+
 	test("archiving an agent revokes it at once", async () => {
 		const { agent, token } = await agentWithChannel(admin);
 		await person(admin).agent.archive({ agentId: agent.id });
@@ -206,14 +256,49 @@ suite("agent access against a migrated PostgreSQL", () => {
 		);
 	});
 
-	test("only org admins create agents, and the worker needs its secret", async () => {
+	test("any member creates an agent; only its creator or an admin changes it", async () => {
+		const mine = await person(outsider).agent.create({
+			organizationId: orgId,
+			name: "Mine",
+		});
+		expect(mine.avatar.shape).toBeTruthy();
+		const theirs = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Theirs",
+		});
 		await expect(
-			person(outsider).agent.create({ organizationId: orgId, name: "No" }),
-		).rejects.toThrow("Only organization admins can manage agents");
+			person(outsider).agent.update({ agentId: theirs.id, name: "Hijacked" }),
+		).rejects.toThrow("Only its creator or an organization admin");
+		await person(admin).agent.update({ agentId: mine.id, name: "Renamed" });
+		expect((await person(outsider).agent.get({ agentId: mine.id })).name).toBe(
+			"Renamed",
+		);
 		await expect(
 			withHeaders({ "x-agent-worker-secret": "wrong" }).agentWorker.turnToken({
 				turnId: crypto.randomUUID(),
 			}),
 		).rejects.toThrow("Unknown worker.");
+	});
+
+	test("a paused agent starts no turns, and a creator-only agent is hidden from others", async () => {
+		const agent = await person(admin).agent.create({
+			organizationId: orgId,
+			name: "Private",
+		});
+		await person(admin).agent.pause({ agentId: agent.id });
+		await expect(
+			person(admin).agent.startDirectTurn({ agentId: agent.id, promptId: "p" }),
+		).rejects.toThrow("This agent is paused");
+		await person(admin).agent.update({
+			agentId: agent.id,
+			messageAccess: "creator",
+		});
+		const visible = await person(outsider).agent.list({
+			organizationId: orgId,
+		});
+		expect(visible.map((a) => a.id)).not.toContain(agent.id);
+		await expect(
+			person(outsider).agent.get({ agentId: agent.id }),
+		).rejects.toThrow("Agent not found");
 	});
 });

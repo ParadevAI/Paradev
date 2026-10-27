@@ -1634,6 +1634,9 @@ msgstr "Um novo workspace a partir desta branch, com a conversa entregue a um no
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Uma página pode salvar a resposta de cada leitor, então uma enquete funciona sem backend."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Um Dev pausado não começa nenhum trabalho. As conversas continuam abertas."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Um problema prático de TypeScript, como os que resolvemos todos os dias. Nada de quebra-cabeças de algoritmos."
 
@@ -1709,6 +1712,9 @@ msgstr "Aceitar convite"
 
 msgid "Accept terms"
 msgstr "Aceitar os termos"
+
+msgid "Access"
+msgstr "Acesso"
 
 msgid "Access denied"
 msgstr "Acesso negado"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Arquivar"
 
+msgid "Archive {name}?"
+msgstr "Arquivar {name}?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "Arquivar #{0}?"
 
 msgid "Archive channel"
 msgstr "Arquivar canal"
+
+msgid "Archive Dev"
+msgstr "Arquivar Dev"
 
 msgid "Archive environment"
 msgstr "Arquivar ambiente"
@@ -3801,6 +3813,9 @@ msgstr "Opções do canal"
 
 msgid "Channels"
 msgstr "Canais"
+
+msgid "Channels it can read and post in"
+msgstr "Canais em que pode ler e publicar"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Cobra no cartão salvo mais GB-horas quando as GB-horas compradas estão acabando."
@@ -5615,6 +5630,9 @@ msgstr "Não foi possível salvar as edições"
 msgid "Couldn't save the change"
 msgstr "Não foi possível salvar a alteração"
 
+msgid "Couldn't save the Dev"
+msgstr "Não foi possível salvar o Dev"
+
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
 
@@ -5704,6 +5722,9 @@ msgstr "Criar \"{newLabel}\""
 
 msgid "Create a channel"
 msgstr "Criar um canal"
+
+msgid "Create a Dev"
+msgstr "Criar um Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Cria uma bifurcação nativa no provedor com o mesmo contexto da conversa. A sessão original permanece inalterada."
@@ -5868,6 +5889,9 @@ msgstr "Criada em {0} · Último uso {1}"
 msgid "Created {ago}"
 msgstr "Criado {ago}"
 
+msgid "Created {created}"
+msgstr "Criado em {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Criado {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Provedor personalizado"
 
 msgid "Custom themes"
 msgstr "Temas personalizados"
+
+msgid "Customize"
+msgstr "Personalizar"
+
+msgid "Customize {devName}"
+msgstr "Personalizar {devName}"
 
 msgid "Customize commands"
 msgstr "Personalizar comandos"
@@ -6465,6 +6495,12 @@ msgstr "Os detalhes não estão disponíveis aqui, mas o link ainda abre."
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev details"
+msgstr "Detalhes do Dev"
+
+msgid "Dev options"
+msgstr "Opções do Dev"
+
 msgid "Dev sign in"
 msgstr "Login de dev"
 
@@ -6491,6 +6527,9 @@ msgstr "Dispositivo: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Dispositivos"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "diff em nova aba"
 
 msgid "Digital Product Designer"
 msgstr "Designer de produtos digitais"
+
+msgid "Direct message"
+msgstr "Mensagem direta"
 
 msgid "Direct mode"
 msgstr "Modo direto"
@@ -7394,6 +7436,9 @@ msgstr "Muito alto"
 
 msgid "Extra small"
 msgstr "Extra pequeno"
+
+msgid "Eyes"
+msgstr "Olhos"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Portão F4 · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "Não será possível recuperá-lo."
 msgid "It keeps the title from your prompt."
 msgstr "O título do seu prompt será mantido."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Ele perde todo o acesso na hora. As conversas e o trabalho que fez são mantidos."
+
 msgid "It may be asleep"
 msgstr "Ele pode estar em repouso"
 
@@ -10392,6 +10440,9 @@ msgstr "A confiabilidade em horizontes longos cruza um limiar. O trabalho atribu
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip só de atalho em hover longo; o estilo de chip dele agora é o padrão do TooltipContent"
 
+msgid "Look"
+msgstr "Aparência"
+
 msgid "Looking at {what}"
 msgstr "Consultando {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "Participação na memória"
 msgid "Mention."
 msgstr "Mencione."
 
+msgid "Mentioned in a channel"
+msgstr "Mencionado em um canal"
+
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -10744,6 +10798,9 @@ msgstr "Fazendo merge…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Enviar mensagem para {name}"
 
 msgid "Message {name}…"
 msgstr "Mensagem para {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Nenhuma versão ainda"
 msgid "No versions yet."
 msgstr "Nenhuma versão ainda."
 
+msgid "No work yet"
+msgstr "Nenhum trabalho ainda"
+
 msgid "No workspace run command configured"
 msgstr "Nenhum comando de execução configurado para a área de trabalho"
 
@@ -11961,6 +12021,9 @@ msgstr "Ninguém revisa de forma diferente por causa disso."
 
 msgid "None"
 msgstr "Nenhum"
+
+msgid "None yet"
+msgstr "Nenhuma ainda"
 
 msgid "None. This is the floor."
 msgstr "Nenhum. Este é o piso."
@@ -12279,11 +12342,14 @@ msgstr "Só proprietários do host ou proprietários da organização podem excl
 msgid "Only images can be attached to a comment"
 msgstr "Apenas imagens podem ser anexadas a um comentário"
 
+msgid "Only its creator"
+msgstr "Só quem o criou"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Só quem criou ou um administrador da organização pode alterar este agente"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Somente nesta máquina: ignorado pelo git e aplicado a cada worktree deste repositório. Qualquer chave definida aqui substitui a compartilhada."
-
-msgid "Only organization admins can manage agents"
-msgstr "Apenas administradores da organização podem gerenciar agentes"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Só proprietários da organização podem alterar estas configurações."
@@ -13524,6 +13590,9 @@ msgstr "Escolha a pasta das worktrees em {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Escolha seu agente para uma instalação em uma linha ou copie a configuração à mão. Todos os clientes, incluindo a configuração de OAuth e de chave de API, estão na <0>documentação completa do servidor MCP</0>."
+
+msgid "Picked by the channel"
+msgstr "Escolhido pelo canal"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "receita de tooltip do shadcn/ui"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "A intensidade é relativa ao dia mais movimentado desta pessoa"
 
+msgid "Shape"
+msgstr "Formato"
+
 msgid "Share"
 msgstr "Compartilhar"
 
@@ -17428,6 +17500,9 @@ msgstr "O limite de solicitações de suporte não está configurado"
 msgid "Support the project with a GitHub star"
 msgstr "Apoie o projeto com uma estrela no GitHub"
 
+msgid "Surprise me"
+msgstr "Me surpreenda"
+
 msgid "Suspended"
 msgstr "Suspenso"
 
@@ -18305,6 +18380,9 @@ msgstr "Este agente não pode ramificar uma conversa"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Este agente não pode ser executado em uma área de trabalho na nuvem"
 
+msgid "This agent is paused"
+msgstr "Este agente está pausado"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente não existe mais no dispositivo selecionado (os agentes podem ter sido redefinidos). As execuções vão falhar até você escolher outro."
 
@@ -18687,6 +18765,9 @@ msgstr "Conversa"
 
 msgid "Thread not found"
 msgstr "Thread não encontrada"
+
+msgid "Thread reply"
+msgstr "Resposta na conversa"
 
 msgid "Threads"
 msgstr "Conversas"
@@ -19981,6 +20062,9 @@ msgstr "O que é o Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Qual é o problema?"
 
+msgid "What it does"
+msgstr "O que faz"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "O que é o Paradev, quem o constrói e para quem ele é. Uma equipe de San Francisco liderada por três ex-CTOs da YC construindo a área de trabalho para agentes de código paralelos."
 
@@ -20086,6 +20170,9 @@ msgstr "Quais agentes de código com IA são suportados?"
 msgid "Which plans include automations?"
 msgstr "Quais planos incluem automações?"
 
+msgid "Who can message it"
+msgstr "Quem pode enviar mensagens"
+
 msgid "Who can open it"
 msgstr "Quem pode abrir"
 
@@ -20122,11 +20209,17 @@ msgstr "com ou sem anexos"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Com o aplicativo móvel do Paradev, posso resolver problemas de produção de qualquer lugar."
 
+msgid "Woke itself"
+msgstr "Acordou sozinho"
+
 msgid "Wordmark, black"
 msgstr "Logotipo, preto"
 
 msgid "Wordmark, white"
 msgstr "Logotipo, branco"
+
+msgid "Work"
+msgstr "Trabalho"
 
 msgid "Work email"
 msgstr "E-mail profissional"

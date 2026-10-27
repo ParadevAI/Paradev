@@ -1,19 +1,51 @@
 import { db, dbWs } from "@superset/db/client";
 import {
 	agentRelations,
-	agentSessions,
 	agents,
 	agentTurns,
+	channels,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
+import {
+	type DevAvatar,
+	isDevAvatar,
+	randomDevAvatar,
+} from "@superset/shared/dev-avatar";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
 import { channelNotFound, loadChannelAccess } from "../channel/access";
-import { agentNotFound, assertOrgAdmin, loadManagedAgent } from "./access";
+import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
+import { ensureDirectMessage } from "./direct-message";
+import { startOrJoinTurn } from "./turns";
 
 const agentIdSchema = z.object({ agentId: z.string().uuid() });
+const avatarSchema = z.custom<DevAvatar>(isDevAvatar, "Invalid avatar");
+const nameSchema = z.string().trim().min(1).max(80);
+
+const listColumns = {
+	id: agents.id,
+	name: agents.name,
+	description: agents.description,
+	avatar: agents.avatar,
+	messageAccess: agents.messageAccess,
+	pausedAt: agents.pausedAt,
+	createdByUserId: agents.createdByUserId,
+	createdAt: agents.createdAt,
+	isWorking: exists(
+		db
+			.select({ one: sql`1` })
+			.from(agentTurns)
+			.where(
+				and(
+					eq(agentTurns.agentId, agents.id),
+					eq(agentTurns.status, "running"),
+				),
+			),
+	).mapWith(Boolean),
+};
 const channelGrantSchema = z.object({
 	agentId: z.string().uuid(),
 	channelId: z.string().uuid(),
@@ -30,43 +62,137 @@ export const agentRouter = {
 			});
 			if (!membership) return [];
 			return db
-				.select({
-					id: agents.id,
-					name: agents.name,
-					description: agents.description,
-					createdAt: agents.createdAt,
-				})
+				.select(listColumns)
 				.from(agents)
 				.where(
 					and(
 						eq(agents.organizationId, input.organizationId),
 						isNull(agents.archivedAt),
+						or(
+							eq(agents.messageAccess, "organization"),
+							eq(agents.createdByUserId, ctx.session.user.id),
+						),
 					),
 				)
-				.orderBy(asc(agents.name));
+				.orderBy(asc(agents.createdAt));
 		}),
+
+	/** One agent with what its page shows: the channels it is in and its recent turns. */
+	get: protectedProcedure.input(agentIdSchema).query(async ({ ctx, input }) => {
+		const { agent, canManage } = await loadAgentAccess(
+			ctx.session.user.id,
+			input.agentId,
+		);
+		const [[row], grants, recentTurns] = await Promise.all([
+			db.select(listColumns).from(agents).where(eq(agents.id, agent.id)),
+			db
+				.select({ id: channels.id, name: channels.name })
+				.from(agentRelations)
+				.innerJoin(channels, eq(channels.id, agentRelations.objectId))
+				.where(
+					and(
+						eq(agentRelations.agentId, agent.id),
+						eq(agentRelations.objectType, "channel"),
+						isNull(channels.archivedAt),
+					),
+				)
+				.orderBy(asc(channels.name)),
+			db
+				.select({
+					id: agentTurns.id,
+					status: agentTurns.status,
+					reason: agentTurns.reason,
+					startedAt: agentTurns.startedAt,
+					settledAt: agentTurns.settledAt,
+				})
+				.from(agentTurns)
+				.where(eq(agentTurns.agentId, agent.id))
+				.orderBy(desc(agentTurns.startedAt))
+				.limit(10),
+		]);
+		if (!row) throw agentNotFound();
+		return {
+			...row,
+			instructions: agent.instructions,
+			model: agent.model,
+			canManage,
+			channels: grants,
+			recentTurns,
+		};
+	}),
 
 	create: protectedProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
-				name: z.string().trim().min(1).max(80),
+				name: nameSchema,
 				description: z.string().trim().max(500).nullish(),
+				avatar: avatarSchema.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertOrgAdmin(ctx.session.user.id, input.organizationId);
+			const membership = await findOrgMembership({
+				userId: ctx.session.user.id,
+				organizationId: input.organizationId,
+			});
+			if (!membership) throw agentNotFound();
 			const [agent] = await db
 				.insert(agents)
 				.values({
 					organizationId: input.organizationId,
 					name: input.name,
 					description: input.description ?? null,
+					avatar: input.avatar ?? randomDevAvatar(),
 					createdByUserId: ctx.session.user.id,
 				})
 				.returning();
 			if (!agent) throw agentNotFound();
 			return agent;
+		}),
+
+	update: protectedProcedure
+		.input(
+			agentIdSchema.extend({
+				name: nameSchema.optional(),
+				description: z.string().trim().max(500).nullish(),
+				avatar: avatarSchema.optional(),
+				instructions: z.string().max(8000).nullish(),
+				model: z.string().max(100).nullish(),
+				messageAccess: z.enum(["organization", "creator"]).optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input: { agentId, ...changes } }) => {
+			const agent = await loadManagedAgent(ctx.session.user.id, agentId);
+			const [updated] = await db
+				.update(agents)
+				.set(changes)
+				.where(eq(agents.id, agent.id))
+				.returning({ id: agents.id });
+			if (!updated) throw agentNotFound();
+			return updated;
+		}),
+
+	/** A paused agent starts no turns until it is resumed. */
+	pause: protectedProcedure
+		.input(agentIdSchema)
+		.mutation(async ({ ctx, input }) => {
+			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
+			await db
+				.update(agents)
+				.set({ pausedAt: new Date() })
+				.where(and(eq(agents.id, agent.id), isNull(agents.pausedAt)));
+			return { paused: true };
+		}),
+
+	resume: protectedProcedure
+		.input(agentIdSchema)
+		.mutation(async ({ ctx, input }) => {
+			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
+			await db
+				.update(agents)
+				.set({ pausedAt: null })
+				.where(eq(agents.id, agent.id));
+			return { paused: false };
 		}),
 
 	/** Revokes everything at once: Melange stops seeing an archived agent's grants. */
@@ -142,106 +268,34 @@ export const agentRouter = {
 		.input(agentIdSchema.extend({ promptId: z.string().min(1).max(200) }))
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const [agent] = await db
-				.select()
-				.from(agents)
-				.where(and(eq(agents.id, input.agentId), isNull(agents.archivedAt)))
-				.limit(1);
-			if (!agent) throw agentNotFound();
-			const membership = await findOrgMembership({
-				userId,
-				organizationId: agent.organizationId,
-			});
-			if (!membership) throw agentNotFound();
-
-			const place = {
-				organizationId: agent.organizationId,
-				agentId: agent.id,
-				kind: "dm" as const,
-				userId,
-			};
-			await db.insert(agentSessions).values(place).onConflictDoNothing();
-			const [session] = await db
-				.select({ id: agentSessions.id })
-				.from(agentSessions)
-				.where(
-					and(
-						eq(agentSessions.agentId, agent.id),
-						eq(agentSessions.kind, "dm"),
-						eq(agentSessions.userId, userId),
-						isNull(agentSessions.channelId),
-						isNull(agentSessions.threadRootId),
-					),
-				)
-				.limit(1);
-			if (!session) throw agentNotFound();
-
-			const promptId = input.promptId;
-			for (let attempt = 0; attempt < 3; attempt++) {
-				const [duplicate] = await db
-					.select({ id: agentTurns.id })
-					.from(agentTurns)
-					.where(
-						and(
-							eq(agentTurns.sessionId, session.id),
-							or(
-								eq(agentTurns.promptId, promptId),
-								sql`${promptId} = any(${agentTurns.steerPromptIds})`,
-							),
-						),
-					)
-					.limit(1);
-				if (duplicate) {
-					return {
-						sessionId: session.id,
-						turnId: duplicate.id,
-						outcome: "duplicate" as const,
-					};
-				}
-				const [started] = await db
-					.insert(agentTurns)
-					.values({
-						organizationId: agent.organizationId,
-						agentId: agent.id,
-						sessionId: session.id,
-						reason: "direct_message",
-						actingUserId: userId,
-						promptId,
-					})
-					.onConflictDoNothing()
-					.returning({ id: agentTurns.id });
-				if (started) {
-					return {
-						sessionId: session.id,
-						turnId: started.id,
-						outcome: "started" as const,
-					};
-				}
-				const [joined] = await db
-					.update(agentTurns)
-					.set({
-						steerPromptIds: sql`array_append(${agentTurns.steerPromptIds}, ${promptId})`,
-					})
-					.where(
-						and(
-							eq(agentTurns.sessionId, session.id),
-							eq(agentTurns.status, "running"),
-							sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
-						),
-					)
-					.returning({
-						id: agentTurns.id,
-						steers: sql<number>`cardinality(${agentTurns.steerPromptIds})`,
-					});
-				if (joined) {
-					return {
-						sessionId: session.id,
-						turnId: joined.id,
-						outcome: "joined" as const,
-						steerSeq: joined.steers,
-					};
-				}
+			const { agent } = await loadAgentAccess(userId, input.agentId);
+			if (agent.pausedAt) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message: "This agent is paused",
+					i18nKey: "serverError.agent.paused",
+				});
 			}
-			throw agentNotFound();
+
+			const { sessionId } = await ensureDirectMessage(agent, userId);
+			const turn = await startOrJoinTurn({
+				agent,
+				sessionId,
+				actingUserId: userId,
+				promptId: input.promptId,
+				reason: "direct_message",
+			});
+			return { sessionId, ...turn };
+		}),
+
+	/** The caller's DM room with a Dev, made on first open. */
+	openDirectMessage: protectedProcedure
+		.input(agentIdSchema)
+		.mutation(async ({ ctx, input }) => {
+			const { agent } = await loadAgentAccess(
+				ctx.session.user.id,
+				input.agentId,
+			);
+			return ensureDirectMessage(agent, ctx.session.user.id);
 		}),
 } satisfies TRPCRouterRecord;

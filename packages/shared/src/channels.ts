@@ -38,6 +38,7 @@ export interface ChannelMessageWire {
 	seq: number;
 	threadRootId: string | null;
 	authorUserId: string | null;
+	authorAgentId: string | null;
 	body: string;
 	mentionedUserIds: string[];
 	clientId: string | null;

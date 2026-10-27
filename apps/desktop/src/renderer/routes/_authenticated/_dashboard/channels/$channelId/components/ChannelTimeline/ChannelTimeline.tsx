@@ -1,5 +1,6 @@
 import type { RouterOutputs } from "@superset/trpc";
 import {
+	type ReactNode,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -56,6 +57,7 @@ interface ChannelTimelineProps {
 	canReact: boolean;
 	now: Date;
 	onOpenThread: (message: ChannelMessage) => void;
+	intro?: ReactNode;
 }
 
 export function ChannelTimeline({
@@ -77,6 +79,7 @@ export function ChannelTimeline({
 	canReact,
 	now,
 	onOpenThread,
+	intro,
 }: ChannelTimelineProps) {
 	const query = cloudTrpc.channelMessage.list.useInfiniteQuery(
 		{ channelId },
@@ -421,7 +424,8 @@ export function ChannelTimeline({
 						{isFetchingNextPage && <LuLoader className="size-4 animate-spin" />}
 					</div>
 				) : (
-					query.data && (
+					query.data &&
+					(intro ?? (
 						<ChannelIntro
 							channel={channel}
 							creator={
@@ -434,7 +438,7 @@ export function ChannelTimeline({
 							onEditDescription={onEditDescription}
 							onRename={onRename}
 						/>
-					)
+					))
 				)}
 				{entries.map((entry) => {
 					if (entry.kind === "day") {

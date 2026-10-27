@@ -1634,6 +1634,9 @@ msgstr "以該分支建立新工作區，並將對話交給新的代理"
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "頁面可以保存每位讀者的答案，所以不需要後端就能做投票。"
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "已暫停的 Dev 不會開始任何工作。它的聊天仍保持開啟。"
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "一道實用的 TypeScript 題目，和我們每天解決的問題類似。不考演算法謎題。"
 
@@ -1709,6 +1712,9 @@ msgstr "接受邀請"
 
 msgid "Accept terms"
 msgstr "接受條款"
+
+msgid "Access"
+msgstr "存取權限"
 
 msgid "Access denied"
 msgstr "存取遭拒"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "歸檔"
 
+msgid "Archive {name}?"
+msgstr "要封存 {name} 嗎？"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "封存 #{0}？"
 
 msgid "Archive channel"
 msgstr "封存頻道"
+
+msgid "Archive Dev"
+msgstr "封存 Dev"
 
 msgid "Archive environment"
 msgstr "封存環境"
@@ -3801,6 +3813,9 @@ msgstr "頻道選項"
 
 msgid "Channels"
 msgstr "頻道"
+
+msgid "Channels it can read and post in"
+msgstr "可以閱讀和發文的頻道"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "當購買的 GB 小時不足時，從已儲存的卡扣款購買更多 GB 小時。"
@@ -5615,6 +5630,9 @@ msgstr "無法儲存編輯"
 msgid "Couldn't save the change"
 msgstr "無法儲存變更"
 
+msgid "Couldn't save the Dev"
+msgstr "無法儲存 Dev"
+
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
 
@@ -5704,6 +5722,9 @@ msgstr "建立「{newLabel}」"
 
 msgid "Create a channel"
 msgstr "建立頻道"
+
+msgid "Create a Dev"
+msgstr "建立 Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "在供應商端建立具有相同對話上下文的原生分支。原本的會話維持不變。"
@@ -5868,6 +5889,9 @@ msgstr "創建於{0} · 最後使用{1}"
 msgid "Created {ago}"
 msgstr "建立於{ago}"
 
+msgid "Created {created}"
+msgstr "建立於 {created}"
+
 msgid "Created {createdAgo}"
 msgstr "建立於{createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "自訂提供商"
 
 msgid "Custom themes"
 msgstr "自訂主題"
+
+msgid "Customize"
+msgstr "自訂"
+
+msgid "Customize {devName}"
+msgstr "自訂 {devName}"
 
 msgid "Customize commands"
 msgstr "自訂命令"
@@ -6465,6 +6495,12 @@ msgstr "此處無法顯示詳細資料，但連結仍可開啟。"
 msgid "Dev"
 msgstr "開發"
 
+msgid "Dev details"
+msgstr "Dev 詳細資料"
+
+msgid "Dev options"
+msgstr "Dev 選項"
+
 msgid "Dev sign in"
 msgstr "開發登入"
 
@@ -6491,6 +6527,9 @@ msgstr "裝置：{selectedLabel}"
 
 msgid "Devices"
 msgstr "裝置"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "在新分頁看差異"
 
 msgid "Digital Product Designer"
 msgstr "數位產品設計師"
+
+msgid "Direct message"
+msgstr "私人訊息"
 
 msgid "Direct mode"
 msgstr "直接模式"
@@ -7394,6 +7436,9 @@ msgstr "極高"
 
 msgid "Extra small"
 msgstr "超小"
+
+msgid "Eyes"
+msgstr "眼睛"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4關卡 · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "刪除後無法復原。"
 msgid "It keeps the title from your prompt."
 msgstr "將保留根據你的提示產生的標題。"
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "它會立即失去所有存取權限。它的聊天和產出的工作會保留。"
+
 msgid "It may be asleep"
 msgstr "裝置可能處於睡眠狀態"
 
@@ -10392,6 +10440,9 @@ msgstr "長週期可靠性越過了一個門檻。傍晚6點派出去的活兒�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "長時間懸停才出現、只顯示快速鍵的tooltip；它的chip樣式現在是TooltipContent的預設樣式"
 
+msgid "Look"
+msgstr "外觀"
+
 msgid "Looking at {what}"
 msgstr "正在查看 {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "記憶體佔比"
 msgid "Mention."
 msgstr "提及。"
 
+msgid "Mentioned in a channel"
+msgstr "在頻道中被提及"
+
 msgid "Menubar"
 msgstr "選單欄"
 
@@ -10744,6 +10798,9 @@ msgstr "正在合併…"
 
 msgid "Mesh Gradient"
 msgstr "網格漸變"
+
+msgid "Message {name}"
+msgstr "傳訊息給 {name}"
 
 msgid "Message {name}…"
 msgstr "傳訊息給 {name}…"
@@ -11917,6 +11974,9 @@ msgstr "還沒有版本"
 msgid "No versions yet."
 msgstr "還沒有任何版本。"
 
+msgid "No work yet"
+msgstr "還沒有工作"
+
 msgid "No workspace run command configured"
 msgstr "未配置工作區執行命令"
 
@@ -11961,6 +12021,9 @@ msgstr "沒有人因此改變審查方式。"
 
 msgid "None"
 msgstr "無"
+
+msgid "None yet"
+msgstr "尚無"
 
 msgid "None. This is the floor."
 msgstr "沒有。這是起點。"
@@ -12279,11 +12342,14 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
 
+msgid "Only its creator"
+msgstr "僅建立者"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "只有建立者或組織管理員可以變更此代理程式"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "僅限本機：會被 git 忽略，並套用至此儲存庫的每個 worktree。在此設定的任何鍵都會取代共享的值。"
-
-msgid "Only organization admins can manage agents"
-msgstr "只有組織管理員可以管理代理程式"
 
 msgid "Only organization owners can modify these settings."
 msgstr "只有組織擁有者可以修改這些設定。"
@@ -13524,6 +13590,9 @@ msgstr "在{hostName}上選擇worktree資料夾。"
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "選擇你的代理程式獲取一行安裝命令，或者手動複製配置。所有客戶端（含OAuth和API金鑰設定）都在<0>完整的MCP伺服器文件</0>裡。"
+
+msgid "Picked by the channel"
+msgstr "由頻道選中"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "shadcn/ui的tooltip方案"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "深淺以該開發者最忙的一天為基準"
 
+msgid "Shape"
+msgstr "形狀"
+
 msgid "Share"
 msgstr "分享"
 
@@ -17428,6 +17500,9 @@ msgstr "未配置支援請求速率限制"
 msgid "Support the project with a GitHub star"
 msgstr "在GitHub上點個star來支援這個專案"
 
+msgid "Surprise me"
+msgstr "隨機一下"
+
 msgid "Suspended"
 msgstr "已暫停"
 
@@ -18305,6 +18380,9 @@ msgstr "此代理無法分叉對話"
 msgid "This agent can't run in a cloud workspace"
 msgstr "此代理程式無法在雲端工作區中執行"
 
+msgid "This agent is paused"
+msgstr "此代理程式已暫停"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"
 
@@ -18687,6 +18765,9 @@ msgstr "討論串"
 
 msgid "Thread not found"
 msgstr "未找到討論串"
+
+msgid "Thread reply"
+msgstr "討論串回覆"
 
 msgid "Threads"
 msgstr "討論串"
@@ -19981,6 +20062,9 @@ msgstr "什麼是Paradev Enterprise？"
 msgid "What is wrong?"
 msgstr "哪裡有問題？"
 
+msgid "What it does"
+msgstr "它做什麼"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Paradev 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
 
@@ -20086,6 +20170,9 @@ msgstr "支援哪些AI編碼代理程式？"
 msgid "Which plans include automations?"
 msgstr "哪些方案包含自動化？"
 
+msgid "Who can message it"
+msgstr "誰可以傳訊息給它"
+
 msgid "Who can open it"
 msgstr "誰可以開啟"
 
@@ -20122,11 +20209,17 @@ msgstr "有無附件均可"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "有了 Paradev 手機應用程式，我可以隨時隨地處理正式環境問題。"
 
+msgid "Woke itself"
+msgstr "自行喚醒"
+
 msgid "Wordmark, black"
 msgstr "文字標誌，黑色"
 
 msgid "Wordmark, white"
 msgstr "文字標誌，白色"
+
+msgid "Work"
+msgstr "工作"
 
 msgid "Work email"
 msgstr "工作電子郵件"

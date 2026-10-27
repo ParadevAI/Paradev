@@ -393,6 +393,10 @@
 			"types": "./src/channels.ts",
 			"default": "./src/channels.ts"
 		},
+		"./dev-avatar": {
+			"types": "./src/dev-avatar.ts",
+			"default": "./src/dev-avatar.ts"
+		},
 		"./org-presence": {
 			"types": "./src/org-presence.ts",
 			"default": "./src/org-presence.ts"

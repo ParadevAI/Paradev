@@ -1634,6 +1634,9 @@ msgstr "Bu daldan yeni bir çalışma alanı; konuşma yeni bir aracıya devredi
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Bir sayfa her okuyucunun yanıtını kaydedebilir, böylece anket arka uç olmadan çalışır."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Duraklatılmış bir Dev iş başlatmaz. Sohbetleri açık kalır."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Her gün çözdüklerimize benzer, pratik bir TypeScript problemi. Algoritma bulmacası yok."
 
@@ -1709,6 +1712,9 @@ msgstr "Daveti kabul et"
 
 msgid "Accept terms"
 msgstr "Koşulları kabul et"
+
+msgid "Access"
+msgstr "Erişim"
 
 msgid "Access denied"
 msgstr "Erişim reddedildi"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Arşivle"
 
+msgid "Archive {name}?"
+msgstr "{name} arşivlensin mi?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "#{0} arşivlensin mi?"
 
 msgid "Archive channel"
 msgstr "Kanalı arşivle"
+
+msgid "Archive Dev"
+msgstr "Dev'i arşivle"
 
 msgid "Archive environment"
 msgstr "Ortamı arşivle"
@@ -3801,6 +3813,9 @@ msgstr "Kanal seçenekleri"
 
 msgid "Channels"
 msgstr "Kanallar"
+
+msgid "Channels it can read and post in"
+msgstr "Okuyup paylaşım yapabildiği kanallar"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Satın alınan GB-saatler azaldığında kayıtlı kartınızdan daha fazla GB-saat için ücret alır."
@@ -5615,6 +5630,9 @@ msgstr "Düzenlemeler kaydedilemedi"
 msgid "Couldn't save the change"
 msgstr "Değişiklik kaydedilemedi"
 
+msgid "Couldn't save the Dev"
+msgstr "Dev kaydedilemedi"
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 
@@ -5704,6 +5722,9 @@ msgstr "\"{newLabel}\" oluştur"
 
 msgid "Create a channel"
 msgstr "Kanal oluştur"
+
+msgid "Create a Dev"
+msgstr "Dev oluştur"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Sağlayıcıda aynı konuşma bağlamına sahip yerel bir fork oluşturur. Özgün oturum değişmeden kalır."
@@ -5868,6 +5889,9 @@ msgstr "Oluşturulma {0} · Son kullanım {1}"
 msgid "Created {ago}"
 msgstr "{ago} oluşturuldu"
 
+msgid "Created {created}"
+msgstr "{created} tarihinde oluşturuldu"
+
 msgid "Created {createdAgo}"
 msgstr "{createdAgo} oluşturuldu"
 
@@ -6031,6 +6055,12 @@ msgstr "Özel sağlayıcı"
 
 msgid "Custom themes"
 msgstr "Özel temalar"
+
+msgid "Customize"
+msgstr "Özelleştir"
+
+msgid "Customize {devName}"
+msgstr "{devName} öğesini özelleştir"
 
 msgid "Customize commands"
 msgstr "Komutları özelleştir"
@@ -6465,6 +6495,12 @@ msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açıl
 msgid "Dev"
 msgstr "Geliştirme"
 
+msgid "Dev details"
+msgstr "Dev ayrıntıları"
+
+msgid "Dev options"
+msgstr "Dev seçenekleri"
+
 msgid "Dev sign in"
 msgstr "Dev oturum açma"
 
@@ -6491,6 +6527,9 @@ msgstr "Cihaz: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Cihazlar"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "yeni sekmede fark"
 
 msgid "Digital Product Designer"
 msgstr "Dijital Ürün Tasarımcısı"
+
+msgid "Direct message"
+msgstr "Doğrudan mesaj"
 
 msgid "Direct mode"
 msgstr "Doğrudan mod"
@@ -7394,6 +7436,9 @@ msgstr "Çok yüksek"
 
 msgid "Extra small"
 msgstr "Çok küçük"
+
+msgid "Eyes"
+msgstr "Gözler"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4 eşiği · %{F4_GATE_SHARE}"
@@ -9576,6 +9621,9 @@ msgstr "Geri getirilemez."
 msgid "It keeps the title from your prompt."
 msgstr "İsteminizdeki başlık korunur."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Tüm erişimini hemen kaybeder. Sohbetleri ve yaptığı işler korunur."
+
 msgid "It may be asleep"
 msgstr "Uykuda olabilir"
 
@@ -10392,6 +10440,9 @@ msgstr "Uzun vadeli güvenilirlik bir eşiği aşar. Akşam 18.00'de verilen iş
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Uzun bekletmede yalnızca kısayol gösteren tooltip; çip stili artık TooltipContent varsayılanı"
 
+msgid "Look"
+msgstr "Görünüm"
+
 msgid "Looking at {what}"
 msgstr "{what} inceleniyor"
 
@@ -10684,6 +10735,9 @@ msgstr "Bellek payı"
 msgid "Mention."
 msgstr "Anın."
 
+msgid "Mentioned in a channel"
+msgstr "Bir kanalda bahsedildi"
+
 msgid "Menubar"
 msgstr "Menü çubuğu"
 
@@ -10744,6 +10798,9 @@ msgstr "Birleştiriliyor…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh gradyanı"
+
+msgid "Message {name}"
+msgstr "{name} adlı kişiye mesaj gönder"
 
 msgid "Message {name}…"
 msgstr "Mesaj gönder: {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Henüz sürüm yok"
 msgid "No versions yet."
 msgstr "Henüz sürüm yok."
 
+msgid "No work yet"
+msgstr "Henüz iş yok"
+
 msgid "No workspace run command configured"
 msgstr "Yapılandırılmış çalışma alanı çalıştırma komutu yok"
 
@@ -11961,6 +12021,9 @@ msgstr "Kimse bu yüzden farklı inceleme yapmaz."
 
 msgid "None"
 msgstr "Yok"
+
+msgid "None yet"
+msgstr "Henüz yok"
 
 msgid "None. This is the floor."
 msgstr "Yok. Bu, taban düzeydir."
@@ -12279,11 +12342,14 @@ msgstr "Bu host'u yalnızca host sahipleri veya kuruluş sahipleri silebilir"
 msgid "Only images can be attached to a comment"
 msgstr "Bir yoruma yalnızca görsel eklenebilir"
 
+msgid "Only its creator"
+msgstr "Yalnızca oluşturan kişi"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi değiştirebilir"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Yalnızca bu makinede: git tarafından yok sayılır ve bu deponun her worktree'sine uygulanır. Burada ayarlanan her anahtar paylaşılanın yerini alır."
-
-msgid "Only organization admins can manage agents"
-msgstr "Ajanları yalnızca kuruluş yöneticileri yönetebilir"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Bu ayarları yalnızca kuruluş sahipleri değiştirebilir."
@@ -13524,6 +13590,9 @@ msgstr "{hostName} üzerindeki worktree klasörünü seçin."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Tek satırlık kurulum için ajanınızı seçin veya yapılandırmayı elle kopyalayın. OAuth ve API anahtarı kurulumu dahil her istemci, <0>tam MCP sunucusu belgelerinde</0> anlatılıyor."
+
+msgid "Picked by the channel"
+msgstr "Kanal tarafından seçildi"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "shadcn/ui tooltip tarifi"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Renk koyuluğu bu geliştiricinin en yoğun gününe göredir"
 
+msgid "Shape"
+msgstr "Şekil"
+
 msgid "Share"
 msgstr "Paylaş"
 
@@ -17428,6 +17500,9 @@ msgstr "Destek hız sınırlaması yapılandırılmamış"
 msgid "Support the project with a GitHub star"
 msgstr "Projeyi bir GitHub yıldızıyla destekleyin"
 
+msgid "Surprise me"
+msgstr "Şaşırt beni"
+
 msgid "Suspended"
 msgstr "Askıya alındı"
 
@@ -18305,6 +18380,9 @@ msgstr "Bu aracı bir konuşmayı çatallayamaz"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Bu ajan bir bulut çalışma alanında çalışamaz"
 
+msgid "This agent is paused"
+msgstr "Bu ajan duraklatıldı"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir). Yeni bir tane seçene kadar çalıştırmalar başarısız olacak."
 
@@ -18687,6 +18765,9 @@ msgstr "Konu"
 
 msgid "Thread not found"
 msgstr "Konu bulunamadı"
+
+msgid "Thread reply"
+msgstr "Konu yanıtı"
 
 msgid "Threads"
 msgstr "Konular"
@@ -19981,6 +20062,9 @@ msgstr "Paradev Enterprise nedir?"
 msgid "What is wrong?"
 msgstr "Sorun nedir?"
 
+msgid "What it does"
+msgstr "Ne yapar"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Paradev nedir, kimler geliştiriyor ve kimler için. Paralel kodlama ajanları için çalışma alanını geliştiren, üç eski YC CTO'sunun liderliğindeki bir San Francisco ekibi."
 
@@ -20086,6 +20170,9 @@ msgstr "Hangi AI kodlama ajanları destekleniyor?"
 msgid "Which plans include automations?"
 msgstr "Hangi planlar otomasyonları içerir?"
 
+msgid "Who can message it"
+msgstr "Kimler mesaj gönderebilir"
+
 msgid "Who can open it"
 msgstr "Kimler açabilir"
 
@@ -20122,11 +20209,17 @@ msgstr "ekli veya eksiz"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Paradev mobil uygulamasıyla üretim ortamındaki sorunlara her yerden müdahale edebiliyorum."
 
+msgid "Woke itself"
+msgstr "Kendi uyandı"
+
 msgid "Wordmark, black"
 msgstr "Yazı logosu, siyah"
 
 msgid "Wordmark, white"
 msgstr "Yazı logosu, beyaz"
+
+msgid "Work"
+msgstr "İş"
 
 msgid "Work email"
 msgstr "İş e-postası"

@@ -12,22 +12,22 @@ export const agentNotFound = () =>
 		i18nKey: "serverError.agent.notFound",
 	});
 
-export async function assertOrgAdmin(userId: string, organizationId: string) {
-	const membership = await findOrgMembership({ userId, organizationId });
-	if (!membership || !isOrgAdmin(membership.role)) {
-		throw userError({
-			code: "FORBIDDEN",
-			message: "Only organization admins can manage agents",
-			i18nKey: "serverError.agent.adminRequired",
-		});
-	}
+export interface AgentAccess {
+	agent: SelectAgent;
+	canManage: boolean;
 }
 
-/** A live agent in an org the caller administers; anything else reads as not found. */
-export async function loadManagedAgent(
+export function canSeeAgent(agent: SelectAgent, userId: string): boolean {
+	return (
+		agent.messageAccess === "organization" || agent.createdByUserId === userId
+	);
+}
+
+/** A live agent the caller may see; anything else reads as not found. */
+export async function loadAgentAccess(
 	userId: string,
 	agentId: string,
-): Promise<SelectAgent> {
+): Promise<AgentAccess> {
 	const [agent] = await db
 		.select()
 		.from(agents)
@@ -38,7 +38,26 @@ export async function loadManagedAgent(
 		userId,
 		organizationId: agent.organizationId,
 	});
-	if (!membership) throw agentNotFound();
-	await assertOrgAdmin(userId, agent.organizationId);
+	if (!membership || !canSeeAgent(agent, userId)) throw agentNotFound();
+	return {
+		agent,
+		canManage: agent.createdByUserId === userId || isOrgAdmin(membership.role),
+	};
+}
+
+/** Its creator or an org admin may change an agent. */
+export async function loadManagedAgent(
+	userId: string,
+	agentId: string,
+): Promise<SelectAgent> {
+	const { agent, canManage } = await loadAgentAccess(userId, agentId);
+	if (!canManage) {
+		throw userError({
+			code: "FORBIDDEN",
+			message:
+				"Only its creator or an organization admin can change this agent",
+			i18nKey: "serverError.agent.adminRequired",
+		});
+	}
 	return agent;
 }

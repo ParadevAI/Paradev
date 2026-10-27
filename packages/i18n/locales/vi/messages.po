@@ -1634,6 +1634,9 @@ msgstr "Một workspace mới từ nhánh này, hội thoại được bàn giao
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Một trang có thể lưu câu trả lời của từng người đọc, nên cuộc khảo sát chạy được mà không cần backend."
 
+msgid "A paused Dev starts no work. Its chats stay open."
+msgstr "Dev bị tạm dừng sẽ không bắt đầu việc gì. Các cuộc trò chuyện vẫn mở."
+
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Một bài toán TypeScript thực tế, giống những gì chúng tôi giải quyết hằng ngày. Không có câu đố thuật toán."
 
@@ -1709,6 +1712,9 @@ msgstr "Chấp nhận lời mời"
 
 msgid "Accept terms"
 msgstr "Chấp nhận điều khoản"
+
+msgid "Access"
+msgstr "Quyền truy cập"
 
 msgid "Access denied"
 msgstr "Truy cập bị từ chối"
@@ -2711,12 +2717,18 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Lưu trữ"
 
+msgid "Archive {name}?"
+msgstr "Lưu trữ {name}?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "Lưu trữ #{0}?"
 
 msgid "Archive channel"
 msgstr "Lưu trữ kênh"
+
+msgid "Archive Dev"
+msgstr "Lưu trữ Dev"
 
 msgid "Archive environment"
 msgstr "Lưu trữ environment"
@@ -3801,6 +3813,9 @@ msgstr "Tùy chọn kênh"
 
 msgid "Channels"
 msgstr "Kênh"
+
+msgid "Channels it can read and post in"
+msgstr "Các kênh có thể đọc và đăng bài"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ đã mua sắp hết."
@@ -5615,6 +5630,9 @@ msgstr "Không thể lưu chỉnh sửa"
 msgid "Couldn't save the change"
 msgstr "Không thể lưu thay đổi"
 
+msgid "Couldn't save the Dev"
+msgstr "Không thể lưu Dev"
+
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
 
@@ -5704,6 +5722,9 @@ msgstr "Tạo \"{newLabel}\""
 
 msgid "Create a channel"
 msgstr "Tạo kênh"
+
+msgid "Create a Dev"
+msgstr "Tạo Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Tạo một bản fork gốc ở nhà cung cấp với cùng ngữ cảnh hội thoại. Phiên ban đầu giữ nguyên."
@@ -5868,6 +5889,9 @@ msgstr "Tạo {0} · Dùng lần cuối {1}"
 msgid "Created {ago}"
 msgstr "Đã tạo {ago}"
 
+msgid "Created {created}"
+msgstr "Tạo ngày {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Đã tạo {createdAgo}"
 
@@ -6031,6 +6055,12 @@ msgstr "Nhà cung cấp tùy chỉnh"
 
 msgid "Custom themes"
 msgstr "Theme tùy chỉnh"
+
+msgid "Customize"
+msgstr "Tùy chỉnh"
+
+msgid "Customize {devName}"
+msgstr "Tùy chỉnh {devName}"
 
 msgid "Customize commands"
 msgstr "Tùy chỉnh lệnh"
@@ -6465,6 +6495,12 @@ msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được.
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev details"
+msgstr "Chi tiết Dev"
+
+msgid "Dev options"
+msgstr "Tùy chọn Dev"
+
 msgid "Dev sign in"
 msgstr "Đăng nhập dev"
 
@@ -6491,6 +6527,9 @@ msgstr "Thiết bị: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Thiết bị"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6536,6 +6575,9 @@ msgstr "diff ở tab mới"
 
 msgid "Digital Product Designer"
 msgstr "Nhà thiết kế sản phẩm số"
+
+msgid "Direct message"
+msgstr "Tin nhắn trực tiếp"
 
 msgid "Direct mode"
 msgstr "Chế độ trực tiếp"
@@ -7394,6 +7436,9 @@ msgstr "Rất cao"
 
 msgid "Extra small"
 msgstr "Rất nhỏ"
+
+msgid "Eyes"
+msgstr "Mắt"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "Cổng F4 · {F4_GATE_SHARE}%"
@@ -9576,6 +9621,9 @@ msgstr "Không thể khôi phục."
 msgid "It keeps the title from your prompt."
 msgstr "Tiêu đề từ lời nhắc của bạn sẽ được giữ nguyên."
 
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Nó mất toàn bộ quyền truy cập ngay lập tức. Các cuộc trò chuyện và công việc đã làm được giữ lại."
+
 msgid "It may be asleep"
 msgstr "Máy có thể đang ngủ"
 
@@ -10392,6 +10440,9 @@ msgstr "Độ tin cậy dài hạn vượt một ngưỡng. Việc giao lúc 6 g
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip chỉ hiện phím tắt khi di chuột lâu; kiểu chip của nó giờ là mặc định của TooltipContent"
 
+msgid "Look"
+msgstr "Diện mạo"
+
 msgid "Looking at {what}"
 msgstr "Đang xem {what}"
 
@@ -10684,6 +10735,9 @@ msgstr "Tỷ lệ bộ nhớ"
 msgid "Mention."
 msgstr "Nhắc đến."
 
+msgid "Mentioned in a channel"
+msgstr "Được nhắc đến trong kênh"
+
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -10744,6 +10798,9 @@ msgstr "Đang merge…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Nhắn tin cho {name}"
 
 msgid "Message {name}…"
 msgstr "Nhắn cho {name}…"
@@ -11917,6 +11974,9 @@ msgstr "Chưa có phiên bản nào"
 msgid "No versions yet."
 msgstr "Chưa có phiên bản nào."
 
+msgid "No work yet"
+msgstr "Chưa có công việc nào"
+
 msgid "No workspace run command configured"
 msgstr "Chưa cấu hình lệnh chạy cho workspace"
 
@@ -11961,6 +12021,9 @@ msgstr "Không ai review khác đi vì điều đó."
 
 msgid "None"
 msgstr "Không có"
+
+msgid "None yet"
+msgstr "Chưa có"
 
 msgid "None. This is the floor."
 msgstr "Không có. Đây là mức sàn."
@@ -12279,11 +12342,14 @@ msgstr "Chỉ chủ sở hữu host hoặc chủ sở hữu tổ chức mới x�
 msgid "Only images can be attached to a comment"
 msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
 
+msgid "Only its creator"
+msgstr "Chỉ người tạo"
+
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Chỉ người tạo hoặc quản trị viên tổ chức mới có thể thay đổi agent này"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Chỉ trên máy này: được git bỏ qua và áp dụng cho mọi worktree của repository này. Mọi khóa đặt ở đây sẽ thay thế khóa dùng chung."
-
-msgid "Only organization admins can manage agents"
-msgstr "Chỉ quản trị viên tổ chức mới có thể quản lý agent"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Chỉ chủ sở hữu tổ chức mới sửa được các cài đặt này."
@@ -13524,6 +13590,9 @@ msgstr "Chọn thư mục worktree trên {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Chọn agent của bạn để cài bằng một dòng lệnh, hoặc tự sao chép cấu hình. Mọi client, kể cả thiết lập OAuth và khóa API, đều có trong <0>tài liệu đầy đủ về server MCP</0>."
+
+msgid "Picked by the channel"
+msgstr "Được kênh chọn"
 
 msgid "PID"
 msgstr "PID"
@@ -16308,6 +16377,9 @@ msgstr "Công thức tooltip của shadcn/ui"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "Độ đậm được tính theo ngày bận rộn nhất của nhà phát triển này"
 
+msgid "Shape"
+msgstr "Hình dạng"
+
 msgid "Share"
 msgstr "Chia sẻ"
 
@@ -17428,6 +17500,9 @@ msgstr "Chưa cấu hình giới hạn tần suất hỗ trợ"
 msgid "Support the project with a GitHub star"
 msgstr "Ủng hộ dự án bằng một sao trên GitHub"
 
+msgid "Surprise me"
+msgstr "Chọn ngẫu nhiên"
+
 msgid "Suspended"
 msgstr "Tạm ngưng"
 
@@ -18305,6 +18380,9 @@ msgstr "Tác nhân này không thể tạo nhánh hội thoại"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agent này không thể chạy trong workspace cloud"
 
+msgid "This agent is paused"
+msgstr "Agent này đang tạm dừng"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."
 
@@ -18687,6 +18765,9 @@ msgstr "Chuỗi"
 
 msgid "Thread not found"
 msgstr "Không tìm thấy luồng"
+
+msgid "Thread reply"
+msgstr "Trả lời trong luồng"
 
 msgid "Threads"
 msgstr "Chuỗi"
@@ -19981,6 +20062,9 @@ msgstr "Paradev Enterprise là gì?"
 msgid "What is wrong?"
 msgstr "Vấn đề là gì?"
 
+msgid "What it does"
+msgstr "Nhiệm vụ"
+
 msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Paradev là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng workspace cho các agent lập trình song song."
 
@@ -20086,6 +20170,9 @@ msgstr "Những coding agent AI nào được hỗ trợ?"
 msgid "Which plans include automations?"
 msgstr "Gói nào có automation?"
 
+msgid "Who can message it"
+msgstr "Ai có thể nhắn tin"
+
 msgid "Who can open it"
 msgstr "Ai có thể mở"
 
@@ -20122,11 +20209,17 @@ msgstr "có hoặc không có tệp đính kèm"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Với ứng dụng di động Paradev, tôi có thể xử lý sự cố trên môi trường production từ bất cứ đâu."
 
+msgid "Woke itself"
+msgstr "Tự thức dậy"
+
 msgid "Wordmark, black"
 msgstr "Wordmark, đen"
 
 msgid "Wordmark, white"
 msgstr "Wordmark, trắng"
+
+msgid "Work"
+msgstr "Công việc"
 
 msgid "Work email"
 msgstr "Email công việc"
