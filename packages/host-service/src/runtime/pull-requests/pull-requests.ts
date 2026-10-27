@@ -78,6 +78,7 @@ const REPO_PULL_REQUEST_CACHE_TTL_MS = 60_000;
 // not respawn `gh` at full cadence forever: each consecutive failure doubles
 // the effective TTL of the cached rejection, capped here.
 const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
+const CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS = 24 * 60 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
@@ -221,6 +222,14 @@ interface PullRequestDetails {
 	isInMergeQueue: boolean | null;
 }
 
+interface GitHubCacheEntry<T> {
+	promise: Promise<T>;
+	fetchedAt: number;
+	consecutiveFailures: number;
+	fingerprint?: string;
+	value?: T;
+}
+
 export class PullRequestRuntimeManager {
 	private readonly db: HostDb;
 	private readonly execGh: ExecGh;
@@ -246,19 +255,11 @@ export class PullRequestRuntimeManager {
 	>();
 	private readonly pullRequestHeadCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode[]>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		GitHubCacheEntry<GitHubPullRequestNode[]>
 	>();
 	private readonly pullRequestNumberCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode | null>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		GitHubCacheEntry<GitHubPullRequestNode | null>
 	>();
 	// Review decision, checks, and merge-queue state per PR head. These were
 	// the bulk of the runtime's GitHub traffic: four uncached calls per linked
@@ -266,20 +267,11 @@ export class PullRequestRuntimeManager {
 	// spends the user's hourly quota by itself (SUPER-2107).
 	private pullRequestDetailsCache = new Map<
 		string,
-		{
-			promise: Promise<PullRequestDetails>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-			fingerprint?: string;
-		}
+		GitHubCacheEntry<PullRequestDetails>
 	>();
 	private readonly openPullRequestsCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode[]>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		GitHubCacheEntry<GitHubPullRequestNode[]>
 	>();
 	private readonly readWorkspaceRefs: (
 		worktreePath: string,
@@ -1375,15 +1367,7 @@ export class PullRequestRuntimeManager {
 	// next TTL boundary instead. Gate-held calls are the exception: they never
 	// reached GitHub, and must retry as soon as another lookup restores access.
 	private cachedGitHubFetch<T>(
-		cache: Map<
-			string,
-			{
-				promise: Promise<T>;
-				fetchedAt: number;
-				consecutiveFailures: number;
-				fingerprint?: string;
-			}
-		>,
+		cache: Map<string, GitHubCacheEntry<T>>,
 		cacheKey: string,
 		options: { bypassCache?: boolean; fingerprint?: string },
 		fetcher: () => Promise<T>,
@@ -1408,7 +1392,7 @@ export class PullRequestRuntimeManager {
 
 		// Carry the failure streak forward so an in-flight retry keeps the
 		// backed-off TTL until it actually resolves.
-		const entry = {
+		const entry: GitHubCacheEntry<T> = {
 			promise: fetcher(),
 			fetchedAt: Date.now(),
 			consecutiveFailures: cached?.consecutiveFailures ?? 0,
@@ -1417,7 +1401,8 @@ export class PullRequestRuntimeManager {
 		// The rejection observer also silences unhandledRejection warnings;
 		// real consumers observe it via their own await on the cached promise.
 		entry.promise.then(
-			() => {
+			(value) => {
+				entry.value = value;
 				entry.consecutiveFailures = 0;
 			},
 			(error: unknown) => {
@@ -1482,10 +1467,20 @@ export class PullRequestRuntimeManager {
 		node: GitHubPullRequestNode,
 		options: { bypassCache?: boolean } = {},
 	): Promise<PullRequestDetails> {
-		// One entry per PR; the head SHA is its fingerprint, so a new push
-		// refetches at once while approvals and check runs on the same SHA
-		// ride the TTL.
+		// Retain completed terminal checks; pending checks and failed fetches still retry.
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${node.number}`;
+		const fingerprint = `${node.headRefOid}:${node.state}`;
+		const cached = this.pullRequestDetailsCache.get(cacheKey);
+		if (
+			!options.bypassCache &&
+			node.state !== "OPEN" &&
+			cached?.value &&
+			cached.fingerprint === fingerprint &&
+			parseCheckContexts(cached.value.checks).every(
+				(check) => check.status !== "pending",
+			)
+		)
+			return cached.promise;
 		const context = {
 			owner: repo.owner,
 			name: repo.name,
@@ -1494,7 +1489,7 @@ export class PullRequestRuntimeManager {
 		return this.cachedGitHubFetch(
 			this.pullRequestDetailsCache,
 			cacheKey,
-			{ ...options, fingerprint: node.headRefOid },
+			{ ...options, fingerprint },
 			async () => {
 				const [reviewDecision, checks] = await this.fetchFromGitHub(
 					"PR review/check lookup",
@@ -1799,7 +1794,14 @@ export class PullRequestRuntimeManager {
 		);
 		for (const row of linked.values()) {
 			if (refreshedIds.has(row.id)) continue;
-			if (!options.bypassCache && row.state === "merged") continue;
+			if (
+				!options.bypassCache &&
+				(row.state === "merged" ||
+					(row.state === "closed" &&
+						Date.now() - (row.lastFetchedAt ?? 0) <
+							CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS))
+			)
+				continue;
 			const repo = { ...projectRepo, owner: row.repoOwner, name: row.repoName };
 			try {
 				const node = await this.cachedGitHubFetch(

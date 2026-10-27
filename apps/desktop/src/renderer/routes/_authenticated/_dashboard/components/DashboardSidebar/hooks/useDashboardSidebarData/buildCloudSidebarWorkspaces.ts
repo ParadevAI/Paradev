@@ -7,6 +7,7 @@ import type {
 } from "@superset/shared/pull-request";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
+import { workspacePullRequests } from "renderer/lib/github/workspacePullRequests";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 import type {
 	DashboardSidebarWorkspace,
@@ -149,6 +150,10 @@ export function buildCloudSidebarWorkspaces({
 			name: getV2WorkspaceDisplayName({ name: workspace.name, branch }),
 			branch,
 			pullRequest: pullRequest ? toSidebarPullRequest(pullRequest) : null,
+			pullRequests: workspacePullRequests(
+				null,
+				pullRequestsById.get(workspace.id),
+			),
 			repoUrl: repoFullName ? `https://github.com/${repoFullName}` : null,
 			branchExistsOnRemote: repoFullName !== null,
 			previewUrl: null,
