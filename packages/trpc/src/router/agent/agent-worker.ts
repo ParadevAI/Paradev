@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import { agentSessions, agents, agentTurns } from "@superset/db/schema";
+import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -9,6 +10,7 @@ import {
 	TURN_TOKEN_TTL_SECONDS,
 } from "../../lib/agent-turn/turn-token";
 import { workerProcedure } from "../../trpc";
+import { resolveTurnHost } from "./turn-host";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
 const turnNotRunning = () =>
@@ -41,6 +43,55 @@ export const agentWorkerRouter = {
 			expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
 		};
 	}),
+
+	/** What a running turn may touch: its session log, its box, and the model as the box. */
+	turnCredentials: workerProcedure
+		.input(turnIdSchema)
+		.mutation(async ({ input }) => {
+			const [turn] = await db
+				.select({
+					sessionId: agentTurns.sessionId,
+					agentId: agentTurns.agentId,
+					organizationId: agentTurns.organizationId,
+					actingUserId: agentTurns.actingUserId,
+					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
+				})
+				.from(agentTurns)
+				.innerJoin(agents, eq(agents.id, agentTurns.agentId))
+				.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
+				.where(
+					and(
+						eq(agentTurns.id, input.turnId),
+						eq(agentTurns.status, "running"),
+						isNull(agents.archivedAt),
+					),
+				)
+				.limit(1);
+			if (!turn) throw turnNotRunning();
+			const access = turn.cloudWorkspaceId
+				? await resolveTurnHost({
+						...turn,
+						cloudWorkspaceId: turn.cloudWorkspaceId,
+					})
+				: null;
+			const sessionWriteTicket = await signAgentSessionTicket(
+				env.AGENT_SESSION_SECRET,
+				{
+					sessionId: turn.sessionId,
+					scope: "write",
+					exp: Math.floor(Date.now() / 1000) + TURN_TOKEN_TTL_SECONDS,
+				},
+			);
+			return {
+				sessionStore: {
+					baseUrl: env.REALTIME_URL,
+					writeTicket: sessionWriteTicket,
+				},
+				host: access?.host ?? null,
+				model: access ? { headers: access.modelHeaders } : null,
+				expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
+			};
+		}),
 
 	settleTurn: workerProcedure
 		.input(

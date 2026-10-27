@@ -1,0 +1,34 @@
+{
+	"name": "@superset/agent-worker",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "node --import tsx src/main.ts",
+		"test": "bun test --pass-with-no-tests",
+		"test:node": "node --import tsx --test src/workflows/agentSession/agentSession.node-test.ts",
+		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
+		"temporal:dev": "node --import tsx scripts/temporal-dev.ts",
+		"send": "bun run scripts/send.ts"
+	},
+	"dependencies": {
+		"@earendil-works/pi-agent-core": "1.4.0",
+		"@earendil-works/pi-ai": "1.4.0",
+		"@superset/agent-harness": "workspace:*",
+		"@superset/shared": "workspace:*",
+		"@temporalio/activity": "1.24.0",
+		"@temporalio/client": "1.24.0",
+		"@temporalio/common": "1.24.0",
+		"@temporalio/worker": "1.24.0",
+		"@temporalio/workflow": "1.24.0",
+		"superjson": "2.2.6"
+	},
+	"devDependencies": {
+		"@superset/typescript": "workspace:*",
+		"@temporalio/testing": "1.24.0",
+		"@types/node": "24.12.0",
+		"bun-types": "1.4.3",
+		"tsx": "4.21.0",
+		"typescript": "7.0.2"
+	}
+}

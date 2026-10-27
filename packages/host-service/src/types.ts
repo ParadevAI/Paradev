@@ -6,6 +6,7 @@ import type { HostDb } from "./db";
 import type { EventBus } from "./events";
 import type { PageWatchManager } from "./page-watch/index.ts";
 import type { ApiAuthProvider } from "./providers/auth/types";
+import type { AgentJobRunner } from "./runtime/agent-jobs";
 import type { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider, GitFactory } from "./runtime/git";
 import type { PullRequestRuntimeManager } from "./runtime/pull-requests";
@@ -20,6 +21,7 @@ export interface HostServiceRuntime {
 	pageWatch: PageWatchManager;
 	chat?: () => ChatRuntime;
 	closeChats?: (scopeId: string) => Promise<void>;
+	agentJobs?: AgentJobRunner;
 }
 
 export interface HostServiceContext {

@@ -1,3 +1,9 @@
+import {
+	interruptTurn,
+	MAX_PROMPT_CHARS,
+	startTurn,
+	steerTurn,
+} from "@superset/agent-harness/session";
 import { db, dbWs } from "@superset/db/client";
 import {
 	agentRelations,
@@ -6,9 +12,12 @@ import {
 	agentTurns,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
+import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { env } from "../../env";
+import { agentTemporal } from "../../lib/agent-runtime";
 import { protectedProcedure } from "../../trpc";
 import { channelNotFound, loadChannelAccess } from "../channel/access";
 import { agentNotFound, assertOrgAdmin, loadManagedAgent } from "./access";
@@ -138,8 +147,46 @@ export const agentRouter = {
 	 * A resent prompt changes nothing. Retries when the running turn settles
 	 * between the insert and the join.
 	 */
+	/** Where the person in a DM reads its live session log. */
+	sessionStream: protectedProcedure
+		.input(z.object({ sessionId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const session = await loadOwnSession(
+				ctx.session.user.id,
+				input.sessionId,
+			);
+			const expiresInSeconds = 15 * 60;
+			const ticket = await signAgentSessionTicket(env.AGENT_SESSION_SECRET, {
+				sessionId: session.id,
+				scope: "read",
+				userId: ctx.session.user.id,
+				exp: Math.floor(Date.now() / 1000) + expiresInSeconds,
+			});
+			return {
+				url: `${env.REALTIME_URL}/v2/agent-runtime/sessions/${session.id}/stream`,
+				ticket,
+				expiresInSeconds,
+			};
+		}),
+
+	interruptTurn: protectedProcedure
+		.input(z.object({ sessionId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const session = await loadOwnSession(
+				ctx.session.user.id,
+				input.sessionId,
+			);
+			await interruptTurn(await agentTemporal(), session.id);
+			return { interrupted: true };
+		}),
+
 	startDirectTurn: protectedProcedure
-		.input(agentIdSchema.extend({ promptId: z.string().min(1).max(200) }))
+		.input(
+			agentIdSchema.extend({
+				promptId: z.string().min(1).max(200),
+				text: z.string().trim().min(1).max(MAX_PROMPT_CHARS),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const [agent] = await db
@@ -176,72 +223,140 @@ export const agentRouter = {
 				.limit(1);
 			if (!session) throw agentNotFound();
 
-			const promptId = input.promptId;
-			for (let attempt = 0; attempt < 3; attempt++) {
-				const [duplicate] = await db
-					.select({ id: agentTurns.id })
-					.from(agentTurns)
-					.where(
-						and(
-							eq(agentTurns.sessionId, session.id),
-							or(
-								eq(agentTurns.promptId, promptId),
-								sql`${promptId} = any(${agentTurns.steerPromptIds})`,
-							),
-						),
-					)
-					.limit(1);
-				if (duplicate) {
-					return {
-						sessionId: session.id,
-						turnId: duplicate.id,
-						outcome: "duplicate" as const,
-					};
-				}
-				const [started] = await db
-					.insert(agentTurns)
-					.values({
-						organizationId: agent.organizationId,
-						agentId: agent.id,
-						sessionId: session.id,
-						reason: "direct_message",
-						actingUserId: userId,
-						promptId,
-					})
-					.onConflictDoNothing()
-					.returning({ id: agentTurns.id });
-				if (started) {
-					return {
-						sessionId: session.id,
-						turnId: started.id,
-						outcome: "started" as const,
-					};
-				}
-				const [joined] = await db
-					.update(agentTurns)
-					.set({
-						steerPromptIds: sql`array_append(${agentTurns.steerPromptIds}, ${promptId})`,
-					})
-					.where(
-						and(
-							eq(agentTurns.sessionId, session.id),
-							eq(agentTurns.status, "running"),
-							sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
-						),
-					)
-					.returning({
-						id: agentTurns.id,
-						steers: sql<number>`cardinality(${agentTurns.steerPromptIds})`,
-					});
-				if (joined) {
-					return {
-						sessionId: session.id,
-						turnId: joined.id,
-						outcome: "joined" as const,
-						steerSeq: joined.steers,
-					};
-				}
-			}
-			throw agentNotFound();
+			const { promptId, text } = input;
+			const turn = await recordDirectTurn(session.id, agent, userId, promptId);
+			await dispatchTurn(session.id, turn, {
+				promptId,
+				text,
+				actingUserId: userId,
+			});
+			return turn;
 		}),
 } satisfies TRPCRouterRecord;
+
+type DirectTurn =
+	| { sessionId: string; turnId: string; outcome: "started" }
+	| { sessionId: string; turnId: string; outcome: "joined"; steerSeq: number }
+	| {
+			sessionId: string;
+			turnId: string;
+			outcome: "duplicate";
+			running: boolean;
+	  };
+
+async function recordDirectTurn(
+	sessionId: string,
+	agent: { id: string; organizationId: string },
+	userId: string,
+	promptId: string,
+): Promise<DirectTurn> {
+	for (let attempt = 0; attempt < 3; attempt++) {
+		const [duplicate] = await db
+			.select({ id: agentTurns.id, status: agentTurns.status })
+			.from(agentTurns)
+			.where(
+				and(
+					eq(agentTurns.sessionId, sessionId),
+					or(
+						eq(agentTurns.promptId, promptId),
+						sql`${promptId} = any(${agentTurns.steerPromptIds})`,
+					),
+				),
+			)
+			.limit(1);
+		if (duplicate) {
+			return {
+				sessionId,
+				turnId: duplicate.id,
+				outcome: "duplicate" as const,
+				running: duplicate.status === "running",
+			};
+		}
+		const [started] = await db
+			.insert(agentTurns)
+			.values({
+				organizationId: agent.organizationId,
+				agentId: agent.id,
+				sessionId,
+				reason: "direct_message",
+				actingUserId: userId,
+				promptId,
+			})
+			.onConflictDoNothing()
+			.returning({ id: agentTurns.id });
+		if (started) {
+			return {
+				sessionId,
+				turnId: started.id,
+				outcome: "started" as const,
+			};
+		}
+		const [joined] = await db
+			.update(agentTurns)
+			.set({
+				steerPromptIds: sql`array_append(${agentTurns.steerPromptIds}, ${promptId})`,
+			})
+			.where(
+				and(
+					eq(agentTurns.sessionId, sessionId),
+					eq(agentTurns.status, "running"),
+					sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
+				),
+			)
+			.returning({
+				id: agentTurns.id,
+				steers: sql<number>`cardinality(${agentTurns.steerPromptIds})`,
+			});
+		if (joined) {
+			return {
+				sessionId,
+				turnId: joined.id,
+				outcome: "joined" as const,
+				steerSeq: joined.steers,
+			};
+		}
+	}
+	throw agentNotFound();
+}
+
+/**
+ * Hands the turn to its session's workflow. A resent prompt for a turn still
+ * running goes again, since the first send may not have landed; the workflow
+ * drops prompt ids it has seen.
+ */
+async function dispatchTurn(
+	sessionId: string,
+	turn: DirectTurn,
+	prompt: { promptId: string; text: string; actingUserId: string },
+) {
+	if (turn.outcome === "duplicate" && !turn.running) return;
+	const temporal = await agentTemporal();
+	if (turn.outcome === "started") {
+		await startTurn(temporal, sessionId, { turnId: turn.turnId, ...prompt });
+		return;
+	}
+	await steerTurn(temporal, sessionId, {
+		turnId: turn.turnId,
+		promptId: prompt.promptId,
+		text: prompt.text,
+	});
+}
+
+/** A DM session belongs to the person it is with; anything else reads as not found. */
+async function loadOwnSession(userId: string, sessionId: string) {
+	const [session] = await db
+		.select({ id: agentSessions.id })
+		.from(agentSessions)
+		.innerJoin(agents, eq(agents.id, agentSessions.agentId))
+		.where(
+			and(
+				eq(agentSessions.id, sessionId),
+				eq(agentSessions.kind, "dm"),
+				eq(agentSessions.userId, userId),
+				isNull(agents.archivedAt),
+			),
+		)
+		.limit(1);
+	if (!session) throw agentNotFound();
+	return session;
+}

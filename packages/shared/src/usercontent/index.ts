@@ -35,16 +35,20 @@ export {
 } from "./manifest";
 export { PAGE_THEME_CSS } from "./theme";
 export {
+	type AgentSessionTicketClaims,
+	type AgentSessionTicketScope,
 	type FileTicketClaims,
 	type PageConnectTicketClaims,
 	type PageTicketClaims,
+	signAgentSessionTicket,
 	signClaims,
 	signFileTicket,
 	signPageConnectTicket,
 	signPageTicket,
+	verifyAgentSessionTicket,
+	verifyClaims,
 	verifyFileTicket,
 	verifyPageConnectTicket,
-	verifyClaims,
 	verifyPageTicket,
 } from "./ticket";
 export {

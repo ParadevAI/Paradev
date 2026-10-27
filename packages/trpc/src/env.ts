@@ -34,6 +34,10 @@ export const env = createEnv({
 		USERCONTENT_TOKEN_SECRET: z.string().min(32),
 		AGENT_WORKER_SECRET: z.string().min(32),
 		AGENT_TURN_SIGNING_SECRET: z.string().min(32),
+		AGENT_SESSION_SECRET: z.string().min(32),
+		TEMPORAL_ADDRESS: z.string().min(1).optional(),
+		TEMPORAL_NAMESPACE: z.string().min(1).default("default"),
+		TEMPORAL_API_KEY: z.string().min(1).optional(),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),

@@ -1,0 +1,238 @@
+import { describe, expect, test } from "bun:test";
+import {
+	type AssistantMessage,
+	createAssistantMessageEventStream,
+} from "@earendil-works/pi-ai";
+import type { HostJobs } from "@superset/agent-harness";
+import type { TurnCredentials } from "../../clients/credentials";
+import type {
+	AppendInput,
+	SessionStore,
+	TranscriptRow,
+} from "../../clients/sessionStore";
+import type { SettleTurnInput } from "../../clients/settler";
+import { createActivities, type StreamFn } from "./createActivities";
+
+const credentials: TurnCredentials = {
+	sessionStore: { baseUrl: "http://store", writeTicket: "t" },
+	host: { url: "http://host", bearer: "b", workspaceId: "w1" },
+	model: { baseUrl: "http://model", modelId: "m", headers: {} },
+};
+
+function memoryStore() {
+	const appends: AppendInput[] = [];
+	const rows: TranscriptRow[] = [];
+	const store: SessionStore = {
+		async append(input) {
+			if (appends.some((a) => a.stepKey === input.stepKey)) {
+				return { duplicate: true };
+			}
+			appends.push(input);
+			for (const entry of input.transcript ?? []) {
+				rows.push({ seq: rows.length + 1, stepKey: input.stepKey, entry });
+			}
+			return { duplicate: false };
+		},
+		async transcript() {
+			return rows;
+		},
+		async transcriptStep(stepKey) {
+			return rows.filter((row) => row.stepKey === stepKey);
+		},
+	};
+	return { store, appends, rows };
+}
+
+function fakeHost(): HostJobs & { commands: string[] } {
+	const commands: string[] = [];
+	return {
+		commands,
+		async exec(input: { command: string }) {
+			commands.push(input.command);
+			return { jobId: "j1", status: "running", pid: 1, logPath: "/tmp/j1.log" };
+		},
+		async output(input: { fromOffset?: number }) {
+			const first = !input.fromOffset;
+			return {
+				chunk: first ? "4 pass\n" : "",
+				nextOffset: 7,
+				status: "done",
+				exitCode: 0,
+				matched: false,
+				logPath: "/tmp/j1.log",
+			};
+		},
+		async kill() {
+			return { status: "killed" };
+		},
+		async readFile() {
+			throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+		},
+		async writeFile() {
+			return {};
+		},
+		async mkdir() {
+			return {};
+		},
+		async stat() {
+			throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+		},
+		async readdir() {
+			return { entries: [] };
+		},
+	} as unknown as HostJobs & { commands: string[] };
+}
+
+function assistant(content: AssistantMessage["content"]): AssistantMessage {
+	return {
+		role: "assistant",
+		content,
+		api: "anthropic-messages",
+		provider: "superset-router",
+		model: "m",
+		usage: {
+			input: 10,
+			output: 5,
+			cacheRead: 0,
+			cacheWrite: 0,
+			totalTokens: 15,
+			cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0.001 },
+		},
+		stopReason: content.some((block) => block.type === "toolCall")
+			? "toolUse"
+			: "stop",
+		timestamp: 0,
+	} as AssistantMessage;
+}
+
+function scriptedModel(replies: AssistantMessage[]) {
+	let calls = 0;
+	const stream: StreamFn = () => {
+		const reply = replies[calls++];
+		if (!reply) throw new Error("no more replies");
+		const events = createAssistantMessageEventStream();
+		queueMicrotask(() => {
+			events.push({
+				type: "done",
+				reason: reply.stopReason,
+				message: reply,
+			} as never);
+			events.end(reply);
+		});
+		return events;
+	};
+	return { stream, calls: () => calls };
+}
+
+function setup(replies: AssistantMessage[]) {
+	const memory = memoryStore();
+	const host = fakeHost();
+	const model = scriptedModel(replies);
+	const settled: SettleTurnInput[] = [];
+	const activities = createActivities({
+		credentials: { forTurn: async () => credentials },
+		settler: {
+			async settle(input) {
+				settled.push(input);
+				return { steerPending: false };
+			},
+		},
+		stream: model.stream,
+		sessionStore: () => memory.store,
+		hostJobs: () => host,
+		workspaceContext: async () => ({ cwd: "/repo" }),
+		readAgentsMd: async () => null,
+		flushEveryMs: 0,
+	});
+	return { activities, memory, host, model, settled };
+}
+
+const ref = { sessionId: "s1", turnId: "t1" };
+
+describe("agent activities", () => {
+	test("a retried model step returns the stored reply without calling the model again", async () => {
+		const { activities, model } = setup([
+			assistant([
+				{
+					type: "toolCall",
+					id: "c1",
+					name: "bash",
+					arguments: { command: "bun test" },
+				},
+			]),
+		]);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
+		const first = await activities.modelStep({ ...ref, step: 0 });
+		const retry = await activities.modelStep({ ...ref, step: 0 });
+		expect(first.toolCalls).toEqual([{ id: "c1", name: "bash" }]);
+		expect(retry).toEqual(first);
+		expect(model.calls()).toBe(1);
+	});
+
+	test("a retried tool step does not run the command twice", async () => {
+		const { activities, host, memory } = setup([
+			assistant([
+				{
+					type: "toolCall",
+					id: "c1",
+					name: "bash",
+					arguments: { command: "bun test" },
+				},
+			]),
+		]);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
+		await activities.modelStep({ ...ref, step: 0 });
+		const first = await activities.toolStep({
+			...ref,
+			step: 0,
+			toolCallId: "c1",
+		});
+		const retry = await activities.toolStep({
+			...ref,
+			step: 0,
+			toolCallId: "c1",
+		});
+		expect(first).toEqual({ isError: false });
+		expect(retry).toEqual(first);
+		expect(host.commands).toHaveLength(1);
+		const result = memory.rows.find((row) => row.stepKey === "t1/s0/c1/end");
+		expect(JSON.stringify(result?.entry)).toContain("4 pass");
+	});
+
+	test("settling sends the reply, tool calls, usage and steers read", async () => {
+		const { activities, settled, memory } = setup([
+			assistant([
+				{
+					type: "toolCall",
+					id: "c1",
+					name: "bash",
+					arguments: { command: "bun test" },
+				},
+			]),
+			assistant([{ type: "text", text: "All 4 tests pass." }]),
+		]);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
+		await activities.modelStep({ ...ref, step: 0 });
+		await activities.toolStep({ ...ref, step: 0, toolCallId: "c1" });
+		await activities.modelStep({ ...ref, step: 1 });
+		await activities.settleTurn({
+			...ref,
+			outcome: "completed",
+			steersConsumed: 1,
+		});
+		expect(settled).toHaveLength(1);
+		expect(settled[0]).toMatchObject({
+			turnId: "t1",
+			status: "completed",
+			reply: "All 4 tests pass.",
+			inputTokens: 20,
+			outputTokens: 10,
+			steersConsumed: 1,
+		});
+		expect(settled[0]?.toolCalls?.[0]).toMatchObject({
+			name: "bash",
+			status: "done",
+		});
+		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
+	});
+});
