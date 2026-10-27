@@ -1,3 +1,6 @@
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +16,16 @@ const need = (name: string) => {
 	if (!value) throw new Error(`${name} is not set`);
 	return value;
 };
+
+const MIN_PDEV = [0, 2, 3];
+const pdevBin = process.env.PDEV_BIN ?? "pdev";
+const pdevVersion = execFileSync(pdevBin, ["--version"]).toString().trim();
+// Older pdev ignores PDEV_REMOTE_* and would run the agent's commands on this machine.
+if (compareVersions(pdevVersion, MIN_PDEV) < 0) {
+	throw new Error(
+		`pdev ${pdevVersion} has no cloud mode; need ${MIN_PDEV.join(".")} or newer`,
+	);
+}
 
 const api = workerApi({
 	apiUrl: need("AGENT_API_URL"),
@@ -45,31 +58,50 @@ const worker = await Worker.create({
 	taskQueue: AGENT_TASK_QUEUE,
 	defaultHeartbeatThrottleInterval: "2 seconds",
 	maxHeartbeatThrottleInterval: "2 seconds",
-	workflowsPath: fileURLToPath(
-		new URL("./workflows/index.ts", import.meta.url),
-	),
+	...workflowSource(),
 	activities: createActivities({
 		credentials: api.credentials,
 		settler: api.settler,
 		roomPoster: api.roomPoster,
 		pdev: {
-			command: process.env.PDEV_BIN ?? "pdev",
+			command: pdevBin,
 			workRoot: process.env.AGENT_WORK_ROOT ?? join(tmpdir(), "agent-sessions"),
 			...(process.env.AGENT_MODEL ? { model: process.env.AGENT_MODEL } : {}),
 		},
 		turnSteers: (workflowId, turnId) =>
 			client.workflow.getHandle(workflowId).query(turnSteersQuery, turnId),
 	}),
-	shutdownGraceTime: "10 seconds",
+	// The container host waits 15 minutes after SIGTERM; a turn still running after this resumes elsewhere.
+	shutdownGraceTime: "5 minutes",
 });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
 	process.once(signal, () => worker.shutdown());
 }
+if (process.env.PORT) {
+	createServer((_request, response) => {
+		const up = worker.getState() === "RUNNING";
+		response.writeHead(up ? 200 : 503).end(worker.getState());
+	}).listen(Number(process.env.PORT));
+}
 await worker.run();
 await connection.close();
+process.exit(0);
 
-/** Local runs only: a session without a box uses this host, and every session uses this model key. */
+/** A built image ships the workflows already bundled; a checkout bundles them at start. */
+function workflowSource() {
+	const bundle = fileURLToPath(
+		new URL("./workflow-bundle.js", import.meta.url),
+	);
+	if (existsSync(bundle)) return { workflowBundle: { codePath: bundle } };
+	return {
+		workflowsPath: fileURLToPath(
+			new URL("./workflows/index.ts", import.meta.url),
+		),
+	};
+}
+
+/** Local runs only: a session without a box uses this host, and every session these router headers. */
 function localFallback(env: NodeJS.ProcessEnv) {
 	return {
 		...(env.AGENT_LOCAL_HOST_URL &&
@@ -83,8 +115,24 @@ function localFallback(env: NodeJS.ProcessEnv) {
 					},
 				}
 			: {}),
-		...(env.AGENT_LOCAL_ROUTER_API_KEY
-			? { modelHeaders: { "x-api-key": env.AGENT_LOCAL_ROUTER_API_KEY } }
+		...(env.AGENT_LOCAL_MODEL_HEADERS
+			? {
+					modelHeaders: JSON.parse(env.AGENT_LOCAL_MODEL_HEADERS) as Record<
+						string,
+						string
+					>,
+				}
 			: {}),
 	};
+}
+
+function compareVersions(version: string, min: number[]): number {
+	const parts = version
+		.split(".")
+		.map((part) => Number.parseInt(part, 10) || 0);
+	for (let i = 0; i < min.length; i++) {
+		const diff = (parts[i] ?? 0) - (min[i] ?? 0);
+		if (diff !== 0) return diff;
+	}
+	return 0;
 }
