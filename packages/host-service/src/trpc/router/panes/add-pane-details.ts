@@ -12,7 +12,10 @@ function cleanTitle(title: string | null | undefined): string | null {
 
 interface TerminalDetails {
 	titles: ReadonlyMap<string, string | null>;
-	agents: ReadonlyMap<string, { agentId: string; lastEventType: string }>;
+	agents: ReadonlyMap<
+		string,
+		{ agentId: string; lastEventType: string; subagents?: readonly unknown[] }
+	>;
 }
 
 /** Adds each terminal pane's title and agent state, which only the host knows. */
@@ -35,7 +38,10 @@ export function addPaneDetails(
 						agent: binding
 							? {
 									id: binding.agentId,
-									state: agentRunState(binding.lastEventType),
+									state: agentRunState(
+										binding.lastEventType,
+										Boolean(binding.subagents?.length),
+									),
 								}
 							: null,
 					};

@@ -224,6 +224,41 @@ describe("TerminalAgentStore", () => {
 			});
 			expect(changes).toEqual([WORKSPACE]);
 		});
+
+		it("clearing statuses ends the live children, even after the parent's Stop, until a child speaks again", () => {
+			attach();
+			store.recordSubagentEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "SubagentStart",
+				subagentId: "a1",
+				occurredAt: NOW + 200,
+			});
+			store.recordEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "Stop",
+				agentId: "claude",
+				agentSessionId: "s1",
+				occurredAt: NOW + 300,
+			});
+			expect(store.get("t1")?.subagents).toHaveLength(1);
+			const changes: string[] = [];
+			store.on("change", (workspaceId: string) => changes.push(workspaceId));
+
+			store.clearWorkspaceStatuses(WORKSPACE, "t1");
+			expect(store.get("t1")?.subagents).toBeUndefined();
+			expect(changes).toEqual([WORKSPACE]);
+
+			store.recordSubagentEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "PostToolUse",
+				subagentId: "a1",
+				occurredAt: NOW + 400,
+			});
+			expect(store.get("t1")?.subagents?.map((s) => s.id)).toEqual(["a1"]);
+		});
 	});
 
 	it("creates a binding on first event and exposes it via get/list/findActive", () => {

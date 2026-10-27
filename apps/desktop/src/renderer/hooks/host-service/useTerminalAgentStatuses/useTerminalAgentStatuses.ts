@@ -6,9 +6,10 @@ import { deriveTerminalAgentStatus } from "./deriveTerminalAgentStatus";
 
 /**
  * Map of `terminalId → derived agent status` for a workspace. Runtime state
- * (working/permission/idle) comes from the host binding's `lastEventType`;
- * `review` means the host recorded a Stop newer than the locally persisted
- * seen timestamp. Terminals without a live binding are absent (treat as idle).
+ * (working/permission/idle) comes from the host binding's `lastEventType` and
+ * its live subagents; `review` means the host recorded a Stop newer than the
+ * locally persisted seen timestamp. Terminals without a live binding are
+ * absent (treat as idle).
  */
 export function useTerminalAgentStatuses(
 	workspaceId: string,
@@ -28,6 +29,7 @@ export function useTerminalAgentStatuses(
 					lastEventType: binding.lastEventType,
 					lastEventAt: binding.lastEventAt,
 					lastSeenAt: terminalSeenAt[binding.terminalId],
+					hasLiveSubagents: Boolean(binding.subagents?.length),
 				}),
 			);
 		}

@@ -81,4 +81,42 @@ describe("deriveTerminalAgentStatus", () => {
 			}),
 		).toBe("idle");
 	});
+
+	it("maps a Stop to working while subagents run, seen or not", () => {
+		expect(
+			deriveTerminalAgentStatus({
+				lastEventType: "Stop",
+				lastEventAt: 200,
+				lastSeenAt: 100,
+				hasLiveSubagents: true,
+			}),
+		).toBe("working");
+		expect(
+			deriveTerminalAgentStatus({
+				lastEventType: "Stop",
+				lastEventAt: 100,
+				lastSeenAt: 200,
+				hasLiveSubagents: true,
+			}),
+		).toBe("working");
+	});
+
+	it("keeps permission and failed while subagents run", () => {
+		expect(
+			deriveTerminalAgentStatus({
+				lastEventType: "PermissionRequest",
+				lastEventAt: 100,
+				lastSeenAt: 200,
+				hasLiveSubagents: true,
+			}),
+		).toBe("permission");
+		expect(
+			deriveTerminalAgentStatus({
+				lastEventType: "Failed",
+				lastEventAt: 100,
+				lastSeenAt: 200,
+				hasLiveSubagents: true,
+			}),
+		).toBe("failed");
+	});
 });
