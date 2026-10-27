@@ -428,6 +428,13 @@
       "when": 1793403533020,
       "tag": "0060_add_browser_pinned_extensions",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "6",
+      "when": 1793736342962,
+      "tag": "0061_add_close_setup_on_success_setting",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveInitialCommand } from "./setup-terminal";
+import { SETUP_SUCCEEDED_COMMAND } from "../../../../terminal/setup-succeeded-marker";
+import { buildSetupCommand, resolveInitialCommand } from "./setup-terminal";
 
 const PROJECT_ID = "11111111-1111-1111-1111-111111111111";
 
@@ -169,5 +170,29 @@ describe("resolveInitialCommand", () => {
 		).toEqual({
 			initialCommand: `bash '${join(worktreePath, ".superset", "setup.sh")}'`,
 		});
+	});
+});
+
+describe("buildSetupCommand", () => {
+	it("leaves the setup command alone by default", () => {
+		expect(
+			buildSetupCommand({ setupCommand: "bun install", closeOnSuccess: false }),
+		).toBe("bun install");
+	});
+
+	it("prints the success marker only after setup succeeds", () => {
+		expect(
+			buildSetupCommand({ setupCommand: "bun install", closeOnSuccess: true }),
+		).toBe(`bun install && ${SETUP_SUCCEEDED_COMMAND}`);
+	});
+
+	it("does not close the setup terminal when an agent is chained into it", () => {
+		expect(
+			buildSetupCommand({
+				setupCommand: "bun install",
+				chainCommand: "claude",
+				closeOnSuccess: true,
+			}),
+		).toBe("bun install && claude");
 	});
 });

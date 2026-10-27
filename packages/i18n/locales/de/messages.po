@@ -4665,6 +4665,9 @@ msgstr "Den aktuellen Bereich schließen"
 msgid "Close the current tab"
 msgstr "Den aktuellen Tab schließen"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Schließt den Tab, wenn die Setup-Befehle ohne Fehler enden. Schlägt das Setup fehl, bleibt der Tab offen, damit du den Fehler siehst"
+
 msgid "Close Window"
 msgstr "Fenster schließen"
 
@@ -4676,6 +4679,9 @@ msgstr "Arbeitsbereich schließen"
 
 msgid "Close your laptop"
 msgstr "Klapp deinen Laptop zu"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Workspace-Setup-Tab schließen, wenn das Setup erfolgreich ist"
 
 msgid "Closed"
 msgstr "Geschlossen"

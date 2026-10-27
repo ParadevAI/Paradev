@@ -75,6 +75,7 @@ import {
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
+import { createSetupSucceededScanner } from "./setup-succeeded-marker.ts";
 import {
 	getShellReadyMarkerEvidence,
 	recordShellReadyMarkerEvidence,
@@ -610,6 +611,11 @@ interface TerminalSession {
 	 */
 	dsrCarry: Uint8Array;
 	initialCommandQueued: boolean;
+	/** Watches for the marker that a successful setup command prints; cleared on match. */
+	setupSucceededWatch: {
+		scan: (chunk: Uint8Array) => boolean;
+		onSucceeded: () => void;
+	} | null;
 	/**
 	 * Basename of the launch shell. Picks the source keyword when a long
 	 * initialCommand is staged as a script (fish 4 removed `.`; sh/ksh
@@ -2927,6 +2933,8 @@ interface CreateTerminalSessionOptions {
 	 * above a brand-new shell.
 	 */
 	restoredNotice?: boolean;
+	/** Called once when the output carries the setup-succeeded marker. */
+	onSetupSucceeded?: () => void;
 }
 
 function resolveTerminalCwd(
@@ -3008,6 +3016,7 @@ async function createTerminalSessionUnlocked({
 	rows: requestedRows,
 	adoptOnly = false,
 	restoredNotice = false,
+	onSetupSucceeded,
 }: CreateTerminalSessionOptions): Promise<
 	TerminalSession | CreateSessionError
 > {
@@ -3325,6 +3334,12 @@ async function createTerminalSessionUnlocked({
 		// Adopted sessions have already run their initialCommand in the prior
 		// host-service lifetime — flag it as queued so we don't double-fire it.
 		initialCommandQueued: isAdopted,
+		setupSucceededWatch: onSetupSucceeded
+			? {
+					scan: createSetupSucceededScanner(),
+					onSucceeded: onSetupSucceeded,
+				}
+			: null,
 		launchShellName: basename(shell),
 		portHintDecoder: new StringDecoder("utf8"),
 		modeTracker,
@@ -3380,6 +3395,11 @@ async function createTerminalSessionUnlocked({
 				);
 				for (const title of titleUpdates.updates) {
 					setSessionTitle(session, title);
+				}
+				const setupWatch = session.setupSucceededWatch;
+				if (setupWatch?.scan(chunk)) {
+					session.setupSucceededWatch = null;
+					setupWatch.onSucceeded();
 				}
 
 				let bytes: Uint8Array = chunk;
