@@ -12632,9 +12632,6 @@ msgstr "Buka komposer prompt multibaris untuk terminal aktif"
 msgid "Open a new {label} chat?"
 msgstr "Buka chat {label} baru?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Buka panel, atau seret panel ke sini dari tengah."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Buka sebuah pull request untuk melihat status review, check, dan komentar."
 

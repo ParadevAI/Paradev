@@ -12632,9 +12632,6 @@ msgstr "Etkin terminal için çok satırlı istem düzenleyicisini aç"
 msgid "Open a new {label} chat?"
 msgstr "Yeni bir {label} sohbeti açılsın mı?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Bir bölme açın veya ortadan buraya sürükleyin."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir pull request açın."
 

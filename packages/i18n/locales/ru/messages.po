@@ -12632,9 +12632,6 @@ msgstr "Открыть многострочный редактор промпт�
 msgid "Open a new {label} chat?"
 msgstr "Открыть новый чат {label}?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Откройте панель или перетащите её сюда из центра."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Откройте пул-реквест, чтобы видеть статус ревью, проверки и комментарии."
 

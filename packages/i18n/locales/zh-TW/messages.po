@@ -12632,9 +12632,6 @@ msgstr "為目前終端開啟多行提示詞編輯器"
 msgid "Open a new {label} chat?"
 msgstr "要開啟新的 {label} 聊天嗎？"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "開啟一個窗格，或從中間拖一個到這裡。"
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "建立拉取請求後即可檢視評審狀態、檢查和評論。"
 

@@ -12632,9 +12632,6 @@ msgstr "Mở ô soạn prompt nhiều dòng cho terminal đang mở"
 msgid "Open a new {label} chat?"
 msgstr "Mở một chat {label} mới?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Mở một ngăn, hoặc kéo một ngăn từ giữa vào đây."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Hãy mở một pull request để xem trạng thái review, check và bình luận."
 

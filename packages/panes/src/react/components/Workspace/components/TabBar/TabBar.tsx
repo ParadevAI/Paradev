@@ -40,6 +40,7 @@ interface TabBarProps<TData> {
 	onMovePaneToNewTab: (paneId: string, toIndex: number) => void;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	onAddTab?: () => void;
 	renderTabBarLeading?: () => ReactNode;
 	renderTabBarTrailing?: () => ReactNode;
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
@@ -50,8 +51,10 @@ type PaneDragItem = { paneId: string; store?: unknown };
 
 function AddTabButton<_TData>({
 	renderAddTabMenu,
+	onAddTab,
 }: {
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	onAddTab?: () => void;
 }) {
 	const pendingActionRef = useRef<(() => void) | null>(null);
 	const button = (
@@ -60,6 +63,7 @@ function AddTabButton<_TData>({
 			size="icon"
 			type="button"
 			variant="ghost"
+			onClick={onAddTab}
 		>
 			<PlusIcon className="size-3.5" />
 		</Button>
@@ -107,6 +111,7 @@ export function TabBar<TData>({
 	onMovePaneToNewTab,
 	renderTabIcon,
 	renderAddTabMenu,
+	onAddTab,
 	renderTabBarLeading,
 	renderTabBarTrailing,
 	renderTabAccessory,
@@ -265,7 +270,10 @@ export function TabBar<TData>({
 					)}
 					<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
 						{!hasHorizontalOverflow && (
-							<AddTabButton renderAddTabMenu={renderAddTabMenu} />
+							<AddTabButton
+								renderAddTabMenu={renderAddTabMenu}
+								onAddTab={onAddTab}
+							/>
 						)}
 					</div>
 					{/* Empty space to the right of the tabs (collapses to 0 when the
@@ -275,7 +283,10 @@ export function TabBar<TData>({
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
 				<div className="no-drag flex h-full w-10 shrink-0 items-center justify-center pt-1">
-					<AddTabButton renderAddTabMenu={renderAddTabMenu} />
+					<AddTabButton
+						renderAddTabMenu={renderAddTabMenu}
+						onAddTab={onAddTab}
+					/>
 				</div>
 			)}
 			{renderTabBarTrailing && (

@@ -12632,9 +12632,6 @@ msgstr "Einen mehrzeiligen Prompt-Editor für das aktive Terminal öffnen"
 msgid "Open a new {label} chat?"
 msgstr "Neuen {label}-Chat öffnen?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Öffne einen Bereich oder ziehe einen aus der Mitte hierher."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Öffne einen Pull Request, um Review-Status, Prüfungen und Kommentare zu sehen."
 

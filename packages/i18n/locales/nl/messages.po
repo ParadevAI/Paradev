@@ -12632,9 +12632,6 @@ msgstr "Een prompt-editor met meerdere regels openen voor de actieve terminal"
 msgid "Open a new {label} chat?"
 msgstr "Nieuwe {label}-chat openen?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Open een paneel of sleep er een hierheen vanuit het midden."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Open een pull request om reviewstatus, checks en opmerkingen te zien."
 

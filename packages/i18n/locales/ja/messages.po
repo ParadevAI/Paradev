@@ -12632,9 +12632,6 @@ msgstr "アクティブなターミナル用の複数行プロンプト入力を
 msgid "Open a new {label} chat?"
 msgstr "新しい {label} チャットを開きますか？"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "ペインを開くか、中央からここへドラッグしてください。"
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "プルリクエストを開くと、レビュー状態、チェック、コメントを確認できます。"
 

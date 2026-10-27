@@ -12632,9 +12632,6 @@ msgstr "为当前终端打开多行提示词编辑器"
 msgid "Open a new {label} chat?"
 msgstr "打开新的 {label} 聊天？"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "打开一个窗格，或从中间拖一个到这里。"
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
 

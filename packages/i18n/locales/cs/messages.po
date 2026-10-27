@@ -12632,9 +12632,6 @@ msgstr "Otevřít víceřádkový editor promptu pro aktivní terminál"
 msgid "Open a new {label} chat?"
 msgstr "Otevřít nový chat {label}?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Otevřete panel nebo sem nějaký přetáhněte ze středu."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Otevřete pull request a uvidíte stav revize, kontroly a komentáře."
 

@@ -8,7 +8,7 @@ import {
 	type WorkspaceInteractionState,
 	type WorkspaceStore,
 } from "@superset/panes";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
@@ -17,11 +17,12 @@ import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications
 import type { StoreApi } from "zustand/vanilla";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
+import { NEW_TAB_PANE, RightPaneNewTab } from "../RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
-import { RightPaneAddMenu } from "./components/RightPaneAddMenu";
-import { RightPaneEmptyState } from "./components/RightPaneEmptyState";
-import type { RightPaneGates } from "./paneOptions";
-import type { RightPaneKind } from "./types";
+import {
+	withNewTabSplitButton,
+	withNewTabSplitMenu,
+} from "./utils/withNewTabSplits";
 
 const RIGHT_PANE_KEPT_TABS = 2;
 
@@ -35,8 +36,6 @@ interface RightPaneAreaProps {
 	toolbar: ReactNode;
 	isFullScreen: boolean;
 	onToggleFullScreen: () => void;
-	onAdd: (kind: RightPaneKind) => void;
-	gates: RightPaneGates;
 }
 
 export function RightPaneArea({
@@ -49,10 +48,16 @@ export function RightPaneArea({
 	toolbar,
 	isFullScreen,
 	onToggleFullScreen,
-	onAdd,
-	gates,
 }: RightPaneAreaProps) {
 	const { t } = useLingui();
+	const rightPaneActions = useMemo(
+		() => withNewTabSplitButton(paneActions),
+		[paneActions],
+	);
+	const rightContextMenuActions = useMemo(
+		() => withNewTabSplitMenu(contextMenuActions),
+		[contextMenuActions],
+	);
 	useEffect(() => {
 		if (!isFullScreen) return;
 		const active = store.getState().getActivePane();
@@ -64,8 +69,8 @@ export function RightPaneArea({
 			<Workspace<PaneViewerData>
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
-				paneActions={paneActions}
-				contextMenuActions={contextMenuActions}
+				paneActions={rightPaneActions}
+				contextMenuActions={rightContextMenuActions}
 				onPaneError={reportRendererError}
 				renderTabIcon={renderBrowserTabIcon}
 				renderTabAccessory={(tab) => (
@@ -74,13 +79,7 @@ export function RightPaneArea({
 					/>
 				)}
 				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
-				renderAddTabMenu={({ runAfterClose }) => (
-					<RightPaneAddMenu
-						onAdd={onAdd}
-						runAfterClose={runAfterClose}
-						gates={gates}
-					/>
-				)}
+				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
 				renderTabBarTrailing={() => (
 					<div className="flex items-center gap-1 pr-1">
 						<RightPaneHeaderButton
@@ -102,7 +101,9 @@ export function RightPaneArea({
 					</div>
 				)}
 				renderEmptyState={() => (
-					<RightPaneEmptyState onAdd={onAdd} gates={gates} />
+					<RightPaneNewTab
+						onOpen={(pane) => store.getState().addTab({ panes: [pane] })}
+					/>
 				)}
 				onBeforeCloseTab={onBeforeCloseTab}
 				onInteractionStateChange={onInteractionStateChange}

@@ -12632,9 +12632,6 @@ msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
 msgid "Open a new {label} chat?"
 msgstr "새 {label} 채팅을 열까요?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "창을 열거나 가운데에서 여기로 끌어 오세요."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "리뷰 상태, 검사, 코멘트를 보려면 풀 리퀘스트를 여세요."
 

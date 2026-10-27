@@ -12632,9 +12632,6 @@ msgstr "Apri un compositore di prompt multiriga per il terminale attivo"
 msgid "Open a new {label} chat?"
 msgstr "Aprire una nuova chat {label}?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Apri un riquadro o trascinane uno qui dal centro."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Apri una pull request per vedere lo stato della revisione, i controlli e i commenti."
 
