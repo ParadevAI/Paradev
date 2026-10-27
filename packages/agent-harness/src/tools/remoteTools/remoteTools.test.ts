@@ -211,6 +211,26 @@ describe("remote tools", () => {
 		expect(waited).toContain("late");
 	});
 
+	it("kills the job as soon as the call is aborted", async () => {
+		const bash = tools.get("bash");
+		if (!bash) throw new Error("no bash");
+		const controller = new AbortController();
+		const started = Date.now();
+		setTimeout(() => controller.abort(), 100);
+		await expect(
+			bash.execute(
+				"c4",
+				{ command: "sleep 30; touch late", timeout: 60 },
+				controller.signal,
+				undefined,
+			),
+		).rejects.toThrow("Command aborted");
+		expect(Date.now() - started).toBeLessThan(2_000);
+		expect(await host.kill({ sessionId: "s1", jobId: "s1:c4" })).toEqual({
+			status: "killed",
+		});
+	});
+
 	it("searches with grep and find through commands on the host", async () => {
 		writeFileSync(join(cwd, "one.ts"), "alpha\nbeta\n");
 		writeFileSync(join(cwd, "two.md"), "beta\n");

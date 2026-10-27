@@ -50,6 +50,7 @@ export interface ActivityDeps {
 	readAgentsMd?: (host: HostJobs, cwd: string) => Promise<string | null>;
 	now?: () => number;
 	flushEveryMs?: number;
+	heartbeatEveryMs?: number;
 }
 
 interface TurnRef {
@@ -64,6 +65,7 @@ const ROUTER_PLACEHOLDER_KEY = "router";
 export function createActivities(deps: ActivityDeps) {
 	const now = deps.now ?? Date.now;
 	const flushEveryMs = deps.flushEveryMs ?? 150;
+	const heartbeatEveryMs = deps.heartbeatEveryMs ?? 5_000;
 	const credentialCache = new Map<
 		string,
 		{ at: number; value: Promise<TurnCredentials> }
@@ -185,43 +187,54 @@ export function createActivities(deps: ActivityDeps) {
 				now,
 			);
 
-			const stream = deps.stream(
-				{
-					...routerModel(credentials.model.baseUrl, credentials.model.modelId),
-					headers: credentials.model.headers,
-				},
-				{
-					systemPrompt,
-					messages: messagesOf(rows),
-					tools: tools.map(declaration),
-				},
-				{
-					apiKey: ROUTER_PLACEHOLDER_KEY,
-					reasoning: "medium",
-					signal: cancellationSignal(),
-				},
-			);
-			for await (const event of stream) {
-				flusher.add(toAcp.assistantEvent(event, messageId));
-				heartbeat();
-			}
-			const message = await stream.result();
-			await flusher.flush();
-
-			if (message.stopReason === "error" || message.stopReason === "aborted") {
-				const text = message.errorMessage ?? "The model request failed.";
-				if (/usage limit|quota|insufficient/i.test(text)) {
-					throw ApplicationFailure.nonRetryable(text, "UsageLimitError");
+			const stopBeat = keepBeating(heartbeatEveryMs);
+			try {
+				const stream = deps.stream(
+					{
+						...routerModel(
+							credentials.model.baseUrl,
+							credentials.model.modelId,
+						),
+						headers: credentials.model.headers,
+					},
+					{
+						systemPrompt,
+						messages: messagesOf(rows),
+						tools: tools.map(declaration),
+					},
+					{
+						apiKey: ROUTER_PLACEHOLDER_KEY,
+						reasoning: "medium",
+						signal: cancellationSignal(),
+					},
+				);
+				for await (const event of stream) {
+					flusher.add(toAcp.assistantEvent(event, messageId));
+					heartbeat();
 				}
-				throw new Error(text);
+				const message = await stream.result();
+				await flusher.flush();
+
+				if (
+					message.stopReason === "error" ||
+					message.stopReason === "aborted"
+				) {
+					const text = message.errorMessage ?? "The model request failed.";
+					if (/usage limit|quota|insufficient/i.test(text)) {
+						throw ApplicationFailure.nonRetryable(text, "UsageLimitError");
+					}
+					throw new Error(text);
+				}
+				await store.append({
+					stepKey: key,
+					turnId: input.turnId,
+					acp: toAcp.assistantEnd(message, messageId),
+					transcript: [message],
+				});
+				return { toolCalls: toolCallsOf(message) };
+			} finally {
+				stopBeat();
 			}
-			await store.append({
-				stepKey: key,
-				turnId: input.turnId,
-				acp: toAcp.assistantEnd(message, messageId),
-				transcript: [message],
-			});
-			return { toolCalls: toolCallsOf(message) };
 		},
 
 		async toolStep(
@@ -269,6 +282,7 @@ export function createActivities(deps: ActivityDeps) {
 				flushEveryMs,
 				now,
 			);
+			const stopBeat = keepBeating(heartbeatEveryMs);
 			const outcome = await runToolCall(call, {
 				tools: tools as RemoteTool[],
 				assistantMessage: assistant,
@@ -278,7 +292,7 @@ export function createActivities(deps: ActivityDeps) {
 					flusher.replace([toAcp.toolUpdate(call.id, call.name, partial)]);
 					heartbeat();
 				},
-			});
+			}).finally(stopBeat);
 			await flusher.flush();
 
 			const result: ToolResultMessage = {
@@ -499,6 +513,12 @@ function heartbeat(): void {
 	try {
 		ActivityContext.current().heartbeat();
 	} catch {}
+}
+
+/** Temporal delivers a cancel only on a heartbeat, so a silent tool must still beat. */
+function keepBeating(everyMs: number): () => void {
+	const timer = setInterval(heartbeat, everyMs);
+	return () => clearInterval(timer);
 }
 
 function cancellationSignal(): AbortSignal | undefined {

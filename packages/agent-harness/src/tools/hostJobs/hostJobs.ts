@@ -101,13 +101,16 @@ export async function followJob(
 	for (;;) {
 		if (input.signal?.aborted) throw new Error("Operation aborted");
 		const waitMs = Math.max(0, Math.min(MAX_WAIT_MS, input.deadlineMs - now()));
-		const out = await host.output({
-			sessionId: input.sessionId,
-			jobId: input.jobId,
-			fromOffset: offset,
-			waitMs,
-			...(input.pattern ? { pattern: input.pattern } : {}),
-		});
+		const out = await untilAborted(
+			host.output({
+				sessionId: input.sessionId,
+				jobId: input.jobId,
+				fromOffset: offset,
+				waitMs,
+				...(input.pattern ? { pattern: input.pattern } : {}),
+			}),
+			input.signal,
+		);
 		if (out.chunk) {
 			output += out.chunk;
 			input.onData?.(out.chunk);
@@ -127,6 +130,18 @@ export async function followJob(
 			};
 		}
 	}
+}
+
+function untilAborted<T>(work: Promise<T>, signal?: AbortSignal): Promise<T> {
+	if (!signal) return work;
+	return new Promise<T>((resolve, reject) => {
+		const onAbort = () => reject(new Error("Operation aborted"));
+		if (signal.aborted) return onAbort();
+		signal.addEventListener("abort", onAbort, { once: true });
+		work
+			.then(resolve, reject)
+			.finally(() => signal.removeEventListener("abort", onAbort));
+	});
 }
 
 export function shellQuote(value: string): string {
