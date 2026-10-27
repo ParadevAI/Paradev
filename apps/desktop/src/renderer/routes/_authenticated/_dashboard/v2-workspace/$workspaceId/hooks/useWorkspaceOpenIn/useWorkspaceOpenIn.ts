@@ -7,6 +7,7 @@ import { useHotkey, useHotkeyDisplay } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useV2ProjectDefaultApp } from "renderer/routes/_authenticated/hooks/useV2ProjectDefaultApp";
 import { useThemeStore } from "renderer/stores";
+import { useCopyWorktreePath } from "../useCopyWorktreePath";
 
 interface UseWorkspaceOpenInOptions {
 	worktreePath: string | null;
@@ -37,20 +38,7 @@ export function useWorkspaceOpenIn({
 				}),
 			),
 	});
-	const copyPath = electronTrpc.external.copyPath.useMutation({
-		onSuccess: () =>
-			toast.success(
-				t({
-					message: "Path copied to clipboard",
-				}),
-			),
-		onError: (error) =>
-			toast.error(
-				t({
-					message: `Failed to copy path: ${error.message}`,
-				}),
-			),
-	});
+	const copyPath = useCopyWorktreePath();
 
 	const currentApp = useMemo(
 		() => getAppOption(resolvedApp) ?? null,

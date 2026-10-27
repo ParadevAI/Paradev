@@ -56,7 +56,9 @@ export const FORWARDED_HOTKEYS: ReadonlySet<HotkeyId> = new Set<HotkeyId>([
 	"CHECK_RESOURCES",
 	"NEW_WORKSPACE",
 	"OPEN_PROJECT",
+	"OPEN_PR",
 	"OPEN_IN_APP",
+	"COPY_PATH",
 ]);
 
 /** Canonical chords of {@link FORWARDED_HOTKEYS} under the current bindings. */

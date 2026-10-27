@@ -33,6 +33,7 @@ import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useShipFormIntent } from "../../state/shipFormIntent";
 import type { PagePaneData, PaneViewerData } from "../../types";
 import {
 	BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,
@@ -263,6 +264,19 @@ export function WorkspaceActivityMenu({
 		setShipView(null);
 		markSeen(workspaceId, workspace[0]?.publishedAtMs ?? 0);
 	};
+
+	const pendingShipForm = useShipFormIntent((state) => state.intent);
+	const canCommit = shipMenu.canCommit;
+	const canCreatePr = shipActions.canCreatePr;
+	useEffect(() => {
+		if (!paneAreaStyle || pendingShipForm?.workspaceId !== workspaceId) return;
+		const requested = useShipFormIntent.getState().consume(workspaceId);
+		if (!requested) return;
+		if (requested === "commit" ? !canCommit : !canCreatePr) return;
+		setComposing(false);
+		setOpen(true);
+		setShipView(requested);
+	}, [paneAreaStyle, pendingShipForm, workspaceId, canCommit, canCreatePr]);
 
 	const handleOpenPage = (page: MenuPage, event: MouseEvent) => {
 		handleOpenChange(false);

@@ -7,7 +7,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
-import { useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
 	VscChevronDown,
 	VscGitCommit,
@@ -16,6 +16,10 @@ import {
 	VscRepoPush,
 } from "react-icons/vsc";
 import { useShipActions } from "../../../../hooks/useShipActions";
+import {
+	type ShipFormView,
+	useShipFormIntent,
+} from "../../../../state/shipFormIntent";
 import type { BranchSyncStatus } from "../../../../utils/getPRFlowState";
 import { CommitForm } from "../../../CommitForm";
 import { CreatePrForm } from "../../../CreatePrForm";
@@ -76,6 +80,21 @@ export function ShipControl({
 	};
 
 	const showCreatePr = !needsCommit && canCreatePr;
+	const openRequestedView = useEffectEvent((requested: ShipFormView) => {
+		if (requested === "commit") {
+			if (needsCommit) setView("commit");
+		} else if (showCreatePr) {
+			openPrView();
+		}
+	});
+
+	const pendingShipForm = useShipFormIntent((state) => state.intent);
+	useEffect(() => {
+		if (pendingShipForm?.workspaceId !== workspaceId) return;
+		const requested = useShipFormIntent.getState().consume(workspaceId);
+		if (requested) openRequestedView(requested);
+	}, [pendingShipForm, workspaceId]);
+
 	if (!needsCommit && !showCreatePr && !needsPush) return null;
 
 	const noCommitsTooltip = t({

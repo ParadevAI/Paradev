@@ -68,6 +68,8 @@ describe("forwardedHotkeys", () => {
 		"OPEN_COMMAND_PALETTE",
 		"CHECK_RESOURCES",
 		"NEW_WORKSPACE",
+		"OPEN_PR",
+		"COPY_PATH",
 	] as const)("forwards the resolved shell binding for %s", (id) => {
 		const chord = getDispatchChord(id);
 		expect(chord).not.toBeNull();
