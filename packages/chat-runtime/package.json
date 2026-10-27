@@ -12,6 +12,10 @@
 			"types": "./src/harness/acp/acp-stream.ts",
 			"default": "./src/harness/acp/acp-stream.ts"
 		},
+		"./acp-client": {
+			"types": "./src/harness/acp/rpcClient/index.ts",
+			"default": "./src/harness/acp/rpcClient/index.ts"
+		},
 		"./testing": {
 			"types": "./src/testing/index.ts",
 			"default": "./src/testing/index.ts"

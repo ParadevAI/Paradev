@@ -1,4 +1,3 @@
-import type { HostJobs } from "@superset/agent-harness";
 import { TrpcCallError, type TrpcCallOptions, trpcMutation } from "../trpcCall";
 
 export interface HostTarget {
@@ -45,24 +44,6 @@ function isUnreachable(error: unknown): boolean {
 	if (error instanceof TrpcCallError)
 		return [502, 503, 504].includes(error.status);
 	return error instanceof TypeError;
-}
-
-export function httpHostJobs(
-	target: HostTarget,
-	options: HostCallOptions = {},
-): HostJobs {
-	const call = <T>(procedure: string, input: unknown) =>
-		callHost<T>(target, procedure, input, options);
-	return {
-		exec: (input) => call("exec", input),
-		output: (input) => call("output", input),
-		kill: (input) => call("kill", input),
-		readFile: (input) => call("readFile", input),
-		writeFile: (input) => call("writeFile", input),
-		mkdir: (input) => call("mkdir", input),
-		stat: (input) => call("stat", input),
-		readdir: (input) => call("readdir", input),
-	};
 }
 
 export function hostContext(

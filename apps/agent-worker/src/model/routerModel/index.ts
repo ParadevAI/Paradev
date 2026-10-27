@@ -1,1 +1,0 @@
-export { routerModel } from "./routerModel";

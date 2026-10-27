@@ -8,6 +8,7 @@ import {
 	startTurnUpdate,
 	stateQuery,
 	steerUpdate,
+	turnSteersQuery,
 } from "@superset/agent-harness/session/definitions";
 import {
 	ActivityCancellationType,
@@ -23,10 +24,12 @@ import {
 	setHandler,
 	workflowInfo,
 } from "@temporalio/workflow";
-import type { AgentActivities } from "../../activities/createActivities";
+import type {
+	AgentActivities,
+	TurnPrompt,
+} from "../../activities/createActivities";
 
 const IDLE_EXIT = "10 minutes";
-const MAX_STEPS_PER_TURN = 200;
 const SEEN_PROMPT_IDS = 500;
 const PENDING_STEER_WAIT = "1 minute";
 const UNFINISHED_SETTLE_ATTEMPTS = 5;
@@ -35,19 +38,16 @@ const quick = proxyActivities<AgentActivities>({
 	startToCloseTimeout: "30 seconds",
 	retry: { maximumAttempts: 10 },
 });
-const model = proxyActivities<AgentActivities>({
-	startToCloseTimeout: "10 minutes",
-	heartbeatTimeout: "1 minute",
-	retry: {
-		maximumAttempts: 5,
-		nonRetryableErrorTypes: ["UsageLimitError", "ModelRefusedError"],
-	},
-});
-const tools = proxyActivities<AgentActivities>({
-	startToCloseTimeout: "30 minutes",
+/** A retry resumes pdev's saved session; it never sends the prompt again. */
+const pdev = proxyActivities<AgentActivities>({
+	startToCloseTimeout: "2 hours",
 	heartbeatTimeout: "1 minute",
 	cancellationType: ActivityCancellationType.WAIT_CANCELLATION_COMPLETED,
-	retry: { maximumAttempts: 20, maximumInterval: "1 minute" },
+	retry: {
+		maximumAttempts: 5,
+		maximumInterval: "1 minute",
+		nonRetryableErrorTypes: ["PdevTurnError", "BadSessionId"],
+	},
 });
 
 type QueuedTurn = StartTurnInput & { steers?: SteerInput[] };
@@ -64,10 +64,10 @@ function validatePrompt(input: {
 }
 
 /**
- * One agent session. Turns come from the API one at a time; a message sent
- * while a turn runs is a steer and joins it before its next model call.
- * The conversation itself lives in the session store, so this history holds
- * only ids and outcomes.
+ * One agent session. Turns come from the API one at a time and pdev runs
+ * each one; a message sent while a turn runs is a steer, which the running
+ * turn reads through `turnSteersQuery`. The conversation lives in the
+ * session store, so this history holds only ids and outcomes.
  */
 export async function agentSession(args: AgentSessionArgs): Promise<void> {
 	const { sessionId } = args;
@@ -76,9 +76,8 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 	const interruptedEarly = new Set<string>();
 	const seen = new Set<string>(args.carried?.seenPromptIds ?? []);
 	let steers: SteerInput[] = [];
-	let steersConsumed = 0;
+	let delivered = 0;
 	let current: { turnId: string; scope: CancellationScope } | null = null;
-	let step = 0;
 	let activity: string | null = null;
 
 	const remember = (promptId: string): boolean => {
@@ -130,10 +129,13 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 		(): SessionState => ({
 			status: current ? "running" : "idle",
 			turnId: current?.turnId ?? null,
-			step,
+			step: 0,
 			activity,
 			pendingTurns: pending.length,
 		}),
+	);
+	setHandler(turnSteersQuery, (turnId) =>
+		current?.turnId === turnId ? steers : [],
 	);
 
 	const runTurn = async (turn: StartTurnInput) => {
@@ -144,39 +146,50 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 			promptId: turn.promptId,
 			text: turn.text,
 		});
-		step = 0;
+		const queued: TurnPrompt[] = steers.map((steer) => ({
+			promptId: steer.promptId,
+			text: steer.text,
+			steer: true,
+		}));
+		let prompts: TurnPrompt[] = [
+			{ promptId: turn.promptId, text: turn.text },
+			...queued,
+		];
+		delivered = steers.length;
 		for (;;) {
-			if (steers.length > 0) {
-				const batch = steers;
-				steers = [];
-				steersConsumed += batch.length;
-				activity = "steering";
-				await quick.addSteers({ sessionId, turnId, steers: batch });
+			activity = "working";
+			const ran = await pdev.runTurn({
+				sessionId,
+				turnId,
+				prompts,
+				steersFrom: delivered,
+			});
+			delivered = ran.steersConsumed;
+			if (steers.length > delivered) {
+				prompts = steers.slice(delivered).map((steer) => ({
+					promptId: steer.promptId,
+					text: steer.text,
+					steer: true,
+				}));
+				delivered = steers.length;
+				continue;
 			}
-			if (step >= MAX_STEPS_PER_TURN) {
-				throw ApplicationFailure.nonRetryable(
-					`Stopped after ${MAX_STEPS_PER_TURN} steps`,
-					"StepLimitError",
-				);
-			}
-			activity = "thinking";
-			const result = await model.modelStep({ sessionId, turnId, step });
-			for (const call of result.toolCalls) {
-				activity = call.name;
-				await tools.toolStep({ sessionId, turnId, step, toolCallId: call.id });
-			}
-			step += 1;
-			if (result.toolCalls.length > 0 || steers.length > 0) continue;
 			activity = "settling";
 			const settled = await quick.settleTurn({
 				sessionId,
 				turnId,
 				outcome: "completed",
-				steersConsumed,
+				steersConsumed: delivered,
 			});
 			if (!settled.steerPending) return;
 			// The API recorded a steer that has not reached this workflow yet.
-			await condition(() => steers.length > 0, PENDING_STEER_WAIT);
+			await condition(() => steers.length > delivered, PENDING_STEER_WAIT);
+			prompts = steers.slice(delivered).map((steer) => ({
+				promptId: steer.promptId,
+				text: steer.text,
+				steer: true,
+			}));
+			delivered = steers.length;
 		}
 	};
 
@@ -189,20 +202,19 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 		end: { outcome: "failed" | "interrupted"; errorMessage?: string },
 	) => {
 		for (let attempt = 0; attempt < UNFINISHED_SETTLE_ATTEMPTS; attempt++) {
+			const unread = steers.slice(delivered);
+			delivered = steers.length;
+			if (unread.length > 0) {
+				await quick.addSteers({ sessionId, turnId, steers: unread });
+			}
 			const settled = await quick.settleTurn({
 				sessionId,
 				turnId,
-				steersConsumed,
+				steersConsumed: delivered,
 				...end,
 			});
 			if (!settled.steerPending) return;
-			await condition(() => steers.length > 0, PENDING_STEER_WAIT);
-			const batch = steers;
-			steers = [];
-			steersConsumed += batch.length;
-			if (batch.length > 0) {
-				await quick.addSteers({ sessionId, turnId, steers: batch });
-			}
+			await condition(() => steers.length > delivered, PENDING_STEER_WAIT);
 		}
 		throw ApplicationFailure.nonRetryable(
 			`Turn ${turnId} has steers that never reached the workflow`,
@@ -219,7 +231,7 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 		const scope = new CancellationScope();
 		current = { turnId: turn.turnId, scope };
 		steers = turn.steers ?? [];
-		steersConsumed = 0;
+		delivered = 0;
 		if (interruptedEarly.delete(turn.turnId)) scope.cancel();
 		try {
 			await scope.run(() => runTurn(turn));
@@ -246,6 +258,7 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 			current = null;
 			activity = null;
 			steers = [];
+			delivered = 0;
 		}
 
 		if (workflowInfo().continueAsNewSuggested) {

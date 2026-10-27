@@ -1,5 +1,5 @@
-import type { RoomPoster } from "@superset/agent-harness";
 import { ApplicationFailure } from "@temporalio/common";
+import type { RoomPoster } from "../../activities/createActivities";
 import type { CredentialsProvider, TurnCredentials } from "../credentials";
 import type { HostTarget } from "../hostJobs";
 import type {
@@ -98,7 +98,7 @@ export function workerApi(options: WorkerApiOptions): {
 								{
 									channelId: room.channelId,
 									body: input.body,
-									threadRootId: input.threadRootId ?? room.threadRootId,
+									threadRootId: room.threadRootId,
 									idempotencyKey: input.idempotencyKey,
 								},
 								options,

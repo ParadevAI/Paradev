@@ -1,0 +1,185 @@
+[
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"name": "bash",
+		"title": "bash",
+		"kind": "execute",
+		"status": "pending"
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"title": "echo 12 pass",
+		"rawInput": {
+			"command": "echo 12 pass"
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"name": "bash",
+		"title": "echo 12 pass",
+		"kind": "execute",
+		"status": "in_progress",
+		"rawInput": {
+			"command": "echo 12 pass"
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"rawOutput": {
+			"content": []
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"content": [
+			{
+				"type": "content",
+				"content": {
+					"type": "text",
+					"text": "12 pass\n"
+				}
+			}
+		],
+		"rawOutput": {
+			"content": [
+				{
+					"type": "text",
+					"text": "12 pass\n"
+				}
+			],
+			"details": {}
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_01JhBRNbp9uxUazPScnG2mbA",
+		"status": "completed",
+		"content": [
+			{
+				"type": "content",
+				"content": {
+					"type": "text",
+					"text": "12 pass\n"
+				}
+			}
+		],
+		"rawOutput": {
+			"content": [
+				{
+					"type": "text",
+					"text": "12 pass\n"
+				}
+			],
+			"structuredContent": {
+				"output": "12 pass\n",
+				"truncated": false,
+				"exit_code": 0,
+				"wall_time_seconds": 0
+			}
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_019csUnNZLkXFPNAJo7pL8yr",
+		"name": "edit",
+		"title": "edit",
+		"kind": "edit",
+		"status": "pending"
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_019csUnNZLkXFPNAJo7pL8yr",
+		"title": "/workspace/a.ts",
+		"locations": [
+			{
+				"path": "/workspace/a.ts"
+			}
+		],
+		"rawInput": {
+			"path": "/workspace/a.ts",
+			"edits": [
+				{
+					"oldText": "a",
+					"newText": "b"
+				}
+			]
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_019csUnNZLkXFPNAJo7pL8yr",
+		"name": "edit",
+		"title": "/workspace/a.ts",
+		"kind": "edit",
+		"status": "in_progress",
+		"locations": [
+			{
+				"path": "/workspace/a.ts",
+				"line": 1
+			}
+		],
+		"rawInput": {
+			"path": "/workspace/a.ts",
+			"edits": [
+				{
+					"oldText": "a",
+					"newText": "b"
+				}
+			]
+		}
+	},
+	{
+		"sessionUpdate": "tool_call_update",
+		"toolCallId": "toolu_019csUnNZLkXFPNAJo7pL8yr",
+		"status": "completed",
+		"content": [
+			{
+				"type": "diff",
+				"changes": [
+					{
+						"operation": "modify",
+						"path": "/workspace/a.ts",
+						"fileType": "text"
+					}
+				],
+				"patch": {
+					"format": "git_patch",
+					"text": "diff --git /workspace/a.ts /workspace/a.ts\n--- /workspace/a.ts\n+++ /workspace/a.ts\n@@ -1,1 +1,1 @@\n-a\n+b\n"
+				}
+			}
+		]
+	},
+	{
+		"sessionUpdate": "agent_message_chunk",
+		"messageId": "1793141843212",
+		"content": {
+			"type": "text",
+			"text": "done"
+		},
+		"_meta": {
+			"piAcp": {
+				"model": "anthropic/claude-haiku-5.5"
+			}
+		}
+	},
+	{
+		"sessionUpdate": "agent_message",
+		"messageId": "1793141843212",
+		"content": [
+			{
+				"type": "text",
+				"text": "done"
+			}
+		],
+		"_meta": {
+			"piAcp": {
+				"model": "anthropic/claude-haiku-5.5"
+			}
+		}
+	}
+]

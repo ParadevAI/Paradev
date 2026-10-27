@@ -1,10 +1,10 @@
-import { describe, expect, test } from "bun:test";
-import {
-	type AssistantMessage,
-	createAssistantMessageEventStream,
-} from "@earendil-works/pi-ai";
-import type { HostJobs } from "@superset/agent-harness";
-import { ApplicationFailure } from "@temporalio/common";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import type { SteerInput } from "@superset/agent-harness/session/definitions";
+import { CancelledFailure } from "@temporalio/common";
+import { MockActivityEnvironment } from "@temporalio/testing";
 import type { TurnCredentials } from "../../clients/credentials";
 import type {
 	AppendInput,
@@ -12,24 +12,25 @@ import type {
 	TranscriptRow,
 } from "../../clients/sessionStore";
 import type { SettleTurnInput } from "../../clients/settler";
-import { createActivities, type StreamFn } from "./createActivities";
+import { createActivities } from "./createActivities";
 
-const credentials: TurnCredentials = {
+const FAKE_PDEV = join(import.meta.dir, "../../../test/fakePdev.ts");
+
+const withBox: TurnCredentials = {
 	sessionStore: { baseUrl: "http://store", writeTicket: "t" },
-	host: { url: "http://host", bearer: "b", workspaceId: "w1" },
-	model: { baseUrl: "http://model", modelId: "m", headers: {} },
+	host: { url: "http://host", bearer: "box-secret", workspaceId: "w1" },
+	model: {
+		baseUrl: "http://router",
+		modelId: "",
+		headers: { "x-superset-sandbox-credential": "c" },
+	},
 };
 
 function memoryStore() {
 	const appends: AppendInput[] = [];
 	const rows: TranscriptRow[] = [];
-	const failNext = { append: false };
 	const store: SessionStore = {
 		async append(input) {
-			if (failNext.append) {
-				failNext.append = false;
-				throw new Error("store unavailable");
-			}
 			if (appends.some((a) => a.stepKey === input.stepKey)) {
 				return { duplicate: true };
 			}
@@ -40,333 +41,300 @@ function memoryStore() {
 			return { duplicate: false };
 		},
 		async transcript() {
-			return rows;
+			return [...rows];
 		},
 		async transcriptStep(stepKey) {
 			return rows.filter((row) => row.stepKey === stepKey);
 		},
 	};
-	return { store, appends, rows, failNext };
+	return { store, appends, rows };
 }
 
-function fakeHost(): HostJobs & { commands: string[] } {
-	const commands: string[] = [];
-	return {
-		commands,
-		async exec(input: { command: string }) {
-			commands.push(input.command);
-			return { jobId: "j1", status: "running", pid: 1, logPath: "/tmp/j1.log" };
-		},
-		async output(input: { fromOffset?: number }) {
-			const first = !input.fromOffset;
-			return {
-				chunk: first ? "4 pass\n" : "",
-				nextOffset: 7,
-				status: "done",
-				exitCode: 0,
-				matched: false,
-				logPath: "/tmp/j1.log",
-			};
-		},
-		async kill() {
-			return { status: "killed" };
-		},
-		async readFile() {
-			throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
-		},
-		async writeFile() {
-			return {};
-		},
-		async mkdir() {
-			return {};
-		},
-		async stat() {
-			throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
-		},
-		async readdir() {
-			return { entries: [] };
-		},
-	} as unknown as HostJobs & { commands: string[] };
+let root: string;
+let logFile: string;
+
+beforeEach(() => {
+	root = mkdtempSync(join(tmpdir(), "agent-worker-"));
+	logFile = join(root, "pdev.log");
+});
+
+afterEach(() => rmSync(root, { recursive: true, force: true }));
+
+interface PdevLogEntry {
+	event?: string;
+	method?: string;
+	params?: { prompt: Array<{ text: string }> };
+	entries?: number;
+	env: Record<string, string | undefined>;
+	settings: string;
+	appendSystem: string | null;
 }
 
-function assistant(content: AssistantMessage["content"]): AssistantMessage {
-	return {
-		role: "assistant",
-		content,
-		api: "anthropic-messages",
-		provider: "superset-router",
-		model: "m",
-		usage: {
-			input: 10,
-			output: 5,
-			cacheRead: 0,
-			cacheWrite: 0,
-			totalTokens: 15,
-			cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0.001 },
-		},
-		stopReason: content.some((block) => block.type === "toolCall")
-			? "toolUse"
-			: "stop",
-		timestamp: 0,
-	} as AssistantMessage;
+function pdevLog(): PdevLogEntry[] {
+	try {
+		return readFileSync(logFile, "utf8")
+			.trim()
+			.split("\n")
+			.map((line) => JSON.parse(line));
+	} catch {
+		return [];
+	}
 }
 
-function scriptedModel(replies: AssistantMessage[]) {
-	let calls = 0;
-	const contexts: Array<{ tools?: unknown[]; systemPrompt?: string }> = [];
-	const stream: StreamFn = (_model, context) => {
-		contexts.push(context as { tools?: unknown[]; systemPrompt?: string });
-		const reply = replies[calls++];
-		if (!reply) throw new Error("no more replies");
-		const events = createAssistantMessageEventStream();
-		queueMicrotask(() => {
-			events.push({
-				type: "done",
-				reason: reply.stopReason,
-				message: reply,
-			} as never);
-			events.end(reply);
-		});
-		return events;
-	};
-	return { stream, calls: () => calls, contexts };
-}
+const prompts = () =>
+	pdevLog()
+		.filter((e) => e.method === "session/prompt")
+		.map((e) => e.params?.prompt[0]?.text ?? "");
 
 function setup(
-	replies: AssistantMessage[],
-	creds: TurnCredentials = credentials,
+	options: {
+		credentials?: TurnCredentials;
+		steers?: () => SteerInput[];
+		model?: string;
+	} = {},
 ) {
-	const posts: Array<{ body: string; idempotencyKey: string }> = [];
 	const memory = memoryStore();
-	const host = fakeHost();
-	const model = scriptedModel(replies);
 	const settled: SettleTurnInput[] = [];
-	const turn = { running: true };
+	const posted: Array<{ body: string; idempotencyKey: string }> = [];
 	const activities = createActivities({
 		credentials: {
-			forTurn: async () => {
-				if (!turn.running) {
-					throw ApplicationFailure.nonRetryable(
-						"Turn is not running.",
-						"TurnNotRunning",
-					);
-				}
-				return creds;
-			},
+			forTurn: async () => options.credentials ?? withBox,
 		},
 		settler: {
 			async settle(input) {
 				settled.push(input);
-				turn.running = false;
-				return { steerPending: false, sessionStore: credentials.sessionStore };
+				return {
+					steerPending: false,
+					sessionStore: { baseUrl: "http://store", writeTicket: "t" },
+				};
 			},
 		},
-		stream: model.stream,
-		modelPrice: async () => ({
-			input: 2,
-			output: 10,
-			cacheRead: 0,
-			cacheWrite: 0,
-		}),
+		pdev: {
+			command: FAKE_PDEV,
+			workRoot: join(root, "sessions"),
+			...(options.model ? { model: options.model } : {}),
+			env: { FAKE_PDEV_LOG: logFile },
+		},
+		turnSteers: async () => options.steers?.() ?? [],
+		sessionStore: () => memory.store,
+		workspaceContext: async () => ({ cwd: "/workspace" }),
 		roomPoster: () => ({
-			post: async (input) => {
-				posts.push(input);
-				return { messageId: `m${posts.length}` };
+			async post(input) {
+				posted.push(input);
+				return {};
 			},
 		}),
-		sessionStore: () => memory.store,
-		hostJobs: () => host,
-		workspaceContext: async () => ({ cwd: "/repo" }),
-		readAgentsMd: async () => null,
 		flushEveryMs: 0,
+		pollEveryMs: 20,
+		settleIdleMs: 30,
+		heartbeatEveryMs: 1_000,
 	});
-	return { activities, memory, host, model, settled, turn, posts };
+	return { activities, memory, settled, posted };
 }
 
-const ref = { sessionId: "s1", turnId: "t1" };
+const turn = { sessionId: "s1", turnId: "t1" };
 
-describe("agent activities", () => {
-	test("a retried model step returns the stored reply without calling the model again", async () => {
-		const { activities, model } = setup([
-			assistant([
-				{
-					type: "toolCall",
-					id: "c1",
-					name: "bash",
-					arguments: { command: "bun test" },
-				},
-			]),
-		]);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
-		const first = await activities.modelStep({ ...ref, step: 0 });
-		const retry = await activities.modelStep({ ...ref, step: 0 });
-		expect(first.toolCalls).toEqual([{ id: "c1", name: "bash" }]);
-		expect(retry).toEqual(first);
-		expect(model.calls()).toBe(1);
+async function runOne(
+	activities: ReturnType<typeof setup>["activities"],
+	text: string,
+	turnId = "t1",
+	env = new MockActivityEnvironment(),
+) {
+	await activities.beginTurn({
+		sessionId: "s1",
+		turnId,
+		promptId: `p-${turnId}`,
+		text,
+	});
+	return (await env.run(activities.runTurn, {
+		sessionId: "s1",
+		turnId,
+		prompts: [{ promptId: `p-${turnId}`, text }],
+		steersFrom: 0,
+	})) as { steersConsumed: number };
+}
+
+describe("runTurn", () => {
+	test("runs pdev on the box, streams its updates and saves its session", async () => {
+		const { activities, memory } = setup({ model: "pdev/auto" });
+		const ran = await runOne(activities, "hello");
+		expect(ran.steersConsumed).toBe(0);
+
+		const start = pdevLog().find((e) => e.event === "start");
+		expect(start?.env).toMatchObject({
+			PDEV_REMOTE_HOST_URL: "http://host",
+			PDEV_REMOTE_HOST_TOKEN: "box-secret",
+			PDEV_REMOTE_WORKSPACE_ID: "w1",
+			PDEV_REMOTE_CWD: "/workspace",
+			PDEV_GATEWAY_URL: "http://router",
+			PDEV_GATEWAY_HEADERS: JSON.stringify(withBox.model.headers),
+			PDEV_SUPERSET: "0",
+		});
+		expect(start?.env.PDEV_NO_WORKSPACE).toBeUndefined();
+		expect(JSON.parse(start?.settings ?? "null")).toEqual({
+			defaultProvider: "pdev",
+			defaultModel: "auto",
+		});
+
+		const updates = memory.appends.flatMap((a) => a.acp ?? []);
+		expect(
+			updates.map((u) => (u as { sessionUpdate: string }).sessionUpdate),
+		).toContain("agent_message_chunk");
+		expect(
+			updates.filter(
+				(u) =>
+					(u as { sessionUpdate: string }).sessionUpdate === "user_message",
+			),
+		).toHaveLength(1);
+		expect(memory.rows.some((row) => row.stepKey === "pdev/file")).toBe(true);
+		expect(
+			memory.rows.filter((row) => row.stepKey.startsWith("pdev/lines/")).length,
+		).toBeGreaterThan(0);
 	});
 
-	test("a retried tool step does not run the command twice", async () => {
-		const { activities, host, memory } = setup([
-			assistant([
-				{
-					type: "toolCall",
-					id: "c1",
-					name: "bash",
-					arguments: { command: "bun test" },
-				},
-			]),
-		]);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
-		await activities.modelStep({ ...ref, step: 0 });
-		const first = await activities.toolStep({
-			...ref,
-			step: 0,
-			toolCallId: "c1",
+	test("a session with no box runs pdev with no workspace", async () => {
+		const { activities } = setup({
+			credentials: {
+				...withBox,
+				host: null,
+				room: { channelId: "c1", threadRootId: null },
+			},
 		});
-		const retry = await activities.toolStep({
-			...ref,
-			step: 0,
-			toolCallId: "c1",
-		});
-		expect(first).toEqual({ isError: false });
-		expect(retry).toEqual(first);
-		expect(host.commands).toHaveLength(1);
-		const result = memory.rows.find((row) => row.stepKey === "t1/s0/c1/end");
-		expect(JSON.stringify(result?.entry)).toContain("4 pass");
+		await runOne(activities, "hello");
+		const start = pdevLog().find((e) => e.event === "start");
+		expect(start?.env.PDEV_NO_WORKSPACE).toBe("1");
+		expect(start?.env.PDEV_REMOTE_HOST_URL).toBeUndefined();
+		expect(start?.appendSystem).toContain("final reply");
 	});
 
-	test("settling sends the reply, tool calls, usage and steers read", async () => {
-		const { activities, settled, memory } = setup([
-			assistant([
-				{
-					type: "toolCall",
-					id: "c1",
-					name: "bash",
-					arguments: { command: "bun test" },
-				},
-			]),
-			assistant([{ type: "text", text: "All 4 tests pass." }]),
-		]);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "run tests" });
-		await activities.modelStep({ ...ref, step: 0 });
-		await activities.toolStep({ ...ref, step: 0, toolCallId: "c1" });
-		await activities.modelStep({ ...ref, step: 1 });
+	test("the next turn resumes the saved session", async () => {
+		const { activities } = setup();
+		await runOne(activities, "first", "t1");
+		await runOne(activities, "second", "t2");
+		const resume = pdevLog().filter((e) => e.method === "session/resume");
+		expect(resume).toHaveLength(1);
+		expect(pdevLog().find((e) => e.event === "resumed")?.entries).toBe(3);
+		expect(prompts()).toEqual(["first", "second"]);
+	});
+
+	test("a retried attempt resumes and does not send the prompt again", async () => {
+		const { activities, memory } = setup();
+		await activities.beginTurn({
+			...turn,
+			promptId: "p1",
+			text: "crash please",
+		});
+		const input = {
+			...turn,
+			prompts: [{ promptId: "p1", text: "crash please" }],
+			steersFrom: 0,
+		};
+		await expect(
+			new MockActivityEnvironment().run(activities.runTurn, input),
+		).rejects.toThrow("pdev exited");
+		expect(
+			memory.rows.some((row) => row.stepKey.startsWith("pdev/lines/")),
+		).toBe(true);
+
+		await new MockActivityEnvironment({ attempt: 2 }).run(
+			activities.runTurn,
+			input,
+		);
+		expect(prompts().at(-1)).toContain("stopped before it finished");
+		expect(prompts().at(-1)).not.toContain("crash please");
+	});
+
+	test("passes steers to pdev as they arrive, once each", async () => {
+		const steers: SteerInput[] = [];
+		const { activities, memory } = setup({ steers: () => steers });
+		await activities.beginTurn({ ...turn, promptId: "p1", text: "hang on" });
+		const env = new MockActivityEnvironment();
+		const running = env.run(activities.runTurn, {
+			...turn,
+			prompts: [{ promptId: "p1", text: "hang on" }],
+			steersFrom: 0,
+		});
+		for (let i = 0; i < 100 && !prompts().length; i++) await Bun.sleep(20);
+		steers.push({ turnId: "t1", promptId: "p2", text: "also this" });
+		for (let i = 0; i < 100 && prompts().length < 2; i++) await Bun.sleep(20);
+		env.cancel();
+		await expect(running).rejects.toBeInstanceOf(CancelledFailure);
+		expect(prompts()).toEqual(["hang on", "also this"]);
+		expect(memory.appends.some((a) => a.stepKey === "steer/p2")).toBe(true);
+		expect(pdevLog().some((e) => e.method === "session/cancel")).toBe(true);
+	});
+	test("waits for a subagent pdev started, and ignores the subagent's own session", async () => {
+		const { activities, settled } = setup();
+		await runOne(activities, "use a subagent");
 		await activities.settleTurn({
-			...ref,
+			...turn,
 			outcome: "completed",
-			steersConsumed: 1,
+			steersConsumed: 0,
 		});
-		expect(settled).toHaveLength(1);
+		expect(settled[0]?.reply).toBe("subagent finished");
+	});
+});
+
+describe("settleTurn", () => {
+	test("reports the reply and cost from pdev's session, and posts the reply in the room", async () => {
+		const { activities, settled, posted } = setup({
+			credentials: {
+				...withBox,
+				room: { channelId: "c1", threadRootId: null },
+			},
+		});
+		await runOne(activities, "hello");
+		await activities.settleTurn({
+			...turn,
+			outcome: "completed",
+			steersConsumed: 0,
+		});
 		expect(settled[0]).toMatchObject({
-			turnId: "t1",
 			status: "completed",
-			reply: "All 4 tests pass.",
-			inputTokens: 20,
-			outputTokens: 10,
-			steersConsumed: 1,
+			reply: "reply to: hello",
+			inputTokens: 12,
+			outputTokens: 5,
+			costMicrosUsd: 2000,
 		});
-		expect(settled[0]?.toolCalls?.[0]).toMatchObject({
-			name: "bash",
-			status: "done",
-		});
-		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
-	});
-
-	test("a settle retried after the turn was recorded still writes the end", async () => {
-		const { activities, settled, memory } = setup([
-			assistant([{ type: "text", text: "Done." }]),
+		expect(posted).toEqual([
+			{ body: "reply to: hello", idempotencyKey: "t1:reply" },
 		]);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "hi" });
-		await activities.modelStep({ ...ref, step: 0 });
-		memory.failNext.append = true;
-		const settle = { ...ref, outcome: "completed" as const, steersConsumed: 0 };
-		await expect(activities.settleTurn(settle)).rejects.toThrow(
-			"store unavailable",
-		);
-		await activities.settleTurn(settle);
-		expect(settled).toHaveLength(2);
-		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
 	});
 
-	test("a session without a workspace gets no tools", async () => {
-		const { activities, model } = setup(
-			[assistant([{ type: "text", text: "Hi." }])],
-			{ ...credentials, host: null },
-		);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "hi" });
-		expect(await activities.modelStep({ ...ref, step: 0 })).toEqual({
-			toolCalls: [],
+	test("counts only this turn and closes calls a stop left open", async () => {
+		const { activities, settled, memory } = setup();
+		await runOne(activities, "first", "t1");
+		await activities.beginTurn({
+			...turn,
+			turnId: "t2",
+			promptId: "p2",
+			text: "hang",
 		});
-		expect(model.contexts[0]?.tools).toEqual([]);
-		expect(model.contexts[0]?.systemPrompt).toContain("no workspace");
-	});
-
-	test("a turn that lost its workspace access still settles as failed", async () => {
-		const { activities, settled, memory, turn } = setup([]);
-		turn.running = false;
+		const env = new MockActivityEnvironment();
+		const running = env.run(activities.runTurn, {
+			...turn,
+			turnId: "t2",
+			prompts: [{ promptId: "p2", text: "hang" }],
+			steersFrom: 0,
+		});
+		for (let i = 0; i < 100 && prompts().length < 2; i++) await Bun.sleep(20);
+		env.cancel();
+		await running.catch(() => {});
 		await activities.settleTurn({
-			...ref,
-			outcome: "failed",
-			errorMessage: "Agent may not use this workspace.",
+			...turn,
+			turnId: "t2",
+			outcome: "interrupted",
 			steersConsumed: 0,
 		});
 		expect(settled[0]).toMatchObject({
-			status: "failed",
-			errorCode: "Agent may not use this workspace.",
+			status: "interrupted",
+			costMicrosUsd: 1000,
 		});
-		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("failed");
-	});
-
-	test("in a room, the reply is posted once when the model did not post it", async () => {
-		const room = {
-			...credentials,
-			room: { channelId: "c1", threadRootId: null },
-		};
-		const { activities, model, posts } = setup(
-			[assistant([{ type: "text", text: "All good." }])],
-			room,
-		);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "status?" });
-		await activities.modelStep({ ...ref, step: 0 });
-		const offered = (model.contexts[0]?.tools ?? []) as Array<{ name: string }>;
-		expect(offered.map((tool) => tool.name)).toContain("post_message");
-		expect(model.contexts[0]?.systemPrompt).toContain("post_message");
-		await activities.settleTurn({
-			...ref,
-			outcome: "completed",
-			steersConsumed: 0,
-		});
-		expect(posts).toEqual([{ body: "All good.", idempotencyKey: "t1:reply" }]);
-	});
-
-	test("in a room, a turn that posted is not posted again", async () => {
-		const room = {
-			...credentials,
-			room: { channelId: "c1", threadRootId: null },
-		};
-		const { activities, posts } = setup(
-			[
-				assistant([
-					{
-						type: "toolCall",
-						id: "c1",
-						name: "post_message",
-						arguments: { body: "Done." },
-					},
-				]),
-				assistant([{ type: "text", text: "Posted the answer." }]),
-			],
-			room,
-		);
-		await activities.beginTurn({ ...ref, promptId: "p1", text: "status?" });
-		await activities.modelStep({ ...ref, step: 0 });
-		await activities.toolStep({ ...ref, step: 0, toolCallId: "c1" });
-		await activities.modelStep({ ...ref, step: 1 });
-		await activities.settleTurn({
-			...ref,
-			outcome: "completed",
-			steersConsumed: 0,
-		});
-		expect(posts).toEqual([{ body: "Done.", idempotencyKey: "c1" }]);
+		const end = memory.appends.find((a) => a.stepKey === "t2/end");
+		expect(
+			end?.acp?.some(
+				(u) => (u as { toolCallId?: string }).toolCallId === "call_1",
+			),
+		).toBe(true);
 	});
 });

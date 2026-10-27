@@ -12,9 +12,8 @@
 		"send": "bun run scripts/send.ts"
 	},
 	"dependencies": {
-		"@earendil-works/pi-agent-core": "1.4.0",
-		"@earendil-works/pi-ai": "1.4.0",
 		"@superset/agent-harness": "workspace:*",
+		"@superset/chat-runtime": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@temporalio/activity": "1.24.0",
 		"@temporalio/client": "1.24.0",

@@ -8,6 +8,7 @@ import {
 	stateQuery,
 	steerTurn,
 } from "@superset/agent-harness/session";
+import { turnSteersQuery } from "@superset/agent-harness/session/definitions";
 import { Context } from "@temporalio/activity";
 import { TestWorkflowEnvironment } from "@temporalio/testing";
 import { Worker } from "@temporalio/worker";
@@ -16,9 +17,11 @@ import type { AgentActivities } from "../../activities/createActivities";
 type Call = { name: string; input: Record<string, unknown> };
 
 interface Script {
-	toolCallsPerStep: Array<Array<{ id: string; name: string }>>;
 	settleSteerPendingTimes?: number;
-	toolStepHangs?: boolean;
+	/** Hold each run until this resolves, then report the steers it read. */
+	runGate?: () => Promise<void>;
+	readSteersDuringRun?: boolean;
+	runHangs?: boolean;
 }
 
 let env: TestWorkflowEnvironment;
@@ -34,7 +37,7 @@ after(async () => {
 function fakeActivities(
 	script: Script,
 	calls: Call[],
-	hooks: { toolStarted?: () => void; toolCancelled?: () => void } = {},
+	hooks: { runStarted?: () => void; runCancelled?: () => void } = {},
 ) {
 	let settlePending = script.settleSteerPendingTimes ?? 0;
 	const activities: AgentActivities = {
@@ -44,14 +47,10 @@ function fakeActivities(
 		async addSteers(input) {
 			calls.push({ name: "addSteers", input: { ...input } });
 		},
-		async modelStep(input) {
-			calls.push({ name: "modelStep", input: { ...input } });
-			return { toolCalls: script.toolCallsPerStep[input.step] ?? [] };
-		},
-		async toolStep(input) {
-			calls.push({ name: "toolStep", input: { ...input } });
-			hooks.toolStarted?.();
-			if (script.toolStepHangs) {
+		async runTurn(input) {
+			calls.push({ name: "runTurn", input: { ...input } });
+			hooks.runStarted?.();
+			if (script.runHangs) {
 				const context = Context.current();
 				try {
 					for (;;) {
@@ -59,10 +58,18 @@ function fakeActivities(
 						await context.sleep(100);
 					}
 				} finally {
-					hooks.toolCancelled?.();
+					hooks.runCancelled?.();
 				}
 			}
-			return { isError: false };
+			await script.runGate?.();
+			if (!script.readSteersDuringRun)
+				return { steersConsumed: input.steersFrom };
+			const workflowId =
+				Context.current().info.workflowExecution?.workflowId ?? "";
+			const steers = await env.client.workflow
+				.getHandle(workflowId)
+				.query(turnSteersQuery, input.turnId);
+			return { steersConsumed: steers.length };
 		},
 		async settleTurn(input) {
 			calls.push({ name: "settleTurn", input: { ...input } });
@@ -112,47 +119,35 @@ async function waitFor(check: () => boolean) {
 const names = (calls: Call[]) => calls.map((call) => call.name);
 
 describe("agentSession workflow", () => {
-	it("runs a turn through model and tool steps, then settles; a resent prompt is a no-op", async () => {
+	it("runs a turn with pdev, then settles; a resent prompt is a no-op", async () => {
 		const calls: Call[] = [];
-		const activities = fakeActivities(
-			{ toolCallsPerStep: [[{ id: "c1", name: "bash" }], []] },
-			calls,
-		);
-		await withWorker(activities, "s1", async () => {
+		await withWorker(fakeActivities({}, calls), "s1", async () => {
 			const input = { turnId: "t1", promptId: "p1", text: "run the tests" };
 			assert.equal(await startTurn(env.client, "s1", input), "accepted");
 			await waitFor(() => names(calls).includes("settleTurn"));
 			assert.equal(await startTurn(env.client, "s1", input), "duplicate");
 		});
-		assert.deepEqual(names(calls), [
-			"beginTurn",
-			"modelStep",
-			"toolStep",
-			"modelStep",
-			"settleTurn",
+		assert.deepEqual(names(calls), ["beginTurn", "runTurn", "settleTurn"]);
+		assert.deepEqual(calls[1]?.input.prompts, [
+			{ promptId: "p1", text: "run the tests" },
 		]);
 		assert.equal(calls.at(-1)?.input.outcome, "completed");
 	});
 
-	it("joins a steer to the running turn before its next model call", async () => {
+	it("hands a steer to the running turn", async () => {
 		const calls: Call[] = [];
 		let released = false;
 		const activities = fakeActivities(
-			{ toolCallsPerStep: [[{ id: "c1", name: "bash" }], [], []] },
+			{ runGate: () => waitFor(() => released), readSteersDuringRun: true },
 			calls,
 		);
-		const slowTool = activities.toolStep;
-		activities.toolStep = async (input) => {
-			await waitFor(() => released);
-			return slowTool(input);
-		};
 		await withWorker(activities, "s2", async () => {
 			await startTurn(env.client, "s2", {
 				turnId: "t1",
 				promptId: "p1",
 				text: "first",
 			});
-			await waitFor(() => names(calls).includes("modelStep"));
+			await waitFor(() => names(calls).includes("runTurn"));
 			assert.equal(
 				await steerTurn(env.client, "s2", {
 					turnId: "t1",
@@ -164,39 +159,65 @@ describe("agentSession workflow", () => {
 			released = true;
 			await waitFor(() => names(calls).includes("settleTurn"));
 		});
+		assert.deepEqual(names(calls), ["beginTurn", "runTurn", "settleTurn"]);
+		assert.equal(calls.at(-1)?.input.steersConsumed, 1);
+	});
+
+	it("runs pdev again for a steer the run ended before reading", async () => {
+		const calls: Call[] = [];
+		let released = false;
+		const activities = fakeActivities(
+			{ runGate: () => waitFor(() => released) },
+			calls,
+		);
+		await withWorker(activities, "s7", async () => {
+			await startTurn(env.client, "s7", {
+				turnId: "t1",
+				promptId: "p1",
+				text: "first",
+			});
+			await waitFor(() => names(calls).includes("runTurn"));
+			await steerTurn(env.client, "s7", {
+				turnId: "t1",
+				promptId: "p2",
+				text: "one more thing",
+			});
+			released = true;
+			await waitFor(() => names(calls).includes("settleTurn"));
+		});
 		assert.deepEqual(names(calls), [
 			"beginTurn",
-			"modelStep",
-			"toolStep",
-			"addSteers",
-			"modelStep",
+			"runTurn",
+			"runTurn",
 			"settleTurn",
 		]);
+		assert.deepEqual(calls[2]?.input.prompts, [
+			{ promptId: "p2", text: "one more thing", steer: true },
+		]);
+		assert.equal(calls[2]?.input.steersFrom, 1);
+		assert.equal(calls.at(-1)?.input.steersConsumed, 1);
 	});
 
 	it("joins a steer to a queued turn, and drops one for a finished turn", async () => {
 		const calls: Call[] = [];
 		let released = false;
-		let toolEntered = false;
+		let entered = false;
 		const activities = fakeActivities(
-			{ toolCallsPerStep: [[{ id: "c1", name: "bash" }], []] },
+			{
+				runGate: async () => {
+					entered = true;
+					await waitFor(() => released);
+				},
+			},
 			calls,
 		);
-		const slowTool = activities.toolStep;
-		activities.toolStep = async (input) => {
-			toolEntered = true;
-			await waitFor(() => released);
-			return slowTool(input);
-		};
-		const turnIds = () =>
-			calls.filter((c) => c.name === "beginTurn").map((c) => c.input.turnId);
 		await withWorker(activities, "s6", async () => {
 			await startTurn(env.client, "s6", {
 				turnId: "t1",
 				promptId: "p1",
 				text: "first",
 			});
-			await waitFor(() => toolEntered);
+			await waitFor(() => entered);
 			await startTurn(env.client, "s6", {
 				turnId: "t2",
 				promptId: "p2",
@@ -217,27 +238,20 @@ describe("agentSession workflow", () => {
 				"duplicate",
 			);
 		});
-		assert.deepEqual(turnIds(), ["t1", "t2"]);
 		const secondTurn = calls.slice(
 			calls.findIndex((c) => c.input.turnId === "t2"),
 		);
-		assert.deepEqual(names(secondTurn), [
-			"beginTurn",
-			"addSteers",
-			"modelStep",
-			"toolStep",
-			"modelStep",
-			"settleTurn",
+		assert.deepEqual(names(secondTurn), ["beginTurn", "runTurn", "settleTurn"]);
+		assert.deepEqual(secondTurn[1]?.input.prompts, [
+			{ promptId: "p2", text: "second" },
+			{ promptId: "p3", text: "and this", steer: true },
 		]);
 		assert.equal(secondTurn.at(-1)?.input.steersConsumed, 1);
 	});
 
-	it("waits for a steer the API reports pending, then settles with it read", async () => {
+	it("waits for a steer the API reports pending, then runs it", async () => {
 		const calls: Call[] = [];
-		const activities = fakeActivities(
-			{ toolCallsPerStep: [[], []], settleSteerPendingTimes: 1 },
-			calls,
-		);
+		const activities = fakeActivities({ settleSteerPendingTimes: 1 }, calls);
 		await withWorker(activities, "s3", async () => {
 			await startTurn(env.client, "s3", {
 				turnId: "t1",
@@ -256,10 +270,9 @@ describe("agentSession workflow", () => {
 		});
 		assert.deepEqual(names(calls), [
 			"beginTurn",
-			"modelStep",
+			"runTurn",
 			"settleTurn",
-			"addSteers",
-			"modelStep",
+			"runTurn",
 			"settleTurn",
 		]);
 		assert.equal(calls.at(-1)?.input.steersConsumed, 1);
@@ -267,29 +280,25 @@ describe("agentSession workflow", () => {
 
 	it("settles a stopped turn as interrupted", async () => {
 		const calls: Call[] = [];
-		let toolRunning = false;
-		let toolCancelled = false;
-		const activities = fakeActivities(
-			{ toolCallsPerStep: [[{ id: "c1", name: "bash" }]], toolStepHangs: true },
-			calls,
-			{
-				toolStarted: () => {
-					toolRunning = true;
-				},
-				toolCancelled: () => {
-					toolCancelled = true;
-				},
+		let running = false;
+		let cancelled = false;
+		const activities = fakeActivities({ runHangs: true }, calls, {
+			runStarted: () => {
+				running = true;
 			},
-		);
+			runCancelled: () => {
+				cancelled = true;
+			},
+		});
 		await withWorker(activities, "s4", async () => {
 			await startTurn(env.client, "s4", {
 				turnId: "t1",
 				promptId: "p1",
 				text: "long job",
 			});
-			await waitFor(() => toolRunning);
+			await waitFor(() => running);
 			await interruptTurn(env.client, "s4", "t1");
-			await waitFor(() => names(calls).includes("settleTurn") && toolCancelled);
+			await waitFor(() => names(calls).includes("settleTurn") && cancelled);
 			const state = await env.client.workflow
 				.getHandle(sessionWorkflowId("s4"))
 				.query(stateQuery);
@@ -300,8 +309,7 @@ describe("agentSession workflow", () => {
 
 	it("ends the workflow after ten idle minutes", async () => {
 		const calls: Call[] = [];
-		const activities = fakeActivities({ toolCallsPerStep: [[]] }, calls);
-		await withWorker(activities, "s5", async () => {
+		await withWorker(fakeActivities({}, calls), "s5", async () => {
 			await startTurn(env.client, "s5", {
 				turnId: "t1",
 				promptId: "p1",
@@ -313,6 +321,6 @@ describe("agentSession workflow", () => {
 			const description = await handle.describe();
 			assert.equal(description.status.name, "COMPLETED");
 		});
-		assert.deepEqual(names(calls), ["beginTurn", "modelStep", "settleTurn"]);
+		assert.deepEqual(names(calls), ["beginTurn", "runTurn", "settleTurn"]);
 	});
 });

@@ -1,6 +1,9 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { streamSimple } from "@earendil-works/pi-ai/compat";
 import { AGENT_TASK_QUEUE } from "@superset/agent-harness/session";
+import { turnSteersQuery } from "@superset/agent-harness/session/definitions";
+import { Client, Connection } from "@temporalio/client";
 import { NativeConnection, Worker } from "@temporalio/worker";
 import { createActivities } from "./activities/createActivities";
 import { workerApi } from "./clients/workerApi";
@@ -16,7 +19,7 @@ const api = workerApi({
 	workerSecret: need("AGENT_WORKER_SECRET"),
 	model: {
 		baseUrl: process.env.AGENT_ROUTER_URL ?? "https://router.superset.sh",
-		modelId: process.env.AGENT_MODEL ?? "claude-sonnet-5",
+		modelId: process.env.AGENT_MODEL ?? "",
 	},
 	...(process.env.AGENT_ROUTER_API_KEY
 		? { modelHeaders: { "x-api-key": process.env.AGENT_ROUTER_API_KEY } }
@@ -25,14 +28,20 @@ const api = workerApi({
 });
 
 const apiKey = process.env.TEMPORAL_API_KEY;
-const connection = await NativeConnection.connect({
+const namespace = process.env.TEMPORAL_NAMESPACE ?? "default";
+const temporal = {
 	address: process.env.TEMPORAL_ADDRESS ?? "localhost:7233",
 	...(apiKey ? { tls: true, apiKey } : {}),
+};
+const connection = await NativeConnection.connect(temporal);
+const client = new Client({
+	connection: await Connection.connect(temporal),
+	namespace,
 });
 
 const worker = await Worker.create({
 	connection,
-	namespace: process.env.TEMPORAL_NAMESPACE ?? "default",
+	namespace,
 	taskQueue: AGENT_TASK_QUEUE,
 	defaultHeartbeatThrottleInterval: "2 seconds",
 	maxHeartbeatThrottleInterval: "2 seconds",
@@ -43,7 +52,13 @@ const worker = await Worker.create({
 		credentials: api.credentials,
 		settler: api.settler,
 		roomPoster: api.roomPoster,
-		stream: streamSimple,
+		pdev: {
+			command: process.env.PDEV_BIN ?? "pdev",
+			workRoot: process.env.AGENT_WORK_ROOT ?? join(tmpdir(), "agent-sessions"),
+			...(process.env.AGENT_MODEL ? { model: process.env.AGENT_MODEL } : {}),
+		},
+		turnSteers: (workflowId, turnId) =>
+			client.workflow.getHandle(workflowId).query(turnSteersQuery, turnId),
 	}),
 	shutdownGraceTime: "60 seconds",
 });
