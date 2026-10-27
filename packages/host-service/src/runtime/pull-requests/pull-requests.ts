@@ -1464,7 +1464,10 @@ export class PullRequestRuntimeManager {
 
 	private getCachedPullRequestDetails(
 		repo: NormalizedRepoIdentity,
-		node: GitHubPullRequestNode,
+		node: Pick<
+			GitHubPullRequestNode,
+			"number" | "headRefOid" | "state" | "isDraft"
+		>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<PullRequestDetails> {
 		// Retain completed terminal checks; pending checks and failed fetches still retry.
@@ -1794,16 +1797,38 @@ export class PullRequestRuntimeManager {
 		);
 		for (const row of linked.values()) {
 			if (refreshedIds.has(row.id)) continue;
-			if (
-				!options.bypassCache &&
-				(row.state === "merged" ||
-					(row.state === "closed" &&
-						Date.now() - (row.lastFetchedAt ?? 0) <
-							CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS))
-			)
-				continue;
 			const repo = { ...projectRepo, owner: row.repoOwner, name: row.repoName };
 			try {
+				if (
+					!options.bypassCache &&
+					(row.state === "merged" ||
+						(row.state === "closed" &&
+							Date.now() - (row.lastFetchedAt ?? 0) <
+								CLOSED_PULL_REQUEST_REFRESH_INTERVAL_MS))
+				) {
+					const details = await this.getCachedPullRequestDetails(
+						repo,
+						{
+							number: row.prNumber,
+							headRefOid: row.headSha,
+							state: row.state === "merged" ? "MERGED" : "CLOSED",
+							isDraft: row.isDraft,
+						},
+						options,
+					);
+					const checks = parseCheckContexts(details.checks);
+					this.db
+						.update(pullRequests)
+						.set({
+							reviewDecision: mapReviewDecision(details.reviewDecision),
+							checksStatus: computeChecksStatus(checks),
+							checksJson: JSON.stringify(checks),
+							updatedAt: Date.now(),
+						})
+						.where(eq(pullRequests.id, row.id))
+						.run();
+					continue;
+				}
 				const node = await this.cachedGitHubFetch(
 					this.pullRequestNumberCache,
 					`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${row.prNumber}`,

@@ -2524,6 +2524,121 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		}
 	});
 
+	test.each([
+		{ state: "closed", failFirst: false },
+		{ state: "merged", failFirst: false },
+		{ state: "closed", failFirst: true },
+		{ state: "merged", failFirst: true },
+	] as const)("refreshes historical $state details independently of state lookup (failure=$failFirst)", async ({
+		state,
+		failFirst,
+	}) => {
+		const t0 = 1_700_000_000_000;
+		setSystemTime(new Date(t0));
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "old",
+			prNumber: 8,
+			headBranch: "old",
+			headSha: "history",
+			state,
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "old", linkedAt: t0 })
+			.run();
+		let lookups = 0;
+		let attempts = 0;
+		let completed = false;
+		const execGh = async (args: string[]) => {
+			const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+			if (path.endsWith("/pulls"))
+				return [
+					makePrNode({ number: 7, headRef: "feature", headSha: "current" }),
+				];
+			if (path.endsWith("/pulls/8")) {
+				lookups++;
+				return makePrNode({
+					number: 8,
+					headRef: "old",
+					headSha: "history",
+					state: "closed",
+					mergedAt: state === "merged" ? "2026-10-26T12:00:00Z" : null,
+				});
+			}
+			if (path.endsWith("commits/history/check-runs")) {
+				attempts++;
+				if (failFirst && attempts === 1) throw new Error("details failed");
+				return {
+					check_runs: [
+						{
+							name: "ci",
+							status: completed ? "completed" : "in_progress",
+							conclusion: completed ? "success" : null,
+						},
+						{ name: "lint", status: "completed", conclusion: "failure" },
+					],
+				};
+			}
+			if (path.endsWith("/check-runs")) return { check_runs: [] };
+			return args.includes("graphql") ? {} : [];
+		};
+		let manager = createManager(db, { execGh });
+		try {
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(attempts).toBe(1);
+			expect(lookups).toBe(1);
+			const currentId = getWorkspace(db, "ws")?.pullRequestId;
+			completed = true;
+			setSystemTime(new Date(t0 + 61_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(failFirst ? 1 : 2);
+			setSystemTime(new Date(t0 + 121_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+			expect(lookups).toBe(1);
+			expect(getPrByNumber(db, 8)?.lastFetchedAt).toBe(t0);
+			expect(
+				JSON.parse(getPrByNumber(db, 8)?.checksJson ?? "[]"),
+			).toContainEqual(
+				expect.objectContaining({ name: "ci", status: "success" }),
+			);
+			setSystemTime(new Date(t0 + 242_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(2);
+			expect(lookups).toBe(1);
+			expect(getWorkspace(db, "ws")?.pullRequestId).toBe(currentId);
+			manager.stop();
+			manager = createManager(db, { execGh });
+			setSystemTime(new Date(t0 + 303_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(3);
+			expect(lookups).toBe(1);
+			expect(getPrByNumber(db, 8)?.lastFetchedAt).toBe(t0);
+			setSystemTime(new Date(t0 + 364_000));
+			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			expect(attempts).toBe(3);
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			expect(attempts).toBe(4);
+			expect(lookups).toBe(2);
+		} finally {
+			setSystemTime();
+			manager.stop();
+			db.$client.close();
+		}
+	});
+
 	test("checks closed history daily, allows explicit refresh, and still detects reopening", async () => {
 		const t0 = 1_700_000_000_000;
 		setSystemTime(new Date(t0));

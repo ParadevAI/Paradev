@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import { ConditionalGh } from "../conditional-gh";
 import {
 	fetchOpenPullRequestsFromGh,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecisionFromGh,
@@ -26,6 +28,44 @@ function createExecGh(responses: unknown[]) {
 }
 
 describe("GitHub pull request REST queries", () => {
+	test("revalidates historical PR lookups through the conditional GET cache", async () => {
+		const body = {
+			number: 42,
+			title: "Historical PR",
+			html_url: "https://github.com/owner/repo/pull/42",
+			state: "closed",
+			head: {
+				ref: "old",
+				sha: "abc123",
+				repo: { name: "repo", owner: { login: "owner" } },
+			},
+		};
+		const calls: string[][] = [];
+		const gh = new ConditionalGh(async (args) => {
+			calls.push(args);
+			if (calls.length === 1) {
+				return args.includes("--include")
+					? `HTTP/2.0 200 OK\r\nEtag: "history"\r\n\r\n${JSON.stringify(body)}`
+					: body;
+			}
+			throw Object.assign(new Error("gh: HTTP 304"), {
+				code: 1,
+				stdout: "HTTP/2.0 304 Not Modified\r\n\r\n",
+			});
+		});
+		const repository = { owner: "owner", name: "repo" };
+		const first = await fetchPullRequestByNumberFromGh(gh.exec, repository, 42);
+		expect(first).toMatchObject({
+			number: 42,
+			state: "CLOSED",
+			headRefOid: "abc123",
+		});
+		expect(
+			await fetchPullRequestByNumberFromGh(gh.exec, repository, 42),
+		).toEqual(first);
+		expect(calls[1]).toContain('If-None-Match: "history"');
+	});
+
 	test("fetches only the PR matching the requested upstream head", async () => {
 		const { calls, execGh } = createExecGh([
 			[

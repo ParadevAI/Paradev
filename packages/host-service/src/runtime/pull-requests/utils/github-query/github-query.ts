@@ -286,6 +286,8 @@ export async function fetchPullRequestByNumberFromGh(
 	return normalizePullRequest(
 		await execGh([
 			"api",
+			"--method",
+			"GET",
 			`repos/${repository.owner}/${repository.name}/pulls/${number}`,
 		]),
 	);
