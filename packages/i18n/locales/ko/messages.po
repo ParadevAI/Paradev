@@ -1628,9 +1628,6 @@ msgstr "이 브랜치에서 새 워크스페이스를 만들고 대화를 새 �
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "페이지가 독자별 답변을 저장하므로 백엔드 없이 투표를 만들 수 있습니다."
 
-msgid "A paused Dev starts no work. Its chats stay open."
-msgstr "일시 중지된 Dev는 작업을 시작하지 않습니다. 채팅은 계속 열려 있습니다."
-
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "우리가 매일 해결하는 것과 비슷한 실전 TypeScript 문제입니다. 알고리즘 퍼즐은 없습니다."
 
@@ -1706,9 +1703,6 @@ msgstr "초대 수락"
 
 msgid "Accept terms"
 msgstr "약관 동의"
-
-msgid "Access"
-msgstr "액세스"
 
 msgid "Access denied"
 msgstr "접근이 거부되었습니다"
@@ -1902,6 +1896,9 @@ msgstr "파일, 앱 등 추가"
 msgid "Add files, apps, and more (@)"
 msgstr "파일, 앱 등 추가 (@)"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "이슈 #{0}을(를) 워크스페이스에 추가"
@@ -2001,6 +1998,9 @@ msgstr "사이드바에 추가"
 
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "이 기기에 직접 만든 터미널 에이전트를 추가합니다."
@@ -2726,9 +2726,6 @@ msgstr "#{0}을(를) 보관할까요?"
 
 msgid "Archive channel"
 msgstr "채널 보관"
-
-msgid "Archive Dev"
-msgstr "Dev 보관"
 
 msgid "Archive environment"
 msgstr "환경 보관"
@@ -3816,9 +3813,6 @@ msgstr "채널 옵션"
 
 msgid "Channels"
 msgstr "채널"
-
-msgid "Channels it can read and post in"
-msgstr "읽고 게시할 수 있는 채널"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 더 결제합니다."
@@ -6507,9 +6501,6 @@ msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
 msgid "Dev"
 msgstr "개발"
 
-msgid "Dev details"
-msgstr "Dev 세부정보"
-
 msgid "Dev options"
 msgstr "Dev 옵션"
 
@@ -6590,6 +6581,9 @@ msgstr "디지털 제품 디자이너"
 
 msgid "Direct message"
 msgstr "다이렉트 메시지"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "다이렉트 모드"
@@ -9025,6 +9019,9 @@ msgstr "묶인 명령이 열리는 방식입니다."
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "터미널에서 그냥 Claude Code를 실행하는 것과 Paradev는 어떻게 다른가요?"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "작동 방식"
 
@@ -10469,9 +10466,6 @@ msgstr "장시간 작업의 신뢰성이 임계점을 넘습니다. 오후 6시�
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "오래 호버하면 단축키만 보여 주는 툴팁이며, 그 칩 스타일이 이제 TooltipContent 기본값입니다"
-
-msgid "Look"
-msgstr "모습"
 
 msgid "Looking at {what}"
 msgstr "{what} 확인 중"
@@ -12013,9 +12007,6 @@ msgstr "아직 버전이 없습니다"
 msgid "No versions yet."
 msgstr "아직 버전이 없습니다."
 
-msgid "No work yet"
-msgstr "아직 작업이 없습니다"
-
 msgid "No workspace run command configured"
 msgstr "설정된 워크스페이스 실행 명령이 없습니다"
 
@@ -12060,9 +12051,6 @@ msgstr "그 때문에 리뷰 방식을 바꾸는 사람은 없습니다."
 
 msgid "None"
 msgstr "없음"
-
-msgid "None yet"
-msgstr "아직 없음"
 
 msgid "None. This is the floor."
 msgstr "없음. 여기가 바닥입니다."
@@ -12181,6 +12169,9 @@ msgstr "실행 중인 항목 없음"
 
 msgid "Nothing was missed"
 msgstr "놓친 실행이 없습니다"
+
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
 
 msgid "Notice"
 msgstr "알림"
@@ -14484,6 +14475,12 @@ msgstr "사용량 읽는 중…"
 
 msgid "Reading your local usage…"
 msgstr "로컬 사용량을 읽는 중…"
+
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
 
 msgid "Ready for review"
 msgstr "리뷰 준비됨"
@@ -17767,6 +17764,9 @@ msgstr "확인 중…"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "평소보다 오래 걸리고 있습니다. 화면을 나가도 계속 진행됩니다."
 
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+
 msgid "Talk to Paradev"
 msgstr "Paradev에 문의하기"
 
@@ -20258,9 +20258,6 @@ msgstr "어떤 AI 코딩 에이전트를 지원하나요?"
 msgid "Which plans include automations?"
 msgstr "어떤 플랜에 자동화가 포함되나요?"
 
-msgid "Who can message it"
-msgstr "메시지를 보낼 수 있는 사람"
-
 msgid "Who can open it"
 msgstr "열 수 있는 사람"
 
@@ -20306,9 +20303,6 @@ msgstr "워드마크, 검정"
 msgid "Wordmark, white"
 msgstr "워드마크, 흰색"
 
-msgid "Work"
-msgstr "작업"
-
 msgid "Work email"
 msgstr "업무용 이메일"
 
@@ -20349,6 +20343,9 @@ msgstr "{0}분 {1}초 동안 작업 중"
 
 msgid "Working for {seconds}s"
 msgstr "{seconds}초 동안 작업 중"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "작업 중…"

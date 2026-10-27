@@ -15,7 +15,6 @@ import {
 	LuArchive,
 	LuCirclePause,
 	LuCirclePlay,
-	LuInfo,
 	LuPencil,
 } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -73,18 +72,6 @@ export function DevContextMenu({
 					<ContextMenuItem onSelect={() => setCustomizing(true)}>
 						<LuPencil className="size-4" />
 						<Trans>Customize</Trans>
-					</ContextMenuItem>
-					<ContextMenuItem
-						onSelect={() =>
-							void navigate({
-								to: "/devs/$devId",
-								params: { devId: dev.id },
-								search: { details: "about" },
-							})
-						}
-					>
-						<LuInfo className="size-4" />
-						<Trans>Dev details</Trans>
 					</ContextMenuItem>
 					<ContextMenuSeparator />
 					{isPaused ? (

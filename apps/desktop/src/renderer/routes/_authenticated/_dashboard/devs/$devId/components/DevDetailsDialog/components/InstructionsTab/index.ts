@@ -1,1 +1,0 @@
-export { InstructionsTab } from "./InstructionsTab";

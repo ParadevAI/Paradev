@@ -93,6 +93,7 @@ export const agentRouter = {
 					and(
 						eq(agentRelations.agentId, agent.id),
 						eq(agentRelations.objectType, "channel"),
+						eq(channels.kind, "channel"),
 						isNull(channels.archivedAt),
 					),
 				)

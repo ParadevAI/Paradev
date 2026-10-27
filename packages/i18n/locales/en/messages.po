@@ -1628,9 +1628,6 @@ msgstr "A new workspace off this branch, with the conversation handed to a fresh
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "A page can save each reader's answer, so a poll works with no backend."
 
-msgid "A paused Dev starts no work. Its chats stay open."
-msgstr "A paused Dev starts no work. Its chats stay open."
-
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 
@@ -1706,9 +1703,6 @@ msgstr "Accept invitation"
 
 msgid "Accept terms"
 msgstr "Accept terms"
-
-msgid "Access"
-msgstr "Access"
 
 msgid "Access denied"
 msgstr "Access denied"
@@ -1902,6 +1896,9 @@ msgstr "Add files, apps, and more"
 msgid "Add files, apps, and more (@)"
 msgstr "Add files, apps, and more (@)"
 
+msgid "Add instructions"
+msgstr "Add instructions"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "Add issue #{0} to workspace"
@@ -2001,6 +1998,9 @@ msgstr "Add to sidebar"
 
 msgid "Add to workspace"
 msgstr "Add to workspace"
+
+msgid "Add what it does"
+msgstr "Add what it does"
 
 msgid "Add your own terminal agent to this device."
 msgstr "Add your own terminal agent to this device."
@@ -2726,9 +2726,6 @@ msgstr "Archive #{0}?"
 
 msgid "Archive channel"
 msgstr "Archive channel"
-
-msgid "Archive Dev"
-msgstr "Archive Dev"
 
 msgid "Archive environment"
 msgstr "Archive environment"
@@ -3816,9 +3813,6 @@ msgstr "Channel options"
 
 msgid "Channels"
 msgstr "Channels"
-
-msgid "Channels it can read and post in"
-msgstr "Channels it can read and post in"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Charge your saved card for more GB-hours when bought GB-hours run low."
@@ -6507,9 +6501,6 @@ msgstr "Details are not available here, but the link still opens."
 msgid "Dev"
 msgstr "Dev"
 
-msgid "Dev details"
-msgstr "Dev details"
-
 msgid "Dev options"
 msgstr "Dev options"
 
@@ -6590,6 +6581,9 @@ msgstr "Digital Product Designer"
 
 msgid "Direct message"
 msgstr "Direct message"
+
+msgid "Direct messages"
+msgstr "Direct messages"
 
 msgid "Direct mode"
 msgstr "Direct mode"
@@ -9025,6 +9019,9 @@ msgstr "How grouped commands open."
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "How is Paradev different from just running Claude Code in a terminal?"
 
+msgid "How it should work and what to avoid"
+msgstr "How it should work and what to avoid"
+
 msgid "How it works"
 msgstr "How it works"
 
@@ -10469,9 +10466,6 @@ msgstr "Long-horizon reliability crosses a threshold. Work assigned at 6pm is me
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
-
-msgid "Look"
-msgstr "Look"
 
 msgid "Looking at {what}"
 msgstr "Looking at {what}"
@@ -12013,9 +12007,6 @@ msgstr "No versions yet"
 msgid "No versions yet."
 msgstr "No versions yet."
 
-msgid "No work yet"
-msgstr "No work yet"
-
 msgid "No workspace run command configured"
 msgstr "No workspace run command configured"
 
@@ -12060,9 +12051,6 @@ msgstr "Nobody reviews differently because of it."
 
 msgid "None"
 msgstr "None"
-
-msgid "None yet"
-msgstr "None yet"
 
 msgid "None. This is the floor."
 msgstr "None. This is the floor."
@@ -12181,6 +12169,9 @@ msgstr "Nothing running"
 
 msgid "Nothing was missed"
 msgstr "Nothing was missed"
+
+msgid "Nothing yet"
+msgstr "Nothing yet"
 
 msgid "Notice"
 msgstr "Notice"
@@ -14484,6 +14475,12 @@ msgstr "Reading usage…"
 
 msgid "Reading your local usage…"
 msgstr "Reading your local usage…"
+
+msgid "Reads and posts"
+msgstr "Reads and posts"
+
+msgid "Ready"
+msgstr "Ready"
 
 msgid "Ready for review"
 msgstr "Ready for review"
@@ -17767,6 +17764,9 @@ msgstr "Taking a look…"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Taking longer than usual. It keeps going if you leave."
 
+msgid "Talk to it"
+msgstr "Talk to it"
+
 msgid "Talk to Paradev"
 msgstr "Talk to Paradev"
 
@@ -20258,9 +20258,6 @@ msgstr "Which AI coding agents are supported?"
 msgid "Which plans include automations?"
 msgstr "Which plans include automations?"
 
-msgid "Who can message it"
-msgstr "Who can message it"
-
 msgid "Who can open it"
 msgstr "Who can open it"
 
@@ -20306,9 +20303,6 @@ msgstr "Wordmark, black"
 msgid "Wordmark, white"
 msgstr "Wordmark, white"
 
-msgid "Work"
-msgstr "Work"
-
 msgid "Work email"
 msgstr "Work email"
 
@@ -20349,6 +20343,9 @@ msgstr "Working for {0}m {1}s"
 
 msgid "Working for {seconds}s"
 msgstr "Working for {seconds}s"
+
+msgid "Working on"
+msgstr "Working on"
 
 msgid "Working…"
 msgstr "Working…"

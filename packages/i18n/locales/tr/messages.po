@@ -1628,9 +1628,6 @@ msgstr "Bu daldan yeni bir çalışma alanı; konuşma yeni bir aracıya devredi
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Bir sayfa her okuyucunun yanıtını kaydedebilir, böylece anket arka uç olmadan çalışır."
 
-msgid "A paused Dev starts no work. Its chats stay open."
-msgstr "Duraklatılmış bir Dev iş başlatmaz. Sohbetleri açık kalır."
-
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Her gün çözdüklerimize benzer, pratik bir TypeScript problemi. Algoritma bulmacası yok."
 
@@ -1706,9 +1703,6 @@ msgstr "Daveti kabul et"
 
 msgid "Accept terms"
 msgstr "Koşulları kabul et"
-
-msgid "Access"
-msgstr "Erişim"
 
 msgid "Access denied"
 msgstr "Erişim reddedildi"
@@ -1902,6 +1896,9 @@ msgstr "Dosya, uygulama ve daha fazlasını ekleyin"
 msgid "Add files, apps, and more (@)"
 msgstr "Dosya, uygulama ve daha fazlasını ekleyin (@)"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "#{0} issue'sunu çalışma alanına ekle"
@@ -2001,6 +1998,9 @@ msgstr "Kenar çubuğuna ekle"
 
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "Bu cihaza kendi terminal ajanınızı ekleyin."
@@ -2726,9 +2726,6 @@ msgstr "#{0} arşivlensin mi?"
 
 msgid "Archive channel"
 msgstr "Kanalı arşivle"
-
-msgid "Archive Dev"
-msgstr "Dev'i arşivle"
 
 msgid "Archive environment"
 msgstr "Ortamı arşivle"
@@ -3816,9 +3813,6 @@ msgstr "Kanal seçenekleri"
 
 msgid "Channels"
 msgstr "Kanallar"
-
-msgid "Channels it can read and post in"
-msgstr "Okuyup paylaşım yapabildiği kanallar"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Satın alınan GB-saatler azaldığında kayıtlı kartınızdan daha fazla GB-saat için ücret alır."
@@ -6507,9 +6501,6 @@ msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açıl
 msgid "Dev"
 msgstr "Geliştirme"
 
-msgid "Dev details"
-msgstr "Dev ayrıntıları"
-
 msgid "Dev options"
 msgstr "Dev seçenekleri"
 
@@ -6590,6 +6581,9 @@ msgstr "Dijital Ürün Tasarımcısı"
 
 msgid "Direct message"
 msgstr "Doğrudan mesaj"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "Doğrudan mod"
@@ -9025,6 +9019,9 @@ msgstr "Gruplanmış komutların nasıl açılacağı."
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev'in Claude Code'u terminalde çalıştırmaktan farkı ne?"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "Nasıl çalışır"
 
@@ -10469,9 +10466,6 @@ msgstr "Uzun vadeli güvenilirlik bir eşiği aşar. Akşam 18.00'de verilen iş
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Uzun bekletmede yalnızca kısayol gösteren tooltip; çip stili artık TooltipContent varsayılanı"
-
-msgid "Look"
-msgstr "Görünüm"
 
 msgid "Looking at {what}"
 msgstr "{what} inceleniyor"
@@ -12013,9 +12007,6 @@ msgstr "Henüz sürüm yok"
 msgid "No versions yet."
 msgstr "Henüz sürüm yok."
 
-msgid "No work yet"
-msgstr "Henüz iş yok"
-
 msgid "No workspace run command configured"
 msgstr "Yapılandırılmış çalışma alanı çalıştırma komutu yok"
 
@@ -12060,9 +12051,6 @@ msgstr "Kimse bu yüzden farklı inceleme yapmaz."
 
 msgid "None"
 msgstr "Yok"
-
-msgid "None yet"
-msgstr "Henüz yok"
 
 msgid "None. This is the floor."
 msgstr "Yok. Bu, taban düzeydir."
@@ -12181,6 +12169,9 @@ msgstr "Çalışan bir şey yok"
 
 msgid "Nothing was missed"
 msgstr "Hiçbir şey kaçırılmadı"
+
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
 
 msgid "Notice"
 msgstr "Bildirim"
@@ -14484,6 +14475,12 @@ msgstr "Kullanım okunuyor…"
 
 msgid "Reading your local usage…"
 msgstr "Yerel kullanımınız okunuyor…"
+
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
 
 msgid "Ready for review"
 msgstr "İncelemeye hazır"
@@ -17767,6 +17764,9 @@ msgstr "Bakıyorum…"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Normalden uzun sürüyor. Ayrılsanız da devam eder."
 
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+
 msgid "Talk to Paradev"
 msgstr "Paradev ile konuşun"
 
@@ -20258,9 +20258,6 @@ msgstr "Hangi AI kodlama ajanları destekleniyor?"
 msgid "Which plans include automations?"
 msgstr "Hangi planlar otomasyonları içerir?"
 
-msgid "Who can message it"
-msgstr "Kimler mesaj gönderebilir"
-
 msgid "Who can open it"
 msgstr "Kimler açabilir"
 
@@ -20306,9 +20303,6 @@ msgstr "Yazı logosu, siyah"
 msgid "Wordmark, white"
 msgstr "Yazı logosu, beyaz"
 
-msgid "Work"
-msgstr "İş"
-
 msgid "Work email"
 msgstr "İş e-postası"
 
@@ -20349,6 +20343,9 @@ msgstr "{0} dk {1} sn'dir çalışıyor"
 
 msgid "Working for {seconds}s"
 msgstr "{seconds} sn'dir çalışıyor"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "Çalışıyor…"

@@ -56,7 +56,7 @@ interface ChannelTimelineProps {
 	canModerate: boolean;
 	canReact: boolean;
 	now: Date;
-	onOpenThread: (message: ChannelMessage) => void;
+	onOpenThread?: (message: ChannelMessage) => void;
 	intro?: ReactNode;
 	focusMessageId: string | null;
 	onFocusedMessage: () => void;

@@ -50,6 +50,8 @@ interface ChannelScreenProps {
 	renderHeader?: (panel: { isOpen: boolean; toggle: () => void }) => ReactNode;
 	/** Replaces the channel intro at the top of the timeline. */
 	intro?: ReactNode;
+	/** Replaces the tabbed panel with one view, and turns off threads. */
+	renderPanel?: (panel: { hide: () => void }) => ReactNode;
 	composerPlaceholder?: string;
 }
 
@@ -60,6 +62,7 @@ export function ChannelScreen({
 	details: detailsParam,
 	renderHeader,
 	intro,
+	renderPanel,
 	composerPlaceholder,
 }: ChannelScreenProps) {
 	const { t } = useLingui();
@@ -390,7 +393,7 @@ export function ChannelScreen({
 							canModerate={channel.canManage}
 							canReact={canPost}
 							now={now}
-							onOpenThread={openThread}
+							onOpenThread={renderPanel ? undefined : openThread}
 							intro={intro}
 							focusMessageId={focusMessageId}
 							onFocusedMessage={clearFocusMessage}
@@ -431,20 +434,24 @@ export function ChannelScreen({
 				onWidthChange={setPanelWidth}
 				onCollapse={panel.hide}
 			>
-				<ChannelPanel
-					channelId={channelId}
-					isFullScreen={panel.mode === "expanded"}
-					onToggleFullScreen={panel.toggleFullScreen}
-					onHide={panel.hide}
-					onOpenThread={openThread}
-					onOpenTask={openTask}
-					peopleById={peopleById}
-					people={people}
-					currentUserId={currentUserId}
-					canModerate={channel.canManage}
-					canPost={canPost}
-					now={now}
-				/>
+				{renderPanel ? (
+					renderPanel({ hide: panel.hide })
+				) : (
+					<ChannelPanel
+						channelId={channelId}
+						isFullScreen={panel.mode === "expanded"}
+						onToggleFullScreen={panel.toggleFullScreen}
+						onHide={panel.hide}
+						onOpenThread={openThread}
+						onOpenTask={openTask}
+						peopleById={peopleById}
+						people={people}
+						currentUserId={currentUserId}
+						canModerate={channel.canManage}
+						canPost={canPost}
+						now={now}
+					/>
+				)}
 			</ChannelPanelFrame>
 			<ChannelDetailsDialog
 				open={details !== null}

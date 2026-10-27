@@ -1628,9 +1628,6 @@ msgstr "基于该分支创建新工作区，并将对话交给新的智能体"
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "页面可以保存每位读者的答案，所以无需后端就能做投票。"
 
-msgid "A paused Dev starts no work. Its chats stay open."
-msgstr "已暂停的 Dev 不会开始任何工作。它的聊天仍然开放。"
-
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "一道实用的 TypeScript 题目，和我们每天解决的问题类似。不考算法谜题。"
 
@@ -1706,9 +1703,6 @@ msgstr "接受邀请"
 
 msgid "Accept terms"
 msgstr "接受条款"
-
-msgid "Access"
-msgstr "访问权限"
 
 msgid "Access denied"
 msgstr "访问被拒绝"
@@ -1902,6 +1896,9 @@ msgstr "添加文件、应用等"
 msgid "Add files, apps, and more (@)"
 msgstr "添加文件、应用等（@）"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "将议题#{0}添加到工作区"
@@ -2001,6 +1998,9 @@ msgstr "添加到侧边栏"
 
 msgid "Add to workspace"
 msgstr "添加到工作区"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "向此设备添加你自己的终端智能体。"
@@ -2726,9 +2726,6 @@ msgstr "归档 #{0}？"
 
 msgid "Archive channel"
 msgstr "归档频道"
-
-msgid "Archive Dev"
-msgstr "归档 Dev"
 
 msgid "Archive environment"
 msgstr "归档环境"
@@ -3816,9 +3813,6 @@ msgstr "频道选项"
 
 msgid "Channels"
 msgstr "频道"
-
-msgid "Channels it can read and post in"
-msgstr "可以阅读和发帖的频道"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 GB 小时。"
@@ -6507,9 +6501,6 @@ msgstr "此处无法显示详情，但链接仍可打开。"
 msgid "Dev"
 msgstr "开发"
 
-msgid "Dev details"
-msgstr "Dev 详情"
-
 msgid "Dev options"
 msgstr "Dev 选项"
 
@@ -6590,6 +6581,9 @@ msgstr "数字产品设计师"
 
 msgid "Direct message"
 msgstr "私信"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "直接模式"
@@ -9025,6 +9019,9 @@ msgstr "分组命令的打开方式。"
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev和直接在终端里跑Claude Code有什么不同？"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "工作方式"
 
@@ -10469,9 +10466,6 @@ msgstr "长周期可靠性越过了一个门槛。傍晚6点派出去的活儿�
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "长时间悬停才出现、只显示快捷键的tooltip；它的chip样式现在是TooltipContent的默认样式"
-
-msgid "Look"
-msgstr "外观"
 
 msgid "Looking at {what}"
 msgstr "正在查看 {what}"
@@ -12013,9 +12007,6 @@ msgstr "还没有版本"
 msgid "No versions yet."
 msgstr "还没有任何版本。"
 
-msgid "No work yet"
-msgstr "还没有工作"
-
 msgid "No workspace run command configured"
 msgstr "未配置工作区运行命令"
 
@@ -12060,9 +12051,6 @@ msgstr "没有人因此改变审查方式。"
 
 msgid "None"
 msgstr "无"
-
-msgid "None yet"
-msgstr "暂无"
 
 msgid "None. This is the floor."
 msgstr "没有。这是起点。"
@@ -12181,6 +12169,9 @@ msgstr "没有正在运行的内容"
 
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
+
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
 
 msgid "Notice"
 msgstr "提示"
@@ -14484,6 +14475,12 @@ msgstr "正在读取用量…"
 
 msgid "Reading your local usage…"
 msgstr "正在读取本地用量…"
+
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
 
 msgid "Ready for review"
 msgstr "待审查"
@@ -17767,6 +17764,9 @@ msgstr "正在查看…"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平时久一些。你离开后它也会继续。"
 
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+
 msgid "Talk to Paradev"
 msgstr "联系Paradev"
 
@@ -20258,9 +20258,6 @@ msgstr "支持哪些AI编码智能体？"
 msgid "Which plans include automations?"
 msgstr "哪些套餐包含自动化？"
 
-msgid "Who can message it"
-msgstr "谁可以给它发消息"
-
 msgid "Who can open it"
 msgstr "谁可以打开"
 
@@ -20306,9 +20303,6 @@ msgstr "文字标志，黑色"
 msgid "Wordmark, white"
 msgstr "文字标志，白色"
 
-msgid "Work"
-msgstr "工作"
-
 msgid "Work email"
 msgstr "工作邮箱"
 
@@ -20349,6 +20343,9 @@ msgstr "已运行 {0} 分 {1} 秒"
 
 msgid "Working for {seconds}s"
 msgstr "已运行 {seconds} 秒"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "处理中…"

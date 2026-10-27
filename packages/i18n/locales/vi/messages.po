@@ -1628,9 +1628,6 @@ msgstr "Một workspace mới từ nhánh này, hội thoại được bàn giao
 msgid "A page can save each reader's answer, so a poll works with no backend."
 msgstr "Một trang có thể lưu câu trả lời của từng người đọc, nên cuộc khảo sát chạy được mà không cần backend."
 
-msgid "A paused Dev starts no work. Its chats stay open."
-msgstr "Dev bị tạm dừng sẽ không bắt đầu việc gì. Các cuộc trò chuyện vẫn mở."
-
 msgid "A practical TypeScript problem, like the ones we solve every day. No algorithm puzzles."
 msgstr "Một bài toán TypeScript thực tế, giống những gì chúng tôi giải quyết hằng ngày. Không có câu đố thuật toán."
 
@@ -1706,9 +1703,6 @@ msgstr "Chấp nhận lời mời"
 
 msgid "Accept terms"
 msgstr "Chấp nhận điều khoản"
-
-msgid "Access"
-msgstr "Quyền truy cập"
 
 msgid "Access denied"
 msgstr "Truy cập bị từ chối"
@@ -1902,6 +1896,9 @@ msgstr "Thêm tệp, ứng dụng và hơn thế"
 msgid "Add files, apps, and more (@)"
 msgstr "Thêm tệp, ứng dụng và hơn thế (@)"
 
+msgid "Add instructions"
+msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "Thêm issue #{0} vào workspace"
@@ -2001,6 +1998,9 @@ msgstr "Thêm vào thanh bên"
 
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
+
+msgid "Add what it does"
+msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
 
 msgid "Add your own terminal agent to this device."
 msgstr "Thêm agent terminal của riêng bạn vào thiết bị này."
@@ -2726,9 +2726,6 @@ msgstr "Lưu trữ #{0}?"
 
 msgid "Archive channel"
 msgstr "Lưu trữ kênh"
-
-msgid "Archive Dev"
-msgstr "Lưu trữ Dev"
 
 msgid "Archive environment"
 msgstr "Lưu trữ environment"
@@ -3816,9 +3813,6 @@ msgstr "Tùy chọn kênh"
 
 msgid "Channels"
 msgstr "Kênh"
-
-msgid "Channels it can read and post in"
-msgstr "Các kênh có thể đọc và đăng bài"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ đã mua sắp hết."
@@ -6507,9 +6501,6 @@ msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được.
 msgid "Dev"
 msgstr "Dev"
 
-msgid "Dev details"
-msgstr "Chi tiết Dev"
-
 msgid "Dev options"
 msgstr "Tùy chọn Dev"
 
@@ -6590,6 +6581,9 @@ msgstr "Nhà thiết kế sản phẩm số"
 
 msgid "Direct message"
 msgstr "Tin nhắn trực tiếp"
+
+msgid "Direct messages"
+msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
 msgid "Direct mode"
 msgstr "Chế độ trực tiếp"
@@ -9025,6 +9019,9 @@ msgstr "Cách mở các lệnh theo nhóm."
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev khác gì so với chỉ chạy Claude Code trong terminal?"
 
+msgid "How it should work and what to avoid"
+msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+
 msgid "How it works"
 msgstr "Cách hoạt động"
 
@@ -10469,9 +10466,6 @@ msgstr "Độ tin cậy dài hạn vượt một ngưỡng. Việc giao lúc 6 g
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip chỉ hiện phím tắt khi di chuột lâu; kiểu chip của nó giờ là mặc định của TooltipContent"
-
-msgid "Look"
-msgstr "Diện mạo"
 
 msgid "Looking at {what}"
 msgstr "Đang xem {what}"
@@ -12013,9 +12007,6 @@ msgstr "Chưa có phiên bản nào"
 msgid "No versions yet."
 msgstr "Chưa có phiên bản nào."
 
-msgid "No work yet"
-msgstr "Chưa có công việc nào"
-
 msgid "No workspace run command configured"
 msgstr "Chưa cấu hình lệnh chạy cho workspace"
 
@@ -12060,9 +12051,6 @@ msgstr "Không ai review khác đi vì điều đó."
 
 msgid "None"
 msgstr "Không có"
-
-msgid "None yet"
-msgstr "Chưa có"
 
 msgid "None. This is the floor."
 msgstr "Không có. Đây là mức sàn."
@@ -12181,6 +12169,9 @@ msgstr "Không có gì đang chạy"
 
 msgid "Nothing was missed"
 msgstr "Không có lần chạy nào bị bỏ lỡ"
+
+msgid "Nothing yet"
+msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
 
 msgid "Notice"
 msgstr "Thông báo"
@@ -14484,6 +14475,12 @@ msgstr "Đang đọc mức sử dụng…"
 
 msgid "Reading your local usage…"
 msgstr "Đang đọc mức sử dụng cục bộ của bạn…"
+
+msgid "Reads and posts"
+msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+
+msgid "Ready"
+msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
 
 msgid "Ready for review"
 msgstr "Sẵn sàng review"
@@ -17767,6 +17764,9 @@ msgstr "Đang xem…"
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Lâu hơn bình thường. Nó vẫn tiếp tục nếu bạn rời đi."
 
+msgid "Talk to it"
+msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+
 msgid "Talk to Paradev"
 msgstr "Trò chuyện với Paradev"
 
@@ -20258,9 +20258,6 @@ msgstr "Những coding agent AI nào được hỗ trợ?"
 msgid "Which plans include automations?"
 msgstr "Gói nào có automation?"
 
-msgid "Who can message it"
-msgstr "Ai có thể nhắn tin"
-
 msgid "Who can open it"
 msgstr "Ai có thể mở"
 
@@ -20306,9 +20303,6 @@ msgstr "Wordmark, đen"
 msgid "Wordmark, white"
 msgstr "Wordmark, trắng"
 
-msgid "Work"
-msgstr "Công việc"
-
 msgid "Work email"
 msgstr "Email công việc"
 
@@ -20349,6 +20343,9 @@ msgstr "Đang chạy {0} phút {1} giây"
 
 msgid "Working for {seconds}s"
 msgstr "Đang chạy {seconds} giây"
+
+msgid "Working on"
+msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working…"
 msgstr "Đang xử lý…"
