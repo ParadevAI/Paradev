@@ -318,7 +318,10 @@ describe("agent activities", () => {
 	});
 
 	test("in a room, the reply is posted once when the model did not post it", async () => {
-		const room = { ...credentials, room: { channelId: "c1", threadRootId: null } };
+		const room = {
+			...credentials,
+			room: { channelId: "c1", threadRootId: null },
+		};
 		const { activities, model, posts } = setup(
 			[assistant([{ type: "text", text: "All good." }])],
 			room,
@@ -337,7 +340,10 @@ describe("agent activities", () => {
 	});
 
 	test("in a room, a turn that posted is not posted again", async () => {
-		const room = { ...credentials, room: { channelId: "c1", threadRootId: null } };
+		const room = {
+			...credentials,
+			room: { channelId: "c1", threadRootId: null },
+		};
 		const { activities, posts } = setup(
 			[
 				assistant([

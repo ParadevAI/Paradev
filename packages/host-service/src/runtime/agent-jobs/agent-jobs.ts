@@ -9,11 +9,11 @@ import {
 	readdirSync,
 	readFileSync,
 	readSync,
-	rmSync,
 	statSync,
 	writeFileSync,
 	writeSync,
 } from "node:fs";
+import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import {
 	type AgentJobMeta,
@@ -88,7 +88,7 @@ export class AgentJobRunner {
 		this.now = options.now ?? Date.now;
 		mkdirSync(options.rootDir, { recursive: true });
 		this.markInterruptedJobsLost();
-		this.sweep();
+		void this.sweep();
 	}
 
 	start(input: StartJobInput): AgentJobMeta {
@@ -241,7 +241,7 @@ export class AgentJobRunner {
 		setTimeout(() => signalGroup(pid, "SIGKILL"), KILL_GRACE_MS).unref();
 	}
 
-	sweep(): void {
+	async sweep(): Promise<void> {
 		const cutoff = this.now() - RETENTION_MS;
 		for (const session of safeReaddir(this.options.rootDir)) {
 			const dir = join(this.options.rootDir, session);
@@ -250,11 +250,11 @@ export class AgentJobRunner {
 				const meta = readJson(join(dir, file));
 				if (!meta || meta.status === "running" || !meta.endedAt) continue;
 				if (Date.parse(meta.endedAt) > cutoff) continue;
-				rmSync(join(dir, file), { force: true });
-				rmSync(meta.logPath, { force: true });
+				await rm(join(dir, file), { force: true });
+				await rm(meta.logPath, { force: true });
 			}
 			if (safeReaddir(dir).length === 0)
-				rmSync(dir, { recursive: true, force: true });
+				await rm(dir, { recursive: true, force: true });
 		}
 	}
 
