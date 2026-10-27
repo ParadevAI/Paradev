@@ -180,6 +180,7 @@ describe("AgentJobRunner", () => {
 		});
 		await waitForEnd("s1", job.jobId);
 		const later = newRunner(() => Date.now() + 25 * 60 * 60 * 1000);
+		await later.sweep();
 		expect(() => later.get("s1", job.jobId)).toThrow();
 	});
 });
