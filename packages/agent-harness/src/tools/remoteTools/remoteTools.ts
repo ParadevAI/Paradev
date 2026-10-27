@@ -20,6 +20,11 @@ import { followJob, type HostJobs, shellQuote } from "../hostJobs";
 const DEFAULT_TIMEOUT_S = 120;
 const MAX_TIMEOUT_S = 600;
 const MAX_WAIT_S = 1_500;
+const ENDED_WITHOUT_EXIT: Partial<Record<string, string>> = {
+	lost: "The workspace's host service restarted while this command ran, so it was stopped. Check what it changed before you run it again.",
+	killed: "The command was killed.",
+	timed_out: "The command ran past its maximum runtime and was stopped.",
+};
 const GREP_DEFAULT_LIMIT = 100;
 const FIND_IGNORES = ["**/node_modules/**", "**/.git/**"];
 
@@ -255,7 +260,7 @@ function createBashTool(
 			}
 			if (result.status !== "done") {
 				throw new Error(
-					`${output}\n\n${result.exitCode === null ? `Command ${result.status}` : `Command exited with code ${result.exitCode}`}`,
+					`${output}\n\n${result.exitCode === null ? (ENDED_WITHOUT_EXIT[result.status] ?? `Command ${result.status}`) : `Command exited with code ${result.exitCode}`}`,
 				);
 			}
 			return text(output, details);
