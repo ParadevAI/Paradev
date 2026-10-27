@@ -20,6 +20,7 @@ import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
+import { DashboardSidebarWorkspacePullRequestsMenu } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/components/DashboardSidebarWorkspacePullRequestsMenu";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
@@ -445,6 +446,13 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									</div>
 								)}
 							</div>
+							{!isPending && (
+								<DashboardSidebarWorkspacePullRequestsMenu
+									workspaceId={workspace.id}
+									pullRequests={workspace.pullRequests}
+									currentUrl={pullRequest?.url}
+								/>
+							)}
 							{ports.length > 0 && (
 								<DashboardSidebarRowEventBoundary>
 									<DashboardSidebarPortsChip ports={ports} />

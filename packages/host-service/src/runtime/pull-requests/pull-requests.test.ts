@@ -1986,6 +1986,7 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		]);
 		const current = await manager.getPullRequestsByWorkspaces(["ws"]);
 		expect(current[0]?.pullRequest?.number).toBe(102);
+		expect(current[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
 
 		// Remove PR Link: the sidebar loses the pointer; history keeps 102.
 		manager.unlinkWorkspacePullRequest("ws");
@@ -1996,6 +1997,203 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		expect(history[0]?.pullRequests.every((pr) => pr.isCurrent === false)).toBe(
 			true,
 		);
+	});
+
+	test("records every same-head PR once while preserving the current pointer and unlink", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+		});
+		const nodes = [201, 202].map((number) =>
+			makePrNode({ number, headRef: "feature", headSha: "sha-feature" }),
+		);
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls")) return nodes;
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		const [current] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(current?.pullRequest?.number).toBe(201);
+		expect(current?.pullRequests.map((pr) => pr.number)).toEqual([201, 202]);
+		expect(
+			(await manager.getPullRequestHistoryByWorkspaces(["ws"]))[0]
+				?.pullRequests,
+		).toHaveLength(2);
+		manager.unlinkWorkspacePullRequest("ws");
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		const [unlinked] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(unlinked?.pullRequest).toBeNull();
+		expect(unlinked?.pullRequests.map((pr) => pr.number)).toEqual([202]);
+		expect(
+			(await manager.getPullRequestHistoryByWorkspaces(["ws"]))[0]
+				?.pullRequests,
+		).toHaveLength(2);
+	});
+
+	test.each([
+		{
+			initialState: "open",
+			responseState: "closed" as const,
+			mergedAt: "2026-10-26T12:00:00Z",
+			expected: "merged",
+		},
+		{
+			initialState: "closed",
+			responseState: "open" as const,
+			mergedAt: null,
+			expected: "open",
+		},
+	])("refreshes historical $initialState → $expected without moving the current pointer", async ({
+		initialState,
+		responseState,
+		mergedAt,
+		expected,
+	}) => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "old",
+			state: initialState,
+			prNumber: 101,
+			headBranch: "old-branch",
+			headSha: "old-sha",
+		});
+		seedPullRequest(db, {
+			id: "current",
+			prNumber: 102,
+			headBranch: "feature",
+			headSha: "sha-feature",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+			pullRequestId: "current",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values([
+				{ workspaceId: "ws", pullRequestId: "old", linkedAt: 1 },
+				{ workspaceId: "ws", pullRequestId: "current", linkedAt: 2 },
+			])
+			.run();
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls"))
+					return [
+						makePrNode({
+							number: 102,
+							headRef: "feature",
+							headSha: "sha-feature",
+						}),
+					];
+				if (path.endsWith("/pulls/101"))
+					return makePrNode({
+						number: 101,
+						headRef: "old-branch",
+						headSha: "old-sha",
+						state: responseState,
+						mergedAt,
+					});
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+		expect(getPrByNumber(db, 101)?.state).toBe(expected);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("current");
+		const [snapshot] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(snapshot?.pullRequests.map((pr) => [pr.number, pr.state])).toEqual([
+			[102, "open"],
+			[101, expected],
+		]);
+	});
+
+	test.each([
+		"archive",
+		"unlink",
+	] as const)("respects %s while the head lookup is pending", async (action) => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "current",
+			prNumber: 101,
+			headBranch: "feature",
+			headSha: "sha",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+			pullRequestId: "current",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "current", linkedAt: 1 })
+			.run();
+		const started = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<unknown>();
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				if (args.includes("graphql")) return {};
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				if (path.endsWith("/pulls")) {
+					started.resolve();
+					return pending.promise;
+				}
+				if (path.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		const refresh = withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		await started.promise;
+		if (action === "archive")
+			db.update(workspaces)
+				.set({ archivedAt: 10 })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+		else manager.unlinkWorkspacePullRequest("ws");
+		pending.resolve(
+			[101, 102].map((number) =>
+				makePrNode({ number, headRef: "feature", headSha: "sha" }),
+			),
+		);
+		await refresh;
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(
+			action === "archive" ? "current" : null,
+		);
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		if (action === "archive")
+			expect(history?.pullRequests.map((pr) => pr.number)).toEqual([101]);
+		else
+			expect(
+				(
+					await manager.getPullRequestsByWorkspaces(["ws"])
+				)[0]?.pullRequests.map((pr) => pr.number),
+			).toEqual([102]);
 	});
 
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {

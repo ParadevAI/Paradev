@@ -18,6 +18,7 @@ import {
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { WorkspacePullRequestsMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspacePullRequestsMenu";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import {
 	type V2WorkspaceActions,
@@ -352,6 +353,13 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							/>
 						</button>
 					) : null}
+
+					<WorkspacePullRequestsMenu
+						workspaceId={workspace.id}
+						pullRequests={workspace.pullRequests}
+						currentUrl={workspace.pr?.url}
+						archived={isArchived}
+					/>
 
 					{workspace.diffStats &&
 					(workspace.diffStats.additions > 0 ||

@@ -14,6 +14,10 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import {
+	type WorkspacePullRequestSummary,
+	workspacePullRequests,
+} from "renderer/lib/github/workspacePullRequests";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { derivePullRequestQueryTargets } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
@@ -441,6 +445,23 @@ export function useAccessibleV2Workspaces(
 	}, [pullRequestQueries]);
 	const prByWorkspaceId = useStableByWorkspaceId(prSummaryEntries);
 
+	const associatedPrEntries = useMemo<
+		[string, WorkspacePullRequestSummary[]][]
+	>(
+		() =>
+			pullRequestQueries.flatMap((query) =>
+				(query.data?.workspaces ?? []).map(
+					(row) =>
+						[
+							row.workspaceId,
+							workspacePullRequests(row.pullRequest, row.pullRequests),
+						] as [string, WorkspacePullRequestSummary[]],
+				),
+			),
+		[pullRequestQueries],
+	);
+	const associatedPrByWorkspaceId = useStableByWorkspaceId(associatedPrEntries);
+
 	// Live agent status, one host-wide query per host — never per workspace
 	// (a 100-row board must not fan out 100 binding queries).
 	const terminalAgentQueries = useQueries({
@@ -583,6 +604,7 @@ export function useAccessibleV2Workspaces(
 					hostType,
 					isInSidebar,
 					pr: prByWorkspaceId.get(row.id) ?? null,
+					pullRequests: associatedPrByWorkspaceId.get(row.id),
 					agentStatus,
 					lastAgentEventAt: activity?.lastEventAt ?? null,
 					diffStats: diffStatsByWorkspaceId.get(row.id) ?? null,
@@ -601,6 +623,7 @@ export function useAccessibleV2Workspaces(
 			currentUserId,
 			manualUnread,
 			prByWorkspaceId,
+			associatedPrByWorkspaceId,
 			agentActivityByWorkspaceId,
 			diffStatsByWorkspaceId,
 		],

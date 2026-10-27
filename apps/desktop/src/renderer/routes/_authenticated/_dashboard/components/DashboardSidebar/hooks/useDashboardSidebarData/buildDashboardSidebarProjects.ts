@@ -1,4 +1,5 @@
 import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
+import type { WorkspacePullRequestSummary } from "renderer/lib/github/workspacePullRequests";
 import {
 	getProjectFolderTagIndex,
 	resolveWorkspaceSectionId,
@@ -94,6 +95,10 @@ function decorateSidebarWorkspace(
 	project: Pick<SidebarProjectInput, "githubOwner" | "githubRepoName">,
 	machineId: string,
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>,
+	associatedPullRequestsByWorkspaceId?: Map<
+		string,
+		WorkspacePullRequestSummary[]
+	>,
 ): DashboardSidebarWorkspace {
 	const hostType: DashboardSidebarWorkspace["hostType"] =
 		workspace.hostId === machineId ? "local-device" : "remote-device";
@@ -109,6 +114,7 @@ function decorateSidebarWorkspace(
 		name: getV2WorkspaceDisplayName(workspace),
 		branch: workspace.branch,
 		pullRequest: pullRequestsByWorkspaceId.get(workspace.id) ?? null,
+		pullRequests: associatedPullRequestsByWorkspaceId?.get(workspace.id),
 		repoUrl:
 			project.githubOwner && project.githubRepoName
 				? `https://github.com/${project.githubOwner}/${project.githubRepoName}`
@@ -140,11 +146,16 @@ export function buildDashboardSidebarPinnedWorkspaces({
 	sidebarProjects,
 	machineId,
 	pullRequestsByWorkspaceId,
+	associatedPullRequestsByWorkspaceId,
 }: {
 	pinnedSidebarWorkspaces: SidebarWorkspaceInput[];
 	sidebarProjects: SidebarProjectInput[];
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
+	associatedPullRequestsByWorkspaceId?: Map<
+		string,
+		WorkspacePullRequestSummary[]
+	>;
 }): DashboardSidebarPinnedWorkspace[] {
 	const projectsById = new Map(
 		sidebarProjects.map((project) => [project.id, project]),
@@ -160,6 +171,7 @@ export function buildDashboardSidebarPinnedWorkspaces({
 							{ githubOwner: null, githubRepoName: null },
 							machineId,
 							pullRequestsByWorkspaceId,
+							associatedPullRequestsByWorkspaceId,
 						),
 						projectName: null,
 						projectIconUrl: null,
@@ -175,6 +187,7 @@ export function buildDashboardSidebarPinnedWorkspaces({
 						project,
 						machineId,
 						pullRequestsByWorkspaceId,
+						associatedPullRequestsByWorkspaceId,
 					),
 					projectName: project.name,
 					projectIconUrl: project.iconUrl,
@@ -197,11 +210,16 @@ export function buildDashboardSidebarSessions({
 	sidebarSections,
 	machineId,
 	pullRequestsByWorkspaceId,
+	associatedPullRequestsByWorkspaceId,
 }: {
 	sessionSidebarWorkspaces: SidebarWorkspaceInput[];
 	sidebarSections: SidebarSectionInput[];
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
+	associatedPullRequestsByWorkspaceId?: Map<
+		string,
+		WorkspacePullRequestSummary[]
+	>;
 }): DashboardSidebarSessions {
 	const sectionMap = new Map<string, DashboardSidebarSection>();
 	const childEntries: Array<{
@@ -248,6 +266,7 @@ export function buildDashboardSidebarSessions({
 			{ githubOwner: null, githubRepoName: null },
 			machineId,
 			pullRequestsByWorkspaceId,
+			associatedPullRequestsByWorkspaceId,
 		);
 		const effectiveSectionId = resolveWorkspaceSectionId({
 			tags: workspace.tags,
@@ -299,6 +318,10 @@ export interface BuildDashboardSidebarProjectsParams {
 	visibleSidebarWorkspaces: SidebarWorkspaceInput[];
 	machineId: string;
 	pullRequestsByWorkspaceId: Map<string, SidebarPullRequest>;
+	associatedPullRequestsByWorkspaceId?: Map<
+		string,
+		WorkspacePullRequestSummary[]
+	>;
 }
 
 export function buildDashboardSidebarProjects({
@@ -307,6 +330,7 @@ export function buildDashboardSidebarProjects({
 	visibleSidebarWorkspaces,
 	machineId,
 	pullRequestsByWorkspaceId,
+	associatedPullRequestsByWorkspaceId,
 }: BuildDashboardSidebarProjectsParams): DashboardSidebarProject[] {
 	const projectsById = new Map<
 		string,
@@ -382,6 +406,7 @@ export function buildDashboardSidebarProjects({
 			project,
 			machineId,
 			pullRequestsByWorkspaceId,
+			associatedPullRequestsByWorkspaceId,
 		);
 
 		const effectiveSectionId = resolveWorkspaceSectionId({
