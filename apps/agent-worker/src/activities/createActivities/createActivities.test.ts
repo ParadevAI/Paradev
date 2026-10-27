@@ -113,7 +113,9 @@ function assistant(content: AssistantMessage["content"]): AssistantMessage {
 
 function scriptedModel(replies: AssistantMessage[]) {
 	let calls = 0;
-	const stream: StreamFn = () => {
+	const contexts: Array<{ tools?: unknown[]; systemPrompt?: string }> = [];
+	const stream: StreamFn = (_model, context) => {
+		contexts.push(context as { tools?: unknown[]; systemPrompt?: string });
 		const reply = replies[calls++];
 		if (!reply) throw new Error("no more replies");
 		const events = createAssistantMessageEventStream();
@@ -127,10 +129,13 @@ function scriptedModel(replies: AssistantMessage[]) {
 		});
 		return events;
 	};
-	return { stream, calls: () => calls };
+	return { stream, calls: () => calls, contexts };
 }
 
-function setup(replies: AssistantMessage[]) {
+function setup(
+	replies: AssistantMessage[],
+	creds: TurnCredentials = credentials,
+) {
 	const memory = memoryStore();
 	const host = fakeHost();
 	const model = scriptedModel(replies);
@@ -145,7 +150,7 @@ function setup(replies: AssistantMessage[]) {
 						"TurnNotRunning",
 					);
 				}
-				return credentials;
+				return creds;
 			},
 		},
 		settler: {
@@ -274,5 +279,18 @@ describe("agent activities", () => {
 		await activities.settleTurn(settle);
 		expect(settled).toHaveLength(2);
 		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
+	});
+
+	test("a session without a workspace gets no tools", async () => {
+		const { activities, model } = setup(
+			[assistant([{ type: "text", text: "Hi." }])],
+			{ ...credentials, host: null },
+		);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "hi" });
+		expect(await activities.modelStep({ ...ref, step: 0 })).toEqual({
+			toolCalls: [],
+		});
+		expect(model.contexts[0]?.tools).toEqual([]);
+		expect(model.contexts[0]?.systemPrompt).toContain("no workspace");
 	});
 });

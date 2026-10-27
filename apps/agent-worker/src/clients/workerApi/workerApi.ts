@@ -21,6 +21,8 @@ export interface WorkerApiOptions extends TrpcCallOptions {
 	apiUrl: string;
 	workerSecret: string;
 	model: { baseUrl: string; modelId: string };
+	/** The router key a turn without a workspace calls the model with. */
+	modelHeaders?: Record<string, string>;
 	/** For local runs, where a session has no box: a host and router headers to use instead. */
 	local?: {
 		host?: HostTarget & { workspaceId: string };
@@ -62,12 +64,15 @@ export function workerApi(options: WorkerApiOptions): {
 					}
 					throw error;
 				});
-				const host = granted.host ?? options.local?.host;
-				const headers = options.local?.modelHeaders ?? granted.model?.headers;
-				if (!host || !headers)
+				const host = granted.host ?? options.local?.host ?? null;
+				const headers =
+					options.local?.modelHeaders ??
+					granted.model?.headers ??
+					options.modelHeaders;
+				if (!headers)
 					throw ApplicationFailure.nonRetryable(
-						"Turn has no workspace to run in",
-						"NoWorkspace",
+						"Turn has no model credentials",
+						"NoModelCredentials",
 					);
 				return {
 					sessionStore: granted.sessionStore,

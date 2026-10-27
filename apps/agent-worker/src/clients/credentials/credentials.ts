@@ -2,7 +2,8 @@ import type { HostTarget } from "../hostJobs";
 
 export interface TurnCredentials {
 	sessionStore: { baseUrl: string; writeTicket: string };
-	host: HostTarget & { workspaceId: string };
+	/** Null when the session has no workspace: the turn runs with no tools. */
+	host: (HostTarget & { workspaceId: string }) | null;
 	model: { baseUrl: string; modelId: string; headers: Record<string, string> };
 }
 

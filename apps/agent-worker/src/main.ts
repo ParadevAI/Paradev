@@ -18,6 +18,9 @@ const api = workerApi({
 		baseUrl: process.env.AGENT_ROUTER_URL ?? "https://router.superset.sh",
 		modelId: process.env.AGENT_MODEL ?? "claude-sonnet-5",
 	},
+	...(process.env.AGENT_ROUTER_API_KEY
+		? { modelHeaders: { "x-api-key": process.env.AGENT_ROUTER_API_KEY } }
+		: {}),
 	local: localFallback(process.env),
 });
 

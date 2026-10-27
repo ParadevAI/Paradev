@@ -80,7 +80,7 @@ export function createActivities(deps: ActivityDeps) {
 	>();
 	const promptCache = new Map<
 		string,
-		Promise<{ cwd: string; systemPrompt: string }>
+		Promise<{ cwd: string | null; systemPrompt: string }>
 	>();
 
 	const credentialsFor = (ref: TurnRef) => {
@@ -99,22 +99,29 @@ export function createActivities(deps: ActivityDeps) {
 			ref.sessionId,
 			() => credentialsFor(ref).then((c) => c.sessionStore.writeTicket),
 		);
-		const host = (deps.hostJobs ?? ((c) => httpHostJobs(c.host)))(credentials);
+		const host = credentials.host
+			? (deps.hostJobs ?? defaultHost)(credentials)
+			: null;
 		return { credentials, store, host };
 	};
 
 	const workspace = (
 		ref: TurnRef,
 		credentials: TurnCredentials,
-		host: HostJobs,
-	) => {
+		host: HostJobs | null,
+	): Promise<{ cwd: string | null; systemPrompt: string }> => {
 		let cached = promptCache.get(ref.turnId);
 		if (!cached) {
 			cached = (async () => {
-				const { cwd } = await (
-					deps.workspaceContext ??
-					((c) => hostContext(c.host, c.host.workspaceId))
-				)(credentials);
+				if (!host) {
+					return {
+						cwd: null,
+						systemPrompt: buildSystemPrompt({ cwd: null, agentsMd: null }),
+					};
+				}
+				const { cwd } = await (deps.workspaceContext ?? defaultContext)(
+					credentials,
+				);
 				const agentsMd = await (deps.readAgentsMd ?? readAgentsMd)(host, cwd);
 				return { cwd, systemPrompt: buildSystemPrompt({ cwd, agentsMd }) };
 			})();
@@ -127,17 +134,19 @@ export function createActivities(deps: ActivityDeps) {
 	const remoteTools = (
 		ref: TurnRef,
 		credentials: TurnCredentials,
-		host: HostJobs,
-		cwd: string,
+		host: HostJobs | null,
+		cwd: string | null,
 		onFileChange?: (toolCallId: string, change: FileChange) => void,
-	) =>
-		createRemoteTools({
-			host,
-			sessionId: ref.sessionId,
-			workspaceId: credentials.host.workspaceId,
-			cwd,
-			...(onFileChange ? { onFileChange } : {}),
-		});
+	): RemoteTool[] =>
+		host && cwd && credentials.host
+			? createRemoteTools({
+					host,
+					sessionId: ref.sessionId,
+					workspaceId: credentials.host.workspaceId,
+					cwd,
+					...(onFileChange ? { onFileChange } : {}),
+				})
+			: [];
 
 	return {
 		async beginTurn(
@@ -186,7 +195,7 @@ export function createActivities(deps: ActivityDeps) {
 				workspace(input, credentials, host),
 			]);
 			const tools = remoteTools(input, credentials, host, cwd);
-			const toAcp = new PiToAcp(cwd);
+			const toAcp = new PiToAcp(cwd ?? "/");
 			const messageId = `${input.turnId}-s${input.step}`;
 			const flusher = createFlusher(
 				store,
@@ -279,7 +288,7 @@ export function createActivities(deps: ActivityDeps) {
 			const tools = remoteTools(input, credentials, host, cwd, (id, change) => {
 				if (id === call.id) fileChange = change;
 			});
-			const toAcp = new PiToAcp(cwd);
+			const toAcp = new PiToAcp(cwd ?? "/");
 			await store.append({
 				stepKey: `${base}/start`,
 				turnId: input.turnId,
@@ -482,6 +491,16 @@ function toolCallsOf(
 	return message.content
 		.filter((block): block is ToolCall => block.type === "toolCall")
 		.map((block) => ({ id: block.id, name: block.name }));
+}
+
+function defaultHost(credentials: TurnCredentials): HostJobs {
+	if (!credentials.host) throw new Error("Turn has no workspace");
+	return httpHostJobs(credentials.host);
+}
+
+function defaultContext(credentials: TurnCredentials) {
+	if (!credentials.host) throw new Error("Turn has no workspace");
+	return hostContext(credentials.host, credentials.host.workspaceId);
 }
 
 function isTurnNotRunning(error: unknown): boolean {
