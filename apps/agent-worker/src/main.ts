@@ -50,7 +50,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 await worker.run();
 await connection.close();
 
-/** Local runs only: sessions without a box use this host and router key. */
+/** Local runs only: a session without a box uses this host, and every session uses this model key. */
 function localFallback(env: NodeJS.ProcessEnv) {
 	return {
 		...(env.AGENT_LOCAL_HOST_URL &&

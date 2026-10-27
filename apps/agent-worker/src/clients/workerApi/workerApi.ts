@@ -59,7 +59,7 @@ export function workerApi(options: WorkerApiOptions): {
 					throw error;
 				});
 				const host = granted.host ?? options.local?.host;
-				const headers = granted.model?.headers ?? options.local?.modelHeaders;
+				const headers = options.local?.modelHeaders ?? granted.model?.headers;
 				if (!host || !headers)
 					throw ApplicationFailure.nonRetryable(
 						"Turn has no workspace to run in",
