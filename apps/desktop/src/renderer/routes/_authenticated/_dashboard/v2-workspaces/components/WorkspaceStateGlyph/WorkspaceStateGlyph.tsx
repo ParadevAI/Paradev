@@ -17,12 +17,6 @@ interface WorkspaceStateGlyphProps {
 	workspace: AccessibleV2Workspace;
 }
 
-/**
- * Row state glyph, by precedence: the sandbox's own state (nothing runs in a
- * dead or unborn box), then live agent states (pulse), then the finished
- * dot the sidebar rows and tab accessories use, then the section headers'
- * icon set so the vocabulary matches at both levels.
- */
 export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	const { t } = useLingui();
 	const { agentStatus, sandboxStatus } = workspace;
@@ -42,15 +36,13 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	) {
 		glyph = <StatusIndicator status={agentStatus} />;
 		label = getStatusTooltip(agentStatus);
+	} else if (agentStatus === "review" && workspace.archivedAt == null) {
+		glyph = <StatusIndicator status="review" />;
+		label = getStatusTooltip("review");
 	} else {
 		const column = deriveBoardColumn(workspace);
-		if (column === "finished") {
-			glyph = <StatusIndicator status="review" />;
-			label = getStatusTooltip("review");
-		} else {
-			glyph = <BoardColumnIcon column={column} />;
-			label = i18n._(BOARD_COLUMN_LABELS[column]);
-		}
+		glyph = <BoardColumnIcon column={column} />;
+		label = i18n._(BOARD_COLUMN_LABELS[column]);
 	}
 
 	return (
