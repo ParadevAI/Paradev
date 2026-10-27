@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { SupportedLocale } from "@superset/i18n";
 import { formatDate } from "@superset/i18n/format";
+import Image from "next/image";
 import { SectionHeading } from "../SectionHeading";
 import { PRESS_ARTICLES } from "./constants";
 
@@ -24,15 +25,24 @@ export function PressCoverageSection({ lang }: PressCoverageSectionProps) {
 			<ul className="mt-6 divide-y divide-border">
 				{PRESS_ARTICLES.map((article) => (
 					<li key={article.url} className="py-5 first:pt-0 last:pb-0">
-						<p className="font-mono text-muted-foreground text-xs">
-							{article.outlet} ·{" "}
-							<time dateTime={article.date}>
-								{formatDate(
-									new Date(`${article.date}T00:00:00Z`),
-									dateFormat,
-									lang,
-								)}
-							</time>
+						<p className="flex items-center gap-2 font-mono text-muted-foreground text-xs">
+							<Image
+								src={article.icon}
+								alt=""
+								width={16}
+								height={16}
+								className="size-4 shrink-0 rounded-sm"
+							/>
+							<span>
+								{article.outlet} ·{" "}
+								<time dateTime={article.date}>
+									{formatDate(
+										new Date(`${article.date}T00:00:00Z`),
+										dateFormat,
+										lang,
+									)}
+								</time>
+							</span>
 						</p>
 						<a
 							href={article.url}
