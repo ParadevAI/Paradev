@@ -178,7 +178,8 @@ export function removeClaudeManagedHooks(): void {
  */
 export function ensureClaudeManagedHooksAt(configDir: string): void {
 	ensureManagedJsonHooks({
-		...claudeHooksSpec(getNotifyScriptPath()),
+		// Re-merged only at host start, so keep the guard and let it read the disabled list.
+		...claudeHooksSpec(getNotifyScriptPath(), []),
 		getFilePath: () => path.join(configDir, "settings.json"),
 	});
 }

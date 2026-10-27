@@ -116,6 +116,9 @@ const {
 const { getManagedArtifactGuardHookCommand, getManagedNotifyHookCommand } =
 	await import("./agent-wrappers-common");
 const { writeSharedDisabledSkillIds } = await import("./disabled-skills");
+const { ensureClaudeManagedHooksAt } = await import(
+	"./agent-wrappers-claude-codex-opencode"
+);
 
 function requireContent(content: string | null): string {
 	if (content === null) throw new Error("Expected merged hook content");
@@ -1777,6 +1780,21 @@ describe("agent-wrappers claude settings.json", () => {
 		} finally {
 			delete process.env.SUPERSET_DISABLED_SKILLS;
 		}
+	});
+
+	it("keeps the Artifact guard in a secondary Claude profile while page is disabled", () => {
+		const profileDir = path.join(TEST_ROOT, "claude-profile");
+		mkdirSync(profileDir, { recursive: true });
+		writeSharedDisabledSkillIds(["page"]);
+
+		ensureClaudeManagedHooksAt(profileDir);
+
+		const settings = JSON.parse(
+			readFileSync(path.join(profileDir, "settings.json"), "utf-8"),
+		) as { hooks: Record<string, Array<{ matcher?: string }>> };
+		expect(
+			settings.hooks.PreToolUse?.filter((def) => def.matcher === "Artifact"),
+		).toHaveLength(1);
 	});
 
 	it("preserves user hooks and non-hook settings when merging", () => {
