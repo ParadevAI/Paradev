@@ -40,6 +40,27 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const agentId = data.agent?.id;
+	const store = ctx.store;
+	const onNewChat = useCallback(
+		(label: string | undefined) => {
+			if (!agentId) return;
+			store.getState().addTab({
+				panes: [
+					{
+						kind: "chat-v3",
+						...(label ? { titleOverride: label } : {}),
+						data: {
+							terminalId: crypto.randomUUID(),
+							sessionId: null,
+							agent: { id: agentId },
+						} satisfies ChatPaneData,
+					},
+				],
+			});
+		},
+		[agentId, store],
+	);
 	const firstPrompt: UserContent[] =
 		data.pendingPrompt || data.pendingAttachments?.length
 			? [
@@ -176,6 +197,7 @@ export function ChatPane({
 				onOpenPage={openPage}
 				onOpenLink={openLink}
 				onOpenHistory={onOpenHistory}
+				onNewChat={agentId ? onNewChat : undefined}
 				sessionId={data.sessionId}
 				terminalId={data.terminalId}
 				workspaceId={workspaceId}

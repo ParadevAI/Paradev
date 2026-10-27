@@ -3,6 +3,7 @@ import type { SessionClient } from "@superset/chat/client";
 import {
 	deriveQueuedPrompts,
 	runningTurnId as findRunningTurnId,
+	latestSessionUsage,
 	launchConfigSelections,
 	userMessageText,
 } from "@superset/chat/core";
@@ -33,6 +34,7 @@ import {
 	type OpenLink,
 	type OpenPage,
 } from "../../providers/ChatPaneActionsProvider";
+import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
 import { heldPromptQueue } from "../../utils/heldPromptQueue";
@@ -49,7 +51,7 @@ import {
 import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
 import { SubagentView } from "../SubagentView";
-import { Transcript } from "../Transcript";
+import { Transcript, type TranscriptHandle } from "../Transcript";
 import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
 import { NestedItemsProvider } from "../Transcript/providers/NestedItemsProvider";
 import { TranscriptPluginsProvider } from "../Transcript/providers/TranscriptPluginsProvider";
@@ -58,6 +60,7 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
+import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
@@ -94,12 +97,16 @@ export function SessionView({
 	onPendingPromptsSent,
 	onFork,
 	onEditMessage,
+	onRestartAndContinue,
+	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
 	openFile,
 	openPage,
 	openLink,
 	onOpenHistory,
+	terminalId,
+	onNewChat,
 	workspaceId,
 }: {
 	client: SessionClient;
@@ -107,6 +114,7 @@ export function SessionView({
 	presetId?: string;
 	draftKey: string;
 	workspaceId: string;
+	terminalId?: string;
 	headerLeft?: ReactNode;
 	held?: {
 		notice: ReactNode;
@@ -129,6 +137,10 @@ export function SessionView({
 	onFork?: ((target: ChatForkTarget, transcript: string) => void) | undefined;
 	canForkToWorktree?: boolean;
 	onEditMessage?: (request: ChatEditRequest) => void;
+	/** Restarts the agent and sends `prompt` once it is back. */
+	onRestartAndContinue?: (prompt: string) => Promise<boolean>;
+	/** Resolves false when the new chat could not be started. */
+	onStartNewChat?: () => Promise<boolean>;
 	/** Called when the user sends a message, as opposed to anything sent for them. */
 	onUserPrompt?: () => void;
 	/** Names the speaker in a handed-over transcript. */
@@ -149,11 +161,13 @@ export function SessionView({
 	openLink?: OpenLink;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
+	onNewChat?: () => void;
 }) {
 	const { t } = useLingui();
 	const session = useChatSession({ client, sendEnabled: held === undefined });
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
+	const transcriptRef = useRef<TranscriptHandle>(null);
 	const paneRef = useRef<HTMLDivElement>(null);
 	const { outbox, discardPrompt } = session;
 	const openDraftKey = useRef(draftKey);
@@ -247,6 +261,10 @@ export function SessionView({
 		() => findRunningTurnId(session.snapshot.turns),
 		[session.snapshot.turns],
 	);
+	const sessionUsage = useMemo(
+		() => latestSessionUsage(session.snapshot.turns),
+		[session.snapshot.turns],
+	);
 
 	const snapshotItems = session.snapshot.items;
 	const queuedPrompts = useStableList(
@@ -257,6 +275,7 @@ export function SessionView({
 	);
 
 	const focusComposer = useCallback(() => composerRef.current?.focus(), []);
+	const openFind = useCallback(() => transcriptRef.current?.openFind(), []);
 	const [revealMessageId, setRevealMessageId] = useState<string | null>(null);
 	const clearRevealMessage = useCallback(() => setRevealMessageId(null), []);
 	const returnToComposer = useCallback(
@@ -322,10 +341,6 @@ export function SessionView({
 			if (loaded) void respondToApproval(approvalId, decision);
 		},
 		[respondToApproval, loaded],
-	);
-	const onSetConfigOption = useCallback(
-		(configId: string, value: string) => void setConfigOption(configId, value),
-		[setConfigOption],
 	);
 	const onSetMode = useCallback(
 		(modeId: string) => {
@@ -482,6 +497,26 @@ export function SessionView({
 		[heldQueued],
 	);
 	const booting = sessionState?.status === "starting";
+	const openModelPicker = useCallback(
+		() => composerRef.current?.openModelPicker(),
+		[],
+	);
+	const { failureActions, onSetConfigOption, onModelPickerOpenChange } =
+		useFailureRecovery({
+			blocked:
+				!loaded ||
+				booting ||
+				held !== undefined ||
+				runningTurnId !== null ||
+				approvals.length > 0 ||
+				outbox.length > 0,
+			configOptions,
+			onRestartAndContinue,
+			onStartNewChat,
+			openModelPicker,
+			sendPrompt,
+			setConfigOption,
+		});
 	const composerQueue = heldQueue ?? (held ? undefined : promptQueue);
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
 
@@ -526,25 +561,28 @@ export function SessionView({
 										queued={subagent.queued}
 									/>
 								) : (
-									<Transcript
-										approvals={approvals}
-										canForkToWorktree={canForkToWorktree}
-										groups={timeline}
-										hasOlder={session.hasOlder}
-										isActive={isActive}
-										onCloseFind={focusComposer}
-										onDiscardPrompt={session.discardPrompt}
-										onFork={onFork ? forkWithTranscript : undefined}
-										onLoadOlder={loadOlder}
-										onRequestItemBodies={session.requestItemBodies}
-										onRespond={onRespond}
-										onMessageRevealed={clearRevealMessage}
-										onRetryPrompt={session.retryPrompt}
-										outbox={session.outbox}
-										revealMessageId={revealMessageId}
-										sessionId={client.sessionId}
-										snapshot={session.snapshot}
-									/>
+									<TurnFailureActionsProvider value={failureActions}>
+										<Transcript
+											approvals={approvals}
+											canForkToWorktree={canForkToWorktree}
+											groups={timeline}
+											hasOlder={session.hasOlder}
+											isActive={isActive}
+											onCloseFind={focusComposer}
+											onDiscardPrompt={session.discardPrompt}
+											onFork={onFork ? forkWithTranscript : undefined}
+											onLoadOlder={loadOlder}
+											onRequestItemBodies={session.requestItemBodies}
+											onRespond={onRespond}
+											onMessageRevealed={clearRevealMessage}
+											onRetryPrompt={session.retryPrompt}
+											outbox={session.outbox}
+											ref={transcriptRef}
+											revealMessageId={revealMessageId}
+											sessionId={client.sessionId}
+											snapshot={session.snapshot}
+										/>
+									</TurnFailureActionsProvider>
 								)}
 							</NestedItemsProvider>
 						</TranscriptPluginsProvider>
@@ -585,6 +623,7 @@ export function SessionView({
 					availableCommands={sessionState?.availableCommands ?? NO_COMMANDS}
 					configOptions={sessionState?.configOptions ?? NO_CONFIG_OPTIONS}
 					onSetConfigOption={onSetConfigOption}
+					onModelPickerOpenChange={onModelPickerOpenChange}
 					modes={sessionState?.availableModes}
 					currentModeId={sessionState?.modeId}
 					onSetMode={onSetMode}
@@ -600,6 +639,14 @@ export function SessionView({
 					target={subagent.target}
 					canQueue={composerQueue !== undefined}
 					onOpenHistory={onOpenHistory}
+					sessionUsage={sessionUsage}
+					turnRunning={runningTurnId !== null}
+					terminalId={terminalId}
+					agentLabel={agentLabel}
+					onNewChat={onNewChat}
+					onFork={onFork ? forkWithTranscript : undefined}
+					canForkToWorktree={canForkToWorktree}
+					onOpenFind={focusedSubagentId ? undefined : openFind}
 					workspaceId={workspaceId}
 				/>
 			</ComposerDropZone>

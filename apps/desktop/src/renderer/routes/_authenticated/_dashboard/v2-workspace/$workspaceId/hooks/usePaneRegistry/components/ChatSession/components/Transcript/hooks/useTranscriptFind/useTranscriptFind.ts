@@ -62,6 +62,8 @@ export type TranscriptFind = {
 	isOpen: boolean;
 	loading: boolean;
 	open: () => void;
+	/** Opens the bar, or puts focus back in it with the query selected. */
+	show: () => void;
 	close: () => void;
 	query: string;
 	setQuery: (query: string) => void;
@@ -229,22 +231,20 @@ export function useTranscriptFind({
 		onClose?.();
 	}, [dismiss, onClose]);
 
-	useHotkey(
-		"FIND_IN_CHAT",
-		() => {
-			if (!isOpen) {
-				setIsOpen(true);
-				return;
-			}
-			inputRef.current?.focus();
-			inputRef.current?.select();
-		},
-		{
-			enabled: isActive,
-			preventDefault: true,
-			ignoreEventWhen: insideForeignFindScope,
-		},
-	);
+	const show = useCallback(() => {
+		if (!isOpen) {
+			setIsOpen(true);
+			return;
+		}
+		inputRef.current?.focus();
+		inputRef.current?.select();
+	}, [isOpen]);
+
+	useHotkey("FIND_IN_CHAT", show, {
+		enabled: isActive,
+		preventDefault: true,
+		ignoreEventWhen: insideForeignFindScope,
+	});
 
 	// Focus already belongs to the pane the reader moved to, so this close
 	// must not hand it back to this pane's composer.
@@ -341,6 +341,7 @@ export function useTranscriptFind({
 		isOpen,
 		loading: isOpen && omittedItemIds.length > 0,
 		open,
+		show,
 		close,
 		query,
 		setQuery,

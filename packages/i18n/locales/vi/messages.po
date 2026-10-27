@@ -92,6 +92,9 @@ msgstr "(không có đầu ra)"
 msgid "(you)"
 msgstr "(bạn)"
 
+msgid "[prompt]"
+msgstr "[prompt]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# cổng đang hoạt động — ẩn chi tiết} other {# cổng đang hoạt động — ẩn chi tiết}}"
@@ -447,6 +450,10 @@ msgstr "{0} đã được gán cho \"{1}\"."
 #. placeholder {0}: params?.key
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0} đã được dùng cho nhiệm vụ trong tổ chức này."
+
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0} đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian. Chúng tôi là 3 cựu CTO của YC đang xây một công cụ mà chính mình yêu thích."
 
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
@@ -1203,6 +1210,9 @@ msgstr "{reason}"
 msgid "{received} of {total}"
 msgstr "{received} trên {total}"
 
+msgid "{remaining} tokens left"
+msgstr "Còn {remaining} token"
+
 msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
 msgstr "{repositoryFullName} không nằm trong {installedAccountLogin}, nơi GitHub App của tổ chức này được cài đặt."
 
@@ -1301,6 +1311,9 @@ msgstr "{uploading, plural, other {Đang tải lên # tệp…}}"
 msgid "{used} of {limit} environments"
 msgstr "{used}/{limit} môi trường"
 
+msgid "{used} of {size} tokens"
+msgstr "{used} / {size} token"
+
 msgid "{used} used"
 msgstr "Đã dùng {used}"
 
@@ -1309,6 +1322,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
+
+msgid "{windowLabel} limit {percent} used"
+msgstr "Giới hạn {windowLabel}: đã dùng {percent}"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: host không khả dụng"
@@ -1331,6 +1347,12 @@ msgstr "@superset"
 
 msgid "* if billed at full API rate"
 msgstr "* nếu tính theo giá API đầy đủ"
+
+msgid "/{name} doesn't take arguments"
+msgstr "/{name} không nhận đối số"
+
+msgid "/{name} doesn't take attachments"
+msgstr "/{name} không nhận tệp đính kèm"
 
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
@@ -1869,6 +1891,9 @@ msgstr "Thêm tệp đính kèm"
 msgid "Add Attachment"
 msgstr "Thêm tệp đính kèm"
 
+msgid "Add back"
+msgstr "Thêm lại"
+
 msgid "Add command"
 msgstr "Thêm lệnh"
 
@@ -1974,6 +1999,9 @@ msgstr "Thêm test cho phần code rủi ro nhất chưa được test…"
 
 msgid "Add tests where they're missing"
 msgstr "Thêm test ở những chỗ còn thiếu"
+
+msgid "Add the /automation prompt back to your message?"
+msgstr "Thêm lại prompt /automation vào tin nhắn của bạn?"
 
 msgid "Add them"
 msgstr "Thêm họ"
@@ -3051,6 +3079,9 @@ msgstr "Quy trình tự động từ ticket tới PR"
 msgid "Available"
 msgstr "Còn trống"
 
+msgid "Available when the agent is idle."
+msgstr "Dùng được khi agent đang rảnh."
+
 msgid "Avatar"
 msgstr "Ảnh đại diện"
 
@@ -3716,6 +3747,9 @@ msgstr "Đổi biểu tượng"
 msgid "Change location"
 msgstr "Đổi vị trí"
 
+msgid "Change model"
+msgstr "Đổi mô hình"
+
 msgid "Change or add labels…"
 msgstr "Đổi hoặc thêm nhãn…"
 
@@ -3981,6 +4015,9 @@ msgstr "Chọn cách mở đường dẫn tệp khi Cmd+nhấp trong terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Chọn server MCP cho tin nhắn này"
+
+msgid "Choose the model"
+msgstr "Chọn mô hình"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
@@ -4563,6 +4600,9 @@ msgstr "Giao tiếp"
 msgid "Community"
 msgstr "Cộng đồng"
 
+msgid "Compact now"
+msgstr "Nén ngay"
+
 msgid "Company"
 msgstr "Công ty"
 
@@ -4905,6 +4945,12 @@ msgstr "Ngữ cảnh"
 msgid "Context Menu"
 msgstr "Context Menu"
 
+msgid "Context window"
+msgstr "Cửa sổ ngữ cảnh"
+
+msgid "Context window: {percent} used"
+msgstr "Cửa sổ ngữ cảnh: đã dùng {percent}"
+
 msgid "Continue"
 msgstr "Tiếp tục"
 
@@ -4948,6 +4994,9 @@ msgstr "Để tiếp tục phiên agent, cần ghim một workspace"
 
 msgid "continuing the last session"
 msgstr "tiếp tục phiên gần nhất"
+
+msgid "Continuing…"
+msgstr "Đang tiếp tục…"
 
 msgid "Contributions"
 msgstr "Đóng góp"
@@ -5033,6 +5082,9 @@ msgstr "Sao chép bình luận"
 
 msgid "Copy comments"
 msgstr "Sao chép bình luận"
+
+msgid "Copy error"
+msgstr "Sao chép lỗi"
 
 msgid "Copy error details"
 msgstr "Sao chép chi tiết lỗi"
@@ -5584,6 +5636,9 @@ msgstr "Không thể đăng trả lời"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Không kết nối được tới cloud cho {0}: {1}"
 
+msgid "Couldn't reach the model provider"
+msgstr "Không kết nối được với nhà cung cấp mô hình"
+
 msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
 msgstr "Không kết nối được với không gian làm việc đám mây này. Có thể nó vẫn đang được đánh thức — hãy thử lại."
 
@@ -5665,6 +5720,9 @@ msgstr "Không thể stage tệp"
 
 msgid "Couldn't start a new agent session"
 msgstr "Không thể bắt đầu phiên agent mới"
+
+msgid "Couldn't start a new chat."
+msgstr "Không bắt đầu được trò chuyện mới."
 
 msgid "Couldn't start agent session"
 msgstr "Không thể bắt đầu phiên agent"
@@ -5770,6 +5828,9 @@ msgstr "Tạo lại"
 
 msgid "Create an account"
 msgstr "Tạo tài khoản"
+
+msgid "Create an automation from this prompt"
+msgstr "Tạo tự động hóa từ prompt này"
 
 msgid "Create environment"
 msgstr "Tạo môi trường"
@@ -7959,6 +8020,12 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Nhanh"
 
+msgid "Fast mode off"
+msgstr "Đã tắt chế độ nhanh"
+
+msgid "Fast mode on"
+msgstr "Đã bật chế độ nhanh"
+
 msgid "Fatal"
 msgstr "Nghiêm trọng"
 
@@ -8150,6 +8217,9 @@ msgstr "Tìm trong trang"
 
 msgid "Find in Terminal"
 msgstr "Tìm trong terminal"
+
+msgid "Find in this chat"
+msgstr "Tìm trong cuộc trò chuyện này"
 
 msgid "Find people and Devs"
 msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
@@ -9476,9 +9546,6 @@ msgstr "Mất kết nối Internet"
 msgid "Interrupt"
 msgstr "Ngắt lời"
 
-msgid "Interrupted"
-msgstr "Bị gián đoạn"
-
 msgid "Intro call"
 msgstr "Cuộc gọi giới thiệu"
 
@@ -10067,6 +10134,9 @@ msgstr "Rời tổ chức?"
 
 msgid "Leave organization..."
 msgstr "Rời tổ chức..."
+
+msgid "Leave plan mode"
+msgstr "Thoát chế độ lập kế hoạch"
 
 msgid "Leave team"
 msgstr "Rời nhóm"
@@ -10924,6 +10994,9 @@ msgstr "Ứng dụng di động"
 
 msgid "Mobile App"
 msgstr "Ứng dụng di động"
+
+msgid "Mode"
+msgstr "Chế độ"
 
 msgid "model"
 msgstr "mô hình"
@@ -12115,6 +12188,9 @@ msgstr "Không có trong phiên bản này"
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Chưa nhận được sự kiện: Microsoft Graph đã từ chối các đăng ký thông báo. Hãy kiểm tra phần cấp quyền quản trị và phê duyệt API bảo vệ của ứng dụng, rồi kết nối lại."
 
+msgid "Not reported yet"
+msgstr "Chưa có báo cáo"
+
 msgid "Not reviewed by you"
 msgstr "Bạn chưa review"
 
@@ -12275,6 +12351,9 @@ msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
 
 msgid "Older"
 msgstr "Cũ hơn"
+
+msgid "On"
+msgstr "Bật"
 
 msgid "on {offScopeHostName} — won't run here"
 msgstr "trên {offScopeHostName} — sẽ không chạy ở đây"
@@ -13304,9 +13383,6 @@ msgstr "Paradev là ứng dụng máy tính. Nhập email và chúng tôi sẽ g
 
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian."
-
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian. Chúng tôi là 3 cựu CTO của YC đang xây một công cụ mà chính mình yêu thích."
 
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev được xây dựng bởi một đội ngũ tại San Francisco, California. Với hỗ trợ sản phẩm hoặc câu hỏi về tài khoản, hãy gửi email tới <0>{supportEmail}</0> và chúng tôi sẽ phản hồi trong vòng một ngày làm việc. Với hợp tác, báo chí, doanh nghiệp hoặc bất cứ điều gì khác, hãy viết tới <1>{teamEmail}</1>."
@@ -14383,6 +14459,9 @@ msgstr "Đánh giá {appName}"
 msgid "Rate limit exceeded."
 msgstr "Đã vượt giới hạn tần suất."
 
+msgid "Rate limits"
+msgstr "Giới hạn sử dụng"
+
 msgid "Reach this Mac from anywhere via the Paradev relay, or spin up cloud workspaces. Connect from any client."
 msgstr "Truy cập chiếc Mac này từ bất cứ đâu qua relay của Paradev, hoặc khởi tạo workspace trên cloud. Kết nối từ mọi thiết bị."
 
@@ -14692,6 +14771,9 @@ msgstr "Chuyển vị trí dự án?"
 
 msgid "Relocating…"
 msgstr "Đang chuyển…"
+
+msgid "Remaining"
+msgstr "Còn lại"
 
 msgid "rematch"
 msgstr "tái đấu"
@@ -15211,6 +15293,9 @@ msgstr "Đang khởi động lại các agent trên {accountLabel}."
 msgid "Restarting host services…"
 msgstr "Đang khởi động lại dịch vụ host…"
 
+msgid "Restarting the agent…"
+msgstr "Đang khởi động lại agent…"
+
 msgid "Restarting…"
 msgstr "Đang khởi động lại…"
 
@@ -15576,6 +15661,9 @@ msgstr "Chạy agent trong terminal Workspace Setup sau khi setup xong thay vì 
 
 msgid "Run this command?"
 msgstr "Chạy lệnh này?"
+
+msgid "Run this in a terminal, then continue:"
+msgstr "Hãy chạy lệnh này trong terminal rồi tiếp tục:"
 
 msgid "Run workspace command"
 msgstr "Chạy lệnh của workspace"
@@ -16320,6 +16408,12 @@ msgstr "Phiên"
 msgid "Session {0}"
 msgstr "Phiên {0}"
 
+msgid "Session cost"
+msgstr "Chi phí phiên"
+
+msgid "Session cost: {cost}"
+msgstr "Chi phí phiên: {cost}"
+
 msgid "Session details"
 msgstr "Chi tiết phiên"
 
@@ -16340,6 +16434,9 @@ msgstr "Đã đổi tên phiên thành {trimmed}"
 
 msgid "Session snapshots & revert"
 msgstr "Ảnh chụp phiên & hoàn tác"
+
+msgid "Session status"
+msgstr "Trạng thái phiên"
 
 msgid "Sessions"
 msgstr "Phiên"
@@ -16740,11 +16837,17 @@ msgstr "Đăng nhập một lần. Paradev giữ kết nối."
 msgid "Sign in to {0}"
 msgstr "Đăng nhập vào {0}"
 
+msgid "Sign in to continue"
+msgstr "Đăng nhập để tiếp tục"
+
 msgid "Sign in to continue to Paradev"
 msgstr "Đăng nhập để tiếp tục vào Paradev"
 
 msgid "Sign in to get started"
 msgstr "Đăng nhập để bắt đầu"
+
+msgid "Sign in to the agent in a terminal, then continue."
+msgstr "Hãy đăng nhập vào agent trong terminal rồi tiếp tục."
 
 msgid "Sign in to view this page"
 msgstr "Đăng nhập để xem trang này"
@@ -17329,6 +17432,9 @@ msgstr "Đang khởi động"
 msgid "Starting {agentLabel}"
 msgstr "Đang khởi động {agentLabel}"
 
+msgid "Starting a new chat…"
+msgstr "Đang bắt đầu trò chuyện mới…"
+
 msgid "Starting a workspace on this pull request"
 msgstr "Đang khởi động workspace cho pull request này"
 
@@ -17533,6 +17639,9 @@ msgstr "Tổng CPU mà Paradev và các cây tiến trình terminal được the
 
 msgid "Summarize the changes in this workspace"
 msgstr "Tóm tắt các thay đổi trong workspace này"
+
+msgid "Summarizes the chat to free up context."
+msgstr "Tóm tắt cuộc trò chuyện để giải phóng ngữ cảnh."
 
 msgid "Summary"
 msgstr "Tóm tắt"
@@ -17798,6 +17907,9 @@ msgstr "Tác vụ"
 msgid "Task ID copied"
 msgstr "Đã sao chép ID tác vụ"
 
+msgid "Task interrupted"
+msgstr "Tác vụ bị gián đoạn"
+
 msgid "Task key"
 msgstr "Khóa nhiệm vụ"
 
@@ -18056,8 +18168,17 @@ msgstr "Agent nhấp và gõ trong cùng một ngăn để kiểm tra thay đổ
 msgid "The agent copies the conversation; the branch opens in a new tab"
 msgstr "Tác nhân sao chép hội thoại; nhánh mở trong một thẻ mới"
 
+msgid "The agent crashed"
+msgstr "Agent đã gặp sự cố"
+
+msgid "The agent lost this conversation"
+msgstr "Agent đã mất cuộc trò chuyện này"
+
 msgid "The agent owns a task from ticket to diff. The human reviews the result, not the keystrokes. Attention shifts from writing code to specifying work and judging it. One engineer runs several agents at once in isolated workspaces."
 msgstr "Agent làm chủ một tác vụ từ ticket đến diff. Con người review kết quả, không phải từng thao tác gõ. Sự chú ý dịch từ viết code sang đặc tả công việc và đánh giá nó. Một kỹ sư chạy nhiều agent cùng lúc trong các workspace tách biệt."
+
+msgid "The agent stopped responding"
+msgstr "Agent đã ngừng phản hồi"
 
 msgid "The agent stopped while resuming the conversation."
 msgstr "Tác tử đã dừng khi đang tiếp tục cuộc trò chuyện."
@@ -18255,6 +18376,9 @@ msgstr "Dịch vụ host cục bộ vừa khởi động. Đang kết nối lạ
 
 msgid "The majority of merged agent PRs need review only, with zero human edits."
 msgstr "Phần lớn PR của agent được merge chỉ cần review, không có chỉnh sửa của con người."
+
+msgid "The model declined to continue"
+msgstr "Mô hình đã từ chối tiếp tục"
 
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
@@ -18514,6 +18638,9 @@ msgstr "Không thể khởi động workspace cloud này"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
 
+msgid "This conversation is too long for the model"
+msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
+
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Thao tác này xóa phần scrollback đã lưu dùng để khôi phục sau khi khởi động lại hoặc crash."
 
@@ -18615,6 +18742,9 @@ msgstr "Tenant Microsoft này đã được {detail} kết nối. Hãy nhờ h�
 
 msgid "This Microsoft tenant is already connected by another Paradev organization."
 msgstr "Tenant Microsoft này đã được một tổ chức Paradev khác kết nối."
+
+msgid "This model isn't available"
+msgstr "Mô hình này không khả dụng"
 
 msgid "This month"
 msgstr "Tháng này"
@@ -19172,11 +19302,8 @@ msgstr "Đã thiết lập tunnel"
 msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
 msgstr "Biến việc lặt vặt thành agent chạy theo lịch hoặc khi có sự kiện: phân loại issue, soạn nháp changelog, cập nhật dependency. Chúng tự chạy và mở PR để bạn review."
 
-msgid "Turn failed"
-msgstr "Lượt xử lý thất bại"
-
-msgid "Turn failed: {message}"
-msgstr "Lượt xử lý thất bại: {message}"
+msgid "Turn Fast mode on or off"
+msgstr "Bật hoặc tắt chế độ nhanh"
 
 msgid "Turn on “Allow remote access to this device via relay”"
 msgstr "Bật “Cho phép truy cập từ xa vào thiết bị này qua relay”"
@@ -19635,6 +19762,9 @@ msgstr "Các mục mức sử dụng"
 msgid "Usage unavailable."
 msgstr "Không có dữ liệu sử dụng."
 
+msgid "Usage: /{name} {hint}"
+msgstr "Cách dùng: /{name} {hint}"
+
 #. placeholder {0}: search.trim()
 msgid "Use “{0}”"
 msgstr "Dùng “{0}”"
@@ -19701,6 +19831,9 @@ msgstr "Dùng tính năng chuyển giọng nói thành văn bản và nhấn đ�
 
 msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
 msgstr "Dùng gói đăng ký agent và khóa API sẵn có của bạn. Paradev không bao giờ proxy lệnh gọi mô hình hay trói quy trình của bạn vào một nhà cung cấp."
+
+msgid "Used"
+msgstr "Đã dùng"
 
 msgid "Used in URLs and APIs."
 msgstr "Dùng trong URL và API."
@@ -20114,6 +20247,10 @@ msgstr "Chào mừng đến với Paradev"
 msgid "Welcome to the new Paradev"
 msgstr "Chào mừng đến với Paradev mới"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "{0} là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng không gian làm việc cho các agent lập trình song song."
+
 msgid "What are the benefits?"
 msgstr "Phúc lợi gồm những gì?"
 
@@ -20149,9 +20286,6 @@ msgstr "Vấn đề là gì?"
 
 msgid "What it does"
 msgstr "Nhiệm vụ"
-
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Paradev là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng workspace cho các agent lập trình song song."
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev chạy trên những nền tảng nào?"
@@ -20272,6 +20406,10 @@ msgstr "Chiều rộng · các phiên song song"
 
 msgid "Window"
 msgstr "Cửa sổ"
+
+msgctxt "context window size"
+msgid "Window"
+msgstr "Kích thước"
 
 msgid "With action"
 msgstr "Có hành động"

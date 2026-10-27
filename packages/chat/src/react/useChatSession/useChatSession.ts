@@ -167,7 +167,11 @@ export type ChatSession = {
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 };
 
 function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
@@ -575,8 +579,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	);
 
 	const setConfigOption = useCallback(
-		(configId: string, value: string) =>
-			client.setConfigOption(configId, value),
+		(configId: string, value: string, options?: { confirm?: boolean }) =>
+			client.setConfigOption(configId, value, options),
 		[client],
 	);
 

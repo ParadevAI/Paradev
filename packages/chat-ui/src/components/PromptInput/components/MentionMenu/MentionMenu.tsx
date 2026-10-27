@@ -2,7 +2,7 @@
 
 import { Trans } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { MentionSection } from "../../hooks/useMentionSources";
 import type { ComposerMentionEntry } from "../../types";
 
@@ -24,6 +24,7 @@ export function MentionMenu({
 	className,
 }: MentionMenuProps) {
 	const flatEntries = sections.flatMap((section) => section.entries);
+	const listRef = useRef<HTMLDivElement>(null);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: flatEntries identity churns per render; selection identity is (index, length)
 	useEffect(() => {
@@ -31,6 +32,13 @@ export function MentionMenu({
 			selectedIndex == null ? null : (flatEntries[selectedIndex] ?? null),
 		);
 	}, [selectedIndex, flatEntries.length]);
+
+	useEffect(() => {
+		if (selectedIndex == null) return;
+		listRef.current
+			?.querySelector(`[data-index="${selectedIndex}"]`)
+			?.scrollIntoView({ block: "nearest" });
+	}, [selectedIndex]);
 
 	if (sections.length === 0) return null;
 	let flatIndex = -1;
@@ -42,7 +50,7 @@ export function MentionMenu({
 				className,
 			)}
 		>
-			<div className="scroll-fade max-h-96 overflow-y-auto">
+			<div ref={listRef} className="scroll-fade max-h-96 overflow-y-auto">
 				{sections.map((section) => (
 					<div key={section.providerId}>
 						<p className="px-3 pt-2.5 pb-1 text-[13px] text-muted-foreground">
@@ -69,6 +77,7 @@ export function MentionMenu({
 								<div
 									key={entry.id}
 									role="option"
+									data-index={index}
 									aria-selected={index === selectedIndex}
 									className={cn(
 										"flex cursor-pointer items-center gap-2.5 rounded-[10px] px-3 py-[5px] text-[15px] leading-[21px]",
@@ -76,7 +85,7 @@ export function MentionMenu({
 											? "bg-accent text-accent-foreground"
 											: "text-foreground",
 									)}
-									onMouseEnter={() => onHighlight(index)}
+									onMouseMove={() => onHighlight(index)}
 									onMouseDown={(event) => event.preventDefault()}
 									onClick={() => onSelect(entry)}
 								>

@@ -767,3 +767,33 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 });
+
+describe("setting a session option", () => {
+	test("with confirm, fails when the agent refuses the setting", async () => {
+		class RefusingHarness extends FakeHarness {
+			setConfigOption(_configId: string, value: string): Promise<boolean> {
+				return Promise.resolve(value !== "refused");
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([[FAKE_HARNESS, () => new RefusingHarness(SCRIPT)]]),
+		});
+		const { sessionId } = createSession(runtime);
+		const set = (value: string, confirm?: boolean) =>
+			runtime.commands.setConfigOption({
+				commandId: randomUUID(),
+				sessionId,
+				configId: "model",
+				value,
+				...(confirm ? { confirm } : {}),
+			});
+
+		expect(set("refused")).toBeUndefined();
+		await expect(set("taken", true)).resolves.toBeUndefined();
+		await expect(set("refused", true)).rejects.toThrow(
+			"the agent did not take that setting",
+		);
+
+		await runtime.dispose();
+	});
+});

@@ -16,7 +16,13 @@ export const createSessionInputSchema = z.object({
 	harness: z.string().min(1),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
-	resume: z.object({ harnessSessionId: z.string().min(1) }).optional(),
+	resume: z
+		.object({
+			harnessSessionId: z.string().min(1),
+			/** The stopped chat this one takes over; a failed last turn carries over. */
+			replacesSessionId: z.string().min(1).optional(),
+		})
+		.optional(),
 	terminalId: z.string().min(1).optional(),
 });
 export type CreateSessionInput = z.infer<typeof createSessionInputSchema>;
@@ -100,6 +106,8 @@ export const setConfigOptionInputSchema = z.object({
 	...commandBaseFields,
 	configId: z.string().min(1),
 	value: z.string().min(1),
+	/** Resolve once the agent has taken the change, and fail if it refused it. */
+	confirm: z.boolean().optional(),
 });
 export type SetConfigOptionInput = z.infer<typeof setConfigOptionInputSchema>;
 
