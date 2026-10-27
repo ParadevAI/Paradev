@@ -92,6 +92,10 @@ export const serverErrorMessages: Record<
 				message: `${params?.agent} cannot be signed in this way yet.`,
 			}),
 		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(msg({ message: "Only organization admins can manage agents" })),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({

@@ -1,6 +1,12 @@
+import { timingSafeEqual } from "node:crypto";
 import type { auth, Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, members } from "@superset/db/schema";
+import {
+	agents,
+	agentTurns,
+	cloudWorkspaces,
+	members,
+} from "@superset/db/schema";
 import {
 	ORGANIZATION_HEADER,
 	STAFF_EMAIL_DOMAINS,
@@ -8,8 +14,13 @@ import {
 import { initTRPC, TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import superjson from "superjson";
+import { env } from "./env";
 import { formatError, userError } from "./i18n-error";
 import { hasAdminAccess } from "./lib/admin-access";
+import {
+	TURN_TOKEN_HEADER,
+	verifyTurnToken,
+} from "./lib/agent-turn/turn-token";
 import { posthog } from "./lib/analytics";
 import {
 	SANDBOX_ALLOWED_PROCEDURES,
@@ -392,4 +403,62 @@ export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
 	}
 
 	return next({ ctx });
+});
+
+export const AGENT_WORKER_SECRET_HEADER = "x-agent-worker-secret";
+
+/** Our agent worker, which may only pick up turns the API created. */
+export const workerProcedure = t.procedure.use(async ({ ctx, next }) => {
+	const expected = Buffer.from(env.AGENT_WORKER_SECRET);
+	const given = Buffer.from(ctx.headers.get(AGENT_WORKER_SECRET_HEADER) ?? "");
+	if (expected.length !== given.length || !timingSafeEqual(expected, given)) {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "Unknown worker." });
+	}
+	return next();
+});
+
+/**
+ * An agent acting inside a running turn, never a person: authenticated by a
+ * turn token in its own header and signed with its own key, so it can never
+ * pass as a user's JWT. A settled turn, or an archived agent, stops working
+ * at once rather than when the token expires.
+ */
+export const agentProcedure = t.procedure.use(async ({ ctx, next }) => {
+	const token = ctx.headers.get(TURN_TOKEN_HEADER);
+	const claims = token
+		? await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token)
+		: null;
+	if (!claims) {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
+	}
+	const [turn] = await db
+		.select({ status: agentTurns.status, archivedAt: agents.archivedAt })
+		.from(agentTurns)
+		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
+		.where(
+			and(
+				eq(agentTurns.id, claims.turnId),
+				eq(agentTurns.sessionId, claims.sessionId),
+				eq(agentTurns.agentId, claims.agentId),
+				eq(agentTurns.organizationId, claims.organizationId),
+			),
+		)
+		.limit(1);
+	if (!turn || turn.status !== "running" || turn.archivedAt) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+			message: "Turn is not running.",
+		});
+	}
+	return next({
+		ctx: {
+			agentTurn: {
+				agentId: claims.agentId,
+				organizationId: claims.organizationId,
+				sessionId: claims.sessionId,
+				turnId: claims.turnId,
+				actingUserId: claims.actingUserId,
+			},
+		},
+	});
 });

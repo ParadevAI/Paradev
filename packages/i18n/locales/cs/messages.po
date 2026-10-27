@@ -2090,6 +2090,9 @@ msgstr "Agent pracuje"
 msgid "Agent launch configuration"
 msgstr "Konfigurace spuštění agenta"
 
+msgid "Agent not found"
+msgstr "Agent nebyl nalezen"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Výběr agenta (Claude, Codex, Cursor…) používaný ve všech tocích vytváření relace"
 
@@ -12278,6 +12281,9 @@ msgstr "Ke komentáři lze připojit pouze obrázky"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Jen na tomto počítači: ignorováno gitem a použito pro každý worktree tohoto repozitáře. Každý zde nastavený klíč nahradí sdílený."
+
+msgid "Only organization admins can manage agents"
+msgstr "Agenty mohou spravovat pouze správci organizace"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Toto nastavení mohou měnit jen vlastníci organizace."

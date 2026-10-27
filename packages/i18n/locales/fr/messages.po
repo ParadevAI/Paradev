@@ -2090,6 +2090,9 @@ msgstr "L’agent travaille"
 msgid "Agent launch configuration"
 msgstr "Configuration de lancement de l'agent"
 
+msgid "Agent not found"
+msgstr "Agent introuvable"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Sélecteur d'agent (Claude, Codex, Cursor…) utilisé par tous les flux de création de session"
 
@@ -12278,6 +12281,9 @@ msgstr "Seules des images peuvent être jointes à un commentaire"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Uniquement sur cette machine : ignoré par git et appliqué à chaque worktree de ce dépôt. Toute clé définie ici remplace la clé partagée."
+
+msgid "Only organization admins can manage agents"
+msgstr "Seuls les administrateurs de l'organisation peuvent gérer les agents"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Seuls les propriétaires de l'organisation peuvent modifier ces paramètres."

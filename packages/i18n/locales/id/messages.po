@@ -2090,6 +2090,9 @@ msgstr "Agen sedang bekerja"
 msgid "Agent launch configuration"
 msgstr "Konfigurasi peluncuran agen"
 
+msgid "Agent not found"
+msgstr "Agen tidak ditemukan"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Pemilih agen (Claude, Codex, Cursor…) yang dipakai tiap alur pembuatan sesi"
 
@@ -12278,6 +12281,9 @@ msgstr "Hanya gambar yang dapat dilampirkan ke komentar"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Hanya di mesin ini: diabaikan git dan diterapkan ke setiap worktree repositori ini. Setiap kunci yang diatur di sini menggantikan yang dibagikan."
+
+msgid "Only organization admins can manage agents"
+msgstr "Hanya admin organisasi yang dapat mengelola agen"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Hanya pemilik organisasi yang bisa mengubah pengaturan ini."

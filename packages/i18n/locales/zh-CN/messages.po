@@ -2090,6 +2090,9 @@ msgstr "智能体正在工作"
 msgid "Agent launch configuration"
 msgstr "智能体启动配置"
 
+msgid "Agent not found"
+msgstr "未找到智能体"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "智能体选择器（Claude、Codex、Cursor…），所有创建会话的流程都在用"
 
@@ -12278,6 +12281,9 @@ msgstr "评论只能附加图片"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "仅限本机：被 git 忽略，并应用于该仓库的每个 worktree。此处设置的任何键都会替换共享的值。"
+
+msgid "Only organization admins can manage agents"
+msgstr "只有组织管理员可以管理智能体"
 
 msgid "Only organization owners can modify these settings."
 msgstr "只有组织所有者可以修改这些设置。"

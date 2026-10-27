@@ -2090,6 +2090,9 @@ msgstr "Agent đang làm việc"
 msgid "Agent launch configuration"
 msgstr "Cấu hình khởi chạy agent"
 
+msgid "Agent not found"
+msgstr "Không tìm thấy agent"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Bộ chọn agent (Claude, Codex, Cursor…) dùng trong mọi luồng tạo phiên"
 
@@ -12278,6 +12281,9 @@ msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Chỉ trên máy này: được git bỏ qua và áp dụng cho mọi worktree của repository này. Mọi khóa đặt ở đây sẽ thay thế khóa dùng chung."
+
+msgid "Only organization admins can manage agents"
+msgstr "Chỉ quản trị viên tổ chức mới có thể quản lý agent"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Chỉ chủ sở hữu tổ chức mới sửa được các cài đặt này."

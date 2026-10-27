@@ -312,3 +312,35 @@ export type ChannelMemberRole = z.infer<typeof channelMemberRoleEnum>;
 export const channelNotifyValues = ["all", "mentions", "none"] as const;
 export const channelNotifyEnum = z.enum(channelNotifyValues);
 export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
+
+/** Where an agent works: a person's DM, a channel timeline, or one thread. */
+export const agentSessionKindValues = [
+	"dm",
+	"channel",
+	"thread",
+	"task",
+] as const;
+export const agentSessionKindEnum = z.enum(agentSessionKindValues);
+export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
+
+export const agentTurnStatusValues = [
+	"running",
+	"completed",
+	"failed",
+	"interrupted",
+] as const;
+export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
+export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;
+
+/** Why a turn started; recorded by the API, never by the worker. */
+export const agentTurnReasonValues = [
+	"direct_message",
+	"mention",
+	"thread_reply",
+	"dispatch",
+	"automation",
+	"schedule",
+	"wake",
+] as const;
+export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
+export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;

@@ -2090,6 +2090,9 @@ msgstr "Ajan çalışıyor"
 msgid "Agent launch configuration"
 msgstr "Ajan başlatma yapılandırması"
 
+msgid "Agent not found"
+msgstr "Ajan bulunamadı"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Her oturum oluşturma akışının kullandığı ajan seçici (Claude, Codex, Cursor…)"
 
@@ -12278,6 +12281,9 @@ msgstr "Bir yoruma yalnızca görsel eklenebilir"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Yalnızca bu makinede: git tarafından yok sayılır ve bu deponun her worktree'sine uygulanır. Burada ayarlanan her anahtar paylaşılanın yerini alır."
+
+msgid "Only organization admins can manage agents"
+msgstr "Ajanları yalnızca kuruluş yöneticileri yönetebilir"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Bu ayarları yalnızca kuruluş sahipleri değiştirebilir."

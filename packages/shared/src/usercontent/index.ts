@@ -38,11 +38,13 @@ export {
 	type FileTicketClaims,
 	type PageConnectTicketClaims,
 	type PageTicketClaims,
+	signClaims,
 	signFileTicket,
 	signPageConnectTicket,
 	signPageTicket,
 	verifyFileTicket,
 	verifyPageConnectTicket,
+	verifyClaims,
 	verifyPageTicket,
 } from "./ticket";
 export {

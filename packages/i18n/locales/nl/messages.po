@@ -2090,6 +2090,9 @@ msgstr "Agent is bezig"
 msgid "Agent launch configuration"
 msgstr "Startconfiguratie van de agent"
 
+msgid "Agent not found"
+msgstr "Agent niet gevonden"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Agentkiezer (Claude, Codex, Cursor…) die elke flow voor sessiecreatie gebruikt"
 
@@ -12278,6 +12281,9 @@ msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Alleen op deze machine: genegeerd door git en toegepast op elke worktree van deze repository. Elke sleutel die je hier instelt, vervangt de gedeelde."
+
+msgid "Only organization admins can manage agents"
+msgstr "Alleen organisatiebeheerders kunnen agents beheren"
 
 msgid "Only organization owners can modify these settings."
 msgstr "Alleen eigenaren van de organisatie kunnen deze instellingen wijzigen."

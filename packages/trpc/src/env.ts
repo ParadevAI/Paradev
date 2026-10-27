@@ -32,6 +32,8 @@ export const env = createEnv({
 		MEDIA_URL: z.string().url(),
 		STATIC_URL: z.string().url(),
 		USERCONTENT_TOKEN_SECRET: z.string().min(32),
+		AGENT_WORKER_SECRET: z.string().min(32),
+		AGENT_TURN_SIGNING_SECRET: z.string().min(32),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),

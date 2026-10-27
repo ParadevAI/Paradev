@@ -2090,6 +2090,9 @@ msgstr "エージェントが作業中です"
 msgid "Agent launch configuration"
 msgstr "エージェント起動設定"
 
+msgid "Agent not found"
+msgstr "エージェントが見つかりません"
+
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "すべてのセッション作成フローで使うエージェントピッカー(Claude、Codex、Cursor…)"
 
@@ -12278,6 +12281,9 @@ msgstr "コメントに添付できるのは画像のみです"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "このマシンのみ: git で無視され、このリポジトリのすべてのワークツリーに適用されます。ここで設定したキーは共有の値を置き換えます。"
+
+msgid "Only organization admins can manage agents"
+msgstr "エージェントを管理できるのは組織の管理者のみです"
 
 msgid "Only organization owners can modify these settings."
 msgstr "これらの設定を変更できるのは組織のオーナーのみです。"

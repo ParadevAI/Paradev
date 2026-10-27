@@ -78,7 +78,10 @@ function hmacKey(secret: string) {
 	);
 }
 
-async function signClaims(secret: string, wire: object): Promise<string> {
+export async function signClaims(
+	secret: string,
+	wire: object,
+): Promise<string> {
 	const payload = toBase64Url(encoder.encode(JSON.stringify(wire)));
 	const signature = await crypto.subtle.sign(
 		"HMAC",
@@ -94,7 +97,7 @@ async function signClaims(secret: string, wire: object): Promise<string> {
  * `secrets` is the current secret first, then any previous one still in its
  * grace period, so rotation never invalidates tickets already handed out.
  */
-async function verifyClaims(
+export async function verifyClaims(
 	secrets: string | readonly string[],
 	ticket: string,
 	now: number,

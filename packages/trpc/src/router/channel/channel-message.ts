@@ -287,29 +287,38 @@ async function announce(
 	}
 }
 
+/** A page of the channel's top-level messages, oldest first. Callers check access. */
+export async function listTopLevelMessages(input: {
+	channelId: string;
+	cursor?: number | null;
+	limit: number;
+}) {
+	const rows = await db
+		.select()
+		.from(channelMessages)
+		.where(
+			and(
+				eq(channelMessages.channelId, input.channelId),
+				isNull(channelMessages.threadRootId),
+				input.cursor ? lt(channelMessages.seq, input.cursor) : undefined,
+			),
+		)
+		.orderBy(desc(channelMessages.seq))
+		.limit(input.limit + 1);
+	const oldestFirst = rows.slice(0, input.limit).reverse();
+	const hasMore = rows.length > input.limit;
+	return {
+		messages: await enrichMessages(oldestFirst),
+		nextCursor: hasMore ? (oldestFirst[0]?.seq ?? null) : null,
+	};
+}
+
 export const channelMessageRouter = {
 	list: protectedProcedure
 		.input(listMessagesSchema)
 		.query(async ({ ctx, input }) => {
 			await loadChannelAccess(ctx.session.user.id, input.channelId);
-			const rows = await db
-				.select()
-				.from(channelMessages)
-				.where(
-					and(
-						eq(channelMessages.channelId, input.channelId),
-						isNull(channelMessages.threadRootId),
-						input.cursor ? lt(channelMessages.seq, input.cursor) : undefined,
-					),
-				)
-				.orderBy(desc(channelMessages.seq))
-				.limit(input.limit + 1);
-			const oldestFirst = rows.slice(0, input.limit).reverse();
-			const hasMore = rows.length > input.limit;
-			return {
-				messages: await enrichMessages(oldestFirst),
-				nextCursor: hasMore ? (oldestFirst[0]?.seq ?? null) : null,
-			};
+			return listTopLevelMessages(input);
 		}),
 
 	thread: protectedProcedure
