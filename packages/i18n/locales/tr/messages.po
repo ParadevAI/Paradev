@@ -15933,6 +15933,12 @@ msgstr "Ajanlarınızın otomatik olarak aldığı yeniden kullanılabilir yöne
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Yeniden kullanılabilir terminal başlatmaları. Düzenlemek için bir betiğe tıklayın veya sıralamak için sürükleyin. Proje kurulum, çalıştırma ve kapatma komutları yaşam döngüsü betikleridir."
 
+msgid "Reveal in File Explorer"
+msgstr "Dosya Gezgini'nde göster"
+
+msgid "Reveal in File Manager"
+msgstr "Dosya yöneticisinde göster"
+
 msgid "Reveal in Finder"
 msgstr "Finder'da göster"
 

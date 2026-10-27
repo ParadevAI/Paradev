@@ -15933,6 +15933,12 @@ msgstr "Znovupoužitelné instrukce, které si agenti automaticky načtou"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Znovupoužitelná spuštění terminálu. Kliknutím skript upravíte, přetažením změníte pořadí. Příkazy pro setup, spuštění a teardown projektu jsou lifecycle skripty."
 
+msgid "Reveal in File Explorer"
+msgstr "Zobrazit v Průzkumníku souborů"
+
+msgid "Reveal in File Manager"
+msgstr "Zobrazit ve správci souborů"
+
 msgid "Reveal in Finder"
 msgstr "Zobrazit ve Finderu"
 

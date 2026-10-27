@@ -15933,6 +15933,12 @@ msgstr "Herbruikbare instructies die je agents automatisch oppikken"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Herbruikbare terminalstarts. Klik op een script om het te bewerken of sleep om te herordenen. Setup-, run- en teardown-commando's van projecten zijn lifecycle-scripts."
 
+msgid "Reveal in File Explorer"
+msgstr "Tonen in Verkenner"
+
+msgid "Reveal in File Manager"
+msgstr "Tonen in bestandsbeheer"
+
 msgid "Reveal in Finder"
 msgstr "Tonen in Finder"
 

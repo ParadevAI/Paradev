@@ -15933,6 +15933,12 @@ msgstr "Wiederverwendbare Anweisungen, die deine Agenten automatisch aufgreifen"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Wiederverwendbare Terminal-Starts. Klicke ein Skript zum Bearbeiten an oder zieh es zum Umsortieren. Setup-, Run- und Teardown-Befehle eines Projekts sind Lifecycle-Skripte."
 
+msgid "Reveal in File Explorer"
+msgstr "Im Datei-Explorer anzeigen"
+
+msgid "Reveal in File Manager"
+msgstr "Im Dateimanager anzeigen"
+
 msgid "Reveal in Finder"
 msgstr "Im Finder anzeigen"
 

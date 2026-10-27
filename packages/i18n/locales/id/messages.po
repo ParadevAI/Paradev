@@ -15933,6 +15933,12 @@ msgstr "Instruksi pakai ulang yang otomatis diambil agen Anda"
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau seret untuk mengurutkan ulang. Perintah setup, run, dan teardown proyek adalah skrip lifecycle."
 
+msgid "Reveal in File Explorer"
+msgstr "Tampilkan di File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Tampilkan di pengelola file"
+
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"
 
