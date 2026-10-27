@@ -9,7 +9,8 @@ interface DeferredDiffPlaceholderProps {
 }
 
 /** Stands in for a file whose diff isn't on screen: a generated artifact held
- * back on purpose, a patch still in flight, or one that failed to load. */
+ * back on purpose, a patch still in flight, one that failed to load, or one
+ * whose only change is whitespace while whitespace is ignored. */
 export function DeferredDiffPlaceholder({
 	reason,
 	onRequest,
@@ -28,6 +29,8 @@ export function DeferredDiffPlaceholder({
 					<Trans>Loading diff…</Trans>
 				) : reason === "error" ? (
 					<Trans>Unable to load diff</Trans>
+				) : reason === "whitespace-only" ? (
+					<Trans>Only whitespace changed</Trans>
 				) : (
 					<Trans>Generated file hidden</Trans>
 				)}

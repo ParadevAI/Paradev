@@ -9561,6 +9561,9 @@ msgstr "如果你觉得Paradev还不错，一个GitHub星标能帮助更多开�
 msgid "Ignore @channel and @here"
 msgstr "忽略 @channel 和 @here"
 
+msgid "Ignore whitespace"
+msgstr "忽略空白"
+
 msgid "Illegal content"
 msgstr "违法内容"
 
@@ -13004,6 +13007,9 @@ msgstr "仅你可见"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "只是想把它从侧边栏移走？请改为隐藏。不会影响其他人。"
+
+msgid "Only whitespace changed"
+msgstr "仅空白有更改"
 
 msgid "Only you"
 msgstr "仅你自己"

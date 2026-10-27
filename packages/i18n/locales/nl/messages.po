@@ -9561,6 +9561,9 @@ msgstr "Als Paradev je tot nu toe bevalt, helpt een GitHub-ster andere ontwikkel
 msgid "Ignore @channel and @here"
 msgstr "@channel en @here negeren"
 
+msgid "Ignore whitespace"
+msgstr "Witruimte negeren"
+
 msgid "Illegal content"
 msgstr "Illegale inhoud"
 
@@ -13004,6 +13007,9 @@ msgstr "Alleen zichtbaar voor jou"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "Wil je het alleen uit je zijbalk halen? Verberg het dan. Niemand anders merkt er iets van."
+
+msgid "Only whitespace changed"
+msgstr "Alleen witruimte gewijzigd"
 
 msgid "Only you"
 msgstr "Alleen jij"

@@ -9561,6 +9561,9 @@ msgstr "Kalau sejauh ini Anda menikmati Paradev, satu star GitHub membantu devel
 msgid "Ignore @channel and @here"
 msgstr "Abaikan @channel dan @here"
 
+msgid "Ignore whitespace"
+msgstr "Abaikan spasi"
+
 msgid "Illegal content"
 msgstr "Konten ilegal"
 
@@ -13004,6 +13007,9 @@ msgstr "Hanya terlihat oleh Anda"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "Hanya ingin menghapusnya dari sidebar Anda? Sembunyikan saja. Tidak ada orang lain yang terpengaruh."
+
+msgid "Only whitespace changed"
+msgstr "Hanya spasi yang berubah"
 
 msgid "Only you"
 msgstr "Hanya Anda"

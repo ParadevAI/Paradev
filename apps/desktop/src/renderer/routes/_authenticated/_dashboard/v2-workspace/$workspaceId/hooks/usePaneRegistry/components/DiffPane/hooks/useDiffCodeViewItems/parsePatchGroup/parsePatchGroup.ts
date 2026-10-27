@@ -51,6 +51,7 @@ export function parsePatchGroup(
 	groupKey: string,
 	result: PatchGroupResult,
 	previous?: ParsedPatchGroup,
+	{ ignoreWhitespace = false }: { ignoreWhitespace?: boolean } = {},
 ): ParsedPatchGroup {
 	const byPath = new Map<string, FileDiffMetadata>();
 	const bySegmentKey = new Map<string, FileDiffMetadata>();
@@ -76,12 +77,16 @@ export function parsePatchGroup(
 					"\0",
 				),
 			);
-			keep(key, () =>
-				parseDiffFromFile(
+			keep(key, () => {
+				const fileDiff = parseDiffFromFile(
 					{ ...file.oldFile, name: oldName, cacheKey: `${key}:old` },
 					{ ...file.newFile, name: file.path, cacheKey: `${key}:new` },
-				),
-			);
+					{ ignoreWhitespace },
+				);
+				// Same result as `git diff --ignore-all-space`: no section.
+				if (ignoreWhitespace && fileDiff.hunks.length === 0) return undefined;
+				return fileDiff;
+			});
 		}
 	}
 
