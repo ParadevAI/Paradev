@@ -92,6 +92,17 @@ function isSkillDisabled(
 	return sourceName === BUNDLED_SOURCE_NAME && disabled.has(skillName);
 }
 
+export function isBundledSkillDisabled(
+	disabledSkillIds: readonly string[],
+	skillName: string,
+): boolean {
+	return isSkillDisabled(
+		new Set(disabledSkillIds),
+		BUNDLED_SOURCE_NAME,
+		skillName,
+	);
+}
+
 function resolvePluginSources(
 	pluginSources: readonly PluginSkillSource[] = [],
 ): ResolvedSource[] {

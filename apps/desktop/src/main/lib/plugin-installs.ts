@@ -7,6 +7,7 @@ import {
 	mcpHeadersHelperCommand,
 	resolveDisabledSkillIds,
 	syncManagedMcpServers,
+	syncSkillGatedHooks,
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { getBundledPluginDir } from "@superset/agent-setup/config";
@@ -280,5 +281,10 @@ export function setSkillEnabled(
 	// `next` straight through would silently re-enable an env-disabled skill
 	// on the next unrelated toggle.
 	queueManagedSkillsSync(resolveDisabledSkillIds(next));
+	syncSkillGatedHooks({
+		disabledAgentIds:
+			localDb.select().from(settings).get()?.disabledAgentHooks ?? [],
+		disabledSkillIds: next,
+	});
 	return next;
 }

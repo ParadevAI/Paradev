@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { existsSync, readdirSync } from "node:fs";
+import path from "node:path";
 import {
 	getPluginByName,
 	isServerSatisfiedExternally,
 	PLUGIN_CATALOG,
+	SUPERSET_MANAGED_SKILLS,
 } from "./index";
 import { FIRST_PARTY_MANIFESTS } from "./manifests.generated";
 
@@ -25,6 +28,28 @@ describe("PLUGIN_CATALOG", () => {
 	test("has no duplicate names", () => {
 		const names = PLUGIN_CATALOG.map((plugin) => plugin.name);
 		expect(names).toEqual([...new Set(names)]);
+	});
+});
+
+describe("SUPERSET_MANAGED_SKILLS", () => {
+	test("lists every skill the superset plugin ships", () => {
+		const skillsDir = path.join(
+			import.meta.dir,
+			"../../../../plugins/superset/skills",
+		);
+		const shipped = readdirSync(skillsDir, { withFileTypes: true })
+			.filter(
+				(entry) =>
+					entry.isDirectory() &&
+					existsSync(path.join(skillsDir, entry.name, "SKILL.md")),
+			)
+			.map((entry) => entry.name);
+		const managed: string[] = SUPERSET_MANAGED_SKILLS.map(
+			(skill) => skill.name,
+		);
+
+		expect(shipped.length).toBeGreaterThan(0);
+		expect(managed.sort()).toEqual(shipped.sort());
 	});
 });
 

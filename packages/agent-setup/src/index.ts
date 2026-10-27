@@ -3,6 +3,7 @@ import {
 	runSetupAction,
 	setupAgentCapabilities,
 	setupSingleAgent,
+	syncSkillGatedHooks,
 	teardownSingleAgent,
 } from "./agent-setup";
 import { resolveDisabledAgentIds } from "./disabled-agent-hooks";
@@ -60,7 +61,7 @@ export function setupAgentIntegrations(
 	console.log("[agent-setup] Agent integrations provisioned");
 }
 
-export { setupSingleAgent, teardownSingleAgent };
+export { setupSingleAgent, syncSkillGatedHooks, teardownSingleAgent };
 
 export {
 	ensureClaudeManagedHooksAt,

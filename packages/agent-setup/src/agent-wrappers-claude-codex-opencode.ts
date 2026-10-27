@@ -12,6 +12,7 @@ import {
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
 import { getTemplatePath } from "./config";
+import { resolveDisabledSkillIds } from "./disabled-skills";
 import {
 	buildNestedDesiredEntries,
 	cleanNestedHookDefinition,
@@ -20,6 +21,7 @@ import {
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
+import { isBundledSkillDisabled } from "./managed-skills";
 import { getNotifyScriptPath } from "./notify-hook";
 import {
 	getOpenCodeConfigDir,
@@ -66,6 +68,7 @@ export function getClaudeManagedHookCommand(): string {
 
 export const CLAUDE_ARTIFACT_GUARD_EVENT = "PreToolUse";
 export const CLAUDE_ARTIFACT_GUARD_MATCHER = "Artifact";
+const CLAUDE_ARTIFACT_GUARD_SKILL = "page";
 
 /**
  * Returns the global Claude settings path used for native hook registration.
@@ -93,21 +96,24 @@ const CLAUDE_MANAGED_EVENTS: Record<string, { matcher?: string }> = {
 
 function claudeHooksSpec(
 	notifyScriptPath: string,
+	disabledSkillIds: readonly string[] = resolveDisabledSkillIds(),
 	artifactGuardScriptPath: string = getArtifactGuardScriptPath(),
 ): ManagedJsonHooksSpec<ClaudeHookDefinition> {
 	const desiredEntriesByEvent = buildNestedDesiredEntries<ClaudeHookDefinition>(
 		CLAUDE_MANAGED_EVENTS,
 		getClaudeManagedHookCommand(),
 	);
-	desiredEntriesByEvent[CLAUDE_ARTIFACT_GUARD_EVENT] = [
-		...(desiredEntriesByEvent[CLAUDE_ARTIFACT_GUARD_EVENT] ?? []),
-		{
-			matcher: CLAUDE_ARTIFACT_GUARD_MATCHER,
-			hooks: [
-				{ type: "command", command: getManagedArtifactGuardHookCommand() },
-			],
-		},
-	];
+	if (!isBundledSkillDisabled(disabledSkillIds, CLAUDE_ARTIFACT_GUARD_SKILL)) {
+		desiredEntriesByEvent[CLAUDE_ARTIFACT_GUARD_EVENT] = [
+			...(desiredEntriesByEvent[CLAUDE_ARTIFACT_GUARD_EVENT] ?? []),
+			{
+				matcher: CLAUDE_ARTIFACT_GUARD_MATCHER,
+				hooks: [
+					{ type: "command", command: getManagedArtifactGuardHookCommand() },
+				],
+			},
+		];
+	}
 	return {
 		fileLabel: "Claude settings.json",
 		agentLabel: "Claude",
@@ -135,8 +141,11 @@ function claudeHooksSpec(
  */
 export function getClaudeGlobalSettingsJsonContent(
 	notifyScriptPath: string,
+	disabledSkillIds?: readonly string[],
 ): string | null {
-	return getManagedJsonHooksContent(claudeHooksSpec(notifyScriptPath));
+	return getManagedJsonHooksContent(
+		claudeHooksSpec(notifyScriptPath, disabledSkillIds),
+	);
 }
 
 /**
@@ -144,8 +153,12 @@ export function getClaudeGlobalSettingsJsonContent(
  * This ensures hooks work regardless of whether the binary wrapper is in PATH,
  * matching the approach used for Cursor, Gemini, Droid, and Mastra.
  */
-export function createClaudeSettingsJson(): void {
-	ensureManagedJsonHooks(claudeHooksSpec(getNotifyScriptPath()));
+export function createClaudeSettingsJson(
+	disabledSkillIds?: readonly string[],
+): void {
+	ensureManagedJsonHooks(
+		claudeHooksSpec(getNotifyScriptPath(), disabledSkillIds),
+	);
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import {
@@ -7,6 +7,7 @@ import {
 	getArtifactGuardScriptContent,
 } from "./artifact-guard-hook";
 import { getTemplatePath } from "./config";
+import { DISABLED_SKILLS_STATE_FILE } from "./disabled-skills";
 
 function renderScript(): string {
 	return readFileSync(
@@ -25,6 +26,8 @@ function runGuard(
 			...process.env,
 			SUPERSET_TERMINAL_ID: "terminal-test",
 			SUPERSET_ARTIFACT_GUARD_STATE_DIR: stateDir,
+			SUPERSET_HOME_DIR: supersetHomeDir,
+			SUPERSET_DISABLED_SKILLS: "",
 			...envOverrides,
 		},
 		stdin: Buffer.from(JSON.stringify(input)),
@@ -46,9 +49,11 @@ function decisionOf(stdout: string): string | null {
 }
 
 let stateDir = "";
+let supersetHomeDir = "";
 
 function freshStateDir(): void {
 	stateDir = mkdtempSync(path.join(tmpdir(), "artifact-guard-state-"));
+	supersetHomeDir = mkdtempSync(path.join(tmpdir(), "artifact-guard-home-"));
 }
 
 const publishInput = (sessionId: string) => ({
@@ -144,6 +149,30 @@ describe("artifact guard hook", () => {
 			});
 			expect(stdout).toBe("");
 		}
+	});
+
+	it("stays silent while the page skill is disabled", () => {
+		const disableSkills = (disabledSkillIds: string[]) =>
+			writeFileSync(
+				path.join(supersetHomeDir, DISABLED_SKILLS_STATE_FILE),
+				JSON.stringify({ disabledSkillIds }, null, "\t"),
+			);
+
+		for (const id of ["page", "superset/page"]) {
+			freshStateDir();
+			disableSkills(["doctor", id]);
+			expect(runGuard(publishInput("session-a")).stdout).toBe("");
+		}
+
+		freshStateDir();
+		const { stdout } = runGuard(publishInput("session-a"), {
+			SUPERSET_DISABLED_SKILLS: "doctor, page",
+		});
+		expect(stdout).toBe("");
+
+		freshStateDir();
+		disableSkills(["doctor", "other-plugin/page"]);
+		expect(decisionOf(runGuard(publishInput("session-a")).stdout)).toBe("deny");
 	});
 
 	it("renders the marker into the provisioned script", () => {
