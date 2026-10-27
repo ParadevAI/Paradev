@@ -16,6 +16,18 @@ const turnIdSchema = z.object({ turnId: z.string().uuid() });
 const turnNotRunning = () =>
 	new TRPCError({ code: "NOT_FOUND", message: "Turn is not running." });
 
+/** A settled turn still owes its session log the end marker, so settling hands out a ticket too. */
+async function sessionStoreFor(sessionId: string) {
+	return {
+		baseUrl: env.REALTIME_URL,
+		writeTicket: await signAgentSessionTicket(env.AGENT_SESSION_SECRET, {
+			sessionId,
+			scope: "write",
+			exp: Math.floor(Date.now() / 1000) + TURN_TOKEN_TTL_SECONDS,
+		}),
+	};
+}
+
 /** Our worker: it may only pick up turns the API created, and only while they run. */
 export const agentWorkerRouter = {
 	turnToken: workerProcedure.input(turnIdSchema).mutation(async ({ input }) => {
@@ -74,19 +86,8 @@ export const agentWorkerRouter = {
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
-			const sessionWriteTicket = await signAgentSessionTicket(
-				env.AGENT_SESSION_SECRET,
-				{
-					sessionId: turn.sessionId,
-					scope: "write",
-					exp: Math.floor(Date.now() / 1000) + TURN_TOKEN_TTL_SECONDS,
-				},
-			);
 			return {
-				sessionStore: {
-					baseUrl: env.REALTIME_URL,
-					writeTicket: sessionWriteTicket,
-				},
+				sessionStore: await sessionStoreFor(turn.sessionId),
 				host: access?.host ?? null,
 				model: access ? { headers: access.modelHeaders } : null,
 				expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
@@ -130,22 +131,32 @@ export const agentWorkerRouter = {
 				.returning({ sessionId: agentTurns.sessionId });
 			if (!settled) {
 				const [turn] = await db
-					.select({ status: agentTurns.status })
+					.select({
+						status: agentTurns.status,
+						sessionId: agentTurns.sessionId,
+					})
 					.from(agentTurns)
 					.where(eq(agentTurns.id, turnId))
 					.limit(1);
-				if (turn?.status === "running") {
+				if (!turn) throw turnNotRunning();
+				if (turn.status === "running") {
 					throw new TRPCError({
 						code: "CONFLICT",
 						message: "STEER_PENDING: a newer steer joined the turn.",
 					});
 				}
-				throw turnNotRunning();
+				return {
+					settled: true,
+					sessionStore: await sessionStoreFor(turn.sessionId),
+				};
 			}
 			await db
 				.update(agentSessions)
 				.set({ lastActivityAt: now })
 				.where(eq(agentSessions.id, settled.sessionId));
-			return { settled: true };
+			return {
+				settled: true,
+				sessionStore: await sessionStoreFor(settled.sessionId),
+			};
 		}),
 } satisfies TRPCRouterRecord;

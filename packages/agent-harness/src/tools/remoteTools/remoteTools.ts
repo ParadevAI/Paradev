@@ -19,7 +19,7 @@ import { followJob, type HostJobs, shellQuote } from "../hostJobs";
 
 const DEFAULT_TIMEOUT_S = 120;
 const MAX_TIMEOUT_S = 600;
-const MAX_WAIT_S = 3_540;
+const MAX_WAIT_S = 1_500;
 const GREP_DEFAULT_LIMIT = 100;
 const FIND_IGNORES = ["**/node_modules/**", "**/.git/**"];
 
@@ -191,7 +191,7 @@ function createBashTool(
 	return {
 		name: "bash",
 		label: "bash",
-		description: `Run a bash command in the workspace. Returns stdout and stderr, truncated to the last ${DEFAULT_MAX_LINES} lines or ${DEFAULT_MAX_BYTES / 1024}KB; the full output stays in the job log at output_path. A command still running when its timeout passes is not killed: it becomes a background job and you get its job_id. Set background to start a long command (dev servers, long builds) and keep working; you are notified when it finishes, or use job_wait.`,
+		description: `Run a bash command in the workspace. Returns stdout and stderr, truncated to the last ${DEFAULT_MAX_LINES} lines or ${DEFAULT_MAX_BYTES / 1024}KB; the full output stays in the job log at output_path. A command still running when its timeout passes is not killed: it becomes a background job and you get its job_id. Set background to start a long command (dev servers, long builds) and keep working; use job_wait when you need its result.`,
 		parameters: bashParameters,
 		async execute(toolCallId, params, signal, onUpdate) {
 			const { host, sessionId, workspaceId } = options;
@@ -283,7 +283,7 @@ function createJobWaitTool(
 		name: "job_wait",
 		label: "job_wait",
 		description:
-			"Wait for a background job, or until its output matches a regex. Returns its status and the end of its output. Only wait when your next step needs the result; otherwise keep working and you are notified when it finishes.",
+			"Wait for a background job, or until its output matches a regex. Returns its status and the end of its output. Only wait when your next step needs the result; otherwise keep working and check back later.",
 		parameters: jobWaitParameters,
 		async execute(_toolCallId, params, signal) {
 			const waitS = Math.min(Math.max(params.wait_seconds, 0), MAX_WAIT_S);

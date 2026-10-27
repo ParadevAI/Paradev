@@ -4,6 +4,7 @@ import {
 	createAssistantMessageEventStream,
 } from "@earendil-works/pi-ai";
 import type { HostJobs } from "@superset/agent-harness";
+import { ApplicationFailure } from "@temporalio/common";
 import type { TurnCredentials } from "../../clients/credentials";
 import type {
 	AppendInput,
@@ -22,8 +23,13 @@ const credentials: TurnCredentials = {
 function memoryStore() {
 	const appends: AppendInput[] = [];
 	const rows: TranscriptRow[] = [];
+	const failNext = { append: false };
 	const store: SessionStore = {
 		async append(input) {
+			if (failNext.append) {
+				failNext.append = false;
+				throw new Error("store unavailable");
+			}
 			if (appends.some((a) => a.stepKey === input.stepKey)) {
 				return { duplicate: true };
 			}
@@ -40,7 +46,7 @@ function memoryStore() {
 			return rows.filter((row) => row.stepKey === stepKey);
 		},
 	};
-	return { store, appends, rows };
+	return { store, appends, rows, failNext };
 }
 
 function fakeHost(): HostJobs & { commands: string[] } {
@@ -129,22 +135,40 @@ function setup(replies: AssistantMessage[]) {
 	const host = fakeHost();
 	const model = scriptedModel(replies);
 	const settled: SettleTurnInput[] = [];
+	const turn = { running: true };
 	const activities = createActivities({
-		credentials: { forTurn: async () => credentials },
+		credentials: {
+			forTurn: async () => {
+				if (!turn.running) {
+					throw ApplicationFailure.nonRetryable(
+						"Turn is not running.",
+						"TurnNotRunning",
+					);
+				}
+				return credentials;
+			},
+		},
 		settler: {
 			async settle(input) {
 				settled.push(input);
-				return { steerPending: false };
+				turn.running = false;
+				return { steerPending: false, sessionStore: credentials.sessionStore };
 			},
 		},
 		stream: model.stream,
+		modelPrice: async () => ({
+			input: 2,
+			output: 10,
+			cacheRead: 0,
+			cacheWrite: 0,
+		}),
 		sessionStore: () => memory.store,
 		hostJobs: () => host,
 		workspaceContext: async () => ({ cwd: "/repo" }),
 		readAgentsMd: async () => null,
 		flushEveryMs: 0,
 	});
-	return { activities, memory, host, model, settled };
+	return { activities, memory, host, model, settled, turn };
 }
 
 const ref = { sessionId: "s1", turnId: "t1" };
@@ -233,6 +257,22 @@ describe("agent activities", () => {
 			name: "bash",
 			status: "done",
 		});
+		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
+	});
+
+	test("a settle retried after the turn was recorded still writes the end", async () => {
+		const { activities, settled, memory } = setup([
+			assistant([{ type: "text", text: "Done." }]),
+		]);
+		await activities.beginTurn({ ...ref, promptId: "p1", text: "hi" });
+		await activities.modelStep({ ...ref, step: 0 });
+		memory.failNext.append = true;
+		const settle = { ...ref, outcome: "completed" as const, steersConsumed: 0 };
+		await expect(activities.settleTurn(settle)).rejects.toThrow(
+			"store unavailable",
+		);
+		await activities.settleTurn(settle);
+		expect(settled).toHaveLength(2);
 		expect(memory.appends.at(-1)?.turnEnd?.status).toBe("completed");
 	});
 });

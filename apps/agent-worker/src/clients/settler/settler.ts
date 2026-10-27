@@ -15,7 +15,20 @@ export interface SettleTurnInput {
 	steersConsumed: number;
 }
 
-/** Records a finished turn. `steerPending` asks for one more step: a message joined after the last one. */
+export interface SessionStoreAccess {
+	baseUrl: string;
+	writeTicket: string;
+}
+
+/**
+ * Records a finished turn. `steerPending` asks for one more step: a message
+ * joined after the last one. A turn already settled answers like a fresh settle.
+ */
 export interface TurnSettler {
-	settle(input: SettleTurnInput): Promise<{ steerPending: boolean }>;
+	settle(
+		input: SettleTurnInput,
+	): Promise<
+		| { steerPending: true }
+		| { steerPending: false; sessionStore: SessionStoreAccess }
+	>;
 }

@@ -27,7 +27,12 @@ import type {
 import { hostContext, httpHostJobs } from "../../clients/hostJobs";
 import type { SessionStore, TranscriptRow } from "../../clients/sessionStore";
 import { httpSessionStore } from "../../clients/sessionStore";
-import type { SettleTurnInput, TurnSettler } from "../../clients/settler";
+import type {
+	SessionStoreAccess,
+	SettleTurnInput,
+	TurnSettler,
+} from "../../clients/settler";
+import { createModelPrices, type ModelPrice } from "../../model/modelPrice";
 import { routerModel } from "../../model/routerModel";
 import { buildSystemPrompt } from "../../systemPrompt";
 
@@ -42,8 +47,9 @@ export interface ActivityDeps {
 	settler: TurnSettler;
 	stream: StreamFn;
 	sessionStore?: (
-		credentials: TurnCredentials,
+		access: SessionStoreAccess,
 		sessionId: string,
+		freshTicket: () => Promise<string>,
 	) => SessionStore;
 	hostJobs?: (credentials: TurnCredentials) => HostJobs;
 	workspaceContext?: (credentials: TurnCredentials) => Promise<{ cwd: string }>;
@@ -51,6 +57,7 @@ export interface ActivityDeps {
 	now?: () => number;
 	flushEveryMs?: number;
 	heartbeatEveryMs?: number;
+	modelPrice?: (model: TurnCredentials["model"]) => Promise<ModelPrice>;
 }
 
 interface TurnRef {
@@ -66,6 +73,7 @@ export function createActivities(deps: ActivityDeps) {
 	const now = deps.now ?? Date.now;
 	const flushEveryMs = deps.flushEveryMs ?? 150;
 	const heartbeatEveryMs = deps.heartbeatEveryMs ?? 5_000;
+	const priceOf = deps.modelPrice ?? createModelPrices({});
 	const credentialCache = new Map<
 		string,
 		{ at: number; value: Promise<TurnCredentials> }
@@ -87,8 +95,9 @@ export function createActivities(deps: ActivityDeps) {
 	const handles = async (ref: TurnRef) => {
 		const credentials = await credentialsFor(ref);
 		const store = (deps.sessionStore ?? defaultStore)(
-			credentials,
+			credentials.sessionStore,
 			ref.sessionId,
+			() => credentialsFor(ref).then((c) => c.sessionStore.writeTicket),
 		);
 		const host = (deps.hostJobs ?? ((c) => httpHostJobs(c.host)))(credentials);
 		return { credentials, store, host };
@@ -187,6 +196,7 @@ export function createActivities(deps: ActivityDeps) {
 				now,
 			);
 
+			const price = await priceOf(credentials.model);
 			const stopBeat = keepBeating(heartbeatEveryMs);
 			try {
 				const stream = deps.stream(
@@ -194,6 +204,7 @@ export function createActivities(deps: ActivityDeps) {
 						...routerModel(
 							credentials.model.baseUrl,
 							credentials.model.modelId,
+							price,
 						),
 						headers: credentials.model.headers,
 					},
@@ -331,21 +342,46 @@ export function createActivities(deps: ActivityDeps) {
 				steersConsumed: number;
 			},
 		): Promise<{ steerPending: boolean }> {
-			const { store } = await handles(input);
-			const rows = (await store.transcript()).filter((row) =>
-				row.stepKey.startsWith(`${input.turnId}/`),
-			);
-			const summary = summarizeTurn(rows);
-			const settled = await deps.settler.settle({
+			const turnRows = async (store: SessionStore) =>
+				(await store.transcript()).filter((row) =>
+					row.stepKey.startsWith(`${input.turnId}/`),
+				);
+			const base = {
 				turnId: input.turnId,
 				status: input.outcome,
 				steersConsumed: input.steersConsumed,
-				...summary,
-				...(input.outcome === "failed"
-					? { errorCode: input.errorMessage ?? "failed" }
-					: {}),
+			};
+			const running = await handles(input).catch((error: unknown) => {
+				if (isTurnNotRunning(error)) return null;
+				throw error;
 			});
+			let rows: TranscriptRow[] | null = null;
+			let settled: Awaited<ReturnType<TurnSettler["settle"]>>;
+			if (running) {
+				rows = await turnRows(running.store);
+				const summary = summarizeTurn(rows);
+				settled = await deps.settler.settle({
+					...base,
+					...summary,
+					...(input.outcome === "failed"
+						? { errorCode: input.errorMessage ?? "failed" }
+						: {}),
+				});
+			} else {
+				// An earlier attempt settled it; this one only owes the end marker.
+				settled = await deps.settler.settle(base);
+			}
 			if (settled.steerPending) return { steerPending: true };
+			credentialCache.delete(input.turnId);
+			promptCache.delete(input.turnId);
+			const access = settled.sessionStore;
+			const store = (deps.sessionStore ?? defaultStore)(
+				access,
+				input.sessionId,
+				async () => access.writeTicket,
+			);
+			rows ??= await turnRows(store);
+			const summary = summarizeTurn(rows);
 
 			const toAcp = new PiToAcp("/");
 			const open: AcpUpdate[] = summary.unfinishedCalls.map((call) =>
@@ -389,13 +425,14 @@ export function createActivities(deps: ActivityDeps) {
 export type AgentActivities = ReturnType<typeof createActivities>;
 
 function defaultStore(
-	credentials: TurnCredentials,
+	access: SessionStoreAccess,
 	sessionId: string,
+	freshTicket: () => Promise<string>,
 ): SessionStore {
 	return httpSessionStore({
-		baseUrl: credentials.sessionStore.baseUrl,
+		baseUrl: access.baseUrl,
 		sessionId,
-		writeTicket: credentials.sessionStore.writeTicket,
+		writeTicket: freshTicket,
 	});
 }
 
@@ -447,6 +484,10 @@ function toolCallsOf(
 		.map((block) => ({ id: block.id, name: block.name }));
 }
 
+function isTurnNotRunning(error: unknown): boolean {
+	return error instanceof ApplicationFailure && error.type === "TurnNotRunning";
+}
+
 function summarizeTurn(rows: TranscriptRow[]) {
 	const assistants = rows
 		.map((row) => row.entry as Message)
@@ -482,7 +523,11 @@ function summarizeTurn(rows: TranscriptRow[]) {
 			})),
 		unfinishedCalls: calls.filter((call) => !results.has(call.id)),
 		inputTokens: assistants.reduce(
-			(sum, message) => sum + (message.usage?.input ?? 0),
+			(sum, message) =>
+				sum +
+				(message.usage?.input ?? 0) +
+				(message.usage?.cacheRead ?? 0) +
+				(message.usage?.cacheWrite ?? 0),
 			0,
 		),
 		outputTokens: assistants.reduce(

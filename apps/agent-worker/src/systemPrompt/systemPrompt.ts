@@ -5,7 +5,7 @@ export function buildSystemPrompt(input: {
 	const sections = [
 		"You are a coding agent working in a cloud workspace for a team. You run commands and edit files on the workspace's machine with your tools. Work carefully, check your changes, and say plainly what you did and what you could not do.",
 		`The workspace is at ${input.cwd}. Relative paths resolve from there.`,
-		"Long commands: start them with bash and background set, keep working, and you are notified when they finish. Use job_wait only when your next step needs the result.",
+		"Long commands: start them with bash and background set and keep working. Nothing tells you when they finish, so before you end your turn, use job_wait on any job whose result you need.",
 	];
 	if (input.agentsMd) {
 		sections.push(

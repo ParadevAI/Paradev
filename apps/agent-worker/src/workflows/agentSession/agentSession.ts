@@ -49,6 +49,8 @@ const tools = proxyActivities<AgentActivities>({
 	retry: { maximumAttempts: 20, maximumInterval: "1 minute" },
 });
 
+type QueuedTurn = StartTurnInput & { steers?: SteerInput[] };
+
 function validatePrompt(input: {
 	text: string;
 	promptId: string;
@@ -68,7 +70,9 @@ function validatePrompt(input: {
  */
 export async function agentSession(args: AgentSessionArgs): Promise<void> {
 	const { sessionId } = args;
-	const pending: StartTurnInput[] = [...(args.carried?.pending ?? [])];
+	const pending: QueuedTurn[] = [...(args.carried?.pending ?? [])];
+	const finished = new Set<string>();
+	const interruptedEarly = new Set<string>();
 	const seen = new Set<string>(args.carried?.seenPromptIds ?? []);
 	let steers: SteerInput[] = [];
 	let steersConsumed = 0;
@@ -103,6 +107,12 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 				steers.push(input);
 				return "steered";
 			}
+			const queued = pending.find((turn) => turn.turnId === input.turnId);
+			if (queued) {
+				queued.steers = [...(queued.steers ?? []), input];
+				return "steered";
+			}
+			if (finished.has(input.turnId)) return "duplicate";
 			pending.push(input);
 			return "started";
 		},
@@ -111,6 +121,8 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 	setHandler(interruptSignal, ({ turnId }) => {
 		if (current && (!turnId || turnId === current.turnId))
 			current.scope.cancel();
+		else if (turnId && pending.some((turn) => turn.turnId === turnId))
+			interruptedEarly.add(turnId);
 	});
 	setHandler(
 		stateQuery,
@@ -132,7 +144,6 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 			text: turn.text,
 		});
 		step = 0;
-		steersConsumed = 0;
 		for (;;) {
 			if (steers.length > 0) {
 				const batch = steers;
@@ -206,6 +217,9 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 
 		const scope = new CancellationScope();
 		current = { turnId: turn.turnId, scope };
+		steers = turn.steers ?? [];
+		steersConsumed = 0;
+		if (interruptedEarly.delete(turn.turnId)) scope.cancel();
 		try {
 			await scope.run(() => runTurn(turn));
 		} catch (error) {
@@ -217,6 +231,11 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 				}),
 			);
 		} finally {
+			finished.add(turn.turnId);
+			if (finished.size > SEEN_PROMPT_IDS) {
+				const oldest = finished.values().next().value;
+				if (oldest !== undefined) finished.delete(oldest);
+			}
 			current = null;
 			activity = null;
 			steers = [];

@@ -33,17 +33,20 @@ export interface SessionStore {
 export function httpSessionStore(options: {
 	baseUrl: string;
 	sessionId: string;
-	writeTicket: string;
+	/** Read per request, so a long step picks up a refreshed ticket. */
+	writeTicket: () => Promise<string>;
 	fetch?: typeof fetch;
 }): SessionStore {
 	const fetcher = options.fetch ?? fetch;
 	const url = (path: string) =>
 		`${options.baseUrl}/v2/agent-runtime/sessions/${encodeURIComponent(options.sessionId)}/${path}`;
-	const headers = { Authorization: `Bearer ${options.writeTicket}` };
 	const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 		const response = await fetcher(url(path), {
 			...init,
-			headers: { ...headers, ...(init?.headers ?? {}) },
+			headers: {
+				Authorization: `Bearer ${await options.writeTicket()}`,
+				...(init?.headers ?? {}),
+			},
 		});
 		if (!response.ok) {
 			throw new Error(

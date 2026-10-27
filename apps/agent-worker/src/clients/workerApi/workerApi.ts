@@ -1,7 +1,11 @@
 import { ApplicationFailure } from "@temporalio/common";
 import type { CredentialsProvider, TurnCredentials } from "../credentials";
 import type { HostTarget } from "../hostJobs";
-import type { SettleTurnInput, TurnSettler } from "../settler";
+import type {
+	SessionStoreAccess,
+	SettleTurnInput,
+	TurnSettler,
+} from "../settler";
 import { TrpcCallError, type TrpcCallOptions, trpcMutation } from "../trpcCall";
 
 const WORKER_SECRET_HEADER = "x-agent-worker-secret";
@@ -75,19 +79,20 @@ export function workerApi(options: WorkerApiOptions): {
 		settler: {
 			async settle(input: SettleTurnInput) {
 				try {
-					await call("settleTurn", input);
+					const { sessionStore } = await call<{
+						sessionStore: SessionStoreAccess;
+					}>("settleTurn", input);
+					return { steerPending: false as const, sessionStore };
 				} catch (error) {
-					if (!(error instanceof TrpcCallError)) throw error;
 					if (
+						error instanceof TrpcCallError &&
 						error.code === "CONFLICT" &&
 						error.message.startsWith("STEER_PENDING")
 					) {
-						return { steerPending: true };
+						return { steerPending: true as const };
 					}
-					// A retry after a settle that landed finds the turn no longer running.
-					if (error.code !== "NOT_FOUND") throw error;
+					throw error;
 				}
-				return { steerPending: false };
 			},
 		},
 	};
