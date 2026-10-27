@@ -38,7 +38,7 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 		label = getStatusTooltip(agentStatus);
 	} else if (agentStatus === "review" && workspace.archivedAt == null) {
 		glyph = <StatusIndicator status="review" />;
-		label = getStatusTooltip("review");
+		label = t({ message: "Ready for review" });
 	} else {
 		const column = deriveBoardColumn(workspace);
 		glyph = <BoardColumnIcon column={column} />;
