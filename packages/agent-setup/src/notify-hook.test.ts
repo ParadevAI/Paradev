@@ -109,7 +109,7 @@ function writeHookManifest(home: string, orgId: string, endpoint: string) {
 
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v20");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v21");
 	});
 
 	it("forwards the main session's transcript path with its identity", async () => {
@@ -917,6 +917,52 @@ describe("session login metadata", () => {
 			expect(JSON.stringify(host.requests)).not.toContain(
 				"secret-must-stay-local",
 			);
+		} finally {
+			host.stop();
+		}
+	});
+});
+
+describe("process starts", () => {
+	it("parses the payload and org manifests without starting text tools", async () => {
+		// The hook runs on every tool call, so each grep/sed/tr it starts is
+		// paid per event. Shims that fail loudly stand in for those tools.
+		const shimDir = mkdtempSync(path.join(tmpdir(), "notify-hook-shims-"));
+		const callLog = path.join(shimDir, "calls.log");
+		writeFileSync(callLog, "");
+		for (const tool of ["cat", "grep", "head", "sed", "tr"]) {
+			writeFileSync(
+				path.join(shimDir, tool),
+				`#!/bin/sh\necho ${tool} >> "${callLog}"\nexit 1\n`,
+				{ mode: 0o755 },
+			);
+		}
+		const host = fakeHostService(false);
+		const home = mkdtempSync(path.join(tmpdir(), "notify-hook-home-"));
+		writeHookManifest(home, "org-a", host.url);
+		try {
+			const result = await runNotifyHookAsync(
+				{
+					hook_event_name: "Stop",
+					session_id: "s1",
+					transcript_path: "/tmp/sessions/s1.jsonl",
+					last_assistant_message: 'Finished "B".\nPath: C:\\repo',
+				},
+				{
+					SUPERSET_AGENT_ID: "claude",
+					SUPERSET_HOME_DIR: home,
+					PATH: `${shimDir}:${process.env.PATH}`,
+				},
+			);
+			expect(result.exitCode).toBe(0);
+			expect(host.requests[0]?.json).toMatchObject({
+				terminalId: "terminal-test",
+				eventType: "Stop",
+				agent: { agentId: "claude", sessionId: "s1" },
+				transcriptPath: "/tmp/sessions/s1.jsonl",
+				preview: 'Finished "B".\nPath: C:\\repo',
+			});
+			expect(readFileSync(callLog, "utf-8")).toBe("");
 		} finally {
 			host.stop();
 		}
