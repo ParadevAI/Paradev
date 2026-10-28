@@ -32,6 +32,11 @@ import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarC
 import { HostConnectionPill } from "./components/HostConnectionPill";
 import { RightPaneArea } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
+import {
+	createRightPane,
+	getRightPaneOptions,
+	type RightPaneKind,
+} from "./components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceOpenInButton } from "./components/V2WorkspaceOpenInButton";
@@ -54,6 +59,7 @@ import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
 import { useConsumeSubagentLink } from "./hooks/useConsumeSubagentLink";
 import { useCreatePendingMigratedTerminals } from "./hooks/useCreatePendingMigratedTerminals";
+import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
@@ -487,6 +493,32 @@ function V2WorkspaceContent() {
 			panes: [{ kind: "desktop", data: { kind: "desktop" } }],
 		});
 	}, [viewerTarget]);
+	const browserUrl = useDefaultBrowserUrl();
+	const rightPaneOptions = useMemo(
+		() =>
+			isRightPaneAreaEnabled
+				? getRightPaneOptions({
+						sandbox: isSandbox,
+						mobilePane: isMobilePaneEnabled,
+					}).filter((option) => option.kind !== "terminal")
+				: [],
+		[isRightPaneAreaEnabled, isSandbox, isMobilePaneEnabled],
+	);
+	const openInRightPane = useCallback(
+		(kind: RightPaneKind) => {
+			if (kind === "diff") {
+				openChanges();
+				return;
+			}
+			rightStore.getState().addTab({
+				panes: [
+					createRightPane(kind, { mintTerminalId: launcher.mint, browserUrl }),
+				],
+			});
+			openRightSidebar();
+		},
+		[openChanges, rightStore, launcher, browserUrl, openRightSidebar],
+	);
 	useRunPendingChatHandoff({
 		workspaceId,
 		isLayoutReady,
@@ -694,6 +726,8 @@ function V2WorkspaceContent() {
 													? addDesktopTab
 													: undefined
 											}
+											rightPaneOptions={rightPaneOptions}
+											onOpenInRightPane={openInRightPane}
 											showPresetsBar={showPresetsBar}
 											onToggleShowPresetsBar={setShowPresetsBar}
 										/>
