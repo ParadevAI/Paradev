@@ -9600,6 +9600,9 @@ msgstr "Geçersiz etiket"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Geçersiz OAuth yanıtı. Lütfen yeniden deneyin."
 
+msgid "Invalid regular expression"
+msgstr "Geçersiz düzenli ifade"
+
 msgid "Invalid Request"
 msgstr "Geçersiz istek"
 
@@ -10764,11 +10767,17 @@ msgstr "İncelemeye hazır olarak işaretleniyor…"
 msgid "Marking ready…"
 msgstr "Hazır olarak işaretleniyor…"
 
+msgid "Match case"
+msgstr "Büyük/küçük harf eşleştir"
+
 msgid "Match existing patterns"
 msgstr "Mevcut desenlere uy"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Kısayolları klavyenizdeki etiketlerle eşleştirin (örn. ⌘Z her zaman \"Z\" etiketli tuşta çalışır — QWERTZ'de fiziksel KeyY). Kapalıyken kısayollar fiziksel tuş konumlarına sabitlenir ve geçerli giriş kaynağını yok sayar."
+
+msgid "Match whole word"
+msgstr "Tam sözcüğü eşleştir"
 
 msgid "Max"
 msgstr "En yüksek"
@@ -16007,6 +16016,9 @@ msgstr "Geçmişte ara"
 msgid "Search in {frameTitle}…"
 msgstr "Şurada ara: {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Dosyalarda Ara"
+
 msgid "Search issues..."
 msgstr "Issue ara..."
 
@@ -16828,6 +16840,9 @@ msgstr "Kenar çubuğunda kullanım sekmesini göster"
 
 msgid "showArrow opt-in"
 msgstr "showArrow açık"
+
+msgid "Showing the first 500 results."
+msgstr "İlk 500 sonuç gösteriliyor."
 
 msgid "Shown in launchers and this list."
 msgstr "Başlatıcılarda ve bu listede gösterilir."
@@ -19852,6 +19867,9 @@ msgstr "Paradev’i mobilde kullanın"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro ile Paradev’i telefonunuzda kullanın."
+
+msgid "Use regular expression"
+msgstr "Düzenli ifade kullan"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Paralel kodlama ajanları çalıştırmaya başlamak için masaüstü uygulamasını kullanın."

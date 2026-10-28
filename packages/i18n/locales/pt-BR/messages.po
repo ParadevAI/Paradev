@@ -9600,6 +9600,9 @@ msgstr "Rótulo inválido"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Resposta OAuth inválida. Tente novamente."
 
+msgid "Invalid regular expression"
+msgstr "Expressão regular inválida"
+
 msgid "Invalid Request"
 msgstr "Requisição inválida"
 
@@ -10764,11 +10767,17 @@ msgstr "Marcando como pronto para revisão…"
 msgid "Marking ready…"
 msgstr "Marcando como pronto…"
 
+msgid "Match case"
+msgstr "Diferenciar maiúsculas de minúsculas"
+
 msgid "Match existing patterns"
 msgstr "Siga os padrões existentes"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faz os atalhos seguirem os rótulos do seu teclado (ex.: ⌘Z sempre dispara na tecla marcada \"Z\" — a KeyY física no QWERTZ). Quando desligado, os atalhos ficam presos às posições físicas e ignoram a fonte de entrada atual."
+
+msgid "Match whole word"
+msgstr "Corresponder palavra inteira"
 
 msgid "Max"
 msgstr "Máx."
@@ -16007,6 +16016,9 @@ msgstr "Buscar no histórico"
 msgid "Search in {frameTitle}…"
 msgstr "Buscar em {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Pesquisar em arquivos"
+
 msgid "Search issues..."
 msgstr "Buscar issues..."
 
@@ -16828,6 +16840,9 @@ msgstr "Mostrar aba de uso na barra lateral"
 
 msgid "showArrow opt-in"
 msgstr "showArrow opcional"
+
+msgid "Showing the first 500 results."
+msgstr "Exibindo os primeiros 500 resultados."
 
 msgid "Shown in launchers and this list."
 msgstr "Aparece nos lançadores e nesta lista."
@@ -19852,6 +19867,9 @@ msgstr "Use o Paradev no celular"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Use o Paradev no celular com o Pro."
+
+msgid "Use regular expression"
+msgstr "Usar expressão regular"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Use o app de desktop para rodar agentes de código em paralelo."

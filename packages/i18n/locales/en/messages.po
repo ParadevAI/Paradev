@@ -9600,6 +9600,9 @@ msgstr "Invalid label"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Invalid OAuth response. Please try again."
 
+msgid "Invalid regular expression"
+msgstr "Invalid regular expression"
+
 msgid "Invalid Request"
 msgstr "Invalid Request"
 
@@ -10764,11 +10767,17 @@ msgstr "Marking ready for review..."
 msgid "Marking ready…"
 msgstr "Marking ready…"
 
+msgid "Match case"
+msgstr "Match case"
+
 msgid "Match existing patterns"
 msgstr "Match existing patterns"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
+
+msgid "Match whole word"
+msgstr "Match whole word"
 
 msgid "Max"
 msgstr "Max"
@@ -16007,6 +16016,9 @@ msgstr "Search history"
 msgid "Search in {frameTitle}…"
 msgstr "Search in {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Search in Files"
+
 msgid "Search issues..."
 msgstr "Search issues..."
 
@@ -16828,6 +16840,9 @@ msgstr "Show usage tab on sidebar"
 
 msgid "showArrow opt-in"
 msgstr "showArrow opt-in"
+
+msgid "Showing the first 500 results."
+msgstr "Showing the first 500 results."
 
 msgid "Shown in launchers and this list."
 msgstr "Shown in launchers and this list."
@@ -19852,6 +19867,9 @@ msgstr "Use Paradev on mobile"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Use Paradev on your phone with Pro."
+
+msgid "Use regular expression"
+msgstr "Use regular expression"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Use the desktop app to start running parallel coding agents."

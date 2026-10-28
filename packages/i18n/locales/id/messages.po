@@ -9600,6 +9600,9 @@ msgstr "Label tidak valid"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Respons OAuth tidak valid. Silakan coba lagi."
 
+msgid "Invalid regular expression"
+msgstr "Ekspresi reguler tidak valid"
+
 msgid "Invalid Request"
 msgstr "Permintaan Tidak Valid"
 
@@ -10764,11 +10767,17 @@ msgstr "Menandai siap ditinjau…"
 msgid "Marking ready…"
 msgstr "Menandai siap…"
 
+msgid "Match case"
+msgstr "Cocokkan huruf besar/kecil"
+
 msgid "Match existing patterns"
 msgstr "Ikuti pola yang ada"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Cocokkan pintasan dengan label pada keyboard Anda (mis. ⌘Z selalu aktif pada tombol berlabel \"Z\" — KeyY fisik di QWERTZ). Saat mati, pintasan terikat pada posisi tombol fisik dan mengabaikan sumber input saat ini."
+
+msgid "Match whole word"
+msgstr "Cocokkan seluruh kata"
 
 msgid "Max"
 msgstr "Maks"
@@ -16007,6 +16016,9 @@ msgstr "Cari riwayat"
 msgid "Search in {frameTitle}…"
 msgstr "Cari di {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Cari dalam File"
+
 msgid "Search issues..."
 msgstr "Cari issue..."
 
@@ -16828,6 +16840,9 @@ msgstr "Tampilkan tab penggunaan di bilah samping"
 
 msgid "showArrow opt-in"
 msgstr "showArrow opsional"
+
+msgid "Showing the first 500 results."
+msgstr "Menampilkan 500 hasil pertama."
 
 msgid "Shown in launchers and this list."
 msgstr "Ditampilkan di peluncur dan daftar ini."
@@ -19852,6 +19867,9 @@ msgstr "Gunakan Paradev di ponsel"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Gunakan Paradev di ponsel dengan Pro."
+
+msgid "Use regular expression"
+msgstr "Gunakan ekspresi reguler"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."

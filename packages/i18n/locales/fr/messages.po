@@ -9600,6 +9600,9 @@ msgstr "Libellé non valide"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Réponse OAuth invalide. Veuillez réessayer."
 
+msgid "Invalid regular expression"
+msgstr "Expression régulière non valide"
+
 msgid "Invalid Request"
 msgstr "Requête invalide"
 
@@ -10764,11 +10767,17 @@ msgstr "Marquage comme prêt pour la revue…"
 msgid "Marking ready…"
 msgstr "Marquage comme prête…"
 
+msgid "Match case"
+msgstr "Respecter la casse"
+
 msgid "Match existing patterns"
 msgstr "Suivre les modèles existants"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faire correspondre les raccourcis aux libellés de votre clavier (par ex. ⌘Z se déclenche toujours sur la touche marquée « Z » — physiquement KeyY sur un clavier QWERTZ). Lorsque cette option est désactivée, les raccourcis sont liés aux positions physiques des touches et ignorent la source de saisie actuelle."
+
+msgid "Match whole word"
+msgstr "Mot entier"
 
 msgid "Max"
 msgstr "Max"
@@ -16007,6 +16016,9 @@ msgstr "Rechercher dans l'historique"
 msgid "Search in {frameTitle}…"
 msgstr "Rechercher dans {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Rechercher dans les fichiers"
+
 msgid "Search issues..."
 msgstr "Rechercher des issues..."
 
@@ -16828,6 +16840,9 @@ msgstr "Afficher l’onglet d’utilisation dans la barre latérale"
 
 msgid "showArrow opt-in"
 msgstr "showArrow en option"
+
+msgid "Showing the first 500 results."
+msgstr "Affichage des 500 premiers résultats."
 
 msgid "Shown in launchers and this list."
 msgstr "Affichée dans les lanceurs et dans cette liste."
@@ -19852,6 +19867,9 @@ msgstr "Utiliser Paradev sur mobile"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Utilisez Paradev sur votre téléphone avec Pro."
+
+msgid "Use regular expression"
+msgstr "Utiliser une expression régulière"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Utilisez l'application de bureau pour lancer des agents de code en parallèle."

@@ -9600,6 +9600,9 @@ msgstr "Nieprawidłowa etykieta"
 msgid "Invalid OAuth response. Please try again."
 msgstr "Nieprawidłowa odpowiedź OAuth. Spróbuj ponownie."
 
+msgid "Invalid regular expression"
+msgstr "Nieprawidłowe wyrażenie regularne"
+
 msgid "Invalid Request"
 msgstr "Nieprawidłowe żądanie"
 
@@ -10764,11 +10767,17 @@ msgstr "Oznaczanie jako gotowe do recenzji…"
 msgid "Marking ready…"
 msgstr "Oznaczanie jako gotowy…"
 
+msgid "Match case"
+msgstr "Uwzględnij wielkość liter"
+
 msgid "Match existing patterns"
 msgstr "Zachowaj istniejące wzorce"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Dopasuj skróty do oznaczeń na klawiaturze (np. ⌘Z zawsze zadziała na klawiszu opisanym „Z” — fizycznie KeyY na QWERTZ). Gdy wyłączone, skróty są przypisane do pozycji fizycznych klawiszy i ignorują bieżące źródło wprowadzania."
+
+msgid "Match whole word"
+msgstr "Dopasuj całe słowo"
 
 msgid "Max"
 msgstr "Maks."
@@ -16007,6 +16016,9 @@ msgstr "Szukaj w historii"
 msgid "Search in {frameTitle}…"
 msgstr "Szukaj w {frameTitle}…"
 
+msgid "Search in Files"
+msgstr "Szukaj w plikach"
+
 msgid "Search issues..."
 msgstr "Szukaj zgłoszeń..."
 
@@ -16828,6 +16840,9 @@ msgstr "Pokaż kartę użycia na pasku bocznym"
 
 msgid "showArrow opt-in"
 msgstr "showArrow włączone"
+
+msgid "Showing the first 500 results."
+msgstr "Wyświetlanie pierwszych 500 wyników."
 
 msgid "Shown in launchers and this list."
 msgstr "Widoczna w launcherach i na tej liście."
@@ -19852,6 +19867,9 @@ msgstr "Korzystaj z Paradev na telefonie"
 
 msgid "Use Paradev on your phone with Pro."
 msgstr "Korzystaj z Paradev na telefonie dzięki Pro."
+
+msgid "Use regular expression"
+msgstr "Użyj wyrażenia regularnego"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Użyj aplikacji desktopowej, aby uruchamiać równoległych agentów kodujących."
