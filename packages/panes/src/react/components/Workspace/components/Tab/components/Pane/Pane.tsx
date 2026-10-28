@@ -319,23 +319,25 @@ export function Pane<TData>({
 					}`}
 					onPointerDownCapture={context.actions.focus}
 				>
-					<PaneHeader
-						title={title}
-						icon={icon}
-						isActive={isActive}
-						titleContent={titleContent}
-						headerExtras={headerExtras}
-						toolbar={toolbar}
-						actionsContent={context.headerActions}
-						paneId={pane.id}
-						store={store}
-						onClick={
-							definition?.onHeaderClick
-								? () => definition.onHeaderClick?.(context)
-								: context.actions.pin
-						}
-						onMiddleClick={context.actions.close}
-					/>
+					{!definition?.hideHeader?.(context) && (
+						<PaneHeader
+							title={title}
+							icon={icon}
+							isActive={isActive}
+							titleContent={titleContent}
+							headerExtras={headerExtras}
+							toolbar={toolbar}
+							actionsContent={context.headerActions}
+							paneId={pane.id}
+							store={store}
+							onClick={
+								definition?.onHeaderClick
+									? () => definition.onHeaderClick?.(context)
+									: context.actions.pin
+							}
+							onMiddleClick={context.actions.close}
+						/>
+					)}
 					<PaneErrorBoundary
 						resetKey={pane.data}
 						onClose={context.actions.close}

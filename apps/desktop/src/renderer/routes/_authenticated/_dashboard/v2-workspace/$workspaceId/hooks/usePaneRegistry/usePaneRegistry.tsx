@@ -836,6 +836,7 @@ export function usePaneRegistry({
 			[NEW_TAB_PANE_KIND]: {
 				getIcon: () => <Plus className="size-3.5" />,
 				getTitle: () => t({ message: "New Tab" }),
+				hideHeader: (ctx) => ctx.pane.parentDirection === null,
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<RightPaneNewTab
 						onOpen={(pane) =>

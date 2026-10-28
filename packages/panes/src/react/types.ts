@@ -76,6 +76,8 @@ export interface PaneDefinition<TData> {
 	titleSource?(pane: Pane<TData>): PaneTitleSource | undefined;
 	getIcon?(context: RendererContext<TData>): ReactNode;
 	renderTitle?(context: RendererContext<TData>): ReactNode;
+	/** Skip the pane's header row; its actions stay in the context menu. */
+	hideHeader?(context: RendererContext<TData>): boolean;
 	renderHeaderExtras?(context: RendererContext<TData>): ReactNode;
 	renderToolbar?(context: RendererContext<TData>): ReactNode;
 	onHeaderClick?(context: RendererContext<TData>): void;
