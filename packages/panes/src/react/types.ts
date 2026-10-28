@@ -130,8 +130,8 @@ export interface WorkspaceProps<TData> {
 	isPreviewTab?: (tab: Tab<TData>) => boolean;
 	/** Defaults to true. When false, tabs can't be renamed. */
 	renameTabs?: boolean;
-	/** Replaces double-click-to-rename. */
-	onTabDoubleClick?: (tab: Tab<TData>) => void;
+	/** Runs when a tab is clicked, after it is selected. */
+	onTabClick?: (tab: Tab<TData>) => void;
 	renderEmptyState?: () => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
 	/** Runs when the add-tab button is clicked. Ignored when `renderAddTabMenu` is set. */

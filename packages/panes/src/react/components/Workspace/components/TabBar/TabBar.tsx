@@ -42,7 +42,7 @@ interface TabBarProps<TData> {
 	onCloseOtherTabs: (tabId: string) => void;
 	onCloseAllTabs: () => void;
 	onRenameTab?: (tabId: string, title: string | undefined) => void;
-	onTabDoubleClick?: (tab: Tab<TData>) => void;
+	onTabClick?: (tab: Tab<TData>) => void;
 	isPreviewTab?: (tab: Tab<TData>) => boolean;
 	onReorderTab: (tabId: string, toIndex: number) => void;
 	onMovePaneToNewTab: (paneId: string, toIndex: number) => void;
@@ -115,7 +115,7 @@ export function TabBar<TData>({
 	onCloseOtherTabs,
 	onCloseAllTabs,
 	onRenameTab,
-	onTabDoubleClick,
+	onTabClick,
 	isPreviewTab,
 	onReorderTab,
 	onMovePaneToNewTab,
@@ -283,9 +283,7 @@ export function TabBar<TData>({
 										? (title) => onRenameTab(tab.id, title)
 										: undefined
 								}
-								onDoubleClick={
-									onTabDoubleClick ? () => onTabDoubleClick(tab) : undefined
-								}
+								onClick={onTabClick ? () => onTabClick(tab) : undefined}
 								isPreview={isPreviewTab?.(tab) ?? false}
 								icon={renderTabIcon?.(tab)}
 								accessory={renderTabAccessory?.(tab)}

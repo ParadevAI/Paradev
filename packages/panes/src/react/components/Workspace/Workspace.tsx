@@ -23,7 +23,7 @@ export function Workspace<TData>({
 	renderTabIcon,
 	isPreviewTab,
 	renameTabs = true,
-	onTabDoubleClick,
+	onTabClick,
 	renderEmptyState,
 	renderAddTabMenu,
 	onAddTab,
@@ -176,7 +176,7 @@ export function Workspace<TData>({
 									.setTabTitleOverride({ tabId, titleOverride: title })
 						: undefined
 				}
-				onTabDoubleClick={onTabDoubleClick}
+				onTabClick={onTabClick}
 				isPreviewTab={isPreviewTab}
 				onReorderTab={(tabId, toIndex) =>
 					store.getState().reorderTab({ tabId, toIndex })

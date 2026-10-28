@@ -89,7 +89,7 @@ export function RightPaneArea({
 				renderTabIcon={renderBrowserTabIcon}
 				renameTabs={false}
 				isPreviewTab={isPreviewTab}
-				onTabDoubleClick={(tab) => {
+				onTabClick={(tab) => {
 					for (const pane of Object.values(tab.panes)) {
 						if (!pane.pinned)
 							store.getState().setPanePinned({ paneId: pane.id, pinned: true });

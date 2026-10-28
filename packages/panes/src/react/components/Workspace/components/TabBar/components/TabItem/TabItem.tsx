@@ -34,7 +34,7 @@ interface TabItemProps<TData> {
 	onCloseOthers: () => void;
 	onCloseAll: () => void;
 	onRename?: (title: string | undefined) => void;
-	onDoubleClick?: () => void;
+	onClick?: () => void;
 	isPreview?: boolean;
 	icon?: ReactNode;
 	accessory?: ReactNode;
@@ -52,7 +52,7 @@ export function TabItem<TData>({
 	onCloseOthers,
 	onCloseAll,
 	onRename,
-	onDoubleClick,
+	onClick,
 	isPreview = false,
 	icon,
 	accessory,
@@ -136,7 +136,10 @@ export function TabItem<TData>({
 					// Select on click, not mousedown: the browser suppresses click after a
 					// drag, so starting a drag (reorder, or merging a tab into a pane) no
 					// longer switches the active tab mid-gesture.
-					onClick={() => onSelect()}
+					onClick={() => {
+						onSelect();
+						onClick?.();
+					}}
 				>
 					{isEditing ? (
 						<div className="flex h-full w-full shrink-0 items-center px-2">
@@ -165,9 +168,7 @@ export function TabItem<TData>({
 												onClose();
 											}
 										}}
-										onDoubleClick={
-											onDoubleClick ?? (onRename ? startEditing : undefined)
-										}
+										onDoubleClick={onRename ? startEditing : undefined}
 									>
 										{icon && <span className="shrink-0">{icon}</span>}
 										<OverflowFadeText
