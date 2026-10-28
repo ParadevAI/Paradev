@@ -18,7 +18,7 @@ import {
 } from "@superset/shared/dev-avatar";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, isNull, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
@@ -29,6 +29,7 @@ import { ensureDirectMessage } from "./direct-message";
 import { submitPrompt } from "./turns";
 
 const agentIdSchema = z.object({ agentId: z.string().uuid() });
+const ACTIVITY_PAGE_SIZE = 50;
 const avatarSchema = z.custom<DevAvatar>(isDevAvatar, "Invalid avatar");
 const nameSchema = z.string().trim().min(1).max(80);
 
@@ -70,7 +71,7 @@ export const agentRouter = {
 			ctx.session.user.id,
 			input.agentId,
 		);
-		const [[row], grants, recentTurns] = await Promise.all([
+		const [[row], grants, [running]] = await Promise.all([
 			db.select(listColumns).from(agents).where(eq(agents.id, agent.id)),
 			db
 				.select({ id: channels.id, name: channels.name })
@@ -85,17 +86,16 @@ export const agentRouter = {
 				)
 				.orderBy(asc(channels.name)),
 			db
-				.select({
-					id: agentTurns.id,
-					status: agentTurns.status,
-					reason: agentTurns.reason,
-					startedAt: agentTurns.startedAt,
-					settledAt: agentTurns.settledAt,
-				})
+				.select({ reason: agentTurns.reason })
 				.from(agentTurns)
-				.where(eq(agentTurns.agentId, agent.id))
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						eq(agentTurns.status, "running"),
+					),
+				)
 				.orderBy(desc(agentTurns.startedAt))
-				.limit(10),
+				.limit(1),
 		]);
 		if (!row) throw agentNotFound();
 		return {
@@ -103,9 +103,83 @@ export const agentRouter = {
 			instructions: agent.instructions,
 			canManage,
 			channels: grants,
-			recentTurns,
+			/** What it is doing right now, if anything. */
+			working: running ?? null,
 		};
 	}),
+
+	/**
+	 * What a Dev has done, newest first: each turn, what started it and where.
+	 * Only turns in places the caller can see: their own DM with it, and
+	 * channels they can read.
+	 */
+	activity: protectedProcedure
+		.input(
+			agentIdSchema.extend({
+				/** `startedAt` of the last row of the previous page. */
+				cursor: z.date().nullish(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const { agent } = await loadAgentAccess(userId, input.agentId);
+			const rows = await db
+				.select({
+					id: agentTurns.id,
+					status: agentTurns.status,
+					reason: agentTurns.reason,
+					startedAt: agentTurns.startedAt,
+					settledAt: agentTurns.settledAt,
+					errorCode: agentTurns.errorCode,
+					actingUserId: agentTurns.actingUserId,
+					triggerMessageId: agentTurns.triggerMessageId,
+					channelId: channels.id,
+					channelName: channels.name,
+					channelKind: channels.kind,
+					threadRootId: agentSessions.threadRootId,
+				})
+				.from(agentTurns)
+				.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
+				.innerJoin(channels, eq(channels.id, agentSessions.channelId))
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						input.cursor ? lt(agentTurns.startedAt, input.cursor) : undefined,
+						or(
+							and(
+								eq(agentSessions.kind, "dm"),
+								eq(agentSessions.userId, userId),
+							),
+							and(
+								eq(agentSessions.kind, "thread"),
+								or(
+									eq(channels.visibility, "public"),
+									exists(
+										db
+											.select({ one: sql`1` })
+											.from(channelMembers)
+											.where(
+												and(
+													eq(channelMembers.channelId, channels.id),
+													eq(channelMembers.actorId, userId),
+												),
+											),
+									),
+								),
+							),
+						),
+					),
+				)
+				.orderBy(desc(agentTurns.startedAt))
+				.limit(ACTIVITY_PAGE_SIZE);
+			return {
+				turns: rows,
+				nextCursor:
+					rows.length === ACTIVITY_PAGE_SIZE
+						? (rows.at(-1)?.startedAt ?? null)
+						: null,
+			};
+		}),
 
 	create: protectedProcedure
 		.input(

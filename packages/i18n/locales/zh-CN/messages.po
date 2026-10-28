@@ -2532,6 +2532,12 @@ msgstr "请在桌面端回答此问题，或跳过。"
 msgid "Answered"
 msgstr "已回答"
 
+msgid "Answered {who} in #{channel}"
+msgstr "{'cs': 'Odpověděl(a) uživateli {who} v #{channel}', 'de': 'Hat {who} in #{channel} geantwortet', 'es': 'Respondió a {who} en #{channel}', 'fr': 'A répondu à {who} dans #{channel}', 'id': 'Menjawab {who} di #{channel}', 'it': 'Ha risposto a {who} in #{channel}', 'ja': '#{channel} で {who} に回答しました', 'ko': '#{channel}에서 {who}에게 답변함', 'nl': 'Heeft {who} geantwoord in #{channel}', 'pl': 'Odpowiedział(a) {who} w #{channel}', 'pt-BR': 'Respondeu {who} em #{channel}', 'ru': 'Ответил(а) {who} в #{channel}', 'tr': '#{channel} kanalında {who} kişisini yanıtladı', 'vi': 'Đã trả lời {who} trong #{channel}', 'zh-CN': '在 #{channel} 回复了 {who}', 'zh-TW': '在 #{channel} 回覆了 {who}'}"
+
+msgid "Answered you in #{channel}"
+msgstr "{'cs': 'Odpověděl(a) vám v #{channel}', 'de': 'Hat dir in #{channel} geantwortet', 'es': 'Te respondió en #{channel}', 'fr': 'Vous a répondu dans #{channel}', 'id': 'Menjawab Anda di #{channel}', 'it': 'Ti ha risposto in #{channel}', 'ja': '#{channel} であなたに回答しました', 'ko': '#{channel}에서 나에게 답변함', 'nl': 'Heeft je geantwoord in #{channel}', 'pl': 'Odpowiedział(a) Ci w #{channel}', 'pt-BR': 'Respondeu você em #{channel}', 'ru': 'Ответил(а) вам в #{channel}', 'tr': '#{channel} kanalında sizi yanıtladı', 'vi': 'Đã trả lời bạn trong #{channel}', 'zh-CN': '在 #{channel} 回复了你', 'zh-TW': '在 #{channel} 回覆了你'}"
+
 msgid "Anthropic rejected this API key."
 msgstr "Anthropic拒绝了此API密钥。"
 
@@ -6643,9 +6649,6 @@ msgstr "在新标签页看差异"
 msgid "Digital Product Designer"
 msgstr "数字产品设计师"
 
-msgid "Direct message"
-msgstr "私信"
-
 msgid "Direct messages"
 msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
 
@@ -8355,6 +8358,12 @@ msgstr "在LinkedIn上关注我们"
 
 msgid "Follow us on X/Twitter"
 msgstr "在X/Twitter上关注我们"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "{'cs': 'Navázal(a) s uživatelem {who} v #{channel}', 'de': 'Hat bei {who} in #{channel} nachgehakt', 'es': 'Dio seguimiento a {who} en #{channel}', 'fr': 'A fait un suivi avec {who} dans #{channel}', 'id': 'Menindaklanjuti {who} di #{channel}', 'it': 'Ha dato seguito a {who} in #{channel}', 'ja': '#{channel} で {who} へのフォローアップを行いました', 'ko': '#{channel}에서 {who}에게 후속 답변함', 'nl': 'Heeft {who} opgevolgd in #{channel}', 'pl': 'Kontynuował(a) z {who} w #{channel}', 'pt-BR': 'Deu continuidade com {who} em #{channel}', 'ru': 'Продолжил(а) с {who} в #{channel}', 'tr': '#{channel} kanalında {who} ile devam etti', 'vi': 'Đã tiếp tục với {who} trong #{channel}', 'zh-CN': '在 #{channel} 跟进了 {who}', 'zh-TW': '在 #{channel} 跟進了 {who}'}"
+
+msgid "Followed up with you in #{channel}"
+msgstr "{'cs': 'Navázal(a) s vámi v #{channel}', 'de': 'Hat bei dir in #{channel} nachgehakt', 'es': 'Te dio seguimiento en #{channel}', 'fr': 'A fait un suivi avec vous dans #{channel}', 'id': 'Menindaklanjuti Anda di #{channel}', 'it': 'Ti ha dato seguito in #{channel}', 'ja': '#{channel} であなたへのフォローアップを行いました', 'ko': '#{channel}에서 나에게 후속 답변함', 'nl': 'Heeft je opgevolgd in #{channel}', 'pl': 'Kontynuował(a) z Tobą w #{channel}', 'pt-BR': 'Deu continuidade com você em #{channel}', 'ru': 'Продолжил(а) с вами в #{channel}', 'tr': '#{channel} kanalında sizinle devam etti', 'vi': 'Đã tiếp tục với bạn trong #{channel}', 'zh-CN': '在 #{channel} 跟进了你', 'zh-TW': '在 #{channel} 跟進了你'}"
 
 msgid "Font family"
 msgstr "字体"
@@ -10837,9 +10846,6 @@ msgstr "内存占比"
 
 msgid "Mention."
 msgstr "提及。"
-
-msgid "Mentioned in a channel"
-msgstr "在频道中被提及"
 
 msgid "Menubar"
 msgstr "菜单栏"
@@ -13740,9 +13746,6 @@ msgstr "在{hostName}上选择worktree文件夹。"
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "选择你的智能体获取一行安装命令，或者手动复制配置。所有客户端（含OAuth和API密钥设置）都在<0>完整的MCP服务器文档</0>里。"
 
-msgid "Picked by the channel"
-msgstr "由频道选中"
-
 msgid "PID"
 msgstr "PID"
 
@@ -15042,6 +15045,9 @@ msgstr "已替换{where}中的{replaced}个文件"
 
 msgid "Replaced 1 file in {where}"
 msgstr "已替换{where}中的1个文件"
+
+msgid "Replied to your DM"
+msgstr "{'cs': 'Odpověděl(a) na vaši přímou zprávu', 'de': 'Hat auf deine Direktnachricht geantwortet', 'es': 'Respondió a tu mensaje directo', 'fr': 'A répondu à votre message direct', 'id': 'Membalas pesan langsung Anda', 'it': 'Ha risposto al tuo messaggio diretto', 'ja': 'あなたのダイレクトメッセージに返信しました', 'ko': '내 다이렉트 메시지에 답장함', 'nl': 'Heeft gereageerd op je direct bericht', 'pl': 'Odpowiedział(a) na Twoją wiadomość bezpośrednią', 'pt-BR': 'Respondeu sua mensagem direta', 'ru': 'Ответил(а) на ваше личное сообщение', 'tr': 'Doğrudan mesajınızı yanıtladı', 'vi': 'Đã trả lời tin nhắn trực tiếp của bạn', 'zh-CN': '回复了你的私信', 'zh-TW': '回覆了你的私訊'}"
 
 msgid "Reply"
 msgstr "回复"
@@ -16760,6 +16766,9 @@ msgstr "给我看看Linear分类自动化最近10次运行"
 msgid "Show more"
 msgstr "显示更多"
 
+msgid "Show older"
+msgstr "{'cs': 'Zobrazit starší', 'de': 'Ältere anzeigen', 'es': 'Mostrar anteriores', 'fr': 'Afficher plus ancien', 'id': 'Tampilkan yang lebih lama', 'it': 'Mostra precedenti', 'ja': '以前のものを表示', 'ko': '이전 항목 보기', 'nl': 'Oudere tonen', 'pl': 'Pokaż starsze', 'pt-BR': 'Mostrar anteriores', 'ru': 'Показать более ранние', 'tr': 'Daha eskileri göster', 'vi': 'Hiện mục cũ hơn', 'zh-CN': '显示更早的', 'zh-TW': '顯示更早的'}"
+
 msgid "Show on Sidebar"
 msgstr "在侧边栏中显示"
 
@@ -17125,6 +17134,9 @@ msgstr "部分 v1 条目未能迁移"
 
 msgid "Some v1 work needs your attention"
 msgstr "部分 v1 工作需要你处理"
+
+msgid "someone"
+msgstr "{'cs': 'někomu', 'de': 'jemandem', 'es': 'alguien', 'fr': 'quelqu’un', 'id': 'seseorang', 'it': 'qualcuno', 'ja': '誰か', 'ko': '누군가', 'nl': 'iemand', 'pl': 'ktoś', 'pt-BR': 'alguém', 'ru': 'кто-то', 'tr': 'birisi', 'vi': 'ai đó', 'zh-CN': '某人', 'zh-TW': '某人'}"
 
 msgid "Someone"
 msgstr "某人"
@@ -18999,9 +19011,6 @@ msgstr "#{channelName} 中的话题"
 msgid "Thread not found"
 msgstr "未找到讨论串"
 
-msgid "Thread reply"
-msgstr "话题回复"
-
 msgid "Threads"
 msgstr "话题"
 
@@ -20459,9 +20468,6 @@ msgstr "有无附件均可"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "有了 Paradev 手机应用，我可以随时随地处理生产环境问题。"
 
-msgid "Woke itself"
-msgstr "自行唤醒"
-
 msgid "Wordmark, black"
 msgstr "文字标志，黑色"
 
@@ -20508,9 +20514,6 @@ msgstr "已运行 {0} 分 {1} 秒"
 
 msgid "Working for {seconds}s"
 msgstr "已运行 {seconds} 秒"
-
-msgid "Working on"
-msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
 
 msgid "Working on a mention"
 msgstr "{'cs': 'Pracuje na zmínce', 'de': 'Arbeitet an einer Erwähnung', 'es': 'Trabajando en una mención', 'fr': 'Traite une mention', 'id': 'Mengerjakan sebutan', 'it': 'Lavora a una menzione', 'ja': 'メンションに対応中', 'ko': '멘션을 처리하는 중', 'nl': 'Werkt aan een vermelding', 'pl': 'Pracuje nad wzmianką', 'pt-BR': 'Trabalhando em uma menção', 'ru': 'Работает над упоминанием', 'tr': 'Bir bahsetme üzerinde çalışıyor', 'vi': 'Đang xử lý một lượt nhắc', 'zh-CN': '正在处理提及', 'zh-TW': '正在處理提及'}"

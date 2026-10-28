@@ -8,7 +8,8 @@ import { ChannelScreen } from "renderer/routes/_authenticated/_dashboard/channel
 import { useChannelPanelStore } from "renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore";
 import { CustomizeDevDialog } from "renderer/routes/_authenticated/_dashboard/components/CustomizeDevDialog";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
-import { DevHeader } from "../DevHeader";
+import { DevActivityTab } from "../DevActivityTab";
+import { DevHeader, type DevTab } from "../DevHeader";
 import { DevIntro } from "../DevIntro";
 import { DevPanel } from "../DevPanel";
 
@@ -17,6 +18,7 @@ export function DevScreen({ devId }: { devId: string }) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const utils = cloudTrpc.useUtils();
+	const [tab, setTab] = useState<DevTab>("chat");
 	const [isCustomizing, setCustomizing] = useState(false);
 	const [isArchiving, setArchiving] = useState(false);
 	const { data: dev } = cloudTrpc.agent.get.useQuery({ agentId: devId });
@@ -64,6 +66,8 @@ export function DevScreen({ devId }: { devId: string }) {
 				renderHeader={(panel) => (
 					<DevHeader
 						dev={dev}
+						tab={tab}
+						onTabChange={setTab}
 						panel={panel}
 						onCustomize={() => setCustomizing(true)}
 						onTogglePause={togglePause}
@@ -77,6 +81,11 @@ export function DevScreen({ devId }: { devId: string }) {
 						onCustomize={() => setCustomizing(true)}
 					/>
 				)}
+				body={
+					tab === "activity" ? (
+						<DevActivityTab devId={dev.id} onOpenChat={() => setTab("chat")} />
+					) : undefined
+				}
 				intro={<DevIntro dev={dev} />}
 				composerPlaceholder={t({ message: `Message ${name}` })}
 			/>

@@ -7,7 +7,6 @@ import { useState } from "react";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
-import { DevActivity } from "./components/DevActivity";
 import { DevInstructions } from "./components/DevInstructions";
 import { DevTalkToIt } from "./components/DevTalkToIt";
 import { PanelSection } from "./components/PanelSection";
@@ -37,13 +36,7 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 							avatar={dev.avatar}
 							size={64}
 							alive
-							mood={
-								isPaused
-									? "asleep"
-									: dev.recentTurns.some((turn) => turn.status === "running")
-										? "working"
-										: "idle"
-							}
+							mood={isPaused ? "asleep" : dev.working ? "working" : "idle"}
 						/>
 						<div className="flex min-w-0 flex-1 flex-col">
 							<span className="truncate text-[17px] font-semibold">
@@ -64,9 +57,6 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 					<DevDescription dev={dev} />
 					<PanelSection title={<Trans>Talk to it</Trans>}>
 						<DevTalkToIt dev={dev} />
-					</PanelSection>
-					<PanelSection title={<Trans>Working on</Trans>}>
-						<DevActivity dev={dev} />
 					</PanelSection>
 					{dev.canManage && (
 						<PanelSection title={<Trans>Instructions</Trans>}>
@@ -89,7 +79,7 @@ function DevStatus({ dev }: { dev: Dev }) {
 			</span>
 		);
 	}
-	const running = dev.recentTurns.find((turn) => turn.status === "running");
+	const running = dev.working;
 	if (!running) {
 		return (
 			<span className="text-[13px] text-muted-foreground">

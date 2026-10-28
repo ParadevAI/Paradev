@@ -52,6 +52,8 @@ interface ChannelScreenProps {
 	intro?: ReactNode;
 	/** Replaces the tabbed panel with one view, and turns off threads. */
 	renderPanel?: (panel: { hide: () => void }) => ReactNode;
+	/** Shown instead of the timeline and composer, beside the same header and panel. */
+	body?: ReactNode;
 	composerPlaceholder?: string;
 }
 
@@ -63,6 +65,7 @@ export function ChannelScreen({
 	renderHeader,
 	intro,
 	renderPanel,
+	body,
 	composerPlaceholder,
 }: ChannelScreenProps) {
 	const { t } = useLingui();
@@ -365,7 +368,9 @@ export function ChannelScreen({
 						}
 					/>
 				)}
-				{tab === "messages" ? (
+				{body ? (
+					body
+				) : tab === "messages" ? (
 					<>
 						<ChannelTimeline
 							channelId={channelId}

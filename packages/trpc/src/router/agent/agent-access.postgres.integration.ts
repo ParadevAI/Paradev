@@ -423,6 +423,14 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Unknown worker.");
 	});
 
+	test("activity shows each person only their own DM and channels they can read", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const mine = await person(admin).agent.activity({ agentId: agent.id });
+		expect(mine.turns.map((turn) => turn.channelId)).toEqual([dm.channelId]);
+		const theirs = await person(outsider).agent.activity({ agentId: agent.id });
+		expect(theirs.turns).toEqual([]);
+	});
+
 	test("a paused agent starts no turns", async () => {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,
