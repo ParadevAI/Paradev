@@ -44,7 +44,7 @@ Read each repository before asking anything. Use the local clone when there is o
 - `.env.example` and the repository's `.superset/` folder: `config.toml`, or the old `config.json`;
 - services the project expects, such as Postgres, Redis or Docker Compose.
 
-Then ask only what you could not infer: missing secret values, extra repositories, and who should be able to use the environment when you are done (only them, or the organization).
+Then ask only what you could not infer: missing secret values and extra repositories.
 
 **The repository list cannot change after the first checkpoint.** Confirm it with the user before step 4, and fix it with `superset environments update` while you still can.
 
@@ -85,7 +85,7 @@ Write what worked into the primary repository's `.superset/config.toml`, so ever
 - `[terminals.<name>]` with `default = true` start on boot, after `setup`.
 - `[ports.<name>]` with `preview = true` get a preview URL.
 
-Show the user the file, commit it on a branch, and offer to open a pull request if none is open for it; ask before pushing. Boxes read the file from their branch, so it applies to new workspaces once it is on the base branch.
+Show the user the file and commit it on a branch. Boxes read the file from their branch, so it applies to new workspaces only once it is on the base branch.
 
 ## 4. Checkpoint
 
@@ -100,9 +100,10 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 ## 5. Finish
 
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
-2. Set the visibility the user chose: `superset environments update <environment-id> --scope organization` (or leave it `personal`).
-3. Archive the setup box: `superset workspaces archive <workspace-id>`.
-4. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready`, then check that `setup` finished and the default terminals run. Give the user its link: the environment URL's origin with `/workspaces/<new-workspace-id>`, which opens it in the desktop app.
-5. Summarize what is installed, what `.superset/config.toml` does, which variables are set, and which are missing and who has to provide them. Tell the user that more workspaces start from the new-workspace screen: pick Cloud, the project, and this environment.
+2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. Private is `personal`, the default.
+3. If the `.superset/config.toml` change is not in a pull request yet, offer to open one, and ask before pushing.
+4. Archive the setup box: `superset workspaces archive <workspace-id>`.
+5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready`, then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Give the user its link: the environment URL's origin with `/workspaces/<new-workspace-id>`, which opens it in the desktop app.
+6. Summarize what is installed, what `.superset/config.toml` does, which variables are set, and which are missing and who has to provide them. Tell the user that more workspaces start from the new-workspace screen: pick Cloud, the project, and this environment.
 
 If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.
