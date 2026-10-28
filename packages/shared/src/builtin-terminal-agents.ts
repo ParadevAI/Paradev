@@ -58,6 +58,16 @@ function createBuiltinTerminalAgent<
 
 export const BUILTIN_TERMINAL_AGENTS = [
 	createBuiltinTerminalAgent({
+		id: "codewhale",
+		label: "Codewhale",
+		description:
+			"Open-source Rust terminal coding agent supporting hosted and local models.",
+		command: "codewhale",
+		promptCommand: "codewhale run --fresh --prompt=",
+		resumeCommand: "codewhale --resume",
+		includeInDefaultTerminalPresets: true,
+	}),
+	createBuiltinTerminalAgent({
 		id: "claude",
 		label: "Claude",
 		description:

@@ -8,6 +8,7 @@ import {
 	createAmpWrapper,
 	createClaudeSettingsJson,
 	createClaudeWrapper,
+	createCodewhaleWrapper,
 	createCodexHooksJson,
 	createCodexWrapper,
 	createCopilotHookScript,
@@ -88,6 +89,9 @@ const AGENT_SETUP_DEFINITIONS: Record<
 	amp: {
 		setup: [createAmpPlugin, createAmpWrapper],
 		teardown: [removeAmpPlugin],
+	},
+	codewhale: {
+		setup: [createCodewhaleWrapper],
 	},
 	claude: {
 		setup: [createClaudeSettingsJson, createClaudeWrapper],
