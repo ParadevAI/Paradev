@@ -10,7 +10,6 @@ const productName = BRAND.NAME;
 const formerName = BRAND.FORMER_NAME;
 const companyName = COMPANY.LEGAL_NAME;
 const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
-const pressEmail = `founders${COMPANY.EMAIL_DOMAIN}`;
 const websiteHost = new URL(COMPANY.MARKETING_URL).host;
 
 export function AtAGlanceSection() {
@@ -74,10 +73,10 @@ export function AtAGlanceSection() {
 			label: <Trans>Press</Trans>,
 			value: (
 				<a
-					href={`mailto:${pressEmail}`}
+					href={COMPANY.FOUNDERS_MAIL_TO}
 					className="text-foreground underline-offset-4 hover:underline"
 				>
-					{pressEmail}
+					{COMPANY.FOUNDERS_EMAIL}
 				</a>
 			),
 		},

@@ -63,6 +63,10 @@ export const COMPANY = {
 	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
+	SALES_EMAIL: `sales@${ROOT_DOMAIN}`,
+	/** The founders' inbox, used as the press contact. Fixed rather than built from ROOT_DOMAIN. */
+	FOUNDERS_EMAIL: "founders@paradev.com",
+	FOUNDERS_MAIL_TO: "mailto:founders@paradev.com",
 	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
 	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,

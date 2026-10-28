@@ -13,7 +13,6 @@ import { LatestNewsSection } from "./components/LatestNewsSection";
 const productName = BRAND.NAME;
 const formerName = BRAND.FORMER_NAME;
 const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
-const pressEmail = `founders${COMPANY.EMAIL_DOMAIN}`;
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -65,10 +64,10 @@ export default async function MediaPage() {
 				<p className="mt-4 text-muted-foreground">
 					<Trans>For press inquiries and interview requests, email us.</Trans>{" "}
 					<a
-						href={`mailto:${pressEmail}`}
+						href={COMPANY.FOUNDERS_MAIL_TO}
 						className="font-medium text-foreground underline-offset-4 hover:underline"
 					>
-						{pressEmail}
+						{COMPANY.FOUNDERS_EMAIL}
 					</a>
 				</p>
 			</header>
