@@ -7,7 +7,8 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/utils/toPullRequestDisplayState";
 
 interface CloudPullRequestRowProps {
-	pullRequest: CloudPullRequest;
+	pullRequest: Omit<CloudPullRequest, "additions" | "deletions"> &
+		Partial<Pick<CloudPullRequest, "additions" | "deletions">>;
 	onOpen: () => void;
 }
 
@@ -31,10 +32,13 @@ export function CloudPullRequestRow({
 				#{pullRequest.number}
 			</span>
 			<span className="min-w-0 truncate">{pullRequest.title}</span>
-			<span className="shrink-0 font-mono text-[11px] tabular-nums">
-				<span className="text-emerald-500">+{pullRequest.additions}</span>{" "}
-				<span className="text-destructive">−{pullRequest.deletions}</span>
-			</span>
+			{pullRequest.additions !== undefined &&
+				pullRequest.deletions !== undefined && (
+					<span className="shrink-0 font-mono text-[11px] tabular-nums">
+						<span className="text-emerald-500">+{pullRequest.additions}</span>{" "}
+						<span className="text-destructive">−{pullRequest.deletions}</span>
+					</span>
+				)}
 		</button>
 	);
 }

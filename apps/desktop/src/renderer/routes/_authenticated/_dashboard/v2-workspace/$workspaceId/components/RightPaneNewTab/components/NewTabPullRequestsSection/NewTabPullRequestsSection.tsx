@@ -1,6 +1,5 @@
 import { Trans } from "@lingui/react/macro";
 import type { CreatePaneInput } from "@superset/panes";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { CloudPullRequestRow } from "renderer/routes/_authenticated/_dashboard/components/CloudPullRequestRow";
 import { CloudSection } from "renderer/routes/_authenticated/_dashboard/components/CloudSection";
 import type { NewTabLists } from "../../../../hooks/useNewTabLists";
@@ -20,22 +19,28 @@ export function NewTabPullRequestsSection({
 	return (
 		<CloudSection title={<Trans>Pull requests</Trans>}>
 			<div className="flex flex-col">
-				{pullRequests.map((row) => (
+				{pullRequests.map((pr) => (
 					<CloudPullRequestRow
-						key={row.id}
+						key={pr.url}
 						pullRequest={{
-							url: row.url,
-							number: row.prNumber,
-							title: row.title,
-							state: "open",
-							isDraft: row.isDraft,
-							additions: row.additions,
-							deletions: row.deletions,
+							url: pr.url,
+							number: pr.number,
+							title: pr.title,
+							state:
+								pr.state === "merged" || pr.state === "closed"
+									? pr.state
+									: "open",
+							isDraft: pr.isDraft || pr.state === "draft",
 						}}
-						onOpen={() => {
-							const ref = pullRequestRefFromUrl(row.url);
-							if (ref) onOpen({ kind: "pull-request", data: ref });
-						}}
+						onOpen={() =>
+							onOpen({
+								kind: "pull-request",
+								data: {
+									repoFullName: `${pr.repoOwner}/${pr.repoName}`,
+									number: pr.number,
+								},
+							})
+						}
 					/>
 				))}
 			</div>
