@@ -20,12 +20,32 @@ The toggle appears for a running session of a supported agent.
 
 ## Supported Agents
 
-| Agent | Chat UI | Minimum CLI version | Upgrade |
-|:------|:-------:|:--------------------|:--------|
-| Claude Code | ✅ | 2.1.226 | `npm i -g @anthropic-ai/claude-code@latest` |
-| Codex | ✅ | 0.160.0 | `npm i -g @openai/codex@latest` |
-| OpenCode | ✅ | 1.15.5 | `npm i -g opencode-ai@latest` |
-| Pi | ✅ | Any | — |
-| Other agents | — | — | — |
+| Agent | Chat UI | Minimum CLI version |
+|:------|:-------:|:--------------------|
+| Claude Code | ✅ | 2.1.226 |
+| Codex | ✅ | 0.160.0 |
+| OpenCode | ✅ | 1.15.5 |
+| Pi | ✅ | Any |
+| Other agents | — | — |
 
-If your CLI is older than the minimum, Paradev tells you and shows the upgrade command. Agents without chat support still run in a Paradev terminal.
+If your CLI is older than the minimum, the chat does not start and Paradev tells you which version it needs. Agents without chat support still run in a Paradev terminal.
+
+## Update the agent CLI
+
+When a newer Claude Code or Codex release is out, a notice above the chat's message box says so. **Update** opens a terminal under the chat and runs the update there, so you can watch it. When it finishes, **Restart** loads the new version into the chat and keeps the conversation. Dismiss the notice to hide it until the next release.
+
+If the CLI is older than the minimum, the chat offers **Update** in place of the conversation and resumes on its own once the new version is installed.
+
+The update command depends on how the CLI was installed, and Paradev reads that from where the binary lives:
+
+| Installed with | Update command |
+|:---------------|:---------------|
+| Claude Code's native installer (`~/.local/bin/claude`) | `claude update` |
+| Homebrew | `brew upgrade --cask claude-code` (or `claude-code@latest`, `codex`) |
+| npm | `npm install -g --prefix <prefix> <package>@latest`, into the prefix that holds the CLI |
+| bun | `bun add -g <package>@latest` |
+| pnpm | `pnpm add -g <package>@latest` |
+
+Paradev never runs one package manager over another's install. If it cannot tell how the CLI was installed, it shows **How to update**, which links here; update the CLI with the tool you installed it with.
+
+In a cloud workspace, the agent CLIs come with the workspace image and Paradev updates them. The chat shows no update notice there.

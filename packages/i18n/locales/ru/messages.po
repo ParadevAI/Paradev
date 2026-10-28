@@ -993,6 +993,12 @@ msgstr "{kind} · автор {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} тема"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} установлен. Перезапустите чат, чтобы использовать новую версию."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "Доступна версия {label} {latest}. У вас установлена {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Чат перерабатывается"
 msgid "Chat Launch"
 msgstr "Запуск в чате"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Для чата нужен {label} {minVersion} или новее, а установлена версия {installed}."
+
 msgid "Chat session not found"
 msgstr "Сессия чата не найдена"
 
@@ -5648,6 +5657,9 @@ msgstr "Не удалось перевести субагента в фон"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
+
+msgid "Couldn't open a terminal"
+msgstr "Не удалось открыть терминал"
 
 msgid "Couldn't open the screenshot"
 msgstr "Не удалось открыть снимок экрана"
@@ -9160,6 +9172,9 @@ msgstr "Как устроены уровни →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Как установить {name} в Paradev"
+
+msgid "How to update"
+msgstr "Как обновить"
 
 msgid "How we build it, in long form."
 msgstr "Как мы это строим, подробно."
@@ -19667,6 +19682,9 @@ msgstr "Обновить"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Обновите {appName} на этой машине, чтобы прикреплять файлы"
 
+msgid "Update {label}"
+msgstr "Обновить {label}"
+
 msgid "Update available"
 msgstr "Доступно обновление"
 
@@ -19741,6 +19759,12 @@ msgstr "Только что обновлено с {0}."
 
 msgid "Updates"
 msgstr "Обновления"
+
+msgid "Updating {label} in a terminal…"
+msgstr "Обновление {label} в терминале…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Идёт обновление в терминале ниже. Чат продолжится, когда новая версия будет установлена."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

@@ -125,6 +125,10 @@
 			"types": "./src/agent-credentials.ts",
 			"default": "./src/agent-credentials.ts"
 		},
+		"./agent-cli-status": {
+			"types": "./src/agent-cli-status.ts",
+			"default": "./src/agent-cli-status.ts"
+		},
 		"./agent-status": {
 			"types": "./src/agent-status.ts",
 			"default": "./src/agent-status.ts"

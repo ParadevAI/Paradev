@@ -945,6 +945,7 @@ export function usePaneRegistry({
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<ChatPane
 						ctx={ctx}
+						launcher={launcher}
 						onOpenFile={onOpenFile}
 						onRevealPath={onRevealPath}
 						workspaceId={workspaceId}

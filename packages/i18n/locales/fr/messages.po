@@ -993,6 +993,12 @@ msgstr "{kind} · par {author}"
 msgid "{kindLabel} theme"
 msgstr "Thème {kindLabel}"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} est installé. Redémarrez le chat pour l'utiliser."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} est disponible. Vous avez la version {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Le chat est en cours de refonte"
 msgid "Chat Launch"
 msgstr "Lancement du chat"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Le chat nécessite {label} {minVersion} ou une version ultérieure, et {installed} est installé."
+
 msgid "Chat session not found"
 msgstr "Session de chat introuvable"
 
@@ -5648,6 +5657,9 @@ msgstr "Impossible de passer le sous-agent en arrière-plan"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
+
+msgid "Couldn't open a terminal"
+msgstr "Impossible d'ouvrir un terminal"
 
 msgid "Couldn't open the screenshot"
 msgstr "Impossible d'ouvrir la capture d'écran"
@@ -9160,6 +9172,9 @@ msgstr "Comment fonctionnent les paliers →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Comment installer {name} dans Paradev"
+
+msgid "How to update"
+msgstr "Comment mettre à jour"
 
 msgid "How we build it, in long form."
 msgstr "Comment nous le construisons, en détail."
@@ -19667,6 +19682,9 @@ msgstr "Mettre à jour"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Mettez à jour {appName} sur cette machine pour joindre des fichiers"
 
+msgid "Update {label}"
+msgstr "Mettre à jour {label}"
+
 msgid "Update available"
 msgstr "Mise à jour disponible"
 
@@ -19741,6 +19759,12 @@ msgstr "Mis à jour à l'instant depuis {0}."
 
 msgid "Updates"
 msgstr "Mises à jour"
+
+msgid "Updating {label} in a terminal…"
+msgstr "Mise à jour de {label} dans un terminal…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Mise à jour dans le terminal ci-dessous. Le chat reprendra une fois la nouvelle version installée."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

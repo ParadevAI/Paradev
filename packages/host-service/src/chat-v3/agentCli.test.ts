@@ -1,5 +1,64 @@
-import { describe, expect, it } from "bun:test";
-import { agentCliUnsupported } from "./agentCli";
+import { afterEach, describe, expect, it } from "bun:test";
+import {
+	chmodSync,
+	mkdirSync,
+	mkdtempSync,
+	renameSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { agentCliUnsupported, probeAgentCli, realAgentCli } from "./agentCli";
+
+const BINARY = "superset-test-agent-cli";
+const dirs: string[] = [];
+
+function fakeCli(dir: string, version: string): string {
+	mkdirSync(dir, { recursive: true });
+	const path = join(dir, BINARY);
+	writeFileSync(`${path}.next`, `#!/bin/sh\necho "${BINARY} ${version}"\n`);
+	chmodSync(`${path}.next`, 0o755);
+	renameSync(`${path}.next`, path);
+	return path;
+}
+
+function tempHome(): string {
+	const home = mkdtempSync(join(tmpdir(), "agent-cli-"));
+	dirs.push(home);
+	return home;
+}
+
+afterEach(() => {
+	for (const dir of dirs.splice(0))
+		rmSync(dir, { recursive: true, force: true });
+});
+
+describe("realAgentCli", () => {
+	it("skips Superset's own bin dirs, as the wrapper does", () => {
+		const home = tempHome();
+		fakeCli(join(home, ".superset-dev", "bin"), "0.0.1");
+		const real = fakeCli(join(home, "real"), "1.0.0");
+		const env = {
+			HOME: home,
+			PATH: [join(home, ".superset-dev", "bin"), join(home, "real")].join(":"),
+		};
+
+		expect(realAgentCli(BINARY, env)?.path).toBe(real);
+	});
+});
+
+describe("probeAgentCli", () => {
+	it("reads the new version as soon as an update replaces the binary", async () => {
+		const home = tempHome();
+		const env = { HOME: home, PATH: join(home, "bin") };
+		fakeCli(join(home, "bin"), "1.0.0");
+		expect((await probeAgentCli(BINARY, env)).version).toBe("1.0.0");
+
+		fakeCli(join(home, "bin"), "2.0.0");
+		expect((await probeAgentCli(BINARY, env)).version).toBe("2.0.0");
+	});
+});
 
 describe("agentCliUnsupported", () => {
 	it("names the version to install when nothing is found", () => {

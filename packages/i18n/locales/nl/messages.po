@@ -993,6 +993,12 @@ msgstr "{kind} · door {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} thema"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} is geïnstalleerd. Start de chat opnieuw om deze te gebruiken."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} is beschikbaar. Je hebt {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Chat wordt herbouwd"
 msgid "Chat Launch"
 msgstr "Start via chat"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "De chat heeft {label} {minVersion} of nieuwer nodig, en {installed} is geïnstalleerd."
+
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
 
@@ -5648,6 +5657,9 @@ msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open a terminal"
+msgstr "Kan geen terminal openen"
 
 msgid "Couldn't open the screenshot"
 msgstr "Kan de screenshot niet openen"
@@ -9160,6 +9172,9 @@ msgstr "Hoe de niveaus werken →"
 
 msgid "How to install {name} in Paradev"
 msgstr "{name} installeren in Paradev"
+
+msgid "How to update"
+msgstr "Zo werk je bij"
 
 msgid "How we build it, in long form."
 msgstr "Hoe we het bouwen, uitgebreid uitgelegd."
@@ -19667,6 +19682,9 @@ msgstr "Bijwerken"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Werk {appName} op deze machine bij om bestanden toe te voegen"
 
+msgid "Update {label}"
+msgstr "{label} bijwerken"
+
 msgid "Update available"
 msgstr "Update beschikbaar"
 
@@ -19741,6 +19759,12 @@ msgstr "Zojuist bijgewerkt vanaf {0}."
 
 msgid "Updates"
 msgstr "Updates"
+
+msgid "Updating {label} in a terminal…"
+msgstr "{label} wordt bijgewerkt in een terminal…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Bijwerken in de terminal hieronder. De chat gaat verder zodra de nieuwe versie is geïnstalleerd."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

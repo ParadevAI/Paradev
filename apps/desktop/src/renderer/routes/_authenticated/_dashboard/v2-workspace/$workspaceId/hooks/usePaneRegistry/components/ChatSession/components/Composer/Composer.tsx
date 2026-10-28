@@ -39,6 +39,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import type { RunInTerminal } from "../../../../hooks/useAgentCliUpdate";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -48,6 +49,7 @@ import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
+import { AgentCliUpdateNotice } from "./components/AgentCliUpdateNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
 import { type AgentSwitcher, ModelPicker } from "./components/ModelPicker";
 import { ModePicker, type SessionMode } from "./components/ModePicker";
@@ -115,6 +117,8 @@ export type ComposerProps = {
 	turnRunning?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
+	onRunInTerminal?: RunInTerminal;
+	onRestartAgent?: (prompt?: string) => Promise<boolean>;
 };
 
 const HIDDEN_AGENT_COMMANDS = new Set(["rewind"]);
@@ -170,6 +174,8 @@ export const Composer = memo(function Composer({
 	onOpenFind,
 	onSend,
 	onOpenHistory,
+	onRestartAgent,
+	onRunInTerminal,
 	placeholder,
 	sessionUsage,
 	target,
@@ -603,6 +609,16 @@ export const Composer = memo(function Composer({
 					workspaceId={workspaceId}
 				/>
 			)}
+			<AgentCliUpdateNotice
+				agentLabel={agentLabel}
+				className={CHAT_COLUMN_CLASSNAME}
+				onRestartAgent={onRestartAgent}
+				onRunInTerminal={onRunInTerminal}
+				presetId={presetId}
+				sessionId={sessionId ?? null}
+				turnRunning={turnRunning}
+				workspaceId={workspaceId}
+			/>
 			<AgentComposer
 				className={CHAT_COLUMN_CLASSNAME}
 				clearOnSubmit={!blocked}

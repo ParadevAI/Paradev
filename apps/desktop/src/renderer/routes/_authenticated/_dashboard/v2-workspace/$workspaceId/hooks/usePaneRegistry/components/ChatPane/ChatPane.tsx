@@ -1,12 +1,17 @@
+import { useLingui } from "@lingui/react/macro";
 import type { UserContent } from "@superset/chat/protocol";
 import type { RendererContext } from "@superset/panes";
+import { toast } from "@superset/ui/sonner";
 import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
+	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type { TerminalLauncher } from "../../../useV2TerminalLauncher";
+import type { RunInTerminal } from "../../hooks/useAgentCliUpdate";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -18,15 +23,18 @@ import { saveChatMode } from "./utils/savedChatMode";
 
 export function ChatPane({
 	ctx,
+	launcher,
 	onOpenFile,
 	onRevealPath,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
+	launcher: TerminalLauncher;
 	workspaceId: string;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
+	const { t } = useLingui();
 	const data = ctx.pane.data as ChatPaneData;
 	const openPage = useOpenChatPage(ctx.store);
 	const { hint, showHint } = useLinkClickHint();
@@ -41,6 +49,25 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const split = ctx.actions.split;
+	const runInTerminal = useCallback<RunInTerminal>(
+		async (command, title) => {
+			try {
+				const terminalId = await launcher.create({ command });
+				split("down", {
+					kind: "terminal",
+					titleOverride: title,
+					data: { terminalId } satisfies TerminalPaneData,
+				});
+				return true;
+			} catch (error) {
+				console.error("[chat] could not open a terminal", error);
+				toast.error(t({ message: "Couldn't open a terminal" }));
+				return false;
+			}
+		},
+		[launcher, split, t],
+	);
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
@@ -197,6 +224,7 @@ export function ChatPane({
 						],
 					});
 				}}
+				onRunInTerminal={runInTerminal}
 				onRewound={(prompt) => {
 					const { agent, chatModelId, chatModelLabel, chatModeId } =
 						latest.current;

@@ -993,6 +993,12 @@ msgstr "{kind} · by {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} theme"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} is installed. Restart the chat to use it."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} is available. You have {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Chat is being reworked"
 msgid "Chat Launch"
 msgstr "Chat Launch"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+
 msgid "Chat session not found"
 msgstr "Chat session not found"
 
@@ -5648,6 +5657,9 @@ msgstr "Couldn't move the subagent to the background"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
+
+msgid "Couldn't open a terminal"
+msgstr "Couldn't open a terminal"
 
 msgid "Couldn't open the screenshot"
 msgstr "Couldn't open the screenshot"
@@ -9160,6 +9172,9 @@ msgstr "How tiers work →"
 
 msgid "How to install {name} in Paradev"
 msgstr "How to install {name} in Paradev"
+
+msgid "How to update"
+msgstr "How to update"
 
 msgid "How we build it, in long form."
 msgstr "How we build it, in long form."
@@ -19667,6 +19682,9 @@ msgstr "Update"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Update {appName} on this machine to attach files"
 
+msgid "Update {label}"
+msgstr "Update {label}"
+
 msgid "Update available"
 msgstr "Update available"
 
@@ -19741,6 +19759,12 @@ msgstr "Updated just now from {0}."
 
 msgid "Updates"
 msgstr "Updates"
+
+msgid "Updating {label} in a terminal…"
+msgstr "Updating {label} in a terminal…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Updating in the terminal below. The chat resumes once the new version is installed."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

@@ -993,6 +993,12 @@ msgstr "{kind} · 作者: {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}テーマ"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} がインストールされました。使用するにはチャットを再起動してください。"
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} が利用可能です。現在のバージョンは {installed} です。"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "チャットには {label} {minVersion} 以降が必要ですが、インストールされているのは {installed} です。"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -5648,6 +5657,9 @@ msgstr "サブエージェントをバックグラウンドに移動できませ
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
+
+msgid "Couldn't open a terminal"
+msgstr "ターミナルを開けませんでした"
 
 msgid "Couldn't open the screenshot"
 msgstr "スクリーンショットを開けませんでした"
@@ -9160,6 +9172,9 @@ msgstr "ティアの仕組み →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Paradevに{name}をインストールする方法"
+
+msgid "How to update"
+msgstr "更新方法"
 
 msgid "How we build it, in long form."
 msgstr "どう作っているかを詳しく。"
@@ -19667,6 +19682,9 @@ msgstr "更新"
 msgid "Update {appName} on this machine to attach files"
 msgstr "ファイルを添付するには、このマシンで{appName}を更新してください"
 
+msgid "Update {label}"
+msgstr "{label} を更新"
+
 msgid "Update available"
 msgstr "アップデートあり"
 
@@ -19741,6 +19759,12 @@ msgstr "{0}からたった今更新しました。"
 
 msgid "Updates"
 msgstr "アップデート"
+
+msgid "Updating {label} in a terminal…"
+msgstr "ターミナルで {label} を更新しています…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "下のターミナルで更新しています。新しいバージョンがインストールされるとチャットが再開されます。"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

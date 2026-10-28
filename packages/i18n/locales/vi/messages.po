@@ -993,6 +993,12 @@ msgstr "{kind} · bởi {author}"
 msgid "{kindLabel} theme"
 msgstr "Chủ đề {kindLabel}"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "Đã cài đặt {label} {installed}. Khởi động lại cuộc trò chuyện để sử dụng."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "Đã có {label} {latest}. Phiên bản của bạn là {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Chat đang được làm lại"
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Trò chuyện cần {label} {minVersion} trở lên, nhưng phiên bản đã cài là {installed}."
+
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
 
@@ -5648,6 +5657,9 @@ msgstr "Không thể chuyển agent con sang chạy nền"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
+
+msgid "Couldn't open a terminal"
+msgstr "Không thể mở terminal"
 
 msgid "Couldn't open the screenshot"
 msgstr "Không thể mở ảnh chụp màn hình"
@@ -9160,6 +9172,9 @@ msgstr "Cách tính hạng →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Cách cài {name} trong Paradev"
+
+msgid "How to update"
+msgstr "Cách cập nhật"
 
 msgid "How we build it, in long form."
 msgstr "Cách chúng tôi xây dựng, chi tiết."
@@ -19667,6 +19682,9 @@ msgstr "Cập nhật"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Hãy cập nhật {appName} trên máy này để đính kèm tệp"
 
+msgid "Update {label}"
+msgstr "Cập nhật {label}"
+
 msgid "Update available"
 msgstr "Có bản cập nhật"
 
@@ -19741,6 +19759,12 @@ msgstr "Vừa cập nhật từ {0}."
 
 msgid "Updates"
 msgstr "Cập nhật"
+
+msgid "Updating {label} in a terminal…"
+msgstr "Đang cập nhật {label} trong terminal…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Đang cập nhật trong terminal bên dưới. Cuộc trò chuyện sẽ tiếp tục khi phiên bản mới được cài đặt."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

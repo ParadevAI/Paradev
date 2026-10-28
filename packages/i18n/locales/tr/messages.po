@@ -993,6 +993,12 @@ msgstr "{kind} · {author} tarafından"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} tema"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} yüklendi. Kullanmak için sohbeti yeniden başlatın."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} kullanılabilir. Sizdeki sürüm: {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Sohbet yeniden düzenleniyor"
 msgid "Chat Launch"
 msgstr "Sohbet başlatma"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Sohbet için {label} {minVersion} veya daha yenisi gerekiyor; yüklü sürüm {installed}."
+
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
 
@@ -5648,6 +5657,9 @@ msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open a terminal"
+msgstr "Terminal açılamadı"
 
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
@@ -9160,6 +9172,9 @@ msgstr "Katmanlar nasıl işler →"
 
 msgid "How to install {name} in Paradev"
 msgstr "{name} teması Paradev'e nasıl kurulur"
+
+msgid "How to update"
+msgstr "Nasıl güncellenir"
 
 msgid "How we build it, in long form."
 msgstr "Nasıl geliştirdiğimiz, ayrıntılı olarak."
@@ -19667,6 +19682,9 @@ msgstr "Güncelle"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Dosya eklemek için bu makinede {appName}'i güncelleyin"
 
+msgid "Update {label}"
+msgstr "Güncelle: {label}"
+
 msgid "Update available"
 msgstr "Güncelleme mevcut"
 
@@ -19741,6 +19759,12 @@ msgstr "Az önce {0} sürümünden güncellendi."
 
 msgid "Updates"
 msgstr "Güncellemeler"
+
+msgid "Updating {label} in a terminal…"
+msgstr "{label} bir terminalde güncelleniyor…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Aşağıdaki terminalde güncelleniyor. Yeni sürüm yüklendiğinde sohbet devam edecek."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

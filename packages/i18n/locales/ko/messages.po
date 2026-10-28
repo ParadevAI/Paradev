@@ -993,6 +993,12 @@ msgstr "{kind} · 제작 {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} 테마"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed}이(가) 설치되었습니다. 사용하려면 채팅을 다시 시작하세요."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest}을(를) 사용할 수 있습니다. 현재 버전은 {installed}입니다."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "채팅에는 {label} {minVersion} 이상이 필요하지만 {installed}이(가) 설치되어 있습니다."
+
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
 
@@ -5648,6 +5657,9 @@ msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
+
+msgid "Couldn't open a terminal"
+msgstr "터미널을 열 수 없습니다"
 
 msgid "Couldn't open the screenshot"
 msgstr "스크린샷을 열 수 없습니다"
@@ -9160,6 +9172,9 @@ msgstr "등급 산정 방식 →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Paradev에 {name} 설치하는 방법"
+
+msgid "How to update"
+msgstr "업데이트 방법"
 
 msgid "How we build it, in long form."
 msgstr "어떻게 만드는지 자세히."
@@ -19667,6 +19682,9 @@ msgstr "업데이트"
 msgid "Update {appName} on this machine to attach files"
 msgstr "파일을 첨부하려면 이 컴퓨터에서 {appName}을 업데이트하세요"
 
+msgid "Update {label}"
+msgstr "{label} 업데이트"
+
 msgid "Update available"
 msgstr "업데이트 있음"
 
@@ -19741,6 +19759,12 @@ msgstr "방금 {0}에서 업데이트되었습니다."
 
 msgid "Updates"
 msgstr "업데이트"
+
+msgid "Updating {label} in a terminal…"
+msgstr "터미널에서 {label} 업데이트 중…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "아래 터미널에서 업데이트하는 중입니다. 새 버전이 설치되면 채팅이 다시 시작됩니다."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

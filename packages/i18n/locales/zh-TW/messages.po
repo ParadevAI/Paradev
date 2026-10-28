@@ -993,6 +993,12 @@ msgstr "{kind} · 作者{author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}主題"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "已安裝 {label} {installed}。重啟聊天即可使用。"
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} 已推出。目前版本為 {installed}。"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天啟動"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "聊天需要 {label} {minVersion} 或更新版本，目前安裝的是 {installed}。"
+
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
 
@@ -5648,6 +5657,9 @@ msgstr "無法將子代理程式移到背景"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
+
+msgid "Couldn't open a terminal"
+msgstr "無法開啟終端機"
 
 msgid "Couldn't open the screenshot"
 msgstr "無法開啟螢幕擷取畫面"
@@ -9160,6 +9172,9 @@ msgstr "等級如何計算 →"
 
 msgid "How to install {name} in Paradev"
 msgstr "如何在Paradev中安裝{name}"
+
+msgid "How to update"
+msgstr "如何更新"
 
 msgid "How we build it, in long form."
 msgstr "我們如何打造它，深入介紹。"
@@ -19667,6 +19682,9 @@ msgstr "更新"
 msgid "Update {appName} on this machine to attach files"
 msgstr "請在這臺機器上更新{appName}以附加檔案"
 
+msgid "Update {label}"
+msgstr "更新 {label}"
+
 msgid "Update available"
 msgstr "有可用更新"
 
@@ -19741,6 +19759,12 @@ msgstr "剛剛從 {0} 更新。"
 
 msgid "Updates"
 msgstr "更新"
+
+msgid "Updating {label} in a terminal…"
+msgstr "正在終端機中更新 {label}…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "正在下方終端機中更新。新版本安裝完成後，聊天會自動繼續。"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

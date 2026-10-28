@@ -993,6 +993,12 @@ msgstr "{kind} · autor: {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} motiv"
 
+msgid "{label} {installed} is installed. Restart the chat to use it."
+msgstr "{label} {installed} je nainstalován. Restartujte chat, abyste ho mohli používat."
+
+msgid "{label} {latest} is available. You have {installed}."
+msgstr "{label} {latest} je k dispozici. Máte verzi {installed}."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3881,6 +3887,9 @@ msgstr "Chat se předělává"
 msgid "Chat Launch"
 msgstr "Spuštění chatu"
 
+msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
+msgstr "Chat vyžaduje {label} {minVersion} nebo novější, nainstalovaná je verze {installed}."
+
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
 
@@ -5648,6 +5657,9 @@ msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
+
+msgid "Couldn't open a terminal"
+msgstr "Terminál se nepodařilo otevřít"
 
 msgid "Couldn't open the screenshot"
 msgstr "Snímek obrazovky se nepodařilo otevřít"
@@ -9160,6 +9172,9 @@ msgstr "Jak fungují úrovně →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Jak nainstalovat {name} do Paradev"
+
+msgid "How to update"
+msgstr "Jak aktualizovat"
 
 msgid "How we build it, in long form."
 msgstr "Jak to stavíme, podrobně."
@@ -19667,6 +19682,9 @@ msgstr "Aktualizovat"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Aktualizujte na tomto počítači {appName}, abyste mohli přikládat soubory"
 
+msgid "Update {label}"
+msgstr "Aktualizovat {label}"
+
 msgid "Update available"
 msgstr "Dostupná aktualizace"
 
@@ -19741,6 +19759,12 @@ msgstr "Právě aktualizováno z {0}."
 
 msgid "Updates"
 msgstr "Aktualizace"
+
+msgid "Updating {label} in a terminal…"
+msgstr "Aktualizace {label} v terminálu…"
+
+msgid "Updating in the terminal below. The chat resumes once the new version is installed."
+msgstr "Aktualizace probíhá v terminálu níže. Chat bude pokračovat, jakmile bude nová verze nainstalována."
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
