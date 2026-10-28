@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FRESH_SHELL_INPUT_MODE_RESET } from "@superset/shared/leaked-input-mode-reclaim";
+import { isRtlRow } from "../lib/terminal/rtlRow";
 
 const mobileRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -81,7 +82,9 @@ const runtimeJs = /* js */ `
 	var term = new Terminal({
 		allowTransparency: false,
 		cursorBlink: true,
-		fontFamily: "Menlo, monospace",
+		// Menlo has no Hebrew or Arabic; without system-ui those glyphs fall to
+		// Courier, which reads like a typewriter next to the rest of the app.
+		fontFamily: "Menlo, system-ui, monospace",
 		fontSize: 12,
 		scrollback: 5000,
 		// The built-in scrollbar only reveals on hover; the overlay one below
@@ -103,6 +106,76 @@ const runtimeJs = /* js */ `
 	term.loadAddon(serializer);
 	term.open(document.getElementById("term"));
 	fit.fit();
+
+	// --- right-to-left rows ----------------------------------------------------
+	// Hebrew and Arabic glyphs are narrower than a Menlo cell, so the DOM
+	// renderer gives each one its own span with its own letter-spacing. WebKit
+	// does not reorder letters across those spans, so every word reads
+	// backwards. Rows holding RTL text get their spans merged back into runs,
+	// which WebKit orders for reading in natural spacing. A row whose first
+	// strong character is RTL is also marked so the CSS lays it out as one
+	// right-aligned paragraph, the way chat apps show it. Rows stay
+	// left-to-right while the cursor is on them or they hold inverse cells (a
+	// TUI's own cursor or selection), where column positions matter. The buffer
+	// is untouched, so copy and the host see no change.
+	var isRtlRow = ${isRtlRow.toString()};
+	var RTL_CHAR = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+	var rowsContainer = term.element.querySelector(".xterm-rows");
+
+	function mergeRuns(rowEl) {
+		var prev = null;
+		var child = rowEl.firstChild;
+		while (child) {
+			var next = child.nextSibling;
+			if (child.nodeType === 1 && !child.firstElementChild) {
+				child.style.letterSpacing = "";
+				if (
+					prev &&
+					prev.className === child.className &&
+					(prev.getAttribute("style") || "") ===
+						(child.getAttribute("style") || "")
+				) {
+					prev.textContent += child.textContent;
+					rowEl.removeChild(child);
+				} else {
+					prev = child;
+				}
+			} else {
+				prev = null;
+			}
+			child = next;
+		}
+	}
+
+	function hasInverse(line) {
+		for (var x = 0; x < line.length; x++) {
+			var cell = line.getCell(x);
+			if (cell && cell.isInverse()) return true;
+		}
+		return false;
+	}
+
+	term.onRender(function (range) {
+		var buffer = term.buffer.active;
+		var cursorRow = term.modes.showCursor
+			? buffer.baseY + buffer.cursorY - buffer.viewportY
+			: -1;
+		for (var y = range.start; y <= range.end; y++) {
+			var rowEl = rowsContainer.children[y];
+			if (!rowEl) continue;
+			var line = buffer.getLine(buffer.viewportY + y);
+			var text = line ? line.translateToString(true) : "";
+			if (!RTL_CHAR.test(text)) {
+				rowEl.classList.remove("rtl");
+				continue;
+			}
+			mergeRuns(rowEl);
+			rowEl.classList.toggle(
+				"rtl",
+				y !== cursorRow && isRtlRow(text) && !hasInverse(line),
+			);
+		}
+	});
 
 	var BASE_RECONNECT_DELAY_MS = 500;
 	var MAX_RECONNECT_DELAY_MS = 10000;
@@ -1251,6 +1324,11 @@ html, body {
 #term {
 	width: 100%;
 	height: 100%;
+}
+.xterm .xterm-rows > div.rtl {
+	direction: rtl;
+	unicode-bidi: plaintext;
+	text-align: right;
 }
 #scrollbar {
 	position: absolute;
