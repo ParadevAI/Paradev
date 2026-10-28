@@ -4185,12 +4185,6 @@ msgstr "Nhấp vào đây nếu không được chuyển hướng"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Nhấp vào nút “↑ update” để xem xác nhận trước khi cập nhật"
 
-msgid "Click the chip to open the issue"
-msgstr "Nhấp vào thẻ để mở issue"
-
-msgid "Click the chip to open the pull request"
-msgstr "Nhấp vào thẻ để mở pull request"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Nhấp để sao chép ID phiên (resume bằng `claude --resume <id>`)."
 

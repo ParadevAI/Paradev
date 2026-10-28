@@ -4185,12 +4185,6 @@ msgstr "Yönlendirilmediyseniz buraya tıklayın"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Güncelleme öncesi onayı görmek için “↑ update” düğmesine tıklayın"
 
-msgid "Click the chip to open the issue"
-msgstr "Issue'yu açmak için etikete tıklayın"
-
-msgid "Click the chip to open the pull request"
-msgstr "Pull request'i açmak için etikete tıklayın"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Oturum kimliğini kopyalamak için tıklayın (`claude --resume <id>` ile sürdürün)."
 

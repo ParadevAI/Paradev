@@ -47,7 +47,7 @@ export function GithubWorkItemChip({
 		: t({ message: `Issue #${link.number}` });
 	const Icon = pr ? GitPullRequest : CircleDot;
 	return (
-		<GithubWorkItemHoverCard link={link} openHint>
+		<GithubWorkItemHoverCard link={link}>
 			<LinkMenu href={url}>
 				<a
 					className="mx-px inline-flex max-w-full items-center rounded-md align-middle text-foreground/70 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"

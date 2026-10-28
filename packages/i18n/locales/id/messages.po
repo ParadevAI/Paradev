@@ -4185,12 +4185,6 @@ msgstr "Klik di sini kalau tidak dialihkan"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik tombol “↑ update” untuk melihat konfirmasi sebelum pembaruan"
 
-msgid "Click the chip to open the issue"
-msgstr "Klik chip untuk membuka issue"
-
-msgid "Click the chip to open the pull request"
-msgstr "Klik chip untuk membuka pull request"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik untuk menyalin ID sesi (lanjutkan dengan `claude --resume <id>`)."
 

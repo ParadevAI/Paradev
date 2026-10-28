@@ -6,6 +6,7 @@ import {
 	CircleCheck,
 	CircleDot,
 	CircleSlash,
+	ExternalLink,
 	GitCompare,
 	GitMerge,
 	GitPullRequest,
@@ -13,6 +14,8 @@ import {
 	GitPullRequestDraft,
 	type LucideIcon,
 } from "lucide-react";
+import type { MouseEvent } from "react";
+import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
 
 /** What `github.getWorkItem` answers, as the card reads it. */
@@ -147,13 +150,16 @@ function Avatar({
 export function GithubWorkItemCard({
 	link,
 	load,
-	openHint = false,
 }: {
 	link: GithubWorkItemLink;
 	load: GithubWorkItemLoad;
-	openHint?: boolean;
 }) {
 	const { i18n, t } = useLingui();
+	const { openLink } = useChatPaneActions();
+	const href = `https://github.com/${link.owner}/${link.repo}/${link.kind === "pr" ? "pull" : "issues"}/${link.number}`;
+	const open = (event: MouseEvent<HTMLAnchorElement>) => {
+		if (openLink?.(href, event)) event.preventDefault();
+	};
 	const item = load.status === "ready" ? load.item : null;
 	const status = statusOf(link.kind, item);
 	const labels = item?.labels ?? [];
@@ -189,7 +195,15 @@ export function GithubWorkItemCard({
 			{item ? (
 				<>
 					<h3 className="mt-2 line-clamp-2 font-semibold text-[13px] text-foreground leading-[1.35]">
-						{item.title}
+						<a
+							className="text-inherit no-underline outline-none hover:underline focus-visible:underline"
+							href={href}
+							onClick={open}
+							rel="noreferrer"
+							target="_blank"
+						>
+							{item.title}
+						</a>
 					</h3>
 					{item.summary && (
 						<p className="mt-1.5 line-clamp-3 text-[11px] text-foreground/55 leading-[1.45]">
@@ -283,15 +297,18 @@ export function GithubWorkItemCard({
 				</div>
 			)}
 
-			{openHint && (
-				<div className="mt-3 border-foreground/[0.07] border-t pt-2 text-[10px] text-foreground/35">
-					{link.kind === "pr" ? (
-						<Trans>Click the chip to open the pull request</Trans>
-					) : (
-						<Trans>Click the chip to open the issue</Trans>
-					)}
-				</div>
-			)}
+			<div className="mt-3 border-foreground/[0.07] border-t pt-2">
+				<a
+					className="inline-flex items-center gap-1 rounded-sm font-medium text-[11px] text-foreground/55 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+					href={href}
+					onClick={open}
+					rel="noreferrer"
+					target="_blank"
+				>
+					<ExternalLink aria-hidden="true" className="size-3" />
+					<Trans>Open on GitHub</Trans>
+				</a>
+			</div>
 		</div>
 	);
 }

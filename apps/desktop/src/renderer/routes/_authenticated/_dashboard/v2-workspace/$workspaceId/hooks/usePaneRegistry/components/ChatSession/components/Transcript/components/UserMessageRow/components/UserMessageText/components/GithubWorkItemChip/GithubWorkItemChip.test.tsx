@@ -155,3 +155,12 @@ test("right-clicking closes the card, and copying the link leaves it closed", as
 		else Reflect.deleteProperty(navigator, "clipboard");
 	}
 });
+
+test("the card's title and its GitHub link both open the pull request", async () => {
+	const openLink = mock<OpenLink>(() => true);
+	const { chip } = renderChip(() => ITEM, undefined, openLink);
+	chip.focus();
+	fireEvent.click(await screen.findByText("feat(chat): load whole sessions"));
+	fireEvent.click(screen.getByText("Open on GitHub"));
+	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_PR, URL_PR]);
+});

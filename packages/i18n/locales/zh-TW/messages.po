@@ -4185,12 +4185,6 @@ msgstr "如果沒有自動跳轉，請點選這裡"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "點擊「↑ update」按鈕查看更新前的確認提示"
 
-msgid "Click the chip to open the issue"
-msgstr "點擊開啟議題"
-
-msgid "Click the chip to open the pull request"
-msgstr "點擊開啟拉取請求"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "點選複製會話ID（使用`claude --resume <id>`恢復）。"
 

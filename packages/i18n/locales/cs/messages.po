@@ -4185,12 +4185,6 @@ msgstr "Pokud nedojde k přesměrování, klikněte sem"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Kliknutím na „↑ update“ zobrazíte potvrzení před aktualizací"
 
-msgid "Click the chip to open the issue"
-msgstr "Kliknutím na štítek otevřete issue"
-
-msgid "Click the chip to open the pull request"
-msgstr "Kliknutím na štítek otevřete pull request"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Kliknutím zkopírujete ID relace (pokračování přes `claude --resume <id>`)."
 
