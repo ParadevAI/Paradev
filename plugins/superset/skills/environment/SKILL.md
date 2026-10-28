@@ -15,6 +15,16 @@ Terms you will use with the user:
 - **Box**: one cloud workspace running on the environment.
 - **Checkpoint**: a snapshot of the box saved into the environment, so the next workspace starts from it. `superset environments replace` saves one. Only the latest checkpoint is kept.
 
+## What a box already has
+
+Do not install or upgrade these:
+
+- Node 24, Bun, Python 3 (pip, pipx, venv), a JDK, build-essential, clang, git, git-lfs, `gh`, and Docker with Compose. They come with the image, and a checkpoint keeps the versions it was saved with.
+- Chrome, Claude Code, Codex and the `superset` CLI. Every boot updates them to the platform's current release, so a checkpoint does not freeze their versions.
+- A Linux desktop (XFCE over VNC, Xvfb), ffmpeg and ImageMagick.
+
+There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, tell the user. Install only what the project needs, and do it through `.superset/config.json` so a fresh checkout repeats it.
+
 ## 0. Find the environment
 
 If you were given an environment ID, run `superset environments list --json` and confirm it exists. Otherwise, look there for a personal environment on the same repositories from an earlier session and offer to continue it. Create one only if there is none:
