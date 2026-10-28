@@ -68,6 +68,7 @@ export type ChannelNotifyReason = "mention" | "here" | "reply" | "message";
 export type ChannelRealtimeEvent =
 	| { type: "channel.message"; channelId: string; message: ChannelMessageWire }
 	| { type: "channels.changed"; organizationId: string }
+	| { type: "agents.changed"; organizationId: string; agentId: string }
 	| { type: "channel.tasks"; channelId: string }
 	| {
 			type: "channel.read";
@@ -98,14 +99,15 @@ export type ChannelRealtimeEvent =
 			showPreview: boolean;
 	  };
 
-const EVENT_TYPES = new Set([
-	"channel.message",
-	"channels.changed",
-	"channel.tasks",
-	"channel.read",
-	"channel.thread.read",
-	"channel.notify",
-]);
+const EVENT_TYPES: Record<ChannelRealtimeEvent["type"], true> = {
+	"channel.message": true,
+	"channels.changed": true,
+	"agents.changed": true,
+	"channel.tasks": true,
+	"channel.read": true,
+	"channel.thread.read": true,
+	"channel.notify": true,
+};
 
 export function parseChannelRealtimeEvent(
 	raw: unknown,
@@ -120,7 +122,10 @@ export function parseChannelRealtimeEvent(
 	}
 	if (typeof value !== "object" || value === null) return null;
 	const event = value as { type?: unknown };
-	if (typeof event.type !== "string" || !EVENT_TYPES.has(event.type)) {
+	if (
+		typeof event.type !== "string" ||
+		!Object.hasOwn(EVENT_TYPES, event.type)
+	) {
 		return null;
 	}
 	return value as ChannelRealtimeEvent;

@@ -139,6 +139,7 @@ export function ChannelsRealtime() {
 			void utils.channel.invalidate();
 			void utils.channelMessage.invalidate();
 			void utils.channelThread.invalidate();
+			void utils.agent.invalidate();
 		};
 
 		const handle = (event: ChannelRealtimeEvent) => {
@@ -182,6 +183,12 @@ export function ChannelsRealtime() {
 				case "channels.changed":
 					void utils.channel.invalidate();
 					void utils.channelThread.invalidate();
+					break;
+				case "agents.changed":
+					if (event.organizationId !== organizationId) break;
+					void utils.agent.list.invalidate();
+					void utils.agent.get.invalidate({ agentId: event.agentId });
+					void utils.agent.activity.invalidate({ agentId: event.agentId });
 					break;
 				case "channel.notify": {
 					if (event.organizationId !== organizationId) break;

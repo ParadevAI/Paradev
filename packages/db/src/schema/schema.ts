@@ -878,6 +878,32 @@ export const environmentRepositories = pgTable(
 	],
 );
 
+/** Projects an environment is linked to; the new-workspace picker offers linked environments first. */
+export const environmentProjects = pgTable(
+	"environment_projects",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		/** A host project's key; projects live on hosts, so there is no row to reference. */
+		projectId: text("project_id").notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		unique("environment_projects_environment_id_project_id_unique").on(
+			table.environmentId,
+			table.projectId,
+		),
+		index("environment_projects_project_id_idx").on(table.projectId),
+	],
+);
+
 export const environmentSecrets = pgTable(
 	"environment_secrets",
 	{

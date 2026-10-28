@@ -25,6 +25,7 @@ import { OrganizationAvatar } from "@/screens/(authenticated)/components/Organiz
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
+import { usePlanName } from "./hooks/usePlanName";
 
 const WRITE_REVIEW_URL = `${COMPANY.APP_STORE_URL}?action=write-review`;
 
@@ -53,7 +54,10 @@ export function SettingsScreen() {
 
 	const user = session?.user;
 	const plan = session?.session.plan;
-	const planLabel = plan ? plan[0].toUpperCase() + plan.slice(1) : "Free";
+	const planName = usePlanName();
+	const planLabel = planName
+		? planName[0].toUpperCase() + planName.slice(1)
+		: "Free";
 	const joined = formatJoined(user?.createdAt);
 
 	const handleSignOut = () => {

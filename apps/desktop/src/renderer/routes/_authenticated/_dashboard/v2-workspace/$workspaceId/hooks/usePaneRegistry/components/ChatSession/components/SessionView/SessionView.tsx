@@ -14,6 +14,7 @@ import type {
 	SessionConfigOption,
 	SessionState,
 	UserContent,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	useApprovals,
@@ -26,6 +27,7 @@ import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { env } from "renderer/env.renderer";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
 import type { OpenFile } from "../../../../../../types";
@@ -50,6 +52,7 @@ import {
 } from "../Composer";
 import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
+import { SetupSessionHeader } from "../SetupSessionHeader";
 import { SubagentView } from "../SubagentView";
 import { Transcript, type TranscriptHandle } from "../Transcript";
 import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
@@ -68,6 +71,7 @@ import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
+import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
@@ -269,6 +273,17 @@ export function SessionView({
 	);
 
 	const snapshotItems = session.snapshot.items;
+	const setupEnvironment = useMemo(() => {
+		for (const { item } of snapshotItems.values()) {
+			if (item.kind === "user_message") {
+				return setupEnvironmentId(
+					userMessageText(item as UserMessage),
+					env.NEXT_PUBLIC_WEB_URL,
+				);
+			}
+		}
+		return null;
+	}, [snapshotItems]);
 	const queuedPrompts = useStableList(
 		useMemo(
 			() => deriveQueuedPrompts({ items: snapshotItems }),
@@ -554,6 +569,9 @@ export function SessionView({
 						left={headerLeft}
 						session={session.snapshot.session}
 					/>
+				)}
+				{setupEnvironment && (
+					<SetupSessionHeader environmentId={setupEnvironment} />
 				)}
 				<MessageScroller.Provider
 					autoScroll

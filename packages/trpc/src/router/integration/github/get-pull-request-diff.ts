@@ -1,7 +1,7 @@
 import type { PullRequestDiff } from "@superset/shared/pull-request-diff";
 import { z } from "zod";
 import { protectedProcedure } from "../../../trpc";
-import { asViewer } from "./viewer-octokit";
+import { asViewerOrInstallation } from "./viewer-octokit";
 
 // Errors stay unmapped: released desktops read this procedure's failures as-is.
 export const getPullRequestDiff = protectedProcedure
@@ -14,5 +14,5 @@ export const getPullRequestDiff = protectedProcedure
 	)
 	.query(
 		async ({ ctx, input }): Promise<PullRequestDiff> =>
-			(await asViewer(ctx.session.user.id, input, "read")).diff(),
+			(await asViewerOrInstallation(ctx.session.user.id, input)).diff(),
 	);

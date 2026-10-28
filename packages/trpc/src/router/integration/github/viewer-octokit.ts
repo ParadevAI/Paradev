@@ -15,11 +15,7 @@ export interface PullRequestInput {
 	number: number;
 }
 
-export type ViewerPullRequest = PullRequestOnGithub & {
-	number: number;
-	/** False when the organization's App reads on the viewer's behalf. */
-	actsAsViewer: boolean;
-};
+export type ViewerPullRequest = PullRequestOnGithub & { number: number };
 
 export function notConnectedError() {
 	return userError({
@@ -32,7 +28,6 @@ export function notConnectedError() {
 function onGithub(
 	octokit: Octokit,
 	input: PullRequestInput,
-	actsAsViewer: boolean,
 ): ViewerPullRequest {
 	const [owner = "", repo = ""] = input.repoFullName.split("/");
 	return {
@@ -44,36 +39,42 @@ function onGithub(
 			{ owner, repo, number: input.number },
 		),
 		number: input.number,
-		actsAsViewer,
 	};
 }
 
 /**
- * GitHub as the person asking: their own connection when they have one, the
- * organization's App installation otherwise. Reads may take either; a write
- * must be theirs, or GitHub would record it under the App's name.
+ * GitHub as the person asking, with their own connection; without one they
+ * are asked to connect. The organization's App is not a fallback: its rate
+ * limit is shared by everything the organization runs.
  */
 export async function asViewer(
 	userId: string,
 	input: PullRequestInput,
-	access: "read" | "write",
 ): Promise<ViewerPullRequest> {
 	await verifyOrgMembership(userId, input.organizationId);
 	const token = await githubUserTokenFor(userId);
-	if (token) return onGithub(new Octokit({ auth: token }), input, true);
-	if (access === "write") throw notConnectedError();
-	// The App seeing nothing says nothing about the viewer: their own account may.
+	if (!token) throw notConnectedError();
+	return onGithub(new Octokit({ auth: token }), input);
+}
+
+/**
+ * `asViewer`, falling back to the organization's App installation. Only for
+ * `getPullRequestDiff`, which released desktops already call without a
+ * connection; new reads must not use it.
+ */
+export async function asViewerOrInstallation(
+	userId: string,
+	input: PullRequestInput,
+): Promise<ViewerPullRequest> {
+	await verifyOrgMembership(userId, input.organizationId);
+	const token = await githubUserTokenFor(userId);
+	if (token) return onGithub(new Octokit({ auth: token }), input);
 	const { installation } = await findInstalledRepository(
 		input.organizationId,
 		input.repoFullName,
-	).catch((error: { code?: string }) => {
-		throw error.code === "NOT_FOUND" || error.code === "PRECONDITION_FAILED"
-			? notConnectedError()
-			: error;
-	});
+	);
 	return onGithub(
 		await installationOctokit(installation.installationId),
 		input,
-		false,
 	);
 }
