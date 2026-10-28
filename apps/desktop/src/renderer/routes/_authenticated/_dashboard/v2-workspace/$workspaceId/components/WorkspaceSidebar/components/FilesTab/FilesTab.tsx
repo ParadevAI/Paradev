@@ -15,6 +15,7 @@ import {
 import type { AppRouter } from "@superset/host-service";
 import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
@@ -397,7 +398,12 @@ export function FilesTab({
 								<button
 									type="button"
 									onClick={onSearch}
-									className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+									className={cn(
+										"flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										variant === "fileView"
+											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
+											: "h-8 rounded-md px-1.5",
+									)}
 								>
 									<Search className="size-3.5 shrink-0" />
 									<span className="truncate">
