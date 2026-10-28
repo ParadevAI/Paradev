@@ -36,12 +36,6 @@ export function FileViewTree({
 		[store, paneId],
 	);
 
-	const handlePinFile = useCallback(
-		(filePath: string) =>
-			openFileFromTree({ store, filePath, sourcePaneId: paneId, pin: true }),
-		[store, paneId],
-	);
-
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<RepoPicker workspaceId={workspaceId} />
@@ -49,7 +43,6 @@ export function FileViewTree({
 				<FilesTab
 					variant="fileView"
 					onSelectFile={handleSelectFile}
-					onPinFile={handlePinFile}
 					selectedFilePath={selectedFilePath}
 					workspaceId={workspaceId}
 					gitStatus={gitStatus.data}

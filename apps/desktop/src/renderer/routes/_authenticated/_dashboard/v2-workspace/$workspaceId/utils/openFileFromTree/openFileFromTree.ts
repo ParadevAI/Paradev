@@ -31,7 +31,8 @@ export function openFileFromTree({
 		(pane) => (pane.data as FilePaneData).filePath === filePath,
 	);
 	if (open) {
-		show(open.id);
+		state.setPanePinned({ paneId: open.id, pinned: true });
+		state.focusPane(open.id);
 		return;
 	}
 

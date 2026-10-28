@@ -40,13 +40,23 @@ describe("openFileFromTree", () => {
 		expect(tabs()).toEqual(["*/b.ts (preview)"]);
 	});
 
-	it("does not pin when an open file is opened again", () => {
+	it("pins the preview when its file is opened again", () => {
 		const { open, tabs } = setup();
 		open("/a.ts");
 
 		open("/a.ts");
 
-		expect(tabs()).toEqual(["*/a.ts (preview)"]);
+		expect(tabs()).toEqual(["*/a.ts"]);
+	});
+
+	it("switches to an open file without opening it again", () => {
+		const { open, tabs } = setup();
+		open("/a.ts", { pin: true });
+		open("/b.ts");
+
+		open("/a.ts");
+
+		expect(tabs()).toEqual(["*/a.ts", "/b.ts (preview)"]);
 	});
 
 	it("pins an open preview", () => {
