@@ -14,11 +14,9 @@ import {
 } from "../../../../state/fileDocumentStore";
 import { fileAutoSave } from "../../../../state/fileDocumentStore/fileAutoSave";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
-import { openFileFromTree } from "../../../../utils/openFileFromTree";
 import { runUrlLinkAction } from "../../utils/runTerminalLinkAction";
 import { ErrorState } from "./components/ErrorState";
 import { ExternalChangeBanner } from "./components/ExternalChangeBanner";
-import { FileBreadcrumb } from "./components/FileBreadcrumb";
 import { LoadingState } from "./components/LoadingState";
 import { OrphanedBanner } from "./components/OrphanedBanner";
 import { SaveErrorBanner } from "./components/SaveErrorBanner";
@@ -27,7 +25,7 @@ import { resolveActivePaneView } from "./registry";
 interface FilePaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
-	/** Right pane file view: breadcrumb chip, and a click inside pins the preview. */
+	/** Right pane file view: room for the breadcrumb, and a click inside pins the preview. */
 	inRightPane?: boolean;
 }
 
@@ -218,21 +216,6 @@ export function FilePane({
 						(activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10"),
 				)}
 			>
-				{inRightPane && (
-					<FileBreadcrumb
-						workspaceId={workspaceId}
-						filePath={filePath}
-						rootPath={workspaceQuery.data?.worktreePath ?? undefined}
-						dirty={document.dirty}
-						onOpenFile={(path) =>
-							openFileFromTree({
-								store: context.store,
-								filePath: path,
-								sourcePaneId: context.pane.id,
-							})
-						}
-					/>
-				)}
 				<MarkdownResourceProvider
 					documentDirectory={getPathDirectory(document.absolutePath)}
 					rootPath={workspaceQuery.data?.worktreePath ?? undefined}

@@ -1,4 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
+import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	Fragment,
 	type ReactNode,
@@ -9,6 +10,7 @@ import {
 import { LuChevronRight } from "react-icons/lu";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { toRelativeWorkspacePath } from "shared/absolute-paths";
+import { useSharedFileDocument } from "../../../../../../state/fileDocumentStore";
 import { BreadcrumbTree } from "./components/BreadcrumbTree";
 import { HiddenTrail } from "./components/HiddenTrail";
 
@@ -18,18 +20,23 @@ const CRUMB_GAP = 4;
 interface FileBreadcrumbProps {
 	workspaceId: string;
 	filePath: string;
-	rootPath?: string;
-	dirty: boolean;
 	onOpenFile: (absolutePath: string) => void;
 }
 
 export function FileBreadcrumb({
 	workspaceId,
 	filePath,
-	rootPath,
-	dirty,
 	onOpenFile,
 }: FileBreadcrumbProps) {
+	const { dirty } = useSharedFileDocument({
+		workspaceId,
+		absolutePath: filePath,
+	});
+	const workspaceQuery = workspaceTrpc.workspace.get.useQuery(
+		{ id: workspaceId },
+		{ staleTime: 30_000 },
+	);
+	const rootPath = workspaceQuery.data?.worktreePath ?? undefined;
 	const relativePath = rootPath
 		? toRelativeWorkspacePath(rootPath, filePath)
 		: filePath;
