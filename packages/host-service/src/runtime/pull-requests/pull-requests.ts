@@ -1173,7 +1173,7 @@ export class PullRequestRuntimeManager {
 		try {
 			return await this.fetchFromGitHub(
 				"repo name lookup",
-				repo,
+				{ owner: repo.owner, name: repo.name },
 				() => fetchRepositoryNameFromGh(this.execGh, repo),
 				async () => fetchRepositoryName(await this.github(), repo),
 			);
