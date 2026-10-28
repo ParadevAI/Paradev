@@ -10,6 +10,7 @@ import { Utf8Base64 } from "./clipboard-base64";
 import { FocusAwareClipboardProvider } from "./clipboard-provider";
 import {
 	installBidiArrowKeys,
+	installBidiMouseSelection,
 	installTerminalBidi,
 	onTerminalBidiChange,
 } from "./terminal-bidi";
@@ -53,6 +54,7 @@ export function loadAddons(
 		terminal.refresh(0, terminal.rows - 1),
 	);
 	const offBidiArrows = installBidiArrowKeys(terminal);
+	const offBidiMouse = installBidiMouseSelection(terminal);
 
 	terminal.loadAddon(new ImageAddon());
 
@@ -138,6 +140,7 @@ export function loadAddons(
 			cancelAnimationFrame(rafId);
 			offBidiChange();
 			offBidiArrows();
+			offBidiMouse();
 			try {
 				ligaturesAddon?.dispose();
 			} catch {}

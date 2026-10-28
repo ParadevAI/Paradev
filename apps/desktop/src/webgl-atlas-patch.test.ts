@@ -40,10 +40,19 @@ describe("@xterm/addon-webgl bidi patch", () => {
 
 		test(`${name} draws cells in bidi visual order`, () => {
 			expect(src.split("__supersetTerminalBidi?.row(").length - 1).toBe(1);
-			expect(src.split("__bd.order[").length - 1).toBe(1);
+			// loadCell + the selection lookup below.
+			expect(src.split("__bd.order[").length - 1).toBe(2);
 			expect(src.split("__supersetTerminalBidi.mirrorCell(").length - 1).toBe(
 				1,
 			);
+		});
+
+		test(`${name} highlights the selection on the logical cell drawn`, () => {
+			expect(
+				src.match(
+					/_cellColorResolver\.resolve\(\w+,__bd\?__bd\.order\[\w+\]:\w+,/g,
+				),
+			).toHaveLength(1);
 		});
 
 		test(`${name} draws the cursor at its visual column`, () => {

@@ -23,6 +23,7 @@ import {
 } from "renderer/lib/terminal/parser-idle-gate";
 import {
 	installBidiArrowKeys,
+	installBidiMouseSelection,
 	installTerminalBidi,
 	onTerminalBidiChange,
 } from "renderer/lib/terminal/terminal-bidi";
@@ -152,6 +153,7 @@ export function createTerminalInWrapper(options: CreateTerminalOptions = {}): {
 		xterm.refresh(0, xterm.rows - 1),
 	);
 	const offBidiArrows = installBidiArrowKeys(xterm);
+	const offBidiMouse = installBidiMouseSelection(xterm);
 
 	try {
 		xterm.loadAddon(new LigaturesAddon());
@@ -250,6 +252,7 @@ export function createTerminalInWrapper(options: CreateTerminalOptions = {}): {
 			cancelAnimationFrame(rafId);
 			offBidiChange();
 			offBidiArrows();
+			offBidiMouse();
 			cleanupQuerySuppression();
 			uninstallWheelHandler();
 			inputModeReclaimer.dispose();

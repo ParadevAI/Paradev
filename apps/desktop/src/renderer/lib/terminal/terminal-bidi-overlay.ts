@@ -123,6 +123,13 @@ export interface OverlayRenderer {
 			canvas: { width: number; height: number };
 		};
 	};
+	_terminal?: { buffer?: { ydisp?: number } };
+	_model?: {
+		selection?: {
+			hasSelection?: boolean;
+			isCellSelected?(terminal: unknown, x: number, y: number): boolean;
+		};
+	};
 }
 
 export interface OverlayRow extends BidiRow {
@@ -186,8 +193,18 @@ export function claimRow(
 	st.rows.delete(y);
 	schedule(renderer, st);
 	if (!row || !row.rtl || !enabled || cursorRow) return;
-	for (let x = 0; x < cols; x++) {
+	const end = row.end ?? cols;
+	for (let x = 0; x < end; x++) {
 		if ((line.getFg?.(x) ?? 0) & FG_INVERSE) return;
+	}
+	// While part of the row is selected it stays in cells, so the highlight
+	// sits exactly on the glyphs being copied.
+	const selection = renderer._model?.selection;
+	if (selection?.hasSelection && selection.isCellSelected) {
+		const bufferY = y + (renderer._terminal?.buffer?.ydisp ?? 0);
+		for (let x = 0; x < end; x++) {
+			if (selection.isCellSelected(renderer._terminal, x, bufferY)) return;
+		}
 	}
 	row.hide = true;
 	row.cells = new Array(cols);
@@ -201,6 +218,8 @@ export function takeCell(
 	x: number,
 	cell: OverlayCellData,
 ): void {
+	// A side panel stays in cells.
+	if (row.end !== undefined && x >= row.end) return;
 	try {
 		recordCell(row, x, cell);
 	} catch {

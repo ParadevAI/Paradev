@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type BidiCell,
+	computeBidiRegions,
 	computeBidiRow,
 	glyphFont,
 	isCursorInRtl,
 	mirrorCell,
+	panelStart,
 } from "./terminal-bidi";
 
 function cellsOf(text: string): BidiCell[] {
@@ -135,5 +137,48 @@ describe("isCursorInRtl", () => {
 		expect(isCursorInRtl(row, 5)).toBe(true); // inside "שלום"
 		expect(isCursorInRtl(row, 7)).toBe(true); // right after "שלום"
 		expect(isCursorInRtl(null, 3)).toBe(false); // row without RTL
+	});
+});
+
+describe("side panel", () => {
+	const DEFAULT_BG = 0;
+	const PANEL_BG = 0x3000000 | 0x262626; // RGB background
+	const bgs = (text: number, panel: number) => [
+		...Array(text).fill(DEFAULT_BG),
+		...Array(panel).fill(PANEL_BG),
+	];
+	const drawn = (cells: BidiCell[], order: Int32Array | undefined) =>
+		Array.from(order ?? [], (logical) =>
+			String.fromCodePoint(cells[logical].codePoint),
+		).join("");
+	const cellsOf = (text: string): BidiCell[] =>
+		Array.from(text, (ch) => ({ codePoint: ch.codePointAt(0) ?? 0, width: 1 }));
+
+	test("finds a trailing block with its own background", () => {
+		const b = bgs(30, 20);
+		expect(panelStart((x) => b[x], b.length)).toBe(30);
+	});
+
+	test("ignores a row without one, or a too-narrow block", () => {
+		const none = bgs(50, 0);
+		expect(panelStart((x) => none[x], 50)).toBe(50);
+		const narrow = bgs(45, 5);
+		expect(panelStart((x) => narrow[x], 50)).toBe(50);
+	});
+
+	test("right-aligns the text area without moving the panel", () => {
+		const text = "שלום    ";
+		const cells = cellsOf(`${text}panel text`);
+		const row = computeBidiRegions(cells, true, text.length);
+		expect(row?.rtl).toBe(true);
+		expect(row?.end).toBe(text.length);
+		expect(drawn(cells, row?.order)).toBe("    םולשpanel text");
+	});
+
+	test("a Hebrew panel reads correctly beside an English text area", () => {
+		const cells = cellsOf("hello     שלום      ");
+		const row = computeBidiRegions(cells, true, 10);
+		expect(row?.rtl).toBe(false);
+		expect(drawn(cells, row?.order)).toBe("hello           םולש");
 	});
 });

@@ -40,11 +40,17 @@ export interface BidiRow {
 	levels: Uint8Array;
 	/** The row was laid out as a right-to-left paragraph. */
 	rtl: boolean;
+	/**
+	 * Cells from here on are a side panel (see panelStart), laid out on their
+	 * own; the paragraph above covers only the cells before it.
+	 */
+	end?: number;
 }
 
 interface BidiLine extends OverlayLine {
 	getCodePoint(index: number): number;
 	getWidth(index: number): number;
+	getBg?(index: number): number;
 }
 
 interface MutableCell {
@@ -310,13 +316,57 @@ export function onTerminalBidiChange(listener: () => void): () => void {
  * `y` is the viewport row and `cursorRow` whether the cursor sits on it; both
  * feed the proportional overlay.
  */
-function rowFromLine(
-	line: BidiLine,
-	cols: number,
-	renderer?: OverlayRenderer,
-	y?: number,
-	cursorRow?: boolean,
+/** A side panel is at least this wide, and so is the text area before it. */
+const MIN_PANEL_COLS = 10;
+const BG_COLOR_MASK = 0x3ffffff; // color mode + color
+const BG_MODE_MASK = 0x3000000;
+
+/**
+ * Where a side panel starts: a trailing block of cells sharing one explicit
+ * background color that reaches the row's right edge (Claude Code draws its
+ * "changes" panel this way). Returns `cols` when the row has none.
+ */
+export function panelStart(bgOf: (x: number) => number, cols: number): number {
+	if (cols < 2 * MIN_PANEL_COLS) return cols;
+	const bg = bgOf(cols - 1) & BG_COLOR_MASK;
+	if (!(bg & BG_MODE_MASK)) return cols;
+	let p = cols - 1;
+	while (p > 0 && (bgOf(p - 1) & BG_COLOR_MASK) === bg) p--;
+	return cols - p >= MIN_PANEL_COLS && p >= MIN_PANEL_COLS ? p : cols;
+}
+
+/**
+ * computeBidiRow, with the cells from `split` on laid out as a separate
+ * paragraph, so right-aligning the text area never moves a side panel across
+ * the row (and the panel's own RTL text still reads correctly).
+ */
+export function computeBidiRegions(
+	cells: readonly BidiCell[],
+	alignRight: boolean,
+	split: number,
 ): BidiRow | null {
+	const n = cells.length;
+	if (split >= n) return computeBidiRow(cells, alignRight);
+	const text = computeBidiRow(cells.slice(0, split), alignRight);
+	const panel = computeBidiRow(cells.slice(split), alignRight);
+	if (!text && !panel) return null;
+	const order = new Int32Array(n);
+	const mirror = new Uint8Array(n);
+	const visualOf = new Int32Array(n);
+	const levels = new Uint8Array(n);
+	for (let x = 0; x < n; x++) {
+		const part = x < split ? text : panel;
+		const offset = x < split ? 0 : split;
+		const i = x - offset;
+		order[x] = offset + (part ? part.order[i] : i);
+		mirror[x] = part ? part.mirror[i] : 0;
+		levels[x] = part ? part.levels[i] : 0;
+	}
+	for (let x = 0; x < n; x++) visualOf[order[x]] = x;
+	return { order, mirror, visualOf, levels, rtl: !!text?.rtl, end: split };
+}
+
+function bidiRowOf(line: BidiLine, cols: number): OverlayRow | null {
 	let hasRtl = false;
 	for (let x = 0; x < cols; x++) {
 		if (isRtlCodePoint(line.getCodePoint(x))) {
@@ -324,14 +374,27 @@ function rowFromLine(
 			break;
 		}
 	}
-	let row: OverlayRow | null = null;
-	if (hasRtl) {
-		const cells: BidiCell[] = new Array(cols);
-		for (let x = 0; x < cols; x++) {
-			cells[x] = { codePoint: line.getCodePoint(x), width: line.getWidth(x) };
-		}
-		row = computeBidiRow(cells, alignRight);
+	if (!hasRtl) return null;
+	const cells: BidiCell[] = new Array(cols);
+	for (let x = 0; x < cols; x++) {
+		cells[x] = { codePoint: line.getCodePoint(x), width: line.getWidth(x) };
 	}
+	const getBg = line.getBg?.bind(line);
+	return computeBidiRegions(
+		cells,
+		alignRight,
+		getBg ? panelStart(getBg, cols) : cols,
+	);
+}
+
+function rowFromLine(
+	line: BidiLine,
+	cols: number,
+	renderer?: OverlayRenderer,
+	y?: number,
+	cursorRow?: boolean,
+): BidiRow | null {
+	const row = bidiRowOf(line, cols);
 	try {
 		claimRow(renderer, row, line, cols, y, cursorRow, proportional);
 	} catch {
@@ -426,6 +489,46 @@ export function installBidiArrowKeys(terminal: {
 	};
 	textarea.addEventListener("keydown", onKeyDown, true);
 	return () => textarea.removeEventListener("keydown", onKeyDown, true);
+}
+
+interface SelectionServiceLike {
+	_getMouseBufferCoords?: (event: MouseEvent) => [number, number] | undefined;
+	_bufferService?: {
+		cols: number;
+		buffer: { lines: { get(y: number): BidiLine | undefined } };
+	};
+}
+
+/**
+ * Mouse selection on a reordered row: xterm maps the pointer to the cell
+ * column under it, but that column holds the logical cell drawn there, so a
+ * drag over Hebrew selected different text than the one highlighted. Wraps
+ * xterm's private SelectionService coordinate lookup to return the logical
+ * column. Returns a disposer.
+ */
+export function installBidiMouseSelection(terminal: object): () => void {
+	const service = (
+		terminal as { _core?: { _selectionService?: SelectionServiceLike } }
+	)._core?._selectionService;
+	const original = service?._getMouseBufferCoords;
+	if (!service || typeof original !== "function") return () => {};
+	service._getMouseBufferCoords = function (
+		this: SelectionServiceLike,
+		event: MouseEvent,
+	) {
+		const coords = original.call(this, event);
+		const buffers = this._bufferService;
+		if (!coords || !buffers) return coords;
+		const [x, y] = coords;
+		const line = buffers.buffer.lines.get(y);
+		if (!line || x < 0 || x >= buffers.cols) return coords;
+		const row = bidiRowOf(line, buffers.cols);
+		if (row) coords[0] = row.order[x];
+		return coords;
+	};
+	return () => {
+		service._getMouseBufferCoords = original;
+	};
 }
 
 export interface TerminalBidiHook {
