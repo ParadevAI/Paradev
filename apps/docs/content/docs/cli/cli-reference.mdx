@@ -1946,7 +1946,7 @@ superset mcp tools --plugin slack
 	name="superset mcp call-tool <tool> [arguments]"
 	args={[
 		{ name: "tool", required: true, description: "Tool name, from `superset mcp tools`." },
-		{ name: "arguments", description: "Tool arguments as JSON (default `{}`)." },
+		{ name: "arguments", description: "Tool arguments as JSON (default `{}`), or `-` to read them from stdin." },
 	]}
 	options={[
 		{ flag: "--plugin <name>", required: true, description: "Plugin name, e.g. `slack` or `google-calendar`." },
