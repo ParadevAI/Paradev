@@ -16,8 +16,12 @@ import { shellSingleQuote } from "../setup/config";
 import { removeDevAppProfile } from "./dev-app-profile";
 import {
 	buildTeardownCommandFromShell,
+	commandOutputTail,
 	resolveTeardownCommand,
+	TEARDOWN_OUTPUT_MARKER,
 } from "./teardown";
+
+const MARKER_PREFIX = "printf '\\''\\033]superset;teardown-output\\a'\\''; ";
 
 function isFishAvailable(): boolean {
 	const result = spawnSync("fish", ["-c", "exit 0"], { stdio: "ignore" });
@@ -30,13 +34,54 @@ describe("teardown initial command", () => {
 			"docker compose down && rm -rf .cache",
 		);
 
-		expect(command).toBe("exec bash -c 'docker compose down && rm -rf .cache'");
+		expect(command).toBe(
+			`exec bash -c '${MARKER_PREFIX}docker compose down && rm -rf .cache'`,
+		);
 		expect(command).not.toContain("$?");
 	});
 
 	test("shell-command form single-quote-escapes the command", () => {
 		expect(buildTeardownCommandFromShell("echo 'bye'")).toBe(
-			"exec bash -c 'echo '\\''bye'\\'''",
+			`exec bash -c '${MARKER_PREFIX}echo '\\''bye'\\'''`,
+		);
+	});
+
+	test("bash prints the output marker before the command's own output", () => {
+		const emptyDir = mkdtempSync(join(tmpdir(), "host-service-teardown-"));
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"-c",
+					buildTeardownCommandFromShell("echo hi && ./.superset/teardown.sh"),
+				],
+				{ cwd: emptyDir },
+			);
+
+			expect(result.status).toBe(127);
+			expect(result.stdout.toString()).toBe(`${TEARDOWN_OUTPUT_MARKER}hi\n`);
+			expect(result.stderr.toString()).toContain(
+				"./.superset/teardown.sh: No such file or directory",
+			);
+		} finally {
+			rmSync(emptyDir, { recursive: true, force: true });
+		}
+	});
+
+	test("output tail starts after the marker, dropping shell echo and redraws", () => {
+		const error =
+			"bash: ./.superset/teardown.sh: No such file or directory\r\n";
+		const fishNoise =
+			"\x1b[>4;1m\x1b]133;A\x07~> \x1b[32;1m(base)\x1b[0m\r" +
+			"\re\x1b[32;1m (base)\x1b[0m\r\rex\x1b[32;1m (base)\x1b[0m\r" +
+			`exec bash -c '${MARKER_PREFIX}./.superset/teardown.sh'\r\n` +
+			"\x1b[>4;0m\x1b]133;C\x07";
+
+		expect(
+			commandOutputTail(`${fishNoise}${TEARDOWN_OUTPUT_MARKER}${error}`),
+		).toBe(error);
+		expect(commandOutputTail(`${fishNoise}${error}`)).toBe(
+			`${fishNoise}${error}`,
 		);
 	});
 
@@ -110,8 +155,9 @@ describe("resolveTeardownCommand", () => {
 			});
 
 			expect(resolved).toEqual({
-				initialCommand:
-					"exec bash -c 'docker compose down && bash teardown.sh'",
+				initialCommand: buildTeardownCommandFromShell(
+					"docker compose down && bash teardown.sh",
+				),
 			});
 		} finally {
 			sb.cleanup();
@@ -135,7 +181,7 @@ describe("resolveTeardownCommand", () => {
 			});
 
 			expect(resolved).toEqual({
-				initialCommand: "exec bash -c 'echo configured'",
+				initialCommand: buildTeardownCommandFromShell("echo configured"),
 			});
 		} finally {
 			sb.cleanup();
@@ -214,7 +260,7 @@ describe("resolveTeardownCommand", () => {
 			});
 
 			expect(resolved).toEqual({
-				initialCommand: "exec bash -c 'docker compose down'",
+				initialCommand: buildTeardownCommandFromShell("docker compose down"),
 				cwd: "apps/web",
 			});
 		} finally {

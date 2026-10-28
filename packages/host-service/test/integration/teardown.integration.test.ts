@@ -73,7 +73,7 @@ describe("runTeardown integration", () => {
 		mkdirSync(scriptDir, { recursive: true });
 		writeFileSync(
 			join(scriptDir, "teardown.sh"),
-			`#!/usr/bin/env bash\nprintf ran > ${shellQuote(markerPath)}\n`,
+			`#!/usr/bin/env bash\nprintf ran > ${shellQuote(markerPath)}\necho bye\n`,
 			{ mode: 0o755 },
 		);
 
@@ -93,5 +93,6 @@ describe("runTeardown integration", () => {
 		expect(writes[0]).toStartWith("exec bash ");
 		expect(writes[0]).not.toContain("$?");
 		expect(existsSync(markerPath)).toBe(true);
+		expect(result.status === "ok" && result.output).toBe("bye\n");
 	});
 });
