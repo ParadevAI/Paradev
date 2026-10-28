@@ -2,10 +2,10 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { cp, rename, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
+	findInstalledTree,
 	getBundledMarketplaceDir,
 	type InstalledPluginEntry,
 	pluginCachePath,
-	readInstalledPluginSources,
 	writeInstalledPlugins,
 	writePluginTree,
 } from "@superset/agent-setup";
@@ -135,7 +135,6 @@ export async function seedSandboxPlugins(
 	}
 
 	const root = getBundledMarketplaceDir();
-	const cachedTrees = readInstalledPluginSources() ?? [];
 	const installedAt = new Date().toISOString();
 	const entries: InstalledPluginEntry[] = [];
 	for (const plugin of parsed.data) {
@@ -151,19 +150,20 @@ export async function seedSandboxPlugins(
 			isOrganizationMarketplace(plugin.marketplace)
 				? await cacheOrganizationTree(plugin.name, fetchOrganizationBundle)
 				: undefined;
+		const cached =
+			!shipped && !fetched && isOrganizationMarketplace(plugin.marketplace)
+				? findInstalledTree(plugin.marketplace, plugin.name)
+				: null;
+		const usableCache =
+			cached && existsSync(join(cached.installPath, "plugin.json"))
+				? cached
+				: null;
 		const version = shipped
 			? treeVersion(dir, plugin.version)
-			: (fetched?.version ?? plugin.version);
+			: (fetched?.version ?? usableCache?.version ?? plugin.version);
 		const installPath = shipped
 			? await cacheShippedTree(dir, plugin.marketplace, plugin.name, version)
-			: (fetched?.installPath ??
-				(isOrganizationMarketplace(plugin.marketplace)
-					? cachedTrees.find(
-							(tree) =>
-								tree.name === plugin.name &&
-								existsSync(join(tree.dir, "plugin.json")),
-						)?.dir
-					: undefined));
+			: (fetched?.installPath ?? usableCache?.installPath);
 		const tools =
 			installPath && isOrganizationMarketplace(plugin.marketplace)
 				? manifestHasTools(readManifest(join(installPath, "plugin.json")))

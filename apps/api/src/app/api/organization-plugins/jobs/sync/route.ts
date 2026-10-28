@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import {
+	ORGANIZATION_PLUGIN_SYNC_PATH,
 	syncAllOrganizationPluginSources,
 	syncOrganizationPluginSource,
 } from "@superset/trpc/lib/organization-plugins";
@@ -12,7 +13,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
-const SYNC_PATH = "/api/organization-plugins/jobs/sync";
 
 async function enqueueSource(sourceId: string): Promise<void> {
 	if (env.NODE_ENV === "development") {
@@ -20,7 +20,7 @@ async function enqueueSource(sourceId: string): Promise<void> {
 		return;
 	}
 	await qstash.publishJSON({
-		url: `${env.NEXT_PUBLIC_API_URL}${SYNC_PATH}`,
+		url: `${env.NEXT_PUBLIC_API_URL}${ORGANIZATION_PLUGIN_SYNC_PATH}`,
 		body: { sourceId },
 		retries: 3,
 	});
@@ -38,7 +38,7 @@ export async function POST(request: Request): Promise<Response> {
 	const rejected = await verifyQstashRequest(
 		request,
 		body,
-		"/api/organization-plugins/jobs/sync",
+		ORGANIZATION_PLUGIN_SYNC_PATH,
 	);
 	if (rejected) return rejected;
 
@@ -55,6 +55,7 @@ export async function POST(request: Request): Promise<Response> {
 
 	if (parsed.data.sourceId) {
 		const outcome = await syncOrganizationPluginSource(parsed.data.sourceId);
+		if (!outcome) return Response.json({ ok: true, removed: true });
 		return Response.json({ ok: !outcome.error, ...outcome });
 	}
 	const outcome = await Sentry.withMonitor(

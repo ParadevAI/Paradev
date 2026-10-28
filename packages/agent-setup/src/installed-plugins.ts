@@ -15,6 +15,7 @@ export function installedPluginsFilePath(): string {
 interface InstalledPluginRecord {
 	name?: unknown;
 	marketplace?: unknown;
+	version?: unknown;
 	installPath?: unknown;
 	enabled?: unknown;
 	tools?: unknown;
@@ -76,6 +77,22 @@ export interface InstalledPluginEntry {
 	enabled: boolean;
 	/** False for an organization plugin with only skills: no MCP entry is written for it. */
 	tools?: boolean;
+}
+
+/** A plugin tree this machine already holds, by marketplace and name. */
+export function findInstalledTree(
+	marketplace: string,
+	name: string,
+	file: string = installedPluginsFilePath(),
+): { version: string; installPath: string } | null {
+	const record = readLedgerRecords(file)?.find(
+		(entry) => entry.marketplace === marketplace && entry.name === name,
+	);
+	return typeof record?.version === "string" &&
+		typeof record.installPath === "string" &&
+		record.installPath
+		? { version: record.version, installPath: record.installPath }
+		: null;
 }
 
 export function writeInstalledPlugins(

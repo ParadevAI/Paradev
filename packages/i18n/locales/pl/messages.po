@@ -13351,9 +13351,6 @@ msgstr "Właściciel"
 msgid "Owner access required"
 msgstr "Wymagany dostęp właściciela"
 
-msgid "owner/name"
-msgstr "właściciel/nazwa"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Jest właścicielem każdej sesji PTY i przeżywa restarty aplikacji."
 

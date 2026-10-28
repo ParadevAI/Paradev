@@ -51,6 +51,9 @@ describe("plugin bundles", () => {
 			".git/config",
 			"node_modules/x/index.js",
 			"hooks/pre.sh",
+			"plugin.json/x",
+			"skills/a/node_modules/x/index.js",
+			"skills/a/.git/config",
 		]) {
 			expect(() =>
 				unpackPluginBundle(

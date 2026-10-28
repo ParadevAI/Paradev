@@ -92,6 +92,7 @@ export {
 } from "./disabled-skills";
 export {
 	type EnabledPlugin,
+	findInstalledTree,
 	type InstalledPluginEntry,
 	installedPluginsFilePath,
 	readEnabledPlugins,

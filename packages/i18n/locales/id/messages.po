@@ -13351,9 +13351,6 @@ msgstr "Pemilik"
 msgid "Owner access required"
 msgstr "Akses pemilik diperlukan"
 
-msgid "owner/name"
-msgstr "pemilik/nama"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Memiliki setiap sesi PTY dan bertahan saat aplikasi dimulai ulang."
 

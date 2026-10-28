@@ -13351,9 +13351,6 @@ msgstr "Sahip"
 msgid "Owner access required"
 msgstr "Sahip erişimi gerekli"
 
-msgid "owner/name"
-msgstr "sahip/ad"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Her PTY oturumunun sahibidir ve uygulama yeniden başlatmalarından sağ çıkar."
 

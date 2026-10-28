@@ -420,7 +420,6 @@ export const pluginsRouter = createTRPCRouter({
 					: row.latest;
 			return {
 				...describe(row.manifest as PluginManifest, row.marketplace),
-				...(row.organizationPluginId ? { version: row.version } : {}),
 				connector: slug ?? null,
 				installed: true,
 				enabled: row.enabled,

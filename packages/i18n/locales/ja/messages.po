@@ -13351,9 +13351,6 @@ msgstr "オーナー"
 msgid "Owner access required"
 msgstr "オーナー権限が必要"
 
-msgid "owner/name"
-msgstr "オーナー/名前"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "すべてのPTYセッションを保持し、アプリの再起動後も動き続けます。"
 

@@ -21,6 +21,7 @@ import {
 import {
 	accessibleTo,
 	memberRole,
+	ORGANIZATION_PLUGIN_SYNC_PATH,
 	organizationBundleKey,
 	syncOrganizationPluginSource,
 } from "../../lib/organization-plugins";
@@ -32,9 +33,6 @@ import { requireActiveOrgId } from "../utils/active-org";
 import { type PluginManifest, pluginConnector } from "./manifest";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
-
-export const ORGANIZATION_PLUGIN_SYNC_PATH =
-	"/api/organization-plugins/jobs/sync";
 
 function unknown(name: string) {
 	return userError({

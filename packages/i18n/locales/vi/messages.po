@@ -13351,9 +13351,6 @@ msgstr "Chủ sở hữu"
 msgid "Owner access required"
 msgstr "Cần quyền chủ sở hữu"
 
-msgid "owner/name"
-msgstr "chủ sở hữu/tên"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Sở hữu mọi phiên PTY và tồn tại qua các lần khởi động lại ứng dụng."
 

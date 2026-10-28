@@ -27,6 +27,7 @@ describe("parseMarketplace", () => {
 					{ name: "remote", source: { source: "github", repo: "a/b" } },
 					{ name: "local", source: { source: "local", path: "./plugins/a" } },
 					{ name: "bare", source: "plugins/a" },
+					{ name: "everything", source: "./" },
 					{ name: "escape", source: "./../secrets" },
 				],
 			},
@@ -37,6 +38,7 @@ describe("parseMarketplace", () => {
 			"remote",
 			"local",
 			"bare",
+			"everything",
 			"escape",
 		]);
 	});

@@ -157,7 +157,7 @@ export function AddPluginSourceDialog({
 							<>
 								<Input
 									id={appRepositories ? undefined : "plugin-source-repo"}
-									placeholder={t({ message: "owner/name" })}
+									placeholder="owner/name"
 									value={typedRepo}
 									onChange={(event) => setTypedRepo(event.target.value)}
 								/>

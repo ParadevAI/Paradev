@@ -521,20 +521,31 @@ export async function installPlugin(
 	};
 }
 
+/** The ledger with this plugin recorded, keeping a member's choice to disable it. */
+export function ledgerWithPlugin(
+	ledger: readonly InstalledPlugin[],
+	plugin: Omit<InstallPluginResult, "skills">,
+	installedAt: string,
+): InstalledPlugin[] {
+	const existing = ledger.find(
+		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
+	);
+	return [
+		...ledger.filter((p) => p !== existing),
+		{
+			...plugin,
+			installedAt,
+			enabled: existing?.enabled ?? true,
+		} satisfies InstalledPlugin,
+	];
+}
+
 export async function recordPlugin(
 	plugin: Omit<InstallPluginResult, "skills">,
 ): Promise<InstallPluginResult> {
-	const all = readInstalledPlugins();
-	const existing = all.find(
-		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
+	writeInstalledPlugins(
+		ledgerWithPlugin(readInstalledPlugins(), plugin, new Date().toISOString()),
 	);
-	const plugins = all.filter((p) => p !== existing);
-	plugins.push({
-		...plugin,
-		installedAt: new Date().toISOString(),
-		enabled: existing?.enabled ?? true,
-	} satisfies InstalledPlugin);
-	writeInstalledPlugins(plugins);
 
 	return { ...plugin, skills: (await syncPlugins()).skills };
 }

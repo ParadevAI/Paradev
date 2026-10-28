@@ -7,6 +7,7 @@ export interface RepositorySnapshot {
 	sha: string;
 	paths: ReadonlySet<string>;
 	executable?: ReadonlySet<string>;
+	sizes?: ReadonlyMap<string, number>;
 	read(path: string): Promise<Buffer>;
 }
 
@@ -56,7 +57,13 @@ export async function repositorySnapshot(args: {
 	);
 	const tree = await github<{
 		truncated: boolean;
-		tree: { path?: string; type?: string; sha?: string; mode?: string }[];
+		tree: {
+			path?: string;
+			type?: string;
+			sha?: string;
+			mode?: string;
+			size?: number;
+		}[];
 	}>(`/git/trees/${sha}?recursive=1`);
 	if (tree.truncated) {
 		throw new Error(
@@ -66,10 +73,13 @@ export async function repositorySnapshot(args: {
 
 	const blobs = new Map<string, string>();
 	const executable = new Set<string>();
+	const sizes = new Map<string, number>();
 	for (const entry of tree.tree) {
-		if (entry.type === "blob" && entry.path && entry.sha) {
+		const isSymlink = entry.mode === "120000";
+		if (entry.type === "blob" && entry.path && entry.sha && !isSymlink) {
 			blobs.set(entry.path, entry.sha);
 			if (entry.mode === "100755") executable.add(entry.path);
+			if (typeof entry.size === "number") sizes.set(entry.path, entry.size);
 		}
 	}
 
@@ -77,6 +87,7 @@ export async function repositorySnapshot(args: {
 		sha,
 		paths: new Set(blobs.keys()),
 		executable,
+		sizes,
 		async read(path) {
 			const blob = blobs.get(path);
 			if (!blob) throw new Error(`${path} is not in ${args.repo}@${sha}`);

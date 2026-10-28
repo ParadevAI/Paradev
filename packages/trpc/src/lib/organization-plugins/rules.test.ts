@@ -63,11 +63,26 @@ describe("organizationPluginProblem", () => {
 			"https://192.168.1.2/mcp",
 			"https://[::1]/mcp",
 			"https://db.internal/mcp",
+			"https://localhost./mcp",
+			"https://db.internal./mcp",
+			"https://metadata/computeMetadata",
+			"https://[::127.0.0.1]/mcp",
 		]) {
 			expect(organizationPluginProblem(manifest(mcp(url)))).toContain(
 				"private or internal",
 			);
 		}
+	});
+});
+
+describe("organizationPluginProblem with an input in the host", () => {
+	test("refuses a host the member's input would decide", () => {
+		const url = ["https://", "$", "{inputs.host}/mcp"].join("");
+		expect(
+			organizationPluginProblem(
+				manifest({ mcp: { type: "streamable-http", url } }),
+			),
+		).not.toBeNull();
 	});
 });
 

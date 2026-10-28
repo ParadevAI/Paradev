@@ -24,8 +24,13 @@ export function joinRepoPath(...parts: string[]): string {
 		.join("/");
 }
 
+/** A plugin's own directory below the marketplace; the marketplace directory itself would bundle every plugin in it. */
 function localDir(base: string, source: string): string | null {
-	if (!source.startsWith("./") || source.split("/").includes("..")) {
+	if (
+		!source.startsWith("./") ||
+		source.split("/").includes("..") ||
+		!joinRepoPath(source)
+	) {
 		return null;
 	}
 	return joinRepoPath(base, source);
@@ -61,7 +66,8 @@ export function parseMarketplace(
 		if (dir === null) {
 			problems.push({
 				name,
-				reason: "its source is not a directory in this repository",
+				reason:
+					"its source is not a ./ directory below the marketplace file in this repository",
 			});
 			continue;
 		}

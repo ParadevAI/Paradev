@@ -140,6 +140,51 @@ describe("seedSandboxPlugins", () => {
 		).toBe(0);
 	});
 
+	it("keeps an organization plugin's cached tree when its download fails", async () => {
+		const marketplace = "organization-org-1";
+		const cached = pluginCachePath(marketplace, "team-tools", "2.0.0");
+		mkdirSync(cached, { recursive: true });
+		writeFileSync(join(cached, "plugin.json"), '{"name":"team-tools"}');
+		mkdirSync(join(home, "plugins"), { recursive: true });
+		writeFileSync(
+			join(home, "plugins", "installed_plugins.json"),
+			JSON.stringify({
+				version: 1,
+				plugins: [
+					{
+						marketplace: "acme",
+						name: "team-tools",
+						version: "9.0.0",
+						installPath: "/elsewhere",
+					},
+					{
+						marketplace,
+						name: "team-tools",
+						version: "2.0.0",
+						installPath: cached,
+					},
+				],
+			}),
+		);
+
+		await seedSandboxPlugins(
+			{
+				SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+					{ marketplace, name: "team-tools", version: "3.0.0", enabled: true },
+				]),
+			},
+			async () => {
+				throw new Error("offline");
+			},
+		);
+
+		expect(ledger().plugins[0]).toMatchObject({
+			marketplace,
+			version: "2.0.0",
+			installPath: cached,
+		});
+	});
+
 	it("leaves no partial tree behind when the copy fails", async () => {
 		shipPlugin("linear", "1.3.0");
 		const cached = pluginCachePath("superset", "linear", "1.3.0");

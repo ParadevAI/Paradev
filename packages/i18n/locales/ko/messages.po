@@ -13351,9 +13351,6 @@ msgstr "소유자"
 msgid "Owner access required"
 msgstr "소유자 권한 필요"
 
-msgid "owner/name"
-msgstr "소유자/이름"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "모든 PTY 세션을 소유하며 앱을 다시 시작해도 살아 있습니다."
 

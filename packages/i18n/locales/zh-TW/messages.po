@@ -13351,9 +13351,6 @@ msgstr "擁有者"
 msgid "Owner access required"
 msgstr "需要擁有者權限"
 
-msgid "owner/name"
-msgstr "擁有者/名稱"
-
 msgid "Owns every PTY session and survives app restarts."
 msgstr "持有所有PTY會話，並在應用重啟後繼續存活。"
 

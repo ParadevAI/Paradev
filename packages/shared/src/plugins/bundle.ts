@@ -2,14 +2,15 @@ import { createHash } from "node:crypto";
 import { gunzipSync, gzipSync } from "node:zlib";
 
 export const PLUGIN_BUNDLE_MAX_BYTES = 2 * 1024 * 1024;
-const PLUGIN_BUNDLE_MAX_UNPACKED_BYTES = 16 * 1024 * 1024;
-const PLUGIN_BUNDLE_MAX_FILES = 500;
+export const PLUGIN_BUNDLE_MAX_UNPACKED_BYTES = 16 * 1024 * 1024;
+export const PLUGIN_BUNDLE_MAX_FILES = 500;
 const PLUGIN_BUNDLE_FORMAT = 2;
 const READABLE_FORMATS = new Set([1, 2]);
 
-/** Top-level folders a plugin bundle leaves out. Hooks are not run, so they are not carried. */
-export const PLUGIN_TREE_EXCLUDED = [".git", "node_modules", "hooks"] as const;
-
+/** Folders a plugin bundle leaves out at any depth. */
+const EXCLUDED_DIRS = new Set([".git", "node_modules"]);
+/** Hooks are not run, so the plugin's top-level hooks folder is not carried. */
+const EXCLUDED_TOP_LEVEL = new Set(["hooks"]);
 const EXCLUDED_FILES = new Set([".DS_Store"]);
 
 export interface PluginTree {
@@ -22,7 +23,8 @@ export function isPluginTreePath(path: string): boolean {
 	const segments = path.split("/");
 	return (
 		Boolean(path) &&
-		!(PLUGIN_TREE_EXCLUDED as readonly string[]).includes(segments[0] ?? "") &&
+		!EXCLUDED_TOP_LEVEL.has(segments[0] ?? "") &&
+		!segments.slice(0, -1).some((segment) => EXCLUDED_DIRS.has(segment)) &&
 		!EXCLUDED_FILES.has(segments[segments.length - 1] ?? "")
 	);
 }
@@ -33,13 +35,30 @@ export function pluginBundleHash(bundle: Uint8Array): string {
 	return createHash("sha256").update(bundle).digest("hex");
 }
 
+/** A hash of the files themselves, which stays the same when only the packing changes. */
+export function pluginTreeHash(tree: {
+	files: ReadonlyMap<string, Uint8Array>;
+	executable: ReadonlySet<string>;
+}): string {
+	const hash = createHash("sha256");
+	for (const path of [...tree.files.keys()].sort()) {
+		const data = tree.files.get(path) as Uint8Array;
+		hash.update(
+			`${path}\0${tree.executable.has(path) ? 1 : 0}\0${data.length}\0`,
+		);
+		hash.update(data);
+	}
+	return hash.digest("hex");
+}
+
 function assertTreePath(path: string): void {
 	const segments = path.split("/");
 	if (
 		!isPluginTreePath(path) ||
 		path.includes("\\") ||
 		path.includes("\0") ||
-		segments.some((s) => !s || s === "." || s === "..")
+		segments.some((s) => !s || s === "." || s === "..") ||
+		(segments[0] === "plugin.json" && segments.length > 1)
 	) {
 		throw new PluginBundleError(`"${path}" is not a path a plugin may carry`);
 	}
