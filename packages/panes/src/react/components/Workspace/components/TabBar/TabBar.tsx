@@ -25,7 +25,12 @@ import type { Tab } from "../../../../../types";
 import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
-import { computeInsertIndex, scrollLeftToRevealTab, TAB_WIDTH } from "./utils";
+import {
+	computeInsertIndex,
+	scrollLeftToRevealTab,
+	TAB_BAR_FADE_WIDTH,
+	TAB_WIDTH,
+} from "./utils";
 
 interface TabBarProps<TData> {
 	store: StoreApi<WorkspaceStore<TData>>;
@@ -127,8 +132,9 @@ export function TabBar<TData>({
 			activeTabIndex,
 			scroller.scrollLeft,
 			scroller.clientWidth,
+			TAB_BAR_FADE_WIDTH,
 		);
-		if (next !== null) scroller.scrollLeft = next;
+		if (next !== null) scroller.scrollTo({ left: next, behavior: "smooth" });
 	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);
@@ -280,14 +286,14 @@ export function TabBar<TData>({
 							style={{ left: insertLineLeft }}
 						/>
 					)}
-					<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
-						{!hasHorizontalOverflow && (
+					{!hasHorizontalOverflow && (
+						<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
 							<AddTabButton
 								renderAddTabMenu={renderAddTabMenu}
 								onAddTab={onAddTab}
 							/>
-						)}
-					</div>
+						</div>
+					)}
 					{/* Empty space to the right of the tabs (collapses to 0 when the
 					    tabs overflow); the bar's only window-drag region. */}
 					<div className="drag h-full flex-1 border-b border-border" />

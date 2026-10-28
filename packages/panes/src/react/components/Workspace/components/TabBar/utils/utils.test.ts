@@ -10,4 +10,10 @@ describe("scrollLeftToRevealTab", () => {
 		);
 		expect(scrollLeftToRevealTab(0, TAB_WIDTH * 2, viewport)).toBe(0);
 	});
+
+	test("keeps the end inset clear so the edge fade doesn't cover the tab", () => {
+		const viewport = TAB_WIDTH * 3;
+		expect(scrollLeftToRevealTab(2, 0, viewport, 24)).toBe(24);
+		expect(scrollLeftToRevealTab(1, 0, viewport, 24)).toBeNull();
+	});
 });
