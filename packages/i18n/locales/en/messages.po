@@ -5592,6 +5592,9 @@ msgstr "Couldn't load earlier messages. Retry"
 msgid "Couldn't load issues: {msg}"
 msgstr "Couldn't load issues: {msg}"
 
+msgid "Couldn't load its activity"
+msgstr "Couldn't load its activity"
+
 msgid "Couldn't load pages"
 msgstr "Couldn't load pages"
 
