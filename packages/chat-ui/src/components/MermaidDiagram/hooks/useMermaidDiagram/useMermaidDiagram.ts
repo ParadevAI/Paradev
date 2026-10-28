@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMermaidRenderer } from "../../providers/MermaidRendererProvider";
-import type { MermaidDiagramState, MermaidTheme } from "../../types";
-import { mermaidThemeConfig } from "../../utils/mermaidThemeConfig";
+import type { MermaidDiagramState } from "../../types";
 
 type Outcome = Extract<MermaidDiagramState, { status: "ready" | "error" }>;
 type Entry = { promise: Promise<Outcome>; outcome: Outcome | null };
@@ -12,17 +11,17 @@ const cache = new Map<string, Entry>();
 const IDLE: MermaidDiagramState = { status: "idle" };
 const RENDERING: MermaidDiagramState = { status: "rendering" };
 
-/** Mermaid explains a parse error over several lines; the first one names it. */
+/** A parse error runs over several lines; the first one names it. */
 function errorLine(error: unknown): string {
 	const message = error instanceof Error ? error.message : String(error);
 	return message.split("\n")[0]?.trim().replace(/:$/, "") ?? "";
 }
 
-function draw(key: string, run: () => Promise<string>): Entry {
-	const cached = cache.get(key);
+function draw(source: string, run: () => Promise<string>): Entry {
+	const cached = cache.get(source);
 	if (cached) {
-		cache.delete(key);
-		cache.set(key, cached);
+		cache.delete(source);
+		cache.set(source, cached);
 		return cached;
 	}
 	const entry: Entry = {
@@ -38,7 +37,7 @@ function draw(key: string, run: () => Promise<string>): Entry {
 	void entry.promise.then((outcome) => {
 		entry.outcome = outcome;
 	});
-	cache.set(key, entry);
+	cache.set(source, entry);
 	if (cache.size > MAX_CACHED) {
 		const oldest = cache.keys().next().value;
 		if (oldest !== undefined) cache.delete(oldest);
@@ -48,36 +47,28 @@ function draw(key: string, run: () => Promise<string>): Entry {
 
 /**
  * Draws `source` with the current renderer. A finished drawing is kept per
- * source and theme, so a block that remounts shows it at once.
+ * source, so a block that remounts shows it at once.
  */
-export function useMermaidDiagram(
-	source: string | null,
-	theme: MermaidTheme,
-): MermaidDiagramState {
+export function useMermaidDiagram(source: string | null): MermaidDiagramState {
 	const renderer = useMermaidRenderer();
-	const config = useMemo(() => mermaidThemeConfig(theme), [theme]);
-	const key = useMemo(
-		() => (source === null ? null : `${JSON.stringify(config)}\u0000${source}`),
-		[config, source],
-	);
 	const [settled, setSettled] = useState<{
-		key: string;
+		source: string;
 		outcome: Outcome;
 	} | null>(null);
 
 	useEffect(() => {
-		if (key === null || source === null) return;
-		const entry = draw(key, () => renderer(source, config));
+		if (source === null) return;
+		const entry = draw(source, () => renderer(source));
 		let cancelled = false;
 		void entry.promise.then((outcome) => {
-			if (!cancelled) setSettled({ key, outcome });
+			if (!cancelled) setSettled({ source, outcome });
 		});
 		return () => {
 			cancelled = true;
 		};
-	}, [key, source, config, renderer]);
+	}, [source, renderer]);
 
-	if (key === null) return IDLE;
-	if (settled?.key === key) return settled.outcome;
-	return cache.get(key)?.outcome ?? RENDERING;
+	if (source === null) return IDLE;
+	if (settled?.source === source) return settled.outcome;
+	return cache.get(source)?.outcome ?? RENDERING;
 }

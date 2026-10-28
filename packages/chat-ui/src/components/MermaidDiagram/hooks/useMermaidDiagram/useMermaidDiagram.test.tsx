@@ -19,11 +19,10 @@ afterAll(async () => {
 	if (!alreadyRegistered) await GlobalRegistrator.unregister();
 });
 
-const THEME = { appearance: "light" } as const;
 const settle = () => act(() => new Promise((done) => setTimeout(done, 0)));
 
 function renderDiagram(renderer: MermaidRenderer, source: string | null) {
-	return renderHook(({ text }) => useMermaidDiagram(text, THEME), {
+	return renderHook(({ text }) => useMermaidDiagram(text), {
 		initialProps: { text: source },
 		wrapper: ({ children }) => (
 			<MermaidRendererProvider renderer={renderer}>
@@ -33,7 +32,7 @@ function renderDiagram(renderer: MermaidRenderer, source: string | null) {
 	});
 }
 
-test("draws nothing without a source and draws a source once per theme", async () => {
+test("draws nothing without a source and draws a source once", async () => {
 	const calls: string[] = [];
 	const renderer: MermaidRenderer = async (source) => {
 		calls.push(source);

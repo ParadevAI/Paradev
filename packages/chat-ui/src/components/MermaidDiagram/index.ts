@@ -5,10 +5,4 @@ export {
 	MermaidRendererProvider,
 	useMermaidRenderer,
 } from "./providers/MermaidRendererProvider";
-export type {
-	MermaidAppearance,
-	MermaidDiagramState,
-	MermaidRenderer,
-	MermaidTheme,
-	MermaidThemeColors,
-} from "./types";
+export type { MermaidDiagramState, MermaidRenderer } from "./types";

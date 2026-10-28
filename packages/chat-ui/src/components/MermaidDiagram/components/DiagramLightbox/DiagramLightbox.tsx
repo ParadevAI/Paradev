@@ -12,6 +12,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { OverlayButton } from "../../../OverlayButton";
+import "../../mermaid-diagram.css";
 import { svgSize } from "./utils/svgSize";
 
 const MIN_SCALE = 0.25;
@@ -181,7 +182,7 @@ export function DiagramLightbox({
 			>
 				<div
 					className="absolute top-0 left-0 origin-top-left rounded-lg bg-background [&_svg]:!h-full [&_svg]:!w-full [&_svg]:!max-w-none"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: Mermaid sanitises its own output under its strict security level
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: the renderer escapes labels and the markup passed through sanitizeSvg
 					dangerouslySetInnerHTML={{ __html: svg }}
 					data-diagram-scale={view.scale}
 					style={{

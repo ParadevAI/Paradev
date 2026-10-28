@@ -7,8 +7,7 @@ import {
 import { ViewToggle } from "@superset/chat-ui/ViewToggle";
 import { cn } from "@superset/ui/utils";
 import { Maximize2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useResolvedTheme } from "renderer/stores/theme";
+import { useState } from "react";
 import { useIsCodeFenceIncomplete } from "streamdown";
 import { CopyButton } from "../../../CopyButton";
 import { CODE_CARD_CLASSNAME, FENCE_BUTTON_CLASSNAME } from "../../constants";
@@ -17,7 +16,6 @@ import { FenceButton } from "../FenceButton";
 import { FenceCode } from "../FenceCode";
 import { FenceHeader } from "../FenceHeader";
 import { WrapLinesButton } from "../WrapLinesButton";
-import { mermaidTheme } from "./utils/mermaidTheme";
 
 type View = "diagram" | "code";
 
@@ -27,13 +25,11 @@ type View = "diagram" | "code";
  */
 export function MermaidBlock({ fence, text }: { fence: Fence; text: string }) {
 	const { t } = useLingui();
-	const theme = useResolvedTheme();
-	const diagramTheme = useMemo(() => mermaidTheme(theme), [theme]);
 	const incomplete = useIsCodeFenceIncomplete();
 	const [view, setView] = useState<View>("diagram");
 	const [wrap, setWrap] = useState(false);
 	const [expanded, setExpanded] = useState(false);
-	const diagram = useMermaidDiagram(incomplete ? null : text, diagramTheme);
+	const diagram = useMermaidDiagram(incomplete ? null : text);
 	const drawn = diagram.status === "ready" ? diagram.svg : null;
 	const failed = diagram.status === "error";
 	const reason = failed ? diagram.error : "";

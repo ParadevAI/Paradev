@@ -1,1 +1,0 @@
-export { mermaidTheme } from "./mermaidTheme";
