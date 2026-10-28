@@ -1,18 +1,9 @@
 import { createHash } from "node:crypto";
 import { PLUGIN_TREE_ENTRIES } from "@superset/shared/plugins/bundle";
 
-/** Superset's own catalog first, then the Codex and Claude Code locations, so one repository can serve all three. */
-export const MARKETPLACE_FILES = [
-	".agent-marketplace.json",
-	".agents/plugins/marketplace.json",
-	".claude-plugin/marketplace.json",
-] as const;
+export const MARKETPLACE_FILE = ".agent-marketplace.json";
 
-const MANIFEST_FILES = [
-	"plugin.json",
-	".codex-plugin/plugin.json",
-	".claude-plugin/plugin.json",
-] as const;
+const MANIFEST_FILE = "plugin.json";
 
 export interface MarketplaceEntry {
 	name: string;
@@ -33,36 +24,22 @@ export function joinRepoPath(...parts: string[]): string {
 		.join("/");
 }
 
-function localDir(
-	base: string,
-	source: string,
-	pluginRoot: string | undefined,
-): string | null {
-	const relative = source.startsWith("./")
-		? source
-		: pluginRoot
-			? `${pluginRoot}/${source}`
-			: null;
-	if (!relative || relative.split("/").includes("..")) return null;
-	return joinRepoPath(base, relative);
+function localDir(base: string, source: string): string | null {
+	if (!source.startsWith("./") || source.split("/").includes("..")) {
+		return null;
+	}
+	return joinRepoPath(base, source);
 }
 
-/** The plugins a marketplace file lists, each resolved to a directory in the repository. Only plugins inside the repository can be synced. */
+/** The plugins a marketplace file lists, each resolved to a `./` directory in the repository. Only plugins inside the repository can be synced. */
 export function parseMarketplace(
 	raw: unknown,
 	base: string,
 ): { entries: MarketplaceEntry[]; problems: MarketplaceProblem[] } {
-	const catalog = (raw ?? {}) as {
-		plugins?: unknown;
-		metadata?: { pluginRoot?: unknown };
-	};
+	const catalog = (raw ?? {}) as { plugins?: unknown };
 	if (!Array.isArray(catalog.plugins)) {
 		throw new Error("the marketplace file has no plugins list");
 	}
-	const pluginRoot =
-		typeof catalog.metadata?.pluginRoot === "string"
-			? catalog.metadata.pluginRoot
-			: undefined;
 
 	const entries: MarketplaceEntry[] = [];
 	const problems: MarketplaceProblem[] = [];
@@ -79,17 +56,8 @@ export function parseMarketplace(
 			problems.push({ name: "?", reason: "an entry has no name" });
 			continue;
 		}
-		const source = item.source as
-			| string
-			| { source?: unknown; path?: unknown }
-			| undefined;
-		const path =
-			typeof source === "string"
-				? source
-				: source?.source === "local" && typeof source.path === "string"
-					? source.path
-					: null;
-		const dir = path === null ? null : localDir(base, path, pluginRoot);
+		const dir =
+			typeof item.source === "string" ? localDir(base, item.source) : null;
 		if (dir === null) {
 			problems.push({
 				name,
@@ -114,22 +82,16 @@ export function findMarketplaceFile(
 	paths: ReadonlySet<string>,
 	base: string,
 ): string | null {
-	for (const file of MARKETPLACE_FILES) {
-		const path = joinRepoPath(base, file);
-		if (paths.has(path)) return path;
-	}
-	return null;
+	const path = joinRepoPath(base, MARKETPLACE_FILE);
+	return paths.has(path) ? path : null;
 }
 
 export function findManifestFile(
 	paths: ReadonlySet<string>,
 	dir: string,
 ): string | null {
-	for (const file of MANIFEST_FILES) {
-		const path = joinRepoPath(dir, file);
-		if (paths.has(path)) return path;
-	}
-	return null;
+	const path = joinRepoPath(dir, MANIFEST_FILE);
+	return paths.has(path) ? path : null;
 }
 
 /** Repository path to the path it takes in a plugin bundle, for every file a plugin carries besides its manifest. */
@@ -154,7 +116,7 @@ export function pluginTreeFiles(
 	return out;
 }
 
-/** Codex and Claude Code manifests may leave out a version; the content then names it, so an unchanged plugin keeps its version across syncs. */
+/** A plugin with no version gets one from its content, so an unchanged plugin keeps its version across syncs. */
 export function withVersion(
 	manifest: Record<string, unknown>,
 	files: ReadonlyMap<string, Uint8Array>,

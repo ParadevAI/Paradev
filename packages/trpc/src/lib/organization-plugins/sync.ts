@@ -16,7 +16,7 @@ import { type RepositorySnapshot, readAll, repositorySnapshot } from "./github";
 import {
 	findManifestFile,
 	findMarketplaceFile,
-	MARKETPLACE_FILES,
+	MARKETPLACE_FILE,
 	type MarketplaceEntry,
 	type MarketplaceProblem,
 	parseMarketplace,
@@ -135,7 +135,7 @@ export async function syncOrganizationPluginSource(
 		const file = findMarketplaceFile(snapshot.paths, source.path);
 		if (!file) {
 			throw new Error(
-				`no marketplace file (${MARKETPLACE_FILES.join(", ")}) at ${source.path || "the repository root"}`,
+				`no ${MARKETPLACE_FILE} at ${source.path || "the repository root"}`,
 			);
 		}
 		let raw: unknown;

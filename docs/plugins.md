@@ -135,10 +135,9 @@ than store a token. pdev needs a build with `headersHelper` support; older build
 ## Organization plugins
 
 An organization gets its own plugins from a GitHub repository. An owner or admin adds the
-repository as a source (repository, ref, path). Sync reads the marketplace file in any of three
-layouts: `.agent-marketplace.json`, `.agents/plugins/marketplace.json` or
-`.claude-plugin/marketplace.json`. It packs each plugin's `plugin.json`, `skills/` and `commands/`
-into a bundle, stored in the `organization_plugins` table under a marketplace named
+repository as a source (repository, ref, path). Sync reads `.agent-marketplace.json` at that path,
+the same format as this repository's marketplace: each plugin's `source` is a `./` directory in the
+repository. It packs each plugin's `plugin.json`, `skills/` and `commands/` into a bundle, stored in the `organization_plugins` table under a marketplace named
 `organization-<organization id>`. Two organizations' same-named plugins never share an install.
 
 Sync runs daily from a QStash schedule that queues one job per source, or on demand with "Sync now".
