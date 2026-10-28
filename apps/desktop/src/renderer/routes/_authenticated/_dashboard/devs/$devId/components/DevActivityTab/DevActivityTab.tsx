@@ -1,11 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
 import type { RouterOutputs } from "@superset/trpc";
-import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { useNavigate } from "@tanstack/react-router";
-import { LuCheck, LuCircleStop, LuLoader, LuX } from "react-icons/lu";
+import { LuLoader } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
+import { TurnStatus } from "./components/TurnStatus";
 
 type Turn = RouterOutputs["agent"]["activity"]["turns"][number];
 
@@ -14,7 +14,6 @@ interface DevActivityTabProps {
 	onOpenChat: () => void;
 }
 
-/** Everything the Dev did that the reader can see, newest first. Each row opens where it happened. */
 export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -55,6 +54,20 @@ export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 		return (
 			<div className="flex flex-1 justify-center py-10 text-muted-foreground">
 				<LuLoader className="size-4 animate-spin" />
+			</div>
+		);
+	}
+	if (query.isError) {
+		return (
+			<div className="flex flex-col items-start gap-2 px-6 pt-6 text-sm text-muted-foreground">
+				<Trans>Couldn't load its activity</Trans>
+				<button
+					type="button"
+					onClick={() => void query.refetch()}
+					className="rounded-md px-2 py-1 text-foreground hover:bg-fill-hover"
+				>
+					<Trans>Try again</Trans>
+				</button>
 			</div>
 		);
 	}
@@ -102,15 +115,6 @@ export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 			</div>
 		</div>
 	);
-}
-
-function TurnStatus({ status }: { status: Turn["status"] }) {
-	if (status === "running")
-		return <WaveSpinner className="text-foreground/80" />;
-	if (status === "completed")
-		return <LuCheck className="size-3.5 text-green-500" />;
-	if (status === "interrupted") return <LuCircleStop className="size-3.5" />;
-	return <LuX className="size-3.5 text-red-500" />;
 }
 
 function durationOf(startedAt: Date | string, settledAt: Date | string) {

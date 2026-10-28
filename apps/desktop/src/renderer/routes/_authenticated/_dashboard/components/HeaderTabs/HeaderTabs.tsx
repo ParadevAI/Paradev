@@ -6,7 +6,6 @@ interface HeaderTabsProps<T extends string> {
 	onChange: (value: T) => void;
 }
 
-/** The small segmented tabs next to a page title, as channels show Messages and Tasks. */
 export function HeaderTabs<T extends string>({
 	tabs,
 	value,

@@ -9,7 +9,7 @@ import {
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { agentNotFound } from "./access";
-import { announceAgentsChanged } from "./agents-changed";
+import { announceAgentChanged } from "./agents-changed";
 
 type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
 
@@ -42,9 +42,7 @@ export async function submitPrompt(prompt: Prompt): Promise<TurnOutcome> {
 		await forgetUndelivered(turn, prompt.promptId);
 		throw error;
 	}
-	if (turn.outcome === "started") {
-		await announceAgentsChanged(prompt.agent.organizationId);
-	}
+	if (turn.outcome === "started") announceAgentChanged(prompt.agent);
 	return turn;
 }
 

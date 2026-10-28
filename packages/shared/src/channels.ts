@@ -68,7 +68,7 @@ export type ChannelNotifyReason = "mention" | "here" | "reply" | "message";
 export type ChannelRealtimeEvent =
 	| { type: "channel.message"; channelId: string; message: ChannelMessageWire }
 	| { type: "channels.changed"; organizationId: string }
-	| { type: "agents.changed"; organizationId: string }
+	| { type: "agents.changed"; organizationId: string; agentId: string }
 	| { type: "channel.tasks"; channelId: string }
 	| {
 			type: "channel.read";
@@ -99,7 +99,6 @@ export type ChannelRealtimeEvent =
 			showPreview: boolean;
 	  };
 
-/** Every event type realtime forwards; the type makes a new event impossible to miss here. */
 const EVENT_TYPES: Record<ChannelRealtimeEvent["type"], true> = {
 	"channel.message": true,
 	"channels.changed": true,

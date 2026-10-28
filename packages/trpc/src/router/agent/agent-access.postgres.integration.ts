@@ -431,6 +431,30 @@ suite("agent access against a migrated PostgreSQL", () => {
 		expect(theirs.turns).toEqual([]);
 	});
 
+	test("activity pages through turns that started at the same moment", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const startedAt = new Date();
+		await db.insert(schema.agentTurns).values(
+			Array.from({ length: 51 }, () => ({
+				organizationId: orgId,
+				agentId: agent.id,
+				sessionId: dm.sessionId,
+				status: "completed" as const,
+				reason: "direct_message" as const,
+				actingUserId: admin,
+				startedAt,
+			})),
+		);
+		const first = await person(admin).agent.activity({ agentId: agent.id });
+		const second = await person(admin).agent.activity({
+			agentId: agent.id,
+			cursor: first.nextCursor,
+		});
+		const ids = [...first.turns, ...second.turns].map((turn) => turn.id);
+		expect(ids).toHaveLength(52);
+		expect(new Set(ids).size).toBe(52);
+	});
+
 	test("a paused agent starts no turns", async () => {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,

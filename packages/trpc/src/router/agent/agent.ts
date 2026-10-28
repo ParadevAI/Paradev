@@ -18,13 +18,13 @@ import {
 } from "@superset/shared/dev-avatar";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, exists, isNull, lt, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { protectedProcedure } from "../../trpc";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
-import { announceAgentsChanged } from "./agents-changed";
+import { announceAgentChanged } from "./agents-changed";
 import { ensureDirectMessage } from "./direct-message";
 import { submitPrompt } from "./turns";
 
@@ -41,6 +41,18 @@ const listColumns = {
 	pausedAt: agents.pausedAt,
 	createdByUserId: agents.createdByUserId,
 	createdAt: agents.createdAt,
+	/** @deprecated Read by desktop 2.0.1; newer clients read `agent.get().working`. */
+	isWorking: exists(
+		db
+			.select({ one: sql`1` })
+			.from(agentTurns)
+			.where(
+				and(
+					eq(agentTurns.agentId, agents.id),
+					eq(agentTurns.status, "running"),
+				),
+			),
+	).mapWith(Boolean),
 };
 
 /** People managing and talking to agents. Agents themselves use `agentApi`. */
@@ -71,7 +83,7 @@ export const agentRouter = {
 			ctx.session.user.id,
 			input.agentId,
 		);
-		const [[row], grants, [running]] = await Promise.all([
+		const [[row], grants, [running], recentTurns] = await Promise.all([
 			db.select(listColumns).from(agents).where(eq(agents.id, agent.id)),
 			db
 				.select({ id: channels.id, name: channels.name })
@@ -96,6 +108,18 @@ export const agentRouter = {
 				)
 				.orderBy(desc(agentTurns.startedAt))
 				.limit(1),
+			db
+				.select({
+					id: agentTurns.id,
+					status: agentTurns.status,
+					reason: agentTurns.reason,
+					startedAt: agentTurns.startedAt,
+					settledAt: agentTurns.settledAt,
+				})
+				.from(agentTurns)
+				.where(eq(agentTurns.agentId, agent.id))
+				.orderBy(desc(agentTurns.startedAt))
+				.limit(10),
 		]);
 		if (!row) throw agentNotFound();
 		return {
@@ -103,21 +127,18 @@ export const agentRouter = {
 			instructions: agent.instructions,
 			canManage,
 			channels: grants,
-			/** What it is doing right now, if anything. */
 			working: running ?? null,
+			/** @deprecated Read by desktop 2.0.1; newer clients use `agent.activity`. */
+			recentTurns,
 		};
 	}),
 
-	/**
-	 * What a Dev has done, newest first: each turn, what started it and where.
-	 * Only turns in places the caller can see: their own DM with it, and
-	 * channels they can read.
-	 */
+	/** A Dev's turns, newest first, only where the caller can see them: their own DM with it and channels they can read. */
 	activity: protectedProcedure
 		.input(
 			agentIdSchema.extend({
-				/** `startedAt` of the last row of the previous page. */
-				cursor: z.date().nullish(),
+				/** The id of the last turn on the previous page. */
+				cursor: z.string().uuid().nullish(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -130,9 +151,7 @@ export const agentRouter = {
 					reason: agentTurns.reason,
 					startedAt: agentTurns.startedAt,
 					settledAt: agentTurns.settledAt,
-					errorCode: agentTurns.errorCode,
 					actingUserId: agentTurns.actingUserId,
-					triggerMessageId: agentTurns.triggerMessageId,
 					channelId: channels.id,
 					channelName: channels.name,
 					channelKind: channels.kind,
@@ -144,7 +163,9 @@ export const agentRouter = {
 				.where(
 					and(
 						eq(agentTurns.agentId, agent.id),
-						input.cursor ? lt(agentTurns.startedAt, input.cursor) : undefined,
+						input.cursor
+							? sql`(${agentTurns.startedAt}, ${agentTurns.id}) < (select t.started_at, t.id from ${agentTurns} t where t.id = ${input.cursor})`
+							: undefined,
 						or(
 							and(
 								eq(agentSessions.kind, "dm"),
@@ -170,14 +191,12 @@ export const agentRouter = {
 						),
 					),
 				)
-				.orderBy(desc(agentTurns.startedAt))
+				.orderBy(desc(agentTurns.startedAt), desc(agentTurns.id))
 				.limit(ACTIVITY_PAGE_SIZE);
 			return {
 				turns: rows,
 				nextCursor:
-					rows.length === ACTIVITY_PAGE_SIZE
-						? (rows.at(-1)?.startedAt ?? null)
-						: null,
+					rows.length === ACTIVITY_PAGE_SIZE ? (rows.at(-1)?.id ?? null) : null,
 			};
 		}),
 
@@ -207,7 +226,7 @@ export const agentRouter = {
 				})
 				.returning();
 			if (!agent) throw agentNotFound();
-			await announceAgentsChanged(agent.organizationId);
+			announceAgentChanged(agent);
 			return agent;
 		}),
 
@@ -228,7 +247,7 @@ export const agentRouter = {
 				.where(eq(agents.id, agent.id))
 				.returning({ id: agents.id });
 			if (!updated) throw agentNotFound();
-			await announceAgentsChanged(agent.organizationId);
+			announceAgentChanged(agent);
 			return updated;
 		}),
 
@@ -241,7 +260,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: new Date() })
 				.where(and(eq(agents.id, agent.id), isNull(agents.pausedAt)));
-			await announceAgentsChanged(agent.organizationId);
+			announceAgentChanged(agent);
 			return { paused: true };
 		}),
 
@@ -253,7 +272,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: null })
 				.where(eq(agents.id, agent.id));
-			await announceAgentsChanged(agent.organizationId);
+			announceAgentChanged(agent);
 			return { paused: false };
 		}),
 
@@ -277,7 +296,7 @@ export const agentRouter = {
 						),
 					);
 			});
-			await announceAgentsChanged(agent.organizationId);
+			announceAgentChanged(agent);
 			return { archived: true };
 		}),
 
