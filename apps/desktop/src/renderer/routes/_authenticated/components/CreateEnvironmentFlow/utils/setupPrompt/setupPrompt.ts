@@ -1,7 +1,4 @@
-/**
- * The setup session's first message: runs the superset:environment skill,
- * which the desktop provisions onto every machine with the bundled plugin.
- */
+/** Names the skill rather than running it as a command; the agent loads it. */
 export function setupPrompt({
 	environmentName,
 	environmentId,
@@ -11,5 +8,5 @@ export function setupPrompt({
 	environmentId: string;
 	url: string;
 }): string {
-	return `/superset:environment Set up cloud environment ${environmentName} (${environmentId}): ${url}`;
+	return `Use the superset:environment skill to set up cloud environment ${environmentName} (${environmentId}): ${url}`;
 }
