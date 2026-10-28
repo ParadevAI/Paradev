@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { realpath } from "node:fs/promises";
-import { resolve } from "node:path";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -730,7 +730,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			return {
 				...page,
 				sessions: page.sessions.filter((session) =>
-					cwds.has(resolve(session.cwd)),
+					cwds.has(pathKey(session.cwd)),
 				),
 			};
 		},
@@ -789,8 +789,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 }
 
 async function equivalentPaths(path: string): Promise<Set<string>> {
-	const paths = new Set([resolve(path)]);
+	const paths = new Set([pathKey(path)]);
 	const real = await realpath(path).catch(() => null);
-	if (real) paths.add(real);
+	if (real) paths.add(pathKey(real));
 	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

@@ -6,6 +6,7 @@ import type {
 	HarnessAdapter,
 } from "../../harness";
 import { createTestRuntime } from "../../testing/testRuntime";
+import { pathKey } from "./commands";
 
 const HARNESS = "listing";
 
@@ -115,5 +116,14 @@ describe("discoverSessions", () => {
 		]);
 		expect(probe.disposed).toBe(1);
 		await runtime.dispose();
+	});
+
+	test("matches Windows paths regardless of case", () => {
+		expect(pathKey("c:\\Src\\Repo\\", "win32")).toBe(
+			pathKey("C:\\src\\repo", "win32"),
+		);
+		expect(pathKey("/work/Repo", "linux")).not.toBe(
+			pathKey("/work/repo", "linux"),
+		);
 	});
 });
