@@ -159,7 +159,7 @@ const isGridCell = (item: HomeListItem) =>
 
 function homeListEntryKey(entry: HomeListEntry): string {
 	return entry.kind === "gridRow"
-		? `row:${homeListItemKey(entry.cells[0])}`
+		? `row:${entry.cells.map(homeListItemKey).join("|")}`
 		: homeListItemKey(entry);
 }
 
