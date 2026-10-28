@@ -5,7 +5,7 @@ argument-hint: the layout to build, or the pane change to make
 allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(jq:*)
 ---
 
-# Superset Pane Layout
+# Paradev Pane Layout
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 

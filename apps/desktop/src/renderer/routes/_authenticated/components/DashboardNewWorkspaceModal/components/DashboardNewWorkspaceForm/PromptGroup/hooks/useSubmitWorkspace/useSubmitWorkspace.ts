@@ -208,6 +208,7 @@ export function useSubmitWorkspace(
 						collections,
 						workspaceId: created.id,
 						launch: initialLaunch,
+						prompt: draft.prompt.trim(),
 						chatEnabled: await awaitAcpChatEnabled(),
 						modelId: selectedModel,
 						modeId: selectedMode,

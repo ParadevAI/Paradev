@@ -92,6 +92,15 @@ export const serverErrorMessages: Record<
 				message: `${params?.agent} cannot be signed in this way yet.`,
 			}),
 		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -326,6 +335,12 @@ export const serverErrorMessages: Record<
 				message: "Only people in this organization can join",
 			}),
 		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
+			}),
+		),
 	"serverError.channelMessage.notFound": () =>
 		i18n._(
 			msg({
@@ -422,6 +437,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Connecting GitHub is not configured on this server",
+			}),
+		),
+	"serverError.githubUser.notConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect GitHub in Settings to act on pull requests as yourself",
 			}),
 		),
 	"serverError.cloudWorkspace.githubRepositoryOutOfReach": () =>
@@ -588,6 +610,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.integration.pullRequestNotFound": () =>
+		i18n._(
+			msg({
+				message: "Pull request not found",
 			}),
 		),
 	"serverError.integration.onlyOwnersCanDeleteProjects": () =>
@@ -1111,7 +1139,7 @@ export const serverErrorMessages: Record<
 	"serverError.user.theRecoveryPeriodHasEndedContact": () =>
 		i18n._(
 			msg({
-				message: "The recovery period has ended. Contact support@superset.sh.",
+				message: "The recovery period has ended. Contact support@paradev.com.",
 			}),
 		),
 	"serverError.user.userNotFound": () =>

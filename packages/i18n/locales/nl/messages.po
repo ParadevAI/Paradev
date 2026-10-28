@@ -451,6 +451,10 @@ msgstr "{0} is al toegewezen aan \"{1}\"."
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0} wordt al gebruikt voor taken in deze organisatie."
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0} bouwt zelfverbeterende software. Dat begint met engineers de beste tools geven, die met hun behoeften meegroeien. We zijn 3 ex-YC-CTO's die een tool bouwen waar we zelf dol op zijn."
+
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} is geen repository waarop de GitHub App is geïnstalleerd"
@@ -926,9 +930,6 @@ msgstr "{formerName} is nu {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} is nu {productName}!"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} heet nu {productName}. Het is hetzelfde product van hetzelfde team; alleen de naam is veranderd. Bestaande superset.sh-links worden doorgestuurd en het superset-commando blijft werken."
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} oprichters uit het YC-netwerk"
 
@@ -1159,6 +1160,9 @@ msgstr "{price}/gebruiker/mnd"
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (voorheen {formerName}, YC P26) is de source-available IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
 
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName} (voorheen {formerName})"
+
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (YC P26) is de source-available IDE voor het tijdperk van AI-agents, waarin engineers honderden codeeragents zoals Claude Code en Codex parallel draaien."
 
@@ -1167,6 +1171,9 @@ msgstr "{productName} voor de pers"
 
 msgid "{productName} has been used by one in eight Fortune 500 companies."
 msgstr "{productName} is gebruikt door één op de acht Fortune 500-bedrijven."
+
+msgid "{productName} in the press"
+msgstr "{productName} in de pers"
 
 msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
 msgstr "{productName} wordt wereldwijd gebruikt door engineers bij Netflix, Microsoft, NVIDIA, DoorDash, Wix en Mistral AI, en in Azië bij ByteDance, Toss, Kakao, Grab, LINE en Rakuten."
@@ -1461,6 +1468,9 @@ msgstr "${balance} tegoed"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "Seedronde van $ 11,5 mln onder leiding van Union Square Ventures"
+
 msgid "1"
 msgstr "1"
 
@@ -1482,8 +1492,14 @@ msgstr "10+ gelijktijdige werkstromen zonder verlies van context"
 msgid "12m ago"
 msgstr "12m geleden"
 
+msgid "145,000+ across 180 countries"
+msgstr "145.000+ in 180 landen"
+
 msgid "15 min"
 msgstr "15 min"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ sterren, 100+ bijdragers"
 
 msgid "1d ago"
 msgstr "1d geleden"
@@ -1685,9 +1701,6 @@ msgstr "Over ons"
 
 msgid "About {displayName}"
 msgstr "Over {displayName}"
-
-msgid "About {productName}"
-msgstr "Over {productName}"
 
 msgid "About Paradev"
 msgstr "Over Paradev"
@@ -1905,6 +1918,9 @@ msgstr "Bestanden, apps en meer toevoegen"
 msgid "Add files, apps, and more (@)"
 msgstr "Bestanden, apps en meer toevoegen (@)"
 
+msgid "Add instructions"
+msgstr "Instructies toevoegen"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "Issue #{0} toevoegen aan werkruimte"
@@ -2008,6 +2024,9 @@ msgstr "Aan zijbalk toevoegen"
 msgid "Add to workspace"
 msgstr "Toevoegen aan werkruimte"
 
+msgid "Add what it does"
+msgstr "Toevoegen wat hij doet"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Voeg je eigen terminalagent toe aan dit apparaat."
 
@@ -2098,6 +2117,9 @@ msgstr "Agent is bezig"
 
 msgid "Agent launch configuration"
 msgstr "Startconfiguratie van de agent"
+
+msgid "Agent not found"
+msgstr "Agent niet gevonden"
 
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "Agentkiezer (Claude, Codex, Cursor…) die elke flow voor sessiecreatie gebruikt"
@@ -2507,6 +2529,12 @@ msgstr "Beantwoord deze vraag op desktop, of sla hem over."
 msgid "Answered"
 msgstr "Beantwoord"
 
+msgid "Answered {who} in #{channel}"
+msgstr "Heeft {who} geantwoord in #{channel}"
+
+msgid "Answered you in #{channel}"
+msgstr "Heeft je geantwoord in #{channel}"
+
 msgid "Anthropic rejected this API key."
 msgstr "Anthropic heeft deze API-sleutel geweigerd."
 
@@ -2720,6 +2748,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "Archiveren"
 
+msgid "Archive {name}?"
+msgstr "{name} archiveren?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "#{0} archiveren?"
@@ -2771,6 +2802,9 @@ msgstr "Argumenten"
 
 msgid "Argv used to launch the agent."
 msgstr "Argv waarmee de agent wordt gestart."
+
+msgid "Articles and coverage about {productName}."
+msgstr "Artikelen en berichtgeving over {productName}."
 
 msgid "Artifact"
 msgstr "Artifact"
@@ -2849,6 +2883,9 @@ msgstr "Ondersteund"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "In het kort"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "Minstens één team dat we kunnen noemen, het onze inbegrepen, haalt een heel kwartaal lang elke F4-drempel en publiceert de cijfers."
@@ -3844,6 +3881,9 @@ msgstr "Chatsessie niet gevonden"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chatoppervlakken: berichten, redeneren, suggesties"
 
+msgid "Chats"
+msgstr "Chats"
+
 msgid "Check again"
 msgstr "Opnieuw controleren"
 
@@ -4715,8 +4755,20 @@ msgstr "Verbind externe diensten om gegevens met je organisatie te synchronisere
 msgid "Connect external services to sync data."
 msgstr "Verbind externe diensten om gegevens te synchroniseren."
 
+msgid "Connect GitHub"
+msgstr "GitHub koppelen"
+
 msgid "Connect GitHub in Integrations to add {repositoryFullName}."
 msgstr "Koppel GitHub in Integraties om {repositoryFullName} toe te voegen."
+
+msgid "Connect GitHub in Settings to act on pull requests as yourself"
+msgstr "Koppel GitHub in Instellingen om pull requests met je eigen account te beheren"
+
+msgid "Connect GitHub to continue"
+msgstr "Koppel GitHub om verder te gaan"
+
+msgid "Connect GitHub to see review comments as yourself."
+msgstr "Koppel GitHub om reviewopmerkingen met je eigen account te zien."
 
 msgid "Connect GitHub…"
 msgstr "GitHub koppelen…"
@@ -4751,8 +4803,14 @@ msgstr "Verbind Slack om taken vanuit gesprekken te beheren. Vermeld de bot in e
 msgid "Connect this computer"
 msgstr "Verbind deze computer"
 
+msgid "Connect to act on pull requests as yourself instead of as the workspace."
+msgstr "Koppel om pull requests met je eigen account te beheren in plaats van via de workspace."
+
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Verbind je {pluginLabel}-account en laad deze pagina daarna opnieuw."
+
+msgid "Connect your GitHub account to load this pull request as you."
+msgstr "Koppel je GitHub-account om deze pull request met je eigen account te laden."
 
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "Koppel je GitHub-repository's en synchroniseer pull requests. Volg CI-status en reviews in je hele team."
@@ -4931,9 +4989,6 @@ msgstr "Ga verder in je browser"
 
 msgid "Continue or fork session"
 msgstr "Sessie voortzetten of forken"
-
-msgid "Continue the same workspace from your iPhone"
-msgstr "Ga verder in dezelfde werkruimte vanaf je iPhone"
 
 msgid "Continue the session the last run left"
 msgstr "Ga verder met de sessie van de vorige run"
@@ -5300,6 +5355,9 @@ msgstr "Kan deze diff niet laden"
 msgid "Could not load this file."
 msgstr "Kan dit bestand niet laden."
 
+msgid "Could not load this pull request."
+msgstr "Kan deze pull request niet laden."
+
 msgid "Could not load your machines"
 msgstr "Kan je machines niet laden"
 
@@ -5332,9 +5390,6 @@ msgstr "Kan geen mobiele simulator bereiken."
 
 msgid "Could not reach the desktop."
 msgstr "Kan het bureaublad niet bereiken."
-
-msgid "Could not reach the host to load this pull request."
-msgstr "Kan de host niet bereiken om deze pull request te laden."
 
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "Kon de host niet bereiken om de update te starten. Controleer of hij online is en probeer het opnieuw."
@@ -5481,6 +5536,9 @@ msgstr "Kon niet afsplitsen naar een nieuwe worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Kon het gesprek niet afsplitsen"
 
+msgid "Couldn't check"
+msgstr "Kon niet controleren"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
 
@@ -5554,6 +5612,9 @@ msgstr "Eerdere berichten konden niet worden geladen. Opnieuw proberen"
 
 msgid "Couldn't load issues: {msg}"
 msgstr "Kan issues niet laden: {msg}"
+
+msgid "Couldn't load its activity"
+msgstr "Kon de activiteit niet laden"
 
 msgid "Couldn't load pages"
 msgstr "Kan pagina's niet laden"
@@ -5657,6 +5718,9 @@ msgstr "Kan bewerkingen niet opslaan"
 msgid "Couldn't save the change"
 msgstr "Kon de wijziging niet opslaan"
 
+msgid "Couldn't save the Dev"
+msgstr "Kan de Dev niet opslaan"
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 
@@ -5752,6 +5816,9 @@ msgstr "\"{newLabel}\" maken"
 
 msgid "Create a channel"
 msgstr "Kanaal maken"
+
+msgid "Create a Dev"
+msgstr "Een Dev maken"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "Maakt bij de provider een native fork met dezelfde gesprekscontext. De oorspronkelijke sessie blijft ongewijzigd."
@@ -5919,6 +5986,9 @@ msgstr "Aangemaakt {0} · Laatst gebruikt {1}"
 msgid "Created {ago}"
 msgstr "Aangemaakt {ago}"
 
+msgid "Created {created}"
+msgstr "Gemaakt op {created}"
+
 msgid "Created {createdAgo}"
 msgstr "Aangemaakt {createdAgo}"
 
@@ -6082,6 +6152,12 @@ msgstr "Eigen provider"
 
 msgid "Custom themes"
 msgstr "Eigen thema's"
+
+msgid "Customize"
+msgstr "Aanpassen"
+
+msgid "Customize {devName}"
+msgstr "{devName} aanpassen"
 
 msgid "Customize commands"
 msgstr "Commando's aanpassen"
@@ -6519,6 +6595,9 @@ msgstr "Details zijn hier niet beschikbaar, maar de link opent nog steeds."
 msgid "Dev"
 msgstr "Dev"
 
+msgid "Dev options"
+msgstr "Dev-opties"
+
 msgid "Dev sign in"
 msgstr "Dev-login"
 
@@ -6545,6 +6624,9 @@ msgstr "Apparaat: {selectedLabel}"
 
 msgid "Devices"
 msgstr "Apparaten"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6590,6 +6672,9 @@ msgstr "diff in nieuw tabblad"
 
 msgid "Digital Product Designer"
 msgstr "Ontwerper van digitale producten"
+
+msgid "Direct messages"
+msgstr "Directe berichten"
 
 msgid "Direct mode"
 msgstr "Directe modus"
@@ -6827,8 +6912,8 @@ msgstr "Logs downloaden"
 msgid "Download Manually"
 msgstr "Handmatig downloaden"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Download onze logo’s en productafbeeldingen voor gebruik in berichtgeving over Paradev."
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Download onze logo’s, productafbeeldingen en foto’s van de oprichters voor gebruik in berichtgeving over Paradev."
 
 msgid "Download Paradev"
 msgstr "Paradev downloaden"
@@ -7455,6 +7540,9 @@ msgstr "Zeer hoog"
 
 msgid "Extra small"
 msgstr "Extra klein"
+
+msgid "Eyes"
+msgstr "Ogen"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4-drempel · {F4_GATE_SHARE}%"
@@ -8167,8 +8255,8 @@ msgstr "Zoeken in terminal"
 msgid "Find in this chat"
 msgstr "Zoeken in deze chat"
 
-msgid "Find people"
-msgstr "Mensen zoeken"
+msgid "Find people and Devs"
+msgstr "Mensen en Devs zoeken"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8284,9 +8372,6 @@ msgstr "Mappen die in nieuwe worktrees worden uitgecheckt, één per regel, rela
 msgid "FOLLOW ON X"
 msgstr "VOLG ONS OP X"
 
-msgid "Follow terminal sessions live"
-msgstr "Volg terminalsessies live"
-
 msgid "Follow thread"
 msgstr "Thread volgen"
 
@@ -8298,6 +8383,12 @@ msgstr "Volg ons op LinkedIn"
 
 msgid "Follow us on X/Twitter"
 msgstr "Volg ons op X/Twitter"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "Heeft {who} opgevolgd in #{channel}"
+
+msgid "Followed up with you in #{channel}"
+msgstr "Heeft je opgevolgd in #{channel}"
 
 msgid "Font family"
 msgstr "Lettertype"
@@ -8425,6 +8516,9 @@ msgstr "12 tooltip-aanroepplekken gevonden"
 msgid "Founder & CEO, WowMakers"
 msgstr "Oprichter en CEO, WowMakers"
 
+msgid "Founders"
+msgstr "Oprichters"
+
 msgid "Founding Engineer"
 msgstr "Oprichtend engineer"
 
@@ -8487,6 +8581,9 @@ msgstr "Volledig zelfrijdend"
 
 msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 msgstr "Volledige broncode beschikbaar op GitHub onder Elastic License 2.0 (ELv2). Bekijk, audit en draag bij aan de code. Geen black boxes, geen verborgen functionaliteit."
+
+msgid "Funding"
+msgstr "Financiering"
 
 msgid "Future home for reusable agent configs."
 msgstr "Toekomstige plek voor herbruikbare agentconfiguraties."
@@ -8809,6 +8906,9 @@ msgstr "Kop 2"
 msgid "Heading 3"
 msgstr "Kop 3"
 
+msgid "Headquarters"
+msgstr "Hoofdkantoor"
+
 msgid "Heart"
 msgstr "Hart"
 
@@ -9037,6 +9137,9 @@ msgstr "Hoe gegroepeerde commando's openen."
 
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Hoe verschilt Paradev van Claude Code gewoon in een terminal draaien?"
+
+msgid "How it should work and what to avoid"
+msgstr "Hoe hij moet werken en wat hij moet vermijden"
 
 msgid "How it works"
 msgstr "Hoe het werkt"
@@ -9660,6 +9763,9 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
+
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "Hij verliest meteen alle toegang. Zijn chats en het werk dat hij maakte blijven bewaard."
 
 msgid "It may be asleep"
 msgstr "Hij staat mogelijk in sluimerstand"
@@ -10329,6 +10435,9 @@ msgstr "Laad- en activiteitsindicatoren"
 msgid "Loading changes..."
 msgstr "Wijzigingen laden..."
 
+msgid "Loading chat"
+msgstr "Chat laden"
+
 msgid "Loading comments…"
 msgstr "Opmerkingen laden…"
 
@@ -10364,6 +10473,9 @@ msgstr "Issues laden..."
 
 msgid "Loading issues…"
 msgstr "Issues laden…"
+
+msgid "Loading link preview"
+msgstr "Linkvoorbeeld laden"
 
 msgid "Loading members..."
 msgstr "Leden laden..."
@@ -10832,6 +10944,9 @@ msgstr "Bezig met mergen…"
 
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
+
+msgid "Message {name}"
+msgstr "Bericht aan {name}"
 
 msgid "Message {name}…"
 msgstr "Bericht aan {name}…"
@@ -11770,6 +11885,9 @@ msgstr "Geen open reviewopmerkingen."
 msgid "No organization selected"
 msgstr "Geen organisatie geselecteerd"
 
+msgid "No other chats here"
+msgstr "Geen andere chats hier"
+
 msgid "No pages match"
 msgstr "Geen overeenkomende pagina's"
 
@@ -12183,6 +12301,9 @@ msgstr "Er draait niets"
 msgid "Nothing was missed"
 msgstr "Er is niets gemist"
 
+msgid "Nothing yet"
+msgstr "Nog niets"
+
 msgid "Notice"
 msgstr "Mededeling"
 
@@ -12346,6 +12467,9 @@ msgstr "Eén engineer houdt 3 of meer agentwerkstromen een werkdag lang draaiend
 msgid "One human drives at most one agent at a time."
 msgstr "Eén mens stuurt hoogstens één agent tegelijk aan."
 
+msgid "One line"
+msgstr "Eén zin"
+
 msgid "One line about how you work"
 msgstr "Eén regel over hoe je werkt"
 
@@ -12354,6 +12478,9 @@ msgstr "Bij de eerste honderd op het bord"
 
 msgid "one of the selected repositories"
 msgstr "een van de geselecteerde repository's"
+
+msgid "One paragraph"
+msgstr "Eén alinea"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "Eén plugin, elke coding-agent: Claude Code, Codex, Cursor, OpenCode en meer. Eén keer installeren, gebruiken op je machines en in de cloud."
@@ -12400,6 +12527,9 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Alleen op deze machine: genegeerd door git en toegepast op elke worktree van deze repository. Elke sleutel die je hier instelt, vervangt de gedeelde."
 
@@ -12420,6 +12550,9 @@ msgstr "Alleen eigenaren kunnen de facturering beheren"
 
 msgid "Only owners can update organization settings"
 msgstr "Alleen eigenaren kunnen organisatie-instellingen bijwerken"
+
+msgid "Only people can manage a channel"
+msgstr "Alleen mensen kunnen een kanaal beheren"
 
 msgid "Only people in this organization can join"
 msgstr "Alleen mensen in deze organisatie kunnen deelnemen"
@@ -12527,9 +12660,6 @@ msgstr "Een prompt-editor met meerdere regels openen voor de actieve terminal"
 msgid "Open a new {label} chat?"
 msgstr "Nieuwe {label}-chat openen?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "Open een paneel of sleep er een hierheen vanuit het midden."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "Open een pull request om reviewstatus, checks en opmerkingen te zien."
 
@@ -12631,9 +12761,6 @@ msgstr "Bestand openen"
 
 msgid "Open File in New Tab"
 msgstr "Bestand openen in nieuw tabblad"
-
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Open bestanden, diffs en browsers in tabbladen aan de rechterkant en houd het midden vrij voor terminals en chats."
 
 msgid "Open from folder"
 msgstr "Openen vanuit map"
@@ -13312,9 +13439,6 @@ msgstr "Paradev is een desktop-app. Vul je e-mailadres in, dan sturen we je een 
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev bouwt zelfverbeterende software. Dat begint met engineers de beste tools geven, die met hun behoeften meegroeien."
 
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev bouwt zelfverbeterende software. Dat begint met engineers de beste tools geven, die met hun behoeften meegroeien. We zijn 3 ex-YC-CTO's die een tool bouwen waar we zelf dol op zijn."
-
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev wordt gebouwd door een team in San Francisco, Californië. Voor productsupport of vragen over je account mail je <0>{supportEmail}</0>; we reageren binnen één werkdag. Voor partnerships, pers, enterprise of iets anders schrijf je naar <1>{teamEmail}</1>."
 
@@ -13350,12 +13474,6 @@ msgstr "Code-diff in Paradev Mobile op iPhone"
 
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradev mobile geeft me de kracht van mijn desktop, waar ik ook ga."
-
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Met Paradev Mobile gaan ontwikkelaars vanaf een iPhone verder in de Paradev-werkruimtes die ze al op hun computer gebruiken."
-
-msgid "Paradev Mobile page"
-msgstr "Pagina over Paradev Mobile"
 
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "Terminal van Paradev Mobile op iPhone"
@@ -13405,6 +13523,9 @@ msgstr "Paradev versus de alternatieven"
 
 msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
 msgstr "Paradev werkt met elke CLI-gebaseerde coding agent, waaronder Claude Code, OpenCode, OpenAI Codex en meer. Kies voor elke taak een andere agent zonder je werkruimte of reviewproces te veranderen."
+
+msgid "paradev.com"
+msgstr "paradev.com"
 
 msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
 msgstr "Met de mobiele app van Paradev kan ik mijn agents overal aan het werk houden en blokkades oplossen, zelfs als ik ver van mijn computer ben."
@@ -13871,6 +13992,9 @@ msgstr "Commitgeschiedenis behouden"
 msgid "PresetsBar.tsx"
 msgstr "PresetsBar.tsx"
 
+msgid "Press"
+msgstr "Pers"
+
 msgid "Press <0>Esc</0> to close"
 msgstr "Druk op <0>Esc</0> om te sluiten"
 
@@ -13880,8 +14004,8 @@ msgstr "Druk op ⌘⇧B of open een poort die Paradev heeft gedetecteerd. Je dev
 msgid "Press a key…"
 msgstr "Druk op een toets…"
 
-msgid "Press contact"
-msgstr "Perscontact"
+msgid "Press coverage"
+msgstr "In de pers"
 
 msgid "Press esc to pick a different element."
 msgstr "Druk op esc om een ander element te kiezen."
@@ -14130,9 +14254,6 @@ msgstr "Prompt"
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "Laat een coding agent bouwen wat je in Paradev wilt zien. Als we je prompt goed vinden, voeren we hem uit en mergen we het resultaat."
 
-msgid "Prompt agents and answer their questions"
-msgstr "Stuur agents prompts en beantwoord hun vragen"
-
 msgid "Prompt command is only available for terminal agents."
 msgstr "Promptcommando is alleen beschikbaar voor terminalagents."
 
@@ -14253,6 +14374,12 @@ msgstr "Pull requests"
 
 msgid "Pull Requests"
 msgstr "Pull requests"
+
+msgid "Pull requests, comments and pushes from Superset are made as you."
+msgstr "Pull requests, reacties en pushes vanuit Superset worden namens jou gedaan."
+
+msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
+msgstr "Pull requests, reacties en pushes vanuit Superset worden niet langer namens jou gedaan."
 
 msgid "Purple"
 msgstr "Paars"
@@ -14438,9 +14565,6 @@ msgstr "Lees het op je telefoon"
 msgid "Read MCP servers again"
 msgstr "MCP-servers opnieuw lezen"
 
-msgid "Read the announcement"
-msgstr "Lees de aankondiging"
-
 msgid "Read the changelog"
 msgstr "Lees de changelog"
 
@@ -14482,6 +14606,12 @@ msgstr "Gebruik wordt gelezen…"
 
 msgid "Reading your local usage…"
 msgstr "Je lokale gebruik wordt gelezen…"
+
+msgid "Reads and posts"
+msgstr "Leest en plaatst"
+
+msgid "Ready"
+msgstr "Klaar"
 
 msgid "Ready for review"
 msgstr "Klaar voor review"
@@ -14737,6 +14867,9 @@ msgstr "{label} verwijderen"
 msgid "Remove {label}?"
 msgstr "{label} verwijderen?"
 
+msgid "Remove {name}"
+msgstr "{name} verwijderen"
+
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} verwijderen"
 
@@ -14944,6 +15077,9 @@ msgstr "{replaced} bestanden vervangen in {where}"
 msgid "Replaced 1 file in {where}"
 msgstr "1 bestand vervangen in {where}"
 
+msgid "Replied to your DM"
+msgstr "Heeft gereageerd op je direct bericht"
+
 msgid "Reply"
 msgstr "Antwoorden"
 
@@ -14956,8 +15092,14 @@ msgstr "Reageren op thread…"
 msgid "Reply…"
 msgstr "Reageren…"
 
+msgid "Replying in a thread"
+msgstr "Reageert in een thread"
+
 msgid "Replying to {replyingTo}"
 msgstr "Antwoord aan {replyingTo}"
+
+msgid "Replying to a DM"
+msgstr "Reageert op een direct bericht"
 
 msgid "repo"
 msgstr "repo"
@@ -15386,9 +15528,6 @@ msgstr "Review gevraagd"
 msgid "Review required"
 msgstr "Review vereist"
 
-msgid "Review syntax-highlighted diffs"
-msgstr "Review diffs met syntaxmarkering"
-
 msgid "Review the result."
 msgstr "Review het resultaat."
 
@@ -15433,9 +15572,6 @@ msgstr "Uitgebreide invoer ({hotkeyText})"
 
 msgid "right pane"
 msgstr "rechterpaneel"
-
-msgid "Right pane area"
-msgstr "Rechterpaneelgebied"
 
 msgid "Right-click here"
 msgstr "Klik hier met rechts"
@@ -16235,6 +16371,9 @@ msgstr "Versturen"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Stuur een uitnodiging om lid te worden van {organizationName}. Verloopt na 48 uur."
 
+msgid "Send email and debug delivery"
+msgstr "Verstuur e-mail en debug de bezorging"
+
 msgid "Send Invitation"
 msgstr "Uitnodiging versturen"
 
@@ -16466,6 +16605,9 @@ msgstr "shadcn/ui tooltip-recept"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "De kleurintensiteit is relatief aan de drukste dag van deze ontwikkelaar"
 
+msgid "Shape"
+msgstr "Vorm"
+
 msgid "Share"
 msgstr "Delen"
 
@@ -16651,6 +16793,9 @@ msgstr "Laat de laatste 10 runs zien van mijn Linear-triage-automatisering"
 
 msgid "Show more"
 msgstr "Meer tonen"
+
+msgid "Show older"
+msgstr "Oudere tonen"
 
 msgid "Show on Sidebar"
 msgstr "In de zijbalk tonen"
@@ -17021,6 +17166,9 @@ msgstr "Sommige v1-items zijn niet overgezet"
 msgid "Some v1 work needs your attention"
 msgstr "Een deel van je v1-werk vraagt aandacht"
 
+msgid "someone"
+msgstr "iemand"
+
 msgid "Someone"
 msgstr "Iemand"
 
@@ -17053,8 +17201,8 @@ msgstr "Er is iets misgegaan."
 msgid "Something went wrong. Please try again."
 msgstr "Er is iets misgegaan. Probeer het opnieuw."
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "Er is iets misgegaan. Probeer het opnieuw of neem contact op via support@superset.sh."
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "Er is iets misgegaan. Probeer het opnieuw of neem contact op via support@paradev.com."
 
 msgid "soon"
 msgstr "binnenkort"
@@ -17577,6 +17725,9 @@ msgstr "vervangen"
 msgid "superset"
 msgstr "superset"
 
+msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Superset handelt op GitHub namens jou. Koppel je GitHub-account om pull requests te mergen, erop te reageren en bij te werken."
+
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp toont een endpoint voor alleen dat paneel. Richt Playwright of browser-use erop."
 
@@ -17585,9 +17736,6 @@ msgstr "Superset heet nu Paradev. En we hebben ook een seedronde van $11,5M opge
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile verschijnt op iPhone"
-
-msgid "superset.sh"
-msgstr "superset.sh"
 
 msgid "Supervised"
 msgstr "Begeleid"
@@ -17600,6 +17748,9 @@ msgstr "Rate limiting voor support is niet geconfigureerd"
 
 msgid "Support the project with a GitHub star"
 msgstr "Steun het project met een GitHub-ster"
+
+msgid "Surprise me"
+msgstr "Verras me"
 
 msgid "Suspended"
 msgstr "Opgeschort"
@@ -17791,6 +17942,9 @@ msgstr "Ik kijk ernaar…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Duurt langer dan gewoonlijk. Het gaat door als je weggaat."
+
+msgid "Talk to it"
+msgstr "Ermee praten"
 
 msgid "Talk to Paradev"
 msgstr "Praat met Paradev"
@@ -18105,12 +18259,6 @@ msgstr "De agent gebruikt zijn skills en tools. Het issue komt in Linear terecht
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "De agent die de pagina volgt, leest elke opmerking. Hij werkt de pagina bij en antwoordt in de thread."
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "De aankondiging deelt ook de seedronde van $11,5 miljoen onder leiding van Union Square Ventures, met Y Combinator en Paul Graham."
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "De app is gratis te downloaden. Vereist iOS 26 of nieuwer en Paradev Pro. Android volgt hierna."
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "De app is op {appVersion}, maar gekoppeld aan een hostservice die door iets anders is gestart, waarschijnlijk een oudere CLI of een andere Paradev-build. Opnieuw starten vervangt die door de kopie van deze app."
 
@@ -18132,8 +18280,8 @@ msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd.
 msgid "The code expired. Start again."
 msgstr "De code is verlopen. Begin opnieuw."
 
-msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "De opdrachten die Superset uitvoert om de werkruimtes van dit project in te richten, te starten en te archiveren, uit .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "De opdrachten die Paradev uitvoert om de werkruimtes van dit project in te richten, te starten en te archiveren, uit .superset/config.toml."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Het bedrijf haalde een seedronde van 11,5 miljoen dollar op onder leiding van Union Square Ventures, met Y Combinator en Paul Graham. TechCrunch noemde het een van de opvallendste startups van YC Demo Day."
@@ -18351,8 +18499,8 @@ msgstr "De provider antwoordde {0}."
 msgid "The provider refused it."
 msgstr "De provider heeft het geweigerd."
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "De herstelperiode is voorbij. Neem contact op via support@superset.sh."
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "De herstelperiode is voorbij. Neem contact op via support@paradev.com."
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "De remote branch is uiteengelopen. Pull voordat je verdergaat."
@@ -18526,6 +18674,12 @@ msgstr "Dit kanaal is gearchiveerd"
 
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
+
+msgid "This chat is empty."
+msgstr "Deze chat is leeg."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Deze chat is gestopt omdat het gesprek in een terminal verderging."
@@ -18716,14 +18870,14 @@ msgstr "Dit profiel is momenteel druk bezet"
 msgid "This project is no longer available on your devices."
 msgstr "Dit project is niet meer beschikbaar op je apparaten."
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "Dit project is niet gekoppeld aan een GitHub-repository."
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "Dit project gebruikt nog de oudere config.json. Die blijft werken; zet hem om naar config.toml om de nieuwe secties te gebruiken."
 
 msgid "This project's host is offline"
 msgstr "De host van dit project is offline"
+
+msgid "This pull request has no GitHub access to act through."
+msgstr "Er is geen GitHub-toegang beschikbaar om deze pull request te beheren."
 
 msgid "This pull request has no host to act through"
 msgstr "Deze pull request heeft geen host om via te handelen"
@@ -19563,6 +19717,9 @@ msgstr "Naamgevingsinstructies bijwerken voor {0}"
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Werk Paradev bij op dat apparaat. Updates vanuit de app vereisen een ondersteunde zelfstandige installatie en een uitgebrachte appversie."
 
+msgid "Update Paradev on this host to edit its workspace config."
+msgstr "Werk Paradev op deze host bij om de werkruimteconfiguratie te bewerken."
+
 msgid "Update payment method"
 msgstr "Betaalmethode bijwerken"
 
@@ -19571,9 +19728,6 @@ msgstr "Update gereed"
 
 msgid "Update Required"
 msgstr "Update vereist"
-
-msgid "Update Superset on this host to edit its workspace config."
-msgstr "Werk Superset op deze host bij om de werkruimteconfiguratie te bewerken."
 
 msgid "update the branch prefix"
 msgstr "de branchprefix bijwerken"
@@ -19912,9 +20066,6 @@ msgstr "Bekijken op GitHub"
 msgid "VIEW ON GITHUB"
 msgstr "BEKIJK OP GITHUB"
 
-msgid "View on the App Store"
-msgstr "Bekijk in de App Store"
-
 msgid "View open roles"
 msgstr "Bekijk openstaande vacatures"
 
@@ -20157,6 +20308,10 @@ msgstr "Welkom bij Paradev"
 msgid "Welcome to the new Paradev"
 msgstr "Welkom bij het nieuwe Paradev"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "Wat {0} is, wie het bouwt en voor wie het bedoeld is. Een team uit San Francisco onder leiding van drie ex-YC-CTO's dat de werkruimte voor parallelle coding agents bouwt."
+
 msgid "What are the benefits?"
 msgstr "Wat zijn de voordelen?"
 
@@ -20190,8 +20345,8 @@ msgstr "Wat is Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Wat is er mis?"
 
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Wat Paradev is, wie het bouwt en voor wie het bedoeld is. Een team uit San Francisco onder leiding van drie ex-YC-CTO's dat de werkruimte voor parallelle coding agents bouwt."
+msgid "What it does"
+msgstr "Wat hij doet"
 
 msgid "What platforms does Paradev run on?"
 msgstr "Op welke platforms draait Paradev?"
@@ -20384,6 +20539,9 @@ msgstr "Bezig sinds {0} min {1} s"
 
 msgid "Working for {seconds}s"
 msgstr "Bezig sinds {seconds} s"
+
+msgid "Working on a mention"
+msgstr "Werkt aan een vermelding"
 
 msgid "Working…"
 msgstr "Bezig…"
@@ -20579,6 +20737,9 @@ msgstr "X-Groot"
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
 
+msgid "Y Combinator batch"
+msgstr "Y Combinator-batch"
+
 msgid "Yearly"
 msgstr "Jaarlijks"
 
@@ -20701,6 +20862,9 @@ msgstr "Je hebt het autorisatieverzoek van {plugin} geweigerd."
 
 msgid "You don't have access to this host"
 msgstr "Je hebt geen toegang tot deze host"
+
+msgid "You don't have access to this pull request on GitHub, or it no longer exists."
+msgstr "Je hebt op GitHub geen toegang tot deze pull request, of hij bestaat niet meer."
 
 msgid "You don't have access to this terminal."
 msgstr "Je hebt geen toegang tot deze terminal."

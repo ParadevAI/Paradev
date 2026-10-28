@@ -8,6 +8,7 @@ import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
 import { MentionChipNode } from "./nodes/mentionChipNode";
+import { ChipRenderProvider } from "./providers/ChipRenderProvider";
 import type { PromptInputProps } from "./types";
 import "./prompt-input.css";
 import { msg } from "@lingui/core/macro";
@@ -61,6 +62,8 @@ export function PromptInput({
 	onMentionHighlight,
 	onAttachmentClick,
 	onChipClick,
+	chipForPaste,
+	renderChip,
 	history,
 	className,
 }: PromptInputProps) {
@@ -75,35 +78,38 @@ export function PromptInput({
 	return (
 		<div className={className}>
 			<LexicalRoot initialConfig={initialConfig}>
-				<ComposerBody
-					ref={ref}
-					placeholder={placeholder}
-					mentionProviders={mentionProviders}
-					commands={commands}
-					dictation={dictation}
-					status={status}
-					submitWhileStreaming={submitWhileStreaming}
-					placement={placement}
-					toolbar={toolbar}
-					toolbarEnd={toolbarEnd}
-					defaultValue={defaultValue}
-					findChips={findChips}
-					onChange={onChange}
-					collapseLargePastes={collapseLargePastes}
-					onSubmit={onSubmit}
-					onStop={onStop}
-					stopOnEscape={stopOnEscape}
-					header={header}
-					onAddFiles={onAddFiles}
-					allowEmptySubmit={allowEmptySubmit}
-					clearOnSubmit={clearOnSubmit}
-					hideSubmit={hideSubmit}
-					autoFocus={autoFocus}
-					onMentionHighlight={onMentionHighlight}
-					onAttachmentClick={onAttachmentClick}
-					onChipClick={onChipClick}
-					history={history}
-				/>
+				<ChipRenderProvider renderChip={renderChip}>
+					<ComposerBody
+						ref={ref}
+						placeholder={placeholder}
+						mentionProviders={mentionProviders}
+						commands={commands}
+						dictation={dictation}
+						status={status}
+						submitWhileStreaming={submitWhileStreaming}
+						placement={placement}
+						toolbar={toolbar}
+						toolbarEnd={toolbarEnd}
+						defaultValue={defaultValue}
+						findChips={findChips}
+						onChange={onChange}
+						collapseLargePastes={collapseLargePastes}
+						onSubmit={onSubmit}
+						onStop={onStop}
+						stopOnEscape={stopOnEscape}
+						header={header}
+						onAddFiles={onAddFiles}
+						allowEmptySubmit={allowEmptySubmit}
+						clearOnSubmit={clearOnSubmit}
+						hideSubmit={hideSubmit}
+						autoFocus={autoFocus}
+						onMentionHighlight={onMentionHighlight}
+						onAttachmentClick={onAttachmentClick}
+						onChipClick={onChipClick}
+						chipForPaste={chipForPaste}
+						history={history}
+					/>
+				</ChipRenderProvider>
 			</LexicalRoot>
 		</div>
 	);

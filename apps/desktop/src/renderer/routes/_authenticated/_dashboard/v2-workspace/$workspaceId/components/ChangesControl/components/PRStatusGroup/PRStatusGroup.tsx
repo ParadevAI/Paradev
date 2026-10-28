@@ -24,11 +24,13 @@ import {
 	VscLoading,
 	VscRepoPush,
 } from "react-icons/vsc";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
@@ -78,6 +80,7 @@ export function PRStatusGroup({
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
+	const organizationId = useActiveOrganizationId();
 	const linkPolicy = usePullRequestLinkPolicy();
 	const isSession = workspace.type === "session";
 	const pr =
@@ -87,7 +90,14 @@ export function PRStatusGroup({
 				? state.pr
 				: null;
 
-	const prActions = usePullRequestActions({ workspaceId, onRefresh });
+	const target: PullRequestTarget | null = pr
+		? {
+				organizationId,
+				repoFullName: `${pr.repoOwner}/${pr.repoName}`,
+				prNumber: pr.number,
+			}
+		: null;
+	const prActions = usePullRequestActions({ workspaceId, target, onRefresh });
 
 	const sync = state.kind === "pr-exists" ? state.sync : null;
 	const canCommit = sync?.hasUncommitted === true;
@@ -263,7 +273,7 @@ export function PRStatusGroup({
 									<DropdownMenuItem
 										className="text-xs"
 										disabled={prActions.isMarkingReady}
-										onClick={() => prActions.markReady(pr)}
+										onClick={prActions.markReady}
 									>
 										<VscGitPullRequest className="size-3.5" />
 										<Trans>Ready for review</Trans>
@@ -282,7 +292,7 @@ export function PRStatusGroup({
 										<Trans>Merge</Trans>
 									</DropdownMenuLabel>
 									<DropdownMenuItem
-										onClick={() => prActions.merge(pr, "squash")}
+										onClick={() => prActions.merge("squash")}
 										className="text-xs"
 										disabled={prActions.isMerging}
 									>
@@ -290,7 +300,7 @@ export function PRStatusGroup({
 										<Trans>Squash and merge</Trans>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										onClick={() => prActions.merge(pr, "merge")}
+										onClick={() => prActions.merge("merge")}
 										className="text-xs"
 										disabled={prActions.isMerging}
 									>
@@ -298,7 +308,7 @@ export function PRStatusGroup({
 										<Trans>Create merge commit</Trans>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										onClick={() => prActions.merge(pr, "rebase")}
+										onClick={() => prActions.merge("rebase")}
 										className="text-xs"
 										disabled={prActions.isMerging}
 									>

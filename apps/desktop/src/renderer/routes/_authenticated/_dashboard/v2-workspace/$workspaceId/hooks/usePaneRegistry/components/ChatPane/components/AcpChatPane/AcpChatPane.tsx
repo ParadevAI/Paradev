@@ -29,6 +29,7 @@ import type {
 	ChatEditRequest,
 	ChatForkTarget,
 } from "../../../ChatSession/types";
+import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
 import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
 import { useForkChat } from "../../hooks/useForkChat";
 import { readSavedChatMode } from "../../utils/savedChatMode";
@@ -42,6 +43,7 @@ import {
 	sharedChatCreate,
 	watchChatCreate,
 } from "./utils/sharedChatCreate";
+import { warmTranscript } from "./utils/warmTranscript";
 
 /**
  * A chat bridged to an agent session, resumed by its session id. `agent` comes
@@ -77,6 +79,7 @@ export function AcpChatPane({
 	onOpenForkedChat,
 	onRewound,
 	pendingPrompts,
+	launchPrompt,
 	sessionId,
 	terminalId,
 	workspaceId,
@@ -92,6 +95,8 @@ export function AcpChatPane({
 	isActive: boolean;
 	sessionId: string | null;
 	pendingPrompts: UserContent[][];
+	/** A cloud launch's first prompt, which the agent got before this pane. */
+	launchPrompt?: string;
 	onPendingPromptsSent: () => void;
 	onQueuePrompt: (content: UserContent[]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
@@ -485,12 +490,16 @@ export function AcpChatPane({
 		refetchInterval: 500,
 		refetchIntervalInBackground: true,
 	});
+	const warmed = useRef<{ sessionId: string; done: Promise<void> } | null>(
+		null,
+	);
 	useEffect(() => {
 		if (!replacement) return;
 		const commit = () => {
 			recoveryInFlight.current = false;
 			const prompt = continueAfterRestart.current ?? undefined;
 			continueAfterRestart.current = null;
+			if (sessionId) carryReaderPosition(sessionId, replacement);
 			onSessionCreated(replacement, prompt);
 			releaseReplacement();
 		};
@@ -506,12 +515,31 @@ export function AcpChatPane({
 			return;
 		}
 		if (replacementState?.live && status !== "starting") {
-			commit();
-			return;
+			if (warmed.current?.sessionId !== replacement) {
+				warmed.current = {
+					sessionId: replacement,
+					done: warmTranscript(replacement, wiring).catch(() => undefined),
+				};
+			}
+			let current = true;
+			void warmed.current.done.then(() => {
+				if (current) commit();
+			});
+			return () => {
+				current = false;
+			};
 		}
 		const timer = setTimeout(commit, REPLACEMENT_TIMEOUT_MS);
 		return () => clearTimeout(timer);
-	}, [replacement, replacementState, onSessionCreated, releaseReplacement, t]);
+	}, [
+		replacement,
+		replacementState,
+		sessionId,
+		wiring,
+		onSessionCreated,
+		releaseReplacement,
+		t,
+	]);
 	const recovering =
 		replacement !== null ||
 		(recoverable && recoveries.current < MAX_RECOVERIES);
@@ -668,6 +696,9 @@ export function AcpChatPane({
 							notice: <Trans>Resuming the conversation…</Trans>,
 							queued: pendingPrompts,
 							onQueue: onQueuePrompt,
+							...(launchPrompt
+								? { launched: [{ type: "text" as const, text: launchPrompt }] }
+								: {}),
 						},
 					}
 				: {})}

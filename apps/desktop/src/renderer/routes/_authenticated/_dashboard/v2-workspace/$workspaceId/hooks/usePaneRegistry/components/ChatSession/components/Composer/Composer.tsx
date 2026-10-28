@@ -15,6 +15,7 @@ import type {
 	PromptInputHandle,
 	PromptInputSubmitPayload,
 } from "@superset/chat-ui/PromptInput";
+import { formatRelativeTime } from "@superset/i18n/format";
 import { usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
@@ -31,14 +32,18 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
+import { useChatWiring } from "../../hooks/useSessionClient";
 import type { ChatForkTarget } from "../../types";
+import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
@@ -54,6 +59,7 @@ import {
 } from "./hooks/useComposerDraft";
 import { useDrawerEntry } from "./hooks/useDrawerEntry";
 import { useFooterTier } from "./hooks/useFooterTier";
+import { useLinkChips } from "./hooks/useLinkChips";
 import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
 import { useStatusDialog } from "./hooks/useStatusDialog";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
@@ -75,6 +81,8 @@ export type ComposerHandle = Pick<
 
 export type ComposerProps = {
 	workspaceId: string;
+	/** This chat's own session, left out of the chats it can mention. */
+	sessionId?: string;
 	presetId?: string;
 	draftKey: string;
 	draftPersisted?: boolean;
@@ -168,6 +176,7 @@ export const Composer = memo(function Composer({
 	turnRunning = false,
 	terminalId,
 	workspaceId,
+	sessionId,
 }: ComposerProps) {
 	const { t } = useLingui();
 	const blocked = disabled || target?.disabledReason !== undefined;
@@ -327,6 +336,53 @@ export const Composer = memo(function Composer({
 		[cloudUtils],
 	);
 
+	const { transport } = useChatWiring();
+	const { workspaces: hostWorkspaces } = useHostWorkspaces();
+	const otherHostOf = useCallback(
+		(chatWorkspaceId: string) => {
+			const hostOf = (id: string) =>
+				hostWorkspaces.find((workspace) => workspace.id === id)?.hostId;
+			const chatHost = hostOf(chatWorkspaceId);
+			return chatHost && chatHost !== hostOf(workspaceId) ? chatHost : null;
+		},
+		[hostWorkspaces, workspaceId],
+	);
+	const isDark = useIsDarkTheme();
+	const searchChats = useCallback(
+		async (query: string) => {
+			const needle = query.trim().toLowerCase();
+			// A host older than `query` ignores it; the filter below still applies.
+			const sessions = await transport.listSessions({
+				workspaceId,
+				limit: 50,
+				...(needle ? { query: needle } : {}),
+			});
+			return sessions
+				.filter((session) => session.sessionId !== sessionId)
+				.map((session) => ({
+					session,
+					title: session.title?.trim() || t({ message: "Untitled chat" }),
+				}))
+				.filter(({ title }) => !needle || title.toLowerCase().includes(needle))
+				.sort((a, b) => b.session.updatedAt - a.session.updatedAt)
+				.map(
+					({ session, title }): ComposerMentionEntry => ({
+						id: session.sessionId,
+						label: title,
+						description: formatRelativeTime(new Date(session.updatedAt)),
+						select: (ctx) =>
+							ctx.insertChip(
+								chatReferenceChip(
+									{ workspaceId, sessionId: session.sessionId, title },
+									{ webUrl: env.NEXT_PUBLIC_WEB_URL, isDark },
+								),
+							),
+					}),
+				);
+		},
+		[transport, workspaceId, sessionId, isDark, t],
+	);
+
 	const mentionProviders = useMemo<ComposerMentionProvider[]>(
 		() => [
 			{
@@ -349,10 +405,21 @@ export const Composer = memo(function Composer({
 					emptyState: t({ message: "No pages yet" }),
 				},
 			},
+			{
+				id: "chats",
+				title: t({ message: "Chats" }),
+				priority: 3,
+				source: {
+					kind: "search",
+					search: searchChats,
+					emptyState: t({ message: "No other chats here" }),
+				},
+			},
 		],
-		[searchFiles, searchPages, t],
+		[searchFiles, searchPages, searchChats, t],
 	);
 
+	const linkChips = useLinkChips();
 	const statusDetails = useMemo(
 		() =>
 			terminalId
@@ -455,6 +522,11 @@ export const Composer = memo(function Composer({
 			const mcpContext = mcpContextLine(
 				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
 			);
+			const chatContext = chatContextLine(
+				mentions,
+				env.NEXT_PUBLIC_WEB_URL,
+				otherHostOf,
+			);
 			onSend(
 				[
 					{
@@ -465,15 +537,23 @@ export const Composer = memo(function Composer({
 						),
 						...(elements.length > 0 ? { elements } : {}),
 					},
-					...(mcpContext
-						? [{ type: "text" as const, text: mcpContext, hidden: true }]
-						: []),
+					...[mcpContext, chatContext].flatMap((context) =>
+						context
+							? [{ type: "text" as const, text: context, hidden: true }]
+							: [],
+					),
 				],
 				{ steer },
 			);
 			clearDraft();
 		},
-		[onSend, uploadAttachments, clearDraft, mcpPicker.serverNameOf],
+		[
+			onSend,
+			uploadAttachments,
+			clearDraft,
+			mcpPicker.serverNameOf,
+			otherHostOf,
+		],
 	);
 
 	const handleSubmit = useCallback(
@@ -529,7 +609,9 @@ export const Composer = memo(function Composer({
 				collapseLargePastes
 				commands={commands}
 				defaultValue={storedDraft}
+				chipForPaste={linkChips.chipForPaste}
 				findChips={mcpPicker.findChips}
+				renderChip={linkChips.renderChip}
 				history={history}
 				key={draftKey}
 				mentionProviders={mentionProviders}

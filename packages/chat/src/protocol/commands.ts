@@ -150,6 +150,8 @@ export type GetSessionInput = z.infer<typeof getSessionInputSchema>;
 export const listSessionsInputSchema = z.object({
 	workspaceId: z.string().min(1).optional(),
 	limit: z.number().int().positive().max(200).default(50),
+	/** Keeps sessions whose title contains this, case-insensitively, before the limit. */
+	query: z.string().max(200).optional(),
 });
 export type ListSessionsInput = z.infer<typeof listSessionsInputSchema>;
 

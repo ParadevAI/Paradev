@@ -10,7 +10,7 @@ allowed-tools: Bash(superset plugins:*) Bash(paradev plugins:*) Bash(superset mc
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 A plugin brings two things: **skills**, which land in the directories agents read, and **MCP
-tools**, which are called through Superset's proxy. Install state lives on the account, so a
+tools**, which are called through Paradev's proxy. Install state lives on the account, so a
 plugin installed here is installed everywhere you sign in. The credential does not. It stays
 server-side, and no token is ever written to this machine.
 
@@ -73,7 +73,7 @@ not from anything in this repo, and they change between versions. The `integrati
 covers this end in full: reading a tool's arguments, choosing an account, parsing the
 result.
 
-The call goes out from Superset's API, which attaches the credential. That is why this
+The call goes out from Paradev's API, which attaches the credential. That is why this
 works with no token on the machine, and why a network-restricted sandbox can still reach a
 plugin's tools.
 

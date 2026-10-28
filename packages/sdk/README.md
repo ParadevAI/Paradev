@@ -1,8 +1,8 @@
 # Paradev TypeScript SDK
 
-Typed wrapper around the Paradev API for cloud workspaces: sandboxes Paradev runs for your organization, and the terminals and agents inside them. Follows the [`superset` CLI](https://docs.superset.sh/docs/cli/getting-started) — same procedures, same shapes.
+Typed wrapper around the Paradev API for cloud workspaces: sandboxes Paradev runs for your organization, and the terminals and agents inside them. Follows the [`superset` CLI](https://docs.paradev.com/cli/getting-started) — same procedures, same shapes.
 
-Full docs: **<https://docs.superset.sh/docs/sdk/getting-started>**
+Full docs: **<https://docs.paradev.com/sdk/getting-started>**
 
 ## Install
 

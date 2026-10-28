@@ -20,6 +20,7 @@ import {
 } from "@superset/shared/realtime";
 import {
 	signPageConnectTicket,
+	verifyAgentSessionTicket,
 	verifyPageConnectTicket,
 } from "@superset/shared/usercontent";
 import { verifyJWT } from "@superset/shared/verify-jwt";
@@ -28,6 +29,8 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getServerByName } from "partyserver";
+import type { AppendInput } from "./agent-session/AgentSessionLog";
+import { AgentSessionHub } from "./agent-session-hub";
 import { ORG_USER_HEADER, OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
@@ -493,6 +496,100 @@ app.post("/v2/nudge", async (c) => {
 
 // Exceptions only, as on the relay: console capture at this volume is a
 // memory leak, and a peer going away is not an error.
+// ── Agent sessions: one object per session, written by the agent worker ──
+
+const MAX_AGENT_APPEND_BYTES = 4 * 1024 * 1024;
+
+async function agentSessionTicket(
+	c: Context<AppContext>,
+	token: string | null,
+	scope: "read" | "write",
+) {
+	if (!token) return null;
+	const claims = await verifyAgentSessionTicket(
+		c.env.AGENT_SESSION_SECRET,
+		token,
+	);
+	if (!claims || claims.sessionId !== c.req.param("sessionId")) return null;
+	if (scope === "write" && claims.scope !== "write") return null;
+	return claims;
+}
+
+app.get("/v2/agent-runtime/sessions/:sessionId/stream", async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const claims = await agentSessionTicket(
+		c,
+		c.req.query("ticket") ?? extractToken(c),
+		"read",
+	);
+	if (!claims) return acceptAndClose(4401, "Unauthorized");
+	const target = new URL("https://realtime/subscribe");
+	for (const key of ["since", "deltas"]) {
+		const value = c.req.query(key);
+		if (value) target.searchParams.set(key, value);
+	}
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return stub.fetch(target.toString(), { headers: { Upgrade: "websocket" } });
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/events", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "read");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const limit = Math.min(
+		Math.max(Number(c.req.query("limit") ?? 500) || 500, 1),
+		1_000,
+	);
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	const before = c.req.query("before");
+	if (before !== undefined) {
+		return c.json(await stub.eventsBefore(before || null, limit));
+	}
+	return c.json(await stub.eventsSince(c.req.query("since") ?? null, limit));
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/head", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "read");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json(await stub.head());
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/transcript", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "write");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const after = Math.max(Number(c.req.query("after") ?? 0) || 0, 0);
+	const stepKey = c.req.query("stepKey");
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json({
+		entries: await stub.transcript(stepKey ? { stepKey } : { afterSeq: after }),
+	});
+});
+
+app.post("/v2/agent-runtime/sessions/:sessionId/append", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "write");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	if (Number(c.req.header("content-length") ?? 0) > MAX_AGENT_APPEND_BYTES) {
+		return c.json({ error: "Too large" }, 413);
+	}
+	const text = await readBodyWithin(
+		c.req.raw.body,
+		MAX_AGENT_APPEND_BYTES,
+	).catch(() => "");
+	if (text === null) return c.json({ error: "Too large" }, 413);
+	const input = parseJson(text) as AppendInput | null;
+	if (
+		!input ||
+		typeof input.stepKey !== "string" ||
+		typeof input.turnId !== "string"
+	) {
+		return c.json({ error: "Invalid body" }, 400);
+	}
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json(await stub.append(input));
+});
+
 function isPeerGone(message: string): boolean {
 	return (
 		message === "Network connection lost." ||
@@ -529,11 +626,16 @@ const InstrumentedUserHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	UserHub,
 );
+const InstrumentedAgentSessionHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	AgentSessionHub,
+);
 export {
 	InstrumentedOrgHub as OrgHub,
 	InstrumentedPageHub as PageHub,
 	InstrumentedWorkspaceHub as WorkspaceHub,
 	InstrumentedUserHub as UserHub,
+	InstrumentedAgentSessionHub as AgentSessionHub,
 };
 
 export default Sentry.withSentry(sentryOptions, {

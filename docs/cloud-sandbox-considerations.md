@@ -236,8 +236,8 @@ older than a few minutes and tears down any sandbox they name, plus the same
 teardown on the paths that can't currently reach it. One row from that incident
 had to be cleared by hand.
 
-**The Superset CLI is offered but not installed. Open.** A cloud workspace's
-agent row includes "Superset CLI" alongside Claude, Codex and Copilot, and
+**The Paradev CLI is offered but not installed. Open.** A cloud workspace's
+agent row includes "Paradev CLI" alongside Claude, Codex and Copilot, and
 picking it fails with command-not-found: the image installs the agent CLIs but
 not ours. It also matters beyond the picker — the CLI is how an agent spawns
 workspaces and other agents, so a sandbox without it can't orchestrate. Install

@@ -1170,6 +1170,34 @@
       "when": 1793061654318,
       "tag": "0166_channel_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1793131420950,
+      "tag": "0167_agents_and_actors",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1793131434999,
+      "tag": "0168_actors_backfill_and_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 169,
+      "version": "7",
+      "when": 1793131506318,
+      "tag": "0169_channels_on_actors",
+      "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1793131554984,
+      "tag": "0170_authz_melange_functions",
+      "breakpoints": true
     }
   ]
 }

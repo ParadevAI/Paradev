@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { BRAND } from "@superset/shared/brand";
 import {
 	type ConfigEnvironment,
 	type ConfigError,
@@ -107,7 +108,7 @@ export function formatConfigErrors({
 	errors: ConfigError[];
 }): string[] {
 	return [
-		`Superset: ${path} is invalid, so nothing was run:`,
+		`${BRAND.NAME}: ${path} is invalid, so nothing was run:`,
 		...errors.map(
 			(error) =>
 				`  ${error.line ? `line ${error.line}: ` : ""}${error.message}`,

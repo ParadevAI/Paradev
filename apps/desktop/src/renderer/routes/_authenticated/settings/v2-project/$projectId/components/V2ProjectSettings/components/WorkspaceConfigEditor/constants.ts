@@ -1,5 +1,7 @@
-export const CONFIG_TEMPLATE = `# How Superset prepares, runs and archives this project's workspaces.
-# Docs: https://docs.superset.sh/setup-teardown-scripts
+import { BRAND } from "@superset/shared/brand";
+
+export const CONFIG_TEMPLATE = `# How ${BRAND.NAME} prepares, runs and archives this project's workspaces.
+# Docs: https://docs.paradev.com/setup-teardown-scripts
 
 [setup]
 run = []

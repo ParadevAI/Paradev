@@ -1,12 +1,14 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import type { ModifierEvent } from "renderer/lib/clickPolicy";
+import type { LinkAction, ModifierEvent } from "renderer/lib/clickPolicy";
 import type { OpenFile } from "../../../../../../types";
 
 export type OpenPage = (url: string, event: ModifierEvent) => void;
 
+/** `action` overrides the click policy, as a context menu entry does. */
 export type OpenLink = (
 	href: string,
 	event: ModifierEvent & { clientX: number; clientY: number },
+	action?: LinkAction,
 ) => boolean;
 
 export type ChatPaneActions = {

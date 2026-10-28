@@ -301,6 +301,9 @@ export type HandleOwnerType = z.infer<typeof handleOwnerTypeEnum>;
 export const agentCredentialKindValues = ["subscription", "api_key"] as const;
 export type AgentCredentialKind = (typeof agentCredentialKindValues)[number];
 
+export const channelKindValues = ["channel", "dm"] as const;
+export const channelKindEnum = z.enum(channelKindValues);
+
 export const channelVisibilityValues = ["public", "private"] as const;
 export const channelVisibilityEnum = z.enum(channelVisibilityValues);
 export type ChannelVisibility = z.infer<typeof channelVisibilityEnum>;
@@ -313,6 +316,28 @@ export const channelNotifyValues = ["all", "mentions", "none"] as const;
 export const channelNotifyEnum = z.enum(channelNotifyValues);
 export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
 
+/** Where a Dev works: its DM with a person, or a thread it was mentioned in. */
+export const agentSessionKindValues = ["dm", "thread"] as const;
+export const agentSessionKindEnum = z.enum(agentSessionKindValues);
+export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
+
+export const agentTurnStatusValues = [
+	"running",
+	"completed",
+	"failed",
+	"interrupted",
+] as const;
+export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
+export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;
+
+/** Why a turn started; recorded by the API, never by the worker. */
+export const agentTurnReasonValues = [
+	"direct_message",
+	"mention",
+	"thread_reply",
+] as const;
+export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
+export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
 export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
 export const channelBroadcastEnum = z.enum(channelBroadcastValues);
 export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;

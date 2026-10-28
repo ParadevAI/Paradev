@@ -74,7 +74,7 @@ If `--draft` was passed, add `--draft`.
 
 Then assign the PR to `superset-home`, unless `--draft` was passed. This starts
 a review of the PR in a cloud workspace; the findings are published as a
-Superset page and linked in a PR comment.
+Paradev page and linked in a PR comment.
 
 ```
 gh pr edit <number> --add-assignee superset-home

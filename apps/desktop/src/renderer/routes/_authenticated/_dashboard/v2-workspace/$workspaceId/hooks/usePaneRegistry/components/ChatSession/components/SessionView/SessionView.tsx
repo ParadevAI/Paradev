@@ -118,6 +118,8 @@ export function SessionView({
 		notice: ReactNode;
 		queued: UserContent[][];
 		onQueue: (content: UserContent[]) => void;
+		/** Already sent, so shown only until the transcript has a user message. */
+		launched?: UserContent[];
 	};
 	isActive?: boolean;
 	pendingPrompts: UserContent[][];
@@ -489,9 +491,16 @@ export function SessionView({
 	);
 
 	const heldQueued = held?.queued;
+	const heldLaunched = held?.launched;
 	const heldQueue = useMemo(
-		() => (heldQueued ? heldPromptQueue(heldQueued) : undefined),
-		[heldQueued],
+		() =>
+			heldQueued
+				? heldPromptQueue(heldQueued, {
+						launched: heldLaunched,
+						items: snapshotItems,
+					})
+				: undefined,
+		[heldQueued, heldLaunched, snapshotItems],
 	);
 	const booting = sessionState?.status === "starting";
 	const openModelPicker = useCallback(
@@ -610,6 +619,7 @@ export function SessionView({
 				/>
 				<Composer
 					presetId={presetId}
+					sessionId={client.sessionId}
 					agentSwitcher={agentSwitcher}
 					availableCommands={sessionState?.availableCommands ?? NO_COMMANDS}
 					configOptions={sessionState?.configOptions ?? NO_CONFIG_OPTIONS}

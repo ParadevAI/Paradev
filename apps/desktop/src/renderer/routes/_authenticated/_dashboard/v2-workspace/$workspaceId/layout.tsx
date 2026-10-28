@@ -169,6 +169,7 @@ function V2WorkspaceLayout() {
 						label={
 							pendingCloudChat.titleOverride ?? pendingCloudChat.data.agentId
 						}
+						prompt={pendingCloudChat.data.launchPrompt}
 					/>
 				</StateScreenShell>
 			);

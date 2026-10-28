@@ -1,10 +1,10 @@
 #!/bin/sh
-# Superset CLI installer
+# Paradev CLI installer
 #
 # Usage:
-#   curl -fsSL https://superset.sh/cli/install.sh | sh
+#   curl -fsSL https://paradev.com/cli/install.sh | sh
 #
-# Installs the Superset CLI and host-service to ~/superset/.
+# Installs the Paradev CLI and host-service to ~/superset/.
 # Adds ~/superset/bin to PATH via your shell profile.
 
 set -eu

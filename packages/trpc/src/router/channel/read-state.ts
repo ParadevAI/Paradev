@@ -15,7 +15,7 @@ export function hasUnreadSql(userId: string) {
 			and m.seq > ${channelMembers.lastReadSeq}
 			and m.thread_root_id is null
 			and m.deleted_at is null
-			and m.author_user_id is distinct from ${userId}
+			and m.author_id is distinct from ${userId}
 	)`;
 }
 
@@ -27,11 +27,11 @@ export function mentionCountSql(userId: string) {
 			and m.thread_root_id is null
 			and m.deleted_at is null
 			and (
-				${userId}::uuid = any(m.mentioned_user_ids)
+				${userId}::uuid = any(m.mentioned_ids)
 				or (
 					m.broadcast is not null
 					and not ${channelMembers.suppressBroadcasts}
-					and m.author_user_id is distinct from ${userId}
+					and m.author_id is distinct from ${userId}
 				)
 			)
 	)`;
@@ -43,7 +43,7 @@ export function threadUnreadCountSql(userId: string) {
 		where m.thread_root_id = ${channelThreadFollows.rootId}
 			and m.seq > ${channelThreadFollows.lastReadSeq}
 			and m.deleted_at is null
-			and m.author_user_id is distinct from ${userId}
+			and m.author_id is distinct from ${userId}
 	)`;
 }
 
@@ -54,10 +54,10 @@ export function threadMentionCountSql(userId: string) {
 			and m.seq > ${channelThreadFollows.lastReadSeq}
 			and m.deleted_at is null
 			and (
-				${userId}::uuid = any(m.mentioned_user_ids)
+				${userId}::uuid = any(m.mentioned_ids)
 				or (
 					m.broadcast = 'here'
-					and m.author_user_id is distinct from ${userId}
+					and m.author_id is distinct from ${userId}
 				)
 			)
 	)`;
@@ -75,7 +75,7 @@ export async function publishReadState(userId: string, channelId: string) {
 		.where(
 			and(
 				eq(channelMembers.channelId, channelId),
-				eq(channelMembers.userId, userId),
+				eq(channelMembers.actorId, userId),
 			),
 		)
 		.limit(1);

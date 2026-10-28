@@ -76,13 +76,13 @@ A Git merge can succeed while the application fails: one branch might rename an 
 
 Keep each task in its own workspace, not in a terminal tab. A worktree keeps the branch and files, but a plain terminal session ends when you close it.
 
-In Paradev, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. Terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Paradev resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running) and [Agent Sessions](https://docs.superset.sh/agent-sessions).
+In Paradev, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. Terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Paradev resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Agent Sessions](https://docs.paradev.com/agent-sessions).
 
 ## I run several web-app branches with coding agents. How can I keep their terminals, previews, and ports organized?
 
 Give each branch its own worktree and its own dev-server port, and keep the preview next to the terminal that started it. Two dev servers on the same port fail, and a preview in a shared browser tab is easy to confuse with another branch.
 
-Paradev does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.superset/ports.json`. See [Port Management](https://docs.superset.sh/ports).
+Paradev does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.superset/ports.json`. See [Port Management](https://docs.paradev.com/ports).
 
 ## How can I click on an element in my running web app and have a coding agent change it, instead of describing the UI in text?
 

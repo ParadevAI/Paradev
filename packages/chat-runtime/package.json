@@ -8,6 +8,10 @@
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
+		"./acp-stream": {
+			"types": "./src/harness/acp/acp-stream.ts",
+			"default": "./src/harness/acp/acp-stream.ts"
+		},
 		"./testing": {
 			"types": "./src/testing/index.ts",
 			"default": "./src/testing/index.ts"

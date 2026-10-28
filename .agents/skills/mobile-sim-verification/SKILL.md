@@ -38,7 +38,7 @@ API and relay. "Rules" is what counts as valid evidence. "Mechanics" is how to g
 
 ### Services
 
-Start each in a Superset terminal so it outlives the tool call. `--local` is required; without it
+Start each in a Paradev terminal so it outlives the tool call. `--local` is required; without it
 the command returns nothing.
 
 ```bash

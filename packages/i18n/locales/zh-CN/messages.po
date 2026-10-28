@@ -451,6 +451,10 @@ msgstr "{0}已分配给“{1}”。"
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0} 已在此组织的任务中使用。"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0}正在构建能自我改进的软件。第一步，是给工程师最好的工具，并让它随需求一起演进。我们是3位YC出身的前CTO，在做一个自己喜欢的工具。"
+
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0} 不是已安装 GitHub App 的仓库"
@@ -926,9 +930,6 @@ msgstr "{formerName} 现已更名为 {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} 现已更名为 {productName}！"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} 现已更名为 {productName}。产品不变，团队不变，只是换了名字。现有的 superset.sh 链接会自动跳转，superset 命令也会继续可用。"
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友创始人"
 
@@ -1159,6 +1160,9 @@ msgstr "{price}/用户/月"
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（原 {formerName}，YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
 
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}（原 {formerName}）"
+
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（YC P26）是面向 AI 智能体时代的源码可用 IDE，工程师可以在其中并行运行数百个 Claude Code、Codex 等编程智能体。"
 
@@ -1167,6 +1171,9 @@ msgstr "面向媒体的 {productName}"
 
 msgid "{productName} has been used by one in eight Fortune 500 companies."
 msgstr "八分之一的 Fortune 500 公司使用过 {productName}。"
+
+msgid "{productName} in the press"
+msgstr "媒体眼中的 {productName}"
 
 msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
 msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 Mistral AI 的工程师都在使用 {productName}；在亚洲，ByteDance、Toss、Kakao、Grab、LINE 和 Rakuten 的工程师也在使用。"
@@ -1461,6 +1468,9 @@ msgstr "${balance}额度"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "由 Union Square Ventures 领投的 1150 万美元种子轮"
+
 msgid "1"
 msgstr "1"
 
@@ -1482,8 +1492,14 @@ msgstr "10条以上并行工作流且不丢状态"
 msgid "12m ago"
 msgstr "12分钟前"
 
+msgid "145,000+ across 180 countries"
+msgstr "180 个国家/地区，14.5 万+"
+
 msgid "15 min"
 msgstr "15 分钟"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ 星标，100+ 贡献者"
 
 msgid "1d ago"
 msgstr "1天前"
@@ -1685,9 +1701,6 @@ msgstr "关于"
 
 msgid "About {displayName}"
 msgstr "关于 {displayName}"
-
-msgid "About {productName}"
-msgstr "关于{productName}"
 
 msgid "About Paradev"
 msgstr "关于Paradev"
@@ -1905,6 +1918,9 @@ msgstr "添加文件、应用等"
 msgid "Add files, apps, and more (@)"
 msgstr "添加文件、应用等（@）"
 
+msgid "Add instructions"
+msgstr "添加指示"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "将议题#{0}添加到工作区"
@@ -2008,6 +2024,9 @@ msgstr "添加到侧边栏"
 msgid "Add to workspace"
 msgstr "添加到工作区"
 
+msgid "Add what it does"
+msgstr "添加它的用途"
+
 msgid "Add your own terminal agent to this device."
 msgstr "向此设备添加你自己的终端智能体。"
 
@@ -2098,6 +2117,9 @@ msgstr "智能体正在工作"
 
 msgid "Agent launch configuration"
 msgstr "智能体启动配置"
+
+msgid "Agent not found"
+msgstr "未找到智能体"
 
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "智能体选择器（Claude、Codex、Cursor…），所有创建会话的流程都在用"
@@ -2507,6 +2529,12 @@ msgstr "请在桌面端回答此问题，或跳过。"
 msgid "Answered"
 msgstr "已回答"
 
+msgid "Answered {who} in #{channel}"
+msgstr "在 #{channel} 回复了 {who}"
+
+msgid "Answered you in #{channel}"
+msgstr "在 #{channel} 回复了你"
+
 msgid "Anthropic rejected this API key."
 msgstr "Anthropic拒绝了此API密钥。"
 
@@ -2720,6 +2748,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "归档"
 
+msgid "Archive {name}?"
+msgstr "要归档 {name} 吗？"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "归档 #{0}？"
@@ -2771,6 +2802,9 @@ msgstr "参数"
 
 msgid "Argv used to launch the agent."
 msgstr "用于启动智能体的argv。"
+
+msgid "Articles and coverage about {productName}."
+msgstr "关于 {productName} 的文章与报道。"
 
 msgid "Artifact"
 msgstr "Artifact"
@@ -2849,6 +2883,9 @@ msgstr "辅助"
 
 msgid "at"
 msgstr "位于"
+
+msgid "At a glance"
+msgstr "概览"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "至少有一支叫得出名字的团队（包括我们自己）连续一个季度通过全部F4关卡，并公布数据。"
@@ -3844,6 +3881,9 @@ msgstr "未找到聊天会话"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
 
+msgid "Chats"
+msgstr "聊天"
+
 msgid "Check again"
 msgstr "重新检查"
 
@@ -4715,8 +4755,20 @@ msgstr "连接外部服务，与你的组织同步数据。"
 msgid "Connect external services to sync data."
 msgstr "连接外部服务以同步数据。"
 
+msgid "Connect GitHub"
+msgstr "连接 GitHub"
+
 msgid "Connect GitHub in Integrations to add {repositoryFullName}."
 msgstr "在集成中连接 GitHub 以添加 {repositoryFullName}。"
+
+msgid "Connect GitHub in Settings to act on pull requests as yourself"
+msgstr "在设置中连接 GitHub，以你自己的身份处理拉取请求"
+
+msgid "Connect GitHub to continue"
+msgstr "连接 GitHub 以继续"
+
+msgid "Connect GitHub to see review comments as yourself."
+msgstr "连接 GitHub，以你自己的身份查看审查评论。"
 
 msgid "Connect GitHub…"
 msgstr "连接 GitHub…"
@@ -4751,8 +4803,14 @@ msgstr "连接Slack，直接在对话中管理任务。在任意频道提及机�
 msgid "Connect this computer"
 msgstr "连接这台电脑"
 
+msgid "Connect to act on pull requests as yourself instead of as the workspace."
+msgstr "连接后，将以你自己的身份而非工作区的身份处理拉取请求。"
+
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "连接你的 {pluginLabel} 账户，然后重新加载此页面。"
+
+msgid "Connect your GitHub account to load this pull request as you."
+msgstr "连接你的 GitHub 账户，以你自己的身份加载此拉取请求。"
 
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "连接你的GitHub仓库并同步拉取请求。跟踪整个团队的CI状态和代码审查。"
@@ -4931,9 +4989,6 @@ msgstr "请在浏览器中继续"
 
 msgid "Continue or fork session"
 msgstr "继续或分叉会话"
-
-msgid "Continue the same workspace from your iPhone"
-msgstr "在 iPhone 上继续同一个工作区"
 
 msgid "Continue the session the last run left"
 msgstr "继续上次运行留下的会话"
@@ -5300,6 +5355,9 @@ msgstr "无法加载这个差异"
 msgid "Could not load this file."
 msgstr "无法加载这个文件。"
 
+msgid "Could not load this pull request."
+msgstr "无法加载此拉取请求。"
+
 msgid "Could not load your machines"
 msgstr "无法加载你的机器"
 
@@ -5332,9 +5390,6 @@ msgstr "无法连接到移动模拟器。"
 
 msgid "Could not reach the desktop."
 msgstr "无法连接到桌面。"
-
-msgid "Could not reach the host to load this pull request."
-msgstr "无法连接到主机以加载此拉取请求。"
 
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "无法连接主机以开始更新。请确认主机在线后重试。"
@@ -5481,6 +5536,9 @@ msgstr "无法分叉到新的 worktree"
 msgid "Couldn't branch the conversation"
 msgstr "无法分叉对话"
 
+msgid "Couldn't check"
+msgstr "无法检查"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "无法检查移除此成员会影响哪些内容"
 
@@ -5554,6 +5612,9 @@ msgstr "无法加载更早的消息。重试"
 
 msgid "Couldn't load issues: {msg}"
 msgstr "无法加载议题：{msg}"
+
+msgid "Couldn't load its activity"
+msgstr "无法加载其活动"
 
 msgid "Couldn't load pages"
 msgstr "无法加载页面"
@@ -5657,6 +5718,9 @@ msgstr "无法保存编辑"
 msgid "Couldn't save the change"
 msgstr "无法保存更改"
 
+msgid "Couldn't save the Dev"
+msgstr "无法保存 Dev"
+
 msgid "Couldn't send comment"
 msgstr "无法发送评论"
 
@@ -5752,6 +5816,9 @@ msgstr "创建“{newLabel}”"
 
 msgid "Create a channel"
 msgstr "创建频道"
+
+msgid "Create a Dev"
+msgstr "创建 Dev"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "在提供方创建一个具有相同对话上下文的原生分叉。原会话保持不变。"
@@ -5919,6 +5986,9 @@ msgstr "创建于{0} · 最后使用{1}"
 msgid "Created {ago}"
 msgstr "创建于{ago}"
 
+msgid "Created {created}"
+msgstr "创建于 {created}"
+
 msgid "Created {createdAgo}"
 msgstr "创建于{createdAgo}"
 
@@ -6082,6 +6152,12 @@ msgstr "自定义提供商"
 
 msgid "Custom themes"
 msgstr "自定义主题"
+
+msgid "Customize"
+msgstr "自定义"
+
+msgid "Customize {devName}"
+msgstr "自定义 {devName}"
 
 msgid "Customize commands"
 msgstr "自定义命令"
@@ -6519,6 +6595,9 @@ msgstr "此处无法显示详情，但链接仍可打开。"
 msgid "Dev"
 msgstr "开发"
 
+msgid "Dev options"
+msgstr "Dev 选项"
+
 msgid "Dev sign in"
 msgstr "开发登录"
 
@@ -6545,6 +6624,9 @@ msgstr "设备：{selectedLabel}"
 
 msgid "Devices"
 msgstr "设备"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6590,6 +6672,9 @@ msgstr "在新标签页看差异"
 
 msgid "Digital Product Designer"
 msgstr "数字产品设计师"
+
+msgid "Direct messages"
+msgstr "私信"
 
 msgid "Direct mode"
 msgstr "直接模式"
@@ -6827,8 +6912,8 @@ msgstr "下载日志"
 msgid "Download Manually"
 msgstr "手动下载"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "下载我们的标志和产品图片，用于报道 Paradev。"
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "下载我们的标志、产品图片和创始人照片，用于报道 Paradev。"
 
 msgid "Download Paradev"
 msgstr "下载Paradev"
@@ -7455,6 +7540,9 @@ msgstr "极高"
 
 msgid "Extra small"
 msgstr "超小"
+
+msgid "Eyes"
+msgstr "眼睛"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4关卡 · {F4_GATE_SHARE}%"
@@ -8167,8 +8255,8 @@ msgstr "在终端中查找"
 msgid "Find in this chat"
 msgstr "在此聊天中查找"
 
-msgid "Find people"
-msgstr "查找成员"
+msgid "Find people and Devs"
+msgstr "查找成员和 Dev"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8284,9 +8372,6 @@ msgstr "要检出到新worktree的文件夹，每行一个，相对于仓库根�
 msgid "FOLLOW ON X"
 msgstr "在X上关注"
 
-msgid "Follow terminal sessions live"
-msgstr "实时跟进终端会话"
-
 msgid "Follow thread"
 msgstr "关注话题"
 
@@ -8298,6 +8383,12 @@ msgstr "在LinkedIn上关注我们"
 
 msgid "Follow us on X/Twitter"
 msgstr "在X/Twitter上关注我们"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "在 #{channel} 跟进了 {who}"
+
+msgid "Followed up with you in #{channel}"
+msgstr "在 #{channel} 跟进了你"
 
 msgid "Font family"
 msgstr "字体"
@@ -8425,6 +8516,9 @@ msgstr "找到12处tooltip调用"
 msgid "Founder & CEO, WowMakers"
 msgstr "创始人兼 CEO，WowMakers"
 
+msgid "Founders"
+msgstr "创始人"
+
 msgid "Founding Engineer"
 msgstr "创始工程师"
 
@@ -8487,6 +8581,9 @@ msgstr "完全自动驾驶"
 
 msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 msgstr "完整源码在GitHub上以Elastic License 2.0（ELv2）提供。可查阅、审计并参与贡献。没有黑箱，没有隐藏功能。"
+
+msgid "Funding"
+msgstr "融资"
 
 msgid "Future home for reusable agent configs."
 msgstr "可复用智能体配置的未来归处。"
@@ -8809,6 +8906,9 @@ msgstr "标题2"
 msgid "Heading 3"
 msgstr "标题3"
 
+msgid "Headquarters"
+msgstr "总部"
+
 msgid "Heart"
 msgstr "心形"
 
@@ -9037,6 +9137,9 @@ msgstr "分组命令的打开方式。"
 
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev和直接在终端里跑Claude Code有什么不同？"
+
+msgid "How it should work and what to avoid"
+msgstr "工作方式和需要避免的事项"
 
 msgid "How it works"
 msgstr "工作方式"
@@ -9660,6 +9763,9 @@ msgstr "删除后无法恢复。"
 
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"
+
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "它会立即失去所有访问权限。它的聊天和产出的工作会保留。"
 
 msgid "It may be asleep"
 msgstr "设备可能处于睡眠状态"
@@ -10329,6 +10435,9 @@ msgstr "加载状态与进行中活动的指示器"
 msgid "Loading changes..."
 msgstr "正在加载更改..."
 
+msgid "Loading chat"
+msgstr "正在加载聊天"
+
 msgid "Loading comments…"
 msgstr "正在加载评论…"
 
@@ -10364,6 +10473,9 @@ msgstr "正在加载议题..."
 
 msgid "Loading issues…"
 msgstr "正在加载议题…"
+
+msgid "Loading link preview"
+msgstr "正在加载链接预览"
 
 msgid "Loading members..."
 msgstr "正在加载成员..."
@@ -10832,6 +10944,9 @@ msgstr "正在合并…"
 
 msgid "Mesh Gradient"
 msgstr "网格渐变"
+
+msgid "Message {name}"
+msgstr "给 {name} 发消息"
 
 msgid "Message {name}…"
 msgstr "发消息给 {name}…"
@@ -11770,6 +11885,9 @@ msgstr "没有未解决的审查评论。"
 msgid "No organization selected"
 msgstr "未选择组织"
 
+msgid "No other chats here"
+msgstr "这里没有其他聊天"
+
 msgid "No pages match"
 msgstr "没有匹配的页面"
 
@@ -12183,6 +12301,9 @@ msgstr "没有正在运行的内容"
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
 
+msgid "Nothing yet"
+msgstr "暂无"
+
 msgid "Notice"
 msgstr "提示"
 
@@ -12346,6 +12467,9 @@ msgstr "一名工程师在一个工作日内维持3条以上智能体工作流�
 msgid "One human drives at most one agent at a time."
 msgstr "一个人同时最多驱动一个智能体。"
 
+msgid "One line"
+msgstr "一句话"
+
 msgid "One line about how you work"
 msgstr "用一句话介绍你的工作方式"
 
@@ -12354,6 +12478,9 @@ msgstr "榜单最早的一百人之一"
 
 msgid "one of the selected repositories"
 msgstr "所选仓库之一"
+
+msgid "One paragraph"
+msgstr "一段话"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "一个插件，所有编码智能体：Claude Code、Codex、Cursor、OpenCode 等。只需安装一次，就能在你的设备上和云端使用。"
@@ -12400,6 +12527,9 @@ msgstr "只有主机所有者或组织所有者才能删除此主机"
 msgid "Only images can be attached to a comment"
 msgstr "评论只能附加图片"
 
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "只有创建者或组织管理员可以更改此智能体"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "仅限本机：被 git 忽略，并应用于该仓库的每个 worktree。此处设置的任何键都会替换共享的值。"
 
@@ -12420,6 +12550,9 @@ msgstr "只有所有者才能管理账单"
 
 msgid "Only owners can update organization settings"
 msgstr "只有所有者才能更新组织设置"
+
+msgid "Only people can manage a channel"
+msgstr "只有成员本人可以管理频道"
 
 msgid "Only people in this organization can join"
 msgstr "只有此组织中的人员可以加入"
@@ -12527,9 +12660,6 @@ msgstr "为当前终端打开多行提示词编辑器"
 msgid "Open a new {label} chat?"
 msgstr "打开新的 {label} 聊天？"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "打开一个窗格，或从中间拖一个到这里。"
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
 
@@ -12631,9 +12761,6 @@ msgstr "打开文件"
 
 msgid "Open File in New Tab"
 msgstr "在新标签页中打开文件"
-
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "在右侧标签页中打开文件、差异和浏览器，中间区域留给终端和聊天。"
 
 msgid "Open from folder"
 msgstr "从文件夹打开"
@@ -13312,9 +13439,6 @@ msgstr "Paradev是桌面应用。留下邮箱，我们会把下载链接发给�
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev正在构建能自我改进的软件。第一步，是给工程师最好的工具，并让它随需求一起演进。"
 
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev正在构建能自我改进的软件。第一步，是给工程师最好的工具，并让它随需求一起演进。我们是3位YC出身的前CTO，在做一个自己喜欢的工具。"
-
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev由一支位于加州旧金山的团队打造。产品支持或账户问题，请发邮件至<0>{supportEmail}</0>，我们会在一个工作日内回复。合作、媒体、企业版或其他任何事宜，请写信至<1>{teamEmail}</1>。"
 
@@ -13350,12 +13474,6 @@ msgstr "iPhone 上的 Paradev Mobile 代码差异"
 
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "无论走到哪里，Paradev 手机版都让我拥有桌面电脑的能力。"
-
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "借助 Paradev Mobile，开发者可以在 iPhone 上继续使用他们在电脑上已经在用的 Paradev 工作区。"
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile 页面"
 
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone 上的 Paradev Mobile 终端"
@@ -13405,6 +13523,9 @@ msgstr "Paradev与同类方案对比"
 
 msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
 msgstr "Paradev支持任何基于CLI的编码智能体，包括Claude Code、OpenCode、OpenAI Codex等。每个任务都可以换用不同的智能体，工作区和审查流程都不用变。"
+
+msgid "paradev.com"
+msgstr "paradev.com"
 
 msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
 msgstr "Paradev 手机应用让我可以随时随地推动智能体工作、解决它们的阻碍，即使我离电脑很远也没问题。"
@@ -13871,6 +13992,9 @@ msgstr "保留提交历史"
 msgid "PresetsBar.tsx"
 msgstr "PresetsBar.tsx"
 
+msgid "Press"
+msgstr "媒体报道"
+
 msgid "Press <0>Esc</0> to close"
 msgstr "按<0>Esc</0>关闭"
 
@@ -13880,8 +14004,8 @@ msgstr "按 ⌘⇧B，或打开 Paradev 检测到的端口。开发服务器会�
 msgid "Press a key…"
 msgstr "请按一个键…"
 
-msgid "Press contact"
-msgstr "媒体联系"
+msgid "Press coverage"
+msgstr "媒体报道"
 
 msgid "Press esc to pick a different element."
 msgstr "按 esc 可重新选择其他元素。"
@@ -14130,9 +14254,6 @@ msgstr "提示词"
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "用提示词让编码智能体实现你想在Paradev中看到的功能。如果我们喜欢你的提示词，就会运行它并合并结果。"
 
-msgid "Prompt agents and answer their questions"
-msgstr "向智能体发送提示并回答它们的问题"
-
 msgid "Prompt command is only available for terminal agents."
 msgstr "提示词命令仅适用于终端智能体。"
 
@@ -14253,6 +14374,12 @@ msgstr "拉取请求"
 
 msgid "Pull Requests"
 msgstr "拉取请求"
+
+msgid "Pull requests, comments and pushes from Superset are made as you."
+msgstr "来自 Superset 的拉取请求、评论和推送以你的身份进行。"
+
+msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
+msgstr "来自 Superset 的拉取请求、评论和推送将不再以你的身份进行。"
 
 msgid "Purple"
 msgstr "紫色"
@@ -14438,9 +14565,6 @@ msgstr "在手机上阅读"
 msgid "Read MCP servers again"
 msgstr "重新读取MCP服务器"
 
-msgid "Read the announcement"
-msgstr "阅读公告"
-
 msgid "Read the changelog"
 msgstr "查看更新日志"
 
@@ -14482,6 +14606,12 @@ msgstr "正在读取用量…"
 
 msgid "Reading your local usage…"
 msgstr "正在读取本地用量…"
+
+msgid "Reads and posts"
+msgstr "可读可发"
+
+msgid "Ready"
+msgstr "就绪"
 
 msgid "Ready for review"
 msgstr "待审查"
@@ -14737,6 +14867,9 @@ msgstr "移除 {label}"
 msgid "Remove {label}?"
 msgstr "移除{label}？"
 
+msgid "Remove {name}"
+msgstr "移除 {name}"
+
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
 
@@ -14944,6 +15077,9 @@ msgstr "已替换{where}中的{replaced}个文件"
 msgid "Replaced 1 file in {where}"
 msgstr "已替换{where}中的1个文件"
 
+msgid "Replied to your DM"
+msgstr "回复了你的私信"
+
 msgid "Reply"
 msgstr "回复"
 
@@ -14956,8 +15092,14 @@ msgstr "回复讨论串…"
 msgid "Reply…"
 msgstr "回复…"
 
+msgid "Replying in a thread"
+msgstr "正在线程中回复"
+
 msgid "Replying to {replyingTo}"
 msgstr "回复 {replyingTo}"
+
+msgid "Replying to a DM"
+msgstr "正在回复私信"
 
 msgid "repo"
 msgstr "仓库"
@@ -15386,9 +15528,6 @@ msgstr "已请求审查"
 msgid "Review required"
 msgstr "需要审查"
 
-msgid "Review syntax-highlighted diffs"
-msgstr "审查带语法高亮的差异"
-
 msgid "Review the result."
 msgstr "审查结果。"
 
@@ -15433,9 +15572,6 @@ msgstr "富输入（{hotkeyText}）"
 
 msgid "right pane"
 msgstr "右侧面板"
-
-msgid "Right pane area"
-msgstr "右侧面板区域"
 
 msgid "Right-click here"
 msgstr "在这里右键点击"
@@ -16235,6 +16371,9 @@ msgstr "发送"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "发送加入{organizationName}的邀请。48小时后过期。"
 
+msgid "Send email and debug delivery"
+msgstr "发送邮件并排查投递问题"
+
 msgid "Send Invitation"
 msgstr "发送邀请"
 
@@ -16466,6 +16605,9 @@ msgstr "shadcn/ui的tooltip方案"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "深浅以该开发者最忙的一天为基准"
 
+msgid "Shape"
+msgstr "形状"
+
 msgid "Share"
 msgstr "分享"
 
@@ -16651,6 +16793,9 @@ msgstr "给我看看Linear分类自动化最近10次运行"
 
 msgid "Show more"
 msgstr "显示更多"
+
+msgid "Show older"
+msgstr "显示更早的"
 
 msgid "Show on Sidebar"
 msgstr "在侧边栏中显示"
@@ -17021,6 +17166,9 @@ msgstr "部分 v1 条目未能迁移"
 msgid "Some v1 work needs your attention"
 msgstr "部分 v1 工作需要你处理"
 
+msgid "someone"
+msgstr "某人"
+
 msgid "Someone"
 msgstr "某人"
 
@@ -17053,8 +17201,8 @@ msgstr "出了点问题。"
 msgid "Something went wrong. Please try again."
 msgstr "出了点问题。请重试。"
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "出了点问题。请重试，或联系support@superset.sh。"
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "出了点问题。请重试，或联系support@paradev.com。"
 
 msgid "soon"
 msgstr "即将"
@@ -17577,6 +17725,9 @@ msgstr "已被取代"
 msgid "superset"
 msgstr "superset"
 
+msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Superset 以你的身份在 GitHub 上操作。连接你的 GitHub 账户以合并、评论和更新拉取请求。"
+
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只会输出该窗格专属的端点。让 Playwright 或 browser-use 连接它即可。"
 
@@ -17585,9 +17736,6 @@ msgstr "Superset 现已更名为 Paradev。另外，我们完成了 1150 万美�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登陆 iPhone"
-
-msgid "superset.sh"
-msgstr "superset.sh"
 
 msgid "Supervised"
 msgstr "监督"
@@ -17600,6 +17748,9 @@ msgstr "未配置支持请求速率限制"
 
 msgid "Support the project with a GitHub star"
 msgstr "在GitHub上点个star来支持这个项目"
+
+msgid "Surprise me"
+msgstr "随机一下"
 
 msgid "Suspended"
 msgstr "已暂停"
@@ -17791,6 +17942,9 @@ msgstr "正在查看…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "比平时久一些。你离开后它也会继续。"
+
+msgid "Talk to it"
+msgstr "与它交流"
 
 msgid "Talk to Paradev"
 msgstr "联系Paradev"
@@ -18105,12 +18259,6 @@ msgstr "智能体使用其技能和工具，问题会出现在 Linear 中。"
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "关注该页面的智能体会读取每条评论，更新页面并在讨论串中回复。"
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "公告还介绍了由 Union Square Ventures 领投、Y Combinator 和 Paul Graham 参投的 1150 万美元种子轮融资。"
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "该应用可免费下载。需要 iOS 26 或更高版本以及 Paradev Pro。接下来将推出 Android 版。"
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "应用版本为 {appVersion}，但连接的是由其他程序（可能是旧版 CLI 或另一个 Paradev 版本）启动的主机服务。重启会将其替换为此应用自带的副本。"
 
@@ -18132,8 +18280,8 @@ msgstr "云端工作区本应已启动，但没有及时响应。下次运行时
 msgid "The code expired. Start again."
 msgstr "代码已过期。请重新开始。"
 
-msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Superset 在设置、运行和归档此项目的工作区时执行的命令，来自 .superset/config.toml。"
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自 .superset/config.toml。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
@@ -18351,8 +18499,8 @@ msgstr "提供商返回了{0}。"
 msgid "The provider refused it."
 msgstr "提供商拒绝了它。"
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "恢复期已结束。请联系support@superset.sh。"
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "恢复期已结束。请联系support@paradev.com。"
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "远程分支已分叉。请先拉取再继续。"
@@ -18526,6 +18674,12 @@ msgstr "此频道已归档"
 
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
+
+msgid "This chat is empty."
+msgstr "此聊天为空。"
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "此聊天可能已被删除，或你没有访问权限。"
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由于对话已在终端中继续，此聊天已停止。"
@@ -18716,14 +18870,14 @@ msgstr "此个人主页当前繁忙"
 msgid "This project is no longer available on your devices."
 msgstr "这个项目在你的设备上已不可用。"
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "此项目未关联 GitHub 仓库。"
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "此项目仍在使用旧的 config.json。它仍可正常工作；转换为 config.toml 即可使用新的配置节。"
 
 msgid "This project's host is offline"
 msgstr "此项目的主机已离线"
+
+msgid "This pull request has no GitHub access to act through."
+msgstr "没有可用于处理此拉取请求的 GitHub 访问权限。"
 
 msgid "This pull request has no host to act through"
 msgstr "此拉取请求没有可用于操作的主机"
@@ -19563,6 +19717,9 @@ msgstr "更新{0}的命名规则"
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "请在该设备上更新 Paradev。应用内更新需要受支持的独立安装和已发布的应用版本。"
 
+msgid "Update Paradev on this host to edit its workspace config."
+msgstr "请更新此主机上的 Paradev，以编辑其工作区配置。"
+
 msgid "Update payment method"
 msgstr "更新支付方式"
 
@@ -19571,9 +19728,6 @@ msgstr "更新已就绪"
 
 msgid "Update Required"
 msgstr "需要更新"
-
-msgid "Update Superset on this host to edit its workspace config."
-msgstr "请更新此主机上的 Superset，以编辑其工作区配置。"
 
 msgid "update the branch prefix"
 msgstr "更新分支前缀"
@@ -19912,9 +20066,6 @@ msgstr "在GitHub上查看"
 msgid "VIEW ON GITHUB"
 msgstr "在GitHub上查看"
 
-msgid "View on the App Store"
-msgstr "在 App Store 查看"
-
 msgid "View open roles"
 msgstr "查看空缺职位"
 
@@ -20157,6 +20308,10 @@ msgstr "欢迎使用Paradev"
 msgid "Welcome to the new Paradev"
 msgstr "欢迎使用全新的 Paradev"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "{0} 是什么、由谁打造、为谁而建。一支由三位前 YC CTO 带领的旧金山团队，正在打造并行编码智能体的工作区。"
+
 msgid "What are the benefits?"
 msgstr "有哪些福利？"
 
@@ -20190,8 +20345,8 @@ msgstr "什么是Paradev Enterprise？"
 msgid "What is wrong?"
 msgstr "哪里有问题？"
 
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Paradev 是什么、由谁打造、为谁而建。一支由三位前 YC CTO 带领的旧金山团队，正在打造并行编码智能体的工作区。"
+msgid "What it does"
+msgstr "它做什么"
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev支持哪些平台？"
@@ -20384,6 +20539,9 @@ msgstr "已运行 {0} 分 {1} 秒"
 
 msgid "Working for {seconds}s"
 msgstr "已运行 {seconds} 秒"
+
+msgid "Working on a mention"
+msgstr "正在处理提及"
 
 msgid "Working…"
 msgstr "处理中…"
@@ -20579,6 +20737,9 @@ msgstr "X-大型"
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
 
+msgid "Y Combinator batch"
+msgstr "Y Combinator 批次"
+
 msgid "Yearly"
 msgstr "按年"
 
@@ -20701,6 +20862,9 @@ msgstr "你拒绝了 {plugin} 的授权请求。"
 
 msgid "You don't have access to this host"
 msgstr "你没有此主机的访问权限"
+
+msgid "You don't have access to this pull request on GitHub, or it no longer exists."
+msgstr "你在 GitHub 上没有此拉取请求的访问权限，或者它已不存在。"
 
 msgid "You don't have access to this terminal."
 msgstr "你没有此终端的访问权限。"

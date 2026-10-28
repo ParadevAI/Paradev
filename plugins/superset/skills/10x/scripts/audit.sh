@@ -4,7 +4,7 @@
 set -u
 
 if ! command -v superset >/dev/null 2>&1; then
-  echo "superset CLI not found on PATH; install with: curl -fsSL https://superset.sh/cli/install.sh | sh" >&2
+  echo "superset CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
   exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then
@@ -31,7 +31,7 @@ run_json() {
   rm -f "$out" "$err"
 }
 
-echo "auditing Superset usage..." >&2
+echo "auditing Paradev usage..." >&2
 jq -n \
   --argjson whoami "$(run_json auth whoami)" \
   --argjson automations "$(run_json automations list)" \

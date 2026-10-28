@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { realpath } from "node:fs/promises";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -137,6 +139,17 @@ function transcriptBefore(
 		if (index !== -1) return { events, midTurn: index > 0 };
 	}
 	return null;
+}
+
+/** Rows whose title contains `query`, case-insensitively; all rows without one. */
+export function sessionsTitled<Row extends { title: string | null }>(
+	rows: readonly Row[],
+	query: string | undefined,
+): readonly Row[] {
+	const needle = query?.trim().toLowerCase();
+	return needle
+		? rows.filter((row) => row.title?.toLowerCase().includes(needle))
+		: rows;
 }
 
 function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
@@ -360,14 +373,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		const rows = parsed.scopeId
 			? options.sessions.listByScope(parsed.scopeId)
 			: options.sessions.list();
-		return rows.slice(0, parsed.limit).map((row) => {
-			const live = options.live.get(row.sessionId);
-			return {
-				...row,
-				live: live !== null,
-				terminalId: live?.terminalId ?? null,
-			};
-		});
+		return sessionsTitled(rows, parsed.query)
+			.slice(0, parsed.limit)
+			.map((row) => {
+				const live = options.live.get(row.sessionId);
+				return {
+					...row,
+					live: live !== null,
+					terminalId: live?.terminalId ?? null,
+				};
+			});
 	};
 
 	return {
@@ -700,14 +715,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		discoverSessions(input) {
+		async discoverSessions(input) {
 			const parsed = discoverSessionsCommandSchema.parse(input);
-			return options.live.discoverSessions({
-				harness: parsed.harness,
-				scopeId: parsed.scopeId,
-				cwd: parsed.cwd,
-				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
-			});
+			const [page, cwds] = await Promise.all([
+				options.live.discoverSessions({
+					harness: parsed.harness,
+					scopeId: parsed.scopeId,
+					cwd: parsed.cwd,
+					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+				}),
+				equivalentPaths(parsed.cwd),
+			]);
+			return {
+				...page,
+				sessions: page.sessions.filter((session) =>
+					cwds.has(pathKey(session.cwd)),
+				),
+			};
 		},
 
 		getItems(input) {
@@ -761,4 +785,19 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			};
 		},
 	};
+}
+
+async function equivalentPaths(path: string): Promise<Set<string>> {
+	const paths = new Set([pathKey(path)]);
+	const real = await realpath(path).catch(() => null);
+	if (real) paths.add(pathKey(real));
+	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

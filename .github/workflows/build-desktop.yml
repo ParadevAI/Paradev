@@ -194,7 +194,7 @@ jobs:
           }
           CLI_BIN="$APP_DIR/Contents/Resources/resources/bin/superset"
           test -x "$CLI_BIN" || {
-            echo "::error::Bundled Superset CLI missing or not executable at $CLI_BIN"
+            echo "::error::Bundled Paradev CLI missing or not executable at $CLI_BIN"
             exit 1
           }
           "$CLI_BIN" --version
@@ -356,7 +356,7 @@ jobs:
           }
           CLI_BIN=$(find release -path "*/resources/resources/bin/superset" -type f -perm -111 | head -1)
           if [ -z "$CLI_BIN" ]; then
-            echo "::error::Bundled Superset CLI missing or not executable in packaged Linux output"
+            echo "::error::Bundled Paradev CLI missing or not executable in packaged Linux output"
             exit 1
           fi
           "$CLI_BIN" --version

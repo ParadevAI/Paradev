@@ -9,7 +9,7 @@ interface YcDealCodeEmailProps {
 
 export function YcDealCodeEmail({
 	firstName = "there",
-	code = "YC-XXXXXXXX",
+	code = "YCXXXXXXXX",
 }: YcDealCodeEmailProps) {
 	return (
 		<EmailLayout preview="Your code for 6 months of Paradev Pro free">

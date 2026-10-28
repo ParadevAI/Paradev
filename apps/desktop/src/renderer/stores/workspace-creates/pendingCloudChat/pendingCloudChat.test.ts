@@ -176,3 +176,31 @@ test("releasing a waiting chat keeps the pane and what was typed but starts its 
 		pending.data.draftId,
 	);
 });
+
+test("the typed prompt goes to the chat that got it, not to a fresh one", () => {
+	const state = collections();
+	seedPendingCloudChat({
+		collections: state.collections,
+		workspaceId: "typed",
+		launch,
+		prompt: "fix the login bug",
+		chatEnabled: true,
+	});
+	const layout = state.rows.get("typed")?.paneLayout;
+	const pending = layout && pendingCloudChatPane(layout);
+	if (!layout || !pending) throw new Error("missing pending pane");
+	expect(pending.data.launchPrompt).toBe("fix the login bug");
+	const attached = attachCloudChatSession(layout, pending.id, {
+		sessionId: "host-chat",
+		terminalId: null,
+		harnessSessionId: null,
+		title: null,
+	});
+	expect(
+		(attached.tabs[0]?.panes[pending.id]?.data as ChatPaneData).launchPrompt,
+	).toBe("fix the login bug");
+	const released = releasePendingCloudChat(layout, pending.id);
+	expect(released.tabs[0]?.panes[pending.id]?.data).not.toHaveProperty(
+		"launchPrompt",
+	);
+});

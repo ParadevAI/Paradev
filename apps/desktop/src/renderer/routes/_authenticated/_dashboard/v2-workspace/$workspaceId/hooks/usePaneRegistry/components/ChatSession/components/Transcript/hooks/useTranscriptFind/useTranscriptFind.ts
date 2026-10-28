@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useHotkey } from "renderer/hotkeys";
+import { rowElement } from "../../utils/rowElement";
 import { toolTitleText } from "../../utils/toolTitle";
 import {
 	type FindMatch,
@@ -26,7 +27,6 @@ import {
 	paintHighlights,
 } from "../../utils/transcriptHighlights";
 import { rowMessageId, type TranscriptRow } from "../../utils/transcriptRows";
-
 import { useThrottledValue } from "./hooks/useThrottledValue";
 
 const DEBOUNCE_MS = 150;
@@ -82,12 +82,6 @@ function insideForeignFindScope(event: KeyboardEvent): boolean {
 		event.target instanceof Element &&
 		event.target.closest(FOREIGN_FIND_SCOPES) !== null
 	);
-}
-
-function rowElement(viewport: HTMLElement, messageId: string): Element | null {
-	if (typeof CSS === "undefined" || typeof CSS.escape !== "function")
-		return null;
-	return viewport.querySelector(`[data-message-id="${CSS.escape(messageId)}"]`);
 }
 
 function revealRect(viewport: HTMLElement, rect: DOMRect, center: boolean) {

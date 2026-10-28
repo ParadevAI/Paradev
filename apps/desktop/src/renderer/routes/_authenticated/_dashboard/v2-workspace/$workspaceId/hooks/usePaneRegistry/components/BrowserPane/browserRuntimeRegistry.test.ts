@@ -469,3 +469,52 @@ describe("browserRuntimeRegistry background open", () => {
 		}
 	});
 });
+
+describe("browserRuntimeRegistry open page lookup", () => {
+	test("finds only a visible, loaded pane on the same page", () => {
+		const makeEntry = (
+			currentUrl: string,
+			overrides: { visible?: boolean; isLoading?: boolean } = {},
+		) => ({
+			state: {
+				currentUrl,
+				pageTitle: `Title of ${currentUrl}`,
+				isLoading: overrides.isLoading ?? false,
+				error: null,
+			},
+			webContentsId: 7,
+			visible: overrides.visible ?? true,
+		});
+		const registryInternals = browserRuntimeRegistry as unknown as {
+			entries: Map<string, ReturnType<typeof makeEntry>>;
+		};
+		const panes = {
+			"lookup-hidden": makeEntry("https://example.com/docs", {
+				visible: false,
+			}),
+			"lookup-loading": makeEntry("https://example.com/docs", {
+				isLoading: true,
+			}),
+			"lookup-open": makeEntry("https://example.com/docs#intro"),
+		};
+		for (const [paneId, entry] of Object.entries(panes)) {
+			registryInternals.entries.set(paneId, entry);
+		}
+		try {
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/docs"),
+			).toEqual({
+				paneId: "lookup-open",
+				title: "Title of https://example.com/docs#intro",
+			});
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/other"),
+			).toBeNull();
+			expect(browserRuntimeRegistry.findOpenPage("not a url")).toBeNull();
+		} finally {
+			for (const paneId of Object.keys(panes)) {
+				registryInternals.entries.delete(paneId);
+			}
+		}
+	});
+});

@@ -267,7 +267,7 @@ export function V2ProjectSettingsBody({
 							usesConfigToml
 								? t({
 										message:
-											"The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml.",
+											"The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml.",
 									})
 								: t({
 										message:

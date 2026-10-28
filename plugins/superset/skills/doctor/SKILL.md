@@ -1,11 +1,11 @@
 ---
 name: doctor
-description: Diagnose and fix Paradev (formerly Superset) problems such as connection failures, offline hosts, terminals not attaching, auth or update issues. Use when the user reports something broken or misbehaving in Superset itself ("Superset won't connect", "my host shows offline", "terminal won't attach", "the app is stuck"), before filing feedback.
+description: Diagnose and fix Paradev (formerly Superset) problems such as connection failures, offline hosts, terminals not attaching, auth or update issues. Use when the user reports something broken or misbehaving in Paradev itself ("Paradev won't connect", "my host shows offline", "terminal won't attach", "the app is stuck"), before filing feedback.
 argument-hint: describe the symptom
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Doctor
+# Paradev Doctor
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
@@ -30,7 +30,7 @@ Diagnose first, change one thing at a time, verify after each change.
 | Private repos will not clone on a host added with `hosts add` | sign in GitHub there: `ssh -t <ssh-target> gh auth login` (install `gh` first if missing) |
 | Linux host stops when the user logs out of it | enable lingering on that machine: `loginctl enable-linger` |
 | `hosts add` stops on an empty or invalid `/etc/machine-id` (cloned VM or container image) | on that machine, `sudo rm -f /etc/machine-id && sudo systemd-machine-id-setup`, then re-run `hosts add`. The user runs this, since it needs sudo on their box |
-| `superset pages publish` in a Superset terminal fails with "Not a member of organization" | `superset update`; newer CLIs use the desktop app's account inside its terminals |
+| `superset pages publish` in a Paradev terminal fails with "Not a member of organization" | `superset update`; newer CLIs use the desktop app's account inside its terminals |
 | CLI and desktop app version mismatch, or stale CLI | `superset update` |
 | App-side misbehavior (macOS) | read the newest entries in `~/Library/Logs/Superset/main.log` for errors |
 

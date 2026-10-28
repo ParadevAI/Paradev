@@ -63,6 +63,10 @@ export const COMPANY = {
 	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
+	SALES_EMAIL: `sales@${ROOT_DOMAIN}`,
+	/** The founders' inbox, used as the press contact. Fixed rather than built from ROOT_DOMAIN. */
+	FOUNDERS_EMAIL: "founders@paradev.com",
+	FOUNDERS_MAIL_TO: "mailto:founders@paradev.com",
 	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
 	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,
@@ -194,7 +198,6 @@ export const FEATURE_FLAGS = {
 	 * Replaces the v2 workspace's right sidebar with a second pane area that
 	 * holds Files, Changes, Review, Browser and Chat panes.
 	 */
-	RIGHT_PANE_AREA: "right-pane-area",
 	/**
 	 * Who may use cloud sandboxes: shows the option in the create picker, and
 	 * gates the cloud procedures server-side (`assertCloudAccess`). The release

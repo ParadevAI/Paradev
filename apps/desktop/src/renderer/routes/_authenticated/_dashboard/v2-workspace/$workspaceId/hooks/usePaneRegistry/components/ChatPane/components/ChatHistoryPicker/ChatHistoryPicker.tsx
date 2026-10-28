@@ -11,10 +11,12 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Check, History, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import type {
 	ChatPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { focusAgentSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusAgentSession";
 import { focusChatSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusChatSession";
 import type { StoreApi } from "zustand/vanilla";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
@@ -74,6 +76,13 @@ export function ChatHistoryPicker({
 		retry: false,
 		refetchOnWindowFocus: false,
 	});
+	const agentSessions = cloudTrpc.agent.listSessions.useQuery(
+		{ cloudWorkspaceId: workspaceId },
+		{ enabled: open, refetchOnWindowFocus: false, retry: false },
+	);
+	const visibleAgentSessions = (agentSessions.data ?? []).filter((session) =>
+		session.agentName.toLowerCase().includes(search.toLowerCase()),
+	);
 	const entries = historyEntries(
 		saved.data ?? [],
 		native.data?.pages.flatMap((page) => page.sessions) ?? [],
@@ -89,6 +98,18 @@ export function ChatHistoryPicker({
 		(entry.presetId === current.agent?.id &&
 			entry.harnessSessionId !== undefined &&
 			entry.harnessSessionId === current.agent?.sessionId);
+
+	const openAgentSession = (session: {
+		sessionId: string;
+		agentName: string;
+	}) => {
+		setOpen(false);
+		focusAgentSession({
+			store: context.store,
+			linkedStores,
+			session: { id: session.sessionId, agentName: session.agentName },
+		});
+	};
 
 	const openChat = (entry: HistoryEntry) => {
 		setOpen(false);
@@ -159,6 +180,33 @@ export function ChatHistoryPicker({
 							<Trans>This agent only shows chats saved in Paradev.</Trans>
 						</p>
 					) : null}
+					{visibleAgentSessions.length > 0 ? (
+						<>
+							<div className="px-2 pt-1 pb-1 text-xs text-muted-foreground">
+								<Trans>Agents</Trans>
+							</div>
+							{visibleAgentSessions.map((session) => (
+								<button
+									type="button"
+									key={session.sessionId}
+									className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
+									onClick={() => openAgentSession(session)}
+								>
+									<div className="min-w-0 flex-1">
+										<div className="truncate text-sm">{session.agentName}</div>
+										<div className="text-xs text-muted-foreground">
+											{formatCompactRelativeTime(
+												new Date(session.lastActivityAt).getTime(),
+											)}
+										</div>
+									</div>
+									{current.agentSession?.id === session.sessionId ? (
+										<Check className="size-3.5 shrink-0" />
+									) : null}
+								</button>
+							))}
+						</>
+					) : null}
 					{visible.map((entry) => (
 						<button
 							type="button"
@@ -181,7 +229,10 @@ export function ChatHistoryPicker({
 							) : null}
 						</button>
 					))}
-					{!saved.isPending && !native.isFetching && visible.length === 0 ? (
+					{!saved.isPending &&
+					!native.isFetching &&
+					visible.length === 0 &&
+					visibleAgentSessions.length === 0 ? (
 						<p className="p-3 text-center text-sm text-muted-foreground">
 							<Trans>No chats found</Trans>
 						</p>

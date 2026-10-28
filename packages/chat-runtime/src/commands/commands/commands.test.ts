@@ -14,6 +14,7 @@ import {
 	journalEnvelopes,
 	waitFor,
 } from "../../testing/testUtils";
+import { sessionsTitled } from "./commands";
 
 const SCRIPT: FakeHarnessScript = {
 	turns: [
@@ -225,6 +226,21 @@ describe("chat commands", () => {
 		).toHaveLength(1);
 		expect(runtime.commands.listSessions({ limit: 1 })).toHaveLength(1);
 		await runtime.dispose();
+	});
+
+	test("a title query keeps matching sessions before the limit applies", () => {
+		const rows = [
+			{ sessionId: "a", title: "Fix the build" },
+			{ sessionId: "b", title: null },
+			{ sessionId: "c", title: "Release notes" },
+			{ sessionId: "d", title: "fix flaky test" },
+		];
+		expect(sessionsTitled(rows, " FIX ").map((row) => row.sessionId)).toEqual([
+			"a",
+			"d",
+		]);
+		expect(sessionsTitled(rows, undefined)).toHaveLength(4);
+		expect(sessionsTitled(rows, "")).toHaveLength(4);
 	});
 
 	test("listSessions reports which sessions are live and their terminal", async () => {

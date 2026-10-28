@@ -8,7 +8,6 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { cn } from "@superset/ui/utils";
 import {
 	LuArchive,
 	LuBell,
@@ -20,6 +19,7 @@ import {
 	LuLogOut,
 	LuUser,
 } from "react-icons/lu";
+import { HeaderTabs } from "renderer/routes/_authenticated/_dashboard/components/HeaderTabs";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import type { ChannelDetailsTab } from "../ChannelDetailsDialog";
@@ -80,23 +80,7 @@ export function ChannelHeader({
 							<Trans>Get channel details</Trans>
 						</TooltipContent>
 					</Tooltip>
-					<div className="flex items-center gap-0.5">
-						{tabs.map((entry) => (
-							<button
-								key={entry.value}
-								type="button"
-								onClick={() => onTabChange(entry.value)}
-								className={cn(
-									"h-7 rounded-md px-2.5 text-xs font-medium transition-colors",
-									tab === entry.value
-										? "bg-fill-selected text-foreground"
-										: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
-								)}
-							>
-								{entry.label}
-							</button>
-						))}
-					</div>
+					<HeaderTabs tabs={tabs} value={tab} onChange={onTabChange} />
 				</div>
 			}
 			end={

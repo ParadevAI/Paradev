@@ -58,7 +58,10 @@ async function latestReplySeq(rootId: string): Promise<number> {
 	return row?.seq ?? 0;
 }
 
-const followTarget = [channelThreadFollows.rootId, channelThreadFollows.userId];
+const followTarget = [
+	channelThreadFollows.rootId,
+	channelThreadFollows.actorId,
+];
 
 export const channelThreadRouter = {
 	/** Followed threads, unread first, each with its root and newest replies. */
@@ -87,19 +90,19 @@ export const channelThreadRouter = {
 					channelMembers,
 					and(
 						eq(channelMembers.channelId, channels.id),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				)
 				.where(
 					and(
-						eq(channelThreadFollows.userId, userId),
+						eq(channelThreadFollows.actorId, userId),
 						eq(channelThreadFollows.following, true),
 						eq(channels.organizationId, input.organizationId),
 						isNull(channels.archivedAt),
 						sql`${channelMessages.replyCount} > 0`,
 						or(
 							eq(channels.visibility, "public"),
-							sql`${channelMembers.userId} is not null`,
+							sql`${channelMembers.actorId} is not null`,
 						),
 					),
 				)
@@ -166,7 +169,7 @@ export const channelThreadRouter = {
 				.where(
 					and(
 						eq(channelThreadFollows.rootId, root.id),
-						eq(channelThreadFollows.userId, userId),
+						eq(channelThreadFollows.actorId, userId),
 						eq(channelThreadFollows.following, true),
 					),
 				)
@@ -206,7 +209,7 @@ export const channelThreadRouter = {
 						eq(channelMessages.threadRootId, root.id),
 						isNull(channelMessages.deletedAt),
 						lte(channelMessages.seq, reply.seq),
-						sql`${channelMessages.authorUserId} is distinct from ${userId}`,
+						sql`${channelMessages.authorId} is distinct from ${userId}`,
 					),
 				);
 			const lastReadSeq = Math.max((other?.seq ?? reply.seq) - 1, 0);
@@ -214,7 +217,7 @@ export const channelThreadRouter = {
 				.insert(channelThreadFollows)
 				.values({
 					rootId: root.id,
-					userId,
+					actorId: userId,
 					channelId: root.channelId,
 					lastReadSeq,
 				})
@@ -245,7 +248,7 @@ export const channelThreadRouter = {
 				.insert(channelThreadFollows)
 				.values({
 					rootId: root.id,
-					userId,
+					actorId: userId,
 					channelId: root.channelId,
 					following: input.following,
 					lastReadSeq,

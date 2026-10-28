@@ -1,10 +1,10 @@
 import { db, dbWs } from "@superset/db/client";
 import {
+	actors,
 	channelMembers,
 	channelMessages,
 	channels,
 	channelThreadFollows,
-	users,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
 import {
@@ -26,6 +26,7 @@ import {
 } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
+import { orgDevIds } from "../agent/access";
 import {
 	assertCanManage,
 	assertNotArchived,
@@ -35,9 +36,12 @@ import {
 } from "./access";
 import {
 	allOrgMemberIds,
+	channelDevs,
 	channelMemberIds,
 	isUniqueViolation,
+	listChannelMembers,
 	orgMemberIds,
+	peopleAmong,
 } from "./members";
 import { publishToUsers } from "./publish";
 import { hasUnreadSql, mentionCountSql, publishReadState } from "./read-state";
@@ -107,7 +111,7 @@ async function assertNotLastAdmin(access: ChannelAccess, userId: string) {
 		.where(
 			and(
 				eq(channelMembers.channelId, access.channel.id),
-				eq(channelMembers.userId, userId),
+				eq(channelMembers.actorId, userId),
 			),
 		)
 		.limit(1);
@@ -120,6 +124,25 @@ async function assertNotLastAdmin(access: ChannelAccess, userId: string) {
 			i18nKey: "serverError.channel.lastAdmin",
 		});
 	}
+}
+
+/** New members by kind: people in the organization and its live Devs. Any other id fails. */
+async function newMembers(organizationId: string, actorIds: readonly string[]) {
+	const unique = [...new Set(actorIds)];
+	const people = await orgMemberIds(organizationId, unique);
+	const isPerson = new Set(people);
+	const devs = await orgDevIds(
+		organizationId,
+		unique.filter((id) => !isPerson.has(id)),
+	);
+	if (people.length + devs.length !== unique.length) {
+		throw userError({
+			code: "BAD_REQUEST",
+			message: "Only people in this organization can join",
+			i18nKey: "serverError.channel.notInOrganization",
+		});
+	}
+	return { people, devs, all: [...people, ...devs] };
 }
 
 /** For changes everyone who can see the channel should pick up: name, visibility, archive. */
@@ -188,24 +211,25 @@ export const channelRouter = {
 					notify: channelMembers.notify,
 					muted: sql<boolean>`coalesce(${channelMembers.muted}, false)`,
 					lastReadSeq: channelMembers.lastReadSeq,
-					hasUnread: sql<boolean>`${channelMembers.userId} is not null and ${hasUnreadSql(userId)}`,
-					mentionCount: sql<number>`case when ${channelMembers.userId} is null then 0 else ${mentionCountSql(userId)} end`,
-					isMember: sql<boolean>`${channelMembers.userId} is not null`,
+					hasUnread: sql<boolean>`${channelMembers.actorId} is not null and ${hasUnreadSql(userId)}`,
+					mentionCount: sql<number>`case when ${channelMembers.actorId} is null then 0 else ${mentionCountSql(userId)} end`,
+					isMember: sql<boolean>`${channelMembers.actorId} is not null`,
 				})
 				.from(channels)
 				.leftJoin(
 					channelMembers,
 					and(
 						eq(channelMembers.channelId, channels.id),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				)
 				.where(
 					and(
 						eq(channels.organizationId, input.organizationId),
+						eq(channels.kind, "channel"),
 						isNull(channels.archivedAt),
 						or(
-							isNotNull(channelMembers.userId),
+							isNotNull(channelMembers.actorId),
 							eq(channels.visibility, "public"),
 						),
 					),
@@ -220,27 +244,19 @@ export const channelRouter = {
 				ctx.session.user.id,
 				input.channelId,
 			);
-			const memberCount = (await channelMemberIds(access.channel.id)).length;
-			return summary(access, memberCount);
+			const [people, devs] = await Promise.all([
+				channelMemberIds(access.channel.id),
+				channelDevs(access.channel.id),
+			]);
+			return summary(access, people.length + devs.length);
 		}),
 
+	/** People and Devs; `kind` says which. */
 	members: protectedProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			await loadChannelAccess(ctx.session.user.id, input.channelId);
-			return db
-				.select({
-					userId: channelMembers.userId,
-					role: channelMembers.role,
-					joinedAt: channelMembers.joinedAt,
-					name: users.name,
-					email: users.email,
-					image: users.image,
-				})
-				.from(channelMembers)
-				.innerJoin(users, eq(users.id, channelMembers.userId))
-				.where(eq(channelMembers.channelId, input.channelId))
-				.orderBy(asc(users.name));
+			return listChannelMembers(input.channelId);
 		}),
 
 	create: protectedProcedure
@@ -249,9 +265,10 @@ export const channelRouter = {
 			const userId = ctx.session.user.id;
 			await assertOrgMember(userId, input.organizationId);
 			const name = validName(input.name);
-			const invited = (
-				await orgMemberIds(input.organizationId, input.memberUserIds)
-			).filter((id) => id !== userId);
+			const invited = await newMembers(
+				input.organizationId,
+				input.memberIds.filter((id) => id !== userId),
+			);
 			try {
 				const channel = await dbWs.transaction(async (tx) => {
 					const [row] = await tx
@@ -268,15 +285,15 @@ export const channelRouter = {
 					await tx
 						.insert(channelMembers)
 						.values([
-							{ channelId: row.id, userId, role: "admin" as const },
-							...invited.map((id) => ({ channelId: row.id, userId: id })),
+							{ channelId: row.id, actorId: userId, role: "admin" as const },
+							...invited.all.map((actorId) => ({ channelId: row.id, actorId })),
 						]);
 					return row;
 				});
 				const listeners =
 					input.visibility === "public"
 						? await allOrgMemberIds(input.organizationId)
-						: [userId, ...invited];
+						: [userId, ...invited.people];
 				publishToUsers(listeners, {
 					type: "channels.changed",
 					organizationId: input.organizationId,
@@ -354,7 +371,7 @@ export const channelRouter = {
 				.insert(channelMembers)
 				.values({
 					channelId: access.channel.id,
-					userId,
+					actorId: userId,
 					lastReadSeq: access.channel.lastSeq,
 				})
 				.onConflictDoNothing();
@@ -374,13 +391,19 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, access.channel.id),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				);
 			const [remaining] = await db
 				.select({ value: count() })
 				.from(channelMembers)
-				.where(eq(channelMembers.channelId, access.channel.id));
+				.innerJoin(actors, eq(actors.id, channelMembers.actorId))
+				.where(
+					and(
+						eq(channelMembers.channelId, access.channel.id),
+						isNotNull(actors.userId),
+					),
+				);
 			if (
 				access.channel.visibility === "private" &&
 				access.channel.archivedAt === null &&
@@ -410,29 +433,22 @@ export const channelRouter = {
 					i18nKey: "serverError.channel.joinFirst",
 				});
 			}
-			const valid = await orgMemberIds(
+			const added = await newMembers(
 				access.channel.organizationId,
-				input.userIds,
+				input.actorIds,
 			);
-			if (valid.length !== new Set(input.userIds).size) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message: "Only people in this organization can join",
-					i18nKey: "serverError.channel.notInOrganization",
-				});
-			}
 			await db
 				.insert(channelMembers)
 				.values(
-					valid.map((userId) => ({
+					added.all.map((actorId) => ({
 						channelId: access.channel.id,
-						userId,
+						actorId,
 						lastReadSeq: access.channel.lastSeq,
 					})),
 				)
 				.onConflictDoNothing();
-			await notifyMembers(access);
-			return { added: valid.length };
+			await notifyMembers(access, added.people);
+			return { added: added.all.length };
 		}),
 
 	removeMember: protectedProcedure
@@ -444,17 +460,17 @@ export const channelRouter = {
 			);
 			assertCanManage(access);
 			assertNotArchived(access);
-			await assertNotLastAdmin(access, input.userId);
+			await assertNotLastAdmin(access, input.actorId);
 			await db
 				.delete(channelMembers)
 				.where(
 					and(
 						eq(channelMembers.channelId, access.channel.id),
-						eq(channelMembers.userId, input.userId),
+						eq(channelMembers.actorId, input.actorId),
 					),
 				);
-			await notifyMembers(access, [input.userId]);
-			return { userId: input.userId };
+			await notifyMembers(access, [input.actorId]);
+			return { actorId: input.actorId };
 		}),
 
 	setRole: protectedProcedure
@@ -466,8 +482,15 @@ export const channelRouter = {
 			);
 			assertCanManage(access);
 			assertNotArchived(access);
+			if ((await peopleAmong([input.actorId])).length === 0) {
+				throw userError({
+					code: "BAD_REQUEST",
+					message: "Only people can manage a channel",
+					i18nKey: "serverError.channel.onlyPeopleManage",
+				});
+			}
 			if (input.role === "member") {
-				await assertNotLastAdmin(access, input.userId);
+				await assertNotLastAdmin(access, input.actorId);
 			}
 			await db
 				.update(channelMembers)
@@ -475,11 +498,11 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, access.channel.id),
-						eq(channelMembers.userId, input.userId),
+						eq(channelMembers.actorId, input.actorId),
 					),
 				);
-			await notifyMembers(access, [input.userId]);
-			return { userId: input.userId, role: input.role };
+			await notifyMembers(access, [input.actorId]);
+			return { actorId: input.actorId, role: input.role };
 		}),
 
 	setNotify: protectedProcedure
@@ -492,7 +515,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, input.channelId),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				);
 			return { notify: input.notify };
@@ -507,7 +530,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, input.channelId),
-						eq(channelMembers.userId, ctx.session.user.id),
+						eq(channelMembers.actorId, ctx.session.user.id),
 					),
 				);
 			return { suppressBroadcasts: input.suppressBroadcasts };
@@ -522,7 +545,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, input.channelId),
-						eq(channelMembers.userId, ctx.session.user.id),
+						eq(channelMembers.actorId, ctx.session.user.id),
 					),
 				);
 			return { muted: input.muted };
@@ -541,7 +564,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, input.channelId),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				);
 			const state = await publishReadState(userId, input.channelId);
@@ -583,7 +606,7 @@ export const channelRouter = {
 						isNull(channelMessages.threadRootId),
 						isNull(channelMessages.deletedAt),
 						lte(channelMessages.seq, message.seq),
-						sql`${channelMessages.authorUserId} is distinct from ${userId}`,
+						sql`${channelMessages.authorId} is distinct from ${userId}`,
 					),
 				);
 			const firstUnread = other?.seq ?? message.seq;
@@ -593,7 +616,7 @@ export const channelRouter = {
 				.where(
 					and(
 						eq(channelMembers.channelId, message.channelId),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				);
 			const state = await publishReadState(userId, message.channelId);
@@ -614,7 +637,7 @@ export const channelRouter = {
 				})
 				.where(
 					and(
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 						sql`${channelMembers.channelId} in ${inOrg}`,
 					),
 				);
@@ -625,7 +648,7 @@ export const channelRouter = {
 				})
 				.where(
 					and(
-						eq(channelThreadFollows.userId, userId),
+						eq(channelThreadFollows.actorId, userId),
 						sql`${channelThreadFollows.channelId} in ${inOrg}`,
 					),
 				);

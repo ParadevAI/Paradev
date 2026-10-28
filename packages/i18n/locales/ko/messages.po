@@ -451,6 +451,10 @@ msgstr "{0}은(는) 이미 \"{1}\"에 지정되어 있습니다."
 msgid "{0} is already used for tasks in this organization."
 msgstr "{0}은(는) 이 조직의 작업에 이미 사용 중입니다."
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "{0} is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
+msgstr "{0}는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다. 우리는 우리가 사랑하는 도구를 만드는 YC 출신 CTO 3인입니다."
+
 #. placeholder {0}: params?.repoFullName
 msgid "{0} is not a repository the GitHub App is installed on"
 msgstr "{0}은(는) GitHub App이 설치된 리포지토리가 아닙니다"
@@ -926,9 +930,6 @@ msgstr "{formerName}의 새 이름: {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName}, 이제 {productName}입니다!"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName}의 새 이름은 {productName}입니다. 같은 제품, 같은 팀이며 이름만 바뀌었습니다. 기존 superset.sh 링크는 리디렉션되며 superset 명령어도 계속 작동합니다."
-
 msgid "{founderCount} ex-YC founders"
 msgstr "YC 출신 창업자 {founderCount}명"
 
@@ -1159,6 +1160,9 @@ msgstr "사용자당 월 {price}"
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(구 {formerName}, YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
 
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}(구 {formerName})"
+
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
 
@@ -1167,6 +1171,9 @@ msgstr "언론을 위한 {productName}"
 
 msgid "{productName} has been used by one in eight Fortune 500 companies."
 msgstr "{productName}의 사용 기업에는 Fortune 500 기업 8곳 중 1곳이 포함됩니다."
+
+msgid "{productName} in the press"
+msgstr "언론 속 {productName}"
 
 msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
 msgstr "{productName}의 사용자로는 전 세계적으로 Netflix, Microsoft, NVIDIA, DoorDash, Wix, Mistral AI의 엔지니어가, 아시아에서는 ByteDance, 토스, 카카오, Grab, LINE, Rakuten의 엔지니어가 있습니다."
@@ -1461,6 +1468,9 @@ msgstr "크레딧 ${balance}"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "Union Square Ventures가 주도한 1,150만 달러 시드 투자"
+
 msgid "1"
 msgstr "1"
 
@@ -1482,8 +1492,14 @@ msgstr "상태 유실 없이 동시 작업 흐름 10개 이상"
 msgid "12m ago"
 msgstr "12분 전"
 
+msgid "145,000+ across 180 countries"
+msgstr "180개국 145,000명 이상"
+
 msgid "15 min"
 msgstr "15분"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "스타 15k+, 기여자 100+"
 
 msgid "1d ago"
 msgstr "1일 전"
@@ -1685,9 +1701,6 @@ msgstr "회사 소개"
 
 msgid "About {displayName}"
 msgstr "{displayName}에 관하여"
-
-msgid "About {productName}"
-msgstr "{productName} 소개"
 
 msgid "About Paradev"
 msgstr "Paradev 소개"
@@ -1905,6 +1918,9 @@ msgstr "파일, 앱 등 추가"
 msgid "Add files, apps, and more (@)"
 msgstr "파일, 앱 등 추가 (@)"
 
+msgid "Add instructions"
+msgstr "지침 추가"
+
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
 msgstr "이슈 #{0}을(를) 워크스페이스에 추가"
@@ -2008,6 +2024,9 @@ msgstr "사이드바에 추가"
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
 
+msgid "Add what it does"
+msgstr "하는 일 추가"
+
 msgid "Add your own terminal agent to this device."
 msgstr "이 기기에 직접 만든 터미널 에이전트를 추가합니다."
 
@@ -2098,6 +2117,9 @@ msgstr "에이전트 작업 중"
 
 msgid "Agent launch configuration"
 msgstr "에이전트 실행 구성"
+
+msgid "Agent not found"
+msgstr "에이전트를 찾을 수 없습니다"
 
 msgid "Agent picker (Claude, Codex, Cursor…) used by every session-creation flow"
 msgstr "모든 세션 생성 흐름에서 쓰는 에이전트 선택기(Claude, Codex, Cursor…)"
@@ -2507,6 +2529,12 @@ msgstr "이 질문은 데스크톱에서 답하거나 건너뛰세요."
 msgid "Answered"
 msgstr "응답함"
 
+msgid "Answered {who} in #{channel}"
+msgstr "#{channel}에서 {who}에게 답변함"
+
+msgid "Answered you in #{channel}"
+msgstr "#{channel}에서 나에게 답변함"
+
 msgid "Anthropic rejected this API key."
 msgstr "Anthropic이 이 API 키를 거부했습니다."
 
@@ -2720,6 +2748,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "보관"
 
+msgid "Archive {name}?"
+msgstr "{name}을(를) 보관할까요?"
+
 #. placeholder {0}: channel.name
 msgid "Archive #{0}?"
 msgstr "#{0}을(를) 보관할까요?"
@@ -2771,6 +2802,9 @@ msgstr "인수"
 
 msgid "Argv used to launch the agent."
 msgstr "에이전트를 실행할 때 사용하는 argv입니다."
+
+msgid "Articles and coverage about {productName}."
+msgstr "{productName}에 관한 기사와 보도."
 
 msgid "Artifact"
 msgstr "아티팩트"
@@ -2849,6 +2883,9 @@ msgstr "보조"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "한눈에 보기"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "우리를 포함해 이름을 댈 수 있는 팀 중 최소 한 곳이 한 분기 내내 모든 F4 관문을 통과하고 그 수치를 공개합니다."
@@ -3844,6 +3881,9 @@ msgstr "채팅 세션을 찾을 수 없습니다"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "채팅 화면: 메시지, 추론, 제안"
 
+msgid "Chats"
+msgstr "채팅"
+
 msgid "Check again"
 msgstr "다시 확인"
 
@@ -4715,8 +4755,20 @@ msgstr "외부 서비스를 연결해 조직과 데이터를 동기화합니다.
 msgid "Connect external services to sync data."
 msgstr "외부 서비스를 연결해 데이터를 동기화합니다."
 
+msgid "Connect GitHub"
+msgstr "GitHub 연결"
+
 msgid "Connect GitHub in Integrations to add {repositoryFullName}."
 msgstr "{repositoryFullName}을(를) 추가하려면 연동에서 GitHub를 연결하세요."
+
+msgid "Connect GitHub in Settings to act on pull requests as yourself"
+msgstr "본인 계정으로 풀 리퀘스트를 처리하려면 설정에서 GitHub를 연결하세요"
+
+msgid "Connect GitHub to continue"
+msgstr "계속하려면 GitHub를 연결하세요"
+
+msgid "Connect GitHub to see review comments as yourself."
+msgstr "본인 계정으로 리뷰 댓글을 보려면 GitHub를 연결하세요."
 
 msgid "Connect GitHub…"
 msgstr "GitHub 연결…"
@@ -4751,8 +4803,14 @@ msgstr "Slack을 연결해 대화에서 바로 작업을 관리하세요. 아무
 msgid "Connect this computer"
 msgstr "이 컴퓨터에 연결"
 
+msgid "Connect to act on pull requests as yourself instead of as the workspace."
+msgstr "연결하면 워크스페이스가 아닌 본인 계정으로 풀 리퀘스트를 처리할 수 있습니다."
+
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} 계정을 연결한 다음 이 페이지를 새로 고치세요."
+
+msgid "Connect your GitHub account to load this pull request as you."
+msgstr "이 풀 리퀘스트를 본인 계정으로 불러오려면 GitHub 계정을 연결하세요."
 
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "GitHub 리포지토리를 연결하고 풀 리퀘스트를 동기화하세요. 팀 전체의 CI 상태와 리뷰를 추적할 수 있습니다."
@@ -4931,9 +4989,6 @@ msgstr "브라우저에서 계속하세요"
 
 msgid "Continue or fork session"
 msgstr "세션 계속하기 또는 포크"
-
-msgid "Continue the same workspace from your iPhone"
-msgstr "같은 워크스페이스를 iPhone에서 이어서 작업"
 
 msgid "Continue the session the last run left"
 msgstr "마지막 실행이 남긴 세션을 계속"
@@ -5300,6 +5355,9 @@ msgstr "이 차이를 불러올 수 없습니다"
 msgid "Could not load this file."
 msgstr "이 파일을 불러올 수 없습니다."
 
+msgid "Could not load this pull request."
+msgstr "이 풀 리퀘스트를 불러오지 못했습니다."
+
 msgid "Could not load your machines"
 msgstr "머신을 불러오지 못했습니다"
 
@@ -5332,9 +5390,6 @@ msgstr "모바일 시뮬레이터에 연결할 수 없습니다."
 
 msgid "Could not reach the desktop."
 msgstr "데스크톱에 연결할 수 없습니다."
-
-msgid "Could not reach the host to load this pull request."
-msgstr "호스트에 연결할 수 없어 이 풀 리퀘스트를 불러오지 못했습니다."
 
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "업데이트를 시작하기 위해 호스트에 연결할 수 없습니다. 온라인 상태인지 확인한 후 다시 시도하세요."
@@ -5481,6 +5536,9 @@ msgstr "새 worktree로 분기할 수 없습니다"
 msgid "Couldn't branch the conversation"
 msgstr "대화를 분기할 수 없습니다"
 
+msgid "Couldn't check"
+msgstr "확인할 수 없음"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "이 멤버 제거의 영향을 확인할 수 없습니다"
 
@@ -5554,6 +5612,9 @@ msgstr "이전 메시지를 불러올 수 없습니다. 다시 시도"
 
 msgid "Couldn't load issues: {msg}"
 msgstr "이슈를 불러오지 못했습니다: {msg}"
+
+msgid "Couldn't load its activity"
+msgstr "활동을 불러올 수 없습니다"
 
 msgid "Couldn't load pages"
 msgstr "페이지를 불러올 수 없습니다"
@@ -5657,6 +5718,9 @@ msgstr "편집을 저장하지 못했습니다"
 msgid "Couldn't save the change"
 msgstr "변경 사항을 저장하지 못했습니다"
 
+msgid "Couldn't save the Dev"
+msgstr "Dev를 저장할 수 없습니다"
+
 msgid "Couldn't send comment"
 msgstr "코멘트를 보내지 못했습니다"
 
@@ -5752,6 +5816,9 @@ msgstr "\"{newLabel}\" 만들기"
 
 msgid "Create a channel"
 msgstr "채널 만들기"
+
+msgid "Create a Dev"
+msgstr "Dev 만들기"
 
 msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
 msgstr "같은 대화 컨텍스트로 제공자의 네이티브 포크를 만듭니다. 원래 세션은 그대로 유지됩니다."
@@ -5919,6 +5986,9 @@ msgstr "{0} 생성 · 마지막 사용 {1}"
 msgid "Created {ago}"
 msgstr "{ago} 생성됨"
 
+msgid "Created {created}"
+msgstr "{created}에 생성됨"
+
 msgid "Created {createdAgo}"
 msgstr "{createdAgo} 생성됨"
 
@@ -6082,6 +6152,12 @@ msgstr "사용자 지정 제공사"
 
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
+
+msgid "Customize"
+msgstr "사용자 지정"
+
+msgid "Customize {devName}"
+msgstr "{devName} 사용자 지정"
 
 msgid "Customize commands"
 msgstr "명령 사용자 지정"
@@ -6519,6 +6595,9 @@ msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
 msgid "Dev"
 msgstr "개발"
 
+msgid "Dev options"
+msgstr "Dev 옵션"
+
 msgid "Dev sign in"
 msgstr "개발용 로그인"
 
@@ -6545,6 +6624,9 @@ msgstr "기기: {selectedLabel}"
 
 msgid "Devices"
 msgstr "기기"
+
+msgid "Devs"
+msgstr "Devs"
 
 msgid "DevTools"
 msgstr "DevTools"
@@ -6590,6 +6672,9 @@ msgstr "새 탭에서 차이"
 
 msgid "Digital Product Designer"
 msgstr "디지털 제품 디자이너"
+
+msgid "Direct messages"
+msgstr "다이렉트 메시지"
 
 msgid "Direct mode"
 msgstr "다이렉트 모드"
@@ -6827,8 +6912,8 @@ msgstr "로그 다운로드"
 msgid "Download Manually"
 msgstr "수동으로 다운로드"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Paradev 관련 보도에 사용할 수 있는 로고와 제품 이미지를 내려받으세요."
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Paradev 관련 보도에 사용할 수 있는 로고, 제품 이미지, 창업자 사진을 내려받으세요."
 
 msgid "Download Paradev"
 msgstr "Paradev 다운로드"
@@ -7455,6 +7540,9 @@ msgstr "매우 높음"
 
 msgid "Extra small"
 msgstr "아주 작음"
+
+msgid "Eyes"
+msgstr "눈"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4 관문 · {F4_GATE_SHARE}%"
@@ -8167,8 +8255,8 @@ msgstr "터미널에서 찾기"
 msgid "Find in this chat"
 msgstr "이 채팅에서 찾기"
 
-msgid "Find people"
-msgstr "사람 찾기"
+msgid "Find people and Devs"
+msgstr "사람 및 Dev 찾기"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8284,9 +8372,6 @@ msgstr "새 worktree에 체크아웃할 폴더를 리포지토리 루트 기준�
 msgid "FOLLOW ON X"
 msgstr "X에서 팔로우하기"
 
-msgid "Follow terminal sessions live"
-msgstr "터미널 세션을 실시간으로 확인"
-
 msgid "Follow thread"
 msgstr "스레드 팔로우"
 
@@ -8298,6 +8383,12 @@ msgstr "LinkedIn에서 팔로우하기"
 
 msgid "Follow us on X/Twitter"
 msgstr "X/Twitter에서 팔로우하기"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "#{channel}에서 {who}에게 후속 답변함"
+
+msgid "Followed up with you in #{channel}"
+msgstr "#{channel}에서 나에게 후속 답변함"
 
 msgid "Font family"
 msgstr "글꼴"
@@ -8425,6 +8516,9 @@ msgstr "툴팁 호출 지점 12곳 발견"
 msgid "Founder & CEO, WowMakers"
 msgstr "창업자 겸 CEO, WowMakers"
 
+msgid "Founders"
+msgstr "창업자"
+
 msgid "Founding Engineer"
 msgstr "창립 엔지니어"
 
@@ -8487,6 +8581,9 @@ msgstr "완전 자율 주행"
 
 msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 msgstr "전체 소스가 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있습니다. 코드를 확인하고, 감사하고, 기여하세요. 블랙박스도, 숨겨진 기능도 없습니다."
+
+msgid "Funding"
+msgstr "투자 유치"
 
 msgid "Future home for reusable agent configs."
 msgstr "재사용 가능한 에이전트 설정이 앞으로 들어올 자리입니다."
@@ -8809,6 +8906,9 @@ msgstr "제목 2"
 msgid "Heading 3"
 msgstr "제목 3"
 
+msgid "Headquarters"
+msgstr "본사"
+
 msgid "Heart"
 msgstr "하트"
 
@@ -9037,6 +9137,9 @@ msgstr "묶인 명령이 열리는 방식입니다."
 
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "터미널에서 그냥 Claude Code를 실행하는 것과 Paradev는 어떻게 다른가요?"
+
+msgid "How it should work and what to avoid"
+msgstr "작업 방식과 피해야 할 것"
 
 msgid "How it works"
 msgstr "작동 방식"
@@ -9660,6 +9763,9 @@ msgstr "되돌릴 수 없습니다."
 
 msgid "It keeps the title from your prompt."
 msgstr "프롬프트에서 가져온 제목이 유지됩니다."
+
+msgid "It loses all its access at once. Its chats and the work it made are kept."
+msgstr "모든 액세스 권한을 즉시 잃습니다. 채팅과 만든 작업은 유지됩니다."
 
 msgid "It may be asleep"
 msgstr "절전 모드일 수 있습니다"
@@ -10329,6 +10435,9 @@ msgstr "로딩 및 진행 중 활동 표시기"
 msgid "Loading changes..."
 msgstr "변경 사항을 불러오는 중..."
 
+msgid "Loading chat"
+msgstr "채팅 불러오는 중"
+
 msgid "Loading comments…"
 msgstr "댓글 불러오는 중…"
 
@@ -10364,6 +10473,9 @@ msgstr "이슈를 불러오는 중..."
 
 msgid "Loading issues…"
 msgstr "이슈 불러오는 중…"
+
+msgid "Loading link preview"
+msgstr "링크 미리보기 불러오는 중"
 
 msgid "Loading members..."
 msgstr "멤버 불러오는 중..."
@@ -10832,6 +10944,9 @@ msgstr "머지 중…"
 
 msgid "Mesh Gradient"
 msgstr "메시 그라데이션"
+
+msgid "Message {name}"
+msgstr "{name}에게 메시지 보내기"
 
 msgid "Message {name}…"
 msgstr "{name}에게 메시지…"
@@ -11770,6 +11885,9 @@ msgstr "열린 리뷰 코멘트가 없습니다."
 msgid "No organization selected"
 msgstr "선택된 조직이 없습니다"
 
+msgid "No other chats here"
+msgstr "다른 채팅이 없습니다"
+
 msgid "No pages match"
 msgstr "일치하는 페이지 없음"
 
@@ -12183,6 +12301,9 @@ msgstr "실행 중인 항목 없음"
 msgid "Nothing was missed"
 msgstr "놓친 실행이 없습니다"
 
+msgid "Nothing yet"
+msgstr "아직 없음"
+
 msgid "Notice"
 msgstr "알림"
 
@@ -12346,6 +12467,9 @@ msgstr "엔지니어 한 명이 하루 근무 내내 3개 이상의 에이전트
 msgid "One human drives at most one agent at a time."
 msgstr "사람 한 명이 한 번에 최대 한 개의 에이전트를 다룹니다."
 
+msgid "One line"
+msgstr "한 줄"
+
 msgid "One line about how you work"
 msgstr "일하는 방식을 한 줄로"
 
@@ -12354,6 +12478,9 @@ msgstr "보드의 첫 100명 중 한 명"
 
 msgid "one of the selected repositories"
 msgstr "선택한 리포지토리 중 하나"
+
+msgid "One paragraph"
+msgstr "한 단락"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "하나의 플러그인, 모든 코딩 에이전트: Claude Code, Codex, Cursor, OpenCode 등. 한 번 설치하면 내 머신과 클라우드에서 씁니다."
@@ -12400,6 +12527,9 @@ msgstr "호스트 소유자 또는 조직 소유자만 이 호스트를 삭제�
 msgid "Only images can be attached to a comment"
 msgstr "댓글에는 이미지만 첨부할 수 있습니다"
 
+msgid "Only its creator or an organization admin can change this agent"
+msgstr "이 에이전트는 만든 사람이나 조직 관리자만 변경할 수 있습니다"
+
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "이 컴퓨터에서만: git에서 무시되며 이 리포지토리의 모든 worktree에 적용됩니다. 여기에서 설정한 키는 공유된 값을 대체합니다."
 
@@ -12420,6 +12550,9 @@ msgstr "소유자만 결제를 관리할 수 있습니다"
 
 msgid "Only owners can update organization settings"
 msgstr "소유자만 조직 설정을 변경할 수 있습니다"
+
+msgid "Only people can manage a channel"
+msgstr "사람만 채널을 관리할 수 있습니다"
 
 msgid "Only people in this organization can join"
 msgstr "이 조직의 사용자만 참여할 수 있습니다"
@@ -12527,9 +12660,6 @@ msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
 msgid "Open a new {label} chat?"
 msgstr "새 {label} 채팅을 열까요?"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "창을 열거나 가운데에서 여기로 끌어 오세요."
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "리뷰 상태, 검사, 코멘트를 보려면 풀 리퀘스트를 여세요."
 
@@ -12631,9 +12761,6 @@ msgstr "파일 열기"
 
 msgid "Open File in New Tab"
 msgstr "새 탭에서 파일 열기"
-
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "파일, diff, 브라우저를 오른쪽 탭에서 열고 가운데는 터미널과 채팅용으로 둡니다."
 
 msgid "Open from folder"
 msgstr "폴더에서 열기"
@@ -13312,9 +13439,6 @@ msgstr "Paradev는 데스크톱 앱입니다. 이메일을 입력하시면 Mac�
 msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time."
 msgstr "Paradev는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다."
 
-msgid "Paradev is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
-msgstr "Paradev는 스스로 나아지는 소프트웨어를 만듭니다. 그 시작은 엔지니어에게 시간이 지날수록 필요에 맞춰지는 최고의 도구를 주는 일입니다. 우리는 우리가 사랑하는 도구를 만드는 YC 출신 CTO 3인입니다."
-
 msgid "Paradev is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
 msgstr "Paradev는 캘리포니아 샌프란시스코에 있는 팀이 만듭니다. 제품 지원이나 계정 문의는 <0>{supportEmail}</0>으로 메일을 보내 주시면 영업일 기준 하루 안에 회신드립니다. 파트너십, 언론, 엔터프라이즈 문의나 그 밖의 내용은 <1>{teamEmail}</1>으로 보내 주세요."
 
@@ -13350,12 +13474,6 @@ msgstr "iPhone의 Paradev Mobile 코드 diff"
 
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradev 모바일은 어디를 가든 데스크톱의 성능을 사용할 수 있게 해줍니다."
-
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Paradev Mobile을 사용하면 개발자는 컴퓨터에서 쓰던 Paradev 워크스페이스를 iPhone에서 이어서 작업할 수 있습니다."
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile 페이지"
 
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone의 Paradev Mobile 터미널"
@@ -13405,6 +13523,9 @@ msgstr "Paradev와 대안 비교"
 
 msgid "Paradev works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
 msgstr "Paradev는 Claude Code, OpenCode, OpenAI Codex 등 CLI 기반 코딩 에이전트라면 무엇이든 함께 씁니다. 워크스페이스나 리뷰 흐름을 바꾸지 않고 작업마다 다른 에이전트를 고르세요."
+
+msgid "paradev.com"
+msgstr "paradev.com"
 
 msgid "Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
 msgstr "Paradev 모바일 앱 덕분에 컴퓨터에서 멀리 떨어져 있어도 어디서든 에이전트가 계속 작업하도록 돕고 막힌 부분을 해결할 수 있습니다."
@@ -13871,6 +13992,9 @@ msgstr "커밋 기록 유지"
 msgid "PresetsBar.tsx"
 msgstr "PresetsBar.tsx"
 
+msgid "Press"
+msgstr "보도"
+
 msgid "Press <0>Esc</0> to close"
 msgstr "닫으려면 <0>Esc</0>를 누르세요"
 
@@ -13880,8 +14004,8 @@ msgstr "⌘⇧B를 누르거나 Paradev가 감지한 포트를 여세요. 개발
 msgid "Press a key…"
 msgstr "키를 누르세요…"
 
-msgid "Press contact"
-msgstr "언론 문의"
+msgid "Press coverage"
+msgstr "언론 보도"
 
 msgid "Press esc to pick a different element."
 msgstr "esc를 누르면 다른 요소를 다시 고를 수 있습니다."
@@ -14130,9 +14254,6 @@ msgstr "프롬프트"
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "코딩 에이전트에게 Paradev에서 보고 싶은 기능을 만들어 달라고 요청하세요. 마음에 드는 프롬프트는 저희가 실행해서 결과를 머지합니다."
 
-msgid "Prompt agents and answer their questions"
-msgstr "에이전트에게 프롬프트를 보내고 질문에 답하기"
-
 msgid "Prompt command is only available for terminal agents."
 msgstr "프롬프트 명령은 터미널 에이전트에서만 사용할 수 있습니다."
 
@@ -14253,6 +14374,12 @@ msgstr "풀 리퀘스트"
 
 msgid "Pull Requests"
 msgstr "풀 리퀘스트"
+
+msgid "Pull requests, comments and pushes from Superset are made as you."
+msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
+
+msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
+msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시가 더 이상 본인 계정으로 처리되지 않습니다."
 
 msgid "Purple"
 msgstr "보라"
@@ -14438,9 +14565,6 @@ msgstr "휴대폰으로 읽기"
 msgid "Read MCP servers again"
 msgstr "MCP 서버 다시 읽기"
 
-msgid "Read the announcement"
-msgstr "발표 읽기"
-
 msgid "Read the changelog"
 msgstr "변경 로그 읽기"
 
@@ -14482,6 +14606,12 @@ msgstr "사용량 읽는 중…"
 
 msgid "Reading your local usage…"
 msgstr "로컬 사용량을 읽는 중…"
+
+msgid "Reads and posts"
+msgstr "읽기 및 게시"
+
+msgid "Ready"
+msgstr "준비됨"
 
 msgid "Ready for review"
 msgstr "리뷰 준비됨"
@@ -14737,6 +14867,9 @@ msgstr "{label} 제거"
 msgid "Remove {label}?"
 msgstr "{label}을(를) 제거할까요?"
 
+msgid "Remove {name}"
+msgstr "{name} 제거"
+
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} 제거"
 
@@ -14944,6 +15077,9 @@ msgstr "{where}에서 파일 {replaced}개를 바꿨습니다"
 msgid "Replaced 1 file in {where}"
 msgstr "{where}에서 파일 1개를 바꿨습니다"
 
+msgid "Replied to your DM"
+msgstr "내 다이렉트 메시지에 답장함"
+
 msgid "Reply"
 msgstr "답글"
 
@@ -14956,8 +15092,14 @@ msgstr "스레드에 답글…"
 msgid "Reply…"
 msgstr "답글…"
 
+msgid "Replying in a thread"
+msgstr "스레드에서 답장하는 중"
+
 msgid "Replying to {replyingTo}"
 msgstr "{replyingTo}에게 답글"
+
+msgid "Replying to a DM"
+msgstr "다이렉트 메시지에 답장하는 중"
 
 msgid "repo"
 msgstr "리포"
@@ -15386,9 +15528,6 @@ msgstr "리뷰 요청됨"
 msgid "Review required"
 msgstr "리뷰 필요"
 
-msgid "Review syntax-highlighted diffs"
-msgstr "구문 강조된 diff 리뷰"
-
 msgid "Review the result."
 msgstr "결과를 리뷰하세요."
 
@@ -15433,9 +15572,6 @@ msgstr "리치 입력 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "오른쪽 패널"
-
-msgid "Right pane area"
-msgstr "오른쪽 패널 영역"
 
 msgid "Right-click here"
 msgstr "여기를 오른쪽 클릭"
@@ -16235,6 +16371,9 @@ msgstr "보내기"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}에 참여하도록 초대를 보냅니다. 48시간 후 만료됩니다."
 
+msgid "Send email and debug delivery"
+msgstr "이메일 전송 및 전달 문제 디버그"
+
 msgid "Send Invitation"
 msgstr "초대 보내기"
 
@@ -16466,6 +16605,9 @@ msgstr "shadcn/ui 툴팁 레시피"
 msgid "Shade is relative to this developer's busiest day"
 msgstr "색의 진하기는 이 개발자의 가장 바빴던 날을 기준으로 합니다"
 
+msgid "Shape"
+msgstr "모양"
+
 msgid "Share"
 msgstr "공유"
 
@@ -16651,6 +16793,9 @@ msgstr "내 Linear 분류 자동화의 최근 실행 10건을 보여 줘"
 
 msgid "Show more"
 msgstr "더 보기"
+
+msgid "Show older"
+msgstr "이전 항목 보기"
 
 msgid "Show on Sidebar"
 msgstr "사이드바에 표시"
@@ -17021,6 +17166,9 @@ msgstr "일부 v1 항목을 옮기지 못했습니다"
 msgid "Some v1 work needs your attention"
 msgstr "일부 v1 작업에 확인이 필요합니다"
 
+msgid "someone"
+msgstr "누군가"
+
 msgid "Someone"
 msgstr "누군가"
 
@@ -17053,8 +17201,8 @@ msgstr "문제가 발생했습니다."
 msgid "Something went wrong. Please try again."
 msgstr "문제가 발생했습니다. 다시 시도해 주세요."
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "문제가 발생했습니다. 다시 시도하거나 support@superset.sh로 문의해 주세요."
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "문제가 발생했습니다. 다시 시도하거나 support@paradev.com로 문의해 주세요."
 
 msgid "soon"
 msgstr "곧"
@@ -17577,6 +17725,9 @@ msgstr "대체됨"
 msgid "superset"
 msgstr "superset"
 
+msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Superset은 본인 계정으로 GitHub에서 작업합니다. 풀 리퀘스트를 병합, 댓글 작성, 업데이트하려면 GitHub 계정을 연결하세요."
+
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp는 해당 패널 전용 엔드포인트만 출력합니다. Playwright나 browser-use를 여기에 연결하세요."
 
@@ -17585,9 +17736,6 @@ msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
-
-msgid "superset.sh"
-msgstr "superset.sh"
 
 msgid "Supervised"
 msgstr "감독"
@@ -17600,6 +17748,9 @@ msgstr "지원 요청 한도가 구성되지 않았습니다"
 
 msgid "Support the project with a GitHub star"
 msgstr "GitHub 스타로 프로젝트를 응원해 주세요"
+
+msgid "Surprise me"
+msgstr "랜덤으로"
 
 msgid "Suspended"
 msgstr "일시 중지됨"
@@ -17791,6 +17942,9 @@ msgstr "확인 중…"
 
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "평소보다 오래 걸리고 있습니다. 화면을 나가도 계속 진행됩니다."
+
+msgid "Talk to it"
+msgstr "대화하기"
 
 msgid "Talk to Paradev"
 msgstr "Paradev에 문의하기"
@@ -18105,12 +18259,6 @@ msgstr "에이전트가 스킬과 도구를 사용하고, 이슈가 Linear에 �
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "페이지를 지켜보는 에이전트가 각 댓글을 읽고 페이지를 업데이트한 뒤 스레드에 답합니다."
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "이번 발표에서는 Union Square Ventures가 주도하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드도 함께 공개합니다."
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "앱은 무료로 다운로드할 수 있습니다. iOS 26 이상과 Paradev Pro가 필요합니다. 다음은 Android입니다."
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "앱은 {appVersion}이지만 다른 것(오래된 CLI나 다른 Paradev 빌드일 가능성)이 시작한 호스트 서비스에 연결되어 있습니다. 다시 시작하면 이 앱의 복사본으로 교체됩니다."
 
@@ -18132,8 +18280,8 @@ msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시�
 msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
 
-msgid "The commands Superset runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Superset이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(.superset/config.toml)."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
+msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(.superset/config.toml)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
@@ -18351,8 +18499,8 @@ msgstr "제공사가 {0}을(를) 반환했습니다."
 msgid "The provider refused it."
 msgstr "제공사가 거부했습니다."
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "복구 기간이 끝났습니다. support@superset.sh로 문의하세요."
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "복구 기간이 끝났습니다. support@paradev.com로 문의하세요."
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "원격 브랜치가 갈라졌습니다. 계속하기 전에 pull하세요."
@@ -18526,6 +18674,12 @@ msgstr "이 채널은 보관되었습니다"
 
 msgid "This chat has ended."
 msgstr "이 채팅은 종료되었습니다."
+
+msgid "This chat is empty."
+msgstr "이 채팅은 비어 있습니다."
+
+msgid "This chat may have been removed or you may not have access."
+msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "대화가 터미널에서 계속되어 이 채팅이 중지되었습니다."
@@ -18716,14 +18870,14 @@ msgstr "이 프로필은 지금 이용자가 많습니다"
 msgid "This project is no longer available on your devices."
 msgstr "이 프로젝트는 더 이상 내 기기에서 사용할 수 없습니다."
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "이 프로젝트는 GitHub 저장소에 연결되어 있지 않습니다."
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "이 프로젝트는 아직 이전 config.json을 사용합니다. 계속 작동하지만, 새 섹션을 사용하려면 config.toml로 변환하세요."
 
 msgid "This project's host is offline"
 msgstr "이 프로젝트의 호스트가 오프라인입니다"
+
+msgid "This pull request has no GitHub access to act through."
+msgstr "이 풀 리퀘스트를 처리할 GitHub 접근 권한이 없습니다."
 
 msgid "This pull request has no host to act through"
 msgstr "이 풀 리퀘스트에는 작업을 수행할 호스트가 없습니다"
@@ -19563,6 +19717,9 @@ msgstr "{0}의 이름 지정 지침 업데이트"
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."
 
+msgid "Update Paradev on this host to edit its workspace config."
+msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev을 업데이트하세요."
+
 msgid "Update payment method"
 msgstr "결제 수단 업데이트"
 
@@ -19571,9 +19728,6 @@ msgstr "업데이트 준비 완료"
 
 msgid "Update Required"
 msgstr "업데이트 필요"
-
-msgid "Update Superset on this host to edit its workspace config."
-msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Superset을 업데이트하세요."
 
 msgid "update the branch prefix"
 msgstr "브랜치 접두사를 업데이트할"
@@ -19912,9 +20066,6 @@ msgstr "GitHub에서 보기"
 msgid "VIEW ON GITHUB"
 msgstr "GITHUB에서 보기"
 
-msgid "View on the App Store"
-msgstr "App Store에서 보기"
-
 msgid "View open roles"
 msgstr "채용 중인 직무 보기"
 
@@ -20157,6 +20308,10 @@ msgstr "Paradev에 오신 것을 환영합니다"
 msgid "Welcome to the new Paradev"
 msgstr "새로운 Paradev에 오신 것을 환영합니다"
 
+#. placeholder {0}: BRAND.INTRO_NAME
+msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
+msgstr "{0}가 무엇이고, 누가 만들며, 누구를 위한 것인지. 병렬 코딩 에이전트를 위한 워크스페이스를 만드는, 전 YC CTO 3인이 이끄는 샌프란시스코 팀입니다."
+
 msgid "What are the benefits?"
 msgstr "복리후생은 어떤가요?"
 
@@ -20190,8 +20345,8 @@ msgstr "Paradev Enterprise란 무엇인가요?"
 msgid "What is wrong?"
 msgstr "무엇이 문제인가요?"
 
-msgid "What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
-msgstr "Paradev가 무엇이고, 누가 만들며, 누구를 위한 것인지. 병렬 코딩 에이전트를 위한 워크스페이스를 만드는, 전 YC CTO 3인이 이끄는 샌프란시스코 팀입니다."
+msgid "What it does"
+msgstr "하는 일"
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev는 어떤 플랫폼에서 실행되나요?"
@@ -20384,6 +20539,9 @@ msgstr "{0}분 {1}초 동안 작업 중"
 
 msgid "Working for {seconds}s"
 msgstr "{seconds}초 동안 작업 중"
+
+msgid "Working on a mention"
+msgstr "멘션을 처리하는 중"
 
 msgid "Working…"
 msgstr "작업 중…"
@@ -20579,6 +20737,9 @@ msgstr "X-대형"
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
 
+msgid "Y Combinator batch"
+msgstr "Y Combinator 배치"
+
 msgid "Yearly"
 msgstr "연간"
 
@@ -20701,6 +20862,9 @@ msgstr "{plugin} 인증 요청을 거부했습니다."
 
 msgid "You don't have access to this host"
 msgstr "이 호스트에 접근할 권한이 없습니다"
+
+msgid "You don't have access to this pull request on GitHub, or it no longer exists."
+msgstr "GitHub에서 이 풀 리퀘스트에 접근할 수 없거나, 더 이상 존재하지 않습니다."
 
 msgid "You don't have access to this terminal."
 msgstr "이 터미널에 접근할 권한이 없습니다."

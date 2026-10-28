@@ -60,7 +60,7 @@ Paradev adds a desktop interface around real terminal sessions. Herdr's terminal
 
 ### Review and the Rest of the Loop
 
-In Paradev, inspect the patch, edit a file, and open the running app beside the agent that made the change. Use [agent status and notifications](https://docs.superset.sh/agent-status) to decide which task needs attention; notification support varies by agent. Scheduled automations let you repeat a task once its setup and review steps are established. These additions can be useful with a single agent as well as several parallel tasks.
+In Paradev, inspect the patch, edit a file, and open the running app beside the agent that made the change. Use [agent status and notifications](https://docs.paradev.com/agent-status) to decide which task needs attention; notification support varies by agent. Scheduled automations let you repeat a task once its setup and review steps are established. These additions can be useful with a single agent as well as several parallel tasks.
 
 ### Give Feedback Where You See the Work
 
@@ -70,7 +70,7 @@ For work you need to discuss with teammates, [publish a report or design as a Pa
 
 ### Persistence and Remote
 
-Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Paradev's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. From a shell, `superset terminals attach` joins a running terminal, `Ctrl+]` detaches it, and `--ssh` attaches to a terminal on another machine. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Paradev, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Paradev's [terminal documentation](https://docs.paradev.com/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.paradev.com/remote-access) connects you to another host. From a shell, `superset terminals attach` joins a running terminal, `Ctrl+]` detaches it, and `--ssh` attaches to a terminal on another machine. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Paradev, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running).
 
 ### Worktree Isolation
 

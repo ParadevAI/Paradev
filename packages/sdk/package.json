@@ -2,7 +2,7 @@
 	"name": "@superset/sdk",
 	"version": "0.0.1-alpha.12",
 	"description": "TypeScript SDK for the Paradev API",
-	"homepage": "https://superset.sh",
+	"homepage": "https://paradev.com",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/paradevai/paradev.git",

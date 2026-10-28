@@ -39,9 +39,10 @@ export function OrganizationMenu() {
 	const { data: activePlan } = useQuery(trpc.billing.activePlan.queryOptions());
 
 	const isPro = isPaidPlan(activePlan?.plan);
+	const planName = activePlan?.planTier ?? activePlan?.plan;
 	const planLabel =
-		isPro && activePlan?.plan
-			? activePlan.plan.charAt(0).toUpperCase() + activePlan.plan.slice(1)
+		isPro && planName
+			? planName.charAt(0).toUpperCase() + planName.slice(1)
 			: null;
 
 	const user = session?.user;

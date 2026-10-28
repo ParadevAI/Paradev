@@ -15,8 +15,8 @@ Only two things in a plugin directory are hand-written:
 | `.agent-marketplace.json` | `superset plugins create` / `publish` |
 | `packages/shared/src/plugins/manifests.generated.ts` | `superset plugins publish` |
 
-A plugin ships no code. Tools come either from the vendor's own MCP server, which Superset proxies
-to, or from a server Superset hosts itself for the handful of plugins whose vendor publishes none
+A plugin ships no code. Tools come either from the vendor's own MCP server, which Paradev proxies
+to, or from a server Paradev hosts itself for the handful of plugins whose vendor publishes none
 (`SUPERSET_HOSTED_PLUGINS` in `packages/shared/src/plugins/index.ts`, implemented under
 `packages/trpc/src/router/plugins/servers/`). Hosted tools ship on an API deploy, not a plugin tag.
 
@@ -36,10 +36,11 @@ and installs the working tree, which is what makes local authoring work.
 superset plugins publish <name> --bump patch   # rewrites the marketplace entry and the bundle
 git add .agent-marketplace.json plugins/<name> packages/shared/src/plugins/manifests.generated.ts
 git commit -m "publish <name>@<version>"
-git tag <name>@<version>
-git push origin <branch> <name>@<version>      # push the branch too: install reads the version from it
 bun run check:plugins                          # what CI runs; catches a change that skipped publish
 ```
+
+Merge to main and `.github/workflows/tag-plugin-releases.yml` pushes `<name>@<version>` at the
+merge commit. Don't tag by hand on a branch: a squash merge leaves that tag off main.
 
 `superset plugins validate` takes a path (`plugins/<name>`), not a name. To test a plugin locally,
 `superset plugins marketplace add <path>` then `superset plugins install <name>`. Install copies the
@@ -62,7 +63,7 @@ that must not change under them.
 ## Manifest shape
 
 `plugin.json` follows the Codex plugin vocabulary — `name`, `version`, `description`, `author`,
-`license` — with everything Superset-specific under `extensions.superset`:
+`license` — with everything Paradev-specific under `extensions.superset`:
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
   `packages/shared/src/plugins/index.ts`), and `icon`.
@@ -75,7 +76,7 @@ that must not change under them.
   `${config.access_token}` and `${inputs.<name>}` placeholders are resolved server-side by
   `packages/trpc/src/router/plugins/manifest.ts`.
 - `mcp` — the vendor's own MCP server (`type: "streamable-http"`, `url`, optional `headers`), not a
-  map: a plugin serves tools from exactly one place. Omit it for a Superset-hosted plugin.
+  map: a plugin serves tools from exactly one place. Omit it for a Paradev-hosted plugin.
 
 The published JSON Schema at `https://superset.sh/schemas/plugin/1.0.0.json` is generated from
 `pluginManifestSchema` in `packages/shared/src/plugins/manifest-schema.ts`, and
@@ -128,7 +129,7 @@ Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at
 `$SUPERSET_HOME_DIR/plugins/mcp-ledger.json`: user-defined or user-edited servers are
 left alone, while disabling or uninstalling a plugin removes unchanged managed entries.
-Superset proxy entries use `headersHelper` to read current auth at connection time rather
+Paradev proxy entries use `headersHelper` to read current auth at connection time rather
 than store a token. pdev needs a build with `headersHelper` support; older builds ignore it.
 
 ## Command surface

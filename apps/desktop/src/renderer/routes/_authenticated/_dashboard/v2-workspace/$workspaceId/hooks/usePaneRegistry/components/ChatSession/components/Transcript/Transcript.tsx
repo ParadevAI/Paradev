@@ -40,6 +40,7 @@ import type { ChatForkTarget } from "../../types";
 import { pageLinkFinder } from "../../utils/pageLinks";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
+import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
 import { useLoadOlderOnReach } from "./hooks/useLoadOlderOnReach";
 import { useNearRows } from "./hooks/useNearRows";
 import { useScrollAnchorKey } from "./hooks/useScrollAnchorKey";
@@ -270,6 +271,14 @@ export function Transcript({
 		scrollerRef.current.scrollToEnd({ behavior: "smooth" });
 	}, [anchorRowKey]);
 
+	const carriedRowKey = useCarriedReaderPosition({
+		sessionId,
+		rows,
+		viewport,
+		awayFromEndRef,
+		scrollerRef,
+	});
+
 	const find = useTranscriptFind({
 		rows,
 		onRequestItemBodies,
@@ -308,6 +317,7 @@ export function Transcript({
 			findMountsAll ? (rows[0]?.key ?? null) : null,
 			find.currentRowKey,
 			revealRowKey,
+			carriedRowKey,
 		],
 		observeRow,
 		find: {
@@ -366,7 +376,8 @@ export function Transcript({
 						row.key === anchorRowKey ||
 						seenRowKeys.has(row.key) ||
 						row.key === find.currentRowKey ||
-						row.key === revealRowKey
+						row.key === revealRowKey ||
+						row.key === carriedRowKey
 					}
 					row={row}
 					rowRef={transcriptWindow.rowRef(row.key)}

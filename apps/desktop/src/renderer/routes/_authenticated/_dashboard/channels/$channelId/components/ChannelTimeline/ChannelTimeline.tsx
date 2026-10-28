@@ -1,5 +1,6 @@
 import type { RouterOutputs } from "@superset/trpc";
 import {
+	type ReactNode,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -55,7 +56,8 @@ interface ChannelTimelineProps {
 	canModerate: boolean;
 	canReact: boolean;
 	now: Date;
-	onOpenThread: (message: ChannelMessage) => void;
+	onOpenThread?: (message: ChannelMessage) => void;
+	intro?: ReactNode;
 	focusMessageId: string | null;
 	onFocusedMessage: () => void;
 }
@@ -79,6 +81,7 @@ export function ChannelTimeline({
 	canReact,
 	now,
 	onOpenThread,
+	intro,
 	focusMessageId,
 	onFocusedMessage,
 }: ChannelTimelineProps) {
@@ -196,7 +199,7 @@ export function ChannelTimeline({
 				(message) =>
 					message.seq > line &&
 					message.seq !== PENDING_SEQ &&
-					message.authorUserId !== currentUserId,
+					message.authorId !== currentUserId,
 			);
 		const oldest = messages[0];
 		if (
@@ -439,7 +442,8 @@ export function ChannelTimeline({
 						{isFetchingNextPage && <LuLoader className="size-4 animate-spin" />}
 					</div>
 				) : (
-					query.data && (
+					query.data &&
+					(intro ?? (
 						<ChannelIntro
 							channel={channel}
 							creator={
@@ -452,7 +456,7 @@ export function ChannelTimeline({
 							onEditDescription={onEditDescription}
 							onRename={onRename}
 						/>
-					)
+					))
 				)}
 				{entries.map((entry) => {
 					if (entry.kind === "day") {
@@ -474,8 +478,8 @@ export function ChannelTimeline({
 							key={entry.key}
 							message={message}
 							author={
-								message.authorUserId
-									? (peopleById.get(message.authorUserId) ?? null)
+								message.authorId
+									? (peopleById.get(message.authorId) ?? null)
 									: null
 							}
 							compact={entry.compact}
