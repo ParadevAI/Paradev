@@ -31,6 +31,8 @@ export function NewTabPullRequestsSection({
 									? pr.state
 									: "open",
 							isDraft: pr.isDraft || pr.state === "draft",
+							additions: pr.additions,
+							deletions: pr.deletions,
 						}}
 						onOpen={() =>
 							onOpen({
