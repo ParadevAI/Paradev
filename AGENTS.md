@@ -137,6 +137,8 @@ workspaces group into a sidebar folder of that name automatically, so a batch fi
 of scattering across the project. `ws list --local --tag SOME_TAG` filters to them, and
 `ws update WORKSPACE_ID --tag ...` retags (`--clear-tags` ungroups). Automation-created workspaces
 are tagged `automation` by default and collect in an "automation" folder.
+To file into a group the user already made, pass `--group "NAME"` with the name the sidebar
+shows: a renamed group keeps its first tag, so `--tag` with that name makes a second group.
 
 `superset schema` prints every command, option and argument as JSON; read it with `jq` to learn the
 rest (tasks, automations, hosts, settings) instead of parsing `--help` text. To check only that a

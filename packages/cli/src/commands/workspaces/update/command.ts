@@ -1,11 +1,16 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { tagFolderScope } from "@superset/shared/workspace-tags";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
-import { resolveHostTarget } from "../../../lib/host-target";
+import {
+	type HostServiceClient,
+	resolveHostTarget,
+} from "../../../lib/host-target";
+import { claimGroupTag, loadGroupContext } from "../../../lib/workspace-groups";
 
 export default command({
 	description:
-		"Update a workspace: a cloud workspace by default if your account has them, else one on this machine; --local or --host picks a host",
+		"Update a workspace or move it to a sidebar group: a cloud workspace by default if your account has them, else one on this machine; --local or --host picks a host",
 	args: [positional("id").required().desc("Workspace UUID")],
 	options: {
 		host: string().desc(
@@ -15,12 +20,17 @@ export default command({
 		name: string().desc("Workspace name"),
 		taskId: string().desc("Link the workspace to a task by id"),
 		clearTask: boolean().desc("Unlink the workspace from its current task"),
+		group: string().desc(
+			"Move the workspace to the sidebar group the desktop shows by this name (case-insensitive), or to a new group by that name. Replaces the workspace's tags",
+		),
 		tag: string()
 			.variadic()
 			.desc(
-				"Replace the workspace's tag set. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
+				"Replace the workspace's tag set. Repeatable. Each tag is a sidebar group; a group renamed in the desktop keeps its first tag, so prefer --group",
 			),
-		clearTags: boolean().desc("Remove every tag from the workspace"),
+		clearTags: boolean().desc(
+			"Remove every tag, which takes the workspace out of its sidebar group",
+		),
 	},
 	run: async ({ ctx, args, options }) => {
 		const id = args.id as string;
@@ -41,6 +51,15 @@ export default command({
 				"Pass one or the other",
 			);
 		}
+		if (
+			options.group !== undefined &&
+			(options.tag?.length || options.clearTags)
+		) {
+			throw new CLIError(
+				"Cannot combine --group with --tag or --clear-tags",
+				"--group already replaces the workspace's tags",
+			);
+		}
 
 		const taskId = options.clearTask
 			? null
@@ -58,11 +77,12 @@ export default command({
 		if (
 			options.name === undefined &&
 			taskId === undefined &&
-			tags === undefined
+			tags === undefined &&
+			options.group === undefined
 		) {
 			throw new CLIError(
 				"No fields to update",
-				"Pass --name, --task-id, --clear-task, --tag, or --clear-tags",
+				"Pass --name, --task-id, --clear-task, --group, --tag, or --clear-tags",
 			);
 		}
 
@@ -73,13 +93,20 @@ export default command({
 		);
 		if (!hostId) {
 			// A cloud workspace's name and tags live in the API; a task link is
-			// a host-side row it does not have.
+			// a host-side row it does not have, and group names are host-side
+			// tag folder settings.
 			if (taskId !== undefined) {
 				throw new CLIError(
 					options.clearTask
 						? "--clear-task does not apply to a cloud workspace"
 						: "--task-id does not apply to a cloud workspace",
 					"Task links belong to host workspaces; pass --local or --host <id>",
+				);
+			}
+			if (options.group !== undefined) {
+				throw new CLIError(
+					"--group does not apply to a cloud workspace",
+					"Pass --tag <tag> to file a cloud workspace, or --local / --host <id> for a workspace on a host",
 				);
 			}
 			const renamed =
@@ -105,16 +132,43 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
+		const nextTags =
+			options.group !== undefined
+				? [await groupTagFor(target.client, hostId, id, options.group)]
+				: tags;
 		const updated = await target.client.workspace.update.mutate({
 			id,
 			...(options.name !== undefined ? { name: options.name } : {}),
 			...(taskId !== undefined ? { taskId } : {}),
-			...(tags !== undefined ? { tags } : {}),
+			...(nextTags !== undefined ? { tags: nextTags } : {}),
 		});
 
 		return {
 			data: updated,
-			message: `Updated workspace ${id}`,
+			message:
+				options.group !== undefined
+					? `Updated workspace ${id} and moved it to group "${options.group.trim()}"`
+					: `Updated workspace ${id}`,
 		};
 	},
 });
+
+async function groupTagFor(
+	client: HostServiceClient,
+	hostId: string,
+	workspaceId: string,
+	group: string,
+): Promise<string> {
+	const context = await loadGroupContext(client);
+	const workspace = context.workspaces.find((row) => row.id === workspaceId);
+	if (!workspace) {
+		throw new CLIError(
+			`Workspace not found on host ${hostId}: ${workspaceId}`,
+			"Pass --host <id> if it lives on another machine",
+		);
+	}
+	return claimGroupTag(client, context, {
+		name: group,
+		scope: tagFolderScope(workspace.projectId),
+	});
+}

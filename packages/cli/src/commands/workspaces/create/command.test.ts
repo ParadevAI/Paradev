@@ -7,10 +7,13 @@ let localCreateError: Error | undefined;
 let createProcedure: string | undefined;
 let createInput: Record<string, unknown> | undefined;
 let sessionInput: Record<string, unknown> | undefined;
+let tagSettings: Array<Record<string, unknown>> = [];
 
 let cloudAvailable = false;
 
 withLocalHostService("org-1", {
+	"workspace.list": () => [{ id: "other", projectId: "project-1", tags: [] }],
+	"tagFolders.list": () => tagSettings,
 	"workspaces.createLocal": (input) => {
 		createProcedure = "createLocal";
 		if (localCreateError) throw localCreateError;
@@ -34,6 +37,7 @@ function invoke(
 		prompt?: string;
 		effort?: string;
 		tag?: string[];
+		group?: string;
 		project?: string | undefined;
 		session?: boolean;
 		local?: boolean;
@@ -72,6 +76,7 @@ afterEach(() => {
 	createProcedure = undefined;
 	localCreateError = undefined;
 	sessionInput = undefined;
+	tagSettings = [];
 });
 
 describe("workspaces create", () => {
@@ -161,15 +166,28 @@ describe("workspaces create", () => {
 		expect(createInput).not.toHaveProperty("tags");
 	});
 
-	test("rejects --tag on a project-less session", async () => {
-		await expect(
-			invoke({
-				project: undefined,
-				session: true,
-				branch: undefined,
-				tag: ["perf"],
-			}),
-		).rejects.toThrow(/--tag requires --project/);
+	test("forwards --tag on a project-less session", async () => {
+		await invoke({
+			project: undefined,
+			session: true,
+			branch: undefined,
+			tag: ["perf"],
+		});
+		expect(sessionInput).toMatchObject({ tags: ["perf"] });
+	});
+
+	test("--group files the workspace by the name the desktop shows", async () => {
+		tagSettings = [
+			{ scope: "project-1", tag: "new group", displayName: "Review" },
+		];
+		await invoke({ group: "review" });
+		expect(createInput).toMatchObject({ tags: ["new group"] });
+	});
+
+	test("rejects --group with --tag", async () => {
+		await expect(invoke({ group: "Review", tag: ["perf"] })).rejects.toThrow(
+			/Cannot combine --group and --tag/,
+		);
 		expect(createInput).toBeUndefined();
 	});
 

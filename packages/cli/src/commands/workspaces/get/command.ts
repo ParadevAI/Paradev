@@ -2,6 +2,10 @@ import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import {
+	listGroupSettings,
+	workspaceGroupNames,
+} from "../../../lib/workspace-groups";
 
 export default command({
 	description: "Show details for a single workspace by id",
@@ -16,7 +20,7 @@ export default command({
 		field: string()
 			.alias("f")
 			.desc(
-				"Print a single field's raw value (e.g. name, branch, worktreePath)",
+				"Print a single field's raw value (e.g. name, branch, group, worktreePath)",
 			),
 	},
 	run: async ({ ctx, args, options }) => {
@@ -99,7 +103,7 @@ async function hostDetail(
 	id: string,
 	hostId: string,
 ) {
-	const [{ workspace }, hosts] = await Promise.all([
+	const [{ workspace, target }, hosts] = await Promise.all([
 		resolveWorkspaceTarget(
 			{
 				organizationId,
@@ -113,6 +117,8 @@ async function hostDetail(
 			.query({ organizationId })
 			.catch(() => [] as Array<{ id: string; name: string }>),
 	]);
+	const groupSettings = await listGroupSettings(target.client);
+	const tags = workspace.tags ?? [];
 	return {
 		id: workspace.id,
 		name: workspace.name,
@@ -125,6 +131,11 @@ async function hostDetail(
 			hosts.find((host) => host.id === workspace.hostId)?.name ??
 			workspace.hostId,
 		taskId: workspace.taskId,
+		group:
+			tags.length > 0
+				? workspaceGroupNames(workspace, groupSettings).join(", ")
+				: null,
+		tags: tags.length > 0 ? tags.join(", ") : null,
 		worktreePath: workspace.worktreePath,
 		worktreeExists: workspace.worktreeExists,
 		createdAt: workspace.createdAt,

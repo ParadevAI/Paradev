@@ -2,7 +2,12 @@ import { boolean, CLIError, string, table } from "@superset/cli-framework";
 import { normalizeWorkspaceTag } from "@superset/shared/workspace-tags";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
-import { listWorkspacesOnHost } from "../../../lib/host-workspaces";
+import { resolveHostTarget } from "../../../lib/host-target";
+import {
+	isInGroup,
+	listGroupSettings,
+	workspaceGroupNames,
+} from "../../../lib/workspace-groups";
 
 export default command({
 	description:
@@ -14,6 +19,9 @@ export default command({
 		search: string()
 			.alias("s")
 			.desc("Search by workspace name or branch substring"),
+		group: string().desc(
+			"Filter to workspaces in the sidebar group the desktop shows by this name (case-insensitive)",
+		),
 		tag: string().desc("Filter to workspaces carrying this tag"),
 	},
 	// `display` gets the data alone, and the two listings are different rows;
@@ -30,8 +38,8 @@ export default command({
 		}
 		return table(
 			rows,
-			["name", "branch", "projectName", "tags", "id"],
-			["NAME", "BRANCH", "PROJECT", "TAGS", "ID"],
+			["name", "branch", "projectName", "group", "id"],
+			["NAME", "BRANCH", "PROJECT", "GROUP", "ID"],
 			[30, 30, 24, 20, 36],
 		);
 	},
@@ -49,6 +57,7 @@ export default command({
 		if (!hostId) {
 			for (const [flag, value] of [
 				["--project", options.project],
+				["--group", options.group],
 				["--tag", options.tag],
 			] as const) {
 				if (value !== undefined) {
@@ -70,12 +79,16 @@ export default command({
 			);
 		}
 
-		const { workspaces } = await listWorkspacesOnHost({
+		const target = await resolveHostTarget({
+			requestedHostId: hostId,
 			organizationId,
 			userJwt: ctx.bearer,
 			api: ctx.api,
-			hostId,
 		});
+		const [workspaces, groupSettings] = await Promise.all([
+			target.client.workspace.list.query(),
+			listGroupSettings(target.client),
+		]);
 
 		const projectInput = options.project?.toLowerCase();
 		const search = options.search?.toLowerCase();
@@ -105,12 +118,18 @@ export default command({
 				(workspace) =>
 					tagFilter == null || (workspace.tags ?? []).includes(tagFilter),
 			)
+			.filter(
+				(workspace) =>
+					options.group === undefined ||
+					isInGroup(workspace, groupSettings, options.group),
+			)
 			.map((workspace) => ({
 				...workspace,
 				// Orphaned projectIds fall back to the raw id; project-less
 				// session workspaces render as "session".
 				projectName: workspace.projectName ?? workspace.projectId ?? "session",
 				tags: (workspace.tags ?? []).join(", "),
+				group: workspaceGroupNames(workspace, groupSettings).join(", "),
 			}));
 	},
 });

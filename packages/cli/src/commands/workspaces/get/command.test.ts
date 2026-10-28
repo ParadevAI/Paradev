@@ -3,9 +3,13 @@ import { withLocalHostService } from "../../../lib/host/test-helpers";
 import getCommand from "./command";
 
 let workspaces: Array<Record<string, unknown>> = [];
+let tagSettings: Array<Record<string, unknown>> = [];
 let previousWorkspaceId: string | undefined;
 
-withLocalHostService("org-1", { "workspace.list": () => workspaces });
+withLocalHostService("org-1", {
+	"workspace.list": () => workspaces,
+	"tagFolders.list": () => tagSettings,
+});
 
 const WORKSPACE = {
 	id: "b502bf30-8693-4815-be65-795035e0ce5f",
@@ -60,6 +64,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	workspaces = [];
+	tagSettings = [];
 	if (previousWorkspaceId === undefined) {
 		delete process.env.SUPERSET_WORKSPACE_ID;
 	} else {
@@ -80,6 +85,16 @@ describe("workspaces get", () => {
 		expect(result.data.worktreePath).toBe(WORKSPACE.worktreePath);
 		expect(result.message).toContain("name");
 		expect(result.message).toContain("ludicrous-candytuft");
+	});
+
+	test("shows the group by the name the desktop shows, beside its tag", async () => {
+		workspaces = [{ ...WORKSPACE, tags: ["new group"] }];
+		tagSettings = [{ scope: "proj-1", tag: "new group", displayName: "Sales" }];
+		const result = (await invoke({ id: WORKSPACE.id })) as {
+			data: Record<string, unknown>;
+		};
+		expect(result.data.group).toBe("Sales");
+		expect(result.data.tags).toBe("new group");
 	});
 
 	test("defaults the id to $SUPERSET_WORKSPACE_ID when no arg is given", async () => {

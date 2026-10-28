@@ -22,6 +22,7 @@ export interface CloudCreateOptions {
 	baseBranch?: string;
 	skipBranchPrefix?: boolean;
 	tag?: string[];
+	group?: string;
 	attachment?: string[];
 	command?: string;
 }
@@ -48,6 +49,7 @@ export async function createCloudWorkspace(args: {
 		["--base-branch", options.baseBranch],
 		["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 		["--tag", options.tag?.length ? options.tag : undefined],
+		["--group", options.group],
 		[
 			"--attachment",
 			options.attachment?.length ? options.attachment : undefined,
