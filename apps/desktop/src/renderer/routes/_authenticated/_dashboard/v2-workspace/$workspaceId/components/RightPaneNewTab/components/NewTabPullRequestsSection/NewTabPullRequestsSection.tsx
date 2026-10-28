@@ -1,30 +1,20 @@
 import { Trans } from "@lingui/react/macro";
 import type { CreatePaneInput } from "@superset/panes";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { CloudPullRequestRow } from "renderer/routes/_authenticated/_dashboard/components/CloudPullRequestRow";
 import { CloudSection } from "renderer/routes/_authenticated/_dashboard/components/CloudSection";
+import type { NewTabLists } from "../../../../hooks/useNewTabLists";
 import type { PaneViewerData } from "../../../../types";
 
-const PULL_REQUEST_LIMIT = 5;
-
 interface NewTabPullRequestsSectionProps {
+	pullRequests: NewTabLists["pullRequests"];
 	onOpen: (pane: CreatePaneInput<PaneViewerData>) => void;
 }
 
 export function NewTabPullRequestsSection({
+	pullRequests,
 	onOpen,
 }: NewTabPullRequestsSectionProps) {
-	const organizationId = useActiveOrganizationId();
-	const { data } =
-		cloudTrpc.integration.github.listOrganizationPullRequests.useQuery(
-			{ organizationId: organizationId ?? "" },
-			{ enabled: organizationId !== null, staleTime: 60_000 },
-		);
-	const pullRequests = (data ?? [])
-		.filter((row) => row.state === "open")
-		.slice(0, PULL_REQUEST_LIMIT);
 	if (pullRequests.length === 0) return null;
 
 	return (

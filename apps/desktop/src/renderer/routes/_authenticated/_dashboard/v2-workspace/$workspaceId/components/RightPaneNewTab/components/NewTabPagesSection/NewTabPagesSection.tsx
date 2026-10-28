@@ -1,26 +1,16 @@
 import { Trans } from "@lingui/react/macro";
 import type { CreatePaneInput } from "@superset/panes";
 import { CloudSection } from "renderer/routes/_authenticated/_dashboard/components/CloudSection";
-import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
+import type { NewTabLists } from "../../../../hooks/useNewTabLists";
 import type { PaneViewerData } from "../../../../types";
 import { PagesListCard } from "../../../PagesListCard";
 
-const PAGE_LIMIT = 4;
-
 interface NewTabPagesSectionProps {
-	workspaceId: string;
+	pages: NewTabLists["pages"];
 	onOpen: (pane: CreatePaneInput<PaneViewerData>) => void;
 }
 
-export function NewTabPagesSection({
-	workspaceId,
-	onOpen,
-}: NewTabPagesSectionProps) {
-	const { items } = usePagesList(
-		{ workspaceId, limit: PAGE_LIMIT },
-		{ staleTime: 60_000 },
-	);
-	const pages = items.slice(0, PAGE_LIMIT);
+export function NewTabPagesSection({ pages, onOpen }: NewTabPagesSectionProps) {
 	if (pages.length === 0) return null;
 
 	return (

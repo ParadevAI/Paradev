@@ -13,8 +13,10 @@ import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import type { StoreApi } from "zustand/vanilla";
+import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
 import { NEW_TAB_PANE, RightPaneNewTab } from "../RightPaneNewTab";
@@ -50,6 +52,9 @@ export function RightPaneArea({
 	onToggleFullScreen,
 }: RightPaneAreaProps) {
 	const { t } = useLingui();
+	const { workspace } = useWorkspace();
+	// Keeps the New Tab's lists cached and fresh while the workspace is open.
+	useNewTabLists(workspace.id);
 	const rightPaneActions = useMemo(
 		() => withNewTabSplitButton(paneActions),
 		[paneActions],

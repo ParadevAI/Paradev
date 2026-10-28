@@ -8,6 +8,7 @@ import { CloudSection } from "renderer/routes/_authenticated/_dashboard/componen
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { EmptyTabActionButton } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/components/EmptyTabActionButton";
 import { useDefaultBrowserUrl } from "../../hooks/useDefaultBrowserUrl";
+import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { useV2TerminalLauncher } from "../../hooks/useV2TerminalLauncher";
 import type { PaneViewerData } from "../../types";
 import { NewTabPagesSection } from "./components/NewTabPagesSection";
@@ -26,6 +27,7 @@ export function RightPaneNewTab({ onOpen }: RightPaneNewTabProps) {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_PANE) === true;
 	const launcher = useV2TerminalLauncher();
 	const browserUrl = useDefaultBrowserUrl();
+	const { pages, pullRequests } = useNewTabLists(workspace.id);
 	const hotkeyKeys: Partial<Record<HotkeyId, string[]>> = {
 		NEW_GROUP: useHotkeyDisplay("NEW_GROUP").keys,
 		NEW_BROWSER: useHotkeyDisplay("NEW_BROWSER").keys,
@@ -62,8 +64,11 @@ export function RightPaneNewTab({ onOpen }: RightPaneNewTabProps) {
 						))}
 					</div>
 				</CloudSection>
-				<NewTabPagesSection workspaceId={workspace.id} onOpen={onOpen} />
-				<NewTabPullRequestsSection onOpen={onOpen} />
+				<NewTabPagesSection pages={pages} onOpen={onOpen} />
+				<NewTabPullRequestsSection
+					pullRequests={pullRequests}
+					onOpen={onOpen}
+				/>
 			</div>
 		</div>
 	);
