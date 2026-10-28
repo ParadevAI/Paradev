@@ -38,7 +38,7 @@ export function FileViewLayout({
 				</ResizablePanel>
 				{visible && (
 					<>
-						<ResizableHandle />
+						<ResizableHandle className="bg-transparent" />
 						<ResizablePanel
 							id="file-view-tree"
 							order={2}
@@ -47,11 +47,13 @@ export function FileViewLayout({
 							maxSize={60}
 						>
 							<div className="flex h-full min-w-0 flex-col pt-11">
-								<FileViewTree
-									context={context}
-									workspaceId={workspaceId}
-									onSearch={onSearch}
-								/>
+								<div className="min-h-0 flex-1 overflow-hidden rounded-tl-lg border-t border-l border-border/60">
+									<FileViewTree
+										context={context}
+										workspaceId={workspaceId}
+										onSearch={onSearch}
+									/>
+								</div>
 							</div>
 						</ResizablePanel>
 					</>
