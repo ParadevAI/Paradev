@@ -15,11 +15,11 @@ import { FcGoogle } from "react-icons/fc";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
+import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { SupersetLogo } from "./components/SupersetLogo";
-import { useSessionRecovery } from "./hooks/useSessionRecovery";
 
 export const Route = createFileRoute("/sign-in/")({
 	component: SignInPage,
@@ -50,11 +50,13 @@ function SignInPage() {
 	const [browserProvider, setBrowserProvider] = useState<AuthProvider | null>(
 		null,
 	);
-	const { hasLocalToken, isPending, session } = useSessionRecovery();
+	const { hasLocalToken, isPending, isRecovering, session } =
+		useSessionRecovery();
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
+	const isRestoring = isPending || isRecovering;
 	const pendingTimedOut = useDelayElapsed(
-		isPending,
+		isRestoring,
 		SESSION_PENDING_TIMEOUT_MS,
 	);
 
@@ -64,7 +66,7 @@ function SignInPage() {
 	}
 
 	// Show loading while session is being fetched
-	if (isPending && !pendingTimedOut) {
+	if (isRestoring && !pendingTimedOut) {
 		return (
 			<div className="flex h-screen w-screen items-center justify-center bg-background">
 				<Spinner className="size-8" />
