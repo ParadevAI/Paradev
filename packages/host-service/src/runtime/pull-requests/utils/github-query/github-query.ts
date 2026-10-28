@@ -507,3 +507,36 @@ export async function fetchPullRequestChecks(
 		(node): node is NonNullable<GitHubCheckContextNode> => node !== null,
 	);
 }
+
+function parseFullName(raw: unknown): { owner: string; name: string } | null {
+	if (!isRecord(raw) || typeof raw.full_name !== "string") return null;
+	const [owner, name] = raw.full_name.split("/");
+	return owner && name ? { owner, name } : null;
+}
+
+// GitHub answers the old owner/name of a renamed or transferred repo with
+// the repo under its current name.
+export async function fetchRepositoryNameFromGh(
+	execGh: ExecGh,
+	repository: { owner: string; name: string },
+): Promise<{ owner: string; name: string } | null> {
+	return parseFullName(
+		await execGh([
+			"api",
+			"--method",
+			"GET",
+			`repos/${repository.owner}/${repository.name}`,
+		]),
+	);
+}
+
+export async function fetchRepositoryName(
+	octokit: Octokit,
+	repository: { owner: string; name: string },
+): Promise<{ owner: string; name: string } | null> {
+	const response = await octokit.rest.repos.get({
+		owner: repository.owner,
+		repo: repository.name,
+	});
+	return parseFullName(response.data);
+}

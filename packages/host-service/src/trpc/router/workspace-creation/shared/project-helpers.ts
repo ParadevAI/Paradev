@@ -29,7 +29,8 @@ export interface ResolvedGithubRepo {
  * Resolve `{owner, name, repoPath}` for a project from the **live** local
  * git remote. Cloud `repoCloneUrl` and cached `projects.repoOwner`/`repoName`
  * are setup-time snapshots that drift on rename/fork/remote re-point;
- * GitHub queries must target wherever the remote points right now.
+ * GitHub queries must target wherever the remote points right now, under
+ * the repo's current GitHub name when it was renamed or transferred.
  *
  * `rev-parse --show-toplevel` validates the path is a git repo.
  * `getGitHubRemotes` reads via `git config --get-regexp ^remote\..*\.url$`
@@ -72,9 +73,10 @@ export async function resolveGithubRepo(
 		});
 	}
 
+	const current = await ctx.runtime.pullRequests.resolveRepoName(preferred);
 	return {
-		owner: preferred.owner,
-		name: preferred.name,
+		owner: current.owner,
+		name: current.name,
 		repoPath: gitRoot,
 	};
 }

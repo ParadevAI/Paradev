@@ -1399,6 +1399,9 @@ function routeGh(prsByHeadRef: Record<string, ReturnType<typeof makePrNode>>) {
 			(arg) => typeof arg === "string" && arg.startsWith("repos/"),
 		);
 		if (!path) throw new Error(`unexpected gh args: ${args.join(" ")}`);
+		if (path === `repos/${REPO.owner}/${REPO.name}`) {
+			return { full_name: `${REPO.owner}/${REPO.name}` };
+		}
 		if (path.endsWith("/reviews")) return [];
 		if (path.endsWith("/check-runs")) return { check_runs: [] };
 		if (path.endsWith("/statuses")) return [];
@@ -1415,6 +1418,66 @@ function routeGh(prsByHeadRef: Record<string, ReturnType<typeof makePrNode>>) {
 		throw new Error(`unexpected gh path: ${path}`);
 	};
 }
+
+describe("renamed or transferred repo", () => {
+	test("links PRs through the new name while git remotes still name the old one", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-existing",
+			prNumber: 42,
+			headBranch: "fix/sidebar",
+			headSha: "abc123",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "fix/sidebar",
+			headSha: "abc123",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "fix/sidebar",
+		});
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/"));
+				if (path === `repos/${REPO.owner}/${REPO.name}`) {
+					return { full_name: "new-owner/new-repo" };
+				}
+				if (
+					path === "repos/new-owner/new-repo/pulls" &&
+					args.includes("head=new-owner:fix/sidebar")
+				) {
+					return [
+						makePrNode({
+							number: 42,
+							headRef: "fix/sidebar",
+							headSha: "abc123",
+							headOwner: "new-owner",
+							headRepo: "new-repo",
+						}),
+					];
+				}
+				if (path?.endsWith("/reviews")) return [];
+				if (path?.endsWith("/check-runs")) return { check_runs: [] };
+				if (path?.endsWith("/statuses")) return [];
+				throw new Error(`unexpected gh call: ${args.join(" ")}`);
+			},
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("pr-existing");
+		expect(getPrById(db, "pr-existing")?.repoOwner).toBe("new-owner");
+		const project = db
+			.select()
+			.from(schema.projects)
+			.where(eq(schema.projects.id, PROJECT_ID))
+			.get();
+		expect(project?.repoOwner).toBe("new-owner");
+		expect(project?.repoName).toBe("new-repo");
+	});
+});
 
 describe("case-variant branch isolation", () => {
 	// P1: `feature` and `Feature` are distinct branches with distinct PRs on a
@@ -2051,6 +2114,9 @@ test("revalidates unchanged PRs after the polling cache expires without falling 
 		git: defaultBranchGit("main"),
 		execGh: async (args) => {
 			if (args.includes("graphql")) return {};
+			if (args.includes(`repos/${REPO.owner}/${REPO.name}`)) {
+				return { full_name: `${REPO.owner}/${REPO.name}` };
+			}
 			requests += 1;
 			if (args.includes('If-None-Match: "unchanged"')) {
 				notModified += 1;
@@ -2107,15 +2173,19 @@ function ghAnsweringPr(
 		const kind =
 			args[1] === "graphql"
 				? "merge-queue"
-				: path.endsWith("/reviews")
-					? "reviews"
-					: path.endsWith("/check-runs")
-						? "check-runs"
-						: path.endsWith("/statuses")
-							? "statuses"
-							: "head-lookup";
+				: path === `repos/${REPO.owner}/${REPO.name}`
+					? "repo-name"
+					: path.endsWith("/reviews")
+						? "reviews"
+						: path.endsWith("/check-runs")
+							? "check-runs"
+							: path.endsWith("/statuses")
+								? "statuses"
+								: "head-lookup";
 		counts[kind] = (counts[kind] ?? 0) + 1;
 		switch (kind) {
+			case "repo-name":
+				return { full_name: `${REPO.owner}/${REPO.name}` };
 			case "head-lookup":
 				return [node];
 			case "reviews":
@@ -2155,6 +2225,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		await refreshProject(PROJECT_ID);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
 		expect(counts).toEqual({
+			"repo-name": 1,
 			"head-lookup": 1,
 			reviews: 1,
 			"check-runs": 1,
@@ -2165,6 +2236,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		// A second timer sweep inside the TTL costs nothing.
 		await refreshProject(PROJECT_ID);
 		expect(counts).toEqual({
+			"repo-name": 1,
 			"head-lookup": 1,
 			reviews: 1,
 			"check-runs": 1,
@@ -2175,6 +2247,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		// The user's explicit refresh bypasses the cache and pays once more.
 		await manager.refreshPullRequestsByWorkspaces(["ws"]);
 		expect(counts).toEqual({
+			"repo-name": 1,
 			"head-lookup": 2,
 			reviews: 2,
 			"check-runs": 2,

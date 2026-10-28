@@ -7,6 +7,12 @@ import { simpleGit } from "simple-git";
 import { projects } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 
+// The host looks up each repo's current GitHub name; answer it unchanged.
+function repoNameLookup(args: string[]): { full_name: string } | null {
+	const path = args.find((arg) => /^repos\/[^/]+\/[^/]+$/.test(arg));
+	return args[0] === "api" && path ? { full_name: path.slice(6) } : null;
+}
+
 /**
  * Real temp git working tree with a remote, plus a `projects` row pointing
  * at it. Procedures resolve owner/name from the live remote, so tests need
@@ -660,6 +666,8 @@ describe("gh CLI is first-class when execGh succeeds", () => {
 		args: string[],
 		options?: { cwd?: string },
 	): Promise<unknown> => {
+		const repoName = repoNameLookup(args);
+		if (repoName) return repoName;
 		ghCalls.push({ args, cwd: options?.cwd });
 		if (args[0] === "pr" && args[1] === "view") {
 			return {
@@ -1007,6 +1015,8 @@ describe("multi-project batched search over gh", () => {
 		args: string[],
 		options?: { cwd?: string },
 	): Promise<unknown> => {
+		const repoName = repoNameLookup(args);
+		if (repoName) return repoName;
 		ghCalls.push({ args, cwd: options?.cwd });
 		if (args[0] === "api" && args.includes("search/issues")) {
 			const q = qOf({ args });

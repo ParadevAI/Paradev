@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -32,6 +32,8 @@ import {
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
+	fetchRepositoryName,
+	fetchRepositoryNameFromGh,
 	parseMergedAt,
 } from "./utils/github-query";
 import type {
@@ -79,6 +81,9 @@ const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
+// Git remotes keep the old owner/name after a GitHub rename or transfer.
+const REPO_NAME_CHECK_TTL_MS = 24 * 60 * 60_000;
+const REPO_NAME_RETRY_TTL_MS = 10 * 60_000;
 // Dedup + link-assignment key. Branch stays case-sensitive: `feature` and
 // `Feature` are distinct branches with distinct PRs, so collapsing them here
 // would mislink. Case drift is tolerated only in the fallback in
@@ -151,6 +156,11 @@ export interface PullRequestRuntimeManagerOptions {
 	readWorkspaceRefs?: (worktreePath: string) => Promise<WorkspaceRefsSnapshot>;
 	/** Test seam for the missing-worktree gate. Defaults to `existsSync`. */
 	worktreeExists?: (worktreePath: string) => boolean;
+}
+
+interface RepoName {
+	owner: string;
+	name: string;
 }
 
 interface NormalizedRepoIdentity {
@@ -281,6 +291,10 @@ export class PullRequestRuntimeManager {
 	private missingWorktreeProbeTimer: ReturnType<typeof setInterval> | null =
 		null;
 	private readonly linkListeners = new Set<() => void>();
+	private readonly repoNames = new Map<
+		string,
+		{ promise: Promise<RepoName | null>; checkedAt: number; ttlMs: number }
+	>();
 
 	constructor(options: PullRequestRuntimeManagerOptions) {
 		this.db = options.db;
@@ -955,7 +969,7 @@ export class PullRequestRuntimeManager {
 		if (!repo) return;
 
 		const scope = options.workspaceIds ? new Set(options.workspaceIds) : null;
-		const projectWorkspaces = this.db
+		const workspaceRows = this.db
 			.select()
 			.from(workspaces)
 			.where(eq(workspaces.projectId, projectId))
@@ -967,7 +981,23 @@ export class PullRequestRuntimeManager {
 				(workspace) =>
 					workspace.archivedAt == null && (!scope || scope.has(workspace.id)),
 			);
-		if (projectWorkspaces.length === 0) return;
+		if (workspaceRows.length === 0) return;
+		const projectWorkspaces = await Promise.all(
+			workspaceRows.map(async (workspace) => {
+				if (!workspace.upstreamOwner || !workspace.upstreamRepo) {
+					return workspace;
+				}
+				const upstream = await this.resolveRepoName({
+					owner: workspace.upstreamOwner,
+					name: workspace.upstreamRepo,
+				});
+				return {
+					...workspace,
+					upstreamOwner: upstream.owner,
+					upstreamRepo: upstream.name,
+				};
+			}),
+		);
 
 		const wantedRefs = new Map<string, GitHubPullRequestHeadRef>();
 		for (const workspace of projectWorkspaces) {
@@ -1107,8 +1137,95 @@ export class PullRequestRuntimeManager {
 			identity = { ...parsedRemote, remoteName };
 		}
 
+		const current = await this.resolveRepoName(identity);
+		if (current.owner !== identity.owner || current.name !== identity.name) {
+			identity = this.renameProjectRepository(projectId, identity, current);
+		}
+
 		const defaultBranch = await this.resolveDefaultBranch(project.repoPath);
 		return { ...identity, defaultBranch };
+	}
+
+	/**
+	 * The repo's current owner/name on GitHub. Checked at most once a day per
+	 * repo; on failure the given name is kept and checked again later.
+	 */
+	async resolveRepoName(repo: RepoName): Promise<RepoName> {
+		const key = `${repo.owner}/${repo.name}`.toLowerCase();
+		const now = Date.now();
+		let entry = this.repoNames.get(key);
+		if (!entry || now - entry.checkedAt >= entry.ttlMs) {
+			const next = {
+				promise: this.fetchRepoName(repo),
+				checkedAt: now,
+				ttlMs: REPO_NAME_CHECK_TTL_MS,
+			};
+			void next.promise.then((name) => {
+				if (!name) next.ttlMs = REPO_NAME_RETRY_TTL_MS;
+			});
+			this.repoNames.set(key, next);
+			entry = next;
+		}
+		return (await entry.promise) ?? repo;
+	}
+
+	private async fetchRepoName(repo: RepoName): Promise<RepoName | null> {
+		try {
+			return await this.fetchFromGitHub(
+				"repo name lookup",
+				repo,
+				() => fetchRepositoryNameFromGh(this.execGh, repo),
+				async () => fetchRepositoryName(await this.github(), repo),
+			);
+		} catch {
+			return null;
+		}
+	}
+
+	// Moves the project and its PR rows to the repo's new name, so existing
+	// links and history keep their row ids. Git remotes are left as they are.
+	private renameProjectRepository(
+		projectId: string,
+		previous: Omit<NormalizedRepoIdentity, "defaultBranch">,
+		current: RepoName,
+	): Omit<NormalizedRepoIdentity, "defaultBranch"> {
+		const url = `https://github.com/${current.owner}/${current.name}`;
+		console.info(
+			"[host-service:pull-request-runtime] GitHub repo was renamed or moved",
+			{
+				projectId,
+				from: `${previous.owner}/${previous.name}`,
+				to: `${current.owner}/${current.name}`,
+			},
+		);
+		this.db.transaction((tx) => {
+			tx.update(projects)
+				.set({ repoOwner: current.owner, repoName: current.name, repoUrl: url })
+				.where(eq(projects.id, projectId))
+				.run();
+			const takenNumbers = tx
+				.select({ prNumber: pullRequests.prNumber })
+				.from(pullRequests)
+				.where(
+					and(
+						eq(pullRequests.repoProvider, previous.provider),
+						eq(pullRequests.repoOwner, current.owner),
+						eq(pullRequests.repoName, current.name),
+					),
+				);
+			tx.update(pullRequests)
+				.set({ repoOwner: current.owner, repoName: current.name })
+				.where(
+					and(
+						eq(pullRequests.repoProvider, previous.provider),
+						eq(pullRequests.repoOwner, previous.owner),
+						eq(pullRequests.repoName, previous.name),
+						notInArray(pullRequests.prNumber, takenNumbers),
+					),
+				)
+				.run();
+		});
+		return { ...previous, owner: current.owner, name: current.name, url };
 	}
 
 	// Shared origin/HEAD resolver; a repo-open failure disables the guard

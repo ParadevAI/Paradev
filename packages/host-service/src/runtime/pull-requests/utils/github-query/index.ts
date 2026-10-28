@@ -9,6 +9,8 @@ export {
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
+	fetchRepositoryName,
+	fetchRepositoryNameFromGh,
 	parseMergedAt,
 } from "./github-query";
 export type {
