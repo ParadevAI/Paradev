@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Run by a QStash schedule every 10 minutes. That schedule lives in the
+ * Run by a QStash schedule every 30 minutes. That schedule lives in the
  * Upstash console, not in this repo.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -21,7 +21,7 @@ export async function POST(request: Request): Promise<Response> {
 	const outcome = await Sentry.withMonitor(
 		"reconcile-usage",
 		reconcileCloudWorkspaceUsage,
-		{ schedule: { type: "crontab", value: "*/10 * * * *" } },
+		{ schedule: { type: "crontab", value: "*/30 * * * *" } },
 	);
 	return Response.json({ ok: true, ...outcome });
 }

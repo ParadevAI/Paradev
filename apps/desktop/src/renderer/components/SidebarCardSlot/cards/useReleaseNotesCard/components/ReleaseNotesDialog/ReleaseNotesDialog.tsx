@@ -37,6 +37,7 @@ export function ReleaseNotesDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				if (!next) onClose();
@@ -56,7 +57,7 @@ export function ReleaseNotesDialog({
 
 				<div className="px-6 pt-5">
 					<DialogTitle className="flex items-baseline gap-2 text-lg font-medium leading-tight">
-						{t({ message: `Superset ${version}` })}
+						{t({ message: `Paradev ${version}` })}
 						<span className="text-base font-normal text-muted-foreground">
 							{formatReleaseDate(release.date, { withYear: true })}
 						</span>

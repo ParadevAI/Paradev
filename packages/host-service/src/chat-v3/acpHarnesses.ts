@@ -10,6 +10,7 @@ import { ACP_HARNESSES } from "./acpCatalogue";
 import { resolveAgentCli } from "./agentCli";
 import { buildChatAgentEnv } from "./agentEnv";
 import { storeAgentImage } from "./agentImages";
+import { agentLoginCommand } from "./agentLogin";
 import type { ChatAgentBridge } from "./chatAgentBridge";
 
 async function resolveAttachment(attachmentId: string) {
@@ -55,6 +56,7 @@ export function acpHarnessFactory(
 				? { defaultModeId: entry.fullAccessModeId }
 				: {}),
 			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
+			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
 			onSpawn: (pid) => agents?.spawned(options.sessionId, pid),
 			launch: async () => {
 				const cli = await resolveAgentCli({
@@ -84,8 +86,10 @@ export function acpHarnessFactory(
 						if (account) agents?.accountCaptured(options.sessionId, account);
 					})
 					.catch(() => undefined);
+				const loginCommand = agentLoginCommand(entry.binary, env);
+				const login = loginCommand ? { loginCommand } : {};
 				if (!adapterEntry) {
-					return { command: cli.command, args: entry.args, env };
+					return { command: cli.command, args: entry.args, env, ...login };
 				}
 				if (!entry.executableEnv) {
 					throw new Error(
@@ -100,6 +104,7 @@ export function acpHarnessFactory(
 						ELECTRON_RUN_AS_NODE: "1",
 						[entry.executableEnv]: cli.command,
 					},
+					...login,
 				};
 			},
 		});

@@ -73,7 +73,7 @@ export const cloudWorkspaceStatusValues = [
 export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
 export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
 
-/** Who can see and open a cloud workspace: its creator alone, or its whole organization. */
+/** Who else can open a cloud workspace besides its creator and the people it is shared with. `just_me` predates sharing: it means no one else. */
 export const cloudWorkspaceVisibilityValues = ["just_me", "org"] as const;
 export const cloudWorkspaceVisibilityEnum = z.enum(
 	cloudWorkspaceVisibilityValues,
@@ -95,6 +95,8 @@ export const cloudWorkspaceActivityEventValues = [
 	"description_edited",
 	"run_finished",
 	"run_failed",
+	"shared",
+	"unshared",
 ] as const;
 export type CloudWorkspaceActivityEvent =
 	(typeof cloudWorkspaceActivityEventValues)[number];
@@ -250,6 +252,10 @@ export const pageVisibilityValues = ["just_me", "org", "everyone"] as const;
 export const pageVisibilityEnum = z.enum(pageVisibilityValues);
 export type PageVisibility = z.infer<typeof pageVisibilityEnum>;
 
+export const pageShareRoleValues = ["view", "comment"] as const;
+export const pageShareRoleEnum = z.enum(pageShareRoleValues);
+export type PageShareRole = z.infer<typeof pageShareRoleEnum>;
+
 export const pageReportReasonValues = [
 	"malware_or_phishing",
 	"spam_or_scam",
@@ -294,3 +300,48 @@ export type HandleOwnerType = z.infer<typeof handleOwnerTypeEnum>;
 /** How a person signed their agent in: a subscription token, or a provider API key. */
 export const agentCredentialKindValues = ["subscription", "api_key"] as const;
 export type AgentCredentialKind = (typeof agentCredentialKindValues)[number];
+
+export const channelKindValues = ["channel", "dm"] as const;
+export const channelKindEnum = z.enum(channelKindValues);
+
+export const channelVisibilityValues = ["public", "private"] as const;
+export const channelVisibilityEnum = z.enum(channelVisibilityValues);
+export type ChannelVisibility = z.infer<typeof channelVisibilityEnum>;
+
+export const channelMemberRoleValues = ["member", "admin"] as const;
+export const channelMemberRoleEnum = z.enum(channelMemberRoleValues);
+export type ChannelMemberRole = z.infer<typeof channelMemberRoleEnum>;
+
+export const channelNotifyValues = ["all", "mentions", "none"] as const;
+export const channelNotifyEnum = z.enum(channelNotifyValues);
+export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
+
+/** Where a Dev works: its DM with a person, or a thread it was mentioned in. */
+export const agentSessionKindValues = ["dm", "thread"] as const;
+export const agentSessionKindEnum = z.enum(agentSessionKindValues);
+export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
+
+export const agentTurnStatusValues = [
+	"running",
+	"completed",
+	"failed",
+	"interrupted",
+] as const;
+export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
+export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;
+
+/** Why a turn started; recorded by the API, never by the worker. */
+export const agentTurnReasonValues = [
+	"direct_message",
+	"mention",
+	"thread_reply",
+] as const;
+export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
+export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
+export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
+export const channelBroadcastEnum = z.enum(channelBroadcastValues);
+export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;
+
+export const dockBounceValues = ["off", "once", "until_focused"] as const;
+export const dockBounceEnum = z.enum(dockBounceValues);
+export type DockBounce = z.infer<typeof dockBounceEnum>;

@@ -20,12 +20,9 @@ import {
 import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import {
-	DEVICE_FILTER_THIS_DEVICE,
 	useV2WorkspacesFilterStore,
-	type V2WorkspacesArchivedWindow,
-	type V2WorkspacesSortMode,
+	WHERE_FILTER_ANYWHERE,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
-import { isWithinArchivedWindow } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/archivedWindow";
 import {
 	BOARD_COLUMN_LABELS,
 	BOARD_COLUMN_ORDER,
@@ -51,6 +48,7 @@ interface StatusSection {
 const LIST_SECTION_ORDER: BoardColumnKey[] = [
 	"attention",
 	"working",
+	"finished",
 	"review",
 	"idle",
 	"merged",
@@ -58,31 +56,23 @@ const LIST_SECTION_ORDER: BoardColumnKey[] = [
 ];
 
 /** Same buckets as the board — the two views must agree on what
- * "needs attention" means. Row order inside a section follows the user's
- * sort mode. */
+ * "needs attention" means. */
 function groupByStatus(
 	workspaces: AccessibleV2Workspace[],
-	archivedWindow: V2WorkspacesArchivedWindow,
-	sortMode: V2WorkspacesSortMode,
+	showArchived: boolean,
 ): StatusSection[] {
-	const now = Date.now();
 	const byColumn = new Map<BoardColumnKey, AccessibleV2Workspace[]>(
 		BOARD_COLUMN_ORDER.map((column) => [column, []]),
 	);
 	for (const workspace of workspaces) {
-		if (
-			workspace.archivedAt != null &&
-			!isWithinArchivedWindow(workspace.archivedAt, archivedWindow, now)
-		) {
-			continue;
-		}
+		if (workspace.archivedAt != null && !showArchived) continue;
 		byColumn.get(deriveBoardColumn(workspace))?.push(workspace);
 	}
 	const sections: StatusSection[] = [];
 	for (const column of LIST_SECTION_ORDER) {
 		const rows = byColumn.get(column) ?? [];
 		if (rows.length === 0) continue;
-		rows.sort((a, b) => compareWorkspaces(a, b, sortMode));
+		rows.sort(compareWorkspaces);
 		sections.push({ column, workspaces: rows });
 	}
 	return sections;
@@ -100,44 +90,29 @@ export function V2WorkspacesList({
 		currentWorkspaceMatch !== false ? currentWorkspaceMatch.workspaceId : null;
 
 	const searchQuery = useV2WorkspacesFilterStore((state) => state.searchQuery);
-	const deviceFilter = useV2WorkspacesFilterStore(
-		(state) => state.deviceFilter,
-	);
+	const whereFilter = useV2WorkspacesFilterStore((state) => state.whereFilter);
 	const projectFilters = useV2WorkspacesFilterStore(
 		(state) => state.projectFilters,
-	);
-	const prStateFilters = useV2WorkspacesFilterStore(
-		(state) => state.prStateFilters,
-	);
-	const agentStatusFilters = useV2WorkspacesFilterStore(
-		(state) => state.agentStatusFilters,
 	);
 	const creatorFilters = useV2WorkspacesFilterStore(
 		(state) => state.creatorFilters,
 	);
-	const pinFilter = useV2WorkspacesFilterStore((state) => state.pinFilter);
 	const resetFilters = useV2WorkspacesFilterStore((state) => state.reset);
-	const archivedWindow = useV2WorkspacesFilterStore(
-		(state) => state.archivedWindow,
+	const showArchived = useV2WorkspacesFilterStore(
+		(state) => state.showArchived,
 	);
-	const sortMode = useV2WorkspacesFilterStore((state) => state.sortMode);
 
 	const sections = useMemo(
-		() => groupByStatus(workspaces, archivedWindow, sortMode),
-		[workspaces, archivedWindow, sortMode],
+		() => groupByStatus(workspaces, showArchived),
+		[workspaces, showArchived],
 	);
 
 	const hasActiveFilters =
 		searchQuery.trim() !== "" ||
-		deviceFilter !== DEVICE_FILTER_THIS_DEVICE ||
+		whereFilter !== WHERE_FILTER_ANYWHERE ||
 		projectFilters.length > 0 ||
-		prStateFilters.length > 0 ||
-		agentStatusFilters.length > 0 ||
 		creatorFilters.length > 0 ||
-		pinFilter !== "all" ||
-		// A narrowed archive window can hide every row (e.g. all tombstones
-		// with "Hide archived") — that's a filter, not an empty account.
-		archivedWindow !== "none";
+		showArchived;
 
 	// Sections, not the input rows: the archived window can drop everything.
 	if (sections.length === 0) {
@@ -161,9 +136,9 @@ export function V2WorkspacesList({
 					</EmptyTitle>
 					<EmptyDescription>
 						{hasActiveFilters ? (
-							<Trans>Try a different search term or another device.</Trans>
+							<Trans>Try a different search term or another place.</Trans>
 						) : (
-							<Trans>Workspaces on this device will show up here.</Trans>
+							<Trans>Workspaces you can open will show up here.</Trans>
 						)}
 					</EmptyDescription>
 				</EmptyHeader>

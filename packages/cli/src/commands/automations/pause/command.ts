@@ -2,7 +2,7 @@ import { positional } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 
 export default command({
-	description: "Pause an automation (stops scheduled firing)",
+	description: "Pause an automation (stops its schedules and event triggers)",
 	args: [positional("id").required().desc("Automation id")],
 	run: async ({ ctx, args }) => {
 		const id = args.id as string;

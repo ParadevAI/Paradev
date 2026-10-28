@@ -8,9 +8,11 @@ import type {
 import { CodeView, type CodeViewHandle } from "@pierre/diffs/react";
 import { FileTree as PierreFileTree, useFileTree } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
+import { useIsTabVisible } from "@superset/panes";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import type { PullRequestDiff } from "@superset/shared/pull-request-diff";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -30,21 +32,25 @@ import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/comp
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
 import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
 import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorkspaceCreates";
-import { pullRequestReadErrorMessage } from "../../utils/combinePullRequestReadErrors";
-import { PullRequestCommentComposer } from "./components/PullRequestCommentComposer";
-import { PullRequestCommentThread } from "./components/PullRequestCommentThread";
-import { fetchPullRequestDiff } from "./utils/fetchPullRequestDiff";
-import { getFileItemVersion } from "./utils/getFileItemVersion";
-import { parsePullRequestPatch } from "./utils/parsePullRequestPatch";
+import { usePullRequestThreads } from "../../hooks/usePullRequestThreads";
 import {
+	type PullRequestTarget,
 	pullRequestDiffQueryKey,
 	pullRequestThreadsQueryKey,
-} from "./utils/pullRequestCodeTabQueryKeys";
+	readPullRequestDiff,
+	replyToPullRequestThread,
+	setPullRequestThreadResolution,
+} from "../../utils/pullRequestClient";
+import { PullRequestCommentComposer } from "./components/PullRequestCommentComposer";
+import { PullRequestCommentThread } from "./components/PullRequestCommentThread";
+import { getFileItemVersion } from "./utils/getFileItemVersion";
+import { parsePullRequestPatch } from "./utils/parsePullRequestPatch";
 
 interface PullRequestCodeTabProps {
 	projectId: string | null;
@@ -197,10 +203,10 @@ export function PullRequestCodeTab({
 	hostId,
 }: PullRequestCodeTabProps) {
 	const { t } = useLingui();
-	// Card look (rounded header/body pairs, gap between files, PR-row
+	// Same file look as the v2-workspace DiffPane (edge-to-edge files, PR-row
 	// additions/deletions colors, app background instead of the terminal
-	// theme's) comes from the shared card theme hook — the same one the
-	// v2-workspace DiffPane renders with.
+	// theme's).
+	const isRightPaneArea = useRightPaneLinkTarget() !== null;
 	const { options, style: codeViewStyle } = useDiffCardCodeViewTheme();
 	const codeViewRef = useRef<CodeViewHandle<PrAnnotationMetadata>>(null);
 	const [initialTreeExpansion] = useState<"open" | "closed">(() =>
@@ -233,7 +239,6 @@ export function PullRequestCodeTab({
 		(containerWidth != null &&
 			containerWidth < NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD);
 	const [treeWidth, setTreeWidth] = useState(DEFAULT_TREE_WIDTH);
-	const [isResizingTree, setIsResizingTree] = useState(false);
 	const [composer, updateComposer] = useState<ComposerState | null>(null);
 	// Cancel/Escape/successful-submit close, as opposed to updateComposer(null)
 	// from onLineSelectionEnd's !range branch — there Pierre has *already*
@@ -267,51 +272,27 @@ export function PullRequestCodeTab({
 	const organizationId = useActiveOrganizationId();
 	const repoFullName = pullRequestRefFromUrl(prUrl)?.repoFullName ?? null;
 	const canUseProject = !!projectId && !!hostUrl;
-
-	const { data, isLoading, error, refetch } = useQuery({
-		queryKey: pullRequestDiffQueryKey({
+	const isTabVisible = useIsTabVisible();
+	const target = useMemo<PullRequestTarget>(
+		() => ({
 			organizationId,
 			repoFullName,
-			projectId,
-			hostUrl,
 			prNumber,
 		}),
-		queryFn: () =>
-			fetchPullRequestDiff({
-				projectId,
-				hostUrl,
-				prNumber,
-				repoFullName,
-				organizationId,
-			}),
+		[organizationId, repoFullName, prNumber],
+	);
+
+	const { data, isLoading, error, refetch } = useQuery({
+		queryKey: pullRequestDiffQueryKey(target),
+		enabled: isTabVisible,
+		queryFn: () => readPullRequestDiff(target),
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
 
-	const threadsQueryKey = pullRequestThreadsQueryKey({
-		projectId,
-		hostUrl,
-		prNumber,
-	});
-	const { data: threadsData, dataUpdatedAt: threadsUpdatedAt } = useQuery({
-		queryKey: threadsQueryKey,
-		enabled: canUseProject,
-		queryFn: async () => {
-			if (!projectId) return { reviewThreads: [], fetchFailed: false };
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.getThreads.query({ projectId, prNumber });
-		},
-		staleTime: 30_000,
-		gcTime: 10 * 60_000,
-		// This tab and a workspace DiffPane for the same PR read threads
-		// through two different tRPC clients with two separate caches, so
-		// resolving/replying in one doesn't invalidate the other. DiffPane's
-		// own threads query already self-heals via a 30s refetchInterval
-		// (see useDiffAnnotations) rather than relying on cross-cache
-		// invalidation — matching that here keeps the two surfaces from
-		// drifting for longer than DiffPane already tolerates.
-		refetchInterval: 30_000,
-	});
+	const threadsQueryKey = pullRequestThreadsQueryKey(target);
+	const { data: threadsData, dataUpdatedAt: threadsUpdatedAt } =
+		usePullRequestThreads(target, { enabled: isTabVisible });
 	// getThreads degrades a GraphQL failure to an empty list rather than
 	// throwing (so a comments-fetch failure doesn't block the diff view
 	// itself) — fetchFailed is how it tells that apart from a PR that
@@ -347,10 +328,8 @@ export function PullRequestCodeTab({
 		ReadonlySet<string>
 	>(new Set());
 	const setThreadResolution = useMutation({
-		mutationFn: async (input: { threadId: string; resolved: boolean }) => {
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.setThreadResolution.mutate(input);
-		},
+		mutationFn: (input: { threadId: string; resolved: boolean }) =>
+			setPullRequestThreadResolution(target, input),
 		onMutate: (input) => {
 			setPendingResolveThreadIds((prev) => new Set(prev).add(input.threadId));
 		},
@@ -379,16 +358,8 @@ export function PullRequestCodeTab({
 		ReadonlySet<number>
 	>(new Set());
 	const replyToThread = useMutation({
-		mutationFn: async (input: { commentId: number; body: string }) => {
-			if (!projectId)
-				throw new Error("No project available to reply to a thread");
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.replyToThread.mutate({
-				projectId,
-				prNumber,
-				...input,
-			});
-		},
+		mutationFn: (input: { commentId: number; body: string }) =>
+			replyToPullRequestThread(target, input),
 		onMutate: (input) => {
 			setPendingReplyCommentIds((prev) => new Set(prev).add(input.commentId));
 		},
@@ -806,7 +777,7 @@ export function PullRequestCodeTab({
 			<div ref={rootRef} className="flex min-h-0 flex-1 flex-col">
 				<div className="flex flex-1 items-center justify-center">
 					<WorkItemDetailState
-						message={pullRequestReadErrorMessage(error)}
+						message={errorMessage(error)}
 						isError
 						onRetry={() => void refetch()}
 					/>
@@ -844,15 +815,16 @@ export function PullRequestCodeTab({
 	return (
 		<div
 			ref={rootRef}
-			className="flex min-h-0 flex-1 flex-col pb-4 pt-3 @[40rem]/detail:px-4 @[56rem]/detail:px-6"
+			className={cn(
+				"flex min-h-0 flex-1 flex-col pb-4 pt-3",
+				!isRightPaneArea && "@[40rem]/detail:px-4 @[56rem]/detail:px-6",
+			)}
 		>
 			<div className="flex min-h-0 flex-1 overflow-hidden">
 				{!isTreeCollapsed && (
 					<ResizablePanel
 						width={treeWidth}
 						onWidthChange={setTreeWidth}
-						isResizing={isResizingTree}
-						onResizingChange={setIsResizingTree}
 						minWidth={MIN_TREE_WIDTH}
 						maxWidth={MAX_TREE_WIDTH}
 						handleSide="right"

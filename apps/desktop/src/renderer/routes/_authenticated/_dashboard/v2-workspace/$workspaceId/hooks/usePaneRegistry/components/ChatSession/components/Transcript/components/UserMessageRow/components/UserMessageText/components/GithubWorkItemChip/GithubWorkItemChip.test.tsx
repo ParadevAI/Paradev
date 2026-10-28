@@ -68,7 +68,7 @@ function renderChip(
 	return { asked, view, chip: view.getByRole("link") };
 }
 
-test("a pull request chip asks for details only once the card opens", async () => {
+test("a pull request chip asks for details only when the pointer or focus arrives", async () => {
 	const { asked, chip } = renderChip(() => ITEM);
 	expect(chip.textContent).toBe("PR #8329");
 	expect(chip.title).toBe(URL_PR);

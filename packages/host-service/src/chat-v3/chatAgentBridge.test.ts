@@ -100,6 +100,28 @@ describe("createChatAgentBridge", () => {
 		bridge.stopped("chat-1");
 	});
 
+	it("keeps the main agent's reply as the preview when a subagent speaks last", () => {
+		const { bridge, lifecycle, status, reply, start, publish } = setup();
+		start("chat-1");
+		status("chat-1", "idle");
+		status("chat-1", "running");
+		reply("chat-1", "Done.");
+		publish("chat-1", {
+			type: "item",
+			turnId: "turn-1",
+			item: {
+				id: "sub:child:item-1",
+				parentItemId: "subagent:child",
+				kind: "agent_message",
+				text: "Child reply.",
+				startedAtMs: 1,
+			},
+		});
+		status("chat-1", "idle");
+		expect(lifecycle.mock.calls[1]?.[0].preview).toBe("Done.");
+		bridge.stopped("chat-1");
+	});
+
 	it("lists the chat's background tasks on its binding", () => {
 		const { bridge, terminalAgentStore, start, publish } = setup();
 		start("chat-1");
@@ -151,6 +173,26 @@ describe("createChatAgentBridge", () => {
 		]);
 		bridge.stopped("chat-1");
 		expect(terminalAgentStore.listByWorkspace(WORKSPACE)).toEqual([]);
+	});
+
+	it("counts each item of a turn as activity, and a background task's output as none", () => {
+		const { bridge, terminalAgentStore, start, status, reply, publishDelta } =
+			setup();
+		const activity = mock(() => {});
+		terminalAgentStore.on("activity", activity);
+		start("chat-1");
+		status("chat-1", "running");
+		const afterStart = activity.mock.calls.length;
+		publishDelta("chat-1", {
+			type: "background",
+			itemId: "a",
+			append: "dev server output",
+		});
+		expect(activity.mock.calls.length).toBe(afterStart);
+		reply("chat-1", "working on it");
+		reply("chat-1", "still working");
+		expect(activity.mock.calls.length).toBe(afterStart + 2);
+		bridge.stopped("chat-1");
 	});
 
 	it("records a background task's step without announcing it at once", () => {

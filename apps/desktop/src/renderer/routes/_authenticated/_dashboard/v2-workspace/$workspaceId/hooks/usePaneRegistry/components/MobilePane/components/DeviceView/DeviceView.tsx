@@ -3,19 +3,27 @@ import {
 	DeviceScreen,
 	displayScreen,
 } from "@expo/hub-client";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import { toast } from "@superset/ui/sonner";
+import { Spinner } from "@superset/ui/spinner";
 import { cn } from "@superset/ui/utils";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { fileToBase64 } from "renderer/lib/file-to-base64";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { DeviceActions } from "./components/DeviceActions";
 import { DeviceControls } from "./components/DeviceControls";
 import { type LogScope, LogsDrawer } from "./components/LogsDrawer";
+import { ScreenshotStrip } from "./components/ScreenshotStrip";
 import { ToolsPanel } from "./components/ToolsPanel";
+import { useDeviceScreenshots } from "./hooks/useDeviceScreenshots";
 
 export type RequestedOrientation = "portrait" | "landscape";
 
 interface DeviceViewProps {
 	client: DeviceClient;
+	workspaceId: string;
+	deviceKey: string;
 	deviceName: string;
 	picker: ReactNode;
 	logStreamUrl: (scope: LogScope) => string;
@@ -26,9 +34,13 @@ interface DeviceViewProps {
 
 const FALLBACK_ASPECT_RATIO = 9 / 19.5;
 const STALLED_AFTER_MS = 10_000;
+/** Below this the strip would cover the centered control bar. */
+const STRIP_MIN_PANE_WIDTH = 680;
 
 export function DeviceView({
 	client,
+	workspaceId,
+	deviceKey,
 	deviceName,
 	picker,
 	logStreamUrl,
@@ -52,6 +64,9 @@ export function DeviceView({
 		onRotate(landscape ? "landscape" : "portrait");
 	};
 
+	// hub-client paints a black box and a broken image until the first frame.
+	const hasPicture =
+		client.status === "streaming" || client.status === "reconnecting";
 	const [stalled, setStalled] = useState(false);
 	useEffect(() => {
 		setStalled(false);
@@ -60,6 +75,37 @@ export function DeviceView({
 		return () => clearTimeout(timer);
 	}, [client.status]);
 
+	const { t } = useLingui();
+	const shots = useDeviceScreenshots(deviceKey);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const [roomForStrip, setRoomForStrip] = useState(false);
+	useEffect(() => {
+		const root = rootRef.current;
+		if (!root) return;
+		const observer = new ResizeObserver(([entry]) => {
+			if (entry) {
+				setRoomForStrip(entry.contentRect.width >= STRIP_MIN_PANE_WIDTH);
+			}
+		});
+		observer.observe(root);
+		return () => observer.disconnect();
+	}, []);
+	const [lastCapturedAt, setLastCapturedAt] = useState(0);
+	const takeScreenshot = async () => {
+		try {
+			const capture = await client.screenshot();
+			if (!capture) throw new Error("No screenshot");
+			await electronTrpcClient.screenshots.saveDeviceCapture.mutate({
+				pngBase64: await fileToBase64(capture.blob),
+				deviceKey,
+				deviceName,
+			});
+			setLastCapturedAt(Date.now());
+			if (!roomForStrip) toast.success(t({ message: "Screenshot copied" }));
+		} catch {
+			toast.error(t({ message: "Couldn't take a screenshot" }));
+		}
+	};
 	const [expanded, setExpanded] = useState(false);
 	const [toolsOpen, setToolsOpen] = useState(false);
 	const [logsOpen, setLogsOpen] = useState(false);
@@ -74,7 +120,7 @@ export function DeviceView({
 	}, [expanded]);
 
 	return (
-		<div className="flex size-full flex-col bg-background">
+		<div ref={rootRef} className="flex size-full flex-col bg-background">
 			<div className="relative flex min-h-0 flex-1 flex-col">
 				{!expanded && picker}
 				<DeviceActions
@@ -86,12 +132,25 @@ export function DeviceView({
 				{!expanded && (
 					<DeviceControls
 						client={client}
-						deviceName={deviceName}
 						onRotate={rotate}
+						onScreenshot={() => void takeScreenshot()}
+					/>
+				)}
+				{!expanded && !toolsOpen && roomForStrip && (
+					<ScreenshotStrip
+						shots={shots}
+						workspaceId={workspaceId}
+						lastCapturedAt={lastCapturedAt}
+						onShowAll={() => setToolsOpen(true)}
 					/>
 				)}
 				{!expanded && toolsOpen && (
-					<ToolsPanel client={client} onClose={() => setToolsOpen(false)} />
+					<ToolsPanel
+						client={client}
+						onClose={() => setToolsOpen(false)}
+						shots={shots}
+						workspaceId={workspaceId}
+					/>
 				)}
 				{!expanded && logsOpen && (
 					<LogsDrawer
@@ -119,19 +178,39 @@ export function DeviceView({
 						}}
 					>
 						<DeviceScreen client={client} borderRadius={20} />
-						{stalled && onReconnect && (
-							<div className="absolute inset-0 flex items-center justify-center">
+						<div
+							className={cn(
+								"pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[20px] px-6 text-center text-sm text-muted-foreground",
+								!hasPicture && "bg-muted",
+							)}
+						>
+							{!hasPicture &&
+								(client.status === "error" ? (
+									<span>
+										{client.error ?? (
+											<Trans>Could not reach {deviceName}.</Trans>
+										)}
+									</span>
+								) : (
+									<>
+										<Spinner className="size-4" />
+										<span>
+											<Trans>Connecting to {deviceName}…</Trans>
+										</span>
+									</>
+								))}
+							{stalled && onReconnect && (
 								<Button
 									variant="outline"
 									size="sm"
-									className="mt-16"
+									className="pointer-events-auto"
 									disabled={reconnecting}
 									onClick={onReconnect}
 								>
 									<Trans>Reconnect</Trans>
 								</Button>
-							</div>
-						)}
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

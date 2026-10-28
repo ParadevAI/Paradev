@@ -1,5 +1,5 @@
 import { auth } from "@superset/auth/server";
-import { COMPANY } from "@superset/shared/constants";
+import { isStaffEmail } from "@superset/shared/constants";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -7,6 +7,7 @@ import {
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
+	safeRedirectUrl,
 } from "./proxy-routes";
 
 export default async function proxy(req: NextRequest) {
@@ -32,7 +33,11 @@ export default async function proxy(req: NextRequest) {
 		pathname.startsWith("/trpc/");
 
 	if (session && isAuthPageRoute(pathname)) {
-		return NextResponse.redirect(new URL("/", req.url));
+		const target = safeRedirectUrl(
+			req.nextUrl.searchParams.get("redirect"),
+			req.nextUrl.origin,
+		);
+		return NextResponse.redirect(target ?? new URL("/", req.url));
 	}
 
 	// Public API routes (e.g. `/api/auth/desktop`, the desktop OAuth start)
@@ -67,7 +72,7 @@ export default async function proxy(req: NextRequest) {
 	if (
 		session &&
 		isInternalRoute(pathname) &&
-		!session.user.email.endsWith(COMPANY.EMAIL_DOMAIN)
+		!isStaffEmail(session.user.email)
 	) {
 		return NextResponse.redirect(new URL("/", req.url));
 	}

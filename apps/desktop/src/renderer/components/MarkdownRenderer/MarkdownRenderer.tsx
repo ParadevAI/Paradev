@@ -1,22 +1,39 @@
 import { cn } from "@superset/ui/utils";
-import { memo, useMemo, useRef } from "react";
-import ReactMarkdown, { type Components } from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
+import { memo, useRef } from "react";
+import type { Components } from "react-markdown";
 import { useMarkdownStyle } from "renderer/stores";
 import { SelectionContextMenu } from "./components";
 import { defaultConfig } from "./styles/default/config";
 import { tufteConfig } from "./styles/tufte/config";
+import { renderMarkdown } from "./utils/renderMarkdown";
 
 const styleConfigs = {
 	default: defaultConfig,
 	tufte: tufteConfig,
 } as const;
 
-const REMARK_PLUGINS = [remarkGfm];
-const REHYPE_PLUGINS_WITH_HTML = [rehypeRaw, rehypeSanitize];
-const REHYPE_PLUGINS = [rehypeSanitize];
+const mergedComponents = new WeakMap<
+	Partial<Components>,
+	WeakMap<Partial<Components>, Partial<Components>>
+>();
+
+function withComponents(
+	base: Partial<Components>,
+	extra: Partial<Components> | undefined,
+): Partial<Components> {
+	if (!extra) return base;
+	let byExtra = mergedComponents.get(base);
+	if (!byExtra) {
+		byExtra = new WeakMap();
+		mergedComponents.set(base, byExtra);
+	}
+	let merged = byExtra.get(extra);
+	if (!merged) {
+		merged = { ...base, ...extra };
+		byExtra.set(extra, merged);
+	}
+	return merged;
+}
 
 interface MarkdownRendererProps {
 	content: string;
@@ -39,11 +56,6 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
 	const style = styleProp ?? globalStyle;
 	const config = styleConfigs[style];
 	const articleRef = useRef<HTMLElement | null>(null);
-	const mergedComponents = useMemo(
-		() =>
-			components ? { ...config.components, ...components } : config.components,
-		[config.components, components],
-	);
 
 	return (
 		<SelectionContextMenu selectAllContainerRef={articleRef}>
@@ -55,15 +67,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
 				)}
 			>
 				<article ref={articleRef} className={config.articleClass}>
-					<ReactMarkdown
-						remarkPlugins={REMARK_PLUGINS}
-						rehypePlugins={
-							allowHtml ? REHYPE_PLUGINS_WITH_HTML : REHYPE_PLUGINS
-						}
-						components={mergedComponents}
-					>
-						{content}
-					</ReactMarkdown>
+					{renderMarkdown({
+						content,
+						allowHtml,
+						components: withComponents(config.components, components),
+					})}
 				</article>
 			</div>
 		</SelectionContextMenu>

@@ -11,10 +11,13 @@ import {
 	packagedAsarUnpackGlobs,
 	packagedNodeModuleCopies,
 } from "./runtime-dependencies";
+import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const currentYear = new Date().getFullYear();
-const author = pkg.author?.name ?? pkg.author;
 const productName = pkg.productName;
+// productName names the bundle, userData, logs and the keychain entry, so it
+// never changes; the menu bar, Dock and launchers show displayName.
+export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
 const macIconPath = join(pkg.resources, "build/icons/icon.icns");
 const linuxIconPath = join(pkg.resources, "build/icons");
 const winIconPath = join(pkg.resources, "build/icons/icon.ico");
@@ -26,7 +29,8 @@ const dmgBackgroundPath = join(
 const config: Configuration = {
 	appId: "com.superset.desktop",
 	productName,
-	copyright: `Copyright © ${currentYear} — ${author}`,
+	afterPack: localizeMacDisplayName(displayName),
+	copyright: `Copyright © ${currentYear} Superset Inc.`,
 	electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
 
 	// Generate update manifests for all channels (latest.yml, canary.yml, etc.)
@@ -36,8 +40,8 @@ const config: Configuration = {
 	// Generate latest-mac.yml for auto-update (workflow handles actual upload)
 	publish: {
 		provider: "github",
-		owner: "superset-sh",
-		repo: "superset",
+		owner: "paradevai",
+		repo: "paradev",
 	},
 
 	// Directories
@@ -125,22 +129,22 @@ const config: Configuration = {
 			"build/entitlements.mac.inherit.plist",
 		),
 		extendInfo: {
+			// Electron finds "<CFBundleName> Helper.app" by this name and aborts at
+			// launch when it is not productName. The shown name is localized in
+			// afterPack.
 			CFBundleName: productName,
 			CFBundleDisplayName: productName,
+			LSHasLocalizedDisplayName: true,
 			// Required for macOS microphone permission prompt
-			NSMicrophoneUsageDescription:
-				"Superset needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.",
+			NSMicrophoneUsageDescription: `${displayName} needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.`,
 			// Required for on-device dictation on macOS 15 and older
-			NSSpeechRecognitionUsageDescription:
-				"Superset uses on-device speech recognition to transcribe dictation in the chat composer.",
+			NSSpeechRecognitionUsageDescription: `${displayName} uses on-device speech recognition to transcribe dictation in the chat composer.`,
 			// Required for macOS local network permission prompt
-			NSLocalNetworkUsageDescription:
-				"Superset needs access to your local network to discover and connect to development servers running on your network.",
+			NSLocalNetworkUsageDescription: `${displayName} needs access to your local network to discover and connect to development servers running on your network.`,
 			// Bonjour service types to browse for (triggers the permission prompt)
 			NSBonjourServices: ["_http._tcp", "_https._tcp"],
 			// Required for Apple Events / Automation permission prompt
-			NSAppleEventsUsageDescription:
-				"Superset needs to interact with other applications to run terminal commands and development tools.",
+			NSAppleEventsUsageDescription: `${displayName} needs to interact with other applications to run terminal commands and development tools.`,
 		},
 	},
 
@@ -179,6 +183,7 @@ const config: Configuration = {
 			// the Actions= key that exposes them, so declare it explicitly —
 			// launchers ignore action groups not listed under Actions.
 			entry: {
+				Name: displayName,
 				Actions: "new-window;",
 				// Electron sets the window class from the executable name, so the
 				// default (the product name) never matches and the dock shows a

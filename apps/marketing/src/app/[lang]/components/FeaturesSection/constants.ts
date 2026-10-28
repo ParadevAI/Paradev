@@ -41,11 +41,11 @@ export const FEATURES: Feature[] = [
 			message: "Automations",
 		}),
 		title: msg({
-			message: "Put recurring work on a schedule",
+			message: "Start agents on events or a schedule",
 		}),
 		description: msg({
 			message:
-				"Turn chores into scheduled agents: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
+				"Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
 		}),
 	},
 	{
@@ -84,7 +84,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP.",
+				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP.",
 		}),
 	},
 	{

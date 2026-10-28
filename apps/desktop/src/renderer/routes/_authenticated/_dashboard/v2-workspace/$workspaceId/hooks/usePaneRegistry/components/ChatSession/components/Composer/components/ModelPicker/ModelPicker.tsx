@@ -11,7 +11,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { Settings2 } from "lucide-react";
-import { type KeyboardEvent, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, useMemo, useRef } from "react";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
 import {
 	getPresetIcon,
@@ -24,6 +24,8 @@ import {
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
 import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
+import { currentLabel } from "../../utils/configOptionLabels";
+import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
 import type { AgentSwitcher } from "./types";
@@ -34,6 +36,8 @@ export type ModelPickerProps = {
 	agentSwitcher?: AgentSwitcher;
 	hideEffortLabel?: boolean;
 	hideModelLabel?: boolean;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 };
 
 const TRAIT_ROW_CLASS = cn(
@@ -41,27 +45,15 @@ const TRAIT_ROW_CLASS = cn(
 	"[&>svg:last-child]:size-3 [&>svg:last-child]:text-muted-foreground/70",
 );
 
-function isToggle(option: SessionConfigOption) {
-	return (
-		option.options.length === 2 &&
-		option.options.some((entry) => entry.id === "on") &&
-		option.options.some((entry) => entry.id === "off")
-	);
-}
-
-function currentLabel(option: SessionConfigOption | undefined) {
-	return option?.options.find((entry) => entry.id === option.currentValue)
-		?.label;
-}
-
 export function ModelPicker({
 	agentSwitcher,
 	configOptions,
 	hideEffortLabel,
 	hideModelLabel,
+	onOpenChange,
 	onSelect,
+	open,
 }: ModelPickerProps) {
-	const [open, setOpen] = useState(false);
 	const searchRef = useRef<HTMLInputElement>(null);
 	const settingsRef = useRef<HTMLDivElement>(null);
 	const isDark = useIsDarkTheme();
@@ -98,9 +90,7 @@ export function ModelPicker({
 			option.category !== "mode" &&
 			option.options.length > 0,
 	);
-	const fast = settings.find(
-		(option) => option.id === "fast" && isToggle(option),
-	);
+	const fast = fastOption(settings);
 	const effort = settings.find((option) => option.category === "thought_level");
 	const effortLabel = currentLabel(effort);
 	// The slider card owns effort and the fast toggle; the rest stay as rows.
@@ -126,7 +116,7 @@ export function ModelPicker({
 		.join(" · ");
 	const pick = (option: SessionConfigOption, value: string) => {
 		if (value !== option.currentValue) choose(option.id, value);
-		setOpen(false);
+		onOpenChange(false);
 	};
 	// Radix traps Tab inside the menu, so the settings row below the model
 	// panel is only reachable by hand: Tab past the last agent tab lands on
@@ -159,7 +149,7 @@ export function ModelPicker({
 	};
 
 	return (
-		<DropdownMenu onOpenChange={setOpen} open={open}>
+		<DropdownMenu onOpenChange={onOpenChange} open={open}>
 			<DropdownMenuTrigger asChild>
 				<button
 					className={cn(PILL_TRIGGER_CLASS, "group")}
@@ -211,7 +201,7 @@ export function ModelPicker({
 							agentSwitcher && {
 								...agentSwitcher,
 								onSwitch: (presetId, picked) => {
-									setOpen(false);
+									onOpenChange(false);
 									agentSwitcher.onSwitch(presetId, picked);
 								},
 							}

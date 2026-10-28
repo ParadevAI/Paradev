@@ -101,6 +101,14 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["list-display"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore/channelPanelStore.ts",
+		["channel-panels-v1"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/components/ChannelMessageRow/components/EmojiPicker/hooks/useSkinTone/useSkinTone.ts",
+		["channels-emoji-skin-tone"],
+	],
+	[
 		"src/renderer/stores/sidebar-sections-collapse.ts",
 		["sidebar-workspaces-collapse"],
 	],
@@ -141,7 +149,8 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		],
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
-	["src/renderer/stores/new-dashboard-sidebar.ts", ["new-dashboard-sidebar"]],
+	["src/renderer/stores/right-pane-area.ts", ["right-pane-area"]],
+	["src/renderer/stores/acp-chat.ts", ["acp-chat"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
 		["usage-last-section-v1"],
@@ -183,6 +192,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	[
 		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/lastChatAgent/lastChatAgent.ts",
+		["chatLastAgent"],
 	],
 	[
 		"src/renderer/hooks/useAgentModelPreference/useAgentModelPreference.ts",

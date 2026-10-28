@@ -16,6 +16,7 @@ import { hostServiceUrl } from "@/lib/host-service/client";
 import { posthog } from "@/lib/posthog";
 import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
+import { useIsCloudAgentEnabled } from "@/screens/(authenticated)/(home)/hooks/useIsCloudAgentEnabled";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
 
 const CLOUD_AGENT_CONFIGS = HOST_AGENT_PRESETS.filter((preset) =>
@@ -59,9 +60,10 @@ export function AgentPickerScreen() {
 	const agentId = useNewSessionPreferencesStore((state) => state.agentId);
 	const setAgentId = useNewSessionPreferencesStore((state) => state.setAgentId);
 	const { machineId } = useLocalSearchParams<{ machineId?: string }>();
+	const isCloudAgentEnabled = useIsCloudAgentEnabled();
 	// Under Cloud a laptop-only preset resolves to the one that launches.
 	const selectedAgentId =
-		machineId === CLOUD_TARGET_ID && (!agentId || !isCloudAgentId(agentId))
+		machineId === CLOUD_TARGET_ID && (!agentId || !isCloudAgentEnabled(agentId))
 			? "claude"
 			: agentId;
 
@@ -83,7 +85,9 @@ export function AgentPickerScreen() {
 	// no host config of its own to list (custom agents: SUPER-2127).
 	const configs =
 		machineId === CLOUD_TARGET_ID
-			? CLOUD_AGENT_CONFIGS
+			? CLOUD_AGENT_CONFIGS.filter((config) =>
+					isCloudAgentEnabled(config.presetId),
+				)
 			: (configsQuery.data ?? []);
 
 	let notice: string | null = null;

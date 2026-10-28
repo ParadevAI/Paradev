@@ -1,14 +1,14 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "circleback",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "Meeting notes, action items, and transcripts from Circleback: search what was said and work what was captured.",
 	"author": {
-		"name": "Superset",
-		"url": "https://superset.sh"
+		"name": "Paradev",
+		"url": "https://paradev.com"
 	},
-	"homepage": "https://docs.superset.sh",
-	"repository": "https://github.com/superset-sh/superset",
+	"homepage": "https://docs.paradev.com",
+	"repository": "https://github.com/paradevai/paradev",
 	"license": "MIT",
 	"keywords": [
 		"circleback",

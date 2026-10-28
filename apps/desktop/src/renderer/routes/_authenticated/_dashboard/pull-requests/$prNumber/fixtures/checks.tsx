@@ -46,9 +46,16 @@ mock.module(`${root}/pull-requests/components/PullRequestListToggle`, () => ({
 mock.module(`${root}/pull-requests/hooks/useRefreshPullRequest`, () => ({
 	useRefreshPullRequest: () => ({ refresh: () => {}, isRefreshing: false }),
 }));
+mock.module("renderer/hooks/useActiveOrganizationId", () => ({
+	useActiveOrganizationId: () => "org",
+}));
 mock.module(`${root}/pull-requests/components/PullRequestActions`, () => ({
-	PullRequestActions: ({ projectId }: { projectId: string | null }) => (
-		<div data-testid="header" data-project={projectId ?? ""} />
+	PullRequestActions: ({
+		target,
+	}: {
+		target: { host: { projectId: string | null } | null } | null;
+	}) => (
+		<div data-testid="header" data-project={target?.host?.projectId ?? ""} />
 	),
 }));
 mock.module(
@@ -91,7 +98,6 @@ for (const project of [undefined, "unrelated", "removed"]) {
 		expect(read).toHaveBeenLastCalledWith({
 			projectId: project ?? null,
 			repoFullName: "other/repo",
-			hostUrl: "http://host.test",
 			prNumber: 12,
 		});
 		fireEvent.click(view.getByRole("button", { name: "Changes" }));

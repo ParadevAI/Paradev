@@ -27,9 +27,8 @@ interface EnvironmentPickerPillProps {
 	selectedEnvironment: EnvironmentOption | undefined;
 	environments: EnvironmentOption[];
 	/**
-	 * What Default resolves to for this project — an environment's name, or
-	 * the repository a new one would be made for. Null when nothing can work
-	 * for the project, so Default is not offered.
+	 * The environment Default resolves to for this project. Null when the
+	 * project has none, so Default is not offered.
 	 */
 	defaultHint: string | null;
 	/** Null picks Default. */

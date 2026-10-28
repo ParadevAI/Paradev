@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { rawErrorMessage } from "@superset/i18n/errors";
-import { autumnProPlanId } from "@superset/shared/billing";
+import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
+
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { env } from "renderer/env.renderer";
@@ -11,10 +11,26 @@ import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 interface UpgradeOptions {
+	planId: string;
+	planName: string;
 	annual: boolean;
 	seats: number;
 	source: "billing_overview" | "billing_plans";
 	returnUrl?: string;
+}
+
+export interface PlanChangePreview {
+	total: number;
+	currency: string;
+	lineItems: { displayName: string; description: string; total: number }[];
+	nextCycle?: { startsAt: number; total: number };
+	incoming: { planId: string; effectiveAt: number | null }[];
+	redirectToCheckout: boolean;
+}
+
+export interface PendingPlanChange {
+	options: UpgradeOptions;
+	preview: PlanChangePreview;
 }
 
 export function useBillingActions() {
@@ -25,6 +41,10 @@ export function useBillingActions() {
 	const [isUpgrading, setIsUpgrading] = useState(false);
 	const [isCanceling, setIsCanceling] = useState(false);
 	const [isRestoring, setIsRestoring] = useState(false);
+	const [pendingChange, setPendingChange] = useState<PendingPlanChange | null>(
+		null,
+	);
+	const [isConfirming, setIsConfirming] = useState(false);
 
 	const usesAutumn = async () => {
 		const known =
@@ -33,59 +53,92 @@ export function useBillingActions() {
 		return known?.billingProvider === "autumn";
 	};
 
-	const currentAutumnPlanId = () =>
-		autumnProPlanId({ annual: activePlan?.billingInterval === "year" });
+	const checkoutPropertiesFor = (options: UpgradeOptions) => ({
+		plan: options.planId,
+		annual: options.annual,
+		seats: options.seats,
+		previous_plan: plan,
+		source: options.source,
+	});
 
-	const upgrade = async ({
-		annual,
-		seats,
-		source,
-		returnUrl,
-	}: UpgradeOptions) => {
+	const trackCheckoutFailed = (
+		options: UpgradeOptions,
+		status: number | undefined,
+		error: unknown,
+	) =>
+		track("checkout_failed", {
+			...checkoutPropertiesFor(options),
+			status,
+			error: rawErrorMessage(error),
+		});
+
+	const attachConfirmed = async (options: UpgradeOptions) => {
 		if (!activeOrgId) return;
+		await authClient.$fetch<{ paymentUrl: string | null }>("/autumn/attach", {
+			method: "POST",
+			body: {
+				organizationId: activeOrgId,
+				planId: options.planId,
+				currentPlanId: activePlan?.autumnPlanId ?? null,
+				successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
+				cancelUrl: env.NEXT_PUBLIC_WEB_URL,
+				confirmed: true,
+			},
+			onSuccess: (ctx) => {
+				if (ctx.data?.paymentUrl) {
+					track("checkout_redirected", checkoutPropertiesFor(options));
+					window.open(ctx.data.paymentUrl, "_blank");
+				} else {
+					toast.success(t({ message: "Plan updated" }));
+				}
+			},
+			onError: (ctx) => {
+				trackCheckoutFailed(options, ctx.response?.status, ctx.error);
+				toast.error(errorMessage(ctx.error));
+			},
+		});
+	};
 
-		const checkoutProperties = {
-			plan: "pro",
-			annual,
-			seats,
-			previous_plan: plan,
-			source,
-		};
+	const confirmChange = async () => {
+		if (!pendingChange) return;
+		setIsConfirming(true);
+		try {
+			await attachConfirmed(pendingChange.options);
+			setPendingChange(null);
+		} finally {
+			setIsConfirming(false);
+			await utils.billing.activePlan.invalidate();
+		}
+	};
+
+	const dismissChange = () => setPendingChange(null);
+
+	const upgrade = async (options: UpgradeOptions) => {
+		if (!activeOrgId) return;
+		const { planId, annual, seats, returnUrl } = options;
+		const checkoutProperties = checkoutPropertiesFor(options);
 		track("checkout_started", checkoutProperties);
 
 		const successUrl = `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`;
-		const trackCheckoutFailed = (status: number | undefined, error: unknown) =>
-			track("checkout_failed", {
-				...checkoutProperties,
-				status,
-				error: rawErrorMessage(error),
-			});
 
 		setIsUpgrading(true);
 		try {
 			if (await usesAutumn()) {
-				await authClient.$fetch<{ paymentUrl: string | null }>(
-					"/autumn/attach",
-					{
+				const { data: preview, error } =
+					await authClient.$fetch<PlanChangePreview>("/autumn/previewAttach", {
 						method: "POST",
-						body: {
-							organizationId: activeOrgId,
-							planId: autumnProPlanId({ annual }),
-							successUrl,
-							cancelUrl: env.NEXT_PUBLIC_WEB_URL,
-						},
-						onSuccess: (ctx) => {
-							if (ctx.data?.paymentUrl) {
-								track("checkout_redirected", checkoutProperties);
-								window.open(ctx.data.paymentUrl, "_blank");
-							} else {
-								toast.success(t({ message: "Plan updated" }));
-							}
-						},
-						onError: (ctx) =>
-							trackCheckoutFailed(ctx.response?.status, ctx.error),
-					},
-				);
+						body: { organizationId: activeOrgId, planId },
+					});
+				if (error || !preview) {
+					trackCheckoutFailed(options, error?.status, error);
+					toast.error(errorMessage(error));
+					return;
+				}
+				if (preview.redirectToCheckout) {
+					await attachConfirmed(options);
+				} else {
+					setPendingChange({ options, preview });
+				}
 				return;
 			}
 
@@ -110,7 +163,7 @@ export function useBillingActions() {
 					// Better Auth resolves rather than throws, so without this hook a
 					// failed checkout is invisible: the button just resets.
 					onError: (ctx) =>
-						trackCheckoutFailed(ctx.response?.status, ctx.error),
+						trackCheckoutFailed(options, ctx.response?.status, ctx.error),
 				},
 			);
 		} finally {
@@ -124,18 +177,6 @@ export function useBillingActions() {
 
 		setIsCanceling(true);
 		try {
-			if (await usesAutumn()) {
-				await authClient.$fetch("/autumn/updateSubscription", {
-					method: "POST",
-					body: {
-						organizationId: activeOrgId,
-						planId: currentAutumnPlanId(),
-						cancelAction: "cancel_end_of_cycle",
-					},
-				});
-				return;
-			}
-
 			await authClient.subscription.cancel(
 				{
 					referenceId: activeOrgId,
@@ -165,7 +206,7 @@ export function useBillingActions() {
 					method: "POST",
 					body: {
 						organizationId: activeOrgId,
-						planId: currentAutumnPlanId(),
+						planId: activePlan?.autumnPlanId ?? "",
 						cancelAction: "uncancel",
 					},
 					onSuccess: () => {
@@ -187,6 +228,10 @@ export function useBillingActions() {
 
 	return {
 		upgrade,
+		pendingChange,
+		confirmChange,
+		dismissChange,
+		isConfirming,
 		cancel,
 		restore,
 		isUpgrading,

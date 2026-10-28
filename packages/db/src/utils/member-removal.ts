@@ -1,6 +1,11 @@
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { db, dbWs } from "../client";
 import { members } from "../schema/auth";
+import {
+	channelMembers,
+	channels,
+	channelThreadFollows,
+} from "../schema/channels";
 import { automations, v2Hosts, v2UsersHosts } from "../schema/schema";
 import { orphanedHostIds } from "./member-removal-orphans";
 
@@ -109,6 +114,26 @@ export function cleanupRemovedMember(
 				and(
 					eq(v2UsersHosts.organizationId, member.organizationId),
 					eq(v2UsersHosts.userId, member.userId),
+				),
+			);
+		const orgChannels = tx
+			.select({ id: channels.id })
+			.from(channels)
+			.where(eq(channels.organizationId, member.organizationId));
+		await tx
+			.delete(channelMembers)
+			.where(
+				and(
+					eq(channelMembers.actorId, member.userId),
+					inArray(channelMembers.channelId, orgChannels),
+				),
+			);
+		await tx
+			.delete(channelThreadFollows)
+			.where(
+				and(
+					eq(channelThreadFollows.actorId, member.userId),
+					inArray(channelThreadFollows.channelId, orgChannels),
 				),
 			);
 		return effects;

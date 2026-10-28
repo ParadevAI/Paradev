@@ -43,7 +43,7 @@ export interface EnvironmentEditorSeed {
 	name: string;
 	scope: EnvironmentScope;
 	repositoryIds: string[];
-	hooksRepositoryId: string | null;
+	primaryRepositoryId: string | null;
 	/** A promoted environment's golden was built for its repositories. */
 	repositoriesFrozen: boolean;
 	region: string;
@@ -64,12 +64,10 @@ interface EnvironmentEditorDialogProps {
 	onCreated?: (environmentId: string) => void;
 }
 
-const NO_HOOKS = "none";
-
 /**
  * One property list: repository, name, region and visibility, prefilled so a
- * new environment needs nothing but the create button. Config location shows
- * once there is more than one repository to choose between. From Settings, a
+ * new environment needs nothing but the create button. The primary repository
+ * shows once there is more than one repository to choose between. From Settings, a
  * new environment can also be handed to an agent that installs what the
  * project needs.
  */
@@ -97,9 +95,8 @@ export function EnvironmentEditorDialog({
 	const [repositoryIdsDraft, setRepositoryIds] = useState<string[] | null>(
 		environment?.repositoryIds ?? null,
 	);
-	// Undefined until chosen: the config location follows the first repository.
-	const [hooksDraft, setHooksDraft] = useState<string | null | undefined>(
-		environment ? environment.hooksRepositoryId : undefined,
+	const [primaryDraft, setPrimaryDraft] = useState<string | null>(
+		environment?.primaryRepositoryId ?? null,
 	);
 	const [scopeDraft, setScope] = useState<EnvironmentScope | null>(
 		environment?.scope ?? null,
@@ -182,13 +179,11 @@ export function EnvironmentEditorDialog({
 		return () => window.removeEventListener("focus", refetch);
 	}, [isAwaitingGitHub, open, organizationId, utils]);
 
-	const hooksChoice = preview.data
-		? (preview.data.repositories.find((repo) => repo.hooks)?.id ?? NO_HOOKS)
-		: hooksDraft === undefined
-			? (repositoryIds[0] ?? NO_HOOKS)
-			: hooksDraft && repositoryIds.includes(hooksDraft)
-				? hooksDraft
-				: NO_HOOKS;
+	const primaryRepositoryId = preview.data
+		? (preview.data.repositories.find((repo) => repo.primary)?.id ?? null)
+		: primaryDraft && repositoryIds.includes(primaryDraft)
+			? primaryDraft
+			: (repositoryIds[0] ?? null);
 
 	const toggleRepository = (repositoryId: string) =>
 		setRepositoryIds(
@@ -213,30 +208,37 @@ export function EnvironmentEditorDialog({
 		create.isPending || update.isPending || createWorkspace.isPending;
 	const valid =
 		name.trim().length > 0 &&
-		(fromWorkspaceId ? preview.isSuccess : repositoryIds.length > 0);
+		(fromWorkspaceId ? preview.isSuccess : primaryRepositoryId !== null);
 
-	const body = () => ({
+	const body = (primary: string) => ({
 		name: name.trim(),
 		repositoryIds,
-		hooksRepositoryId: hooksChoice === NO_HOOKS ? null : hooksChoice,
+		primaryRepositoryId: primary,
 		scope,
 	});
 
 	const save = async () => {
+		if (!primaryRepositoryId) throw new Error("No repository selected");
 		if (environment) {
-			await update.mutateAsync({ id: environment.id, ...body() });
+			await update.mutateAsync({
+				id: environment.id,
+				...body(primaryRepositoryId),
+			});
 			return environment.id;
 		}
 		const row = await create.mutateAsync({
 			organizationId,
-			...body(),
+			...body(primaryRepositoryId),
 			region: chosenRegion,
 		});
 		return row.id;
 	};
 
 	const finish = async () => {
-		await utils.environment.list.invalidate();
+		await Promise.all([
+			utils.environment.list.invalidate(),
+			utils.billing.environmentUsage.invalidate(),
+		]);
 		onOpenChange(false);
 	};
 
@@ -261,7 +263,10 @@ export function EnvironmentEditorDialog({
 			promote
 				.mutateAsync({ cloudWorkspaceId, name: name.trim(), scope })
 				.then(async (created) => {
-					await utils.environment.list.invalidate();
+					await Promise.all([
+						utils.environment.list.invalidate(),
+						utils.billing.environmentUsage.invalidate(),
+					]);
 					return created;
 				}),
 			{
@@ -312,7 +317,7 @@ export function EnvironmentEditorDialog({
 		}
 	};
 
-	const showsConfigLocation = !!environment || selectedRepositories.length > 1;
+	const showsPrimary = !!environment || selectedRepositories.length > 1;
 	const rowControl =
 		"h-10 w-full rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent";
 
@@ -376,25 +381,23 @@ export function EnvironmentEditorDialog({
 							/>
 						</EnvironmentPropertyRow>
 
-						{isAdvanced && showsConfigLocation && (
+						{isAdvanced && showsPrimary && (
 							<EnvironmentPropertyRow
-								htmlFor="environment-hooks"
+								htmlFor="environment-primary"
 								label={<Trans>Opens on</Trans>}
 							>
 								<Select
-									disabled={fromWorkspaceId !== undefined}
-									onValueChange={(value) =>
-										setHooksDraft(value === NO_HOOKS ? null : value)
-									}
-									value={hooksChoice}
+									disabled={repositoriesFrozen}
+									onValueChange={setPrimaryDraft}
+									value={primaryRepositoryId ?? undefined}
 								>
-									<SelectTrigger className={rowControl} id="environment-hooks">
+									<SelectTrigger
+										className={rowControl}
+										id="environment-primary"
+									>
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value={NO_HOOKS}>
-											<Trans>First repository by name</Trans>
-										</SelectItem>
 										{selectedRepositories.map((repo) => (
 											<SelectItem key={repo.id} value={repo.id}>
 												{repo.fullName}

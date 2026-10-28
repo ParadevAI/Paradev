@@ -1,55 +1,47 @@
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import {
+	type PullRequestTarget,
 	pullRequestDiffQueryKey,
 	pullRequestThreadsQueryKey,
-} from "../../components/PullRequestCodeTab/utils/pullRequestCodeTabQueryKeys";
+} from "../../utils/pullRequestClient";
 import { pullRequestDetailQueryKey } from "../usePullRequestDetail";
 
 interface RefreshPullRequestInput {
-	projectId: string | null;
-	hostUrl: string | null;
-	prNumber: number | null;
-	repoFullName: string | null;
+	target: PullRequestTarget | null;
 	/** The PR's own URL; the Code tab keys its diff on the repository in it. */
 	url: string | null | undefined;
 }
 
 export function useRefreshPullRequest({
-	projectId,
-	hostUrl,
-	prNumber,
-	repoFullName,
+	target,
 	url,
 }: RefreshPullRequestInput) {
 	const queryClient = useQueryClient();
-	const organizationId = useActiveOrganizationId();
-	const detailKey = pullRequestDetailQueryKey({ projectId, hostUrl, prNumber });
+	const detailKey = pullRequestDetailQueryKey(
+		target?.repoFullName ?? null,
+		target?.prNumber ?? null,
+	);
 	const isRefreshing = useIsFetching({ queryKey: detailKey }) > 0;
 
 	const refresh = () => {
 		void queryClient.invalidateQueries({ queryKey: detailKey });
-		if (prNumber === null) return;
-		const codeTabKey = { projectId, hostUrl: hostUrl ?? "", prNumber };
+		if (!target) return;
+		const codeTabTarget = {
+			...target,
+			repoFullName:
+				(url ? pullRequestRefFromUrl(url)?.repoFullName : null) ??
+				target.repoFullName,
+		};
 		void queryClient.invalidateQueries({
-			queryKey: pullRequestDiffQueryKey({
-				...codeTabKey,
-				organizationId,
-				repoFullName:
-					(url ? pullRequestRefFromUrl(url)?.repoFullName : null) ??
-					repoFullName,
-			}),
+			queryKey: pullRequestDiffQueryKey(codeTabTarget),
 		});
 		void queryClient.invalidateQueries({
-			queryKey: pullRequestThreadsQueryKey(codeTabKey),
+			queryKey: pullRequestThreadsQueryKey(codeTabTarget),
 		});
-		for (const queryKey of [
-			[["git", "getPullRequest"]],
-			[["git", "getPullRequestThreads"]],
-		]) {
-			void queryClient.invalidateQueries({ queryKey });
-		}
+		void queryClient.invalidateQueries({
+			queryKey: [["git", "getPullRequest"]],
+		});
 	};
 
 	return { refresh, isRefreshing };

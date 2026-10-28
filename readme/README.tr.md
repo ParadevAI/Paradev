@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="full" alt="Claude ve OpenCode, canlı farklarla paralel Superset çalışma alanlarında çalışıyor" src="../apps/marketing/public/images/readme-hero.gif" />
+<img width="full" alt="Claude ve OpenCode, canlı farklarla paralel Paradev çalışma alanlarında çalışıyor" src="../apps/marketing/public/images/readme-hero.gif" />
 
 ### 100'den Fazla Kodlama Ajanını Paralel Çalıştırın
 
@@ -14,10 +14,10 @@
 
 *Bu, İngilizce README'nin çevirisidir; esas sürüm İngilizce olandır.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
-[![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
+[![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
 <br />
@@ -27,7 +27,7 @@ Zamanınızı beklemeye değil, ürün çıkarmaya ayırın.
 
 <br />
 
-[**macOS için indirin**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Belgeler](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**macOS için indirin**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Belgeler](https://docs.paradev.com) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -36,7 +36,7 @@ Zamanınızı beklemeye değil, ürün çıkarmaya ayırın.
 
 ## Bağlam Değiştirme Maliyeti Olmadan 10 Kat Hızlı Kod Yazın
 
-Superset, CLI tabanlı kodlama ajanlarını izole git worktree'lerinde paralel çalıştırır; yerleşik terminal, inceleme ve editörde açma iş akışlarıyla birlikte gelir.
+Paradev, CLI tabanlı kodlama ajanlarını izole git worktree'lerinde paralel çalıştırır; yerleşik terminal, inceleme ve editörde açma iş akışlarıyla birlikte gelir.
 
 - **Birden fazla ajanı aynı anda çalıştırın** — bağlam değiştirme yükü olmadan
 - **Her görevi kendi git worktree'sinde izole edin** — ajanlar birbirine karışmaz
@@ -57,11 +57,11 @@ Daha az bekleyin, daha çok ürün çıkarın.
 
 Aynı anda 100'den fazla kodlama ajanı çalıştırın; her biri kendi dalı, terminali ve ortamıyla kendi git worktree'sinde. Sonuçları karşılaştırın ve kazananı merge edin.
 
-[Belgeler →](https://docs.superset.sh/workspaces)
+[Belgeler →](https://docs.paradev.com/workspaces)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Diğer ajanlar paralel çalışma alanlarında çalışırken Claude bir faturalama migrasyonunu akış halinde yazıyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Diğer ajanlar paralel çalışma alanlarında çalışırken Claude bir faturalama migrasyonunu akış halinde yazıyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -71,11 +71,11 @@ Aynı anda 100'den fazla kodlama ajanı çalıştırın; her biri kendi dalı, t
 
 Her ajanı kenar çubuğundan takip edin: çalışma göstergeleri, tamamlanma sesleri ve bir ajan ilginizi gerektirdiğinde dock rozetleri.
 
-[Belgeler →](https://docs.superset.sh/agent-integration)
+[Belgeler →](https://docs.paradev.com/agent-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Bir ajan görevini bitiriyor ve kenar çubuğundaki durum çalışıyordan tamamlandıya geçiyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Bir ajan görevini bitiriyor ve kenar çubuğundaki durum çalışıyordan tamamlandıya geçiyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -85,11 +85,11 @@ Her ajanı kenar çubuğundan takip edin: çalışma göstergeleri, tamamlanma s
 
 Sekmeler, sınırsız bölmeler, ön ayarlar ve yeniden başlatmalara dayanan kalıcı oturumlar. Çok satırlı düzenleme ve @-dosya bahisleri içeren zengin istem editörü için ⌘I tuşlarına basın.
 
-[Belgeler →](https://docs.superset.sh/terminal-integration)
+[Belgeler →](https://docs.paradev.com/terminal-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Bölünmüş bir terminalin yanında, zengin istem editöründe @-dosya bahsiyle bir devam mesajı yazılıyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Bölünmüş bir terminalin yanında, zengin istem editöründe @-dosya bahsiyle bir devam mesajı yazılıyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -99,11 +99,11 @@ Sekmeler, sınırsız bölmeler, ön ayarlar ve yeniden başlatmalara dayanan ka
 
 Ajan değişikliklerini uygulamadan çıkmadan inceleyin, yorumlayın ve düzenleyin; hazır olduğunda commit ve push yapın.
 
-[Belgeler →](https://docs.superset.sh/diff-viewer)
+[Belgeler →](https://docs.paradev.com/diff-viewer)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Bir ajanın değişiklikleri fark görüntüleyicide inceleniyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Bir ajanın değişiklikleri fark görüntüleyicide inceleniyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -113,11 +113,11 @@ Ajan değişikliklerini uygulamadan çıkmadan inceleyin, yorumlayın ve düzenl
 
 Çalışan geliştirme sunucularını bir tarayıcı bölmesinde önizleyin. Portlar çalışma alanı başına algılanır, böylece her worktree kendi önizlemesine sahip olur.
 
-[Belgeler →](https://docs.superset.sh/browser)
+[Belgeler →](https://docs.paradev.com/browser)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Uygulama içi tarayıcı, algılanan portlarla bir geliştirme sunucusunu önizliyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Uygulama içi tarayıcı, algılanan portlarla bir geliştirme sunucusunu önizliyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -127,11 +127,11 @@ Ajan değişikliklerini uygulamadan çıkmadan inceleyin, yorumlayın ve düzenl
 
 Ajan oturumlarını zamanlamayla çalıştırın: geceleri issue triyajı yapın, haftalık changelog taslağını hazırlayın, bağımlılıkları güncel tutun.
 
-[Belgeler →](https://docs.superset.sh/automations)
+[Belgeler →](https://docs.paradev.com/automations)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Zamanlanmış ajan otomasyonları" width="100%" /></a>
+  <a href="https://docs.paradev.com/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Zamanlanmış ajan otomasyonları" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -141,25 +141,25 @@ Ajan oturumlarını zamanlamayla çalıştırın: geceleri issue triyajı yapın
 
 Başka bir makineyi bağlayın ve çalışma alanlarına her yerden erişin: masaüstü uygulaması, CLI veya telefonunuz. Çevrimdışı ana bilgisayarları özel bir komutla uyandırın.
 
-[Belgeler →](https://docs.superset.sh/remote-access)
+[Belgeler →](https://docs.paradev.com/remote-access)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Organizasyon ayarlarında ana bilgisayarlar ve üyeler" width="100%" /></a>
+  <a href="https://docs.paradev.com/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Organizasyon ayarlarında ana bilgisayarlar ve üyeler" width="100%" /></a>
 </td>
 </tr>
 <tr>
 <td width="50%" valign="middle">
 
-### Superset CLI
+### Paradev CLI
 
-Herhangi bir kabuktan betikleyin: tek bir ikili dosyayla çalışma alanları oluşturun, ajanlar başlatın, terminallerini okuyun ve otomasyonları yönetin. Bir ajan komut çalıştırabiliyorsa Superset'i de yönetebilir.
+Herhangi bir kabuktan betikleyin: tek bir ikili dosyayla çalışma alanları oluşturun, ajanlar başlatın, terminallerini okuyun ve otomasyonları yönetin. Bir ajan komut çalıştırabiliyorsa Paradev'i de yönetebilir.
 
-[Belgeler →](https://docs.superset.sh/cli/getting-started)
+[Belgeler →](https://docs.paradev.com/cli/getting-started)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Superset CLI ile bir çalışma alanı oluşturuluyor ve bir ajan başlatılıyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Paradev CLI ile bir çalışma alanı oluşturuluyor ve bir ajan başlatılıyor" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -169,31 +169,31 @@ Herhangi bir kabuktan betikleyin: tek bir ikili dosyayla çalışma alanları ol
 
 Tek bir arama kutusundan herhangi bir çalışma alanına, eyleme veya ayara atlayın.
 
-[Belgeler →](https://docs.superset.sh/keyboard-shortcuts)
+[Belgeler →](https://docs.paradev.com/keyboard-shortcuts)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Komut paletine yazılıyor ve çalışma alanı eylemleri canlı filtreleniyor" width="100%" /></a>
+  <a href="https://docs.paradev.com/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Komut paletine yazılıyor ve çalışma alanı eylemleri canlı filtreleniyor" width="100%" /></a>
 </td>
 </tr>
 </table>
 
 **Kutudan çıkanlar:**
 
-- **[Yerleşik beceriler](https://docs.superset.sh/skills)**: ajanlar `superset:*` becerileriyle önceden yüklü gelir (paralel ajanları orkestre etme, otomasyon zamanlama, geri bildirim gönderme, sorun teşhisi) ve başlatmada otomatik sağlanır
-- **[Model seçici ve özel ajanlar](https://docs.superset.sh/agent-integration)**: başlatmada model ve akıl yürütme seviyesi seçin, kendi simgesiyle herhangi bir terminal ajanı ekleyin
-- **[Çalışma alanı kurulum betikleri](https://docs.superset.sh/setup-teardown-scripts)**: ortam kurulumunu, bağımlılık yüklemelerini ve geliştirme sunucularını çalışma alanı başına otomatikleştirin
-- **[Terminal ön ayarları](https://docs.superset.sh/terminal-presets)**: ajan ve kabuk düzenlerini kaydedin, tek tuşla açın
-- **[Slack ve Linear](https://docs.superset.sh/use-with-linear)**: Slack mesajlarından veya Linear issue'larından çalışma alanları oluşturun
-- **[IDE'nizde açın](https://docs.superset.sh/use-with-ide)**: tek tıkla Cursor'a, VS Code'a veya herhangi bir editöre devredin
-- **[Özel temalar](https://docs.superset.sh/custom-themes)**: tema dosyaları oluşturun, düzenleyin ve içe aktarın
-- **[Klavye kısayolları](https://docs.superset.sh/keyboard-shortcuts)**: her eylem **Ayarlar → Klavye kısayolları** (⌘/) üzerinden yeniden atanabilir
-- **[Kendi sağlayıcılarınızı getirin](https://docs.superset.sh/providers)**: OpenRouter, Bedrock, Vertex veya Vercel AI Gateway bağlayın
-- **Ve çok daha fazlası**: her gün yeni sürüm çıkarıyoruz, bu yüzden bu liste hep geride kalıyor. Gerçek özellik listesi [changelog](https://superset.sh/changelog) sayfasıdır.
+- **[Yerleşik beceriler](https://docs.paradev.com/skills)**: ajanlar `superset:*` becerileriyle önceden yüklü gelir (paralel ajanları orkestre etme, otomasyon zamanlama, geri bildirim gönderme, sorun teşhisi) ve başlatmada otomatik sağlanır
+- **[Model seçici ve özel ajanlar](https://docs.paradev.com/agent-integration)**: başlatmada model ve akıl yürütme seviyesi seçin, kendi simgesiyle herhangi bir terminal ajanı ekleyin
+- **[Çalışma alanı kurulum betikleri](https://docs.paradev.com/setup-teardown-scripts)**: ortam kurulumunu, bağımlılık yüklemelerini ve geliştirme sunucularını çalışma alanı başına otomatikleştirin
+- **[Terminal ön ayarları](https://docs.paradev.com/terminal-presets)**: ajan ve kabuk düzenlerini kaydedin, tek tuşla açın
+- **[Slack ve Linear](https://docs.paradev.com/use-with-linear)**: Slack mesajlarından veya Linear issue'larından çalışma alanları oluşturun
+- **[IDE'nizde açın](https://docs.paradev.com/use-with-ide)**: tek tıkla Cursor'a, VS Code'a veya herhangi bir editöre devredin
+- **[Özel temalar](https://docs.paradev.com/custom-themes)**: tema dosyaları oluşturun, düzenleyin ve içe aktarın
+- **[Klavye kısayolları](https://docs.paradev.com/keyboard-shortcuts)**: her eylem **Ayarlar → Klavye kısayolları** (⌘/) üzerinden yeniden atanabilir
+- **[Kendi sağlayıcılarınızı getirin](https://docs.paradev.com/providers)**: OpenRouter, Bedrock, Vertex veya Vercel AI Gateway bağlayın
+- **Ve çok daha fazlası**: her gün yeni sürüm çıkarıyoruz, bu yüzden bu liste hep geride kalıyor. Gerçek özellik listesi [changelog](https://paradev.com/changelog) sayfasıdır.
 
 ## Desteklenen Ajanlar
 
-Superset, aşağıdakiler dahil CLI tabanlı her kodlama ajanıyla çalışır:
+Paradev, aşağıdakiler dahil CLI tabanlı her kodlama ajanıyla çalışır:
 
 | Ajan | Durum |
 |:------|:-------|
@@ -220,7 +220,7 @@ Superset, aşağıdakiler dahil CLI tabanlı her kodlama ajanıyla çalışır:
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/polygraph-white.svg" /><img height="16" align="top" alt="Polygraph" src="../packages/ui/src/assets/icons/preset-icons/polygraph.svg" /></picture> &nbsp;[Polygraph](https://trypolygraph.com/) | Tam destek |
 | Başka herhangi bir CLI ajanı | Yapılandırma gerektirmeden çalışır |
 
-Bir terminalde çalışıyorsa Superset üzerinde de çalışır
+Bir terminalde çalışıyorsa Paradev üzerinde de çalışır
 
 Ajanlar bir terminalden fazlasını elde eder:
 
@@ -236,17 +236,17 @@ Her yüzey aynı çalışma alanlarıyla konuşur; bir görevi uygulamada başla
 
 | Yüzey | Ne elde edersiniz |
 |:--------|:-------------|
-| [**Masaüstü Uygulaması**](https://github.com/superset-sh/superset/releases/latest) | Eksiksiz IDE: terminaller, fark görüntüleyici, uygulama içi tarayıcı, otomasyonlar |
-| [**CLI**](https://docs.superset.sh/cli/getting-started) | Herhangi bir kabuktan çalışma alanlarını, ajanları, terminalleri ve ana bilgisayarları yönetmek için tek bir `superset` ikili dosyası |
-| [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Node, Bun veya Deno üzerinden [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) ile Superset'i programatik olarak yönetin |
-| [**MCP Sunucusu**](https://docs.superset.sh/mcp) | Claude Code, Codex, Cursor ve diğer ajanların çalışma alanlarını kendilerinin oluşturup yönetmesine izin verin |
+| [**Masaüstü Uygulaması**](https://github.com/paradevai/paradev/releases/latest) | Eksiksiz IDE: terminaller, fark görüntüleyici, uygulama içi tarayıcı, otomasyonlar |
+| [**CLI**](https://docs.paradev.com/cli/getting-started) | Herhangi bir kabuktan çalışma alanlarını, ajanları, terminalleri ve ana bilgisayarları yönetmek için tek bir `superset` ikili dosyası |
+| [**TypeScript SDK**](https://docs.paradev.com/sdk/getting-started) | Node, Bun veya Deno üzerinden [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) ile Paradev'i programatik olarak yönetin |
+| [**MCP Sunucusu**](https://docs.paradev.com/mcp) | Claude Code, Codex, Cursor ve diğer ajanların çalışma alanlarını kendilerinin oluşturup yönetmesine izin verin |
 
 CLI, masaüstü uygulamasıyla birlikte gelir; tek başına da kurabilirsiniz:
 
 ```bash
-curl -fsSL https://superset.sh/cli/install.sh | sh
+curl -fsSL https://paradev.com/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da yakında geliyor.
@@ -255,20 +255,20 @@ Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da 
 
 Masaüstü uygulamasını indirin:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (deneysel; birincil hedef macOS)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (deneysel; birincil hedef macOS)
 - **Windows**: henüz mevcut değil
-- [Tüm derlemeler](https://github.com/superset-sh/superset/releases/latest)
+- [Tüm derlemeler](https://github.com/paradevai/paradev/releases/latest)
 
-Kurulu olması gereken tek şey [Git](https://git-scm.com/). [gh](https://cli.github.com/) isteğe bağlıdır ve PR iş akışlarının kilidini açar; Superset sizin için kurmayı önerir.
+Kurulu olması gereken tek şey [Git](https://git-scm.com/). [gh](https://cli.github.com/) isteğe bağlıdır ve PR iş akışlarının kilidini açar; Paradev sizin için kurmayı önerir.
 
 ## Geliştirme
 
-Superset üzerinde çalışmak veya bir PR ile katkıda bulunmak mı istiyorsunuz? Depoyu klonlayın,
-kurulu Superset uygulamasına ekleyin ve değişikliğiniz için bir çalışma alanı oluşturun:
+Paradev üzerinde çalışmak veya bir PR ile katkıda bulunmak mı istiyorsunuz? Depoyu klonlayın,
+kurulu Paradev uygulamasına ekleyin ve değişikliğiniz için bir çalışma alanı oluşturun:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Ardından o çalışma alanı terminalinden geliştirme kurulumunu çalıştırın:
@@ -280,19 +280,19 @@ bun run dev
 
 `setup.local.sh` betiğini her yeni worktree'de bir kez çalıştırın. Betik, çalışma alanına özgü
 uygulama kimliğini ve portları yapılandırır; böylece geliştirme masaüstü uygulaması, kurulu
-Superset uygulaması ve diğer geliştirme worktree'leriyle yan yana çalışabilir.
+Paradev uygulaması ve diğer geliştirme worktree'leriyle yan yana çalışabilir.
 
 Neon hesabı veya üçüncü taraf kimlik bilgileri gerekmez. `setup.local.sh`, Docker üzerinden
 yerel bir Postgres + Electric yığını başlatır ve bir geliştirme hesabı oluşturur.
 **"Sign in as dev"** düğmesiyle (veya `admin@local.test` / `supersetdev`) oturum açın.
 
-Önkoşullar: [Bun](https://bun.sh/) v1.4.2+ (`.bun-version` dosyasında sabitlenmiştir), `docker`, `jq` ve `bun dev` komutunun yerel HTTPS proxy'si olarak çalıştırdığı `caddy` (`brew install jq caddy && caddy trust`).
+Önkoşullar: [Bun](https://bun.sh/) v1.4.3+ (`.bun-version` dosyasında sabitlenmiştir), `docker`, `jq` ve `bun dev` komutunun yerel HTTPS proxy'si olarak çalıştırdığı `caddy` (`brew install jq caddy && caddy trust`).
 
 Tam kılavuz için [**DEVELOPMENT.md**](../DEVELOPMENT.md) dosyasına bakın: kurulum betiğinin ne yaptığı, gerçek servislerle manuel kurulum, yaygın komutlar, sorun giderme ve masaüstü uygulamasının nasıl derleneceği. Katkı süreci [**CONTRIBUTING.md**](../CONTRIBUTING.md) dosyasındadır.
 
 ## Yapılandırma
 
-Çalışma alanı kurulum, kaldırma ve çalıştırma betiklerini `.superset/config.json` dosyasında yapılandırın. [Tam belgelere](https://docs.superset.sh/setup-teardown-scripts) bakın.
+Çalışma alanı kurulum, kaldırma ve çalıştırma betiklerini `.superset/config.json` dosyasında yapılandırın. [Tam belgelere](https://docs.paradev.com/setup-teardown-scripts) bakın.
 
 ```json
 {
@@ -302,7 +302,7 @@ Tam kılavuz için [**DEVELOPMENT.md**](../DEVELOPMENT.md) dosyasına bakın: ku
 }
 ```
 
-Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden özelleştirilebilir; [tam kısayol listesine](https://docs.superset.sh/keyboard-shortcuts) bakın.
+Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden özelleştirilebilir; [tam kısayol listesine](https://docs.paradev.com/keyboard-shortcuts) bakın.
 
 ## Teknoloji Yığını
 
@@ -326,20 +326,20 @@ Klavye kısayolları **Ayarlar → Klavye kısayolları** (⌘/) üzerinden öze
 
 ## Katkıda Bulunma
 
-Katkılarınızı bekliyoruz! Kurulum ve PR açma adımları için [CONTRIBUTING.md](../CONTRIBUTING.md) dosyasına bakın. Hatalar ve özellik istekleri [issues](https://github.com/superset-sh/superset/issues) sayfasına gider.
+Katkılarınızı bekliyoruz! Kurulum ve PR açma adımları için [CONTRIBUTING.md](../CONTRIBUTING.md) dosyasına bakın. Hatalar ve özellik istekleri [issues](https://github.com/paradevai/paradev/issues) sayfasına gider.
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Topluluk
 
-Yardım almak, geri bildirim paylaşmak ve diğer kullanıcılarla bağlantı kurmak için Superset topluluğuna katılın:
+Yardım almak, geri bildirim paylaşmak ve diğer kullanıcılarla bağlantı kurmak için Paradev topluluğuna katılın:
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: ekiple ve toplulukla sohbet edin
-- **[Twitter](https://x.com/superset_sh)**: güncellemeler ve duyurular için takip edin
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: hata bildirin ve özellik isteyin
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: soru sorun ve fikirlerinizi paylaşın
+- **[Twitter](https://x.com/paradevai)**: güncellemeler ve duyurular için takip edin
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: hata bildirin ve özellik isteyin
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: soru sorun ve fikirlerinizi paylaşın
 
 ### Ekip
 
@@ -351,4 +351,4 @@ Yardım almak, geri bildirim paylaşmak ve diğer kullanıcılarla bağlantı ku
 
 **Masaüstü uygulaması sonsuza kadar ücretsizdir.** Kendi makinenizde ajanları paralel çalıştırmak hiçbir zaman ödeme gerektirmeyecek. Ücretlendireceğimiz her şey, bunun üzerine isteğe bağlı bir hizmet olacak.
 
-Uygulamanın tamamı bu depoda [Elastic License 2.0](../LICENSE.md) altındadır: kullanın, fork edin, değiştirin, ekibiniz için kendiniz barındırın. Tek yasak, Superset'in kendisini başkalarına sattığınız bir hizmet olarak yeniden paketlemektir.
+Uygulamanın tamamı bu depoda [Elastic License 2.0](../LICENSE.md) altındadır: kullanın, fork edin, değiştirin, ekibiniz için kendiniz barındırın. Tek yasak, Paradev'in kendisini başkalarına sattığınız bir hizmet olarak yeniden paketlemektir.

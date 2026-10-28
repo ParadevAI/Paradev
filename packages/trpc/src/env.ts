@@ -32,6 +32,12 @@ export const env = createEnv({
 		MEDIA_URL: z.string().url(),
 		STATIC_URL: z.string().url(),
 		USERCONTENT_TOKEN_SECRET: z.string().min(32),
+		AGENT_WORKER_SECRET: z.string().min(32),
+		AGENT_TURN_SIGNING_SECRET: z.string().min(32),
+		AGENT_SESSION_SECRET: z.string().min(32),
+		TEMPORAL_ADDRESS: z.string().min(1).optional(),
+		TEMPORAL_NAMESPACE: z.string().min(1).default("default"),
+		TEMPORAL_API_KEY: z.string().min(1).optional(),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),
@@ -97,8 +103,8 @@ export const env = createEnv({
 		// Optional: the Google connector, and so the Gmail plugin, reports "not
 		// configured" wherever these are unset, and every other connector and
 		// the Google sign-in above keep working.
-		GOOGLE_TEMP_CLIENT_ID: z.string().min(1).optional(),
-		GOOGLE_TEMP_CLIENT_SECRET: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1).optional(),
 		SENTRY_CLIENT_ID: z.string().optional(),
 		SENTRY_CLIENT_SECRET: z.string().optional(),
 		// Optional: the Teams integration is off wherever these are unset, and

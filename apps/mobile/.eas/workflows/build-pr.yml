@@ -7,7 +7,7 @@ on:
 
 defaults:
   tools:
-    bun: 1.4.2
+    bun: 1.4.3
 
 jobs:
   build:

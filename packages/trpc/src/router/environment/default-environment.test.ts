@@ -8,9 +8,9 @@ describe("pickDefaultEnvironment", () => {
 		expect(
 			pickDefaultEnvironment(
 				[
-					{ id: "mono", repositoryCount: 3, hooksRepositoryId: "repo-api" },
-					{ id: "solo-old", repositoryCount: 1, hooksRepositoryId: null },
-					{ id: "solo-new", repositoryCount: 1, hooksRepositoryId: REPO },
+					{ id: "mono", primaryRepositoryId: "repo-api" },
+					{ id: "solo-old", primaryRepositoryId: REPO },
+					{ id: "solo-new", primaryRepositoryId: REPO },
 				],
 				REPO,
 			)?.id,
@@ -19,10 +19,8 @@ describe("pickDefaultEnvironment", () => {
 
 	test("reuses a multi-repository environment only when it opens on the repository", () => {
 		expect(
-			pickDefaultEnvironment(
-				[{ id: "mono", repositoryCount: 2, hooksRepositoryId: REPO }],
-				REPO,
-			)?.id,
+			pickDefaultEnvironment([{ id: "mono", primaryRepositoryId: REPO }], REPO)
+				?.id,
 		).toBe("mono");
 	});
 
@@ -30,11 +28,10 @@ describe("pickDefaultEnvironment", () => {
 		expect(
 			pickDefaultEnvironment(
 				[
-					{ id: "mono", repositoryCount: 2, hooksRepositoryId: "repo-api" },
+					{ id: "mono", primaryRepositoryId: "repo-api" },
 					{
-						id: "other-hooks",
-						repositoryCount: 1,
-						hooksRepositoryId: "repo-api",
+						id: "other-primary",
+						primaryRepositoryId: "repo-api",
 					},
 				],
 				REPO,

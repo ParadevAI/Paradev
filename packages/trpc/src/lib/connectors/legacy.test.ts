@@ -128,7 +128,7 @@ describe("legacyConnectionRow", () => {
 		expect(externalUserSource).toBe("identity");
 	});
 
-	test("falls back to the Superset user when no identity was recorded", async () => {
+	test("falls back to the Paradev user when no identity was recorded", async () => {
 		const { row, externalUserSource } = await legacyConnectionRow(
 			legacy({}),
 			[identity({ externalScopeId: "another-org" })],

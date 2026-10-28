@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { cursorSchema } from "./cursor";
-import { itemSchema } from "./items";
+import { itemSchema, subagentStatusSchema } from "./items";
 
 export const sessionStatusSchema = z.enum([
 	"starting",
@@ -50,7 +50,11 @@ export const backgroundTaskSchema = z.looseObject({
 	kind: backgroundTaskKindSchema,
 	name: z.string(),
 	detail: z.string().optional(),
+	parentId: z.string().min(1).optional(),
 	canStop: z.boolean(),
+	canSteer: z.boolean().optional(),
+	canBackground: z.boolean().optional(),
+	subagentStatus: subagentStatusSchema.optional().catch(undefined),
 	startedAtMs: z.number(),
 });
 export type BackgroundTask = z.infer<typeof backgroundTaskSchema>;
@@ -78,10 +82,35 @@ export const sessionStateSchema = z.looseObject({
 });
 export type SessionState = z.infer<typeof sessionStateSchema>;
 
+export const TURN_FAILURE_KINDS = [
+	"crashed",
+	"timeout",
+	"auth",
+	"network",
+	"model_unavailable",
+	"context_too_long",
+	"refused",
+	"session_lost",
+	"unknown",
+] as const;
+export const turnFailureKindSchema = z.enum(TURN_FAILURE_KINDS);
+export type TurnFailureKind = z.infer<typeof turnFailureKindSchema>;
+
+export const turnErrorSchema = z.looseObject({
+	/** The agent's own words for the failure. */
+	message: z.string(),
+	kind: turnFailureKindSchema.optional().catch(undefined),
+	/** What the agent printed to stderr while the turn ran. */
+	detail: z.string().optional(),
+	/** The terminal command that signs this agent in again, for an `auth` failure. */
+	loginCommand: z.string().optional(),
+});
+export type TurnError = z.infer<typeof turnErrorSchema>;
+
 export const turnSchema = z.looseObject({
 	id: z.string().min(1),
 	status: z.enum(["running", "completed", "failed", "interrupted"]),
-	error: z.looseObject({ message: z.string() }).optional(),
+	error: turnErrorSchema.optional(),
 	usage: z
 		.looseObject({
 			inputTokens: z.number().nonnegative(),
@@ -92,11 +121,24 @@ export const turnSchema = z.looseObject({
 			costUsd: z.number().nonnegative().optional(),
 		})
 		.optional(),
+	/**
+	 * The agent's latest report on the whole session while this turn ran: how
+	 * full the context window is, and its running cost total, not this turn's.
+	 */
+	sessionUsage: z
+		.looseObject({
+			contextUsed: z.number().nonnegative(),
+			contextSize: z.number().positive(),
+			costUsd: z.number().nonnegative().optional(),
+		})
+		.optional()
+		.catch(undefined),
 	startedAtMs: z.number(),
 	completedAtMs: z.number().optional(),
 });
 export type Turn = z.infer<typeof turnSchema>;
 export type Usage = NonNullable<Turn["usage"]>;
+export type SessionUsage = NonNullable<Turn["sessionUsage"]>;
 
 export const durableEventSchema = z.discriminatedUnion("type", [
 	z.looseObject({
@@ -122,6 +164,7 @@ export const deltaSchema = z.discriminatedUnion("type", [
 		type: z.literal("text"),
 		itemId: z.string().min(1),
 		append: z.string(),
+		parentItemId: z.string().min(1).optional(),
 	}),
 	z.looseObject({
 		type: z.literal("tool_input"),

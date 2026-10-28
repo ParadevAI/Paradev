@@ -68,7 +68,7 @@
 		"@types/babel__core": "7.20.5",
 		"@types/react": "19.2.14",
 		"@types/react-dom": "19.2.3",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
 		"typescript": "7.0.2"

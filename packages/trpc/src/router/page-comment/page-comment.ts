@@ -13,11 +13,16 @@ import {
 } from "@superset/db/schema";
 import { fileOriginalKey } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { reapOrphanFiles } from "../../lib/files";
 import { presignedPutUrl } from "../../lib/r2";
 import { protectedProcedure, userError } from "../../trpc";
-import { assertPageReadable } from "../page/access";
+import {
+	assertPageCommentable,
+	assertPageReadable,
+	loadPageShareRole,
+	pageReadableBy,
+} from "../page/access";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	agentSessionFor,
@@ -44,14 +49,29 @@ import {
 } from "./schema";
 import { shapeComment, shapeThread } from "./shape";
 
+/** "comment" for anything that writes to the conversation; "read" otherwise. */
+type PageNeed = "read" | "comment";
+
+async function assertPageAllows(
+	page: SelectPage,
+	userId: string,
+	need: PageNeed,
+) {
+	const shareRole = await loadPageShareRole(page, userId);
+	if (need === "comment") assertPageCommentable(page, userId, shareRole);
+	else assertPageReadable(page, userId, shareRole);
+}
+
 async function loadReadablePage({
 	pageId,
 	organizationId,
 	userId,
+	need = "read",
 }: {
 	pageId: string;
 	organizationId: string;
 	userId: string;
+	need?: PageNeed;
 }): Promise<SelectPage> {
 	const [page] = await db
 		.select()
@@ -66,7 +86,7 @@ async function loadReadablePage({
 			i18nKey: "serverError.pageComment.pageNotFound",
 		});
 	}
-	assertPageReadable(page, userId);
+	await assertPageAllows(page, userId, need);
 	return page;
 }
 
@@ -74,10 +94,12 @@ async function loadThread({
 	threadId,
 	organizationId,
 	userId,
+	need = "read",
 }: {
 	threadId: string;
 	organizationId: string;
 	userId: string;
+	need?: PageNeed;
 }) {
 	const [row] = await db
 		.select({ thread: pageCommentThreads, page: pages })
@@ -98,7 +120,7 @@ async function loadThread({
 			i18nKey: "serverError.pageComment.threadNotFound",
 		});
 	}
-	assertPageReadable(row.page, userId);
+	await assertPageAllows(row.page, userId, need);
 	return row;
 }
 
@@ -223,14 +245,7 @@ export const pageCommentRouter = {
 
 			const readable = and(
 				eq(pages.organizationId, organizationId),
-				or(
-					eq(pages.visibility, "org"),
-					eq(pages.visibility, "everyone"),
-					and(
-						eq(pages.visibility, "just_me"),
-						eq(pages.createdByUserId, userId),
-					),
-				),
+				pageReadableBy(userId),
 				activatedOnly
 					? isNotNull(pageCommentThreads.agentActivatedAt)
 					: undefined,
@@ -370,8 +385,8 @@ export const pageCommentRouter = {
 	 * PUT. The comment doesn't exist yet, so nothing is attached here — the
 	 * row stays `pending` until a create or reply names the file, is checked
 	 * against its declaration there, and is swept in a day if that never
-	 * happens. Gated on reading the page because attaching is: a viewer who
-	 * could never post the comment shouldn't get the upload either.
+	 * happens. Gated on commenting because attaching is: a viewer who could
+	 * never post the comment shouldn't get the upload either.
 	 */
 	createImageUpload: protectedProcedure
 		.input(createCommentImageUploadSchema)
@@ -381,6 +396,7 @@ export const pageCommentRouter = {
 				pageId: input.pageId,
 				organizationId,
 				userId: ctx.session.user.id,
+				need: "comment",
 			});
 
 			const [row] = await db
@@ -415,7 +431,12 @@ export const pageCommentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
-			await loadReadablePage({ pageId: input.pageId, organizationId, userId });
+			await loadReadablePage({
+				pageId: input.pageId,
+				organizationId,
+				userId,
+				need: "comment",
+			});
 
 			const [version] = await db
 				.select({ id: pageVersions.id })
@@ -509,6 +530,7 @@ export const pageCommentRouter = {
 				threadId: input.threadId,
 				organizationId,
 				userId,
+				need: "comment",
 			});
 
 			const agentSession = agentSessionFor(ctx, input.agentSessionId);
@@ -590,7 +612,7 @@ export const pageCommentRouter = {
 					i18nKey: "serverError.pageComment.commentNotFound",
 				});
 			}
-			assertPageReadable(existing.page, userId);
+			await assertPageAllows(existing.page, userId, "comment");
 			if (existing.comment.authorUserId !== userId) {
 				throw userError({
 					code: "FORBIDDEN",
@@ -616,6 +638,7 @@ export const pageCommentRouter = {
 				threadId: input.threadId,
 				organizationId,
 				userId,
+				need: "comment",
 			});
 
 			assertActivatedForAgent(thread, agentSessionFor(ctx));

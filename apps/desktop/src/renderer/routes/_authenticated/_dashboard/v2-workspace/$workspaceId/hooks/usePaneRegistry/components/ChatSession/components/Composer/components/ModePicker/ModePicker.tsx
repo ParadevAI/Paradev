@@ -8,9 +8,7 @@ import {
 import { cn } from "@superset/ui/utils";
 import {
 	FastForward,
-	FilePen,
 	type LucideIcon,
-	NotebookPen,
 	Pause,
 	Play,
 	SlidersHorizontal,
@@ -24,6 +22,7 @@ import {
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
 import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
+import { KNOWN_MODES } from "../../utils/modeCopy";
 
 export type SessionMode = { id: string; label: string };
 
@@ -49,69 +48,25 @@ export function ModePicker({
 	iconOnly?: boolean;
 	onSelect: (modeId: string) => void;
 }) {
-	const { t } = useLingui();
+	const { i18n, t } = useLingui();
 	const { shown, select } = useOptimisticSelections({ mode: currentModeId });
 	const shownModeId = shown("mode");
 	const offeredModes = modes.filter((mode) => !HIDDEN_MODE_IDS.has(mode.id));
 	if (offeredModes.length < 2) return null;
 
-	const knownModes: Record<string, ModeCopy> = {
-		default: {
-			title: t({ message: "Ask for approval" }),
-			description: t({ message: "Asks before edits and commands" }),
-			icon: Pause,
-		},
-		acceptEdits: {
-			title: t({ message: "Approve edits" }),
-			description: t({
-				message: "Edit files without asking; ask before commands",
-			}),
-			icon: FilePen,
-		},
-		plan: {
-			title: t({ message: "Plan" }),
-			description: t({ message: "Read and plan without changing anything" }),
-			icon: NotebookPen,
-		},
-		"read-only": {
-			title: t({ message: "Ask for approval" }),
-			description: t({ message: "Asks before edits and commands" }),
-			icon: Pause,
-		},
-		auto: {
-			title: t({ message: "Approve for me" }),
-			description: t({ message: "Asks only for risky actions" }),
-			icon: Play,
-		},
-		bypassPermissions: {
-			title: t({ message: "Full access" }),
-			description: t({ message: "Never asks before acting" }),
-			icon: FastForward,
-		},
-		"full-access": {
-			title: t({ message: "Full access" }),
-			description: t({ message: "Never asks before acting" }),
-			icon: FastForward,
-		},
-		"agent-full-access": {
-			title: t({ message: "Full access" }),
-			description: t({ message: "Never asks before acting" }),
-			icon: FastForward,
-		},
-		agent: {
-			title: t({ message: "Approve for me" }),
-			description: t({ message: "Asks only for risky actions" }),
-			icon: Play,
-		},
+	const copyFor = (mode: SessionMode): ModeCopy => {
+		const known = KNOWN_MODES[mode.id];
+		return {
+			...(known
+				? {
+						title: i18n._(known.title),
+						description: i18n._(known.description),
+						icon: known.icon,
+					}
+				: { title: mode.label, description: "", icon: SlidersHorizontal }),
+			unrestricted: isUnrestrictedMode(mode.id),
+		};
 	};
-	const copyFor = (mode: SessionMode): ModeCopy => ({
-		...(knownModes[mode.id] ?? {
-			title: mode.label,
-			description: "",
-			icon: SlidersHorizontal,
-		}),
-		unrestricted: isUnrestrictedMode(mode.id),
-	});
 
 	const current =
 		modes.find((mode) => mode.id === shownModeId) ?? offeredModes[0];

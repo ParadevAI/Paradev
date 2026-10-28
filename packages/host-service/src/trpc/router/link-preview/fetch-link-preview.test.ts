@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
 	createLinkPreviewLoader,
+	EMPTY_LINK_PREVIEW,
 	type LinkPreviewDeps,
 } from "./fetch-link-preview";
 import { LinkPreviewUnavailableError } from "./public-url";
@@ -28,7 +29,7 @@ function loaderFor(
 	overrides: Partial<LinkPreviewDeps> = {},
 ) {
 	const requested: string[] = [];
-	const load = createLinkPreviewLoader({
+	const loader = createLinkPreviewLoader({
 		lookup: async () => ["93.184.216.34"],
 		fetch: async (url, init) => {
 			requested.push(url);
@@ -36,6 +37,7 @@ function loaderFor(
 		},
 		...overrides,
 	});
+	const load = (url: string, image = false) => loader({ url, image });
 	return { load, requested };
 }
 
@@ -53,7 +55,9 @@ describe("link preview fetch", () => {
 		});
 		expect(await load(PAGE)).toEqual({
 			title: "Guide",
+			description: null,
 			iconDataUrl: `data:image/png;base64,${PNG.toString("base64")}`,
+			image: null,
 		});
 		expect(sent[0]?.redirect).toBe("manual");
 		expect(new Headers(sent[0]?.headers).get("user-agent")).toContain(
@@ -91,7 +95,10 @@ describe("link preview fetch", () => {
 				"image/x-icon",
 			),
 		});
-		expect(await load(PAGE)).toEqual({ title: "Guide", iconDataUrl: null });
+		expect(await load(PAGE)).toMatchObject({
+			title: "Guide",
+			iconDataUrl: null,
+		});
 	});
 
 	it("follows a redirect and resolves the icon against the final URL", async () => {
@@ -148,7 +155,7 @@ describe("link preview fetch", () => {
 		const { load, requested } = loaderFor({
 			[PAGE]: bytes(Buffer.from("%PDF-1.7"), "application/pdf"),
 		});
-		expect(await load(PAGE)).toEqual({ title: null, iconDataUrl: null });
+		expect(await load(PAGE)).toEqual(EMPTY_LINK_PREVIEW);
 		expect(requested).toEqual([PAGE]);
 	});
 
@@ -208,5 +215,89 @@ describe("link preview fetch", () => {
 		expect(second).toBe(first);
 		expect(await load(PAGE)).toBe(first);
 		expect(requested.filter((url) => url === PAGE)).toHaveLength(2);
+	});
+
+	it("returns the description, and the preview image only when asked", async () => {
+		const page = html(
+			`<title>Guide</title><meta name="description" content="How to start">` +
+				`<meta property="og:image" content="/static/card.png">`,
+		);
+		const { load, requested } = loaderFor({
+			[PAGE]: page,
+			"https://docs.example.com/static/card.png": bytes(PNG, "image/png"),
+		});
+		const withoutImage = await load(PAGE);
+		expect(withoutImage.description).toBe("How to start");
+		expect(withoutImage.image).toBeNull();
+		expect(requested).not.toContain("https://docs.example.com/static/card.png");
+
+		expect((await load(PAGE, true)).image).toEqual({
+			dataUrl: `data:image/png;base64,${PNG.toString("base64")}`,
+			width: 1,
+			height: 1,
+		});
+	});
+
+	it("drops a preview image that is not a supported picture", async () => {
+		const { load } = loaderFor({
+			[PAGE]: html(
+				`<title>Guide</title><meta property="og:image" content="/card.ico">`,
+			),
+			"https://docs.example.com/card.ico": bytes(
+				new Uint8Array([0, 0, 1, 0, 1, 0]),
+				"image/png",
+			),
+		});
+		expect(await load(PAGE, true)).toMatchObject({
+			title: "Guide",
+			image: null,
+		});
+	});
+
+	it("stops reading the page at the end of its head", async () => {
+		let pulls = 0;
+		const head = new TextEncoder().encode(
+			"<html><head><title>Guide</title></HEAD>",
+		);
+		const body = new ReadableStream<Uint8Array>({
+			pull(controller) {
+				pulls++;
+				controller.enqueue(
+					pulls === 1 ? head : new Uint8Array(1024).fill(0x20),
+				);
+			},
+		});
+		const { load } = loaderFor({
+			[PAGE]: () =>
+				new Response(body, { headers: { "content-type": "text/html" } }),
+		});
+		expect((await load(PAGE)).title).toBe("Guide");
+		expect(pulls).toBeLessThan(3);
+	});
+
+	it("keeps only the 20 most recent previews with images", async () => {
+		const routes: Record<string, Route> = {};
+		for (let i = 0; i <= 20; i++) {
+			routes[`https://docs.example.com/p${i}`] = html(
+				`<title>Page ${i}</title>`,
+			);
+		}
+		const { load, requested } = loaderFor(routes);
+		for (let i = 0; i <= 20; i++)
+			await load(`https://docs.example.com/p${i}`, true);
+		await load("https://docs.example.com/p20", true);
+		await load("https://docs.example.com/p0", true);
+		const fetches = (url: string) => requested.filter((r) => r === url).length;
+		expect(fetches("https://docs.example.com/p20")).toBe(1);
+		expect(fetches("https://docs.example.com/p0")).toBe(2);
+	});
+
+	it("does not stop at a </head inside a script", async () => {
+		const { load } = loaderFor({
+			[PAGE]: html(
+				'<head><script>var s = "</head>";</script><meta property="og:title" content="Real title"></head>',
+			),
+		});
+		expect((await load(PAGE)).title).toBe("Real title");
 	});
 });

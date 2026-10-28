@@ -21,13 +21,11 @@ interface SidebarState {
 	lastOpenSidebarWidth: number;
 	currentMode: SidebarMode;
 	lastMode: SidebarMode;
-	isResizing: boolean;
 	rightSidebarTab: RightSidebarTab;
 	toggleSidebar: () => void;
 	setSidebarOpen: (open: boolean) => void;
 	setSidebarWidth: (width: number) => void;
 	setMode: (mode: SidebarMode) => void;
-	setIsResizing: (isResizing: boolean) => void;
 	setRightSidebarTab: (tab: RightSidebarTab) => void;
 }
 
@@ -40,7 +38,6 @@ export const useSidebarStore = create<SidebarState>()(
 				lastOpenSidebarWidth: DEFAULT_SIDEBAR_WIDTH,
 				currentMode: SidebarMode.Tabs,
 				lastMode: SidebarMode.Tabs,
-				isResizing: false,
 				rightSidebarTab: RightSidebarTab.Changes,
 
 				toggleSidebar: () => {
@@ -113,10 +110,6 @@ export const useSidebarStore = create<SidebarState>()(
 
 				setMode: (mode) => {
 					set({ currentMode: mode });
-				},
-
-				setIsResizing: (isResizing) => {
-					set({ isResizing });
 				},
 
 				setRightSidebarTab: (tab) => {

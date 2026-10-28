@@ -13,3 +13,9 @@ test("keeps one mode per agent, newest last, and at most 32 agents", () => {
 	expect(next.agent0).toBeUndefined();
 	expect(next.codex).toBe("read-only");
 });
+
+test("never saves plan as the mode new chats start in", () => {
+	expect(withSavedMode({ claude: "auto" }, "claude", "plan")).toEqual({
+		claude: "auto",
+	});
+});

@@ -1,15 +1,15 @@
 ---
-title: Superset MCP Server
-description: Connect AI agents directly to Superset via MCP
+title: Paradev MCP Server
+description: Connect AI agents directly to Paradev via MCP
 ---
 
 <Callout type="info">
-The Superset MCP server lives at `https://api.superset.sh/mcp`. The versioned URL (`/api/v2/agent/mcp`) keeps working for existing configurations; the legacy v1 server (`/api/agent/mcp`) has been removed and returns `410 Gone`.
+The Paradev MCP server lives at `https://api.superset.sh/mcp`. The versioned URL (`/api/v2/agent/mcp`) keeps working for existing configurations; the legacy v1 server (`/api/agent/mcp`) has been removed and returns `410 Gone`.
 </Callout>
 
 ## Overview
 
-Superset provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI agents interact with your tasks, workspaces, and devices programmatically.
+Paradev provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI agents interact with your tasks, workspaces, and devices programmatically.
 
 ## Capabilities
 
@@ -20,7 +20,7 @@ Superset provides an [MCP (Model Context Protocol)](https://modelcontextprotocol
 | **Agents** | list agents on a host, launch an agent session in a workspace |
 | **Terminals** | create in a workspace, list, send input, read screen, close |
 | **Pages** | list, get, list versions, pull content, publish, read storage; list/reply/resolve page comments |
-| **Automations** | list, get metadata, get/set prompt body, create, update metadata, pause, resume, run on demand, list runs, delete |
+| **Automations** | list, get metadata, get/set prompt body, create, update metadata and triggers, list trigger options, pause, resume, run on demand, list runs, delete |
 | **Projects** | list projects on a host |
 | **Hosts** | list hosts (registered machines) you have access to |
 | **Organization** | list members |
@@ -247,7 +247,7 @@ For headless environments, CI/CD pipelines, or scripts where browser-based OAuth
 
 **Generating an API key:**
 
-1. Open the Superset desktop app
+1. Open the Paradev desktop app
 2. Go to **Settings > API Keys**
 3. Click **Create API Key**
 4. Copy the key (it starts with `sk_live_`). You won't be able to see it again.
@@ -328,7 +328,7 @@ API keys grant full access to your organization. Keep them secret and never comm
 
 ### Pages
 
-[Superset Pages](/pages) lets agents present designs and reports to your team and act on feedback left directly on the page. The MCP publish tool accepts a self-contained HTML document and returns a shareable URL. Every publish creates a new version; nothing is overwritten.
+[Paradev Pages](/pages) lets agents present designs and reports to your team and act on feedback left directly on the page. The MCP publish tool accepts a self-contained HTML document and returns a shareable URL. Every publish creates a new version; nothing is overwritten.
 
 | Tool | Description |
 |------|-------------|
@@ -363,12 +363,13 @@ publishing updates. Otherwise each publish creates a separate page.
 | `automations_list` | List automations the calling user owns |
 | `automations_get` | Get one automation's metadata (prompt body omitted) |
 | `automations_get_prompt` | Fetch the full markdown prompt for one automation |
-| `automations_create` | Schedule a recurring agent run with an RFC 5545 RRULE |
-| `automations_update` | Update metadata (name, schedule, agent, host); use `automations_set_prompt` to change the prompt |
+| `automations_create` | Create an automation that runs on an RFC 5545 RRULE schedule, on event triggers, or both |
+| `automations_update` | Update an automation (name, schedule, triggers, agent, host); `triggers` replaces the whole set. Use `automations_set_prompt` to change the prompt |
 | `automations_set_prompt` | Replace the full markdown prompt body |
-| `automations_pause` | Pause an automation (schedule stops firing) |
+| `automations_pause` | Pause an automation (its schedules and event triggers stop firing) |
 | `automations_resume` | Resume a paused automation |
-| `automations_run` | Dispatch an automation immediately, outside its schedule |
+| `automations_run` | Dispatch an automation immediately, without waiting for a schedule or event |
+| `automations_trigger_options` | List the values an event trigger can filter on (channels, repositories, teams, ...) |
 | `automations_logs` | List recent runs for an automation |
 | `automations_delete` | Delete an automation |
 

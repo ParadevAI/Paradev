@@ -47,7 +47,7 @@ The **Code** tab is a complete diff viewer: a file tree with per-file added/dele
 Select lines in the Code tab and send a comment to an agent, optionally posting it on GitHub too. The agent receives the file, line range, and diff side:
 
 - If a workspace is already linked to the PR, send it to one of its **running agent terminals**, or start a **new agent session** there
-- If no workspace exists yet, Superset **creates a PR-checkout workspace** and launches the agent with your comment as its first prompt
+- If no workspace exists yet, Paradev **creates a PR-checkout workspace** and launches the agent with your comment as its first prompt
 
 ## Actions
 
@@ -61,6 +61,14 @@ From the detail header:
 <Callout type="info">
 Merging, closing, and commenting act on the real PR through your GitHub connection - same permissions, same effects as doing it on github.com.
 </Callout>
+
+### Open a PR from a Workspace
+
+PR links in a workspace open the PR pane or GitHub, depending on the click. This covers the **Open PR** button in the Diff pane, the PR title in the sidebar **Review** tab, **Open pull request** in the PR status menu, and the PR icon on a sidebar row.
+
+- **Click** - opens the PR pane in a split beside the active pane
+- **Shift-click** - opens it in a new tab
+- **⌘-click** or **Ctrl-click** - opens the PR on GitHub in your browser
 
 ## Where PRs Come From
 

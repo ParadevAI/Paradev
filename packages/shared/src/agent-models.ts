@@ -276,6 +276,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "gpt-5.4-medium", label: "GPT-5.4", group: CURSOR_OPENAI_GROUP },
 			{ id: "gpt-5.3-codex", label: "Codex 5.3", group: CURSOR_OPENAI_GROUP },
 			{
+				id: "gemini-4-argon-high",
+				label: "Gemini 4 Argon",
+				group: CURSOR_OTHER_GROUP,
+			},
+			{
 				id: "gemini-3.8-flash-high",
 				label: "Gemini 3.8 Flash",
 				group: CURSOR_OTHER_GROUP,
@@ -534,6 +539,11 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 		["low", "medium", "high", "xhigh"],
 		{ medium: "gpt-5.3-codex" },
 	),
+	"gemini-4-argon-high": cursorEffortVariants("gemini-4-argon", [
+		"low",
+		"medium",
+		"high",
+	]),
 	"gemini-3.8-flash-high": cursorEffortVariants("gemini-3.8-flash", [
 		"low",
 		"medium",

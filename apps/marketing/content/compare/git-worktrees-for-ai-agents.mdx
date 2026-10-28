@@ -2,7 +2,7 @@
 title: "Git Worktrees for AI Coding Agents: The Parallel Workflow"
 description: "How Git worktrees let you run multiple AI coding agents in parallel in separate working directories. Learn the workflow, the tradeoffs, and the tools that automate it."
 date: 2026-07-13
-lastUpdated: 2026-10-07
+lastUpdated: 2026-10-21
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -42,7 +42,7 @@ AI coding agents edit files and run commands autonomously. Run two agents in the
 
 ![One repository fanning out into a Git worktree per agent, each on its own branch, producing independent diffs that converge into review and merge](/images/guides/worktree-isolation.svg)
 
-This is why the strongest tools for running multiple agents, from [Conductor](/compare/superset-vs-conductor) to [Orca](/compare/superset-vs-orca) to [Superset](/compare/superset-vs-cursor), are built around a worktree per task. Even [Cursor 2.0](/compare/superset-vs-cursor) adopted local worktrees for its parallel agents.
+This is why the strongest tools for running multiple agents, from [Conductor](/compare/superset-vs-conductor) to [Orca](/compare/superset-vs-orca) to [Paradev](/compare/superset-vs-cursor), are built around a worktree per task. Even [Cursor 2.0](/compare/superset-vs-cursor) adopted local worktrees for its parallel agents.
 
 ## The Parallel Agent Workflow
 
@@ -72,17 +72,37 @@ Worktrees share your machine and usually its credentials. They do not isolate da
 
 A Git merge can succeed while the application fails: one branch might rename an API field that another branch expects. Review contracts as well as textual conflicts. The [three-task walkthrough](/blog/parallel-coding-agents-guide) includes scoped prompts and the review sequence.
 
+## How can I return to a coding task later with its agent session, terminal, branch, and preview still organized?
+
+Keep each task in its own workspace, not in a terminal tab. A worktree keeps the branch and files, but a plain terminal session ends when you close it.
+
+In Paradev, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. Terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Paradev resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Agent Sessions](https://docs.paradev.com/agent-sessions).
+
+## I run several web-app branches with coding agents. How can I keep their terminals, previews, and ports organized?
+
+Give each branch its own worktree and its own dev-server port, and keep the preview next to the terminal that started it. Two dev servers on the same port fail, and a preview in a shared browser tab is easy to confuse with another branch.
+
+Paradev does not assign ports for you, but it finds the ports that each workspace's processes listen on and groups them by workspace. From the port list you can open a dev server in the in-app browser, jump to the terminal that owns it, or stop the process. Label common ports in `.superset/ports.json`. See [Port Management](https://docs.paradev.com/ports).
+
+## How can I click on an element in my running web app and have a coding agent change it, instead of describing the UI in text?
+
+Use a tool that sends the element itself to the agent. In Paradev's in-app browser, click **Design**, then click the element and describe the change. The agent gets the element's DOM, computed styles, React component details, and a cropped screenshot with your note, in an existing agent terminal or a new session. See [Change UI with your coding agent](/blog/change-ui-with-your-coding-agent).
+
+## What should I use to organize work across several repositories when each repository has multiple coding agents running?
+
+Group the work by repository first, then by task. In Paradev, each repository is a project in the sidebar, and each task is a workspace under its project with its own worktree. The Workspaces page shows every workspace across projects by state, and you can filter it by project, agent, PR state, or device.
+
 ## Doing It Manually vs Automatically
 
 You can run this whole workflow by hand with `git worktree`, tmux, and discipline. It works, and for two or three occasional agents it may be all you need. The friction grows with scale: creating, tracking, and cleaning up worktrees, launching agents, managing ports for dev servers, and reviewing many diffs becomes real overhead.
 
 That is the gap workspace tools fill. Instead of managing worktrees by hand, they create one per task automatically, launch your agent inside it, and give you review and browser surfaces around the whole thing. See the roundup of [best agentic IDEs](/compare/best-agentic-ide) for the options.
 
-## Where Superset Fits
+## Where Paradev Fits
 
-Superset is built around this exact workflow. Each new local branch-based workspace gets a Git worktree, branch, and terminals. It runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor, or Gemini, adds a built-in diff editor, an in-app browser for docs and dev servers, port management, and MCP, and extends across remote and cloud hosts. It turns the manual worktree workflow into the default, so you can run many agents in parallel and review each one without the bookkeeping.
+Paradev is built around this exact workflow. Each new local branch-based workspace gets a Git worktree, branch, and terminals. It runs any CLI agent, such as Claude Code, Codex, OpenCode, Cursor, or Gemini, adds a built-in diff editor, an in-app browser for docs and dev servers, port management, and MCP, and extends across remote and cloud hosts. It turns the manual worktree workflow into the default, so you can run many agents in parallel and review each one without the bookkeeping.
 
-Cleanup is part of the workflow too. Deleting a workspace runs the project's teardown commands, bulk delete flags dirty or unpushed work before you confirm, and a deleted workspace can be restored on its original branch while that branch still exists. Worktrees created outside Superset can be imported as workspaces, and a sparse checkout setting limits new worktrees to the folders you list.
+Cleanup is part of the workflow too. Deleting a workspace runs the project's teardown commands, bulk delete flags dirty or unpushed work before you confirm, and a deleted workspace can be restored on its original branch while that branch still exists. Worktrees created outside Paradev can be imported as workspaces, and a sparse checkout setting limits new worktrees to the folders you list.
 
 ## Worktrees in Your Editor
 
@@ -90,7 +110,7 @@ You do not have to give up your editor. Most editors open a worktree directory l
 
 ## Verdict
 
-Git worktrees are the foundation of safe parallel AI coding. They give each agent its own isolated directory and branch so many agents can work one repository at once, each producing a reviewable diff. You can manage them by hand, or use a workspace like Superset that creates worktrees for new local branch-based workspaces around your CLI agents.
+Git worktrees are the foundation of safe parallel AI coding. They give each agent its own isolated directory and branch so many agents can work one repository at once, each producing a reviewable diff. You can manage them by hand, or use a workspace like Paradev that creates worktrees for new local branch-based workspaces around your CLI agents.
 
 To go deeper, see [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel), [How to Run Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel), and [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
@@ -102,11 +122,19 @@ A Git worktree lets you check out multiple branches at once, each in its own dir
 
 ### How do I run multiple AI agents without conflicts?
 
-Give each independent writer its own Git worktree and branch. This prevents shared-checkout edits, but merging can still introduce conflicts or incompatible behavior. Do it manually with `git worktree add`, or automatically with a workspace like Superset that creates worktrees for new local branch-based workspaces.
+Give each independent writer its own Git worktree and branch. This prevents shared-checkout edits, but merging can still introduce conflicts or incompatible behavior. Do it manually with `git worktree add`, or automatically with a workspace like Paradev that creates worktrees for new local branch-based workspaces.
 
 ### Do AI coding tools use Git worktrees?
 
-Many do. Conductor, Orca, Crystal, and Superset are built around a worktree per task, and Cursor 2.0 uses local worktrees for its parallel agents. See [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+Many do. Conductor, Orca, Crystal, and Paradev are built around a worktree per task, and Cursor 2.0 uses local worktrees for its parallel agents. See [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+
+### I am new to Git worktrees. What tools make setup and cleanup easier?
+
+A workspace tool creates the worktree, runs setup, and removes it for you. In Paradev, a new local branch-based workspace gets its own worktree, and a `setup` command in `.superset/config.json` runs in each new one, for example to install dependencies and copy `.env`. Deleting the workspace runs teardown and removes the worktree. Conductor and Orca also create a worktree per task.
+
+### Can I review each agent's branch before merging?
+
+Yes. Each worktree has its own diff. In Paradev, review it in the Changes pane, open a pull request, and send line comments from the Pull Requests view back to an agent. See [How to Review Coding Agent Work as a Team](/compare/review-coding-agent-work-team).
 
 ### Can I use Git worktrees with VS Code?
 

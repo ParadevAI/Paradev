@@ -78,7 +78,10 @@ function hmacKey(secret: string) {
 	);
 }
 
-async function signClaims(secret: string, wire: object): Promise<string> {
+export async function signClaims(
+	secret: string,
+	wire: object,
+): Promise<string> {
 	const payload = toBase64Url(encoder.encode(JSON.stringify(wire)));
 	const signature = await crypto.subtle.sign(
 		"HMAC",
@@ -94,7 +97,7 @@ async function signClaims(secret: string, wire: object): Promise<string> {
  * `secrets` is the current secret first, then any previous one still in its
  * grace period, so rotation never invalidates tickets already handed out.
  */
-async function verifyClaims(
+export async function verifyClaims(
 	secrets: string | readonly string[],
 	ticket: string,
 	now: number,
@@ -269,4 +272,59 @@ export async function verifyFileTicket(
 		return null;
 	}
 	return { fileId, contentType, exp };
+}
+
+const AGENT_SESSION_KIND = "agent-session";
+
+export type AgentSessionTicketScope = "read" | "write";
+
+export interface AgentSessionTicketClaims {
+	sessionId: string;
+	scope: AgentSessionTicketScope;
+	/** The person reading; absent on the worker's write tickets. */
+	userId?: string;
+	exp: number;
+}
+
+export async function signAgentSessionTicket(
+	secret: string,
+	claims: AgentSessionTicketClaims,
+): Promise<string> {
+	return signClaims(secret, {
+		kind: AGENT_SESSION_KIND,
+		sessionId: claims.sessionId,
+		scope: claims.scope,
+		...(claims.userId ? { userId: claims.userId } : {}),
+		exp: claims.exp,
+	});
+}
+
+export async function verifyAgentSessionTicket(
+	secrets: string | readonly string[],
+	ticket: string,
+	now: number = Date.now(),
+): Promise<AgentSessionTicketClaims | null> {
+	const wire = await verifyClaims(secrets, ticket, now);
+	if (!wire) return null;
+	const { kind, sessionId, scope, userId, exp } = wire as {
+		kind?: unknown;
+		sessionId?: unknown;
+		scope?: unknown;
+		userId?: unknown;
+		exp: number;
+	};
+	if (
+		kind !== AGENT_SESSION_KIND ||
+		typeof sessionId !== "string" ||
+		(scope !== "read" && scope !== "write") ||
+		(userId !== undefined && typeof userId !== "string")
+	) {
+		return null;
+	}
+	return {
+		sessionId,
+		scope,
+		...(typeof userId === "string" ? { userId } : {}),
+		exp,
+	};
 }

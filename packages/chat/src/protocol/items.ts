@@ -22,6 +22,8 @@ export const userContentSchema = z.discriminatedUnion("type", [
 		type: z.literal("text"),
 		text: z.string(),
 		elements: z.array(textElementSchema).optional(),
+		/** Reaches the agent, but is not kept on the transcript's user message. */
+		hidden: z.boolean().optional(),
 	}),
 	z.looseObject({
 		type: z.literal("attachment"),
@@ -31,6 +33,21 @@ export const userContentSchema = z.discriminatedUnion("type", [
 	}),
 ]);
 export type UserContent = z.infer<typeof userContentSchema>;
+
+const HIDDEN_TEXT_TAG = "superset-context";
+
+/** How a hidden part reaches the agent, so a replay of its history can drop it again. */
+export function wrapHiddenText(text: string): string {
+	return `<${HIDDEN_TEXT_TAG}>${text}</${HIDDEN_TEXT_TAG}>`;
+}
+
+export function isHiddenText(text: string): boolean {
+	const trimmed = text.trim();
+	return (
+		trimmed.startsWith(`<${HIDDEN_TEXT_TAG}>`) &&
+		trimmed.endsWith(`</${HIDDEN_TEXT_TAG}>`)
+	);
+}
 
 /** `path` is relative to the worktree. An item never carries image bytes. */
 export const imageAttachmentSchema = z.looseObject({
@@ -107,6 +124,7 @@ export type ToolKind = z.infer<typeof toolKindSchema>;
 export const userMessageSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("user_message"),
+	from: z.literal("parent").optional().catch(undefined),
 	clientId: z.string().min(1).optional(),
 	queued: z.boolean().optional(),
 	discarded: z.boolean().optional(),
@@ -118,6 +136,8 @@ export const agentMessageSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("agent_message"),
 	text: z.string(),
+	/** The agent's own id for this message, where it gives one. */
+	agentMessageId: z.string().optional(),
 	attachments: z.array(itemAttachmentSchema).optional(),
 	model: z.string().optional(),
 });
@@ -140,6 +160,14 @@ export const toolCallStatusSchema = z.enum([
 ]);
 export type ToolCallStatus = z.infer<typeof toolCallStatusSchema>;
 
+export const subagentStatusSchema = z.enum([
+	"running",
+	"idle",
+	"stopped",
+	"failed",
+]);
+export type SubagentStatus = z.infer<typeof subagentStatusSchema>;
+
 export const toolCallSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("tool_call"),
@@ -156,6 +184,10 @@ export const toolCallSchema = z.looseObject({
 	rawInput: z.unknown().optional(),
 	rawOutput: z.unknown().optional(),
 	subagent: z.boolean().optional(),
+	subagentStatus: subagentStatusSchema.optional().catch(undefined),
+	canSteer: z.boolean().optional(),
+	canStop: z.boolean().optional(),
+	canBackground: z.boolean().optional(),
 	attachments: z.array(itemAttachmentSchema).optional(),
 	bodyOmitted: z.boolean().optional(),
 	mcpServer: z

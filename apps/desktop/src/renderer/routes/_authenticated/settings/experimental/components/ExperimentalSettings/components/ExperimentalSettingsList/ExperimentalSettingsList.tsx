@@ -4,13 +4,17 @@ import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useNewDashboardSidebarEnabled } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNewDashboardSidebarEnabled";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useAcpChatStore } from "renderer/stores/acp-chat";
 import {
 	useInlineWorkspacePortsStore,
 	usePortsDisplayMode,
 } from "renderer/stores/inline-workspace-ports";
-import { useNewDashboardSidebarStore } from "renderer/stores/new-dashboard-sidebar";
+import {
+	useRightPaneAreaEnabled,
+	useRightPaneAreaStore,
+} from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { useOpenV1ImportModal } from "renderer/stores/v1-import-modal";
 import {
@@ -47,15 +51,21 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const cloudWorkspacesEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
-	const showNewSidebar =
-		cloudWorkspacesEnabled &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_NEW_SIDEBAR, visibleItems);
-	const newSidebarEnabled = useNewDashboardSidebarEnabled();
-	const setNewSidebarEnabled = useNewDashboardSidebarStore(
+	const rightPaneAreaFlag =
+		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
+	const showRightPaneArea =
+		rightPaneAreaFlag &&
+		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA, visibleItems);
+	const rightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
+	const setRightPaneAreaEnabled = useRightPaneAreaStore(
 		(state) => state.setEnabled,
 	);
+	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
+	const showAcpChat =
+		acpChatFlag &&
+		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT, visibleItems);
+	const acpChatEnabled = useAcpChatEnabled() === "enabled";
+	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
 		visibleItems,
@@ -175,13 +185,13 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showNewSidebar && (
+				{showRightPaneArea && (
 					<div className="flex items-center justify-between gap-6">
 						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="new-sidebar" className="text-sm font-medium">
+							<Label htmlFor="right-pane-area" className="text-sm font-medium">
 								<HighlightText
 									text={t({
-										message: "New sidebar",
+										message: "Right pane area",
 									})}
 									query={searchQuery}
 								/>
@@ -190,16 +200,42 @@ export function ExperimentalSettingsList({
 								<HighlightText
 									text={t({
 										message:
-											"Cloud workspaces under their projects, a local and cloud filter, and the redesigned workspace row.",
+											"Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats.",
 									})}
 									query={searchQuery}
 								/>
 							</p>
 						</div>
 						<Switch
-							id="new-sidebar"
-							checked={newSidebarEnabled}
-							onCheckedChange={setNewSidebarEnabled}
+							id="right-pane-area"
+							checked={rightPaneAreaEnabled}
+							onCheckedChange={setRightPaneAreaEnabled}
+						/>
+					</div>
+				)}
+				{showAcpChat && (
+					<div className="flex items-center justify-between gap-6">
+						<div className="min-w-0 flex-1 space-y-0.5">
+							<Label htmlFor="acp-chat" className="text-sm font-medium">
+								<HighlightText
+									text={t({ message: "Chat" })}
+									query={searchQuery}
+								/>
+							</Label>
+							<p className="text-xs text-muted-foreground">
+								<HighlightText
+									text={t({
+										message:
+											"Open Claude and Codex sessions in a chat pane instead of a terminal.",
+									})}
+									query={searchQuery}
+								/>
+							</p>
+						</div>
+						<Switch
+							id="acp-chat"
+							checked={acpChatEnabled}
+							onCheckedChange={setAcpChatEnabled}
 						/>
 					</div>
 				)}

@@ -1,13 +1,13 @@
 ---
 title: Getting Started
-description: Drive Superset programmatically from any TypeScript or JavaScript codebase.
+description: Drive Paradev programmatically from any TypeScript or JavaScript codebase.
 ---
 
 <Callout type="warn">
 The SDK is in early alpha. It is not meant for production use and may be removed in the future. Stay on the latest version (`@superset_sh/sdk@latest`) while we iterate.
 </Callout>
 
-The Superset TypeScript SDK lets you create and manage your workspaces, tasks, projects, and automations from code. Anything you can do in the dashboard, your scripts and services can do too.
+The Paradev TypeScript SDK lets you create and manage your workspaces, tasks, projects, and automations from code. Anything you can do in the dashboard, your scripts and services can do too.
 
 A few things you might use it for:
 
@@ -47,7 +47,7 @@ We're under active development. The SDK follows the API as it grows, so **stay o
 
 ## Get an API key
 
-1. Open the [Superset desktop app](https://superset.sh/download) → **Settings → API Keys** → **Create**. The key starts with `sk_live_…`. Copy it now (you won't be able to see it again).
+1. Open the [Paradev desktop app](https://paradev.com/download) → **Settings → API Keys** → **Create**. The key starts with `sk_live_…`. Copy it now (you won't be able to see it again).
 2. Note your **organization ID**. Find it in the org switcher inside the desktop app.
 
 ```bash
@@ -140,7 +140,7 @@ try {
     // 404
   } else if (err instanceof APIError) {
     // anything else: err.status, err.headers, err.error (the parsed body)
-    console.error(`Superset returned ${err.status}:`, err.error);
+    console.error(`Paradev returned ${err.status}:`, err.error);
   }
 }
 ```

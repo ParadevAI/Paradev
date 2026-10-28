@@ -1,22 +1,27 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
-	cloudWorkspacePresence,
 	cloudWorkspaceRepositories,
 	cloudWorkspaces,
+	cloudWorkspaceTags,
 	cloudWorkspaceVisibilityEnum,
 	environments,
 	githubRepositories,
-	members,
 	users,
 } from "@superset/db/schema";
+import { MACHINE_SIZES, machineSpec } from "@superset/shared/billing";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
+import {
+	normalizeWorkspaceTags,
+	workspaceTagsInputSchema,
+} from "@superset/shared/workspace-tags";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
-import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { organizationMachineSizes } from "../../lib/billing/plan";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
 import {
@@ -32,12 +37,14 @@ import {
 	sandboxExists,
 	stopAndSnapshot,
 } from "../../lib/sandbox";
+import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
 import { ensureDefaultEnvironment } from "../environment/default-environment";
 import { regionForRequest } from "../environment/region-for-request";
 import {
-	isVisibleTo,
+	canOpenWorkspace,
+	isListed,
 	loadVisibleWorkspace,
 	notFound,
 	visibleTo,
@@ -45,8 +52,10 @@ import {
 import { recordCloudWorkspaceActivity } from "./activity";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { nextSandboxNameFor } from "./provision";
+import { listPullRequests } from "./pull-requests";
 import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
+import { cloudWorkspaceSharingRouter } from "./sharing";
 import { queueProvision, startCloudWorkspace } from "./start";
 import { transitionCloudWorkspace } from "./transition";
 import {
@@ -78,9 +87,9 @@ async function loadReadyWorkspace(
 			i18nKey: "serverError.cloudWorkspace.notFound",
 		});
 	}
-	await assertCloudAccess(ctx);
 	assertMember(ctx.organizationIds, row.organizationId);
-	if (!isVisibleTo(row, ctx.userId)) throw notFound();
+	await assertCloudAccess(ctx, row.organizationId);
+	if (!(await canOpenWorkspace(row, ctx.userId))) throw notFound();
 	if (row.status !== "ready") {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
@@ -135,54 +144,50 @@ async function addressSandbox(
 	}
 }
 
-/**
- * Current members who have opened the workspaces, most recently seen first.
- * The creator counts as present from the moment they created it.
- */
-async function loadPresence(organizationId: string, workspaceIds: string[]) {
-	if (workspaceIds.length === 0) return [];
-	const isMember = (userId: typeof users.id) =>
-		and(eq(members.userId, userId), eq(members.organizationId, organizationId));
-	const [visits, creators] = await Promise.all([
-		db
-			.select({
-				cloudWorkspaceId: cloudWorkspacePresence.cloudWorkspaceId,
-				userId: cloudWorkspacePresence.userId,
-				name: users.name,
-				image: users.image,
-				lastSeenAt: cloudWorkspacePresence.lastSeenAt,
-			})
-			.from(cloudWorkspacePresence)
-			.innerJoin(users, eq(cloudWorkspacePresence.userId, users.id))
-			.innerJoin(members, isMember(users.id))
-			.where(inArray(cloudWorkspacePresence.cloudWorkspaceId, workspaceIds)),
-		db
-			.select({
-				cloudWorkspaceId: cloudWorkspaces.id,
-				userId: users.id,
-				name: users.name,
-				image: users.image,
-				lastSeenAt: cloudWorkspaces.createdAt,
-			})
-			.from(cloudWorkspaces)
-			.innerJoin(users, eq(cloudWorkspaces.createdByUserId, users.id))
-			.innerJoin(members, isMember(users.id))
-			.where(inArray(cloudWorkspaces.id, workspaceIds)),
-	]);
-	const visited = new Set(
-		visits.map((visit) => `${visit.cloudWorkspaceId}:${visit.userId}`),
-	);
-	return [
-		...visits,
-		...creators.filter(
-			(creator) =>
-				!visited.has(`${creator.cloudWorkspaceId}:${creator.userId}`),
-		),
-	].sort((a, b) => b.lastSeenAt.getTime() - a.lastSeenAt.getTime());
+/** The caller's own tags per workspace, normalized and sorted; ids with none are absent. */
+async function loadCallerTags(
+	workspaceIds: string[],
+	userId: string,
+): Promise<Map<string, string[]>> {
+	const byWorkspaceId = new Map<string, string[]>();
+	if (workspaceIds.length === 0) return byWorkspaceId;
+	const rows = await db
+		.select({
+			cloudWorkspaceId: cloudWorkspaceTags.cloudWorkspaceId,
+			tag: cloudWorkspaceTags.tag,
+		})
+		.from(cloudWorkspaceTags)
+		.where(
+			and(
+				inArray(cloudWorkspaceTags.cloudWorkspaceId, workspaceIds),
+				eq(cloudWorkspaceTags.createdByUserId, userId),
+			),
+		);
+	for (const row of rows) {
+		const tags = byWorkspaceId.get(row.cloudWorkspaceId);
+		if (tags) tags.push(row.tag);
+		else byWorkspaceId.set(row.cloudWorkspaceId, [row.tag]);
+	}
+	for (const [id, tags] of byWorkspaceId) {
+		byWorkspaceId.set(id, normalizeWorkspaceTags(tags));
+	}
+	return byWorkspaceId;
 }
+
+/**
+ * Released desktop and mobile builds still read `presence`; it now lives in the realtime WorkspaceHub.
+ * TODO(2026-10-26): drop `presence` from list and create once MINIMUM_DESKTOP_VERSION is past the release that stopped reading it.
+ */
+const NO_PRESENCE: {
+	userId: string;
+	name: string;
+	image: string | null;
+	lastSeenAt: Date;
+}[] = [];
 
 export const cloudWorkspaceRouter = {
 	...cloudWorkspaceRecordRouter,
+	sharing: cloudWorkspaceSharingRouter,
 
 	/**
 	 * Whether this account may use cloud workspaces. Clients decide their
@@ -191,7 +196,7 @@ export const cloudWorkspaceRouter = {
 	 */
 	available: jwtProcedure.query(async ({ ctx }) => {
 		try {
-			await assertCloudAccess(ctx);
+			await assertCloudAccess(ctx, ctx.activeOrganizationId ?? null);
 			return { available: true };
 		} catch {
 			return { available: false };
@@ -206,8 +211,8 @@ export const cloudWorkspaceRouter = {
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select({
 					workspace: cloudWorkspaces,
@@ -219,31 +224,19 @@ export const cloudWorkspaceRouter = {
 					and(
 						eq(cloudWorkspaces.organizationId, input.organizationId),
 						visibleTo(ctx.userId),
-						// Deleted rows are never a workspace you can open, so they
-						// are only listed when archived ones are asked for.
-						// Everything else is listed from the moment it is created:
-						// the client renders provisioning and failed rows off
-						// `status` rather than being told they don't exist yet.
-						input.archived
-							? and(
-									eq(cloudWorkspaces.status, "deleted"),
-									// Rows deleted before archiving existed have no deletedAt and no box.
-									isNotNull(cloudWorkspaces.deletedAt),
-								)
-							: ne(cloudWorkspaces.status, "deleted"),
+						isListed(input.archived),
 					),
 				)
 				.orderBy(desc(cloudWorkspaces.createdAt));
-			const presence = await loadPresence(
-				input.organizationId,
-				rows.map((r) => r.workspace.id),
+			const tagsByWorkspaceId = await loadCallerTags(
+				rows.map(({ workspace }) => workspace.id),
+				ctx.userId,
 			);
 			return rows.map(({ workspace, createdBy }) => ({
 				...workspace,
 				createdBy,
-				presence: presence
-					.filter((p) => p.cloudWorkspaceId === workspace.id)
-					.map(({ cloudWorkspaceId: _id, ...person }) => person),
+				presence: NO_PRESENCE,
+				tags: tagsByWorkspaceId.get(workspace.id) ?? [],
 			}));
 		}),
 
@@ -254,15 +247,15 @@ export const cloudWorkspaceRouter = {
 	repositories: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select({
 					cloudWorkspaceId: cloudWorkspaceRepositories.cloudWorkspaceId,
 					repositoryId: githubRepositories.id,
 					fullName: githubRepositories.fullName,
 					path: cloudWorkspaceRepositories.path,
-					hooksRepositoryId: environments.hooksRepositoryId,
+					primaryRepositoryId: environments.primaryRepositoryId,
 				})
 				.from(cloudWorkspaceRepositories)
 				.innerJoin(
@@ -289,15 +282,41 @@ export const cloudWorkspaceRouter = {
 				const own = rows.filter((r) => r.cloudWorkspaceId === workspaceId);
 				const primary = primaryRepository(
 					own.map((r) => ({ id: r.repositoryId, fullName: r.fullName })),
-					own[0]?.hooksRepositoryId,
+					own[0]?.primaryRepositoryId,
 				);
 				if (primary) primaryByWorkspace.set(workspaceId, primary.id);
 			}
-			return rows.map(({ hooksRepositoryId: _hooks, ...row }) => ({
+			return rows.map(({ primaryRepositoryId: _primary, ...row }) => ({
 				...row,
 				primary:
 					primaryByWorkspace.get(row.cloudWorkspaceId) === row.repositoryId,
 			}));
+		}),
+
+	pullRequests: jwtProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				archived: z.boolean().default(false),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
+			return listPullRequests(input.organizationId, ctx.userId, input.archived);
+		}),
+
+	machineSizes: jwtProcedure
+		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			assertMember(ctx.organizationIds, input.organizationId);
+			const { sizes, defaultSize } = await organizationMachineSizes(
+				input.organizationId,
+			);
+			return {
+				defaultSize,
+				sizes: sizes.map((name) => ({ name, ...machineSpec(name) })),
+			};
 		}),
 
 	listBranches: jwtProcedure
@@ -309,8 +328,8 @@ export const cloudWorkspaceRouter = {
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const [repo] = await loadRepositories({
 				organizationId: input.organizationId,
 				repositoryIds: [input.repositoryId],
@@ -330,10 +349,14 @@ export const cloudWorkspaceRouter = {
 				/** Omitted = the repo's default branch, resolved here — a client
 				 * whose branch query hadn't answered must not guess "main". */
 				branch: z.string().min(1).max(300).optional(),
-				/** One of the two: an environment, or a repository whose default
-				 * environment is used — made on first use when the organization
-				 * has none that checks the repository out. */
+				/** Required in practice; optional only while `repositoryId` is accepted. */
 				environmentId: z.string().uuid().optional(),
+				/**
+				 * @deprecated desktop 1.39.x sends this when no environment covers the
+				 * repository; the API then makes one. Newer clients send `environmentId`.
+				 * Remove with `ensureDefaultEnvironment` once MINIMUM_DESKTOP_VERSION
+				 * passes 1.39.x.
+				 */
 				repositoryId: z.string().uuid().optional(),
 				/**
 				 * A built-in agent to launch on first boot with `prompt`. Absent
@@ -353,11 +376,13 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
+				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				machineSize: z.enum(MACHINE_SIZES).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -396,6 +421,7 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: input.typedPrompt,
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
+				machineSize: input.machineSize,
 				...(input.agent
 					? {
 							launch: {
@@ -419,7 +445,8 @@ export const cloudWorkspaceRouter = {
 				createdBy: creator
 					? { userId: creator.id, name: creator.name, image: creator.image }
 					: null,
-				presence: [],
+				presence: NO_PRESENCE,
+				tags: [] as string[],
 			};
 		}),
 
@@ -452,6 +479,47 @@ export const cloudWorkspaceRouter = {
 		}),
 
 	/**
+	 * Replaces the caller's tag set on a workspace — the sidebar's folder
+	 * membership, the same contract as host-service `workspace.update`. Tags
+	 * are personal, so anyone who can see the workspace may file it, and only
+	 * their own rows move.
+	 */
+	setTags: jwtProcedure
+		.input(z.object({ id: z.string().uuid(), tags: workspaceTagsInputSchema }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			await dbWs.transaction(async (tx) => {
+				// One replace-set write at a time per (workspace, user): two
+				// that overlap would each delete past the other's insert and
+				// leave the union of both sets.
+				await tx.execute(
+					sql`select pg_advisory_xact_lock(hashtext(${`${row.id}:${ctx.userId}`}))`,
+				);
+				await tx
+					.delete(cloudWorkspaceTags)
+					.where(
+						and(
+							eq(cloudWorkspaceTags.cloudWorkspaceId, row.id),
+							eq(cloudWorkspaceTags.createdByUserId, ctx.userId),
+						),
+					);
+				if (input.tags.length > 0) {
+					await tx.insert(cloudWorkspaceTags).values(
+						input.tags.map((tag) => ({
+							cloudWorkspaceId: row.id,
+							tag,
+							createdByUserId: ctx.userId,
+						})),
+					);
+				}
+			});
+			// Tags are personal, but the caller's other windows learn of the
+			// change only through the organization channel.
+			nudge(row.organizationId, "cloud_workspaces");
+			return { ...row, tags: input.tags };
+		}),
+
+	/**
 	 * Checks org membership, then mints the tickets for this workspace's ports.
 	 *
 	 * This is the *only* gate. A sandbox's ports are public URLs; the gate
@@ -475,47 +543,6 @@ export const cloudWorkspaceRouter = {
 				row,
 				input.wake ? "wake" : "address",
 			);
-			// Only the open workspace wakes; addressing a listed one is not
-			// being in it.
-			// Presence is a hint; this call is also the sandbox keepalive.
-			if (input.wake) {
-				try {
-					const [visit] = await db
-						.insert(cloudWorkspacePresence)
-						.values({ cloudWorkspaceId: row.id, userId: ctx.userId })
-						.onConflictDoUpdate({
-							target: [
-								cloudWorkspacePresence.cloudWorkspaceId,
-								cloudWorkspacePresence.userId,
-							],
-							set: { lastSeenAt: new Date() },
-						})
-						.returning({ firstVisit: sql<boolean>`xmax = 0` });
-					if (visit?.firstVisit && ctx.userId !== row.createdByUserId) {
-						await recordCloudWorkspaceActivity(
-							db,
-							row.id,
-							{ kind: "user", userId: ctx.userId },
-							{ event: "joined" },
-						);
-					}
-					nudge(row.organizationId, "cloud_workspaces", {
-						kind: "cloud_workspaces",
-						workspaceId: row.id,
-						presence: (await loadPresence(row.organizationId, [row.id])).map(
-							({ cloudWorkspaceId: _id, lastSeenAt, ...person }) => ({
-								...person,
-								lastSeenAt: lastSeenAt.getTime(),
-							}),
-						),
-					});
-				} catch (error) {
-					console.error(
-						`[cloud-workspace] ${row.id} presence write failed`,
-						error,
-					);
-				}
-			}
 			const host = await mintSandboxGateAccess({
 				workspaceId: row.id,
 				userId: ctx.userId,
@@ -638,6 +665,9 @@ export const cloudWorkspaceRouter = {
 					{ fromVisibility: row.visibility, toVisibility: input.visibility },
 				);
 			}
+			if (input.visibility !== row.visibility) {
+				pushWorkspaceAccess(row.organizationId, row.id);
+			}
 			nudge(row.organizationId, "cloud_workspaces");
 			return { visibility: input.visibility };
 		}),
@@ -649,9 +679,11 @@ export const cloudWorkspaceRouter = {
 				where: eq(cloudWorkspaces.id, input.id),
 			});
 			if (!row) return { deleted: false };
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, row.organizationId);
-			if (!isVisibleTo(row, ctx.userId)) return { deleted: false };
+			await assertCloudAccess(ctx, row.organizationId);
+			if (!(await canOpenWorkspace(row, ctx.userId))) {
+				return { deleted: false };
+			}
 
 			const archivedAt = new Date();
 			// From any state, provisioning included: the job checks the row

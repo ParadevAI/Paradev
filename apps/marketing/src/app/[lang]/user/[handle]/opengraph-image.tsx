@@ -1,4 +1,4 @@
-import { COMPANY } from "@superset/shared/constants";
+import { BRAND } from "@superset/shared/brand";
 import { ImageResponse } from "next/og";
 import { fetchParticipant } from "@/app/[lang]/utils/fetchLeaderboard";
 import { formatTokens, formatUsd } from "@/app/[lang]/utils/formatUsage";
@@ -6,11 +6,11 @@ import { getInterBold } from "../../utils/getInterBold";
 import { OgStat } from "./components/OgStat";
 import { OG_BG, OG_BRAND, OG_DIM } from "./constants";
 
-export const alt = "Superset leaderboard profile";
+export const alt = `${BRAND.NAME} leaderboard profile`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const COMPANY_LABEL = `${COMPANY.NAME.toUpperCase()} LEADERBOARD`;
+const COMPANY_LABEL = `${BRAND.NAME.toUpperCase()} LEADERBOARD`;
 
 export default async function Image({
 	params,

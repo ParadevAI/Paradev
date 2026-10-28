@@ -38,7 +38,7 @@ const renderBootError = (message: string, error?: unknown) => {
 	inner.style.textAlign = "center";
 
 	const title = document.createElement("div");
-	title.textContent = "Superset failed to start";
+	title.textContent = "Paradev failed to start";
 	title.style.fontSize = "18px";
 	title.style.marginBottom = "8px";
 

@@ -6,7 +6,7 @@ import type { Theme } from "../types";
 export const lightTheme: Theme = {
 	id: "light",
 	name: "Light",
-	author: "Superset",
+	author: "Paradev",
 	type: "light",
 	isBuiltIn: true,
 

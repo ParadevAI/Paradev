@@ -31,6 +31,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { HelpSubMenu } from "./components/HelpSubMenu";
+import { PauseNotificationsSubMenu } from "./components/PauseNotificationsSubMenu";
 import { SubmitPromptDialog } from "./components/SubmitPromptDialog";
 
 export function OrganizationDropdown({
@@ -221,6 +222,8 @@ export function OrganizationDropdown({
 							<Trans>New window</Trans>
 						</span>
 					</DropdownMenuItem>
+
+					<PauseNotificationsSubMenu />
 
 					<HelpSubMenu onSubmitPrompt={() => setSubmitPromptOpen(true)} />
 

@@ -1,7 +1,13 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { rawErrorMessage } from "@superset/i18n/errors";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
+import {
+	archiveOnHost,
+	type DeleteReport,
+	reportHostOutcomes,
+} from "./archiveOnHost";
 
 export default command({
 	description:
@@ -27,20 +33,40 @@ export default command({
 		if (!hostId) {
 			const archived: string[] = [];
 			const missing: string[] = [];
+			const failed: DeleteReport["failed"] = [];
 			for (const id of ids) {
-				const result = await ctx.api.cloudWorkspace.delete.mutate({ id });
-				(result.deleted ? archived : missing).push(id);
+				try {
+					const result = await ctx.api.cloudWorkspace.delete.mutate({ id });
+					(result.deleted ? archived : missing).push(id);
+				} catch (error) {
+					failed.push({ id, reason: rawErrorMessage(error) });
+				}
 			}
-			if (missing.length > 0) {
+			const data: DeleteReport = {
+				deleted: archived,
+				notFound: missing,
+				failed,
+				warnings: [],
+			};
+			if (missing.length > 0 || failed.length > 0) {
+				const lines = [
+					...(missing.length > 0
+						? [`No cloud workspace in this organization: ${missing.join(", ")}`]
+						: []),
+					...failed.map(({ id, reason }) => `Failed: ${id}: ${reason}`),
+				];
 				const alsoArchived =
 					archived.length > 0 ? ` (archived: ${archived.join(", ")})` : "";
 				throw new CLIError(
-					`No cloud workspace in this organization: ${missing.join(", ")}${alsoArchived}`,
-					"Pass --local or --host <id> if it lives on a machine",
+					`${lines.join("\n")}${alsoArchived}`,
+					missing.length > 0
+						? "Pass --local or --host <id> if it lives on a machine"
+						: undefined,
+					data,
 				);
 			}
 			return {
-				data: { deleted: archived },
+				data,
 				message:
 					archived.length === 1
 						? `Archived cloud workspace ${archived[0]}`
@@ -55,26 +81,9 @@ export default command({
 			api: ctx.api,
 		});
 
-		const archived: string[] = [];
-		const warnings: string[] = [];
-		for (const id of ids) {
-			const result = await target.client.workspace.delete.mutate({ id });
-			archived.push(id);
-			for (const warning of result.warnings ?? []) {
-				warnings.push(`${id}: ${warning}`);
-			}
-		}
-
-		const archiveMessage =
-			archived.length === 1
-				? `Archived workspace ${archived[0]}`
-				: `Archived ${archived.length} workspaces`;
-		return {
-			data: { deleted: archived, warnings },
-			message:
-				warnings.length > 0
-					? `${archiveMessage}\nWarnings:\n${warnings.map((warning) => `- ${warning}`).join("\n")}`
-					: archiveMessage,
-		};
+		return reportHostOutcomes(
+			await archiveOnHost(target.client, ids),
+			target.hostId,
+		);
 	},
 });

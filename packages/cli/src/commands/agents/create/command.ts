@@ -1,5 +1,5 @@
 import { boolean, CLIError, number, string } from "@superset/cli-framework";
-import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/terminal-session-handoff";
+import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/session-handoff";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
 import { buildHandoffPromptFromTerminal } from "../../../lib/terminal-handoff";
@@ -16,7 +16,7 @@ export default command({
 		agent: string()
 			.required()
 			.desc(
-				"Agent preset id (e.g. `claude`), HostAgentConfig instance UUID, or `superset` for a Superset session",
+				"Agent preset id (e.g. `claude`), HostAgentConfig instance UUID, or `superset` for a Paradev session",
 			),
 		prompt: string().desc(
 			"Prompt sent to the agent (required unless resuming, forking, or handing off a session)",

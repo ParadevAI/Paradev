@@ -84,7 +84,6 @@ interface TerminalComposerProps {
 	/** How much room the composer takes above the safe area, so the terminal can
 	 *  inset for an overlay it cannot measure. */
 	onHeightChange?: (height: number) => void;
-	onEdgeChange?: (inset: number) => void;
 	/** Terminal select mode: swaps the quick keys for Copy Selection. */
 	selectActive: boolean;
 	selectHasSelection: boolean;
@@ -132,7 +131,6 @@ export const TerminalComposer = forwardRef<
 		onQuickKeysActionPress,
 		onActiveChange,
 		onHeightChange,
-		onEdgeChange,
 		selectActive,
 		selectHasSelection,
 		onCopySelection,
@@ -346,7 +344,6 @@ export const TerminalComposer = forwardRef<
 				onDraftChange={draft.setText}
 				onRemoveAttachment={(id) => draft.remove(id)}
 				onHeightChange={onHeightChange}
-				onEdgeChange={onEdgeChange}
 				onExpandedChange={(expanded) => {
 					wasExpanded.current = expanded;
 					onActiveChange?.(expanded);

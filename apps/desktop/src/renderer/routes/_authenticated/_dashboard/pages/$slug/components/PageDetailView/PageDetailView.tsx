@@ -3,8 +3,8 @@ import { Button } from "@superset/ui/button";
 import {
 	CommentModeButton,
 	PageHeader as PageTitleBar,
-	PageViewers,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { Spinner } from "@superset/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
@@ -38,6 +38,8 @@ export function PageDetailView({
 		onRename,
 		onRefresh,
 		onDelete,
+		sharing,
+		canComment,
 	} = usePageHeaderData({ slug, version: previewVersion });
 
 	const goBack = () => navigate({ to: "/pages" });
@@ -73,18 +75,21 @@ export function PageDetailView({
 						leading={backButton}
 						trailing={
 							<>
-								<PageViewers pageId={page.id} className="mr-1" />
-								<CommentModeButton
-									enabled={commentsEnabled}
-									openCount={
-										threads.filter((thread) => !thread.resolved).length
-									}
-									onToggle={() => setCommentsEnabled(!commentsEnabled)}
-								/>
+								<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
+								{canComment ? (
+									<CommentModeButton
+										enabled={commentsEnabled}
+										openCount={
+											threads.filter((thread) => !thread.resolved).length
+										}
+										onToggle={() => setCommentsEnabled(!commentsEnabled)}
+									/>
+								) : null}
 							</>
 						}
 						onSetVisibility={onSetVisibility}
 						onSetSharedVersion={onSetSharedVersion}
+						sharing={sharing}
 						onRename={onRename}
 						onRefresh={onRefresh}
 						onPreviewVersion={setPreviewVersion}
@@ -114,7 +119,7 @@ export function PageDetailView({
 					key={slug}
 					slug={slug}
 					version={previewVersion}
-					commentsEnabled={commentsEnabled}
+					commentsEnabled={commentsEnabled && canComment}
 					onCommentsEnabledChange={setCommentsEnabled}
 					initialThreadId={initialThreadId}
 					initialPanelOpen={initialPanelOpen}

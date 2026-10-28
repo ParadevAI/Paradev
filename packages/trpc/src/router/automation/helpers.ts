@@ -312,6 +312,7 @@ export const automationBaseColumns = {
 	environmentId: automations.environmentId,
 	tags: automations.tags,
 	continueAgentSession: automations.continueAgentSession,
+	machineSize: automations.machineSize,
 	enabled: automations.enabled,
 	createdAt: automations.createdAt,
 	updatedAt: automations.updatedAt,
