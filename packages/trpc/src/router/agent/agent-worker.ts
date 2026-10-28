@@ -1,5 +1,11 @@
 import { db } from "@superset/db/client";
-import { agentSessions, agents, agentTurns } from "@superset/db/schema";
+import {
+	agentSessions,
+	agents,
+	agentTurns,
+	channelMessages,
+	channels,
+} from "@superset/db/schema";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
@@ -11,6 +17,7 @@ import {
 } from "../../lib/agent-turn/turn-token";
 import { workerProcedure } from "../../trpc";
 import { announceAgentChanged } from "./agents-changed";
+import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
@@ -26,6 +33,27 @@ async function sessionStoreFor(sessionId: string) {
 			scope: "write",
 			exp: Math.floor(Date.now() / 1000) + TURN_TOKEN_TTL_SECONDS,
 		}),
+	};
+}
+
+/** Where an answer to a message goes: its thread in a channel, or the DM itself. */
+async function replyRoomOf(messageId: string) {
+	const [row] = await db
+		.select({
+			id: channelMessages.id,
+			channelId: channelMessages.channelId,
+			threadRootId: channelMessages.threadRootId,
+			kind: channels.kind,
+		})
+		.from(channelMessages)
+		.innerJoin(channels, eq(channels.id, channelMessages.channelId))
+		.where(eq(channelMessages.id, messageId))
+		.limit(1);
+	if (!row) return null;
+	return {
+		channelId: row.channelId,
+		threadRootId:
+			row.kind === "dm" ? row.threadRootId : (row.threadRootId ?? row.id),
 	};
 }
 
@@ -73,8 +101,13 @@ export const agentWorkerRouter = {
 					organizationId: agentTurns.organizationId,
 					actingUserId: agentTurns.actingUserId,
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
-					channelId: agentSessions.channelId,
-					threadRootId: agentSessions.threadRootId,
+					kind: agentSessions.kind,
+					role: agentSessions.role,
+					title: agentSessions.title,
+					devName: agents.name,
+					devDescription: agents.description,
+					devInstructions: agents.instructions,
+					triggerMessageId: agentTurns.triggerMessageId,
 				})
 				.from(agentTurns)
 				.innerJoin(agents, eq(agents.id, agentTurns.agentId))
@@ -94,17 +127,31 @@ export const agentWorkerRouter = {
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
-			const {
-				channelId,
-				threadRootId,
-				cloudWorkspaceId: _,
-				...identity
-			} = turn;
+			const identity = {
+				turnId: turn.turnId,
+				sessionId: turn.sessionId,
+				agentId: turn.agentId,
+				organizationId: turn.organizationId,
+				actingUserId: turn.actingUserId,
+			};
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),
 				host: access?.host ?? null,
 				model: access ? { headers: access.modelHeaders } : null,
-				room: channelId ? { channelId, threadRootId } : null,
+				room:
+					turn.kind === "main" && turn.triggerMessageId
+						? await replyRoomOf(turn.triggerMessageId)
+						: null,
+				dev: {
+					name: turn.devName,
+					description: turn.devDescription,
+					instructions: turn.devInstructions,
+				},
+				session: { kind: turn.kind, role: turn.role, title: turn.title },
+				tools:
+					turn.kind === "main"
+						? { mcpUrl: `${env.NEXT_PUBLIC_API_URL}/mcp/agent` }
+						: null,
 				agentToken: await signTurnToken(
 					env.AGENT_TURN_SIGNING_SECRET,
 					identity,
@@ -174,6 +221,7 @@ export const agentWorkerRouter = {
 					id: turn.agentId,
 					organizationId: turn.organizationId,
 				});
+				await afterTaskTurn(turnId);
 				return {
 					settled: true,
 					sessionStore: await sessionStoreFor(turn.sessionId),
@@ -187,6 +235,8 @@ export const agentWorkerRouter = {
 				id: settled.agentId,
 				organizationId: settled.organizationId,
 			});
+			// A retried settle runs this again; the parent hears each turn once.
+			await afterTaskTurn(turnId);
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),
