@@ -1,12 +1,27 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
+import { workspaceTrpc } from "@superset/workspace-client";
 import { CircleDot, GitPullRequest } from "lucide-react";
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../../../../../utils/githubWorkItem";
-import { GithubWorkItemHoverCard } from "../../../../../../../GithubWorkItemHoverCard";
+import {
+	GithubWorkItemHoverCard,
+	type GithubWorkItemTone,
+	githubWorkItemTone,
+} from "../../../../../../../GithubWorkItemHoverCard";
 import { LinkMenu } from "../../../../../../../LinkMenu";
 
-/** A pull request or issue someone pasted, as a small coloured chip. */
+const TONE_CHIP: Record<GithubWorkItemTone, string> = {
+	neutral: "bg-foreground/[0.07] text-foreground/60",
+	open: "bg-emerald-400/10 text-emerald-400/90",
+	done: "bg-violet-400/10 text-violet-400/90",
+	closed: "bg-rose-400/10 text-rose-400/90",
+};
+
+/**
+ * A pull request or issue someone pasted, as a small chip. It stays neutral
+ * until the hover card has read the state, so its colour never guesses.
+ */
 export function GithubWorkItemChip({
 	link,
 	url,
@@ -17,6 +32,16 @@ export function GithubWorkItemChip({
 	const { t } = useLingui();
 	const { openLink } = useChatPaneActions();
 	const pr = link.kind === "pr";
+	const { data: item } = workspaceTrpc.github.getWorkItem.useQuery(
+		{
+			owner: link.owner,
+			repo: link.repo,
+			kind: link.kind,
+			number: link.number,
+		},
+		{ enabled: false },
+	);
+	const tone = githubWorkItemTone(link.kind, item ?? null);
 	const label = pr
 		? t({ message: `PR #${link.number}` })
 		: t({ message: `Issue #${link.number}` });
@@ -37,9 +62,7 @@ export function GithubWorkItemChip({
 					<span
 						className={cn(
 							"inline-flex h-[18px] shrink-0 items-center gap-0.5 rounded-[6px] px-1.5 font-medium text-xs leading-4",
-							pr
-								? "bg-violet-400/10 text-violet-400/90"
-								: "bg-emerald-400/10 text-emerald-400/90",
+							TONE_CHIP[tone],
 						)}
 					>
 						<Icon aria-hidden="true" className="size-3" />

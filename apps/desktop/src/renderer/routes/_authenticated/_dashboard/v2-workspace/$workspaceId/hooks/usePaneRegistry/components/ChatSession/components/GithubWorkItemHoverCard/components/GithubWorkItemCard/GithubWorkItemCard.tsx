@@ -3,8 +3,9 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { cn } from "@superset/ui/utils";
 import {
+	CircleCheck,
 	CircleDot,
-	CircleX,
+	CircleSlash,
 	GitCompare,
 	GitMerge,
 	GitPullRequest,
@@ -19,6 +20,7 @@ export type GithubWorkItemGlance = {
 	title: string;
 	state: "open" | "closed" | "merged";
 	draft: boolean;
+	stateReason: string | null;
 	summary: string;
 	author: { login: string; avatarUrl: string | null } | null;
 	baseRefName: string | null;
@@ -45,6 +47,29 @@ const STATE_LABELS = {
 	open: msg({ message: "Open", context: "pull request or issue state" }),
 };
 
+export type GithubWorkItemTone = "neutral" | "open" | "done" | "closed";
+
+const TONE_TEXT: Record<GithubWorkItemTone, string> = {
+	neutral: "text-foreground/50",
+	open: "text-emerald-400/90",
+	done: "text-violet-400/90",
+	closed: "text-rose-400/90",
+};
+
+/** The colour GitHub shows for a pull request or issue in this state. */
+export function githubWorkItemTone(
+	kind: GithubWorkItemLink["kind"],
+	item: Pick<GithubWorkItemGlance, "state" | "draft" | "stateReason"> | null,
+): GithubWorkItemTone {
+	if (!item || item.draft) return "neutral";
+	if (item.state === "open") return "open";
+	if (item.state === "merged") return "done";
+	if (kind === "pr") return "closed";
+	return item.stateReason === "not_planned" || item.stateReason === "duplicate"
+		? "neutral"
+		: "done";
+}
+
 function statusOf(
 	kind: GithubWorkItemLink["kind"],
 	item: GithubWorkItemGlance | null,
@@ -53,38 +78,34 @@ function statusOf(
 	label: (typeof STATE_LABELS)[keyof typeof STATE_LABELS];
 	className: string;
 } {
+	const tone = githubWorkItemTone(kind, item);
+	const className = TONE_TEXT[tone];
 	if (!item) {
 		return {
 			Icon: kind === "pr" ? GitPullRequest : CircleDot,
 			label: kind === "pr" ? STATE_LABELS.pr : STATE_LABELS.issue,
-			className: "text-foreground/50",
+			className,
 		};
 	}
 	if (item.draft) {
-		return {
-			Icon: GitPullRequestDraft,
-			label: STATE_LABELS.draft,
-			className: "text-foreground/50",
-		};
+		return { Icon: GitPullRequestDraft, label: STATE_LABELS.draft, className };
 	}
 	if (item.state === "merged") {
-		return {
-			Icon: GitMerge,
-			label: STATE_LABELS.merged,
-			className: "text-violet-400/90",
-		};
+		return { Icon: GitMerge, label: STATE_LABELS.merged, className };
 	}
 	if (item.state === "closed") {
-		return {
-			Icon: kind === "pr" ? GitPullRequestClosed : CircleX,
-			label: STATE_LABELS.closed,
-			className: "text-rose-400/90",
-		};
+		const Icon =
+			kind === "pr"
+				? GitPullRequestClosed
+				: tone === "done"
+					? CircleCheck
+					: CircleSlash;
+		return { Icon, label: STATE_LABELS.closed, className };
 	}
 	return {
 		Icon: kind === "pr" ? GitPullRequest : CircleDot,
 		label: STATE_LABELS.open,
-		className: "text-emerald-400/90",
+		className,
 	};
 }
 

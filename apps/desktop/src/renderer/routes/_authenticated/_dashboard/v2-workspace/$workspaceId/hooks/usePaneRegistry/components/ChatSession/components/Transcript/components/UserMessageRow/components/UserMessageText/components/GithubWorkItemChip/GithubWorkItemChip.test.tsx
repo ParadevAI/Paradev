@@ -78,7 +78,7 @@ test("a pull request chip asks for details only when the pointer or focus arrive
 	const { asked, chip } = renderChip(() => ITEM);
 	expect(chip.textContent).toBe("PR #8329");
 	expect(chip.title).toBe(URL_PR);
-	expect(chip.querySelector("span")?.className).toContain("violet");
+	expect(chip.querySelector("span")?.className).toContain("text-foreground");
 	expect(asked).toEqual([]);
 
 	chip.focus();
@@ -94,9 +94,19 @@ test("a pull request chip asks for details only when the pointer or focus arrive
 	expect(card.textContent).toContain("desktop");
 	expect(card.textContent).toContain("AviPeltz");
 	expect(card.textContent).toContain("Updated");
+	expect(chip.querySelector("span")?.className).toContain("violet");
 });
 
-test("an issue chip is green, and a lookup that fails still leaves the link usable", async () => {
+test("an open pull request chip turns green, not the merged purple", async () => {
+	const { chip } = renderChip(() => ({ ...ITEM, state: "open" }));
+	chip.focus();
+	await screen.findByText("feat(chat): load whole sessions");
+	const className = chip.querySelector("span")?.className;
+	expect(className).toContain("emerald");
+	expect(className).not.toContain("violet");
+});
+
+test("a chip with an unknown state stays neutral, and the link still opens", async () => {
 	const openLink = mock<OpenLink>(() => true);
 	const { chip } = renderChip(
 		() => {
@@ -106,7 +116,7 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 		openLink,
 	);
 	expect(chip.textContent).toBe("Issue #42");
-	expect(chip.querySelector("span")?.className).toContain("emerald");
+	expect(chip.querySelector("span")?.className).toContain("text-foreground");
 
 	chip.focus();
 	expect(
@@ -114,6 +124,8 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 			"Details are not available here, but the link still opens.",
 		),
 	).toBeTruthy();
+
+	expect(chip.querySelector("span")?.className).toContain("text-foreground");
 
 	fireEvent.click(chip);
 	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_PR]);
