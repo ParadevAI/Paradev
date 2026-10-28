@@ -24,6 +24,7 @@ export function NewTabPullRequestRow({
 				...counts,
 			}}
 			onOpen={onOpen}
+			fullWidth
 		/>
 	);
 }
