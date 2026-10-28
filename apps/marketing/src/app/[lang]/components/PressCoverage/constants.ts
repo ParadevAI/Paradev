@@ -10,7 +10,7 @@ export interface PressArticle {
 	url: string;
 	/** Publication date, YYYY-MM-DD. */
 	date: string;
-	/** Shown at the top, with its preview image. Keep this to four to six articles. */
+	/** Shown on the media kit page. Keep this to four to six articles; /press shows them all. */
 	featured?: boolean;
 }
 
