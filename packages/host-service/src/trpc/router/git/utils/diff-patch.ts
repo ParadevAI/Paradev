@@ -284,6 +284,13 @@ export interface DiffPatchRequest extends GitSpawnOptions {
 	maxBytes?: number;
 }
 
+export interface DiffPatch {
+	patch: string;
+	/** The bound cut the patch short, so a file missing from it may still
+	 * have changes. */
+	truncated: boolean;
+}
+
 /** One patch covering a whole category, plus a section per untracked file,
  * bounded by `maxBytes`. The renderer parses this into per-file metadata
  * (`parsePatchFiles`) and fetches full contents later, only for files
@@ -298,7 +305,7 @@ export async function buildDiffPatch({
 	untrackedPaths,
 	ignoreWhitespace = false,
 	maxBytes = MAX_PATCH_BYTES,
-}: DiffPatchRequest): Promise<string> {
+}: DiffPatchRequest): Promise<DiffPatch> {
 	const budget = new PatchBudget(maxBytes);
 	const options = { cwd, env };
 	const args = diffArgsForCategory(category, refs, ignoreWhitespace);
@@ -324,13 +331,15 @@ export async function buildDiffPatch({
 		: [];
 
 	const sections = [tracked, ...untracked];
-	if (sections.some((section) => section.truncated)) {
+	const truncated = sections.some((section) => section.truncated);
+	if (truncated) {
 		console.warn(
 			`[git/getDiffPatch] ${cwd}: patch reached the ${maxBytes} byte bound; files past the cut render as placeholders`,
 		);
 	}
-	return sections
+	const patch = sections
 		.map((section) => section.patch)
 		.filter(Boolean)
 		.join("");
+	return { patch, truncated };
 }
