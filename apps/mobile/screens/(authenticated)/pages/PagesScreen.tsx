@@ -3,9 +3,10 @@ import { useLingui } from "@lingui/react/macro";
 import * as Haptics from "expo-haptics";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { RefreshControl, useWindowDimensions, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { useWideLayout } from "@/hooks/useWideLayout";
 import { PageRow } from "./components/PageRow";
 import { type OrgPage, usePagesQuery } from "./hooks/usePages";
 import { type PageScope, usePagesFilterStore } from "./stores/pagesFilterStore";
@@ -35,8 +36,8 @@ export function PagesScreen() {
 		setRefreshing(false);
 	}, [pages]);
 
-	const { width } = useWindowDimensions();
-	const columns = width >= 1024 ? 3 : width >= 640 ? 2 : 1;
+	const { contentWidth } = useWideLayout();
+	const columns = contentWidth >= 1024 ? 3 : contentWidth >= 640 ? 2 : 1;
 
 	const renderItem = useCallback(
 		({ item }: { item: OrgPage }) => (
