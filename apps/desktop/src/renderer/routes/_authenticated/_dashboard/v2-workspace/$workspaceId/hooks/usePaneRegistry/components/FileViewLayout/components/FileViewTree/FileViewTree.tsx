@@ -4,8 +4,6 @@ import { FilesTab } from "../../../../../../components/WorkspaceSidebar/componen
 import { useWorkspaceGitStatus } from "../../../../../../providers/WorkspaceGitStatusProvider";
 import type { FilePaneData, PaneViewerData } from "../../../../../../types";
 import { openFileFromTree } from "../../../../../../utils/openFileFromTree";
-import { FileOpenInButton } from "../../../FileOpenInButton";
-import { FileTreeToggle } from "../../../FileTreeToggle";
 import { RepoPicker } from "./components/RepoPicker";
 
 interface FileViewTreeProps {
@@ -58,17 +56,6 @@ export function FileViewTree({
 			<div className="min-h-0 flex-1">
 				<FilesTab
 					variant="fileView"
-					trailingActions={
-						<>
-							{selectedFilePath && (
-								<FileOpenInButton
-									workspaceId={workspaceId}
-									filePath={selectedFilePath}
-								/>
-							)}
-							<FileTreeToggle />
-						</>
-					}
 					onSelectFile={handleSelectFile}
 					onPinFile={handlePinFile}
 					selectedFilePath={selectedFilePath}

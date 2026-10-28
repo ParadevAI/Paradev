@@ -25,13 +25,7 @@ import {
 	RefreshCw,
 	Search,
 } from "lucide-react";
-import {
-	type ReactNode,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGitStatusMap } from "renderer/hooks/host-service/useGitStatusMap";
 import {
 	ShadowClickHint,
@@ -74,9 +68,8 @@ interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** Double-clicking a file pins it instead of renaming it. */
 	onPinFile?: (absolutePath: string) => void;
-	/** "fileView": icon-only actions, no New File/Folder, `trailingActions` at the end. */
+	/** "fileView" drops New File/New Folder; the context menus have them. */
 	variant?: "sidebar" | "fileView";
-	trailingActions?: ReactNode;
 	selectedFilePath?: string;
 	pendingReveal?: {
 		path: string;
@@ -91,7 +84,6 @@ export function FilesTab({
 	onSelectFile,
 	onPinFile,
 	variant = "sidebar",
-	trailingActions,
 	selectedFilePath,
 	pendingReveal,
 	workspaceId,
@@ -401,45 +393,21 @@ export function FilesTab({
 							data-file-tree-header="true"
 							className="group flex h-10 items-center gap-1 bg-background px-2"
 						>
-							{variant === "fileView" ? (
-								<>
-									{onSearch && (
-										<FilesTabHeaderButton
-											icon={Search}
-											label={t({ message: "Search files" })}
-											onClick={onSearch}
-										/>
-									)}
-									<FilesTabHeaderButton
-										icon={RefreshCw}
-										label={t({ message: "Refresh" })}
-										loading={bridge.isRefreshing}
-										onClick={() => void bridge.doRefresh()}
-									/>
-									<FilesTabHeaderButton
-										icon={FoldVertical}
-										label={t({ message: "Collapse All" })}
-										onClick={collapseAll}
-									/>
-									<div className="ml-auto flex items-center gap-1">
-										{trailingActions}
-									</div>
-								</>
-							) : (
-								<>
-									{onSearch && (
-										<button
-											type="button"
-											onClick={onSearch}
-											className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-										>
-											<Search className="size-3.5 shrink-0" />
-											<span className="truncate">
-												<Trans>Search files</Trans>
-											</span>
-										</button>
-									)}
-									<div className="ml-auto flex items-center gap-0.5">
+							{onSearch && (
+								<button
+									type="button"
+									onClick={onSearch}
+									className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+								>
+									<Search className="size-3.5 shrink-0" />
+									<span className="truncate">
+										<Trans>Search files</Trans>
+									</span>
+								</button>
+							)}
+							<div className="ml-auto flex items-center gap-0.5">
+								{variant !== "fileView" && (
+									<>
 										<FilesTabHeaderButton
 											icon={FilePlus}
 											label={t({
@@ -454,24 +422,24 @@ export function FilesTab({
 											})}
 											onClick={() => void startCreating("folder")}
 										/>
-										<FilesTabHeaderButton
-											icon={RefreshCw}
-											label={t({
-												message: "Refresh",
-											})}
-											loading={bridge.isRefreshing}
-											onClick={() => void bridge.doRefresh()}
-										/>
-										<FilesTabHeaderButton
-											icon={FoldVertical}
-											label={t({
-												message: "Collapse All",
-											})}
-											onClick={collapseAll}
-										/>
-									</div>
-								</>
-							)}
+									</>
+								)}
+								<FilesTabHeaderButton
+									icon={RefreshCw}
+									label={t({
+										message: "Refresh",
+									})}
+									loading={bridge.isRefreshing}
+									onClick={() => void bridge.doRefresh()}
+								/>
+								<FilesTabHeaderButton
+									icon={FoldVertical}
+									label={t({
+										message: "Collapse All",
+									})}
+									onClick={collapseAll}
+								/>
+							</div>
 						</div>
 					}
 					renderContextMenu={renderContextMenu}
