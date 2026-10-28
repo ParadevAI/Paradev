@@ -1,5 +1,5 @@
 import { isLiquidGlassAvailable } from "expo-glass-effect";
-import type { NativeStackNavigationOptions } from "expo-router/build/react-navigation/native-stack";
+import type { NativeStackNavigationOptions } from "expo-router";
 import { createElement, type ReactElement } from "react";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

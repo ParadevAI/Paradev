@@ -6,6 +6,7 @@ import * as Clipboard from "expo-clipboard";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FileDiff } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActionSheetIOS,
 	ActivityIndicator,
@@ -319,7 +320,7 @@ export function FilesChangedScreen() {
 	}, [contentWidths.maxOffset, maxScrollX, scrollX]);
 
 	const panStartX = useRef(0);
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create({
