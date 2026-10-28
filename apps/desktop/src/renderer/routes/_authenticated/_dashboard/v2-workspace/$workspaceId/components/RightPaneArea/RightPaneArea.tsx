@@ -90,9 +90,9 @@ export function RightPaneArea({
 				renameTabs={false}
 				isPreviewTab={isPreviewTab}
 				onTabClick={(tab) => {
+					if (!isPreviewTab(tab)) return;
 					for (const pane of Object.values(tab.panes)) {
-						if (!pane.pinned)
-							store.getState().setPanePinned({ paneId: pane.id, pinned: true });
+						store.getState().setPanePinned({ paneId: pane.id, pinned: true });
 					}
 				}}
 				renderTabAccessory={(tab) => (

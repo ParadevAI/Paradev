@@ -69,7 +69,6 @@ interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** Double-clicking a file pins it instead of renaming it. */
 	onPinFile?: (absolutePath: string) => void;
-	/** "fileView" shows the search as a pill. */
 	variant?: "sidebar" | "fileView";
 	selectedFilePath?: string;
 	pendingReveal?: {

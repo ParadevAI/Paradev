@@ -2,11 +2,6 @@ import type { WorkspaceStore } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { FilePaneData, PaneViewerData } from "../../types";
 
-/**
- * Opens a file from a file view's tree. A plain open goes to the preview tab,
- * which the next plain open replaces; `pin` opens it as a tab that stays.
- * Opening from the empty Files view turns that view into the file.
- */
 export function openFileFromTree({
 	store,
 	filePath,
@@ -41,7 +36,12 @@ export function openFileFromTree({
 	}
 
 	const data: FilePaneData = { filePath, mode: "editor" };
-	const newPane = { kind: "file", pinned: pin || undefined, data };
+	const newPane = {
+		id: crypto.randomUUID(),
+		kind: "file",
+		pinned: pin || undefined,
+		data,
+	};
 	const source = sourcePaneId ? state.getPane(sourcePaneId) : null;
 	const sourceTab = source ? state.getTab(source.tabId) : null;
 	if (
@@ -53,7 +53,7 @@ export function openFileFromTree({
 			paneId: source.pane.id,
 			newPane,
 		});
-		if (pin) state.focusPane(state.getActivePane(source.tabId)?.pane.id ?? "");
+		if (pin) state.focusPane(newPane.id);
 		return;
 	}
 

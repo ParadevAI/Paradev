@@ -26,21 +26,13 @@ export function FileViewTree({
 			: undefined;
 
 	const handleSelectFile = useCallback(
-		(filePath: string, openInNewTab?: boolean) => {
-			if (openInNewTab) {
-				store.getState().addTab({
-					panes: [
-						{
-							kind: "file",
-							pinned: true,
-							data: { filePath, mode: "editor" } as FilePaneData,
-						},
-					],
-				});
-				return;
-			}
-			openFileFromTree({ store, filePath, sourcePaneId: paneId });
-		},
+		(filePath: string, openInNewTab?: boolean) =>
+			openFileFromTree({
+				store,
+				filePath,
+				sourcePaneId: paneId,
+				pin: openInNewTab,
+			}),
 		[store, paneId],
 	);
 

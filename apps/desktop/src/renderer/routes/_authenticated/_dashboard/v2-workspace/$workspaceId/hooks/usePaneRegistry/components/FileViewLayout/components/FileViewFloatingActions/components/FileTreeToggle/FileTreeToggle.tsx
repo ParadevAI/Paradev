@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { LuFolderTree } from "react-icons/lu";
-import { useFileTreeVisibilityStore } from "../../../../state/fileTreeVisibilityStore";
+import { useFileTreeVisibilityStore } from "../../../../../../../../state/fileTreeVisibilityStore";
 
 export function FileTreeToggle() {
 	const { t } = useLingui();

@@ -1,5 +1,5 @@
 import { FileOpenInButton } from "../../../FileOpenInButton";
-import { FileTreeToggle } from "../../../FileTreeToggle";
+import { FileTreeToggle } from "./components/FileTreeToggle";
 
 interface FileViewFloatingActionsProps {
 	workspaceId: string;

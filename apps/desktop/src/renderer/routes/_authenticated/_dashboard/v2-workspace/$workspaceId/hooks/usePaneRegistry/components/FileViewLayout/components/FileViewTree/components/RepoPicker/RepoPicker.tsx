@@ -11,7 +11,6 @@ interface RepoPickerProps {
 	workspaceId: string;
 }
 
-/** Shown only for a workspace with more than one repository. */
 export function RepoPicker({ workspaceId }: RepoPickerProps) {
 	// A host older than workspace.repositories errors here, which hides the
 	// picker the same way a single repository does.
