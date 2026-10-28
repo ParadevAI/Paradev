@@ -117,7 +117,7 @@ export function SettingsScreen() {
 								}),
 								t({
 									message:
-										"Something went wrong. Try again, or contact support@superset.sh.",
+										"Something went wrong. Try again, or contact support@paradev.com.",
 								}),
 							);
 						});

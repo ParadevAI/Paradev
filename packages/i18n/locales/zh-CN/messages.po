@@ -17185,8 +17185,8 @@ msgstr "出了点问题。"
 msgid "Something went wrong. Please try again."
 msgstr "出了点问题。请重试。"
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "出了点问题。请重试，或联系support@superset.sh。"
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "出了点问题。请重试，或联系support@paradev.com。"
 
 msgid "soon"
 msgstr "即将"
@@ -18483,8 +18483,8 @@ msgstr "提供商返回了{0}。"
 msgid "The provider refused it."
 msgstr "提供商拒绝了它。"
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "恢复期已结束。请联系support@superset.sh。"
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "恢复期已结束。请联系support@paradev.com。"
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "远程分支已分叉。请先拉取再继续。"

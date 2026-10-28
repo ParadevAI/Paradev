@@ -17185,8 +17185,8 @@ msgstr "Coś poszło nie tak."
 msgid "Something went wrong. Please try again."
 msgstr "Coś poszło nie tak. Spróbuj ponownie."
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "Coś poszło nie tak. Spróbuj ponownie lub napisz na support@superset.sh."
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "Coś poszło nie tak. Spróbuj ponownie lub napisz na support@paradev.com."
 
 msgid "soon"
 msgstr "wkrótce"
@@ -18483,8 +18483,8 @@ msgstr "Dostawca odpowiedział {0}."
 msgid "The provider refused it."
 msgstr "Dostawca je odrzucił."
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "Okres odzyskiwania dobiegł końca. Napisz na support@superset.sh."
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "Okres odzyskiwania dobiegł końca. Napisz na support@paradev.com."
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "Zdalna gałąź się rozjechała. Pobierz zmiany przed kontynuowaniem."
