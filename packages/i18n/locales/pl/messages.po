@@ -16334,6 +16334,9 @@ msgstr "Wyślij"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Wyślij zaproszenie do {organizationName}. Wygasa po 48 godzinach."
 
+msgid "Send email and debug delivery"
+msgstr "Wysyłaj e-maile i debuguj dostarczanie"
+
 msgid "Send Invitation"
 msgstr "Wyślij zaproszenie"
 

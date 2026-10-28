@@ -16334,6 +16334,9 @@ msgstr "Odeslat"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Pošlete pozvánku do {organizationName}. Platnost vyprší za 48 hodin."
 
+msgid "Send email and debug delivery"
+msgstr "Odesílání e-mailů a ladění doručování"
+
 msgid "Send Invitation"
 msgstr "Odeslat pozvánku"
 

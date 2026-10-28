@@ -16334,6 +16334,9 @@ msgstr "Gönder"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName} kuruluşuna katılmak için davet gönderin. 48 saat içinde sona erer."
 
+msgid "Send email and debug delivery"
+msgstr "E-posta gönderin ve teslimatta hata ayıklayın"
+
 msgid "Send Invitation"
 msgstr "Davet gönder"
 

@@ -16334,6 +16334,9 @@ msgstr "Versturen"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Stuur een uitnodiging om lid te worden van {organizationName}. Verloopt na 48 uur."
 
+msgid "Send email and debug delivery"
+msgstr "Verstuur e-mail en debug de bezorging"
+
 msgid "Send Invitation"
 msgstr "Uitnodiging versturen"
 

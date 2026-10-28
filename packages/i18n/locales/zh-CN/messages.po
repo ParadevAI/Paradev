@@ -16334,6 +16334,9 @@ msgstr "发送"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "发送加入{organizationName}的邀请。48小时后过期。"
 
+msgid "Send email and debug delivery"
+msgstr "发送邮件并排查投递问题"
+
 msgid "Send Invitation"
 msgstr "发送邀请"
 

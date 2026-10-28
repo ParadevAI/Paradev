@@ -16334,6 +16334,9 @@ msgstr "Gửi"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Gửi lời mời tham gia {organizationName}. Hết hạn sau 48 giờ."
 
+msgid "Send email and debug delivery"
+msgstr "Gửi email và gỡ lỗi việc gửi thư"
+
 msgid "Send Invitation"
 msgstr "Gửi lời mời"
 

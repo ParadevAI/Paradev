@@ -16334,6 +16334,9 @@ msgstr "Kirim"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Kirim undangan untuk bergabung ke {organizationName}. Kedaluwarsa dalam 48 jam."
 
+msgid "Send email and debug delivery"
+msgstr "Kirim email dan debug pengiriman"
+
 msgid "Send Invitation"
 msgstr "Kirim Undangan"
 

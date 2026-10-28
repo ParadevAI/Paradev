@@ -16334,6 +16334,9 @@ msgstr "Отправить"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Отправьте приглашение в {organizationName}. Действует 48 часов."
 
+msgid "Send email and debug delivery"
+msgstr "Отправка писем и отладка доставки"
+
 msgid "Send Invitation"
 msgstr "Отправить приглашение"
 

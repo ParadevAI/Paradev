@@ -16334,6 +16334,9 @@ msgstr "送信"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}への招待を送ります。48時間で失効します。"
 
+msgid "Send email and debug delivery"
+msgstr "メールを送信し、配信の問題を調査"
+
 msgid "Send Invitation"
 msgstr "招待を送信"
 

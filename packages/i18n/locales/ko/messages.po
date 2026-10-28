@@ -16334,6 +16334,9 @@ msgstr "보내기"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}에 참여하도록 초대를 보냅니다. 48시간 후 만료됩니다."
 
+msgid "Send email and debug delivery"
+msgstr "이메일 전송 및 전달 문제 디버그"
+
 msgid "Send Invitation"
 msgstr "초대 보내기"
 

@@ -21,6 +21,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)sentry\.io$/, "sentry"],
 	[/(^|\.)posthog\.com$/, "posthog"],
 	[/(^|\.)vercel\.com$/, "vercel"],
+	[/(^|\.)resend\.com$/, "resend"],
 	[/(^|\.)figma\.com$/, "figma"],
 	[/(^|\.)stripe\.com$/, "stripe"],
 	[/(^|\.)neon\.(tech|com)$/, "neon"],
