@@ -136,65 +136,72 @@ export function AtAGlanceSection() {
 						</p>
 						<CopyButton targetId="boilerplate-long" />
 					</div>
-					<p
+					<div
 						id="boilerplate-long"
-						className="px-4 py-4 text-muted-foreground leading-relaxed"
+						className="space-y-4 px-4 py-4 text-muted-foreground leading-relaxed"
 					>
-						{isRenamed ? (
-							<Trans>
-								{productName} (formerly {formerName}, YC P26) is the
-								source-available IDE for the AI agents era, where engineers run
-								hundreds of coding agents like Claude Code and Codex in
-								parallel.
-							</Trans>
-						) : (
-							<Trans>
-								{productName} (YC P26) is the source-available IDE for the AI
-								agents era, where engineers run hundreds of coding agents like
-								Claude Code and Codex in parallel.
-							</Trans>
-						)}{" "}
-						<Trans>
-							In under a year, more than 145,000 developers across 180 countries
-							have run {productName} and created over 1.85 million agent
-							workspaces.
-						</Trans>{" "}
-						<Trans>
-							Japan is its second-largest market after the US, with over 13,000
-							developers, and Asia as a whole now accounts for more users than
-							the US.
-						</Trans>{" "}
-						<Trans>
-							{productName} has been used by one in eight Fortune 500 companies.
-						</Trans>{" "}
-						<Trans>
-							{productName} is used by engineers at Netflix, Microsoft, NVIDIA,
-							DoorDash, Wix, and Mistral AI globally, and across Asia at
-							ByteDance, Toss, Kakao, Grab, LINE, and Rakuten.
-						</Trans>{" "}
-						{isRenamed ? (
-							<>
+						<p>
+							{isRenamed ? (
 								<Trans>
-									{companyName} makes {productName}.
-								</Trans>{" "}
+									{productName} (formerly {formerName}, YC P26) is the
+									source-available IDE for the AI agents era, where engineers
+									run hundreds of coding agents like Claude Code and Codex in
+									parallel.
+								</Trans>
+							) : (
 								<Trans>
-									The company raised an $11.5M seed round led by Union Square
+									{productName} (YC P26) is the source-available IDE for the AI
+									agents era, where engineers run hundreds of coding agents like
+									Claude Code and Codex in parallel.
+								</Trans>
+							)}{" "}
+							<Trans>
+								In under a year, more than 145,000 developers across 180
+								countries have run {productName} and created over 1.85 million
+								agent workspaces.
+							</Trans>
+						</p>
+						<p>
+							<Trans>
+								{productName} has been used by one in eight Fortune 500
+								companies.
+							</Trans>{" "}
+							<Trans>
+								{productName} is used by engineers at Netflix, Microsoft,
+								NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia
+								at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten.
+							</Trans>{" "}
+							<Trans>
+								Japan is its second-largest market after the US, with over
+								13,000 developers, and Asia as a whole now accounts for more
+								users than the US.
+							</Trans>
+						</p>
+						<p>
+							{isRenamed ? (
+								<>
+									<Trans>
+										{companyName} makes {productName}.
+									</Trans>{" "}
+									<Trans>
+										The company raised an $11.5M seed round led by Union Square
+										Ventures, with Y Combinator and Paul Graham. TechCrunch
+										named it one of the standout startups from YC Demo Day.
+									</Trans>
+								</>
+							) : (
+								<Trans>
+									{productName} raised an $11.5M seed round led by Union Square
 									Ventures, with Y Combinator and Paul Graham. TechCrunch named
 									it one of the standout startups from YC Demo Day.
 								</Trans>
-							</>
-						) : (
+							)}{" "}
 							<Trans>
-								{productName} raised an $11.5M seed round led by Union Square
-								Ventures, with Y Combinator and Paul Graham. TechCrunch named it
-								one of the standout startups from YC Demo Day.
+								On GitHub, it has 15k+ stars, 1,000+ forks, and 100+
+								contributors. It also hit #1 on Product Hunt.
 							</Trans>
-						)}{" "}
-						<Trans>
-							On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors.
-							It also hit #1 on Product Hunt.
-						</Trans>
-					</p>
+						</p>
+					</div>
 				</div>
 			</div>
 		</section>
