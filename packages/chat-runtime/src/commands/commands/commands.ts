@@ -726,7 +726,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				}),
 				equivalentPaths(parsed.cwd),
 			]);
-			// Claude lists the sessions of every git worktree of the repo, and each worktree is a different workspace.
 			return {
 				...page,
 				sessions: page.sessions.filter((session) =>
