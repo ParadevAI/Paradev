@@ -4,18 +4,10 @@ import { cn } from "@superset/ui/utils";
 import { LuFolderTree } from "react-icons/lu";
 import { useFileTreeVisibilityStore } from "../../../../state/fileTreeVisibilityStore";
 
-interface FileTreeToggleProps {
-	/** For the pane header: the tree's own row holds the toggle while it shows. */
-	onlyWhenHidden?: boolean;
-}
-
-export function FileTreeToggle({
-	onlyWhenHidden = false,
-}: FileTreeToggleProps) {
+export function FileTreeToggle() {
 	const { t } = useLingui();
 	const visible = useFileTreeVisibilityStore((state) => state.visible);
 	const toggle = useFileTreeVisibilityStore((state) => state.toggle);
-	if (onlyWhenHidden && visible) return null;
 	const label = visible
 		? t({ message: "Hide file tree" })
 		: t({ message: "Show file tree" });

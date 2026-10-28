@@ -105,7 +105,6 @@ import {
 import { FilePane } from "./components/FilePane";
 import { FilePaneHeaderExtras } from "./components/FilePane/components/FilePaneHeaderExtras";
 import { FilesTreePane } from "./components/FilesTreePane";
-import { FileTreeToggle } from "./components/FileTreeToggle";
 import { FileViewLayout } from "./components/FileViewLayout";
 import { MobilePane } from "./components/MobilePane";
 import { PagePane } from "./components/PagePane";
@@ -316,7 +315,7 @@ export function usePaneRegistry({
 					<FilePaneHeaderExtras
 						context={ctx}
 						workspaceId={workspaceId}
-						showTreeToggle={ctx.store === rightStore}
+						inRightPane={ctx.store === rightStore}
 					/>
 				),
 				onHeaderClick: (ctx: RendererContext<PaneViewerData>) =>
@@ -796,7 +795,6 @@ export function usePaneRegistry({
 			files: {
 				getIcon: () => <FolderTree className="size-3.5" />,
 				getTitle: () => t({ message: "Files" }),
-				renderHeaderExtras: () => <FileTreeToggle onlyWhenHidden />,
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<FilesTreePane
 						context={ctx}
