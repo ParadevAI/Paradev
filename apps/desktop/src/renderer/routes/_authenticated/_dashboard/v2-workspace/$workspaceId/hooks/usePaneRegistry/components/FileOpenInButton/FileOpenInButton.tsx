@@ -2,8 +2,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { LuCheck, LuCopy } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { V2OpenInMenuButton } from "../../../../../../../../components/V2OpenInMenuButton";
-import { useWorkspaceOpenInTarget } from "../../../../../../../../hooks/useWorkspaceOpenInTarget";
+import { V2OpenInMenuButton } from "../../../../components/V2OpenInMenuButton";
+import { useWorkspaceOpenInTarget } from "../../../useWorkspaceOpenInTarget";
 
 interface FileOpenInButtonProps {
 	workspaceId: string;

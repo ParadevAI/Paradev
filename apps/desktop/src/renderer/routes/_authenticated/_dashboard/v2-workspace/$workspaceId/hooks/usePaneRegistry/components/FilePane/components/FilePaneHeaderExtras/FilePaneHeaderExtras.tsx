@@ -3,11 +3,12 @@ import type { RendererContext } from "@superset/panes";
 import { Button } from "@superset/ui/button";
 import { useCallback } from "react";
 import { useSharedFileDocument } from "../../../../../../state/fileDocumentStore";
+import { useFileTreeVisibilityStore } from "../../../../../../state/fileTreeVisibilityStore";
 import type { FilePaneData, PaneViewerData } from "../../../../../../types";
+import { FileOpenInButton } from "../../../FileOpenInButton";
 import { FileTreeToggle } from "../../../FileTreeToggle";
 import { orderForToggle, resolveActivePaneView } from "../../registry";
 import { FileViewToggle } from "../FileViewToggle";
-import { FileOpenInButton } from "./components/FileOpenInButton";
 
 interface FilePaneHeaderExtrasProps {
 	context: RendererContext<PaneViewerData>;
@@ -22,6 +23,8 @@ export function FilePaneHeaderExtras({
 }: FilePaneHeaderExtrasProps) {
 	const data = context.pane.data as FilePaneData;
 	const { filePath } = data;
+	const treeVisible = useFileTreeVisibilityStore((state) => state.visible);
+	const treeHoldsActions = showTreeToggle && treeVisible;
 
 	const document = useSharedFileDocument({
 		workspaceId,
@@ -68,8 +71,10 @@ export function FilePaneHeaderExtras({
 					onChange={handleChangeView}
 				/>
 			)}
-			<FileOpenInButton workspaceId={workspaceId} filePath={filePath} />
-			{showTreeToggle && <FileTreeToggle />}
+			{!treeHoldsActions && (
+				<FileOpenInButton workspaceId={workspaceId} filePath={filePath} />
+			)}
+			{showTreeToggle && <FileTreeToggle onlyWhenHidden />}
 		</div>
 	);
 }

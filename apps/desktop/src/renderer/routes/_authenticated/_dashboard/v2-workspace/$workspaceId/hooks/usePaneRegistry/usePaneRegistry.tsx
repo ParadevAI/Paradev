@@ -796,7 +796,7 @@ export function usePaneRegistry({
 			files: {
 				getIcon: () => <FolderTree className="size-3.5" />,
 				getTitle: () => t({ message: "Files" }),
-				renderHeaderExtras: () => <FileTreeToggle />,
+				renderHeaderExtras: () => <FileTreeToggle onlyWhenHidden />,
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<FilesTreePane
 						context={ctx}

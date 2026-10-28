@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type {
+	ContextMenuAnchorRect,
 	FileTreeDropResult,
 	FileTreeRenameEvent,
 	FileTreeRowDecoration,
@@ -12,8 +13,8 @@ import {
 	useFileTree as usePierreFileTree,
 } from "@pierre/trees/react";
 import type { AppRouter } from "@superset/host-service";
+import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
@@ -24,7 +25,13 @@ import {
 	RefreshCw,
 	Search,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useGitStatusMap } from "renderer/hooks/host-service/useGitStatusMap";
 import {
 	ShadowClickHint,
@@ -67,8 +74,9 @@ interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** Double-clicking a file pins it instead of renaming it. */
 	onPinFile?: (absolutePath: string) => void;
-	/** "fileView" floats the search as a pill over the tree. */
+	/** "fileView": icon-only actions, no New File/Folder, `trailingActions` at the end. */
 	variant?: "sidebar" | "fileView";
+	trailingActions?: ReactNode;
 	selectedFilePath?: string;
 	pendingReveal?: {
 		path: string;
@@ -83,6 +91,7 @@ export function FilesTab({
 	onSelectFile,
 	onPinFile,
 	variant = "sidebar",
+	trailingActions,
 	selectedFilePath,
 	pendingReveal,
 	workspaceId,
@@ -193,6 +202,35 @@ export function FilesTab({
 			}
 		},
 		[model],
+	);
+
+	const [rootMenuAnchor, setRootMenuAnchor] =
+		useState<ContextMenuAnchorRect | null>(null);
+	const handleTreeBackgroundContextMenu = useCallback(
+		(event: React.MouseEvent<HTMLDivElement>) => {
+			for (const node of event.nativeEvent.composedPath()) {
+				if (!(node instanceof HTMLElement)) continue;
+				if (
+					node.dataset.itemPath !== undefined ||
+					node.closest("[data-file-tree-context-menu-root]")
+				) {
+					return;
+				}
+			}
+			event.preventDefault();
+			const { clientX: x, clientY: y } = event;
+			setRootMenuAnchor({
+				top: y,
+				bottom: y,
+				left: x,
+				right: x,
+				width: 0,
+				height: 0,
+				x,
+				y,
+			});
+		},
+		[],
 	);
 
 	const drop = useFilesTabDrop({ model, bridge, rootPath, workspaceId });
@@ -347,6 +385,7 @@ export function FilesTab({
 			className="relative flex h-full min-h-0 flex-col overflow-hidden"
 			onClickCapture={handleClickCapture}
 			onClick={handleTreeBackgroundClick}
+			onContextMenu={handleTreeBackgroundContextMenu}
 			onDragStart={handleRowDragStart}
 			onDragOver={drop.onDragOver}
 			onDragLeave={drop.onDragLeave}
@@ -360,59 +399,79 @@ export function FilesTab({
 					header={
 						<div
 							data-file-tree-header="true"
-							className={cn(
-								"group flex items-center gap-1 px-2",
-								variant === "fileView" ? "h-11 pt-1" : "h-10 bg-background",
-							)}
+							className="group flex h-10 items-center gap-1 bg-background px-2"
 						>
-							{onSearch && (
-								<button
-									type="button"
-									onClick={onSearch}
-									className={cn(
-										"flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-										variant === "fileView"
-											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
-											: "h-8 rounded-md px-1.5",
+							{variant === "fileView" ? (
+								<>
+									{onSearch && (
+										<FilesTabHeaderButton
+											icon={Search}
+											label={t({ message: "Search files" })}
+											onClick={onSearch}
+										/>
 									)}
-								>
-									<Search className="size-3.5 shrink-0" />
-									<span className="truncate">
-										<Trans>Search files</Trans>
-									</span>
-								</button>
+									<FilesTabHeaderButton
+										icon={RefreshCw}
+										label={t({ message: "Refresh" })}
+										loading={bridge.isRefreshing}
+										onClick={() => void bridge.doRefresh()}
+									/>
+									<FilesTabHeaderButton
+										icon={FoldVertical}
+										label={t({ message: "Collapse All" })}
+										onClick={collapseAll}
+									/>
+									<div className="ml-auto flex items-center gap-1">
+										{trailingActions}
+									</div>
+								</>
+							) : (
+								<>
+									{onSearch && (
+										<button
+											type="button"
+											onClick={onSearch}
+											className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+										>
+											<Search className="size-3.5 shrink-0" />
+											<span className="truncate">
+												<Trans>Search files</Trans>
+											</span>
+										</button>
+									)}
+									<div className="ml-auto flex items-center gap-0.5">
+										<FilesTabHeaderButton
+											icon={FilePlus}
+											label={t({
+												message: "New File",
+											})}
+											onClick={() => void startCreating("file")}
+										/>
+										<FilesTabHeaderButton
+											icon={FolderPlus}
+											label={t({
+												message: "New Folder",
+											})}
+											onClick={() => void startCreating("folder")}
+										/>
+										<FilesTabHeaderButton
+											icon={RefreshCw}
+											label={t({
+												message: "Refresh",
+											})}
+											loading={bridge.isRefreshing}
+											onClick={() => void bridge.doRefresh()}
+										/>
+										<FilesTabHeaderButton
+											icon={FoldVertical}
+											label={t({
+												message: "Collapse All",
+											})}
+											onClick={collapseAll}
+										/>
+									</div>
+								</>
 							)}
-							<div className="ml-auto flex items-center gap-0.5">
-								<FilesTabHeaderButton
-									icon={FilePlus}
-									label={t({
-										message: "New File",
-									})}
-									onClick={() => void startCreating("file")}
-								/>
-								<FilesTabHeaderButton
-									icon={FolderPlus}
-									label={t({
-										message: "New Folder",
-									})}
-									onClick={() => void startCreating("folder")}
-								/>
-								<FilesTabHeaderButton
-									icon={RefreshCw}
-									label={t({
-										message: "Refresh",
-									})}
-									loading={bridge.isRefreshing}
-									onClick={() => void bridge.doRefresh()}
-								/>
-								<FilesTabHeaderButton
-									icon={FoldVertical}
-									label={t({
-										message: "Collapse All",
-									})}
-									onClick={collapseAll}
-								/>
-							</div>
 						</div>
 					}
 					renderContextMenu={renderContextMenu}
@@ -420,6 +479,26 @@ export function FilesTab({
 			</ShadowClickHint>
 
 			{drop.dropTarget && <FilesTabDropOverlay target={drop.dropTarget} />}
+			{rootMenuAnchor && (
+				<PierreRowContextMenu
+					anchorRect={rootMenuAnchor}
+					onClose={() => setRootMenuAnchor(null)}
+					data-file-tree-context-menu-root="true"
+				>
+					<DropdownMenuItem
+						onSelect={() => setTimeout(() => void startCreating("file"), 0)}
+					>
+						<FilePlus />
+						<Trans>New File...</Trans>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onSelect={() => setTimeout(() => void startCreating("folder"), 0)}
+					>
+						<FolderPlus />
+						<Trans>New Folder...</Trans>
+					</DropdownMenuItem>
+				</PierreRowContextMenu>
+			)}
 		</div>
 	);
 }
