@@ -248,6 +248,47 @@ describe("runTurn", () => {
 		expect(prompts().at(-1)).not.toContain("crash please");
 	});
 
+	test("a retry sends only what the crashed attempt did not, in order", async () => {
+		const { activities } = setup();
+		await activities.beginTurn({
+			...turn,
+			promptId: "p1",
+			text: "crash please",
+		});
+		const input = {
+			...turn,
+			prompts: [
+				{ promptId: "p1", text: "crash please" },
+				{ promptId: "p2", text: "also this", steer: true },
+			],
+			steersFrom: 1,
+		};
+		await expect(
+			new MockActivityEnvironment().run(activities.runTurn, input),
+		).rejects.toThrow();
+		expect(prompts()).toEqual(["crash please"]);
+		await new MockActivityEnvironment({ attempt: 2 }).run(
+			activities.runTurn,
+			input,
+		);
+		expect(prompts().slice(1, 2)[0]).toContain("stopped before it finished");
+		expect(prompts().slice(2)).toEqual(["also this"]);
+	});
+
+	test("sends two messages with the same text as two messages", async () => {
+		const { activities } = setup();
+		await activities.beginTurn({ ...turn, promptId: "p1", text: "yes" });
+		await new MockActivityEnvironment().run(activities.runTurn, {
+			...turn,
+			prompts: [
+				{ promptId: "p1", text: "yes" },
+				{ promptId: "p2", text: "yes", steer: true },
+			],
+			steersFrom: 1,
+		});
+		expect(prompts()).toEqual(["yes", "yes"]);
+	});
+
 	test("passes steers to pdev as they arrive, once each", async () => {
 		const steers: SteerInput[] = [];
 		const { activities, memory } = setup({ steers: () => steers });

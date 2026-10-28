@@ -7,7 +7,7 @@ interface Env {
 	AGENT_MODEL?: string;
 	AGENT_WORKER_SECRET: string;
 	TEMPORAL_ADDRESS: string;
-	TEMPORAL_NAMESPACE: string;
+	TEMPORAL_NAMESPACE?: string;
 	TEMPORAL_API_KEY: string;
 }
 
@@ -22,15 +22,20 @@ export class AgentWorker extends Container<Env> {
 	constructor(...args: ConstructorParameters<typeof Container<Env>>) {
 		super(...args);
 		const env = args[1];
-		this.envVars = {
+		const vars: Record<string, string | undefined> = {
 			AGENT_API_URL: env.AGENT_API_URL,
 			AGENT_ROUTER_URL: env.AGENT_ROUTER_URL,
-			...(env.AGENT_MODEL ? { AGENT_MODEL: env.AGENT_MODEL } : {}),
+			AGENT_MODEL: env.AGENT_MODEL,
 			AGENT_WORKER_SECRET: env.AGENT_WORKER_SECRET,
 			TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS,
 			TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE,
 			TEMPORAL_API_KEY: env.TEMPORAL_API_KEY,
 		};
+		this.envVars = Object.fromEntries(
+			Object.entries(vars).filter((entry): entry is [string, string] =>
+				Boolean(entry[1]),
+			),
+		);
 	}
 
 	override async onActivityExpired(): Promise<void> {

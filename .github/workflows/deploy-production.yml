@@ -598,6 +598,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
+    permissions:
+      contents: read
     needs: [agent-worker-changes, deploy-api]
     if: >-
       !cancelled() && needs.deploy-api.result == 'success' && (
@@ -652,7 +654,7 @@ jobs:
           set -euo pipefail
           secrets="$(mktemp)"
           trap 'rm -f "$secrets"' EXIT
-          jq -n '{AGENT_WORKER_SECRET: env.AGENT_WORKER_SECRET, TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE, TEMPORAL_API_KEY: env.TEMPORAL_API_KEY}' > "$secrets"
+          jq -n '{AGENT_WORKER_SECRET: env.AGENT_WORKER_SECRET, TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE, TEMPORAL_API_KEY: env.TEMPORAL_API_KEY} | with_entries(select(.value != null and .value != ""))' > "$secrets"
           bunx wrangler deploy --secrets-file "$secrets"
 
   realtime-changes:

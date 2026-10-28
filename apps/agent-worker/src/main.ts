@@ -44,7 +44,7 @@ const api = workerApi({
 });
 
 const apiKey = process.env.TEMPORAL_API_KEY;
-const namespace = process.env.TEMPORAL_NAMESPACE ?? "default";
+const namespace = process.env.TEMPORAL_NAMESPACE || "default";
 const temporal = {
 	address: process.env.TEMPORAL_ADDRESS ?? "localhost:7233",
 	...(apiKey ? { tls: true, apiKey } : {}),

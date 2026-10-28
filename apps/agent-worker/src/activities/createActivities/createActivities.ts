@@ -76,6 +76,7 @@ export interface TurnPrompt {
 const CREDENTIALS_TTL_MS = 5 * 60_000;
 const MAX_REPLY_CHARS = 32 * 1024;
 const TURN_START = "turn_start";
+const RUN_START = "run_start";
 /** pdev's own echo of what this worker already wrote to the session. */
 const HIDDEN_UPDATES = new Set([
 	"user_message",
@@ -213,11 +214,22 @@ export function createActivities(deps: ActivityDeps) {
 				Boolean(credentials.room),
 			);
 
-			const rows = await store.transcript();
+			const runKey = `${input.turnId}/run/${input.steersFrom}`;
+			let rows = await store.transcript();
+			if (!rows.some((row) => row.stepKey === runKey)) {
+				await store.append({
+					stepKey: runKey,
+					turnId: input.turnId,
+					transcript: [{ type: RUN_START, turnId: input.turnId }],
+				});
+				rows = await store.transcript();
+			}
 			const resumeId = await restoreSessionFile(agentDir, rows);
 			const tail = new SessionFileTail(agentDir);
 			if (resumeId) await tail.skipExisting();
-			const before = entriesOfTurn(rows, input.turnId);
+			const delivery = deliveryLog(
+				rows.slice(rows.findIndex((row) => row.stepKey === runKey) + 1),
+			);
 
 			const flusher = createFlusher(
 				store,
@@ -256,23 +268,21 @@ export function createActivities(deps: ActivityDeps) {
 				});
 			};
 
-			const said = new Set(userTexts(before));
-			const unsent = (prompts: TurnPrompt[]) =>
-				prompts.filter((prompt) => !said.has(prompt.text));
 			const signal = cancellationSignal();
 			const stopBeat = keepBeating(heartbeatEveryMs);
 			let delivered = input.steersFrom;
 			try {
 				await session.open(resumeId);
-				const first = unsent(input.prompts);
-				for (const prompt of first.filter((p) => p.steer)) {
-					await showSteer(store, input, prompt);
+				const unsent = input.prompts.filter(
+					(prompt) => !delivery.alreadySent(prompt.text),
+				);
+				if (attempt > 1 && unsent.length < input.prompts.length) {
+					await session.prompt(RESUMED);
 				}
-				const text =
-					attempt > 1 && first.length < input.prompts.length
-						? [RESUMED, ...first.map((p) => p.text)].join("\n\n")
-						: first.map((p) => p.text).join("\n\n");
-				if (text) await session.prompt(text);
+				for (const prompt of unsent) {
+					if (prompt.steer) await showSteer(store, input, prompt);
+					await session.prompt(prompt.text);
+				}
 				let idleSince: number | null = null;
 				for (;;) {
 					if (signal?.aborted) {
@@ -293,7 +303,7 @@ export function createActivities(deps: ActivityDeps) {
 							)
 						: [];
 					for (const steer of steers.slice(delivered)) {
-						if (!said.has(steer.text)) {
+						if (!delivery.alreadySent(steer.text)) {
 							await showSteer(store, input, steer);
 							await session.prompt(steer.text);
 						}
@@ -322,6 +332,7 @@ export function createActivities(deps: ActivityDeps) {
 			} finally {
 				stopBeat();
 				await session.close().catch(() => {});
+				await syncFile().catch(() => {});
 				await rm(home, { recursive: true, force: true }).catch(() => {});
 			}
 		},
@@ -494,6 +505,29 @@ function textOf(content: unknown): string {
 			block.type === "text" ? (block.text ?? "") : "",
 		)
 		.join("");
+}
+
+/**
+ * What an earlier attempt of this run already gave pdev. Prompts and steers
+ * reach pdev one at a time and in order, so they are matched by position,
+ * which also tells apart two messages with the same text.
+ */
+function deliveryLog(runRows: TranscriptRow[]) {
+	const recorded = userTexts(pdevEntriesOf(runRows)).filter(
+		(text) => text !== RESUMED,
+	);
+	let next = 0;
+	let matching = true;
+	return {
+		alreadySent(text: string): boolean {
+			if (matching && recorded[next] === text.trim()) {
+				next += 1;
+				return true;
+			}
+			matching = false;
+			return false;
+		},
+	};
 }
 
 function userTexts(entries: PdevEntry[]): string[] {

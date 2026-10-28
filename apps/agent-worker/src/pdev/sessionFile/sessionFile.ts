@@ -47,7 +47,6 @@ export async function restoreSessionFile(
 export class SessionFileTail {
 	private file: string | null = null;
 	private offset = 0;
-	private partial = "";
 
 	constructor(private readonly agentDir: string) {}
 
@@ -69,11 +68,14 @@ export class SessionFileTail {
 			if (size <= this.offset) return [];
 			const buffer = Buffer.alloc(size - this.offset);
 			await handle.read(buffer, 0, buffer.length, this.offset);
-			this.offset = size;
-			const text = this.partial + buffer.toString("utf8");
-			const lines = text.split("\n");
-			this.partial = lines.pop() ?? "";
-			return lines
+			// A line pdev is still writing may end mid-character; decode only whole lines.
+			const end = buffer.lastIndexOf(0x0a);
+			if (end < 0) return [];
+			this.offset += end + 1;
+			return buffer
+				.subarray(0, end)
+				.toString("utf8")
+				.split("\n")
 				.filter((line) => line.trim())
 				.map((line) => JSON.parse(line) as PdevEntry);
 		} finally {
