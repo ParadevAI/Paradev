@@ -10,6 +10,7 @@ import {
 	LuGitPullRequestArrow,
 } from "react-icons/lu";
 import { TbDeviceDesktop, TbDeviceMobile, TbWorld } from "react-icons/tb";
+import type { HotkeyId } from "renderer/hotkeys";
 import type {
 	BrowserPaneData,
 	PaneViewerData,
@@ -27,60 +28,47 @@ export interface RightPaneOption {
 	kind: RightPaneKind;
 	label: MessageDescriptor;
 	Icon: IconType;
-	group: "workspace" | "tool";
+	hotkeyId?: HotkeyId;
 	gate?: keyof RightPaneGates;
 }
 
 const RIGHT_PANE_OPTIONS: RightPaneOption[] = [
 	{
-		kind: "files",
-		label: msg({ message: "Files" }),
-		Icon: LuFolderTree,
-		group: "workspace",
-	},
-	{
-		kind: "diff",
-		label: msg({ message: "Changes" }),
-		Icon: LuFileDiff,
-		group: "workspace",
-	},
-	{
-		kind: "review",
-		label: msg({ message: "Review" }),
-		Icon: LuGitPullRequestArrow,
-		group: "workspace",
-	},
-	{
-		kind: "pages-list",
-		label: msg({ message: "Pages" }),
-		Icon: LuFileText,
-		group: "workspace",
+		kind: "terminal",
+		label: msg({ message: "Terminal" }),
+		Icon: BsTerminalPlus,
+		hotkeyId: "NEW_GROUP",
 	},
 	{
 		kind: "browser",
 		label: msg({ message: "Browser" }),
 		Icon: TbWorld,
-		group: "tool",
+		hotkeyId: "NEW_BROWSER",
 	},
+	{
+		kind: "diff",
+		label: msg({ message: "Changes" }),
+		Icon: LuFileDiff,
+		hotkeyId: "OPEN_DIFF_VIEWER",
+	},
+	{ kind: "files", label: msg({ message: "Files" }), Icon: LuFolderTree },
+	{
+		kind: "review",
+		label: msg({ message: "Review" }),
+		Icon: LuGitPullRequestArrow,
+	},
+	{ kind: "pages-list", label: msg({ message: "Pages" }), Icon: LuFileText },
 	{
 		kind: "desktop",
 		label: msg({ message: "Desktop" }),
 		Icon: TbDeviceDesktop,
-		group: "tool",
 		gate: "sandbox",
 	},
 	{
 		kind: "mobile",
 		label: msg({ message: "Mobile" }),
 		Icon: TbDeviceMobile,
-		group: "tool",
 		gate: "mobilePane",
-	},
-	{
-		kind: "terminal",
-		label: msg({ message: "Terminal" }),
-		Icon: BsTerminalPlus,
-		group: "tool",
 	},
 ];
 

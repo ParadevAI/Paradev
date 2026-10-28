@@ -81,6 +81,7 @@ import {
 	focusTerminalPane,
 } from "../../utils/focusTerminalPane";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
+import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
@@ -837,17 +838,13 @@ export function usePaneRegistry({
 				getTitle: () => t({ message: "New Tab" }),
 				renderPane: (ctx: RendererContext<PaneViewerData>) => (
 					<RightPaneNewTab
-						onOpen={(pane) => {
-							const state = ctx.store.getState();
-							state.setPanePinned({ paneId: ctx.pane.id, pinned: false });
-							state.replacePane({
-								tabId: ctx.tab.id,
-								paneId: ctx.pane.id,
-								newPane: pane,
-							});
-							const opened = state.getActivePane(ctx.tab.id);
-							if (opened) state.focusPane(opened.pane.id);
-						}}
+						onOpen={(pane) =>
+							replaceNewTabPane(
+								ctx.store,
+								{ tabId: ctx.tab.id, paneId: ctx.pane.id },
+								pane,
+							)
+						}
 					/>
 				),
 			},

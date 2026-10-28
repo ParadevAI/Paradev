@@ -7,14 +7,14 @@ describe("getRightPaneOptions", () => {
 			getRightPaneOptions({ sandbox, mobilePane }).map((option) => option.kind);
 
 		expect(kinds(true, true)).toEqual([
-			"files",
+			"terminal",
+			"browser",
 			"diff",
+			"files",
 			"review",
 			"pages-list",
-			"browser",
 			"desktop",
 			"mobile",
-			"terminal",
 		]);
 		expect(kinds(false, true)).not.toContain("desktop");
 		expect(kinds(true, false)).not.toContain("mobile");
@@ -32,14 +32,14 @@ describe("createRightPane", () => {
 		);
 
 		expect(panes.map((pane) => pane.kind)).toEqual([
-			"files",
+			"terminal",
+			"browser",
 			"diff",
+			"files",
 			"review",
 			"pages-list",
-			"browser",
 			"desktop",
 			"mobile",
-			"terminal",
 		]);
 		expect(panes.find((pane) => pane.kind === "browser")?.data).toEqual({
 			url: "https://example.com",
