@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { LuChevronRight } from "react-icons/lu";
+import { FileIcon } from "renderer/lib/fileIcons";
 import { toRelativeWorkspacePath } from "shared/absolute-paths";
 
 interface FileBreadcrumbProps {
@@ -24,13 +25,14 @@ export function FileBreadcrumb({ filePath, rootPath }: FileBreadcrumbProps) {
 						{index > 0 && (
 							<LuChevronRight className="size-3 shrink-0 text-muted-foreground/50" />
 						)}
-						<span
-							className={
-								isLast ? "shrink-0 text-foreground" : "min-w-0 truncate"
-							}
-						>
-							{segment}
-						</span>
+						{isLast ? (
+							<span className="flex shrink-0 items-center gap-1.5 text-foreground">
+								<FileIcon fileName={segment} className="size-3.5 shrink-0" />
+								{segment}
+							</span>
+						) : (
+							<span className="min-w-0 truncate">{segment}</span>
+						)}
 					</Fragment>
 				);
 			})}
