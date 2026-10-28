@@ -12,7 +12,7 @@ import {
 	users,
 } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
-import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, arrayOverlaps, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { agentNotFound } from "./access";
 import { announceAgentChanged } from "./agents-changed";
@@ -416,7 +416,7 @@ async function deliverToMains({
 	}
 }
 
-/** Devs that follow a thread or have written in it. */
+/** Devs that follow a thread, have written in it, or were mentioned in it. */
 async function devsInThread(
 	threadRootId: string,
 	devIds: string[],
@@ -434,7 +434,10 @@ async function devsInThread(
 				),
 			),
 		db
-			.selectDistinct({ id: channelMessages.authorId })
+			.select({
+				authorId: channelMessages.authorId,
+				mentionedIds: channelMessages.mentionedIds,
+			})
 			.from(channelMessages)
 			.where(
 				and(
@@ -442,11 +445,19 @@ async function devsInThread(
 						eq(channelMessages.threadRootId, threadRootId),
 						eq(channelMessages.id, threadRootId),
 					),
-					inArray(channelMessages.authorId, devIds),
+					or(
+						inArray(channelMessages.authorId, devIds),
+						arrayOverlaps(channelMessages.mentionedIds, devIds),
+					),
 				),
 			),
 	]);
-	return new Set(
-		[...followers, ...writers].flatMap((row) => (row.id ? [row.id] : [])),
-	);
+	const wanted = new Set(devIds);
+	return new Set([
+		...followers.map((row) => row.id),
+		...writers.flatMap((row) => [
+			...(row.authorId ? [row.authorId] : []),
+			...(row.mentionedIds ?? []).filter((id) => wanted.has(id)),
+		]),
+	]);
 }
