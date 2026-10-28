@@ -72,7 +72,10 @@ export function PressCoverageSection({ lang }: PressCoverageSectionProps) {
 										</time>
 									</span>
 								</p>
-								<p className="mt-2 font-medium text-foreground text-lg leading-snug underline-offset-4 group-hover:underline">
+								<p
+									lang={article.titleLang}
+									className="mt-2 font-medium text-foreground text-lg leading-snug underline-offset-4 group-hover:underline"
+								>
 									{article.title}
 								</p>
 							</div>
