@@ -1,4 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	Fragment,
@@ -106,9 +107,12 @@ export function FileBreadcrumb({
 					className="size-3.5 shrink-0"
 				/>
 				{segments[index]}
-				{dirty && (
-					<span className="size-2 shrink-0 rounded-full bg-muted-foreground" />
-				)}
+				<span
+					className={cn(
+						"size-2 shrink-0 rounded-full bg-muted-foreground",
+						!dirty && "invisible",
+					)}
+				/>
 			</span>
 		) : (
 			segments[index]
