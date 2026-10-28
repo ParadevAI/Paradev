@@ -1,0 +1,67 @@
+import type { WorkspaceStore } from "@superset/panes";
+import type { StoreApi } from "zustand/vanilla";
+import type { FilePaneData, PaneViewerData } from "../../types";
+
+/**
+ * Opens a file from a file view's tree. A plain open goes to the preview tab,
+ * which the next plain open replaces; `pin` opens it as a tab that stays.
+ * Opening from the empty Files view turns that view into the file.
+ */
+export function openFileFromTree({
+	store,
+	filePath,
+	sourcePaneId,
+	pin = false,
+}: {
+	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	filePath: string;
+	sourcePaneId?: string;
+	pin?: boolean;
+}): void {
+	const state = store.getState();
+	const show = (paneId: string) => {
+		if (!pin) {
+			const location = state.getPane(paneId);
+			if (location) state.setActivePane({ tabId: location.tabId, paneId });
+			return;
+		}
+		state.setPanePinned({ paneId, pinned: true });
+		state.focusPane(paneId);
+	};
+
+	const filePanes = state.tabs.flatMap((tab) =>
+		Object.values(tab.panes).filter((pane) => pane.kind === "file"),
+	);
+	const open = filePanes.find(
+		(pane) => (pane.data as FilePaneData).filePath === filePath,
+	);
+	if (open) {
+		show(open.id);
+		return;
+	}
+
+	const data: FilePaneData = { filePath, mode: "editor" };
+	const newPane = { kind: "file", pinned: pin || undefined, data };
+	const source = sourcePaneId ? state.getPane(sourcePaneId) : null;
+	const sourceTab = source ? state.getTab(source.tabId) : null;
+	if (
+		source?.pane.kind === "files" &&
+		Object.keys(sourceTab?.panes ?? {}).length === 1
+	) {
+		state.replacePane({
+			tabId: source.tabId,
+			paneId: source.pane.id,
+			newPane,
+		});
+		if (pin) state.focusPane(state.getActivePane(source.tabId)?.pane.id ?? "");
+		return;
+	}
+
+	const preview = pin ? undefined : filePanes.find((pane) => !pane.pinned);
+	if (preview) {
+		state.setPaneData({ paneId: preview.id, data });
+		show(preview.id);
+		return;
+	}
+	state.addTab({ panes: [newPane], focus: pin });
+}

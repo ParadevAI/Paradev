@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { LayoutNode, WorkspaceState } from "../../types";
+import type { WorkspaceState } from "../../types";
 import type { CreatePaneInput } from "./store";
 import { createWorkspaceStore } from "./store";
 
@@ -1021,95 +1021,5 @@ describe("pane keys", () => {
 
 		expect(store.getState().activeTabId).toBe("t1");
 		expect(store.getState().focusRequest).toBeNull();
-	});
-});
-
-describe("stacked panes", () => {
-	function makeStackedStore() {
-		const store = makeStore();
-		store.getState().addTab({
-			id: "t1",
-			panes: [tp("a"), { id: "tree", kind: "tree", data: { label: "tree" } }],
-		});
-		store.getState().stackPane({ tabId: "t1", paneId: "a", newPane: tp("b") });
-		store.getState().stackPane({ tabId: "t1", paneId: "b", newPane: tp("c") });
-		return store;
-	}
-
-	function visibleIds(store: ReturnType<typeof makeStore>): string[] {
-		const ids: string[] = [];
-		const walk = (node: LayoutNode) => {
-			if (node.type === "pane") ids.push(node.paneId);
-			else {
-				walk(node.first);
-				walk(node.second);
-			}
-		};
-		const tab = store.getState().getTab("t1");
-		if (tab) walk(tab.layout);
-		return ids;
-	}
-
-	it("shows the new pane in the anchor's slot and keeps the anchor stacked", () => {
-		const store = makeStackedStore();
-		const tab = store.getState().getTab("t1");
-
-		expect(Object.keys(tab?.panes ?? {})).toEqual(["a", "b", "c", "tree"]);
-		expect(visibleIds(store)).toEqual(["c", "tree"]);
-		expect(tab?.activePaneId).toBe("c");
-	});
-
-	it("swaps a stacked pane into view when it becomes active", () => {
-		const store = makeStackedStore();
-
-		store.getState().setActivePane({ tabId: "t1", paneId: "a" });
-
-		expect(visibleIds(store)).toEqual(["a", "tree"]);
-		expect(store.getState().getTab("t1")?.activePaneId).toBe("a");
-	});
-
-	it("shows the next stacked pane when the visible one closes", () => {
-		const store = makeStackedStore();
-		store.getState().setActivePane({ tabId: "t1", paneId: "b" });
-
-		store.getState().closePane({ tabId: "t1", paneId: "b" });
-
-		expect(visibleIds(store)).toEqual(["c", "tree"]);
-		expect(store.getState().getTab("t1")?.activePaneId).toBe("c");
-	});
-
-	it("closes a stacked pane without touching the layout", () => {
-		const store = makeStackedStore();
-
-		store.getState().closePane({ tabId: "t1", paneId: "a" });
-
-		expect(visibleIds(store)).toEqual(["c", "tree"]);
-		expect(Object.keys(store.getState().getTab("t1")?.panes ?? {})).toEqual([
-			"b",
-			"c",
-			"tree",
-		]);
-	});
-
-	it("keeps a replaced stacked pane in its place and shows it", () => {
-		const store = makeStackedStore();
-
-		store
-			.getState()
-			.replacePane({ tabId: "t1", paneId: "a", newPane: tp("d") });
-
-		const tab = store.getState().getTab("t1");
-		expect(Object.keys(tab?.panes ?? {})).toEqual(["d", "b", "c", "tree"]);
-		expect(visibleIds(store)).toEqual(["d", "tree"]);
-	});
-
-	it("leaves a stacked sibling in view when the visible pane moves to a new tab", () => {
-		const store = makeStackedStore();
-
-		store.getState().movePaneToNewTab({ paneId: "c" });
-
-		const tab = store.getState().getTab("t1");
-		expect(visibleIds(store)).toEqual(["b", "tree"]);
-		expect(Object.keys(tab?.panes ?? {})).toEqual(["a", "b", "tree"]);
 	});
 });

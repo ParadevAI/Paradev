@@ -13,6 +13,7 @@ import {
 } from "@pierre/trees/react";
 import type { AppRouter } from "@superset/host-service";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
@@ -66,6 +67,8 @@ interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** Double-clicking a file pins it instead of renaming it. */
 	onPinFile?: (absolutePath: string) => void;
+	/** "fileView" floats the search as a pill over the tree. */
+	variant?: "sidebar" | "fileView";
 	selectedFilePath?: string;
 	pendingReveal?: {
 		path: string;
@@ -79,6 +82,7 @@ interface FilesTabProps {
 export function FilesTab({
 	onSelectFile,
 	onPinFile,
+	variant = "sidebar",
 	selectedFilePath,
 	pendingReveal,
 	workspaceId,
@@ -355,13 +359,21 @@ export function FilesTab({
 					header={
 						<div
 							data-file-tree-header="true"
-							className="group flex h-10 items-center gap-1 bg-background px-2"
+							className={cn(
+								"group flex items-center gap-1 px-2",
+								variant === "fileView" ? "h-11 pt-1" : "h-10 bg-background",
+							)}
 						>
 							{onSearch && (
 								<button
 									type="button"
 									onClick={onSearch}
-									className="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+									className={cn(
+										"flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										variant === "fileView"
+											? "h-7 rounded-full border border-border/60 bg-background px-2.5 shadow-sm"
+											: "h-8 rounded-md px-1.5",
+									)}
 								>
 									<Search className="size-3.5 shrink-0" />
 									<span className="truncate">

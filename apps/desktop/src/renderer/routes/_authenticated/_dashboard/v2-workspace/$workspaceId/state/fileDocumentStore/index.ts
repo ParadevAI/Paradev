@@ -5,7 +5,6 @@ export {
 	dispatchFsEvent,
 	getDocument,
 	releaseDocument,
-	subscribeDocuments,
 } from "./fileDocumentStore";
 export type {
 	ConflictResolution,

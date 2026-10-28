@@ -33,7 +33,9 @@ interface TabItemProps<TData> {
 	onClose: () => void;
 	onCloseOthers: () => void;
 	onCloseAll: () => void;
-	onRename: (title: string | undefined) => void;
+	onRename?: (title: string | undefined) => void;
+	onDoubleClick?: () => void;
+	isPreview?: boolean;
 	icon?: ReactNode;
 	accessory?: ReactNode;
 }
@@ -50,6 +52,8 @@ export function TabItem<TData>({
 	onCloseOthers,
 	onCloseAll,
 	onRename,
+	onDoubleClick,
+	isPreview = false,
 	icon,
 	accessory,
 }: TabItemProps<TData>) {
@@ -71,9 +75,9 @@ export function TabItem<TData>({
 	const saveEdit = () => {
 		const nextTitle = editValue.trim();
 		if (nextTitle.length === 0) {
-			onRename(undefined);
+			onRename?.(undefined);
 		} else if (nextTitle !== title) {
-			onRename(nextTitle);
+			onRename?.(nextTitle);
 		}
 		stopEditing();
 	};
@@ -161,10 +165,14 @@ export function TabItem<TData>({
 												onClose();
 											}
 										}}
-										onDoubleClick={startEditing}
+										onDoubleClick={
+											onDoubleClick ?? (onRename ? startEditing : undefined)
+										}
 									>
 										{icon && <span className="shrink-0">{icon}</span>}
-										<OverflowFadeText className="flex-1">
+										<OverflowFadeText
+											className={cn("flex-1", isPreview && "italic")}
+										>
 											{title}
 										</OverflowFadeText>
 									</div>
@@ -203,11 +211,15 @@ export function TabItem<TData>({
 				</div>
 			</ContextMenuTrigger>
 			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
-				<ContextMenuItem onSelect={() => runAfterClose(startEditing)}>
-					<PencilIcon className="mr-2 size-4" />
-					<Trans>Rename</Trans>
-				</ContextMenuItem>
-				<ContextMenuSeparator />
+				{onRename && (
+					<>
+						<ContextMenuItem onSelect={() => runAfterClose(startEditing)}>
+							<PencilIcon className="mr-2 size-4" />
+							<Trans>Rename</Trans>
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+					</>
+				)}
 				<ContextMenuItem onSelect={onClose}>
 					<XIcon className="mr-2 size-4" />
 					<Trans>Close</Trans>

@@ -29,6 +29,11 @@ import {
 
 const RIGHT_PANE_KEPT_TABS = 2;
 
+function isPreviewTab(tab: Tab<PaneViewerData>): boolean {
+	const panes = Object.values(tab.panes);
+	return panes.length === 1 && panes[0]?.kind === "file" && !panes[0].pinned;
+}
+
 interface RightPaneAreaProps {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	registry: PaneRegistry<PaneViewerData>;
@@ -82,6 +87,14 @@ export function RightPaneArea({
 				contextMenuActions={rightContextMenuActions}
 				onPaneError={reportRendererError}
 				renderTabIcon={renderBrowserTabIcon}
+				renameTabs={false}
+				isPreviewTab={isPreviewTab}
+				onTabDoubleClick={(tab) => {
+					for (const pane of Object.values(tab.panes)) {
+						if (!pane.pinned)
+							store.getState().setPanePinned({ paneId: pane.id, pinned: true });
+					}
+				}}
 				renderTabAccessory={(tab) => (
 					<V2NotificationStatusIndicator
 						sources={getV2NotificationSourcesForTab(tab)}
