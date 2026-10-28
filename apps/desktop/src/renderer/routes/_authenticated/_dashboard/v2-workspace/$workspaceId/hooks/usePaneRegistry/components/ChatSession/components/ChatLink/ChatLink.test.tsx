@@ -147,3 +147,21 @@ test("a square preview image is a thumbnail beside the text", async () => {
 	const card = title.closest("div.flex") as HTMLElement;
 	expect(card.querySelector("img.size-16")).toBeTruthy();
 });
+
+test("right-clicking a link copies its address", async () => {
+	const writes: string[] = [];
+	const original = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+	Object.defineProperty(navigator, "clipboard", {
+		configurable: true,
+		value: { writeText: async (text: string) => void writes.push(text) },
+	});
+	try {
+		const { link } = renderLink(PR, PR, null);
+		fireEvent.contextMenu(link);
+		fireEvent.click(await screen.findByText("Copy Link"));
+		await waitFor(() => expect(writes).toEqual([PR]));
+	} finally {
+		if (original) Object.defineProperty(navigator, "clipboard", original);
+		else Reflect.deleteProperty(navigator, "clipboard");
+	}
+});
