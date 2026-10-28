@@ -16,8 +16,8 @@ import {
 	ChatPaneActionsProvider,
 	type OpenLink,
 } from "../../../../../../../../providers/ChatPaneActionsProvider";
-import type { GithubWorkItemLink } from "../../../../../../../../utils/githubWorkItem";
-import { GithubWorkItemChip } from "./GithubWorkItemChip";
+import { linkChip } from "../../../../../../../../utils/linkChip";
+import { MessageChip } from "./MessageChip";
 
 afterEach(cleanup);
 
@@ -40,16 +40,18 @@ const ITEM = {
 	updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
 };
 
+const URL_ISSUE = "https://github.com/acme/widgets/issues/42";
+
 function renderChip(
 	answer: () => unknown,
-	link: GithubWorkItemLink = {
-		kind: "pr",
-		owner: "superset-sh",
-		repo: "superset",
-		number: 8329,
-	},
+	url: string = URL_PR,
 	openLink: OpenLink = () => true,
 ) {
+	const chip = linkChip(url, {
+		webUrl: "https://app.superset.sh",
+		isDark: false,
+	});
+	if (!chip) throw new Error("not a link");
 	const asked: unknown[] = [];
 	const trpcLink: TRPCLink<AppRouter> = () => (call) =>
 		observable((observer) => {
@@ -67,18 +69,18 @@ function renderChip(
 			queryClient={new QueryClient()}
 		>
 			<ChatPaneActionsProvider openLink={openLink} workspaceId="workspace-1">
-				<GithubWorkItemChip link={link} url={URL_PR} />
+				<MessageChip chip={chip} link={url} />
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
 	return { asked, view, chip: view.getByRole("link") };
 }
 
-test("a pull request chip asks for details only when the pointer or focus arrives", async () => {
+test("a pull request chip looks as the composer drew it and asks for details only when the pointer or focus arrives", async () => {
 	const { asked, chip } = renderChip(() => ITEM);
-	expect(chip.textContent).toBe("PR #8329");
-	expect(chip.title).toBe(URL_PR);
-	expect(chip.querySelector("span")?.className).toContain("sky");
+	expect(chip.textContent).toBe("superset-sh/superset#8329");
+	expect(chip.getAttribute("href")).toBe(URL_PR);
+	expect(chip.querySelector(".prompt-input-chip img")).not.toBeNull();
 	expect(asked).toEqual([]);
 
 	chip.focus();
@@ -96,17 +98,16 @@ test("a pull request chip asks for details only when the pointer or focus arrive
 	expect(card.textContent).toContain("Updated");
 });
 
-test("an issue chip is green, and a lookup that fails still leaves the link usable", async () => {
+test("a lookup that fails still leaves the link usable", async () => {
 	const openLink = mock<OpenLink>(() => true);
 	const { chip } = renderChip(
 		() => {
 			throw new Error("Not Found");
 		},
-		{ kind: "issue", owner: "acme", repo: "widgets", number: 42 },
+		URL_ISSUE,
 		openLink,
 	);
-	expect(chip.textContent).toBe("Issue #42");
-	expect(chip.querySelector("span")?.className).toContain("emerald");
+	expect(chip.textContent).toBe("acme/widgets#42");
 
 	chip.focus();
 	expect(
@@ -116,7 +117,7 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 	).toBeTruthy();
 
 	fireEvent.click(chip);
-	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_PR]);
+	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_ISSUE]);
 });
 
 test("right-clicking closes the card, and copying the link leaves it closed", async () => {

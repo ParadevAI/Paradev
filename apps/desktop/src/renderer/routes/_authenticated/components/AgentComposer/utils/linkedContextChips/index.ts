@@ -3,6 +3,8 @@ export {
 	LINKED_STATE_COLOR,
 	type LinkedContext,
 	type LinkedContextChipData,
+	linkedContextChip,
+	linkedContextData,
 	linkedContextOf,
 	linkedContextSeed,
 	linkedIssueChip,

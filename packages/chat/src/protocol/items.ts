@@ -14,6 +14,8 @@ export const textElementSchema = z.looseObject({
 	}),
 	elementKind: z.enum(["file_mention", "slash_command", "other"]),
 	label: z.string().optional(),
+	/** What the composer knew about the chip, so a sent message draws it the same. Opaque to the host. */
+	data: z.unknown().optional(),
 });
 export type TextElement = z.infer<typeof textElementSchema>;
 

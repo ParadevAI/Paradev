@@ -225,9 +225,7 @@ msgstr "{0, plural, one {# результат в облаке} few {# резул
 msgid "{0, plural, one {# result on this host} other {# results on this host}}"
 msgstr "{0, plural, one {# результат на этом хосте} few {# результата на этом хосте} many {# результатов на этом хосте} other {# результата на этом хосте}}"
 
-#. placeholder {0}: pullRequests.length
 #. placeholder {0}: results.length
-#. placeholder {0}: searchResults.length
 msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {# результат} few {# результата} many {# результатов} other {# результата}}"
 
@@ -1018,9 +1016,6 @@ msgstr "{minutes} мин."
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} мин {rest} с"
-
-msgid "{modKey}↵ to create"
-msgstr "{modKey}↵ — создать"
 
 msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
 msgstr "{monthlyPrice} за пользователя в месяц при помесячной оплате или {yearlyPrice} при оплате за год. Мобильное приложение, автоматизации, приоритетная поддержка."
@@ -1890,9 +1885,6 @@ msgstr "Подключите ещё аккаунт или отключите т�
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Добавьте любую машину как хост. Рабочие области продолжают работать, когда ноутбук спит, а вы можете заглянуть откуда угодно."
 
-msgid "Add attachment"
-msgstr "Добавить вложение"
-
 msgid "Add Attachment"
 msgstr "Добавить вложение"
 
@@ -2206,9 +2198,6 @@ msgstr "AI · диалог"
 
 msgid "AI · Status"
 msgstr "AI · статус"
-
-msgid "AI authentication failed. Please check your AI settings."
-msgstr "Не удалось выполнить аутентификацию AI. Проверьте настройки AI."
 
 msgid "Alert"
 msgstr "Оповещение"
@@ -2904,9 +2893,6 @@ msgstr "Назначена"
 msgid "Assigned to me"
 msgstr "Назначенные мне"
 
-msgid "Assigned to you"
-msgstr "Назначенные вам"
-
 msgid "Assignee"
 msgstr "Исполнитель"
 
@@ -3044,9 +3030,6 @@ msgstr "Автосохранение"
 
 msgid "Auto top-up"
 msgstr "Автопополнение"
-
-msgid "auto-generated"
-msgstr "генерируется автоматически"
 
 msgid "Auto-run command"
 msgstr "Команда автозапуска"
@@ -3242,7 +3225,6 @@ msgstr "Базовый образ · контрольных точек пока 
 msgid "Base URL"
 msgstr "Базовый URL"
 
-#. placeholder {0}: draft.linkedPR.prNumber
 #. placeholder {0}: linkedPR.prNumber
 msgid "based off PR #{0}"
 msgstr "на основе PR #{0}"
@@ -3386,12 +3368,6 @@ msgstr "Ответвить в новом worktree"
 
 msgid "Branch in this workspace"
 msgstr "Ответвить в этом рабочем пространстве"
-
-msgid "branch name"
-msgstr "имя ветки"
-
-msgid "Branch name"
-msgstr "Имя ветки"
 
 msgid "Branch name copied"
 msgstr "Имя ветки скопировано"
@@ -4869,9 +4845,6 @@ msgstr "Подключите репозитории GitHub и синхрониз
 msgid "Connect your Linear account before tracking tasks in Linear."
 msgstr "Подключите свой аккаунт Linear, прежде чем вести задачи в Linear."
 
-msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
-msgstr "Подключите свой аккаунт Linear в разделе Настройки → Интеграции, чтобы связывать задачи Linear."
-
 msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
 msgstr "Подключите свой аккаунт Linear, чтобы просматривать, обновлять задачи Linear и начинать работу над ними в Paradev."
 
@@ -5664,17 +5637,11 @@ msgstr "Не удалось загрузить контрибьюторов — 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Не удалось загрузить более ранние сообщения. Повторить"
 
-msgid "Couldn't load issues: {msg}"
-msgstr "Не удалось загрузить задачи: {msg}"
-
 msgid "Couldn't load its activity"
 msgstr "Не удалось загрузить активность"
 
 msgid "Couldn't load pages"
 msgstr "Не удалось загрузить страницы"
-
-msgid "Couldn't load pull requests: {msg}"
-msgstr "Не удалось загрузить пул-реквесты: {msg}"
 
 msgid "Couldn't load review comments"
 msgstr "Не удалось загрузить комментарии ревью"
@@ -5891,9 +5858,6 @@ msgstr "Создайте проект, клонировав репозитори
 
 msgid "Create a new task from the desktop tasks view."
 msgstr "Создайте задачу из раздела задач в приложении."
-
-msgid "Create a new workspace"
-msgstr "Создать новую рабочую область"
 
 msgid "Create a project to group tasks and cloud workspaces."
 msgstr "Создайте проект, чтобы объединить задачи и облачные рабочие области."
@@ -6113,10 +6077,6 @@ msgstr "Создаётся песочница"
 
 msgid "Creating workspace"
 msgstr "Создание рабочей области"
-
-#. placeholder {0}: linkedPR.prNumber
-msgid "Creating workspace from PR #{0}..."
-msgstr "Создание рабочей области из PR #{0}..."
 
 msgid "Creating workspace: {name}"
 msgstr "Создание рабочей области: {name}"
@@ -7172,8 +7132,8 @@ msgstr "Изменить имя"
 msgid "Edit on GitHub"
 msgstr "Изменить на GitHub"
 
-msgid "Edit prefix"
-msgstr "Изменить префикс"
+msgid "Edit queued message"
+msgstr "Изменить сообщение в очереди"
 
 msgid "Edit Run Script"
 msgstr "Изменить скрипт запуска"
@@ -7569,9 +7529,6 @@ msgstr "Изучаем"
 msgid "Extended thinking: {activeLabel}"
 msgstr "Расширенное мышление: {activeLabel}"
 
-msgid "external"
-msgstr "внешняя"
-
 msgid "External Application"
 msgstr "Внешнее приложение"
 
@@ -7747,9 +7704,6 @@ msgstr "Не удалось создать ветку обсуждения"
 msgid "Failed to create workspace"
 msgstr "Не удалось создать рабочую область"
 
-msgid "Failed to create workspace from PR"
-msgstr "Не удалось создать рабочую область из PR"
-
 msgid "Failed to delete"
 msgstr "Не удалось удалить"
 
@@ -7868,17 +7822,8 @@ msgstr "Не удалось открыть новое окно: {0}"
 msgid "Failed to open new window: {message}"
 msgstr "Не удалось открыть новое окно: {message}"
 
-msgid "Failed to open project"
-msgstr "Не удалось открыть проект"
-
-msgid "Failed to open task"
-msgstr "Не удалось открыть задачу"
-
 msgid "Failed to open the billing portal"
 msgstr "Не удалось открыть портал оплаты"
-
-msgid "Failed to open worktree"
-msgstr "Не удалось открыть worktree"
 
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
@@ -7886,12 +7831,6 @@ msgstr "Не удалось открыть: {0}"
 
 msgid "Failed to post reply"
 msgstr "Не удалось отправить ответ"
-
-msgid "Failed to prepare agent launch"
-msgstr "Не удалось подготовить запуск агента"
-
-msgid "Failed to process attachments"
-msgstr "Не удалось обработать вложения"
 
 msgid "Failed to push branch"
 msgstr "Не удалось отправить ветку"
@@ -9800,10 +9739,6 @@ msgstr "Изоляция"
 msgid "Issue"
 msgstr "Задача"
 
-#. placeholder {0}: link.number
-msgid "Issue #{0}"
-msgstr "Задача #{0}"
-
 msgid "Issue archived"
 msgstr "Задача архивирована"
 
@@ -10393,6 +10328,9 @@ msgstr "Интеграция с Linear"
 msgid "Linear is limiting requests. Try again in a few minutes."
 msgstr "Linear ограничивает число запросов. Повторите попытку через несколько минут."
 
+msgid "Linear issues"
+msgstr "Задачи Linear"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10402,9 +10340,6 @@ msgstr "Строки {0}–{1}"
 
 msgid "Link"
 msgstr "Ссылка"
-
-msgid "Link ↵"
-msgstr "Привязать ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "Сначала свяжите проект с репозиторием GitHub, чтобы включить клонирование."
@@ -10417,15 +10352,6 @@ msgstr "ссылка скопирована"
 
 msgid "Link copied"
 msgstr "Ссылка скопирована"
-
-msgid "Link GitHub issue"
-msgstr "Привязать задачу GitHub"
-
-msgid "Link Linear issue"
-msgstr "Связать задачу Linear"
-
-msgid "Link pull request"
-msgstr "Привязать пул-реквест"
 
 msgid "Link task"
 msgstr "Привязать задачу"
@@ -10565,9 +10491,6 @@ msgstr "Загрузка групп…"
 msgid "Loading issue…"
 msgstr "Загрузка задачи…"
 
-msgid "Loading issues..."
-msgstr "Загрузка задач..."
-
 msgid "Loading issues…"
 msgstr "Загрузка задач…"
 
@@ -10591,9 +10514,6 @@ msgstr "Загрузка проектов…"
 
 msgid "Loading pull request…"
 msgstr "Загрузка пул-реквеста…"
-
-msgid "Loading pull requests..."
-msgstr "Загрузка пул-реквестов..."
 
 msgid "Loading pull requests…"
 msgstr "Загрузка пул-реквестов…"
@@ -11149,6 +11069,9 @@ msgstr "Мобильное приложение"
 
 msgid "Mobile App"
 msgstr "Мобильное приложение"
+
+msgid "Mode"
+msgstr "Режим"
 
 msgid "model"
 msgstr "модель"
@@ -11907,6 +11830,12 @@ msgstr "Нет совпадений"
 msgid "No matches"
 msgstr "Нет совпадений"
 
+msgid "No matching issues"
+msgstr "Нет подходящих задач"
+
+msgid "No matching Linear issues"
+msgstr "Нет подходящих задач Linear"
+
 msgid "No matching MCP servers"
 msgstr "Нет подходящих серверов MCP"
 
@@ -11918,6 +11847,12 @@ msgstr "Нет подходящих участников организации.
 
 msgid "No matching pages"
 msgstr "Нет подходящих страниц"
+
+msgid "No matching pull requests"
+msgstr "Нет подходящих пул-реквестов"
+
+msgid "No matching tasks"
+msgstr "Нет подходящих задач"
 
 msgid "No MCP servers found"
 msgstr "Серверы MCP не найдены"
@@ -11955,14 +11890,8 @@ msgstr "Никого не найдено"
 msgid "No one to mention"
 msgstr "Некого упомянуть"
 
-msgid "No open issues found."
-msgstr "Открытых задач не найдено."
-
 msgid "No open issues."
 msgstr "Нет открытых задач."
-
-msgid "No open pull requests found."
-msgstr "Открытых пул-реквестов не найдено."
 
 msgid "No open pull requests."
 msgstr "Нет открытых пул-реквестов."
@@ -12990,9 +12919,6 @@ msgstr "Открыть задачу на GitHub"
 msgid "Open issue in Linear"
 msgstr "Открыть задачу в Linear"
 
-msgid "Open issues"
-msgstr "Открытые задачи"
-
 msgid "Open leaderboard"
 msgstr "Открыть рейтинг"
 
@@ -13049,9 +12975,6 @@ msgstr "Открыть проект"
 msgid "Open Projects"
 msgstr "Открыть проекты"
 
-msgid "Open PRs"
-msgstr "Открытые PR"
-
 msgid "Open pull request"
 msgstr "Открыть пул-реквест"
 
@@ -13065,9 +12988,6 @@ msgstr "Открыть пул-реквест #{0}"
 
 msgid "Open pull request options"
 msgstr "Открыть параметры пул-реквеста"
-
-msgid "Open pull requests"
-msgstr "Открытые пул-реквесты"
 
 msgid "Open recent"
 msgstr "Открыть недавние"
@@ -13092,9 +13012,6 @@ msgstr "Открыть параметры отправки"
 
 msgid "Open System Settings"
 msgstr "Открыть Системные настройки"
-
-msgid "Open task {title}"
-msgstr "Открыть задачу {title}"
 
 msgid "Open Terminal"
 msgstr "Открыть терминал"
@@ -13185,9 +13102,6 @@ msgstr "Открытие папок"
 
 msgid "Opening pages"
 msgstr "Открытие страниц"
-
-msgid "Opening worktree..."
-msgstr "Открытие worktree..."
 
 msgid "Opens beside this pane. This one keeps running."
 msgstr "Откроется рядом с этой панелью. Эта продолжит работать."
@@ -14023,10 +13937,6 @@ msgstr "Отправить ответ"
 msgid "PR"
 msgstr "PR"
 
-#. placeholder {0}: link.number
-msgid "PR #{0}"
-msgstr "PR #{0}"
-
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -14067,9 +13977,6 @@ msgstr "URL PR"
 
 msgid "PR URL must match {repoMismatch}."
 msgstr "URL пул-реквеста должен соответствовать {repoMismatch}."
-
-msgid "PR URL must match {selectedRepositoryLabel}."
-msgstr "URL пул-реквеста должен соответствовать {selectedRepositoryLabel}."
 
 msgid "Prediction progress"
 msgstr "Прогресс по прогнозу"
@@ -14525,6 +14432,9 @@ msgstr "Вопросы"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Вопросы, отзывы, поддержка или что угодно ещё. Напишите, и мы направим сообщение нужному человеку."
 
+msgid "Queue message"
+msgstr "Поставить сообщение в очередь"
+
 msgid "Queue paused"
 msgstr "Очередь приостановлена"
 
@@ -14533,6 +14443,9 @@ msgstr "Очередь приостановлена, потому что вы п
 
 msgid "Queue work for agents"
 msgstr "Ставьте работу агентам в очередь"
+
+msgid "Queue; ⌘↩ to steer the running turn"
+msgstr "В очередь; ⌘↩ — направить текущий ход"
 
 msgid "Queued"
 msgstr "В очереди"
@@ -14765,17 +14678,8 @@ msgstr "Недавние приложения"
 msgid "Recent invoices"
 msgstr "Недавние счета"
 
-msgid "Recent issues"
-msgstr "Недавние задачи"
-
 msgid "Recent prompts"
 msgstr "Недавние промпты"
-
-msgid "Recent PRs"
-msgstr "Недавние PR"
-
-msgid "Recent pull requests"
-msgstr "Недавние пул-реквесты"
 
 msgid "Recently deleted"
 msgstr "Недавно удалённые"
@@ -15011,12 +14915,6 @@ msgstr "Убрать изображение"
 
 msgid "Remove link"
 msgstr "Удалить ссылку"
-
-msgid "Remove linked issue"
-msgstr "Отвязать задачу"
-
-msgid "Remove linked PR"
-msgstr "Отвязать PR"
 
 msgid "Remove member"
 msgstr "Удалить участника"
@@ -15802,9 +15700,6 @@ msgstr "Запуск по расписанию или по событиям, з�
 msgid "Run script"
 msgstr "Запустить скрипт"
 
-msgid "Run setup script"
-msgstr "Запустить скрипт установки"
-
 msgid "Run setup script in each imported workspace"
 msgstr "Запускать скрипт установки в каждой импортированной рабочей области"
 
@@ -16123,8 +16018,8 @@ msgstr "Поиск по истории"
 msgid "Search in {frameTitle}…"
 msgstr "Поиск в {frameTitle}…"
 
-msgid "Search issues..."
-msgstr "Поиск задач..."
+msgid "Search issues…"
+msgstr "Поиск задач…"
 
 msgid "Search labels..."
 msgstr "Поиск меток..."
@@ -16167,9 +16062,6 @@ msgstr "Поиск проектов…"
 
 msgid "Search pull requests"
 msgstr "Поиск пул-реквестов"
-
-msgid "Search pull requests..."
-msgstr "Поиск пул-реквестов..."
 
 msgid "Search pull requests…"
 msgstr "Поиск пул-реквестов…"
@@ -16236,12 +16128,6 @@ msgstr "Искали переопределения tooltip"
 
 msgid "Searching for Kbd usages"
 msgstr "Ищем использования Kbd"
-
-msgid "Searching..."
-msgstr "Поиск..."
-
-msgid "Searching…"
-msgstr "Поиск…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -20048,12 +19934,6 @@ msgstr "user@example.com"
 msgid "user@host, ssh://user@host:2222, or an ssh config alias"
 msgstr "user@host, ssh://user@host:2222 или псевдоним из конфигурации ssh"
 
-msgid "Using random branch name (AI generation timed out)"
-msgstr "Используется случайное имя ветки (истекло время генерации AI)"
-
-msgid "Using random branch name (AI generation unavailable)"
-msgstr "Используется случайное имя ветки (генерация AI недоступна)"
-
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId не совпадает с проектом рабочей области"
 
@@ -20710,9 +20590,6 @@ msgstr "Конфигурация рабочей области"
 msgid "Workspace created"
 msgstr "Рабочая область создана"
 
-msgid "Workspace created from PR"
-msgstr "Рабочая область создана из PR"
-
 msgid "Workspace details"
 msgstr "Сведения о рабочей области"
 
@@ -20724,9 +20601,6 @@ msgstr "Раскладка рабочих областей"
 
 msgid "Workspace name"
 msgstr "Название рабочего пространства"
-
-msgid "Workspace name (optional)"
-msgstr "Имя рабочей области (необязательно)"
 
 msgid "Workspace not found"
 msgstr "Рабочая область не найдена"
@@ -20793,9 +20667,6 @@ msgstr "Расположение worktree обновлено"
 
 msgid "Worktree missing"
 msgstr "Worktree отсутствует"
-
-msgid "Worktree opened"
-msgstr "Worktree открыт"
 
 msgid "Worktree out of sync"
 msgstr "Worktree рассинхронизирован"

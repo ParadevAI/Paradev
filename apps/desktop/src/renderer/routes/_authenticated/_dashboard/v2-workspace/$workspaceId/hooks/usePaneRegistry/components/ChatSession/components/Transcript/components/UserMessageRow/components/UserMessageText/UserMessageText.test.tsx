@@ -18,9 +18,17 @@ import {
 import type { TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
 import {
+	linkedPrChip,
+	linkedPrIconUrl,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
+import {
 	ChatPaneActionsProvider,
 	type OpenLink,
 } from "../../../../../../providers/ChatPaneActionsProvider";
+import {
+	elementsForChips,
+	splitByElements,
+} from "../../../../../../utils/messageElements";
 import { copySourceText } from "../../../../utils/copySourceText";
 import { UserMessageText } from "./UserMessageText";
 
@@ -81,10 +89,12 @@ test("a service link is a pill, the first other link its page title, the rest pl
 	const title = view.getByText("Content · Agent Client Protocol");
 	expect(title.closest("a")?.href).toBe(DOCS);
 	expect(asked).toEqual([{ url: DOCS }]);
-	expect(view.getByText("PR #8329").closest("a")?.href).toBe(PR);
+	expect(view.getByText("superset-sh/superset#8329").closest("a")?.href).toBe(
+		PR,
+	);
 	expect(view.getByText(LATER).className).toContain("text-link");
 	expect(view.container.textContent).toBe(
-		"Look at PR #8329 and aContent · Agent Client Protocol\nthen https://example.com/later.",
+		"Look at superset-sh/superset#8329 and aContent · Agent Client Protocol\nthen https://example.com/later.",
 	);
 });
 
@@ -93,7 +103,7 @@ test("right-clicking a link chip opens the link menu, not the pane's", async () 
 		title: "Content",
 		iconDataUrl: null,
 	});
-	for (const label of ["PR #8329", "Content"]) {
+	for (const label of ["superset-sh/superset#8329", "Content"]) {
 		fireEvent.contextMenu(view.getByText(label));
 		expect(await screen.findByText("Copy Link")).toBeTruthy();
 		expect(screen.queryByText("Close Pane")).toBeNull();
@@ -147,7 +157,7 @@ test("copying a sent message gives back what was typed, not the labels shown", a
 	window.getSelection()?.selectAllChildren(message);
 	expect(copy(message)).toEqual([["text/plain", text]]);
 
-	const pill = view.getByText("PR #8329");
+	const pill = view.getByText("superset-sh/superset#8329");
 	window.getSelection()?.selectAllChildren(pill);
 	expect(copy(pill)).toEqual([["text/plain", PR]]);
 
@@ -193,4 +203,46 @@ test("copying part of a plain URL keeps the selected substring", async () => {
 	expect(setData.mock.calls).toEqual([
 		["text/plain", `${DOCS} then https://example`],
 	]);
+});
+
+test("a pull request picked in the composer is drawn as the composer drew it", () => {
+	const pr = {
+		prNumber: 8329,
+		title: "Load whole sessions",
+		url: PR,
+		state: "merged",
+	};
+	const chip = linkedPrChip(pr);
+	const text = `Review ${PR}`;
+	const elements = elementsForChips(text, [chip]);
+	const sent = splitByElements(text, elements);
+	// A message sent before chips kept their data.
+	const older = splitByElements(
+		text,
+		elements.map(({ data: _data, ...element }) => element),
+	);
+	const link: TRPCLink<AppRouter> = () => () => observable(() => {});
+	const view = render(
+		<workspaceTrpc.Provider
+			client={workspaceTrpc.createClient({ links: [link] })}
+			queryClient={new QueryClient()}
+		>
+			<ChatPaneActionsProvider openLink={() => true} workspaceId="workspace-1">
+				<div data-testid="sent">
+					<UserMessageText segments={sent} />
+				</div>
+				<div data-testid="older">
+					<UserMessageText segments={older} />
+				</div>
+			</ChatPaneActionsProvider>
+		</workspaceTrpc.Provider>,
+	);
+	const shown = view.getByTestId("sent").querySelector(".prompt-input-chip");
+	expect(shown?.textContent).toBe(chip.label);
+	expect(shown?.querySelector("img")?.getAttribute("src")).toBe(
+		linkedPrIconUrl(pr),
+	);
+	const plain = view.getByTestId("older").querySelector(".prompt-input-chip");
+	expect(plain?.textContent).toBe(chip.label);
+	expect(plain?.querySelector("img")).toBeNull();
 });

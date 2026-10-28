@@ -225,9 +225,7 @@ msgstr "{0, plural, one {# výsledek v Cloudu} few {# výsledky v Cloudu} many {
 msgid "{0, plural, one {# result on this host} other {# results on this host}}"
 msgstr "{0, plural, one {# výsledek na tomto hostu} few {# výsledky na tomto hostu} many {# výsledku na tomto hostu} other {# výsledků na tomto hostu}}"
 
-#. placeholder {0}: pullRequests.length
 #. placeholder {0}: results.length
-#. placeholder {0}: searchResults.length
 msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {# výsledek} few {# výsledky} many {# výsledku} other {# výsledků}}"
 
@@ -1018,9 +1016,6 @@ msgstr "{minutes} m"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} m {rest} s"
-
-msgid "{modKey}↵ to create"
-msgstr "{modKey}↵ pro vytvoření"
 
 msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za uživatele/měs. při měsíční fakturaci, nebo {yearlyPrice} při roční fakturaci. Mobilní aplikace, automatizace, prioritní podpora."
@@ -1890,9 +1885,6 @@ msgstr "Připoj další účet nebo odpoj ten, který už nepoužíváš."
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Přidejte jako hosta libovolný počítač. Pracovní prostory běží dál, i když váš laptop usne, a vy se můžete kdykoli podívat, jak si vedou."
 
-msgid "Add attachment"
-msgstr "Přidat přílohu"
-
 msgid "Add Attachment"
 msgstr "Přidat přílohu"
 
@@ -2206,9 +2198,6 @@ msgstr "AI · Konverzace"
 
 msgid "AI · Status"
 msgstr "AI · Stav"
-
-msgid "AI authentication failed. Please check your AI settings."
-msgstr "Ověření AI selhalo. Zkontrolujte prosím nastavení AI."
 
 msgid "Alert"
 msgstr "Upozornění"
@@ -2904,9 +2893,6 @@ msgstr "Přiřazeno"
 msgid "Assigned to me"
 msgstr "Přiřazené mně"
 
-msgid "Assigned to you"
-msgstr "Přiřazené vám"
-
 msgid "Assignee"
 msgstr "Řešitel"
 
@@ -3044,9 +3030,6 @@ msgstr "Automatické ukládání"
 
 msgid "Auto top-up"
 msgstr "Automatické dobití"
-
-msgid "auto-generated"
-msgstr "automaticky"
 
 msgid "Auto-run command"
 msgstr "Automaticky spustit příkaz"
@@ -3242,7 +3225,6 @@ msgstr "Základní obraz · zatím bez kontrolního bodu"
 msgid "Base URL"
 msgstr "Základní URL"
 
-#. placeholder {0}: draft.linkedPR.prNumber
 #. placeholder {0}: linkedPR.prNumber
 msgid "based off PR #{0}"
 msgstr "na základě PR #{0}"
@@ -3386,12 +3368,6 @@ msgstr "Rozvětvit do nového worktree"
 
 msgid "Branch in this workspace"
 msgstr "Rozvětvit v tomto pracovním prostoru"
-
-msgid "branch name"
-msgstr "název větve"
-
-msgid "Branch name"
-msgstr "Název větve"
 
 msgid "Branch name copied"
 msgstr "Název větve zkopírován"
@@ -4869,9 +4845,6 @@ msgstr "Připojte své GitHub repozitáře a synchronizujte pull requesty. Sledu
 msgid "Connect your Linear account before tracking tasks in Linear."
 msgstr "Než začnete sledovat úkoly v Linearu, připojte svůj účet Linear."
 
-msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
-msgstr "Připojte svůj účet Linear v Nastavení → Integrace, abyste mohli propojovat Linear issues."
-
 msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
 msgstr "Připojte svůj účet Linear a procházejte, upravujte a začněte pracovat na Linear issues přímo ze Paradev."
 
@@ -5664,17 +5637,11 @@ msgstr "Nepodařilo se načíst přispěvatele — zadejte uživatelské jméno.
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Starší zprávy se nepodařilo načíst. Zkusit znovu"
 
-msgid "Couldn't load issues: {msg}"
-msgstr "Nepodařilo se načíst issues: {msg}"
-
 msgid "Couldn't load its activity"
 msgstr "Aktivitu se nepodařilo načíst"
 
 msgid "Couldn't load pages"
 msgstr "Stránky se nepodařilo načíst"
-
-msgid "Couldn't load pull requests: {msg}"
-msgstr "Nepodařilo se načíst pull requesty: {msg}"
 
 msgid "Couldn't load review comments"
 msgstr "Nepodařilo se načíst komentáře k revizi"
@@ -5891,9 +5858,6 @@ msgstr "Vytvořte nový projekt naklonováním repozitáře nebo z lokální ces
 
 msgid "Create a new task from the desktop tasks view."
 msgstr "Vytvořte nový úkol z desktopového zobrazení úkolů."
-
-msgid "Create a new workspace"
-msgstr "Vytvořit nový pracovní prostor"
 
 msgid "Create a project to group tasks and cloud workspaces."
 msgstr "Vytvořte projekt a seskupte do něj úkoly a cloudové pracovní prostory."
@@ -6113,10 +6077,6 @@ msgstr "Vytváří se sandbox"
 
 msgid "Creating workspace"
 msgstr "Vytvářím pracovní prostor"
-
-#. placeholder {0}: linkedPR.prNumber
-msgid "Creating workspace from PR #{0}..."
-msgstr "Vytvářím pracovní prostor z PR #{0}..."
 
 msgid "Creating workspace: {name}"
 msgstr "Vytvářím pracovní prostor: {name}"
@@ -7172,8 +7132,8 @@ msgstr "Upravit název"
 msgid "Edit on GitHub"
 msgstr "Upravit na GitHubu"
 
-msgid "Edit prefix"
-msgstr "Upravit prefix"
+msgid "Edit queued message"
+msgstr "Upravit zprávu ve frontě"
 
 msgid "Edit Run Script"
 msgstr "Upravit run skript"
@@ -7569,9 +7529,6 @@ msgstr "Zvažujeme"
 msgid "Extended thinking: {activeLabel}"
 msgstr "Rozšířené přemýšlení: {activeLabel}"
 
-msgid "external"
-msgstr "externí"
-
 msgid "External Application"
 msgstr "Externí aplikace"
 
@@ -7747,9 +7704,6 @@ msgstr "Nepodařilo se vytvořit vlákno"
 msgid "Failed to create workspace"
 msgstr "Nepodařilo se vytvořit pracovní prostor"
 
-msgid "Failed to create workspace from PR"
-msgstr "Nepodařilo se vytvořit pracovní prostor z PR"
-
 msgid "Failed to delete"
 msgstr "Nepodařilo se smazat"
 
@@ -7868,17 +7822,8 @@ msgstr "Nepodařilo se otevřít nové okno: {0}"
 msgid "Failed to open new window: {message}"
 msgstr "Nepodařilo se otevřít nové okno: {message}"
 
-msgid "Failed to open project"
-msgstr "Nepodařilo se otevřít projekt"
-
-msgid "Failed to open task"
-msgstr "Nepodařilo se otevřít úkol"
-
 msgid "Failed to open the billing portal"
 msgstr "Nepodařilo se otevřít fakturační portál"
-
-msgid "Failed to open worktree"
-msgstr "Nepodařilo se otevřít worktree"
 
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
@@ -7886,12 +7831,6 @@ msgstr "Nepodařilo se otevřít: {0}"
 
 msgid "Failed to post reply"
 msgstr "Nepodařilo se odeslat odpověď"
-
-msgid "Failed to prepare agent launch"
-msgstr "Nepodařilo se připravit spuštění agenta"
-
-msgid "Failed to process attachments"
-msgstr "Nepodařilo se zpracovat přílohy"
 
 msgid "Failed to push branch"
 msgstr "Nepodařilo se odeslat větev"
@@ -9800,10 +9739,6 @@ msgstr "Izolace"
 msgid "Issue"
 msgstr "Issue"
 
-#. placeholder {0}: link.number
-msgid "Issue #{0}"
-msgstr "Issue #{0}"
-
 msgid "Issue archived"
 msgstr "Issue archivována"
 
@@ -10393,6 +10328,9 @@ msgstr "Integrace s Linearem"
 msgid "Linear is limiting requests. Try again in a few minutes."
 msgstr "Linear omezuje počet požadavků. Zkuste to za pár minut znovu."
 
+msgid "Linear issues"
+msgstr "Linear issues"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10402,9 +10340,6 @@ msgstr "Řádky {0}–{1}"
 
 msgid "Link"
 msgstr "Odkaz"
-
-msgid "Link ↵"
-msgstr "Propojit ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "Klonování zapnete tím, že k projektu nejprve propojíte GitHub repozitář."
@@ -10417,15 +10352,6 @@ msgstr "odkaz zkopírován"
 
 msgid "Link copied"
 msgstr "Odkaz zkopírován"
-
-msgid "Link GitHub issue"
-msgstr "Propojit GitHub issue"
-
-msgid "Link Linear issue"
-msgstr "Propojit Linear issue"
-
-msgid "Link pull request"
-msgstr "Propojit pull request"
 
 msgid "Link task"
 msgstr "Propojit úkol"
@@ -10565,9 +10491,6 @@ msgstr "Načítám skupiny…"
 msgid "Loading issue…"
 msgstr "Načítám issue…"
 
-msgid "Loading issues..."
-msgstr "Načítám issues..."
-
 msgid "Loading issues…"
 msgstr "Načítám issues…"
 
@@ -10591,9 +10514,6 @@ msgstr "Načítám projekty…"
 
 msgid "Loading pull request…"
 msgstr "Načítám pull request…"
-
-msgid "Loading pull requests..."
-msgstr "Načítám pull requesty..."
 
 msgid "Loading pull requests…"
 msgstr "Načítám pull requesty…"
@@ -11149,6 +11069,9 @@ msgstr "Mobilní aplikace"
 
 msgid "Mobile App"
 msgstr "Mobilní aplikace"
+
+msgid "Mode"
+msgstr "Režim"
 
 msgid "model"
 msgstr "model"
@@ -11907,6 +11830,12 @@ msgstr "Žádná shoda"
 msgid "No matches"
 msgstr "Žádné shody"
 
+msgid "No matching issues"
+msgstr "Žádné odpovídající issues"
+
+msgid "No matching Linear issues"
+msgstr "Žádné odpovídající Linear issues"
+
 msgid "No matching MCP servers"
 msgstr "Žádné odpovídající MCP servery"
 
@@ -11918,6 +11847,12 @@ msgstr "Žádní odpovídající členové organizace."
 
 msgid "No matching pages"
 msgstr "Žádné odpovídající stránky"
+
+msgid "No matching pull requests"
+msgstr "Žádné odpovídající pull requesty"
+
+msgid "No matching tasks"
+msgstr "Žádné odpovídající úkoly"
 
 msgid "No MCP servers found"
 msgstr "Nenalezeny žádné MCP servery"
@@ -11955,14 +11890,8 @@ msgstr "Nikdo neodpovídá"
 msgid "No one to mention"
 msgstr "Není koho zmínit"
 
-msgid "No open issues found."
-msgstr "Nenalezeny žádné otevřené issues."
-
 msgid "No open issues."
 msgstr "Žádné otevřené issues."
-
-msgid "No open pull requests found."
-msgstr "Nenalezeny žádné otevřené pull requesty."
 
 msgid "No open pull requests."
 msgstr "Žádné otevřené pull requesty."
@@ -12990,9 +12919,6 @@ msgstr "Otevřít issue na GitHubu"
 msgid "Open issue in Linear"
 msgstr "Otevřít issue v Linearu"
 
-msgid "Open issues"
-msgstr "Otevřené issues"
-
 msgid "Open leaderboard"
 msgstr "Otevřít žebříček"
 
@@ -13049,9 +12975,6 @@ msgstr "Otevřít projekt"
 msgid "Open Projects"
 msgstr "Otevřít projekty"
 
-msgid "Open PRs"
-msgstr "Otevřené PR"
-
 msgid "Open pull request"
 msgstr "Otevřít pull request"
 
@@ -13065,9 +12988,6 @@ msgstr "Otevřít pull request #{0}"
 
 msgid "Open pull request options"
 msgstr "Otevřít možnosti pull requestu"
-
-msgid "Open pull requests"
-msgstr "Otevřené pull requesty"
 
 msgid "Open recent"
 msgstr "Otevřít nedávné"
@@ -13092,9 +13012,6 @@ msgstr "Otevřít možnosti odeslání"
 
 msgid "Open System Settings"
 msgstr "Otevřít Nastavení systému"
-
-msgid "Open task {title}"
-msgstr "Otevřít úkol {title}"
 
 msgid "Open Terminal"
 msgstr "Otevřít terminál"
@@ -13185,9 +13102,6 @@ msgstr "Otevírání složek"
 
 msgid "Opening pages"
 msgstr "Otevírání stránek"
-
-msgid "Opening worktree..."
-msgstr "Otevírám worktree..."
 
 msgid "Opens beside this pane. This one keeps running."
 msgstr "Otevře se vedle tohoto panelu. Tento dál běží."
@@ -14023,10 +13937,6 @@ msgstr "Odeslat odpověď"
 msgid "PR"
 msgstr "PR"
 
-#. placeholder {0}: link.number
-msgid "PR #{0}"
-msgstr "PR #{0}"
-
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -14067,9 +13977,6 @@ msgstr "URL PR"
 
 msgid "PR URL must match {repoMismatch}."
 msgstr "URL pull requestu musí odpovídat {repoMismatch}."
-
-msgid "PR URL must match {selectedRepositoryLabel}."
-msgstr "URL pull requestu musí odpovídat {selectedRepositoryLabel}."
 
 msgid "Prediction progress"
 msgstr "Průběh předpovědi"
@@ -14525,6 +14432,9 @@ msgstr "Otázky"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Dotazy, zpětná vazba, podpora nebo cokoli jiného. Napište nám a předáme to správnému člověku."
 
+msgid "Queue message"
+msgstr "Zařadit zprávu do fronty"
+
 msgid "Queue paused"
 msgstr "Fronta pozastavena"
 
@@ -14533,6 +14443,9 @@ msgstr "Fronta pozastavena, protože jste přerušili agenta"
 
 msgid "Queue work for agents"
 msgstr "Fronta práce pro agenty"
+
+msgid "Queue; ⌘↩ to steer the running turn"
+msgstr "Zařadit do fronty; ⌘↩ usměrní běžící tah"
 
 msgid "Queued"
 msgstr "Ve frontě"
@@ -14765,17 +14678,8 @@ msgstr "Nedávné aplikace"
 msgid "Recent invoices"
 msgstr "Poslední faktury"
 
-msgid "Recent issues"
-msgstr "Nedávné issues"
-
 msgid "Recent prompts"
 msgstr "Nedávné prompty"
-
-msgid "Recent PRs"
-msgstr "Nedávné PR"
-
-msgid "Recent pull requests"
-msgstr "Nedávné pull requesty"
 
 msgid "Recently deleted"
 msgstr "Nedávno smazané"
@@ -15011,12 +14915,6 @@ msgstr "Odebrat obrázek"
 
 msgid "Remove link"
 msgstr "Odebrat odkaz"
-
-msgid "Remove linked issue"
-msgstr "Odebrat propojenou issue"
-
-msgid "Remove linked PR"
-msgstr "Odebrat propojený PR"
 
 msgid "Remove member"
 msgstr "Odebrat člena"
@@ -15802,9 +15700,6 @@ msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení
 msgid "Run script"
 msgstr "Spustit skript"
 
-msgid "Run setup script"
-msgstr "Spustit setup skript"
-
 msgid "Run setup script in each imported workspace"
 msgstr "Spustit setup skript v každém importovaném pracovním prostoru"
 
@@ -16123,8 +16018,8 @@ msgstr "Prohledat historii"
 msgid "Search in {frameTitle}…"
 msgstr "Hledat v {frameTitle}…"
 
-msgid "Search issues..."
-msgstr "Hledat issues..."
+msgid "Search issues…"
+msgstr "Hledat issues…"
 
 msgid "Search labels..."
 msgstr "Hledat štítky..."
@@ -16167,9 +16062,6 @@ msgstr "Hledat projekty…"
 
 msgid "Search pull requests"
 msgstr "Hledat pull requesty"
-
-msgid "Search pull requests..."
-msgstr "Hledat pull requesty..."
 
 msgid "Search pull requests…"
 msgstr "Hledat pull requesty…"
@@ -16236,12 +16128,6 @@ msgstr "Hledány přepisy tooltipů"
 
 msgid "Searching for Kbd usages"
 msgstr "Hledám použití Kbd"
-
-msgid "Searching..."
-msgstr "Hledám..."
-
-msgid "Searching…"
-msgstr "Hledání…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -20048,12 +19934,6 @@ msgstr "uzivatel@example.com"
 msgid "user@host, ssh://user@host:2222, or an ssh config alias"
 msgstr "uživatel@host, ssh://uživatel@host:2222 nebo alias z konfigurace ssh"
 
-msgid "Using random branch name (AI generation timed out)"
-msgstr "Použije se náhodný název větve (generování přes AI vypršelo)"
-
-msgid "Using random branch name (AI generation unavailable)"
-msgstr "Použije se náhodný název větve (generování přes AI není dostupné)"
-
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId neodpovídá projektu pracovního prostoru"
 
@@ -20710,9 +20590,6 @@ msgstr "Konfigurace pracovního prostoru"
 msgid "Workspace created"
 msgstr "Pracovní prostor vytvořen"
 
-msgid "Workspace created from PR"
-msgstr "Pracovní prostor vytvořen z PR"
-
 msgid "Workspace details"
 msgstr "Podrobnosti pracovního prostoru"
 
@@ -20724,9 +20601,6 @@ msgstr "Rozvržení pracovních prostorů"
 
 msgid "Workspace name"
 msgstr "Název pracovního prostoru"
-
-msgid "Workspace name (optional)"
-msgstr "Název pracovního prostoru (volitelné)"
 
 msgid "Workspace not found"
 msgstr "Pracovní prostor nenalezen"
@@ -20793,9 +20667,6 @@ msgstr "Umístění worktree změněno"
 
 msgid "Worktree missing"
 msgstr "Chybí worktree"
-
-msgid "Worktree opened"
-msgstr "Worktree otevřen"
 
 msgid "Worktree out of sync"
 msgstr "Worktree není synchronizovaný"

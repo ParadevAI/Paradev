@@ -76,15 +76,26 @@ export function linkedPrChip(pr: LinkedPR): ComposerChip {
 	};
 }
 
-function chipData(chip: ComposerChip): LinkedContextChipData | null {
-	const data = chip.data as
+/** The issue or PR a chip (or a sent message's element) carries, if any. */
+export function linkedContextData(data: unknown): LinkedContextChipData | null {
+	const linked = data as
 		| { kind?: unknown; issue?: LinkedIssue; pr?: LinkedPR }
 		| undefined;
-	if (data?.kind === "linked_issue" && data.issue)
-		return { kind: "linked_issue", issue: data.issue };
-	if (data?.kind === "linked_pr" && data.pr)
-		return { kind: "linked_pr", pr: data.pr };
+	if (linked?.kind === "linked_issue" && linked.issue)
+		return { kind: "linked_issue", issue: linked.issue };
+	if (linked?.kind === "linked_pr" && linked.pr)
+		return { kind: "linked_pr", pr: linked.pr };
 	return null;
+}
+
+/** The chip the composer draws for linked context, rebuilt from its data. */
+export function linkedContextChip(
+	data: LinkedContextChipData,
+	isDark: boolean,
+): ComposerChip {
+	return data.kind === "linked_pr"
+		? linkedPrChip(data.pr)
+		: linkedIssueChip(data.issue, isDark);
 }
 
 /** The issues and PR a prompt links, deduped; the first PR chip wins. */
@@ -92,7 +103,7 @@ export function linkedContextOf(chips: readonly ComposerChip[]): LinkedContext {
 	const issues: LinkedIssue[] = [];
 	let pr: LinkedPR | null = null;
 	for (const chip of chips) {
-		const data = chipData(chip);
+		const data = linkedContextData(chip.data);
 		if (!data) continue;
 		if (data.kind === "linked_pr") {
 			pr ??= data.pr;
