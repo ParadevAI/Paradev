@@ -27,7 +27,9 @@ owner's own address. It is for a first test, not for real recipients.
 
 ## 2. Prove it on a test address first
 
-Before a real recipient, send the same message to Resend's test addresses:
+Before a real recipient, send the same message to Resend's test addresses.
+Remove `cc` and `bcc`, and put only test addresses in `to`. A real address in
+any recipient field gets the test email before the user confirms in step 3.
 
 - `delivered@resend.dev`: delivered. Add a label for each case, for example
   `delivered+welcome@resend.dev`.
