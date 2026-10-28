@@ -72,6 +72,7 @@ interface PdevLogEntry {
 	env: Record<string, string | undefined>;
 	settings: string;
 	appendSystem: string | null;
+	mcp: string | null;
 }
 
 function pdevLog(): PdevLogEntry[] {
@@ -337,6 +338,28 @@ describe("runTurn", () => {
 		expect((error as ApplicationFailure).nonRetryable).toBe(false);
 		expect(pdevLog().some((e) => e.method === "session/cancel")).toBe(false);
 	});
+	test("a main session gets the Dev's prompt and its tools, and no machine", async () => {
+		const { activities } = setup({
+			credentials: {
+				...withBox,
+				host: null,
+				dev: { name: "Ada", description: "backend", instructions: "Be brief." },
+				session: { kind: "main", role: null, title: null },
+				tools: { mcpUrl: "http://api/mcp/agent" },
+				agentToken: "turn-token",
+			},
+		});
+		await runOne(activities, "hello");
+		const start = pdevLog().find((e) => e.event === "start");
+		expect(start?.env.PDEV_NO_WORKSPACE).toBe("1");
+		expect(start?.appendSystem).toContain("You are Ada");
+		expect(start?.appendSystem).toContain("Be brief.");
+		const mcp = JSON.parse(start?.mcp ?? "{}");
+		expect(mcp.mcpServers.dev.url).toBe("http://api/mcp/agent");
+		expect(mcp.mcpServers.dev.headersHelper).toContain(
+			"dev-tools-headers.json",
+		);
+	});
 });
 
 describe("settleTurn", () => {
@@ -363,6 +386,22 @@ describe("settleTurn", () => {
 		expect(posted).toEqual([
 			{ body: "reply to: hello", idempotencyKey: "t1:reply" },
 		]);
+	});
+
+	test("does not post the final reply again when the Dev replied with its tool", async () => {
+		const { activities, posted } = setup({
+			credentials: {
+				...withBox,
+				room: { channelId: "c1", threadRootId: null },
+			},
+		});
+		await runOne(activities, "please use the reply tool");
+		await activities.settleTurn({
+			...turn,
+			outcome: "completed",
+			steersConsumed: 0,
+		});
+		expect(posted).toEqual([]);
 	});
 
 	test("counts only this turn and closes calls a stop left open", async () => {

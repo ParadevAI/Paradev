@@ -86,6 +86,10 @@ const HIDDEN_UPDATES = new Set([
 const SESSION_ID = /^[A-Za-z0-9_-]{1,128}$/;
 const IN_ROOM =
 	"People read this conversation in a channel. They see only your final reply, so end each turn with a short, self-contained answer.";
+const TOKEN_REFRESH_MS = 4 * 60_000;
+const TURN_TOKEN_HEADER = "x-agent-turn-token";
+const PROVISIONING_WAIT_MS = 10 * 60_000;
+const PROVISIONING_POLL_MS = 5_000;
 const RESUMED =
 	"This turn stopped before it finished, because the machine running you restarted. Continue the task from where it stopped. Check the current state before you repeat any action.";
 
@@ -152,12 +156,16 @@ export function createActivities(deps: ActivityDeps) {
 
 	/** A turn that answered without posting would leave the room silent. */
 	const postReply = async (
-		ref: TurnRef & { outcome: SettleTurnInput["status"] },
+		ref: TurnRef & {
+			outcome: SettleTurnInput["status"];
+			repliedWithTool: boolean;
+		},
 		credentials: TurnCredentials,
 		reply: string | undefined,
 	) => {
 		const poster = posterFor(credentials);
 		if (!poster || ref.outcome !== "completed" || !reply?.trim()) return;
+		if (ref.repliedWithTool) return;
 		await poster.post({ body: reply, idempotencyKey: `${ref.turnId}:reply` });
 	};
 
@@ -201,18 +209,30 @@ export function createActivities(deps: ActivityDeps) {
 			}
 			const info = activityInfo();
 			const attempt = info?.attempt ?? 1;
-			const { credentials, store } = await handles(input);
+			const { credentials, store } = await untilProvisioned(() =>
+				handles(input),
+			);
 			const home = join(deps.pdev.workRoot, input.sessionId);
 			const agentDir = join(home, ".paradev", "agent");
 			const cwd = join(home, "work");
 			await rm(home, { recursive: true, force: true });
 			await mkdir(cwd, { recursive: true });
 			await mkdir(agentDir, { recursive: true });
-			await writeAgentSettings(
+			const headersFile = join(home, "dev-tools-headers.json");
+			const writeHeaders = async (token: string) =>
+				writeFile(headersFile, JSON.stringify({ [TURN_TOKEN_HEADER]: token }), {
+					mode: 0o600,
+				});
+			if (credentials.tools) await writeHeaders(credentials.agentToken ?? "");
+			await writeAgentSettings({
 				agentDir,
-				deps.pdev.model,
-				Boolean(credentials.room),
-			);
+				model: deps.pdev.model,
+				system: systemFor(credentials),
+				tools: credentials.tools
+					? { mcpUrl: credentials.tools.mcpUrl, headersFile }
+					: null,
+			});
+			let headersAt = now();
 
 			const runKey = `${input.turnId}/run/${input.steersFrom}`;
 			let rows = await store.transcript();
@@ -311,6 +331,11 @@ export function createActivities(deps: ActivityDeps) {
 						idleSince = null;
 					}
 					await syncFile();
+					if (credentials.tools && now() - headersAt >= TOKEN_REFRESH_MS) {
+						headersAt = now();
+						const fresh = await credentialsFor(input);
+						await writeHeaders(fresh.agentToken ?? "");
+					}
 					if (session.idle) {
 						idleSince ??= now();
 						if (now() - idleSince >= settleIdleMs) break;
@@ -362,7 +387,16 @@ export function createActivities(deps: ActivityDeps) {
 			if (running) {
 				rows = await running.store.transcript();
 				const summary = summarizeTurn(entriesOfTurn(rows, input.turnId));
-				await postReply(input, running.credentials, summary.reply);
+				await postReply(
+					{
+						...input,
+						repliedWithTool: summary.toolCalls.some((call) =>
+							/(^|__)reply$/.test(call.name),
+						),
+					},
+					running.credentials,
+					summary.reply,
+				);
 				settled = await deps.settler.settle({ ...base, ...summary });
 			} else {
 				settled = await deps.settler.settle(base);
@@ -422,11 +456,17 @@ async function showSteer(
 	});
 }
 
-async function writeAgentSettings(
-	agentDir: string,
-	model: string | undefined,
-	inRoom: boolean,
-): Promise<void> {
+async function writeAgentSettings({
+	agentDir,
+	model,
+	system,
+	tools,
+}: {
+	agentDir: string;
+	model: string | undefined;
+	system: string;
+	tools: { mcpUrl: string; headersFile: string } | null;
+}): Promise<void> {
 	const slash = model?.indexOf("/") ?? -1;
 	if (model && slash > 0) {
 		await writeFile(
@@ -437,7 +477,48 @@ async function writeAgentSettings(
 			}),
 		);
 	}
-	if (inRoom) await writeFile(join(agentDir, "APPEND_SYSTEM.md"), IN_ROOM);
+	await writeFile(join(agentDir, "APPEND_SYSTEM.md"), system);
+	if (tools) {
+		await writeFile(
+			join(agentDir, "mcp.json"),
+			JSON.stringify({
+				mcpServers: {
+					dev: {
+						url: tools.mcpUrl,
+						headersHelper: `cat '${tools.headersFile}'`,
+						exposure: "direct",
+					},
+				},
+			}),
+		);
+	}
+}
+
+/** What pdev is told about who it is in this session, on top of its own prompt. */
+export function systemFor(credentials: TurnCredentials): string {
+	const dev = credentials.dev;
+	const name = dev?.name ?? "the Dev";
+	const kind = credentials.session?.kind;
+	const title = credentials.session?.title ?? "a task";
+	const team = dev?.instructions
+		? `\n\nYour team's instructions for you:\n${dev.instructions}`
+		: "";
+	if (kind === "main") {
+		return `You are ${name}, a teammate in this organization${dev?.description ? ` (${dev.description})` : ""}.
+
+Everything sent to you arrives here as <message> blocks that say who sent it, where, and reply_to. People see only what you send with the reply tool: answer each message with reply, passing its reply_to as target. A message from one of your tasks has no reply_to; tell the person who asked for the work.
+
+You have no machine. For anything that needs reading or changing code, running commands, or opening a pull request, start a task with start_task and give it complete instructions, since it knows only what you write. When a writer task reports a pull request, start a reviewer task for it (role reviewer, reviewOfTaskId). Send review findings or CI failures back to the writer with message_task. Tell people the outcome once it is reviewed.
+
+Answer questions about your work from list_work and read_task. Keep notes with remember and recall. Keep each turn short: decide, delegate, reply.${team}`;
+	}
+	if (credentials.session?.role === "reviewer") {
+		return `You are reviewing work for ${name}: ${title}. Check out the pull request, read the change against what was asked, and run the relevant tests. Do not push changes. End with a verdict line, APPROVE or CHANGES REQUESTED, and a short list of concrete problems. Your report goes to ${name}, not to people.${team}`;
+	}
+	if (kind === "task") {
+		return `You are working on a task for ${name}: ${title}. Do the work in this workspace. When the code changes, commit to a new branch, push it, and open a pull request with gh. End with a short report: what you did, the pull request URL, and anything you could not do or that needs a decision. Your report goes to ${name}, not to people, so put any question in your report.${team}`;
+	}
+	return credentials.room ? IN_ROOM : "";
 }
 
 function turnStartIndex(rows: TranscriptRow[], turnId: string): number {
@@ -627,6 +708,22 @@ function defaultContext(credentials: TurnCredentials) {
 
 function isPermanent(error: unknown): boolean {
 	return error instanceof ApplicationFailure && error.nonRetryable === true;
+}
+
+/** A task's box is still being made when its first turn starts; wait for it, beating. */
+async function untilProvisioned<T>(load: () => Promise<T>): Promise<T> {
+	const deadline = Date.now() + PROVISIONING_WAIT_MS;
+	for (;;) {
+		try {
+			return await load();
+		} catch (error) {
+			const provisioning =
+				error instanceof Error && /still provisioning/i.test(error.message);
+			if (!provisioning || Date.now() > deadline) throw error;
+			heartbeat();
+			await new Promise((resolve) => setTimeout(resolve, PROVISIONING_POLL_MS));
+		}
+	}
 }
 
 function activityInfo() {

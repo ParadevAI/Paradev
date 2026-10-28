@@ -38,6 +38,9 @@ interface TurnCredentialsResponse {
 	model: { headers: Record<string, string> } | null;
 	room: { channelId: string; threadRootId: string | null } | null;
 	agentToken: string;
+	dev?: TurnCredentials["dev"];
+	session?: TurnCredentials["session"];
+	tools?: TurnCredentials["tools"];
 }
 
 /** The API's `agentWorker` routes (per-turn credentials and settling) and the Dev's room posts. */
@@ -85,6 +88,9 @@ export function workerApi(options: WorkerApiOptions): {
 					room: granted.room,
 					agentToken: granted.agentToken,
 					model: { ...options.model, headers },
+					...(granted.dev ? { dev: granted.dev } : {}),
+					...(granted.session ? { session: granted.session } : {}),
+					tools: granted.tools ?? null,
 				};
 			},
 		},
