@@ -40,12 +40,14 @@ Then ask only what you could not infer: missing secret values, extra repositorie
 
 ## 2. Variables
 
-Look for values in local `.env*` files first. Set them on the environment:
+Ask the user before you read any local `.env*` file, and name the files you would read. Only with a yes, read them and list the keys you would set, never the values, and set only the keys the user confirms:
 
 ```bash
-superset environments secrets set --environment <environment-id> --env-file path/to/.env
 printf %s "$VALUE" | superset environments secrets set --environment <environment-id> KEY
+superset environments secrets set --environment <environment-id> --env-file path/to/.env
 ```
+
+Use `--env-file` only when the user confirms every key in that file. If the user says no, ask for each value the code needs instead.
 
 Never pass a value with `--body`: it ends up in the process list and the shell history. Reserved keys (`SUPERSET_*`, `HOST_SERVICE_*`, `PATH`, `HOME`, `PORT` and similar) and agent credentials are skipped; tell the user if one they need is skipped. For each value you could not find, say which variable is missing and where the code reads it, then carry on without it.
 
