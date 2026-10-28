@@ -12965,9 +12965,6 @@ msgstr "Sayfayı aç"
 msgid "Open ship options"
 msgstr "Gönderim seçeneklerini aç"
 
-msgid "Open source"
-msgstr "Açık kaynak"
-
 msgid "Open System Settings"
 msgstr "Sistem Ayarları'nı aç"
 

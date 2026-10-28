@@ -12965,9 +12965,6 @@ msgstr "Buka sheet"
 msgid "Open ship options"
 msgstr "Buka opsi pengiriman"
 
-msgid "Open source"
-msgstr "Sumber terbuka"
-
 msgid "Open System Settings"
 msgstr "Buka System Settings"
 

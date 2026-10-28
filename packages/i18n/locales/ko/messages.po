@@ -12965,9 +12965,6 @@ msgstr "시트 열기"
 msgid "Open ship options"
 msgstr "배포 옵션 열기"
 
-msgid "Open source"
-msgstr "오픈 소스"
-
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
 

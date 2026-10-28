@@ -12965,9 +12965,6 @@ msgstr "打开侧边面板"
 msgid "Open ship options"
 msgstr "打开发布选项"
 
-msgid "Open source"
-msgstr "开源"
-
 msgid "Open System Settings"
 msgstr "打开系统设置"
 

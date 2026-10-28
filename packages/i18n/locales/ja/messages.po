@@ -12965,9 +12965,6 @@ msgstr "シートを開く"
 msgid "Open ship options"
 msgstr "送信オプションを開く"
 
-msgid "Open source"
-msgstr "オープンソース"
-
 msgid "Open System Settings"
 msgstr "システム設定を開く"
 

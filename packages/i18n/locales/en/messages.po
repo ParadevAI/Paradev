@@ -12965,9 +12965,6 @@ msgstr "Open sheet"
 msgid "Open ship options"
 msgstr "Open ship options"
 
-msgid "Open source"
-msgstr "Open source"
-
 msgid "Open System Settings"
 msgstr "Open System Settings"
 

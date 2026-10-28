@@ -12965,9 +12965,6 @@ msgstr "Ouvrir le panneau"
 msgid "Open ship options"
 msgstr "Ouvrir les options d'envoi"
 
-msgid "Open source"
-msgstr "Open source"
-
 msgid "Open System Settings"
 msgstr "Ouvrir les Réglages Système"
 

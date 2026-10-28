@@ -12965,9 +12965,6 @@ msgstr "Otwórz arkusz"
 msgid "Open ship options"
 msgstr "Otwórz opcje wysyłki"
 
-msgid "Open source"
-msgstr "Open source"
-
 msgid "Open System Settings"
 msgstr "Otwórz Ustawienia systemowe"
 

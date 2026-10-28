@@ -61,8 +61,8 @@ export function AboutSection() {
 			),
 		},
 		{
-			id: "open-source",
-			label: <Trans>Open source</Trans>,
+			id: "github",
+			label: <Trans>GitHub</Trans>,
 			value: (
 				<Trans>
 					On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It

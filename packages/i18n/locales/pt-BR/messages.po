@@ -12965,9 +12965,6 @@ msgstr "Abrir sheet"
 msgid "Open ship options"
 msgstr "Abrir opções de envio"
 
-msgid "Open source"
-msgstr "Código aberto"
-
 msgid "Open System Settings"
 msgstr "Abrir Ajustes do Sistema"
 

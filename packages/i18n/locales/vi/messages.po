@@ -12965,9 +12965,6 @@ msgstr "Mở sheet"
 msgid "Open ship options"
 msgstr "Mở tùy chọn gửi"
 
-msgid "Open source"
-msgstr "Mã nguồn mở"
-
 msgid "Open System Settings"
 msgstr "Mở System Settings"
 

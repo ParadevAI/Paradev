@@ -12965,9 +12965,6 @@ msgstr "Otevřít sheet"
 msgid "Open ship options"
 msgstr "Otevřít možnosti odeslání"
 
-msgid "Open source"
-msgstr "Open source"
-
 msgid "Open System Settings"
 msgstr "Otevřít Nastavení systému"
 

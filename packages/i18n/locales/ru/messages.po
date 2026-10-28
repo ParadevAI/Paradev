@@ -12965,9 +12965,6 @@ msgstr "Открыть панель"
 msgid "Open ship options"
 msgstr "Открыть параметры отправки"
 
-msgid "Open source"
-msgstr "Открытый код"
-
 msgid "Open System Settings"
 msgstr "Открыть Системные настройки"
 
