@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@superset/shared": "workspace:*",
+		"fflate": "0.8.3",
 		"marked": "17.0.6",
 		"zod": "4.6.5"
 	},

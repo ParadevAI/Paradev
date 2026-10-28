@@ -95,6 +95,9 @@ msgstr "(bạn)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+msgid "[title]"
+msgstr "[tiêu đề]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# cổng đang hoạt động — ẩn chi tiết} other {# cổng đang hoạt động — ẩn chi tiết}}"
@@ -3863,8 +3866,14 @@ msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ 
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat actions"
+msgstr "Thao tác trò chuyện"
+
 msgid "Chat closed"
 msgstr "Đã đóng cuộc trò chuyện"
+
+msgid "Chat exported"
+msgstr "Đã xuất cuộc trò chuyện"
 
 msgid "Chat history"
 msgstr "Lịch sử trò chuyện"
@@ -3880,6 +3889,9 @@ msgstr "Không tìm thấy phiên chat"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Các bề mặt chat: tin nhắn, suy luận, gợi ý"
+
+msgid "Chat title"
+msgstr "Tiêu đề cuộc trò chuyện"
 
 msgid "Chats"
 msgstr "Cuộc trò chuyện"
@@ -5318,6 +5330,9 @@ msgstr "Không thể xóa trang này"
 msgid "Could not disconnect."
 msgstr "Không thể ngắt kết nối."
 
+msgid "Could not export chat"
+msgstr "Không thể xuất cuộc trò chuyện"
+
 msgid "Could not forget {domain}"
 msgstr "Không thể quên {domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "Không thể lưu environment"
 
 msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
+
+msgid "Could not rename chat"
+msgstr "Không thể đổi tên cuộc trò chuyện"
 
 msgid "Could not rename the session"
 msgstr "Không thể đổi tên phiên"
@@ -7509,6 +7527,15 @@ msgstr "Đang tìm hiểu"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Đang tìm hiểu"
+
+msgid "Export Chat"
+msgstr "Xuất cuộc trò chuyện"
+
+msgid "Export chat…"
+msgstr "Xuất cuộc trò chuyện…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Xuất cuộc trò chuyện này dưới dạng ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Suy nghĩ mở rộng: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Giữ tài liệu luôn mới"
 
 msgid "Keep editing"
 msgstr "Tiếp tục chỉnh sửa"
+
+msgid "Keep it short and recognizable."
+msgstr "Ngắn gọn và dễ nhận ra."
 
 msgid "Keep typing an email to invite"
 msgstr "Tiếp tục nhập email để mời"
@@ -14992,6 +15022,12 @@ msgstr "Đổi tên tài khoản"
 msgid "Rename branch"
 msgstr "Đổi tên nhánh"
 
+msgid "Rename chat"
+msgstr "Đổi tên cuộc trò chuyện"
+
+msgid "Rename chat…"
+msgstr "Đổi tên cuộc trò chuyện…"
+
 msgid "Rename failed"
 msgstr "Đổi tên thất bại"
 
@@ -15016,6 +15052,9 @@ msgstr "đổi tên nhánh"
 
 msgid "Rename this channel"
 msgstr "Đổi tên kênh này"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Đổi tên cuộc trò chuyện này hoặc tạo lại tiêu đề"
 
 msgid "Rename workspace"
 msgstr "Đổi tên workspace"
@@ -19740,6 +19779,9 @@ msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 msgid "Update this host to move subagents to the background"
 msgstr "Cập nhật máy chủ này để chuyển agent con sang chạy nền"
 
+msgid "Update this host to rename chats."
+msgstr "Hãy cập nhật host này để đổi tên cuộc trò chuyện."
+
 msgid "Updated"
 msgstr "Đã cập nhật"
 
@@ -21066,6 +21108,9 @@ msgstr "Tia chớp"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Phần lớn PR agent được merge không cần chỉnh sửa"
+
+msgid "ZIP archive"
+msgstr "Tệp nén ZIP"
 
 msgid "Zoom"
 msgstr "Thu phóng"

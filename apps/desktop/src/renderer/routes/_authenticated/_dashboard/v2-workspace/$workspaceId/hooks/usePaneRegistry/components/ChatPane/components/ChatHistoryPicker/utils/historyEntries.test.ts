@@ -12,6 +12,7 @@ function saved(overrides: Partial<SavedSession> = {}): SavedSession {
 		epoch: "epoch",
 		status: "idle",
 		title: "Saved chat",
+		userTitle: null,
 		queuedCount: 0,
 		updatedAt: 1000,
 		live: false,

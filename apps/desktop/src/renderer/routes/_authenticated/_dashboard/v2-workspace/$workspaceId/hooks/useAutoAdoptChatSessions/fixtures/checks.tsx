@@ -210,6 +210,7 @@ function session(id: string): Session {
 		epoch: "epoch",
 		status: "starting",
 		title: null,
+		userTitle: null,
 		queuedCount: 1,
 		updatedAt: 1,
 		live: true,

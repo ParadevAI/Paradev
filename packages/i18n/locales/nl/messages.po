@@ -95,6 +95,9 @@ msgstr "(jij)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+msgid "[title]"
+msgstr "[titel]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# actieve poort — details verbergen} other {# actieve poorten — details verbergen}}"
@@ -3863,8 +3866,14 @@ msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-ure
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat actions"
+msgstr "Chatacties"
+
 msgid "Chat closed"
 msgstr "Chat gesloten"
+
+msgid "Chat exported"
+msgstr "Chat geëxporteerd"
 
 msgid "Chat history"
 msgstr "Chatgeschiedenis"
@@ -3880,6 +3889,9 @@ msgstr "Chatsessie niet gevonden"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chatoppervlakken: berichten, redeneren, suggesties"
+
+msgid "Chat title"
+msgstr "Chattitel"
 
 msgid "Chats"
 msgstr "Chats"
@@ -5318,6 +5330,9 @@ msgstr "Kan deze pagina niet verwijderen"
 msgid "Could not disconnect."
 msgstr "Loskoppelen is mislukt."
 
+msgid "Could not export chat"
+msgstr "Kon de chat niet exporteren"
+
 msgid "Could not forget {domain}"
 msgstr "Kan {domain} niet vergeten"
 
@@ -5432,6 +5447,9 @@ msgstr "Omgeving kon niet worden opgeslagen"
 
 msgid "Could not remove access"
 msgstr "Kan toegang niet verwijderen"
+
+msgid "Could not rename chat"
+msgstr "Kon de chat niet hernoemen"
 
 msgid "Could not rename the session"
 msgstr "Kan de naam van de sessie niet wijzigen"
@@ -7509,6 +7527,15 @@ msgstr "Verkennen"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Verkennen"
+
+msgid "Export Chat"
+msgstr "Chat exporteren"
+
+msgid "Export chat…"
+msgstr "Chat exporteren…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Deze chat als ZIP exporteren"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Uitgebreid nadenken: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Docs actueel houden"
 
 msgid "Keep editing"
 msgstr "Verder bewerken"
+
+msgid "Keep it short and recognizable."
+msgstr "Kort en herkenbaar."
 
 msgid "Keep typing an email to invite"
 msgstr "Typ verder een e-mailadres om uit te nodigen"
@@ -14992,6 +15022,12 @@ msgstr "Accountnaam wijzigen"
 msgid "Rename branch"
 msgstr "Branchnaam wijzigen"
 
+msgid "Rename chat"
+msgstr "Chat hernoemen"
+
+msgid "Rename chat…"
+msgstr "Chat hernoemen…"
+
 msgid "Rename failed"
 msgstr "Naam wijzigen mislukt"
 
@@ -15016,6 +15052,9 @@ msgstr "de branch hernoemen"
 
 msgid "Rename this channel"
 msgstr "Dit kanaal hernoemen"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Deze chat hernoemen of de titel opnieuw genereren"
 
 msgid "Rename workspace"
 msgstr "Werkruimte hernoemen"
@@ -19740,6 +19779,9 @@ msgstr "Werk deze host bij om subagents berichten te sturen"
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"
 
+msgid "Update this host to rename chats."
+msgstr "Werk deze host bij om chats te hernoemen."
+
 msgid "Updated"
 msgstr "Bijgewerkt"
 
@@ -21066,6 +21108,9 @@ msgstr "Bliksem"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Meerderheid van gemergede agent-PR's zonder bewerkingen"
+
+msgid "ZIP archive"
+msgstr "ZIP-archief"
 
 msgid "Zoom"
 msgstr "Zoom"

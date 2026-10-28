@@ -302,6 +302,16 @@ terminals and agent launches inherit the pushed set; open terminals keep the
 one they started with; nothing is written to disk. A host-service restart
 comes up with an empty set until the next push, which every wake performs.
 
+**A naming CLI spawned from host-service's own env is not signed in.** Workspace naming runs the
+agent's headless CLI (`claude -p` on its small model) with host-service's `process.env`, which on a
+machine someone owns carries their CLI login. A sandbox's credential placeholders exist only in
+the managed environment, so that spawn answers "Not logged in" and naming falls back to the prompt
+text. Cloud workspaces are named by the API, so this never mattered until chat titles. **What we
+did:** "Regenerate title" (`sessions.rename` without a title) passes the chat agent's launch env
+(`buildChatAgentEnv`, which waits for the managed env) to the naming CLI, and a failure there still
+ends in the local first-line title. **Open:** observed only from a script outside host-service; the
+signed-in path on a box needs a published host-service bundle to confirm.
+
 **Listening precedes the managed environment push.** Chat launches and boot-time
 agent resumes used to build their environment as soon as the listener opened,
 before the control plane supplied credential placeholders. They now use the

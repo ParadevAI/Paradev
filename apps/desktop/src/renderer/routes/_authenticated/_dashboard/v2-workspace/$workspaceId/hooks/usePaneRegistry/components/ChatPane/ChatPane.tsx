@@ -1,6 +1,6 @@
 import type { UserContent } from "@superset/chat/protocol";
 import type { RendererContext } from "@superset/panes";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type {
 	ChatPaneData,
@@ -10,9 +10,12 @@ import type {
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
+import { RenameChatDialog } from "./components/RenameChatDialog";
+import { useChatActions } from "./hooks/useChatActions";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
 import { openChatHistory } from "./utils/chatHistoryOpen";
+import { onChatPaneAction } from "./utils/chatPaneActions";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
 import { saveChatMode } from "./utils/savedChatMode";
 
@@ -41,6 +44,26 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const { renameChat, exportChat } = useChatActions(workspaceId);
+	const [renameOpen, setRenameOpen] = useState(false);
+	const sessionId = data.sessionId;
+	const onRenameChat = useCallback(
+		(title: string | null) => {
+			if (sessionId) void renameChat(sessionId, title);
+		},
+		[renameChat, sessionId],
+	);
+	const onExportChat = useCallback(() => {
+		if (sessionId) void exportChat(sessionId);
+	}, [exportChat, sessionId]);
+	useEffect(
+		() =>
+			onChatPaneAction(paneId, (action) => {
+				if (action === "rename") setRenameOpen(true);
+				else onExportChat();
+			}),
+		[paneId, onExportChat],
+	);
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
@@ -132,7 +155,9 @@ export function ChatPane({
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title }) => {
+				onSessionInfo={({ harnessSessionId, title, userTitle }) => {
+					if (userTitle && userTitle !== ctx.pane.titleOverride)
+						ctx.actions.setTitle(userTitle);
 					const rebound = harnessSessionId !== undefined && data.agent;
 					const retitled = title !== undefined && title !== data.chatTitle;
 					if (!rebound && !retitled) return;
@@ -226,11 +251,20 @@ export function ChatPane({
 				onOpenLink={openLink}
 				onOpenHistory={onOpenHistory}
 				onNewChat={agentId ? onNewChat : undefined}
+				{...(sessionId ? { onRenameChat, onExportChat } : {})}
 				sessionId={data.sessionId}
 				terminalId={data.terminalId}
 				workspaceId={workspaceId}
 			/>
 			<LinkHoverHint hoverLabel={null} hoverPosition={null} clickHint={hint} />
+			<RenameChatDialog
+				open={renameOpen && sessionId !== null}
+				title={data.chatTitle ?? ""}
+				onOpenChange={setRenameOpen}
+				onRename={(title) =>
+					sessionId ? renameChat(sessionId, title) : Promise.resolve(false)
+				}
+			/>
 		</>
 	);
 }

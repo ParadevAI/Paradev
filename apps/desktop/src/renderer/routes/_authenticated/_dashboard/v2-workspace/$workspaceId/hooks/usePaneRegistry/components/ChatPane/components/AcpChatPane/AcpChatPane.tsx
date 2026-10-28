@@ -72,6 +72,8 @@ export function AcpChatPane({
 	onOpenLink,
 	onOpenHistory,
 	onNewChat,
+	onRenameChat,
+	onExportChat,
 	onModeChange,
 	onSessionCreated,
 	onSwitchAgent,
@@ -101,7 +103,11 @@ export function AcpChatPane({
 	onQueuePrompt: (content: UserContent[]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
-	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
+	onSessionInfo: (info: {
+		harnessSessionId?: string;
+		title?: string;
+		userTitle?: string;
+	}) => void;
 	onOpenFile?: OpenFile;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
@@ -109,6 +115,8 @@ export function AcpChatPane({
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
 	onNewChat?: (label: string | undefined) => void;
+	onRenameChat?: (title: string | null) => void;
+	onExportChat?: () => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -719,6 +727,8 @@ export function AcpChatPane({
 			openLink={onOpenLink}
 			onOpenHistory={onOpenHistory}
 			onNewChat={newChat}
+			onRenameChat={onRenameChat}
+			onExportChat={onExportChat}
 			onSessionState={(state) => {
 				// A resume that found no transcript lands on a different agent
 				// session. Keep the pane pointed at the live one, or the trip back
@@ -730,6 +740,7 @@ export function AcpChatPane({
 						? { harnessSessionId: bound }
 						: {}),
 					...(state?.title ? { title: state.title } : {}),
+					...(state?.userTitle ? { userTitle: state.userTitle } : {}),
 				});
 			}}
 			pendingPrompts={pendingPrompts}

@@ -95,6 +95,9 @@ msgstr "(вы)"
 msgid "[prompt]"
 msgstr "[промпт]"
 
+msgid "[title]"
+msgstr "[название]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# активный порт — скрыть детали} few {# активных порта — скрыть детали} many {# активных портов — скрыть детали} other {# активных портов — скрыть детали}}"
@@ -3863,8 +3866,14 @@ msgstr "Списывает с сохранённой карты оплату з�
 msgid "Chat"
 msgstr "Чат"
 
+msgid "Chat actions"
+msgstr "Действия с чатом"
+
 msgid "Chat closed"
 msgstr "Чат закрыт"
+
+msgid "Chat exported"
+msgstr "Чат экспортирован"
 
 msgid "Chat history"
 msgstr "История чатов"
@@ -3880,6 +3889,9 @@ msgstr "Сессия чата не найдена"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Поверхности чата: сообщения, рассуждения, подсказки"
+
+msgid "Chat title"
+msgstr "Название чата"
 
 msgid "Chats"
 msgstr "Чаты"
@@ -5318,6 +5330,9 @@ msgstr "Не удалось удалить эту страницу"
 msgid "Could not disconnect."
 msgstr "Не удалось отключить."
 
+msgid "Could not export chat"
+msgstr "Не удалось экспортировать чат"
+
 msgid "Could not forget {domain}"
 msgstr "Не удалось забыть {domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "Не удалось сохранить окружение"
 
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
+
+msgid "Could not rename chat"
+msgstr "Не удалось переименовать чат"
 
 msgid "Could not rename the session"
 msgstr "Не удалось переименовать сессию"
@@ -7509,6 +7527,15 @@ msgstr "Изучаем"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Изучаем"
+
+msgid "Export Chat"
+msgstr "Экспорт чата"
+
+msgid "Export chat…"
+msgstr "Экспортировать чат…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Экспортировать этот чат в ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Расширенное мышление: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Держать документацию актуальной"
 
 msgid "Keep editing"
 msgstr "Продолжить редактирование"
+
+msgid "Keep it short and recognizable."
+msgstr "Коротко и узнаваемо."
 
 msgid "Keep typing an email to invite"
 msgstr "Продолжайте вводить email, чтобы пригласить"
@@ -14992,6 +15022,12 @@ msgstr "Переименовать аккаунт"
 msgid "Rename branch"
 msgstr "Переименовать ветку"
 
+msgid "Rename chat"
+msgstr "Переименовать чат"
+
+msgid "Rename chat…"
+msgstr "Переименовать чат…"
+
 msgid "Rename failed"
 msgstr "Не удалось переименовать"
 
@@ -15016,6 +15052,9 @@ msgstr "переименовать ветку"
 
 msgid "Rename this channel"
 msgstr "Переименовать канал"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Переименовать этот чат или создать название заново"
 
 msgid "Rename workspace"
 msgstr "Переименовать рабочую область"
@@ -19740,6 +19779,9 @@ msgstr "Обновите этот хост, чтобы писать субаге
 msgid "Update this host to move subagents to the background"
 msgstr "Обновите этот хост, чтобы переводить субагентов в фон"
 
+msgid "Update this host to rename chats."
+msgstr "Обновите этот хост, чтобы переименовывать чаты."
+
 msgid "Updated"
 msgstr "Обновлено"
 
@@ -21066,6 +21108,9 @@ msgstr "Молния"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Большинство объединённых агентских PR без правок"
+
+msgid "ZIP archive"
+msgstr "ZIP-архив"
 
 msgid "Zoom"
 msgstr "Масштаб"

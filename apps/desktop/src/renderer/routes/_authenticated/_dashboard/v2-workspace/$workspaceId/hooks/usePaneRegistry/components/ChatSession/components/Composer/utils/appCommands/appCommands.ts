@@ -4,12 +4,14 @@ import type { ComposerActionContext } from "@superset/chat-ui/PromptInput";
 import {
 	Brain,
 	CalendarClock,
+	Download,
 	History,
 	Info,
 	type LucideIcon,
 	MessageSquarePlus,
 	NotebookPen,
 	Paperclip,
+	Pencil,
 	Search,
 	ServerIcon,
 	Split,
@@ -30,6 +32,9 @@ export type AppCommandContext = {
 		run: (target: ChatForkTarget) => void;
 	};
 	openHistory?: () => void;
+	/** `null` asks the host to regenerate the title. */
+	renameChat?: (title: string | null) => void;
+	exportChat?: () => void;
 	openMcp?: (composer: ComposerActionContext) => void;
 	openFind?: () => void;
 	openStatus?: () => void;
@@ -147,6 +152,25 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		description: msg({ message: "Chat history" }),
 		available: (context) => context.openHistory !== undefined,
 		run: (context, args) => withoutArgs(args, context.openHistory),
+	},
+	{
+		name: "rename",
+		icon: Pencil,
+		description: msg({ message: "Rename this chat, or regenerate its title" }),
+		hint: msg({ message: "[title]" }),
+		takesText: true,
+		available: (context) => context.renameChat !== undefined,
+		run: (context, args) => {
+			context.renameChat?.(args || null);
+			return "done";
+		},
+	},
+	{
+		name: "export",
+		icon: Download,
+		description: msg({ message: "Export this chat as a ZIP" }),
+		available: (context) => context.exportChat !== undefined,
+		run: (context, args) => withoutArgs(args, context.exportChat),
 	},
 	{
 		name: "mcp",

@@ -95,6 +95,9 @@ msgstr "（你）"
 msgid "[prompt]"
 msgstr "[提示詞]"
 
+msgid "[title]"
+msgstr "[標題]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個活動埠 — 隱藏詳情} other {#個活動埠 — 隱藏詳情}}"
@@ -3863,8 +3866,14 @@ msgstr "當購買的 GB 小時不足時，從已儲存的卡扣款購買更多 G
 msgid "Chat"
 msgstr "聊天"
 
+msgid "Chat actions"
+msgstr "聊天操作"
+
 msgid "Chat closed"
 msgstr "聊天已關閉"
+
+msgid "Chat exported"
+msgstr "已匯出聊天"
 
 msgid "Chat history"
 msgstr "聊天記錄"
@@ -3880,6 +3889,9 @@ msgstr "未找到聊天會話"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天介面：訊息、推理、建議"
+
+msgid "Chat title"
+msgstr "聊天標題"
 
 msgid "Chats"
 msgstr "聊天"
@@ -5318,6 +5330,9 @@ msgstr "無法刪除這個頁面"
 msgid "Could not disconnect."
 msgstr "無法中斷連線。"
 
+msgid "Could not export chat"
+msgstr "無法匯出聊天"
+
 msgid "Could not forget {domain}"
 msgstr "無法忘記{domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "無法儲存環境"
 
 msgid "Could not remove access"
 msgstr "無法移除存取權限"
+
+msgid "Could not rename chat"
+msgstr "無法重新命名聊天"
 
 msgid "Could not rename the session"
 msgstr "無法重新命名會話"
@@ -7509,6 +7527,15 @@ msgstr "正在探索"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "探索中"
+
+msgid "Export Chat"
+msgstr "匯出聊天"
+
+msgid "Export chat…"
+msgstr "匯出聊天…"
+
+msgid "Export this chat as a ZIP"
+msgstr "將此聊天匯出為 ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "擴充套件思考：{activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "讓文件保持最新"
 
 msgid "Keep editing"
 msgstr "繼續編輯"
+
+msgid "Keep it short and recognizable."
+msgstr "簡短且容易辨識。"
 
 msgid "Keep typing an email to invite"
 msgstr "繼續輸入電子郵件以邀請"
@@ -14992,6 +15022,12 @@ msgstr "重新命名帳號"
 msgid "Rename branch"
 msgstr "重新命名分支"
 
+msgid "Rename chat"
+msgstr "重新命名聊天"
+
+msgid "Rename chat…"
+msgstr "重新命名聊天…"
+
 msgid "Rename failed"
 msgstr "重新命名失敗"
 
@@ -15016,6 +15052,9 @@ msgstr "重新命名分支"
 
 msgid "Rename this channel"
 msgstr "重新命名此頻道"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "重新命名此聊天，或重新產生標題"
 
 msgid "Rename workspace"
 msgstr "重新命名工作區"
@@ -19740,6 +19779,9 @@ msgstr "請更新此主機以傳送訊息給子代理程式"
 msgid "Update this host to move subagents to the background"
 msgstr "請更新此主機以將子代理程式移到背景"
 
+msgid "Update this host to rename chats."
+msgstr "請更新此主機以重新命名聊天。"
+
 msgid "Updated"
 msgstr "已更新"
 
@@ -21066,6 +21108,9 @@ msgstr "閃電"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "多數已合併的代理程式PR零修改"
+
+msgid "ZIP archive"
+msgstr "ZIP 壓縮檔"
 
 msgid "Zoom"
 msgstr "縮放"

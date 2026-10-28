@@ -95,6 +95,9 @@ msgstr "(vy)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+msgid "[title]"
+msgstr "[název]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktivní port — skrýt podrobnosti} few {# aktivní porty — skrýt podrobnosti} many {# aktivního portu — skrýt podrobnosti} other {# aktivních portů — skrýt podrobnosti}}"
@@ -3863,8 +3866,14 @@ msgstr "Strhne z uložené karty další GB-hodiny, když koupené GB-hodiny doc
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat actions"
+msgstr "Akce chatu"
+
 msgid "Chat closed"
 msgstr "Chat zavřen"
+
+msgid "Chat exported"
+msgstr "Chat byl exportován"
 
 msgid "Chat history"
 msgstr "Historie chatů"
@@ -3880,6 +3889,9 @@ msgstr "Relace chatu nenalezena"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Plochy chatu: zprávy, uvažování, návrhy"
+
+msgid "Chat title"
+msgstr "Název chatu"
 
 msgid "Chats"
 msgstr "Chaty"
@@ -5318,6 +5330,9 @@ msgstr "Tuto stránku se nepodařilo smazat"
 msgid "Could not disconnect."
 msgstr "Odpojení se nezdařilo."
 
+msgid "Could not export chat"
+msgstr "Chat se nepodařilo exportovat"
+
 msgid "Could not forget {domain}"
 msgstr "Nepodařilo se zapomenout {domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "Prostředí se nepodařilo uložit"
 
 msgid "Could not remove access"
 msgstr "Přístup se nepodařilo odebrat"
+
+msgid "Could not rename chat"
+msgstr "Chat se nepodařilo přejmenovat"
 
 msgid "Could not rename the session"
 msgstr "Relaci se nepodařilo přejmenovat"
@@ -7509,6 +7527,15 @@ msgstr "Zvažujeme"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Zvažujeme"
+
+msgid "Export Chat"
+msgstr "Exportovat chat"
+
+msgid "Export chat…"
+msgstr "Exportovat chat…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Exportovat tento chat jako ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Rozšířené přemýšlení: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Udržovat dokumentaci aktuální"
 
 msgid "Keep editing"
 msgstr "Pokračovat v úpravách"
+
+msgid "Keep it short and recognizable."
+msgstr "Krátký a snadno rozpoznatelný."
 
 msgid "Keep typing an email to invite"
 msgstr "Pokračujte v psaní e-mailu pro pozvání"
@@ -14992,6 +15022,12 @@ msgstr "Přejmenovat účet"
 msgid "Rename branch"
 msgstr "Přejmenovat větev"
 
+msgid "Rename chat"
+msgstr "Přejmenovat chat"
+
+msgid "Rename chat…"
+msgstr "Přejmenovat chat…"
+
 msgid "Rename failed"
 msgstr "Přejmenování selhalo"
 
@@ -15016,6 +15052,9 @@ msgstr "přejmenovat větev"
 
 msgid "Rename this channel"
 msgstr "Přejmenovat tento kanál"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Přejmenovat tento chat nebo znovu vygenerovat jeho název"
 
 msgid "Rename workspace"
 msgstr "Přejmenovat pracovní prostor"
@@ -19740,6 +19779,9 @@ msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
 msgid "Update this host to move subagents to the background"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli přesouvat subagenty na pozadí"
 
+msgid "Update this host to rename chats."
+msgstr "Pro přejmenování chatů aktualizujte tohoto hosta."
+
 msgid "Updated"
 msgstr "Aktualizováno"
 
@@ -21066,6 +21108,9 @@ msgstr "Blesk"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Většina sloučených PR od agentů bez úprav"
+
+msgid "ZIP archive"
+msgstr "Archiv ZIP"
 
 msgid "Zoom"
 msgstr "Přiblížení"

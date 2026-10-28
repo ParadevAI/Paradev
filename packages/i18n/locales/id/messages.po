@@ -95,6 +95,9 @@ msgstr "(Anda)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+msgid "[title]"
+msgstr "[judul]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# port aktif — sembunyikan detail} other {# port aktif — sembunyikan detail}}"
@@ -3863,8 +3866,14 @@ msgstr "Menagih kartu tersimpan untuk GB-jam tambahan saat GB-jam yang dibeli ha
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat actions"
+msgstr "Tindakan obrolan"
+
 msgid "Chat closed"
 msgstr "Chat ditutup"
+
+msgid "Chat exported"
+msgstr "Obrolan diekspor"
 
 msgid "Chat history"
 msgstr "Riwayat obrolan"
@@ -3880,6 +3889,9 @@ msgstr "Sesi chat tidak ditemukan"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Permukaan chat: pesan, penalaran, saran"
+
+msgid "Chat title"
+msgstr "Judul obrolan"
 
 msgid "Chats"
 msgstr "Obrolan"
@@ -5318,6 +5330,9 @@ msgstr "Tidak bisa menghapus halaman ini"
 msgid "Could not disconnect."
 msgstr "Tidak dapat memutuskan."
 
+msgid "Could not export chat"
+msgstr "Tidak dapat mengekspor obrolan"
+
 msgid "Could not forget {domain}"
 msgstr "Tidak bisa melupakan {domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "Tidak dapat menyimpan environment"
 
 msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
+
+msgid "Could not rename chat"
+msgstr "Tidak dapat mengganti nama obrolan"
 
 msgid "Could not rename the session"
 msgstr "Tidak dapat mengganti nama sesi"
@@ -7509,6 +7527,15 @@ msgstr "Sedang dijajaki"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Sedang dijajaki"
+
+msgid "Export Chat"
+msgstr "Ekspor Obrolan"
+
+msgid "Export chat…"
+msgstr "Ekspor obrolan…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Ekspor obrolan ini sebagai ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Extended thinking: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Jaga dokumentasi tetap segar"
 
 msgid "Keep editing"
 msgstr "Lanjutkan mengedit"
+
+msgid "Keep it short and recognizable."
+msgstr "Buat singkat dan mudah dikenali."
 
 msgid "Keep typing an email to invite"
 msgstr "Terus ketik email untuk mengundang"
@@ -14992,6 +15022,12 @@ msgstr "Ganti nama akun"
 msgid "Rename branch"
 msgstr "Ganti nama branch"
 
+msgid "Rename chat"
+msgstr "Ganti nama obrolan"
+
+msgid "Rename chat…"
+msgstr "Ganti nama obrolan…"
+
 msgid "Rename failed"
 msgstr "Ganti nama gagal"
 
@@ -15016,6 +15052,9 @@ msgstr "mengganti nama branch"
 
 msgid "Rename this channel"
 msgstr "Ganti nama saluran ini"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Ganti nama obrolan ini, atau buat ulang judulnya"
 
 msgid "Rename workspace"
 msgstr "Ganti nama workspace"
@@ -19740,6 +19779,9 @@ msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"
 
+msgid "Update this host to rename chats."
+msgstr "Perbarui host ini untuk mengganti nama obrolan."
+
 msgid "Updated"
 msgstr "Diperbarui"
 
@@ -21066,6 +21108,9 @@ msgstr "Petir"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Mayoritas PR agen di-merge tanpa suntingan"
+
+msgid "ZIP archive"
+msgstr "Arsip ZIP"
 
 msgid "Zoom"
 msgstr "Zoom"

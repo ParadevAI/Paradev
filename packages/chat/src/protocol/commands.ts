@@ -144,6 +144,14 @@ export const closeSessionInputSchema = z.object({
 });
 export type CloseSessionInput = z.infer<typeof closeSessionInputSchema>;
 
+export const CHAT_TITLE_MAX = 200;
+
+export const renameSessionInputSchema = z.object({
+	sessionId: z.string().min(1),
+	title: z.string().trim().min(1).max(CHAT_TITLE_MAX),
+});
+export type RenameSessionInput = z.input<typeof renameSessionInputSchema>;
+
 export const getSessionInputSchema = z.object({ sessionId: z.string().min(1) });
 export type GetSessionInput = z.infer<typeof getSessionInputSchema>;
 

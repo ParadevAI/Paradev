@@ -48,6 +48,8 @@ export type UseAppCommandsOptions = {
 	onFork?: (target: ChatForkTarget) => void;
 	canForkToWorktree?: boolean;
 	onOpenHistory?: () => void;
+	onRenameChat?: (title: string | null) => void;
+	onExportChat?: () => void;
 	onOpenFind?: () => void;
 	openStatus?: () => void;
 	openMcp?: (composer: ComposerActionContext) => void;
@@ -69,6 +71,8 @@ export function useAppCommands({
 	onFork,
 	canForkToWorktree,
 	onOpenHistory,
+	onRenameChat,
+	onExportChat,
 	onOpenFind,
 	openStatus,
 	openMcp,
@@ -157,6 +161,8 @@ export function useAppCommands({
 					}
 				: {}),
 			...(onOpenHistory ? { openHistory: leaveComposer(onOpenHistory) } : {}),
+			...(onRenameChat ? { renameChat: onRenameChat } : {}),
+			...(onExportChat ? { exportChat: leaveComposer(onExportChat) } : {}),
 			...(onOpenFind ? { openFind: leaveComposer(onOpenFind) } : {}),
 			...(openStatus ? { openStatus: leaveComposer(openStatus) } : {}),
 			createAutomation: (prompt: string) => {
@@ -188,10 +194,12 @@ export function useAppCommands({
 		inputRef,
 		modeBeforePlan,
 		modes,
+		onExportChat,
 		onFork,
 		onNewChat,
 		onOpenFind,
 		onOpenHistory,
+		onRenameChat,
 		onSetConfigOption,
 		onSetMode,
 		openMcp,

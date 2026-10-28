@@ -1,10 +1,12 @@
-import { presetForAcpHarness } from "@superset/chat/core";
-import { cursorSchema } from "@superset/chat/protocol";
+import { presetForAcpHarness, readAllEnvelopes } from "@superset/chat/core";
+import { CHAT_TITLE_MAX, cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { buildChatAgentEnv } from "../../../chat-v3/agentEnv";
 import { protectedProcedure, router } from "../../index";
 import { chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
+import { generateChatTitle } from "./generate-chat-title";
 import {
 	createChatSessionInWorkspace,
 	createChatSessionSchema,
@@ -12,6 +14,8 @@ import {
 	requireChatSession,
 	requireSessionWorkspace,
 } from "./session-service";
+
+const READ_ALL_PAGE = 500;
 
 const sessionInput = z.object({
 	workspaceId: z.string().uuid(),
@@ -78,6 +82,47 @@ export const sessionsRouter = router({
 				sessionId: input.sessionId,
 				limit: input.limit,
 				before: input.before,
+			});
+		}),
+	rename: protectedProcedure
+		.input(
+			sessionInput.extend({
+				title: z.string().trim().min(1).max(CHAT_TITLE_MAX).optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { chat, session } = requireChatSession(
+				ctx,
+				input.workspaceId,
+				input.sessionId,
+			);
+			const title =
+				input.title ??
+				(await generateChatTitle({
+					db: ctx.db,
+					agent: presetForAcpHarness(session.harness),
+					env: () =>
+						buildChatAgentEnv({
+							db: ctx.db,
+							cwd: requireSessionWorkspace(ctx, input.workspaceId).worktreePath,
+							workspaceId: input.workspaceId,
+						}),
+					envelopes: await readAllEnvelopes(async (before) =>
+						chat.commands.getItems({
+							sessionId: input.sessionId,
+							limit: READ_ALL_PAGE,
+							before,
+						}),
+					),
+				}));
+			if (!title)
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "This chat has no prompt to name it from yet.",
+				});
+			return chat.commands.renameSession({
+				sessionId: input.sessionId,
+				title: title.slice(0, CHAT_TITLE_MAX),
 			});
 		}),
 	send: protectedProcedure

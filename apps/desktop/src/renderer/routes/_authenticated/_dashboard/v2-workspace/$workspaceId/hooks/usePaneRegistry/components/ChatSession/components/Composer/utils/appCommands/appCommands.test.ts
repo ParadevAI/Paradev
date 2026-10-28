@@ -41,6 +41,8 @@ describe("APP_COMMANDS", () => {
 				plan: { active: false, enter: NOOP, leave: NOOP },
 				fork: { targets: ["workspace"], run: NOOP },
 				openHistory: NOOP,
+				renameChat: NOOP,
+				exportChat: NOOP,
 				openMcp: NOOP,
 				openStatus: NOOP,
 				openFind: NOOP,
@@ -53,6 +55,8 @@ describe("APP_COMMANDS", () => {
 			"plan",
 			"fork",
 			"resume",
+			"rename",
+			"export",
 			"mcp",
 			"status",
 			"find",
@@ -68,11 +72,14 @@ describe("APP_COMMANDS", () => {
 		const set = mock((_on: boolean) => {});
 		const run = mock((_target: string) => {});
 		const createAutomation = mock((_prompt: string) => {});
+		const renameChat = mock((_title: string | null) => {});
 		const context: AppCommandContext = {
 			newChat: NOOP,
 			fast: { on: true, set },
 			fork: { targets: ["workspace", "worktree"], run },
 			createAutomation,
+			renameChat,
+			exportChat: NOOP,
 		};
 		expect(command("fast").run(context, "", COMPOSER)).toBe("done");
 		expect(set).toHaveBeenLastCalledWith(false);
@@ -82,6 +89,11 @@ describe("APP_COMMANDS", () => {
 			"done",
 		);
 		expect(createAutomation).toHaveBeenLastCalledWith("check CI");
+		expect(command("rename").run(context, "Fix login", COMPOSER)).toBe("done");
+		expect(renameChat).toHaveBeenLastCalledWith("Fix login");
+		expect(command("rename").run(context, "", COMPOSER)).toBe("done");
+		expect(renameChat).toHaveBeenLastCalledWith(null);
+		expect(command("export").run(context, "now", COMPOSER)).toBe("bad-args");
 		expect(command("new").run(context, "please", COMPOSER)).toBe("bad-args");
 		expect(command("automation").run(context, "", COMPOSER)).toBe("bad-args");
 		expect(command("fast").run(context, "faster", COMPOSER)).toBe("bad-args");

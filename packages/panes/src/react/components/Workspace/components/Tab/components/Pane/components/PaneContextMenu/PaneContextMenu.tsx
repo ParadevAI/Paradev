@@ -9,7 +9,7 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import type {
 	ContextMenuActionConfig,
 	RendererContext,
@@ -24,9 +24,11 @@ interface PaneContextMenuProps<TData> {
 function ContextMenuItems<TData>({
 	actions,
 	context,
+	runAfterClose,
 }: {
 	actions: ContextMenuActionConfig<TData>[];
 	context: RendererContext<TData>;
+	runAfterClose: (action: () => void) => void;
 }) {
 	return (
 		<>
@@ -54,7 +56,11 @@ function ContextMenuItems<TData>({
 								{action.label}
 							</ContextMenuSubTrigger>
 							<ContextMenuSubContent>
-								<ContextMenuItems actions={childActions} context={context} />
+								<ContextMenuItems
+									actions={childActions}
+									context={context}
+									runAfterClose={runAfterClose}
+								/>
 							</ContextMenuSubContent>
 						</ContextMenuSub>
 					);
@@ -72,7 +78,13 @@ function ContextMenuItems<TData>({
 						key={action.key}
 						disabled={disabled}
 						variant={action.variant}
-						onSelect={() => action.onSelect?.(context)}
+						onSelect={() => {
+							if (action.runAfterMenuClose) {
+								runAfterClose(() => action.onSelect?.(context));
+							} else {
+								action.onSelect?.(context);
+							}
+						}}
 					>
 						{action.icon}
 						{action.label}
@@ -89,6 +101,17 @@ export function PaneContextMenu<TData>({
 	actions,
 	context,
 }: PaneContextMenuProps<TData>) {
+	const afterClose = useRef<(() => void) | null>(null);
+	const runAfterClose = (action: () => void) => {
+		afterClose.current = action;
+	};
+	const onCloseAutoFocus = (event: Event) => {
+		const action = afterClose.current;
+		if (!action) return;
+		afterClose.current = null;
+		event.preventDefault();
+		action();
+	};
 	if (actions.length === 0) {
 		return <>{children}</>;
 	}
@@ -96,8 +119,12 @@ export function PaneContextMenu<TData>({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItems actions={actions} context={context} />
+			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				<ContextMenuItems
+					actions={actions}
+					context={context}
+					runAfterClose={runAfterClose}
+				/>
 			</ContextMenuContent>
 		</ContextMenu>
 	);

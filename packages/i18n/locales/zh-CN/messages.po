@@ -95,6 +95,9 @@ msgstr "（你）"
 msgid "[prompt]"
 msgstr "[提示词]"
 
+msgid "[title]"
+msgstr "[标题]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#个活动端口 — 隐藏详情} other {#个活动端口 — 隐藏详情}}"
@@ -3863,8 +3866,14 @@ msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 G
 msgid "Chat"
 msgstr "聊天"
 
+msgid "Chat actions"
+msgstr "聊天操作"
+
 msgid "Chat closed"
 msgstr "聊天已关闭"
+
+msgid "Chat exported"
+msgstr "已导出聊天"
 
 msgid "Chat history"
 msgstr "聊天历史"
@@ -3880,6 +3889,9 @@ msgstr "未找到聊天会话"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
+
+msgid "Chat title"
+msgstr "聊天标题"
 
 msgid "Chats"
 msgstr "聊天"
@@ -5318,6 +5330,9 @@ msgstr "无法删除这个页面"
 msgid "Could not disconnect."
 msgstr "无法断开连接。"
 
+msgid "Could not export chat"
+msgstr "无法导出聊天"
+
 msgid "Could not forget {domain}"
 msgstr "无法忘记{domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "无法保存环境"
 
 msgid "Could not remove access"
 msgstr "无法移除访问权限"
+
+msgid "Could not rename chat"
+msgstr "无法重命名聊天"
 
 msgid "Could not rename the session"
 msgstr "无法重命名会话"
@@ -7509,6 +7527,15 @@ msgstr "正在探索"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "探索中"
+
+msgid "Export Chat"
+msgstr "导出聊天"
+
+msgid "Export chat…"
+msgstr "导出聊天…"
+
+msgid "Export this chat as a ZIP"
+msgstr "将此聊天导出为 ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "扩展思考：{activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "让文档保持最新"
 
 msgid "Keep editing"
 msgstr "继续编辑"
+
+msgid "Keep it short and recognizable."
+msgstr "简短且易于辨认。"
 
 msgid "Keep typing an email to invite"
 msgstr "继续输入邮箱以邀请"
@@ -14992,6 +15022,12 @@ msgstr "重命名账号"
 msgid "Rename branch"
 msgstr "重命名分支"
 
+msgid "Rename chat"
+msgstr "重命名聊天"
+
+msgid "Rename chat…"
+msgstr "重命名聊天…"
+
 msgid "Rename failed"
 msgstr "重命名失败"
 
@@ -15016,6 +15052,9 @@ msgstr "重命名分支"
 
 msgid "Rename this channel"
 msgstr "重命名此频道"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "重命名此聊天，或重新生成标题"
 
 msgid "Rename workspace"
 msgstr "重命名工作区"
@@ -19740,6 +19779,9 @@ msgstr "请更新此主机以向子智能体发送消息"
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"
 
+msgid "Update this host to rename chats."
+msgstr "请更新此主机以重命名聊天。"
+
 msgid "Updated"
 msgstr "已更新"
 
@@ -21066,6 +21108,9 @@ msgstr "闪电"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "多数已合并的智能体PR零修改"
+
+msgid "ZIP archive"
+msgstr "ZIP 压缩包"
 
 msgid "Zoom"
 msgstr "缩放"

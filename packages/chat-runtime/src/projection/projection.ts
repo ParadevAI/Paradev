@@ -1,5 +1,5 @@
 import type { SessionStatus } from "@superset/chat/protocol";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import type { ChatDb, ChatSessionRow } from "../db";
 import { chatSessionsLocal } from "../db";
 
@@ -64,6 +64,38 @@ export function setHarnessSessionId(
 		.set({ harnessSessionId })
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
+}
+
+export function setUserTitle(
+	db: ChatDb,
+	sessionId: string,
+	userTitle: string,
+): void {
+	db.update(chatSessionsLocal)
+		.set({ userTitle })
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
+export function inheritedUserTitle(
+	db: ChatDb,
+	harness: string,
+	harnessSessionId: string,
+): string | null {
+	return (
+		db
+			.select({ userTitle: chatSessionsLocal.userTitle })
+			.from(chatSessionsLocal)
+			.where(
+				and(
+					eq(chatSessionsLocal.harness, harness),
+					eq(chatSessionsLocal.harnessSessionId, harnessSessionId),
+					isNotNull(chatSessionsLocal.userTitle),
+				),
+			)
+			.orderBy(desc(chatSessionsLocal.updatedAt))
+			.get()?.userTitle ?? null
+	);
 }
 
 export function removeSessionRow(db: ChatDb, sessionId: string): void {

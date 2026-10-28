@@ -17,10 +17,12 @@ import type {
 	Cursor,
 	DiscoverSessionsResult,
 	DurableEvent,
+	Envelope,
 	GetItemsInput,
 	GetSessionInput,
 	PromptInput,
 	QueuedPromptInput,
+	RenameSessionInput,
 	RespondToApprovalInput,
 	ResumeQueueInput,
 	SetConfigOptionInput,
@@ -43,6 +45,7 @@ import {
 	listSessionsInputSchema,
 	promptInputSchema,
 	queuedPromptInputSchema,
+	renameSessionInputSchema,
 	respondToApprovalInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
@@ -55,6 +58,7 @@ import { z } from "zod";
 import type { ChatDb, ChatSessionRow } from "../../db";
 import type { ChatJournal } from "../../journal";
 import type { ChatSessionStore } from "../../projection";
+import { inheritedUserTitle, setUserTitle } from "../../projection";
 import type { ChatResetReason, PageResult } from "../../replay";
 import { latestSeq, readPage, readSince } from "../../replay";
 import type {
@@ -77,6 +81,7 @@ export const createSessionCommandSchema = createSessionInputSchema
 				replacesSessionId: z.string().min(1).optional(),
 			})
 			.optional(),
+		userTitle: z.string().min(1).optional(),
 	});
 export type CreateSessionCommandInput = z.input<
 	typeof createSessionCommandSchema
@@ -230,6 +235,7 @@ export type ChatCommands = {
 		input: ForkSessionCommandInput,
 	): Promise<CreateSessionResult | null>;
 	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
+	renameSession(input: RenameSessionInput): { title: string };
 	getSession(input: GetSessionInput): GetSessionResult;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
@@ -259,6 +265,7 @@ export type CommandsOptions = {
 	dedupe: { run<T>(commandId: string, execute: () => T): T };
 	mintSessionId?: () => string;
 	subagentItems?: SubagentItems;
+	publish?: (envelope: Envelope) => void;
 };
 
 const MAX_CACHED_REPLAY_EVENTS = 20_000;
@@ -405,6 +412,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
 				});
+				const userTitle =
+					parsed.userTitle ??
+					(parsed.resume
+						? inheritedUserTitle(
+								options.db,
+								parsed.harness,
+								parsed.resume.harnessSessionId,
+							)
+						: null);
+				if (userTitle) setUserTitle(options.db, sessionId, userTitle);
 				try {
 					options.live.create({
 						sessionId,
@@ -415,6 +432,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						modelId: parsed.modelId,
 						resume: parsed.resume,
 						terminalId: parsed.terminalId,
+						...(userTitle ? { userTitle } : {}),
 					});
 				} catch (error) {
 					options.journal.discard(sessionId);
@@ -633,6 +651,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						modeId: sourceLive?.state.modeId ?? parsed.modeId,
 						modelId: parsed.modelId,
 						terminalId: sourceLive?.terminalId,
+						...(source.userTitle ? { userTitle: source.userTitle } : {}),
 						...(forked
 							? { resume: { harnessSessionId: forked, quiet: true } }
 							: {}),
@@ -685,6 +704,29 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				subagentItems.forget(sessionId);
 				options.journal.announce(sessionId);
 			}
+		},
+
+		renameSession(input) {
+			const { sessionId, title } = renameSessionInputSchema.parse(input);
+			const row = options.sessions.get(sessionId);
+			if (!row) throw new Error(`chat session ${sessionId} not found`);
+			setUserTitle(options.db, sessionId, title);
+			const live = options.live.get(sessionId);
+			if (live) {
+				live.setUserTitle(title);
+				return { title };
+			}
+			const replay = replaySession(sessionId);
+			const stored = (replay.ok ? replay.snapshot.session : null) ?? {
+				status: row.status,
+				harness: row.harness,
+			};
+			const envelope = options.journal.appendEnvelope(sessionId, {
+				type: "session",
+				session: { ...stored, title, userTitle: title },
+			});
+			options.publish?.(envelope);
+			return { title };
 		},
 
 		getSession(input) {

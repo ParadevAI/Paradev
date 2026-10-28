@@ -98,6 +98,9 @@ export type ComposerProps = {
 	onSend: (content: UserContent[], options: { steer: boolean }) => unknown;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
+	/** `null` asks the host to regenerate the title. */
+	onRenameChat?: (title: string | null) => void;
+	onExportChat?: () => void;
 	onNewChat?: () => void;
 	onFork?: (target: ChatForkTarget) => void;
 	canForkToWorktree?: boolean;
@@ -170,6 +173,8 @@ export const Composer = memo(function Composer({
 	onOpenFind,
 	onSend,
 	onOpenHistory,
+	onRenameChat,
+	onExportChat,
 	placeholder,
 	sessionUsage,
 	target,
@@ -480,6 +485,8 @@ export const Composer = memo(function Composer({
 		...(onFork ? { onFork } : {}),
 		...(canForkToWorktree ? { canForkToWorktree } : {}),
 		...(onOpenHistory ? { onOpenHistory } : {}),
+		...(onRenameChat ? { onRenameChat } : {}),
+		...(onExportChat ? { onExportChat } : {}),
 		...(onOpenFind ? { onOpenFind } : {}),
 		...(status.available ? { openStatus: status.open } : {}),
 		...(mcpPicker.available ? { openMcp } : {}),

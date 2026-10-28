@@ -11,6 +11,7 @@ const session: NonNullable<SessionResult["session"]> = {
 	epoch: "epoch-1",
 	status: "idle",
 	title: "Automation run",
+	userTitle: null,
 	queuedCount: 0,
 	updatedAt: 1,
 };

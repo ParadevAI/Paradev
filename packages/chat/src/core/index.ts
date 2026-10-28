@@ -1,4 +1,5 @@
 export * from "./bookkeeping/readBookkeeping";
+export * from "./chatExport";
 export * from "./coalesce";
 export * from "./config/launchConfigSelections";
 export * from "./continuePrompt/continuePrompt";

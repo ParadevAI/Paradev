@@ -75,6 +75,7 @@ export function createChatRuntime(options: ChatRuntimeOptions): ChatRuntime {
 		live,
 		dedupe: new CommandDedupe(options.dedupeCapacity),
 		subagentItems,
+		publish: (envelope) => subscriptions.publish(envelope),
 	});
 
 	return {

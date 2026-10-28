@@ -33,6 +33,7 @@ export const chatSessionsLocal = sqliteTable(
 		epoch: text().notNull(),
 		status: text().$type<SessionStatus>().notNull(),
 		title: text(),
+		userTitle: text("user_title"),
 		queuedCount: integer("queued_count").notNull().default(0),
 		updatedAt: integer("updated_at").notNull(),
 	},

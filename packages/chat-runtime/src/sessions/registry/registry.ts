@@ -19,6 +19,10 @@ export type HarnessFactoryOptions = {
 	terminalId?: string;
 };
 
+export type LiveSessionCreateOptions = HarnessFactoryOptions & {
+	userTitle?: string;
+};
+
 export type HarnessFactory = (options: HarnessFactoryOptions) => HarnessAdapter;
 
 export type HarnessRegistry = Map<string, HarnessFactory>;
@@ -95,7 +99,11 @@ export class LiveSessionRegistry {
 		}
 	}
 
-	create(options: HarnessFactoryOptions): LiveSession {
+	publish(envelope: Envelope): void {
+		this.options.publish(envelope);
+	}
+
+	create({ userTitle, ...options }: LiveSessionCreateOptions): LiveSession {
 		const factory = this.options.harnesses.get(options.harness);
 		if (!factory) throw new Error(`unknown harness ${options.harness}`);
 		if (this.live.has(options.sessionId)) {
@@ -114,6 +122,7 @@ export class LiveSessionRegistry {
 				this.observe(() => observer?.published(envelope, session));
 			},
 			adapter: factory(options),
+			...(userTitle ? { userTitle } : {}),
 			mintId: this.options.mintId,
 			now: this.options.now,
 		});

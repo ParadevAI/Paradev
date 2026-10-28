@@ -16,6 +16,8 @@ export const COLLISION_WINNERS: Readonly<Record<string, CollisionWinner>> = {
 	branch: "app",
 	resume: "app",
 	continue: "app",
+	rename: "app",
+	export: "app",
 	mcp: "app",
 	status: "app",
 	compact: "agent",

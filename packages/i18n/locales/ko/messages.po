@@ -95,6 +95,9 @@ msgstr "(나)"
 msgid "[prompt]"
 msgstr "[프롬프트]"
 
+msgid "[title]"
+msgstr "[제목]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {활성 포트 #개 — 세부 정보 숨기기} other {활성 포트 #개 — 세부 정보 숨기기}}"
@@ -3863,8 +3866,14 @@ msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 
 msgid "Chat"
 msgstr "채팅"
 
+msgid "Chat actions"
+msgstr "채팅 작업"
+
 msgid "Chat closed"
 msgstr "채팅을 닫았습니다"
+
+msgid "Chat exported"
+msgstr "채팅을 내보냈습니다"
 
 msgid "Chat history"
 msgstr "채팅 기록"
@@ -3880,6 +3889,9 @@ msgstr "채팅 세션을 찾을 수 없습니다"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "채팅 화면: 메시지, 추론, 제안"
+
+msgid "Chat title"
+msgstr "채팅 제목"
 
 msgid "Chats"
 msgstr "채팅"
@@ -5318,6 +5330,9 @@ msgstr "이 페이지를 삭제할 수 없습니다"
 msgid "Could not disconnect."
 msgstr "연결을 해제하지 못했습니다."
 
+msgid "Could not export chat"
+msgstr "채팅을 내보낼 수 없습니다"
+
 msgid "Could not forget {domain}"
 msgstr "{domain}을(를) 잊지 못했습니다"
 
@@ -5432,6 +5447,9 @@ msgstr "환경을 저장할 수 없습니다"
 
 msgid "Could not remove access"
 msgstr "접근 권한을 제거할 수 없습니다"
+
+msgid "Could not rename chat"
+msgstr "채팅 이름을 바꿀 수 없습니다"
 
 msgid "Could not rename the session"
 msgstr "세션 이름을 변경할 수 없습니다"
@@ -7509,6 +7527,15 @@ msgstr "탐색 중"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "검토 중"
+
+msgid "Export Chat"
+msgstr "채팅 내보내기"
+
+msgid "Export chat…"
+msgstr "채팅 내보내기…"
+
+msgid "Export this chat as a ZIP"
+msgstr "이 채팅을 ZIP으로 내보내기"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "확장 사고: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "문서 최신 상태 유지"
 
 msgid "Keep editing"
 msgstr "계속 편집"
+
+msgid "Keep it short and recognizable."
+msgstr "짧고 알아보기 쉽게 지으세요."
 
 msgid "Keep typing an email to invite"
 msgstr "초대하려면 이메일을 계속 입력하세요"
@@ -14992,6 +15022,12 @@ msgstr "계정 이름 변경"
 msgid "Rename branch"
 msgstr "브랜치 이름 변경"
 
+msgid "Rename chat"
+msgstr "채팅 이름 바꾸기"
+
+msgid "Rename chat…"
+msgstr "채팅 이름 바꾸기…"
+
 msgid "Rename failed"
 msgstr "이름 변경 실패"
 
@@ -15016,6 +15052,9 @@ msgstr "브랜치 이름을 변경할"
 
 msgid "Rename this channel"
 msgstr "이 채널 이름 바꾸기"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "이 채팅의 이름을 바꾸거나 제목을 다시 생성합니다"
 
 msgid "Rename workspace"
 msgstr "워크스페이스 이름 변경"
@@ -19740,6 +19779,9 @@ msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업
 msgid "Update this host to move subagents to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 업데이트하세요"
 
+msgid "Update this host to rename chats."
+msgstr "채팅 이름을 바꾸려면 이 호스트를 업데이트하세요."
+
 msgid "Updated"
 msgstr "업데이트됨"
 
@@ -21066,6 +21108,9 @@ msgstr "번개"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "머지된 에이전트 PR의 과반이 수정 없음"
+
+msgid "ZIP archive"
+msgstr "ZIP 아카이브"
 
 msgid "Zoom"
 msgstr "확대/축소"

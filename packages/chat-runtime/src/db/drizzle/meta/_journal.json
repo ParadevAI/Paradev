@@ -8,6 +8,13 @@
       "when": 1785962456515,
       "tag": "0000_natural_wolverine",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793086875217,
+      "tag": "0001_add_user_title",
+      "breakpoints": true
     }
   ]
 }

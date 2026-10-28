@@ -132,6 +132,8 @@ superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_I
 superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions resume --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions import --local --workspace WORKSPACE_ID --agent claude --native-session PROVIDER_SESSION_ID
+superset sessions rename --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --title "Release notes"
+superset sessions export --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID --format md --out chat.md
 ```
 
 The host resolves the selected agent to an installed ACP harness. It does not check the `acp-chat`
@@ -142,6 +144,11 @@ Old hosts produce an update instruction instead of falling back to `agents.run`.
 `sessions read --json` returns the newest page of events, in journal order, with a `nextBefore`
 cursor. To read older events, pass that cursor as JSON to `--before`. `nextBefore` is `null` on the
 oldest page.
+
+`sessions rename` without `--title` asks the host for a new title from the chat's first prompts.
+A user title wins over the agent's and stays with the chat when it is resumed. `sessions export`
+reads every page of the journal and writes `superset-chat-<title>-<date>.zip` (`chat.json` and
+`transcript.md`) unless `--format md|json` or `--out` says otherwise.
 
 A chat session ID identifies the host's journal. A provider session ID identifies the conversation
 inside Claude, Codex, or another ACP agent. `sessions resume --session` accepts the former and

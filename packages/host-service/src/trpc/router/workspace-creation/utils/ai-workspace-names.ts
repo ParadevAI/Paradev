@@ -185,6 +185,8 @@ function buildAgentJsonInstructions(
 export interface WorkspaceNamingAgentContext {
 	db: HostDb;
 	agent: string;
+	/** Used as-is instead of the host's own env, e.g. a chat agent's launch env. */
+	env?: Record<string, string>;
 }
 
 // Small/fast model per agent for the naming call, validated against the
@@ -264,6 +266,7 @@ async function generateNamesViaAgentCli(
 	namingInstructions?: string | null,
 	signal?: AbortSignal,
 	context?: NamingContext,
+	launchEnv?: Record<string, string>,
 ): Promise<GeneratedWorkspaceNames | null> {
 	if (signal?.aborted) return null;
 	const shell =
@@ -288,9 +291,13 @@ async function generateNamesViaAgentCli(
 	// auth (claude disables its claude.ai login when ANTHROPIC_API_KEY is
 	// set). Strip them so the agent names with the credentials the user
 	// actually signed the CLI in with.
-	const env = { ...process.env };
-	delete env.ANTHROPIC_API_KEY;
-	delete env.OPENAI_API_KEY;
+	const env: NodeJS.ProcessEnv = launchEnv
+		? { ...launchEnv }
+		: { ...process.env };
+	if (!launchEnv) {
+		delete env.ANTHROPIC_API_KEY;
+		delete env.OPENAI_API_KEY;
+	}
 
 	const output = await new Promise<string | null>((resolve) => {
 		const child = spawn(shell, ["-lc", shellCommand], {
@@ -432,6 +439,7 @@ export async function generateWorkspaceNamesFromPrompt(
 					namingInstructions,
 					signal,
 					context,
+					agentContext.env,
 				);
 				if (names) {
 					console.log(

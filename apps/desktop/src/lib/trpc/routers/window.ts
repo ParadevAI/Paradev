@@ -1,8 +1,9 @@
 import fs from "node:fs/promises";
 import { homedir } from "node:os";
+import { join } from "node:path";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
-import { dialog, Menu } from "electron";
+import { app, dialog, Menu } from "electron";
 import { menuEmitter } from "main/lib/menu-events";
 import { getOrg, setOrg } from "main/lib/window-registry/window-registry";
 import { getImageMimeType } from "shared/file-types";
@@ -158,6 +159,36 @@ export const createWindowRouter = () => {
 				}
 
 				return { canceled: false, path: result.filePaths[0] };
+			}),
+
+		saveChatExport: publicProcedure
+			.input(
+				z.object({
+					filename: z.string().min(1),
+					base64: z.string(),
+				}),
+			)
+			.mutation(async ({ ctx, input }) => {
+				const window = ctx.senderWindow;
+				if (!window) return { canceled: true, path: null };
+				const result = await dialog.showSaveDialog(window, {
+					title: i18n._(msg({ message: "Export Chat" })),
+					defaultPath: join(app.getPath("downloads"), input.filename),
+					filters: [
+						{
+							name: i18n._(msg({ message: "ZIP archive" })),
+							extensions: ["zip"],
+						},
+					],
+				});
+				if (result.canceled || !result.filePath) {
+					return { canceled: true, path: null };
+				}
+				await fs.writeFile(
+					result.filePath,
+					Buffer.from(input.base64, "base64"),
+				);
+				return { canceled: false, path: result.filePath };
 			}),
 
 		selectImageFile: publicProcedure.mutation(async ({ ctx }) => {

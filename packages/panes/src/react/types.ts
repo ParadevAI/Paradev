@@ -17,6 +17,8 @@ export interface ContextMenuActionConfig<TData> {
 	hotkeyId?: string;
 	shortcut?: string;
 	onSelect?: (context: RendererContext<TData>) => void;
+	/** Wait for the menu to close first, for an action that moves focus (opens a dialog). */
+	runAfterMenuClose?: boolean;
 	disabled?: boolean | ((context: RendererContext<TData>) => boolean);
 	/**
 	 * Omit the entry entirely. Evaluated when the menu opens, not when the

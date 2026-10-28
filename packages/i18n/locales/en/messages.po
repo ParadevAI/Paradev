@@ -95,6 +95,9 @@ msgstr "(you)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+msgid "[title]"
+msgstr "[title]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
@@ -3863,8 +3866,14 @@ msgstr "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat actions"
+msgstr "Chat actions"
+
 msgid "Chat closed"
 msgstr "Chat closed"
+
+msgid "Chat exported"
+msgstr "Chat exported"
 
 msgid "Chat history"
 msgstr "Chat history"
@@ -3880,6 +3889,9 @@ msgstr "Chat session not found"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chat surfaces: messages, reasoning, suggestions"
+
+msgid "Chat title"
+msgstr "Chat title"
 
 msgid "Chats"
 msgstr "Chats"
@@ -5318,6 +5330,9 @@ msgstr "Could not delete this page"
 msgid "Could not disconnect."
 msgstr "Could not disconnect."
 
+msgid "Could not export chat"
+msgstr "Could not export chat"
+
 msgid "Could not forget {domain}"
 msgstr "Could not forget {domain}"
 
@@ -5432,6 +5447,9 @@ msgstr "Could not record environment"
 
 msgid "Could not remove access"
 msgstr "Could not remove access"
+
+msgid "Could not rename chat"
+msgstr "Could not rename chat"
 
 msgid "Could not rename the session"
 msgstr "Could not rename the session"
@@ -7509,6 +7527,15 @@ msgstr "Exploring"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Exploring"
+
+msgid "Export Chat"
+msgstr "Export Chat"
+
+msgid "Export chat…"
+msgstr "Export chat…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Export this chat as a ZIP"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Extended thinking: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Keep docs fresh"
 
 msgid "Keep editing"
 msgstr "Keep editing"
+
+msgid "Keep it short and recognizable."
+msgstr "Keep it short and recognizable."
 
 msgid "Keep typing an email to invite"
 msgstr "Keep typing an email to invite"
@@ -14992,6 +15022,12 @@ msgstr "Rename account"
 msgid "Rename branch"
 msgstr "Rename branch"
 
+msgid "Rename chat"
+msgstr "Rename chat"
+
+msgid "Rename chat…"
+msgstr "Rename chat…"
+
 msgid "Rename failed"
 msgstr "Rename failed"
 
@@ -15016,6 +15052,9 @@ msgstr "rename the branch"
 
 msgid "Rename this channel"
 msgstr "Rename this channel"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Rename this chat, or regenerate its title"
 
 msgid "Rename workspace"
 msgstr "Rename workspace"
@@ -19740,6 +19779,9 @@ msgstr "Update this host to message subagents"
 msgid "Update this host to move subagents to the background"
 msgstr "Update this host to move subagents to the background"
 
+msgid "Update this host to rename chats."
+msgstr "Update this host to rename chats."
+
 msgid "Updated"
 msgstr "Updated"
 
@@ -21066,6 +21108,9 @@ msgstr "Zap"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Zero-edit majority on merged agent PRs"
+
+msgid "ZIP archive"
+msgstr "ZIP archive"
 
 msgid "Zoom"
 msgstr "Zoom"

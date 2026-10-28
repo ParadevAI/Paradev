@@ -20,7 +20,10 @@ import { focusAgentSession } from "renderer/routes/_authenticated/_dashboard/v2-
 import { focusChatSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusChatSession";
 import type { StoreApi } from "zustand/vanilla";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
+import { useChatActions } from "../../hooks/useChatActions";
 import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
+import { RenameChatDialog } from "../RenameChatDialog";
+import { ChatHistoryEntryMenu } from "./components/ChatHistoryEntryMenu";
 import { type HistoryEntry, historyEntries } from "./utils/historyEntries";
 
 interface ChatHistoryPickerProps {
@@ -37,6 +40,8 @@ export function ChatHistoryPicker({
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
+	const [renaming, setRenaming] = useState<HistoryEntry | null>(null);
+	const { renameChat, exportChat } = useChatActions(workspaceId);
 	const current = context.pane.data as ChatPaneData;
 	const paneId = context.pane.id;
 	// The composer's `/resume` opens this picker from the pane body.
@@ -117,139 +122,171 @@ export function ChatHistoryPicker({
 	};
 
 	return (
-		<Popover
-			open={open}
-			onOpenChange={(nextOpen) => {
-				setOpen(nextOpen);
-				if (nextOpen) setSearch("");
-			}}
-		>
-			<PopoverTrigger asChild>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="size-6"
-					aria-label={t({ message: "Chat history" })}
-					title={t({ message: "Chat history" })}
+		<>
+			<Popover
+				open={open}
+				onOpenChange={(nextOpen) => {
+					setOpen(nextOpen);
+					if (nextOpen) setSearch("");
+				}}
+			>
+				<PopoverTrigger asChild>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="size-6"
+						aria-label={t({ message: "Chat history" })}
+						title={t({ message: "Chat history" })}
+						onClick={(event) => event.stopPropagation()}
+					>
+						<History className="size-3.5" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					align="end"
+					className="w-80 p-2"
 					onClick={(event) => event.stopPropagation()}
 				>
-					<History className="size-3.5" />
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent
-				align="end"
-				className="w-80 p-2"
-				onClick={(event) => event.stopPropagation()}
-			>
-				<div className="pb-2 text-sm font-medium">
-					<Trans>Chat history</Trans>
-				</div>
-				<Input
-					className="h-8"
-					placeholder={t({ message: "Search chats..." })}
-					aria-label={t({ message: "Search chats..." })}
-					value={search}
-					onChange={(event) => setSearch(event.target.value)}
-				/>
-				<div className="mt-2 max-h-72 overflow-y-auto">
-					{saved.isPending || native.isFetching ? (
-						<div className="flex justify-center p-2">
-							<LoaderCircle
-								className="size-4 animate-spin"
-								aria-label={t({ message: "Loading" })}
-							/>
-						</div>
-					) : null}
-					{saved.isError || native.isError ? (
-						<div className="p-2 text-xs text-muted-foreground">
-							<Trans>Some chat history could not be loaded.</Trans>
-							<Button
-								variant="link"
-								size="sm"
-								onClick={() => {
-									void saved.refetch();
-									void native.refetch();
-								}}
-							>
-								<Trans>Retry</Trans>
-							</Button>
-						</div>
-					) : null}
-					{native.data?.pages[0]?.supported === false ? (
-						<p className="p-2 text-xs text-muted-foreground">
-							<Trans>This agent only shows chats saved in Paradev.</Trans>
-						</p>
-					) : null}
-					{visibleAgentSessions.length > 0 ? (
-						<>
-							<div className="px-2 pt-1 pb-1 text-xs text-muted-foreground">
-								<Trans>Agents</Trans>
+					<div className="pb-2 text-sm font-medium">
+						<Trans>Chat history</Trans>
+					</div>
+					<Input
+						className="h-8"
+						placeholder={t({ message: "Search chats..." })}
+						aria-label={t({ message: "Search chats..." })}
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+					/>
+					<div className="mt-2 max-h-72 overflow-y-auto">
+						{saved.isPending || native.isFetching ? (
+							<div className="flex justify-center p-2">
+								<LoaderCircle
+									className="size-4 animate-spin"
+									aria-label={t({ message: "Loading" })}
+								/>
 							</div>
-							{visibleAgentSessions.map((session) => (
-								<button
-									type="button"
-									key={session.sessionId}
-									className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
-									onClick={() => openAgentSession(session)}
+						) : null}
+						{saved.isError || native.isError ? (
+							<div className="p-2 text-xs text-muted-foreground">
+								<Trans>Some chat history could not be loaded.</Trans>
+								<Button
+									variant="link"
+									size="sm"
+									onClick={() => {
+										void saved.refetch();
+										void native.refetch();
+									}}
 								>
-									<div className="min-w-0 flex-1">
-										<div className="truncate text-sm">{session.agentName}</div>
-										<div className="text-xs text-muted-foreground">
-											{formatCompactRelativeTime(
-												new Date(session.lastActivityAt).getTime(),
-											)}
-										</div>
-									</div>
-									{current.agentSession?.id === session.sessionId ? (
-										<Check className="size-3.5 shrink-0" />
-									) : null}
-								</button>
-							))}
-						</>
-					) : null}
-					{visible.map((entry) => (
-						<button
-							type="button"
-							key={entry.key}
-							className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
-							onClick={() => openChat(entry)}
-						>
-							<div className="min-w-0 flex-1">
-								<div className="truncate text-sm">
-									{entry.title || t({ message: "Untitled chat" })}
-								</div>
-								{entry.updatedAt > 0 ? (
-									<div className="text-xs text-muted-foreground">
-										{formatCompactRelativeTime(entry.updatedAt)}
-									</div>
-								) : null}
+									<Trans>Retry</Trans>
+								</Button>
 							</div>
-							{isCurrent(entry) ? (
-								<Check className="size-3.5 shrink-0" />
-							) : null}
-						</button>
-					))}
-					{!saved.isPending &&
-					!native.isFetching &&
-					visible.length === 0 &&
-					visibleAgentSessions.length === 0 ? (
-						<p className="p-3 text-center text-sm text-muted-foreground">
-							<Trans>No chats found</Trans>
-						</p>
-					) : null}
-					{native.hasNextPage ? (
-						<Button
-							variant="ghost"
-							size="sm"
-							className="w-full"
-							disabled={native.isFetchingNextPage}
-							onClick={() => void native.fetchNextPage()}
-						>
-							<Trans>Load more</Trans>
-						</Button>
-					) : null}
-				</div>
-			</PopoverContent>
-		</Popover>
+						) : null}
+						{native.data?.pages[0]?.supported === false ? (
+							<p className="p-2 text-xs text-muted-foreground">
+								<Trans>This agent only shows chats saved in Paradev.</Trans>
+							</p>
+						) : null}
+						{visibleAgentSessions.length > 0 ? (
+							<>
+								<div className="px-2 pt-1 pb-1 text-xs text-muted-foreground">
+									<Trans>Agents</Trans>
+								</div>
+								{visibleAgentSessions.map((session) => (
+									<button
+										type="button"
+										key={session.sessionId}
+										className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
+										onClick={() => openAgentSession(session)}
+									>
+										<div className="min-w-0 flex-1">
+											<div className="truncate text-sm">
+												{session.agentName}
+											</div>
+											<div className="text-xs text-muted-foreground">
+												{formatCompactRelativeTime(
+													new Date(session.lastActivityAt).getTime(),
+												)}
+											</div>
+										</div>
+										{current.agentSession?.id === session.sessionId ? (
+											<Check className="size-3.5 shrink-0" />
+										) : null}
+									</button>
+								))}
+							</>
+						) : null}
+						{visible.map((entry) => {
+							const { sessionId } = entry;
+							return (
+								<div
+									key={entry.key}
+									className="group flex items-center rounded-sm hover:bg-accent focus-within:bg-accent"
+								>
+									<button
+										type="button"
+										className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left focus-visible:outline-none"
+										onClick={() => openChat(entry)}
+									>
+										<div className="min-w-0 flex-1">
+											<div className="truncate text-sm">
+												{entry.title || t({ message: "Untitled chat" })}
+											</div>
+											{entry.updatedAt > 0 ? (
+												<div className="text-xs text-muted-foreground">
+													{formatCompactRelativeTime(entry.updatedAt)}
+												</div>
+											) : null}
+										</div>
+										{isCurrent(entry) ? (
+											<Check className="size-3.5 shrink-0" />
+										) : null}
+									</button>
+									{sessionId ? (
+										<ChatHistoryEntryMenu
+											onRename={() => {
+												setOpen(false);
+												setRenaming(entry);
+											}}
+											onExport={() => void exportChat(sessionId)}
+										/>
+									) : null}
+								</div>
+							);
+						})}
+						{!saved.isPending &&
+						!native.isFetching &&
+						visible.length === 0 &&
+						visibleAgentSessions.length === 0 ? (
+							<p className="p-3 text-center text-sm text-muted-foreground">
+								<Trans>No chats found</Trans>
+							</p>
+						) : null}
+						{native.hasNextPage ? (
+							<Button
+								variant="ghost"
+								size="sm"
+								className="w-full"
+								disabled={native.isFetchingNextPage}
+								onClick={() => void native.fetchNextPage()}
+							>
+								<Trans>Load more</Trans>
+							</Button>
+						) : null}
+					</div>
+				</PopoverContent>
+			</Popover>
+			<RenameChatDialog
+				open={renaming !== null}
+				title={renaming?.title ?? ""}
+				onOpenChange={(nextOpen) => {
+					if (!nextOpen) setRenaming(null);
+				}}
+				onRename={(title) =>
+					renaming?.sessionId
+						? renameChat(renaming.sessionId, title)
+						: Promise.resolve(false)
+				}
+			/>
+		</>
 	);
 }

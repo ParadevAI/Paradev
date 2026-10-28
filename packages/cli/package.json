@@ -18,6 +18,7 @@
 		"@clack/prompts": "0.10.1",
 		"@modelcontextprotocol/sdk": "1.31.0",
 		"@superset/agent-setup": "workspace:*",
+		"@superset/chat": "workspace:*",
 		"@superset/cli-framework": "workspace:*",
 		"@superset/host-service": "workspace:*",
 		"@superset/i18n": "workspace:*",
@@ -38,6 +39,7 @@
 		"@types/mime-types": "3.0.1",
 		"@types/react": "19.2.14",
 		"bun-types": "1.4.3",
+		"fflate": "0.8.3",
 		"typescript": "7.0.2"
 	}
 }

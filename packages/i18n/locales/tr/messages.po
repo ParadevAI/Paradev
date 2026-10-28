@@ -95,6 +95,9 @@ msgstr "(siz)"
 msgid "[prompt]"
 msgstr "[istem]"
 
+msgid "[title]"
+msgstr "[başlık]"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# etkin port — ayrıntıları gizle} other {# etkin port — ayrıntıları gizle}}"
@@ -3863,8 +3866,14 @@ msgstr "Satın alınan GB-saatler azaldığında kayıtlı kartınızdan daha fa
 msgid "Chat"
 msgstr "Sohbet"
 
+msgid "Chat actions"
+msgstr "Sohbet işlemleri"
+
 msgid "Chat closed"
 msgstr "Sohbet kapatıldı"
+
+msgid "Chat exported"
+msgstr "Sohbet dışa aktarıldı"
 
 msgid "Chat history"
 msgstr "Sohbet geçmişi"
@@ -3880,6 +3889,9 @@ msgstr "Sohbet oturumu bulunamadı"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Sohbet yüzeyleri: mesajlar, akıl yürütme, öneriler"
+
+msgid "Chat title"
+msgstr "Sohbet başlığı"
 
 msgid "Chats"
 msgstr "Sohbetler"
@@ -5318,6 +5330,9 @@ msgstr "Bu sayfa silinemedi"
 msgid "Could not disconnect."
 msgstr "Bağlantı kesilemedi."
 
+msgid "Could not export chat"
+msgstr "Sohbet dışa aktarılamadı"
+
 msgid "Could not forget {domain}"
 msgstr "{domain} unutulamadı"
 
@@ -5432,6 +5447,9 @@ msgstr "Ortam kaydedilemedi"
 
 msgid "Could not remove access"
 msgstr "Erişim kaldırılamadı"
+
+msgid "Could not rename chat"
+msgstr "Sohbet yeniden adlandırılamadı"
 
 msgid "Could not rename the session"
 msgstr "Oturum yeniden adlandırılamadı"
@@ -7509,6 +7527,15 @@ msgstr "Araştırılıyor"
 msgctxt "roadmap"
 msgid "Exploring"
 msgstr "Araştırılıyor"
+
+msgid "Export Chat"
+msgstr "Sohbeti Dışa Aktar"
+
+msgid "Export chat…"
+msgstr "Sohbeti dışa aktar…"
+
+msgid "Export this chat as a ZIP"
+msgstr "Bu sohbeti ZIP olarak dışa aktar"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Genişletilmiş düşünme: {activeLabel}"
@@ -9907,6 +9934,9 @@ msgstr "Belgeleri güncel tut"
 
 msgid "Keep editing"
 msgstr "Düzenlemeye devam et"
+
+msgid "Keep it short and recognizable."
+msgstr "Kısa ve tanınır olsun."
 
 msgid "Keep typing an email to invite"
 msgstr "Davet etmek için e-postayı yazmaya devam edin"
@@ -14992,6 +15022,12 @@ msgstr "Hesabı yeniden adlandır"
 msgid "Rename branch"
 msgstr "Dalı yeniden adlandır"
 
+msgid "Rename chat"
+msgstr "Sohbeti yeniden adlandır"
+
+msgid "Rename chat…"
+msgstr "Sohbeti yeniden adlandır…"
+
 msgid "Rename failed"
 msgstr "Yeniden adlandırılamadı"
 
@@ -15016,6 +15052,9 @@ msgstr "dalı yeniden adlandırma"
 
 msgid "Rename this channel"
 msgstr "Bu kanalı yeniden adlandır"
+
+msgid "Rename this chat, or regenerate its title"
+msgstr "Bu sohbeti yeniden adlandır veya başlığını yeniden oluştur"
 
 msgid "Rename workspace"
 msgstr "Çalışma alanını yeniden adlandır"
@@ -19740,6 +19779,9 @@ msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
 msgid "Update this host to move subagents to the background"
 msgstr "Alt ajanları arka plana taşımak için bu ana makineyi güncelleyin"
 
+msgid "Update this host to rename chats."
+msgstr "Sohbetleri yeniden adlandırmak için bu host'u güncelleyin."
+
 msgid "Updated"
 msgstr "Güncellendi"
 
@@ -21066,6 +21108,9 @@ msgstr "Şimşek"
 
 msgid "Zero-edit majority on merged agent PRs"
 msgstr "Birleştirilen ajan PR'larında sıfır düzenleme çoğunluğu"
+
+msgid "ZIP archive"
+msgstr "ZIP arşivi"
 
 msgid "Zoom"
 msgstr "Yakınlaştırma"

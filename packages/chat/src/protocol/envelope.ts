@@ -63,6 +63,8 @@ export const sessionStateSchema = z.looseObject({
 	status: sessionStatusSchema,
 	harness: z.string().min(1),
 	title: z.string().optional(),
+	/** Set when a person named the chat; `title` then carries it too. */
+	userTitle: z.string().optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	availableModes: z.array(selectOptionSchema).optional(),

@@ -8,7 +8,7 @@ import {
 
 type SessionsClient = Pick<
 	HostServiceClient["sessions"],
-	"create" | "list" | "get" | "read" | "send" | "close" | "resume"
+	"create" | "list" | "get" | "read" | "send" | "close" | "resume" | "rename"
 >;
 export type SessionPageResult = Awaited<
 	ReturnType<SessionsClient["read"]["query"]>
@@ -53,6 +53,7 @@ function sessionsClient(client: HostServiceClient): SessionsClient {
 		send: { mutate: (input) => callSessions(() => raw.send.mutate(input)) },
 		close: { mutate: (input) => callSessions(() => raw.close.mutate(input)) },
 		resume: { mutate: (input) => callSessions(() => raw.resume.mutate(input)) },
+		rename: { mutate: (input) => callSessions(() => raw.rename.mutate(input)) },
 	};
 }
 

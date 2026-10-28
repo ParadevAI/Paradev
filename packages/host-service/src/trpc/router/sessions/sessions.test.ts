@@ -307,4 +307,26 @@ describe("sessions router", () => {
 			`native-${created.sessionId}`,
 		);
 	});
+
+	test("renames a chat, and keeps the title when there is nothing to regenerate from", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		await waitFor(
+			() => runtime.live.get(created.sessionId)?.state.status === "idle",
+		);
+		const input = { workspaceId: WORKSPACE, sessionId: created.sessionId };
+		expect(await caller.rename({ ...input, title: "Release notes" })).toEqual({
+			title: "Release notes",
+		});
+		await expect(caller.rename(input)).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+		});
+		const [listed] = await caller.list({ workspaceId: WORKSPACE });
+		expect(listed).toMatchObject({
+			title: "Release notes",
+			userTitle: "Release notes",
+		});
+	});
 });

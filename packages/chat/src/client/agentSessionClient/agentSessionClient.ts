@@ -146,6 +146,7 @@ export function createAgentSessionClient(
 					epoch: head.cursor?.epoch ?? "",
 					status: head.session?.status ?? "idle",
 					title: options.title ?? null,
+					userTitle: null,
 					queuedCount: 0,
 					updatedAt: head.updatedAt ?? now(),
 				},
