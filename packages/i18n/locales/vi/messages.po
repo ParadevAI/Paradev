@@ -936,9 +936,6 @@ msgstr "{formerName} nay là {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} nay là {productName}!"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} nay đã đổi tên thành {productName}. Vẫn là sản phẩm đó, vẫn đội ngũ đó, chỉ có tên là thay đổi. Các liên kết superset.sh hiện có sẽ được chuyển hướng và lệnh superset vẫn hoạt động bình thường."
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} nhà sáng lập từng tham gia YC"
 
@@ -1168,6 +1165,9 @@ msgstr "{price}/người/tháng"
 
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (trước đây là {formerName}, YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
+
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName} (trước đây là {formerName})"
 
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (YC P26) là IDE công khai mã nguồn cho kỷ nguyên agent AI, nơi các kỹ sư chạy song song hàng trăm agent lập trình như Claude Code và Codex."
@@ -1480,6 +1480,9 @@ msgstr "${balance} credit"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "Vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt"
+
 msgid "1"
 msgstr "1"
 
@@ -1501,8 +1504,14 @@ msgstr "10+ luồng công việc đồng thời mà không rớt trạng thái"
 msgid "12m ago"
 msgstr "12 phút trước"
 
+msgid "145,000+ across 180 countries"
+msgstr "Hơn 145.000 tại 180 quốc gia"
+
 msgid "15 min"
 msgstr "15 phút"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ sao, 100+ người đóng góp"
 
 msgid "1d ago"
 msgstr "1 ngày trước"
@@ -1704,9 +1713,6 @@ msgstr "Giới thiệu"
 
 msgid "About {displayName}"
 msgstr "Giới thiệu về {displayName}"
-
-msgid "About {productName}"
-msgstr "Về {productName}"
 
 msgid "About Paradev"
 msgstr "Về Paradev"
@@ -2815,9 +2821,6 @@ msgstr "Theo báo cáo gần nhất. Máy chủ phải trực tuyến để cậ
 msgid "ascending"
 msgstr "tăng dần"
 
-msgid "Asia"
-msgstr "Châu Á"
-
 msgid "Ask a member to add you to this channel"
 msgstr "Hãy nhờ một thành viên thêm bạn vào kênh này"
 
@@ -2886,6 +2889,9 @@ msgstr "Có hỗ trợ"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "Tổng quan"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "Ít nhất một đội mà chúng tôi có thể nêu tên, kể cả đội của chúng tôi, vượt mọi cổng F4 trong trọn một quý và công bố số liệu."
@@ -4990,9 +4996,6 @@ msgstr "Tiếp tục trong trình duyệt"
 msgid "Continue or fork session"
 msgstr "Tiếp tục hoặc fork phiên"
 
-msgid "Continue the same workspace from your iPhone"
-msgstr "Tiếp tục cùng một workspace từ iPhone của bạn"
-
 msgid "Continue the session the last run left"
 msgstr "Tiếp tục phiên mà lần chạy trước để lại"
 
@@ -6153,9 +6156,6 @@ msgstr "Nhà cung cấp tùy chỉnh"
 msgid "Custom themes"
 msgstr "Theme tùy chỉnh"
 
-msgid "Customers"
-msgstr "Khách hàng"
-
 msgid "Customize"
 msgstr "Tùy chỉnh"
 
@@ -6914,8 +6914,8 @@ msgstr "Tải nhật ký xuống"
 msgid "Download Manually"
 msgstr "Tải xuống thủ công"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Tải logo và hình ảnh sản phẩm của chúng tôi để dùng trong các bài viết về Paradev."
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Tải logo, hình ảnh sản phẩm và ảnh nhà sáng lập của chúng tôi để dùng trong các bài viết về Paradev."
 
 msgid "Download Paradev"
 msgstr "Tải Paradev"
@@ -8374,9 +8374,6 @@ msgstr "Các thư mục sẽ được checkout vào worktree mới, mỗi dòng 
 msgid "FOLLOW ON X"
 msgstr "THEO DÕI TRÊN X"
 
-msgid "Follow terminal sessions live"
-msgstr "Theo dõi trực tiếp các phiên terminal"
-
 msgid "Follow thread"
 msgstr "Theo dõi chuỗi"
 
@@ -8514,6 +8511,9 @@ msgstr "Tìm thấy 12 chỗ gọi tooltip"
 
 msgid "Founder & CEO, WowMakers"
 msgstr "Nhà sáng lập & CEO, WowMakers"
+
+msgid "Founders"
+msgstr "Nhà sáng lập"
 
 msgid "Founding Engineer"
 msgstr "Kỹ sư sáng lập"
@@ -8901,6 +8901,9 @@ msgstr "Tiêu đề 2"
 
 msgid "Heading 3"
 msgstr "Tiêu đề 3"
+
+msgid "Headquarters"
+msgstr "Trụ sở"
 
 msgid "Heart"
 msgstr "Trái tim"
@@ -12460,6 +12463,9 @@ msgstr "Một kỹ sư duy trì từ 3 luồng công việc agent trở lên su�
 msgid "One human drives at most one agent at a time."
 msgstr "Mỗi người điều khiển tối đa một agent tại một thời điểm."
 
+msgid "One line"
+msgstr "Một câu"
+
 msgid "One line about how you work"
 msgstr "Một dòng về cách bạn làm việc"
 
@@ -12468,6 +12474,9 @@ msgstr "Một trong một trăm người đầu tiên trên bảng"
 
 msgid "one of the selected repositories"
 msgstr "một trong các repository đã chọn"
+
+msgid "One paragraph"
+msgstr "Một đoạn"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "Một plugin, mọi agent lập trình: Claude Code, Codex, Cursor, OpenCode và nhiều hơn nữa. Cài một lần, dùng trên máy của bạn và trên cloud."
@@ -13465,12 +13474,6 @@ msgstr "Diff mã của Paradev Mobile trên iPhone"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradev mobile mang sức mạnh của máy tính để bàn đến bất cứ đâu tôi đi."
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Paradev Mobile giúp nhà phát triển tiếp tục từ iPhone các workspace Paradev mà họ đang dùng trên máy tính."
-
-msgid "Paradev Mobile page"
-msgstr "Trang Paradev Mobile"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "Terminal của Paradev Mobile trên iPhone"
 
@@ -14003,9 +14006,6 @@ msgstr "Nhấn ⌘⇧B hoặc mở một cổng mà Paradev đã phát hiện. D
 msgid "Press a key…"
 msgstr "Nhấn một phím…"
 
-msgid "Press contact"
-msgstr "Liên hệ báo chí"
-
 msgid "Press coverage"
 msgstr "Báo chí đưa tin"
 
@@ -14255,9 +14255,6 @@ msgstr "Prompt"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "Ra prompt cho một coding agent để xây điều bạn muốn thấy trong Paradev. Nếu chúng tôi thích prompt của bạn, chúng tôi sẽ chạy nó và merge kết quả."
-
-msgid "Prompt agents and answer their questions"
-msgstr "Gửi prompt cho agent và trả lời câu hỏi của chúng"
 
 msgid "Prompt command is only available for terminal agents."
 msgstr "Lệnh prompt chỉ dùng được cho agent terminal."
@@ -14569,9 +14566,6 @@ msgstr "Đọc trên điện thoại"
 
 msgid "Read MCP servers again"
 msgstr "Đọc lại các server MCP"
-
-msgid "Read the announcement"
-msgstr "Đọc thông báo"
 
 msgid "Read the changelog"
 msgstr "Đọc changelog"
@@ -15526,9 +15520,6 @@ msgstr "Yêu cầu review"
 
 msgid "Review required"
 msgstr "Cần review"
-
-msgid "Review syntax-highlighted diffs"
-msgstr "Xem xét diff có tô sáng cú pháp"
 
 msgid "Review the result."
 msgstr "Review kết quả."
@@ -18252,12 +18243,6 @@ msgstr "Agent dùng skill và công cụ của nó. Issue xuất hiện trong Li
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "Agent theo dõi trang sẽ đọc từng bình luận. Agent cập nhật trang và trả lời trong luồng."
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "Thông báo cũng chia sẻ vòng gọi vốn hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham."
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "Ứng dụng được tải miễn phí. Yêu cầu iOS 26 trở lên và Paradev Pro. Tiếp theo sẽ là Android."
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "Ứng dụng đang ở {appVersion} nhưng kết nối với dịch vụ máy chủ do thứ khác khởi động, có thể là CLI cũ hoặc bản dựng Paradev khác. Khởi động lại sẽ thay thế nó bằng bản của ứng dụng này."
 
@@ -20068,9 +20053,6 @@ msgstr "Xem trên GitHub"
 msgid "VIEW ON GITHUB"
 msgstr "XEM TRÊN GITHUB"
 
-msgid "View on the App Store"
-msgstr "Xem trên App Store"
-
 msgid "View open roles"
 msgstr "Xem vị trí đang tuyển"
 
@@ -20740,6 +20722,9 @@ msgstr "X-Lớn"
 
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
+
+msgid "Y Combinator batch"
+msgstr "Khóa Y Combinator"
 
 msgid "Yearly"
 msgstr "Hằng năm"

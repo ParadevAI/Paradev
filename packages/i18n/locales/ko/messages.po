@@ -936,9 +936,6 @@ msgstr "{formerName}의 새 이름: {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName}, 이제 {productName}입니다!"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName}의 새 이름은 {productName}입니다. 같은 제품, 같은 팀이며 이름만 바뀌었습니다. 기존 superset.sh 링크는 리디렉션되며 superset 명령어도 계속 작동합니다."
-
 msgid "{founderCount} ex-YC founders"
 msgstr "YC 출신 창업자 {founderCount}명"
 
@@ -1168,6 +1165,9 @@ msgstr "사용자당 월 {price}"
 
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(구 {formerName}, YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
+
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}(구 {formerName})"
 
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
@@ -1480,6 +1480,9 @@ msgstr "크레딧 ${balance}"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "Union Square Ventures가 주도한 1,150만 달러 시드 투자"
+
 msgid "1"
 msgstr "1"
 
@@ -1501,8 +1504,14 @@ msgstr "상태 유실 없이 동시 작업 흐름 10개 이상"
 msgid "12m ago"
 msgstr "12분 전"
 
+msgid "145,000+ across 180 countries"
+msgstr "180개국 145,000명 이상"
+
 msgid "15 min"
 msgstr "15분"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "스타 15k+, 기여자 100+"
 
 msgid "1d ago"
 msgstr "1일 전"
@@ -1704,9 +1713,6 @@ msgstr "회사 소개"
 
 msgid "About {displayName}"
 msgstr "{displayName}에 관하여"
-
-msgid "About {productName}"
-msgstr "{productName} 소개"
 
 msgid "About Paradev"
 msgstr "Paradev 소개"
@@ -2815,9 +2821,6 @@ msgstr "마지막으로 보고된 값입니다. 업데이트하려면 호스트�
 msgid "ascending"
 msgstr "오름차순"
 
-msgid "Asia"
-msgstr "아시아"
-
 msgid "Ask a member to add you to this channel"
 msgstr "멤버에게 이 채널에 추가해 달라고 요청하세요"
 
@@ -2886,6 +2889,9 @@ msgstr "보조"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "한눈에 보기"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "우리를 포함해 이름을 댈 수 있는 팀 중 최소 한 곳이 한 분기 내내 모든 F4 관문을 통과하고 그 수치를 공개합니다."
@@ -4990,9 +4996,6 @@ msgstr "브라우저에서 계속하세요"
 msgid "Continue or fork session"
 msgstr "세션 계속하기 또는 포크"
 
-msgid "Continue the same workspace from your iPhone"
-msgstr "같은 워크스페이스를 iPhone에서 이어서 작업"
-
 msgid "Continue the session the last run left"
 msgstr "마지막 실행이 남긴 세션을 계속"
 
@@ -6153,9 +6156,6 @@ msgstr "사용자 지정 제공사"
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
 
-msgid "Customers"
-msgstr "고객"
-
 msgid "Customize"
 msgstr "사용자 지정"
 
@@ -6914,8 +6914,8 @@ msgstr "로그 다운로드"
 msgid "Download Manually"
 msgstr "수동으로 다운로드"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Paradev 관련 보도에 사용할 수 있는 로고와 제품 이미지를 내려받으세요."
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Paradev 관련 보도에 사용할 수 있는 로고, 제품 이미지, 창업자 사진을 내려받으세요."
 
 msgid "Download Paradev"
 msgstr "Paradev 다운로드"
@@ -8374,9 +8374,6 @@ msgstr "새 worktree에 체크아웃할 폴더를 리포지토리 루트 기준�
 msgid "FOLLOW ON X"
 msgstr "X에서 팔로우하기"
 
-msgid "Follow terminal sessions live"
-msgstr "터미널 세션을 실시간으로 확인"
-
 msgid "Follow thread"
 msgstr "스레드 팔로우"
 
@@ -8514,6 +8511,9 @@ msgstr "툴팁 호출 지점 12곳 발견"
 
 msgid "Founder & CEO, WowMakers"
 msgstr "창업자 겸 CEO, WowMakers"
+
+msgid "Founders"
+msgstr "창업자"
 
 msgid "Founding Engineer"
 msgstr "창립 엔지니어"
@@ -8901,6 +8901,9 @@ msgstr "제목 2"
 
 msgid "Heading 3"
 msgstr "제목 3"
+
+msgid "Headquarters"
+msgstr "본사"
 
 msgid "Heart"
 msgstr "하트"
@@ -12460,6 +12463,9 @@ msgstr "엔지니어 한 명이 하루 근무 내내 3개 이상의 에이전트
 msgid "One human drives at most one agent at a time."
 msgstr "사람 한 명이 한 번에 최대 한 개의 에이전트를 다룹니다."
 
+msgid "One line"
+msgstr "한 줄"
+
 msgid "One line about how you work"
 msgstr "일하는 방식을 한 줄로"
 
@@ -12468,6 +12474,9 @@ msgstr "보드의 첫 100명 중 한 명"
 
 msgid "one of the selected repositories"
 msgstr "선택한 리포지토리 중 하나"
+
+msgid "One paragraph"
+msgstr "한 단락"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "하나의 플러그인, 모든 코딩 에이전트: Claude Code, Codex, Cursor, OpenCode 등. 한 번 설치하면 내 머신과 클라우드에서 씁니다."
@@ -13465,12 +13474,6 @@ msgstr "iPhone의 Paradev Mobile 코드 diff"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradev 모바일은 어디를 가든 데스크톱의 성능을 사용할 수 있게 해줍니다."
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Paradev Mobile을 사용하면 개발자는 컴퓨터에서 쓰던 Paradev 워크스페이스를 iPhone에서 이어서 작업할 수 있습니다."
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile 페이지"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone의 Paradev Mobile 터미널"
 
@@ -14003,9 +14006,6 @@ msgstr "⌘⇧B를 누르거나 Paradev가 감지한 포트를 여세요. 개발
 msgid "Press a key…"
 msgstr "키를 누르세요…"
 
-msgid "Press contact"
-msgstr "언론 문의"
-
 msgid "Press coverage"
 msgstr "언론 보도"
 
@@ -14255,9 +14255,6 @@ msgstr "프롬프트"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "코딩 에이전트에게 Paradev에서 보고 싶은 기능을 만들어 달라고 요청하세요. 마음에 드는 프롬프트는 저희가 실행해서 결과를 머지합니다."
-
-msgid "Prompt agents and answer their questions"
-msgstr "에이전트에게 프롬프트를 보내고 질문에 답하기"
 
 msgid "Prompt command is only available for terminal agents."
 msgstr "프롬프트 명령은 터미널 에이전트에서만 사용할 수 있습니다."
@@ -14569,9 +14566,6 @@ msgstr "휴대폰으로 읽기"
 
 msgid "Read MCP servers again"
 msgstr "MCP 서버 다시 읽기"
-
-msgid "Read the announcement"
-msgstr "발표 읽기"
 
 msgid "Read the changelog"
 msgstr "변경 로그 읽기"
@@ -15526,9 +15520,6 @@ msgstr "리뷰 요청됨"
 
 msgid "Review required"
 msgstr "리뷰 필요"
-
-msgid "Review syntax-highlighted diffs"
-msgstr "구문 강조된 diff 리뷰"
 
 msgid "Review the result."
 msgstr "결과를 리뷰하세요."
@@ -18252,12 +18243,6 @@ msgstr "에이전트가 스킬과 도구를 사용하고, 이슈가 Linear에 �
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "페이지를 지켜보는 에이전트가 각 댓글을 읽고 페이지를 업데이트한 뒤 스레드에 답합니다."
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "이번 발표에서는 Union Square Ventures가 주도하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드도 함께 공개합니다."
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "앱은 무료로 다운로드할 수 있습니다. iOS 26 이상과 Paradev Pro가 필요합니다. 다음은 Android입니다."
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "앱은 {appVersion}이지만 다른 것(오래된 CLI나 다른 Paradev 빌드일 가능성)이 시작한 호스트 서비스에 연결되어 있습니다. 다시 시작하면 이 앱의 복사본으로 교체됩니다."
 
@@ -20068,9 +20053,6 @@ msgstr "GitHub에서 보기"
 msgid "VIEW ON GITHUB"
 msgstr "GITHUB에서 보기"
 
-msgid "View on the App Store"
-msgstr "App Store에서 보기"
-
 msgid "View open roles"
 msgstr "채용 중인 직무 보기"
 
@@ -20740,6 +20722,9 @@ msgstr "X-대형"
 
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
+
+msgid "Y Combinator batch"
+msgstr "Y Combinator 배치"
 
 msgid "Yearly"
 msgstr "연간"

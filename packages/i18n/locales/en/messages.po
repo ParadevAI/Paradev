@@ -936,9 +936,6 @@ msgstr "{formerName} is now {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} is now {productName}!"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} ex-YC founders"
 
@@ -1168,6 +1165,9 @@ msgstr "{price}/user/mo"
 
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName} (formerly {formerName})"
 
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
@@ -1480,6 +1480,9 @@ msgstr "${balance} credits"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "$11.5M seed led by Union Square Ventures"
+
 msgid "1"
 msgstr "1"
 
@@ -1501,8 +1504,14 @@ msgstr "10+ concurrent workstreams without dropped state"
 msgid "12m ago"
 msgstr "12m ago"
 
+msgid "145,000+ across 180 countries"
+msgstr "145,000+ across 180 countries"
+
 msgid "15 min"
 msgstr "15 min"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ stars, 100+ contributors"
 
 msgid "1d ago"
 msgstr "1d ago"
@@ -1704,9 +1713,6 @@ msgstr "About"
 
 msgid "About {displayName}"
 msgstr "About {displayName}"
-
-msgid "About {productName}"
-msgstr "About {productName}"
 
 msgid "About Paradev"
 msgstr "About Paradev"
@@ -2815,9 +2821,6 @@ msgstr "As last reported. The host must be online to update."
 msgid "ascending"
 msgstr "ascending"
 
-msgid "Asia"
-msgstr "Asia"
-
 msgid "Ask a member to add you to this channel"
 msgstr "Ask a member to add you to this channel"
 
@@ -2886,6 +2889,9 @@ msgstr "Assisted"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "At a glance"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
@@ -4990,9 +4996,6 @@ msgstr "Continue in your browser"
 msgid "Continue or fork session"
 msgstr "Continue or fork session"
 
-msgid "Continue the same workspace from your iPhone"
-msgstr "Continue the same workspace from your iPhone"
-
 msgid "Continue the session the last run left"
 msgstr "Continue the session the last run left"
 
@@ -6153,9 +6156,6 @@ msgstr "Custom provider"
 msgid "Custom themes"
 msgstr "Custom themes"
 
-msgid "Customers"
-msgstr "Customers"
-
 msgid "Customize"
 msgstr "Customize"
 
@@ -6914,8 +6914,8 @@ msgstr "Download logs"
 msgid "Download Manually"
 msgstr "Download Manually"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Download our logos and product images for use in coverage of Paradev."
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Download our logos, product images, and founder photos for use in coverage of Paradev."
 
 msgid "Download Paradev"
 msgstr "Download Paradev"
@@ -8374,9 +8374,6 @@ msgstr "Folders to check out into new worktrees, one per line, relative to the r
 msgid "FOLLOW ON X"
 msgstr "FOLLOW ON X"
 
-msgid "Follow terminal sessions live"
-msgstr "Follow terminal sessions live"
-
 msgid "Follow thread"
 msgstr "Follow thread"
 
@@ -8514,6 +8511,9 @@ msgstr "Found 12 tooltip call sites"
 
 msgid "Founder & CEO, WowMakers"
 msgstr "Founder & CEO, WowMakers"
+
+msgid "Founders"
+msgstr "Founders"
 
 msgid "Founding Engineer"
 msgstr "Founding Engineer"
@@ -8901,6 +8901,9 @@ msgstr "Heading 2"
 
 msgid "Heading 3"
 msgstr "Heading 3"
+
+msgid "Headquarters"
+msgstr "Headquarters"
 
 msgid "Heart"
 msgstr "Heart"
@@ -12460,6 +12463,9 @@ msgstr "One engineer sustains 3 or more agent workstreams through a workday."
 msgid "One human drives at most one agent at a time."
 msgstr "One human drives at most one agent at a time."
 
+msgid "One line"
+msgstr "One line"
+
 msgid "One line about how you work"
 msgstr "One line about how you work"
 
@@ -12468,6 +12474,9 @@ msgstr "One of the first hundred on the board"
 
 msgid "one of the selected repositories"
 msgstr "one of the selected repositories"
+
+msgid "One paragraph"
+msgstr "One paragraph"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
@@ -13465,12 +13474,6 @@ msgstr "Paradev Mobile code diff on iPhone"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradev mobile gives me the power of my desktop anywhere I go."
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile page"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "Paradev Mobile terminal on iPhone"
 
@@ -14003,9 +14006,6 @@ msgstr "Press ⌘⇧B or open a port Paradev detected. Your dev server loads in 
 msgid "Press a key…"
 msgstr "Press a key…"
 
-msgid "Press contact"
-msgstr "Press contact"
-
 msgid "Press coverage"
 msgstr "Press coverage"
 
@@ -14255,9 +14255,6 @@ msgstr "Prompt"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
-
-msgid "Prompt agents and answer their questions"
-msgstr "Prompt agents and answer their questions"
 
 msgid "Prompt command is only available for terminal agents."
 msgstr "Prompt command is only available for terminal agents."
@@ -14569,9 +14566,6 @@ msgstr "Read it on your phone"
 
 msgid "Read MCP servers again"
 msgstr "Read MCP servers again"
-
-msgid "Read the announcement"
-msgstr "Read the announcement"
 
 msgid "Read the changelog"
 msgstr "Read the changelog"
@@ -15526,9 +15520,6 @@ msgstr "Review requested"
 
 msgid "Review required"
 msgstr "Review required"
-
-msgid "Review syntax-highlighted diffs"
-msgstr "Review syntax-highlighted diffs"
 
 msgid "Review the result."
 msgstr "Review the result."
@@ -18252,12 +18243,6 @@ msgstr "The agent uses its skills and tools. The issue lands in Linear."
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "The agent watching the page reads each comment. It updates the page and replies in the thread."
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 
@@ -20068,9 +20053,6 @@ msgstr "View on GitHub"
 msgid "VIEW ON GITHUB"
 msgstr "VIEW ON GITHUB"
 
-msgid "View on the App Store"
-msgstr "View on the App Store"
-
 msgid "View open roles"
 msgstr "View open roles"
 
@@ -20740,6 +20722,9 @@ msgstr "X-Large"
 
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
+
+msgid "Y Combinator batch"
+msgstr "Y Combinator batch"
 
 msgid "Yearly"
 msgstr "Yearly"

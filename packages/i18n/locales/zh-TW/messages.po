@@ -936,9 +936,6 @@ msgstr "{formerName} 現已更名為 {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} 現已更名為 {productName}！"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} 現已更名為 {productName}。產品不變，團隊不變，只是換了名字。現有的 superset.sh 連結會自動轉址，superset 指令也會繼續可用。"
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友創辦人"
 
@@ -1168,6 +1165,9 @@ msgstr "{price}/使用者/月"
 
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（原 {formerName}，YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
+
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}（原 {formerName}）"
 
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
@@ -1480,6 +1480,9 @@ msgstr "${balance}額度"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "由 Union Square Ventures 領投的 1,150 萬美元種子輪"
+
 msgid "1"
 msgstr "1"
 
@@ -1501,8 +1504,14 @@ msgstr "10條以上並行工作流且不丟狀態"
 msgid "12m ago"
 msgstr "12分鐘前"
 
+msgid "145,000+ across 180 countries"
+msgstr "180 個國家/地區，14.5 萬+"
+
 msgid "15 min"
 msgstr "15 分鐘"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ 星標，100+ 貢獻者"
 
 msgid "1d ago"
 msgstr "1天前"
@@ -1704,9 +1713,6 @@ msgstr "關於"
 
 msgid "About {displayName}"
 msgstr "關於 {displayName}"
-
-msgid "About {productName}"
-msgstr "關於{productName}"
 
 msgid "About Paradev"
 msgstr "關於Paradev"
@@ -2815,9 +2821,6 @@ msgstr "上次回報的版本。主機必須在線上才能更新。"
 msgid "ascending"
 msgstr "升序"
 
-msgid "Asia"
-msgstr "亞洲"
-
 msgid "Ask a member to add you to this channel"
 msgstr "請讓成員將你加入此頻道"
 
@@ -2886,6 +2889,9 @@ msgstr "輔助"
 
 msgid "at"
 msgstr "位於"
+
+msgid "At a glance"
+msgstr "概覽"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "至少有一支叫得出名字的團隊（包括我們自己）連續一個季度通過全部F4關卡，並公佈資料。"
@@ -4990,9 +4996,6 @@ msgstr "請在瀏覽器中繼續"
 msgid "Continue or fork session"
 msgstr "繼續或分支會話"
 
-msgid "Continue the same workspace from your iPhone"
-msgstr "在 iPhone 上繼續同一個工作區"
-
 msgid "Continue the session the last run left"
 msgstr "繼續上次執行留下的工作階段"
 
@@ -6153,9 +6156,6 @@ msgstr "自訂提供商"
 msgid "Custom themes"
 msgstr "自訂主題"
 
-msgid "Customers"
-msgstr "客戶"
-
 msgid "Customize"
 msgstr "自訂"
 
@@ -6914,8 +6914,8 @@ msgstr "下載記錄"
 msgid "Download Manually"
 msgstr "手動下載"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "下載我們的標誌與產品圖片，用於報導 Paradev。"
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "下載我們的標誌、產品圖片與創辦人照片，用於報導 Paradev。"
 
 msgid "Download Paradev"
 msgstr "下載Paradev"
@@ -8374,9 +8374,6 @@ msgstr "要檢出到新worktree的資料夾，每行一個，相對於儲存庫�
 msgid "FOLLOW ON X"
 msgstr "在X上關注"
 
-msgid "Follow terminal sessions live"
-msgstr "即時追蹤終端工作階段"
-
 msgid "Follow thread"
 msgstr "追蹤討論串"
 
@@ -8514,6 +8511,9 @@ msgstr "找到12處tooltip呼叫"
 
 msgid "Founder & CEO, WowMakers"
 msgstr "創辦人暨 CEO，WowMakers"
+
+msgid "Founders"
+msgstr "創辦人"
 
 msgid "Founding Engineer"
 msgstr "創始工程師"
@@ -8901,6 +8901,9 @@ msgstr "標題2"
 
 msgid "Heading 3"
 msgstr "標題3"
+
+msgid "Headquarters"
+msgstr "總部"
 
 msgid "Heart"
 msgstr "心形"
@@ -12460,6 +12463,9 @@ msgstr "一名工程師在一個工作日內維持3條以上代理程式工作�
 msgid "One human drives at most one agent at a time."
 msgstr "一個人同時最多驅動一個代理程式。"
 
+msgid "One line"
+msgstr "一句話"
+
 msgid "One line about how you work"
 msgstr "用一句話介紹你的工作方式"
 
@@ -12468,6 +12474,9 @@ msgstr "榜單最早的一百人之一"
 
 msgid "one of the selected repositories"
 msgstr "所選儲存庫之一"
+
+msgid "One paragraph"
+msgstr "一段話"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "一個外掛，所有程式碼代理程式：Claude Code、Codex、Cursor、OpenCode 等。只需安裝一次，就能在你的裝置上和雲端使用。"
@@ -13465,12 +13474,6 @@ msgstr "iPhone 上的 Paradev Mobile 程式碼差異"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "無論走到哪裡，Paradev 手機版都讓我擁有桌上型電腦的能力。"
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "透過 Paradev Mobile，開發者可以在 iPhone 上繼續使用他們在電腦上已在使用的 Paradev 工作區。"
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile 頁面"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone 上的 Paradev Mobile 終端"
 
@@ -14003,9 +14006,6 @@ msgstr "按 ⌘⇧B，或開啟 Paradev 偵測到的連接埠。開發伺服器�
 msgid "Press a key…"
 msgstr "請按一個鍵…"
 
-msgid "Press contact"
-msgstr "媒體聯絡"
-
 msgid "Press coverage"
 msgstr "媒體報導"
 
@@ -14255,9 +14255,6 @@ msgstr "提示詞"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "用提示詞讓編碼代理程式實現你想在Paradev中看到的功能。如果我們喜歡你的提示詞，就會執行它併合併結果。"
-
-msgid "Prompt agents and answer their questions"
-msgstr "向 agent 下達提示並回答它們的問題"
 
 msgid "Prompt command is only available for terminal agents."
 msgstr "提示詞命令僅適用於終端代理程式。"
@@ -14569,9 +14566,6 @@ msgstr "在手機上閱讀"
 
 msgid "Read MCP servers again"
 msgstr "重新讀取MCP伺服器"
-
-msgid "Read the announcement"
-msgstr "閱讀公告"
 
 msgid "Read the changelog"
 msgstr "檢視更新日誌"
@@ -15526,9 +15520,6 @@ msgstr "已請求審查"
 
 msgid "Review required"
 msgstr "需要審查"
-
-msgid "Review syntax-highlighted diffs"
-msgstr "審查含語法醒目提示的差異"
 
 msgid "Review the result."
 msgstr "審查結果。"
@@ -18252,12 +18243,6 @@ msgstr "代理程式使用其技能和工具，問題會出現在 Linear 中。"
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "關注該頁面的代理程式會讀取每則留言，更新頁面並在討論串中回覆。"
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "公告也介紹了由 Union Square Ventures 領投、Y Combinator 與 Paul Graham 參投的 1,150 萬美元種子輪融資。"
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "此 App 可免費下載。需要 iOS 26 或更新版本以及 Paradev Pro。接下來將推出 Android 版。"
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "應用程式版本為 {appVersion}，但連接的是由其他程式（可能是舊版 CLI 或另一個 Paradev 版本）啟動的主機服務。重新啟動會將其替換為此應用程式自帶的副本。"
 
@@ -20068,9 +20053,6 @@ msgstr "在GitHub上檢視"
 msgid "VIEW ON GITHUB"
 msgstr "在GitHub上檢視"
 
-msgid "View on the App Store"
-msgstr "在 App Store 查看"
-
 msgid "View open roles"
 msgstr "檢視空缺職位"
 
@@ -20740,6 +20722,9 @@ msgstr "X-大型"
 
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
+
+msgid "Y Combinator batch"
+msgstr "Y Combinator 梯次"
 
 msgid "Yearly"
 msgstr "按年"
