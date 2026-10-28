@@ -23,3 +23,7 @@ export function toGridRows<T>(
 	}
 	return out;
 }
+
+/** A row's list key; it changes whenever a cell does, so the list re-reports what is visible. */
+export const gridRowKey = <T>(row: GridRow<T>, keyOf: (item: T) => string) =>
+	`row:${row.cells.map(keyOf).join("|")}`;

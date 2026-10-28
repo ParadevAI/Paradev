@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { toGridRows } from "./toGridRows";
+import { gridRowKey, toGridRows } from "./toGridRows";
 
 type Item = { kind: "header" | "row"; id: string };
 const header = (id: string): Item => ({ kind: "header", id });
@@ -28,5 +28,14 @@ describe("toGridRows", () => {
 	test("one column leaves the phone list untouched", () => {
 		const items = [header("a"), row("1"), row("2")];
 		expect(toGridRows(items, 1, isRow)).toBe(items);
+	});
+});
+
+describe("gridRowKey", () => {
+	test("changes when a cell fills a row's empty slot", () => {
+		const keyOf = (item: Item) => item.id;
+		const partly = { kind: "gridRow" as const, cells: [row("1")] };
+		const full = { kind: "gridRow" as const, cells: [row("1"), row("2")] };
+		expect(gridRowKey(full, keyOf)).not.toBe(gridRowKey(partly, keyOf));
 	});
 });

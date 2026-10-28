@@ -90,7 +90,7 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
-import { type GridRow, toGridRows } from "./utils/toGridRows";
+import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -159,7 +159,7 @@ const isGridCell = (item: HomeListItem) =>
 
 function homeListEntryKey(entry: HomeListEntry): string {
 	return entry.kind === "gridRow"
-		? `row:${entry.cells.map(homeListItemKey).join("|")}`
+		? gridRowKey(entry, homeListItemKey)
 		: homeListItemKey(entry);
 }
 

@@ -1,1 +1,1 @@
-export { type GridRow, toGridRows } from "./toGridRows";
+export { type GridRow, gridRowKey, toGridRows } from "./toGridRows";
