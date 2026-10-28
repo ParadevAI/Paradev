@@ -6,9 +6,14 @@ import { toRelativeWorkspacePath } from "shared/absolute-paths";
 interface FileBreadcrumbProps {
 	filePath: string;
 	rootPath?: string;
+	dirty: boolean;
 }
 
-export function FileBreadcrumb({ filePath, rootPath }: FileBreadcrumbProps) {
+export function FileBreadcrumb({
+	filePath,
+	rootPath,
+	dirty,
+}: FileBreadcrumbProps) {
 	const relativePath = rootPath
 		? toRelativeWorkspacePath(rootPath, filePath)
 		: filePath;
@@ -29,6 +34,9 @@ export function FileBreadcrumb({ filePath, rootPath }: FileBreadcrumbProps) {
 							<span className="flex shrink-0 items-center gap-1.5 text-foreground">
 								<FileIcon fileName={segment} className="size-3.5 shrink-0" />
 								{segment}
+								{dirty && (
+									<span className="size-2 shrink-0 rounded-full bg-muted-foreground" />
+								)}
 							</span>
 						) : (
 							<span className="min-w-0 truncate">{segment}</span>

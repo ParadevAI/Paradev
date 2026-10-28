@@ -44,7 +44,8 @@ export function FilePaneHeaderExtras({
 
 	return (
 		<div className="flex min-w-0 items-center gap-1">
-			{document.content.kind === "text" &&
+			{!inRightPane &&
+				document.content.kind === "text" &&
 				(document.dirty || document.pendingSave) && (
 					<Button
 						size="sm"

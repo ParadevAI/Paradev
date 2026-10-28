@@ -135,11 +135,13 @@ function FilePaneTabTitle({
 	filePath,
 	isActive,
 	pinned,
+	showDirty,
 	workspaceId,
 }: {
 	filePath: string;
 	isActive: boolean;
 	pinned: boolean;
+	showDirty: boolean;
 	workspaceId: string;
 }) {
 	const document = useSharedFileDocument({
@@ -159,7 +161,7 @@ function FilePaneTabTitle({
 			<span className={cn("min-w-0 truncate", !pinned && "italic")}>
 				{name}
 			</span>
-			{document.dirty && (
+			{showDirty && document.dirty && (
 				<Circle className="size-2 shrink-0 fill-current text-muted-foreground" />
 			)}
 		</div>
@@ -290,6 +292,7 @@ export function usePaneRegistry({
 							filePath={data.filePath}
 							isActive={ctx.isActive}
 							pinned={Boolean(ctx.pane.pinned)}
+							showDirty={ctx.store !== rightStore}
 							workspaceId={workspaceId}
 						/>
 					);

@@ -1,4 +1,5 @@
 import { FileOpenInButton } from "../../../FileOpenInButton";
+import { FileSaveButton } from "./components/FileSaveButton";
 import { FileTreeToggle } from "./components/FileTreeToggle";
 
 interface FileViewFloatingActionsProps {
@@ -14,7 +15,10 @@ export function FileViewFloatingActions({
 	return (
 		<div className="absolute top-2 right-2 z-10 flex h-8 items-center gap-1">
 			{filePath && (
-				<FileOpenInButton workspaceId={workspaceId} filePath={filePath} />
+				<>
+					<FileSaveButton workspaceId={workspaceId} filePath={filePath} />
+					<FileOpenInButton workspaceId={workspaceId} filePath={filePath} />
+				</>
 			)}
 			<FileTreeToggle />
 		</div>

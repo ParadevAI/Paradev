@@ -221,6 +221,7 @@ export function FilePane({
 					<FileBreadcrumb
 						filePath={filePath}
 						rootPath={workspaceQuery.data?.worktreePath ?? undefined}
+						dirty={document.dirty}
 					/>
 				)}
 				<MarkdownResourceProvider
