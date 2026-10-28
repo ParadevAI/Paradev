@@ -21,8 +21,7 @@ export function FileSaveButton({ workspaceId, filePath }: FileSaveButtonProps) {
 	return (
 		<Button
 			size="sm"
-			variant="ghost"
-			className="h-7 px-2 text-xs"
+			className="h-7 px-3 text-xs"
 			disabled={document.pendingSave}
 			onClick={() => void document.save()}
 		>
