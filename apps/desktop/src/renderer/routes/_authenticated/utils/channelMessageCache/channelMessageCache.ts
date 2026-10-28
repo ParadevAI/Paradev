@@ -16,8 +16,8 @@ export const PENDING_SEQ = Number.MAX_SAFE_INTEGER;
 export function fromWire(wire: ChannelMessageWire): ChannelMessage {
 	return {
 		...wire,
-		subtype: null,
-		inviterId: null,
+		subtype: wire.subtype ?? null,
+		inviterId: wire.inviterId ?? null,
 		lastReplyAt: wire.lastReplyAt ? new Date(wire.lastReplyAt) : null,
 		editedAt: wire.editedAt ? new Date(wire.editedAt) : null,
 		deletedAt: wire.deletedAt ? new Date(wire.deletedAt) : null,

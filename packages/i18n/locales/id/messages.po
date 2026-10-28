@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# login} other {# login}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# balasan baru}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {# lainnya}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# lulus} other {# lulus}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} dari {size} token"
 msgid "{used} used"
 msgstr "{used} terpakai"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} dan {others} bergabung lalu keluar."
+
+msgid "{user} and {others} joined."
+msgstr "{user} dan {others} bergabung."
+
+msgid "{user} and {others} left."
+msgstr "{user} dan {others} keluar."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} dan {others} bergabung kembali."
+
+msgid "{user} joined and left."
+msgstr "{user} bergabung lalu keluar."
+
+msgid "{user} joined."
+msgstr "{user} bergabung."
+
+msgid "{user} left."
+msgstr "{user} keluar."
+
+msgid "{user} rejoined."
+msgstr "{user} bergabung kembali."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Juga dapat mengedit saluran dan anggotanya"
 
 msgid "Also viewing this page"
 msgstr "Juga melihat halaman ini"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Selain itu, {user} dan {others} bergabung lalu keluar."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Selain itu, {user} dan {others} bergabung."
+
+msgid "Also, {user} and {others} left."
+msgstr "Selain itu, {user} dan {others} keluar."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Selain itu, {user} dan {others} bergabung kembali."
+
+msgid "Also, {user} joined and left."
+msgstr "Selain itu, {user} bergabung lalu keluar."
+
+msgid "Also, {user} joined."
+msgstr "Selain itu, {user} bergabung."
+
+msgid "Also, {user} left."
+msgstr "Selain itu, {user} keluar."
+
+msgid "Also, {user} rejoined."
+msgstr "Selain itu, {user} bergabung kembali."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Juga: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Bergabung"
 msgid "Joined {0}"
 msgstr "Bergabung {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "bergabung dengan {channel} bersama {others}."
+
+msgid "joined {channel}."
+msgstr "bergabung dengan {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "bergabung dengan {channel} lalu keluar, bersama {others}."
+
+msgid "joined and left {channel}."
+msgstr "bergabung dengan {channel} lalu keluar."
+
 msgid "Joining…"
 msgstr "Bergabung…"
 
@@ -10230,6 +10294,12 @@ msgstr "Keluar dari organisasi..."
 
 msgid "Leaving..."
 msgstr "Keluar..."
+
+msgid "left {channel} along with {others}."
+msgstr "keluar dari {channel} bersama {others}."
+
+msgid "left {channel}."
+msgstr "keluar dari {channel}."
 
 msgid "Left organization"
 msgstr "Sudah keluar dari organisasi"
@@ -14825,6 +14895,18 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Mendaftarkan hook lifecycle di konfigurasi global agen ini agar Paradev bisa menampilkan status dan mengirim notifikasi. Mematikannya menghapus entri Paradev di mana-mana — status dan notifikasi berhenti untuk agen ini, termasuk di dalam Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "bergabung kembali dengan {channel} atas undangan {inviter}, bersama {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "bergabung kembali dengan {channel} atas undangan {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "bergabung kembali dengan {channel}, bersama {others}."
+
+msgid "rejoined {channel}."
+msgstr "bergabung kembali dengan {channel}."
 
 msgid "Related Posts"
 msgstr "Tulisan Terkait"
@@ -20210,6 +20292,18 @@ msgstr "Warning"
 
 msgid "Warning occurred."
 msgstr "Terjadi peringatan."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "ditambahkan ke {channel} oleh {inviter}, bersama {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "ditambahkan ke {channel} oleh {inviter}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "ditambahkan ke percakapan ini oleh {inviter}."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "dikeluarkan dari percakapan ini oleh {inviter}."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Lihat bagaimana tinjauan desain berubah dari komentar menjadi versi baru."

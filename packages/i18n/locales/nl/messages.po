@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# login} other {# logins}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nieuwe reactie} other {# nieuwe reacties}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {# andere} other {# anderen}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# geslaagd} other {# geslaagd}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} van {size} tokens"
 msgid "{used} used"
 msgstr "{used} gebruikt"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} en {others} zijn erbij gekomen en weer vertrokken."
+
+msgid "{user} and {others} joined."
+msgstr "{user} en {others} zijn erbij gekomen."
+
+msgid "{user} and {others} left."
+msgstr "{user} en {others} zijn vertrokken."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} en {others} zijn opnieuw erbij gekomen."
+
+msgid "{user} joined and left."
+msgstr "{user} is erbij gekomen en weer vertrokken."
+
+msgid "{user} joined."
+msgstr "{user} is erbij gekomen."
+
+msgid "{user} left."
+msgstr "{user} is vertrokken."
+
+msgid "{user} rejoined."
+msgstr "{user} is opnieuw erbij gekomen."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Kan ook het kanaal en de leden bewerken"
 
 msgid "Also viewing this page"
 msgstr "Ook op deze pagina"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Ook {user} en {others} zijn erbij gekomen en weer vertrokken."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Ook {user} en {others} zijn erbij gekomen."
+
+msgid "Also, {user} and {others} left."
+msgstr "Ook {user} en {others} zijn vertrokken."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Ook {user} en {others} zijn opnieuw erbij gekomen."
+
+msgid "Also, {user} joined and left."
+msgstr "Ook {user} is erbij gekomen en weer vertrokken."
+
+msgid "Also, {user} joined."
+msgstr "Ook {user} is erbij gekomen."
+
+msgid "Also, {user} left."
+msgstr "Ook {user} is vertrokken."
+
+msgid "Also, {user} rejoined."
+msgstr "Ook {user} is opnieuw erbij gekomen."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Ook: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Lid sinds"
 msgid "Joined {0}"
 msgstr "Lid sinds {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "is samen met {others} lid geworden van {channel}."
+
+msgid "joined {channel}."
+msgstr "is lid geworden van {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "is samen met {others} lid geworden van {channel} en weer vertrokken."
+
+msgid "joined and left {channel}."
+msgstr "is lid geworden van {channel} en weer vertrokken."
+
 msgid "Joining…"
 msgstr "Meedoen…"
 
@@ -10230,6 +10294,12 @@ msgstr "Organisatie verlaten..."
 
 msgid "Leaving..."
 msgstr "Verlaten..."
+
+msgid "left {channel} along with {others}."
+msgstr "heeft samen met {others} {channel} verlaten."
+
+msgid "left {channel}."
+msgstr "heeft {channel} verlaten."
 
 msgid "Left organization"
 msgstr "Organisatie verlaten"
@@ -14825,6 +14895,18 @@ msgstr "Regio"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registreert lifecycle-hooks in de globale configuratie van deze agent zodat Paradev status kan tonen en meldingen kan sturen. Uitzetten verwijdert de items van Paradev overal — status en meldingen stoppen voor deze agent, ook binnen Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "is op uitnodiging van {inviter} samen met {others} opnieuw lid geworden van {channel}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "is op uitnodiging van {inviter} opnieuw lid geworden van {channel}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "is samen met {others} opnieuw lid geworden van {channel}."
+
+msgid "rejoined {channel}."
+msgstr "is opnieuw lid geworden van {channel}."
 
 msgid "Related Posts"
 msgstr "Gerelateerde berichten"
@@ -20210,6 +20292,18 @@ msgstr "Warning"
 
 msgid "Warning occurred."
 msgstr "Er is een waarschuwing opgetreden."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "is samen met {others} door {inviter} toegevoegd aan {channel}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "is door {inviter} toegevoegd aan {channel}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "is door {inviter} toegevoegd aan dit gesprek."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "is door {inviter} verwijderd uit dit gesprek."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Bekijk hoe een designreview van opmerking naar nieuwe versie gaat."

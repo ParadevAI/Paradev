@@ -180,6 +180,10 @@ msgstr "{0, plural, one {로그인 #개} other {로그인 #개}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {새 답글 #개}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {다른 #명}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#개 통과} other {#개 통과}}"
@@ -1318,6 +1322,30 @@ msgstr "{size} 토큰 중 {used}"
 msgid "{used} used"
 msgstr "{used} 사용됨"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user}님과 {others} 모두 참여했다가 나갔습니다."
+
+msgid "{user} and {others} joined."
+msgstr "{user}님과 {others} 모두 참여했습니다."
+
+msgid "{user} and {others} left."
+msgstr "{user}님과 {others} 모두 나갔습니다."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user}님과 {others} 모두 다시 참여했습니다."
+
+msgid "{user} joined and left."
+msgstr "{user}님이 참여했다가 나갔습니다."
+
+msgid "{user} joined."
+msgstr "{user}님이 참여했습니다."
+
+msgid "{user} left."
+msgstr "{user}님이 나갔습니다."
+
+msgid "{user} rejoined."
+msgstr "{user}님이 다시 참여했습니다."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "채널과 멤버도 편집할 수 있습니다"
 
 msgid "Also viewing this page"
 msgstr "이 페이지를 함께 보는 사람"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "또한 {user}님과 {others} 모두 참여했다가 나갔습니다."
+
+msgid "Also, {user} and {others} joined."
+msgstr "또한 {user}님과 {others} 모두 참여했습니다."
+
+msgid "Also, {user} and {others} left."
+msgstr "또한 {user}님과 {others} 모두 나갔습니다."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "또한 {user}님과 {others} 모두 다시 참여했습니다."
+
+msgid "Also, {user} joined and left."
+msgstr "또한 {user}님이 참여했다가 나갔습니다."
+
+msgid "Also, {user} joined."
+msgstr "또한 {user}님이 참여했습니다."
+
+msgid "Also, {user} left."
+msgstr "또한 {user}님이 나갔습니다."
+
+msgid "Also, {user} rejoined."
+msgstr "또한 {user}님이 다시 참여했습니다."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "참고: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "가입일"
 msgid "Joined {0}"
 msgstr "{0} 가입"
 
+msgid "joined {channel} along with {others}."
+msgstr "{others}와(과) 함께 {channel}에 참여했습니다."
+
+msgid "joined {channel}."
+msgstr "{channel}에 참여했습니다."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "{others}와(과) 함께 {channel}에 참여했다가 나갔습니다."
+
+msgid "joined and left {channel}."
+msgstr "{channel}에 참여했다가 나갔습니다."
+
 msgid "Joining…"
 msgstr "참가하는 중…"
 
@@ -10230,6 +10294,12 @@ msgstr "조직에서 나가는 중..."
 
 msgid "Leaving..."
 msgstr "나가는 중..."
+
+msgid "left {channel} along with {others}."
+msgstr "{others}와(과) 함께 {channel}에서 나갔습니다."
+
+msgid "left {channel}."
+msgstr "{channel}에서 나갔습니다."
 
 msgid "Left organization"
 msgstr "조직에서 나갔습니다"
@@ -14825,6 +14895,18 @@ msgstr "리전"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "이 에이전트의 전역 구성에 라이프사이클 훅을 등록해 Paradev가 상태를 표시하고 알림을 보낼 수 있게 합니다. 이 기능을 끄면 모든 곳에서 Paradev의 항목이 제거되며, Paradev 안에서도 이 에이전트의 상태와 알림이 중단됩니다."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "{inviter}님의 초대로 {others}와(과) 함께 {channel}에 다시 참여했습니다."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "{inviter}님의 초대로 {channel}에 다시 참여했습니다."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "{others}와(과) 함께 {channel}에 다시 참여했습니다."
+
+msgid "rejoined {channel}."
+msgstr "{channel}에 다시 참여했습니다."
 
 msgid "Related Posts"
 msgstr "관련 게시물"
@@ -20210,6 +20292,18 @@ msgstr "경고"
 
 msgid "Warning occurred."
 msgstr "경고가 발생했습니다."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "{inviter}님에 의해 {others}와(과) 함께 {channel}에 추가되었습니다."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "{inviter}님에 의해 {channel}에 추가되었습니다."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "{inviter}님에 의해 이 대화에 추가되었습니다."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "{inviter}님에 의해 이 대화에서 제거되었습니다."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "디자인 리뷰가 댓글에서 새 버전으로 이어지는 과정을 확인하세요."

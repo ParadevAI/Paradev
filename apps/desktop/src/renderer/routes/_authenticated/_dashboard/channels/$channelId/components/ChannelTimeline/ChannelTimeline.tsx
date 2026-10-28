@@ -14,7 +14,8 @@ import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
-import { unreadState } from "../../utils/unreadState";
+import { useOrgDevs } from "../../hooks/useOrgDevs";
+import { countsAsUnread, unreadState } from "../../utils/unreadState";
 import { ChannelMessageRow, type ChannelPerson } from "../ChannelMessageRow";
 import { NewMessagesLine } from "../NewMessagesLine";
 import { ChannelIntro } from "./components/ChannelIntro";
@@ -97,10 +98,13 @@ export function ChannelTimeline({
 				.flatMap((page) => page.messages),
 		[query.data],
 	);
-	const entries = useMemo(
-		() => groupMessages(messages, lineSeq ?? null, currentUserId),
-		[messages, lineSeq, currentUserId],
-	);
+	const devs = useOrgDevs();
+	const entries = useMemo(() => {
+		const devIds = new Set((devs ?? []).map((dev) => dev.id));
+		return groupMessages(messages, lineSeq ?? null, currentUserId, (id) =>
+			devIds.has(id),
+		);
+	}, [messages, lineSeq, currentUserId, devs]);
 	const unread = useMemo(
 		() =>
 			lastReadSeq === null
@@ -199,7 +203,7 @@ export function ChannelTimeline({
 				(message) =>
 					message.seq > line &&
 					message.seq !== PENDING_SEQ &&
-					message.authorId !== currentUserId,
+					countsAsUnread(message, currentUserId),
 			);
 		const oldest = messages[0];
 		if (
@@ -483,6 +487,7 @@ export function ChannelTimeline({
 									: null
 							}
 							compact={entry.compact}
+							rollup={entry.rollup}
 							now={now}
 							currentUserId={currentUserId}
 							canModerate={canModerate}

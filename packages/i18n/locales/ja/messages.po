@@ -180,6 +180,10 @@ msgstr "{0, plural, one {#件のログイン情報} other {#件のログイン�
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# 件の新しい返信}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {他 # 人}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#件成功} other {#件成功}}"
@@ -1318,6 +1322,30 @@ msgstr "{size} トークン中 {used}"
 msgid "{used} used"
 msgstr "{used} 使用済み"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} と {others} が参加して退出しました。"
+
+msgid "{user} and {others} joined."
+msgstr "{user} と {others} が参加しました。"
+
+msgid "{user} and {others} left."
+msgstr "{user} と {others} が退出しました。"
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} と {others} が再参加しました。"
+
+msgid "{user} joined and left."
+msgstr "{user} が参加して退出しました。"
+
+msgid "{user} joined."
+msgstr "{user} が参加しました。"
+
+msgid "{user} left."
+msgstr "{user} が退出しました。"
+
+msgid "{user} rejoined."
+msgstr "{user} が再参加しました。"
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "チャンネルとメンバーも編集できます"
 
 msgid "Also viewing this page"
 msgstr "このページを見ている他のユーザー"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "また、{user} と {others} が参加して退出しました。"
+
+msgid "Also, {user} and {others} joined."
+msgstr "また、{user} と {others} が参加しました。"
+
+msgid "Also, {user} and {others} left."
+msgstr "また、{user} と {others} が退出しました。"
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "また、{user} と {others} が再参加しました。"
+
+msgid "Also, {user} joined and left."
+msgstr "また、{user} が参加して退出しました。"
+
+msgid "Also, {user} joined."
+msgstr "また、{user} が参加しました。"
+
+msgid "Also, {user} left."
+msgstr "また、{user} が退出しました。"
+
+msgid "Also, {user} rejoined."
+msgstr "また、{user} が再参加しました。"
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "その他: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "参加日"
 msgid "Joined {0}"
 msgstr "{0} に参加"
 
+msgid "joined {channel} along with {others}."
+msgstr "{others} と一緒に {channel} に参加しました。"
+
+msgid "joined {channel}."
+msgstr "{channel} に参加しました。"
+
+msgid "joined and left {channel} along with {others}."
+msgstr "{others} と一緒に {channel} に参加して退出しました。"
+
+msgid "joined and left {channel}."
+msgstr "{channel} に参加して退出しました。"
+
 msgid "Joining…"
 msgstr "参加中…"
 
@@ -10230,6 +10294,12 @@ msgstr "組織から退出中..."
 
 msgid "Leaving..."
 msgstr "退出中..."
+
+msgid "left {channel} along with {others}."
+msgstr "{others} と一緒に {channel} から退出しました。"
+
+msgid "left {channel}."
+msgstr "{channel} から退出しました。"
 
 msgid "Left organization"
 msgstr "組織から退出しました"
@@ -14825,6 +14895,18 @@ msgstr "リージョン"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "このエージェントのグローバル設定にライフサイクルフックを登録し、Paradevがステータス表示と通知を行えるようにします。オフにするとParadevのエントリがすべて削除され、Paradev内も含めてこのエージェントのステータスと通知が停止します。"
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "{inviter} の招待で {others} と一緒に {channel} に再参加しました。"
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "{inviter} の招待で {channel} に再参加しました。"
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "{others} と一緒に {channel} に再参加しました。"
+
+msgid "rejoined {channel}."
+msgstr "{channel} に再参加しました。"
 
 msgid "Related Posts"
 msgstr "関連記事"
@@ -20210,6 +20292,18 @@ msgstr "警告"
 
 msgid "Warning occurred."
 msgstr "警告が発生しました。"
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "{inviter} により {others} と一緒に {channel} に追加されました。"
+
+msgid "was added to {channel} by {inviter}."
+msgstr "{inviter} により {channel} に追加されました。"
+
+msgid "was added to this conversation by {inviter}."
+msgstr "{inviter} によりこの会話に追加されました。"
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "{inviter} によりこの会話から削除されました。"
 
 msgid "Watch a design review go from comment to new version."
 msgstr "デザインレビューがコメントから新しいバージョンになるまでをご覧ください。"

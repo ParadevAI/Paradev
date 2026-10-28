@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# přihlášení} few {# přihlášení} many {# přihl
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nová odpověď} few {# nové odpovědi} many {# nových odpovědí} other {# nových odpovědí}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {# další} few {# další} many {# dalšího} other {# dalších}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# prošlo} few {# prošlo} many {# prošlo} other {# prošlo}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} z {size} tokenů"
 msgid "{used} used"
 msgstr "Využito {used}"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} a {others} se připojili a zase kanál opustili."
+
+msgid "{user} and {others} joined."
+msgstr "{user} a {others} se připojili."
+
+msgid "{user} and {others} left."
+msgstr "{user} a {others} opustili kanál."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} a {others} se znovu připojili."
+
+msgid "{user} joined and left."
+msgstr "{user} se připojil(a) a zase kanál opustil(a)."
+
+msgid "{user} joined."
+msgstr "{user} se připojil(a)."
+
+msgid "{user} left."
+msgstr "{user} opustil(a) kanál."
+
+msgid "{user} rejoined."
+msgstr "{user} se znovu připojil(a)."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Navíc může upravovat kanál a jeho členy"
 
 msgid "Also viewing this page"
 msgstr "Tuto stránku si také prohlížejí"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Také {user} a {others} se připojili a zase kanál opustili."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Také {user} a {others} se připojili."
+
+msgid "Also, {user} and {others} left."
+msgstr "Také {user} a {others} opustili kanál."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Také {user} a {others} se znovu připojili."
+
+msgid "Also, {user} joined and left."
+msgstr "Také {user} se připojil(a) a zase kanál opustil(a)."
+
+msgid "Also, {user} joined."
+msgstr "Také {user} se připojil(a)."
+
+msgid "Also, {user} left."
+msgstr "Také {user} opustil(a) kanál."
+
+msgid "Also, {user} rejoined."
+msgstr "Také {user} se znovu připojil(a)."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Také: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Připojeno"
 msgid "Joined {0}"
 msgstr "Připojen(a) {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "se připojil(a) ke kanálu {channel}, stejně jako {others}."
+
+msgid "joined {channel}."
+msgstr "se připojil(a) ke kanálu {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "se připojil(a) ke kanálu {channel} a zase ho opustil(a), stejně jako {others}."
+
+msgid "joined and left {channel}."
+msgstr "se připojil(a) ke kanálu {channel} a zase ho opustil(a)."
+
 msgid "Joining…"
 msgstr "Připojuji…"
 
@@ -10230,6 +10294,12 @@ msgstr "Opouštím organizaci..."
 
 msgid "Leaving..."
 msgstr "Odcházím..."
+
+msgid "left {channel} along with {others}."
+msgstr "opustil(a) kanál {channel}, stejně jako {others}."
+
+msgid "left {channel}."
+msgstr "opustil(a) kanál {channel}."
 
 msgid "Left organization"
 msgstr "Organizace opuštěna"
@@ -14825,6 +14895,18 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Zaregistruje lifecycle hooky do globální konfigurace tohoto agenta, aby Paradev mohl zobrazovat stav a posílat oznámení. Vypnutím se záznamy Paradev odeberou všude — stav a oznámení pro tohoto agenta přestanou fungovat, i uvnitř Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "se znovu připojil(a) ke kanálu {channel} na pozvání uživatele {inviter}, stejně jako {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "se znovu připojil(a) ke kanálu {channel} na pozvání uživatele {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "se znovu připojil(a) ke kanálu {channel}, stejně jako {others}."
+
+msgid "rejoined {channel}."
+msgstr "se znovu připojil(a) ke kanálu {channel}."
 
 msgid "Related Posts"
 msgstr "Související články"
@@ -20210,6 +20292,18 @@ msgstr "Varování"
 
 msgid "Warning occurred."
 msgstr "Došlo k varování."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "byl(a) přidán(a) do kanálu {channel} uživatelem {inviter}, stejně jako {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "byl(a) přidán(a) do kanálu {channel} uživatelem {inviter}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "byl(a) přidán(a) do této konverzace uživatelem {inviter}."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "byl(a) odebrán(a) z této konverzace uživatelem {inviter}."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Podívejte se, jak se design review dostane od komentáře k nové verzi."

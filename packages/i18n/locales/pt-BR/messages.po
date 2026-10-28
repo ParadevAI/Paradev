@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# login} other {# logins}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nova resposta} other {# novas respostas}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {# outra pessoa} other {# outras pessoas}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# passou} other {# passaram}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} de {size} tokens"
 msgid "{used} used"
 msgstr "{used} usado"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} e {others} entraram e saíram."
+
+msgid "{user} and {others} joined."
+msgstr "{user} e {others} entraram."
+
+msgid "{user} and {others} left."
+msgstr "{user} e {others} saíram."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} e {others} voltaram a entrar."
+
+msgid "{user} joined and left."
+msgstr "{user} entrou e saiu."
+
+msgid "{user} joined."
+msgstr "{user} entrou."
+
+msgid "{user} left."
+msgstr "{user} saiu."
+
+msgid "{user} rejoined."
+msgstr "{user} voltou a entrar."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Também pode editar o canal e seus membros"
 
 msgid "Also viewing this page"
 msgstr "Também estão vendo esta página"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Além disso, {user} e {others} entraram e saíram."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Além disso, {user} e {others} entraram."
+
+msgid "Also, {user} and {others} left."
+msgstr "Além disso, {user} e {others} saíram."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Além disso, {user} e {others} voltaram a entrar."
+
+msgid "Also, {user} joined and left."
+msgstr "Além disso, {user} entrou e saiu."
+
+msgid "Also, {user} joined."
+msgstr "Além disso, {user} entrou."
+
+msgid "Also, {user} left."
+msgstr "Além disso, {user} saiu."
+
+msgid "Also, {user} rejoined."
+msgstr "Além disso, {user} voltou a entrar."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Também: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Entrou em"
 msgid "Joined {0}"
 msgstr "Entrou em {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "entrou em {channel} junto com {others}."
+
+msgid "joined {channel}."
+msgstr "entrou em {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "entrou e saiu de {channel} junto com {others}."
+
+msgid "joined and left {channel}."
+msgstr "entrou e saiu de {channel}."
+
 msgid "Joining…"
 msgstr "Entrando…"
 
@@ -10230,6 +10294,12 @@ msgstr "Saindo da organização..."
 
 msgid "Leaving..."
 msgstr "Saindo..."
+
+msgid "left {channel} along with {others}."
+msgstr "saiu de {channel} junto com {others}."
+
+msgid "left {channel}."
+msgstr "saiu de {channel}."
 
 msgid "Left organization"
 msgstr "Você saiu da organização"
@@ -14825,6 +14895,18 @@ msgstr "Região"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registra hooks de ciclo de vida na configuração global deste agente para o Paradev mostrar o status e enviar notificações. Desligar isso remove as entradas do Paradev em todo lugar — status e notificações param para este agente, inclusive dentro do Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "voltou a entrar em {channel} a convite de {inviter}, junto com {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "voltou a entrar em {channel} a convite de {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "voltou a entrar em {channel}, junto com {others}."
+
+msgid "rejoined {channel}."
+msgstr "voltou a entrar em {channel}."
 
 msgid "Related Posts"
 msgstr "Posts relacionados"
@@ -20210,6 +20292,18 @@ msgstr "Aviso"
 
 msgid "Warning occurred."
 msgstr "Houve um aviso."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "foi adicionado a {channel} por {inviter}, junto com {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "foi adicionado a {channel} por {inviter}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "foi adicionado a esta conversa por {inviter}."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "foi removido desta conversa por {inviter}."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Veja uma revisão de design ir de um comentário a uma nova versão."

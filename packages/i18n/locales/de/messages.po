@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# Login} other {# Logins}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# neue Antwort} other {# neue Antworten}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {# weitere Person} other {# weitere Personen}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# bestanden} other {# bestanden}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} von {size} Tokens"
 msgid "{used} used"
 msgstr "{used} verbraucht"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} und {others} sind beigetreten und haben den Kanal wieder verlassen."
+
+msgid "{user} and {others} joined."
+msgstr "{user} und {others} sind beigetreten."
+
+msgid "{user} and {others} left."
+msgstr "{user} und {others} haben den Kanal verlassen."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} und {others} sind wieder beigetreten."
+
+msgid "{user} joined and left."
+msgstr "{user} ist beigetreten und hat den Kanal wieder verlassen."
+
+msgid "{user} joined."
+msgstr "{user} ist beigetreten."
+
+msgid "{user} left."
+msgstr "{user} hat den Kanal verlassen."
+
+msgid "{user} rejoined."
+msgstr "{user} ist wieder beigetreten."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Kann außerdem den Kanal und seine Mitglieder bearbeiten"
 
 msgid "Also viewing this page"
 msgstr "Ebenfalls auf dieser Seite"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Außerdem sind {user} und {others} beigetreten und haben den Kanal wieder verlassen."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Außerdem sind {user} und {others} beigetreten."
+
+msgid "Also, {user} and {others} left."
+msgstr "Außerdem haben {user} und {others} den Kanal verlassen."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Außerdem sind {user} und {others} wieder beigetreten."
+
+msgid "Also, {user} joined and left."
+msgstr "Außerdem ist {user} beigetreten und hat den Kanal wieder verlassen."
+
+msgid "Also, {user} joined."
+msgstr "Außerdem ist {user} beigetreten."
+
+msgid "Also, {user} left."
+msgstr "Außerdem hat {user} den Kanal verlassen."
+
+msgid "Also, {user} rejoined."
+msgstr "Außerdem ist {user} wieder beigetreten."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Außerdem: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Beigetreten"
 msgid "Joined {0}"
 msgstr "Beigetreten {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "ist {channel} beigetreten, ebenso wie {others}."
+
+msgid "joined {channel}."
+msgstr "ist {channel} beigetreten."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "ist {channel} beigetreten und hat den Kanal wieder verlassen, ebenso wie {others}."
+
+msgid "joined and left {channel}."
+msgstr "ist {channel} beigetreten und hat den Kanal wieder verlassen."
+
 msgid "Joining…"
 msgstr "Beitritt läuft…"
 
@@ -10230,6 +10294,12 @@ msgstr "Organisation wird verlassen..."
 
 msgid "Leaving..."
 msgstr "Wird verlassen..."
+
+msgid "left {channel} along with {others}."
+msgstr "hat {channel} verlassen, ebenso wie {others}."
+
+msgid "left {channel}."
+msgstr "hat {channel} verlassen."
 
 msgid "Left organization"
 msgstr "Organisation verlassen"
@@ -14825,6 +14895,18 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Registriert Lifecycle-Hooks in der globalen Konfiguration dieses Agenten, damit Paradev Status anzeigen und Benachrichtigungen senden kann. Wird das ausgeschaltet, werden Paradevs Einträge überall entfernt — Status und Benachrichtigungen für diesen Agenten enden, auch innerhalb von Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "ist {channel} auf Einladung von {inviter} wieder beigetreten, ebenso wie {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "ist {channel} auf Einladung von {inviter} wieder beigetreten."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "ist {channel} wieder beigetreten, ebenso wie {others}."
+
+msgid "rejoined {channel}."
+msgstr "ist {channel} wieder beigetreten."
 
 msgid "Related Posts"
 msgstr "Verwandte Beiträge"
@@ -20210,6 +20292,18 @@ msgstr "Warnung"
 
 msgid "Warning occurred."
 msgstr "Es gab eine Warnung."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "wurde von {inviter} zu {channel} hinzugefügt, ebenso wie {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "wurde von {inviter} zu {channel} hinzugefügt."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "wurde von {inviter} zu dieser Unterhaltung hinzugefügt."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "wurde von {inviter} aus dieser Unterhaltung entfernt."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Sieh zu, wie aus einem Kommentar in einem Design-Review eine neue Version wird."

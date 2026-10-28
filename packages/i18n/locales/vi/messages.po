@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# đăng nhập} other {# đăng nhập}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# câu trả lời mới}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {# người khác}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# đã qua} other {# đã qua}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} / {size} token"
 msgid "{used} used"
 msgstr "Đã dùng {used}"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} và {others} đã tham gia rồi rời đi."
+
+msgid "{user} and {others} joined."
+msgstr "{user} và {others} đã tham gia."
+
+msgid "{user} and {others} left."
+msgstr "{user} và {others} đã rời đi."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} và {others} đã tham gia lại."
+
+msgid "{user} joined and left."
+msgstr "{user} đã tham gia rồi rời đi."
+
+msgid "{user} joined."
+msgstr "{user} đã tham gia."
+
+msgid "{user} left."
+msgstr "{user} đã rời đi."
+
+msgid "{user} rejoined."
+msgstr "{user} đã tham gia lại."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Có thể sửa kênh và thành viên"
 
 msgid "Also viewing this page"
 msgstr "Cũng đang xem trang này"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Ngoài ra, {user} và {others} đã tham gia rồi rời đi."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Ngoài ra, {user} và {others} đã tham gia."
+
+msgid "Also, {user} and {others} left."
+msgstr "Ngoài ra, {user} và {others} đã rời đi."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Ngoài ra, {user} và {others} đã tham gia lại."
+
+msgid "Also, {user} joined and left."
+msgstr "Ngoài ra, {user} đã tham gia rồi rời đi."
+
+msgid "Also, {user} joined."
+msgstr "Ngoài ra, {user} đã tham gia."
+
+msgid "Also, {user} left."
+msgstr "Ngoài ra, {user} đã rời đi."
+
+msgid "Also, {user} rejoined."
+msgstr "Ngoài ra, {user} đã tham gia lại."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Ngoài ra: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Tham gia"
 msgid "Joined {0}"
 msgstr "Tham gia {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "đã tham gia {channel} cùng với {others}."
+
+msgid "joined {channel}."
+msgstr "đã tham gia {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "đã tham gia rồi rời khỏi {channel} cùng với {others}."
+
+msgid "joined and left {channel}."
+msgstr "đã tham gia rồi rời khỏi {channel}."
+
 msgid "Joining…"
 msgstr "Đang tham gia…"
 
@@ -10230,6 +10294,12 @@ msgstr "Đang rời tổ chức..."
 
 msgid "Leaving..."
 msgstr "Đang rời..."
+
+msgid "left {channel} along with {others}."
+msgstr "đã rời khỏi {channel} cùng với {others}."
+
+msgid "left {channel}."
+msgstr "đã rời khỏi {channel}."
 
 msgid "Left organization"
 msgstr "Đã rời tổ chức"
@@ -14825,6 +14895,18 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "đã tham gia lại {channel} theo lời mời của {inviter}, cùng với {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "đã tham gia lại {channel} theo lời mời của {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "đã tham gia lại {channel}, cùng với {others}."
+
+msgid "rejoined {channel}."
+msgstr "đã tham gia lại {channel}."
 
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
@@ -20210,6 +20292,18 @@ msgstr "Cảnh báo"
 
 msgid "Warning occurred."
 msgstr "Có cảnh báo."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "đã được {inviter} thêm vào {channel}, cùng với {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "đã được {inviter} thêm vào {channel}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "đã được {inviter} thêm vào cuộc trò chuyện này."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "đã bị {inviter} xóa khỏi cuộc trò chuyện này."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Xem một buổi duyệt thiết kế đi từ bình luận đến phiên bản mới."

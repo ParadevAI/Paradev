@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# oturum bilgisi} other {# oturum bilgisi}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# yeni yanıt}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {# kişi daha} other {# kişi daha}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# geçti} other {# geçti}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} / {size} token"
 msgid "{used} used"
 msgstr "{used} kullanıldı"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} ve {others} katıldı ve ayrıldı."
+
+msgid "{user} and {others} joined."
+msgstr "{user} ve {others} katıldı."
+
+msgid "{user} and {others} left."
+msgstr "{user} ve {others} ayrıldı."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} ve {others} yeniden katıldı."
+
+msgid "{user} joined and left."
+msgstr "{user} katıldı ve ayrıldı."
+
+msgid "{user} joined."
+msgstr "{user} katıldı."
+
+msgid "{user} left."
+msgstr "{user} ayrıldı."
+
+msgid "{user} rejoined."
+msgstr "{user} yeniden katıldı."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "Kanalı ve üyelerini de düzenleyebilir"
 
 msgid "Also viewing this page"
 msgstr "Bu sayfayı görüntüleyen diğer kişiler"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Ayrıca {user} ve {others} katıldı ve ayrıldı."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Ayrıca {user} ve {others} katıldı."
+
+msgid "Also, {user} and {others} left."
+msgstr "Ayrıca {user} ve {others} ayrıldı."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Ayrıca {user} ve {others} yeniden katıldı."
+
+msgid "Also, {user} joined and left."
+msgstr "Ayrıca {user} katıldı ve ayrıldı."
+
+msgid "Also, {user} joined."
+msgstr "Ayrıca {user} katıldı."
+
+msgid "Also, {user} left."
+msgstr "Ayrıca {user} ayrıldı."
+
+msgid "Also, {user} rejoined."
+msgstr "Ayrıca {user} yeniden katıldı."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Ayrıca: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Katılım"
 msgid "Joined {0}"
 msgstr "Katılma: {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "{others} ile birlikte {channel} kanalına katıldı."
+
+msgid "joined {channel}."
+msgstr "{channel} kanalına katıldı."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "{others} ile birlikte {channel} kanalına katıldı ve ayrıldı."
+
+msgid "joined and left {channel}."
+msgstr "{channel} kanalına katıldı ve ayrıldı."
+
 msgid "Joining…"
 msgstr "Katılınıyor…"
 
@@ -10230,6 +10294,12 @@ msgstr "Kuruluştan ayrılınıyor..."
 
 msgid "Leaving..."
 msgstr "Ayrılınıyor..."
+
+msgid "left {channel} along with {others}."
+msgstr "{others} ile birlikte {channel} kanalından ayrıldı."
+
+msgid "left {channel}."
+msgstr "{channel} kanalından ayrıldı."
 
 msgid "Left organization"
 msgstr "Kuruluştan ayrılındı"
@@ -14825,6 +14895,18 @@ msgstr "Bölge"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Paradev'in durum gösterebilmesi ve bildirim gönderebilmesi için bu ajanın genel yapılandırmasına yaşam döngüsü hook'ları kaydeder. Bunu kapatmak Paradev'in kayıtlarını her yerden kaldırır — Paradev içinde dahil olmak üzere bu ajan için durum ve bildirimler durur."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "{inviter} tarafından davet edilerek {others} ile birlikte {channel} kanalına yeniden katıldı."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "{inviter} tarafından davet edilerek {channel} kanalına yeniden katıldı."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "{others} ile birlikte {channel} kanalına yeniden katıldı."
+
+msgid "rejoined {channel}."
+msgstr "{channel} kanalına yeniden katıldı."
 
 msgid "Related Posts"
 msgstr "İlgili yazılar"
@@ -20210,6 +20292,18 @@ msgstr "Uyarı"
 
 msgid "Warning occurred."
 msgstr "Bir uyarı oluştu."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "{inviter} tarafından {others} ile birlikte {channel} kanalına eklendi."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "{inviter} tarafından {channel} kanalına eklendi."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "{inviter} tarafından bu sohbete eklendi."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "{inviter} tarafından bu sohbetten çıkarıldı."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Bir tasarım incelemesinin yorumdan yeni sürüme nasıl geçtiğini izleyin."

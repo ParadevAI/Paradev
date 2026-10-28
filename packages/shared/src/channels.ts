@@ -35,6 +35,8 @@ export interface ChannelAttachment {
 
 export type ChannelBroadcast = "here" | "channel" | "everyone";
 
+export type ChannelMessageSubtype = "channel_join" | "channel_leave";
+
 export const CHANNEL_BROADCASTS: readonly ChannelBroadcast[] = [
 	"here",
 	"channel",
@@ -49,6 +51,10 @@ export interface ChannelMessageWire {
 	/** A person's user id or a Dev's agent id. */
 	authorId: string | null;
 	body: string;
+	/** Set when the author joined or left; the body is then only a fallback. */
+	subtype: ChannelMessageSubtype | null;
+	/** Who added or removed the author. */
+	inviterId: string | null;
 	/** The people and Devs the message mentions. */
 	mentionedIds: string[];
 	broadcast: ChannelBroadcast | null;

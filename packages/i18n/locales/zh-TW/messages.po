@@ -180,6 +180,10 @@ msgstr "{0, plural, one {#項登入資訊} other {#項登入資訊}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# 則新回覆}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {其他 # 人}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#項通過} other {#項通過}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} / {size} 個 token"
 msgid "{used} used"
 msgstr "已使用 {used}"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} 和 {others} 加入後又離開了。"
+
+msgid "{user} and {others} joined."
+msgstr "{user} 和 {others} 已加入。"
+
+msgid "{user} and {others} left."
+msgstr "{user} 和 {others} 已離開。"
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} 和 {others} 已重新加入。"
+
+msgid "{user} joined and left."
+msgstr "{user} 加入後又離開了。"
+
+msgid "{user} joined."
+msgstr "{user} 已加入。"
+
+msgid "{user} left."
+msgstr "{user} 已離開。"
+
+msgid "{user} rejoined."
+msgstr "{user} 已重新加入。"
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -2454,6 +2482,30 @@ msgstr "也可以編輯頻道及其成員"
 
 msgid "Also viewing this page"
 msgstr "也在檢視此頁面的人"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "此外，{user} 和 {others} 加入後又離開了。"
+
+msgid "Also, {user} and {others} joined."
+msgstr "此外，{user} 和 {others} 已加入。"
+
+msgid "Also, {user} and {others} left."
+msgstr "此外，{user} 和 {others} 已離開。"
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "此外，{user} 和 {others} 已重新加入。"
+
+msgid "Also, {user} joined and left."
+msgstr "此外，{user} 加入後又離開了。"
+
+msgid "Also, {user} joined."
+msgstr "此外，{user} 已加入。"
+
+msgid "Also, {user} left."
+msgstr "此外，{user} 已離開。"
+
+msgid "Also, {user} rejoined."
+msgstr "此外，{user} 已重新加入。"
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "另有：@superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "加入時間"
 msgid "Joined {0}"
 msgstr "{0} 加入"
 
+msgid "joined {channel} along with {others}."
+msgstr "與 {others} 一起加入了 {channel}。"
+
+msgid "joined {channel}."
+msgstr "已加入 {channel}。"
+
+msgid "joined and left {channel} along with {others}."
+msgstr "與 {others} 一起加入後又離開了 {channel}。"
+
+msgid "joined and left {channel}."
+msgstr "加入後又離開了 {channel}。"
+
 msgid "Joining…"
 msgstr "正在加入…"
 
@@ -10230,6 +10294,12 @@ msgstr "正在退出組織..."
 
 msgid "Leaving..."
 msgstr "正在退出..."
+
+msgid "left {channel} along with {others}."
+msgstr "與 {others} 一起離開了 {channel}。"
+
+msgid "left {channel}."
+msgstr "已離開 {channel}。"
 
 msgid "Left organization"
 msgstr "已退出組織"
@@ -14825,6 +14895,18 @@ msgstr "區域"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "在該代理程式的全域性配置中註冊生命週期鉤子，以便Paradev顯示狀態併發送通知。關閉後會在所有位置移除Paradev的條目，該代理程式的狀態和通知都會停止，包括在Paradev內部。"
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "應 {inviter} 邀請，與 {others} 一起重新加入了 {channel}。"
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "應 {inviter} 邀請重新加入了 {channel}。"
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "與 {others} 一起重新加入了 {channel}。"
+
+msgid "rejoined {channel}."
+msgstr "已重新加入 {channel}。"
 
 msgid "Related Posts"
 msgstr "相關文章"
@@ -20210,6 +20292,18 @@ msgstr "警告"
 
 msgid "Warning occurred."
 msgstr "出現了警告。"
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "由 {inviter} 新增至 {channel}，同時新增的還有 {others}。"
+
+msgid "was added to {channel} by {inviter}."
+msgstr "由 {inviter} 新增至 {channel}。"
+
+msgid "was added to this conversation by {inviter}."
+msgstr "由 {inviter} 新增至此對話。"
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "被 {inviter} 移出此對話。"
 
 msgid "Watch a design review go from comment to new version."
 msgstr "看一次設計審查如何從留言變成新版本。"

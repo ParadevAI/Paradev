@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# логин} few {# логина} many {# логино
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# новый ответ} few {# новых ответа} many {# новых ответов} other {# нового ответа}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, one {ещё # участник} few {ещё # участника} many {ещё # участников} other {ещё # участника}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# пройдено} few {# пройдено} many {# пройдено} other {# пройдено}}"
@@ -1318,6 +1322,30 @@ msgstr "{used} из {size} токенов"
 msgid "{used} used"
 msgstr "Использовано {used}"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} и {others} присоединились и вышли."
+
+msgid "{user} and {others} joined."
+msgstr "{user} и {others} присоединились."
+
+msgid "{user} and {others} left."
+msgstr "{user} и {others} вышли."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} и {others} снова присоединились."
+
+msgid "{user} joined and left."
+msgstr "{user} присоединился(-ась) и вышел(-ла)."
+
+msgid "{user} joined."
+msgstr "{user} присоединился(-ась)."
+
+msgid "{user} left."
+msgstr "{user} вышел(-ла)."
+
+msgid "{user} rejoined."
+msgstr "{user} снова присоединился(-ась)."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
 
@@ -2454,6 +2482,30 @@ msgstr "Также может изменять канал и его участн
 
 msgid "Also viewing this page"
 msgstr "Также просматривают эту страницу"
+
+msgid "Also, {user} and {others} joined and left."
+msgstr "Также {user} и {others} присоединились и вышли."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Также {user} и {others} присоединились."
+
+msgid "Also, {user} and {others} left."
+msgstr "Также {user} и {others} вышли."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Также {user} и {others} снова присоединились."
+
+msgid "Also, {user} joined and left."
+msgstr "Также {user} присоединился(-ась) и вышел(-ла)."
+
+msgid "Also, {user} joined."
+msgstr "Также {user} присоединился(-ась)."
+
+msgid "Also, {user} left."
+msgstr "Также {user} вышел(-ла)."
+
+msgid "Also, {user} rejoined."
+msgstr "Также {user} снова присоединился(-ась)."
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Также: @superset/ui/ai-elements/braille-spinner"
@@ -9899,6 +9951,18 @@ msgstr "Присоединился"
 msgid "Joined {0}"
 msgstr "Присоединился(ась) {0}"
 
+msgid "joined {channel} along with {others}."
+msgstr "присоединился(-ась) к {channel}, как и {others}."
+
+msgid "joined {channel}."
+msgstr "присоединился(-ась) к {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "присоединился(-ась) к {channel} и вышел(-ла), как и {others}."
+
+msgid "joined and left {channel}."
+msgstr "присоединился(-ась) к {channel} и вышел(-ла)."
+
 msgid "Joining…"
 msgstr "Присоединение…"
 
@@ -10230,6 +10294,12 @@ msgstr "Выход из организации..."
 
 msgid "Leaving..."
 msgstr "Выход..."
+
+msgid "left {channel} along with {others}."
+msgstr "покинул(а) {channel}, как и {others}."
+
+msgid "left {channel}."
+msgstr "покинул(а) {channel}."
 
 msgid "Left organization"
 msgstr "Организация покинута"
@@ -14825,6 +14895,18 @@ msgstr "Регион"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Регистрирует хуки жизненного цикла в глобальной конфигурации этого агента, чтобы Paradev мог показывать статус и отправлять уведомления. Отключение убирает записи Paradev везде — статус и уведомления для этого агента перестанут работать, в том числе внутри Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "снова присоединился(-ась) к {channel} по приглашению пользователя {inviter}, как и {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "снова присоединился(-ась) к {channel} по приглашению пользователя {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "снова присоединился(-ась) к {channel}, как и {others}."
+
+msgid "rejoined {channel}."
+msgstr "снова присоединился(-ась) к {channel}."
 
 msgid "Related Posts"
 msgstr "Похожие посты"
@@ -20210,6 +20292,18 @@ msgstr "Предупреждение"
 
 msgid "Warning occurred."
 msgstr "Возникло предупреждение."
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "добавлен(а) в {channel} пользователем {inviter}, как и {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "добавлен(а) в {channel} пользователем {inviter}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "добавлен(а) в эту беседу пользователем {inviter}."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "удалён(а) из этой беседы пользователем {inviter}."
 
 msgid "Watch a design review go from comment to new version."
 msgstr "Посмотрите, как дизайн-ревью проходит путь от комментария до новой версии."
