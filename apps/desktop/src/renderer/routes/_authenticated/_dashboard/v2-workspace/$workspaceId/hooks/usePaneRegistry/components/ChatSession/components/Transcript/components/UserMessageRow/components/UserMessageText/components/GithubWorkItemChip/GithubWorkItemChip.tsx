@@ -38,7 +38,7 @@ export function GithubWorkItemChip({
 						className={cn(
 							"inline-flex h-[18px] shrink-0 items-center gap-0.5 rounded-[6px] px-1.5 font-medium text-xs leading-4",
 							pr
-								? "bg-violet-400/10 text-violet-400/90"
+								? "bg-sky-400/10 text-sky-400/90"
 								: "bg-emerald-400/10 text-emerald-400/90",
 						)}
 					>

@@ -78,7 +78,7 @@ test("a pull request chip asks for details only when the pointer or focus arrive
 	const { asked, chip } = renderChip(() => ITEM);
 	expect(chip.textContent).toBe("PR #8329");
 	expect(chip.title).toBe(URL_PR);
-	expect(chip.querySelector("span")?.className).toContain("violet");
+	expect(chip.querySelector("span")?.className).toContain("sky");
 	expect(asked).toEqual([]);
 
 	chip.focus();
