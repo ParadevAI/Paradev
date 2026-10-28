@@ -19,7 +19,7 @@ import type { StoreApi } from "zustand/vanilla";
 import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
-import { NEW_TAB_PANE, RightPaneNewTab } from "../RightPaneNewTab";
+import { NEW_TAB_PANE } from "../RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
 import { PullRequestCountsPrefetch } from "./components/PullRequestCountsPrefetch";
 import {
@@ -121,11 +121,6 @@ export function RightPaneArea({
 						</RightPaneHeaderButton>
 						{toolbar}
 					</div>
-				)}
-				renderEmptyState={() => (
-					<RightPaneNewTab
-						onOpen={(pane) => store.getState().addTab({ panes: [pane] })}
-					/>
 				)}
 				onBeforeCloseTab={onBeforeCloseTab}
 				onInteractionStateChange={onInteractionStateChange}
