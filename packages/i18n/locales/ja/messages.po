@@ -2329,6 +2329,9 @@ msgstr "匿名の組立工"
 msgid "another device"
 msgstr "別のデバイス"
 
+msgid "Another repository..."
+msgstr "別のリポジトリ..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "パスワードなど、下のターミナルでの質問に答えてください。"
 
@@ -12519,6 +12522,9 @@ msgstr "オーナー"
 msgid "Owner access required"
 msgstr "オーナー権限が必要"
 
+msgid "owner/name"
+msgstr "オーナー/名前"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "すべてのPTYセッションを保持し、アプリの再起動後も動き続けます。"
 
@@ -12958,9 +12964,6 @@ msgstr "プラグインマーケットプレイス"
 
 msgid "Plugins"
 msgstr "プラグイン"
-
-msgid "Plugins update when the sync finishes."
-msgstr "同期が完了するとプラグインが更新されます。"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "ページを指すだけで、エージェントが変更します。"
@@ -16864,6 +16867,9 @@ msgstr "Superset プラグイン"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は Superset を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Supersetは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Supersetは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認はtrust.superset.shから行えます。"
 
@@ -17014,9 +17020,6 @@ msgstr "GitHub リポジトリからプラグインを同期し、インスト�
 
 msgid "Sync Repositories"
 msgstr "リポジトリを同期"
-
-msgid "Sync requested"
-msgstr "同期をリクエストしました"
 
 msgid "Sync started"
 msgstr "同期を開始しました"
@@ -17493,9 +17496,6 @@ msgstr "フル機能のワークスペース。エージェントを並列実行
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "再利用可能なSupersetエージェント設定、プロンプト、セットアップガイドの今後の公開場所。"
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App からはまだリポジトリが見えません。GitHub でアクセスを許可してから、もう一度お試しください。"
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "お名前 <0>(プロンプトを採用した場合、changelogでクレ�
 
 msgid "Your organization"
 msgstr "あなたの組織"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "組織はまだ GitHub に接続していません。<0>設定 › 連携</0>で GitHub App をインストールしてから戻ってきてください。"
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "組織がクラウドの利用上限に達しました。このワークスペースを起動するには、「設定」の「請求」で上限を引き上げるかアップグレードしてください。"

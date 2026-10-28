@@ -5,18 +5,28 @@ import {
 	getBundledMarketplaceDir,
 	type InstalledPluginEntry,
 	pluginCachePath,
+	readInstalledPluginSources,
 	writeInstalledPlugins,
 	writePluginTree,
 } from "@superset/agent-setup";
 import {
 	DEFAULT_MARKETPLACE,
 	isOrganizationMarketplace,
+	manifestHasTools,
 } from "@superset/shared/plugins";
 import {
 	pluginBundleHash,
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { sandboxPluginsSchema } from "@superset/shared/sandbox-contract";
+
+function readManifest(file: string): unknown {
+	try {
+		return JSON.parse(readFileSync(file, "utf8"));
+	} catch {
+		return null;
+	}
+}
 
 function treeVersion(dir: string, fallback: string): string {
 	try {
@@ -123,6 +133,7 @@ export async function seedSandboxPlugins(
 	}
 
 	const root = getBundledMarketplaceDir();
+	const cachedTrees = readInstalledPluginSources() ?? [];
 	const installedAt = new Date().toISOString();
 	const entries: InstalledPluginEntry[] = [];
 	for (const plugin of parsed.data) {
@@ -143,12 +154,24 @@ export async function seedSandboxPlugins(
 			: (fetched?.version ?? plugin.version);
 		const installPath = shipped
 			? await cacheShippedTree(dir, plugin.marketplace, plugin.name, version)
-			: fetched?.installPath;
+			: (fetched?.installPath ??
+				(isOrganizationMarketplace(plugin.marketplace)
+					? cachedTrees.find(
+							(tree) =>
+								tree.name === plugin.name &&
+								existsSync(join(tree.dir, "plugin.json")),
+						)?.dir
+					: undefined));
+		const tools =
+			installPath && isOrganizationMarketplace(plugin.marketplace)
+				? manifestHasTools(readManifest(join(installPath, "plugin.json")))
+				: undefined;
 		entries.push({
 			marketplace: plugin.marketplace,
 			name: plugin.name,
 			version,
 			...(installPath ? { installPath } : {}),
+			...(tools === undefined ? {} : { tools }),
 			installedAt,
 			enabled: plugin.enabled,
 		});

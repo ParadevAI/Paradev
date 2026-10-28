@@ -12,6 +12,35 @@ import {
 } from "../../router/plugins/manifest";
 import { connectorServer } from "../../router/plugins/proxy/resolve-target";
 
+function isInternalHost(hostname: string): boolean {
+	const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+	if (host === "localhost" || host.endsWith(".localhost")) return true;
+	if (host.endsWith(".local") || host.endsWith(".internal")) return true;
+	if (host.includes(":")) {
+		return (
+			host === "::1" ||
+			host === "::" ||
+			/^f[cd]/.test(host) ||
+			/^fe[89ab]/.test(host) ||
+			host.startsWith("::ffff:")
+		);
+	}
+	const octets = host.split(".").map(Number);
+	if (octets.length !== 4 || octets.some((n) => !Number.isInteger(n))) {
+		return false;
+	}
+	const [a = 0, b = 0] = octets;
+	return (
+		a === 0 ||
+		a === 10 ||
+		a === 127 ||
+		(a === 169 && b === 254) ||
+		(a === 172 && b >= 16 && b <= 31) ||
+		(a === 192 && b === 168) ||
+		(a === 100 && b >= 64 && b <= 127)
+	);
+}
+
 export class OrganizationPluginError extends Error {}
 
 /** Why an organization may not offer this manifest, or null when it may. A plugin with no tools, only skills and commands, is fine. */
@@ -33,7 +62,18 @@ export function organizationPluginProblem(
 	}
 
 	const url = supersetExtension(manifest)?.mcp?.url;
-	if (url && !url.startsWith("https://")) return "its mcp url must be https";
+	if (url) {
+		let parsed: URL;
+		try {
+			parsed = new URL(url);
+		} catch {
+			return "its mcp url is not a valid url";
+		}
+		if (parsed.protocol !== "https:") return "its mcp url must be https";
+		if (isInternalHost(parsed.hostname)) {
+			return "its mcp url must not point at a private or internal address";
+		}
+	}
 	return null;
 }
 

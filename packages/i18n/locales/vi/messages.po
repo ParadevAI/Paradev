@@ -2329,6 +2329,9 @@ msgstr "Thợ lắp ráp ẩn danh"
 msgid "another device"
 msgstr "thiết bị khác"
 
+msgid "Another repository..."
+msgstr "Kho lưu trữ khác..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Trả lời các câu hỏi trong terminal bên dưới, chẳng hạn mật khẩu."
 
@@ -12519,6 +12522,9 @@ msgstr "Chủ sở hữu"
 msgid "Owner access required"
 msgstr "Cần quyền chủ sở hữu"
 
+msgid "owner/name"
+msgstr "chủ sở hữu/tên"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Sở hữu mọi phiên PTY và tồn tại qua các lần khởi động lại ứng dụng."
 
@@ -12958,9 +12964,6 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
-
-msgid "Plugins update when the sync finishes."
-msgstr "Plugin sẽ cập nhật khi đồng bộ xong."
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Chỉ vào trang. Agent của bạn sẽ thực hiện thay đổi."
@@ -16864,6 +16867,9 @@ msgstr "Plugin Superset"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn Superset là một trong những startup nổi bật tại YC Demo Day."
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Superset đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
 
@@ -17014,9 +17020,6 @@ msgstr "Đồng bộ plugin từ các repository GitHub của bạn và chọn a
 
 msgid "Sync Repositories"
 msgstr "Đồng bộ repository"
-
-msgid "Sync requested"
-msgstr "Đã yêu cầu đồng bộ"
 
 msgid "Sync started"
 msgstr "Đã bắt đầu đồng bộ"
@@ -17493,9 +17496,6 @@ msgstr "Toàn bộ workspace. Chạy nhiều agent song song, giữ mỗi agent 
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Superset có thể tái sử dụng."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App chưa thấy repository nào. Cấp quyền cho nó trên GitHub rồi thử lại."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "Tên của bạn <0>(nếu dùng prompt của bạn, chúng tôi sẽ gh
 
 msgid "Your organization"
 msgstr "Tổ chức của bạn"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Tổ chức của bạn chưa kết nối GitHub. Cài GitHub App trong <0>Cài đặt › Tích hợp</0>, rồi quay lại."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Hãy tăng giới hạn hoặc nâng cấp trong Cài đặt, Thanh toán để khởi động workspace này."

@@ -2,6 +2,7 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect } from "react";
 import { env } from "renderer/env.renderer";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { usePluginCatalog } from "renderer/hooks/usePluginCatalog";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { managedPluginsKey } from "./utils/managedPluginsKey";
@@ -16,14 +17,22 @@ export function OrganizationPluginSync() {
 
 function SyncOnCatalogChange() {
 	const { plugins, isLoading, error } = usePluginCatalog();
-	const { mutate: sync } = electronTrpc.plugins.sync.useMutation();
-	const key = isLoading || error ? null : managedPluginsKey(plugins);
+	const organizationId = useActiveOrganizationId();
+	const { mutate: sync } = electronTrpc.plugins.sync.useMutation({
+		onError: () => {
+			lastSyncedKey = null;
+		},
+	});
+	const key =
+		isLoading || error || !organizationId
+			? null
+			: `${organizationId}:${managedPluginsKey(plugins)}`;
 
 	useEffect(() => {
 		if (key === null || key === lastSyncedKey) return;
 		lastSyncedKey = key;
-		sync();
-	}, [key, sync]);
+		sync({ organizationId: organizationId ?? undefined });
+	}, [key, sync, organizationId]);
 
 	return null;
 }

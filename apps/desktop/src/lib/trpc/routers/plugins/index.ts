@@ -92,7 +92,7 @@ export const createPluginsRouter = () => {
 
 		install: publicProcedure.input(pluginRef).mutation(({ input }) => {
 			if (isOrganizationPlugin(input)) {
-				installOrganizationPlugin(input.name);
+				installOrganizationPlugin(input.name, input.marketplace);
 				return { installed: getInstalledPlugins() };
 			}
 			const installed = installPlugin(input.name);
@@ -128,9 +128,13 @@ export const createPluginsRouter = () => {
 			}),
 
 		/** Reconciles local skills and MCP entries, including the organization's managed plugins. */
-		sync: publicProcedure.mutation(async () => {
-			await syncPlugins();
-			return { ok: true };
-		}),
+		sync: publicProcedure
+			.input(
+				z.object({ organizationId: z.string().min(1).optional() }).optional(),
+			)
+			.mutation(async ({ input }) => {
+				await syncPlugins(input?.organizationId);
+				return { ok: true };
+			}),
 	});
 };

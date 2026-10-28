@@ -2329,6 +2329,9 @@ msgstr "匿名装配工"
 msgid "another device"
 msgstr "另一台设备"
 
+msgid "Another repository..."
+msgstr "其他仓库..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "请在下方终端中回答提问，例如输入密码。"
 
@@ -12519,6 +12522,9 @@ msgstr "所有者"
 msgid "Owner access required"
 msgstr "需要所有者权限"
 
+msgid "owner/name"
+msgstr "所有者/名称"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "持有所有PTY会话，并在应用重启后继续存活。"
 
@@ -12958,9 +12964,6 @@ msgstr "插件市场"
 
 msgid "Plugins"
 msgstr "插件"
-
-msgid "Plugins update when the sync finishes."
-msgstr "同步完成后插件会更新。"
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "指向页面，智能体来完成修改。"
@@ -16864,6 +16867,9 @@ msgstr "Superset 插件"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset 使用你已连接的 GitHub 账号读取它。如果还没有连接，请在<0>设置 › 集成</0>中连接。"
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Superset已通过独立审计机构的SOC 2 Type II审计。可在trust.superset.sh索取报告并查阅我们的安全文档。"
 
@@ -17015,14 +17021,11 @@ msgstr "从你的 GitHub 仓库同步插件，并选择谁可以安装它们。"
 msgid "Sync Repositories"
 msgstr "同步仓库"
 
-msgid "Sync requested"
-msgstr "已请求同步"
-
 msgid "Sync started"
 msgstr "同步已开始"
 
 msgid "Synced {syncedAgo}"
-msgstr "{syncedAgo}同步"
+msgstr "上次同步：{syncedAgo}"
 
 msgid "Syncing..."
 msgstr "正在同步..."
@@ -17493,9 +17496,6 @@ msgstr "完整的工作区。并行运行智能体，让每个智能体独占自
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "未来用于存放可复用的 Superset 智能体配置、提示词与安装指南。"
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App 还看不到任何仓库。请在 GitHub 上为它授予访问权限，然后重试。"
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "你的名字 <0>（若我们采用你的提示词，会在更新日志�
 
 msgid "Your organization"
 msgstr "你的组织"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "你的组织尚未连接 GitHub。请在<0>设置 › 集成</0>中安装 GitHub App，然后再回来。"
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "你的组织已达到云端用量上限。请在“设置”中的“账单”提高上限或升级，以启动此工作区。"

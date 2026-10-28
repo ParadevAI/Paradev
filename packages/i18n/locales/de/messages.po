@@ -2329,6 +2329,9 @@ msgstr "Anonymer Monteur"
 msgid "another device"
 msgstr "ein anderes Gerät"
 
+msgid "Another repository..."
+msgstr "Anderes Repository..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantworte Fragen im Terminal unten, zum Beispiel nach einem Passwort."
 
@@ -12519,6 +12522,9 @@ msgstr "Eigentümer"
 msgid "Owner access required"
 msgstr "Eigentümerzugriff erforderlich"
 
+msgid "owner/name"
+msgstr "inhaber/name"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Verwaltet jede PTY-Sitzung und überlebt Neustarts der App."
 
@@ -12958,9 +12964,6 @@ msgstr "Plugin-Marketplace"
 
 msgid "Plugins"
 msgstr "Plugins"
-
-msgid "Plugins update when the sync finishes."
-msgstr "Plugins werden aktualisiert, sobald die Synchronisierung abgeschlossen ist."
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Zeig auf die Seite. Dein Agent macht die Änderung."
@@ -16864,6 +16867,9 @@ msgstr "Superset-Plugins"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar abgeschlossen, angeführt von Union Square Ventures, mit Y Combinator und Paul Graham. TechCrunch zählte Superset zu den herausragenden Startups des YC Demo Day."
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset liest es mit deinem verbundenen GitHub-Konto. Falls noch nicht geschehen, verbinde eines unter <0>Einstellungen › Integrationen</0>."
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset läuft lokal auf den Rechnern deiner Entwickler. Wir speichern weder deinen Code noch deine KI-Unterhaltungen, und Superset hat ein SOC-2-Type-II-Audit bei einem unabhängigen Prüfer abgeschlossen. Fordere den Bericht an und sieh dir unsere Sicherheitsdokumentation unter trust.superset.sh an."
 
@@ -17014,9 +17020,6 @@ msgstr "Synchronisieren Sie Plugins aus Ihren GitHub-Repositories und legen Sie 
 
 msgid "Sync Repositories"
 msgstr "Repositories synchronisieren"
-
-msgid "Sync requested"
-msgstr "Synchronisierung angefordert"
 
 msgid "Sync started"
 msgstr "Synchronisierung gestartet"
@@ -17493,9 +17496,6 @@ msgstr "Der vollständige Arbeitsbereich. Agents parallel ausführen, jeden in e
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Der künftige Ort für wiederverwendbare Superset-Agent-Konfigurationen, Prompts und Setup-Anleitungen."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "Die GitHub App sieht noch keine Repositories. Geben Sie ihr auf GitHub Zugriff und versuchen Sie es dann erneut."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "Dein Name <0>(wenn wir deinen Prompt verwenden, nennen wir dich im Chang
 
 msgid "Your organization"
 msgstr "Ihre Organisation"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Ihre Organisation hat GitHub noch nicht verbunden. Installieren Sie die GitHub App unter <0>Einstellungen › Integrationen</0> und kommen Sie dann zurück."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Deine Organisation hat ihr Cloud-Nutzungslimit erreicht. Erhöhe das Limit oder führe in Einstellungen, Abrechnung ein Upgrade durch, um diesen Arbeitsbereich zu starten."

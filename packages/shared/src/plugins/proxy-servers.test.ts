@@ -71,6 +71,18 @@ describe("desiredPluginMcpServers", () => {
 		);
 	});
 
+	test("an organization plugin with only skills gets no MCP entry", () => {
+		expect(
+			desiredPluginMcpServers([
+				{
+					name: "team-skills",
+					marketplace: "organization-org-1",
+					tools: false,
+				},
+			]),
+		).toEqual({});
+	});
+
 	test("another marketplace's same-named plugin is not served Superset's", () => {
 		const desired = desiredPluginMcpServers([
 			{ name: "linear", marketplace: "acme" },

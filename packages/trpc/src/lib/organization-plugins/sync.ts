@@ -128,6 +128,9 @@ export async function syncOrganizationPluginSource(
 	try {
 		const snapshot = await readWithFirstCredential(source, readSnapshot);
 		result.sha = snapshot.sha;
+		if (source.syncedSha === snapshot.sha && !source.syncError) {
+			return result;
+		}
 
 		const file = findMarketplaceFile(snapshot.paths, source.path);
 		if (!file) {
@@ -149,8 +152,10 @@ export async function syncOrganizationPluginSource(
 			.from(organizationPlugins)
 			.where(eq(organizationPlugins.organizationId, source.organizationId));
 		const byName = new Map(existing.map((row) => [row.name, row]));
+		const seen: string[] = problems
+			.map((problem) => problem.name)
+			.filter((name) => byName.get(name)?.sourceId === source.id);
 
-		const seen: string[] = [];
 		for (const entry of entries) {
 			try {
 				const current = byName.get(entry.name);
@@ -164,6 +169,15 @@ export async function syncOrganizationPluginSource(
 				const contentHash = pluginBundleHash(bundle);
 				seen.push(entry.name);
 
+				if (
+					current &&
+					current.version === manifest.version &&
+					current.contentHash !== contentHash
+				) {
+					throw new Error(
+						`its content changed but its version is still ${manifest.version}; bump the version`,
+					);
+				}
 				if (
 					current?.contentHash === contentHash &&
 					!current.removedFromSourceAt
@@ -199,6 +213,7 @@ export async function syncOrganizationPluginSource(
 							contentHash,
 							removedFromSourceAt: null,
 						},
+						setWhere: eq(organizationPlugins.sourceId, source.id),
 					});
 				result.synced.push(entry.name);
 			} catch (error) {
@@ -238,7 +253,11 @@ export async function syncOrganizationPluginSource(
 	return result;
 }
 
-export async function syncAllOrganizationPluginSources(): Promise<{
+export async function syncAllOrganizationPluginSources(
+	enqueue: (sourceId: string) => Promise<void> = async (sourceId) => {
+		await syncOrganizationPluginSource(sourceId);
+	},
+): Promise<{
 	sources: number;
 	failed: number;
 }> {
@@ -247,13 +266,12 @@ export async function syncAllOrganizationPluginSources(): Promise<{
 		.from(organizationPluginSources);
 	let failed = 0;
 	for (const source of sources) {
-		const outcome = await syncOrganizationPluginSource(source.id).catch(
-			(error) => {
-				console.error("[organization-plugins] sync failed", source.id, error);
-				return null;
-			},
-		);
-		if (!outcome || outcome.error) failed++;
+		try {
+			await enqueue(source.id);
+		} catch (error) {
+			console.error("[organization-plugins] enqueue failed", source.id, error);
+			failed++;
+		}
 	}
 	return { sources: sources.length, failed };
 }

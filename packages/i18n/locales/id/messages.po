@@ -2329,6 +2329,9 @@ msgstr "Perakit Anonim"
 msgid "another device"
 msgstr "perangkat lain"
 
+msgid "Another repository..."
+msgstr "Repositori lain..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Jawab pertanyaan di terminal di bawah, misalnya kata sandi."
 
@@ -12519,6 +12522,9 @@ msgstr "Pemilik"
 msgid "Owner access required"
 msgstr "Akses pemilik diperlukan"
 
+msgid "owner/name"
+msgstr "pemilik/nama"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "Memiliki setiap sesi PTY dan bertahan saat aplikasi dimulai ulang."
 
@@ -12958,9 +12964,6 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
-
-msgid "Plugins update when the sync finishes."
-msgstr "Plugin diperbarui setelah sinkronisasi selesai."
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Tunjuk halamannya. Agen Anda yang membuat perubahan."
@@ -16864,6 +16867,9 @@ msgstr "Plugin Superset"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Superset meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "Superset berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Superset telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di trust.superset.sh."
 
@@ -17014,9 +17020,6 @@ msgstr "Sinkronkan plugin dari repositori GitHub Anda dan pilih siapa yang dapat
 
 msgid "Sync Repositories"
 msgstr "Sinkronkan Repositori"
-
-msgid "Sync requested"
-msgstr "Sinkronisasi diminta"
 
 msgid "Sync started"
 msgstr "Sinkronisasi dimulai"
@@ -17493,9 +17496,6 @@ msgstr "Workspace lengkap. Jalankan agen secara paralel, simpan masing-masing di
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "Rumah masa depan untuk konfigurasi agen Superset, prompt, dan panduan penyiapan yang dapat digunakan ulang."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App belum dapat melihat repositori apa pun. Beri akses di GitHub, lalu coba lagi."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "Nama Anda <0>(kalau prompt Anda kami pakai, kami akan mencantumkan Anda 
 
 msgid "Your organization"
 msgstr "Organisasi Anda"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Organisasi Anda belum menghubungkan GitHub. Pasang GitHub App di <0>Pengaturan › Integrasi</0>, lalu kembali."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Naikkan batas atau upgrade di Pengaturan, Penagihan untuk memulai workspace ini."

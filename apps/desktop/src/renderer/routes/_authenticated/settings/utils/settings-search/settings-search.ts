@@ -2132,11 +2132,13 @@ export function getVisibleMatchCountBySection(
 	isV2: boolean,
 	cloudWorkspaces: boolean,
 	mobileEnabled = false,
+	pluginsVisible = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
-			(item.section !== "mobile" || mobileEnabled),
+			(item.section !== "mobile" || mobileEnabled) &&
+			(item.section !== "plugins" || pluginsVisible),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {

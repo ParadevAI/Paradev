@@ -17,11 +17,13 @@ interface InstalledPluginRecord {
 	marketplace?: unknown;
 	installPath?: unknown;
 	enabled?: unknown;
+	tools?: unknown;
 }
 
 export interface EnabledPlugin {
 	name: string;
 	marketplace: string;
+	tools?: boolean;
 }
 
 /**
@@ -60,6 +62,7 @@ export function readEnabledPlugins(
 			name: entry.name as string,
 			marketplace:
 				typeof entry.marketplace === "string" ? entry.marketplace : "",
+			...(typeof entry.tools === "boolean" ? { tools: entry.tools } : {}),
 		})) ?? null
 	);
 }
@@ -71,6 +74,8 @@ export interface InstalledPluginEntry {
 	installPath?: string;
 	installedAt: string;
 	enabled: boolean;
+	/** False for an organization plugin with only skills: no MCP entry is written for it. */
+	tools?: boolean;
 }
 
 export function writeInstalledPlugins(

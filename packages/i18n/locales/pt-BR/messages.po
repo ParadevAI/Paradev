@@ -2329,6 +2329,9 @@ msgstr "Montador Anônimo"
 msgid "another device"
 msgstr "outro dispositivo"
 
+msgid "Another repository..."
+msgstr "Outro repositório..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Responda às perguntas no terminal abaixo, como uma senha."
 
@@ -2871,7 +2874,7 @@ msgid "Available"
 msgstr "Disponível"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
-msgstr "Plugins disponíveis aparecem na página Plugins de cada função. Plugins instalados são instalados para todos na função, que podem desativá-los, mas não removê-los."
+msgstr "Plugins disponíveis aparecem na página Plugins de cada cargo. Plugins instalados ficam disponíveis para todos os membros com esse cargo; eles podem desativá-los, mas não removê-los."
 
 msgid "Avatar"
 msgstr "Avatar"
@@ -12519,6 +12522,9 @@ msgstr "Proprietário"
 msgid "Owner access required"
 msgstr "Acesso de proprietário necessário"
 
+msgid "owner/name"
+msgstr "proprietário/nome"
+
 msgid "Owns every PTY session and survives app restarts."
 msgstr "É dono de cada sessão PTY e sobrevive a reinícios do app."
 
@@ -12958,9 +12964,6 @@ msgstr "Marketplace de plugins"
 
 msgid "Plugins"
 msgstr "Plugins"
-
-msgid "Plugins update when the sync finishes."
-msgstr "Os plugins são atualizados quando a sincronização termina."
 
 msgid "Point at the page. Your agent makes the change."
 msgstr "Aponte para a página. Seu agente faz a mudança."
@@ -16864,6 +16867,9 @@ msgstr "Plugins do Superset"
 msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "O Superset captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch o apontou como uma das startups de destaque do YC Demo Day."
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "O Superset lê o repositório com sua conta do GitHub conectada. Se ainda não conectou, conecte uma em <0>Configurações › Integrações</0>."
+
 msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
 msgstr "O Superset roda localmente nas máquinas do seu time. Não guardamos seu código nem suas conversas com a IA, e o Superset concluiu uma auditoria SOC 2 Tipo II com um auditor independente. Solicite o relatório e veja nossa documentação de segurança em trust.superset.sh."
 
@@ -17014,9 +17020,6 @@ msgstr "Sincronize plugins dos seus repositórios do GitHub e escolha quem pode 
 
 msgid "Sync Repositories"
 msgstr "Sincronizar repositórios"
-
-msgid "Sync requested"
-msgstr "Sincronização solicitada"
 
 msgid "Sync started"
 msgstr "Sincronização iniciada"
@@ -17493,9 +17496,6 @@ msgstr "A área de trabalho completa. Execute agentes em paralelo, mantenha cada
 
 msgid "The future home for reusable Superset agent configs, prompts, and setup guides."
 msgstr "O futuro lar de configurações de agentes, prompts e guias de configuração reutilizáveis do Superset."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "O GitHub App ainda não vê nenhum repositório. Dê acesso a ele no GitHub e tente de novo."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -19973,9 +19973,6 @@ msgstr "Seu nome <0>(se usarmos seu prompt, damos os créditos no changelog)</0>
 
 msgid "Your organization"
 msgstr "Sua organização"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Sua organização ainda não conectou o GitHub. Instale o GitHub App em <0>Configurações › Integrações</0> e depois volte."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Sua organização atingiu o limite de uso na nuvem. Aumente o limite ou faça upgrade em Configurações, Faturamento para iniciar esta área de trabalho."

@@ -53,8 +53,9 @@ export function writePluginTree(
 	version: string,
 	files: ReadonlyMap<string, Uint8Array>,
 ): string {
-	const target = pluginCachePath(marketplace, name, version);
+	const target = path.resolve(pluginCachePath(marketplace, name, version));
 	const staging = `${target}.incoming-${process.pid}`;
+	const previous = `${target}.previous-${process.pid}`;
 	fs.rmSync(staging, { recursive: true, force: true });
 	try {
 		for (const [relative, data] of files) {
@@ -67,8 +68,16 @@ export function writePluginTree(
 			fs.mkdirSync(path.dirname(destination), { recursive: true });
 			fs.writeFileSync(destination, data);
 		}
-		fs.rmSync(target, { recursive: true, force: true });
-		fs.renameSync(staging, target);
+		fs.rmSync(previous, { recursive: true, force: true });
+		const hadTarget = fs.existsSync(target);
+		if (hadTarget) fs.renameSync(target, previous);
+		try {
+			fs.renameSync(staging, target);
+		} catch (error) {
+			if (hadTarget) fs.renameSync(previous, target);
+			throw error;
+		}
+		fs.rmSync(previous, { recursive: true, force: true });
 	} catch (error) {
 		fs.rmSync(staging, { recursive: true, force: true });
 		throw error;

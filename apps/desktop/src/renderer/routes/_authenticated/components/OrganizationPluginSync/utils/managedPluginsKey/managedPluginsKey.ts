@@ -4,6 +4,7 @@ interface Listed {
 	name: string;
 	marketplace: string;
 	managed: boolean;
+	installed: boolean;
 	latestVersion: string | null;
 }
 
@@ -11,7 +12,8 @@ export function managedPluginsKey(plugins: Listed[]): string {
 	return plugins
 		.filter(
 			(plugin) =>
-				plugin.managed && isOrganizationMarketplace(plugin.marketplace),
+				(plugin.managed || plugin.installed) &&
+				isOrganizationMarketplace(plugin.marketplace),
 		)
 		.map(
 			(plugin) =>

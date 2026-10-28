@@ -397,6 +397,7 @@ export interface InstallPluginResult {
 	version: string;
 	installPath: string;
 	skills: number;
+	tools?: boolean;
 }
 
 export interface InstallPluginOptions {
@@ -523,13 +524,15 @@ export async function installPlugin(
 export async function recordPlugin(
 	plugin: Omit<InstallPluginResult, "skills">,
 ): Promise<InstallPluginResult> {
-	const plugins = readInstalledPlugins().filter(
-		(p) => !(p.name === plugin.name && p.marketplace === plugin.marketplace),
+	const all = readInstalledPlugins();
+	const existing = all.find(
+		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
 	);
+	const plugins = all.filter((p) => p !== existing);
 	plugins.push({
 		...plugin,
 		installedAt: new Date().toISOString(),
-		enabled: true,
+		enabled: existing?.enabled ?? true,
 	} satisfies InstalledPlugin);
 	writeInstalledPlugins(plugins);
 

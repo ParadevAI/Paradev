@@ -14,6 +14,29 @@ export function organizationMarketplace(organizationId: string): string {
 	return `${ORGANIZATION_MARKETPLACE_PREFIX}${organizationId}`;
 }
 
+export function organizationIdOfMarketplace(
+	marketplace: string,
+): string | null {
+	return isOrganizationMarketplace(marketplace)
+		? marketplace.slice(ORGANIZATION_MARKETPLACE_PREFIX.length) || null
+		: null;
+}
+
+/** Whether a plugin manifest names a connector or its own MCP server. */
+export function manifestHasTools(manifest: unknown): boolean {
+	const superset = (
+		manifest as {
+			extensions?: {
+				superset?: { connector?: { slug?: unknown }; mcp?: { url?: unknown } };
+			};
+		}
+	)?.extensions?.superset;
+	return (
+		typeof superset?.connector?.slug === "string" ||
+		typeof superset?.mcp?.url === "string"
+	);
+}
+
 export function isOrganizationMarketplace(marketplace: string): boolean {
 	return marketplace.startsWith(ORGANIZATION_MARKETPLACE_PREFIX);
 }
@@ -594,6 +617,7 @@ export function desiredPluginMcpServers(
 		name: string;
 		marketplace?: string;
 		enabled?: boolean;
+		tools?: boolean;
 	}[],
 	options: {
 		/** Command printing the auth header, so no entry needs its own OAuth. */
@@ -608,6 +632,7 @@ export function desiredPluginMcpServers(
 		// would otherwise be served Superset's.
 		const marketplace = install.marketplace || DEFAULT_MARKETPLACE;
 		if (isOrganizationMarketplace(marketplace)) {
+			if (install.tools === false) continue;
 			Object.assign(
 				desired,
 				proxyMcpServer(install.name, marketplace, options),
