@@ -15,3 +15,16 @@ export function computeInsertIndex(
 	// Left half → insert before this tab, right half → insert after
 	return withinTab > TAB_WIDTH / 2 ? tabIndex + 1 : tabIndex;
 }
+
+/** The scrollLeft that brings tab `index` fully into view, or null if it is already visible. */
+export function scrollLeftToRevealTab(
+	index: number,
+	scrollLeft: number,
+	viewportWidth: number,
+): number | null {
+	const tabLeft = index * TAB_WIDTH;
+	const tabRight = tabLeft + TAB_WIDTH;
+	if (tabLeft < scrollLeft) return tabLeft;
+	if (tabRight > scrollLeft + viewportWidth) return tabRight - viewportWidth;
+	return null;
+}

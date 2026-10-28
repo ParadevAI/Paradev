@@ -10,6 +10,7 @@ import {
 	type ComponentProps,
 	type ReactNode,
 	useCallback,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -24,7 +25,7 @@ import type { Tab } from "../../../../../types";
 import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
-import { computeInsertIndex, TAB_WIDTH } from "./utils";
+import { computeInsertIndex, scrollLeftToRevealTab, TAB_WIDTH } from "./utils";
 
 interface TabBarProps<TData> {
 	store: StoreApi<WorkspaceStore<TData>>;
@@ -118,6 +119,17 @@ export function TabBar<TData>({
 }: TabBarProps<TData>) {
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
+	const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+	useLayoutEffect(() => {
+		const scroller = tabsTrackRef.current?.parentElement;
+		if (!scroller || !hasHorizontalOverflow || activeTabIndex < 0) return;
+		const next = scrollLeftToRevealTab(
+			activeTabIndex,
+			scroller.scrollLeft,
+			scroller.clientWidth,
+		);
+		if (next !== null) scroller.scrollLeft = next;
+	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);
 	const [insertIndex, setInsertIndex] = useState<number | null>(null);

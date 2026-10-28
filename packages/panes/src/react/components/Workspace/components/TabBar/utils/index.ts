@@ -1,1 +1,1 @@
-export { computeInsertIndex, TAB_WIDTH } from "./utils";
+export { computeInsertIndex, scrollLeftToRevealTab, TAB_WIDTH } from "./utils";
