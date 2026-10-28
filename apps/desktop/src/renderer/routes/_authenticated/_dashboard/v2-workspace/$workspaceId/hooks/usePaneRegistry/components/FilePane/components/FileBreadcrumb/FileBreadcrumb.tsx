@@ -10,6 +10,7 @@ import { LuChevronRight } from "react-icons/lu";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { toRelativeWorkspacePath } from "shared/absolute-paths";
 import { BreadcrumbTree } from "./components/BreadcrumbTree";
+import { HiddenTrail } from "./components/HiddenTrail";
 
 const MIN_GAP_TO_ACTIONS = 64;
 const CRUMB_GAP = 4;
@@ -40,6 +41,7 @@ export function FileBreadcrumb({
 	const measureRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(segments.length);
 	const [openCrumb, setOpenCrumb] = useState<number | null>(null);
+	const [trailPick, setTrailPick] = useState<number | null>(null);
 
 	useLayoutEffect(() => {
 		const chip = chipRef.current;
@@ -105,10 +107,29 @@ export function FileBreadcrumb({
 			segments[index]
 		);
 
-	const crumb = (key: number, label: ReactNode, listIndex: number) => (
+	const treeFor = (listIndex: number) => (
+		<BreadcrumbTree
+			workspaceId={workspaceId}
+			directory={pathOf(listIndex)}
+			expandedPaths={segments
+				.slice(0, -1)
+				.map((_, index) => pathOf(index + 1))
+				.slice(listIndex)}
+			currentFilePath={filePath}
+			onOpenFile={(path) => {
+				setOpenCrumb(null);
+				onOpenFile(path);
+			}}
+		/>
+	);
+
+	const crumb = (key: number, label: ReactNode, content: ReactNode) => (
 		<Popover
 			open={openCrumb === key}
-			onOpenChange={(open) => setOpenCrumb(open ? key : null)}
+			onOpenChange={(open) => {
+				setOpenCrumb(open ? key : null);
+				setTrailPick(null);
+			}}
 		>
 			<PopoverTrigger asChild>
 				<button
@@ -119,19 +140,7 @@ export function FileBreadcrumb({
 				</button>
 			</PopoverTrigger>
 			<PopoverContent align="start" className="w-auto p-0">
-				<BreadcrumbTree
-					workspaceId={workspaceId}
-					directory={pathOf(listIndex)}
-					expandedPaths={segments
-						.slice(0, -1)
-						.map((_, index) => pathOf(index + 1))
-						.slice(listIndex)}
-					currentFilePath={filePath}
-					onOpenFile={(path) => {
-						setOpenCrumb(null);
-						onOpenFile(path);
-					}}
-				/>
+				{content}
 			</PopoverContent>
 		</Popover>
 	);
@@ -162,7 +171,18 @@ export function FileBreadcrumb({
 			>
 				{hidden > 0 && (
 					<>
-						{crumb(-1, "…", 0)}
+						{crumb(
+							-1,
+							"…",
+							trailPick === null ? (
+								<HiddenTrail
+									folders={segments.slice(0, hidden)}
+									onPick={setTrailPick}
+								/>
+							) : (
+								treeFor(trailPick)
+							),
+						)}
 						{separator}
 					</>
 				)}
@@ -171,7 +191,7 @@ export function FileBreadcrumb({
 					return (
 						<Fragment key={`${index}:${segment}`}>
 							{offset > 0 && separator}
-							{crumb(index, crumbLabel(index), index)}
+							{crumb(index, crumbLabel(index), treeFor(index))}
 						</Fragment>
 					);
 				})}
