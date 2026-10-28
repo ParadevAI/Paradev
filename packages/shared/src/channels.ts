@@ -21,7 +21,8 @@ export function normalizeChannelName(input: string): string {
 export interface ChannelReaction {
 	/** Slack shortcode, `+1::skin-tone-3` for a toned one. */
 	emoji: string;
-	userIds: string[];
+	/** People and Devs who reacted. */
+	actorIds: string[];
 }
 
 export interface ChannelAttachment {
@@ -45,9 +46,11 @@ export interface ChannelMessageWire {
 	channelId: string;
 	seq: number;
 	threadRootId: string | null;
-	authorUserId: string | null;
+	/** A person's user id or a Dev's agent id. */
+	authorId: string | null;
 	body: string;
-	mentionedUserIds: string[];
+	/** The people and Devs the message mentions. */
+	mentionedIds: string[];
 	broadcast: ChannelBroadcast | null;
 	clientId: string | null;
 	replyCount: number;

@@ -81,6 +81,10 @@ export const createBrowserRouter = () => {
 				return { base64: saved.base64, id: saved.id };
 			}),
 
+		capturePreview: publicProcedure
+			.input(z.object({ paneId: z.string() }))
+			.mutation(({ input }) => browserManager.capturePreview(input.paneId)),
+
 		evaluateJS: publicProcedure
 			.input(z.object({ paneId: z.string(), code: z.string() }))
 			.mutation(async ({ input }) => {

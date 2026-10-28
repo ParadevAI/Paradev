@@ -52,7 +52,7 @@ superset ws create --host <host-id> --project <project-id> \
   --name fix-login-bug --branch fix/login-bug --agent claude --prompt "Fix the login redirect bug"
 ```
 
-Remote Access is a Pro feature. See [Remote Access](https://docs.superset.sh/remote-access).
+Remote Access is a Pro feature. See [Remote Access](https://docs.paradev.com/remote-access).
 
 ## How do I control coding agents on a remote Linux server from my Mac?
 
@@ -72,7 +72,7 @@ export SUPERSET_API_KEY=sk_live_…
 superset start --daemon --org <id|slug|name>
 ```
 
-The host launches whichever agents are on its `PATH`: the docs list Claude Code, Codex, Cursor Agent, Amp, Gemini CLI, and OpenCode. The host also needs `git` and `gh`. The Mac then sees the server under **Other devices** in the Device filter. Details: [Host Server](https://docs.superset.sh/cli/host-server).
+The host launches whichever agents are on its `PATH`: the docs list Claude Code, Codex, Cursor Agent, Amp, Gemini CLI, and OpenCode. The host also needs `git` and `gh`. The Mac then sees the server under **Other devices** in the Device filter. Details: [Host Server](https://docs.paradev.com/cli/host-server).
 
 ## How do I keep coding agents working when I close my laptop?
 
@@ -93,7 +93,7 @@ KillMode=process
 
 Keep `KillMode=process`; other modes stop every terminal and agent when the service restarts. Add `--auto-update` to a daemon start if you want the host to update itself.
 
-You can then check on agents from your laptop when it wakes, or from [Paradev for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.superset.sh/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
+You can then check on agents from your laptop when it wakes, or from [Paradev for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.paradev.com/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
 
 ## Can I use Claude Code Remote Control or Codex cloud on a Paradev host?
 
@@ -115,7 +115,7 @@ What Paradev adds for a shared host:
 - **Access per host.** When a host first comes online, only the person who started it can see it. Add teammates in **Settings → Hosts → Add member**; owners can promote or remove members.
 - **One worktree per workspace.** Each workspace gets its own branch, directory, terminals, and port list.
 - **Know whose work is whose.** The Workspaces page filters by who created each workspace, and tags stay with the user who applied them.
-- **Ports.** Paradev detects the ports each workspace listens on but does not assign port ranges. If several agents run dev servers, reserve ports in a [setup script](https://docs.superset.sh/ports).
+- **Ports.** Paradev detects the ports each workspace listens on but does not assign port ranges. If several agents run dev servers, reserve ports in a [setup script](https://docs.paradev.com/ports).
 
 Paradev's docs recommend a **dedicated machine** for this, provisioned with only the repos and credentials you mean to share, not your personal workstation. Anything the host service can reach becomes reachable by clients you grant access to.
 
@@ -143,7 +143,7 @@ Review the diff where the code lives, and forward the dev server's port to your 
 - **Tailscale:** `tailscale serve 3000` on the host, then open the URL it prints. This keeps the port inside your tailnet.
 - **Codespaces** forwards ports from its cloud environment the same way.
 
-In Paradev, open the remote workspace and its **Changes** pane shows the agent's diff from the host. When you select a remote workspace, the app forwards each port that workspace started to the same port on your machine, so `localhost:3000` reaches the dev server on the host. Open it in the [in-app browser pane](https://docs.superset.sh/browser) next to the diff, or in your own browser. If the port is busy locally, choose **Use another port**. Limits: the host needs host-service 1.26 or newer, only TCP is forwarded, and other services on the host stay unreachable. Details: [Ports on a remote host](https://docs.superset.sh/remote-access#ports-on-a-remote-host).
+In Paradev, open the remote workspace and its **Changes** pane shows the agent's diff from the host. When you select a remote workspace, the app forwards each port that workspace started to the same port on your machine, so `localhost:3000` reaches the dev server on the host. Open it in the [in-app browser pane](https://docs.paradev.com/browser) next to the diff, or in your own browser. If the port is busy locally, choose **Use another port**. Limits: the host needs host-service 1.26 or newer, only TCP is forwarded, and other services on the host stay unreachable. Details: [Ports on a remote host](https://docs.paradev.com/remote-access#ports-on-a-remote-host).
 
 Do not make a dev server public just to preview it. A forwarded port carries your cookies and auth headers, so treat it like the remote service it is.
 

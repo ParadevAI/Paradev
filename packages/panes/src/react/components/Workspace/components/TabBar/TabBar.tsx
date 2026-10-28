@@ -10,6 +10,7 @@ import {
 	type ComponentProps,
 	type ReactNode,
 	useCallback,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -24,7 +25,12 @@ import type { Tab } from "../../../../../types";
 import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
-import { computeInsertIndex, TAB_WIDTH } from "./utils";
+import {
+	computeInsertIndex,
+	scrollLeftToRevealTab,
+	TAB_BAR_FADE_WIDTH,
+	TAB_WIDTH,
+} from "./utils";
 
 interface TabBarProps<TData> {
 	store: StoreApi<WorkspaceStore<TData>>;
@@ -40,6 +46,7 @@ interface TabBarProps<TData> {
 	onMovePaneToNewTab: (paneId: string, toIndex: number) => void;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	onAddTab?: () => void;
 	renderTabBarLeading?: () => ReactNode;
 	renderTabBarTrailing?: () => ReactNode;
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
@@ -50,8 +57,10 @@ type PaneDragItem = { paneId: string; store?: unknown };
 
 function AddTabButton<_TData>({
 	renderAddTabMenu,
+	onAddTab,
 }: {
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	onAddTab?: () => void;
 }) {
 	const pendingActionRef = useRef<(() => void) | null>(null);
 	const button = (
@@ -60,6 +69,7 @@ function AddTabButton<_TData>({
 			size="icon"
 			type="button"
 			variant="ghost"
+			onClick={onAddTab}
 		>
 			<PlusIcon className="size-3.5" />
 		</Button>
@@ -107,12 +117,25 @@ export function TabBar<TData>({
 	onMovePaneToNewTab,
 	renderTabIcon,
 	renderAddTabMenu,
+	onAddTab,
 	renderTabBarLeading,
 	renderTabBarTrailing,
 	renderTabAccessory,
 }: TabBarProps<TData>) {
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
+	const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+	useLayoutEffect(() => {
+		const scroller = tabsTrackRef.current?.parentElement;
+		if (!scroller || !hasHorizontalOverflow || activeTabIndex < 0) return;
+		const next = scrollLeftToRevealTab(
+			activeTabIndex,
+			scroller.scrollLeft,
+			scroller.clientWidth,
+			TAB_BAR_FADE_WIDTH,
+		);
+		if (next !== null) scroller.scrollTo({ left: next, behavior: "smooth" });
+	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);
 	const [insertIndex, setInsertIndex] = useState<number | null>(null);
@@ -263,11 +286,14 @@ export function TabBar<TData>({
 							style={{ left: insertLineLeft }}
 						/>
 					)}
-					<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
-						{!hasHorizontalOverflow && (
-							<AddTabButton renderAddTabMenu={renderAddTabMenu} />
-						)}
-					</div>
+					{!hasHorizontalOverflow && (
+						<div className="flex h-full w-10 shrink-0 items-center justify-center pt-1">
+							<AddTabButton
+								renderAddTabMenu={renderAddTabMenu}
+								onAddTab={onAddTab}
+							/>
+						</div>
+					)}
 					{/* Empty space to the right of the tabs (collapses to 0 when the
 					    tabs overflow); the bar's only window-drag region. */}
 					<div className="drag h-full flex-1 border-b border-border" />
@@ -275,7 +301,10 @@ export function TabBar<TData>({
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
 				<div className="no-drag flex h-full w-10 shrink-0 items-center justify-center pt-1">
-					<AddTabButton renderAddTabMenu={renderAddTabMenu} />
+					<AddTabButton
+						renderAddTabMenu={renderAddTabMenu}
+						onAddTab={onAddTab}
+					/>
 				</div>
 			)}
 			{renderTabBarTrailing && (

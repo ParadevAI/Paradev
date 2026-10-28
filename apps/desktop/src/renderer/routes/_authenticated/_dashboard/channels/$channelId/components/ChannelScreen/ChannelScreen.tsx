@@ -2,7 +2,14 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -39,6 +46,13 @@ interface ChannelScreenProps {
 	message?: string;
 	/** Opens the details dialog on this tab, then clears itself from the URL. */
 	details?: ChannelDetailsTab;
+	/** Replaces the channel header, for a DM drawn as its Dev's page. */
+	renderHeader?: (panel: { isOpen: boolean; toggle: () => void }) => ReactNode;
+	/** Replaces the channel intro at the top of the timeline. */
+	intro?: ReactNode;
+	/** Replaces the tabbed panel with one view, and turns off threads. */
+	renderPanel?: (panel: { hide: () => void }) => ReactNode;
+	composerPlaceholder?: string;
 }
 
 export function ChannelScreen({
@@ -46,6 +60,10 @@ export function ChannelScreen({
 	thread,
 	message: messageParam,
 	details: detailsParam,
+	renderHeader,
+	intro,
+	renderPanel,
+	composerPlaceholder,
 }: ChannelScreenProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -327,22 +345,26 @@ export function ChannelScreen({
 				ref={mainRef}
 				className="flex min-w-0 flex-1 flex-col overflow-hidden"
 			>
-				<ChannelHeader
-					channel={channel}
-					isPanelOpen={panel.isOpen}
-					onTogglePanel={panel.toggle}
-					tab={tab}
-					onTabChange={setTab}
-					onOpenDetails={setDetails}
-					onArchive={() => setArchiving(true)}
-					onLeave={requestLeave}
-					onToggleMute={() =>
-						setMuted.mutate({
-							channelId,
-							muted: !channel.membership?.muted,
-						})
-					}
-				/>
+				{renderHeader ? (
+					renderHeader({ isOpen: panel.isOpen, toggle: panel.toggle })
+				) : (
+					<ChannelHeader
+						channel={channel}
+						isPanelOpen={panel.isOpen}
+						onTogglePanel={panel.toggle}
+						tab={tab}
+						onTabChange={setTab}
+						onOpenDetails={setDetails}
+						onArchive={() => setArchiving(true)}
+						onLeave={requestLeave}
+						onToggleMute={() =>
+							setMuted.mutate({
+								channelId,
+								muted: !channel.membership?.muted,
+							})
+						}
+					/>
+				)}
 				{tab === "messages" ? (
 					<>
 						<ChannelTimeline
@@ -371,7 +393,8 @@ export function ChannelScreen({
 							canModerate={channel.canManage}
 							canReact={canPost}
 							now={now}
-							onOpenThread={openThread}
+							onOpenThread={renderPanel ? undefined : openThread}
+							intro={intro}
 							focusMessageId={focusMessageId}
 							onFocusedMessage={clearFocusMessage}
 						/>
@@ -382,7 +405,10 @@ export function ChannelScreen({
 									threadRootId={null}
 									people={people}
 									currentUserId={currentUserId}
-									placeholder={t({ message: `Message #${channel.name}` })}
+									placeholder={
+										composerPlaceholder ??
+										t({ message: `Message #${channel.name}` })
+									}
 									autoFocus
 								/>
 							</div>
@@ -408,20 +434,24 @@ export function ChannelScreen({
 				onWidthChange={setPanelWidth}
 				onCollapse={panel.hide}
 			>
-				<ChannelPanel
-					channelId={channelId}
-					isFullScreen={panel.mode === "expanded"}
-					onToggleFullScreen={panel.toggleFullScreen}
-					onHide={panel.hide}
-					onOpenThread={openThread}
-					onOpenTask={openTask}
-					peopleById={peopleById}
-					people={people}
-					currentUserId={currentUserId}
-					canModerate={channel.canManage}
-					canPost={canPost}
-					now={now}
-				/>
+				{renderPanel ? (
+					renderPanel({ hide: panel.hide })
+				) : (
+					<ChannelPanel
+						channelId={channelId}
+						isFullScreen={panel.mode === "expanded"}
+						onToggleFullScreen={panel.toggleFullScreen}
+						onHide={panel.hide}
+						onOpenThread={openThread}
+						onOpenTask={openTask}
+						peopleById={peopleById}
+						people={people}
+						currentUserId={currentUserId}
+						canModerate={channel.canManage}
+						canPost={canPost}
+						now={now}
+					/>
+				)}
 			</ChannelPanelFrame>
 			<ChannelDetailsDialog
 				open={details !== null}

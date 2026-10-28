@@ -3,7 +3,7 @@ import type { ChangesOpenTarget } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
 import type { DiffPaneData, PaneViewerData } from "../../types";
 
-const NEW_DIFF_PANE = {
+export const NEW_DIFF_PANE = {
 	kind: "diff",
 	data: { path: "", collapsedFiles: [] } as DiffPaneData,
 } as const;

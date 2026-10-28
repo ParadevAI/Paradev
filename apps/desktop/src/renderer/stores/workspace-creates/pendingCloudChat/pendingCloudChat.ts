@@ -31,6 +31,7 @@ export function seedPendingCloudChat({
 	collections,
 	workspaceId,
 	launch,
+	prompt,
 	chatEnabled,
 	modelId,
 	modeId,
@@ -38,6 +39,7 @@ export function seedPendingCloudChat({
 	collections: AppCollections;
 	workspaceId: string;
 	launch: CloudAgentLaunchDescriptor | null | undefined;
+	prompt?: string;
 	chatEnabled: boolean;
 	modelId?: string | null;
 	modeId?: string | null;
@@ -67,6 +69,7 @@ export function seedPendingCloudChat({
 					draftId: crypto.randomUUID(),
 					agentId: launch.agent,
 					promptHash: launch.promptHash,
+					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
 				} satisfies PendingCloudChatPaneData,
@@ -134,6 +137,7 @@ export function attachCloudChatSession(
 				: {}),
 		},
 		...carriedOver(data),
+		...(data.launchPrompt ? { launchPrompt: data.launchPrompt } : {}),
 		...(session.title ? { chatTitle: session.title } : {}),
 	}));
 }

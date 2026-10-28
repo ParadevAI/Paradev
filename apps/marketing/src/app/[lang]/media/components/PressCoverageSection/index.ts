@@ -1,0 +1,1 @@
+export { PressCoverageSection } from "./PressCoverageSection";

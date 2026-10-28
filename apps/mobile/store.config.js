@@ -17,7 +17,7 @@ const reviewVideoUrl = process.env.APP_REVIEW_VIDEO_URL ?? "";
 // guidelines a reviewer is most likely to check, each under a short heading.
 const reviewNotes = [
 	"WHAT THE APP IS",
-	"Paradev Mobile is the companion app for Paradev (formerly Superset, https://superset.sh), a desktop tool where developers run AI coding agents on their own computers or in Paradev cloud workspaces. The phone app is a remote client for those sessions, in the same class as an SSH or remote desktop client: it shows agent progress, lets the user chat with an agent, review file diffs, and type into a terminal session that is running on the user's own machine. The app does not download, install, or execute any user or project code on the device: it renders data streamed from the user's host and sends keystrokes back to the remote session.",
+	"Paradev Mobile is the companion app for Paradev (formerly Superset, https://paradev.com), a desktop tool where developers run AI coding agents on their own computers or in Paradev cloud workspaces. The phone app is a remote client for those sessions, in the same class as an SSH or remote desktop client: it shows agent progress, lets the user chat with an agent, review file diffs, and type into a terminal session that is running on the user's own machine. The app does not download, install, or execute any user or project code on the device: it renders data streamed from the user's host and sends keystrokes back to the remote session.",
 	"",
 	"HOW TO REVIEW",
 	"1. On the sign-in screen tap 'Sign in with email' and use the demo account below (no two-factor prompt; the account belongs to an organization that already has a workspace with sample agent sessions, so nothing needs to be installed to see the full app).",
@@ -67,9 +67,9 @@ module.exports = {
 					"llm",
 					"assistant",
 				],
-				marketingUrl: "https://superset.sh",
-				supportUrl: "https://superset.sh",
-				privacyPolicyUrl: "https://superset.sh/privacy",
+				marketingUrl: "https://paradev.com",
+				supportUrl: "https://paradev.com",
+				privacyPolicyUrl: "https://paradev.com/privacy",
 			},
 		},
 		review: {

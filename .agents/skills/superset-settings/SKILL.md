@@ -1,9 +1,9 @@
 ---
 name: superset-settings
-description: Read and update the Superset desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI, including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
+description: Read and update the Paradev desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI, including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
 ---
 
-# Superset settings via CLI
+# Paradev settings via CLI
 
 Change the desktop app's user settings from the command line with
 `superset settings`. Works offline, no login required; everything is local
@@ -29,7 +29,7 @@ superset settings theme remove <id>                 # delete a custom theme
 
 Prefer `--json` (auto-on in agent environments; parse it rather than
 matching the human sentences) and `superset settings list` to discover keys
-and allowed values instead of guessing. In Superset terminals `superset` is
+and allowed values instead of guessing. In Paradev terminals `superset` is
 already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
 (`~/.superset` by default); useful for testing against a sandbox copy.
 
@@ -119,7 +119,7 @@ no app acknowledged (app not running, or an older app version):
 - **Theme** (`settings theme set`): applies live when the nudge lands. If
   the output shows the restart fallback instead: quit the app cleanly first,
   then set, then relaunch; a running older app overwrites the file on its
-  own writes. If you are an agent running inside a Superset terminal, never
+  own writes. If you are an agent running inside a Paradev terminal, never
   kill the app yourself (that kills your own session); ask the user to
   restart instead.
 - Both stores are created by the desktop app. On a machine that never ran

@@ -195,7 +195,7 @@ key.
 **A ChatGPT sign-in is a file and a session, not a key.** Codex on a ChatGPT
 plan reads `~/.codex/auth.json`, and its refresh token works once: two holders
 of one session sign each other out ("refresh token was already used"). The API
-runs Codex's device-code sign-in itself, so the session is Superset's own and
+runs Codex's device-code sign-in itself, so the session is Paradev's own and
 never the one on the person's laptop, and renews it under a row lock before
 the access token lapses. The box gets an `auth.json` of placeholders (an
 unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
@@ -277,7 +277,15 @@ fails its first content read with a gh auth error. **What we did:** the review
 run wrote a temporary `~/.config/gh/hosts.yml` from the token and deleted it
 afterwards. The durable fix is for `getToolEnvironment()` to carry `GH_TOKEN`
 (and `GITHUB_TOKEN`) through from the host-service process when the shell did
-not provide one.
+not provide one. Since 2026-10-23 the PR pane, the workspace PR badge, the diff
+pane's review threads, the Review tab and mobile no longer use a host's GitHub
+access at all. Writes always act as the person looking: the desktop with the
+GitHub login on that person's own machine (the `viewerGithub` router in the
+main process), otherwise and on mobile through the API's
+`integration.github.*PullRequest*` procedures with their Superset connection
+(`githubUserTokenFor`). Reads take the same path, except that a person with
+neither may still read through the organization's GitHub App installation;
+anything the App cannot see asks them to connect GitHub.
 
 ## Runtime environment
 
@@ -695,6 +703,16 @@ section — and up to 15 ports may be exposed; exactly one is.
 Alpine) and only the pinned version ships prebuilds at all; better-sqlite3 must
 match what host-service was built against or it crashes on load. The image
 asserts the prebuild exists rather than letting something compile silently.
+
+**The desktop's native modules compile for Electron, and bookworm's compilers
+cannot.** No better-sqlite3 prebuild exists for Electron 44 on linux-x64, so
+`install:deps` (run by the root postinstall) builds it from source. Electron
+44's V8 headers fail on gcc 12 and on clang 14 (`std::source_location`), so
+`bun install` exited 1 and `bun run dev` in `apps/desktop` died on "Could not
+locate the bindings file". Postinstall uses `clang-16` when `CC` is unset. The
+image does not carry it, since only this repo needs it: the internal
+environment's setup hook (`satya-setup.sh`) installs it, and any other
+environment that builds the desktop has to install it too.
 
 **Local dev cannot exercise a sandbox, and the failure mode if you force it is
 silent.** `setup.local.sh` copies `.env.local.example` to `.env`, which sets

@@ -9,6 +9,7 @@ import { AboutSection } from "./components/AboutSection";
 import { BrandAssetsSection } from "./components/BrandAssetsSection";
 import { LatestNewsSection } from "./components/LatestNewsSection";
 import { PressContactSection } from "./components/PressContactSection";
+import { PressCoverageSection } from "./components/PressCoverageSection";
 
 const productName = BRAND.NAME;
 const formerName = BRAND.FORMER_NAME;
@@ -65,6 +66,7 @@ export default async function MediaPage() {
 			<div className="mt-14 space-y-16 sm:mt-20 sm:space-y-20">
 				<AboutSection />
 				<LatestNewsSection lang={lang} />
+				<PressCoverageSection lang={lang} />
 				<BrandAssetsSection />
 				<PressContactSection />
 			</div>

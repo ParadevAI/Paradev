@@ -40,6 +40,8 @@ import {
 	cachedSnapshot,
 	cacheSnapshot,
 	forgetSnapshot,
+	primeSnapshot,
+	takePrimedSnapshot,
 } from "./utils/snapshotCache";
 
 export type FrameScheduler = (flush: () => void) => () => void;
@@ -91,6 +93,23 @@ async function fetchSeed(
 		envelopes: page.envelopes,
 		nextBefore: page.nextBefore,
 	};
+}
+
+export async function prefetchChatSession(
+	client: SessionClient,
+	pageSize?: number,
+): Promise<boolean> {
+	const seed = await fetchSeed(client, pageSize).catch(() => null);
+	if (!seed) return false;
+	if (seed.kind === "outline") {
+		primeSnapshot(client.sessionId, seed.snapshot);
+	} else {
+		cacheSnapshot(
+			client.sessionId,
+			reduceMany(emptySnapshot(), seed.envelopes),
+		);
+	}
+	return true;
 }
 
 type InitialLoad = [
@@ -167,7 +186,11 @@ export type ChatSession = {
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 };
 
 function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
@@ -402,6 +425,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		setStatus("loading");
 		setUnreachable(false);
 		setConnection("connecting");
+		const primed = takePrimedSnapshot(client.sessionId);
 		const cached = cachedSnapshot(client.sessionId);
 		setSnapshot(cached ?? emptySnapshot());
 		setHasOlder(false);
@@ -464,9 +488,12 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 			}
 			loaded = seed !== null;
 			setStatus("ready");
+			subscribe(seeded?.cursor ?? session.cursor);
+		};
+		const subscribe = (since: Cursor | null) => {
 			stream = client.subscribe({
 				deltas,
-				since: seeded?.cursor ?? session.cursor,
+				since,
 				onEnvelope: (envelope) => {
 					if (!isResetEnvelope(envelope)) enqueue(envelope);
 				},
@@ -480,7 +507,14 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 				},
 			});
 		};
-		void seed(0);
+		if (primed) {
+			const seeded = applySeed({ kind: "outline", snapshot: primed }, false);
+			loaded = true;
+			setStatus("ready");
+			subscribe(seeded?.cursor ?? null);
+		} else {
+			void seed(0);
+		}
 
 		return () => {
 			if (loaded && !snapshotRef.current.pendingReset) {
@@ -575,8 +609,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	);
 
 	const setConfigOption = useCallback(
-		(configId: string, value: string) =>
-			client.setConfigOption(configId, value),
+		(configId: string, value: string, options?: { confirm?: boolean }) =>
+			client.setConfigOption(configId, value, options),
 		[client],
 	);
 

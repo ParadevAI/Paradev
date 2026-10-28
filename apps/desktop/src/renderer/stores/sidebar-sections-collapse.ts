@@ -4,6 +4,7 @@ import { devtools, persist } from "zustand/middleware";
 export type SidebarSectionKey =
 	| "channels"
 	| "cloud"
+	| "devs"
 	| "pinned"
 	| "sessions"
 	| "workspaces";
@@ -24,6 +25,7 @@ export const useSidebarSectionsCollapseStore =
 					collapsed: {
 						channels: false,
 						cloud: false,
+						devs: false,
 						pinned: false,
 						sessions: false,
 						workspaces: false,
@@ -48,6 +50,7 @@ export const useSidebarSectionsCollapseStore =
 								collapsed: {
 									channels: false,
 									cloud: false,
+									devs: false,
 									pinned: false,
 									sessions: false,
 									workspaces: state.isCollapsed ?? false,

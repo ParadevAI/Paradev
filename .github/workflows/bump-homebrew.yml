@@ -87,7 +87,7 @@ jobs:
           import os
           template = '''class Superset < Formula
             desc "CLI and host-service for Paradev"
-            homepage "https://superset.sh"
+            homepage "https://paradev.com"
             version "{version}"
             license "MIT"
 

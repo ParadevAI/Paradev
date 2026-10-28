@@ -55,7 +55,7 @@ See Anthropic's [Claude Code docs](https://code.claude.com/docs/en/agents) for t
 
 [Paradev](/) is a desktop workspace that creates a worktree, branch, and terminal for every new local branch-based workspace, and runs Claude Code in it. You can run as many sessions as you like on the same repository, next to Codex or other agents, and:
 
-- **Configured setup runs automatically.** If you add a `setup` command to `.superset/config.json`, Paradev runs it for each new worktree. Configure it to install dependencies and copy `.env` files. See [Project Lifecycle Scripts](https://docs.superset.sh/setup-teardown-scripts).
+- **Configured setup runs automatically.** If you add a `setup` command to `.superset/config.json`, Paradev runs it for each new worktree. Configure it to install dependencies and copy `.env` files. See [Project Lifecycle Scripts](https://docs.paradev.com/setup-teardown-scripts).
 - **Review is built in.** Each workspace's Changes pane shows the diff, and you can commit, push, and open a pull request from it.
 - **Sessions survive restarts.** Terminals run in a background daemon, so closing or updating the app does not stop Claude Code.
 - **You can check on it from your phone** with the [iPhone and iPad app](/mobile).
@@ -86,4 +86,4 @@ Ignored files are not copied into new worktrees. Add a setup command that copies
 
 ### Can I run Claude Code and Codex in worktrees at the same time?
 
-Yes. Give each its own worktree. See [Race Agents on One Task](https://docs.superset.sh/recipes/race-agents) and [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).
+Yes. Give each its own worktree. See [Race Agents on One Task](https://docs.paradev.com/recipes/race-agents) and [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).

@@ -60,7 +60,7 @@ test("a service link is a pill, the first other link its page title, the rest pl
 		{ title: "Content · Agent Client Protocol", iconDataUrl: null },
 	);
 	const title = view.getByText("Content · Agent Client Protocol");
-	expect(title.closest("a")?.title).toBe(DOCS);
+	expect(title.closest("a")?.href).toBe(DOCS);
 	expect(asked).toEqual([{ url: DOCS }]);
 	expect(view.getByText("PR #8329").closest("a")?.href).toBe(PR);
 	expect(view.getByText(LATER).className).toContain("text-link");

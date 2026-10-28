@@ -35,9 +35,9 @@ export interface NotifyRecipient {
 }
 
 export interface NotifyMessage {
-	authorUserId: string | null;
+	authorId: string | null;
 	body: string;
-	mentionedUserIds: readonly string[];
+	mentionedIds: readonly string[];
 	broadcast: ChannelBroadcast | null;
 	isReply: boolean;
 }
@@ -142,12 +142,12 @@ export function notifyReason(
 	message: NotifyMessage,
 	now: Date,
 ): ChannelNotifyReason | null {
-	if (message.authorUserId === recipient.userId) return null;
+	if (message.authorId === recipient.userId) return null;
 	const level = recipient.notify ?? prefs.notify;
 	if (level === "none") return null;
 
 	const direct =
-		message.mentionedUserIds.includes(recipient.userId) ||
+		message.mentionedIds.includes(recipient.userId) ||
 		matchesKeyword(message.body, prefs.keywords);
 	const broadcast =
 		message.broadcast !== null &&

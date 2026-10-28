@@ -94,7 +94,7 @@ Choose Paradev when you want to keep using your CLI agents and give their work a
 - **Preview the result:** open your development server in a browser pane.
 - **Return to the task:** switch workspaces and come back to the terminal and diff.
 
-[Download Paradev](/download), then follow the [workspace walkthrough](/blog/parallel-coding-agents-guide). Paradev's [terminal guide](https://docs.superset.sh/terminal-integration) explains app-restart persistence; the host still needs to remain running.
+[Download Paradev](/download), then follow the [workspace walkthrough](/blog/parallel-coding-agents-guide). Paradev's [terminal guide](https://docs.paradev.com/terminal-integration) explains app-restart persistence; the host still needs to remain running.
 
 ## Frequently Asked Questions
 
@@ -108,7 +108,7 @@ Yes. Orca (MIT), Emdash (Apache-2.0), Claude Squad (AGPL), and cmux (GPL) are al
 
 ### Do these alternatives keep agents running like Herdr does?
 
-Paradev's terminals are held by a background daemon, so agents keep running when you close the window, quit the app with ⌘Q, or install an update, and reattach with scrollback when you reopen it. To keep a machine reachable from your phone while the app is quit, run the host service from the standalone CLI; see [Keep Agents Running](https://docs.superset.sh/keep-agents-running). Emdash persists terminal state and supports tmux. Claude Squad and Herdr both lean on tmux-style detach. Orca persists scrollback across restarts.
+Paradev's terminals are held by a background daemon, so agents keep running when you close the window, quit the app with ⌘Q, or install an update, and reattach with scrollback when you reopen it. To keep a machine reachable from your phone while the app is quit, run the host service from the standalone CLI; see [Keep Agents Running](https://docs.paradev.com/keep-agents-running). Emdash persists terminal state and supports tmux. Claude Squad and Herdr both lean on tmux-style detach. Orca persists scrollback across restarts.
 
 ### Can I review code beside my agent in Paradev?
 

@@ -14,3 +14,7 @@ process.env.NEXT_PUBLIC_API_URL ??= "https://api.superset.test";
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.DATABASE_URL_UNPOOLED ??= process.env.DATABASE_URL;
 process.env.SANDBOX_GATE_SECRET ??= "test-sandbox-gate-secret-placeholder-0000";
+process.env.AGENT_WORKER_SECRET ??=
+	"test-agent-worker-secret-placeholder-00000";
+process.env.AGENT_TURN_SIGNING_SECRET ??=
+	"test-agent-turn-signing-secret-placeholder-0";

@@ -59,7 +59,7 @@ Git worktrees separate working files; they do not sandbox processes or guarantee
 
 Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
-Paradev desktop supports macOS and experimental Linux; Windows is not available. Its iPhone and iPad app requires iOS 26 or iPadOS 26 or later, Pro, and either a reachable host or a cloud workspace. See [platform and plan requirements](/pricing) and [remote access setup](https://docs.superset.sh/remote-access).
+Paradev desktop supports macOS and experimental Linux; Windows is not available. Its iPhone and iPad app requires iOS 26 or iPadOS 26 or later, Pro, and either a reachable host or a cloud workspace. See [platform and plan requirements](/pricing) and [remote access setup](https://docs.paradev.com/remote-access).
 
 ## What Is bb?
 
@@ -73,7 +73,7 @@ Paradev combines task workspaces, persistent terminals, diff review, a browser, 
 
 ### Threads vs Workspaces
 
-bb organizes work around threads and environments; Paradev organizes it around workspaces. A new local branch-based Paradev workspace gets its own Git worktree, while cloud workspaces use clones and projectless sessions use scratch directories. See [Paradev workspace types](https://docs.superset.sh/workspaces). In either product, verify the directory and branch before parallel writes instead of assuming every session has identical isolation.
+bb organizes work around threads and environments; Paradev organizes it around workspaces. A new local branch-based Paradev workspace gets its own Git worktree, while cloud workspaces use clones and projectless sessions use scratch directories. See [Paradev workspace types](https://docs.paradev.com/workspaces). In either product, verify the directory and branch before parallel writes instead of assuming every session has identical isolation.
 
 ### Agents as Operators
 
@@ -127,4 +127,4 @@ Both are agent-agnostic. Paradev runs Claude Code, Codex, OpenCode, Cursor, Copi
 
 ### Can either run agents on another machine?
 
-Yes. Paradev supports connected hosts; see [remote access setup](https://docs.superset.sh/remote-access) for plan and online-host requirements. bb’s [repository](https://github.com/get-bb/bb) documents remote access options. Compare where execution happens and how the client connects before choosing.
+Yes. Paradev supports connected hosts; see [remote access setup](https://docs.paradev.com/remote-access) for plan and online-host requirements. bb’s [repository](https://github.com/get-bb/bb) documents remote access options. Compare where execution happens and how the client connects before choosing.

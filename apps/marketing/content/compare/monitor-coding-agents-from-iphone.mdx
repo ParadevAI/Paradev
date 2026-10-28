@@ -68,7 +68,7 @@ On the computer, run `tmux new -s claude` and start `claude` inside it. From the
 
 Yes. The vendor apps don't share one: Claude Code lives in the Claude app and Codex lives in the ChatGPT app. To see both in one list, use a third-party app or a workspace tool with a mobile client.
 
-[Paradev for iPhone](/mobile) is one of these. Paradev runs each task in its own [workspace](https://docs.superset.sh/workspaces), a git worktree on its own branch, and you launch any supported CLI agent there: Claude Code, Codex, Amp, Gemini CLI, OpenCode, Cursor Agent, and [others](https://docs.superset.sh/agent-integration). The phone shows the same workspaces, whichever agent runs in them.
+[Paradev for iPhone](/mobile) is one of these. Paradev runs each task in its own [workspace](https://docs.paradev.com/workspaces), a git worktree on its own branch, and you launch any supported CLI agent there: Claude Code, Codex, Amp, Gemini CLI, OpenCode, Cursor Agent, and [others](https://docs.paradev.com/agent-integration). The phone shows the same workspaces, whichever agent runs in them.
 
 From the iPhone you can:
 
@@ -85,7 +85,7 @@ Other apps also cover both agents. [Happy](https://happy.engineering) describes 
 
 Which products fit depends on where the tasks run.
 
-**Tasks on your own machines.** Claude Code Remote Control server mode and Codex's connected-computer mode each handle several sessions of their own agent. Paradev handles several agents on several hosts. Each computer that should appear on your phone turns on **Settings → Remote Access → Allow remote access to this device via relay** in the desktop app. A headless box runs `superset start --daemon` from the [CLI](https://docs.superset.sh/remote-access). Your phone then lists every host you have access to, so you can check a laptop, a Mac mini, and a build server from one app.
+**Tasks on your own machines.** Claude Code Remote Control server mode and Codex's connected-computer mode each handle several sessions of their own agent. Paradev handles several agents on several hosts. Each computer that should appear on your phone turns on **Settings → Remote Access → Allow remote access to this device via relay** in the desktop app. A headless box runs `superset start --daemon` from the [CLI](https://docs.paradev.com/remote-access). Your phone then lists every host you have access to, so you can check a laptop, a Mac mini, and a build server from one app.
 
 **Tasks in a vendor's cloud.** Claude Code on the web, Codex Cloud, and the GitHub Copilot coding agent run tasks on hosted infrastructure and report back as branches or pull requests. They keep going when your laptop is closed. GitHub's agents panel tracks Copilot sessions on github.com, and you can review the pull request it opens in GitHub Mobile.
 
@@ -97,7 +97,7 @@ For Claude Code, the built-in answer is Remote Control push notifications. Run `
 
 For other agents, the common pattern is a hook that posts to a push service. Most CLI agents can run a command on stop or on a permission request. Point that command at ntfy, Pushover, or a Telegram bot to get a buzz on any phone. OpenAI's Codex mobile page says you can see when your input is needed, but does not describe push notifications.
 
-Paradev detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Paradev [notifies you](https://docs.superset.sh/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. If you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
+Paradev detects these states through lifecycle hooks it installs in each agent's config. Claude Code reports both finished and waiting. Some agents only report finished. On desktop, Paradev [notifies you](https://docs.paradev.com/agent-status) with a sound and a macOS dock badge. On the iPhone, a Live Activity on the Lock Screen lists your agents with **Needs you**, **Working**, or **Review**, while the app is open. It shows up to four agents at once, with attention states first. It does not update in the background yet: after you leave the app it keeps the last status and dims when that status is out of date. If you need your phone to buzz for every prompt, add Remote Control push or a hook script alongside it.
 
 ## How can I send follow-up instructions to a coding agent from my phone while it works on my computer?
 

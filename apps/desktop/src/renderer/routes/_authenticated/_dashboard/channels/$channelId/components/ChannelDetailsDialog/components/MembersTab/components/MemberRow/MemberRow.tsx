@@ -10,7 +10,10 @@ import {
 import { LuCheck, LuChevronDown, LuTrash2 } from "react-icons/lu";
 import { PersonRow } from "../PersonRow";
 
-type ChannelMember = RouterOutputs["channel"]["members"][number];
+type ChannelMember = Extract<
+	RouterOutputs["channel"]["members"][number],
+	{ kind: "person" }
+>;
 type ChannelRole = ChannelMember["role"];
 
 interface MemberRowProps {
@@ -45,7 +48,7 @@ export function MemberRow({
 
 	return (
 		<PersonRow
-			userId={member.userId}
+			userId={member.actorId}
 			name={member.name}
 			email={member.email}
 			image={member.image}

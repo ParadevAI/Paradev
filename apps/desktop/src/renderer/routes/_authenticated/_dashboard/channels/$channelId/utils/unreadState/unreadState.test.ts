@@ -7,7 +7,7 @@ import { unreadState } from "./unreadState";
 
 function message(
 	seq: number,
-	authorUserId: string,
+	authorId: string,
 	deleted = false,
 ): ChannelMessage {
 	return {
@@ -15,9 +15,9 @@ function message(
 		channelId: "c",
 		seq,
 		threadRootId: null,
-		authorUserId,
+		authorId,
 		body: "hi",
-		mentionedUserIds: [],
+		mentionedIds: [],
 		broadcast: null,
 		clientId: null,
 		replyCount: 0,

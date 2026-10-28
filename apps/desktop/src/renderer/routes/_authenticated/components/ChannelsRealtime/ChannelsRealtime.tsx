@@ -72,7 +72,7 @@ export function ChannelsRealtime() {
 						...target,
 						body: event.data.text,
 						clientId: crypto.randomUUID(),
-						mentionedUserIds: [],
+						mentionedIds: [],
 						fileIds: [],
 					})
 					.then(

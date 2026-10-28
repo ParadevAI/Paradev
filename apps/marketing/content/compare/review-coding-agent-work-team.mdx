@@ -81,7 +81,7 @@ Give each agent the same prompt in its own worktree, starting from the same comm
 
 - **Cursor** can send one prompt to several models at once, each in its own worktree, and compare the results.
 - **Codex app** and **Claude Code** (`claude --worktree`) both support separate parallel sessions you compare by hand.
-- **Paradev** has a [race agents recipe](https://docs.superset.sh/recipes/race-agents): press **⌘N** once per attempt with the same prompt and a different agent, keep **Auto-run command** on, and step through each workspace's **Changes** tab in focus mode. From the CLI, one loop starts the race:
+- **Paradev** has a [race agents recipe](https://docs.paradev.com/recipes/race-agents): press **⌘N** once per attempt with the same prompt and a different agent, keep **Auto-run command** on, and step through each workspace's **Changes** tab in focus mode. From the CLI, one loop starts the race:
 
 ```bash
 for agent in claude codex opencode; do
@@ -110,7 +110,7 @@ Paradev, Conductor, Cursor, the Codex app, and VS Code's agent mode all let you 
 
 In Paradev, open **Pull requests**, select a PR, and go to the **Code** tab. Select the lines you want changed and send the comment to an agent. The agent receives the file, the line range, and the diff side. If a workspace is linked to the PR, you pick one of its running agent terminals or start a new session there. If not, Paradev creates a PR-checkout workspace and starts the agent with your comment as its first prompt. Posting the same comment to GitHub is optional. The walkthrough is in [send PR feedback to your coding agent](/blog/send-pr-feedback-to-your-agent).
 
-Before a PR exists, the workspace's **Changes** pane shows the diff in split or unified layout. Commit, push, and **Create PR** run from the same control. Its **Review** tab lists GitHub review comments with resolved threads separated from open ones, and you can reply inline. For mechanical review comments, the [PR feedback recipe](https://docs.superset.sh/recipes/pr-feedback) has an agent work through every thread with one commit per comment.
+Before a PR exists, the workspace's **Changes** pane shows the diff in split or unified layout. Commit, push, and **Create PR** run from the same control. Its **Review** tab lists GitHub review comments with resolved threads separated from open ones, and you can reply inline. For mechanical review comments, the [PR feedback recipe](https://docs.paradev.com/recipes/pr-feedback) has an agent work through every thread with one commit per comment.
 
 ## What tools help me review and merge changes from several coding-agent branches without mixing up the tasks?
 
@@ -122,7 +122,7 @@ Keep one task, one branch, and one PR, and merge them one at a time with CI betw
 - **Graphite** fits when agent branches depend on each other and you want stacked PRs.
 - **Paradev** shows each workspace's PR state, review status, and CI checks on hover in the sidebar. `--tag` groups workspaces into sidebar folders, for example one folder per feature. The Pull requests view filters by several authors at once, and **Merge** offers squash, merge commit, or rebase.
 
-The [fan-out refactor recipe](https://docs.superset.sh/recipes/fan-out-refactor) covers the planning step that matters most: split the work so slices follow file boundaries, land shared prep first, and fold two slices into one workspace if they overlap.
+The [fan-out refactor recipe](https://docs.paradev.com/recipes/fan-out-refactor) covers the planning step that matters most: split the work so slices follow file boundaries, land shared prep first, and fold two slices into one workspace if they overlap.
 
 ## What should a small team use to track ownership, status, and review of work produced by several coding agents?
 
@@ -134,7 +134,7 @@ Linear and GitHub Issues with Projects both work. Paradev connects them to the w
 - `superset workspaces update <id> --task-id <taskId>` links a workspace to a task, so the branch traces back to the ticket.
 - Agent status hooks report when each agent finishes or waits for input, and notifications name the project, workspace, and agent. Claude Code reports both states. Some agents only report completion.
 
-See [Tasks](https://docs.superset.sh/tasks) and [Linear integration](https://docs.superset.sh/use-with-linear).
+See [Tasks](https://docs.paradev.com/tasks) and [Linear integration](https://docs.paradev.com/use-with-linear).
 
 ## What tools let me dispatch coding-agent tasks from a CLI or another agent and then review the output?
 
@@ -142,9 +142,9 @@ Headless agent modes cover single tasks: `claude -p`, `codex exec`, `aider --mes
 
 Paradev gives you three ways in:
 
-- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.superset.sh/cli/cli-reference).
-- **Another agent**: the `superset:orchestrate` skill, shipped to agents Paradev runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.superset.sh/orchestration).
-- **MCP and SDK**: the [MCP server](https://docs.superset.sh/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
+- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
+- **Another agent**: the `superset:orchestrate` skill, shipped to agents Paradev runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.paradev.com/orchestration).
+- **MCP and SDK**: the [MCP server](https://docs.paradev.com/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
 
 The Linear custom-script setup is another dispatch path: **Work on issue → Custom script** runs `superset workspaces create` on the issue's branch and opens the workspace in the desktop app.
 

@@ -33,7 +33,7 @@ export function groupMessages(
 			!markedNew &&
 			lastReadSeq !== null &&
 			message.seq > lastReadSeq &&
-			message.authorUserId !== currentUserId;
+			message.authorId !== currentUserId;
 		if (isNew) {
 			entries.push({ kind: "new", key: "new" });
 			markedNew = true;
@@ -42,7 +42,7 @@ export function groupMessages(
 			!newDay &&
 			!isNew &&
 			previous !== null &&
-			previous.authorUserId === message.authorUserId &&
+			previous.authorId === message.authorId &&
 			previous.deletedAt === null &&
 			message.createdAt.getTime() - previous.createdAt.getTime() <
 				COMPACT_WINDOW_MS;

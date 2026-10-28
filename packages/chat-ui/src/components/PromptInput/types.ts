@@ -84,6 +84,8 @@ export type PromptInputCommand = {
 	rightIcon?: ReactNode;
 	group?: string;
 	searchAliases?: string[];
+	// Tab inserts this chip in place of the typed command instead of selecting.
+	completion?: ComposerChip;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -126,6 +128,7 @@ export type PromptInputDictation = {
 
 export type PromptInputHandle = {
 	appendText(text: string): void;
+	isEmpty(): boolean;
 	addFiles(files: File[]): void;
 	insertChip(chip: ComposerChip): void;
 	openFileDialog(): void;
@@ -178,6 +181,13 @@ export type PromptInputProps = {
 		attachments: readonly PromptInputAttachment[],
 	) => void;
 	onChipClick?: (chip: ComposerChip) => void;
+	/** A chip for pasted plain text, such as a link; null keeps the text. */
+	chipForPaste?: (text: string) => ComposerChip | null;
+	/**
+	 * Wraps a chip as the composer draws it, for example in a hover card.
+	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
+	 */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
 	history?: string[];
 	className?: string;
 };

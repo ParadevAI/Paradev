@@ -1,4 +1,7 @@
+export * from "./actors";
+export * from "./agents";
 export * from "./auth";
+export * from "./authz";
 export * from "./channels";
 export * from "./enums";
 export * from "./github";

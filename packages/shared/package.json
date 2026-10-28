@@ -13,6 +13,10 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./slack-links": {
+			"types": "./src/slack-links.ts",
+			"default": "./src/slack-links.ts"
+		},
 		"./voice": {
 			"types": "./src/voice/index.ts",
 			"default": "./src/voice/index.ts"
@@ -184,6 +188,18 @@
 		"./pull-request": {
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
+		},
+		"./pull-request-github": {
+			"types": "./src/pull-request-github/index.ts",
+			"default": "./src/pull-request-github/index.ts"
+		},
+		"./pull-request-detail": {
+			"types": "./src/pull-request-detail/index.ts",
+			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-threads": {
+			"types": "./src/pull-request-threads/index.ts",
+			"default": "./src/pull-request-threads/index.ts"
 		},
 		"./sandbox-gate": {
 			"types": "./src/sandbox-gate.ts",
@@ -392,6 +408,10 @@
 		"./channels": {
 			"types": "./src/channels.ts",
 			"default": "./src/channels.ts"
+		},
+		"./dev-avatar": {
+			"types": "./src/dev-avatar.ts",
+			"default": "./src/dev-avatar.ts"
 		},
 		"./org-presence": {
 			"types": "./src/org-presence.ts",

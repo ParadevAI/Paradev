@@ -27,6 +27,7 @@ import type {
 	SetModeInput,
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
+	Turn,
 } from "@superset/chat/protocol";
 import {
 	backgroundSubagentInputSchema,
@@ -73,6 +74,7 @@ export const createSessionCommandSchema = createSessionInputSchema
 			.object({
 				harnessSessionId: z.string().min(1),
 				quiet: z.boolean().optional(),
+				replacesSessionId: z.string().min(1).optional(),
 			})
 			.optional(),
 	});
@@ -135,6 +137,22 @@ function transcriptBefore(
 		if (index !== -1) return { events, midTurn: index > 0 };
 	}
 	return null;
+}
+
+/** Rows whose title contains `query`, case-insensitively; all rows without one. */
+export function sessionsTitled<Row extends { title: string | null }>(
+	rows: readonly Row[],
+	query: string | undefined,
+): readonly Row[] {
+	const needle = query?.trim().toLowerCase();
+	return needle
+		? rows.filter((row) => row.title?.toLowerCase().includes(needle))
+		: rows;
+}
+
+function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
+	const last = deriveTimeline(snapshot).at(-1)?.turn;
+	return last?.status === "failed" ? last : null;
 }
 
 export const listSessionsCommandSchema = listSessionsInputSchema
@@ -205,7 +223,7 @@ export type ChatCommands = {
 	backgroundSubagent(input: BackgroundSubagentInput): Promise<boolean>;
 	respondToApproval(input: RespondToApprovalInput): void;
 	setMode(input: SetModeInput): void;
-	setConfigOption(input: SetConfigOptionInput): void;
+	setConfigOption(input: SetConfigOptionInput): void | Promise<void>;
 	closeSession(input: CloseSessionInput): Promise<void>;
 	closeScope(scopeId: string): Promise<void>;
 	forkSession(
@@ -353,14 +371,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		const rows = parsed.scopeId
 			? options.sessions.listByScope(parsed.scopeId)
 			: options.sessions.list();
-		return rows.slice(0, parsed.limit).map((row) => {
-			const live = options.live.get(row.sessionId);
-			return {
-				...row,
-				live: live !== null,
-				terminalId: live?.terminalId ?? null,
-			};
-		});
+		return sessionsTitled(rows, parsed.query)
+			.slice(0, parsed.limit)
+			.map((row) => {
+				const live = options.live.get(row.sessionId);
+				return {
+					...row,
+					live: live !== null,
+					terminalId: live?.terminalId ?? null,
+				};
+			});
 	};
 
 	return {
@@ -373,6 +393,12 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
+				const replaced = parsed.resume?.replacesSessionId;
+				const replay =
+					replaced && options.sessions.get(replaced)?.scopeId === parsed.scopeId
+						? replaySession(replaced)
+						: null;
+				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -394,6 +420,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
+				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
 				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
@@ -524,10 +551,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		setConfigOption(input) {
 			const parsed: SetConfigOptionInput =
 				setConfigOptionInputSchema.parse(input);
-			options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
-				options.live
+			return options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
+				const taken = options.live
 					.require(parsed.sessionId)
 					.setConfigOption(parsed.configId, parsed.value);
+				if (!parsed.confirm) return;
+				return taken.then((accepted) => {
+					if (accepted === false) {
+						throw new Error("the agent did not take that setting");
+					}
+				});
 			});
 		},
 

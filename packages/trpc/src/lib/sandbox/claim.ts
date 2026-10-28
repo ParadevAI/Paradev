@@ -8,6 +8,7 @@ import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
 import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { BRAND } from "@superset/shared/brand";
 import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
@@ -60,7 +61,7 @@ function agentCredentialDigest(signIns: AgentSignIns): string {
 }
 
 /** Commits by a workspace nobody created, such as an automation's. */
-const SUPERSET_GIT_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
 
 /** A size the org no longer offers falls back to its default at the next start. */
 async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {

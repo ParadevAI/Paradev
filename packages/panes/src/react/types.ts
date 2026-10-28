@@ -76,6 +76,8 @@ export interface PaneDefinition<TData> {
 	titleSource?(pane: Pane<TData>): PaneTitleSource | undefined;
 	getIcon?(context: RendererContext<TData>): ReactNode;
 	renderTitle?(context: RendererContext<TData>): ReactNode;
+	/** Skip the pane's header row; its actions stay in the context menu. */
+	hideHeader?(context: RendererContext<TData>): boolean;
 	renderHeaderExtras?(context: RendererContext<TData>): ReactNode;
 	renderToolbar?(context: RendererContext<TData>): ReactNode;
 	onHeaderClick?(context: RendererContext<TData>): void;
@@ -126,6 +128,8 @@ export interface WorkspaceProps<TData> {
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
 	renderEmptyState?: () => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	/** Runs when the add-tab button is clicked. Ignored when `renderAddTabMenu` is set. */
+	onAddTab?: () => void;
 	/** Rendered at the leading (left) edge of the tab bar row, before the tabs. */
 	renderTabBarLeading?: () => ReactNode;
 	/** Rendered at the trailing (right) edge of the tab bar row. */

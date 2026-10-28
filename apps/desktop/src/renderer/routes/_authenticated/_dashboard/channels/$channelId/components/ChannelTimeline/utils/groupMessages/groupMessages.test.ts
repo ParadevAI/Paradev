@@ -8,11 +8,11 @@ import { groupMessages } from "./groupMessages";
 const at = (seq: number, author: string, iso: string): ChannelMessage => ({
 	...pendingMessage({
 		channelId: "c",
-		authorUserId: author,
+		authorId: author,
 		body: "x",
 		clientId: `k${seq}`,
 		threadRootId: null,
-		mentionedUserIds: [],
+		mentionedIds: [],
 		broadcast: null,
 	}),
 	id: `m${seq}`,

@@ -5,7 +5,7 @@ argument-hint: describe the recurring task
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Automate
+# Paradev Automate
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 

@@ -85,7 +85,11 @@ export type SessionClient = {
 	backgroundSubagent(taskId: string): Promise<BackgroundSubagentResult>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 	subscribe(options: SessionSubscribeOptions): SessionStream;
 	close(): void;
 };
@@ -197,12 +201,13 @@ export function createSessionClient(
 			});
 		},
 
-		setConfigOption: async (configId, value) => {
+		setConfigOption: async (configId, value, setOptions) => {
 			await options.transport.setConfigOption({
 				commandId: mintId(),
 				sessionId,
 				configId,
 				value,
+				...(setOptions?.confirm ? { confirm: true } : {}),
 			});
 		},
 

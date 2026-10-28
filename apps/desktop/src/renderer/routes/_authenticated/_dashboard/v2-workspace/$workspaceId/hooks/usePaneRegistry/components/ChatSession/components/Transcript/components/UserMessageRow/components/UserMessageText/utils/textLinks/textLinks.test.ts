@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { displayHost, findPreviewLink, splitTextLinks } from "./textLinks";
+import { findPreviewLink, splitTextLinks } from "./textLinks";
 
 const WEB = "https://app.superset.sh";
 const PR = "https://github.com/superset-sh/superset/pull/8329";
@@ -79,9 +79,4 @@ describe("findPreviewLink", () => {
 		const parts = splitTextLinks(`${PR} ${DOCS}`);
 		expect(findPreviewLink(parts, WEB)).toBe(parts[2] ?? null);
 	});
-});
-
-test("displayHost names the site without www or a trailing dot", () => {
-	expect(displayHost("https://WWW.Example.com./docs")).toBe("example.com");
-	expect(displayHost("https://docs.example.com/a")).toBe("docs.example.com");
 });
