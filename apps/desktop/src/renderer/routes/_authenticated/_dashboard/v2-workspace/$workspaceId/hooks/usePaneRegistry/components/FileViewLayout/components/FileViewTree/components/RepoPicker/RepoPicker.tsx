@@ -11,18 +11,17 @@ interface RepoPickerProps {
 	workspaceId: string;
 }
 
+/** Shown only for a workspace with more than one repository. */
 export function RepoPicker({ workspaceId }: RepoPickerProps) {
-	const workspaceQuery = workspaceTrpc.workspace.get.useQuery(
-		{ id: workspaceId },
-		{ staleTime: 30_000 },
+	// A host older than workspace.repositories errors here, which hides the
+	// picker the same way a single repository does.
+	const repositoriesQuery = workspaceTrpc.workspace.repositories.useQuery(
+		{ workspaceId },
+		{ retry: false, staleTime: 30_000 },
 	);
-	const projectId = workspaceQuery.data?.projectId;
-	const projectQuery = workspaceTrpc.project.get.useQuery(
-		{ projectId: projectId ?? "" },
-		{ enabled: Boolean(projectId), staleTime: 30_000 },
-	);
-	const name = projectQuery.data?.repoName || projectQuery.data?.name;
-	if (!name) return null;
+	const repositories = repositoriesQuery.data ?? [];
+	const current = repositories.find((repository) => repository.primary);
+	if (repositories.length < 2 || !current) return null;
 	return (
 		<div className="px-2 pt-2">
 			<DropdownMenu>
@@ -32,7 +31,9 @@ export function RepoPicker({ workspaceId }: RepoPickerProps) {
 						className="flex h-8 w-full min-w-0 items-center gap-2 rounded-md border border-border/60 bg-muted/30 px-2.5 text-xs text-foreground transition-colors hover:bg-accent/60"
 					>
 						<LuFolderGit2 className="size-3.5 shrink-0 text-muted-foreground" />
-						<span className="min-w-0 flex-1 truncate text-left">{name}</span>
+						<span className="min-w-0 flex-1 truncate text-left">
+							{current.name}
+						</span>
 						<LuChevronDown className="size-3 shrink-0 text-muted-foreground" />
 					</button>
 				</DropdownMenuTrigger>
@@ -40,11 +41,13 @@ export function RepoPicker({ workspaceId }: RepoPickerProps) {
 					align="start"
 					className="w-(--radix-dropdown-menu-trigger-width)"
 				>
-					<DropdownMenuItem>
-						<LuFolderGit2 className="text-muted-foreground" />
-						<span className="flex-1 truncate">{name}</span>
-						<LuCheck />
-					</DropdownMenuItem>
+					{repositories.map((repository) => (
+						<DropdownMenuItem key={repository.id}>
+							<LuFolderGit2 className="text-muted-foreground" />
+							<span className="flex-1 truncate">{repository.name}</span>
+							{repository.id === current.id && <LuCheck />}
+						</DropdownMenuItem>
+					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>
