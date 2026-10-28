@@ -4681,7 +4681,7 @@ msgid "Close your laptop"
 msgstr "ノートパソコンを閉じる"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "セットアップが成功したら Workspace Setup タブを閉じる"
+msgstr "セットアップが成功したらワークスペースセットアップのタブを閉じる"
 
 msgid "Closed"
 msgstr "クローズ済み"

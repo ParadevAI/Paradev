@@ -4681,7 +4681,7 @@ msgid "Close your laptop"
 msgstr "Закройте ноутбук"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "Закрывать вкладку Workspace Setup после успешной настройки"
+msgstr "Закрывать вкладку настройки рабочей области после успешной настройки"
 
 msgid "Closed"
 msgstr "Закрыт"

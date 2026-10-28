@@ -4681,7 +4681,7 @@ msgid "Close your laptop"
 msgstr "Dizüstünüzü kapatın"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "Kurulum başarılı olunca Workspace Setup sekmesini kapat"
+msgstr "Kurulum başarılı olunca Çalışma Alanı Kurulumu sekmesini kapat"
 
 msgid "Closed"
 msgstr "Kapalı"

@@ -4681,7 +4681,7 @@ msgid "Close your laptop"
 msgstr "Klap je laptop dicht"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "Tabblad Workspace Setup sluiten als de setup slaagt"
+msgstr "Tabblad van de werkruimte-setup sluiten als de setup slaagt"
 
 msgid "Closed"
 msgstr "Gesloten"

@@ -2,8 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { SETUP_SUCCEEDED_COMMAND } from "../../../../terminal/setup-succeeded-marker";
-import { buildSetupCommand, resolveInitialCommand } from "./setup-terminal";
+import { resolveInitialCommand, shouldCloseOnSuccess } from "./setup-terminal";
 
 const PROJECT_ID = "11111111-1111-1111-1111-111111111111";
 
@@ -173,26 +172,26 @@ describe("resolveInitialCommand", () => {
 	});
 });
 
-describe("buildSetupCommand", () => {
-	it("leaves the setup command alone by default", () => {
+describe("shouldCloseOnSuccess", () => {
+	it("closes when the setting is on and the desktop can edit panes", () => {
 		expect(
-			buildSetupCommand({ setupCommand: "bun install", closeOnSuccess: false }),
-		).toBe("bun install");
-	});
-
-	it("prints the success marker only after setup succeeds", () => {
-		expect(
-			buildSetupCommand({ setupCommand: "bun install", closeOnSuccess: true }),
-		).toBe(`bun install && ${SETUP_SUCCEEDED_COMMAND}`);
+			shouldCloseOnSuccess({ closeOnSuccess: true, hasPaneBridge: true }),
+		).toBe(true);
 	});
 
 	it("does not close the setup terminal when an agent is chained into it", () => {
 		expect(
-			buildSetupCommand({
-				setupCommand: "bun install",
-				chainCommand: "claude",
+			shouldCloseOnSuccess({
 				closeOnSuccess: true,
+				chainCommand: "claude",
+				hasPaneBridge: true,
 			}),
-		).toBe("bun install && claude");
+		).toBe(false);
+	});
+
+	it("does not close without a desktop pane bridge", () => {
+		expect(
+			shouldCloseOnSuccess({ closeOnSuccess: true, hasPaneBridge: false }),
+		).toBe(false);
 	});
 });

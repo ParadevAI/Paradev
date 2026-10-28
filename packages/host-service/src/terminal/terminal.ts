@@ -75,7 +75,10 @@ import {
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
-import { createSetupSucceededScanner } from "./setup-succeeded-marker.ts";
+import {
+	appendSetupSucceededMarker,
+	createSetupSucceededScanner,
+} from "./setup-succeeded-marker.ts";
 import {
 	getShellReadyMarkerEvidence,
 	recordShellReadyMarkerEvidence,
@@ -612,10 +615,7 @@ interface TerminalSession {
 	dsrCarry: Uint8Array;
 	initialCommandQueued: boolean;
 	/** Watches for the marker that a successful setup command prints; cleared on match. */
-	setupSucceededWatch: {
-		scan: (chunk: Uint8Array) => boolean;
-		onSucceeded: () => void;
-	} | null;
+	setupSucceededScan: ((chunk: Uint8Array) => boolean) | null;
 	/**
 	 * Basename of the launch shell. Picks the source keyword when a long
 	 * initialCommand is staged as a script (fish 4 removed `.`; sh/ksh
@@ -2529,6 +2529,11 @@ const FISH_PROMPT_STAGE_FAILED_NOTICE = new TextEncoder().encode(
 function queueInitialCommand(
 	session: TerminalSession,
 	initialCommand: string,
+	/**
+	 * Stage a multi-line command as a script. A typed newline submits the
+	 * first line at once, so an echo retype would run it twice.
+	 */
+	stageMultiline = false,
 ): void {
 	if (session.initialCommandQueued || session.exited) return;
 	session.initialCommandQueued = true;
@@ -2580,7 +2585,8 @@ function queueInitialCommand(
 		let typedText = effectiveCommand;
 		if (
 			Buffer.byteLength(effectiveCommand, "utf8") >
-			MAX_TYPED_INITIAL_COMMAND_BYTES
+				MAX_TYPED_INITIAL_COMMAND_BYTES ||
+			(stageMultiline && effectiveCommand.includes("\n"))
 		) {
 			const staged = stageInitialCommandScript(session, effectiveCommand);
 			if (staged) {
@@ -2933,8 +2939,25 @@ interface CreateTerminalSessionOptions {
 	 * above a brand-new shell.
 	 */
 	restoredNotice?: boolean;
-	/** Called once when the output carries the setup-succeeded marker. */
-	onSetupSucceeded?: () => void;
+	/**
+	 * Append the setup-succeeded marker to `initialCommand` and report it to
+	 * the handler from {@link setSetupSucceededHandler}. Stored with the
+	 * session, so an adopted session keeps watching after a host restart.
+	 */
+	closeOnSetupSuccess?: boolean;
+}
+
+type SetupSucceededHandler = (args: {
+	workspaceId: string;
+	terminalId: string;
+}) => void;
+
+let setupSucceededHandler: SetupSucceededHandler | null = null;
+
+export function setSetupSucceededHandler(
+	handler: SetupSucceededHandler | null,
+): void {
+	setupSucceededHandler = handler;
 }
 
 function resolveTerminalCwd(
@@ -3016,7 +3039,7 @@ async function createTerminalSessionUnlocked({
 	rows: requestedRows,
 	adoptOnly = false,
 	restoredNotice = false,
-	onSetupSucceeded,
+	closeOnSetupSuccess = false,
 }: CreateTerminalSessionOptions): Promise<
 	TerminalSession | CreateSessionError
 > {
@@ -3240,6 +3263,7 @@ async function createTerminalSessionUnlocked({
 			originWorkspaceId: workspaceId,
 			status: "active",
 			createdAt,
+			...(closeOnSetupSuccess && { closeOnSetupSuccess: true }),
 		})
 		.onConflictDoUpdate({
 			target: terminalSessions.id,
@@ -3248,6 +3272,7 @@ async function createTerminalSessionUnlocked({
 				status: "active",
 				createdAt,
 				endedAt: null,
+				...(closeOnSetupSuccess && { closeOnSetupSuccess: true }),
 			},
 		})
 		.run();
@@ -3255,12 +3280,15 @@ async function createTerminalSessionUnlocked({
 	// Read back rather than default to null: relaunching into the same
 	// terminal id (adoption, an agent resume) must keep the name it was given,
 	// and the conflict update above deliberately leaves the column alone.
-	const customTitle =
-		db
-			.select({ customTitle: terminalSessions.customTitle })
-			.from(terminalSessions)
-			.where(eq(terminalSessions.id, terminalId))
-			.get()?.customTitle ?? null;
+	const persisted = db
+		.select({
+			customTitle: terminalSessions.customTitle,
+			closeOnSetupSuccess: terminalSessions.closeOnSetupSuccess,
+		})
+		.from(terminalSessions)
+		.where(eq(terminalSessions.id, terminalId))
+		.get();
+	const customTitle = persisted?.customTitle ?? null;
 
 	// Determine shell readiness support. Adopted sessions are already past
 	// shell startup, so treat them as immediately ready — the OSC 133;A
@@ -3334,11 +3362,8 @@ async function createTerminalSessionUnlocked({
 		// Adopted sessions have already run their initialCommand in the prior
 		// host-service lifetime — flag it as queued so we don't double-fire it.
 		initialCommandQueued: isAdopted,
-		setupSucceededWatch: onSetupSucceeded
-			? {
-					scan: createSetupSucceededScanner(),
-					onSucceeded: onSetupSucceeded,
-				}
+		setupSucceededScan: persisted?.closeOnSetupSuccess
+			? createSetupSucceededScanner()
 			: null,
 		launchShellName: basename(shell),
 		portHintDecoder: new StringDecoder("utf8"),
@@ -3396,10 +3421,13 @@ async function createTerminalSessionUnlocked({
 				for (const title of titleUpdates.updates) {
 					setSessionTitle(session, title);
 				}
-				const setupWatch = session.setupSucceededWatch;
-				if (setupWatch?.scan(chunk)) {
-					session.setupSucceededWatch = null;
-					setupWatch.onSucceeded();
+				if (session.setupSucceededScan?.(chunk)) {
+					session.setupSucceededScan = null;
+					db.update(terminalSessions)
+						.set({ closeOnSetupSuccess: null })
+						.where(eq(terminalSessions.id, terminalId))
+						.run();
+					setupSucceededHandler?.({ workspaceId, terminalId });
 				}
 
 				let bytes: Uint8Array = chunk;
@@ -3514,7 +3542,15 @@ async function createTerminalSessionUnlocked({
 			: Promise.resolve();
 
 	if (initialCommand) {
-		queueInitialCommand(session, initialCommand);
+		if (closeOnSetupSuccess) {
+			queueInitialCommand(
+				session,
+				appendSetupSucceededMarker(initialCommand, session.launchShellName),
+				true,
+			);
+		} else {
+			queueInitialCommand(session, initialCommand);
+		}
 	}
 
 	return session;
