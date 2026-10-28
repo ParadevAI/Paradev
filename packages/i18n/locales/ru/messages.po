@@ -5062,6 +5062,9 @@ msgstr "Скопировать ID сессии агента"
 msgid "Copy all"
 msgstr "Скопировать всё"
 
+msgid "Copy as CSV"
+msgstr "Копировать как CSV"
+
 msgid "Copy as Markdown"
 msgstr "Копировать как Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools рядом со страницей"
 
+msgid "Diagram"
+msgstr "Диаграмма"
+
+msgid "Diagram could not be drawn"
+msgstr "Не удалось построить диаграмму"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Не удалось построить диаграмму: {reason}"
+
 msgid "Dialog"
 msgstr "Диалог"
 
@@ -7431,6 +7443,9 @@ msgstr "Развернуть всё"
 msgid "Expand all files"
 msgstr "Развернуть все файлы"
 
+msgid "Expand diagram"
+msgstr "Развернуть диаграмму"
+
 msgid "Expand file"
 msgstr "Развернуть файл"
 
@@ -8241,6 +8256,9 @@ msgstr "Завершено · не прочитано"
 
 msgid "finished · worked for 7s"
 msgstr "завершил · работал 7 с"
+
+msgid "Fit"
+msgstr "По размеру"
 
 msgid "Fix all failing checks"
 msgstr "Починить все упавшие проверки"
@@ -9136,6 +9154,9 @@ msgstr "Как мы работаем"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Как ваши агенты входят внутри облачных рабочих областей. Другие подключают свои подписки или ключи API; на этой машине каждый агент продолжает использовать вход, который уже на ней есть."
+
+msgid "HTML preview"
+msgstr "Предпросмотр HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Этот путь — папка"
 
 msgid "This port is still in use"
 msgstr "Этот порт ещё используется"
+
+msgid "This preview is too large to show."
+msgstr "Этот предпросмотр слишком велик для показа."
 
 msgid "This profile is busy right now"
 msgstr "Этот профиль сейчас перегружен"

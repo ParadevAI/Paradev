@@ -5062,6 +5062,9 @@ msgstr "Agentsessie-ID kopiëren"
 msgid "Copy all"
 msgstr "Alles kopiëren"
 
+msgid "Copy as CSV"
+msgstr "Kopiëren als CSV"
+
 msgid "Copy as Markdown"
 msgstr "Kopiëren als Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools naast de pagina"
 
+msgid "Diagram"
+msgstr "Diagram"
+
+msgid "Diagram could not be drawn"
+msgstr "Diagram kon niet worden getekend"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diagram kon niet worden getekend: {reason}"
+
 msgid "Dialog"
 msgstr "Dialog"
 
@@ -7431,6 +7443,9 @@ msgstr "Alles uitklappen"
 msgid "Expand all files"
 msgstr "Alle bestanden uitklappen"
 
+msgid "Expand diagram"
+msgstr "Diagram vergroten"
+
 msgid "Expand file"
 msgstr "Bestand uitklappen"
 
@@ -8241,6 +8256,9 @@ msgstr "Klaar · ongelezen"
 
 msgid "finished · worked for 7s"
 msgstr "klaar · 7s gewerkt"
+
+msgid "Fit"
+msgstr "Passend"
 
 msgid "Fix all failing checks"
 msgstr "Alle mislukte checks fixen"
@@ -9136,6 +9154,9 @@ msgstr "Hoe we werken"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Hoe je agents inloggen binnen cloudwerkruimtes. Anderen koppelen hun eigen abonnementen of API-sleutels; op deze machine blijft elke agent de login gebruiken die er al op staat."
+
+msgid "HTML preview"
+msgstr "HTML-voorbeeld"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Dit pad is een map"
 
 msgid "This port is still in use"
 msgstr "Deze poort is nog in gebruik"
+
+msgid "This preview is too large to show."
+msgstr "Dit voorbeeld is te groot om weer te geven."
 
 msgid "This profile is busy right now"
 msgstr "Dit profiel is momenteel druk bezet"

@@ -5062,6 +5062,9 @@ msgstr "Copiar el ID de sesión del agente"
 msgid "Copy all"
 msgstr "Copiar todo"
 
+msgid "Copy as CSV"
+msgstr "Copiar como CSV"
+
 msgid "Copy as Markdown"
 msgstr "Copiar como Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools junto a la página"
 
+msgid "Diagram"
+msgstr "Diagrama"
+
+msgid "Diagram could not be drawn"
+msgstr "No se pudo dibujar el diagrama"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "No se pudo dibujar el diagrama: {reason}"
+
 msgid "Dialog"
 msgstr "Diálogo"
 
@@ -7431,6 +7443,9 @@ msgstr "Expandir todo"
 msgid "Expand all files"
 msgstr "Expandir todos los archivos"
 
+msgid "Expand diagram"
+msgstr "Ampliar diagrama"
+
 msgid "Expand file"
 msgstr "Expandir archivo"
 
@@ -8241,6 +8256,9 @@ msgstr "Terminado · sin leer"
 
 msgid "finished · worked for 7s"
 msgstr "finalizado · trabajó 7 s"
+
+msgid "Fit"
+msgstr "Ajustar"
 
 msgid "Fix all failing checks"
 msgstr "Corregir todas las comprobaciones fallidas"
@@ -9136,6 +9154,9 @@ msgstr "Cómo trabajamos"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cómo inician sesión tus agentes dentro de los espacios de trabajo en la nube. Otras personas conectan sus propias suscripciones o claves de API; en esta máquina cada agente sigue usando la sesión que ya tiene."
+
+msgid "HTML preview"
+msgstr "Vista previa HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Esta ruta es un directorio"
 
 msgid "This port is still in use"
 msgstr "Este puerto sigue en uso"
+
+msgid "This preview is too large to show."
+msgstr "Esta vista previa es demasiado grande para mostrarse."
 
 msgid "This profile is busy right now"
 msgstr "Este perfil está saturado ahora mismo"

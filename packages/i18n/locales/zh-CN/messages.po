@@ -5062,6 +5062,9 @@ msgstr "复制智能体会话ID"
 msgid "Copy all"
 msgstr "全部复制"
 
+msgid "Copy as CSV"
+msgstr "复制为 CSV"
+
 msgid "Copy as Markdown"
 msgstr "复制为 Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "页面旁的 DevTools"
 
+msgid "Diagram"
+msgstr "图表"
+
+msgid "Diagram could not be drawn"
+msgstr "无法绘制图表"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "无法绘制图表：{reason}"
+
 msgid "Dialog"
 msgstr "对话框"
 
@@ -7431,6 +7443,9 @@ msgstr "全部展开"
 msgid "Expand all files"
 msgstr "展开所有文件"
 
+msgid "Expand diagram"
+msgstr "放大图表"
+
 msgid "Expand file"
 msgstr "展开文件"
 
@@ -8241,6 +8256,9 @@ msgstr "已完成 · 未读"
 
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用时7秒"
+
+msgid "Fit"
+msgstr "适应"
 
 msgid "Fix all failing checks"
 msgstr "修复所有失败的检查"
@@ -9136,6 +9154,9 @@ msgstr "我们的工作方式"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的智能体在云端工作区中如何登录。其他人连接各自的订阅或API密钥；在这台机器上，每个智能体继续使用它上面已有的登录。"
+
+msgid "HTML preview"
+msgstr "HTML 预览"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "该路径是一个目录"
 
 msgid "This port is still in use"
 msgstr "此端口仍在使用中"
+
+msgid "This preview is too large to show."
+msgstr "此预览过大，无法显示。"
 
 msgid "This profile is busy right now"
 msgstr "此个人主页当前繁忙"

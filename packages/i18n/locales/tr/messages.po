@@ -5062,6 +5062,9 @@ msgstr "Ajan oturum kimliğini kopyala"
 msgid "Copy all"
 msgstr "Tümünü kopyala"
 
+msgid "Copy as CSV"
+msgstr "CSV olarak kopyala"
+
 msgid "Copy as Markdown"
 msgstr "Markdown olarak kopyala"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools sayfanın yanında"
 
+msgid "Diagram"
+msgstr "Diyagram"
+
+msgid "Diagram could not be drawn"
+msgstr "Diyagram çizilemedi"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diyagram çizilemedi: {reason}"
+
 msgid "Dialog"
 msgstr "Pencere"
 
@@ -7431,6 +7443,9 @@ msgstr "Tümünü genişlet"
 msgid "Expand all files"
 msgstr "Tüm dosyaları genişlet"
 
+msgid "Expand diagram"
+msgstr "Diyagramı büyüt"
+
 msgid "Expand file"
 msgstr "Dosyayı genişlet"
 
@@ -8241,6 +8256,9 @@ msgstr "Tamamlandı · okunmadı"
 
 msgid "finished · worked for 7s"
 msgstr "bitti · 7 sn çalıştı"
+
+msgid "Fit"
+msgstr "Sığdır"
 
 msgid "Fix all failing checks"
 msgstr "Başarısız tüm kontrolleri düzelt"
@@ -9136,6 +9154,9 @@ msgstr "Nasıl çalışıyoruz"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Ajanlarınızın bulut çalışma alanlarında nasıl oturum açtığı. Başkaları kendi aboneliklerini veya API anahtarlarını bağlar; bu makinede her ajan üzerinde zaten bulunan oturumu kullanmayı sürdürür."
+
+msgid "HTML preview"
+msgstr "HTML önizleme"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Bu yol bir dizin"
 
 msgid "This port is still in use"
 msgstr "Bu port hâlâ kullanımda"
+
+msgid "This preview is too large to show."
+msgstr "Bu önizleme gösterilemeyecek kadar büyük."
 
 msgid "This profile is busy right now"
 msgstr "Bu profil şu anda yoğun"

@@ -29,6 +29,10 @@
 			"types": "./src/account-labels.ts",
 			"default": "./src/account-labels.ts"
 		},
+		"./html-preview": {
+			"types": "./src/html-preview.ts",
+			"default": "./src/html-preview.ts"
+		},
 		"./page-zoom": {
 			"types": "./src/page-zoom.ts",
 			"default": "./src/page-zoom.ts"

@@ -5062,6 +5062,9 @@ msgstr "Salin ID sesi agen"
 msgid "Copy all"
 msgstr "Salin semua"
 
+msgid "Copy as CSV"
+msgstr "Salin sebagai CSV"
+
 msgid "Copy as Markdown"
 msgstr "Salin sebagai Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools di samping halaman"
 
+msgid "Diagram"
+msgstr "Diagram"
+
+msgid "Diagram could not be drawn"
+msgstr "Diagram tidak dapat digambar"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diagram tidak dapat digambar: {reason}"
+
 msgid "Dialog"
 msgstr "Dialog"
 
@@ -7431,6 +7443,9 @@ msgstr "Bentangkan semua"
 msgid "Expand all files"
 msgstr "Bentangkan semua file"
 
+msgid "Expand diagram"
+msgstr "Perbesar diagram"
+
 msgid "Expand file"
 msgstr "Bentangkan file"
 
@@ -8241,6 +8256,9 @@ msgstr "Selesai · belum dibaca"
 
 msgid "finished · worked for 7s"
 msgstr "selesai · bekerja 7 dtk"
+
+msgid "Fit"
+msgstr "Sesuaikan"
 
 msgid "Fix all failing checks"
 msgstr "Perbaiki semua check yang gagal"
@@ -9136,6 +9154,9 @@ msgstr "Cara kami bekerja"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
+
+msgid "HTML preview"
+msgstr "Pratinjau HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Path ini adalah direktori"
 
 msgid "This port is still in use"
 msgstr "Port ini masih dipakai"
+
+msgid "This preview is too large to show."
+msgstr "Pratinjau ini terlalu besar untuk ditampilkan."
 
 msgid "This profile is busy right now"
 msgstr "Profil ini sedang sibuk"

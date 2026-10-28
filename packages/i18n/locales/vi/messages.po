@@ -5062,6 +5062,9 @@ msgstr "Sao chép ID phiên agent"
 msgid "Copy all"
 msgstr "Sao chép tất cả"
 
+msgid "Copy as CSV"
+msgstr "Sao chép dưới dạng CSV"
+
 msgid "Copy as Markdown"
 msgstr "Sao chép dưới dạng Markdown"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools bên cạnh trang"
 
+msgid "Diagram"
+msgstr "Sơ đồ"
+
+msgid "Diagram could not be drawn"
+msgstr "Không thể vẽ sơ đồ"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Không thể vẽ sơ đồ: {reason}"
+
 msgid "Dialog"
 msgstr "Dialog"
 
@@ -7431,6 +7443,9 @@ msgstr "Mở rộng tất cả"
 msgid "Expand all files"
 msgstr "Mở rộng tất cả tệp"
 
+msgid "Expand diagram"
+msgstr "Phóng to sơ đồ"
+
 msgid "Expand file"
 msgstr "Mở rộng tệp"
 
@@ -8241,6 +8256,9 @@ msgstr "Đã xong · chưa đọc"
 
 msgid "finished · worked for 7s"
 msgstr "đã xong · làm trong 7s"
+
+msgid "Fit"
+msgstr "Vừa khung"
 
 msgid "Fix all failing checks"
 msgstr "Sửa mọi check đang lỗi"
@@ -9136,6 +9154,9 @@ msgstr "Cách chúng tôi làm việc"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cách các agent của bạn đăng nhập bên trong workspace cloud. Người khác kết nối gói đăng ký hoặc khóa API của riêng họ; trên máy này mỗi agent vẫn dùng phiên đăng nhập sẵn có."
+
+msgid "HTML preview"
+msgstr "Xem trước HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "Đường dẫn này là một thư mục"
 
 msgid "This port is still in use"
 msgstr "Cổng này vẫn đang được dùng"
+
+msgid "This preview is too large to show."
+msgstr "Bản xem trước này quá lớn để hiển thị."
 
 msgid "This profile is busy right now"
 msgstr "Hồ sơ này hiện đang quá tải"

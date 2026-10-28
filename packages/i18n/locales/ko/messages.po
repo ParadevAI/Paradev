@@ -5062,6 +5062,9 @@ msgstr "에이전트 세션 ID 복사"
 msgid "Copy all"
 msgstr "모두 복사"
 
+msgid "Copy as CSV"
+msgstr "CSV로 복사"
+
 msgid "Copy as Markdown"
 msgstr "Markdown으로 복사"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "페이지 옆의 DevTools"
 
+msgid "Diagram"
+msgstr "다이어그램"
+
+msgid "Diagram could not be drawn"
+msgstr "다이어그램을 그릴 수 없습니다"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "다이어그램을 그릴 수 없습니다: {reason}"
+
 msgid "Dialog"
 msgstr "대화상자"
 
@@ -7431,6 +7443,9 @@ msgstr "모두 펼치기"
 msgid "Expand all files"
 msgstr "모든 파일 펼치기"
 
+msgid "Expand diagram"
+msgstr "다이어그램 확대"
+
 msgid "Expand file"
 msgstr "파일 펼치기"
 
@@ -8241,6 +8256,9 @@ msgstr "완료 · 읽지 않음"
 
 msgid "finished · worked for 7s"
 msgstr "완료 · 7초 작업"
+
+msgid "Fit"
+msgstr "맞춤"
 
 msgid "Fix all failing checks"
 msgstr "실패한 검사 모두 고치기"
@@ -9136,6 +9154,9 @@ msgstr "일하는 방식"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "클라우드 워크스페이스 안에서 에이전트가 로그인하는 방식입니다. 다른 사람은 각자의 구독이나 API 키를 연결하며, 이 컴퓨터에서는 각 에이전트가 이미 있는 로그인을 계속 사용합니다."
+
+msgid "HTML preview"
+msgstr "HTML 미리보기"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "이 경로는 디렉터리입니다"
 
 msgid "This port is still in use"
 msgstr "이 포트는 아직 사용 중입니다"
+
+msgid "This preview is too large to show."
+msgstr "이 미리보기는 너무 커서 표시할 수 없습니다."
 
 msgid "This profile is busy right now"
 msgstr "이 프로필은 지금 이용자가 많습니다"

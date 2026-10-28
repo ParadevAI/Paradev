@@ -5062,6 +5062,9 @@ msgstr "エージェントセッションIDをコピー"
 msgid "Copy all"
 msgstr "すべてコピー"
 
+msgid "Copy as CSV"
+msgstr "CSVとしてコピー"
+
 msgid "Copy as Markdown"
 msgstr "Markdownとしてコピー"
 
@@ -6604,6 +6607,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "ページの横にDevTools"
 
+msgid "Diagram"
+msgstr "図"
+
+msgid "Diagram could not be drawn"
+msgstr "図を描画できませんでした"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "図を描画できませんでした：{reason}"
+
 msgid "Dialog"
 msgstr "Dialog"
 
@@ -7431,6 +7443,9 @@ msgstr "すべて展開"
 msgid "Expand all files"
 msgstr "すべてのファイルを展開"
 
+msgid "Expand diagram"
+msgstr "図を拡大"
+
 msgid "Expand file"
 msgstr "ファイルを展開"
 
@@ -8241,6 +8256,9 @@ msgstr "完了 · 未読"
 
 msgid "finished · worked for 7s"
 msgstr "完了 · 7秒稼働"
+
+msgid "Fit"
+msgstr "全体表示"
 
 msgid "Fix all failing checks"
 msgstr "失敗したチェックをすべて修正"
@@ -9136,6 +9154,9 @@ msgstr "私たちの働き方"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "クラウドワークスペース内でエージェントがどうサインインするかの設定です。ほかの人は自分のサブスクリプションやAPIキーを接続します。このマシンでは、各エージェントはすでにあるログインをそのまま使い続けます。"
+
+msgid "HTML preview"
+msgstr "HTMLプレビュー"
 
 msgid "https://"
 msgstr "https://"
@@ -18814,6 +18835,9 @@ msgstr "このパスはディレクトリです"
 
 msgid "This port is still in use"
 msgstr "このポートはまだ使用中です"
+
+msgid "This preview is too large to show."
+msgstr "このプレビューは大きすぎて表示できません。"
 
 msgid "This profile is busy right now"
 msgstr "このプロフィールは現在混み合っています"
