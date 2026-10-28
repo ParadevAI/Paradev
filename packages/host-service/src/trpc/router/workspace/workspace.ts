@@ -63,10 +63,7 @@ export const workspaceRouter = router({
 				{
 					id: workspace.id,
 					path: ".",
-					name:
-						project?.repoName ||
-						project?.name ||
-						basename(workspace.worktreePath),
+					name: basename(project?.repoPath ?? workspace.worktreePath),
 					primary: true,
 				},
 			];
