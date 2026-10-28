@@ -53,7 +53,7 @@ import { useFilesTabBridge } from "./hooks/useFilesTabBridge";
 import { useFilesTabDrop } from "./hooks/useFilesTabDrop";
 import { useFileTreeScrollFade } from "./hooks/useFileTreeScrollFade";
 import { buildPierreGitStatus } from "./utils/buildPierreGitStatus";
-import { stripTrailingSlash, toAbs, toRel } from "./utils/treePath";
+import { stripTrailingSlash, toAbs } from "./utils/treePath";
 
 const TREE_STYLE = createPierreTreeStyle({
 	rowHeight: FILE_EXPLORER_ROW_HEIGHT,
@@ -226,13 +226,14 @@ export function FilesTab({
 
 	useFallthroughIcons(model);
 
-	// Reflect external selection changes (e.g. tab switch) back into the model.
+	// Reveal reads the latest tree, but only a new open file should move the
+	// selection; re-running on every folder load would yank the scroll.
+	const revealRef = useRef(reveal);
+	revealRef.current = reveal;
 	useEffect(() => {
 		if (!selectedFilePath || !rootPath) return;
-		const rel = toRel(rootPath, selectedFilePath);
-		if (!bridge.knownPaths.has(rel)) return;
-		model.focusPath(rel);
-	}, [model, selectedFilePath, rootPath, bridge.knownPaths]);
+		void revealRef.current(selectedFilePath, false);
+	}, [selectedFilePath, rootPath]);
 
 	useEffect(() => {
 		if (!pendingReveal || !rootPath) return;
