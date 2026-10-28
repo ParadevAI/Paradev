@@ -69,7 +69,7 @@ interface FilesTabProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** Double-clicking a file pins it instead of renaming it. */
 	onPinFile?: (absolutePath: string) => void;
-	/** "fileView" drops New File/New Folder; the context menus have them. */
+	/** "fileView" shows the search as a pill. */
 	variant?: "sidebar" | "fileView";
 	selectedFilePath?: string;
 	pendingReveal?: {
@@ -412,24 +412,20 @@ export function FilesTab({
 								</button>
 							)}
 							<div className="ml-auto flex items-center gap-0.5">
-								{variant !== "fileView" && (
-									<>
-										<FilesTabHeaderButton
-											icon={FilePlus}
-											label={t({
-												message: "New File",
-											})}
-											onClick={() => void startCreating("file")}
-										/>
-										<FilesTabHeaderButton
-											icon={FolderPlus}
-											label={t({
-												message: "New Folder",
-											})}
-											onClick={() => void startCreating("folder")}
-										/>
-									</>
-								)}
+								<FilesTabHeaderButton
+									icon={FilePlus}
+									label={t({
+										message: "New File",
+									})}
+									onClick={() => void startCreating("file")}
+								/>
+								<FilesTabHeaderButton
+									icon={FolderPlus}
+									label={t({
+										message: "New Folder",
+									})}
+									onClick={() => void startCreating("folder")}
+								/>
 								<FilesTabHeaderButton
 									icon={RefreshCw}
 									label={t({
