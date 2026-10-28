@@ -229,6 +229,13 @@ export const FEATURE_FLAGS = {
 	 * release condition on the flag, so widening never needs a release.
 	 */
 	ACP_CHAT: "acp-chat",
+	/**
+	 * Shows the ways to open a Mobile pane: the right pane add menu, its empty
+	 * state, and the Split with Mobile hotkey. Open panes stay. Off, unloaded
+	 * or offline all hide them, and that includes the team. The flag's release
+	 * conditions give it to the team only; keep the public off until agents
+	 * can drive the device.
+	 */
 	MOBILE_PANE: "mobile-pane",
 	/**
 	 * Shows the `pdev` agent: in the agent catalog, agent pickers
