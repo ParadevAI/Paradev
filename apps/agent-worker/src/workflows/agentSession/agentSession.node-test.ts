@@ -10,6 +10,7 @@ import {
 } from "@superset/agent-harness/session";
 import { turnSteersQuery } from "@superset/agent-harness/session/definitions";
 import { Context } from "@temporalio/activity";
+import { ApplicationFailure } from "@temporalio/common";
 import { TestWorkflowEnvironment } from "@temporalio/testing";
 import { Worker } from "@temporalio/worker";
 import type { AgentActivities } from "../../activities/createActivities";
@@ -22,6 +23,8 @@ interface Script {
 	runGate?: () => Promise<void>;
 	readSteersDuringRun?: boolean;
 	runHangs?: boolean;
+	/** Fail this many runs with a provider error before one succeeds. */
+	modelErrors?: number;
 }
 
 let env: TestWorkflowEnvironment;
@@ -40,6 +43,7 @@ function fakeActivities(
 	hooks: { runStarted?: () => void; runCancelled?: () => void } = {},
 ) {
 	let settlePending = script.settleSteerPendingTimes ?? 0;
+	let modelErrors = script.modelErrors ?? 0;
 	const activities: AgentActivities = {
 		async beginTurn(input) {
 			calls.push({ name: "beginTurn", input: { ...input } });
@@ -50,6 +54,10 @@ function fakeActivities(
 		async runTurn(input) {
 			calls.push({ name: "runTurn", input: { ...input } });
 			hooks.runStarted?.();
+			if (modelErrors > 0) {
+				modelErrors -= 1;
+				throw ApplicationFailure.retryable("529 overloaded", "PdevModelError");
+			}
 			if (script.runHangs) {
 				const context = Context.current();
 				try {
@@ -134,6 +142,25 @@ describe("agentSession workflow", () => {
 		assert.equal(calls.at(-1)?.input.outcome, "completed");
 	});
 
+	it("retries a turn through provider errors until it completes", async () => {
+		const calls: Call[] = [];
+		await withWorker(
+			fakeActivities({ modelErrors: 6 }, calls),
+			"s-retry",
+			async () => {
+				await startTurn(env.client, "s-retry", {
+					turnId: "t1",
+					promptId: "p1",
+					text: "hi",
+				});
+				await waitFor(() => names(calls).includes("runTurn"));
+				await env.sleep("1 hour");
+				await waitFor(() => names(calls).includes("settleTurn"));
+			},
+		);
+		assert.equal(names(calls).filter((name) => name === "runTurn").length, 7);
+		assert.equal(calls.at(-1)?.input.outcome, "completed");
+	});
 	it("hands a steer to the running turn", async () => {
 		const calls: Call[] = [];
 		let released = false;

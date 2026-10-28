@@ -38,14 +38,19 @@ const quick = proxyActivities<AgentActivities>({
 	startToCloseTimeout: "30 seconds",
 	retry: { maximumAttempts: 10 },
 });
-/** A retry resumes pdev's saved session; it never sends the prompt again. */
+/**
+ * A retry resumes pdev's saved session; it never sends the prompt again.
+ * Attempts have no limit: a provider outage or a lost credential must not drop
+ * the messages in the turn, and messages that arrive meanwhile join it.
+ */
 const pdev = proxyActivities<AgentActivities>({
 	startToCloseTimeout: "2 hours",
 	heartbeatTimeout: "1 minute",
 	cancellationType: ActivityCancellationType.WAIT_CANCELLATION_COMPLETED,
 	retry: {
-		maximumAttempts: 5,
-		maximumInterval: "1 minute",
+		initialInterval: "5 seconds",
+		backoffCoefficient: 2,
+		maximumInterval: "5 minutes",
 		nonRetryableErrorTypes: ["PdevTurnError", "BadSessionId"],
 	},
 });

@@ -91,7 +91,11 @@ const TURN_TOKEN_HEADER = "x-agent-turn-token";
 const PROVISIONING_WAIT_MS = 10 * 60_000;
 const PROVISIONING_POLL_MS = 5_000;
 const RESUMED =
-	"This turn stopped before it finished, because the machine running you restarted. Continue the task from where it stopped. Check the current state before you repeat any action.";
+	"This turn stopped before it finished, because the machine running you restarted or the model request failed. Continue from where it stopped. Check the current state before you repeat any action.";
+
+/** A model error that a later attempt cannot fix: the request itself is wrong. */
+const BAD_REQUEST =
+	/\b(400|413|422)\b|invalid_request|context (length|window)|prompt is too long/i;
 
 export function createActivities(deps: ActivityDeps) {
 	const now = deps.now ?? Date.now;
@@ -347,11 +351,13 @@ export function createActivities(deps: ActivityDeps) {
 				await flusher.flush();
 				await syncFile();
 				if (session.lastStopReason === "error") {
-					throw ApplicationFailure.nonRetryable(
+					const message =
 						lastError(await tailEntries(store, input.turnId)) ??
-							"The model request failed.",
-						"PdevTurnError",
-					);
+						"The model request failed.";
+					if (BAD_REQUEST.test(message)) {
+						throw ApplicationFailure.nonRetryable(message, "PdevTurnError");
+					}
+					throw ApplicationFailure.retryable(message, "PdevModelError");
 				}
 				return { steersConsumed: delivered };
 			} finally {

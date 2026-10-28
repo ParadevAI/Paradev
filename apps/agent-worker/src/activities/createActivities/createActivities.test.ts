@@ -338,6 +338,26 @@ describe("runTurn", () => {
 		expect((error as ApplicationFailure).nonRetryable).toBe(false);
 		expect(pdevLog().some((e) => e.method === "session/cancel")).toBe(false);
 	});
+	test("a provider error fails the attempt for a retry; a bad request fails the turn", async () => {
+		const { activities } = setup();
+		const attempt = async (text: string) => {
+			await activities.beginTurn({ ...turn, promptId: text, text });
+			const error = await new MockActivityEnvironment()
+				.run(activities.runTurn, {
+					...turn,
+					prompts: [{ promptId: text, text }],
+					steersFrom: 0,
+				})
+				.catch((e: unknown) => e);
+			expect(error).toBeInstanceOf(ApplicationFailure);
+			return error as ApplicationFailure;
+		};
+		const outage = await attempt("model error: 529 overloaded");
+		expect(outage.nonRetryable).toBe(false);
+		expect(outage.message).toBe("529 overloaded");
+		const bad = await attempt("model error: 400 invalid_request_error");
+		expect(bad.nonRetryable).toBe(true);
+	});
 	test("a main session gets the Dev's prompt and its tools, and no machine", async () => {
 		const { activities } = setup({
 			credentials: {

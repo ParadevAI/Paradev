@@ -132,6 +132,25 @@ function run(text: string) {
 		}, 300);
 		return;
 	}
+	const modelError = /model error: (.*)/.exec(text)?.[1];
+	if (modelError) {
+		entry({
+			type: "message",
+			message: {
+				role: "assistant",
+				content: [],
+				stopReason: "error",
+				errorMessage: modelError,
+				usage: { input: 0, output: 0, cost: { total: 0 } },
+			},
+		});
+		update({
+			sessionUpdate: "state_update",
+			state: "idle",
+			stopReason: "error",
+		});
+		return;
+	}
 	if (text.includes("use the reply tool")) {
 		entry({
 			type: "message",
