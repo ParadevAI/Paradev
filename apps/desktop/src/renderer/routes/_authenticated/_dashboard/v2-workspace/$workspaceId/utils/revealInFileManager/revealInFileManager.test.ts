@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { revealInFileManagerLabel, revealTarget } from "./revealInFileManager";
+import {
+	revealFailedMessage,
+	revealInFileManagerLabel,
+	revealTarget,
+} from "./revealInFileManager";
 
 describe("revealInFileManagerLabel", () => {
 	it("names the file manager of each platform", () => {
@@ -9,6 +13,20 @@ describe("revealInFileManagerLabel", () => {
 		);
 		expect(revealInFileManagerLabel("linux").message).toBe(
 			"Reveal in File Manager",
+		);
+	});
+});
+
+describe("revealFailedMessage", () => {
+	it("names the same file manager as the menu label", () => {
+		expect(revealFailedMessage("mac").message).toBe(
+			"Failed to reveal in Finder",
+		);
+		expect(revealFailedMessage("windows").message).toBe(
+			"Failed to reveal in File Explorer",
+		);
+		expect(revealFailedMessage("linux").message).toBe(
+			"Failed to reveal in File Manager",
 		);
 	});
 });

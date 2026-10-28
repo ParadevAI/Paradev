@@ -9,10 +9,20 @@ const REVEAL_LABELS: Record<Platform, MessageDescriptor> = {
 	linux: msg({ message: "Reveal in File Manager" }),
 };
 
+const REVEAL_FAILED_MESSAGES: Record<Platform, MessageDescriptor> = {
+	mac: msg({ message: "Failed to reveal in Finder" }),
+	windows: msg({ message: "Failed to reveal in File Explorer" }),
+	linux: msg({ message: "Failed to reveal in File Manager" }),
+};
+
 export function revealInFileManagerLabel(
 	platform: Platform,
 ): MessageDescriptor {
 	return REVEAL_LABELS[platform];
+}
+
+export function revealFailedMessage(platform: Platform): MessageDescriptor {
+	return REVEAL_FAILED_MESSAGES[platform];
 }
 
 export function revealTarget(

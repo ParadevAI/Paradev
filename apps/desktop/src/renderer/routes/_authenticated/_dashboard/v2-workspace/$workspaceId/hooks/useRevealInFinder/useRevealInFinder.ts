@@ -1,9 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
+import { PLATFORM } from "renderer/hotkeys";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { revealFailedMessage } from "../../utils/revealInFileManager";
 
 /**
  * Reveals a path in Finder: folders open directly (like `open <path>`),
@@ -11,7 +13,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
  * whose paths don't exist on this machine.
  */
 export function useRevealInFinder(workspaceId: string) {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
 	const { machineId } = useLocalHostService();
 	const { workspaces } = useHostWorkspaces();
 	const workspaceRow = workspaces.find((w) => w.id === workspaceId);
@@ -31,13 +33,9 @@ export function useRevealInFinder(workspaceId: string) {
 				: electronTrpcClient.external.openInFinder;
 			procedure.mutate(path).catch((error) => {
 				console.error("Failed to reveal path in Finder:", path, error);
-				toast.error(
-					t({
-						message: "Failed to reveal in Finder",
-					}),
-				);
+				toast.error(i18n._(revealFailedMessage(PLATFORM)));
 			});
 		},
-		[workspaceRow, machineId, t],
+		[workspaceRow, machineId, t, i18n],
 	);
 }
