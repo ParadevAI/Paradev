@@ -15055,8 +15055,14 @@ msgstr "Reply to thread…"
 msgid "Reply…"
 msgstr "Reply…"
 
+msgid "Replying in a thread"
+msgstr "Replying in a thread"
+
 msgid "Replying to {replyingTo}"
 msgstr "Replying to {replyingTo}"
+
+msgid "Replying to a DM"
+msgstr "Replying to a DM"
 
 msgid "repo"
 msgstr "repo"
@@ -20505,6 +20511,9 @@ msgstr "Working for {seconds}s"
 
 msgid "Working on"
 msgstr "Working on"
+
+msgid "Working on a mention"
+msgstr "Working on a mention"
 
 msgid "Working…"
 msgstr "Working…"

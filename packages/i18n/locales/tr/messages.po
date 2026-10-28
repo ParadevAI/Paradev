@@ -15055,8 +15055,14 @@ msgstr "Konuya yanıt verin…"
 msgid "Reply…"
 msgstr "Yanıtla…"
 
+msgid "Replying in a thread"
+msgstr "{'cs': 'Odpovídá ve vlákně', 'de': 'Antwortet in einem Thread', 'es': 'Respondiendo en un hilo', 'fr': 'Répond dans un fil', 'id': 'Membalas di utas', 'it': 'Risponde in un thread', 'ja': 'スレッドで返信中', 'ko': '스레드에서 답장하는 중', 'nl': 'Reageert in een thread', 'pl': 'Odpowiada w wątku', 'pt-BR': 'Respondendo em uma thread', 'ru': 'Отвечает в ветке', 'tr': 'Bir başlıkta yanıtlıyor', 'vi': 'Đang trả lời trong chuỗi', 'zh-CN': '正在线程中回复', 'zh-TW': '正在討論串中回覆'}"
+
 msgid "Replying to {replyingTo}"
 msgstr "{replyingTo} kullanıcısına yanıt"
+
+msgid "Replying to a DM"
+msgstr "{'cs': 'Odpovídá na přímou zprávu', 'de': 'Antwortet auf eine Direktnachricht', 'es': 'Respondiendo a un mensaje directo', 'fr': 'Répond à un message direct', 'id': 'Membalas pesan langsung', 'it': 'Risponde a un messaggio diretto', 'ja': 'ダイレクトメッセージに返信中', 'ko': '다이렉트 메시지에 답장하는 중', 'nl': 'Reageert op een direct bericht', 'pl': 'Odpowiada na wiadomość bezpośrednią', 'pt-BR': 'Respondendo a uma mensagem direta', 'ru': 'Отвечает на личное сообщение', 'tr': 'Doğrudan mesajı yanıtlıyor', 'vi': 'Đang trả lời tin nhắn trực tiếp', 'zh-CN': '正在回复私信', 'zh-TW': '正在回覆私訊'}"
 
 msgid "repo"
 msgstr "depo"
@@ -20505,6 +20511,9 @@ msgstr "{seconds} sn'dir çalışıyor"
 
 msgid "Working on"
 msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
+
+msgid "Working on a mention"
+msgstr "{'cs': 'Pracuje na zmínce', 'de': 'Arbeitet an einer Erwähnung', 'es': 'Trabajando en una mención', 'fr': 'Traite une mention', 'id': 'Mengerjakan sebutan', 'it': 'Lavora a una menzione', 'ja': 'メンションに対応中', 'ko': '멘션을 처리하는 중', 'nl': 'Werkt aan een vermelding', 'pl': 'Pracuje nad wzmianką', 'pt-BR': 'Trabalhando em uma menção', 'ru': 'Работает над упоминанием', 'tr': 'Bir bahsetme üzerinde çalışıyor', 'vi': 'Đang xử lý một lượt nhắc', 'zh-CN': '正在处理提及', 'zh-TW': '正在處理提及'}"
 
 msgid "Working…"
 msgstr "Çalışıyor…"

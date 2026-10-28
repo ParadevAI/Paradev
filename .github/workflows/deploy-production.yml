@@ -583,6 +583,7 @@ jobs:
             realtime:
               - 'apps/realtime/**'
               - 'packages/shared/src/realtime.ts'
+              - 'packages/shared/src/channels.ts'
               - 'packages/shared/src/page-storage.ts'
               - 'packages/shared/src/page-storage-hub.ts'
               - 'packages/shared/src/page-storage-access.ts'

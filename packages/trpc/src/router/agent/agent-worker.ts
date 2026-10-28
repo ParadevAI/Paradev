@@ -10,6 +10,7 @@ import {
 	TURN_TOKEN_TTL_SECONDS,
 } from "../../lib/agent-turn/turn-token";
 import { workerProcedure } from "../../trpc";
+import { announceAgentsChanged } from "./agents-changed";
 import { resolveTurnHost } from "./turn-host";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
@@ -146,7 +147,10 @@ export const agentWorkerRouter = {
 						sql`cardinality(${agentTurns.steerPromptIds}) = ${steersConsumed}`,
 					),
 				)
-				.returning({ sessionId: agentTurns.sessionId });
+				.returning({
+					sessionId: agentTurns.sessionId,
+					organizationId: agentTurns.organizationId,
+				});
 			if (!settled) {
 				const [turn] = await db
 					.select({
@@ -172,6 +176,7 @@ export const agentWorkerRouter = {
 				.update(agentSessions)
 				.set({ lastActivityAt: now })
 				.where(eq(agentSessions.id, settled.sessionId));
+			await announceAgentsChanged(settled.organizationId);
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),

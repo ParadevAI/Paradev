@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { RouterOutputs } from "@superset/trpc";
+import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { Button } from "@superset/ui/button";
 import { Textarea } from "@superset/ui/textarea";
 import { useState } from "react";
@@ -36,21 +37,19 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 							avatar={dev.avatar}
 							size={64}
 							alive
-							mood={isPaused ? "asleep" : dev.isWorking ? "working" : "idle"}
+							mood={
+								isPaused
+									? "asleep"
+									: dev.recentTurns.some((turn) => turn.status === "running")
+										? "working"
+										: "idle"
+							}
 						/>
 						<div className="flex min-w-0 flex-1 flex-col">
 							<span className="truncate text-[17px] font-semibold">
 								{dev.name}
 							</span>
-							<span className="text-[13px] text-muted-foreground">
-								{isPaused ? (
-									<Trans>Paused</Trans>
-								) : dev.isWorking ? (
-									<Trans>Working</Trans>
-								) : (
-									<Trans>Ready</Trans>
-								)}
-							</span>
+							<DevStatus dev={dev} />
 						</div>
 						{dev.canManage && (
 							<button
@@ -77,6 +76,37 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+/** What the Dev is doing right now, from its running turn. */
+function DevStatus({ dev }: { dev: Dev }) {
+	const { t } = useLingui();
+	if (dev.pausedAt) {
+		return (
+			<span className="text-[13px] text-muted-foreground">
+				<Trans>Paused</Trans>
+			</span>
+		);
+	}
+	const running = dev.recentTurns.find((turn) => turn.status === "running");
+	if (!running) {
+		return (
+			<span className="text-[13px] text-muted-foreground">
+				<Trans>Ready</Trans>
+			</span>
+		);
+	}
+	const doing: Record<string, string> = {
+		direct_message: t({ message: "Replying to a DM" }),
+		mention: t({ message: "Working on a mention" }),
+		thread_reply: t({ message: "Replying in a thread" }),
+	};
+	return (
+		<span className="flex items-center gap-1.5 text-[13px] text-foreground">
+			<WaveSpinner className="text-foreground/80" />
+			{doing[running.reason] ?? t({ message: "Working" })}
+		</span>
 	);
 }
 

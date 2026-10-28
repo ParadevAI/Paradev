@@ -18,12 +18,13 @@ import {
 } from "@superset/shared/dev-avatar";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, exists, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { protectedProcedure } from "../../trpc";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
+import { announceAgentsChanged } from "./agents-changed";
 import { ensureDirectMessage } from "./direct-message";
 import { submitPrompt } from "./turns";
 
@@ -39,17 +40,6 @@ const listColumns = {
 	pausedAt: agents.pausedAt,
 	createdByUserId: agents.createdByUserId,
 	createdAt: agents.createdAt,
-	isWorking: exists(
-		db
-			.select({ one: sql`1` })
-			.from(agentTurns)
-			.where(
-				and(
-					eq(agentTurns.agentId, agents.id),
-					eq(agentTurns.status, "running"),
-				),
-			),
-	).mapWith(Boolean),
 };
 
 /** People managing and talking to agents. Agents themselves use `agentApi`. */
@@ -143,6 +133,7 @@ export const agentRouter = {
 				})
 				.returning();
 			if (!agent) throw agentNotFound();
+			await announceAgentsChanged(agent.organizationId);
 			return agent;
 		}),
 
@@ -163,6 +154,7 @@ export const agentRouter = {
 				.where(eq(agents.id, agent.id))
 				.returning({ id: agents.id });
 			if (!updated) throw agentNotFound();
+			await announceAgentsChanged(agent.organizationId);
 			return updated;
 		}),
 
@@ -175,6 +167,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: new Date() })
 				.where(and(eq(agents.id, agent.id), isNull(agents.pausedAt)));
+			await announceAgentsChanged(agent.organizationId);
 			return { paused: true };
 		}),
 
@@ -186,6 +179,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: null })
 				.where(eq(agents.id, agent.id));
+			await announceAgentsChanged(agent.organizationId);
 			return { paused: false };
 		}),
 
@@ -209,6 +203,7 @@ export const agentRouter = {
 						),
 					);
 			});
+			await announceAgentsChanged(agent.organizationId);
 			return { archived: true };
 		}),
 

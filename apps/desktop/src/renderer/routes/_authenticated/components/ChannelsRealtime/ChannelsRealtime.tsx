@@ -183,6 +183,9 @@ export function ChannelsRealtime() {
 					void utils.channel.invalidate();
 					void utils.channelThread.invalidate();
 					break;
+				case "agents.changed":
+					void utils.agent.invalidate();
+					break;
 				case "channel.notify": {
 					if (event.organizationId !== organizationId) break;
 					if (isViewing(event.channelId, event.threadRootId)) break;

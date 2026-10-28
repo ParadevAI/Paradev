@@ -19,10 +19,7 @@ export function DevScreen({ devId }: { devId: string }) {
 	const utils = cloudTrpc.useUtils();
 	const [isCustomizing, setCustomizing] = useState(false);
 	const [isArchiving, setArchiving] = useState(false);
-	const { data: dev } = cloudTrpc.agent.get.useQuery(
-		{ agentId: devId },
-		{ refetchInterval: 15_000 },
-	);
+	const { data: dev } = cloudTrpc.agent.get.useQuery({ agentId: devId });
 	const openDm = cloudTrpc.agent.openDirectMessage.useMutation();
 	const { mutate: openDmMutate } = openDm;
 	useEffect(() => {
