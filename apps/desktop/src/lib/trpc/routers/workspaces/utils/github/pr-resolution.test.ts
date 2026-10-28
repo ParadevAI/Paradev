@@ -25,10 +25,14 @@ describe("computeChecksStatus", () => {
 		).toBe("failure");
 	});
 
-	test("cancelled beats pending, matching the failure/pending precedence used elsewhere", () => {
+	test("pending beats cancelled while other checks still run", () => {
 		expect(
-			computeChecksStatus([state("PENDING"), conclusion("CANCELLED")]),
-		).toBe("failure");
+			computeChecksStatus([
+				state("SUCCESS"),
+				conclusion(""),
+				conclusion("CANCELLED"),
+			]),
+		).toBe("pending");
 	});
 
 	test("failure beats pending", () => {

@@ -55,22 +55,24 @@ export type ChecksRollup = {
 /** Roll up an array of check runs into a single overall status + counts. */
 export function computeChecksRollup(checks: CheckRun[]): ChecksRollup {
 	let successCount = 0;
-	let failureCount = 0;
+	let failedCount = 0;
+	let cancelledCount = 0;
 	let pendingCount = 0;
 	for (const c of checks) {
 		const s = coerceCheckStatus(c.status, c.conclusion);
 		if (s === "skipped") continue;
 		if (s === "success") successCount++;
-		// A cancelled run never produced a real verdict — treat it as a
-		// failure rather than silently excluding it from the rollup.
-		else if (s === "failure" || s === "cancelled") failureCount++;
+		else if (s === "failure") failedCount++;
+		else if (s === "cancelled") cancelledCount++;
 		else pendingCount++;
 	}
+	const failureCount = failedCount + cancelledCount;
 	const relevantCount = successCount + failureCount + pendingCount;
 	let overall: ChecksRollup["overall"];
 	if (relevantCount === 0) overall = "none";
-	else if (failureCount > 0) overall = "failure";
+	else if (failedCount > 0) overall = "failure";
 	else if (pendingCount > 0) overall = "pending";
+	else if (cancelledCount > 0) overall = "failure";
 	else overall = "success";
 	return {
 		overall,

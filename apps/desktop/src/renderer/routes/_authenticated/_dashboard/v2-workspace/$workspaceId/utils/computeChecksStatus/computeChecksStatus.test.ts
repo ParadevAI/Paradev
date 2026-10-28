@@ -58,6 +58,17 @@ describe("computeChecksRollup", () => {
 		expect(rollup.overall).toBe("failure");
 	});
 
+	test("pending beats cancelled while other checks still run", () => {
+		const rollup = computeChecksRollup([
+			check("success"),
+			check("pending"),
+			check("cancelled"),
+		]);
+		expect(rollup.overall).toBe("pending");
+		expect(rollup.pendingCount).toBe(1);
+		expect(rollup.failureCount).toBe(1);
+	});
+
 	test("pending beats success", () => {
 		const rollup = computeChecksRollup([check("success"), check("pending")]);
 		expect(rollup.overall).toBe("pending");
