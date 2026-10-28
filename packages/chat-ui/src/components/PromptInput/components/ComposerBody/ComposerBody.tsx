@@ -25,6 +25,7 @@ import {
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_LOW,
 	DROP_COMMAND,
+	KEY_ARROW_RIGHT_COMMAND,
 	KEY_BACKSPACE_COMMAND,
 	KEY_DELETE_COMMAND,
 	KEY_DOWN_COMMAND,
@@ -70,11 +71,14 @@ import type {
 	ComposerActionContext,
 	ComposerChip,
 	ComposerDraft,
+	ComposerMentionBrowse,
 	ComposerMentionEntry,
+	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
 	PromptInputProps,
 } from "../../types";
+import { browseRows } from "../../utils/browseRows";
 import {
 	$insertDraftSegments,
 	$readDraftSegments,
@@ -92,6 +96,7 @@ import { ComposerPanel } from "../ComposerPanel";
 import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
+import { MentionSubmenu } from "../MentionSubmenu";
 
 const FOOTER_BUTTON_CLASS =
 	"flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors";
@@ -292,6 +297,9 @@ export function ComposerBody({
 	const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
 	const [browseOpen, setBrowseOpen] = useState(false);
 	const [browseIndex, setBrowseIndex] = useState(0);
+	const [submenu, setSubmenu] = useState<
+		(ComposerMentionProvider & { browse: ComposerMentionBrowse }) | null
+	>(null);
 	const [typeaheadDismissed, setTypeaheadDismissed] = useState(false);
 	const renderChip = useRenderChip();
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -437,6 +445,16 @@ export function ComposerBody({
 		mentionQuery != null || browseOpen,
 		mentionQuery ?? "",
 	);
+	const openSubmenu = useCallback((provider: ComposerMentionProvider) => {
+		const { browse } = provider;
+		if (!browse) return;
+		setBrowseOpen(false);
+		setSubmenu({ ...provider, browse });
+	}, []);
+	const links = useMemo(
+		() => browseRows(activeProviders, openSubmenu),
+		[activeProviders, openSubmenu],
+	);
 	const browseSections = useMemo<MentionSection[]>(
 		() => [
 			{
@@ -452,9 +470,22 @@ export function ComposerBody({
 					},
 				],
 			},
-			...sections.filter((section) => section.entries.length > 0),
+			...(links.rows.length > 0
+				? [
+						{
+							providerId: "link",
+							title: t({ message: "Link" }),
+							isLoading: false,
+							entries: links.rows,
+						},
+					]
+				: []),
+			...sections.filter(
+				(section) =>
+					section.entries.length > 0 && !links.browsed.has(section.providerId),
+			),
 		],
-		[sections, t],
+		[links, sections, t],
 	);
 	const browseEntries = useMemo(
 		() => browseSections.flatMap((section) => section.entries),
@@ -493,6 +524,25 @@ export function ComposerBody({
 		select: (option: CommandTypeaheadOption) => void;
 	} | null>(null);
 	const completingRef = useRef(false);
+	const mentionMenuRef = useRef<{
+		option: MentionTypeaheadOption | undefined;
+		select: (option: MentionTypeaheadOption) => void;
+	} | null>(null);
+	useEffect(
+		() =>
+			editor.registerCommand<KeyboardEvent>(
+				KEY_ARROW_RIGHT_COMMAND,
+				(event) => {
+					const menu = mentionMenuRef.current;
+					if (!menu?.option?.entry.opensSubmenu) return false;
+					event.preventDefault();
+					menu.select(menu.option);
+					return true;
+				},
+				COMMAND_PRIORITY_CRITICAL,
+			),
+		[editor],
+	);
 	useEffect(
 		() =>
 			editor.registerCommand<KeyboardEvent | null>(
@@ -745,6 +795,7 @@ export function ComposerBody({
 	}, [editor]);
 
 	const toggleBrowseMenu = () => {
+		setSubmenu(null);
 		setTypeaheadDismissed(true);
 		setBrowseIndex(0);
 		setBrowseOpen((previous) => !previous);
@@ -815,9 +866,10 @@ export function ComposerBody({
 				});
 				return;
 			}
-			if (event.key === "Enter") {
-				event.preventDefault();
+			if (event.key === "Enter" || event.key === "ArrowRight") {
 				const entry = browseEntries[browseIndex];
+				if (event.key === "ArrowRight" && !entry?.opensSubmenu) return;
+				event.preventDefault();
 				if (entry) selectBrowseEntry(entry);
 				return;
 			}
@@ -842,10 +894,12 @@ export function ComposerBody({
 					target.closest(".prompt-input-editor")
 				) {
 					setBrowseOpen(false);
+					setSubmenu(null);
 				}
 				return;
 			}
 			setBrowseOpen(false);
+			setSubmenu(null);
 			setTypeaheadDismissed(true);
 			setCommandDismissed(true);
 			setPanel((current) => (current?.bare ? null : current));
@@ -863,7 +917,10 @@ export function ComposerBody({
 	// A chip's hover card or tooltip opens above the composer, where these
 	// menus open, and would catch a click meant for the menu.
 	const chipMenuOpen =
-		mentionQuery !== null || commandQuery !== null || browseOpen;
+		mentionQuery !== null ||
+		commandQuery !== null ||
+		browseOpen ||
+		submenu !== null;
 	return (
 		<ChipRenderProvider renderChip={chipMenuOpen ? withoutTooltip : renderChip}>
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the file picker button */}
@@ -906,6 +963,30 @@ export function ComposerBody({
 							selectedIndex={browseIndex}
 							onHighlight={setBrowseIndex}
 							onSelect={selectBrowseEntry}
+						/>
+					)}
+					{submenu && (
+						<MentionSubmenu
+							key={submenu.id}
+							provider={submenu}
+							className="max-w-[28rem]"
+							onSelect={(entry) => {
+								setSubmenu(null);
+								editor.focus();
+								void entry.select(actionContextRef.current);
+							}}
+							onBack={() => {
+								const row = browseEntries.findIndex(
+									(entry) => entry.id === `browse:${submenu.id}`,
+								);
+								setSubmenu(null);
+								setBrowseIndex(Math.max(row, 0));
+								setBrowseOpen(true);
+							}}
+							onClose={() => {
+								setSubmenu(null);
+								editor.focus();
+							}}
 						/>
 					)}
 				</div>
@@ -994,12 +1075,27 @@ export function ComposerBody({
 						options={mentionOptions}
 						triggerFn={matchTrigger}
 						commandPriority={COMMAND_PRIORITY_HIGH}
-						onClose={() => setMentionQuery(null)}
+						onClose={() => {
+							mentionMenuRef.current = null;
+							setMentionQuery(null);
+						}}
 						menuRenderFn={(
 							anchorElementRef,
 							{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-						) =>
-							anchorElementRef.current && menuSlot && !typeaheadDismissed
+						) => {
+							const shown = Boolean(
+								anchorElementRef.current && menuSlot && !typeaheadDismissed,
+							);
+							mentionMenuRef.current = shown
+								? {
+										option:
+											selectedIndex === null
+												? undefined
+												: mentionOptions[selectedIndex],
+										select: selectOptionAndCleanUp,
+									}
+								: null;
+							return shown && menuSlot
 								? createPortal(
 										<MentionMenu
 											sections={typeaheadSections}
@@ -1014,8 +1110,8 @@ export function ComposerBody({
 										/>,
 										menuSlot,
 									)
-								: null
-						}
+								: null;
+						}}
 					/>
 					<LexicalTypeaheadMenuPlugin<CommandTypeaheadOption>
 						onQueryChange={setCommandQuery}

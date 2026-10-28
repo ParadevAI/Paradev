@@ -20,6 +20,7 @@ import {
 } from "../../utils/linkedContextChips";
 
 const MAX_RESULTS = 20;
+const CLOSED_FILTER = "closed";
 
 function isClosedStatus(type: StatusType | undefined): boolean {
 	return type === "completed" || type === "canceled";
@@ -49,18 +50,28 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 				id: "linear-issues",
 				title: t({ message: "Linear issues" }),
 				priority: 3,
+				icon: <PluginIcon className="size-4" pluginName="linear" />,
+				browse: {
+					label: t({ message: "Linear issues" }),
+					placeholder: t({ message: "Search Linear…" }),
+					filters: [
+						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
+					],
+				},
 				source: {
 					kind: "search",
 					emptyState: t({ message: "No matching Linear issues" }),
-					search: async (query) => {
+					search: async (query, _signal, options) => {
 						// A pasted issue link resolves to that one issue.
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "linear") return [];
+						const includeClosed =
+							ref !== null || options?.filters.has(CLOSED_FILTER) === true;
 						const search = ref ? ref.identifier : query || null;
 						const { issues } = await cloudUtils.integration.linear.issues.fetch(
 							{
 								organizationId,
-								status: ref ? "all" : "open",
+								status: includeClosed ? "all" : "open",
 								assignee: search ? null : "me",
 								search,
 							},
@@ -77,10 +88,19 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 				id: "tasks",
 				title: t({ message: "Tasks" }),
 				priority: 3,
+				icon: <PluginIcon className="size-4" pluginName="superset" />,
+				browse: {
+					label: t({ message: "Tasks" }),
+					placeholder: t({ message: "Search tasks…" }),
+					filters: [
+						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
+					],
+				},
 				source: {
 					kind: "search",
 					emptyState: t({ message: "No matching tasks" }),
-					search: async (query) => {
+					search: async (query, _signal, options) => {
+						const includeClosed = options?.filters.has(CLOSED_FILTER) === true;
 						const [page, statuses] = await Promise.all([
 							cloudUtils.task.listPage.fetch(TASK_PICKER_INPUT),
 							cloudUtils.task.statuses.list.fetch(),
@@ -92,7 +112,10 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 						);
 						const open = page.items
 							.map(({ task }) => task)
-							.filter((task) => !task.statusId || !closed.has(task.statusId));
+							.filter(
+								(task) =>
+									includeClosed || !task.statusId || !closed.has(task.statusId),
+							);
 						const matches = query
 							? new Fuse(open, {
 									keys: [

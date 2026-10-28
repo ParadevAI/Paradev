@@ -40,7 +40,26 @@ export type ComposerMentionEntry = {
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
+	/** Opens a provider's submenu instead of inserting; drawn with a chevron. */
+	opensSubmenu?: boolean;
 	select(ctx: ComposerActionContext): void | Promise<void>;
+};
+
+export type ComposerMentionFilter = { id: string; label: string };
+
+export type ComposerMentionSearchOptions = {
+	/** Ids of the provider's filters that are switched on. */
+	filters: ReadonlySet<string>;
+};
+
+/**
+ * A provider that can be browsed on its own: a row in the top-level menu that
+ * opens a submenu with its own search box and filters.
+ */
+export type ComposerMentionBrowse = {
+	label: string;
+	placeholder: string;
+	filters?: ComposerMentionFilter[];
 };
 
 export type ComposerMentionSource =
@@ -55,6 +74,7 @@ export type ComposerMentionSource =
 			search(
 				query: string,
 				signal: AbortSignal,
+				options?: ComposerMentionSearchOptions,
 			): Promise<ComposerMentionEntry[]>;
 			emptyState: string;
 			loadingState?: string;
@@ -66,6 +86,9 @@ export type ComposerMentionProvider = {
 	priority: number;
 	// The character that opens this provider's menu; "@" when unset.
 	trigger?: string;
+	icon?: ReactNode;
+	/** When set, the top-level menu shows this provider as a submenu row. */
+	browse?: ComposerMentionBrowse;
 	source: ComposerMentionSource;
 };
 

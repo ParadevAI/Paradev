@@ -13,7 +13,10 @@ export type MentionSection = {
 	isLoading: boolean;
 };
 
-function matchesQuery(entry: ComposerMentionEntry, query: string): boolean {
+export function matchesQuery(
+	entry: ComposerMentionEntry,
+	query: string,
+): boolean {
 	if (!query) return true;
 	const lowered = query.toLowerCase();
 	if (entry.label.toLowerCase().includes(lowered)) return true;

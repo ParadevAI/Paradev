@@ -23,9 +23,12 @@ import {
 } from "../../utils/linkedContextChips";
 
 const MAX_RESULTS = 20;
+const CLOSED_FILTER = "closed";
 
 /** A repository reached through its host; the chat pane has one per workspace, the modal per project. */
 export type GitHubRepo = { projectId: string; hostUrl: string };
+
+const PullRequestIcon = PULL_REQUEST_ICON.open;
 
 function normalizePrState(state: string, isDraft: boolean): string {
 	if (isDraft) return "draft";
@@ -80,10 +83,18 @@ export function useGitHubMentionProviders(
 				id: "github-issues",
 				title: t({ message: "GitHub issues" }),
 				priority: 4,
+				icon: <GoIssueOpened className="size-4" />,
+				browse: {
+					label: t({ message: "GitHub issues" }),
+					placeholder: t({ message: "Search issues…" }),
+					filters: [
+						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
+					],
+				},
 				source: {
 					kind: "search",
 					emptyState: t({ message: "No matching issues" }),
-					search: async (query) => {
+					search: async (query, _signal, options) => {
 						// A pasted issue link resolves to that one issue.
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-issue") return [];
@@ -92,7 +103,8 @@ export function useGitHubMentionProviders(
 								projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
-								includeClosed: ref !== null,
+								includeClosed:
+									ref !== null || options?.filters.has(CLOSED_FILTER) === true,
 							});
 						return issues
 							.filter((issue) => !ref || issue.issueNumber === ref.number)
@@ -114,10 +126,18 @@ export function useGitHubMentionProviders(
 				id: "pull-requests",
 				title: t({ message: "Pull requests" }),
 				priority: 5,
+				icon: <PullRequestIcon className="size-4" strokeWidth={1.75} />,
+				browse: {
+					label: t({ message: "Pull requests" }),
+					placeholder: t({ message: "Search pull requests…" }),
+					filters: [
+						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
+					],
+				},
 				source: {
 					kind: "search",
 					emptyState: t({ message: "No matching pull requests" }),
-					search: async (query) => {
+					search: async (query, _signal, options) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-pr") return [];
 						const { pullRequests } =
@@ -125,7 +145,8 @@ export function useGitHubMentionProviders(
 								projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
-								includeClosed: ref !== null,
+								includeClosed:
+									ref !== null || options?.filters.has(CLOSED_FILTER) === true,
 							});
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)
