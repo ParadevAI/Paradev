@@ -2498,6 +2498,7 @@ import {
 	GROK_COMPAT_MARKER_START,
 	getGrokConfigTomlContent,
 	getGrokHooksJsonContent,
+	getGrokManagedNotifyHookCommand,
 	getGrokWrapperScript,
 } from "./agent-wrappers-grok";
 
@@ -2537,6 +2538,37 @@ describe("grok hooks json", () => {
 		expect(parsed.hooks.Notification[0].matcher).toBe(
 			`^(${GROK_BLOCKING_NOTIFICATION_TYPES.join("|")})$`,
 		);
+	});
+
+	it("names no env var and notifies only when SUPERSET_HOME_DIR is set", () => {
+		const command = getGrokManagedNotifyHookCommand();
+		expect(command).not.toMatch(/\$\{?[A-Za-z_]/);
+
+		const home = path.join(TEST_ROOT, "grok-notify");
+		try {
+			const log = path.join(home, "log");
+			const notifyPath = path.join(home, "hooks", "notify.sh");
+			mkdirSync(path.dirname(notifyPath), { recursive: true });
+			writeFileSync(
+				notifyPath,
+				`#!/bin/sh\necho "$SUPERSET_HOOK_HARNESS" >> "${log}"\n`,
+			);
+			chmodSync(notifyPath, 0o755);
+			const { SUPERSET_HOME_DIR: _unset, ...env } = process.env;
+
+			const outside = spawnSync("sh", ["-c", command], { env });
+			expect(outside.status).toBe(0);
+			expect(outside.stderr.toString()).toBe("");
+			expect(existsSync(log)).toBe(false);
+
+			const inside = spawnSync("sh", ["-c", command], {
+				env: { ...env, SUPERSET_HOME_DIR: home },
+			});
+			expect(inside.status).toBe(0);
+			expect(readFileSync(log, "utf-8").trim()).toBe("grok");
+		} finally {
+			rmSync(home, { recursive: true, force: true });
+		}
 	});
 
 	it("keeps the notify template's subtype filter in sync with the matcher", () => {
