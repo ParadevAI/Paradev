@@ -4511,7 +4511,7 @@ msgid "Close Workspace"
 msgstr "Çalışma alanını kapat"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "Kurulum başarılı olunca Workspace Setup sekmesini kapat"
+msgstr "Kurulum başarılı olunca Çalışma Alanı Kurulumu sekmesini kapat"
 
 msgid "Closed"
 msgstr "Kapalı"

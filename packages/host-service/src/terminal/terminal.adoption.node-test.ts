@@ -35,6 +35,7 @@ import {
 	disposeSessionAndWait,
 	listTerminalSessions,
 	replayBuffer,
+	setSetupSucceededHandler,
 } from "./terminal.ts";
 import { __setAccountShellForTesting } from "./user-shell.ts";
 
@@ -666,6 +667,69 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		);
 
 		await disposeSessionAndWait(terminalId, db);
+	});
+
+	test("adopted setup session still reports success after a host-service restart", async () => {
+		const terminalId = `e2e-setup-close-${randomUUID().slice(0, 8)}`;
+		const startedFile = path.join(TEST_HOME, `setup-started-${terminalId}`);
+		const succeeded: string[] = [];
+		setSetupSucceededHandler(({ terminalId: id }) => succeeded.push(id));
+		try {
+			const first = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				listed: false,
+				initialCommand: `touch "${startedFile}" && sleep 1`,
+				closeOnSetupSuccess: true,
+			});
+			assert.ok(!("error" in first));
+			await waitFor(() => fs.existsSync(startedFile), 5000);
+
+			__resetSessionsForTesting();
+			await disposeDaemonClient();
+
+			const adopted = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				listed: false,
+				adoptOnly: true,
+			});
+			assert.ok(!("error" in adopted));
+
+			await waitFor(() => succeeded.includes(terminalId), 5000);
+			const row = db
+				.select({ closeOnSetupSuccess: terminalSessions.closeOnSetupSuccess })
+				.from(terminalSessions)
+				.where(eq(terminalSessions.id, terminalId))
+				.get();
+			assert.ok(!row?.closeOnSetupSuccess);
+		} finally {
+			setSetupSucceededHandler(null);
+			await disposeSessionAndWait(terminalId, db);
+		}
+	});
+
+	test("a typed setup ending in a comment still reports success", async () => {
+		const terminalId = `e2e-setup-comment-${randomUUID().slice(0, 8)}`;
+		const succeeded: string[] = [];
+		setSetupSucceededHandler(({ terminalId: id }) => succeeded.push(id));
+		try {
+			const result = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				listed: false,
+				initialCommand: "true # install deps\n",
+				closeOnSetupSuccess: true,
+			});
+			assert.ok(!("error" in result));
+			await waitFor(() => succeeded.includes(terminalId), 5000);
+		} finally {
+			setSetupSucceededHandler(null);
+			await disposeSessionAndWait(terminalId, db);
+		}
 	});
 
 	test("adoption when the original workspace row is gone returns a clear error", async () => {

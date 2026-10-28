@@ -927,9 +927,10 @@ export const createSettingsRouter = () => {
 		setCloseSetupOnSuccess: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
+				const { id } = getSettings();
 				localDb
 					.insert(settings)
-					.values({ id: 1, closeSetupOnSuccess: input.enabled })
+					.values({ id, closeSetupOnSuccess: input.enabled })
 					.onConflictDoUpdate({
 						target: settings.id,
 						set: { closeSetupOnSuccess: input.enabled },

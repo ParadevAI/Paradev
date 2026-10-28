@@ -4511,7 +4511,7 @@ msgid "Close Workspace"
 msgstr "关闭工作区"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "设置成功后关闭 Workspace Setup 标签页"
+msgstr "设置成功后关闭“工作区设置”标签页"
 
 msgid "Closed"
 msgstr "已关闭"

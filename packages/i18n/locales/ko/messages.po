@@ -4511,7 +4511,7 @@ msgid "Close Workspace"
 msgstr "워크스페이스 닫기"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "설정이 성공하면 Workspace Setup 탭 닫기"
+msgstr "설정이 성공하면 워크스페이스 설정 탭 닫기"
 
 msgid "Closed"
 msgstr "닫힘"

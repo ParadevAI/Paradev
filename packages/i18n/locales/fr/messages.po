@@ -4511,7 +4511,7 @@ msgid "Close Workspace"
 msgstr "Fermer l'espace de travail"
 
 msgid "Close Workspace Setup tab when setup succeeds"
-msgstr "Fermer l'onglet Workspace Setup quand la configuration réussit"
+msgstr "Fermer l'onglet de configuration de l'espace de travail quand la configuration réussit"
 
 msgid "Closed"
 msgstr "Fermée"
