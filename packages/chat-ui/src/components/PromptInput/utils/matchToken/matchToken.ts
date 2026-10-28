@@ -4,7 +4,8 @@ export function matchToken(
 	text: string,
 	trigger: string,
 ): MenuTextMatch | null {
-	const pattern = new RegExp(`(^|\\s)(\\${trigger}([\\w./:-]*))$`);
+	// Route paths such as `[id]`, `(group)` and `$param` are file names too.
+	const pattern = new RegExp(`(^|\\s)(\\${trigger}([\\w./:$()[\\]+~-]*))$`);
 	const match = pattern.exec(text);
 	if (!match) return null;
 	const leadOffset = match.index + (match[1]?.length ?? 0);

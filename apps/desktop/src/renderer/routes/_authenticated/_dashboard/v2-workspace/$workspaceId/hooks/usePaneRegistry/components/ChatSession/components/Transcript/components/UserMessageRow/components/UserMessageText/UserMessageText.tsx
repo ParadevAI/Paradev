@@ -2,6 +2,7 @@ import type { AvailableCommand } from "@superset/chat/protocol";
 import { Chip } from "@superset/chat-ui/Chip";
 import { env } from "renderer/env.renderer";
 import { commandChip } from "../../../../../../utils/commandChip";
+import { fileMentionChip } from "../../../../../../utils/fileMentions";
 import { parseGithubWorkItemUrl } from "../../../../../../utils/githubWorkItem";
 import { unfurlLink } from "../../../../../../utils/linkUnfurl";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
@@ -19,6 +20,9 @@ function segmentChip(
 	if (element.elementKind === "slash_command" && text.startsWith("/")) {
 		const name = text.slice(1);
 		return commandChip(name, commands?.get(name)?.description);
+	}
+	if (element.elementKind === "file_mention") {
+		return fileMentionChip(text, element.label);
 	}
 	return {
 		label: element.label ?? text.split("/").pop() ?? text,

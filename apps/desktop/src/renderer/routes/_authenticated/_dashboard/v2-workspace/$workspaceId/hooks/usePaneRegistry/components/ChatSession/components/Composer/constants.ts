@@ -11,3 +11,5 @@ export const MENU_PANEL_CLASS =
 export const MENU_ROW_CLASS = "h-7 gap-2 rounded-[0.625rem] px-2 text-[13px]";
 
 export const MENU_DESCRIPTION_CLASS = "text-[12px] leading-snug";
+
+export const FILE_SEARCH_LIMIT = 50;

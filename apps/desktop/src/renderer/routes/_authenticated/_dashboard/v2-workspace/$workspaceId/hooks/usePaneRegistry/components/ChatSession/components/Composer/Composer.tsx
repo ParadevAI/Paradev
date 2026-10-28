@@ -36,21 +36,25 @@ import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { FileIcon } from "renderer/lib/fileIcons";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useRecentlyViewedFiles } from "../../../../../useRecentlyViewedFiles";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
 import { type AgentSwitcher, ModelPicker } from "./components/ModelPicker";
 import { ModePicker, type SessionMode } from "./components/ModePicker";
+import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import { useAttachmentPreview } from "./hooks/useAttachmentPreview";
 import {
@@ -287,31 +291,28 @@ export const Composer = memo(function Composer({
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [isActive]);
+	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
 	const searchFiles = useCallback(
 		async (query: string) => {
-			if (!query) return [];
-			const { matches } = await trpcUtils.filesystem.searchFiles.fetch({
-				workspaceId,
-				query,
-				includeHidden: false,
-				limit: 20,
-			});
-			return matches.map(
-				(match): ComposerMentionEntry => ({
-					id: match.absolutePath,
-					label: match.name,
-					description: match.relativePath,
-					// The agent reads the path itself, so a mention is the path.
-					select: (ctx) =>
-						ctx.insertChip({
-							label: match.name,
-							serialized: match.relativePath,
-							data: { elementKind: "file_mention" },
-						}),
+			const { matches } = query.trim()
+				? await trpcUtils.filesystem.searchFiles.fetch({
+						workspaceId,
+						query,
+						includeHidden: false,
+						limit: FILE_SEARCH_LIMIT,
+					})
+				: { matches: [] };
+			return fileMentionMatches(query, recentFiles, matches).map(
+				(file): ComposerMentionEntry => ({
+					id: file.absolutePath,
+					label: file.name,
+					description: file.relativePath,
+					icon: <FileIcon className="size-4" fileName={file.name} />,
+					select: (ctx) => ctx.insertChip(fileMentionChip(file.relativePath)),
 				}),
 			);
 		},
-		[trpcUtils, workspaceId],
+		[trpcUtils, workspaceId, recentFiles],
 	);
 
 	const searchPages = useCallback(
