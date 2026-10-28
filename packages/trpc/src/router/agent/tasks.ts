@@ -32,6 +32,7 @@ export interface StartTaskInput {
 
 export type StartTaskResult =
 	| { taskId: string; status: "running" | "queued" }
+	| { taskId: string; status: "failed"; error: string }
 	| { taskId: string; status: "duplicate"; title: string | null };
 
 /**
@@ -76,10 +77,12 @@ export async function startTask(
 		if (!existing) throw new Error("task insert conflicted with no task");
 		return { taskId: existing.id, status: "duplicate", title: existing.title };
 	}
-	const launched = await fillSlots(input.agentId);
+	const { started, failed } = await fillSlots(input.agentId, task.id);
+	const error = failed.get(task.id);
+	if (error) return { taskId: task.id, status: "failed", error };
 	return {
 		taskId: task.id,
-		status: launched.includes(task.id) ? "running" : "queued",
+		status: started.includes(task.id) ? "running" : "queued",
 	};
 }
 
@@ -148,9 +151,17 @@ async function taskBrief(input: StartTaskInput): Promise<string> {
 		.join("\n\n");
 }
 
-/** Starts queued tasks, oldest first, until the Dev runs its limit. Returns the ids it started. */
-export async function fillSlots(agentId: string): Promise<string[]> {
+/**
+ * Starts queued tasks, oldest first, until the Dev runs its limit. A task that
+ * cannot start is reported to its main session, except `caller`, whose
+ * failure the caller returns itself.
+ */
+export async function fillSlots(
+	agentId: string,
+	caller?: string,
+): Promise<{ started: string[]; failed: Map<string, string> }> {
 	const started: string[] = [];
+	const failed = new Map<string, string>();
 	for (;;) {
 		const [running] = await db
 			.select({ n: count() })
@@ -162,7 +173,7 @@ export async function fillSlots(agentId: string): Promise<string[]> {
 					eq(agentSessions.taskStatus, "running"),
 				),
 			);
-		if ((running?.n ?? 0) >= MAX_RUNNING_TASKS) return started;
+		if ((running?.n ?? 0) >= MAX_RUNNING_TASKS) return { started, failed };
 		const [next] = await db
 			.update(agentSessions)
 			.set({ taskStatus: "running" })
@@ -184,19 +195,18 @@ export async function fillSlots(agentId: string): Promise<string[]> {
 				),
 			)
 			.returning();
-		if (!next) return started;
+		if (!next) return { started, failed };
 		try {
 			await launchTask(next);
 			started.push(next.id);
 		} catch (error) {
+			const result = `Could not start: ${error instanceof Error ? error.message : String(error)}`;
 			await db
 				.update(agentSessions)
-				.set({
-					taskStatus: "failed",
-					result: `Could not start: ${error instanceof Error ? error.message : String(error)}`,
-				})
+				.set({ taskStatus: "failed", result })
 				.where(eq(agentSessions.id, next.id));
-			await reportToParent(next.id, null);
+			failed.set(next.id, result);
+			if (next.id !== caller) await reportToParent(next.id, null);
 		}
 	}
 }
@@ -295,7 +305,7 @@ async function reportToParent(taskId: string, turnId: string | null) {
 		actingUserId: task.requestedByUserId,
 		promptId: `task-update:${turnId ?? task.id}`,
 		text: eventText({
-			from: `your task "${task.title ?? task.id}"`,
+			from: `your task: ${task.title ?? task.id}`,
 			where: "a task you started",
 			replyTo: null,
 			body: lines.join("\n"),
