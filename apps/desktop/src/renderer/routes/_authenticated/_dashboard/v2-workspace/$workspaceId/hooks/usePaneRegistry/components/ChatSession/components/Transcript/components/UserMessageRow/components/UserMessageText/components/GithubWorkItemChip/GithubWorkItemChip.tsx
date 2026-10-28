@@ -5,23 +5,13 @@ import { CircleDot, GitPullRequest } from "lucide-react";
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../../../../../utils/githubWorkItem";
 import {
-	GithubWorkItemHoverCard,
-	type GithubWorkItemTone,
+	GITHUB_WORK_ITEM_TONE_TEXT,
 	githubWorkItemTone,
-} from "../../../../../../../GithubWorkItemHoverCard";
+} from "../../../../../../../../utils/githubWorkItemTone";
+import { GithubWorkItemHoverCard } from "../../../../../../../GithubWorkItemHoverCard";
 import { LinkMenu } from "../../../../../../../LinkMenu";
 
-const TONE_CHIP: Record<GithubWorkItemTone, string> = {
-	neutral: "bg-foreground/[0.07] text-foreground/60",
-	open: "bg-emerald-400/10 text-emerald-400/90",
-	done: "bg-violet-400/10 text-violet-400/90",
-	closed: "bg-rose-400/10 text-rose-400/90",
-};
-
-/**
- * A pull request or issue someone pasted, as a small chip. It stays neutral
- * until the hover card has read the state, so its colour never guesses.
- */
+/** A pull request or issue someone pasted, as a small chip in GitHub's colour for its state. */
 export function GithubWorkItemChip({
 	link,
 	url,
@@ -47,7 +37,7 @@ export function GithubWorkItemChip({
 		: t({ message: `Issue #${link.number}` });
 	const Icon = pr ? GitPullRequest : CircleDot;
 	return (
-		<GithubWorkItemHoverCard link={link}>
+		<GithubWorkItemHoverCard link={link} url={url}>
 			<LinkMenu href={url}>
 				<a
 					className="mx-px inline-flex max-w-full items-center rounded-md align-middle text-foreground/70 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
@@ -62,7 +52,8 @@ export function GithubWorkItemChip({
 					<span
 						className={cn(
 							"inline-flex h-[18px] shrink-0 items-center gap-0.5 rounded-[6px] px-1.5 font-medium text-xs leading-4",
-							TONE_CHIP[tone],
+							"bg-[color-mix(in_srgb,currentColor_12%,transparent)]",
+							GITHUB_WORK_ITEM_TONE_TEXT[tone],
 						)}
 					>
 						<Icon aria-hidden="true" className="size-3" />

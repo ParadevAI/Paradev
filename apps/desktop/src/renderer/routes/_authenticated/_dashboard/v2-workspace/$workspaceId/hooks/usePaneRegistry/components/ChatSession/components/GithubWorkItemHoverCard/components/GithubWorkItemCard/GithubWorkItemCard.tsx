@@ -17,6 +17,10 @@ import {
 import type { MouseEvent } from "react";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
+import {
+	GITHUB_WORK_ITEM_TONE_TEXT,
+	githubWorkItemTone,
+} from "../../../../utils/githubWorkItemTone";
 
 /** What `github.getWorkItem` answers, as the card reads it. */
 export type GithubWorkItemGlance = {
@@ -50,29 +54,6 @@ const STATE_LABELS = {
 	open: msg({ message: "Open", context: "pull request or issue state" }),
 };
 
-export type GithubWorkItemTone = "neutral" | "open" | "done" | "closed";
-
-const TONE_TEXT: Record<GithubWorkItemTone, string> = {
-	neutral: "text-foreground/50",
-	open: "text-emerald-400/90",
-	done: "text-violet-400/90",
-	closed: "text-rose-400/90",
-};
-
-/** The colour GitHub shows for a pull request or issue in this state. */
-export function githubWorkItemTone(
-	kind: GithubWorkItemLink["kind"],
-	item: Pick<GithubWorkItemGlance, "state" | "draft" | "stateReason"> | null,
-): GithubWorkItemTone {
-	if (!item || item.draft) return "neutral";
-	if (item.state === "open") return "open";
-	if (item.state === "merged") return "done";
-	if (kind === "pr") return "closed";
-	return item.stateReason === "not_planned" || item.stateReason === "duplicate"
-		? "neutral"
-		: "done";
-}
-
 function statusOf(
 	kind: GithubWorkItemLink["kind"],
 	item: GithubWorkItemGlance | null,
@@ -82,16 +63,13 @@ function statusOf(
 	className: string;
 } {
 	const tone = githubWorkItemTone(kind, item);
-	const className = TONE_TEXT[tone];
+	const className = GITHUB_WORK_ITEM_TONE_TEXT[tone];
 	if (!item) {
 		return {
 			Icon: kind === "pr" ? GitPullRequest : CircleDot,
 			label: kind === "pr" ? STATE_LABELS.pr : STATE_LABELS.issue,
 			className,
 		};
-	}
-	if (item.draft) {
-		return { Icon: GitPullRequestDraft, label: STATE_LABELS.draft, className };
 	}
 	if (item.state === "merged") {
 		return { Icon: GitMerge, label: STATE_LABELS.merged, className };
@@ -104,6 +82,9 @@ function statusOf(
 					? CircleCheck
 					: CircleSlash;
 		return { Icon, label: STATE_LABELS.closed, className };
+	}
+	if (item.draft) {
+		return { Icon: GitPullRequestDraft, label: STATE_LABELS.draft, className };
 	}
 	return {
 		Icon: kind === "pr" ? GitPullRequest : CircleDot,
@@ -150,15 +131,19 @@ function Avatar({
 export function GithubWorkItemCard({
 	link,
 	load,
+	url,
+	onOpen,
 }: {
 	link: GithubWorkItemLink;
 	load: GithubWorkItemLoad;
+	url: string;
+	onOpen?: () => void;
 }) {
 	const { i18n, t } = useLingui();
 	const { openLink } = useChatPaneActions();
-	const href = `https://github.com/${link.owner}/${link.repo}/${link.kind === "pr" ? "pull" : "issues"}/${link.number}`;
 	const open = (event: MouseEvent<HTMLAnchorElement>) => {
-		if (openLink?.(href, event)) event.preventDefault();
+		if (openLink?.(url, event)) event.preventDefault();
+		onOpen?.();
 	};
 	const item = load.status === "ready" ? load.item : null;
 	const status = statusOf(link.kind, item);
@@ -197,7 +182,7 @@ export function GithubWorkItemCard({
 					<h3 className="mt-2 line-clamp-2 font-semibold text-[13px] text-foreground leading-[1.35]">
 						<a
 							className="text-inherit no-underline outline-none hover:underline focus-visible:underline"
-							href={href}
+							href={url}
 							onClick={open}
 							rel="noreferrer"
 							target="_blank"
@@ -300,7 +285,7 @@ export function GithubWorkItemCard({
 			<div className="mt-3 border-foreground/[0.07] border-t pt-2">
 				<a
 					className="inline-flex items-center gap-1 rounded-sm font-medium text-[11px] text-foreground/55 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
-					href={href}
+					href={url}
 					onClick={open}
 					rel="noreferrer"
 					target="_blank"

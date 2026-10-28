@@ -23,9 +23,11 @@ const FRESH_FOR_MS = 2 * 60 * 1000;
 export function GithubWorkItemHoverCard({
 	children,
 	link,
+	url,
 }: {
 	children: ReactNode;
 	link: GithubWorkItemLink;
+	url: string;
 }) {
 	const { workspaceId } = useChatPaneActions();
 	const [open, setOpen] = useState(false);
@@ -72,7 +74,12 @@ export function GithubWorkItemHoverCard({
 				side="top"
 				sideOffset={6}
 			>
-				<GithubWorkItemCard link={link} load={load} />
+				<GithubWorkItemCard
+					link={link}
+					load={load}
+					onOpen={() => setOpen(false)}
+					url={url}
+				/>
 			</HoverCardContent>
 		</HoverCard>
 	);

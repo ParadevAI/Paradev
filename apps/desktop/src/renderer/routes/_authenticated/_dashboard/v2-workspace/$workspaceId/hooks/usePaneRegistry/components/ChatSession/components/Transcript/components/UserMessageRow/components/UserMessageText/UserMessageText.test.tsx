@@ -9,6 +9,7 @@ import {
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
@@ -81,6 +82,7 @@ test("a service link is a pill, the first other link its host and then its title
 		`Look at ${PR} and ${DOCS}\nthen ${LATER}.`,
 		{ title: "Content · Agent Client Protocol", iconDataUrl: null },
 	);
+	await act(async () => {});
 	expect(view.getByText("agentclientprotocol.com").closest("a")?.href).toBe(
 		DOCS,
 	);
