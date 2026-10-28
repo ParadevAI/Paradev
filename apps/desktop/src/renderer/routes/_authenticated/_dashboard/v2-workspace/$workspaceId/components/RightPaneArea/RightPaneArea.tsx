@@ -21,6 +21,7 @@ import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/Bro
 import type { PaneViewerData } from "../../types";
 import { NEW_TAB_PANE, RightPaneNewTab } from "../RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../V2NotificationStatusIndicator";
+import { PullRequestCountsPrefetch } from "./components/PullRequestCountsPrefetch";
 import {
 	withNewTabSplitButton,
 	withNewTabSplitMenu,
@@ -54,7 +55,7 @@ export function RightPaneArea({
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	// Keeps the New Tab's lists cached and fresh while the workspace is open.
-	useNewTabLists(workspace.id);
+	const { pullRequests } = useNewTabLists(workspace.id);
 	const rightPaneActions = useMemo(
 		() => withNewTabSplitButton(paneActions),
 		[paneActions],
@@ -71,6 +72,9 @@ export function RightPaneArea({
 
 	return (
 		<div className="contents" data-pane-area="right">
+			{pullRequests.map((pr) => (
+				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
+			))}
 			<Workspace<PaneViewerData>
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
