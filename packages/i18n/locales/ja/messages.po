@@ -8152,6 +8152,12 @@ msgstr "デフォルトの復元に失敗しました"
 msgid "Failed to resume {0}"
 msgstr "{0}の再開に失敗しました"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "エクスプローラーでの表示に失敗しました"
+
+msgid "Failed to reveal in File Manager"
+msgstr "ファイルマネージャーでの表示に失敗しました"
+
 msgid "Failed to reveal in Finder"
 msgstr "Finderでの表示に失敗しました"
 

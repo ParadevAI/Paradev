@@ -84,6 +84,10 @@ import {
 } from "../../utils/focusTerminalPane";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
+import {
+	revealInFileManagerLabel,
+	revealTarget,
+} from "../../utils/revealInFileManager";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
@@ -130,10 +134,6 @@ import { openInActions } from "./utils/openInActions";
 import { pagePaneLabel } from "./utils/pagePaneLabel";
 import { pagesListPageUiId } from "./utils/pagesListPageUiId";
 import { replaceEndedTerminal } from "./utils/replaceEndedTerminal";
-import {
-	revealInFileManagerLabel,
-	revealTarget,
-} from "./utils/revealInFileManager";
 
 function getFileName(filePath: string): string {
 	return getBaseName(filePath);

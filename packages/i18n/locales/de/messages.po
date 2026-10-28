@@ -8152,6 +8152,12 @@ msgstr "Standardwerte konnten nicht wiederhergestellt werden"
 msgid "Failed to resume {0}"
 msgstr "{0} konnte nicht fortgesetzt werden"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Anzeigen im Datei-Explorer fehlgeschlagen"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Anzeigen im Dateimanager fehlgeschlagen"
+
 msgid "Failed to reveal in Finder"
 msgstr "Anzeigen im Finder fehlgeschlagen"
 

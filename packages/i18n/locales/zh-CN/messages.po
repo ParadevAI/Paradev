@@ -8152,6 +8152,12 @@ msgstr "恢复默认值失败"
 msgid "Failed to resume {0}"
 msgstr "恢复{0}失败"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "在文件资源管理器中显示失败"
+
+msgid "Failed to reveal in File Manager"
+msgstr "在文件管理器中显示失败"
+
 msgid "Failed to reveal in Finder"
 msgstr "在Finder中显示失败"
 

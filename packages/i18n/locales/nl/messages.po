@@ -8152,6 +8152,12 @@ msgstr "Herstellen van standaardwaarden mislukt"
 msgid "Failed to resume {0}"
 msgstr "Hervatten van {0} mislukt"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Tonen in Verkenner mislukt"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Tonen in bestandsbeheer mislukt"
+
 msgid "Failed to reveal in Finder"
 msgstr "Tonen in Finder mislukt"
 

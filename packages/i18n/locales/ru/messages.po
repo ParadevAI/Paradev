@@ -8152,6 +8152,12 @@ msgstr "Не удалось восстановить значения по ум�
 msgid "Failed to resume {0}"
 msgstr "Не удалось возобновить {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Не удалось показать в Проводнике"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Не удалось показать в файловом менеджере"
+
 msgid "Failed to reveal in Finder"
 msgstr "Не удалось показать в Finder"
 

@@ -8152,6 +8152,12 @@ msgstr "Nepodařilo se obnovit výchozí nastavení"
 msgid "Failed to resume {0}"
 msgstr "Nepodařilo se obnovit {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Nepodařilo se zobrazit v Průzkumníku souborů"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Nepodařilo se zobrazit ve správci souborů"
+
 msgid "Failed to reveal in Finder"
 msgstr "Nepodařilo se zobrazit ve Finderu"
 

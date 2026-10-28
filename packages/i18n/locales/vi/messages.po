@@ -8152,6 +8152,12 @@ msgstr "Không thể khôi phục mặc định"
 msgid "Failed to resume {0}"
 msgstr "Không thể resume {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Không thể hiện trong File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Không thể hiện trong trình quản lý tệp"
+
 msgid "Failed to reveal in Finder"
 msgstr "Không thể hiện trong Finder"
 

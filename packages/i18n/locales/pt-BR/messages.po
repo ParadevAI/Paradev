@@ -8152,6 +8152,12 @@ msgstr "Falha ao restaurar os padrões"
 msgid "Failed to resume {0}"
 msgstr "Falha ao retomar {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Falha ao mostrar no Explorador de Arquivos"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Falha ao mostrar no gerenciador de arquivos"
+
 msgid "Failed to reveal in Finder"
 msgstr "Falha ao mostrar no Finder"
 

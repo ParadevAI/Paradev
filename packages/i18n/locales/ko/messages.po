@@ -8152,6 +8152,12 @@ msgstr "기본값을 복원하지 못했습니다"
 msgid "Failed to resume {0}"
 msgstr "{0}을(를) 재개하지 못했습니다"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "파일 탐색기에서 표시하지 못했습니다"
+
+msgid "Failed to reveal in File Manager"
+msgstr "파일 관리자에서 표시하지 못했습니다"
+
 msgid "Failed to reveal in Finder"
 msgstr "Finder에서 표시하지 못했습니다"
 

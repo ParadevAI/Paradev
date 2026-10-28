@@ -8152,6 +8152,12 @@ msgstr "恢復預設值失敗"
 msgid "Failed to resume {0}"
 msgstr "恢復{0}失敗"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "在檔案總管中顯示失敗"
+
+msgid "Failed to reveal in File Manager"
+msgstr "在檔案管理員中顯示失敗"
+
 msgid "Failed to reveal in Finder"
 msgstr "在Finder中顯示失敗"
 

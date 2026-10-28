@@ -8152,6 +8152,12 @@ msgstr "Nie udało się przywrócić ustawień domyślnych"
 msgid "Failed to resume {0}"
 msgstr "Nie udało się wznowić {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Nie udało się pokazać w Eksploratorze plików"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Nie udało się pokazać w menedżerze plików"
+
 msgid "Failed to reveal in Finder"
 msgstr "Nie udało się pokazać w Finderze"
 

@@ -8152,6 +8152,12 @@ msgstr "Échec de la restauration des valeurs par défaut"
 msgid "Failed to resume {0}"
 msgstr "Échec de la reprise de {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Échec de l'affichage dans l'Explorateur de fichiers"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Échec de l'affichage dans le gestionnaire de fichiers"
+
 msgid "Failed to reveal in Finder"
 msgstr "Échec de l'affichage dans le Finder"
 

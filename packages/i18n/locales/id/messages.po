@@ -8152,6 +8152,12 @@ msgstr "Gagal memulihkan setelan bawaan"
 msgid "Failed to resume {0}"
 msgstr "Gagal melanjutkan {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Gagal menampilkan di File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Gagal menampilkan di pengelola file"
+
 msgid "Failed to reveal in Finder"
 msgstr "Gagal menampilkan di Finder"
 

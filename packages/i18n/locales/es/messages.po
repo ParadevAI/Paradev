@@ -8152,6 +8152,12 @@ msgstr "No se pudieron restaurar los valores predeterminados"
 msgid "Failed to resume {0}"
 msgstr "No se pudo retomar {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "No se pudo mostrar en el Explorador de archivos"
+
+msgid "Failed to reveal in File Manager"
+msgstr "No se pudo mostrar en el gestor de archivos"
+
 msgid "Failed to reveal in Finder"
 msgstr "No se pudo mostrar en Finder"
 
