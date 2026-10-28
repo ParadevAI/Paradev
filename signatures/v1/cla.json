@@ -95,6 +95,14 @@
       "created_at": "2026-10-28T10:19:19Z",
       "repoId": 1080370450,
       "pullRequestNo": 8995
+    },
+    {
+      "name": "serhii-kucherenko",
+      "id": 21200035,
+      "comment_id": 6475809512,
+      "created_at": "2026-10-28T17:21:28Z",
+      "repoId": 1080370450,
+      "pullRequestNo": 9000
     }
   ]
 }
