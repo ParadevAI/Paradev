@@ -12758,9 +12758,6 @@ msgstr "Otwórz plik"
 msgid "Open File in New Tab"
 msgstr "Otwórz plik w nowej karcie"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Otwieraj pliki, diffy i przeglądarki w kartach po prawej, a środek zostaw dla terminali i czatów."
-
 msgid "Open from folder"
 msgstr "Otwórz z folderu"
 
@@ -15565,9 +15562,6 @@ msgstr "Rozbudowane pole tekstowe ({hotkeyText})"
 
 msgid "right pane"
 msgstr "prawy panel"
-
-msgid "Right pane area"
-msgstr "Obszar prawego panelu"
 
 msgid "Right-click here"
 msgstr "Kliknij tutaj prawym przyciskiem"

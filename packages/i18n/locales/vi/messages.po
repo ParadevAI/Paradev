@@ -12758,9 +12758,6 @@ msgstr "Mở tệp"
 msgid "Open File in New Tab"
 msgstr "Mở tệp ở tab mới"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Mở tệp, diff và trình duyệt trong các tab ở bên phải, giữ khu vực giữa cho terminal và chat."
-
 msgid "Open from folder"
 msgstr "Mở từ thư mục"
 
@@ -15565,9 +15562,6 @@ msgstr "Nhập nâng cao ({hotkeyText})"
 
 msgid "right pane"
 msgstr "ngăn bên phải"
-
-msgid "Right pane area"
-msgstr "Khu vực ngăn bên phải"
 
 msgid "Right-click here"
 msgstr "Nhấp chuột phải ở đây"

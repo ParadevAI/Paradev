@@ -12758,9 +12758,6 @@ msgstr "Открыть файл"
 msgid "Open File in New Tab"
 msgstr "Открыть файл в новой вкладке"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Открывайте файлы, диффы и браузеры во вкладках справа, а центр оставьте для терминалов и чатов."
-
 msgid "Open from folder"
 msgstr "Открыть из папки"
 
@@ -15565,9 +15562,6 @@ msgstr "Расширенный ввод ({hotkeyText})"
 
 msgid "right pane"
 msgstr "правая панель"
-
-msgid "Right pane area"
-msgstr "Область правой панели"
 
 msgid "Right-click here"
 msgstr "Кликните здесь правой кнопкой"

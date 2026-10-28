@@ -12758,9 +12758,6 @@ msgstr "Apri il file"
 msgid "Open File in New Tab"
 msgstr "Apri il file in una nuova scheda"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Apri file, diff e browser in schede a destra e riserva il centro ai terminali e alle chat."
-
 msgid "Open from folder"
 msgstr "Apri da cartella"
 
@@ -15565,9 +15562,6 @@ msgstr "Input avanzato ({hotkeyText})"
 
 msgid "right pane"
 msgstr "riquadro destro"
-
-msgid "Right pane area"
-msgstr "Area del riquadro destro"
 
 msgid "Right-click here"
 msgstr "Clicca qui con il tasto destro"

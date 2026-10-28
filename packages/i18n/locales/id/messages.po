@@ -12758,9 +12758,6 @@ msgstr "Buka File"
 msgid "Open File in New Tab"
 msgstr "Buka File di Tab Baru"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Buka file, diff, dan browser di tab sebelah kanan, dan sisakan bagian tengah untuk terminal dan chat."
-
 msgid "Open from folder"
 msgstr "Buka dari folder"
 
@@ -15565,9 +15562,6 @@ msgstr "Input kaya ({hotkeyText})"
 
 msgid "right pane"
 msgstr "panel kanan"
-
-msgid "Right pane area"
-msgstr "Area panel kanan"
 
 msgid "Right-click here"
 msgstr "Klik kanan di sini"

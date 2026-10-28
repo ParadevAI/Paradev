@@ -12758,9 +12758,6 @@ msgstr "파일 열기"
 msgid "Open File in New Tab"
 msgstr "새 탭에서 파일 열기"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "파일, diff, 브라우저를 오른쪽 탭에서 열고 가운데는 터미널과 채팅용으로 둡니다."
-
 msgid "Open from folder"
 msgstr "폴더에서 열기"
 
@@ -15565,9 +15562,6 @@ msgstr "리치 입력 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "오른쪽 패널"
-
-msgid "Right pane area"
-msgstr "오른쪽 패널 영역"
 
 msgid "Right-click here"
 msgstr "여기를 오른쪽 클릭"

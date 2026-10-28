@@ -12758,9 +12758,6 @@ msgstr "打开文件"
 msgid "Open File in New Tab"
 msgstr "在新标签页中打开文件"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "在右侧标签页中打开文件、差异和浏览器，中间区域留给终端和聊天。"
-
 msgid "Open from folder"
 msgstr "从文件夹打开"
 
@@ -15565,9 +15562,6 @@ msgstr "富输入（{hotkeyText}）"
 
 msgid "right pane"
 msgstr "右侧面板"
-
-msgid "Right pane area"
-msgstr "右侧面板区域"
 
 msgid "Right-click here"
 msgstr "在这里右键点击"

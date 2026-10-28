@@ -12758,9 +12758,6 @@ msgstr "ファイルを開く"
 msgid "Open File in New Tab"
 msgstr "新しいタブでファイルを開く"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "ファイル、差分、ブラウザを右側のタブで開き、中央はターミナルとチャット用に残します。"
-
 msgid "Open from folder"
 msgstr "フォルダから開く"
 
@@ -15565,9 +15562,6 @@ msgstr "リッチ入力 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "右ペイン"
-
-msgid "Right pane area"
-msgstr "右ペインエリア"
 
 msgid "Right-click here"
 msgstr "ここを右クリック"

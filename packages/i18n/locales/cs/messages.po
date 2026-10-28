@@ -12758,9 +12758,6 @@ msgstr "Otevřít soubor"
 msgid "Open File in New Tab"
 msgstr "Otevřít soubor na nové kartě"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Otevírejte soubory, rozdíly a prohlížeče v kartách vpravo a střed ponechte pro terminály a chaty."
-
 msgid "Open from folder"
 msgstr "Otevřít ze složky"
 
@@ -15565,9 +15562,6 @@ msgstr "Rozšířený vstup ({hotkeyText})"
 
 msgid "right pane"
 msgstr "pravý panel"
-
-msgid "Right pane area"
-msgstr "Oblast pravého panelu"
 
 msgid "Right-click here"
 msgstr "Klikněte sem pravým tlačítkem"

@@ -12758,9 +12758,6 @@ msgstr "Dosyayı aç"
 msgid "Open File in New Tab"
 msgstr "Dosyayı yeni sekmede aç"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Dosyaları, diff'leri ve tarayıcıları sağdaki sekmelerde açın, ortayı terminaller ve sohbetler için bırakın."
-
 msgid "Open from folder"
 msgstr "Klasörden aç"
 
@@ -15565,9 +15562,6 @@ msgstr "Zengin giriş ({hotkeyText})"
 
 msgid "right pane"
 msgstr "sağ panel"
-
-msgid "Right pane area"
-msgstr "Sağ panel alanı"
 
 msgid "Right-click here"
 msgstr "Buraya sağ tıklayın"

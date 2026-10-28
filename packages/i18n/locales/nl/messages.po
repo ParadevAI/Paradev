@@ -12758,9 +12758,6 @@ msgstr "Bestand openen"
 msgid "Open File in New Tab"
 msgstr "Bestand openen in nieuw tabblad"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Open bestanden, diffs en browsers in tabbladen aan de rechterkant en houd het midden vrij voor terminals en chats."
-
 msgid "Open from folder"
 msgstr "Openen vanuit map"
 
@@ -15565,9 +15562,6 @@ msgstr "Uitgebreide invoer ({hotkeyText})"
 
 msgid "right pane"
 msgstr "rechterpaneel"
-
-msgid "Right pane area"
-msgstr "Rechterpaneelgebied"
 
 msgid "Right-click here"
 msgstr "Klik hier met rechts"
