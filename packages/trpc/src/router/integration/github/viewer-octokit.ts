@@ -9,15 +9,15 @@ import { userError } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import { findInstalledRepository } from "./find-installed-repository";
 
-export interface PullRequestInput {
+interface PullRequestInput {
 	organizationId: string;
 	repoFullName: string;
 	number: number;
 }
 
-export type ViewerPullRequest = PullRequestOnGithub & { number: number };
+type ViewerPullRequest = PullRequestOnGithub & { number: number };
 
-export function notConnectedError() {
+function notConnectedError() {
 	return userError({
 		code: "PRECONDITION_FAILED",
 		message: "Connect GitHub in Settings to act on pull requests as yourself",

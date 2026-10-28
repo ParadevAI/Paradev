@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -12,17 +12,12 @@ export function usePullRequestThreads(
 	options: { enabled?: boolean } = {},
 ) {
 	return useQuery({
-		queryKey: target
-			? pullRequestThreadsQueryKey(target)
-			: ["pull-request-threads", null],
-		queryFn: () => {
-			if (!target) throw new Error("The pull request is not known yet");
-			return readPullRequestThreads(target);
-		},
-		enabled:
-			(options.enabled ?? true) &&
-			target !== null &&
-			canActOnPullRequest(target),
+		queryKey: pullRequestThreadsQueryKey(target),
+		queryFn:
+			target && canActOnPullRequest(target)
+				? () => readPullRequestThreads(target)
+				: skipToken,
+		enabled: options.enabled ?? true,
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 		refetchInterval: 30_000,
