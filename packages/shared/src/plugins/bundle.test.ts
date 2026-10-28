@@ -10,6 +10,8 @@ import {
 const tree = new Map([
 	["plugin.json", Buffer.from('{"name":"team-tools"}')],
 	["skills/triage/SKILL.md", Buffer.from("---\nname: triage\n---\n")],
+	["scripts/deploy.sh", Buffer.from("#!/bin/sh\necho hi\n")],
+	["assets/icon.svg", Buffer.from("<svg/>")],
 ]);
 
 function raw(files: unknown[]): Buffer {
@@ -18,11 +20,27 @@ function raw(files: unknown[]): Buffer {
 
 describe("plugin bundles", () => {
 	test("a tree comes back byte for byte, and packs the same way twice", () => {
-		const bundle = packPluginBundle(tree);
-		expect(unpackPluginBundle(bundle)).toEqual(tree);
+		const bundle = packPluginBundle(tree, new Set(["scripts/deploy.sh"]));
+		expect(unpackPluginBundle(bundle)).toEqual({
+			files: tree,
+			executable: new Set(["scripts/deploy.sh"]),
+		});
 		expect(
-			pluginBundleHash(packPluginBundle(new Map([...tree].reverse()))),
+			pluginBundleHash(
+				packPluginBundle(
+					new Map([...tree].reverse()),
+					new Set(["scripts/deploy.sh"]),
+				),
+			),
 		).toBe(pluginBundleHash(bundle));
+	});
+
+	test("a format 1 bundle still unpacks", () => {
+		expect(
+			unpackPluginBundle(
+				raw([{ path: "plugin.json", content: "e30=" }]),
+			).files.has("plugin.json"),
+		).toBe(true);
 	});
 
 	test("a path outside the plugin tree is refused", () => {
@@ -30,8 +48,9 @@ describe("plugin bundles", () => {
 			"../escape",
 			"skills/../../x",
 			"/etc/passwd",
-			"src/server.js",
-			"plugin.json/x",
+			".git/config",
+			"node_modules/x/index.js",
+			"hooks/pre.sh",
 		]) {
 			expect(() =>
 				unpackPluginBundle(

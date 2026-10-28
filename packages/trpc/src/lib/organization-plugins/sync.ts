@@ -68,7 +68,15 @@ async function bundleFor(
 		"plugin.json",
 		Buffer.from(JSON.stringify(withVersion(manifest, files), null, "\t")),
 	);
-	return { bundle: packPluginBundle(files), skills: skillsIn(files) };
+	const executable = new Set(
+		[...tree]
+			.filter(([repoPath]) => snapshot.executable?.has(repoPath))
+			.map(([, bundlePath]) => bundlePath),
+	);
+	return {
+		bundle: packPluginBundle(files, executable),
+		skills: skillsIn(files),
+	};
 }
 
 /**

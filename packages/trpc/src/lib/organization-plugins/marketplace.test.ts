@@ -55,6 +55,8 @@ describe("repository paths", () => {
 		"plugins/a/skills/triage/SKILL.md",
 		"plugins/a/commands/ship.md",
 		"plugins/a/node_modules/x/index.js",
+		"plugins/a/hooks/pre.sh",
+		"plugins/a/scripts/deploy.sh",
 		"plugins/a/README.md",
 		"plugins/ab/skills/other/SKILL.md",
 	]);
@@ -68,10 +70,12 @@ describe("repository paths", () => {
 		expect(findManifestFile(paths, "plugins/b")).toBeNull();
 	});
 
-	test("carries only skills and commands, and only from the plugin's own directory", () => {
+	test("carries the whole plugin directory except hooks, node_modules and .git", () => {
 		expect([...pluginTreeFiles(paths, "plugins/a")]).toEqual([
 			["plugins/a/skills/triage/SKILL.md", "skills/triage/SKILL.md"],
 			["plugins/a/commands/ship.md", "commands/ship.md"],
+			["plugins/a/scripts/deploy.sh", "scripts/deploy.sh"],
+			["plugins/a/README.md", "README.md"],
 		]);
 	});
 });

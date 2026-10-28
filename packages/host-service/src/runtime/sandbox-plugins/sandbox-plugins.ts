@@ -97,13 +97,15 @@ async function cacheOrganizationTree(
 		if (pluginBundleHash(bundle) !== download.contentHash) {
 			throw new Error("the download does not match its hash");
 		}
+		const { files, executable } = unpackPluginBundle(bundle);
 		return {
 			version: download.version,
 			installPath: writePluginTree(
 				download.marketplace,
 				download.name,
 				download.version,
-				unpackPluginBundle(bundle),
+				files,
+				executable,
 			),
 		};
 	} catch (error) {

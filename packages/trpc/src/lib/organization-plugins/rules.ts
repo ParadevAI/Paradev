@@ -89,7 +89,8 @@ export function readOrganizationBundle(bundle: Uint8Array): PluginManifest {
 	let raw: unknown;
 	try {
 		raw = JSON.parse(
-			unpackPluginBundle(bundle).get("plugin.json")?.toString("utf8") ?? "",
+			unpackPluginBundle(bundle).files.get("plugin.json")?.toString("utf8") ??
+				"",
 		);
 	} catch (error) {
 		throw new OrganizationPluginError(

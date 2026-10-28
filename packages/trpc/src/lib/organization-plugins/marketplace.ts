@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { PLUGIN_TREE_ENTRIES } from "@superset/shared/plugins/bundle";
+import { isPluginTreePath } from "@superset/shared/plugins/bundle";
 
 export const MARKETPLACE_FILE = ".agent-marketplace.json";
 
@@ -94,7 +94,7 @@ export function findManifestFile(
 	return paths.has(path) ? path : null;
 }
 
-/** Repository path to the path it takes in a plugin bundle, for every file a plugin carries besides its manifest. */
+/** Repository path to the path it takes in a plugin bundle: the whole plugin directory, as Codex copies it, besides its manifest and the excluded folders. */
 export function pluginTreeFiles(
 	paths: Iterable<string>,
 	dir: string,
@@ -104,12 +104,7 @@ export function pluginTreeFiles(
 	for (const path of paths) {
 		if (!path.startsWith(prefix)) continue;
 		const relative = path.slice(prefix.length);
-		const top = relative.split("/")[0];
-		if (
-			top !== "plugin.json" &&
-			relative.includes("/") &&
-			(PLUGIN_TREE_ENTRIES as readonly string[]).includes(top ?? "")
-		) {
+		if (relative !== "plugin.json" && isPluginTreePath(relative)) {
 			out.set(path, relative);
 		}
 	}

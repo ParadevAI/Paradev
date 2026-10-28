@@ -52,6 +52,7 @@ export function writePluginTree(
 	name: string,
 	version: string,
 	files: ReadonlyMap<string, Uint8Array>,
+	executable: ReadonlySet<string> = new Set(),
 ): string {
 	const target = path.resolve(pluginCachePath(marketplace, name, version));
 	const staging = `${target}.incoming-${process.pid}`;
@@ -66,7 +67,9 @@ export function writePluginTree(
 				);
 			}
 			fs.mkdirSync(path.dirname(destination), { recursive: true });
-			fs.writeFileSync(destination, data);
+			fs.writeFileSync(destination, data, {
+				mode: executable.has(relative) ? 0o755 : 0o644,
+			});
 		}
 		fs.rmSync(previous, { recursive: true, force: true });
 		const hadTarget = fs.existsSync(target);

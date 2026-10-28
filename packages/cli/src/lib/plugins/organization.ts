@@ -35,12 +35,13 @@ export async function installOrganizationPlugin(
 			`The download of "${name}" does not match what your organization synced. Try again.`,
 		);
 	}
-	const files = unpackPluginBundle(bundle);
+	const { files, executable } = unpackPluginBundle(bundle);
 	const installPath = writePluginTree(
 		download.marketplace,
 		download.name,
 		download.version,
 		files,
+		executable,
 	);
 	return await recordPlugin({
 		name: download.name,

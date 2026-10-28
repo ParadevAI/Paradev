@@ -6,6 +6,7 @@ import {
 	readdirSync,
 	readFileSync,
 	rmSync,
+	statSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -106,7 +107,9 @@ describe("seedSandboxPlugins", () => {
 			new Map([
 				["plugin.json", Buffer.from('{"name":"team-tools","version":"2.0.0"}')],
 				["skills/triage/SKILL.md", Buffer.from("---\nname: triage\n---\n")],
+				["scripts/run.sh", Buffer.from("#!/bin/sh\n")],
 			]),
+			new Set(["scripts/run.sh"]),
 		);
 		await seedSandboxPlugins(
 			{
@@ -129,6 +132,12 @@ describe("seedSandboxPlugins", () => {
 			installPath: cached,
 		});
 		expect(existsSync(join(cached, "skills", "triage", "SKILL.md"))).toBe(true);
+		expect(statSync(join(cached, "scripts", "run.sh")).mode & 0o111).not.toBe(
+			0,
+		);
+		expect(
+			statSync(join(cached, "skills", "triage", "SKILL.md")).mode & 0o111,
+		).toBe(0);
 	});
 
 	it("leaves no partial tree behind when the copy fails", async () => {

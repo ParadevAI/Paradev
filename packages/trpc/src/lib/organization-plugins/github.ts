@@ -6,6 +6,7 @@ const REQUEST_TIMEOUT_MS = 15_000;
 export interface RepositorySnapshot {
 	sha: string;
 	paths: ReadonlySet<string>;
+	executable?: ReadonlySet<string>;
 	read(path: string): Promise<Buffer>;
 }
 
@@ -55,7 +56,7 @@ export async function repositorySnapshot(args: {
 	);
 	const tree = await github<{
 		truncated: boolean;
-		tree: { path?: string; type?: string; sha?: string }[];
+		tree: { path?: string; type?: string; sha?: string; mode?: string }[];
 	}>(`/git/trees/${sha}?recursive=1`);
 	if (tree.truncated) {
 		throw new Error(
@@ -64,15 +65,18 @@ export async function repositorySnapshot(args: {
 	}
 
 	const blobs = new Map<string, string>();
+	const executable = new Set<string>();
 	for (const entry of tree.tree) {
 		if (entry.type === "blob" && entry.path && entry.sha) {
 			blobs.set(entry.path, entry.sha);
+			if (entry.mode === "100755") executable.add(entry.path);
 		}
 	}
 
 	return {
 		sha,
 		paths: new Set(blobs.keys()),
+		executable,
 		async read(path) {
 			const blob = blobs.get(path);
 			if (!blob) throw new Error(`${path} is not in ${args.repo}@${sha}`);
