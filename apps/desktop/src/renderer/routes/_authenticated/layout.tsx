@@ -29,6 +29,7 @@ import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
+import { HostTerminalThemeSync } from "renderer/routes/_authenticated/components/HostTerminalThemeSync";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
 import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
@@ -327,6 +328,7 @@ function AuthenticatedLayout() {
 									highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
 								>
 									<DiffThemeSync />
+									<HostTerminalThemeSync />
 									<AgentHooks />
 									<FileMenuListener />
 									<V2NotificationController />
