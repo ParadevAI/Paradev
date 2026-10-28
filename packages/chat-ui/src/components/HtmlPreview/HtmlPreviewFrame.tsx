@@ -34,6 +34,8 @@ export function HtmlPreviewFrame({
 	const frameRef = useRef<HTMLIFrameElement>(null);
 	const [box, setBox] = useState({ width: 0, height: 0 });
 	const [page, setPage] = useState<PreviewSize | null>(null);
+	// A page that once overflowed keeps that width: laid out wider to fit, it
+	// no longer overflows, and forgetting would make fit flip back and forth.
 
 	useEffect(() => {
 		const element = boxRef.current;
@@ -52,17 +54,18 @@ export function HtmlPreviewFrame({
 			if (event.source !== frameRef.current?.contentWindow) return;
 			const size = readPreviewSize(event.data);
 			if (!size) return;
-			setPage((current) =>
-				current?.width === size.width && current.height === size.height
+			setPage((current) => {
+				const width = size.width > 0 ? size.width : (current?.width ?? 0);
+				return current?.width === width && current.height === size.height
 					? current
-					: size,
-			);
+					: { width, height: size.height };
+			});
 		};
 		window.addEventListener("message", onMessage);
 		return () => window.removeEventListener("message", onMessage);
 	}, []);
 
-	const scale = previewScale(zoom, box.width, page?.width ?? null);
+	const scale = previewScale(zoom, box.width, page?.width || null);
 	const pageHeight = Math.min(
 		PREVIEW_MAX_HEIGHT,
 		Math.max(PREVIEW_MIN_HEIGHT, page?.height ?? DEFAULT_HEIGHT),

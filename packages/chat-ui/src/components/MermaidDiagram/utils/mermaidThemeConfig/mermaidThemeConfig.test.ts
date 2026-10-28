@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mermaidThemeConfig } from "./mermaidThemeConfig";
+import { mermaidThemeConfig, normalizeCssColor } from "./mermaidThemeConfig";
 
 const hexOnly = (value: string) => (value.startsWith("#") ? value : null);
 
@@ -30,5 +30,17 @@ describe("mermaidThemeConfig", () => {
 		expect(dark.themeVariables?.darkMode).toBe(true);
 		expect(dark.themeVariables?.background).toBe("#1e1e2e");
 		expect(light.themeVariables?.background).toBe("#ffffff");
+	});
+
+	test("reads the app's oklch and hsl tokens as hex and refuses what it cannot read", () => {
+		expect(normalizeCssColor("oklch(1 0 0)")).toBe("#ffffff");
+		expect(normalizeCssColor("hsl(0 0% 0%)")).toBe("#000000");
+		expect(normalizeCssColor("var(--background)")).toBeNull();
+		expect(
+			mermaidThemeConfig({
+				appearance: "light",
+				colors: { background: "oklch(1 0 0)" },
+			}).themeVariables?.background,
+		).toBe("#ffffff");
 	});
 });

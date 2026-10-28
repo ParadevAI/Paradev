@@ -1,3 +1,4 @@
+import { toHex } from "@superset/shared/themes/utils";
 import type {
 	MermaidAppearance,
 	MermaidRenderConfig,
@@ -26,28 +27,12 @@ const FALLBACK_COLORS: Record<MermaidAppearance, MermaidThemeColors> = {
 
 export type NormalizeColor = (value: string) => string | null;
 
-const HEX_COLOR = /^#[0-9a-f]{3,8}$/i;
-const PROBE_COLOR = "#010203";
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
-let probe: CanvasRenderingContext2D | null | undefined;
-
-/**
- * Mermaid's colour maths reads hex, rgb and hsl; a canvas reads every CSS
- * colour syntax and gives back one of those.
- */
+/** Mermaid's colour maths reads hex; the app's tokens may be oklch or hsl. */
 export const normalizeCssColor: NormalizeColor = (value) => {
-	if (HEX_COLOR.test(value)) return value;
-	if (probe === undefined) {
-		probe =
-			typeof document === "undefined"
-				? null
-				: document.createElement("canvas").getContext("2d");
-	}
-	if (!probe) return null;
-	probe.fillStyle = PROBE_COLOR;
-	probe.fillStyle = value;
-	const normalized = probe.fillStyle;
-	return normalized === PROBE_COLOR ? null : normalized;
+	const hex = toHex(value);
+	return HEX_COLOR.test(hex) ? hex : null;
 };
 
 export function mermaidThemeConfig(

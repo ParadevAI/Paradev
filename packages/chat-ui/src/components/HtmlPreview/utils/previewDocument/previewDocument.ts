@@ -9,7 +9,12 @@ export const PREVIEW_MAX_HEIGHT = 480;
 const MAX_REPORTED_WIDTH = 10_000;
 const MAX_REPORTED_HEIGHT = 20_000;
 
-const SIZE_SCRIPT = `(()=>{const post=()=>parent.postMessage({type:"${PREVIEW_SIZE_MESSAGE}",width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight},"*");let frame=0;const schedule=()=>{if(frame)return;frame=requestAnimationFrame(()=>{frame=0;post()})};if(typeof ResizeObserver==="function"){const observer=new ResizeObserver(schedule);observer.observe(document.documentElement);if(document.body)observer.observe(document.body)}addEventListener("load",schedule);schedule()})();`;
+/**
+ * The root's own box is the page's height; scrollHeight would never be less
+ * than the frame, so a frame sized from it could only grow. Width is only
+ * reported when the page overflows its frame; 0 means it fits.
+ */
+const SIZE_SCRIPT = `(()=>{const post=()=>{const html=document.documentElement;const box=html.getBoundingClientRect();parent.postMessage({type:"${PREVIEW_SIZE_MESSAGE}",width:html.scrollWidth>innerWidth?html.scrollWidth:0,height:Math.max(box.height,html.scrollHeight>innerHeight?html.scrollHeight:0)},"*")};let frame=0;const schedule=()=>{if(frame)return;frame=requestAnimationFrame(()=>{frame=0;post()})};if(typeof ResizeObserver==="function"){const observer=new ResizeObserver(schedule);observer.observe(document.documentElement);if(document.body)observer.observe(document.body)}addEventListener("load",schedule);schedule()})();`;
 
 /**
  * The policy comes first, so it covers everything the fence wrote, and a
@@ -21,6 +26,7 @@ export function previewDocument(html: string): string {
 	return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${HTML_PREVIEW_CSP}"></head><body>${html}<script>${SIZE_SCRIPT}</script></body></html>`;
 }
 
+/** `width` is 0 when the page fits its frame sideways. */
 export type PreviewSize = { width: number; height: number };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -40,7 +46,7 @@ export function readPreviewSize(data: unknown): PreviewSize | null {
 		return null;
 	}
 	return {
-		width: clamp(Math.ceil(width), 1, MAX_REPORTED_WIDTH),
+		width: clamp(Math.ceil(width), 0, MAX_REPORTED_WIDTH),
 		height: clamp(Math.ceil(height), 1, MAX_REPORTED_HEIGHT),
 	};
 }

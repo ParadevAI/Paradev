@@ -29,6 +29,9 @@ describe("readPreviewSize", () => {
 				height: 1e9,
 			}),
 		).toEqual({ width: 641, height: 20_000 });
+		expect(
+			readPreviewSize({ type: PREVIEW_SIZE_MESSAGE, width: 0, height: 120 }),
+		).toEqual({ width: 0, height: 120 });
 		expect(readPreviewSize({ type: "other", width: 1, height: 1 })).toBeNull();
 		expect(
 			readPreviewSize({ type: PREVIEW_SIZE_MESSAGE, width: "640", height: 1 }),
