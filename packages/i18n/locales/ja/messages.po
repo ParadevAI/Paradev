@@ -4401,6 +4401,9 @@ msgstr "クラウド使用量"
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
+msgid "Cloud workspace — connecting"
+msgstr "クラウドワークスペース — 接続中"
+
 msgid "Cloud workspaces"
 msgstr "クラウドワークスペース"
 

@@ -4401,6 +4401,9 @@ msgstr "云端用量"
 msgid "Cloud workspace"
 msgstr "云端工作区"
 
+msgid "Cloud workspace — connecting"
+msgstr "云端工作区，正在连接"
+
 msgid "Cloud workspaces"
 msgstr "云工作区"
 

@@ -4401,6 +4401,9 @@ msgstr "Использование облака"
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
+msgid "Cloud workspace — connecting"
+msgstr "Облачная рабочая область — подключение"
+
 msgid "Cloud workspaces"
 msgstr "Облачные рабочие области"
 

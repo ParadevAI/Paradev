@@ -4401,6 +4401,9 @@ msgstr "Cloud usage"
 msgid "Cloud workspace"
 msgstr "Cloud workspace"
 
+msgid "Cloud workspace — connecting"
+msgstr "Cloud workspace — connecting"
+
 msgid "Cloud workspaces"
 msgstr "Cloud workspaces"
 

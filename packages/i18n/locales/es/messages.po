@@ -4401,6 +4401,9 @@ msgstr "Uso de la nube"
 msgid "Cloud workspace"
 msgstr "Espacio de trabajo en la nube"
 
+msgid "Cloud workspace — connecting"
+msgstr "Espacio de trabajo en la nube: conectando"
+
 msgid "Cloud workspaces"
 msgstr "Espacios de trabajo en la nube"
 

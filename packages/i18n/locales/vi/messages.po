@@ -4401,6 +4401,9 @@ msgstr "Mức sử dụng đám mây"
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
+msgid "Cloud workspace — connecting"
+msgstr "Workspace cloud — đang kết nối"
+
 msgid "Cloud workspaces"
 msgstr "Không gian làm việc đám mây"
 

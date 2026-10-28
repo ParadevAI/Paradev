@@ -4401,6 +4401,9 @@ msgstr "Využití cloudu"
 msgid "Cloud workspace"
 msgstr "Cloudový pracovní prostor"
 
+msgid "Cloud workspace — connecting"
+msgstr "Cloudový pracovní prostor — připojuji"
+
 msgid "Cloud workspaces"
 msgstr "Cloudové pracovní prostory"
 
