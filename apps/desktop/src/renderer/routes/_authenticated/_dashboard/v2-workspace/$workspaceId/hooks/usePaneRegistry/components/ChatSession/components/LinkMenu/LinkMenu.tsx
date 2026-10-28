@@ -9,7 +9,7 @@ import { toast } from "@superset/ui/sonner";
 import { Clipboard, ExternalLink } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
+import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 
 const WEB_URL = /^https?:\/\//i;
 const NO_MODIFIERS = {
@@ -40,7 +40,7 @@ export function LinkMenu({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild {...triggerProps} />
-			<ContextMenuContent>
+			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
 				<ContextMenuItem onSelect={copy}>
 					<Clipboard />
 					<Trans>Copy Link</Trans>

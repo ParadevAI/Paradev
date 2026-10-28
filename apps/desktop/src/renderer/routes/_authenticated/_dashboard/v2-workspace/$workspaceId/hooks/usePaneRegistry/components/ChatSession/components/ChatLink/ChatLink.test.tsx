@@ -1,5 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
 import type { AppRouter } from "@superset/host-service/trpc";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
@@ -34,7 +40,16 @@ function renderLink(href: string, children: ReactNode, answer: unknown) {
 			queryClient={new QueryClient()}
 		>
 			<ChatPaneActionsProvider openLink={() => true} workspaceId="workspace-1">
-				<ChatLink href={href}>{children}</ChatLink>
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<div>
+							<ChatLink href={href}>{children}</ChatLink>
+						</div>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem>Close Pane</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
@@ -148,7 +163,7 @@ test("a square preview image is a thumbnail beside the text", async () => {
 	expect(card.querySelector("img.size-16")).toBeTruthy();
 });
 
-test("right-clicking a link copies its address", async () => {
+test("right-clicking a link opens its own menu, not the pane's, and copies it", async () => {
 	const writes: string[] = [];
 	const original = Object.getOwnPropertyDescriptor(navigator, "clipboard");
 	Object.defineProperty(navigator, "clipboard", {
@@ -158,7 +173,9 @@ test("right-clicking a link copies its address", async () => {
 	try {
 		const { link } = renderLink(PR, PR, null);
 		fireEvent.contextMenu(link);
-		fireEvent.click(await screen.findByText("Copy Link"));
+		const copy = await screen.findByText("Copy Link");
+		expect(screen.queryByText("Close Pane")).toBeNull();
+		fireEvent.click(copy);
 		await waitFor(() => expect(writes).toEqual([PR]));
 	} finally {
 		if (original) Object.defineProperty(navigator, "clipboard", original);

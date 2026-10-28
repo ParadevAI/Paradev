@@ -17,8 +17,8 @@ import {
 import { ChatPreviewHoverCard } from "../ChatPreviewHoverCard";
 import { FileLinkMenu } from "../FileLinkMenu";
 import { GithubWorkItemHoverCard } from "../GithubWorkItemHoverCard";
+import { LinkMenu } from "../LinkMenu";
 import { WebsiteHoverCard } from "../WebsiteHoverCard";
-import { LinkMenu } from "./components/LinkMenu";
 import { LinkUnfurlIcon } from "./components/LinkUnfurlIcon";
 
 const MarkdownLink = chatMarkdownComponents.a;

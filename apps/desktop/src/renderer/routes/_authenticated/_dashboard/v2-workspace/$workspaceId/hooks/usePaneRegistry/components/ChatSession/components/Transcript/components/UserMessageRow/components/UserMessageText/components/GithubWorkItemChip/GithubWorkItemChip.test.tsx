@@ -2,7 +2,13 @@ import { afterEach, expect, mock, test } from "bun:test";
 import type { AppRouter } from "@superset/host-service/trpc";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/react";
 import type { TRPCLink } from "@trpc/client";
 import { TRPCClientError } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
@@ -111,4 +117,29 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 
 	fireEvent.click(chip);
 	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_PR]);
+});
+
+test("right-clicking closes the card, and copying the link leaves it closed", async () => {
+	const original = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+	Object.defineProperty(navigator, "clipboard", {
+		configurable: true,
+		value: { writeText: async () => {} },
+	});
+	try {
+		const { chip } = renderChip(() => ITEM);
+		chip.focus();
+		await screen.findByText("feat(chat): load whole sessions");
+
+		fireEvent.contextMenu(chip);
+		const copy = await screen.findByText("Copy Link");
+		expect(screen.queryByText("feat(chat): load whole sessions")).toBeNull();
+
+		fireEvent.click(copy);
+		await waitFor(() => expect(screen.queryByText("Copy Link")).toBeNull());
+		expect(document.activeElement).not.toBe(chip);
+		expect(screen.queryByText("feat(chat): load whole sessions")).toBeNull();
+	} finally {
+		if (original) Object.defineProperty(navigator, "clipboard", original);
+		else Reflect.deleteProperty(navigator, "clipboard");
+	}
 });
