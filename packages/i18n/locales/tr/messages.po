@@ -997,9 +997,6 @@ msgstr "{kindLabel} tema"
 msgid "{label} access to {pluginName}"
 msgstr "{label} rolünün {pluginName} erişimi"
 
-msgid "{label} in cloud workspaces"
-msgstr "Bulut çalışma alanlarında {label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "Kullanılabilir"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Kullanılabilir eklentiler her rolün Eklentiler sayfasında görünür. Yüklü eklentiler roldeki herkes için yüklenir; bu kişiler onları devre dışı bırakabilir ama kaldıramaz."
+
 msgid "Available when the agent is idle."
 msgstr "Ajan boştayken kullanılabilir."
 
@@ -12597,13 +12595,14 @@ msgstr "Bu host'u yalnızca host sahipleri veya kuruluş sahipleri silebilir"
 msgid "Only images can be attached to a comment"
 msgstr "Bir yoruma yalnızca görsel eklenebilir"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "Eklentileri yalnızca kuruluş sahipleri ve yöneticileri yönetebilir."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi değiştirebilir"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Yalnızca bu makinede: git tarafından yok sayılır ve bu deponun her worktree'sine uygulanır. Burada ayarlanan her anahtar paylaşılanın yerini alır."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Eklentileri yalnızca kuruluş sahipleri ve yöneticileri yönetebilir."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Bu ayarları yalnızca kuruluş sahipleri değiştirebilir."
@@ -14964,10 +14963,11 @@ msgstr "{label} kaldır"
 msgid "Remove {label}?"
 msgstr "{label} kaldırılsın mı?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan kaldırılır."
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan kaldırılır."
 
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} kaldır"
@@ -17830,78 +17830,8 @@ msgstr "Superset artık Paradev. Bir de 11,5 milyon dolarlık tohum yatırımı 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile ile geliştiriciler, bilgisayarlarında zaten kullandıkları Superset çalışma alanlarına iPhone'dan devam edebilir."
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile sayfası"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile, ajanları bağladığınız bilgisayarlarda çalıştırır."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "iPhone'da Superset Mobile terminali"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, bulut çalışma alanları, otomasyonlar ve öncelikli destek."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset'in başka bir tarayıcının verilerini okuyabilmesi için Tam Disk Erişimi gerekir. Sistem Ayarları'ndan verin, sonra yeniden denetleyin."
-
-msgid "Superset next to others"
-msgstr "Superset ve diğerleri"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "iPad'de Superset; bir pull request ve bir çalışma alanı listesi gösteriliyor"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset yalnızca bu bağlayıcının istediği izinleri alır. İzinleri geri almak için istediğiniz zaman bağlantıyı kesin."
-
-msgid "Superset originals"
-msgstr "Superset özgünleri"
-
-msgid "Superset Pages"
-msgstr "Superset Sayfalar"
-
-msgid "Superset Pages demo"
-msgstr "Superset Sayfalar demosu"
-
-msgid "Superset Plugins"
-msgstr "Superset Eklentileri"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, Superset'i YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Superset, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi trust.superset.sh adresinde inceleyin."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
-
-msgid "Superset Teams"
-msgstr "Superset Takımlar"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset sistem RAM'inin {0} kadarını kullanıyor"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset ve alternatifleri"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset, Claude Code, OpenCode, OpenAI Codex ve daha fazlası dahil olmak üzere CLI tabanlı her kodlama ajanıyla çalışır. Çalışma alanınızı veya inceleme akışınızı değiştirmeden her görev için farklı bir ajan seçin."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Superset'in mobil uygulaması, bilgisayarımdan çok uzakta olsam bile ajanlarımı her yerden çalışır durumda tutmamı ve önlerindeki engelleri kaldırmamı sağlıyor."
 
 msgid "Supervised"
 msgstr "Gözetimli"
@@ -18656,9 +18586,6 @@ msgstr "Aradığınız sayfa mevcut değil."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Bölme gerçek oturumlarınızı kullanır. Ajanlar, önemli sonuçları olan bir eylemden önce size sorar."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "Yol deponun içinde kalmalı"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Paradev masaüstü uygulaması macOS ve Linux için kullanılabilir."
 
@@ -18667,6 +18594,10 @@ msgstr "{organization} için Paradev host hizmeti beklenmedik şekilde durdu ({c
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev host hizmeti beklenmedik şekilde durdu ({cause}) ve otomatik olarak yeniden başlatılamadı."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "Yol deponun içinde kalmalı"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Havuz her ay sıfırlanır. Havuzu aşan kullanım her planda gösterilen GB-saat ücretiyle faturalandırılır."
@@ -21186,15 +21117,16 @@ msgstr "Kuruluşunuz"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Bu çalışma alanını başlatmak için Ayarlar, Faturalandırma bölümünden sınırı artırın veya planı yükseltin."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Kuruluşunuz ortam sınırına ({0}) ulaştı. Bir ortamı arşivleyin veya daha fazla eklemek için Ayarlar, Faturalandırma bölümünden planı yükseltin."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Kuruluşunuz {plugin} eklentisini sizin için yüklüyor, bu yüzden kaldırılamaz. Devre dışı bırakabilirsiniz."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Kuruluşunuz bu eklentiyi sizin için yüklüyor. Devre dışı bırakabilirsiniz ama kaldıramazsınız."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "Kuruluşunuz ortam sınırına ({0}) ulaştı. Bir ortamı arşivleyin veya daha fazla eklemek için Ayarlar, Faturalandırma bölümünden planı yükseltin."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Sınır artırılmazsa bu çalışma alanı birkaç dakika içinde durdurulacak."

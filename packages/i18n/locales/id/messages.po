@@ -997,9 +997,6 @@ msgstr "Tema {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Akses {label} ke {pluginName}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} di workspace cloud"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "Tersedia"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Plugin yang tersedia muncul di halaman Plugin setiap peran. Plugin yang terpasang dipasang untuk semua orang dalam peran itu, yang bisa menonaktifkannya tetapi tidak bisa menghapusnya."
+
 msgid "Available when the agent is idle."
 msgstr "Tersedia saat agen tidak sedang bekerja."
 
@@ -12597,13 +12595,14 @@ msgstr "Hanya pemilik host atau pemilik organisasi yang bisa menghapus host ini"
 msgid "Only images can be attached to a comment"
 msgstr "Hanya gambar yang dapat dilampirkan ke komentar"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "Hanya pemilik dan admin organisasi yang dapat mengelola plugin."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Hanya pembuatnya atau admin organisasi yang dapat mengubah agen ini"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Hanya di mesin ini: diabaikan git dan diterapkan ke setiap worktree repositori ini. Setiap kunci yang diatur di sini menggantikan yang dibagikan."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Hanya pemilik dan admin organisasi yang dapat mengelola plugin."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Hanya pemilik organisasi yang bisa mengubah pengaturan ini."
@@ -14964,10 +14963,11 @@ msgstr "Hapus {label}"
 msgid "Remove {label}?"
 msgstr "Hapus {label}?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Hapus {repo}? Semua plugin yang disinkronkan darinya dihapus dari organisasi Anda."
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "Hapus {repo}? Semua plugin yang disinkronkan darinya dihapus dari organisasi Anda."
 
 msgid "Remove {repositoryName}"
 msgstr "Hapus {repositoryName}"
@@ -17830,78 +17830,8 @@ msgstr "Superset kini menjadi Paradev. Oh ya, kami juga meraih pendanaan awal se
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile hadir di iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile memungkinkan developer melanjutkan workspace Superset yang sudah mereka gunakan di komputer dari iPhone."
-
-msgid "Superset Mobile page"
-msgstr "Halaman Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile menjalankan agen di komputer yang Anda hubungkan."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Terminal Superset Mobile di iPhone"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, workspace cloud, otomatisasi, dan dukungan prioritas."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset butuh Full Disk Access untuk membaca data browser lain. Berikan izinnya di System Settings, lalu periksa lagi."
-
-msgid "Superset next to others"
-msgstr "Superset dibanding yang lain"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset di iPad, menampilkan pull request dan daftar workspace"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset hanya menerima izin yang diminta konektor ini. Putuskan koneksi kapan saja untuk mencabutnya."
-
-msgid "Superset originals"
-msgstr "Orisinal Superset"
-
-msgid "Superset Pages"
-msgstr "Halaman Superset"
-
-msgid "Superset Pages demo"
-msgstr "Demo Halaman Superset"
-
-msgid "Superset Plugins"
-msgstr "Plugin Superset"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Superset telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset bermula sebagai proyek hackathon pada November 2025. Waktu itu sekadar aplikasi desktop untuk mengelola worktree."
-
-msgid "Superset Teams"
-msgstr "Tim Superset"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset memakai {0} dari RAM sistem"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset vs Alternatifnya"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset bekerja dengan agen coding berbasis CLI mana pun, termasuk Claude Code, OpenCode, OpenAI Codex, dan lainnya. Pilih agen berbeda untuk tiap tugas tanpa mengubah workspace atau alur review Anda."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Aplikasi seluler Superset memungkinkan saya menjaga agen tetap bekerja dan mengatasi hambatannya dari mana saja, bahkan saat saya jauh dari komputer."
 
 msgid "Supervised"
 msgstr "Diawasi"
@@ -18656,9 +18586,6 @@ msgstr "Halaman yang Anda cari tidak ada."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Panel memakai login asli Anda. Agen bertanya dulu sebelum melakukan tindakan yang berdampak."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "Path harus tetap di dalam repositori"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Aplikasi desktop Paradev tersedia untuk macOS dan Linux."
 
@@ -18667,6 +18594,10 @@ msgstr "Layanan host Paradev untuk {organization} berhenti tak terduga ({cause})
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Layanan host Paradev berhenti tak terduga ({cause}) dan tidak bisa dimulai ulang otomatis."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "Path harus tetap di dalam repositori"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Kumpulan direset setiap bulan. Penggunaan di atasnya ditagih per GB-jam sesuai tarif di setiap paket."
@@ -21186,15 +21117,16 @@ msgstr "Organisasi Anda"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Naikkan batas atau upgrade di Pengaturan, Penagihan untuk memulai workspace ini."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Organisasi Anda telah mencapai batas lingkungan ({0}). Arsipkan satu lingkungan, atau upgrade di Pengaturan, Penagihan untuk menambah lagi."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Organisasi Anda memasang {plugin} untuk Anda, jadi plugin ini tidak dapat dicopot. Anda dapat menonaktifkannya."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Organisasi Anda memasang plugin ini untuk Anda. Anda dapat menonaktifkannya, tetapi tidak dapat menghapusnya."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "Organisasi Anda telah mencapai batas lingkungan ({0}). Arsipkan satu lingkungan, atau upgrade di Pengaturan, Penagihan untuk menambah lagi."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini akan berhenti dalam beberapa menit kecuali batasnya dinaikkan."

@@ -997,9 +997,6 @@ msgstr "{kindLabel} theme"
 msgid "{label} access to {pluginName}"
 msgstr "{label} access to {pluginName}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} in cloud workspaces"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "Available"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
+
 msgid "Available when the agent is idle."
 msgstr "Available when the agent is idle."
 
@@ -12597,13 +12595,14 @@ msgstr "Only host owners or organization owners can delete this host"
 msgid "Only images can be attached to a comment"
 msgstr "Only images can be attached to a comment"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "Only organization owners and admins can manage plugins."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Only its creator or an organization admin can change this agent"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Only organization owners and admins can manage plugins."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Only organization owners can modify these settings."
@@ -14964,10 +14963,11 @@ msgstr "Remove {label}"
 msgid "Remove {label}?"
 msgstr "Remove {label}?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Remove {repo}? Every plugin synced from it is removed from your organization."
 msgid "Remove {name}"
 msgstr "Remove {name}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "Remove {repo}? Every plugin synced from it is removed from your organization."
 
 msgid "Remove {repositoryName}"
 msgstr "Remove {repositoryName}"
@@ -17830,78 +17830,8 @@ msgstr "Superset is now Paradev. Also, we raised an $11.5M seed"
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile launches on iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile page"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile runs agents on the computers you connect."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Superset Mobile terminal on iPhone"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, cloud workspaces, automations, and priority support."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-
-msgid "Superset next to others"
-msgstr "Superset next to others"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset on iPad, showing a pull request and a workspace list"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-
-msgid "Superset originals"
-msgstr "Superset originals"
-
-msgid "Superset Pages"
-msgstr "Superset Pages"
-
-msgid "Superset Pages demo"
-msgstr "Superset Pages demo"
-
-msgid "Superset Plugins"
-msgstr "Superset Plugins"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-
-msgid "Superset Teams"
-msgstr "Superset Teams"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset uses {0} of system RAM"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset vs the Alternatives"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
 
 msgid "Supervised"
 msgstr "Supervised"
@@ -18656,9 +18586,6 @@ msgstr "The page you're looking for doesn't exist."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "The pane uses your real logins. Agents ask you before they take a consequential action."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "The path must stay inside the repository"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "The Paradev desktop app is available for macOS and Linux."
 
@@ -18667,6 +18594,10 @@ msgstr "The Paradev host service for {organization} stopped unexpectedly ({cause
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "The path must stay inside the repository"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
@@ -21186,15 +21117,16 @@ msgstr "Your organization"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Your organization installs this plugin for you. You can disable it, but not remove it."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."

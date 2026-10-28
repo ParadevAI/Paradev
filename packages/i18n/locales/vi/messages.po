@@ -997,9 +997,6 @@ msgstr "Chủ đề {kindLabel}"
 msgid "{label} access to {pluginName}"
 msgstr "Quyền {label} với {pluginName}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} trong workspace cloud"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "Khả dụng"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Plugin khả dụng hiện trên trang Plugin của từng vai trò. Plugin đã cài được cài cho mọi người trong vai trò đó; họ có thể tắt nhưng không thể gỡ."
+
 msgid "Available when the agent is idle."
 msgstr "Dùng được khi agent đang rảnh."
 
@@ -12597,13 +12595,14 @@ msgstr "Chỉ chủ sở hữu host hoặc chủ sở hữu tổ chức mới x�
 msgid "Only images can be attached to a comment"
 msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "Chỉ chủ sở hữu và admin của tổ chức mới có thể quản lý plugin."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Chỉ người tạo hoặc quản trị viên tổ chức mới có thể thay đổi agent này"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Chỉ trên máy này: được git bỏ qua và áp dụng cho mọi worktree của repository này. Mọi khóa đặt ở đây sẽ thay thế khóa dùng chung."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Chỉ chủ sở hữu và admin của tổ chức mới có thể quản lý plugin."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Chỉ chủ sở hữu tổ chức mới sửa được các cài đặt này."
@@ -14964,10 +14963,11 @@ msgstr "Gỡ {label}"
 msgid "Remove {label}?"
 msgstr "Gỡ {label}?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn."
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn."
 
 msgid "Remove {repositoryName}"
 msgstr "Gỡ {repositoryName}"
@@ -17830,78 +17830,8 @@ msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi đư�
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile giúp nhà phát triển tiếp tục từ iPhone các workspace Superset mà họ đang dùng trên máy tính."
-
-msgid "Superset Mobile page"
-msgstr "Trang Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile chạy agent trên những máy tính bạn kết nối."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Terminal của Superset Mobile trên iPhone"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, workspace đám mây, tự động hóa và hỗ trợ ưu tiên."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset cần quyền Full Disk Access để đọc dữ liệu của trình duyệt khác. Cấp quyền trong System Settings rồi kiểm tra lại."
-
-msgid "Superset next to others"
-msgstr "Superset so với các công cụ khác"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset trên iPad, hiển thị một pull request và danh sách workspace"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset chỉ nhận các quyền mà trình kết nối này yêu cầu. Ngắt kết nối bất cứ lúc nào để thu hồi."
-
-msgid "Superset originals"
-msgstr "Thành phần riêng của Superset"
-
-msgid "Superset Pages"
-msgstr "Superset Trang"
-
-msgid "Superset Pages demo"
-msgstr "Bản demo Superset Trang"
-
-msgid "Superset Plugins"
-msgstr "Plugin Superset"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn Superset là một trong những startup nổi bật tại YC Demo Day."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Superset đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
-
-msgid "Superset Teams"
-msgstr "Nhóm Superset"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset dùng {0} RAM hệ thống"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset và các lựa chọn khác"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset làm việc với mọi coding agent dạng CLI, gồm Claude Code, OpenCode, OpenAI Codex và nhiều agent khác. Chọn agent khác nhau cho từng tác vụ mà không phải đổi workspace hay quy trình review."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Ứng dụng di động Superset giúp tôi duy trì công việc của các agent và gỡ vướng cho chúng từ bất cứ đâu, ngay cả khi tôi ở xa máy tính."
 
 msgid "Supervised"
 msgstr "Có giám sát"
@@ -18656,9 +18586,6 @@ msgstr "Trang bạn tìm không tồn tại."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Ngăn dùng thông tin đăng nhập thật của bạn. Agent sẽ hỏi bạn trước khi thực hiện hành động quan trọng."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "Đường dẫn phải nằm trong repository"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Ứng dụng desktop Paradev có sẵn cho macOS và Linux."
 
@@ -18667,6 +18594,10 @@ msgstr "Dịch vụ host Paradev cho {organization} đã dừng bất ngờ ({ca
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Dịch vụ host Paradev đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "Đường dẫn phải nằm trong repository"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ được tính theo GB-giờ với mức giá hiển thị ở từng gói."
@@ -21186,15 +21117,16 @@ msgstr "Tổ chức của bạn"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Hãy tăng giới hạn hoặc nâng cấp trong Cài đặt, Thanh toán để khởi động workspace này."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). Hãy lưu trữ một môi trường hoặc nâng cấp trong Cài đặt, Thanh toán để thêm."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Tổ chức của bạn cài {plugin} cho bạn nên không thể gỡ cài đặt. Bạn có thể tắt nó."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Tổ chức của bạn cài plugin này cho bạn. Bạn có thể tắt nhưng không thể gỡ nó."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). Hãy lưu trữ một môi trường hoặc nâng cấp trong Cài đặt, Thanh toán để thêm."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Workspace này sẽ dừng sau vài phút nếu giới hạn không được tăng."

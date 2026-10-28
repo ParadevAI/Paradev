@@ -997,9 +997,6 @@ msgstr "{kindLabel} 테마"
 msgid "{label} access to {pluginName}"
 msgstr "{label}의 {pluginName} 접근 권한"
 
-msgid "{label} in cloud workspaces"
-msgstr "클라우드 워크스페이스의 {label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "사용 가능"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "사용 가능한 플러그인은 각 역할의 플러그인 페이지에 표시됩니다. 설치된 플러그인은 해당 역할의 모든 사람에게 설치되며, 비활성화할 수는 있지만 제거할 수는 없습니다."
+
 msgid "Available when the agent is idle."
 msgstr "에이전트가 대기 중일 때 사용할 수 있습니다."
 
@@ -12597,13 +12595,14 @@ msgstr "호스트 소유자 또는 조직 소유자만 이 호스트를 삭제�
 msgid "Only images can be attached to a comment"
 msgstr "댓글에는 이미지만 첨부할 수 있습니다"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "조직 소유자와 관리자만 플러그인을 관리할 수 있습니다."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "이 에이전트는 만든 사람이나 조직 관리자만 변경할 수 있습니다"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "이 컴퓨터에서만: git에서 무시되며 이 리포지토리의 모든 worktree에 적용됩니다. 여기에서 설정한 키는 공유된 값을 대체합니다."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "조직 소유자와 관리자만 플러그인을 관리할 수 있습니다."
 
 msgid "Only organization owners can modify these settings."
 msgstr "조직 소유자만 이 설정을 변경할 수 있습니다."
@@ -14964,10 +14963,11 @@ msgstr "{label} 제거"
 msgid "Remove {label}?"
 msgstr "{label}을(를) 제거할까요?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직에서 제거됩니다."
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직에서 제거됩니다."
 
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} 제거"
@@ -17830,78 +17830,8 @@ msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile을 사용하면 개발자는 컴퓨터에서 쓰던 Superset 워크스페이스를 iPhone에서 이어서 작업할 수 있습니다."
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile 페이지"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile은 연결한 컴퓨터에서 에이전트를 실행합니다."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "iPhone의 Superset Mobile 터미널"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, 클라우드 워크스페이스, 자동화, 우선 지원."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "다른 브라우저의 데이터를 읽으려면 Superset에 전체 디스크 접근 권한이 필요합니다. 시스템 설정에서 권한을 허용한 다음 다시 확인하세요."
-
-msgid "Superset next to others"
-msgstr "다른 도구와 비교한 Superset"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "iPad의 Superset. 풀 리퀘스트와 워크스페이스 목록이 보입니다"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset는 이 커넥터가 요청한 권한만 받습니다. 언제든지 연결을 해제해 취소할 수 있습니다."
-
-msgid "Superset originals"
-msgstr "Superset 오리지널"
-
-msgid "Superset Pages"
-msgstr "Superset 페이지"
-
-msgid "Superset Pages demo"
-msgstr "Superset 페이지 데모"
-
-msgid "Superset Plugins"
-msgstr "Superset 플러그인"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset은 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 Superset을 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset은 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset은 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. trust.superset.sh에서 보고서를 요청하고 보안 문서를 확인하세요."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset은 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
-
-msgid "Superset Teams"
-msgstr "Superset 팀"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset이 시스템 RAM의 {0}을(를) 사용합니다"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset과 대안 비교"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset은 Claude Code, OpenCode, OpenAI Codex 등 CLI 기반 코딩 에이전트라면 무엇이든 함께 씁니다. 워크스페이스나 리뷰 흐름을 바꾸지 않고 작업마다 다른 에이전트를 고르세요."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Superset 모바일 앱 덕분에 컴퓨터에서 멀리 떨어져 있어도 어디서든 에이전트가 계속 작업하도록 돕고 막힌 부분을 해결할 수 있습니다."
 
 msgid "Supervised"
 msgstr "감독"
@@ -18656,9 +18586,6 @@ msgstr "찾으시는 페이지가 존재하지 않습니다."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "패널은 실제 로그인 상태를 사용합니다. 에이전트는 중요한 작업을 하기 전에 먼저 확인을 요청합니다."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "경로는 리포지토리 안에 있어야 합니다"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Paradev 데스크톱 앱은 macOS와 Linux에서 사용할 수 있습니다."
 
@@ -18667,6 +18594,10 @@ msgstr "{organization}의 Paradev 호스트 서비스가 예기치 않게 중지
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev 호스트 서비스가 예기치 않게 중지되었으며({cause}) 자동으로 다시 시작하지 못했습니다."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "경로는 리포지토리 안에 있어야 합니다"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "풀은 매달 초기화됩니다. 초과 사용량은 각 플랜에 표시된 GB 시간당 요금으로 청구됩니다."
@@ -21186,15 +21117,16 @@ msgstr "내 조직"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "조직이 클라우드 사용 한도에 도달했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 한도를 올리거나 업그레이드하세요."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "조직이 환경 한도({0})에 도달했습니다. 환경을 보관하거나 설정의 결제에서 업그레이드하여 더 추가하세요."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "조직에서 {plugin}을(를) 대신 설치하므로 제거할 수 없습니다. 비활성화할 수는 있습니다."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "조직에서 이 플러그인을 대신 설치합니다. 비활성화할 수는 있지만 제거할 수는 없습니다."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "조직이 환경 한도({0})에 도달했습니다. 환경을 보관하거나 설정의 결제에서 업그레이드하여 더 추가하세요."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 올리지 않으면 이 워크스페이스는 몇 분 후에 중지됩니다."

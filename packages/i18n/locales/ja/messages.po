@@ -997,9 +997,6 @@ msgstr "{kindLabel}テーマ"
 msgid "{label} access to {pluginName}"
 msgstr "{label} の {pluginName} へのアクセス"
 
-msgid "{label} in cloud workspaces"
-msgstr "クラウドワークスペースでの{label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "利用可能"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "利用可能なプラグインは各ロールのプラグインページに表示されます。インストール済みのプラグインはそのロールの全員にインストールされ、無効にはできますが削除はできません。"
+
 msgid "Available when the agent is idle."
 msgstr "エージェントが待機中のときに使用できます。"
 
@@ -12597,13 +12595,14 @@ msgstr "このホストを削除できるのはホストのオーナーまたは
 msgid "Only images can be attached to a comment"
 msgstr "コメントに添付できるのは画像のみです"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "プラグインを管理できるのは組織のオーナーと管理者だけです。"
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "このエージェントを変更できるのは、作成者または組織の管理者のみです"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "このマシンのみ: git で無視され、このリポジトリのすべてのワークツリーに適用されます。ここで設定したキーは共有の値を置き換えます。"
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "プラグインを管理できるのは組織のオーナーと管理者だけです。"
 
 msgid "Only organization owners can modify these settings."
 msgstr "これらの設定を変更できるのは組織のオーナーのみです。"
@@ -14964,10 +14963,11 @@ msgstr "{label}を削除"
 msgid "Remove {label}?"
 msgstr "{label}を削除しますか?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて組織から削除されます。"
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて組織から削除されます。"
 
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} を削除"
@@ -17830,78 +17830,8 @@ msgstr "Superset は Paradev になりました。あと、1,150万ドルのシ�
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile が iPhone で登場"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Superset Mobile を使えば、開発者はパソコンで使っている Superset のワークスペースを iPhone から続けられます。"
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile のページ"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobileは、接続したコンピュータ上でエージェントを実行します。"
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "iPhone 上の Superset Mobile のターミナル"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile、クラウドワークスペース、オートメーション、優先サポート。"
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "他のブラウザのデータを読み取るには、Supersetにフルディスクアクセスが必要です。システム設定で許可してから再確認してください。"
-
-msgid "Superset next to others"
-msgstr "他ツールとSupersetの比較"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "iPad 上の Superset。プルリクエストとワークスペース一覧を表示"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset はこのコネクタが要求する権限のみを受け取ります。接続を解除すればいつでも取り消せます。"
-
-msgid "Superset originals"
-msgstr "Superset独自コンポーネント"
-
-msgid "Superset Pages"
-msgstr "Superset ページ"
-
-msgid "Superset Pages demo"
-msgstr "Superset ページのデモ"
-
-msgid "Superset Plugins"
-msgstr "Superset プラグイン"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は Superset を YC Demo Day の注目スタートアップの 1 社に選びました。"
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Supersetは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Supersetは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認はtrust.superset.shから行えます。"
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Supersetは2025年11月、ハッカソンのプロジェクトとして始まりました。ワークツリーを管理するだけの、シンプルなデスクトップアプリでした。"
-
-msgid "Superset Teams"
-msgstr "Superset チーム"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "SupersetはシステムRAMの{0}を使用中"
-
-msgid "Superset vs the Alternatives"
-msgstr "Supersetと他ツールの比較"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "SupersetはClaude Code、OpenCode、OpenAI Codexなど、CLIベースのコーディングエージェントであれば何でも使えます。ワークスペースやレビューの流れを変えずに、タスクごとに違うエージェントを選べます。"
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Supersetのモバイルアプリなら、コンピューターから遠く離れていても、どこからでもエージェントの作業を進め、行き詰まりを解消できます。"
 
 msgid "Supervised"
 msgstr "監督付き"
@@ -18656,9 +18586,6 @@ msgstr "お探しのページは存在しません。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "ペインでは、あなたの実際のログイン状態が使われます。重要な操作の前には、エージェントが確認を求めます。"
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "パスはリポジトリ内にある必要があります"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Paradevデスクトップアプリは macOS と Linux で利用できます。"
 
@@ -18667,6 +18594,10 @@ msgstr "{organization}のParadevホストサービスが予期せず停止し ({
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradevのホストサービスが予期せず停止し ({cause})、自動的に再起動できませんでした。"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "パスはリポジトリ内にある必要があります"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "プールは毎月リセットされます。超過分は各プランに表示された GB 時間あたりの料金で請求されます。"
@@ -21186,15 +21117,16 @@ msgstr "あなたの組織"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "組織がクラウドの利用上限に達しました。このワークスペースを起動するには、「設定」の「請求」で上限を引き上げるかアップグレードしてください。"
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "組織が環境数の上限（{0}）に達しました。環境をアーカイブするか、「設定」の「請求」でアップグレードして追加してください。"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "{plugin} は組織によってインストールされているため、アンインストールできません。無効にすることはできます。"
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "このプラグインは組織によってインストールされています。無効にはできますが、削除はできません。"
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "組織が環境数の上限（{0}）に達しました。環境をアーカイブするか、「設定」の「請求」でアップグレードして追加してください。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"

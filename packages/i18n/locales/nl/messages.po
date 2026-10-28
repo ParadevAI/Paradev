@@ -997,9 +997,6 @@ msgstr "{kindLabel} thema"
 msgid "{label} access to {pluginName}"
 msgstr "{label}-toegang tot {pluginName}"
 
-msgid "{label} in cloud workspaces"
-msgstr "{label} in cloudwerkruimtes"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "Beschikbaar"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Beschikbare plugins verschijnen op de Plugins-pagina van elke rol. Geïnstalleerde plugins worden voor iedereen in de rol geïnstalleerd; zij kunnen ze uitschakelen, maar niet verwijderen."
+
 msgid "Available when the agent is idle."
 msgstr "Beschikbaar als de agent niet bezig is."
 
@@ -12597,13 +12595,14 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "Alleen eigenaren en beheerders van de organisatie kunnen plugins beheren."
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Alleen op deze machine: genegeerd door git en toegepast op elke worktree van deze repository. Elke sleutel die je hier instelt, vervangt de gedeelde."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Alleen eigenaren en beheerders van de organisatie kunnen plugins beheren."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Alleen eigenaren van de organisatie kunnen deze instellingen wijzigen."
@@ -14964,10 +14963,11 @@ msgstr "{label} verwijderen"
 msgid "Remove {label}?"
 msgstr "{label} verwijderen?"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie verwijderd."
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie verwijderd."
 
 msgid "Remove {repositoryName}"
 msgstr "{repositoryName} verwijderen"
@@ -17830,78 +17830,8 @@ msgstr "Superset heet nu Paradev. En we hebben ook een seedronde van $11,5M opge
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile verschijnt op iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "Met Superset Mobile gaan ontwikkelaars vanaf een iPhone verder in de Superset-werkruimtes die ze al op hun computer gebruiken."
-
-msgid "Superset Mobile page"
-msgstr "Pagina over Superset Mobile"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile draait agents op de computers die je koppelt."
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "Terminal van Superset Mobile op iPhone"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile, cloud-workspaces, automatiseringen en prioritaire support."
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset heeft Volledige Schijftoegang nodig om de gegevens van een andere browser te lezen. Geef die in Systeeminstellingen en controleer opnieuw."
-
-msgid "Superset next to others"
-msgstr "Superset naast andere tools"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "Superset op iPad, met een pull request en een lijst met workspaces"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset ontvangt alleen de rechten die deze connector vraagt. Verbreek de verbinding wanneer je wilt om ze in te trekken."
-
-msgid "Superset originals"
-msgstr "Superset-originelen"
-
-msgid "Superset Pages"
-msgstr "Superset Pagina's"
-
-msgid "Superset Pages demo"
-msgstr "Demo van Superset Pagina's"
-
-msgid "Superset Plugins"
-msgstr "Superset Plugins"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset haalde een seedronde van 11,5 miljoen dollar op onder leiding van Union Square Ventures, met Y Combinator en Paul Graham. TechCrunch noemde het een van de opvallendste startups van YC Demo Day."
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset leest het met je gekoppelde GitHub-account. Koppel er een in <0>Instellingen › Integraties</0> als je dat nog niet hebt gedaan."
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset draait lokaal op de machines van je ontwikkelaars. We slaan je code of AI-gesprekken niet op, en Superset heeft een SOC 2 Type II-audit door een onafhankelijke auditor afgerond. Vraag het rapport aan en bekijk onze securitydocumentatie op trust.superset.sh."
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset begon in november 2025 als hackathonproject. Het was een simpele desktop-app om worktrees te beheren."
-
-msgid "Superset Teams"
-msgstr "Superset Teams"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset gebruikt {0} van het systeem-RAM"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset versus de alternatieven"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset werkt met elke CLI-gebaseerde coding agent, waaronder Claude Code, OpenCode, OpenAI Codex en meer. Kies voor elke taak een andere agent zonder je werkruimte of reviewproces te veranderen."
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Met de mobiele app van Superset kan ik mijn agents overal aan het werk houden en blokkades oplossen, zelfs als ik ver van mijn computer ben."
 
 msgid "Supervised"
 msgstr "Begeleid"
@@ -18656,9 +18586,6 @@ msgstr "De pagina die je zoekt bestaat niet."
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "Het paneel gebruikt je echte logins. Agents vragen het je voordat ze een ingrijpende actie uitvoeren."
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "Het pad moet binnen de repository blijven"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "De Paradev-desktopapp is beschikbaar voor macOS en Linux."
 
@@ -18667,6 +18594,10 @@ msgstr "De Paradev-hostservice voor {organization} is onverwacht gestopt ({cause
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "De Paradev-hostservice is onverwacht gestopt ({cause}) en kon niet automatisch opnieuw worden gestart."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "Het pad moet binnen de repository blijven"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "De pool wordt elke maand vernieuwd. Gebruik daarboven wordt per GB-uur gefactureerd tegen het tarief bij elk abonnement."
@@ -21186,15 +21117,16 @@ msgstr "Je organisatie"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Verhoog de limiet of upgrade in Instellingen, Facturering om deze werkruimte te starten."
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archiveer een omgeving of upgrade in Instellingen, Facturering om er meer toe te voegen."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Je organisatie installeert {plugin} voor je, dus het kan niet worden verwijderd. Je kunt het uitschakelen."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Je organisatie installeert deze plugin voor je. Je kunt hem uitschakelen, maar niet verwijderen."
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archiveer een omgeving of upgrade in Instellingen, Facturering om er meer toe te voegen."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkruimte stopt over een paar minuten, tenzij de limiet wordt verhoogd."

@@ -997,9 +997,6 @@ msgstr "{kindLabel}主题"
 msgid "{label} access to {pluginName}"
 msgstr "{label} 对 {pluginName} 的访问权限"
 
-msgid "{label} in cloud workspaces"
-msgstr "云端工作区中的{label}"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -3116,6 +3113,7 @@ msgstr "可用"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "可用的插件会显示在各角色的插件页面上。已安装的插件会为该角色的所有人安装，他们可以停用但不能移除。"
+
 msgid "Available when the agent is idle."
 msgstr "智能体空闲时可用。"
 
@@ -12597,13 +12595,14 @@ msgstr "只有主机所有者或组织所有者才能删除此主机"
 msgid "Only images can be attached to a comment"
 msgstr "评论只能附加图片"
 
-msgid "Only organization owners and admins can manage plugins."
-msgstr "只有组织所有者和管理员可以管理插件。"
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有创建者或组织管理员可以更改此智能体"
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "仅限本机：被 git 忽略，并应用于该仓库的每个 worktree。此处设置的任何键都会替换共享的值。"
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "只有组织所有者和管理员可以管理插件。"
 
 msgid "Only organization owners can modify these settings."
 msgstr "只有组织所有者可以修改这些设置。"
@@ -14964,10 +14963,11 @@ msgstr "移除 {label}"
 msgid "Remove {label}?"
 msgstr "移除{label}？"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "移除 {repo}？从中同步的所有插件都会从你的组织中移除。"
 msgid "Remove {name}"
 msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
+msgstr "移除 {repo}？从中同步的所有插件都会从你的组织中移除。"
 
 msgid "Remove {repositoryName}"
 msgstr "移除 {repositoryName}"
@@ -17830,78 +17830,8 @@ msgstr "Superset 现已更名为 Paradev。另外，我们完成了 1150 万美�
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登陆 iPhone"
 
-msgid "Superset Mobile lets developers continue the Superset workspaces they already use on their computer from an iPhone."
-msgstr "借助 Superset Mobile，开发者可以在 iPhone 上继续使用他们在电脑上已经在用的 Superset 工作区。"
-
-msgid "Superset Mobile page"
-msgstr "Superset Mobile 页面"
-
-msgid "Superset Mobile runs agents on the computers you connect."
-msgstr "Superset Mobile在你连接的电脑上运行智能体。"
-
-msgid "Superset Mobile terminal on iPhone"
-msgstr "iPhone 上的 Superset Mobile 终端"
-
-msgid "Superset Mobile, cloud workspaces, automations, and priority support."
-msgstr "Superset Mobile、云工作区、自动化和优先支持。"
-
-msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
-msgstr "Superset需要“完全磁盘访问权限”才能读取其他浏览器的数据。请在系统设置中授予权限，然后重新检查。"
-
-msgid "Superset next to others"
-msgstr "Superset 与其他工具对比"
-
-msgid "Superset on iPad, showing a pull request and a workspace list"
-msgstr "iPad 上的 Superset，显示一个拉取请求和工作区列表"
-
-msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
-msgstr "Superset 只获得此连接器请求的权限。你可以随时断开连接以撤销。"
-
-msgid "Superset originals"
-msgstr "Superset原创组件"
-
-msgid "Superset Pages"
-msgstr "Superset 页面"
-
-msgid "Superset Pages demo"
-msgstr "Superset 页面演示"
-
-msgid "Superset Plugins"
-msgstr "Superset 插件"
-
-msgid "Superset raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
-msgstr "Superset 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
-
 msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
 msgstr "Superset 使用你已连接的 GitHub 账号读取它。如果还没有连接，请在<0>设置 › 集成</0>中连接。"
-
-msgid "Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Superset在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Superset已通过独立审计机构的SOC 2 Type II审计。可在trust.superset.sh索取报告并查阅我们的安全文档。"
-
-msgid "Superset started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
-msgstr "Superset起初是2025年11月的一个黑客松项目，一个用来管理worktree的简单桌面应用。"
-
-msgid "Superset Teams"
-msgstr "Superset 团队"
-
-msgid "Superset UI"
-msgstr "Superset UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Superset uses {0} of system RAM"
-msgstr "Superset占用了系统RAM的{0}"
-
-msgid "Superset vs the Alternatives"
-msgstr "Superset与同类方案对比"
-
-msgid "Superset works with any CLI-based coding agent, including Claude Code, OpenCode, OpenAI Codex, and more. Choose a different agent for every task without changing your workspace or review flow."
-msgstr "Superset支持任何基于CLI的编码智能体，包括Claude Code、OpenCode、OpenAI Codex等。每个任务都可以换用不同的智能体，工作区和审查流程都不用变。"
-
-msgid "superset.sh"
-msgstr "superset.sh"
-
-msgid "Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer."
-msgstr "Superset 手机应用让我可以随时随地推动智能体工作、解决它们的阻碍，即使我离电脑很远也没问题。"
 
 msgid "Supervised"
 msgstr "监督"
@@ -18656,9 +18586,6 @@ msgstr "你要找的页面不存在。"
 msgid "The pane uses your real logins. Agents ask you before they take a consequential action."
 msgstr "窗格使用你真实的登录状态。智能体在执行重要操作前会先征求你的同意。"
 
-#. js-lingui-explicit-id
-msgid "serverError.plugins.pluginSourcePathOutside"
-msgstr "路径必须位于仓库内"
 msgid "The Paradev desktop app is available for macOS and Linux."
 msgstr "Paradev 桌面应用支持 macOS 和 Linux。"
 
@@ -18667,6 +18594,10 @@ msgstr "{organization}的Paradev主机服务意外停止（{cause}），且无�
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev主机服务意外停止（{cause}），且无法自动重启。"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "路径必须位于仓库内"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"
@@ -21186,15 +21117,16 @@ msgstr "你的组织"
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "你的组织已达到云端用量上限。请在“设置”中的“账单”提高上限或升级，以启动此工作区。"
 
+#. placeholder {0}: params?.limit
+msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
+msgstr "你的组织已达到环境数量上限（{0}）。请归档一个环境，或在“设置”中的“账单”升级以添加更多。"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "你的组织为你安装了 {plugin}，因此无法卸载。你可以停用它。"
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "你的组织为你安装了此插件。你可以停用它，但不能移除。"
-#. placeholder {0}: params?.limit
-msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
-msgstr "你的组织已达到环境数量上限（{0}）。请归档一个环境，或在“设置”中的“账单”升级以添加更多。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "你的组织已达到云端用量上限。除非提高上限，此工作区将在几分钟后停止。"
