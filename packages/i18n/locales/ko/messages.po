@@ -12049,7 +12049,7 @@ msgid "No Stripe customer found"
 msgstr "Stripe 고객을 찾을 수 없습니다"
 
 msgid "No subagents yet"
-msgstr "아직 서브에이전트가 없습니다"
+msgstr "아직 서브 에이전트가 없습니다"
 
 msgid "no tags"
 msgstr "태그 없음"

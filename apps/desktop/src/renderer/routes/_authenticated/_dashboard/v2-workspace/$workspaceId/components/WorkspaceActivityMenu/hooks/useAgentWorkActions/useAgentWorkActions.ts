@@ -8,6 +8,7 @@ import { useChatWiring } from "../../../../hooks/usePaneRegistry/components/Chat
 import { useChatSubagentStore } from "../../../../hooks/usePaneRegistry/stores/chatSubagentStore";
 import type { PaneViewerData } from "../../../../types";
 import { focusTerminalPane } from "../../../../utils/focusTerminalPane";
+import { useActivityPanelStore } from "../../stores/activityPanelStore";
 import type { AgentWork } from "../../utils/collectAgentWork";
 
 export function useAgentWorkActions(
@@ -45,6 +46,8 @@ export function useAgentWorkActions(
 			stop: async (work: AgentWork) => {
 				const { sessionId } = work;
 				if (!sessionId) return;
+				const { noteStopped, forgetStopped } = useActivityPanelStore.getState();
+				noteStopped(work.key);
 				await withClient(sessionId, (client) =>
 					client.stopBackgroundTask(work.taskId),
 				)
@@ -52,6 +55,7 @@ export function useAgentWorkActions(
 						if (!stopped) throw new Error("the agent did not stop the task");
 					})
 					.catch((error: unknown) => {
+						forgetStopped([work.key]);
 						console.warn("[WorkspaceActivityMenu] could not stop task", error);
 						toast.error(t({ message: "Couldn't stop the background task" }));
 					});

@@ -12049,7 +12049,7 @@ msgid "No Stripe customer found"
 msgstr "未找到Stripe客戶"
 
 msgid "No subagents yet"
-msgstr "尚無子代理"
+msgstr "尚無子代理程式"
 
 msgid "no tags"
 msgstr "無標籤"

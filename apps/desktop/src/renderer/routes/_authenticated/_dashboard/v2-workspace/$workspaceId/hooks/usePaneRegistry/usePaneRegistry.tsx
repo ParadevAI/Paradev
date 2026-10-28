@@ -892,6 +892,7 @@ export function usePaneRegistry({
 					});
 				},
 				getTitle: () => t({ message: "Chat" }),
+				insetsAside: true,
 				onAfterClose: (pane) => {
 					const data = pane.data as PendingCloudChatPaneData;
 					markCloudChatLaunchClosed(workspaceId, data.promptHash);

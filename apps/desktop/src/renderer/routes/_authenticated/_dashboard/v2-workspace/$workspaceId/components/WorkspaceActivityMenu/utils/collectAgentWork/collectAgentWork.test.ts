@@ -87,3 +87,23 @@ test("finished subagents, ended agents and nested subagents are left out", () =>
 		["outer", 2],
 	]);
 });
+
+test("nested running subagents still count as running", () => {
+	const { subagents, runningKeys } = collectAgentWork([
+		{
+			terminalId: "chat-a",
+			chatSessionId: "s-a",
+			backgroundTasks: [task("outer"), task("inner", { parentId: "outer" })],
+		},
+		{ terminalId: "term-b", subagents: [{ id: "agent-1", startedAt: 0 }] },
+	]);
+	expect(subagents.map(({ key }) => key)).toEqual([
+		"chat-a:outer",
+		"term-b:agent-1",
+	]);
+	expect([...runningKeys].sort()).toEqual([
+		"chat-a:inner",
+		"chat-a:outer",
+		"term-b:agent-1",
+	]);
+});

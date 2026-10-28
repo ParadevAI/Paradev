@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { WorkspaceStore } from "@superset/panes";
+import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -18,6 +19,7 @@ import {
 import { createPortal } from "react-dom";
 import { env } from "renderer/env.renderer";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import {
 	usePagePolicy,
@@ -38,6 +40,7 @@ import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
+import { usePullRequestActions } from "../../hooks/usePullRequestActions";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
@@ -59,10 +62,7 @@ import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
 import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
-import {
-	ActivityMenuHeader,
-	type ShipView,
-} from "./components/ActivityMenuHeader";
+import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
 import { AgentWorkRow } from "./components/AgentWorkRow";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
 import { ChangesMenuRow } from "./components/ChangesMenuRow";
@@ -73,6 +73,7 @@ import {
 	type PullRequestEntry,
 	PullRequestRow,
 } from "./components/PullRequestRow";
+import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
 import { PANEL_MAX_HEIGHT_PX } from "./constants";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
@@ -141,7 +142,11 @@ export function WorkspaceActivityMenu({
 	const asideNode = useActivityPanelStore(
 		(state) => state.asideNodes[workspaceId],
 	);
-	const open = panelPinned && asideNode !== undefined;
+	const fits = useActivityPanelStore(
+		(state) => state.fits[workspaceId] === true,
+	);
+	const open = panelPinned;
+	const floating = panelPinned && !fits;
 	const newPageStatusId = useId();
 	const {
 		flowState,
@@ -174,6 +179,36 @@ export function WorkspaceActivityMenu({
 		sync: branchSync,
 		workspaceCanCreatePr: shipActions.canCreatePr,
 		commitsLoaded: shipActions.commitsLoaded,
+	});
+
+	const shipMenuProps = {
+		canCommit: shipMenu.canCommit,
+		canPush: shipMenu.canPush,
+		hasCommitsAhead: shipActions.hasCommitsAhead,
+		isBusy: shipActions.isShipping || shipActions.isCommitting,
+		onOpenView: (view: ShipView) => {
+			if (view === "pr") shipActions.seedPrTitle();
+			setShipView(view);
+		},
+		onPush: shipActions.push,
+		onNoCommitsAhead: () =>
+			toast.info(
+				t({
+					message: "No commits to open a pull request from",
+				}),
+			),
+	};
+	const organizationId = useActiveOrganizationId();
+	const prActions = usePullRequestActions({
+		workspaceId,
+		target: currentPr
+			? {
+					organizationId,
+					repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
+					prNumber: currentPr.number,
+				}
+			: null,
+		onRefresh: refreshFlowState,
 	});
 
 	const pagePolicy = usePagePolicy("4-tier");
@@ -275,10 +310,32 @@ export function WorkspaceActivityMenu({
 				]
 			: linkedPullRequests;
 	const pullRequestLinkPolicy = usePullRequestLinkPolicy();
+	const isCurrentPullRequest = (pullRequest: PullRequestEntry) =>
+		changes !== undefined &&
+		currentPr !== null &&
+		pullRequest.number === currentPr.number &&
+		pullRequest.repoOwner === currentPr.repoOwner &&
+		pullRequest.repoName === currentPr.repoName;
 	const pullRequestRow = (pullRequest: PullRequestEntry) => (
 		<PullRequestRow
 			key={`${pullRequest.repoOwner}/${pullRequest.repoName}#${pullRequest.number}`}
 			pullRequest={pullRequest}
+			menu={
+				isCurrentPullRequest(pullRequest) && currentPr ? (
+					<ShipActionsMenu
+						canCreatePr={false}
+						{...shipMenuProps}
+						pullRequest={{
+							canMarkReady: currentPrState === "draft",
+							canMerge: currentPr.state === "open" && !currentPr.isDraft,
+							isMarkingReady: prActions.isMarkingReady,
+							isMerging: prActions.isMerging,
+							onMarkReady: prActions.markReady,
+							onMerge: prActions.merge,
+						}}
+					/>
+				) : undefined
+			}
 			onOpen={(target, event) =>
 				openPullRequestLink(
 					target.url,
@@ -357,6 +414,11 @@ export function WorkspaceActivityMenu({
 			seenAt,
 		],
 	);
+
+	const newestPublishedAt = workspace[0]?.publishedAtMs ?? 0;
+	useEffect(() => {
+		if (open) markSeen(workspaceId, newestPublishedAt);
+	}, [open, workspaceId, newestPublishedAt, markSeen]);
 
 	const togglePanel = () => {
 		togglePinned(workspaceId);
@@ -471,79 +533,255 @@ export function WorkspaceActivityMenu({
 		</div>
 	);
 
-	return (
-		<>
-			<Tooltip disableHoverableContent>
-				<TooltipTrigger asChild>
+	const panel = (
+		// biome-ignore lint/a11y/noStaticElementInteractions: arrow keys move between the panel's buttons
+		<div
+			className="pointer-events-auto flex flex-col overflow-y-auto rounded-xl border border-border/60 bg-popover p-1 text-popover-foreground shadow-sm"
+			style={{
+				maxHeight: floating
+					? `min(${PANEL_MAX_HEIGHT_PX}px, var(--radix-popover-content-available-height))`
+					: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)`,
+			}}
+			id={`workspace-activity-${workspaceId}`}
+			data-activity-panel
+			onKeyDown={(event) => {
+				if (event.key === "Escape") {
+					if (!shipView && !composing) return;
+					event.preventDefault();
+					event.stopPropagation();
+					if (shipView) setShipView(null);
+					else setComposing(false);
+					return;
+				}
+				if (composing || shipView) return;
+				if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+				const items = [
+					...event.currentTarget.querySelectorAll<HTMLElement>(
+						"button:not([disabled])",
+					),
+				];
+				if (items.length === 0) return;
+				event.preventDefault();
+				const index = items.indexOf(document.activeElement as HTMLElement);
+				const step = event.key === "ArrowDown" ? 1 : -1;
+				items[(index + step + items.length) % items.length]?.focus();
+			}}
+		>
+			{composing ? (
+				<>
 					<button
 						type="button"
-						onClick={togglePanel}
-						aria-label={
-							changes && currentPr
-								? t({
-										message: `Workspace activity, pull request #${currentPr.number}`,
-									})
-								: t({ message: "Workspace activity" })
-						}
-						aria-pressed={panelPinned}
-						aria-controls={
-							open ? `workspace-activity-${workspaceId}` : undefined
-						}
-						aria-describedby={hasNew ? newPageStatusId : undefined}
-						className={cn(
-							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
-							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							panelPinned
-								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
-								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
-						)}
+						onClick={() => setComposing(false)}
+						className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
 					>
-						<ListTree className="size-3.5 shrink-0" />
-						{runningCount > 0 ? (
-							<>
-								<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-								<span className="tabular-nums">{runningCount}</span>
-							</>
+						<ArrowLeft className="size-3.5 shrink-0" />
+						<Trans>New page</Trans>
+					</button>
+					<NewPageComposer
+						workspaceId={workspaceId}
+						onSent={() => setComposing(false)}
+						onCreateNewAgentSession={onCreateNewAgentSession}
+						onFocusAgentTerminal={onFocusAgentTerminal}
+					/>
+				</>
+			) : shipView ? (
+				<>
+					<button
+						type="button"
+						onClick={() => setShipView(null)}
+						className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
+					>
+						<ArrowLeft className="size-3.5 shrink-0" />
+						{shipView === "commit" ? (
+							<Trans>Commit</Trans>
 						) : (
-							!paneAreaStyle &&
-							workspace.length > 0 && (
-								<span className="tabular-nums">{workspace.length}</span>
-							)
-						)}
-						{changes && currentPr && currentPrState ? (
-							<>
-								<span className="h-3.5 w-px shrink-0 bg-border" />
-								<PRIcon state={currentPrState} className="size-3.5 shrink-0" />
-								<span className="tabular-nums">#{currentPr.number}</span>
-								{currentPrChecks && showsChecks(currentPrState) && (
-									<PRStatusIndicators checks={currentPrChecks} />
-								)}
-							</>
-						) : (
-							triggerChangesStats && (
-								<>
-									<span className="h-3.5 w-px shrink-0 bg-border" />
-									<GitCompareArrows className="size-3.5 shrink-0" />
-									<span className="flex items-center gap-1">
-										<ChangesStats stats={triggerChangesStats} />
-									</span>
-								</>
-							)
-						)}
-						{hasNew && (
-							<>
-								<span
-									aria-hidden="true"
-									className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
-								/>
-								<span id={newPageStatusId} className="sr-only">
-									<Trans context="badge on a page published since the menu was last opened">
-										New
-									</Trans>
-								</span>
-							</>
+							<Trans>Create PR</Trans>
 						)}
 					</button>
+					<div className="p-1">
+						{shipView === "commit" ? (
+							<CommitForm actions={shipActions} />
+						) : (
+							<CreatePrForm actions={shipActions} />
+						)}
+					</div>
+				</>
+			) : (
+				<div className="divide-y divide-border">
+					{changes && !currentPr && (
+						<section className="py-1">
+							<ActivityMenuHeader
+								title={currentWorkspace.name}
+								canCreatePr={shipMenu.canCreatePr}
+								{...shipMenuProps}
+							/>
+							<ChangesMenuRow
+								stats={changesStats}
+								isOpen={changes.isOpen}
+								onToggle={changes.onToggle}
+							/>
+						</section>
+					)}
+					{pullRequests.length > 0 && (
+						<MenuGroup
+							title={<Trans>Pull requests</Trans>}
+							count={pullRequests.length}
+						>
+							<div>{pullRequests.map(pullRequestRow)}</div>
+						</MenuGroup>
+					)}
+					<MenuGroup
+						title={<Trans>Subagents</Trans>}
+						count={agentWork.subagents.length}
+					>
+						<div>
+							{agentWork.subagents.length + agentWork.finished.length > 0
+								? [
+										...agentRows(agentWork.subagents),
+										...agentWork.finished.map((entry) => (
+											<FinishedSubagentRow
+												key={entry.key}
+												entry={entry}
+												source={sourceOf(entry.terminalId)}
+												onOpen={(target) =>
+													agentActions.open(target, { subagent: true })
+												}
+											/>
+										)),
+									]
+								: emptyRow(<Trans>No subagents yet</Trans>)}
+						</div>
+					</MenuGroup>
+					<MenuGroup
+						title={<Trans>Background processes</Trans>}
+						count={processes.length + agentWork.shells.length}
+					>
+						<div>
+							{processes.length + agentWork.shells.length > 0
+								? [...agentRows(agentWork.shells), ...workRows(processes)]
+								: terminalSessionsQuery.isLoading
+									? emptyRow(<Trans>Loading…</Trans>)
+									: emptyRow(<Trans>Nothing running</Trans>)}
+						</div>
+					</MenuGroup>
+					<MenuGroup
+						title={<Trans>Pages</Trans>}
+						addLabel={t({ message: "New page" })}
+						onAdd={() => setComposing(true)}
+					>
+						<div>
+							{workspace.length > 0
+								? workspace.map((page) => (
+										<PagesMenuRow
+											key={page.id}
+											page={page}
+											onOpen={handleOpenPage}
+										/>
+									))
+								: emptyRow(<Trans>No pages yet</Trans>)}
+						</div>
+					</MenuGroup>
+					{pinned.length > 0 && (
+						<MenuGroup title={<Trans>Pinned</Trans>}>
+							<div>
+								{pinned.map((page) => (
+									<PagesMenuRow
+										key={page.id}
+										page={page}
+										onOpen={handleOpenPage}
+									/>
+								))}
+							</div>
+						</MenuGroup>
+					)}
+				</div>
+			)}
+		</div>
+	);
+
+	return (
+		<Popover
+			open={floating}
+			onOpenChange={(next) => {
+				if (!next) togglePanel();
+			}}
+		>
+			<Tooltip disableHoverableContent>
+				<TooltipTrigger asChild>
+					<PopoverAnchor asChild>
+						<button
+							type="button"
+							onClick={togglePanel}
+							aria-label={
+								changes && currentPr
+									? t({
+											message: `Workspace activity, pull request #${currentPr.number}`,
+										})
+									: t({ message: "Workspace activity" })
+							}
+							aria-pressed={panelPinned}
+							aria-controls={
+								panelPinned ? `workspace-activity-${workspaceId}` : undefined
+							}
+							aria-describedby={hasNew ? newPageStatusId : undefined}
+							className={cn(
+								"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
+								"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+								panelPinned
+									? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
+									: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+							)}
+						>
+							<ListTree className="size-3.5 shrink-0" />
+							{runningCount > 0 ? (
+								<>
+									<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+									<span className="tabular-nums">{runningCount}</span>
+								</>
+							) : (
+								!paneAreaStyle &&
+								workspace.length > 0 && (
+									<span className="tabular-nums">{workspace.length}</span>
+								)
+							)}
+							{changes && currentPr && currentPrState ? (
+								<>
+									<span className="h-3.5 w-px shrink-0 bg-border" />
+									<PRIcon
+										state={currentPrState}
+										className="size-3.5 shrink-0"
+									/>
+									<span className="tabular-nums">#{currentPr.number}</span>
+									{currentPrChecks && showsChecks(currentPrState) && (
+										<PRStatusIndicators checks={currentPrChecks} />
+									)}
+								</>
+							) : (
+								triggerChangesStats && (
+									<>
+										<span className="h-3.5 w-px shrink-0 bg-border" />
+										<GitCompareArrows className="size-3.5 shrink-0" />
+										<span className="flex items-center gap-1">
+											<ChangesStats stats={triggerChangesStats} />
+										</span>
+									</>
+								)
+							)}
+							{hasNew && (
+								<>
+									<span
+										aria-hidden="true"
+										className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
+									/>
+									<span id={newPageStatusId} className="sr-only">
+										<Trans context="badge on a page published since the menu was last opened">
+											New
+										</Trans>
+									</span>
+								</>
+							)}
+						</button>
+					</PopoverAnchor>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
 					{panelPinned ? (
@@ -553,187 +791,17 @@ export function WorkspaceActivityMenu({
 					)}
 				</TooltipContent>
 			</Tooltip>
-			{asideNode &&
-				createPortal(
-					// biome-ignore lint/a11y/noStaticElementInteractions: arrow keys move between the panel's buttons
-					<div
-						className="pointer-events-auto flex flex-col overflow-y-auto rounded-xl border border-border/60 bg-popover p-1 text-popover-foreground shadow-sm"
-						style={{ maxHeight: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)` }}
-						data-activity-panel
-						onKeyDown={(event) => {
-							if (event.key === "Escape") {
-								if (!shipView && !composing) return;
-								event.preventDefault();
-								event.stopPropagation();
-								if (shipView) setShipView(null);
-								else setComposing(false);
-								return;
-							}
-							if (composing || shipView) return;
-							if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-							const items = [
-								...event.currentTarget.querySelectorAll<HTMLElement>(
-									"button:not([disabled])",
-								),
-							];
-							if (items.length === 0) return;
-							event.preventDefault();
-							const index = items.indexOf(
-								document.activeElement as HTMLElement,
-							);
-							const step = event.key === "ArrowDown" ? 1 : -1;
-							items[(index + step + items.length) % items.length]?.focus();
-						}}
-					>
-						{composing ? (
-							<>
-								<button
-									type="button"
-									onClick={() => setComposing(false)}
-									className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
-								>
-									<ArrowLeft className="size-3.5 shrink-0" />
-									<Trans>New page</Trans>
-								</button>
-								<NewPageComposer
-									workspaceId={workspaceId}
-									onSent={() => setComposing(false)}
-									onCreateNewAgentSession={onCreateNewAgentSession}
-									onFocusAgentTerminal={onFocusAgentTerminal}
-								/>
-							</>
-						) : shipView ? (
-							<>
-								<button
-									type="button"
-									onClick={() => setShipView(null)}
-									className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
-								>
-									<ArrowLeft className="size-3.5 shrink-0" />
-									{shipView === "commit" ? (
-										<Trans>Commit</Trans>
-									) : (
-										<Trans>Create PR</Trans>
-									)}
-								</button>
-								<div className="p-1">
-									{shipView === "commit" ? (
-										<CommitForm actions={shipActions} />
-									) : (
-										<CreatePrForm actions={shipActions} />
-									)}
-								</div>
-							</>
-						) : (
-							<div className="divide-y divide-border">
-								{changes && !currentPr && (
-									<section className="py-1">
-										<ActivityMenuHeader
-											title={currentWorkspace.name}
-											canCommit={shipMenu.canCommit}
-											canPush={shipMenu.canPush}
-											canCreatePr={shipMenu.canCreatePr}
-											hasCommitsAhead={shipActions.hasCommitsAhead}
-											isBusy={
-												shipActions.isShipping || shipActions.isCommitting
-											}
-											onOpenView={(view) => {
-												if (view === "pr") shipActions.seedPrTitle();
-												setShipView(view);
-											}}
-											onPush={shipActions.push}
-											onNoCommitsAhead={() =>
-												toast.info(
-													t({
-														message: "No commits to open a pull request from",
-													}),
-												)
-											}
-										/>
-										<ChangesMenuRow
-											stats={changesStats}
-											isOpen={changes.isOpen}
-											onToggle={changes.onToggle}
-										/>
-									</section>
-								)}
-								{pullRequests.length > 0 && (
-									<MenuGroup
-										title={<Trans>Pull requests</Trans>}
-										count={pullRequests.length}
-									>
-										<div>{pullRequests.map(pullRequestRow)}</div>
-									</MenuGroup>
-								)}
-								<MenuGroup
-									title={<Trans>Subagents</Trans>}
-									count={agentWork.subagents.length}
-								>
-									<div>
-										{agentWork.subagents.length + agentWork.finished.length > 0
-											? [
-													...agentRows(agentWork.subagents),
-													...agentWork.finished.map((entry) => (
-														<FinishedSubagentRow
-															key={entry.key}
-															entry={entry}
-															source={sourceOf(entry.terminalId)}
-															onOpen={(target) =>
-																agentActions.open(target, { subagent: true })
-															}
-														/>
-													)),
-												]
-											: emptyRow(<Trans>No subagents yet</Trans>)}
-									</div>
-								</MenuGroup>
-								<MenuGroup
-									title={<Trans>Background processes</Trans>}
-									count={processes.length + agentWork.shells.length}
-								>
-									<div>
-										{processes.length + agentWork.shells.length > 0
-											? [...agentRows(agentWork.shells), ...workRows(processes)]
-											: terminalSessionsQuery.isLoading
-												? emptyRow(<Trans>Loading…</Trans>)
-												: emptyRow(<Trans>Nothing running</Trans>)}
-									</div>
-								</MenuGroup>
-								<MenuGroup
-									title={<Trans>Pages</Trans>}
-									addLabel={t({ message: "New page" })}
-									onAdd={() => setComposing(true)}
-								>
-									<div>
-										{workspace.length > 0
-											? workspace.map((page) => (
-													<PagesMenuRow
-														key={page.id}
-														page={page}
-														onOpen={handleOpenPage}
-													/>
-												))
-											: emptyRow(<Trans>No pages yet</Trans>)}
-									</div>
-								</MenuGroup>
-								{pinned.length > 0 && (
-									<MenuGroup title={<Trans>Pinned</Trans>}>
-										<div>
-											{pinned.map((page) => (
-												<PagesMenuRow
-													key={page.id}
-													page={page}
-													onOpen={handleOpenPage}
-												/>
-											))}
-										</div>
-									</MenuGroup>
-								)}
-							</div>
-						)}
-					</div>,
-					asideNode,
-				)}
-		</>
+			<PopoverContent
+				align="end"
+				sideOffset={6}
+				className="w-80 border-0 bg-transparent p-0 shadow-none"
+				onEscapeKeyDown={(event) => {
+					if (shipView || composing) event.preventDefault();
+				}}
+			>
+				{floating && panel}
+			</PopoverContent>
+			{asideNode && createPortal(panel, asideNode)}
+		</Popover>
 	);
 }

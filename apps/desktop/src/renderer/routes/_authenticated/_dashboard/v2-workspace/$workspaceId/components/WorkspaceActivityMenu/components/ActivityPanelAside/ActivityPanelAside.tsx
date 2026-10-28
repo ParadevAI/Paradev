@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useIsTabVisible } from "@superset/panes";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import {
 	MIN_CONTENT_WIDTH_PX,
 	PANEL_CONTENT_GAP_PX,
@@ -19,11 +19,12 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	const isTabVisible = useIsTabVisible();
 	const setAsideNode = useActivityPanelStore((state) => state.setAsideNode);
 	const clearAsideNode = useActivityPanelStore((state) => state.clearAsideNode);
+	const setFits = useActivityPanelStore((state) => state.setFits);
 	const [sentinel, setSentinel] = useState<HTMLElement | null>(null);
 	const [hasRoom, setHasRoom] = useState(false);
 	const shown = pinned && hasRoom && isTabVisible;
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const host = sentinel?.parentElement;
 		if (!host) return;
 		const measure = () =>
@@ -33,6 +34,12 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 		observer.observe(host);
 		return () => observer.disconnect();
 	}, [sentinel]);
+
+	const fits = hasRoom && isTabVisible;
+	useLayoutEffect(() => {
+		setFits(workspaceId, fits);
+		return () => setFits(workspaceId, false);
+	}, [workspaceId, fits, setFits]);
 
 	useLayoutEffect(() => {
 		const host = sentinel?.parentElement;
@@ -57,7 +64,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 			{shown && (
 				<aside
 					aria-label={t({ message: "Workspace activity" })}
-					id={`workspace-activity-${workspaceId}`}
 					className="pointer-events-none absolute inset-y-0 z-10 flex min-h-0 flex-col py-2"
 					ref={attach}
 					style={{ right: PANEL_EDGE_GAP_PX, width: PANEL_WIDTH_PX }}

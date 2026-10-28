@@ -42,3 +42,18 @@ test("pinning is per workspace", () => {
 	expect(pinned["ws-a"]).toBe(true);
 	expect(pinned["ws-b"]).toBeUndefined();
 });
+
+test("fits and stopped keys are tracked per call and cleared on demand", () => {
+	const { setFits, noteStopped, forgetStopped } =
+		useActivityPanelStore.getState();
+	setFits("ws-fit", true);
+	expect(useActivityPanelStore.getState().fits["ws-fit"]).toBe(true);
+	setFits("ws-fit", false);
+	expect(useActivityPanelStore.getState().fits["ws-fit"]).toBeUndefined();
+	noteStopped("chat:1");
+	expect(useActivityPanelStore.getState().stoppedKeys.has("chat:1")).toBe(true);
+	forgetStopped(["chat:1"]);
+	expect(useActivityPanelStore.getState().stoppedKeys.has("chat:1")).toBe(
+		false,
+	);
+});

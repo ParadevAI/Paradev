@@ -12,25 +12,31 @@ import {
 
 const sameSession = (
 	binding: AgentBinding | undefined,
-	item: Pick<AgentWork, "sessionId">,
+	item: Pick<AgentWork, "sessionId" | "agentSessionId">,
 ) =>
 	binding !== undefined &&
 	!binding.endedAt &&
-	(binding.chatSessionId ?? undefined) === item.sessionId;
+	(binding.chatSessionId ?? undefined) === item.sessionId &&
+	(binding.chatSessionId !== undefined ||
+		(binding.agentSessionId ?? undefined) === item.agentSessionId);
 
 export function useAgentWork(workspaceId: string) {
 	const bindings = useTerminalAgentBindings(workspaceId);
 	const work = useMemo(() => collectAgentWork(bindings.values()), [bindings]);
 	const recordFinished = useActivityPanelStore((state) => state.recordFinished);
+	const forgetStopped = useActivityPanelStore((state) => state.forgetStopped);
 	const recorded = useFinishedSubagents(workspaceId);
 	const previous = useRef<readonly AgentWork[]>([]);
 
 	useEffect(() => {
-		const live = new Set(work.subagents.map((item) => item.key));
-		const finished = previous.current
+		const { stoppedKeys } = useActivityPanelStore.getState();
+		const gone = previous.current.filter(
+			(item) => !work.runningKeys.has(item.key),
+		);
+		const finished = gone
 			.filter(
 				(item) =>
-					!live.has(item.key) &&
+					!stoppedKeys.has(item.key) &&
 					sameSession(bindings.get(item.terminalId), item),
 			)
 			.map((item) => ({
@@ -39,19 +45,22 @@ export function useAgentWork(workspaceId: string) {
 				terminalId: item.terminalId,
 				taskId: item.taskId,
 				...(item.sessionId ? { sessionId: item.sessionId } : {}),
+				...(item.agentSessionId ? { agentSessionId: item.agentSessionId } : {}),
 			}));
 		previous.current = work.subagents;
 		recordFinished(workspaceId, finished);
-	}, [work, bindings, workspaceId, recordFinished]);
+		forgetStopped(gone.map((item) => item.key));
+	}, [work, bindings, workspaceId, recordFinished, forgetStopped]);
 
-	const finished = useMemo(() => {
-		const live = new Set(work.subagents.map((item) => item.key));
-		return recorded.filter(
-			(entry) =>
-				!live.has(entry.key) &&
-				sameSession(bindings.get(entry.terminalId), entry),
-		);
-	}, [recorded, work, bindings]);
+	const finished = useMemo(
+		() =>
+			recorded.filter(
+				(entry) =>
+					!work.runningKeys.has(entry.key) &&
+					sameSession(bindings.get(entry.terminalId), entry),
+			),
+		[recorded, work, bindings],
+	);
 
 	return { ...work, finished };
 }

@@ -34,12 +34,12 @@ import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboar
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
+import { usePullRequestActions } from "../../../../hooks/usePullRequestActions";
 import { useShipActions } from "../../../../hooks/useShipActions";
 import type { PRFlowState } from "../../../../utils/getPRFlowState";
 import { CommitForm } from "../../../CommitForm";
 import { PRStatusIndicators } from "../../../PRStatusIndicators";
 import { PRDetailCard } from "./components/PRDetailCard";
-import { usePullRequestActions } from "./hooks/usePullRequestActions";
 
 interface PRStatusGroupProps {
 	state: PRFlowState;

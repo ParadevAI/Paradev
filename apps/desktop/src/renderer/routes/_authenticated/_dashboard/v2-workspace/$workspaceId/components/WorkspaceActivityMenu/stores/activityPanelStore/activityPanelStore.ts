@@ -8,6 +8,7 @@ export type FinishedSubagent = {
 	terminalId: string;
 	taskId: string;
 	sessionId?: string;
+	agentSessionId?: string;
 };
 
 const NO_FINISHED: readonly FinishedSubagent[] = [];
@@ -16,6 +17,11 @@ interface ActivityPanelStore {
 	pinned: Record<string, true>;
 	finished: Record<string, readonly FinishedSubagent[]>;
 	asideNodes: Record<string, HTMLElement>;
+	fits: Record<string, true>;
+	setFits: (workspaceId: string, fits: boolean) => void;
+	stoppedKeys: ReadonlySet<string>;
+	noteStopped: (key: string) => void;
+	forgetStopped: (keys: readonly string[]) => void;
 	setAsideNode: (workspaceId: string, node: HTMLElement) => void;
 	clearAsideNode: (workspaceId: string, node: HTMLElement) => void;
 	togglePinned: (workspaceId: string) => void;
@@ -29,6 +35,23 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 	pinned: {},
 	finished: {},
 	asideNodes: {},
+	fits: {},
+	setFits: (workspaceId, fits) =>
+		set((state) => {
+			if ((state.fits[workspaceId] === true) === fits) return state;
+			const { [workspaceId]: _previous, ...rest } = state.fits;
+			return { fits: fits ? { ...rest, [workspaceId]: true } : rest };
+		}),
+	stoppedKeys: new Set(),
+	noteStopped: (key) =>
+		set((state) => ({ stoppedKeys: new Set(state.stoppedKeys).add(key) })),
+	forgetStopped: (keys) =>
+		set((state) => {
+			if (!keys.some((key) => state.stoppedKeys.has(key))) return state;
+			const stoppedKeys = new Set(state.stoppedKeys);
+			for (const key of keys) stoppedKeys.delete(key);
+			return { stoppedKeys };
+		}),
 	setAsideNode: (workspaceId, node) =>
 		set((state) =>
 			state.asideNodes[workspaceId] === node

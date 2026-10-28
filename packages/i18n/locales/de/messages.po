@@ -8995,7 +8995,7 @@ msgid "Hide text"
 msgstr "Text ausblenden"
 
 msgid "Hide workspace activity"
-msgstr "Workspace-Aktivität ausblenden"
+msgstr "Arbeitsbereichsaktivität ausblenden"
 
 msgid "High"
 msgstr "Hoch"
@@ -16846,7 +16846,7 @@ msgid "Show usage tab on sidebar"
 msgstr "Nutzungs-Tab in der Seitenleiste anzeigen"
 
 msgid "Show workspace activity"
-msgstr "Workspace-Aktivität anzeigen"
+msgstr "Arbeitsbereichsaktivität anzeigen"
 
 msgid "showArrow opt-in"
 msgstr "showArrow aktiviert"
@@ -20571,11 +20571,11 @@ msgid "Workspace actions"
 msgstr "Arbeitsbereich-Aktionen"
 
 msgid "Workspace activity"
-msgstr "Workspace-Aktivität"
+msgstr "Arbeitsbereichsaktivität"
 
 #. placeholder {0}: currentPr.number
 msgid "Workspace activity, pull request #{0}"
-msgstr "Workspace-Aktivität, Pull Request #{0}"
+msgstr "Arbeitsbereichsaktivität, Pull Request #{0}"
 
 msgid "Workspace agents"
 msgstr "Arbeitsbereich-Agenten"

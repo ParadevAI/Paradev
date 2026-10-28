@@ -12049,7 +12049,7 @@ msgid "No Stripe customer found"
 msgstr "Không tìm thấy khách hàng Stripe"
 
 msgid "No subagents yet"
-msgstr "Chưa có subagent nào"
+msgstr "Chưa có agent con nào"
 
 msgid "no tags"
 msgstr "không có thẻ"
