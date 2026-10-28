@@ -14,6 +14,7 @@ import {
 } from "../../../../state/fileDocumentStore";
 import { fileAutoSave } from "../../../../state/fileDocumentStore/fileAutoSave";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
+import { openFileFromTree } from "../../../../utils/openFileFromTree";
 import { runUrlLinkAction } from "../../utils/runTerminalLinkAction";
 import { ErrorState } from "./components/ErrorState";
 import { ExternalChangeBanner } from "./components/ExternalChangeBanner";
@@ -219,9 +220,17 @@ export function FilePane({
 			>
 				{inRightPane && (
 					<FileBreadcrumb
+						workspaceId={workspaceId}
 						filePath={filePath}
 						rootPath={workspaceQuery.data?.worktreePath ?? undefined}
 						dirty={document.dirty}
+						onOpenFile={(path) =>
+							openFileFromTree({
+								store: context.store,
+								filePath: path,
+								sourcePaneId: context.pane.id,
+							})
+						}
 					/>
 				)}
 				<MarkdownResourceProvider

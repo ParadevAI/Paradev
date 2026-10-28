@@ -34,7 +34,7 @@ export function FileViewLayout({
 		Object.values(context.tab.panes).some((pane) => pane.kind === "files");
 	if (!showTree || tabHasTreePane) return children;
 	return (
-		<div className="relative h-full w-full min-w-0">
+		<div data-file-view className="relative h-full w-full min-w-0">
 			<ResizablePanelGroup ref={groupRef} direction="horizontal">
 				<ResizablePanel id="file-view-content" order={1} minSize={30}>
 					<div className="relative h-full min-w-0">{children}</div>
