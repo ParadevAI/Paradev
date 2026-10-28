@@ -76,6 +76,15 @@ export const PRESS_ARTICLES: PressArticle[] = [
 		featured: true,
 	},
 	{
+		outlet: "Dealroom",
+		icon: "/media/press/dealroom.png",
+		image: "/media/press/previews/dealroom.jpg",
+		title: "Paradev raises $11.5M seed to run coding agents by the hundreds",
+		url: "https://app.dealroom.co/news/note/paradev-raises-11-5m-seed-to-run-coding-agents-by-the-hundreds",
+		titleLang: "en",
+		date: "2026-10-26",
+	},
+	{
 		outlet: "MakeUseOf",
 		icon: "/media/press/makeuseof.png",
 		image: "/media/press/previews/makeuseof.jpg",
