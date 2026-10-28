@@ -33,6 +33,7 @@ import type {
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
 import {
+	isWhitespaceOnly,
 	type ParsedPatchGroup,
 	type PatchGroupResult,
 	parsePatchGroup,
@@ -284,8 +285,13 @@ export function useDiffCodeViewItems({
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
 				try {
-					const { patch } = await trpcClient.git.getDiffPatch.query(input);
-					return { kind: "patch", patch, ...requested };
+					const { patch, truncated } =
+						await trpcClient.git.getDiffPatch.query(input);
+					// An older host has no `truncated` and does not ignore
+					// whitespace either.
+					const whitespaceFiltered =
+						input.ignoreWhitespace === true && truncated === false;
+					return { kind: "patch", patch, whitespaceFiltered, ...requested };
 				} catch (error) {
 					if (!isMissingProcedureError(error)) throw error;
 					// Older host-service (a remote host or cloud sandbox that
@@ -313,7 +319,12 @@ export function useDiffCodeViewItems({
 						},
 					);
 					await Promise.all(workers);
-					return { kind: "files", files, ...requested };
+					return {
+						kind: "files",
+						files,
+						whitespaceFiltered: input.ignoreWhitespace === true,
+						...requested,
+					};
 				}
 			},
 			staleTime: Number.POSITIVE_INFINITY,
@@ -426,7 +437,9 @@ export function useDiffCodeViewItems({
 				const reason: DeferredDiffReason = query?.isError
 					? "error"
 					: settled && isRequested(data, member.file)
-						? "deferred"
+						? isWhitespaceOnly(data, member.file)
+							? "whitespace-only"
+							: "deferred"
 						: "loading";
 				map.set(member.itemId, reason);
 			}
@@ -477,14 +490,10 @@ export function useDiffCodeViewItems({
 				// empty patch, or a change git expresses without hunks such as
 				// a mode-only edit). That is a failure to show the diff, not a
 				// file we chose to hold back — offer Retry, not "Load diff".
-				// With whitespace ignored, no section is the expected result
-				// for a file whose only change is whitespace.
 				const reason: DeferredDiffReason = heldBack
 					? "deferred"
 					: groupReason === "deferred"
-						? ignoreWhitespace
-							? "whitespace-only"
-							: "error"
+						? "error"
 						: groupReason;
 				nextItems.push(
 					buildPlaceholderItem(annotationsByPath, file, itemId, collapsed, {
@@ -529,7 +538,6 @@ export function useDiffCodeViewItems({
 		return nextItems;
 	}, [
 		files,
-		ignoreWhitespace,
 		diffByItemId,
 		reasonByItemId,
 		requestedItemIds,

@@ -1,4 +1,5 @@
 export {
+	isWhitespaceOnly,
 	type ParsedPatchGroup,
 	type PatchGroupFile,
 	type PatchGroupResult,

@@ -9562,7 +9562,7 @@ msgid "Ignore @channel and @here"
 msgstr "Abaikan @channel dan @here"
 
 msgid "Ignore whitespace"
-msgstr "Abaikan spasi"
+msgstr "Abaikan spasi kosong"
 
 msgid "Illegal content"
 msgstr "Konten ilegal"
@@ -13009,7 +13009,7 @@ msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affecte
 msgstr "Hanya ingin menghapusnya dari sidebar Anda? Sembunyikan saja. Tidak ada orang lain yang terpengaruh."
 
 msgid "Only whitespace changed"
-msgstr "Hanya spasi yang berubah"
+msgstr "Hanya spasi kosong yang berubah"
 
 msgid "Only you"
 msgstr "Hanya Anda"

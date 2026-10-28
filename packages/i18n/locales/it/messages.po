@@ -9562,7 +9562,7 @@ msgid "Ignore @channel and @here"
 msgstr "Ignora @channel e @here"
 
 msgid "Ignore whitespace"
-msgstr "Ignora spazi"
+msgstr "Ignora gli spazi bianchi"
 
 msgid "Illegal content"
 msgstr "Contenuti illegali"
@@ -13009,7 +13009,7 @@ msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affecte
 msgstr "Vuoi solo toglierlo dalla barra laterale? Nascondilo. Nessun altro ne è interessato."
 
 msgid "Only whitespace changed"
-msgstr "Sono cambiati solo gli spazi"
+msgstr "Sono cambiati solo gli spazi bianchi"
 
 msgid "Only you"
 msgstr "Solo tu"

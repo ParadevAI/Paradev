@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
-import { parsePatchGroup, splitPatchSegments } from "./parsePatchGroup";
+import {
+	isWhitespaceOnly,
+	parsePatchGroup,
+	splitPatchSegments,
+} from "./parsePatchGroup";
 
 const FILE_A = [
 	"diff --git a/a.ts b/a.ts",
@@ -42,6 +46,7 @@ describe("parsePatchGroup", () => {
 			patch: FILE_A + FILE_B,
 			requestedPaths: ["a.ts", "b.ts"],
 			requestedUntrackedPaths: [],
+			whitespaceFiltered: false,
 		});
 		const after = parsePatchGroup(
 			"group",
@@ -50,6 +55,7 @@ describe("parsePatchGroup", () => {
 				patch: FILE_A + FILE_B_EDITED,
 				requestedPaths: ["a.ts", "b.ts"],
 				requestedUntrackedPaths: [],
+				whitespaceFiltered: false,
 			},
 			before,
 		);
@@ -84,12 +90,18 @@ describe("parsePatchGroup fallback files", () => {
 			oldFile: { name: "edit.ts", contents: "const a = 1;\n" },
 			newFile: { name: "edit.ts", contents: "const a = 2;\n" },
 		},
+		{
+			path: "mode.sh",
+			oldFile: { name: "mode.sh", contents: "echo hi\n" },
+			newFile: { name: "mode.sh", contents: "echo hi\n" },
+		},
 	];
 	const result = {
 		kind: "files" as const,
 		files,
-		requestedPaths: ["indent.ts", "edit.ts"],
+		requestedPaths: ["indent.ts", "edit.ts", "mode.sh"],
 		requestedUntrackedPaths: [],
+		whitespaceFiltered: false,
 	};
 
 	test("keeps whitespace-only files by default", () => {
@@ -104,5 +116,44 @@ describe("parsePatchGroup fallback files", () => {
 		});
 		expect(parsed.byPath.has("indent.ts")).toBe(false);
 		expect(parsed.byPath.has("edit.ts")).toBe(true);
+	});
+
+	test("keeps a mode-only file when whitespace is ignored", () => {
+		const parsed = parsePatchGroup("unstaged", result, undefined, {
+			ignoreWhitespace: true,
+		});
+		expect(parsed.byPath.has("mode.sh")).toBe(true);
+	});
+});
+
+describe("isWhitespaceOnly", () => {
+	const base = {
+		kind: "patch" as const,
+		patch: "",
+		requestedPaths: ["a.ts"],
+		requestedUntrackedPaths: [],
+	};
+	const edited = { status: "modified" as const, additions: 2, deletions: 2 };
+
+	test("a tracked file with line changes missing from a filtered patch", () => {
+		expect(
+			isWhitespaceOnly({ ...base, whitespaceFiltered: true }, edited),
+		).toBe(true);
+	});
+
+	test("not when the patch was truncated or whitespace was kept", () => {
+		expect(
+			isWhitespaceOnly({ ...base, whitespaceFiltered: false }, edited),
+		).toBe(false);
+	});
+
+	test("not for an untracked or a mode-only file", () => {
+		const result = { ...base, whitespaceFiltered: true };
+		expect(
+			isWhitespaceOnly(result, { ...edited, status: "untracked" as const }),
+		).toBe(false);
+		expect(
+			isWhitespaceOnly(result, { ...edited, additions: 0, deletions: 0 }),
+		).toBe(false);
 	});
 });
