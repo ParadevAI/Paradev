@@ -1,1 +1,0 @@
-export { AboutSection } from "./AboutSection";

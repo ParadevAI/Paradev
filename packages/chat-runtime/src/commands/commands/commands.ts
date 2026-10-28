@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { realpath } from "node:fs/promises";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -713,14 +715,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		discoverSessions(input) {
+		async discoverSessions(input) {
 			const parsed = discoverSessionsCommandSchema.parse(input);
-			return options.live.discoverSessions({
-				harness: parsed.harness,
-				scopeId: parsed.scopeId,
-				cwd: parsed.cwd,
-				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
-			});
+			const [page, cwds] = await Promise.all([
+				options.live.discoverSessions({
+					harness: parsed.harness,
+					scopeId: parsed.scopeId,
+					cwd: parsed.cwd,
+					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+				}),
+				equivalentPaths(parsed.cwd),
+			]);
+			return {
+				...page,
+				sessions: page.sessions.filter((session) =>
+					cwds.has(pathKey(session.cwd)),
+				),
+			};
 		},
 
 		getItems(input) {
@@ -774,4 +785,19 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			};
 		},
 	};
+}
+
+async function equivalentPaths(path: string): Promise<Set<string>> {
+	const paths = new Set([pathKey(path)]);
+	const real = await realpath(path).catch(() => null);
+	if (real) paths.add(pathKey(real));
+	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

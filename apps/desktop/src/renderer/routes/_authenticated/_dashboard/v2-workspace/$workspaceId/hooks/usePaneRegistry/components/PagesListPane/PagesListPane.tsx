@@ -11,6 +11,10 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { useStore } from "zustand";
 import { NewPageComposer } from "../../../../components/NewPageComposer";
+import {
+	PagesListCard,
+	type PagesListItem,
+} from "../../../../components/PagesListCard";
 import type { CreateNewAgentSession } from "../../../../hooks/useAgentSessionLauncher";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
 import type {
@@ -22,7 +26,6 @@ import { openBesidePane } from "../../../../utils/openBesidePane";
 import { openPagePaneInStore } from "../../../../utils/openPagePaneInStore";
 import { pagesListPageUiId } from "../../utils/pagesListPageUiId";
 import { PagePane } from "../PagePane";
-import { PagesListCard, type PagesListItem } from "./components/PagesListCard";
 
 const WORKSPACE_PAGE_LIMIT = 200;
 

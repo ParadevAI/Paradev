@@ -38,7 +38,7 @@ export default async function ContactPage() {
 
 	// Named locals so the paragraph extracts with `{supportEmail}` /
 	// `{teamEmail}` instead of positional `{0}` / `{1}`.
-	const supportEmail = `support${COMPANY.EMAIL_DOMAIN}`;
+	const supportEmail = COMPANY.SUPPORT_EMAIL;
 	const teamEmail = COMPANY.TEAM_EMAIL;
 
 	return (

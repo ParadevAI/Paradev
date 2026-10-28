@@ -21,8 +21,12 @@ export function Workspace<TData>({
 	className,
 	renderTabAccessory,
 	renderTabIcon,
+	isPreviewTab,
+	renameTabs = true,
+	onTabClick,
 	renderEmptyState,
 	renderAddTabMenu,
+	onAddTab,
 	renderTabBarLeading,
 	renderTabBarTrailing,
 	renderBelowTabBar,
@@ -164,9 +168,16 @@ export function Workspace<TData>({
 						await closeTab(tab.id);
 					}
 				}}
-				onRenameTab={(tabId, title) =>
-					store.getState().setTabTitleOverride({ tabId, titleOverride: title })
+				onRenameTab={
+					renameTabs
+						? (tabId, title) =>
+								store
+									.getState()
+									.setTabTitleOverride({ tabId, titleOverride: title })
+						: undefined
 				}
+				onTabClick={onTabClick}
+				isPreviewTab={isPreviewTab}
 				onReorderTab={(tabId, toIndex) =>
 					store.getState().reorderTab({ tabId, toIndex })
 				}
@@ -175,6 +186,7 @@ export function Workspace<TData>({
 				}
 				renderTabIcon={renderTabIcon}
 				renderAddTabMenu={renderAddTabMenu}
+				onAddTab={onAddTab}
 				renderTabBarLeading={renderTabBarLeading}
 				renderTabBarTrailing={renderTabBarTrailing}
 				renderTabAccessory={renderTabAccessory}

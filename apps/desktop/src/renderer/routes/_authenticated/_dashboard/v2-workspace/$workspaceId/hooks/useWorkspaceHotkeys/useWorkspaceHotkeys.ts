@@ -11,14 +11,20 @@ import { useCallback, useMemo, useRef } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import type { StoreApi } from "zustand";
-import type {
-	BrowserPaneData,
-	DesktopPaneData,
-	MobilePaneData,
-	PaneTarget,
-	PaneViewerData,
-	TerminalPaneData,
+import {
+	createRightPane,
+	type RightPaneKind,
+} from "../../components/RightPaneNewTab";
+import {
+	type BrowserPaneData,
+	type DesktopPaneData,
+	type MobilePaneData,
+	NEW_TAB_PANE_KIND,
+	type PaneTarget,
+	type PaneViewerData,
+	type TerminalPaneData,
 } from "../../types";
+import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -58,11 +64,28 @@ export function useWorkspaceHotkeys({
 
 	// --- Tab creation ---
 
+	const replaceFocusedNewTab = (kind: RightPaneKind): boolean => {
+		const target = getCloseTarget().store;
+		const active = target.getState().getActivePane();
+		if (active?.pane.kind !== NEW_TAB_PANE_KIND) return false;
+		replaceNewTabPane(
+			target,
+			{ tabId: active.tabId, paneId: active.pane.id },
+			createRightPane(kind, {
+				mintTerminalId: launcher.mint,
+				browserUrl: defaultBrowserUrl,
+			}),
+		);
+		return true;
+	};
+
 	useHotkey("NEW_GROUP", async () => {
+		if (replaceFocusedNewTab("terminal")) return;
 		await addTerminalTab();
 	});
 
 	useHotkey("NEW_BROWSER", () => {
+		if (replaceFocusedNewTab("browser")) return;
 		viewer.reveal();
 		viewer.store.getState().addTab({
 			panes: [
@@ -77,6 +100,7 @@ export function useWorkspaceHotkeys({
 	});
 
 	useHotkey("OPEN_DIFF_VIEWER", () => {
+		if (replaceFocusedNewTab("diff")) return;
 		openChangesPane();
 	});
 

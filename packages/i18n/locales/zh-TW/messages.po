@@ -936,9 +936,6 @@ msgstr "{formerName} 現已更名為 {productName}"
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} 現已更名為 {productName}！"
 
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} 現已更名為 {productName}。產品不變，團隊不變，只是換了名字。現有的 superset.sh 連結會自動轉址，superset 指令也會繼續可用。"
-
 msgid "{founderCount} ex-YC founders"
 msgstr "{founderCount} 位 YC 校友創辦人"
 
@@ -1169,6 +1166,9 @@ msgstr "{price}/使用者/月"
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（原 {formerName}，YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}（原 {formerName}）"
+
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（YC P26）是為 AI agent 時代打造的原始碼公開 IDE，工程師可以在其中平行執行數百個 Claude Code、Codex 等程式設計 agent。"
 
@@ -1177,6 +1177,9 @@ msgstr "給媒體的 {productName} 資訊"
 
 msgid "{productName} has been used by one in eight Fortune 500 companies."
 msgstr "八分之一的 Fortune 500 公司使用過 {productName}。"
+
+msgid "{productName} in the press"
+msgstr "媒體眼中的 {productName}"
 
 msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
 msgstr "在全球，Netflix、Microsoft、NVIDIA、DoorDash、Wix 與 Mistral AI 的工程師都在使用 {productName}；在亞洲，ByteDance、Toss、Kakao、Grab、LINE 與 Rakuten 的工程師也在使用。"
@@ -1477,6 +1480,9 @@ msgstr "${balance}額度"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "由 Union Square Ventures 領投的 1,150 萬美元種子輪"
+
 msgid "1"
 msgstr "1"
 
@@ -1498,8 +1504,14 @@ msgstr "10條以上並行工作流且不丟狀態"
 msgid "12m ago"
 msgstr "12分鐘前"
 
+msgid "145,000+ across 180 countries"
+msgstr "180 個國家/地區，14.5 萬+"
+
 msgid "15 min"
 msgstr "15 分鐘"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "15k+ 星標，100+ 貢獻者"
 
 msgid "1d ago"
 msgstr "1天前"
@@ -1701,9 +1713,6 @@ msgstr "關於"
 
 msgid "About {displayName}"
 msgstr "關於 {displayName}"
-
-msgid "About {productName}"
-msgstr "關於{productName}"
 
 msgid "About Paradev"
 msgstr "關於Paradev"
@@ -2806,6 +2815,9 @@ msgstr "引數"
 msgid "Argv used to launch the agent."
 msgstr "用於啟動代理程式的argv。"
 
+msgid "Articles and coverage about {productName}."
+msgstr "關於 {productName} 的文章與報導。"
+
 msgid "Artifact"
 msgstr "Artifact"
 
@@ -2883,6 +2895,9 @@ msgstr "輔助"
 
 msgid "at"
 msgstr "位於"
+
+msgid "At a glance"
+msgstr "概覽"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "至少有一支叫得出名字的團隊（包括我們自己）連續一個季度通過全部F4關卡，並公佈資料。"
@@ -4752,8 +4767,20 @@ msgstr "連線外部服務，與你的組織同步資料。"
 msgid "Connect external services to sync data."
 msgstr "連線外部服務以同步資料。"
 
+msgid "Connect GitHub"
+msgstr "連接 GitHub"
+
 msgid "Connect GitHub in Integrations to add {repositoryFullName}."
 msgstr "在整合中連結 GitHub 以新增 {repositoryFullName}。"
+
+msgid "Connect GitHub in Settings to act on pull requests as yourself"
+msgstr "在設定中連接 GitHub，以你自己的身分處理拉取請求"
+
+msgid "Connect GitHub to continue"
+msgstr "連接 GitHub 以繼續"
+
+msgid "Connect GitHub to see review comments as yourself."
+msgstr "連接 GitHub，以你自己的身分查看審查留言。"
 
 msgid "Connect GitHub…"
 msgstr "連結 GitHub…"
@@ -4788,8 +4815,14 @@ msgstr "連線Slack，直接在對話中管理任務。在任意頻道提及機�
 msgid "Connect this computer"
 msgstr "連線至這台電腦"
 
+msgid "Connect to act on pull requests as yourself instead of as the workspace."
+msgstr "連接後，將以你自己的身分而非工作區的身分處理拉取請求。"
+
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "連線你的 {pluginLabel} 帳戶，然後重新載入此頁面。"
+
+msgid "Connect your GitHub account to load this pull request as you."
+msgstr "連接你的 GitHub 帳戶，以你自己的身分載入此拉取請求。"
 
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "連線你的GitHub儲存庫並同步拉取請求。追蹤整個團隊的CI狀態和程式碼審查。"
@@ -4968,9 +5001,6 @@ msgstr "請在瀏覽器中繼續"
 
 msgid "Continue or fork session"
 msgstr "繼續或分支會話"
-
-msgid "Continue the same workspace from your iPhone"
-msgstr "在 iPhone 上繼續同一個工作區"
 
 msgid "Continue the session the last run left"
 msgstr "繼續上次執行留下的工作階段"
@@ -5337,6 +5367,9 @@ msgstr "無法載入這個差異"
 msgid "Could not load this file."
 msgstr "無法載入這個檔案。"
 
+msgid "Could not load this pull request."
+msgstr "無法載入此拉取請求。"
+
 msgid "Could not load your machines"
 msgstr "無法載入你的機器"
 
@@ -5369,9 +5402,6 @@ msgstr "無法連線至行動模擬器。"
 
 msgid "Could not reach the desktop."
 msgstr "無法連線至桌面。"
-
-msgid "Could not reach the host to load this pull request."
-msgstr "無法連線到主機以載入此拉取請求。"
 
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "無法連線主機以開始更新。請確認主機在線上後重試。"
@@ -5517,6 +5547,9 @@ msgstr "無法分叉到新的 worktree"
 
 msgid "Couldn't branch the conversation"
 msgstr "無法分叉對話"
+
+msgid "Couldn't check"
+msgstr "無法檢查"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "無法檢查移除此成員會影響哪些內容"
@@ -6887,8 +6920,8 @@ msgstr "下載記錄"
 msgid "Download Manually"
 msgstr "手動下載"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "下載我們的標誌與產品圖片，用於報導 Paradev。"
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "下載我們的標誌、產品圖片與創辦人照片，用於報導 Paradev。"
 
 msgid "Download Paradev"
 msgstr "下載Paradev"
@@ -8347,9 +8380,6 @@ msgstr "要檢出到新worktree的資料夾，每行一個，相對於儲存庫�
 msgid "FOLLOW ON X"
 msgstr "在X上關注"
 
-msgid "Follow terminal sessions live"
-msgstr "即時追蹤終端工作階段"
-
 msgid "Follow thread"
 msgstr "追蹤討論串"
 
@@ -8494,6 +8524,9 @@ msgstr "找到12處tooltip呼叫"
 msgid "Founder & CEO, WowMakers"
 msgstr "創辦人暨 CEO，WowMakers"
 
+msgid "Founders"
+msgstr "創辦人"
+
 msgid "Founding Engineer"
 msgstr "創始工程師"
 
@@ -8556,6 +8589,9 @@ msgstr "完全自動駕駛"
 
 msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 msgstr "完整原始碼在GitHub上以Elastic License 2.0（ELv2）提供。可查閱、審計並參與貢獻。沒有黑箱，沒有隱藏功能。"
+
+msgid "Funding"
+msgstr "融資"
 
 msgid "Future home for reusable agent configs."
 msgstr "可複用代理程式配置的未來歸處。"
@@ -8877,6 +8913,9 @@ msgstr "標題2"
 
 msgid "Heading 3"
 msgstr "標題3"
+
+msgid "Headquarters"
+msgstr "總部"
 
 msgid "Heart"
 msgstr "心形"
@@ -12433,6 +12472,9 @@ msgstr "一名工程師在一個工作日內維持3條以上代理程式工作�
 msgid "One human drives at most one agent at a time."
 msgstr "一個人同時最多驅動一個代理程式。"
 
+msgid "One line"
+msgstr "一句話"
+
 msgid "One line about how you work"
 msgstr "用一句話介紹你的工作方式"
 
@@ -12441,6 +12483,9 @@ msgstr "榜單最早的一百人之一"
 
 msgid "one of the selected repositories"
 msgstr "所選儲存庫之一"
+
+msgid "One paragraph"
+msgstr "一段話"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "一個外掛，所有程式碼代理程式：Claude Code、Codex、Cursor、OpenCode 等。只需安裝一次，就能在你的裝置上和雲端使用。"
@@ -12620,9 +12665,6 @@ msgstr "為目前終端開啟多行提示詞編輯器"
 msgid "Open a new {label} chat?"
 msgstr "要開啟新的 {label} 聊天嗎？"
 
-msgid "Open a pane, or drag one here from the center."
-msgstr "開啟一個窗格，或從中間拖一個到這裡。"
-
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "建立拉取請求後即可檢視評審狀態、檢查和評論。"
 
@@ -12724,9 +12766,6 @@ msgstr "開啟檔案"
 
 msgid "Open File in New Tab"
 msgstr "在新分頁中開啟檔案"
-
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "在右側分頁中開啟檔案、差異和瀏覽器，中間區域保留給終端機和聊天。"
 
 msgid "Open from folder"
 msgstr "從資料夾開啟"
@@ -13441,12 +13480,6 @@ msgstr "iPhone 上的 Paradev Mobile 程式碼差異"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "無論走到哪裡，Paradev 手機版都讓我擁有桌上型電腦的能力。"
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "透過 Paradev Mobile，開發者可以在 iPhone 上繼續使用他們在電腦上已在使用的 Paradev 工作區。"
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile 頁面"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone 上的 Paradev Mobile 終端"
 
@@ -13964,6 +13997,9 @@ msgstr "保留提交歷史"
 msgid "PresetsBar.tsx"
 msgstr "PresetsBar.tsx"
 
+msgid "Press"
+msgstr "媒體報導"
+
 msgid "Press <0>Esc</0> to close"
 msgstr "按<0>Esc</0>關閉"
 
@@ -13972,9 +14008,6 @@ msgstr "按 ⌘⇧B，或開啟 Paradev 偵測到的連接埠。開發伺服器�
 
 msgid "Press a key…"
 msgstr "請按一個鍵…"
-
-msgid "Press contact"
-msgstr "媒體聯絡"
 
 msgid "Press coverage"
 msgstr "媒體報導"
@@ -14226,9 +14259,6 @@ msgstr "提示詞"
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "用提示詞讓編碼代理程式實現你想在Paradev中看到的功能。如果我們喜歡你的提示詞，就會執行它併合併結果。"
 
-msgid "Prompt agents and answer their questions"
-msgstr "向 agent 下達提示並回答它們的問題"
-
 msgid "Prompt command is only available for terminal agents."
 msgstr "提示詞命令僅適用於終端代理程式。"
 
@@ -14349,6 +14379,12 @@ msgstr "拉取請求"
 
 msgid "Pull Requests"
 msgstr "拉取請求"
+
+msgid "Pull requests, comments and pushes from Superset are made as you."
+msgstr "來自 Superset 的拉取請求、留言和推送以你的身分進行。"
+
+msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
+msgstr "來自 Superset 的拉取請求、留言和推送將不再以你的身分進行。"
 
 msgid "Purple"
 msgstr "紫色"
@@ -14533,9 +14569,6 @@ msgstr "在手機上閱讀"
 
 msgid "Read MCP servers again"
 msgstr "重新讀取MCP伺服器"
-
-msgid "Read the announcement"
-msgstr "閱讀公告"
 
 msgid "Read the changelog"
 msgstr "檢視更新日誌"
@@ -15500,9 +15533,6 @@ msgstr "已請求審查"
 msgid "Review required"
 msgstr "需要審查"
 
-msgid "Review syntax-highlighted diffs"
-msgstr "審查含語法醒目提示的差異"
-
 msgid "Review the result."
 msgstr "審查結果。"
 
@@ -15547,9 +15577,6 @@ msgstr "富輸入（{hotkeyText}）"
 
 msgid "right pane"
 msgstr "右側面板"
-
-msgid "Right pane area"
-msgstr "右側面板區域"
 
 msgid "Right-click here"
 msgstr "在這裡右鍵點選"
@@ -16348,6 +16375,9 @@ msgstr "傳送"
 
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "傳送加入{organizationName}的邀請。48小時後過期。"
+
+msgid "Send email and debug delivery"
+msgstr "傳送郵件並排查投遞問題"
 
 msgid "Send Invitation"
 msgstr "傳送邀請"
@@ -17173,8 +17203,8 @@ msgstr "出了點問題。"
 msgid "Something went wrong. Please try again."
 msgstr "出了點問題。請重試。"
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "出了點問題。請重試，或聯絡support@superset.sh。"
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "出了點問題。請重試，或聯絡support@paradev.com。"
 
 msgid "soon"
 msgstr "即將"
@@ -17696,6 +17726,9 @@ msgstr "已被取代"
 
 msgid "superset"
 msgstr "superset"
+
+msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Superset 以你的身分在 GitHub 上操作。連接你的 GitHub 帳戶以合併、留言和更新拉取請求。"
 
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只會輸出該窗格專屬的端點。讓 Playwright 或 browser-use 連接它即可。"
@@ -18228,12 +18261,6 @@ msgstr "代理程式使用其技能和工具，問題會出現在 Linear 中。"
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "關注該頁面的代理程式會讀取每則留言，更新頁面並在討論串中回覆。"
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "公告也介紹了由 Union Square Ventures 領投、Y Combinator 與 Paul Graham 參投的 1,150 萬美元種子輪融資。"
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "此 App 可免費下載。需要 iOS 26 或更新版本以及 Paradev Pro。接下來將推出 Android 版。"
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "應用程式版本為 {appVersion}，但連接的是由其他程式（可能是舊版 CLI 或另一個 Paradev 版本）啟動的主機服務。重新啟動會將其替換為此應用程式自帶的副本。"
 
@@ -18474,8 +18501,8 @@ msgstr "提供商回應了{0}。"
 msgid "The provider refused it."
 msgstr "提供商拒絕了它。"
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "恢復期已結束。請聯絡support@superset.sh。"
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "恢復期已結束。請聯絡support@paradev.com。"
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "遠端分支已分叉。請先拉取再繼續。"
@@ -18845,14 +18872,14 @@ msgstr "此個人檔案目前繁忙"
 msgid "This project is no longer available on your devices."
 msgstr "這個專案在你的裝置上已不可用。"
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "此專案未連結 GitHub 儲存庫。"
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "此專案仍在使用舊的 config.json。它仍可正常運作；轉換為 config.toml 即可使用新的區段。"
 
 msgid "This project's host is offline"
 msgstr "此專案的主機已離線"
+
+msgid "This pull request has no GitHub access to act through."
+msgstr "沒有可用於處理此拉取請求的 GitHub 存取權限。"
 
 msgid "This pull request has no host to act through"
 msgstr "此提取請求沒有可用於操作的主機"
@@ -20041,9 +20068,6 @@ msgstr "在GitHub上檢視"
 msgid "VIEW ON GITHUB"
 msgstr "在GitHub上檢視"
 
-msgid "View on the App Store"
-msgstr "在 App Store 查看"
-
 msgid "View open roles"
 msgstr "檢視空缺職位"
 
@@ -20711,6 +20735,9 @@ msgstr "X-大型"
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
 
+msgid "Y Combinator batch"
+msgstr "Y Combinator 梯次"
+
 msgid "Yearly"
 msgstr "按年"
 
@@ -20833,6 +20860,9 @@ msgstr "你拒絕了 {plugin} 的授權請求。"
 
 msgid "You don't have access to this host"
 msgstr "你沒有此主機的存取權限"
+
+msgid "You don't have access to this pull request on GitHub, or it no longer exists."
+msgstr "你在 GitHub 上沒有此拉取請求的存取權限，或者它已不存在。"
 
 msgid "You don't have access to this terminal."
 msgstr "你沒有此終端的存取權限。"

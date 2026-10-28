@@ -11,6 +11,8 @@ import { useThemeStore } from "renderer/stores";
 interface UseWorkspaceOpenInOptions {
 	worktreePath: string | null;
 	projectId: string | null;
+	/** Bind the open-in and copy-path hotkeys to this path. Defaults to true. */
+	hotkeys?: boolean;
 }
 
 export type WorkspaceOpenIn = ReturnType<typeof useWorkspaceOpenIn>;
@@ -18,6 +20,7 @@ export type WorkspaceOpenIn = ReturnType<typeof useWorkspaceOpenIn>;
 export function useWorkspaceOpenIn({
 	worktreePath,
 	projectId,
+	hotkeys = true,
 }: UseWorkspaceOpenInOptions) {
 	const { t } = useLingui();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
@@ -79,7 +82,7 @@ export function useWorkspaceOpenIn({
 	}, [worktreePath, copyPath, openInApp.isPending]);
 
 	useHotkey("OPEN_IN_APP", openInDefaultApp, {
-		enabled: worktreePath !== null,
+		enabled: hotkeys && worktreePath !== null,
 	});
 
 	return {
@@ -88,9 +91,13 @@ export function useWorkspaceOpenIn({
 		isDark: activeTheme?.type === "dark",
 		isLoading,
 		openInShortcut:
-			openInDisplay.text !== "Unassigned" ? openInDisplay.text : null,
+			hotkeys && openInDisplay.text !== "Unassigned"
+				? openInDisplay.text
+				: null,
 		copyPathShortcut:
-			copyPathDisplay.text !== "Unassigned" ? copyPathDisplay.text : null,
+			hotkeys && copyPathDisplay.text !== "Unassigned"
+				? copyPathDisplay.text
+				: null,
 		openInDefaultApp,
 		openInOtherApp,
 		copyWorktreePath,

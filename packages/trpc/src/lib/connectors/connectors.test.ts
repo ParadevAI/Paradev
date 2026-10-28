@@ -483,6 +483,26 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "user_abc", label: "harshith" });
 	});
 
+	test("resend_mcp reads the team behind the token from /me", async () => {
+		const calls = respond({ object: "me", team_id: "team_abc" });
+
+		const identity = await probeIdentity(
+			"resend_mcp",
+			connectorMethod(requireConnector("resend_mcp")),
+			"re-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.resend.com/me",
+				method: "GET",
+				auth: "Bearer re-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "team_abc", label: null });
+		expect(identity.user?.id).toBe("team_abc");
+	});
+
 	test("superhuman_mcp reads the default account wherever the server lists it", async () => {
 		const calls: { method?: string; params?: { name?: string } }[] = [];
 		globalThis.fetch = (async (_url: string, init: RequestInit) => {
@@ -694,6 +714,17 @@ describe("authorizeUrl for a dynamic client", () => {
 					code_challenge_methods_supported: ["S256"],
 					client_id_metadata_document_supported: true,
 				},
+			"https://mcp.resend.com/.well-known/oauth-protected-resource": {
+				resource: "https://mcp.resend.com",
+				authorization_servers: ["https://api.resend.com"],
+			},
+			"https://api.resend.com/.well-known/oauth-authorization-server": {
+				issuer: "https://api.resend.com",
+				authorization_endpoint: "https://api.resend.com/oauth/authorize",
+				token_endpoint: "https://api.resend.com/oauth/token",
+				code_challenge_methods_supported: ["S256"],
+				client_id_metadata_document_supported: true,
+			},
 		};
 		globalThis.fetch = (async (input: string | URL) => {
 			const route = routes[String(input)];
@@ -743,5 +774,17 @@ describe("authorizeUrl for a dynamic client", () => {
 		expect(url.searchParams.get("scope")).toBe(
 			"openid email profile offline_access",
 		);
+	});
+	test("resend_mcp finds its metadata at the root well-known path", async () => {
+		const url = await authorize("resend_mcp");
+
+		expect(`${url.origin}${url.pathname}`).toBe(
+			"https://api.resend.com/oauth/authorize",
+		);
+		expect(url.searchParams.get("client_id")).toBe(
+			"https://api.test/api/connectors/resend_mcp/client-metadata",
+		);
+		expect(url.searchParams.get("resource")).toBe("https://mcp.resend.com");
+		expect(url.searchParams.get("scope")).toBe("full_access");
 	});
 });

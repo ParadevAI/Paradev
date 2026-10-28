@@ -17,6 +17,7 @@ import {
 import { ChatPreviewHoverCard } from "../ChatPreviewHoverCard";
 import { FileLinkMenu } from "../FileLinkMenu";
 import { GithubWorkItemHoverCard } from "../GithubWorkItemHoverCard";
+import { LinkMenu } from "../LinkMenu";
 import { WebsiteHoverCard } from "../WebsiteHoverCard";
 import { LinkUnfurlIcon } from "./components/LinkUnfurlIcon";
 
@@ -103,7 +104,7 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 		props.children
 	);
 
-	const link = (
+	const anchor = (
 		<MarkdownLink
 			{...props}
 			title={
@@ -134,8 +135,9 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 		</MarkdownLink>
 	);
 	if (isLocalPath) {
-		return <FileLinkMenu reference={href}>{link}</FileLinkMenu>;
+		return <FileLinkMenu reference={href}>{anchor}</FileLinkMenu>;
 	}
+	const link = <LinkMenu href={href}>{anchor}</LinkMenu>;
 	if (appLink?.kind === "chat") {
 		return (
 			<ChatPreviewHoverCard
