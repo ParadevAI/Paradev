@@ -19,8 +19,9 @@ export class AgentWorker extends Container<Env> {
 	sleepAfter = "1h";
 	enableInternet = true;
 
-	constructor(ctx: DurableObjectState<{}>, env: Env) {
-		super(ctx, env);
+	constructor(...args: ConstructorParameters<typeof Container<Env>>) {
+		super(...args);
+		const env = args[1];
 		this.envVars = {
 			AGENT_API_URL: env.AGENT_API_URL,
 			AGENT_ROUTER_URL: env.AGENT_ROUTER_URL,

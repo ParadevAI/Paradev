@@ -1,9 +1,10 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { AGENT_TASK_QUEUE } from "@superset/agent-harness/session";
 import { turnSteersQuery } from "@superset/agent-harness/session/definitions";
 import { Client, Connection } from "@temporalio/client";
@@ -19,7 +20,9 @@ const need = (name: string) => {
 
 const MIN_PDEV = [0, 2, 3];
 const pdevBin = process.env.PDEV_BIN ?? "pdev";
-const pdevVersion = execFileSync(pdevBin, ["--version"]).toString().trim();
+const pdevVersion = (
+	await promisify(execFile)(pdevBin, ["--version"])
+).stdout.trim();
 // Older pdev ignores PDEV_REMOTE_* and would run the agent's commands on this machine.
 if (compareVersions(pdevVersion, MIN_PDEV) < 0) {
 	throw new Error(
