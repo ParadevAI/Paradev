@@ -10,7 +10,7 @@
 		"AGENT_API_URL": "https://api.superset.sh",
 		"AGENT_ROUTER_URL": "https://router.superset.sh"
 	},
-	// Secrets (`wrangler secret put`): AGENT_WORKER_SECRET, TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE, TEMPORAL_API_KEY.
+	// Secrets come from GitHub on each deploy (deploy-production.yml): AGENT_WORKER_SECRET and TEMPORAL_*.
 	"containers": [
 		{
 			"class_name": "AgentWorker",
