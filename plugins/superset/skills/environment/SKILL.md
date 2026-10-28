@@ -23,7 +23,7 @@ Do not install or upgrade these:
 - Chrome, Claude Code, Codex and the `superset` CLI. Every boot updates them to the platform's current release, so a checkpoint does not freeze their versions.
 - A Linux desktop (XFCE over VNC, Xvfb), ffmpeg and ImageMagick.
 
-There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, tell the user. Install only what the project needs, and do it through `.superset/config.json` so a fresh checkout repeats it.
+There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, tell the user. Install only what the project needs, and do it through `.superset/config.toml` so a fresh checkout repeats it.
 
 ## 0. Find the environment
 
@@ -41,7 +41,7 @@ Read each repository before asking anything. Use the local clone when there is o
 
 - the README, package manifests and lockfiles (they decide the package manager and install command);
 - CI config (it is the most honest list of what a working build needs);
-- `.env.example` and any existing `.superset/config.json`;
+- `.env.example` and the repository's `.superset/` folder: `config.toml`, or the old `config.json`;
 - services the project expects, such as Postgres, Redis or Docker Compose.
 
 Then ask only what you could not infer: missing secret values, extra repositories, and who should be able to use the environment when you are done (only them, or the organization).
@@ -76,17 +76,16 @@ superset terminals read --workspace <workspace-id> --terminal <terminal-id> --ma
 superset terminals send --workspace <workspace-id> --terminal <terminal-id> --text "<input>"
 ```
 
-Install toolchains and dependencies, start the services, and check that the project builds and its tests or dev server run. Write what worked into `.superset/config.json` in the primary repository, so a fresh checkout repeats it:
+Install toolchains and dependencies, start the services, and check that the project builds and its tests or dev server run.
 
-```json
-{
-  "setup": ["bun install"],
-  "start": ["docker compose up -d postgres"],
-  "ports": [3000]
-}
-```
+Write what worked into the primary repository's `.superset/config.toml`, so every box repeats it. If the repository has no `config.toml`, or still has the old `config.json`, follow the superset:setup skill to write one; it converts `config.json`. In the cloud:
 
-`setup` reruns on a fresh checkout and must be idempotent. `start` runs on every boot. Show the user the file and offer to commit it in a branch; do not push without asking.
+- `[install]` runs when the environment's image is built: workspace-independent installs go there.
+- `[setup]`, with `[setup.cloud]` for cloud-only steps, runs on every boot and resume, so it must be safe to run again.
+- `[terminals.<name>]` with `default = true` start on boot, after `setup`.
+- `[ports.<name>]` with `preview = true` get a preview URL.
+
+Show the user the file, commit it on a branch, and offer to open a pull request if none is open for it; ask before pushing. Boxes read the file from their branch, so it applies to new workspaces once it is on the base branch.
 
 ## 4. Checkpoint
 
@@ -103,6 +102,6 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
 2. Set the visibility the user chose: `superset environments update <environment-id> --scope organization` (or leave it `personal`).
 3. Archive the setup box: `superset workspaces archive <workspace-id>`.
-4. Summarize what is installed, what `.superset/config.json` does, which variables are set, which are missing and who has to provide them, and how to start a workspace from the environment.
+4. Summarize what is installed, what `.superset/config.toml` does, which variables are set, which are missing and who has to provide them, and how to start a workspace from the environment.
 
 If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.
