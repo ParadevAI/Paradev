@@ -4,11 +4,13 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@superset/ui/resizable";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import { useFileTreeVisibilityStore } from "../../../../state/fileTreeVisibilityStore";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
 import { FileViewFloatingActions } from "./components/FileViewFloatingActions";
 import { FileViewTree } from "./components/FileViewTree";
+
+const TREE_DEFAULT_SIZE = 35;
 
 interface FileViewLayoutProps {
 	context: RendererContext<PaneViewerData>;
@@ -26,23 +28,32 @@ export function FileViewLayout({
 	children,
 }: FileViewLayoutProps) {
 	const visible = useFileTreeVisibilityStore((state) => state.visible);
+	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const tabHasTreePane =
 		context.pane.kind !== "files" &&
 		Object.values(context.tab.panes).some((pane) => pane.kind === "files");
 	if (!showTree || tabHasTreePane) return children;
 	return (
 		<div className="relative h-full w-full min-w-0">
-			<ResizablePanelGroup direction="horizontal">
+			<ResizablePanelGroup ref={groupRef} direction="horizontal">
 				<ResizablePanel id="file-view-content" order={1} minSize={30}>
 					<div className="relative h-full min-w-0">{children}</div>
 				</ResizablePanel>
 				{visible && (
 					<>
-						<ResizableHandle className="bg-transparent" />
+						<ResizableHandle
+							className="bg-transparent"
+							onDoubleClick={() =>
+								groupRef.current?.setLayout([
+									100 - TREE_DEFAULT_SIZE,
+									TREE_DEFAULT_SIZE,
+								])
+							}
+						/>
 						<ResizablePanel
 							id="file-view-tree"
 							order={2}
-							defaultSize={35}
+							defaultSize={TREE_DEFAULT_SIZE}
 							minSize={20}
 							maxSize={60}
 						>
