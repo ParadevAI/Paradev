@@ -136,6 +136,10 @@
 			"types": "./src/router/plugins/proxy/index.ts",
 			"default": "./src/router/plugins/proxy/index.ts"
 		},
+		"./agent-events": {
+			"types": "./src/router/agent/github-events.ts",
+			"default": "./src/router/agent/github-events.ts"
+		},
 		"./router/cloud-workspace/provision": {
 			"types": "./src/router/cloud-workspace/provision.ts",
 			"default": "./src/router/cloud-workspace/provision.ts"

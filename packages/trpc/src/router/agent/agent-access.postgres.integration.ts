@@ -490,6 +490,39 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).toBe(true);
 	});
 
+	test("GitHub events on a task's pull request reach the Dev's main session once", async () => {
+		const { notifyDevOfPullRequest } = await import("./github-events");
+		const { agent, turn: mainTurn } = await agentWithChannel(admin);
+		const url = `https://github.com/acme/app/pull/${Date.now()}`;
+		await db.insert(schema.agentSessions).values({
+			organizationId: orgId,
+			agentId: agent.id,
+			kind: "task",
+			parentSessionId: mainTurn.sessionId,
+			title: "Add retries",
+			role: "writer",
+			taskStatus: "done",
+			pullRequestUrl: url,
+		});
+		const event = {
+			url,
+			deliveryId: crypto.randomUUID(),
+			what: 'Check "ci" failure.',
+		};
+		await notifyDevOfPullRequest(event);
+		await notifyDevOfPullRequest(event);
+		await notifyDevOfPullRequest({
+			...event,
+			url: "https://github.com/acme/app/pull/1",
+			deliveryId: crypto.randomUUID(),
+		});
+		const [main] = await db
+			.select({ steers: schema.agentTurns.steerPromptIds })
+			.from(schema.agentTurns)
+			.where(eq(schema.agentTurns.id, mainTurn.id));
+		expect(main?.steers).toEqual([`github:${event.deliveryId}`]);
+	});
+
 	test("archiving an agent revokes it at once", async () => {
 		const { agent, token } = await agentWithChannel(admin);
 		await person(admin).agent.archive({ agentId: agent.id });
