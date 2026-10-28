@@ -61,4 +61,43 @@ describe("addPaneDetails", () => {
 		expect(b).toMatchObject({ terminalTitle: "zsh", agent: null });
 		expect(c).not.toHaveProperty("agent");
 	});
+
+	test("reports an agent whose turn ended as working while its subagents run", () => {
+		const result = addPaneDetails(
+			{
+				paneId: null,
+				tabId: null,
+				layout: {
+					activeTabId: "tab",
+					tabs: [
+						{
+							id: "tab",
+							title: null,
+							active: true,
+							activePaneId: "a",
+							layout: { type: "pane", paneId: "a" },
+							panes: [
+								{
+									id: "a",
+									kind: "terminal",
+									title: null,
+									terminalId: "t1",
+									active: true,
+								},
+							],
+						},
+					],
+				},
+			},
+			{
+				titles: new Map(),
+				agents: new Map([
+					["t1", { agentId: "claude", lastEventType: "Stop", subagents: [{}] }],
+				]),
+			},
+		);
+		expect(result.layout.tabs[0]?.panes[0]).toMatchObject({
+			agent: { id: "claude", state: "working" },
+		});
+	});
 });

@@ -529,6 +529,7 @@ export function useAccessibleV2Workspaces(
 					lastEventType: binding.lastEventType,
 					lastEventAt: binding.lastEventAt,
 					lastSeenAt: terminalSeenAt[binding.terminalId],
+					hasLiveSubagents: Boolean(binding.subagents?.length),
 				});
 				const prev = byWorkspace.get(binding.workspaceId) ?? {
 					status: "idle" as PaneStatus,

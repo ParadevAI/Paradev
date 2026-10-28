@@ -2,6 +2,7 @@ import {
 	type ActiveAgentStatus,
 	agentStatusFromEvent,
 	highestAgentStatus,
+	withSubagentActivity,
 } from "@superset/shared/agent-status";
 import type { TerminalAgentStore } from "../../terminal-agents/store";
 
@@ -23,7 +24,12 @@ export function startSandboxAgentStatusReporter(args: {
 		highestAgentStatus(
 			args.store
 				.list()
-				.map((binding) => agentStatusFromEvent(binding.lastEventType)),
+				.map((binding) =>
+					withSubagentActivity(
+						agentStatusFromEvent(binding.lastEventType),
+						Boolean(binding.subagents?.length),
+					),
+				),
 		);
 
 	const send = async () => {

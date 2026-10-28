@@ -36,13 +36,29 @@ export function agentStatusFromEvent(
 	}
 }
 
+/** A Stop ends only the agent's own turn; its running subagents keep it working. */
+export function withSubagentActivity(
+	status: ActiveAgentStatus | null,
+	hasLiveSubagents: boolean,
+): ActiveAgentStatus | null {
+	if (!hasLiveSubagents || status === "permission" || status === "failed") {
+		return status;
+	}
+	return "working";
+}
+
 /** An agent's turn state as scripts see it; there is no unseen "review" here. */
 export type AgentRunState = "starting" | "working" | "blocked" | "idle";
 
 /** `Attached` is the launch event, before the agent has started a turn. */
-export function agentRunState(lastEventType: string): AgentRunState {
-	if (lastEventType === "Attached") return "starting";
-	switch (agentStatusFromEvent(lastEventType)) {
+export function agentRunState(
+	lastEventType: string,
+	hasLiveSubagents = false,
+): AgentRunState {
+	if (lastEventType === "Attached" && !hasLiveSubagents) return "starting";
+	switch (
+		withSubagentActivity(agentStatusFromEvent(lastEventType), hasLiveSubagents)
+	) {
 		case "working":
 			return "working";
 		case "permission":

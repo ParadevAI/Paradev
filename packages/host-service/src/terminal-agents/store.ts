@@ -467,10 +467,10 @@ export class TerminalAgentStore extends EventEmitter {
 	/**
 	 * Escape hatch for wedged working/permission state (an agent whose final
 	 * Stop hook never fired — interrupts fire no hook at all). Forces the
-	 * workspace's bindings (or just `terminalId`'s) to `Stop`, keeping
-	 * lastEventAt so seen-gating still resolves to idle. Live agents
-	 * re-assert within seconds via their next hook event, so clearing a
-	 * genuinely working agent self-corrects.
+	 * workspace's bindings (or just `terminalId`'s) to `Stop` and ends their
+	 * subagents, keeping lastEventAt so seen-gating still resolves to idle.
+	 * Live agents and subagents re-assert within seconds via their next hook
+	 * event, so clearing a genuinely working agent self-corrects.
 	 */
 	clearWorkspaceStatuses(workspaceId: string, onlyTerminalId?: string): void {
 		let changed = false;
@@ -478,6 +478,7 @@ export class TerminalAgentStore extends EventEmitter {
 			if (binding.workspaceId !== workspaceId) continue;
 			if (onlyTerminalId !== undefined && terminalId !== onlyTerminalId)
 				continue;
+			if (this.endLiveSubagents(terminalId)) changed = true;
 			if (binding.lastEventType === "Stop") continue;
 			const next: TerminalAgentBinding = { ...binding, lastEventType: "Stop" };
 			this.byTerminal.set(terminalId, next);
@@ -611,6 +612,19 @@ export class TerminalAgentStore extends EventEmitter {
 			return undefined;
 		}
 		return roster;
+	}
+
+	private endLiveSubagents(terminalId: string): boolean {
+		const roster = this.subagentsByTerminal.get(terminalId);
+		if (!roster) return false;
+		const endedAt = Date.now();
+		let ended = false;
+		for (const [id, subagent] of roster) {
+			if (subagent.endedAt !== undefined) continue;
+			roster.set(id, { ...subagent, endedAt });
+			ended = true;
+		}
+		return ended;
 	}
 
 	findActive(
