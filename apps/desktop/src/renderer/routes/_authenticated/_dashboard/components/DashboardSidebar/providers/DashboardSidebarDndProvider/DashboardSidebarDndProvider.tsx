@@ -28,7 +28,7 @@ interface DashboardSidebarDndProviderProps {
 	workspaceShortcutLabels: Map<string, string>;
 	onReorderProjects: (projectIds: string[]) => void;
 	/**
-	 * True while `projects` is a filtered view rather than the manual order —
+	 * True while `projects` is a sorted/filtered view rather than the manual order —
 	 * see useSidebarDnd's `projectDragDisabled` option.
 	 */
 	isProjectDragDisabled?: boolean;

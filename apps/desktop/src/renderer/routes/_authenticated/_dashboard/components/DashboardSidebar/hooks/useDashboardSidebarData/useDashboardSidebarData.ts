@@ -60,6 +60,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { refreshDashboardSidebarProjects } from "./refreshDashboardSidebarProjects";
 import {
 	type StableDashboardSidebarProjects,
 	stabilizeDashboardSidebarProjects,
@@ -862,6 +863,10 @@ export function useDashboardSidebarData() {
 		[computedPinnedWorkspaces, cloudRowById],
 	);
 	const pinnedWorkspaces = useJsonStable(decoratedPinnedWorkspaces);
+	const refreshProjects = useCallback(async () => {
+		if (!organizationId) return;
+		await refreshDashboardSidebarProjects(queryClient, organizationId);
+	}, [organizationId, queryClient]);
 
 	return {
 		groups,
@@ -871,6 +876,7 @@ export function useDashboardSidebarData() {
 		sessionChildren: sessions.children,
 		githubStatus,
 		refreshWorkspacePullRequest,
+		refreshProjects,
 		toggleProjectCollapsed,
 	};
 }

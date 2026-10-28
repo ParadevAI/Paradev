@@ -174,6 +174,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		sessionChildren,
 		githubStatus,
 		refreshWorkspacePullRequest,
+		refreshProjects,
 		toggleProjectCollapsed,
 	} = useDashboardSidebarData();
 	const {
@@ -275,10 +276,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	);
 	const trimmedFilterQuery = projectFilterQuery.trim();
 	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
-	// The sort modes only reorder rows inside a project, so the project list
-	// is still the manual order and stays draggable; only a filter, which
-	// hides projects outright, makes a project drop unsafe to commit.
-	const isProjectDragDisabled = isFilterActive;
+	const isProjectDragDisabled = sortMode !== "manual" || isFilterActive;
 	const isChildDragDisabled = sortMode !== "manual" || isFilterActive;
 	useBlockedDragNotice({
 		reason: isFilterActive ? "filter" : sortMode !== "manual" ? "sort" : null,
@@ -542,6 +540,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 														onHostFilterChange={setSidebarProjectHostFilter}
 														filterQuery={projectFilterQuery}
 														onFilterQueryChange={setProjectFilterQuery}
+														onRefresh={refreshProjects}
 													/>
 												</DashboardSidebarBulkActions>
 											</div>

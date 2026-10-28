@@ -6955,8 +6955,8 @@ msgstr "サポート返信を3件下書き"
 msgid "Drag to reorder"
 msgstr "ドラッグして並べ替え"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "手動順ではワークスペースをドラッグして並べ替え"
+msgid "Drag to reorder in Manual order"
+msgstr "手動順序でドラッグして並べ替え"
 
 msgid "Drawer"
 msgstr "Drawer"
@@ -7830,6 +7830,9 @@ msgstr "ブランチをプッシュできませんでした"
 
 msgid "Failed to record page version"
 msgstr "ページバージョンの記録に失敗しました"
+
+msgid "Failed to refresh projects"
+msgstr "プロジェクトを更新できませんでした"
 
 msgid "Failed to remove"
 msgstr "削除に失敗しました"
@@ -17191,14 +17194,17 @@ msgstr "並び替え"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "{label}で並べ替え、現在{sortLabel}"
 
+msgid "Sort projects"
+msgstr "プロジェクトを並べ替え"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "プロジェクトを並べ替え ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "プロジェクトを並べ替え ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "ワークスペースを並べ替え"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "ワークスペースを並べ替え（{currentLabel}）"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "ワークスペースを並べ替え（{currentLabel}） · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "タスク完了時のサウンドと着信音"

@@ -8,6 +8,7 @@ import type {
 	DashboardSidebarProjectChild,
 	DashboardSidebarWorkspace,
 } from "../../types";
+import { getProjectChildrenWorkspaces } from "../projectChildren";
 
 // An item with no usable timestamp sinks below everything dated. Mapping
 // NaN to -Infinity keeps the comparator a consistent total order instead of
@@ -19,6 +20,17 @@ function rankTime(time: number): number {
 function newest(times: number[]): number {
 	const known = times.filter((time) => !Number.isNaN(time));
 	return known.length > 0 ? Math.max(...known) : Number.NaN;
+}
+
+function getProjectActivityTimestamp(project: DashboardSidebarProject): number {
+	const activity = newest(
+		getProjectChildrenWorkspaces(project.children).map(
+			getWorkspaceActivityTime,
+		),
+	);
+	if (!Number.isNaN(activity)) return activity;
+	const updatedAt = toTime(project.updatedAt);
+	return Number.isNaN(updatedAt) ? toTime(project.createdAt) : updatedAt;
 }
 
 function makeStableComparator<Item>(
@@ -104,25 +116,27 @@ export function sortDashboardSidebarProjectChildren(
 	return haveSameItems(sorted, children) ? children : sorted;
 }
 
-/**
- * Sorts each project's children for a sort mode. The project list itself is
- * always the manual (drag) order: projects are the stable landmarks people
- * navigate by, and reshuffling them under the user because an agent touched
- * a workspace loses the map. `manual` returns the input untouched; the other
- * modes never mutate it, and a project whose children are already in order
- * keeps its identity.
- */
 export function sortDashboardSidebarProjects(
 	projects: DashboardSidebarProject[],
 	mode: SidebarProjectSortMode,
 ): DashboardSidebarProject[] {
 	if (mode === "manual") return projects;
 
-	return projects.map((project) => {
-		const children = sortDashboardSidebarProjectChildren(
-			project.children,
-			mode,
-		);
-		return children === project.children ? project : { ...project, children };
-	});
+	const compareProjects = makeStableComparator<DashboardSidebarProject>(
+		mode === "created"
+			? (project) => toTime(project.createdAt)
+			: getProjectActivityTimestamp,
+		(project) => project.name,
+		(project) => project.id,
+	);
+
+	return projects
+		.map((project) => {
+			const children = sortDashboardSidebarProjectChildren(
+				project.children,
+				mode,
+			);
+			return children === project.children ? project : { ...project, children };
+		})
+		.sort(compareProjects);
 }

@@ -6955,8 +6955,8 @@ msgstr "подготовил 3 ответа поддержки"
 msgid "Drag to reorder"
 msgstr "Перетащите, чтобы изменить порядок"
 
-msgid "Drag workspaces to reorder in Manual order"
-msgstr "Перетаскивайте рабочие области для изменения порядка в ручной сортировке"
+msgid "Drag to reorder in Manual order"
+msgstr "Перетаскивайте для изменения порядка в режиме «Вручную»"
 
 msgid "Drawer"
 msgstr "Шторка"
@@ -7830,6 +7830,9 @@ msgstr "Не удалось отправить ветку"
 
 msgid "Failed to record page version"
 msgstr "Не удалось записать версию страницы"
+
+msgid "Failed to refresh projects"
+msgstr "Не удалось обновить проекты"
 
 msgid "Failed to remove"
 msgstr "Не удалось удалить"
@@ -17191,14 +17194,17 @@ msgstr "Сортировать по"
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Сортировать по {label}, сейчас {sortLabel}"
 
+msgid "Sort projects"
+msgstr "Сортировать проекты"
+
+msgid "Sort projects ({currentLabel})"
+msgstr "Сортировать проекты ({currentLabel})"
+
+msgid "Sort projects ({currentLabel}) · {hostLabel}"
+msgstr "Сортировать проекты ({currentLabel}) · {hostLabel}"
+
 msgid "Sort workspaces"
 msgstr "Сортировать рабочие области"
-
-msgid "Sort workspaces ({currentLabel})"
-msgstr "Сортировать рабочие области ({currentLabel})"
-
-msgid "Sort workspaces ({currentLabel}) · {hostLabel}"
-msgstr "Сортировать рабочие области ({currentLabel}) · {hostLabel}"
 
 msgid "Sounds and ringtone for completed tasks"
 msgstr "Звуки и мелодия для завершённых задач"
