@@ -102,6 +102,7 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
 2. Set the visibility the user chose: `superset environments update <environment-id> --scope organization` (or leave it `personal`).
 3. Archive the setup box: `superset workspaces archive <workspace-id>`.
-4. Summarize what is installed, what `.superset/config.toml` does, which variables are set, which are missing and who has to provide them, and how to start a workspace from the environment.
+4. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready`, then check that `setup` finished and the default terminals run. Give the user its link: the environment URL's origin with `/workspaces/<new-workspace-id>`, which opens it in the desktop app.
+5. Summarize what is installed, what `.superset/config.toml` does, which variables are set, and which are missing and who has to provide them. Tell the user that more workspaces start from the new-workspace screen: pick Cloud, the project, and this environment.
 
 If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.
