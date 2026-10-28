@@ -1,11 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { Redirect, Stack, usePathname } from "expo-router";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
 import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
-import { glassHeaderOptions, sheetDetents } from "@/lib/navigation";
+import {
+	glassHeaderOptions,
+	sheetDetents,
+	sideSafeAreaLayout,
+} from "@/lib/navigation";
 import { VoiceLayer } from "@/screens/(authenticated)/voice/VoiceLayer";
 
 export const unstable_settings = { anchor: "(home)" };
@@ -28,7 +31,6 @@ export default function AuthenticatedLayout() {
 	const { t } = useLingui();
 	const { data: session } = useSession();
 	const pathname = usePathname();
-	const insets = useSafeAreaInsets();
 
 	// Unpaid sessions may only see home (which renders the paywall) and
 	// settings — App Review requires sign-out, org switching, and account
@@ -43,22 +45,21 @@ export default function AuthenticatedLayout() {
 	return (
 		<View className="flex-1">
 			<Stack
-				screenOptions={{
-					headerShown: false,
-					contentStyle: {
-						paddingLeft: insets.left,
-						paddingRight: insets.right,
-					},
-				}}
+				screenOptions={{ headerShown: false }}
+				// Home's own stack pads its screens, so its header still reaches
+				// the iPhone Duo's right-edge button column.
+				screenLayout={(props) =>
+					props.route.name === "(home)"
+						? props.children
+						: sideSafeAreaLayout(props)
+				}
 			>
 				{/* Root headers are hidden — `title` here only names routes in
 			    back-button long-press menus (otherwise raw route names leak,
 			    e.g. "(home)"). */}
 				<Stack.Screen
 					name="(home)"
-					// Home's own stack pads its screens, so its header still reaches
-					// the iPhone Duo's right-edge button column.
-					options={{ title: t({ message: "Home" }), contentStyle: {} }}
+					options={{ title: t({ message: "Home" }) }}
 				/>
 				<Stack.Screen
 					name="voice/index"

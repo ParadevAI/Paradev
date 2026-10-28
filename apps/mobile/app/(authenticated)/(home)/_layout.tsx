@@ -1,18 +1,17 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { sideSafeAreaLayout } from "@/lib/navigation";
 
 export default function HomeLayout() {
 	const { t } = useLingui();
-	const insets = useSafeAreaInsets();
 
 	return (
 		<Stack
 			screenOptions={{
 				headerBackButtonDisplayMode: "minimal",
 				headerShadowVisible: false,
-				contentStyle: { paddingLeft: insets.left, paddingRight: insets.right },
 			}}
+			screenLayout={sideSafeAreaLayout}
 		>
 			<Stack.Screen name="index" options={{ title: "" }} />
 			<Stack.Screen

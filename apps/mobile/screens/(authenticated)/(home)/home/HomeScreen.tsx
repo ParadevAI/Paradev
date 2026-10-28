@@ -611,6 +611,7 @@ export function HomeScreen() {
 						now={now}
 						cache={cloudCache}
 						onCopied={handleCopied}
+						card={card}
 					/>
 				);
 			}
