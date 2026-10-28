@@ -516,6 +516,7 @@ export const v2UserPreferencesSchema = z.object({
 	rightSidebarTab: z.enum(["changes", "files"]).default("changes"),
 	rightSidebarWidth: z.number().default(340),
 	rightPaneAreaWidth: z.number().optional(),
+	changesFileListWidth: z.number().optional(),
 	deleteLocalBranch: z.boolean().default(false),
 	showPresetsBar: z.boolean().default(true),
 	changesViewMode: changesViewModeSchema.default("folders"),

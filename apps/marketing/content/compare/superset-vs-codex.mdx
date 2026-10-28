@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Codex CLI (2026): Agent Orchestrator vs OpenAI's Coding Agent"
-description: "Compare Superset and OpenAI Codex CLI for AI-powered development. See how parallel agent orchestration differs from a single cloud-backed coding agent."
+title: "Paradev vs Codex CLI (2026): Agent Orchestrator vs OpenAI's Coding Agent"
+description: "Compare Paradev and OpenAI Codex CLI for AI-powered development. See how parallel agent orchestration differs from a single cloud-backed coding agent."
 date: 2026-02-18
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,27 +15,27 @@ keywords:
   - ai coding agent comparison
 ---
 
-Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broader Codex product that also spans IDE extensions, a desktop app, and cloud workflows. Superset is a local-first desktop workspace that can run multiple Codex instances, other agents, and Superset Chat in parallel across isolated Git worktrees. The products overlap more than they used to, but they still solve different jobs: Codex is the coding suite, while Superset is the orchestration and review layer around many agents.
+Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broader Codex product that also spans IDE extensions, a desktop app, and cloud workflows. Paradev is a local-first desktop workspace that can run multiple Codex instances, other agents, and Paradev Chat in parallel across isolated Git worktrees. The products overlap more than they used to, but they still solve different jobs: Codex is the coding suite, while Paradev is the orchestration and review layer around many agents.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Codex CLI** |
+| | **Paradev** | **Codex CLI** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI coding agent (terminal-native) |
 | **What it does** | Runs multiple coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | AI assistant that reads, writes, and executes code via OpenAI models |
-| **AI approach** | Agent-agnostic: works with Codex, Claude Code, Aider, OpenCode, Superset Chat, and more | OpenAI's Codex model family and related OpenAI coding workflows |
+| **AI approach** | Agent-agnostic: works with Codex, Claude Code, Aider, OpenCode, Paradev Chat, and more | OpenAI's Codex model family and related OpenAI coding workflows |
 | **Parallelism** | Core feature: many agents, from any vendor, on separate branches simultaneously | Subagents, worktrees (on by default since September 2026), an `/agents` view, and cloud tasks |
 | **Isolation** | Git worktrees for local branch-based workspaces | Sandbox modes (network-disabled, full-auto) per session |
-| **Pricing** | Free tier + Pro $20/seat/mo | ChatGPT-plan access and API usage vary by Codex surface |
+| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | ChatGPT-plan access and API usage vary by Codex surface |
 | **License** | Source-available (ELv2) | Open source (Apache 2.0) |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -49,29 +49,29 @@ Codex CLI is OpenAI's open-source local terminal client for Codex. It runs on yo
 
 ### Orchestrator vs Agent Suite
 
-Codex is the agent suite: it reads code, talks to OpenAI models, and writes changes through local and cloud surfaces. Superset is the orchestration workspace around agents: it runs many Codex sessions in parallel, each in its own isolated environment, then gives you chat, review, browser preview, and MCP-connected workflow around them. Run Codex inside Superset to get automatic worktree isolation and parallel execution with zero manual setup.
+Codex is the agent suite: it reads code, talks to OpenAI models, and writes changes through local and cloud surfaces. Paradev is the orchestration workspace around agents: it runs many Codex sessions in parallel, each in its own isolated environment, then gives you chat, review, browser preview, and MCP-connected workflow around them. Run Codex inside Paradev to get automatic worktree isolation and parallel execution with zero manual setup.
 
-### Codex Surfaces vs Superset Orchestration
+### Codex Surfaces vs Paradev Orchestration
 
-Codex now spans multiple surfaces: CLI, IDE extension, desktop app, and cloud delegation. Superset is local-first: the worktrees, terminals, chat UI, browser tabs, and diff/file review live in the desktop app, and workspaces can run on your machine, on a host you add, or in a cloud workspace. Provider traffic depends on whichever agents you run. That makes the relationship clearer: Codex provides the coding surfaces, while Superset provides the orchestration layer around many tasks.
+Codex now spans multiple surfaces: CLI, IDE extension, desktop app, and cloud delegation. Paradev is local-first: the worktrees, terminals, chat UI, browser tabs, and diff/file review live in the desktop app, and workspaces can run on your machine, on a host you add, or in a cloud workspace. Provider traffic depends on whichever agents you run. That makes the relationship clearer: Codex provides the coding surfaces, while Paradev provides the orchestration layer around many tasks.
 
 ### Single Product Stack vs Mixed-Agent Stack
 
-With Codex alone, whether from the CLI or app, you stay inside OpenAI's Codex product model. With Superset, you can assign tasks to multiple Codex instances simultaneously (or mix Codex with Claude Code, Aider, OpenCode, or Superset Chat), each on its own branch with its own worktree.
+With Codex alone, whether from the CLI or app, you stay inside OpenAI's Codex product model. With Paradev, you can assign tasks to multiple Codex instances simultaneously (or mix Codex with Claude Code, Aider, OpenCode, or Paradev Chat), each on its own branch with its own worktree.
 
 ### Agent Flexibility
 
-Codex CLI only works with OpenAI's models. Superset doesn't care which agent you use: run Codex for tasks where OpenAI models excel, Claude Code for complex architectural work, and Aider for iterative changes. Mix and match per task based on what works best.
+Codex CLI only works with OpenAI's models. Paradev doesn't care which agent you use: run Codex for tasks where OpenAI models excel, Claude Code for complex architectural work, and Aider for iterative changes. Mix and match per task based on what works best.
 
 ### Session Persistence
 
-Codex gives you the agent surfaces. Superset adds the operational layer around them: task-level worktrees, long-lived sessions, browser previews for local apps, in-app diff/file review, and MCP-aware coordination. That matters once you are managing many tasks on one codebase rather than one prompt in one surface.
+Codex gives you the agent surfaces. Paradev adds the operational layer around them: task-level worktrees, long-lived sessions, browser previews for local apps, in-app diff/file review, and MCP-aware coordination. That matters once you are managing many tasks on one codebase rather than one prompt in one surface.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Codex is included in ChatGPT plans from Free and Go up through Plus, Pro, Business, Edu, and Enterprise, with cloud features from Plus up. With an API key instead, you get the CLI, SDK, and IDE extension at API rates, without cloud features or the desktop app. The important practical difference is still the same: Codex gives you OpenAI's agent surfaces, while Superset gives you the orchestration layer to run many tasks in parallel.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Codex is included in ChatGPT plans from Free and Go up through Plus, Pro, Business, Edu, and Enterprise, with cloud features from Plus up. With an API key instead, you get the CLI, SDK, and IDE extension at API rates, without cloud features or the desktop app. The important practical difference is still the same: Codex gives you OpenAI's agent surfaces, while Paradev gives you the orchestration layer to run many tasks in parallel.
 
 ---
 
@@ -83,31 +83,31 @@ Superset offers a free tier and Pro at $20/seat/month. Codex is included in Chat
 - Prefer Full Auto mode for autonomous execution in a sandboxed environment
 - Want Codex cloud tasks in OpenAI-managed environments for heavy work
 
-**Choose Superset + Codex CLI if you:**
+**Choose Paradev + Codex CLI if you:**
 - Want to run Codex instances in parallel across separate tasks
 - Need automatic Git worktree isolation to separate working files for review
 - Want sessions that survive crashes and app restarts
 - Plan to mix Codex with other agents (Claude Code, Aider, OpenCode) per task
 - Work on large codebases where parallel execution saves hours
 
-Superset and Codex CLI work together naturally. Each Superset task launches Codex in its own worktree: you get Codex's coding ability with Superset's parallelism and isolation.
+Paradev and Codex CLI work together naturally. Each Paradev task launches Codex in its own worktree: you get Codex's coding ability with Paradev's parallelism and isolation.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Superset a Codex replacement?
+### Is Paradev a Codex replacement?
 
-Not really. Superset now has built-in chat, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Codex is the coding agent suite. Superset is the layer that lets you run many Codex sessions safely or mix Codex with other agents on the same repo.
+Not really. Paradev now has built-in chat, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Codex is the coding agent suite. Paradev is the layer that lets you run many Codex sessions safely or mix Codex with other agents on the same repo.
 
-### Can I run Codex in Full Auto mode inside Superset?
+### Can I run Codex in Full Auto mode inside Paradev?
 
-Yes. Each Superset task runs Codex in its own isolated worktree. You can use any Codex mode (Suggest, Auto Edit, or Full Auto) safely, because worktree isolation means an autonomous agent can't affect your main working directory.
+Yes. Each Paradev task runs Codex in its own isolated worktree. You can use any Codex mode (Suggest, Auto Edit, or Full Auto) safely, because worktree isolation means an autonomous agent can't affect your main working directory.
 
-### How does the Codex app compare to Superset?
+### How does the Codex app compare to Paradev?
 
-The Codex app gives you an OpenAI-native GUI for Codex itself, with built-in worktrees, skills, automations, and Git support. Superset is broader in a different direction: it is not tied to Codex, and it can orchestrate many different agents while also giving you chat, browser preview, and in-app diff/file review. If you want a Codex-specific app, use the Codex app. If you want an agent-agnostic control plane, use Superset.
+The Codex app gives you an OpenAI-native GUI for Codex itself, with built-in worktrees, skills, automations, and Git support. Paradev is broader in a different direction: it is not tied to Codex, and it can orchestrate many different agents while also giving you chat, browser preview, and in-app diff/file review. If you want a Codex-specific app, use the Codex app. If you want an agent-agnostic control plane, use Paradev.
 
 ### Are both tools open source?
 
-No. Codex CLI is open source under Apache 2.0. Superset is source-available on GitHub under Elastic License 2.0 (ELv2).
+No. Codex CLI is open source under Apache 2.0. Paradev is source-available on GitHub under Elastic License 2.0 (ELv2).

@@ -24,6 +24,11 @@ import {
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
+import {
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
+	type SandboxFile,
+} from "./credentials";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
@@ -98,6 +103,8 @@ export interface SandboxClaim {
 	hostSecret: string;
 	managedEnv: Record<string, string>;
 	networkPolicy: NetworkPolicy;
+	/** The creator's agent login files; a golden under construction has none. */
+	files?: SandboxFile[];
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
@@ -140,6 +147,19 @@ async function writeIdentity(
 			mode: 0o644,
 		},
 	]);
+}
+
+/**
+ * The agents' login files, on every wake including one that finds the box
+ * serving: a sign-in made since the last boot has to reach the next agent
+ * started there. They hold placeholders only.
+ */
+async function writeSignInFiles(
+	sandbox: Sandbox,
+	files: SandboxFile[] = [],
+): Promise<void> {
+	if (files.length === 0) return;
+	await sandbox.writeFiles(files.map((file) => ({ ...file, mode: 0o644 })));
 }
 
 /**
@@ -211,6 +231,7 @@ export async function provisionSandbox(args: {
 					resources: { vcpus: args.claim.vcpus },
 				}));
 	await writeIdentity(sandbox, args.claim.identity);
+	await writeSignInFiles(sandbox, args.claim.files);
 	await runBoot(sandbox, args.claim.hostSecret);
 	return {
 		providerSandboxId: args.name,
@@ -427,6 +448,7 @@ export async function wakeSandbox(args: {
 					),
 				),
 			serving ? null : writeIdentity(sandbox, args.claim.identity),
+			writeSignInFiles(sandbox, args.claim.files),
 		]);
 		if (!serving) await runBoot(sandbox, args.claim.hostSecret);
 		await settleSandbox({
@@ -459,6 +481,8 @@ const INHERITED_IDENTITY = [
 	`${SANDBOX_PATHS.home}/.superset/host`,
 	`${SANDBOX_PATHS.home}/.gitconfig`,
 	`${SANDBOX_PATHS.workspace}/.env`,
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
 ];
 
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
@@ -521,6 +545,7 @@ export async function promoteSandboxToEnvironment(args: {
 	await waitForStopSnapshot(args.goldenName, created);
 	if (wasRunning) {
 		await writeIdentity(source, args.claim.identity);
+		await writeSignInFiles(source, args.claim.files);
 		await runBoot(source, args.claim.hostSecret);
 	}
 	return { goldenName: args.goldenName, region: source.region };

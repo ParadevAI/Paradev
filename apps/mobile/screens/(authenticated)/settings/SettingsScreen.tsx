@@ -16,6 +16,7 @@ import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSignOut } from "@/hooks/useSignOut";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
+import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
@@ -40,6 +41,7 @@ function formatJoined(createdAt?: Date | string | null) {
 
 export function SettingsScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
@@ -47,6 +49,7 @@ export function SettingsScreen() {
 	const { activeOrganization, activeOrganizationId } = useOrganizations();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
+	const github = useGithubConnection();
 
 	const user = session?.user;
 	const plan = session?.session.plan;
@@ -122,6 +125,28 @@ export function SettingsScreen() {
 				},
 			],
 		);
+	};
+
+	const handleGithub = () => {
+		if (github.connection) {
+			Alert.alert(
+				t({ message: "Disconnect GitHub?" }),
+				t({
+					message:
+						"Pull requests, comments and pushes from Superset will no longer be made as you.",
+				}),
+				[
+					{ style: "cancel", text: t({ message: "Cancel" }) },
+					{
+						style: "destructive",
+						text: t({ message: "Disconnect" }),
+						onPress: () => github.disconnect.mutate(),
+					},
+				],
+			);
+			return;
+		}
+		github.connect.mutate();
 	};
 
 	// 24pt (px-6) on a phone; a centered column on iPad.
@@ -234,6 +259,48 @@ export function SettingsScreen() {
 				/>
 			</SettingsSection>
 
+			{github.available !== false ? (
+				<SettingsSection label={t({ message: "Connections" })}>
+					<ListRow
+						icon={
+							<Ionicons
+								name="logo-github"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "GitHub" })}
+						subtitle={
+							github.connection
+								? t({
+										message:
+											"Pull requests, comments and pushes from Superset are made as you.",
+									})
+								: t({
+										message:
+											"Connect to act on pull requests as yourself instead of as the workspace.",
+									})
+						}
+						trailing={
+							<ListRowValue
+								value={
+									github.isLoading
+										? ""
+										: github.isError
+											? t({ message: "Couldn't check" })
+											: (github.connection?.login ??
+												t({ message: "Not connected" }))
+								}
+							/>
+						}
+						onPress={
+							github.isLoading || github.isError ? undefined : handleGithub
+						}
+						isLast
+					/>
+				</SettingsSection>
+			) : null}
+
 			<SettingsSection label={t({ message: "Plan", context: "billing" })}>
 				<ListRow
 					icon={
@@ -304,7 +371,7 @@ export function SettingsScreen() {
 						/>
 					}
 					label={t({
-						message: "Rate Superset",
+						message: `Rate ${appName}`,
 					})}
 					trailing={<ExternalIcon color={theme.mutedForeground} />}
 					onPress={() => openUrl(WRITE_REVIEW_URL)}

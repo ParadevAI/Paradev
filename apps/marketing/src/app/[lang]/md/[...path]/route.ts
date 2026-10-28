@@ -1,21 +1,36 @@
 import type { I18n, MessageDescriptor } from "@lingui/core";
 import { isSupportedLocale } from "@superset/i18n";
 import { getI18nInstance, preloadServerLocale } from "@superset/i18n/server";
+import type { PlanFamily } from "@superset/shared/billing";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { MCP_CAPABILITIES } from "@/app/[lang]/mcp-install/components/McpCapabilities/constants";
 import {
 	COMPARISON_SECTIONS,
 	type ComparisonValue,
+	ENTERPRISE_TIER,
 	PRICING_FAQ_ITEMS,
-	PRICING_TIERS,
+	pricingTiers,
 } from "@/app/[lang]/pricing/constants";
-import { proSeatPriceValues } from "@/app/[lang]/pricing/utils/proSeatPriceValues";
+import { checkoutHref } from "@/app/[lang]/pricing/utils/checkoutHref";
+import { faqAnswer } from "@/app/[lang]/pricing/utils/faqAnswer";
+import { fetchPlanCatalog } from "@/app/[lang]/pricing/utils/fetchPlanCatalog";
+import {
+	comparisonValue,
+	seatPrice,
+} from "@/app/[lang]/pricing/utils/planDisplay";
+import {
+	faqShown,
+	featureShown,
+	featureValues,
+	planPriceValues,
+} from "@/app/[lang]/pricing/utils/planPriceValues";
 import { fetchParticipant } from "@/app/[lang]/utils/fetchLeaderboard";
+import { env } from "@/env";
 import { getBlogPost } from "@/lib/blog";
 import { getCategoryPage } from "@/lib/category";
 import { getChangelogEntry } from "@/lib/changelog";
-import { getComparisonPage } from "@/lib/compare";
+import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
 	buildFrontmatter,
 	MARKDOWN_HEADERS,
@@ -48,47 +63,80 @@ function cell(i18n: I18n, value: ComparisonValue | null): string {
 	return text(i18n, value);
 }
 
-function pricingPage(i18n: I18n): MarkdownPage {
+function pricingPage(i18n: I18n, catalog: PlanFamily[]): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
-	const prices = proSeatPriceValues(i18n.locale);
-	const tiers = PRICING_TIERS.map((tier) => {
+	const prices = planPriceValues(catalog, i18n);
+	const allTiers = pricingTiers(catalog);
+	const tierName = (tier: (typeof allTiers)[number]) =>
+		typeof tier.name === "string" ? tier.name : text(i18n, tier.name);
+	const tiers = allTiers.map((tier) => {
+		const { price: tierPrice } = tier;
+		const set = prices.byFamily[tier.id];
 		const price =
-			tier.price.kind === "proSeat"
-				? `${prices.monthlyPrice} ${text(i18n, tier.price.monthly.note)} (${text(i18n, tier.price.monthly.cadence)}) or ${prices.yearlyPrice} ${text(i18n, tier.price.yearly.note)} (${i18n._({ ...tier.price.yearly.cadence, values: prices })})`
-				: `${text(i18n, tier.price.display)} (${text(i18n, tier.price.note)})`;
+			tierPrice.kind === "seat" && set
+				? [
+						`${seatPrice(set, false).display} ${text(i18n, tierPrice.note)} (${text(i18n, tierPrice.monthlyCadence)})`,
+						...(set.hasYearlyDiscount
+							? [
+									`or ${seatPrice(set, true).display} ${text(i18n, tierPrice.note)} (${i18n._({ ...tierPrice.yearlyCadence, values: { yearlyTotal: set.yearlyTotal } })})`,
+								]
+							: []),
+					].join("; ")
+				: tierPrice.kind === "seat"
+					? ""
+					: `${text(i18n, tierPrice.display)} (${text(i18n, tierPrice.note)})`;
 		return [
-			`### ${text(i18n, tier.name)}`,
+			`### ${tierName(tier)}`,
 			"",
 			text(i18n, tier.description),
 			"",
 			`- **Price**: ${price}`,
-			...tier.features.map((feature) => `- ${text(i18n, feature.label)}`),
-			`- [${text(i18n, tier.cta.label)}](${tier.cta.href.startsWith("/") ? baseUrl + tier.cta.href : tier.cta.href})`,
+			...tier.features
+				.filter((feature) => featureShown(feature, set))
+				.flatMap((feature) => [
+					`- ${i18n._({ ...feature.label, values: featureValues(set) })}`,
+					...[feature.detail, feature.info?.body]
+						.filter((line) => line !== undefined)
+						.map(
+							(line) =>
+								`  - ${i18n._({ ...line, values: featureValues(set) })}`,
+						),
+				]),
+			`- [${i18n._({ ...tier.cta.label, values: { plan: tierName(tier) } })}](${tier.price.kind === "seat" ? checkoutHref(env.NEXT_PUBLIC_WEB_URL, tier.id, Boolean(set?.hasYearlyDiscount)) : tier.cta.href.startsWith("/") ? baseUrl + tier.cta.href : tier.cta.href})`,
 			"",
 		];
 	});
-	const tierNames = PRICING_TIERS.map((tier) => text(i18n, tier.name));
+	const tierNames = allTiers.map(tierName);
 	const comparison = COMPARISON_SECTIONS.flatMap((section) => [
-		`### ${text(i18n, section.title)}`,
+		`### ${text(i18n, section.title)}${section.badge ? ` (${text(i18n, section.badge)})` : ""}`,
 		"",
 		`| | ${tierNames.join(" | ")} |`,
 		`|---|${tierNames.map(() => "---").join("|")}|`,
 		...section.rows.map(
 			(row) =>
-				`| ${text(i18n, row.label)}${row.badge ? ` (${text(i18n, row.badge.label)})` : ""} | ${row.values.map((value) => cell(i18n, value)).join(" | ")} |`,
+				`| ${text(i18n, row.label)} | ${allTiers.map((tier) => cell(i18n, comparisonValue(row, tier, prices))).join(" | ")} |`,
 		),
 		"",
 	]);
-	const faq = PRICING_FAQ_ITEMS.flatMap((item) => [
-		`### ${text(i18n, item.question)}`,
-		"",
-		i18n._({ ...item.answer, values: prices }),
-		"",
-	]);
+	const faq = PRICING_FAQ_ITEMS.filter((item) =>
+		faqShown(item, prices),
+	).flatMap((item) => {
+		const answer = faqAnswer(item, prices, i18n);
+		return [
+			`### ${text(i18n, item.question)}`,
+			"",
+			answer.lead,
+			"",
+			...(answer.list.length
+				? [...answer.list.map((line) => `- ${line}`), ""]
+				: []),
+			...answer.more.flatMap((paragraph) => [paragraph, ""]),
+		];
+	});
 	return {
 		title: `${BRAND.NAME} pricing`,
 		url: `${baseUrl}/pricing`,
-		description: `Free for individuals. Pro is ${prices.monthlyPrice} per user/month (or ${prices.yearlyPrice} billed yearly). Enterprise adds SSO, SCIM, audit logs, and an SLA.`,
+		description: `Free for individuals. ${prices.planPrices ? `${prices.planPrices}. ` : ""}Enterprise adds SSO, SCIM, audit logs, and an SLA.`,
 		content: [
 			"## Plans",
 			"",
@@ -111,7 +159,7 @@ function mcpInstallPage(i18n: I18n): MarkdownPage {
 		url: `${baseUrl}/mcp-install`,
 		description: `Connect Claude, Codex, Cursor, or any MCP client to ${BRAND.NAME}. Create tasks, spin up workspaces, launch agents, and run automations straight from your AI agent.`,
 		content: [
-			`Server URL: ${MCP_SERVER_URL} (Streamable HTTP). Authentication: OAuth 2.1 + PKCE with dynamic client registration, or a Superset API key as a Bearer token. Walkthrough: ${baseUrl}/auth.md`,
+			`Server URL: ${MCP_SERVER_URL} (Streamable HTTP). Authentication: OAuth 2.1 + PKCE with dynamic client registration, or a ${BRAND.NAME} API key as a Bearer token. Walkthrough: ${baseUrl}/auth.md`,
 			"",
 			"## Generic MCP client config",
 			"",
@@ -151,8 +199,7 @@ function teamPage(): MarkdownPage {
 	return {
 		title: `About ${BRAND.NAME}`,
 		url: `${baseUrl}/team`,
-		description:
-			"What Superset is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.",
+		description: `What ${BRAND.NAME} is, who builds it, and who it's for. A San Francisco team of three ex-YC CTOs building the workspace for parallel coding agents.`,
 		content: [
 			"## Team",
 			"",
@@ -176,7 +223,7 @@ function teamPage(): MarkdownPage {
 
 function enterprisePage(i18n: I18n): MarkdownPage {
 	const baseUrl = COMPANY.MARKETING_URL;
-	const enterprise = PRICING_TIERS.find((tier) => tier.id === "enterprise");
+
 	return {
 		title: `${BRAND.NAME} for enterprise`,
 		url: `${baseUrl}/enterprise`,
@@ -184,25 +231,28 @@ function enterprisePage(i18n: I18n): MarkdownPage {
 		content: [
 			"## What Enterprise includes",
 			"",
-			...(enterprise?.features ?? []).map(
+			...ENTERPRISE_TIER.features.map(
 				(feature) => `- ${text(i18n, feature.label)}`,
 			),
 			"",
 			"## Where your code runs",
 			"",
-			"On your machines. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. Superset never proxies model API calls.",
+			`On your machines. Repos, worktrees, terminal output, and agent sessions stay local by default; cloud sync covers account and organization metadata only. ${BRAND.NAME} never proxies model API calls.`,
 			"",
 			"## Get in touch",
 			"",
 			`- Contact sales: ${baseUrl}/enterprise`,
 			`- Security and compliance: ${COMPANY.TRUST_URL}`,
-			`- Email: sales${COMPANY.EMAIL_DOMAIN}`,
+			`- Email: ${COMPANY.SALES_EMAIL}`,
 		].join("\n"),
 	};
 }
 
-const STATIC_PAGES: Record<string, (i18n: I18n) => MarkdownPage> = {
-	pricing: pricingPage,
+const STATIC_PAGES: Record<
+	string,
+	(i18n: I18n) => MarkdownPage | Promise<MarkdownPage>
+> = {
+	pricing: async (i18n) => pricingPage(i18n, await fetchPlanCatalog()),
 	"mcp-install": mcpInstallPage,
 	team: teamPage,
 	enterprise: enterprisePage,
@@ -231,7 +281,7 @@ async function loadPage(
 		};
 	}
 	if (section === "compare") {
-		const page = getComparisonPage(slug);
+		const page = await getPricedComparisonPage(slug);
 		if (!page) return undefined;
 		return {
 			title: page.title,

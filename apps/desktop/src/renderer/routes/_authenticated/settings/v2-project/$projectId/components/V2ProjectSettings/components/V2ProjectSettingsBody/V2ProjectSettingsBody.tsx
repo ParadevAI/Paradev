@@ -40,6 +40,7 @@ interface V2ProjectSettingsBodyProps {
 	onHostProjectChanged: () => unknown;
 	locationSection: ReactNode;
 	scriptsEditor: ReactNode;
+	usesConfigToml: boolean;
 	dangerZone: ReactNode;
 }
 
@@ -57,6 +58,7 @@ export function V2ProjectSettingsBody({
 	onHostProjectChanged,
 	locationSection,
 	scriptsEditor,
+	usesConfigToml,
 	dangerZone,
 }: V2ProjectSettingsBodyProps) {
 	const { t } = useLingui();
@@ -256,13 +258,22 @@ export function V2ProjectSettingsBody({
 
 				{targetHostUrl && (
 					<SettingsSection
-						title={t({
-							message: "Project lifecycle scripts",
-						})}
-						description={t({
-							message:
-								"Commands run for workspace setup, teardown, and the Run button.",
-						})}
+						title={
+							usesConfigToml
+								? t({ message: "Workspace config" })
+								: t({ message: "Project lifecycle scripts" })
+						}
+						description={
+							usesConfigToml
+								? t({
+										message:
+											"The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml.",
+									})
+								: t({
+										message:
+											"Commands run for workspace setup, teardown, and the Run button.",
+									})
+						}
 					>
 						{scriptsEditor}
 					</SettingsSection>

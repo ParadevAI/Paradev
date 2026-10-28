@@ -1,9 +1,11 @@
 import type { MachineSize, PlanTier } from "@superset/shared/billing";
-import { Redis } from "@upstash/redis";
 import { AutumnError } from "autumn-js";
-import { env } from "../../../env";
 import { billingFromCustomer, type OrganizationBilling } from "./billing-state";
+import { seatLicenseFor } from "./catalog";
 import { getAutumnCustomer } from "./customer";
+import { paidPlanIdFromFlags } from "./entitlements";
+import type { EnvironmentLimit } from "./environment-limit";
+import { billingRedis } from "./redis";
 
 const MEMORY_TTL_MS = 10_000;
 const SHARED_TTL_SECONDS = 60;
@@ -12,34 +14,40 @@ const AUTUMN_READ_TIMEOUT_MS = 2_000;
 
 const FREE: OrganizationBilling = {
 	tier: "free",
+	autumnPlanId: null,
 	status: null,
 	cancelAt: null,
+	scheduledPlanId: null,
+	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
 	billingInterval: null,
 	lapsed: false,
 	paymentState: { kind: "ok" },
 	cloudUsage: null,
+	planTier: "free",
 	gatedMachineSizes: [],
+	environmentLimit: 0,
 };
 
 const FAIL_OPEN: OrganizationBilling = {
 	tier: "pro",
+	autumnPlanId: null,
 	status: "active",
 	cancelAt: null,
+	scheduledPlanId: null,
+	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
 	billingInterval: null,
 	lapsed: false,
 	paymentState: { kind: "ok" },
 	cloudUsage: null,
+	planTier: "pro",
 	gatedMachineSizes: [],
+	environmentLimit: null,
 };
 
-const redis = new Redis({
-	url: env.KV_REST_API_URL,
-	token: env.KV_REST_API_TOKEN,
-});
 const memory = new Map<
 	string,
 	{ value: OrganizationBilling; expiresAt: number }
@@ -55,7 +63,20 @@ function lastKnownKey(organizationId: string): string {
 
 async function readShared(key: string): Promise<OrganizationBilling | null> {
 	try {
-		return await redis.get<OrganizationBilling>(key);
+		const value = await billingRedis.get<OrganizationBilling>(key);
+		if (!value) return value;
+		return {
+			...value,
+			planTier: value.planTier ?? value.tier,
+			scheduledPlanId: value.scheduledPlanId ?? null,
+			scheduledAt: value.scheduledAt ?? null,
+			environmentLimit:
+				value.environmentLimit !== undefined
+					? value.environmentLimit
+					: value.tier === "free"
+						? 0
+						: null,
+		};
 	} catch (error) {
 		console.error("[billing/plan-state] cache read failed", error);
 		return null;
@@ -66,11 +87,20 @@ async function fetchBilling(
 	organizationId: string,
 ): Promise<OrganizationBilling> {
 	try {
+		const customer = await getAutumnCustomer(organizationId, {
+			timeoutMs: AUTUMN_READ_TIMEOUT_MS,
+		});
+		const planId = paidPlanIdFromFlags(customer.flags);
+		const license = planId
+			? await seatLicenseFor(planId).catch((error) => {
+					console.error("[billing/plan-state] catalog read failed", error);
+					return null;
+				})
+			: null;
 		return billingFromCustomer(
-			await getAutumnCustomer(organizationId, {
-				timeoutMs: AUTUMN_READ_TIMEOUT_MS,
-			}),
+			customer,
 			Date.now(),
+			license?.price?.interval ?? null,
 		);
 	} catch (error) {
 		if (error instanceof AutumnError && error.statusCode === 404) return FREE;
@@ -97,7 +127,7 @@ export async function organizationBilling(
 			value,
 			expiresAt: Date.now() + MEMORY_TTL_MS,
 		});
-		await redis
+		await billingRedis
 			.pipeline()
 			.set(sharedKey(organizationId), value, { ex: SHARED_TTL_SECONDS })
 			.set(lastKnownKey(organizationId), value, { ex: LAST_KNOWN_TTL_SECONDS })
@@ -113,7 +143,7 @@ export async function organizationBilling(
 			error,
 		);
 		const fallback = lastKnown
-			? { ...lastKnown, gatedMachineSizes: [] }
+			? { ...lastKnown, gatedMachineSizes: [], environmentLimit: null }
 			: FAIL_OPEN;
 		memory.set(organizationId, {
 			value: fallback,
@@ -135,11 +165,17 @@ export async function organizationGatedMachineSizesFromAutumn(
 	return (await organizationBilling(organizationId)).gatedMachineSizes ?? [];
 }
 
+export async function organizationEnvironmentLimitFromAutumn(
+	organizationId: string,
+): Promise<EnvironmentLimit> {
+	return (await organizationBilling(organizationId)).environmentLimit ?? null;
+}
+
 export async function invalidateOrganizationBilling(
 	organizationId: string,
 ): Promise<void> {
 	memory.delete(organizationId);
-	await redis
+	await billingRedis
 		.del(sharedKey(organizationId))
 		.catch((error) =>
 			console.error("[billing/plan-state] cache invalidate failed", error),

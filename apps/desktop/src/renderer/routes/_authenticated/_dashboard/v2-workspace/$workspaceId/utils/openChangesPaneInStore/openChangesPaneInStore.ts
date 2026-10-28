@@ -3,7 +3,7 @@ import type { ChangesOpenTarget } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
 import type { DiffPaneData, PaneViewerData } from "../../types";
 
-const NEW_DIFF_PANE = {
+export const NEW_DIFF_PANE = {
 	kind: "diff",
 	data: { path: "", collapsedFiles: [] } as DiffPaneData,
 } as const;
@@ -30,7 +30,7 @@ export function openChangesPaneInStore(
 			activeTab &&
 			Object.values(activeTab.panes).find((pane) => pane.kind === "diff");
 		if (activeTab && existing) {
-			state.setActivePane({ tabId: activeTab.id, paneId: existing.id });
+			state.focusPane(existing.id);
 			return;
 		}
 		state.openPane({ pane: NEW_DIFF_PANE });
@@ -40,8 +40,7 @@ export function openChangesPaneInStore(
 	for (const tab of state.tabs) {
 		for (const pane of Object.values(tab.panes)) {
 			if (pane.kind !== "diff") continue;
-			state.setActiveTab(tab.id);
-			state.setActivePane({ tabId: tab.id, paneId: pane.id });
+			state.focusPane(pane.id);
 			return;
 		}
 	}

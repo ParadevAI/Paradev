@@ -194,6 +194,9 @@ if [ -x /usr/local/bin/superset-memguard ]; then
 	stamp "memguard.start pid=$!"
 fi
 
+# The fixed swapfile of an earlier bundle; memguard adds swap on demand now.
+[ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
+
 # --- the desktop and the checkout: side effects of being up.
 as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \
 	"SUPERSET_SANDBOX_WORKSPACE_ID=${SUPERSET_SANDBOX_WORKSPACE_ID}" \

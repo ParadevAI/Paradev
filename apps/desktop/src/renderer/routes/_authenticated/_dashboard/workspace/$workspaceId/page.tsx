@@ -340,7 +340,7 @@ function WorkspacePage() {
 	// Toggle changes sidebar (⌘L)
 	useHotkey("TOGGLE_SIDEBAR", () => toggleSidebar());
 
-	// Open diff viewer (⌘⇧L)
+	// Open diff viewer (⌘⇧G)
 	useHotkey("OPEN_DIFF_VIEWER", () => {
 		if (!isSidebarOpen) {
 			setSidebarOpen(true);

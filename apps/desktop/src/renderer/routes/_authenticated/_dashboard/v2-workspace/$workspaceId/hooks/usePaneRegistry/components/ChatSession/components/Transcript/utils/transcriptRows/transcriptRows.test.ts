@@ -376,3 +376,41 @@ test("a subagent's task call leaves its tool run", () => {
 		),
 	).toEqual([["r1", "r2"], "task-1", "r3"]);
 });
+
+test("a failed turn says its failure once, on the turn's own row, keeping the stderr an older host put only in the notice", () => {
+	const notice = (id: string, text: string): Item => ({
+		id,
+		kind: "notice",
+		noticeKind: "error",
+		text,
+		startedAtMs: 3,
+	});
+	const failed: TurnGroup = {
+		turnId: "t1",
+		turn: {
+			id: "t1",
+			status: "failed",
+			error: { message: "acp agent exited (code 1)" },
+			startedAtMs: 2,
+			completedAtMs: 4,
+		},
+		entries: collapseWorkLog([
+			prompt,
+			notice("n1", "acp agent exited (code 1)\n\nSegmentation fault"),
+			notice("n2", "Could not read report.pdf"),
+		]),
+	};
+	const rows = transcriptRows([failed], [], new Set(), find);
+	expect(
+		rows.map((row) => (row.kind === "item" ? row.item.id : row.kind)),
+	).toEqual(["item-1", "working", "n2", "turn_status"]);
+	expect(rows.at(-1)).toMatchObject({
+		kind: "turn_status",
+		turnId: "t1",
+		error: {
+			message: "acp agent exited (code 1)",
+			detail: "Segmentation fault",
+		},
+		latest: true,
+	});
+});

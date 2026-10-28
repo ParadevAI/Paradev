@@ -48,6 +48,8 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "last-active-v2-workspace", match: "exact" },
 	// v1/v2 surface toggle; v2 is always on
 	{ key: "v2-local-override-v2", match: "exact" },
+	// New-sidebar experiment toggle; the new sidebar is always on
+	{ key: "new-dashboard-sidebar", match: "exact" },
 ];
 
 function matchesDeadKey(key: string): boolean {

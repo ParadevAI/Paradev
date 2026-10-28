@@ -4,12 +4,12 @@ import {
 	CommentModeButton,
 	PageHeader as PageTitleBar,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { Spinner } from "@superset/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
-import { PagePresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PagePresenceStack";
 import { PageViewer } from "renderer/routes/_authenticated/_dashboard/components/PageViewer";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 
@@ -75,7 +75,7 @@ export function PageDetailView({
 						leading={backButton}
 						trailing={
 							<>
-								<PagePresenceStack pageId={page.id} />
+								<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
 								{canComment ? (
 									<CommentModeButton
 										enabled={commentsEnabled}

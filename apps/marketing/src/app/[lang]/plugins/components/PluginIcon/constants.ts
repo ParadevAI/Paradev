@@ -1,7 +1,6 @@
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
 import {
-	SiGooglecalendar,
 	SiLinear,
 	SiNotion,
 	SiPosthog,
@@ -15,6 +14,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 	circleback: "/plugins/circleback-icon.png",
 	exa: "/plugins/exa-icon.svg",
 	gmail: "/plugins/gmail-icon.svg",
+	"google-calendar": "/plugins/google-calendar-icon.svg",
 	granola: "/plugins/granola-icon.svg",
 	neon: "/plugins/neon-icon.png",
 	slack: "/plugins/slack-icon.svg",
@@ -31,5 +31,4 @@ export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	sentry: { icon: SiSentry },
 	superhuman: { icon: SuperhumanIcon },
 	vercel: { icon: SiVercel },
-	"google-calendar": { icon: SiGooglecalendar, color: "#4285F4" },
 };

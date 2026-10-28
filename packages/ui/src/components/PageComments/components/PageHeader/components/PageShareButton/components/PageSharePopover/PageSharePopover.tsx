@@ -242,7 +242,7 @@ export function PageSharePopover({
 							<SelectTrigger size="sm" className="w-full">
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent className="w-(--radix-select-trigger-width)">
 								<SelectItem value={LATEST}>
 									{latestVersion === null
 										? t({ message: "Latest" })
@@ -251,9 +251,15 @@ export function PageSharePopover({
 								{pinnable.map((entry) => {
 									const version = entry.version;
 									return (
-										<SelectItem key={version} value={String(version)}>
-											<Trans>Version {version}</Trans> ·{" "}
-											{entry.label ?? relativeTime(entry.createdAt)}
+										<SelectItem
+											key={version}
+											value={String(version)}
+											className="*:[span]:last:min-w-0"
+										>
+											<span className="truncate">
+												<Trans>Version {version}</Trans> ·{" "}
+												{entry.label ?? relativeTime(entry.createdAt)}
+											</span>
 										</SelectItem>
 									);
 								})}

@@ -6,7 +6,6 @@ export type SidebarSlideMode = "closed" | "open" | "expanded";
 interface SidebarSlideProps {
 	mode: SidebarSlideMode;
 	width: number;
-	expandedWidth: number;
 	onLayoutFrame?: () => void;
 	keepMounted?: boolean;
 	durationMs?: number;
@@ -16,7 +15,6 @@ interface SidebarSlideProps {
 export function SidebarSlide({
 	mode,
 	width,
-	expandedWidth,
 	onLayoutFrame,
 	keepMounted = false,
 	durationMs = 300,
@@ -75,22 +73,14 @@ export function SidebarSlide({
 	const inFlow = !move && settled === "open";
 	const hidden = !move && settled === "closed";
 	const widthOf = (m: SidebarSlideMode) =>
-		m === "closed" ? 0 : m === "open" ? width : expandedWidth;
-	const spaceOf = (m: SidebarSlideMode) => (m === "closed" ? 0 : width);
+		m === "closed" ? 0 : m === "open" ? width : "100%";
 	const fill = move
 		? move.from === "expanded" || move.to === "expanded"
 		: settled === "expanded";
-	const spaceWidth = move
-		? spaceOf(armed ? move.to : move.from)
-		: spaceOf(settled);
 	const panelWidth = move
 		? widthOf(armed ? move.to : move.from)
 		: widthOf(settled);
-	const contentWidth = fill
-		? "100%"
-		: move
-			? Math.max(width, widthOf(move.from), widthOf(move.to))
-			: width;
+	const contentWidth = fill ? "100%" : width;
 	const transition = {
 		transitionProperty: "width",
 		transitionDuration: move && armed ? `${durationMs}ms` : "0ms",
@@ -100,15 +90,14 @@ export function SidebarSlide({
 	return (
 		<div
 			className="relative flex h-full shrink-0 ease-[ease] motion-reduce:transition-none"
-			style={{ width: inFlow ? undefined : spaceWidth, ...transition }}
+			style={{ width: inFlow ? undefined : panelWidth, ...transition }}
 		>
 			<div
 				data-browser-layer={inFlow ? undefined : "raised"}
 				className={cn(
-					"overflow-hidden ease-[ease] motion-reduce:transition-none",
-					inFlow ? "flex h-full" : "absolute inset-y-0 right-0 z-30",
+					"overflow-hidden",
+					inFlow ? "flex h-full" : "absolute inset-0 z-30",
 				)}
-				style={{ width: inFlow ? undefined : panelWidth, ...transition }}
 			>
 				<div
 					inert={hidden}

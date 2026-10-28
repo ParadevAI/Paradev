@@ -13,7 +13,8 @@ import {
 	FAQPageJsonLd,
 	ItemListJsonLd,
 } from "@/components/JsonLd";
-import { getComparisonPage, getComparisonPages } from "@/lib/compare";
+import { getComparisonPages } from "@/lib/compare";
+import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
 	extractComparisonFaqItems,
 	extractRoundupItems,
@@ -30,7 +31,7 @@ export default async function ComparePageRoute({ params }: PageProps) {
 	await initServerI18n();
 
 	const { slug } = await params;
-	const page = getComparisonPage(slug);
+	const page = await getPricedComparisonPage(slug);
 
 	if (!page) {
 		notFound();
@@ -95,7 +96,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const { slug } = await params;
-	const page = getComparisonPage(slug);
+	const page = await getPricedComparisonPage(slug);
 
 	if (!page) {
 		return {};

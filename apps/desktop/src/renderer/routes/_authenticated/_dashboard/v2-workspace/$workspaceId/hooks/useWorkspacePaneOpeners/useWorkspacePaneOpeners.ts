@@ -116,8 +116,7 @@ export function useWorkspacePaneOpeners({
 							...focusFields,
 						} as PaneViewerData,
 					});
-					state.setActiveTab(tab.id);
-					state.setActivePane({ tabId: tab.id, paneId: pane.id });
+					state.focusPane(pane.id);
 					return;
 				}
 			}

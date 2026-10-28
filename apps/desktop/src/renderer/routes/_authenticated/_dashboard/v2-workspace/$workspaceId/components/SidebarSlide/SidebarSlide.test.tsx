@@ -19,7 +19,6 @@ function renderSlide(mode: SidebarSlideMode, keepMounted = false) {
 		<SidebarSlide
 			mode={next}
 			width={300}
-			expandedWidth={900}
 			keepMounted={keepMounted}
 			durationMs={1}
 		>
@@ -50,6 +49,24 @@ describe("SidebarSlide", () => {
 		await settle();
 		expect(slide.panel()).toBe(node);
 		expect(slide.fills.at(-1)).toBe(false);
+	});
+
+	test("expanded takes the parent's full width in flow, from closed and from open", async () => {
+		for (const from of ["closed", "open"] as const) {
+			const slide = renderSlide(from, true);
+			slide.setMode("expanded");
+			const space = slide.panel()?.parentElement?.parentElement
+				?.parentElement as HTMLElement;
+			expect(space.style.transitionProperty).toBe("width");
+			await settle();
+			expect(space.style.width).toBe("100%");
+			expect(space.className).toContain("shrink-0");
+			expect(space.firstElementChild?.className).toContain("inset-0");
+			slide.setMode(from);
+			await settle();
+			expect(space.style.width).toBe(from === "closed" ? "0px" : "");
+			slide.unmount();
+		}
 	});
 
 	test("mounts the panel only once opened and unmounts it on close unless kept", async () => {

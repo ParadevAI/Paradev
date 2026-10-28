@@ -1,4 +1,4 @@
 interface:
-  display_name: "Superset Panes"
-  short_description: "Split, resize, swap, move, focus, and close panes in a Superset workspace"
+  display_name: "Paradev Panes"
+  short_description: "Split, resize, swap, move, focus, and close panes in a Paradev workspace"
   default_prompt: "Use $superset-panes to arrange this workspace's panes."

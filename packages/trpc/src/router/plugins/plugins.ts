@@ -23,7 +23,10 @@ import {
 	memberRole,
 } from "../../lib/organization-plugins";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
-import { requireActiveOrgId } from "../utils/active-org";
+import {
+	requireActiveOrgId,
+	requireActiveOrgMembership,
+} from "../utils/active-org";
 import {
 	AmbiguousPluginError,
 	installedPlugin,
@@ -37,7 +40,9 @@ import {
 	supersetExtension,
 } from "./manifest";
 import { organizationPluginsRouter } from "./organization";
-import { forgetUpstreamTools } from "./proxy";
+import { forgetUpstreamTools, resolveTarget } from "./proxy";
+import { slack } from "./servers/slack/tools";
+import { createSlackLinkPreviewLoader } from "./slack-link-preview";
 
 const FIRST_PARTY = "superset";
 
@@ -310,7 +315,23 @@ const connectionsRouter = {
 		}),
 } satisfies TRPCRouterRecord;
 
+const loadSlackPreview = createSlackLinkPreviewLoader({
+	resolveTarget,
+	slackApi: slack,
+});
+
 export const pluginsRouter = createTRPCRouter({
+	/** A Slack message or profile link, read with the caller's own Slack. */
+	slackLinkPreview: protectedProcedure
+		.input(z.object({ url: z.string().max(2048) }))
+		.query(async ({ ctx, input }) =>
+			loadSlackPreview({
+				href: input.url,
+				userId: ctx.session.user.id,
+				organizationId: await requireActiveOrgMembership(ctx),
+			}),
+		),
+
 	list: protectedProcedure.query(async ({ ctx }) => {
 		const organizationId = ctx.activeOrganizationId;
 		const role = organizationId
@@ -415,8 +436,9 @@ export const pluginsRouter = createTRPCRouter({
 			installs.map((row) => `${row.marketplace}/${row.pluginName}`),
 		);
 
-		const claimed = new Set(
+		const claimedByOthers = new Set(
 			installs
+				.filter((row) => row.marketplace !== FIRST_PARTY)
 				.map((row) => installConnector(row))
 				.filter((slug): slug is string => slug !== undefined),
 		);
@@ -431,7 +453,7 @@ export const pluginsRouter = createTRPCRouter({
 					FIRST_PARTY,
 				);
 				const held_ =
-					described.connector && !claimed.has(described.connector)
+					described.connector && !claimedByOthers.has(described.connector)
 						? (held.get(described.connector) ?? [])
 						: [];
 				return {

@@ -67,9 +67,9 @@ OpenCode ships its own desktop app next to the terminal UI and IDE extension. Co
 
 ---
 
-## Run Both Side by Side in Superset
+## Run Both Side by Side in Paradev
 
-[Superset](/) runs Codex and OpenCode as built-in agents, each in its own Git worktree and terminal, on your own subscriptions and keys. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. You can point OpenCode at an OpenAI model to compare the two harnesses on the same model family. Superset never proxies model calls. Worktrees keep working files apart, but they do not sandbox processes or prevent merge conflicts ([docs](https://docs.superset.sh/workspaces)). See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side), [Claude Code vs OpenCode](/compare/claude-code-vs-opencode), and [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
+[Paradev](/) runs Codex and OpenCode as built-in agents, each in its own Git worktree and terminal, on your own subscriptions and keys. Create two workspaces from the same branch, start each agent with the same prompt, compare the diffs in the Changes pane, and open a pull request from the better one. You can point OpenCode at an OpenAI model to compare the two harnesses on the same model family. Paradev never proxies model calls. Worktrees keep working files apart, but they do not sandbox processes or prevent merge conflicts ([docs](https://docs.paradev.com/workspaces)). See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side), [Claude Code vs OpenCode](/compare/claude-code-vs-opencode), and [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
 
 ## Which Should You Choose?
 
@@ -103,4 +103,4 @@ The CLI is open source and included in ChatGPT Free. Cloud tasks need ChatGPT Pl
 
 ### Can I run Codex and OpenCode at the same time?
 
-Yes. Give each its own Git worktree so they do not edit the same files. In Superset, each runs in its own workspace on the same repository.
+Yes. Give each its own Git worktree so they do not edit the same files. In Paradev, each runs in its own workspace on the same repository.

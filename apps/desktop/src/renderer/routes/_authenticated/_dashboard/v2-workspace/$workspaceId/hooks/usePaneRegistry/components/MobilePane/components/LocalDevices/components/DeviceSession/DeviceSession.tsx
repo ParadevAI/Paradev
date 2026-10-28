@@ -2,11 +2,13 @@ import { useActiveDeviceClient } from "@expo/hub-client";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { DeviceView } from "../../../DeviceView";
+import { deviceKey } from "../../utils/deviceKey";
 import type { LocalDevice } from "../DevicePicker";
 
 interface DeviceSessionProps {
 	hubUrl: string;
 	hubToken: string;
+	workspaceId: string;
 	device: LocalDevice;
 	picker: ReactNode;
 }
@@ -14,6 +16,7 @@ interface DeviceSessionProps {
 export function DeviceSession({
 	hubUrl,
 	hubToken,
+	workspaceId,
 	device,
 	picker,
 }: DeviceSessionProps) {
@@ -35,6 +38,8 @@ export function DeviceSession({
 	return (
 		<DeviceView
 			client={client}
+			workspaceId={workspaceId}
+			deviceKey={deviceKey(device)}
 			deviceName={device.name}
 			picker={picker}
 			logStreamUrl={(scope) => {

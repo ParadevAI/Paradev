@@ -20,6 +20,10 @@ const NOT_GIT_REPO_PATTERN =
 // such as running out of memory, stay unclassified.
 const INDEX_STORAGE_UNAVAILABLE_PATTERN =
 	/unable to map index file: Operation (?:timed out|canceled)$/m;
+// The same storage failure on any other file git maps (packfiles, pack
+// indexes, worktree files it hashes), reported by git's xmmap() wrapper.
+const MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN =
+	/^fatal: mmap failed: Operation (?:timed out|canceled)$/m;
 // Git's text when the directory resolves to a repository but has no work tree
 // attached: the repo is bare, or the linked worktree's admin data was removed
 // or pruned. Distinct from CWD_GONE_PATTERN, where the directory itself is
@@ -147,7 +151,8 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		CWD_UNREADABLE_PATTERN.test(error.message) ||
-		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
+		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message) ||
+		MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",

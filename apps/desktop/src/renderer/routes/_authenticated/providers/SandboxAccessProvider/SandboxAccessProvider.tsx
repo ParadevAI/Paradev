@@ -1,14 +1,22 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMatchRoute } from "@tanstack/react-router";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useMemo,
+	useState,
+} from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { setHostServiceSecret } from "renderer/lib/host-service-auth";
+import {
+	accessRefetchInterval,
+	createFailureStreak,
+	wakeRefetchInterval,
+} from "./utils/accessRefetchInterval";
 
-/** Re-mint with time to spare; a ticket lasts hours, so this is rare. */
-const REFRESH_AT = 0.8;
-const RETRY_MS = 30_000;
 /**
  * The open workspace's wake is also what extends its sandbox session, which
  * stops after hours of not being asked; and if the session stops anyway, the
@@ -100,6 +108,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		[cloudWorkspaces],
 	);
 
+	const [failureStreak] = useState(createFailureStreak);
 	const results = useQueries({
 		queries: workspaces.map((workspace) => ({
 			queryKey: sandboxAccessQueryKey(workspace.id),
@@ -107,11 +116,19 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			// pause with navigator.onLine the way the default mode would.
 			networkMode: "always" as const,
 			queryFn: () => requestAccess(workspace.id, false),
-			refetchInterval: (query: { state: { data?: SandboxAccess } }): number => {
-				const expiresAt = query.state.data?.expiresAt;
-				if (!expiresAt) return RETRY_MS;
-				return Math.max(RETRY_MS, (expiresAt - Date.now()) * REFRESH_AT);
-			},
+			refetchInterval: (query: {
+				queryHash: string;
+				state: {
+					data?: SandboxAccess;
+					error: unknown;
+					errorUpdateCount: number;
+				};
+			}): number =>
+				accessRefetchInterval({
+					data: query.state.data,
+					error: query.state.error,
+					consecutiveFailures: failureStreak(query.queryHash, query.state),
+				}),
 			refetchIntervalInBackground: true,
 		})),
 	});
@@ -129,7 +146,14 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			queryClient.setQueryData(sandboxAccessQueryKey(openWorkspace.id), access);
 			return access;
 		},
-		refetchInterval: OPEN_WORKSPACE_KEEPALIVE_MS,
+		refetchInterval: (query) =>
+			wakeRefetchInterval(
+				{
+					error: query.state.error,
+					consecutiveFailures: failureStreak(query.queryHash, query.state),
+				},
+				OPEN_WORKSPACE_KEEPALIVE_MS,
+			),
 		refetchIntervalInBackground: true,
 		gcTime: 0,
 	});

@@ -10,7 +10,7 @@ import {
 } from "@superset/ui/collapsible";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
 	LuCheck,
@@ -33,8 +33,6 @@ interface Comment {
 }
 
 interface CommentThreadProps {
-	workspaceId: string;
-	threadId: string;
 	isResolved: boolean;
 	isOutdated?: boolean;
 	url?: string;
@@ -46,17 +44,19 @@ interface CommentThreadProps {
 	/** Force-expand the bubble whenever this changes — lets jump-to-line
 	 *  reveal a collapsed (resolved/outdated) thread. */
 	focusTick?: number;
+	onReply: (commentId: number, body: string) => Promise<unknown>;
+	onSetResolved: (resolved: boolean) => Promise<unknown>;
 }
 
 export function CommentThread({
-	workspaceId,
-	threadId,
 	isResolved,
 	isOutdated,
 	url,
 	comments,
 	replyToCommentId,
 	focusTick,
+	onReply,
+	onSetResolved,
 }: CommentThreadProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(!isResolved && !isOutdated);
@@ -93,29 +93,23 @@ export function CommentThread({
 	useEffect(() => {
 		if (focusTick != null) setOpen(true);
 	}, [focusTick]);
-	const utils = workspaceTrpc.useUtils();
-	const setResolution = workspaceTrpc.git.setReviewThreadResolution.useMutation(
-		{
-			onSuccess: () => {
-				void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-			},
-			onError: (error) => {
-				toast.error(
-					t({
-						message: "Couldn't update thread",
-					}),
-					{
-						description: errorMessage(error),
-					},
-				);
-			},
+	const setResolution = useMutation({
+		mutationFn: (resolved: boolean) => onSetResolved(resolved),
+		onError: (error) => {
+			toast.error(
+				t({
+					message: "Couldn't update thread",
+				}),
+				{
+					description: errorMessage(error),
+				},
+			);
 		},
-	);
+	});
 	const [replyText, setReplyText] = useState("");
-	const replyToThread = workspaceTrpc.git.replyToReviewThread.useMutation({
-		onSuccess: () => {
-			void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-		},
+	const replyToThread = useMutation({
+		mutationFn: (reply: { commentId: number; body: string }) =>
+			onReply(reply.commentId, reply.body),
 		onError: (error, variables) => {
 			// The draft is cleared as soon as it's sent; hand it back so a
 			// rejected reply isn't retyped — unless a new one is already
@@ -226,11 +220,7 @@ export function CommentThread({
 					onChange={setReplyText}
 					onReply={(body) => {
 						if (replyToCommentId == null) return false;
-						replyToThread.mutate({
-							workspaceId,
-							commentId: replyToCommentId,
-							body,
-						});
+						replyToThread.mutate({ commentId: replyToCommentId, body });
 						return true;
 					}}
 					isPending={replyToThread.isPending}
@@ -241,13 +231,7 @@ export function CommentThread({
 							size="xs"
 							variant="outline"
 							disabled={setResolution.isPending}
-							onClick={() =>
-								setResolution.mutate({
-									workspaceId,
-									threadId,
-									resolved: !isResolved,
-								})
-							}
+							onClick={() => setResolution.mutate(!isResolved)}
 						>
 							{setResolution.isPending && (
 								<LuLoaderCircle className="size-3 animate-spin" />

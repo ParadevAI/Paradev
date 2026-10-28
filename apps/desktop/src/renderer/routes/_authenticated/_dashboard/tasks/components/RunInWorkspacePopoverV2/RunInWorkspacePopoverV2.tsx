@@ -22,9 +22,9 @@ import { AgentSelect } from "renderer/components/AgentSelect";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
-import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { DevicePicker } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker";
@@ -146,7 +146,8 @@ export function RunInWorkspacePopoverV2({
 
 	const { agents: hostAgents, isFetched: hostAgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
-	const v2Agents = isCloud ? CLOUD_AGENT_CHOICES : hostAgents;
+	const cloudAgents = useCloudAgentChoices();
+	const v2Agents = isCloud ? cloudAgents : hostAgents;
 	const v2AgentsFetched = isCloud || hostAgentsFetched;
 	const validAgentIds = useMemo(
 		() => new Set(v2Agents.map((agent) => agent.id)),

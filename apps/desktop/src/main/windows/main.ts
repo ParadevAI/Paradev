@@ -404,7 +404,9 @@ export async function createPlatformWindow({
 		height: initialBounds.height,
 		x: initialBounds.x,
 		y: initialBounds.y,
-		minWidth: 400,
+		// At least the open workspace sidebar's minimum (225) plus the right
+		// pane's (262), and under half of a 1280px display for split screen.
+		minWidth: 540,
 		minHeight: 400,
 		show: false,
 		backgroundColor: nativeTheme.shouldUseDarkColors ? "#252525" : "#ffffff",
@@ -453,18 +455,19 @@ export async function createPlatformWindow({
 	if (isDev) {
 		window.webContents.on(
 			"console-message",
-			(_event, level, message, line, sourceId) => {
+			({ level, message, lineNumber, sourceId }) => {
+				const isProblem = level === "warning" || level === "error";
 				const shouldForward =
-					level >= 2 ||
+					isProblem ||
 					message.includes("[stress]") ||
 					message.includes("[main]");
 				if (!shouldForward) return;
 
-				const details = sourceId ? ` (${sourceId}:${line})` : "";
+				const details = sourceId ? ` (${sourceId}:${lineNumber})` : "";
 				const formatted = `[renderer-console] ${message}${details}`;
-				if (level >= 3) {
+				if (level === "error") {
 					log.error(formatted);
-				} else if (level >= 2) {
+				} else if (level === "warning") {
 					log.warn(formatted);
 				} else {
 					log.info(formatted);

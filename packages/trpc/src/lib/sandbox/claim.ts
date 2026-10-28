@@ -8,6 +8,7 @@ import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
 import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { BRAND } from "@superset/shared/brand";
 import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
@@ -19,7 +20,10 @@ import {
 } from "@superset/shared/sandbox-contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import { resolveAgentCredentialEnv } from "../../router/agent-credential";
+import {
+	type AgentSignIns,
+	resolveAgentSignIns,
+} from "../../router/agent-credential";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
@@ -36,17 +40,28 @@ import type { SandboxClaim, SandboxEnvironment } from "./vercel";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
-function agentCredentialDigest(userAgentEnv: Record<string, string>): string {
-	const sorted = Object.keys(userAgentEnv)
+/**
+ * A ChatGPT sign-in counts by its account, not its access token: the API
+ * renews that token every few days and the firewall carries the new one, so a
+ * renewal is not a change a running agent has to restart for.
+ */
+function agentCredentialDigest(signIns: AgentSignIns): string {
+	const values: Record<string, string> = {
+		...signIns.env,
+		...(signIns.codexChatgpt
+			? { CODEX_CHATGPT_ACCOUNT: signIns.codexChatgpt.accountId }
+			: {}),
+	};
+	const sorted = Object.keys(values)
 		.sort()
-		.map((key) => [key, userAgentEnv[key]]);
+		.map((key) => [key, values[key]]);
 	return createHmac("sha256", env.SANDBOX_GATE_SECRET)
 		.update(`agent-credentials:${JSON.stringify(sorted)}`)
 		.digest("hex");
 }
 
 /** Commits by a workspace nobody created, such as an automation's. */
-const SUPERSET_GIT_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
 
 /** A size the org no longer offers falls back to its default at the next start. */
 async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
@@ -72,16 +87,16 @@ export async function buildSandboxClaim(args: {
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
 }> {
-	const [environment, userAgentEnv] = await Promise.all([
+	const [environment, signIns] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
-			? resolveAgentCredentialEnv({ userId: args.row.createdByUserId })
-			: Promise.resolve({}),
+			? resolveAgentSignIns({ userId: args.row.createdByUserId })
+			: Promise.resolve({ env: {}, codexChatgpt: null }),
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
 		cloudWorkspaceId: args.row.id,
-		hooksRepositoryId: environment.hooksRepositoryId,
+		primaryRepositoryId: environment.primaryRepositoryId,
 		primaryBranch: args.row.baseBranch,
 		workingBranch: args.row.branch,
 	});
@@ -102,12 +117,12 @@ export async function buildSandboxClaim(args: {
 	const token =
 		userToken ??
 		(await installationTokenFor(checkouts.map((entry) => entry.repository)));
-	const hooksCheckout = checkouts.find((entry) => entry.hooks) ?? checkouts[0];
+	const primaryCheckout = checkouts[0];
 	const repoHooks =
-		args.withRepoHooks && hooksCheckout
+		args.withRepoHooks && primaryCheckout
 			? await readRepoHooks({
-					repo: hooksCheckout.repository,
-					branch: hooksCheckout.baseBranch,
+					repo: primaryCheckout.repository,
+					branch: primaryCheckout.baseBranch,
 					token,
 				})
 			: null;
@@ -133,10 +148,11 @@ export async function buildSandboxClaim(args: {
 			: {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
-	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({
 		workspaceId: args.row.id,
 		environmentEnv: environment.envs,
-		userAgentEnv,
+		userAgentEnv: signIns.env,
+		codexChatgpt: signIns.codexChatgpt,
 		githubToken: token,
 		gitAuthor: gitAuthorFor({
 			github: githubAccount
@@ -155,6 +171,7 @@ export async function buildSandboxClaim(args: {
 			hostSecret: await sandboxHostSecretFor(args.row.id),
 			managedEnv,
 			networkPolicy,
+			files,
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
 		},
@@ -164,6 +181,6 @@ export async function buildSandboxClaim(args: {
 			region: environment.region,
 		},
 		repositories,
-		agentCredentialDigest: agentCredentialDigest(userAgentEnv),
+		agentCredentialDigest: agentCredentialDigest(signIns),
 	};
 }

@@ -1,6 +1,6 @@
 ---
 title: "Best IDE for Muse Code in 2026: Where to Run Meta's Coding Agent"
-description: "The best places to run Meta's Muse Code in 2026, from its own terminal UI and headless mode to Zed, OpenCode, and Superset for parallel worktree sessions."
+description: "The best places to run Meta's Muse Code in 2026, from its own terminal UI and headless mode to Zed, OpenCode, and Paradev for parallel worktree sessions."
 date: 2026-10-13
 lastUpdated: 2026-10-14
 type: "roundup"
@@ -27,7 +27,7 @@ This guide covers each option, including how to run several Muse Code tasks in p
 
 | Where you run Muse Code | Best for | Parallel tasks on one repo? | Main tradeoff |
 |---|---|---|---|
-| **Superset** | Running many Muse Code tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Paradev** | Running many Muse Code tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
 | **Muse Code terminal UI** | One focused task with Muse's own subagents | Subagents inside one session | You manage separate tasks and review yourself |
 | **`muse exec` in CI** | Scripted and headless runs | One run per job | No interactive review |
 | **Zed** | Editing alongside Muse Code | Limited | One working copy |
@@ -47,7 +47,7 @@ This guide covers each option, including how to run several Muse Code tasks in p
 
 Meta's changelog names Zed as a client of Muse Code's session protocol, so you can work with Muse Code from inside the editor. It suits editing alongside the agent, with the usual single-working-copy limit when you want several tasks at once.
 
-For the direct comparison, see [Superset vs Zed](/compare/superset-vs-zed).
+For the direct comparison, see [Paradev vs Zed](/compare/superset-vs-zed).
 
 ### Other agents with Muse models
 
@@ -55,18 +55,18 @@ Meta documents how to use Muse models inside OpenCode, Codex, and Claude Code. T
 
 For running OpenCode in parallel, see [Multiple OpenCode Agents in Parallel](/compare/multiple-opencode-agents-parallel).
 
-### Superset
+### Paradev
 
-Superset runs Muse Code as a built-in agent. Each new local branch-based workspace gets its own Git worktree and terminal, so several Muse Code tasks can run on the same repository at once, in separate working directories, locally or on your own remote hosts. Superset resumes interrupted Muse Code sessions and shows its token history in the Usage tab. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an iPhone and iPad app to check on sessions away from your desk. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+Paradev runs Muse Code as a built-in agent. Each new local branch-based workspace gets its own Git worktree and terminal, so several Muse Code tasks can run on the same repository at once, in separate working directories, locally or on your own remote hosts. Paradev resumes interrupted Muse Code sessions and shows its token history in the Usage tab. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an iPhone and iPad app to check on sessions away from your desk. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
 
-For the direct comparison, see [Superset vs Muse Code](/compare/superset-vs-muse-code).
+For the direct comparison, see [Paradev vs Muse Code](/compare/superset-vs-muse-code).
 
 ## How To Choose
 
 - For one task, or to use Muse Code's own subagents, use the `muse` terminal UI.
 - For CI and scripts, use `muse exec`.
 - To edit alongside Muse Code, use Zed.
-- For several Muse Code tasks at once, or Muse Code next to other agents, use Superset.
+- For several Muse Code tasks at once, or Muse Code next to other agents, use Paradev.
 
 ## Best Picks by Use Case
 
@@ -78,13 +78,13 @@ It is the full agent, with subagents and workflows built in.
 
 Headless mode with JSONL output and exit codes fits pipelines.
 
-### Best for parallel local runs: Superset
+### Best for parallel local runs: Paradev
 
-Superset gives every Muse Code task its own worktree on your own machine, with review and orchestration built in.
+Paradev gives every Muse Code task its own worktree on your own machine, with review and orchestration built in.
 
 ## Verdict
 
-Muse Code is a terminal-first agent, so its own UI is the best place for one task and `muse exec` is the best place for CI. Once you want several Muse Code tasks running at once, or want to compare it with the agents you already use, run it in a workspace like Superset, where each task gets its own worktree and the diffs and PRs are in one place.
+Muse Code is a terminal-first agent, so its own UI is the best place for one task and `muse exec` is the best place for CI. Once you want several Muse Code tasks running at once, or want to compare it with the agents you already use, run it in a workspace like Paradev, where each task gets its own worktree and the diffs and PRs are in one place.
 
 For the broader category, see [Best Agentic IDE in 2026](/compare/best-agentic-ide) and [Best AI Coding Tools and Agents (2026)](/compare/best-ai-coding-agents-2026).
 
@@ -92,11 +92,11 @@ For the broader category, see [Best Agentic IDE in 2026](/compare/best-agentic-i
 
 ### What is the best IDE for Muse Code?
 
-For one task, Muse Code's own terminal UI. For CI, `muse exec`. For several tasks in parallel, or Muse Code next to other agents, a worktree workspace like Superset.
+For one task, Muse Code's own terminal UI. For CI, `muse exec`. For several tasks in parallel, or Muse Code next to other agents, a worktree workspace like Paradev.
 
 ### How do I run Muse Code with Git worktrees?
 
-Muse Code can give each of its subagents a Muse-managed worktree inside one session. To run separate tasks in parallel, give each its own worktree; Superset does this for every new local branch-based workspace.
+Muse Code can give each of its subagents a Muse-managed worktree inside one session. To run separate tasks in parallel, give each its own worktree; Paradev does this for every new local branch-based workspace.
 
 ### Does Muse Code have a desktop app or VS Code extension?
 
@@ -104,4 +104,4 @@ Meta's documentation does not list a desktop app or a VS Code extension. Muse Co
 
 ### Can I run Muse Code and Claude Code at the same time?
 
-Yes. In Superset, each runs in its own workspace and worktree on the same repository. Muse Code can also continue a local Claude Code or Codex session.
+Yes. In Paradev, each runs in its own workspace and worktree on the same repository. Muse Code can also continue a local Claude Code or Codex session.

@@ -1,6 +1,6 @@
 ---
-title: "Superset vs AQ (2026): Desktop Agent Workspace vs Cloud Team Harness"
-description: "Compare Superset and AQ for running coding agents: desktop vs browser, local vs cloud runners, team sessions, review, and pricing."
+title: "Paradev vs AQ (2026): Desktop Agent Workspace vs Cloud Team Harness"
+description: "Compare Paradev and AQ for running coding agents: desktop vs browser, local vs cloud runners, team sessions, review, and pricing."
 date: 2026-10-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - cloud coding agents for teams
 ---
 
-Superset and AQ both run real CLI coding agents, such as Claude Code and Codex, with one Git worktree per task. The difference is where they run and who is in the session. AQ is a browser app: agents run on a cloud VM (yours or one AQ manages), and teammates open the same live terminal through a link. Superset is a desktop app: agents run on your machine, a remote host you add, or a Superset cloud workspace, with diff review, pull requests, and a browser beside them. Choose AQ when your team wants shared live sessions on an always-on machine. Choose Superset when you want a local-first desktop workspace with a full review path.
+Paradev and AQ both run real CLI coding agents, such as Claude Code and Codex, with one Git worktree per task. The difference is where they run and who is in the session. AQ is a browser app: agents run on a cloud VM (yours or one AQ manages), and teammates open the same live terminal through a link. Paradev is a desktop app: agents run on your machine, a remote host you add, or a Paradev cloud workspace, with diff review, pull requests, and a browser beside them. Choose AQ when your team wants shared live sessions on an always-on machine. Choose Paradev when you want a local-first desktop workspace with a full review path.
 
-This comparison is published by Superset. AQ details were checked against [aq.dev](https://aq.dev), its [docs](https://aq.dev/docs), [workspaces page](https://aq.dev/docs/workspaces), and [pricing](https://aq.dev/pricing) on October 7, 2026. AQ also uses the domain agentqueue.dev, which redirects to aq.dev.
+This comparison is published by Paradev. AQ details were checked against [aq.dev](https://aq.dev), its [docs](https://aq.dev/docs), [workspaces page](https://aq.dev/docs/workspaces), and [pricing](https://aq.dev/pricing) on October 7, 2026. AQ also uses the domain agentqueue.dev, which redirects to aq.dev.
 
 ## At a Glance
 
-| Requirement | Superset | AQ |
+| Requirement | Paradev | AQ |
 |---|---|---|
 | Interface | Desktop app | Browser app |
 | Where agents run | Your machine, remote hosts you add through the relay (Pro), or cloud workspaces | A runner VM: in your own cloud (Team) or AQ-managed |
@@ -32,7 +32,7 @@ This comparison is published by Superset. AQ details were checked against [aq.de
 | Review | Changes pane that commits, pushes, and opens PRs; PR pane with checks, review threads, and merge | Live previews with pinned comments that go to the agent; PRs tracked per workspace |
 | Phone | iPhone and iPad app (iOS or iPadOS 26+, Pro) with Lock Screen Live Activity | Same workspace in a mobile browser |
 | Intake | Linear, GitHub, and Slack integrations (Pro) | Linear `ai-task` label creates a workspace; API, webhooks, MCP |
-| Pricing | Free; Pro $20/user/month or $15 billed yearly; Enterprise custom | Free solo sandbox; Team $50/user/month early access |
+| Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free solo sandbox; Team $50/user/month early access |
 | License | Source-available, Elastic License 2.0 | Proprietary |
 
 ## What Is AQ?
@@ -43,31 +43,31 @@ AQ calls itself "the multiplayer coding harness." Its headline is "Run every cod
 
 This is the main split. AQ runs every session on a runner VM. On the Free plan that is a private AQ-managed sandbox that sleeps when idle. On Team it is either a VM you connect from your own cloud account or a dedicated AQ machine that never sleeps. Agents keep working when your laptop closes, and nothing runs on your laptop.
 
-Superset is local-first. Agents run on your Mac or Linux machine by default, next to your editor and local tools. To keep work going away from your desk, add another machine as a host through the Superset relay, and run workspaces there from the desktop or iPhone and iPad app (Pro). Superset also has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. If you want the runner VM in your own cloud account, AQ offers that and Superset does not.
+Paradev is local-first. Agents run on your Mac or Linux machine by default, next to your editor and local tools. To keep work going away from your desk, add another machine as a host through the Paradev relay, and run workspaces there from the desktop or iPhone and iPad app (Pro). Paradev also has cloud workspaces, which run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. If you want the runner VM in your own cloud account, AQ offers that and Paradev does not.
 
 ## Can teammates join the same agent session?
 
 AQ is built for this. A teammate with access opens the same workspace URL and sees the same live terminal, editor, and preview. Typing into someone else's terminal needs the owner to approve a control request. Guest links let someone outside the team view a preview without a seat.
 
-Superset shares at the host and workspace level, not as a live co-editing session. An organization adds hosts and grants access per member, automations keep a run history the team can see, and agents can publish Pages with pinned comments. If two people need to watch one terminal at the same time, AQ fits better.
+Paradev shares at the host and workspace level, not as a live co-editing session. An organization adds hosts and grants access per member, automations keep a run history the team can see, and agents can publish Pages with pinned comments. If two people need to watch one terminal at the same time, AQ fits better.
 
 ## How do you review the agent's work?
 
 AQ focuses on the running app. A workspace can expose its dev server as a preview link. Reviewers pin comments on elements, and any comment can go to the agent as its next prompt. Agents open pull requests with each user's own GitHub access, and AQ tracks each PR's state. AQ does not describe a separate code-review interface; see their docs.
 
-Superset focuses on the diff and the pull request. The Changes pane stages, commits, pushes, and opens a pull request. The pull request pane shows checks, review threads, and merge. The in-app browser has Design Mode: click an element and send it, with its DOM, styles, and a screenshot, to an agent.
+Paradev focuses on the diff and the pull request. The Changes pane stages, commits, pushes, and opens a pull request. The pull request pane shows checks, review threads, and merge. The in-app browser has Design Mode: click an element and send it, with its DOM, styles, and a screenshot, to an agent.
 
 ## Pricing
 
 Both start free, and both leave model usage on your own agent subscriptions.
 
-| Plan | Superset | AQ |
+| Plan | Paradev | AQ |
 |---|---|---|
 | Free | $0, one user, local workspaces, desktop app, CLI | $0, one person, private AQ-managed sandbox that sleeps when idle, $5/month of AQ Composer credits |
-| Paid | Pro: $20/user/month, or $15 billed yearly | Team: $50/user/month early access, locked for 12 months, then $100; standard price $200 |
+| Paid | Pro: {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly. Team: {{price:team}}, or {{price:team:yearly}} billed yearly. Ultra: {{price:ultra}} | Team: $50/user/month early access, locked for 12 months, then $100; standard price $200 |
 | Large teams | Enterprise: custom, with SSO, SCIM, audit logs, and an uptime SLA | Contact sales |
 
-Superset Pro adds remote hosts, automations, the iPhone and iPad app, and the GitHub, Linear, and Slack integrations. AQ Team adds teammates, shared workspaces, guest links, your own cloud runners, an always-on machine, and $10 of Composer credits per seat. Check [Superset pricing](/pricing) and [AQ pricing](https://aq.dev/pricing) for current terms.
+Paradev Pro adds remote hosts, automations, the iPhone and iPad app, and the GitHub, Linear, and Slack integrations. Team and Ultra add cloud workspaces. AQ Team adds teammates, shared workspaces, guest links, your own cloud runners, an always-on machine, and $10 of Composer credits per seat. Check [Paradev pricing](/pricing) and [AQ pricing](https://aq.dev/pricing) for current terms.
 
 ## Choose AQ if
 
@@ -76,7 +76,7 @@ Superset Pro adds remote hosts, automations, the iPhone and iPad app, and the Gi
 - Teammates use Windows, or you want nothing to install.
 - Product managers or clients review through preview links with pinned comments.
 
-## Choose Superset if
+## Choose Paradev if
 
 - You want agents on your own machine, next to your local tools, with no VM to run.
 - You review through diffs, commits, and pull requests, with checks and review threads in the same app.
@@ -85,26 +85,26 @@ Superset Pro adds remote hosts, automations, the iPhone and iPad app, and the Gi
 
 ## Verdict
 
-AQ is a cloud-first, multiplayer tool: one shared session on a VM, reached from any browser. Superset is a local-first desktop workspace: one workspace per task on your machine, your hosts, or a cloud workspace, with review and merge in the app. Teams that pair on agent runs or want a runner in their own cloud account should try AQ. Developers who want a fast local loop and pull request review should try Superset. Running the same task in both is the quickest test.
+AQ is a cloud-first, multiplayer tool: one shared session on a VM, reached from any browser. Paradev is a local-first desktop workspace: one workspace per task on your machine, your hosts, or a cloud workspace, with review and merge in the app. Teams that pair on agent runs or want a runner in their own cloud account should try AQ. Developers who want a fast local loop and pull request review should try Paradev. Running the same task in both is the quickest test.
 
 ## Frequently Asked Questions
 
 ### What is the best AQ alternative?
 
-If you want to keep agents on your own machines, Superset is a close alternative: same worktree-per-task model, with desktop review and pull requests. If you want cloud agents run by a model vendor, look at Cursor or Codex cloud agents.
+If you want to keep agents on your own machines, Paradev is a close alternative: same worktree-per-task model, with desktop review and pull requests. If you want cloud agents run by a model vendor, look at Cursor or Codex cloud agents.
 
 ### What is the best Orca alternative for teams?
 
-It depends on what "team" means. For live shared sessions on a cloud VM, AQ fits. For shared remote hosts with per-member access, a team run history for automations, and Enterprise SSO and SCIM, Superset fits. See [Orca alternatives](/compare/orca-alternative) and [Superset vs Orca](/compare/superset-vs-orca).
+It depends on what "team" means. For live shared sessions on a cloud VM, AQ fits. For shared remote hosts with per-member access, a team run history for automations, and Enterprise SSO and SCIM, Paradev fits. See [Orca alternatives](/compare/orca-alternative) and [Paradev vs Orca](/compare/superset-vs-orca).
 
 ### Does AQ use Git worktrees?
 
-Yes. Each AQ workspace is a Git worktree on its own branch, on the runner VM. Superset also uses one worktree per workspace, on your machine or a host you add.
+Yes. Each AQ workspace is a Git worktree on its own branch, on the runner VM. Paradev also uses one worktree per workspace, on your machine or a host you add.
 
 ### Is AQ open source?
 
-AQ does not describe itself as open source; its site states all rights reserved. Superset is source-available under Elastic License 2.0, which is not OSI open source.
+AQ does not describe itself as open source; its site states all rights reserved. Paradev is source-available under Elastic License 2.0, which is not OSI open source.
 
 ### Does either tool charge for model usage?
 
-Neither marks up your own agent subscriptions. Superset never proxies model calls. AQ's built-in AQ Composer agent uses included credits, then per-token prices.
+Neither marks up your own agent subscriptions. Paradev never proxies model calls. AQ's built-in AQ Composer agent uses included credits, then per-token prices.

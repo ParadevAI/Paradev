@@ -54,11 +54,11 @@ import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreferenc
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
 import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
+import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
 import { useTaskTracker } from "renderer/hooks/useTaskTracker";
 import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
-import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -78,10 +78,6 @@ import {
 } from "renderer/stores/new-workspace-width";
 import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
-import {
-	type PromptCardsVariant,
-	useNewWorkspacePromptCardsVariant,
-} from "../../hooks/useNewWorkspacePromptCardsVariant";
 import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
@@ -114,7 +110,6 @@ import {
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
 import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
 import { AttachmentCard } from "./components/AttachmentCard";
-import { SamplePromptCards } from "./components/SamplePromptCards";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
@@ -123,18 +118,7 @@ import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { environmentsForRepository } from "./utils/environmentsForRepository";
 
-/** Nested prefixes of one fixed pool — only the form factor varies by arm. */
-const PROMPT_COUNTS: Record<PromptCardsVariant, number> = {
-	control: 3,
-	cards2: 2,
-	cards4: 4,
-};
-
-const PROMPT_LAYOUTS: Record<PromptCardsVariant, string> = {
-	control: "rows",
-	cards2: "cards2",
-	cards4: "cards4",
-};
+const SAMPLE_PROMPT_COUNT = 3;
 
 interface NewWorkspaceScreenProps {
 	isOpen: boolean;
@@ -397,24 +381,21 @@ export function NewWorkspaceScreen({
 	const selectedEnvironment = environmentOptions.find(
 		(row) => row.id === draft.environmentId,
 	);
-	// With no environment for the project's repository, the API starts from
-	// the repository's default one — as long as the GitHub App can see it.
-	const defaultRepository =
+	// The project's repository as the GitHub App sees it, for the branch picker.
+	const projectRepository =
 		!draft.isSession && projectRepositoryFullName
 			? (github.repositoriesByFullName.get(
 					projectRepositoryFullName.toLowerCase(),
 				) ?? null)
 			: null;
-	// Default: the project's first environment, else one the API makes for
-	// the project's repository on create.
+	// Default: the project's first environment. With none, the picker offers to set one up.
 	const resolvedEnvironment = selectedEnvironment ?? environmentOptions[0];
-	const defaultHint =
-		resolvedEnvironment?.name ?? defaultRepository?.fullName ?? null;
+	const defaultHint = resolvedEnvironment?.name ?? null;
 	const isCloudTargetLoading = environmentsQuery.isLoading || github.isLoading;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
-		const primary = resolvedEnvironment?.repositories?.[0] ?? defaultRepository;
+		const primary = resolvedEnvironment?.repositories?.[0] ?? projectRepository;
 		return primary
 			? {
 					owner: primary.owner,
@@ -422,7 +403,7 @@ export function NewWorkspaceScreen({
 					defaultBranch: primary.defaultBranch,
 				}
 			: null;
-	}, [isCloudHost, resolvedEnvironment, defaultRepository]);
+	}, [isCloudHost, resolvedEnvironment, projectRepository]);
 	const isPromptEmpty = !draft.prompt.trim();
 	// The markdown editor is uncontrolled after mount, so programmatic prompt
 	// insertion bumps promptSeed to remount it with the new content.
@@ -514,10 +495,6 @@ export function NewWorkspaceScreen({
 		);
 	}, [draft.hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
 
-	const promptCardsVariant = useNewWorkspacePromptCardsVariant(isOpen);
-	const promptLayout =
-		promptCardsVariant === null ? "rows" : PROMPT_LAYOUTS[promptCardsVariant];
-
 	// One signal drives both the prompt tier and the dismiss affordance: has
 	// this person shipped anything yet. Every workspace is something they
 	// created — nothing seeds one for them.
@@ -530,20 +507,19 @@ export function NewWorkspaceScreen({
 			samplePromptTier,
 			launchHostUrl,
 			projectId,
-			promptCardsVariant === null ? 0 : PROMPT_COUNTS[promptCardsVariant],
+			SAMPLE_PROMPT_COUNT,
 		);
 
-	// Logged so the prompt-cards experiment can account for lost exposure.
 	const handleDismissSamplePrompts = useCallback(() => {
-		track("new_workspace_sample_prompts_dismissed", { layout: promptLayout });
+		track("new_workspace_sample_prompts_dismissed");
 		setSamplePromptsDismissed(true);
-	}, [promptLayout, setSamplePromptsDismissed]);
+	}, [setSamplePromptsDismissed]);
 
 	const { agents: hostAgents, isFetched: hostAgentsFetched } =
 		useV2AgentChoices(launchHostUrl);
+	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const v2Agents =
-		draft.hostId === CLOUD_HOST_ID ? CLOUD_AGENT_CHOICES : hostAgents;
+	const v2Agents = draft.hostId === CLOUD_HOST_ID ? cloudAgents : hostAgents;
 	const v2AgentsFetched = draft.hostId === CLOUD_HOST_ID || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => v2Agents.map((agent) => agent.id),
@@ -667,7 +643,6 @@ export function NewWorkspaceScreen({
 		promptContext,
 		{
 			environmentId: resolvedEnvironment?.id ?? null,
-			repositoryId: defaultRepository?.id ?? null,
 			repositoryFullName: draft.isSession ? null : projectRepositoryFullName,
 		},
 	);
@@ -873,7 +848,6 @@ export function NewWorkspaceScreen({
 				>
 					<AnimatePresence initial={false}>
 						{isPromptEmpty &&
-							promptCardsVariant !== null &&
 							!samplePromptsPending &&
 							!samplePromptsDismissed && (
 								<motion.div
@@ -892,24 +866,13 @@ export function NewWorkspaceScreen({
 									// sets overlap the heading instead.
 									className="mb-1"
 								>
-									{promptCardsVariant === "control" ? (
-										<SamplePrompts
-											prompts={samplePrompts}
-											onSelect={applyPrompt}
-											onDismiss={handleDismissSamplePrompts}
-											canDismiss={hasRealWorkspace}
-											tier={samplePromptTier}
-										/>
-									) : (
-										<SamplePromptCards
-											prompts={samplePrompts}
-											onSelect={applyPrompt}
-											onDismiss={handleDismissSamplePrompts}
-											canDismiss={hasRealWorkspace}
-											layout={promptLayout}
-											tier={samplePromptTier}
-										/>
-									)}
+									<SamplePrompts
+										prompts={samplePrompts}
+										onSelect={applyPrompt}
+										onDismiss={handleDismissSamplePrompts}
+										canDismiss={hasRealWorkspace}
+										tier={samplePromptTier}
+									/>
 								</motion.div>
 							)}
 					</AnimatePresence>

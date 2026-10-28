@@ -12,25 +12,19 @@ import { currentBundleSha } from "./current-bundle";
 
 interface CarryingEnvironment {
 	id: string;
-	repositoryCount: number;
-	hooksRepositoryId: string | null;
+	primaryRepositoryId: string | null;
 }
 
 /**
  * Among the environments that check out a repository, oldest first: the first
- * that opens on it, meaning it checks out only that repository or names it as
- * its config location. One that opens on another repository is never reused;
+ * whose primary it is. One that opens on another repository is never reused;
  * the workspace would start, and file, somewhere else.
  */
 export function pickDefaultEnvironment<T extends CarryingEnvironment>(
 	carrying: readonly T[],
 	repositoryId: string,
 ): T | undefined {
-	return carrying.find(
-		(row) =>
-			row.hooksRepositoryId === repositoryId ||
-			(row.repositoryCount === 1 && row.hooksRepositoryId === null),
-	);
+	return carrying.find((row) => row.primaryRepositoryId === repositoryId);
 }
 
 /**
@@ -38,6 +32,8 @@ export function pickDefaultEnvironment<T extends CarryingEnvironment>(
  * caller names none. An existing one the caller can use wins; otherwise a new
  * one named after the repository, shared with the organization, opening on
  * that repository, in `region`.
+ * @deprecated Only `cloudWorkspace.create`'s `repositoryId`, which desktop
+ * 1.39.x sends, reaches this. Remove both once MINIMUM_DESKTOP_VERSION passes 1.39.x.
  */
 export async function ensureDefaultEnvironment(args: {
 	organizationId: string;
@@ -55,11 +51,7 @@ export async function ensureDefaultEnvironment(args: {
 		const carrying = await tx
 			.select({
 				id: environments.id,
-				hooksRepositoryId: environments.hooksRepositoryId,
-				repositoryCount: sql<number>`(
-					select count(*)::int from ${environmentRepositories}
-					where ${environmentRepositories.environmentId} = ${environments.id}
-				)`,
+				primaryRepositoryId: environments.primaryRepositoryId,
 			})
 			.from(environments)
 			.innerJoin(
@@ -109,7 +101,7 @@ export async function ensureDefaultEnvironment(args: {
 				region: args.region,
 				bundleSha: await currentBundleSha(),
 				scope: "organization",
-				hooksRepositoryId: repository.id,
+				primaryRepositoryId: repository.id,
 				createdByUserId: args.userId,
 			})
 			.returning({ id: environments.id });

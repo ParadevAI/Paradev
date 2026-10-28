@@ -9,6 +9,8 @@ interface WorkspaceBulkMenuScopeValue {
 
 const WorkspaceBulkMenuScopeContext =
 	createContext<WorkspaceBulkMenuScopeValue | null>(null);
+// Rows read only this: the value above changes on every workspace update.
+const InWorkspaceBulkMenuScopeContext = createContext(false);
 
 /**
  * Scopes the bulk context menu to one project's rows. Rows rendered outside
@@ -40,11 +42,17 @@ export function WorkspaceBulkMenuScope({
 	);
 	return (
 		<WorkspaceBulkMenuScopeContext.Provider value={value}>
-			{children}
+			<InWorkspaceBulkMenuScopeContext.Provider value={true}>
+				{children}
+			</InWorkspaceBulkMenuScopeContext.Provider>
 		</WorkspaceBulkMenuScopeContext.Provider>
 	);
 }
 
 export function useWorkspaceBulkMenuScope(): WorkspaceBulkMenuScopeValue | null {
 	return useContext(WorkspaceBulkMenuScopeContext);
+}
+
+export function useIsInWorkspaceBulkMenuScope(): boolean {
+	return useContext(InWorkspaceBulkMenuScopeContext);
 }

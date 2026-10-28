@@ -1,5 +1,6 @@
 import type { TextElement } from "@superset/chat/protocol";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
+import { linkOfChip } from "../linkChip";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -17,6 +18,8 @@ export function elementsForChips(
 	const elements: TextElement[] = [];
 	let cursor = 0;
 	for (const chip of chips) {
+		// A link chip is sent as its URL, so the message shows it as a link.
+		if (linkOfChip(chip)) continue;
 		const start = text.indexOf(chip.serialized, cursor);
 		if (start === -1) continue;
 		cursor = start + chip.serialized.length;

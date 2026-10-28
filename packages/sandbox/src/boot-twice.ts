@@ -89,7 +89,7 @@ const identity = renderSandboxConf({
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: "main",
 			path: ".",
 		},
@@ -248,6 +248,17 @@ try {
 		`curl -fs -X POST -H 'Authorization: Bearer boot-twice-secret' -H 'Content-Type: application/json' -d '{"json":{"variables":{"FOO":"bar"}}}' http://127.0.0.1:${SANDBOX_PORTS.hostService}/trpc/sandbox.setEnvironment`,
 		{ check: false },
 	);
+	// The clone outlives host-service's readiness; a wake that interrupts it
+	// is its own case (the runner reclones), not this test's.
+	expect(
+		"first boot: checkout done",
+		/ready/.test(
+			exec(
+				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+				{ check: false },
+			),
+		),
+	);
 	expect(
 		"start hook: the runner asked host-service once the push landed",
 		/hook\.(none|started)/.test(
@@ -275,17 +286,6 @@ try {
 		).trim(),
 	);
 
-	// The clone outlives host-service's readiness; a wake that interrupts it
-	// is its own case (the runner reclones), not this test's.
-	expect(
-		"first boot: checkout done",
-		/ready/.test(
-			exec(
-				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
-				{ check: false },
-			),
-		),
-	);
 	// Second boot: stop everything the way a wake would (no processes survive), then boot again.
 	exec(
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,

@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Mux (2026): Agent-Agnostic Workspace vs Coder's Agent Multiplexer"
-description: "Compare Superset and Mux by Coder for parallel agentic development: running any CLI agent in worktrees vs Mux's built-in agent loop with container and Coder runtimes."
+title: "Paradev vs Mux (2026): Agent-Agnostic Workspace vs Coder's Agent Multiplexer"
+description: "Compare Paradev and Mux by Coder for parallel agentic development: running any CLI agent in worktrees vs Mux's built-in agent loop with container and Coder runtimes."
 date: 2026-08-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - ai agent workspace
 ---
 
-Superset and Mux (by Coder, the company behind the self-hosted dev-environment platform) both run parallel agent sessions in isolated workspaces from a desktop app. The structural difference decides everything downstream: Superset orchestrates the agents you already use -- Claude Code, Codex, OpenCode, any CLI -- while Mux ships its own agent loop that talks to model APIs directly. That makes Mux a coding agent with a multiplexer around it, and Superset a multiplexer for every agent, including the ones your team already pays for.
+Paradev and Mux (by Coder, the company behind the self-hosted dev-environment platform) both run parallel agent sessions in isolated workspaces from a desktop app. The structural difference decides everything downstream: Paradev orchestrates the agents you already use -- Claude Code, Codex, OpenCode, any CLI -- while Mux ships its own agent loop that talks to model APIs directly. That makes Mux a coding agent with a multiplexer around it, and Paradev a multiplexer for every agent, including the ones your team already pays for.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Mux** |
+| | **Paradev** | **Mux** |
 |---|---|---|
 | **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Plans and executes tasks with parallel sessions of its own agent loop |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Open-source "coding agent multiplexer" (desktop + self-hosted server) |
@@ -35,9 +35,9 @@ Superset and Mux (by Coder, the company behind the self-hosted dev-environment p
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Mux?
 
@@ -47,31 +47,31 @@ Mux is Coder's open-source (AGPL-3.0) desktop and browser app for parallel agent
 
 ### Whose Agent Runs
 
-This is the fork in the road. Mux does not run Claude Code, Codex, or any external CLI agent -- you use Mux's loop with API-key billing. That buys deep integration (budgets, compaction, tool policies, best-of-N) but means giving up the agents your team knows and, importantly, the Claude Max or ChatGPT subscriptions you already pay for -- API tokens bill separately. Superset orchestrates vendor CLIs directly, so agents keep their own configs, skills, and subscription pricing, and you can mix brands per task.
+This is the fork in the road. Mux does not run Claude Code, Codex, or any external CLI agent -- you use Mux's loop with API-key billing. That buys deep integration (budgets, compaction, tool policies, best-of-N) but means giving up the agents your team knows and, importantly, the Claude Max or ChatGPT subscriptions you already pay for -- API tokens bill separately. Paradev orchestrates vendor CLIs directly, so agents keep their own configs, skills, and subscription pricing, and you can mix brands per task.
 
 ### Isolation Options
 
-Mux's runtime matrix is broader: beyond worktrees it offers Docker containers, devcontainers, and Coder-managed workspaces -- attractive for platform teams that want containment or already run Coder. Superset standardizes on worktrees across local, remote, and cloud workspaces, keeping agents in your real environment with your services and dependencies. Containment versus fidelity, again -- but if containers are a requirement, Mux has them today.
+Mux's runtime matrix is broader: beyond worktrees it offers Docker containers, devcontainers, and Coder-managed workspaces -- attractive for platform teams that want containment or already run Coder. Paradev standardizes on worktrees across local, remote, and cloud workspaces, keeping agents in your real environment with your services and dependencies. Containment versus fidelity, again -- but if containers are a requirement, Mux has them today.
 
 ### Governance and Enterprise Posture
 
-Mux comes from Coder and inherits its self-hosted, regulated-industry framing -- pair it with Coder's platform and you get governed infrastructure for agent fleets, all AGPL open source. Superset's enterprise story is product-led: team plans, SSO and audit logs, remote hosts shared across teammates, and a Slack bot in the flow of work. Platform teams may prefer Mux's posture; engineering teams adopting a tool usually prefer a product.
+Mux comes from Coder and inherits its self-hosted, regulated-industry framing -- pair it with Coder's platform and you get governed infrastructure for agent fleets, all AGPL open source. Paradev's enterprise story is product-led: team plans, SSO and audit logs, remote hosts shared across teammates, and a Slack bot in the flow of work. Platform teams may prefer Mux's posture; engineering teams adopting a tool usually prefer a product.
 
 ### Budgets and Headless Runs
 
-Credit where due: Mux's cost controls are first-class -- per-session and per-goal dollar budgets on `mux run`, and subsidized gateway credits. Superset also tracks tokens: its Usage page shows quota meters and estimated cost by agent, model, and workspace. Its automations cover scheduled unattended sessions with an SDK and Slack triggers, but Superset does not enforce dollar caps per run; costs live with your providers. If hard spend limits on autonomous runs matter, Mux thought about it first.
+Credit where due: Mux's cost controls are first-class -- per-session and per-goal dollar budgets on `mux run`, and subsidized gateway credits. Paradev also tracks tokens: its Usage page shows quota meters and estimated cost by agent, model, and workspace. Its automations cover scheduled unattended sessions with an SDK and Slack triggers, but Paradev does not enforce dollar caps per run; costs live with your providers. If hard spend limits on autonomous runs matter, Mux thought about it first.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month, with agents running on your existing subscriptions or keys. Mux is free and AGPL-3.0; you pay model APIs directly (or draw on Mux Gateway's evaluation credits). Note the billing-model difference: Superset can reuse Claude Max / ChatGPT plans through vendor CLIs, while Mux's own loop requires API-key usage.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Agents run on your existing subscriptions or keys. Mux is free and AGPL-3.0; you pay model APIs directly (or draw on Mux Gateway's evaluation credits). Note the billing-model difference: Paradev can reuse Claude Max / ChatGPT plans through vendor CLIs, while Mux's own loop requires API-key usage.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want to run the agents you already use -- Claude Code, Codex, Cursor, OpenCode -- on their existing subscriptions
 - Want a full workspace: diff editor, browser, port management, persistent terminals
@@ -85,7 +85,7 @@ Superset offers a free tier and Pro at $20/seat/month, with agents running on yo
 - Need dollar-budgeted headless runs and durable JS workflows
 - Want AGPL open source with a self-hosted browser/mobile-web server
 
-**Verdict:** Mux is a thoughtful, well-engineered take -- but it is structurally an agent with a multiplexer, and adopting it means adopting its loop and its billing. Superset is the multiplexer for the agents you already trust, with the workspace, automations, and team surfaces to make a fleet of them a daily workflow. If Coder-style self-hosted governance or container isolation is the requirement, evaluate Mux; otherwise Superset preserves your agent choices and your subscriptions.
+**Verdict:** Mux is a thoughtful, well-engineered take -- but it is structurally an agent with a multiplexer, and adopting it means adopting its loop and its billing. Paradev is the multiplexer for the agents you already trust, with the workspace, automations, and team surfaces to make a fleet of them a daily workflow. If Coder-style self-hosted governance or container isolation is the requirement, evaluate Mux; otherwise Paradev preserves your agent choices and your subscriptions.
 
 ---
 
@@ -93,16 +93,16 @@ Superset offers a free tier and Pro at $20/seat/month, with agents running on yo
 
 ### Can Mux run Claude Code or Codex?
 
-No. Mux uses its own agent loop against model APIs (Anthropic, OpenAI, xAI, Ollama, OpenRouter) with your keys. Superset runs the vendor CLIs themselves -- Claude Code, Codex, Cursor, OpenCode, and any terminal agent -- on their own subscriptions.
+No. Mux uses its own agent loop against model APIs (Anthropic, OpenAI, xAI, Ollama, OpenRouter) with your keys. Paradev runs the vendor CLIs themselves -- Claude Code, Codex, Cursor, OpenCode, and any terminal agent -- on their own subscriptions.
 
 ### Do both use Git worktrees?
 
-Both offer them. Worktree is one of Mux's six runtimes alongside local, SSH, Docker, devcontainer, and Coder workspaces. Superset creates worktrees for new local branch-based workspaces; cloud workspaces use clones and projectless sessions use scratch folders.
+Both offer them. Worktree is one of Mux's six runtimes alongside local, SSH, Docker, devcontainer, and Coder workspaces. Paradev creates worktrees for new local branch-based workspaces; cloud workspaces use clones and projectless sessions use scratch folders.
 
 ### Is Mux open source?
 
-Yes, AGPL-3.0, free, from Coder Technologies (~2,000 GitHub stars). Superset is source-available under ELv2 with a free tier and paid plans.
+Yes, AGPL-3.0, free, from Coder Technologies (~2,000 GitHub stars). Paradev is source-available under ELv2 with a free tier and paid plans.
 
 ### Which is better for teams?
 
-Different angles: Mux plus the Coder platform suits platform teams wanting self-hosted governed infrastructure; Superset ships team plans, SSO/audit logs, shared remote hosts, and a Slack bot as product features. For most engineering teams adopting a tool directly, Superset is the shorter path.
+Different angles: Mux plus the Coder platform suits platform teams wanting self-hosted governed infrastructure; Paradev ships team plans, SSO/audit logs, shared remote hosts, and a Slack bot as product features. For most engineering teams adopting a tool directly, Paradev is the shorter path.

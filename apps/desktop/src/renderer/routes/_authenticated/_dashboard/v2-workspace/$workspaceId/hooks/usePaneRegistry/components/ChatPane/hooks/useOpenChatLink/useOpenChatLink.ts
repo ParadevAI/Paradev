@@ -18,6 +18,7 @@ import type {
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import {
+	runChatPullRequestLink,
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
@@ -89,10 +90,13 @@ export function useOpenChatLink({
 	};
 
 	return useCallback(
-		(href, event) => {
+		(href, event, chosen) => {
 			const isPlain = tierFor(event, "2-tier") === "plain";
 			if (WEB_URL.test(href)) {
-				const action = getUrlAction(event, href) ?? (isPlain ? "pane" : null);
+				if (runChatPullRequestLink(depsRef.current, href, event, chosen))
+					return true;
+				const action =
+					chosen ?? getUrlAction(event, href) ?? (isPlain ? "pane" : null);
 				if (action === null) showHint(event.clientX, event.clientY);
 				else runUrlLinkAction(depsRef.current, href, action);
 				return true;
@@ -108,16 +112,19 @@ export function useOpenChatLink({
 						return;
 					}
 					if (stat.isDirectory) {
-						const intent =
-							folderPolicy.map[tierFor(event, "2-tier")] ??
-							(isPlain ? "reveal" : null);
+						const intent = chosen
+							? chosen === "external"
+								? "external"
+								: "reveal"
+							: (folderPolicy.map[tierFor(event, "2-tier")] ??
+								(isPlain ? "reveal" : null));
 						if (intent === null) showHint(event.clientX, event.clientY);
 						else
 							runFolderLinkAction(depsRef.current, stat.resolvedPath, intent);
 						return;
 					}
 					const action =
-						filePolicy.getAction(event) ?? (isPlain ? "pane" : null);
+						chosen ?? filePolicy.getAction(event) ?? (isPlain ? "pane" : null);
 					if (action === null) {
 						showHint(event.clientX, event.clientY);
 						return;

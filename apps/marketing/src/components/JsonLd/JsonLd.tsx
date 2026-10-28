@@ -1,5 +1,5 @@
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import {
 	PRODUCT_DISAMBIGUATION,
 	PRODUCT_PLATFORMS,
@@ -42,6 +42,8 @@ export function OrganizationJsonLd() {
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
 		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
+		legalName: COMPANY.LEGAL_NAME,
 		url: COMPANY.MARKETING_URL,
 		logo: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
 		description: "One workspace for orchestrating any coding agent",
@@ -62,10 +64,15 @@ export function OrganizationJsonLd() {
 		},
 		sameAs: [
 			COMPANY.GITHUB_URL,
-			"https://github.com/superset-sh",
+			"https://github.com/paradevai",
 			COMPANY.X_URL,
 			COMPANY.LINKEDIN_URL,
 			COMPANY.YOUTUBE_URL,
+			"https://github.com/superset-sh/superset",
+			"https://github.com/superset-sh",
+			SOCIAL.X_FORMER.url,
+			"https://www.linkedin.com/company/superset-sh",
+			"https://www.youtube.com/@superset-sh",
 		],
 	};
 
@@ -78,6 +85,7 @@ export function SoftwareApplicationJsonLd() {
 		"@type": "SoftwareApplication",
 		"@id": `${COMPANY.MARKETING_URL}/#software`,
 		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
 		operatingSystem: PRODUCT_PLATFORMS,
 		license: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
 		publisher: { "@id": `${COMPANY.MARKETING_URL}/#organization` },
@@ -216,6 +224,7 @@ export function WebsiteJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
 		name: BRAND.INTRO_NAME,
+		alternateName: BRAND.FORMER_NAME,
 		url: COMPANY.MARKETING_URL,
 	};
 
@@ -228,7 +237,7 @@ export function HomeWebPageJsonLd() {
 		"@type": "WebPage",
 		"@id": COMPANY.MARKETING_URL,
 		url: COMPANY.MARKETING_URL,
-		name: `${BRAND.INTRO_NAME}: Orchestrate any coding agent`,
+		name: `${BRAND.INTRO_NAME}: Run an army of coding agents`,
 		isPartOf: {
 			"@type": "WebSite",
 			name: BRAND.INTRO_NAME,

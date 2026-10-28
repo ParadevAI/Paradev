@@ -120,6 +120,9 @@ function SettingsLayout() {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
+	const rightPaneAreaFlag =
+		useFeatureFlagEnabled(FEATURE_FLAGS.RIGHT_PANE_AREA) === true;
+	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
 	const pluginsVisible = usePluginsSettingsVisible();
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
@@ -141,6 +144,8 @@ function SettingsLayout() {
 						isV2CloudEnabled,
 						cloudWorkspacesEnabled,
 						mobileEnabled,
+						rightPaneAreaFlag,
+						acpChatFlag,
 						pluginsVisible,
 					)
 				: {},
@@ -150,6 +155,8 @@ function SettingsLayout() {
 			isV2CloudEnabled,
 			cloudWorkspacesEnabled,
 			mobileEnabled,
+			rightPaneAreaFlag,
+			acpChatFlag,
 			pluginsVisible,
 		],
 	);

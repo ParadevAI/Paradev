@@ -45,6 +45,19 @@ export type QueueState = {
 	}[];
 };
 
+export type UnfinishedSession = {
+	sessionId: string;
+	scopeId: string;
+	harness: string;
+	harnessSessionId: string;
+	terminalId?: string;
+	modeId?: string;
+	modelId?: string;
+	interrupted: boolean;
+	prompts: UserContent[][];
+	pausedPrompts: UserContent[][];
+};
+
 type PendingPrompt = {
 	item: UserMessage;
 	content: UserContent[];
@@ -78,6 +91,14 @@ export class LiveSession {
 	private currentTurn: Turn | null = null;
 	private pump: Promise<void> | null = null;
 	private stopped = false;
+	private heldUntilStarted: UserContent[][] = [];
+	private heldPaused: UserContent[][] = [];
+	private onHeldReleased: (() => void) | null = null;
+	private carriedFailure: Turn | null = null;
+	private carriedAtMs: number | null = null;
+	private readonly turnStarts = new Map<string, number>();
+	/** Replays stamp items ahead of the clock to keep their order. */
+	private latestStartMs = 0;
 	/** Turns a user prompt started, and those of them that have shown anything yet. */
 	private readonly promptedTurns = new Set<string>();
 	private readonly turnsWithOutput = new Set<string>();
@@ -124,6 +145,60 @@ export class LiveSession {
 
 	get queuedCount(): number {
 		return this.queue.length;
+	}
+
+	unfinished(): UnfinishedSession | null {
+		const harnessSessionId = this.sessionState.harnessSessionId;
+		if (!harnessSessionId || this.sessionState.status === "dead") return null;
+		const interrupted =
+			this.currentTurn?.status === "running" ||
+			(this.sessionState.backgroundTasks?.length ?? 0) > 0;
+		const prompts = [
+			...(this.awaitingTurn ? [this.awaitingTurn] : []),
+			...this.pendingSteers,
+			...(this.queuePaused ? [] : this.queue),
+		]
+			.map((pending) => pending.content)
+			.concat(this.heldUntilStarted);
+		const pausedPrompts = (this.queuePaused ? this.queue : [])
+			.map((pending) => pending.content)
+			.concat(this.heldPaused);
+		if (!interrupted && prompts.length === 0 && pausedPrompts.length === 0) {
+			return null;
+		}
+		return {
+			sessionId: this.options.sessionId,
+			scopeId: this.options.scopeId,
+			harness: this.options.harness,
+			harnessSessionId,
+			terminalId: this.options.terminalId,
+			modeId: this.sessionState.modeId,
+			modelId: this.sessionState.modelId,
+			interrupted,
+			prompts,
+			pausedPrompts,
+		};
+	}
+
+	promptOnceStarted(
+		prompts: UserContent[][],
+		pausedPrompts: UserContent[][] = [],
+		onReleased?: () => void,
+	): void {
+		this.heldUntilStarted.push(...prompts);
+		this.heldPaused.push(...pausedPrompts);
+		this.onHeldReleased = onReleased ?? null;
+		this.releaseHeldPrompts();
+	}
+
+	/**
+	 * Shows `turn`, a failure that ended the chat this one replaces, once the
+	 * agent has started: after any history it replays, so it reads as the
+	 * latest turn.
+	 */
+	carryFailedTurn(turn: Turn): void {
+		this.carriedFailure = turn;
+		this.releaseCarriedFailure();
 	}
 
 	start(startOptions: HarnessStartOptions): void {
@@ -296,11 +371,11 @@ export class LiveSession {
 		this.options.adapter.setMode(modeId);
 	}
 
-	setConfigOption(configId: string, value: string): void {
+	setConfigOption(configId: string, value: string): Promise<boolean> {
 		if (!this.options.adapter.setConfigOption) {
 			throw new Error("this agent has no settings to change");
 		}
-		this.options.adapter.setConfigOption(configId, value);
+		return this.options.adapter.setConfigOption(configId, value);
 	}
 
 	stopBackgroundTask(taskId: string): Promise<boolean> {
@@ -357,8 +432,14 @@ export class LiveSession {
 				});
 				return;
 			case "turn": {
-				this.currentTurn = event.turn;
-				this.appendDurable({ type: "turn", turn: event.turn });
+				const previous = this.currentTurn;
+				this.currentTurn = this.afterCarriedFailure(event.turn);
+				this.appendDurable({ type: "turn", turn: this.currentTurn });
+				if (
+					previous?.id === event.turn.id &&
+					previous.status === event.turn.status
+				)
+					return;
 				if (event.turn.status === "running") {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
@@ -375,6 +456,8 @@ export class LiveSession {
 			case "session":
 				if (event.session.status === "dead") this.discardPending();
 				this.emitSession(event.session);
+				this.releaseCarriedFailure();
+				this.releaseHeldPrompts();
 				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
 				return;
 			case "delta":
@@ -386,6 +469,80 @@ export class LiveSession {
 				});
 				return;
 		}
+	}
+
+	private releaseCarriedFailure(): void {
+		const turn = this.carriedFailure;
+		if (!turn || this.sessionState.status === "starting") return;
+		this.carriedFailure = null;
+		const at = Math.max(this.now(), this.latestStartMs + 1);
+		this.carriedAtMs = at;
+		this.appendDurable({
+			type: "turn",
+			turn: { ...turn, startedAtMs: at, completedAtMs: at },
+		});
+		this.appendDurable({
+			type: "item",
+			item: {
+				id: this.mintId(),
+				kind: "notice",
+				noticeKind: "error",
+				text: turn.error?.message ?? "",
+				startedAtMs: at,
+				completedAtMs: at,
+			},
+			turnId: turn.id,
+		});
+	}
+
+	/**
+	 * After a long replay the agent's clock gives new turns starts at or before
+	 * the carried failure's, and a tie sorts at random. Each new turn starts
+	 * after everything written so far, decided once so its later events agree.
+	 */
+	private afterCarriedFailure(turn: Turn): Turn {
+		if (this.carriedAtMs === null) return turn;
+		let startedAtMs = this.turnStarts.get(turn.id);
+		if (startedAtMs === undefined) {
+			startedAtMs = Math.max(turn.startedAtMs, this.latestStartMs + 1);
+			this.turnStarts.set(turn.id, startedAtMs);
+		}
+		return startedAtMs === turn.startedAtMs ? turn : { ...turn, startedAtMs };
+	}
+
+	private releaseHeldPrompts(): void {
+		const status = this.sessionState.status;
+		if (status === "starting") return;
+		const held = this.heldUntilStarted.splice(0);
+		const paused = this.heldPaused.splice(0);
+		const onReleased = this.onHeldReleased;
+		this.onHeldReleased = null;
+		if (status === "dead") return;
+		onReleased?.();
+		this.queue.unshift(...held.map((content) => this.queuedPrompt(content)));
+		if (this.currentTurn?.status !== "running" && !this.awaitingTurn) {
+			this.deliverNextQueued();
+		}
+		if (paused.length === 0) return;
+		this.queue.push(...paused.map((content) => this.queuedPrompt(content)));
+		if (!this.queuePaused) {
+			this.queuePaused = true;
+			this.emitSession({ queuePaused: true });
+		}
+	}
+
+	private queuedPrompt(content: UserContent[]): PendingPrompt {
+		const item: UserMessage = {
+			id: this.mintId(),
+			kind: "user_message",
+			clientId: this.mintId(),
+			startedAtMs: this.now(),
+			content,
+			queued: true,
+		};
+		const turnId = this.mintId();
+		this.appendDurable({ type: "item", item, turnId });
+		return { item, content, turnId, seq: ++this.sent };
 	}
 
 	/** A turn that ends as if it worked but shows nothing would otherwise read as success. */
@@ -574,6 +731,13 @@ export class LiveSession {
 	}
 
 	private appendDurable(event: DurableEvent): void {
+		const startedAtMs =
+			event.type === "item"
+				? event.item.startedAtMs
+				: event.type === "turn"
+					? event.turn.startedAtMs
+					: 0;
+		this.latestStartMs = Math.max(this.latestStartMs, startedAtMs);
 		this.options.publish(
 			this.options.journal.appendEnvelope(this.options.sessionId, event),
 		);
@@ -589,7 +753,8 @@ export class LiveSession {
 		return (
 			this.currentTurn?.status === "running" ||
 			this.hasPendingWork() ||
-			this.pendingSteers.length > 0
+			this.pendingSteers.length > 0 ||
+			this.heldUntilStarted.length > 0
 		);
 	}
 

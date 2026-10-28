@@ -6,5 +6,6 @@ export type {
 	CreateSessionResult,
 	DiscoverSessionsCommandInput,
 	GetSessionResult,
+	ResumeSessionInput,
 } from "./commands";
 export { createCommands, createSessionCommandSchema } from "./commands";

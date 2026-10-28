@@ -36,6 +36,15 @@ describe("superset-boot", () => {
 		);
 	});
 
+	test("swap is memguard's, grown on demand up to a cap by box size", () => {
+		expect(boot).not.toMatch(/swapon/);
+		expect(memguard).toMatch(/swap_cap_mb=\$\(\( \$\(box_mb\) \* 3 \/ 2 \)\)/);
+		expect(memguard).toMatch(/-lt 6144 \] && swap_cap_mb=6144/);
+		expect(memguard).toMatch(/-gt 16384 \] && swap_cap_mb=16384/);
+		expect(memguard).toMatch(/swapon "\$f"/);
+		expect(memguard).toMatch(/swapoff "\$f"/);
+	});
+
 	test("writes the cgroup's memory ceiling and CPU count for login shells", () => {
 		expect(boot).toMatch(/SUPERSET_SANDBOX_MEMORY_MB/);
 		expect(boot).toMatch(/SUPERSET_SANDBOX_VCPUS/);

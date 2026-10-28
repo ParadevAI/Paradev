@@ -1,7 +1,7 @@
 import type { WorkspaceStore } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { ChatPaneData, PaneViewerData } from "../../types";
-import { reopenChatSession } from "../closedChatSessions";
+import { reopenChatSession, reopenChatTerminal } from "../closedChatSessions";
 import { removePendingChatStop } from "../pendingChatStops";
 
 export interface ChatSessionTarget {
@@ -25,6 +25,7 @@ export function focusChatSession({
 		reopenChatSession(session.sessionId);
 		removePendingChatStop(session.sessionId);
 	}
+	if (session.terminalId) reopenChatTerminal(session.terminalId);
 	for (const paneStore of [store, ...linkedStores]) {
 		for (const tab of paneStore.getState().tabs) {
 			const pane = Object.values(tab.panes).find((pane) => {
@@ -39,8 +40,7 @@ export function focusChatSession({
 				);
 			});
 			if (pane) {
-				paneStore.getState().setActiveTab(tab.id);
-				paneStore.getState().setActivePane({ tabId: tab.id, paneId: pane.id });
+				paneStore.getState().focusPane(pane.id);
 				return "focused";
 			}
 		}

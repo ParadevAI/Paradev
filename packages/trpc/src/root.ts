@@ -1,12 +1,20 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { adminRouter } from "./router/admin";
+import { agentApiRouter, agentRouter, agentWorkerRouter } from "./router/agent";
 import { agentCredentialRouter } from "./router/agent-credential";
 import { analyticsRouter } from "./router/analytics";
 import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
 import { billingRouter } from "./router/billing";
+import {
+	channelMessageRouter,
+	channelNotificationPrefsRouter,
+	channelRouter,
+	channelTaskRouter,
+	channelThreadRouter,
+} from "./router/channel";
 import { chatRouter } from "./router/chat";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
@@ -36,6 +44,9 @@ import { createCallerFactory, createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
 	admin: adminRouter,
+	agent: agentRouter,
+	agentApi: agentApiRouter,
+	agentWorker: agentWorkerRouter,
 	apiKey: apiKeyRouter,
 	analytics: analyticsRouter,
 	attachment: attachmentRouter,
@@ -59,6 +70,11 @@ export const appRouter = createTRPCRouter({
 	mention: mentionRouter,
 	taskLabel: taskLabelRouter,
 	taskProject: taskProjectRouter,
+	channel: channelRouter,
+	channelMessage: channelMessageRouter,
+	channelNotificationPrefs: channelNotificationPrefsRouter,
+	channelTask: channelTaskRouter,
+	channelThread: channelThreadRouter,
 	taskRecord: taskRecordRouter,
 	team: teamRouter,
 	agentCredential: agentCredentialRouter,

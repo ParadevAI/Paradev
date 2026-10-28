@@ -1,13 +1,15 @@
 ---
 name: browser
-description: Open, navigate, screenshot, read, click, and type in web pages from an agent. Use when the user asks to open a URL, preview or verify a running web app, check a page's console, fill a form, click through a web flow, or automate anything in a browser, including "open localhost:3000", "screenshot the page", "what does the console say", "click the submit button", "I'm logged in on Chrome". Drives the in-app browser pane of a Superset workspace by default and Browser Use for browsers the panes cannot reach.
+description: Open, navigate, screenshot, read, click, and type in web pages from an agent. Use when the user asks to open a URL, preview or verify a running web app, check a page's console, fill a form, click through a web flow, or automate anything in a browser, including "open localhost:3000", "screenshot the page", "what does the console say", "click the submit button", "I'm logged in on Chrome". Drives the in-app browser pane of a Paradev (formerly Superset) workspace by default and Browser Use for browsers the panes cannot reach.
 argument-hint: URL or what to do in the browser
-allowed-tools: Bash(superset:*) Bash(curl:*)
+allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(curl:*)
 ---
 
-# Superset Browser Control
+# Paradev Browser Control
 
-Drive web pages through the browser panes inside a Superset workspace with the
+`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+
+Drive web pages through the browser panes inside a Paradev workspace with the
 `superset browser` commands. Every operation runs in the pane the user can see,
 against the pane's real, logged-in session. A raw Chrome DevTools Protocol (CDP)
 endpoint covers anything the high-level verbs don't.
@@ -20,7 +22,7 @@ endpoint covers anything the high-level verbs don't.
   workspace pane: previewing a dev server, verifying UI the user is watching,
   clicking through a flow in the app.
 - Use Browser Use only when the panes cannot reach the target: a Chrome window
-  outside Superset, a host with no desktop app attached (pane commands error
+  outside Paradev, a host with no desktop app attached (pane commands error
   clearly there), or work that needs an isolated or cloud browser. Read
   `references/browser-use.md` before using it; it covers install consent,
   attaching, and cleanup.
@@ -104,7 +106,7 @@ users discover it, so reach for it in two cases:
 - The user says they're already signed in somewhere ("I'm logged in on
   Chrome", "use my Arc session", "it works in my browser"). Ask once before you
   navigate, and wait for a yes: "Want me to import your logins from
-  <browser>? It copies all of that browser's cookies into the Superset
+  <browser>? It copies all of that browser's cookies into the Paradev
   browser, not just this site." Naming the browser is not consent to the full
   scope; the yes to this question is.
 - A pane hits a login wall for a site the user uses in their own browser:

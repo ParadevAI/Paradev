@@ -25,6 +25,10 @@ import {
 import { jwtProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { currentBundleSha } from "./current-bundle";
+import {
+	assertEnvironmentCapacity,
+	assertEnvironmentCapacityLocked,
+} from "./limit";
 import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
@@ -75,12 +79,12 @@ function personalOwner(
 async function repositoriesByEnvironment(
 	environmentRows: ReadonlyArray<{
 		id: string;
-		hooksRepositoryId: string | null;
+		primaryRepositoryId: string | null;
 	}>,
 ) {
 	const environmentIds = environmentRows.map((row) => row.id);
-	const hooksById = new Map(
-		environmentRows.map((row) => [row.id, row.hooksRepositoryId]),
+	const primaryById = new Map(
+		environmentRows.map((row) => [row.id, row.primaryRepositoryId]),
 	);
 	const rows = environmentIds.length
 		? await db
@@ -107,7 +111,7 @@ async function repositoriesByEnvironment(
 		map.set(environmentId, [...(map.get(environmentId) ?? []), repo]);
 	}
 	for (const [environmentId, repos] of map) {
-		const primary = primaryRepository(repos, hooksById.get(environmentId));
+		const primary = primaryRepository(repos, primaryById.get(environmentId));
 		map.set(environmentId, [
 			...(primary ? [primary] : []),
 			...sortRepositories(repos).filter((repo) => repo.id !== primary?.id),
@@ -120,7 +124,7 @@ async function setEnvironmentRepositories(args: {
 	environmentId: string;
 	organizationId: string;
 	repositoryIds: readonly string[];
-	hooksRepositoryId: string | null | undefined;
+	primaryRepositoryId: string;
 }): Promise<void> {
 	let repositories: Awaited<ReturnType<typeof loadRepositories>>;
 	try {
@@ -136,16 +140,8 @@ async function setEnvironmentRepositories(args: {
 			i18nKey: "serverError.environment.repositoryNotConnected",
 		});
 	}
-	if (
-		args.hooksRepositoryId &&
-		!repositories.some((repo) => repo.id === args.hooksRepositoryId)
-	) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message:
-				"The hooks repository must be one of the environment's repositories",
-			i18nKey: "serverError.environment.hooksRepositoryNotIncluded",
-		});
+	if (!repositories.some((repo) => repo.id === args.primaryRepositoryId)) {
+		throw primaryNotIncluded();
 	}
 	await db
 		.delete(environmentRepositories)
@@ -160,8 +156,17 @@ async function setEnvironmentRepositories(args: {
 	}
 	await db
 		.update(environments)
-		.set({ hooksRepositoryId: args.hooksRepositoryId ?? null })
+		.set({ primaryRepositoryId: args.primaryRepositoryId })
 		.where(eq(environments.id, args.environmentId));
+}
+
+function primaryNotIncluded() {
+	return userError({
+		code: "BAD_REQUEST",
+		message:
+			"The primary repository must be one of the environment's repositories",
+		i18nKey: "serverError.environment.primaryRepositoryNotIncluded",
+	});
 }
 
 async function loadPromotable(
@@ -181,7 +186,7 @@ async function loadPromotable(
 	});
 	const checkouts = await workspaceRepositories({
 		cloudWorkspaceId: workspace.id,
-		hooksRepositoryId: source?.hooksRepositoryId ?? null,
+		primaryRepositoryId: source?.primaryRepositoryId ?? null,
 		primaryBranch: workspace.baseBranch,
 		workingBranch: workspace.branch,
 	});
@@ -198,8 +203,8 @@ export const environmentRouter = {
 	list: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select()
 				.from(environments)
@@ -225,8 +230,8 @@ export const environmentRouter = {
 	get: jwtProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const row = await loadEnvironment(input.id, ctx);
+			await assertCloudAccess(ctx, row.organizationId);
 			const repos = await repositoriesByEnvironment([row]);
 			return { ...row, repositories: repos.get(row.id) ?? [] };
 		}),
@@ -236,43 +241,39 @@ export const environmentRouter = {
 			z.object({
 				organizationId: z.string().uuid(),
 				name: z.string().min(1).max(100),
-				/** In order; the first is the primary, the one a workspace opens on. */
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20),
-				/** Which repository's `.superset/config.json` the box acts on. */
-				hooksRepositoryId: z.string().uuid().nullable().optional(),
+				/** The repository a workspace opens on; its `.superset` config runs. */
+				primaryRepositoryId: z.string().uuid(),
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
-			if (
-				input.hooksRepositoryId &&
-				!input.repositoryIds.includes(input.hooksRepositoryId)
-			) {
-				throw userError({
-					code: "BAD_REQUEST",
-					message:
-						"The hooks repository must be one of the environment's repositories",
-					i18nKey: "serverError.environment.hooksRepositoryNotIncluded",
-				});
+			await assertCloudAccess(ctx, input.organizationId);
+			const limit = await assertEnvironmentCapacity(input.organizationId);
+			if (!input.repositoryIds.includes(input.primaryRepositoryId)) {
+				throw primaryNotIncluded();
 			}
-			const [row] = await db
-				.insert(environments)
-				.values({
-					organizationId: input.organizationId,
-					name: input.name,
-					provider: "vercel",
-					sourceKind: "image",
-					sourceRef: SANDBOX_IMAGE_NAME,
-					region: input.region ?? regionForRequest(ctx.headers),
-					bundleSha: await currentBundleSha(),
-					scope: input.scope,
-					createdByUserId: ctx.userId,
-				})
-				.returning();
+			const [row] = await dbWs.transaction(async (tx) => {
+				await assertEnvironmentCapacityLocked(tx, input.organizationId, limit);
+				const bundleSha = await currentBundleSha();
+				return tx
+					.insert(environments)
+					.values({
+						organizationId: input.organizationId,
+						name: input.name,
+						provider: "vercel",
+						sourceKind: "image",
+						sourceRef: SANDBOX_IMAGE_NAME,
+						region: input.region ?? regionForRequest(ctx.headers),
+						bundleSha,
+						scope: input.scope,
+						createdByUserId: ctx.userId,
+					})
+					.returning();
+			});
 			if (!row) {
 				throw userError({
 					code: "INTERNAL_SERVER_ERROR",
@@ -280,13 +281,18 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.couldNotRecord",
 				});
 			}
-			await setEnvironmentRepositories({
-				environmentId: row.id,
-				organizationId: input.organizationId,
-				repositoryIds: input.repositoryIds,
-				hooksRepositoryId: input.hooksRepositoryId,
-			});
-			return row;
+			try {
+				await setEnvironmentRepositories({
+					environmentId: row.id,
+					organizationId: input.organizationId,
+					repositoryIds: input.repositoryIds,
+					primaryRepositoryId: input.primaryRepositoryId,
+				});
+			} catch (error) {
+				await db.delete(environments).where(eq(environments.id, row.id));
+				throw error;
+			}
+			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
 		}),
 
 	/** What promoting this workspace would make, before its golden is built. */
@@ -299,10 +305,10 @@ export const environmentRouter = {
 			);
 			return {
 				name: workspace.name,
-				repositories: checkouts.map((entry) => ({
+				repositories: checkouts.map((entry, index) => ({
 					id: entry.repository.id,
 					fullName: entry.repository.fullName,
-					hooks: entry.hooks,
+					primary: index === 0,
 				})),
 				region: source?.region ?? null,
 				scope: source?.scope ?? "organization",
@@ -369,24 +375,33 @@ export const environmentRouter = {
 								),
 							);
 
+			const limit = target
+				? null
+				: await assertEnvironmentCapacity(workspace.organizationId);
 			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
 				claim,
 			});
-			const hooksRepositoryId =
-				checkouts.find((entry) => entry.hooks)?.repository.id ?? null;
+			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,
 				sourceKind: "fork" as const,
 				sourceRef: goldenName,
 				region: golden.region,
 				bundleSha: await currentBundleSha(),
-				hooksRepositoryId,
+				primaryRepositoryId,
 			};
 			const row = await dbWs
 				.transaction(async (tx) => {
+					if (limit !== null) {
+						await assertEnvironmentCapacityLocked(
+							tx,
+							workspace.organizationId,
+							limit,
+						);
+					}
 					const [saved] = target
 						? await tx
 								.update(environments)
@@ -487,17 +502,23 @@ export const environmentRouter = {
 				id: z.string().uuid(),
 				name: z.string().min(1).max(100).optional(),
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
-				hooksRepositoryId: z.string().uuid().nullable().optional(),
+				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const current = await loadEnvironment(input.id, ctx);
+			await assertCloudAccess(ctx, current.organizationId);
 
-			// A golden was built for its repositories: cloned, set up, snapshotted.
-			// A different set means a different golden, so it is promoted again.
-			if (input.repositoryIds && current.sourceKind !== "image") {
+			// A golden was built for its repositories and set up by its primary.
+			// Changing either means a different golden, so it is promoted again.
+			const changesPrimary =
+				input.primaryRepositoryId !== undefined &&
+				input.primaryRepositoryId !== current.primaryRepositoryId;
+			if (
+				(input.repositoryIds || changesPrimary) &&
+				current.sourceKind !== "image"
+			) {
 				throw userError({
 					code: "FORBIDDEN",
 					message:
@@ -506,35 +527,26 @@ export const environmentRouter = {
 				});
 			}
 			if (input.repositoryIds) {
+				const primaryRepositoryId =
+					input.primaryRepositoryId ?? current.primaryRepositoryId;
+				if (!primaryRepositoryId) throw primaryNotIncluded();
 				await setEnvironmentRepositories({
 					environmentId: input.id,
 					organizationId: current.organizationId,
 					repositoryIds: input.repositoryIds,
-					hooksRepositoryId:
-						input.hooksRepositoryId === undefined
-							? current.hooksRepositoryId
-							: input.hooksRepositoryId,
+					primaryRepositoryId,
 				});
-			} else if (input.hooksRepositoryId !== undefined) {
-				if (input.hooksRepositoryId) {
-					const included = await db.query.environmentRepositories.findFirst({
-						where: and(
-							eq(environmentRepositories.environmentId, input.id),
-							eq(environmentRepositories.repositoryId, input.hooksRepositoryId),
-						),
-					});
-					if (!included) {
-						throw userError({
-							code: "BAD_REQUEST",
-							message:
-								"The hooks repository must be one of the environment's repositories",
-							i18nKey: "serverError.environment.hooksRepositoryNotIncluded",
-						});
-					}
-				}
+			} else if (input.primaryRepositoryId !== undefined) {
+				const included = await db.query.environmentRepositories.findFirst({
+					where: and(
+						eq(environmentRepositories.environmentId, input.id),
+						eq(environmentRepositories.repositoryId, input.primaryRepositoryId),
+					),
+				});
+				if (!included) throw primaryNotIncluded();
 				await db
 					.update(environments)
-					.set({ hooksRepositoryId: input.hooksRepositoryId })
+					.set({ primaryRepositoryId: input.primaryRepositoryId })
 					.where(eq(environments.id, input.id));
 			}
 			const patch = {
@@ -558,8 +570,8 @@ export const environmentRouter = {
 	archive: jwtProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.id, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 			const [archived] = await db
 				.update(environments)
 				.set({ archivedAt: new Date() })

@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Windsurf (2026): Parallel Agent Orchestration vs AI IDE"
-description: "Compare Superset and Windsurf, now Devin Desktop, for AI-assisted development. See how parallel worktree orchestration differs from an AI-powered IDE."
+title: "Paradev vs Windsurf (2026): Parallel Agent Orchestration vs AI IDE"
+description: "Compare Paradev and Windsurf, now Devin Desktop, for AI-assisted development. See how parallel worktree orchestration differs from an AI-powered IDE."
 date: 2026-02-18
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,29 +15,29 @@ keywords:
   - ai coding tool comparison
 ---
 
-Windsurf is an AI-powered IDE, now rebranded as Devin Desktop after Cognition's acquisition. Superset is a local-first workspace that runs many AI coding agents in parallel, each in its own Git worktree. They solve different problems: Windsurf, as Devin Desktop, is an AI-native editor with a command center for local and cloud agents, while Superset scales autonomous agent work across isolated worktrees alongside any editor.
+Windsurf is an AI-powered IDE, now rebranded as Devin Desktop after Cognition's acquisition. Paradev is a local-first workspace that runs many AI coding agents in parallel, each in its own Git worktree. They solve different problems: Windsurf, as Devin Desktop, is an AI-native editor with a command center for local and cloud agents, while Paradev scales autonomous agent work across isolated worktrees alongside any editor.
 
-Note: as of mid-2026, Windsurf is now Devin Desktop, and the original Cascade agent has been retired in favor of Devin Local. This page uses both names. For Cognition's autonomous cloud engineer, see [Superset vs Devin](/compare/superset-vs-devin).
+Note: as of mid-2026, Windsurf is now Devin Desktop, and the original Cascade agent has been retired in favor of Devin Local. This page uses both names. For Cognition's autonomous cloud engineer, see [Paradev vs Devin](/compare/superset-vs-devin).
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Windsurf (Devin Desktop)** |
+| | **Paradev** | **Windsurf (Devin Desktop)** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI-powered IDE with an agent command center |
 | **AI approach** | Agent-agnostic -- Claude Code, Codex, OpenCode, Cursor, Gemini, or any CLI agent | Devin Local plus ACP agents (Codex, Claude, OpenCode) |
 | **Parallelism** | Core feature -- multiple agents across isolated worktrees | Manages local and cloud agents from a Kanban command center |
 | **Isolation** | Git worktrees for local branch-based workspaces | Cloud isolated; local mechanism not clearly documented |
 | **Editor** | Works alongside any editor (VS Code, Cursor, JetBrains, Xcode) | You use the Devin Desktop IDE |
-| **Pricing** | Free tier + Pro $20/seat/mo | Free tier, Pro $20/mo, Max $200/mo |
+| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free tier, Pro $20/mo, Max $200/mo |
 | **License** | Source-available (ELv2) | Closed source |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -51,29 +51,29 @@ Windsurf began as a VS Code fork with AI integrated throughout the editing exper
 
 ### One IDE vs an Agent-Agnostic Workspace
 
-Devin Desktop is an editor: you work inside its IDE, with Devin Local and a command center for managing agents. Superset is a workspace that sits around any editor. It runs Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and custom agents, each in its own worktree, and hands off to VS Code, Cursor, JetBrains, or Xcode. If you want one AI-native IDE, Devin Desktop is that; if you want an editor-independent orchestration layer, Superset is built for it.
+Devin Desktop is an editor: you work inside its IDE, with Devin Local and a command center for managing agents. Paradev is a workspace that sits around any editor. It runs Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and custom agents, each in its own worktree, and hands off to VS Code, Cursor, JetBrains, or Xcode. If you want one AI-native IDE, Devin Desktop is that; if you want an editor-independent orchestration layer, Paradev is built for it.
 
 ### Isolation Model
 
-Superset creates Git worktrees for new local branch-based workspaces, so many agents can work the same repository at once in separate working directories. Devin Desktop manages multiple agents from its command center and runs autonomous work in the cloud (isolated remotely), but its local per-agent isolation mechanism is not clearly documented. If local worktree isolation is the point, that is Superset's core. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+Paradev creates Git worktrees for new local branch-based workspaces, so many agents can work the same repository at once in separate working directories. Devin Desktop manages multiple agents from its command center and runs autonomous work in the cloud (isolated remotely), but its local per-agent isolation mechanism is not clearly documented. If local worktree isolation is the point, that is Paradev's core. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
 
 ### Hosting External Agents
 
-Both can run external CLI agents now. Devin Desktop added ACP support, so ACP-compatible agents run inside it. Superset runs any terminal agent directly in a worktree. The difference is framing: Superset treats agent orchestration as the product, while Devin Desktop treats it as a capability inside an IDE.
+Both can run external CLI agents now. Devin Desktop added ACP support, so ACP-compatible agents run inside it. Paradev runs any terminal agent directly in a worktree. The difference is framing: Paradev treats agent orchestration as the product, while Devin Desktop treats it as a capability inside an IDE.
 
 ### Reach and Automation
 
-Superset extends past the local desktop with Remote Access to machines you own and cloud workspaces that run in the cloud, plus CLI and MCP surfaces and scheduled automations. Devin Desktop pairs its local IDE with Cognition's cloud agents. Both cross the local/cloud boundary; they differ in whether the center of gravity is a worktree workspace or an IDE.
+Paradev extends past the local desktop with Remote Access to machines you own and cloud workspaces that run in the cloud, plus CLI and MCP surfaces and scheduled automations. Devin Desktop pairs its local IDE with Cognition's cloud agents. Both cross the local/cloud boundary; they differ in whether the center of gravity is a worktree workspace or an IDE.
 
 ### Privacy and Licensing
 
-Superset runs agents locally in Git worktrees and is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source. If auditability and local-first control matter, that is a real distinction.
+Paradev runs agents locally in Git worktrees and is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source. If auditability and local-first control matter, that is a real distinction.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month, and you pay your agents' providers directly with no markup. Devin Desktop offers a free tier, Pro at $20/month, and Max at $200/month, with team plans available; usage is governed by quotas.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces, and you pay your agents' providers directly with no markup. Devin Desktop offers a free tier, Pro at $20/month, and Max at $200/month, with team plans available; usage is governed by quotas.
 
 ---
 
@@ -85,13 +85,13 @@ Superset offers a free tier and Pro at $20/seat/month, and you pay your agents' 
 - Are comfortable adopting Cognition's editor and cloud agents
 - Want ACP agents hosted inside one IDE
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 - Run CLI-based agents and want to parallelize across many isolated worktrees
 - Use JetBrains, Xcode, Neovim, or any editor, and want orchestration to stay independent
 - Need local worktrees plus remote hosts you own and cloud workspaces
 - Want agent and model flexibility with no editor lock-in
 
-Both can coexist. Use Devin Desktop as your AI IDE, and Superset alongside it to dispatch parallel agents for larger tasks like test generation, refactors, and migrations.
+Both can coexist. Use Devin Desktop as your AI IDE, and Paradev alongside it to dispatch parallel agents for larger tasks like test generation, refactors, and migrations.
 
 ---
 
@@ -103,12 +103,12 @@ Windsurf is now Devin Desktop, following Cognition's acquisition. It shipped as 
 
 ### Does Windsurf (Devin Desktop) support parallel agents?
 
-Devin Desktop manages multiple local and cloud agents from its command center, and its cloud agents run in isolation. It does not clearly document a local worktree-per-agent model. Superset's worktree isolation is built specifically for parallel agent execution on one repository.
+Devin Desktop manages multiple local and cloud agents from its command center, and its cloud agents run in isolation. It does not clearly document a local worktree-per-agent model. Paradev's worktree isolation is built specifically for parallel agent execution on one repository.
 
-### Is Superset open source?
+### Is Paradev open source?
 
-Superset is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source.
+Paradev is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source.
 
 ### What is the difference between Windsurf and Devin?
 
-Windsurf, now Devin Desktop, is the IDE. Devin is Cognition's autonomous cloud software engineer. They are related surfaces from the same company. See [Superset vs Devin](/compare/superset-vs-devin).
+Windsurf, now Devin Desktop, is the IDE. Devin is Cognition's autonomous cloud software engineer. They are related surfaces from the same company. See [Paradev vs Devin](/compare/superset-vs-devin).

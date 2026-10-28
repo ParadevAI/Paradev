@@ -1,9 +1,9 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
@@ -11,9 +11,10 @@ import { getAbout } from "@/lib/about";
 import { getAllPeople } from "@/lib/people";
 import { CompanyFacts } from "../components/CompanyFacts";
 import { CTASection } from "../components/CTASection";
+import { Investors } from "../components/Investors";
 import { PhotoFan } from "../components/PhotoFan";
+import { StoryPhoto } from "../components/StoryPhoto";
 import { FounderRow } from "./components/FounderRow";
-import { Investors } from "./components/Investors";
 import { ProofLinks } from "./components/ProofLinks";
 import { Timeline } from "./components/Timeline";
 
@@ -27,14 +28,13 @@ export async function generateMetadata(): Promise<Metadata> {
 	);
 	const description = i18n._(
 		msg({
-			message:
-				"What Superset is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents.",
+			message: `What ${BRAND.INTRO_NAME} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents.`,
 		}),
 	);
 	const ogDescription = i18n._(
 		msg({
 			message:
-				"Meet the team behind Superset, building parallel coding agents for developers.",
+				"Meet the team behind Paradev, building parallel coding agents for developers.",
 		}),
 	);
 	return {
@@ -45,14 +45,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/team").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: ogDescription,
 			url: localeUrl(lang, "/team"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: ogDescription,
 			images: ["/og-image.png"],
 		},
@@ -72,16 +72,16 @@ export default async function TeamPage() {
 				{/* Hero */}
 				<section className="mb-12 md:mb-16">
 					<p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6">
-						<Trans>About Superset</Trans>
+						<Trans>About Paradev</Trans>
 					</p>
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-normal leading-[1.05] text-foreground max-w-4xl mb-8">
 						<Trans>Building the last piece of software.</Trans>
 					</h1>
 					<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
 						<Trans>
-							Superset is building self-improving software. It starts with
-							giving engineers the best tools that adapt to their needs over
-							time. We're 3 ex-YC CTOs building a tool that we love.
+							{BRAND.INTRO_NAME} is building self-improving software. It starts
+							with giving engineers the best tools that adapt to their needs
+							over time. We're 3 ex-YC CTOs building a tool that we love.
 						</Trans>
 					</p>
 				</section>
@@ -102,7 +102,7 @@ export default async function TeamPage() {
 							<div className="space-y-4 text-muted-foreground leading-relaxed">
 								<p>
 									<Trans>
-										Superset started as a hackathon project in November 2025. It
+										Paradev started as a hackathon project in November 2025. It
 										was a simple desktop app for managing worktrees.
 									</Trans>
 								</p>
@@ -112,7 +112,7 @@ export default async function TeamPage() {
 										<span className="text-foreground">
 											tens of thousands of engineers
 										</span>{" "}
-										run Superset as their primary IDE, at companies like Wix,
+										run Paradev as their primary IDE, at companies like Wix,
 										DoorDash, and Netflix.
 									</Trans>
 								</p>
@@ -125,20 +125,11 @@ export default async function TeamPage() {
 							</div>
 						</div>
 						{storyPhoto && (
-							<figure className="m-0 md:sticky md:top-24">
-								<div className="relative aspect-[8/5] rounded-lg overflow-hidden bg-muted border border-border">
-									<Image
-										src={storyPhoto.src}
-										alt={storyPhoto.alt}
-										fill
-										className="object-cover"
-										sizes="(max-width: 768px) 100vw, 480px"
-									/>
-								</div>
-								<figcaption className="mt-3 text-xs text-muted-foreground">
-									{storyPhoto.caption}
-								</figcaption>
-							</figure>
+							<StoryPhoto
+								photo={storyPhoto}
+								sizes="(max-width: 768px) 100vw, 480px"
+								className="md:sticky md:top-24"
+							/>
 						)}
 					</div>
 				</section>
@@ -173,7 +164,7 @@ export default async function TeamPage() {
 					)}
 				</section>
 
-				<section className="hidden">
+				<section className="mb-24 md:mb-32">
 					<h2 className="text-2xl md:text-3xl font-normal text-foreground mb-3">
 						<Trans>Backed by</Trans>
 					</h2>
@@ -183,7 +174,10 @@ export default async function TeamPage() {
 							Combinator, Paul Graham, and founders we admire.
 						</Trans>
 					</p>
-					<Investors investors={about.investors} />
+					<Investors
+						investors={about.investors}
+						moreInvestors={about.moreInvestors}
+					/>
 				</section>
 
 				<section className="mb-24 md:mb-32">

@@ -29,7 +29,7 @@ describe("explainAgent", () => {
 		expect(result.details[0]).toContain("12 seconds ago");
 	});
 
-	test("a recorded Stop allows for an interrupt, since Superset records one as Stop", () => {
+	test("a recorded Stop allows for an interrupt, since Paradev records one as Stop", () => {
 		expect(explain({ binding: binding("Stop") }).because).toContain(
 			"or it was interrupted",
 		);

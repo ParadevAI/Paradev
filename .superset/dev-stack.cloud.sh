@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="${SUPERSET_LOG_DIR:-/var/log/superset}"
 
 DEV_SERVERS_MIN_MB=8192
-DESKTOP_DEV_MIN_MB=12288
+DESKTOP_DEV_MIN_MB=8192
 
 box_memory_mb() {
   if [ -n "${SUPERSET_SANDBOX_MEMORY_MB:-}" ]; then echo "$SUPERSET_SANDBOX_MEMORY_MB"; return; fi

@@ -73,8 +73,3 @@ export function findPreviewLink(
 		) ?? null
 	);
 }
-
-export function displayHost(url: string): string {
-	const host = parseWebUrl(url)?.hostname.replace(/\.$/, "").toLowerCase();
-	return host?.replace(/^www\./, "") ?? url;
-}

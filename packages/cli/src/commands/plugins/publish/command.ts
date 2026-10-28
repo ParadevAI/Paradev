@@ -87,7 +87,7 @@ export default command({
 				files: r.files,
 				tag: r.tag,
 			})),
-			message: `Published ${results.map((r) => `${r.name}@${r.version}`).join(", ")}. Commit, then tag: ${results.map((r) => `git tag ${r.tag}`).join(" && ")}`,
+			message: `Published ${results.map((r) => `${r.name}@${r.version}`).join(", ")}. Commit and merge to main; CI tags ${results.map((r) => r.tag).join(", ")}.`,
 		};
 	},
 });

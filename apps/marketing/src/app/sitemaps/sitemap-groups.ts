@@ -160,6 +160,11 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.7,
 		},
 		{
+			url: `${baseUrl}/press`,
+			changeFrequency: "weekly",
+			priority: 0.6,
+		},
+		{
 			url: `${baseUrl}/contact`,
 			changeFrequency: "monthly",
 			priority: 0.6,

@@ -115,6 +115,21 @@ async function loadLabels(cloudWorkspaceId: string) {
 		.orderBy(asc(taskLabels.name));
 }
 
+export function toAssignee(task: {
+	assigneeId: string | null;
+	assigneeName: string | null;
+	assigneeImage: string | null;
+}) {
+	if (task.assigneeId && task.assigneeName) {
+		return {
+			id: task.assigneeId,
+			name: task.assigneeName,
+			image: task.assigneeImage,
+		};
+	}
+	return null;
+}
+
 export async function assertTaskInOrganization(
 	taskId: string,
 	organizationId: string,
@@ -264,7 +279,7 @@ export const cloudWorkspaceRecordRouter = {
 						: undefined,
 					db.query.environments.findFirst({
 						where: eq(environments.id, row.environmentId),
-						columns: { id: true, name: true, hooksRepositoryId: true },
+						columns: { id: true, name: true, primaryRepositoryId: true },
 					}),
 					db
 						.select({
@@ -292,7 +307,7 @@ export const cloudWorkspaceRecordRouter = {
 				]);
 			const primary = primaryRepository(
 				repositories,
-				environment?.hooksRepositoryId,
+				environment?.primaryRepositoryId,
 			);
 			const orderedRepositories = primary
 				? [primary, ...repositories.filter((repo) => repo.id !== primary.id)]
@@ -525,8 +540,8 @@ export const cloudWorkspaceRecordRouter = {
 	tasks: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			const visible = await db
 				.select({ id: cloudWorkspaces.id })
 				.from(cloudWorkspaces)
@@ -543,8 +558,8 @@ export const cloudWorkspaceRecordRouter = {
 	labels: jwtProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			assertMember(ctx.organizationIds, input.organizationId);
+			await assertCloudAccess(ctx, input.organizationId);
 			return db
 				.select({
 					cloudWorkspaceId: cloudWorkspaceLabels.cloudWorkspaceId,

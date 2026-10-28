@@ -84,7 +84,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP.",
+				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP.",
 		}),
 	},
 	{

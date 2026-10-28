@@ -4,30 +4,10 @@ import { PLAN_TIERS, type PlanTier } from "@superset/shared/billing";
 
 export { PLAN_TIERS, type PlanTier };
 
-export interface PlanFeature {
-	id: string;
-	name: string;
-	description?: string;
-	included: boolean;
-	limit?: string;
-}
-
 export interface Plan {
 	id: PlanTier;
 	name: MessageDescriptor;
 	description: MessageDescriptor;
-	limits: {
-		maxUsers: number | null;
-		maxWorkspaces: number | null;
-		cloudWorkspaces: boolean;
-		mobileApp: boolean;
-	};
-	features: PlanFeature[];
-	cta: {
-		text: string;
-		action: "current" | "upgrade" | "contact";
-		disabled?: boolean;
-	};
 }
 
 export const PLANS: Record<PlanTier, Plan> = {
@@ -37,20 +17,6 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For individuals getting started",
 		}),
-		limits: {
-			maxUsers: 1,
-			maxWorkspaces: 5,
-			cloudWorkspaces: false,
-			mobileApp: false,
-		},
-		features: [
-			{ id: "users", name: "1 user", included: true },
-			{ id: "workspaces", name: "Up to 5 workspaces", included: true },
-			{ id: "local-only", name: "Local workspaces only", included: true },
-			{ id: "desktop-app", name: "Desktop app", included: true },
-			{ id: "github", name: "GitHub integration", included: true },
-		],
-		cta: { text: "Current plan", action: "current", disabled: true },
 	},
 	pro: {
 		id: "pro",
@@ -58,21 +24,6 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For teams that need more power",
 		}),
-		limits: {
-			maxUsers: null,
-			maxWorkspaces: null,
-			cloudWorkspaces: true,
-			mobileApp: true,
-		},
-		features: [
-			{ id: "users", name: "Unlimited users", included: true },
-			{ id: "tasks", name: "Task management", included: true },
-			{ id: "cloud", name: "Cloud workspaces", included: true },
-			{ id: "mobile", name: "Mobile app access", included: true },
-			{ id: "priority", name: "Priority support", included: true },
-			{ id: "roles", name: "Role-based permissions", included: true },
-		],
-		cta: { text: "Upgrade to Pro", action: "upgrade" },
 	},
 	enterprise: {
 		id: "enterprise",
@@ -82,52 +33,5 @@ export const PLANS: Record<PlanTier, Plan> = {
 		description: msg({
 			message: "For organizations with advanced needs",
 		}),
-		limits: {
-			maxUsers: null,
-			maxWorkspaces: null,
-			cloudWorkspaces: true,
-			mobileApp: true,
-		},
-		features: [
-			{ id: "everything-pro", name: "Everything in Pro", included: true },
-			{
-				id: "sso",
-				name: "SSO & advanced security",
-				included: true,
-			},
-			{ id: "audit", name: "Audit logs", included: true },
-			{
-				id: "sla",
-				name: "SLA & dedicated support",
-				included: true,
-			},
-			{ id: "custom", name: "Custom integrations", included: true },
-		],
-		cta: { text: "Contact sales", action: "contact" },
-	},
-};
-
-export interface BillingInfo {
-	organizationId: string;
-	currentPlan: PlanTier;
-	seats: number;
-	usage: {
-		users: number;
-		workspaces: number;
-	};
-	billing?: {
-		stripeCustomerId: string;
-		nextBillingDate: string;
-		amount: number;
-	};
-}
-
-export const MOCK_BILLING_INFO: BillingInfo = {
-	organizationId: "mock-org",
-	currentPlan: "free",
-	seats: 1,
-	usage: {
-		users: 1,
-		workspaces: 3,
 	},
 };

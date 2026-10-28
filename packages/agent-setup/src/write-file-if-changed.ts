@@ -33,7 +33,7 @@ function inaccessibleLinkError(
 		?.isSymbolicLink();
 	if (linked !== true) return error;
 	return new Error(
-		`${filePath} links to ${target}, which Superset cannot read or write (${code}). The config was left alone; point the link at a writable file to have it managed.`,
+		`${filePath} links to ${target}, which Paradev cannot read or write (${code}). The config was left alone; point the link at a writable file to have it managed.`,
 		{ cause: error },
 	);
 }
