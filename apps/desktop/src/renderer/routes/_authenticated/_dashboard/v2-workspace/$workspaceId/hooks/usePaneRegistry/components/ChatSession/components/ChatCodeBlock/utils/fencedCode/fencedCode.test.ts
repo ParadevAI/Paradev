@@ -4,8 +4,8 @@ import {
 	fenceLanguage,
 	fenceText,
 	isDiffLanguage,
-	isSingleFilePatch,
 	parseFence,
+	parsePatchFileDiffs,
 } from "./fencedCode";
 
 describe("fenceLanguage", () => {
@@ -110,15 +110,13 @@ const TWO_FILE_PATCH = `${ONE_FILE_PATCH}--- a/b.ts
 +new
 `;
 
-describe("isSingleFilePatch", () => {
-	test("accepts a patch for one file with hunks", () => {
-		expect(isSingleFilePatch(ONE_FILE_PATCH)).toBe(true);
+describe("parsePatchFileDiffs", () => {
+	test("returns each file of a patch", () => {
+		expect(parsePatchFileDiffs(ONE_FILE_PATCH)).toHaveLength(1);
+		expect(parsePatchFileDiffs(TWO_FILE_PATCH)).toHaveLength(2);
 	});
-	test("rejects a patch spanning several files", () => {
-		expect(isSingleFilePatch(TWO_FILE_PATCH)).toBe(false);
-	});
-	test("rejects text that is not a patch", () => {
-		expect(isSingleFilePatch("const x = 1;")).toBe(false);
-		expect(isSingleFilePatch("")).toBe(false);
+	test("returns nothing for text that is not a patch", () => {
+		expect(parsePatchFileDiffs("const x = 1;")).toEqual([]);
+		expect(parsePatchFileDiffs("")).toEqual([]);
 	});
 });

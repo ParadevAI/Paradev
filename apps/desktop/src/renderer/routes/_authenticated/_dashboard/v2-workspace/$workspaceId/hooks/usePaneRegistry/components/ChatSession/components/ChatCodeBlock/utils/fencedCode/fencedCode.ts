@@ -1,4 +1,4 @@
-import { parsePatchFiles } from "@pierre/diffs";
+import { type FileDiffMetadata, parsePatchFiles } from "@pierre/diffs";
 import type { ReactNode } from "react";
 import {
 	isLocalPathText,
@@ -86,18 +86,12 @@ export function isDiffLanguage(language: string | null): boolean {
 	return language !== null && DIFF_LANGUAGES.has(language);
 }
 
-/**
- * Whether the text is a patch the patch view can show: it renders exactly one
- * file and throws on any other count, so a fence holding a whole `git diff`
- * goes to the plain code view instead.
- */
-export function isSingleFilePatch(text: string): boolean {
+/** The files of a patch with at least one hunk each, or none for other text. */
+export function parsePatchFileDiffs(text: string): FileDiffMetadata[] {
 	try {
-		const patches = parsePatchFiles(text);
-		if (patches.length !== 1) return false;
-		const files = patches[0]?.files ?? [];
-		return files.length === 1 && (files[0]?.hunks.length ?? 0) > 0;
+		const files = parsePatchFiles(text).flatMap((patch) => patch.files);
+		return files.every((file) => file.hunks.length > 0) ? files : [];
 	} catch {
-		return false;
+		return [];
 	}
 }
