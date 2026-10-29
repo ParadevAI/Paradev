@@ -1189,9 +1189,6 @@ msgstr "{productName} は、グローバルでは Netflix、Microsoft、NVIDIA�
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は {productName} を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
-msgid "{provider} logo"
-msgstr "{provider}のロゴ"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
 
@@ -5016,9 +5013,6 @@ msgstr "同意が付与されませんでした。テナント管理者の承認
 
 msgid "Consider alternatives"
 msgstr "代替案を検討して"
-
-msgid "Console"
-msgstr "コンソール"
 
 msgid "Constraints"
 msgstr "制約"
@@ -11189,9 +11183,6 @@ msgstr "モデルのコンテキスト使用量"
 msgid "Model picker scoped to the selected agent"
 msgstr "選択中のエージェントに絞ったモデルピッカー"
 
-msgid "Model Selector"
-msgstr "モデルを選択"
-
 msgid "Model volume"
 msgstr "モデル別ボリューム"
 
@@ -11792,9 +11783,6 @@ msgstr "プルリクエストを作成できるコミットがありません"
 
 msgid "No comparisons yet."
 msgstr "比較はまだありません。"
-
-msgid "No console output"
-msgstr "コンソール出力はありません"
 
 msgid "No contributors found."
 msgstr "コントリビューターが見つかりません。"
@@ -12934,9 +12922,6 @@ msgstr "ブラウザで開く"
 
 msgid "Open in Changes pane"
 msgstr "変更ペインで開く"
-
-msgid "Open in chat"
-msgstr "チャットで開く"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPTで開く"

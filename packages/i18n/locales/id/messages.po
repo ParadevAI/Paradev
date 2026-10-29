@@ -1189,9 +1189,6 @@ msgstr "{productName} digunakan oleh engineer di Netflix, Microsoft, NVIDIA, Doo
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "Logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -5016,9 +5013,6 @@ msgstr "Persetujuan tidak diberikan. Administrator tenant harus menyetujuinya."
 
 msgid "Consider alternatives"
 msgstr "Pertimbangkan alternatif"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Constraint"
@@ -11189,9 +11183,6 @@ msgstr "Penggunaan konteks model"
 msgid "Model picker scoped to the selected agent"
 msgstr "Pemilih model yang dibatasi pada agen yang dipilih"
 
-msgid "Model Selector"
-msgstr "Pemilih Model"
-
 msgid "Model volume"
 msgstr "Volume model"
 
@@ -11792,9 +11783,6 @@ msgstr "Tidak ada commit untuk membuka pull request"
 
 msgid "No comparisons yet."
 msgstr "Belum ada perbandingan."
-
-msgid "No console output"
-msgstr "Tidak ada output console"
 
 msgid "No contributors found."
 msgstr "Tidak ada kontributor ditemukan."
@@ -12934,9 +12922,6 @@ msgstr "Buka di Browser"
 
 msgid "Open in Changes pane"
 msgstr "Buka di panel Perubahan"
-
-msgid "Open in chat"
-msgstr "Buka di chat"
 
 msgid "Open in ChatGPT"
 msgstr "Buka di ChatGPT"

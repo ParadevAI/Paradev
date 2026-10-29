@@ -1189,9 +1189,6 @@ msgstr "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDa
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "{provider} logo"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
@@ -5016,9 +5013,6 @@ msgstr "Consent was not granted. A tenant administrator has to approve."
 
 msgid "Consider alternatives"
 msgstr "Consider alternatives"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Constraints"
@@ -11189,9 +11183,6 @@ msgstr "Model context usage"
 msgid "Model picker scoped to the selected agent"
 msgstr "Model picker scoped to the selected agent"
 
-msgid "Model Selector"
-msgstr "Model Selector"
-
 msgid "Model volume"
 msgstr "Model volume"
 
@@ -11792,9 +11783,6 @@ msgstr "No commits to open a pull request from"
 
 msgid "No comparisons yet."
 msgstr "No comparisons yet."
-
-msgid "No console output"
-msgstr "No console output"
 
 msgid "No contributors found."
 msgstr "No contributors found."
@@ -12934,9 +12922,6 @@ msgstr "Open in Browser"
 
 msgid "Open in Changes pane"
 msgstr "Open in Changes pane"
-
-msgid "Open in chat"
-msgstr "Open in chat"
 
 msgid "Open in ChatGPT"
 msgstr "Open in ChatGPT"

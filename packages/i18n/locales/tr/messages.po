@@ -1189,9 +1189,6 @@ msgstr "{productName} dünya genelinde Netflix, Microsoft, NVIDIA, DoorDash, Wix
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, {productName}'i YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
 
-msgid "{provider} logo"
-msgstr "{provider} logosu"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -5016,9 +5013,6 @@ msgstr "Onay verilmedi. Bir kiracı yöneticisinin onaylaması gerekiyor."
 
 msgid "Consider alternatives"
 msgstr "Alternatifleri değerlendir"
-
-msgid "Console"
-msgstr "Konsol"
 
 msgid "Constraints"
 msgstr "Kısıtlamalar"
@@ -11189,9 +11183,6 @@ msgstr "Model bağlam kullanımı"
 msgid "Model picker scoped to the selected agent"
 msgstr "Seçili ajanla sınırlı model seçici"
 
-msgid "Model Selector"
-msgstr "Model seçici"
-
 msgid "Model volume"
 msgstr "Model hacmi"
 
@@ -11792,9 +11783,6 @@ msgstr "Pull request açılabilecek commit yok"
 
 msgid "No comparisons yet."
 msgstr "Henüz karşılaştırma yok."
-
-msgid "No console output"
-msgstr "Konsol çıktısı yok"
 
 msgid "No contributors found."
 msgstr "Katkıda bulunan bulunamadı."
@@ -12934,9 +12922,6 @@ msgstr "Tarayıcıda aç"
 
 msgid "Open in Changes pane"
 msgstr "Değişiklikler bölmesinde aç"
-
-msgid "Open in chat"
-msgstr "Sohbette aç"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPT'de aç"

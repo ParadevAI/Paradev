@@ -1189,9 +1189,6 @@ msgstr "{productName} lo usan ingenieros de Netflix, Microsoft, NVIDIA, DoorDash
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "Logotipo de {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -5016,9 +5013,6 @@ msgstr "No se concedió el consentimiento. Tiene que aprobarlo un administrador 
 
 msgid "Consider alternatives"
 msgstr "Considera alternativas"
-
-msgid "Console"
-msgstr "Consola"
 
 msgid "Constraints"
 msgstr "Restricciones"
@@ -11189,9 +11183,6 @@ msgstr "Uso del contexto del modelo"
 msgid "Model picker scoped to the selected agent"
 msgstr "Selector de modelo limitado al agente seleccionado"
 
-msgid "Model Selector"
-msgstr "Selector de modelo"
-
 msgid "Model volume"
 msgstr "Volumen por modelo"
 
@@ -11792,9 +11783,6 @@ msgstr "No hay commits desde los que abrir un pull request"
 
 msgid "No comparisons yet."
 msgstr "Aún no hay comparativas."
-
-msgid "No console output"
-msgstr "Sin salida de consola"
 
 msgid "No contributors found."
 msgstr "No se encontraron colaboradores."
@@ -12934,9 +12922,6 @@ msgstr "Abrir en el navegador"
 
 msgid "Open in Changes pane"
 msgstr "Abrir en el panel de cambios"
-
-msgid "Open in chat"
-msgstr "Abrir en el chat"
 
 msgid "Open in ChatGPT"
 msgstr "Abrir en ChatGPT"

@@ -1189,9 +1189,6 @@ msgstr "{productName} пользуются инженеры Netflix, Microsoft, 
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} привлёк 11,5 млн долларов в посевном раунде под руководством Union Square Ventures при участии Y Combinator и Пола Грэма. TechCrunch назвал {productName} одним из самых заметных стартапов YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "логотип {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
@@ -5016,9 +5013,6 @@ msgstr "Согласие не выдано. Его должен одобрить
 
 msgid "Consider alternatives"
 msgstr "Рассмотри альтернативы"
-
-msgid "Console"
-msgstr "Консоль"
 
 msgid "Constraints"
 msgstr "Ограничения"
@@ -11189,9 +11183,6 @@ msgstr "Использование контекста модели"
 msgid "Model picker scoped to the selected agent"
 msgstr "Выбор модели в рамках выбранного агента"
 
-msgid "Model Selector"
-msgstr "Выбор модели"
-
 msgid "Model volume"
 msgstr "Объём по моделям"
 
@@ -11792,9 +11783,6 @@ msgstr "Нет коммитов, из которых можно открыть �
 
 msgid "No comparisons yet."
 msgstr "Сравнений пока нет."
-
-msgid "No console output"
-msgstr "Нет вывода в консоль"
 
 msgid "No contributors found."
 msgstr "Контрибьюторы не найдены."
@@ -12934,9 +12922,6 @@ msgstr "Открыть в браузере"
 
 msgid "Open in Changes pane"
 msgstr "Открыть в панели изменений"
-
-msgid "Open in chat"
-msgstr "Открыть в чате"
 
 msgid "Open in ChatGPT"
 msgstr "Открыть в ChatGPT"

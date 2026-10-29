@@ -1189,9 +1189,6 @@ msgstr "{productName}의 사용자로는 전 세계적으로 Netflix, Microsoft,
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 팀을 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
-msgid "{provider} logo"
-msgstr "{provider} 로고"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 
@@ -5016,9 +5013,6 @@ msgstr "동의가 부여되지 않았습니다. 테넌트 관리자가 승인해
 
 msgid "Consider alternatives"
 msgstr "대안을 검토해 주세요"
-
-msgid "Console"
-msgstr "콘솔"
 
 msgid "Constraints"
 msgstr "제약 조건"
@@ -11189,9 +11183,6 @@ msgstr "모델 컨텍스트 사용량"
 msgid "Model picker scoped to the selected agent"
 msgstr "선택한 에이전트로 범위가 한정된 모델 선택기"
 
-msgid "Model Selector"
-msgstr "모델 선택기"
-
 msgid "Model volume"
 msgstr "모델 사용량"
 
@@ -11792,9 +11783,6 @@ msgstr "풀 리퀘스트를 만들 커밋이 없습니다"
 
 msgid "No comparisons yet."
 msgstr "아직 비교가 없습니다."
-
-msgid "No console output"
-msgstr "콘솔 출력 없음"
 
 msgid "No contributors found."
 msgstr "기여자를 찾을 수 없습니다."
@@ -12934,9 +12922,6 @@ msgstr "브라우저에서 열기"
 
 msgid "Open in Changes pane"
 msgstr "변경 사항 패널에서 열기"
-
-msgid "Open in chat"
-msgstr "채팅에서 열기"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPT에서 열기"
