@@ -30,7 +30,7 @@ import {
 	organizationBundleKey,
 	syncOrganizationPluginSource,
 } from "../../lib/organization-plugins";
-import { getObject } from "../../lib/r2";
+import { deleteObjects, getObject } from "../../lib/r2";
 import { nudge } from "../../lib/realtime";
 import { protectedProcedure } from "../../trpc";
 import { verifyOrgAdmin } from "../integration/utils";
@@ -208,6 +208,15 @@ const sourcesRouter = {
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAdmin(ctx);
+			const bundles = await db
+				.select({ contentHash: organizationPlugins.contentHash })
+				.from(organizationPlugins)
+				.where(
+					and(
+						eq(organizationPlugins.sourceId, input.id),
+						eq(organizationPlugins.organizationId, organizationId),
+					),
+				);
 			const [row] = await db
 				.delete(organizationPluginSources)
 				.where(
@@ -218,6 +227,16 @@ const sourcesRouter = {
 				)
 				.returning({ id: organizationPluginSources.id });
 			if (!row) throw unknownSource();
+			await deleteObjects(
+				bundles.map((bundle) =>
+					organizationBundleKey(organizationId, bundle.contentHash),
+				),
+			).catch((error) =>
+				console.warn(
+					"[organization-plugins] bundles left for the sweep",
+					error,
+				),
+			);
 			nudge(organizationId, "plugins");
 			return { removed: row.id };
 		}),

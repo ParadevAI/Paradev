@@ -1,10 +1,12 @@
 import {
 	boolean,
+	foreignKey,
 	index,
 	jsonb,
 	pgTable,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex,
 	uuid,
 } from "drizzle-orm/pg-core";
@@ -126,6 +128,10 @@ export const organizationPluginSources = pgTable(
 			table.repo,
 			table.path,
 		),
+		unique("organization_plugin_sources_id_organization_unique").on(
+			table.id,
+			table.organizationId,
+		),
 	],
 );
 
@@ -149,9 +155,7 @@ export const organizationPlugins = pgTable(
 		organizationId: uuid("organization_id")
 			.notNull()
 			.references(() => organizations.id, { onDelete: "cascade" }),
-		sourceId: uuid("source_id").references(() => organizationPluginSources.id, {
-			onDelete: "cascade",
-		}),
+		sourceId: uuid("source_id"),
 
 		name: text().notNull(),
 		version: text().notNull(),
@@ -179,6 +183,15 @@ export const organizationPlugins = pgTable(
 			table.name,
 		),
 		index("organization_plugins_source_idx").on(table.sourceId),
+		// A plugin can only come from a source of its own organization.
+		foreignKey({
+			name: "organization_plugins_source_organization_fk",
+			columns: [table.sourceId, table.organizationId],
+			foreignColumns: [
+				organizationPluginSources.id,
+				organizationPluginSources.organizationId,
+			],
+		}).onDelete("cascade"),
 	],
 );
 

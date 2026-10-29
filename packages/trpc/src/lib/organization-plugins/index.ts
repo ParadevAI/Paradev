@@ -8,6 +8,7 @@ export {
 	installedFor,
 	memberRole,
 } from "./access";
+export { sweepOrganizationPluginBundles } from "./bundles";
 export {
 	OrganizationPluginError,
 	organizationBundleKey,

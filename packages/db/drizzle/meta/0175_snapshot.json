@@ -1,5 +1,5 @@
 {
-  "id": "fa9333a0-9c80-4aa5-a2e4-874703a681d3",
+  "id": "08b158e5-1a14-4943-ae75-86f0c01e0111",
   "prevId": "20d0759a-b608-484a-a1f7-9a84673eae94",
   "version": "7",
   "dialect": "postgresql",
@@ -5347,7 +5347,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "organization_plugin_sources_id_organization_unique": {
+          "name": "organization_plugin_sources_id_organization_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "organization_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -5486,15 +5495,17 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "organization_plugins_source_id_organization_plugin_sources_id_fk": {
-          "name": "organization_plugins_source_id_organization_plugin_sources_id_fk",
+        "organization_plugins_source_organization_fk": {
+          "name": "organization_plugins_source_organization_fk",
           "tableFrom": "organization_plugins",
           "tableTo": "organization_plugin_sources",
           "columnsFrom": [
-            "source_id"
+            "source_id",
+            "organization_id"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "organization_id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import {
 	members,
+	organizationPluginSources,
 	organizationPlugins,
 	pluginInstalls,
 } from "@superset/db/schema";
@@ -57,8 +58,13 @@ const result = <T>(value: T[]) =>
 	});
 
 stub(realtime, { nudge: () => {} });
+let deletedObjects: string[][] = [];
+
 stub(r2, {
 	getObject: async () => new Response(new Uint8Array([1, 2, 3])),
+	deleteObjects: async (keys: string[]) => {
+		deletedObjects.push([...keys]);
+	},
 });
 stub(db, {
 	query: {
@@ -117,10 +123,14 @@ stub(db, {
 		}),
 	}),
 	delete: (table: unknown) => ({
-		where: async (condition: SQL) => {
+		where: (condition: SQL) => {
 			if (table === pluginInstalls) {
 				deletedInstalls.push(dialect.sqlToQuery(condition).params);
 			}
+			return Object.assign(Promise.resolve(), {
+				returning: async () =>
+					table === organizationPluginSources ? [{ id: "source-1" }] : [],
+			});
 		},
 	}),
 });
@@ -155,6 +165,7 @@ const plugin = (name: string, installPolicy: Record<string, string>) => ({
 beforeEach(() => {
 	role = "member";
 	deletedInstalls = [];
+	deletedObjects = [];
 	plugins = [
 		plugin("admins", { owner: "available", admin: "available" }),
 		plugin("everyone", { member: "available", admin: "available" }),
@@ -194,6 +205,19 @@ describe("organization plugins access", () => {
 			owner: "installed",
 		});
 		expect(deletedInstalls).toEqual([]);
+	});
+
+	test("removing a source deletes its plugins' bundles from storage", async () => {
+		role = "admin";
+		await caller.organization.sources.remove({
+			id: "00000000-0000-4000-8000-000000000001",
+		});
+		expect(deletedObjects).toEqual([
+			[
+				`organization-plugins/${ORG}/hash`,
+				`organization-plugins/${ORG}/hash`,
+			].map((key) => `${key}.json.gz`),
+		]);
 	});
 
 	test("a member cannot change a plugin's access", async () => {
