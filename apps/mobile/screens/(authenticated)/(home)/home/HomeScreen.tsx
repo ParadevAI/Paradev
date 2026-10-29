@@ -40,6 +40,7 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
+import { contentScrollsUnderHeader } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
@@ -773,7 +774,7 @@ export function HomeScreen() {
 			    offline — its list isn't shown, so there is nothing to search. */}
 			<Stack.Screen
 				options={{
-					headerTransparent: true,
+					headerTransparent: contentScrollsUnderHeader,
 					headerTitle: notice
 						? () => (
 								<HeaderNotice

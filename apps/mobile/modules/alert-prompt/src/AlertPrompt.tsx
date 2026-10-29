@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Modal, Pressable, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Pressable, View } from "react-native";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import type {
@@ -62,10 +62,12 @@ export const AlertPromptHost: AlertPromptHostComponent = () => {
 			visible
 			animationType="fade"
 			statusBarTranslucent
-			navigationBarTranslucent
 			onRequestClose={cancel}
 		>
-			<View className="flex-1 items-center justify-center bg-black/60 px-8">
+			<KeyboardAvoidingView
+				behavior="padding"
+				className="flex-1 items-center justify-center bg-black/60 px-8"
+			>
 				<Pressable
 					accessibilityRole="button"
 					accessibilityLabel={options.cancelText ?? t({ message: "Cancel" })}
@@ -113,7 +115,7 @@ export const AlertPromptHost: AlertPromptHostComponent = () => {
 						</Pressable>
 					</View>
 				</View>
-			</View>
+			</KeyboardAvoidingView>
 		</Modal>
 	);
 };

@@ -49,11 +49,11 @@ export const SymbolButton: SymbolButtonComponent = ({
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu style={style}>
 			<DropdownMenuTrigger
 				accessibilityLabel={accessibilityLabel}
 				disabled={!enabled}
-				style={style}
+				className="flex-1"
 			>
 				{content}
 			</DropdownMenuTrigger>

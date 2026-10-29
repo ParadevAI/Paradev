@@ -2,21 +2,24 @@ import { View } from "react-native";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import type { ForwardSwipeComponent } from "./ForwardSwipe.types";
 
-const EDGE_WIDTH = 20;
+// Gesture navigation keeps the outer ~24dp for system Back.
+const EDGE_WIDTH = 40;
 const ACTIVATE_AFTER = 16;
 
 export const ForwardSwipe: ForwardSwipeComponent = ({
 	enabled,
 	onSwipeBegin,
 }) => {
+	// A 1px view with hit slop, not a 40dp strip: taps under the edge still
+	// reach the content, and only a leftward pan claims the touch.
 	const pan = usePanGesture({
 		enabled,
 		runOnJS: true,
+		hitSlop: { left: EDGE_WIDTH },
 		activeOffsetX: -ACTIVATE_AFTER,
 		failOffsetY: [-ACTIVATE_AFTER, ACTIVATE_AFTER],
 		onActivate: () => onSwipeBegin(),
 	});
-	if (!enabled) return null;
 	return (
 		<GestureDetector gesture={pan}>
 			<View
@@ -26,7 +29,7 @@ export const ForwardSwipe: ForwardSwipeComponent = ({
 					top: 0,
 					right: 0,
 					bottom: 0,
-					width: EDGE_WIDTH,
+					width: 1,
 					zIndex: 1,
 				}}
 			/>
