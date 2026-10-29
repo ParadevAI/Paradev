@@ -5,7 +5,7 @@ import type { CreatePaneInput, RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
-import { markChatSessionClosed } from "../../../../utils/closedChatSessions";
+import { markChatTerminalClosed } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 
@@ -22,7 +22,7 @@ export type ForkIntoOtherSurface = (
 ) => Promise<void>;
 
 type ChatFork =
-	| { status: "forked"; terminalId: string; sessionId: string }
+	| { status: "forked"; sessionId: string }
 	| { status: "unsupported" }
 	| { status: "empty" };
 
@@ -50,22 +50,27 @@ export function useSurfaceFork(
 	);
 
 	const forkIntoChat = useCallback(
-		async (presetId: string, harnessSessionId: string): Promise<ChatFork> => {
+		async (
+			presetId: string,
+			harnessSessionId: string,
+			terminalId: string,
+		): Promise<ChatFork> => {
 			const harness = acpHarnessForPreset(presetId);
 			if (!harness) return { status: "unsupported" };
 			// The host forks only a live chat, so the terminal's session is first
 			// loaded into a hidden one. It needs its own terminal id (the CLI's would
-			// rebind that terminal's agent) and the closed mark keeps auto-adopt off it.
+			// rebind that terminal's agent), closed before the request so auto-adopt
+			// never opens it.
+			const loaderTerminalId = crypto.randomUUID();
+			markChatTerminalClosed(loaderTerminalId);
 			const loader = await transport.createSession({
 				commandId: crypto.randomUUID(),
 				workspaceId,
 				harness,
-				terminalId: crypto.randomUUID(),
+				terminalId: loaderTerminalId,
 				resume: { harnessSessionId },
 			});
-			markChatSessionClosed(loader.sessionId);
 			try {
-				const terminalId = crypto.randomUUID();
 				const forked = await transport
 					.forkSession({
 						commandId: crypto.randomUUID(),
@@ -81,7 +86,7 @@ export function useSurfaceFork(
 					});
 				if (forked === "empty") return { status: "empty" };
 				return forked
-					? { status: "forked", terminalId, sessionId: forked.sessionId }
+					? { status: "forked", sessionId: forked.sessionId }
 					: { status: "unsupported" };
 			} finally {
 				void transport
@@ -99,12 +104,13 @@ export function useSurfaceFork(
 			});
 			const place = (newPane: CreatePaneInput<PaneViewerData>) => {
 				const state = ctx.store.getState();
-				if (placement === "tab") {
+				const current = state.getPane(ctx.pane.id);
+				if (placement === "tab" || !current) {
 					state.addTab({ panes: [newPane] });
 					return;
 				}
 				state.splitPane({
-					tabId: ctx.tab.id,
+					tabId: current.tabId,
 					paneId: ctx.pane.id,
 					position: "right",
 					newPane,
@@ -127,11 +133,15 @@ export function useSurfaceFork(
 				return;
 			}
 
+			const terminalId = crypto.randomUUID();
+			// Kept from auto-adopt until its pane exists, or it opens twice.
+			const releaseTerminal = markChatTerminalClosed(terminalId);
 			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
 			try {
 				const forked = await forkIntoChat(
 					source.presetId,
 					source.harnessSessionId,
+					terminalId,
 				);
 				if (forked.status !== "forked") {
 					toast.error(
@@ -149,7 +159,7 @@ export function useSurfaceFork(
 						? { titleOverride: ctx.pane.titleOverride }
 						: {}),
 					data: {
-						terminalId: forked.terminalId,
+						terminalId,
 						sessionId: forked.sessionId,
 						agent: { id: source.presetId },
 					} satisfies ChatPaneData,
@@ -159,6 +169,8 @@ export function useSurfaceFork(
 					id: toastId,
 					description: errorMessage(error, t({ message: "Unknown error" })),
 				});
+			} finally {
+				releaseTerminal();
 			}
 		},
 		[forkIntoChat, hasMessages, createNewAgentSession, t],

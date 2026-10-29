@@ -8525,7 +8525,7 @@ msgid "Fork session…"
 msgstr "Forker la session…"
 
 msgid "Forking into a chat…"
-msgstr "Fork dans un chat en cours…"
+msgstr "Création du fork dans un chat…"
 
 msgid "Form controls and field composition"
 msgstr "Contrôles de formulaire et composition des champs"
