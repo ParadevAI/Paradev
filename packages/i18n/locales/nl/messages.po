@@ -16363,6 +16363,9 @@ msgstr "Bekijk waar je laatste 30 dagen staan op de publieke ranglijst. Alleen t
 msgid "Select"
 msgstr "Select"
 
+msgid "Select a file to view it here"
+msgstr "Selecteer een bestand om het hier te bekijken"
+
 msgid "Select a project"
 msgstr "Kies een project"
 

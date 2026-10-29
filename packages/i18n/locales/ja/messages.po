@@ -16363,6 +16363,9 @@ msgstr "直近30日の実績が公開リーダーボードでどの位置にな�
 msgid "Select"
 msgstr "Select"
 
+msgid "Select a file to view it here"
+msgstr "ファイルを選択するとここに表示されます"
+
 msgid "Select a project"
 msgstr "プロジェクトを選択してください"
 

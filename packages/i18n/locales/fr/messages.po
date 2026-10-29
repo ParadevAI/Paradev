@@ -16363,6 +16363,9 @@ msgstr "Découvrez où se situent vos 30 derniers jours dans le classement publi
 msgid "Select"
 msgstr "Sélecteur"
 
+msgid "Select a file to view it here"
+msgstr "Sélectionnez un fichier pour l’afficher ici"
+
 msgid "Select a project"
 msgstr "Sélectionnez un projet"
 

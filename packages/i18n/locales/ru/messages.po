@@ -16363,6 +16363,9 @@ msgstr "Посмотрите, какое место ваши последние 
 msgid "Select"
 msgstr "Селект"
 
+msgid "Select a file to view it here"
+msgstr "Выберите файл, чтобы просмотреть его здесь"
+
 msgid "Select a project"
 msgstr "Выберите проект"
 
