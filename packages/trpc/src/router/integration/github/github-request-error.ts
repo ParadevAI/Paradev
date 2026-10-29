@@ -22,10 +22,3 @@ export function githubRequestError(
 		cause: error,
 	});
 }
-
-/** A read the organization's App could not make is the viewer's own to try. */
-export function hiddenFromApp(actsAsViewer: boolean, error: unknown): boolean {
-	if (actsAsViewer) return false;
-	const code = githubErrorCode(error);
-	return code === "NOT_FOUND" || code === "FORBIDDEN";
-}

@@ -423,6 +423,38 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).rejects.toThrow("Unknown worker.");
 	});
 
+	test("activity shows each person only their own DM and channels they can read", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const mine = await person(admin).agent.activity({ agentId: agent.id });
+		expect(mine.turns.map((turn) => turn.channelId)).toEqual([dm.channelId]);
+		const theirs = await person(outsider).agent.activity({ agentId: agent.id });
+		expect(theirs.turns).toEqual([]);
+	});
+
+	test("activity pages through turns that started at the same moment", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const startedAt = new Date();
+		await db.insert(schema.agentTurns).values(
+			Array.from({ length: 51 }, () => ({
+				organizationId: orgId,
+				agentId: agent.id,
+				sessionId: dm.sessionId,
+				status: "completed" as const,
+				reason: "direct_message" as const,
+				actingUserId: admin,
+				startedAt,
+			})),
+		);
+		const first = await person(admin).agent.activity({ agentId: agent.id });
+		const second = await person(admin).agent.activity({
+			agentId: agent.id,
+			cursor: first.nextCursor,
+		});
+		const ids = [...first.turns, ...second.turns].map((turn) => turn.id);
+		expect(ids).toHaveLength(52);
+		expect(new Set(ids).size).toBe(52);
+	});
+
 	test("a paused agent starts no turns", async () => {
 		const agent = await person(admin).agent.create({
 			organizationId: orgId,

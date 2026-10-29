@@ -20,6 +20,7 @@ import {
 	channelBroadcastValues,
 	channelKindValues,
 	channelMemberRoleValues,
+	channelMessageSubtypeValues,
 	channelNotifyValues,
 	channelVisibilityValues,
 	dockBounceValues,
@@ -41,6 +42,10 @@ export const channelBroadcast = pgEnum(
 );
 export const dockBounce = pgEnum("dock_bounce", dockBounceValues);
 export const channelKind = pgEnum("channel_kind", channelKindValues);
+export const channelMessageSubtype = pgEnum(
+	"channel_message_subtype",
+	channelMessageSubtypeValues,
+);
 
 /**
  * A conversation for a group of people and Devs in an organization, or a
@@ -120,7 +125,8 @@ export type SelectChannelMember = typeof channelMembers.$inferSelect;
  * A message in a channel. A reply carries `threadRootId`; the root keeps the
  * thread's reply count and last reply time so the timeline can draw the
  * replies line without counting. Deleting keeps the row (body cleared) so a
- * thread under a deleted message survives.
+ * thread under a deleted message survives. A `subtype` row records the
+ * author joining or leaving; `inviterId` is who added or removed them.
  */
 export const channelMessages = pgTable(
 	"channel_messages",
@@ -138,6 +144,10 @@ export const channelMessages = pgTable(
 			onDelete: "set null",
 		}),
 		body: text().notNull(),
+		subtype: channelMessageSubtype(),
+		inviterId: uuid("inviter_id").references(() => actors.id, {
+			onDelete: "set null",
+		}),
 		mentionedIds: uuid("mentioned_ids")
 			.array()
 			.notNull()

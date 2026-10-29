@@ -1,5 +1,6 @@
 import { db, dbWs } from "@superset/db/client";
 import {
+	environmentProjects,
 	environmentRepositories,
 	environmentScopeValues,
 	environmentSecrets,
@@ -120,6 +121,39 @@ async function repositoriesByEnvironment(
 	return map;
 }
 
+async function projectIdsByEnvironment(environmentIds: readonly string[]) {
+	const rows = environmentIds.length
+		? await db
+				.select({
+					environmentId: environmentProjects.environmentId,
+					projectId: environmentProjects.projectId,
+				})
+				.from(environmentProjects)
+				.where(inArray(environmentProjects.environmentId, [...environmentIds]))
+		: [];
+	const map = new Map<string, string[]>();
+	for (const { environmentId, projectId } of rows) {
+		map.set(environmentId, [...(map.get(environmentId) ?? []), projectId]);
+	}
+	return map;
+}
+
+async function linkProject(args: {
+	environmentId: string;
+	organizationId: string;
+	projectId: string;
+}) {
+	await db
+		.insert(environmentProjects)
+		.values(args)
+		.onConflictDoNothing({
+			target: [
+				environmentProjects.environmentId,
+				environmentProjects.projectId,
+			],
+		});
+}
+
 async function setEnvironmentRepositories(args: {
 	environmentId: string;
 	organizationId: string;
@@ -220,10 +254,15 @@ export const environmentRouter = {
 					),
 				)
 				.orderBy(asc(environments.name));
-			const repos = await repositoriesByEnvironment(rows);
+			const ids = rows.map((row) => row.id);
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment(rows),
+				projectIdsByEnvironment(ids),
+			]);
 			return rows.map((row) => ({
 				...row,
 				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
 			}));
 		}),
 
@@ -232,8 +271,15 @@ export const environmentRouter = {
 		.query(async ({ ctx, input }) => {
 			const row = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, row.organizationId);
-			const repos = await repositoriesByEnvironment([row]);
-			return { ...row, repositories: repos.get(row.id) ?? [] };
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment([row]),
+				projectIdsByEnvironment([row.id]),
+			]);
+			return {
+				...row,
+				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
+			};
 		}),
 
 	create: jwtProcedure
@@ -247,6 +293,7 @@ export const environmentRouter = {
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
+				projectId: z.string().min(1).max(200).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -288,11 +335,57 @@ export const environmentRouter = {
 					repositoryIds: input.repositoryIds,
 					primaryRepositoryId: input.primaryRepositoryId,
 				});
+				if (input.projectId) {
+					await linkProject({
+						environmentId: row.id,
+						organizationId: input.organizationId,
+						projectId: input.projectId,
+					});
+				}
 			} catch (error) {
 				await db.delete(environments).where(eq(environments.id, row.id));
 				throw error;
 			}
 			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
+		}),
+
+	linkProject: jwtProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await linkProject({
+				environmentId: environment.id,
+				organizationId: environment.organizationId,
+				projectId: input.projectId,
+			});
+			return { linked: true };
+		}),
+
+	unlinkProject: jwtProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await db
+				.delete(environmentProjects)
+				.where(
+					and(
+						eq(environmentProjects.environmentId, environment.id),
+						eq(environmentProjects.projectId, input.projectId),
+					),
+				);
+			return { linked: false };
 		}),
 
 	/** What promoting this workspace would make, before its golden is built. */

@@ -153,7 +153,7 @@ Never submit anything before the user explicitly picks 1 or 2. Loop on edits.
   EOF
   ```
   Only when the user agreed to them in step 1, add `--attach /path/to/screenshot.png` (comma-separated paths, about 3 MB total) and/or `--diagnostics`. The submission is sent from the user's Paradev account, a copy is CC'd to them, and the team replies to their account email.
-- If the CLI is missing or not logged in (`superset auth whoami` fails), offer `superset auth login` first; if declined, fall back to email: give the user a clickable mailto link (`mailto:support@superset.sh?subject=<url-encoded title>&body=<url-encoded body>`) and also print the raw draft so they can copy it.
+- If the CLI is missing or not logged in (`superset auth whoami` fails), offer `superset auth login` first; if declined, fall back to email: give the user a clickable mailto link (`mailto:support@paradev.com?subject=<url-encoded title>&body=<url-encoded body>`) and also print the raw draft so they can copy it.
 
 **Public path:**
 - **Check for duplicates first**: `gh search issues -R paradevai/paradev "<key terms>" --limit 5`. If an existing issue matches, show it and offer to comment there (`gh issue comment`) instead of opening a new one; only create a fresh issue if the user confirms it's genuinely different.

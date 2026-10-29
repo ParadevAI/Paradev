@@ -283,9 +283,10 @@ access at all. Writes always act as the person looking: the desktop with the
 GitHub login on that person's own machine (the `viewerGithub` router in the
 main process), otherwise and on mobile through the API's
 `integration.github.*PullRequest*` procedures with their Superset connection
-(`githubUserTokenFor`). Reads take the same path, except that a person with
-neither may still read through the organization's GitHub App installation;
-anything the App cannot see asks them to connect GitHub.
+(`githubUserTokenFor`). Reads take the same path. A person with neither is
+asked to connect GitHub; the organization's App installation is not a
+fallback, because its rate limit is shared by everything the organization
+runs.
 
 ## Runtime environment
 

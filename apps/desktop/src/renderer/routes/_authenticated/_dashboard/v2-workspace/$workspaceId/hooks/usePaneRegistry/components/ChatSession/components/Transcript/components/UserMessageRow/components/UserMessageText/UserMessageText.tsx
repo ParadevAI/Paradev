@@ -16,9 +16,12 @@ function segmentChip(
 ) {
 	const { element, text } = segment;
 	if (!element) return null;
-	if (element.elementKind === "slash_command" && text.startsWith("/")) {
-		const name = text.slice(1);
-		return commandChip(name, commands?.get(name)?.description);
+	if (element.elementKind === "slash_command") {
+		const name = text.replace(/^\//, "");
+		return {
+			...commandChip(name, commands?.get(name)?.description),
+			serialized: text,
+		};
 	}
 	return {
 		label: element.label ?? text.split("/").pop() ?? text,

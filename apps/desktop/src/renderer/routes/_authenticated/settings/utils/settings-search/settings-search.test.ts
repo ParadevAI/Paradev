@@ -158,19 +158,7 @@ describe("settings search - chat", () => {
 			getVisibleMatchCountBySection("acp", true, false).experimental,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("acp", true, false, false, false, true)
-				.experimental,
-		).toBe(1);
-	});
-});
-
-describe("settings search - right pane area", () => {
-	it("counts the Right pane area switch only when its flag is on", () => {
-		expect(
-			getVisibleMatchCountBySection("right pane", true, false).experimental,
-		).toBeUndefined();
-		expect(
-			getVisibleMatchCountBySection("right pane", true, false, false, true)
+			getVisibleMatchCountBySection("acp", true, false, false, true)
 				.experimental,
 		).toBe(1);
 	});

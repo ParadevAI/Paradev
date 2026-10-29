@@ -1,8 +1,20 @@
 import { afterEach, expect, mock, test } from "bun:test";
 import type { AppRouter } from "@superset/host-service/trpc";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/react";
 import type { TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
 import {
@@ -37,13 +49,20 @@ async function renderText(
 			queryClient={queryClient}
 		>
 			<ChatPaneActionsProvider openLink={openLink} workspaceId="workspace-1">
-				<div data-testid="messages" onCopy={copySourceText}>
-					{(Array.isArray(text) ? text : [text]).map((message) => (
-						<div key={message}>
-							<UserMessageText segments={[{ text: message }]} />
+				<ContextMenu>
+					<ContextMenuTrigger asChild>
+						<div data-testid="messages" onCopy={copySourceText}>
+							{(Array.isArray(text) ? text : [text]).map((message) => (
+								<div key={message}>
+									<UserMessageText segments={[{ text: message }]} />
+								</div>
+							))}
 						</div>
-					))}
-				</div>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuItem>Close Pane</ContextMenuItem>
+					</ContextMenuContent>
+				</ContextMenu>
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
@@ -67,6 +86,20 @@ test("a service link is a pill, the first other link its page title, the rest pl
 	expect(view.container.textContent).toBe(
 		"Look at PR #8329 and aContent · Agent Client Protocol\nthen https://example.com/later.",
 	);
+});
+
+test("right-clicking a link chip opens the link menu, not the pane's", async () => {
+	const { view } = await renderText(`Look at ${PR} and ${DOCS}`, {
+		title: "Content",
+		iconDataUrl: null,
+	});
+	for (const label of ["PR #8329", "Content"]) {
+		fireEvent.contextMenu(view.getByText(label));
+		expect(await screen.findByText("Copy Link")).toBeTruthy();
+		expect(screen.queryByText("Close Pane")).toBeNull();
+		fireEvent.keyDown(screen.getByText("Copy Link"), { key: "Escape" });
+		await waitFor(() => expect(screen.queryByText("Copy Link")).toBeNull());
+	}
 });
 
 test("the chip shows the bare host when no title comes back, and opens like a link", async () => {

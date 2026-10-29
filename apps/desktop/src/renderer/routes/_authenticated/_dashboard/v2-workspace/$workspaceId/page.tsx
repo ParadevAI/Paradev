@@ -32,11 +32,19 @@ import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarC
 import { HostConnectionPill } from "./components/HostConnectionPill";
 import { RightPaneArea } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
+import {
+	createRightPane,
+	getRightPaneOptions,
+	type RightPaneKind,
+} from "./components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "./components/V2NotificationStatusIndicator";
 import { V2PresetsBar } from "./components/V2PresetsBar";
 import { V2WorkspaceOpenInButton } from "./components/V2WorkspaceOpenInButton";
 import { V2WorkspaceRunButton } from "./components/V2WorkspaceRunButton";
-import { WorkspaceActivityMenu } from "./components/WorkspaceActivityMenu";
+import {
+	ActivityPanelAside,
+	WorkspaceActivityMenu,
+} from "./components/WorkspaceActivityMenu";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
@@ -54,6 +62,7 @@ import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
 import { useConsumeSubagentLink } from "./hooks/useConsumeSubagentLink";
 import { useCreatePendingMigratedTerminals } from "./hooks/useCreatePendingMigratedTerminals";
+import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
@@ -368,6 +377,7 @@ function V2WorkspaceContent() {
 
 	const {
 		openFilePaneFromTreeClick,
+		openPinnedFilePane,
 		revealPath,
 		selectedFilePath,
 		pendingReveal,
@@ -414,10 +424,20 @@ function V2WorkspaceContent() {
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
 		(filePath: string, openInNewTab?: boolean) => {
-			if (!isRightPaneAreaEnabled) setRightSidebarOpen(true);
-			openFilePaneFromTreeClick(filePath, openInNewTab);
+			if (!isRightPaneAreaEnabled) {
+				setRightSidebarOpen(true);
+				openFilePaneFromTreeClick(filePath, openInNewTab);
+				return;
+			}
+			if (openInNewTab) openFilePaneFromTreeClick(filePath, true);
+			else openPinnedFilePane(filePath);
 		},
-		[openFilePaneFromTreeClick, setRightSidebarOpen, isRightPaneAreaEnabled],
+		[
+			openFilePaneFromTreeClick,
+			openPinnedFilePane,
+			setRightSidebarOpen,
+			isRightPaneAreaEnabled,
+		],
 	);
 	const paneRegistry = usePaneRegistry({
 		onOpenDiff: openDiffPane,
@@ -428,6 +448,7 @@ function V2WorkspaceContent() {
 		linkedStores: linkedPaneStores,
 		onOpenSubagent: openSubagentPane,
 		onSearch: handleQuickOpen,
+		rightStore: isRightPaneAreaEnabled ? rightStore : undefined,
 	});
 	const defaultContextMenuActions = useDefaultContextMenuActions({
 		paneRegistry,
@@ -475,6 +496,32 @@ function V2WorkspaceContent() {
 			panes: [{ kind: "desktop", data: { kind: "desktop" } }],
 		});
 	}, [viewerTarget]);
+	const browserUrl = useDefaultBrowserUrl();
+	const rightPaneOptions = useMemo(
+		() =>
+			isRightPaneAreaEnabled
+				? getRightPaneOptions({
+						sandbox: isSandbox,
+						mobilePane: isMobilePaneEnabled,
+					}).filter((option) => option.kind !== "terminal")
+				: [],
+		[isRightPaneAreaEnabled, isSandbox, isMobilePaneEnabled],
+	);
+	const openInRightPane = useCallback(
+		(kind: RightPaneKind) => {
+			if (kind === "diff") {
+				openChanges();
+				return;
+			}
+			rightStore.getState().addTab({
+				panes: [
+					createRightPane(kind, { mintTerminalId: launcher.mint, browserUrl }),
+				],
+			});
+			openRightSidebar();
+		},
+		[openChanges, rightStore, launcher, browserUrl, openRightSidebar],
+	);
 	useRunPendingChatHandoff({
 		workspaceId,
 		isLayoutReady,
@@ -548,10 +595,6 @@ function V2WorkspaceContent() {
 	const renderWorkspaceToolbar = (isRightPaneOpen: boolean) => (
 		<WorkspaceToolbar
 			run={workspaceRun}
-			showChanges={isLayoutReady}
-			isChangesOpen={isChangesOpen}
-			onToggleChanges={toggleChanges}
-			onOpenPullRequest={openPullRequestPane}
 			isRightPaneOpen={isRightPaneOpen}
 			onToggleRightPane={toggleRightSidebar}
 			showWindowControls={!isMac}
@@ -567,6 +610,7 @@ function V2WorkspaceContent() {
 			onOpenPage={openPagePane}
 			onCreateNewAgentSession={createNewAgentSession}
 			onFocusAgentTerminal={focusAgentTerminal}
+			onOpenPullRequest={openPullRequestPane}
 			changes={
 				isRightPaneAreaEnabled
 					? { isOpen: isChangesOpen, onToggle: toggleChanges }
@@ -682,9 +726,14 @@ function V2WorkspaceContent() {
 													? addDesktopTab
 													: undefined
 											}
+											rightPaneOptions={rightPaneOptions}
+											onOpenInRightPane={openInRightPane}
 											showPresetsBar={showPresetsBar}
 											onToggleShowPresetsBar={setShowPresetsBar}
 										/>
+									)}
+									renderPaneAside={() => (
+										<ActivityPanelAside workspaceId={workspaceId} />
 									)}
 									renderTabBarLeading={() => <WindowChrome />}
 									renderTabBarTrailing={() => (

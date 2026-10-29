@@ -5,6 +5,8 @@ import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../types";
+import { closeFilePanes } from "./closeFilePanes";
+import { FileDeleteContext } from "./fileDeleteContext";
 import { dispatchFsEvent } from "./fileDocumentStore";
 import { FileMoveContext } from "./fileMoveContext";
 import { renameFilePanePaths } from "./renameFilePanePaths";
@@ -25,10 +27,20 @@ export function FileDocumentStoreProvider({
 		[workspace.id, stores],
 	);
 	useWorkspaceEvent("fs:events", workspace.id, handleFsEvent);
+	const handleDeleted = useCallback(
+		(absolutePath: string, isDirectory: boolean) => {
+			for (const store of stores) {
+				closeFilePanes(store, absolutePath, isDirectory);
+			}
+		},
+		[stores],
+	);
 
 	return (
 		<FileMoveContext.Provider value={handleFsEvent}>
-			{children}
+			<FileDeleteContext.Provider value={handleDeleted}>
+				{children}
+			</FileDeleteContext.Provider>
 		</FileMoveContext.Provider>
 	);
 }

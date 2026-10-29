@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# đăng nhập} other {# đăng nhập}}"
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# câu trả lời mới}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {# người khác}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {# đã qua} other {# đã qua}}"
@@ -532,6 +536,10 @@ msgstr "{0} dự án"
 msgid "{0} Running"
 msgstr "{0} đang chạy"
 
+#. placeholder {0}: selected.length
+msgid "{0} selected"
+msgstr "Đã chọn {0}"
+
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "Đã kết thúc {0} phiên"
@@ -749,9 +757,6 @@ msgstr "{appName} Mobile thuộc gói Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile chạy agent trên những máy tính bạn kết nối."
 
-msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
-msgstr "{approvalCount, plural, other {# cần phê duyệt}}"
-
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
 
@@ -863,9 +868,6 @@ msgstr "{count, plural, one {Đã dùng # nguồn} other {Đã dùng # nguồn}}
 
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {đã dùng # công cụ} other {đã dùng # công cụ}}"
-
-msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
-msgstr "{count, plural, other {đang chờ # agent con}}"
 
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
@@ -1220,12 +1222,6 @@ msgstr "{received} trên {total}"
 msgid "{remaining} tokens left"
 msgstr "Còn {remaining} token"
 
-msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
-msgstr "{repositoryFullName} không nằm trong {installedAccountLogin}, nơi GitHub App của tổ chức này được cài đặt."
-
-msgid "{repositoryFullName} isn't shared with the Paradev GitHub App yet."
-msgstr "{repositoryFullName} chưa được chia sẻ với GitHub App của Paradev."
-
 msgid "{seconds}s"
 msgstr "{seconds} giây"
 
@@ -1237,9 +1233,6 @@ msgstr "Đã chọn {selectedCount}"
 
 msgid "{share}% human"
 msgstr "{share}% con người"
-
-msgid "{shellCount, plural, one {# shell} other {# shells}}"
-msgstr "{shellCount, plural, other {# shell}}"
 
 msgid "{shown} of {total}"
 msgstr "{shown} trong {total}"
@@ -1260,9 +1253,6 @@ msgstr "{started, plural, one {Đã khởi chạy # tự động hóa} other {Đ
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# agent con đang chạy}}"
-
-msgid "{subagentCount, plural, one {# subagent} other {# subagents}}"
-msgstr "{subagentCount, plural, other {# agent con}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Đã tạo # workspace, {failCount} thất bại} other {Đã tạo # workspace, {failCount} thất bại}}"
@@ -1324,6 +1314,30 @@ msgstr "{used} / {size} token"
 msgid "{used} used"
 msgstr "Đã dùng {used}"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} và {others} đã tham gia rồi rời đi."
+
+msgid "{user} and {others} joined."
+msgstr "{user} và {others} đã tham gia."
+
+msgid "{user} and {others} left."
+msgstr "{user} và {others} đã rời đi."
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} và {others} đã tham gia lại."
+
+msgid "{user} joined and left."
+msgstr "{user} đã tham gia rồi rời đi."
+
+msgid "{user} joined."
+msgstr "{user} đã tham gia."
+
+msgid "{user} left."
+msgstr "{user} đã rời đi."
+
+msgid "{user} rejoined."
+msgstr "{user} đã tham gia lại."
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -1348,6 +1362,9 @@ msgstr "{years} năm trước"
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
 msgstr "@{0} · workspace cloud commit, push và mở pull request dưới tên bạn"
+
+msgid "@{accountLogin}"
+msgstr "@{accountLogin}"
 
 msgid "@superset"
 msgstr "@superset"
@@ -1935,7 +1952,7 @@ msgid "Add files, apps, and more (@)"
 msgstr "Thêm tệp, ứng dụng và hơn thế (@)"
 
 msgid "Add instructions"
-msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+msgstr "Thêm hướng dẫn"
 
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
@@ -2041,7 +2058,7 @@ msgid "Add to workspace"
 msgstr "Thêm vào workspace"
 
 msgid "Add what it does"
-msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
+msgstr "Thêm việc nó làm"
 
 msgid "Add your own terminal agent to this device."
 msgstr "Thêm agent terminal của riêng bạn vào thiết bị này."
@@ -2467,6 +2484,30 @@ msgstr "Có thể sửa kênh và thành viên"
 msgid "Also viewing this page"
 msgstr "Cũng đang xem trang này"
 
+msgid "Also, {user} and {others} joined and left."
+msgstr "Ngoài ra, {user} và {others} đã tham gia rồi rời đi."
+
+msgid "Also, {user} and {others} joined."
+msgstr "Ngoài ra, {user} và {others} đã tham gia."
+
+msgid "Also, {user} and {others} left."
+msgstr "Ngoài ra, {user} và {others} đã rời đi."
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "Ngoài ra, {user} và {others} đã tham gia lại."
+
+msgid "Also, {user} joined and left."
+msgstr "Ngoài ra, {user} đã tham gia rồi rời đi."
+
+msgid "Also, {user} joined."
+msgstr "Ngoài ra, {user} đã tham gia."
+
+msgid "Also, {user} left."
+msgstr "Ngoài ra, {user} đã rời đi."
+
+msgid "Also, {user} rejoined."
+msgstr "Ngoài ra, {user} đã tham gia lại."
+
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "Ngoài ra: @superset/ui/ai-elements/braille-spinner"
 
@@ -2553,6 +2594,12 @@ msgstr "Trả lời câu hỏi này trên máy tính, hoặc bỏ qua."
 
 msgid "Answered"
 msgstr "Đã trả lời"
+
+msgid "Answered {who} in #{channel}"
+msgstr "Đã trả lời {who} trong #{channel}"
+
+msgid "Answered you in #{channel}"
+msgstr "Đã trả lời bạn trong #{channel}"
 
 msgid "Anthropic rejected this API key."
 msgstr "Anthropic đã từ chối khóa API này."
@@ -2766,6 +2813,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "Lưu trữ"
+
+msgid "Archive {environmentName}?"
+msgstr "Lưu trữ {environmentName}?"
 
 msgid "Archive {name}?"
 msgstr "Lưu trữ {name}?"
@@ -3229,6 +3279,9 @@ msgstr "Thư mục gốc cho worktree mới trên {selectedHostLabel}"
 
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Thư mục gốc cho worktree mới trên {selectedHostName}."
+
+msgid "Base image · no checkpoint yet"
+msgstr "Image cơ sở · chưa có checkpoint"
 
 msgid "Base URL"
 msgstr "URL gốc"
@@ -3997,6 +4050,10 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · trước khi refactor tooltip"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+msgid "Checkpoint saved {0}"
+msgstr "Đã lưu checkpoint {0}"
+
 msgid "Checks"
 msgstr "Check"
 
@@ -4059,6 +4116,9 @@ msgstr "Chọn server MCP cho tin nhắn này"
 
 msgid "Choose the model"
 msgstr "Chọn mô hình"
+
+msgid "Choose the primary repository"
+msgstr "Chọn repository chính"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
@@ -4421,8 +4481,14 @@ msgstr "Đóng terminal này sẽ kết thúc tiến trình đang chạy."
 msgid "Cloud"
 msgstr "Cloud"
 
+msgid "Cloud environment setup"
+msgstr "Thiết lập environment đám mây"
+
 msgid "Cloud environments"
 msgstr "Môi trường đám mây"
+
+msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
+msgstr "Environment đám mây lấy các repository của bạn từ GitHub. Hãy kết nối những thứ này trước; bạn chỉ làm một lần."
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-giờ đám mây cho mỗi người dùng mỗi tháng"
@@ -4446,20 +4512,20 @@ msgstr "Không gian làm việc đám mây"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Không gian làm việc trên đám mây chưa được bật cho {account}. Tính năng này có trong gói Team và Ultra: nâng cấp trong Cài đặt, Thanh toán."
 
+msgid "Cloud workspaces commit, push and open pull requests as you"
+msgstr "Workspace đám mây commit, push và mở pull request với tư cách là bạn"
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Workspace đám mây bỏ qua biến này. Thay vào đó, các agent đăng nhập trong Cài đặt › Agent."
-
-msgid "Cloud workspaces need a project for now"
-msgstr "Hiện tại workspace đám mây cần có dự án"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Không gian làm việc trên đám mây cần gói Team hoặc Ultra. Nâng cấp trong Cài đặt, Thanh toán để khởi động."
 
+msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
+msgstr "Workspace đám mây mở trên repository này, và .superset/config.json của nó chạy thiết lập. Các repository khác được lấy về bên cạnh."
+
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Workspace đám mây sẽ ngừng chạy {agentLabel} với thông tin này."
-
-msgid "Cloud workspaces without a project are coming. Pick a project for now."
-msgstr "Workspace đám mây không cần dự án sắp ra mắt. Hiện tại hãy chọn một dự án."
 
 msgid "Co-founder & CTO, TrainLoop (YC W25)"
 msgstr "Đồng sáng lập & CTO, TrainLoop (YC W25)"
@@ -4696,6 +4762,9 @@ msgstr "config.json phải là một đối tượng JSON"
 msgid "Configure"
 msgstr "Cấu hình"
 
+msgid "Configure access"
+msgstr "Cấu hình quyền truy cập"
+
 msgid "Configure agents…"
 msgstr "Cấu hình agent…"
 
@@ -4707,9 +4776,6 @@ msgstr "Cấu hình tùy chọn chung của ứng dụng"
 
 msgid "Configure git branch and worktree behavior"
 msgstr "Cấu hình hành vi của nhánh git và worktree"
-
-msgid "Configure GitHub App"
-msgstr "Cấu hình GitHub App"
 
 msgid "Configure GitHub App…"
 msgstr "Cấu hình GitHub App…"
@@ -4786,9 +4852,6 @@ msgstr "Kết nối dịch vụ bên ngoài để đồng bộ dữ liệu."
 
 msgid "Connect GitHub"
 msgstr "Kết nối GitHub"
-
-msgid "Connect GitHub in Integrations to add {repositoryFullName}."
-msgstr "Kết nối GitHub trong Tích hợp để thêm {repositoryFullName}."
 
 msgid "Connect GitHub in Settings to act on pull requests as yourself"
 msgstr "Kết nối GitHub trong Cài đặt để thao tác với pull request dưới tên của bạn"
@@ -4888,6 +4951,9 @@ msgstr "Đã kết nối tới"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "Đã kết nối với {connectedOrgName}"
+
+msgid "Connected to GitHub as {accountLogin}"
+msgstr "Đã kết nối GitHub với tên {accountLogin}"
 
 msgid "Connected via subscription"
 msgstr "Đã kết nối qua gói đăng ký"
@@ -5657,6 +5723,9 @@ msgstr "Không thể tải các tin nhắn trước đó. Thử lại"
 msgid "Couldn't load issues: {msg}"
 msgstr "Không thể tải issue: {msg}"
 
+msgid "Couldn't load its activity"
+msgstr "Không thể tải hoạt động"
+
 msgid "Couldn't load pages"
 msgstr "Không thể tải các trang"
 
@@ -5858,6 +5927,9 @@ msgstr "Tạo \"{newLabel}\""
 msgid "Create a channel"
 msgstr "Tạo kênh"
 
+msgid "Create a cloud environment"
+msgstr "Tạo environment đám mây"
+
 msgid "Create a Dev"
 msgstr "Tạo Dev"
 
@@ -6014,6 +6086,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Đã tạo"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -6717,11 +6790,8 @@ msgstr "diff ở tab mới"
 msgid "Digital Product Designer"
 msgstr "Nhà thiết kế sản phẩm số"
 
-msgid "Direct message"
-msgstr "Tin nhắn trực tiếp"
-
 msgid "Direct messages"
-msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
+msgstr "Tin nhắn trực tiếp"
 
 msgid "Direct mode"
 msgstr "Chế độ trực tiếp"
@@ -6909,6 +6979,10 @@ msgstr "Chưa có tài khoản? <0>Đăng ký</0>"
 msgid "Don't Save"
 msgstr "Không lưu"
 
+msgid "Done"
+msgstr "Xong"
+
+msgctxt "subagent status"
 msgid "Done"
 msgstr "Xong"
 
@@ -7335,11 +7409,11 @@ msgstr "Enterprise"
 msgid "Environment"
 msgstr "Môi trường"
 
-msgid "Environment created"
-msgstr "Đã tạo environment"
+msgid "Environment archived"
+msgstr "Đã lưu trữ environment"
 
-msgid "Environment saved"
-msgstr "Đã lưu environment"
+msgid "Environment not found"
+msgstr "Không tìm thấy environment"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối thông tin đăng nhập, những kiểu hỏng buồn tẻ đã giết các lần chạy không giám sát năm 2025, phần lớn được xử lý bằng kỹ thuật chứ không phải bằng mô hình."
@@ -8302,7 +8376,7 @@ msgid "Find in this chat"
 msgstr "Tìm trong cuộc trò chuyện này"
 
 msgid "Find people and Devs"
-msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
+msgstr "Tìm người và Dev"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8429,6 +8503,12 @@ msgstr "Theo dõi chúng tôi trên LinkedIn"
 
 msgid "Follow us on X/Twitter"
 msgstr "Theo dõi chúng tôi trên X/Twitter"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "Đã tiếp tục với {who} trong #{channel}"
+
+msgid "Followed up with you in #{channel}"
+msgstr "Đã tiếp tục với bạn trong #{channel}"
 
 msgid "Font family"
 msgstr "Họ font"
@@ -9040,6 +9120,9 @@ msgstr "Ẩn phiên"
 msgid "Hide text"
 msgstr "Ẩn văn bản"
 
+msgid "Hide workspace activity"
+msgstr "Ẩn hoạt động của workspace"
+
 msgid "High"
 msgstr "Cao"
 
@@ -9182,7 +9265,7 @@ msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "Paradev khác gì so với chỉ chạy Claude Code trong terminal?"
 
 msgid "How it should work and what to avoid"
-msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+msgstr "Cách làm việc và những điều cần tránh"
 
 msgid "How it works"
 msgstr "Cách hoạt động"
@@ -9608,6 +9691,9 @@ msgstr "Đã cài"
 msgid "Installed by your organization"
 msgstr "Do tổ chức của bạn cài"
 
+msgid "Installed on {appAccountLogin}"
+msgstr "Đã cài trên {appAccountLogin}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceHasInstalls"
 msgstr "Các plugin đã cài đến từ {name}: {plugins}. Hãy gỡ chúng trước."
@@ -9922,6 +10008,18 @@ msgstr "Tham gia"
 #. placeholder {0}: formatDate(member.createdAt, { month: "long", year: "numeric" })
 msgid "Joined {0}"
 msgstr "Tham gia {0}"
+
+msgid "joined {channel} along with {others}."
+msgstr "đã tham gia {channel} cùng với {others}."
+
+msgid "joined {channel}."
+msgstr "đã tham gia {channel}."
+
+msgid "joined and left {channel} along with {others}."
+msgstr "đã tham gia rồi rời khỏi {channel} cùng với {others}."
+
+msgid "joined and left {channel}."
+msgstr "đã tham gia rồi rời khỏi {channel}."
 
 msgid "Joining…"
 msgstr "Đang tham gia…"
@@ -10255,6 +10353,12 @@ msgstr "Đang rời tổ chức..."
 msgid "Leaving..."
 msgstr "Đang rời..."
 
+msgid "left {channel} along with {others}."
+msgstr "đã rời khỏi {channel} cùng với {others}."
+
+msgid "left {channel}."
+msgstr "đã rời khỏi {channel}."
+
 msgid "Left organization"
 msgstr "Đã rời tổ chức"
 
@@ -10272,6 +10376,9 @@ msgstr "chưa đầy một phút trước"
 
 msgid "Let the agent drive."
 msgstr "Để agent điều khiển."
+
+msgid "Lets your organization list and clone repositories"
+msgstr "Cho phép tổ chức của bạn liệt kê và clone repository"
 
 msgid "Letter spacing (px)"
 msgstr "Giãn cách chữ (px)"
@@ -10394,6 +10501,9 @@ msgstr "Liên kết tác vụ này"
 
 msgid "Linked {slug} to workspace"
 msgstr "Đã liên kết {slug} với workspace"
+
+msgid "Linked to {projectName}"
+msgstr "Đã liên kết với {projectName}"
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -10733,6 +10843,9 @@ msgstr "Quản lý tài khoản…"
 msgid "Manage billing"
 msgstr "Quản lý thanh toán"
 
+msgid "Manage environments"
+msgstr "Quản lý environment"
+
 msgid "Manage integrations in the web app to connect and configure services."
 msgstr "Quản lý tích hợp trong ứng dụng web để kết nối và cấu hình dịch vụ."
 
@@ -10937,9 +11050,6 @@ msgstr "Tỷ lệ bộ nhớ"
 msgid "Mention."
 msgstr "Nhắc đến."
 
-msgid "Mentioned in a channel"
-msgstr "Được nhắc đến trong kênh"
-
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -11077,6 +11187,9 @@ msgstr "Bị bỏ lỡ"
 
 msgid "Missed <0>· 7d</0>"
 msgstr "Bị bỏ lỡ <0>· 7 ngày</0>"
+
+msgid "Missing a repository?"
+msgstr "Thiếu repository?"
 
 msgid "Missing authorization code. Re-run"
 msgstr "Thiếu mã cấp quyền. Hãy chạy lại"
@@ -11335,9 +11448,6 @@ msgstr "Cần chạy lại"
 
 msgid "Needs Action"
 msgstr "Cần xử lý"
-
-msgid "needs approval"
-msgstr "cần phê duyệt"
 
 msgid "Needs attention"
 msgstr "Cần chú ý"
@@ -11755,17 +11865,14 @@ msgstr "Chưa có lượt tải xuống nào"
 msgid "No emoji found"
 msgstr "Không tìm thấy emoji"
 
-msgid "No environment for {repositoryFullName}"
-msgstr "Không có môi trường cho {repositoryFullName}"
+msgid "No environments are linked to this project yet."
+msgstr "Chưa có environment nào được liên kết với dự án này."
 
 msgid "No environments available"
 msgstr "Không có environment nào"
 
 msgid "No environments found."
 msgstr "Không tìm thấy environment nào."
-
-msgid "No environments yet"
-msgstr "Chưa có môi trường nào"
 
 msgid "No environments yet."
 msgstr "Chưa có environment nào. Tạo một cái để khởi động workspace cloud từ đó."
@@ -11889,9 +11996,6 @@ msgstr "Không có thành viên tổ chức nào khớp."
 
 msgid "No matching pages"
 msgstr "Không có trang phù hợp"
-
-msgid "No matching repositories."
-msgstr "Không có repository nào khớp."
 
 msgid "No MCP servers found"
 msgstr "Không tìm thấy server MCP"
@@ -12032,6 +12136,9 @@ msgstr "Không có dự án nào khớp."
 msgid "No projects on this host yet"
 msgstr "Chưa có dự án nào trên host này"
 
+msgid "No projects to link."
+msgstr "Không có dự án nào để liên kết."
+
 msgid "No projects were deleted in the last 30 days."
 msgstr "Không có dự án nào bị xóa trong 30 ngày qua."
 
@@ -12053,14 +12160,14 @@ msgstr "Không tìm thấy pull request nào."
 msgid "No release notes at {url}"
 msgstr "Không có ghi chú phát hành tại {url}"
 
+msgid "No repositories found."
+msgstr "Không tìm thấy repository."
+
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Không tìm thấy repository nào. Hãy đảm bảo GitHub App của bạn có quyền truy cập repository."
 
 msgid "No repositories yet."
 msgstr "Chưa có repository nào."
-
-msgid "No repositories. Connect GitHub in Integrations, then refresh."
-msgstr "Không có repository. Hãy kết nối GitHub trong Tích hợp rồi làm mới."
 
 msgid "No results"
 msgstr "Không có kết quả"
@@ -12115,6 +12222,9 @@ msgstr "Không có star nào trong khoảng này."
 
 msgid "No Stripe customer found"
 msgstr "Không tìm thấy khách hàng Stripe"
+
+msgid "No subagents yet"
+msgstr "Chưa có agent con nào"
 
 msgid "no tags"
 msgstr "không có thẻ"
@@ -12194,6 +12304,9 @@ msgstr "Không tìm thấy dự án v1 trên thiết bị này."
 msgid "No v1 terminal scripts found."
 msgstr "Không tìm thấy tập lệnh terminal v1."
 
+msgid "No variables set yet."
+msgstr "Chưa đặt biến nào."
+
 msgid "No versions yet"
 msgstr "Chưa có phiên bản nào"
 
@@ -12244,6 +12357,9 @@ msgstr "Không ai review khác đi vì điều đó."
 
 msgid "None"
 msgstr "Không có"
+
+msgid "None selected"
+msgstr "Chưa chọn gì"
 
 msgid "None. This is the floor."
 msgstr "Không có. Đây là mức sàn."
@@ -12370,7 +12486,7 @@ msgid "Nothing was missed"
 msgstr "Không có lần chạy nào bị bỏ lỡ"
 
 msgid "Nothing yet"
-msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
+msgstr "Chưa có gì"
 
 msgid "Notice"
 msgstr "Thông báo"
@@ -12833,9 +12949,6 @@ msgstr "Mở tệp"
 msgid "Open File in New Tab"
 msgstr "Mở tệp ở tab mới"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "Mở tệp, diff và trình duyệt trong các tab ở bên phải, giữ khu vực giữa cho terminal và chat."
-
 msgid "Open from folder"
 msgstr "Mở từ thư mục"
 
@@ -13166,12 +13279,6 @@ msgstr "Mở trang"
 msgid "Opening worktree..."
 msgstr "Đang mở worktree..."
 
-msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
-msgstr "Mở một workspace cloud để agent cài đặt những gì dự án cần và ghi .superset/config.json của nó"
-
-msgid "Opens on"
-msgstr "Mở tại"
-
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -13277,6 +13384,9 @@ msgstr "Ứng dụng khác"
 
 msgid "Other devices"
 msgstr "Thiết bị khác"
+
+msgid "Other environments"
+msgstr "Environment khác"
 
 msgid "Other Hosts"
 msgstr "Host khác"
@@ -13494,6 +13604,9 @@ msgstr "Paradev cho đội ngũ của bạn"
 
 msgid "Paradev forwards the ports a remote workspace opens while you have it selected."
 msgstr "Paradev chuyển tiếp các cổng mà workspace từ xa mở trong lúc bạn chọn nó."
+
+msgid "Paradev GitHub App"
+msgstr "Paradev GitHub App"
 
 msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "Paradev có gói miễn phí. Mã nguồn có trên GitHub theo Elastic License 2.0 (ELv2), nên bạn có thể xem và tự host theo các điều khoản của giấy phép."
@@ -13854,14 +13967,14 @@ msgstr "Chọn thư mục dự án mới trên {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree của dự án trên {hostName}."
 
+msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
+msgstr "Chọn các repository mà nó lấy về. Một agent trên máy này sẽ tìm ra cần cài gì và chạy nó trên đám mây."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree trên {hostName}."
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "Chọn agent của bạn để cài bằng một dòng lệnh, hoặc tự sao chép cấu hình. Mọi client, kể cả thiết lập OAuth và khóa API, đều có trong <0>tài liệu đầy đủ về server MCP</0>."
-
-msgid "Picked by the channel"
-msgstr "Được kênh chọn"
 
 msgid "PID"
 msgstr "PID"
@@ -14174,6 +14287,9 @@ msgstr "Bảng giá"
 msgid "Pricing depends on your team and use case. Get in touch and we'll put together a plan that works for you."
 msgstr "Giá phụ thuộc vào đội ngũ và nhu cầu của bạn. Hãy liên hệ và chúng tôi sẽ đưa ra gói phù hợp."
 
+msgid "primary"
+msgstr "chính"
+
 msgid "Primary"
 msgstr "Chính"
 
@@ -14298,6 +14414,9 @@ msgstr "Dự án chưa được thiết lập trên host này"
 msgid "Project not trusted in Codex"
 msgstr "Dự án chưa được tin cậy trong Codex"
 
+msgid "Project on another device"
+msgstr "Dự án trên thiết bị khác"
+
 msgid "Project ready — open it from the sidebar."
 msgstr "Dự án đã sẵn sàng — mở nó từ thanh bên."
 
@@ -14333,9 +14452,6 @@ msgstr "Không kết nối được host của dự án — hiện không thể 
 
 msgid "Projects"
 msgstr "Dự án"
-
-msgid "Promoted from a workspace, so its repositories and region are fixed. Promote a workspace again to change them."
-msgstr "Được promote từ một workspace nên repository và khu vực là cố định. Promote lại một workspace để thay đổi."
 
 msgid "Prompt"
 msgstr "Prompt"
@@ -14697,10 +14813,10 @@ msgid "Reading your local usage…"
 msgstr "Đang đọc mức sử dụng cục bộ của bạn…"
 
 msgid "Reads and posts"
-msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+msgstr "Đọc và đăng"
 
 msgid "Ready"
-msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
+msgstr "Sẵn sàng"
 
 msgid "Ready for review"
 msgstr "Sẵn sàng review"
@@ -14853,9 +14969,6 @@ msgstr "Làm mới số liệu"
 msgid "Refresh pull requests"
 msgstr "Làm mới pull request"
 
-msgid "Refresh repositories"
-msgstr "Làm mới repository"
-
 msgid "Refreshes when Claude Code next runs."
 msgstr "Làm mới khi Claude Code chạy lần tiếp theo."
 
@@ -14870,6 +14983,18 @@ msgstr "Region"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "đã tham gia lại {channel} theo lời mời của {inviter}, cùng với {others}."
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "đã tham gia lại {channel} theo lời mời của {inviter}."
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "đã tham gia lại {channel}, cùng với {others}."
+
+msgid "rejoined {channel}."
+msgstr "đã tham gia lại {channel}."
 
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
@@ -14961,13 +15086,10 @@ msgid "Remove {label}?"
 msgstr "Gỡ {label}?"
 
 msgid "Remove {name}"
-msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
+msgstr "Xóa {name}"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
 msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn."
-
-msgid "Remove {repositoryName}"
-msgstr "Gỡ {repositoryName}"
 
 msgid "Remove attachment"
 msgstr "Xóa tệp đính kèm"
@@ -15176,6 +15298,9 @@ msgstr "Đã thay thế {replaced} tệp trong {where}"
 msgid "Replaced 1 file in {where}"
 msgstr "Đã thay thế 1 tệp trong {where}"
 
+msgid "Replied to your DM"
+msgstr "Đã trả lời tin nhắn trực tiếp của bạn"
+
 msgid "Reply"
 msgstr "Trả lời"
 
@@ -15188,8 +15313,14 @@ msgstr "Trả lời luồng…"
 msgid "Reply…"
 msgstr "Trả lời…"
 
+msgid "Replying in a thread"
+msgstr "Đang trả lời trong chuỗi"
+
 msgid "Replying to {replyingTo}"
 msgstr "Đang trả lời {replyingTo}"
+
+msgid "Replying to a DM"
+msgstr "Đang trả lời tin nhắn trực tiếp"
 
 msgid "repo"
 msgstr "repo"
@@ -15668,9 +15799,6 @@ msgstr "Nhập nâng cao ({hotkeyText})"
 
 msgid "right pane"
 msgstr "ngăn bên phải"
-
-msgid "Right pane area"
-msgstr "Khu vực ngăn bên phải"
 
 msgid "Right-click here"
 msgstr "Nhấp chuột phải ở đây"
@@ -16473,6 +16601,9 @@ msgstr "Gửi"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Gửi lời mời tham gia {organizationName}. Hết hạn sau 48 giờ."
 
+msgid "Send email and debug delivery"
+msgstr "Gửi email và gỡ lỗi việc gửi thư"
+
 msgid "Send Invitation"
 msgstr "Gửi lời mời"
 
@@ -16602,6 +16733,9 @@ msgstr "Phiên"
 msgid "Sessions · top {0} by cost"
 msgstr "Phiên · {0} phiên tốn nhiều nhất"
 
+msgid "Set"
+msgstr "Đã đặt"
+
 msgid "Set a notification schedule"
 msgstr "Đặt lịch thông báo"
 
@@ -16634,7 +16768,7 @@ msgstr "Đặt dự án này"
 msgid "Set up"
 msgstr "Thiết lập"
 
-#. placeholder {0}: name.trim()
+#. placeholder {0}: environment.name
 msgid "Set up {0}"
 msgstr "Thiết lập {0}"
 
@@ -16644,9 +16778,6 @@ msgstr "Thiết lập host qua SSH"
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
 
-msgid "Set up environment"
-msgstr "Thiết lập môi trường"
-
 msgid "Set up project on {hostName}"
 msgstr "Thiết lập dự án trên {hostName}"
 
@@ -16655,9 +16786,6 @@ msgstr "Thiết lập dự án…"
 
 msgid "Set up this project for Paradev"
 msgstr "Thiết lập dự án này cho Paradev"
-
-msgid "Set up with an agent"
-msgstr "Thiết lập bằng agent"
 
 msgid "Set up your organization to get started"
 msgstr "Thiết lập tổ chức của bạn để bắt đầu"
@@ -16893,6 +17021,9 @@ msgstr "Cho tôi xem 10 lần chạy gần nhất của tự động hóa phân 
 msgid "Show more"
 msgstr "Hiện thêm"
 
+msgid "Show older"
+msgstr "Hiện mục cũ hơn"
+
 msgid "Show on Sidebar"
 msgstr "Hiển thị trên thanh bên"
 
@@ -16940,6 +17071,9 @@ msgstr "Xem bản dịch"
 
 msgid "Show usage tab on sidebar"
 msgstr "Hiển thị thẻ mức sử dụng trên thanh bên"
+
+msgid "Show workspace activity"
+msgstr "Hiện hoạt động của workspace"
 
 msgid "showArrow opt-in"
 msgstr "bật showArrow"
@@ -17207,6 +17341,9 @@ msgstr "Mặt cười & Con người"
 msgid "Smoother onboarding"
 msgstr "Onboarding mượt hơn"
 
+msgid "Snapshot"
+msgstr "Snapshot"
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Chụp nhanh không gian làm việc này ở trạng thái hiện tại, cùng mọi thứ đã cài đặt. Các không gian làm việc mới từ môi trường này bắt đầu từ bản chụp đó."
 
@@ -17259,6 +17396,9 @@ msgstr "Một số mục v1 chưa được chuyển"
 msgid "Some v1 work needs your attention"
 msgstr "Một số công việc v1 cần bạn chú ý"
 
+msgid "someone"
+msgstr "ai đó"
+
 msgid "Someone"
 msgstr "Ai đó"
 
@@ -17291,8 +17431,8 @@ msgstr "Đã xảy ra lỗi."
 msgid "Something went wrong. Please try again."
 msgstr "Đã xảy ra lỗi. Vui lòng thử lại."
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "Đã xảy ra lỗi. Hãy thử lại hoặc liên hệ support@superset.sh."
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "Đã xảy ra lỗi. Hãy thử lại hoặc liên hệ support@paradev.com."
 
 msgid "soon"
 msgstr "sắp tới"
@@ -18046,7 +18186,7 @@ msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "Lâu hơn bình thường. Nó vẫn tiếp tục nếu bạn rời đi."
 
 msgid "Talk to it"
-msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+msgstr "Trò chuyện"
 
 msgid "Talk to Paradev"
 msgstr "Trò chuyện với Paradev"
@@ -18612,8 +18752,8 @@ msgstr "Nhà cung cấp trả về {0}."
 msgid "The provider refused it."
 msgstr "Nhà cung cấp đã từ chối."
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "Thời hạn khôi phục đã kết thúc. Hãy liên hệ support@superset.sh."
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "Thời hạn khôi phục đã kết thúc. Hãy liên hệ support@paradev.com."
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "Nhánh remote đã rẽ nhánh khác. Hãy pull trước khi tiếp tục."
@@ -18974,6 +19114,9 @@ msgstr "Đường dẫn này tồn tại nhưng không phải thư mục."
 msgid "This path is a directory"
 msgstr "Đường dẫn này là một thư mục"
 
+msgid "This permanently removes the saved environment for everyone with access to it. Workspaces already running from it stay available."
+msgstr "Thao tác này xóa vĩnh viễn môi trường đã lưu đối với mọi người có quyền truy cập. Các workspace đang chạy từ môi trường này vẫn dùng được."
+
 msgid "This port is still in use"
 msgstr "Cổng này vẫn đang được dùng"
 
@@ -19151,9 +19294,6 @@ msgstr "Chuỗi trong #{channelName}"
 
 msgid "Thread not found"
 msgstr "Không tìm thấy luồng"
-
-msgid "Thread reply"
-msgstr "Trả lời trong luồng"
 
 msgid "Threads"
 msgstr "Chuỗi"
@@ -19706,6 +19846,9 @@ msgstr "Workspace không xác định"
 
 msgid "Unlimited"
 msgstr "Không giới hạn"
+
+msgid "Unlink project"
+msgstr "Hủy liên kết dự án"
 
 msgid "Unlink task"
 msgstr "Bỏ liên kết nhiệm vụ"
@@ -20284,6 +20427,18 @@ msgstr "Cảnh báo"
 msgid "Warning occurred."
 msgstr "Có cảnh báo."
 
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "đã được {inviter} thêm vào {channel}, cùng với {others}."
+
+msgid "was added to {channel} by {inviter}."
+msgstr "đã được {inviter} thêm vào {channel}."
+
+msgid "was added to this conversation by {inviter}."
+msgstr "đã được {inviter} thêm vào cuộc trò chuyện này."
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "đã bị {inviter} xóa khỏi cuộc trò chuyện này."
+
 msgid "Watch a design review go from comment to new version."
 msgstr "Xem một buổi duyệt thiết kế đi từ bình luận đến phiên bản mới."
 
@@ -20613,9 +20768,6 @@ msgstr "có hoặc không có tệp đính kèm"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Với ứng dụng di động Paradev, tôi có thể xử lý sự cố trên môi trường production từ bất cứ đâu."
 
-msgid "Woke itself"
-msgstr "Tự thức dậy"
-
 msgid "Wordmark, black"
 msgstr "Wordmark, đen"
 
@@ -20663,8 +20815,8 @@ msgstr "Đang chạy {0} phút {1} giây"
 msgid "Working for {seconds}s"
 msgstr "Đang chạy {seconds} giây"
 
-msgid "Working on"
-msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
+msgid "Working on a mention"
+msgstr "Đang xử lý một lượt nhắc"
 
 msgid "Working…"
 msgstr "Đang xử lý…"
@@ -20695,6 +20847,10 @@ msgstr "Hành động workspace"
 
 msgid "Workspace activity"
 msgstr "Hoạt động của không gian làm việc"
+
+#. placeholder {0}: currentPr.number
+msgid "Workspace activity, pull request #{0}"
+msgstr "Hoạt động của workspace, pull request #{0}"
 
 msgid "Workspace agents"
 msgstr "Agent của workspace"
@@ -21050,6 +21206,9 @@ msgstr "Bạn được mời tham gia {organization}"
 msgid "you@example.com"
 msgstr "you@example.com"
 
+msgid "Your account can be connected later in Settings → Connections"
+msgstr "Bạn có thể kết nối tài khoản sau trong Cài đặt → Kết nối"
+
 msgid "Your account is deactivated and will be permanently deleted soon. Reactivate to restore it exactly as you left it."
 msgstr "Tài khoản của bạn đã bị vô hiệu hóa và sẽ sớm bị xóa vĩnh viễn. Kích hoạt lại để khôi phục đúng như lúc bạn rời đi."
 
@@ -21089,6 +21248,9 @@ msgstr "Email của bạn (không bắt buộc)"
 msgid "Your first agent"
 msgstr "Agent đầu tiên của bạn"
 
+msgid "Your GitHub account"
+msgstr "Tài khoản GitHub của bạn"
+
 msgid "Your GitHub account cannot reach a repository in this environment"
 msgstr "Tài khoản GitHub của bạn không truy cập được một repository trong environment này"
 
@@ -21117,6 +21279,9 @@ msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Hãy
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). Hãy lưu trữ một môi trường hoặc nâng cấp trong Cài đặt, Thanh toán để thêm."
+
+msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
+msgstr "Tổ chức của bạn đã đạt giới hạn {reachedLimit} environment. Hãy lưu trữ một environment để có chỗ trống."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

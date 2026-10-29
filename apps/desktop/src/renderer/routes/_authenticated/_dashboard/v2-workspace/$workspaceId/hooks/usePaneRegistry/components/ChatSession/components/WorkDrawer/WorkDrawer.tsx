@@ -1,11 +1,6 @@
-import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { type SessionSnapshot, userMessageText } from "@superset/chat/core";
-import type {
-	ApprovalRequest,
-	BackgroundTask,
-	UserMessage,
-} from "@superset/chat/protocol";
+import { userMessageText } from "@superset/chat/core";
+import type { UserMessage } from "@superset/chat/protocol";
 import { cn } from "@superset/ui/utils";
 import {
 	type FocusEvent,
@@ -14,34 +9,22 @@ import {
 	type RefObject,
 	useImperativeHandle,
 	useLayoutEffect,
-	useMemo,
 	useRef,
 	useState,
 } from "react";
-import { useNow } from "renderer/hooks/useNow";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { parseAttachmentTags } from "../../utils/attachmentTags";
 import { DrawerSection } from "./components/DrawerSection";
 import { QueuedPromptRow } from "./components/QueuedPromptRow";
 import { QueuePausedBar } from "./components/QueuePausedBar";
-import { RunningRow } from "./components/RunningRow";
 import { usePaneThird } from "./hooks/usePaneThird";
 import { useQueueActions } from "./hooks/useQueueActions";
 import type { DrawerExit, DrawerQueue, WorkDrawerHandle } from "./types";
-import {
-	type RunningRow as RunningEntry,
-	runningRows,
-} from "./utils/runningRows";
 
 const MAX_HEIGHT = "13.5rem";
 const STOP_SELECTOR = "[data-drawer-stop]";
 
-type Section = "queued" | "running";
-
-type Entry =
-	| { kind: "queued"; prompt: UserMessage }
-	| { kind: "running"; row: RunningEntry }
-	| { kind: "header"; section: Section };
+type Entry = { kind: "queued"; prompt: UserMessage } | { kind: "header" };
 
 const hasAttachments = (prompt: UserMessage) =>
 	prompt.content.some((content) => content.type === "attachment") ||
@@ -61,73 +44,35 @@ function focusStop(stop: HTMLElement | undefined) {
 export function WorkDrawer({
 	ref,
 	queue,
-	tasks,
-	snapshot,
-	approvals = [],
 	paneRef,
-	now: readNow = Date.now,
 	onAppendToComposer,
 	onExit,
-	onOpenSubagent,
-	onStop,
-	onMoveToBackground,
 }: {
 	ref?: Ref<WorkDrawerHandle>;
 	queue?: DrawerQueue;
-	tasks: readonly BackgroundTask[];
-	snapshot: SessionSnapshot;
-	approvals?: readonly ApprovalRequest[];
 	paneRef?: RefObject<HTMLElement | null>;
-	now?: () => number;
 	onAppendToComposer: (text: string) => void;
 	onExit: (exit: DrawerExit) => void;
-	onOpenSubagent: (itemId: string) => void;
-	onStop: (taskId: string) => void;
-	onMoveToBackground: (taskId: string) => void;
 }) {
 	const { t } = useLingui();
 	const rootRef = useRef<HTMLDivElement>(null);
-	const [collapsed, setCollapsed] = useState({ queued: false, running: false });
+	const [collapsed, setCollapsed] = useState(false);
 	const [activeKey, setActiveKey] = useState<string | null>(null);
 	const lastFocusRef = useRef<string | null>(null);
 	const previousKeysRef = useRef<string[]>([]);
 	const queueActions = useQueueActions(queue, onAppendToComposer);
-	const asking = useMemo(
-		() => new Set(approvals.flatMap((approval) => approval.parentItemId ?? [])),
-		[approvals],
-	);
-	const running = runningRows(
-		tasks,
-		snapshot,
-		asking,
-		t({ message: "Subagent" }),
-		(count) =>
-			plural(count, {
-				one: "waiting on # subagent",
-				other: "waiting on # subagents",
-			}),
-	);
 	const prompts = queue?.prompts ?? [];
 	const actionableQueue = queue?.actionable === true;
-	const now = useNow(1000, running.length > 0, readNow).getTime();
 	const paneThird = usePaneThird(paneRef);
 
 	const showQueuedHeader = prompts.length > 1;
-	if (!showQueuedHeader && collapsed.queued)
-		setCollapsed((current) => ({ ...current, queued: false }));
+	if (!showQueuedHeader && collapsed) setCollapsed(false);
 	const entries = new Map<string, Entry>();
 	if (prompts.length > 0) {
-		if (showQueuedHeader)
-			entries.set("header:queued", { kind: "header", section: "queued" });
-		if (!showQueuedHeader || !collapsed.queued)
+		if (showQueuedHeader) entries.set("header:queued", { kind: "header" });
+		if (!showQueuedHeader || !collapsed)
 			for (const prompt of prompts)
 				entries.set(`queued:${prompt.id}`, { kind: "queued", prompt });
-	}
-	if (running.length > 0) {
-		entries.set("header:running", { kind: "header", section: "running" });
-		if (!collapsed.running)
-			for (const row of running)
-				entries.set(`running:${row.task.id}`, { kind: "running", row });
 	}
 	const keys = [...entries.keys()];
 	const lastKey =
@@ -135,9 +80,7 @@ export function WorkDrawer({
 	const tabbableKey =
 		activeKey !== null && entries.has(activeKey) ? activeKey : lastKey;
 	const keySignature = keys.join("\n");
-	const hasActionableEntry =
-		(actionableQueue && prompts.length > 0) ||
-		running.some((row) => row.kind === "subagent" || row.canStop);
+	const hasActionableEntry = actionableQueue && prompts.length > 0;
 
 	const exit = (mode: DrawerExit) => {
 		lastFocusRef.current = null;
@@ -184,49 +127,38 @@ export function WorkDrawer({
 		exit("composer");
 	}, [keySignature]);
 
-	if (prompts.length === 0 && running.length === 0) return null;
+	if (prompts.length === 0) return null;
 
-	const toggle = (section: Section) => {
+	const toggle = () => {
 		const active = document.activeElement;
 		const header = rootRef.current?.querySelector<HTMLElement>(
-			`[data-drawer-stop="header:${section}"]`,
+			'[data-drawer-stop="header:queued"]',
 		);
 		if (
-			!collapsed[section] &&
+			!collapsed &&
 			active instanceof HTMLElement &&
-			active.dataset.drawerStop?.startsWith(`${section}:`)
+			active.dataset.drawerStop?.startsWith("queued:")
 		)
 			header?.focus();
-		setCollapsed((current) => ({ ...current, [section]: !current[section] }));
+		setCollapsed((current) => !current);
 	};
 
 	const primary = (entry: Entry) => {
 		switch (entry.kind) {
 			case "header":
-				toggle(entry.section);
+				toggle();
 				return true;
 			case "queued":
 				if (!actionableQueue) return false;
 				queueActions.onSteer(entry.prompt.id);
 				exit("composer");
 				return true;
-			case "running":
-				if (entry.row.kind !== "subagent") return false;
-				onOpenSubagent(entry.row.task.id);
-				exit("composer");
-				return true;
 		}
 	};
 
 	const remove = (entry: Entry) => {
-		if (entry.kind === "header") return false;
-		if (entry.kind === "queued") {
-			if (!actionableQueue) return false;
-			queueActions.onRemove(entry.prompt.id);
-			return true;
-		}
-		if (!entry.row.canStop) return false;
-		onStop(entry.row.task.id);
+		if (entry.kind === "header" || !actionableQueue) return false;
+		queueActions.onRemove(entry.prompt.id);
 		return true;
 	};
 
@@ -298,37 +230,6 @@ export function WorkDrawer({
 		if (event.target.isConnected) lastFocusRef.current = null;
 	};
 
-	const queuedCount = prompts.length;
-	const runningCount = running.length;
-	const subagentCount = running.filter((row) => row.kind === "subagent").length;
-	const shellCount = runningCount - subagentCount;
-	const approvalCount = running.filter((row) => row.needsApproval).length;
-	const runningSummary = (
-		<>
-			<span className="truncate">
-				{[
-					subagentCount > 0 &&
-						plural(subagentCount, {
-							one: "# subagent",
-							other: "# subagents",
-						}),
-					shellCount > 0 &&
-						plural(shellCount, { one: "# shell", other: "# shells" }),
-				]
-					.filter(Boolean)
-					.join(" · ")}
-			</span>
-			{approvalCount > 0 && (
-				<span className="shrink-0 text-warning">
-					{plural(approvalCount, {
-						one: "# needs approval",
-						other: "# need approval",
-					})}
-				</span>
-			)}
-		</>
-	);
-
 	return (
 		<div className={cn(CHAT_GUTTER_CLASSNAME, "-mb-1")}>
 			<div className={CHAT_COLUMN_CLASSNAME}>
@@ -350,79 +251,37 @@ export function WorkDrawer({
 								: MAX_HEIGHT,
 						}}
 					>
-						{prompts.length > 0 && (
-							<DrawerSection
-								stopKey="header:queued"
-								tabbable={tabbableKey === "header:queued"}
-								banner={
-									queue?.paused && (
-										<QueuePausedBar
-											actionable={queue.actionable}
-											onClear={queueActions.onClear}
-											onResume={queueActions.onResume}
-										/>
-									)
-								}
-								expanded={!collapsed.queued}
-								showHeader={showQueuedHeader}
-								onToggle={() => toggle("queued")}
-								count={queuedCount}
-								title={t({ message: "Queued" })}
-							>
-								{prompts.map((prompt) => (
-									<QueuedPromptRow
-										actionable={actionableQueue}
-										key={prompt.id}
-										onEdit={queueActions.onEdit}
-										onRemove={queueActions.onRemove}
-										onSteer={queueActions.onSteer}
-										prompt={prompt}
-										rowKey={`queued:${prompt.id}`}
-										tabbable={tabbableKey === `queued:${prompt.id}`}
+						<DrawerSection
+							stopKey="header:queued"
+							tabbable={tabbableKey === "header:queued"}
+							banner={
+								queue?.paused && (
+									<QueuePausedBar
+										actionable={queue.actionable}
+										onClear={queueActions.onClear}
+										onResume={queueActions.onResume}
 									/>
-								))}
-							</DrawerSection>
-						)}
-						{prompts.length > 0 && running.length > 0 && (
-							<div className="mx-2 my-1 border-border/60 border-t" />
-						)}
-						{running.length > 0 && (
-							<DrawerSection
-								stopKey="header:running"
-								tabbable={tabbableKey === "header:running"}
-								expanded={!collapsed.running}
-								onToggle={() => toggle("running")}
-								count={runningCount}
-								summary={runningSummary}
-								title={t({ message: "Running" })}
-							>
-								{running.map((row) => (
-									<RunningRow
-										key={row.task.id}
-										kind={row.kind}
-										name={row.name}
-										needsApproval={row.needsApproval}
-										now={now}
-										onMoveToBackground={
-											row.canBackground
-												? () => onMoveToBackground(row.task.id)
-												: undefined
-										}
-										onOpen={
-											row.kind === "subagent"
-												? () => onOpenSubagent(row.task.id)
-												: undefined
-										}
-										onStop={row.canStop ? () => onStop(row.task.id) : undefined}
-										rowKey={`running:${row.task.id}`}
-										runningSubagents={row.runningSubagents}
-										startedAtMs={row.task.startedAtMs}
-										step={row.step}
-										tabbable={tabbableKey === `running:${row.task.id}`}
-									/>
-								))}
-							</DrawerSection>
-						)}
+								)
+							}
+							expanded={!collapsed}
+							showHeader={showQueuedHeader}
+							onToggle={toggle}
+							count={prompts.length}
+							title={t({ message: "Queued" })}
+						>
+							{prompts.map((prompt) => (
+								<QueuedPromptRow
+									actionable={actionableQueue}
+									key={prompt.id}
+									onEdit={queueActions.onEdit}
+									onRemove={queueActions.onRemove}
+									onSteer={queueActions.onSteer}
+									prompt={prompt}
+									rowKey={`queued:${prompt.id}`}
+									tabbable={tabbableKey === `queued:${prompt.id}`}
+								/>
+							))}
+						</DrawerSection>
 					</div>
 				</div>
 			</div>

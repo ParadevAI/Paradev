@@ -716,6 +716,57 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"resend": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "resend",
+		"version": "1.0.0",
+		"description": "Send and debug email with Resend: emails, domains, contacts, broadcasts, and inboxes.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"resend",
+			"email",
+			"transactional",
+			"domains",
+			"broadcasts"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Resend",
+					"category": "Developer tools",
+					"icon": "resend"
+				},
+				"connector": {
+					"slug": "resend_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.resend.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "debug-resend-delivery",
+				"description": "Find out why an email sent with Resend did not arrive — find the email, read its status, then check the API log, the suppression list, the sending domain, and the webhook that should have reported it. Use when the user says an email never arrived, went to spam, bounced, or that their app's sends or webhooks are failing."
+			},
+			{
+				"name": "send-with-resend",
+				"description": "Send email through Resend without surprising anyone — check the sending domain first, prove the message on Resend's test addresses, and get the user's confirmation before mail goes to a real inbox. Use when the user asks to send, schedule, or batch-send an email, test a template, or wire Resend sending into a codebase."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

@@ -17,14 +17,19 @@ import {
 } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
+import { HeaderTabs } from "renderer/routes/_authenticated/_dashboard/components/HeaderTabs";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { PROTOCOL_SCHEME } from "shared/constants";
 
 type Dev = RouterOutputs["agent"]["get"];
 
+export type DevTab = "chat" | "activity";
+
 interface DevHeaderProps {
 	dev: Dev;
+	tab: DevTab;
+	onTabChange: (tab: DevTab) => void;
 	panel: { isOpen: boolean; toggle: () => void };
 	onCustomize: () => void;
 	onTogglePause: () => void;
@@ -33,6 +38,8 @@ interface DevHeaderProps {
 
 export function DevHeader({
 	dev,
+	tab,
+	onTabChange,
 	panel,
 	onCustomize,
 	onTogglePause,
@@ -46,13 +53,23 @@ export function DevHeader({
 			className="border-b border-border"
 			reservesWindowControls={!panel.isOpen}
 			start={
-				<div className="flex min-w-0 items-center gap-2 px-1.5">
-					<DevAvatar
-						avatar={dev.avatar}
-						size={20}
-						mood={isPaused ? "asleep" : "idle"}
+				<div className="flex min-w-0 items-center gap-3">
+					<div className="flex min-w-0 items-center gap-2 px-1.5">
+						<DevAvatar
+							avatar={dev.avatar}
+							size={20}
+							mood={isPaused ? "asleep" : "idle"}
+						/>
+						<span className="truncate text-[15px] font-bold">{dev.name}</span>
+					</div>
+					<HeaderTabs
+						tabs={[
+							{ value: "chat", label: t({ message: "Chat" }) },
+							{ value: "activity", label: t({ message: "Activity" }) },
+						]}
+						value={tab}
+						onChange={onTabChange}
 					/>
-					<span className="truncate text-[15px] font-bold">{dev.name}</span>
 				</div>
 			}
 			end={

@@ -198,7 +198,6 @@ export const FEATURE_FLAGS = {
 	 * Replaces the v2 workspace's right sidebar with a second pane area that
 	 * holds Files, Changes, Review, Browser and Chat panes.
 	 */
-	RIGHT_PANE_AREA: "right-pane-area",
 	/**
 	 * Who may use cloud sandboxes: shows the option in the create picker, and
 	 * gates the cloud procedures server-side (`assertCloudAccess`). The release
