@@ -20,14 +20,14 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { QuestionPage } from "./components/QuestionPage";
 import {
 	answerText,
 	type FormValues,
 	isInvalidNumber,
 	isPageAnswered,
 	questionPages,
-} from "./utils/questionPages";
+} from "../../../../../../utils/questionPages";
+import { QuestionPage } from "./components/QuestionPage";
 
 function focusIfLost(element: HTMLElement | null) {
 	const focused = document.activeElement;

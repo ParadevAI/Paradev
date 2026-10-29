@@ -166,6 +166,14 @@
 		"version": "1.29.0+bfc1ec72a",
 		"node": 24
 	},
+	"pdev": {
+		"sha256": "fc16cd4c039a98e05dd2da478aa1cbd02b12139ed84f41b4444cc2e3558a6817",
+		"suffix": ".tar.gz",
+		"dest": "/usr/local/share/superset/media/pdev-0.2.2.tar.gz",
+		"mode": "0644",
+		"source": "https://github.com/ParadevAI/pdev/releases/download/v0.2.2/pdev-0.2.2-linux-x64.tar.gz",
+		"version": "0.2.2"
+	},
 	"wallpaper-0": {
 		"sha256": "497a4edb230a58ea385c8b63fe8135e47554cb4a5169de3f6bbae293a1f5435a",
 		"suffix": ".jpg",

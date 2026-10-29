@@ -1,6 +1,7 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, normalize, resolve } from "node:path";
 import { transformAsync } from "@babel/core";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import type { Plugin } from "vite";
 
 import { main, resources } from "../package.json";
@@ -21,7 +22,7 @@ export function defineEnv(
 	value: string | undefined,
 	fallback?: string,
 ): string {
-	return JSON.stringify(value ?? fallback);
+	return JSON.stringify(fallback === undefined ? value : value || fallback);
 }
 
 const RESOURCES_TO_COPY = [
@@ -111,16 +112,17 @@ export function linguiMacroPlugin(): Plugin {
 function connectSrcOrigins(): string {
 	const origins = [
 		process.env.NEXT_PUBLIC_API_URL || "https://api.superset.sh",
-		process.env.NEXT_PUBLIC_MARKETING_URL || "https://superset.sh",
+		process.env.NEXT_PUBLIC_MARKETING_URL ||
+			`https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh"}`,
 		process.env.RELAY_URL || "https://relay.superset.sh",
 		process.env.REALTIME_URL || "https://realtime.superset.sh",
 		process.env.SANDBOX_GATE_ORIGIN ||
 			"https://*.sandbox.supersetusercontent.com",
 		process.env.R2_ENDPOINT || "https://*.r2.cloudflarestorage.com",
 	];
-	return [
-		...new Set(origins.flatMap((url) => [url, url.replace(/^http/, "ws")])),
-	].join(" ");
+	return withOwnDomainTwins(
+		origins.flatMap((url) => [url, url.replace(/^http/, "ws")]),
+	).join(" ");
 }
 
 export function htmlEnvTransformPlugin(): Plugin {

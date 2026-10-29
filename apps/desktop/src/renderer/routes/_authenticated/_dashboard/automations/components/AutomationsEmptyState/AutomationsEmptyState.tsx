@@ -33,7 +33,7 @@ export function AutomationsEmptyState({
 				</div>
 				<div className="space-y-2">
 					<h2 className="flex items-center gap-2 font-semibold text-lg tracking-tight">
-						<Trans>What should run on a schedule?</Trans>
+						<Trans>What should run automatically?</Trans>
 						{showProBadge && (
 							<Badge variant="default">
 								<Trans>PRO</Trans>

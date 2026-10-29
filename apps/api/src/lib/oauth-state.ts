@@ -34,6 +34,7 @@ export const linearStateSchema = basePayloadSchema.extend({
 
 export const connectorStateSchema = basePayloadSchema.extend({
 	codeVerifier: z.string().optional(),
+	plugin: z.string().optional(),
 });
 
 export type ConnectorState = z.infer<typeof connectorStateSchema>;

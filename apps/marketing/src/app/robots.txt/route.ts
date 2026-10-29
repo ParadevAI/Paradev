@@ -26,11 +26,9 @@ export function GET() {
 	const content = `# Default: open to all crawlers
 User-Agent: *
 Allow: /
-Allow: /api/llms.txt
-Disallow: /api/
 
 # AI assistants, AI search, and AI training crawlers: explicitly welcome
-${WELCOME_AI_AGENTS.map((agent) => `User-Agent: ${agent}\nAllow: /\nAllow: /api/llms.txt\nDisallow: /api/`).join("\n\n")}
+${WELCOME_AI_AGENTS.map((agent) => `User-Agent: ${agent}\nAllow: /`).join("\n\n")}
 
 # Content Signals (https://contentsignals.org)
 Content-Signal: search=yes, ai-input=yes, ai-train=yes

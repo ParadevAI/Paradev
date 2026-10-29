@@ -90,7 +90,7 @@ export function AgentDetail({
 		joinArgs(config.promptArgs),
 	);
 	const [resumeArgsText, setResumeArgsText] = useState(
-		joinArgs(config.resumeArgs),
+		joinArgs(config.resumeArgs ?? []),
 	);
 	const [forkArgsText, setForkArgsText] = useState(
 		joinArgs(config.forkArgs ?? []),
@@ -109,7 +109,7 @@ export function AgentDetail({
 			}),
 		);
 		setPromptArgsText(joinArgs(config.promptArgs));
-		setResumeArgsText(joinArgs(config.resumeArgs));
+		setResumeArgsText(joinArgs(config.resumeArgs ?? []));
 		setForkArgsText(joinArgs(config.forkArgs ?? []));
 		setPromptTransport(config.promptTransport);
 	}, [
@@ -246,8 +246,8 @@ export function AgentDetail({
 	const handleResumeArgsBlur = () => {
 		const args = parseArgs(resumeArgsText);
 		const changed =
-			args.length !== config.resumeArgs.length ||
-			args.some((arg, i) => arg !== config.resumeArgs[i]);
+			args.length !== (config.resumeArgs ?? []).length ||
+			args.some((arg, i) => arg !== (config.resumeArgs ?? [])[i]);
 		if (changed) updateMutation.mutate({ resumeArgs: args });
 	};
 
@@ -330,7 +330,7 @@ export function AgentDetail({
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center gap-1.5">
 									<div className="text-sm font-medium">
-										<Trans>Superset hooks</Trans>
+										<Trans>Paradev hooks</Trans>
 									</div>
 									<Tooltip>
 										<TooltipTrigger asChild>
@@ -339,10 +339,10 @@ export function AgentDetail({
 										<TooltipContent side="top" className="max-w-[320px]">
 											<Trans>
 												Registers lifecycle hooks in this agent's global config
-												so Superset can show status and send notifications.
-												Turning this off removes Superset's entries everywhere —
+												so Paradev can show status and send notifications.
+												Turning this off removes Paradev's entries everywhere —
 												status and notifications stop for this agent, including
-												inside Superset.
+												inside Paradev.
 											</Trans>
 										</TooltipContent>
 									</Tooltip>
@@ -355,7 +355,7 @@ export function AgentDetail({
 							</div>
 							<Switch
 								aria-label={t({
-									message: "Superset hooks",
+									message: "Paradev hooks",
 								})}
 								checked={hooksEnabled}
 								onCheckedChange={(enabled) =>

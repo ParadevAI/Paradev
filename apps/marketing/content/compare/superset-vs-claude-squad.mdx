@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Claude Squad (2026): Desktop Workspace vs Terminal Multiplexer"
-description: "Compare Superset and Claude Squad for running multiple coding agents in Git worktrees. See how a desktop agent workspace differs from a terminal TUI."
+title: "Paradev vs Claude Squad (2026): Desktop Workspace vs Terminal Multiplexer"
+description: "Compare Paradev and Claude Squad for running multiple coding agents in Git worktrees. See how a desktop agent workspace differs from a terminal TUI."
 date: 2026-07-13
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - git worktree agents
 ---
 
-Superset and Claude Squad both run multiple coding agents in parallel, each in its own Git worktree. Claude Squad does it as a terminal app: a TUI that manages agent sessions with Git worktrees and tmux. Superset does it as a desktop workspace, layering diff review, an in-app browser, MCP, and remote and cloud workspaces on the same worktree model. If you love the terminal, Claude Squad is lean and effective; if you want a graphical workspace around the same idea, Superset covers more.
+Paradev and Claude Squad both run multiple coding agents in parallel, each in its own Git worktree. Claude Squad does it as a terminal app: a TUI that manages agent sessions with Git worktrees and tmux. Paradev does it as a desktop workspace, layering diff review, an in-app browser, MCP, and remote and cloud workspaces on the same worktree model. If you love the terminal, Claude Squad is lean and effective; if you want a graphical workspace around the same idea, Paradev covers more.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Claude Squad** |
+| | **Paradev** | **Claude Squad** |
 |---|---|---|
 | **Category** | Desktop agent orchestration workspace | Terminal TUI for managing agents |
 | **What it does** | Runs multiple agents in parallel with worktree isolation, review, and browser | Runs multiple agent sessions in isolated worktrees via tmux |
@@ -35,9 +35,9 @@ Superset and Claude Squad both run multiple coding agents in parallel, each in i
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Claude Squad?
 
@@ -47,15 +47,15 @@ Claude Squad is an open-source terminal app that manages multiple AI coding agen
 
 ### Terminal TUI vs Desktop Workspace
 
-Claude Squad lives entirely in the terminal. It is fast, keyboard-driven, and pairs worktrees with tmux to keep sessions isolated. Superset is a graphical desktop workspace: the same local branch-based worktree isolation, but with panes, a built-in diff and file editor, an in-app browser for docs and dev servers, and one-click handoff into your IDE. Which you prefer comes down to whether you want a lean terminal tool or a full workspace UI.
+Claude Squad lives entirely in the terminal. It is fast, keyboard-driven, and pairs worktrees with tmux to keep sessions isolated. Paradev is a graphical desktop workspace: the same local branch-based worktree isolation, but with panes, a built-in diff and file editor, an in-app browser for docs and dev servers, and one-click handoff into your IDE. Which you prefer comes down to whether you want a lean terminal tool or a full workspace UI.
 
 ### Review and Extras
 
-Because Claude Squad is terminal-native, review happens in the agent itself or in whatever editor you open. Superset adds review, browser preview, port management, and MCP tooling in one app. If you want those surfaces built in rather than assembled yourself, that is Superset's advantage.
+Because Claude Squad is terminal-native, review happens in the agent itself or in whatever editor you open. Paradev adds review, browser preview, port management, and MCP tooling in one app. If you want those surfaces built in rather than assembled yourself, that is Paradev's advantage.
 
 ### Reach Beyond One Machine
 
-Superset extends past the local desktop with Remote Access to your other machines and cloud workspaces, plus a CLI and MCP server. Claude Squad runs locally. If moving work across machines or scripting the orchestration matters, Superset offers more.
+Paradev extends past the local desktop with Remote Access to your other machines and cloud workspaces, plus a CLI and MCP server. Claude Squad runs locally. If moving work across machines or scripting the orchestration matters, Paradev offers more.
 
 ### Shared Foundation
 
@@ -65,13 +65,13 @@ Both are agent-agnostic and both make a Git worktree per agent the unit of isola
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Claude Squad is free and open source (AGPL-3.0). In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Claude Squad is free and open source (AGPL-3.0). In both cases, you still pay the underlying providers for Claude Code, Codex, or any compatible API usage.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want a graphical workspace with built-in review and browser
 - Need remote, cloud, CLI, or MCP surfaces
@@ -85,20 +85,20 @@ Superset offers a free tier and Pro at $20/seat/month. Claude Squad is free and 
 - Want a free, open-source tool with minimal footprint
 - Only need local, single-machine orchestration
 
-**Verdict:** Claude Squad is a great fit if you want a lightweight terminal multiplexer for parallel agents and are happy managing review yourself. Superset is the better fit if you want the same worktree model wrapped in a desktop workspace with review, browser, remote hosting, and MCP built in.
+**Verdict:** Claude Squad is a great fit if you want a lightweight terminal multiplexer for parallel agents and are happy managing review yourself. Paradev is the better fit if you want the same worktree model wrapped in a desktop workspace with review, browser, remote hosting, and MCP built in.
 
 ---
 
 ## Frequently Asked Questions
 
-### Do Superset and Claude Squad both use Git worktrees?
+### Do Paradev and Claude Squad both use Git worktrees?
 
-Yes. Both support worktree-backed tasks. Superset creates a worktree and branch for each new local branch-based workspace. Claude Squad adds tmux for terminal sessions; Superset adds a desktop UI, review, and browser around the same model.
+Yes. Both support worktree-backed tasks. Paradev creates a worktree and branch for each new local branch-based workspace. Claude Squad adds tmux for terminal sessions; Paradev adds a desktop UI, review, and browser around the same model.
 
 ### Is Claude Squad only for Claude Code?
 
-No. Despite the name, Claude Squad is agent-agnostic and runs Claude Code, Codex, Gemini, Aider, OpenCode, Amp, and custom agents. Superset is likewise agent-agnostic.
+No. Despite the name, Claude Squad is agent-agnostic and runs Claude Code, Codex, Gemini, Aider, OpenCode, Amp, and custom agents. Paradev is likewise agent-agnostic.
 
 ### Which one has a graphical interface?
 
-Superset is a graphical desktop app. Claude Squad is a terminal TUI. If you want built-in visual diff review and a browser, Superset provides them; if you prefer the terminal, Claude Squad is lighter.
+Paradev is a graphical desktop app. Claude Squad is a terminal TUI. If you want built-in visual diff review and a browser, Paradev provides them; if you prefer the terminal, Claude Squad is lighter.

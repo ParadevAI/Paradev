@@ -8,13 +8,23 @@ import {
 import type { ApiAuthProvider } from "../../../providers/auth/types";
 import type { ApiClient } from "../../../types";
 import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
-import { rethrowCloudUnreachable } from "./cloud-api-error";
+import {
+	rethrowCloudUnreachable,
+	rethrowSessionRejected,
+} from "./cloud-api-error";
 
 const ORGANIZATION_CACHE_TTL_MS = 60 * 60 * 1000;
 const MIN_API_TOKEN_LIFETIME_MS = 5 * 60 * 1000;
 
 async function readBearer(apiAuth: ApiAuthProvider): Promise<string | null> {
-	const authorization = (await apiAuth.getHeaders()).Authorization;
+	let authorization: string | undefined;
+	try {
+		authorization = (await apiAuth.getHeaders()).Authorization;
+	} catch (error) {
+		rethrowCloudUnreachable(error);
+		rethrowSessionRejected(error);
+		throw error;
+	}
 	return authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
 }
 
@@ -58,6 +68,7 @@ async function getOrganization(
 		});
 	} catch (error) {
 		rethrowCloudUnreachable(error);
+		rethrowSessionRejected(error);
 		throw error;
 	}
 	if (!organization) {

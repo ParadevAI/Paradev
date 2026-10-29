@@ -24,20 +24,25 @@ import {
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
+import {
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
+	type SandboxFile,
+} from "./credentials";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
  * A session ends after this long; the workspace's files survive and the next
- * open resumes it. A workspace someone has open is extended before it gets
- * there (`wakeSandbox`), so this is really the idle stop, and how long an
- * unattended agent run can last.
+ * open resumes it. A workspace someone has open (`wakeSandbox`) or whose agent
+ * is active (`topUpSandboxSession`) is extended before it gets there, so this
+ * is really the idle stop.
  */
-const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
-/** Extend an open workspace's session when it has less than this left. */
-const EXTEND_BELOW_MS = 60 * 60 * 1000;
+export const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
+/** Above the 10-minute client keepalive, so an open workspace is always extended in time. */
+const EXTEND_BELOW_MS = 30 * 60 * 1000;
+const MIN_TOP_UP_MS = 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
-export const IMAGE_SANDBOX_VCPUS = 8;
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const BOOT_COMMAND = "/usr/local/bin/superset-boot";
@@ -98,8 +103,11 @@ export interface SandboxClaim {
 	hostSecret: string;
 	managedEnv: Record<string, string>;
 	networkPolicy: NetworkPolicy;
+	/** The creator's agent login files; a golden under construction has none. */
+	files?: SandboxFile[];
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
+	vcpus: number;
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -139,6 +147,19 @@ async function writeIdentity(
 			mode: 0o644,
 		},
 	]);
+}
+
+/**
+ * The agents' login files, on every wake including one that finds the box
+ * serving: a sign-in made since the last boot has to reach the next agent
+ * started there. They hold placeholders only.
+ */
+async function writeSignInFiles(
+	sandbox: Sandbox,
+	files: SandboxFile[] = [],
+): Promise<void> {
+	if (files.length === 0) return;
+	await sandbox.writeFiles(files.map((file) => ({ ...file, mode: 0o644 })));
 }
 
 /**
@@ -196,19 +217,21 @@ export async function provisionSandbox(args: {
 	const sandbox =
 		(await getSandbox(args.name)) ??
 		(args.environment.sourceKind === "fork"
-			? // A fork copies the golden's resources and its region; a snapshot
-				// only exists where it was taken.
+			? // A fork copies the golden's region; a snapshot only exists where
+				// it was taken.
 				await Sandbox.fork({
 					...config,
 					sourceSandbox: args.environment.sourceRef,
+					resources: { vcpus: args.claim.vcpus },
 				})
 			: await Sandbox.create({
 					...config,
 					image: args.environment.sourceRef,
 					region: args.environment.region as SandboxRegion,
-					resources: { vcpus: IMAGE_SANDBOX_VCPUS },
+					resources: { vcpus: args.claim.vcpus },
 				}));
 	await writeIdentity(sandbox, args.claim.identity);
+	await writeSignInFiles(sandbox, args.claim.files);
 	await runBoot(sandbox, args.claim.hostSecret);
 	return {
 		providerSandboxId: args.name,
@@ -330,6 +353,24 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	}
 }
 
+/**
+ * Extends a running session so it ends `SESSION_TIMEOUT_MS` from now; never
+ * wakes a stopped one. The provider only extends by a duration, and refuses
+ * past the plan's 24h session cap. Goes through the session:
+ * `Sandbox.extendTimeout` resumes a session that stopped meanwhile.
+ */
+export async function topUpSandboxSession(
+	providerSandboxId: string,
+): Promise<void> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (sandbox?.status !== "running" || !sandbox.expiresAt) return;
+	const extension =
+		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
+	if (extension > MIN_TOP_UP_MS) {
+		await sandbox.currentSession().extendTimeout(extension);
+	}
+}
+
 /** Whether host-service is already serving, so a wake can skip the boot. */
 async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 	try {
@@ -369,11 +410,22 @@ export async function wakeSandbox(args: {
 		});
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
 		const wasRunning = sandbox.status === "running";
+		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
+		if (!wasRunning && vcpus !== args.claim.vcpus) {
+			await sandbox
+				.update({ resources: { vcpus: args.claim.vcpus } })
+				.then(() => {
+					vcpus = args.claim.vcpus;
+				})
+				.catch((error) =>
+					console.warn(
+						`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
+						error,
+					),
+				);
+		}
 		if (!wasRunning && args.beforeResume) {
-			await args.beforeResume({
-				memoryMb: sandbox.memory ?? IMAGE_SANDBOX_VCPUS * MEMORY_MB_PER_VCPU,
-				vcpus: sandbox.vcpus ?? IMAGE_SANDBOX_VCPUS,
-			});
+			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
 		}
 		if (wasRunning) {
 			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
@@ -396,6 +448,7 @@ export async function wakeSandbox(args: {
 					),
 				),
 			serving ? null : writeIdentity(sandbox, args.claim.identity),
+			writeSignInFiles(sandbox, args.claim.files),
 		]);
 		if (!serving) await runBoot(sandbox, args.claim.hostSecret);
 		await settleSandbox({
@@ -428,6 +481,8 @@ const INHERITED_IDENTITY = [
 	`${SANDBOX_PATHS.home}/.superset/host`,
 	`${SANDBOX_PATHS.home}/.gitconfig`,
 	`${SANDBOX_PATHS.workspace}/.env`,
+	CODEX_AUTH_PATH,
+	CODEX_SYSTEM_CONFIG_PATH,
 ];
 
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
@@ -490,6 +545,7 @@ export async function promoteSandboxToEnvironment(args: {
 	await waitForStopSnapshot(args.goldenName, created);
 	if (wasRunning) {
 		await writeIdentity(source, args.claim.identity);
+		await writeSignInFiles(source, args.claim.files);
 		await runBoot(source, args.claim.hostSecret);
 	}
 	return { goldenName: args.goldenName, region: source.region };
@@ -544,7 +600,7 @@ export interface BoxSession {
 }
 
 const LIVE_STATUSES = new Set(["pending", "running"]);
-const SESSION_SEARCH_LIMIT = 20;
+const SESSION_PAGE_SIZE = 20;
 
 export function sessionEndedAt(session: {
 	status: string;
@@ -594,17 +650,14 @@ export async function findSandboxSession(
 ): Promise<{ session: BoxSession | null } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
 	if (!sandbox) return null;
-	let seen = 0;
 	for await (const raw of await sandbox.listSessions({
 		sortOrder: "desc",
-		limit: SESSION_SEARCH_LIMIT,
+		limit: SESSION_PAGE_SIZE,
 	})) {
 		const session = toBoxSession(raw);
 		if (session && (sessionId === null || session.id === sessionId)) {
 			return { session };
 		}
-		seen += 1;
-		if (seen >= SESSION_SEARCH_LIMIT) break;
 	}
 	return { session: null };
 }
@@ -622,14 +675,15 @@ export async function listActiveWorkspaceSandboxes(
 ): Promise<string[]> {
 	const names: string[] = [];
 	const oldestRunning = Date.now() - SESSION_MAX_MS;
+	// Vercel's tag filter uses creation-order pagination instead of statusUpdatedAt.
 	for await (const sandbox of await Sandbox.list({
 		...credentials(),
-		tags: { kind: "workspace" },
 		sortBy: "statusUpdatedAt",
 		sortOrder: "desc",
 	})) {
 		const updatedAt = sandbox.statusUpdatedAt ?? sandbox.updatedAt;
 		if (updatedAt < oldestRunning) break;
+		if (sandbox.tags?.kind !== "workspace") continue;
 		if (UNSETTLED_SANDBOX_STATUSES.has(sandbox.status) || updatedAt >= since) {
 			names.push(sandbox.name);
 		}

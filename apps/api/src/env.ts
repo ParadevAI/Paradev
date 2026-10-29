@@ -12,6 +12,10 @@ export const env = createEnv({
 		DATABASE_URL_UNPOOLED: z.string(),
 		GOOGLE_CLIENT_ID: z.string().min(1),
 		GOOGLE_CLIENT_SECRET: z.string().min(1),
+		// Google connections (Gmail triggers and the Gmail plugin) sign in with
+		// this client; GOOGLE_CLIENT_ID is for Sign in with Google only.
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1),
 		GH_CLIENT_ID: z.string().min(1),
 		GH_CLIENT_SECRET: z.string().min(1),
 		// Gmail push: the Pub/Sub topic `users.watch` publishes to, and the
@@ -64,7 +68,7 @@ export const env = createEnv({
 		// edit page, under the webhook documentation.
 		YC_DEALS_WEBHOOK_SECRET: z.string().min(1).optional(),
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
-		YC_BOOKFACE_COUPON_ID: z.string().min(1).default("yc-bookface-6mo"),
+		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-6mo-pro"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app

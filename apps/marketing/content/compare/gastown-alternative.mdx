@@ -1,8 +1,8 @@
 ---
 title: "Best Gas Town Alternatives in 2026"
-description: "The best alternatives to Gas Town for orchestrating fleets of AI coding agents, including Superset, Orchestrator, Herdr, Firstmate, and Symphony."
+description: "The best alternatives to Gas Town for orchestrating fleets of AI coding agents, including Paradev, Orchestrator, Herdr, Firstmate, and Symphony."
 date: 2026-08-07
-lastUpdated: 2026-10-07
+lastUpdated: 2026-10-20
 type: "roundup"
 competitors:
   - gastown
@@ -20,13 +20,17 @@ keywords:
 
 Gas Town is Steve Yegge's MIT-licensed orchestrator for running 20-30 coding agents on a sustained, autonomous basis: an AI Mayor dispatches work from a git-backed ledger, watchdogs recover stuck agents, and a bisecting merge queue lands the results. It is also heavy machinery -- Go, Dolt, tmux, and Beads to operate, a single-operator model, an admittedly steep bar, and token costs its author warns about outright. Here are the best Gas Town alternatives in 2026.
 
+**Our recommendation: choose Paradev if you want to run the CLI agents you already use in parallel worktrees, with review, a browser, automations, and remote and cloud workspaces in one place.** The alternatives below cover other preferences.
+
+[Download Paradev](/download) to try a small task, or read [Paradev vs Gas Town](/compare/superset-vs-gastown) for the direct comparison. This guide is published by Paradev; recommendations describe workflow fit rather than benchmark results.
+
 ---
 
 ## The Short Version
 
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
-| **Superset** | Fleet-scale parallel agents with visibility, review, and automations | macOS; experimental Linux AppImage; Windows unavailable | Source-available (ELv2) |
+| **Paradev** | Fleet-scale parallel agents with visibility, review, and automations | macOS; experimental Linux AppImage; Windows unavailable | Source-available (ELv2) |
 | **Orchestrator** | Project planning and worker-owned PR feedback | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Herdr** | Persistent terminal runtime for many agents | macOS, Linux, Windows (beta) | Open source (Apache-2.0) |
 | **Firstmate** | Lightweight crew delegation, nothing to install | Terminal (macOS, Linux) | Open source (MIT) |
@@ -38,39 +42,39 @@ Gas Town optimizes for maximum autonomy per operator, and the costs follow: real
 
 ## The Best Alternatives
 
-### Superset
+### Paradev
 
-Superset scales to large agent fleets while keeping humans usefully in the loop: any CLI agent in automatic worktree isolation, every terminal and diff visible in one workspace, orchestrating agents that spawn workers through the CLI and MCP server, and scheduled automations with a TypeScript SDK and Slack bot for the unattended slice. It installs as a desktop app, works across your machines via remote and cloud workspaces, and has team plans -- the fleet without the factory floor.
+Paradev scales to large agent fleets while keeping humans usefully in the loop: any CLI agent in automatic worktree isolation, every terminal and diff visible in one workspace, orchestrating agents that spawn workers through the CLI and MCP server, and scheduled automations with a TypeScript SDK and Slack bot for the unattended slice. It installs as a desktop app, works across your machines via remote and cloud workspaces, and has team plans -- the fleet without the factory floor.
 
-For the direct comparison, see [Superset vs Gas Town](/compare/superset-vs-gastown).
+For the direct comparison, see [Paradev vs Gas Town](/compare/superset-vs-gastown).
 
 ### Orchestrator
 
 Orchestrator (formerly Agent Orchestrator, Apache-2.0) combines a project planning agent, worktree workers, and PR feedback that returns CI failures, review comments, and merge conflicts to the responsible worker. Its cross-platform desktop app also has file review, recurring automations, and paired iOS and Android apps.
 
-See [Superset vs Orchestrator](/compare/superset-vs-agent-orchestrator).
+See [Paradev vs Orchestrator](/compare/superset-vs-agent-orchestrator).
 
 ### Herdr
 
 Herdr covers the runtime layer: an always-on server that keeps dozens of agent terminals alive with status visualization, worktree management in the CLI, and a JSON socket API. You bring the coordination; it brings the persistence.
 
-See [Superset vs Herdr](/compare/superset-vs-herdr).
+See [Paradev vs Herdr](/compare/superset-vs-herdr).
 
 ### Firstmate
 
 Firstmate is the featherweight take on Gas Town's delegation idea: an MIT "agent distro" where one agent you talk to spawns and supervises crewmates in tmux windows and disposable worktrees. No daemon, no database -- just instructions and scripts.
 
-See [Superset vs Firstmate](/compare/superset-vs-firstmate).
+See [Paradev vs Firstmate](/compare/superset-vs-firstmate).
 
 ### Symphony
 
 Symphony, OpenAI's open-source spec and reference daemon, shares Gas Town's unattended ethos with a simpler control plane: your issue tracker. Tickets become isolated autonomous Codex runs that end in PRs. Codex-only and an engineering preview, but far less machinery.
 
-See [Superset vs Symphony](/compare/superset-vs-symphony).
+See [Paradev vs Symphony](/compare/superset-vs-symphony).
 
 ## How To Choose
 
-- For fleet-scale agents with visibility, review, and team features, choose **Superset**.
+- For fleet-scale agents with visibility, review, and team features, choose **Paradev**.
 - For project planning and worker-owned PR feedback, choose **Orchestrator**.
 - For terminal persistence under your own coordination, choose **Herdr**.
 - For the lightest possible crew model, choose **Firstmate**.
@@ -78,17 +82,17 @@ See [Superset vs Symphony](/compare/superset-vs-symphony).
 
 ## Verdict
 
-Gas Town is the boldest autonomy experiment in the category and its ideas -- the work ledger, the merge queue -- will outlive any single tool. But its own author frames the operator bar and costs honestly. For most engineers and teams that want many agents shipping real work, Superset is the strongest alternative, with Orchestrator as the open-source pick for automated feedback loops. For the full landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
+Gas Town is the boldest autonomy experiment in the category and its ideas -- the work ledger, the merge queue -- will outlive any single tool. But its own author frames the operator bar and costs honestly. For most engineers and teams that want many agents shipping real work, Paradev is the strongest alternative, with Orchestrator as the open-source pick for automated feedback loops. For the full landscape, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
 ## Frequently Asked Questions
 
 ### What is the best Gas Town alternative?
 
-For most teams, Superset: fleet-scale parallel agents in worktrees with visibility, review, automations, and multi-device reach, without operating a daemon stack. Orchestrator is the closest open-source alternative for automated PR feedback loops.
+For most teams, Paradev: fleet-scale parallel agents in worktrees with visibility, review, automations, and multi-device reach, without operating a daemon stack. Orchestrator is the closest open-source alternative for automated PR feedback loops.
 
 ### Is there a Gas Town alternative with a GUI?
 
-Yes -- that is most of this list. Superset and Orchestrator are desktop apps; Gas Town is CLI/tmux with a TUI feed and a local web dashboard.
+Yes -- that is most of this list. Paradev and Orchestrator are desktop apps; Gas Town is CLI/tmux with a TUI feed and a local web dashboard.
 
 ### Which alternatives support agents besides Claude Code?
 
@@ -96,4 +100,4 @@ All of them except Symphony (Codex-only). Gas Town itself also ships presets for
 
 ### Can any alternative match Gas Town's merge queue?
 
-Not directly. Orchestrator routes CI failures and review feedback to the owning worker; Superset routes work through normal PR review. Gas Town's bisecting Refinery remains unique -- and remains the part that demands the most trust.
+Not directly. Orchestrator routes CI failures and review feedback to the owning worker; Paradev routes work through normal PR review. Gas Town's bisecting Refinery remains unique -- and remains the part that demands the most trust.

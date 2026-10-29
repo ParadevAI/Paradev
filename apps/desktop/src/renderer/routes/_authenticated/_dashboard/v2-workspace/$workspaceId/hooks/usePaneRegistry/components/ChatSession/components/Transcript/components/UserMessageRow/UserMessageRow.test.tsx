@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { appendPastedText } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { ChatPaneActionsProvider } from "../../../../providers/ChatPaneActionsProvider";
 import { copySourceText } from "../../utils/copySourceText";
 import { UserMessageRow } from "./UserMessageRow";
 
@@ -112,4 +113,26 @@ test("a message that is only a paste has no empty bubble", () => {
 		view.container.querySelectorAll("[data-pasted-text-card]"),
 	).toHaveLength(1);
 	expect(view.container.querySelector(".whitespace-pre-wrap")).toBeNull();
+});
+
+test("editing a message sends the new text in place of the old one", () => {
+	const editMessage = mock((_itemId: string, _text: string) => {});
+	const view = render(
+		<ChatPaneActionsProvider
+			editMessage={editMessage}
+			editableMessageIds={new Set(["user-1"])}
+		>
+			<UserMessageRow harness={undefined} item={message(TYPED)} />
+		</ChatPaneActionsProvider>,
+	);
+	fireEvent.click(view.getByRole("button", { name: "Edit message" }));
+	const box = view.getByRole("textbox");
+	fireEvent.change(box, { target: { value: "Why does it crash on reset?" } });
+	fireEvent.keyDown(box, { key: "Enter" });
+
+	expect(editMessage).toHaveBeenCalledWith(
+		"user-1",
+		"Why does it crash on reset?",
+	);
+	expect(view.queryByRole("textbox")).toBeNull();
 });

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="full" alt="Claude dan OpenCode bekerja paralel di workspace Superset dengan diff langsung" src="../apps/marketing/public/images/readme-hero.gif" />
+<img width="full" alt="Claude dan OpenCode bekerja paralel di workspace Paradev dengan diff langsung" src="../apps/marketing/public/images/readme-hero.gif" />
 
 ### Jalankan 100+ Agen Coding Secara Paralel
 
@@ -14,10 +14,10 @@
 
 *Ini adalah terjemahan dari README bahasa Inggris, yang menjadi acuan resmi.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
-[![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
+[![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
 <br />
@@ -27,7 +27,7 @@ Habiskan waktu Anda untuk shipping, bukan menunggu.
 
 <br />
 
-[**Unduh untuk macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Dokumentasi](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Unduh untuk macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Dokumentasi](https://docs.paradev.com) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -36,7 +36,7 @@ Habiskan waktu Anda untuk shipping, bukan menunggu.
 
 ## Coding 10x Lebih Cepat Tanpa Biaya Berpindah Konteks
 
-Superset menjalankan agen coding berbasis CLI secara paralel di git worktree yang terisolasi, dengan alur kerja terminal, review, dan buka-di-editor bawaan.
+Paradev menjalankan agen coding berbasis CLI secara paralel di git worktree yang terisolasi, dengan alur kerja terminal, review, dan buka-di-editor bawaan.
 
 - **Jalankan banyak agen sekaligus** tanpa beban berpindah konteks
 - **Isolasi tiap tugas** di git worktree-nya sendiri sehingga agen tidak saling mengganggu
@@ -57,11 +57,11 @@ Lebih sedikit menunggu, lebih banyak shipping.
 
 Jalankan 100+ agen coding sekaligus, masing-masing di git worktree-nya sendiri dengan branch, terminal, dan lingkungannya sendiri. Bandingkan hasilnya dan merge pemenangnya.
 
-[Dokumentasi →](https://docs.superset.sh/workspaces)
+[Dokumentasi →](https://docs.paradev.com/workspaces)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Claude sedang men-streaming migrasi billing sementara agen lain berjalan di workspace paralel" width="100%" /></a>
+  <a href="https://docs.paradev.com/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Claude sedang men-streaming migrasi billing sementara agen lain berjalan di workspace paralel" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -71,11 +71,11 @@ Jalankan 100+ agen coding sekaligus, masing-masing di git worktree-nya sendiri d
 
 Lacak setiap agen dari sidebar, dengan indikator bekerja, bunyi penanda selesai, dan badge dock saat ada yang butuh perhatian Anda.
 
-[Dokumentasi →](https://docs.superset.sh/agent-integration)
+[Dokumentasi →](https://docs.paradev.com/agent-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Agen menyelesaikan tugasnya dan status di sidebar berubah dari bekerja menjadi selesai" width="100%" /></a>
+  <a href="https://docs.paradev.com/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Agen menyelesaikan tugasnya dan status di sidebar berubah dari bekerja menjadi selesai" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -85,11 +85,11 @@ Lacak setiap agen dari sidebar, dengan indikator bekerja, bunyi penanda selesai,
 
 Tab, split tanpa batas, preset, dan sesi persisten yang bertahan setelah restart. Tekan ⌘I untuk editor prompt kaya dengan pengeditan multibaris dan mention file dengan @.
 
-[Dokumentasi →](https://docs.superset.sh/terminal-integration)
+[Dokumentasi →](https://docs.paradev.com/terminal-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Mengetik tindak lanjut dengan mention file @ di editor prompt kaya di samping terminal yang di-split" width="100%" /></a>
+  <a href="https://docs.paradev.com/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Mengetik tindak lanjut dengan mention file @ di editor prompt kaya di samping terminal yang di-split" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -99,11 +99,11 @@ Tab, split tanpa batas, preset, dan sesi persisten yang bertahan setelah restart
 
 Periksa, komentari, dan edit perubahan agen tanpa meninggalkan aplikasi, lalu commit dan push saat sudah siap.
 
-[Dokumentasi →](https://docs.superset.sh/diff-viewer)
+[Dokumentasi →](https://docs.paradev.com/diff-viewer)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Me-review perubahan agen di diff viewer" width="100%" /></a>
+  <a href="https://docs.paradev.com/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Me-review perubahan agen di diff viewer" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -113,11 +113,11 @@ Periksa, komentari, dan edit perubahan agen tanpa meninggalkan aplikasi, lalu co
 
 Pratinjau server dev yang berjalan di panel browser. Port dideteksi per workspace, jadi setiap worktree mendapat pratinjaunya sendiri.
 
-[Dokumentasi →](https://docs.superset.sh/browser)
+[Dokumentasi →](https://docs.paradev.com/browser)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Browser dalam aplikasi menampilkan pratinjau server dev dengan port yang terdeteksi" width="100%" /></a>
+  <a href="https://docs.paradev.com/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Browser dalam aplikasi menampilkan pratinjau server dev dengan port yang terdeteksi" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -127,11 +127,11 @@ Pratinjau server dev yang berjalan di panel browser. Port dideteksi per workspac
 
 Jalankan sesi agen sesuai jadwal: triase issue semalaman, susun draf changelog mingguan, jaga dependensi tetap mutakhir.
 
-[Dokumentasi →](https://docs.superset.sh/automations)
+[Dokumentasi →](https://docs.paradev.com/automations)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Otomatisasi agen terjadwal" width="100%" /></a>
+  <a href="https://docs.paradev.com/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Otomatisasi agen terjadwal" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -141,25 +141,25 @@ Jalankan sesi agen sesuai jadwal: triase issue semalaman, susun draf changelog m
 
 Hubungkan mesin lain dan akses workspace-nya dari mana saja: aplikasi desktop, CLI, atau ponsel Anda. Bangunkan host yang offline dengan perintah kustom.
 
-[Dokumentasi →](https://docs.superset.sh/remote-access)
+[Dokumentasi →](https://docs.paradev.com/remote-access)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Host dan anggota di pengaturan organisasi" width="100%" /></a>
+  <a href="https://docs.paradev.com/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Host dan anggota di pengaturan organisasi" width="100%" /></a>
 </td>
 </tr>
 <tr>
 <td width="50%" valign="middle">
 
-### Superset CLI
+### Paradev CLI
 
-Skrip dari shell mana pun: buat workspace, luncurkan agen, baca terminal mereka, dan kelola otomatisasi dengan satu binary. Kalau sebuah agen bisa menjalankan perintah, ia bisa mengendalikan Superset.
+Skrip dari shell mana pun: buat workspace, luncurkan agen, baca terminal mereka, dan kelola otomatisasi dengan satu binary. Kalau sebuah agen bisa menjalankan perintah, ia bisa mengendalikan Paradev.
 
-[Dokumentasi →](https://docs.superset.sh/cli/getting-started)
+[Dokumentasi →](https://docs.paradev.com/cli/getting-started)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Membuat workspace dan meluncurkan agen dari Superset CLI" width="100%" /></a>
+  <a href="https://docs.paradev.com/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Membuat workspace dan meluncurkan agen dari Paradev CLI" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -169,31 +169,31 @@ Skrip dari shell mana pun: buat workspace, luncurkan agen, baca terminal mereka,
 
 Lompat ke workspace, aksi, atau pengaturan mana pun dari satu kotak pencarian.
 
-[Dokumentasi →](https://docs.superset.sh/keyboard-shortcuts)
+[Dokumentasi →](https://docs.paradev.com/keyboard-shortcuts)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Mengetik di palet perintah dan memfilter aksi workspace secara langsung" width="100%" /></a>
+  <a href="https://docs.paradev.com/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Mengetik di palet perintah dan memfilter aksi workspace secara langsung" width="100%" /></a>
 </td>
 </tr>
 </table>
 
 **Juga sudah termasuk:**
 
-- **[Skill bawaan](https://docs.superset.sh/skills)**: agen sudah dimuat dengan skill `superset:*` (mengorkestrasi agen paralel, menjadwalkan otomatisasi, mengirim umpan balik, mendiagnosis masalah), disediakan otomatis saat diluncurkan
-- **[Pemilih model & agen kustom](https://docs.superset.sh/agent-integration)**: pilih model dan tingkat penalaran saat meluncurkan, dan tambahkan agen terminal apa pun dengan ikonnya sendiri
-- **[Skrip setup workspace](https://docs.superset.sh/setup-teardown-scripts)**: otomatiskan setup env, instalasi dependensi, dan server dev per workspace
-- **[Preset terminal](https://docs.superset.sh/terminal-presets)**: simpan tata letak agen dan shell lalu buka dengan satu tekanan tombol
-- **[Slack & Linear](https://docs.superset.sh/use-with-linear)**: buat workspace dari pesan Slack atau issue Linear
-- **[Buka di IDE Anda](https://docs.superset.sh/use-with-ide)**: serah terima sekali klik ke Cursor, VS Code, atau editor apa pun
-- **[Tema kustom](https://docs.superset.sh/custom-themes)**: buat, edit, dan impor berkas tema
-- **[Pintasan keyboard](https://docs.superset.sh/keyboard-shortcuts)**: setiap aksi bisa dipetakan ulang lewat **Pengaturan → Pintasan Keyboard** (⌘/)
-- **[Bawa provider Anda sendiri](https://docs.superset.sh/providers)**: hubungkan OpenRouter, Bedrock, Vertex, atau Vercel AI Gateway
-- **Dan masih banyak lagi**: kami shipping setiap hari, jadi daftar ini selalu tertinggal. [Changelog](https://superset.sh/changelog) adalah daftar fitur yang sebenarnya.
+- **[Skill bawaan](https://docs.paradev.com/skills)**: agen sudah dimuat dengan skill `superset:*` (mengorkestrasi agen paralel, menjadwalkan otomatisasi, mengirim umpan balik, mendiagnosis masalah), disediakan otomatis saat diluncurkan
+- **[Pemilih model & agen kustom](https://docs.paradev.com/agent-integration)**: pilih model dan tingkat penalaran saat meluncurkan, dan tambahkan agen terminal apa pun dengan ikonnya sendiri
+- **[Skrip setup workspace](https://docs.paradev.com/setup-teardown-scripts)**: otomatiskan setup env, instalasi dependensi, dan server dev per workspace
+- **[Preset terminal](https://docs.paradev.com/terminal-presets)**: simpan tata letak agen dan shell lalu buka dengan satu tekanan tombol
+- **[Slack & Linear](https://docs.paradev.com/use-with-linear)**: buat workspace dari pesan Slack atau issue Linear
+- **[Buka di IDE Anda](https://docs.paradev.com/use-with-ide)**: serah terima sekali klik ke Cursor, VS Code, atau editor apa pun
+- **[Tema kustom](https://docs.paradev.com/custom-themes)**: buat, edit, dan impor berkas tema
+- **[Pintasan keyboard](https://docs.paradev.com/keyboard-shortcuts)**: setiap aksi bisa dipetakan ulang lewat **Pengaturan → Pintasan Keyboard** (⌘/)
+- **[Bawa provider Anda sendiri](https://docs.paradev.com/providers)**: hubungkan OpenRouter, Bedrock, Vertex, atau Vercel AI Gateway
+- **Dan masih banyak lagi**: kami shipping setiap hari, jadi daftar ini selalu tertinggal. [Changelog](https://paradev.com/changelog) adalah daftar fitur yang sebenarnya.
 
 ## Agen yang Didukung
 
-Superset bekerja dengan agen coding berbasis CLI apa pun, termasuk:
+Paradev bekerja dengan agen coding berbasis CLI apa pun, termasuk:
 
 | Agen | Status |
 |:------|:-------|
@@ -220,7 +220,7 @@ Superset bekerja dengan agen coding berbasis CLI apa pun, termasuk:
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/polygraph-white.svg" /><img height="16" align="top" alt="Polygraph" src="../packages/ui/src/assets/icons/preset-icons/polygraph.svg" /></picture> &nbsp;[Polygraph](https://trypolygraph.com/) | Didukung penuh |
 | Agen CLI lainnya | Bekerja tanpa konfigurasi |
 
-Kalau bisa berjalan di terminal, ia bisa berjalan di Superset
+Kalau bisa berjalan di terminal, ia bisa berjalan di Paradev
 
 Agen mendapat lebih dari sekadar terminal:
 
@@ -236,17 +236,17 @@ Setiap permukaan berbicara dengan workspace yang sama, jadi Anda bisa memulai tu
 
 | Permukaan | Yang Anda dapat |
 |:--------|:-------------|
-| [**Aplikasi Desktop**](https://github.com/superset-sh/superset/releases/latest) | IDE lengkap: terminal, diff viewer, browser dalam aplikasi, otomatisasi |
-| [**CLI**](https://docs.superset.sh/cli/getting-started) | Satu binary `superset` untuk mengelola workspace, agen, terminal, dan host dari shell mana pun |
-| [**TypeScript SDK**](https://docs.superset.sh/sdk/getting-started) | Kendalikan Superset secara programatik dengan [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) dari Node, Bun, atau Deno |
-| [**MCP Server**](https://docs.superset.sh/mcp) | Biarkan Claude Code, Codex, Cursor, dan agen lainnya membuat dan mengelola workspace sendiri |
+| [**Aplikasi Desktop**](https://github.com/paradevai/paradev/releases/latest) | IDE lengkap: terminal, diff viewer, browser dalam aplikasi, otomatisasi |
+| [**CLI**](https://docs.paradev.com/cli/getting-started) | Satu binary `superset` untuk mengelola workspace, agen, terminal, dan host dari shell mana pun |
+| [**TypeScript SDK**](https://docs.paradev.com/sdk/getting-started) | Kendalikan Paradev secara programatik dengan [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) dari Node, Bun, atau Deno |
+| [**MCP Server**](https://docs.paradev.com/mcp) | Biarkan Claude Code, Codex, Cursor, dan agen lainnya membuat dan mengelola workspace sendiri |
 
 CLI sudah dibundel dengan aplikasi desktop, atau pasang secara terpisah:
 
 ```bash
-curl -fsSL https://superset.sh/cli/install.sh | sh
+curl -fsSL https://paradev.com/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
@@ -255,20 +255,20 @@ Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
 
 Unduh aplikasi desktop:
 
-- **macOS**: [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
+- **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
 - **Windows**: belum tersedia
-- [Semua build](https://github.com/superset-sh/superset/releases/latest)
+- [Semua build](https://github.com/paradevai/paradev/releases/latest)
 
-Yang perlu terpasang hanya [Git](https://git-scm.com/). [gh](https://cli.github.com/) bersifat opsional dan membuka alur kerja PR; Superset menawarkan untuk memasangnya bagi Anda.
+Yang perlu terpasang hanya [Git](https://git-scm.com/). [gh](https://cli.github.com/) bersifat opsional dan membuka alur kerja PR; Paradev menawarkan untuk memasangnya bagi Anda.
 
 ## Pengembangan
 
-Ingin mengutak-atik Superset atau menyumbang PR? Clone repositorinya, tambahkan ke
-aplikasi Superset yang terpasang, lalu buat workspace untuk perubahan Anda:
+Ingin mengutak-atik Paradev atau menyumbang PR? Clone repositorinya, tambahkan ke
+aplikasi Paradev yang terpasang, lalu buat workspace untuk perubahan Anda:
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Lalu jalankan setup pengembangan dari terminal workspace tersebut:
@@ -280,19 +280,19 @@ bun run dev
 
 Jalankan `setup.local.sh` sekali di setiap worktree baru. Skrip ini mengonfigurasi identitas
 aplikasi dan port yang spesifik per workspace, sehingga aplikasi desktop versi pengembangan
-bisa berjalan berdampingan dengan aplikasi Superset yang terpasang dan worktree pengembangan lainnya.
+bisa berjalan berdampingan dengan aplikasi Paradev yang terpasang dan worktree pengembangan lainnya.
 
 Tidak perlu akun Neon atau kredensial pihak ketiga. `setup.local.sh` menyiapkan
 stack Postgres + Electric lokal via Docker dan mengisi akun dev. Masuk
 dengan tombol **"Sign in as dev"** (atau `admin@local.test` / `supersetdev`).
 
-Prasyarat: [Bun](https://bun.sh/) v1.4.2+ (dipatok di `.bun-version`), `docker`, `jq`, dan `caddy`, yang dijalankan `bun dev` sebagai proxy HTTPS lokal (`brew install jq caddy && caddy trust`).
+Prasyarat: [Bun](https://bun.sh/) v1.4.3+ (dipatok di `.bun-version`), `docker`, `jq`, dan `caddy`, yang dijalankan `bun dev` sebagai proxy HTTPS lokal (`brew install jq caddy && caddy trust`).
 
 Lihat [**DEVELOPMENT.md**](../DEVELOPMENT.md) untuk panduan lengkap: apa yang dilakukan skrip setup, setup manual dengan layanan sungguhan, perintah umum, pemecahan masalah, dan cara mem-build aplikasi desktop. Proses kontribusi ada di [**CONTRIBUTING.md**](../CONTRIBUTING.md).
 
 ## Konfigurasi
 
-Konfigurasikan skrip setup, teardown, dan run workspace di `.superset/config.json`. Lihat [dokumentasi lengkap](https://docs.superset.sh/setup-teardown-scripts).
+Konfigurasikan skrip setup, teardown, dan run workspace di `.superset/config.json`. Lihat [dokumentasi lengkap](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
@@ -302,7 +302,7 @@ Konfigurasikan skrip setup, teardown, dan run workspace di `.superset/config.jso
 }
 ```
 
-Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** (⌘/); lihat [daftar pintasan lengkap](https://docs.superset.sh/keyboard-shortcuts).
+Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** (⌘/); lihat [daftar pintasan lengkap](https://docs.paradev.com/keyboard-shortcuts).
 
 ## Tech Stack
 
@@ -326,20 +326,20 @@ Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** 
 
 ## Berkontribusi
 
-Kami menyambut kontribusi! Lihat [CONTRIBUTING.md](../CONTRIBUTING.md) untuk cara menyiapkan lingkungan dan membuka PR. Bug dan permintaan fitur masuk ke [issues](https://github.com/superset-sh/superset/issues).
+Kami menyambut kontribusi! Lihat [CONTRIBUTING.md](../CONTRIBUTING.md) untuk cara menyiapkan lingkungan dan membuka PR. Bug dan permintaan fitur masuk ke [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Komunitas
 
-Bergabunglah dengan komunitas Superset untuk mendapat bantuan, berbagi umpan balik, dan terhubung dengan pengguna lain:
+Bergabunglah dengan komunitas Paradev untuk mendapat bantuan, berbagi umpan balik, dan terhubung dengan pengguna lain:
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: mengobrol dengan tim dan komunitas
-- **[Twitter](https://x.com/superset_sh)**: ikuti untuk pembaruan dan pengumuman
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)**: laporkan bug dan ajukan permintaan fitur
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)**: ajukan pertanyaan dan bagikan ide
+- **[Twitter](https://x.com/paradevai)**: ikuti untuk pembaruan dan pengumuman
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: laporkan bug dan ajukan permintaan fitur
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: ajukan pertanyaan dan bagikan ide
 
 ### Tim
 
@@ -351,4 +351,4 @@ Bergabunglah dengan komunitas Superset untuk mendapat bantuan, berbagi umpan bal
 
 **Aplikasi desktop gratis selamanya.** Menjalankan agen secara paralel di mesin Anda sendiri tidak akan pernah memerlukan pembayaran. Apa pun yang kami kenakan biaya akan berupa layanan opsional di atasnya.
 
-Seluruh aplikasi ada di repositori ini di bawah [Elastic License 2.0](../LICENSE.md): gunakan, fork, modifikasi, self-host untuk tim Anda. Satu-satunya yang tidak boleh adalah mengemas ulang Superset itu sendiri sebagai layanan yang Anda jual ke orang lain.
+Seluruh aplikasi ada di repositori ini di bawah [Elastic License 2.0](../LICENSE.md): gunakan, fork, modifikasi, self-host untuk tim Anda. Satu-satunya yang tidak boleh adalah mengemas ulang Paradev itu sendiri sebagai layanan yang Anda jual ke orang lain.

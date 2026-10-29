@@ -62,7 +62,7 @@ describe("desiredPluginMcpServers", () => {
 		);
 	});
 
-	test("another marketplace's same-named plugin is not served Superset's", () => {
+	test("another marketplace's same-named plugin is not served Paradev's", () => {
 		const desired = desiredPluginMcpServers([
 			{ name: "linear", marketplace: "acme" },
 		]);

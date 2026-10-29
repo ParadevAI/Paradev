@@ -1,4 +1,4 @@
-# Superset CLI Current-State Reference
+# Paradev CLI Current-State Reference
 
 This document records the CLI surface implemented in `packages/cli` as of
 2026-05-12. Public user-facing docs live in
@@ -36,6 +36,7 @@ superset automations
 superset hosts
 superset organization
 superset projects
+superset sessions
 superset start
 superset status
 superset stop
@@ -89,6 +90,14 @@ projects
   create
   list
   setup
+sessions
+  close
+  create
+  list
+  open
+  read
+  resume
+  send
 tasks
   create
   delete
@@ -148,7 +157,7 @@ CLI runtime state is under `SUPERSET_HOME_DIR`, defaulting to
 
 The desktop app installs an app-managed shim at
 `<SUPERSET_HOME_DIR>/bin/superset` (`~/.superset/bin/superset` by default)
-when the app starts. Superset desktop terminals prepend that directory to
+when the app starts. Paradev desktop terminals prepend that directory to
 `PATH`, so the bundled CLI is available in app-launched terminals without a
 standalone install.
 
@@ -190,6 +199,11 @@ The desktop app has its own bundling script,
 
 ## Current Notes And Gaps
 
+- `superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`,
+  `import`, `open`) manages chat-only ACP sessions through the host
+  `sessions.*` router. The host accepts only supported chat providers, with no
+  terminal fallback (`superset agents` and `superset terminals` remain the
+  terminal-backed namespaces).
 - Required named options are enforced by the parser, but help output does
   not visually mark named options as required. Positional required args are
   marked.

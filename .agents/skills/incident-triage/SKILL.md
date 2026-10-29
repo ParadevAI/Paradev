@@ -1,6 +1,6 @@
 ---
 name: incident-triage
-description: First-pass triage of a possible production incident for Superset's hosted services. Gathers signals (recent deploys, Sentry spikes, health checks), proposes a severity and a status.superset.sh message, then stops for human approval. Use when someone reports an outage, errors spike, or asks "is something down?".
+description: First-pass triage of a possible production incident for Paradev's hosted services. Gathers signals (recent deploys, Sentry spikes, health checks), proposes a severity and a status.superset.sh message, then stops for human approval. Use when someone reports an outage, errors spike, or asks "is something down?".
 ---
 
 # Incident triage

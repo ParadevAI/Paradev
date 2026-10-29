@@ -10,7 +10,7 @@ Run commands automatically when creating or deleting workspaces, and define dev 
 These are **project lifecycle scripts**: project-owned behavior stored in the
 repository or a per-machine override. They are different from
 [terminal scripts](/terminal-scripts), which are reusable launches saved in
-your Superset settings and shown in the Scripts bar.
+your Paradev settings and shown in the Scripts bar.
 
 Create `.superset/config.json` in your project:
 
@@ -101,7 +101,7 @@ Levels merge per key: a key one level doesn't define falls through to the next. 
 
 ### Script Fallback
 
-If no commands are configured for a key, Superset looks for a script instead: `.superset/<key>.sh` (`setup.sh`, `teardown.sh`, `run.sh`) in the worktree first, then the main repo. A gitignored script isn't checked out into new worktrees, so it typically exists only in the main repo.
+If no commands are configured for a key, Paradev looks for a script instead: `.superset/<key>.sh` (`setup.sh`, `teardown.sh`, `run.sh`) in the worktree first, then the main repo. A gitignored script isn't checked out into new worktrees, so it typically exists only in the main repo.
 
 ### Working Directory
 

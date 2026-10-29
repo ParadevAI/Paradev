@@ -15,12 +15,7 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { generateCloudWorkspaceName } from "./generate-name";
-import {
-	attachBootSession,
-	authorizeBoot,
-	DEFAULT_BOX,
-	releaseBoot,
-} from "./meter";
+import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -118,7 +113,8 @@ async function provision(
 		({ bootId } = await authorizeBoot({
 			organizationId: row.organizationId,
 			cloudWorkspaceId: row.id,
-			...DEFAULT_BOX,
+			createdByUserId: row.createdByUserId,
+			...boxFor(claim.vcpus),
 		}));
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },

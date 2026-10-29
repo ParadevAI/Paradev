@@ -11,7 +11,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
@@ -706,10 +706,13 @@ describe("local workspaces: sessions and sandbox seed", () => {
 					path: "docs",
 				},
 			],
-			hooksPath: "/workspace/repo",
 		} as Parameters<typeof runSandboxSelfSeed>[1];
-		runSandboxSelfSeed(host.db, identity);
-		runSandboxSelfSeed(host.db, identity);
+		const agentDir = join(dirname(host.dbPath), "pdev-agent");
+		runSandboxSelfSeed(host.db, identity, agentDir);
+		runSandboxSelfSeed(host.db, identity, agentDir);
+		expect(
+			JSON.parse(readFileSync(join(agentDir, "trust.json"), "utf8")),
+		).toEqual({ "/workspace": true });
 		const rows = host.db.select().from(workspaces).all();
 		// One local workspace per checkout: the primary under the cloud
 		// workspace's id, the sibling under an id derived from it.
@@ -752,7 +755,7 @@ describe("local workspaces: sessions and sandbox seed", () => {
 			})
 			.where(eq(projects.id, primaryProjectId))
 			.run();
-		runSandboxSelfSeed(host.db, identity);
+		runSandboxSelfSeed(host.db, identity, agentDir);
 		expect(readPrimaryProject()).toMatchObject(repoIdentity);
 		// A sandbox's only workspace can still be retired record-only.
 		const preview = await host.trpc.workspaceCleanup.inspect.query({

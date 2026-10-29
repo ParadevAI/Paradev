@@ -10,7 +10,7 @@ import { sameItems } from "../../utils/sameItems";
  * A placed cloud row comes out of the project builder decorated as a device
  * row (host type from its host id, PR from the host poll). Swap in the row
  * the cloud list built, keeping only what placement decided: project, pin
- * state and the in-flight transaction.
+ * state, the folder's accent and the in-flight transaction.
  */
 function withCloudRow(
 	built: DashboardSidebarWorkspace,
@@ -22,6 +22,7 @@ function withCloudRow(
 		...cloud,
 		projectId: built.projectId,
 		isPinned: built.isPinned,
+		accentColor: built.accentColor,
 		pendingTransaction: built.pendingTransaction,
 	};
 }

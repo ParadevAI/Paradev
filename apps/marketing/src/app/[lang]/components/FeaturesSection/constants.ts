@@ -41,7 +41,7 @@ export const FEATURES: Feature[] = [
 			message: "Automations",
 		}),
 		title: msg({
-			message: "Put recurring work on a schedule",
+			message: "Start agents on events or a schedule",
 		}),
 		description: msg({
 			message:
@@ -84,7 +84,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Superset into CI with the SDK, or let your agent drive it over MCP.",
+				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP.",
 		}),
 	},
 	{

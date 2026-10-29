@@ -11,11 +11,11 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 	{
 		id: "whatIsEnterprise",
 		question: msg({
-			message: "What is Superset Enterprise?",
+			message: "What is Paradev Enterprise?",
 		}),
 		answer: msg({
 			message:
-				"Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization.",
+				"Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization.",
 		}),
 	},
 	{
@@ -45,7 +45,7 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Superset runs locally on your developers' machines. We don't store your code or AI conversations, and Superset has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh.",
+				"Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh.",
 		}),
 	},
 ];

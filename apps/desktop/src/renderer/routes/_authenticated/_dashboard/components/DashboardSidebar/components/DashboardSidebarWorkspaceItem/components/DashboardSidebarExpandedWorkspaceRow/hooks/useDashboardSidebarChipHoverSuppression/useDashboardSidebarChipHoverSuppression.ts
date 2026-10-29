@@ -1,51 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDashboardSidebarHoverActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarHoverProvider";
 
-interface UseDashboardSidebarChipHoverSuppressionOptions {
-	/**
-	 * When the workspace hover card is held closed. "hover" holds it from the
-	 * moment the pointer enters the chip; "open" holds it only while the
-	 * chip's own card is open, so a pointer passing over the chip on its way
-	 * to the workspace card does not dismiss it.
-	 */
-	suppressWorkspaceCardOn?: "hover" | "open";
-}
-
 interface UseDashboardSidebarChipHoverSuppressionResult {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	onPointerEnter: () => void;
 	onPointerLeave: () => void;
 	toggleOpen: () => void;
 }
 
 /**
- * Controls a chip's hover card and keeps a ref-counted hold on the sidebar's
- * workspace hover card while the chip (or its card) is active. Holds still
- * owned on unmount are released automatically — a chip can disappear
- * mid-hover after a bulk close.
+ * Controls a chip's hover card and holds the sidebar's workspace hover card
+ * while the chip's card is open. A hold still owned on unmount is released
+ * automatically — a chip can disappear mid-hover after a bulk close.
  */
-export function useDashboardSidebarChipHoverSuppression({
-	suppressWorkspaceCardOn = "hover",
-}: UseDashboardSidebarChipHoverSuppressionOptions = {}): UseDashboardSidebarChipHoverSuppressionResult {
+export function useDashboardSidebarChipHoverSuppression(): UseDashboardSidebarChipHoverSuppressionResult {
 	const { beginHoverCardSuppression, endHoverCardSuppression } =
 		useDashboardSidebarHoverActions();
-	const holdsWhileHovered = suppressWorkspaceCardOn === "hover";
-	const holdsRef = useRef(0);
 	const isOpenRef = useRef(false);
 	const dismissedByClickRef = useRef(false);
 	const [isOpen, setIsOpen] = useState(false);
-
-	const hold = useCallback(() => {
-		holdsRef.current += 1;
-		beginHoverCardSuppression();
-	}, [beginHoverCardSuppression]);
-
-	const release = useCallback(() => {
-		if (holdsRef.current === 0) return;
-		holdsRef.current -= 1;
-		endHoverCardSuppression();
-	}, [endHoverCardSuppression]);
 
 	const onOpenChange = useCallback(
 		(open: boolean) => {
@@ -57,24 +30,17 @@ export function useDashboardSidebarChipHoverSuppression({
 			isOpenRef.current = open;
 			setIsOpen(open);
 			if (open) {
-				hold();
+				beginHoverCardSuppression();
 			} else {
-				release();
+				endHoverCardSuppression();
 			}
 		},
-		[hold, release],
+		[beginHoverCardSuppression, endHoverCardSuppression],
 	);
-
-	const onPointerEnter = useCallback(() => {
-		// Do not clear a click dismissal here. Removing the hover-card content can
-		// produce another enter while the pointer is still over the trigger.
-		if (holdsWhileHovered) hold();
-	}, [hold, holdsWhileHovered]);
 
 	const onPointerLeave = useCallback(() => {
 		dismissedByClickRef.current = false;
-		if (holdsWhileHovered) release();
-	}, [release, holdsWhileHovered]);
+	}, []);
 
 	const toggleOpen = useCallback(() => {
 		const nextOpen = !isOpenRef.current;
@@ -84,10 +50,7 @@ export function useDashboardSidebarChipHoverSuppression({
 
 	useEffect(
 		() => () => {
-			while (holdsRef.current > 0) {
-				holdsRef.current -= 1;
-				endHoverCardSuppression();
-			}
+			if (isOpenRef.current) endHoverCardSuppression();
 		},
 		[endHoverCardSuppression],
 	);
@@ -95,7 +58,6 @@ export function useDashboardSidebarChipHoverSuppression({
 	return {
 		isOpen,
 		onOpenChange,
-		onPointerEnter,
 		onPointerLeave,
 		toggleOpen,
 	};

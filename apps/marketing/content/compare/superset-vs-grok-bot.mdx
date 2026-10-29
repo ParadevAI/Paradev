@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Grok Bot (2026): Agent Workspace vs Always-On Cloud Teammates"
-description: "Compare Superset and xAI's Grok Bot. A local-first workspace for running any coding agent in parallel Git worktrees vs always-on computer-use teammates on Cursor-hosted cloud computers."
+title: "Paradev vs Grok Bot (2026): Agent Workspace vs Always-On Cloud Teammates"
+description: "Compare Paradev and xAI's Grok Bot. A local-first workspace for running any coding agent in parallel Git worktrees vs always-on computer-use teammates on Cursor-hosted cloud computers."
 date: 2026-09-11
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -16,31 +16,31 @@ keywords:
   - parallel coding agents
 ---
 
-Superset and Grok Bot both promise agents that keep working after you walk away, but they are different kinds of product. Superset is a local-first workspace for software engineering: it runs Claude Code, Codex, Grok Build, and any other CLI agent in parallel on machines you own or in cloud workspaces, with diff review, pull requests, a browser, automations, and Remote Access so workspaces keep running when your laptop sleeps. Grok Bot, launched in beta by xAI in August 2026, is a team of general-purpose "always-on" AI teammates that share one persistent cloud computer per account, work inside apps the way a person would, and run on Cursor-hosted infrastructure with Cursor choosing the model.
+Paradev and Grok Bot both promise agents that keep working after you walk away, but they are different kinds of product. Paradev is a local-first workspace for software engineering: it runs Claude Code, Codex, Grok Build, and any other CLI agent in parallel on machines you own or in cloud workspaces, with diff review, pull requests, a browser, automations, and Remote Access so workspaces keep running when your laptop sleeps. Grok Bot, launched in beta by xAI in August 2026, is a team of general-purpose "always-on" AI teammates that share one persistent cloud computer per account, work inside apps the way a person would, and run on Cursor-hosted infrastructure with Cursor choosing the model.
 
-If you were looking for xAI's coding agent, that is Grok Build, a separate open-source CLI, and Superset runs it as one of its built-in agents. The [FAQ](#is-grok-bot-the-same-as-grok-build) covers the difference.
+If you were looking for xAI's coding agent, that is Grok Build, a separate open-source CLI, and Paradev runs it as one of its built-in agents. The [FAQ](#is-grok-bot-the-same-as-grok-build) covers the difference.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Grok Bot** |
+| | **Paradev** | **Grok Bot** |
 |---|---|---|
 | **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | Always-on AI teammates on a shared cloud computer that work inside tools and apps 24/7 |
 | **Category** | Local-first agent workspace with remote hosts | Cloud computer-use agents (beta) |
-| **Where agents run** | Your machine, any machine you add as a host, or a Superset cloud workspace | Cursor-hosted cloud computers only, one Firecracker microVM per user, US-only |
+| **Where agents run** | Your machine, any machine you add as a host, or a Paradev cloud workspace | Cursor-hosted cloud computers only, one Firecracker microVM per user, US-only |
 | **Agent and model choice** | Any CLI agent on your own subscription or keys (Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and more) | Cursor manages model selection; no customer-facing model picker |
 | **Focus** | Software engineering: worktrees, diffs, PRs, CI, dev servers | General work: sales, recruiting, ops, and some engineering triage |
 | **Isolation** | Git worktrees for local branch-based workspaces on your own repos | Persistent cloud VM per user |
 | **Clients** | macOS desktop (experimental Linux AppImage; Windows unavailable), CLI, MCP server | macOS, Windows, and Linux desktop app; iOS and Android apps |
 | **Automation** | Scheduled automations, CLI, TypeScript SDK, MCP server, Slack bot | Agents run continuously on the account's cloud computer |
-| **Pricing** | Free tier; Pro $20 per user per month; Enterprise custom | Bundled with eligible SuperGrok and Cursor plans with weekly usage included; on-demand usage add-on; no standalone price published |
+| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month; Enterprise custom | Bundled with eligible SuperGrok and Cursor plans with weekly usage included; on-demand usage add-on; no standalone price published |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Kimi Code, Mistral Vibe, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is Grok Bot?
 
@@ -50,31 +50,31 @@ Grok Bot is xAI's product for "durable AI teammates on a persistent cloud comput
 
 ### Where Agents Run
 
-Superset's agents run on your laptop, your desktop, any machine you add as a host, or a Superset cloud workspace, with your existing agent subscriptions. On your own machines they work against your real services and dependencies. Grok Bot's agents run exclusively on Cursor-hosted cloud computers you do not control, with no model picker and, during the beta, US-only availability. That is the deepest split: Superset lets you pick where each coding agent runs, and Grok Bot is a managed general-purpose service.
+Paradev's agents run on your laptop, your desktop, any machine you add as a host, or a Paradev cloud workspace, with your existing agent subscriptions. On your own machines they work against your real services and dependencies. Grok Bot's agents run exclusively on Cursor-hosted cloud computers you do not control, with no model picker and, during the beta, US-only availability. That is the deepest split: Paradev lets you pick where each coding agent runs, and Grok Bot is a managed general-purpose service.
 
 ### Engineering Loop vs General Work
 
-Superset is built around the software loop: local branch-based worktrees, diffs, commit, push, and PR from the Changes pane, CI checks, line comments back to the agent, dev servers in an in-app browser. Grok Bot is a general-purpose computer-use teammate whose documented use cases lean toward sales, recruiting, and operations, with engineering triage as one case among many. If the work is code, Superset gives the agent the surface it needs; if the work is a browser and a dozen SaaS tabs, Grok Bot is aimed at it.
+Paradev is built around the software loop: local branch-based worktrees, diffs, commit, push, and PR from the Changes pane, CI checks, line comments back to the agent, dev servers in an in-app browser. Grok Bot is a general-purpose computer-use teammate whose documented use cases lean toward sales, recruiting, and operations, with engineering triage as one case among many. If the work is code, Paradev gives the agent the surface it needs; if the work is a browser and a dozen SaaS tabs, Grok Bot is aimed at it.
 
 ### Any Agent vs One Vendor's Stack
 
-Superset is agent-agnostic. Claude Code, Codex, Grok Build, and any other CLI agent run side by side, and you can continue a session with a different agent. Grok Bot is a single product on Cursor's infrastructure with Cursor's model choice. Notably, xAI's own coding agent, Grok Build, is one of Superset's built-in agents, so you can run Grok for code inside Superset without committing to Grok Bot.
+Paradev is agent-agnostic. Claude Code, Codex, Grok Build, and any other CLI agent run side by side, and you can continue a session with a different agent. Grok Bot is a single product on Cursor's infrastructure with Cursor's model choice. Notably, xAI's own coding agent, Grok Build, is one of Paradev's built-in agents, so you can run Grok for code inside Paradev without committing to Grok Bot.
 
 ### Always-On, Two Ways
 
-Grok Bot's answer to "keep working while I'm away" is a persistent cloud VM per user. Superset's answer is cloud workspaces, which run without your own computer connected, and Remote Access: add a machine as a host and workspaces keep running when your laptop sleeps. It adds scheduled automations that run agent sessions on a device you choose and a Slack bot that dispatches work from a mention. Both deliver unattended work; Superset lets you pick where it runs.
+Grok Bot's answer to "keep working while I'm away" is a persistent cloud VM per user. Paradev's answer is cloud workspaces, which run without your own computer connected, and Remote Access: add a machine as a host and workspaces keep running when your laptop sleeps. It adds scheduled automations that run agent sessions on a device you choose and a Slack bot that dispatches work from a mention. Both deliver unattended work; Paradev lets you pick where it runs.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly, with an enterprise tier on custom billing. Grok Bot has no standalone price as of September 2026: xAI's docs say availability and billing depend on the account and plan, eligible plans include SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra, and Cursor Teams, subscriptions include weekly usage, and eligible accounts can add on-demand usage billed from model and token cost. Superset is bring-your-own-agent for model costs.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Grok Bot has no standalone price as of September 2026: xAI's docs say availability and billing depend on the account and plan, eligible plans include SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra, and Cursor Teams, subscriptions include weekly usage, and eligible accounts can add on-demand usage billed from model and token cost. Paradev is bring-your-own-agent for model costs.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want agents working on your code, on machines you control, with your own subscriptions
 - Run several different agents in parallel and switch between them
@@ -88,7 +88,7 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 - Are fine with agents running only on Cursor-hosted cloud computers with no model choice
 - Are in the US and comfortable with a beta
 
-**Verdict:** These products mostly do not compete. Grok Bot is an always-on, general-purpose computer-use teammate on a managed cloud; Superset is an engineering workspace that runs any coding agent, Grok Build included, in parallel, on your own hardware or in cloud workspaces. Developers who searched for a Grok Bot alternative because they want Grok on their code should look at Grok Build inside Superset. Teams that want unattended agent work should look at Superset's cloud workspaces, Remote Access, and automations.
+**Verdict:** These products mostly do not compete. Grok Bot is an always-on, general-purpose computer-use teammate on a managed cloud; Paradev is an engineering workspace that runs any coding agent, Grok Build included, in parallel, on your own hardware or in cloud workspaces. Developers who searched for a Grok Bot alternative because they want Grok on their code should look at Grok Build inside Paradev. Teams that want unattended agent work should look at Paradev's cloud workspaces, Remote Access, and automations.
 
 ---
 
@@ -96,16 +96,16 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 per user p
 
 ### Is Grok Bot the same as Grok Build?
 
-No. Grok Bot is xAI's always-on computer-use teammate product on Cursor-hosted cloud computers, launched in beta in August 2026. Grok Build is xAI's open-source, Apache-2.0 coding agent CLI for macOS, Linux, and Windows, with Git worktree isolation, an agent dashboard, subagents, and MCP support. Superset runs Grok Build as a built-in agent.
+No. Grok Bot is xAI's always-on computer-use teammate product on Cursor-hosted cloud computers, launched in beta in August 2026. Grok Build is xAI's open-source, Apache-2.0 coding agent CLI for macOS, Linux, and Windows, with Git worktree isolation, an agent dashboard, subagents, and MCP support. Paradev runs Grok Build as a built-in agent.
 
-### Can I run Grok in Superset?
+### Can I run Grok in Paradev?
 
-Yes. Grok Build is one of Superset's built-in agent presets, running on your SuperGrok or X Premium+ subscription or an xAI API key, in an isolated worktree alongside Claude Code, Codex, and any other CLI agent.
+Yes. Grok Build is one of Paradev's built-in agent presets, running on your SuperGrok or X Premium+ subscription or an xAI API key, in an isolated worktree alongside Claude Code, Codex, and any other CLI agent.
 
 ### Does Grok Bot run on my computer?
 
-No. Grok Bot runs only on Cursor-hosted cloud computers, in a Firecracker microVM per user, and Cursor manages model selection. Superset runs agents on your own machine, on any machine you add as a host through Remote Access, or in a cloud workspace.
+No. Grok Bot runs only on Cursor-hosted cloud computers, in a Firecracker microVM per user, and Cursor manages model selection. Paradev runs agents on your own machine, on any machine you add as a host through Remote Access, or in a cloud workspace.
 
 ### Is Grok Bot free?
 
-Grok Bot has no standalone price. It is bundled with eligible SuperGrok and Cursor plans with weekly usage included, and eligible accounts can add on-demand usage billed from model and token cost. Superset has a free tier and Pro at $20 per user per month.
+Grok Bot has no standalone price. It is bundled with eligible SuperGrok and Cursor plans with weekly usage included, and eligible accounts can add on-demand usage billed from model and token cost. Paradev has a free tier, Pro at {{price:pro}} per user per month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces.

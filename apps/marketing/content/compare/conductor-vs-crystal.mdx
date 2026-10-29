@@ -1,6 +1,6 @@
 ---
 title: "Conductor vs Crystal (2026): Parallel Claude Code Apps Compared"
-description: "Compare Conductor and Crystal (now Nimbalyst) for running Claude Code and Codex in parallel Git worktrees, plus where Superset fits as an agent-agnostic alternative."
+description: "Compare Conductor and Crystal (now Nimbalyst) for running Claude Code and Codex in parallel Git worktrees, plus where Paradev fits as an agent-agnostic alternative."
 date: 2026-07-13
 lastUpdated: 2026-09-24
 type: "1v1"
@@ -16,7 +16,7 @@ keywords:
   - parallel claude code
 ---
 
-Conductor and Crystal are close competitors: both are desktop apps that run Claude Code and Codex in parallel Git worktrees, with in-app diff review and merge. The main differences are platform, licensing, and project direction. Conductor is a proprietary macOS app; Crystal is open source and cross-platform, and is now continuing under the name Nimbalyst. Neither is agent-agnostic, which is where a broader workspace like [Superset](/compare/superset-vs-conductor) comes in.
+Conductor and Crystal are close competitors: both are desktop apps that run Claude Code and Codex in parallel Git worktrees, with in-app diff review and merge. The main differences are platform, licensing, and project direction. Conductor is a proprietary macOS app; Crystal is open source and cross-platform, and is now continuing under the name Nimbalyst. Neither is agent-agnostic, which is where a broader workspace like [Paradev](/compare/superset-vs-conductor) comes in.
 
 This page compares all three.
 
@@ -24,7 +24,7 @@ This page compares all three.
 
 ## At a Glance
 
-| | **Conductor** | **Crystal (now Nimbalyst)** | **Superset** |
+| | **Conductor** | **Crystal (now Nimbalyst)** | **Paradev** |
 |---|---|---|---|
 | **Agents** | Claude Code, Codex, Cursor | Claude Code, Codex | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, and more) |
 | **Isolation** | Git worktree per task | Git worktree per session | Git worktrees for local branch-based workspaces |
@@ -32,7 +32,7 @@ This page compares all three.
 | **License** | Proprietary | Open source (MIT) | Source-available (ELv2) |
 | **Remote / cloud** | Local | Local | Remote and cloud workspaces |
 | **Status** | Active | Renamed to Nimbalyst | Active |
-| **Pricing** | Free, bring your own subscription | Free (open source) | Free tier + Pro $20/seat/mo |
+| **Pricing** | Free, bring your own subscription | Free (open source) | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo |
 
 ---
 
@@ -58,17 +58,17 @@ Conductor runs Claude Code, Codex, and Cursor. Crystal runs Claude Code and Code
 
 Conductor is actively developed under its name. Crystal has been renamed and its active development moved to Nimbalyst, so evaluate Nimbalyst's current state rather than the legacy Crystal repo.
 
-## Where Superset Fits
+## Where Paradev Fits
 
-Both Conductor and Crystal are focused on a small set of agents. If you want the same worktree-per-task model but agent-agnostic on macOS and experimental Linux, and extended with remote and cloud workspaces, Superset is the broader option. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and custom agents, with review, an in-app browser, and MCP built in. See [Superset vs Conductor](/compare/superset-vs-conductor) and [Superset vs Crystal](/compare/superset-vs-crystal).
+Both Conductor and Crystal are focused on a small set of agents. If you want the same worktree-per-task model but agent-agnostic on macOS and experimental Linux, and extended with remote and cloud workspaces, Paradev is the broader option. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and custom agents, with review, an in-app browser, and MCP built in. See [Paradev vs Conductor](/compare/superset-vs-conductor) and [Paradev vs Crystal](/compare/superset-vs-crystal).
 
 ## Which Should You Choose?
 
 - **Choose Conductor** if you want a polished native macOS app for Claude Code, Codex, and Cursor.
 - **Choose Crystal (Nimbalyst)** if you want an open-source, cross-platform app for Claude Code and Codex.
-- **Choose Superset** if you want agent-agnostic worktree orchestration across many agents, plus remote and cloud workspaces.
+- **Choose Paradev** if you want agent-agnostic worktree orchestration across many agents, plus remote and cloud workspaces.
 
-**Verdict:** Conductor and Crystal are two takes on the same idea: a desktop app for parallel Claude Code and Codex in worktrees. Pick Conductor for a native Mac experience, Crystal (Nimbalyst) for open-source and cross-platform, and Superset if you want the broadest agent support and remote hosting.
+**Verdict:** Conductor and Crystal are two takes on the same idea: a desktop app for parallel Claude Code and Codex in worktrees. Pick Conductor for a native Mac experience, Crystal (Nimbalyst) for open-source and cross-platform, and Paradev if you want the broadest agent support and remote hosting.
 
 ---
 
@@ -76,7 +76,7 @@ Both Conductor and Crystal are focused on a small set of agents. If you want the
 
 ### Do Conductor and Crystal both use Git worktrees?
 
-Yes. Both give each agent session its own Git worktree and branch. Superset uses worktrees for new local branch-based workspaces with support for CLI agents.
+Yes. Both give each agent session its own Git worktree and branch. Paradev uses worktrees for new local branch-based workspaces with support for CLI agents.
 
 ### Is Crystal still maintained?
 
@@ -84,4 +84,4 @@ Crystal has been renamed and its maintainers now direct active development to Ni
 
 ### Which runs on Windows and Linux?
 
-Crystal (Nimbalyst) is cross-platform. Conductor is macOS only. Superset supports macOS and experimental Linux; Windows is not available.
+Crystal (Nimbalyst) is cross-platform. Conductor is macOS only. Paradev supports macOS and experimental Linux; Windows is not available.

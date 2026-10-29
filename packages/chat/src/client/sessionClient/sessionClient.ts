@@ -2,6 +2,7 @@ import type {
 	ChatRouterInputs,
 	ChatRouterOutputs,
 } from "@superset/chat-runtime";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import type { UsageLimitAction } from "../../protocol/commands";
 import type { Cursor } from "../../protocol/cursor";
 import type { DeltaChannel, Envelope } from "../../protocol/envelope";
@@ -19,6 +20,20 @@ export type ChatTransport = {
 		input: ChatRouterInputs[Procedure],
 	) => Promise<ChatRouterOutputs[Procedure]>;
 };
+
+export type SteerSubagentResult = "steered" | "finished" | "unsupported";
+export type BackgroundSubagentResult = "moved" | "refused" | "unsupported";
+
+async function orUnsupported<Result>(
+	call: () => Promise<{ result: Result }>,
+): Promise<Result | "unsupported"> {
+	try {
+		return (await call()).result;
+	} catch (error) {
+		if (isMissingProcedureError(error)) return "unsupported";
+		throw error;
+	}
+}
 
 export type GetItemsPage = {
 	before?: Cursor;
@@ -45,6 +60,7 @@ export type SessionClientOptions = {
 	transport: ChatTransport;
 	streamBaseUrl: string;
 	createSocket: StreamSocketFactory;
+	nestedSubagents?: boolean;
 	mintId?(): string;
 	wait?: Wait;
 	backoffInitialMs?: number;
@@ -64,9 +80,18 @@ export type SessionClient = {
 	respondToUsageLimit(action: UsageLimitAction): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
+	steerSubagent(
+		taskId: string,
+		content: UserContent[],
+	): Promise<SteerSubagentResult>;
+	backgroundSubagent(taskId: string): Promise<BackgroundSubagentResult>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 	subscribe(options: SessionSubscribeOptions): SessionStream;
 	close(): void;
 };
@@ -77,6 +102,7 @@ export function createSessionClient(
 	const mintId = options.mintId ?? (() => crypto.randomUUID());
 	const sessionId = options.sessionId;
 	const streams = new Set<SessionStream>();
+	const nested = options.nestedSubagents ? { nestedSubagents: true } : {};
 
 	return {
 		sessionId,
@@ -88,12 +114,13 @@ export function createSessionClient(
 				sessionId,
 				before: page.before,
 				limit: page.limit,
+				...nested,
 			}),
 
-		getOutline: () => options.transport.getOutline({ sessionId }),
+		getOutline: () => options.transport.getOutline({ sessionId, ...nested }),
 
 		getItemBodies: (itemIds) =>
-			options.transport.getItemBodies({ sessionId, itemIds }),
+			options.transport.getItemBodies({ sessionId, itemIds, ...nested }),
 
 		prompt: (promptOptions) =>
 			options.transport.prompt({
@@ -148,6 +175,25 @@ export function createSessionClient(
 				taskId,
 			}),
 
+		steerSubagent: (taskId, content) =>
+			orUnsupported(() =>
+				options.transport.steerSubagent({
+					commandId: mintId(),
+					sessionId,
+					taskId,
+					content,
+				}),
+			),
+
+		backgroundSubagent: (taskId) =>
+			orUnsupported(() =>
+				options.transport.backgroundSubagent({
+					commandId: mintId(),
+					sessionId,
+					taskId,
+				}),
+			),
+
 		respondToApproval: async (approvalId, decision) => {
 			await options.transport.respondToApproval({
 				commandId: mintId(),
@@ -165,12 +211,13 @@ export function createSessionClient(
 			});
 		},
 
-		setConfigOption: async (configId, value) => {
+		setConfigOption: async (configId, value, setOptions) => {
 			await options.transport.setConfigOption({
 				commandId: mintId(),
 				sessionId,
 				configId,
 				value,
+				...(setOptions?.confirm ? { confirm: true } : {}),
 			});
 		},
 
@@ -184,6 +231,7 @@ export function createSessionClient(
 						sessionId,
 						deltas,
 						since,
+						nestedSubagents: options.nestedSubagents,
 					}),
 				since: subscribeOptions.since,
 				onEnvelope: subscribeOptions.onEnvelope,

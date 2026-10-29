@@ -83,8 +83,8 @@ export function SubmitPromptDialog({
 					</DialogTitle>
 					<DialogDescription>
 						<Trans>
-							Prompt a coding agent to build what you want to see in Superset.
-							If we like your prompt, we'll run it and merge the result.
+							Prompt a coding agent to build what you want to see in Paradev. If
+							we like your prompt, we'll run it and merge the result.
 						</Trans>
 					</DialogDescription>
 				</DialogHeader>

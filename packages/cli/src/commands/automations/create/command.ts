@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { boolean, CLIError, string } from "@superset/cli-framework";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { command } from "../../../lib/command";
 import { resolveHostFilter } from "../../../lib/host-target";
 import { formatAutomationDate } from "../format";
@@ -14,7 +15,7 @@ const DEFAULT_TIMEZONE =
 	Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
 export default command({
-	description: "Create a scheduled automation",
+	description: "Create an automation that runs on a schedule or on events",
 	options: {
 		name: string().required().desc("Human-readable automation name"),
 		prompt: string().desc("Prompt to send to the agent"),
@@ -42,6 +43,11 @@ export default command({
 		environment: string().desc(
 			"Id of the environment each run's cloud workspace starts from. Implies --cloud; required when several environments have repositories",
 		),
+		machineSize: string()
+			.enum(...MACHINE_SIZES)
+			.desc(
+				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Implies --cloud",
+			),
 		continueSession: boolean().desc(
 			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",
 		),
@@ -80,7 +86,9 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
-		const cloud = Boolean(options.cloud || options.environment);
+		const cloud = Boolean(
+			options.cloud || options.environment || options.machineSize,
+		);
 		if (cloud) {
 			refuseHostFlagsForCloud({
 				"--host": options.host,
@@ -121,6 +129,7 @@ export default command({
 			agent: options.agent,
 			...target,
 			continueAgentSession: options.continueSession ?? undefined,
+			...(options.machineSize ? { machineSize: options.machineSize } : {}),
 			rrule: options.rrule ?? undefined,
 			dtstart: options.dtstart ? new Date(options.dtstart) : undefined,
 			timezone: options.timezone ?? DEFAULT_TIMEZONE,

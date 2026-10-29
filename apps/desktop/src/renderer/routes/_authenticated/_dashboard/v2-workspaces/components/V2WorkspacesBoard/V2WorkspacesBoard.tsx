@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useV2WorkspacesFilterStore } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
-import { isWithinArchivedWindow } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/archivedWindow";
 import {
 	BOARD_COLUMN_ORDER,
 	type BoardColumnKey,
@@ -20,31 +19,23 @@ export function V2WorkspacesBoard({
 	workspaces,
 	isReady,
 }: V2WorkspacesBoardProps) {
-	const archivedWindow = useV2WorkspacesFilterStore(
-		(state) => state.archivedWindow,
+	const showArchived = useV2WorkspacesFilterStore(
+		(state) => state.showArchived,
 	);
-	const sortMode = useV2WorkspacesFilterStore((state) => state.sortMode);
-	const hiddenLanes = useV2WorkspacesFilterStore((state) => state.hiddenLanes);
 
 	const byColumn = useMemo(() => {
-		const now = Date.now();
 		const map = new Map<BoardColumnKey, AccessibleV2Workspace[]>(
 			BOARD_COLUMN_ORDER.map((column) => [column, []]),
 		);
 		for (const workspace of workspaces) {
-			if (
-				workspace.archivedAt != null &&
-				!isWithinArchivedWindow(workspace.archivedAt, archivedWindow, now)
-			) {
-				continue;
-			}
+			if (workspace.archivedAt != null && !showArchived) continue;
 			map.get(deriveBoardColumn(workspace))?.push(workspace);
 		}
 		for (const column of map.values()) {
-			column.sort((a, b) => compareWorkspaces(a, b, sortMode));
+			column.sort(compareWorkspaces);
 		}
 		return map;
-	}, [workspaces, archivedWindow, sortMode]);
+	}, [workspaces, showArchived]);
 
 	const isEmpty = workspaces.length === 0;
 	if (isEmpty && !isReady) {
@@ -53,9 +44,9 @@ export function V2WorkspacesBoard({
 	}
 
 	const visibleColumns = getVisibleBoardColumns(
-		archivedWindow,
+		showArchived,
 		(column) => byColumn.get(column)?.length ?? 0,
-	).filter((column) => !hiddenLanes.includes(column));
+	);
 
 	return (
 		<div className="flex-1 overflow-x-auto overflow-y-hidden">

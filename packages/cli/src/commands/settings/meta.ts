@@ -1,3 +1,3 @@
 export default {
-	description: "Read and update Superset desktop app settings",
+	description: "Read and update Paradev desktop app settings",
 };

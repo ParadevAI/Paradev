@@ -51,7 +51,6 @@ import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useCreateAgentSession } from "renderer/hooks/useCreateAgentSession";
 import { useNow } from "renderer/hooks/useNow";
-import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -62,17 +61,16 @@ import {
 	SortableHeader,
 	type SortDirection,
 } from "renderer/routes/_authenticated/_dashboard/components/SortableHeader";
+import { useCreateAutomation } from "renderer/routes/_authenticated/_dashboard/hooks/useCreateAutomation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
-import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { AutomationRow } from "./components/AutomationRow";
 import { AutomationStatCards } from "./components/AutomationStatCards";
 import { AutomationsEmptyState } from "./components/AutomationsEmptyState";
 import { HostOfflineRunDialog } from "./components/HostOfflineRunDialog";
 import type { AutomationTemplate } from "./templates";
-import { matchAgentChoice, portableAgentValue } from "./utils/agentIdentity";
 import { dispatchErrorCode, runErrorHelp } from "./utils/runErrorHelp";
+import { RUN_STATUS_META } from "./utils/runStatus";
 
 export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	{
@@ -84,16 +82,25 @@ type Scope = "mine" | "team";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
 
-type AutomationSortField = "name" | "owner" | "schedule" | "status";
+type AutomationSortField = "name" | "owner" | "schedule" | "status" | "lastRun";
+
+type LastRunSortMode = "time" | "result";
+
+const LAST_RUN_SORT_CYCLE: {
+	mode: LastRunSortMode;
+	direction: SortDirection;
+}[] = [
+	{ mode: "time", direction: "desc" },
+	{ mode: "time", direction: "asc" },
+	{ mode: "result", direction: "asc" },
+	{ mode: "result", direction: "desc" },
+];
 
 // Seeds the "Create with AI" agent session. The skill is provisioned as
 // superset:automate; mentioning it by name loads it (it isn't in the chat
 // slash-command allowlist).
 const AUTOMATION_AGENT_PROMPT =
-	"Help me create a Superset automation. Use the superset:automate skill if it's available, otherwise the `superset` CLI (start with `superset automations --help`). Ask me what the automation should do and what should fire it — a schedule, or an event like a Slack message, GitHub pull request, or Linear issue. Confirm that, the target project, and the agent, then create the automation and trigger a first run so we can review the result together.";
-
-const DEFAULT_TIMEZONE =
-	Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+	"Help me create a Paradev automation. Use the superset:automate skill if it's available, otherwise the `superset` CLI (start with `superset automations --help`). Ask me what the automation should do and what should fire it — a schedule, or an event like a Slack message, GitHub pull request, or Linear issue. Confirm that, the target project, and the agent, then create the automation and trigger a first run so we can review the result together.";
 
 function AutomationsPage() {
 	const { t } = useLingui();
@@ -283,7 +290,24 @@ function AutomationsPage() {
 	const [sortField, setSortField] = useState<AutomationSortField | null>(null);
 	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
+	const [lastRunSortMode, setLastRunSortMode] =
+		useState<LastRunSortMode>("time");
+
 	const handleSort = (field: AutomationSortField) => {
+		if (field === "lastRun") {
+			const current = LAST_RUN_SORT_CYCLE.findIndex(
+				(step) =>
+					sortField === "lastRun" &&
+					step.mode === lastRunSortMode &&
+					step.direction === sortDirection,
+			);
+			const next =
+				LAST_RUN_SORT_CYCLE[(current + 1) % LAST_RUN_SORT_CYCLE.length];
+			setSortField("lastRun");
+			setLastRunSortMode(next.mode);
+			setSortDirection(next.direction);
+			return;
+		}
 		if (sortField === field) {
 			setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
 		} else {
@@ -302,6 +326,24 @@ function AutomationsPage() {
 
 	const sortedVisible = useMemo(() => {
 		if (!sortField) return visible;
+		if (sortField === "lastRun") {
+			// Never-run automations stay at the bottom in both directions.
+			return [...visible].sort((a, b) => {
+				const aRun = lastRunById.get(a.id);
+				const bRun = lastRunById.get(b.id);
+				if (!aRun || !bRun) return aRun === bRun ? 0 : aRun ? -1 : 1;
+				if (lastRunSortMode === "time") {
+					return sortDirection === "asc"
+						? aRun.at - bRun.at
+						: bRun.at - aRun.at;
+				}
+				const cmp =
+					RUN_STATUS_META[aRun.status].sortRank -
+					RUN_STATUS_META[bRun.status].sortRank;
+				if (cmp !== 0) return sortDirection === "asc" ? cmp : -cmp;
+				return bRun.at - aRun.at;
+			});
+		}
 		const sortValue = (automation: AutomationListItem): string => {
 			switch (sortField) {
 				case "name":
@@ -324,11 +366,16 @@ function AutomationsPage() {
 			const cmp = sortValue(a).localeCompare(sortValue(b));
 			return sortDirection === "asc" ? cmp : -cmp;
 		});
-	}, [visible, sortField, sortDirection, usersById]);
+	}, [
+		visible,
+		sortField,
+		sortDirection,
+		usersById,
+		lastRunById,
+		lastRunSortMode,
+	]);
 
 	const navigate = useNavigate();
-	const { machineId, activeHostUrl } = useLocalHostService();
-	const { agents: agentChoices } = useV2AgentChoices(activeHostUrl);
 	const { createSession, isPending: creatingWithAgent } =
 		useCreateAgentSession();
 	// Automations are Pro. Creating, running, and resuming go through the
@@ -338,70 +385,21 @@ function AutomationsPage() {
 	const { gateFeature, hasAccess, isReady: planReady } = usePaywall();
 	const showProBadge = planReady && !hasAccess(GATED_FEATURES.AUTOMATIONS);
 
-	// Cursor-style creation: no dialog. "New automation" writes an untitled
-	// automation with no triggers and opens its detail page, which is the
-	// editor; a template pre-fills name/prompt/schedule the same way.
-	const createMutation = useMutation({
-		mutationFn: (template: AutomationTemplate | null) => {
-			const stored = window.localStorage.getItem(AGENT_STORAGE_KEY);
-			// Template preference first (iconId is a legacy fallback, as in the
-			// old dialog), then the last-used agent, then the first host agent.
-			const choice =
-				(template?.agentType
-					? (matchAgentChoice(agentChoices, template.agentType) ??
-						agentChoices.find((option) => option.iconId === template.agentType))
-					: null) ??
-				(stored ? matchAgentChoice(agentChoices, stored) : null) ??
-				agentChoices[0];
-			if (!choice) throw new Error("No agent available yet");
-			return apiTrpcClient.automation.create.mutate({
-				name: template
-					? i18n._(template.name)
-					: t({
-							message: "Untitled",
-						}),
-				prompt: template?.prompt ?? "",
-				// Preset slug when unambiguous — instance UUIDs die when the host's
-				// agent-config table is re-seeded, orphaning the automation.
-				agent: portableAgentValue(agentChoices, choice),
-				targetHostId: machineId ?? null,
-				v2ProjectId: recentProjects.find((p) => p != null)?.id ?? null,
-				...(template?.rrule
-					? { rrule: template.rrule, timezone: DEFAULT_TIMEZONE }
-					: { triggers: [] }),
-			});
-		},
-		onSuccess: (result) => {
-			void utils.automation.list.invalidate();
-			void navigate({
-				to: "/automations/$automationId",
-				params: { automationId: result.id },
-			});
-		},
-		onError: (error) => {
-			// Raw Postgres errors are multi-line SQL dumps — keep the first line.
-			const message =
-				error instanceof Error ? error.message.split("\n")[0]?.trim() : null;
-			toast.error(
-				message ||
-					t({
-						message: "Failed to create automation",
-					}),
-			);
-		},
-	});
+	const { create: createAutomation, isPending: creatingAutomation } =
+		useCreateAutomation();
+	const recentProjectId = recentProjects.find((p) => p != null)?.id ?? null;
 
-	const handleSelectTemplate = (template: AutomationTemplate) => {
-		if (createMutation.isPending) return;
-		gateFeature(GATED_FEATURES.AUTOMATIONS, () =>
-			createMutation.mutate(template),
-		);
-	};
+	const handleSelectTemplate = (template: AutomationTemplate) =>
+		createAutomation({
+			name: i18n._(template.name),
+			prompt: template.prompt,
+			agent: template.agentType,
+			projectId: recentProjectId,
+			rrule: template.rrule,
+		});
 
-	const handleCreateManually = () => {
-		if (createMutation.isPending) return;
-		gateFeature(GATED_FEATURES.AUTOMATIONS, () => createMutation.mutate(null));
-	};
+	const handleCreateManually = () =>
+		createAutomation({ prompt: "", projectId: recentProjectId });
 
 	const handleCreateWithAgent = () => {
 		if (creatingWithAgent) return;
@@ -483,7 +481,7 @@ function AutomationsPage() {
 						primaryAction={{
 							label: <Trans>New automation</Trans>,
 							onSelect: handleCreateManually,
-							disabled: createMutation.isPending,
+							disabled: creatingAutomation,
 						}}
 					/>
 
@@ -638,7 +636,7 @@ function AutomationsPage() {
 									onCreateWithAgent={handleCreateWithAgent}
 									isCreating={creatingWithAgent}
 									onCreateManually={handleCreateManually}
-									isCreatingManually={createMutation.isPending}
+									isCreatingManually={creatingAutomation}
 									showProBadge={showProBadge}
 								/>
 							</div>
@@ -726,11 +724,19 @@ function AutomationsPage() {
 											<TableHead
 												className={cn(DATA_TABLE_HEAD_CELL, lastRunWidth)}
 											>
-												{/* Sortable heads are buttons, which Chrome's UA sheet
-												    exempts from the header's `uppercase` — match them. */}
-												<span className="normal-case">
-													<Trans>Last run</Trans>
-												</span>
+												<SortableHeader
+													field="lastRun"
+													label={
+														sortField !== "lastRun"
+															? t({ message: "Last run" })
+															: lastRunSortMode === "time"
+																? t({ message: "Last run (time)" })
+																: t({ message: "Last run (result)" })
+													}
+													sortField={sortField}
+													sortDirection={sortDirection}
+													onSort={handleSort}
+												/>
 											</TableHead>
 											<TableHead
 												className={cn(DATA_TABLE_HEAD_CELL, "w-20 pr-4")}

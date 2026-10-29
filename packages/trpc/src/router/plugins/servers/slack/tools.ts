@@ -9,7 +9,7 @@ interface SlackResponse {
 	[key: string]: unknown;
 }
 
-async function slack(
+export async function slack(
 	accessToken: string,
 	method: string,
 	params: Record<string, unknown> = {},
@@ -55,7 +55,7 @@ function text(value: string): ToolResult {
 	return { content: [{ type: "text", text: value }] };
 }
 
-interface SlackMessage {
+export interface SlackMessage {
 	ts?: string;
 	user?: string;
 	username?: string;
@@ -85,7 +85,7 @@ interface SlackChannel {
 	purpose?: { value?: string };
 }
 
-interface SlackUser {
+export interface SlackUser {
 	id: string;
 	name?: string;
 	real_name?: string;

@@ -1,6 +1,6 @@
 ---
 title: "Warp vs Conductor (2026): Agentic Terminal vs Parallel Agent App"
-description: "Compare Warp and Conductor for AI coding. See how an agentic terminal with a cloud orchestrator differs from a Mac app for parallel worktree agents, plus where Superset fits."
+description: "Compare Warp and Conductor for AI coding. See how an agentic terminal with a cloud orchestrator differs from a Mac app for parallel worktree agents, plus where Paradev fits."
 date: 2026-07-13
 lastUpdated: 2026-09-24
 type: "1v1"
@@ -18,20 +18,20 @@ keywords:
 
 Warp and Conductor both help you run AI coding agents, but from different angles. Warp is a fast terminal that has grown into an agentic development environment, running multiple agents side by side and adding a cloud orchestrator for background work. Conductor is a macOS app focused on running agents in parallel, each isolated in its own Git worktree, with a review-and-merge flow. The choice comes down to whether you want an agentic terminal or a dedicated worktree orchestrator.
 
-If you want worktree-based orchestration that is agent-agnostic on macOS and experimental Linux, [Superset](/compare/superset-vs-warp) is a third option. This page compares all three.
+If you want worktree-based orchestration that is agent-agnostic on macOS and experimental Linux, [Paradev](/compare/superset-vs-warp) is a third option. This page compares all three.
 
 ---
 
 ## At a Glance
 
-| | **Warp** | **Conductor** | **Superset** |
+| | **Warp** | **Conductor** | **Paradev** |
 |---|---|---|---|
 | **Category** | Agentic terminal and dev environment | Mac app for parallel agents | Agent orchestration workspace |
 | **Agents** | Runs Claude Code, Codex, Gemini, OpenCode, plus Warp Agent | Claude Code, Codex, Cursor | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, and more) |
 | **Parallel model** | Multiple agents in panes; Oz cloud orchestrator | Worktree per task (local) | Local branch-based worktrees; connected hosts |
 | **Task isolation** | No named per-task worktree isolation | Git worktree per task | Git worktrees for local branch-based workspaces |
 | **Platform** | macOS, Linux, Windows + cloud | macOS only | macOS; experimental Linux AppImage; Windows unavailable |
-| **Pricing** | Free; Build $20/mo, Max $200/mo, Business $50/seat | Free, bring your own subscription | Free tier + Pro $20/seat/mo |
+| **Pricing** | Free; Build $20/mo, Max $200/mo, Business $50/seat | Free, bring your own subscription | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo |
 
 ---
 
@@ -57,17 +57,17 @@ Conductor runs agents locally in worktrees. Warp runs agents in local panes and 
 
 Warp runs on macOS, Linux, and Windows, plus its cloud. Conductor is macOS only. If you need Linux or Windows, Warp is the option here.
 
-## Where Superset Fits
+## Where Paradev Fits
 
-If you like Conductor's worktree isolation but want it agent-agnostic on macOS and experimental Linux, or you like Warp's multi-agent approach but want per-task worktrees rather than terminal panes, Superset combines the two ideas. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, and custom agents in local branch-based workspaces with separate worktrees, review, an in-app browser, MCP, and remote and cloud workspaces. See [Superset vs Warp](/compare/superset-vs-warp) and [Superset vs Conductor](/compare/superset-vs-conductor).
+If you like Conductor's worktree isolation but want it agent-agnostic on macOS and experimental Linux, or you like Warp's multi-agent approach but want per-task worktrees rather than terminal panes, Paradev combines the two ideas. It runs Claude Code, Codex, OpenCode, Cursor, Gemini, and custom agents in local branch-based workspaces with separate worktrees, review, an in-app browser, MCP, and remote and cloud workspaces. See [Paradev vs Warp](/compare/superset-vs-warp) and [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ## Which Should You Choose?
 
 - **Choose Warp** if you want a fast, agentic terminal that runs multiple agents and offloads background work to a cloud orchestrator, on any platform.
 - **Choose Conductor** if you are on macOS and want a focused app for parallel agents in isolated worktrees.
-- **Choose Superset** if you want agent-agnostic worktree orchestration across many agents, local plus remote and cloud, not tied to a terminal or macOS.
+- **Choose Paradev** if you want agent-agnostic worktree orchestration across many agents, local plus remote and cloud, not tied to a terminal or macOS.
 
-**Verdict:** Warp is the strongest agentic terminal; Conductor is a focused worktree orchestrator for the Mac. Superset sits between them: worktree isolation like Conductor, broad CLI-agent support on macOS and experimental Linux; Windows is not available.
+**Verdict:** Warp is the strongest agentic terminal; Conductor is a focused worktree orchestrator for the Mac. Paradev sits between them: worktree isolation like Conductor, broad CLI-agent support on macOS and experimental Linux; Windows is not available.
 
 ---
 
@@ -75,12 +75,12 @@ If you like Conductor's worktree isolation but want it agent-agnostic on macOS a
 
 ### Does Warp use Git worktrees?
 
-Warp runs multiple agents in panes and orchestrates background agents through its Oz cloud, but it does not name a per-task Git worktree isolation model. Conductor supports worktree-based tasks. Superset creates worktrees for new local branch-based workspaces.
+Warp runs multiple agents in panes and orchestrates background agents through its Oz cloud, but it does not name a per-task Git worktree isolation model. Conductor supports worktree-based tasks. Paradev creates worktrees for new local branch-based workspaces.
 
 ### Is Warp or Conductor cross-platform?
 
-Warp runs on macOS, Linux, and Windows plus its cloud. Conductor is macOS only. Superset supports macOS and experimental Linux; Windows is not available.
+Warp runs on macOS, Linux, and Windows plus its cloud. Conductor is macOS only. Paradev supports macOS and experimental Linux; Windows is not available.
 
 ### Can both run Claude Code and Codex?
 
-Yes. Warp runs Claude Code, Codex, Gemini, and OpenCode in panes; Conductor runs Claude Code, Codex, and Cursor in worktrees. Superset runs all of these, each in its own worktree.
+Yes. Warp runs Claude Code, Codex, Gemini, and OpenCode in panes; Conductor runs Claude Code, Codex, and Cursor in worktrees. Paradev runs all of these, each in its own worktree.

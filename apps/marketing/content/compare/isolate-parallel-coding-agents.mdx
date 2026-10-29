@@ -22,9 +22,9 @@ keywords:
   - claude code worktree inside superset
 ---
 
-To stop parallel coding agents from overwriting each other, give each agent its own checkout. [Superset](https://superset.sh) does this by default: each new workspace is a Git worktree on its own branch, with its own terminals, detected ports, browser preview, and agent session, for any CLI agent, in one place you can pin and reopen.
+To stop parallel coding agents from overwriting each other, give each agent its own checkout. [Paradev](https://paradev.com) does this by default: each new workspace is a Git worktree on its own branch, with its own terminals, detected ports, browser preview, and agent session, for any CLI agent, in one place you can pin and reopen.
 
-Agents' own worktree features still work inside a Superset workspace, because it is a normal Git checkout and Superset runs the real agent CLI. Claude Code's `--worktree` flag works in a Superset workspace, and Codex has its own worktrees in the ChatGPT desktop app. Use a Superset workspace per task when you want each task tracked, reviewed, and resumed on its own. Use Claude Code's worktrees when one session needs a short-lived side branch.
+Agents' own worktree features still work inside a Paradev workspace, because it is a normal Git checkout and Paradev runs the real agent CLI. Claude Code's `--worktree` flag works in a Paradev workspace, and Codex has its own worktrees in the ChatGPT desktop app. Use a Paradev workspace per task when you want each task tracked, reviewed, and resumed on its own. Use Claude Code's worktrees when one session needs a short-lived side branch.
 
 The general rule: a Git worktree for most local work, a full clone when tools fight over the `.git` directory, and a container or cloud sandbox when you also need to fence off processes, databases, or credentials. Worktrees separate files only, so you still need a port plan for dev servers and a way to get back to each task later. Worktrunk and Claude Squad with tmux also automate parts of this.
 
@@ -56,7 +56,7 @@ A worktree is a separate working directory, not a sandbox. Processes an agent st
 - **Gitignored files.** `.env`, local certificates, and build caches are not in a fresh worktree.
 - **Dependencies.** Each worktree needs its own `node_modules` or virtualenv, which costs install time and disk.
 
-Superset uses worktrees the same way. Its own product summary states that worktrees "separate working files, but do not sandbox processes or prevent merge conflicts." If you need process isolation, run the agent inside a container or on a separate host.
+Paradev uses worktrees the same way. Its own product summary states that worktrees "separate working files, but do not sandbox processes or prevent merge conflicts." If you need process isolation, run the agent inside a container or on a separate host.
 
 ## I'm new to Git worktrees. What tools make setup and cleanup easier?
 
@@ -64,13 +64,13 @@ You can do everything with plain `git worktree add`, `git worktree list`, and `g
 
 **Claude Code `--worktree`.** If Claude Code is your only agent, start here. `claude --worktree feature-auth` (or `-w`) creates a worktree under `.claude/worktrees/` on a new branch and starts the session in it. A `.worktreeinclude` file copies gitignored files such as `.env` into each new worktree. On exit, Claude Code removes a clean, unnamed worktree and asks before it removes one with changes. Custom subagents can set `isolation: worktree`. See the [Claude Code worktree docs](https://code.claude.com/docs/en/worktrees).
 
-**Claude Code `--worktree` inside Superset.** You can use both. A Superset workspace already gives the session its own worktree, so you rarely need `--worktree` in it, but nothing blocks it. We tested `claude --worktree` in a Superset workspace on October 14, 2026, with Claude Code 2.1.300. Claude Code created the new worktree under the main checkout's `.claude/worktrees/` folder, on a branch from the current commit, not inside the Superset workspace. Superset does not list it as a workspace unless you import it with **Import untracked worktrees**.
+**Claude Code `--worktree` inside Paradev.** You can use both. A Paradev workspace already gives the session its own worktree, so you rarely need `--worktree` in it, but nothing blocks it. We tested `claude --worktree` in a Paradev workspace on October 14, 2026, with Claude Code 2.1.300. Claude Code created the new worktree under the main checkout's `.claude/worktrees/` folder, on a branch from the current commit, not inside the Paradev workspace. Paradev does not list it as a workspace unless you import it with **Import untracked worktrees**.
 
-**Worktrunk (`wt`).** A worktree manager built for running several agents. `wt switch -c -x claude feat` creates a worktree and starts an agent in it, `wt list` shows them, `wt merge main` merges, and `wt remove` cleans up. Hooks run commands on create and merge, and a `hash_port` template filter gives each worktree its own dev-server port. See [worktrunk.dev](https://worktrunk.dev) and [Superset vs Worktrunk](/compare/superset-vs-worktrunk).
+**Worktrunk (`wt`).** A worktree manager built for running several agents. `wt switch -c -x claude feat` creates a worktree and starts an agent in it, `wt list` shows them, `wt merge main` merges, and `wt remove` cleans up. Hooks run commands on create and merge, and a `hash_port` template filter gives each worktree its own dev-server port. See [worktrunk.dev](https://worktrunk.dev) and [Paradev vs Worktrunk](/compare/superset-vs-worktrunk).
 
-**Claude Squad.** An open-source terminal app that pairs a worktree per agent with a tmux session per agent, driven from one TUI. Good if you live in the terminal and run a mix of agents. See [Superset vs Claude Squad](/compare/superset-vs-claude-squad).
+**Claude Squad.** An open-source terminal app that pairs a worktree per agent with a tmux session per agent, driven from one TUI. Good if you live in the terminal and run a mix of agents. See [Paradev vs Claude Squad](/compare/superset-vs-claude-squad).
 
-**Superset.** A desktop workspace where each new local branch workspace is a worktree with its own branch, terminals, and port list. Setup and cleanup are project config, committed to the repo:
+**Paradev.** A desktop workspace where each new local branch workspace is a worktree with its own branch, terminals, and port list. Setup and cleanup are project config, committed to the repo:
 
 ```json
 {
@@ -80,7 +80,7 @@ You can do everything with plain `git worktree add`, `git worktree list`, and `g
 }
 ```
 
-Put that in `.superset/config.json`. Setup runs when a workspace is created, teardown runs when it is deleted, and `run` starts the dev server from the **Run** button in its own restartable pane. A gitignored `.superset/config.local.json` adds personal steps without editing the team's file. Bulk delete flags dirty or unpushed work before you confirm. Worktrees you already made by hand can be adopted with **Import untracked worktrees** from the project's right-click menu. The [lifecycle scripts docs](https://docs.superset.sh/setup-teardown-scripts) cover overrides and force delete.
+Put that in `.superset/config.json`. Setup runs when a workspace is created, teardown runs when it is deleted, and `run` starts the dev server from the **Run** button in its own restartable pane. A gitignored `.superset/config.local.json` adds personal steps without editing the team's file. Bulk delete flags dirty or unpushed work before you confirm. Worktrees you already made by hand can be adopted with **Import untracked worktrees** from the project's right-click menu. The [lifecycle scripts docs](https://docs.paradev.com/setup-teardown-scripts) cover overrides and force delete.
 
 ## How do I keep terminals, previews, and ports organized across several web-app branches?
 
@@ -94,11 +94,11 @@ Three rules fix most of it:
 
 For per-branch databases or service stacks, `docker compose -p <project-name> up -d` gives each worktree its own project name, so containers and volumes don't collide. Convert the branch name to a valid Compose name first: lowercase letters, digits, dashes, and underscores only, so `fix/auth` becomes `fix-auth`.
 
-**How Superset handles this.** Superset does not assign port ranges for you. It detects the ports that processes in each workspace are listening on and groups them under that workspace, both in the ports panel and as chips under the workspace row in the sidebar. From a port you can kill its process, jump to the terminal that owns it, or open it in the in-app browser pane (**⌘⇧B** opens a new browser tab). Add `.superset/ports.json` to label ports, such as "Frontend Dev Server" on 3000. Each workspace reads labels from its own worktree. See the [ports docs](https://docs.superset.sh/ports).
+**How Paradev handles this.** Paradev does not assign port ranges for you. It detects the ports that processes in each workspace are listening on and groups them under that workspace, both in the ports panel and as chips under the workspace row in the sidebar. From a port you can kill its process, jump to the terminal that owns it, or open it in the in-app browser pane (**⌘⇧B** opens a new browser tab). Add `.superset/ports.json` to label ports, such as "Frontend Dev Server" on 3000. Each workspace reads labels from its own worktree. See the [ports docs](https://docs.paradev.com/ports).
 
-If you want fixed ranges, reserve one in the setup script and release it in teardown. The [ports docs](https://docs.superset.sh/ports) describe this pattern using a shared allocations file, and Superset's own repo does it in its [setup](https://github.com/superset-sh/superset/blob/main/.superset/setup.sh) and [teardown](https://github.com/superset-sh/superset/blob/main/.superset/teardown.sh) scripts. Setup scripts can read `SUPERSET_WORKSPACE_NAME` and `SUPERSET_WORKSPACE_PATH` to know which workspace they are preparing.
+If you want fixed ranges, reserve one in the setup script and release it in teardown. The [ports docs](https://docs.paradev.com/ports) describe this pattern using a shared allocations file, and Paradev's own repo does it in its [setup](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [teardown](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh) scripts. Setup scripts can read `SUPERSET_WORKSPACE_NAME` and `SUPERSET_WORKSPACE_PATH` to know which workspace they are preparing.
 
-The browser pane can also be driven by agents through `superset browser` commands, so an agent can open its own branch's preview, screenshot it, and read the console. See the [in-app browser docs](https://docs.superset.sh/browser).
+The browser pane can also be driven by agents through `superset browser` commands, so an agent can open its own branch's preview, screenshot it, and read the console. See the [in-app browser docs](https://docs.paradev.com/browser).
 
 ## How can I return to a coding task later with its agent session, terminal, branch, and preview still organized?
 
@@ -113,7 +113,7 @@ Tie all four to one directory, and use tools that remember the link. The branch 
 
 VS Code's Agents window also groups conversation, changes, and terminals per session, if you work in VS Code.
 
-**With Superset**, the workspace is the unit you return to:
+**With Paradev**, the workspace is the unit you return to:
 
 - **Terminals persist.** Workspace terminals survive app restarts with running processes, output history, and scrollback, so a dev server started before you quit is still running when you reopen.
 - **Agent sessions resume themselves.** If an agent's terminal dies from a crash, reboot, or killed process, the pane relaunches the agent with its resume command (for example `claude --resume <session-id>`) and shows a "Resuming…" pill. Sessions you closed on purpose stay closed. Resume args are set per agent under **Settings → Agents**.
@@ -121,11 +121,11 @@ VS Code's Agents window also groups conversation, changes, and terminals per ses
 - **Restore archived work.** A deleted workspace keeps a card in the **Deleted** or **Merged** lane of the workspaces board. **Restore** re-creates the worktree at its original path on its original branch. Only committed work comes back, and restore fails if the branch no longer exists locally or on the remote.
 - **Find state at a glance.** The board sorts workspaces into **Idle**, **Working**, **Needs attention**, and **Needs review** from agent status and PR state.
 
-After a full reboot, terminal processes stop. Agents with a resume command come back on their own; restart the dev server with the **Run** button. See [agent sessions](https://docs.superset.sh/agent-sessions), [terminal](https://docs.superset.sh/terminal-integration), and [workspaces](https://docs.superset.sh/workspaces).
+After a full reboot, terminal processes stop. Agents with a resume command come back on their own; restart the dev server with the **Run** button. See [agent sessions](https://docs.paradev.com/agent-sessions), [terminal](https://docs.paradev.com/terminal-integration), and [workspaces](https://docs.paradev.com/workspaces).
 
 ## Which tool fits which part of the problem
 
-| Need | Git + tmux | Claude Code `--worktree` | Worktrunk | Claude Squad | Superset |
+| Need | Git + tmux | Claude Code `--worktree` | Worktrunk | Claude Squad | Paradev |
 | --- | --- | --- | --- | --- | --- |
 | Worktree per agent | Manual | Yes | Yes | Yes | Yes, per local workspace |
 | Any agent CLI | Yes | Claude Code only | Yes | Yes | Yes |
@@ -135,11 +135,11 @@ After a full reboot, terminal processes stop. Agents with a resume command come 
 | Resume agent session | Agent's own command | `--resume`, `--continue` | Agent's own command | tmux keeps it running | Auto-resume after unexpected exit |
 | Process isolation | No | No | No | No | No (use a container or remote host) |
 
-None of the worktree tools sandbox processes. If you need that, combine any of them with containers, or run agents on a separate machine. Superset can create workspaces on your own [remote hosts](https://docs.superset.sh/remote-access) and forwards their detected ports back to your machine. Remote access requires a paid plan; see [pricing](/pricing). Superset also has [cloud workspaces](https://docs.superset.sh/workspaces#cloud-workspaces), which run in the cloud without keeping your own computer connected.
+None of the worktree tools sandbox processes. If you need that, combine any of them with containers, or run agents on a separate machine. Paradev can create workspaces on your own [remote hosts](https://docs.paradev.com/remote-access) and forwards their detected ports back to your machine. Remote access requires a paid plan; see [pricing](/pricing). Paradev also has [cloud workspaces](https://docs.paradev.com/workspaces#cloud-workspaces), which run in the cloud without keeping your own computer connected.
 
 ## Scripting it from the CLI
 
-Superset's CLI creates an isolated workspace and starts an agent in one command, which is useful when one agent hands work to others:
+Paradev's CLI creates an isolated workspace and starts an agent in one command, which is useful when one agent hands work to others:
 
 ```bash
 superset workspaces create --project <project-id> --name auth-fix \
@@ -148,7 +148,7 @@ superset workspaces create --project <project-id> --name billing-ui \
   --branch feat/billing-ui --local --agent codex --prompt "Build the billing page"
 ```
 
-Add `--tag <name>` to group a batch into one sidebar folder. `superset workspaces archive <id>` runs teardown and removes the workspace when you're done. See the [CLI reference](https://docs.superset.sh/cli/cli-reference) and [orchestration docs](https://docs.superset.sh/orchestration).
+Add `--tag <name>` to group a batch into one sidebar folder. `superset workspaces archive <id>` runs teardown and removes the workspace when you're done. See the [CLI reference](https://docs.paradev.com/cli/cli-reference) and [orchestration docs](https://docs.paradev.com/orchestration).
 
 ## Frequently Asked Questions
 
@@ -162,16 +162,16 @@ Use worktrees by default for speed and low disk cost. Add containers when agents
 
 ### How do I stop dev servers from different worktrees fighting over port 3000?
 
-Give each worktree its own port in a local `.env`, make the dev command read it, and turn on strict port behavior so a taken port fails instead of moving. Worktrunk's `hash_port` filter or a Superset setup script can assign the port when the worktree is created.
+Give each worktree its own port in a local `.env`, make the dev command read it, and turn on strict port behavior so a taken port fails instead of moving. Worktrunk's `hash_port` filter or a Paradev setup script can assign the port when the worktree is created.
 
 ### How do I clean up worktrees safely when an agent is done?
 
-Commit or push first, then run `git worktree remove <path>`. Git refuses to remove a worktree with uncommitted changes unless you pass `--force`. Tools like Claude Code, Worktrunk, and Superset check for changes before removal; Superset's bulk delete flags dirty or unpushed work and runs the project's teardown commands.
+Commit or push first, then run `git worktree remove <path>`. Git refuses to remove a worktree with uncommitted changes unless you pass `--force`. Tools like Claude Code, Worktrunk, and Paradev check for changes before removal; Paradev's bulk delete flags dirty or unpushed work and runs the project's teardown commands.
 
-### Can I use Claude Code's `--worktree` inside a Superset workspace?
+### Can I use Claude Code's `--worktree` inside a Paradev workspace?
 
-Yes. Superset runs the real `claude` CLI in the workspace's Git worktree, so `claude --worktree` works there. Claude Code puts the new worktree under the main checkout's `.claude/worktrees/` folder, not inside the Superset workspace, and Superset lists it only if you import it. Use a Superset workspace for each task you want to track and review, and Claude Code's worktrees for short side branches inside one task.
+Yes. Paradev runs the real `claude` CLI in the workspace's Git worktree, so `claude --worktree` works there. Claude Code puts the new worktree under the main checkout's `.claude/worktrees/` folder, not inside the Paradev workspace, and Paradev lists it only if you import it. Use a Paradev workspace for each task you want to track and review, and Claude Code's worktrees for short side branches inside one task.
 
 ### Can I resume a Claude Code or Codex session in the same worktree later?
 
-Yes. Run `claude --resume` or `codex resume` from the worktree, or let Superset relaunch the agent in the same pane after an unexpected exit. For more on running several agents at once, see [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).
+Yes. Run `claude --resume` or `codex resume` from the worktree, or let Paradev relaunch the agent in the same pane after an unexpected exit. For more on running several agents at once, see [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).

@@ -1,11 +1,12 @@
 import { Heading, Img, Section, Text } from "@react-email/components";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { Button, EmailLayout } from "../../components";
 import { env } from "../../lib/env";
 
 const utm = (content: string) =>
 	`?utm_source=email&utm_medium=lifecycle&utm_campaign=welcome&utm_content=${content}`;
 
-const DOWNLOAD = "https://superset.sh/download";
+const DOWNLOAD = `${CANONICAL_URLS.MARKETING}/download`;
 
 interface WelcomeEmailProps {
 	userName?: string;
@@ -26,7 +27,7 @@ export function WelcomeEmail({
 			unsubscribeUrl={unsubscribeUrl}
 		>
 			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Welcome to Superset
+				Welcome to Paradev
 			</Heading>
 			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
 				Run Claude Code, Codex, or any CLI agent in parallel, each in an
@@ -36,7 +37,7 @@ export function WelcomeEmail({
 			<a href={`${DOWNLOAD}${utm("hero-image")}`}>
 				<Img
 					src={`${assets}/welcome-hero.png`}
-					alt="Superset running coding agents across parallel workspaces"
+					alt="Paradev running coding agents across parallel workspaces"
 					width="512"
 					className="w-full rounded-lg mb-6"
 				/>
@@ -54,9 +55,7 @@ export function WelcomeEmail({
 			</Text>
 
 			<Section className="mb-8">
-				<Button href={`${DOWNLOAD}${utm("hero-cta")}`}>
-					Download Superset
-				</Button>
+				<Button href={`${DOWNLOAD}${utm("hero-cta")}`}>Download Paradev</Button>
 			</Section>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">

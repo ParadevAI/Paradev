@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Warp (2026): Agent Orchestration vs AI-Powered Terminal"
-description: "Compare Superset and Warp for AI-enhanced development workflows. See how multi-agent orchestration differs from an AI-powered terminal experience."
+title: "Paradev vs Warp (2026): Agent Orchestration vs AI-Powered Terminal"
+description: "Compare Paradev and Warp for AI-enhanced development workflows. See how multi-agent orchestration differs from an AI-powered terminal experience."
 date: 2026-02-02
 lastUpdated: 2026-10-07
 type: "1v1"
@@ -14,26 +14,26 @@ keywords:
   - ai powered terminal
 ---
 
-Superset and Warp both help developers work with AI around the command line, but they solve different problems. Warp is a modern terminal emulator with built-in AI agents. Superset is a local-first workspace for running many coding agents in parallel, each in its own isolated Git worktree.
+Paradev and Warp both help developers work with AI around the command line, but they solve different problems. Warp is a modern terminal emulator with built-in AI agents. Paradev is a local-first workspace for running many coding agents in parallel, each in its own isolated Git worktree.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Warp** |
+| | **Paradev** | **Warp** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI-powered terminal emulator |
 | **What it does** | Runs multiple AI coding agents in parallel with Git worktrees, chat, diff/file review, and browser tooling | Modern terminal with built-in AI agents, code editing, and collaboration |
-| **AI approach** | Agent-agnostic: works with Claude Code, Codex, Aider, Superset Chat, or any CLI agent | Built-in agents (OpenAI, Anthropic, Google); supports BYOK and third-party CLI agents |
+| **AI approach** | Agent-agnostic: works with Claude Code, Codex, Aider, Paradev Chat, or any CLI agent | Built-in agents (OpenAI, Anthropic, Google); supports BYOK and third-party CLI agents |
 | **Parallelism** | Core feature: new local branch-based workspaces get separate worktrees and branches | Agents run in terminal panes; Oz cloud orchestrator for background agents |
-| **Pricing** | Free tier + Pro $20/seat/mo | Free; Build $20/mo, Max $200/mo, Business $50/seat |
-| **License** | Source-available (ELv2) | Open source |
+| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free; Build $20/mo, Max $200/mo, Business $50/seat |
+| **License** | Source-available (ELv2) | Open source (AGPL-3.0) |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. New local branch-based workspaces give tasks separate Git worktrees and branches with terminals for your agents. Size concurrent workloads to your host resources and provider limits. Around that core, Superset adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Superset ships no required model layer: you can bring Claude Code, Codex, Aider, OpenCode, or other agents, and you can review inside Superset or jump into your editor of choice. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. New local branch-based workspaces give tasks separate Git worktrees and branches with terminals for your agents. Size concurrent workloads to your host resources and provider limits. Around that core, Paradev adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Paradev ships no required model layer: you can bring Claude Code, Codex, Aider, OpenCode, or other agents, and you can review inside Paradev or jump into your editor of choice. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -47,25 +47,25 @@ Warp is a Rust-based, GPU-accelerated terminal that evolved into an agentic deve
 
 ### Built-In Agents vs Bring-Your-Own
 
-Warp ships its own agents: type a prompt, get results, no external tools to install. Superset is more bring-your-own by default: you install Claude Code, Codex, Aider, or another agent, and Superset runs them in parallel. Warp is more convenient out of the box; Superset gives you complete freedom over which agent, model, and provider you use, while still adding its own chat and workspace tooling around them.
+Warp ships its own agents: type a prompt, get results, no external tools to install. Paradev is more bring-your-own by default: you install Claude Code, Codex, Aider, or another agent, and Paradev runs them in parallel. Warp is more convenient out of the box; Paradev gives you complete freedom over which agent, model, and provider you use, while still adding its own chat and workspace tooling around them.
 
 ### Parallelism and Isolation
 
-Both tools support multiple agents, but the isolation model differs. Superset gives each new local branch-based workspace a separate Git worktree and branch. This separates working files but does not restrict what an agent process can access. Warp runs agents in terminal panes on your file system directly. For a few agents on unrelated tasks, that works. For independent tasks on the same codebase, worktrees separate working files; merge conflicts and shared-service interference still require review and coordination.
+Both tools support multiple agents, but the isolation model differs. Paradev gives each new local branch-based workspace a separate Git worktree and branch. This separates working files but does not restrict what an agent process can access. Warp runs agents in terminal panes on your file system directly. For a few agents on unrelated tasks, that works. For independent tasks on the same codebase, worktrees separate working files; merge conflicts and shared-service interference still require review and coordination.
 
 ### Terminal Quality vs Orchestration Focus
 
-Warp is a polished terminal: GPU-accelerated, with block-based output and a command palette. Superset includes terminals because agents need them, but the product is a workspace for organizing parallel coding-agent tasks, not a classic daily-driver terminal. You would still use Warp, iTerm2, or Kitty for SSH and ad-hoc commands.
+Warp is a polished terminal: GPU-accelerated, with block-based output and a command palette. Paradev includes terminals because agents need them, but the product is a workspace for organizing parallel coding-agent tasks, not a classic daily-driver terminal. You would still use Warp, iTerm2, or Kitty for SSH and ad-hoc commands.
 
 ### Team Collaboration
 
-Warp has team features via Warp Drive: shared commands, notebooks, environment variables, plus Slack/Linear/GitHub integrations. Superset's team features center on organizations: workspaces on shared remote hosts, team automations with a shared run history, Pages that teammates read and comment on, and Slack and Linear integrations.
+Warp has team features via Warp Drive: shared commands, notebooks, environment variables, plus Slack/Linear/GitHub integrations. Paradev's team features center on organizations: workspaces on shared remote hosts, team automations with a shared run history, Pages that teammates read and comment on, and Slack and Linear integrations.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. You also pay for the API keys your chosen agents consume.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. You also pay for the API keys your chosen agents consume.
 
 Warp's terminal features are free, and the app is now open source. AI features come with the Build plan ($20/month, 1,500 credits) or BYOK, with Max at $200/month for higher credit volume and Business at $50/user/month with SSO and zero data retention.
 
@@ -79,26 +79,26 @@ Warp's terminal features are free, and the app is now open source. AI features c
 - Need cross-platform support (macOS, Windows, Linux)
 - Prefer built-in agents that work without configuring external tools
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 - Run many coding agents in parallel and need Git-level isolation between them
 - Want full control over which agent and model you use, with no lock-in
 - Require source-available tooling with local Git worktrees
 - Already have a terminal you like and need an orchestration layer on top
 
-These tools complement each other. Use Warp as your daily terminal and Superset for parallel agent orchestration across worktrees.
+These tools complement each other. Use Warp as your daily terminal and Paradev for parallel agent orchestration across worktrees.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Superset a replacement for Warp?
+### Is Paradev a replacement for Warp?
 
-No. Superset is not your general daily-driver terminal. It now includes chat, browser, and diff/file review for agent workflows, but it is still specialized around orchestrating coding agents in parallel. You can use both: Warp for daily terminal work, Superset for parallel agent workflows.
+No. Paradev is not your general daily-driver terminal. It now includes chat, browser, and diff/file review for agent workflows, but it is still specialized around orchestrating coding agents in parallel. You can use both: Warp for daily terminal work, Paradev for parallel agent workflows.
 
 ### Does Warp isolate agents with Git worktrees?
 
-No. Warp agents operate on your file system directly. If two agents modify the same file concurrently, conflicts can arise. Superset separates working files in new local branch-based workspaces. Worktrees do not sandbox agents or prevent merge conflicts.
+No. Warp agents operate on your file system directly. If two agents modify the same file concurrently, conflicts can arise. Paradev separates working files in new local branch-based workspaces. Worktrees do not sandbox agents or prevent merge conflicts.
 
 ### Can I run Claude Code or Codex in both tools?
 
-Yes. Warp runs them in terminal panes alongside its built-in agents. Superset runs them in isolated Git worktrees with parallel execution as the core workflow. For one or two agents, either works. For ten agents on ten tasks with branch isolation, Superset is purpose-built for that.
+Yes. Warp runs them in terminal panes alongside its built-in agents. Paradev runs them in isolated Git worktrees with parallel execution as the core workflow. For one or two agents, either works. For ten agents on ten tasks with branch isolation, Paradev is purpose-built for that.

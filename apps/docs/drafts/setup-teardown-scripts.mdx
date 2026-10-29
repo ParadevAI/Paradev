@@ -1,0 +1,183 @@
+---
+title: Project Lifecycle Scripts
+description: Configure how Paradev sets up, runs, and archives a project's workspaces
+---
+
+## Overview
+
+Run commands automatically when a workspace is created or archived, and define the dev server the **Run** button starts.
+
+These are **project lifecycle scripts**: project-owned behavior stored in the
+repository, in `.superset/config.toml`. They are different from
+[terminal scripts](/terminal-scripts), which are reusable launches saved in
+your Paradev settings and shown in the Scripts bar.
+
+Create `.superset/config.toml` in your project:
+
+```toml
+[setup]
+run = ["bun install", 'cp "$SUPERSET_ROOT_PATH/.env" .env']
+
+[terminals.dev]
+run = "bun dev"
+default = true
+
+[archive]
+run = ["docker compose down"]
+```
+
+You can also edit it in the app: **Settings → your project → Workspace config**. The editor shows the whole file, keeps your comments, and checks it as you type; **Save** stays disabled until the file is valid.
+
+![Settings → Workspace config editing .superset/config.toml](/images/workspace-config.png)
+
+## How It Works
+
+1. Create a workspace → `[install]` then `[setup]` commands run in a terminal
+2. Click **Run** → the `default` terminal's command runs in a dedicated pane
+3. Archive a workspace → `[archive]` commands run, then the worktree is removed
+
+Commands in a section run in order, in the workspace directory, and stop at the first one that fails.
+
+By default, an agent launched at workspace creation starts immediately, in parallel with setup. Enable **Settings → Experimental → Wait for workspace setup before starting agents** to chain the agent after the setup commands in the same terminal: the agent only starts once setup succeeds, and no separate setup pane is left behind.
+
+## Sections
+
+### `[install]`
+
+Optional. Work that doesn't depend on a particular workspace, such as installing dependencies. It runs just before `[setup]`.
+
+### `[setup]`
+
+Get this workspace ready: copy `.env` from the main checkout, create a database, seed data. Keep it safe to run more than once.
+
+### `[terminals.<name>]`
+
+Long-running commands such as dev servers. The first terminal with `default = true` is what **Run** starts. Names use lowercase letters, digits and underscores, and start with a letter.
+
+```toml
+[terminals.web]
+run = "bun dev"
+default = true
+
+[terminals.storybook]
+run = "bun storybook"
+```
+
+### `[archive]`
+
+Release what `[setup]` created outside the workspace: stop containers, drop a database, delete a branch. A failing archive command is reported, and you can archive anyway. Archive commands are stopped after 60 seconds, and they can run more than once, so keep them quick and safe to repeat.
+
+### Keys
+
+| Key | Where | Meaning |
+|-----|-------|---------|
+| `run` | every section | A command, or a list of commands run in order. `run = []` turns a section off. |
+| `cwd` | every section | Directory to run in, relative to the workspace root. |
+| `default` | terminals | `true` for the terminal the **Run** button starts. |
+
+Unknown keys are errors, so a typo like `defualt` is caught. When the file is invalid, the setup terminal shows what's wrong and runs nothing.
+
+## Checking It Works
+
+**Setup:** create a workspace and open its **Workspace Setup** tab. It shows each `[install]` and `[setup]` command and its output. A command that fails stops the rest, and its error stays in the tab.
+
+![The Workspace Setup tab running a setup command](/images/workspace-setup-terminal.png)
+
+**Run:** click **Run** in the top bar. The `default` terminal's command starts in its own tab, and the button turns into **Stop**.
+
+**Archive:** archive or delete a workspace. If an `[archive]` command fails, you see "Delete Anyway" and "View Logs" (see [Force Delete](#force-delete)).
+
+**A broken file:** the Workspace config editor names the problem and its line before you save:
+
+![An unknown key reported with its line number](/images/workspace-config-error.png)
+
+If the file is broken anyway, for example edited by hand, the Workspace Setup tab prints the same errors and runs nothing. Archive still works and skips the commands.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `SUPERSET_ROOT_PATH` | Path to the main checkout |
+| `SUPERSET_WORKSPACE_NAME` | Current workspace name |
+| `SUPERSET_WORKSPACE_PATH` | Path to the workspace worktree |
+
+## Examples
+
+**Node.js:**
+```toml
+[setup]
+run = ["bun install", 'cp "$SUPERSET_ROOT_PATH/.env" .env']
+```
+
+**Docker:**
+```toml
+[setup]
+run = ["docker compose up -d", "bun run db:migrate"]
+
+[archive]
+run = ["docker compose down -v"]
+```
+
+**Scripts and a subdirectory:**
+```toml
+[setup]
+run = "./.superset/setup.sh"
+
+[terminals.dev]
+run = "bun dev"
+cwd = "apps/web"
+default = true
+
+[archive]
+run = "./.superset/archive.sh"
+```
+
+## Personal Config
+
+Add your own tweaks without changing the team's file: create `.superset/config.local.toml` in your main checkout. It applies to every worktree of the repository. When you save it from **Settings → Workspace config**, Paradev keeps it out of your commits; otherwise add it to `.gitignore`.
+
+It has the same shape as `config.toml`, and any key you set replaces the shared one:
+
+```toml
+[setup]
+run = ["bun install", 'cp "$SUPERSET_ROOT_PATH/.env" .env', "direnv allow"]
+
+[terminals.storybook]
+run = "bun storybook"
+```
+
+Here `setup` replaces the shared list, so copy the shared commands you want to keep. The `storybook` terminal is added only for you.
+
+## Coming from config.json
+
+Projects with `.superset/config.json` keep working. When both files exist, `config.toml` is used. To convert, open **Settings → Workspace config** and click **Convert to config.toml**, or write it by hand:
+
+| config.json | config.toml |
+|-------------|-------------|
+| `setup` | `[setup]` `run` |
+| `teardown` | `[archive]` `run` |
+| `run` | `[terminals.dev]` `run`, with `default = true` |
+| `cwd` | `cwd` on each section |
+| `.superset/<key>.sh` used automatically | list the script in `run` |
+| `config.local.json` with `before` / `after` | `config.local.toml`, with the full list |
+| `~/.superset/projects/<repo-path>/config.json` | `config.local.toml` in your main checkout |
+
+Coming from Cursor: `install` stays `install`, `start` becomes `[setup]`, and `terminals` stays `terminals`.
+
+## Force Delete
+
+If archive commands fail when you delete a workspace, you can continue anyway.
+
+When an archive command fails:
+1. Error toast appears with "Delete Anyway" and "View Logs" buttons
+2. Click "Delete Anyway" to force-delete immediately
+3. Or click "View Logs" to review the failure, then force-delete from the dialog
+
+Deleting a workspace through the CLI, SDK, or MCP also runs `[archive]`. Since there's no one to prompt on those surfaces, a failure doesn't block the delete; it's reported in the response's `warnings` instead.
+
+## Tips
+
+- Keep setup fast: it runs on every workspace creation
+- Commit `.superset/config.toml` to share it with your team
+- Use shell scripts for complex logic: `run = "./.superset/setup.sh"`
+- Put dev servers in `[terminals]`, not `[setup]`: they're restartable and don't block workspace creation

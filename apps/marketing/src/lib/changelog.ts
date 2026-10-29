@@ -8,6 +8,7 @@ import matter from "gray-matter";
 import { z } from "zod";
 import { type ChangelogEntry, slugify } from "./changelog-utils";
 import { normalizeContentDate } from "./content-utils";
+import { getPublicImageSize } from "./public-image-size";
 
 export {
 	type ChangelogEntry,
@@ -32,6 +33,9 @@ function parseFrontmatter(filePath: string): ChangelogEntry | null {
 			description: data.description,
 			date: dateValue,
 			image: data.image,
+			imageSize: data.image
+				? (getPublicImageSize(data.image) ?? undefined)
+				: undefined,
 			version: data.version,
 			highlights: z
 				.array(releaseHighlightSchema)

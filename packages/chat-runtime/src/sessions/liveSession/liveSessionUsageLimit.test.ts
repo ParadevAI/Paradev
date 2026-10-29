@@ -1,7 +1,11 @@
 import { describe, expect, jest, mock, setSystemTime, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { setImmediate as flush } from "node:timers/promises";
-import { emptySnapshot, reduceMany } from "@superset/chat/core";
+import {
+	CONTINUE_PROMPT,
+	emptySnapshot,
+	reduceMany,
+} from "@superset/chat/core";
 import type { UsageLimitAction, UserMessage } from "@superset/chat/protocol";
 import type { HarnessAdapter } from "../../harness";
 import { EventQueue } from "../../harness/eventQueue";
@@ -139,7 +143,10 @@ describe("LiveSession usage limit", () => {
 			() =>
 				snapshot(runtime, sessionId).turns.get("t2")?.status === "completed",
 		);
-		expect(deliveredTexts(runtime, sessionId)).toEqual(["first", "Continue"]);
+		expect(deliveredTexts(runtime, sessionId)).toEqual([
+			"first",
+			CONTINUE_PROMPT,
+		]);
 		await runtime.dispose();
 	});
 
@@ -176,7 +183,7 @@ describe("LiveSession usage limit", () => {
 			session.respondToUsageLimit("resume_at_reset");
 			advance(0);
 			expect(prompt.mock.calls).toEqual([
-				[[{ type: "text", text: "Continue" }]],
+				[[{ type: "text", text: CONTINUE_PROMPT }]],
 			]);
 			expect(session.state.usageLimit).toBeUndefined();
 		} finally {

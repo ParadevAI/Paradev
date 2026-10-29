@@ -218,6 +218,52 @@ describe("browserRuntimeRegistry overlay layer", () => {
 		}
 	});
 
+	test("raises a browser above a panel drawn over the page, and only there", () => {
+		const panel = document.createElement("div");
+		panel.setAttribute("data-browser-layer", "raised");
+		const inPanel = document.createElement("div");
+		const inPage = document.createElement("div");
+		panel.appendChild(inPanel);
+		document.body.append(panel, inPage);
+		try {
+			const raised = { ...makeEntry(), placeholder: inPanel };
+			const plain = { ...makeEntry(), placeholder: inPage };
+			registryInternals.updateLayout(raised as never);
+			registryInternals.updateLayout(plain as never);
+			expect(raised.webview.style.zIndex).toBe("31");
+			expect(raised.overlay.style.zIndex).toBe("32");
+			expect(plain.webview.style.zIndex).toBe("");
+			expect(plain.overlay.style.zIndex).toBe("1");
+		} finally {
+			panel.remove();
+			inPage.remove();
+		}
+	});
+
+	test("a browser shown again after an agent parked it takes clicks", () => {
+		const paneId = "reshown-pane";
+		const placeholder = document.createElement("div");
+		document.body.appendChild(placeholder);
+		const entry = { ...makeEntry(), placeholder };
+		const internals = browserRuntimeRegistry as unknown as {
+			agentActivePaneIds: Set<string>;
+			applyParkedStyle: (id: string, entry: unknown) => void;
+		};
+		const previous = internals.agentActivePaneIds;
+		internals.agentActivePaneIds = new Set([paneId]);
+		registryInternals.entries.set(paneId, entry as never);
+		try {
+			internals.applyParkedStyle(paneId, entry);
+			expect(entry.webview.style.pointerEvents).toBe("none");
+			browserRuntimeRegistry.relayout();
+			expect(entry.webview.style.pointerEvents).toBe("auto");
+		} finally {
+			internals.agentActivePaneIds = previous;
+			registryInternals.entries.delete(paneId);
+			placeholder.remove();
+		}
+	});
+
 	test("reports no overlay for an unknown pane", () => {
 		expect(browserRuntimeRegistry.getOverlayContainer("nope")).toBeNull();
 	});
@@ -420,6 +466,55 @@ describe("browserRuntimeRegistry background open", () => {
 			document.createElement = original;
 			rootSpy.mockRestore();
 			await new Promise((resolve) => setTimeout(resolve, 0));
+		}
+	});
+});
+
+describe("browserRuntimeRegistry open page lookup", () => {
+	test("finds only a visible, loaded pane on the same page", () => {
+		const makeEntry = (
+			currentUrl: string,
+			overrides: { visible?: boolean; isLoading?: boolean } = {},
+		) => ({
+			state: {
+				currentUrl,
+				pageTitle: `Title of ${currentUrl}`,
+				isLoading: overrides.isLoading ?? false,
+				error: null,
+			},
+			webContentsId: 7,
+			visible: overrides.visible ?? true,
+		});
+		const registryInternals = browserRuntimeRegistry as unknown as {
+			entries: Map<string, ReturnType<typeof makeEntry>>;
+		};
+		const panes = {
+			"lookup-hidden": makeEntry("https://example.com/docs", {
+				visible: false,
+			}),
+			"lookup-loading": makeEntry("https://example.com/docs", {
+				isLoading: true,
+			}),
+			"lookup-open": makeEntry("https://example.com/docs#intro"),
+		};
+		for (const [paneId, entry] of Object.entries(panes)) {
+			registryInternals.entries.set(paneId, entry);
+		}
+		try {
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/docs"),
+			).toEqual({
+				paneId: "lookup-open",
+				title: "Title of https://example.com/docs#intro",
+			});
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/other"),
+			).toBeNull();
+			expect(browserRuntimeRegistry.findOpenPage("not a url")).toBeNull();
+		} finally {
+			for (const paneId of Object.keys(panes)) {
+				registryInternals.entries.delete(paneId);
+			}
 		}
 	});
 });

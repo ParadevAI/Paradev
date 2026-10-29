@@ -15,6 +15,15 @@ context.
 
 ## Identity and ownership
 
+**An automation dispatch finishes before its cloud chat exists.** A machine-owned host returns the
+chat session ID during dispatch. A fresh sandbox creates that session only on first boot, after the
+API has queued provisioning. The run now binds its cloud workspace before provisioning and carries
+its run ID in the launch environment. Host-service reports the actual chat/terminal identity through
+a sandbox-scoped procedure; the API checks the run, workspace, organization, and creator before
+linking it. Failed reports stay in the launch marker for retry on restart, without relaunching the
+agent. **Open:** a process crash between session creation and writing the report can still lose the
+session link. Changes in this path require a published host-service/sandbox bundle.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the
@@ -77,6 +86,30 @@ A closed box's dot is therefore at most a few seconds behind; the open box's
 own subscribers stay live as before. Reaches a box only through a
 host-service release.
 
+**A closed box's pull requests are not on its creation branch.**
+`cloud_workspaces.branch` is the branch the box was cut on, and an agent
+moves on from it: new branches, one PR each. Looking PRs up by that branch
+showed a stale or missing PR for every box but the open one, which the host
+fan-out reaches. The box's PR runtime already keeps every PR it has linked
+(`workspace_pull_requests` in host.db), so the box reports each one once to
+`cloudWorkspace.reportPullRequests` (`sandbox-pull-requests` in
+host-service: everything on boot, then each new link as the runtime records
+it), and the API records it in `cloud_workspace_pull_requests` for the
+repositories the workspace checked out. State still comes from
+`github_pull_requests`. After a successful send, a PR reaches the table at
+most a sweep of the PR runtime (5 minutes) after it is opened; a failed send
+retries with back-off up to 5 minutes more. Reaches a box only through a host-service release.
+`cloudWorkspace.pullRequests` is what desktop and mobile list, badge and
+hover-card a cloud workspace with: every linked PR, plus the PR on
+`cloud_workspaces.branch` for a box that has not reported yet, open ones first
+and then the newest link. It does not poll: a new link, and every GitHub
+webhook or sync write to a PR some cloud workspace shows, sends a
+`pull_requests` nudge that refetches only this query. Inside an open workspace
+both apps still ask the box itself.
+**Open:** a repository renamed or transferred
+after the box linked a PR is reported under its old name; the API answers with
+it in `ignored` and the link is lost.
+
 **Nobody on the box knows who is in it.** A host is one person's machine, so
 a workspace row implies its owner and the sidebar never had to say. A cloud
 workspace is opened by any member of the organization, and host-service inside
@@ -104,6 +137,21 @@ next token refresh minutes later. What a person sees now: the pane
 reconnects, the lost session is reported gone, and the agent is resumed into
 a fresh terminal with its scrollback (the cold-restore path), about 15–20 s
 after opening.
+
+**A stored chat survives a stop, but its agent process does not.** A cached
+`getSession` result can still say `live: true` when a resumed box has no chat
+process. The transcript socket can reconnect and replay that stored session
+before recovery checks its liveness, so an immediate prompt fails with
+"Couldn't send your message. It's back in the composer." Switching tabs or
+workspaces remounts the chat and used to be what reran a liveness check that
+failed during boot, so the resume notice could appear only after returning.
+The desktop now rechecks liveness on mount, host reconnect and address change,
+and holds prompts in the pane's pending queue until that check finishes and
+recovery resumes the agent. The client's existing outbox stays paused too; if recovery
+replaces the session, never-attempted text returns to the same composer draft
+rather than being sent to the stopped process. Failed liveness checks retry
+even if the connection stays open, and never reuse the cached live flag. This
+is a client change; existing boxes do not need a new host-service bundle.
 
 **Two gates sit between the renderer and a sandbox**, and both fail as a bare
 `TypeError: Failed to fetch`: the renderer's CSP `connect-src` allowlist
@@ -144,6 +192,26 @@ rewrite. An environment variable by a credential's name is ignored and never
 reaches the box; a cloud workspace has no way to carry an app's own provider
 key.
 
+**A ChatGPT sign-in is a file and a session, not a key.** Codex on a ChatGPT
+plan reads `~/.codex/auth.json`, and its refresh token works once: two holders
+of one session sign each other out ("refresh token was already used"). The API
+runs Codex's device-code sign-in itself, so the session is Paradev's own and
+never the one on the person's laptop, and renews it under a row lock before
+the access token lapses. The box gets an `auth.json` of placeholders (an
+unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
+never tries to renew) written with the identity on every create and wake; the
+firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
+including a forced rotation while it ran.
+
+**The firewall refuses a WebSocket upgrade on a host whose headers it
+rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
+the bearer swap in place the upgrade fails ("Attack attempt detected") and
+Codex spends ~10 s on retries before it falls back to HTTPS, once per session.
+The built-in provider cannot be reconfigured, so the claim writes
+`/etc/codex/config.toml` (Codex's system layer, below the person's own config)
+with the same endpoint and `supports_websockets = false`. Measured: 13.3 s →
+3.6 s for one `codex exec`.
+
 **The firewall terminates TLS for the domains it rewrites, and the terminal
 must trust its CA.** The CA is in the image's system bundle, which curl, git,
 gh, python and bun read. Node does not read it, and the platform sets no CA
@@ -170,6 +238,23 @@ Archiving the box from inside it
 about a minute later: put the box's own id last when archiving several, and
 unarchive from a signed-in client.
 
+**pdev signs in to its router with the box's credential.** On a laptop pdev
+gets a token from `superset auth mcp-headers`, which a box refuses because it
+holds no token. The firewall adds the same `x-superset-sandbox-credential` to
+requests for `router.superset.sh`, and the router passes it to `user.me` and
+`user.myOrganization`, so pdev runs as the workspace's creator in the box's
+organization. The box sets `PDEV_TOKEN` to the placeholder only so pdev skips
+the CLI; the router ignores a key without the `pdev_` prefix.
+
+The same credential also names the box itself, which is what host-service's
+own calls about its workspace need: an automation's workspace has no creator,
+and a box keeps working after its creator leaves the organization. Those calls
+are the `sandbox` router, built on `sandboxProcedure`, which takes the
+workspace from the credential and never from the input and needs no creator
+or allowlist entry. Anything in the box can call them, so each must be safe
+for an agent to call on its own workspace. `agent-status` and `credentials`
+predate it and are still plain routes authenticated by the host secret.
+
 **Docker is installed but not started.** An environment whose repository needs
 containers starts it from its own `start` command, which is also where it
 waits for the daemon:
@@ -192,7 +277,16 @@ fails its first content read with a gh auth error. **What we did:** the review
 run wrote a temporary `~/.config/gh/hosts.yml` from the token and deleted it
 afterwards. The durable fix is for `getToolEnvironment()` to carry `GH_TOKEN`
 (and `GITHUB_TOKEN`) through from the host-service process when the shell did
-not provide one.
+not provide one. Since 2026-10-23 the PR pane, the workspace PR badge, the diff
+pane's review threads, the Review tab and mobile no longer use a host's GitHub
+access at all. Writes always act as the person looking: the desktop with the
+GitHub login on that person's own machine (the `viewerGithub` router in the
+main process), otherwise and on mobile through the API's
+`integration.github.*PullRequest*` procedures with their Superset connection
+(`githubUserTokenFor`). Reads take the same path. A person with neither is
+asked to connect GitHub; the organization's App installation is not a
+fallback, because its rate limit is shared by everything the organization
+runs.
 
 ## Runtime environment
 
@@ -208,6 +302,31 @@ boot, host-service holds them in memory (`sandbox-managed-env`) and
 terminals and agent launches inherit the pushed set; open terminals keep the
 one they started with; nothing is written to disk. A host-service restart
 comes up with an empty set until the next push, which every wake performs.
+
+**Listening precedes the managed environment push.** Chat launches and boot-time
+agent resumes used to build their environment as soon as the listener opened,
+before the control plane supplied credential placeholders. They now use the
+same bounded 120-second environment wait as the initial sandbox agent launch;
+local hosts do not wait. This part requires a published host-service bundle.
+A slow bundle update can also exceed the control plane's 60-second health wait,
+so that wake never reaches the environment push. The desktop now retries failed
+wakes after 30 seconds with bounded backoff, rather than waiting for the normal
+ten-minute keepalive. Successful wakes keep that normal interval. These are
+code-level startup gaps, not a verified explanation of any particular user's
+delay.
+
+**Cloud agent registration cannot depend on the first launch.** The creation picker knows which
+CLIs the image installs, but the chat picker reads the sandbox's persisted agent configurations.
+Flag-gated pdev was excluded from default configurations and only added when it was the initial
+launch agent, so Claude-created and idle boxes hid it. The cloud launch gate also allowed only
+Claude to chat, sending pdev to a terminal even when ACP chat was enabled. **Fixed:** every boot
+ensures configurations for all installed cloud agents and seeds pdev folder trust, including on
+existing boxes. Both new-workspace and pinned-automation dispatch allow pdev chat through the
+existing `acp-chat` flag; clients still apply `pdev-agent` visibility. Registration and trust repair
+require a published host-service/sandbox bundle, an updated environment bundle pin, and a box
+restart. Trust repair is best-effort: a failed pdev trust write must not prevent host-service from
+starting. This does not remove unrelated
+default agent configurations or make their CLIs available in the image.
 
 **Agent CLIs are pre-configured in the image.** A first run otherwise opens a
 theme picker, an API-key approval and a workspace trust dialog — three
@@ -239,7 +358,7 @@ is frozen because its golden was built for it. host-service seeds one
 project and one workspace row per checkout; the primary's row carries the cloud workspace's
 id, the others get ids derived from it and the path, so anything keyed on the cloud id (the
 desktop route, the agent launch, the terminals) lands in the primary and the rest are
-siblings. The `start` hook runs in the hooks repository's checkout, not in `/workspace`.
+siblings. The `start` hook runs in the primary repository's checkout, not in `/workspace`.
 
 **The checkout is the workspace.** No worktrees and no base repo — anything
 assuming a worktree can be created or discarded next to a main checkout has
@@ -306,11 +425,43 @@ missing. The CLI bundle has the same gap.
 
 ## Lifecycle
 
+**A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
+reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
+session length. Vercel's server-side tag filter uses creation-order pagination
+even when that sort is requested. An old stopped entry therefore hid older
+workspaces that had resumed recently, leaving them running without meter records.
+`listActiveWorkspaceSandboxes` now lists without the tag filter and checks
+`kind: workspace` locally, so the status-time cutoff is safe.
+
 **Delete was not wired.** The generic delete routed to the owning host, which
 for a cloud workspace deleted the row *inside* the sandbox and left the
 sandbox running (and billing) plus the `cloud_workspaces` row intact — the
 workspace reappeared on the next refetch. **Fixed:** `useDestroyWorkspace`
 sends a cloud workspace to `cloudWorkspace.delete`.
+
+**Archive ran no teardown.** Locally, deleting a workspace runs the repository's
+teardown before the worktree goes. A cloud archive only stopped the box and
+deleted it seven days later, so anything `setup` created outside the box
+leaked: this repository's per-workspace Neon branches piled up until 383 were
+deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
+calls `sandbox.runArchiveHook` on the still-running box (direct with the host
+secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
+`.superset/config.toml` resolved for the cloud. A failing hook never blocks the
+stop, and an undo that lands during the hook re-runs setup (`runStartHook`
+with `force`) instead of stopping the box. A box whose host-service predates
+the procedure answers 404 and is stopped as before, so the fix reaches a box
+only after a sandbox release.
+
+The hook is best effort, not a guarantee. It runs only when the box is still
+running at the stop stage, and boxes stop on their own after four hours idle,
+which is exactly the state an archived workspace is usually in. So a resource
+must not depend on it: this repository's Neon branch is a lease
+(`NEON_BRANCH_LEASE_DAYS=7` in `setup.cloud.sh`), set when the branch is
+created and renewed on every boot, so a box that stops renewing releases its
+branch through Neon's own expiry. **Open:** running `[archive]` at least once,
+in a fresh short-lived box from the environment's image when the original is
+stopped or gone. That works because `[archive]` only releases outside
+resources: it needs the workspace's identity and secrets, not its disk.
 
 **Sidebar affordances are driven by local state, not by the row.** Visibility,
 pinning and ordering live in `v2WorkspaceLocalState`; a section that renders
@@ -390,6 +541,12 @@ live cwd. An interrupted clone (a wake that ends the session mid-fetch)
 leaves a repository that can fetch nothing; the runner reclones rather than
 failing every boot.
 
+**GitHub names are case-insensitive; the release database lookup was not.** After the repository
+rename, production stored `ParadevAI/Paradev` while the release requested `paradevai/paradev`.
+An exact SQL comparison reported an installed repository as disconnected and stopped the release
+before environment pins advanced. **Fixed:** the release compares normalized names while retaining
+the organization constraint. No repository reconnection or production data rewrite is needed.
+
 **A freshly pushed image is not usable for a few minutes.** VCR reports the
 tag `Preparing` while it optimises a `linux/amd64` build (a gigabyte takes
 about four minutes), and `Sandbox.create` answers 409 `image_not_ready` until
@@ -405,14 +562,24 @@ the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, four hours, extended while a workspace is open) or on
+(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
-an unattended agent run has to finish within a session, and the idle stop
-must not fire on a workspace someone is using — which is what the open
-workspace's `wake` on every token refresh is for. Sessions cap at 24 hours on
-the plan; past that the extension is refused and the next open resumes.
+the idle stop must not fire on a workspace someone is using — which is what
+the open workspace's `wake` on every token refresh is for — nor under an
+agent that is still working. For that the box itself asks: on agent activity
+(any hook event from a terminal agent or one of its subagents, any item of a
+chat turn), at most every fifteen minutes, `sandbox-keepalive` in host-service
+calls `sandbox.keepalive`, and the API tops the session up to a full timeout
+(`topUpSandboxSession`). The box then stops a
+session timeout after its agent last did anything. An agent waiting on a
+permission prompt, a hung one, and a background shell or dev server left
+running after the turn all count as idle. A single tool call that runs longer
+than the timeout without a hook event is also idle, and is stopped. Top-ups go
+through the session, never `Sandbox.extendTimeout`, which resumes a session
+that stopped meanwhile. Sessions cap at 24 hours on the plan; past that the
+extension is refused, the session ends and the next open resumes.
 
 **A fork starts from the source's snapshot, not its live filesystem.** A
 golden is therefore a *stopped* sandbox: `promoteSandboxToEnvironment` takes
@@ -537,6 +704,16 @@ section — and up to 15 ports may be exposed; exactly one is.
 Alpine) and only the pinned version ships prebuilds at all; better-sqlite3 must
 match what host-service was built against or it crashes on load. The image
 asserts the prebuild exists rather than letting something compile silently.
+
+**The desktop's native modules compile for Electron, and bookworm's compilers
+cannot.** No better-sqlite3 prebuild exists for Electron 44 on linux-x64, so
+`install:deps` (run by the root postinstall) builds it from source. Electron
+44's V8 headers fail on gcc 12 and on clang 14 (`std::source_location`), so
+`bun install` exited 1 and `bun run dev` in `apps/desktop` died on "Could not
+locate the bindings file". Postinstall uses `clang-16` when `CC` is unset. The
+image does not carry it, since only this repo needs it: the internal
+environment's setup hook (`satya-setup.sh`) installs it, and any other
+environment that builds the desktop has to install it too.
 
 **Local dev cannot exercise a sandbox, and the failure mode if you force it is
 silent.** `setup.local.sh` copies `.env.local.example` to `.env`, which sets

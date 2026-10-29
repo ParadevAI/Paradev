@@ -1,6 +1,6 @@
 ---
-title: "Superset vs OpenHands (2026): Local Worktrees vs Sandboxed Agent"
-description: "Compare Superset and OpenHands for AI coding. See how a local-first workspace running CLI agents in Git worktrees differs from a sandboxed autonomous software engineer."
+title: "Paradev vs OpenHands (2026): Local Worktrees vs Sandboxed Agent"
+description: "Compare Paradev and OpenHands for AI coding. See how a local-first workspace running CLI agents in Git worktrees differs from a sandboxed autonomous software engineer."
 date: 2026-07-13
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -14,26 +14,26 @@ keywords:
   - parallel coding agents
 ---
 
-OpenHands (formerly OpenDevin) is an open-source platform for autonomous AI software engineers that run inside a sandbox, editing code, running commands, and browsing the web to complete tasks. Superset takes a local-first approach instead: it runs your choice of CLI coding agents directly in isolated Git worktrees on your machine, wrapped in a desktop workspace. The core contrast is a sandboxed autonomous agent versus an agent-agnostic local workspace.
+OpenHands (formerly OpenDevin) is an open-source platform for autonomous AI software engineers that run inside a sandbox, editing code, running commands, and browsing the web to complete tasks. Paradev takes a local-first approach instead: it runs your choice of CLI coding agents directly in isolated Git worktrees on your machine, wrapped in a desktop workspace. The core contrast is a sandboxed autonomous agent versus an agent-agnostic local workspace.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **OpenHands** |
+| | **Paradev** | **OpenHands** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Autonomous agent platform |
 | **Execution** | Git worktrees on your machine or other machines you own (Remote Access); cloud workspaces | Sandboxed runtime (Docker) or OpenHands Cloud |
-| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, Superset Chat, any CLI agent | Model-agnostic agent framework (via LiteLLM) |
+| **AI approach** | Agent-agnostic: Claude Code, Codex, Aider, Paradev Chat, any CLI agent | Model-agnostic agent framework (via LiteLLM) |
 | **Parallelism** | Core feature: multiple agents across isolated worktrees | Multiple sessions, typically one sandbox per task |
 | **Interface** | Desktop app: terminals, diff/file editor, chat, in-app browser | Web UI / CLI over a sandboxed agent |
-| **Pricing** | Free tier + Pro $20/seat/mo (bring your own API keys) | Open source (MIT) to self-host; Cloud is usage-based |
+| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo (bring your own API keys) | Open source (MIT) to self-host; Cloud is usage-based |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Superset Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Remote Access (Pro) lets agents keep running on other macOS or Linux machines you own, and an iPhone/iPad app lets you check on them. You can review inside Superset or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. Remote Access (Pro) lets agents keep running on other macOS or Linux machines you own, and an iPhone/iPad app lets you check on them. You can review inside Paradev or jump into VS Code, Cursor, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -47,25 +47,25 @@ OpenHands, from All Hands AI, is an open-source platform for autonomous AI agent
 
 ### Sandboxed Runtime vs Local Worktrees
 
-OpenHands executes agents inside a sandbox (Docker or cloud), which is great for isolation and reproducibility but adds a runtime layer between the agent and your working copy. Superset runs agents directly on your machine, each in its own Git worktree: no container to manage, and the code stays in your local repo the whole time.
+OpenHands executes agents inside a sandbox (Docker or cloud), which is great for isolation and reproducibility but adds a runtime layer between the agent and your working copy. Paradev runs agents directly on your machine, each in its own Git worktree: no container to manage, and the code stays in your local repo the whole time.
 
 ### Autonomous Agent vs Agent Orchestrator
 
-OpenHands is itself the agent: one framework that plans and executes. Superset does not ship its own single autonomous engine: it orchestrates the agents you already use (Claude Code, Codex, Aider, and more), letting you pick the right one per task and run several side by side.
+OpenHands is itself the agent: one framework that plans and executes. Paradev does not ship its own single autonomous engine: it orchestrates the agents you already use (Claude Code, Codex, Aider, and more), letting you pick the right one per task and run several side by side.
 
 ### Review and Workspace Surface
 
-OpenHands centers on the agent's task loop with a web or CLI view. Superset centers on the workspace: a diff/file editor, chat, an in-app browser for dev servers, port management, and MCP tooling, so steering and reviewing multiple agents happens in one desktop app.
+OpenHands centers on the agent's task loop with a web or CLI view. Paradev centers on the workspace: a diff/file editor, chat, an in-app browser for dev servers, port management, and MCP tooling, so steering and reviewing multiple agents happens in one desktop app.
 
 ### Privacy
 
-By default Superset keeps code in Git worktrees on machines you own (your laptop, or a remote host via Remote Access), with cloud workspaces as an option, and it is source-available. OpenHands can be fully self-hosted (MIT) for local control, or run via OpenHands Cloud, where execution happens on hosted infrastructure. Both give you a local-control option; the default execution model differs.
+By default Paradev keeps code in Git worktrees on machines you own (your laptop, or a remote host via Remote Access), with cloud workspaces as an option, and it is source-available. OpenHands can be fully self-hosted (MIT) for local control, or run via OpenHands Cloud, where execution happens on hosted infrastructure. Both give you a local-control option; the default execution model differs.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and a Pro plan at $20/seat/month. You also pay for your agents' API keys (for example Anthropic for Claude Code or OpenAI for Codex): transparent provider costs, no platform credit system.
+Paradev offers a free tier, a Pro plan at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. You also pay for your agents' API keys (for example Anthropic for Claude Code or OpenAI for Codex): transparent provider costs, no platform credit system.
 
 OpenHands is open source under MIT, so self-hosting is free apart from the model API and the compute you run the sandbox on. OpenHands Cloud is a managed, usage-based option if you would rather not run the runtime yourself.
 
@@ -79,13 +79,13 @@ OpenHands is open source under MIT, so self-hosting is free apart from the model
 - Want an open-source agent framework you can extend and self-host
 - Optimize for hands-off, benchmark-style task completion
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 - Want to run your existing CLI agents locally, in isolated Git worktrees
 - Want local branch-based task workspaces without requiring a container runtime
 - Want a desktop workspace with diff review, chat, browser preview, and MCP
 - Prefer agent choice and editor independence over one autonomous engine
 
-The two can complement each other: use OpenHands for sandboxed autonomous runs, and Superset as your day-to-day local workspace for orchestrating CLI agents across worktrees.
+The two can complement each other: use OpenHands for sandboxed autonomous runs, and Paradev as your day-to-day local workspace for orchestrating CLI agents across worktrees.
 
 ---
 
@@ -95,10 +95,10 @@ The two can complement each other: use OpenHands for sandboxed autonomous runs, 
 
 Yes. OpenHands is the current name for the project formerly known as OpenDevin, maintained by All Hands AI.
 
-### Does Superset run agents in a sandbox like OpenHands?
+### Does Paradev run agents in a sandbox like OpenHands?
 
 Not for local work. Local workspaces run agents directly in isolated Git worktrees on your machine, or on another machine you own through Remote Access, with no Docker sandbox. That removes a runtime layer and keeps code in your own repo, while worktrees still keep parallel tasks separated. If you want work off your machine, cloud workspaces run in the cloud on separate clones.
 
 ### Can I self-host either tool?
 
-OpenHands is open source (MIT) and designed to be self-hosted, with a managed cloud option. Superset is a source-available (ELv2) local-first desktop app: it runs on your machine and on any remote hosts you add, plus cloud workspaces, with a free tier and a $20/seat/month Pro plan.
+OpenHands is open source (MIT) and designed to be self-hosted, with a managed cloud option. Paradev is a source-available (ELv2) local-first desktop app: it runs on your machine and on any remote hosts you add, plus cloud workspaces, with a free tier and paid plans from {{price:pro}}/seat/month. Cloud workspaces are on the Team and Ultra plans.

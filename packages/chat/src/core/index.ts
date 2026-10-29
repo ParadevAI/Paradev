@@ -1,6 +1,7 @@
 export * from "./bookkeeping/readBookkeeping";
 export * from "./coalesce";
 export * from "./config/launchConfigSelections";
+export * from "./continuePrompt/continuePrompt";
 export * from "./harness/harness";
 export * from "./markdown/fenceState";
 export * from "./markdown/splitBlocks";
@@ -8,5 +9,7 @@ export * from "./outbox/outbox";
 export * from "./outline";
 export * from "./pastedText/pastedText";
 export * from "./reducer/reducer";
+export * from "./sessionUsage/sessionUsage";
+export * from "./subagents/subagents";
 export * from "./timeline/deriveTimeline";
 export * from "./transcript/transcript";

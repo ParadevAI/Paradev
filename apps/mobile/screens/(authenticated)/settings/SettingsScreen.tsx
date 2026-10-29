@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLingui } from "@lingui/react/macro";
 import { formatDate } from "@superset/i18n/format";
+import { BRAND } from "@superset/shared/brand";
 import {
 	ACCOUNT_DELETION_GRACE_DAYS,
 	COMPANY,
@@ -15,6 +16,7 @@ import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSignOut } from "@/hooks/useSignOut";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
+import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
@@ -23,6 +25,7 @@ import { OrganizationAvatar } from "@/screens/(authenticated)/components/Organiz
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
+import { usePlanName } from "./hooks/usePlanName";
 
 const WRITE_REVIEW_URL = `${COMPANY.APP_STORE_URL}?action=write-review`;
 
@@ -39,6 +42,7 @@ function formatJoined(createdAt?: Date | string | null) {
 
 export function SettingsScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
@@ -46,10 +50,14 @@ export function SettingsScreen() {
 	const { activeOrganization, activeOrganizationId } = useOrganizations();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
+	const github = useGithubConnection();
 
 	const user = session?.user;
 	const plan = session?.session.plan;
-	const planLabel = plan ? plan[0].toUpperCase() + plan.slice(1) : "Free";
+	const planName = usePlanName();
+	const planLabel = planName
+		? planName[0].toUpperCase() + planName.slice(1)
+		: "Free";
 	const joined = formatJoined(user?.createdAt);
 
 	const handleSignOut = () => {
@@ -113,7 +121,7 @@ export function SettingsScreen() {
 								}),
 								t({
 									message:
-										"Something went wrong. Try again, or contact support@superset.sh.",
+										"Something went wrong. Try again, or contact support@paradev.com.",
 								}),
 							);
 						});
@@ -121,6 +129,28 @@ export function SettingsScreen() {
 				},
 			],
 		);
+	};
+
+	const handleGithub = () => {
+		if (github.connection) {
+			Alert.alert(
+				t({ message: "Disconnect GitHub?" }),
+				t({
+					message:
+						"Pull requests, comments and pushes from Superset will no longer be made as you.",
+				}),
+				[
+					{ style: "cancel", text: t({ message: "Cancel" }) },
+					{
+						style: "destructive",
+						text: t({ message: "Disconnect" }),
+						onPress: () => github.disconnect.mutate(),
+					},
+				],
+			);
+			return;
+		}
+		github.connect.mutate();
 	};
 
 	// 24pt (px-6) on a phone; a centered column on iPad.
@@ -233,6 +263,48 @@ export function SettingsScreen() {
 				/>
 			</SettingsSection>
 
+			{github.available !== false ? (
+				<SettingsSection label={t({ message: "Connections" })}>
+					<ListRow
+						icon={
+							<Ionicons
+								name="logo-github"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "GitHub" })}
+						subtitle={
+							github.connection
+								? t({
+										message:
+											"Pull requests, comments and pushes from Superset are made as you.",
+									})
+								: t({
+										message:
+											"Connect to act on pull requests as yourself instead of as the workspace.",
+									})
+						}
+						trailing={
+							<ListRowValue
+								value={
+									github.isLoading
+										? ""
+										: github.isError
+											? t({ message: "Couldn't check" })
+											: (github.connection?.login ??
+												t({ message: "Not connected" }))
+								}
+							/>
+						}
+						onPress={
+							github.isLoading || github.isError ? undefined : handleGithub
+						}
+						isLast
+					/>
+				</SettingsSection>
+			) : null}
+
 			<SettingsSection label={t({ message: "Plan", context: "billing" })}>
 				<ListRow
 					icon={
@@ -303,7 +375,7 @@ export function SettingsScreen() {
 						/>
 					}
 					label={t({
-						message: "Rate Superset",
+						message: `Rate ${appName}`,
 					})}
 					trailing={<ExternalIcon color={theme.mutedForeground} />}
 					onPress={() => openUrl(WRITE_REVIEW_URL)}
@@ -352,7 +424,7 @@ export function SettingsScreen() {
 				className="pt-10 text-center text-xs uppercase"
 				style={{ color: theme.mutedForeground }}
 			>
-				{`${COMPANY.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
+				{`${BRAND.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
 			</Text>
 		</ScrollView>
 	);

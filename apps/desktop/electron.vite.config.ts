@@ -59,6 +59,8 @@ const hostServiceSentryPlugin = process.env.SENTRY_AUTH_TOKEN
 		})
 	: null;
 
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+
 export default defineConfig({
 	main: {
 		plugins: [tsconfigPaths, linguiMacroPlugin(), copyResourcesPlugin()],
@@ -75,7 +77,7 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_STREAMS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_STREAMS_URL,
-				"https://streams.superset.sh",
+				`https://streams.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_WEB_URL": defineEnv(
 				process.env.NEXT_PUBLIC_WEB_URL,
@@ -83,15 +85,15 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_MARKETING_URL": defineEnv(
 				process.env.NEXT_PUBLIC_MARKETING_URL,
-				"https://superset.sh",
+				`https://${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_DOCS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_DOCS_URL,
-				"https://docs.superset.sh",
+				`https://docs.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_ROOT_DOMAIN": defineEnv(
 				process.env.NEXT_PUBLIC_ROOT_DOMAIN,
-				"superset.sh",
+				rootDomain,
 			),
 			"process.env.SENTRY_DSN_DESKTOP": defineEnv(
 				process.env.SENTRY_DSN_DESKTOP,
@@ -118,6 +120,10 @@ export default defineConfig({
 			),
 			"process.env.SUPERSET_WORKSPACE_NAME": defineEnv(
 				process.env.SUPERSET_WORKSPACE_NAME,
+			),
+			"process.env.DESKTOP_DISPLAY_NAME": defineEnv(
+				process.env.DESKTOP_DISPLAY_NAME,
+				"",
 			),
 		},
 
@@ -206,15 +212,15 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_MARKETING_URL": defineEnv(
 				process.env.NEXT_PUBLIC_MARKETING_URL,
-				"https://superset.sh",
+				`https://${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_DOCS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_DOCS_URL,
-				"https://docs.superset.sh",
+				`https://docs.${rootDomain}`,
 			),
 			"process.env.NEXT_PUBLIC_ROOT_DOMAIN": defineEnv(
 				process.env.NEXT_PUBLIC_ROOT_DOMAIN,
-				"superset.sh",
+				rootDomain,
 			),
 			"import.meta.env.DEV_SERVER_PORT": defineEnv(String(DEV_SERVER_PORT)),
 			"import.meta.env.NEXT_PUBLIC_POSTHOG_KEY": defineEnv(
@@ -238,6 +244,10 @@ export default defineConfig({
 			),
 			"process.env.SUPERSET_WORKSPACE_NAME": defineEnv(
 				process.env.SUPERSET_WORKSPACE_NAME,
+			),
+			"process.env.DESKTOP_DISPLAY_NAME": defineEnv(
+				process.env.DESKTOP_DISPLAY_NAME,
+				"Superset",
 			),
 		},
 

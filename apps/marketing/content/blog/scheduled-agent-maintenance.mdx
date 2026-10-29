@@ -1,6 +1,6 @@
 ---
 title: "Schedule an agent maintenance check you can review"
-description: "Set up a recurring Superset agent check on a connected host, inspect its workspace, and handle offline runs. Includes a bounded maintenance prompt and review checklist."
+description: "Set up a recurring Paradev agent check on a connected host, inspect its workspace, and handle offline runs. Includes a bounded maintenance prompt and review checklist."
 author: kiet
 date: 2026-09-22
 category: Engineering
@@ -9,15 +9,15 @@ relatedSlugs:
   - claude-code-codex-iphone
 ---
 
-Have an agent check your repository every week and leave a report you can review. Superset Automations run the task on a computer you choose and keep the work in a workspace you can reopen.
+Have an agent check your repository every week and leave a report you can review. Paradev Automations run the task on a computer you choose and keep the work in a workspace you can reopen.
 
 Start with a check that reports findings without changing files.
 
 ## Prepare the host and project
 
-Automations require **Superset Pro or Enterprise**, an available target device, and an installed, authenticated agent. Choose a project with an existing test or lint command. Set up its dependencies and credentials on the host first.
+Automations require **Paradev Pro or Enterprise**, an available target device, and an installed, authenticated agent. Choose a project with an existing test or lint command. Set up its dependencies and credentials on the host first.
 
-Use a connected machine that will be awake when the schedule fires. A remote host requires appropriate host membership; see [remote access](https://docs.superset.sh/remote-access). Your model subscription or API usage is separate from Superset's plan.
+Use a connected machine that will be awake when the schedule fires. A remote host requires appropriate host membership; see [remote access](https://docs.superset.sh/remote-access). Your model subscription or API usage is separate from Paradev's plan.
 
 ## Create a weekly maintenance check
 
@@ -48,7 +48,7 @@ For expensive test suites, name a focused command and time budget rather than as
 
 Use **Run now**, then open **Run History**. Open the created workspace and inspect the terminal and report. Confirm the agent used the intended repository, command, and scope.
 
-A run marked **created** means Superset created the workspace. It does **not** mean the agent's checks passed or its work was correct. Read the actual output before treating the maintenance job as successful.
+A run marked **created** means Paradev created the workspace. It does **not** mean the agent's checks passed or its work was correct. Read the actual output before treating the maintenance job as successful.
 
 ## Handle offline and duplicate runs
 

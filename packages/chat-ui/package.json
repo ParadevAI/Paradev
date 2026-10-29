@@ -13,7 +13,14 @@
 		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
+		"@lexical/code": "0.41.0",
+		"@lexical/link": "0.41.0",
+		"@lexical/list": "0.41.0",
+		"@lexical/markdown": "0.41.0",
 		"@lexical/react": "0.41.0",
+		"@lexical/rich-text": "0.41.0",
+		"@lexical/selection": "0.41.0",
+		"@lexical/utils": "0.41.0",
 		"@lingui/core": "6.8.0",
 		"@lingui/react": "6.8.0",
 		"@shadcn/react": "0.2.1",

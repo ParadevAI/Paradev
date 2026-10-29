@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { buildChatSessionHandoffPrompt } from "@superset/shared/terminal-session-handoff";
+import { buildChatSessionHandoffPrompt } from "@superset/shared/session-handoff";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";

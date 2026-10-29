@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test";
-import { cloudPullRequestRefKey } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import {
 	type BuildCloudSidebarWorkspacesParams,
 	buildCloudSidebarWorkspaces,
@@ -48,7 +47,7 @@ function build(overrides: Partial<BuildCloudSidebarWorkspacesParams> = {}) {
 		projects: [],
 		repoFullNameById: new Map(),
 		branchById: new Map(),
-		pullRequestsByRef: new Map(),
+		pullRequestsById: new Map(),
 		unknownRepoProjectName: "Cloud",
 		...overrides,
 	});
@@ -174,20 +173,28 @@ describe("buildCloudSidebarWorkspaces", () => {
 		);
 	});
 
-	it("looks the pull request up by repo and the live branch", () => {
+	it("ranks a row with no agent message by creation, not by updatedAt", () => {
+		const layout = build({
+			cloudWorkspaces: [
+				makeCloudWorkspace({
+					id: "restarted",
+					updatedAt: new Date("2026-01-05T00:00:00.000Z"),
+				}),
+			],
+		});
+
+		const rows = layout.repoProjects[0]?.cloudWorkspaces ?? [];
+		expect(rows[0]?.lastActivityAt).toBe(DATE.getTime());
+	});
+
+	it("badges the workspace's first pull request, on the live branch", () => {
 		const pullRequest = makePullRequest({ isDraft: true });
 		const layout = build({
 			cloudWorkspaces: [makeCloudWorkspace({ id: "ws-1", branch: "stale" })],
 			repoFullNameById: new Map([["ws-1", "acme/app"]]),
 			branchById: new Map([["ws-1", "live"]]),
-			pullRequestsByRef: new Map([
-				[
-					cloudPullRequestRefKey({
-						repoFullName: "acme/app",
-						headBranch: "live",
-					}),
-					pullRequest,
-				],
+			pullRequestsById: new Map([
+				["ws-1", [pullRequest, makePullRequest({ number: 8 })]],
 			]),
 		});
 

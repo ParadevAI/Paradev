@@ -1,17 +1,17 @@
 # Translation glossary
 
 Input for translators, reviewers, and the translation CI prompt. Policy
-(Kiet, 2026-08-27): **product vocabulary translates — except the word
-"Superset" itself, which is never translated or transliterated in any
-locale.** "Workspace", "agent", "pane", "task", "automation", and the rest
+(Kiet, 2026-08-27): **product vocabulary translates — except the words
+"Paradev" and the former name "Superset", which are never translated or
+transliterated in any locale.** "Workspace", "agent", "pane", "task", "automation", and the rest
 are rendered in each locale's natural term, not kept as English islands.
 
 ## Never translated
 
 These are literal identifiers, not vocabulary:
 
-- **Superset** (brand), product names of third-party agents and tools
-  (Claude, Claude Code, Codex, Gemini, Cursor, GitHub, Linear, Slack, ...)
+- **Paradev** (brand), **Superset** (former name), product names of
+  third-party agents and tools (Claude, Claude Code, Codex, Gemini, Cursor, GitHub, Linear, Slack, ...)
 - CLI commands and flags (`superset ws create`, `--json`), file paths,
   environment variables, code identifiers
 - Keyboard keys and chords (⌘K, Ctrl+Shift+P)

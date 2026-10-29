@@ -6,25 +6,39 @@ import { useState } from "react";
 import { PaneMessage } from "../PaneMessage";
 import { DevicePicker, type LocalDevice } from "./components/DevicePicker";
 import { DeviceSession } from "./components/DeviceSession";
+import { useDeviceLease } from "./hooks/useDeviceLease";
+import { deviceKey } from "./utils/deviceKey";
 
-// Simulators on different iOS runtimes can share a name. An emulator's id
-// is its serial, which only exists while it runs, so it is keyed by name.
-const deviceKey = (device: LocalDevice) =>
-	device.platform === "ios"
-		? `ios:${device.id}`
-		: `${device.platform}:${device.name}`;
+interface LocalDevicesProps {
+	workspaceId: string;
+}
 
-export function LocalDevices() {
-	const devicesQuery = workspaceTrpc.mobile.localDevices.useQuery(undefined, {
-		refetchInterval: 3000,
-	});
+export function LocalDevices({ workspaceId }: LocalDevicesProps) {
+	// A cached list can show a device as running after it shut down, and
+	// mounting its stream would boot it again.
+	const devicesQuery = workspaceTrpc.mobile.localDevices.useQuery(
+		{ workspaceId },
+		{ refetchInterval: 3000, gcTime: 0 },
+	);
 	const boot = workspaceTrpc.mobile.bootLocalDevice.useMutation({
 		onSettled: () => devicesQuery.refetch(),
 	});
 	const shutdown = workspaceTrpc.mobile.shutdownLocalDevice.useMutation({
 		onSettled: () => devicesQuery.refetch(),
 	});
+	const remember = workspaceTrpc.mobile.rememberLocalDevice.useMutation();
 	const [selectedKey, setSelectedKey] = useState<string | null>(null);
+
+	const data = devicesQuery.data;
+	const lastPickedKey = data?.lastPicked
+		? `${data.lastPicked.platform}:${data.lastPicked.key}`
+		: null;
+	const selected =
+		data?.devices.find((device) => deviceKey(device) === selectedKey) ??
+		data?.devices.find((device) => deviceKey(device) === lastPickedKey) ??
+		data?.devices.find((device) => device.booted) ??
+		null;
+	useDeviceLease(selected);
 
 	if (devicesQuery.isPending) {
 		return (
@@ -53,15 +67,17 @@ export function LocalDevices() {
 	}
 
 	const { hubUrl, hubToken, devices } = devicesQuery.data;
-	const selected =
-		devices.find((device) => deviceKey(device) === selectedKey) ??
-		devices.find((device) => device.booted) ??
-		null;
 
 	const select = (device: LocalDevice) => {
 		setSelectedKey(deviceKey(device));
+		remember.mutate({ ...device, workspaceId });
 		if (!device.booted) boot.mutate(device);
 	};
+	const booting =
+		selected !== null &&
+		boot.variables !== undefined &&
+		deviceKey(boot.variables) === deviceKey(selected) &&
+		!boot.isError;
 
 	const picker = (
 		<DevicePicker
@@ -71,6 +87,7 @@ export function LocalDevices() {
 			onShutdown={() => {
 				if (!selected) return;
 				setSelectedKey(null);
+				boot.reset();
 				shutdown.mutate(selected);
 			}}
 		/>
@@ -82,6 +99,7 @@ export function LocalDevices() {
 				key={`${deviceKey(selected)}:${selected.id}`}
 				hubUrl={hubUrl}
 				hubToken={hubToken}
+				workspaceId={workspaceId}
 				device={selected}
 				picker={picker}
 			/>
@@ -92,10 +110,24 @@ export function LocalDevices() {
 		<div className="relative flex size-full flex-col">
 			{picker}
 			<PaneMessage>
-				{selected ? (
+				{!selected ? (
+					<Trans>No device is running.</Trans>
+				) : booting ? (
 					<Trans>Booting {selected.name}…</Trans>
 				) : (
-					<Trans>No device is running.</Trans>
+					<>
+						<div>
+							<Trans>{selected.name} is not running.</Trans>
+						</div>
+						<Button
+							variant="outline"
+							size="sm"
+							className="mt-3"
+							onClick={() => boot.mutate(selected)}
+						>
+							<Trans>Boot</Trans>
+						</Button>
+					</>
 				)}
 				{boot.error && (
 					<div className="mt-2 text-xs opacity-70">

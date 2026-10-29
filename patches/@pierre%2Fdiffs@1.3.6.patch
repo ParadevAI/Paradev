@@ -1,0 +1,12 @@
+diff --git a/dist/components/CodeView.js b/dist/components/CodeView.js
+index 051e7d0a211c0cdf32badbd4ff836f04df1ff511..1ceb8ec2a18c9f460725c8d76f4a91fff0b80b24 100644
+--- a/dist/components/CodeView.js
++++ b/dist/components/CodeView.js
+@@ -402,6 +402,7 @@ var CodeView = class CodeView {
+ 		this.clearReadySubscription();
+ 		this.restoreScrollInteractions();
+ 		this.cleanAllRenderedItems();
++		for (const item of this.items) item.instance.cleanUp();
+ 		for (const record of this.itemEditors.values()) record.editor.cleanUp();
+ 		this.itemEditors.clear();
+ 		this.attachedEditors.clear();

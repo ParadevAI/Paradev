@@ -28,6 +28,14 @@
 			"types": "./src/lib/sandbox/index.ts",
 			"default": "./src/lib/sandbox/index.ts"
 		},
+		"./lib/sandbox/*": {
+			"types": "./src/lib/sandbox/*.ts",
+			"default": "./src/lib/sandbox/*.ts"
+		},
+		"./lib/workspace-access": {
+			"types": "./src/lib/workspace-access/index.ts",
+			"default": "./src/lib/workspace-access/index.ts"
+		},
 		"./lib/document-files": {
 			"types": "./src/lib/document-files/index.ts",
 			"default": "./src/lib/document-files/index.ts"
@@ -150,14 +158,17 @@
 		"@modelcontextprotocol/sdk": "1.31.0",
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
+		"@octokit/core": "7.0.8",
 		"@sentry/core": "10.68.0",
 		"@slack/web-api": "7.15.0",
+		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/email": "workspace:*",
 		"@superset/i18n": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@t3-oss/env-core": "0.13.11",
+		"@temporalio/client": "1.24.0",
 		"@trpc/server": "11.16.0",
 		"@upstash/qstash": "2.10.1",
 		"@upstash/ratelimit": "2.0.8",

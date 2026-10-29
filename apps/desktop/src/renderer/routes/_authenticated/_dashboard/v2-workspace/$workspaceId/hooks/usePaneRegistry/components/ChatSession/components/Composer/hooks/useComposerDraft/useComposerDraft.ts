@@ -17,7 +17,7 @@ function persistDraft(draftKey: string, text: string): boolean {
 	}
 }
 
-function readDraft(draftKey: string): string | undefined {
+export function readDraft(draftKey: string): string | undefined {
 	const unsaved = unsavedDrafts.get(draftKey);
 	if (unsaved !== undefined) return unsaved;
 	try {
@@ -38,10 +38,14 @@ function joinDrafts(drafts: readonly string[]): string {
 	);
 }
 
-export function prependToDraft(draftKey: string, texts: readonly string[]) {
+export function prependToDraft(
+	draftKey: string,
+	texts: readonly string[],
+	persisted = true,
+) {
 	const merged = joinDrafts([...texts, readDraft(draftKey) ?? ""]);
 	unsavedDrafts.set(draftKey, merged);
-	persistDraft(draftKey, merged);
+	if (persisted) persistDraft(draftKey, merged);
 	recoveredAfterRead.set(draftKey, [
 		...(recoveredAfterRead.get(draftKey) ?? []),
 		...texts,
@@ -54,7 +58,7 @@ export function takeRecoveredDraftText(draftKey: string): string | null {
 	return recovered?.length ? joinDrafts(recovered) : null;
 }
 
-export function useComposerDraft(draftKey: string) {
+export function useComposerDraft(draftKey: string, persisted = true) {
 	const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pendingDraftKey = useRef<string | null>(null);
 	const flushDraft = useCallback(() => {
@@ -70,12 +74,17 @@ export function useComposerDraft(draftKey: string) {
 	}, []);
 	const onChange = useCallback(
 		(text: string) => {
+			if (!persisted) {
+				if (text === "") unsavedDrafts.delete(draftKey);
+				else unsavedDrafts.set(draftKey, text);
+				return;
+			}
 			if (draftTimer.current) clearTimeout(draftTimer.current);
 			unsavedDrafts.set(draftKey, text);
 			pendingDraftKey.current = draftKey;
 			draftTimer.current = setTimeout(flushDraft, DRAFT_DEBOUNCE_MS);
 		},
-		[draftKey, flushDraft],
+		[draftKey, persisted, flushDraft],
 	);
 	useEffect(() => flushDraft, [flushDraft]);
 
@@ -85,16 +94,24 @@ export function useComposerDraft(draftKey: string) {
 	});
 
 	const clearDraft = useCallback(() => {
-		if (draftTimer.current) clearTimeout(draftTimer.current);
-		draftTimer.current = null;
-		pendingDraftKey.current = null;
 		unsavedDrafts.delete(draftKey);
-		persistDraft(draftKey, "");
+		if (persisted) {
+			if (draftTimer.current) clearTimeout(draftTimer.current);
+			draftTimer.current = null;
+			pendingDraftKey.current = null;
+			persistDraft(draftKey, "");
+		}
 		setSeed({ draftKey, text: undefined });
-	}, [draftKey]);
+	}, [draftKey, persisted]);
 
-	const storedDraft =
-		seed.draftKey === draftKey ? seed.text : readDraft(draftKey);
+	if (seed.draftKey !== draftKey) {
+		recoveredAfterRead.delete(draftKey);
+		setSeed({ draftKey, text: readDraft(draftKey) });
+	}
 
-	return { storedDraft, onChange, clearDraft };
+	return {
+		storedDraft: seed.draftKey === draftKey ? seed.text : readDraft(draftKey),
+		onChange,
+		clearDraft,
+	};
 }

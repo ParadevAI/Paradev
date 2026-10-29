@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
@@ -19,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const description = i18n._(
 		msg({
 			message:
-				"See what we're building now, what's coming next, and where Superset is headed.",
+				"See what we're building now, what's coming next, and where Paradev is headed.",
 		}),
 	);
 	return {
@@ -30,14 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/roadmap").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: description,
 			url: localeUrl(lang, "/roadmap"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: description,
 			images: ["/og-image.png"],
 		},
@@ -47,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RoadmapPage() {
 	await initServerI18n();
 
-	const company = COMPANY.NAME;
+	const company = BRAND.NAME;
 
 	return (
 		<main className="relative min-h-screen">

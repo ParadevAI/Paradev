@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Solo (2026): Agent Workspace vs Process Dashboard"
-description: "Compare Superset and Solo (soloterm.com): parallel coding agents in Git worktrees vs Aaron Francis's native dashboard for agents and your dev stack."
+title: "Paradev vs Solo (2026): Agent Workspace vs Process Dashboard"
+description: "Compare Paradev and Solo (soloterm.com): parallel coding agents in Git worktrees vs Aaron Francis's native dashboard for agents and your dev stack."
 date: 2026-08-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - ai agent workspace
 ---
 
-Superset and Solo both put your coding agents in one window, but they manage different things. Superset manages the work: new local branch-based workspaces get Git worktrees, with terminals, diffs, and review. Solo -- Aaron Francis's native terminal workspace -- manages the environment: your dev servers, databases, queue workers, and agents run as supervised processes with auto-restart, crash notifications, and a rich MCP surface agents use to coordinate. Solo's own compare pages say it plainly: it is "not a git-worktree orchestrator," and it positions itself as complementary to tools like Superset rather than a replacement.
+Paradev and Solo both put your coding agents in one window, but they manage different things. Paradev manages the work: new local branch-based workspaces get Git worktrees, with terminals, diffs, and review. Solo -- Aaron Francis's native terminal workspace -- manages the environment: your dev servers, databases, queue workers, and agents run as supervised processes with auto-restart, crash notifications, and a rich MCP surface agents use to coordinate. Solo's own compare pages say it plainly: it is "not a git-worktree orchestrator," and it positions itself as complementary to tools like Paradev rather than a replacement.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Solo** |
+| | **Paradev** | **Solo** |
 |---|---|---|
 | **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Runs agents and your whole dev stack as supervised processes in one native window |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Native process dashboard / terminal workspace (Tauri, "not an IDE. On purpose.") |
@@ -31,13 +31,13 @@ Superset and Solo both put your coding agents in one window, but they manage dif
 | **Agent coordination** | CLI, MCP server, SDK; orchestrating agents spawn workers | 40+ MCP tools: shared todos, scratchpads, locks, timers, agent spawning |
 | **Diff review / PRs** | Built-in diff/file editor, PR flow | None -- does not review code or manage branches |
 | **Platforms** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | macOS and Windows (Linux coming); local only |
-| **License / pricing** | Source-available (ELv2); free tier + Pro $20/seat/mo | Proprietary; free (4 projects) / Pro $99/yr / Team $69-99/seat/yr |
+| **License / pricing** | Source-available (ELv2); free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Proprietary; free (4 projects) / Pro $99/yr / Team $69-99/seat/yr |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Solo?
 
@@ -47,31 +47,31 @@ Solo is a native desktop terminal workspace from Aaron Francis -- "the workspace
 
 ### Work Isolation vs Environment Health
 
-Superset’s local branch-based workspaces separate working directories and branches, with terminals and diff review attached. Worktrees do not prevent merge conflicts or isolate shared services. Solo's unit is the process: everything runs in one shared checkout, kept healthy by supervision. Solo is upfront that parallel agents in the same project share the working tree unless you hand-create worktrees (its "linked checkouts" then share todos across them, but Solo will not create or manage the checkouts). For parallel agent coding, that is the decisive difference.
+Paradev’s local branch-based workspaces separate working directories and branches, with terminals and diff review attached. Worktrees do not prevent merge conflicts or isolate shared services. Solo's unit is the process: everything runs in one shared checkout, kept healthy by supervision. Solo is upfront that parallel agents in the same project share the working tree unless you hand-create worktrees (its "linked checkouts" then share todos across them, but Solo will not create or manage the checkouts). For parallel agent coding, that is the decisive difference.
 
 ### The Review Gap
 
-Solo does not read agent conversations, review code changes, or manage branches -- by design. When an agent finishes, you review in your editor and handle git yourself. Superset builds the review loop in: a diff/file editor per worktree, PR creation, review threads, and CI status. If "what did the agent actually change?" is the question you ask most, only one of these answers it.
+Solo does not read agent conversations, review code changes, or manage branches -- by design. When an agent finishes, you review in your editor and handle git yourself. Paradev builds the review loop in: a diff/file editor per worktree, PR creation, review threads, and CI status. If "what did the agent actually change?" is the question you ask most, only one of these answers it.
 
 ### Where Solo Shines
 
-Solo's process supervision is genuinely better than anything in the orchestrator category: stack auto-detection with one-click start, auto-restart with crash alerts, resource tracking, and a committable `solo.yml` that describes the whole stack for the team. Its MCP coordination surface -- shared todos with blockers, scratchpads, locks, timers that wake idle agents -- is also the richest agent-to-agent toolkit shipped by any tool here. Superset covers the adjacent ground differently: run scripts with a restartable dev-server pane, port detection with jump-to-terminal, and setup/teardown scripts in `.superset/config.json`, with coordination flowing through its CLI, MCP server, and SDK.
+Solo's process supervision is genuinely better than anything in the orchestrator category: stack auto-detection with one-click start, auto-restart with crash alerts, resource tracking, and a committable `solo.yml` that describes the whole stack for the team. Its MCP coordination surface -- shared todos with blockers, scratchpads, locks, timers that wake idle agents -- is also the richest agent-to-agent toolkit shipped by any tool here. Paradev covers the adjacent ground differently: run scripts with a restartable dev-server pane, port detection with jump-to-terminal, and setup/teardown scripts in `.superset/config.json`, with coordination flowing through its CLI, MCP server, and SDK.
 
 ### Complement, Not Substitute
 
-Solo's own comparison pages describe it as a layer around your existing tools, coexisting with worktree orchestrators. That is accurate: you could supervise your dev stack in Solo while Superset runs the parallel agents and review. The choice becomes either/or only if you want one window -- in which case pick by primary job: shipping parallel agent work (Superset) or keeping a busy local stack healthy (Solo).
+Solo's own comparison pages describe it as a layer around your existing tools, coexisting with worktree orchestrators. That is accurate: you could supervise your dev stack in Solo while Paradev runs the parallel agents and review. The choice becomes either/or only if you want one window -- in which case pick by primary job: shipping parallel agent work (Paradev) or keeping a busy local stack healthy (Solo).
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Solo is free for up to 4 projects with all features, then Pro at $99/year or Team at $69-99/seat/year. Both are bring-your-own-agent: model costs stay with your providers.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Solo is free for up to 4 projects with all features, then Pro at $99/year or Team at $69-99/seat/year. Both are bring-your-own-agent: model costs stay with your providers.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Run multiple coding agents in parallel and need them isolated in worktrees
 - Want diff review, PR flow, and a browser around agent work
@@ -85,24 +85,24 @@ Superset offers a free tier and Pro at $20/seat/month. Solo is free for up to 4 
 - Want agents coordinating through shared todos, locks, and timers via MCP
 - Work in one shared checkout and review code in your own editor
 
-**Verdict:** Solo is the best process dashboard a developer running agents can buy, and its MCP coordination toolkit deserves the attention it gets. But it manages the environment, not the work -- no isolation, no review, no branches, by its own description. For parallel agent development, Superset is the tool for the job, and plenty of developers will happily run both.
+**Verdict:** Solo is the best process dashboard a developer running agents can buy, and its MCP coordination toolkit deserves the attention it gets. But it manages the environment, not the work -- no isolation, no review, no branches, by its own description. For parallel agent development, Paradev is the tool for the job, and plenty of developers will happily run both.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Solo a Superset alternative?
+### Is Solo a Paradev alternative?
 
-Only partially -- Solo itself says it is not a git-worktree orchestrator and positions against editors and terminals, not orchestrators. It supervises processes; Superset orchestrates isolated agent work. They overlap in "agents in one window" and complement each other beyond that.
+Only partially -- Solo itself says it is not a git-worktree orchestrator and positions against editors and terminals, not orchestrators. It supervises processes; Paradev orchestrates isolated agent work. They overlap in "agents in one window" and complement each other beyond that.
 
 ### Does Solo support Git worktrees?
 
-It does not create or manage them. If you make worktrees yourself, Solo's "linked checkouts" share project todos and scratchpads across them. Superset creates and manages worktrees for new local branch-based workspaces.
+It does not create or manage them. If you make worktrees yourself, Solo's "linked checkouts" share project todos and scratchpads across them. Paradev creates and manages worktrees for new local branch-based workspaces.
 
 ### Which agents does each support?
 
-Solo runs Claude Code, Codex, Gemini CLI, Amp, OpenCode, Aider, Goose, Copilot, Kimi, and custom agents as managed processes with status detection. Superset runs any CLI agent with orchestration, worktrees, and review attached.
+Solo runs Claude Code, Codex, Gemini CLI, Amp, OpenCode, Aider, Goose, Copilot, Kimi, and custom agents as managed processes with status detection. Paradev runs any CLI agent with orchestration, worktrees, and review attached.
 
 ### Is Solo open source?
 
-The desktop app is proprietary (the MIT `soloterm/solo` repo on GitHub is the original Laravel package, not the app). Superset is source-available under ELv2.
+The desktop app is proprietary (the MIT `soloterm/solo` repo on GitHub is the original Laravel package, not the app). Paradev is source-available under ELv2.

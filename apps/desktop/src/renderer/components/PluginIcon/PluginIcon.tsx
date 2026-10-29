@@ -4,13 +4,13 @@ import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
 import { LuBookOpen, LuDrama, LuPuzzle } from "react-icons/lu";
 import {
-	SiGooglecalendar,
 	SiGooglechrome,
 	SiGoogledocs,
 	SiGooglesheets,
 	SiLinear,
 	SiNotion,
 	SiPosthog,
+	SiResend,
 	SiSentry,
 	SiSupabase,
 	SiVercel,
@@ -20,14 +20,17 @@ import {
 	usePresetIcon,
 } from "renderer/assets/app-icons/preset-icons";
 import circlebackIconUrl from "renderer/assets/icons/circleback-icon.png";
+import exaIconUrl from "renderer/assets/icons/exa-icon.svg";
 import figmaIconUrl from "renderer/assets/icons/figma-icon.svg";
 import gmailIconUrl from "renderer/assets/icons/gmail-icon.svg";
+import googleCalendarIconUrl from "renderer/assets/icons/google-calendar-icon.svg";
 import granolaIconUrl from "renderer/assets/icons/granola-icon.svg";
 import mondayIconUrl from "renderer/assets/icons/monday-icon.svg";
 import neonIconUrl from "renderer/assets/icons/neon-icon.png";
 import slackIconUrl from "renderer/assets/icons/slack-icon.svg";
 import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
+import { AutumnIcon } from "./components/AutumnIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 /**
@@ -51,20 +54,23 @@ const IMAGE_ICONS: Record<string, string> = {
 	ynab: ynabIconUrl,
 	granola: granolaIconUrl,
 	monday: mondayIconUrl,
+	exa: exaIconUrl,
+	"google-calendar": googleCalendarIconUrl,
 };
 
 const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
+	autumn: { icon: AutumnIcon },
 	github: { icon: FaGithub },
 	superhuman: { icon: SuperhumanIcon },
 	notion: { icon: SiNotion },
 	sentry: { icon: SiSentry },
 	posthog: { icon: SiPosthog },
+	resend: { icon: SiResend },
 	linear: { icon: SiLinear },
 	supabase: { icon: SiSupabase, color: "#3ECF8E" },
 	context7: { icon: LuBookOpen },
 	playwright: { icon: LuDrama, color: "#2EAD33" },
 	"chrome-devtools": { icon: SiGooglechrome, color: "#4285F4" },
-	"google-calendar": { icon: SiGooglecalendar, color: "#4285F4" },
 	"google-docs": { icon: SiGoogledocs, color: "#4285F4" },
 	"google-sheets": { icon: SiGooglesheets, color: "#0F9D58" },
 	vercel: { icon: SiVercel },

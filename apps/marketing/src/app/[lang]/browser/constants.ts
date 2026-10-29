@@ -14,7 +14,7 @@ export const BROWSER_STEPS: (BrowserItem & { id: BrowserStepId })[] = [
 		title: msg({ message: "Open your app." }),
 		description: msg({
 			message:
-				"Press ⌘⇧B or open a port Superset detected. Your dev server loads in a pane beside your terminals.",
+				"Press ⌘⇧B or open a port Paradev detected. Your dev server loads in a pane beside your terminals.",
 		}),
 	},
 	{
@@ -68,7 +68,7 @@ export const FEATURES: BrowserItem[] = [
 		title: msg({ message: "Ports on remote hosts" }),
 		description: msg({
 			message:
-				"Superset forwards the ports a remote workspace opens while you have it selected.",
+				"Paradev forwards the ports a remote workspace opens while you have it selected.",
 		}),
 	},
 ];

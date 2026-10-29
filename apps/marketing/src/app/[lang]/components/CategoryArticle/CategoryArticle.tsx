@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
@@ -33,7 +34,7 @@ export function CategoryArticle({ page }: CategoryArticleProps) {
 			<ArticleJsonLd
 				title={page.title}
 				description={page.description}
-				author={{ name: COMPANY.NAME, url: COMPANY.MARKETING_URL }}
+				author={{ name: BRAND.NAME, url: COMPANY.MARKETING_URL }}
 				publishedTime={new Date(page.date).toISOString()}
 				modifiedTime={new Date(page.lastUpdated ?? page.date).toISOString()}
 				url={url}
@@ -101,7 +102,7 @@ export function CategoryArticle({ page }: CategoryArticleProps) {
 					</div>
 					<div className="max-w-3xl mx-auto px-6 py-10 text-center">
 						<p className="text-muted-foreground mb-4">
-							<Trans>Ready to try Superset?</Trans>
+							<Trans>Ready to try Paradev?</Trans>
 						</p>
 						<Link
 							href="/"

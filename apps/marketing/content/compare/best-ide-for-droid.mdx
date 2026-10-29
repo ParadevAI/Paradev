@@ -1,6 +1,6 @@
 ---
 title: "Best IDE for Factory Droid in 2026"
-description: "The best places to run Factory's Droid coding agent in 2026, from the droid CLI and Factory desktop app to VS Code, JetBrains, Zed, Droid Computers, and Superset for parallel worktree sessions next to other agents."
+description: "The best places to run Factory's Droid coding agent in 2026, from the droid CLI and Factory desktop app to VS Code, JetBrains, Zed, Droid Computers, and Paradev for parallel worktree sessions next to other agents."
 date: 2026-10-13
 lastUpdated: 2026-10-15
 type: "roundup"
@@ -27,7 +27,7 @@ Facts were checked against Factory's own docs on October 13, 2026.
 
 | Where you run Droid | Best for | Parallel tasks on one repo? | Main tradeoff |
 |---|---|---|---|
-| **Superset** | Many Droid tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Built-in file editor, but not an editor-first IDE |
+| **Paradev** | Many Droid tasks at once, next to other agents | Git worktrees for local branch-based workspaces | Built-in file editor, but not an editor-first IDE |
 | **`droid` CLI** | One focused task, scripts, and CI | Missions, custom Droids, background agents | You manage separate tasks yourself |
 | **Factory desktop app** | Many Droids at once in Factory's own app | Git worktrees, local or on Droid Computers | macOS and Windows only; Droid only |
 | **VS Code extension** | Editing alongside Droid | Limited | One working copy |
@@ -44,7 +44,7 @@ The `droid` CLI runs on macOS, Linux, and Windows. Missions (`/missions`, `droid
 
 Factory's desktop app for macOS and Windows runs many Droids at once in Git worktrees, on your machine or on Droid Computers. It is the strongest option if you only use Droid and want Factory's automations and review in one place.
 
-For the direct comparison, see [Superset vs Factory](/compare/superset-vs-factory).
+For the direct comparison, see [Paradev vs Factory](/compare/superset-vs-factory).
 
 ### VS Code extension
 
@@ -58,9 +58,9 @@ JetBrains IDEs and Zed connect to Droid through the Agent Client Protocol (ACP),
 
 Droid Computers are persistent machines: managed cloud VMs that pause when idle, or your own machine connected through Factory's relay. The Plus plan ($100 per month) includes managed Droid Computers. The work keeps going when your laptop is closed.
 
-### Superset
+### Paradev
 
-Superset runs Droid as a built-in agent. Each new local branch-based workspace gets its own Git worktree and terminal, so several Droid tasks can run on the same repository at once, locally or on your own remote hosts. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Superset never proxies model calls. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+Paradev runs Droid as a built-in agent. Each new local branch-based workspace gets its own Git worktree and terminal, so several Droid tasks can run on the same repository at once, locally or on your own remote hosts. You can also run Claude Code, Codex, or any other CLI agent in the next workspace and compare the results. Around it you get a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks, an in-app browser, and an [iPhone and iPad app](/mobile). Paradev never proxies model calls. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
 
 ## How To Choose
 
@@ -68,28 +68,28 @@ Superset runs Droid as a built-in agent. Each new local branch-based workspace g
 - For many Droids in Factory's own app, use the Factory desktop app.
 - To edit alongside Droid, use the VS Code extension, or JetBrains or Zed through ACP.
 - For work that keeps going without your machine, use Droid Computers.
-- For many Droid tasks next to other agents, with PRs and review in one place, use Superset.
+- For many Droid tasks next to other agents, with PRs and review in one place, use Paradev.
 
 ## Verdict
 
-Factory's own surfaces are the best place for Droid alone. The desktop app already runs many Droids in worktrees, and Droid Computers give you persistent managed cloud machines that pause when idle. Once you want Droid next to Claude Code or Codex on the same repository, on your own subscriptions and machines, run it in a workspace like Superset.
+Factory's own surfaces are the best place for Droid alone. The desktop app already runs many Droids in worktrees, and Droid Computers give you persistent managed cloud machines that pause when idle. Once you want Droid next to Claude Code or Codex on the same repository, on your own subscriptions and machines, run it in a workspace like Paradev.
 
 For other options, see [Factory Alternatives](/compare/factory-alternative). For the full field, see [Best AI Coding Agents in 2026](/compare/best-coding-agents).
 
-## How To Run Droid in Superset
+## How To Run Droid in Paradev
 
-1. Open your repository in Superset and create a workspace. Each new local branch-based workspace gets its own Git worktree.
+1. Open your repository in Paradev and create a workspace. Each new local branch-based workspace gets its own Git worktree.
 2. Pick Droid (Factory) from the agent presets. It signs in with your own Factory plan or keys.
 3. To compare agents, create a second workspace with Claude Code or Codex and give it the same prompt.
 4. Compare the diffs in the Changes pane, then open a PR from the better one.
 
-Superset never proxies model calls; each agent uses your own subscription or key. Superset does not track Droid's token use, because Droid keeps no local usage log it can read.
+Paradev never proxies model calls; each agent uses your own subscription or key. Paradev does not track Droid's token use, because Droid keeps no local usage log it can read.
 
 ## Frequently Asked Questions
 
 ### What is the best IDE for Factory Droid?
 
-For one task or CI, the `droid` CLI. For many Droids in Factory's own app, the Factory desktop app. For several Droid tasks next to other agents on one repository, a worktree workspace like Superset.
+For one task or CI, the `droid` CLI. For many Droids in Factory's own app, the Factory desktop app. For several Droid tasks next to other agents on one repository, a worktree workspace like Paradev.
 
 ### Does Droid work in VS Code or JetBrains?
 
@@ -101,4 +101,4 @@ Factory's Pro plan is $20 per month, Plus is $100 per month (about 5x Pro, with 
 
 ### Can I run Droid and Claude Code at the same time?
 
-Yes. In Superset, each runs in its own workspace and worktree on the same repository, and you compare the diffs before you open a PR.
+Yes. In Paradev, each runs in its own workspace and worktree on the same repository, and you compare the diffs before you open a PR.

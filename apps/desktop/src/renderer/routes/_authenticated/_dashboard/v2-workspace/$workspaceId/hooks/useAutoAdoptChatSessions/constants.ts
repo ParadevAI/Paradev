@@ -1,0 +1,2 @@
+export const PENDING_CLOUD_CHAT_TIMEOUT_MS = 3 * 60_000;
+export const UNRESOLVED_POLL_MAX_MS = 60_000;

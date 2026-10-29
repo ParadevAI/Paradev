@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { FAQ_ITEMS } from "@/app/[lang]/components/FAQSection/constants";
 import {
@@ -24,11 +25,11 @@ export async function GET() {
 
 	const lines: string[] = [
 		...buildFrontmatter({
-			title: `${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+			title: `${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 			description: PRODUCT_SUMMARY,
 			canonical: `${baseUrl}/`,
 		}),
-		`# ${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+		`# ${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 		"",
 		PRODUCT_SUMMARY,
 		"",
@@ -41,7 +42,7 @@ export async function GET() {
 		"- **Diff review**: review every change from one dashboard before merging.",
 		"- **Persistent terminals**: sessions survive app restarts.",
 		"- **Automations** (Pro): run an agent with a prompt on a schedule or when an event happens.",
-		"- **MCP server**: drive Superset from other AI agents over the Model Context Protocol.",
+		`- **MCP server**: drive ${BRAND.NAME} from other AI agents over the Model Context Protocol.`,
 		"",
 		"## Get started",
 		"",
@@ -67,7 +68,7 @@ export async function GET() {
 		]),
 		`## Contact`,
 		"",
-		`- Support: support${COMPANY.EMAIL_DOMAIN}`,
+		`- Support: ${COMPANY.SUPPORT_EMAIL}`,
 		`- Team: ${COMPANY.TEAM_EMAIL}`,
 		`- [Discord](${COMPANY.DISCORD_URL})`,
 		`- [X](${COMPANY.X_URL})`,

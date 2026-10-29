@@ -10,9 +10,10 @@ import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useRef } from "react";
+import { Pencil } from "lucide-react";
+import { useRef, useState } from "react";
+import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import { parseAttachmentTags } from "../../../../utils/attachmentTags";
-import { LEADING_COMMAND } from "../../../../utils/commandChip";
 import {
 	type MessageSegment,
 	splitByElements,
@@ -21,8 +22,10 @@ import { CopyButton } from "../../../CopyButton";
 import { AttachmentImage } from "../AttachmentImage";
 import { MessageTime } from "../MessageTime";
 import { PastedTextBlock } from "./components/PastedTextBlock";
+import { UserMessageEditor } from "./components/UserMessageEditor";
 import { UserMessageText } from "./components/UserMessageText";
 import { useFitsOneLine } from "./hooks/useFitsOneLine";
+import { textElementsFromText } from "./utils/textElementsFromText";
 
 function BookkeepingRow({ label }: { label: string }) {
 	return (
@@ -43,8 +46,10 @@ export function UserMessageRow({
 	harness,
 	item,
 	pending,
+	sender,
 }: {
 	item: UserMessage;
+	sender?: string | undefined;
 	commands?: ReadonlyMap<string, AvailableCommand> | undefined;
 	/** Which harness spelled this turn; its reader decides what is bookkeeping. */
 	harness: string | undefined;
@@ -55,19 +60,14 @@ export function UserMessageRow({
 	const note = readBookkeeping(harness, raw);
 	const { text, attachments, pastedTexts } = parseAttachmentTags(raw);
 	const elements = item.content.find((part) => part.type === "text")?.elements;
-	const leading = LEADING_COMMAND.exec(text)?.[1];
-	const segments: MessageSegment[] = elements?.length
-		? splitByElements(text, elements)
-		: leading && commands?.has(leading)
-			? splitByElements(text, [
-					{
-						byteRange: { start: 0, end: leading.length + 1 },
-						elementKind: "slash_command",
-					},
-				])
-			: [{ text }];
+	const segments: MessageSegment[] = splitByElements(
+		text,
+		elements?.length ? elements : textElementsFromText(text, commands),
+	);
 	const textRef = useRef<HTMLDivElement>(null);
 	const oneLine = useFitsOneLine(textRef);
+	const { editMessage, editableMessageIds } = useChatPaneActions();
+	const [editing, setEditing] = useState(false);
 	if (note && !pending) return <BookkeepingRow label={note.label} />;
 
 	const images = attachments.filter((attachment) =>
@@ -88,11 +88,37 @@ export function UserMessageRow({
 	];
 	const copyable = (text.length > 0 || pastedTexts.length > 0) && !pending;
 	const copyText = [text, ...pastedTexts].filter(Boolean).join("\n\n");
+	const editable =
+		copyable &&
+		editMessage !== undefined &&
+		editableMessageIds?.has(item.id) === true &&
+		attachments.length === 0 &&
+		pastedTexts.length === 0 &&
+		files.length === 0;
+	if (editing && editable) {
+		return (
+			<Message className="pt-1.5 pb-5 pl-10" from="user">
+				<UserMessageEditor
+					initialText={text}
+					onCancel={() => setEditing(false)}
+					onSubmit={(edited) => {
+						setEditing(false);
+						editMessage(item.id, edited);
+					}}
+				/>
+			</Message>
+		);
+	}
 	return (
 		<Message
 			className={cn("group/message pt-1.5 pl-10", copyable ? "pb-0" : "pb-5")}
 			from="user"
 		>
+			{sender && (
+				<span className="self-end font-sans text-foreground/45 text-xs">
+					{sender}
+				</span>
+			)}
 			{images.length > 0 && (
 				<div
 					className={cn(
@@ -167,6 +193,23 @@ export function UserMessageRow({
 							<Trans>Copy message</Trans>
 						</TooltipContent>
 					</Tooltip>
+					{editable && (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<button
+									aria-label={t({ message: "Edit message" })}
+									className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-secondary hover:text-foreground"
+									onClick={() => setEditing(true)}
+									type="button"
+								>
+									<Pencil className="size-3.5" />
+								</button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<Trans>Edit message</Trans>
+							</TooltipContent>
+						</Tooltip>
+					)}
 				</div>
 			)}
 			{pending?.failed && (
