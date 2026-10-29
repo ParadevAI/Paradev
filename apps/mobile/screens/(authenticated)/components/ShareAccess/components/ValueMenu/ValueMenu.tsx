@@ -1,75 +1,87 @@
-import { Host, HStack, Image, Menu, Text } from "@expo/ui/swift-ui";
 import {
-	accessibilityLabel,
-	disabled as disabledModifier,
-	font,
-	foregroundStyle,
-	frame,
-	lineLimit,
-} from "@expo/ui/swift-ui/modifiers";
-import type { ReactNode } from "react";
-import { useTheme } from "@/hooks/useTheme";
+	ChevronDown,
+	ChevronRight,
+	ChevronsUpDown,
+	Ellipsis,
+	type LucideIcon,
+} from "lucide-react-native";
+import {
+	DropdownMenu,
+	DropdownMenuCheckboxItem,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Icon } from "@/components/ui/icon";
+import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
+import type { ValueMenuComponent, ValueMenuProps } from "./ValueMenu.types";
 
-/**
- * A native pull-down menu anchored to its trigger: a label with a chevron, or
- * an ellipsis when `label` is omitted. The children are `@expo/ui/swift-ui`
- * `Button`, `Section` and `Divider` elements.
- */
-export function ValueMenu({
+const CHEVRON_ICON: Record<
+	NonNullable<ValueMenuProps["chevron"]>,
+	LucideIcon
+> = {
+	down: ChevronDown,
+	right: ChevronRight,
+	upDown: ChevronsUpDown,
+};
+
+const WEIGHT_CLASS: Record<NonNullable<ValueMenuProps["weight"]>, string> = {
+	regular: "font-normal",
+	medium: "font-medium",
+	semibold: "font-semibold",
+};
+
+export const ValueMenu: ValueMenuComponent = ({
 	label,
 	a11yLabel,
 	tone = "muted",
 	size = 13,
 	weight = "regular",
-	chevron = "chevron.down",
+	chevron = "down",
 	disabled = false,
-	children,
-}: {
-	label?: string;
-	a11yLabel: string;
-	tone?: "muted" | "foreground";
-	size?: number;
-	weight?: "regular" | "medium" | "semibold";
-	chevron?: "chevron.down" | "chevron.right" | "chevron.up.chevron.down";
-	disabled?: boolean;
-	children: ReactNode;
-}) {
-	const theme = useTheme();
-	const color = tone === "muted" ? theme.mutedForeground : theme.foreground;
-	return (
-		<Host matchContents>
-			<Menu
-				label={
-					label === undefined ? (
-						<Image
-							systemName="ellipsis"
-							size={17}
-							color={theme.mutedForeground}
-							modifiers={[frame({ width: 36, height: 36 })]}
-						/>
-					) : (
-						<HStack spacing={4}>
-							<Text
-								modifiers={[
-									font({ size, weight }),
-									foregroundStyle(color),
-									lineLimit(1),
-								]}
-							>
-								{label}
-							</Text>
-							<Image
-								systemName={chevron}
-								size={size - 4}
-								color={theme.mutedForeground}
-							/>
-						</HStack>
-					)
-				}
-				modifiers={[accessibilityLabel(a11yLabel), disabledModifier(disabled)]}
-			>
-				{children}
-			</Menu>
-		</Host>
-	);
-}
+	items,
+}) => (
+	<DropdownMenu>
+		<DropdownMenuTrigger
+			accessibilityLabel={a11yLabel}
+			disabled={disabled}
+			className={cn(
+				"flex-row items-center gap-1",
+				label === undefined && "size-9 justify-center",
+			)}
+		>
+			{label === undefined ? (
+				<Icon as={Ellipsis} className="text-muted-foreground size-[17px]" />
+			) : (
+				<>
+					<Text
+						numberOfLines={1}
+						className={cn(
+							WEIGHT_CLASS[weight],
+							tone === "muted" ? "text-muted-foreground" : "text-foreground",
+						)}
+						style={{ fontSize: size }}
+					>
+						{label}
+					</Text>
+					<Icon
+						as={CHEVRON_ICON[chevron]}
+						className="text-muted-foreground"
+						size={size - 2}
+					/>
+				</>
+			)}
+		</DropdownMenuTrigger>
+		<DropdownMenuContent align="end">
+			{items.map((item) => (
+				<DropdownMenuCheckboxItem
+					key={item.key}
+					checked={item.checked ?? false}
+					onCheckedChange={item.onSelect}
+				>
+					<Text>{item.label}</Text>
+				</DropdownMenuCheckboxItem>
+			))}
+		</DropdownMenuContent>
+	</DropdownMenu>
+);

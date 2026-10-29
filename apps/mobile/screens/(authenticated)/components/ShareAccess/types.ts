@@ -1,14 +1,10 @@
-import type { Button } from "@expo/ui/swift-ui";
 import type { LucideIcon } from "lucide-react-native";
-import type { ComponentProps } from "react";
 
 export interface GeneralAccessOption {
 	value: string;
 	label: string;
 	description: string;
 	icon: LucideIcon;
-	/** SF Symbol shown beside the option in the menu. */
-	systemImage: ComponentProps<typeof Button>["systemImage"];
 	/** Shown with the organization's avatar instead of `icon`. */
 	organization?: { name: string; logo: string | null };
 }

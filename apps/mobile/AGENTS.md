@@ -63,8 +63,20 @@ export default function AuthenticatedLayout() {
 
 ## Conventions
 
-- **`apps/mobile` is iOS-only.** No Android fallbacks or platform guards for iOS-only APIs, and
-  Android incompatibility isn't a blocker until Android is explicitly in scope.
+- **iOS ships; Android is a seam, not a target yet.** Every iOS-only API sits behind a typed
+  contract, picked by Metro's platform extensions, never by `Platform.OS` checks in screens:
+  - `X.types.ts` is the contract: props, handle and function types, with no SF Symbol names or
+    other iOS words in what callers pass. Screens import only the folder's `index.ts`.
+  - `X.ios.tsx` is the native binding: an Expo module in `modules/<name>/ios`, `@expo/ui/swift-ui`,
+    or an iOS-only Expo package. It is the only file that may import those.
+  - `X.tsx` is the fallback for every other platform and for `bun test`. It does nothing or
+    degrades to plain RN, and it must not crash.
+  - Both implementations annotate their exports with the contract type, so `tsc` checks the
+    `.ios` file against the same shape as the fallback that callers resolve to.
+  - To port to Android: add `X.android.tsx`, or for a module, add `android/` and `"android"` to
+    `expo-module.config.json` and rename the binding `X.native.tsx` so both platforms use it.
+  Examples: `modules/composer/src`, `ShareAccess/components/ValueMenu`,
+  `sign-in/utils/signInWithApple`.
 - **Bottom sheets are expo-router `formSheet` routes** — `...glassHeaderOptions` gives the native
   title and ✕, the body is RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to
   match ours), and the list stays the screen's only layout child or it cold-mounts at zero height.

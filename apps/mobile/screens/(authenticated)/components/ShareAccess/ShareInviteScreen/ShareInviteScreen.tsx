@@ -1,4 +1,3 @@
-import { Button } from "@expo/ui/swift-ui";
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import {
@@ -147,19 +146,14 @@ export function ShareInviteScreen({
 				label={current?.label}
 				a11yLabel={t({ message: "Access for this person" })}
 				size={14}
-				chevron="chevron.up.chevron.down"
-			>
-				{roles.map((option) => (
-					<Button
-						key={option.id}
-						label={option.label}
-						systemImage={option.id === current?.id ? "checkmark" : undefined}
-						onPress={() =>
-							setPickRoles((all) => ({ ...all, [key]: option.id }))
-						}
-					/>
-				))}
-			</ValueMenu>
+				chevron="upDown"
+				items={roles.map((option) => ({
+					key: option.id,
+					label: option.label,
+					checked: option.id === current?.id,
+					onSelect: () => setPickRoles((all) => ({ ...all, [key]: option.id })),
+				}))}
+			/>
 		);
 	};
 
