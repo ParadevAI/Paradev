@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
+import * as files from "../../lib/files";
 import * as sandbox from "../../lib/sandbox";
 import * as jobs from "./jobs";
 import * as meter from "./meter";
 
 type Row = {
+	id: string;
 	status: string;
 	deletedAt: Date | null;
 	provider: string;
@@ -22,6 +24,7 @@ let meterFailure: Error | null = null;
 let boxRunning = true;
 let archiveHook: sandbox.BoxHookOutcome = { kind: "ran", status: "ok" };
 let onArchiveHook: () => void = () => {};
+let reapedFiles: string[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
 stub(sandbox, {
@@ -60,6 +63,15 @@ stub(jobs, {
 			body: job.body,
 			delaySeconds: job.delaySeconds,
 		});
+		return Promise.resolve();
+	},
+});
+
+stub(files, {
+	detachAll: ({ parentIds }: { parentIds: string[] }) =>
+		Promise.resolve(parentIds.map((id) => `file-of-${id}`)),
+	reapOrphanFiles: (fileIds: string[]) => {
+		reapedFiles.push(...fileIds);
 		return Promise.resolve();
 	},
 });
@@ -127,6 +139,7 @@ describe("queueReap", () => {
 describe("reapArchivedCloudWorkspace", () => {
 	beforeEach(() => {
 		row = {
+			id: input.cloudWorkspaceId,
 			status: "deleted",
 			deletedAt: archivedAt,
 			provider: "vercel",
@@ -139,6 +152,7 @@ describe("reapArchivedCloudWorkspace", () => {
 		boxRunning = true;
 		archiveHook = { kind: "ran", status: "ok" };
 		onArchiveHook = () => {};
+		reapedFiles = [];
 	});
 
 	test("the stop stage runs the archive hook, stops the box and queues its final settle", async () => {
@@ -148,6 +162,7 @@ describe("reapArchivedCloudWorkspace", () => {
 		expect(sandboxCalls).toEqual(["archive-hook", "stop:ws-box"]);
 		expect(meterCalls).toEqual(["queue"]);
 		expect(queued).toEqual([]);
+		expect(reapedFiles).toEqual([]);
 	});
 
 	test("a failing or unsupported archive hook still stops the box", async () => {
@@ -194,6 +209,11 @@ describe("reapArchivedCloudWorkspace", () => {
 		expect(sandboxCalls).toEqual(["delete:ws-box"]);
 	});
 
+	test("the delete stage removes the files sent to the workspace", async () => {
+		await reapArchivedCloudWorkspace({ ...input, stage: "delete" });
+		expect(reapedFiles).toEqual([`file-of-${input.cloudWorkspaceId}`]);
+	});
+
 	test("a delete still deletes when the final settle fails: at most one lock window goes unbilled", async () => {
 		meterFailure = new Error("autumn down");
 		expect(
@@ -209,6 +229,7 @@ describe("reapArchivedCloudWorkspace", () => {
 				"skipped",
 			);
 			expect(sandboxCalls).toEqual([]);
+			expect(reapedFiles).toEqual([]);
 		});
 
 		test(`the ${stage} stage leaves a later archive's box alone`, async () => {
@@ -229,6 +250,7 @@ describe("reapArchivedCloudWorkspace", () => {
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
 		).toBe("skipped");
 		row = {
+			id: input.cloudWorkspaceId,
 			status: "deleted",
 			deletedAt: archivedAt,
 			provider: "e2b",

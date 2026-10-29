@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { closeSync, mkdirSync, openSync } from "node:fs";
+import { closeSync, openSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -7,6 +7,7 @@ import {
 	attachmentNameWithSuffix,
 	WORKSPACE_ATTACHMENTS_DIR,
 } from "@superset/shared/workspace-attachments";
+import { ensureWorkspaceAttachmentsDir } from "@superset/shared/workspace-attachments-dir";
 import { TRPCError } from "@trpc/server";
 import mimeTypes from "mime-types";
 import { z } from "zod";
@@ -172,8 +173,7 @@ export const attachmentsRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const directory = join(worktreePath, WORKSPACE_ATTACHMENTS_DIR);
-			mkdirSync(directory, { recursive: true });
+			const directory = ensureWorkspaceAttachmentsDir(worktreePath);
 
 			const resolved = await ctx.api.attachment.resolve.mutate({
 				fileIds: input.fileIds,
