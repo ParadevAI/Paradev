@@ -24,7 +24,8 @@ The Linear document **Dev doctor notes** (id `b74e1574-7fef-4297-b3b9-d99976cfcd
 **Devs and Channels**, id `124fd465-3c78-43dc-a252-e99f5f8c33e0`) is your memory between runs.
 
 - Read it first: `get_document` on the Linear plugin.
-- Update it last, with `save_document`, keeping everything people wrote. Add one line at the top
+- Update it last. Two runs can overlap, so read it again right before you write, and change only
+  your parts with `save_document`'s `patch`, never a full rewrite. Keep everything people wrote. Add one line at the top
   of "Run log" for this run. Update the "Failure kinds" table and the "Rough edges" list from what
   you learned. When you research something, add a section with what you found and the sources.
 - When this procedure is wrong or missing something, open a PR that edits this file.
@@ -38,6 +39,9 @@ The prompt says which mode: **incidents** (hourly) or **architecture** (daily). 
 ## Incidents
 
 ### 1. Gather the last day
+
+Until Devs v2 is in production, there is nothing to gather: if `agent_turns` has no `attempts`
+column, add a run log line saying so and finish.
 
 Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-32416990`,
 `database_name` `neondb`. **SELECT only.** Never write to production.
