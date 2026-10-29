@@ -152,7 +152,6 @@ export const agentSessions = pgTable(
 				sql`${t.dedupeKey} is not null and ${t.taskStatus} in ('queued', 'running')`,
 			),
 		index("agent_sessions_parent_idx").on(t.parentSessionId),
-		index("agent_sessions_pull_request_idx").on(t.pullRequestUrl),
 	],
 );
 
