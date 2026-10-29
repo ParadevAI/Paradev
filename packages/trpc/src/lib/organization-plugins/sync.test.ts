@@ -8,6 +8,7 @@ import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
 import * as r2 from "../r2";
+import * as realtime from "../realtime";
 import * as credentials from "./credentials";
 import type { RepositorySnapshot } from "./github";
 
@@ -44,6 +45,14 @@ let objects = new Map<string, Uint8Array>();
 let reads: string[] = [];
 let sourceWrites: Record<string, unknown>[] = [];
 let removalParams: unknown[][] = [];
+let removedNames: string[] = [];
+let nudges: string[] = [];
+
+stub(realtime, {
+	nudge: (organizationId: string, kind: string) => {
+		nudges.push(`${organizationId}:${kind}`);
+	},
+});
 
 stub(credentials, {
 	sourceCredentials: async () => [{ as: "admin", token: async () => "token" }],
@@ -88,11 +97,14 @@ stub(db, {
 	}),
 	update: (table: unknown) => ({
 		set: (values: Record<string, unknown>) => ({
-			where: async (condition: SQL) => {
+			where: (condition: SQL) => {
 				if (table === organizationPluginSources) sourceWrites.push(values);
 				if (table === organizationPlugins) {
 					removalParams.push(params(condition));
 				}
+				return Object.assign(Promise.resolve(), {
+					returning: async () => removedNames.map((name) => ({ name })),
+				});
 			},
 		}),
 	}),
@@ -134,6 +146,8 @@ beforeEach(() => {
 	reads = [];
 	sourceWrites = [];
 	removalParams = [];
+	removedNames = [];
+	nudges = [];
 });
 
 describe("syncOrganizationPluginSource", () => {
@@ -273,6 +287,28 @@ describe("syncOrganizationPluginSource", () => {
 			}),
 		);
 		expect(removalParams[0]).toContain("tools");
+	});
+
+	test("members' apps hear about a new version, not about an unchanged sync", async () => {
+		const files = {
+			".agent-marketplace.json": marketplace("tools"),
+			...plugin("tools", "1.0.0"),
+		};
+		await syncOrganizationPluginSource(SOURCE.id, repo("sha-1", files));
+		expect(nudges).toEqual([`${ORG}:plugins`]);
+
+		await syncOrganizationPluginSource(SOURCE.id, repo("sha-2", files));
+		expect(nudges).toEqual([`${ORG}:plugins`]);
+	});
+
+	test("members' apps hear about a plugin leaving the repository", async () => {
+		removedNames = ["gone"];
+		const result = await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", { ".agent-marketplace.json": marketplace() }),
+		);
+		expect(result?.removed).toEqual(["gone"]);
+		expect(nudges).toEqual([`${ORG}:plugins`]);
 	});
 
 	test("a removed source is nothing to do", async () => {

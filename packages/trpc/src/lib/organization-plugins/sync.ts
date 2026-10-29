@@ -15,6 +15,7 @@ import {
 } from "@superset/shared/plugins/bundle";
 import { and, eq, isNull, notInArray } from "drizzle-orm";
 import { getObject, putObject } from "../r2";
+import { nudge } from "../realtime";
 import { sourceCredentials } from "./credentials";
 import { type RepositorySnapshot, readAll, repositorySnapshot } from "./github";
 import {
@@ -34,6 +35,7 @@ export interface SourceSyncResult {
 	sha: string | null;
 	synced: string[];
 	unchanged: string[];
+	removed: string[];
 	problems: MarketplaceProblem[];
 	error: string | null;
 }
@@ -275,7 +277,7 @@ async function syncSnapshot(
 		}
 	}
 
-	await db
+	const removed = await db
 		.update(organizationPlugins)
 		.set({ removedFromSourceAt: new Date() })
 		.where(
@@ -284,7 +286,9 @@ async function syncSnapshot(
 				isNull(organizationPlugins.removedFromSourceAt),
 				seen.length ? notInArray(organizationPlugins.name, seen) : undefined,
 			),
-		);
+		)
+		.returning({ name: organizationPlugins.name });
+	result.removed.push(...removed.map((row) => row.name));
 }
 
 export async function syncOrganizationPluginSource(
@@ -300,6 +304,7 @@ export async function syncOrganizationPluginSource(
 		sha: null,
 		synced: [],
 		unchanged: [],
+		removed: [],
 		problems: [],
 		error: null,
 	};
@@ -324,6 +329,9 @@ export async function syncOrganizationPluginSource(
 		})
 		.where(eq(organizationPluginSources.id, source.id));
 
+	if (result.synced.length || result.removed.length) {
+		nudge(source.organizationId, "plugins");
+	}
 	return result;
 }
 

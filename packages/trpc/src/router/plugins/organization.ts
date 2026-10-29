@@ -26,6 +26,7 @@ import {
 	syncOrganizationPluginSource,
 } from "../../lib/organization-plugins";
 import { getObject } from "../../lib/r2";
+import { nudge } from "../../lib/realtime";
 import { protectedProcedure } from "../../trpc";
 import { findInstalledRepository } from "../integration/github/find-installed-repository";
 import { verifyOrgAdmin } from "../integration/utils";
@@ -203,6 +204,7 @@ const sourcesRouter = {
 				)
 				.returning({ id: organizationPluginSources.id });
 			if (!row) throw unknownSource();
+			nudge(organizationId, "plugins");
 			return { removed: row.id };
 		}),
 } satisfies TRPCRouterRecord;
@@ -293,6 +295,7 @@ export const organizationPluginsRouter = {
 				)
 				.returning();
 			if (!row) throw unknown(input.name);
+			nudge(organizationId, "plugins");
 			return { name: row.name, policy: row.installPolicy };
 		}),
 
