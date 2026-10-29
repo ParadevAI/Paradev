@@ -127,9 +127,10 @@ export function dedupeCodexAccounts(
 	return accounts
 		.filter(({ account, chatgptAccountId }) => {
 			// One email can hold several ChatGPT accounts: a personal plan and workspace seats.
-			const key = account.email
-				? JSON.stringify([account.email, chatgptAccountId])
-				: account.accountKey;
+			const key =
+				account.email && chatgptAccountId
+					? JSON.stringify([account.email, chatgptAccountId])
+					: account.accountKey;
 			if (seen.has(key)) return false;
 			seen.add(key);
 			return true;

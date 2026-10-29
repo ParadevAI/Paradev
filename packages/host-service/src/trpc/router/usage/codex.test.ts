@@ -74,4 +74,18 @@ describe("dedupeCodexAccounts", () => {
 			]),
 		).toEqual([first, second]);
 	});
+
+	it("keeps homes that share an email but state no account id", () => {
+		const first = codexAccount("/home/.codex/auth.json", "dev@example.com");
+		const second = codexAccount(
+			"/home/.codex-work/auth.json",
+			"dev@example.com",
+		);
+		expect(
+			dedupeCodexAccounts([
+				{ account: first, chatgptAccountId: null },
+				{ account: second, chatgptAccountId: null },
+			]),
+		).toEqual([first, second]);
+	});
 });
