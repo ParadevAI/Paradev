@@ -3,12 +3,14 @@ import { Input } from "@superset/ui/input";
 import { Skeleton } from "@superset/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@superset/ui/tabs";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 import {
 	type CatalogPlugin,
 	usePluginCatalog,
 } from "renderer/hooks/usePluginCatalog";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
 import { OrganizationPluginsSection } from "./components/OrganizationPluginsSection";
 import { PluginCard } from "./components/PluginCard";
@@ -19,6 +21,13 @@ export function PluginsView() {
 	const { t } = useLingui();
 	const [search, setSearch] = useState("");
 	const navigate = useNavigate();
+	const utils = cloudTrpc.useUtils();
+	const machineUtils = electronTrpc.useUtils();
+
+	useEffect(() => {
+		void utils.plugins.list.invalidate();
+		void machineUtils.plugins.organizationVersions.invalidate();
+	}, [utils, machineUtils]);
 
 	const {
 		plugins: catalog,

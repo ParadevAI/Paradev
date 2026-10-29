@@ -79,6 +79,27 @@ export interface InstalledPluginEntry {
 	tools?: boolean;
 }
 
+/** The version of each plugin this machine holds, or null when the ledger cannot be read. */
+export function readInstalledVersions(
+	file: string = installedPluginsFilePath(),
+): { marketplace: string; name: string; version: string }[] | null {
+	const records = readLedgerRecords(file);
+	if (!records) return null;
+	return records.flatMap((entry) =>
+		typeof entry.marketplace === "string" &&
+		typeof entry.name === "string" &&
+		typeof entry.version === "string"
+			? [
+					{
+						marketplace: entry.marketplace,
+						name: entry.name,
+						version: entry.version,
+					},
+				]
+			: [],
+	);
+}
+
 /** A plugin tree this machine already holds, by marketplace and name. */
 export function findInstalledTree(
 	marketplace: string,

@@ -97,6 +97,7 @@ export {
 	installedPluginsFilePath,
 	readEnabledPlugins,
 	readInstalledPluginSources,
+	readInstalledVersions,
 	writeInstalledPlugins,
 } from "./installed-plugins";
 export {

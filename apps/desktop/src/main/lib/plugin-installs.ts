@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import {
 	createManagedSkills,
 	mcpHeadersHelperCommand,
+	readInstalledVersions,
 	resolveDisabledSkillIds,
 	syncManagedMcpServers,
 	writeSharedDisabledSkillIds,
@@ -15,6 +16,7 @@ import {
 	desiredPluginMcpServers,
 	getPluginByName,
 	type InstalledPlugin,
+	isOrganizationMarketplace,
 	organizationIdOfMarketplace,
 	SUPERSET_MANAGED_SKILLS,
 } from "@superset/shared/plugins";
@@ -144,11 +146,22 @@ function queueOrganizationPluginCli(
 export function installOrganizationPlugin(
 	name: string,
 	marketplace: string,
-): void {
-	void queueOrganizationPluginCli(
+): Promise<void> {
+	return queueOrganizationPluginCli(
 		["install", `${name}@organization`, "--update"],
 		organizationIdOfMarketplace(marketplace),
-	).catch(() => {});
+	);
+}
+
+/** The version of each organization plugin on this machine, which only the ledger knows. */
+export function organizationPluginVersions(): {
+	marketplace: string;
+	name: string;
+	version: string;
+}[] {
+	return (readInstalledVersions() ?? []).filter((entry) =>
+		isOrganizationMarketplace(entry.marketplace),
+	);
 }
 
 export function uninstallOrganizationPlugin(
