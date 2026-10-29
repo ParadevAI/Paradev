@@ -3931,6 +3931,9 @@ msgstr "Chat wird überarbeitet"
 msgid "Chat Launch"
 msgstr "Chat-Start"
 
+msgid "Chat mode"
+msgstr "Chat-Modus"
+
 msgid "Chat session not found"
 msgstr "Chat-Sitzung nicht gefunden"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-Doku"
+
+msgid "CLI mode"
+msgstr "CLI-Modus"
 
 msgid "CLI reference"
 msgstr "CLI-Referenz"
@@ -5655,6 +5661,9 @@ msgstr "Die Nachricht konnte nicht bearbeitet werden"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Das Löschen der Arbeitsbereiche konnte nicht abgeschlossen werden"
+
+msgid "Couldn't fork into a chat"
+msgstr "Sitzung konnte nicht in einen Chat geforkt werden"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Konnte nicht an einen Agenten übergeben werden"
@@ -8571,11 +8580,26 @@ msgstr "Fork-Argumente"
 msgid "Fork conversation"
 msgstr "Unterhaltung verzweigen"
 
+msgid "Fork into chat"
+msgstr "In einen Chat forken"
+
+msgid "Fork into chat in a new tab"
+msgstr "In einem neuen Tab in einen Chat forken"
+
+msgid "Fork into CLI"
+msgstr "In die CLI forken"
+
+msgid "Fork into CLI in a new tab"
+msgstr "In einem neuen Tab in die CLI forken"
+
 msgid "Fork session"
 msgstr "Sitzung forken"
 
 msgid "Fork session…"
 msgstr "Sitzung forken…"
+
+msgid "Forking into a chat…"
+msgstr "Wird in einen Chat geforkt…"
 
 msgid "Form controls and field composition"
 msgstr "Formularelemente und Feldaufbau"
@@ -10171,9 +10195,6 @@ msgstr "Ende 2026"
 
 msgid "Latency"
 msgstr "Latenz"
-
-msgid "Later"
-msgstr "Später"
 
 msgid "Later messages are removed."
 msgstr "Spätere Nachrichten werden entfernt."
@@ -12407,6 +12428,9 @@ msgstr "In den letzten 30 Tagen wurde noch nichts veröffentlicht. Dein Rang ers
 msgid "Nothing running"
 msgstr "Nichts läuft"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Noch nichts zum Forken. Sende zuerst eine Nachricht."
+
 msgid "Nothing was missed"
 msgstr "Nichts wurde verpasst"
 
@@ -13200,6 +13224,9 @@ msgstr "Seiten öffnen"
 
 msgid "Opening worktree..."
 msgstr "Worktree wird geöffnet..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Öffnet sich neben diesem Bereich. Dieser läuft weiter."
 
 msgid "Operator"
 msgstr "Operator"
@@ -15448,9 +15475,6 @@ msgstr "Terminal-Daemon neu starten?"
 msgid "Restart terminals"
 msgstr "Terminals neu starten"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Neu starten, um die neueste Version von {appName} zu verwenden."
-
 msgid "Restart workspace"
 msgstr "Arbeitsbereich neu starten"
 
@@ -15684,12 +15708,6 @@ msgstr "Schlüssel widerrufen"
 
 msgid "Rewrote it and published version 2."
 msgstr "Umgeschrieben und Version 2 veröffentlicht."
-
-msgid "Rich input"
-msgstr "Rich-Eingabe"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Rich-Eingabe ({hotkeyText})"
 
 msgid "right pane"
 msgstr "rechter Bereich"
@@ -16338,6 +16356,9 @@ msgstr "Sieh, wo deine letzten 30 Tage in der öffentlichen Bestenliste landen. 
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Wähle eine Datei aus, um sie hier anzuzeigen"
 
 msgid "Select a project"
 msgstr "Wähle ein Projekt"
@@ -19849,9 +19870,6 @@ msgstr "Aktualisiere Paradev auf diesem Host, um die Arbeitsbereich-Konfiguratio
 
 msgid "Update payment method"
 msgstr "Zahlungsmethode aktualisieren"
-
-msgid "Update ready"
-msgstr "Update bereit"
 
 msgid "Update Required"
 msgstr "Update erforderlich"

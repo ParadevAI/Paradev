@@ -3931,6 +3931,9 @@ msgstr "Chat is being reworked"
 msgid "Chat Launch"
 msgstr "Chat Launch"
 
+msgid "Chat mode"
+msgstr "Chat mode"
+
 msgid "Chat session not found"
 msgstr "Chat session not found"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI docs"
+
+msgid "CLI mode"
+msgstr "CLI mode"
 
 msgid "CLI reference"
 msgstr "CLI reference"
@@ -5655,6 +5661,9 @@ msgstr "Couldn't edit the message"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Couldn’t finish deleting workspaces"
+
+msgid "Couldn't fork into a chat"
+msgstr "Couldn't fork into a chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Couldn't hand this to an agent"
@@ -8571,11 +8580,26 @@ msgstr "Fork args"
 msgid "Fork conversation"
 msgstr "Fork conversation"
 
+msgid "Fork into chat"
+msgstr "Fork into chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Fork into chat in a new tab"
+
+msgid "Fork into CLI"
+msgstr "Fork into CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Fork into CLI in a new tab"
+
 msgid "Fork session"
 msgstr "Fork session"
 
 msgid "Fork session…"
 msgstr "Fork session…"
+
+msgid "Forking into a chat…"
+msgstr "Forking into a chat…"
 
 msgid "Form controls and field composition"
 msgstr "Form controls and field composition"
@@ -10171,9 +10195,6 @@ msgstr "Late 2026"
 
 msgid "Latency"
 msgstr "Latency"
-
-msgid "Later"
-msgstr "Later"
 
 msgid "Later messages are removed."
 msgstr "Later messages are removed."
@@ -12407,6 +12428,9 @@ msgstr "Nothing published in the last 30 days yet. Your rank appears once usage 
 msgid "Nothing running"
 msgstr "Nothing running"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Nothing to fork yet. Send a message first."
+
 msgid "Nothing was missed"
 msgstr "Nothing was missed"
 
@@ -13200,6 +13224,9 @@ msgstr "Opening pages"
 
 msgid "Opening worktree..."
 msgstr "Opening worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Opens beside this pane. This one keeps running."
 
 msgid "Operator"
 msgstr "Operator"
@@ -15448,9 +15475,6 @@ msgstr "Restart terminal daemon?"
 msgid "Restart terminals"
 msgstr "Restart terminals"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Restart to use the latest version of {appName}."
-
 msgid "Restart workspace"
 msgstr "Restart workspace"
 
@@ -15684,12 +15708,6 @@ msgstr "Revoke key"
 
 msgid "Rewrote it and published version 2."
 msgstr "Rewrote it and published version 2."
-
-msgid "Rich input"
-msgstr "Rich input"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Rich input ({hotkeyText})"
 
 msgid "right pane"
 msgstr "right pane"
@@ -16338,6 +16356,9 @@ msgstr "See where your last 30 days land on the public leaderboard. Token counts
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Select a file to view it here"
 
 msgid "Select a project"
 msgstr "Select a project"
@@ -19849,9 +19870,6 @@ msgstr "Update Paradev on this host to edit its workspace config."
 
 msgid "Update payment method"
 msgstr "Update payment method"
-
-msgid "Update ready"
-msgstr "Update ready"
 
 msgid "Update Required"
 msgstr "Update Required"
