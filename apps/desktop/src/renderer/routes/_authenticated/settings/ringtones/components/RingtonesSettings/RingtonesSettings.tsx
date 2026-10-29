@@ -1,8 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HiArrowPath, HiCheck, HiPlay, HiPlus, HiStop } from "react-icons/hi2";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -21,6 +23,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { ChannelNotificationSettings } from "./components/ChannelNotificationSettings";
 import { VolumeDropdown } from "./components/VolumeDropdown";
 
 function formatDuration(seconds: number): string {
@@ -124,6 +127,8 @@ export function RingtonesSettings({ visibleItems }: RingtonesSettingsProps) {
 		visibleItems,
 	);
 
+	const channelsEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	const selectedRingtoneId = useSelectedRingtoneId();
 	const setRingtone = useSetRingtone();
 	const [playingId, setPlayingId] = useState<string | null>(null);
@@ -348,6 +353,8 @@ export function RingtonesSettings({ visibleItems }: RingtonesSettingsProps) {
 						</div>
 					</div>
 				)}
+
+				{channelsEnabled && !searchQuery && <ChannelNotificationSettings />}
 			</div>
 		</div>
 	);

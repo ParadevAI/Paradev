@@ -5,6 +5,7 @@ import {
 } from "renderer/lib/github/pullRequestRef";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, PullRequestPaneData } from "../../types";
+import { PULL_REQUEST_PANE_KEY } from "../getPaneKey";
 
 /**
  * Focus the workspace's pull-request pane, retargeting it to `ref` when one
@@ -17,28 +18,16 @@ export function openPullRequestPaneInStore(
 	ref: PullRequestRef,
 	placement: "split" | "tab" = "split",
 ): void {
-	const state = store.getState();
 	const data: PullRequestPaneData = {
 		repoFullName: ref.repoFullName,
 		number: ref.number,
 	};
-
-	for (const tab of state.tabs) {
-		for (const pane of Object.values(tab.panes)) {
-			if (pane.kind !== "pull-request") continue;
-			if (!isSamePullRequest(pane.data as PullRequestPaneData, data)) {
-				state.setPaneData({ paneId: pane.id, data: data as PaneViewerData });
-			}
-			state.setActiveTab(tab.id);
-			state.setActivePane({ tabId: tab.id, paneId: pane.id });
-			return;
-		}
-	}
-
+	const state = store.getState();
+	const open = state.findPaneByKey(PULL_REQUEST_PANE_KEY);
+	const replaceData =
+		open !== null &&
+		!isSamePullRequest(open.pane.data as PullRequestPaneData, data);
 	const pane = { kind: "pull-request", data: data as PaneViewerData };
-	if (placement === "tab") {
-		state.addTab({ panes: [pane] });
-		return;
-	}
-	state.openPane({ pane });
+	if (placement === "tab") state.addTab({ panes: [pane], replaceData });
+	else state.openPane({ pane, replaceData });
 }

@@ -1,18 +1,37 @@
 "use client";
 
+import type { MessageDescriptor } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
+import type { PlanFamily } from "@superset/shared/billing";
 import { cn } from "@superset/ui/utils";
 import { Check, Minus } from "lucide-react";
 import { useState } from "react";
 import {
 	COMPARISON_SECTIONS,
 	type ComparisonRow,
-	PRICING_TIERS,
 	type PricingTier,
+	pricingTiers,
 } from "../../constants";
-import { proSeatPriceValues } from "../../utils/proSeatPriceValues";
+import { comparisonValue, seatPrice } from "../../utils/planDisplay";
+import {
+	type PlanPriceValues,
+	planPriceValues,
+} from "../../utils/planPriceValues";
 
-export function ComparisonTable() {
+interface ComparisonTableProps {
+	catalog: PlanFamily[];
+}
+
+interface TableProps {
+	tiers: PricingTier[];
+	values: PlanPriceValues;
+}
+
+export function ComparisonTable({ catalog }: ComparisonTableProps) {
+	const { i18n } = useLingui();
+	const values = planPriceValues(catalog, i18n);
+	const tiers = pricingTiers(catalog);
+
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex flex-col gap-3 text-center">
@@ -24,13 +43,13 @@ export function ComparisonTable() {
 				</h2>
 			</div>
 
-			<DesktopTable />
-			<MobileTable />
+			<DesktopTable tiers={tiers} values={values} />
+			<MobileTable tiers={tiers} values={values} />
 		</div>
 	);
 }
 
-function DesktopTable() {
+function DesktopTable({ tiers, values }: TableProps) {
 	const { t } = useLingui();
 
 	return (
@@ -38,17 +57,17 @@ function DesktopTable() {
 			<table className="w-full table-fixed border-separate border-spacing-0">
 				<thead>
 					<tr>
-						<th className="sticky top-16 z-10 w-2/5 border-b border-border bg-background py-4 pr-4 text-left text-sm font-medium text-muted-foreground">
+						<th className="sticky top-16 z-10 w-1/4 border-b border-border bg-background py-4 pr-4 text-left text-sm font-medium text-muted-foreground">
 							<Trans>Features</Trans>
 						</th>
-						{PRICING_TIERS.map((tier) => (
+						{tiers.map((tier) => (
 							<th
 								key={tier.id}
-								className="sticky top-16 z-10 w-1/5 border-b border-border bg-background py-4 px-4 text-left text-sm font-medium text-foreground"
+								className="sticky top-16 z-10 border-b border-border bg-background py-4 px-4 text-left text-sm font-medium text-foreground"
 							>
-								{t(tier.name)}
-								<span className="ml-2 font-normal text-xs text-muted-foreground">
-									<TierPriceLabel tier={tier} />
+								{typeof tier.name === "string" ? tier.name : t(tier.name)}
+								<span className="block font-normal text-xs text-muted-foreground">
+									<TierPriceLabel tier={tier} values={values} />
 								</span>
 							</th>
 						))}
@@ -56,9 +75,19 @@ function DesktopTable() {
 				</thead>
 				<tbody>
 					{COMPARISON_SECTIONS.map((section) => (
-						<DesktopSectionGroup key={section.id} title={t(section.title)}>
+						<DesktopSectionGroup
+							key={section.id}
+							title={t(section.title)}
+							badge={section.badge}
+							columns={tiers.length + 1}
+						>
 							{section.rows.map((row) => (
-								<DesktopRow key={row.id} row={row} />
+								<DesktopRow
+									key={row.id}
+									row={row}
+									tiers={tiers}
+									values={values}
+								/>
 							))}
 						</DesktopSectionGroup>
 					))}
@@ -68,33 +97,51 @@ function DesktopTable() {
 	);
 }
 
-function TierPriceLabel({ tier }: { tier: PricingTier }) {
-	const { i18n } = useLingui();
+function TierPriceLabel({
+	tier,
+	values,
+}: {
+	tier: PricingTier;
+	values: PlanPriceValues;
+}) {
 	if (tier.price.kind === "fixed") {
 		return <>{tier.price.display}</>;
 	}
-	if (tier.price.kind === "proSeat") {
-		const price = proSeatPriceValues(i18n.locale).yearlyPrice;
-		return <Trans>from {price}/user/mo</Trans>;
+	if (tier.price.kind === "seat") {
+		const set = values.byFamily[tier.id];
+		if (!set) return null;
+		const price = seatPrice(set, true).display;
+		return set.hasYearlyDiscount ? (
+			<Trans>from {price}/user/mo</Trans>
+		) : (
+			<Trans>{price}/user/mo</Trans>
+		);
 	}
 	return <Trans>Custom</Trans>;
 }
 
 function DesktopSectionGroup({
 	title,
+	badge,
+	columns,
 	children,
 }: {
 	title: string;
+	badge?: MessageDescriptor;
+	columns: number;
 	children: React.ReactNode;
 }) {
 	return (
 		<>
 			<tr>
 				<td
-					colSpan={4}
+					colSpan={columns}
 					className="border-b border-border bg-accent/20 px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground"
 				>
-					{title}
+					<div className="flex items-center gap-2">
+						<span>{title}</span>
+						{badge && <SectionBadge label={badge} />}
+					</div>
 				</td>
 			</tr>
 			{children}
@@ -102,52 +149,53 @@ function DesktopSectionGroup({
 	);
 }
 
-function DesktopRow({ row }: { row: ComparisonRow }) {
+function DesktopRow({
+	row,
+	tiers,
+	values,
+}: TableProps & { row: ComparisonRow }) {
 	const { t } = useLingui();
 
 	return (
 		<tr>
 			<td className="border-b border-border/60 py-4 pr-4 text-sm text-foreground">
-				<div className="flex items-center gap-2">
-					<span>{t(row.label)}</span>
-					{row.badge && <RowBadge badge={row.badge} />}
-				</div>
+				{t(row.label)}
 			</td>
-			{row.values.map((value, index) => (
+			{tiers.map((tier) => (
 				<td
-					key={`${row.id}-${index}`}
+					key={`${row.id}-${tier.id}`}
 					className="border-b border-border/60 px-4 py-4 text-sm text-foreground"
 				>
-					<Cell value={value} />
+					<Cell value={comparisonValue(row, tier, values)} />
 				</td>
 			))}
 		</tr>
 	);
 }
 
-function MobileTable() {
+function MobileTable({ tiers, values }: TableProps) {
 	const { t } = useLingui();
 	const [selectedIndex, setSelectedIndex] = useState(1);
-	const selectedTier = PRICING_TIERS[selectedIndex];
+	const selectedTier = tiers[selectedIndex];
 	if (!selectedTier) return null;
 
 	return (
 		<div className="flex flex-col gap-6 md:hidden">
-			<div className="inline-flex rounded-md border border-border bg-card p-1">
-				{PRICING_TIERS.map((tier, index) => (
+			<div className="flex overflow-x-auto rounded-md border border-border bg-card p-1">
+				{tiers.map((tier, index) => (
 					<button
 						key={tier.id}
 						type="button"
 						onClick={() => setSelectedIndex(index)}
 						aria-pressed={index === selectedIndex}
 						className={cn(
-							"flex-1 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+							"flex-1 whitespace-nowrap rounded-sm px-2 py-1.5 text-sm font-medium transition-colors",
 							index === selectedIndex
 								? "bg-foreground text-background"
 								: "text-muted-foreground hover:text-foreground",
 						)}
 					>
-						{t(tier.name)}
+						{typeof tier.name === "string" ? tier.name : t(tier.name)}
 					</button>
 				))}
 			</div>
@@ -155,8 +203,9 @@ function MobileTable() {
 			<div className="flex flex-col gap-6">
 				{COMPARISON_SECTIONS.map((section) => (
 					<section key={section.id} className="flex flex-col">
-						<p className="mb-1 rounded-md bg-accent/20 px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-							{t(section.title)}
+						<p className="mb-1 flex items-center gap-2 rounded-md bg-accent/20 px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+							<span>{t(section.title)}</span>
+							{section.badge && <SectionBadge label={section.badge} />}
 						</p>
 						<ul>
 							{section.rows.map((row) => (
@@ -164,12 +213,11 @@ function MobileTable() {
 									key={row.id}
 									className="flex items-center justify-between gap-3 border-b border-border/60 py-3 last:border-b-0"
 								>
-									<div className="flex items-center gap-2 text-sm text-foreground">
-										<span>{t(row.label)}</span>
-										{row.badge && <RowBadge badge={row.badge} />}
-									</div>
+									<span className="text-sm text-foreground">
+										{t(row.label)}
+									</span>
 									<div className="shrink-0 text-sm text-foreground">
-										<Cell value={row.values[selectedIndex] ?? null} />
+										<Cell value={comparisonValue(row, selectedTier, values)} />
 									</div>
 								</li>
 							))}
@@ -207,19 +255,11 @@ function Cell({ value }: { value: ComparisonRow["values"][number] }) {
 	return <span>{typeof value === "string" ? value : t(value)}</span>;
 }
 
-function RowBadge({ badge }: { badge: NonNullable<ComparisonRow["badge"]> }) {
+function SectionBadge({ label }: { label: MessageDescriptor }) {
 	const { t } = useLingui();
-	const isPrimary = badge.variant === "default";
 	return (
-		<span
-			className={cn(
-				"rounded-sm px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-				isPrimary
-					? "bg-foreground text-background"
-					: "bg-accent/40 text-muted-foreground",
-			)}
-		>
-			{t(badge.label)}
+		<span className="rounded-sm bg-accent/40 px-2 py-0.5 text-[10px] text-muted-foreground">
+			{t(label)}
 		</span>
 	);
 }

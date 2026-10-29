@@ -16,6 +16,7 @@ import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
@@ -52,7 +53,6 @@ import {
 } from "./lib/billing/subscription-events";
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
-import { getActivationVariant } from "./lib/lifecycle";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
 	convertPendingShares,
@@ -125,11 +125,13 @@ export const auth = betterAuth({
 		schema: { ...authSchema, subscriptions },
 	}),
 	trustedOrigins: async (request) => [
-		env.NEXT_PUBLIC_WEB_URL,
-		env.NEXT_PUBLIC_API_URL,
-		env.NEXT_PUBLIC_MARKETING_URL,
-		env.NEXT_PUBLIC_ADMIN_URL,
-		...(env.NEXT_PUBLIC_DESKTOP_URL ? [env.NEXT_PUBLIC_DESKTOP_URL] : []),
+		...withOwnDomainTwins([
+			env.NEXT_PUBLIC_WEB_URL,
+			env.NEXT_PUBLIC_API_URL,
+			env.NEXT_PUBLIC_MARKETING_URL,
+			env.NEXT_PUBLIC_ADMIN_URL,
+			env.NEXT_PUBLIC_DESKTOP_URL,
+		]),
 		...getTrustedVercelPreviewOrigins(request?.url ?? env.NEXT_PUBLIC_API_URL),
 		...desktopDevOrigins,
 		"superset://app",
@@ -311,11 +313,8 @@ export const auth = betterAuth({
 							.where(eq(authSchema.sessions.userId, user.id));
 					}
 
-					// The welcome email is unconditional in BOTH arms. Gating it is
-					// what invalidated experiment 387868: a6beb048b changed the control
-					// condition mid-flight and the run became unreadable. The `welcome`
-					// automation sends it, because only automation sends get Resend's
-					// unsubscribe link and List-Unsubscribe headers.
+					// The `welcome` automation sends this, because only automation
+					// sends get Resend's unsubscribe link and List-Unsubscribe headers.
 					try {
 						const { error } = await resend.events.send({
 							event: "user.welcome",
@@ -330,35 +329,18 @@ export const auth = betterAuth({
 						);
 					}
 
-					// Only drip enrolment is randomised. Nothing differs between arms
-					// until the first nudge (>=23h after signup), so "not activated at
-					// 22h" stays a pre-treatment covariate and the analysis can restrict
-					// to it without selection bias. Kill switch for the nudges is still
-					// the Resend automation toggle.
-					//
-					// CAUTION: withholding this event withholds it from EVERY consumer,
-					// not just the activation drip. Safe today because activation-drip
-					// is the only automation in sync-automations.ts triggering on
-					// `user.signed_up` — but that script is create-only and Resend can
-					// hold automations it never defined, so check the live account
-					// before trusting that. A second consumer means splitting enrolment
-					// first: emit `user.signed_up` unconditionally and gate an
-					// activation-only event instead, or the control arm silently drops
-					// out of that campaign too.
-					if ((await getActivationVariant(user.id)) === "test") {
-						try {
-							const { error } = await resend.events.send({
-								event: "user.signed_up",
-								email: user.email,
-								payload: { userId: user.id, name: user.name },
-							});
-							if (error) throw new Error(error.message);
-						} catch (error) {
-							console.error(
-								`[lifecycle] Failed to emit signup event for ${user.id}:`,
-								error,
-							);
-						}
+					try {
+						const { error } = await resend.events.send({
+							event: "user.signed_up",
+							email: user.email,
+							payload: { userId: user.id, name: user.name },
+						});
+						if (error) throw new Error(error.message);
+					} catch (error) {
+						console.error(
+							`[lifecycle] Failed to emit signup event for ${user.id}:`,
+							error,
+						);
 					}
 				},
 			},
@@ -803,7 +785,7 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
@@ -835,7 +817,6 @@ export const auth = betterAuth({
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -847,10 +828,11 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
-					const seatsSetInAutumn =
+					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					if (!seatsSetInAutumn && itemId) {
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{
@@ -958,13 +940,12 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -976,10 +957,11 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
-					const seatsSetInAutumn =
+					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					if (!seatsSetInAutumn && itemId) {
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{

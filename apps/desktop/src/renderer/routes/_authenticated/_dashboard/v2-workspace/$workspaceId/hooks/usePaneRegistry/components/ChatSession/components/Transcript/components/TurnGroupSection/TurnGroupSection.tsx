@@ -173,7 +173,14 @@ export function TurnGroupSection({
 				</>
 			);
 		case "turn_status":
-			return <TurnStatusRow message={row.message} status={row.status} />;
+			return (
+				<TurnStatusRow
+					error={row.error}
+					latest={row.latest}
+					status={row.status}
+					turnId={row.turnId}
+				/>
+			);
 		case "reply_footer":
 			return (
 				<ReplyFooter

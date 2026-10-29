@@ -1,0 +1,18 @@
+export {
+	addPullRequestComment,
+	canActOnPullRequest,
+	mergePullRequest,
+	needsGithubConnection,
+	type PullRequestGateways,
+	type PullRequestMergeMethod,
+	type PullRequestTarget,
+	type PullRequestThreads,
+	pullRequestThreadsQueryKey,
+	readPullRequestDetail,
+	readPullRequestDiff,
+	readPullRequestThreads,
+	replyToPullRequestThread,
+	setPullRequestDraft,
+	setPullRequestState,
+	setPullRequestThreadResolution,
+} from "./pullRequestClient";

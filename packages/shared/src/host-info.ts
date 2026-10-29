@@ -7,13 +7,18 @@ import { homedir, hostname, platform } from "node:os";
 // stable for users already registered against the cloud.
 const APP_HOST_SALT = "superset-desktop-device-id-v1";
 
+// Absolute so the id never depends on the caller's PATH: a login-shell PATH
+// can lack /usr/sbin, and one machine would then report two host ids.
+const IOREG_PATH = "/usr/sbin/ioreg";
+
 function getRawMachineId(): string {
+	let failure: unknown = null;
 	try {
 		const os = platform();
 
 		if (os === "darwin") {
 			const output = execFileSync(
-				"ioreg",
+				IOREG_PATH,
 				["-rd1", "-c", "IOPlatformExpertDevice"],
 				{ encoding: "utf8" },
 			);
@@ -39,10 +44,14 @@ function getRawMachineId(): string {
 			const match = output.match(/MachineGuid\s+REG_SZ\s+(\S+)/);
 			if (match?.[1]) return match[1];
 		}
-	} catch {
-		// Fallback if platform-specific method fails
+	} catch (error) {
+		failure = error;
 	}
 
+	console.warn(
+		"[host-info] platform machine id unavailable, using hostname fallback:",
+		failure instanceof Error ? failure.message : "no id in command output",
+	);
 	return `${hostname()}-${homedir()}-superset-fallback`;
 }
 
@@ -70,13 +79,26 @@ export function hostIdFromMachineId(machineId: string): string {
 }
 
 /**
+ * The desktop passes its own host id to the host-service it spawns as
+ * HOST_CLIENT_ID, so parent and child always report the same machine.
+ */
+export function resolveHostId(
+	env: NodeJS.ProcessEnv,
+	computeHostId: () => string,
+): string {
+	return env.HOST_CLIENT_ID?.trim() || computeHostId();
+}
+
+/**
  * Stable host id safe for cloud transmission.
  * HMAC of the raw machine id; non-reversible and app-specific.
  * This is the canonical identifier for a machine acting as a host or client.
  */
 export function getHostId(): string {
 	if (!cachedHashedId) {
-		cachedHashedId = hostIdFromMachineId(getMachineId());
+		cachedHashedId = resolveHostId(process.env, () =>
+			hostIdFromMachineId(getMachineId()),
+		);
 	}
 	return cachedHashedId;
 }

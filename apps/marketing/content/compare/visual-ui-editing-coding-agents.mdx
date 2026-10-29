@@ -1,6 +1,6 @@
 ---
 title: "How to Click an Element in Your Web App and Have a Coding Agent Change It (2026)"
-description: "Point at UI instead of describing it: screenshots, Playwright MCP, Cursor Design Mode, Orca, stagewise, and Superset Design Mode compared."
+description: "Point at UI instead of describing it: screenshots, Playwright MCP, Cursor Design Mode, Orca, stagewise, and Paradev Design Mode compared."
 date: 2026-10-07
 lastUpdated: 2026-10-15
 type: "tutorial"
@@ -23,11 +23,11 @@ keywords:
   - playwright mcp ui changes
 ---
 
-To have a coding agent change the element you click, you need a browser that can pick an element and hand the agent its DOM, styles, and a screenshot, so the agent can find the source file without a paragraph of description from you. Cursor's Design Mode, Orca's Design Mode, the stagewise browser, and [Superset](https://superset.sh)'s browser pane with Design Mode all do this. If you don't want a new tool, a screenshot pasted into Claude Code or Codex works for small changes, and a browser MCP server such as Playwright MCP lets the agent open and inspect the page itself, but in both cases you still describe the element in words.
+To have a coding agent change the element you click, you need a browser that can pick an element and hand the agent its DOM, styles, and a screenshot, so the agent can find the source file without a paragraph of description from you. Cursor's Design Mode, Orca's Design Mode, the stagewise browser, and [Paradev](https://paradev.com)'s browser pane with Design Mode all do this. If you don't want a new tool, a screenshot pasted into Claude Code or Codex works for small changes, and a browser MCP server such as Playwright MCP lets the agent open and inspect the page itself, but in both cases you still describe the element in words.
 
-The right choice depends on which agent you want to keep. Cursor and stagewise send the element to their own agent. Orca and Superset send it to the CLI agent you already run, such as Claude Code or Codex.
+The right choice depends on which agent you want to keep. Cursor and stagewise send the element to their own agent. Orca and Paradev send it to the CLI agent you already run, such as Claude Code or Codex.
 
-This article is published by Superset. Competitor details come from each vendor's own docs as of October 2026.
+This article is published by Paradev. Competitor details come from each vendor's own docs as of October 2026.
 
 ---
 
@@ -40,7 +40,7 @@ This article is published by Superset. Competitor details come from each vendor'
 | **Cursor Design Mode** | Click, multi-select, draw, or voice in Cursor's browser | Xpath, component, attributes, computed styles, props, screenshot | Cursor's agent | Ties the flow to Cursor's Agents Window |
 | **Orca Design Mode** | Click in a per-worktree Chromium window | HTML, computed CSS, cropped screenshot, source file and line with a source map | The active agent terminal | Open source (MIT); a separate app from your current setup |
 | **stagewise** | Click in the stagewise browser | Outer HTML, key computed CSS, bounding box, selector path | stagewise's own agent | The original toolbar that fed editor agents is deprecated |
-| **Superset Design Mode** | Click in the browser pane, type a note on the prompt card | DOM, computed styles, React component metadata, cropped screenshot | Any CLI agent, existing terminal or new session | macOS (Linux AppImage is experimental), no Windows |
+| **Paradev Design Mode** | Click in the browser pane, type a note on the prompt card | DOM, computed styles, React component metadata, cropped screenshot | Any CLI agent, existing terminal or new session | macOS (Linux AppImage is experimental), no Windows |
 
 ## Can I just paste a screenshot into Claude Code or Codex?
 
@@ -64,7 +64,7 @@ Cursor wins on input options: drawing over a frozen frame and multi-element sele
 
 [Orca](https://www.onorca.dev/) is a free, MIT-licensed app for running agents in worktrees on macOS, Windows, and Linux. Each worktree gets an embedded Chromium window. Turn on [Design Mode](https://www.onorca.dev/docs/browser/design-mode) from the browser toolbar, click an element, and Orca sends the element's HTML with a small neighborhood, its computed CSS, a cropped screenshot, and the source file and line when a dev-mode source map is available. It goes to the active agent terminal as one attachment, then you type the change.
 
-Orca has an annotation tray, so you can collect several notes before sending, and the source-map lookup can save the agent a search. It also runs on Windows, which Superset does not. For a full comparison of the two apps, see [Superset vs Orca](/compare/superset-vs-orca).
+Orca has an annotation tray, so you can collect several notes before sending, and the source-map lookup can save the agent a search. It also runs on Windows, which Paradev does not. For a full comparison of the two apps, see [Paradev vs Orca](/compare/superset-vs-orca).
 
 ## What happened to the stagewise toolbar?
 
@@ -72,9 +72,9 @@ stagewise started as a browser toolbar that you added to your dev app to send se
 
 stagewise fits if you want one app with a broad model list, including open-weight and local models. It has a free tier and paid plans; see [their pricing](https://stagewise.io/pricing). If you want the element to reach Claude Code or Codex, it is no longer the toolbar answer that older posts describe.
 
-## How does Superset's Design Mode work?
+## How does Paradev's Design Mode work?
 
-Superset is a desktop app for running CLI coding agents, each task in its own Git worktree. Its [browser pane](https://docs.superset.sh/browser) previews your running dev server next to the agent's terminal.
+Paradev is a desktop app for running CLI coding agents, each task in its own Git worktree. Its [browser pane](https://docs.paradev.com/browser) previews your running dev server next to the agent's terminal.
 
 1. Open a workspace, start your dev server, and open it in a browser pane (`⌘⇧B`, or click a detected port in the sidebar).
 2. Click **Design** in the browser toolbar to arm the element picker.
@@ -83,11 +83,11 @@ Superset is a desktop app for running CLI coding agents, each task in its own Gi
 
 The agent receives the element's DOM, computed styles, React component metadata, and usually a cropped screenshot, with your note. Press **esc** to pick a different element, and **esc** again to leave Design Mode. It works on any page the pane can load, including localhost. The [walkthrough post](/blog/change-ui-with-your-coding-agent) shows a full example.
 
-Superset's difference is where the element goes. It works with the agent you already use (Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, and others), and the change lands in that task's worktree, so two UI experiments don't edit the same files. The same pane can be driven by the agent through `superset browser` commands or a CDP endpoint to check its own work. The tradeoffs: Superset runs on macOS with an experimental Linux AppImage, has no Windows build, and is source-available under ELv2 rather than open source.
+Paradev's difference is where the element goes. It works with the agent you already use (Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, and others), and the change lands in that task's worktree, so two UI experiments don't edit the same files. The same pane can be driven by the agent through `superset browser` commands or a CDP endpoint to check its own work. The tradeoffs: Paradev runs on macOS with an experimental Linux AppImage, has no Windows build, and is source-available under ELv2 rather than open source.
 
 ## How do I review an agent's design with my team?
 
-Clicking an element covers your own feedback on a running app. When a teammate needs to review an agent-built design or mockup, Superset [Pages](https://docs.superset.sh/pages) handles that step. An agent publishes the design as a page, teammates pin comments to the part they want changed, and the agent picks up the comments, republishes, and replies at the same link. The [Pages walkthrough](/blog/review-agent-work-with-pages) shows the loop. For code review, both Superset and Orca let you comment on diff lines and send the comments to the agent.
+Clicking an element covers your own feedback on a running app. When a teammate needs to review an agent-built design or mockup, Paradev [Pages](https://docs.paradev.com/pages) handles that step. An agent publishes the design as a page, teammates pin comments to the part they want changed, and the agent picks up the comments, republishes, and replies at the same link. The [Pages walkthrough](/blog/review-agent-work-with-pages) shows the loop. For code review, both Paradev and Orca let you comment on diff lines and send the comments to the agent.
 
 ## Which option should I pick?
 
@@ -96,7 +96,7 @@ Clicking an element covers your own feedback on a running app. When a teammate n
 - **You already use Cursor's agent:** Cursor Design Mode, for the drawing and voice input.
 - **You want open source, or need Windows:** Orca.
 - **You want open-weight or local models in one app:** stagewise.
-- **You want to click an element and send it to the CLI agent you already run, in an isolated worktree, with team review on Pages:** [Superset](/download).
+- **You want to click an element and send it to the CLI agent you already run, in an isolated worktree, with team review on Pages:** [Paradev](/download).
 
 For more on running several UI tasks at once without collisions, see [How to Isolate Parallel Coding Agents](/compare/isolate-parallel-coding-agents).
 
@@ -104,7 +104,7 @@ For more on running several UI tasks at once without collisions, see [How to Iso
 
 ### Can Claude Code see my running web app?
 
-Not by itself. Paste a screenshot, add a browser MCP server such as Playwright MCP so it can open the page, or use a tool like Superset or Orca that sends a selected element's DOM, styles, and screenshot into the Claude Code terminal.
+Not by itself. Paste a screenshot, add a browser MCP server such as Playwright MCP so it can open the page, or use a tool like Paradev or Orca that sends a selected element's DOM, styles, and screenshot into the Claude Code terminal.
 
 ### Is a screenshot enough for an agent to change the right element?
 
@@ -112,11 +112,11 @@ For distinct elements, often yes. When a page has several similar components, th
 
 ### Does Cursor's Design Mode work with Claude Code?
 
-Cursor's docs describe Design Mode in the browser inside Cursor's Agents Window, sending context to Cursor's agent. To send a selected element to Claude Code in a terminal, use Orca or Superset.
+Cursor's docs describe Design Mode in the browser inside Cursor's Agents Window, sending context to Cursor's agent. To send a selected element to Claude Code in a terminal, use Orca or Paradev.
 
-### Does Superset's Design Mode work on localhost?
+### Does Paradev's Design Mode work on localhost?
 
-Yes. It works on any page the browser pane can load, including your local dev server. Superset detects ports in use and opens them in the pane with one click.
+Yes. It works on any page the browser pane can load, including your local dev server. Paradev detects ports in use and opens them in the pane with one click.
 
 ### Is the stagewise toolbar still maintained?
 

@@ -25,6 +25,7 @@ import { readLastChatAgent } from "../../utils/lastChatAgent";
 export interface CreateNewAgentSessionInput {
 	configId: string;
 	placement: "split-pane" | "new-tab";
+	besidePaneId?: string;
 	prompt: string;
 	forkSessionId?: string;
 	attachments?: Array<{ attachmentId: string; name: string; mimeType: string }>;
@@ -60,7 +61,7 @@ export function useAgentSessionLauncher({
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
-	const runAgent = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
 	const appearance = useTerminalAppearance();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
@@ -134,7 +135,7 @@ export function useAgentSessionLauncher({
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
 				// no bind-wait race vs. the launching shell.
-				const result = await runAgent.mutateAsync({
+				const result = await runAgent({
 					workspaceId,
 					colors: terminalQueryColors(appearance.theme),
 					agent: input.configId,
@@ -167,7 +168,17 @@ export function useAgentSessionLauncher({
 					titleOverride: result.label,
 					data: { terminalId } as TerminalPaneData,
 				};
-				if (input.placement === "split-pane" && state.activeTabId) {
+				const beside = input.besidePaneId
+					? state.getPane(input.besidePaneId)
+					: null;
+				if (input.placement === "split-pane" && beside) {
+					state.splitPane({
+						tabId: beside.tabId,
+						paneId: beside.pane.id,
+						position: "right",
+						newPane: pane,
+					});
+				} else if (input.placement === "split-pane" && state.activeTabId) {
 					state.addPane({ tabId: state.activeTabId, pane });
 				} else {
 					state.addTab({ panes: [pane] });

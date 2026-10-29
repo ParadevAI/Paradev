@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Firstmate (2026): Agent Workspace vs the DIY Agent Distro"
-description: "Compare Superset and Firstmate for orchestrating parallel coding agents. A purpose-built desktop workspace vs an open-source agent distro that runs on tmux."
+title: "Paradev vs Firstmate (2026): Agent Workspace vs the DIY Agent Distro"
+description: "Compare Paradev and Firstmate for orchestrating parallel coding agents. A purpose-built desktop workspace vs an open-source agent distro that runs on tmux."
 date: 2026-08-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - multi agent workflow
 ---
 
-Superset and Firstmate both answer "how do I get one conversation to fan out into a crew of parallel coding agents?" -- with almost opposite ingredients. Superset is an app: a desktop workspace with worktree isolation, diff review, automations, and remote hosts built in. Firstmate is not an app at all. It is an MIT-licensed "agent distro": a portable directory of instructions, skills, scripts, and conventions that turns a terminal agent you already run into an orchestrator that spawns and supervises crewmates in tmux windows and disposable Git worktrees.
+Paradev and Firstmate both answer "how do I get one conversation to fan out into a crew of parallel coding agents?" -- with almost opposite ingredients. Paradev is an app: a desktop workspace with worktree isolation, diff review, automations, and remote hosts built in. Firstmate is not an app at all. It is an MIT-licensed "agent distro": a portable directory of instructions, skills, scripts, and conventions that turns a terminal agent you already run into an orchestrator that spawns and supervises crewmates in tmux windows and disposable Git worktrees.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Firstmate** |
+| | **Paradev** | **Firstmate** |
 |---|---|---|
 | **What it is** | Desktop workspace that runs multiple AI agents in parallel with worktree isolation, chat, review, and browser | An "agent distro": instructions, skills, and scripts that make one agent orchestrate a crew |
 | **Form factor** | App (desktop, CLI, MCP server) | A cloned Git repo; nothing to install |
@@ -35,9 +35,9 @@ Superset and Firstmate both answer "how do I get one conversation to fan out int
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Firstmate?
 
@@ -47,31 +47,31 @@ Firstmate is an open-source "agent distro" -- its own words: "talk to one agent,
 
 ### App vs Distro
 
-This is the whole comparison in one line: Superset is software you run; Firstmate is behavior you install into an agent. Firstmate's approach is remarkably portable -- it works anywhere tmux and your agent CLI work, composes with other tools (it can even use Orca or Herdr as its session backend), and you can read every line of what it does. The cost is that everything visual is BYO: no diff review, no dashboard, no browser, no port management. Superset builds the environment; Firstmate assumes you already have one.
+This is the whole comparison in one line: Paradev is software you run; Firstmate is behavior you install into an agent. Firstmate's approach is remarkably portable -- it works anywhere tmux and your agent CLI work, composes with other tools (it can even use Orca or Herdr as its session backend), and you can read every line of what it does. The cost is that everything visual is BYO: no diff review, no dashboard, no browser, no port management. Paradev builds the environment; Firstmate assumes you already have one.
 
 ### Supervision Models
 
-Both fan work out to isolated worktrees, and both let you talk to one agent that manages the rest. Firstmate's first mate supervises crewmates in tmux windows and reports back with PRs or summaries. Superset's orchestrate skill turns Claude Code or Codex into a coordinator that starts worker agents in separate workspaces and collects their results, and every worker's terminal, diff, and status stays a click away in the app. Orchestration can also be programmatic through the CLI, MCP server, and SDK. The difference is where the crew lives: in tmux and your own tools, or in a workspace with review built in.
+Both fan work out to isolated worktrees, and both let you talk to one agent that manages the rest. Firstmate's first mate supervises crewmates in tmux windows and reports back with PRs or summaries. Paradev's orchestrate skill turns Claude Code or Codex into a coordinator that starts worker agents in separate workspaces and collects their results, and every worker's terminal, diff, and status stays a click away in the app. Orchestration can also be programmatic through the CLI, MCP server, and SDK. The difference is where the crew lives: in tmux and your own tools, or in a workspace with review built in.
 
 ### Reliability Surface
 
-A distro built on prompts and shell scripts inherits the failure modes of both: agent instructions drift across harness versions, tmux quirks surface, and there is no vendor to file a ticket with. It also inherits their transparency -- nothing is hidden. Superset owns its stack end to end (terminals, worktree lifecycle, review, automations) and carries a product team, support, and enterprise compliance behind it. For personal experimentation the distro trade is often fine; for a team's daily workflow, owned infrastructure matters.
+A distro built on prompts and shell scripts inherits the failure modes of both: agent instructions drift across harness versions, tmux quirks surface, and there is no vendor to file a ticket with. It also inherits their transparency -- nothing is hidden. Paradev owns its stack end to end (terminals, worktree lifecycle, review, automations) and carries a product team, support, and enterprise compliance behind it. For personal experimentation the distro trade is often fine; for a team's daily workflow, owned infrastructure matters.
 
 ### Automation
 
-Firstmate runs when you talk to your agent; recurring work means wiring your own triggers, though its secondmates give it a persistent-worker story on remote hosts. Superset ships automations -- scheduled agent sessions with a TypeScript SDK and a Slack bot -- so nightly dependency bumps or triage runs happen without you in the loop.
+Firstmate runs when you talk to your agent; recurring work means wiring your own triggers, though its secondmates give it a persistent-worker story on remote hosts. Paradev ships automations -- scheduled agent sessions with a TypeScript SDK and a Slack bot -- so nightly dependency bumps or triage runs happen without you in the loop.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Firstmate is free and MIT-licensed with no company behind it. Both are bring-your-own-agent: model costs go to Anthropic, OpenAI, or your other providers either way.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Firstmate is free and MIT-licensed with no company behind it. Both are bring-your-own-agent: model costs go to Anthropic, OpenAI, or your other providers either way.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want the crew visible: terminals, diffs, and status for every agent in one workspace
 - Need built-in review, browser, automations, and remote/cloud workspaces
@@ -85,24 +85,24 @@ Superset offers a free tier and Pro at $20/seat/month. Firstmate is free and MIT
 - Already have tmux (or Herdr/cmux/Orca) and your own review habits
 - Enjoy customizing the orchestration logic itself -- it is all readable text
 
-**Verdict:** Firstmate is the best expression of the DIY end of this space: a clever, transparent, free distro that turns any capable terminal agent into an orchestrator. But it deliberately stops at spawning and supervising -- environment, review, scheduling, and visibility are your problem. Superset is the purpose-built version of the same idea: parallel worktree agents with the workspace, review, automations, and remote reach already around them. Tinkerers should try Firstmate; teams shipping with agents every day will get further in Superset.
+**Verdict:** Firstmate is the best expression of the DIY end of this space: a clever, transparent, free distro that turns any capable terminal agent into an orchestrator. But it deliberately stops at spawning and supervising -- environment, review, scheduling, and visibility are your problem. Paradev is the purpose-built version of the same idea: parallel worktree agents with the workspace, review, automations, and remote reach already around them. Tinkerers should try Firstmate; teams shipping with agents every day will get further in Paradev.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Firstmate an app like Superset?
+### Is Firstmate an app like Paradev?
 
-No. Firstmate is a repository of instructions, skills, and scripts -- an "agent distro" -- that an agent like Claude Code or Codex reads to become an orchestrator. Superset is a desktop workspace with the orchestration, terminals, and review built in as software.
+No. Firstmate is a repository of instructions, skills, and scripts -- an "agent distro" -- that an agent like Claude Code or Codex reads to become an orchestrator. Paradev is a desktop workspace with the orchestration, terminals, and review built in as software.
 
 ### Do both use Git worktrees?
 
-Yes. Firstmate gives each crewmate a disposable worktree (or delegates worktree management to Orca when used as a backend). Superset creates a worktree for each new local branch-based workspace and attaches persistent terminals and diff review to it.
+Yes. Firstmate gives each crewmate a disposable worktree (or delegates worktree management to Orca when used as a backend). Paradev creates a worktree for each new local branch-based workspace and attaches persistent terminals and diff review to it.
 
-### Can Firstmate and Superset be used together?
+### Can Firstmate and Paradev be used together?
 
-Not as an integrated pair -- Firstmate's supported backends are tmux, and experimentally Herdr, Zellij, cmux, and Orca. Superset's orchestrate skill covers the same delegation pattern inside the workspace: one Claude Code or Codex agent coordinates workers it starts through the Superset CLI.
+Not as an integrated pair -- Firstmate's supported backends are tmux, and experimentally Herdr, Zellij, cmux, and Orca. Paradev's orchestrate skill covers the same delegation pattern inside the workspace: one Claude Code or Codex agent coordinates workers it starts through the Paradev CLI.
 
 ### Is Firstmate free?
 
-Yes -- MIT-licensed, no paid tier, no company. Superset has a free tier and Pro at $20/seat/month, with enterprise plans for teams.
+Yes -- MIT-licensed, no paid tier, no company. Paradev has a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces, and enterprise plans for teams.

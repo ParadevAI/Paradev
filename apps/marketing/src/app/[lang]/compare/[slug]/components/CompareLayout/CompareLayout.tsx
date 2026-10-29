@@ -85,14 +85,14 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 				</div>
 				<div className="max-w-3xl mx-auto px-6 py-10 text-center">
 					<p className="text-muted-foreground mb-4">
-						<Trans>Ready to try Superset?</Trans>
+						<Trans>Ready to try Paradev?</Trans>
 					</p>
 					<DownloadLink
 						source="compare"
 						properties={{ slug: page.slug }}
 						className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors border border-border rounded-md px-4 py-2"
 					>
-						<Trans>Download Superset</Trans>
+						<Trans>Download Paradev</Trans>
 					</DownloadLink>
 				</div>
 			</footer>

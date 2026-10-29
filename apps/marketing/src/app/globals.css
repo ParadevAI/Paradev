@@ -183,22 +183,22 @@
 	line-height: 1.75;
 }
 
-.prose ul,
-.prose ol {
+.prose ul:not(.not-prose *),
+.prose ol:not(.not-prose *) {
 	margin-top: 1.25rem;
 	margin-bottom: 1.25rem;
 	padding-left: 1.5rem;
 }
 
-.prose ul {
+.prose ul:not(.not-prose *) {
 	list-style: disc;
 }
 
-.prose ol {
+.prose ol:not(.not-prose *) {
 	list-style: decimal;
 }
 
-.prose li {
+.prose li:not(.not-prose *) {
 	margin-top: 0.5rem;
 	margin-bottom: 0.5rem;
 }

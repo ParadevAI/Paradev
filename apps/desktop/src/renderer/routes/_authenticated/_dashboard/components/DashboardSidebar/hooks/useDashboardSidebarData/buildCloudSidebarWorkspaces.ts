@@ -7,7 +7,6 @@ import type {
 } from "@superset/shared/pull-request";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
-import { cloudPullRequestRefKey } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 import type {
 	DashboardSidebarWorkspace,
@@ -85,8 +84,11 @@ export interface BuildCloudSidebarWorkspacesParams {
 	repoFullNameById: ReadonlyMap<string, string>;
 	/** Live branch per cloud workspace id, for the ones whose sandbox is a host. */
 	branchById: ReadonlyMap<string, string>;
-	/** Keyed by {@link cloudPullRequestRefKey}. */
-	pullRequestsByRef: ReadonlyMap<string, CloudSidebarPullRequestInput>;
+	/** Per cloud workspace id, the one to show first. */
+	pullRequestsById: ReadonlyMap<
+		string,
+		readonly CloudSidebarPullRequestInput[]
+	>;
 	/** Name of the stand-in project for rows whose repo isn't known yet. */
 	unknownRepoProjectName: string;
 }
@@ -111,7 +113,7 @@ export function buildCloudSidebarWorkspaces({
 	projects,
 	repoFullNameById,
 	branchById,
-	pullRequestsByRef,
+	pullRequestsById,
 	unknownRepoProjectName,
 }: BuildCloudSidebarWorkspacesParams): CloudSidebarWorkspacesLayout {
 	const projectIdByRepo = new Map<string, string>();
@@ -134,11 +136,7 @@ export function buildCloudSidebarWorkspaces({
 			? projectIdByRepo.get(repoFullName.toLowerCase())
 			: undefined;
 		const projectId = existingProjectId ?? cloudRepoProjectId(repoFullName);
-		const pullRequest = repoFullName
-			? pullRequestsByRef.get(
-					cloudPullRequestRefKey({ repoFullName, headBranch: branch }),
-				)
-			: undefined;
+		const pullRequest = pullRequestsById.get(workspace.id)?.[0];
 
 		const row: DashboardSidebarWorkspace = {
 			id: workspace.id,

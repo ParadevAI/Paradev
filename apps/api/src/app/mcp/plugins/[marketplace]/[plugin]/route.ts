@@ -11,6 +11,7 @@ import {
 	PluginTargetError,
 	resolveTarget,
 } from "@superset/trpc/plugins-proxy";
+import { z } from "zod";
 import { env } from "@/env";
 import {
 	checkRateLimit,
@@ -47,9 +48,9 @@ function describeServer(
 			marketplace,
 			transport: "streamable-http",
 			url: `${origin}/mcp/plugins/${marketplace}/${plugin}`,
-			description: `Superset MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
+			description: `Paradev MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
 			usage:
-				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Superset API key). Add ?connection=<id> to pin a specific connected account.",
+				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Paradev API key). Add ?connection=<id> to pin a specific connected account.",
 			authentication: {
 				type: "oauth2",
 				resourceMetadataUrl: mcpProtectedResourceMetadataUrl(req),
@@ -95,6 +96,18 @@ async function handle(
 		throw error;
 	}
 
+	const connectionId = new URL(req.url).searchParams.get("connection");
+	if (connectionId && !z.uuid().safeParse(connectionId).success) {
+		return withRateLimitHeaders(
+			errorResponse(
+				"INVALID_CONNECTION",
+				"connection must be a connection id.",
+				400,
+			),
+			rateLimitState,
+		);
+	}
+
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
 		const target = await resolveTarget({
@@ -102,7 +115,7 @@ async function handle(
 			organizationId: ctx.organizationId,
 			marketplace,
 			plugin,
-			connectionId: new URL(req.url).searchParams.get("connection"),
+			connectionId,
 		});
 		server = await buildPluginServer(target);
 	} catch (error) {

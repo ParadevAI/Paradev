@@ -4,11 +4,19 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./project-config": {
+			"types": "./src/project-config/index.ts",
+			"default": "./src/project-config/index.ts"
+		},
 		"./oauth-refresh": {
 			"types": "./src/oauth-refresh.ts",
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./slack-links": {
+			"types": "./src/slack-links.ts",
+			"default": "./src/slack-links.ts"
+		},
 		"./voice": {
 			"types": "./src/voice/index.ts",
 			"default": "./src/voice/index.ts"
@@ -133,6 +141,10 @@
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
 		},
+		"./own-domains": {
+			"types": "./src/own-domains.ts",
+			"default": "./src/own-domains.ts"
+		},
 		"./legacy-host-redirects": {
 			"types": "./src/legacy-host-redirects.ts",
 			"default": "./src/legacy-host-redirects.ts"
@@ -176,6 +188,18 @@
 		"./pull-request": {
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
+		},
+		"./pull-request-github": {
+			"types": "./src/pull-request-github/index.ts",
+			"default": "./src/pull-request-github/index.ts"
+		},
+		"./pull-request-detail": {
+			"types": "./src/pull-request-detail/index.ts",
+			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-threads": {
+			"types": "./src/pull-request-threads/index.ts",
+			"default": "./src/pull-request-threads/index.ts"
 		},
 		"./sandbox-gate": {
 			"types": "./src/sandbox-gate.ts",
@@ -381,6 +405,18 @@
 			"types": "./src/host-routing.ts",
 			"default": "./src/host-routing.ts"
 		},
+		"./channels": {
+			"types": "./src/channels.ts",
+			"default": "./src/channels.ts"
+		},
+		"./dev-avatar": {
+			"types": "./src/dev-avatar.ts",
+			"default": "./src/dev-avatar.ts"
+		},
+		"./org-presence": {
+			"types": "./src/org-presence.ts",
+			"default": "./src/org-presence.ts"
+		},
 		"./realtime": {
 			"types": "./src/realtime.ts",
 			"default": "./src/realtime.ts"
@@ -473,6 +509,7 @@
 		"jose": "6.2.2",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
+		"smol-toml": "1.9.1",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {

@@ -20,8 +20,8 @@ const UNSTAR_BACKSTOP_INTERVAL_MS = 30 * 60_000;
 /**
  * App-shell singleton — mounted once in the authenticated layout, renders
  * nothing — that owns every checkStarred -> useStarNagStore side effect, so
- * the four independently-mounted star-nag surfaces (settings row,
- * empty-state pill, sidebar card, onboarding toast) don't each run their own
+ * the independently-mounted star-nag surfaces (settings row, empty-state
+ * pill, onboarding toast) don't each run their own
  * copy of this logic.
  *
  * Also the only place that ever schedules a deliberate re-check of star

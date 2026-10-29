@@ -1,13 +1,32 @@
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
+import { Badge } from "@superset/ui/badge";
 import { Progress } from "@superset/ui/progress";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { GbHourPurchase } from "./components/GbHourPurchase";
 
-export function CloudUsageCard() {
+interface CloudUsageCardProps {
+	organizationId: string | null;
+	canBuy: boolean;
+}
+
+export function CloudUsageCard({
+	organizationId,
+	canBuy,
+}: CloudUsageCardProps) {
 	const { formatNumber, formatDate } = useFormat();
 	const { data: usage } = cloudTrpc.billing.cloudUsage.useQuery(undefined);
 
-	if (!usage) return null;
+	if (
+		!usage ||
+		(usage.includedGbMinutes === 0 &&
+			usage.usedGbMinutes === 0 &&
+			usage.overageGbMinutes === 0 &&
+			usage.prepaidGbMinutes === 0 &&
+			!usage.pack)
+	) {
+		return null;
+	}
 
 	const gbHours = (gbMinutes: number) => {
 		const hours = gbMinutes / 60;
@@ -19,6 +38,8 @@ export function CloudUsageCard() {
 		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
 	const overage =
 		usage.overageGbMinutes > 0 ? gbHours(usage.overageGbMinutes) : null;
+	const prepaid =
+		usage.prepaidGbMinutes > 0 ? gbHours(usage.prepaidGbMinutes) : null;
 	const resetDate = usage.resetsAt
 		? formatDate(new Date(usage.resetsAt))
 		: null;
@@ -29,8 +50,14 @@ export function CloudUsageCard() {
 
 	return (
 		<div>
-			<h3 className="text-sm font-medium mb-2">
+			<h3 className="text-sm font-medium mb-2 flex items-center gap-2">
 				<Trans>Cloud usage</Trans>
+				<Badge
+					variant="secondary"
+					className="px-1.5 py-0 text-[10px] font-medium"
+				>
+					<Trans>Beta</Trans>
+				</Badge>
 			</h3>
 			<div className="space-y-2 py-3">
 				<div className="flex items-baseline justify-between gap-4 text-sm">
@@ -52,12 +79,24 @@ export function CloudUsageCard() {
 				{usage.includedGbMinutes !== null && usage.includedGbMinutes > 0 && (
 					<Progress value={percentUsed} />
 				)}
+				{prepaid && (
+					<div className="text-xs text-muted-foreground tabular-nums">
+						<Trans>Bought GB-hours left: {prepaid}</Trans>
+					</div>
+				)}
 				{overage && (
 					<div className="text-xs text-warning tabular-nums">
 						<Trans>GB-hours over the plan: {overage}</Trans>
 					</div>
 				)}
 			</div>
+			{canBuy && usage.pack && organizationId && (
+				<GbHourPurchase
+					organizationId={organizationId}
+					pack={usage.pack}
+					autoTopup={usage.autoTopup}
+				/>
+			)}
 		</div>
 	);
 }

@@ -200,7 +200,7 @@ function parseThemeEntry(
 	if (RESERVED_THEME_IDS.has(id)) {
 		return {
 			ok: false,
-			issue: `Theme ${index + 1}: "${id}" is reserved by Superset`,
+			issue: `Theme ${index + 1}: "${id}" is reserved by Paradev`,
 		};
 	}
 

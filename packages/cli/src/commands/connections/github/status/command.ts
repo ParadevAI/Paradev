@@ -10,7 +10,7 @@ export default command({
 			message: connection
 				? `Connected as ${connection.login}`
 				: available
-					? "Not connected; cloud workspaces push as the Superset GitHub App. Run: superset connections github connect"
+					? "Not connected; cloud workspaces push as the Paradev GitHub App. Run: superset connections github connect"
 					: "GitHub account connections are not set up on this server",
 		};
 	},

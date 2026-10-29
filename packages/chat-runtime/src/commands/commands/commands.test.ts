@@ -14,6 +14,7 @@ import {
 	journalEnvelopes,
 	waitFor,
 } from "../../testing/testUtils";
+import { sessionsTitled } from "./commands";
 
 const SCRIPT: FakeHarnessScript = {
 	turns: [
@@ -225,6 +226,21 @@ describe("chat commands", () => {
 		).toHaveLength(1);
 		expect(runtime.commands.listSessions({ limit: 1 })).toHaveLength(1);
 		await runtime.dispose();
+	});
+
+	test("a title query keeps matching sessions before the limit applies", () => {
+		const rows = [
+			{ sessionId: "a", title: "Fix the build" },
+			{ sessionId: "b", title: null },
+			{ sessionId: "c", title: "Release notes" },
+			{ sessionId: "d", title: "fix flaky test" },
+		];
+		expect(sessionsTitled(rows, " FIX ").map((row) => row.sessionId)).toEqual([
+			"a",
+			"d",
+		]);
+		expect(sessionsTitled(rows, undefined)).toHaveLength(4);
+		expect(sessionsTitled(rows, "")).toHaveLength(4);
 	});
 
 	test("listSessions reports which sessions are live and their terminal", async () => {
@@ -527,7 +543,16 @@ describe("chat commands", () => {
 			}
 		}
 		const runtime = createTestRuntime({
-			harnesses: new Map([[FAKE_HARNESS, () => new ForkingHarness(SCRIPT)]]),
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new ForkingHarness({
+							...SCRIPT,
+							start: [{ kind: "session", session: { status: "idle" } }],
+						}),
+				],
+			]),
 		});
 		const source = runtime.commands.createSession({
 			commandId: randomUUID(),
@@ -551,6 +576,124 @@ describe("chat commands", () => {
 		expect(runtime.live.require(source.sessionId).terminalId).toBe(
 			"terminal-source",
 		);
+		await runtime.dispose();
+	});
+
+	test("forkSession waits for a session that is still starting", async () => {
+		let sourceId = "";
+		const statusesAtFork: (string | undefined)[] = [];
+		const runtime: ChatRuntime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new (class extends FakeHarness {
+							async fork() {
+								statusesAtFork.push(runtime.sessions.get(sourceId)?.status);
+								return "agent-forked";
+							}
+						})({
+							...SCRIPT,
+							start: [
+								{ kind: "session", session: { modeId: "default" } },
+								{ kind: "session", session: { status: "idle" }, delayMs: 20 },
+							],
+						}),
+				],
+			]),
+		});
+		sourceId = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			resume: { harnessSessionId: "agent-cli" },
+		}).sessionId;
+
+		const forked = await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: sourceId,
+			cwd: "/tmp/workspace",
+		});
+
+		expect(forked).not.toBeNull();
+		expect(statusesAtFork).toEqual(["idle"]);
+		await runtime.dispose();
+	});
+
+	test("forkSession gives up when the agent dies while starting", async () => {
+		let forkCalls = 0;
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new (class extends FakeHarness {
+							async fork() {
+								forkCalls += 1;
+								return "agent-forked";
+							}
+						})({
+							...SCRIPT,
+							start: [
+								{ kind: "session", session: { status: "dead" }, delayMs: 10 },
+							],
+						}),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+
+		const forked = await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		expect(forked).toBeNull();
+		expect(forkCalls).toBe(0);
+		await runtime.dispose();
+	});
+
+	test("forkSession gives up when the agent's start ends without a status", async () => {
+		let forkCalls = 0;
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new (class extends FakeHarness {
+							start() {
+								return (async function* () {})();
+							}
+							async fork() {
+								forkCalls += 1;
+								return "agent-forked";
+							}
+						})(SCRIPT),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+
+		const forked = await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		expect(forked).toBeNull();
+		expect(forkCalls).toBe(0);
 		await runtime.dispose();
 	});
 
@@ -623,6 +766,7 @@ describe("chat commands", () => {
 					FAKE_HARNESS,
 					() =>
 						new CuttingHarness({
+							start: [{ kind: "session", session: { status: "idle" } }],
 							turns: [
 								[
 									{ kind: "turn", turn: turn("t9") },
@@ -764,6 +908,36 @@ describe("chat commands", () => {
 		expect(runtime.commands.getSession({ sessionId }).lastError).toBe(
 			"Authentication required",
 		);
+		await runtime.dispose();
+	});
+});
+
+describe("setting a session option", () => {
+	test("with confirm, fails when the agent refuses the setting", async () => {
+		class RefusingHarness extends FakeHarness {
+			setConfigOption(_configId: string, value: string): Promise<boolean> {
+				return Promise.resolve(value !== "refused");
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([[FAKE_HARNESS, () => new RefusingHarness(SCRIPT)]]),
+		});
+		const { sessionId } = createSession(runtime);
+		const set = (value: string, confirm?: boolean) =>
+			runtime.commands.setConfigOption({
+				commandId: randomUUID(),
+				sessionId,
+				configId: "model",
+				value,
+				...(confirm ? { confirm } : {}),
+			});
+
+		expect(set("refused")).toBeUndefined();
+		await expect(set("taken", true)).resolves.toBeUndefined();
+		await expect(set("refused", true)).rejects.toThrow(
+			"the agent did not take that setting",
+		);
+
 		await runtime.dispose();
 	});
 });

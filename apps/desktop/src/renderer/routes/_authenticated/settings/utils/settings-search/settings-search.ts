@@ -77,7 +77,7 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_V1_MIGRATION: "experimental-v1-migration",
 	EXPERIMENTAL_INLINE_WORKSPACE_PORTS: "experimental-inline-workspace-ports",
 	EXPERIMENTAL_WORKSPACE_AGENTS: "experimental-workspace-agents",
-	EXPERIMENTAL_NEW_SIDEBAR: "experimental-new-sidebar",
+	EXPERIMENTAL_ACP_CHAT: "experimental-acp-chat",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
 
@@ -238,7 +238,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.EXPERIMENTAL_V1_MIGRATION]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_INLINE_WORKSPACE_PORTS]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_NEW_SIDEBAR]: "v2",
+	[SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
 
@@ -355,7 +355,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.MOBILE_APP,
 		section: "mobile",
 		title: "Mobile",
-		description: "Use Superset on your iPhone",
+		description: "Use Paradev on your iPhone",
 		keywords: ["phone", "mobile", "qr", "scan", "ios", "app store"],
 	},
 	{
@@ -471,7 +471,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.ORGANIZATION_TASK_TRACKER,
 		section: "organization",
 		title: "Track tasks in",
-		description: "Use Superset tasks or your Linear issues",
+		description: "Use Paradev tasks or your Linear issues",
 		keywords: [
 			"organization",
 			"tasks",
@@ -927,7 +927,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "behavior",
 		title: "Dictation",
 		description:
-			"Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers.",
+			"Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers.",
 		keywords: [
 			"dictation",
 			"dictate",
@@ -994,7 +994,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		section: "behavior",
-		title: "Star Superset on GitHub",
+		title: "Star Paradev on GitHub",
 		description: "Support the project with a GitHub star",
 		keywords: [
 			"star",
@@ -1487,19 +1487,20 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_SIDEBAR,
+		id: SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
 		section: "experimental",
-		title: "New sidebar",
+		title: "Chat",
 		description:
-			"Cloud workspaces under their projects, a local and cloud filter, and the redesigned workspace row",
+			"Open Claude and Codex sessions in a chat pane instead of a terminal",
 		keywords: [
 			"experimental",
-			"sidebar",
-			"cloud",
-			"workspaces",
-			"projects",
-			"filter",
-			"redesign",
+			"chat",
+			"acp",
+			"agent",
+			"claude",
+			"codex",
+			"session",
+			"pane",
 			"toggle",
 			"switch",
 		],
@@ -1679,7 +1680,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.PROJECT_IMPORT_WORKTREES,
 		section: "project",
 		title: "Import Worktrees",
-		description: "Import existing worktrees from disk into Superset",
+		description: "Import existing worktrees from disk into Paradev",
 		keywords: [
 			"project",
 			"import",
@@ -1850,7 +1851,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "security",
 		title: "Allow remote access to this device via relay",
 		description:
-			"Controls whether other devices can reach your local host service through the Superset relay",
+			"Controls whether other devices can reach your local host service through the Paradev relay",
 		keywords: [
 			"security",
 			"relay",
@@ -2132,11 +2133,13 @@ export function getVisibleMatchCountBySection(
 	isV2: boolean,
 	cloudWorkspaces: boolean,
 	mobileEnabled = false,
+	acpChatFlag = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
-			(item.section !== "mobile" || mobileEnabled),
+			(item.section !== "mobile" || mobileEnabled) &&
+			(item.id !== SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT || acpChatFlag),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {

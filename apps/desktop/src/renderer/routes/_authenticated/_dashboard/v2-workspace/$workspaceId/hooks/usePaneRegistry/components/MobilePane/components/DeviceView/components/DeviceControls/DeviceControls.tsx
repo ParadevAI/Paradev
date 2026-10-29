@@ -13,25 +13,14 @@ import { FloatingBar } from "../../../FloatingBar";
 
 interface DeviceControlsProps {
 	client: DeviceClient;
-	deviceName: string;
 	onRotate: () => void;
-}
-
-async function saveScreenshot(client: DeviceClient, deviceName: string) {
-	const capture = await client.screenshot();
-	if (!capture) return;
-	const url = URL.createObjectURL(capture.blob);
-	const link = document.createElement("a");
-	link.href = url;
-	link.download = `${deviceName}-${Date.now()}.png`;
-	link.click();
-	URL.revokeObjectURL(url);
+	onScreenshot: () => void;
 }
 
 export function DeviceControls({
 	client,
-	deviceName,
 	onRotate,
+	onScreenshot,
 }: DeviceControlsProps) {
 	const { t } = useLingui();
 	const disconnected = client.status !== "streaming";
@@ -78,10 +67,10 @@ export function DeviceControls({
 				</DeviceControlButton>
 			)}
 			<DeviceControlButton
-				label={t({ message: "Screenshot" })}
+				label={t({ message: "Take screenshot" })}
 				side="top"
 				disabled={disconnected}
-				onClick={() => void saveScreenshot(client, deviceName)}
+				onClick={onScreenshot}
 			>
 				<TbCamera className="size-4" />
 			</DeviceControlButton>

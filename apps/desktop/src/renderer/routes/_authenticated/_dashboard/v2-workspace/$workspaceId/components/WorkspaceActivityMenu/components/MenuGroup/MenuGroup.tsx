@@ -3,12 +3,14 @@ import type { ReactNode } from "react";
 
 export function MenuGroup({
 	title,
+	count = 0,
 	actions,
 	addLabel,
 	onAdd,
 	children,
 }: {
 	title: ReactNode;
+	count?: number;
 	actions?: ReactNode;
 	addLabel?: string;
 	onAdd?: () => void;
@@ -16,9 +18,14 @@ export function MenuGroup({
 }) {
 	return (
 		<section className="py-1">
-			<div className="flex h-7 items-center justify-between pl-2 pr-1">
-				<span className="text-[11px] font-medium text-muted-foreground">
+			<div className="sticky top-0 z-10 flex h-7 items-center justify-between bg-popover pl-2 pr-1">
+				<span className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
 					{title}
+					{count > 0 && (
+						<span className="tabular-nums text-muted-foreground/70">
+							{count}
+						</span>
+					)}
 				</span>
 				<span className="flex items-center gap-0.5">
 					{actions}

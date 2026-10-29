@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Herdr (2026): Agent Workspace vs Agent Runtime"
-description: "Compare Superset and Herdr for persistent CLI-agent workflows. Bring terminals, diff review, and browser previews together in a visual workspace."
+title: "Paradev vs Herdr (2026): Agent Workspace vs Agent Runtime"
+description: "Compare Paradev and Herdr for persistent CLI-agent workflows. Bring terminals, diff review, and browser previews together in a visual workspace."
 date: 2026-08-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,19 +15,19 @@ keywords:
   - ai agent orchestration
 ---
 
-Superset and Herdr share a useful starting point: keep your coding agents in persistent terminals and organize work across projects. Superset brings that workflow into a desktop workspace with visual diff review, file editing, and browser previews alongside your agents. Herdr organizes sessions in a terminal interface with remote attachment and scripting.
+Paradev and Herdr share a useful starting point: keep your coding agents in persistent terminals and organize work across projects. Paradev brings that workflow into a desktop workspace with visual diff review, file editing, and browser previews alongside your agents. Herdr organizes sessions in a terminal interface with remote attachment and scripting.
 
-**Choose Superset when you like working directly with CLI agents and want the surrounding work in one visual workspace.** Start with one task, keep the agent you already use, and add parallel work when you need it. Choose Herdr when a terminal interface fits the review and editing tools you already have.
+**Choose Paradev when you like working directly with CLI agents and want the surrounding work in one visual workspace.** Start with one task, keep the agent you already use, and add parallel work when you need it. Choose Herdr when a terminal interface fits the review and editing tools you already have.
 
-[Download Superset](/download) to try it with an existing repository, or follow the [workspace walkthrough](/blog/parallel-coding-agents-guide).
+[Download Paradev](/download) to try it with an existing repository, or follow the [workspace walkthrough](/blog/parallel-coding-agents-guide).
 
-This comparison is published by Superset and evaluates workflow fit, not measured speed or agent quality. Herdr details were checked against its official documentation on September 23, 2026. Superset CLI details were updated on October 15, 2026.
+This comparison is published by Paradev and evaluates workflow fit, not measured speed or agent quality. Herdr details were checked against its official documentation on September 23, 2026. Paradev CLI details were updated on October 15, 2026.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Herdr** |
+| | **Paradev** | **Herdr** |
 |---|---|---|
 | **What it does** | Persistent agent terminals with Git worktrees, chat, review, and browser | Persistent runtime for agents: sessions, workspaces, tabs, and panes that outlive clients |
 | **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Terminal-native agent runtime (TUI + CLI + socket API) |
@@ -41,9 +41,9 @@ This comparison is published by Superset and evaluates workflow fit, not measure
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Herdr?
 
@@ -53,14 +53,14 @@ Herdr is an open-source runtime that organizes coding-agent terminals into works
 
 ### Workspace vs Runtime
 
-Superset brings the task's terminal, changed files, and preview into the same workspace. You can keep your agent's own commands and permissions while using the surrounding interface to navigate projects and review its work. Herdr focuses on organizing terminals; your existing editor and review tools can remain part of that workflow.
+Paradev brings the task's terminal, changed files, and preview into the same workspace. You can keep your agent's own commands and permissions while using the surrounding interface to navigate projects and review its work. Herdr focuses on organizing terminals; your existing editor and review tools can remain part of that workflow.
 ### GUI vs Terminal
 
-Superset adds a desktop interface around real terminal sessions. Herdr's terminal UI also supports clicking panes, resizing splits, and sidebar navigation. The useful distinction is what you want beside the terminal: Superset includes a diff/file editor and browser pane for the task, and can open your existing editor when you need it.
+Paradev adds a desktop interface around real terminal sessions. Herdr's terminal UI also supports clicking panes, resizing splits, and sidebar navigation. The useful distinction is what you want beside the terminal: Paradev includes a diff/file editor and browser pane for the task, and can open your existing editor when you need it.
 
 ### Review and the Rest of the Loop
 
-In Superset, inspect the patch, edit a file, and open the running app beside the agent that made the change. Use [agent status and notifications](https://docs.superset.sh/agent-status) to decide which task needs attention; notification support varies by agent. Scheduled automations let you repeat a task once its setup and review steps are established. These additions can be useful with a single agent as well as several parallel tasks.
+In Paradev, inspect the patch, edit a file, and open the running app beside the agent that made the change. Use [agent status and notifications](https://docs.paradev.com/agent-status) to decide which task needs attention; notification support varies by agent. Scheduled automations let you repeat a task once its setup and review steps are established. These additions can be useful with a single agent as well as several parallel tasks.
 
 ### Give Feedback Where You See the Work
 
@@ -70,23 +70,23 @@ For work you need to discuss with teammates, [publish a report or design as a Pa
 
 ### Persistence and Remote
 
-Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Superset's [terminal documentation](https://docs.superset.sh/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.superset.sh/remote-access) connects you to another host. From a shell, `superset terminals attach` joins a running terminal, `Ctrl+]` detaches it, and `--ssh` attaches to a terminal on another machine. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Superset, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+Herdr's [persistence documentation](https://herdr.dev/docs/persistence-remote/) explains server-owned terminals and remote attachment over SSH. Paradev's [terminal documentation](https://docs.paradev.com/terminal-integration) covers running processes and scrollback surviving app restarts, while [remote access](https://docs.paradev.com/remote-access) connects you to another host. From a shell, `superset terminals attach` joins a running terminal, `Ctrl+]` detaches it, and `--ssh` attaches to a terminal on another machine. In both cases, continuing execution requires the machine running the agent to remain available; closing a client and stopping a host are different events. In Paradev, agents do not live in the app window: they run in a background terminal daemon, so closing the window, quitting with ⌘Q, or installing an update leaves them running, and they reattach with scrollback when you reopen the app. While the desktop app is quit, the machine is not reachable from your phone or by automations; running the host service from the standalone CLI keeps it reachable. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running).
 
 ### Worktree Isolation
 
-Both tools can organize work in Git worktrees. Superset combines those separate working directories with visual review and previews. Worktrees separate files and branches; they do not sandbox processes or prevent conflicts when changes are merged. For a practical verification exercise, use the [parallel coding guide](/blog/parallel-coding-agents-guide).
+Both tools can organize work in Git worktrees. Paradev combines those separate working directories with visual review and previews. Worktrees separate files and branches; they do not sandbox processes or prevent conflicts when changes are merged. For a practical verification exercise, use the [parallel coding guide](/blog/parallel-coding-agents-guide).
 
 ---
 
 ## Pricing
 
-Superset is source-available under Elastic License 2.0, with plan details on the [pricing page](/pricing). Herdr's licensing and installation details are available in its [official repository](https://github.com/herdrdev/herdr). Compare workspace costs separately from the model or agent subscriptions you bring to either tool.
+Paradev is source-available under Elastic License 2.0, with plan details on the [pricing page](/pricing). Herdr's licensing and installation details are available in its [official repository](https://github.com/herdrdev/herdr). Compare workspace costs separately from the model or agent subscriptions you bring to either tool.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want persistent CLI-agent terminals, diff review, and browser previews in one workspace
 - Prefer a GUI over a terminal multiplexer
@@ -100,11 +100,11 @@ Superset is source-available under Elastic License 2.0, with plan details on the
 - Want to extend the runtime with executable plugins and event hooks over a JSON socket API
 - Prefer to compose your terminal environment with external review tools
 
-**Verdict:** Superset is a strong fit for developers who want to keep the direct CLI-agent experience and gain a visual home for their work. Herdr is a good fit when you want terminal session management alongside an existing toolchain. Evaluate the review and return-to-work experience with a real task, even if you only run one agent.
+**Verdict:** Paradev is a strong fit for developers who want to keep the direct CLI-agent experience and gain a visual home for their work. Herdr is a good fit when you want terminal session management alongside an existing toolchain. Evaluate the review and return-to-work experience with a real task, even if you only run one agent.
 
 ## Try the Workflow With One Task
 
-1. [Download Superset](/download) and open a Git repository you already work in.
+1. [Download Paradev](/download) and open a Git repository you already work in.
 2. Create a workspace for a small fix and launch your usual CLI agent there.
 3. Review the changed files in the diff view. For a UI task, run the dev server and open its URL in a browser pane.
 4. Switch to another workspace, then return to the original terminal and patch. Check whether you can pick up the task without reconstructing its context.
@@ -115,18 +115,18 @@ Keep your normal tests and editor in the loop. The goal is to see whether the wo
 
 ## Frequently Asked Questions
 
-### Is Herdr a Superset alternative?
+### Is Herdr a Paradev alternative?
 
-Yes, for developers choosing how to organize CLI-agent work. Both support persistent terminals and Git worktrees. Superset adds a desktop workspace with integrated diff review, file editing, and browser previews around that workflow.
+Yes, for developers choosing how to organize CLI-agent work. Both support persistent terminals and Git worktrees. Paradev adds a desktop workspace with integrated diff review, file editing, and browser previews around that workflow.
 
 ### Do both support Git worktrees?
 
-Yes. New local branch-based Superset workspaces get their own Git worktree. Herdr offers worktree actions in its CLI and sidebar. In either tool, review and test the combined changes before merging.
+Yes. New local branch-based Paradev workspaces get their own Git worktree. Herdr offers worktree actions in its CLI and sidebar. In either tool, review and test the combined changes before merging.
 
 ### Is Herdr open source?
 
-Yes. Herdr's runtime uses the [Apache-2.0 license](https://github.com/herdrdev/herdr). Superset is source-available under the Elastic License 2.0 with a free tier and paid Pro.
+Yes. Herdr's runtime uses the [Apache-2.0 license](https://github.com/herdrdev/herdr). Paradev is source-available under the Elastic License 2.0 with a free tier and paid Pro.
 
-### Do I need to run several agents to benefit from Superset?
+### Do I need to run several agents to benefit from Paradev?
 
 No. One task can use the same persistent terminal, diff review, and browser preview. Separate workspaces help you return to unfinished work across projects; parallel agents are an additional option when tasks can proceed independently.

@@ -1,6 +1,7 @@
 export {
 	detectMobileBackend,
+	disposeLocalDevices as disposeLocalMobileDevices,
 	type MobileBackend,
 	mobileRouter,
-	stopLocalServer as stopLocalMobileServer,
+	startLocalDeviceCleanup as startLocalMobileDeviceCleanup,
 } from "./mobile";

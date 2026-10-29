@@ -26,6 +26,12 @@ export const serverErrorMessages: Record<
 				message: "Anthropic rejected this token.",
 			}),
 		),
+	"serverError.agentCredential.chatgptSignInFailed": () =>
+		i18n._(
+			msg({
+				message: "OpenAI did not complete the sign-in. Start again.",
+			}),
+		),
 	"serverError.agentCredential.empty": () =>
 		i18n._(
 			msg({
@@ -84,6 +90,15 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: `${params?.agent} cannot be signed in this way yet.`,
+			}),
+		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
 			}),
 		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
@@ -258,18 +273,116 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.channel.notFound": () =>
+		i18n._(
+			msg({
+				message: "Channel not found",
+			}),
+		),
+	"serverError.channel.nameTaken": () =>
+		i18n._(
+			msg({
+				message: "A channel with this name already exists",
+			}),
+		),
+	"serverError.channel.invalidName": () =>
+		i18n._(
+			msg({
+				message: "Use lowercase letters, numbers, dashes and underscores",
+			}),
+		),
+	"serverError.channel.joinFirst": () =>
+		i18n._(
+			msg({
+				message: "Join the channel first",
+			}),
+		),
+	"serverError.channel.adminRequired": () =>
+		i18n._(
+			msg({
+				message: "Only channel admins can do that",
+			}),
+		),
+	"serverError.channel.taskInHiddenChannel": () =>
+		i18n._(msg({ message: "This task is in a channel you can't see" })),
+	"serverError.channel.archived": () =>
+		i18n._(
+			msg({
+				message: "This channel is archived",
+			}),
+		),
+	"serverError.channel.lastAdmin": () =>
+		i18n._(
+			msg({
+				message: "A channel needs at least one admin",
+			}),
+		),
+	"serverError.channel.cannotJoinPrivate": () =>
+		i18n._(
+			msg({
+				message: "Ask a member to add you to this channel",
+			}),
+		),
+	"serverError.channel.projectNotFound": () =>
+		i18n._(
+			msg({
+				message: "Project not found",
+			}),
+		),
+	"serverError.channel.notInOrganization": () =>
+		i18n._(
+			msg({
+				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
+			}),
+		),
+	"serverError.channelMessage.notFound": () =>
+		i18n._(
+			msg({
+				message: "Message not found",
+			}),
+		),
+	"serverError.channelMessage.notAuthor": () =>
+		i18n._(
+			msg({
+				message: "You can only edit your own messages",
+			}),
+		),
+	"serverError.channelMessage.cannotDelete": () =>
+		i18n._(
+			msg({
+				message: "You can only delete your own messages",
+			}),
+		),
+	"serverError.channelMessage.empty": () =>
+		i18n._(
+			msg({
+				message: "Write a message first",
+			}),
+		),
+	"serverError.channelMessage.tooLong": () =>
+		i18n._(
+			msg({
+				message: "This message is too long",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
 			message:
-				"Cloud sandboxes are not enabled for {account}. Ask the Superset team for access.",
+				"Cloud workspaces are not enabled for {account}. They come with the Team and Ultra plans: upgrade in Settings, Billing.",
 			values: params,
 		}),
 	"serverError.cloudWorkspace.cloudNeedsPaidPlan": () =>
 		i18n._(
 			msg({
 				message:
-					"Cloud workspaces need a paid plan. Upgrade in Settings, Billing to start one.",
+					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 			}),
 		),
 	"serverError.cloudWorkspace.usageLimitReached": () =>
@@ -300,17 +413,37 @@ export const serverErrorMessages: Record<
 					"A repository is not connected to this organization, or the repositories come from different GitHub installations",
 			}),
 		),
-	"serverError.environment.hooksRepositoryNotIncluded": () =>
+	"serverError.environment.primaryRepositoryNotIncluded": () =>
 		i18n._(
 			msg({
 				message:
-					"The config repository must be one of the environment's repositories",
+					"The primary repository must be one of the environment's repositories",
+			}),
+		),
+	"serverError.environment.limitReached": (params) =>
+		i18n._(
+			msg({
+				message: `Your organization has reached its environment limit (${params?.limit}). Archive an environment, or upgrade in Settings, Billing to add more.`,
+			}),
+		),
+	"serverError.environment.notIncluded": () =>
+		i18n._(
+			msg({
+				message:
+					"Your plan does not include cloud environments. Upgrade in Settings, Billing to create one.",
 			}),
 		),
 	"serverError.githubUser.notConfigured": () =>
 		i18n._(
 			msg({
 				message: "Connecting GitHub is not configured on this server",
+			}),
+		),
+	"serverError.githubUser.notConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect GitHub in Settings to act on pull requests as yourself",
 			}),
 		),
 	"serverError.cloudWorkspace.githubRepositoryOutOfReach": () =>
@@ -477,6 +610,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.integration.pullRequestNotFound": () =>
+		i18n._(
+			msg({
+				message: "Pull request not found",
 			}),
 		),
 	"serverError.integration.onlyOwnersCanDeleteProjects": () =>
@@ -1023,7 +1162,7 @@ export const serverErrorMessages: Record<
 	"serverError.user.theRecoveryPeriodHasEndedContact": () =>
 		i18n._(
 			msg({
-				message: "The recovery period has ended. Contact support@superset.sh.",
+				message: "The recovery period has ended. Contact support@paradev.com.",
 			}),
 		),
 	"serverError.user.userNotFound": () =>

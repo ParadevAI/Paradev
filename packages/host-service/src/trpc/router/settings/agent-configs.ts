@@ -147,6 +147,16 @@ export function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 	return listOrdered(db);
 }
 
+export function ensurePresetRow(db: HostDb, presetId: string): void {
+	const existing = seedDefaultsIfEmpty(db);
+	if (existing.some((row) => row.presetId === presetId)) return;
+	const preset = getPresetById(presetId);
+	if (!preset) return;
+	const nextOrder =
+		Math.max(-1, ...existing.map((row) => row.displayOrder)) + 1;
+	db.insert(hostAgentConfigs).values(rowFromPreset(preset, nextOrder)).run();
+}
+
 /**
  * Defaults are seeded once, when the table is empty, so an install that
  * predates a preset gaining fork support would keep an empty `forkArgs`

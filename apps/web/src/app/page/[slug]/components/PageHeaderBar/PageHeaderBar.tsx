@@ -5,8 +5,8 @@ import {
 	PageHeader,
 	type PageHeaderPage,
 	type PageHeaderVersion,
-	PageViewers,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useTRPC } from "@/trpc/react";
@@ -54,7 +54,7 @@ export function PageHeaderBar({
 			previewVersion={previewVersion}
 			trailing={
 				<>
-					<PageViewers pageId={page.id} className="mr-1" />
+					<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
 					<OpenInSupersetButton slug={slug} />
 					<PageWatchBadge
 						slug={slug}

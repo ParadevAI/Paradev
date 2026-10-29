@@ -26,11 +26,13 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
 import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
 import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
+import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
 import { OrganizationPluginSync } from "renderer/routes/_authenticated/components/OrganizationPluginSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
+import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
 import { RealtimeNudges } from "renderer/routes/_authenticated/components/RealtimeNudges";
 import { StarNagObserver } from "renderer/routes/_authenticated/components/StarNagObserver";
 import {
@@ -69,6 +71,7 @@ import { CollectionsProvider } from "./providers/CollectionsProvider";
 import { HostWorkspacesProvider } from "./providers/HostWorkspacesProvider";
 import { LocalHostServiceProvider } from "./providers/LocalHostServiceProvider";
 import { SandboxAccessProvider } from "./providers/SandboxAccessProvider";
+import { TagFolderWorkspacesProvider } from "./providers/TagFolderWorkspacesProvider";
 
 export const Route = createFileRoute("/_authenticated")({
 	component: AuthenticatedLayout,
@@ -231,7 +234,7 @@ function AuthenticatedLayout() {
 								Still restoring your session
 							</h2>
 							<p className="text-sm text-muted-foreground">
-								Superset can't confirm your sign-in with the server.
+								Paradev can't confirm your sign-in with the server.
 							</p>
 						</div>
 						<div className="flex gap-2">
@@ -307,6 +310,7 @@ function AuthenticatedLayout() {
 		<DndProvider manager={dragDropManager}>
 			<CollectionsProvider>
 				<WindowTitle />
+				<PostHogPlanFlags />
 				<GlobalBrowserLifecycle />
 				<GlobalPaneLayoutRequests />
 				<FileAutoSave />
@@ -315,44 +319,52 @@ function AuthenticatedLayout() {
 					    include them as hosts. */}
 					<SandboxAccessProvider>
 						<HostWorkspacesProvider>
-							<WorkerPoolContextProvider
-								poolOptions={{ workerFactory: createPierreWorker, poolSize: 8 }}
-								highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
-							>
-								<DiffThemeSync />
-								<AgentHooks />
-								<FileMenuListener />
-								<V2NotificationController />
-								<DockBadgeController />
-								<StarNagObserver />
-								<LeaderboardAutoPublish />
-								<OrganizationPluginSync />
-								<RealtimeNudges />
-								<DaemonAutoUpdateFailureDialog />
-								<Outlet />
-								<V1ImportModal />
-								{isV2CloudEnabled ? (
-									<>
-										<V1MigrationContinuity />
-										<V2FlipWelcome organizationId={activeOrganizationId} />
-										<V1MigrationStatusCard
-											organizationId={activeOrganizationId}
-										/>
-										<V1TerminalsNotice organizationId={activeOrganizationId} />
-									</>
-								) : (
-									<V1FlipNotice />
-								)}
-								<V1AutoMigration />
-								<WorkspaceInitEffects />
-								{/* v2 creates from the /new-workspace route; only v1 has a modal. */}
-								{!isV2CloudEnabled && <NewWorkspaceModal />}
-								<InitGitDialog />
-								<GitInitConfirmDialog />
-								<TeardownLogsDialog />
-								<Paywall />
-								<InviteMemberDialog />
-							</WorkerPoolContextProvider>
+							<TagFolderWorkspacesProvider>
+								<WorkerPoolContextProvider
+									poolOptions={{
+										workerFactory: createPierreWorker,
+										poolSize: 8,
+									}}
+									highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
+								>
+									<DiffThemeSync />
+									<AgentHooks />
+									<FileMenuListener />
+									<V2NotificationController />
+									<DockBadgeController />
+									<StarNagObserver />
+									<LeaderboardAutoPublish />
+									<OrganizationPluginSync />
+									<RealtimeNudges />
+									<ChannelsRealtime />
+									<DaemonAutoUpdateFailureDialog />
+									<Outlet />
+									<V1ImportModal />
+									{isV2CloudEnabled ? (
+										<>
+											<V1MigrationContinuity />
+											<V2FlipWelcome organizationId={activeOrganizationId} />
+											<V1MigrationStatusCard
+												organizationId={activeOrganizationId}
+											/>
+											<V1TerminalsNotice
+												organizationId={activeOrganizationId}
+											/>
+										</>
+									) : (
+										<V1FlipNotice />
+									)}
+									<V1AutoMigration />
+									<WorkspaceInitEffects />
+									{/* v2 creates from the /new-workspace route; only v1 has a modal. */}
+									{!isV2CloudEnabled && <NewWorkspaceModal />}
+									<InitGitDialog />
+									<GitInitConfirmDialog />
+									<TeardownLogsDialog />
+									<Paywall />
+									<InviteMemberDialog />
+								</WorkerPoolContextProvider>
+							</TagFolderWorkspacesProvider>
 						</HostWorkspacesProvider>
 					</SandboxAccessProvider>
 				</LocalHostServiceProvider>

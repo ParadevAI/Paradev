@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Muse Code (2026): Agent Workspace vs Meta's Coding Agent"
-description: "Compare Superset and Meta's Muse Code. See how a workspace that runs any coding agent in parallel Git worktrees differs from Meta's terminal coding agent built for Muse Spark, and how to run Muse Code inside Superset."
+title: "Paradev vs Muse Code (2026): Agent Workspace vs Meta's Coding Agent"
+description: "Compare Paradev and Meta's Muse Code. See how a workspace that runs any coding agent in parallel Git worktrees differs from Meta's terminal coding agent built for Muse Spark, and how to run Muse Code inside Paradev."
 date: 2026-10-13
 lastUpdated: 2026-10-14
 type: "1v1"
@@ -16,13 +16,13 @@ keywords:
   - muse code worktrees
 ---
 
-Muse Code is Meta's coding agent for the terminal and CI, built for the Muse Spark models. Superset is a local-first desktop workspace that runs Muse Code, Claude Code, Codex, and any other CLI agent in parallel, each in its own Git worktree, with review, pull requests, a browser, and automations around them. The two are not really rivals: Muse Code is an agent, and Superset is where you run and review agents. Muse Code has been a built-in agent in Superset since September 2026.
+Muse Code is Meta's coding agent for the terminal and CI, built for the Muse Spark models. Paradev is a local-first desktop workspace that runs Muse Code, Claude Code, Codex, and any other CLI agent in parallel, each in its own Git worktree, with review, pull requests, a browser, and automations around them. The two are not really rivals: Muse Code is an agent, and Paradev is where you run and review agents. Muse Code has been a built-in agent in Paradev since September 2026.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Muse Code** |
+| | **Paradev** | **Muse Code** |
 |---|---|---|
 | **Category** | Agent workspace and orchestrator | AI coding agent (terminal and CI) |
 | **What it does** | Runs multiple coding agents in parallel with Git worktrees, diff review, PRs, chat, and browser | Reads, writes, and runs code with Meta's Muse models, with subagents and workflows |
@@ -30,13 +30,13 @@ Muse Code is Meta's coding agent for the terminal and CI, built for the Muse Spa
 | **Parallelism** | Many agents, from different vendors, on separate branches at once | Subagents and workflows inside one Muse Code session, up to 8 agents per tree by default |
 | **Isolation** | Git worktrees for local branch-based workspaces | Optional Muse-managed worktree per subagent, or the parent's checkout |
 | **Interface** | macOS desktop app (experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | Terminal UI, headless `muse exec`, TypeScript and Python SDKs |
-| **Pricing** | Free tier; Pro $20 per user per month | Muse subscriptions with usage limits per 5 hours, or API pay-per-token |
+| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Muse subscriptions with usage limits per 5 hours, or API pay-per-token |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Muse Code, Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Muse Code, Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Muse Code?
 
@@ -46,31 +46,31 @@ Meta describes Muse Code as "Meta's coding agent for the terminal and CI, built 
 
 ### Workspace vs Agent
 
-Muse Code is the agent that writes the code. Superset is the workspace around agents: it creates a worktree and branch per task, keeps terminal sessions alive, shows the diff, and takes the change through commit, push, and pull request. You can use Muse Code on its own in a terminal, or run it inside Superset to get that review loop.
+Muse Code is the agent that writes the code. Paradev is the workspace around agents: it creates a worktree and branch per task, keeps terminal sessions alive, shows the diff, and takes the change through commit, push, and pull request. You can use Muse Code on its own in a terminal, or run it inside Paradev to get that review loop.
 
 ### One Model Family vs Many
 
-Muse Code is built for Meta's Muse models. Superset runs agents from every vendor side by side, so you can give one task to Muse Code, the next to Claude Code, and a third to Codex, then compare the diffs. If you are trying Muse Spark against the agents you already use, Superset is the easiest place to do it on the same repository.
+Muse Code is built for Meta's Muse models. Paradev runs agents from every vendor side by side, so you can give one task to Muse Code, the next to Claude Code, and a third to Codex, then compare the diffs. If you are trying Muse Spark against the agents you already use, Paradev is the easiest place to do it on the same repository.
 
 ### Subagents vs Parallel Workspaces
 
-Both run work in parallel, at different levels. Muse Code splits one task across subagents and workflows inside a single session. Superset runs separate tasks, each in its own workspace, worktree, and terminal, and each with any agent. The two combine: a Muse Code session with its own subagents can be one of several workspaces in Superset.
+Both run work in parallel, at different levels. Muse Code splits one task across subagents and workflows inside a single session. Paradev runs separate tasks, each in its own workspace, worktree, and terminal, and each with any agent. The two combine: a Muse Code session with its own subagents can be one of several workspaces in Paradev.
 
 ### Terminal vs Review Surface
 
-Muse Code is a terminal and CI tool. Superset adds the parts a terminal does not have: a Changes pane, a Pull Requests view with CI checks, line comments sent back to the agent, an in-app browser for your dev server, and an iPhone and iPad app to check on sessions away from your desk.
+Muse Code is a terminal and CI tool. Paradev adds the parts a terminal does not have: a Changes pane, a Pull Requests view with CI checks, line comments sent back to the agent, an in-app browser for your dev server, and an iPhone and iPad app to check on sessions away from your desk.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20 per user per month, or $15 per user per month billed yearly. Superset does not charge for model usage; you bring your own agent subscriptions. Muse Code is sold as subscription tiers (Everyday, High, Power, and Maximum Usage) with prompt limits that reset every 5 hours and weekly, or through the API per token. As of October 2026, Muse Spark 1.3 costs $1.25 per million input tokens and $4.25 per million output tokens, and Muse Wonder 1.0 costs $4 and $20. Meta does not list subscription prices as text on its plans page.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces. Paradev does not charge for model usage; you bring your own agent subscriptions. Muse Code is sold as subscription tiers (Everyday, High, Power, and Maximum Usage) with prompt limits that reset every 5 hours and weekly, or through the API per token. As of October 2026, Muse Spark 1.3 costs $1.25 per million input tokens and $4.25 per million output tokens, and Muse Wonder 1.0 costs $4 and $20. Meta does not list subscription prices as text on its plans page.
 
 ---
 
 ## Which Should You Choose?
 
-You do not have to choose. Muse Code runs inside Superset.
+You do not have to choose. Muse Code runs inside Paradev.
 
 **Use Muse Code on its own if you:**
 
@@ -78,22 +78,22 @@ You do not have to choose. Muse Code runs inside Superset.
 - Are happy splitting work across Muse Code's own subagents
 - Only use Meta's models
 
-**Run Muse Code in Superset if you:**
+**Run Muse Code in Paradev if you:**
 
 - Want several tasks running at once, each in its own worktree
 - Use Muse Code next to Claude Code, Codex, or other agents
 - Want diffs, PRs, CI checks, and a browser in one place
 - Want sessions to keep running on a remote host, or to run on a schedule
 
-**Verdict:** Muse Code is a capable agent with strong subagent and workflow support. Superset is the workspace that runs it alongside every other agent you use, with the review loop built in.
+**Verdict:** Muse Code is a capable agent with strong subagent and workflow support. Paradev is the workspace that runs it alongside every other agent you use, with the review loop built in.
 
 ---
 
 ## Frequently Asked Questions
 
-### Can I run Muse Code in Superset?
+### Can I run Muse Code in Paradev?
 
-Yes. Muse Code is a built-in agent in Superset. Add it from **Settings → Agents → Add agent**. Superset resumes interrupted Muse Code sessions and shows its token history in the Usage tab.
+Yes. Muse Code is a built-in agent in Paradev. Add it from **Settings → Agents → Add agent**. Paradev resumes interrupted Muse Code sessions and shows its token history in the Usage tab.
 
 ### Is Muse Code free?
 
@@ -101,8 +101,8 @@ No. Muse Code needs a Muse subscription or API access. Subscriptions are usage t
 
 ### Does Muse Code run agents in parallel?
 
-Yes, inside one session. Muse Code runs up to 8 agents per tree by default, counting the root agent, and workflows that run teams of subagents in parallel or in stages. Superset runs separate tasks in parallel, each in its own workspace with any agent.
+Yes, inside one session. Muse Code runs up to 8 agents per tree by default, counting the root agent, and workflows that run teams of subagents in parallel or in stages. Paradev runs separate tasks in parallel, each in its own workspace with any agent.
 
 ### Which platforms does Muse Code support?
 
-Meta's site offers macOS and Windows installers, and its docs also describe Linux. Superset's desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available.
+Meta's site offers macOS and Windows installers, and its docs also describe Linux. Paradev's desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available.

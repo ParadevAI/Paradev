@@ -1,6 +1,7 @@
 import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
 import { BRAND } from "./brand";
+import { OWN_ROOT_DOMAINS } from "./own-domains";
 
 export { CANONICAL_URLS, IOS_APP } from "./app-identity";
 
@@ -26,26 +27,48 @@ const MARKETING_URL =
 	process.env.NEXT_PUBLIC_MARKETING_URL || `https://${ROOT_DOMAIN}`;
 const APP_STORE_ID = "6788926383";
 
+export const SOCIAL = {
+	GITHUB: {
+		handle: "github.com/paradevai/paradev",
+		url: "https://github.com/paradevai/paradev",
+	},
+	X: { handle: "@paradevai", url: "https://x.com/paradevai" },
+	X_FORMER: { handle: "@superset_sh", url: "https://x.com/superset_sh" },
+	LINKEDIN: {
+		handle: "linkedin.com/company/paradevai",
+		url: "https://www.linkedin.com/company/paradevai",
+	},
+	YOUTUBE: { handle: "@paradevai", url: "https://www.youtube.com/@paradevai" },
+	DISCORD: {
+		handle: "discord.gg/cZeD9WYcV7",
+		url: "https://discord.gg/cZeD9WYcV7",
+	},
+} as const;
+
 export const COMPANY = {
 	NAME: BRAND.NAME,
 	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
-	GITHUB_URL: "https://github.com/superset-sh/superset",
+	GITHUB_URL: SOCIAL.GITHUB.url,
 	DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL || `https://docs.${ROOT_DOMAIN}`,
 	MARKETING_URL,
 	TERMS_URL: `${MARKETING_URL}/terms`,
 	PRIVACY_URL: `${MARKETING_URL}/privacy`,
 	CHANGELOG_URL: `${MARKETING_URL}/changelog`,
-	X_URL: "https://x.com/superset_sh",
-	LINKEDIN_URL: "https://www.linkedin.com/company/superset-sh",
-	YOUTUBE_URL: "https://www.youtube.com/@superset-sh",
+	X_URL: SOCIAL.X.url,
+	LINKEDIN_URL: SOCIAL.LINKEDIN.url,
+	YOUTUBE_URL: SOCIAL.YOUTUBE.url,
 	SUPPORT_EMAIL,
 	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
-	REPORT_ISSUE_URL: "https://github.com/superset-sh/superset/issues/new",
-	DISCORD_URL: "https://discord.gg/cZeD9WYcV7",
+	SALES_EMAIL: `sales@${ROOT_DOMAIN}`,
+	/** The founders' inbox, used as the press contact. Fixed rather than built from ROOT_DOMAIN. */
+	FOUNDERS_EMAIL: "founders@paradev.com",
+	FOUNDERS_MAIL_TO: "mailto:founders@paradev.com",
+	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
+	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,
 	APP_STORE_URL: `https://apps.apple.com/app/id${APP_STORE_ID}`,
 	STATUS_URL: `https://status.${ROOT_DOMAIN}`,
@@ -57,7 +80,10 @@ export const COMPANY = {
 
 // Staff keep their @superset.sh accounts after the root domain changes.
 export const STAFF_EMAIL_DOMAINS = [
-	...new Set([COMPANY.EMAIL_DOMAIN, "@superset.sh"]),
+	...new Set([
+		COMPANY.EMAIL_DOMAIN,
+		...OWN_ROOT_DOMAINS.map((domain) => `@${domain}`),
+	]),
 ];
 
 export function isStaffEmail(email: string): boolean {
@@ -128,12 +154,16 @@ export const FEATURE_FLAGS = {
 	 * hash the site's single distinct id to one side.
 	 */
 	MOBILE_LAUNCH: "mobile-launch",
-	/** Gates access to Cloud features (environment variables, sandboxes). */
-	CLOUD_ACCESS: "cloud-access",
+	/**
+	 * Shows the `.superset/config.toml` editor in project settings in place of
+	 * the config.json form. host-service reads a config.toml wherever one
+	 * exists; this gates only where people are led to write one.
+	 */
+	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
+	/** In-app channels in the desktop sidebar. */
+	CHANNELS: "channels",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
-	/** When enabled, blocks remote agent execution on the desktop (e.g., for enterprise orgs). */
-	DISABLE_REMOTE_AGENT: "disable-remote-agent",
 	/**
 	 * Paces the v1→v2 auto-migration rollout (percentage ramp + high-profile
 	 * org exclusions). Gates only NEW migrations on the v1 surface — post-flip
@@ -150,8 +180,6 @@ export const FEATURE_FLAGS = {
 	 * it to reach users who cross the threshold later.
 	 */
 	HIRING_BANNER: "hiring-banner",
-	/** Shows the "Star Superset on GitHub" sidebar card once a user crosses the workspace-count threshold. Lets us kill the nag instantly without a release if it reads as annoying. */
-	STAR_NAG_CARD: "star-nag-card",
 	/**
 	 * Which trigger providers the Add Trigger menu offers. Payload is a JSON
 	 * array of provider kinds, e.g. `["github", "slack"]`; Scheduled is always
@@ -167,55 +195,15 @@ export const FEATURE_FLAGS = {
 	 */
 	AUTOMATION_EVENT_TRIGGERS: "automation-event-triggers",
 	/**
-	 * Three-arm experiment flag nested inside the shipped new-workspace screen,
-	 * testing form factor only: `control` keeps the inline sample-prompt rows,
-	 * `cards2` shows two cards above the composer, `cards4` shows four in a 2x2
-	 * grid. Every arm slices a nested prefix of one fixed prompt pool and shares
-	 * the same selection rule, so content is identical and only layout and count
-	 * vary. Evaluated when the screen opens, so exposure matches the population
-	 * that sees it.
-	 *
-	 * Anything other than `cards2`/`cards4` renders control — which is why the
-	 * flag must not go live before a build carrying those arms ships, or older
-	 * builds would be assigned a card arm and shown rows.
-	 *
-	 * Eligibility (new accounts only) is a release condition on the flag, not
-	 * code: a `created_at` person property cutoff, which the renderer sends with
-	 * flag requests at identify time. Existing accounts get `false` back and
-	 * render the rows exactly as they do today, with no exposure recorded.
-	 */
-	NEW_WORKSPACE_PROMPT_CARDS: "new-workspace-prompt-cards",
-	/**
-	 * Boolean override that forces the `cards2` arm without evaluating the
-	 * experiment flag — no exposure event, so team and dev accounts can look at
-	 * the cards without entering the analysis. Checked before the experiment
-	 * flag.
-	 */
-	NEW_WORKSPACE_PROMPT_CARDS_OVERRIDE: "new-workspace-prompt-cards-override",
-	/**
-	 * Shows the rebuilt chat pane (ChatV3Pane). UI-only: host-service always
-	 * serves its `/chat-v3/*` routes, so this flag decides who sees the pane,
-	 * not what the host can do — flips take effect live, with no host restart.
-	 */
-	CHAT_V3: "chat-v3",
-	/**
 	 * Replaces the v2 workspace's right sidebar with a second pane area that
 	 * holds Files, Changes, Review, Browser and Chat panes.
 	 */
-	RIGHT_PANE_AREA: "right-pane-area",
 	/**
 	 * Who may use cloud sandboxes: shows the option in the create picker, and
 	 * gates the cloud procedures server-side (`assertCloudAccess`). The release
 	 * conditions are the allowlist, so access changes without a deploy.
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
-	/**
-	 * Renders cloud workspaces as rows of their GitHub repo's project in the
-	 * desktop sidebar instead of in a separate Cloud section. UI-only and
-	 * renderer-local: off, unloaded, or offline all keep the Cloud section, so
-	 * flips take effect live and nothing on a host changes.
-	 */
-	SIDEBAR_INLINE_CLOUD_WORKSPACES: "sidebar-inline-cloud-workspaces",
 	/**
 	 * Lets the Slack agent answer replies in a thread it has already replied
 	 * in without an @-mention. Evaluated per Slack team; off, unloaded or
@@ -244,6 +232,14 @@ export const FEATURE_FLAGS = {
 	 * release condition on the flag, so widening never needs a release.
 	 */
 	ACP_CHAT: "acp-chat",
+	/**
+	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
+	 * headers: a native fork of the session, opened in the other surface beside
+	 * it. Off, unloaded or offline hide them. Audience is a release condition on
+	 * the flag, in both the Production and Local Development projects.
+	 */
+	AGENT_SURFACE_FORK: "agent-surface-fork",
+	MOBILE_PANE: "mobile-pane",
 	/**
 	 * Shows the `pdev` agent: in the agent catalog, agent pickers
 	 * and, with ACP_CHAT, as a chat harness (`pdev acp`). Off, unloaded or

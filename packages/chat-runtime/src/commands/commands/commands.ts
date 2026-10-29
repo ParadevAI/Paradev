@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { realpath } from "node:fs/promises";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -27,6 +29,7 @@ import type {
 	SetModeInput,
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
+	Turn,
 } from "@superset/chat/protocol";
 import {
 	backgroundSubagentInputSchema,
@@ -60,6 +63,7 @@ import type {
 	LiveSessionRegistry,
 	PromptResult,
 	QueueState,
+	UnfinishedSession,
 } from "../../sessions";
 import { SubagentItems } from "../../stream";
 
@@ -72,6 +76,7 @@ export const createSessionCommandSchema = createSessionInputSchema
 			.object({
 				harnessSessionId: z.string().min(1),
 				quiet: z.boolean().optional(),
+				replacesSessionId: z.string().min(1).optional(),
 			})
 			.optional(),
 	});
@@ -136,6 +141,22 @@ function transcriptBefore(
 	return null;
 }
 
+/** Rows whose title contains `query`, case-insensitively; all rows without one. */
+export function sessionsTitled<Row extends { title: string | null }>(
+	rows: readonly Row[],
+	query: string | undefined,
+): readonly Row[] {
+	const needle = query?.trim().toLowerCase();
+	return needle
+		? rows.filter((row) => row.title?.toLowerCase().includes(needle))
+		: rows;
+}
+
+function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
+	const last = deriveTimeline(snapshot).at(-1)?.turn;
+	return last?.status === "failed" ? last : null;
+}
+
 export const listSessionsCommandSchema = listSessionsInputSchema
 	.omit({ workspaceId: true })
 	.extend({ scopeId: z.string().min(1).optional() });
@@ -171,6 +192,19 @@ export type GetSessionResult = {
 	lastError?: string;
 };
 
+export type ResumeSessionInput = Omit<
+	UnfinishedSession,
+	"sessionId" | "interrupted"
+> & { cwd: string };
+
+type ResumedChat = {
+	terminalId: string;
+	sessionId: string;
+	harness: string;
+	harnessSessionId: string;
+	pending: Pick<ResumeSessionInput, "prompts" | "pausedPrompts"> | null;
+};
+
 export type GetQueueResult = QueueState & { live: boolean };
 
 export type ChatSessionListEntry = ChatSessionRow & {
@@ -180,6 +214,7 @@ export type ChatSessionListEntry = ChatSessionRow & {
 
 export type ChatCommands = {
 	createSession(input: CreateSessionCommandInput): CreateSessionResult;
+	resumeSession(input: ResumeSessionInput): CreateSessionResult;
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
@@ -190,7 +225,7 @@ export type ChatCommands = {
 	backgroundSubagent(input: BackgroundSubagentInput): Promise<boolean>;
 	respondToApproval(input: RespondToApprovalInput): void;
 	setMode(input: SetModeInput): void;
-	setConfigOption(input: SetConfigOptionInput): void;
+	setConfigOption(input: SetConfigOptionInput): void | Promise<void>;
 	closeSession(input: CloseSessionInput): Promise<void>;
 	closeScope(scopeId: string): Promise<void>;
 	forkSession(
@@ -280,6 +315,42 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		return { ok: true, snapshot };
 	};
 
+	const resumedByTerminal = new Map<string, ResumedChat>();
+	const resumedFor = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): ResumedChat | null => {
+		if (!input.terminalId || !input.resume) return null;
+		const resumed = resumedByTerminal.get(input.terminalId);
+		if (
+			!resumed ||
+			resumed.harness !== input.harness ||
+			resumed.harnessSessionId !== input.resume.harnessSessionId
+		) {
+			return null;
+		}
+		return resumed;
+	};
+	const handOff = (resumed: ResumedChat): CreateSessionResult | null => {
+		const row = options.sessions.get(resumed.sessionId);
+		const live = options.live.get(resumed.sessionId);
+		if (!row || !live || live.state.status === "dead") return null;
+		if (!resumed.pending) resumedByTerminal.delete(resumed.terminalId);
+		return { sessionId: resumed.sessionId, epoch: row.epoch };
+	};
+	const sendPending = (resumed: ResumedChat, sessionId: string): void => {
+		const pending = resumed.pending;
+		if (!pending) {
+			resumedByTerminal.delete(resumed.terminalId);
+			return;
+		}
+		resumed.sessionId = sessionId;
+		options.live
+			.require(sessionId)
+			.promptOnceStarted(pending.prompts, pending.pausedPrompts, () => {
+				resumed.pending = null;
+			});
+	};
+
 	const lastErrorNotice = (sessionId: string): string | null => {
 		const replay = replaySession(sessionId);
 		if (!replay.ok) return null;
@@ -302,23 +373,34 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		const rows = parsed.scopeId
 			? options.sessions.listByScope(parsed.scopeId)
 			: options.sessions.list();
-		return rows.slice(0, parsed.limit).map((row) => {
-			const live = options.live.get(row.sessionId);
-			return {
-				...row,
-				live: live !== null,
-				terminalId: live?.terminalId ?? null,
-			};
-		});
+		return sessionsTitled(rows, parsed.query)
+			.slice(0, parsed.limit)
+			.map((row) => {
+				const live = options.live.get(row.sessionId);
+				return {
+					...row,
+					live: live !== null,
+					terminalId: live?.terminalId ?? null,
+				};
+			});
 	};
 
 	return {
 		createSession(input) {
 			const parsed = createSessionCommandSchema.parse(input);
 			return options.dedupe.run(`createSession:${parsed.commandId}`, () => {
+				const resumed = resumedFor(parsed);
+				const handedOff = resumed && handOff(resumed);
+				if (handedOff) return handedOff;
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
+				const replaced = parsed.resume?.replacesSessionId;
+				const replay =
+					replaced && options.sessions.get(replaced)?.scopeId === parsed.scopeId
+						? replaySession(replaced)
+						: null;
+				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -340,8 +422,43 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					options.journal.discard(sessionId);
 					throw error;
 				}
+				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
+				if (resumed) sendPending(resumed, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
+		},
+
+		resumeSession(input) {
+			const created = this.createSession({
+				commandId: randomUUID(),
+				scopeId: input.scopeId,
+				cwd: input.cwd,
+				harness: input.harness,
+				modeId: input.modeId,
+				modelId: input.modelId,
+				terminalId: input.terminalId,
+				resume: { harnessSessionId: input.harnessSessionId },
+			});
+			const pending = {
+				prompts: input.prompts,
+				pausedPrompts: input.pausedPrompts,
+			};
+			if (!input.terminalId) {
+				options.live
+					.require(created.sessionId)
+					.promptOnceStarted(pending.prompts, pending.pausedPrompts);
+				return created;
+			}
+			const resumed: ResumedChat = {
+				terminalId: input.terminalId,
+				sessionId: created.sessionId,
+				harness: input.harness,
+				harnessSessionId: input.harnessSessionId,
+				pending,
+			};
+			resumedByTerminal.set(input.terminalId, resumed);
+			sendPending(resumed, created.sessionId);
+			return created;
 		},
 
 		prompt(input) {
@@ -436,10 +553,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		setConfigOption(input) {
 			const parsed: SetConfigOptionInput =
 				setConfigOptionInputSchema.parse(input);
-			options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
-				options.live
+			return options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
+				const taken = options.live
 					.require(parsed.sessionId)
 					.setConfigOption(parsed.configId, parsed.value);
+				if (!parsed.confirm) return;
+				return taken.then((accepted) => {
+					if (accepted === false) {
+						throw new Error("the agent did not take that setting");
+					}
+				});
 			});
 		},
 
@@ -592,14 +715,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		discoverSessions(input) {
+		async discoverSessions(input) {
 			const parsed = discoverSessionsCommandSchema.parse(input);
-			return options.live.discoverSessions({
-				harness: parsed.harness,
-				scopeId: parsed.scopeId,
-				cwd: parsed.cwd,
-				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
-			});
+			const [page, cwds] = await Promise.all([
+				options.live.discoverSessions({
+					harness: parsed.harness,
+					scopeId: parsed.scopeId,
+					cwd: parsed.cwd,
+					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+				}),
+				equivalentPaths(parsed.cwd),
+			]);
+			return {
+				...page,
+				sessions: page.sessions.filter((session) =>
+					cwds.has(pathKey(session.cwd)),
+				),
+			};
 		},
 
 		getItems(input) {
@@ -653,4 +785,19 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			};
 		},
 	};
+}
+
+async function equivalentPaths(path: string): Promise<Set<string>> {
+	const paths = new Set([pathKey(path)]);
+	const real = await realpath(path).catch(() => null);
+	if (real) paths.add(pathKey(real));
+	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
+import { PresenceStack } from "@superset/ui/presence";
 import { useNavigate } from "@tanstack/react-router";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useNow } from "renderer/hooks/useNow";
 import { authClient } from "renderer/lib/auth-client";
 import { CloudWorkspaceShareButton } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspaceShareButton";
-import { PresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PresenceStack";
 import { useCloudWorkspacePresence } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspacePresence";
 import { useSetCloudWorkspaceVisibility } from "renderer/routes/_authenticated/_dashboard/hooks/useSetCloudWorkspaceVisibility";
 

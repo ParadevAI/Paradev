@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import * as Updates from "expo-updates";
 import { useEffect, useRef } from "react";
 import { Alert, AppState } from "react-native";
@@ -17,6 +18,7 @@ async function downloadIfAvailable() {
  */
 export function useOtaUpdates() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const { isUpdatePending, downloadedUpdate } = Updates.useUpdates();
 	const lastCheckedAt = useRef(Date.now());
 	const promptedFor = useRef<string | null>(null);
@@ -47,7 +49,7 @@ export function useOtaUpdates() {
 		promptedFor.current = key;
 		Alert.alert(
 			t({ message: "Update ready" }),
-			t({ message: "Restart to use the latest version of Superset." }),
+			t({ message: `Restart to use the latest version of ${appName}.` }),
 			[
 				{ text: t({ message: "Later" }), style: "cancel" },
 				{

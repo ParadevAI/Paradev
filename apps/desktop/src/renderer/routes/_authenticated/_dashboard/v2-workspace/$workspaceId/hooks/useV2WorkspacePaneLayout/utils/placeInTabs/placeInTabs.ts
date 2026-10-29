@@ -2,7 +2,7 @@ import type { OpenPaneArgs, WorkspaceStore } from "@superset/panes";
 
 export function placeInTabs<TData>(
 	store: WorkspaceStore<TData>,
-	{ pane }: OpenPaneArgs<TData>,
+	{ pane, focus, reuse }: OpenPaneArgs<TData>,
 ): void {
 	const tabs = [
 		...store.tabs.filter((tab) => tab.id === store.activeTabId),
@@ -17,5 +17,5 @@ export function placeInTabs<TData>(
 		store.setActiveTab(tab.id);
 		return;
 	}
-	store.addTab({ panes: [pane] });
+	store.addTab({ panes: [pane], focus, reuse });
 }

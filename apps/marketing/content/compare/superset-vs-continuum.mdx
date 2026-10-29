@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Continuum (2026): Agent Workbench, Mobile, and Pricing"
-description: "Compare Superset and Continuum for running coding agents in parallel: platforms, mobile apps, review, remote hosts, hosted inference, and pricing."
+title: "Paradev vs Continuum (2026): Agent Workbench, Mobile, and Pricing"
+description: "Compare Paradev and Continuum for running coding agents in parallel: platforms, mobile apps, review, remote hosts, hosted inference, and pricing."
 date: 2026-10-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -16,11 +16,11 @@ keywords:
   - worktree agent workspace
 ---
 
-Superset and Continuum both run coding agents such as Claude Code and Codex in isolated Git worktrees, with diff and PR review. Continuum is a free app that runs on Mac, Windows and Linux (beta), the web, and iPhone, with usage gauges, multi-account switching, and optional paid hosted inference. Superset is a desktop workspace for any CLI agent, with a PR pane, a browser pane with Design Mode, usage meters with multi-account switching, scheduled automations, and shared hosts with per-member access on Pro. Choose Continuum for the widest set of devices, hosted inference, and team spend caps. Choose Superset for a review and team workflow built around pull requests.
+Paradev and Continuum both run coding agents such as Claude Code and Codex in isolated Git worktrees, with diff and PR review. Continuum is a free app that runs on Mac, Windows and Linux (beta), the web, and iPhone, with usage gauges, multi-account switching, and optional paid hosted inference. Paradev is a desktop workspace for any CLI agent, with a PR pane, a browser pane with Design Mode, usage meters with multi-account switching, scheduled automations, and shared hosts with per-member access on Pro. Choose Continuum for the widest set of devices, hosted inference, and team spend caps. Choose Paradev for a review and team workflow built around pull requests.
 
 ## At a Glance
 
-| Requirement | Superset | Continuum |
+| Requirement | Paradev | Continuum |
 |---|---|---|
 | Parallel work | One workspace per task, each with its own Git worktree and branch | Sessions in isolated Git worktrees |
 | Agents | Any CLI agent | Claude Code, Codex, Cursor, Gemini, Grok, OpenCode, and models through OpenRouter |
@@ -33,7 +33,7 @@ Superset and Continuum both run coding agents such as Claude Code and Codex in i
 | Remote hosts | Hosts connected through a relay, with access granted per member (Pro); cloud workspaces | Enrolled devices, a VPS, or Continuum-provisioned cloud runners |
 | Usage tracking | Quota meters for Claude Code, Codex, Grok, Antigravity, and OpenCode logins; more than one Claude Code or Codex account, with a default you pick; estimated token cost by agent, model, and workspace over 7, 30, or 90 days | Rate-limit gauges and spend by repo, provider, model, and day |
 | Model calls | Never proxied | Your own subscriptions and keys, or optional Continuum-hosted inference |
-| Pricing | Free; Pro $20 per user/month or $15 billed yearly; Enterprise custom | Free app; hosted inference plans from $25/month; teams from $25 per member/month |
+| Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free app; hosted inference plans from $25/month; teams from $25 per member/month |
 | License | Source-available, Elastic License 2.0 | No public source repository found; see their site |
 
 ## What Is Continuum?
@@ -44,25 +44,25 @@ Continuum also publishes guides such as [What is Conductor](https://continuumcod
 
 ## Which one runs on more devices?
 
-Continuum does. Its [download page](https://continuumcode.ai/download/) lists the Mac app and iPhone app as stable, the web app as stable, and Windows, Linux, and the CLI as beta. Superset runs on macOS, with an experimental Linux AppImage, and has no Windows build. Superset's [iPhone and iPad app](/mobile) is on the App Store for Pro users on iOS 26 or iPadOS 26 or later. It shows agent progress in a Lock Screen Live Activity. Push notifications are coming, and Android is on the waitlist.
+Continuum does. Its [download page](https://continuumcode.ai/download/) lists the Mac app and iPhone app as stable, the web app as stable, and Windows, Linux, and the CLI as beta. Paradev runs on macOS, with an experimental Linux AppImage, and has no Windows build. Paradev's [iPhone and iPad app](/mobile) is on the App Store for Pro users on iOS 26 or iPadOS 26 or later. It shows agent progress in a Lock Screen Live Activity. Push notifications are coming, and Android is on the waitlist.
 
 ## Which one is better for reviewing agent work?
 
-Both handle diffs and pull requests. Continuum puts plan approval first: a session can stay read-only until you approve its plan. Superset is a full desktop GUI built around the pull request. The Changes pane commits, pushes, and opens a PR. The PR pane shows checks and review threads next to the diff, and you can merge from it. A file editor and a browser pane with Design Mode sit in the same window, so you can test a UI change and send an element back to the agent.
+Both handle diffs and pull requests. Continuum puts plan approval first: a session can stay read-only until you approve its plan. Paradev is a full desktop GUI built around the pull request. The Changes pane commits, pushes, and opens a PR. The PR pane shows checks and review threads next to the diff, and you can merge from it. A file editor and a browser pane with Design Mode sit in the same window, so you can test a UI change and send an element back to the agent.
 
 ## How do they handle models and cost?
 
 Both show usage and let you switch accounts. Continuum shows rate-limit gauges per account, lets you stack two or three Claude or Codex subscriptions and switch between them, and tracks spend by repo, provider, model, and day. It also sells optional hosted inference: Plus at $25 per month, Max at $100 or $200, and Ultra at $500, each with a weekly usage budget. Its pricing page says new Plus sign-ups are paused.
 
-Superset does not sell inference and never proxies model calls. Your agent talks to your provider directly, under your own account. Its [Usage](https://docs.superset.sh/usage) page shows quota meters for Claude Code, Codex, Grok, Antigravity, and OpenCode logins. You can add more than one Claude Code or Codex account and pick the default. When you switch, Superset offers to restart running agents on the new login, and the conversation resumes. Token cost history covers 13 agents, estimated at API list rates, by agent, model, and workspace. Superset does not switch accounts for you when a quota runs out, and it has no spend caps.
+Paradev does not sell inference and never proxies model calls. Your agent talks to your provider directly, under your own account. Its [Usage](https://docs.paradev.com/usage) page shows quota meters for Claude Code, Codex, Grok, Antigravity, and OpenCode logins. You can add more than one Claude Code or Codex account and pick the default. When you switch, Paradev offers to restart running agents on the new login, and the conversation resumes. Token cost history covers 13 agents, estimated at API list rates, by agent, model, and workspace. Paradev does not switch accounts for you when a quota runs out, and it has no spend caps.
 
 ## What do teams get?
 
-Superset Pro adds shared hosts with access granted per member, automations with run history and retry, and GitHub, Linear, and Slack integrations. Superset is SOC 2 Type II. Continuum's organization plans start at $25 per member per month and add model policy by team and person, weekly caps, approvals, and one bill. Its Enterprise plan lists on-prem deployment.
+Paradev Pro adds shared hosts with access granted per member, automations with run history and retry, and GitHub, Linear, and Slack integrations. Paradev is SOC 2 Type II. Continuum's organization plans start at $25 per member per month and add model policy by team and person, weekly caps, approvals, and one bill. Its Enterprise plan lists on-prem deployment.
 
 ## Pricing
 
-Continuum's app is free on every client when you bring your own keys. Hosted inference plans start at $25 per month. Superset has a Free plan for one user. Pro costs $20 per user per month, or $15 billed yearly, and Enterprise pricing is custom. See [pricing](/pricing). With Superset you pay your model provider directly.
+Continuum's app is free on every client when you bring your own keys. Hosted inference plans start at $25 per month. Paradev has a Free plan for one user. Pro costs {{price:pro}} per user per month, or {{price:pro:yearly}} billed yearly. Team adds cloud workspaces at {{price:team}}, or {{price:team:yearly}} billed yearly, and Ultra costs {{price:ultra}}. Enterprise pricing is custom. See [pricing](/pricing). With Paradev you pay your model provider directly.
 
 ## Choose Continuum if
 
@@ -71,7 +71,7 @@ Continuum's app is free on every client when you bring your own keys. Hosted inf
 - You want to compare models by sending one message to several at once.
 - You may want hosted inference instead of your own keys.
 
-## Choose Superset if
+## Choose Paradev if
 
 - You review agent work as GitHub pull requests and want checks, threads, and merge in one app.
 - You want any CLI agent, including ones without a built-in integration.
@@ -81,7 +81,7 @@ Continuum's app is free on every client when you bring your own keys. Hosted inf
 
 ## Verdict
 
-Continuum covers more devices, adds hosted inference and team spend caps, and its app is free. Both track usage and switch between accounts. Superset is the better fit for Mac teams that review through pull requests and want automations and shared hosts in one desktop app. Run the same task with the same agent in each, then compare the review step. The [parallel-task guide](/blog/parallel-coding-agents-guide) has prompts you can use.
+Continuum covers more devices, adds hosted inference and team spend caps, and its app is free. Both track usage and switch between accounts. Paradev is the better fit for Mac teams that review through pull requests and want automations and shared hosts in one desktop app. Run the same task with the same agent in each, then compare the review step. The [parallel-task guide](/blog/parallel-coding-agents-guide) has prompts you can use.
 
 ## Frequently Asked Questions
 
@@ -89,17 +89,17 @@ Continuum covers more devices, adds hosted inference and team spend caps, and it
 
 Yes. Continuum's app is free when you use your own subscriptions or API keys. Paid plans add Continuum-hosted inference and team controls.
 
-### Does Superset run on Windows?
+### Does Paradev run on Windows?
 
-No. Superset runs on macOS, with an experimental Linux AppImage. Continuum has Windows and Linux apps in beta.
+No. Paradev runs on macOS, with an experimental Linux AppImage. Continuum has Windows and Linux apps in beta.
 
 ### Do both have an iPhone and iPad app?
 
-Yes. Both are on the App Store and run on iPhone and iPad. Superset's app needs iOS 26 or iPadOS 26 or later and Pro. Continuum lists its iPhone app as free with your own keys.
+Yes. Both are on the App Store and run on iPhone and iPad. Paradev's app needs iOS 26 or iPadOS 26 or later and Pro. Continuum lists its iPhone app as free with your own keys.
 
-### Does Superset proxy my model calls?
+### Does Paradev proxy my model calls?
 
-No. Superset never proxies model calls. Continuum runs your own subscriptions through each provider's CLI, and also offers optional hosted inference.
+No. Paradev never proxies model calls. Continuum runs your own subscriptions through each provider's CLI, and also offers optional hosted inference.
 
 ### Do worktrees sandbox the agent?
 

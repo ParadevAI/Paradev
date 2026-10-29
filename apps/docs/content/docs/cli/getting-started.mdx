@@ -1,25 +1,27 @@
 ---
 title: Getting Started
-description: Install the Superset CLI, sign in, and run your first commands.
+description: Install the Paradev CLI, sign in, and run your first commands.
 ---
 
 <Callout type="warn">
 The CLI is currently in Beta. Commands and flags are still evolving. Make sure you're on the latest version of the CLI if you run into issues.
 </Callout>
 
-The Superset CLI (`superset`) is a single static binary that drives the same
+The Paradev CLI (`superset`) is a single static binary that drives the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
 and the local host server from your terminal or from CI.
+`paradev` is an alias for `superset`: every install below puts both on `PATH`,
+and either name runs the same binary.
 
-<YouTubeVideo id="8g-l5kYEGBc" title="Superset CLI + Skills Demo" thumbnail="/images/cli-skills-demo.jpg" />
+<YouTubeVideo id="8g-l5kYEGBc" title="Paradev CLI + Skills Demo" thumbnail="/images/cli-skills-demo.jpg" />
 
 ## Install
 
 ### Desktop app
 
-The desktop app includes the Superset CLI. When the app launches, it writes
-an app-managed shim at `~/.superset/bin/superset`, and Superset terminals
-prepend `~/.superset/bin` to `PATH` automatically.
+The desktop app includes the Paradev CLI. When the app launches, it writes
+app-managed shims at `~/.superset/bin/superset` and `~/.superset/bin/paradev`,
+and Paradev terminals prepend `~/.superset/bin` to `PATH` automatically.
 
 To use the bundled CLI from a normal shell, add the directory to your shell
 profile:
@@ -31,17 +33,17 @@ export PATH="$HOME/.superset/bin:$PATH"
 ### Standalone install
 
 ```bash
-curl -fsSL https://superset.sh/cli/install.sh | sh
+curl -fsSL https://paradev.com/cli/install.sh | sh
 ```
 
 The script auto-detects your platform (macOS on Apple Silicon or Intel, Linux on
-x64 or arm64), installs Superset under `~/superset` by default, and adds
+x64 or arm64), installs Paradev under `~/superset` by default, and adds
 `~/superset/bin` to your shell `PATH`.
 
 ### Homebrew
 
 ```bash
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 ## Sign in

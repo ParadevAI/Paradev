@@ -17,7 +17,7 @@ function persistDraft(draftKey: string, text: string): boolean {
 	}
 }
 
-function readDraft(draftKey: string): string | undefined {
+export function readDraft(draftKey: string): string | undefined {
 	const unsaved = unsavedDrafts.get(draftKey);
 	if (unsaved !== undefined) return unsaved;
 	try {

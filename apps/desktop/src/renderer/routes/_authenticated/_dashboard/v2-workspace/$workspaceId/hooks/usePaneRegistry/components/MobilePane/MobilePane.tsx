@@ -8,14 +8,18 @@ import { PaneMessage } from "./components/PaneMessage";
 /** Mobile simulator backed by whichever this host can produce: a hosted
  * simulator on a cloud sandbox, or a local iOS/Android simulator on a real
  * machine. */
-export function MobilePane() {
+interface MobilePaneProps {
+	workspaceId: string;
+}
+
+export function MobilePane({ workspaceId }: MobilePaneProps) {
 	const statusQuery = workspaceTrpc.mobile.status.useQuery();
 	const backend = statusQuery.data?.backend;
 
 	if (backend === "eas") {
 		return (
 			<div className="size-full bg-background">
-				<CloudSimulator />
+				<CloudSimulator workspaceId={workspaceId} />
 			</div>
 		);
 	}
@@ -23,7 +27,7 @@ export function MobilePane() {
 	if (backend === "local-ios" || backend === "local-android") {
 		return (
 			<div className="size-full bg-background">
-				<LocalDevices />
+				<LocalDevices workspaceId={workspaceId} />
 			</div>
 		);
 	}

@@ -1,0 +1,1 @@
+export { HeaderTabs } from "./HeaderTabs";

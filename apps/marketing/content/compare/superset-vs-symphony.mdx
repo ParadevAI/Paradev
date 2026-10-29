@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Symphony (2026): Agent Workspace vs OpenAI's Tracker-Driven Orchestration"
-description: "Compare Superset and OpenAI's Symphony: an interactive workspace for parallel coding agents vs an open-source spec that turns tickets into autonomous Codex runs."
+title: "Paradev vs Symphony (2026): Agent Workspace vs OpenAI's Tracker-Driven Orchestration"
+description: "Compare Paradev and OpenAI's Symphony: an interactive workspace for parallel coding agents vs an open-source spec that turns tickets into autonomous Codex runs."
 date: 2026-08-07
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -15,13 +15,13 @@ keywords:
   - issue tracker agents
 ---
 
-Superset and Symphony both scale coding agents past one-at-a-time, from opposite directions. Superset is an interactive workspace: agents in parallel worktrees with terminals, diffs, and a browser, plus automations for the scheduled slice. Symphony is OpenAI's open-source answer to "stop supervising agents entirely": a headless daemon that continuously reads tickets from your issue tracker, creates an isolated workspace per issue, and runs a Codex session in each until the ticket is done -- "manage work instead of supervising coding agents." It ships as a spec first, with an Elixir reference implementation OpenAI labels an engineering preview.
+Paradev and Symphony both scale coding agents past one-at-a-time, from opposite directions. Paradev is an interactive workspace: agents in parallel worktrees with terminals, diffs, and a browser, plus automations for the scheduled slice. Symphony is OpenAI's open-source answer to "stop supervising agents entirely": a headless daemon that continuously reads tickets from your issue tracker, creates an isolated workspace per issue, and runs a Codex session in each until the ticket is done -- "manage work instead of supervising coding agents." It ships as a spec first, with an Elixir reference implementation OpenAI labels an engineering preview.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Symphony** |
+| | **Paradev** | **Symphony** |
 |---|---|---|
 | **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Turns tracker tickets into isolated, autonomous Codex implementation runs |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Headless orchestration daemon (spec + reference implementation) |
@@ -35,9 +35,9 @@ Superset and Symphony both scale coding agents past one-at-a-time, from opposite
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also reaches other machines you own through Remote Access, offers cloud workspaces that run in the cloud, and can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also reaches other machines you own through Remote Access, offers cloud workspaces that run in the cloud, and can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Symphony?
 
@@ -47,31 +47,31 @@ Symphony is OpenAI's open-source (Apache-2.0) orchestration project for Codex. A
 
 ### The Tracker Is the UI
 
-Symphony's radical simplification is that assigning work is the entire interface: move a ticket to an active state and an agent picks it up; review happens on the PR and the ticket. There are no terminals to watch and no way to steer mid-run. Superset assumes the opposite -- that engineers want to see agents work, interrupt them, run the app in a browser pane, and review diffs before anything lands. Superset's automations and MCP surface cover unattended work too, but the center of gravity is interactive.
+Symphony's radical simplification is that assigning work is the entire interface: move a ticket to an active state and an agent picks it up; review happens on the PR and the ticket. There are no terminals to watch and no way to steer mid-run. Paradev assumes the opposite -- that engineers want to see agents work, interrupt them, run the app in a browser pane, and review diffs before anything lands. Paradev's automations and MCP surface cover unattended work too, but the center of gravity is interactive.
 
 ### One Agent vs Any Agent
 
-Symphony speaks the Codex app-server protocol and nothing else -- no Claude Code, no Gemini, no adapter layer. If your org standardizes on OpenAI, that is coherent; if you want to fan a task across different agents or pick per-job, it is disqualifying. Superset is agent-agnostic by design, running Codex alongside Claude Code, OpenCode, Cursor, and any CLI agent.
+Symphony speaks the Codex app-server protocol and nothing else -- no Claude Code, no Gemini, no adapter layer. If your org standardizes on OpenAI, that is coherent; if you want to fan a task across different agents or pick per-job, it is disqualifying. Paradev is agent-agnostic by design, running Codex alongside Claude Code, OpenCode, Cursor, and any CLI agent.
 
 ### Product vs Spec
 
-Superset is a shipping product with onboarding, support, and team plans. Symphony is an engineering preview whose README's first install option is telling your coding agent to build Symphony from the spec -- powerful for teams that want to own a hardened implementation, but you are signing up to operate (or write) infrastructure, with full-auto approval policies in the sample config that demand real trust in your sandboxing.
+Paradev is a shipping product with onboarding, support, and team plans. Symphony is an engineering preview whose README's first install option is telling your coding agent to build Symphony from the spec -- powerful for teams that want to own a hardened implementation, but you are signing up to operate (or write) infrastructure, with full-auto approval policies in the sample config that demand real trust in your sandboxing.
 
 ### Autonomy Model
 
-Symphony bets on full autonomy bounded by ticket states: agents work unattended, humans gate at review, agents land the merge. Superset bets on graduated autonomy: interactive when you are present, scheduled automations with an SDK and Slack bot when you are not, and orchestrating agents that spawn workers through the CLI and MCP server -- with humans reviewing in the workspace either way.
+Symphony bets on full autonomy bounded by ticket states: agents work unattended, humans gate at review, agents land the merge. Paradev bets on graduated autonomy: interactive when you are present, scheduled automations with an SDK and Slack bot when you are not, and orchestrating agents that spawn workers through the CLI and MCP server -- with humans reviewing in the workspace either way.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Symphony is free and Apache-2.0; you run the daemon on your own infrastructure and pay for Codex usage under your OpenAI plan or API keys. Both are bring-your-own-provider.
+Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. Symphony is free and Apache-2.0; you run the daemon on your own infrastructure and pay for Codex usage under your OpenAI plan or API keys. Both are bring-your-own-provider.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Want to see, steer, and review agent work in one workspace
 - Run multiple agent brands, not just Codex
@@ -85,24 +85,24 @@ Superset offers a free tier and Pro at $20/seat/month. Symphony is free and Apac
 - Are comfortable running preview infrastructure, or hardening your own from the spec
 - Manage work at the board level and rarely need to steer mid-run
 
-**Verdict:** Symphony is the clearest statement yet of the fully-autonomous thesis -- the ticket board as the only interface -- and its spec is worth reading whatever you run. But it is Codex-only, headless, and a preview by its own label. Superset delivers parallel agent leverage today with the visibility engineers actually want, across any agent, with automations covering the unattended slice. Many teams will eventually want both patterns; Superset is the one you can adopt this afternoon.
+**Verdict:** Symphony is the clearest statement yet of the fully-autonomous thesis -- the ticket board as the only interface -- and its spec is worth reading whatever you run. But it is Codex-only, headless, and a preview by its own label. Paradev delivers parallel agent leverage today with the visibility engineers actually want, across any agent, with automations covering the unattended slice. Many teams will eventually want both patterns; Paradev is the one you can adopt this afternoon.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Symphony a product like Superset?
+### Is Symphony a product like Paradev?
 
-Not exactly. Symphony is an open-source spec plus a reference implementation that OpenAI calls a "low-key engineering preview" -- teams are encouraged to build their own hardened version. Superset is a shipping desktop product with a CLI, MCP server, and SDK.
+Not exactly. Symphony is an open-source spec plus a reference implementation that OpenAI calls a "low-key engineering preview" -- teams are encouraged to build their own hardened version. Paradev is a shipping desktop product with a CLI, MCP server, and SDK.
 
 ### Does Symphony work with Claude Code or other agents?
 
-No. Symphony drives Codex through its app-server protocol exclusively. Superset runs Codex, Claude Code, OpenCode, Cursor, Copilot, Gemini, and any CLI agent.
+No. Symphony drives Codex through its app-server protocol exclusively. Paradev runs Codex, Claude Code, OpenCode, Cursor, Copilot, Gemini, and any CLI agent.
 
 ### Does Symphony use Git worktrees?
 
-No -- it clones the repo into an isolated workspace per issue, contained within a workspace root. Superset uses a Git worktree for each new local branch-based workspace, which shares the repository's object store and is cheaper to create.
+No -- it clones the repo into an isolated workspace per issue, contained within a workspace root. Paradev uses a Git worktree for each new local branch-based workspace, which shares the repository's object store and is cheaper to create.
 
-### Can Superset do tracker-driven autonomous runs?
+### Can Paradev do tracker-driven autonomous runs?
 
-Partially. Superset's tasks integrate GitHub Issues and Linear, its automations run scheduled unattended sessions, and automation event triggers from Linear and GitHub can start an agent when work comes in -- but Superset does not land PRs on its own, so it does not ship Symphony's full poll-dispatch-land loop. The inverse gap is larger: Symphony has no interactive workspace at all.
+Partially. Paradev's tasks integrate GitHub Issues and Linear, its automations run scheduled unattended sessions, and automation event triggers from Linear and GitHub can start an agent when work comes in -- but Paradev does not land PRs on its own, so it does not ship Symphony's full poll-dispatch-land loop. The inverse gap is larger: Symphony has no interactive workspace at all.

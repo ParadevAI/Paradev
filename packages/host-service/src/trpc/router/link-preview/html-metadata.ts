@@ -1,13 +1,14 @@
 import { decodeHTML, decodeHTMLAttribute } from "entities";
 
 const MAX_TITLE_LENGTH = 240;
+const MAX_DESCRIPTION_LENGTH = 300;
 const ATTRIBUTE =
 	/([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
-function cleanText(value: string): string | null {
+function cleanText(value: string, maxLength: number): string | null {
 	const text = decodeHTML(value.replace(/<[^>]*>/g, ""))
 		.replace(/\s+/g, " ")
 		.trim();
-	return text ? Array.from(text).slice(0, MAX_TITLE_LENGTH).join("") : null;
+	return text ? Array.from(text).slice(0, maxLength).join("") : null;
 }
 
 function openingTags(
@@ -29,18 +30,51 @@ function openingTags(
 	});
 }
 
-export function documentTitle(html: string): string | null {
+function metaContent(
+	html: string,
+	keys: readonly string[],
+	clean: (value: string) => string | null,
+): string | null {
 	const metas = openingTags(html, "meta");
-	for (const key of ["og:title", "twitter:title"]) {
+	for (const key of keys) {
 		for (const meta of metas) {
 			const marker = meta.get("property") ?? meta.get("name");
 			if (marker?.toLowerCase() !== key) continue;
-			const title = cleanText(meta.get("content") ?? "");
-			if (title) return title;
+			const content = clean(meta.get("content") ?? "");
+			if (content) return content;
 		}
 	}
+	return null;
+}
+
+export function documentTitle(html: string): string | null {
+	const clean = (value: string) => cleanText(value, MAX_TITLE_LENGTH);
+	const social = metaContent(html, ["og:title", "twitter:title"], clean);
+	if (social) return social;
 	const title = /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(html);
-	return title ? cleanText(title[1] ?? "") : null;
+	return title ? clean(title[1] ?? "") : null;
+}
+
+export function documentDescription(html: string): string | null {
+	return metaContent(
+		html,
+		["og:description", "twitter:description", "description"],
+		(value) => cleanText(value, MAX_DESCRIPTION_LENGTH),
+	);
+}
+
+export function documentImageHref(html: string): string | null {
+	return metaContent(
+		html,
+		[
+			"og:image:secure_url",
+			"og:image",
+			"og:image:url",
+			"twitter:image",
+			"twitter:image:src",
+		],
+		(value) => decodeHTMLAttribute(value).trim() || null,
+	);
 }
 
 export function documentIconHrefs(html: string): string[] {

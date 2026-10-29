@@ -10,12 +10,14 @@ export interface RemoteSimulatorSession {
 }
 
 interface RemoteSimulatorProps {
+	workspaceId: string;
 	session: RemoteSimulatorSession;
 	deviceName: string;
 	picker: ReactNode;
 }
 
 export function RemoteSimulator({
+	workspaceId,
 	session,
 	deviceName,
 	picker,
@@ -31,6 +33,8 @@ export function RemoteSimulator({
 	return (
 		<DeviceView
 			client={client}
+			workspaceId={workspaceId}
+			deviceKey={`cloud:${deviceId}`}
 			deviceName={deviceName}
 			picker={picker}
 			logStreamUrl={(scope) => {

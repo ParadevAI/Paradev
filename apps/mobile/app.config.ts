@@ -1,6 +1,7 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { IOS_APP } from "@superset/shared/app-identity";
+import { BRAND } from "@superset/shared/brand";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";
@@ -41,7 +42,7 @@ export default ({ config }: ConfigContext) => ({
 	locales: Object.fromEntries(
 		SUPPORTED_LOCALES.map((locale) => [locale, `./locales/${locale}.json`]),
 	),
-	version: "1.1.4",
+	version: "1.2.1",
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
@@ -67,6 +68,7 @@ export default ({ config }: ConfigContext) => ({
 		...(associatedDomains && { associatedDomains }),
 		usesAppleSignIn: true,
 		infoPlist: {
+			CFBundleDisplayName: BRAND.NAME,
 			"UISupportedInterfaceOrientations~ipad": [
 				"UIInterfaceOrientationPortrait",
 				"UIInterfaceOrientationPortraitUpsideDown",

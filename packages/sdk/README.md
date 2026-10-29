@@ -1,8 +1,8 @@
-# Superset TypeScript SDK
+# Paradev TypeScript SDK
 
-Typed wrapper around the Superset API for cloud workspaces: sandboxes Superset runs for your organization, and the terminals and agents inside them. Follows the [`superset` CLI](https://docs.superset.sh/docs/cli/getting-started) — same procedures, same shapes.
+Typed wrapper around the Paradev API for cloud workspaces: sandboxes Paradev runs for your organization, and the terminals and agents inside them. Follows the [`superset` CLI](https://docs.paradev.com/cli/getting-started) — same procedures, same shapes.
 
-Full docs: **<https://docs.superset.sh/docs/sdk/getting-started>**
+Full docs: **<https://docs.paradev.com/sdk/getting-started>**
 
 ## Install
 
@@ -85,7 +85,7 @@ try {
 
 ## Two transport paths
 
-Most methods hit `api.superset.sh` directly. `terminals.*` and `agents.create` run inside a workspace's sandbox: the SDK asks the API for a short-lived ticket for that workspace (waking its sandbox if it had stopped), caches it, and calls the sandbox through Superset's gate with it. Your API key is only ever sent to the API.
+Most methods hit `api.superset.sh` directly. `terminals.*` and `agents.create` run inside a workspace's sandbox: the SDK asks the API for a short-lived ticket for that workspace (waking its sandbox if it had stopped), caches it, and calls the sandbox through Paradev's gate with it. Your API key is only ever sent to the API.
 
 The workspace must be `ready`; otherwise the ticket request fails with a `412`.
 

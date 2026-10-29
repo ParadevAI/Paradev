@@ -40,6 +40,8 @@ import {
 	cachedSnapshot,
 	cacheSnapshot,
 	forgetSnapshot,
+	primeSnapshot,
+	takePrimedSnapshot,
 } from "./utils/snapshotCache";
 
 export type FrameScheduler = (flush: () => void) => () => void;
@@ -93,6 +95,23 @@ async function fetchSeed(
 	};
 }
 
+export async function prefetchChatSession(
+	client: SessionClient,
+	pageSize?: number,
+): Promise<boolean> {
+	const seed = await fetchSeed(client, pageSize).catch(() => null);
+	if (!seed) return false;
+	if (seed.kind === "outline") {
+		primeSnapshot(client.sessionId, seed.snapshot);
+	} else {
+		cacheSnapshot(
+			client.sessionId,
+			reduceMany(emptySnapshot(), seed.envelopes),
+		);
+	}
+	return true;
+}
+
 type InitialLoad = [
 	session: Awaited<ReturnType<SessionClient["getSession"]>>,
 	seed: Seed | null,
@@ -136,6 +155,7 @@ export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
 
 export type UseChatSessionOptions = {
 	client: SessionClient;
+	sendEnabled?: boolean;
 	deltas?: readonly DeltaChannel[];
 	pageSize?: number;
 	scheduler?: FrameScheduler;
@@ -166,7 +186,11 @@ export type ChatSession = {
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
 	setMode(modeId: string): Promise<void>;
-	setConfigOption(configId: string, value: string): Promise<void>;
+	setConfigOption(
+		configId: string,
+		value: string,
+		options?: { confirm?: boolean },
+	): Promise<void>;
 };
 
 function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
@@ -182,6 +206,9 @@ function confirmEchoes(outbox: Outbox, batch: readonly Envelope[]): void {
 
 export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const client = options.client;
+	const sendEnabled = options.sendEnabled ?? true;
+	const sendEnabledRef = useRef(sendEnabled);
+	sendEnabledRef.current = sendEnabled;
 	const pageSize = options.pageSize;
 	const deltasKey = (options.deltas ?? DEFAULT_DELTAS).join(",");
 
@@ -202,7 +229,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	schedulerRef.current = options.scheduler ?? defaultScheduler;
 	const waitRef = useRef(options.wait ?? defaultWait);
 	waitRef.current = options.wait ?? defaultWait;
-	const connectedRef = useRef(false);
+	const connectedRef = useRef<SessionClient | null>(null);
 
 	const pendingRef = useRef<Envelope[]>([]);
 	const cancelFlushRef = useRef<(() => void) | null>(null);
@@ -216,6 +243,10 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const outbox = useMemo(
 		() =>
 			new Outbox({
+				canSend: () =>
+					sendEnabledRef.current &&
+					connectedRef.current === client &&
+					clientRef.current === client,
 				send: async (entry) => {
 					await client.prompt({
 						commandId: entry.commandId,
@@ -234,9 +265,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	}, [outbox]);
 
 	useEffect(() => {
-		connectedRef.current = connection === "open";
-		if (connectedRef.current) void outbox.flush();
-	}, [connection, outbox]);
+		if (connection === "open" && sendEnabled) void outbox.flush();
+	}, [connection, outbox, sendEnabled]);
 
 	const commit = useCallback(() => {
 		cancelFlushRef.current = null;
@@ -395,6 +425,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		setStatus("loading");
 		setUnreachable(false);
 		setConnection("connecting");
+		const primed = takePrimedSnapshot(client.sessionId);
 		const cached = cachedSnapshot(client.sessionId);
 		setSnapshot(cached ?? emptySnapshot());
 		setHasOlder(false);
@@ -457,25 +488,40 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 			}
 			loaded = seed !== null;
 			setStatus("ready");
+			subscribe(seeded?.cursor ?? session.cursor);
+		};
+		const subscribe = (since: Cursor | null) => {
 			stream = client.subscribe({
 				deltas,
-				since: seeded?.cursor ?? session.cursor,
+				since,
 				onEnvelope: (envelope) => {
 					if (!isResetEnvelope(envelope)) enqueue(envelope);
 				},
 				onReset: () => {
 					void resync(true);
 				},
-				onStatusChange: setConnection,
+				onStatusChange: (next) => {
+					if (cancelled) return;
+					connectedRef.current = next === "open" ? client : null;
+					setConnection(next);
+				},
 			});
 		};
-		void seed(0);
+		if (primed) {
+			const seeded = applySeed({ kind: "outline", snapshot: primed }, false);
+			loaded = true;
+			setStatus("ready");
+			subscribe(seeded?.cursor ?? null);
+		} else {
+			void seed(0);
+		}
 
 		return () => {
 			if (loaded && !snapshotRef.current.pendingReset) {
 				cacheSnapshot(client.sessionId, snapshotRef.current);
 			}
 			cancelled = true;
+			if (connectedRef.current === client) connectedRef.current = null;
 			seedGenerationRef.current += 1;
 			cancelRetry?.();
 			cancelFlushRef.current?.();
@@ -488,7 +534,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const sendPrompt = useCallback(
 		(content: UserContent[], steer?: { expectedTurnId: string }) => {
 			const entry = outbox.enqueue(content, steer);
-			if (connectedRef.current) void outbox.flush();
+			void outbox.flush();
 			return entry;
 		},
 		[outbox],
@@ -497,7 +543,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const retryPrompt = useCallback(
 		(clientId: string) => {
 			outbox.retry(clientId);
-			if (connectedRef.current) void outbox.flush();
+			void outbox.flush();
 		},
 		[outbox],
 	);
@@ -563,8 +609,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	);
 
 	const setConfigOption = useCallback(
-		(configId: string, value: string) =>
-			client.setConfigOption(configId, value),
+		(configId: string, value: string, options?: { confirm?: boolean }) =>
+			client.setConfigOption(configId, value, options),
 		[client],
 	);
 

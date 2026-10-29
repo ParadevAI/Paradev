@@ -3,7 +3,10 @@ import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
 export type LinkUnfurl = {
-	icon: { kind: "plugin"; name: string } | { kind: "file"; fileName: string };
+	icon:
+		| { kind: "plugin"; name: string }
+		| { kind: "file"; fileName: string }
+		| { kind: "environment" };
 	label?: string;
 };
 
@@ -21,6 +24,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)sentry\.io$/, "sentry"],
 	[/(^|\.)posthog\.com$/, "posthog"],
 	[/(^|\.)vercel\.com$/, "vercel"],
+	[/(^|\.)resend\.com$/, "resend"],
 	[/(^|\.)figma\.com$/, "figma"],
 	[/(^|\.)stripe\.com$/, "stripe"],
 	[/(^|\.)neon\.(tech|com)$/, "neon"],
@@ -64,6 +68,8 @@ const supersetApp: LinkUnfurler = ({ href }, webUrl) => {
 			return { icon, label: link.taskId };
 		case "plugin":
 			return { icon: { kind: "plugin", name: link.pluginName } };
+		case "environment":
+			return { icon: { kind: "environment" } };
 		default:
 			return { icon };
 	}

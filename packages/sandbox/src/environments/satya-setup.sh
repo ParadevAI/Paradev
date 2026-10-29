@@ -18,10 +18,26 @@ CONFIG_DIR="$HOME/code/config"
 WORKSPACE="$(pwd)"
 
 export DEBIAN_FRONTEND=noninteractive
+# The bundle writes /etc/zsh/zprofile before zsh is installed, and dpkg asks
+# about a config file it did not create; keep the bundle's. On failure, logs
+# apt's last lines tagged, since the release keeps only this script's lines.
+apt_install() {
+	local output
+	if ! output="$(sudo -E apt-get install -y -qq -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold "$@" 2>&1)"; then
+		log "apt-get install $* failed:"
+		tail -n 20 <<<"$output" | while IFS= read -r line; do log "  $line"; done
+		exit 1
+	fi
+}
+
 sudo -E apt-get update -qq
 # The image carries the toolchain; these are the internal team's shell tools.
-sudo -E apt-get install -y -qq --no-install-recommends zsh fzf silversearcher-ag neovim postgresql-client >/dev/null
+apt_install --no-install-recommends zsh fzf silversearcher-ag neovim postgresql-client
 log "shell tooling installed"
+# The root postinstall builds the desktop's native modules for Electron with
+# clang-16; bookworm's gcc 12 and clang 14 cannot compile Electron 44's headers.
+apt_install --no-install-recommends clang-16
+log "clang-16 installed"
 # neonctl: a workspace branches the database for itself on its first start,
 # the same way .superset/setup.sh does on a laptop.
 sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
@@ -36,7 +52,9 @@ sudo npm install -g vercel wrangler eas-cli agent-device >/dev/null 2>&1 && log 
 sudo npm install -g ntn >/dev/null 2>&1 && log "ntn $(ntn --version 2>/dev/null) installed" || { log "ntn install failed"; exit 1; }
 curl -fsSL https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee /etc/apt/sources.list.d/stripe.list >/dev/null
-sudo -E apt-get update -qq && sudo -E apt-get install -y -qq stripe >/dev/null && log "stripe $(stripe --version 2>/dev/null) installed" || { log "stripe install failed"; exit 1; }
+sudo -E apt-get update -qq
+apt_install stripe
+log "stripe $(stripe --version 2>/dev/null) installed"
 
 # The dev stack and the workspace's database are the repository's own
 # .superset/setup.cloud.sh and .superset/dev-stack.cloud.sh, run by the start

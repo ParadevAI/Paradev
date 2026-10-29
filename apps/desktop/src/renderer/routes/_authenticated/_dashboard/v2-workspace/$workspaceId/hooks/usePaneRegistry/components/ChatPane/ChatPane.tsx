@@ -1,6 +1,6 @@
 import type { UserContent } from "@superset/chat/protocol";
 import type { RendererContext } from "@superset/panes";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type {
 	ChatPaneData,
@@ -9,8 +9,11 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { AcpChatPane } from "./components/AcpChatPane";
+import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
+import { openChatHistory } from "./utils/chatHistoryOpen";
+import { restartedChatPaneData } from "./utils/restartedChatPaneData";
 import { saveChatMode } from "./utils/savedChatMode";
 
 export function ChatPane({
@@ -36,6 +39,29 @@ export function ChatPane({
 	});
 	const latest = useRef(data);
 	latest.current = data;
+	const paneId = ctx.pane.id;
+	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const agentId = data.agent?.id;
+	const store = ctx.store;
+	const onNewChat = useCallback(
+		(label: string | undefined) => {
+			if (!agentId) return;
+			store.getState().addTab({
+				panes: [
+					{
+						kind: "chat-v3",
+						...(label ? { titleOverride: label } : {}),
+						data: {
+							terminalId: crypto.randomUUID(),
+							sessionId: null,
+							agent: { id: agentId },
+						} satisfies ChatPaneData,
+					},
+				],
+			});
+		},
+		[agentId, store],
+	);
 	const firstPrompt: UserContent[] =
 		data.pendingPrompt || data.pendingAttachments?.length
 			? [
@@ -53,21 +79,48 @@ export function ChatPane({
 		...(data.queuedPrompts ?? []),
 	];
 
+	const clearPendingPrompts = () => {
+		const {
+			pendingPrompt: _sent,
+			pendingAttachments: _attached,
+			queuedPrompts: _queued,
+			...rest
+		} = latest.current;
+		ctx.actions.updateData(rest);
+	};
+
+	if (data.agentSession) {
+		return (
+			<>
+				<AgentChatPane
+					agentSessionId={data.agentSession.id}
+					agentName={data.agentSession.agentName}
+					workspaceId={workspaceId}
+					isActive={ctx.isActive}
+					pendingPrompts={pendingPrompts}
+					onPendingPromptsSent={clearPendingPrompts}
+					onOpenFile={onOpenFile}
+					onOpenPage={openPage}
+					onOpenLink={openLink}
+					onOpenHistory={onOpenHistory}
+				/>
+				<LinkHoverHint
+					hoverLabel={null}
+					hoverPosition={null}
+					clickHint={hint}
+				/>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<AcpChatPane
-				key={`${data.terminalId}:${data.agent?.id}`}
+				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
 				agent={data.agent}
+				draftId={data.draftId}
 				isActive={ctx.isActive}
-				onPendingPromptsSent={() => {
-					const {
-						pendingPrompt: _sent,
-						pendingAttachments: _attached,
-						queuedPrompts: _queued,
-						...rest
-					} = latest.current;
-					ctx.actions.updateData(rest);
-				}}
+				onPendingPromptsSent={clearPendingPrompts}
 				onQueuePrompt={(content) =>
 					ctx.actions.updateData({
 						...latest.current,
@@ -75,6 +128,7 @@ export function ChatPane({
 					})
 				}
 				pendingPrompts={pendingPrompts}
+				launchPrompt={data.launchPrompt}
 				modelId={data.chatModelId}
 				modelLabel={data.chatModelLabel}
 				modeId={data.chatModeId}
@@ -92,16 +146,16 @@ export function ChatPane({
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
 					ctx.actions.setTitle(label);
-					ctx.actions.updateData({
-						terminalId: data.terminalId,
-						sessionId: null,
-						agent: { id: presetId },
-						...(model
-							? { chatModelId: model.id, chatModelLabel: model.label }
-							: {}),
-						...(modeId ? { chatModeId: modeId } : {}),
-						...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
-					});
+					ctx.actions.updateData(
+						restartedChatPaneData(data, {
+							agent: { id: presetId },
+							...(model
+								? { chatModelId: model.id, chatModelLabel: model.label }
+								: {}),
+							...(modeId ? { chatModeId: modeId } : {}),
+							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
+						}),
+					);
 				}}
 				onOpenAgentChat={({ presetId, label, model, modeId, handoffPrompt }) =>
 					ctx.store.getState().addTab({
@@ -146,15 +200,15 @@ export function ChatPane({
 				onRewound={(prompt) => {
 					const { agent, chatModelId, chatModelLabel, chatModeId } =
 						latest.current;
-					ctx.actions.updateData({
-						terminalId: latest.current.terminalId,
-						sessionId: null,
-						...(agent ? { agent: { id: agent.id } } : {}),
-						...(chatModelId ? { chatModelId } : {}),
-						...(chatModelLabel ? { chatModelLabel } : {}),
-						...(chatModeId ? { chatModeId } : {}),
-						pendingPrompt: prompt,
-					});
+					ctx.actions.updateData(
+						restartedChatPaneData(latest.current, {
+							...(agent ? { agent: { id: agent.id } } : {}),
+							...(chatModelId ? { chatModelId } : {}),
+							...(chatModelLabel ? { chatModelLabel } : {}),
+							...(chatModeId ? { chatModeId } : {}),
+							pendingPrompt: prompt,
+						}),
+					);
 				}}
 				onModeChange={(chatModeId) => {
 					if (data.agent) saveChatMode(data.agent.id, chatModeId);
@@ -170,6 +224,8 @@ export function ChatPane({
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}
+				onOpenHistory={onOpenHistory}
+				onNewChat={agentId ? onNewChat : undefined}
 				sessionId={data.sessionId}
 				terminalId={data.terminalId}
 				workspaceId={workspaceId}

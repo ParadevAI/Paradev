@@ -82,6 +82,16 @@ const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 
 const ROOT_CONTAINER_ID = "browser-runtime-root";
 
+function withoutHash(url: string): string | null {
+	try {
+		const parsed = new URL(url);
+		parsed.hash = "";
+		return parsed.href;
+	} catch {
+		return null;
+	}
+}
+
 /** Page-zoom bounds and step for a browser pane (1 = 100%). */
 export const BROWSER_ZOOM = Object.freeze({ min: 0.25, max: 5, step: 0.1 });
 
@@ -695,9 +705,32 @@ export class BrowserRuntimeRegistryImpl {
 		if (entry?.webview.canGoForward()) entry.webview.goForward();
 	}
 
+	focus(paneId: string): void {
+		this.entries.get(paneId)?.webview.focus();
+	}
+
 	reload(paneId: string): void {
 		const entry = this.entries.get(paneId);
 		entry?.webview.reload();
+	}
+
+	/** A visible pane that finished loading `url`, for a link preview to reuse. */
+	findOpenPage(url: string): { paneId: string; title: string } | null {
+		const target = withoutHash(url);
+		if (!target) return null;
+		for (const [paneId, entry] of this.entries) {
+			const { currentUrl, isLoading, error, pageTitle } = entry.state;
+			if (
+				entry.visible &&
+				entry.webContentsId !== null &&
+				!isLoading &&
+				!error &&
+				withoutHash(currentUrl) === target
+			) {
+				return { paneId, title: pageTitle };
+			}
+		}
+		return null;
 	}
 
 	getState(paneId: string): BrowserRuntimeState {

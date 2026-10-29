@@ -39,6 +39,8 @@ import {
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
+	/** False pauses patch fetches, also the refetch after a git change. */
+	enabled?: boolean;
 	files: ChangesetFile[];
 	collapsedSet: ReadonlySet<string>;
 	editingSet: ReadonlySet<string>;
@@ -161,6 +163,7 @@ function groupKeyFor(input: DiffPatchScope): string {
 
 export function useDiffCodeViewItems({
 	workspaceId,
+	enabled = true,
 	files,
 	collapsedSet,
 	editingSet,
@@ -309,6 +312,7 @@ export function useDiffCodeViewItems({
 				}
 			},
 			staleTime: Number.POSITIVE_INFINITY,
+			enabled,
 		})),
 	});
 
@@ -328,6 +332,7 @@ export function useDiffCodeViewItems({
 		new Map<string, { signature: string; data: PatchGroupResult }>(),
 	);
 	useEffect(() => {
+		if (!enabled) return;
 		patchGroups.forEach((group, index) => {
 			const query = patchQueries[index];
 			if (!query?.data || query.isFetching || query.isError) return;
@@ -346,7 +351,7 @@ export function useDiffCodeViewItems({
 			});
 			void query.refetch();
 		});
-	}, [patchGroups, patchQueries]);
+	}, [enabled, patchGroups, patchQueries]);
 
 	// Parsed in an effect, per section, reusing unchanged sections' objects:
 	// @pierre/diffs hydrates a partial diff in place, so a new object per

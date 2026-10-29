@@ -1,9 +1,9 @@
 ---
-description: Create a task and assign it to me via Superset MCP
+description: Create a task and assign it to me via Paradev MCP
 allowed-tools: mcp__superset__create_task, mcp__superset__list_members, Bash(git config user.email)
 ---
 
-Create a new task in Superset and assign it to me.
+Create a new task in Paradev and assign it to me.
 
 ## Input
 

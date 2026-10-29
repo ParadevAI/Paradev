@@ -3,7 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { TRPCClientError } from "@trpc/client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
@@ -14,9 +14,8 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { NewProjectDialog } from "renderer/routes/_authenticated/_dashboard/components/NewProjectDialog";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WorkspaceNotFoundState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceNotFoundState";
-import type { CloudPullRequest } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import {
-	cloudPullRequestRefKey,
+	type CloudPullRequest,
 	useCloudPullRequests,
 } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspacePresence } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspacePresence";
@@ -118,19 +117,12 @@ export function CloudWorkspaceRecordScreen({
 
 	const data = record.data;
 	const listed = workspaces?.find((row) => row.id === workspaceId);
-	const refs = useMemo(
-		() =>
-			(data?.repositories ?? []).map((repository) => ({
-				repoFullName: repository.fullName,
-				headBranch: repository.branch,
-			})),
-		[data?.repositories],
-	);
-	const { byRef } = useCloudPullRequests(refs);
-	const pullRequests = refs.flatMap((ref): CloudPullRequest[] => {
-		const pullRequest = byRef.get(cloudPullRequestRefKey(ref));
-		return pullRequest ? [pullRequest] : [];
+	const { byWorkspace: pullRequestsById } = useCloudPullRequests({
+		active: data !== undefined && data.status !== "deleted",
+		archived: data?.status === "deleted",
 	});
+	const pullRequests: CloudPullRequest[] =
+		pullRequestsById.get(workspaceId) ?? [];
 
 	const isGone =
 		record.error instanceof TRPCClientError &&

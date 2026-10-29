@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Nimbalyst (2026): Agent Workspace vs Visual Workspace for Claude Code and Codex"
-description: "Compare Superset and Nimbalyst, the successor to Crystal. Any CLI agent in parallel Git worktrees with PR review and remote hosts vs a visual workspace with editors, a task board, and multiplayer for Claude Code and Codex."
+title: "Paradev vs Nimbalyst (2026): Agent Workspace vs Visual Workspace for Claude Code and Codex"
+description: "Compare Paradev and Nimbalyst, the successor to Crystal. Any CLI agent in parallel Git worktrees with PR review and remote hosts vs a visual workspace with editors, a task board, and multiplayer for Claude Code and Codex."
 date: 2026-10-14
 lastUpdated: 2026-10-15
 type: "1v1"
@@ -16,7 +16,7 @@ keywords:
   - parallel coding agents
 ---
 
-Superset and Nimbalyst both run coding agents in parallel, each optionally in its own Git worktree, with diff review and an iPhone app. Nimbalyst is the successor to Crystal, which its makers deprecated in February 2026. The two take different angles: Nimbalyst is a visual, multiplayer workspace centered on Claude Code and Codex, with built-in editors for documents, sheets, diagrams, and mockups, plus a task board. Superset is a workspace for running any CLI agent, on your own machines, through to the pull request.
+Paradev and Nimbalyst both run coding agents in parallel, each optionally in its own Git worktree, with diff review and an iPhone app. Nimbalyst is the successor to Crystal, which its makers deprecated in February 2026. The two take different angles: Nimbalyst is a visual, multiplayer workspace centered on Claude Code and Codex, with built-in editors for documents, sheets, diagrams, and mockups, plus a task board. Paradev is a workspace for running any CLI agent, on your own machines, through to the pull request.
 
 Facts were checked against Nimbalyst's own site, docs, changelog, and repository on October 13, 2026.
 
@@ -24,25 +24,25 @@ Facts were checked against Nimbalyst's own site, docs, changelog, and repository
 
 ## At a Glance
 
-| | **Superset** | **Nimbalyst** |
+| | **Paradev** | **Nimbalyst** |
 |---|---|---|
 | **What it is** | Desktop workspace for orchestrating any CLI coding agent | Visual workspace and multiplayer for Claude Code and Codex |
 | **Agents** | Any CLI agent; built-in presets for more than 20 | Claude Code and Codex; OpenCode, Copilot, and ACP agents in alpha |
 | **Isolation** | Git worktree per local branch-based workspace | Optional one-click Git worktree per session |
-| **Planning** | Tasks from Linear, GitHub Issues, and Superset as a list or kanban board; Workspaces board by status; Slack bot | Kanban board of sessions by phase; plans split into tasks agents can update |
+| **Planning** | Tasks from Linear, GitHub Issues, and Paradev as a list or kanban board; Workspaces board by status; Slack bot | Kanban board of sessions by phase; plans split into tasks agents can update |
 | **Editors** | Diff and file editor; opens workspaces in VS Code, Cursor, JetBrains, Zed, Xcode | Markdown, sheets, mockups, Excalidraw, Mermaid, data models, mind maps, code, wiki |
 | **Review** | Changes pane commits, pushes, and opens PRs; Pull Requests view with CI checks | Per-file diff review with accept and reject; PR review mode; AI-written commits |
 | **Remote** | macOS or Linux hosts you add through Remote Access; cloud workspaces | Remote sessions in your own Cloudflare sandbox |
-| **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro) | iPhone and iPad app |
+| **Mobile** | iPhone and iPad app for your own hosts and cloud workspaces (Pro; cloud workspaces need Team or Ultra) | iPhone and iPad app |
 | **Team** | Shared hosts with per-member access; Enterprise SAML SSO, SCIM, audit logs | Real-time multiplayer docs, boards, and shared agent sessions |
 | **Platforms** | macOS; experimental Linux AppImage; Windows not yet available | macOS, Windows, Linux |
-| **License and price** | Source-available (ELv2); Free, Pro $20 per user/month | MIT; Individual free; Teams $20 per user/month (free during beta) |
+| **License and price** | Source-available (ELv2); Free, Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user/month | MIT; Individual free; Teams $20 per user/month (free during beta) |
 
 ---
 
-## What Is Superset?
+## What Is Paradev?
 
-Superset is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Superset never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, cloud workspaces run in the cloud, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts and cloud workspaces away from your desk.
+Paradev is a desktop workspace for orchestrating CLI coding agents. Each task runs in its own workspace with a Git worktree and a persistent terminal, so Claude Code, Codex, and any other agent run side by side on your own subscriptions; Paradev never proxies model calls. The Changes pane commits, pushes, and opens pull requests, and the Pull Requests view shows CI checks and sends line comments back to agents. Remote Access adds macOS or Linux machines as shared hosts, cloud workspaces run in the cloud, scheduled automations run agents on a host you choose, and a CLI, TypeScript SDK, MCP server, and Slack bot let other tools drive it. The [iPhone and iPad app](/mobile) reaches your hosts and cloud workspaces away from your desk.
 
 ## What Is Nimbalyst?
 
@@ -52,35 +52,35 @@ Nimbalyst describes itself as "the visual workspace for Codex and Claude Code" a
 
 ### Any Agent vs Claude Code and Codex First
 
-Superset runs any CLI agent in a real terminal, with built-in presets for more than 20. Nimbalyst is built around Claude Code and Codex, with other agents in alpha. If your team uses several agents, or wants to compare them on the same task, Superset is the broader fit.
+Paradev runs any CLI agent in a real terminal, with built-in presets for more than 20. Nimbalyst is built around Claude Code and Codex, with other agents in alpha. If your team uses several agents, or wants to compare them on the same task, Paradev is the broader fit.
 
 ### Engineering Loop vs Visual Workspace
 
-Nimbalyst puts documents, diagrams, sheets, and a session board that agents can update next to the agents, which suits teams that plan and specify work visually. Superset focuses on the engineering loop: worktrees, terminals, diffs, pull requests, CI checks, and an in-app browser, and it works alongside the editor you already use. Both have boards: Superset's Tasks view shows issues as a kanban board and starts a workspace per task, and its Workspaces page has a board view by status.
+Nimbalyst puts documents, diagrams, sheets, and a session board that agents can update next to the agents, which suits teams that plan and specify work visually. Paradev focuses on the engineering loop: worktrees, terminals, diffs, pull requests, CI checks, and an in-app browser, and it works alongside the editor you already use. Both have boards: Paradev's Tasks view shows issues as a kanban board and starts a workspace per task, and its Workspaces page has a board view by status.
 
 ### Where Agents Run
 
-Superset runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. It also has cloud workspaces that run in the cloud without your own computer connected. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
+Paradev runs agents on your machine or on macOS or Linux hosts you add, which keeps them working on your real environment when your laptop sleeps. It also has cloud workspaces that run in the cloud without your own computer connected. Nimbalyst runs locally and can run remote sessions in your own Cloudflare sandbox.
 
 ### Platforms and License
 
-Nimbalyst runs on Windows, macOS, and Linux and is MIT-licensed. Superset runs on macOS with an experimental Linux build, has no Windows app yet, and is source-available under ELv2.
+Nimbalyst runs on Windows, macOS, and Linux and is MIT-licensed. Paradev runs on macOS with an experimental Linux build, has no Windows app yet, and is source-available under ELv2.
 
 ### Team Features
 
-Nimbalyst's team story is real-time multiplayer: shared documents, boards, and agent sessions. Superset's is shared hosts with per-member access, task intake from Linear, GitHub Issues, and Slack, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Nimbalyst's team story is real-time multiplayer: shared documents, boards, and agent sessions. Paradev's is shared hosts with per-member access, task intake from Linear, GitHub Issues, and Slack, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20 per user per month, or $15 billed yearly, with an enterprise tier on custom billing. Nimbalyst is free for individuals, with no account needed; Teams is $20 per user per month or $200 per year and free while in beta; Enterprise is custom. Both are bring-your-own-agent for model costs. Prices as of October 2026.
+Paradev offers a free tier, Pro at {{price:pro}} per user per month ({{price:pro:yearly}} billed yearly), Team at {{price:team}} ({{price:team:yearly}} billed yearly) and Ultra at {{price:ultra}} for cloud workspaces, with an enterprise tier on custom billing. Nimbalyst is free for individuals, with no account needed; Teams is $20 per user per month or $200 per year and free while in beta; Enterprise is custom. Both are bring-your-own-agent for model costs. Prices as of October 2026.
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
+**Choose Paradev if you:**
 
 - Run more than Claude Code and Codex, or want to compare agents
 - Want agents on shared hosts you own or in cloud workspaces, reachable from an iPhone or iPad
@@ -100,16 +100,16 @@ Superset offers a free tier and Pro at $20 per user per month, or $15 billed yea
 
 ### Is Nimbalyst the same as Crystal?
 
-Nimbalyst replaced Crystal. Crystal's repository says it "has been deprecated and replaced by Nimbalyst," with the deprecation dated February 2026. See also [Superset vs Crystal](/compare/superset-vs-crystal).
+Nimbalyst replaced Crystal. Crystal's repository says it "has been deprecated and replaced by Nimbalyst," with the deprecation dated February 2026. See also [Paradev vs Crystal](/compare/superset-vs-crystal).
 
 ### Does Nimbalyst use Git worktrees?
 
-Yes, optionally: one click gives a session its own worktree. Superset gives every new local branch-based workspace its own worktree and terminal.
+Yes, optionally: one click gives a session its own worktree. Paradev gives every new local branch-based workspace its own worktree and terminal.
 
 ### Is Nimbalyst free?
 
-Yes, for individuals. Teams is $20 per user per month, free while in beta. Superset has a free tier and Pro at $20 per user per month.
+Yes, for individuals. Teams is $20 per user per month, free while in beta. Paradev has a free tier, Pro at {{price:pro}} per user per month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces.
 
-### Can I run Claude Code and Codex in Superset?
+### Can I run Claude Code and Codex in Paradev?
 
-Yes. Both are built-in agents in Superset, alongside Cursor's agent, Antigravity CLI, Copilot, Amp, OpenCode, and any other CLI agent, each in its own worktree.
+Yes. Both are built-in agents in Paradev, alongside Cursor's agent, Antigravity CLI, Copilot, Amp, OpenCode, and any other CLI agent, each in its own worktree.

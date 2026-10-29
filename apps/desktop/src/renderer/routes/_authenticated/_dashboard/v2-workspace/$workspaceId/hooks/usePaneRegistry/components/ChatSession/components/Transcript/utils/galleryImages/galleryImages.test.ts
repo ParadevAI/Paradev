@@ -155,8 +155,10 @@ describe("galleryImages", () => {
 				kind: "turn_status",
 				key: "status:t1",
 				groupStart: false,
+				turnId: "t1",
 				status: "failed",
-				message: undefined,
+				error: undefined,
+				latest: true,
 			},
 		];
 		expect(galleryImages(rows)).toEqual([]);

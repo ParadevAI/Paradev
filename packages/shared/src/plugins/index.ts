@@ -4,7 +4,7 @@ import type { OrganizationRole } from "../auth/roles/roles";
 import { firstPartyManifest } from "./manifests.generated";
 
 export const DEFAULT_MARKETPLACE = "superset";
-export const DEFAULT_MARKETPLACE_REPO = "superset-sh/superset";
+export const DEFAULT_MARKETPLACE_REPO = "paradevai/paradev";
 export const DEFAULT_MARKETPLACE_REF = "main";
 
 const ORGANIZATION_MARKETPLACE_PREFIX = "organization-";
@@ -266,11 +266,11 @@ export function getPluginComponentKinds(
 export const SUPERSET_MANAGED_SKILLS = [
 	{
 		name: "10x",
-		description: "Personalized audit of Superset features you're not using yet",
+		description: "Personalized audit of Paradev features you're not using yet",
 	},
 	{
 		name: "automate",
-		description: "Turn a recurring chore into a Superset automation",
+		description: "Turn a recurring chore into a Paradev automation",
 	},
 	{
 		name: "browser",
@@ -282,9 +282,9 @@ export const SUPERSET_MANAGED_SKILLS = [
 	},
 	{
 		name: "contribute",
-		description: "Set up an open-source contribution to Superset",
+		description: "Set up an open-source contribution to Paradev",
 	},
-	{ name: "doctor", description: "Diagnose and fix Superset problems" },
+	{ name: "doctor", description: "Diagnose and fix Paradev problems" },
 	{ name: "feedback", description: "Report bugs and request features" },
 	{
 		name: "orchestrate",
@@ -295,16 +295,16 @@ export const SUPERSET_MANAGED_SKILLS = [
 		description:
 			"Install plugins, connect their accounts, and call their MCP tools",
 	},
-	{ name: "setup", description: "Make a repository Superset-ready" },
-	{ name: "standup", description: "Digest of what your Superset agents did" },
+	{ name: "setup", description: "Make a repository Paradev-ready" },
+	{ name: "standup", description: "Digest of what your Paradev agents did" },
 ] as const;
 
 export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 	{
 		name: "superset",
 		version: "1.0.0",
-		description: "Manage Superset workspaces, tasks, and automations",
-		interface: { displayName: "Superset", category: "Productivity" },
+		description: "Manage Paradev workspaces, tasks, and automations",
+		interface: { displayName: "Paradev", category: "Productivity" },
 		mcpServers: {
 			superset: { type: "http", url: "https://api.superset.sh/mcp" },
 		},
@@ -392,18 +392,6 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
-		name: "neon-readonly",
-		version: "1.0.1",
-		description: "Read Postgres schemas and run read-only queries",
-		interface: { displayName: "Neon (read-only)", category: "Data & APIs" },
-		mcpServers: {
-			"neon-readonly": {
-				type: "http",
-				url: "https://mcp.neon.tech/mcp?readonly=true",
-			},
-		},
-	},
-	{
 		name: "exa",
 		version: "1.0.1",
 		description: "Search the web, companies, and people",
@@ -462,6 +450,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "Vercel", category: "Developer tools" },
 		mcpServers: {
 			vercel: { type: "http", url: "https://mcp.vercel.com" },
+		},
+	},
+	{
+		name: "resend",
+		version: "1.0.0",
+		description: "Send and debug email",
+		interface: { displayName: "Resend", category: "Developer tools" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			resend: { type: "http", url: "https://mcp.resend.com/mcp" },
 		},
 	},
 	{

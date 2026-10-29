@@ -1,7 +1,7 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useStore } from "zustand";
 import type { StoreApi } from "zustand/vanilla";
-import type { PaneViewerData } from "../../types";
+import { type PaneViewerData, PENDING_CLOUD_CHAT_PANE_KIND } from "../../types";
 
 export function useIsChatTabActive(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
@@ -12,6 +12,12 @@ export function useIsChatTabActive(
 		);
 		if (!tab) return false;
 		const panes = Object.values(tab.panes);
-		return panes.length > 0 && panes.every((pane) => pane.kind === "chat-v3");
+		return (
+			panes.length > 0 &&
+			panes.every(
+				(pane) =>
+					pane.kind === "chat-v3" || pane.kind === PENDING_CLOUD_CHAT_PANE_KIND,
+			)
+		);
 	});
 }

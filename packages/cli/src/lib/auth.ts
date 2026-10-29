@@ -43,6 +43,10 @@ export function getWebUrl(): string {
 	return env.SUPERSET_WEB_URL;
 }
 
+export function getPasteRedirectUri(): string {
+	return new URL(PASTE_REDIRECT_PATH, getWebUrl()).toString();
+}
+
 function shouldOpenBrowser(): boolean {
 	if (!process.stdout.isTTY) return false;
 	if (process.env.CI) return false;
@@ -136,9 +140,7 @@ function waitForCallback({
 			}
 			response
 				.writeHead(200, { "Content-Type": "text/html" })
-				.end(
-					"<h1>Signed in to Superset CLI</h1><p>You can close this tab.</p>",
-				);
+				.end("<h1>Signed in to Paradev CLI</h1><p>You can close this tab.</p>");
 			finish(null, code);
 		});
 	});
@@ -289,7 +291,6 @@ export async function login(
 	callbacks: LoginCallbacks,
 ): Promise<LoginResult> {
 	const apiUrl = env.SUPERSET_API_URL;
-	const webUrl = getWebUrl();
 
 	const codeVerifier = generateCodeVerifier();
 	const codeChallenge = generateCodeChallenge(codeVerifier);
@@ -299,7 +300,7 @@ export async function login(
 	const loopbackRedirectUri = loopback
 		? `http://127.0.0.1:${loopback.port}/callback`
 		: null;
-	const pasteRedirectUri = new URL(PASTE_REDIRECT_PATH, webUrl).toString();
+	const pasteRedirectUri = getPasteRedirectUri();
 
 	const pasteAuthorizeUrl = buildAuthorizeUrl({
 		apiUrl,

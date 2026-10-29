@@ -41,6 +41,8 @@ export type ComposerMentionEntry = {
 	description?: string;
 	icon?: ReactNode;
 	keywords?: string[];
+	// Drawn in place of icon, label and description; label still drives matching.
+	row?: ReactNode;
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
@@ -68,6 +70,8 @@ export type ComposerMentionProvider = {
 	id: string;
 	title: string;
 	priority: number;
+	// The character that opens this provider's menu; "@" when unset.
+	trigger?: string;
 	source: ComposerMentionSource;
 };
 
@@ -80,6 +84,8 @@ export type PromptInputCommand = {
 	rightIcon?: ReactNode;
 	group?: string;
 	searchAliases?: string[];
+	// Tab inserts this chip in place of the typed command instead of selecting.
+	completion?: ComposerChip;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -122,11 +128,14 @@ export type PromptInputDictation = {
 
 export type PromptInputHandle = {
 	appendText(text: string): void;
+	isEmpty(): boolean;
+	addFiles(files: File[]): void;
 	insertChip(chip: ComposerChip): void;
 	openFileDialog(): void;
 	openPanel(panel: ComposerPanelContent): void;
 	focus(): void;
 	recallPreviousPrompt(): void;
+	blur(): void;
 };
 
 export type PromptInputProps = {
@@ -172,6 +181,13 @@ export type PromptInputProps = {
 		attachments: readonly PromptInputAttachment[],
 	) => void;
 	onChipClick?: (chip: ComposerChip) => void;
+	/** A chip for pasted plain text, such as a link; null keeps the text. */
+	chipForPaste?: (text: string) => ComposerChip | null;
+	/**
+	 * Wraps a chip as the composer draws it, for example in a hover card.
+	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
+	 */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
 	history?: string[];
 	className?: string;
 };

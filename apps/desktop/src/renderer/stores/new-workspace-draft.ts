@@ -1,5 +1,5 @@
-import type { MachineSize } from "@superset/shared/billing";
 import { create } from "zustand";
+import { useV2WorkspaceCreateDefaultsStore } from "./v2-workspace-create-defaults";
 
 export type LinkedIssue = {
 	slug: string;
@@ -39,10 +39,6 @@ export interface NewWorkspaceDraft {
 	isSession: boolean;
 	hostId: string | null;
 	checkout: WorkspaceCheckout;
-	/** Cloud only. Null until picked; submit falls back to the first. */
-	environmentId: string | null;
-	machineSize: MachineSize | null;
-	/** Cloud only, for an environment without repositories of its own: primary first. */
 	prompt: string;
 	baseBranch: string | null;
 	baseBranchSource: BaseBranchSource | null;
@@ -78,9 +74,7 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		selectedProjectId: null,
 		isSession: false,
 		hostId: null,
-		checkout: "worktree",
-		environmentId: null,
-		machineSize: null,
+		checkout: useV2WorkspaceCreateDefaultsStore.getState().checkout,
 		prompt: "",
 		baseBranch: null,
 		baseBranchSource: null,
@@ -146,8 +140,6 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 				...buildInitialDraft(),
 				hostId: state.hostId,
 				checkout: state.checkout,
-				environmentId: state.environmentId,
-				machineSize: state.machineSize,
 				resetKey: state.resetKey + 1,
 			})),
 	}),

@@ -26,6 +26,7 @@ import { jwtProcedure } from "../../trpc";
 import {
 	assertTaskInOrganization,
 	taskColumns,
+	toAssignee,
 	toTaskChip,
 } from "../cloud-workspace/record";
 import { recordTaskActivity } from "../task/activity";
@@ -61,21 +62,6 @@ async function loadProject(ctx: { organizationIds: string[] }, id: string) {
 	}
 	assertMember(ctx.organizationIds, project.organizationId);
 	return project;
-}
-
-function toAssignee(task: {
-	assigneeId: string | null;
-	assigneeName: string | null;
-	assigneeImage: string | null;
-}) {
-	if (task.assigneeId && task.assigneeName) {
-		return {
-			id: task.assigneeId,
-			name: task.assigneeName,
-			image: task.assigneeImage,
-		};
-	}
-	return null;
 }
 
 export const taskProjectRouter = {

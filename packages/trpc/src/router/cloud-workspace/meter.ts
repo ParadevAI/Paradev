@@ -7,7 +7,11 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
-import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
+import {
+	cloudWorkspaceBoots,
+	cloudWorkspaces,
+	users,
+} from "@superset/db/schema";
 import { CLOUD_USAGE_REFUSAL_KEYS } from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
 import { and, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
@@ -34,6 +38,7 @@ export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
 }
 
 type Boot = typeof cloudWorkspaceBoots.$inferSelect;
+type UsageUser = { id: string; name: string | null; email: string | null };
 type Refusal = "cloudNeedsPaidPlan" | "usageLimitReached";
 
 export function gbMinutes({
@@ -60,7 +65,7 @@ export function refusalFor(result: {
 
 const REFUSAL_MESSAGES: Record<Refusal, string> = {
 	cloudNeedsPaidPlan:
-		"Cloud workspaces need a paid plan. Upgrade in Settings, Billing to start one.",
+		"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 	usageLimitReached:
 		"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
 };
@@ -79,15 +84,26 @@ function reservation(memoryMb: number): number {
 
 function usageProperties(
 	boot: Pick<Boot, "id" | "lockSeq" | "cloudWorkspaceId">,
-	userId: string | null,
+	user: UsageUser | null,
 ) {
 	return {
 		bootId: boot.id,
 		lockSeq: boot.lockSeq,
 		meteringVersion: 1,
 		workspaceId: boot.cloudWorkspaceId,
-		userId: userId ?? "unattributed",
+		userId: user?.id ?? "unattributed",
+		...(user?.name ? { userName: user.name } : {}),
+		...(user?.email ? { userEmail: user.email } : {}),
 	};
+}
+
+async function usageUser(userId: string | null): Promise<UsageUser | null> {
+	if (!userId) return null;
+	const [user] = await db
+		.select({ name: users.name, email: users.email })
+		.from(users)
+		.where(eq(users.id, userId));
+	return { id: userId, name: user?.name ?? null, email: user?.email ?? null };
 }
 
 const OPEN_BOOT = or(
@@ -144,6 +160,7 @@ export async function authorizeBoot(
 ): Promise<{ bootId: string | null }> {
 	if (!billingEnabled) return { bootId: null };
 	const bootId = `boot_${randomUUID()}`;
+	const user = await usageUser(args.createdByUserId);
 	const result = await checkOrFailOpen(args.organizationId, () =>
 		autumnClient.check({
 			customerId: args.organizationId,
@@ -151,7 +168,7 @@ export async function authorizeBoot(
 			requiredBalance: reservation(args.memoryMb),
 			properties: usageProperties(
 				{ id: bootId, lockSeq: 0, cloudWorkspaceId: args.cloudWorkspaceId },
-				args.createdByUserId,
+				user,
 			),
 			lock: {
 				enabled: true,
@@ -237,10 +254,10 @@ export async function attachBootSession(args: {
 
 async function recordUsage(
 	boot: Boot,
-	window: { from: number; amount: number; userId: string | null },
+	window: { from: number; amount: number; user: UsageUser | null },
 ): Promise<void> {
 	const { amount } = window;
-	const properties = usageProperties(boot, window.userId);
+	const properties = usageProperties(boot, window.user);
 	const lockId = lockIdFor(boot.id, boot.lockSeq);
 	if (boot.lockOpen) {
 		try {
@@ -310,7 +327,7 @@ function clearLease(bootId: string) {
 async function recordActiveCpu(
 	boot: Boot,
 	activeCpuMs: number,
-	userId: string | null,
+	user: UsageUser | null,
 ) {
 	try {
 		await autumnClient.track(
@@ -319,7 +336,7 @@ async function recordActiveCpu(
 				featureId: ACTIVE_CPU_MINUTES_FEATURE_ID,
 				value: activeCpuMs / 60_000,
 				async: false,
-				properties: usageProperties(boot, userId),
+				properties: usageProperties(boot, user),
 			},
 			{ headers: { "Idempotency-Key": `${boot.id}:active-cpu` } },
 		);
@@ -346,8 +363,11 @@ export async function settleBoot(
 						providerSandboxId: cloudWorkspaces.providerSandboxId,
 						createdByUserId: cloudWorkspaces.createdByUserId,
 						usageStopAt: cloudWorkspaces.usageStopAt,
+						userName: users.name,
+						userEmail: users.email,
 					})
 					.from(cloudWorkspaces)
+					.leftJoin(users, eq(users.id, cloudWorkspaces.createdByUserId))
 					.where(eq(cloudWorkspaces.id, boot.cloudWorkspaceId))
 			: [];
 		if (!boot.vercelSessionId) {
@@ -379,6 +399,13 @@ export async function settleBoot(
 			return "closed";
 		}
 		const { session } = found;
+		const user = workspace?.createdByUserId
+			? {
+					id: workspace.createdByUserId,
+					name: workspace.userName,
+					email: workspace.userEmail,
+				}
+			: null;
 		const end = session.endedAt ?? Date.now();
 		const from = (
 			boot.finalizedThrough ?? new Date(session.startedAt)
@@ -386,7 +413,7 @@ export async function settleBoot(
 		await recordUsage(boot, {
 			from,
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
-			userId: workspace?.createdByUserId ?? null,
+			user,
 		});
 		await db
 			.update(cloudWorkspaceBoots)
@@ -395,11 +422,7 @@ export async function settleBoot(
 
 		if (session.endedAt !== null) {
 			if (session.activeCpuMs) {
-				await recordActiveCpu(
-					boot,
-					session.activeCpuMs,
-					workspace?.createdByUserId ?? null,
-				);
+				await recordActiveCpu(boot, session.activeCpuMs, user);
 			}
 			await db
 				.update(cloudWorkspaceBoots)
@@ -416,10 +439,7 @@ export async function settleBoot(
 			customerId: boot.organizationId,
 			featureId: BOX_GB_MINUTES_FEATURE_ID,
 			requiredBalance: reservation(session.memoryMb),
-			properties: usageProperties(
-				{ ...boot, lockSeq: nextSeq },
-				workspace?.createdByUserId ?? null,
-			),
+			properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
 			lock: {
 				enabled: true,
 				lockId: lockIdFor(bootId, nextSeq),

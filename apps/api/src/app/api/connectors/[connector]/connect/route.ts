@@ -86,6 +86,7 @@ export async function GET(
 			console.error(`[connectors/${slug}] ${error.message}`);
 			return Response.redirect(`${connectUrl}?error=not_configured`);
 		}
-		throw error;
+		console.error(`[connectors/${slug}] connect failed:`, error);
+		return Response.redirect(`${connectUrl}?error=connect_failed`);
 	}
 }

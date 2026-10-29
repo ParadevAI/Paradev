@@ -68,7 +68,7 @@ export const env = createEnv({
 		// edit page, under the webhook documentation.
 		YC_DEALS_WEBHOOK_SECRET: z.string().min(1).optional(),
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
-		YC_BOOKFACE_COUPON_ID: z.string().min(1).default("yc-bookface-6mo"),
+		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-6mo-pro"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app

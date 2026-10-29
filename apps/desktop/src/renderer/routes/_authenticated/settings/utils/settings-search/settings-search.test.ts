@@ -151,3 +151,15 @@ describe("settings search - mobile rollout", () => {
 		).toBe(1);
 	});
 });
+
+describe("settings search - chat", () => {
+	it("counts the Chat switch only when its flag is on", () => {
+		expect(
+			getVisibleMatchCountBySection("acp", true, false).experimental,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection("acp", true, false, false, true)
+				.experimental,
+		).toBe(1);
+	});
+});

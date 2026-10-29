@@ -1,6 +1,6 @@
 ---
-title: "Superset vs Orchestrator (2026): Parallel Coding Agents"
-description: "Compare Superset and Orchestrator, formerly Agent Orchestrator, for PR feedback, reviews, scheduled work, mobile access, and supported platforms."
+title: "Paradev vs Orchestrator (2026): Parallel Coding Agents"
+description: "Compare Paradev and Orchestrator, formerly Agent Orchestrator, for PR feedback, reviews, scheduled work, mobile access, and supported platforms."
 date: 2026-08-07
 lastUpdated: 2026-10-08
 type: "1v1"
@@ -15,17 +15,17 @@ keywords:
   - parallel coding agents
 ---
 
-Superset and [Orchestrator](https://orchestrator.inc/) (formerly Agent Orchestrator) both manage coding agents working in separate Git worktrees. Superset centers the workspace, with terminals, diff review, connected hosts, and tools for scripting agent work. Orchestrator connects a project planning agent to workers, a live Kanban, pull requests, CI, and reviews. Its feedback loop can return a failed check, review comment, or merge conflict to the worker that owns the branch.
+Paradev and [Orchestrator](https://orchestrator.inc/) (formerly Agent Orchestrator) both manage coding agents working in separate Git worktrees. Paradev centers the workspace, with terminals, diff review, connected hosts, and tools for scripting agent work. Orchestrator connects a project planning agent to workers, a live Kanban, pull requests, CI, and reviews. Its feedback loop can return a failed check, review comment, or merge conflict to the worker that owns the branch.
 
 ## At a Glance
 
-| Requirement | Superset | Orchestrator |
+| Requirement | Paradev | Orchestrator |
 |---|---|---|
 | Coordinating work | Parallel workspaces and agent sessions | A project orchestrator that plans and delegates to workers, with a live Kanban |
 | PR feedback | CI and review state in the workspace | CI, review, and conflict feedback routed to the owning worker |
 | Review | Diff and file editor with PR context | Files and Reviews views, file editing, and reviewer-agent runs |
 | Recurring work | Scheduled automations | Recurring automations with run history; reusable project Cues |
-| Mobile | iPhone and iPad app for eligible Superset plans | Paired iPhone, iPad, and Android companion apps |
+| Mobile | iPhone and iPad app for eligible Paradev plans | Paired iPhone, iPad, and Android companion apps |
 | Desktop | macOS; experimental Linux AppImage | macOS, Windows, and Linux |
 | License | Source-available under Elastic License 2.0 | Open source under Apache-2.0 |
 
@@ -41,11 +41,11 @@ Orchestrator includes a current [CLI](https://docs.orchestrator.inc/cli/) for cr
 
 The [mobile companion](https://docs.orchestrator.inc/configuration/remote-access/) pairs with the desktop through an opt-in, password-protected connection. From a phone, users can follow sessions, reply to agents, handle input, and inspect PR and review state while execution stays on their computer. See [AO Mobile for iPhone and iPad](https://apps.apple.com/app/ao-mobile/id6792552173) and [AO Mobile for Android](https://play.google.com/store/apps/details?id=aoagents.dev). Remote connection options depend on the paired host and its setup.
 
-## What Superset Brings to the Workflow
+## What Paradev Brings to the Workflow
 
-Superset runs CLI coding agents in branch-based workspaces with persistent terminals, a diff and file editor, an in-app browser, and port management. It provides a [CLI](https://docs.superset.sh/cli/getting-started), an [MCP server](https://docs.superset.sh/mcp-server), a TypeScript SDK, Slack integration, and automations around those workspaces. Connected hosts and cloud workspaces support work across devices and teams.
+Paradev runs CLI coding agents in branch-based workspaces with persistent terminals, a diff and file editor, an in-app browser, and port management. It provides a [CLI](https://docs.paradev.com/cli/getting-started), an [MCP server](https://docs.paradev.com/mcp-server), a TypeScript SDK, Slack integration, and automations around those workspaces. Connected hosts and cloud workspaces support work across devices and teams.
 
-Superset desktop targets macOS and offers an experimental Linux AppImage. Its [iPhone and iPad app](/mobile), remote access, and automations have plan and host requirements; check [pricing](/pricing) and [remote access setup](https://docs.superset.sh/remote-access) before comparing a specific workflow.
+Paradev desktop targets macOS and offers an experimental Linux AppImage. Its [iPhone and iPad app](/mobile), remote access, and automations have plan and host requirements; check [pricing](/pricing) and [remote access setup](https://docs.paradev.com/remote-access) before comparing a specific workflow.
 
 ## Try Both on the Same Task
 
@@ -53,7 +53,7 @@ Use the same repository, agent, model, and acceptance checks. Open the resulting
 
 ## Which Should You Choose?
 
-Choose Superset if connected hosts, team controls, or its CLI, MCP, SDK, and Slack surfaces fit the way you coordinate work. Choose Orchestrator if you want a project planning agent, worker-owned PR feedback, GitHub and GitLab support, reviewer agents, or an Apache-2.0 desktop app with iOS and Android companions. Both let you inspect changes in the app and schedule agent work. A short trial in your own repository will show which flow fits your team.
+Choose Paradev if connected hosts, team controls, or its CLI, MCP, SDK, and Slack surfaces fit the way you coordinate work. Choose Orchestrator if you want a project planning agent, worker-owned PR feedback, GitHub and GitLab support, reviewer agents, or an Apache-2.0 desktop app with iOS and Android companions. Both let you inspect changes in the app and schedule agent work. A short trial in your own repository will show which flow fits your team.
 
 ## Frequently Asked Questions
 
@@ -71,4 +71,4 @@ Yes. AO Mobile is available for [iPhone and iPad](https://apps.apple.com/app/ao-
 
 ### How are the products licensed?
 
-Orchestrator is open source under Apache-2.0. Superset's source is available under Elastic License 2.0. Read the licenses if redistribution or service hosting matters to your team.
+Orchestrator is open source under Apache-2.0. Paradev's source is available under Elastic License 2.0. Read the licenses if redistribution or service hosting matters to your team.

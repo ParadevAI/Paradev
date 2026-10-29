@@ -309,14 +309,14 @@ export async function generateMetadata({
 	const url = localeUrl(lang, `/team/${id}`);
 	const description = person.bio
 		? getTeamBioText(person.bio)
-		: `${person.name}, ${person.role} at Superset`;
+		: `${person.name}, ${person.role} at ${BRAND.NAME}`;
 
 	return {
 		title: `${person.name} - ${person.role}`,
 		description,
 		alternates: localizedAlternates(lang, `/team/${id}`),
 		openGraph: {
-			title: `${person.name} - ${person.role} at Superset`,
+			title: `${person.name} - ${person.role} at ${BRAND.NAME}`,
 			description,
 			type: "profile",
 			url,
@@ -327,7 +327,7 @@ export async function generateMetadata({
 		},
 		twitter: {
 			card: "summary",
-			title: `${person.name} - ${person.role} at Superset`,
+			title: `${person.name} - ${person.role} at ${BRAND.NAME}`,
 			description,
 			...(person.avatar && {
 				images: [`${COMPANY.MARKETING_URL}${person.avatar}`],

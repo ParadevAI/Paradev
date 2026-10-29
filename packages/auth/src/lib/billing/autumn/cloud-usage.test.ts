@@ -29,6 +29,9 @@ describe("cloudUsageFromBalances", () => {
 			includedGbMinutes: 9600,
 			usedGbMinutes: 2400,
 			overageGbMinutes: 0,
+			prepaidGbMinutes: 0,
+			autoTopup: null,
+			pack: null,
 			resetsAt: new Date(RESET).toISOString(),
 		});
 	});
@@ -48,11 +51,71 @@ describe("cloudUsageFromBalances", () => {
 			includedGbMinutes: null,
 			usedGbMinutes: 50000,
 			overageGbMinutes: 0,
+			prepaidGbMinutes: 0,
+			autoTopup: null,
+			pack: null,
 			resetsAt: null,
 		});
 	});
 
 	test("a customer without the feature has no cloud usage", () => {
 		expect(cloudUsageFromBalances({})).toBeNull();
+	});
+
+	test("bought packs are counted apart from the monthly pool", () => {
+		const usage = cloudUsageFromBalances(
+			boxBalance({
+				granted: 420000,
+				usage: 370000,
+				remaining: 50000,
+				breakdown: [
+					{
+						id: "monthly",
+						planId: null,
+						includedGrant: 360000,
+						prepaidGrant: 0,
+						remaining: 0,
+						usage: 360000,
+						unlimited: false,
+						reset: { interval: "month", resetsAt: RESET },
+						price: null,
+						expiresAt: null,
+					},
+					{
+						id: "pack",
+						planId: "team",
+						includedGrant: 0,
+						prepaidGrant: 60000,
+						remaining: 50000,
+						usage: 10000,
+						unlimited: false,
+						reset: { interval: "one_off", resetsAt: null },
+						price: null,
+						expiresAt: null,
+					},
+				],
+			}),
+			{
+				autoTopups: [
+					{
+						featureId: "box_gb_minutes",
+						enabled: true,
+						threshold: 15000,
+						quantity: 60000,
+					},
+				],
+			},
+		);
+		expect(usage).toMatchObject({
+			includedGbMinutes: 360000,
+			usedGbMinutes: 360000,
+			overageGbMinutes: 0,
+			prepaidGbMinutes: 50000,
+			autoTopup: {
+				enabled: true,
+				thresholdGbMinutes: 15000,
+				quantityGbMinutes: 60000,
+			},
+		});
 	});
 });

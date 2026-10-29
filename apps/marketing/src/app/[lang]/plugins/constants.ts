@@ -106,6 +106,11 @@ export const CATALOG: {
 				displayName: "Vercel",
 				description: msg({ message: "Read deployment and build logs" }),
 			},
+			{
+				name: "resend",
+				displayName: "Resend",
+				description: msg({ message: "Send email and debug delivery" }),
+			},
 		],
 	},
 	{
@@ -145,14 +150,14 @@ export const STEPS: (PluginsItem & { id: StepId })[] = [
 		id: "install",
 		title: msg({ message: "Install." }),
 		description: msg({
-			message: "Pick one in the Superset app. It's saved to your account.",
+			message: "Pick one in the Paradev app. It's saved to your account.",
 		}),
 	},
 	{
 		id: "connect",
 		title: msg({ message: "Connect." }),
 		description: msg({
-			message: "Sign in once. Superset keeps the connection.",
+			message: "Sign in once. Paradev keeps the connection.",
 		}),
 	},
 	{
@@ -184,7 +189,7 @@ export const FEATURES: PluginsItem[] = [
 		title: msg({ message: "Tokens stay off your machine" }),
 		description: msg({
 			message:
-				"Superset holds the token and makes the calls. Agents never see it.",
+				"Paradev holds the token and makes the calls. Agents never see it.",
 		}),
 	},
 	{

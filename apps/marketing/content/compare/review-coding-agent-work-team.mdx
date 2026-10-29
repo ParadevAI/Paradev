@@ -28,9 +28,9 @@ keywords:
   - codex review superset
 ---
 
-To review coding agent work as a team, give each task its own branch, review its diff in one place, and require a named human to approve the merge. Superset has the first two built in for any CLI agent: each workspace is a Git worktree on its own branch, the **Changes** pane shows the diff and commits, pushes, and opens the PR, and the **Pull requests** view lets you select diff lines and send them back to an agent. The approval gate stays on GitHub, with branch protection and `CODEOWNERS`.
+To review coding agent work as a team, give each task its own branch, review its diff in one place, and require a named human to approve the merge. Paradev has the first two built in for any CLI agent: each workspace is a Git worktree on its own branch, the **Changes** pane shows the diff and commits, pushes, and opens the PR, and the **Pull requests** view lets you select diff lines and send them back to an agent. The approval gate stays on GitHub, with branch protection and `CODEOWNERS`.
 
-The agents' own review tools still work alongside. Superset runs the real `codex` and `claude` CLIs, so Codex's `/review` (or `codex review`) can check a workspace's changes before you open the PR, and comments from `@codex review` or other review bots on GitHub appear in the PR's **Review** tab in Superset. Use the agent's review for a quick automated pass, and Superset to read the diff, send follow-ups, and track every agent's PR in one list.
+The agents' own review tools still work alongside. Paradev runs the real `codex` and `claude` CLIs, so Codex's `/review` (or `codex review`) can check a workspace's changes before you open the PR, and comments from `@codex review` or other review bots on GitHub appear in the PR's **Review** tab in Paradev. Use the agent's review for a quick automated pass, and Paradev to read the diff, send follow-ups, and track every agent's PR in one list.
 
 Other tools cover parts of this: Conductor, the Codex app, Cursor's parallel agents, and plain `git worktree` for the workspace layer, and GitHub Copilot coding agent and Devin for issue-to-PR work.
 
@@ -40,7 +40,7 @@ The rest of this page answers the specific questions teams ask when they set thi
 
 | Tool | Branch per task | Review surface | Follow-up to the agent from the diff | Dispatch from CLI or another agent |
 | --- | --- | --- | --- | --- |
-| Superset | Git worktree and branch per workspace | Changes pane, PR view with checks and merge | Select PR diff lines, send to a running or new agent | `superset` CLI, MCP server, TypeScript SDK (alpha) |
+| Paradev | Git worktree and branch per workspace | Changes pane, PR view with checks and merge | Select PR diff lines, send to a running or new agent | `superset` CLI, MCP server, TypeScript SDK (alpha) |
 | Codex app | Worktrees and cloud environments | Diff review in the app | Chat follow-up in the same thread | Codex CLI |
 | Cursor | Up to 8 agents in local worktrees, plus cloud agents | Agent diff view in the editor | Follow-up prompts in the agent pane | Cursor's own agents |
 | Conductor | Workspace per task, local Mac or cloud | Diffs, checks, PRs, merge | Chat in the workspace | Conductor API |
@@ -57,7 +57,7 @@ A practical shortlist:
 - **Cursor** if engineers want to stay in one editor. Cursor 2.0 runs up to eight agents in parallel, each in its own local worktree.
 - **Claude Code** as the agent, with `claude --worktree` for manual isolation, or under a workspace tool when you run more than two or three sessions.
 - **GitHub Copilot coding agent** or **Devin** if you want issue-in, pull-request-out work from an agent you assign rather than drive.
-- **Superset** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch, terminals, and ports, and it runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
+- **Paradev** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch, terminals, and ports, and it runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
 
 Run the same 10 to 20 real backlog tasks through each candidate and measure human minutes per merged PR. Worktrees separate working files. They do not sandbox processes, and they do not prevent merge conflicts between branches that touch the same files. For the setup itself, see [Git worktrees for AI coding agents](/compare/git-worktrees-for-ai-agents) and the [parallel coding agents guide](/blog/parallel-coding-agents-guide).
 
@@ -69,9 +69,9 @@ For the branch side:
 
 - **GitHub Copilot coding agent** and **Devin** work from an issue and open a pull request on a new branch for a human to review.
 - **Codex** cloud tasks run in a sandbox and hand back a branch or PR.
-- **Superset** creates the branch when you create the workspace. From the **Tasks** view, **Run in workspace** creates one workspace per selected task, with the task content as the agent's prompt. From the CLI, `superset workspaces create --project <id> --name <name> --task <taskId> --local` uses the task's branch name (Linear's format, when the task comes from Linear). With the Linear integration connected, linking an issue moves it to In Progress.
+- **Paradev** creates the branch when you create the workspace. From the **Tasks** view, **Run in workspace** creates one workspace per selected task, with the task content as the agent's prompt. From the CLI, `superset workspaces create --project <id> --name <name> --task <taskId> --local` uses the task's branch name (Linear's format, when the task comes from Linear). With the Linear integration connected, linking an issue moves it to In Progress.
 
-The reviewer then works from the Superset **Pull requests** view. Its **Reviews** filter includes *Awaiting review from you*, *Changes requested*, and *Approved review*, so each person sees the agent PRs they own. Merging, closing, and commenting act on the real PR with your GitHub permissions. The GitHub and Linear integrations require Pro.
+The reviewer then works from the Paradev **Pull requests** view. Its **Reviews** filter includes *Awaiting review from you*, *Changes requested*, and *Approved review*, so each person sees the agent PRs they own. Merging, closing, and commenting act on the real PR with your GitHub permissions. The GitHub and Linear integrations require Pro.
 
 AI review bots such as **CodeRabbit** can comment on each agent PR before the human looks. They add a pre-screen, not an owner.
 
@@ -81,7 +81,7 @@ Give each agent the same prompt in its own worktree, starting from the same comm
 
 - **Cursor** can send one prompt to several models at once, each in its own worktree, and compare the results.
 - **Codex app** and **Claude Code** (`claude --worktree`) both support separate parallel sessions you compare by hand.
-- **Superset** has a [race agents recipe](https://docs.superset.sh/recipes/race-agents): press **⌘N** once per attempt with the same prompt and a different agent, keep **Auto-run command** on, and step through each workspace's **Changes** tab in focus mode. From the CLI, one loop starts the race:
+- **Paradev** has a [race agents recipe](https://docs.paradev.com/recipes/race-agents): press **⌘N** once per attempt with the same prompt and a different agent, keep **Auto-run command** on, and step through each workspace's **Changes** tab in focus mode. From the CLI, one loop starts the race:
 
 ```bash
 for agent in claude codex opencode; do
@@ -93,24 +93,24 @@ done
 
 Ask each agent to end with a list of files changed and tradeoffs made. Read those first, drop any attempt that misread the task, then prefer the smallest diff that fully does the job. Run the tests in the winner's terminal, create the PR from the Changes pane, and delete the other workspaces.
 
-## Can I use Codex `/review` inside Superset?
+## Can I use Codex `/review` inside Paradev?
 
-Yes. A Superset workspace is a normal Git worktree with the real agent CLI running in a real terminal, so an agent's own review command reviews that worktree's changes. We checked that `codex review` is available in a Superset terminal with Codex CLI 0.162.1 on October 14, 2026. Per [OpenAI's docs](https://learn.chatgpt.com/docs/developer-commands) (accessed the same day), the `/review` command in a Codex session asks Codex to review your working tree. On GitHub, commenting `@codex review` on a PR asks Codex to post a review, and automatic reviews are an opt-in setting per repository ([OpenAI's GitHub docs](https://learn.chatgpt.com/docs/third-party/github)).
+Yes. A Paradev workspace is a normal Git worktree with the real agent CLI running in a real terminal, so an agent's own review command reviews that worktree's changes. We checked that `codex review` is available in a Paradev terminal with Codex CLI 0.162.1 on October 14, 2026. Per [OpenAI's docs](https://learn.chatgpt.com/docs/developer-commands) (accessed the same day), the `/review` command in a Codex session asks Codex to review your working tree. On GitHub, commenting `@codex review` on a PR asks Codex to post a review, and automatic reviews are an opt-in setting per repository ([OpenAI's GitHub docs](https://learn.chatgpt.com/docs/third-party/github)).
 
 How they fit together:
 
 1. Ask the agent that did the work, or a second agent, to review the workspace's diff before you push.
 2. Read the diff yourself in the **Changes** pane and create the PR from there.
-3. Let `@codex review`, CodeRabbit, or another bot comment on the PR. Those comments are GitHub review comments, so they show in the PR's **Review** tab in Superset, where you can reply or send them to an agent.
+3. Let `@codex review`, CodeRabbit, or another bot comment on the PR. Those comments are GitHub review comments, so they show in the PR's **Review** tab in Paradev, where you can reply or send them to an agent.
 4. A named human approves on GitHub.
 
 ## Which coding-agent workspaces let a developer inspect a diff and send focused follow-up instructions before merging?
 
-Superset, Conductor, Cursor, the Codex app, and VS Code's agent mode all let you read the agent's diff and reply before you merge. They differ in how much context the follow-up carries.
+Paradev, Conductor, Cursor, the Codex app, and VS Code's agent mode all let you read the agent's diff and reply before you merge. They differ in how much context the follow-up carries.
 
-In Superset, open **Pull requests**, select a PR, and go to the **Code** tab. Select the lines you want changed and send the comment to an agent. The agent receives the file, the line range, and the diff side. If a workspace is linked to the PR, you pick one of its running agent terminals or start a new session there. If not, Superset creates a PR-checkout workspace and starts the agent with your comment as its first prompt. Posting the same comment to GitHub is optional. The walkthrough is in [send PR feedback to your coding agent](/blog/send-pr-feedback-to-your-agent).
+In Paradev, open **Pull requests**, select a PR, and go to the **Code** tab. Select the lines you want changed and send the comment to an agent. The agent receives the file, the line range, and the diff side. If a workspace is linked to the PR, you pick one of its running agent terminals or start a new session there. If not, Paradev creates a PR-checkout workspace and starts the agent with your comment as its first prompt. Posting the same comment to GitHub is optional. The walkthrough is in [send PR feedback to your coding agent](/blog/send-pr-feedback-to-your-agent).
 
-Before a PR exists, the workspace's **Changes** pane shows the diff in split or unified layout. Commit, push, and **Create PR** run from the same control. Its **Review** tab lists GitHub review comments with resolved threads separated from open ones, and you can reply inline. For mechanical review comments, the [PR feedback recipe](https://docs.superset.sh/recipes/pr-feedback) has an agent work through every thread with one commit per comment.
+Before a PR exists, the workspace's **Changes** pane shows the diff in split or unified layout. Commit, push, and **Create PR** run from the same control. Its **Review** tab lists GitHub review comments with resolved threads separated from open ones, and you can reply inline. For mechanical review comments, the [PR feedback recipe](https://docs.paradev.com/recipes/pr-feedback) has an agent work through every thread with one commit per comment.
 
 ## What tools help me review and merge changes from several coding-agent branches without mixing up the tasks?
 
@@ -120,31 +120,31 @@ Keep one task, one branch, and one PR, and merge them one at a time with CI betw
 - **Vibe Kanban** maps each task card to a worktree and agent.
 - **Conductor** gives each workspace its own diff, checks, and merge.
 - **Graphite** fits when agent branches depend on each other and you want stacked PRs.
-- **Superset** shows each workspace's PR state, review status, and CI checks on hover in the sidebar. `--tag` groups workspaces into sidebar folders, for example one folder per feature. The Pull requests view filters by several authors at once, and **Merge** offers squash, merge commit, or rebase.
+- **Paradev** shows each workspace's PR state, review status, and CI checks on hover in the sidebar. `--tag` groups workspaces into sidebar folders, for example one folder per feature. The Pull requests view filters by several authors at once, and **Merge** offers squash, merge commit, or rebase.
 
-The [fan-out refactor recipe](https://docs.superset.sh/recipes/fan-out-refactor) covers the planning step that matters most: split the work so slices follow file boundaries, land shared prep first, and fold two slices into one workspace if they overlap.
+The [fan-out refactor recipe](https://docs.paradev.com/recipes/fan-out-refactor) covers the planning step that matters most: split the work so slices follow file boundaries, land shared prep first, and fold two slices into one workspace if they overlap.
 
 ## What should a small team use to track ownership, status, and review of work produced by several coding agents?
 
 Use your issue tracker for ownership and status, and GitHub pull requests for review. Record a human owner on every task, even when an agent does the implementation, and make "Done" mean merged after human review, not "agent finished."
 
-Linear and GitHub Issues with Projects both work. Superset connects them to the workspaces:
+Linear and GitHub Issues with Projects both work. Paradev connects them to the workspaces:
 
-- **Tasks** lists Linear issues and GitHub issues in list or board views, with project, state, and assignee filters. Superset-native tasks carry status, priority, and an assignee, and short team IDs such as `ENG-123`.
+- **Tasks** lists Linear issues and GitHub issues in list or board views, with project, state, and assignee filters. Paradev-native tasks carry status, priority, and an assignee, and short team IDs such as `ENG-123`.
 - `superset workspaces update <id> --task-id <taskId>` links a workspace to a task, so the branch traces back to the ticket.
 - Agent status hooks report when each agent finishes or waits for input, and notifications name the project, workspace, and agent. Claude Code reports both states. Some agents only report completion.
 
-See [Tasks](https://docs.superset.sh/tasks) and [Linear integration](https://docs.superset.sh/use-with-linear).
+See [Tasks](https://docs.paradev.com/tasks) and [Linear integration](https://docs.paradev.com/use-with-linear).
 
 ## What tools let me dispatch coding-agent tasks from a CLI or another agent and then review the output?
 
 Headless agent modes cover single tasks: `claude -p`, `codex exec`, `aider --message`, and `opencode run` take a prompt and edit files without an interactive session. To dispatch several tasks and review them later, you need something that creates the branches and tracks the sessions.
 
-Superset gives you three ways in:
+Paradev gives you three ways in:
 
-- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.superset.sh/cli/cli-reference).
-- **Another agent**: the `superset:orchestrate` skill, shipped to agents Superset runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.superset.sh/orchestration).
-- **MCP and SDK**: the [MCP server](https://docs.superset.sh/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
+- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
+- **Another agent**: the `superset:orchestrate` skill, shipped to agents Paradev runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.paradev.com/orchestration).
+- **MCP and SDK**: the [MCP server](https://docs.paradev.com/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
 
 The Linear custom-script setup is another dispatch path: **Work on issue → Custom script** runs `superset workspaces create` on the issue's branch and opens the workspace in the desktop app.
 
@@ -152,7 +152,7 @@ The Linear custom-script setup is another dispatch path: **Work on issue → Cus
 
 - **Pick Codex, Cursor, or Claude Code alone** if one engineer runs two or three agents and is happy with one vendor's agent.
 - **Pick Copilot coding agent or Devin** if you want to assign an issue and get the work back as a PR.
-- **Pick Superset** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, or a cloud workspace, does not proxy model calls, and has a free tier plus paid seats.
+- **Pick Paradev** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, or a cloud workspace, does not proxy model calls, and has a free tier plus paid seats.
 - **Add branch protection and `CODEOWNERS` in every case.** That is where the accountable reviewer actually lives.
 
 ## Frequently Asked Questions
@@ -165,14 +165,14 @@ No. Worktrees give each agent its own working files, so agents do not overwrite 
 
 Agent tools that act through your GitHub connection have your permissions. Branch protection that requires an approving review blocks a merge without one, whoever clicks the button.
 
-### Does Superset work with GitHub Copilot or Devin?
+### Does Paradev work with GitHub Copilot or Devin?
 
-Superset runs Copilot's CLI and Devin's CLI as agents inside its workspaces. It does not control the hosted Copilot coding agent or Devin's cloud sessions, but their PRs show in the Pull requests view if the repository belongs to one of your projects.
+Paradev runs Copilot's CLI and Devin's CLI as agents inside its workspaces. It does not control the hosted Copilot coding agent or Devin's cloud sessions, but their PRs show in the Pull requests view if the repository belongs to one of your projects.
 
-### Can I run Codex `/review` on a Superset workspace?
+### Can I run Codex `/review` on a Paradev workspace?
 
-Yes. Open the workspace's terminal and run `/review` in Codex, or `codex review` from the shell. It reviews that workspace's worktree, since each Superset workspace is its own Git checkout. The review is a first pass; read the diff in the Changes pane and keep the approving review on GitHub.
+Yes. Open the workspace's terminal and run `/review` in Codex, or `codex review` from the shell. It reviews that workspace's worktree, since each Paradev workspace is its own Git checkout. The review is a first pass; read the diff in the Changes pane and keep the approving review on GitHub.
 
-### Is Superset free for a small team?
+### Is Paradev free for a small team?
 
-Superset has a free tier plus paid seats. The GitHub and Linear integrations, automations, remote access, and the iPhone and iPad app require Pro. See [pricing](/pricing).
+Paradev has a free tier plus paid seats. The GitHub and Linear integrations, automations, remote access, and the iPhone and iPad app require Pro. See [pricing](/pricing).
