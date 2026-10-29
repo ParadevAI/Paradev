@@ -12,7 +12,7 @@ import {
 	indentOnInput,
 } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, type Extension } from "@codemirror/state";
 import {
 	drawSelection,
 	dropCursor,
@@ -32,6 +32,7 @@ import { replaceEditorDocument } from "renderer/lib/replaceEditorDocument";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { createZedTheme } from "renderer/screens/main/components/WorkspaceView/utils/code-theme";
 import { useResolvedTheme } from "renderer/stores/theme";
+import type { Theme } from "shared/themes";
 import {
 	type CodeEditorAdapter,
 	createCodeMirrorAdapter,
@@ -43,10 +44,23 @@ import { buildFoldPlaceholder } from "./extensions/foldPlaceholder";
 import {
 	liveHighlighting,
 	loadLiveHighlighting,
+	resolveLiveHighlighting,
 } from "./extensions/liveHighlighting";
 import { selectionClassTogglePlugin } from "./extensions/selectionClassTogglePlugin";
 import { loadLanguageSupport } from "./loadLanguageSupport";
 import { getCodeSyntaxHighlighting } from "./syntax-highlighting";
+
+/** Undefined while the live lexers are still loading. */
+function highlightingFor(
+	filePath: string | undefined,
+	theme: Theme,
+): Extension | undefined {
+	const live = filePath ? resolveLiveHighlighting(filePath) : null;
+	if (live === undefined) return undefined;
+	return live
+		? liveHighlighting(live, createZedTheme(theme))
+		: getCodeSyntaxHighlighting(theme);
+}
 
 interface CodeEditorProps {
 	value: string;
@@ -83,6 +97,10 @@ export function CodeEditor({
 	const languageCompartment = useRef(new Compartment()).current;
 	const themeCompartment = useRef(new Compartment()).current;
 	const highlightCompartment = useRef(new Compartment()).current;
+	const appliedHighlightingRef = useRef<{
+		filePath: string | undefined;
+		theme: Theme;
+	} | null>(null);
 	const editableCompartment = useRef(new Compartment()).current;
 	const onChangeRef = useRef(onChange);
 	const onSaveRef = useRef(onSave);
@@ -127,6 +145,11 @@ export function CodeEditor({
 			},
 		]);
 
+		const initialHighlighting = highlightingFor(filePath, activeTheme);
+		if (initialHighlighting) {
+			appliedHighlightingRef.current = { filePath, theme: activeTheme };
+		}
+
 		const state = EditorState.create({
 			doc: value,
 			extensions: [
@@ -161,7 +184,7 @@ export function CodeEditor({
 					...foldKeymap,
 				]),
 				saveKeymap,
-				highlightCompartment.of([]),
+				highlightCompartment.of(initialHighlighting ?? []),
 				themeCompartment.of([
 					createCodeMirrorTheme(
 						activeTheme,
@@ -317,35 +340,27 @@ export function CodeEditor({
 	}, [language, languageCompartment]);
 
 	useEffect(() => {
+		const applied = appliedHighlightingRef.current;
+		if (
+			applied &&
+			applied.filePath === filePath &&
+			applied.theme === activeTheme
+		)
+			return;
 		let cancelled = false;
-		const applyHighlighting = (
-			extension: ReturnType<typeof getCodeSyntaxHighlighting>,
-		) => {
+		const apply = (extension: Extension) => {
 			const view = viewRef.current;
 			if (cancelled || !view) return;
+			appliedHighlightingRef.current = { filePath, theme: activeTheme };
 			view.dispatch({ effects: highlightCompartment.reconfigure(extension) });
 		};
-		const fallback = () =>
-			applyHighlighting(getCodeSyntaxHighlighting(activeTheme));
-
-		if (!filePath) {
-			fallback();
-		} else {
+		const ready = highlightingFor(filePath, activeTheme);
+		if (ready) {
+			apply(ready);
+		} else if (filePath) {
 			void loadLiveHighlighting(filePath)
-				.then((live) =>
-					live
-						? applyHighlighting(
-								liveHighlighting(live, createZedTheme(activeTheme)),
-							)
-						: fallback(),
-				)
-				.catch((error) => {
-					console.error("[CodeEditor] Failed to load live highlighting:", {
-						error,
-						filePath,
-					});
-					fallback();
-				});
+				.then(() => apply(highlightingFor(filePath, activeTheme) ?? []))
+				.catch(() => apply(getCodeSyntaxHighlighting(activeTheme)));
 		}
 
 		return () => {

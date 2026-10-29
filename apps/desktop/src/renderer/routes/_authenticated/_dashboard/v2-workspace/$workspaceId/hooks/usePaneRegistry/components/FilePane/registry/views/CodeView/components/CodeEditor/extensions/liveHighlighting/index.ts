@@ -1,1 +1,5 @@
-export { liveHighlighting, loadLiveHighlighting } from "./liveHighlighting";
+export {
+	liveHighlighting,
+	loadLiveHighlighting,
+	resolveLiveHighlighting,
+} from "./liveHighlighting";

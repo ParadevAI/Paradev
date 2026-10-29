@@ -19,22 +19,44 @@ const FONT_STYLE_BOLD = 2;
 const FONT_STYLE_UNDERLINE = 4;
 
 type HighlightsModule = typeof import("@pierre/highlights");
+type LiveHighlighting = { module: HighlightsModule; lang: string };
 
 const refreshTokens = StateEffect.define<null>();
 
+let loadedModule: HighlightsModule | undefined;
+let moduleFailed = false;
+const moduleLoad = canUseWASM()
+	? import("@pierre/highlights").then(
+			(module) => {
+				loadedModule = module;
+			},
+			(error) => {
+				moduleFailed = true;
+				console.error("[CodeEditor] Failed to load live highlighting:", error);
+			},
+		)
+	: undefined;
+
 /**
  * The language the diff view would pick for this path, when the Highlights
- * lexers cover it. Null means the editor keeps its Lezer highlight style.
+ * lexers cover it. Null means the editor keeps its Lezer highlight style;
+ * undefined means the lexers are still loading.
  */
-export async function loadLiveHighlighting(filePath: string): Promise<{
-	module: HighlightsModule;
-	lang: string;
-} | null> {
-	if (!canUseWASM()) return null;
+export function resolveLiveHighlighting(
+	filePath: string,
+): LiveHighlighting | null | undefined {
+	if (!moduleLoad || moduleFailed) return null;
+	if (!loadedModule) return undefined;
 	const lang = getFiletypeFromFileName(filePath);
-	const module = await import("@pierre/highlights");
-	if (lang === "text" || !module.isSupportedLanguage(lang)) return null;
-	return { module, lang };
+	if (lang === "text" || !loadedModule.isSupportedLanguage(lang)) return null;
+	return { module: loadedModule, lang };
+}
+
+export async function loadLiveHighlighting(
+	filePath: string,
+): Promise<LiveHighlighting | null> {
+	await moduleLoad;
+	return resolveLiveHighlighting(filePath) ?? null;
 }
 
 function toPosition(doc: Text, offset: number) {
@@ -57,7 +79,7 @@ function tokenStyle(color: string | undefined, fontStyle = 0) {
  * background and trigger a redraw.
  */
 export function liveHighlighting(
-	{ module, lang }: { module: HighlightsModule; lang: string },
+	{ module, lang }: LiveHighlighting,
 	theme: ZedTheme,
 ) {
 	return ViewPlugin.define(

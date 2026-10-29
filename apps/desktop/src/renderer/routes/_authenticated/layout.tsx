@@ -88,13 +88,16 @@ const onboardingRedirect = <Redirect to="/onboarding" replace />;
 
 const SESSION_PENDING_TIMEOUT_MS = 15_000;
 
-const PIERRE_POOL_OPTIONS: WorkerPoolOptions = {
-	workerFactory: createPierreWorker,
-	poolSize: 2,
-	mainThreadMaxCharacters: 200_000,
-};
+const HIGHLIGHT_WITH_WASM = canUseWASM();
+const PIERRE_POOL_OPTIONS: WorkerPoolOptions = HIGHLIGHT_WITH_WASM
+	? {
+			workerFactory: createPierreWorker,
+			poolSize: 2,
+			mainThreadMaxCharacters: 200_000,
+		}
+	: { workerFactory: createPierreWorker, poolSize: 8 };
 const PIERRE_HIGHLIGHTER_OPTIONS: WorkerInitializationRenderOptions = {
-	preferredHighlighter: canUseWASM() ? "highlights" : "shiki-js",
+	preferredHighlighter: HIGHLIGHT_WITH_WASM ? "highlights" : "shiki-js",
 };
 
 function AuthenticatedLayout() {
