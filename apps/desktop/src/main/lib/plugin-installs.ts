@@ -19,7 +19,11 @@ import log from "electron-log/main";
 import { env } from "main/env.main";
 import { resolveBundledCliPath } from "main/lib/bundled-cli";
 import { localDb } from "main/lib/local-db";
-import { type PluginCliAction, runPluginCli } from "main/lib/plugin-cli";
+import {
+	type PluginCliAction,
+	type PluginCliResult,
+	runPluginCli,
+} from "main/lib/plugin-cli";
 import { createSerialQueue } from "main/lib/serial-queue";
 
 /**
@@ -33,24 +37,30 @@ import { createSerialQueue } from "main/lib/serial-queue";
 
 const pluginCliQueue = createSerialQueue();
 
+export interface PluginChangeResult extends PluginCliResult {
+	installed: InstalledPlugin[];
+}
+
 /** Applies the change on disk first, so a failed one leaves no record behind. */
 async function applyPluginChange(
-	action: PluginCliAction,
+	action: PluginCliAction | null,
 	name: string,
 	nextInstalled: (installed: InstalledPlugin[]) => InstalledPlugin[],
-): Promise<InstalledPlugin[]> {
-	let next: InstalledPlugin[] = [];
+): Promise<PluginChangeResult> {
+	let result: PluginChangeResult = { installed: [], mcpError: null };
 	await pluginCliQueue(async () => {
-		const cli = resolveBundledCliPath();
-		if (cli) {
-			await runPluginCli(cli, action, name);
-		} else {
+		const cli = action ? resolveBundledCliPath() : null;
+		let mcpError: string | null = null;
+		if (action && cli) {
+			({ mcpError } = await runPluginCli(cli, action, name));
+		} else if (action) {
 			log.warn("[plugins] no bundled CLI; skills were not provisioned");
 		}
-		next = nextInstalled(getInstalledPlugins());
-		saveInstalledPlugins(next);
+		const installed = nextInstalled(getInstalledPlugins());
+		saveInstalledPlugins(installed);
+		result = { installed, mcpError };
 	});
-	return next;
+	return result;
 }
 
 export function getInstalledPlugins(): InstalledPlugin[] {
@@ -77,10 +87,10 @@ export function syncInstalledPluginMcpServers(): void {
 	);
 }
 
-/** Returns the updated install list; unknown plugin names return null. */
+/** Unknown plugin names return null. */
 export async function installPlugin(
 	name: string,
-): Promise<InstalledPlugin[] | null> {
+): Promise<PluginChangeResult | null> {
 	const plugin = getPluginByName(name);
 	if (!plugin) return null;
 
@@ -98,7 +108,7 @@ export async function installPlugin(
 	});
 }
 
-export function uninstallPlugin(name: string): Promise<InstalledPlugin[]> {
+export function uninstallPlugin(name: string): Promise<PluginChangeResult> {
 	return applyPluginChange("uninstall", name, (installed) =>
 		installed.filter((entry) => entry.name !== name),
 	);
@@ -180,13 +190,13 @@ export function getBundledSkillIcons(): Record<string, string> {
 export function setPluginEnabled(
 	name: string,
 	enabled: boolean,
-): Promise<InstalledPlugin[]> {
+): Promise<PluginChangeResult> {
 	const plugin = getPluginByName(name);
 	// installed_plugins.json is the only `enabled` flag provisioning reads, and
 	// local-db is not it: without the CLI step the skills stay materialized
 	// while the MCP servers are reaped, leaving the plugin half on.
 	return applyPluginChange(
-		enabled ? "enable" : "disable",
+		plugin ? (enabled ? "enable" : "disable") : null,
 		name,
 		(installed) => {
 			if (installed.some((entry) => entry.name === name)) {

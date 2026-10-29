@@ -2192,6 +2192,10 @@ msgstr "Podglądy sterowane przez agenta"
 msgid "Agents"
 msgstr "Agenci"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agenci nie mają dostępu do narzędzi {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agenci kończą rutynowe zgłoszenia bez interwencji w trakcie zadania."
 
@@ -18627,6 +18631,9 @@ msgstr "Usługa hosta Paradev dla {organization} zatrzymała się nieoczekiwanie
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Usługa hosta Paradev zatrzymała się nieoczekiwanie ({cause}) i nie udało się jej automatycznie uruchomić ponownie."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Zmiana wtyczki nie zakończyła się w ciągu {seconds} sekund."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Pula odnawia się co miesiąc. Użycie ponad nią jest rozliczane za GB-godzinę według stawki podanej przy każdym planie."

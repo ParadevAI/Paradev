@@ -2192,6 +2192,10 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agent không thể truy cập các công cụ của {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thiệp giữa chừng."
 
@@ -18627,6 +18631,9 @@ msgstr "Dịch vụ host Paradev cho {organization} đã dừng bất ngờ ({ca
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Dịch vụ host Paradev đã dừng bất ngờ ({cause}) và không tự khởi động lại được."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Thay đổi plugin chưa hoàn tất trong {seconds} giây."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ được tính theo GB-giờ với mức giá hiển thị ở từng gói."

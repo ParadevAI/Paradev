@@ -28,7 +28,25 @@ describe("runPluginCli", () => {
 		await runPluginCli(cli, "install", "linear");
 
 		expect(fs.readFileSync(argsFile, "utf8").trim()).toBe(
-			"plugins local install linear --json",
+			"plugins local install linear@superset --json",
+		);
+	});
+
+	test("reports a failed MCP config write, past the agent-setup logs", async () => {
+		const cli = fakeCli(
+			`echo "[agent-setup] Managed skills provisioned"; printf '{\n  "name": "linear",\n  "mcpError": "EACCES ~/.claude.json"\n}\n'`,
+		);
+
+		expect(await runPluginCli(cli, "install", "linear")).toEqual({
+			mcpError: "EACCES ~/.claude.json",
+		});
+	});
+
+	test("names the timeout instead of the raw command line", async () => {
+		const cli = fakeCli("exec sleep 5");
+
+		await expect(runPluginCli(cli, "install", "linear", 50)).rejects.toThrow(
+			"did not finish",
 		);
 	});
 

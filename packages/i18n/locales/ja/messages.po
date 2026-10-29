@@ -2192,6 +2192,10 @@ msgstr "エージェントが操作するプレビュー"
 msgid "Agents"
 msgstr "エージェント"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "エージェントは {0} のツールにアクセスできません"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "エージェントが定型チケットを途中の介入なしに完了する。"
 
@@ -18627,6 +18631,9 @@ msgstr "{organization}のParadevホストサービスが予期せず停止し ({
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradevのホストサービスが予期せず停止し ({cause})、自動的に再起動できませんでした。"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "プラグインの変更が {seconds} 秒以内に完了しませんでした。"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "プールは毎月リセットされます。超過分は各プランに表示された GB 時間あたりの料金で請求されます。"

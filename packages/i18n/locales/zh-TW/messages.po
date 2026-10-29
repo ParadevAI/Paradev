@@ -2192,6 +2192,10 @@ msgstr "由代理程式驅動的預覽"
 msgid "Agents"
 msgstr "代理程式"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "代理程式無法存取 {0} 的工具"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "代理程式無需中途干預即可完成常規工單。"
 
@@ -18627,6 +18631,9 @@ msgstr "{organization}的Paradev主機服務意外停止（{cause}），且無�
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev主機服務意外停止（{cause}），且無法自動重啟。"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "外掛變更未在 {seconds} 秒內完成。"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "時數池每月重置。超出部分按各方案標示的每 GB 小時價格計費。"

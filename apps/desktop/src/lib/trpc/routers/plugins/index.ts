@@ -72,28 +72,26 @@ export const createPluginsRouter = () => {
 		install: publicProcedure
 			.input(z.object({ name: z.string().min(1) }))
 			.mutation(async ({ input }) => {
-				const installed = await installPlugin(input.name);
-				if (installed === null) {
+				const result = await installPlugin(input.name);
+				if (result === null) {
 					throw new TRPCError({
 						code: "NOT_FOUND",
 						message: `Unknown plugin: ${input.name}`,
 					});
 				}
-				return { installed };
+				return result;
 			}),
 
 		uninstall: publicProcedure
 			.input(z.object({ name: z.string().min(1) }))
 			.mutation(async ({ input }) => {
-				return { installed: await uninstallPlugin(input.name) };
+				return uninstallPlugin(input.name);
 			}),
 
 		setEnabled: publicProcedure
 			.input(z.object({ name: z.string().min(1), enabled: z.boolean() }))
 			.mutation(async ({ input }) => {
-				return {
-					installed: await setPluginEnabled(input.name, input.enabled),
-				};
+				return setPluginEnabled(input.name, input.enabled);
 			}),
 	});
 };
