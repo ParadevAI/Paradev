@@ -176,6 +176,22 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		presetId: "agy",
+		modelFlag: "--model",
+		models: [
+			// Family ids; `--effort` picks the level. The catalog is
+			// account-dependent and agy rejects ids the account lacks. Verified
+			// against `agy models` (agy 1.4.10, 2026-10-29) except Gemini 4 Argon,
+			// whose family and level ids ship in the binary but need a plan that
+			// includes it.
+			{ id: "gemini-4-argon", label: "Gemini 4 Argon" },
+			{ id: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+			{ id: "claude-opus-4-6-thinking", label: "Claude Opus 4.6" },
+			{ id: "gpt-oss-120b", label: "GPT-OSS 120B" },
+		],
+	},
+	{
 		presetId: "copilot",
 		modelFlag: "--model",
 		models: [
@@ -559,6 +575,8 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 	"glm-5.2-high": cursorEffortVariants("glm-5.2", ["high", "max"]),
 };
 
+const AGY_EFFORT_MODELS = ["gemini-4-argon", "gemini-3.8-flash"] as const;
+
 const PI_THINKING_LEVELS: AgentModelOption[] = [
 	{ id: "off", label: "Off" },
 	{ id: "minimal", label: "Minimal" },
@@ -662,6 +680,16 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 		presetId: "pdev",
 		effortFlag: "--thinking",
 		efforts: [...PI_THINKING_LEVELS, { id: "max", label: "Max" }],
+	},
+	{
+		// Only Gemini models take `--effort`; agy rejects it on the others.
+		presetId: "agy",
+		effortFlag: "--effort",
+		efforts: [
+			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
+			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
+			{ id: "high", label: "High", models: AGY_EFFORT_MODELS },
+		],
 	},
 	{
 		presetId: "copilot",
