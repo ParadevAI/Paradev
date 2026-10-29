@@ -16,7 +16,10 @@
 			"class_name": "AgentWorker",
 			"image": "./container/Dockerfile",
 			"image_build_context": ".",
-			"image_vars": { "PDEV_VERSION": "0.2.3", "PDEV_SHA256": "4f98a7f1a34ee30ece56664dab2cfc872ff3f146630696269356a8dc7efb4130" },
+			"image_vars": {
+				"PDEV_VERSION": "0.2.3",
+				"PDEV_SHA256": "4f98a7f1a34ee30ece56664dab2cfc872ff3f146630696269356a8dc7efb4130"
+			},
 			"instance_type": "standard-4",
 			"max_instances": 1,
 			"rollout_active_grace_period": 0
