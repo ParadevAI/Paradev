@@ -32,6 +32,7 @@ export function useWorkspaceFileNavigation({
 }): {
 	openFilePane: OpenFile;
 	openFilePaneFromTreeClick: OpenFile;
+	openPinnedFilePane: (filePath: string) => void;
 	revealPath: (
 		path: string,
 		options?: {
@@ -144,6 +145,27 @@ export function useWorkspaceFileNavigation({
 		[openFilePane, viewer, worktreePath],
 	);
 
+	const openPinnedFilePane = useCallback(
+		(filePath: string) => {
+			openFilePane(filePath);
+			const absoluteFilePath = worktreePath
+				? toAbsoluteWorkspacePath(worktreePath, filePath)
+				: filePath;
+			const state = viewer.store.getState();
+			for (const tab of state.tabs) {
+				for (const pane of Object.values(tab.panes)) {
+					if (
+						pane.kind === "file" &&
+						(pane.data as FilePaneData).filePath === absoluteFilePath
+					) {
+						state.setPanePinned({ paneId: pane.id, pinned: true });
+					}
+				}
+			}
+		},
+		[openFilePane, viewer, worktreePath],
+	);
+
 	const revealPath = useCallback(
 		(path: string, options?: { isDirectory?: boolean }) => {
 			const isDirectory = options?.isDirectory === true;
@@ -171,6 +193,7 @@ export function useWorkspaceFileNavigation({
 	return {
 		openFilePane,
 		openFilePaneFromTreeClick,
+		openPinnedFilePane,
 		revealPath,
 		selectedFilePath,
 		pendingReveal,

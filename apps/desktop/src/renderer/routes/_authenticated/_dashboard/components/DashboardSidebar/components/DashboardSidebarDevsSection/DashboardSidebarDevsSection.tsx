@@ -22,7 +22,7 @@ export function DashboardSidebarDevsSection() {
 	);
 	const { data: devs = [] } = cloudTrpc.agent.list.useQuery(
 		{ organizationId: organizationId ?? "" },
-		{ enabled: organizationId !== null, refetchInterval: 15_000 },
+		{ enabled: organizationId !== null },
 	);
 	const active = matchRoute({ to: "/devs/$devId", fuzzy: true });
 	const activeDevId = active ? active.devId : null;

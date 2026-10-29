@@ -1,3 +1,4 @@
+import { LuContainer } from "react-icons/lu";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { getPluginIconUrl } from "renderer/components/PluginIcon";
 import { FileIcon } from "renderer/lib/fileIcons";
@@ -8,6 +9,9 @@ const ICON_CLASSNAME =
 
 export function LinkUnfurlIcon({ icon }: { icon: LinkUnfurl["icon"] }) {
 	const isDark = useIsDarkTheme();
+	if (icon.kind === "environment") {
+		return <LuContainer className={ICON_CLASSNAME} />;
+	}
 	if (icon.kind === "file") {
 		return <FileIcon className={ICON_CLASSNAME} fileName={icon.fileName} />;
 	}

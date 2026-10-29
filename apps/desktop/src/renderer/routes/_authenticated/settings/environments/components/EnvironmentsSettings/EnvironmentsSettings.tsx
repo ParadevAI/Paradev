@@ -3,7 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	HiOutlineArchiveBox,
@@ -13,10 +13,8 @@ import {
 } from "react-icons/hi2";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import {
-	EnvironmentEditorDialog,
-	type EnvironmentEditorSeed,
-} from "renderer/routes/_authenticated/components/EnvironmentEditorDialog";
+import { ArchiveEnvironmentDialog } from "renderer/routes/_authenticated/components/ArchiveEnvironmentDialog";
+import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import {
 	isItemVisible,
 	SETTING_ITEM_ID,
@@ -34,12 +32,13 @@ export function EnvironmentsSettings({
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
-	const [editor, setEditor] = useState<
-		| { mode: "closed" }
-		| { mode: "create" }
-		| { mode: "edit"; seed: EnvironmentEditorSeed }
-	>({ mode: "closed" });
+	const navigate = useNavigate();
+	const [isCreating, setIsCreating] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [archiving, setArchiving] = useState<{
+		id: string;
+		name: string;
+	} | null>(null);
 	const showList = isItemVisible(
 		SETTING_ITEM_ID.ENVIRONMENTS_LIST,
 		visibleItems,
@@ -121,7 +120,7 @@ export function EnvironmentsSettings({
 						)
 					)}
 					<Button
-						onClick={() => setEditor({ mode: "create" })}
+						onClick={() => setIsCreating(true)}
 						size="sm"
 						disabled={atLimit}
 					>
@@ -183,19 +182,9 @@ export function EnvironmentsSettings({
 									aria-label={t({ message: "Edit environment" })}
 									className="h-8 w-8 text-muted-foreground"
 									onClick={() =>
-										setEditor({
-											mode: "edit",
-											seed: {
-												id: environment.id,
-												name: environment.name,
-												scope: environment.scope,
-												repositoryIds: (environment.repositories ?? []).map(
-													(repo) => repo.id,
-												),
-												primaryRepositoryId: environment.primaryRepositoryId,
-												repositoriesFrozen: environment.sourceKind !== "image",
-												region: environment.region,
-											},
+										navigate({
+											to: "/environments/$environmentId",
+											params: { environmentId: environment.id },
 										})
 									}
 									size="icon"
@@ -206,7 +195,9 @@ export function EnvironmentsSettings({
 								<Button
 									aria-label={t({ message: "Archive environment" })}
 									className="h-8 w-8 text-muted-foreground hover:text-destructive"
-									onClick={() => archive.mutate({ id: environment.id })}
+									onClick={() =>
+										setArchiving({ id: environment.id, name: environment.name })
+									}
 									size="icon"
 									variant="ghost"
 								>
@@ -225,14 +216,20 @@ export function EnvironmentsSettings({
 				</div>
 			)}
 
-			{organizationId && editor.mode !== "closed" && (
-				<EnvironmentEditorDialog
-					environment={editor.mode === "edit" ? editor.seed : undefined}
-					key={editor.mode === "edit" ? editor.seed.id : "create"}
-					onOpenChange={(open) => {
-						if (!open) setEditor({ mode: "closed" });
-					}}
-					open
+			<ArchiveEnvironmentDialog
+				environmentName={archiving?.name ?? null}
+				onConfirm={() => {
+					if (archiving) archive.mutate({ id: archiving.id });
+				}}
+				onOpenChange={(open) => {
+					if (!open) setArchiving(null);
+				}}
+			/>
+
+			{organizationId && (
+				<CreateEnvironmentFlow
+					onOpenChange={setIsCreating}
+					open={isCreating}
 					organizationId={organizationId}
 				/>
 			)}

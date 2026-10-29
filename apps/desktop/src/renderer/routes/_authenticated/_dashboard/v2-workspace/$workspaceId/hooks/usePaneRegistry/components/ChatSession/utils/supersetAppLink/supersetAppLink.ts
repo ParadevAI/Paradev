@@ -6,6 +6,7 @@ export type SupersetAppLink =
 	| { kind: "task"; taskId: string }
 	| { kind: "automation"; automationId: string }
 	| { kind: "plugin"; pluginName: string }
+	| { kind: "environment"; environmentId: string }
 	| { kind: "workspace"; workspaceId: string }
 	| { kind: "chat"; workspaceId: string; sessionId: string };
 
@@ -16,6 +17,10 @@ const ROUTES: [RegExp, (id: string) => SupersetAppLink][] = [
 		(automationId) => ({ kind: "automation", automationId }),
 	],
 	[/^\/plugins\/([^/]+)\/?$/, (pluginName) => ({ kind: "plugin", pluginName })],
+	[
+		/^\/environments\/([^/]+)\/?$/,
+		(environmentId) => ({ kind: "environment", environmentId }),
+	],
 	[
 		/^\/workspaces\/([^/]+)\/?$/,
 		(workspaceId) => ({ kind: "workspace", workspaceId }),

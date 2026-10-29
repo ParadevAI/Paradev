@@ -65,7 +65,8 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
-import { EnvironmentEditorDialog } from "renderer/routes/_authenticated/components/EnvironmentEditorDialog";
+import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
+import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { newWorkspaceAttachmentPaths } from "renderer/stores/new-workspace-attachments";
@@ -76,7 +77,11 @@ import {
 	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
 	useNewWorkspaceWidthStore,
 } from "renderer/stores/new-workspace-width";
-import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
+import {
+	environmentBranchKey,
+	NO_PROJECT_KEY,
+	useV2WorkspaceCreateDefaultsStore,
+} from "renderer/stores/v2-workspace-create-defaults";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
 import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
@@ -116,7 +121,7 @@ import { SupersetIcon } from "./components/SupersetIcon";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
-import { environmentsForRepository } from "./utils/environmentsForRepository";
+import { resolveCloudChoices } from "./utils/resolveCloudChoices";
 
 const SAMPLE_PROMPT_COUNT = 3;
 
@@ -175,6 +180,18 @@ export function NewWorkspaceScreen({
 	);
 	const setLastHostId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastHostId,
+	);
+	const setLastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.setLastProjectChoice,
+	);
+	const setCheckoutDefault = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.setCheckout,
+	);
+	const cloudChoices = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.cloudChoices,
+	);
+	const setCloudChoice = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.setCloudChoice,
 	);
 	const samplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.samplePromptsDismissed,
@@ -303,6 +320,10 @@ export function NewWorkspaceScreen({
 	);
 	const selectableProjects = isCloudHost ? cloudProjects : projects;
 
+	const lastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+		(state) =>
+			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
+	);
 	const isProjectPreselectionPending = useProjectPreselection({
 		isOpen,
 		areProjectsReady: areProjectsReady && (!isCloudHost || !github.isLoading),
@@ -311,11 +332,43 @@ export function NewWorkspaceScreen({
 		preSelectedSession,
 		selectedProjectId: draft.selectedProjectId,
 		isSession: draft.isSession,
-		lastProjectId: useV2WorkspaceCreateDefaultsStore.getState().lastProjectId,
+		target: isCloudHost ? "cloud" : "device",
+		lastChoice: lastProjectChoice,
 		selectProject,
 		selectSession,
 		updateDraft,
 	});
+
+	// A project without a GitHub repository can't start in the cloud, so a
+	// handoff of one keeps everything but the host.
+	useEffect(() => {
+		if (
+			!isOpen ||
+			!isCloudHost ||
+			!preSelectedProjectId ||
+			!areProjectsReady ||
+			github.isLoading ||
+			!machineId
+		)
+			return;
+		const isCloudProject = cloudProjects.some(
+			(project) => project.id === preSelectedProjectId,
+		);
+		const isDeviceProject = projects.some(
+			(project) => project.id === preSelectedProjectId,
+		);
+		if (!isCloudProject && isDeviceProject) updateDraft({ hostId: machineId });
+	}, [
+		isOpen,
+		isCloudHost,
+		preSelectedProjectId,
+		areProjectsReady,
+		github.isLoading,
+		machineId,
+		cloudProjects,
+		projects,
+		updateDraft,
+	]);
 
 	const storedComposerWidth = useNewWorkspaceWidthStore(
 		(state) => state.screenWidth,
@@ -368,34 +421,33 @@ export function NewWorkspaceScreen({
 		selectedProject?.githubOwner && selectedProject.githubRepoName
 			? `${selectedProject.githubOwner}/${selectedProject.githubRepoName}`
 			: null;
-	// A cloud workspace without a project would be a session, which the cloud
-	// can't start yet; offer nothing rather than an unrelated repository.
-	const environmentOptions =
-		draft.isSession || !projectRepositoryFullName
-			? []
-			: environmentsForRepository(
-					startableCloudEnvironments(environmentsQuery.data ?? []),
-					projectRepositoryFullName,
-				);
-	// An explicit pick; otherwise Default, which resolves below.
-	const selectedEnvironment = environmentOptions.find(
-		(row) => row.id === draft.environmentId,
+	const machineSizeOptions = useMachineSizeOptions();
+	const cloudProjectId = draft.isSession ? null : projectId;
+	const cloudChoiceKey = cloudProjectId ?? NO_PROJECT_KEY;
+	const cloudSelection = useMemo(
+		() =>
+			resolveCloudChoices({
+				environments: startableCloudEnvironments(environmentsQuery.data ?? []),
+				projectId: cloudProjectId,
+				repositoryFullName: projectRepositoryFullName,
+				choices: cloudChoices,
+				offeredSizes: machineSizeOptions.options.map((option) => option.size),
+				defaultSize: machineSizeOptions.defaultSize,
+			}),
+		[
+			environmentsQuery.data,
+			cloudProjectId,
+			projectRepositoryFullName,
+			cloudChoices,
+			machineSizeOptions,
+		],
 	);
-	// The project's repository as the GitHub App sees it, for the branch picker.
-	const projectRepository =
-		!draft.isSession && projectRepositoryFullName
-			? (github.repositoriesByFullName.get(
-					projectRepositoryFullName.toLowerCase(),
-				) ?? null)
-			: null;
-	// Default: the project's first environment. With none, the picker offers to set one up.
-	const resolvedEnvironment = selectedEnvironment ?? environmentOptions[0];
-	const defaultHint = resolvedEnvironment?.name ?? null;
+	const resolvedEnvironment = cloudSelection.environment ?? undefined;
 	const isCloudTargetLoading = environmentsQuery.isLoading || github.isLoading;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
-		const primary = resolvedEnvironment?.repositories?.[0] ?? projectRepository;
+		const primary = resolvedEnvironment?.repositories?.[0];
 		return primary
 			? {
 					owner: primary.owner,
@@ -403,7 +455,7 @@ export function NewWorkspaceScreen({
 					defaultBranch: primary.defaultBranch,
 				}
 			: null;
-	}, [isCloudHost, resolvedEnvironment, projectRepository]);
+	}, [isCloudHost, resolvedEnvironment]);
 	const isPromptEmpty = !draft.prompt.trim();
 	// The markdown editor is uncontrolled after mount, so programmatic prompt
 	// insertion bumps promptSeed to remount it with the new content.
@@ -451,12 +503,20 @@ export function NewWorkspaceScreen({
 		}
 	}, [isOpen, preSelectedHostId, updateDraft]);
 
-	// Reset baseBranch on project or host change, defaulting to the user's
-	// last selected branch for that project — the draft store is global, so a
-	// stale branch from another project would otherwise ride into the create.
+	// Reset baseBranch when what it branches from changes, defaulting to the
+	// user's last branch there — the draft store is global, so a stale branch
+	// from another repository would otherwise ride into the create. On the
+	// cloud that is the environment's repository, not the project's.
+	const branchDefaultKey = isCloudHost
+		? resolvedEnvironment
+			? environmentBranchKey(resolvedEnvironment.id)
+			: null
+		: projectId;
 	const persistedBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
 		(state) =>
-			projectId ? (state.baseBranchesByProjectId[projectId] ?? null) : null,
+			branchDefaultKey
+				? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
+				: null,
 	);
 	const setBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setBaseBranchDefault,
@@ -464,21 +524,21 @@ export function NewWorkspaceScreen({
 	const clearBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.clearBaseBranchDefault,
 	);
-	const previousProjectIdRef = useRef(projectId);
+	const previousBranchDefaultKeyRef = useRef(branchDefaultKey);
 	const previousHostIdRef = useRef(draft.hostId);
 	useEffect(() => {
 		if (
-			previousProjectIdRef.current !== projectId ||
+			previousBranchDefaultKeyRef.current !== branchDefaultKey ||
 			previousHostIdRef.current !== draft.hostId
 		) {
-			previousProjectIdRef.current = projectId;
+			previousBranchDefaultKeyRef.current = branchDefaultKey;
 			previousHostIdRef.current = draft.hostId;
 			updateDraft({
 				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
 				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
 			});
 		}
-	}, [projectId, draft.hostId, persistedBaseBranchDefault, updateDraft]);
+	}, [branchDefaultKey, draft.hostId, persistedBaseBranchDefault, updateDraft]);
 
 	// ── Agent / model / effort ───────────────────────────────────────
 	const launchHostUrl = useMemo(() => {
@@ -598,11 +658,11 @@ export function NewWorkspaceScreen({
 		baseBranch: draft.baseBranch,
 		typedWorkspaceName: draft.workspaceName,
 		onBaseBranchChange: (branch, source) => {
-			if (projectId) {
+			if (branchDefaultKey) {
 				if (branch && source) {
-					setBaseBranchDefault(projectId, branch, source);
+					setBaseBranchDefault(branchDefaultKey, branch, source);
 				} else {
-					clearBaseBranchDefault(projectId);
+					clearBaseBranchDefault(branchDefaultKey);
 				}
 			}
 			updateDraft({ baseBranch: branch, baseBranchSource: source });
@@ -641,25 +701,19 @@ export function NewWorkspaceScreen({
 		modeSupport ? selectedMode : null,
 		uploadAttachments,
 		promptContext,
-		{
-			environmentId: resolvedEnvironment?.id ?? null,
-			repositoryFullName: draft.isSession ? null : projectRepositoryFullName,
-		},
+		resolvedEnvironment?.id ?? null,
+		isCloudHost ? cloudSelection.machineSize : null,
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {
 		const selectedHostId = draft.hostId ?? machineId;
 		// A cloud workspace is provisioned by the API from its environment: no
 		// host readiness to wait on, and the project only narrows the list.
-		if (selectedHostId === CLOUD_HOST_ID && draft.isSession)
-			return t({ message: "Cloud workspaces need a project for now" });
-		if (selectedHostId === CLOUD_HOST_ID && !projectRepositoryFullName)
-			return t({ message: "Select a project" });
 		if (selectedHostId === CLOUD_HOST_ID) {
 			if (isCloudTargetLoading) return t({ message: "Loading environments…" });
-			return defaultHint === null
-				? t({ message: "Select an environment" })
-				: null;
+			return resolvedEnvironment
+				? null
+				: t({ message: "Select an environment" });
 		}
 		if (isProjectPreselectionPending || (!selectedProject && !draft.isSession))
 			return t({
@@ -689,8 +743,7 @@ export function NewWorkspaceScreen({
 		activeHostUrl,
 		selectedRemoteHostPresence,
 		isCloudTargetLoading,
-		defaultHint,
-		projectRepositoryFullName,
+		resolvedEnvironment,
 		t,
 	]);
 
@@ -1114,11 +1167,20 @@ export function NewWorkspaceScreen({
 								isSessionSelected={draft.isSession}
 								githubRepositories={isCloudHost ? github.repositories : []}
 								githubConnection={isCloudHost ? github.connection : null}
+								isLoading={
+									!areProjectsReady || (isCloudHost && github.isLoading)
+								}
 								onSelectProject={(selectedProjectId) => {
+									const target = isCloudHost ? "cloud" : "device";
 									if (selectedProjectId === null) {
+										setLastProjectChoice(target, { kind: "none" });
 										selectSession();
 										return;
 									}
+									setLastProjectChoice(target, {
+										kind: "project",
+										projectId: selectedProjectId,
+									});
 									// A stand-in id means nothing to a device; keep the
 									// device's last project for next time.
 									if (
@@ -1130,46 +1192,38 @@ export function NewWorkspaceScreen({
 							/>
 							{isCloudHost && (
 								<EnvironmentPickerPill
-									selectedEnvironment={selectedEnvironment}
-									environments={environmentOptions}
-									defaultHint={defaultHint}
-									repositoryFullName={
-										draft.isSession
-											? undefined
-											: (projectRepositoryFullName ?? undefined)
+									selectedEnvironment={resolvedEnvironment}
+									linked={cloudSelection.linked}
+									other={cloudSelection.other}
+									projectName={
+										draft.isSession ? undefined : selectedProject?.name
 									}
-									onSelectEnvironment={(next) =>
-										updateDraft({ environmentId: next })
+									onSelectEnvironment={(environmentId) =>
+										setCloudChoice(cloudChoiceKey, { environmentId })
 									}
 									onCreateEnvironment={() => setIsCreatingEnvironment(true)}
+									onManageEnvironments={() => {
+										closeModal();
+										void navigate({ to: "/settings/environments" });
+									}}
 									isLoading={environmentsQuery.isLoading}
-									isSessionUnavailable={draft.isSession}
 								/>
 							)}
 							{isCloudHost && (
 								<MachineSizePickerPill
-									machineSize={draft.machineSize}
+									machineSize={cloudSelection.machineSize}
 									onSelectMachineSize={(machineSize) =>
-										updateDraft({ machineSize })
+										setCloudChoice(cloudChoiceKey, { machineSize })
 									}
 								/>
 							)}
-							{isCreatingEnvironment && activeOrganizationId && (
-								<EnvironmentEditorDialog
-									open
+							{activeOrganizationId && (
+								<CreateEnvironmentFlow
+									onOpenChange={setIsCreatingEnvironment}
+									onStarted={closeModal}
+									open={isCreatingEnvironment}
 									organizationId={activeOrganizationId}
-									initialName={
-										draft.isSession ? undefined : selectedProject?.name
-									}
-									initialRepositoryFullName={
-										draft.isSession
-											? undefined
-											: (projectRepositoryFullName ?? undefined)
-									}
-									onOpenChange={(open) => {
-										if (!open) setIsCreatingEnvironment(false);
-									}}
-									onCreated={(environmentId) => updateDraft({ environmentId })}
+									projectId={draft.isSession ? null : projectId}
 								/>
 							)}
 							{draft.linkedPR ? (
@@ -1190,7 +1244,10 @@ export function NewWorkspaceScreen({
 								<>
 									<CheckoutPickerPill
 										checkout={draft.checkout}
-										onSelectCheckout={(checkout) => updateDraft({ checkout })}
+										onSelectCheckout={(checkout) => {
+											setCheckoutDefault(checkout);
+											updateDraft({ checkout });
+										}}
 									/>
 									{draft.checkout === "worktree" && (
 										<CompareBaseBranchPicker

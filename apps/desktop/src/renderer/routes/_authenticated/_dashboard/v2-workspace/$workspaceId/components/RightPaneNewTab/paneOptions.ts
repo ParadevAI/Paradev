@@ -3,12 +3,7 @@ import { msg } from "@lingui/core/macro";
 import type { CreatePaneInput } from "@superset/panes";
 import type { IconType } from "react-icons";
 import { BsTerminalPlus } from "react-icons/bs";
-import {
-	LuFileDiff,
-	LuFileText,
-	LuFolderTree,
-	LuGitPullRequestArrow,
-} from "react-icons/lu";
+import { LuFileDiff, LuFileText, LuFolderTree } from "react-icons/lu";
 import { TbDeviceDesktop, TbDeviceMobile, TbWorld } from "react-icons/tb";
 import type { HotkeyId } from "renderer/hotkeys";
 import type {
@@ -52,11 +47,6 @@ const RIGHT_PANE_OPTIONS: RightPaneOption[] = [
 		hotkeyId: "OPEN_DIFF_VIEWER",
 	},
 	{ kind: "files", label: msg({ message: "Files" }), Icon: LuFolderTree },
-	{
-		kind: "review",
-		label: msg({ message: "Review" }),
-		Icon: LuGitPullRequestArrow,
-	},
 	{ kind: "pages-list", label: msg({ message: "Pages" }), Icon: LuFileText },
 	{
 		kind: "desktop",
@@ -87,7 +77,6 @@ export function createRightPane(
 ): CreatePaneInput<PaneViewerData> {
 	switch (kind) {
 		case "files":
-		case "review":
 		case "pages-list":
 		case "desktop":
 		case "mobile":

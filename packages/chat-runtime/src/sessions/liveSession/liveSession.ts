@@ -102,9 +102,15 @@ export class LiveSession {
 	/** Turns a user prompt started, and those of them that have shown anything yet. */
 	private readonly promptedTurns = new Set<string>();
 	private readonly turnsWithOutput = new Set<string>();
+	/** False when the agent died before it reported any other status. */
+	private readonly started: Promise<boolean>;
+	private settleStarted: (started: boolean) => void = () => {};
 
 	constructor(private readonly options: LiveSessionOptions) {
 		this.sessionState = { status: "starting", harness: options.harness };
+		this.started = new Promise((resolve) => {
+			this.settleStarted = resolve;
+		});
 	}
 
 	get sessionId(): string {
@@ -401,11 +407,14 @@ export class LiveSession {
 		);
 	}
 
-	fork(cut?: { upToMessageId: string }): Promise<string | null> {
-		return this.options.adapter.fork?.(cut) ?? Promise.resolve(null);
+	/** An agent has no session to copy until it has started. */
+	async fork(cut?: { upToMessageId: string }): Promise<string | null> {
+		if (!this.options.adapter.fork || !(await this.started)) return null;
+		return this.options.adapter.fork(cut);
 	}
 
 	async dispose(): Promise<void> {
+		this.settleStarted(false);
 		this.stopped = true;
 		this.discardPending();
 		await this.options.adapter.dispose();
@@ -413,9 +422,13 @@ export class LiveSession {
 	}
 
 	private async run(stream: AsyncIterable<AdapterEvent>): Promise<void> {
-		for await (const event of stream) {
-			if (this.stopped) return;
-			this.handle(event);
+		try {
+			for await (const event of stream) {
+				if (this.stopped) return;
+				this.handle(event);
+			}
+		} finally {
+			this.settleStarted(false);
 		}
 	}
 
@@ -455,6 +468,9 @@ export class LiveSession {
 			}
 			case "session":
 				if (event.session.status === "dead") this.discardPending();
+				if (event.session.status && event.session.status !== "starting") {
+					this.settleStarted(event.session.status !== "dead");
+				}
 				this.emitSession(event.session);
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
@@ -656,6 +672,7 @@ export class LiveSession {
 	}
 
 	private fail(error: unknown): void {
+		this.settleStarted(false);
 		this.stopped = true;
 		const failedAtMs = this.now();
 		const turn = this.currentTurn;
