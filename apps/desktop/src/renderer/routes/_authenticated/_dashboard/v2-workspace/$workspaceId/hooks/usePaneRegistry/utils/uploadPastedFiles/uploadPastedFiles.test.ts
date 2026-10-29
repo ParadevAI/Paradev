@@ -234,4 +234,43 @@ describe("uploadPastedFiles", () => {
 			`${WORKSPACE_ATTACHMENTS_DIR}/attachment_3`,
 		]);
 	});
+
+	it("copies disk-backed files into a local workspace without the upload limits", async () => {
+		const { deps, writes } = makeDeps({ existing: [`${DIR_ABS}/build.dmg`] });
+		fileReads = 0;
+		const dmg = new File([new Uint8Array(1)], "build.dmg");
+		Object.defineProperty(dmg, "size", { value: 451 * 1024 * 1024 });
+		const screenshot = new File(["x"], "image.png", { type: "image/png" });
+		const copies: Array<{ sourcePath: string; destinationPath: string }> = [];
+
+		const paths = await uploadPastedFiles({
+			deps: {
+				...deps,
+				local: {
+					pathOf: (file) =>
+						file === dmg ? "/Users/me/Downloads/build.dmg" : "",
+					async copyFile(input) {
+						copies.push(input);
+						return input.destinationPath === `${DIR_ABS}/build.dmg`
+							? { ok: false, reason: "exists" }
+							: { ok: true };
+					},
+				},
+			},
+			workspaceId: "ws-1",
+			worktreePath: WORKTREE,
+			files: [dmg, screenshot],
+		});
+
+		expect(paths).toEqual([
+			`${WORKSPACE_ATTACHMENTS_DIR}/build_1.dmg`,
+			`${WORKSPACE_ATTACHMENTS_DIR}/image.png`,
+		]);
+		expect(copies.at(-1)).toEqual({
+			sourcePath: "/Users/me/Downloads/build.dmg",
+			destinationPath: `${DIR_ABS}/build_1.dmg`,
+		});
+		expect(fileReads).toBe(1);
+		expect(writes.at(-1)?.absolutePath).toBe(`${DIR_ABS}/image.png`);
+	});
 });

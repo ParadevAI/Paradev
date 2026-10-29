@@ -3,6 +3,9 @@ import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback } from "react";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	PasteUploadLimitError,
 	uploadPastedFiles,
@@ -18,6 +21,11 @@ export function useUploadAttachments(workspaceId: string) {
 		workspaceTrpc.filesystem.createDirectory.useMutation();
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const worktreePath = workspace?.worktreePath;
+	const { machineId } = useLocalHostService();
+	const { workspaces } = useHostWorkspaces();
+	const isLocal =
+		Boolean(machineId) &&
+		workspaces.find((w) => w.id === workspaceId)?.hostId === machineId;
 
 	return useCallback(
 		async (files: File[]): Promise<string[] | null> => {
@@ -28,6 +36,13 @@ export function useUploadAttachments(workspaceId: string) {
 					deps: {
 						createDirectory: (input) => createDirectory.mutateAsync(input),
 						writeFile: (input) => writeFile.mutateAsync(input),
+						local: isLocal
+							? {
+									pathOf: (file) => window.webUtils.getPathForFile(file),
+									copyFile: (input) =>
+										electronTrpcClient.attachments.copyLocalFile.mutate(input),
+								}
+							: undefined,
 					},
 					workspaceId,
 					worktreePath,
@@ -46,6 +61,6 @@ export function useUploadAttachments(workspaceId: string) {
 				return null;
 			}
 		},
-		[worktreePath, workspaceId, createDirectory, writeFile, t],
+		[worktreePath, workspaceId, isLocal, createDirectory, writeFile, t],
 	);
 }

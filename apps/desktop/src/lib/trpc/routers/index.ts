@@ -1,6 +1,7 @@
 import type { BrowserWindow } from "electron";
 import { router } from "..";
 import { createAnalyticsRouter } from "./analytics";
+import { createAttachmentsRouter } from "./attachments";
 import { createAuthRouter } from "./auth";
 import { createAutoUpdateRouter } from "./auto-update";
 import { createBrowserRouter } from "./browser/browser";
@@ -38,6 +39,7 @@ import { createWorkspacesRouter } from "./workspaces";
 export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 	return router({
 		analytics: createAnalyticsRouter(),
+		attachments: createAttachmentsRouter(),
 		browser: createBrowserRouter(),
 		browserHistory: createBrowserHistoryRouter(),
 		downloads: createDownloadsRouter(),

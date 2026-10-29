@@ -46,6 +46,17 @@ export interface UploadPastedFilesDeps {
 		content: string | { kind: "base64"; data: string };
 		options: { create: boolean; overwrite: boolean };
 	}): Promise<FsWriteOutcome>;
+	/**
+	 * Set only when the workspace is on this machine. Files with a disk path
+	 * are then copied in place, so the upload size limits do not apply.
+	 */
+	local?: {
+		pathOf(file: File): string;
+		copyFile(input: {
+			sourcePath: string;
+			destinationPath: string;
+		}): Promise<FsWriteOutcome>;
+	};
 }
 
 const MIME_EXTENSIONS: Record<string, string> = {
@@ -79,20 +90,12 @@ function baseFileName(file: File, index: number): string {
  * references.
  */
 async function writeUnique(
-	deps: UploadPastedFilesDeps,
-	workspaceId: string,
-	dirAbs: string,
 	base: string,
-	data: string,
+	write: (fileName: string) => Promise<FsWriteOutcome>,
 ): Promise<string> {
 	for (let attempt = 0; attempt < MAX_NAME_ATTEMPTS; attempt++) {
 		const fileName = attachmentNameWithSuffix(base, attempt);
-		const outcome = await deps.writeFile({
-			workspaceId,
-			absolutePath: `${dirAbs}/${fileName}`,
-			content: { kind: "base64", data },
-			options: { create: true, overwrite: false },
-		});
+		const outcome = await write(fileName);
 		if (outcome.ok !== false) return fileName;
 		if (outcome.reason !== "exists") {
 			throw new Error(outcome.reason ?? "write failed");
@@ -102,10 +105,9 @@ async function writeUnique(
 }
 
 /**
- * Ship clipboard files to a workspace whose PTY runs on another machine and
- * return the worktree-relative paths written, ready to paste into the
- * terminal. Throws on the first failed write — the caller owns the error
- * surface.
+ * Write files into the workspace's attachments directory and return the
+ * worktree-relative paths written. Throws on the first failed write — the
+ * caller owns the error surface.
  */
 export async function uploadPastedFiles(options: {
 	deps: UploadPastedFilesDeps;
@@ -116,18 +118,22 @@ export async function uploadPastedFiles(options: {
 	const { deps, workspaceId, worktreePath, files } = options;
 	const dirAbs = `${worktreePath}/${WORKSPACE_ATTACHMENTS_DIR}`;
 
+	const localPaths = files.map((file) => deps.local?.pathOf(file) ?? "");
+	const limitScope = deps.local ? "uploaded" : "sent to a remote workspace";
+
 	let totalBytes = 0;
-	for (const file of files) {
+	for (const [index, file] of files.entries()) {
+		if (localPaths[index]) continue;
 		if (file.size > MAX_SINGLE_FILE_BYTES) {
 			throw new PasteUploadLimitError(
-				`"${file.name || "pasted file"}" is ${formatMb(file.size)} — files over ${formatMb(MAX_SINGLE_FILE_BYTES)} can't be sent to a remote workspace`,
+				`"${file.name || "pasted file"}" is ${formatMb(file.size)} — files over ${formatMb(MAX_SINGLE_FILE_BYTES)} can't be ${limitScope}`,
 			);
 		}
 		totalBytes += file.size;
 	}
 	if (totalBytes > MAX_TOTAL_BYTES) {
 		throw new PasteUploadLimitError(
-			`Pasted files total ${formatMb(totalBytes)} — more than the ${formatMb(MAX_TOTAL_BYTES)} limit for a remote workspace`,
+			`Pasted files total ${formatMb(totalBytes)} — more than the ${formatMb(MAX_TOTAL_BYTES)} limit for ${deps.local ? "an upload" : "a remote workspace"}`,
 		);
 	}
 
@@ -151,14 +157,24 @@ export async function uploadPastedFiles(options: {
 
 	const paths: string[] = [];
 	for (const [index, file] of files.entries()) {
-		const data = await fileToBase64(file);
-		const fileName = await writeUnique(
-			deps,
-			workspaceId,
-			dirAbs,
-			baseFileName(file, index),
-			data,
-		);
+		const sourcePath = localPaths[index];
+		const data = sourcePath ? null : await fileToBase64(file);
+		const write = (fileName: string): Promise<FsWriteOutcome> => {
+			const absolutePath = `${dirAbs}/${fileName}`;
+			if (sourcePath && deps.local) {
+				return deps.local.copyFile({
+					sourcePath,
+					destinationPath: absolutePath,
+				});
+			}
+			return deps.writeFile({
+				workspaceId,
+				absolutePath,
+				content: { kind: "base64", data: data ?? "" },
+				options: { create: true, overwrite: false },
+			});
+		};
+		const fileName = await writeUnique(baseFileName(file, index), write);
 		paths.push(`${WORKSPACE_ATTACHMENTS_DIR}/${fileName}`);
 	}
 	return paths;
