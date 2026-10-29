@@ -7,7 +7,7 @@ import {
 	writeFileIfChanged,
 } from "@superset/agent-setup";
 import { CLIError } from "@superset/cli-framework";
-import { getSupersetHomeDir } from "../settings/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { MARKETPLACE_FILE, type Marketplace } from "./marketplace";
 
 export {
@@ -33,7 +33,7 @@ export interface KnownMarketplace {
 export type { InstalledPluginEntry as InstalledPlugin } from "@superset/agent-setup";
 
 export function supersetHome(): string {
-	return getSupersetHomeDir();
+	return resolveAppHomeDir();
 }
 
 export function pluginsRoot(): string {

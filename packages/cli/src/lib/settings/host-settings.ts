@@ -5,7 +5,7 @@ import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc
 import type { BranchPrefixMode } from "@superset/local-db/schema/zod";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import SuperJSON from "superjson";
-import { getSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 
 // Git settings live in the host service's host_settings table (the v2 store
 // the desktop UI reads), not in local.db. The CLI reaches the local host
@@ -35,7 +35,7 @@ const NOT_RUNNING = new CLIError(
 
 /** Find a live host-service manifest, preferring the configured org. */
 function findManifest(): HostServiceManifest {
-	const home = getSupersetHomeDir();
+	const home = resolveAppHomeDir();
 	const orgIds: string[] = [];
 	try {
 		const config = JSON.parse(

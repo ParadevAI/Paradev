@@ -26,6 +26,7 @@ import {
 	type SessionInfo,
 } from "@superset/pty-daemon/protocol";
 import { probeTrustdHealthy } from "@superset/pty-daemon/trustd-probe";
+import { isDefaultAppHomeDir } from "@superset/agent-setup/paths";
 import semver from "semver";
 import { DaemonClient } from "../terminal/DaemonClient/index.ts";
 import { EXPECTED_DAEMON_VERSION } from "./expected-version.ts";
@@ -182,14 +183,12 @@ export function ptyDaemonSocketPath(
 	// looks live on a restored disk.
 	if (env.SUPERSET_RUN_DIR) return path.join(env.SUPERSET_RUN_DIR, "ptyd.sock");
 	const home = env.SUPERSET_HOME_DIR;
-	const defaultHome = path.join(os.homedir(), ".superset");
-	const isDefaultHome =
-		!home || path.resolve(home) === path.resolve(defaultHome);
 	// Hash the RESOLVED home so equivalent spellings of one custom home
 	// (trailing slash, relative segments) land on the same socket.
-	const key = isDefaultHome
-		? organizationId
-		: `${organizationId}:${path.resolve(home)}`;
+	const key =
+		!home || isDefaultAppHomeDir(home)
+			? organizationId
+			: `${organizationId}:${path.resolve(home)}`;
 	const shortId = createHash("sha256").update(key).digest("hex").slice(0, 12);
 	return path.join(os.tmpdir(), `superset-ptyd-${shortId}.sock`);
 }

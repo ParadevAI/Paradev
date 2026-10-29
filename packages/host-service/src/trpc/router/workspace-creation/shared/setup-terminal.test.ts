@@ -8,19 +8,19 @@ const PROJECT_ID = "11111111-1111-1111-1111-111111111111";
 
 interface Sandbox {
 	repoPath: string;
-	homeDir: string;
+	appHomeDir: string;
 	cleanup: () => void;
 }
 
 function createSandbox(): Sandbox {
 	const root = mkdtempSync(join(tmpdir(), "setup-terminal-test-"));
 	const repoPath = join(root, "repo");
-	const homeDir = join(root, "home");
+	const appHomeDir = join(root, "home");
 	mkdirSync(repoPath, { recursive: true });
-	mkdirSync(homeDir, { recursive: true });
+	mkdirSync(appHomeDir, { recursive: true });
 	return {
 		repoPath,
-		homeDir,
+		appHomeDir,
 		cleanup: () => rmSync(root, { recursive: true, force: true }),
 	};
 }
@@ -52,7 +52,7 @@ describe("resolveInitialCommand", () => {
 		return resolveInitialCommand({
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 	}
 
@@ -127,7 +127,7 @@ describe("resolveInitialCommand", () => {
 			const cmd = resolveInitialCommand({
 				repoPath: trickyRepo,
 				projectId: PROJECT_ID,
-				homeDir: sandboxWithQuote.homeDir,
+				appHomeDir: sandboxWithQuote.appHomeDir,
 			})?.initialCommand;
 			expect(cmd).toContain("'\\''");
 			// Verify the escape sequence wraps the single quote correctly.
@@ -149,7 +149,7 @@ describe("resolveInitialCommand", () => {
 				repoPath: sandbox.repoPath,
 				projectId: PROJECT_ID,
 				worktreePath,
-				homeDir: sandbox.homeDir,
+				appHomeDir: sandbox.appHomeDir,
 			}),
 		).toEqual({ initialCommand: "from-worktree" });
 	});
@@ -164,7 +164,7 @@ describe("resolveInitialCommand", () => {
 				repoPath: sandbox.repoPath,
 				projectId: PROJECT_ID,
 				worktreePath,
-				homeDir: sandbox.homeDir,
+				appHomeDir: sandbox.appHomeDir,
 			}),
 		).toEqual({
 			initialCommand: `bash '${join(worktreePath, ".superset", "setup.sh")}'`,

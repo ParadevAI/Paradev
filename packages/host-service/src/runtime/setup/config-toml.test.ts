@@ -15,7 +15,7 @@ import {
 let root: string;
 let repoPath: string;
 let worktreePath: string;
-let homeDir: string;
+let appHomeDir: string;
 const projectId = "proj-1";
 
 function write(dir: string, name: string, content: string) {
@@ -27,8 +27,8 @@ beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "config-toml-test-"));
 	repoPath = join(root, "repo");
 	worktreePath = join(root, "worktree");
-	homeDir = join(root, "home");
-	for (const dir of [repoPath, worktreePath, homeDir]) {
+	appHomeDir = join(root, "home");
+	for (const dir of [repoPath, worktreePath, appHomeDir]) {
 		mkdirSync(dir, { recursive: true });
 	}
 	delete process.env.SUPERSET_HOST_RUN_MODE;
@@ -41,7 +41,7 @@ afterEach(() => {
 	delete process.env.IS_SANDBOX;
 });
 
-const args = () => ({ repoPath, projectId, worktreePath, homeDir });
+const args = () => ({ repoPath, projectId, worktreePath, appHomeDir });
 
 type LoadArgs =
 	| ReturnType<typeof args>
@@ -166,7 +166,7 @@ describe("loadProjectConfig with v1 in the cloud", () => {
 describe("hasProjectConfig and describeProjectConfigSources", () => {
 	it("a config.toml counts as configured and reports no legacy sources", () => {
 		write(repoPath, "config.toml", "");
-		expect(hasProjectConfig({ repoPath, projectId, homeDir })).toBe(true);
+		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(true);
 		expect(describeProjectConfigSources(args())).toEqual({
 			format: "toml",
 			legacySources: [],
@@ -185,7 +185,7 @@ describe("hasProjectConfig and describeProjectConfigSources", () => {
 			JSON.stringify({ setup: { after: ["c"] } }),
 		);
 		write(repoPath, "teardown.sh", "echo");
-		const userDir = join(homeDir, ".superset", "projects", projectId);
+		const userDir = join(appHomeDir, "projects", projectId);
 		mkdirSync(userDir, { recursive: true });
 		writeFileSync(join(userDir, "config.json"), "{}");
 		const expected: LegacyConfigSource[] = [
@@ -203,6 +203,6 @@ describe("hasProjectConfig and describeProjectConfigSources", () => {
 
 	it("nothing configured reports none", () => {
 		expect(describeProjectConfigSources(args()).format).toBe("none");
-		expect(hasProjectConfig({ repoPath, projectId, homeDir })).toBe(false);
+		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(false);
 	});
 });
