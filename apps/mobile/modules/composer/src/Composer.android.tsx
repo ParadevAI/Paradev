@@ -94,7 +94,8 @@ export const Composer: ComposerComponent = forwardRef<
 	const inputRef = useRef<TextInputInstance>(null);
 	const [draft, setDraftState] = useState(initialDraft);
 	const [expanded, setExpanded] = useState(false);
-	const keyboardHeight = useKeyboardHeight();
+	// Android keeps focus when Back lowers the keyboard; iOS collapses there.
+	const keyboardHeight = useKeyboardHeight(() => inputRef.current?.blur());
 	const insets = useSafeAreaInsets();
 
 	const setDraft = (text: string) => {
@@ -139,7 +140,8 @@ export const Composer: ComposerComponent = forwardRef<
 	const editorLines = compactEditor
 		? COMPOSER_METRICS.compactEditorLines
 		: COMPOSER_METRICS.editorLines;
-	const lift = Math.max(keyboardHeight, insets.bottom);
+	// React Native reports the keyboard without the navigation bar under it.
+	const lift = keyboardHeight + insets.bottom;
 
 	return (
 		<View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
@@ -180,7 +182,13 @@ export const Composer: ComposerComponent = forwardRef<
 								onRemove={(id) => onRemoveAttachment?.(id)}
 							/>
 						) : null}
-						<View style={expanded ? styles.editor : styles.collapsedField}>
+						<View
+							// Flattening this wrapper in one state and not the other
+							// re-parents the field, and Android drops focus from it.
+							collapsable={false}
+							pointerEvents={expanded ? "auto" : "none"}
+							style={expanded ? styles.editor : styles.collapsedField}
+						>
 							<TextInput
 								ref={inputRef}
 								value={draft}
@@ -280,13 +288,18 @@ export const Composer: ComposerComponent = forwardRef<
 	);
 });
 
-function useKeyboardHeight() {
+function useKeyboardHeight(onHide: () => void) {
+	const onHideRef = useRef(onHide);
+	onHideRef.current = onHide;
 	const [height, setHeight] = useState(0);
 	useEffect(() => {
 		const show = Keyboard.addListener("keyboardDidShow", (event) =>
 			setHeight(event.endCoordinates.height),
 		);
-		const hide = Keyboard.addListener("keyboardDidHide", () => setHeight(0));
+		const hide = Keyboard.addListener("keyboardDidHide", () => {
+			setHeight(0);
+			onHideRef.current();
+		});
 		return () => {
 			show.remove();
 			hide.remove();
@@ -395,7 +408,13 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 	},
 	editor: { paddingHorizontal: COMPOSER_METRICS.edgeInset + 4, paddingTop: 12 },
-	collapsedField: { height: 0, overflow: "hidden", opacity: 0 },
+	collapsedField: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		opacity: 0,
+	},
 	input: {
 		color: COMPOSER_COLORS.foreground,
 		fontSize: 16,

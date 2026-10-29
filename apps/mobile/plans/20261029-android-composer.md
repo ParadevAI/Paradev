@@ -56,11 +56,28 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 ## Progress
 
 - [x] (2026-10-29) Plan and decision.
-- [ ] MVP `Composer.android.tsx`.
-- [ ] Verified on the `Pixel_2_API_33` emulator.
+- [x] (2026-10-29) MVP `Composer.android.tsx`.
+- [x] (2026-10-29) Verified on the `Pixel_2_API_33` emulator through a temporary route that drove
+  every prop and handle method: collapsed and expanded states, the keyboard lift, `dim` and
+  `passthrough`, Back to collapse, tray remove and upload states, send held while uploading,
+  `isSending`, `canStop`/`onStop`, `clear`, `appendDraft`, the mode menu, `presentImage` and
+  `fileThumbnail`. Home and the workspace screen are not verified yet: they need a signed-in session
+  against a local API.
+
+## Surprises & Discoveries
+
+- Fabric flattens a layout-only `View`. The field's wrapper had a layout-only style when expanded
+  and `opacity: 0` when collapsed, so each change re-parented the field and Android moved focus to
+  the next focusable view. `collapsable={false}` keeps the wrapper.
+- `keyboardDidShow` on Android reports the keyboard height without the navigation bar below it, so
+  the lift is `keyboard + insets.bottom`.
+- Back lowers the keyboard without blurring the field, so the composer blurs on `keyboardDidHide`.
+- `CI=1 expo start` turns off Metro's file watcher: a cold restart still gets the old bundle.
+- The emulator shows the soft keyboard only after the first key input; it is not an app bug.
 
 ## Decision Log
 
 | Date | Decision |
 |---|---|
 | 2026-10-29 | React Native over a Kotlin module, for the reasons in the table above. |
+| 2026-10-29 | Expanded means focused. The collapsed row shows a one-line label over a transparent field, rather than restyling the field, so the head of a long draft shows with an ellipsis, as on iOS. |
