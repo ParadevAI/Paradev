@@ -76,7 +76,8 @@ export default function AuthenticatedLayout() {
   - To port to Android: add `X.android.tsx`, or for a module, add `android/` and `"android"` to
     `expo-module.config.json` and rename the binding `X.native.tsx` so both platforms use it.
   Examples: `modules/composer/src`, `ShareAccess/components/ValueMenu`,
-  `sign-in/utils/signInWithApple`.
+  `sign-in/utils/signInWithApple`. Android-only the other way round: `sign-in/utils/signInWithGoogle`
+  (`.android.ts` on `modules/google-credential`, `.ts` everywhere else).
 - **Bottom sheets are expo-router `formSheet` routes** — `...glassHeaderOptions` gives the native
   title and ✕, the body is RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to
   match ours), and the list stays the screen's only layout child or it cold-mounts at zero height.
@@ -84,7 +85,9 @@ export default function AuthenticatedLayout() {
 - **Hermes ships a partial `Intl`.** `lib/intl-polyfills` lists what is missing and what is
   polyfilled. A `@superset/i18n/format` helper that reaches for an API outside that list throws, and
   no mobile screen has an error boundary, so the throw takes the screen down. Add the polyfill, its
-  per-locale data, and a case in the polyfill test.
+  per-locale data, and a case in the polyfill test. Android's Hermes also lacks `zh-CN`/`zh-TW` in
+  `NumberFormat`/`DateTimeFormat` and formats them as `en-US`; `scriptSubtagFallback.android.ts`
+  passes the script-qualified tag instead.
 - **Pending and failed are not answers.** A query with no data yet has not said "offline" or
   "empty". Keep loading while it is pending and say you could not check when it failed; Home once
   painted "is offline" on every cold start because presence defaulted to `false`.
