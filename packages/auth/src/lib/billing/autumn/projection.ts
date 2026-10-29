@@ -1,23 +1,30 @@
 import { db, dbWs } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import * as authSchema from "@superset/db/schema/auth";
-import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
+import {
+	ACTIVE_SUBSCRIPTION_STATUSES,
+	planCatalogFromAutumn,
+} from "@superset/shared/billing";
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { planFromStripePrice } from "../legacy/plan-ids";
 import {
+	notifyPlanUpgraded,
 	notifySubscriptionCanceled,
 	notifySubscriptionStarted,
 } from "../subscription-events";
+import { catalogAutumnPlans } from "./catalog";
 import {
 	getAutumnCustomer,
 	organizationForStripeCustomer,
 	saveStripeCustomerId,
 } from "./customer";
-import { tierFromFlags } from "./entitlements";
+import { paidPlanIdFromFlags, tierFromFlags } from "./entitlements";
+import { emailPlanFor, upgradedFrom } from "./plan-family";
 import { invalidateOrganizationBilling } from "./plan-state";
+import { billingRedis } from "./redis";
 import {
 	seatItem,
 	subscriptionRowFromStripe,
@@ -108,20 +115,28 @@ async function resolveStripeCustomerId(
 	return saveStripeCustomerId(organizationId, customer.stripeId);
 }
 
-async function autumnTierFor(
-	organizationId: string,
-): Promise<"pro" | "enterprise" | null> {
+async function autumnPlanFor(organizationId: string): Promise<{
+	tier: "pro" | "enterprise" | null;
+	paidPlanId: string | null;
+}> {
 	try {
-		const tier = tierFromFlags((await getAutumnCustomer(organizationId)).flags);
-		return tier === "free" ? null : tier;
+		const { flags } = await getAutumnCustomer(organizationId);
+		const tier = tierFromFlags(flags);
+		return {
+			tier: tier === "free" ? null : tier,
+			paidPlanId: paidPlanIdFromFlags(flags),
+		};
 	} catch (error) {
 		console.error(
 			`[billing/projection] ${organizationId} Autumn lookup failed`,
 			error,
 		);
-		return null;
+		return { tier: null, paidPlanId: null };
 	}
 }
+
+const notifiedFamilyKey = (organizationId: string) =>
+	`billing:notified-family:${organizationId}`;
 
 /**
  * Rewrites an organization's `subscriptions` rows: the tier from Autumn's
@@ -136,12 +151,13 @@ export async function syncOrganizationSubscription(
 	const stripeCustomerId = await resolveStripeCustomerId(organizationId);
 	if (!stripeCustomerId) return;
 
+	let paidPlanId: string | null = null;
 	const changes = await dbWs.transaction(async (tx) => {
 		await tx.execute(
 			sql`select pg_advisory_xact_lock(hashtextextended(${`billing-sync:${organizationId}`}, 0))`,
 		);
-		const [autumnTier, listed] = await Promise.all([
-			autumnTierFor(organizationId),
+		const [autumnPlan, listed] = await Promise.all([
+			autumnPlanFor(organizationId),
 			stripeClient.subscriptions.list({
 				customer: stripeCustomerId,
 				status: "all",
@@ -156,12 +172,13 @@ export async function syncOrganizationSubscription(
 			),
 			columns: { stripeSubscriptionId: true },
 		});
+		paidPlanId = autumnPlan.paidPlanId;
 		const written = [];
 		for (const [index, stripeSubscription] of seatSubscriptions.entries()) {
 			const { previous, row } = await writeRow(tx, {
 				organizationId,
 				stripeSubscription,
-				autumnTier,
+				autumnTier: autumnPlan.tier,
 				isLatest: index === 0,
 			});
 			if (!row) continue;
@@ -178,6 +195,11 @@ export async function syncOrganizationSubscription(
 		return written;
 	});
 
+	const catalog = paidPlanId
+		? planCatalogFromAutumn(await catalogAutumnPlans().catch(() => []))
+		: [];
+	const plan = emailPlanFor(catalog, paidPlanId);
+	let startedNoticeSent = false;
 	for (const {
 		previous,
 		row,
@@ -190,10 +212,12 @@ export async function syncOrganizationSubscription(
 			organizationAlreadyPaying,
 		);
 		if (transitions.started) {
+			startedNoticeSent = true;
 			await notifySubscriptionStarted({
 				subscription: row,
 				stripeSubscription,
 				planName: row.plan,
+				plan,
 			});
 		}
 		if (transitions.canceled) {
@@ -203,6 +227,31 @@ export async function syncOrganizationSubscription(
 				cancellationDetails: stripeSubscription.cancellation_details,
 			});
 		}
+	}
+
+	const latest = changes[0];
+	if (!plan || !latest) return;
+	let previousFamily: string | null;
+	try {
+		previousFamily = await billingRedis.getset<string>(
+			notifiedFamilyKey(organizationId),
+			plan.family,
+		);
+	} catch (error) {
+		console.error(
+			`[billing/projection] ${organizationId} plan family read failed`,
+			error,
+		);
+		return;
+	}
+	const upgradedFromFamily = upgradedFrom(catalog, previousFamily, plan);
+	if (upgradedFromFamily && !startedNoticeSent) {
+		await notifyPlanUpgraded({
+			subscription: latest.row,
+			stripeSubscription: latest.stripeSubscription,
+			plan,
+			previousFamily: upgradedFromFamily,
+		});
 	}
 }
 
