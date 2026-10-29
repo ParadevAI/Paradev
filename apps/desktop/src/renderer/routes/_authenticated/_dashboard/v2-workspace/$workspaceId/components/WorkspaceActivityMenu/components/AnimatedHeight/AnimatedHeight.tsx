@@ -15,7 +15,7 @@ export function AnimatedHeight({ children }: { children: ReactNode }) {
 			className={cn(
 				"shrink-0 overflow-clip",
 				height !== undefined &&
-					"transition-[height] duration-200 ease-out motion-reduce:transition-none",
+					"transition-[height] duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
 			)}
 			style={{ height }}
 		>

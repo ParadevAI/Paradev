@@ -76,7 +76,11 @@ import {
 	PullRequestRow,
 } from "./components/PullRequestRow";
 import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
-import { PANEL_MAX_HEIGHT_PX, VIEW_ENTER_CLASSNAME } from "./constants";
+import {
+	PANEL_EXIT_MS,
+	PANEL_MAX_HEIGHT_PX,
+	VIEW_ENTER_CLASSNAME,
+} from "./constants";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
@@ -155,6 +159,13 @@ export function WorkspaceActivityMenu({
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
+	const [dockedMounted, setDockedMounted] = useState(docked);
+	if (docked && !dockedMounted) setDockedMounted(true);
+	useEffect(() => {
+		if (docked) return;
+		const timer = setTimeout(() => setDockedMounted(false), PANEL_EXIT_MS);
+		return () => clearTimeout(timer);
+	}, [docked]);
 	const panelId = `workspace-activity-${workspaceId}`;
 	const newPageStatusId = useId();
 	const {
@@ -812,7 +823,7 @@ export function WorkspaceActivityMenu({
 			<PopoverContent
 				align="end"
 				sideOffset={0}
-				className="w-80 border-0 bg-transparent p-0 shadow-none duration-200 ease-out data-[state=closed]:duration-150 data-[state=closed]:ease-in data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
+				className="w-80 border-0 bg-transparent p-0 shadow-none duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[state=closed]:duration-150 data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)] data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
 				onEscapeKeyDown={(event) => {
 					if (shipView || composing) event.preventDefault();
 				}}
@@ -823,7 +834,9 @@ export function WorkspaceActivityMenu({
 			>
 				{renderPanel("floating")}
 			</PopoverContent>
-			{asideNode && createPortal(renderPanel("docked"), asideNode)}
+			{asideNode &&
+				dockedMounted &&
+				createPortal(renderPanel("docked"), asideNode)}
 		</Popover>
 	);
 }
