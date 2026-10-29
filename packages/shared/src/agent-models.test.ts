@@ -439,6 +439,8 @@ describe("getAgentEfforts", () => {
 			"high",
 		]);
 		expect(getAgentEfforts("agy", "claude-sonnet-4-6")).toEqual([]);
+		expect(getAgentEfforts("agy")).toEqual([]);
+		expect(buildAgentEffortArgs("agy", "high")).toEqual([]);
 		expect(buildAgentEffortArgs("agy", "high", "claude-sonnet-4-6")).toEqual(
 			[],
 		);

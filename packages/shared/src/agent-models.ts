@@ -440,6 +440,11 @@ export interface AgentEffortSupport {
 	 * offer an effort at all.
 	 */
 	modelVariants?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+	/**
+	 * Offer effort only next to a curated model. The agent's own default model
+	 * is unknown here and may reject the flag (agy's Claude models do).
+	 */
+	requiresModel?: boolean;
 }
 
 export interface AgentModeOption extends AgentModelOption {
@@ -685,6 +690,7 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 		// Only Gemini models take `--effort`; agy rejects it on the others.
 		presetId: "agy",
 		effortFlag: "--effort",
+		requiresModel: true,
 		efforts: [
 			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
 			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
@@ -782,6 +788,7 @@ export function getAgentEfforts(
 	)
 		? model
 		: undefined;
+	if (support.requiresModel && !selected) return [];
 	if (support.modelVariants) {
 		const variants = selected ? support.modelVariants[selected] : undefined;
 		if (!variants) return [];
