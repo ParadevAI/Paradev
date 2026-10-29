@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
+import { useRef } from "react";
 import { LuExternalLink, LuLoaderCircle, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { resolvePortUrl } from "renderer/lib/resolvePortUrl";
@@ -21,22 +22,30 @@ export function MergedPortBadge({ port }: MergedPortBadgeProps) {
 		electronTrpc.settings.getOpenLinksInApp.useQuery();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const { isPending, killPort } = useKillPort();
+	// Checking the scheme takes a moment; a second click meanwhile must not
+	// open the page twice.
+	const opening = useRef(false);
 
 	const handleClick = () => {
 		navigateToWorkspace(port.workspaceId, navigate);
 	};
 
 	const handleOpenInBrowser = async () => {
-		if (openUrl.isPending) return;
-		const url = await resolvePortUrl(`http://localhost:${port.port}`);
+		if (openUrl.isPending || opening.current) return;
+		opening.current = true;
+		try {
+			const url = await resolvePortUrl(`http://localhost:${port.port}`);
 
-		if (openLinksInApp) {
-			navigateToWorkspace(port.workspaceId, navigate);
-			openInBrowserPane(port.workspaceId, url);
-			return;
+			if (openLinksInApp) {
+				navigateToWorkspace(port.workspaceId, navigate);
+				openInBrowserPane(port.workspaceId, url);
+				return;
+			}
+
+			openUrl.mutate(url);
+		} finally {
+			opening.current = false;
 		}
-
-		openUrl.mutate(url);
 	};
 
 	const handleClose = () => {

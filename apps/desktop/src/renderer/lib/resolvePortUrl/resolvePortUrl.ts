@@ -7,7 +7,11 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
  */
 export async function resolvePortUrl(url: string): Promise<string> {
 	try {
-		const port = Number(new URL(url).port);
+		const parsed = new URL(url);
+		// URL drops a default port (80 for http:), leaving it empty.
+		const port = Number(
+			parsed.port || (parsed.protocol === "https:" ? 443 : 80),
+		);
 		const scheme = await electronTrpcClient.ports.detectScheme.query({ port });
 		return scheme === "https" ? url.replace(/^http:/, "https:") : url;
 	} catch {

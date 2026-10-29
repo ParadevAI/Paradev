@@ -21,9 +21,8 @@ beforeAll(() => {
 			"req",
 			"-x509",
 			"-newkey",
-			"ec",
-			"-pkeyopt",
-			"ec_paramgen_curve:prime256v1",
+			// RSA, not EC: macOS LibreSSL can write an unusable EC key here.
+			"rsa:2048",
 			"-nodes",
 			"-keyout",
 			join(certDir, "key.pem"),

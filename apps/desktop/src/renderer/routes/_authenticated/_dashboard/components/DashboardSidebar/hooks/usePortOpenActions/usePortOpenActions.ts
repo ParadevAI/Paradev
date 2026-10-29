@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useRef } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { resolvePortUrl } from "renderer/lib/resolvePortUrl";
@@ -36,6 +37,18 @@ export function usePortOpener() {
 	const navigate = useNavigate();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 	const { preferences } = useV2UserPreferences();
+	// Checking the scheme takes a moment; a second click meanwhile must not
+	// open the page twice.
+	const opening = useRef(false);
+	const once = async (open: () => Promise<void>) => {
+		if (opening.current) return;
+		opening.current = true;
+		try {
+			await open();
+		} finally {
+			opening.current = false;
+		}
+	};
 
 	const openExternal = (url: string) => {
 		if (!openUrl.isPending) openUrl.mutate(url);
@@ -55,34 +68,39 @@ export function usePortOpener() {
 			});
 			return;
 		}
-		const url = await resolvePortUrl(browserUrl);
-		if (preferences.portOpenAction === "external") {
-			openExternal(url);
-			return;
-		}
-		void navigateToV2Workspace(port.workspaceId, navigate, {
-			search: {
-				openUrl: url,
-				openUrlTarget:
-					preferences.portOpenAction === "newTab" ? "new-tab" : "current-tab",
-				openUrlRequestId: crypto.randomUUID(),
-			},
+		await once(async () => {
+			const url = await resolvePortUrl(browserUrl);
+			if (preferences.portOpenAction === "external") {
+				openExternal(url);
+				return;
+			}
+			void navigateToV2Workspace(port.workspaceId, navigate, {
+				search: {
+					openUrl: url,
+					openUrlTarget:
+						preferences.portOpenAction === "newTab" ? "new-tab" : "current-tab",
+					openUrlRequestId: crypto.randomUUID(),
+				},
+			});
 		});
 	};
 
-	return { openPort, openExternal };
+	const openPortExternal = (browserUrl: string) =>
+		once(async () => openExternal(await resolvePortUrl(browserUrl)));
+
+	return { openPort, openPortExternal };
 }
 
 export function usePortOpenActions(port: DashboardSidebarPort) {
 	const forward = usePortForward(port);
-	const { openPort, openExternal } = usePortOpener();
+	const { openPort, openPortExternal } = usePortOpener();
 	const browserUrl = getPortBrowserUrl(port, forward);
 
 	return {
 		canOpenInBrowser: browserUrl !== null,
 		portUrl: browserUrl ?? `http://localhost:${port.port}`,
 		openExternal: async () => {
-			if (browserUrl !== null) openExternal(await resolvePortUrl(browserUrl));
+			if (browserUrl !== null) await openPortExternal(browserUrl);
 		},
 		openPrimary: () => void openPort(port, forward),
 	};
