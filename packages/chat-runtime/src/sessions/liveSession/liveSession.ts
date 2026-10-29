@@ -295,6 +295,18 @@ export class LiveSession {
 		this.unpauseIfEmpty();
 	}
 
+	updateQueued(itemId: string, content: UserContent[]): void {
+		const pending = this.queue[this.requireQueuedIndex(itemId)];
+		if (!pending) return;
+		pending.content = content;
+		pending.item = { ...pending.item, content };
+		this.appendDurable({
+			type: "item",
+			item: pending.item,
+			turnId: pending.turnId,
+		});
+	}
+
 	steerQueued(itemId: string): void {
 		const index = this.requireQueuedIndex(itemId);
 		const [steered] = this.queue.splice(index, 1);

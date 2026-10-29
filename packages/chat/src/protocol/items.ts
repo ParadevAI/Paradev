@@ -14,6 +14,7 @@ export const textElementSchema = z.looseObject({
 	}),
 	elementKind: z.enum(["file_mention", "slash_command", "other"]),
 	label: z.string().optional(),
+	data: z.unknown().optional(),
 });
 export type TextElement = z.infer<typeof textElementSchema>;
 

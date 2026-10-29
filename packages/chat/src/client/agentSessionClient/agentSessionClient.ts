@@ -196,6 +196,7 @@ export function createAgentSessionClient(
 
 		async removeQueuedPrompt() {},
 		async steerQueuedPrompt() {},
+		async updateQueuedPrompt() {},
 		async resumeQueue() {},
 		async stopBackgroundTask() {
 			return false;
