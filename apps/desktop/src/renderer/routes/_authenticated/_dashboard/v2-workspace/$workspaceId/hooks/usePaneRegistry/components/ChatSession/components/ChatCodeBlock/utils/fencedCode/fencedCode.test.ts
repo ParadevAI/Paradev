@@ -115,6 +115,19 @@ describe("parsePatchFileDiffs", () => {
 		expect(parsePatchFileDiffs(ONE_FILE_PATCH)).toHaveLength(1);
 		expect(parsePatchFileDiffs(TWO_FILE_PATCH)).toHaveLength(2);
 	});
+	test("drops the a/ and b/ prefixes of a headerless patch", () => {
+		const [file] = parsePatchFileDiffs(ONE_FILE_PATCH);
+		expect(file?.name).toBe("a.ts");
+		expect(file?.prevName).toBeUndefined();
+		expect(file?.type).toBe("change");
+	});
+	test("keeps a pure rename next to a changed file", () => {
+		const patch = `diff --git a/x.ts b/x.ts\n--- a/x.ts\n+++ b/x.ts\n@@ -1 +1 @@\n-a\n+b\ndiff --git a/old.ts b/new.ts\nsimilarity index 100%\nrename from old.ts\nrename to new.ts\n`;
+		expect(parsePatchFileDiffs(patch).map((file) => file.name)).toEqual([
+			"x.ts",
+			"new.ts",
+		]);
+	});
 	test("returns nothing for text that is not a patch", () => {
 		expect(parsePatchFileDiffs("const x = 1;")).toEqual([]);
 		expect(parsePatchFileDiffs("")).toEqual([]);

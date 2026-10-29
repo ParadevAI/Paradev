@@ -86,11 +86,25 @@ export function isDiffLanguage(language: string | null): boolean {
 	return language !== null && DIFF_LANGUAGES.has(language);
 }
 
-/** The files of a patch with at least one hunk each, or none for other text. */
+const GIT_DIFF_HEADER = /^diff --git /m;
+const UNIFIED_SIDE_PREFIX = /^[ab]\//;
+
+/** Headerless `---`/`+++` patches keep git's `a/`/`b/` prefixes in their names. */
+function withoutSidePrefixes(file: FileDiffMetadata): FileDiffMetadata {
+	const name = file.name.replace(UNIFIED_SIDE_PREFIX, "");
+	const prevName = file.prevName?.replace(UNIFIED_SIDE_PREFIX, "");
+	if (prevName === undefined || prevName !== name) {
+		return { ...file, name, prevName };
+	}
+	return { ...file, name, prevName: undefined, type: "change" };
+}
+
+/** The files of a patch that changes at least one line, or none for other text. */
 export function parsePatchFileDiffs(text: string): FileDiffMetadata[] {
 	try {
 		const files = parsePatchFiles(text).flatMap((patch) => patch.files);
-		return files.every((file) => file.hunks.length > 0) ? files : [];
+		if (!files.some((file) => file.hunks.length > 0)) return [];
+		return GIT_DIFF_HEADER.test(text) ? files : files.map(withoutSidePrefixes);
 	} catch {
 		return [];
 	}

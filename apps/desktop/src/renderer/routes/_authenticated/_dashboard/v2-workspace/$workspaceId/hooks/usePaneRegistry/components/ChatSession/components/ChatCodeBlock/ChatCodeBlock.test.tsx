@@ -100,4 +100,10 @@ test("a diff fence spanning several files shows each file as a diff", async () =
 			element.shadowRoot?.querySelector("pre[data-diff]"),
 		);
 	await waitFor(() => expect(diffs()).toHaveLength(2));
+	expect(
+		diffs().map(
+			(element) =>
+				element.shadowRoot?.querySelector("[data-title]")?.textContent,
+		),
+	).toEqual(["a.ts", "b.ts"]);
 });
