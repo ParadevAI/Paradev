@@ -993,11 +993,14 @@ msgstr "{kind} · autor: {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} motiv"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} je nainstalován. Restartujte chat, abyste ho mohli používat."
+msgid "{label} needs an update"
+msgstr "{label} potřebuje aktualizaci"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} je k dispozici. Máte verzi {installed}."
+msgid "{label} update available"
+msgstr "K dispozici je aktualizace {label}"
+
+msgid "{label} updated"
+msgstr "Aktualizace {label} dokončena"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Zobrazení složek"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Složky, které se mají vytáhnout do nových worktree, jedna na řádek, relativně ke kořeni repozitáře. Soubory v kořeni jsou vždy zahrnuty. Prázdné vytáhne vše."
 
+msgid "Follow along in the terminal below."
+msgstr "Průběh sledujte v terminálu níže."
+
 msgid "FOLLOW ON X"
 msgstr "SLEDOVAT NA X"
 
@@ -15332,6 +15338,9 @@ msgstr "Restartovat terminálového démona?"
 msgid "Restart terminals"
 msgstr "Restartovat terminály"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Restartujte chat, abyste mohli používat verzi {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Restartujte aplikaci, abyste používali nejnovější verzi {appName}u."
 
@@ -18270,6 +18279,9 @@ msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Změna platí hned. Platíte jen rozdíl za zbytek období."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Chat bude pokračovat, jakmile bude nová verze nainstalována."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."
 
@@ -19760,11 +19772,8 @@ msgstr "Právě aktualizováno z {0}."
 msgid "Updates"
 msgstr "Aktualizace"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Aktualizace {label} v terminálu…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Aktualizace probíhá v terminálu níže. Chat bude pokračovat, jakmile bude nová verze nainstalována."
+msgid "Updating {label}…"
+msgstr "Aktualizace {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

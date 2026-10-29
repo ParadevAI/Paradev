@@ -993,11 +993,14 @@ msgstr "{kind} · автор {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} тема"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} установлен. Перезапустите чат, чтобы использовать новую версию."
+msgid "{label} needs an update"
+msgstr "{label} нужно обновить"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "Доступна версия {label} {latest}. У вас установлена {installed}."
+msgid "{label} update available"
+msgstr "Доступно обновление {label}"
+
+msgid "{label} updated"
+msgstr "{label} обновлён"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Вид папок"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Папки для выгрузки в новые worktree, по одной в строке, относительно корня репозитория. Файлы в корне включаются всегда. Пусто — выгружается всё."
 
+msgid "Follow along in the terminal below."
+msgstr "Следите за ходом в терминале ниже."
+
 msgid "FOLLOW ON X"
 msgstr "ПОДПИСАТЬСЯ В X"
 
@@ -15332,6 +15338,9 @@ msgstr "Перезапустить демон терминала?"
 msgid "Restart terminals"
 msgstr "Перезапустить терминалы"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Перезапустите чат, чтобы использовать версию {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Перезапустите приложение, чтобы использовать последнюю версию {appName}."
 
@@ -18270,6 +18279,9 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Чат продолжится, когда новая версия будет установлена."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Облачная рабочая область должна была запуститься, но не ответила вовремя. Следующий запуск попробует снова."
 
@@ -19760,11 +19772,8 @@ msgstr "Только что обновлено с {0}."
 msgid "Updates"
 msgstr "Обновления"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Обновление {label} в терминале…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Идёт обновление в терминале ниже. Чат продолжится, когда новая версия будет установлена."
+msgid "Updating {label}…"
+msgstr "Обновление {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

@@ -122,6 +122,29 @@ export function useAgentCliUpdate({
 	return { status, label, phase, canUpdate, update, finish };
 }
 
+/**
+ * True when the chat's CLI is older than chat needs. Checked again when the
+ * chat stops, since the CLI may have changed since the last look.
+ */
+export function useAgentCliTooOld(
+	workspaceId: string,
+	harness: string | undefined,
+	stopped: boolean,
+): boolean {
+	const { data, refetch } = workspaceTrpc.agentTooling.agentCliStatus.useQuery(
+		{ workspaceId, harness: harness ?? "" },
+		{
+			enabled: harness !== undefined,
+			staleTime: STATUS_STALE_MS,
+			retry: false,
+		},
+	);
+	useEffect(() => {
+		if (stopped && harness !== undefined) void refetch();
+	}, [stopped, harness, refetch]);
+	return data?.belowFloor === true;
+}
+
 /** True while an update this chat session started has not landed yet. */
 export function useAgentCliUpdatePending(
 	workspaceId: string,

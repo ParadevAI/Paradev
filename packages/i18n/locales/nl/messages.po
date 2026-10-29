@@ -993,11 +993,14 @@ msgstr "{kind} · door {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} thema"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} is geïnstalleerd. Start de chat opnieuw om deze te gebruiken."
+msgid "{label} needs an update"
+msgstr "{label} moet worden bijgewerkt"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} is beschikbaar. Je hebt {installed}."
+msgid "{label} update available"
+msgstr "Update voor {label} beschikbaar"
+
+msgid "{label} updated"
+msgstr "{label} bijgewerkt"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Mapweergave"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Mappen die in nieuwe worktrees worden uitgecheckt, één per regel, relatief aan de repo-root. Bestanden in de root worden altijd meegenomen. Leeg checkt alles uit."
 
+msgid "Follow along in the terminal below."
+msgstr "Volg de voortgang in de terminal hieronder."
+
 msgid "FOLLOW ON X"
 msgstr "VOLG ONS OP X"
 
@@ -15332,6 +15338,9 @@ msgstr "Terminal-daemon herstarten?"
 msgid "Restart terminals"
 msgstr "Terminals herstarten"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Start de chat opnieuw om {installed} te gebruiken."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Start opnieuw om de nieuwste versie van {appName} te gebruiken."
 
@@ -18270,6 +18279,9 @@ msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van deze periode."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "De chat gaat verder zodra de nieuwe versie is geïnstalleerd."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd. De volgende run probeert het opnieuw."
 
@@ -19760,11 +19772,8 @@ msgstr "Zojuist bijgewerkt vanaf {0}."
 msgid "Updates"
 msgstr "Updates"
 
-msgid "Updating {label} in a terminal…"
-msgstr "{label} wordt bijgewerkt in een terminal…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Bijwerken in de terminal hieronder. De chat gaat verder zodra de nieuwe versie is geïnstalleerd."
+msgid "Updating {label}…"
+msgstr "{label} bijwerken…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

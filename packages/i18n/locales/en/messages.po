@@ -993,11 +993,14 @@ msgstr "{kind} · by {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} theme"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} is installed. Restart the chat to use it."
+msgid "{label} needs an update"
+msgstr "{label} needs an update"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} is available. You have {installed}."
+msgid "{label} update available"
+msgstr "{label} update available"
+
+msgid "{label} updated"
+msgstr "{label} updated"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Folder view"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 
+msgid "Follow along in the terminal below."
+msgstr "Follow along in the terminal below."
+
 msgid "FOLLOW ON X"
 msgstr "FOLLOW ON X"
 
@@ -15332,6 +15338,9 @@ msgstr "Restart terminal daemon?"
 msgid "Restart terminals"
 msgstr "Restart terminals"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Restart the chat to use {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Restart to use the latest version of {appName}."
 
@@ -18270,6 +18279,9 @@ msgstr "The button now stands out. I checked it in your pane."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "The change starts now. You pay only the difference for the rest of this period."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "The chat resumes once the new version is installed."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "The cloud workspace should have started but didn't answer in time. The next run tries again."
 
@@ -19760,11 +19772,8 @@ msgstr "Updated just now from {0}."
 msgid "Updates"
 msgstr "Updates"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Updating {label} in a terminal…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Updating in the terminal below. The chat resumes once the new version is installed."
+msgid "Updating {label}…"
+msgstr "Updating {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

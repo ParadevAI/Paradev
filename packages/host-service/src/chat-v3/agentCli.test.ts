@@ -9,7 +9,13 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { agentCliUnsupported, probeAgentCli, realAgentCli } from "./agentCli";
+import { AGENT_CLI_OUTDATED } from "@superset/shared/agent-cli-status";
+import {
+	agentCliUnsupported,
+	probeAgentCli,
+	realAgentCli,
+	resolveAgentCli,
+} from "./agentCli";
 
 const BINARY = "superset-test-agent-cli";
 const dirs: string[] = [];
@@ -57,6 +63,22 @@ describe("probeAgentCli", () => {
 
 		fakeCli(join(home, "bin"), "2.0.0");
 		expect((await probeAgentCli(BINARY, env)).version).toBe("2.0.0");
+	});
+});
+
+describe("resolveAgentCli", () => {
+	it("marks a CLI that is too old, so chat can offer the update instead", async () => {
+		const home = tempHome();
+		fakeCli(join(home, "bin"), "1.0.0");
+		const env = { HOME: home, PATH: join(home, "bin") };
+
+		const error = await resolveAgentCli({
+			binary: BINARY,
+			minVersion: "2.0.0",
+			env: async () => env,
+		}).catch((caught: unknown) => caught);
+
+		expect(error).toMatchObject({ code: AGENT_CLI_OUTDATED });
 	});
 });
 

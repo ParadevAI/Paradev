@@ -993,11 +993,14 @@ msgstr "{kind} · par {author}"
 msgid "{kindLabel} theme"
 msgstr "Thème {kindLabel}"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} est installé. Redémarrez le chat pour l'utiliser."
+msgid "{label} needs an update"
+msgstr "{label} doit être mis à jour"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} est disponible. Vous avez la version {installed}."
+msgid "{label} update available"
+msgstr "Mise à jour de {label} disponible"
+
+msgid "{label} updated"
+msgstr "{label} mis à jour"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Vue par dossiers"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Dossiers à extraire dans les nouveaux worktrees, un par ligne, relatifs à la racine du dépôt. Les fichiers à la racine sont toujours inclus. Vide, tout est extrait."
 
+msgid "Follow along in the terminal below."
+msgstr "Suivez la progression dans le terminal ci-dessous."
+
 msgid "FOLLOW ON X"
 msgstr "SUIVRE SUR X"
 
@@ -15332,6 +15338,9 @@ msgstr "Redémarrer le démon de terminal ?"
 msgid "Restart terminals"
 msgstr "Redémarrer les terminaux"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Redémarrez le chat pour utiliser la version {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Redémarrez pour utiliser la dernière version de {appName}."
 
@@ -18270,6 +18279,9 @@ msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Le changement s'applique tout de suite. Vous payez seulement la différence pour le reste de la période."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Le chat reprendra une fois la nouvelle version installée."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."
 
@@ -19760,11 +19772,8 @@ msgstr "Mis à jour à l'instant depuis {0}."
 msgid "Updates"
 msgstr "Mises à jour"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Mise à jour de {label} dans un terminal…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Mise à jour dans le terminal ci-dessous. Le chat reprendra une fois la nouvelle version installée."
+msgid "Updating {label}…"
+msgstr "Mise à jour de {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

@@ -993,11 +993,14 @@ msgstr "{kind} · bởi {author}"
 msgid "{kindLabel} theme"
 msgstr "Chủ đề {kindLabel}"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "Đã cài đặt {label} {installed}. Khởi động lại cuộc trò chuyện để sử dụng."
+msgid "{label} needs an update"
+msgstr "{label} cần được cập nhật"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "Đã có {label} {latest}. Phiên bản của bạn là {installed}."
+msgid "{label} update available"
+msgstr "Có bản cập nhật {label}"
+
+msgid "{label} updated"
+msgstr "Đã cập nhật {label}"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Xem theo thư mục"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Các thư mục sẽ được checkout vào worktree mới, mỗi dòng một thư mục, tính từ gốc repo. Tệp ở gốc luôn được đưa vào. Để trống sẽ checkout tất cả."
 
+msgid "Follow along in the terminal below."
+msgstr "Theo dõi tiến trình trong terminal bên dưới."
+
 msgid "FOLLOW ON X"
 msgstr "THEO DÕI TRÊN X"
 
@@ -15332,6 +15338,9 @@ msgstr "Khởi động lại daemon terminal?"
 msgid "Restart terminals"
 msgstr "Khởi động lại terminal"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Khởi động lại cuộc trò chuyện để dùng phiên bản {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Khởi động lại để dùng phiên bản {appName} mới nhất."
 
@@ -18270,6 +18279,9 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệch cho thời gian còn lại của kỳ này."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Cuộc trò chuyện sẽ tiếp tục khi phiên bản mới được cài đặt."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi kịp. Lần chạy tiếp theo sẽ thử lại."
 
@@ -19760,11 +19772,8 @@ msgstr "Vừa cập nhật từ {0}."
 msgid "Updates"
 msgstr "Cập nhật"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Đang cập nhật {label} trong terminal…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Đang cập nhật trong terminal bên dưới. Cuộc trò chuyện sẽ tiếp tục khi phiên bản mới được cài đặt."
+msgid "Updating {label}…"
+msgstr "Đang cập nhật {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

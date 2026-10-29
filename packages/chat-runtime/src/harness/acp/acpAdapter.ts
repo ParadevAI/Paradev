@@ -203,6 +203,11 @@ const CLIENT_APPROVAL_MODES = [
 	{ id: "bypassPermissions", label: "Full access" },
 ];
 
+function errorCode(error: unknown): string | undefined {
+	const code = (error as { code?: unknown } | null)?.code;
+	return typeof code === "string" ? code : undefined;
+}
+
 function sessionMissing(error: unknown): boolean {
 	return (
 		error instanceof AcpRpcError &&
@@ -1078,7 +1083,11 @@ export class AcpAdapter implements HarnessAdapter {
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
-			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
+			this.emitNotice(
+				"error",
+				this.withStderr(this.authAwareMessage(error)),
+				errorCode(error),
+			);
 			this.dead = true;
 			this.emitSession({ status: "dead" });
 			this.queue.close();
@@ -2506,6 +2515,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private emitNotice(
 		noticeKind: "info" | "error" | "compaction" | "config_change",
 		text?: string,
+		code?: string,
 	): void {
 		this.emitItem(
 			{
@@ -2515,6 +2525,7 @@ export class AcpAdapter implements HarnessAdapter {
 				startedAtMs: this.nextStartMs(),
 				completedAtMs: this.now(),
 				...(text ? { text } : {}),
+				...(code ? { code } : {}),
 			},
 			this.resolveTurnId(),
 		);

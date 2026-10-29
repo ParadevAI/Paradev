@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { delimiter, join, relative } from "node:path";
 import { promisify } from "node:util";
 import { getBinDir } from "@superset/agent-setup";
+import { AGENT_CLI_OUTDATED } from "@superset/shared/agent-cli-status";
 import { coerce, gte } from "semver";
 import { UNGATED_VERSION } from "./acpCatalogue";
 import { type AgentCliBinary, resolveAgentCliUpdate } from "./agentCliUpdate";
@@ -173,6 +174,10 @@ export function agentCliUnsupported(options: {
 	return `${options.binary} ${options.minVersion} or newer is needed for chat, and ${options.found} is installed.${upgrade}`;
 }
 
+export class AgentCliOutdatedError extends Error {
+	readonly code = AGENT_CLI_OUTDATED;
+}
+
 export function meetsFloor(found: string, minVersion: string): boolean {
 	if (minVersion === UNGATED_VERSION) return true;
 	const coerced = coerce(found);
@@ -195,7 +200,8 @@ export async function resolveAgentCli(options: {
 			runMode: process.env.SUPERSET_HOST_RUN_MODE,
 		});
 		const upgrade = update ? (update.command ?? undefined) : options.upgrade;
-		throw new Error(agentCliUnsupported({ ...options, found, upgrade }));
+		const message = agentCliUnsupported({ ...options, found, upgrade });
+		throw found ? new AgentCliOutdatedError(message) : new Error(message);
 	}
 	return { command: probed.command, env };
 }

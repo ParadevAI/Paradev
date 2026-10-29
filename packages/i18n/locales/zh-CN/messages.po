@@ -993,11 +993,14 @@ msgstr "{kind} · 作者{author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}主题"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "已安装 {label} {installed}。重启聊天即可使用。"
+msgid "{label} needs an update"
+msgstr "{label} 需要更新"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} 已发布。当前版本为 {installed}。"
+msgid "{label} update available"
+msgstr "{label} 有可用更新"
+
+msgid "{label} updated"
+msgstr "{label} 已更新"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "文件夹视图"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "要检出到新worktree的文件夹，每行一个，相对于仓库根目录。根目录下的文件始终包含在内。留空则检出全部。"
 
+msgid "Follow along in the terminal below."
+msgstr "可在下方终端中查看进度。"
+
 msgid "FOLLOW ON X"
 msgstr "在X上关注"
 
@@ -15332,6 +15338,9 @@ msgstr "重启终端守护进程？"
 msgid "Restart terminals"
 msgstr "重启终端"
 
+msgid "Restart the chat to use {installed}."
+msgstr "重启聊天即可使用 {installed}。"
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "重新启动以使用最新版本的 {appName}。"
 
@@ -18270,6 +18279,9 @@ msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 
+msgid "The chat resumes once the new version is installed."
+msgstr "新版本安装完成后，聊天将自动恢复。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"
 
@@ -19760,11 +19772,8 @@ msgstr "刚刚从 {0} 更新。"
 msgid "Updates"
 msgstr "更新"
 
-msgid "Updating {label} in a terminal…"
-msgstr "正在终端中更新 {label}…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "正在下方终端中更新。新版本安装完成后，聊天将自动恢复。"
+msgid "Updating {label}…"
+msgstr "正在更新 {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

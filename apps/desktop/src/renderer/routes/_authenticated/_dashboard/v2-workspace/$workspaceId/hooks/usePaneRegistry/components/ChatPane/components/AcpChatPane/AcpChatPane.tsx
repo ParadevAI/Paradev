@@ -21,6 +21,7 @@ import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import {
 	type RunInTerminal,
+	useAgentCliTooOld,
 	useAgentCliUpdatePending,
 } from "../../../../hooks/useAgentCliUpdate";
 import { SessionView } from "../../../ChatSession/components/SessionView";
@@ -547,16 +548,25 @@ export function AcpChatPane({
 		releaseReplacement,
 		t,
 	]);
-	// Retrying mid-install can start the chat on whatever install the PATH
-	// falls through to; the recovery screen resumes once the update lands.
+	// A retry cannot get past a CLI that is too old, and one mid-install can
+	// start the chat on whatever install the PATH falls through to. The
+	// recovery screen offers the update and resumes once it lands.
 	const cliUpdatePending = useAgentCliUpdatePending(
 		workspaceId,
 		harness,
 		sessionId,
 	);
+	const cliTooOld = useAgentCliTooOld(
+		workspaceId,
+		harness,
+		sessionDead || sessionStopped,
+	);
 	const recovering =
 		replacement !== null ||
-		(recoverable && !cliUpdatePending && recoveries.current < MAX_RECOVERIES);
+		(recoverable &&
+			!cliUpdatePending &&
+			!cliTooOld &&
+			recoveries.current < MAX_RECOVERIES);
 	useEffect(() => {
 		if (!recovering || recoveryInFlight.current) return;
 		const delayMs =

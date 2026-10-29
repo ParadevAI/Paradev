@@ -6,6 +6,10 @@ import {
 	type RunInTerminal,
 	useAgentCliUpdate,
 } from "../../../../../../hooks/useAgentCliUpdate";
+import {
+	AgentCliUpdateCard,
+	type AgentCliUpdateCardAction,
+} from "../../../../../AgentCliUpdateCard";
 
 /**
  * Shown when the chat cannot be used: the agent session had no transcript to
@@ -60,23 +64,71 @@ export function AcpRecovery({
 	const installed = status?.installed;
 	const minVersion = status?.minVersion;
 	const updating = phase === "updating";
-	const offerUpdate = tooOld || updating;
+	if (tooOld || updating) {
+		const actions: AgentCliUpdateCardAction[] = [];
+		if (!updating && canUpdate) {
+			actions.push({
+				id: "update",
+				label: <Trans>Update {label}</Trans>,
+				primary: true,
+				onClick: () => void update(),
+			});
+		}
+		if (!updating && !canUpdate) {
+			actions.push({
+				id: "docs",
+				label: <Trans>How to update</Trans>,
+				primary: true,
+				href: AGENT_CLI_UPDATE_DOCS_URL,
+			});
+		}
+		if (onResume) {
+			actions.push({
+				id: "resume",
+				label: <Trans>Resume</Trans>,
+				onClick: onResume,
+			});
+		}
+		actions.push({
+			id: "new",
+			label: <Trans>Start a new chat</Trans>,
+			onClick: onStartNew,
+		});
+		return (
+			<div className="flex h-full w-full items-center justify-center p-8">
+				<AgentCliUpdateCard
+					actions={actions}
+					className="w-full max-w-md"
+					description={
+						updating ? (
+							<Trans>The chat resumes once the new version is installed.</Trans>
+						) : (
+							<Trans>
+								Chat needs {label} {minVersion} or newer, and {installed} is
+								installed.
+							</Trans>
+						)
+					}
+					detail={!updating && canUpdate ? status?.updateCommand : undefined}
+					state={updating ? "updating" : "required"}
+					testId="agent-cli-update-recovery"
+					title={
+						updating ? (
+							<Trans>Updating {label}…</Trans>
+						) : (
+							<Trans>{label} needs an update</Trans>
+						)
+					}
+				/>
+			</div>
+		);
+	}
 	return (
 		// w-full because the pane lays its children out in a row: without it this
 		// sizes to its content and hugs the left edge.
 		<div className="flex h-full w-full flex-col items-center justify-center gap-3 p-8 text-center">
 			<p className="max-w-sm text-muted-foreground text-sm">
-				{updating ? (
-					<Trans>
-						Updating in the terminal below. The chat resumes once the new
-						version is installed.
-					</Trans>
-				) : tooOld ? (
-					<Trans>
-						Chat needs {label} {minVersion} or newer, and {installed} is
-						installed.
-					</Trans>
-				) : reason === "in-terminal" ? (
+				{reason === "in-terminal" ? (
 					<Trans>
 						This chat stopped because the conversation continued in a terminal.
 					</Trans>
@@ -89,41 +141,14 @@ export function AcpRecovery({
 					<Trans>This chat was stopped.</Trans>
 				)}
 			</p>
-			{offerUpdate
-				? canUpdate &&
-					!updating && (
-						<p className="max-w-lg font-mono text-[11px] text-muted-foreground/60">
-							{status?.updateCommand}
-						</p>
-					)
-				: detail && (
-						<p className="max-w-lg font-mono text-[11px] text-muted-foreground/60">
-							{detail}
-						</p>
-					)}
+			{detail && (
+				<p className="max-w-lg font-mono text-[11px] text-muted-foreground/60">
+					{detail}
+				</p>
+			)}
 			<div className="flex gap-2">
-				{offerUpdate && canUpdate && (
-					<Button disabled={updating} onClick={() => void update()} size="sm">
-						<Trans>Update {label}</Trans>
-					</Button>
-				)}
-				{tooOld && !canUpdate && !updating && (
-					<Button asChild size="sm" variant="secondary">
-						<a
-							href={AGENT_CLI_UPDATE_DOCS_URL}
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Trans>How to update</Trans>
-						</a>
-					</Button>
-				)}
 				{onResume && (
-					<Button
-						onClick={onResume}
-						size="sm"
-						variant={offerUpdate ? "secondary" : "default"}
-					>
+					<Button onClick={onResume} size="sm">
 						<Trans>Resume</Trans>
 					</Button>
 				)}

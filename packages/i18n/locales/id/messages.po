@@ -993,11 +993,14 @@ msgstr "{kind} · oleh {author}"
 msgid "{kindLabel} theme"
 msgstr "Tema {kindLabel}"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} sudah terpasang. Mulai ulang chat untuk menggunakannya."
+msgid "{label} needs an update"
+msgstr "{label} perlu diperbarui"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} tersedia. Versi Anda {installed}."
+msgid "{label} update available"
+msgstr "Pembaruan {label} tersedia"
+
+msgid "{label} updated"
+msgstr "{label} sudah diperbarui"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Tampilan folder"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Folder yang di-checkout ke worktree baru, satu per baris, relatif terhadap root repo. File di root selalu disertakan. Kosong berarti checkout semuanya."
 
+msgid "Follow along in the terminal below."
+msgstr "Pantau prosesnya di terminal di bawah."
+
 msgid "FOLLOW ON X"
 msgstr "IKUTI DI X"
 
@@ -15332,6 +15338,9 @@ msgstr "Mulai ulang daemon terminal?"
 msgid "Restart terminals"
 msgstr "Mulai ulang terminal"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Mulai ulang chat untuk menggunakan versi {installed}."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "Mulai ulang untuk menggunakan versi terbaru {appName}."
 
@@ -18270,6 +18279,9 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Chat akan dilanjutkan setelah versi baru terpasang."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
 
@@ -19760,11 +19772,8 @@ msgstr "Baru saja diperbarui dari {0}."
 msgid "Updates"
 msgstr "Pembaruan"
 
-msgid "Updating {label} in a terminal…"
-msgstr "Memperbarui {label} di terminal…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Memperbarui di terminal di bawah. Chat akan dilanjutkan setelah versi baru terpasang."
+msgid "Updating {label}…"
+msgstr "Memperbarui {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

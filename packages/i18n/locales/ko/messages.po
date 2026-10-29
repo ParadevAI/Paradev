@@ -993,11 +993,14 @@ msgstr "{kind} · 제작 {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} 테마"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed}이(가) 설치되었습니다. 사용하려면 채팅을 다시 시작하세요."
+msgid "{label} needs an update"
+msgstr "{label} 업데이트가 필요합니다"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest}을(를) 사용할 수 있습니다. 현재 버전은 {installed}입니다."
+msgid "{label} update available"
+msgstr "{label} 업데이트 가능"
+
+msgid "{label} updated"
+msgstr "{label} 업데이트됨"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "폴더 보기"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "새 worktree에 체크아웃할 폴더를 리포지토리 루트 기준으로 한 줄에 하나씩 적습니다. 루트에 있는 파일은 항상 포함됩니다. 비워 두면 전체를 체크아웃합니다."
 
+msgid "Follow along in the terminal below."
+msgstr "아래 터미널에서 진행 상황을 확인하세요."
+
 msgid "FOLLOW ON X"
 msgstr "X에서 팔로우하기"
 
@@ -15332,6 +15338,9 @@ msgstr "터미널 데몬을 다시 시작할까요?"
 msgid "Restart terminals"
 msgstr "터미널 다시 시작"
 
+msgid "Restart the chat to use {installed}."
+msgstr "{installed} 버전을 사용하려면 채팅을 다시 시작하세요."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "다시 시작하면 최신 버전의 {appName}을 사용할 수 있습니다."
 
@@ -18270,6 +18279,9 @@ msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "변경은 바로 적용됩니다. 남은 기간에 대한 차액만 결제합니다."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "새 버전이 설치되면 채팅이 다시 시작됩니다."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시간에 응답하지 않았습니다. 다음 실행에서 다시 시도합니다."
 
@@ -19760,11 +19772,8 @@ msgstr "방금 {0}에서 업데이트되었습니다."
 msgid "Updates"
 msgstr "업데이트"
 
-msgid "Updating {label} in a terminal…"
-msgstr "터미널에서 {label} 업데이트 중…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "아래 터미널에서 업데이트하는 중입니다. 새 버전이 설치되면 채팅이 다시 시작됩니다."
+msgid "Updating {label}…"
+msgstr "{label} 업데이트 중…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

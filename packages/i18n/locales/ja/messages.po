@@ -993,11 +993,14 @@ msgstr "{kind} · 作者: {author}"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel}テーマ"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} がインストールされました。使用するにはチャットを再起動してください。"
+msgid "{label} needs an update"
+msgstr "{label} の更新が必要です"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} が利用可能です。現在のバージョンは {installed} です。"
+msgid "{label} update available"
+msgstr "{label} のアップデートがあります"
+
+msgid "{label} updated"
+msgstr "{label} を更新しました"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "フォルダ表示"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "新しいワークツリーにチェックアウトするフォルダを、リポジトリルートからの相対パスで1行に1つずつ。ルートのファイルは常に含まれます。空欄ですべてをチェックアウトします。"
 
+msgid "Follow along in the terminal below."
+msgstr "進行状況は下のターミナルで確認できます。"
+
 msgid "FOLLOW ON X"
 msgstr "Xでフォロー"
 
@@ -15332,6 +15338,9 @@ msgstr "ターミナルデーモンを再起動しますか?"
 msgid "Restart terminals"
 msgstr "ターミナルを再起動"
 
+msgid "Restart the chat to use {installed}."
+msgstr "{installed} を使用するにはチャットを再起動してください。"
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "再起動すると最新バージョンの {appName} を使用できます。"
 
@@ -18270,6 +18279,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
+msgid "The chat resumes once the new version is installed."
+msgstr "新しいバージョンがインストールされるとチャットが再開されます。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"
 
@@ -19760,11 +19772,8 @@ msgstr "{0}からたった今更新しました。"
 msgid "Updates"
 msgstr "アップデート"
 
-msgid "Updating {label} in a terminal…"
-msgstr "ターミナルで {label} を更新しています…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "下のターミナルで更新しています。新しいバージョンがインストールされるとチャットが再開されます。"
+msgid "Updating {label}…"
+msgstr "{label} を更新しています…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

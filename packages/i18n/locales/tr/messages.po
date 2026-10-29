@@ -993,11 +993,14 @@ msgstr "{kind} · {author} tarafından"
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} tema"
 
-msgid "{label} {installed} is installed. Restart the chat to use it."
-msgstr "{label} {installed} yüklendi. Kullanmak için sohbeti yeniden başlatın."
+msgid "{label} needs an update"
+msgstr "{label} güncellenmeli"
 
-msgid "{label} {latest} is available. You have {installed}."
-msgstr "{label} {latest} kullanılabilir. Sizdeki sürüm: {installed}."
+msgid "{label} update available"
+msgstr "{label} güncellemesi var"
+
+msgid "{label} updated"
+msgstr "{label} güncellendi"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -8383,6 +8386,9 @@ msgstr "Klasör görünümü"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Yeni worktree'lere checkout edilecek klasörler; her satıra bir tane, depo köküne göre. Kökteki dosyalar her zaman dahildir. Boş bırakılırsa her şey checkout edilir."
 
+msgid "Follow along in the terminal below."
+msgstr "İlerlemeyi aşağıdaki terminalden izleyin."
+
 msgid "FOLLOW ON X"
 msgstr "X'TE TAKİP EDİN"
 
@@ -15332,6 +15338,9 @@ msgstr "Terminal daemon'u yeniden başlatılsın mı?"
 msgid "Restart terminals"
 msgstr "Terminalleri yeniden başlat"
 
+msgid "Restart the chat to use {installed}."
+msgstr "{installed} sürümünü kullanmak için sohbeti yeniden başlatın."
+
 msgid "Restart to use the latest version of {appName}."
 msgstr "{appName}'in en son sürümünü kullanmak için yeniden başlatın."
 
@@ -18270,6 +18279,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı ödersiniz."
 
+msgid "The chat resumes once the new version is installed."
+msgstr "Yeni sürüm yüklendiğinde sohbet devam edecek."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
@@ -19760,11 +19772,8 @@ msgstr "Az önce {0} sürümünden güncellendi."
 msgid "Updates"
 msgstr "Güncellemeler"
 
-msgid "Updating {label} in a terminal…"
-msgstr "{label} bir terminalde güncelleniyor…"
-
-msgid "Updating in the terminal below. The chat resumes once the new version is installed."
-msgstr "Aşağıdaki terminalde güncelleniyor. Yeni sürüm yüklendiğinde sohbet devam edecek."
+msgid "Updating {label}…"
+msgstr "{label} güncelleniyor…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

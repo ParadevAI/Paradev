@@ -12,6 +12,9 @@ export type AgentCliInstallSource =
 	| "managed"
 	| "unknown";
 
+/** The `code` on a chat's start error when its CLI is older than chat needs. */
+export const AGENT_CLI_OUTDATED = "agent_cli_outdated";
+
 export interface AgentCliStatus {
 	binary: string;
 	installed: string | null;
