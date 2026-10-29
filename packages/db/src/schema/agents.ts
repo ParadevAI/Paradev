@@ -129,10 +129,9 @@ export const agentSessions = pgTable(
 		environmentId: uuid("environment_id").references(() => environments.id, {
 			onDelete: "set null",
 		}),
-		requestedByUserId: uuid("requested_by_user_id").references(
-			() => users.id,
-			{ onDelete: "set null" },
-		),
+		requestedByUserId: uuid("requested_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
