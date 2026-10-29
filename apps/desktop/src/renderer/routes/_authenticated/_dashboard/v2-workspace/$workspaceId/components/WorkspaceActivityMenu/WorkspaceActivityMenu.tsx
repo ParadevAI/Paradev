@@ -148,8 +148,13 @@ export function WorkspaceActivityMenu({
 	const fits = useActivityPanelStore(
 		(state) => state.fits[workspaceId] === true,
 	);
+	const hidden = useActivityPanelStore(
+		(state) => state.hidden[workspaceId] === true,
+	);
+	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
-	const open = fits || floating;
+	const open = docked || floating;
 	const panelId = `workspace-activity-${workspaceId}`;
 	const newPageStatusId = useId();
 	const {
@@ -440,7 +445,7 @@ export function WorkspaceActivityMenu({
 
 	const onTriggerClick = () => {
 		if (fits) {
-			document.getElementById(panelId)?.querySelector("button")?.focus();
+			setHidden(workspaceId, !hidden);
 			return;
 		}
 		setFloating(!popoverOpen);
@@ -558,7 +563,7 @@ export function WorkspaceActivityMenu({
 						? `min(${PANEL_MAX_HEIGHT_PX}px, var(--radix-popover-content-available-height))`
 						: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)`,
 			}}
-			id={(variant === "docked") === fits ? panelId : undefined}
+			id={(variant === "docked") === docked ? panelId : undefined}
 			data-activity-panel
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {
@@ -797,9 +802,7 @@ export function WorkspaceActivityMenu({
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					{fits ? (
-						<Trans>Workspace activity</Trans>
-					) : floating ? (
+					{open ? (
 						<Trans>Hide workspace activity</Trans>
 					) : (
 						<Trans>Show workspace activity</Trans>
@@ -812,6 +815,10 @@ export function WorkspaceActivityMenu({
 				className="w-80 border-0 bg-transparent p-0 shadow-none duration-200 ease-out data-[state=closed]:duration-150 data-[state=closed]:ease-in data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
 				onEscapeKeyDown={(event) => {
 					if (shipView || composing) event.preventDefault();
+				}}
+				onInteractOutside={(event) => {
+					if (triggerRef.current?.contains(event.target as Node))
+						event.preventDefault();
 				}}
 			>
 				{renderPanel("floating")}

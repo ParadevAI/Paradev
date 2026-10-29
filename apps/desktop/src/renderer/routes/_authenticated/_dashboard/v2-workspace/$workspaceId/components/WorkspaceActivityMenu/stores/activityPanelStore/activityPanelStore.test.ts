@@ -47,3 +47,12 @@ test("fits and stopped keys are tracked per call and cleared on demand", () => {
 		false,
 	);
 });
+
+test("hiding the docked card is per workspace", () => {
+	const { setHidden } = useActivityPanelStore.getState();
+	setHidden("ws-a", true);
+	expect(useActivityPanelStore.getState().hidden["ws-a"]).toBe(true);
+	expect(useActivityPanelStore.getState().hidden["ws-b"]).toBeUndefined();
+	setHidden("ws-a", false);
+	expect("ws-a" in useActivityPanelStore.getState().hidden).toBe(false);
+});

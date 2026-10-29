@@ -25,7 +25,11 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	const clearAnchorNode = useActivityPanelStore(
 		(state) => state.clearAnchorNode,
 	);
-	const shown = hasRoom && isTabVisible;
+	const hidden = useActivityPanelStore(
+		(state) => state.hidden[workspaceId] === true,
+	);
+	const fits = hasRoom && isTabVisible;
+	const shown = fits && !hidden;
 
 	useLayoutEffect(() => {
 		const host = sentinel?.parentElement;
@@ -38,7 +42,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 		return () => observer.disconnect();
 	}, [sentinel]);
 
-	const fits = shown;
 	useLayoutEffect(() => {
 		setFits(workspaceId, fits);
 		return () => setFits(workspaceId, false);
