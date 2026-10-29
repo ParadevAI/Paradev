@@ -1,4 +1,9 @@
-import { WorkerPoolContextProvider } from "@pierre/diffs/react";
+import { canUseWASM } from "@pierre/diffs";
+import {
+	type WorkerInitializationRenderOptions,
+	WorkerPoolContextProvider,
+	type WorkerPoolOptions,
+} from "@pierre/diffs/react";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import {
@@ -82,6 +87,15 @@ const createOrganizationRedirect = (
 const onboardingRedirect = <Redirect to="/onboarding" replace />;
 
 const SESSION_PENDING_TIMEOUT_MS = 15_000;
+
+const PIERRE_POOL_OPTIONS: WorkerPoolOptions = {
+	workerFactory: createPierreWorker,
+	poolSize: 2,
+	mainThreadMaxCharacters: 200_000,
+};
+const PIERRE_HIGHLIGHTER_OPTIONS: WorkerInitializationRenderOptions = {
+	preferredHighlighter: canUseWASM() ? "highlights" : "shiki-js",
+};
 
 function AuthenticatedLayout() {
 	const {
@@ -319,11 +333,8 @@ function AuthenticatedLayout() {
 						<HostWorkspacesProvider>
 							<TagFolderWorkspacesProvider>
 								<WorkerPoolContextProvider
-									poolOptions={{
-										workerFactory: createPierreWorker,
-										poolSize: 8,
-									}}
-									highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
+									poolOptions={PIERRE_POOL_OPTIONS}
+									highlighterOptions={PIERRE_HIGHLIGHTER_OPTIONS}
 								>
 									<DiffThemeSync />
 									<AgentHooks />

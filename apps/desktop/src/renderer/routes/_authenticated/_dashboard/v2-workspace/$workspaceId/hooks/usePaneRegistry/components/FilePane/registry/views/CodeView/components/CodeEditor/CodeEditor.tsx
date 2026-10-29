@@ -30,6 +30,7 @@ import { type MutableRefObject, useEffect, useRef } from "react";
 import { FONT_SETTINGS_QUERY_KEY } from "renderer/lib/font-settings";
 import { replaceEditorDocument } from "renderer/lib/replaceEditorDocument";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { createZedTheme } from "renderer/screens/main/components/WorkspaceView/utils/code-theme";
 import { useResolvedTheme } from "renderer/stores/theme";
 import {
 	type CodeEditorAdapter,
@@ -39,6 +40,10 @@ import { createCodeMirrorTheme } from "./createCodeMirrorTheme";
 import { contourSelectionLayer } from "./extensions/contourSelectionLayer";
 import { buildFoldChevron } from "./extensions/foldChevron";
 import { buildFoldPlaceholder } from "./extensions/foldPlaceholder";
+import {
+	liveHighlighting,
+	loadLiveHighlighting,
+} from "./extensions/liveHighlighting";
 import { selectionClassTogglePlugin } from "./extensions/selectionClassTogglePlugin";
 import { loadLanguageSupport } from "./loadLanguageSupport";
 import { getCodeSyntaxHighlighting } from "./syntax-highlighting";
@@ -46,6 +51,7 @@ import { getCodeSyntaxHighlighting } from "./syntax-highlighting";
 interface CodeEditorProps {
 	value: string;
 	language: string;
+	filePath?: string;
 	readOnly?: boolean;
 	fillHeight?: boolean;
 	className?: string;
@@ -62,6 +68,7 @@ interface CodeEditorProps {
 export function CodeEditor({
 	value,
 	language,
+	filePath,
 	readOnly = false,
 	fillHeight = true,
 	className,
@@ -75,6 +82,7 @@ export function CodeEditor({
 	const viewRef = useRef<EditorView | null>(null);
 	const languageCompartment = useRef(new Compartment()).current;
 	const themeCompartment = useRef(new Compartment()).current;
+	const highlightCompartment = useRef(new Compartment()).current;
 	const editableCompartment = useRef(new Compartment()).current;
 	const onChangeRef = useRef(onChange);
 	const onSaveRef = useRef(onSave);
@@ -153,8 +161,8 @@ export function CodeEditor({
 					...foldKeymap,
 				]),
 				saveKeymap,
+				highlightCompartment.of([]),
 				themeCompartment.of([
-					getCodeSyntaxHighlighting(activeTheme),
 					createCodeMirrorTheme(
 						activeTheme,
 						{
@@ -238,7 +246,6 @@ export function CodeEditor({
 
 		view.dispatch({
 			effects: themeCompartment.reconfigure([
-				getCodeSyntaxHighlighting(activeTheme),
 				createCodeMirrorTheme(
 					activeTheme,
 					{
@@ -308,6 +315,43 @@ export function CodeEditor({
 			cancelled = true;
 		};
 	}, [language, languageCompartment]);
+
+	useEffect(() => {
+		let cancelled = false;
+		const applyHighlighting = (
+			extension: ReturnType<typeof getCodeSyntaxHighlighting>,
+		) => {
+			const view = viewRef.current;
+			if (cancelled || !view) return;
+			view.dispatch({ effects: highlightCompartment.reconfigure(extension) });
+		};
+		const fallback = () =>
+			applyHighlighting(getCodeSyntaxHighlighting(activeTheme));
+
+		if (!filePath) {
+			fallback();
+		} else {
+			void loadLiveHighlighting(filePath)
+				.then((live) =>
+					live
+						? applyHighlighting(
+								liveHighlighting(live, createZedTheme(activeTheme)),
+							)
+						: fallback(),
+				)
+				.catch((error) => {
+					console.error("[CodeEditor] Failed to load live highlighting:", {
+						error,
+						filePath,
+					});
+					fallback();
+				});
+		}
+
+		return () => {
+			cancelled = true;
+		};
+	}, [activeTheme, filePath, highlightCompartment]);
 
 	return (
 		<div

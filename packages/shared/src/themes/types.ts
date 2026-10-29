@@ -254,6 +254,12 @@ export interface EditorSyntaxColors {
 	tagName: string;
 	attributeName: string;
 	invalid: string;
+	operator: string;
+	punctuation: string;
+	property: string;
+	parameter: string;
+	heading: string;
+	link: string;
 }
 
 /**
