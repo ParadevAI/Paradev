@@ -11,8 +11,9 @@
  *
  * Each store is the CLI's own sanctioned escape hatch: Claude's untrusted-
  * folder error says to set `projects[<path>].hasTrustDialogAccepted: true`
- * in its state file, and Codex persists `trust_level = "trusted"` in
- * config.toml the same way. Everything here is best-effort — a failed seed
+ * in its state file, Codex persists `trust_level = "trusted"` in
+ * config.toml the same way, and Antigravity lists trusted folders under
+ * `trustedWorkspaces` in its settings.json. Everything here is best-effort — a failed seed
  * just means the dialog shows once.
  */
 
@@ -32,7 +33,7 @@ import { resolveWriteTarget } from "@superset/agent-setup";
 import type { HostDb } from "../../../../db";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
-type TrustFamily = "claude" | "codex";
+type TrustFamily = "claude" | "codex" | "agy";
 
 interface TrustTarget {
 	family: TrustFamily;
@@ -53,7 +54,7 @@ export function resolveTrustFamily(config: {
 	const executable = (token.split(/[\\/]/).pop() ?? "")
 		.toLowerCase()
 		.replace(/\.exe$/, "");
-	for (const family of ["claude", "codex"] as const) {
+	for (const family of ["claude", "codex", "agy"] as const) {
 		if (config.presetId === family || executable === family) return family;
 	}
 	return null;
@@ -74,6 +75,12 @@ function resolveTrustTarget(
 ): TrustTarget | null {
 	const family = resolveTrustFamily(config);
 	if (family === null) return null;
+	if (family === "agy") {
+		return {
+			family,
+			file: join(homedir(), ".gemini", "antigravity-cli", "settings.json"),
+		};
+	}
 	const env = { ...resolveDefaultAccountEnv(db, family), ...config.env };
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
@@ -191,6 +198,29 @@ export async function seedCodexFolderTrust(
 	await atomicWrite(configFile, next);
 }
 
+/**
+ * Append `folderPath` to `trustedWorkspaces` in Antigravity's settings.json,
+ * preserving every other key. A corrupt file throws instead of being
+ * clobbered. No-op when the folder is already listed.
+ */
+export async function seedAgyFolderTrust(
+	settingsFile: string,
+	folderPath: string,
+): Promise<void> {
+	let settings: Record<string, unknown> = {};
+	if (existsSync(settingsFile)) {
+		settings = JSON.parse(await readFile(settingsFile, "utf-8"));
+	} else if (!existsSync(dirname(settingsFile))) {
+		return;
+	}
+	const trusted = Array.isArray(settings.trustedWorkspaces)
+		? settings.trustedWorkspaces
+		: [];
+	if (trusted.includes(folderPath)) return;
+	settings.trustedWorkspaces = [...trusted, folderPath];
+	await atomicWrite(settingsFile, JSON.stringify(settings, null, 2));
+}
+
 function normalizeFolderPath(path: string): string {
 	try {
 		return realpathSync(path);
@@ -216,6 +246,8 @@ export async function seedAgentFolderTrust(
 		const normalized = normalizeFolderPath(folderPath);
 		if (target.family === "claude") {
 			await seedClaudeFolderTrust(target.file, normalized);
+		} else if (target.family === "agy") {
+			await seedAgyFolderTrust(target.file, normalized);
 		} else {
 			await seedCodexFolderTrust(target.file, normalized);
 		}
