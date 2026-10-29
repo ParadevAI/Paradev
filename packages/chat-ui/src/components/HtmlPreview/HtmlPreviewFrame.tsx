@@ -42,8 +42,6 @@ export function HtmlPreviewFrame({
 	}, [onEscape]);
 	const [box, setBox] = useState({ width: 0, height: 0 });
 	const [page, setPage] = useState<PreviewSize | null>(null);
-	// A page that once overflowed keeps that width: laid out wider to fit, it
-	// no longer overflows, and forgetting would make fit flip back and forth.
 
 	useEffect(() => {
 		const element = boxRef.current;
@@ -66,6 +64,8 @@ export function HtmlPreviewFrame({
 			}
 			const size = readPreviewSize(event.data);
 			if (!size) return;
+			// A page that once overflowed keeps that width: laid out wider to fit,
+			// it no longer overflows, and forgetting would make fit flip back and forth.
 			setPage((current) => {
 				const width = size.width > 0 ? size.width : (current?.width ?? 0);
 				return current?.width === width && current.height === size.height
