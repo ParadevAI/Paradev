@@ -124,7 +124,12 @@ suite("agent access against a migrated PostgreSQL", () => {
 		const created = await db
 			.insert(schema.channels)
 			.values([
-				{ organizationId: orgId, name: "secret", visibility: "private" },
+				{
+					organizationId: orgId,
+					name: "secret",
+					visibility: "private",
+					lastSeq: 1,
+				},
 				{ organizationId: orgId, name: "other", visibility: "public" },
 			])
 			.returning({ id: schema.channels.id });
@@ -162,6 +167,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		expect(page.messages.map((message) => message.body)).toEqual([
 			"only for members",
+			"has joined the channel",
 		]);
 	});
 

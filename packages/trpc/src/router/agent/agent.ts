@@ -8,6 +8,7 @@ import {
 	agents,
 	agentTurns,
 	channelMembers,
+	channelMessages,
 	channels,
 	members,
 } from "@superset/db/schema";
@@ -166,11 +167,23 @@ export const agentRouter = {
 					channelId: channels.id,
 					channelName: channels.name,
 					channelKind: channels.kind,
-					threadRootId: agentSessions.threadRootId,
+					threadRootId: sql<
+						string | null
+					>`case when ${channels.kind} = 'dm' then null else coalesce(${channelMessages.threadRootId}, ${channelMessages.id}, ${agentSessions.threadRootId}) end`,
 				})
 				.from(agentTurns)
 				.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
-				.innerJoin(channels, eq(channels.id, agentSessions.channelId))
+				.leftJoin(
+					channelMessages,
+					eq(channelMessages.id, agentTurns.triggerMessageId),
+				)
+				.innerJoin(
+					channels,
+					eq(
+						channels.id,
+						sql`coalesce(${channelMessages.channelId}, ${agentSessions.channelId})`,
+					),
+				)
 				.where(
 					and(
 						eq(agentTurns.agentId, agent.id),
@@ -178,26 +191,17 @@ export const agentRouter = {
 							? sql`(${agentTurns.startedAt}, ${agentTurns.id}) < (select t.started_at, t.id from ${agentTurns} t where t.id = ${input.cursor})`
 							: undefined,
 						or(
-							and(
-								eq(agentSessions.kind, "dm"),
-								eq(agentSessions.userId, userId),
-							),
-							and(
-								eq(agentSessions.kind, "thread"),
-								or(
-									eq(channels.visibility, "public"),
-									exists(
-										db
-											.select({ one: sql`1` })
-											.from(channelMembers)
-											.where(
-												and(
-													eq(channelMembers.channelId, channels.id),
-													eq(channelMembers.actorId, userId),
-												),
-											),
+							eq(channels.visibility, "public"),
+							exists(
+								db
+									.select({ one: sql`1` })
+									.from(channelMembers)
+									.where(
+										and(
+											eq(channelMembers.channelId, channels.id),
+											eq(channelMembers.actorId, userId),
+										),
 									),
-								),
 							),
 						),
 					),
