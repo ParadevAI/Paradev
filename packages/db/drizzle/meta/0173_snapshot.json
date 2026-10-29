@@ -1,5 +1,5 @@
 {
-  "id": "c8fe2d6f-39be-418b-b3f0-6509f03bfcb6",
+  "id": "f34ab4d4-993e-489d-b717-5d2fdd7eca86",
   "prevId": "19af1a79-aa7f-4bbe-b300-af5a9c04a12d",
   "version": "7",
   "dialect": "postgresql",
@@ -394,21 +394,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "agent_sessions_pull_request_idx": {
-          "name": "agent_sessions_pull_request_idx",
-          "columns": [
-            {
-              "expression": "pull_request_url",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -640,6 +625,19 @@
         },
         "error_code": {
           "name": "error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "last_attempt_error": {
+          "name": "last_attempt_error",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -16290,8 +16288,7 @@
         "thread_reply",
         "channel_message",
         "task_start",
-        "task_update",
-        "github"
+        "task_update"
       ]
     },
     "public.agent_turn_status": {
