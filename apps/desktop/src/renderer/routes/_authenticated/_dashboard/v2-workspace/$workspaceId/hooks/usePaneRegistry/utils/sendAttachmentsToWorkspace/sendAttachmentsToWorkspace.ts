@@ -16,6 +16,10 @@ export interface AttachmentUploadTarget {
 	headers: Record<string, string>;
 }
 
+export type LocalAttachmentItem =
+	| { kind: "path"; sourcePath: string }
+	| { kind: "base64"; name: string; data: string };
+
 export interface SendAttachmentsDeps {
 	createUpload(input: {
 		name: string;
@@ -29,14 +33,10 @@ export interface SendAttachmentsDeps {
 		workspaceId: string;
 		fileIds: string[];
 	}): Promise<{ paths: string[] }>;
-	/**
-	 * Set only when the workspace is on this machine. A file with a disk path
-	 * is then copied into the worktree: it never goes to storage and has no
-	 * size limit.
-	 */
-	local?: {
+	sameMachine?: {
 		pathOf(file: File): string;
-		copy(sourcePaths: string[]): Promise<string[]>;
+		readBase64(file: File): Promise<string>;
+		write(items: LocalAttachmentItem[]): Promise<string[]>;
 	};
 }
 
@@ -64,13 +64,13 @@ function nameOf(file: File, index: number): string {
 	return attachmentFallbackName(index, extension ? `.${extension}` : "");
 }
 
-function assertWithinLimits(files: File[], uploads: File[]): void {
+function assertWithinLimits(files: File[], sized: File[] = files): void {
 	if (files.length > MAX_ATTACHMENTS) {
 		throw new AttachmentLimitError(
 			`${files.length} files attached — a message carries at most ${MAX_ATTACHMENTS}`,
 		);
 	}
-	for (const file of uploads) {
+	for (const file of sized) {
 		if (file.size > MAX_ATTACHMENT_BYTES) {
 			throw new AttachmentLimitError(
 				`"${file.name || "attachment"}" is ${formatMb(file.size)} — files over ${formatMb(MAX_ATTACHMENT_BYTES)} can't be attached`,
@@ -97,13 +97,47 @@ async function uploadOne(
 	return fileId;
 }
 
+function expectOnePathEach(files: File[], paths: string[]): string[] {
+	if (paths.length !== files.length) {
+		throw new Error(
+			`Expected ${files.length} attachment paths, got ${paths.length}`,
+		);
+	}
+	return paths;
+}
+
+async function writeOnSameMachine(
+	sameMachine: NonNullable<SendAttachmentsDeps["sameMachine"]>,
+	files: File[],
+): Promise<string[]> {
+	const sourcePaths = files.map((file) => sameMachine.pathOf(file));
+	assertWithinLimits(
+		files,
+		files.filter((_, index) => !sourcePaths[index]),
+	);
+	const items = await Promise.all(
+		files.map(async (file, index): Promise<LocalAttachmentItem> => {
+			const sourcePath = sourcePaths[index];
+			if (sourcePath) return { kind: "path", sourcePath };
+			return {
+				kind: "base64",
+				name: nameOf(file, index),
+				data: await sameMachine.readBase64(file),
+			};
+		}),
+	);
+	return expectOnePathEach(files, await sameMachine.write(items));
+}
+
 /**
  * Gets composer files into a workspace's worktree and returns the
- * worktree-relative paths an agent is handed — the same route the mobile
- * composer and the new-workspace modal take: bytes go client → cloud storage
- * over a presigned PUT, and the host pulls them from there. The host-service
- * request carries only ids, so neither a relay's body cap nor a sandbox
- * ingress that cuts an upload the host answers early ever sees the bytes.
+ * worktree-relative paths an agent is handed, in the order of `files`.
+ *
+ * A workspace on this machine gets them from the desktop main process and
+ * nothing leaves the machine. Any other workspace gets them through storage,
+ * like the mobile composer: client → presigned PUT, then the host pulls them,
+ * so the host-service request carries only ids and a sandbox ingress that
+ * cuts an upload answered early never sees the bytes.
  *
  * The caller owns the error surface; a thrown `AttachmentLimitError` is
  * already worded for a toast.
@@ -116,45 +150,15 @@ export async function sendAttachmentsToWorkspace(options: {
 }): Promise<string[]> {
 	const { deps, workspaceId, isCloudWorkspace, files } = options;
 	if (files.length === 0) return [];
-	const localPaths = files.map((file) => deps.local?.pathOf(file) ?? "");
-	const uploads = files.filter((_, index) => !localPaths[index]);
-	assertWithinLimits(files, uploads);
+	if (deps.sameMachine) return writeOnSameMachine(deps.sameMachine, files);
+	assertWithinLimits(files);
 
-	// Order is kept: the host names attachments positionally and the caller
-	// pairs each path back with the file it came from.
-	const uploadedPaths = await uploadAndMaterialize(
-		deps,
-		workspaceId,
-		isCloudWorkspace,
-		files,
-		localPaths,
-	);
-	const copySources = localPaths.filter(Boolean);
-	const copiedPaths =
-		deps.local && copySources.length > 0
-			? await deps.local.copy(copySources)
-			: [];
-	return localPaths.map((localPath) =>
-		localPath ? (copiedPaths.shift() ?? "") : (uploadedPaths.shift() ?? ""),
-	);
-}
-
-async function uploadAndMaterialize(
-	deps: SendAttachmentsDeps,
-	workspaceId: string,
-	isCloudWorkspace: boolean,
-	files: File[],
-	localPaths: string[],
-): Promise<string[]> {
 	const fileIds = await Promise.all(
-		files.flatMap((file, index) =>
-			localPaths[index] ? [] : [uploadOne(deps, file, index)],
-		),
+		files.map((file, index) => uploadOne(deps, file, index)),
 	);
-	if (fileIds.length === 0) return [];
 	if (isCloudWorkspace) {
 		await deps.attachFiles({ id: workspaceId, fileIds });
 	}
 	const { paths } = await deps.materialize({ workspaceId, fileIds });
-	return paths;
+	return expectOnePathEach(files, paths);
 }

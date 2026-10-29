@@ -7,10 +7,10 @@ import {
 	attachmentNameWithSuffix,
 	WORKSPACE_ATTACHMENTS_DIR,
 } from "@superset/shared/workspace-attachments";
+import { ensureWorkspaceAttachmentsDir } from "@superset/shared/workspace-attachments-dir";
 import { TRPCError } from "@trpc/server";
 import mimeTypes from "mime-types";
 import { z } from "zod";
-import { ensureWorkspaceAttachmentsDir } from "../../../runtime/workspace-attachments-dir";
 import { protectedProcedure, router } from "../../index";
 import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { MAX_INLINE_ATTACHMENT_BYTES } from "./constants";

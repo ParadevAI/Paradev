@@ -1,9 +1,16 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useRef } from "react";
-import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import {
+	useWorkspaceHostTarget,
+	type WorkspaceHostTarget,
+} from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { fileToBase64 } from "renderer/lib/file-to-base64";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { sendAttachmentsToWorkspace } from "../../utils/sendAttachmentsToWorkspace";
+import {
+	type SendAttachmentsDeps,
+	sendAttachmentsToWorkspace,
+} from "../../utils/sendAttachmentsToWorkspace";
 
 async function putObject(
 	target: { url: string; headers: Record<string, string> },
@@ -16,15 +23,28 @@ async function putObject(
 	});
 }
 
-function localDeps(worktreePath: string | undefined) {
-	if (!worktreePath) return undefined;
+type Route = "same-machine" | "remote" | "cloud" | "unknown";
+
+function routeOf(target: WorkspaceHostTarget): Route {
+	if (target.status === "local-starting") return "same-machine";
+	if (target.status !== "ready") return "unknown";
+	if (target.kind === "local") return "same-machine";
+	return target.kind === "sandbox" ? "cloud" : "remote";
+}
+
+function sameMachineDeps(
+	worktreePath: string | undefined,
+): SendAttachmentsDeps["sameMachine"] {
 	return {
-		pathOf: (file: File) => window.webUtils.getPathForFile(file),
-		copy: (sourcePaths: string[]) =>
-			electronTrpcClient.attachments.copyLocalFilesIntoWorktree.mutate({
+		pathOf: (file) => window.webUtils.getPathForFile(file),
+		readBase64: fileToBase64,
+		write: (items) => {
+			if (!worktreePath) throw new Error("Workspace is not ready");
+			return electronTrpcClient.attachments.writeIntoWorktree.mutate({
 				worktreePath,
-				sourcePaths,
-			}),
+				items,
+			});
+		},
 	};
 }
 
@@ -36,21 +56,15 @@ function localDeps(worktreePath: string | undefined) {
 export function useSendAttachments(
 	workspaceId: string,
 ): (files: File[]) => Promise<string[]> {
-	const target = useWorkspaceHostTarget(workspaceId);
-	const isCloudWorkspace =
-		target.status === "ready" && target.kind === "sandbox";
-	const isCloudRef = useRef(isCloudWorkspace);
-	isCloudRef.current = isCloudWorkspace;
+	const route = routeOf(useWorkspaceHostTarget(workspaceId));
+	const routeRef = useRef(route);
+	routeRef.current = route;
 
 	const { data: workspace } = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
-	const localWorktreePath =
-		target.status === "ready" && target.kind === "local"
-			? workspace?.worktreePath
-			: undefined;
-	const localWorktreeRef = useRef(localWorktreePath);
-	localWorktreeRef.current = localWorktreePath;
+	const worktreePathRef = useRef(workspace?.worktreePath);
+	worktreePathRef.current = workspace?.worktreePath;
 
 	const materialize =
 		workspaceTrpc.attachments.materializeIntoWorkspace.useMutation();
@@ -58,8 +72,12 @@ export function useSendAttachments(
 	materializeRef.current = materialize.mutateAsync;
 
 	return useCallback(
-		(files: File[]) =>
-			sendAttachmentsToWorkspace({
+		async (files: File[]) => {
+			// An unresolved target must not fall through to storage: it may be this machine.
+			if (routeRef.current === "unknown") {
+				throw new Error("Workspace is not ready");
+			}
+			return sendAttachmentsToWorkspace({
 				deps: {
 					createUpload: (input) =>
 						apiTrpcClient.attachment.createUpload.mutate(input),
@@ -67,12 +85,16 @@ export function useSendAttachments(
 					attachFiles: (input) =>
 						apiTrpcClient.cloudWorkspace.attachFiles.mutate(input),
 					materialize: (input) => materializeRef.current(input),
-					local: localDeps(localWorktreeRef.current),
+					sameMachine:
+						routeRef.current === "same-machine"
+							? sameMachineDeps(worktreePathRef.current)
+							: undefined,
 				},
 				workspaceId,
-				isCloudWorkspace: isCloudRef.current,
+				isCloudWorkspace: routeRef.current === "cloud",
 				files,
-			}),
+			});
+		},
 		[workspaceId],
 	);
 }

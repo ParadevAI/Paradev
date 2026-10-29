@@ -21,8 +21,8 @@ import {
 	sanitizeAttachmentFileName,
 	WORKSPACE_ATTACHMENTS_DIR,
 } from "@superset/shared/workspace-attachments";
+import { ensureWorkspaceAttachmentsDir } from "@superset/shared/workspace-attachments-dir";
 import mimeTypes from "mime-types";
-import { ensureWorkspaceAttachmentsDir } from "../runtime/workspace-attachments-dir";
 
 const NAME_HASH_CHARS = 12;
 

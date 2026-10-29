@@ -1,6 +1,6 @@
 import { closeSync, mkdirSync, openSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
+import { WORKSPACE_ATTACHMENTS_DIR } from "./workspace-attachments";
 
 /**
  * The worktree directory attachments are written into, created with a

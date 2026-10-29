@@ -5,6 +5,7 @@ import {
 } from "@superset/shared/attachment-limits";
 import {
 	AttachmentLimitError,
+	type LocalAttachmentItem,
 	type SendAttachmentsDeps,
 	sendAttachmentsToWorkspace,
 } from "./sendAttachmentsToWorkspace";
@@ -178,33 +179,82 @@ describe("sendAttachmentsToWorkspace", () => {
 		expect(recorded.uploads).toEqual([]);
 		expect(recorded.attached).toEqual([]);
 	});
-	it("copies disk-backed files in a local workspace instead of uploading them, with no size limit", async () => {
+	it("keeps a same-machine send off storage: paths are copied, blobs written, order kept", async () => {
 		const { deps, recorded } = makeDeps();
 		const dmg = new File([new Uint8Array(1)], "build.dmg");
 		Object.defineProperty(dmg, "size", { value: MAX_ATTACHMENT_BYTES * 2 });
-		const copied: string[][] = [];
+		const notes = new File(["n"], "notes.txt");
+		const diskPaths = new Map([
+			[dmg, "/Users/me/build.dmg"],
+			[notes, "/Users/me/notes.txt"],
+		]);
+		const written: LocalAttachmentItem[][] = [];
 
 		const paths = await sendAttachmentsToWorkspace({
 			deps: {
 				...deps,
-				local: {
-					pathOf: (file) => (file === dmg ? "/Users/me/build.dmg" : ""),
-					async copy(sourcePaths) {
-						copied.push(sourcePaths);
-						return [".superset/attachments/build.dmg"];
+				sameMachine: {
+					pathOf: (file) => diskPaths.get(file) ?? "",
+					readBase64: async () => "cG5n",
+					async write(items) {
+						written.push(items);
+						return items.map((_, i) => `.superset/attachments/${i}`);
 					},
 				},
 			},
 			workspaceId: "ws-1",
 			isCloudWorkspace: false,
-			files: [png("shot.png"), dmg],
+			files: [dmg, png("shot.png"), notes],
 		});
 
-		expect(copied).toEqual([["/Users/me/build.dmg"]]);
-		expect(recorded.uploads.map((u) => u.name)).toEqual(["shot.png"]);
-		expect(paths).toEqual([
-			".superset/attachments/file-1.png",
-			".superset/attachments/build.dmg",
+		expect(written).toEqual([
+			[
+				{ kind: "path", sourcePath: "/Users/me/build.dmg" },
+				{ kind: "base64", name: "shot.png", data: "cG5n" },
+				{ kind: "path", sourcePath: "/Users/me/notes.txt" },
+			],
 		]);
+		expect(paths).toEqual([
+			".superset/attachments/0",
+			".superset/attachments/1",
+			".superset/attachments/2",
+		]);
+		expect(recorded.uploads).toEqual([]);
+		expect(recorded.materialized).toEqual([]);
+	});
+
+	it("caps same-machine blobs, since their bytes cross IPC", async () => {
+		const { deps } = makeDeps();
+		const big = png("huge.png");
+		Object.defineProperty(big, "size", { value: MAX_ATTACHMENT_BYTES + 1 });
+
+		await expect(
+			sendAttachmentsToWorkspace({
+				deps: {
+					...deps,
+					sameMachine: {
+						pathOf: () => "",
+						readBase64: async () => "",
+						write: async () => [],
+					},
+				},
+				workspaceId: "ws-1",
+				isCloudWorkspace: false,
+				files: [big],
+			}),
+		).rejects.toThrow(AttachmentLimitError);
+	});
+
+	it("throws when the host returns a different number of paths than files", async () => {
+		const { deps } = makeDeps();
+
+		await expect(
+			sendAttachmentsToWorkspace({
+				deps: { ...deps, materialize: async () => ({ paths: [] }) },
+				workspaceId: "ws-1",
+				isCloudWorkspace: false,
+				files: [png("a.png")],
+			}),
+		).rejects.toThrow("Expected 1 attachment paths, got 0");
 	});
 });
