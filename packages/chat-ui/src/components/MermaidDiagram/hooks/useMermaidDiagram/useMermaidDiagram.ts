@@ -11,10 +11,8 @@ const cache = new Map<string, Entry>();
 const IDLE: MermaidDiagramState = { status: "idle" };
 const RENDERING: MermaidDiagramState = { status: "rendering" };
 
-/** A parse error runs over several lines; the first one names it. */
-function errorLine(error: unknown): string {
-	const message = error instanceof Error ? error.message : String(error);
-	return message.split("\n")[0]?.trim().replace(/:$/, "") ?? "";
+function errorMessage(error: unknown): string {
+	return (error instanceof Error ? error.message : String(error)).trim();
 }
 
 function draw(source: string, run: () => Promise<string>): Entry {
@@ -29,7 +27,7 @@ function draw(source: string, run: () => Promise<string>): Entry {
 			(svg): Outcome => ({ status: "ready", svg }),
 			(error: unknown): Outcome => ({
 				status: "error",
-				error: errorLine(error),
+				error: errorMessage(error),
 			}),
 		),
 		outcome: null,

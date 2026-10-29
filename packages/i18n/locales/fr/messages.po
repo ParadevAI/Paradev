@@ -16703,6 +16703,9 @@ msgstr "Afficher les vérifications"
 msgid "Show closed"
 msgstr "Afficher les fermées"
 
+msgid "Show code"
+msgstr "Afficher le code"
+
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Afficher l'utilisation du processeur et de la mémoire dans la barre supérieure"
 

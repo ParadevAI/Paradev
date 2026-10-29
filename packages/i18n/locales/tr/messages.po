@@ -16703,6 +16703,9 @@ msgstr "Kontrolleri göster"
 msgid "Show closed"
 msgstr "Kapalıları göster"
 
+msgid "Show code"
+msgstr "Kodu göster"
+
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Üst çubukta CPU ve bellek kullanımını göster"
 

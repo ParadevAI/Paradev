@@ -16703,6 +16703,9 @@ msgstr "顯示檢查"
 msgid "Show closed"
 msgstr "顯示已關閉"
 
+msgid "Show code"
+msgstr "顯示程式碼"
+
 msgid "Show CPU and memory usage in the top bar"
 msgstr "在頂欄顯示CPU和記憶體用量"
 

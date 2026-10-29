@@ -29,18 +29,25 @@ function renderMermaid(markdown: string, renderer: MermaidRenderer) {
 	);
 }
 
-test("draws a closed fence and keeps the code a toggle away", async () => {
+test("draws a closed fence without a card and keeps the code a toggle away", async () => {
 	const view = renderMermaid("```mermaid\ngraph LR; A-->B\n```\n", drawn);
 	await settle();
 	expect(view.container.querySelector("svg[data-drawn]")).toBeTruthy();
-	// The diagram itself and the header button both open the lightbox.
+	// No header while the drawing shows: no language label, no wrap toggle.
+	expect(view.queryByText("Mermaid")).toBeNull();
+	expect(view.queryByRole("button", { name: "Wrap lines" })).toBeNull();
+	// The diagram itself and the toolbar button both open the lightbox.
 	expect(view.getAllByRole("button", { name: "Expand diagram" })).toHaveLength(
 		2,
 	);
 
-	fireEvent.click(view.getByRole("button", { name: "Code" }));
+	fireEvent.click(view.getByRole("button", { name: "Show code" }));
 	expect(view.container.querySelector("svg[data-drawn]")).toBeNull();
+	expect(view.getByText("Mermaid")).toBeTruthy();
 	expect(view.getByRole("button", { name: "Wrap lines" })).toBeTruthy();
+
+	fireEvent.click(view.getByRole("button", { name: "Diagram" }));
+	expect(view.container.querySelector("svg[data-drawn]")).toBeTruthy();
 });
 
 test("shows the code and draws nothing while the fence is still open", async () => {
@@ -58,13 +65,15 @@ test("shows the code and draws nothing while the fence is still open", async () 
 	expect(view.getByRole("button", { name: "Wrap lines" })).toBeTruthy();
 });
 
-test("falls back to the code with the reason when the diagram cannot be drawn", async () => {
+test("falls back to the code with the whole reason when the diagram cannot be drawn", async () => {
 	const view = renderMermaid("```mermaid\nnot a diagram\n```\n", async () => {
 		throw new Error("Parse error on line 1:\n...^\nExpecting 'NEWLINE'");
 	});
 	await settle();
 	expect(
-		view.getByText("Diagram could not be drawn: Parse error on line 1"),
+		view.getByText(
+			/^Diagram could not be drawn: Parse error on line 1: \.\.\.\^ Expecting 'NEWLINE'$/,
+		),
 	).toBeTruthy();
 	expect(view.queryByRole("group", { name: "View" })).toBeNull();
 	expect(view.container.querySelector("svg[data-drawn]")).toBeNull();

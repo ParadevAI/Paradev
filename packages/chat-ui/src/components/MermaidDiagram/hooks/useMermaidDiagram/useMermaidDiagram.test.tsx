@@ -55,15 +55,15 @@ test("draws nothing without a source and draws a source once", async () => {
 	expect(calls).toEqual(["graph LR; A-->B"]);
 });
 
-test("keeps the first line of a parse error", async () => {
+test("keeps the whole parse error", async () => {
 	const renderer: MermaidRenderer = async () => {
-		throw new Error("Parse error on line 2:\n...\nExpecting 'SEMI'");
+		throw new Error("Parse error on line 2:\n...\nExpecting 'SEMI'\n");
 	};
 	const view = renderDiagram(renderer, "graph LR; A-->");
 	await settle();
 	expect(view.result.current).toEqual({
 		status: "error",
-		error: "Parse error on line 2",
+		error: "Parse error on line 2:\n...\nExpecting 'SEMI'",
 	});
 	await act(async () => view.rerender({ text: null }));
 	expect(view.result.current).toEqual({ status: "idle" });

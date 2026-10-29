@@ -16703,6 +16703,9 @@ msgstr "Zobrazit kontroly"
 msgid "Show closed"
 msgstr "Zobrazit uzavřené"
 
+msgid "Show code"
+msgstr "Zobrazit kód"
+
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Zobrazovat využití CPU a paměti v horní liště"
 

@@ -1,7 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import "./mermaid-diagram.css";
 
-/** A drawn diagram; a click hands it to the caller to show large. */
+/** A drawn diagram at its natural size, fit to the width; a click hands it to the caller to show large. */
 export function MermaidDiagram({
 	className,
 	label,
@@ -17,7 +17,7 @@ export function MermaidDiagram({
 		<button
 			aria-label={label}
 			className={cn(
-				"block w-full cursor-zoom-in bg-background px-3 py-3 text-left [&_svg]:mx-auto [&_svg]:block [&_svg]:h-auto [&_svg]:w-auto [&_svg]:max-h-[480px] [&_svg]:max-w-full",
+				"block w-full cursor-zoom-in text-left [&_svg]:mx-auto [&_svg]:block [&_svg]:h-auto [&_svg]:w-auto [&_svg]:max-w-full",
 				className,
 			)}
 			// biome-ignore lint/security/noDangerouslySetInnerHtml: the renderer escapes labels and the markup passed through sanitizeSvg

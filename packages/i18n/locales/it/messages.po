@@ -16703,6 +16703,9 @@ msgstr "Mostra i controlli"
 msgid "Show closed"
 msgstr "Mostra chiuse"
 
+msgid "Show code"
+msgstr "Mostra codice"
+
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Mostra l'uso di CPU e memoria nella barra superiore"
 
