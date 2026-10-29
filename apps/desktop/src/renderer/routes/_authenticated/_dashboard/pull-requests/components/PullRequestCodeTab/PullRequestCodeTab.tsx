@@ -24,7 +24,7 @@ import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
 	createPierreTreeStyle,
-	formatDiffStats,
+	diffStatsDecoration,
 	PIERRE_TREE_UNSAFE_CSS,
 	type PierreGitStatus,
 } from "renderer/lib/pierreTree";
@@ -115,7 +115,6 @@ const MAX_TREE_WIDTH = 560;
 
 const ITEM_HEIGHT = 24;
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: ITEM_HEIGHT,
 	levelIndent: 8,
 });
 
@@ -208,7 +207,8 @@ export function PullRequestCodeTab({
 	// theme's).
 	const isRightPaneArea = useRightPaneLinkTarget() !== null;
 	const { options, style: codeViewStyle } = useDiffCardCodeViewTheme();
-	const codeViewRef = useRef<CodeViewHandle<PrAnnotationMetadata>>(null);
+	const codeViewRef =
+		useRef<CodeViewHandle<PrAnnotationMetadata, undefined>>(null);
 	const [initialTreeExpansion] = useState<"open" | "closed">(() =>
 		window.innerWidth < NARROW_WINDOW_WIDTH_THRESHOLD ? "closed" : "open",
 	);
@@ -686,7 +686,7 @@ export function PullRequestCodeTab({
 					if (!path) return;
 					updateComposer({ itemId: context.item.id, path, range });
 				},
-			}) as CodeViewOptions<PrAnnotationMetadata>,
+			}) as CodeViewOptions<PrAnnotationMetadata, undefined>,
 		[options, pathByItemId, canUseProject],
 	);
 
@@ -709,7 +709,7 @@ export function PullRequestCodeTab({
 	const handlersRef = useRef({
 		onSelect(_path: string) {},
 		renderRowDecoration(_ctx: { item: { kind: string; path: string } }) {
-			return null as { text: string } | null;
+			return null as ReturnType<typeof diffStatsDecoration>;
 		},
 	});
 	handlersRef.current.onSelect = (path) => {
@@ -726,8 +726,7 @@ export function PullRequestCodeTab({
 		if (ctx.item.kind === "directory") return null;
 		const file = fileByPath.get(ctx.item.path);
 		if (!file) return null;
-		const text = formatDiffStats(file.additions, file.deletions);
-		return text ? { text } : null;
+		return diffStatsDecoration(file.additions, file.deletions);
 	};
 
 	const { model } = useFileTree({
@@ -875,7 +874,7 @@ export function PullRequestCodeTab({
 							if (!path) return null;
 							return <DiffFileHeaderName path={path} />;
 						}}
-						renderAnnotation={(annotation) => {
+						renderAnnotation={(...[annotation]) => {
 							const metadata = annotation.metadata;
 							if (!metadata) return null;
 							if (metadata.kind === "composer") {

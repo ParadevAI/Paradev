@@ -44,7 +44,6 @@ interface UseDiffCodeViewItemsOptions {
 	files: ChangesetFile[];
 	collapsedSet: ReadonlySet<string>;
 	editingSet: ReadonlySet<string>;
-	editorRevisionByItemId: ReadonlyMap<string, number>;
 	annotationsByPath: ReadonlyMap<
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
@@ -167,7 +166,6 @@ export function useDiffCodeViewItems({
 	files,
 	collapsedSet,
 	editingSet,
-	editorRevisionByItemId,
 	annotationsByPath,
 	extraAnnotationsByItemId,
 }: UseDiffCodeViewItemsOptions): UseDiffCodeViewItemsResult {
@@ -480,7 +478,6 @@ export function useDiffCodeViewItems({
 					file.deletions,
 					collapsed ? "1" : "0",
 					editing ? "editing" : "readonly",
-					editorRevisionByItemId.get(itemId) ?? 0,
 					getAnnotationsVersion(annotations),
 				].join("\0"),
 			);
@@ -505,7 +502,6 @@ export function useDiffCodeViewItems({
 		annotationsByPath,
 		collapsedSet,
 		editingSet,
-		editorRevisionByItemId,
 		extraAnnotationsByItemId,
 	]);
 
