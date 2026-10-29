@@ -2032,6 +2032,9 @@ msgstr "添加到工作区"
 msgid "Add what it does"
 msgstr "添加它的用途"
 
+msgid "Add your first project"
+msgstr "添加你的第一个项目"
+
 msgid "Add your own terminal agent to this device."
 msgstr "向此设备添加你自己的终端智能体。"
 
@@ -3035,9 +3038,6 @@ msgstr "自动"
 
 msgid "Auto (system)"
 msgstr "自动（跟随系统）"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "自动模式会跟随你的系统语言。之后可以在设置中更改。"
 
 msgid "Auto Save"
 msgstr "自动保存"
@@ -4248,6 +4248,9 @@ msgstr "客户端"
 msgid "Clone"
 msgstr "克隆"
 
+msgid "Clone a repo"
+msgstr "克隆仓库"
+
 msgid "Clone a repository"
 msgstr "克隆仓库"
 
@@ -4259,9 +4262,6 @@ msgstr "克隆仓库"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "克隆仓库，或导入主机上已有的文件夹。"
-
-msgid "Clone, push, and create PRs."
-msgstr "克隆、推送并创建 PR。"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "连接。"
 
 msgid "Connected"
 msgstr "已连接"
+
+msgid "Connected · v{version}"
+msgstr "已连接 · v{version}"
 
 msgid "Connected {label}"
 msgstr "已连接 {label}"
@@ -7268,6 +7271,9 @@ msgstr "空状态"
 msgid "Empty command"
 msgstr "空命令"
 
+msgid "Empty project"
+msgstr "空项目"
+
 msgid "Emulator"
 msgstr "模拟器"
 
@@ -8622,6 +8628,9 @@ msgstr "{price}/用户/月起"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "从一个黑客松项目，到并行编程智能体的工作空间。"
 
+msgid "From a template"
+msgstr "从模板开始"
+
 msgid "From GitHub"
 msgstr "来自 GitHub"
 
@@ -8744,6 +8753,9 @@ msgstr "获取Paradev Pro"
 
 msgid "Get started"
 msgstr "开始使用"
+
+msgid "Get support"
+msgstr "获取支持"
 
 msgid "Get the best out of Pro"
 msgstr "充分利用 Pro"
@@ -9603,6 +9615,9 @@ msgstr "安装失败"
 
 msgid "Install GitHub App"
 msgstr "安装GitHub App"
+
+msgid "Install GitHub CLI"
+msgstr "安装 GitHub CLI"
 
 msgid "Install on your iPhone"
 msgstr "在 iPhone 上安装"
@@ -12328,6 +12343,9 @@ msgstr "不在频道中"
 msgid "Not included"
 msgstr "不包含"
 
+msgid "Not installed"
+msgstr "未安装"
+
 msgid "Not loaded"
 msgstr "未加载"
 
@@ -12360,6 +12378,9 @@ msgstr "尚未在{hostName}上设置"
 
 msgid "Not set up on this host"
 msgstr "尚未在此主机上配置"
+
+msgid "Not signed in"
+msgstr "未登录"
 
 msgid "not sorted"
 msgstr "未排序"
@@ -12756,6 +12777,12 @@ msgstr "打开 {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "在文件面板中打开{path}"
+
+msgid "Open a folder"
+msgstr "打开文件夹"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "打开你正在使用的文件夹。之后还可以添加更多项目。"
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "为当前终端打开多行提示词编辑器"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev占用了系统RAM的{0}"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev 使用 GitHub CLI 克隆仓库并创建拉取请求。你也可以稍后再设置。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev与同类方案对比"
@@ -17015,6 +17045,9 @@ msgstr "登录以继续使用Paradev"
 
 msgid "Sign in to get started"
 msgstr "登录即可开始"
+
+msgid "Sign in to GitHub"
+msgstr "登录 GitHub"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "在终端中登录智能体，然后继续。"

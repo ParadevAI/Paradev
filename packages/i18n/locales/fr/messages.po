@@ -2032,6 +2032,9 @@ msgstr "Ajouter à un espace de travail"
 msgid "Add what it does"
 msgstr "Ajouter ce qu’il fait"
 
+msgid "Add your first project"
+msgstr "Ajoutez votre premier projet"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Ajoutez votre propre agent de terminal sur cet appareil."
 
@@ -3035,9 +3038,6 @@ msgstr "Auto"
 
 msgid "Auto (system)"
 msgstr "Auto (système)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "Auto suit la langue de votre système. Vous pourrez la changer plus tard dans les paramètres."
 
 msgid "Auto Save"
 msgstr "Enregistrement automatique"
@@ -4248,6 +4248,9 @@ msgstr "Clients"
 msgid "Clone"
 msgstr "Cloner"
 
+msgid "Clone a repo"
+msgstr "Cloner un dépôt"
+
 msgid "Clone a repository"
 msgstr "Cloner un dépôt"
 
@@ -4259,9 +4262,6 @@ msgstr "cloner le dépôt"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clonez le dépôt, ou importez un dossier existant sur l'hôte."
-
-msgid "Clone, push, and create PRs."
-msgstr "Clonez, poussez et créez des PR."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "Connectez."
 
 msgid "Connected"
 msgstr "Connecté"
+
+msgid "Connected · v{version}"
+msgstr "Connecté · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} connecté"
@@ -7268,6 +7271,9 @@ msgstr "Vide"
 msgid "Empty command"
 msgstr "Commande vide"
 
+msgid "Empty project"
+msgstr "Projet vide"
+
 msgid "Emulator"
 msgstr "Émulateur"
 
@@ -8622,6 +8628,9 @@ msgstr "à partir de {price}/utilisateur/mois"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "D'un projet de hackathon à l'espace de travail pour agents de code en parallèle."
 
+msgid "From a template"
+msgstr "À partir d'un modèle"
+
 msgid "From GitHub"
 msgstr "Depuis GitHub"
 
@@ -8744,6 +8753,9 @@ msgstr "Obtenir Paradev Pro"
 
 msgid "Get started"
 msgstr "Commencer"
+
+msgid "Get support"
+msgstr "Obtenir de l'aide"
 
 msgid "Get the best out of Pro"
 msgstr "Profitez pleinement de Pro"
@@ -9603,6 +9615,9 @@ msgstr "Échec de l'installation"
 
 msgid "Install GitHub App"
 msgstr "Installer la GitHub App"
+
+msgid "Install GitHub CLI"
+msgstr "Installer GitHub CLI"
 
 msgid "Install on your iPhone"
 msgstr "Installer sur votre iPhone"
@@ -12328,6 +12343,9 @@ msgstr "Pas dans le canal"
 msgid "Not included"
 msgstr "Non inclus"
 
+msgid "Not installed"
+msgstr "Non installé"
+
 msgid "Not loaded"
 msgstr "Non chargée"
 
@@ -12360,6 +12378,9 @@ msgstr "Non configuré sur {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Non configuré sur cet hôte"
+
+msgid "Not signed in"
+msgstr "Non connecté"
 
 msgid "not sorted"
 msgstr "non trié"
@@ -12756,6 +12777,12 @@ msgstr "Ouvrir {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Ouvrir {path} dans le volet Fichier"
+
+msgid "Open a folder"
+msgstr "Ouvrir un dossier"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "Ouvrez un dossier dans lequel vous travaillez déjà. Vous pourrez en ajouter d'autres plus tard."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Ouvrir un éditeur de prompt multiligne pour le terminal actif"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev utilise {0} de la RAM système"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev utilise GitHub CLI pour cloner des dépôts et ouvrir des pull requests. Vous pouvez aussi le faire plus tard."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev face aux alternatives"
@@ -17015,6 +17045,9 @@ msgstr "Connectez-vous pour continuer vers Paradev"
 
 msgid "Sign in to get started"
 msgstr "Connectez-vous pour commencer"
+
+msgid "Sign in to GitHub"
+msgstr "Se connecter à GitHub"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Connectez-vous à l'agent dans un terminal, puis continuez."

@@ -2032,6 +2032,9 @@ msgstr "Tambahkan ke workspace"
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
 
+msgid "Add your first project"
+msgstr "Tambahkan proyek pertama Anda"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Tambahkan agen terminal Anda sendiri ke perangkat ini."
 
@@ -3035,9 +3038,6 @@ msgstr "Otomatis"
 
 msgid "Auto (system)"
 msgstr "Otomatis (sistem)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "Otomatis mengikuti bahasa sistem Anda. Anda bisa mengubahnya nanti di Pengaturan."
 
 msgid "Auto Save"
 msgstr "Simpan Otomatis"
@@ -4248,6 +4248,9 @@ msgstr "Klien"
 msgid "Clone"
 msgstr "Clone"
 
+msgid "Clone a repo"
+msgstr "Klon repositori"
+
 msgid "Clone a repository"
 msgstr "Clone sebuah repositori"
 
@@ -4259,9 +4262,6 @@ msgstr "meng-clone repositori"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clone repositorinya, atau impor folder yang sudah ada di host."
-
-msgid "Clone, push, and create PRs."
-msgstr "Klon, push, dan buat PR."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "Hubungkan."
 
 msgid "Connected"
 msgstr "Terhubung"
+
+msgid "Connected · v{version}"
+msgstr "Terhubung · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} terhubung"
@@ -7268,6 +7271,9 @@ msgstr "Kosong"
 msgid "Empty command"
 msgstr "Perintah kosong"
 
+msgid "Empty project"
+msgstr "Proyek kosong"
+
 msgid "Emulator"
 msgstr "Emulator"
 
@@ -8622,6 +8628,9 @@ msgstr "mulai {price}/pengguna/bln"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "Dari proyek hackathon menjadi workspace untuk agen coding paralel."
 
+msgid "From a template"
+msgstr "Dari templat"
+
 msgid "From GitHub"
 msgstr "Dari GitHub"
 
@@ -8744,6 +8753,9 @@ msgstr "Dapatkan Paradev Pro"
 
 msgid "Get started"
 msgstr "Mulai"
+
+msgid "Get support"
+msgstr "Dapatkan bantuan"
 
 msgid "Get the best out of Pro"
 msgstr "Maksimalkan Pro"
@@ -9603,6 +9615,9 @@ msgstr "Pemasangan gagal"
 
 msgid "Install GitHub App"
 msgstr "Pasang GitHub App"
+
+msgid "Install GitHub CLI"
+msgstr "Pasang GitHub CLI"
 
 msgid "Install on your iPhone"
 msgstr "Instal di iPhone Anda"
@@ -12328,6 +12343,9 @@ msgstr "Tidak di kanal"
 msgid "Not included"
 msgstr "Tidak termasuk"
 
+msgid "Not installed"
+msgstr "Belum terpasang"
+
 msgid "Not loaded"
 msgstr "Belum dimuat"
 
@@ -12360,6 +12378,9 @@ msgstr "Belum disiapkan di {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Belum disiapkan di host ini"
+
+msgid "Not signed in"
+msgstr "Belum masuk"
 
 msgid "not sorted"
 msgstr "tidak diurutkan"
@@ -12756,6 +12777,12 @@ msgstr "Buka {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Buka {path} di panel file"
+
+msgid "Open a folder"
+msgstr "Buka folder"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "Buka folder yang sudah Anda kerjakan. Anda bisa menambahkan yang lain nanti."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Buka komposer prompt multibaris untuk terminal aktif"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev memakai {0} dari RAM sistem"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev menggunakan GitHub CLI untuk mengklon repositori dan membuka pull request. Anda juga bisa melakukannya nanti."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs Alternatifnya"
@@ -17015,6 +17045,9 @@ msgstr "Masuk untuk melanjutkan ke Paradev"
 
 msgid "Sign in to get started"
 msgstr "Masuk untuk memulai"
+
+msgid "Sign in to GitHub"
+msgstr "Masuk ke GitHub"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Masuk ke agen di terminal, lalu lanjutkan."

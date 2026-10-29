@@ -2032,6 +2032,9 @@ msgstr "Přidat do pracovního prostoru"
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
 
+msgid "Add your first project"
+msgstr "Přidejte svůj první projekt"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Přidejte na toto zařízení vlastního terminálového agenta."
 
@@ -3035,9 +3038,6 @@ msgstr "Automaticky"
 
 msgid "Auto (system)"
 msgstr "Automaticky (systém)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "Automatický režim se řídí jazykem systému. Později to můžete změnit v Nastavení."
 
 msgid "Auto Save"
 msgstr "Automatické ukládání"
@@ -4248,6 +4248,9 @@ msgstr "Klienti"
 msgid "Clone"
 msgstr "Naklonovat"
 
+msgid "Clone a repo"
+msgstr "Klonovat repozitář"
+
 msgid "Clone a repository"
 msgstr "Naklonovat repozitář"
 
@@ -4259,9 +4262,6 @@ msgstr "naklonovat repozitář"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Naklonujte repozitář nebo naimportujte existující složku na hostu."
-
-msgid "Clone, push, and create PRs."
-msgstr "Klonujte, odesílejte změny a vytvářejte PR."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "Připojte."
 
 msgid "Connected"
 msgstr "Připojeno"
+
+msgid "Connected · v{version}"
+msgstr "Připojeno · v{version}"
 
 msgid "Connected {label}"
 msgstr "Připojeno {label}"
@@ -7268,6 +7271,9 @@ msgstr "Prázdné"
 msgid "Empty command"
 msgstr "Prázdný příkaz"
 
+msgid "Empty project"
+msgstr "Prázdný projekt"
+
 msgid "Emulator"
 msgstr "Emulátor"
 
@@ -8622,6 +8628,9 @@ msgstr "od {price}/uživatele/měs."
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "Od projektu z hackathonu k pracovnímu prostoru pro paralelní kódovací agenty."
 
+msgid "From a template"
+msgstr "Ze šablony"
+
 msgid "From GitHub"
 msgstr "Z GitHubu"
 
@@ -8744,6 +8753,9 @@ msgstr "Pořídit Paradev Pro"
 
 msgid "Get started"
 msgstr "Začít"
+
+msgid "Get support"
+msgstr "Získat podporu"
 
 msgid "Get the best out of Pro"
 msgstr "Využijte Pro naplno"
@@ -9603,6 +9615,9 @@ msgstr "Instalace selhala"
 
 msgid "Install GitHub App"
 msgstr "Nainstalovat GitHub App"
+
+msgid "Install GitHub CLI"
+msgstr "Nainstalovat GitHub CLI"
 
 msgid "Install on your iPhone"
 msgstr "Nainstalujte na iPhone"
@@ -12328,6 +12343,9 @@ msgstr "Není v kanálu"
 msgid "Not included"
 msgstr "Není zahrnuto"
 
+msgid "Not installed"
+msgstr "Nenainstalováno"
+
 msgid "Not loaded"
 msgstr "Nenačteno"
 
@@ -12360,6 +12378,9 @@ msgstr "Na {hostName} není nastaveno"
 
 msgid "Not set up on this host"
 msgstr "Na tomto hostu není nastaveno"
+
+msgid "Not signed in"
+msgstr "Nepřihlášeno"
 
 msgid "not sorted"
 msgstr "neseřazeno"
@@ -12756,6 +12777,12 @@ msgstr "Otevřít {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "Otevřít {path} v panelu souboru"
+
+msgid "Open a folder"
+msgstr "Otevřít složku"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "Otevřete složku, ve které už pracujete. Další můžete přidat později."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Otevřít víceřádkový editor promptu pro aktivní terminál"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev využívá {0} systémové RAM"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev používá GitHub CLI ke klonování repozitářů a otevírání pull requestů. Můžete to udělat i později."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs. alternativy"
@@ -17015,6 +17045,9 @@ msgstr "Přihlaste se a pokračujte do Paradev"
 
 msgid "Sign in to get started"
 msgstr "Přihlaste se a můžete začít"
+
+msgid "Sign in to GitHub"
+msgstr "Přihlásit se ke GitHubu"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Přihlaste se k agentovi v terminálu a pak pokračujte."

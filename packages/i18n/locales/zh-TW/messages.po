@@ -2032,6 +2032,9 @@ msgstr "新增到工作區"
 msgid "Add what it does"
 msgstr "新增它的用途"
 
+msgid "Add your first project"
+msgstr "新增你的第一個專案"
+
 msgid "Add your own terminal agent to this device."
 msgstr "向此裝置新增你自己的終端代理程式。"
 
@@ -3035,9 +3038,6 @@ msgstr "自動"
 
 msgid "Auto (system)"
 msgstr "自動（跟隨系統）"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "自動模式會跟隨你的系統語言。之後可以在設定中更改。"
 
 msgid "Auto Save"
 msgstr "自動儲存"
@@ -4248,6 +4248,9 @@ msgstr "客戶端"
 msgid "Clone"
 msgstr "克隆"
 
+msgid "Clone a repo"
+msgstr "複製儲存庫"
+
 msgid "Clone a repository"
 msgstr "克隆儲存庫"
 
@@ -4259,9 +4262,6 @@ msgstr "克隆儲存庫"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "克隆儲存庫，或匯入主機上已有的資料夾。"
-
-msgid "Clone, push, and create PRs."
-msgstr "複製、推送並建立 PR。"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "連接。"
 
 msgid "Connected"
 msgstr "已連線"
+
+msgid "Connected · v{version}"
+msgstr "已連線 · v{version}"
 
 msgid "Connected {label}"
 msgstr "已連線 {label}"
@@ -7268,6 +7271,9 @@ msgstr "空狀態"
 msgid "Empty command"
 msgstr "空命令"
 
+msgid "Empty project"
+msgstr "空白專案"
+
 msgid "Emulator"
 msgstr "模擬器"
 
@@ -8622,6 +8628,9 @@ msgstr "{price}/使用者/月起"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "從一個黑客松專案，到平行程式設計代理的工作空間。"
 
+msgid "From a template"
+msgstr "從模板開始"
+
 msgid "From GitHub"
 msgstr "來自 GitHub"
 
@@ -8744,6 +8753,9 @@ msgstr "獲取Paradev Pro"
 
 msgid "Get started"
 msgstr "開始使用"
+
+msgid "Get support"
+msgstr "取得支援"
 
 msgid "Get the best out of Pro"
 msgstr "充分運用 Pro"
@@ -9603,6 +9615,9 @@ msgstr "安裝失敗"
 
 msgid "Install GitHub App"
 msgstr "安裝GitHub App"
+
+msgid "Install GitHub CLI"
+msgstr "安裝 GitHub CLI"
 
 msgid "Install on your iPhone"
 msgstr "在 iPhone 上安裝"
@@ -12328,6 +12343,9 @@ msgstr "不在頻道中"
 msgid "Not included"
 msgstr "不包含"
 
+msgid "Not installed"
+msgstr "未安裝"
+
 msgid "Not loaded"
 msgstr "未載入"
 
@@ -12360,6 +12378,9 @@ msgstr "尚未在{hostName}上設定"
 
 msgid "Not set up on this host"
 msgstr "尚未在此主機上配置"
+
+msgid "Not signed in"
+msgstr "未登入"
 
 msgid "not sorted"
 msgstr "未排序"
@@ -12756,6 +12777,12 @@ msgstr "開啟 {parentLabel}"
 
 msgid "Open {path} in file pane"
 msgstr "在檔案面板中開啟{path}"
+
+msgid "Open a folder"
+msgstr "開啟資料夾"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "開啟你正在使用的資料夾。之後還可以新增更多專案。"
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "為目前終端開啟多行提示詞編輯器"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev佔用了系統RAM的{0}"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev 使用 GitHub CLI 複製儲存庫並建立拉取請求。你也可以稍後再設定。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev與同類方案對比"
@@ -17015,6 +17045,9 @@ msgstr "登入以繼續使用Paradev"
 
 msgid "Sign in to get started"
 msgstr "登入即可開始"
+
+msgid "Sign in to GitHub"
+msgstr "登入 GitHub"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "在終端機中登入代理，然後繼續。"

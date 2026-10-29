@@ -2032,6 +2032,9 @@ msgstr "ワークスペースに追加"
 msgid "Add what it does"
 msgstr "役割を追加"
 
+msgid "Add your first project"
+msgstr "最初のプロジェクトを追加"
+
 msgid "Add your own terminal agent to this device."
 msgstr "このデバイスに独自のターミナルエージェントを追加します。"
 
@@ -3035,9 +3038,6 @@ msgstr "自動"
 
 msgid "Auto (system)"
 msgstr "自動(システム)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "自動ではシステムの言語に従います。後から設定で変更できます。"
 
 msgid "Auto Save"
 msgstr "自動保存"
@@ -4248,6 +4248,9 @@ msgstr "クライアント"
 msgid "Clone"
 msgstr "クローン"
 
+msgid "Clone a repo"
+msgstr "リポジトリをクローン"
+
 msgid "Clone a repository"
 msgstr "リポジトリをクローン"
 
@@ -4259,9 +4262,6 @@ msgstr "リポジトリをクローンする"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "リポジトリをクローンするか、ホスト上の既存フォルダをインポートします。"
-
-msgid "Clone, push, and create PRs."
-msgstr "クローン、プッシュ、PRの作成。"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "接続する。"
 
 msgid "Connected"
 msgstr "接続済み"
+
+msgid "Connected · v{version}"
+msgstr "接続済み · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} に接続しました"
@@ -7268,6 +7271,9 @@ msgstr "Empty"
 msgid "Empty command"
 msgstr "空のコマンド"
 
+msgid "Empty project"
+msgstr "空のプロジェクト"
+
 msgid "Emulator"
 msgstr "エミュレータ"
 
@@ -8622,6 +8628,9 @@ msgstr "{price}/ユーザー/月〜"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "ハッカソンのプロジェクトから、並列コーディングエージェントのためのワークスペースへ。"
 
+msgid "From a template"
+msgstr "テンプレートから"
+
 msgid "From GitHub"
 msgstr "GitHub から"
 
@@ -8744,6 +8753,9 @@ msgstr "Paradev Proを入手"
 
 msgid "Get started"
 msgstr "始める"
+
+msgid "Get support"
+msgstr "サポートを受ける"
 
 msgid "Get the best out of Pro"
 msgstr "Proを最大限に活用する"
@@ -9603,6 +9615,9 @@ msgstr "インストールに失敗しました"
 
 msgid "Install GitHub App"
 msgstr "GitHub Appをインストール"
+
+msgid "Install GitHub CLI"
+msgstr "GitHub CLI をインストール"
 
 msgid "Install on your iPhone"
 msgstr "iPhoneにインストール"
@@ -12328,6 +12343,9 @@ msgstr "チャンネル外"
 msgid "Not included"
 msgstr "含まれない"
 
+msgid "Not installed"
+msgstr "未インストール"
+
 msgid "Not loaded"
 msgstr "未読み込み"
 
@@ -12360,6 +12378,9 @@ msgstr "{hostName}ではセットアップされていません"
 
 msgid "Not set up on this host"
 msgstr "このホストではセットアップされていません"
+
+msgid "Not signed in"
+msgstr "未サインイン"
 
 msgid "not sorted"
 msgstr "並べ替えなし"
@@ -12756,6 +12777,12 @@ msgstr "{parentLabel}を開く"
 
 msgid "Open {path} in file pane"
 msgstr "{path}をファイルペインで開く"
+
+msgid "Open a folder"
+msgstr "フォルダを開く"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "作業中のフォルダを開きましょう。プロジェクトは後から追加できます。"
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "アクティブなターミナル用の複数行プロンプト入力を開く"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "ParadevはシステムRAMの{0}を使用中"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev は GitHub CLI を使ってリポジトリのクローンやプルリクエストの作成を行います。この設定は後からでもできます。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradevと他ツールの比較"
@@ -17015,6 +17045,9 @@ msgstr "サインインしてParadevに進む"
 
 msgid "Sign in to get started"
 msgstr "サインインして始めましょう"
+
+msgid "Sign in to GitHub"
+msgstr "GitHub にサインイン"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "ターミナルでエージェントにサインインしてから続行してください。"

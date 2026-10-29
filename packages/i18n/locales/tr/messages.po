@@ -2032,6 +2032,9 @@ msgstr "Çalışma alanına ekle"
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
 
+msgid "Add your first project"
+msgstr "İlk projeni ekle"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Bu cihaza kendi terminal ajanınızı ekleyin."
 
@@ -3035,9 +3038,6 @@ msgstr "Otomatik"
 
 msgid "Auto (system)"
 msgstr "Otomatik (sistem)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "Otomatik, sistem dilinizi izler. Daha sonra Ayarlar'dan değiştirebilirsiniz."
 
 msgid "Auto Save"
 msgstr "Otomatik Kaydetme"
@@ -4248,6 +4248,9 @@ msgstr "İstemciler"
 msgid "Clone"
 msgstr "Klonla"
 
+msgid "Clone a repo"
+msgstr "Depo klonla"
+
 msgid "Clone a repository"
 msgstr "Bir depoyu klonla"
 
@@ -4259,9 +4262,6 @@ msgstr "depoyu klonlama"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Depoyu klonlayın veya host'taki mevcut bir klasörü içe aktarın."
-
-msgid "Clone, push, and create PRs."
-msgstr "Klonlayın, gönderin ve PR oluşturun."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "Bağlayın."
 
 msgid "Connected"
 msgstr "Bağlı"
+
+msgid "Connected · v{version}"
+msgstr "Bağlı · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} bağlandı"
@@ -7268,6 +7271,9 @@ msgstr "Boş"
 msgid "Empty command"
 msgstr "Boş komut"
 
+msgid "Empty project"
+msgstr "Boş proje"
+
 msgid "Emulator"
 msgstr "Emülatör"
 
@@ -8622,6 +8628,9 @@ msgstr "başlangıç: {price}/kullanıcı/ay"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "Bir hackathon projesinden paralel kodlama ajanları için çalışma alanına."
 
+msgid "From a template"
+msgstr "Şablondan"
+
 msgid "From GitHub"
 msgstr "GitHub'dan"
 
@@ -8744,6 +8753,9 @@ msgstr "Paradev Pro'yu edinin"
 
 msgid "Get started"
 msgstr "Başlayın"
+
+msgid "Get support"
+msgstr "Destek al"
 
 msgid "Get the best out of Pro"
 msgstr "Pro’dan en iyi şekilde yararlanın"
@@ -9603,6 +9615,9 @@ msgstr "Kurulum başarısız"
 
 msgid "Install GitHub App"
 msgstr "GitHub App'i kur"
+
+msgid "Install GitHub CLI"
+msgstr "GitHub CLI'yi yükle"
 
 msgid "Install on your iPhone"
 msgstr "iPhone’unuza yükleyin"
@@ -12328,6 +12343,9 @@ msgstr "Kanalda değil"
 msgid "Not included"
 msgstr "Dahil değil"
 
+msgid "Not installed"
+msgstr "Yüklü değil"
+
 msgid "Not loaded"
 msgstr "Yüklenmedi"
 
@@ -12360,6 +12378,9 @@ msgstr "{hostName} üzerinde kurulu değil"
 
 msgid "Not set up on this host"
 msgstr "Bu host'ta kurulu değil"
+
+msgid "Not signed in"
+msgstr "Oturum açılmadı"
 
 msgid "not sorted"
 msgstr "sıralanmamış"
@@ -12756,6 +12777,12 @@ msgstr "{parentLabel} aç"
 
 msgid "Open {path} in file pane"
 msgstr "{path} dosyasını dosya bölmesinde aç"
+
+msgid "Open a folder"
+msgstr "Klasör aç"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "Zaten üzerinde çalıştığın bir klasörü aç. Daha sonra başkalarını da ekleyebilirsin."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Etkin terminal için çok satırlı istem düzenleyicisini aç"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev sistem RAM'inin {0} kadarını kullanıyor"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev, depoları klonlamak ve pull request açmak için GitHub CLI'yi kullanır. Bunu daha sonra da yapabilirsin."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev ve alternatifleri"
@@ -17015,6 +17045,9 @@ msgstr "Paradev'e devam etmek için oturum açın"
 
 msgid "Sign in to get started"
 msgstr "Başlamak için oturum açın"
+
+msgid "Sign in to GitHub"
+msgstr "GitHub'da oturum aç"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Bir terminalde ajana oturum açın, ardından devam edin."

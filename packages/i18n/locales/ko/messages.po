@@ -2032,6 +2032,9 @@ msgstr "워크스페이스에 추가"
 msgid "Add what it does"
 msgstr "하는 일 추가"
 
+msgid "Add your first project"
+msgstr "첫 프로젝트 추가"
+
 msgid "Add your own terminal agent to this device."
 msgstr "이 기기에 직접 만든 터미널 에이전트를 추가합니다."
 
@@ -3035,9 +3038,6 @@ msgstr "자동"
 
 msgid "Auto (system)"
 msgstr "자동(시스템)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "자동은 시스템 언어를 따릅니다. 나중에 설정에서 변경할 수 있습니다."
 
 msgid "Auto Save"
 msgstr "자동 저장"
@@ -4248,6 +4248,9 @@ msgstr "클라이언트"
 msgid "Clone"
 msgstr "클론"
 
+msgid "Clone a repo"
+msgstr "저장소 클론"
+
 msgid "Clone a repository"
 msgstr "리포지토리 클론"
 
@@ -4259,9 +4262,6 @@ msgstr "리포지토리를 클론할"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "리포지토리를 클론하거나 호스트에 있는 기존 폴더를 가져옵니다."
-
-msgid "Clone, push, and create PRs."
-msgstr "복제, 푸시 및 PR 생성."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "연결."
 
 msgid "Connected"
 msgstr "연결됨"
+
+msgid "Connected · v{version}"
+msgstr "연결됨 · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} 연결됨"
@@ -7268,6 +7271,9 @@ msgstr "비어 있음"
 msgid "Empty command"
 msgstr "빈 명령"
 
+msgid "Empty project"
+msgstr "빈 프로젝트"
+
 msgid "Emulator"
 msgstr "에뮬레이터"
 
@@ -8622,6 +8628,9 @@ msgstr "사용자당 월 {price}부터"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "해커톤 프로젝트에서 병렬 코딩 에이전트를 위한 워크스페이스로."
 
+msgid "From a template"
+msgstr "템플릿에서"
+
 msgid "From GitHub"
 msgstr "GitHub에서"
 
@@ -8744,6 +8753,9 @@ msgstr "Paradev Pro 시작하기"
 
 msgid "Get started"
 msgstr "시작하기"
+
+msgid "Get support"
+msgstr "지원 받기"
 
 msgid "Get the best out of Pro"
 msgstr "Pro를 최대한 활용하기"
@@ -9603,6 +9615,9 @@ msgstr "설치 실패"
 
 msgid "Install GitHub App"
 msgstr "GitHub App 설치"
+
+msgid "Install GitHub CLI"
+msgstr "GitHub CLI 설치"
 
 msgid "Install on your iPhone"
 msgstr "iPhone에 설치"
@@ -12328,6 +12343,9 @@ msgstr "채널에 없음"
 msgid "Not included"
 msgstr "미포함"
 
+msgid "Not installed"
+msgstr "설치되지 않음"
+
 msgid "Not loaded"
 msgstr "로드 안 됨"
 
@@ -12360,6 +12378,9 @@ msgstr "{hostName}에 설정되지 않음"
 
 msgid "Not set up on this host"
 msgstr "이 호스트에 설정되지 않음"
+
+msgid "Not signed in"
+msgstr "로그인되지 않음"
 
 msgid "not sorted"
 msgstr "정렬 안 됨"
@@ -12756,6 +12777,12 @@ msgstr "{parentLabel} 열기"
 
 msgid "Open {path} in file pane"
 msgstr "파일 패널에서 {path} 열기"
+
+msgid "Open a folder"
+msgstr "폴더 열기"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "이미 작업 중인 폴더를 여세요. 나중에 더 추가할 수 있습니다."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev가 시스템 RAM의 {0}을(를) 사용합니다"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev는 GitHub CLI로 저장소를 클론하고 풀 리퀘스트를 엽니다. 나중에 설정해도 됩니다."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev와 대안 비교"
@@ -17015,6 +17045,9 @@ msgstr "Paradev를 계속 사용하려면 로그인하세요"
 
 msgid "Sign in to get started"
 msgstr "로그인하고 시작하세요"
+
+msgid "Sign in to GitHub"
+msgstr "GitHub에 로그인"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "터미널에서 에이전트에 로그인한 후 계속하세요."

@@ -2032,6 +2032,9 @@ msgstr "Zum Arbeitsbereich hinzufügen"
 msgid "Add what it does"
 msgstr "Beschreiben, was er macht"
 
+msgid "Add your first project"
+msgstr "Füge dein erstes Projekt hinzu"
+
 msgid "Add your own terminal agent to this device."
 msgstr "Füge diesem Gerät einen eigenen Terminal-Agenten hinzu."
 
@@ -3035,9 +3038,6 @@ msgstr "Automatisch"
 
 msgid "Auto (system)"
 msgstr "Automatisch (System)"
-
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "Automatisch folgt deiner Systemsprache. Du kannst sie später in den Einstellungen ändern."
 
 msgid "Auto Save"
 msgstr "Automatisches Speichern"
@@ -4248,6 +4248,9 @@ msgstr "Clients"
 msgid "Clone"
 msgstr "Klonen"
 
+msgid "Clone a repo"
+msgstr "Repository klonen"
+
 msgid "Clone a repository"
 msgstr "Repository klonen"
 
@@ -4259,9 +4262,6 @@ msgstr "das Repository klonen"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Klone das Repository oder importiere einen vorhandenen Ordner auf dem Host."
-
-msgid "Clone, push, and create PRs."
-msgstr "Klonen, pushen und PRs erstellen."
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4895,6 +4895,9 @@ msgstr "Verbinden."
 
 msgid "Connected"
 msgstr "Verbunden"
+
+msgid "Connected · v{version}"
+msgstr "Verbunden · v{version}"
 
 msgid "Connected {label}"
 msgstr "{label} verbunden"
@@ -7268,6 +7271,9 @@ msgstr "Leer"
 msgid "Empty command"
 msgstr "Leerer Befehl"
 
+msgid "Empty project"
+msgstr "Leeres Projekt"
+
 msgid "Emulator"
 msgstr "Emulator"
 
@@ -8622,6 +8628,9 @@ msgstr "ab {price}/Nutzer/Mon."
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "Vom Hackathon-Projekt zum Workspace für parallele Coding-Agents."
 
+msgid "From a template"
+msgstr "Aus einer Vorlage"
+
 msgid "From GitHub"
 msgstr "Von GitHub"
 
@@ -8744,6 +8753,9 @@ msgstr "Paradev Pro holen"
 
 msgid "Get started"
 msgstr "Loslegen"
+
+msgid "Get support"
+msgstr "Support erhalten"
 
 msgid "Get the best out of Pro"
 msgstr "Pro optimal nutzen"
@@ -9603,6 +9615,9 @@ msgstr "Installation fehlgeschlagen"
 
 msgid "Install GitHub App"
 msgstr "GitHub-App installieren"
+
+msgid "Install GitHub CLI"
+msgstr "GitHub CLI installieren"
 
 msgid "Install on your iPhone"
 msgstr "Auf deinem iPhone installieren"
@@ -12328,6 +12343,9 @@ msgstr "Nicht im Kanal"
 msgid "Not included"
 msgstr "Nicht enthalten"
 
+msgid "Not installed"
+msgstr "Nicht installiert"
+
 msgid "Not loaded"
 msgstr "Nicht geladen"
 
@@ -12360,6 +12378,9 @@ msgstr "Auf {hostName} nicht eingerichtet"
 
 msgid "Not set up on this host"
 msgstr "Auf diesem Host nicht eingerichtet"
+
+msgid "Not signed in"
+msgstr "Nicht angemeldet"
 
 msgid "not sorted"
 msgstr "nicht sortiert"
@@ -12756,6 +12777,12 @@ msgstr "{parentLabel} öffnen"
 
 msgid "Open {path} in file pane"
 msgstr "{path} im Dateibereich öffnen"
+
+msgid "Open a folder"
+msgstr "Ordner öffnen"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "Öffne einen Ordner, in dem du bereits arbeitest. Weitere kannst du später hinzufügen."
 
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Einen mehrzeiligen Prompt-Editor für das aktive Terminal öffnen"
@@ -13620,6 +13647,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev nutzt {0} des System-RAM"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev nutzt die GitHub CLI, um Repositorys zu klonen und Pull Requests zu öffnen. Du kannst das auch später erledigen."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev im Vergleich"
@@ -17015,6 +17045,9 @@ msgstr "Melde dich an, um zu Paradev zu gelangen"
 
 msgid "Sign in to get started"
 msgstr "Melde dich an, um loszulegen"
+
+msgid "Sign in to GitHub"
+msgstr "Bei GitHub anmelden"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Melde dich in einem Terminal beim Agenten an und mach dann weiter."
