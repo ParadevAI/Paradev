@@ -20419,8 +20419,8 @@ msgstr "Ti invieremo un'email quando Paradev per Android sarà pronto."
 msgid "We'll get back to you shortly."
 msgstr "Ti risponderemo a breve."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Ti avviseremo quando il supporto per Windows e Linux sarà pronto."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Ti avviseremo quando il supporto per Windows sarà pronto."
 
 msgid "We'll only use this to send your download link."
 msgstr "La useremo solo per inviarti il link di download."

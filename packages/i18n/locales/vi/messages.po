@@ -20419,8 +20419,8 @@ msgstr "Chúng tôi sẽ gửi email cho bạn khi Paradev cho Android sẵn sà
 msgid "We'll get back to you shortly."
 msgstr "Chúng tôi sẽ phản hồi sớm."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Chúng tôi sẽ báo cho bạn khi hỗ trợ Windows & Linux sẵn sàng."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Chúng tôi sẽ báo cho bạn khi hỗ trợ Windows sẵn sàng."
 
 msgid "We'll only use this to send your download link."
 msgstr "Chúng tôi chỉ dùng địa chỉ này để gửi liên kết tải."

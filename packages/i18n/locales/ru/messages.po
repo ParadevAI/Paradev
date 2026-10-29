@@ -20419,8 +20419,8 @@ msgstr "Мы напишем вам, когда Paradev для Android будет
 msgid "We'll get back to you shortly."
 msgstr "Скоро ответим."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Мы сообщим, когда поддержка Windows и Linux будет готова."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Мы сообщим, когда поддержка Windows будет готова."
 
 msgid "We'll only use this to send your download link."
 msgstr "Используем адрес только для отправки ссылки на скачивание."

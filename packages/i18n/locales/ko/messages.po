@@ -20419,8 +20419,8 @@ msgstr "Android용 Paradev가 준비되면 이메일로 알려드리겠습니다
 msgid "We'll get back to you shortly."
 msgstr "곧 회신드리겠습니다."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Windows와 Linux 지원이 준비되면 알려 드리겠습니다."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Windows 지원이 준비되면 알려 드리겠습니다."
 
 msgid "We'll only use this to send your download link."
 msgstr "다운로드 링크를 보내는 데에만 사용합니다."

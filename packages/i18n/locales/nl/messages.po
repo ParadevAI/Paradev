@@ -20419,8 +20419,8 @@ msgstr "We mailen je zodra Paradev voor Android klaar is."
 msgid "We'll get back to you shortly."
 msgstr "We nemen snel contact met je op."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "We laten het weten zodra ondersteuning voor Windows en Linux klaar is."
+msgid "We'll notify you when Windows support is ready."
+msgstr "We laten het weten zodra ondersteuning voor Windows klaar is."
 
 msgid "We'll only use this to send your download link."
 msgstr "We gebruiken dit alleen om je downloadlink te sturen."

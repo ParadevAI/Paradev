@@ -6986,7 +6986,7 @@ msgid "Download for {platformName}"
 msgstr "Pobierz na {platformName}"
 
 msgid "Download for Linux"
-msgstr "Pobierz na Linux"
+msgstr "Pobierz na Linuksa"
 
 msgid "Download for Mac"
 msgstr "Pobierz na Maca"
@@ -20419,8 +20419,8 @@ msgstr "Wyślemy Ci e-mail, gdy Paradev na Androida będzie gotowy."
 msgid "We'll get back to you shortly."
 msgstr "Odezwiemy się wkrótce."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Damy znać, gdy wsparcie dla Windows i Linux będzie gotowe."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Damy znać, gdy wsparcie dla Windows będzie gotowe."
 
 msgid "We'll only use this to send your download link."
 msgstr "Użyjemy go tylko do wysłania linku do pobrania."

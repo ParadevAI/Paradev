@@ -20419,8 +20419,8 @@ msgstr "Kami akan mengirim email saat Paradev untuk Android sudah siap."
 msgid "We'll get back to you shortly."
 msgstr "Kami akan segera menghubungi Anda kembali."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Kami akan memberi tahu Anda saat dukungan Windows & Linux siap."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Kami akan memberi tahu Anda saat dukungan Windows siap."
 
 msgid "We'll only use this to send your download link."
 msgstr "Kami hanya memakainya untuk mengirim tautan unduhan Anda."

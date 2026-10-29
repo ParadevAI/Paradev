@@ -20419,8 +20419,8 @@ msgstr "Pošleme vám e-mail, až bude Paradev pro Android připraven."
 msgid "We'll get back to you shortly."
 msgstr "Brzy se vám ozveme."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Dáme vám vědět, jakmile bude podpora Windows a Linuxu hotová."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Dáme vám vědět, jakmile bude podpora Windowsu hotová."
 
 msgid "We'll only use this to send your download link."
 msgstr "Použijeme ho jen k odeslání odkazu ke stažení."

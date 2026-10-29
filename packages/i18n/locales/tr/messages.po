@@ -20419,8 +20419,8 @@ msgstr "Android için Paradev hazır olduğunda size e-posta göndereceğiz."
 msgid "We'll get back to you shortly."
 msgstr "Kısa süre içinde size döneceğiz."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Windows ve Linux desteği hazır olduğunda size haber vereceğiz."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Windows desteği hazır olduğunda size haber vereceğiz."
 
 msgid "We'll only use this to send your download link."
 msgstr "Bunu yalnızca indirme bağlantınızı göndermek için kullanacağız."

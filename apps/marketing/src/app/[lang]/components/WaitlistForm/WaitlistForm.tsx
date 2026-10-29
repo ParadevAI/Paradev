@@ -42,7 +42,7 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 				</h2>
 				<p className="text-sm text-muted-foreground">
 					<Trans>
-						We'll notify you when Windows &amp; Linux support is ready.
+						We'll notify you when Windows support is ready.
 					</Trans>
 				</p>
 			</div>
