@@ -17,8 +17,8 @@ export function DownloadLinkEmail({
 			recipientEmail={recipientEmail}
 		>
 			<Text className="m-0 mb-6 text-[15px] leading-6 text-foreground">
-				Open this email on your Mac and use the button below. It picks the right
-				version for your Mac.
+				Open this email on your computer and use the button below. It picks the
+				right version for you.
 			</Text>
 
 			<Section className="mb-8">
