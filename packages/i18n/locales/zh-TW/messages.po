@@ -8307,7 +8307,7 @@ msgid "finished · worked for 7s"
 msgstr "已完成 · 用時7秒"
 
 msgid "Fit"
-msgstr "適應"
+msgstr "符合視窗"
 
 msgid "Fix all failing checks"
 msgstr "修復所有失敗的檢查"

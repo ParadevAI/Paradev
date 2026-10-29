@@ -24,13 +24,13 @@ describe("serializeTable", () => {
 		);
 	});
 
-	test("Markdown writes a header rule and escapes pipes", () => {
+	test("Markdown writes a header rule, escapes pipes and keeps a cell on one row", () => {
 		expect(serializeTable(data, "markdown")).toBe(
 			[
 				"| Region | Rate, net | Note |",
 				"| --- | --- | --- |",
 				'| EU | 20% | Says "hi" |',
-				"| US | a\\|b | two\nlines |",
+				"| US | a\\|b | two<br>lines |",
 			].join("\n"),
 		);
 	});

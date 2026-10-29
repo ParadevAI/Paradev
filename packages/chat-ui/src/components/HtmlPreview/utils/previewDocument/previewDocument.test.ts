@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { HTML_PREVIEW_CSP } from "@superset/shared/html-preview";
 import {
+	isPreviewEscape,
+	PREVIEW_ESCAPE_MESSAGE,
 	PREVIEW_SANDBOX,
 	PREVIEW_SIZE_MESSAGE,
 	previewDocument,
@@ -16,7 +18,18 @@ describe("previewDocument", () => {
 		expect(policyAt).toBeGreaterThan(-1);
 		expect(policyAt).toBeLessThan(document.indexOf("<h1>Hi</h1>"));
 		expect(document).toContain(`"${PREVIEW_SIZE_MESSAGE}"`);
+		expect(document).toContain(`"${PREVIEW_ESCAPE_MESSAGE}"`);
 		expect(PREVIEW_SANDBOX).toBe("allow-scripts");
+	});
+});
+
+describe("isPreviewEscape", () => {
+	test("accepts only the page's Escape report", () => {
+		expect(isPreviewEscape({ type: PREVIEW_ESCAPE_MESSAGE })).toBe(true);
+		expect(
+			isPreviewEscape({ type: PREVIEW_SIZE_MESSAGE, width: 0, height: 1 }),
+		).toBe(false);
+		expect(isPreviewEscape("Escape")).toBe(false);
 	});
 });
 

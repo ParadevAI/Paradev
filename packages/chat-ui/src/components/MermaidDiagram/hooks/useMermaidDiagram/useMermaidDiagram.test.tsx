@@ -68,3 +68,25 @@ test("keeps the whole parse error", async () => {
 	await act(async () => view.rerender({ text: null }));
 	expect(view.result.current).toEqual({ status: "idle" });
 });
+
+test("draws the same source again for another renderer", async () => {
+	const first = renderDiagram(
+		async () => "<svg data-renderer='first'></svg>",
+		"graph TD; A-->B",
+	);
+	await settle();
+	first.unmount();
+
+	const calls: string[] = [];
+	const second = renderDiagram(async (source) => {
+		calls.push(source);
+		return "<svg data-renderer='second'></svg>";
+	}, "graph TD; A-->B");
+	expect(second.result.current.status).toBe("rendering");
+	await settle();
+	expect(calls).toEqual(["graph TD; A-->B"]);
+	expect(second.result.current).toEqual({
+		status: "ready",
+		svg: "<svg data-renderer='second'></svg>",
+	});
+});

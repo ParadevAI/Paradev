@@ -43,7 +43,7 @@ export function ZoomMenu({
 					<ChevronDown className="size-3 opacity-60" />
 				</button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="min-w-24">
+			<DropdownMenuContent align="end" className="z-[110] min-w-24">
 				<DropdownMenuRadioGroup
 					onValueChange={(value) =>
 						onChange(

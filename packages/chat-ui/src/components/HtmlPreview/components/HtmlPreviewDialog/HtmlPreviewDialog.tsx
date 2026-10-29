@@ -1,13 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useModalOverlay } from "../../../../hooks/useModalOverlay";
 import { OverlayButton } from "../../../OverlayButton";
 import { HtmlPreviewFrame } from "../../HtmlPreviewFrame";
 import type { PreviewZoom } from "../../utils/previewZoom";
 import { ZoomMenu } from "../ZoomMenu";
 
-/** The page across the whole window, with its own zoom. Escape closes. */
+/** The page across the whole window, with its own zoom. Escape closes, from the page too. */
 export function HtmlPreviewDialog({
 	initialZoom = "fit",
 	onClose,
@@ -23,20 +24,7 @@ export function HtmlPreviewDialog({
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState<PreviewZoom>(initialZoom);
 
-	useEffect(() => {
-		const opener = document.activeElement;
-		dialogRef.current?.focus();
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return;
-			event.stopPropagation();
-			onClose();
-		};
-		window.addEventListener("keydown", onKeyDown, true);
-		return () => {
-			window.removeEventListener("keydown", onKeyDown, true);
-			if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
-		};
-	}, [onClose]);
+	useModalOverlay(dialogRef, onClose);
 
 	return createPortal(
 		<div
@@ -63,6 +51,7 @@ export function HtmlPreviewDialog({
 			<HtmlPreviewFrame
 				className="min-h-0 flex-1 rounded-lg"
 				fill
+				onEscape={onClose}
 				src={src}
 				title={title}
 				zoom={zoom}

@@ -9,27 +9,38 @@ import {
 
 const COPIED_MS = 1500;
 
+type Outcome = { format: TableCopyFormat; ok: boolean };
+
 function CopyAction({
 	children,
-	copied,
 	onClick,
+	outcome,
 }: {
 	children: string;
-	copied: boolean;
 	onClick: () => void;
+	outcome: boolean | null;
 }) {
 	const { t } = useLingui();
 	return (
 		<button
 			className={cn(
 				"flex items-center gap-1 rounded-md px-1.5 py-0.5 text-foreground/55 transition-colors hover:bg-foreground/10 hover:text-foreground",
-				copied && "text-foreground",
+				outcome === true && "text-foreground",
+				outcome === false && "text-destructive",
 			)}
 			onClick={onClick}
 			type="button"
 		>
-			{copied ? <Check className="size-3" /> : <Copy className="size-3" />}
-			{copied ? t({ message: "Copied" }) : children}
+			{outcome === true ? (
+				<Check className="size-3" />
+			) : (
+				<Copy className="size-3" />
+			)}
+			{outcome === null
+				? children
+				: outcome
+					? t({ message: "Copied" })
+					: t({ message: "Copy failed" })}
 		</button>
 	);
 }
@@ -41,7 +52,7 @@ export function TableCopyActions({
 	table: RefObject<HTMLTableElement | null>;
 }) {
 	const { t } = useLingui();
-	const [copied, setCopied] = useState<TableCopyFormat | null>(null);
+	const [outcome, setOutcome] = useState<Outcome | null>(null);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	useEffect(
 		() => () => {
@@ -50,30 +61,34 @@ export function TableCopyActions({
 		[],
 	);
 
+	const show = (next: Outcome) => {
+		setOutcome(next);
+		if (timer.current) clearTimeout(timer.current);
+		timer.current = setTimeout(() => setOutcome(null), COPIED_MS);
+	};
 	const copy = (format: TableCopyFormat) => {
 		const element = table.current;
 		if (!element) return;
 		navigator.clipboard.writeText(tableClipboardText(element, format)).then(
-			() => {
-				setCopied(format);
-				if (timer.current) clearTimeout(timer.current);
-				timer.current = setTimeout(() => setCopied(null), COPIED_MS);
-			},
+			() => show({ format, ok: true }),
 			(error: unknown) => {
 				console.error("[chat] table copy failed", error);
+				show({ format, ok: false });
 			},
 		);
 	};
+	const outcomeOf = (format: TableCopyFormat) =>
+		outcome?.format === format ? outcome.ok : null;
 
 	return (
 		<div className="mt-1 flex items-center gap-0.5 text-xs">
 			<CopyAction
-				copied={copied === "markdown"}
 				onClick={() => copy("markdown")}
+				outcome={outcomeOf("markdown")}
 			>
 				{t({ message: "Copy as Markdown" })}
 			</CopyAction>
-			<CopyAction copied={copied === "csv"} onClick={() => copy("csv")}>
+			<CopyAction onClick={() => copy("csv")} outcome={outcomeOf("csv")}>
 				{t({ message: "Copy as CSV" })}
 			</CopyAction>
 		</div>

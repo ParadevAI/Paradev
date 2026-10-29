@@ -36,3 +36,24 @@ test("copies the table as Markdown and confirms", async () => {
 	expect(view.getByText("Copied")).toBeTruthy();
 	expect(view.getByRole("button", { name: "Copy as CSV" })).toBeTruthy();
 });
+
+test("says so when the clipboard refuses the write", async () => {
+	Object.defineProperty(navigator, "clipboard", {
+		configurable: true,
+		value: {
+			writeText: async () => {
+				throw new Error("Document is not focused");
+			},
+		},
+	});
+	const table = { current: document.createElement("table") };
+	table.current.innerHTML = "<tbody><tr><td>1</td></tr></tbody>";
+	const view = render(<TableCopyActions table={table} />);
+
+	await act(async () => {
+		fireEvent.click(view.getByRole("button", { name: "Copy as CSV" }));
+		await new Promise((done) => setTimeout(done, 0));
+	});
+	expect(view.getByText("Copy failed")).toBeTruthy();
+	expect(view.getByRole("button", { name: "Copy as Markdown" })).toBeTruthy();
+});

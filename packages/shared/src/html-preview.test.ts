@@ -26,6 +26,9 @@ describe("html preview URLs", () => {
 		expect(readHtmlPreviewUrl("superset-preview://document/?d=%%%")).toEqual({
 			status: "not-found",
 		});
+		expect(readHtmlPreviewUrl("superset-preview://document/?d=A")).toEqual({
+			status: "not-found",
+		});
 		expect(readHtmlPreviewUrl("not a url")).toEqual({ status: "not-found" });
 		expect(
 			readHtmlPreviewUrl(

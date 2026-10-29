@@ -1,6 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import { useEffect, useRef, useState } from "react";
 import {
+	isPreviewEscape,
 	PREVIEW_MAX_HEIGHT,
 	PREVIEW_MIN_HEIGHT,
 	PREVIEW_SANDBOX,
@@ -19,6 +20,7 @@ const DEFAULT_HEIGHT = 240;
 export function HtmlPreviewFrame({
 	className,
 	fill = false,
+	onEscape,
 	src,
 	title,
 	zoom,
@@ -28,10 +30,16 @@ export function HtmlPreviewFrame({
 	zoom: PreviewZoom;
 	/** Take the parent's height instead of the page's own. */
 	fill?: boolean;
+	/** Escape pressed inside the page. */
+	onEscape?: () => void;
 	className?: string;
 }) {
 	const boxRef = useRef<HTMLDivElement>(null);
 	const frameRef = useRef<HTMLIFrameElement>(null);
+	const onEscapeRef = useRef(onEscape);
+	useEffect(() => {
+		onEscapeRef.current = onEscape;
+	}, [onEscape]);
 	const [box, setBox] = useState({ width: 0, height: 0 });
 	const [page, setPage] = useState<PreviewSize | null>(null);
 	// A page that once overflowed keeps that width: laid out wider to fit, it
@@ -52,6 +60,10 @@ export function HtmlPreviewFrame({
 	useEffect(() => {
 		const onMessage = (event: MessageEvent) => {
 			if (event.source !== frameRef.current?.contentWindow) return;
+			if (isPreviewEscape(event.data)) {
+				onEscapeRef.current?.();
+				return;
+			}
 			const size = readPreviewSize(event.data);
 			if (!size) return;
 			setPage((current) => {

@@ -7,11 +7,18 @@ import {
 
 export type TableCopyFormat = "markdown" | "csv";
 
+const oneLine = (cell: string) => cell.replace(/\r?\n/g, "<br>");
+
+/** CSV quotes a cell with line breaks; a Markdown row has no room for them. */
 export function serializeTable(
 	data: TableData,
 	format: TableCopyFormat,
 ): string {
-	return format === "csv" ? tableDataToCSV(data) : tableDataToMarkdown(data);
+	if (format === "csv") return tableDataToCSV(data);
+	return tableDataToMarkdown({
+		headers: data.headers.map(oneLine),
+		rows: data.rows.map((row) => row.map(oneLine)),
+	});
 }
 
 /** The table as text: cells are their visible text, without markup. */

@@ -35,7 +35,12 @@ function base64Url(bytes: Uint8Array): string {
 
 function fromBase64Url(text: string): Uint8Array<ArrayBuffer> | null {
 	if (!/^[A-Za-z0-9_-]*$/.test(text)) return null;
-	const binary = atob(text.replace(/-/g, "+").replace(/_/g, "/"));
+	let binary: string;
+	try {
+		binary = atob(text.replace(/-/g, "+").replace(/_/g, "/"));
+	} catch {
+		return null;
+	}
 	const bytes = new Uint8Array(binary.length);
 	for (let index = 0; index < binary.length; index += 1) {
 		bytes[index] = binary.charCodeAt(index);

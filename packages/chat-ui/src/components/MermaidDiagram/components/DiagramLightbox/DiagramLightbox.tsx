@@ -11,6 +11,7 @@ import {
 	useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useModalOverlay } from "../../../../hooks/useModalOverlay";
 import { OverlayButton } from "../../../OverlayButton";
 import "../../mermaid-diagram.css";
 import { svgSize } from "./utils/svgSize";
@@ -113,20 +114,7 @@ export function DiagramLightbox({
 		return () => stage.removeEventListener("wheel", onWheel);
 	}, [zoomAt]);
 
-	useEffect(() => {
-		const opener = document.activeElement;
-		stageRef.current?.focus();
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return;
-			event.stopPropagation();
-			onClose();
-		};
-		window.addEventListener("keydown", onKeyDown, true);
-		return () => {
-			window.removeEventListener("keydown", onKeyDown, true);
-			if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
-		};
-	}, [onClose]);
+	useModalOverlay(stageRef, onClose);
 
 	const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
 		if (event.button !== 0) return;
