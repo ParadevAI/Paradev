@@ -17,7 +17,6 @@ export function FilesTreePane({
 		<FileViewLayout
 			context={context}
 			workspaceId={workspaceId}
-			showTree
 			onSearch={onSearch}
 		/>
 	);

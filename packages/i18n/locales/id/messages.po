@@ -920,12 +920,6 @@ msgstr "{entryPath} di workspace ini sudah diterbitkan sebagai halaman di organi
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# gagal} other {# gagal}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} dari {total} check gagal"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} dari {total} check gagal"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} untuk fokus"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} check"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} check lulus"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} dari {total} check berjalan"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} dari {total} check berjalan"
-
 msgid "{percent} used"
 msgstr "{percent} terpakai"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
@@ -3874,9 +3859,6 @@ msgstr "Perubahan"
 msgid "Changes are isolated"
 msgstr "Perubahan terisolasi"
 
-msgid "Changes open target"
-msgstr "Tempat membuka perubahan"
-
 msgid "Changes requested"
 msgstr "Perubahan diminta"
 
@@ -4081,9 +4063,6 @@ msgstr "Pilih aplikasi"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Pilih cara file dibuka saat tidak ada panel pratinjau"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Pilih cara membuka tampilan perubahan dari bilah atas"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Pilih cara membuka path file saat Cmd+klik di terminal"
@@ -4329,9 +4308,6 @@ msgstr "Tutup semua port di workspace ini"
 
 msgid "Close Browser"
 msgstr "Tutup Browser"
-
-msgid "Close changes"
-msgstr "Tutup perubahan"
 
 msgid "Close Chat"
 msgstr "Tutup Chat"
@@ -11060,9 +11036,6 @@ msgstr "Sudah di-merge, tapi status PR tidak bisa disegarkan — coba lagi seben
 msgid "Merging PR..."
 msgstr "Me-merge PR..."
 
-msgid "Merging pull request"
-msgstr "Me-merge pull request"
-
 msgid "Merging…"
 msgstr "Melakukan merge…"
 
@@ -12826,9 +12799,6 @@ msgstr "Buka Browser"
 msgid "Open browser again"
 msgstr "Buka browser lagi"
 
-msgid "Open changes"
-msgstr "Buka perubahan"
-
 msgid "Open Changes"
 msgstr "Buka Perubahan"
 
@@ -13099,9 +13069,6 @@ msgstr "Buka Pull Request"
 msgid "Open pull request #{0}"
 msgstr "Buka pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Buka opsi pull request"
-
 msgid "Open pull requests"
 msgstr "Pull request terbuka"
 
@@ -13122,9 +13089,6 @@ msgstr "Buka Pengaturan"
 
 msgid "Open sheet"
 msgstr "Buka sheet"
-
-msgid "Open ship options"
-msgstr "Buka opsi pengiriman"
 
 msgid "Open System Settings"
 msgstr "Buka System Settings"
@@ -13481,9 +13445,6 @@ msgstr "Uji coba kerja berbayar"
 
 msgid "Palette"
 msgstr "Palet"
-
-msgid "Pane in current tab"
-msgstr "Panel di tab saat ini"
 
 msgid "Pane system"
 msgstr "Sistem panel"
@@ -19893,9 +19854,6 @@ msgstr "Diperbarui {0}"
 msgid "Updated {date}"
 msgstr "Diperbarui {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Diperbarui {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Baru saja diperbarui dari {0}."
@@ -20787,9 +20745,6 @@ msgstr "root workspace"
 
 msgid "Workspace Run"
 msgstr "Run Workspace"
-
-msgid "Workspace run options"
-msgstr "Opsi run workspace"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Run workspace: {workspaceRunState}"

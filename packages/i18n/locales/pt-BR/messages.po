@@ -920,12 +920,6 @@ msgstr "{entryPath} neste workspace já está publicado como página em outra or
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# falhou} other {# falharam}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} de {total} verificação falhando"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} de {total} verificações falhando"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} para focar"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} verificações"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} verificações passando"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} de {total} verificação em execução"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} de {total} verificações em execução"
-
 msgid "{percent} used"
 msgstr "{percent} usado"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, one {# PR de agente mesclado} other {# PRs de agente
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompida"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {A verificação passou} other {Todas as # verificações passaram}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue do GitHub} other {issues do GitHub}}"
@@ -3874,9 +3859,6 @@ msgstr "Alterações"
 msgid "Changes are isolated"
 msgstr "As mudanças ficam isoladas"
 
-msgid "Changes open target"
-msgstr "Destino ao abrir alterações"
-
 msgid "Changes requested"
 msgstr "Alterações solicitadas"
 
@@ -4081,9 +4063,6 @@ msgstr "Escolher app"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Escolha como os arquivos abrem quando não há painel de prévia"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Escolha como a visualização de alterações abre pela barra superior"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Escolha como abrir caminhos de arquivo ao dar Cmd+clique no terminal"
@@ -4329,9 +4308,6 @@ msgstr "Fechar todas as portas desta área de trabalho"
 
 msgid "Close Browser"
 msgstr "Fechar navegador"
-
-msgid "Close changes"
-msgstr "Fechar alterações"
 
 msgid "Close Chat"
 msgstr "Fechar chat"
@@ -11060,9 +11036,6 @@ msgstr "Mesclado, mas não foi possível atualizar o estado do PR — tente de n
 msgid "Merging PR..."
 msgstr "Fazendo merge do PR..."
 
-msgid "Merging pull request"
-msgstr "Fazendo merge do pull request"
-
 msgid "Merging…"
 msgstr "Fazendo merge…"
 
@@ -12826,9 +12799,6 @@ msgstr "Abrir navegador"
 msgid "Open browser again"
 msgstr "Abrir o navegador novamente"
 
-msgid "Open changes"
-msgstr "Abrir alterações"
-
 msgid "Open Changes"
 msgstr "Abrir alterações"
 
@@ -13099,9 +13069,6 @@ msgstr "Abrir pull request"
 msgid "Open pull request #{0}"
 msgstr "Abrir o pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Abrir opções do pull request"
-
 msgid "Open pull requests"
 msgstr "Pull requests abertos"
 
@@ -13122,9 +13089,6 @@ msgstr "Abrir configurações"
 
 msgid "Open sheet"
 msgstr "Abrir sheet"
-
-msgid "Open ship options"
-msgstr "Abrir opções de envio"
 
 msgid "Open System Settings"
 msgstr "Abrir Ajustes do Sistema"
@@ -13481,9 +13445,6 @@ msgstr "Teste prático remunerado"
 
 msgid "Palette"
 msgstr "Paleta"
-
-msgid "Pane in current tab"
-msgstr "Painel na aba atual"
 
 msgid "Pane system"
 msgstr "Sistema de painéis"
@@ -19893,9 +19854,6 @@ msgstr "Atualizado {0}"
 msgid "Updated {date}"
 msgstr "Atualizado em {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Atualizado {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Atualizado agora mesmo a partir da {0}."
@@ -20787,9 +20745,6 @@ msgstr "raiz da área de trabalho"
 
 msgid "Workspace Run"
 msgstr "Execução da área de trabalho"
-
-msgid "Workspace run options"
-msgstr "Opções de execução da área de trabalho"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Execução da área de trabalho: {workspaceRunState}"

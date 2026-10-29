@@ -8,6 +8,7 @@ import type { DiffPaneData, PaneViewerData } from "../../types";
 import {
 	closeVisibleChangesPane,
 	findVisibleChangesPane,
+	NEW_DIFF_PANE,
 	openChangesPaneInStore,
 } from "./openChangesPaneInStore";
 
@@ -63,11 +64,11 @@ function storeWith(withDiffTab: boolean) {
 	});
 }
 
-describe("openChangesPaneInStore with target 'tab'", () => {
+describe("openChangesPaneInStore", () => {
 	it("adds a tab with an empty-target diff pane when none exists", () => {
 		const store = storeWith(false);
 
-		openChangesPaneInStore(store, "tab");
+		openChangesPaneInStore(store);
 
 		const state = store.getState();
 		expect(state.tabs).toHaveLength(2);
@@ -83,7 +84,7 @@ describe("openChangesPaneInStore with target 'tab'", () => {
 	it("focuses the first existing diff pane across tabs instead of adding one", () => {
 		const store = storeWith(true);
 
-		openChangesPaneInStore(store, "tab");
+		openChangesPaneInStore(store);
 
 		const state = store.getState();
 		expect(state.tabs).toHaveLength(2);
@@ -98,74 +99,10 @@ describe("openChangesPaneInStore with target 'tab'", () => {
 	it("is idempotent once a diff pane exists", () => {
 		const store = storeWith(false);
 
-		openChangesPaneInStore(store, "tab");
-		openChangesPaneInStore(store, "tab");
+		openChangesPaneInStore(store);
+		openChangesPaneInStore(store);
 
 		expect(store.getState().tabs).toHaveLength(2);
-	});
-});
-
-describe("openChangesPaneInStore with target 'pane' (default)", () => {
-	it("splits the active tab with a diff pane instead of adding a tab", () => {
-		const store = storeWith(false);
-
-		openChangesPaneInStore(store);
-
-		const state = store.getState();
-		expect(state.tabs).toHaveLength(1);
-		expect(state.activeTabId).toBe("tab-1");
-		const activeTab = state.tabs[0];
-		const panes = Object.values(activeTab?.panes ?? {});
-		expect(panes).toHaveLength(2);
-		const diffPane = panes.find((pane) => pane.kind === "diff");
-		expect(diffPane).toBeDefined();
-		expect(activeTab?.activePaneId).toBe(diffPane?.id ?? null);
-		expect(diffPane?.data as DiffPaneData).toEqual({
-			path: "",
-			collapsedFiles: [],
-		});
-	});
-
-	it("stays in the active tab even when another tab has a diff pane", () => {
-		const store = storeWith(true);
-
-		openChangesPaneInStore(store);
-
-		const state = store.getState();
-		expect(state.tabs).toHaveLength(2);
-		expect(state.activeTabId).toBe("tab-1");
-		const activeTab = state.tabs.find((tab) => tab.id === "tab-1");
-		expect(
-			Object.values(activeTab?.panes ?? {}).filter((p) => p.kind === "diff"),
-		).toHaveLength(1);
-	});
-
-	it("focuses the active tab's existing diff pane instead of splitting again", () => {
-		const store = storeWith(false);
-
-		openChangesPaneInStore(store);
-		const afterFirst = Object.keys(store.getState().tabs[0]?.panes ?? {});
-		openChangesPaneInStore(store);
-
-		const state = store.getState();
-		expect(Object.keys(state.tabs[0]?.panes ?? {})).toEqual(afterFirst);
-	});
-
-	it("adds a tab when the workspace has none", () => {
-		const store = createWorkspaceStore<PaneViewerData>({
-			initialState: {
-				version: 1,
-				activeTabId: null,
-				tabs: [],
-			} as unknown as WorkspaceState<PaneViewerData>,
-		});
-
-		openChangesPaneInStore(store);
-
-		const state = store.getState();
-		expect(state.tabs).toHaveLength(1);
-		const opened = Object.values(state.tabs[0]?.panes ?? {})[0];
-		expect(opened?.kind).toBe("diff");
 	});
 });
 
@@ -180,7 +117,7 @@ describe("closeVisibleChangesPane", () => {
 
 	it("closes the active tab's split diff pane and keeps the tab", () => {
 		const store = storeWith(false);
-		openChangesPaneInStore(store, "pane");
+		store.getState().openPane({ pane: NEW_DIFF_PANE });
 
 		expect(findVisibleChangesPane(store.getState())?.tabId).toBe("tab-1");
 		expect(closeVisibleChangesPane(store)).toBe(true);

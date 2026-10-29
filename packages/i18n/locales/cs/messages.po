@@ -920,12 +920,6 @@ msgstr "{entryPath} v tomto workspace je už publikovaný jako stránka v jiné 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# selhalo} few {# selhalo} many {# selhalo} other {# selhalo}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "Selhává {failing} z {total} kontroly"
-
-msgid "{failing} of {total} checks failing"
-msgstr "Selhává {failing} z {total} kontrol"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pro zaměření"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} kontrol"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "Prošlo {passingChecks}/{0} kontrol"
 
-msgid "{pending} of {total} check running"
-msgstr "Běží {pending} z {total} kontroly"
-
-msgid "{pending} of {total} checks running"
-msgstr "Běží {pending} z {total} kontrol"
-
 msgid "{percent} used"
 msgstr "Využito {percent}"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agent
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} few {GitHub issues} many {GitHub issues} other {GitHub issues}}"
@@ -3874,9 +3859,6 @@ msgstr "Změny"
 msgid "Changes are isolated"
 msgstr "Změny jsou izolované"
 
-msgid "Changes open target"
-msgstr "Cíl otevření změn"
-
 msgid "Changes requested"
 msgstr "Vyžádány změny"
 
@@ -4081,9 +4063,6 @@ msgstr "Vyberte aplikaci"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Zvolte, jak se soubory otevírají, když není žádný panel náhledu"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Zvolte, jak se zobrazení změn otevírá z horní lišty"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Zvolte, jak se otevírají cesty k souborům při Cmd+kliknutí v terminálu"
@@ -4329,9 +4308,6 @@ msgstr "Zavřít všechny porty v tomto pracovním prostoru"
 
 msgid "Close Browser"
 msgstr "Zavřít prohlížeč"
-
-msgid "Close changes"
-msgstr "Zavřít změny"
 
 msgid "Close Chat"
 msgstr "Zavřít chat"
@@ -11060,9 +11036,6 @@ msgstr "Sloučeno, ale nepodařilo se obnovit stav PR — zkuste to za chvíli z
 msgid "Merging PR..."
 msgstr "Slučuji PR..."
 
-msgid "Merging pull request"
-msgstr "Slučuji pull request"
-
 msgid "Merging…"
 msgstr "Slučování…"
 
@@ -12826,9 +12799,6 @@ msgstr "Otevřít prohlížeč"
 msgid "Open browser again"
 msgstr "Znovu otevřít prohlížeč"
 
-msgid "Open changes"
-msgstr "Otevřít změny"
-
 msgid "Open Changes"
 msgstr "Otevřít změny"
 
@@ -13099,9 +13069,6 @@ msgstr "Otevřít pull request"
 msgid "Open pull request #{0}"
 msgstr "Otevřít pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Otevřít možnosti pull requestu"
-
 msgid "Open pull requests"
 msgstr "Otevřené pull requesty"
 
@@ -13122,9 +13089,6 @@ msgstr "Otevřít nastavení"
 
 msgid "Open sheet"
 msgstr "Otevřít sheet"
-
-msgid "Open ship options"
-msgstr "Otevřít možnosti odeslání"
 
 msgid "Open System Settings"
 msgstr "Otevřít Nastavení systému"
@@ -13481,9 +13445,6 @@ msgstr "Placená zkušební spolupráce"
 
 msgid "Palette"
 msgstr "Paleta"
-
-msgid "Pane in current tab"
-msgstr "Panel v aktuální kartě"
 
 msgid "Pane system"
 msgstr "Systém panelů"
@@ -19893,9 +19854,6 @@ msgstr "Aktualizováno {0}"
 msgid "Updated {date}"
 msgstr "Aktualizováno {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Aktualizováno {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Právě aktualizováno z {0}."
@@ -20787,9 +20745,6 @@ msgstr "kořen pracovního prostoru"
 
 msgid "Workspace Run"
 msgstr "Spuštění pracovního prostoru"
-
-msgid "Workspace run options"
-msgstr "Možnosti spuštění pracovního prostoru"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Spuštění pracovního prostoru: {workspaceRunState}"

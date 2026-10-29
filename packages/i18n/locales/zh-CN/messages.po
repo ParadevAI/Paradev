@@ -920,12 +920,6 @@ msgstr "该工作区中的 {entryPath} 已在另一个组织中发布为页面�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#项失败} other {#项失败}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{total}项检查中有{failing}项失败"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{total}项检查中有{failing}项失败"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total}项检查"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0}项检查通过"
 
-msgid "{pending} of {total} check running"
-msgstr "{total}项检查中有{pending}项运行中"
-
-msgid "{pending} of {total} checks running"
-msgstr "{total}项检查中有{pending}项运行中"
-
 msgid "{percent} used"
 msgstr "已使用 {percent}"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub议题} other {GitHub议题}}"
@@ -3874,9 +3859,6 @@ msgstr "更改"
 msgid "Changes are isolated"
 msgstr "改动彼此隔离"
 
-msgid "Changes open target"
-msgstr "更改视图打开位置"
-
 msgid "Changes requested"
 msgstr "要求修改"
 
@@ -4081,9 +4063,6 @@ msgstr "选择应用"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "选择在没有预览窗格时文件的打开方式"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "选择从顶栏打开更改视图的方式"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "选择在终端中Cmd+点击文件路径时的打开方式"
@@ -4329,9 +4308,6 @@ msgstr "关闭此工作区中的全部端口"
 
 msgid "Close Browser"
 msgstr "关闭浏览器"
-
-msgid "Close changes"
-msgstr "关闭更改"
 
 msgid "Close Chat"
 msgstr "关闭聊天"
@@ -11060,9 +11036,6 @@ msgstr "已合并，但无法刷新PR状态 — 请稍后重试"
 msgid "Merging PR..."
 msgstr "正在合并PR..."
 
-msgid "Merging pull request"
-msgstr "正在合并拉取请求"
-
 msgid "Merging…"
 msgstr "正在合并…"
 
@@ -12826,9 +12799,6 @@ msgstr "打开浏览器"
 msgid "Open browser again"
 msgstr "重新打开浏览器"
 
-msgid "Open changes"
-msgstr "打开更改"
-
 msgid "Open Changes"
 msgstr "打开更改"
 
@@ -13099,9 +13069,6 @@ msgstr "打开拉取请求"
 msgid "Open pull request #{0}"
 msgstr "打开拉取请求#{0}"
 
-msgid "Open pull request options"
-msgstr "打开拉取请求选项"
-
 msgid "Open pull requests"
 msgstr "打开的拉取请求"
 
@@ -13122,9 +13089,6 @@ msgstr "打开设置"
 
 msgid "Open sheet"
 msgstr "打开侧边面板"
-
-msgid "Open ship options"
-msgstr "打开发布选项"
 
 msgid "Open System Settings"
 msgstr "打开系统设置"
@@ -13481,9 +13445,6 @@ msgstr "带薪工作试用"
 
 msgid "Palette"
 msgstr "调色板"
-
-msgid "Pane in current tab"
-msgstr "当前标签页中的窗格"
 
 msgid "Pane system"
 msgstr "面板系统"
@@ -19893,9 +19854,6 @@ msgstr "更新于{0}"
 msgid "Updated {date}"
 msgstr "更新于{date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "更新于{updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "刚刚从 {0} 更新。"
@@ -20787,9 +20745,6 @@ msgstr "工作区根目录"
 
 msgid "Workspace Run"
 msgstr "工作区运行"
-
-msgid "Workspace run options"
-msgstr "工作区运行选项"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "工作区运行：{workspaceRunState}"

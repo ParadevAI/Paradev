@@ -920,12 +920,6 @@ msgstr "이 워크스페이스의 {entryPath}는 다른 조직에서 이미 페�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#개 실패} other {#개 실패}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "검사 {total}개 중 {failing}개 실패"
-
-msgid "{failing} of {total} checks failing"
-msgstr "검사 {total}개 중 {failing}개 실패"
-
 msgid "{focusShortcutText} to focus"
 msgstr "포커스하려면 {focusShortcutText}"
 
@@ -1122,12 +1116,6 @@ msgstr "검사 {passing}/{total}"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "검사 {passingChecks}/{0} 통과"
 
-msgid "{pending} of {total} check running"
-msgstr "검사 {total}개 중 {pending}개 실행 중"
-
-msgid "{pending} of {total} checks running"
-msgstr "검사 {total}개 중 {pending}개 실행 중"
-
 msgid "{percent} used"
 msgstr "{percent} 사용됨"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, other {에이전트 PR # 건 머지}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} 중단됨"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub 이슈} other {GitHub 이슈}}"
@@ -3874,9 +3859,6 @@ msgstr "변경"
 msgid "Changes are isolated"
 msgstr "변경은 격리됩니다"
 
-msgid "Changes open target"
-msgstr "변경 사항 열기 대상"
-
 msgid "Changes requested"
 msgstr "변경 요청됨"
 
@@ -4081,9 +4063,6 @@ msgstr "앱 선택"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "미리보기 패널이 없을 때 파일을 여는 방식을 선택합니다"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "상단 바에서 변경 사항 보기를 여는 방식을 선택합니다"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "터미널에서 Cmd+클릭할 때 파일 경로를 여는 방식을 선택하세요"
@@ -4329,9 +4308,6 @@ msgstr "이 워크스페이스의 모든 포트 닫기"
 
 msgid "Close Browser"
 msgstr "브라우저 닫기"
-
-msgid "Close changes"
-msgstr "변경 닫기"
 
 msgid "Close Chat"
 msgstr "채팅 닫기"
@@ -11060,9 +11036,6 @@ msgstr "머지했지만 PR 상태를 새로 고치지 못했습니다 — 잠시
 msgid "Merging PR..."
 msgstr "PR을 머지하는 중..."
 
-msgid "Merging pull request"
-msgstr "풀 리퀘스트 머지 중"
-
 msgid "Merging…"
 msgstr "머지 중…"
 
@@ -12826,9 +12799,6 @@ msgstr "브라우저 열기"
 msgid "Open browser again"
 msgstr "브라우저 다시 열기"
 
-msgid "Open changes"
-msgstr "변경 열기"
-
 msgid "Open Changes"
 msgstr "변경 열기"
 
@@ -13099,9 +13069,6 @@ msgstr "풀 리퀘스트 열기"
 msgid "Open pull request #{0}"
 msgstr "풀 리퀘스트 #{0} 열기"
 
-msgid "Open pull request options"
-msgstr "풀 리퀘스트 옵션 열기"
-
 msgid "Open pull requests"
 msgstr "열린 풀 리퀘스트"
 
@@ -13122,9 +13089,6 @@ msgstr "설정 열기"
 
 msgid "Open sheet"
 msgstr "시트 열기"
-
-msgid "Open ship options"
-msgstr "배포 옵션 열기"
 
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
@@ -13481,9 +13445,6 @@ msgstr "유급 업무 체험"
 
 msgid "Palette"
 msgstr "팔레트"
-
-msgid "Pane in current tab"
-msgstr "현재 탭의 패널"
 
 msgid "Pane system"
 msgstr "패널 시스템"
@@ -19893,9 +19854,6 @@ msgstr "{0} 업데이트됨"
 msgid "Updated {date}"
 msgstr "{date} 업데이트"
 
-msgid "Updated {updatedRelative}"
-msgstr "{updatedRelative} 업데이트됨"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "방금 {0}에서 업데이트되었습니다."
@@ -20787,9 +20745,6 @@ msgstr "워크스페이스 루트"
 
 msgid "Workspace Run"
 msgstr "워크스페이스 실행"
-
-msgid "Workspace run options"
-msgstr "워크스페이스 실행 옵션"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "워크스페이스 실행: {workspaceRunState}"

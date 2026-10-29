@@ -920,12 +920,6 @@ msgstr "{entryPath} w tym workspace jest już opublikowany jako strona w innej o
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# nieudany} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} z {total} kontroli nie przechodzi"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} z {total} kontroli nie przechodzi"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} aby aktywować"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} kontroli"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} kontroli przechodzi"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} z {total} kontroli w toku"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} z {total} kontroli w toku"
-
 msgid "{percent} used"
 msgstr "Wykorzystano {percent}"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, one {scalono # PR agenta} few {scalono # PR agenta} 
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} przerwane"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {Kontrola przeszła} few {Wszystkie # kontrole przeszły} many {Wszystkie # kontroli przeszło} other {Wszystkie # kontroli przeszło}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {zgłoszenie GitHub} few {zgłoszenia GitHub} many {zgłoszeń GitHub} other {zgłoszenia GitHub}}"
@@ -3874,9 +3859,6 @@ msgstr "Zmiany"
 msgid "Changes are isolated"
 msgstr "Zmiany są izolowane"
 
-msgid "Changes open target"
-msgstr "Cel otwierania zmian"
-
 msgid "Changes requested"
 msgstr "Zażądano zmian"
 
@@ -4081,9 +4063,6 @@ msgstr "Wybierz aplikację"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Wybierz, jak otwierają się pliki, gdy nie ma panelu podglądu"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Wybierz, jak widok zmian otwiera się z górnego paska"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Wybierz, jak otwierać ścieżki plików po Cmd+kliknięciu w terminalu"
@@ -4329,9 +4308,6 @@ msgstr "Zamknij wszystkie porty w tym obszarze roboczym"
 
 msgid "Close Browser"
 msgstr "Zamknij przeglądarkę"
-
-msgid "Close changes"
-msgstr "Zamknij zmiany"
 
 msgid "Close Chat"
 msgstr "Zamknij czat"
@@ -11060,9 +11036,6 @@ msgstr "Scalono, ale nie udało się odświeżyć stanu PR — spróbuj za chwil
 msgid "Merging PR..."
 msgstr "Scalanie PR..."
 
-msgid "Merging pull request"
-msgstr "Scalanie pull requesta"
-
 msgid "Merging…"
 msgstr "Scalanie…"
 
@@ -12826,9 +12799,6 @@ msgstr "Otwórz przeglądarkę"
 msgid "Open browser again"
 msgstr "Otwórz przeglądarkę ponownie"
 
-msgid "Open changes"
-msgstr "Otwórz zmiany"
-
 msgid "Open Changes"
 msgstr "Otwórz zmiany"
 
@@ -13099,9 +13069,6 @@ msgstr "Otwórz pull request"
 msgid "Open pull request #{0}"
 msgstr "Otwórz pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Otwórz opcje pull requesta"
-
 msgid "Open pull requests"
 msgstr "Otwarte pull requesty"
 
@@ -13122,9 +13089,6 @@ msgstr "Otwórz ustawienia"
 
 msgid "Open sheet"
 msgstr "Otwórz arkusz"
-
-msgid "Open ship options"
-msgstr "Otwórz opcje wysyłki"
 
 msgid "Open System Settings"
 msgstr "Otwórz Ustawienia systemowe"
@@ -13481,9 +13445,6 @@ msgstr "Płatna praca próbna"
 
 msgid "Palette"
 msgstr "Paleta"
-
-msgid "Pane in current tab"
-msgstr "Panel w bieżącej karcie"
 
 msgid "Pane system"
 msgstr "System paneli"
@@ -19893,9 +19854,6 @@ msgstr "Zaktualizowano {0}"
 msgid "Updated {date}"
 msgstr "Zaktualizowano {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Zaktualizowano {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Przed chwilą zaktualizowano z {0}."
@@ -20787,9 +20745,6 @@ msgstr "katalog główny obszaru roboczego"
 
 msgid "Workspace Run"
 msgstr "Uruchomienie obszaru roboczego"
-
-msgid "Workspace run options"
-msgstr "Opcje uruchamiania obszaru roboczego"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Uruchomienie obszaru roboczego: {workspaceRunState}"

@@ -10,12 +10,10 @@ export function useRightPaneMode({
 	workspaceId,
 	isOpen,
 	setOpen,
-	canExpand,
 }: {
 	workspaceId: string;
 	isOpen: boolean;
 	setOpen: (open: boolean) => void;
-	canExpand: boolean;
 }): { mode: SidebarSlideMode; toggleFullScreen: () => void } {
 	const [fullScreen, setFullScreen] = useState<FullScreenState | null>(null);
 	const isFullScreen = fullScreen?.workspaceId === workspaceId;
@@ -45,7 +43,7 @@ export function useRightPaneMode({
 
 	const mode: SidebarSlideMode = !isOpen
 		? "closed"
-		: canExpand && isFullScreen
+		: isFullScreen
 			? "expanded"
 			: "open";
 
