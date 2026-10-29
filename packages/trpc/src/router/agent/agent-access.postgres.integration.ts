@@ -570,7 +570,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 	});
 
 	test("activity pages through turns that started at the same moment", async () => {
-		const { agent, dm } = await agentWithChannel(admin);
+		const { agent, dm, turn } = await agentWithChannel(admin);
 		const startedAt = new Date();
 		await db.insert(schema.agentTurns).values(
 			Array.from({ length: 51 }, () => ({
@@ -580,6 +580,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				status: "completed" as const,
 				reason: "direct_message" as const,
 				actingUserId: admin,
+				triggerMessageId: turn.triggerMessageId,
 				startedAt,
 			})),
 		);
