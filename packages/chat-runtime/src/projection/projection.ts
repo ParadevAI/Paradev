@@ -3,7 +3,9 @@ import { desc, eq } from "drizzle-orm";
 import type { ChatDb, ChatSessionRow } from "../db";
 import { chatSessionsLocal } from "../db";
 
-export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert;
+export type SessionRowInsert = typeof chatSessionsLocal.$inferInsert & {
+	closedAt: number | null;
+};
 
 export type SessionProjection = {
 	status: SessionStatus;
@@ -50,7 +52,14 @@ export function resetSessionForEpoch(
 	updatedAt: number,
 ): void {
 	db.update(chatSessionsLocal)
-		.set({ epoch, status, title: null, queuedCount: 0, updatedAt })
+		.set({
+			epoch,
+			status,
+			title: null,
+			queuedCount: 0,
+			updatedAt,
+			closedAt: null,
+		})
 		.where(eq(chatSessionsLocal.sessionId, sessionId))
 		.run();
 }

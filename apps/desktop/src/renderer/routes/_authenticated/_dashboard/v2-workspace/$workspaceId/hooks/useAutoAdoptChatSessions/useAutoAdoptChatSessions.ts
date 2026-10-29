@@ -262,7 +262,8 @@ export function useAutoAdoptChatSessions({
 					!isChatSessionClosed(session.sessionId) &&
 					!(session.terminalId && isChatTerminalClosed(session.terminalId)) &&
 					!(
-						typeof result.promptHashes[session.sessionId] === "string" &&
+						(!session.live ||
+							typeof result.promptHashes[session.sessionId] === "string") &&
 						waitingAgents.has(presetForAcpHarness(session.harness) ?? "")
 					) &&
 					presetForAcpHarness(session.harness),

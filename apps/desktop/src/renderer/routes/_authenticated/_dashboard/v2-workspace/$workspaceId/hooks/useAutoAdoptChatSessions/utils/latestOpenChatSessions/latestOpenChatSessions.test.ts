@@ -56,6 +56,15 @@ test("a conversation a pane already shows is skipped, by session or terminal", (
 	expect(latestOpenChatSessions(sessions, new Set(["shown", "t"]))).toEqual([]);
 });
 
+test("a session still stopping after its close does not open", () => {
+	expect(
+		latestOpenChatSessions(
+			[row("closing", { live: true, closedAt: 5 })],
+			new Set(),
+		),
+	).toEqual([]);
+});
+
 test("an older host without closedAt only opens live sessions", () => {
 	const sessions = [
 		row("stopped", { closedAt: undefined }),

@@ -23,6 +23,7 @@ export function latestOpenChatSessions<Session extends ChatSessionRow>(
 		);
 		if (isAttached) return [];
 		const latest = rows.reduce((a, b) => (b.updatedAt > a.updatedAt ? b : a));
+		if (latest.closedAt) return [];
 		// Hosts older than closedAt omit it; only their live sessions are safe to open.
 		return latest.live || latest.closedAt === null ? [latest] : [];
 	});
