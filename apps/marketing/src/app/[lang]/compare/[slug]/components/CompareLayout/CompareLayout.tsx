@@ -5,22 +5,27 @@ import { BRAND } from "@superset/shared/brand";
 import type { ReactNode } from "react";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
+import type { TocItem } from "@/lib/blog-utils";
 import {
 	type ComparisonPage,
 	formatCompareDate,
 	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
+import { TableOfContents } from "./components/TableOfContents";
 
 const productName = BRAND.NAME;
 const formerName = BRAND.FORMER_NAME;
 const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
+const MIN_SECTIONS_FOR_TOC = 4;
 
 interface CompareLayoutProps {
 	page: ComparisonPage;
+	toc: TocItem[];
 	children: ReactNode;
 }
 
-export function CompareLayout({ page, children }: CompareLayoutProps) {
+export function CompareLayout({ page, toc, children }: CompareLayoutProps) {
+	const sections = toc.filter((item) => item.level === 2);
 	const formattedDate = formatCompareDate(page.lastUpdated ?? page.date);
 	const pageTypeLabel = getComparisonPageTypeLabel(page.type);
 
@@ -87,11 +92,14 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 
 			{/* Content */}
 			<div className="relative max-w-3xl mx-auto px-6 py-12">
+				{sections.length >= MIN_SECTIONS_FOR_TOC && (
+					<TableOfContents items={sections} />
+				)}
 				<div className="prose max-w-none">{children}</div>
 			</div>
 
-			{/* Footer CTA */}
-			<footer className="relative border-t border-border">
+			{/* CTA */}
+			<aside className="relative border-t border-border">
 				<div className="max-w-3xl mx-auto px-6 relative">
 					<GridCross className="top-0 left-0" />
 					<GridCross className="top-0 right-0" />
@@ -108,7 +116,7 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 						<Trans>Download Paradev</Trans>
 					</DownloadLink>
 				</div>
-			</footer>
+			</aside>
 		</article>
 	);
 }

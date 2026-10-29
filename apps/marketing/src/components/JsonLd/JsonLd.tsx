@@ -79,7 +79,11 @@ export function OrganizationJsonLd() {
 	return <JsonLdScript schema={schema} />;
 }
 
-export function SoftwareApplicationJsonLd() {
+export function SoftwareApplicationJsonLd({
+	dateModified,
+}: {
+	dateModified?: string;
+}) {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
@@ -99,6 +103,7 @@ export function SoftwareApplicationJsonLd() {
 		description: PRODUCT_SUMMARY,
 		disambiguatingDescription: PRODUCT_DISAMBIGUATION,
 		url: COMPANY.MARKETING_URL,
+		...(dateModified && { dateModified }),
 	};
 
 	return <JsonLdScript schema={schema} />;

@@ -13,7 +13,7 @@ import {
 	FAQPageJsonLd,
 	ItemListJsonLd,
 } from "@/components/JsonLd";
-import { getComparisonPages } from "@/lib/compare";
+import { extractCompareToc, getComparisonPages } from "@/lib/compare";
 import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
 	extractComparisonFaqItems,
@@ -74,7 +74,7 @@ export default async function ComparePageRoute({ params }: PageProps) {
 				]}
 			/>
 			{faqItems.length > 0 && <FAQPageJsonLd items={faqItems} />}
-			<CompareLayout page={page}>
+			<CompareLayout page={page} toc={extractCompareToc(page.content)}>
 				<MDXRemote
 					source={page.content}
 					components={mdxComponents}
