@@ -895,9 +895,6 @@ msgstr "{days}d"
 msgid "{days}d {hours}h"
 msgstr "{days}d {hours}u"
 
-msgid "{days}d ago"
-msgstr "{days}d geleden"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {Nog # dag} other {Nog # dagen}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours}u"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}u {minutes}m"
 
-msgid "{hours}h ago"
-msgstr "{hours}u geleden"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree als werkruimte geïmporteerd} other {# worktrees als werkruimtes geïmporteerd}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes}m"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}m geleden"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ om aan te maken"
 
@@ -1036,9 +1027,6 @@ msgstr "{monthlyPrice} per gebruiker/maand bij maandelijkse facturering, of {yea
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per gebruiker/maand. Mobiel, automatiseringen, prioriteitsondersteuning."
-
-msgid "{months}mo ago"
-msgstr "{months}mnd geleden"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
@@ -1189,9 +1177,6 @@ msgstr "{productName} wordt wereldwijd gebruikt door engineers bij Netflix, Micr
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} haalde een seedronde van 11,5 miljoen dollar op onder leiding van Union Square Ventures, met Y Combinator en Paul Graham. TechCrunch noemde het een van de opvallendste startups van YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "logo van {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR's}}"
 
@@ -1220,9 +1205,6 @@ msgstr "Nog {remaining} tokens over"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}s geleden"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} geselecteerd"
@@ -1351,9 +1333,6 @@ msgstr "{workspaceName}: teardown mislukt"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per gebruiker, jaarlijks gefactureerd"
-
-msgid "{years}y ago"
-msgstr "{years}j geleden"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5016,9 +4995,6 @@ msgstr "Er is geen toestemming gegeven. Een tenantbeheerder moet dit goedkeuren.
 
 msgid "Consider alternatives"
 msgstr "Overweeg alternatieven"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Constraints"
@@ -11189,9 +11165,6 @@ msgstr "Contextgebruik van model"
 msgid "Model picker scoped to the selected agent"
 msgstr "Modelkiezer beperkt tot de gekozen agent"
 
-msgid "Model Selector"
-msgstr "Modelkiezer"
-
 msgid "Model volume"
 msgstr "Modelvolume"
 
@@ -11792,9 +11765,6 @@ msgstr "Geen commits om een pull request van te openen"
 
 msgid "No comparisons yet."
 msgstr "Nog geen vergelijkingen."
-
-msgid "No console output"
-msgstr "Geen console-uitvoer"
 
 msgid "No contributors found."
 msgstr "Geen contributors gevonden."
@@ -12934,9 +12904,6 @@ msgstr "Openen in browser"
 
 msgid "Open in Changes pane"
 msgstr "Openen in paneel Wijzigingen"
-
-msgid "Open in chat"
-msgstr "Openen in chat"
 
 msgid "Open in ChatGPT"
 msgstr "Openen in ChatGPT"
@@ -16356,6 +16323,9 @@ msgstr "Bekijk waar je laatste 30 dagen staan op de publieke ranglijst. Alleen t
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Selecteer een bestand om het hier te bekijken"
 
 msgid "Select a project"
 msgstr "Kies een project"

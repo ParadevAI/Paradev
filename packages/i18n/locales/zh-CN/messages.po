@@ -895,9 +895,6 @@ msgstr "{days}天"
 msgid "{days}d {hours}h"
 msgstr "{days}天{hours}小时"
 
-msgid "{days}d ago"
-msgstr "{days}天前"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {剩余 # 天}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours}小时"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}小时{minutes}分"
 
-msgid "{hours}h ago"
-msgstr "{hours}小时前"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {已将#个worktree导入为工作区} other {已将#个worktree导入为工作区}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes}分"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} 分 {rest} 秒"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}分钟前"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵创建"
 
@@ -1036,9 +1027,6 @@ msgstr "按月计费每用户每月 {monthlyPrice}，或按年计费 {yearlyPric
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。"
-
-msgid "{months}mo ago"
-msgstr "{months}个月前"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
@@ -1189,9 +1177,6 @@ msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 M
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
-msgid "{provider} logo"
-msgstr "{provider}标志"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
@@ -1220,9 +1205,6 @@ msgstr "剩余 {remaining} 个 token"
 
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}秒前"
 
 msgid "{selectedCount} selected"
 msgstr "已选择{selectedCount}项"
@@ -1351,9 +1333,6 @@ msgstr "{workspaceName}：清理失败"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每用户{yearlyTotal}，按年计费"
-
-msgid "{years}y ago"
-msgstr "{years}年前"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5016,9 +4995,6 @@ msgstr "未获得授权同意。需要租户管理员批准。"
 
 msgid "Consider alternatives"
 msgstr "考虑其他方案"
-
-msgid "Console"
-msgstr "控制台"
 
 msgid "Constraints"
 msgstr "约束"
@@ -11189,9 +11165,6 @@ msgstr "模型上下文用量"
 msgid "Model picker scoped to the selected agent"
 msgstr "限定在所选智能体范围内的模型选择器"
 
-msgid "Model Selector"
-msgstr "模型选择器"
-
 msgid "Model volume"
 msgstr "模型用量"
 
@@ -11792,9 +11765,6 @@ msgstr "没有可用于创建拉取请求的提交"
 
 msgid "No comparisons yet."
 msgstr "暂无对比。"
-
-msgid "No console output"
-msgstr "没有控制台输出"
 
 msgid "No contributors found."
 msgstr "未找到贡献者。"
@@ -12934,9 +12904,6 @@ msgstr "在浏览器中打开"
 
 msgid "Open in Changes pane"
 msgstr "在“改动”面板中打开"
-
-msgid "Open in chat"
-msgstr "在聊天中打开"
 
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中打开"
@@ -16356,6 +16323,9 @@ msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数�
 
 msgid "Select"
 msgstr "选择框"
+
+msgid "Select a file to view it here"
+msgstr "选择一个文件以在此处查看"
 
 msgid "Select a project"
 msgstr "请选择项目"

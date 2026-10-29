@@ -71,7 +71,6 @@
 		"@streamdown/mermaid": "1.0.2",
 		"@superset/i18n": "workspace:*",
 		"@superset/shared": "workspace:*",
-		"@xyflow/react": "12.10.2",
 		"ai": "6.0.235",
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",

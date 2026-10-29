@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@superset/shared": "workspace:*",
-		"jose": "6.2.2",
+		"jose": "6.2.13",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {
