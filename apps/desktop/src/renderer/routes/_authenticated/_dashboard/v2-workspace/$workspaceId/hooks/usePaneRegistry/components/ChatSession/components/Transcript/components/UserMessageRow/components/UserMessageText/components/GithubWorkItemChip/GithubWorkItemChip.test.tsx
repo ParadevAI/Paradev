@@ -3,6 +3,7 @@ import type { AppRouter } from "@superset/host-service/trpc";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
@@ -49,6 +50,7 @@ function renderChip(
 		number: 8329,
 	},
 	openLink: OpenLink = () => true,
+	url = URL_PR,
 ) {
 	const asked: unknown[] = [];
 	const trpcLink: TRPCLink<AppRouter> = () => (call) =>
@@ -67,7 +69,7 @@ function renderChip(
 			queryClient={new QueryClient()}
 		>
 			<ChatPaneActionsProvider openLink={openLink} workspaceId="workspace-1">
-				<GithubWorkItemChip link={link} url={URL_PR} />
+				<GithubWorkItemChip link={link} url={url} />
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
@@ -76,9 +78,12 @@ function renderChip(
 
 test("a pull request chip asks for details only when the pointer or focus arrives", async () => {
 	const { asked, chip } = renderChip(() => ITEM);
+	await act(async () => {});
 	expect(chip.textContent).toBe("PR #8329");
 	expect(chip.title).toBe(URL_PR);
-	expect(chip.querySelector("span")?.className).toContain("sky");
+	expect(chip.querySelector("span")?.className).toContain(
+		"text-muted-foreground",
+	);
 	expect(asked).toEqual([]);
 
 	chip.focus();
@@ -94,9 +99,19 @@ test("a pull request chip asks for details only when the pointer or focus arrive
 	expect(card.textContent).toContain("desktop");
 	expect(card.textContent).toContain("AviPeltz");
 	expect(card.textContent).toContain("Updated");
+	expect(chip.querySelector("span")?.className).toContain("violet");
 });
 
-test("an issue chip is green, and a lookup that fails still leaves the link usable", async () => {
+test("an open pull request chip turns green, not the merged purple", async () => {
+	const { chip } = renderChip(() => ({ ...ITEM, state: "open" }));
+	chip.focus();
+	await screen.findByText("feat(chat): load whole sessions");
+	const className = chip.querySelector("span")?.className;
+	expect(className).toContain("emerald");
+	expect(className).not.toContain("violet");
+});
+
+test("a chip with an unknown state stays neutral, and the link still opens", async () => {
 	const openLink = mock<OpenLink>(() => true);
 	const { chip } = renderChip(
 		() => {
@@ -106,7 +121,9 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 		openLink,
 	);
 	expect(chip.textContent).toBe("Issue #42");
-	expect(chip.querySelector("span")?.className).toContain("emerald");
+	expect(chip.querySelector("span")?.className).toContain(
+		"text-muted-foreground",
+	);
 
 	chip.focus();
 	expect(
@@ -114,6 +131,10 @@ test("an issue chip is green, and a lookup that fails still leaves the link usab
 			"Details are not available here, but the link still opens.",
 		),
 	).toBeTruthy();
+
+	expect(chip.querySelector("span")?.className).toContain(
+		"text-muted-foreground",
+	);
 
 	fireEvent.click(chip);
 	expect(openLink.mock.calls.map(([href]) => href)).toEqual([URL_PR]);
@@ -142,4 +163,19 @@ test("right-clicking closes the card, and copying the link leaves it closed", as
 		if (original) Object.defineProperty(navigator, "clipboard", original);
 		else Reflect.deleteProperty(navigator, "clipboard");
 	}
+});
+
+test("the card links to the pasted URL, and opening it closes the card", async () => {
+	const files = `${URL_PR}/files`;
+	const openLink = mock<OpenLink>(() => true);
+	const { chip } = renderChip(() => ITEM, undefined, openLink, files);
+	chip.focus();
+	const title = await screen.findByText("feat(chat): load whole sessions");
+	expect(title.closest("a")?.getAttribute("href")).toBe(files);
+
+	fireEvent.click(screen.getByText("Open on GitHub"));
+	expect(openLink.mock.calls.map(([href]) => href)).toEqual([files]);
+	await waitFor(() =>
+		expect(screen.queryByText("feat(chat): load whole sessions")).toBeNull(),
+	);
 });

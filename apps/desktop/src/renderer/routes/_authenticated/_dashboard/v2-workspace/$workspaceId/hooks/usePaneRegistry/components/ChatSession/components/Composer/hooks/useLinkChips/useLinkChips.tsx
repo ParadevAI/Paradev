@@ -32,7 +32,7 @@ export function useLinkChips() {
 		const workItem = parseGithubWorkItemUrl(link);
 		if (workItem) {
 			return (
-				<GithubWorkItemHoverCard link={workItem}>
+				<GithubWorkItemHoverCard link={workItem} url={link}>
 					<span>{rendered}</span>
 				</GithubWorkItemHoverCard>
 			);

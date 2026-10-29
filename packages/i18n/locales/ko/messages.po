@@ -4227,12 +4227,6 @@ msgstr "이동하지 않으면 여기를 클릭하세요"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "“↑ update” 버튼을 클릭하면 업데이트 전 확인 창이 표시됩니다"
 
-msgid "Click the chip to open the issue"
-msgstr "칩을 클릭하면 이슈가 열립니다"
-
-msgid "Click the chip to open the pull request"
-msgstr "칩을 클릭하면 풀 리퀘스트가 열립니다"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "클릭하면 세션 ID를 복사합니다(`claude --resume <id>`로 이어서 진행)."
 

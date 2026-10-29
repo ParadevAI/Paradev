@@ -4227,12 +4227,6 @@ msgstr "リダイレクトされない場合はこちらをクリック"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "「↑ update」ボタンをクリックすると更新前の確認が表示されます"
 
-msgid "Click the chip to open the issue"
-msgstr "チップをクリックするとIssueを開きます"
-
-msgid "Click the chip to open the pull request"
-msgstr "チップをクリックするとプルリクエストを開きます"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
 

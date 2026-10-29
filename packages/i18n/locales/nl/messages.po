@@ -4227,12 +4227,6 @@ msgstr "Klik hier als je niet wordt doorgestuurd"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik op ‘↑ update’ om de bevestiging vóór de update te bekijken"
 
-msgid "Click the chip to open the issue"
-msgstr "Klik op de chip om de issue te openen"
-
-msgid "Click the chip to open the pull request"
-msgstr "Klik op de chip om de pull request te openen"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik om de sessie-ID te kopiëren (hervatten met `claude --resume <id>`)."
 

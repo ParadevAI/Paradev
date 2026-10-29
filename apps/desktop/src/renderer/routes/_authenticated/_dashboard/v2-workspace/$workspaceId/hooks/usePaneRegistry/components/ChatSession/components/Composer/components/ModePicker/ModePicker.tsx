@@ -131,7 +131,7 @@ export function ModePicker({
 								select("mode", mode.id, () => onSelect(mode.id));
 							}}
 						>
-							<span className="flex h-4 w-4 shrink-0 items-center justify-center">
+							<span className="flex h-5 w-4 shrink-0 items-center justify-center">
 								<Icon
 									{...iconProps(
 										copy,
@@ -140,7 +140,9 @@ export function ModePicker({
 								/>
 							</span>
 							<span className="flex min-w-0 flex-1 flex-col gap-0.5">
-								<span className="truncate font-medium">{copy.title}</span>
+								<span className="truncate font-medium leading-5">
+									{copy.title}
+								</span>
 								{copy.description ? (
 									<span
 										className={cn(
@@ -152,7 +154,7 @@ export function ModePicker({
 									</span>
 								) : null}
 							</span>
-							<span className="flex h-4 w-3.5 shrink-0 items-center justify-center">
+							<span className="flex h-5 w-3.5 shrink-0 items-center justify-center">
 								{selected ? (
 									<LuCheck className="size-3.5 text-current" />
 								) : null}
