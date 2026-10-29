@@ -341,7 +341,6 @@ export const agentTurnReasonValues = [
 	"channel_message",
 	"task_start",
 	"task_update",
-	"github",
 ] as const;
 export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
 export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
