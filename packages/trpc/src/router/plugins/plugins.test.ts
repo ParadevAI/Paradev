@@ -52,6 +52,9 @@ stub(pluginConnections, {
 stub(db, {
 	select: () => ({
 		from: (table: unknown) => ({
+			leftJoin() {
+				return this;
+			},
 			where: (condition: SQL) => {
 				if (table === connections) {
 					return rows(
