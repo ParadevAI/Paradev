@@ -19,7 +19,10 @@ import {
 	View,
 } from "react-native";
 import { useSharedValue, withDecay } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -695,7 +698,11 @@ export function FilesChangedScreen() {
 				</Stack.Toolbar>
 			</Stack.Screen>
 			<CharWidthProbe onMeasure={setCharWidth} />
-			<View className="flex-1" {...panResponder.panHandlers}>
+			<SafeAreaView
+				edges={["left", "right"]}
+				style={{ flex: 1 }}
+				{...panResponder.panHandlers}
+			>
 				<CellTransitionsContext.Provider value={cellTransitions}>
 					<FlashList
 						ref={listRef}
@@ -704,7 +711,6 @@ export function FilesChangedScreen() {
 						keyExtractor={(item) => item.key}
 						getItemType={(item) => item.kind}
 						CellRendererComponent={AnimatedCellContainer}
-						contentInsetAdjustmentBehavior="automatic"
 						stickyHeaderIndices={stickyHeaderIndices}
 						stickyHeaderConfig={{ hideRelatedCell: true }}
 						contentContainerStyle={{ paddingBottom: 96 }}
@@ -727,7 +733,7 @@ export function FilesChangedScreen() {
 						}
 					/>
 				</CellTransitionsContext.Provider>
-			</View>
+			</SafeAreaView>
 			<ReviewOverlay
 				draftCount={comments.length}
 				onFinishReview={() =>
