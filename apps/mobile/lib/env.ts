@@ -14,6 +14,9 @@ const envSchema = z.object({
 	EXPO_PUBLIC_SENTRY_DSN_MOBILE: z.url().optional(),
 	EXPO_PUBLIC_SENTRY_ENVIRONMENT: z.string().default("production"),
 	EXPO_PUBLIC_E2E: z.string().optional(),
+	/** The API's Google web client (`GOOGLE_CLIENT_ID`). Android asks Credential
+	 * Manager for an ID token addressed to it, and uses the browser without it. */
+	EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: z.string().optional(),
 	/** Set by .superset/setup.sh or setup.cloud.sh (seed-local-mobile-token.ts,
 	 * seed-cloud-mobile-token.ts): a one-time token redeemable for a real
 	 * session as the real developer/workspace creator, via the dev-only
@@ -32,6 +35,8 @@ const rawEnv: Record<string, string | undefined> = {
 	EXPO_PUBLIC_SENTRY_DSN_MOBILE: process.env.EXPO_PUBLIC_SENTRY_DSN_MOBILE,
 	EXPO_PUBLIC_SENTRY_ENVIRONMENT: process.env.EXPO_PUBLIC_SENTRY_ENVIRONMENT,
 	EXPO_PUBLIC_E2E: process.env.EXPO_PUBLIC_E2E,
+	EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID:
+		process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
 	EXPO_PUBLIC_DEV_ONE_TIME_TOKEN: process.env.EXPO_PUBLIC_DEV_ONE_TIME_TOKEN,
 };
 

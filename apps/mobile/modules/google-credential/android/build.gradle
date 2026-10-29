@@ -1,0 +1,21 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'sh.superset.mobile'
+version = '0.0.1'
+
+expoModule {
+  v2 true
+}
+
+android {
+  namespace "expo.modules.googlecredential"
+}
+
+dependencies {
+  implementation "androidx.credentials:credentials:1.5.0"
+  implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
+  implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
+}

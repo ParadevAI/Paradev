@@ -76,7 +76,8 @@ export default function AuthenticatedLayout() {
   - To port to Android: add `X.android.tsx`, or for a module, add `android/` and `"android"` to
     `expo-module.config.json` and rename the binding `X.native.tsx` so both platforms use it.
   Examples: `modules/composer/src`, `ShareAccess/components/ValueMenu`,
-  `sign-in/utils/signInWithApple`.
+  `sign-in/utils/signInWithApple`. Android-only the other way round: `sign-in/utils/signInWithGoogle`
+  (`.android.ts` on `modules/google-credential`, `.ts` everywhere else).
 - **Bottom sheets are expo-router `formSheet` routes** — `...glassHeaderOptions` gives the native
   title and ✕, the body is RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to
   match ours), and the list stays the screen's only layout child or it cold-mounts at zero height.

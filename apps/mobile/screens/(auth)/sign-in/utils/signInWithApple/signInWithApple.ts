@@ -1,6 +1,2 @@
-import { signIn } from "@/lib/auth/client";
-
-export async function signInWithApple(): Promise<void> {
-	const res = await signIn.social({ provider: "apple", callbackURL: "/" });
-	if (res.error) throw new Error(res.error.message);
-}
+// Sign in with Apple is offered on iOS only, so nothing calls this elsewhere.
+export async function signInWithApple(): Promise<void> {}
