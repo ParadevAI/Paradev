@@ -173,12 +173,12 @@ const config: NextConfig = {
 				permanent: true,
 			},
 			{
-				source: "/:lang(en)?/:page(join-us|career)",
+				source: "/:lang(en)?/:page(join-us|career|hiring)",
 				destination: "/careers",
 				permanent: true,
 			},
 			{
-				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career)`,
+				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career|hiring)`,
 				destination: "/:lang/careers",
 				permanent: true,
 			},
