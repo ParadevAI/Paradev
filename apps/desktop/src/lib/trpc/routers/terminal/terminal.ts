@@ -62,7 +62,7 @@ const terminalProcedure = publicProcedure.use(async ({ next }) => {
  * Sessions are keyed by paneId and linked to workspaces for cwd resolution
  *
  * Environment variables set for terminal sessions:
- * - PATH: Prepends ~/.superset/bin so wrapper scripts intercept agent commands
+ * - PATH: Prepends ~/.paradev/bin so wrapper scripts intercept agent commands
  * - SUPERSET_PANE_ID: The pane ID (used by notification hooks, session key)
  * - SUPERSET_TAB_ID: The tab ID (parent of pane, used by notification hooks)
  * - SUPERSET_WORKSPACE_ID: The workspace ID (used by notification hooks)

@@ -271,7 +271,7 @@ async function sample(): Promise<string> {
 }
 
 /**
- * Appends one JSON line a minute to ~/.superset/resources.jsonl: machine
+ * Appends one JSON line a minute to ~/.paradev/resources.jsonl: machine
  * memory, then every Superset process by role (desktop main, renderers,
  * helpers, each host-service, each pty-daemon and its terminals), then the
  * heaviest other processes, so a slow or leaking host can be diagnosed from

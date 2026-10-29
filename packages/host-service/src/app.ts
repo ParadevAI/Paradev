@@ -41,6 +41,7 @@ import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-ro
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
 import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
@@ -146,6 +147,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	void applyLegacyHomeMove(db);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.

@@ -8,9 +8,6 @@ export const PLATFORM = {
 };
 
 const workspace = getWorkspaceName();
-export const SUPERSET_DIR_NAME = workspace
-	? `.superset-${workspace}`
-	: ".superset";
 export const PROTOCOL_SCHEME = workspace
 	? `superset-${workspace}`
 	: PROTOCOL_SCHEMES.PROD;

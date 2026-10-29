@@ -31,7 +31,7 @@ import {
  * process and the standalone (CLI-launched) host-service alike.
  *
  * Callers without their own settings store (headless hosts) omit
- * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.superset mirror files
+ * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.paradev mirror files
  * (agent-hooks.json, disabled-skills.json) and their SUPERSET_DISABLED_*
  * env overrides apply instead, so a machine running both the desktop and CLI
  * hosts converges on one disable set.

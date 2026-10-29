@@ -19,7 +19,7 @@ function describe(result: ConfigCheckResult): string {
 
 export default command({
 	description:
-		"Validate the config file under ~/.superset before a hand edit or a bad restore surfaces as an auth failure; exits 1 on an error",
+		"Validate the config file under ~/.paradev before a hand edit or a bad restore surfaces as an auth failure; exits 1 on an error",
 	skipMiddleware: true,
 	run: async () => {
 		const result = checkConfigFile(getSupersetConfigPath());

@@ -144,7 +144,7 @@ json_escape() {
 # is frozen into the agent's env at terminal creation; after a host-service
 # restart on a new port it would point at a dead socket forever (a live
 # process's env can't change). Each org's manifest
-# (~/.superset/host/<orgId>/manifest.json) is rewritten with the live endpoint
+# (~/.paradev/host/<orgId>/manifest.json) is rewritten with the live endpoint
 # on every start, so it never goes stale. Try the env URL first (fast path),
 # then every org manifest's endpoint. Only the host that owns this terminal
 # answers "ignored":false; probing the other orgs' hosts is a harmless no-op.

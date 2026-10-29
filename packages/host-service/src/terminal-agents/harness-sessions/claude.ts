@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { claudeProjectDirName } from "@superset/agent-setup/claude-project-links";
 import { isFile } from "./is-file";
 import type {
 	HarnessEnv,
@@ -9,30 +10,8 @@ import type {
 	HarnessSessionStore,
 } from "./types";
 
-/**
- * Claude Code names a session's project directory after its working directory
- * (resolved through symlinks, NFC-normalized) with every non-alphanumeric
- * UTF-16 code unit replaced by `-`, and past 200 characters truncates it and
- * appends a hash of the full path.
- */
-const PROJECT_DIR_MAX_LENGTH = 200;
 /** Project directories scanned when looking a session up by id alone. */
 const MAX_PROJECT_DIRS_SCANNED = 5000;
-
-function projectPathHash(path: string): string {
-	let hash = 0;
-	for (let i = 0; i < path.length; i++) {
-		hash = ((hash << 5) - hash + path.charCodeAt(i)) | 0;
-	}
-	return Math.abs(hash).toString(36);
-}
-
-export function claudeProjectDirName(worktreePath: string): string {
-	const path = worktreePath.normalize("NFC").replace(/(?<=.)[\\/]+$/, "");
-	const encoded = path.replaceAll(/[^a-zA-Z0-9]/g, "-");
-	if (encoded.length <= PROJECT_DIR_MAX_LENGTH) return encoded;
-	return `${encoded.slice(0, PROJECT_DIR_MAX_LENGTH)}-${projectPathHash(path)}`;
-}
 
 function defaultConfigDir(): string {
 	return join(homedir(), ".claude");

@@ -176,8 +176,8 @@ step_delete_neon_branch() {
 step_deallocate_port() {
   echo "🔌 Deallocating port base..."
 
-  local alloc_file="$HOME/.superset/port-allocations.json"
-  local lock_dir="$HOME/.superset/port-allocations.lock"
+  local alloc_file="$(prod_app_home)/port-allocations.json"
+  local lock_dir="$(prod_app_home)/port-allocations.lock"
 
   if [ ! -f "$alloc_file" ]; then
     warn "No port allocations file found, skipping"
