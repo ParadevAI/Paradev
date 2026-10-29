@@ -1,0 +1,1 @@
+ALTER TABLE `chat_sessions_local` ADD `closed_at` integer DEFAULT 0;

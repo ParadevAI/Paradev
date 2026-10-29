@@ -671,6 +671,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
 			const wasLive = options.live.get(parsed.sessionId) !== null;
+			options.sessions.markClosed(parsed.sessionId);
 			replays.delete(parsed.sessionId);
 			subagentItems.forget(parsed.sessionId);
 			try {

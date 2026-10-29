@@ -148,6 +148,7 @@ export function createAgentSessionClient(
 					title: options.title ?? null,
 					queuedCount: 0,
 					updatedAt: head.updatedAt ?? now(),
+					closedAt: null,
 				},
 				cursor: head.cursor,
 				live: true,

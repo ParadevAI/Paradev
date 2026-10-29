@@ -41,6 +41,7 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 			title: init.title ?? null,
 			queuedCount: 0,
 			updatedAt: Date.now(),
+			closedAt: null,
 		});
 		return { epoch, minted: true };
 	}

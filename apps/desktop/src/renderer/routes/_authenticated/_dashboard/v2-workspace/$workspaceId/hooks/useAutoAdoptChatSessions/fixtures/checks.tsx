@@ -212,6 +212,7 @@ function session(id: string): Session {
 		title: null,
 		queuedCount: 1,
 		updatedAt: 1,
+		closedAt: null,
 		live: true,
 		terminalId: `terminal-${id}`,
 	};

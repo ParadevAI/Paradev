@@ -72,6 +72,17 @@ export function removeSessionRow(db: ChatDb, sessionId: string): void {
 		.run();
 }
 
+export function markSessionClosed(
+	db: ChatDb,
+	sessionId: string,
+	closedAt: number,
+): void {
+	db.update(chatSessionsLocal)
+		.set({ closedAt })
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
 export function writeSessionProjection(
 	db: ChatDb,
 	sessionId: string,
@@ -88,6 +99,10 @@ export class ChatSessionStore {
 
 	get(sessionId: string): ChatSessionRow | null {
 		return readSessionRow(this.db, sessionId);
+	}
+
+	markClosed(sessionId: string, closedAt = Date.now()): void {
+		markSessionClosed(this.db, sessionId, closedAt);
 	}
 
 	list(): ChatSessionRow[] {

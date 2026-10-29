@@ -30,6 +30,7 @@ import { readComposerDraft } from "../usePaneRegistry/components/ChatSession/com
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { PENDING_CLOUD_CHAT_TIMEOUT_MS } from "./constants";
 import { initialCloudChatPromptHash } from "./utils/initialCloudChatPrompt";
+import { latestOpenChatSessions } from "./utils/latestOpenChatSessions";
 import { unresolvedPollDelay } from "./utils/unresolvedPollDelay";
 
 type PaneStore = StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -254,14 +255,11 @@ export function useAutoAdoptChatSessions({
 			}
 		}
 
-		const toAdopt = result.sessions
+		const toAdopt = latestOpenChatSessions(result.sessions, attached)
 			.filter(
 				(session) =>
-					session.live &&
 					!result.unresolved.includes(session.sessionId) &&
 					!isChatSessionClosed(session.sessionId) &&
-					!attached.has(session.sessionId) &&
-					!(session.terminalId && attached.has(session.terminalId)) &&
 					!(session.terminalId && isChatTerminalClosed(session.terminalId)) &&
 					!(
 						typeof result.promptHashes[session.sessionId] === "string" &&
