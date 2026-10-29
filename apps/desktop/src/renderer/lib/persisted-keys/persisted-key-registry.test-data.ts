@@ -83,9 +83,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/markdown-preferences/store.ts",
 		["markdown-preferences"],
 	],
-	["src/renderer/stores/file-explorer.ts", ["file-explorer-store"]],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
-	["src/renderer/stores/search-dialog-state.ts", ["search-dialog-store"]],
 	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
 	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
