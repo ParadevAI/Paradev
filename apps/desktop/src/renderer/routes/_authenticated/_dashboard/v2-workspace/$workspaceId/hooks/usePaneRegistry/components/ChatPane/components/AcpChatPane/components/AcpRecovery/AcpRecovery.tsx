@@ -1,15 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useRef } from "react";
 import {
 	AGENT_CLI_UPDATE_DOCS_URL,
 	type RunInTerminal,
 	useAgentCliUpdate,
 } from "../../../../../../hooks/useAgentCliUpdate";
-import {
-	AgentCliUpdateCard,
-	type AgentCliUpdateCardAction,
-} from "../../../../../AgentCliUpdateCard";
 
 /**
  * Shown when the chat cannot be used: the agent session had no transcript to
@@ -65,58 +62,62 @@ export function AcpRecovery({
 	const minVersion = status?.minVersion;
 	const updating = phase === "updating";
 	if (tooOld || updating) {
-		const actions: AgentCliUpdateCardAction[] = [];
-		if (!updating && canUpdate) {
-			actions.push({
-				id: "update",
-				label: <Trans>Update {label}</Trans>,
-				title: status?.updateCommand ?? undefined,
-				onClick: () => void update(),
-			});
-		}
-		if (!updating && !canUpdate) {
-			actions.push({
-				id: "docs",
-				label: <Trans>How to update</Trans>,
-				href: AGENT_CLI_UPDATE_DOCS_URL,
-			});
-		}
-		if (onResume) {
-			actions.push({
-				id: "resume",
-				label: <Trans>Resume</Trans>,
-				onClick: onResume,
-			});
-		}
-		actions.push({
-			id: "new",
-			label: <Trans>Start a new chat</Trans>,
-			onClick: onStartNew,
-		});
 		return (
-			<div className="flex h-full w-full items-center justify-center p-8">
-				<AgentCliUpdateCard
-					actions={actions}
-					className="w-full max-w-sm"
-					description={
-						updating ? (
+			<div
+				className="flex h-full w-full flex-col items-center justify-center gap-4 p-8 text-center"
+				data-testid="agent-cli-update-recovery"
+			>
+				<div className="flex max-w-sm flex-col items-center gap-1 text-sm">
+					<p className="flex items-center gap-2 font-medium text-foreground">
+						{updating && (
+							<LoaderCircle className="size-3.5 animate-spin text-muted-foreground" />
+						)}
+						{updating ? (
+							<Trans>Updating {label}…</Trans>
+						) : (
+							<Trans>{label} needs an update</Trans>
+						)}
+					</p>
+					<p className="text-muted-foreground">
+						{updating ? (
 							<Trans>The chat resumes after the update.</Trans>
 						) : (
 							<Trans>
 								Chat needs {minVersion} or newer. {installed} is installed.
 							</Trans>
-						)
-					}
-					state={updating ? "updating" : "required"}
-					testId="agent-cli-update-recovery"
-					title={
-						updating ? (
-							<Trans>Updating {label}…</Trans>
+						)}
+					</p>
+				</div>
+				<div className="flex gap-2">
+					{!updating &&
+						(canUpdate ? (
+							<Button
+								onClick={() => void update()}
+								size="sm"
+								title={status?.updateCommand ?? undefined}
+							>
+								<Trans>Update {label}</Trans>
+							</Button>
 						) : (
-							<Trans>{label} needs an update</Trans>
-						)
-					}
-				/>
+							<Button asChild size="sm">
+								<a
+									href={AGENT_CLI_UPDATE_DOCS_URL}
+									rel="noopener noreferrer"
+									target="_blank"
+								>
+									<Trans>How to update</Trans>
+								</a>
+							</Button>
+						))}
+					{onResume && (
+						<Button onClick={onResume} size="sm" variant="ghost">
+							<Trans>Resume</Trans>
+						</Button>
+					)}
+					<Button onClick={onStartNew} size="sm" variant="ghost">
+						<Trans>Start a new chat</Trans>
+					</Button>
+				</div>
 			</div>
 		);
 	}
