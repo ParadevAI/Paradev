@@ -96,6 +96,7 @@ function setup(
 		credentials?: TurnCredentials;
 		steers?: () => SteerInput[];
 		model?: string;
+		mainModel?: string;
 	} = {},
 ) {
 	const memory = memoryStore();
@@ -122,6 +123,7 @@ function setup(
 			command: FAKE_PDEV,
 			workRoot: join(root, "sessions"),
 			...(options.model ? { model: options.model } : {}),
+			...(options.mainModel ? { mainModel: options.mainModel } : {}),
 			env: { FAKE_PDEV_LOG: logFile },
 		},
 		turnSteers: async () => options.steers?.() ?? [],
@@ -375,10 +377,18 @@ describe("runTurn", () => {
 				tools: { mcpUrl: "http://api/mcp/agent" },
 				agentToken: "turn-token",
 			},
+			model: "pdev/auto",
+			mainModel: "vercel-ai-gateway/anthropic/claude-haiku-5-5",
 		});
 		await runOne(activities, "hello");
 		const start = pdevLog().find((e) => e.event === "start");
 		expect(start?.env.PDEV_NO_WORKSPACE).toBe("1");
+		expect(
+			pdevLog().find((e) => e.method === "session/set_config_option")?.params,
+		).toMatchObject({
+			configId: "model",
+			value: "vercel-ai-gateway/anthropic/claude-haiku-5-5",
+		});
 		expect(start?.appendSystem).toContain("You are Ada");
 		expect(start?.appendSystem).toContain("Be brief.");
 		const mcp = JSON.parse(start?.mcp ?? "{}");

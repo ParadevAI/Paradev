@@ -36,6 +36,8 @@ export interface PdevLaunch {
 	workRoot: string;
 	/** `provider/model`, written as pdev's default model. Unset: the router's default. */
 	model?: string;
+	/** The model for a Dev's main session, which people wait on; unset uses `model`. */
+	mainModel?: string;
 	/** Extra environment, for local runs. */
 	env?: NodeJS.ProcessEnv;
 }
@@ -91,6 +93,8 @@ const IN_ROOM =
 const TOKEN_REFRESH_MS = 4 * 60_000;
 const TURN_TOKEN_HEADER = "x-agent-turn-token";
 const PROVISIONING_WAIT_MS = 10 * 60_000;
+/** A main session has no machine and no subagents, so nothing restarts it once it is idle. */
+const MAIN_SETTLE_IDLE_MS = 200;
 const PROVISIONING_POLL_MS = 5_000;
 const RESUMED =
 	"This turn stopped before it finished, because the machine running you restarted or the model request failed. Continue from where it stopped. Check the current state before you repeat any action.";
@@ -241,9 +245,16 @@ export function createActivities(deps: ActivityDeps) {
 					mode: 0o600,
 				});
 			if (credentials.tools) await writeHeaders(credentials.agentToken ?? "");
+			const isMain = credentials.session?.kind === "main";
+			const idleFor = isMain
+				? Math.min(settleIdleMs, MAIN_SETTLE_IDLE_MS)
+				: settleIdleMs;
+			const model = isMain
+				? (deps.pdev.mainModel ?? deps.pdev.model)
+				: deps.pdev.model;
 			await writeAgentSettings({
 				agentDir,
-				model: deps.pdev.model,
+				model,
 				system: systemFor(credentials),
 				tools: credentials.tools
 					? { mcpUrl: credentials.tools.mcpUrl, headersFile }
@@ -278,6 +289,7 @@ export function createActivities(deps: ActivityDeps) {
 			const session = new PdevSession({
 				command: deps.pdev.command,
 				cwd,
+				...(model ? { model } : {}),
 				env: await pdevEnv(credentials, home, agentDir),
 				onUpdate: (update) => {
 					if (!HIDDEN_UPDATES.has(update.sessionUpdate)) {
@@ -355,11 +367,9 @@ export function createActivities(deps: ActivityDeps) {
 					}
 					if (session.idle) {
 						idleSince ??= now();
-						if (now() - idleSince >= settleIdleMs) break;
+						if (now() - idleSince >= idleFor) break;
 					} else idleSince = null;
-					await session.waitForChange(
-						session.idle ? settleIdleMs : pollEveryMs,
-					);
+					await session.waitForChange(session.idle ? idleFor : pollEveryMs);
 				}
 				await flusher.flush();
 				await syncFile();

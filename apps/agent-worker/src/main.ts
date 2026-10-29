@@ -76,6 +76,9 @@ const worker = await Worker.create({
 			command: pdevBin,
 			workRoot: process.env.AGENT_WORK_ROOT ?? join(tmpdir(), "agent-sessions"),
 			...(process.env.AGENT_MODEL ? { model: process.env.AGENT_MODEL } : {}),
+			...(process.env.AGENT_MAIN_MODEL
+				? { mainModel: process.env.AGENT_MAIN_MODEL }
+				: {}),
 		},
 		turnSteers: (workflowId, turnId) =>
 			client.workflow.getHandle(workflowId).query(turnSteersQuery, turnId),

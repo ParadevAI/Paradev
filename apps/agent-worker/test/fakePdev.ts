@@ -231,6 +231,8 @@ for await (const line of createInterface({ input: process.stdin })) {
 			entries: readFileSync(file, "utf8").trim().split("\n").length,
 		});
 		send({ jsonrpc: "2.0", id: msg.id, result: {} });
+	} else if (msg.method === "session/set_config_option") {
+		send({ jsonrpc: "2.0", id: msg.id, result: { configOptions: [] } });
 	} else if (msg.method === "session/prompt") {
 		send({ jsonrpc: "2.0", id: msg.id, result: { messageId: `user-${n}` } });
 		run(msg.params.prompt[0].text);

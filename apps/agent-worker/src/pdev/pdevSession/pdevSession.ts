@@ -16,6 +16,8 @@ export interface PdevSessionOptions {
 	command: string;
 	cwd: string;
 	env: NodeJS.ProcessEnv;
+	/** `provider/model` for this run; a resumed session otherwise keeps the model it was made with. */
+	model?: string;
 	onUpdate(update: AcpSessionUpdate): void;
 	onStderr?(chunk: string): void;
 }
@@ -105,6 +107,26 @@ export class PdevSession {
 				STARTUP_TIMEOUT_MS,
 			)) as { sessionId: string };
 			this.sessionId = created.sessionId;
+		}
+		if (this.options.model) {
+			// A bad model setting must not stop a Dev answering: keep the session's model.
+			await this.client
+				.request(
+					"session/set_config_option",
+					{
+						sessionId: this.sessionId,
+						configId: "model",
+						type: "id",
+						value: this.options.model,
+					},
+					STARTUP_TIMEOUT_MS,
+				)
+				.catch((error: unknown) =>
+					console.warn(
+						`[pdev] could not switch to ${this.options.model}; keeping the session's model`,
+						error instanceof Error ? error.message : error,
+					),
+				);
 		}
 		return this.sessionId;
 	}

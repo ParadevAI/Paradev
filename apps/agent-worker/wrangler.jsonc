@@ -8,7 +8,8 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"vars": {
 		"AGENT_API_URL": "https://api.superset.sh",
-		"AGENT_ROUTER_URL": "https://router.superset.sh"
+		"AGENT_ROUTER_URL": "https://router.superset.sh",
+		"AGENT_MAIN_MODEL": "vercel-ai-gateway/anthropic/claude-sonnet-5.5"
 	},
 	// Secrets come from GitHub on each deploy (deploy-production.yml): AGENT_WORKER_SECRET and TEMPORAL_*.
 	"containers": [
