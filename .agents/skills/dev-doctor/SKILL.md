@@ -63,7 +63,7 @@ Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-3241699
 PostHog (`exec`): count `dev_reconciler_fixed` by `fix`, and `dev_turn_retried` by `reason`, over
 the last 7 days.
 
-Sentry: `search_issues` in organization `superset-sh` for `agent-worker`, `agentWorker`, `devTools`
+Sentry: `search_issues` in organization `paradev` for `agent-worker`, `agentWorker`, `devTools`
 and `reconcile`, unresolved, last 7 days.
 
 ### 2. Group by cause
