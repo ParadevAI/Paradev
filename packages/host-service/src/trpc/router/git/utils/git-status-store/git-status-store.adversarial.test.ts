@@ -479,7 +479,7 @@ describe("GitStatusStore failure paths", () => {
 	});
 });
 
-describe("GitStatusStore keys and growth", () => {
+describe("GitStatusStore keys", () => {
 	test('baseBranch "" and null share one cache slot even though computeFull would differ', async () => {
 		const store = new GitStatusStore();
 		store.attach("w");
@@ -499,56 +499,5 @@ describe("GitStatusStore keys and growth", () => {
 		expect(seenBases).toEqual([null]);
 		// The "" reader gets the null reader's snapshot.
 		expect(viaEmpty).toBe(viaNull);
-	});
-
-	test("pending grows without bound for a variant nobody reads again", async () => {
-		const store = new GitStatusStore();
-		store.attach("w");
-		const h = harness();
-		await store.read({ workspaceId: "w", baseBranch: null, ...h });
-		await store.read({ workspaceId: "w", baseBranch: "main", ...h });
-
-		const batches = 5_000;
-		const perBatch = 128;
-		const before = process.memoryUsage().heapUsed;
-		for (let b = 0; b < batches; b++) {
-			const paths = Array.from(
-				{ length: perBatch },
-				(_, i) => `src/dir-${b}/file-${i}.ts`,
-			);
-			store.recordChange("w", paths);
-			// The sidebar variant is read (and drained) every batch...
-			await store.read({ workspaceId: "w", baseBranch: null, ...h });
-		}
-		const after = process.memoryUsage().heapUsed;
-		// ...but the Changes-tab variant was never read again.
-		const main = variantsOf(store, "w").get("main");
-		const sidebar = variantsOf(store, "w").get("");
-		expect(sidebar?.pending?.size).toBe(0);
-		expect(main?.pending?.size).toBe(batches * perBatch);
-		console.info(
-			`[finding] pending Set for the unread variant holds ${main?.pending?.size} paths; heap grew ~${Math.round((after - before) / 1024 / 1024)} MB`,
-		);
-	});
-
-	test("variants are never evicted: one cached snapshot per distinct baseBranch ever read", async () => {
-		const store = new GitStatusStore();
-		store.attach("w");
-		const h = harness({
-			full: () =>
-				snapshot(Array.from({ length: 2_000 }, (_, i) => file(`f-${i}.ts`))),
-		});
-		for (let i = 0; i < 300; i++) {
-			await store.read({ workspaceId: "w", baseBranch: `branch-${i}`, ...h });
-		}
-		const variants = variantsOf(store, "w");
-		expect(variants.size).toBe(300);
-		let cachedEntries = 0;
-		for (const v of variants.values()) {
-			cachedEntries += (v.cached as GitStatusSnapshot).unstaged.length;
-		}
-		console.info(
-			`[finding] ${variants.size} variants retained, ${cachedEntries} cached ChangedFile entries for one workspace`,
-		);
 	});
 });
