@@ -12101,9 +12101,6 @@ msgstr "Нет звёзд за этот период."
 msgid "No Stripe customer found"
 msgstr "Клиент Stripe не найден"
 
-msgid "No subagents yet"
-msgstr "Пока нет субагентов"
-
 msgid "no tags"
 msgstr "нет тегов"
 
@@ -12359,9 +12356,6 @@ msgstr "Повторять нечего"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "За последние 30 дней ещё ничего не опубликовано. Ваше место появится, как только синхронизируется использование с этой машины; публикация как <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Ничего не запущено"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Пока нечего форкать. Сначала отправьте сообщение."

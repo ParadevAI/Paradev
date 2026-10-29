@@ -12101,9 +12101,6 @@ msgstr "Không có star nào trong khoảng này."
 msgid "No Stripe customer found"
 msgstr "Không tìm thấy khách hàng Stripe"
 
-msgid "No subagents yet"
-msgstr "Chưa có agent con nào"
-
 msgid "no tags"
 msgstr "không có thẻ"
 
@@ -12359,9 +12356,6 @@ msgstr "Không có gì cần chạy lại"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của bạn sẽ xuất hiện khi dữ liệu sử dụng từ máy này đồng bộ, công khai dưới tên <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Không có gì đang chạy"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Chưa có gì để fork. Hãy gửi một tin nhắn trước."

@@ -12101,9 +12101,6 @@ msgstr "No stars in this range."
 msgid "No Stripe customer found"
 msgstr "No Stripe customer found"
 
-msgid "No subagents yet"
-msgstr "No subagents yet"
-
 msgid "no tags"
 msgstr "no tags"
 
@@ -12359,9 +12356,6 @@ msgstr "Nothing needs a retry"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Nothing running"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Nothing to fork yet. Send a message first."

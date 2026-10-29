@@ -12101,9 +12101,6 @@ msgstr "Geen sterren in dit bereik."
 msgid "No Stripe customer found"
 msgstr "Geen Stripe-klant gevonden"
 
-msgid "No subagents yet"
-msgstr "Nog geen subagents"
-
 msgid "no tags"
 msgstr "geen tags"
 
@@ -12359,9 +12356,6 @@ msgstr "Niets hoeft opnieuw te worden geprobeerd"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zodra het gebruik van deze machine is gesynchroniseerd, gepubliceerd als <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Er draait niets"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Nog niets om te forken. Stuur eerst een bericht."

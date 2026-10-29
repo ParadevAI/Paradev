@@ -12101,9 +12101,6 @@ msgstr "V tomto období žádné hvězdy."
 msgid "No Stripe customer found"
 msgstr "Nenalezen žádný zákazník ve Stripe"
 
-msgid "No subagents yet"
-msgstr "Zatím žádní subagenti"
-
 msgid "no tags"
 msgstr "žádné štítky"
 
@@ -12359,9 +12356,6 @@ msgstr "Není co opakovat"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se objeví, jakmile se synchronizuje využití z tohoto počítače; publikujete jako <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Nic neběží"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Zatím není co forkovat. Nejprve pošlete zprávu."

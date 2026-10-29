@@ -12101,9 +12101,6 @@ msgstr "此區間內沒有星標。"
 msgid "No Stripe customer found"
 msgstr "未找到Stripe客戶"
 
-msgid "No subagents yet"
-msgstr "尚無子代理程式"
-
 msgid "no tags"
 msgstr "無標籤"
 
@@ -12359,9 +12356,6 @@ msgstr "沒有需要重試的執行"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "最近 30 天尚未發佈任何資料。這台機器的用量同步後即會顯示你的排名，將以 <0>{handle}</0> 發佈。"
-
-msgid "Nothing running"
-msgstr "沒有正在執行的項目"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "還沒有可分叉的內容。請先傳送一則訊息。"

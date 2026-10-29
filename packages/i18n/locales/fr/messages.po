@@ -12101,9 +12101,6 @@ msgstr "Aucune étoile sur cette période."
 msgid "No Stripe customer found"
 msgstr "Aucun client Stripe trouvé"
 
-msgid "No subagents yet"
-msgstr "Aucun sous-agent pour l’instant"
-
 msgid "no tags"
 msgstr "aucun tag"
 
@@ -12359,9 +12356,6 @@ msgstr "Rien à relancer"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Rien de publié sur les 30 derniers jours pour l'instant. Votre rang apparaîtra dès que l'usage de cette machine sera synchronisé, publié sous <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Rien en cours d'exécution"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Rien à forker pour l'instant. Envoyez d'abord un message."

@@ -12101,9 +12101,6 @@ msgstr "Tidak ada star di rentang ini."
 msgid "No Stripe customer found"
 msgstr "Tidak ada pelanggan Stripe yang ditemukan"
 
-msgid "No subagents yet"
-msgstr "Belum ada subagen"
-
 msgid "no tags"
 msgstr "tanpa tag"
 
@@ -12359,9 +12356,6 @@ msgstr "Tidak ada yang perlu dicoba ulang"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda muncul setelah penggunaan dari mesin ini tersinkron, dipublikasikan sebagai <0>{handle}</0>."
-
-msgid "Nothing running"
-msgstr "Tidak ada yang berjalan"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Belum ada yang bisa di-fork. Kirim pesan terlebih dahulu."

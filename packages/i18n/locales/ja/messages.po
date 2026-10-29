@@ -12101,9 +12101,6 @@ msgstr "この期間にスターはありません。"
 msgid "No Stripe customer found"
 msgstr "Stripeの顧客が見つかりません"
 
-msgid "No subagents yet"
-msgstr "サブエージェントはまだありません"
-
 msgid "no tags"
 msgstr "タグなし"
 
@@ -12359,9 +12356,6 @@ msgstr "再実行が必要なものはありません"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "直近30日に公開された実績はまだありません。このマシンの利用状況が同期されるとランクが表示されます(<0>{handle}</0>として公開)。"
-
-msgid "Nothing running"
-msgstr "実行中のものはありません"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "まだフォークできる内容がありません。先にメッセージを送信してください。"

@@ -12101,9 +12101,6 @@ msgstr "이 기간에는 스타가 없습니다."
 msgid "No Stripe customer found"
 msgstr "Stripe 고객을 찾을 수 없습니다"
 
-msgid "No subagents yet"
-msgstr "아직 서브 에이전트가 없습니다"
-
 msgid "no tags"
 msgstr "태그 없음"
 
@@ -12359,9 +12356,6 @@ msgstr "재시도가 필요한 항목이 없습니다"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기기의 사용량이 동기화되면 <0>{handle}</0>(으)로 게시되며 순위가 표시됩니다."
-
-msgid "Nothing running"
-msgstr "실행 중인 항목 없음"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "아직 포크할 내용이 없습니다. 먼저 메시지를 보내세요."

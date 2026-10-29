@@ -12101,9 +12101,6 @@ msgstr "Bu aralıkta yıldız yok."
 msgid "No Stripe customer found"
 msgstr "Stripe müşterisi bulunamadı"
 
-msgid "No subagents yet"
-msgstr "Henüz alt ajan yok"
-
 msgid "no tags"
 msgstr "etiket yok"
 
@@ -12359,9 +12356,6 @@ msgstr "Yeniden denenecek bir şey yok"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanım eşitlendiğinde sıralamanız görünür; <0>{handle}</0> olarak yayınlanıyor."
-
-msgid "Nothing running"
-msgstr "Çalışan bir şey yok"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "Henüz forklanacak bir şey yok. Önce bir mesaj gönderin."
