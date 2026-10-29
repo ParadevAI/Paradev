@@ -206,6 +206,8 @@ export const agentTurns = pgTable(
 		outputTokens: integer("output_tokens"),
 		costMicrosUsd: bigint("cost_micros_usd", { mode: "number" }),
 		errorCode: text("error_code"),
+		attempts: integer().notNull().default(1),
+		lastAttemptError: text("last_attempt_error"),
 	},
 	(t) => [
 		index("agent_turns_session_idx").on(t.sessionId, t.startedAt),
