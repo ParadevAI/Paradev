@@ -89,6 +89,14 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		expect(res.status).toBe(200);
 	});
 
+	it("leaves the Android assetlinks.json file reachable unauthenticated", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/.well-known/assetlinks.json",
+		);
+
+		expect(res.status).toBe(200);
+	});
+
 	it("does not extend that exemption to other .well-known routes", async () => {
 		const res = await callProxy("https://app.superset.sh/.well-known/secrets");
 
