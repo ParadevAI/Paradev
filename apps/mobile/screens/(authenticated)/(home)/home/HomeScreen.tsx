@@ -38,12 +38,6 @@ import {
 } from "@/hooks/useHostWorkspaces";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
-import {
-	GRID_GAP,
-	gridColumns,
-	useWideLayout,
-	WIDE_GUTTER,
-} from "@/hooks/useWideLayout";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
@@ -90,7 +84,6 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
-import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -152,19 +145,6 @@ function homeListItemKey(item: HomeListItem): string {
 	}
 }
 
-type HomeListEntry = HomeListItem | GridRow<HomeListItem>;
-
-const isGridCell = (item: HomeListItem) =>
-	item.kind === "workspace" || item.kind === "cloudRow";
-
-function homeListEntryKey(entry: HomeListEntry): string {
-	return entry.kind === "gridRow"
-		? gridRowKey(entry, homeListItemKey)
-		: homeListItemKey(entry);
-}
-
-const GRID_MAX_WIDTH = 1080;
-
 const NOTICE_MS = 1500;
 
 export function HomeScreen() {
@@ -195,11 +175,6 @@ export function HomeScreen() {
 	const insets = useSafeAreaInsets();
 	const headerHeight = useHeaderHeight();
 	const readableInset = useReadableInset();
-	const { contentWidth, wide } = useWideLayout();
-	const gridWidth = Math.min(GRID_MAX_WIDTH, contentWidth - 2 * WIDE_GUTTER);
-	const columns = wide ? gridColumns(gridWidth) : 1;
-	const listInset = wide ? (contentWidth - gridWidth) / 2 : readableInset;
-	const cellWidth = (gridWidth - GRID_GAP * (columns - 1)) / columns;
 	const queryClient = useQueryClient();
 	useAppReviewPrompt();
 	const setTargetKey = useNewSessionPreferencesStore(
@@ -518,16 +493,12 @@ export function HomeScreen() {
 		({
 			viewableItems,
 		}: {
-			viewableItems: Array<{ item: HomeListEntry; isViewable: boolean }>;
+			viewableItems: Array<{ item: HomeListItem; isViewable: boolean }>;
 		}) => {
 			setVisibleIds(
 				viewableItems
 					.filter((viewable) => viewable.isViewable)
-					.flatMap((viewable) =>
-						viewable.item.kind === "gridRow"
-							? viewable.item.cells
-							: [viewable.item],
-					)
+					.map((viewable) => viewable.item)
 					.filter((item) => item.kind === "workspace")
 					.slice(0, MAX_VISIBLE_DIFF_STATS)
 					.map((item) => item.workspace.id),
@@ -595,8 +566,8 @@ export function HomeScreen() {
 		[projects],
 	);
 
-	const renderListItem = useCallback(
-		(item: HomeListItem, card: boolean) => {
+	const renderItem = useCallback(
+		({ item }: { item: HomeListItem }) => {
 			if (item.kind === "periodHeader") {
 				return <PeriodHeader label={item.label} />;
 			}
@@ -611,7 +582,6 @@ export function HomeScreen() {
 						now={now}
 						cache={cloudCache}
 						onCopied={handleCopied}
-						card={card}
 					/>
 				);
 			}
@@ -680,7 +650,6 @@ export function HomeScreen() {
 					attention={attentionByWorkspace.get(workspace.id) ?? null}
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
 					onCopied={handleCopied}
-					card={card}
 				/>
 			);
 		},
@@ -702,34 +671,6 @@ export function HomeScreen() {
 			requestComposerFocus,
 			handleCopied,
 		],
-	);
-
-	const listEntries = useMemo(
-		() => toGridRows(listItems, columns, isGridCell),
-		[listItems, columns],
-	);
-
-	const renderItem = useCallback(
-		({ item }: { item: HomeListEntry }) => {
-			if (item.kind !== "gridRow") return renderListItem(item, false);
-			return (
-				<View
-					className="flex-row"
-					style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
-				>
-					{item.cells.map((cell) => (
-						<View
-							key={homeListItemKey(cell)}
-							className="border-border rounded-xl border"
-							style={{ width: cellWidth }}
-						>
-							{renderListItem(cell, true)}
-						</View>
-					))}
-				</View>
-			);
-		},
-		[renderListItem, cellWidth],
 	);
 
 	// The native splash is still up until hideSplash() below; nothing to draw.
@@ -864,11 +805,11 @@ export function HomeScreen() {
 							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
 						paddingBottom: 112,
 						paddingTop: 8,
-						paddingHorizontal: listInset,
+						paddingHorizontal: readableInset,
 					}}
-					data={listEntries}
+					data={listItems}
 					extraData={renderItem}
-					keyExtractor={homeListEntryKey}
+					keyExtractor={homeListItemKey}
 					renderItem={renderItem}
 					ListHeaderComponent={scopeBar}
 					viewabilityConfig={VIEWABILITY_CONFIG}

@@ -42,7 +42,6 @@ export function WorkspaceRow({
 	sessions,
 	cloudStatus,
 	onCopied,
-	card = false,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -54,8 +53,6 @@ export function WorkspaceRow({
 	cloudStatus?: CloudWorkspaceStatus;
 	/** Copy ID landed on the pasteboard; the screen shows its "Copied" notice. */
 	onCopied: () => void;
-	/** A cell of Home's wide grid rather than a row indented under its project. */
-	card?: boolean;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
@@ -100,10 +97,7 @@ export function WorkspaceRow({
 			{/* Default press behavior on purpose: the system context-menu lift
 			    owns the hold animation, and custom press feedback fights it. */}
 			<Pressable
-				className={cn(
-					"bg-background flex-row items-center gap-3 rounded-xl pr-3",
-					card ? "py-3 pl-3" : "py-2 pl-10",
-				)}
+				className="bg-background flex-row items-center gap-3 rounded-xl py-2 pl-10 pr-3"
 				onPress={() =>
 					router.push(`/(authenticated)/workspace/${workspace.id}`)
 				}

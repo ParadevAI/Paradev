@@ -579,3 +579,33 @@ make the same change in `handleRefreshTokenGrant` (keep the
 `superset-patch: refresh-reuse-grace` comment), `bun patch --commit
 'node_modules/@better-auth/oauth-provider'`, then
 `bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+
+## react-native (`react-native@<version>.patch`)
+
+**Why:** On iPhone Duo the status bar and navigation buttons sit in a column on
+one side of the window. UIKit reports it as a side safe area, but
+`ScrollView`'s `contentInsetAdjustmentBehavior` only clears the safe area along
+the scrolling axis, so list rows run under the column. The upstream fix is
+facebook/react-native#59194 (open), built on #58109
+(`experimental_onSafeAreaInsetsChange`, on `main` since 2026-10-09). Neither is
+in 0.88.
+
+**What it changes:** the iOS and shared parts of both PRs. A `View` reports its
+native safe-area insets; a `ScrollView` whose `contentInsetAdjustmentBehavior`
+is not `never` pads its content container by the insets across its scrolling
+axis, and `RCTEnhancedScrollView` stops UIKit adding the same inset again. bun
+cannot apply a patch that creates files, so the two new modules of the PRs
+(`getSafeAreaContentPadding`, `warnOnRepeatedSafeAreaInsetsChanges`) are
+inlined at the end of `ScrollView.js` and `View.js`. The native half is in
+React Native's core, so `app.config.ts` sets `buildReactNativeFromSource`.
+
+**Guard test:** `apps/mobile/react-native-safe-area-scroll-patch.test.ts`.
+
+**Removing:** delete the patch, its `patchedDependencies` entry and
+`buildReactNativeFromSource` once the React Native in use ships #59194.
+
+**Regenerating:** apply `gh pr diff 58109` and `gh pr diff 59194` (React Native
+repo, without Android, tests, rn-tester and API snapshots) to a copy of the
+package with `patch -p3`, inline the two new files as above, and write
+`git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
+before the button column.

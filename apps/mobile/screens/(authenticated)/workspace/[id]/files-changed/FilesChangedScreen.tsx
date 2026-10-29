@@ -15,13 +15,14 @@ import {
 	PanResponder,
 	RefreshControl,
 	Share,
+	useWindowDimensions,
 	View,
 } from "react-native";
 import { useSharedValue, withDecay } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useWideLayout } from "@/hooks/useWideLayout";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
@@ -87,7 +88,8 @@ export function FilesChangedScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
 	const workspaceId = id ?? null;
-	const { contentWidth } = useWideLayout();
+	const { width: windowWidth } = useWindowDimensions();
+	const safeArea = useSafeAreaInsets();
 	const queryClient = useQueryClient();
 
 	const changeset = useWorkspaceChangeset(workspaceId);
@@ -295,7 +297,8 @@ export function FilesChangedScreen() {
 	// Horizontal pan: one shared value, per-segment clamping in HunkSegmentCell.
 	const scrollX = useSharedValue(0);
 	const maxScrollX = useSharedValue(0);
-	const codeViewportWidth = contentWidth - GUTTER_WIDTH;
+	const codeViewportWidth =
+		windowWidth - safeArea.left - safeArea.right - GUTTER_WIDTH;
 
 	const contentWidths = useMemo(() => {
 		const byPath = new Map<string, number>();
@@ -701,6 +704,7 @@ export function FilesChangedScreen() {
 						keyExtractor={(item) => item.key}
 						getItemType={(item) => item.kind}
 						CellRendererComponent={AnimatedCellContainer}
+						contentInsetAdjustmentBehavior="automatic"
 						stickyHeaderIndices={stickyHeaderIndices}
 						stickyHeaderConfig={{ hideRelatedCell: true }}
 						contentContainerStyle={{ paddingBottom: 96 }}

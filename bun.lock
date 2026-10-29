@@ -1465,6 +1465,7 @@
     "@pierre/diffs@1.3.6": "patches/@pierre%2Fdiffs@1.3.6.patch",
     "@xterm/addon-serialize@0.15.0-beta.310": "patches/@xterm%2Faddon-serialize@0.15.0-beta.310.patch",
     "@xterm/addon-webgl@0.20.0-beta.309": "patches/@xterm%2Faddon-webgl@0.20.0-beta.309.patch",
+    "react-native@0.88.1": "patches/react-native@0.88.1.patch",
     "@better-auth/oauth-provider@1.6.22": "patches/@better-auth%2Foauth-provider@1.6.22.patch",
     "metro@0.84.6": "patches/metro@0.84.6.patch",
     "metro@0.87.1": "patches/metro@0.87.1.patch",

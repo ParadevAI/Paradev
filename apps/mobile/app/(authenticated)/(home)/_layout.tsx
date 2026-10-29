@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
-import { sideSafeAreaLayout } from "@/lib/navigation";
 
 export default function HomeLayout() {
 	const { t } = useLingui();
@@ -11,7 +10,6 @@ export default function HomeLayout() {
 				headerBackButtonDisplayMode: "minimal",
 				headerShadowVisible: false,
 			}}
-			screenLayout={sideSafeAreaLayout}
 		>
 			<Stack.Screen name="index" options={{ title: "" }} />
 			<Stack.Screen

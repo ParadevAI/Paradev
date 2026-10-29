@@ -28,6 +28,7 @@ export function HostsSettingsScreen() {
 	return (
 		<ScrollView
 			className="bg-background flex-1"
+			contentInsetAdjustmentBehavior="automatic"
 			contentContainerClassName="pb-12"
 			contentContainerStyle={{ paddingHorizontal: readableInset }}
 		>

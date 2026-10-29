@@ -15,7 +15,6 @@ import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSignOut } from "@/hooks/useSignOut";
 import { useTheme } from "@/hooks/useTheme";
-import { useWideLayout, WIDE_GUTTER } from "@/hooks/useWideLayout";
 import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
@@ -28,9 +27,6 @@ import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
 
 const WRITE_REVIEW_URL = `${COMPANY.APP_STORE_URL}?action=write-review`;
-const WIDE_BLOCK_WIDTH = 864;
-const WIDE_BLOCK_GAP = 24;
-const ACCOUNT_CARD_WIDTH = 280;
 
 function ExternalIcon({ color }: { color: string }) {
 	return <Ionicons name="open-outline" size={16} color={color} />;
@@ -153,312 +149,280 @@ export function SettingsScreen() {
 		github.connect.mutate();
 	};
 
-	// 24pt (px-6) on a phone; on a wide window the account card sits beside
-	// the sections in one centered block.
+	// 24pt (px-6) on a phone; a centered column on iPad.
 	const readableInset = useReadableInset(24);
-	const { contentWidth, wide } = useWideLayout();
-	const blockWidth = Math.min(WIDE_BLOCK_WIDTH, contentWidth - 2 * WIDE_GUTTER);
 	return (
 		<ScrollView
 			className="bg-background flex-1"
+			contentInsetAdjustmentBehavior="automatic"
 			contentContainerStyle={{
 				paddingBottom: insets.bottom,
-				paddingHorizontal: wide
-					? (contentWidth - blockWidth) / 2
-					: readableInset,
+				paddingHorizontal: readableInset,
 			}}
 		>
-			<View
-				className={wide ? "flex-row items-start" : undefined}
-				style={wide ? { gap: WIDE_BLOCK_GAP } : undefined}
-			>
-				<View
-					className={
-						wide ? "border-border mt-4 rounded-xl border px-5 pb-5" : undefined
-					}
-					style={wide ? { width: ACCOUNT_CARD_WIDTH } : undefined}
-				>
-					<View className="items-center pt-4">
-						<UserAvatar
-							name={user?.name ?? "?"}
-							image={user?.image}
-							className="size-20"
-							textClassName="text-xl"
-						/>
-					</View>
-					<View className="gap-1 pt-5">
-						<Text
-							className="text-2xl font-semibold"
-							style={{ color: theme.foreground }}
-						>
-							{user?.name}
-						</Text>
-						<Text
-							className="text-base"
-							style={{ color: theme.mutedForeground }}
-						>
-							{user?.email}
-						</Text>
-						<Text className="text-sm" style={{ color: theme.mutedForeground }}>
-							{joined
-								? t({
-										message: `${planLabel} · Joined ${joined}`,
-									})
-								: planLabel}
-						</Text>
-					</View>
-				</View>
-				<View
-					// A fixed width, not flex-1: a flexed column lets a long row
-					// subtitle take the room its trailing value needs.
-					style={
-						wide
-							? {
-									width: blockWidth - ACCOUNT_CARD_WIDTH - WIDE_BLOCK_GAP,
-								}
-							: undefined
-					}
-				>
-					<SettingsSection
-						label={t({
-							message: "Organization",
-						})}
-					>
-						<ListRow
-							icon={
-								<Ionicons
-									name="people-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: "Organization",
-							})}
-							trailing={
-								<ListRowValue
-									value={activeOrganization?.name ?? ""}
-									accessory={
-										activeOrganization ? (
-											<OrganizationAvatar
-												name={activeOrganization.name}
-												logo={activeOrganization.logo}
-												size={20}
-											/>
-										) : undefined
-									}
-								/>
-							}
-							onPress={() =>
-								router.push("/(authenticated)/settings/organization")
-							}
-						/>
-						{plan ? (
-							<ListRow
-								icon={
-									<Ionicons
-										name="document-text-outline"
-										size={20}
-										color={theme.mutedForeground}
-									/>
-								}
-								label={t({ message: "Pages" })}
-								trailing={
-									<Ionicons
-										name="chevron-forward"
-										size={18}
-										color={theme.mutedForeground}
-									/>
-								}
-								onPress={() => router.push("/(authenticated)/pages")}
-							/>
-						) : null}
-						<ListRow
-							icon={
-								<Ionicons
-									name="desktop-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({ message: "Hosts" })}
-							trailing={
-								<Ionicons
-									name="chevron-forward"
-									size={18}
-									color={theme.mutedForeground}
-								/>
-							}
-							onPress={() => router.push("/(authenticated)/settings/hosts")}
-							isLast
-						/>
-					</SettingsSection>
-
-					{github.available !== false ? (
-						<SettingsSection label={t({ message: "Connections" })}>
-							<ListRow
-								icon={
-									<Ionicons
-										name="logo-github"
-										size={20}
-										color={theme.mutedForeground}
-									/>
-								}
-								label={t({ message: "GitHub" })}
-								subtitle={
-									github.connection
-										? t({
-												message:
-													"Pull requests, comments and pushes from Superset are made as you.",
-											})
-										: t({
-												message:
-													"Connect to act on pull requests as yourself instead of as the workspace.",
-											})
-								}
-								trailing={
-									<ListRowValue
-										value={
-											github.isLoading
-												? ""
-												: github.isError
-													? t({ message: "Couldn't check" })
-													: (github.connection?.login ??
-														t({ message: "Not connected" }))
-										}
-									/>
-								}
-								onPress={
-									github.isLoading || github.isError ? undefined : handleGithub
-								}
-								isLast
-							/>
-						</SettingsSection>
-					) : null}
-
-					<SettingsSection label={t({ message: "Plan", context: "billing" })}>
-						<ListRow
-							icon={
-								<Ionicons
-									name="card-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: "Manage Plan",
-							})}
-							trailing={<ListRowValue value={planLabel} />}
-							onPress={handleManagePlan}
-							isLast
-						/>
-					</SettingsSection>
-
-					<SettingsSection label={t({ message: "Support" })}>
-						<ListRow
-							icon={
-								<Ionicons
-									name="help-circle-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: "Help & Docs",
-							})}
-							trailing={<ExternalIcon color={theme.mutedForeground} />}
-							onPress={() => openUrl(COMPANY.DOCS_URL)}
-						/>
-						<ListRow
-							icon={
-								<Ionicons
-									name="logo-discord"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: "Community",
-							})}
-							trailing={<ExternalIcon color={theme.mutedForeground} />}
-							onPress={() => openUrl(COMPANY.DISCORD_URL)}
-						/>
-						<ListRow
-							icon={
-								<Ionicons
-									name="mail-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: "Contact Support",
-							})}
-							trailing={<ExternalIcon color={theme.mutedForeground} />}
-							onPress={() => openUrl(COMPANY.MAIL_TO)}
-						/>
-						<ListRow
-							icon={
-								<Ionicons
-									name="star-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({
-								message: `Rate ${appName}`,
-							})}
-							trailing={<ExternalIcon color={theme.mutedForeground} />}
-							onPress={() => openUrl(WRITE_REVIEW_URL)}
-							isLast
-						/>
-					</SettingsSection>
-
-					<SettingsSection label={t({ message: "More" })}>
-						<ListRow
-							icon={
-								<Ionicons
-									name="log-out-outline"
-									size={20}
-									color={theme.mutedForeground}
-								/>
-							}
-							label={t({ message: "Sign out" })}
-							onPress={isSigningOut ? undefined : handleSignOut}
-							isLast
-						/>
-					</SettingsSection>
-
-					<SettingsSection
-						label={t({
-							message: "Danger Zone",
-						})}
-					>
-						<ListRow
-							icon={
-								<Ionicons
-									name="trash-outline"
-									size={20}
-									color={theme.destructive}
-								/>
-							}
-							label={t({
-								message: "Delete Account",
-							})}
-							destructive
-							onPress={isDeleting ? undefined : handleDeleteAccount}
-							isLast
-						/>
-					</SettingsSection>
-
-					<Text
-						className="pt-10 text-center text-xs uppercase"
-						style={{ color: theme.mutedForeground }}
-					>
-						{`${BRAND.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
-					</Text>
-				</View>
+			<View className="items-center pt-4">
+				<UserAvatar
+					name={user?.name ?? "?"}
+					image={user?.image}
+					className="size-20"
+					textClassName="text-xl"
+				/>
 			</View>
+			<View className="gap-1 pt-5">
+				<Text
+					className="text-2xl font-semibold"
+					style={{ color: theme.foreground }}
+				>
+					{user?.name}
+				</Text>
+				<Text className="text-base" style={{ color: theme.mutedForeground }}>
+					{user?.email}
+				</Text>
+				<Text className="text-sm" style={{ color: theme.mutedForeground }}>
+					{joined
+						? t({
+								message: `${planLabel} · Joined ${joined}`,
+							})
+						: planLabel}
+				</Text>
+			</View>
+
+			<SettingsSection
+				label={t({
+					message: "Organization",
+				})}
+			>
+				<ListRow
+					icon={
+						<Ionicons
+							name="people-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: "Organization",
+					})}
+					trailing={
+						<ListRowValue
+							value={activeOrganization?.name ?? ""}
+							accessory={
+								activeOrganization ? (
+									<OrganizationAvatar
+										name={activeOrganization.name}
+										logo={activeOrganization.logo}
+										size={20}
+									/>
+								) : undefined
+							}
+						/>
+					}
+					onPress={() => router.push("/(authenticated)/settings/organization")}
+				/>
+				{plan ? (
+					<ListRow
+						icon={
+							<Ionicons
+								name="document-text-outline"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "Pages" })}
+						trailing={
+							<Ionicons
+								name="chevron-forward"
+								size={18}
+								color={theme.mutedForeground}
+							/>
+						}
+						onPress={() => router.push("/(authenticated)/pages")}
+					/>
+				) : null}
+				<ListRow
+					icon={
+						<Ionicons
+							name="desktop-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({ message: "Hosts" })}
+					trailing={
+						<Ionicons
+							name="chevron-forward"
+							size={18}
+							color={theme.mutedForeground}
+						/>
+					}
+					onPress={() => router.push("/(authenticated)/settings/hosts")}
+					isLast
+				/>
+			</SettingsSection>
+
+			{github.available !== false ? (
+				<SettingsSection label={t({ message: "Connections" })}>
+					<ListRow
+						icon={
+							<Ionicons
+								name="logo-github"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "GitHub" })}
+						subtitle={
+							github.connection
+								? t({
+										message:
+											"Pull requests, comments and pushes from Superset are made as you.",
+									})
+								: t({
+										message:
+											"Connect to act on pull requests as yourself instead of as the workspace.",
+									})
+						}
+						trailing={
+							<ListRowValue
+								value={
+									github.isLoading
+										? ""
+										: github.isError
+											? t({ message: "Couldn't check" })
+											: (github.connection?.login ??
+												t({ message: "Not connected" }))
+								}
+							/>
+						}
+						onPress={
+							github.isLoading || github.isError ? undefined : handleGithub
+						}
+						isLast
+					/>
+				</SettingsSection>
+			) : null}
+
+			<SettingsSection label={t({ message: "Plan", context: "billing" })}>
+				<ListRow
+					icon={
+						<Ionicons
+							name="card-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: "Manage Plan",
+					})}
+					trailing={<ListRowValue value={planLabel} />}
+					onPress={handleManagePlan}
+					isLast
+				/>
+			</SettingsSection>
+
+			<SettingsSection label={t({ message: "Support" })}>
+				<ListRow
+					icon={
+						<Ionicons
+							name="help-circle-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: "Help & Docs",
+					})}
+					trailing={<ExternalIcon color={theme.mutedForeground} />}
+					onPress={() => openUrl(COMPANY.DOCS_URL)}
+				/>
+				<ListRow
+					icon={
+						<Ionicons
+							name="logo-discord"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: "Community",
+					})}
+					trailing={<ExternalIcon color={theme.mutedForeground} />}
+					onPress={() => openUrl(COMPANY.DISCORD_URL)}
+				/>
+				<ListRow
+					icon={
+						<Ionicons
+							name="mail-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: "Contact Support",
+					})}
+					trailing={<ExternalIcon color={theme.mutedForeground} />}
+					onPress={() => openUrl(COMPANY.MAIL_TO)}
+				/>
+				<ListRow
+					icon={
+						<Ionicons
+							name="star-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({
+						message: `Rate ${appName}`,
+					})}
+					trailing={<ExternalIcon color={theme.mutedForeground} />}
+					onPress={() => openUrl(WRITE_REVIEW_URL)}
+					isLast
+				/>
+			</SettingsSection>
+
+			<SettingsSection label={t({ message: "More" })}>
+				<ListRow
+					icon={
+						<Ionicons
+							name="log-out-outline"
+							size={20}
+							color={theme.mutedForeground}
+						/>
+					}
+					label={t({ message: "Sign out" })}
+					onPress={isSigningOut ? undefined : handleSignOut}
+					isLast
+				/>
+			</SettingsSection>
+
+			<SettingsSection
+				label={t({
+					message: "Danger Zone",
+				})}
+			>
+				<ListRow
+					icon={
+						<Ionicons
+							name="trash-outline"
+							size={20}
+							color={theme.destructive}
+						/>
+					}
+					label={t({
+						message: "Delete Account",
+					})}
+					destructive
+					onPress={isDeleting ? undefined : handleDeleteAccount}
+					isLast
+				/>
+			</SettingsSection>
+
+			<Text
+				className="pt-10 text-center text-xs uppercase"
+				style={{ color: theme.mutedForeground }}
+			>
+				{`${BRAND.NAME} v${Application.nativeApplicationVersion ?? "0.0.0"} (${Application.nativeBuildVersion ?? "0"})`}
+			</Text>
 		</ScrollView>
 	);
 }

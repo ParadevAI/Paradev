@@ -4,11 +4,7 @@ import { View } from "react-native";
 import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
 import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
-import {
-	glassHeaderOptions,
-	sheetDetents,
-	sideSafeAreaLayout,
-} from "@/lib/navigation";
+import { glassHeaderOptions, sheetDetents } from "@/lib/navigation";
 import { VoiceLayer } from "@/screens/(authenticated)/voice/VoiceLayer";
 
 export const unstable_settings = { anchor: "(home)" };
@@ -44,16 +40,7 @@ export default function AuthenticatedLayout() {
 
 	return (
 		<View className="flex-1">
-			<Stack
-				screenOptions={{ headerShown: false }}
-				// Home's own stack pads its screens, so its header still reaches
-				// the iPhone Duo's right-edge button column.
-				screenLayout={(props) =>
-					props.route.name === "(home)"
-						? props.children
-						: sideSafeAreaLayout(props)
-				}
-			>
+			<Stack screenOptions={{ headerShown: false }}>
 				{/* Root headers are hidden — `title` here only names routes in
 			    back-button long-press menus (otherwise raw route names leak,
 			    e.g. "(home)"). */}
