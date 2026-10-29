@@ -2282,6 +2282,9 @@ msgstr "Tutti i commit"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "Tutti i dati verranno eliminati definitivamente per tutti i {0} membri — l'operazione non può essere annullata."
 
+msgid "All downloads"
+msgstr "Tutti i download"
+
 msgid "All features, side by side"
 msgstr "Tutte le funzioni, a confronto"
 
@@ -2718,6 +2721,9 @@ msgstr "Logo Apple"
 
 msgid "Application menu"
 msgstr "Menu dell'applicazione"
+
+msgid "Applications"
+msgstr "Applicazioni"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "Applica ogni notte gli aggiornamenti sicuri delle dipendenze ed elenca il resto."
@@ -6946,8 +6952,14 @@ msgstr "Scarica {appName} su <0>{0}/download</0>."
 msgid "Download {name}"
 msgstr "Scarica {name}"
 
+msgid "Download again"
+msgstr "Scarica di nuovo"
+
 msgid "Download app"
 msgstr "Scarica l'app"
+
+msgid "Download didn't start?"
+msgstr "Il download non è partito?"
 
 msgid "Download failed"
 msgstr "Download non riuscito"
@@ -7019,6 +7031,9 @@ msgstr "PR in bozza #2841"
 
 msgid "drafted 3 support replies"
 msgstr "preparate 3 risposte di supporto"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "Trascina <0>Paradev</0> nella cartella <1>Applicazioni</1>"
 
 msgid "Drag to reorder"
 msgstr "Trascina per riordinare"
@@ -9241,6 +9256,9 @@ msgstr "Come funzionano i livelli →"
 msgid "How to install {name} in Paradev"
 msgstr "Come installare {name} in Paradev"
 
+msgid "How to install Paradev"
+msgstr "Come installare Paradev"
+
 msgid "How we build it, in long form."
 msgstr "Come lo costruiamo, in dettaglio."
 
@@ -9652,6 +9670,9 @@ msgstr "Istruzioni"
 
 msgid "Integrations"
 msgstr "Integrazioni"
+
+msgid "Intel Mac"
+msgstr "Mac Intel"
 
 msgid "Interactive agent terminal."
 msgstr "Terminale interattivo dell'agente."
@@ -12757,6 +12778,9 @@ msgstr "Apri {parentLabel}"
 msgid "Open {path} in file pane"
 msgstr "Apri {path} nel pannello dei file"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "Apri <0>Paradev</0> dalla cartella <1>Applicazioni</1>"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Apri un compositore di prompt multiriga per il terminale attivo"
 
@@ -13134,6 +13158,9 @@ msgstr "Aprire terminali e dare istruzioni agli agenti"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "Apre il pannello delle modifiche in una nuova scheda, o attiva quello esistente"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "Apri l'immagine disco dalla cartella <0>Download</0>"
 
 msgid "Open the global command palette"
 msgstr "Apri la palette dei comandi globale"
@@ -14435,9 +14462,6 @@ msgstr "Pubblica dalla CLI di Paradev o tramite MCP."
 
 msgid "Publish from your own repo"
 msgstr "Pubblica dal tuo repo"
-
-msgid "Published"
-msgstr "Pubblicato"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "Il tuo agente pubblica design e report. Il team commenta e l'agente si m
 msgid "Your Agents, Your Accounts"
 msgstr "I tuoi agenti, i tuoi account"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "Il tuo browser non indica quale chip hai, quindi questa è la build per Apple Silicon. Su un Mac con Intel, <0>scarica invece la build Intel</0>."
-
 msgid "Your changes"
 msgstr "Le tue modifiche"
 
@@ -21088,8 +21109,8 @@ msgstr "Le tue modifiche andranno perse se non le salvi."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Il tuo codice resta locale per impostazione predefinita, con controllo esplicito sui servizi collegati."
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "Il download parte automaticamente. Se non è partito, scaricalo qui."
+msgid "Your download starts automatically."
+msgstr "Il download parte automaticamente."
 
 msgid "Your email (optional)"
 msgstr "La tua email (facoltativa)"

@@ -2282,6 +2282,9 @@ msgstr "모든 커밋"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "멤버 {0}명 전원의 모든 데이터가 영구적으로 삭제되며, 되돌릴 수 없습니다."
 
+msgid "All downloads"
+msgstr "모든 다운로드"
+
 msgid "All features, side by side"
 msgstr "모든 기능 한눈에 비교"
 
@@ -2718,6 +2721,9 @@ msgstr "Apple 로고"
 
 msgid "Application menu"
 msgstr "애플리케이션 메뉴"
+
+msgid "Applications"
+msgstr "응용 프로그램"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "매일 밤 안전한 의존성 업데이트를 적용하고 나머지는 정리합니다."
@@ -6946,8 +6952,14 @@ msgstr "<0>{0}/download</0>에서 {appName}을 다운로드하세요."
 msgid "Download {name}"
 msgstr "{name} 다운로드"
 
+msgid "Download again"
+msgstr "다시 다운로드"
+
 msgid "Download app"
 msgstr "앱 다운로드"
+
+msgid "Download didn't start?"
+msgstr "다운로드가 시작되지 않았나요?"
 
 msgid "Download failed"
 msgstr "다운로드 실패"
@@ -7019,6 +7031,9 @@ msgstr "초안 PR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "지원 답변 3건 초안 작성"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "<0>Paradev</0>를 <1>응용 프로그램</1> 폴더로 드래그하세요"
 
 msgid "Drag to reorder"
 msgstr "끌어서 순서 변경"
@@ -9241,6 +9256,9 @@ msgstr "등급 산정 방식 →"
 msgid "How to install {name} in Paradev"
 msgstr "Paradev에 {name} 설치하는 방법"
 
+msgid "How to install Paradev"
+msgstr "Paradev 설치 방법"
+
 msgid "How we build it, in long form."
 msgstr "어떻게 만드는지 자세히."
 
@@ -9652,6 +9670,9 @@ msgstr "지침"
 
 msgid "Integrations"
 msgstr "연동"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "대화형 에이전트 터미널입니다."
@@ -12757,6 +12778,9 @@ msgstr "{parentLabel} 열기"
 msgid "Open {path} in file pane"
 msgstr "파일 패널에서 {path} 열기"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "<1>응용 프로그램</1> 폴더에서 <0>Paradev</0>를 여세요"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
 
@@ -13134,6 +13158,9 @@ msgstr "터미널을 열고 에이전트에 지시"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "변경 패널을 새 탭에서 열거나 기존 패널에 포커스합니다"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "<0>다운로드</0> 폴더에서 디스크 이미지를 여세요"
 
 msgid "Open the global command palette"
 msgstr "전역 명령 팔레트를 엽니다"
@@ -14435,9 +14462,6 @@ msgstr "Paradev CLI나 MCP로 게시하세요."
 
 msgid "Publish from your own repo"
 msgstr "내 저장소에서 게시"
-
-msgid "Published"
-msgstr "게시일"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "에이전트가 디자인과 보고서를 게시합니다. 팀이 댓글
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "브라우저가 사용 중인 칩 정보를 제공하지 않아 Apple Silicon 빌드로 표시됩니다. Intel Mac이라면 대신 <0>Intel 빌드를 받으세요</0>."
-
 msgid "Your changes"
 msgstr "내 변경 내용"
 
@@ -21088,8 +21109,8 @@ msgstr "저장하지 않으면 변경 사항이 사라집니다."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "코드는 기본적으로 로컬에 머물고, 연결된 서비스는 명시적으로 통제합니다."
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "다운로드가 자동으로 시작됩니다. 시작되지 않으면 여기서 받으세요."
+msgid "Your download starts automatically."
+msgstr "다운로드가 자동으로 시작됩니다."
 
 msgid "Your email (optional)"
 msgstr "이메일 주소 (선택)"

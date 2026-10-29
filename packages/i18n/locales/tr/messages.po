@@ -2282,6 +2282,9 @@ msgstr "Tüm commit'ler"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "Tüm veriler {0} üyenin tamamı için kalıcı olarak silinecek — bu geri alınamaz."
 
+msgid "All downloads"
+msgstr "Tüm indirmeler"
+
 msgid "All features, side by side"
 msgstr "Tüm özellikler, yan yana"
 
@@ -2718,6 +2721,9 @@ msgstr "Apple logosu"
 
 msgid "Application menu"
 msgstr "Uygulama menüsü"
+
+msgid "Applications"
+msgstr "Uygulamalar"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "Her gece güvenli bağımlılık güncellemelerini uygular ve kalanını listeler."
@@ -6946,8 +6952,14 @@ msgstr "{appName}'i <0>{0}/download</0> adresinden indirin."
 msgid "Download {name}"
 msgstr "{name} temasını indir"
 
+msgid "Download again"
+msgstr "Yeniden indir"
+
 msgid "Download app"
 msgstr "Uygulamayı indir"
+
+msgid "Download didn't start?"
+msgstr "İndirme başlamadı mı?"
 
 msgid "Download failed"
 msgstr "İndirilemedi"
@@ -7019,6 +7031,9 @@ msgstr "Taslak PR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "3 destek yanıtı taslağı hazırladı"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "<0>Paradev</0>'i <1>Uygulamalar</1> klasörüne sürükle"
 
 msgid "Drag to reorder"
 msgstr "Sıralamak için sürükleyin"
@@ -9241,6 +9256,9 @@ msgstr "Katmanlar nasıl işler →"
 msgid "How to install {name} in Paradev"
 msgstr "{name} teması Paradev'e nasıl kurulur"
 
+msgid "How to install Paradev"
+msgstr "Paradev nasıl yüklenir"
+
 msgid "How we build it, in long form."
 msgstr "Nasıl geliştirdiğimiz, ayrıntılı olarak."
 
@@ -9652,6 +9670,9 @@ msgstr "Yönergeler"
 
 msgid "Integrations"
 msgstr "Entegrasyonlar"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "Etkileşimli ajan terminali."
@@ -12757,6 +12778,9 @@ msgstr "{parentLabel} aç"
 msgid "Open {path} in file pane"
 msgstr "{path} dosyasını dosya bölmesinde aç"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "<0>Paradev</0>'i <1>Uygulamalar</1> klasöründen aç"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Etkin terminal için çok satırlı istem düzenleyicisini aç"
 
@@ -13134,6 +13158,9 @@ msgstr "Terminal açabilir ve ajanlara komut verebilir"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "Değişiklikler panelini yeni sekmede açar veya mevcut olana odaklanır"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "Disk görüntüsünü <0>İndirilenler</0> klasöründen aç"
 
 msgid "Open the global command palette"
 msgstr "Genel komut paletini aç"
@@ -14435,9 +14462,6 @@ msgstr "Paradev CLI'dan veya MCP üzerinden yayınlayın."
 
 msgid "Publish from your own repo"
 msgstr "Kendi deponuzdan yayımlayın"
-
-msgid "Published"
-msgstr "Yayınlanma"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "Ajanınız tasarımlar ve raporlar yayınlar. Ekibiniz yorum yapar, ajan
 msgid "Your Agents, Your Accounts"
 msgstr "Sizin ajanlarınız, sizin hesaplarınız"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "Tarayıcınız hangi yongaya sahip olduğunuzu bildirmediğinden bu, Apple Silicon derlemesidir. Intel Mac kullanıyorsanız bunun yerine <0>Intel derlemesini indirin</0>."
-
 msgid "Your changes"
 msgstr "Değişiklikleriniz"
 
@@ -21088,8 +21109,8 @@ msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "İndirme otomatik olarak başlıyor. Başlamadıysa buradan indirin."
+msgid "Your download starts automatically."
+msgstr "İndirmen otomatik olarak başlar."
 
 msgid "Your email (optional)"
 msgstr "E-posta adresiniz (isteğe bağlı)"

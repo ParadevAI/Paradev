@@ -2282,6 +2282,9 @@ msgstr "所有提交"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "全部{0}名成員的所有資料都將被永久刪除——此操作無法復原。"
 
+msgid "All downloads"
+msgstr "所有下載"
+
 msgid "All features, side by side"
 msgstr "所有功能逐項對比"
 
@@ -2718,6 +2721,9 @@ msgstr "Apple 標誌"
 
 msgid "Application menu"
 msgstr "應用程式選單"
+
+msgid "Applications"
+msgstr "應用程式"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "每晚套用安全的相依套件更新，並列出其餘的。"
@@ -6946,8 +6952,14 @@ msgstr "在<0>{0}/download</0>下載{appName}。"
 msgid "Download {name}"
 msgstr "下載{name}"
 
+msgid "Download again"
+msgstr "重新下載"
+
 msgid "Download app"
 msgstr "下載應用"
+
+msgid "Download didn't start?"
+msgstr "下載沒有開始？"
 
 msgid "Download failed"
 msgstr "下載失敗"
@@ -7019,6 +7031,9 @@ msgstr "草稿 PR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "起草了3條支援回覆"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "將 <0>Paradev</0> 拖曳到<1>應用程式</1>資料夾"
 
 msgid "Drag to reorder"
 msgstr "拖曳以重新排序"
@@ -9241,6 +9256,9 @@ msgstr "等級如何計算 →"
 msgid "How to install {name} in Paradev"
 msgstr "如何在Paradev中安裝{name}"
 
+msgid "How to install Paradev"
+msgstr "如何安裝 Paradev"
+
 msgid "How we build it, in long form."
 msgstr "我們如何打造它，深入介紹。"
 
@@ -9652,6 +9670,9 @@ msgstr "說明"
 
 msgid "Integrations"
 msgstr "整合"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "可互動的代理程式終端。"
@@ -12757,6 +12778,9 @@ msgstr "開啟 {parentLabel}"
 msgid "Open {path} in file pane"
 msgstr "在檔案面板中開啟{path}"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "從<1>應用程式</1>資料夾開啟 <0>Paradev</0>"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "為目前終端開啟多行提示詞編輯器"
 
@@ -13134,6 +13158,9 @@ msgstr "開啟終端機並向代理程式下達指令"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "在新分頁中開啟更改面板，或聚焦現有面板"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "從<0>下載項目</0>資料夾開啟磁碟映像檔"
 
 msgid "Open the global command palette"
 msgstr "開啟全域性命令面板"
@@ -14435,9 +14462,6 @@ msgstr "透過 Paradev CLI 或 MCP 發布。"
 
 msgid "Publish from your own repo"
 msgstr "從你自己的儲存庫發布"
-
-msgid "Published"
-msgstr "發布時間"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "你的代理程式發布設計和報告。團隊留言，代理程式隨
 msgid "Your Agents, Your Accounts"
 msgstr "你的代理程式，你的帳號"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "您的瀏覽器未回報裝置使用的晶片，因此這是Apple Silicon版本。若使用Intel的Mac，請改為<0>取得Intel版本</0>。"
-
 msgid "Your changes"
 msgstr "你的變更"
 
@@ -21088,8 +21109,8 @@ msgstr "如果不儲存，你的更改將會丟失。"
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的程式碼預設留在本地，連線哪些服務由你明確決定。"
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "下載將自動開始。若未開始，請由此取得。"
+msgid "Your download starts automatically."
+msgstr "下載會自動開始。"
 
 msgid "Your email (optional)"
 msgstr "你的電子郵件（選填）"

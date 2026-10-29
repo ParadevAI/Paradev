@@ -2282,6 +2282,9 @@ msgstr "Tous les commits"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "Toutes les données seront définitivement supprimées pour les {0} membres — cette action est irréversible."
 
+msgid "All downloads"
+msgstr "Tous les téléchargements"
+
 msgid "All features, side by side"
 msgstr "Toutes les fonctionnalités, côte à côte"
 
@@ -2718,6 +2721,9 @@ msgstr "Logo Apple"
 
 msgid "Application menu"
 msgstr "Menu de l'application"
+
+msgid "Applications"
+msgstr "Applications"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "Applique chaque nuit les mises à jour de dépendances sûres et liste le reste."
@@ -6946,8 +6952,14 @@ msgstr "Téléchargez {appName} sur <0>{0}/download</0>."
 msgid "Download {name}"
 msgstr "Télécharger {name}"
 
+msgid "Download again"
+msgstr "Télécharger à nouveau"
+
 msgid "Download app"
 msgstr "Télécharger l'application"
+
+msgid "Download didn't start?"
+msgstr "Le téléchargement n'a pas démarré ?"
 
 msgid "Download failed"
 msgstr "Échec du téléchargement"
@@ -7019,6 +7031,9 @@ msgstr "PR en brouillon #2841"
 
 msgid "drafted 3 support replies"
 msgstr "3 réponses au support rédigées"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "Faites glisser <0>Paradev</0> dans votre dossier <1>Applications</1>"
 
 msgid "Drag to reorder"
 msgstr "Faites glisser pour réorganiser"
@@ -9241,6 +9256,9 @@ msgstr "Comment fonctionnent les paliers →"
 msgid "How to install {name} in Paradev"
 msgstr "Comment installer {name} dans Paradev"
 
+msgid "How to install Paradev"
+msgstr "Comment installer Paradev"
+
 msgid "How we build it, in long form."
 msgstr "Comment nous le construisons, en détail."
 
@@ -9652,6 +9670,9 @@ msgstr "Instructions"
 
 msgid "Integrations"
 msgstr "Intégrations"
+
+msgid "Intel Mac"
+msgstr "Mac Intel"
 
 msgid "Interactive agent terminal."
 msgstr "Terminal d'agent interactif."
@@ -12757,6 +12778,9 @@ msgstr "Ouvrir {parentLabel}"
 msgid "Open {path} in file pane"
 msgstr "Ouvrir {path} dans le volet Fichier"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "Ouvrez <0>Paradev</0> depuis votre dossier <1>Applications</1>"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "Ouvrir un éditeur de prompt multiligne pour le terminal actif"
 
@@ -13134,6 +13158,9 @@ msgstr "Ouvrir des terminaux et donner des instructions aux agents"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "Ouvre le panneau des modifications dans un nouvel onglet, ou active celui existant"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "Ouvrez l'image disque depuis votre dossier <0>Téléchargements</0>"
 
 msgid "Open the global command palette"
 msgstr "Ouvrir la palette de commandes globale"
@@ -14435,9 +14462,6 @@ msgstr "Publiez depuis la CLI Paradev ou via MCP."
 
 msgid "Publish from your own repo"
 msgstr "Publiez depuis votre propre dépôt"
-
-msgid "Published"
-msgstr "Publiée"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "Votre agent publie des maquettes et des rapports. Votre équipe commente
 msgid "Your Agents, Your Accounts"
 msgstr "Vos agents, vos comptes"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "Votre navigateur n'indique pas quelle puce vous avez : il s'agit donc de la version Apple Silicon. Sur un Mac Intel, préférez <0>la version Intel</0>."
-
 msgid "Your changes"
 msgstr "Vos modifications"
 
@@ -21088,8 +21109,8 @@ msgstr "Vos modifications seront perdues si vous ne les enregistrez pas."
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "Votre code reste local par défaut, avec un contrôle explicite sur les services connectés."
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "Votre téléchargement démarre automatiquement. Sinon, récupérez-le ici."
+msgid "Your download starts automatically."
+msgstr "Votre téléchargement démarre automatiquement."
 
 msgid "Your email (optional)"
 msgstr "Votre e-mail (facultatif)"

@@ -2282,6 +2282,9 @@ msgstr "すべてのコミット"
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "{0}人のメンバー全員のデータが完全に削除されます — この操作は元に戻せません。"
 
+msgid "All downloads"
+msgstr "すべてのダウンロード"
+
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
 
@@ -2718,6 +2721,9 @@ msgstr "Appleのロゴ"
 
 msgid "Application menu"
 msgstr "アプリケーションメニュー"
+
+msgid "Applications"
+msgstr "アプリケーション"
 
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "毎晩、安全な依存関係の更新を適用し、残りを一覧にします。"
@@ -6946,8 +6952,14 @@ msgstr "<0>{0}/download</0>から{appName}をダウンロードしてくださ�
 msgid "Download {name}"
 msgstr "{name}をダウンロード"
 
+msgid "Download again"
+msgstr "もう一度ダウンロード"
+
 msgid "Download app"
 msgstr "アプリをダウンロード"
+
+msgid "Download didn't start?"
+msgstr "ダウンロードが始まりませんか？"
 
 msgid "Download failed"
 msgstr "ダウンロードに失敗しました"
@@ -7019,6 +7031,9 @@ msgstr "ドラフトPR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "サポート返信を3件下書き"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "<0>Paradev</0> を<1>アプリケーション</1>フォルダにドラッグ"
 
 msgid "Drag to reorder"
 msgstr "ドラッグして並べ替え"
@@ -9241,6 +9256,9 @@ msgstr "ティアの仕組み →"
 msgid "How to install {name} in Paradev"
 msgstr "Paradevに{name}をインストールする方法"
 
+msgid "How to install Paradev"
+msgstr "Paradev のインストール方法"
+
 msgid "How we build it, in long form."
 msgstr "どう作っているかを詳しく。"
 
@@ -9652,6 +9670,9 @@ msgstr "指示"
 
 msgid "Integrations"
 msgstr "連携"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "対話型のエージェントターミナル。"
@@ -12757,6 +12778,9 @@ msgstr "{parentLabel}を開く"
 msgid "Open {path} in file pane"
 msgstr "{path}をファイルペインで開く"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "<1>アプリケーション</1>フォルダから <0>Paradev</0> を開く"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "アクティブなターミナル用の複数行プロンプト入力を開く"
 
@@ -13134,6 +13158,9 @@ msgstr "ターミナルを開いてエージェントに指示"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "変更ペインを新しいタブで開くか、既存のペインにフォーカスします"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "<0>ダウンロード</0>フォルダからディスクイメージを開く"
 
 msgid "Open the global command palette"
 msgstr "グローバルコマンドパレットを開く"
@@ -14435,9 +14462,6 @@ msgstr "Paradev CLI か MCP 経由で公開できます。"
 
 msgid "Publish from your own repo"
 msgstr "自分のリポジトリから公開"
-
-msgid "Published"
-msgstr "公開日"
 
 msgctxt "github release action"
 msgid "Published"
@@ -21076,9 +21100,6 @@ msgstr "エージェントがデザインやレポートを公開します。チ
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "お使いのブラウザはチップの種類を報告しないため、これはApple Silicon版です。IntelのMacをお使いの場合は、代わりに<0>Intel版を入手</0>してください。"
-
 msgid "Your changes"
 msgstr "編集中の内容"
 
@@ -21088,8 +21109,8 @@ msgstr "保存しないと変更は失われます。"
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "コードは既定でローカルに留まり、連携するサービスは明示的に制御できます。"
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "ダウンロードは自動的に開始されます。開始されない場合はこちらから取得してください。"
+msgid "Your download starts automatically."
+msgstr "ダウンロードは自動的に始まります。"
 
 msgid "Your email (optional)"
 msgstr "メールアドレス（任意）"
