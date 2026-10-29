@@ -393,4 +393,122 @@ describe("GitStatusStore", () => {
 		expect(h.calls.full).toBe(1);
 		expect(h.calls.partial).toBe(1);
 	});
+
+	test("concurrent reads share one full walk", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		const h = harness({ full: () => snapshot([file("a.ts")]) });
+
+		const [first, second] = await Promise.all([
+			store.read({ workspaceId: "w", baseBranch: null, ...h }),
+			store.read({ workspaceId: "w", baseBranch: null, ...h }),
+		]);
+
+		expect(first).toBe(second);
+		expect(h.calls.full).toBe(1);
+		expect(h.calls.partial).toBe(0);
+	});
+
+	test("a failed full walk does not block the next read", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		let attempt = 0;
+		const h = harness();
+		const computeFull = async () => {
+			if (++attempt === 1) throw new Error("boom");
+			return snapshot([file("ok.ts")]);
+		};
+		const input = {
+			workspaceId: "w",
+			baseBranch: null,
+			computeFull,
+			computePartial: h.computePartial,
+		};
+
+		const first = store.read(input);
+		const second = store.read(input);
+
+		await expect(first).rejects.toThrow("boom");
+		expect((await second).unstaged.map((f) => f.path)).toEqual(["ok.ts"]);
+		expect(attempt).toBe(2);
+	});
+
+	test("a broad change during a partial read forces the next read to walk", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		const h = harness({
+			full: () => snapshot([file("a.ts")]),
+			partial: (paths) => ({ paths, unstaged: [file("b.ts")] }),
+		});
+
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+		store.recordChange("w", ["b.ts"]);
+		await store.read({
+			workspaceId: "w",
+			baseBranch: null,
+			computeFull: h.computeFull,
+			computePartial: async (paths) => {
+				store.recordChange("w", undefined);
+				return h.computePartial(paths);
+			},
+		});
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+
+		expect(h.calls.full).toBe(2);
+	});
+
+	test("a partial read with an empty scope keeps the cache and clears pending", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		const cached = snapshot([file("a.ts")]);
+		const h = harness({
+			full: () => cached,
+			partial: () => ({ paths: [], unstaged: [] }),
+		});
+
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+		store.recordChange("w", ["../escape"]);
+		const result = await store.read({
+			workspaceId: "w",
+			baseBranch: null,
+			...h,
+		});
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+
+		expect(result).toBe(cached);
+		expect(h.calls.full).toBe(1);
+		expect(h.calls.partial).toBe(1);
+	});
+
+	test("attaching again keeps the cache", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		const h = harness();
+
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+		store.attach("w");
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+
+		expect(h.calls.full).toBe(1);
+	});
+
+	test("a drop during a full walk does not cache its result", async () => {
+		const store = new GitStatusStore();
+		store.attach("w");
+		const h = harness();
+
+		await store.read({
+			workspaceId: "w",
+			baseBranch: null,
+			computeFull: async () => {
+				store.drop("w");
+				store.attach("w");
+				return h.computeFull();
+			},
+			computePartial: h.computePartial,
+		});
+		await store.read({ workspaceId: "w", baseBranch: null, ...h });
+
+		expect(h.calls.full).toBe(2);
+	});
 });
