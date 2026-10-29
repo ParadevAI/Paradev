@@ -1172,6 +1172,9 @@ msgstr "{productName} dünya genelinde Netflix, Microsoft, NVIDIA, DoorDash, Wix
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, {productName}'i YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
 
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName}, Ekim 2026'ya kadar {formerName} adını taşıyordu."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 

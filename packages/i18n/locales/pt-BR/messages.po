@@ -1172,6 +1172,9 @@ msgstr "O {productName} é usado por engenheiros da Netflix, Microsoft, NVIDIA, 
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "O {productName} captou uma rodada seed de US$ 11,5 milhões liderada pela Union Square Ventures, com Y Combinator e Paul Graham. O TechCrunch o apontou como uma das startups de destaque do YC Demo Day."
 
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} se chamava {formerName} até outubro de 2026."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 

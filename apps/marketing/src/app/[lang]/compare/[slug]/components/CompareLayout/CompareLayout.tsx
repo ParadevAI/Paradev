@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import type { ReactNode } from "react";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
@@ -9,6 +10,10 @@ import {
 	formatCompareDate,
 	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
+
+const productName = BRAND.NAME;
+const formerName = BRAND.FORMER_NAME;
+const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
 
 interface CompareLayoutProps {
 	page: ComparisonPage;
@@ -62,6 +67,14 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 								{formattedDate}
 							</time>
 						</div>
+
+						{isRenamed && (
+							<p className="mt-2 text-sm text-muted-foreground">
+								<Trans>
+									{productName} was called {formerName} until October 2026.
+								</Trans>
+							</p>
+						)}
 					</div>
 				</div>
 

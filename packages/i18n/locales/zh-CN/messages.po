@@ -1172,6 +1172,9 @@ msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 M
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 

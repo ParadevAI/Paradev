@@ -1172,6 +1172,9 @@ msgstr "{productName} digunakan oleh engineer di Netflix, Microsoft, NVIDIA, Doo
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} bernama {formerName} hingga Oktober 2026."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 

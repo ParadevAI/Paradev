@@ -1172,6 +1172,9 @@ msgstr "{productName} được các kỹ sư tại Netflix, Microsoft, NVIDIA, D
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn {productName} là một trong những startup nổi bật tại YC Demo Day."
 
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} có tên là {formerName} cho đến tháng 10 năm 2026."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
