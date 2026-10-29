@@ -31,14 +31,14 @@ export default command({
 			"Where the files live: `worktree` (default) checks out --branch in its own worktree; `local` uses the project's checkout as it is — no branch switch, files shared with the project's other local workspaces",
 		),
 		branch: string().desc(
-			"Git branch (required unless --pr, --task, or --checkout local is set)",
+			"Git branch the workspace works on, for a workspace on a host (required there unless --pr, --task, or --checkout local is set). A cloud workspace always gets a new branch of its own; use --base-branch",
 		),
 		pr: number().desc("PR number — checks out the verified PR head"),
 		task: string().desc(
 			"Task ID to link. When --branch is omitted, the task's provider branch name (e.g. Linear's) is used verbatim",
 		),
 		baseBranch: string().desc(
-			"Branch to fork from when `branch` does not exist (defaults to project default)",
+			"Branch to start from. On a host: used when --branch does not exist (defaults to the project default). In the cloud: the branch the workspace's new branch is cut from (defaults to the repository default)",
 		),
 		skipBranchPrefix: boolean().desc(
 			"Use --branch exactly as given instead of namespacing it under the project branch prefix",

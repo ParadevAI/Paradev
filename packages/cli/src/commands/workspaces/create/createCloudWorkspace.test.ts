@@ -23,8 +23,8 @@ test.each([
 	expect(contacted).toBe(false);
 });
 
-test("sends the chosen machine size to the cloud", async () => {
-	let createInput: Record<string, unknown> | undefined;
+function recordingApi() {
+	const calls: { createInput?: Record<string, unknown> } = {};
 	const api = {
 		environment: {
 			list: {
@@ -36,16 +36,31 @@ test("sends the chosen machine size to the cloud", async () => {
 		cloudWorkspace: {
 			create: {
 				mutate: async (input: Record<string, unknown>) => {
-					createInput = input;
+					calls.createInput = input;
 					return { id: "ws-1", branch: "main" };
 				},
 			},
 		},
 	} as unknown as ApiClient;
+	return { api, calls };
+}
+
+test("sends the chosen machine size to the cloud", async () => {
+	const { api, calls } = recordingApi();
 	await createCloudWorkspace({
 		api,
 		organizationId: "org",
 		options: { machineSize: "small" },
 	});
-	expect(createInput).toMatchObject({ machineSize: "small" });
+	expect(calls.createInput).toMatchObject({ machineSize: "small" });
+});
+
+test("sends --base-branch as the branch the cloud workspace starts from", async () => {
+	const { api, calls } = recordingApi();
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { baseBranch: "main" },
+	});
+	expect(calls.createInput).toMatchObject({ branch: "main" });
 });
