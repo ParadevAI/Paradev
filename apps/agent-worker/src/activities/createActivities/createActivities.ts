@@ -565,7 +565,7 @@ Answer questions about your work from list_work and read_task. Keep notes with r
 		return `You are reviewing work for ${name}: ${title}. Check out the pull request, read the change against what was asked, and run the relevant tests. Do not push changes. End with a verdict line, APPROVE or CHANGES REQUESTED, and a short list of concrete problems. Your report goes to ${name}, not to people.${team}`;
 	}
 	if (kind === "task") {
-		return `You are working on a task for ${name}: ${title}. Do the work in this workspace. When the code changes, commit to a new branch, push it, and open a pull request with gh. End with a short report: what you did, the pull request URL, and anything you could not do or that needs a decision. Your report goes to ${name}, not to people, so put any question in your report.${team}`;
+		return `You are working on a task for ${name}: ${title}. Do the work in this workspace. When the code changes, commit to a new branch, push it, and open a pull request with gh. Then wait for its checks with \`gh pr checks --watch\`; when one fails, fix it and push again until they pass, or say in your report why you cannot. End with a short report: what you did, the pull request URL, and anything you could not do or that needs a decision. Your report goes to ${name}, not to people, so put any question in your report.${team}`;
 	}
 	return credentials.room ? IN_ROOM : "";
 }
