@@ -1,4 +1,4 @@
-import { afterAll, afterEach, expect, mock, test } from "bun:test";
+import { afterAll, afterEach, expect, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 const alreadyRegistered = GlobalRegistrator.isRegistered;
@@ -6,13 +6,6 @@ if (!alreadyRegistered) GlobalRegistrator.register();
 (
 	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
-
-// Macros compile away in the app; the test runs the source.
-mock.module("@lingui/react/macro", () => ({
-	useLingui: () => ({
-		t: ({ message }: { message: string }) => message,
-	}),
-}));
 
 const { cleanup, fireEvent, render } = await import("@testing-library/react");
 const { DiagramLightbox } = await import("./DiagramLightbox");
