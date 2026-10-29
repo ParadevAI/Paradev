@@ -167,12 +167,12 @@
 		"node": 24
 	},
 	"pdev": {
-		"sha256": "fc16cd4c039a98e05dd2da478aa1cbd02b12139ed84f41b4444cc2e3558a6817",
+		"sha256": "5a51852a4de0a40e20c0137b873f83e1b26255b4c5d01b6b0a2f608e152d8535",
 		"suffix": ".tar.gz",
-		"dest": "/usr/local/share/superset/media/pdev-0.2.2.tar.gz",
+		"dest": "/usr/local/share/superset/media/pdev-0.2.5.tar.gz",
 		"mode": "0644",
-		"source": "https://github.com/ParadevAI/pdev/releases/download/v0.2.2/pdev-0.2.2-linux-x64.tar.gz",
-		"version": "0.2.2"
+		"source": "https://github.com/ParadevAI/pdev/releases/download/v0.2.5/pdev-0.2.5-linux-x64.tar.gz",
+		"version": "0.2.5"
 	},
 	"wallpaper-0": {
 		"sha256": "497a4edb230a58ea385c8b63fe8135e47554cb4a5169de3f6bbae293a1f5435a",
