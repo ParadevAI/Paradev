@@ -18,6 +18,7 @@ import { z } from "zod";
 import { userError } from "../../i18n-error";
 import { AmbiguousConnectionError } from "../../lib/connectors/lookup";
 import {
+	accessiblePlugin,
 	accessibleTo,
 	ensureManagedInstalls,
 	memberRole,
@@ -477,6 +478,7 @@ export const pluginsRouter = createTRPCRouter({
 			? published
 					.filter(
 						(row) =>
+							!row.removedFromSourceAt &&
 							!installedKeys.has(
 								`${organizationMarketplace(organizationId)}/${row.name}`,
 							),
@@ -518,20 +520,12 @@ export const pluginsRouter = createTRPCRouter({
 			if (input.marketplace && isOrganizationMarketplace(input.marketplace)) {
 				const organizationId = requireActiveOrgId(ctx);
 				const role = await memberRole(ctx.session.user.id, organizationId);
-				const [plugin] =
+				const plugin =
 					input.marketplace === organizationMarketplace(organizationId)
-						? await db
-								.select()
-								.from(organizationPlugins)
-								.where(
-									and(
-										eq(organizationPlugins.organizationId, organizationId),
-										eq(organizationPlugins.name, input.name),
-										accessibleTo(role),
-									),
-								)
-								.limit(1)
-						: [];
+						? await accessiblePlugin(organizationId, role, input.name, {
+								offered: true,
+							})
+						: null;
 				if (!plugin) {
 					throw userError({
 						code: "NOT_FOUND",

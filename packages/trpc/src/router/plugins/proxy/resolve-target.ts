@@ -66,6 +66,7 @@ export type PluginTarget = TargetIdentity &
 				kind: "remote";
 				url: string;
 				headers: Record<string, string>;
+				publicOnly?: boolean;
 				connectionId: string;
 				account?: AccountRef;
 				storedAccessToken?: string;
@@ -156,7 +157,11 @@ function remoteBinding(
 	slug: string | undefined,
 	scope: TemplateScope,
 	authMethod: string | null,
-): { url: string; headers: Record<string, string> } | null {
+): {
+	url: string;
+	headers: Record<string, string>;
+	publicOnly?: boolean;
+} | null {
 	const extension = supersetExtension(install.manifest);
 	const mcp = extension?.mcp;
 
@@ -187,7 +192,8 @@ function remoteBinding(
 		method ? secretInputNames(method) : undefined,
 		"mcp.url",
 	);
-	if (!trustedManifest(install.marketplace) && isInternalUrl(url)) {
+	const untrusted = !trustedManifest(install.marketplace);
+	if (untrusted && isInternalUrl(url)) {
 		throw new PluginTargetError(
 			`"${install.manifest.name}" points at a private or internal address.`,
 			403,
@@ -196,6 +202,7 @@ function remoteBinding(
 
 	return {
 		url,
+		publicOnly: untrusted,
 		headers: {
 			...resolveTemplateDeep(mcp.headers ?? {}, scope),
 			...resolveTemplateDeep(method?.bind ?? extension?.bind ?? {}, scope)

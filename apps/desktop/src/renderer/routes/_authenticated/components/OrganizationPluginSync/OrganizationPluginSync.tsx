@@ -35,6 +35,13 @@ function SyncOnCatalogChange() {
 			? null
 			: `${organizationId}:${managedPluginsKey(plugins)}`;
 
+	useEffect(
+		() => () => {
+			lastSyncedKey = null;
+		},
+		[],
+	);
+
 	useEffect(() => {
 		if (failures === 0) return;
 		const timer = setTimeout(

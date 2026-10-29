@@ -44,6 +44,15 @@ afterEach(() => {
 	fs.rmSync(home, { recursive: true, force: true });
 });
 
+const stayedList = [
+	{
+		name: "deploy",
+		marketplace: STAYED,
+		installed: true,
+		latestVersion: "1.0.0",
+	},
+];
+
 const kept = () =>
 	readInstalledPlugins().map((entry) => `${entry.marketplace}/${entry.name}`);
 
@@ -57,11 +66,36 @@ describe("forgetOrganizationPlugins", () => {
 });
 
 describe("reconcileOrganizationPlugins", () => {
+	test("removes a plugin another of the member's organizations took away", async () => {
+		const lists: Record<string, unknown[]> = {
+			[LEFT.slice(13)]: [],
+		};
+		const apiFor = (organizationId: string) =>
+			({
+				plugins: { list: { query: async () => lists[organizationId] ?? [] } },
+			}) as never;
+		const api = {
+			plugins: { list: { query: async () => stayedList } },
+			user: {
+				myOrganizations: {
+					query: async () => [{ id: STAYED.slice(13) }, { id: LEFT.slice(13) }],
+				},
+				myOrganization: { query: async () => ({ id: STAYED.slice(13) }) },
+			},
+		} as never;
+
+		const result = await reconcileOrganizationPlugins(api, apiFor);
+
+		expect(result.removed).toEqual(["deploy"]);
+		expect(kept()).toEqual(["superset/linear", `${STAYED}/deploy`]);
+	});
+
 	test("removes the plugins of an organization the member left", async () => {
 		const api = {
+			plugins: { list: { query: async () => stayedList } },
 			user: {
 				myOrganizations: { query: async () => [{ id: STAYED.slice(13) }] },
-				myOrganization: { query: async () => null },
+				myOrganization: { query: async () => ({ id: STAYED.slice(13) }) },
 			},
 		} as never;
 

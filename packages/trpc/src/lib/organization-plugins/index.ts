@@ -2,6 +2,7 @@ export const ORGANIZATION_PLUGIN_SYNC_PATH =
 	"/api/organization-plugins/jobs/sync";
 
 export {
+	accessiblePlugin,
 	accessibleTo,
 	ensureManagedInstalls,
 	installedFor,

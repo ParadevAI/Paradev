@@ -22,6 +22,7 @@ import {
 	githubUserTokenFor,
 } from "../../lib/github-user";
 import {
+	accessiblePlugin,
 	accessibleTo,
 	memberRole,
 	ORGANIZATION_PLUGIN_SYNC_PATH,
@@ -258,22 +259,13 @@ export const organizationPluginsRouter = {
 		.query(async ({ ctx, input }) => {
 			const organizationId = requireActiveOrgId(ctx);
 			const role = await memberRole(ctx.session.user.id, organizationId);
-			const [row] = await db
-				.select({
-					name: organizationPlugins.name,
-					version: organizationPlugins.version,
-					contentHash: organizationPlugins.contentHash,
-				})
-				.from(organizationPlugins)
-				.where(
-					and(
-						eq(organizationPlugins.organizationId, organizationId),
-						eq(organizationPlugins.name, input.name),
-						accessibleTo(role),
-					),
-				)
-				.limit(1);
-			if (!row) throw unknown(input.name);
+			const plugin = await accessiblePlugin(organizationId, role, input.name);
+			if (!plugin) throw unknown(input.name);
+			const row = {
+				name: plugin.name,
+				version: plugin.version,
+				contentHash: plugin.contentHash,
+			};
 
 			const object = await getObject(
 				organizationBundleKey(organizationId, row.contentHash),

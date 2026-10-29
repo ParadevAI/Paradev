@@ -65,7 +65,10 @@ import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
-import { syncInstalledPluginMcpServers } from "./lib/plugin-installs";
+import {
+	finishPendingOrganizationForget,
+	syncInstalledPluginMcpServers,
+} from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
 import { runQuitCleanup } from "./lib/quit-sequence";
@@ -640,6 +643,9 @@ if (!gotTheLock) {
 		} catch (error) {
 			console.error("[main] Failed to sync plugin MCP servers:", error);
 		}
+		void finishPendingOrganizationForget().catch((error) =>
+			console.error("[main] Failed to remove organization plugins:", error),
+		);
 		try {
 			installBundledCliShim();
 		} catch (error) {

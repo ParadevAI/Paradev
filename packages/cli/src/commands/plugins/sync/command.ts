@@ -1,4 +1,5 @@
 import { boolean, CLIError, table } from "@superset/cli-framework";
+import { createApiClient } from "../../../lib/api-client";
 import { command } from "../../../lib/command";
 import { skillsRoot } from "../../../lib/plugins/host";
 import { syncPlugins } from "../../../lib/plugins/install";
@@ -24,9 +25,9 @@ export async function organizationChanges(
 	failed: string[];
 	error?: string;
 }> {
-	let api: Awaited<ReturnType<typeof resolveAuth>>["api"];
+	let resolved: Awaited<ReturnType<typeof resolveAuth>>;
 	try {
-		({ api } = await auth(undefined));
+		resolved = await auth(undefined);
 	} catch (error) {
 		if (error instanceof CLIError && error.message === NOT_LOGGED_IN) {
 			return { text: removedText(forget()), failed: [] };
@@ -38,7 +39,11 @@ export async function organizationChanges(
 		};
 	}
 	try {
-		const { installed, removed, failed } = await reconcile(api);
+		const { installed, removed, failed } = await reconcile(
+			resolved.api,
+			(organizationId) =>
+				createApiClient({ bearer: resolved.bearer, organizationId }),
+		);
 		const text = [
 			installed.length
 				? ` Organization plugins updated: ${installed.join(", ")}.`

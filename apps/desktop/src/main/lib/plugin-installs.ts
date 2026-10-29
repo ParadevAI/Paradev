@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import {
 	createManagedSkills,
+	installedPluginsFilePath,
 	mcpHeadersHelperCommand,
 	readInstalledVersions,
 	resolveDisabledSkillIds,
@@ -175,8 +176,25 @@ export function setOrganizationPluginEnabled(
 	).catch(() => {});
 }
 
-export function forgetOrganizationPlugins(): Promise<void> {
-	return queueOrganizationPluginCli(["sync", "--forget-organizations"], null);
+const pendingForgetMarker = () =>
+	path.join(
+		path.dirname(installedPluginsFilePath()),
+		".forget-organizations-pending",
+	);
+
+/** Removes every organization's plugins after a sign-out; a marker survives a quit so the next start finishes it. */
+export async function forgetOrganizationPlugins(): Promise<void> {
+	const marker = pendingForgetMarker();
+	await fs.promises.mkdir(path.dirname(marker), { recursive: true });
+	await fs.promises.writeFile(marker, "");
+	await queueOrganizationPluginCli(["sync", "--forget-organizations"], null);
+	await fs.promises.rm(marker, { force: true });
+}
+
+export function finishPendingOrganizationForget(): Promise<void> {
+	return fs.existsSync(pendingForgetMarker())
+		? forgetOrganizationPlugins()
+		: Promise.resolve();
 }
 
 export function syncPlugins(organizationId?: string | null): Promise<void> {

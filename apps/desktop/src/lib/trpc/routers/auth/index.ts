@@ -125,8 +125,11 @@ export const createAuthRouter = () => {
 		signOut: publicProcedure.mutation(async () => {
 			getHostServiceCoordinator().stopAll();
 			await writeAuth(() => clearToken());
-			void forgetOrganizationPlugins().catch(() => {});
-			return { success: true };
+			const pluginsRemoved = await forgetOrganizationPlugins().then(
+				() => true,
+				() => false,
+			);
+			return { success: true, pluginsRemoved };
 		}),
 	});
 };
