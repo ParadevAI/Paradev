@@ -3890,8 +3890,8 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "チャットには {label} {minVersion} 以降が必要ですが、インストールされているのは {installed} です。"
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "チャットには {minVersion} 以降が必要です。インストールされているのは {installed} です。"
 
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
@@ -18279,8 +18279,8 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
-msgid "The chat resumes once the new version is installed."
-msgstr "新しいバージョンがインストールされるとチャットが再開されます。"
+msgid "The chat resumes after the update."
+msgstr "アップデート後にチャットが再開されます。"
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"

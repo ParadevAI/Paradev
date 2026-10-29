@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { acpHarnessForPreset, CONTINUE_PROMPT } from "@superset/chat/core";
 import { cn } from "@superset/ui/utils";
+import { ArrowRight } from "lucide-react";
 import {
 	AGENT_CLI_UPDATE_DOCS_URL,
 	type RunInTerminal,
@@ -71,7 +72,6 @@ export function AgentCliUpdateNotice({
 								{
 									id: "restart",
 									label: <Trans>Restart</Trans>,
-									primary: true,
 									onClick: () => {
 										finish();
 										void onRestartAgent(
@@ -102,7 +102,6 @@ export function AgentCliUpdateNotice({
 					? {
 							id: "update",
 							label: <Trans>Update</Trans>,
-							primary: true,
 							title: status.updateCommand ?? undefined,
 							onClick: () => void update(),
 						}
@@ -114,7 +113,18 @@ export function AgentCliUpdateNotice({
 			]}
 			className={cardClassName}
 			compact
-			description={`v${installed} → v${latest}`}
+			description={
+				<span className="flex items-center gap-1.5 font-mono">
+					<span className="text-popover-foreground/50">{installed}</span>
+					<ArrowRight
+						aria-hidden
+						className="size-3 shrink-0 text-popover-foreground/30"
+					/>
+					<span className="font-medium text-popover-foreground/85">
+						{latest}
+					</span>
+				</span>
+			}
 			onDismiss={dismiss}
 			state="available"
 			testId="agent-cli-update-notice"

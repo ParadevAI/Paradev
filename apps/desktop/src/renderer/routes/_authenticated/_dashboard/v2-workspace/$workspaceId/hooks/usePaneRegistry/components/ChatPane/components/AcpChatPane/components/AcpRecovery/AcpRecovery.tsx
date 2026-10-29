@@ -70,7 +70,7 @@ export function AcpRecovery({
 			actions.push({
 				id: "update",
 				label: <Trans>Update {label}</Trans>,
-				primary: true,
+				title: status?.updateCommand ?? undefined,
 				onClick: () => void update(),
 			});
 		}
@@ -78,7 +78,6 @@ export function AcpRecovery({
 			actions.push({
 				id: "docs",
 				label: <Trans>How to update</Trans>,
-				primary: true,
 				href: AGENT_CLI_UPDATE_DOCS_URL,
 			});
 		}
@@ -98,18 +97,16 @@ export function AcpRecovery({
 			<div className="flex h-full w-full items-center justify-center p-8">
 				<AgentCliUpdateCard
 					actions={actions}
-					className="w-full max-w-md"
+					className="w-full max-w-sm"
 					description={
 						updating ? (
-							<Trans>The chat resumes once the new version is installed.</Trans>
+							<Trans>The chat resumes after the update.</Trans>
 						) : (
 							<Trans>
-								Chat needs {label} {minVersion} or newer, and {installed} is
-								installed.
+								Chat needs {minVersion} or newer. {installed} is installed.
 							</Trans>
 						)
 					}
-					detail={!updating && canUpdate ? status?.updateCommand : undefined}
 					state={updating ? "updating" : "required"}
 					testId="agent-cli-update-recovery"
 					title={

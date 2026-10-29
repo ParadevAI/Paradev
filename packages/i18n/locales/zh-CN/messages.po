@@ -3890,8 +3890,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天启动"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "聊天需要 {label} {minVersion} 或更高版本，当前安装的是 {installed}。"
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "聊天需要 {minVersion} 或更高版本。当前安装的是 {installed}。"
 
 msgid "Chat session not found"
 msgstr "未找到聊天会话"
@@ -18279,8 +18279,8 @@ msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 
-msgid "The chat resumes once the new version is installed."
-msgstr "新版本安装完成后，聊天将自动恢复。"
+msgid "The chat resumes after the update."
+msgstr "更新完成后，聊天将自动恢复。"
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"

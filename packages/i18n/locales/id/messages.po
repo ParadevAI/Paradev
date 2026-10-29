@@ -3890,8 +3890,8 @@ msgstr "Chat sedang dirombak"
 msgid "Chat Launch"
 msgstr "Peluncuran Chat"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "Chat memerlukan {label} {minVersion} atau yang lebih baru, sedangkan yang terpasang {installed}."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Chat memerlukan versi {minVersion} atau yang lebih baru. Yang terpasang {installed}."
 
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
@@ -18279,8 +18279,8 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "Chat akan dilanjutkan setelah versi baru terpasang."
+msgid "The chat resumes after the update."
+msgstr "Chat akan dilanjutkan setelah pembaruan."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."

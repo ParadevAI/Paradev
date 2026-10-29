@@ -3890,8 +3890,8 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "채팅에는 {label} {minVersion} 이상이 필요하지만 {installed}이(가) 설치되어 있습니다."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "채팅에는 {minVersion} 이상이 필요합니다. 설치된 버전은 {installed}입니다."
 
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
@@ -18279,8 +18279,8 @@ msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "변경은 바로 적용됩니다. 남은 기간에 대한 차액만 결제합니다."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "새 버전이 설치되면 채팅이 다시 시작됩니다."
+msgid "The chat resumes after the update."
+msgstr "업데이트 후 채팅이 다시 시작됩니다."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시간에 응답하지 않았습니다. 다음 실행에서 다시 시도합니다."

@@ -3890,8 +3890,8 @@ msgstr "Le chat est en cours de refonte"
 msgid "Chat Launch"
 msgstr "Lancement du chat"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "Le chat nécessite {label} {minVersion} ou une version ultérieure, et {installed} est installé."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Le chat nécessite la version {minVersion} ou ultérieure. La version {installed} est installée."
 
 msgid "Chat session not found"
 msgstr "Session de chat introuvable"
@@ -18279,8 +18279,8 @@ msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Le changement s'applique tout de suite. Vous payez seulement la différence pour le reste de la période."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "Le chat reprendra une fois la nouvelle version installée."
+msgid "The chat resumes after the update."
+msgstr "Le chat reprendra après la mise à jour."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."

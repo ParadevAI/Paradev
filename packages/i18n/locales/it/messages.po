@@ -3890,8 +3890,8 @@ msgstr "La chat è in fase di rifacimento"
 msgid "Chat Launch"
 msgstr "Avvio in chat"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "La chat richiede {label} {minVersion} o successivo, ed è installata la versione {installed}."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "La chat richiede la versione {minVersion} o successiva. È installata la {installed}."
 
 msgid "Chat session not found"
 msgstr "Sessione di chat non trovata"
@@ -18279,8 +18279,8 @@ msgstr "Ora il pulsante risalta. L'ho verificato nel tuo riquadro."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Il cambio inizia subito. Paghi solo la differenza per il resto del periodo."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "La chat riprenderà quando la nuova versione sarà installata."
+msgid "The chat resumes after the update."
+msgstr "La chat riprenderà dopo l'aggiornamento."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Il workspace cloud avrebbe dovuto avviarsi, ma non ha risposto in tempo. La prossima esecuzione riproverà."

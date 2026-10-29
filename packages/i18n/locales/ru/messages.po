@@ -3890,8 +3890,8 @@ msgstr "Чат перерабатывается"
 msgid "Chat Launch"
 msgstr "Запуск в чате"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "Для чата нужен {label} {minVersion} или новее, а установлена версия {installed}."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Для чата нужна версия {minVersion} или новее. Установлена {installed}."
 
 msgid "Chat session not found"
 msgstr "Сессия чата не найдена"
@@ -18279,8 +18279,8 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "Чат продолжится, когда новая версия будет установлена."
+msgid "The chat resumes after the update."
+msgstr "Чат продолжится после обновления."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Облачная рабочая область должна была запуститься, но не ответила вовремя. Следующий запуск попробует снова."

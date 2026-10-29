@@ -3890,8 +3890,8 @@ msgstr "Chat se předělává"
 msgid "Chat Launch"
 msgstr "Spuštění chatu"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "Chat vyžaduje {label} {minVersion} nebo novější, nainstalovaná je verze {installed}."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Chat vyžaduje verzi {minVersion} nebo novější. Nainstalovaná je {installed}."
 
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
@@ -18279,8 +18279,8 @@ msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Změna platí hned. Platíte jen rozdíl za zbytek období."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "Chat bude pokračovat, jakmile bude nová verze nainstalována."
+msgid "The chat resumes after the update."
+msgstr "Chat bude pokračovat po aktualizaci."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."

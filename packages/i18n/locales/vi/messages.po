@@ -3890,8 +3890,8 @@ msgstr "Chat đang được làm lại"
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "Trò chuyện cần {label} {minVersion} trở lên, nhưng phiên bản đã cài là {installed}."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Trò chuyện cần phiên bản {minVersion} trở lên. Phiên bản đã cài là {installed}."
 
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
@@ -18279,8 +18279,8 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệch cho thời gian còn lại của kỳ này."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "Cuộc trò chuyện sẽ tiếp tục khi phiên bản mới được cài đặt."
+msgid "The chat resumes after the update."
+msgstr "Cuộc trò chuyện sẽ tiếp tục sau khi cập nhật."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi kịp. Lần chạy tiếp theo sẽ thử lại."

@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import {
+	CircleArrowUp,
 	CircleCheck,
-	Download,
 	LoaderCircle,
 	TriangleAlert,
 	X,
@@ -10,7 +10,7 @@ import {
 import type { ReactNode } from "react";
 
 const ICONS = {
-	available: Download,
+	available: CircleArrowUp,
 	required: TriangleAlert,
 	updating: LoaderCircle,
 	updated: CircleCheck,
@@ -25,11 +25,10 @@ export interface AgentCliUpdateCardAction {
 	href?: string;
 	title?: string;
 	disabled?: boolean;
-	primary?: boolean;
 }
 
 const ACTION_CLASSNAME =
-	"shrink-0 rounded-md px-2 py-0.5 font-medium text-popover-foreground/80 transition-colors hover:bg-popover-foreground/10 hover:text-popover-foreground disabled:pointer-events-none disabled:opacity-50";
+	"inline-flex h-6 shrink-0 items-center rounded-md px-2 font-medium text-[13px] text-popover-foreground/80 transition-colors hover:bg-popover-foreground/10 hover:text-popover-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-popover-foreground/35 disabled:pointer-events-none disabled:opacity-55";
 
 /**
  * Where an agent CLI update is offered and followed: compact above the
@@ -40,7 +39,6 @@ export function AgentCliUpdateCard({
 	className,
 	compact = false,
 	description,
-	detail,
 	onDismiss,
 	state,
 	testId,
@@ -49,8 +47,6 @@ export function AgentCliUpdateCard({
 	state: AgentCliUpdateCardState;
 	title: ReactNode;
 	description?: ReactNode;
-	/** Shown in mono under the description, such as the update command. */
-	detail?: ReactNode;
 	actions: AgentCliUpdateCardAction[];
 	onDismiss?: () => void;
 	compact?: boolean;
@@ -59,14 +55,10 @@ export function AgentCliUpdateCard({
 }) {
 	const { t } = useLingui();
 	const Icon = ICONS[state];
-	const buttons = actions.map((action) => {
-		const actionClassName = cn(
-			ACTION_CLASSNAME,
-			action.primary && "bg-popover-foreground/10 text-popover-foreground",
-		);
-		return action.href ? (
+	const buttons = actions.map((action) =>
+		action.href ? (
 			<a
-				className={actionClassName}
+				className={ACTION_CLASSNAME}
 				href={action.href}
 				key={action.id}
 				rel="noopener noreferrer"
@@ -77,7 +69,7 @@ export function AgentCliUpdateCard({
 			</a>
 		) : (
 			<button
-				className={actionClassName}
+				className={ACTION_CLASSNAME}
 				disabled={action.disabled}
 				key={action.id}
 				onClick={action.onClick}
@@ -86,15 +78,15 @@ export function AgentCliUpdateCard({
 			>
 				{action.label}
 			</button>
-		);
-	});
+		),
+	);
 	return (
 		<div
 			className={cn(
-				"relative flex gap-2 border border-border bg-popover/95 text-popover-foreground shadow-lg/10 backdrop-blur-sm",
+				"relative flex gap-2.5 border border-border bg-popover/95 text-[13px] text-popover-foreground leading-normal shadow-lg/10 backdrop-blur-xl dark:shadow-lg/15",
 				compact
-					? "items-center rounded-xl py-2 pr-1.5 pl-3 text-xs"
-					: "items-start rounded-2xl py-3 pr-10 pl-3.5 text-left text-sm",
+					? "items-center rounded-2xl py-2.5 pr-2 pl-3.5"
+					: "items-start rounded-2xl py-3 pr-10 pl-3.5 text-left",
 				className,
 			)}
 			data-testid={testId}
@@ -102,30 +94,26 @@ export function AgentCliUpdateCard({
 			<Icon
 				aria-hidden
 				className={cn(
-					"shrink-0 text-popover-foreground/90",
-					compact ? "size-3.5" : "mt-0.5 size-4",
-					state === "updating" && "animate-spin",
+					"h-lh w-4 shrink-0 text-popover-foreground/90",
+					state === "updating" && "animate-spin opacity-90",
 				)}
 			/>
-			<div className="min-w-0 flex-1 leading-snug">
-				<div className={cn(compact && "truncate font-medium")}>{title}</div>
+			<div className="flex min-w-0 flex-1 flex-col">
+				<div className={cn(compact && "truncate")}>{title}</div>
 				{description && (
 					<div
 						className={cn(
-							"text-popover-foreground/70 tabular-nums",
-							compact ? "truncate" : "mt-0.5",
+							"text-popover-foreground/70",
+							compact ? "truncate text-xs leading-5" : "text-pretty",
 						)}
 					>
 						{description}
 					</div>
 				)}
-				{detail && (
-					<div className="mt-2 break-all font-mono text-[11px] text-muted-foreground leading-4">
-						{detail}
-					</div>
-				)}
 				{!compact && buttons.length > 0 && (
-					<div className="-ms-2 mt-3 flex flex-wrap gap-1">{buttons}</div>
+					<div className="-ms-2 mt-1.5 flex flex-wrap items-center gap-0.5">
+						{buttons}
+					</div>
 				)}
 			</div>
 			{compact && buttons}
@@ -133,14 +121,14 @@ export function AgentCliUpdateCard({
 				<button
 					aria-label={t({ message: "Dismiss" })}
 					className={cn(
-						"flex shrink-0 items-center justify-center rounded-full text-popover-foreground/65 transition-colors hover:bg-popover-foreground/10 hover:text-popover-foreground",
-						compact ? "size-5" : "absolute top-2 right-2 size-6",
+						"flex size-6 shrink-0 items-center justify-center rounded-full text-popover-foreground/65 transition-colors hover:bg-popover-foreground/10 hover:text-popover-foreground",
+						!compact && "absolute top-2 right-2",
 					)}
 					onClick={onDismiss}
 					title={t({ message: "Dismiss" })}
 					type="button"
 				>
-					<X className={compact ? "size-3" : "size-3.5"} />
+					<X className="size-3.5" />
 				</button>
 			)}
 		</div>

@@ -3890,8 +3890,8 @@ msgstr "Chat wordt herbouwd"
 msgid "Chat Launch"
 msgstr "Start via chat"
 
-msgid "Chat needs {label} {minVersion} or newer, and {installed} is installed."
-msgstr "De chat heeft {label} {minVersion} of nieuwer nodig, en {installed} is geïnstalleerd."
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "De chat heeft {minVersion} of nieuwer nodig. {installed} is geïnstalleerd."
 
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
@@ -18279,8 +18279,8 @@ msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van deze periode."
 
-msgid "The chat resumes once the new version is installed."
-msgstr "De chat gaat verder zodra de nieuwe versie is geïnstalleerd."
+msgid "The chat resumes after the update."
+msgstr "De chat gaat verder na de update."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd. De volgende run probeert het opnieuw."
