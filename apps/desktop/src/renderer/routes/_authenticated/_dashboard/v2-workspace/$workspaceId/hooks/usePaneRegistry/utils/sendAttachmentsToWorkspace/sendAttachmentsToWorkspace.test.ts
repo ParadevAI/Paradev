@@ -5,6 +5,7 @@ import {
 } from "@superset/shared/attachment-limits";
 import {
 	AttachmentLimitError,
+	AttachmentSourceError,
 	type LocalAttachmentItem,
 	type SendAttachmentsDeps,
 	sendAttachmentsToWorkspace,
@@ -198,7 +199,10 @@ describe("sendAttachmentsToWorkspace", () => {
 					readBase64: async () => "cG5n",
 					async write(items) {
 						written.push(items);
-						return items.map((_, i) => `.superset/attachments/${i}`);
+						return {
+							ok: true,
+							paths: items.map((_, i) => `.superset/attachments/${i}`),
+						};
 					},
 				},
 			},
@@ -235,7 +239,7 @@ describe("sendAttachmentsToWorkspace", () => {
 					sameMachine: {
 						pathOf: () => "",
 						readBase64: async () => "",
-						write: async () => [],
+						write: async () => ({ ok: true, paths: [] }),
 					},
 				},
 				workspaceId: "ws-1",
@@ -256,5 +260,30 @@ describe("sendAttachmentsToWorkspace", () => {
 				files: [png("a.png")],
 			}),
 		).rejects.toThrow("Expected 1 attachment paths, got 0");
+	});
+
+	it("names the file the host could not read, so the composer can say which", async () => {
+		const { deps } = makeDeps();
+
+		const error = await sendAttachmentsToWorkspace({
+			deps: {
+				...deps,
+				sameMachine: {
+					pathOf: (file) => `/Users/me/${file.name}`,
+					readBase64: async () => "",
+					write: async () => ({ ok: false, index: 1, problem: "missing" }),
+				},
+			},
+			workspaceId: "ws-1",
+			isCloudWorkspace: false,
+			files: [png("a.png"), png("moved.png")],
+		}).catch((caught: unknown) => caught);
+
+		expect(error).toBeInstanceOf(AttachmentSourceError);
+		expect(error).toMatchObject({
+			index: 1,
+			fileName: "moved.png",
+			problem: "missing",
+		});
 	});
 });

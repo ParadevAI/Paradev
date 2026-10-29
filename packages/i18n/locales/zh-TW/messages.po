@@ -65,11 +65,17 @@ msgstr "「{0}」將不再觸發，其執行歷史也會被移除。此操作無
 msgid "\"{name}\" deleted"
 msgstr "「{name}」已刪除"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "「{name}」是資料夾。請改為附加其中的檔案。"
+
 msgid "\"{name}\" paused"
 msgstr "「{name}」已暫停"
 
 msgid "\"{name}\" resumed"
 msgstr "「{name}」已恢復"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "「{name}」已被移動或刪除。請重新附加。"
 
 msgid "\"{title}\" has finished its task"
 msgstr "「{title}」已完成任務"
@@ -13505,6 +13511,9 @@ msgstr "Paradev設計系統"
 
 msgid "Paradev desktop app"
 msgstr "Paradev 桌面 App"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev 沒有讀取「{name}」的權限。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise是面向團隊的Paradev。聯絡我們，瞭解它包含什麼，以及如何適配你的組織。"

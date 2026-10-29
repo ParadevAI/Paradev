@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import {
+	chmodSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -51,10 +52,13 @@ describe("writeAttachmentsIntoWorktree", () => {
 			],
 		});
 
-		expect(paths).toEqual([
-			`${WORKSPACE_ATTACHMENTS_DIR}/build.dmg`,
-			`${WORKSPACE_ATTACHMENTS_DIR}/image.png`,
-		]);
+		expect(paths).toEqual({
+			ok: true,
+			paths: [
+				`${WORKSPACE_ATTACHMENTS_DIR}/build.dmg`,
+				`${WORKSPACE_ATTACHMENTS_DIR}/image.png`,
+			],
+		});
 		expect(readFileSync(join(directory, "build.dmg"), "utf8")).toBe("first");
 		expect(readFileSync(join(directory, "image.png"), "utf8")).toBe("png");
 		expect(readFileSync(join(directory, ".gitignore"), "utf8")).toBe("*\n");
@@ -67,22 +71,43 @@ describe("writeAttachmentsIntoWorktree", () => {
 		await writeAttachmentsIntoWorktree({ worktreePath, items });
 		writeFileSync(source, "second");
 		expect(await writeAttachmentsIntoWorktree({ worktreePath, items })).toEqual(
-			[`${WORKSPACE_ATTACHMENTS_DIR}/build_1.dmg`],
+			{ ok: true, paths: [`${WORKSPACE_ATTACHMENTS_DIR}/build_1.dmg`] },
 		);
 		expect(readFileSync(join(directory, "build.dmg"), "utf8")).toBe("first");
 	});
 
-	it("refuses a directory or a UNC path as a source before writing anything", async () => {
-		const { root, worktreePath, directory } = setup();
+	it("reports which source is missing, a folder or unreadable, before writing anything", async () => {
+		const { root, source, worktreePath, directory } = setup();
+		const unreadable = join(root, "locked.txt");
+		writeFileSync(unreadable, "secret");
+		chmodSync(unreadable, 0o000);
 
-		for (const sourcePath of [root, "//server/share/x.png"]) {
-			await expect(
-				writeAttachmentsIntoWorktree({
+		for (const [sourcePath, problem] of [
+			[join(root, "moved.dmg"), "missing"],
+			[root, "not-a-file"],
+			[unreadable, "unreadable"],
+		] as const) {
+			expect(
+				await writeAttachmentsIntoWorktree({
 					worktreePath,
-					items: [{ kind: "path", sourcePath }],
+					items: [
+						{ kind: "path", sourcePath: source },
+						{ kind: "path", sourcePath },
+					],
 				}),
-			).rejects.toThrow();
+			).toEqual({ ok: false, index: 1, problem });
 		}
 		expect(existsSync(directory)).toBe(false);
+	});
+
+	it("refuses a UNC source path", async () => {
+		const { worktreePath } = setup();
+
+		await expect(
+			writeAttachmentsIntoWorktree({
+				worktreePath,
+				items: [{ kind: "path", sourcePath: "//server/share/x.png" }],
+			}),
+		).rejects.toThrow("Not a local absolute path");
 	});
 });

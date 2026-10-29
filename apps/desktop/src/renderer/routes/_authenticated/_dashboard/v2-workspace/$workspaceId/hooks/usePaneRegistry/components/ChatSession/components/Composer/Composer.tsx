@@ -512,11 +512,13 @@ export const Composer = memo(function Composer({
 			pastedTexts: string[],
 			steer: boolean,
 		) => {
-			const tags = await uploadAttachments(files);
-			if (!tags) {
+			const upload = await uploadAttachments(files);
+			if (!upload.ok) {
 				promptInputRef.current?.appendText(appendPastedText(text, pastedTexts));
+				promptInputRef.current?.addFiles(upload.keep);
 				return;
 			}
+			const { tags } = upload;
 			const message = text.trim();
 			const elements = elementsForChips(message, mentions);
 			const mcpContext = mcpContextLine(

@@ -1,5 +1,5 @@
 import { constants } from "node:fs";
-import { copyFile, stat, writeFile } from "node:fs/promises";
+import { copyFile, open, stat, writeFile } from "node:fs/promises";
 import { basename, isAbsolute, join } from "node:path";
 import {
 	MAX_ATTACHMENT_BYTES,
@@ -29,6 +29,12 @@ const itemSchema = z.discriminatedUnion("kind", [
 
 export type LocalAttachmentItem = z.infer<typeof itemSchema>;
 
+export type AttachmentSourceProblem = "missing" | "not-a-file" | "unreadable";
+
+export type WriteAttachmentsResult =
+	| { ok: true; paths: string[] }
+	| { ok: false; index: number; problem: AttachmentSourceProblem };
+
 function badRequest(message: string): TRPCError {
 	return new TRPCError({ code: "BAD_REQUEST", message });
 }
@@ -40,20 +46,29 @@ function assertLocalAbsolute(path: string): void {
 	}
 }
 
-async function assertValid(
-	worktreePath: string,
-	items: LocalAttachmentItem[],
-): Promise<void> {
+function errnoOf(error: unknown): string | undefined {
+	return (error as NodeJS.ErrnoException | null)?.code;
+}
+
+async function sourceProblem(
+	sourcePath: string,
+): Promise<AttachmentSourceProblem | null> {
+	try {
+		if (!(await stat(sourcePath)).isFile()) return "not-a-file";
+		await (await open(sourcePath, "r")).close();
+		return null;
+	} catch (error) {
+		const code = errnoOf(error);
+		if (code === "ENOENT" || code === "ENOTDIR") return "missing";
+		if (code === "EACCES" || code === "EPERM") return "unreadable";
+		throw error;
+	}
+}
+
+async function assertWorktree(worktreePath: string): Promise<void> {
 	assertLocalAbsolute(worktreePath);
 	if (!(await stat(worktreePath)).isDirectory()) {
 		throw badRequest(`Not a directory: ${worktreePath}`);
-	}
-	for (const item of items) {
-		if (item.kind !== "path") continue;
-		assertLocalAbsolute(item.sourcePath);
-		if (!(await stat(item.sourcePath)).isFile()) {
-			throw badRequest(`Not a file: ${item.sourcePath}`);
-		}
 	}
 }
 
@@ -86,7 +101,7 @@ async function writeUnique(
 			await writeExclusive(item, join(directory, fileName));
 			return fileName;
 		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+			if (errnoOf(error) !== "EEXIST") throw error;
 		}
 	}
 	throw new Error(`Could not find a free name for ${base}`);
@@ -95,8 +110,14 @@ async function writeUnique(
 export async function writeAttachmentsIntoWorktree(input: {
 	worktreePath: string;
 	items: LocalAttachmentItem[];
-}): Promise<string[]> {
-	await assertValid(input.worktreePath, input.items);
+}): Promise<WriteAttachmentsResult> {
+	await assertWorktree(input.worktreePath);
+	for (const [index, item] of input.items.entries()) {
+		if (item.kind !== "path") continue;
+		assertLocalAbsolute(item.sourcePath);
+		const problem = await sourceProblem(item.sourcePath);
+		if (problem) return { ok: false, index, problem };
+	}
 	const directory = ensureWorkspaceAttachmentsDir(input.worktreePath);
 	const paths: string[] = [];
 	for (const [index, item] of input.items.entries()) {
@@ -107,7 +128,7 @@ export async function writeAttachmentsIntoWorktree(input: {
 		);
 		paths.push(`${WORKSPACE_ATTACHMENTS_DIR}/${fileName}`);
 	}
-	return paths;
+	return { ok: true, paths };
 }
 
 export const createAttachmentsRouter = () => {

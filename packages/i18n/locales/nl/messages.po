@@ -65,11 +65,17 @@ msgstr "\"{0}\" wordt niet meer geactiveerd en de geschiedenis van runs wordt ve
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" verwijderd"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" is een map. Voeg in plaats daarvan de bestanden in de map toe."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" gepauzeerd"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" hervat"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" is verplaatst of verwijderd. Voeg het opnieuw toe."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" is klaar met de taak"
@@ -13505,6 +13511,9 @@ msgstr "Paradev Design System"
 
 msgid "Paradev desktop app"
 msgstr "Paradev-desktopapp"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev heeft geen toestemming om \"{name}\" te lezen."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise is Paradev voor teams. Neem contact op om te horen wat erbij zit en hoe het voor jouw organisatie kan werken."

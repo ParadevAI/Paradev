@@ -7,6 +7,19 @@ import { attachmentFallbackName } from "@superset/shared/workspace-attachments";
 /** Thrown for limits the user can act on; the message is toast-ready. */
 export class AttachmentLimitError extends Error {}
 
+export type AttachmentSourceProblem = "missing" | "not-a-file" | "unreadable";
+
+/** A file on this machine that could not be attached; `index` is its place in the send. */
+export class AttachmentSourceError extends Error {
+	constructor(
+		readonly index: number,
+		readonly fileName: string,
+		readonly problem: AttachmentSourceProblem,
+	) {
+		super(`${fileName}: ${problem}`);
+	}
+}
+
 function formatMb(bytes: number): string {
 	return `${Math.round(bytes / 1024 / 1024)}MB`;
 }
@@ -19,6 +32,10 @@ export interface AttachmentUploadTarget {
 export type LocalAttachmentItem =
 	| { kind: "path"; sourcePath: string }
 	| { kind: "base64"; name: string; data: string };
+
+export type SameMachineWriteResult =
+	| { ok: true; paths: string[] }
+	| { ok: false; index: number; problem: AttachmentSourceProblem };
 
 export interface SendAttachmentsDeps {
 	createUpload(input: {
@@ -36,7 +53,7 @@ export interface SendAttachmentsDeps {
 	sameMachine?: {
 		pathOf(file: File): string;
 		readBase64(file: File): Promise<string>;
-		write(items: LocalAttachmentItem[]): Promise<string[]>;
+		write(items: LocalAttachmentItem[]): Promise<SameMachineWriteResult>;
 	};
 }
 
@@ -126,7 +143,15 @@ async function writeOnSameMachine(
 			};
 		}),
 	);
-	return expectOnePathEach(files, await sameMachine.write(items));
+	const result = await sameMachine.write(items);
+	if (!result.ok) {
+		throw new AttachmentSourceError(
+			result.index,
+			files[result.index]?.name || attachmentFallbackName(result.index),
+			result.problem,
+		);
+	}
+	return expectOnePathEach(files, result.paths);
 }
 
 /**

@@ -65,11 +65,17 @@ msgstr "\"{0}\" will stop firing and its run history will be removed. This can't
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" deleted"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" is a folder. Attach the files inside it instead."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" paused"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" resumed"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" was moved or deleted. Attach it again."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" has finished its task"
@@ -13505,6 +13511,9 @@ msgstr "Paradev Design System"
 
 msgid "Paradev desktop app"
 msgstr "Paradev desktop app"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev doesn't have permission to read \"{name}\"."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."

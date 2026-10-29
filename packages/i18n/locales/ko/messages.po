@@ -65,11 +65,17 @@ msgstr "\"{0}\"이(가) 더 이상 실행되지 않으며 실행 기록도 삭�
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\"을(를) 삭제했습니다"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\"은(는) 폴더입니다. 대신 폴더 안의 파일을 첨부하세요."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\"을(를) 일시 중지했습니다"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\"을(를) 재개했습니다"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\"이(가) 이동되었거나 삭제되었습니다. 다시 첨부하세요."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\"이(가) 작업을 완료했습니다"
@@ -13505,6 +13511,9 @@ msgstr "Paradev 디자인 시스템"
 
 msgid "Paradev desktop app"
 msgstr "Paradev 데스크톱 앱"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev에 \"{name}\"을(를) 읽을 권한이 없습니다."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise는 팀을 위한 Paradev입니다. 어떤 기능이 포함되고 조직에 어떻게 적용할 수 있는지 문의해 주세요."

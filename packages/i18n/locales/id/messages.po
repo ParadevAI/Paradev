@@ -65,11 +65,17 @@ msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tid
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" dihapus"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" adalah folder. Lampirkan file di dalamnya sebagai gantinya."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" dijeda"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" dilanjutkan"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" telah dipindahkan atau dihapus. Lampirkan lagi."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" telah menyelesaikan tugasnya"
@@ -13505,6 +13511,9 @@ msgstr "Design System Paradev"
 
 msgid "Paradev desktop app"
 msgstr "Aplikasi desktop Paradev"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev tidak memiliki izin untuk membaca \"{name}\"."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise adalah Paradev untuk tim. Hubungi kami untuk tahu lebih banyak soal apa saja yang termasuk dan bagaimana cocoknya untuk organisasi Anda."

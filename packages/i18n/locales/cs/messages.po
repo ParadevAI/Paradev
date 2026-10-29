@@ -65,11 +65,17 @@ msgstr "„{0}“ se přestane spouštět a její historie běhů bude odstraně
 msgid "\"{name}\" deleted"
 msgstr "„{name}“ smazáno"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "„{name}“ je složka. Připojte místo toho soubory v ní."
+
 msgid "\"{name}\" paused"
 msgstr "„{name}“ pozastaveno"
 
 msgid "\"{name}\" resumed"
 msgstr "„{name}“ pokračuje"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "„{name}“ byl přesunut nebo smazán. Připojte ho znovu."
 
 msgid "\"{title}\" has finished its task"
 msgstr "„{title}“ dokončil svůj úkol"
@@ -13505,6 +13511,9 @@ msgstr "Design systém Paradev"
 
 msgid "Paradev desktop app"
 msgstr "Desktopová aplikace Paradev"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev nemá oprávnění ke čtení „{name}“."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise je Paradev pro týmy. Ozvěte se a řekneme vám, co obsahuje a jak může fungovat ve vaší organizaci."

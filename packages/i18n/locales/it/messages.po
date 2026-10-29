@@ -65,11 +65,17 @@ msgstr "\"{0}\" smetterà di scattare e la sua cronologia delle esecuzioni verr�
 msgid "\"{name}\" deleted"
 msgstr "\"{name}\" eliminata"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "\"{name}\" è una cartella. Allega invece i file al suo interno."
+
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" messa in pausa"
 
 msgid "\"{name}\" resumed"
 msgstr "\"{name}\" ripresa"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "\"{name}\" è stato spostato o eliminato. Allegalo di nuovo."
 
 msgid "\"{title}\" has finished its task"
 msgstr "\"{title}\" ha completato il suo task"
@@ -13505,6 +13511,9 @@ msgstr "Paradev Design System"
 
 msgid "Paradev desktop app"
 msgstr "App desktop di Paradev"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev non ha l'autorizzazione per leggere \"{name}\"."
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise è Paradev per i team. Contattaci per sapere cosa include e come può funzionare per la tua organizzazione."

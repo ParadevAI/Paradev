@@ -65,11 +65,17 @@ msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。
 msgid "\"{name}\" deleted"
 msgstr "「{name}」を削除しました"
 
+msgid "\"{name}\" is a folder. Attach the files inside it instead."
+msgstr "「{name}」はフォルダです。代わりにフォルダ内のファイルを添付してください。"
+
 msgid "\"{name}\" paused"
 msgstr "「{name}」を一時停止しました"
 
 msgid "\"{name}\" resumed"
 msgstr "「{name}」を再開しました"
+
+msgid "\"{name}\" was moved or deleted. Attach it again."
+msgstr "「{name}」は移動または削除されました。もう一度添付してください。"
 
 msgid "\"{title}\" has finished its task"
 msgstr "「{title}」がタスクを完了しました"
@@ -13505,6 +13511,9 @@ msgstr "Paradevデザインシステム"
 
 msgid "Paradev desktop app"
 msgstr "Paradev デスクトップアプリ"
+
+msgid "Paradev doesn't have permission to read \"{name}\"."
+msgstr "Paradev には「{name}」を読み取る権限がありません。"
 
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterpriseは、チーム向けのParadevです。含まれる内容や組織での活用方法については、お問い合わせください。"
