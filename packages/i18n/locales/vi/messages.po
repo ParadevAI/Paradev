@@ -3707,6 +3707,9 @@ msgstr "Không thể mở đường dẫn workspace từ xa trong trình soạn 
 msgid "Can't open remote workspace paths in Finder"
 msgstr "Không thể mở đường dẫn workspace từ xa trong Finder"
 
+msgid "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+msgstr "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+
 msgid "Can't reach the host"
 msgstr "Không thể kết nối với host"
 

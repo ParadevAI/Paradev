@@ -3707,6 +3707,9 @@ msgstr "Paden van externe werkruimtes kunnen niet in een externe editor worden g
 msgid "Can't open remote workspace paths in Finder"
 msgstr "Paden van externe werkruimtes kunnen niet in Finder worden geopend"
 
+msgid "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+msgstr "Can't reach {apiHost}. Check your network, VPN, or DNS filter."
+
 msgid "Can't reach the host"
 msgstr "Host niet bereikbaar"
 
