@@ -1,4 +1,4 @@
-import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
+import type { WorkspaceState } from "@superset/panes";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect, useMemo, useRef } from "react";
@@ -13,8 +13,7 @@ import {
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
 import type { PaneViewerData } from "../../types";
-import { getPaneKey } from "../../utils/getPaneKey";
-import { placeInTabs } from "./utils/placeInTabs";
+import { createPaneLayoutStore } from "./utils/createPaneLayoutStore";
 import {
 	getSharedPaneLayoutSnapshot,
 	preserveLocalPaneSelection,
@@ -62,11 +61,7 @@ export function useV2WorkspacePaneLayout({
 		return {
 			workspaceId,
 			seededSnapshot: getSnapshot(seededLayout),
-			store: createWorkspaceStore<PaneViewerData>({
-				initialState: seededLayout,
-				getPaneKey,
-				...(slot === "rightPaneLayout" ? { placePane: placeInTabs } : {}),
-			}),
+			store: createPaneLayoutStore(slot, seededLayout),
 		};
 	}, [collections, workspaceId, slot, selectionKey]);
 	const { store } = workspaceRuntime;
