@@ -79,6 +79,21 @@ describe("stepCounts", () => {
 			tools: 0,
 		});
 	});
+	test("shell writes count each file once", () => {
+		const shell = (command: string, cwd?: string): ToolCall => ({
+			...call("execute"),
+			rawInput: cwd ? { command, cwd } : { command },
+		});
+		expect(
+			stepCounts([
+				shell("echo a > out.txt"),
+				shell("echo b >> out.txt"),
+				shell("echo c > other.txt"),
+				shell("echo d > notes.md", "/repo"),
+				shell("echo e >> /repo/notes.md"),
+			]).edits,
+		).toBe(3);
+	});
 	test("is all zeros for an empty run", () => {
 		expect(stepCounts([])).toEqual({
 			commands: 0,
