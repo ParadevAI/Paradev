@@ -896,9 +896,6 @@ msgstr "{days} ngày"
 msgid "{days}d {hours}h"
 msgstr "{days} ngày {hours} giờ"
 
-msgid "{days}d ago"
-msgstr "{days} ngày trước"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {Còn # ngày}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours} giờ"
 msgid "{hours}h {minutes}m"
 msgstr "{hours} giờ {minutes} phút"
 
-msgid "{hours}h ago"
-msgstr "{hours} giờ trước"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Đã nhập # worktree thành workspace} other {Đã nhập # worktree thành workspace}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes} phút"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} phút {rest} giây"
 
-msgid "{minutes}m ago"
-msgstr "{minutes} phút trước"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ để tạo"
 
@@ -1040,9 +1031,6 @@ msgstr "{monthlyPrice} mỗi người dùng/tháng khi thanh toán theo tháng, 
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hóa, hỗ trợ ưu tiên."
-
-msgid "{months}mo ago"
-msgstr "{months} tháng trước"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
@@ -1193,9 +1181,6 @@ msgstr "{productName} được các kỹ sư tại Netflix, Microsoft, NVIDIA, D
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn {productName} là một trong những startup nổi bật tại YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "Logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -1224,9 +1209,6 @@ msgstr "Còn {remaining} token"
 
 msgid "{seconds}s"
 msgstr "{seconds} giây"
-
-msgid "{seconds}s ago"
-msgstr "{seconds} giây trước"
 
 msgid "{selectedCount} selected"
 msgstr "Đã chọn {selectedCount}"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: teardown thất bại"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} mỗi người, thanh toán theo năm"
-
-msgid "{years}y ago"
-msgstr "{years} năm trước"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "Quyền chưa được cấp. Cần quản trị viên tenant phê duy�
 
 msgid "Consider alternatives"
 msgstr "Cân nhắc phương án khác"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Ràng buộc"
@@ -11252,9 +11228,6 @@ msgstr "Mức dùng ngữ cảnh của mô hình"
 msgid "Model picker scoped to the selected agent"
 msgstr "Bộ chọn mô hình giới hạn theo agent đang chọn"
 
-msgid "Model Selector"
-msgstr "Bộ chọn mô hình"
-
 msgid "Model volume"
 msgstr "Lưu lượng theo mô hình"
 
@@ -11855,9 +11828,6 @@ msgstr "Không có commit nào để mở pull request"
 
 msgid "No comparisons yet."
 msgstr "Chưa có so sánh nào."
-
-msgid "No console output"
-msgstr "Không có kết quả console"
 
 msgid "No contributors found."
 msgstr "Không tìm thấy người đóng góp nào."
@@ -13012,9 +12982,6 @@ msgstr "Mở trong trình duyệt"
 
 msgid "Open in Changes pane"
 msgstr "Mở trong khung Thay đổi"
-
-msgid "Open in chat"
-msgstr "Mở trong chat"
 
 msgid "Open in ChatGPT"
 msgstr "Mở trong ChatGPT"

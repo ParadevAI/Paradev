@@ -896,9 +896,6 @@ msgstr "{days}일"
 msgid "{days}d {hours}h"
 msgstr "{days}일 {hours}시간"
 
-msgid "{days}d ago"
-msgstr "{days}일 전"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {#일 남음}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours}시간"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}시간 {minutes}분"
 
-msgid "{hours}h ago"
-msgstr "{hours}시간 전"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {worktree #개를 워크스페이스로 가져왔습니다} other {worktree #개를 워크스페이스로 가져왔습니다}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes}분"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}분 {rest}초"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}분 전"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵로 만들기"
 
@@ -1040,9 +1031,6 @@ msgstr "월간 결제 시 사용자당 월 {monthlyPrice}, 연간 결제 시 {ye
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "사용자당 월 {monthlyPrice}. 모바일, 자동화, 우선 지원."
-
-msgid "{months}mo ago"
-msgstr "{months}개월 전"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "내 자동화 {myFailedCount}개가 마지막 실행에 실패했습니다"
@@ -1193,9 +1181,6 @@ msgstr "{productName}의 사용자로는 전 세계적으로 Netflix, Microsoft,
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 팀을 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
-msgid "{provider} logo"
-msgstr "{provider} 로고"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 
@@ -1224,9 +1209,6 @@ msgstr "{remaining} 토큰 남음"
 
 msgid "{seconds}s"
 msgstr "{seconds}초"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}초 전"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}개 선택됨"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: 정리에 실패했습니다"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "사용자당 {yearlyTotal}, 연간 결제"
-
-msgid "{years}y ago"
-msgstr "{years}년 전"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "동의가 부여되지 않았습니다. 테넌트 관리자가 승인해
 
 msgid "Consider alternatives"
 msgstr "대안을 검토해 주세요"
-
-msgid "Console"
-msgstr "콘솔"
 
 msgid "Constraints"
 msgstr "제약 조건"
@@ -11252,9 +11228,6 @@ msgstr "모델 컨텍스트 사용량"
 msgid "Model picker scoped to the selected agent"
 msgstr "선택한 에이전트로 범위가 한정된 모델 선택기"
 
-msgid "Model Selector"
-msgstr "모델 선택기"
-
 msgid "Model volume"
 msgstr "모델 사용량"
 
@@ -11855,9 +11828,6 @@ msgstr "풀 리퀘스트를 만들 커밋이 없습니다"
 
 msgid "No comparisons yet."
 msgstr "아직 비교가 없습니다."
-
-msgid "No console output"
-msgstr "콘솔 출력 없음"
 
 msgid "No contributors found."
 msgstr "기여자를 찾을 수 없습니다."
@@ -13012,9 +12982,6 @@ msgstr "브라우저에서 열기"
 
 msgid "Open in Changes pane"
 msgstr "변경 사항 패널에서 열기"
-
-msgid "Open in chat"
-msgstr "채팅에서 열기"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPT에서 열기"

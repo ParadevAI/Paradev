@@ -896,9 +896,6 @@ msgstr "{days}h"
 msgid "{days}d {hours}h"
 msgstr "{days}h {hours}j"
 
-msgid "{days}d ago"
-msgstr "{days}h lalu"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {Sisa # hari}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours}j"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}j {minutes}m"
 
-msgid "{hours}h ago"
-msgstr "{hours}j lalu"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Mengimpor # worktree sebagai workspace} other {Mengimpor # worktree sebagai workspace}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes}m"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} mnt {rest} dtk"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}m lalu"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ untuk membuat"
 
@@ -1040,9 +1031,6 @@ msgstr "{monthlyPrice} per pengguna/bulan ditagih bulanan, atau {yearlyPrice} di
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan prioritas."
-
-msgid "{months}mo ago"
-msgstr "{months}bln lalu"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
@@ -1193,9 +1181,6 @@ msgstr "{productName} digunakan oleh engineer di Netflix, Microsoft, NVIDIA, Doo
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "Logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -1224,9 +1209,6 @@ msgstr "Sisa {remaining} token"
 
 msgid "{seconds}s"
 msgstr "{seconds} dtk"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}d lalu"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} dipilih"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: teardown gagal"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per pengguna, ditagih tahunan"
-
-msgid "{years}y ago"
-msgstr "{years}thn lalu"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "Persetujuan tidak diberikan. Administrator tenant harus menyetujuinya."
 
 msgid "Consider alternatives"
 msgstr "Pertimbangkan alternatif"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Constraint"
@@ -11252,9 +11228,6 @@ msgstr "Penggunaan konteks model"
 msgid "Model picker scoped to the selected agent"
 msgstr "Pemilih model yang dibatasi pada agen yang dipilih"
 
-msgid "Model Selector"
-msgstr "Pemilih Model"
-
 msgid "Model volume"
 msgstr "Volume model"
 
@@ -11855,9 +11828,6 @@ msgstr "Tidak ada commit untuk membuka pull request"
 
 msgid "No comparisons yet."
 msgstr "Belum ada perbandingan."
-
-msgid "No console output"
-msgstr "Tidak ada output console"
 
 msgid "No contributors found."
 msgstr "Tidak ada kontributor ditemukan."
@@ -13012,9 +12982,6 @@ msgstr "Buka di Browser"
 
 msgid "Open in Changes pane"
 msgstr "Buka di panel Perubahan"
-
-msgid "Open in chat"
-msgstr "Buka di chat"
 
 msgid "Open in ChatGPT"
 msgstr "Buka di ChatGPT"

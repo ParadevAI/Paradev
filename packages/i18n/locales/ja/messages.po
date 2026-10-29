@@ -896,9 +896,6 @@ msgstr "{days}日"
 msgid "{days}d {hours}h"
 msgstr "{days}日{hours}時間"
 
-msgid "{days}d ago"
-msgstr "{days}日前"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {残り # 日}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours}時間"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}時間{minutes}分"
 
-msgid "{hours}h ago"
-msgstr "{hours}時間前"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {#件のワークツリーをワークスペースとしてインポートしました} other {#件のワークツリーをワークスペースとしてインポートしました}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes}分"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}分{rest}秒"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}分前"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵で作成"
 
@@ -1040,9 +1031,6 @@ msgstr "月払いで1ユーザーあたり月額 {monthlyPrice}、または年�
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オートメーション、優先サポート。"
-
-msgid "{months}mo ago"
-msgstr "{months}か月前"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
@@ -1193,9 +1181,6 @@ msgstr "{productName} は、グローバルでは Netflix、Microsoft、NVIDIA�
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は {productName} を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
-msgid "{provider} logo"
-msgstr "{provider}のロゴ"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
 
@@ -1224,9 +1209,6 @@ msgstr "残り {remaining} トークン"
 
 msgid "{seconds}s"
 msgstr "{seconds}秒"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}秒前"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}件選択中"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: ティアダウンに失敗しました"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "年払いで1ユーザーあたり{yearlyTotal}"
-
-msgid "{years}y ago"
-msgstr "{years}年前"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "同意が付与されませんでした。テナント管理者の承認
 
 msgid "Consider alternatives"
 msgstr "代替案を検討して"
-
-msgid "Console"
-msgstr "コンソール"
 
 msgid "Constraints"
 msgstr "制約"
@@ -11252,9 +11228,6 @@ msgstr "モデルのコンテキスト使用量"
 msgid "Model picker scoped to the selected agent"
 msgstr "選択中のエージェントに絞ったモデルピッカー"
 
-msgid "Model Selector"
-msgstr "モデルを選択"
-
 msgid "Model volume"
 msgstr "モデル別ボリューム"
 
@@ -11855,9 +11828,6 @@ msgstr "プルリクエストを作成できるコミットがありません"
 
 msgid "No comparisons yet."
 msgstr "比較はまだありません。"
-
-msgid "No console output"
-msgstr "コンソール出力はありません"
 
 msgid "No contributors found."
 msgstr "コントリビューターが見つかりません。"
@@ -13012,9 +12982,6 @@ msgstr "ブラウザで開く"
 
 msgid "Open in Changes pane"
 msgstr "変更ペインで開く"
-
-msgid "Open in chat"
-msgstr "チャットで開く"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPTで開く"

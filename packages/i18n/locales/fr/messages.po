@@ -896,9 +896,6 @@ msgstr "{days} j"
 msgid "{days}d {hours}h"
 msgstr "{days} j {hours} h"
 
-msgid "{days}d ago"
-msgstr "il y a {days} j"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {# jour restant} other {# jours restants}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours} h"
 msgid "{hours}h {minutes}m"
 msgstr "{hours} h {minutes} min"
 
-msgid "{hours}h ago"
-msgstr "il y a {hours} h"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree importé en tant qu'espace de travail} other {# worktrees importés en tant qu'espaces de travail}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes} min"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
 
-msgid "{minutes}m ago"
-msgstr "il y a {minutes} min"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ pour créer"
 
@@ -1040,9 +1031,6 @@ msgstr "{monthlyPrice} par utilisateur/mois en facturation mensuelle, ou {yearly
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} par utilisateur/mois. Mobile, automatisations, support prioritaire."
-
-msgid "{months}mo ago"
-msgstr "il y a {months} mois"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vos automatisations en échec lors de leur dernière exécution : {myFailedCount}"
@@ -1193,9 +1181,6 @@ msgstr "{productName} est utilisé par des ingénieurs de Netflix, Microsoft, NV
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} a levé un tour de table d’amorçage de 11,5 millions de dollars mené par Union Square Ventures, avec Y Combinator et Paul Graham. TechCrunch l’a cité parmi les startups les plus remarquables du YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "Logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -1224,9 +1209,6 @@ msgstr "{remaining} tokens restants"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
-
-msgid "{seconds}s ago"
-msgstr "il y a {seconds} s"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} sélectionnées"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName} : échec du nettoyage"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} par utilisateur, facturation annuelle"
-
-msgid "{years}y ago"
-msgstr "il y a {years} ans"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "Le consentement n'a pas été accordé. Un administrateur du tenant doit
 
 msgid "Consider alternatives"
 msgstr "Envisager des alternatives"
-
-msgid "Console"
-msgstr "Console"
 
 msgid "Constraints"
 msgstr "Contraintes"
@@ -11252,9 +11228,6 @@ msgstr "Utilisation du contexte du modèle"
 msgid "Model picker scoped to the selected agent"
 msgstr "Sélecteur de modèle limité à l'agent sélectionné"
 
-msgid "Model Selector"
-msgstr "Sélecteur de modèle"
-
 msgid "Model volume"
 msgstr "Volume par modèle"
 
@@ -11855,9 +11828,6 @@ msgstr "Aucun commit à partir duquel ouvrir une pull request"
 
 msgid "No comparisons yet."
 msgstr "Aucune comparaison pour l'instant."
-
-msgid "No console output"
-msgstr "Aucune sortie console"
 
 msgid "No contributors found."
 msgstr "Aucun contributeur trouvé."
@@ -13012,9 +12982,6 @@ msgstr "Ouvrir dans le navigateur"
 
 msgid "Open in Changes pane"
 msgstr "Ouvrir dans le volet Modifications"
-
-msgid "Open in chat"
-msgstr "Ouvrir dans le chat"
 
 msgid "Open in ChatGPT"
 msgstr "Ouvrir dans ChatGPT"

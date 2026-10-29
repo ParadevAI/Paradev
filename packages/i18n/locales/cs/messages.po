@@ -896,9 +896,6 @@ msgstr "{days} d"
 msgid "{days}d {hours}h"
 msgstr "{days} d {hours} h"
 
-msgid "{days}d ago"
-msgstr "před {days} d"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {Zbývá # den} few {Zbývají # dny} many {Zbývá # dne} other {Zbývá # dní}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours} h"
 msgid "{hours}h {minutes}m"
 msgstr "{hours} h {minutes} m"
 
-msgid "{hours}h ago"
-msgstr "před {hours} h"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Importován # worktree jako pracovní prostor} few {Importovány # worktree jako pracovní prostory} many {Importováno # worktree jako pracovní prostory} other {Importováno # worktree jako pracovní prostory}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes} m"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} m {rest} s"
 
-msgid "{minutes}m ago"
-msgstr "před {minutes} m"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ pro vytvoření"
 
@@ -1040,9 +1031,6 @@ msgstr "{monthlyPrice} za uživatele/měs. při měsíční fakturaci, nebo {yea
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prioritní podpora."
-
-msgid "{months}mo ago"
-msgstr "před {months} měs."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
@@ -1193,9 +1181,6 @@ msgstr "{productName} celosvětově používají inženýři ze společností Ne
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} získal 11,5 milionu dolarů v seed kole, které vedl fond Union Square Ventures za účasti Y Combinatoru a Paula Grahama. TechCrunch ho zařadil mezi nejvýraznější startupy YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
@@ -1224,9 +1209,6 @@ msgstr "Zbývající tokeny: {remaining}"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
-
-msgid "{seconds}s ago"
-msgstr "před {seconds} s"
 
 msgid "{selectedCount} selected"
 msgstr "vybráno: {selectedCount}"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: teardown selhal"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} na uživatele, účtováno ročně"
-
-msgid "{years}y ago"
-msgstr "před {years} r."
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "Souhlas nebyl udělen. Musí ho schválit administrátor tenantu."
 
 msgid "Consider alternatives"
 msgstr "Zvaž alternativy"
-
-msgid "Console"
-msgstr "Konzole"
 
 msgid "Constraints"
 msgstr "Omezení"
@@ -11252,9 +11228,6 @@ msgstr "Využití kontextu modelu"
 msgid "Model picker scoped to the selected agent"
 msgstr "Výběr modelu omezený na vybraného agenta"
 
-msgid "Model Selector"
-msgstr "Výběr modelu"
-
 msgid "Model volume"
 msgstr "Objem modelů"
 
@@ -11855,9 +11828,6 @@ msgstr "Žádné commity, ze kterých by šel otevřít pull request"
 
 msgid "No comparisons yet."
 msgstr "Zatím žádná srovnání."
-
-msgid "No console output"
-msgstr "Žádný výstup konzole"
 
 msgid "No contributors found."
 msgstr "Nenalezeni žádní přispěvatelé."
@@ -13012,9 +12982,6 @@ msgstr "Otevřít v prohlížeči"
 
 msgid "Open in Changes pane"
 msgstr "Otevřít v panelu Změny"
-
-msgid "Open in chat"
-msgstr "Otevřít v chatu"
 
 msgid "Open in ChatGPT"
 msgstr "Otevřít v ChatGPT"

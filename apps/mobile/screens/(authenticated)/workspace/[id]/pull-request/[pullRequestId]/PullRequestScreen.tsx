@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import { router, Stack } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActivityIndicator,
 	Linking,
@@ -53,7 +54,7 @@ export function PullRequestScreen() {
 
 	// Once per pull request the screen shows, not once per refetch.
 	const openedPullRequestRef = useRef<string | null>(null);
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const readableInset = useReadableInset();
 	useEffect(() => {
 		const key = `${workspaceId}:${pullNumber}`;

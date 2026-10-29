@@ -896,9 +896,6 @@ msgstr "{days} dni"
 msgid "{days}d {hours}h"
 msgstr "{days} d {hours} godz."
 
-msgid "{days}d ago"
-msgstr "{days} dni temu"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {Został # dzień} few {Zostały # dni} many {Zostało # dni} other {Zostało # dnia}}"
 
@@ -981,9 +978,6 @@ msgstr "{hours} godz."
 msgid "{hours}h {minutes}m"
 msgstr "{hours} godz. {minutes} min"
 
-msgid "{hours}h ago"
-msgstr "{hours} godz. temu"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Zaimportowano # worktree jako obszar roboczy} few {Zaimportowano # worktree jako obszary robocze} many {Zaimportowano # worktree jako obszary robocze} other {Zaimportowano # worktree jako obszary robocze}}"
 
@@ -1029,9 +1023,6 @@ msgstr "{minutes} min"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
 
-msgid "{minutes}m ago"
-msgstr "{minutes} min temu"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ aby utworzyć"
 
@@ -1040,9 +1031,6 @@ msgstr "{monthlyPrice} za użytkownika/mies. przy rozliczeniu miesięcznym lub {
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, priorytetowe wsparcie."
-
-msgid "{months}mo ago"
-msgstr "{months} mies. temu"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
@@ -1193,9 +1181,6 @@ msgstr "Z {productName} korzystają inżynierowie z Netflix, Microsoft, NVIDIA, 
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} pozyskał 11,5 mln USD w rundzie seed prowadzonej przez Union Square Ventures, z udziałem Y Combinator i Paula Grahama. TechCrunch wymienił go wśród wyróżniających się startupów YC Demo Day."
 
-msgid "{provider} logo"
-msgstr "logo {provider}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR-y} many {# PR-ów} other {# PR-a}}"
 
@@ -1224,9 +1209,6 @@ msgstr "Pozostałe tokeny: {remaining}"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
-
-msgid "{seconds}s ago"
-msgstr "{seconds} s temu"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} zaznaczonych"
@@ -1355,9 +1337,6 @@ msgstr "{workspaceName}: sprzątanie nie powiodło się"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} za użytkownika, rozliczenie roczne"
-
-msgid "{years}y ago"
-msgstr "{years} lat temu"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -5042,9 +5021,6 @@ msgstr "Zgoda nie została udzielona. Musi ją zatwierdzić administrator tenant
 
 msgid "Consider alternatives"
 msgstr "Rozważ alternatywy"
-
-msgid "Console"
-msgstr "Konsola"
 
 msgid "Constraints"
 msgstr "Ograniczenia"
@@ -11252,9 +11228,6 @@ msgstr "Zużycie kontekstu modelu"
 msgid "Model picker scoped to the selected agent"
 msgstr "Wybór modelu ograniczony do wybranego agenta"
 
-msgid "Model Selector"
-msgstr "Wybór modelu"
-
 msgid "Model volume"
 msgstr "Wolumen modeli"
 
@@ -11855,9 +11828,6 @@ msgstr "Brak commitów, z których można otworzyć pull request"
 
 msgid "No comparisons yet."
 msgstr "Brak porównań."
-
-msgid "No console output"
-msgstr "Brak wyjścia konsoli"
 
 msgid "No contributors found."
 msgstr "Nie znaleziono współtwórców."
@@ -13012,9 +12982,6 @@ msgstr "Otwórz w przeglądarce"
 
 msgid "Open in Changes pane"
 msgstr "Otwórz w panelu Zmiany"
-
-msgid "Open in chat"
-msgstr "Otwórz na czacie"
 
 msgid "Open in ChatGPT"
 msgstr "Otwórz w ChatGPT"
