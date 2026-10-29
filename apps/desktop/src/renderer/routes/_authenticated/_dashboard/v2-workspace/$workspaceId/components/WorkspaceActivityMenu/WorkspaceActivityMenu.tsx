@@ -65,6 +65,7 @@ import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
 import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
 import { AgentWorkRow } from "./components/AgentWorkRow";
+import { AnimatedHeight } from "./components/AnimatedHeight";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
 import { ChangesMenuRow } from "./components/ChangesMenuRow";
 import { FinishedSubagentRow } from "./components/FinishedSubagentRow";
@@ -75,7 +76,7 @@ import {
 	PullRequestRow,
 } from "./components/PullRequestRow";
 import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
-import { PANEL_MAX_HEIGHT_PX } from "./constants";
+import { PANEL_MAX_HEIGHT_PX, VIEW_ENTER_CLASSNAME } from "./constants";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
@@ -547,16 +548,17 @@ export function WorkspaceActivityMenu({
 		</div>
 	);
 
-	const panel = (
+	const renderPanel = (variant: "docked" | "floating") => (
 		// biome-ignore lint/a11y/noStaticElementInteractions: arrow keys move between the panel's buttons
 		<div
 			className="pointer-events-auto flex flex-col overflow-y-auto rounded-xl border border-border/60 bg-popover p-1 text-popover-foreground shadow-sm"
 			style={{
-				maxHeight: floating
-					? `min(${PANEL_MAX_HEIGHT_PX}px, var(--radix-popover-content-available-height))`
-					: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)`,
+				maxHeight:
+					variant === "floating"
+						? `min(${PANEL_MAX_HEIGHT_PX}px, var(--radix-popover-content-available-height))`
+						: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)`,
 			}}
-			id={panelId}
+			id={(variant === "docked") === fits ? panelId : undefined}
 			data-activity-panel
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {
@@ -581,135 +583,140 @@ export function WorkspaceActivityMenu({
 				items[(index + step + items.length) % items.length]?.focus();
 			}}
 		>
-			{composing ? (
-				<>
-					<button
-						type="button"
-						onClick={() => setComposing(false)}
-						className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
-					>
-						<ArrowLeft className="size-3.5 shrink-0" />
-						<Trans>New page</Trans>
-					</button>
-					<NewPageComposer
-						workspaceId={workspaceId}
-						onSent={() => setComposing(false)}
-						onCreateNewAgentSession={onCreateNewAgentSession}
-						onFocusAgentTerminal={onFocusAgentTerminal}
-					/>
-				</>
-			) : shipView ? (
-				<>
-					<button
-						type="button"
-						onClick={() => setShipView(null)}
-						className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
-					>
-						<ArrowLeft className="size-3.5 shrink-0" />
-						{shipView === "commit" ? (
-							<Trans>Commit</Trans>
-						) : (
-							<Trans>Create PR</Trans>
-						)}
-					</button>
-					<div className="p-1">
-						{shipView === "commit" ? (
-							<CommitForm actions={shipActions} />
-						) : (
-							<CreatePrForm actions={shipActions} />
-						)}
-					</div>
-				</>
-			) : (
-				<div className="divide-y divide-border">
-					{changes && !currentPr && (
-						<section className="py-1">
-							<ActivityMenuHeader
-								title={currentWorkspace.name}
-								canCreatePr={shipMenu.canCreatePr}
-								{...shipMenuProps}
-							/>
-							<ChangesMenuRow
-								stats={changesStats}
-								isOpen={changes.isOpen}
-								onToggle={changes.onToggle}
-							/>
-						</section>
-					)}
-					{pullRequests.length > 0 && (
-						<MenuGroup
-							title={<Trans>Pull requests</Trans>}
-							count={pullRequests.length}
+			<AnimatedHeight>
+				{composing ? (
+					<div key="composing" className={VIEW_ENTER_CLASSNAME}>
+						<button
+							type="button"
+							onClick={() => setComposing(false)}
+							className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
 						>
-							<div>{pullRequests.map(pullRequestRow)}</div>
+							<ArrowLeft className="size-3.5 shrink-0" />
+							<Trans>New page</Trans>
+						</button>
+						<NewPageComposer
+							workspaceId={workspaceId}
+							onSent={() => setComposing(false)}
+							onCreateNewAgentSession={onCreateNewAgentSession}
+							onFocusAgentTerminal={onFocusAgentTerminal}
+						/>
+					</div>
+				) : shipView ? (
+					<div key="ship" className={VIEW_ENTER_CLASSNAME}>
+						<button
+							type="button"
+							onClick={() => setShipView(null)}
+							className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-xs text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent"
+						>
+							<ArrowLeft className="size-3.5 shrink-0" />
+							{shipView === "commit" ? (
+								<Trans>Commit</Trans>
+							) : (
+								<Trans>Create PR</Trans>
+							)}
+						</button>
+						<div className="p-1">
+							{shipView === "commit" ? (
+								<CommitForm actions={shipActions} />
+							) : (
+								<CreatePrForm actions={shipActions} />
+							)}
+						</div>
+					</div>
+				) : (
+					<div
+						key="list"
+						className={cn("divide-y divide-border", VIEW_ENTER_CLASSNAME)}
+					>
+						{changes && !currentPr && (
+							<section className="py-1">
+								<ActivityMenuHeader
+									title={currentWorkspace.name}
+									canCreatePr={shipMenu.canCreatePr}
+									{...shipMenuProps}
+								/>
+								<ChangesMenuRow
+									stats={changesStats}
+									isOpen={changes.isOpen}
+									onToggle={changes.onToggle}
+								/>
+							</section>
+						)}
+						{pullRequests.length > 0 && (
+							<MenuGroup
+								title={<Trans>Pull requests</Trans>}
+								count={pullRequests.length}
+							>
+								<div>{pullRequests.map(pullRequestRow)}</div>
+							</MenuGroup>
+						)}
+						<MenuGroup
+							title={<Trans>Subagents</Trans>}
+							count={agentWork.subagents.length}
+						>
+							<div>
+								{agentWork.subagents.length + agentWork.finished.length > 0
+									? [
+											...agentRows(agentWork.subagents),
+											...agentWork.finished.map((entry) => (
+												<FinishedSubagentRow
+													key={entry.key}
+													entry={entry}
+													source={sourceOf(entry.terminalId)}
+													onOpen={(target) =>
+														agentActions.open(target, { subagent: true })
+													}
+												/>
+											)),
+										]
+									: emptyRow(<Trans>No subagents yet</Trans>)}
+							</div>
 						</MenuGroup>
-					)}
-					<MenuGroup
-						title={<Trans>Subagents</Trans>}
-						count={agentWork.subagents.length}
-					>
-						<div>
-							{agentWork.subagents.length + agentWork.finished.length > 0
-								? [
-										...agentRows(agentWork.subagents),
-										...agentWork.finished.map((entry) => (
-											<FinishedSubagentRow
-												key={entry.key}
-												entry={entry}
-												source={sourceOf(entry.terminalId)}
-												onOpen={(target) =>
-													agentActions.open(target, { subagent: true })
-												}
+						<MenuGroup
+							title={<Trans>Background processes</Trans>}
+							count={processes.length + agentWork.shells.length}
+						>
+							<div>
+								{processes.length + agentWork.shells.length > 0
+									? [...agentRows(agentWork.shells), ...workRows(processes)]
+									: terminalSessionsQuery.isLoading
+										? emptyRow(<Trans>Loading…</Trans>)
+										: emptyRow(<Trans>Nothing running</Trans>)}
+							</div>
+						</MenuGroup>
+						<MenuGroup
+							title={<Trans>Pages</Trans>}
+							addLabel={t({ message: "New page" })}
+							onAdd={() => setComposing(true)}
+						>
+							<div>
+								{workspace.length > 0
+									? workspace.map((page) => (
+											<PagesMenuRow
+												key={page.id}
+												page={page}
+												onOpen={handleOpenPage}
 											/>
-										)),
-									]
-								: emptyRow(<Trans>No subagents yet</Trans>)}
-						</div>
-					</MenuGroup>
-					<MenuGroup
-						title={<Trans>Background processes</Trans>}
-						count={processes.length + agentWork.shells.length}
-					>
-						<div>
-							{processes.length + agentWork.shells.length > 0
-								? [...agentRows(agentWork.shells), ...workRows(processes)]
-								: terminalSessionsQuery.isLoading
-									? emptyRow(<Trans>Loading…</Trans>)
-									: emptyRow(<Trans>Nothing running</Trans>)}
-						</div>
-					</MenuGroup>
-					<MenuGroup
-						title={<Trans>Pages</Trans>}
-						addLabel={t({ message: "New page" })}
-						onAdd={() => setComposing(true)}
-					>
-						<div>
-							{workspace.length > 0
-								? workspace.map((page) => (
+										))
+									: emptyRow(<Trans>No pages yet</Trans>)}
+							</div>
+						</MenuGroup>
+						{pinned.length > 0 && (
+							<MenuGroup title={<Trans>Pinned</Trans>}>
+								<div>
+									{pinned.map((page) => (
 										<PagesMenuRow
 											key={page.id}
 											page={page}
 											onOpen={handleOpenPage}
 										/>
-									))
-								: emptyRow(<Trans>No pages yet</Trans>)}
-						</div>
-					</MenuGroup>
-					{pinned.length > 0 && (
-						<MenuGroup title={<Trans>Pinned</Trans>}>
-							<div>
-								{pinned.map((page) => (
-									<PagesMenuRow
-										key={page.id}
-										page={page}
-										onOpen={handleOpenPage}
-									/>
-								))}
-							</div>
-						</MenuGroup>
-					)}
-				</div>
-			)}
+									))}
+								</div>
+							</MenuGroup>
+						)}
+					</div>
+				)}
+			</AnimatedHeight>
 		</div>
 	);
 
@@ -802,14 +809,14 @@ export function WorkspaceActivityMenu({
 			<PopoverContent
 				align="end"
 				sideOffset={0}
-				className="w-80 border-0 bg-transparent p-0 shadow-none"
+				className="w-80 border-0 bg-transparent p-0 shadow-none duration-200 ease-out data-[state=closed]:duration-150 data-[state=closed]:ease-in data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
 				onEscapeKeyDown={(event) => {
 					if (shipView || composing) event.preventDefault();
 				}}
 			>
-				{floating && panel}
+				{renderPanel("floating")}
 			</PopoverContent>
-			{asideNode && createPortal(panel, asideNode)}
+			{asideNode && createPortal(renderPanel("docked"), asideNode)}
 		</Popover>
 	);
 }

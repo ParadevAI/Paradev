@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useIsTabVisible } from "@superset/panes";
+import { cn } from "@superset/ui/utils";
 import { useCallback, useLayoutEffect, useState } from "react";
 import {
 	CENTERED_CONTENT_WIDTH_PX,
@@ -83,10 +84,17 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 					}}
 				/>
 			)}
-			{shown && (
+			{isTabVisible && (
 				<aside
 					aria-label={t({ message: "Workspace activity" })}
-					className="pointer-events-none absolute inset-y-0 z-10 flex min-h-0 flex-col py-2"
+					aria-hidden={!shown}
+					inert={!shown}
+					className={cn(
+						"pointer-events-none absolute inset-y-0 z-10 flex min-h-0 flex-col py-2 transition-[opacity,transform,visibility] motion-reduce:transition-none",
+						shown
+							? "visible translate-y-0 scale-100 opacity-100 duration-200 ease-out"
+							: "invisible -translate-y-1 scale-[0.98] opacity-0 duration-150 ease-in",
+					)}
 					ref={attach}
 					style={{ right: PANEL_EDGE_GAP_PX, width: PANEL_WIDTH_PX }}
 				/>
