@@ -1205,6 +1205,13 @@
       "when": 1793159809685,
       "tag": "0171_environment_projects",
       "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1793239078531,
+      "tag": "0172_channel_membership_messages",
+      "breakpoints": true
     }
   ]
 }
