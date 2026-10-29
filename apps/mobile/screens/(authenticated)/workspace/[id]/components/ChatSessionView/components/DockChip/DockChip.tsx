@@ -1,7 +1,7 @@
-import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import type { LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
+import { GlassSurface } from "@/components/GlassSurface";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -44,20 +44,14 @@ export function DockChip({
 	);
 	return (
 		<Pressable accessibilityRole="button" onPress={onPress}>
-			{isLiquidGlassAvailable() ? (
-				<GlassView
-					colorScheme="dark"
-					glassEffectStyle="regular"
-					isInteractive
-					style={{ borderRadius: DOCK_CHIP_HEIGHT / 2 }}
-				>
-					{content}
-				</GlassView>
-			) : (
-				<View className="rounded-full border border-white/10 bg-[#1C1C1C]">
-					{content}
-				</View>
-			)}
+			<GlassSurface
+				dark
+				interactive
+				radius={DOCK_CHIP_HEIGHT / 2}
+				fallbackClassName="rounded-full border border-white/10 bg-[#1C1C1C]"
+			>
+				{content}
+			</GlassSurface>
 		</Pressable>
 	);
 }

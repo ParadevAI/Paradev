@@ -78,10 +78,12 @@ export default function AuthenticatedLayout() {
   Examples: `modules/composer/src`, `ShareAccess/components/ValueMenu`,
   `sign-in/utils/signInWithApple`. Android-only the other way round: `sign-in/utils/signInWithGoogle`
   (`.android.ts` on `modules/google-credential`, `.ts` everywhere else).
-- **Bottom sheets are expo-router `formSheet` routes** — `...glassHeaderOptions` gives the native
-  title and ✕, the body is RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to
-  match ours), and the list stays the screen's only layout child or it cold-mounts at zero height.
-  Copy `PullRequestsSheet` and its route entry.
+- **Bottom sheets are expo-router `formSheet` routes** — `...sheetHeaderOptions` gives the native
+  title and ✕ on iOS and a JS drag handle and title on Android, where a form sheet draws no native
+  bar (so `Stack.SearchBar` and SF Symbol `Stack.Toolbar` buttons do not show there). The body is
+  RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to match ours), and the
+  list stays the screen's only layout child or it cold-mounts at zero height. Copy
+  `PullRequestsSheet` and its route entry.
 - **Hermes ships a partial `Intl`.** `lib/intl-polyfills` lists what is missing and what is
   polyfilled. A `@superset/i18n/format` helper that reaches for an API outside that list throws, and
   no mobile screen has an error boundary, so the throw takes the screen down. Add the polyfill, its

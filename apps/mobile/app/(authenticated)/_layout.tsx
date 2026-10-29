@@ -4,7 +4,11 @@ import { View } from "react-native";
 import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
 import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
-import { glassHeaderOptions, sheetDetents } from "@/lib/navigation";
+import {
+	glassHeaderOptions,
+	sheetDetents,
+	sheetHeaderOptions,
+} from "@/lib/navigation";
 import { VoiceLayer } from "@/screens/(authenticated)/voice/VoiceLayer";
 
 export const unstable_settings = { anchor: "(home)" };
@@ -63,7 +67,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Voice" }),
 					}}
 				/>
@@ -73,7 +77,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.6]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Voice settings" }),
 					}}
 				/>
@@ -96,7 +100,7 @@ export default function AuthenticatedLayout() {
 						title: "",
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -184,7 +188,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Commits" }),
 					}}
 				/>
@@ -194,7 +198,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Add comment",
 						}),
@@ -206,7 +210,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Finish review",
 						}),
@@ -220,7 +224,7 @@ export default function AuthenticatedLayout() {
 						sheetGrabberVisible: true,
 						// The workspace name is the sheet's own centred headline, so
 						// the bar carries no title — only the native close button.
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: "",
 					}}
 				/>
@@ -230,7 +234,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Sessions" }),
 					}}
 				/>
@@ -240,7 +244,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "New session",
 						}),
@@ -252,7 +256,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.5, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -261,7 +265,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -270,7 +274,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -288,7 +292,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -297,7 +301,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -306,7 +310,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.6]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 					}}
 				/>
 				<Stack.Screen
@@ -315,7 +319,7 @@ export default function AuthenticatedLayout() {
 						presentation: "formSheet",
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Jump to file",
 						}),

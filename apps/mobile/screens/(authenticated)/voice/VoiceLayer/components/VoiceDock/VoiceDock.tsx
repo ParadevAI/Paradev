@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from "expo-haptics";
 import { Mic, MicOff, X } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { GlassSurface } from "@/components/GlassSurface";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -106,13 +106,12 @@ export function VoiceDock({
 					onExpand();
 				}}
 			>
-				{isLiquidGlassAvailable() ? (
-					<GlassView glassEffectStyle="regular" style={{ borderRadius: 999 }}>
-						{body}
-					</GlassView>
-				) : (
-					<View className="bg-secondary rounded-full">{body}</View>
-				)}
+				<GlassSurface
+					radius={999}
+					fallbackClassName="bg-secondary rounded-full"
+				>
+					{body}
+				</GlassSurface>
 			</Pressable>
 		</Animated.View>
 	);

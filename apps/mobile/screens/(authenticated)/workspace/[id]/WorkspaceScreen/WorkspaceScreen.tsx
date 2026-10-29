@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { prompt } from "@superset/alert-prompt";
 import type {
 	ComposerHandle,
 	ComposerQuickKeysAction,
@@ -9,7 +10,7 @@ import type {
 import { i18n } from "@superset/i18n";
 import { BRAND } from "@superset/shared/brand";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { TitlePress } from "@superset/title-press";
+import { pressableTitle, TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import {
@@ -49,6 +50,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { contentScrollsUnderHeader } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
@@ -694,28 +696,20 @@ export function WorkspaceScreen() {
 				Alert.alert(t({ message: "A chat takes its name from the agent." }));
 				return;
 			}
-			Alert.prompt(
-				t({
+			void prompt({
+				title: t({
 					message: "Rename session",
 				}),
-				t({
+				message: t({
 					message:
 						"Leave it empty to go back to the name the terminal reports.",
 				}),
-				[
-					{
-						text: t({ message: "Cancel" }),
-						style: "cancel",
-					},
-					{
-						text: t({ message: "Save" }),
-						onPress: (value?: string) =>
-							renameTerminal(terminalId, value ?? ""),
-					},
-				],
-				"plain-text",
-				row?.customTitle ?? "",
-			);
+				defaultValue: row?.customTitle ?? "",
+				cancelText: t({ message: "Cancel" }),
+				confirmText: t({ message: "Save" }),
+			}).then((value) => {
+				if (value !== null) renameTerminal(terminalId, value);
+			});
 		},
 		[rows, renameTerminal, t],
 	);
@@ -997,7 +991,7 @@ export function WorkspaceScreen() {
 			<Stack.Screen
 				options={{
 					...headerOptions,
-					headerTransparent: activeIsChat,
+					headerTransparent: activeIsChat && contentScrollsUnderHeader,
 					title: workspace?.name ?? cloud?.name ?? archivedCloud?.name ?? "",
 					headerTitle: notice
 						? () => (
@@ -1008,7 +1002,9 @@ export function WorkspaceScreen() {
 									visibleFor={NOTICE_MS}
 								/>
 							)
-						: undefined,
+						: workspace
+							? pressableTitle(openActions)
+							: undefined,
 				}}
 			/>
 
