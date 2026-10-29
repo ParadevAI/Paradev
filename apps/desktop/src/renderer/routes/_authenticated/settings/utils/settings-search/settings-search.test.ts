@@ -174,14 +174,12 @@ describe("settings search - plugins visibility", () => {
 				false,
 				false,
 				false,
-				false,
 			).plugins,
 		).toBeUndefined();
 		expect(
 			getVisibleMatchCountBySection(
 				"marketplace",
 				true,
-				false,
 				false,
 				false,
 				false,
