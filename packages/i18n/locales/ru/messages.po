@@ -3931,6 +3931,9 @@ msgstr "Чат перерабатывается"
 msgid "Chat Launch"
 msgstr "Запуск в чате"
 
+msgid "Chat mode"
+msgstr "Режим чата"
+
 msgid "Chat session not found"
 msgstr "Сессия чата не найдена"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI и SDK"
 
 msgid "CLI docs"
 msgstr "Документация CLI"
+
+msgid "CLI mode"
+msgstr "Режим CLI"
 
 msgid "CLI reference"
 msgstr "Справочник CLI"
@@ -5655,6 +5661,9 @@ msgstr "Не удалось изменить сообщение"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Не удалось завершить удаление рабочих областей"
+
+msgid "Couldn't fork into a chat"
+msgstr "Не удалось форкнуть в чат"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Не удалось передать агенту"
@@ -8571,11 +8580,26 @@ msgstr "Аргументы форка"
 msgid "Fork conversation"
 msgstr "Ответвить разговор"
 
+msgid "Fork into chat"
+msgstr "Форкнуть в чат"
+
+msgid "Fork into chat in a new tab"
+msgstr "Форкнуть в чат в новой вкладке"
+
+msgid "Fork into CLI"
+msgstr "Форкнуть в CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Форкнуть в CLI в новой вкладке"
+
 msgid "Fork session"
 msgstr "Форкнуть сессию"
 
 msgid "Fork session…"
 msgstr "Форкнуть сессию…"
+
+msgid "Forking into a chat…"
+msgstr "Создание форка в чате…"
 
 msgid "Form controls and field composition"
 msgstr "Элементы формы и композиция полей"
@@ -10171,9 +10195,6 @@ msgstr "Конец 2026"
 
 msgid "Latency"
 msgstr "Задержка"
-
-msgid "Later"
-msgstr "Позже"
 
 msgid "Later messages are removed."
 msgstr "Последующие сообщения будут удалены."
@@ -12407,6 +12428,9 @@ msgstr "За последние 30 дней ещё ничего не опубл�
 msgid "Nothing running"
 msgstr "Ничего не запущено"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Пока нечего форкать. Сначала отправьте сообщение."
+
 msgid "Nothing was missed"
 msgstr "Ничего не пропущено"
 
@@ -13200,6 +13224,9 @@ msgstr "Открытие страниц"
 
 msgid "Opening worktree..."
 msgstr "Открытие worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Откроется рядом с этой панелью. Эта продолжит работать."
 
 msgid "Operator"
 msgstr "Оператор"
@@ -15448,9 +15475,6 @@ msgstr "Перезапустить демон терминала?"
 msgid "Restart terminals"
 msgstr "Перезапустить терминалы"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Перезапустите приложение, чтобы использовать последнюю версию {appName}."
-
 msgid "Restart workspace"
 msgstr "Перезапустить рабочую область"
 
@@ -15684,12 +15708,6 @@ msgstr "Отозвать ключ"
 
 msgid "Rewrote it and published version 2."
 msgstr "Переписал и опубликовал версию 2."
-
-msgid "Rich input"
-msgstr "Расширенный ввод"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Расширенный ввод ({hotkeyText})"
 
 msgid "right pane"
 msgstr "правая панель"
@@ -16338,6 +16356,9 @@ msgstr "Посмотрите, какое место ваши последние 
 
 msgid "Select"
 msgstr "Селект"
+
+msgid "Select a file to view it here"
+msgstr "Выберите файл, чтобы просмотреть его здесь"
 
 msgid "Select a project"
 msgstr "Выберите проект"
@@ -19849,9 +19870,6 @@ msgstr "Обновите Paradev на этом хосте, чтобы измен
 
 msgid "Update payment method"
 msgstr "Обновить способ оплаты"
-
-msgid "Update ready"
-msgstr "Обновление готово"
 
 msgid "Update Required"
 msgstr "Требуется обновление"

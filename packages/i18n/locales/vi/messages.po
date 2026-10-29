@@ -3931,6 +3931,9 @@ msgstr "Chat đang được làm lại"
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
+msgid "Chat mode"
+msgstr "Chế độ chat"
+
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Tài liệu CLI"
+
+msgid "CLI mode"
+msgstr "Chế độ CLI"
 
 msgid "CLI reference"
 msgstr "Tài liệu tham chiếu CLI"
@@ -5655,6 +5661,9 @@ msgstr "Không thể chỉnh sửa tin nhắn"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Không xóa xong các workspace"
+
+msgid "Couldn't fork into a chat"
+msgstr "Không thể fork sang chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Không thể giao việc này cho agent"
@@ -8571,11 +8580,26 @@ msgstr "Tham số fork"
 msgid "Fork conversation"
 msgstr "Tách cuộc trò chuyện"
 
+msgid "Fork into chat"
+msgstr "Fork sang chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Fork sang chat trong tab mới"
+
+msgid "Fork into CLI"
+msgstr "Fork sang CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Fork sang CLI trong tab mới"
+
 msgid "Fork session"
 msgstr "Fork phiên"
 
 msgid "Fork session…"
 msgstr "Fork phiên…"
+
+msgid "Forking into a chat…"
+msgstr "Đang fork sang chat…"
 
 msgid "Form controls and field composition"
 msgstr "Các điều khiển form và cách ghép trường"
@@ -10171,9 +10195,6 @@ msgstr "Cuối 2026"
 
 msgid "Latency"
 msgstr "Độ trễ"
-
-msgid "Later"
-msgstr "Để sau"
 
 msgid "Later messages are removed."
 msgstr "Các tin nhắn sau sẽ bị xóa."
@@ -12407,6 +12428,9 @@ msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của
 msgid "Nothing running"
 msgstr "Không có gì đang chạy"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Chưa có gì để fork. Hãy gửi một tin nhắn trước."
+
 msgid "Nothing was missed"
 msgstr "Không có lần chạy nào bị bỏ lỡ"
 
@@ -13200,6 +13224,9 @@ msgstr "Mở trang"
 
 msgid "Opening worktree..."
 msgstr "Đang mở worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Mở bên cạnh khung này. Khung này vẫn tiếp tục chạy."
 
 msgid "Operator"
 msgstr "Người vận hành"
@@ -15448,9 +15475,6 @@ msgstr "Khởi động lại daemon terminal?"
 msgid "Restart terminals"
 msgstr "Khởi động lại terminal"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Khởi động lại để dùng phiên bản {appName} mới nhất."
-
 msgid "Restart workspace"
 msgstr "Khởi động lại workspace"
 
@@ -15684,12 +15708,6 @@ msgstr "Thu hồi khóa"
 
 msgid "Rewrote it and published version 2."
 msgstr "Đã viết lại và xuất bản phiên bản 2."
-
-msgid "Rich input"
-msgstr "Nhập nâng cao"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Nhập nâng cao ({hotkeyText})"
 
 msgid "right pane"
 msgstr "ngăn bên phải"
@@ -16338,6 +16356,9 @@ msgstr "Xem 30 ngày qua của bạn đứng ở đâu trên bảng xếp hạng
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Chọn một tệp để xem tại đây"
 
 msgid "Select a project"
 msgstr "Chọn một dự án"
@@ -19849,9 +19870,6 @@ msgstr "Hãy cập nhật Paradev trên máy chủ này để chỉnh sửa cấ
 
 msgid "Update payment method"
 msgstr "Cập nhật phương thức thanh toán"
-
-msgid "Update ready"
-msgstr "Bản cập nhật đã sẵn sàng"
 
 msgid "Update Required"
 msgstr "Cần cập nhật"

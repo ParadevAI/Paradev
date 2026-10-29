@@ -3931,6 +3931,9 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天启动"
 
+msgid "Chat mode"
+msgstr "聊天模式"
+
 msgid "Chat session not found"
 msgstr "未找到聊天会话"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI与SDK"
 
 msgid "CLI docs"
 msgstr "CLI文档"
+
+msgid "CLI mode"
+msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 参考"
@@ -5655,6 +5661,9 @@ msgstr "无法编辑该消息"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "没能完成工作区的删除"
+
+msgid "Couldn't fork into a chat"
+msgstr "无法分叉到聊天"
 
 msgid "Couldn't hand this to an agent"
 msgstr "无法交给智能体处理"
@@ -8571,11 +8580,26 @@ msgstr "分叉参数"
 msgid "Fork conversation"
 msgstr "分叉对话"
 
+msgid "Fork into chat"
+msgstr "分叉到聊天"
+
+msgid "Fork into chat in a new tab"
+msgstr "在新标签页中分叉到聊天"
+
+msgid "Fork into CLI"
+msgstr "分叉到CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "在新标签页中分叉到CLI"
+
 msgid "Fork session"
 msgstr "分叉会话"
 
 msgid "Fork session…"
 msgstr "分叉会话…"
+
+msgid "Forking into a chat…"
+msgstr "正在分叉到聊天…"
 
 msgid "Form controls and field composition"
 msgstr "表单控件与字段组合"
@@ -10171,9 +10195,6 @@ msgstr "2026年末"
 
 msgid "Latency"
 msgstr "延迟"
-
-msgid "Later"
-msgstr "稍后"
 
 msgid "Later messages are removed."
 msgstr "之后的消息将被移除。"
@@ -12407,6 +12428,9 @@ msgstr "最近30天还没有已公开的数据。待本机用量同步后，你�
 msgid "Nothing running"
 msgstr "没有正在运行的内容"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "还没有可分叉的内容。请先发送一条消息。"
+
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
 
@@ -13200,6 +13224,9 @@ msgstr "打开页面"
 
 msgid "Opening worktree..."
 msgstr "正在打开worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "在此窗格旁打开。原窗格会继续运行。"
 
 msgid "Operator"
 msgstr "操作员"
@@ -15448,9 +15475,6 @@ msgstr "重启终端守护进程？"
 msgid "Restart terminals"
 msgstr "重启终端"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "重新启动以使用最新版本的 {appName}。"
-
 msgid "Restart workspace"
 msgstr "重启工作区"
 
@@ -15684,12 +15708,6 @@ msgstr "吊销密钥"
 
 msgid "Rewrote it and published version 2."
 msgstr "已重写并发布版本 2。"
-
-msgid "Rich input"
-msgstr "富输入"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "富输入（{hotkeyText}）"
 
 msgid "right pane"
 msgstr "右侧面板"
@@ -16338,6 +16356,9 @@ msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数�
 
 msgid "Select"
 msgstr "选择框"
+
+msgid "Select a file to view it here"
+msgstr "选择一个文件以在此处查看"
 
 msgid "Select a project"
 msgstr "请选择项目"
@@ -19849,9 +19870,6 @@ msgstr "请更新此主机上的 Paradev，以编辑其工作区配置。"
 
 msgid "Update payment method"
 msgstr "更新支付方式"
-
-msgid "Update ready"
-msgstr "更新已就绪"
 
 msgid "Update Required"
 msgstr "需要更新"
