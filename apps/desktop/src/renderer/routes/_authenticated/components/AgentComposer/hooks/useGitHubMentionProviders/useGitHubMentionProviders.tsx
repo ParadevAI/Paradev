@@ -31,8 +31,8 @@ export type GitHubRepo = { projectId: string; hostUrl: string };
 const PullRequestIcon = PULL_REQUEST_ICON.open;
 
 function normalizePrState(state: string, isDraft: boolean): string {
-	if (isDraft) return "draft";
-	return state.toLowerCase();
+	const normalized = state.toLowerCase();
+	return isDraft && normalized === "open" ? "draft" : normalized;
 }
 
 function prState(pr: LinkedPR) {
