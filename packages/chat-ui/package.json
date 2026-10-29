@@ -28,7 +28,7 @@
 		"@superset/i18n": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/ui": "workspace:*",
-		"dompurify": "3.4.16",
+		"dompurify": "3.4.17",
 		"lexical": "0.41.0",
 		"lucide-react": "0.563.0",
 		"pele": "1.10.0",
