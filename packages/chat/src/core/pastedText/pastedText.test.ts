@@ -36,7 +36,6 @@ describe("card labels", () => {
 	});
 });
 
-/** The trailing-block format older builds sent; parsing it still has to work. */
 function legacyPastedMessage(
 	prompt: string,
 	pastes: readonly string[],

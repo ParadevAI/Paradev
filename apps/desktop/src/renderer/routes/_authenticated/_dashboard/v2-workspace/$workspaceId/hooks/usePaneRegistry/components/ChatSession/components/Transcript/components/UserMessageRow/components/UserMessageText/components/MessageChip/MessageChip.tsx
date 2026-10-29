@@ -6,10 +6,6 @@ import { LinkMenu } from "../../../../../../../LinkMenu";
 
 const WEB_URL = /^https?:\/\//i;
 
-/**
- * A chip in a sent message, drawn as the composer drew it. One that points at a
- * web page opens it, has the link's hover card and its right-click menu.
- */
 export function MessageChip({
 	chip,
 	link,

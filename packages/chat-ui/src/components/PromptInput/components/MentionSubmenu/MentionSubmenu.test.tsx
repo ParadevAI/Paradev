@@ -18,7 +18,6 @@ const { MentionSubmenu } = await import("./MentionSubmenu");
 
 afterEach(cleanup);
 
-// The search resolves at once; flushing lets React render its results.
 const settle = () => act(async () => {});
 afterAll(() => {
 	if (!alreadyRegistered) GlobalRegistrator.unregister();

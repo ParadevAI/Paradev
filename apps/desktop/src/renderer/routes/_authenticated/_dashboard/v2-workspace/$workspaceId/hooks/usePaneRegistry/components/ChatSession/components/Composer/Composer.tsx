@@ -101,7 +101,6 @@ export type ComposerProps = {
 	modes?: SessionMode[];
 	currentModeId?: string;
 	onSetMode?: (modeId: string) => void;
-	// `draft` is what the composer held, for the host to hand back if the send fails.
 	onSend: (
 		content: UserContent[],
 		options: { steer: boolean; draft: ComposerDraft },

@@ -25,7 +25,6 @@ import {
 const MAX_RESULTS = 20;
 const CLOSED_FILTER = "closed";
 
-/** A repository reached through its host; the chat pane has one per workspace, the modal per project. */
 export type GitHubRepo = { projectId: string; hostUrl: string };
 
 const PullRequestIcon = PULL_REQUEST_ICON.open;
@@ -41,14 +40,12 @@ function prState(pr: LinkedPR) {
 		: "open";
 }
 
-/** The repo's GitHub issues and pull requests as @-mentions, scoped like `files` is. */
 export function useGitHubMentionProviders(
 	repo: GitHubRepo | null,
 ): ComposerMentionProvider[] {
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
 	return useMemo(() => {
-		// Without a repository the rows stay, so people see where linking lives.
 		const client = () =>
 			repo ? getHostServiceClientByUrl(repo.hostUrl) : null;
 		const issueEntry = (issue: LinkedIssue): ComposerMentionEntry => ({
@@ -97,7 +94,6 @@ export function useGitHubMentionProviders(
 						? t({ message: "No matching issues" })
 						: t({ message: "Choose a project to search its issues" }),
 					search: async (query, _signal, options) => {
-						// A pasted issue link resolves to that one issue.
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-issue") return [];
 						const host = client();

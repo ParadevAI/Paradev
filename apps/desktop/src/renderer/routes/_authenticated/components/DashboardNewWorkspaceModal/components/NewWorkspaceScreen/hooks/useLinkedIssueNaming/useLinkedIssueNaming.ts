@@ -10,12 +10,6 @@ function seedsNames(issue: LinkedIssue): boolean {
 	return issue.source === "internal" || issue.source === "linear";
 }
 
-/**
- * Keeps the workspace and branch names in step with the issues the prompt
- * links: the first tracker issue seeds them so the branch matches the
- * provider's format (Linear autolinks it back), and unlinking hands the seed
- * to the next linked issue or clears it. Anything the user typed stays.
- */
 export function useLinkedIssueNaming(linkedIssues: LinkedIssue[]): void {
 	const previous = useRef<LinkedIssue[]>([]);
 	useEffect(() => {

@@ -62,9 +62,6 @@ export function useMentionSources(
 		return () => controller.abort();
 	}, [menuOpen, providers]);
 
-	// Search sources fire on open (an empty query lists what is recent), per
-	// keystroke and when the providers change; aborting the previous request
-	// replaces debouncing.
 	useEffect(() => {
 		if (!menuOpen) return;
 		const controller = new AbortController();

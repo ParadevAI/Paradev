@@ -221,7 +221,6 @@ test("a pull request picked in the composer is drawn as the composer drew it", (
 	const text = `Review ${PR}`;
 	const elements = elementsForChips(text, [chip]);
 	const sent = splitByElements(text, elements);
-	// A message sent before chips kept their data.
 	const older = splitByElements(
 		text,
 		elements.map(({ data: _data, ...element }) => element),

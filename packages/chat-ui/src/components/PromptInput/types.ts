@@ -40,7 +40,6 @@ export type ComposerMentionEntry = {
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
-	/** Opens a provider's submenu instead of inserting; drawn with a chevron. */
 	opensSubmenu?: boolean;
 	select(ctx: ComposerActionContext): void | Promise<void>;
 };
@@ -48,14 +47,9 @@ export type ComposerMentionEntry = {
 export type ComposerMentionFilter = { id: string; label: string };
 
 export type ComposerMentionSearchOptions = {
-	/** Ids of the provider's filters that are switched on. */
 	filters: ReadonlySet<string>;
 };
 
-/**
- * A provider that can be browsed on its own: a row in the top-level menu that
- * opens a submenu with its own search box and filters.
- */
 export type ComposerMentionBrowse = {
 	label: string;
 	placeholder: string;
@@ -87,7 +81,6 @@ export type ComposerMentionProvider = {
 	// The character that opens this provider's menu; "@" when unset.
 	trigger?: string;
 	icon?: ReactNode;
-	/** When set, the top-level menu shows this provider as a submenu row. */
 	browse?: ComposerMentionBrowse;
 	source: ComposerMentionSource;
 };
@@ -111,13 +104,10 @@ export type PromptInputAttachment = {
 	file: File;
 	// Object URL for image attachments; owned and revoked by the composer.
 	previewUrl?: string;
-	// A large paste held as a text file; "Show in text field" puts it back.
 	pastedText?: string;
-	// Where the file lives on disk, when it came from there.
 	sourcePath?: string;
 };
 
-/** The host's view of the filesystem; the composer itself has none. */
 export type PromptInputLocalFiles = {
 	pathOf(file: File): string | undefined;
 	reveal(path: string): void;
@@ -127,11 +117,9 @@ export type ComposerDraftSegment =
 	| { type: "text"; text: string }
 	| { type: "chip"; chip: ComposerChip };
 
-/** Everything the editor holds, losslessly: what a host persists or hands back after a failed send. */
 export type ComposerDraft = {
 	segments: ComposerDraftSegment[];
 	attachments: PromptInputAttachment[];
-	// Dictation put text into this draft; for analytics.
 	usedDictation?: boolean;
 };
 
@@ -140,7 +128,6 @@ export type PromptInputSubmitPayload = {
 	files: File[];
 	mentions: ComposerChip[];
 	steer: boolean;
-	// What was sent, for `restoreDraft` when the send fails later.
 	draft: ComposerDraft;
 };
 
@@ -168,7 +155,6 @@ export type PromptInputDictation = {
 export type PromptInputHandle = {
 	isEmpty(): boolean;
 	addFiles(files: File[]): void;
-	/** Appends a draft to whatever is in the editor, attachments included. */
 	restoreDraft(draft: ComposerDraft): void;
 	insertChip(chip: ComposerChip): void;
 	openFileDialog(): void;
@@ -183,13 +169,11 @@ export type PromptInputProps = {
 	placeholder?: string;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
-	// While streaming, a submit queues behind the running turn and ⌘↩ steers it.
 	status?: "ready" | "streaming";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;
 	toolbarEnd?: ReactNode;
-	// Read once on mount; the composer owns the editor state from then on.
 	draft?: ComposerDraft;
 	onDraftChange?: (draft: ComposerDraft) => void;
 	/** Returning `false` keeps the draft in the editor. */
@@ -200,7 +184,6 @@ export type PromptInputProps = {
 	stopOnEscape?: boolean;
 	allowEmptySubmit?: boolean;
 	disabled?: boolean;
-	// The host is still handling the last submit: the button spins and nothing sends.
 	pending?: boolean;
 	autoFocus?: boolean;
 	/** The clicked pill, and every pending attachment in order. */

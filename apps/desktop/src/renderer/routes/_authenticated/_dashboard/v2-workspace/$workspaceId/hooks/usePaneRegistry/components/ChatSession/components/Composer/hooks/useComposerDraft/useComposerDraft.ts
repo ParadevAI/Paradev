@@ -8,7 +8,6 @@ const DRAFT_DEBOUNCE_MS = 300;
 
 const EMPTY_DRAFT: ComposerDraft = { segments: [], attachments: [] };
 
-// Attachments are files, so they live here only; storage keeps the segments.
 const unsavedDrafts = new Map<string, ComposerDraft>();
 const recoveredAfterRead = new Map<string, ComposerDraft[]>();
 
@@ -27,14 +26,11 @@ function persistDraft(draftKey: string, draft: ComposerDraft): boolean {
 	}
 }
 
-// Drafts saved before segments were plain text.
 function parseStoredDraft(stored: string): ComposerDraftSegment[] {
 	try {
 		const parsed: unknown = JSON.parse(stored);
 		if (Array.isArray(parsed)) return parsed as ComposerDraftSegment[];
-	} catch {
-		// Not JSON: a plain-text draft.
-	}
+	} catch {}
 	return stored ? [{ type: "text", text: stored }] : [];
 }
 

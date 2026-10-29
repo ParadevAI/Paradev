@@ -1,6 +1,5 @@
 import { mock } from "bun:test";
 
-// Lingui macros are compile-time; bun test runs uncompiled source.
 type MessageDescriptor = {
 	id?: string;
 	message?: string;

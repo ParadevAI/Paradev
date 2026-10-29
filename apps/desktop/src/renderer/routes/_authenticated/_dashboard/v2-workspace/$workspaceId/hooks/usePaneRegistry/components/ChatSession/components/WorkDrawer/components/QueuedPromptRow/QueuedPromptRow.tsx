@@ -40,7 +40,6 @@ export function QueuedPromptRow({
 	actionable: boolean;
 	editing: boolean;
 	onEdit: () => void;
-	/** `null` when the edit was abandoned or left the text unchanged. */
 	onEditEnd: (text: string | null) => void;
 	onRemove: (id: string) => void;
 	onSteer: (id: string) => void;

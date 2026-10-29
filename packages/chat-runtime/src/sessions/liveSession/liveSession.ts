@@ -295,7 +295,6 @@ export class LiveSession {
 		this.unpauseIfEmpty();
 	}
 
-	/** Rewrites a queued prompt in place; it keeps its turn in the queue. */
 	updateQueued(itemId: string, content: UserContent[]): void {
 		const pending = this.queue[this.requireQueuedIndex(itemId)];
 		if (!pending) return;

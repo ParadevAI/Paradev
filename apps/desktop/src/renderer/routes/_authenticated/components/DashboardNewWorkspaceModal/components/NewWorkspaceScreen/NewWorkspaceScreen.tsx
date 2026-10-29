@@ -595,8 +595,6 @@ export function NewWorkspaceScreen({
 		},
 		[setSelectedEffort, setSelectedModel],
 	);
-	// A model picked under another agent's tab lands once that agent's
-	// preference hook has re-keyed to it.
 	const pendingSwitchModel = useRef<{
 		agent: WorkspaceCreateAgent;
 		model: string;

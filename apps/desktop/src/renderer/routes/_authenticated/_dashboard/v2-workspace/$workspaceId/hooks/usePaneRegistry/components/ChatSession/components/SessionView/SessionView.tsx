@@ -188,8 +188,6 @@ export function SessionView({
 		},
 		[draftKey],
 	);
-	// What each outbox entry was composed from, so a failed send comes back
-	// whole; an entry from before this view mounted falls back to its text.
 	const sentDrafts = useRef(new Map<string, ComposerDraft>());
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>

@@ -30,8 +30,6 @@ export function useQueueActions(promptQueue: DrawerQueue | undefined) {
 		[t],
 	);
 
-	// The edited text keeps the prompt's attachments; mention ranges are dropped
-	// because the text they pointed into has changed.
 	const updateQueued = useCallback(
 		async (prompt: UserMessage, text: string) => {
 			if (!promptQueue) return;

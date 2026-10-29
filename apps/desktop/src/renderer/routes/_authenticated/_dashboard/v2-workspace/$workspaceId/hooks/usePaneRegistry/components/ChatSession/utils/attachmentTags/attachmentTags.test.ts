@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { formatAttachmentTag, parseAttachmentTags } from "./attachmentTags";
 
-/** The trailing-block format older builds sent; parsing it still has to work. */
 function legacyPastedMessage(
 	prompt: string,
 	pastes: readonly string[],

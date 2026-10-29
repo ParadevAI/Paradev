@@ -24,7 +24,6 @@ const NO_FILTERS: ReadonlySet<string> = new Set();
 export type MentionSubmenuProps = {
 	provider: ComposerMentionProvider & { browse: ComposerMentionBrowse };
 	onSelect: (entry: ComposerMentionEntry) => void;
-	/** Back to the menu the submenu was opened from. */
 	onBack: () => void;
 	onClose: () => void;
 	className?: string;
@@ -45,8 +44,6 @@ export function MentionSubmenu({
 	const { entries, isLoading } = useProviderSearch(provider, query, filters);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Opened from a typed "@", the editor takes focus back when it removes the
-	// "@"; focusing after that frame keeps typing in the search box.
 	useEffect(() => {
 		const frame = requestAnimationFrame(() => inputRef.current?.focus());
 		return () => cancelAnimationFrame(frame);

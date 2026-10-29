@@ -26,7 +26,6 @@ function isClosedStatus(type: StatusType | undefined): boolean {
 	return type === "completed" || type === "canceled";
 }
 
-/** The organization's tracker — its Superset tasks or its Linear issues — as @-mentions. */
 export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
@@ -62,7 +61,6 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 					kind: "search",
 					emptyState: t({ message: "No matching Linear issues" }),
 					search: async (query, _signal, options) => {
-						// A pasted issue link resolves to that one issue.
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "linear") return [];
 						const includeClosed =

@@ -3,11 +3,6 @@ import type {
 	ComposerMentionProvider,
 } from "../../types";
 
-/**
- * The top-level menu's submenu rows: one per provider that can be browsed, in
- * priority order. `browsed` names those providers, whose own results the top
- * level leaves to their submenus.
- */
 export function browseRows(
 	providers: readonly ComposerMentionProvider[],
 	open: (provider: ComposerMentionProvider) => void,

@@ -17,11 +17,6 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 
 export type AcpStartMode = { id: string; label: string };
 
-/**
- * The modes each harness offers at `session/new`, so a session can be told its
- * mode before it exists. Mirrors the adapters; a harness missing here offers
- * no start mode. The runtime applies a start mode only if the session offers it.
- */
 const ACP_START_MODES: Record<
 	string,
 	{ modes: readonly AcpStartMode[]; defaultModeId: string }

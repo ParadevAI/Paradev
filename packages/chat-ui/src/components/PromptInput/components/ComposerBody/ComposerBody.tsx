@@ -332,8 +332,6 @@ export function ComposerBody({
 		reset: () => void;
 	} | null>(null);
 
-	// The host's stored draft, read once: after mount the editor is the only
-	// writer, and re-applying would fight what is being typed.
 	const seeded = useRef(false);
 	useEffect(() => {
 		if (seeded.current) return;
@@ -501,7 +499,6 @@ export function ComposerBody({
 	useEffect(() => {
 		setCommandDismissed(false);
 	}, [commandQuery]);
-	// A bare "@" opens the same menu as ⊕, so "Attach files" leads it.
 	const typeaheadSections = mentionQuery === "" ? browseSections : sections;
 	const mentionOptions = useMemo(
 		() =>
@@ -739,8 +736,6 @@ export function ComposerBody({
 			},
 			COMMAND_PRIORITY_HIGH,
 		);
-		// Chips are decorator nodes: clicks select them as a node selection, and
-		// Backspace/Delete remove the selected chips.
 		const unregisterClick = editor.registerCommand<MouseEvent>(
 			CLICK_COMMAND,
 			(event) => {

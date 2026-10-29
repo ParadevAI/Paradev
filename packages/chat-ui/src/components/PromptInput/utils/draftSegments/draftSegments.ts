@@ -10,7 +10,6 @@ import {
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type { ComposerDraftSegment } from "../../types";
 
-/** The editor's content as text runs and chips, in order; the text matches `getTextContent()`. */
 export function $readDraftSegments(): ComposerDraftSegment[] {
 	const segments: ComposerDraftSegment[] = [];
 	let text = "";
@@ -46,7 +45,6 @@ export function $readDraftSegments(): ComposerDraftSegment[] {
 	return segments;
 }
 
-/** Inserts the segments at the selection, or at the end when nothing is selected. */
 export function $insertDraftSegments(
 	segments: readonly ComposerDraftSegment[],
 ): void {

@@ -12,11 +12,6 @@ function same(a: string, b: string): boolean {
 	return words(a).join("-") === words(b).join("-");
 }
 
-/**
- * The option a start selection names. Catalogs name a model by its CLI alias
- * (`haiku`), and an agent may list it under another spelling
- * (`claude-haiku-4-5`, `opus[1m]`, "Haiku 4.5"). An ambiguous name picks none.
- */
 export function startOptionId(
 	choices: readonly Choice[],
 	wanted: string,

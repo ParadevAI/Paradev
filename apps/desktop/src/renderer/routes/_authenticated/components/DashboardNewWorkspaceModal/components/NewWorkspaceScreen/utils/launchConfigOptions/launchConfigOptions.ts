@@ -4,7 +4,6 @@ import type {
 	AgentModelSupport,
 } from "@superset/shared/agent-models";
 
-/** Picking this option launches with the agent's own default. */
 export const AGENT_DEFAULT_OPTION_ID = "__agent_default__";
 export const LAUNCH_MODEL_OPTION_ID = "model";
 export const LAUNCH_EFFORT_OPTION_ID = "effort";
@@ -35,10 +34,6 @@ function withDefault(
 	};
 }
 
-/**
- * The static agent catalog in the shape the chat's ModelPicker reads from a
- * live session, so the New Workspace screen renders the same picker.
- */
 export function launchConfigOptions(input: {
 	modelSupport: AgentModelSupport | undefined;
 	selectedModel: string | null;
@@ -71,7 +66,6 @@ export function launchConfigOptions(input: {
 	return options;
 }
 
-/** The catalog id a picked option value stands for; the default is `null`. */
 export function launchOptionValue(value: string): string | null {
 	return value === AGENT_DEFAULT_OPTION_ID ? null : value;
 }

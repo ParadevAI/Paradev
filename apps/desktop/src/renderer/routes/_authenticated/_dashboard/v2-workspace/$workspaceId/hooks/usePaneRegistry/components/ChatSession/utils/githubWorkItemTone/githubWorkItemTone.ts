@@ -20,7 +20,6 @@ export const GITHUB_WORK_ITEM_TONE_TEXT: Record<GithubWorkItemTone, string> = {
 	closed: PR_RED_TEXT_CLASS_NAME,
 };
 
-/** The colour GitHub shows for a pull request or issue in this state. */
 export function githubWorkItemTone(
 	kind: GithubWorkItemLink["kind"],
 	item: GithubWorkItemState | null,

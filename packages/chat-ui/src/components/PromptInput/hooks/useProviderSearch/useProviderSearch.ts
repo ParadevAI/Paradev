@@ -5,7 +5,6 @@ import type {
 } from "../../types";
 import { matchesQuery } from "../useMentionSources";
 
-/** One provider's results for a query and filters, as its submenu shows them. */
 export function useProviderSearch(
 	provider: ComposerMentionProvider,
 	query: string,

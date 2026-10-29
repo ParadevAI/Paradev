@@ -49,7 +49,6 @@ export interface NewWorkspaceDraft {
 	 */
 	branchNameFromProvider: boolean;
 	selectedAgentId: string | null;
-	// Files stay in memory, so they survive navigation like the prompt does.
 	promptAttachments: PromptInputAttachment[];
 }
 

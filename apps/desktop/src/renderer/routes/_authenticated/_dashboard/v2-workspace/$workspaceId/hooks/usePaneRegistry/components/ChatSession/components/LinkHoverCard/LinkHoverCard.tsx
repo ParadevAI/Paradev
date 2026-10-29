@@ -8,10 +8,6 @@ import { WebsiteHoverCard } from "../WebsiteHoverCard";
 
 const WEB_URL = env.NEXT_PUBLIC_WEB_URL;
 
-/**
- * The hover card a link gets wherever it shows as a chip, in the composer and
- * in a sent message alike. An app link without a card shows unwrapped.
- */
 export function LinkHoverCard({
 	link,
 	children,

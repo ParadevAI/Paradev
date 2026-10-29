@@ -18,8 +18,6 @@ export type LinkedContextChipData =
 
 export type LinkedContext = { issues: LinkedIssue[]; pr: LinkedPR | null };
 
-// Tailwind's emerald-500, purple-500, red-500 and zinc-400: the colours the
-// PR and issue rows use, as hex for an <img> chip.
 export const LINKED_STATE_COLOR = {
 	open: "#10b981",
 	merged: "#a855f7",
@@ -76,7 +74,6 @@ export function linkedPrChip(pr: LinkedPR): ComposerChip {
 	};
 }
 
-/** The issue or PR a chip (or a sent message's element) carries, if any. */
 export function linkedContextData(data: unknown): LinkedContextChipData | null {
 	const linked = data as
 		| { kind?: unknown; issue?: LinkedIssue; pr?: LinkedPR }
@@ -88,7 +85,6 @@ export function linkedContextData(data: unknown): LinkedContextChipData | null {
 	return null;
 }
 
-/** The chip the composer draws for linked context, rebuilt from its data. */
 export function linkedContextChip(
 	data: LinkedContextChipData,
 	isDark: boolean,
@@ -98,7 +94,6 @@ export function linkedContextChip(
 		: linkedIssueChip(data.issue, isDark);
 }
 
-/** The issues and PR a prompt links, deduped; the first PR chip wins. */
 export function linkedContextOf(chips: readonly ComposerChip[]): LinkedContext {
 	const issues: LinkedIssue[] = [];
 	let pr: LinkedPR | null = null;
@@ -124,7 +119,6 @@ export function draftLinkedContext(
 	);
 }
 
-/** A draft that opens with these chips, ready to type after. */
 export function linkedContextSeed(
 	chips: readonly ComposerChip[],
 ): ComposerDraftSegment[] {
@@ -138,7 +132,6 @@ const LINEAR_ISSUE_URL = /linear\.app\/[^/]+\/issue\/([A-Z][A-Z0-9]*-\d+)/i;
 const GITHUB_ISSUE_URL = /github\.com\/[^/]+\/[^/]+\/issues\/(\d+)/;
 const GITHUB_PR_URL = /github\.com\/[^/]+\/[^/]+\/pull\/(\d+)/;
 
-/** What a pasted link points at, so `@<url>` can resolve to that one item. */
 export function linkedRefFromText(
 	text: string,
 ):
