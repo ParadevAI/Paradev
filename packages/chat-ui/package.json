@@ -28,8 +28,8 @@
 		"@superset/i18n": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/ui": "workspace:*",
-		"lexical": "0.41.0",
 		"dompurify": "3.4.16",
+		"lexical": "0.41.0",
 		"lucide-react": "0.563.0",
 		"pele": "1.10.0",
 		"streamdown": "2.5.0"
