@@ -19,6 +19,7 @@ import {
 	type ConnectionSecrets,
 	connectionSecrets,
 } from "../../../lib/connectors/upsert";
+import { isInternalUrl } from "../../../lib/organization-plugins/internal-host";
 import { installedPlugin } from "../connections";
 import {
 	type PluginManifest,
@@ -180,13 +181,21 @@ function remoteBinding(
 
 	if (!mcp?.url) return null;
 
+	const url = resolveUrlTemplate(
+		mcp.url,
+		scope,
+		method ? secretInputNames(method) : undefined,
+		"mcp.url",
+	);
+	if (!trustedManifest(install.marketplace) && isInternalUrl(url)) {
+		throw new PluginTargetError(
+			`"${install.manifest.name}" points at a private or internal address.`,
+			403,
+		);
+	}
+
 	return {
-		url: resolveUrlTemplate(
-			mcp.url,
-			scope,
-			method ? secretInputNames(method) : undefined,
-			"mcp.url",
-		),
+		url,
 		headers: {
 			...resolveTemplateDeep(mcp.headers ?? {}, scope),
 			...resolveTemplateDeep(method?.bind ?? extension?.bind ?? {}, scope)

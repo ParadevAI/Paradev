@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { cp, rename, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
+	findInstalledTree,
 	getBundledMarketplaceDir,
 	type InstalledPluginEntry,
 	pluginCachePath,
@@ -11,12 +12,21 @@ import {
 import {
 	DEFAULT_MARKETPLACE,
 	isOrganizationMarketplace,
+	manifestHasTools,
 } from "@superset/shared/plugins";
 import {
 	pluginBundleHash,
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { sandboxPluginsSchema } from "@superset/shared/sandbox-contract";
+
+function readManifest(file: string): unknown {
+	try {
+		return JSON.parse(readFileSync(file, "utf8"));
+	} catch {
+		return null;
+	}
+}
 
 function treeVersion(dir: string, fallback: string): string {
 	try {
@@ -87,13 +97,15 @@ async function cacheOrganizationTree(
 		if (pluginBundleHash(bundle) !== download.contentHash) {
 			throw new Error("the download does not match its hash");
 		}
+		const { files, executable } = unpackPluginBundle(bundle);
 		return {
 			version: download.version,
 			installPath: writePluginTree(
 				download.marketplace,
 				download.name,
 				download.version,
-				unpackPluginBundle(bundle),
+				files,
+				executable,
 			),
 		};
 	} catch (error) {
@@ -138,17 +150,30 @@ export async function seedSandboxPlugins(
 			isOrganizationMarketplace(plugin.marketplace)
 				? await cacheOrganizationTree(plugin.name, fetchOrganizationBundle)
 				: undefined;
+		const cached =
+			!shipped && !fetched && isOrganizationMarketplace(plugin.marketplace)
+				? findInstalledTree(plugin.marketplace, plugin.name)
+				: null;
+		const usableCache =
+			cached && existsSync(join(cached.installPath, "plugin.json"))
+				? cached
+				: null;
 		const version = shipped
 			? treeVersion(dir, plugin.version)
-			: (fetched?.version ?? plugin.version);
+			: (fetched?.version ?? usableCache?.version ?? plugin.version);
 		const installPath = shipped
 			? await cacheShippedTree(dir, plugin.marketplace, plugin.name, version)
-			: fetched?.installPath;
+			: (fetched?.installPath ?? usableCache?.installPath);
+		const tools =
+			installPath && isOrganizationMarketplace(plugin.marketplace)
+				? manifestHasTools(readManifest(join(installPath, "plugin.json")))
+				: undefined;
 		entries.push({
 			marketplace: plugin.marketplace,
 			name: plugin.name,
 			version,
 			...(installPath ? { installPath } : {}),
+			...(tools === undefined ? {} : { tools }),
 			installedAt,
 			enabled: plugin.enabled,
 		});

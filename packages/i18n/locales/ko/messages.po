@@ -2583,6 +2583,9 @@ msgstr "익명의 조립공"
 msgid "another device"
 msgstr "다른 기기"
 
+msgid "Another repository..."
+msgstr "다른 저장소..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "아래 터미널에서 비밀번호 등 질문에 답하세요."
 
@@ -14107,9 +14110,6 @@ msgstr "플러그인 마켓플레이스"
 msgid "Plugins"
 msgstr "플러그인"
 
-msgid "Plugins update when the sync finishes."
-msgstr "동기화가 끝나면 플러그인이 업데이트됩니다."
-
 msgid "Point at the page. Your agent makes the change."
 msgstr "페이지를 가리키면 에이전트가 변경합니다."
 
@@ -17991,6 +17991,9 @@ msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset은 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
+
 msgid "Supervised"
 msgstr "감독"
 
@@ -18130,9 +18133,6 @@ msgstr "GitHub 리포지토리에서 플러그인을 동기화하고 설치할 �
 
 msgid "Sync Repositories"
 msgstr "리포지토리 동기화"
-
-msgid "Sync requested"
-msgstr "동기화 요청됨"
 
 msgid "Sync started"
 msgstr "동기화를 시작했습니다"
@@ -18639,9 +18639,6 @@ msgstr "저희 팀을 후원하는 펀드와 엔젤 투자자입니다."
 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "재사용 가능한 Paradev 에이전트 설정, 프롬프트, 셋업 가이드가 모일 공간입니다."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App이 아직 리포지토리를 볼 수 없습니다. GitHub에서 접근 권한을 준 다음 다시 시도하세요."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -21299,9 +21296,6 @@ msgstr "이름 <0>(프롬프트를 채택하면 변경 로그에 이름을 남�
 
 msgid "Your organization"
 msgstr "내 조직"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "조직이 아직 GitHub를 연결하지 않았습니다. <0>설정 › 연동</0>에서 GitHub App을 설치한 다음 돌아오세요."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "조직이 클라우드 사용 한도에 도달했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 한도를 올리거나 업그레이드하세요."

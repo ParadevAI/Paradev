@@ -2134,12 +2134,14 @@ export function getVisibleMatchCountBySection(
 	cloudWorkspaces: boolean,
 	mobileEnabled = false,
 	acpChatFlag = false,
+	pluginsVisible = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
 			(item.section !== "mobile" || mobileEnabled) &&
-			(item.id !== SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT || acpChatFlag),
+			(item.id !== SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT || acpChatFlag) &&
+			(item.section !== "plugins" || pluginsVisible),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {

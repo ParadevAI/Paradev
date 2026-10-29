@@ -9,35 +9,15 @@ import {
 } from "./marketplace";
 
 describe("parseMarketplace", () => {
-	test("reads Superset, Codex and Claude Code local sources", () => {
+	test("reads ./ sources, under the source path", () => {
 		const { entries, problems } = parseMarketplace(
-			{
-				plugins: [
-					{ name: "ours", source: "./plugins/ours" },
-					{
-						name: "codex",
-						source: { source: "local", path: "./plugins/codex" },
-					},
-				],
-			},
-			"",
+			{ plugins: [{ name: "ours", source: "./plugins/ours" }] },
+			"tools",
 		);
 		expect(problems).toEqual([]);
 		expect(entries.map(({ name, dir }) => ({ name, dir }))).toEqual([
-			{ name: "ours", dir: "plugins/ours" },
-			{ name: "codex", dir: "plugins/codex" },
+			{ name: "ours", dir: "tools/plugins/ours" },
 		]);
-	});
-
-	test("resolves bare names under pluginRoot and paths under the source path", () => {
-		const { entries } = parseMarketplace(
-			{
-				metadata: { pluginRoot: "./plugins" },
-				plugins: [{ name: "a", source: "a" }],
-			},
-			"tools",
-		);
-		expect(entries.map((e) => e.dir)).toEqual(["tools/plugins/a"]);
 	});
 
 	test("refuses sources outside the repository", () => {
@@ -45,13 +25,22 @@ describe("parseMarketplace", () => {
 			{
 				plugins: [
 					{ name: "remote", source: { source: "github", repo: "a/b" } },
+					{ name: "local", source: { source: "local", path: "./plugins/a" } },
+					{ name: "bare", source: "plugins/a" },
+					{ name: "everything", source: "./" },
 					{ name: "escape", source: "./../secrets" },
 				],
 			},
 			"",
 		);
 		expect(entries).toEqual([]);
-		expect(problems.map((p) => p.name)).toEqual(["remote", "escape"]);
+		expect(problems.map((p) => p.name)).toEqual([
+			"remote",
+			"local",
+			"bare",
+			"everything",
+			"escape",
+		]);
 	});
 
 	test("refuses a file with no plugins list", () => {
@@ -61,33 +50,46 @@ describe("parseMarketplace", () => {
 
 describe("repository paths", () => {
 	const paths = new Set([
+		".agent-marketplace.json",
 		".claude-plugin/marketplace.json",
-		"plugins/a/.codex-plugin/plugin.json",
+		"plugins/a/plugin.json",
+		"plugins/b/.claude-plugin/plugin.json",
 		"plugins/a/skills/triage/SKILL.md",
 		"plugins/a/commands/ship.md",
 		"plugins/a/node_modules/x/index.js",
+		"plugins/a/hooks/pre.sh",
+		"plugins/a/scripts/deploy.sh",
 		"plugins/a/README.md",
 		"plugins/ab/skills/other/SKILL.md",
 	]);
 
-	test("finds the marketplace and manifest files in any supported location", () => {
-		expect(findMarketplaceFile(paths, "")).toBe(
-			".claude-plugin/marketplace.json",
-		);
-		expect(findManifestFile(paths, "plugins/a")).toBe(
-			"plugins/a/.codex-plugin/plugin.json",
-		);
+	test("reads only .agent-marketplace.json and plugin.json", () => {
+		expect(findMarketplaceFile(paths, "")).toBe(".agent-marketplace.json");
+		expect(
+			findMarketplaceFile(new Set([".claude-plugin/marketplace.json"]), ""),
+		).toBeNull();
+		expect(findManifestFile(paths, "plugins/a")).toBe("plugins/a/plugin.json");
+		expect(findManifestFile(paths, "plugins/b")).toBeNull();
 	});
 
-	test("carries only skills and commands, and only from the plugin's own directory", () => {
+	test("carries the whole plugin directory except hooks, node_modules and .git", () => {
 		expect([...pluginTreeFiles(paths, "plugins/a")]).toEqual([
 			["plugins/a/skills/triage/SKILL.md", "skills/triage/SKILL.md"],
 			["plugins/a/commands/ship.md", "commands/ship.md"],
+			["plugins/a/scripts/deploy.sh", "scripts/deploy.sh"],
+			["plugins/a/README.md", "README.md"],
 		]);
 	});
 });
 
 describe("withVersion", () => {
+	test("a generated version changes when only an executable bit changes", () => {
+		const files = new Map([["scripts/run.sh", Buffer.from("#!/bin/sh\n")]]);
+		expect(
+			withVersion({ name: "a" }, files, new Set(["scripts/run.sh"])).version,
+		).not.toBe(withVersion({ name: "a" }, files).version);
+	});
+
 	const files = new Map([["skills/a/SKILL.md", Buffer.from("one")]]);
 
 	test("keeps a declared version", () => {

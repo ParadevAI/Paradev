@@ -1,6 +1,9 @@
 import { writePluginTree } from "@superset/agent-setup";
 import { CLIError } from "@superset/cli-framework";
-import { organizationMarketplace } from "@superset/shared/plugins";
+import {
+	manifestHasTools,
+	organizationMarketplace,
+} from "@superset/shared/plugins";
 import {
 	pluginBundleHash,
 	unpackPluginBundle,
@@ -13,6 +16,14 @@ import {
 	removePlugin,
 } from "./install";
 
+function parseManifest(raw: Uint8Array | undefined): unknown {
+	try {
+		return raw ? JSON.parse(Buffer.from(raw).toString("utf8")) : null;
+	} catch {
+		return null;
+	}
+}
+
 export async function installOrganizationPlugin(
 	api: ApiClient,
 	name: string,
@@ -24,17 +35,20 @@ export async function installOrganizationPlugin(
 			`The download of "${name}" does not match what your organization synced. Try again.`,
 		);
 	}
+	const { files, executable } = unpackPluginBundle(bundle);
 	const installPath = writePluginTree(
 		download.marketplace,
 		download.name,
 		download.version,
-		unpackPluginBundle(bundle),
+		files,
+		executable,
 	);
 	return await recordPlugin({
 		name: download.name,
 		marketplace: download.marketplace,
 		version: download.version,
 		installPath,
+		tools: manifestHasTools(parseManifest(files.get("plugin.json"))),
 	});
 }
 

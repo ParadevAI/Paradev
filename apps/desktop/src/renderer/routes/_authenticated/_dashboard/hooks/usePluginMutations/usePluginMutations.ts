@@ -14,6 +14,7 @@ const displayName = (name: string) =>
 export function usePluginMutations() {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
+	const machineUtils = electronTrpc.useUtils();
 	const navigate = useNavigate();
 
 	const accountInstall = cloudTrpc.plugins.install.useMutation();
@@ -24,6 +25,7 @@ export function usePluginMutations() {
 		await Promise.all([
 			utils.plugins.list.invalidate(),
 			utils.plugins.connections.list.invalidate(),
+			machineUtils.plugins.organizationVersions.invalidate(),
 		]);
 	};
 

@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import {
 	createManagedSkills,
 	mcpHeadersHelperCommand,
+	readInstalledVersions,
 	resolveDisabledSkillIds,
 	syncManagedMcpServers,
 	writeSharedDisabledSkillIds,
@@ -15,6 +16,8 @@ import {
 	desiredPluginMcpServers,
 	getPluginByName,
 	type InstalledPlugin,
+	isOrganizationMarketplace,
+	organizationIdOfMarketplace,
 	SUPERSET_MANAGED_SKILLS,
 } from "@superset/shared/plugins";
 import log from "electron-log/main";
@@ -37,11 +40,17 @@ const execFileAsync = promisify(execFile);
 
 const pluginCliQueue = createSerialQueue();
 
-function queuePluginCli(args: string[]): Promise<void> {
-	return pluginCliQueue(() => runPluginCli(args));
+function queuePluginCli(
+	args: string[],
+	organizationId?: string | null,
+): Promise<void> {
+	return pluginCliQueue(() => runPluginCli(args, organizationId));
 }
 
-async function runPluginCli(args: string[]): Promise<void> {
+async function runPluginCli(
+	args: string[],
+	organizationId?: string | null,
+): Promise<void> {
 	const cli = resolveBundledCliPath();
 	if (!cli) {
 		log.warn("[plugins] no bundled CLI; skills were not provisioned");
@@ -59,6 +68,7 @@ async function runPluginCli(args: string[]): Promise<void> {
 				SUPERSET_CLI_AUDIENCE: "internal",
 				SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
 				...(token ? { SUPERSET_API_KEY: token } : {}),
+				...(organizationId ? { SUPERSET_ORGANIZATION_ID: organizationId } : {}),
 			},
 		});
 	} catch (error) {
@@ -66,6 +76,7 @@ async function runPluginCli(args: string[]): Promise<void> {
 			`[plugins] ${args.join(" ")} failed; skills may be stale:`,
 			error instanceof Error ? error.message : error,
 		);
+		throw error;
 	}
 }
 
@@ -111,42 +122,56 @@ export function installPlugin(name: string): InstalledPlugin[] | null {
 		: [...installed, record];
 
 	saveInstalledPlugins(next);
-	void queuePluginCli(["install", name, "--update"]);
+	void queuePluginCli(["install", name, "--update"]).catch(() => {});
 	return next;
 }
 
 export function uninstallPlugin(name: string): InstalledPlugin[] {
 	const next = getInstalledPlugins().filter((entry) => entry.name !== name);
 	saveInstalledPlugins(next);
-	void queuePluginCli(["uninstall", name]);
+	void queuePluginCli(["uninstall", name]).catch(() => {});
 	return next;
 }
 
 /** The bundled CLI fetches an organization plugin's tree; skills are written here, where the templates live. */
-function queueOrganizationPluginCli(args: string[]): Promise<void> {
-	return queuePluginCli(args).then(() =>
+function queueOrganizationPluginCli(
+	args: string[],
+	organizationId: string | null,
+): Promise<void> {
+	return queuePluginCli(args, organizationId).finally(() =>
 		queueManagedSkillsSync(resolveDisabledSkillIds(getDisabledSkills())),
 	);
 }
 
-export function installOrganizationPlugin(name: string): void {
-	void queueOrganizationPluginCli([
-		"install",
-		`${name}@organization`,
-		"--update",
-	]);
+export function installOrganizationPlugin(
+	name: string,
+	marketplace: string,
+): Promise<void> {
+	return queueOrganizationPluginCli(
+		["install", `${name}@organization`, "--update"],
+		organizationIdOfMarketplace(marketplace),
+	);
+}
+
+/** The version of each organization plugin on this machine, which only the ledger knows. */
+export function organizationPluginVersions(): {
+	marketplace: string;
+	name: string;
+	version: string;
+}[] {
+	return (readInstalledVersions() ?? []).filter((entry) =>
+		isOrganizationMarketplace(entry.marketplace),
+	);
 }
 
 export function uninstallOrganizationPlugin(
 	name: string,
 	marketplace: string,
 ): void {
-	void queueOrganizationPluginCli([
-		"uninstall",
-		name,
-		"--marketplace",
-		marketplace,
-	]);
+	void queueOrganizationPluginCli(
+		["uninstall", name, "--marketplace", marketplace],
+		organizationIdOfMarketplace(marketplace),
+	).catch(() => {});
 }
 
 export function setOrganizationPluginEnabled(
@@ -154,16 +179,14 @@ export function setOrganizationPluginEnabled(
 	marketplace: string,
 	enabled: boolean,
 ): void {
-	void queueOrganizationPluginCli([
-		enabled ? "enable" : "disable",
-		name,
-		"--marketplace",
-		marketplace,
-	]);
+	void queueOrganizationPluginCli(
+		[enabled ? "enable" : "disable", name, "--marketplace", marketplace],
+		organizationIdOfMarketplace(marketplace),
+	).catch(() => {});
 }
 
-export function syncPlugins(): Promise<void> {
-	return queueOrganizationPluginCli(["sync"]);
+export function syncPlugins(organizationId?: string | null): Promise<void> {
+	return queueOrganizationPluginCli(["sync"], organizationId ?? null);
 }
 
 /**
@@ -265,7 +288,7 @@ export function setPluginEnabled(
 	// installed_plugins.json is the only `enabled` flag provisioning reads, and
 	// local-db is not it: without this the skills stay materialized while the
 	// MCP servers are reaped, leaving the plugin half on.
-	void queuePluginCli([enabled ? "enable" : "disable", name]);
+	void queuePluginCli([enabled ? "enable" : "disable", name]).catch(() => {});
 	return next;
 }
 

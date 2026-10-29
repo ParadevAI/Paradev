@@ -134,17 +134,29 @@ than store a token. pdev needs a build with `headersHelper` support; older build
 
 ## Organization plugins
 
-An organization can have plugins of its own, without a repository. An admin uploads a `plugin.json`
-with `superset plugins organization upload <dir>`, and `publish` makes it installable by members;
-until then it is a draft only admins see. It lives in the `organization_plugins` table, in a
-marketplace named `organization-<organization id>`, so two organizations' same-named plugins never
-share an install.
+An organization gets its own plugins from a GitHub repository. An owner or admin adds the
+repository as a source (repository, ref, path). Sync reads `.agent-marketplace.json` at that path,
+the same format as this repository's marketplace: each plugin's `source` is a `./` directory in the
+repository. Like Codex, it packs the whole plugin directory into a bundle, so skills can use
+`scripts/`, `assets/` and other folders next to them, and executable files stay executable. It
+leaves out `.git`, `node_modules` and `hooks/`, which Superset does not run. Bundles go to the
+private R2 bucket; each plugin is a row in `organization_plugins` under a marketplace named
+`organization-<organization id>`. Two organizations' same-named plugins never share an install.
 
-These plugins are tools only: no skills, and no code served by Superset. The manifest must name a
-connector that has a tool server of its own, or give an `https` `mcp.url`. It cannot take a
-first-party plugin's name, because a client keys each tool server by plugin name. An upload replaces
-the current version for everyone who installed it, with no reinstall. The proxy refuses a call made
-from another organization, and one made after the plugin is unpublished or removed.
+Sync runs daily from a QStash schedule that queues one job per source, or on demand with "Sync now".
+It reads the repository with the GitHub account of the admin who added the source, while that admin
+is still an admin with GitHub connected, and then with the organization's GitHub App. A plugin that
+fails to sync keeps its last good version. A plugin that leaves the repository is marked "No longer
+in source" and is not deleted. Changed content that reuses a declared version is refused.
+
+Each plugin has an access policy per role (owner, admin, member): `unavailable`, `available` or
+`installed`. A new plugin is available to owners and admins only. `installed` gives every member of
+the role an install that they can disable but not remove. Every read path checks the policy: the
+catalog, install, bundle download, the tool proxy and the cloud workspace plugin list.
+
+A plugin may have only skills. A plugin with tools must name a connector that has a tool server of
+its own, or give an `https` `mcp.url` that is not a private or internal address. It cannot take a
+first-party plugin's name, because a client keys each tool server by plugin name.
 
 ## Command surface
 
@@ -154,7 +166,8 @@ superset plugins install|uninstall|list|sync    # this machine
 superset plugins enable|disable <name>          # without dropping its skills
 superset plugins connect|connections            # credentials
 superset plugins marketplace list|add|remove    # marketplace sources
-superset plugins organization list|upload|publish|unpublish|remove  # an organization's own plugins
+superset plugins organization list|access       # an organization's own plugins
+superset plugins organization sources add|list|remove|sync  # their GitHub sources
 superset mcp tools|call-tool                    # call a plugin's tools through the proxy
 superset skills list
 ```

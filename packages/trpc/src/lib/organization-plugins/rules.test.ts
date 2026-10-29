@@ -52,6 +52,38 @@ describe("organizationPluginProblem", () => {
 			organizationPluginProblem(manifest(mcp("https://tools.test/mcp"))),
 		).toBeNull();
 	});
+
+	test("a plugin's tool server cannot be a private or internal address", () => {
+		const mcp = (url: string) => ({ mcp: { type: "streamable-http", url } });
+		for (const url of [
+			"https://127.0.0.1/mcp",
+			"https://localhost/mcp",
+			"https://169.254.169.254/latest",
+			"https://10.0.0.5/mcp",
+			"https://192.168.1.2/mcp",
+			"https://[::1]/mcp",
+			"https://db.internal/mcp",
+			"https://localhost./mcp",
+			"https://db.internal./mcp",
+			"https://metadata/computeMetadata",
+			"https://[::127.0.0.1]/mcp",
+		]) {
+			expect(organizationPluginProblem(manifest(mcp(url)))).toContain(
+				"private or internal",
+			);
+		}
+	});
+});
+
+describe("organizationPluginProblem with an input in the host", () => {
+	test("refuses a host the member's input would decide", () => {
+		const url = ["https://", "$", "{inputs.host}/mcp"].join("");
+		expect(
+			organizationPluginProblem(
+				manifest({ mcp: { type: "streamable-http", url } }),
+			),
+		).not.toBeNull();
+	});
 });
 
 describe("readOrganizationBundle", () => {

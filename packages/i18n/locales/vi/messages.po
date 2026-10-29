@@ -2583,6 +2583,9 @@ msgstr "Thợ lắp ráp ẩn danh"
 msgid "another device"
 msgstr "thiết bị khác"
 
+msgid "Another repository..."
+msgstr "Kho lưu trữ khác..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Trả lời các câu hỏi trong terminal bên dưới, chẳng hạn mật khẩu."
 
@@ -14107,9 +14110,6 @@ msgstr "Marketplace plugin"
 msgid "Plugins"
 msgstr "Plugin"
 
-msgid "Plugins update when the sync finishes."
-msgstr "Plugin sẽ cập nhật khi đồng bộ xong."
-
 msgid "Point at the page. Your agent makes the change."
 msgstr "Chỉ vào trang. Agent của bạn sẽ thực hiện thay đổi."
 
@@ -17991,6 +17991,9 @@ msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi đư�
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
+
 msgid "Supervised"
 msgstr "Có giám sát"
 
@@ -18130,9 +18133,6 @@ msgstr "Đồng bộ plugin từ các repository GitHub của bạn và chọn a
 
 msgid "Sync Repositories"
 msgstr "Đồng bộ repository"
-
-msgid "Sync requested"
-msgstr "Đã yêu cầu đồng bộ"
 
 msgid "Sync started"
 msgstr "Đã bắt đầu đồng bộ"
@@ -18639,9 +18639,6 @@ msgstr "Các quỹ và nhà đầu tư thiên thần đồng hành cùng đội 
 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Paradev có thể tái sử dụng."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App chưa thấy repository nào. Cấp quyền cho nó trên GitHub rồi thử lại."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -21299,9 +21296,6 @@ msgstr "Tên của bạn <0>(nếu dùng prompt của bạn, chúng tôi sẽ gh
 
 msgid "Your organization"
 msgstr "Tổ chức của bạn"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Tổ chức của bạn chưa kết nối GitHub. Cài GitHub App trong <0>Cài đặt › Tích hợp</0>, rồi quay lại."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Hãy tăng giới hạn hoặc nâng cấp trong Cài đặt, Thanh toán để khởi động workspace này."

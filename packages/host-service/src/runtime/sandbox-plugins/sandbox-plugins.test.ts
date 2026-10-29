@@ -6,6 +6,7 @@ import {
 	readdirSync,
 	readFileSync,
 	rmSync,
+	statSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -106,7 +107,9 @@ describe("seedSandboxPlugins", () => {
 			new Map([
 				["plugin.json", Buffer.from('{"name":"team-tools","version":"2.0.0"}')],
 				["skills/triage/SKILL.md", Buffer.from("---\nname: triage\n---\n")],
+				["scripts/run.sh", Buffer.from("#!/bin/sh\n")],
 			]),
+			new Set(["scripts/run.sh"]),
 		);
 		await seedSandboxPlugins(
 			{
@@ -129,6 +132,57 @@ describe("seedSandboxPlugins", () => {
 			installPath: cached,
 		});
 		expect(existsSync(join(cached, "skills", "triage", "SKILL.md"))).toBe(true);
+		expect(statSync(join(cached, "scripts", "run.sh")).mode & 0o111).not.toBe(
+			0,
+		);
+		expect(
+			statSync(join(cached, "skills", "triage", "SKILL.md")).mode & 0o111,
+		).toBe(0);
+	});
+
+	it("keeps an organization plugin's cached tree when its download fails", async () => {
+		const marketplace = "organization-org-1";
+		const cached = pluginCachePath(marketplace, "team-tools", "2.0.0");
+		mkdirSync(cached, { recursive: true });
+		writeFileSync(join(cached, "plugin.json"), '{"name":"team-tools"}');
+		mkdirSync(join(home, "plugins"), { recursive: true });
+		writeFileSync(
+			join(home, "plugins", "installed_plugins.json"),
+			JSON.stringify({
+				version: 1,
+				plugins: [
+					{
+						marketplace: "acme",
+						name: "team-tools",
+						version: "9.0.0",
+						installPath: "/elsewhere",
+					},
+					{
+						marketplace,
+						name: "team-tools",
+						version: "2.0.0",
+						installPath: cached,
+					},
+				],
+			}),
+		);
+
+		await seedSandboxPlugins(
+			{
+				SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+					{ marketplace, name: "team-tools", version: "3.0.0", enabled: true },
+				]),
+			},
+			async () => {
+				throw new Error("offline");
+			},
+		);
+
+		expect(ledger().plugins[0]).toMatchObject({
+			marketplace,
+			version: "2.0.0",
+			installPath: cached,
+		});
 	});
 
 	it("leaves no partial tree behind when the copy fails", async () => {

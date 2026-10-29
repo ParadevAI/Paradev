@@ -92,10 +92,12 @@ export {
 } from "./disabled-skills";
 export {
 	type EnabledPlugin,
+	findInstalledTree,
 	type InstalledPluginEntry,
 	installedPluginsFilePath,
 	readEnabledPlugins,
 	readInstalledPluginSources,
+	readInstalledVersions,
 	writeInstalledPlugins,
 } from "./installed-plugins";
 export {

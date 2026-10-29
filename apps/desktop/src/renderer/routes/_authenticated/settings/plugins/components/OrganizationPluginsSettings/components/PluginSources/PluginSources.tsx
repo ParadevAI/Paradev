@@ -5,19 +5,23 @@ import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { LuPlus, LuRefreshCw, LuTrash2 } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { AddPluginSourceDialog } from "renderer/routes/_authenticated/components/AddPluginSourceDialog";
+import { usePendingSourceSyncs } from "./hooks/usePendingSourceSyncs";
 
 export function PluginSources() {
 	const { t } = useLingui();
 	const { formatRelativeTime } = useFormat();
 	const utils = cloudTrpc.useUtils();
 	const [isAddOpen, setIsAddOpen] = useState(false);
+	const [isPolling, setIsPolling] = useState(false);
 	const { data: sources, isPending } =
-		cloudTrpc.plugins.organization.sources.list.useQuery();
+		cloudTrpc.plugins.organization.sources.list.useQuery(undefined, {
+			refetchInterval: isPolling ? 2_000 : false,
+		});
 
 	const refresh = () =>
 		Promise.all([
@@ -25,14 +29,23 @@ export function PluginSources() {
 			utils.plugins.organization.list.invalidate(),
 			utils.plugins.list.invalidate(),
 		]);
+	const refreshPlugins = useCallback(
+		() =>
+			Promise.all([
+				utils.plugins.organization.list.invalidate(),
+				utils.plugins.list.invalidate(),
+			]),
+		[utils],
+	);
+	const pendingSyncs = usePendingSourceSyncs(sources, refreshPlugins);
+	useEffect(() => {
+		setIsPolling(pendingSyncs.anyPending);
+	}, [pendingSyncs.anyPending]);
 
 	const syncMutation = cloudTrpc.plugins.organization.sources.sync.useMutation({
-		onSuccess: () => {
-			toast.success(t({ message: "Sync requested" }), {
-				description: t({
-					message: "Plugins update when the sync finishes.",
-				}),
-			});
+		onMutate: ({ id }) => {
+			const source = sources?.find((row) => row.id === id);
+			if (source) pendingSyncs.markRequested(source);
 		},
 		onError: (error) => {
 			toast.error(t({ message: "Could not sync" }), {
@@ -154,18 +167,21 @@ export function PluginSources() {
 										variant="ghost"
 										size="sm"
 										className="gap-1.5"
-										disabled={syncMutation.isPending}
+										disabled={pendingSyncs.isPending(source.id)}
 										onClick={() => syncMutation.mutate({ id: source.id })}
 									>
 										<LuRefreshCw
 											className={
-												syncMutation.isPending &&
-												syncMutation.variables?.id === source.id
+												pendingSyncs.isPending(source.id)
 													? "size-3.5 animate-spin"
 													: "size-3.5"
 											}
 										/>
-										<Trans>Sync now</Trans>
+										{pendingSyncs.isPending(source.id) ? (
+											<Trans>Syncing...</Trans>
+										) : (
+											<Trans>Sync now</Trans>
+										)}
 									</Button>
 									<Button
 										variant="ghost"

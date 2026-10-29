@@ -397,6 +397,7 @@ export interface InstallPluginResult {
 	version: string;
 	installPath: string;
 	skills: number;
+	tools?: boolean;
 }
 
 export interface InstallPluginOptions {
@@ -520,18 +521,31 @@ export async function installPlugin(
 	};
 }
 
+/** The ledger with this plugin recorded, keeping a member's choice to disable it. */
+export function ledgerWithPlugin(
+	ledger: readonly InstalledPlugin[],
+	plugin: Omit<InstallPluginResult, "skills">,
+	installedAt: string,
+): InstalledPlugin[] {
+	const existing = ledger.find(
+		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
+	);
+	return [
+		...ledger.filter((p) => p !== existing),
+		{
+			...plugin,
+			installedAt,
+			enabled: existing?.enabled ?? true,
+		} satisfies InstalledPlugin,
+	];
+}
+
 export async function recordPlugin(
 	plugin: Omit<InstallPluginResult, "skills">,
 ): Promise<InstallPluginResult> {
-	const plugins = readInstalledPlugins().filter(
-		(p) => !(p.name === plugin.name && p.marketplace === plugin.marketplace),
+	writeInstalledPlugins(
+		ledgerWithPlugin(readInstalledPlugins(), plugin, new Date().toISOString()),
 	);
-	plugins.push({
-		...plugin,
-		installedAt: new Date().toISOString(),
-		enabled: true,
-	} satisfies InstalledPlugin);
-	writeInstalledPlugins(plugins);
 
 	return { ...plugin, skills: (await syncPlugins()).skills };
 }

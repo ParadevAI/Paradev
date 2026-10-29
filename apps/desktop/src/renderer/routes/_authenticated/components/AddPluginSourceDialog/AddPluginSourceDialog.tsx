@@ -24,6 +24,9 @@ import { useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
+const OTHER_REPOSITORY = "__other__";
+const REPOSITORY_PATTERN = /^[\w.-]+\/[\w.-]+$/;
+
 interface AddPluginSourceDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -37,6 +40,7 @@ export function AddPluginSourceDialog({
 	const utils = cloudTrpc.useUtils();
 	const organizationId = useActiveOrganizationId();
 	const [repo, setRepo] = useState("");
+	const [typedRepo, setTypedRepo] = useState("");
 	const [ref, setRef] = useState("");
 	const [path, setPath] = useState("");
 
@@ -54,11 +58,17 @@ export function AddPluginSourceDialog({
 	const repositories = [...(repositoriesQuery.data ?? [])].sort((a, b) =>
 		a.fullName.localeCompare(b.fullName),
 	);
-	const hasGitHub =
-		installationQuery.isPending || Boolean(installationQuery.data);
+	const appRepositories =
+		installationQuery.isPending ||
+		repositoriesQuery.isPending ||
+		repositories.length > 0;
+	const typing = !appRepositories || repo === OTHER_REPOSITORY;
+	const chosenRepo = typing ? typedRepo.trim() : repo;
+	const repoIsValid = REPOSITORY_PATTERN.test(chosenRepo);
 
 	const reset = () => {
 		setRepo("");
+		setTypedRepo("");
 		setRef("");
 		setPath("");
 	};
@@ -86,9 +96,9 @@ export function AddPluginSourceDialog({
 	});
 
 	const submit = () => {
-		if (!repo) return;
+		if (!repoIsValid) return;
 		addMutation.mutate({
-			repo,
+			repo: chosenRepo,
 			ref: ref.trim() || undefined,
 			path: path.trim() || undefined,
 		});
@@ -115,12 +125,12 @@ export function AddPluginSourceDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				{hasGitHub ? (
-					<div className="space-y-4 py-2">
-						<div className="space-y-2">
-							<Label htmlFor="plugin-source-repo">
-								<Trans>Repository</Trans>
-							</Label>
+				<div className="space-y-4 py-2">
+					<div className="space-y-2">
+						<Label htmlFor="plugin-source-repo">
+							<Trans>Repository</Trans>
+						</Label>
+						{appRepositories && (
 							<Select value={repo} onValueChange={setRepo}>
 								<SelectTrigger id="plugin-source-repo" className="w-full">
 									<SelectValue
@@ -137,65 +147,69 @@ export function AddPluginSourceDialog({
 											{repository.fullName}
 										</SelectItem>
 									))}
+									<SelectItem value={OTHER_REPOSITORY}>
+										<Trans>Another repository...</Trans>
+									</SelectItem>
 								</SelectContent>
 							</Select>
-							{!repositoriesQuery.isPending && repositories.length === 0 && (
+						)}
+						{typing && (
+							<>
+								<Input
+									id={appRepositories ? undefined : "plugin-source-repo"}
+									placeholder="owner/name"
+									value={typedRepo}
+									onChange={(event) => setTypedRepo(event.target.value)}
+								/>
 								<p className="text-xs text-muted-foreground">
 									<Trans>
-										The GitHub App cannot see any repositories yet. Give it
-										access on GitHub, then try again.
+										Superset reads it with your connected GitHub account.
+										Connect one in{" "}
+										<Link
+											to="/settings/integrations"
+											className="text-primary hover:underline"
+											onClick={() => onOpenChange(false)}
+										>
+											Settings › Integrations
+										</Link>{" "}
+										if you have not yet.
 									</Trans>
 								</p>
-							)}
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="plugin-source-ref">
-								<Trans>Branch or tag (optional)</Trans>
-							</Label>
-							<Input
-								id="plugin-source-ref"
-								placeholder={t({ message: "Default branch" })}
-								value={ref}
-								onChange={(event) => setRef(event.target.value)}
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="plugin-source-path">
-								<Trans>Path (optional)</Trans>
-							</Label>
-							<Input
-								id="plugin-source-path"
-								placeholder={t({ message: "Repository root" })}
-								value={path}
-								onChange={(event) => setPath(event.target.value)}
-								onKeyDown={(event) => {
-									if (event.key === "Enter") submit();
-								}}
-							/>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									The folder that holds the marketplace file, if it is not at
-									the root.
-								</Trans>
-							</p>
-						</div>
+							</>
+						)}
 					</div>
-				) : (
-					<p className="py-2 text-sm text-muted-foreground">
-						<Trans>
-							Your organization has not connected GitHub yet. Install the GitHub
-							App in{" "}
-							<Link
-								to="/settings/integrations"
-								className="text-primary hover:underline"
-								onClick={() => onOpenChange(false)}
-							>
-								Settings › Integrations
-							</Link>
-							, then come back.
-						</Trans>
-					</p>
-				)}
+					<div className="space-y-2">
+						<Label htmlFor="plugin-source-ref">
+							<Trans>Branch or tag (optional)</Trans>
+						</Label>
+						<Input
+							id="plugin-source-ref"
+							placeholder={t({ message: "Default branch" })}
+							value={ref}
+							onChange={(event) => setRef(event.target.value)}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="plugin-source-path">
+							<Trans>Path (optional)</Trans>
+						</Label>
+						<Input
+							id="plugin-source-path"
+							placeholder={t({ message: "Repository root" })}
+							value={path}
+							onChange={(event) => setPath(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") submit();
+							}}
+						/>
+						<p className="text-xs text-muted-foreground">
+							<Trans>
+								The folder that holds the marketplace file, if it is not at the
+								root.
+							</Trans>
+						</p>
+					</div>
+				</div>
 
 				<DialogFooter>
 					<Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -203,7 +217,7 @@ export function AddPluginSourceDialog({
 					</Button>
 					<Button
 						onClick={submit}
-						disabled={!hasGitHub || !repo || addMutation.isPending}
+						disabled={!repoIsValid || addMutation.isPending}
 					>
 						{addMutation.isPending ? (
 							<Trans>Adding...</Trans>

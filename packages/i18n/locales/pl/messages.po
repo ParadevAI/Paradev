@@ -2583,6 +2583,9 @@ msgstr "Anonimowy Monter"
 msgid "another device"
 msgstr "inne urządzenie"
 
+msgid "Another repository..."
+msgstr "Inne repozytorium..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpowiadaj na pytania w terminalu poniżej, na przykład podaj hasło."
 
@@ -14107,9 +14110,6 @@ msgstr "Marketplace wtyczek"
 msgid "Plugins"
 msgstr "Wtyczki"
 
-msgid "Plugins update when the sync finishes."
-msgstr "Wtyczki zaktualizują się po zakończeniu synchronizacji."
-
 msgid "Point at the page. Your agent makes the change."
 msgstr "Wskaż stronę. Twój agent wprowadzi zmianę."
 
@@ -17991,6 +17991,9 @@ msgstr "Superset to teraz Paradev. Pozyskaliśmy też 11,5 mln $ w rundzie seed"
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile debiutuje na iPhonie"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset odczytuje je przez połączone konto GitHub. Jeśli jeszcze go nie połączono, zrób to w <0>Ustawienia › Integracje</0>."
+
 msgid "Supervised"
 msgstr "Nadzorowany"
 
@@ -18130,9 +18133,6 @@ msgstr "Synchronizuj wtyczki ze swoich repozytoriów GitHub i wybierz, kto może
 
 msgid "Sync Repositories"
 msgstr "Synchronizuj repozytoria"
-
-msgid "Sync requested"
-msgstr "Zlecono synchronizację"
 
 msgid "Sync started"
 msgstr "Rozpoczęto synchronizację"
@@ -18639,9 +18639,6 @@ msgstr "Fundusze i aniołowie biznesu, którzy wspierają nasz zespół."
 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Przyszłe miejsce dla wielokrotnie używanych konfiguracji agentów Paradev, promptów i przewodników po konfiguracji."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App nie widzi jeszcze żadnych repozytoriów. Przyznaj jej dostęp w GitHub i spróbuj ponownie."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -21299,9 +21296,6 @@ msgstr "Twoje imię <0>(jeśli użyjemy Twojego promptu, wymienimy Cię w change
 
 msgid "Your organization"
 msgstr "Twoja organizacja"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Twoja organizacja nie połączyła jeszcze GitHub. Zainstaluj GitHub App w <0>Ustawienia › Integracje</0>, a potem wróć."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Twoja organizacja osiągnęła limit użycia chmury. Zwiększ limit lub podnieś plan w Ustawienia, Rozliczenia, aby uruchomić ten obszar roboczy."

@@ -21,10 +21,12 @@ import {
 import {
 	accessibleTo,
 	memberRole,
+	ORGANIZATION_PLUGIN_SYNC_PATH,
 	organizationBundleKey,
 	syncOrganizationPluginSource,
 } from "../../lib/organization-plugins";
 import { getObject } from "../../lib/r2";
+import { nudge } from "../../lib/realtime";
 import { protectedProcedure } from "../../trpc";
 import { findInstalledRepository } from "../integration/github/find-installed-repository";
 import { verifyOrgAdmin } from "../integration/utils";
@@ -32,9 +34,6 @@ import { requireActiveOrgId } from "../utils/active-org";
 import { type PluginManifest, pluginConnector } from "./manifest";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
-
-export const ORGANIZATION_PLUGIN_SYNC_PATH =
-	"/api/organization-plugins/jobs/sync";
 
 function unknown(name: string) {
 	return userError({
@@ -205,6 +204,7 @@ const sourcesRouter = {
 				)
 				.returning({ id: organizationPluginSources.id });
 			if (!row) throw unknownSource();
+			nudge(organizationId, "plugins");
 			return { removed: row.id };
 		}),
 } satisfies TRPCRouterRecord;
@@ -295,6 +295,7 @@ export const organizationPluginsRouter = {
 				)
 				.returning();
 			if (!row) throw unknown(input.name);
+			nudge(organizationId, "plugins");
 			return { name: row.name, policy: row.installPolicy };
 		}),
 

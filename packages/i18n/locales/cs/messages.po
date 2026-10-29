@@ -2583,6 +2583,9 @@ msgstr "Anonymní montér"
 msgid "another device"
 msgstr "jiné zařízení"
 
+msgid "Another repository..."
+msgstr "Jiný repozitář..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpovězte na dotazy v terminálu níže, například heslo."
 
@@ -14107,9 +14110,6 @@ msgstr "Marketplace pluginů"
 msgid "Plugins"
 msgstr "Pluginy"
 
-msgid "Plugins update when the sync finishes."
-msgstr "Pluginy se aktualizují po dokončení synchronizace."
-
 msgid "Point at the page. Your agent makes the change."
 msgstr "Ukažte na stránku. Změnu provede váš agent."
 
@@ -17991,6 +17991,9 @@ msgstr "Superset je nyní Paradev. A také jsme získali seedové kolo ve výši
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile přichází na iPhone"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset jej čte pomocí připojeného účtu GitHub. Pokud jste účet ještě nepřipojili, připojte jej v <0>Nastavení › Integrace</0>."
+
 msgid "Supervised"
 msgstr "Pod dohledem"
 
@@ -18130,9 +18133,6 @@ msgstr "Synchronizujte pluginy ze svých repozitářů GitHub a zvolte, kdo je m
 
 msgid "Sync Repositories"
 msgstr "Synchronizovat repozitáře"
-
-msgid "Sync requested"
-msgstr "Synchronizace vyžádána"
 
 msgid "Sync started"
 msgstr "Synchronizace spuštěna"
@@ -18639,9 +18639,6 @@ msgstr "Fondy a andělští investoři, kteří podporují náš tým."
 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Budoucí domov pro znovupoužitelné konfigurace agentů, prompty a průvodce nastavením pro Paradev."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App zatím nevidí žádné repozitáře. Udělte jí přístup na GitHubu a zkuste to znovu."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -21299,9 +21296,6 @@ msgstr "Vaše jméno <0>(pokud váš prompt použijeme, uvedeme vás v changelog
 
 msgid "Your organization"
 msgstr "Vaše organizace"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Vaše organizace zatím nepřipojila GitHub. Nainstalujte GitHub App v <0>Nastavení › Integrace</0> a pak se vraťte."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Vaše organizace dosáhla limitu využití cloudu. Pro spuštění tohoto pracovního prostoru zvyšte limit nebo přejděte na vyšší tarif v Nastavení, Fakturace."

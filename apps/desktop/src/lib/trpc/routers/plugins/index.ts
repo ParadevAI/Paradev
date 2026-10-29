@@ -8,6 +8,7 @@ import {
 	getInstalledPlugins,
 	installOrganizationPlugin,
 	installPlugin,
+	organizationPluginVersions,
 	setOrganizationPluginEnabled,
 	setPluginEnabled,
 	setSkillEnabled,
@@ -90,9 +91,9 @@ export const createPluginsRouter = () => {
 				return { ok: true };
 			}),
 
-		install: publicProcedure.input(pluginRef).mutation(({ input }) => {
+		install: publicProcedure.input(pluginRef).mutation(async ({ input }) => {
 			if (isOrganizationPlugin(input)) {
-				installOrganizationPlugin(input.name);
+				await installOrganizationPlugin(input.name, input.marketplace);
 				return { installed: getInstalledPlugins() };
 			}
 			const installed = installPlugin(input.name);
@@ -127,10 +128,18 @@ export const createPluginsRouter = () => {
 				return { installed: setPluginEnabled(input.name, input.enabled) };
 			}),
 
+		organizationVersions: publicProcedure.query(() =>
+			organizationPluginVersions(),
+		),
+
 		/** Reconciles local skills and MCP entries, including the organization's managed plugins. */
-		sync: publicProcedure.mutation(async () => {
-			await syncPlugins();
-			return { ok: true };
-		}),
+		sync: publicProcedure
+			.input(
+				z.object({ organizationId: z.string().min(1).optional() }).optional(),
+			)
+			.mutation(async ({ input }) => {
+				await syncPlugins(input?.organizationId);
+				return { ok: true };
+			}),
 	});
 };

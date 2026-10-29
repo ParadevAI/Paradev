@@ -1,19 +1,36 @@
 import * as Sentry from "@sentry/nextjs";
 import {
+	ORGANIZATION_PLUGIN_SYNC_PATH,
 	syncAllOrganizationPluginSources,
 	syncOrganizationPluginSource,
 } from "@superset/trpc/lib/organization-plugins";
+import { Client } from "@upstash/qstash";
 import { z } from "zod";
+import { env } from "@/env";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+const qstash = new Client({ token: env.QSTASH_TOKEN });
+
+async function enqueueSource(sourceId: string): Promise<void> {
+	if (env.NODE_ENV === "development") {
+		await syncOrganizationPluginSource(sourceId);
+		return;
+	}
+	await qstash.publishJSON({
+		url: `${env.NEXT_PUBLIC_API_URL}${ORGANIZATION_PLUGIN_SYNC_PATH}`,
+		body: { sourceId },
+		retries: 3,
+	});
+}
+
 const bodySchema = z.object({ sourceId: z.string().uuid().optional() });
 
 /**
- * One source when an admin asks for a sync; every source when the daily
- * QStash schedule calls with no body. That schedule lives in the Upstash
+ * One source when an admin asks for a sync. The daily QStash schedule calls
+ * with no body and this route queues one job per source. That schedule lives in the Upstash
  * console, not in this repo.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -21,7 +38,7 @@ export async function POST(request: Request): Promise<Response> {
 	const rejected = await verifyQstashRequest(
 		request,
 		body,
-		"/api/organization-plugins/jobs/sync",
+		ORGANIZATION_PLUGIN_SYNC_PATH,
 	);
 	if (rejected) return rejected;
 
@@ -38,11 +55,12 @@ export async function POST(request: Request): Promise<Response> {
 
 	if (parsed.data.sourceId) {
 		const outcome = await syncOrganizationPluginSource(parsed.data.sourceId);
+		if (!outcome) return Response.json({ ok: true, removed: true });
 		return Response.json({ ok: !outcome.error, ...outcome });
 	}
 	const outcome = await Sentry.withMonitor(
 		"organization-plugin-sync",
-		syncAllOrganizationPluginSources,
+		() => syncAllOrganizationPluginSources(enqueueSource),
 		{ schedule: { type: "crontab", value: "0 6 * * *" } },
 	);
 	return Response.json({ ok: true, ...outcome });

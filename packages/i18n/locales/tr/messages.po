@@ -2583,6 +2583,9 @@ msgstr "Anonim Montajcı"
 msgid "another device"
 msgstr "başka bir cihaz"
 
+msgid "Another repository..."
+msgstr "Başka bir depo..."
+
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Aşağıdaki terminalde parola gibi soruları yanıtla."
 
@@ -14107,9 +14110,6 @@ msgstr "Eklenti pazar yeri"
 msgid "Plugins"
 msgstr "Eklentiler"
 
-msgid "Plugins update when the sync finishes."
-msgstr "Eklentiler eşitleme bitince güncellenir."
-
 msgid "Point at the page. Your agent makes the change."
 msgstr "Sayfayı işaret edin. Ajanınız değişikliği yapar."
 
@@ -17991,6 +17991,9 @@ msgstr "Superset artık Paradev. Bir de 11,5 milyon dolarlık tohum yatırımı 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
+
 msgid "Supervised"
 msgstr "Gözetimli"
 
@@ -18130,9 +18133,6 @@ msgstr "GitHub depolarınızdan eklentileri eşitleyin ve onları kimin yükleye
 
 msgid "Sync Repositories"
 msgstr "Depoları eşitle"
-
-msgid "Sync requested"
-msgstr "Eşitleme istendi"
 
 msgid "Sync started"
 msgstr "Eşitleme başladı"
@@ -18639,9 +18639,6 @@ msgstr "Ekibimizi destekleyen fonlar ve melek yatırımcılar."
 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Yeniden kullanılabilir Paradev ajan yapılandırmaları, istemleri ve kurulum kılavuzları için gelecekteki adres."
-
-msgid "The GitHub App cannot see any repositories yet. Give it access on GitHub, then try again."
-msgstr "GitHub App henüz hiçbir depoyu göremiyor. GitHub'da ona erişim verin, sonra tekrar deneyin."
 
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
@@ -21299,9 +21296,6 @@ msgstr "Adınız <0>(isteminizi kullanırsak değişiklik günlüğünde size te
 
 msgid "Your organization"
 msgstr "Kuruluşunuz"
-
-msgid "Your organization has not connected GitHub yet. Install the GitHub App in <0>Settings › Integrations</0>, then come back."
-msgstr "Kuruluşunuz henüz GitHub'ı bağlamadı. GitHub App'i <0>Ayarlar › Entegrasyonlar</0> bölümünden yükleyin, sonra geri gelin."
 
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Bu çalışma alanını başlatmak için Ayarlar, Faturalandırma bölümünden sınırı artırın veya planı yükseltin."

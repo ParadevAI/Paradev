@@ -11,6 +11,7 @@ import {
 	supersetExtension,
 } from "../../router/plugins/manifest";
 import { connectorServer } from "../../router/plugins/proxy/resolve-target";
+import { isInternalHost } from "./internal-host";
 
 export class OrganizationPluginError extends Error {}
 
@@ -33,7 +34,21 @@ export function organizationPluginProblem(
 	}
 
 	const url = supersetExtension(manifest)?.mcp?.url;
-	if (url && !url.startsWith("https://")) return "its mcp url must be https";
+	if (url) {
+		let parsed: URL;
+		try {
+			parsed = new URL(url);
+		} catch {
+			return "its mcp url is not a valid url";
+		}
+		if (parsed.protocol !== "https:") return "its mcp url must be https";
+		if (/^https:\/\/[^/?#]*\$\{/.test(url)) {
+			return "its mcp url host cannot come from an input";
+		}
+		if (isInternalHost(parsed.hostname)) {
+			return "its mcp url must not point at a private or internal address";
+		}
+	}
 	return null;
 }
 
@@ -49,7 +64,8 @@ export function readOrganizationBundle(bundle: Uint8Array): PluginManifest {
 	let raw: unknown;
 	try {
 		raw = JSON.parse(
-			unpackPluginBundle(bundle).get("plugin.json")?.toString("utf8") ?? "",
+			unpackPluginBundle(bundle).files.get("plugin.json")?.toString("utf8") ??
+				"",
 		);
 	} catch (error) {
 		throw new OrganizationPluginError(
