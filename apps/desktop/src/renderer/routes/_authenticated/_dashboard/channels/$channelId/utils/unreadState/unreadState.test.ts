@@ -17,6 +17,8 @@ function message(
 		threadRootId: null,
 		authorId,
 		body: "hi",
+		subtype: null,
+		inviterId: null,
 		mentionedIds: [],
 		broadcast: null,
 		clientId: null,

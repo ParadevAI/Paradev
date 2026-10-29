@@ -16,6 +16,8 @@ export const PENDING_SEQ = Number.MAX_SAFE_INTEGER;
 export function fromWire(wire: ChannelMessageWire): ChannelMessage {
 	return {
 		...wire,
+		subtype: null,
+		inviterId: null,
 		lastReplyAt: wire.lastReplyAt ? new Date(wire.lastReplyAt) : null,
 		editedAt: wire.editedAt ? new Date(wire.editedAt) : null,
 		deletedAt: wire.deletedAt ? new Date(wire.deletedAt) : null,
@@ -41,6 +43,8 @@ export function pendingMessage(input: {
 		threadRootId: input.threadRootId,
 		authorId: input.authorId,
 		body: input.body,
+		subtype: null,
+		inviterId: null,
 		mentionedIds: input.mentionedIds,
 		broadcast: input.broadcast ?? null,
 		clientId: input.clientId,
