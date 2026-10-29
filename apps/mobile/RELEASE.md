@@ -1,6 +1,8 @@
 # Mobile App Release Process
 
-iOS only. Builds and submissions go through EAS; the App Store listing and the
+iOS only; Android has not shipped yet, and what it still needs is in
+[`plans/20261029-android-launch-checklist.md`](./plans/20261029-android-launch-checklist.md).
+Builds and submissions go through EAS; the App Store listing and the
 App Review notes live in [`store.config.js`](./store.config.js) and are pushed
 with `eas metadata:push`. This file is the runbook for shipping a build and for
 getting unstuck when App Review rejects or stalls it.

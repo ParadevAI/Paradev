@@ -94,6 +94,7 @@ export default function AuthenticatedLayout() {
   "empty". Keep loading while it is pending and say you could not check when it failed; Home once
   painted "is offline" on every cold start because presence defaulted to `false`.
 - **Verifying in the real app:** on a machine with Xcode, `.agents/skills/mobile-sim-verification/SKILL.md`.
+  On Android, `apps/mobile/scripts/android-dev.sh` and `.agents/skills/mobile-android-verification/SKILL.md`.
   On a cloud sandbox (no local Xcode/simulator), run `apps/mobile/scripts/eas-dev.sh`; see
   `.agents/skills/mobile-eas-dev/SKILL.md`. The script encodes what was found getting the app running
   on an EAS simulator from a sandbox (2026-10-09), so nobody has to rediscover it:

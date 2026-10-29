@@ -1,0 +1,28 @@
+# Signs in through the dev email prompt as ${EMAIL}, signing out first if needed.
+# Run by scripts/android-dev.sh --user; works on the iOS simulator too.
+appId: sh.superset.mobile
+---
+- extendedWaitUntil:
+    visible: "Sign in with email \\(dev\\)"
+    timeout: 15000
+  optional: true
+- runFlow:
+    when:
+      notVisible: "Sign in with email \\(dev\\)"
+    commands:
+      - openLink: "superset://settings"
+      - scrollUntilVisible:
+          element: "Sign out"
+      - tapOn: "Sign out"
+      - tapOn: "Log out"
+      - extendedWaitUntil:
+          visible: "Sign in with email \\(dev\\)"
+          timeout: 15000
+- tapOn: "Sign in with email \\(dev\\)"
+- eraseText: 80
+- inputText: ${EMAIL}
+- tapOn: "Next"
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    notVisible: "Sign in with email \\(dev\\)"
+    timeout: 20000
