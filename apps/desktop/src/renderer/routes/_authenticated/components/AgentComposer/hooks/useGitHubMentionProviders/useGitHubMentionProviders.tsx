@@ -23,7 +23,6 @@ import {
 } from "../../utils/linkedContextChips";
 
 const MAX_RESULTS = 20;
-const CLOSED_FILTER = "closed";
 
 export type GitHubRepo = { projectId: string; hostUrl: string };
 
@@ -84,16 +83,13 @@ export function useGitHubMentionProviders(
 				browse: {
 					label: t({ message: "GitHub issues" }),
 					placeholder: t({ message: "Search issues…" }),
-					filters: [
-						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
-					],
 				},
 				source: {
 					kind: "search",
 					emptyState: repo
 						? t({ message: "No matching issues" })
 						: t({ message: "Choose a project to search its issues" }),
-					search: async (query, _signal, options) => {
+					search: async (query) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-issue") return [];
 						const host = client();
@@ -103,8 +99,7 @@ export function useGitHubMentionProviders(
 								projectId: repo.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
-								includeClosed:
-									ref !== null || options?.filters.has(CLOSED_FILTER) === true,
+								includeClosed: query !== "",
 							});
 						return issues
 							.filter((issue) => !ref || issue.issueNumber === ref.number)
@@ -130,16 +125,13 @@ export function useGitHubMentionProviders(
 				browse: {
 					label: t({ message: "Pull requests" }),
 					placeholder: t({ message: "Search pull requests…" }),
-					filters: [
-						{ id: CLOSED_FILTER, label: t({ message: "Show closed" }) },
-					],
 				},
 				source: {
 					kind: "search",
 					emptyState: repo
 						? t({ message: "No matching pull requests" })
 						: t({ message: "Choose a project to search its pull requests" }),
-					search: async (query, _signal, options) => {
+					search: async (query) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-pr") return [];
 						const host = client();
@@ -149,8 +141,7 @@ export function useGitHubMentionProviders(
 								projectId: repo.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
-								includeClosed:
-									ref !== null || options?.filters.has(CLOSED_FILTER) === true,
+								includeClosed: query !== "",
 							});
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)

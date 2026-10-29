@@ -16711,9 +16711,6 @@ msgstr "Mostrar bordas"
 msgid "Show checks"
 msgstr "Mostrar verificações"
 
-msgid "Show closed"
-msgstr "Mostrar fechadas"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Mostra o uso de CPU e memória na barra superior"
 

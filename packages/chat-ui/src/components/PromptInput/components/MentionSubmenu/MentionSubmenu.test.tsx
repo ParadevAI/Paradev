@@ -1,9 +1,6 @@
 import { afterAll, afterEach, expect, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import type {
-	ComposerMentionEntry,
-	ComposerMentionSearchOptions,
-} from "../../types";
+import type { ComposerMentionEntry } from "../../types";
 
 const alreadyRegistered = GlobalRegistrator.isRegistered;
 if (!alreadyRegistered) GlobalRegistrator.register();
@@ -30,16 +27,10 @@ const issue = (id: string): ComposerMentionEntry => ({
 });
 
 function renderSubmenu() {
-	const search = mock(
-		async (
-			query: string,
-			_signal: AbortSignal,
-			options?: ComposerMentionSearchOptions,
-		) => {
-			const closed = options?.filters.has("closed") ? [issue("ENG-9")] : [];
-			const open = [issue("ENG-1"), issue("ENG-2")];
-			return [...open, ...closed].filter((entry) => entry.id.includes(query));
-		},
+	const search = mock(async (query: string, _signal: AbortSignal) =>
+		[issue("ENG-1"), issue("ENG-2")].filter((entry) =>
+			entry.id.includes(query),
+		),
 	);
 	const handlers = {
 		onSelect: mock((_entry: ComposerMentionEntry) => {}),
@@ -55,7 +46,6 @@ function renderSubmenu() {
 				browse: {
 					label: "Linear issues",
 					placeholder: "Search Linear…",
-					filters: [{ id: "closed", label: "Show closed" }],
 				},
 				source: { kind: "search", emptyState: "No matching issues", search },
 			}}
@@ -69,7 +59,8 @@ function renderSubmenu() {
 }
 
 test("lists results before typing, searches as you type, and picks with the keyboard", async () => {
-	const { input, rows, onSelect } = renderSubmenu();
+	const { view, input, rows, onSelect } = renderSubmenu();
+	expect(view.getByRole("dialog", { name: "Linear issues" })).toBeTruthy();
 	expect(document.activeElement).toBe(input);
 	await settle();
 	expect(rows()).toEqual(["ENG-1", "ENG-2"]);
@@ -84,16 +75,6 @@ test("lists results before typing, searches as you type, and picks with the keyb
 	fireEvent.keyDown(input, { key: "ArrowDown" });
 	fireEvent.keyDown(input, { key: "Enter" });
 	expect(onSelect.mock.calls[0]?.[0].id).toBe("ENG-2");
-});
-
-test("show closed reaches the provider's search", async () => {
-	const { view, rows, search } = renderSubmenu();
-	await settle();
-	expect(rows()).toHaveLength(2);
-	fireEvent.click(view.getByRole("switch"));
-	await settle();
-	expect(rows()).toEqual(["ENG-1", "ENG-2", "ENG-9"]);
-	expect(search.mock.calls.at(-1)?.[2]?.filters.has("closed")).toBe(true);
 });
 
 test("left arrow at the start goes back and escape closes", async () => {

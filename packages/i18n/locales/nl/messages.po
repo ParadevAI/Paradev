@@ -16711,9 +16711,6 @@ msgstr "Toon randen"
 msgid "Show checks"
 msgstr "Checks tonen"
 
-msgid "Show closed"
-msgstr "Gesloten tonen"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Toon CPU- en geheugengebruik in de bovenbalk"
 

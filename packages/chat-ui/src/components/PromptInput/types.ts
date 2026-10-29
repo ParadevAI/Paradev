@@ -44,16 +44,9 @@ export type ComposerMentionEntry = {
 	select(ctx: ComposerActionContext): void | Promise<void>;
 };
 
-export type ComposerMentionFilter = { id: string; label: string };
-
-export type ComposerMentionSearchOptions = {
-	filters: ReadonlySet<string>;
-};
-
 export type ComposerMentionBrowse = {
 	label: string;
 	placeholder: string;
-	filters?: ComposerMentionFilter[];
 };
 
 export type ComposerMentionSource =
@@ -68,7 +61,6 @@ export type ComposerMentionSource =
 			search(
 				query: string,
 				signal: AbortSignal,
-				options?: ComposerMentionSearchOptions,
 			): Promise<ComposerMentionEntry[]>;
 			emptyState: string;
 			loadingState?: string;

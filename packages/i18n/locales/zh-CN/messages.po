@@ -16711,9 +16711,6 @@ msgstr "显示边框"
 msgid "Show checks"
 msgstr "显示检查"
 
-msgid "Show closed"
-msgstr "显示已关闭"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "在顶栏显示CPU和内存用量"
 

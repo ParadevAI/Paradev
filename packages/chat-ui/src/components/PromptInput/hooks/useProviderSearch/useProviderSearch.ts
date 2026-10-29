@@ -8,7 +8,6 @@ import { matchesQuery } from "../useMentionSources";
 export function useProviderSearch(
 	provider: ComposerMentionProvider,
 	query: string,
-	filters: ReadonlySet<string>,
 ): { entries: ComposerMentionEntry[]; isLoading: boolean } {
 	const [entries, setEntries] = useState<ComposerMentionEntry[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +18,7 @@ export function useProviderSearch(
 		setIsLoading(true);
 		const pending =
 			source.kind === "search"
-				? source.search(query, controller.signal, { filters })
+				? source.search(query, controller.signal)
 				: Promise.resolve(source.load(controller.signal)).then((loaded) =>
 						loaded.filter((entry) => matchesQuery(entry, query)),
 					);
@@ -35,7 +34,7 @@ export function useProviderSearch(
 				setIsLoading(false);
 			});
 		return () => controller.abort();
-	}, [provider, query, filters]);
+	}, [provider, query]);
 
 	return { entries, isLoading };
 }

@@ -16711,9 +16711,6 @@ msgstr "Hiển thị đường viền"
 msgid "Show checks"
 msgstr "Hiện check"
 
-msgid "Show closed"
-msgstr "Hiện issue đã đóng"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Hiện mức dùng CPU và bộ nhớ trên thanh trên cùng"
 

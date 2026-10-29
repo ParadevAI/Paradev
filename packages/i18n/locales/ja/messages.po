@@ -16711,9 +16711,6 @@ msgstr "境界線を表示"
 msgid "Show checks"
 msgstr "チェックを表示"
 
-msgid "Show closed"
-msgstr "クローズ済みも表示"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "トップバーにCPUとメモリ使用量を表示"
 

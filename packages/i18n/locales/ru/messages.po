@@ -16711,9 +16711,6 @@ msgstr "Показывать границы"
 msgid "Show checks"
 msgstr "Показать проверки"
 
-msgid "Show closed"
-msgstr "Показать закрытые"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Показывать загрузку CPU и памяти в верхней панели"
 

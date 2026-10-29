@@ -16711,9 +16711,6 @@ msgstr "Tampilkan Batas"
 msgid "Show checks"
 msgstr "Tampilkan check"
 
-msgid "Show closed"
-msgstr "Tampilkan yang ditutup"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Tampilkan penggunaan CPU dan memori di bilah atas"
 

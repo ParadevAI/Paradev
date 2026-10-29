@@ -16711,9 +16711,6 @@ msgstr "Kenarlıkları Göster"
 msgid "Show checks"
 msgstr "Kontrolleri göster"
 
-msgid "Show closed"
-msgstr "Kapalıları göster"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Üst çubukta CPU ve bellek kullanımını göster"
 

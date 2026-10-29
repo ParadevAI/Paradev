@@ -954,7 +954,6 @@ export function ComposerBody({
 					{browseOpen && (
 						<MentionMenu
 							sections={browseSections}
-							className="max-w-80"
 							selectedIndex={browseIndex}
 							onHighlight={setBrowseIndex}
 							onSelect={selectBrowseEntry}
@@ -964,7 +963,6 @@ export function ComposerBody({
 						<MentionSubmenu
 							key={submenu.id}
 							provider={submenu}
-							className="max-w-[28rem]"
 							onSelect={(entry) => {
 								setSubmenu(null);
 								editor.focus();

@@ -16711,9 +16711,6 @@ msgstr "Rahmen anzeigen"
 msgid "Show checks"
 msgstr "Prüfungen anzeigen"
 
-msgid "Show closed"
-msgstr "Geschlossene anzeigen"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "CPU- und Speichernutzung in der oberen Leiste anzeigen"
 

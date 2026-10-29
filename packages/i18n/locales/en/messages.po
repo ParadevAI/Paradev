@@ -16711,9 +16711,6 @@ msgstr "Show Borders"
 msgid "Show checks"
 msgstr "Show checks"
 
-msgid "Show closed"
-msgstr "Show closed"
-
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Show CPU and memory usage in the top bar"
 

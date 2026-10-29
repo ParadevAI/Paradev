@@ -1,1 +1,0 @@
-export { SubmenuFilters } from "./SubmenuFilters";
