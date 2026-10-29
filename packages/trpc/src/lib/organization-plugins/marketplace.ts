@@ -117,10 +117,11 @@ export function pluginTreeFiles(
 	return out;
 }
 
-/** A plugin with no version gets one from its content, so an unchanged plugin keeps its version across syncs. */
+/** A plugin with no version gets one from its content and executable bits, so an unchanged plugin keeps its version across syncs. */
 export function withVersion(
 	manifest: Record<string, unknown>,
 	files: ReadonlyMap<string, Uint8Array>,
+	executable: ReadonlySet<string> = new Set(),
 ): Record<string, unknown> {
 	if (typeof manifest.version === "string" && manifest.version) {
 		return manifest;
@@ -131,6 +132,7 @@ export function withVersion(
 		a < b ? -1 : a > b ? 1 : 0,
 	)) {
 		hash.update(path);
+		hash.update(executable.has(path) ? "x" : "-");
 		hash.update(data);
 	}
 	return { ...manifest, version: `0.0.0-${hash.digest("hex").slice(0, 12)}` };

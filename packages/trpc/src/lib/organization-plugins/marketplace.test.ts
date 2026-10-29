@@ -83,6 +83,13 @@ describe("repository paths", () => {
 });
 
 describe("withVersion", () => {
+	test("a generated version changes when only an executable bit changes", () => {
+		const files = new Map([["scripts/run.sh", Buffer.from("#!/bin/sh\n")]]);
+		expect(
+			withVersion({ name: "a" }, files, new Set(["scripts/run.sh"])).version,
+		).not.toBe(withVersion({ name: "a" }, files).version);
+	});
+
 	const files = new Map([["skills/a/SKILL.md", Buffer.from("one")]]);
 
 	test("keeps a declared version", () => {

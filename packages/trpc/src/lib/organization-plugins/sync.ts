@@ -102,14 +102,16 @@ async function bundleFor(
 			`its plugin.json is named "${String(manifest.name)}", not "${entry.name}"`,
 		);
 	}
-	files.set(
-		"plugin.json",
-		Buffer.from(JSON.stringify(withVersion(manifest, files), null, "\t")),
-	);
 	const executable = new Set(
 		[...tree]
 			.filter(([repoPath]) => snapshot.executable?.has(repoPath))
 			.map(([, bundlePath]) => bundlePath),
+	);
+	files.set(
+		"plugin.json",
+		Buffer.from(
+			JSON.stringify(withVersion(manifest, files, executable), null, "\t"),
+		),
 	);
 	return {
 		bundle: packPluginBundle(files, executable),

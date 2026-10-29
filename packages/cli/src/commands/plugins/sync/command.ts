@@ -5,15 +5,26 @@ import { syncPlugins } from "../../../lib/plugins/install";
 import { reconcileOrganizationPlugins } from "../../../lib/plugins/organization";
 import { resolveAuth } from "../../../lib/resolve-auth";
 
-/** Signed out or offline, the local plugins still sync; only the organization's go unchecked. */
-async function organizationChanges(): Promise<{
+/**
+ * Signed out, the local plugins still sync and the organization's go
+ * unchecked. Signed in, a failed check is an error, so a caller can retry.
+ */
+export async function organizationChanges(
+	auth: typeof resolveAuth = resolveAuth,
+	reconcile: typeof reconcileOrganizationPlugins = reconcileOrganizationPlugins,
+): Promise<{
 	text: string;
 	failed: string[];
+	error?: string;
 }> {
+	let api: Awaited<ReturnType<typeof resolveAuth>>["api"];
 	try {
-		const { api } = await resolveAuth(undefined);
-		const { installed, removed, failed } =
-			await reconcileOrganizationPlugins(api);
+		({ api } = await auth(undefined));
+	} catch {
+		return { text: "", failed: [] };
+	}
+	try {
+		const { installed, removed, failed } = await reconcile(api);
 		const text = [
 			installed.length
 				? ` Organization plugins updated: ${installed.join(", ")}.`
@@ -22,8 +33,12 @@ async function organizationChanges(): Promise<{
 			failed.length ? ` Could not fetch: ${failed.join(", ")}.` : "",
 		].join("");
 		return { text, failed };
-	} catch {
-		return { text: "", failed: [] };
+	} catch (error) {
+		return {
+			text: " Organization plugins were not checked.",
+			failed: [],
+			error: error instanceof Error ? error.message : String(error),
+		};
 	}
 }
 
@@ -49,6 +64,9 @@ export default command({
 			: ` ${result.mcpServers} MCP ${result.mcpServers === 1 ? "entry" : "entries"} in place for Claude, Codex, and pdev.`;
 
 		const message = `Synced ${result.skills} skill${result.skills === 1 ? "" : "s"} from ${result.plugins} plugin${result.plugins === 1 ? "" : "s"} into ${skillsRoot()}.${reaped}${mcp}${organization.text}`;
+		if (organization.error) {
+			throw new CLIError(`${message} ${organization.error}`);
+		}
 		if (organization.failed.length) throw new CLIError(message);
 
 		return {
