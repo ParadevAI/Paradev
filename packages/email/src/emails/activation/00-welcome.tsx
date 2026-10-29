@@ -22,13 +22,13 @@ export function WelcomeEmail({
 
 	return (
 		<EmailLayout
-			preview="They do the work. You review the diffs."
+			preview="Finish your backlog in a day."
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 				Run Claude Code, Codex, or any CLI agent in parallel, each in an
-				isolated copy of your repo. They do the work. You review the diffs.
+				isolated copy of your repo. Finish your backlog in a day.
 			</Text>
 
 			<a href={`${DOWNLOAD}${utm("hero-image")}`}>
