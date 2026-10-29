@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { findPreviewLink, splitTextLinks } from "./textLinks";
+import { splitTextLinks } from "./textLinks";
 
-const WEB = "https://app.superset.sh";
 const PR = "https://github.com/superset-sh/superset/pull/8329";
 const DOCS = "https://agentclientprotocol.com/protocol/content";
 
@@ -45,38 +44,5 @@ describe("splitTextLinks", () => {
 			expect(splitTextLinks(text)).toEqual([{ kind: "text", text }]);
 		}
 		expect(splitTextLinks("")).toEqual([]);
-	});
-});
-
-describe("findPreviewLink", () => {
-	const pick = (text: string) => {
-		const link = findPreviewLink(splitTextLinks(text), WEB);
-		return link?.kind === "link" ? link.url : null;
-	};
-
-	test("picks the first link that no pill claims", () => {
-		expect(pick(`${PR} then ${DOCS} then https://example.com/later`)).toBe(
-			DOCS,
-		);
-	});
-
-	test("passes over services, files and the app's own links", () => {
-		expect(
-			pick(
-				[
-					PR,
-					"https://linear.app/superset-sh/issue/SUPER-2608/find",
-					"https://acme.slack.com/archives/C1/p2",
-					"https://example.com/files/report.pdf",
-					`${WEB}/page/links-and-files-bhfk5c`,
-					`${WEB}/settings/account`,
-				].join(" "),
-			),
-		).toBeNull();
-	});
-
-	test("returns the same part the split produced", () => {
-		const parts = splitTextLinks(`${PR} ${DOCS}`);
-		expect(findPreviewLink(parts, WEB)).toBe(parts[2] ?? null);
 	});
 });

@@ -8,14 +8,11 @@ import {
 	linkedContextData,
 } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { commandChip } from "../../../../../../utils/commandChip";
-import { parseGithubWorkItemUrl } from "../../../../../../utils/githubWorkItem";
 import { linkChip } from "../../../../../../utils/linkChip";
-import { unfurlLink } from "../../../../../../utils/linkUnfurl";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
 import { ChatLink } from "../../../../../ChatLink";
-import { LinkPreviewChip } from "./components/LinkPreviewChip";
 import { MessageChip } from "./components/MessageChip";
-import { findPreviewLink, splitTextLinks } from "./utils/textLinks";
+import { splitTextLinks } from "./utils/textLinks";
 
 function segmentChip(
 	segment: MessageSegment,
@@ -52,7 +49,6 @@ export function UserMessageText({
 	const runs = segments.map((segment) =>
 		segment.element ? [] : splitTextLinks(segment.text),
 	);
-	const preview = findPreviewLink(runs.flat(), env.NEXT_PUBLIC_WEB_URL);
 	return (
 		<span>
 			{segments.map((segment, index) => {
@@ -72,31 +68,21 @@ export function UserMessageText({
 				}
 				return runs[index]?.map((part, partIndex) => {
 					if (part.kind === "text") return part.text;
-					const workItem = parseGithubWorkItemUrl(part.url);
+					const chip = linkChip(part.url, {
+						webUrl: env.NEXT_PUBLIC_WEB_URL,
+						isDark,
+						chatLabel,
+					});
 					return (
 						<span
 							data-source-text={
-								part === preview ||
-								unfurlLink(part.url, false, env.NEXT_PUBLIC_WEB_URL)?.label
-									? part.url
-									: undefined
+								chip && chip.label !== part.url ? part.url : undefined
 							}
 							// biome-ignore lint/suspicious/noArrayIndexKey: parts have no identity beyond their order
 							key={`${index}:${partIndex}`}
 						>
-							{workItem ? (
-								<MessageChip
-									chip={
-										linkChip(part.url, {
-											webUrl: env.NEXT_PUBLIC_WEB_URL,
-											isDark,
-											chatLabel,
-										}) ?? { label: part.url, serialized: part.url }
-									}
-									link={part.url}
-								/>
-							) : part === preview ? (
-								<LinkPreviewChip url={part.url} />
+							{chip ? (
+								<MessageChip chip={chip} link={part.url} />
 							) : (
 								<ChatLink href={part.url}>{part.url}</ChatLink>
 							)}
