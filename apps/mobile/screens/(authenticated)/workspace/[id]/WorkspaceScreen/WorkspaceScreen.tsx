@@ -26,6 +26,7 @@ import {
 } from "lucide-react-native";
 import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActivityIndicator,
 	Alert,
@@ -635,7 +636,7 @@ export function WorkspaceScreen() {
 	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [composerActive, setComposerActive] = useState(false);
 	const composerRef = useRef<ComposerHandle>(null);
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const [select, setSelect] = useState<TerminalSelectState>({
 		active: false,
 		hasSelection: false,
@@ -910,7 +911,6 @@ export function WorkspaceScreen() {
 
 	const pullRequestCount = pullRequests.length;
 	const latestPullRequestDiffstat = usePullRequestDiffstat({
-		hostUrl,
 		pullRequest: pullRequests[0],
 	});
 	const chatPullRequestChip = pullRequestStatusNow
@@ -937,9 +937,16 @@ export function WorkspaceScreen() {
 			});
 			return;
 		}
+		const [pullRequest] = pullRequests;
 		router.push({
 			pathname: "/workspace/[id]/pull-request/[pullRequestId]",
-			params: { id, pullRequestId: String(pullRequests[0]?.prNumber ?? "") },
+			params: {
+				id,
+				pullRequestId: String(pullRequest?.prNumber ?? ""),
+				...(pullRequest
+					? { owner: pullRequest.repoOwner, repo: pullRequest.repoName }
+					: {}),
+			},
 		});
 	}, [id, pullRequests, router]);
 

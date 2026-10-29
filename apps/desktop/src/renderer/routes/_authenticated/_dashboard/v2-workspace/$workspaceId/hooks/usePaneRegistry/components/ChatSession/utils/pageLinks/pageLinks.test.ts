@@ -49,6 +49,13 @@ describe("pageLinkFinder", () => {
 		]);
 	});
 
+	test("finds a page on the web origin's twin on the other root domain", () => {
+		const twin = "https://app.paradev.com/page/quarterly-report-a3f9k";
+		expect(find(`See ${twin}`)).toEqual([
+			{ slug: "quarterly-report-a3f9k", url: twin },
+		]);
+	});
+
 	test("finds nothing when the web URL is not a URL", () => {
 		expect(pageLinkFinder("not a url")(REPORT)).toEqual([]);
 	});

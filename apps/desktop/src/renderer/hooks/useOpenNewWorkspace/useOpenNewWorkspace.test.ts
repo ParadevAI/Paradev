@@ -37,7 +37,7 @@ test.each([
 	useNewWorkspaceDraftStore.getState().updateDraft({
 		hostId,
 		selectedProjectId: "old-project",
-		prompt: "Keep my prompt",
+		promptDraft: [{ type: "text", text: "Keep my prompt" }],
 		checkout: "local",
 	});
 	openNewWorkspaceForLocalProject(v2, "new-project");
@@ -51,7 +51,7 @@ test.each([
 		hostId: "this-machine",
 		selectedProjectId: "new-project",
 		isSession: false,
-		prompt: "Keep my prompt",
+		promptDraft: [{ type: "text", text: "Keep my prompt" }],
 		checkout: "local",
 	});
 	useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "cloud" });
@@ -65,26 +65,26 @@ test("ordinary new workspace navigation preserves the selected remote host", () 
 	expect(useNewWorkspaceDraftStore.getState().hostId).toBe("other-machine");
 });
 
-test("project handoff leaves the cloud host for the local machine", () => {
+test("project handoff keeps the cloud host and switches the project", () => {
 	useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "cloud" });
 	openNewWorkspace(v2, "project-a");
 	expect(navigate).toHaveBeenCalledWith(
 		expect.objectContaining({
-			search: { projectId: "project-a", host: "this-machine" },
+			search: { projectId: "project-a", host: "cloud" },
 		}),
 	);
 	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
-		hostId: "this-machine",
+		hostId: "cloud",
 		selectedProjectId: "project-a",
 	});
 });
 
-test("project handoff leaves a remembered cloud host before the page restores it", () => {
+test("project handoff keeps a remembered cloud host", () => {
 	useV2WorkspaceCreateDefaultsStore.getState().setLastHostId("cloud");
 	openNewWorkspace(v2, "project-a");
 	expect(navigate).toHaveBeenCalledWith(
 		expect.objectContaining({
-			search: { projectId: "project-a", host: "this-machine" },
+			search: { projectId: "project-a", host: "cloud" },
 		}),
 	);
 });
@@ -119,16 +119,16 @@ test("new workspace without a project keeps the cloud host", () => {
 	expect(useNewWorkspaceDraftStore.getState().hostId).toBe("cloud");
 });
 
-test("session handoff leaves the cloud host and selects the session", () => {
+test("session handoff keeps the cloud host and selects the session", () => {
 	useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "cloud" });
 	openNewSession(v2);
 	expect(navigate).toHaveBeenCalledWith(
 		expect.objectContaining({
-			search: { session: true, host: "this-machine" },
+			search: { session: true, host: "cloud" },
 		}),
 	);
 	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
-		hostId: "this-machine",
+		hostId: "cloud",
 		isSession: true,
 	});
 });

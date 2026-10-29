@@ -15,3 +15,8 @@ type channel
     define member: [user, agent]
     define can_read: member
     define can_post: member
+
+type cloud_workspace
+  relations
+    define operator: [agent]
+    define can_operate: operator

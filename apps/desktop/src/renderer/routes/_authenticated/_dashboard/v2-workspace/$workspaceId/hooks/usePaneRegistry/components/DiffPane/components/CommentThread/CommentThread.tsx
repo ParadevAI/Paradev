@@ -1,6 +1,6 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
+import { useFormat } from "@superset/i18n/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { Button } from "@superset/ui/button";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@superset/ui/collapsible";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
 	LuCheck,
@@ -22,7 +22,6 @@ import {
 import { CommentMarkdown } from "renderer/components/CommentMarkdown";
 import { ReviewThreadReplyComposer } from "renderer/routes/_authenticated/_dashboard/components/ReviewThreadReplyComposer";
 import "./comment-thread.css";
-import { msg } from "@lingui/core/macro";
 
 interface Comment {
 	id: string;
@@ -33,8 +32,6 @@ interface Comment {
 }
 
 interface CommentThreadProps {
-	workspaceId: string;
-	threadId: string;
 	isResolved: boolean;
 	isOutdated?: boolean;
 	url?: string;
@@ -46,17 +43,19 @@ interface CommentThreadProps {
 	/** Force-expand the bubble whenever this changes — lets jump-to-line
 	 *  reveal a collapsed (resolved/outdated) thread. */
 	focusTick?: number;
+	onReply: (commentId: number, body: string) => Promise<unknown>;
+	onSetResolved: (resolved: boolean) => Promise<unknown>;
 }
 
 export function CommentThread({
-	workspaceId,
-	threadId,
 	isResolved,
 	isOutdated,
 	url,
 	comments,
 	replyToCommentId,
 	focusTick,
+	onReply,
+	onSetResolved,
 }: CommentThreadProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(!isResolved && !isOutdated);
@@ -93,29 +92,23 @@ export function CommentThread({
 	useEffect(() => {
 		if (focusTick != null) setOpen(true);
 	}, [focusTick]);
-	const utils = workspaceTrpc.useUtils();
-	const setResolution = workspaceTrpc.git.setReviewThreadResolution.useMutation(
-		{
-			onSuccess: () => {
-				void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-			},
-			onError: (error) => {
-				toast.error(
-					t({
-						message: "Couldn't update thread",
-					}),
-					{
-						description: errorMessage(error),
-					},
-				);
-			},
+	const setResolution = useMutation({
+		mutationFn: (resolved: boolean) => onSetResolved(resolved),
+		onError: (error) => {
+			toast.error(
+				t({
+					message: "Couldn't update thread",
+				}),
+				{
+					description: errorMessage(error),
+				},
+			);
 		},
-	);
+	});
 	const [replyText, setReplyText] = useState("");
-	const replyToThread = workspaceTrpc.git.replyToReviewThread.useMutation({
-		onSuccess: () => {
-			void utils.git.getPullRequestThreads.invalidate({ workspaceId });
-		},
+	const replyToThread = useMutation({
+		mutationFn: (reply: { commentId: number; body: string }) =>
+			onReply(reply.commentId, reply.body),
 		onError: (error, variables) => {
 			// The draft is cleared as soon as it's sent; hand it back so a
 			// rejected reply isn't retyped — unless a new one is already
@@ -226,11 +219,7 @@ export function CommentThread({
 					onChange={setReplyText}
 					onReply={(body) => {
 						if (replyToCommentId == null) return false;
-						replyToThread.mutate({
-							workspaceId,
-							commentId: replyToCommentId,
-							body,
-						});
+						replyToThread.mutate({ commentId: replyToCommentId, body });
 						return true;
 					}}
 					isPending={replyToThread.isPending}
@@ -241,13 +230,7 @@ export function CommentThread({
 							size="xs"
 							variant="outline"
 							disabled={setResolution.isPending}
-							onClick={() =>
-								setResolution.mutate({
-									workspaceId,
-									threadId,
-									resolved: !isResolved,
-								})
-							}
+							onClick={() => setResolution.mutate(!isResolved)}
 						>
 							{setResolution.isPending && (
 								<LuLoaderCircle className="size-3 animate-spin" />
@@ -266,6 +249,7 @@ export function CommentThread({
 }
 
 function CommentRow({ comment }: { comment: Comment }) {
+	const { formatCompactRelativeTime } = useFormat();
 	return (
 		<li className="flex gap-2 px-2.5 py-2">
 			<Avatar className="mt-0.5 size-5 shrink-0">
@@ -286,7 +270,7 @@ function CommentRow({ comment }: { comment: Comment }) {
 							className="text-muted-foreground"
 							dateTime={new Date(comment.createdAt).toISOString()}
 						>
-							{formatRelative(comment.createdAt)}
+							{formatCompactRelativeTime(comment.createdAt)}
 						</time>
 					)}
 				</div>
@@ -296,57 +280,4 @@ function CommentRow({ comment }: { comment: Comment }) {
 			</div>
 		</li>
 	);
-}
-
-function formatRelative(ms: number): string {
-	// Floor (not round) so a 30-minute comment doesn't read "1h ago".
-	// Clamp >=0 so future-dated timestamps from clock skew aren't negative.
-	const delta = Math.max(0, Date.now() - ms);
-	const seconds = Math.floor(delta / 1000);
-	if (seconds < 60)
-		return i18n._({
-			...msg({
-				message: "{seconds}s ago",
-			}),
-			values: { seconds },
-		});
-	const minutes = Math.floor(seconds / 60);
-	if (minutes < 60)
-		return i18n._({
-			...msg({
-				message: "{minutes}m ago",
-			}),
-			values: { minutes },
-		});
-	const hours = Math.floor(minutes / 60);
-	if (hours < 24)
-		return i18n._({
-			...msg({
-				message: "{hours}h ago",
-			}),
-			values: { hours },
-		});
-	const days = Math.floor(hours / 24);
-	if (days < 30)
-		return i18n._({
-			...msg({
-				message: "{days}d ago",
-			}),
-			values: { days },
-		});
-	const months = Math.floor(days / 30);
-	if (months < 12)
-		return i18n._({
-			...msg({
-				message: "{months}mo ago",
-			}),
-			values: { months },
-		});
-	const years = Math.floor(days / 365);
-	return i18n._({
-		...msg({
-			message: "{years}y ago",
-		}),
-		values: { years },
-	});
 }

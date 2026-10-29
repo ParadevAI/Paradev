@@ -8,7 +8,9 @@ import {
 	agents,
 	agentTurns,
 	channelMembers,
+	channelMessages,
 	channels,
+	members,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
 import {
@@ -18,16 +20,28 @@ import {
 } from "@superset/shared/dev-avatar";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, exists, isNull, sql } from "drizzle-orm";
+import {
+	and,
+	asc,
+	desc,
+	eq,
+	exists,
+	inArray,
+	isNull,
+	or,
+	sql,
+} from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { protectedProcedure } from "../../trpc";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
+import { announceAgentChanged } from "./agents-changed";
 import { ensureDirectMessage } from "./direct-message";
-import { submitPrompt } from "./turns";
+import { eventText, submitPrompt } from "./turns";
 
 const agentIdSchema = z.object({ agentId: z.string().uuid() });
+const ACTIVITY_PAGE_SIZE = 50;
 const avatarSchema = z.custom<DevAvatar>(isDevAvatar, "Invalid avatar");
 const nameSchema = z.string().trim().min(1).max(80);
 
@@ -39,6 +53,7 @@ const listColumns = {
 	pausedAt: agents.pausedAt,
 	createdByUserId: agents.createdByUserId,
 	createdAt: agents.createdAt,
+	/** @deprecated Read by desktop 2.0.1; newer clients read `agent.get().working`. */
 	isWorking: exists(
 		db
 			.select({ one: sql`1` })
@@ -80,7 +95,7 @@ export const agentRouter = {
 			ctx.session.user.id,
 			input.agentId,
 		);
-		const [[row], grants, recentTurns] = await Promise.all([
+		const [[row], grants, [running], recentTurns] = await Promise.all([
 			db.select(listColumns).from(agents).where(eq(agents.id, agent.id)),
 			db
 				.select({ id: channels.id, name: channels.name })
@@ -94,6 +109,17 @@ export const agentRouter = {
 					),
 				)
 				.orderBy(asc(channels.name)),
+			db
+				.select({ reason: agentTurns.reason })
+				.from(agentTurns)
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						eq(agentTurns.status, "running"),
+					),
+				)
+				.orderBy(desc(agentTurns.startedAt))
+				.limit(1),
 			db
 				.select({
 					id: agentTurns.id,
@@ -113,9 +139,81 @@ export const agentRouter = {
 			instructions: agent.instructions,
 			canManage,
 			channels: grants,
+			working: running ?? null,
+			/** @deprecated Read by desktop 2.0.1; newer clients use `agent.activity`. */
 			recentTurns,
 		};
 	}),
+
+	/** A Dev's turns, newest first, only where the caller can see them: their own DM with it and channels they can read. */
+	activity: protectedProcedure
+		.input(
+			agentIdSchema.extend({
+				/** The id of the last turn on the previous page. */
+				cursor: z.string().uuid().nullish(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const { agent } = await loadAgentAccess(userId, input.agentId);
+			const rows = await db
+				.select({
+					id: agentTurns.id,
+					status: agentTurns.status,
+					reason: agentTurns.reason,
+					startedAt: agentTurns.startedAt,
+					settledAt: agentTurns.settledAt,
+					actingUserId: agentTurns.actingUserId,
+					channelId: channels.id,
+					channelName: channels.name,
+					channelKind: channels.kind,
+					threadRootId: sql<
+						string | null
+					>`case when ${channels.kind} = 'dm' then null else coalesce(${channelMessages.threadRootId}, ${channelMessages.id}, ${agentSessions.threadRootId}) end`,
+				})
+				.from(agentTurns)
+				.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
+				.leftJoin(
+					channelMessages,
+					eq(channelMessages.id, agentTurns.triggerMessageId),
+				)
+				.innerJoin(
+					channels,
+					eq(
+						channels.id,
+						sql`coalesce(${channelMessages.channelId}, ${agentSessions.channelId})`,
+					),
+				)
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						input.cursor
+							? sql`(${agentTurns.startedAt}, ${agentTurns.id}) < (select t.started_at, t.id from ${agentTurns} t where t.id = ${input.cursor})`
+							: undefined,
+						or(
+							eq(channels.visibility, "public"),
+							exists(
+								db
+									.select({ one: sql`1` })
+									.from(channelMembers)
+									.where(
+										and(
+											eq(channelMembers.channelId, channels.id),
+											eq(channelMembers.actorId, userId),
+										),
+									),
+							),
+						),
+					),
+				)
+				.orderBy(desc(agentTurns.startedAt), desc(agentTurns.id))
+				.limit(ACTIVITY_PAGE_SIZE);
+			return {
+				turns: rows,
+				nextCursor:
+					rows.length === ACTIVITY_PAGE_SIZE ? (rows.at(-1)?.id ?? null) : null,
+			};
+		}),
 
 	create: protectedProcedure
 		.input(
@@ -143,6 +241,7 @@ export const agentRouter = {
 				})
 				.returning();
 			if (!agent) throw agentNotFound();
+			announceAgentChanged(agent);
 			return agent;
 		}),
 
@@ -163,6 +262,7 @@ export const agentRouter = {
 				.where(eq(agents.id, agent.id))
 				.returning({ id: agents.id });
 			if (!updated) throw agentNotFound();
+			announceAgentChanged(agent);
 			return updated;
 		}),
 
@@ -175,6 +275,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: new Date() })
 				.where(and(eq(agents.id, agent.id), isNull(agents.pausedAt)));
+			announceAgentChanged(agent);
 			return { paused: true };
 		}),
 
@@ -186,6 +287,7 @@ export const agentRouter = {
 				.update(agents)
 				.set({ pausedAt: null })
 				.where(eq(agents.id, agent.id));
+			announceAgentChanged(agent);
 			return { paused: false };
 		}),
 
@@ -209,6 +311,7 @@ export const agentRouter = {
 						),
 					);
 			});
+			announceAgentChanged(agent);
 			return { archived: true };
 		}),
 
@@ -227,7 +330,7 @@ export const agentRouter = {
 	sessionStream: protectedProcedure
 		.input(z.object({ sessionId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const session = await loadOwnSession(
+			const session = await loadViewableSession(
 				ctx.session.user.id,
 				input.sessionId,
 			);
@@ -249,7 +352,7 @@ export const agentRouter = {
 	interruptTurn: protectedProcedure
 		.input(z.object({ sessionId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const session = await loadOwnSession(
+			const session = await loadViewableSession(
 				ctx.session.user.id,
 				input.sessionId,
 			);
@@ -257,7 +360,11 @@ export const agentRouter = {
 			return { interrupted: true };
 		}),
 
-	/** The person's DM sessions, newest first; a cloud workspace narrows them to that box. */
+	/**
+	 * The main and task sessions of Devs the person manages, newest first; a
+	 * cloud workspace narrows them to that box. A main session holds everything
+	 * a Dev was told, so only its creator and org admins look inside.
+	 */
 	listSessions: protectedProcedure
 		.input(
 			z.object({
@@ -272,20 +379,33 @@ export const agentRouter = {
 					sessionId: agentSessions.id,
 					agentId: agents.id,
 					agentName: agents.name,
+					kind: agentSessions.kind,
+					title: agentSessions.title,
+					taskStatus: agentSessions.taskStatus,
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
 					lastActivityAt: agentSessions.lastActivityAt,
 					running: sql<boolean>`exists (select 1 from ${agentTurns} where ${agentTurns.sessionId} = ${agentSessions.id} and ${agentTurns.status} = 'running')`,
 				})
 				.from(agentSessions)
 				.innerJoin(agents, eq(agents.id, agentSessions.agentId))
+				.innerJoin(
+					members,
+					and(
+						eq(members.organizationId, agents.organizationId),
+						eq(members.userId, userId),
+					),
+				)
 				.where(
 					and(
 						input.organizationId
 							? eq(agentSessions.organizationId, input.organizationId)
 							: undefined,
-						eq(agentSessions.kind, "dm"),
-						eq(agentSessions.userId, userId),
+						inArray(agentSessions.kind, ["main", "task"]),
 						isNull(agents.archivedAt),
+						or(
+							eq(agents.createdByUserId, userId),
+							inArray(members.role, ["owner", "admin"]),
+						),
 						input.cloudWorkspaceId
 							? eq(agentSessions.cloudWorkspaceId, input.cloudWorkspaceId)
 							: undefined,
@@ -305,7 +425,7 @@ export const agentRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const session = await loadOwnSession(userId, input.sessionId);
+			const session = await loadViewableSession(userId, input.sessionId);
 			const [agent] = await db
 				.select({ id: agents.id, organizationId: agents.organizationId })
 				.from(agents)
@@ -317,28 +437,32 @@ export const agentRouter = {
 				sessionId: session.id,
 				actingUserId: userId,
 				promptId: input.promptId,
-				text: input.text,
+				text: eventText({
+					from: ctx.session.user.name,
+					where: "the session view",
+					replyTo: null,
+					body: input.text,
+				}),
 				reason: "direct_message",
 			});
 			return { sessionId: session.id, ...turn };
 		}),
 } satisfies TRPCRouterRecord;
 
-/** A DM session belongs to the person it is with; anything else reads as not found. */
-async function loadOwnSession(userId: string, sessionId: string) {
+/** A Dev's main or task session, for the people who manage the Dev; anything else reads as not found. */
+async function loadViewableSession(userId: string, sessionId: string) {
 	const [session] = await db
 		.select({ id: agentSessions.id, agentId: agentSessions.agentId })
 		.from(agentSessions)
-		.innerJoin(agents, eq(agents.id, agentSessions.agentId))
 		.where(
 			and(
 				eq(agentSessions.id, sessionId),
-				eq(agentSessions.kind, "dm"),
-				eq(agentSessions.userId, userId),
-				isNull(agents.archivedAt),
+				inArray(agentSessions.kind, ["main", "task"]),
 			),
 		)
 		.limit(1);
 	if (!session) throw agentNotFound();
+	const { canManage } = await loadAgentAccess(userId, session.agentId);
+	if (!canManage) throw agentNotFound();
 	return session;
 }

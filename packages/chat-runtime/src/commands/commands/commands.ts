@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { realpath } from "node:fs/promises";
+import { resolve, win32 } from "node:path";
 import {
 	deriveTimeline,
 	emptySnapshot,
@@ -50,6 +52,8 @@ import {
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
+	type UpdateQueuedPromptInput,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import { z } from "zod";
 import type { ChatDb, ChatSessionRow } from "../../db";
@@ -216,6 +220,7 @@ export type ChatCommands = {
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
+	updateQueuedPrompt(input: UpdateQueuedPromptInput): void;
 	resumeQueue(input: ResumeQueueInput): void;
 	cancelTurn(input: CancelTurnInput): void;
 	stopBackgroundTask(input: StopBackgroundTaskInput): Promise<boolean>;
@@ -486,6 +491,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 		},
 
+		updateQueuedPrompt(input) {
+			const parsed: UpdateQueuedPromptInput =
+				updateQueuedPromptInputSchema.parse(input);
+			options.dedupe.run(`updateQueuedPrompt:${parsed.commandId}`, () => {
+				options.live
+					.require(parsed.sessionId)
+					.updateQueued(parsed.itemId, parsed.content);
+			});
+		},
+
 		resumeQueue(input) {
 			const parsed: ResumeQueueInput = resumeQueueInputSchema.parse(input);
 			options.dedupe.run(`resumeQueue:${parsed.commandId}`, () => {
@@ -669,6 +684,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
 			const wasLive = options.live.get(parsed.sessionId) !== null;
+			options.sessions.markClosed(parsed.sessionId);
 			replays.delete(parsed.sessionId);
 			subagentItems.forget(parsed.sessionId);
 			try {
@@ -713,14 +729,23 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		listSessions,
 
-		discoverSessions(input) {
+		async discoverSessions(input) {
 			const parsed = discoverSessionsCommandSchema.parse(input);
-			return options.live.discoverSessions({
-				harness: parsed.harness,
-				scopeId: parsed.scopeId,
-				cwd: parsed.cwd,
-				...(parsed.cursor ? { cursor: parsed.cursor } : {}),
-			});
+			const [page, cwds] = await Promise.all([
+				options.live.discoverSessions({
+					harness: parsed.harness,
+					scopeId: parsed.scopeId,
+					cwd: parsed.cwd,
+					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
+				}),
+				equivalentPaths(parsed.cwd),
+			]);
+			return {
+				...page,
+				sessions: page.sessions.filter((session) =>
+					cwds.has(pathKey(session.cwd)),
+				),
+			};
 		},
 
 		getItems(input) {
@@ -774,4 +799,19 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			};
 		},
 	};
+}
+
+async function equivalentPaths(path: string): Promise<Set<string>> {
+	const paths = new Set([pathKey(path)]);
+	const real = await realpath(path).catch(() => null);
+	if (real) paths.add(pathKey(real));
+	return paths;
+}
+
+export function pathKey(
+	path: string,
+	platform: NodeJS.Platform = process.platform,
+): string {
+	if (platform !== "win32") return resolve(path);
+	return win32.resolve(path).toLowerCase();
 }

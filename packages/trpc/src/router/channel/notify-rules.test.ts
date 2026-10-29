@@ -32,6 +32,7 @@ const message = (overrides: Partial<NotifyMessage> = {}): NotifyMessage => ({
 });
 const prefs = (overrides: Partial<NotifyPrefs> = {}): NotifyPrefs => ({
 	...DEFAULT_NOTIFY_PREFS,
+	notify: "mentions",
 	...overrides,
 });
 const reason = (
@@ -45,7 +46,13 @@ describe("notifyReason", () => {
 		expect(reason({}, { authorId: ME, mentionedIds: [ME] })).toBeNull();
 	});
 
-	test("level comes from the channel, else the default", () => {
+	test("everything notifies by default", () => {
+		expect(
+			notifyReason(recipient(), DEFAULT_NOTIFY_PREFS, message(), NOW),
+		).toBe("message");
+	});
+
+	test("level comes from the channel, else the person's setting", () => {
 		expect(reason({}, {})).toBeNull();
 		expect(reason({}, {}, { notify: "all" })).toBe("message");
 		expect(reason({ notify: "all" }, {})).toBe("message");

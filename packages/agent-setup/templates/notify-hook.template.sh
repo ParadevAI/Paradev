@@ -69,7 +69,7 @@ SUBAGENT_TYPE=$(json_field agent_type agentType)
 TRANSCRIPT_PATH=$(json_field transcript_path transcriptPath)
 AGENT_TRANSCRIPT_PATH=$(json_field agent_transcript_path agentTranscriptPath)
 
-HOOK_SESSION_ID=$(json_field session_id sessionId)
+HOOK_SESSION_ID=$(json_field session_id sessionId conversationId)
 RESOURCE_ID=$(json_field resourceId resource_id)
 SESSION_ID=${RESOURCE_ID:-$HOOK_SESSION_ID}
 if [ -z "$SESSION_ID" ]; then
@@ -80,7 +80,11 @@ fi
 
 # Claude/Mastra/Droid/Kimi use "hook_event_name"; Grok uses camelCase
 # "hookEventName" (snake_case values, mapped server-side); Codex uses "type".
-EVENT_TYPE=$(json_field hook_event_name hookEventName)
+# Antigravity's payload names no event, so its hook config sets
+# SUPERSET_HOOK_EVENT. It wins over the payload, which carries the user's
+# prompt text verbatim.
+EVENT_TYPE="$SUPERSET_HOOK_EVENT"
+[ -z "$EVENT_TYPE" ] && EVENT_TYPE=$(json_field hook_event_name hookEventName)
 if [ -z "$EVENT_TYPE" ]; then
   CODEX_TYPE=$(json_field type)
   case "$CODEX_TYPE" in

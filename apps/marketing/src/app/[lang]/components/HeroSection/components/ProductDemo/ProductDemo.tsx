@@ -112,7 +112,7 @@ export function ProductDemo() {
 							}}
 						/>
 						<div className="relative overflow-x-auto scrollbar-hide max-md:[mask-image:linear-gradient(to_right,black_88%,transparent)]">
-							<AppMockup activeDemo={activeOption} />
+							<AppMockup activeDemo={activeOption} edgeGlare />
 						</div>
 					</m.div>
 				</m.div>

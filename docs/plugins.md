@@ -36,10 +36,11 @@ and installs the working tree, which is what makes local authoring work.
 superset plugins publish <name> --bump patch   # rewrites the marketplace entry and the bundle
 git add .agent-marketplace.json plugins/<name> packages/shared/src/plugins/manifests.generated.ts
 git commit -m "publish <name>@<version>"
-git tag <name>@<version>
-git push origin <branch> <name>@<version>      # push the branch too: install reads the version from it
 bun run check:plugins                          # what CI runs; catches a change that skipped publish
 ```
+
+Merge to main and `.github/workflows/tag-plugin-releases.yml` pushes `<name>@<version>` at the
+merge commit. Don't tag by hand on a branch: a squash merge leaves that tag off main.
 
 `superset plugins validate` takes a path (`plugins/<name>`), not a name. To test a plugin locally,
 `superset plugins marketplace add <path>` then `superset plugins install <name>`. Install copies the

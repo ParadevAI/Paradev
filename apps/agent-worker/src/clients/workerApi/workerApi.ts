@@ -1,5 +1,5 @@
-import type { RoomPoster } from "@superset/agent-harness";
 import { ApplicationFailure } from "@temporalio/common";
+import type { RoomPoster } from "../../activities/createActivities";
 import type { CredentialsProvider, TurnCredentials } from "../credentials";
 import type { HostTarget } from "../hostJobs";
 import type {
@@ -38,6 +38,9 @@ interface TurnCredentialsResponse {
 	model: { headers: Record<string, string> } | null;
 	room: { channelId: string; threadRootId: string | null } | null;
 	agentToken: string;
+	dev?: TurnCredentials["dev"];
+	session?: TurnCredentials["session"];
+	tools?: TurnCredentials["tools"];
 }
 
 /** The API's `agentWorker` routes (per-turn credentials and settling) and the Dev's room posts. */
@@ -45,6 +48,7 @@ export function workerApi(options: WorkerApiOptions): {
 	credentials: CredentialsProvider;
 	settler: TurnSettler;
 	roomPoster: (credentials: TurnCredentials) => RoomPoster | null;
+	reconcile: () => Promise<unknown>;
 } {
 	const call = <T>(procedure: string, input: unknown) =>
 		trpcMutation<T>(
@@ -85,6 +89,9 @@ export function workerApi(options: WorkerApiOptions): {
 					room: granted.room,
 					agentToken: granted.agentToken,
 					model: { ...options.model, headers },
+					...(granted.dev ? { dev: granted.dev } : {}),
+					...(granted.session ? { session: granted.session } : {}),
+					tools: granted.tools ?? null,
 				};
 			},
 		},
@@ -98,14 +105,21 @@ export function workerApi(options: WorkerApiOptions): {
 								{
 									channelId: room.channelId,
 									body: input.body,
-									threadRootId: input.threadRootId ?? room.threadRootId,
+									threadRootId: room.threadRootId,
 									idempotencyKey: input.idempotencyKey,
 								},
 								options,
 							).then((message) => ({ messageId: message.id })),
 					}
 				: null,
+		reconcile: () => call("reconcile", undefined),
 		settler: {
+			async noteRetry(input) {
+				await call("noteRetry", {
+					...input,
+					error: input.error.slice(0, 2000),
+				});
+			},
 			async settle(input: SettleTurnInput) {
 				try {
 					const { sessionStore } = await call<{

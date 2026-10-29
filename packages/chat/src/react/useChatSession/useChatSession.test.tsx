@@ -23,7 +23,12 @@ import { createManualWait } from "../../testing/manualWait";
 import { createMemoryStreamServer } from "../../testing/memoryStream";
 import { registerDom } from "../../testing/registerDom";
 import type { ChatSession, FrameScheduler } from "./useChatSession";
-import { DEFAULT_DELTAS, useChatSession } from "./useChatSession";
+import {
+	DEFAULT_DELTAS,
+	prefetchChatSession,
+	useChatSession,
+} from "./useChatSession";
+import { forgetSnapshot } from "./utils/snapshotCache";
 
 registerDom();
 const {
@@ -778,6 +783,111 @@ describe("useChatSession", () => {
 		expect([...session().snapshot.items.keys()]).toEqual(shown);
 		view.unmount();
 		again.close();
+		await stack.runtime.dispose();
+	});
+
+	test("seeds from a prefetched transcript without fetching it again, and streams what follows", async () => {
+		const stack = await startStack();
+		const writer = stack.makeClient();
+		const writerView = render(<Probe client={writer} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		const shown = [...session().snapshot.items.keys()];
+		writerView.unmount();
+		writer.close();
+		forgetSnapshot(stack.sessionId);
+
+		const prefetcher = stack.makeClient();
+		expect(await prefetchChatSession(prefetcher)).toBe(true);
+		prefetcher.close();
+
+		const host = heldUntilReleased(stack.transport);
+		const client = stack.makeClient({ transport: host.transport });
+		const view = render(<Probe client={client} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		expect([...session().snapshot.items.keys()]).toEqual(shown);
+		expect(host.requested).toEqual([]);
+
+		await domWaitFor(() => expect(session().connection).toBe("open"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "again" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.items.size).toBeGreaterThan(shown.length),
+		);
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		expect(host.requested).toEqual([]);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("streams what happened between the prefetch and the mount, without fetching", async () => {
+		const stack = await startStack();
+		const writer = stack.makeClient();
+		const writerView = render(<Probe client={writer} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		const before = session().snapshot.items.size;
+		writerView.unmount();
+		writer.close();
+		forgetSnapshot(stack.sessionId);
+
+		const prefetcher = stack.makeClient();
+		expect(await prefetchChatSession(prefetcher)).toBe(true);
+		prefetcher.close();
+
+		const outside = stack.makeClient();
+		await outside.prompt({
+			clientId: randomUUID(),
+			content: [{ type: "text", text: "meanwhile" }],
+		});
+		let latestOutline = await stack.transport.getOutline({
+			sessionId: stack.sessionId,
+		});
+		for (
+			let attempt = 0;
+			attempt < 200 &&
+			!(
+				latestOutline.ok &&
+				latestOutline.outline.items.length > before &&
+				latestOutline.outline.session?.status === "idle"
+			);
+			attempt++
+		) {
+			await new Promise((resolve) => setTimeout(resolve, 5));
+			latestOutline = await stack.transport.getOutline({
+				sessionId: stack.sessionId,
+			});
+		}
+		if (!latestOutline.ok) throw new Error("no outline");
+		const meanwhile = latestOutline.outline.items.map(({ item }) => item.id);
+		expect(meanwhile.length).toBeGreaterThan(before);
+		outside.close();
+
+		const host = heldUntilReleased(stack.transport);
+		const client = stack.makeClient({ transport: host.transport });
+		const view = render(<Probe client={client} />);
+		await domWaitFor(() =>
+			expect([...session().snapshot.items.keys()].sort()).toEqual(
+				[...meanwhile].sort(),
+			),
+		);
+		expect(host.requested).toEqual([]);
+		view.unmount();
+		client.close();
 		await stack.runtime.dispose();
 	});
 

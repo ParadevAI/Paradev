@@ -180,6 +180,10 @@ msgstr "{0, plural, one {#件のログイン情報} other {#件のログイン�
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# 件の新しい返信}}"
 
+#. placeholder {0}: actorIds.length
+msgid "{0, plural, one {# other} other {# others}}"
+msgstr "{0, plural, other {他 # 人}}"
+
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#件成功} other {#件成功}}"
@@ -221,9 +225,7 @@ msgstr "{0, plural, one {クラウドで#件} other {クラウドで#件}}"
 msgid "{0, plural, one {# result on this host} other {# results on this host}}"
 msgstr "{0, plural, one {このホストで#件} other {このホストで#件}}"
 
-#. placeholder {0}: pullRequests.length
 #. placeholder {0}: results.length
-#. placeholder {0}: searchResults.length
 msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {#件の結果} other {#件の結果}}"
 
@@ -531,6 +533,10 @@ msgstr "{0}件のプロジェクト"
 msgid "{0} Running"
 msgstr "{0}件実行中"
 
+#. placeholder {0}: selected.length
+msgid "{0} selected"
+msgstr "{0} 件選択"
+
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "{0}件のセッションを終了しました"
@@ -748,9 +754,6 @@ msgstr "{appName} MobileはProの一部です"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobileは、接続したコンピュータ上でエージェントを実行します。"
 
-msgid "{approvalCount, plural, one {# needs approval} other {# need approval}}"
-msgstr "{approvalCount, plural, other {#件が承認待ち}}"
-
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {mainより#コミット遅れています。リベースが必要です} other {mainより#コミット遅れています。リベースが必要です}}"
 
@@ -863,9 +866,6 @@ msgstr "{count, plural, one {#件のソースを使用} other {#件のソース�
 msgid "{count, plural, one {used # tool} other {used # tools}}"
 msgstr "{count, plural, one {#件のツールを使用} other {#件のツールを使用}}"
 
-msgid "{count, plural, one {waiting on # subagent} other {waiting on # subagents}}"
-msgstr "{count, plural, other {# 件のサブエージェントを待機中}}"
-
 msgid "{count} GitHub stars"
 msgstr "GitHubスター{count}件"
 
@@ -892,9 +892,6 @@ msgstr "{days}日"
 
 msgid "{days}d {hours}h"
 msgstr "{days}日{hours}時間"
-
-msgid "{days}d ago"
-msgstr "{days}日前"
 
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {残り # 日}}"
@@ -935,9 +932,6 @@ msgstr "{formerName} は {productName} になりました"
 
 msgid "{formerName} is now {productName}!"
 msgstr "{formerName} は {productName} になりました！"
-
-msgid "{formerName} is now called {productName}. It is the same product, built by the same team, and only the name has changed. Existing superset.sh links redirect, and the superset command keeps working."
-msgstr "{formerName} は {productName} に名称を変更しました。製品もチームも変わらず、変わったのは名前だけです。既存の superset.sh のリンクはリダイレクトされ、superset コマンドも引き続き使えます。"
 
 msgid "{founderCount} ex-YC founders"
 msgstr "YC出身の創業者{founderCount}人"
@@ -981,9 +975,6 @@ msgstr "{hours}時間"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}時間{minutes}分"
 
-msgid "{hours}h ago"
-msgstr "{hours}時間前"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {#件のワークツリーをワークスペースとしてインポートしました} other {#件のワークツリーをワークスペースとしてインポートしました}}"
 
@@ -1026,20 +1017,11 @@ msgstr "{minutes}分"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}分{rest}秒"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}分前"
-
-msgid "{modKey}↵ to create"
-msgstr "{modKey}↵で作成"
-
 msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
 msgstr "月払いで1ユーザーあたり月額 {monthlyPrice}、または年払いで {yearlyPrice}。モバイル、オートメーション、優先サポート。"
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オートメーション、優先サポート。"
-
-msgid "{months}mo ago"
-msgstr "{months}か月前"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
@@ -1169,6 +1151,9 @@ msgstr "{price}/ユーザー/月"
 msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（旧 {formerName}、YC P26）は、AI エージェント時代のためのソースコード公開型 IDE です。エンジニアは Claude Code や Codex などのコーディングエージェントを数百単位で並行して実行できます。"
 
+msgid "{productName} (formerly {formerName})"
+msgstr "{productName}（旧 {formerName}）"
+
 msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
 msgstr "{productName}（YC P26）は、AI エージェント時代のためのソースコード公開型 IDE です。エンジニアは Claude Code や Codex などのコーディングエージェントを数百単位で並行して実行できます。"
 
@@ -1178,14 +1163,17 @@ msgstr "{productName} 報道関係者向け情報"
 msgid "{productName} has been used by one in eight Fortune 500 companies."
 msgstr "{productName} は、Fortune 500 企業の 8 社に 1 社で利用されています。"
 
+msgid "{productName} in the press"
+msgstr "メディアで紹介された{productName}"
+
 msgid "{productName} is used by engineers at Netflix, Microsoft, NVIDIA, DoorDash, Wix, and Mistral AI globally, and across Asia at ByteDance, Toss, Kakao, Grab, LINE, and Rakuten."
 msgstr "{productName} は、グローバルでは Netflix、Microsoft、NVIDIA、DoorDash、Wix、Mistral AI、アジアでは ByteDance、Toss、Kakao、Grab、LINE、楽天のエンジニアに利用されています。"
 
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は {productName} を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
-msgid "{provider} logo"
-msgstr "{provider}のロゴ"
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} は 2026 年 10 月まで {formerName} という名前でした。"
 
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
@@ -1213,26 +1201,14 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "残り {remaining} トークン"
 
-msgid "{repositoryFullName} isn't on {installedAccountLogin}, where this organization's GitHub App is installed."
-msgstr "{repositoryFullName} は、この組織の GitHub App がインストールされている {installedAccountLogin} にありません。"
-
-msgid "{repositoryFullName} isn't shared with the Paradev GitHub App yet."
-msgstr "{repositoryFullName} はまだ Paradev の GitHub App と共有されていません。"
-
 msgid "{seconds}s"
 msgstr "{seconds}秒"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}秒前"
 
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}件選択中"
 
 msgid "{share}% human"
 msgstr "人間{share}%"
-
-msgid "{shellCount, plural, one {# shell} other {# shells}}"
-msgstr "{shellCount, plural, other {# 件のシェル}}"
 
 msgid "{shown} of {total}"
 msgstr "{total}件中{shown}件"
@@ -1253,9 +1229,6 @@ msgstr "{started, plural, one {#件のオートメーションを開始しまし
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 件のサブエージェントが実行中}}"
-
-msgid "{subagentCount, plural, one {# subagent} other {# subagents}}"
-msgstr "{subagentCount, plural, other {# 件のサブエージェント}}"
 
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {#件のワークスペースを作成、{failCount}件失敗} other {#件のワークスペースを作成、{failCount}件失敗}}"
@@ -1317,6 +1290,30 @@ msgstr "{size} トークン中 {used}"
 msgid "{used} used"
 msgstr "{used} 使用済み"
 
+msgid "{user} and {others} joined and left."
+msgstr "{user} と {others} が参加して退出しました。"
+
+msgid "{user} and {others} joined."
+msgstr "{user} と {others} が参加しました。"
+
+msgid "{user} and {others} left."
+msgstr "{user} と {others} が退出しました。"
+
+msgid "{user} and {others} rejoined."
+msgstr "{user} と {others} が再参加しました。"
+
+msgid "{user} joined and left."
+msgstr "{user} が参加して退出しました。"
+
+msgid "{user} joined."
+msgstr "{user} が参加しました。"
+
+msgid "{user} left."
+msgstr "{user} が退出しました。"
+
+msgid "{user} rejoined."
+msgstr "{user} が再参加しました。"
+
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -1335,12 +1332,12 @@ msgstr "{workspaceName}: ティアダウンに失敗しました"
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "年払いで1ユーザーあたり{yearlyTotal}"
 
-msgid "{years}y ago"
-msgstr "{years}年前"
-
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
 msgstr "@{0} · クラウドワークスペースはあなたとしてコミット、プッシュ、プルリクエストの作成を行います"
+
+msgid "@{accountLogin}"
+msgstr "@{accountLogin}"
 
 msgid "@superset"
 msgstr "@superset"
@@ -1477,6 +1474,9 @@ msgstr "${balance}のクレジット"
 msgid "$0"
 msgstr "$0"
 
+msgid "$11.5M seed led by Union Square Ventures"
+msgstr "Union Square Ventures がリードしたシードラウンドで 1,150 万ドル"
+
 msgid "1"
 msgstr "1"
 
@@ -1498,8 +1498,14 @@ msgstr "状態を取りこぼさない10以上の並行ワークストリーム"
 msgid "12m ago"
 msgstr "12分前"
 
+msgid "145,000+ across 180 countries"
+msgstr "180 か国で 14 万 5,000 人以上"
+
 msgid "15 min"
 msgstr "15分"
+
+msgid "15k+ stars, 100+ contributors"
+msgstr "スター 15k+、コントリビューター 100+"
 
 msgid "1d ago"
 msgstr "1日前"
@@ -1702,9 +1708,6 @@ msgstr "会社概要"
 msgid "About {displayName}"
 msgstr "{displayName}について"
 
-msgid "About {productName}"
-msgstr "{productName}について"
-
 msgid "About Paradev"
 msgstr "Paradevについて"
 
@@ -1885,9 +1888,6 @@ msgstr "別のアカウントを接続するか、使わなくなったものを
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "どんなマシンでもホストとして追加できます。ノートPCがスリープしてもワークスペースは動き続け、どこからでも様子を確認できます。"
 
-msgid "Add attachment"
-msgstr "添付ファイルを追加"
-
 msgid "Add Attachment"
 msgstr "添付ファイルを追加"
 
@@ -1922,7 +1922,7 @@ msgid "Add files, apps, and more (@)"
 msgstr "ファイルやアプリなどを追加(@)"
 
 msgid "Add instructions"
-msgstr "{'cs': 'Přidat pokyny', 'de': 'Anweisungen hinzufügen', 'es': 'Añadir instrucciones', 'fr': 'Ajouter des instructions', 'id': 'Tambahkan instruksi', 'it': 'Aggiungi istruzioni', 'ja': '指示を追加', 'ko': '지침 추가', 'nl': 'Instructies toevoegen', 'pl': 'Dodaj instrukcje', 'pt-BR': 'Adicionar instruções', 'ru': 'Добавить инструкции', 'tr': 'Talimat ekle', 'vi': 'Thêm hướng dẫn', 'zh-CN': '添加指示', 'zh-TW': '新增指示'}"
+msgstr "指示を追加"
 
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
@@ -1969,9 +1969,6 @@ msgstr "プロンプトを追加 例: $sentryでクラッシュを探す"
 
 msgid "Add reaction…"
 msgstr "リアクションを追加…"
-
-msgid "Add repository"
-msgstr "リポジトリを追加"
 
 msgid "Add script"
 msgstr "スクリプトを追加"
@@ -2028,7 +2025,10 @@ msgid "Add to workspace"
 msgstr "ワークスペースに追加"
 
 msgid "Add what it does"
-msgstr "{'cs': 'Přidat, co dělá', 'de': 'Beschreiben, was er macht', 'es': 'Añadir qué hace', 'fr': 'Ajouter ce qu’il fait', 'id': 'Tambahkan apa yang dilakukannya', 'it': 'Aggiungi cosa fa', 'ja': '役割を追加', 'ko': '하는 일 추가', 'nl': 'Toevoegen wat hij doet', 'pl': 'Dodaj, co robi', 'pt-BR': 'Adicionar o que ele faz', 'ru': 'Добавить, что он делает', 'tr': 'Ne yaptığını ekle', 'vi': 'Thêm việc nó làm', 'zh-CN': '添加它的用途', 'zh-TW': '新增它的用途'}"
+msgstr "役割を追加"
+
+msgid "Add your first project"
+msgstr "最初のプロジェクトを追加"
 
 msgid "Add your own terminal agent to this device."
 msgstr "このデバイスに独自のターミナルエージェントを追加します。"
@@ -2205,9 +2205,6 @@ msgstr "AI · 会話"
 msgid "AI · Status"
 msgstr "AI · ステータス"
 
-msgid "AI authentication failed. Please check your AI settings."
-msgstr "AIの認証に失敗しました。AI設定を確認してください。"
-
 msgid "Alert"
 msgstr "Alert"
 
@@ -2279,6 +2276,9 @@ msgstr "すべてのコミット"
 #. placeholder {0}: members.length
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "{0}人のメンバー全員のデータが完全に削除されます — この操作は元に戻せません。"
+
+msgid "All downloads"
+msgstr "すべてのダウンロード"
 
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
@@ -2448,6 +2448,30 @@ msgstr "チャンネルとメンバーも編集できます"
 msgid "Also viewing this page"
 msgstr "このページを見ている他のユーザー"
 
+msgid "Also, {user} and {others} joined and left."
+msgstr "また、{user} と {others} が参加して退出しました。"
+
+msgid "Also, {user} and {others} joined."
+msgstr "また、{user} と {others} が参加しました。"
+
+msgid "Also, {user} and {others} left."
+msgstr "また、{user} と {others} が退出しました。"
+
+msgid "Also, {user} and {others} rejoined."
+msgstr "また、{user} と {others} が再参加しました。"
+
+msgid "Also, {user} joined and left."
+msgstr "また、{user} が参加して退出しました。"
+
+msgid "Also, {user} joined."
+msgstr "また、{user} が参加しました。"
+
+msgid "Also, {user} left."
+msgstr "また、{user} が退出しました。"
+
+msgid "Also, {user} rejoined."
+msgstr "また、{user} が再参加しました。"
+
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "その他: @superset/ui/ai-elements/braille-spinner"
 
@@ -2531,6 +2555,12 @@ msgstr "この質問はデスクトップで回答するか、スキップして
 
 msgid "Answered"
 msgstr "回答済み"
+
+msgid "Answered {who} in #{channel}"
+msgstr "#{channel} で {who} に回答しました"
+
+msgid "Answered you in #{channel}"
+msgstr "#{channel} であなたに回答しました"
 
 msgid "Anthropic rejected this API key."
 msgstr "AnthropicがこのAPIキーを拒否しました。"
@@ -2687,6 +2717,9 @@ msgstr "Appleのロゴ"
 msgid "Application menu"
 msgstr "アプリケーションメニュー"
 
+msgid "Applications"
+msgstr "アプリケーション"
+
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "毎晩、安全な依存関係の更新を適用し、残りを一覧にします。"
 
@@ -2745,6 +2778,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 msgid "Archive"
 msgstr "アーカイブ"
 
+msgid "Archive {environmentName}?"
+msgstr "{environmentName} をアーカイブしますか？"
+
 msgid "Archive {name}?"
 msgstr "{name} をアーカイブしますか？"
 
@@ -2799,6 +2835,9 @@ msgstr "引数"
 
 msgid "Argv used to launch the agent."
 msgstr "エージェントの起動に使うargv。"
+
+msgid "Articles and coverage about {productName}."
+msgstr "{productName} に関する記事と報道。"
 
 msgid "Artifact"
 msgstr "Artifact"
@@ -2866,9 +2905,6 @@ msgstr "割り当て"
 msgid "Assigned to me"
 msgstr "自分に割り当て"
 
-msgid "Assigned to you"
-msgstr "あなたに割り当て"
-
 msgid "Assignee"
 msgstr "担当者"
 
@@ -2877,6 +2913,9 @@ msgstr "補助"
 
 msgid "at"
 msgstr "at"
+
+msgid "At a glance"
+msgstr "概要"
 
 msgid "At least one team we can name, ours included, passes every F4 gate for a full quarter and publishes the numbers."
 msgstr "名前を挙げられるチームが少なくとも1つ、当社を含めて、四半期を通してF4のゲートをすべて通過し、その数値を公開する。"
@@ -2995,17 +3034,11 @@ msgstr "自動"
 msgid "Auto (system)"
 msgstr "自動(システム)"
 
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "自動ではシステムの言語に従います。後から設定で変更できます。"
-
 msgid "Auto Save"
 msgstr "自動保存"
 
 msgid "Auto top-up"
 msgstr "自動チャージ"
-
-msgid "auto-generated"
-msgstr "自動生成"
 
 msgid "Auto-run command"
 msgstr "コマンドを自動実行"
@@ -3195,10 +3228,12 @@ msgstr "{selectedHostLabel}の新規ワークツリーのベースディレク�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}の新規ワークツリーのベースディレクトリ。"
 
+msgid "Base image · no checkpoint yet"
+msgstr "ベースイメージ · チェックポイントはまだありません"
+
 msgid "Base URL"
 msgstr "ベースURL"
 
-#. placeholder {0}: draft.linkedPR.prNumber
 #. placeholder {0}: linkedPR.prNumber
 msgid "based off PR #{0}"
 msgstr "PR #{0} をベースに"
@@ -3342,12 +3377,6 @@ msgstr "新しい worktree で分岐"
 
 msgid "Branch in this workspace"
 msgstr "このワークスペースで分岐"
-
-msgid "branch name"
-msgstr "ブランチ名"
-
-msgid "Branch name"
-msgstr "ブランチ名"
 
 msgid "Branch name copied"
 msgstr "ブランチ名をコピーしました"
@@ -3866,6 +3895,9 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
+msgid "Chat mode"
+msgstr "チャットモード"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -3959,6 +3991,10 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+msgid "Checkpoint saved {0}"
+msgstr "チェックポイント保存 {0}"
+
 msgid "Checks"
 msgstr "チェック"
 
@@ -3992,6 +4028,12 @@ msgstr "親ディレクトリを選択"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "issueを開く前に、GitHub issueでプロジェクトを選択してください。"
 
+msgid "Choose a project to search its issues"
+msgstr "プロジェクトを選ぶと、そのIssueを検索できます"
+
+msgid "Choose a project to search its pull requests"
+msgstr "プロジェクトを選ぶと、そのプルリクエストを検索できます"
+
 msgid "Choose a section."
 msgstr "セクションを選んでください。"
 
@@ -4021,6 +4063,9 @@ msgstr "このメッセージで使うMCPサーバーを選択"
 
 msgid "Choose the model"
 msgstr "モデルを選択"
+
+msgid "Choose the primary repository"
+msgstr "メインのリポジトリを選択"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "アプリ内ブラウザから消去する項目を選択してください。"
@@ -4146,6 +4191,9 @@ msgstr "CLIとSDK"
 msgid "CLI docs"
 msgstr "CLIドキュメント"
 
+msgid "CLI mode"
+msgstr "CLIモード"
+
 msgid "CLI reference"
 msgstr "CLIリファレンス"
 
@@ -4170,12 +4218,6 @@ msgstr "リダイレクトされない場合はこちらをクリック"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "「↑ update」ボタンをクリックすると更新前の確認が表示されます"
 
-msgid "Click the chip to open the issue"
-msgstr "チップをクリックするとIssueを開きます"
-
-msgid "Click the chip to open the pull request"
-msgstr "チップをクリックするとプルリクエストを開きます"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
 
@@ -4191,6 +4233,9 @@ msgstr "クライアント"
 msgid "Clone"
 msgstr "クローン"
 
+msgid "Clone a repo"
+msgstr "リポジトリをクローン"
+
 msgid "Clone a repository"
 msgstr "リポジトリをクローン"
 
@@ -4202,9 +4247,6 @@ msgstr "リポジトリをクローンする"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "リポジトリをクローンするか、ホスト上の既存フォルダをインポートします。"
-
-msgid "Clone, push, and create PRs."
-msgstr "クローン、プッシュ、PRの作成。"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4383,8 +4425,14 @@ msgstr "このターミナルを閉じると実行中のプロセスが終了し
 msgid "Cloud"
 msgstr "クラウド"
 
+msgid "Cloud environment setup"
+msgstr "クラウド環境のセットアップ"
+
 msgid "Cloud environments"
 msgstr "クラウド環境"
+
+msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
+msgstr "クラウド環境は GitHub からリポジトリをチェックアウトします。まずこれらを接続してください。一度だけで済みます。"
 
 msgid "Cloud GB-hours per seat each month"
 msgstr "1席あたりの毎月のクラウド GB 時間"
@@ -4408,20 +4456,20 @@ msgstr "クラウドワークスペース"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} ではクラウドワークスペースが有効になっていません。Team と Ultra プランで利用できます。設定の請求からアップグレードしてください。"
 
+msgid "Cloud workspaces commit, push and open pull requests as you"
+msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "クラウドワークスペースはこの変数を無視します。エージェントは代わりに「設定 › エージェント」でサインインします。"
-
-msgid "Cloud workspaces need a project for now"
-msgstr "現在、クラウドワークスペースにはプロジェクトが必要です"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "クラウドワークスペースには Team または Ultra プランが必要です。起動するには設定の請求からアップグレードしてください。"
 
+msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
+msgstr "クラウドワークスペースはこのリポジトリで開き、その .superset/config.json がセットアップを実行します。ほかのリポジトリは横にチェックアウトされます。"
+
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "クラウドワークスペースはこれを使って{agentLabel}を実行しなくなります。"
-
-msgid "Cloud workspaces without a project are coming. Pick a project for now."
-msgstr "プロジェクトなしのクラウドワークスペースは近日対応予定です。今はプロジェクトを選択してください。"
 
 msgid "Co-founder & CTO, TrainLoop (YC W25)"
 msgstr "共同創業者兼CTO、TrainLoop (YC W25)"
@@ -4658,6 +4706,9 @@ msgstr "config.json は JSON オブジェクトである必要があります"
 msgid "Configure"
 msgstr "設定"
 
+msgid "Configure access"
+msgstr "アクセスを設定"
+
 msgid "Configure agents…"
 msgstr "エージェントを設定…"
 
@@ -4669,9 +4720,6 @@ msgstr "アプリの全般設定"
 
 msgid "Configure git branch and worktree behavior"
 msgstr "gitブランチとワークツリーの動作を設定"
-
-msgid "Configure GitHub App"
-msgstr "GitHub App を設定"
 
 msgid "Configure GitHub App…"
 msgstr "GitHub App を設定…"
@@ -4746,8 +4794,17 @@ msgstr "外部サービスを接続して組織とデータを同期します。
 msgid "Connect external services to sync data."
 msgstr "外部サービスを接続してデータを同期します。"
 
-msgid "Connect GitHub in Integrations to add {repositoryFullName}."
-msgstr "{repositoryFullName} を追加するには、連携で GitHub を接続してください。"
+msgid "Connect GitHub"
+msgstr "GitHub を接続"
+
+msgid "Connect GitHub in Settings to act on pull requests as yourself"
+msgstr "自分としてプルリクエストを操作するには、設定で GitHub を接続してください"
+
+msgid "Connect GitHub to continue"
+msgstr "続行するには GitHub を接続してください"
+
+msgid "Connect GitHub to see review comments as yourself."
+msgstr "自分としてレビューコメントを表示するには、GitHub を接続してください。"
 
 msgid "Connect GitHub…"
 msgstr "GitHub を接続…"
@@ -4782,17 +4839,20 @@ msgstr "Slackを接続して会話からタスクを管理します。任意の�
 msgid "Connect this computer"
 msgstr "このコンピューターに接続"
 
+msgid "Connect to act on pull requests as yourself instead of as the workspace."
+msgstr "接続すると、ワークスペースではなく自分としてプルリクエストを操作できます。"
+
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} アカウントを接続してから、このページを再読み込みしてください。"
+
+msgid "Connect your GitHub account to load this pull request as you."
+msgstr "このプルリクエストを自分として読み込むには、GitHub アカウントを接続してください。"
 
 msgid "Connect your GitHub repositories and sync pull requests. Track CI status and reviews across your team."
 msgstr "GitHubリポジトリを接続してプルリクエストを同期します。チーム全体のCIステータスとレビューを追跡できます。"
 
 msgid "Connect your Linear account before tracking tasks in Linear."
 msgstr "タスクを Linear で管理する前に、Linear アカウントを接続してください。"
-
-msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
-msgstr "Linear issueをリンクするには、設定 → 連携でLinearアカウントを接続してください。"
 
 msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
 msgstr "Linearアカウントを接続すると、ParadevからLinear issueの閲覧・更新・作業開始ができます。"
@@ -4832,6 +4892,9 @@ msgstr "接続先"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "{connectedOrgName}に接続済み"
+
+msgid "Connected to GitHub as {accountLogin}"
+msgstr "{accountLogin} として GitHub に接続済み"
 
 msgid "Connected via subscription"
 msgstr "サブスクリプションで接続済み"
@@ -4915,9 +4978,6 @@ msgstr "同意が付与されませんでした。テナント管理者の承認
 msgid "Consider alternatives"
 msgstr "代替案を検討して"
 
-msgid "Console"
-msgstr "コンソール"
-
 msgid "Constraints"
 msgstr "制約"
 
@@ -4962,9 +5022,6 @@ msgstr "ブラウザで続行してください"
 
 msgid "Continue or fork session"
 msgstr "セッションを続行またはフォーク"
-
-msgid "Continue the same workspace from your iPhone"
-msgstr "同じワークスペースを iPhone から続ける"
 
 msgid "Continue the session the last run left"
 msgstr "前回の実行が残したセッションを継続"
@@ -5334,6 +5391,9 @@ msgstr "この差分を読み込めませんでした"
 msgid "Could not load this file."
 msgstr "このファイルを読み込めませんでした。"
 
+msgid "Could not load this pull request."
+msgstr "このプルリクエストを読み込めませんでした。"
+
 msgid "Could not load your machines"
 msgstr "マシンを読み込めませんでした"
 
@@ -5366,9 +5426,6 @@ msgstr "モバイルシミュレーターに接続できませんでした。"
 
 msgid "Could not reach the desktop."
 msgstr "デスクトップに接続できませんでした。"
-
-msgid "Could not reach the host to load this pull request."
-msgstr "このプルリクエストを読み込むためのホストに接続できませんでした。"
 
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "更新を開始するためにホストに接続できませんでした。オンラインであることを確認して、もう一度お試しください。"
@@ -5515,6 +5572,9 @@ msgstr "新しい worktree へ分岐できませんでした"
 msgid "Couldn't branch the conversation"
 msgstr "会話を分岐できませんでした"
 
+msgid "Couldn't check"
+msgstr "確認できませんでした"
+
 msgid "Couldn't check what removing this member affects"
 msgstr "このメンバーの削除による影響を確認できませんでした"
 
@@ -5563,6 +5623,9 @@ msgstr "メッセージを編集できませんでした"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
 
+msgid "Couldn't fork into a chat"
+msgstr "チャットにフォークできませんでした"
+
 msgid "Couldn't hand this to an agent"
 msgstr "エージェントに引き渡せませんでした"
 
@@ -5586,14 +5649,11 @@ msgstr "コントリビューターを読み込めませんでした — ユー�
 msgid "Couldn't load earlier messages. Retry"
 msgstr "以前のメッセージを読み込めませんでした。再試行"
 
-msgid "Couldn't load issues: {msg}"
-msgstr "Issueを読み込めませんでした: {msg}"
+msgid "Couldn't load its activity"
+msgstr "アクティビティを読み込めませんでした"
 
 msgid "Couldn't load pages"
 msgstr "ページを読み込めませんでした"
-
-msgid "Couldn't load pull requests: {msg}"
-msgstr "プルリクエストを読み込めませんでした: {msg}"
 
 msgid "Couldn't load review comments"
 msgstr "レビューコメントを読み込めませんでした"
@@ -5790,6 +5850,9 @@ msgstr "「{newLabel}」を作成"
 msgid "Create a channel"
 msgstr "チャンネルを作成"
 
+msgid "Create a cloud environment"
+msgstr "クラウド環境を作成"
+
 msgid "Create a Dev"
 msgstr "Devを作成"
 
@@ -5807,9 +5870,6 @@ msgstr "リポジトリまたはローカルパスをクローンして新しい
 
 msgid "Create a new task from the desktop tasks view."
 msgstr "デスクトップのタスクビューから新しいタスクを作成します。"
-
-msgid "Create a new workspace"
-msgstr "新しいワークスペースを作成"
 
 msgid "Create a project to group tasks and cloud workspaces."
 msgstr "タスクとクラウドワークスペースをまとめるプロジェクトを作成します。"
@@ -5946,6 +6006,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "作成"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -6028,10 +6089,6 @@ msgstr "サンドボックスを作成中"
 
 msgid "Creating workspace"
 msgstr "ワークスペースを作成中"
-
-#. placeholder {0}: linkedPR.prNumber
-msgid "Creating workspace from PR #{0}..."
-msgstr "PR #{0}からワークスペースを作成中..."
 
 msgid "Creating workspace: {name}"
 msgstr "ワークスペースを作成中: {name}"
@@ -6655,11 +6712,8 @@ msgstr "新しいタブで差分"
 msgid "Digital Product Designer"
 msgstr "デジタルプロダクトデザイナー"
 
-msgid "Direct message"
-msgstr "ダイレクトメッセージ"
-
 msgid "Direct messages"
-msgstr "{'cs': 'Přímé zprávy', 'de': 'Direktnachrichten', 'es': 'Mensajes directos', 'fr': 'Messages directs', 'id': 'Pesan langsung', 'it': 'Messaggi diretti', 'ja': 'ダイレクトメッセージ', 'ko': '다이렉트 메시지', 'nl': 'Directe berichten', 'pl': 'Wiadomości bezpośrednie', 'pt-BR': 'Mensagens diretas', 'ru': 'Личные сообщения', 'tr': 'Doğrudan mesajlar', 'vi': 'Tin nhắn trực tiếp', 'zh-CN': '私信', 'zh-TW': '私訊'}"
+msgstr "ダイレクトメッセージ"
 
 msgid "Direct mode"
 msgstr "ダイレクトモード"
@@ -6847,6 +6901,10 @@ msgstr "保存しない"
 msgid "Done"
 msgstr "完了"
 
+msgctxt "subagent status"
+msgid "Done"
+msgstr "完了"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "完了 — プリセットバーで使っていた枠線付きチップスタイルをすべてのtooltipのデフォルトにし、コピペされたオーバーライドを削除しました(差し引き−90行)。"
 
@@ -6869,8 +6927,14 @@ msgstr "<0>{0}/download</0>から{appName}をダウンロードしてくださ�
 msgid "Download {name}"
 msgstr "{name}をダウンロード"
 
+msgid "Download again"
+msgstr "もう一度ダウンロード"
+
 msgid "Download app"
 msgstr "アプリをダウンロード"
+
+msgid "Download didn't start?"
+msgstr "ダウンロードが始まりませんか？"
 
 msgid "Download failed"
 msgstr "ダウンロードに失敗しました"
@@ -6893,8 +6957,8 @@ msgstr "ログをダウンロード"
 msgid "Download Manually"
 msgstr "手動でダウンロード"
 
-msgid "Download our logos and product images for use in coverage of Paradev."
-msgstr "Paradev に関する報道でご利用いただけるロゴと製品画像をダウンロードできます。"
+msgid "Download our logos, product images, and founder photos for use in coverage of Paradev."
+msgstr "Paradev に関する報道でご利用いただけるロゴ、製品画像、創業者の写真をダウンロードできます。"
 
 msgid "Download Paradev"
 msgstr "Paradevをダウンロード"
@@ -6942,6 +7006,9 @@ msgstr "ドラフトPR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "サポート返信を3件下書き"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "<0>Paradev</0> を<1>アプリケーション</1>フォルダにドラッグ"
 
 msgid "Drag to reorder"
 msgstr "ドラッグして並べ替え"
@@ -7095,8 +7162,8 @@ msgstr "名前を編集"
 msgid "Edit on GitHub"
 msgstr "GitHubで編集"
 
-msgid "Edit prefix"
-msgstr "プレフィックスを編集"
+msgid "Edit queued message"
+msgstr "キューのメッセージを編集"
 
 msgid "Edit Run Script"
 msgstr "実行スクリプトを編集"
@@ -7191,6 +7258,9 @@ msgstr "Empty"
 msgid "Empty command"
 msgstr "空のコマンド"
 
+msgid "Empty project"
+msgstr "空のプロジェクト"
+
 msgid "Emulator"
 msgstr "エミュレータ"
 
@@ -7270,11 +7340,11 @@ msgstr "エンタープライズ"
 msgid "Environment"
 msgstr "環境"
 
-msgid "Environment created"
-msgstr "環境を作成しました"
+msgid "Environment archived"
+msgstr "環境をアーカイブしました"
 
-msgid "Environment saved"
-msgstr "環境を保存しました"
+msgid "Environment not found"
+msgstr "環境が見つかりません"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境構築、不安定なテスト、認証情報の受け渡し。2025年に無人実行を潰していた退屈な失敗要因は、モデルの進歩ではなくエンジニアリングでほぼ取り除かれます。"
@@ -7495,9 +7565,6 @@ msgstr "検討中"
 msgid "Extended thinking: {activeLabel}"
 msgstr "拡張思考: {activeLabel}"
 
-msgid "external"
-msgstr "外部"
-
 msgid "External Application"
 msgstr "外部アプリケーション"
 
@@ -7673,9 +7740,6 @@ msgstr "スレッドの作成に失敗しました"
 msgid "Failed to create workspace"
 msgstr "ワークスペースを作成できませんでした"
 
-msgid "Failed to create workspace from PR"
-msgstr "PRからワークスペースを作成できませんでした"
-
 msgid "Failed to delete"
 msgstr "削除に失敗しました"
 
@@ -7794,17 +7858,8 @@ msgstr "新規ウィンドウを開けませんでした: {0}"
 msgid "Failed to open new window: {message}"
 msgstr "新規ウィンドウを開けませんでした: {message}"
 
-msgid "Failed to open project"
-msgstr "プロジェクトを開けませんでした"
-
-msgid "Failed to open task"
-msgstr "タスクを開けませんでした"
-
 msgid "Failed to open the billing portal"
 msgstr "請求ポータルを開けませんでした"
-
-msgid "Failed to open worktree"
-msgstr "ワークツリーを開けませんでした"
 
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
@@ -7812,12 +7867,6 @@ msgstr "開けませんでした: {0}"
 
 msgid "Failed to post reply"
 msgstr "返信の投稿に失敗しました"
-
-msgid "Failed to prepare agent launch"
-msgstr "エージェントの起動準備に失敗しました"
-
-msgid "Failed to process attachments"
-msgstr "添付ファイルを処理できませんでした"
 
 msgid "Failed to push branch"
 msgstr "ブランチをプッシュできませんでした"
@@ -8240,7 +8289,7 @@ msgid "Find in this chat"
 msgstr "このチャット内を検索"
 
 msgid "Find people and Devs"
-msgstr "{'cs': 'Najít lidi a Devy', 'de': 'Personen und Devs finden', 'es': 'Buscar personas y Devs', 'fr': 'Trouver des personnes et des Devs', 'id': 'Cari orang dan Dev', 'it': 'Trova persone e Dev', 'ja': 'メンバーと Dev を検索', 'ko': '사람 및 Dev 찾기', 'nl': 'Mensen en Devs zoeken', 'pl': 'Znajdź osoby i Devy', 'pt-BR': 'Encontrar pessoas e Devs', 'ru': 'Найти людей и Dev', 'tr': \"Kişileri ve Dev'leri bul\", 'vi': 'Tìm người và Dev', 'zh-CN': '查找成员和 Dev', 'zh-TW': '尋找成員和 Dev'}"
+msgstr "メンバーと Dev を検索"
 
 msgid "Finder"
 msgstr "Finder"
@@ -8359,9 +8408,6 @@ msgstr "新しいワークツリーにチェックアウトするフォルダを
 msgid "FOLLOW ON X"
 msgstr "Xでフォロー"
 
-msgid "Follow terminal sessions live"
-msgstr "ターミナルセッションをリアルタイムで確認"
-
 msgid "Follow thread"
 msgstr "スレッドをフォロー"
 
@@ -8373,6 +8419,12 @@ msgstr "LinkedInでフォロー"
 
 msgid "Follow us on X/Twitter"
 msgstr "X/Twitterでフォロー"
+
+msgid "Followed up with {who} in #{channel}"
+msgstr "#{channel} で {who} へのフォローアップを行いました"
+
+msgid "Followed up with you in #{channel}"
+msgstr "#{channel} であなたへのフォローアップを行いました"
 
 msgid "Font family"
 msgstr "フォントファミリー"
@@ -8482,11 +8534,26 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
+msgid "Fork into chat"
+msgstr "チャットにフォーク"
+
+msgid "Fork into chat in a new tab"
+msgstr "新しいタブでチャットにフォーク"
+
+msgid "Fork into CLI"
+msgstr "CLIにフォーク"
+
+msgid "Fork into CLI in a new tab"
+msgstr "新しいタブでCLIにフォーク"
+
 msgid "Fork session"
 msgstr "セッションをフォーク"
 
 msgid "Fork session…"
 msgstr "セッションをフォーク…"
+
+msgid "Forking into a chat…"
+msgstr "チャットにフォーク中…"
 
 msgid "Form controls and field composition"
 msgstr "フォームコントロールとフィールドの組み立て"
@@ -8499,6 +8566,9 @@ msgstr "tooltipの呼び出し元を12か所検出"
 
 msgid "Founder & CEO, WowMakers"
 msgstr "創業者兼CEO、WowMakers"
+
+msgid "Founders"
+msgstr "創業者"
 
 msgid "Founding Engineer"
 msgstr "創業エンジニア"
@@ -8529,6 +8599,9 @@ msgstr "{price}/ユーザー/月〜"
 
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "ハッカソンのプロジェクトから、並列コーディングエージェントのためのワークスペースへ。"
+
+msgid "From a template"
+msgstr "テンプレートから"
 
 msgid "From GitHub"
 msgstr "GitHub から"
@@ -8562,6 +8635,9 @@ msgstr "完全自動運転"
 
 msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
 msgstr "全ソースがElastic License 2.0(ELv2)のもとGitHubで公開されています。コードを確認し、監査し、貢献できます。ブラックボックスも隠し機能もありません。"
+
+msgid "Funding"
+msgstr "資金調達"
 
 msgid "Future home for reusable agent configs."
 msgstr "再利用可能なエージェント設定を、いずれここに置きます。"
@@ -8649,6 +8725,9 @@ msgstr "Paradev Proを入手"
 
 msgid "Get started"
 msgstr "始める"
+
+msgid "Get support"
+msgstr "サポートを受ける"
 
 msgid "Get the best out of Pro"
 msgstr "Proを最大限に活用する"
@@ -8884,6 +8963,9 @@ msgstr "見出し2"
 msgid "Heading 3"
 msgstr "見出し3"
 
+msgid "Headquarters"
+msgstr "本社"
+
 msgid "Heart"
 msgstr "ハート"
 
@@ -8968,6 +9050,9 @@ msgstr "セッションを隠す"
 
 msgid "Hide text"
 msgstr "テキストを隠す"
+
+msgid "Hide workspace activity"
+msgstr "ワークスペースのアクティビティを隠す"
 
 msgid "High"
 msgstr "高"
@@ -9111,7 +9196,7 @@ msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "ターミナルでClaude Codeを動かすのと何が違いますか?"
 
 msgid "How it should work and what to avoid"
-msgstr "{'cs': 'Jak má pracovat a čemu se vyhnout', 'de': 'Wie er arbeiten soll und was er vermeiden soll', 'es': 'Cómo debe trabajar y qué evitar', 'fr': 'Comment il doit travailler et ce qu’il doit éviter', 'id': 'Cara kerjanya dan apa yang harus dihindari', 'it': 'Come deve lavorare e cosa evitare', 'ja': '作業の進め方と避けること', 'ko': '작업 방식과 피해야 할 것', 'nl': 'Hoe hij moet werken en wat hij moet vermijden', 'pl': 'Jak ma działać i czego unikać', 'pt-BR': 'Como ele deve trabalhar e o que evitar', 'ru': 'Как работать и чего избегать', 'tr': 'Nasıl çalışmalı ve nelerden kaçınmalı', 'vi': 'Cách làm việc và những điều cần tránh', 'zh-CN': '工作方式和需要避免的事项', 'zh-TW': '工作方式與需要避免的事項'}"
+msgstr "作業の進め方と避けること"
 
 msgid "How it works"
 msgstr "仕組み"
@@ -9139,6 +9224,9 @@ msgstr "ティアの仕組み →"
 
 msgid "How to install {name} in Paradev"
 msgstr "Paradevに{name}をインストールする方法"
+
+msgid "How to install Paradev"
+msgstr "Paradev のインストール方法"
 
 msgid "How we build it, in long form."
 msgstr "どう作っているかを詳しく。"
@@ -9506,6 +9594,9 @@ msgstr "インストールに失敗しました"
 msgid "Install GitHub App"
 msgstr "GitHub Appをインストール"
 
+msgid "Install GitHub CLI"
+msgstr "GitHub CLI をインストール"
+
 msgid "Install on your iPhone"
 msgstr "iPhoneにインストール"
 
@@ -9533,6 +9624,9 @@ msgstr "すべてのワークスペースにまたがるMCPサーバーのイン
 msgid "Install."
 msgstr "インストール。"
 
+msgid "Installed on {appAccountLogin}"
+msgstr "{appAccountLogin} にインストール済み"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceHasInstalls"
 msgstr "インストール済みのプラグインが {name} 由来です: {plugins}。先に削除してください。"
@@ -9551,6 +9645,9 @@ msgstr "指示"
 
 msgid "Integrations"
 msgstr "連携"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "対話型のエージェントターミナル。"
@@ -9699,10 +9796,6 @@ msgstr "分離"
 msgid "Issue"
 msgstr "Issue"
 
-#. placeholder {0}: link.number
-msgid "Issue #{0}"
-msgstr "Issue #{0}"
-
 msgid "Issue archived"
 msgstr "Issueをアーカイブ"
 
@@ -9844,6 +9937,18 @@ msgstr "参加日"
 #. placeholder {0}: formatDate(member.createdAt, { month: "long", year: "numeric" })
 msgid "Joined {0}"
 msgstr "{0} に参加"
+
+msgid "joined {channel} along with {others}."
+msgstr "{others} と一緒に {channel} に参加しました。"
+
+msgid "joined {channel}."
+msgstr "{channel} に参加しました。"
+
+msgid "joined and left {channel} along with {others}."
+msgstr "{others} と一緒に {channel} に参加して退出しました。"
+
+msgid "joined and left {channel}."
+msgstr "{channel} に参加して退出しました。"
 
 msgid "Joining…"
 msgstr "参加中…"
@@ -10059,9 +10164,6 @@ msgstr "2026年後半"
 msgid "Latency"
 msgstr "レイテンシ"
 
-msgid "Later"
-msgstr "後で"
-
 msgid "Later messages are removed."
 msgstr "以降のメッセージは削除されます。"
 
@@ -10177,6 +10279,12 @@ msgstr "組織から退出中..."
 msgid "Leaving..."
 msgstr "退出中..."
 
+msgid "left {channel} along with {others}."
+msgstr "{others} と一緒に {channel} から退出しました。"
+
+msgid "left {channel}."
+msgstr "{channel} から退出しました。"
+
 msgid "Left organization"
 msgstr "組織から退出しました"
 
@@ -10194,6 +10302,9 @@ msgstr "1分未満前"
 
 msgid "Let the agent drive."
 msgstr "エージェントに操作させる。"
+
+msgid "Lets your organization list and clone repositories"
+msgstr "組織がリポジトリを一覧表示してクローンできるようにします"
 
 msgid "Letter spacing (px)"
 msgstr "字間 (px)"
@@ -10274,6 +10385,9 @@ msgstr "Linear連携"
 msgid "Linear is limiting requests. Try again in a few minutes."
 msgstr "Linearがリクエストを制限しています。数分後にもう一度お試しください。"
 
+msgid "Linear issues"
+msgstr "Linear issue"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10283,9 +10397,6 @@ msgstr "{0}–{1}行目"
 
 msgid "Link"
 msgstr "リンク"
-
-msgid "Link ↵"
-msgstr "リンク ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "クローンを有効にするには、先にプロジェクトにGitHubリポジトリをリンクしてください。"
@@ -10299,15 +10410,6 @@ msgstr "リンクをコピーしました"
 msgid "Link copied"
 msgstr "リンクをコピーしました"
 
-msgid "Link GitHub issue"
-msgstr "GitHub issueをリンク"
-
-msgid "Link Linear issue"
-msgstr "Linear issueをリンク"
-
-msgid "Link pull request"
-msgstr "プルリクエストをリンク"
-
 msgid "Link task"
 msgstr "タスクをリンク"
 
@@ -10316,6 +10418,9 @@ msgstr "このタスクをリンク"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug}をワークスペースにリンクしました"
+
+msgid "Linked to {projectName}"
+msgstr "{projectName} にリンク済み"
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -10443,9 +10548,6 @@ msgstr "グループを読み込み中…"
 msgid "Loading issue…"
 msgstr "Issueを読み込み中…"
 
-msgid "Loading issues..."
-msgstr "Issueを読み込み中..."
-
 msgid "Loading issues…"
 msgstr "Issueを読み込み中…"
 
@@ -10469,9 +10571,6 @@ msgstr "プロジェクトを読み込み中…"
 
 msgid "Loading pull request…"
 msgstr "プルリクエストを読み込み中…"
-
-msgid "Loading pull requests..."
-msgstr "プルリクエストを読み込み中..."
 
 msgid "Loading pull requests…"
 msgstr "プルリクエストを読み込み中…"
@@ -10654,6 +10753,9 @@ msgstr "アカウントを管理…"
 
 msgid "Manage billing"
 msgstr "請求を管理"
+
+msgid "Manage environments"
+msgstr "環境を管理"
 
 msgid "Manage integrations in the web app to connect and configure services."
 msgstr "Webアプリで連携を管理し、サービスを接続・設定します。"
@@ -10859,9 +10961,6 @@ msgstr "メモリシェア"
 msgid "Mention."
 msgstr "メンション。"
 
-msgid "Mentioned in a channel"
-msgstr "チャンネルでメンションされた"
-
 msgid "Menubar"
 msgstr "Menubar"
 
@@ -11000,6 +11099,9 @@ msgstr "未実行"
 msgid "Missed <0>· 7d</0>"
 msgstr "未実行 <0>· 7日</0>"
 
+msgid "Missing a repository?"
+msgstr "リポジトリが見つからない場合"
+
 msgid "Missing authorization code. Re-run"
 msgstr "認可コードがありません。再実行してください"
 
@@ -11039,9 +11141,6 @@ msgstr "モデルのコンテキスト使用量"
 
 msgid "Model picker scoped to the selected agent"
 msgstr "選択中のエージェントに絞ったモデルピッカー"
-
-msgid "Model Selector"
-msgstr "モデルを選択"
 
 msgid "Model volume"
 msgstr "モデル別ボリューム"
@@ -11257,9 +11356,6 @@ msgstr "再実行が必要"
 
 msgid "Needs Action"
 msgstr "対応が必要"
-
-msgid "needs approval"
-msgstr "承認が必要"
 
 msgid "Needs attention"
 msgstr "要対応"
@@ -11647,9 +11743,6 @@ msgstr "プルリクエストを作成できるコミットがありません"
 msgid "No comparisons yet."
 msgstr "比較はまだありません。"
 
-msgid "No console output"
-msgstr "コンソール出力はありません"
-
 msgid "No contributors found."
 msgstr "コントリビューターが見つかりません。"
 
@@ -11677,17 +11770,14 @@ msgstr "ダウンロードはまだありません"
 msgid "No emoji found"
 msgstr "絵文字が見つかりません"
 
-msgid "No environment for {repositoryFullName}"
-msgstr "{repositoryFullName} の環境はありません"
+msgid "No environments are linked to this project yet."
+msgstr "このプロジェクトにリンクされた環境はまだありません。"
 
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
 
 msgid "No environments found."
 msgstr "環境が見つかりません。"
-
-msgid "No environments yet"
-msgstr "環境はまだありません"
 
 msgid "No environments yet."
 msgstr "環境はまだありません。作成すると、そこからクラウドワークスペースを起動できます。"
@@ -11797,6 +11887,12 @@ msgstr "一致なし"
 msgid "No matches"
 msgstr "一致なし"
 
+msgid "No matching issues"
+msgstr "一致するissueはありません"
+
+msgid "No matching Linear issues"
+msgstr "一致するLinear issueはありません"
+
 msgid "No matching MCP servers"
 msgstr "一致するMCPサーバーはありません"
 
@@ -11809,8 +11905,11 @@ msgstr "一致する組織メンバーがいません。"
 msgid "No matching pages"
 msgstr "一致するページはありません"
 
-msgid "No matching repositories."
-msgstr "一致するリポジトリがありません。"
+msgid "No matching pull requests"
+msgstr "一致するプルリクエストはありません"
+
+msgid "No matching tasks"
+msgstr "一致するタスクはありません"
 
 msgid "No MCP servers found"
 msgstr "MCPサーバーが見つかりません"
@@ -11848,14 +11947,8 @@ msgstr "一致するメンバーはいません"
 msgid "No one to mention"
 msgstr "メンションできる人がいません"
 
-msgid "No open issues found."
-msgstr "オープンなIssueが見つかりません。"
-
 msgid "No open issues."
 msgstr "オープンなissueはありません。"
-
-msgid "No open pull requests found."
-msgstr "オープンなプルリクエストが見つかりません。"
 
 msgid "No open pull requests."
 msgstr "オープンなプルリクエストはありません。"
@@ -11948,6 +12041,9 @@ msgstr "一致するプロジェクトがありません。"
 msgid "No projects on this host yet"
 msgstr "このホストにはまだプロジェクトがありません"
 
+msgid "No projects to link."
+msgstr "リンクできるプロジェクトはありません。"
+
 msgid "No projects were deleted in the last 30 days."
 msgstr "過去 30 日間に削除されたプロジェクトはありません。"
 
@@ -11969,11 +12065,11 @@ msgstr "プルリクエストが見つかりません。"
 msgid "No release notes at {url}"
 msgstr "{url} にリリースノートがありません"
 
+msgid "No repositories found."
+msgstr "リポジトリが見つかりません。"
+
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "リポジトリが見つかりません。GitHub Appにリポジトリへのアクセス権があるか確認してください。"
-
-msgid "No repositories. Connect GitHub in Integrations, then refresh."
-msgstr "リポジトリがありません。「連携」で GitHub を接続してから更新してください。"
 
 msgid "No results"
 msgstr "結果がありません"
@@ -12107,6 +12203,9 @@ msgstr "このデバイスにv1プロジェクトが見つかりません。"
 msgid "No v1 terminal scripts found."
 msgstr "v1ターミナルスクリプトが見つかりません。"
 
+msgid "No variables set yet."
+msgstr "変数はまだ設定されていません。"
+
 msgid "No versions yet"
 msgstr "バージョンはまだありません"
 
@@ -12158,6 +12257,9 @@ msgstr "それによってレビューのやり方が変わることはない。
 msgid "None"
 msgstr "なし"
 
+msgid "None selected"
+msgstr "未選択"
+
 msgid "None. This is the floor."
 msgstr "なし。ここが出発点です。"
 
@@ -12206,6 +12308,9 @@ msgstr "チャンネル外"
 msgid "Not included"
 msgstr "含まれない"
 
+msgid "Not installed"
+msgstr "未インストール"
+
 msgid "Not loaded"
 msgstr "未読み込み"
 
@@ -12238,6 +12343,9 @@ msgstr "{hostName}ではセットアップされていません"
 
 msgid "Not set up on this host"
 msgstr "このホストではセットアップされていません"
+
+msgid "Not signed in"
+msgstr "未サインイン"
 
 msgid "not sorted"
 msgstr "並べ替えなし"
@@ -12273,14 +12381,14 @@ msgstr "再実行が必要なものはありません"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "直近30日に公開された実績はまだありません。このマシンの利用状況が同期されるとランクが表示されます(<0>{handle}</0>として公開)。"
 
-msgid "Nothing running"
-msgstr "実行中のものはありません"
+msgid "Nothing to fork yet. Send a message first."
+msgstr "まだフォークできる内容がありません。先にメッセージを送信してください。"
 
 msgid "Nothing was missed"
 msgstr "未実行はありません"
 
 msgid "Nothing yet"
-msgstr "{'cs': 'Zatím nic', 'de': 'Noch nichts', 'es': 'Nada todavía', 'fr': 'Rien pour l’instant', 'id': 'Belum ada', 'it': 'Ancora niente', 'ja': 'まだありません', 'ko': '아직 없음', 'nl': 'Nog niets', 'pl': 'Na razie nic', 'pt-BR': 'Nada ainda', 'ru': 'Пока ничего', 'tr': 'Henüz bir şey yok', 'vi': 'Chưa có gì', 'zh-CN': '暂无', 'zh-TW': '尚無'}"
+msgstr "まだありません"
 
 msgid "Notice"
 msgstr "お知らせ"
@@ -12445,6 +12553,9 @@ msgstr "エンジニア1人が1日を通して3つ以上のエージェントの
 msgid "One human drives at most one agent at a time."
 msgstr "人間1人が同時に動かすエージェントは最大1体。"
 
+msgid "One line"
+msgstr "1 文"
+
 msgid "One line about how you work"
 msgstr "働き方について一行で"
 
@@ -12453,6 +12564,9 @@ msgstr "ボード最初の100人のひとり"
 
 msgid "one of the selected repositories"
 msgstr "選択したリポジトリのいずれか"
+
+msgid "One paragraph"
+msgstr "1 段落"
 
 msgid "One plugin, every coding agent: Claude Code, Codex, Cursor, OpenCode and more. Install once, use it on your machines and in the cloud."
 msgstr "ひとつのプラグインを、すべてのコーディングエージェントで。Claude Code、Codex、Cursor、OpenCodeなど。一度インストールすれば、手元のマシンでもクラウドでも使えます。"
@@ -12626,14 +12740,20 @@ msgstr "{parentLabel}を開く"
 msgid "Open {path} in file pane"
 msgstr "{path}をファイルペインで開く"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "<1>アプリケーション</1>フォルダから <0>Paradev</0> を開く"
+
+msgid "Open a folder"
+msgstr "フォルダを開く"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "作業中のフォルダを開きましょう。プロジェクトは後から追加できます。"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "アクティブなターミナル用の複数行プロンプト入力を開く"
 
 msgid "Open a new {label} chat?"
 msgstr "新しい {label} チャットを開きますか？"
-
-msgid "Open a pane, or drag one here from the center."
-msgstr "ペインを開くか、中央からここへドラッグしてください。"
 
 msgid "Open a pull request to view review status, checks, and comments."
 msgstr "プルリクエストを開くと、レビュー状態、チェック、コメントを確認できます。"
@@ -12737,9 +12857,6 @@ msgstr "ファイルを開く"
 msgid "Open File in New Tab"
 msgstr "新しいタブでファイルを開く"
 
-msgid "Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats."
-msgstr "ファイル、差分、ブラウザを右側のタブで開き、中央はターミナルとチャット用に残します。"
-
 msgid "Open from folder"
 msgstr "フォルダから開く"
 
@@ -12779,9 +12896,6 @@ msgstr "ブラウザで開く"
 
 msgid "Open in Changes pane"
 msgstr "変更ペインで開く"
-
-msgid "Open in chat"
-msgstr "チャットで開く"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPTで開く"
@@ -12871,9 +12985,6 @@ msgstr "GitHubでissueを開く"
 msgid "Open issue in Linear"
 msgstr "Linearでissueを開く"
 
-msgid "Open issues"
-msgstr "オープンなIssue"
-
 msgid "Open leaderboard"
 msgstr "リーダーボードを開く"
 
@@ -12930,9 +13041,6 @@ msgstr "プロジェクトを開く"
 msgid "Open Projects"
 msgstr "プロジェクトを開く"
 
-msgid "Open PRs"
-msgstr "オープンなPR"
-
 msgid "Open pull request"
 msgstr "プルリクエストを開く"
 
@@ -12946,9 +13054,6 @@ msgstr "プルリクエスト#{0}を開く"
 
 msgid "Open pull request options"
 msgstr "プルリクエストのオプションを開く"
-
-msgid "Open pull requests"
-msgstr "オープンなプルリクエスト"
 
 msgid "Open recent"
 msgstr "最近使った項目を開く"
@@ -12973,9 +13078,6 @@ msgstr "送信オプションを開く"
 
 msgid "Open System Settings"
 msgstr "システム設定を開く"
-
-msgid "Open task {title}"
-msgstr "タスク{title}を開く"
 
 msgid "Open Terminal"
 msgstr "ターミナルを開く"
@@ -13012,6 +13114,9 @@ msgstr "ターミナルを開いてエージェントに指示"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "変更ペインを新しいタブで開くか、既存のペインにフォーカスします"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "<0>ダウンロード</0>フォルダからディスクイメージを開く"
 
 msgid "Open the global command palette"
 msgstr "グローバルコマンドパレットを開く"
@@ -13067,14 +13172,8 @@ msgstr "フォルダーを開く"
 msgid "Opening pages"
 msgstr "ページを開く"
 
-msgid "Opening worktree..."
-msgstr "ワークツリーを開いています..."
-
-msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
-msgstr "クラウドワークスペースを開き、エージェントがプロジェクトに必要なものをインストールして .superset/config.json を書き込みます"
-
-msgid "Opens on"
-msgstr "開くリポジトリ"
+msgid "Opens beside this pane. This one keeps running."
+msgstr "このペインの横に開きます。元のペインは動作し続けます。"
 
 msgid "Operator"
 msgstr "オペレーター"
@@ -13178,6 +13277,9 @@ msgstr "他のアプリ"
 
 msgid "Other devices"
 msgstr "その他のデバイス"
+
+msgid "Other environments"
+msgstr "その他の環境"
 
 msgid "Other Hosts"
 msgstr "その他のホスト"
@@ -13396,6 +13498,9 @@ msgstr "チームのためのParadev"
 msgid "Paradev forwards the ports a remote workspace opens while you have it selected."
 msgstr "リモートワークスペースを選択している間、Paradevはそのワークスペースが開くポートを転送します。"
 
+msgid "Paradev GitHub App"
+msgstr "Paradev GitHub App"
+
 msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
 msgstr "Paradevには無料プランがあります。ソースコードはElastic License 2.0(ELv2)のもとGitHubで公開されており、ライセンス条件の範囲で内容を確認したりセルフホストしたりできます。"
 
@@ -13453,12 +13558,6 @@ msgstr "iPhone 上の Paradev Mobile のコード差分"
 msgid "Paradev mobile gives me the power of my desktop anywhere I go."
 msgstr "Paradevモバイルは、どこにいてもデスクトップの力を使えるようにしてくれます。"
 
-msgid "Paradev Mobile lets developers continue the Paradev workspaces they already use on their computer from an iPhone."
-msgstr "Paradev Mobile を使えば、開発者はパソコンで使っている Paradev のワークスペースを iPhone から続けられます。"
-
-msgid "Paradev Mobile page"
-msgstr "Paradev Mobile のページ"
-
 msgid "Paradev Mobile terminal on iPhone"
 msgstr "iPhone 上の Paradev Mobile のターミナル"
 
@@ -13501,6 +13600,9 @@ msgstr "Paradev UI"
 #. placeholder {0}: formatPercent(trackedMemorySharePercent)
 msgid "Paradev uses {0} of system RAM"
 msgstr "ParadevはシステムRAMの{0}を使用中"
+
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev は GitHub CLI を使ってリポジトリのクローンやプルリクエストの作成を行います。この設定は後からでもできます。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradevと他ツールの比較"
@@ -13755,14 +13857,14 @@ msgstr "{hostName}の新しいプロジェクトフォルダを選択してく�
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "{hostName}のプロジェクトのワークツリーフォルダを選択してください。"
 
+msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
+msgstr "チェックアウトするリポジトリを選んでください。このマシン上のエージェントが必要なものを判断し、クラウドで動く状態にします。"
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}のワークツリーフォルダを選択してください。"
 
 msgid "Pick your agent for a one-line install, or copy the config by hand. Every client, including OAuth and API key setup, is covered in the <0>full MCP server docs</0>."
 msgstr "エージェントを選べば1行でインストールできます。設定を手でコピーしても構いません。OAuthやAPIキーの設定を含む各クライアントの手順は<0>MCPサーバーの完全なドキュメント</0>にあります。"
-
-msgid "Picked by the channel"
-msgstr "チャンネルが選択"
 
 msgid "PID"
 msgstr "PID"
@@ -13907,10 +14009,6 @@ msgstr "返信を投稿"
 msgid "PR"
 msgstr "PR"
 
-#. placeholder {0}: link.number
-msgid "PR #{0}"
-msgstr "PR #{0}"
-
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -13952,9 +14050,6 @@ msgstr "PRのURL"
 msgid "PR URL must match {repoMismatch}."
 msgstr "PRのURLは{repoMismatch}と一致する必要があります。"
 
-msgid "PR URL must match {selectedRepositoryLabel}."
-msgstr "PRのURLは{selectedRepositoryLabel}と一致する必要があります。"
-
 msgid "Prediction progress"
 msgstr "予測の進捗"
 
@@ -13979,6 +14074,9 @@ msgstr "コミット履歴を保持"
 msgid "PresetsBar.tsx"
 msgstr "PresetsBar.tsx"
 
+msgid "Press"
+msgstr "プレス"
+
 msgid "Press <0>Esc</0> to close"
 msgstr "<0>Esc</0>で閉じる"
 
@@ -13988,8 +14086,8 @@ msgstr "⌘⇧Bを押すか、Paradevが検出したポートを開きます。�
 msgid "Press a key…"
 msgstr "キーを押してください…"
 
-msgid "Press contact"
-msgstr "報道関係のお問い合わせ"
+msgid "Press coverage"
+msgstr "メディア掲載"
 
 msgid "Press esc to pick a different element."
 msgstr "escを押すと、別の要素を選び直せます。"
@@ -14068,6 +14166,9 @@ msgstr "料金"
 
 msgid "Pricing depends on your team and use case. Get in touch and we'll put together a plan that works for you."
 msgstr "料金はチームの規模と用途によって異なります。ご連絡いただければ、最適なプランをご提案します。"
+
+msgid "primary"
+msgstr "メイン"
 
 msgid "Primary"
 msgstr "プライマリ"
@@ -14193,6 +14294,9 @@ msgstr "このホストにプロジェクトがセットアップされていま
 msgid "Project not trusted in Codex"
 msgstr "Codexで信頼されていないプロジェクト"
 
+msgid "Project on another device"
+msgstr "別のデバイスのプロジェクト"
+
 msgid "Project ready — open it from the sidebar."
 msgstr "プロジェクトの準備ができました — サイドバーから開いてください。"
 
@@ -14229,17 +14333,11 @@ msgstr "プロジェクトのホストに到達できません — 今は名前�
 msgid "Projects"
 msgstr "プロジェクト"
 
-msgid "Promoted from a workspace, so its repositories and region are fixed. Promote a workspace again to change them."
-msgstr "ワークスペースから昇格したため、リポジトリとリージョンは固定です。変更するには再度ワークスペースを昇格してください。"
-
 msgid "Prompt"
 msgstr "プロンプト"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "Paradevで見たいものをコーディングエージェントへのプロンプトとして投稿してください。良いプロンプトは実際に実行し、結果をマージします。"
-
-msgid "Prompt agents and answer their questions"
-msgstr "エージェントに指示を送り、質問に答える"
 
 msgid "Prompt command is only available for terminal agents."
 msgstr "プロンプトコマンドはターミナルエージェントでのみ利用できます。"
@@ -14314,9 +14412,6 @@ msgstr "Paradev CLI か MCP 経由で公開できます。"
 msgid "Publish from your own repo"
 msgstr "自分のリポジトリから公開"
 
-msgid "Published"
-msgstr "公開日"
-
 msgctxt "github release action"
 msgid "Published"
 msgstr "公開"
@@ -14362,6 +14457,12 @@ msgstr "プルリクエスト"
 msgid "Pull Requests"
 msgstr "プルリクエスト"
 
+msgid "Pull requests, comments and pushes from Superset are made as you."
+msgstr "Superset からのプルリクエスト、コメント、プッシュはあなたとして行われます。"
+
+msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
+msgstr "Superset からのプルリクエスト、コメント、プッシュは、あなたとして行われなくなります。"
+
 msgid "Purple"
 msgstr "紫"
 
@@ -14400,6 +14501,9 @@ msgstr "よくある質問"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "ご質問、フィードバック、サポート、その他何でも。メッセージをお送りいただければ、適切な担当者にお繋ぎします。"
 
+msgid "Queue message"
+msgstr "メッセージをキューに追加"
+
 msgid "Queue paused"
 msgstr "キューは一時停止中"
 
@@ -14408,6 +14512,9 @@ msgstr "中断したためキューを一時停止しました"
 
 msgid "Queue work for agents"
 msgstr "エージェントの作業をキューに入れる"
+
+msgid "Queue; ⌘↩ to steer the running turn"
+msgstr "キューに追加。⌘↩で実行中のターンを軌道修正"
 
 msgid "Queued"
 msgstr "待機中"
@@ -14546,9 +14653,6 @@ msgstr "スマートフォンで読める"
 msgid "Read MCP servers again"
 msgstr "MCPサーバーを再読み込み"
 
-msgid "Read the announcement"
-msgstr "発表を読む"
-
 msgid "Read the changelog"
 msgstr "Changelogを読む"
 
@@ -14592,10 +14696,10 @@ msgid "Reading your local usage…"
 msgstr "ローカルの使用量を読み取り中…"
 
 msgid "Reads and posts"
-msgstr "{'cs': 'Čte a píše', 'de': 'Liest und postet', 'es': 'Lee y publica', 'fr': 'Lit et publie', 'id': 'Membaca dan memposting', 'it': 'Legge e pubblica', 'ja': '閲覧・投稿', 'ko': '읽기 및 게시', 'nl': 'Leest en plaatst', 'pl': 'Czyta i publikuje', 'pt-BR': 'Lê e publica', 'ru': 'Читает и пишет', 'tr': 'Okur ve paylaşır', 'vi': 'Đọc và đăng', 'zh-CN': '可读可发', 'zh-TW': '可讀可發'}"
+msgstr "閲覧・投稿"
 
 msgid "Ready"
-msgstr "{'cs': 'Připraven', 'de': 'Bereit', 'es': 'Listo', 'fr': 'Prêt', 'id': 'Siap', 'it': 'Pronto', 'ja': '準備完了', 'ko': '준비됨', 'nl': 'Klaar', 'pl': 'Gotowy', 'pt-BR': 'Pronto', 'ru': 'Готов', 'tr': 'Hazır', 'vi': 'Sẵn sàng', 'zh-CN': '就绪', 'zh-TW': '就緒'}"
+msgstr "準備完了"
 
 msgid "Ready for review"
 msgstr "レビュー可能"
@@ -14643,17 +14747,8 @@ msgstr "最近使ったアプリ"
 msgid "Recent invoices"
 msgstr "最近の請求書"
 
-msgid "Recent issues"
-msgstr "最近のIssue"
-
 msgid "Recent prompts"
 msgstr "最近のプロンプト"
-
-msgid "Recent PRs"
-msgstr "最近のPR"
-
-msgid "Recent pull requests"
-msgstr "最近のプルリクエスト"
 
 msgid "Recently deleted"
 msgstr "最近削除した項目"
@@ -14745,9 +14840,6 @@ msgstr "メトリクスを更新"
 msgid "Refresh pull requests"
 msgstr "プルリクエストを更新"
 
-msgid "Refresh repositories"
-msgstr "リポジトリを更新"
-
 msgid "Refreshes when Claude Code next runs."
 msgstr "次に Claude Code を実行すると更新されます。"
 
@@ -14762,6 +14854,18 @@ msgstr "リージョン"
 
 msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
 msgstr "このエージェントのグローバル設定にライフサイクルフックを登録し、Paradevがステータス表示と通知を行えるようにします。オフにするとParadevのエントリがすべて削除され、Paradev内も含めてこのエージェントのステータスと通知が停止します。"
+
+msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
+msgstr "{inviter} の招待で {others} と一緒に {channel} に再参加しました。"
+
+msgid "rejoined {channel} by invitation from {inviter}."
+msgstr "{inviter} の招待で {channel} に再参加しました。"
+
+msgid "rejoined {channel}, along with {others}."
+msgstr "{others} と一緒に {channel} に再参加しました。"
+
+msgid "rejoined {channel}."
+msgstr "{channel} に再参加しました。"
 
 msgid "Related Posts"
 msgstr "関連記事"
@@ -14852,10 +14956,7 @@ msgid "Remove {label}?"
 msgstr "{label}を削除しますか?"
 
 msgid "Remove {name}"
-msgstr "{'cs': 'Odebrat {name}', 'de': '{name} entfernen', 'es': 'Quitar a {name}', 'fr': 'Retirer {name}', 'id': 'Hapus {name}', 'it': 'Rimuovi {name}', 'ja': '{name} を削除', 'ko': '{name} 제거', 'nl': '{name} verwijderen', 'pl': 'Usuń {name}', 'pt-BR': 'Remover {name}', 'ru': 'Удалить {name}', 'tr': '{name} kaldır', 'vi': 'Xóa {name}', 'zh-CN': '移除 {name}', 'zh-TW': '移除 {name}'}"
-
-msgid "Remove {repositoryName}"
-msgstr "{repositoryName} を削除"
+msgstr "{name} を削除"
 
 msgid "Remove attachment"
 msgstr "添付ファイルを削除"
@@ -14883,12 +14984,6 @@ msgstr "画像を削除"
 
 msgid "Remove link"
 msgstr "リンクを削除"
-
-msgid "Remove linked issue"
-msgstr "リンクされたIssueを削除"
-
-msgid "Remove linked PR"
-msgstr "リンクされたPRを削除"
 
 msgid "Remove member"
 msgstr "メンバーを削除"
@@ -15061,6 +15156,9 @@ msgstr "{replaced}件のファイルを{where}で置き換えました"
 msgid "Replaced 1 file in {where}"
 msgstr "1件のファイルを{where}で置き換えました"
 
+msgid "Replied to your DM"
+msgstr "あなたのダイレクトメッセージに返信しました"
+
 msgid "Reply"
 msgstr "返信"
 
@@ -15073,8 +15171,14 @@ msgstr "スレッドに返信…"
 msgid "Reply…"
 msgstr "返信…"
 
+msgid "Replying in a thread"
+msgstr "スレッドで返信中"
+
 msgid "Replying to {replyingTo}"
 msgstr "{replyingTo} に返信"
+
+msgid "Replying to a DM"
+msgstr "ダイレクトメッセージに返信中"
 
 msgid "repo"
 msgstr "リポジトリ"
@@ -15302,9 +15406,6 @@ msgstr "ターミナルデーモンを再起動しますか?"
 msgid "Restart terminals"
 msgstr "ターミナルを再起動"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "再起動すると最新バージョンの {appName} を使用できます。"
-
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
 
@@ -15503,9 +15604,6 @@ msgstr "レビューリクエスト"
 msgid "Review required"
 msgstr "レビュー必須"
 
-msgid "Review syntax-highlighted diffs"
-msgstr "シンタックスハイライト付きの差分をレビュー"
-
 msgid "Review the result."
 msgstr "結果をレビューする。"
 
@@ -15542,17 +15640,8 @@ msgstr "キーを取り消す"
 msgid "Rewrote it and published version 2."
 msgstr "書き直してバージョン2を公開しました。"
 
-msgid "Rich input"
-msgstr "リッチ入力"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "リッチ入力 ({hotkeyText})"
-
 msgid "right pane"
 msgstr "右ペイン"
-
-msgid "Right pane area"
-msgstr "右ペインエリア"
 
 msgid "Right-click here"
 msgstr "ここを右クリック"
@@ -15679,9 +15768,6 @@ msgstr "スケジュールやイベントで実行、オンデマンド実行、
 
 msgid "Run script"
 msgstr "スクリプトを実行"
-
-msgid "Run setup script"
-msgstr "セットアップスクリプトを実行"
 
 msgid "Run setup script in each imported workspace"
 msgstr "インポートした各ワークスペースでセットアップスクリプトを実行"
@@ -16001,8 +16087,8 @@ msgstr "履歴を検索"
 msgid "Search in {frameTitle}…"
 msgstr "{frameTitle}内を検索…"
 
-msgid "Search issues..."
-msgstr "Issueを検索..."
+msgid "Search issues…"
+msgstr "Issueを検索…"
 
 msgid "Search labels..."
 msgstr "ラベルを検索..."
@@ -16045,9 +16131,6 @@ msgstr "プロジェクトを検索…"
 
 msgid "Search pull requests"
 msgstr "プルリクエストを検索"
-
-msgid "Search pull requests..."
-msgstr "プルリクエストを検索..."
 
 msgid "Search pull requests…"
 msgstr "プルリクエストを検索…"
@@ -16114,12 +16197,6 @@ msgstr "tooltipのオーバーライドを検索"
 
 msgid "Searching for Kbd usages"
 msgstr "Kbdの使用箇所を検索中"
-
-msgid "Searching..."
-msgstr "検索中..."
-
-msgid "Searching…"
-msgstr "検索中…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -16198,6 +16275,9 @@ msgstr "直近30日の実績が公開リーダーボードでどの位置にな�
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "ファイルを選択するとここに表示されます"
 
 msgid "Select a project"
 msgstr "プロジェクトを選択してください"
@@ -16352,6 +16432,9 @@ msgstr "送信"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}への招待を送ります。48時間で失効します。"
 
+msgid "Send email and debug delivery"
+msgstr "メールを送信し、配信の問題を調査"
+
 msgid "Send Invitation"
 msgstr "招待を送信"
 
@@ -16481,6 +16564,9 @@ msgstr "セッション"
 msgid "Sessions · top {0} by cost"
 msgstr "セッション · コスト上位{0}件"
 
+msgid "Set"
+msgstr "設定済み"
+
 msgid "Set a notification schedule"
 msgstr "通知スケジュールを設定"
 
@@ -16513,7 +16599,7 @@ msgstr "このプロジェクトに設定"
 msgid "Set up"
 msgstr "設定する"
 
-#. placeholder {0}: name.trim()
+#. placeholder {0}: environment.name
 msgid "Set up {0}"
 msgstr "{0} をセットアップ"
 
@@ -16523,9 +16609,6 @@ msgstr "SSH でホストを設定"
 msgid "Set up an automation"
 msgstr "自動化を設定する"
 
-msgid "Set up environment"
-msgstr "環境をセットアップ"
-
 msgid "Set up project on {hostName}"
 msgstr "{hostName}でプロジェクトをセットアップ"
 
@@ -16534,9 +16617,6 @@ msgstr "プロジェクトをセットアップ…"
 
 msgid "Set up this project for Paradev"
 msgstr "このプロジェクトをParadev向けにセットアップ"
-
-msgid "Set up with an agent"
-msgstr "エージェントでセットアップ"
 
 msgid "Set up your organization to get started"
 msgstr "組織をセットアップして始めましょう"
@@ -16700,9 +16780,6 @@ msgstr "境界線を表示"
 msgid "Show checks"
 msgstr "チェックを表示"
 
-msgid "Show closed"
-msgstr "クローズ済みも表示"
-
 msgid "Show code"
 msgstr "コードを表示"
 
@@ -16775,6 +16852,9 @@ msgstr "Linearトリアージのオートメーションの直近10件の実行�
 msgid "Show more"
 msgstr "もっと見る"
 
+msgid "Show older"
+msgstr "以前のものを表示"
+
 msgid "Show on Sidebar"
 msgstr "サイドバーに表示"
 
@@ -16822,6 +16902,9 @@ msgstr "翻訳を表示"
 
 msgid "Show usage tab on sidebar"
 msgstr "サイドバーに使用状況タブを表示"
+
+msgid "Show workspace activity"
+msgstr "ワークスペースのアクティビティを表示"
 
 msgid "showArrow opt-in"
 msgstr "showArrowで有効化"
@@ -16884,6 +16967,9 @@ msgstr "サインインしてParadevに進む"
 
 msgid "Sign in to get started"
 msgstr "サインインして始めましょう"
+
+msgid "Sign in to GitHub"
+msgstr "GitHub にサインイン"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "ターミナルでエージェントにサインインしてから続行してください。"
@@ -17089,6 +17175,9 @@ msgstr "スマイリーと人"
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
 
+msgid "Snapshot"
+msgstr "スナップショット"
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "このワークスペースを、インストール済みのものも含めて現在の状態でスナップショットします。この環境から作る新しいワークスペースは、そのスナップショットから始まります。"
 
@@ -17141,6 +17230,9 @@ msgstr "一部の v1 項目を移行できませんでした"
 msgid "Some v1 work needs your attention"
 msgstr "一部の v1 の作業に対応が必要です"
 
+msgid "someone"
+msgstr "誰か"
+
 msgid "Someone"
 msgstr "誰か"
 
@@ -17173,8 +17265,8 @@ msgstr "問題が発生しました。"
 msgid "Something went wrong. Please try again."
 msgstr "問題が発生しました。もう一度お試しください。"
 
-msgid "Something went wrong. Try again, or contact support@superset.sh."
-msgstr "問題が発生しました。もう一度お試しいただくか、support@superset.shまでご連絡ください。"
+msgid "Something went wrong. Try again, or contact support@paradev.com."
+msgstr "問題が発生しました。もう一度お試しいただくか、support@paradev.comまでご連絡ください。"
 
 msgid "soon"
 msgstr "まもなく"
@@ -17697,6 +17789,9 @@ msgstr "置き換え済み"
 msgid "superset"
 msgstr "superset"
 
+msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Superset はあなたとして GitHub を操作します。プルリクエストのマージ、コメント、更新を行うには GitHub アカウントを接続してください。"
+
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp は、そのペイン専用のエンドポイントを出力します。Playwrightやbrowser-useをそこに向けてください。"
 
@@ -17913,7 +18008,7 @@ msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "いつもより時間がかかっています。画面を離れても処理は続きます。"
 
 msgid "Talk to it"
-msgstr "{'cs': 'Jak s ním mluvit', 'de': 'Ansprechen', 'es': 'Hablar con él', 'fr': 'Lui parler', 'id': 'Bicara dengannya', 'it': 'Parlagli', 'ja': '話しかける', 'ko': '대화하기', 'nl': 'Ermee praten', 'pl': 'Rozmowa', 'pt-BR': 'Falar com ele', 'ru': 'Связаться', 'tr': 'Onunla konuş', 'vi': 'Trò chuyện', 'zh-CN': '与它交流', 'zh-TW': '與它交流'}"
+msgstr "話しかける"
 
 msgid "Talk to Paradev"
 msgstr "Paradevに相談する"
@@ -18228,12 +18323,6 @@ msgstr "エージェントがスキルとツールを使い、IssueがLinearに�
 msgid "The agent watching the page reads each comment. It updates the page and replies in the thread."
 msgstr "ページを見ているエージェントが各コメントを読み、ページを更新してスレッドで返信します。"
 
-msgid "The announcement also shares the $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham."
-msgstr "この発表では、Union Square Ventures が主導し、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドについても紹介しています。"
-
-msgid "The app is free to download. It requires iOS 26 or later and Paradev Pro. Android is next."
-msgstr "アプリは無料でダウンロードできます。iOS 26 以降と Paradev Pro が必要です。次は Android に対応予定です。"
-
 msgid "The app is on {appVersion} but attached to a host service started by something else, likely an older CLI or another Paradev build. Restarting replaces it with this app's copy."
 msgstr "アプリは{appVersion}ですが、別のもの（古いCLIや別のParadevビルドの可能性）が起動したホストサービスに接続しています。再起動するとこのアプリのコピーに置き換わります。"
 
@@ -18474,8 +18563,8 @@ msgstr "プロバイダーが{0}を返しました。"
 msgid "The provider refused it."
 msgstr "プロバイダーに拒否されました。"
 
-msgid "The recovery period has ended. Contact support@superset.sh."
-msgstr "復元期間は終了しました。support@superset.shまでご連絡ください。"
+msgid "The recovery period has ended. Contact support@paradev.com."
+msgstr "復元期間は終了しました。support@paradev.comまでご連絡ください。"
 
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "リモートブランチが分岐しています。続ける前にpullしてください。"
@@ -18836,6 +18925,9 @@ msgstr "このパスは存在しますが、ディレクトリではありませ
 msgid "This path is a directory"
 msgstr "このパスはディレクトリです"
 
+msgid "This permanently removes the saved environment for everyone with access to it. Workspaces already running from it stay available."
+msgstr "保存された環境は、アクセスできるすべてのユーザーから完全に削除されます。この環境からすでに実行中のワークスペースは引き続き利用できます。"
+
 msgid "This port is still in use"
 msgstr "このポートはまだ使用中です"
 
@@ -18848,14 +18940,14 @@ msgstr "このプロフィールは現在混み合っています"
 msgid "This project is no longer available on your devices."
 msgstr "このプロジェクトはお使いのデバイスでは利用できなくなりました。"
 
-msgid "This project isn't linked to a GitHub repository."
-msgstr "このプロジェクトは GitHub リポジトリにリンクされていません。"
-
 msgid "This project still uses the older config.json. It keeps working; convert it to config.toml to use the new sections."
 msgstr "このプロジェクトはまだ以前の config.json を使っています。引き続き動作しますが、新しいセクションを使うには config.toml に変換してください。"
 
 msgid "This project's host is offline"
 msgstr "このプロジェクトのホストはオフラインです"
+
+msgid "This pull request has no GitHub access to act through."
+msgstr "このプルリクエストを操作するための GitHub アクセスがありません。"
 
 msgid "This pull request has no host to act through"
 msgstr "このプルリクエストには操作に使うホストがありません"
@@ -19016,9 +19108,6 @@ msgstr "#{channelName} のスレッド"
 
 msgid "Thread not found"
 msgstr "スレッドが見つかりません"
-
-msgid "Thread reply"
-msgstr "スレッドへの返信"
 
 msgid "Threads"
 msgstr "スレッド"
@@ -19568,6 +19657,9 @@ msgstr "不明なワークスペース"
 msgid "Unlimited"
 msgstr "無制限"
 
+msgid "Unlink project"
+msgstr "プロジェクトのリンクを解除"
+
 msgid "Unlink task"
 msgstr "タスクのリンクを解除"
 
@@ -19703,9 +19795,6 @@ msgstr "ワークスペースの設定を編集するには、このホストの
 
 msgid "Update payment method"
 msgstr "支払い方法を更新"
-
-msgid "Update ready"
-msgstr "アップデートの準備ができました"
 
 msgid "Update Required"
 msgstr "アップデートが必要です"
@@ -19920,12 +20009,6 @@ msgstr "user@example.com"
 msgid "user@host, ssh://user@host:2222, or an ssh config alias"
 msgstr "user@host、ssh://user@host:2222、または ssh config のエイリアス"
 
-msgid "Using random branch name (AI generation timed out)"
-msgstr "ランダムなブランチ名を使用します(AI生成がタイムアウトしました)"
-
-msgid "Using random branch name (AI generation unavailable)"
-msgstr "ランダムなブランチ名を使用します(AI生成を利用できません)"
-
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectIdがワークスペースのプロジェクトと一致しません"
 
@@ -20047,9 +20130,6 @@ msgstr "GitHubで表示"
 msgid "VIEW ON GITHUB"
 msgstr "GITHUBで見る"
 
-msgid "View on the App Store"
-msgstr "App Store で見る"
-
 msgid "View open roles"
 msgstr "募集中の職種を見る"
 
@@ -20147,6 +20227,18 @@ msgstr "警告"
 
 msgid "Warning occurred."
 msgstr "警告が発生しました。"
+
+msgid "was added to {channel} by {inviter}, along with {others}."
+msgstr "{inviter} により {others} と一緒に {channel} に追加されました。"
+
+msgid "was added to {channel} by {inviter}."
+msgstr "{inviter} により {channel} に追加されました。"
+
+msgid "was added to this conversation by {inviter}."
+msgstr "{inviter} によりこの会話に追加されました。"
+
+msgid "was removed from this conversation by {inviter}."
+msgstr "{inviter} によりこの会話から削除されました。"
 
 msgid "Watch a design review go from comment to new version."
 msgstr "デザインレビューがコメントから新しいバージョンになるまでをご覧ください。"
@@ -20477,9 +20569,6 @@ msgstr "添付の有無を問わず"
 msgid "With the Paradev mobile app, I can address production issues from anywhere."
 msgstr "Paradevのモバイルアプリがあれば、どこからでも本番環境の問題に対応できます。"
 
-msgid "Woke itself"
-msgstr "自分で起動"
-
 msgid "Wordmark, black"
 msgstr "ワードマーク（黒）"
 
@@ -20527,8 +20616,8 @@ msgstr "作業時間 {0}分{1}秒"
 msgid "Working for {seconds}s"
 msgstr "作業時間 {seconds}秒"
 
-msgid "Working on"
-msgstr "{'cs': 'Pracuje na', 'de': 'Arbeitet an', 'es': 'Trabajando en', 'fr': 'En cours', 'id': 'Sedang dikerjakan', 'it': 'Sta lavorando a', 'ja': '作業中', 'ko': '작업 중', 'nl': 'Bezig met', 'pl': 'Pracuje nad', 'pt-BR': 'Trabalhando em', 'ru': 'В работе', 'tr': 'Üzerinde çalışıyor', 'vi': 'Đang làm', 'zh-CN': '正在处理', 'zh-TW': '正在處理'}"
+msgid "Working on a mention"
+msgstr "メンションに対応中"
 
 msgid "Working…"
 msgstr "処理中…"
@@ -20560,6 +20649,10 @@ msgstr "ワークスペースの操作"
 msgid "Workspace activity"
 msgstr "ワークスペースのアクティビティ"
 
+#. placeholder {0}: currentPr.number
+msgid "Workspace activity, pull request #{0}"
+msgstr "ワークスペースのアクティビティ、プルリクエスト #{0}"
+
 msgid "Workspace agents"
 msgstr "ワークスペースのエージェント"
 
@@ -20572,9 +20665,6 @@ msgstr "ワークスペースの設定"
 msgid "Workspace created"
 msgstr "ワークスペースを作成しました"
 
-msgid "Workspace created from PR"
-msgstr "PRからワークスペースを作成しました"
-
 msgid "Workspace details"
 msgstr "ワークスペースの詳細"
 
@@ -20586,9 +20676,6 @@ msgstr "ワークスペースのレイアウト"
 
 msgid "Workspace name"
 msgstr "ワークスペース名"
-
-msgid "Workspace name (optional)"
-msgstr "ワークスペース名(任意)"
 
 msgid "Workspace not found"
 msgstr "ワークスペースが見つかりません"
@@ -20656,9 +20743,6 @@ msgstr "ワークツリーの場所を更新しました"
 msgid "Worktree missing"
 msgstr "ワークツリーが見つかりません"
 
-msgid "Worktree opened"
-msgstr "ワークツリーを開きました"
-
 msgid "Worktree out of sync"
 msgstr "ワークツリーが同期していません"
 
@@ -20719,6 +20803,9 @@ msgstr "X-大"
 
 msgid "xs · sm · default · lg · icon-xs → icon-lg"
 msgstr "xs · sm · default · lg · icon-xs → icon-lg"
+
+msgid "Y Combinator batch"
+msgstr "Y Combinator のバッチ"
 
 msgid "Yearly"
 msgstr "年払い"
@@ -20843,6 +20930,9 @@ msgstr "{plugin} の認可リクエストを拒否しました。"
 msgid "You don't have access to this host"
 msgstr "このホストへのアクセス権がありません"
 
+msgid "You don't have access to this pull request on GitHub, or it no longer exists."
+msgstr "GitHub でこのプルリクエストにアクセスできないか、プルリクエストがもう存在しません。"
+
 msgid "You don't have access to this terminal."
 msgstr "このターミナルへのアクセス権がありません。"
 
@@ -20908,6 +20998,9 @@ msgstr "{organization}への招待が届いています"
 msgid "you@example.com"
 msgstr "you@example.com"
 
+msgid "Your account can be connected later in Settings → Connections"
+msgstr "アカウントは後で 設定 → 接続 から接続できます"
+
 msgid "Your account is deactivated and will be permanently deleted soon. Reactivate to restore it exactly as you left it."
 msgstr "アカウントは無効化されており、まもなく完全に削除されます。再有効化すると元の状態に戻ります。"
 
@@ -20926,9 +21019,6 @@ msgstr "エージェントがデザインやレポートを公開します。チ
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "お使いのブラウザはチップの種類を報告しないため、これはApple Silicon版です。IntelのMacをお使いの場合は、代わりに<0>Intel版を入手</0>してください。"
-
 msgid "Your changes"
 msgstr "編集中の内容"
 
@@ -20938,14 +21028,17 @@ msgstr "保存しないと変更は失われます。"
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "コードは既定でローカルに留まり、連携するサービスは明示的に制御できます。"
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "ダウンロードは自動的に開始されます。開始されない場合はこちらから取得してください。"
+msgid "Your download starts automatically."
+msgstr "ダウンロードは自動的に始まります。"
 
 msgid "Your email (optional)"
 msgstr "メールアドレス（任意）"
 
 msgid "Your first agent"
 msgstr "最初のエージェント"
+
+msgid "Your GitHub account"
+msgstr "あなたの GitHub アカウント"
 
 msgid "Your GitHub account cannot reach a repository in this environment"
 msgstr "あなたの GitHub アカウントはこの環境のリポジトリにアクセスできません"
@@ -20968,6 +21061,9 @@ msgstr "組織がクラウドの利用上限に達しました。このワーク
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "組織が環境数の上限（{0}）に達しました。環境をアーカイブするか、「設定」の「請求」でアップグレードして追加してください。"
+
+msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
+msgstr "組織の環境数が上限の {reachedLimit} に達しました。空きを作るには 1 つアーカイブしてください。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"

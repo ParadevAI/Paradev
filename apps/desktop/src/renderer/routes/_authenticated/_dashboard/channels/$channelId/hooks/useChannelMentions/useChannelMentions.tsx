@@ -46,7 +46,7 @@ export function useChannelMentions({
 	);
 	const { data: tasks } = cloudTrpc.channelTask.list.useQuery({ channelId });
 	const channels = useOrgChannels();
-	const { provider: pluginProvider } = usePluginMentionProvider();
+	const pluginProvider = usePluginMentionProvider();
 
 	const mentionProviders = useMemo((): ComposerMentionProvider[] => {
 		const memberIds = new Set((members ?? []).map((member) => member.actorId));

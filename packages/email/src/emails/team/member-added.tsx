@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { Button, EmailLayout } from "../../components";
 
@@ -22,10 +22,6 @@ export function MemberAddedEmail({
 
 	return (
 		<EmailLayout preview={`You've been added to ${organizationName}`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				You're now part of {organizationName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {memberName ?? "there"},
 			</Text>

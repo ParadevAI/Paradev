@@ -83,9 +83,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/markdown-preferences/store.ts",
 		["markdown-preferences"],
 	],
-	["src/renderer/stores/file-explorer.ts", ["file-explorer-store"]],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
-	["src/renderer/stores/search-dialog-state.ts", ["search-dialog-store"]],
 	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
 	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
@@ -149,7 +147,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		],
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
-	["src/renderer/stores/right-pane-area.ts", ["right-pane-area"]],
 	["src/renderer/stores/acp-chat.ts", ["acp-chat"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
@@ -186,7 +183,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["leaderboard-auto-publish-v2"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/components/ModelPicker/hooks/useFavoriteModels/useFavoriteModels.ts",
+		"src/renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker/hooks/useFavoriteModels/useFavoriteModels.ts",
 		["chatFavoriteModels"],
 	],
 	[

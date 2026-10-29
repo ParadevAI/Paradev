@@ -1,5 +1,6 @@
 import type { TextElement } from "@superset/chat/protocol";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
+import { linkedContextData } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { linkOfChip } from "../linkChip";
 
 const encoder = new TextEncoder();
@@ -31,6 +32,7 @@ export function elementsForChips(
 			},
 			elementKind: elementKindOf(chip),
 			label: chip.label,
+			...(linkedContextData(chip.data) ? { data: chip.data } : {}),
 		});
 	}
 	return elements;

@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { findNodeHandle, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
@@ -18,8 +19,9 @@ export function CommentCardRow({
 	onLongPress: (comment: DraftComment, anchor: number | null) => void;
 }) {
 	const { t } = useLingui();
-	const cardRef = useRef<View>(null);
-	const openMenu = () => onLongPress(comment, findNodeHandle(cardRef.current));
+	const cardRef = useRef<ViewInstance>(null);
+	const openMenu = () =>
+		onLongPress(comment, findNodeHandle(cardRef.current) ?? null);
 	return (
 		<PressableScale
 			ref={cardRef}

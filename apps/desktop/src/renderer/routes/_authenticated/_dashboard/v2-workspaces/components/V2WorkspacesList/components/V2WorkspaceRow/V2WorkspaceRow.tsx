@@ -31,7 +31,6 @@ import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dash
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 
 interface V2WorkspaceRowProps {
@@ -93,7 +92,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	workspace,
 	isCurrentRoute,
 }: V2WorkspaceRowProps) {
-	const { formatDateTime } = useFormat();
+	const { formatCompactRelativeTime, formatDateTime } = useFormat();
 
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -127,9 +126,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 
 	// The visible age tracks activity (matches the sort); creation and
 	// last-agent-event details live in the tooltip.
-	const timeLabel = getRelativeTime(workspaceActivityAt(workspace), {
-		format: "compact",
-	});
+	const timeLabel = formatCompactRelativeTime(workspaceActivityAt(workspace));
 	const createdAtLabel = formatDateTime(workspace.createdAt, undefined);
 	const timeTitle = [
 		creatorLabel

@@ -14,6 +14,7 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
+import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
 	ContextMenuActionConfig,
@@ -298,6 +299,7 @@ export function Pane<TData>({
 	const icon = definition?.getIcon?.(context);
 	const titleContent = definition?.renderTitle?.(context);
 	const headerExtras = definition?.renderHeaderExtras?.(context);
+	const aside = usePaneAside(pane.id);
 	const toolbar = definition?.renderToolbar?.(context);
 
 	const isDropTarget = isOver && canDrop;
@@ -319,29 +321,33 @@ export function Pane<TData>({
 					}`}
 					onPointerDownCapture={context.actions.focus}
 				>
-					<PaneHeader
-						title={title}
-						icon={icon}
-						isActive={isActive}
-						titleContent={titleContent}
-						headerExtras={headerExtras}
-						toolbar={toolbar}
-						actionsContent={context.headerActions}
-						paneId={pane.id}
-						store={store}
-						onClick={
-							definition?.onHeaderClick
-								? () => definition.onHeaderClick?.(context)
-								: context.actions.pin
-						}
-						onMiddleClick={context.actions.close}
-					/>
+					{!definition?.hideHeader?.(context) && (
+						<PaneHeader
+							title={title}
+							icon={icon}
+							isActive={isActive}
+							titleContent={titleContent}
+							headerExtras={headerExtras}
+							toolbar={toolbar}
+							actionsContent={context.headerActions}
+							paneId={pane.id}
+							store={store}
+							onClick={
+								definition?.onHeaderClick
+									? () => definition.onHeaderClick?.(context)
+									: context.actions.pin
+							}
+							onMiddleClick={context.actions.close}
+						/>
+					)}
 					<PaneErrorBoundary
 						resetKey={pane.data}
 						onClose={context.actions.close}
 						onError={onPaneError}
 					>
 						<PaneContent
+							aside={aside}
+							insetsAside={definition?.insetsAside === true}
 							render={() =>
 								definition ? (
 									definition.renderPane(context)

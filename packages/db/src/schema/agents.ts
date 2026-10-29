@@ -16,10 +16,12 @@ import { organizations, users } from "./auth";
 import { channelMessages, channels } from "./channels";
 import {
 	agentSessionKindValues,
+	agentTaskRoleValues,
+	agentTaskStatusValues,
 	agentTurnReasonValues,
 	agentTurnStatusValues,
 } from "./enums";
-import { cloudWorkspaces } from "./schema";
+import { cloudWorkspaces, environments } from "./schema";
 
 /**
  * A Dev: an agent that works in an organization under its own identity, as
@@ -40,6 +42,13 @@ export const agents = pgTable(
 			.notNull()
 			.default({ shape: "pebble", eyes: "dots", color: "#7aa7ff" }),
 		instructions: text(),
+		/** Set once, under a row lock, so a Dev never has two. */
+		mainSessionId: uuid("main_session_id"),
+		/** The repository its tasks get a box for when the request names none. */
+		defaultEnvironmentId: uuid("default_environment_id").references(
+			() => environments.id,
+			{ onDelete: "set null" },
+		),
 		pausedAt: timestamp("paused_at", { withTimezone: true }),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
@@ -71,11 +80,16 @@ export const agentTurnReason = pgEnum(
 	"agent_turn_reason",
 	agentTurnReasonValues,
 );
+export const agentTaskStatus = pgEnum(
+	"agent_task_status",
+	agentTaskStatusValues,
+);
+export const agentTaskRole = pgEnum("agent_task_role", agentTaskRoleValues);
 
 /**
- * One place a Dev works and keeps context: its DM with a person, or a thread
- * it was mentioned in. Turns happen inside it. Its run state lives in
- * Temporal and the session store.
+ * A Dev's `main` session, which every message to it reaches, or a `task` it
+ * delegated. Turns happen inside a session; its run state lives in Temporal
+ * and the session store. A task has its own box and reports to its parent.
  */
 export const agentSessions = pgTable(
 	"agent_sessions",
@@ -101,6 +115,23 @@ export const agentSessions = pgTable(
 			() => cloudWorkspaces.id,
 			{ onDelete: "set null" },
 		),
+		parentSessionId: uuid("parent_session_id"),
+		title: text(),
+		role: agentTaskRole(),
+		taskStatus: agentTaskStatus("task_status"),
+		/** A task for the same issue or pull request is refused while this one is active. */
+		dedupeKey: text("dedupe_key"),
+		/** What the main session asked the task to do; sent when the task starts. */
+		instructions: text(),
+		/** The task's last reply, which its parent reads. */
+		result: text(),
+		pullRequestUrl: text("pull_request_url"),
+		environmentId: uuid("environment_id").references(() => environments.id, {
+			onDelete: "set null",
+		}),
+		requestedByUserId: uuid("requested_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -115,6 +146,12 @@ export const agentSessions = pgTable(
 		uniqueIndex("agent_sessions_thread_unique")
 			.on(t.agentId, t.threadRootId)
 			.where(sql`${t.kind} = 'thread'`),
+		uniqueIndex("agent_sessions_active_task_dedupe_unique")
+			.on(t.agentId, t.dedupeKey)
+			.where(
+				sql`${t.dedupeKey} is not null and ${t.taskStatus} in ('queued', 'running')`,
+			),
+		index("agent_sessions_parent_idx").on(t.parentSessionId),
 	],
 );
 
@@ -168,6 +205,8 @@ export const agentTurns = pgTable(
 		outputTokens: integer("output_tokens"),
 		costMicrosUsd: bigint("cost_micros_usd", { mode: "number" }),
 		errorCode: text("error_code"),
+		attempts: integer().notNull().default(1),
+		lastAttemptError: text("last_attempt_error"),
 	},
 	(t) => [
 		index("agent_turns_session_idx").on(t.sessionId, t.startedAt),
@@ -182,3 +221,22 @@ export const agentTurns = pgTable(
 );
 
 export type SelectAgentTurn = typeof agentTurns.$inferSelect;
+
+/** Notes a Dev keeps across all its sessions. */
+export const agentMemories = pgTable(
+	"agent_memories",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		agentId: uuid("agent_id")
+			.notNull()
+			.references(() => agents.id, { onDelete: "cascade" }),
+		content: text().notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [index("agent_memories_agent_idx").on(t.agentId, t.createdAt)],
+);

@@ -102,7 +102,7 @@ serves them from `packages/trpc/src/router/plugins/servers/`. A release is the g
 downloads — and `packages/shared/src/plugins/manifests.generated.ts` is the bundle the API resolves
 against, which is generated and must never be hand-edited. Change the source, then
 `superset plugins publish <name> --bump patch`, which rewrites the marketplace entry in
-`.agent-marketplace.json` and the generated manifests; commit and tag to publish it. `bun run check:plugins` is what CI
+`.agent-marketplace.json` and the generated manifests; merging to main tags it. `bun run check:plugins` is what CI
 runs to catch a change that skipped that step; run it before pushing.
 
 Installed plugins are recorded once per machine in

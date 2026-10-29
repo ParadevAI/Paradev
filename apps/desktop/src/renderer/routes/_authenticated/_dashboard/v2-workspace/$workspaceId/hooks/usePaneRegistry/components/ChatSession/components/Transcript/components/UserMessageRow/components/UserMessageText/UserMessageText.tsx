@@ -1,24 +1,34 @@
+import { useLingui } from "@lingui/react/macro";
 import type { AvailableCommand } from "@superset/chat/protocol";
-import { Chip } from "@superset/chat-ui/Chip";
+import type { ComposerChip } from "@superset/chat-ui/PromptInput";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { env } from "renderer/env.renderer";
+import {
+	linkedContextChip,
+	linkedContextData,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { commandChip } from "../../../../../../utils/commandChip";
-import { parseGithubWorkItemUrl } from "../../../../../../utils/githubWorkItem";
-import { unfurlLink } from "../../../../../../utils/linkUnfurl";
+import { linkChip } from "../../../../../../utils/linkChip";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
 import { ChatLink } from "../../../../../ChatLink";
-import { GithubWorkItemChip } from "./components/GithubWorkItemChip";
-import { LinkPreviewChip } from "./components/LinkPreviewChip";
-import { findPreviewLink, splitTextLinks } from "./utils/textLinks";
+import { MessageChip } from "./components/MessageChip";
+import { splitTextLinks } from "./utils/textLinks";
 
 function segmentChip(
 	segment: MessageSegment,
 	commands: ReadonlyMap<string, AvailableCommand> | undefined,
-) {
+	isDark: boolean,
+): ComposerChip | null {
 	const { element, text } = segment;
 	if (!element) return null;
-	if (element.elementKind === "slash_command" && text.startsWith("/")) {
-		const name = text.slice(1);
-		return commandChip(name, commands?.get(name)?.description);
+	const linked = linkedContextData(element.data);
+	if (linked) return linkedContextChip(linked, isDark);
+	if (element.elementKind === "slash_command") {
+		const name = text.replace(/^\//, "");
+		return {
+			...commandChip(name, commands?.get(name)?.description),
+			serialized: text,
+		};
 	}
 	return {
 		label: element.label ?? text.split("/").pop() ?? text,
@@ -33,14 +43,16 @@ export function UserMessageText({
 	segments: readonly MessageSegment[];
 	commands?: ReadonlyMap<string, AvailableCommand> | undefined;
 }) {
+	const { t } = useLingui();
+	const isDark = useIsDarkTheme();
+	const chatLabel = t({ message: "Chat" });
 	const runs = segments.map((segment) =>
 		segment.element ? [] : splitTextLinks(segment.text),
 	);
-	const preview = findPreviewLink(runs.flat(), env.NEXT_PUBLIC_WEB_URL);
 	return (
 		<span>
 			{segments.map((segment, index) => {
-				const chip = segmentChip(segment, commands);
+				const chip = segmentChip(segment, commands, isDark);
 				if (chip) {
 					return (
 						<span
@@ -50,28 +62,27 @@ export function UserMessageText({
 							// biome-ignore lint/suspicious/noArrayIndexKey: segments have no identity beyond their order
 							key={index}
 						>
-							<Chip chip={chip} />
+							<MessageChip chip={chip} />
 						</span>
 					);
 				}
 				return runs[index]?.map((part, partIndex) => {
 					if (part.kind === "text") return part.text;
-					const workItem = parseGithubWorkItemUrl(part.url);
+					const chip = linkChip(part.url, {
+						webUrl: env.NEXT_PUBLIC_WEB_URL,
+						isDark,
+						chatLabel,
+					});
 					return (
 						<span
 							data-source-text={
-								part === preview ||
-								unfurlLink(part.url, false, env.NEXT_PUBLIC_WEB_URL)?.label
-									? part.url
-									: undefined
+								chip && chip.label !== part.url ? part.url : undefined
 							}
 							// biome-ignore lint/suspicious/noArrayIndexKey: parts have no identity beyond their order
 							key={`${index}:${partIndex}`}
 						>
-							{workItem ? (
-								<GithubWorkItemChip link={workItem} url={part.url} />
-							) : part === preview ? (
-								<LinkPreviewChip url={part.url} />
+							{chip ? (
+								<MessageChip chip={chip} link={part.url} />
 							) : (
 								<ChatLink href={part.url}>{part.url}</ChatLink>
 							)}

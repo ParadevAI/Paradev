@@ -1,15 +1,26 @@
 import { db } from "@superset/db/client";
-import { agentSessions, agents, agentTurns } from "@superset/db/schema";
+import {
+	agentSessions,
+	agents,
+	agentTurns,
+	channelMessages,
+	channels,
+} from "@superset/db/schema";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { agentTemporal } from "../../lib/agent-runtime";
 import {
 	signTurnToken,
 	TURN_TOKEN_TTL_SECONDS,
 } from "../../lib/agent-turn/turn-token";
+import { posthog } from "../../lib/analytics";
 import { workerProcedure } from "../../trpc";
+import { announceAgentChanged } from "./agents-changed";
+import { reconcileDevs } from "./reconcile";
+import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
@@ -28,8 +39,68 @@ async function sessionStoreFor(sessionId: string) {
 	};
 }
 
+/** Where an answer to a message goes: its thread in a channel, or the DM itself. */
+async function replyRoomOf(messageId: string) {
+	const [row] = await db
+		.select({
+			id: channelMessages.id,
+			channelId: channelMessages.channelId,
+			threadRootId: channelMessages.threadRootId,
+			kind: channels.kind,
+		})
+		.from(channelMessages)
+		.innerJoin(channels, eq(channels.id, channelMessages.channelId))
+		.where(eq(channelMessages.id, messageId))
+		.limit(1);
+	if (!row) return null;
+	return {
+		channelId: row.channelId,
+		threadRootId:
+			row.kind === "dm" ? row.threadRootId : (row.threadRootId ?? row.id),
+	};
+}
+
 /** Our worker: it may only pick up turns the API created, and only while they run. */
 export const agentWorkerRouter = {
+	/** Runs from the worker on a schedule; see `reconcileDevs`. */
+	reconcile: workerProcedure.mutation(async () =>
+		reconcileDevs(await agentTemporal()),
+	),
+
+	/** A turn attempt failed and Temporal will run it again. */
+	noteRetry: workerProcedure
+		.input(
+			turnIdSchema.extend({
+				attempt: z.number().int().positive(),
+				error: z.string().max(2000),
+			}),
+		)
+		.mutation(async ({ input }) => {
+			const [turn] = await db
+				.update(agentTurns)
+				.set({ attempts: input.attempt + 1, lastAttemptError: input.error })
+				.where(
+					and(
+						eq(agentTurns.id, input.turnId),
+						eq(agentTurns.status, "running"),
+					),
+				)
+				.returning({ agentId: agentTurns.agentId, reason: agentTurns.reason });
+			if (turn) {
+				posthog.capture({
+					distinctId: turn.agentId,
+					event: "dev_turn_retried",
+					properties: {
+						turnId: input.turnId,
+						attempt: input.attempt,
+						reason: turn.reason,
+						error: input.error.slice(0, 300),
+					},
+				});
+			}
+			return { recorded: Boolean(turn) };
+		}),
+
 	turnToken: workerProcedure.input(turnIdSchema).mutation(async ({ input }) => {
 		const [turn] = await db
 			.select({
@@ -72,8 +143,13 @@ export const agentWorkerRouter = {
 					organizationId: agentTurns.organizationId,
 					actingUserId: agentTurns.actingUserId,
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
-					channelId: agentSessions.channelId,
-					threadRootId: agentSessions.threadRootId,
+					kind: agentSessions.kind,
+					role: agentSessions.role,
+					title: agentSessions.title,
+					devName: agents.name,
+					devDescription: agents.description,
+					devInstructions: agents.instructions,
+					triggerMessageId: agentTurns.triggerMessageId,
 				})
 				.from(agentTurns)
 				.innerJoin(agents, eq(agents.id, agentTurns.agentId))
@@ -93,17 +169,31 @@ export const agentWorkerRouter = {
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
-			const {
-				channelId,
-				threadRootId,
-				cloudWorkspaceId: _,
-				...identity
-			} = turn;
+			const identity = {
+				turnId: turn.turnId,
+				sessionId: turn.sessionId,
+				agentId: turn.agentId,
+				organizationId: turn.organizationId,
+				actingUserId: turn.actingUserId,
+			};
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),
 				host: access?.host ?? null,
 				model: access ? { headers: access.modelHeaders } : null,
-				room: channelId ? { channelId, threadRootId } : null,
+				room:
+					turn.kind === "main" && turn.triggerMessageId
+						? await replyRoomOf(turn.triggerMessageId)
+						: null,
+				dev: {
+					name: turn.devName,
+					description: turn.devDescription,
+					instructions: turn.devInstructions,
+				},
+				session: { kind: turn.kind, role: turn.role, title: turn.title },
+				tools:
+					turn.kind === "main"
+						? { mcpUrl: `${env.NEXT_PUBLIC_API_URL}/mcp/agent` }
+						: null,
 				agentToken: await signTurnToken(
 					env.AGENT_TURN_SIGNING_SECRET,
 					identity,
@@ -146,12 +236,18 @@ export const agentWorkerRouter = {
 						sql`cardinality(${agentTurns.steerPromptIds}) = ${steersConsumed}`,
 					),
 				)
-				.returning({ sessionId: agentTurns.sessionId });
+				.returning({
+					sessionId: agentTurns.sessionId,
+					agentId: agentTurns.agentId,
+					organizationId: agentTurns.organizationId,
+				});
 			if (!settled) {
 				const [turn] = await db
 					.select({
 						status: agentTurns.status,
 						sessionId: agentTurns.sessionId,
+						agentId: agentTurns.agentId,
+						organizationId: agentTurns.organizationId,
 					})
 					.from(agentTurns)
 					.where(eq(agentTurns.id, turnId))
@@ -163,6 +259,11 @@ export const agentWorkerRouter = {
 						message: "STEER_PENDING: a newer steer joined the turn.",
 					});
 				}
+				announceAgentChanged({
+					id: turn.agentId,
+					organizationId: turn.organizationId,
+				});
+				await afterTaskTurn(turnId);
 				return {
 					settled: true,
 					sessionStore: await sessionStoreFor(turn.sessionId),
@@ -172,6 +273,12 @@ export const agentWorkerRouter = {
 				.update(agentSessions)
 				.set({ lastActivityAt: now })
 				.where(eq(agentSessions.id, settled.sessionId));
+			announceAgentChanged({
+				id: settled.agentId,
+				organizationId: settled.organizationId,
+			});
+			// A retried settle runs this again; the parent hears each turn once.
+			await afterTaskTurn(turnId);
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),

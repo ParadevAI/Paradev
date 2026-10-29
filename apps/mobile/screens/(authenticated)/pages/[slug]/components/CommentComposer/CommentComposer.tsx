@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import type { TextInputInstance } from "react-native";
 import { Alert, Pressable, TextInput, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useTheme } from "@/hooks/useTheme";
@@ -35,7 +36,7 @@ export const CommentComposer = forwardRef<
 ) {
 	const { t } = useLingui();
 	const theme = useTheme();
-	const inputRef = useRef<TextInput>(null);
+	const inputRef = useRef<TextInputInstance>(null);
 	const inFlight = useRef(false);
 	const [body, setBody] = useState("");
 	const trimmed = body.trim();

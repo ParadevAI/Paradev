@@ -34,6 +34,10 @@ sudo -E apt-get update -qq
 # The image carries the toolchain; these are the internal team's shell tools.
 apt_install --no-install-recommends zsh fzf silversearcher-ag neovim postgresql-client
 log "shell tooling installed"
+# The root postinstall builds the desktop's native modules for Electron with
+# clang-16; bookworm's gcc 12 and clang 14 cannot compile Electron 44's headers.
+apt_install --no-install-recommends clang-16
+log "clang-16 installed"
 # neonctl: a workspace branches the database for itself on its first start,
 # the same way .superset/setup.sh does on a laptop.
 sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }

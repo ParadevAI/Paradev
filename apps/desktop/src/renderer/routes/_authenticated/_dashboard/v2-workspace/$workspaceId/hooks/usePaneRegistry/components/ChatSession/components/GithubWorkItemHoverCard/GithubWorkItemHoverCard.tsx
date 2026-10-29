@@ -23,11 +23,11 @@ const FRESH_FOR_MS = 2 * 60 * 1000;
 export function GithubWorkItemHoverCard({
 	children,
 	link,
-	openHint,
+	url,
 }: {
 	children: ReactNode;
 	link: GithubWorkItemLink;
-	openHint?: boolean;
+	url: string;
 }) {
 	const { workspaceId } = useChatPaneActions();
 	const [open, setOpen] = useState(false);
@@ -60,6 +60,7 @@ export function GithubWorkItemHoverCard({
 			<HoverCardTrigger
 				asChild
 				onClick={() => setOpen(false)}
+				onContextMenu={() => setOpen(false)}
 				onFocus={() => setWanted(true)}
 				onPointerEnter={(event) => {
 					if (event.pointerType !== "touch") setWanted(true);
@@ -73,7 +74,12 @@ export function GithubWorkItemHoverCard({
 				side="top"
 				sideOffset={6}
 			>
-				<GithubWorkItemCard link={link} load={load} openHint={openHint} />
+				<GithubWorkItemCard
+					link={link}
+					load={load}
+					onOpen={() => setOpen(false)}
+					url={url}
+				/>
 			</HoverCardContent>
 		</HoverCard>
 	);
