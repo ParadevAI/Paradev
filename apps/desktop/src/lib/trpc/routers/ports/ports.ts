@@ -3,6 +3,7 @@ import { portManager } from "main/lib/terminal/port-manager";
 import type { DetectedPort, EnrichedPort } from "shared/types";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { detectPortScheme, type PortScheme } from "./detect-port-scheme";
 import { getLabelsForWorkspace } from "./label-cache";
 
 export { invalidatePortLabelCache } from "./label-cache";
@@ -44,6 +45,10 @@ export const createPortsRouter = () => {
 				};
 			});
 		}),
+
+		detectScheme: publicProcedure
+			.input(z.object({ port: z.number().int().positive() }))
+			.query(({ input }): Promise<PortScheme> => detectPortScheme(input.port)),
 
 		kill: publicProcedure
 			.input(

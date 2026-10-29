@@ -3,6 +3,7 @@ import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { LuExternalLink, LuLoaderCircle, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { resolvePortUrl } from "renderer/lib/resolvePortUrl";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import type { EnrichedPort } from "shared/types";
@@ -25,9 +26,9 @@ export function MergedPortBadge({ port }: MergedPortBadgeProps) {
 		navigateToWorkspace(port.workspaceId, navigate);
 	};
 
-	const handleOpenInBrowser = () => {
+	const handleOpenInBrowser = async () => {
 		if (openUrl.isPending) return;
-		const url = `http://localhost:${port.port}`;
+		const url = await resolvePortUrl(`http://localhost:${port.port}`);
 
 		if (openLinksInApp) {
 			navigateToWorkspace(port.workspaceId, navigate);

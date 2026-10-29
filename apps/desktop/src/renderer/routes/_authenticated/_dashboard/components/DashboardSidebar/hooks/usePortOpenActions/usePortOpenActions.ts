@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { resolvePortUrl } from "renderer/lib/resolvePortUrl";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { PortForward } from "shared/types";
 import { usePortForward } from "../../providers/PortForwardsProvider";
@@ -40,12 +41,12 @@ export function usePortOpener() {
 		if (!openUrl.isPending) openUrl.mutate(url);
 	};
 
-	const openPort = (
+	const openPort = async (
 		port: OpenablePort,
 		forward: Pick<PortForward, "status"> | null,
 	) => {
-		const url = getPortBrowserUrl(port, forward);
-		if (url === null) {
+		const browserUrl = getPortBrowserUrl(port, forward);
+		if (browserUrl === null) {
 			void navigateToV2Workspace(port.workspaceId, navigate, {
 				search: {
 					terminalId: port.terminalId,
@@ -54,6 +55,7 @@ export function usePortOpener() {
 			});
 			return;
 		}
+		const url = await resolvePortUrl(browserUrl);
 		if (preferences.portOpenAction === "external") {
 			openExternal(url);
 			return;
@@ -79,9 +81,9 @@ export function usePortOpenActions(port: DashboardSidebarPort) {
 	return {
 		canOpenInBrowser: browserUrl !== null,
 		portUrl: browserUrl ?? `http://localhost:${port.port}`,
-		openExternal: () => {
-			if (browserUrl !== null) openExternal(browserUrl);
+		openExternal: async () => {
+			if (browserUrl !== null) openExternal(await resolvePortUrl(browserUrl));
 		},
-		openPrimary: () => openPort(port, forward),
+		openPrimary: () => void openPort(port, forward),
 	};
 }
