@@ -1,4 +1,4 @@
-import { Heading, Img, Section, Text } from "@react-email/components";
+import { Img, Section, Text } from "@react-email/components";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { Button, EmailLayout } from "../../components";
 import { env } from "../../lib/env";
@@ -26,10 +26,7 @@ export function WelcomeEmail({
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Welcome to Paradev
-			</Heading>
-			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 				Run Claude Code, Codex, or any CLI agent in parallel, each in an
 				isolated copy of your repo. They do the work. You review the diffs.
 			</Text>

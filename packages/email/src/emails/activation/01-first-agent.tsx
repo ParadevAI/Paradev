@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { Button, EmailLayout } from "../../components";
 
@@ -20,10 +20,7 @@ export function ActivationNudge1({
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Your first agent, safely
-			</Heading>
-			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 				Get the desktop app and try it on something small, like a flaky test or
 				the rename you&apos;ve been putting off.
 			</Text>

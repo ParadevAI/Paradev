@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { DetailRow, EmailLayout } from "../../components";
 
 interface MemberRemovedBillingEmailProps {
@@ -36,10 +36,6 @@ export function MemberRemovedBillingEmail({
 		<EmailLayout
 			preview={`Billing update: ${removedMemberName} was removed from ${organizationName}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Member removed from {organizationName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>

@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import { EmailLayout, emailTheme } from "../../components";
 
 // Sent instead of 01-first-agent when the Resend automation has seen
@@ -20,10 +20,7 @@ export function ActivationNudge1Installed({
 			recipientEmail={userEmail}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-3">
-				Your first agent is one prompt away
-			</Heading>
-			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
+			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 				You&apos;ve got the app. The next step takes two minutes.
 			</Text>
 

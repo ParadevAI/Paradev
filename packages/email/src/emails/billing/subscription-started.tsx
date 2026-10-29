@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { DetailRow, EmailLayout } from "../../components";
 
 interface SubscriptionStartedEmailProps {
@@ -22,10 +22,6 @@ export function SubscriptionStartedEmail({
 
 	return (
 		<EmailLayout preview={`Welcome to Paradev ${planName}!`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Welcome to Paradev {planName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {ownerName ?? "there"},
 			</Text>

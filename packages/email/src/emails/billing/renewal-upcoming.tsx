@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { format } from "date-fns";
 import { DetailRow, EmailLayout } from "../../components";
 
@@ -36,10 +36,6 @@ export function RenewalUpcomingEmail({
 		<EmailLayout
 			preview={`${organizationName}'s ${planName} plan renews ${formattedRenewalDate}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Your plan renews on {formattedRenewalDate}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
 				Hi {recipientName ?? "there"},
 			</Text>

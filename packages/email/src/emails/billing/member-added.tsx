@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { DetailRow, EmailLayout } from "../../components";
 
 interface MemberAddedBillingEmailProps {
@@ -36,10 +36,6 @@ export function MemberAddedBillingEmail({
 		<EmailLayout
 			preview={`Billing update: ${newMemberName} was added to ${organizationName}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				New member added to {organizationName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
