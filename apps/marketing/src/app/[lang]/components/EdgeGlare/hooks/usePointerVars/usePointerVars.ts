@@ -62,16 +62,26 @@ export function usePointerVars(
 			}
 		};
 
-		const onPointerMove = (event: PointerEvent) => {
-			pointer = { x: event.clientX, y: event.clientY };
-			if (frame) return;
+		const schedule = () => {
+			if (!pointer || frame) return;
 			lastFrameAt = performance.now();
 			frame = requestAnimationFrame(step);
 		};
+		// Hover-only: a finger drag would light the edge and leave it lit
+		const onPointerMove = (event: PointerEvent) => {
+			if (event.pointerType !== "mouse") return;
+			pointer = { x: event.clientX, y: event.clientY };
+			schedule();
+		};
 
 		window.addEventListener("pointermove", onPointerMove, { passive: true });
+		window.addEventListener("scroll", schedule, {
+			passive: true,
+			capture: true,
+		});
 		return () => {
 			window.removeEventListener("pointermove", onPointerMove);
+			window.removeEventListener("scroll", schedule, { capture: true });
 			if (frame) cancelAnimationFrame(frame);
 		};
 	}, [ref, name, glideMs, unscale]);

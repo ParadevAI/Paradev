@@ -132,7 +132,9 @@ export function DownloadInterstitial() {
 			{showInstallSteps || canAutoDownload ? (
 				<div className="space-y-10 pb-8">
 					{showInstallSteps ? <InstallSteps /> : null}
-					{canAutoDownload ? <DownloadFallback /> : null}
+					{canAutoDownload ? (
+						<DownloadFallback platform={platform} archSource={archSource} />
+					) : null}
 				</div>
 			) : null}
 		</>

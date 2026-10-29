@@ -2,15 +2,22 @@
 
 import { Trans } from "@lingui/react/macro";
 import { DOWNLOAD_URL_MAC_X64 } from "@superset/shared/constants";
-import { Platform, usePlatform } from "@/app/[lang]/hooks/useOS";
+import { type ArchSource, Platform } from "@/app/[lang]/hooks/useOS";
 import { track } from "@/lib/analytics";
 import { desktopUrlFor } from "../../utils/desktopUrlFor";
 
 const LINK_CLASS =
 	"text-foreground underline-offset-4 transition-colors hover:underline";
 
-export function DownloadFallback() {
-	const { platform, archSource } = usePlatform();
+interface DownloadFallbackProps {
+	platform: Platform;
+	archSource: ArchSource;
+}
+
+export function DownloadFallback({
+	platform,
+	archSource,
+}: DownloadFallbackProps) {
 	const offerIntel =
 		platform === Platform.MacAppleSilicon || platform === Platform.Unknown;
 

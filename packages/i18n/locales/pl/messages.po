@@ -9672,7 +9672,7 @@ msgid "Integrations"
 msgstr "Integracje"
 
 msgid "Intel Mac"
-msgstr "Mac z Intel"
+msgstr "Mac z procesorem Intel"
 
 msgid "Interactive agent terminal."
 msgstr "Interaktywny terminal agenta."
