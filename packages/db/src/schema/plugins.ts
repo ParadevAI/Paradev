@@ -1,4 +1,3 @@
-import type { OrganizationPluginPolicy } from "@superset/shared/plugins";
 import {
 	boolean,
 	index,
@@ -135,6 +134,14 @@ export type InsertOrganizationPluginSource =
 export type SelectOrganizationPluginSource =
 	typeof organizationPluginSources.$inferSelect;
 
+/** Per role: "unavailable", "available" or "installed"; a missing role is unavailable. */
+type InstallPolicy = Partial<
+	Record<
+		"owner" | "admin" | "member",
+		"unavailable" | "available" | "installed"
+	>
+>;
+
 export const organizationPlugins = pgTable(
 	"organization_plugins",
 	{
@@ -155,7 +162,7 @@ export const organizationPlugins = pgTable(
 		sourceFingerprint: text("source_fingerprint"),
 
 		installPolicy: jsonb("install_policy")
-			.$type<OrganizationPluginPolicy>()
+			.$type<InstallPolicy>()
 			.notNull()
 			.default({}),
 		removedFromSourceAt: timestamp("removed_from_source_at"),
