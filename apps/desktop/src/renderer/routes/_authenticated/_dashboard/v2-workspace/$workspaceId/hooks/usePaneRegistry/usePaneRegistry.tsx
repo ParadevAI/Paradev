@@ -106,6 +106,7 @@ import {
 import { FilePane } from "./components/FilePane";
 import { FilePaneHeaderExtras } from "./components/FilePane/components/FilePaneHeaderExtras";
 import { FilesTreePane } from "./components/FilesTreePane";
+import { FileViewLayout } from "./components/FileViewLayout";
 import { MobilePane } from "./components/MobilePane";
 import { PagePane } from "./components/PagePane";
 import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
@@ -136,11 +137,13 @@ function FilePaneTabTitle({
 	filePath,
 	isActive,
 	pinned,
+	showDirty,
 	workspaceId,
 }: {
 	filePath: string;
 	isActive: boolean;
 	pinned: boolean;
+	showDirty: boolean;
 	workspaceId: string;
 }) {
 	const document = useSharedFileDocument({
@@ -160,7 +163,7 @@ function FilePaneTabTitle({
 			<span className={cn("min-w-0 truncate", !pinned && "italic")}>
 				{name}
 			</span>
-			{document.dirty && (
+			{showDirty && document.dirty && (
 				<Circle className="size-2 shrink-0 fill-current text-muted-foreground" />
 			)}
 		</div>
@@ -180,6 +183,8 @@ interface UsePaneRegistryOptions {
 	linkedStores?: StoreApi<WorkspaceStore<PaneViewerData>>[];
 	onOpenSubagent: (data: SubagentPaneData) => void;
 	onSearch?: () => void;
+	/** File views in this store show the file tree and breadcrumb. */
+	rightStore?: StoreApi<WorkspaceStore<PaneViewerData>>;
 }
 
 export function usePaneRegistry({
@@ -191,6 +196,7 @@ export function usePaneRegistry({
 	linkedStores,
 	onOpenSubagent,
 	onSearch,
+	rightStore,
 }: UsePaneRegistryOptions): PaneRegistry<PaneViewerData> {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
@@ -292,15 +298,34 @@ export function usePaneRegistry({
 							filePath={data.filePath}
 							isActive={ctx.isActive}
 							pinned={Boolean(ctx.pane.pinned)}
+							showDirty={ctx.store !== rightStore}
 							workspaceId={workspaceId}
 						/>
 					);
 				},
-				renderPane: (ctx: RendererContext<PaneViewerData>) => (
-					<FilePane context={ctx} workspaceId={workspaceId} />
-				),
+				renderPane: (ctx: RendererContext<PaneViewerData>) => {
+					const inRightPane = ctx.store === rightStore;
+					return (
+						<FileViewLayout
+							context={ctx}
+							workspaceId={workspaceId}
+							showTree={inRightPane}
+							onSearch={onSearch}
+						>
+							<FilePane
+								context={ctx}
+								workspaceId={workspaceId}
+								inRightPane={inRightPane}
+							/>
+						</FileViewLayout>
+					);
+				},
 				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
-					<FilePaneHeaderExtras context={ctx} workspaceId={workspaceId} />
+					<FilePaneHeaderExtras
+						context={ctx}
+						workspaceId={workspaceId}
+						inRightPane={ctx.store === rightStore}
+					/>
 				),
 				onHeaderClick: (ctx: RendererContext<PaneViewerData>) =>
 					ctx.actions.pin(),
@@ -876,6 +901,7 @@ export function usePaneRegistry({
 					});
 				},
 				getTitle: () => t({ message: "Chat" }),
+				insetsAside: true,
 				onAfterClose: (pane) => {
 					const data = pane.data as PendingCloudChatPaneData;
 					markCloudChatLaunchClosed(workspaceId, data.promptHash);
@@ -898,6 +924,7 @@ export function usePaneRegistry({
 					};
 				},
 				onAfterClose: closeChatWithUndo,
+				insetsAside: true,
 				renderTitle: (ctx: RendererContext<PaneViewerData>) => {
 					const data = ctx.pane.data as ChatPaneData;
 					return (
@@ -1126,6 +1153,7 @@ export function usePaneRegistry({
 			desktopUrl,
 			chatPaneIcon,
 			onOpenSubagent,
+			rightStore,
 		],
 	);
 }

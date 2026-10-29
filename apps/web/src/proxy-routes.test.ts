@@ -25,6 +25,7 @@ describe("isPublicRoute", () => {
 		"/workspaces/f48e8a62-ac73-4e31-b9bd-7477932fd0ee",
 		"/plugins",
 		"/plugins/linear",
+		"/environments/environment-123",
 		"/page",
 		"/page/my-published-page",
 		"/robots.txt",
@@ -45,6 +46,7 @@ describe("isPublicRoute", () => {
 		"/tasksy",
 		"/automations-overview",
 		"/workspaces-list",
+		"/environmentsy",
 		"/pages",
 	])("keeps sibling routes protected: %s", (pathname: string) => {
 		expect(isPublicRoute(pathname)).toBe(false);

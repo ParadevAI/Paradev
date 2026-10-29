@@ -49,4 +49,29 @@ describe("groupMessages", () => {
 		const index = entries.findIndex((e) => e.kind === "new");
 		expect(entries[index + 1]?.key).toBe("m3");
 	});
+
+	test("draws a run of joins as one row, a Dev's apart, and skips them for the New line", () => {
+		const join = (seq: number, author: string): ChannelMessage => ({
+			...at(seq, author, "2026-10-20T10:00:00"),
+			subtype: "channel_join",
+		});
+		const entries = groupMessages(
+			[
+				join(1, "a"),
+				join(2, "b"),
+				join(3, "dev"),
+				at(4, "a", "2026-10-20T10:01:00"),
+			],
+			0,
+			"me",
+			(id) => id === "dev",
+		);
+		expect(
+			entries.map((e) =>
+				e.kind === "message"
+					? `${e.key}:${e.rollup?.map((m) => m.id).join("+") ?? "post"}:${e.compact}`
+					: e.kind,
+			),
+		).toEqual(["day", "m1:m1+m2:false", "m3:m3:false", "new", "m4:post:false"]);
+	});
 });

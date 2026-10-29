@@ -342,6 +342,14 @@ export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
 export const channelBroadcastEnum = z.enum(channelBroadcastValues);
 export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;
 
+/** Slack's membership message subtypes; a message without one is a post. */
+export const channelMessageSubtypeValues = [
+	"channel_join",
+	"channel_leave",
+] as const;
+export const channelMessageSubtypeEnum = z.enum(channelMessageSubtypeValues);
+export type ChannelMessageSubtype = z.infer<typeof channelMessageSubtypeEnum>;
+
 export const dockBounceValues = ["off", "once", "until_focused"] as const;
 export const dockBounceEnum = z.enum(dockBounceValues);
 export type DockBounce = z.infer<typeof dockBounceEnum>;

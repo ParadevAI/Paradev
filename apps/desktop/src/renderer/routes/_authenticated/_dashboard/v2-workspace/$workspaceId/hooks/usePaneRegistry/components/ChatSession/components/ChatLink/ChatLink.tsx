@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { chatMarkdownComponents } from "@superset/chat-ui/ChatMarkdown";
 import { cn } from "@superset/ui/utils";
 import { type UseNavigateResult, useNavigate } from "@tanstack/react-router";
-import type { ComponentProps, MouseEvent } from "react";
+import type { ComponentProps, MouseEvent, ReactNode } from "react";
 import { env } from "renderer/env.renderer";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ChatLinkProvider } from "../../providers/ChatLinkProvider";
@@ -17,7 +17,9 @@ import {
 import { ChatPreviewHoverCard } from "../ChatPreviewHoverCard";
 import { FileLinkMenu } from "../FileLinkMenu";
 import { GithubWorkItemHoverCard } from "../GithubWorkItemHoverCard";
+import { LinkMenu } from "../LinkMenu";
 import { WebsiteHoverCard } from "../WebsiteHoverCard";
+import { EnvironmentLinkLabel } from "./components/EnvironmentLinkLabel";
 import { LinkUnfurlIcon } from "./components/LinkUnfurlIcon";
 
 const MarkdownLink = chatMarkdownComponents.a;
@@ -42,6 +44,12 @@ function openInApp(
 			void navigate({
 				to: "/plugins/$pluginName",
 				params: { pluginName: link.pluginName },
+			});
+			return;
+		case "environment":
+			void navigate({
+				to: "/environments/$environmentId",
+				params: { environmentId: link.environmentId },
 			});
 			return;
 		case "workspace":
@@ -92,8 +100,14 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 	const bare =
 		typeof props.children === "string" &&
 		(props.children === props.href || props.children === href);
-	const bareLabel =
-		appLink?.kind === "chat" ? t({ message: "Chat" }) : unfurl?.label;
+	const bareLabel: ReactNode =
+		appLink?.kind === "chat" ? (
+			t({ message: "Chat" })
+		) : appLink?.kind === "environment" ? (
+			<EnvironmentLinkLabel environmentId={appLink.environmentId} />
+		) : (
+			unfurl?.label
+		);
 	const children = unfurl ? (
 		<>
 			<LinkUnfurlIcon icon={unfurl.icon} />
@@ -103,7 +117,7 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 		props.children
 	);
 
-	const link = (
+	const anchor = (
 		<MarkdownLink
 			{...props}
 			title={
@@ -134,8 +148,9 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 		</MarkdownLink>
 	);
 	if (isLocalPath) {
-		return <FileLinkMenu reference={href}>{link}</FileLinkMenu>;
+		return <FileLinkMenu reference={href}>{anchor}</FileLinkMenu>;
 	}
+	const link = <LinkMenu href={href}>{anchor}</LinkMenu>;
 	if (appLink?.kind === "chat") {
 		return (
 			<ChatPreviewHoverCard

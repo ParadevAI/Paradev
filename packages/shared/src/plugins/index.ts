@@ -415,6 +415,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "resend",
+		version: "1.0.0",
+		description: "Send and debug email",
+		interface: { displayName: "Resend", category: "Developer tools" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			resend: { type: "http", url: "https://mcp.resend.com/mcp" },
+		},
+	},
+	{
 		name: "supabase",
 		version: "1.0.0",
 		description: "Manage your Supabase projects and data",

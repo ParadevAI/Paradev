@@ -9,6 +9,7 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useContext, useEffect, useRef } from "react";
 import { canonicalizeTreePath } from "renderer/lib/pierreTree";
+import { FileDeleteContext } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore/fileDeleteContext";
 import { FileMoveContext } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore/fileMoveContext";
 import { FILE_EXPLORER_ROW_HEIGHT } from "../../constants";
 import {
@@ -78,6 +79,7 @@ export function useFilesTabActions({
 }: UseFilesTabActionsOptions): FilesTabActions {
 	const { t } = useLingui();
 	const onFileMove = useContext(FileMoveContext);
+	const onFileDeleted = useContext(FileDeleteContext);
 	const createUniqueEntry =
 		workspaceTrpc.filesystem.createUniqueEntry.useMutation();
 	const removeEmptyDirectory =
@@ -561,7 +563,9 @@ export function useFilesTabActions({
 						variant: "destructive",
 						onClick: () => {
 							toast.promise(
-								deletePath.mutateAsync({ workspaceId, absolutePath }),
+								deletePath
+									.mutateAsync({ workspaceId, absolutePath })
+									.then(() => onFileDeleted?.(absolutePath, isDirectory)),
 								{
 									loading: t({
 										message: `Deleting ${name}...`,
@@ -585,7 +589,7 @@ export function useFilesTabActions({
 				],
 			});
 		},
-		[workspaceId, deletePath, t],
+		[workspaceId, deletePath, onFileDeleted, t],
 	);
 
 	const collapseAll = useCallback(() => {

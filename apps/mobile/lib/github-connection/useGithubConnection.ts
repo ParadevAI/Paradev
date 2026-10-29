@@ -2,11 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as WebBrowser from "expo-web-browser";
 import { apiClient } from "@/lib/trpc/client";
 
-export const GITHUB_CONNECTION_QUERY_KEY = [
-	"cloud",
-	"githubUser",
-	"get",
-] as const;
+const GITHUB_CONNECTION_QUERY_KEY = ["cloud", "githubUser", "get"] as const;
 
 /**
  * The person's own GitHub connection: what it is, and how to start or end

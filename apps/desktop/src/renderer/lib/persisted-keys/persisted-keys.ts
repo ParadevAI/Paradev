@@ -18,6 +18,8 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "v2-terminal-presets-migrated-", match: "prefix" },
 	// Replaced by v2-notifications-v1
 	{ key: "notification-center-store", match: "exact" },
+	// Right pane area opt-out; the right pane area is on for everyone
+	{ key: "right-pane-area", match: "exact" },
 	// Workspace details moved into the workspace item (#5392)
 	{ key: "workspace-details-store", match: "exact" },
 	// Replaced by the v2 onboarding setup flow (#4080)

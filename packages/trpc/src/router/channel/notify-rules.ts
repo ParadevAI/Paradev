@@ -13,7 +13,7 @@ export type NotifyPrefs = Omit<
 >;
 
 export const DEFAULT_NOTIFY_PREFS: NotifyPrefs = {
-	notify: "mentions",
+	notify: "all",
 	showPreview: true,
 	keywords: [],
 	pausedUntil: null,

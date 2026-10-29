@@ -720,6 +720,72 @@
 				}
 			]
 		},
+		"resend_mcp": {
+			"displayName": "Resend",
+			"icon": "resend",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.resend.com/mcp",
+					"scopes": ["full_access"],
+					"identity": {
+						"url": "https://api.resend.com/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.team_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "API key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Resend API key",
+							"placeholder": "re_…",
+							"description": "Resend → API Keys → Create API key, with Full access",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.resend.com/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.team_id"
+						},
+						"user": {
+							"id": "$.team_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"neon_mcp": {
 			"displayName": "Neon",
 			"icon": "neon",

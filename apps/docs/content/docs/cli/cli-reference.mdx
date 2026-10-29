@@ -1031,6 +1031,96 @@ Linux/Windows substitute your platform's URL opener (`xdg-open`, `start`) for
 
 ---
 
+### environments
+
+An environment is what a cloud workspace starts from: its repositories, its variables, and a
+snapshot of a box that is already set up. Creating one needs a plan that includes environments.
+To set one up end to end, ask an agent to use the `superset:environment` skill.
+
+<Command
+	name="superset environments list"
+	options={[]}
+>
+List the environments a cloud workspace can start from.
+</Command>
+
+<Command
+	name="superset environments repos"
+	options={[]}
+>
+List the repositories the organization's GitHub App can see. These are what `--repo` accepts.
+</Command>
+
+<Command
+	name="superset environments create"
+	options={[
+		{ flag: "--name <name>", description: "Environment name. Required." },
+		{ flag: "--repo <owner/name>", description: "Repository it checks out. Required; repeatable." },
+		{ flag: "--primary-repo <owner/name>", description: "Repository a workspace opens on and whose `.superset` config runs. Default: the first `--repo`." },
+		{ flag: "--scope <personal|organization>", description: "Who can use it. Default: `organization`." },
+		{ flag: "--region <region>", description: "Where its workspaces run, e.g. `iad1` or `fra1`. Default: the region nearest you." },
+	]}
+>
+Create an environment for cloud workspaces to start from.
+</Command>
+
+<Command
+	name="superset environments update <environment>"
+	options={[
+		{ flag: "--name <name>", description: "New name." },
+		{ flag: "--scope <personal|organization>", description: "Who can use it." },
+	]}
+>
+Rename an environment or change who can use it.
+</Command>
+
+<Command
+	name="superset environments save"
+	options={[
+		{ flag: "--workspace <id>", description: "Cloud workspace ID. Required." },
+		{ flag: "--name <name>", description: "Name for the new environment. Required." },
+		{ flag: "--scope <personal|organization>", description: "Who can use it. Default: the same as the workspace's environment." },
+	]}
+>
+Save a ready cloud workspace as a new environment that new workspaces fork from. Restarts the workspace.
+</Command>
+
+<Command
+	name="superset environments replace <environment>"
+	options={[
+		{ flag: "--workspace <id>", description: "Cloud workspace ID. Required." },
+		{ flag: "--scope <personal|organization>", description: "Also change who can use it." },
+		{ flag: "--yes", description: "Replace without asking. Required without a terminal." },
+	]}
+>
+Replace an environment's snapshot with a ready cloud workspace, keeping its name and variables.
+Restarts the workspace.
+</Command>
+
+<Command
+	name="superset environments archive <environment>"
+	options={[
+		{ flag: "--yes", description: "Archive without asking. Required without a terminal." },
+	]}
+>
+Archive an environment. Its snapshot is deleted and no new workspace can start from it.
+</Command>
+
+<Command
+	name="superset environments secrets set [name]"
+	options={[
+		{ flag: "--environment <id>", description: "Environment ID. Required when the organization has several." },
+		{ flag: "--body <value>", description: "The value. Read from stdin when omitted." },
+		{ flag: "--env-file <path>", description: "Set every variable in a `.env` file instead of one name." },
+		{ flag: "--visible", description: "Store it readable in settings instead of as a secret." },
+	]}
+>
+Set a variable on an environment. `secrets list` shows the names, never the values, and
+`secrets delete <name>` removes one.
+</Command>
+
+---
+
 ### agents
 
 Agents are terminal-agent rows configured on a host (the same rows shown in

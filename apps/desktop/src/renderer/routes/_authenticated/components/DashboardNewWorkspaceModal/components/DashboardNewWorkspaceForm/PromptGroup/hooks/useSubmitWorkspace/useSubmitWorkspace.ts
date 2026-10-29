@@ -1,7 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
-import { isCloudUsageRefusal } from "@superset/shared/billing";
+import {
+	isCloudUsageRefusal,
+	type MachineSize,
+} from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
@@ -36,12 +39,8 @@ export function useSubmitWorkspace(
 	selectedMode: string | null,
 	uploadAttachments: UseUploadAttachmentsApi,
 	promptContext: NewWorkspacePromptContextApi,
-	/** Where a cloud workspace starts: the environment the create surface resolved. */
-	cloudTarget: {
-		environmentId: string | null;
-		/** The project's repository; the environment must still open on it. */
-		repositoryFullName: string | null;
-	} = { environmentId: null, repositoryFullName: null },
+	cloudEnvironmentId: string | null = null,
+	cloudMachineSize: MachineSize | null = null,
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -128,22 +127,15 @@ export function useSubmitWorkspace(
 		// they bypass the host `workspaces.create` path entirely.
 		if (isCloud) {
 			try {
-				// A named pick is checked against the live list so a stale draft
-				// can't start a vanished environment; Default needs no list.
-				const liveEnvironment = cloudTarget.environmentId
+				// Checked against the live list so a stale draft can't start a
+				// vanished environment.
+				const environmentId = cloudEnvironmentId
 					? startableCloudEnvironments(
 							await cloudTrpcClient.environment.list.query({
 								organizationId: activeOrganizationId,
 							}),
-						).find((row) => row.id === cloudTarget.environmentId)
+						).find((row) => row.id === cloudEnvironmentId)?.id
 					: undefined;
-				// An environment edited since the form loaded may open on another repository now.
-				const opensOnProject =
-					!cloudTarget.repositoryFullName ||
-					liveEnvironment?.repositories?.[0]?.fullName.toLowerCase() ===
-						cloudTarget.repositoryFullName.toLowerCase();
-				const environmentId =
-					liveEnvironment && opensOnProject ? liveEnvironment.id : null;
 				if (!environmentId) {
 					toast.error(
 						t({
@@ -189,7 +181,7 @@ export function useSubmitWorkspace(
 						)
 						.slice(0, 10),
 					branch: draft.baseBranch ?? branchName ?? undefined,
-					machineSize: draft.machineSize ?? undefined,
+					machineSize: cloudMachineSize ?? undefined,
 					...(attachmentIds.length > 0
 						? { attachmentFileIds: attachmentIds }
 						: {}),
@@ -423,8 +415,8 @@ export function useSubmitWorkspace(
 		t,
 		uploadAttachments,
 		utils,
-		cloudTarget.environmentId,
-		cloudTarget.repositoryFullName,
+		cloudEnvironmentId,
+		cloudMachineSize,
 	]);
 
 	const submitWorkspace = useCallback(async () => {
