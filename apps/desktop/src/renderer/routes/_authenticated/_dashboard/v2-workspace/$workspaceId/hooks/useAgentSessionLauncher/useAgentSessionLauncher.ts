@@ -25,6 +25,7 @@ import { readLastChatAgent } from "../../utils/lastChatAgent";
 export interface CreateNewAgentSessionInput {
 	configId: string;
 	placement: "split-pane" | "new-tab";
+	besidePaneId?: string;
 	prompt: string;
 	forkSessionId?: string;
 	attachments?: Array<{ attachmentId: string; name: string; mimeType: string }>;
@@ -167,7 +168,17 @@ export function useAgentSessionLauncher({
 					titleOverride: result.label,
 					data: { terminalId } as TerminalPaneData,
 				};
-				if (input.placement === "split-pane" && state.activeTabId) {
+				const beside = input.besidePaneId
+					? state.getPane(input.besidePaneId)
+					: null;
+				if (input.placement === "split-pane" && beside) {
+					state.splitPane({
+						tabId: beside.tabId,
+						paneId: beside.pane.id,
+						position: "right",
+						newPane: pane,
+					});
+				} else if (input.placement === "split-pane" && state.activeTabId) {
 					state.addPane({ tabId: state.activeTabId, pane });
 				} else {
 					state.addTab({ panes: [pane] });

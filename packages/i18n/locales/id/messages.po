@@ -3957,6 +3957,9 @@ msgstr "Chat sedang dirombak"
 msgid "Chat Launch"
 msgstr "Peluncuran Chat"
 
+msgid "Chat mode"
+msgstr "Mode chat"
+
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
 
@@ -4243,6 +4246,9 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
+
+msgid "CLI mode"
+msgstr "Mode CLI"
 
 msgid "CLI reference"
 msgstr "Referensi CLI"
@@ -5696,6 +5702,9 @@ msgstr "Tidak dapat mengedit pesan"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Tidak bisa menyelesaikan penghapusan workspace"
+
+msgid "Couldn't fork into a chat"
+msgstr "Tidak dapat melakukan fork ke chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Tidak dapat menyerahkan ini ke agen"
@@ -8618,11 +8627,26 @@ msgstr "Argumen fork"
 msgid "Fork conversation"
 msgstr "Cabangkan percakapan"
 
+msgid "Fork into chat"
+msgstr "Fork ke chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Fork ke chat di tab baru"
+
+msgid "Fork into CLI"
+msgstr "Fork ke CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Fork ke CLI di tab baru"
+
 msgid "Fork session"
 msgstr "Fork sesi"
 
 msgid "Fork session…"
 msgstr "Fork sesi…"
+
+msgid "Forking into a chat…"
+msgstr "Melakukan fork ke chat…"
 
 msgid "Form controls and field composition"
 msgstr "Kontrol form dan komposisi field"
@@ -12482,6 +12506,9 @@ msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda mun
 msgid "Nothing running"
 msgstr "Tidak ada yang berjalan"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Belum ada yang bisa di-fork. Kirim pesan terlebih dahulu."
+
 msgid "Nothing was missed"
 msgstr "Tidak ada yang terlewat"
 
@@ -13278,6 +13305,9 @@ msgstr "Membuka halaman"
 
 msgid "Opening worktree..."
 msgstr "Membuka worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Terbuka di samping panel ini. Panel ini tetap berjalan."
 
 msgid "Operator"
 msgstr "Operator"
@@ -15790,12 +15820,6 @@ msgstr "Cabut kunci"
 
 msgid "Rewrote it and published version 2."
 msgstr "Sudah ditulis ulang dan versi 2 diterbitkan."
-
-msgid "Rich input"
-msgstr "Input kaya"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Input kaya ({hotkeyText})"
 
 msgid "right pane"
 msgstr "panel kanan"

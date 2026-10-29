@@ -3957,6 +3957,9 @@ msgstr "Chat wordt herbouwd"
 msgid "Chat Launch"
 msgstr "Start via chat"
 
+msgid "Chat mode"
+msgstr "Chatmodus"
+
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
 
@@ -4243,6 +4246,9 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-docs"
+
+msgid "CLI mode"
+msgstr "CLI-modus"
 
 msgid "CLI reference"
 msgstr "CLI-referentie"
@@ -5696,6 +5702,9 @@ msgstr "Kan het bericht niet bewerken"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
+
+msgid "Couldn't fork into a chat"
+msgstr "Kon niet forken naar een chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Kon dit niet aan een agent overdragen"
@@ -8618,11 +8627,26 @@ msgstr "Fork-argumenten"
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
 
+msgid "Fork into chat"
+msgstr "Forken naar chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Forken naar chat in een nieuw tabblad"
+
+msgid "Fork into CLI"
+msgstr "Forken naar CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Forken naar CLI in een nieuw tabblad"
+
 msgid "Fork session"
 msgstr "Sessie forken"
 
 msgid "Fork session…"
 msgstr "Sessie forken…"
+
+msgid "Forking into a chat…"
+msgstr "Forken naar een chat…"
 
 msgid "Form controls and field composition"
 msgstr "Formulierbesturing en veldsamenstelling"
@@ -12482,6 +12506,9 @@ msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zod
 msgid "Nothing running"
 msgstr "Er draait niets"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Nog niets om te forken. Stuur eerst een bericht."
+
 msgid "Nothing was missed"
 msgstr "Er is niets gemist"
 
@@ -13278,6 +13305,9 @@ msgstr "Pagina's openen"
 
 msgid "Opening worktree..."
 msgstr "Worktree openen..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Opent naast dit paneel. Dit paneel blijft draaien."
 
 msgid "Operator"
 msgstr "Operator"
@@ -15790,12 +15820,6 @@ msgstr "Sleutel intrekken"
 
 msgid "Rewrote it and published version 2."
 msgstr "Herschreven en versie 2 gepubliceerd."
-
-msgid "Rich input"
-msgstr "Uitgebreide invoer"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Uitgebreide invoer ({hotkeyText})"
 
 msgid "right pane"
 msgstr "rechterpaneel"

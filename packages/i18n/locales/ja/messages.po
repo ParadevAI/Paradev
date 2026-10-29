@@ -3957,6 +3957,9 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
+msgid "Chat mode"
+msgstr "チャットモード"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -4243,6 +4246,9 @@ msgstr "CLIとSDK"
 
 msgid "CLI docs"
 msgstr "CLIドキュメント"
+
+msgid "CLI mode"
+msgstr "CLIモード"
 
 msgid "CLI reference"
 msgstr "CLIリファレンス"
@@ -5696,6 +5702,9 @@ msgstr "メッセージを編集できませんでした"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
+
+msgid "Couldn't fork into a chat"
+msgstr "チャットにフォークできませんでした"
 
 msgid "Couldn't hand this to an agent"
 msgstr "エージェントに引き渡せませんでした"
@@ -8618,11 +8627,26 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
+msgid "Fork into chat"
+msgstr "チャットにフォーク"
+
+msgid "Fork into chat in a new tab"
+msgstr "新しいタブでチャットにフォーク"
+
+msgid "Fork into CLI"
+msgstr "CLIにフォーク"
+
+msgid "Fork into CLI in a new tab"
+msgstr "新しいタブでCLIにフォーク"
+
 msgid "Fork session"
 msgstr "セッションをフォーク"
 
 msgid "Fork session…"
 msgstr "セッションをフォーク…"
+
+msgid "Forking into a chat…"
+msgstr "チャットにフォーク中…"
 
 msgid "Form controls and field composition"
 msgstr "フォームコントロールとフィールドの組み立て"
@@ -12482,6 +12506,9 @@ msgstr "直近30日に公開された実績はまだありません。このマ�
 msgid "Nothing running"
 msgstr "実行中のものはありません"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "まだフォークできる内容がありません。先にメッセージを送信してください。"
+
 msgid "Nothing was missed"
 msgstr "未実行はありません"
 
@@ -13278,6 +13305,9 @@ msgstr "ページを開く"
 
 msgid "Opening worktree..."
 msgstr "ワークツリーを開いています..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "このペインの横に開きます。元のペインは動作し続けます。"
 
 msgid "Operator"
 msgstr "オペレーター"
@@ -15790,12 +15820,6 @@ msgstr "キーを取り消す"
 
 msgid "Rewrote it and published version 2."
 msgstr "書き直してバージョン2を公開しました。"
-
-msgid "Rich input"
-msgstr "リッチ入力"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "リッチ入力 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "右ペイン"

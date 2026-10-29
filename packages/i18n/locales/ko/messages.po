@@ -3957,6 +3957,9 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
+msgid "Chat mode"
+msgstr "채팅 모드"
+
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
 
@@ -4243,6 +4246,9 @@ msgstr "CLI 및 SDK"
 
 msgid "CLI docs"
 msgstr "CLI 문서"
+
+msgid "CLI mode"
+msgstr "CLI 모드"
 
 msgid "CLI reference"
 msgstr "CLI 레퍼런스"
@@ -5696,6 +5702,9 @@ msgstr "메시지를 편집할 수 없습니다"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "워크스페이스 삭제를 끝내지 못했습니다"
+
+msgid "Couldn't fork into a chat"
+msgstr "채팅으로 포크할 수 없습니다"
 
 msgid "Couldn't hand this to an agent"
 msgstr "에이전트에게 넘길 수 없습니다"
@@ -8618,11 +8627,26 @@ msgstr "포크 인자"
 msgid "Fork conversation"
 msgstr "대화 분기"
 
+msgid "Fork into chat"
+msgstr "채팅으로 포크"
+
+msgid "Fork into chat in a new tab"
+msgstr "새 탭에서 채팅으로 포크"
+
+msgid "Fork into CLI"
+msgstr "CLI로 포크"
+
+msgid "Fork into CLI in a new tab"
+msgstr "새 탭에서 CLI로 포크"
+
 msgid "Fork session"
 msgstr "세션 포크"
 
 msgid "Fork session…"
 msgstr "세션 포크…"
+
+msgid "Forking into a chat…"
+msgstr "채팅으로 포크하는 중…"
 
 msgid "Form controls and field composition"
 msgstr "폼 컨트롤과 필드 구성"
@@ -12482,6 +12506,9 @@ msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기�
 msgid "Nothing running"
 msgstr "실행 중인 항목 없음"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "아직 포크할 내용이 없습니다. 먼저 메시지를 보내세요."
+
 msgid "Nothing was missed"
 msgstr "놓친 실행이 없습니다"
 
@@ -13278,6 +13305,9 @@ msgstr "페이지 열기"
 
 msgid "Opening worktree..."
 msgstr "worktree를 여는 중..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "이 패널 옆에 열립니다. 이 패널은 계속 실행됩니다."
 
 msgid "Operator"
 msgstr "작업자"
@@ -15790,12 +15820,6 @@ msgstr "키 해지"
 
 msgid "Rewrote it and published version 2."
 msgstr "다시 작성하고 버전 2를 게시했습니다."
-
-msgid "Rich input"
-msgstr "리치 입력"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "리치 입력 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "오른쪽 패널"
