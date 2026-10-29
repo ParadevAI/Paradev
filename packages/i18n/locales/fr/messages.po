@@ -3931,6 +3931,9 @@ msgstr "Le chat est en cours de refonte"
 msgid "Chat Launch"
 msgstr "Lancement du chat"
 
+msgid "Chat mode"
+msgstr "Mode chat"
+
 msgid "Chat session not found"
 msgstr "Session de chat introuvable"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI et SDK"
 
 msgid "CLI docs"
 msgstr "Docs de la CLI"
+
+msgid "CLI mode"
+msgstr "Mode CLI"
 
 msgid "CLI reference"
 msgstr "Référence CLI"
@@ -5655,6 +5661,9 @@ msgstr "Impossible de modifier le message"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Impossible de terminer la suppression des espaces de travail"
+
+msgid "Couldn't fork into a chat"
+msgstr "Impossible de forker dans un chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Impossible de confier ceci à un agent"
@@ -8571,11 +8580,26 @@ msgstr "Arguments de fork"
 msgid "Fork conversation"
 msgstr "Dupliquer la conversation"
 
+msgid "Fork into chat"
+msgstr "Forker dans un chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Forker dans un chat dans un nouvel onglet"
+
+msgid "Fork into CLI"
+msgstr "Forker dans la CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Forker dans la CLI dans un nouvel onglet"
+
 msgid "Fork session"
 msgstr "Forker la session"
 
 msgid "Fork session…"
 msgstr "Forker la session…"
+
+msgid "Forking into a chat…"
+msgstr "Création du fork dans un chat…"
 
 msgid "Form controls and field composition"
 msgstr "Contrôles de formulaire et composition des champs"
@@ -10171,9 +10195,6 @@ msgstr "Fin 2026"
 
 msgid "Latency"
 msgstr "Latence"
-
-msgid "Later"
-msgstr "Plus tard"
 
 msgid "Later messages are removed."
 msgstr "Les messages suivants seront supprimés."
@@ -12407,6 +12428,9 @@ msgstr "Rien de publié sur les 30 derniers jours pour l'instant. Votre rang app
 msgid "Nothing running"
 msgstr "Rien en cours d'exécution"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Rien à forker pour l'instant. Envoyez d'abord un message."
+
 msgid "Nothing was missed"
 msgstr "Rien n'a été manqué"
 
@@ -13200,6 +13224,9 @@ msgstr "Ouverture des pages"
 
 msgid "Opening worktree..."
 msgstr "Ouverture du worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "S'ouvre à côté de ce volet. Celui-ci continue de tourner."
 
 msgid "Operator"
 msgstr "Opérateur"
@@ -15448,9 +15475,6 @@ msgstr "Redémarrer le démon de terminal ?"
 msgid "Restart terminals"
 msgstr "Redémarrer les terminaux"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Redémarrez pour utiliser la dernière version de {appName}."
-
 msgid "Restart workspace"
 msgstr "Redémarrer l'espace de travail"
 
@@ -15684,12 +15708,6 @@ msgstr "Révoquer la clé"
 
 msgid "Rewrote it and published version 2."
 msgstr "Réécrit et publié en version 2."
-
-msgid "Rich input"
-msgstr "Saisie enrichie"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Saisie enrichie ({hotkeyText})"
 
 msgid "right pane"
 msgstr "panneau de droite"
@@ -16338,6 +16356,9 @@ msgstr "Découvrez où se situent vos 30 derniers jours dans le classement publi
 
 msgid "Select"
 msgstr "Sélecteur"
+
+msgid "Select a file to view it here"
+msgstr "Sélectionnez un fichier pour l’afficher ici"
 
 msgid "Select a project"
 msgstr "Sélectionnez un projet"
@@ -19849,9 +19870,6 @@ msgstr "Mettez à jour Paradev sur cet hôte pour modifier la configuration de l
 
 msgid "Update payment method"
 msgstr "Mettre à jour le moyen de paiement"
-
-msgid "Update ready"
-msgstr "Mise à jour prête"
 
 msgid "Update Required"
 msgstr "Mise à jour requise"

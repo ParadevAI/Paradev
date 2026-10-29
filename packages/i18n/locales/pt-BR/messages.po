@@ -3931,6 +3931,9 @@ msgstr "O chat está sendo refeito"
 msgid "Chat Launch"
 msgstr "Execução no chat"
 
+msgid "Chat mode"
+msgstr "Modo chat"
+
 msgid "Chat session not found"
 msgstr "Sessão de chat não encontrada"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI e SDK"
 
 msgid "CLI docs"
 msgstr "Documentação da CLI"
+
+msgid "CLI mode"
+msgstr "Modo CLI"
 
 msgid "CLI reference"
 msgstr "Referência da CLI"
@@ -5655,6 +5661,9 @@ msgstr "Não foi possível editar a mensagem"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Não foi possível terminar a exclusão das áreas de trabalho"
+
+msgid "Couldn't fork into a chat"
+msgstr "Não foi possível bifurcar em um chat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Não foi possível entregar isto a um agente"
@@ -8571,11 +8580,26 @@ msgstr "Argumentos de fork"
 msgid "Fork conversation"
 msgstr "Bifurcar conversa"
 
+msgid "Fork into chat"
+msgstr "Bifurcar em um chat"
+
+msgid "Fork into chat in a new tab"
+msgstr "Bifurcar em um chat em uma nova aba"
+
+msgid "Fork into CLI"
+msgstr "Bifurcar na CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Bifurcar na CLI em uma nova aba"
+
 msgid "Fork session"
 msgstr "Bifurcar sessão"
 
 msgid "Fork session…"
 msgstr "Bifurcar sessão…"
+
+msgid "Forking into a chat…"
+msgstr "Bifurcando em um chat…"
 
 msgid "Form controls and field composition"
 msgstr "Controles de formulário e composição de campos"
@@ -10171,9 +10195,6 @@ msgstr "Fim de 2026"
 
 msgid "Latency"
 msgstr "Latência"
-
-msgid "Later"
-msgstr "Mais tarde"
 
 msgid "Later messages are removed."
 msgstr "As mensagens posteriores serão removidas."
@@ -12407,6 +12428,9 @@ msgstr "Nada publicado nos últimos 30 dias ainda. Sua posição aparece assim q
 msgid "Nothing running"
 msgstr "Nada em execução"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Ainda não há nada para bifurcar. Envie uma mensagem primeiro."
+
 msgid "Nothing was missed"
 msgstr "Nada foi perdido"
 
@@ -13200,6 +13224,9 @@ msgstr "Abertura de páginas"
 
 msgid "Opening worktree..."
 msgstr "Abrindo worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Abre ao lado deste painel. Este continua em execução."
 
 msgid "Operator"
 msgstr "Operador"
@@ -15448,9 +15475,6 @@ msgstr "Reiniciar o daemon de terminal?"
 msgid "Restart terminals"
 msgstr "Reiniciar os terminais"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Reinicie para usar a versão mais recente do {appName}."
-
 msgid "Restart workspace"
 msgstr "Reiniciar área de trabalho"
 
@@ -15684,12 +15708,6 @@ msgstr "Revogar chave"
 
 msgid "Rewrote it and published version 2."
 msgstr "Reescrevi e publiquei a versão 2."
-
-msgid "Rich input"
-msgstr "Entrada avançada"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Entrada avançada ({hotkeyText})"
 
 msgid "right pane"
 msgstr "painel direito"
@@ -16338,6 +16356,9 @@ msgstr "Veja em que posição seus últimos 30 dias ficam no ranking público. A
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Selecione um arquivo para visualizá-lo aqui"
 
 msgid "Select a project"
 msgstr "Selecione um projeto"
@@ -19849,9 +19870,6 @@ msgstr "Atualize o Paradev neste host para editar a configuração da área de t
 
 msgid "Update payment method"
 msgstr "Atualizar forma de pagamento"
-
-msgid "Update ready"
-msgstr "Atualização pronta"
 
 msgid "Update Required"
 msgstr "Atualização necessária"

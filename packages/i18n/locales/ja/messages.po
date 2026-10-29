@@ -3931,6 +3931,9 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
+msgid "Chat mode"
+msgstr "チャットモード"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -4217,6 +4220,9 @@ msgstr "CLIとSDK"
 
 msgid "CLI docs"
 msgstr "CLIドキュメント"
+
+msgid "CLI mode"
+msgstr "CLIモード"
 
 msgid "CLI reference"
 msgstr "CLIリファレンス"
@@ -5655,6 +5661,9 @@ msgstr "メッセージを編集できませんでした"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
+
+msgid "Couldn't fork into a chat"
+msgstr "チャットにフォークできませんでした"
 
 msgid "Couldn't hand this to an agent"
 msgstr "エージェントに引き渡せませんでした"
@@ -8571,11 +8580,26 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
+msgid "Fork into chat"
+msgstr "チャットにフォーク"
+
+msgid "Fork into chat in a new tab"
+msgstr "新しいタブでチャットにフォーク"
+
+msgid "Fork into CLI"
+msgstr "CLIにフォーク"
+
+msgid "Fork into CLI in a new tab"
+msgstr "新しいタブでCLIにフォーク"
+
 msgid "Fork session"
 msgstr "セッションをフォーク"
 
 msgid "Fork session…"
 msgstr "セッションをフォーク…"
+
+msgid "Forking into a chat…"
+msgstr "チャットにフォーク中…"
 
 msgid "Form controls and field composition"
 msgstr "フォームコントロールとフィールドの組み立て"
@@ -10171,9 +10195,6 @@ msgstr "2026年後半"
 
 msgid "Latency"
 msgstr "レイテンシ"
-
-msgid "Later"
-msgstr "後で"
 
 msgid "Later messages are removed."
 msgstr "以降のメッセージは削除されます。"
@@ -12407,6 +12428,9 @@ msgstr "直近30日に公開された実績はまだありません。このマ�
 msgid "Nothing running"
 msgstr "実行中のものはありません"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "まだフォークできる内容がありません。先にメッセージを送信してください。"
+
 msgid "Nothing was missed"
 msgstr "未実行はありません"
 
@@ -13200,6 +13224,9 @@ msgstr "ページを開く"
 
 msgid "Opening worktree..."
 msgstr "ワークツリーを開いています..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "このペインの横に開きます。元のペインは動作し続けます。"
 
 msgid "Operator"
 msgstr "オペレーター"
@@ -15448,9 +15475,6 @@ msgstr "ターミナルデーモンを再起動しますか?"
 msgid "Restart terminals"
 msgstr "ターミナルを再起動"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "再起動すると最新バージョンの {appName} を使用できます。"
-
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
 
@@ -15684,12 +15708,6 @@ msgstr "キーを取り消す"
 
 msgid "Rewrote it and published version 2."
 msgstr "書き直してバージョン2を公開しました。"
-
-msgid "Rich input"
-msgstr "リッチ入力"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "リッチ入力 ({hotkeyText})"
 
 msgid "right pane"
 msgstr "右ペイン"
@@ -16338,6 +16356,9 @@ msgstr "直近30日の実績が公開リーダーボードでどの位置にな�
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "ファイルを選択するとここに表示されます"
 
 msgid "Select a project"
 msgstr "プロジェクトを選択してください"
@@ -19849,9 +19870,6 @@ msgstr "ワークスペースの設定を編集するには、このホストの
 
 msgid "Update payment method"
 msgstr "支払い方法を更新"
-
-msgid "Update ready"
-msgstr "アップデートの準備ができました"
 
 msgid "Update Required"
 msgstr "アップデートが必要です"

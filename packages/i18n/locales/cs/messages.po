@@ -3931,6 +3931,9 @@ msgstr "Chat se předělává"
 msgid "Chat Launch"
 msgstr "Spuštění chatu"
 
+msgid "Chat mode"
+msgstr "Režim chatu"
+
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
 
@@ -4217,6 +4220,9 @@ msgstr "CLI a SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentace CLI"
+
+msgid "CLI mode"
+msgstr "Režim CLI"
 
 msgid "CLI reference"
 msgstr "Reference CLI"
@@ -5655,6 +5661,9 @@ msgstr "Zprávu se nepodařilo upravit"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Mazání pracovních prostorů se nepodařilo dokončit"
+
+msgid "Couldn't fork into a chat"
+msgstr "Do chatu se nepodařilo forkovat"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Nepodařilo se předat agentovi"
@@ -8571,11 +8580,26 @@ msgstr "Argumenty pro fork"
 msgid "Fork conversation"
 msgstr "Rozvětvit konverzaci"
 
+msgid "Fork into chat"
+msgstr "Forkovat do chatu"
+
+msgid "Fork into chat in a new tab"
+msgstr "Forkovat do chatu v nové kartě"
+
+msgid "Fork into CLI"
+msgstr "Forkovat do CLI"
+
+msgid "Fork into CLI in a new tab"
+msgstr "Forkovat do CLI v nové kartě"
+
 msgid "Fork session"
 msgstr "Forkovat relaci"
 
 msgid "Fork session…"
 msgstr "Forkovat relaci…"
+
+msgid "Forking into a chat…"
+msgstr "Forkuji do chatu…"
 
 msgid "Form controls and field composition"
 msgstr "Prvky formuláře a skládání polí"
@@ -10171,9 +10195,6 @@ msgstr "Konec 2026"
 
 msgid "Latency"
 msgstr "Latence"
-
-msgid "Later"
-msgstr "Později"
 
 msgid "Later messages are removed."
 msgstr "Pozdější zprávy budou odstraněny."
@@ -12407,6 +12428,9 @@ msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se o
 msgid "Nothing running"
 msgstr "Nic neběží"
 
+msgid "Nothing to fork yet. Send a message first."
+msgstr "Zatím není co forkovat. Nejprve pošlete zprávu."
+
 msgid "Nothing was missed"
 msgstr "Nic nebylo zmeškáno"
 
@@ -13200,6 +13224,9 @@ msgstr "Otevírání stránek"
 
 msgid "Opening worktree..."
 msgstr "Otevírám worktree..."
+
+msgid "Opens beside this pane. This one keeps running."
+msgstr "Otevře se vedle tohoto panelu. Tento dál běží."
 
 msgid "Operator"
 msgstr "Operátor"
@@ -15448,9 +15475,6 @@ msgstr "Restartovat terminálového démona?"
 msgid "Restart terminals"
 msgstr "Restartovat terminály"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Restartujte aplikaci, abyste používali nejnovější verzi {appName}u."
-
 msgid "Restart workspace"
 msgstr "Restartovat pracovní prostor"
 
@@ -15684,12 +15708,6 @@ msgstr "Zneplatnit klíč"
 
 msgid "Rewrote it and published version 2."
 msgstr "Přepsáno a publikována verze 2."
-
-msgid "Rich input"
-msgstr "Rozšířený vstup"
-
-msgid "Rich input ({hotkeyText})"
-msgstr "Rozšířený vstup ({hotkeyText})"
 
 msgid "right pane"
 msgstr "pravý panel"
@@ -16338,6 +16356,9 @@ msgstr "Podívejte se, kde se vašich posledních 30 dní umístí ve veřejném
 
 msgid "Select"
 msgstr "Výběr"
+
+msgid "Select a file to view it here"
+msgstr "Vyberte soubor a zobrazí se zde"
 
 msgid "Select a project"
 msgstr "Vyberte projekt"
@@ -19849,9 +19870,6 @@ msgstr "Pro úpravu konfigurace pracovního prostoru aktualizujte Paradev na tom
 
 msgid "Update payment method"
 msgstr "Aktualizovat způsob platby"
-
-msgid "Update ready"
-msgstr "Aktualizace je připravena"
 
 msgid "Update Required"
 msgstr "Vyžadována aktualizace"

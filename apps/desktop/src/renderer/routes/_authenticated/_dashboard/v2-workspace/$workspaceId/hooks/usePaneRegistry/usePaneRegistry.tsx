@@ -91,6 +91,7 @@ import { BrowserPane, BrowserPaneToolbar } from "./components/BrowserPane";
 import { ChangesListPane } from "./components/ChangesListPane";
 import { ChatPane } from "./components/ChatPane";
 import { ChatHistoryPicker } from "./components/ChatPane/components/ChatHistoryPicker";
+import { ChatModeMenu } from "./components/ChatPane/components/ChatModeMenu";
 import { ChatPaneTitle } from "./components/ChatPaneTitle";
 import { CommentPane } from "./components/CommentPane";
 import { CommentPaneHeaderExtras } from "./components/CommentPane/components/CommentPaneHeaderExtras";
@@ -121,6 +122,7 @@ import { TerminalPaneHeaderExtras } from "./components/TerminalPane/components/T
 import { TerminalPaneIcon } from "./components/TerminalPane/components/TerminalPaneIcon";
 import { TerminalSessionDropdown } from "./components/TerminalPane/components/TerminalSessionDropdown";
 import { terminalContextMenuLinkStore } from "./components/TerminalPane/contextMenuLinkStore";
+import { useSurfaceFork } from "./hooks/useSurfaceFork";
 import { useUndoableChatClose } from "./hooks/useUndoableChatClose";
 import { openInActions } from "./utils/openInActions";
 import { pagePaneLabel } from "./utils/pagePaneLabel";
@@ -263,6 +265,10 @@ export function usePaneRegistry({
 
 	const { createNewAgentSession, focusAgentTerminal } = useAgentSessionLauncher(
 		{ workspaceId, store },
+	);
+	const forkIntoOtherSurface = useSurfaceFork(
+		workspaceId,
+		createNewAgentSession,
 	);
 
 	const chatPaneIcon = useCallback(
@@ -558,6 +564,9 @@ export function usePaneRegistry({
 									})
 								}
 								onCreateNewAgentSession={createNewAgentSession}
+								onForkIntoOtherSurface={(source, placement) =>
+									void forkIntoOtherSurface(ctx, source, placement)
+								}
 								onOpenSubagent={onOpenSubagent}
 							/>
 						</div>
@@ -941,6 +950,13 @@ export function usePaneRegistry({
 								workspaceId={workspaceId}
 								terminalId={data.terminalId}
 							/>
+							<ChatModeMenu
+								data={data}
+								onFork={(source, placement) =>
+									void forkIntoOtherSurface(ctx, source, placement)
+								}
+								workspaceId={workspaceId}
+							/>
 						</div>
 					);
 				},
@@ -1117,6 +1133,7 @@ export function usePaneRegistry({
 			store,
 			linkedStores,
 			workspaceId,
+			forkIntoOtherSurface,
 			closeChatWithUndo,
 			clearWorkspaceRunTerminal,
 			clearShortcut,
