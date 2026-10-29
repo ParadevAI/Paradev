@@ -10172,9 +10172,6 @@ msgstr "2026年末"
 msgid "Latency"
 msgstr "延遲"
 
-msgid "Later"
-msgstr "稍後"
-
 msgid "Later messages are removed."
 msgstr "之後的訊息將被移除。"
 
@@ -15448,9 +15445,6 @@ msgstr "重啟終端守護程式？"
 msgid "Restart terminals"
 msgstr "重啟終端"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "重新啟動以使用最新版本的 {appName}。"
-
 msgid "Restart workspace"
 msgstr "重新啟動工作區"
 
@@ -19849,9 +19843,6 @@ msgstr "請更新此主機上的 Paradev，以編輯其工作區設定。"
 
 msgid "Update payment method"
 msgstr "更新支付方式"
-
-msgid "Update ready"
-msgstr "更新已就緒"
 
 msgid "Update Required"
 msgstr "需要更新"

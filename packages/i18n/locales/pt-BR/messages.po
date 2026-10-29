@@ -10172,9 +10172,6 @@ msgstr "Fim de 2026"
 msgid "Latency"
 msgstr "Latência"
 
-msgid "Later"
-msgstr "Mais tarde"
-
 msgid "Later messages are removed."
 msgstr "As mensagens posteriores serão removidas."
 
@@ -15448,9 +15445,6 @@ msgstr "Reiniciar o daemon de terminal?"
 msgid "Restart terminals"
 msgstr "Reiniciar os terminais"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Reinicie para usar a versão mais recente do {appName}."
-
 msgid "Restart workspace"
 msgstr "Reiniciar área de trabalho"
 
@@ -19849,9 +19843,6 @@ msgstr "Atualize o Paradev neste host para editar a configuração da área de t
 
 msgid "Update payment method"
 msgstr "Atualizar forma de pagamento"
-
-msgid "Update ready"
-msgstr "Atualização pronta"
 
 msgid "Update Required"
 msgstr "Atualização necessária"

@@ -10172,9 +10172,6 @@ msgstr "Konec 2026"
 msgid "Latency"
 msgstr "Latence"
 
-msgid "Later"
-msgstr "Později"
-
 msgid "Later messages are removed."
 msgstr "Pozdější zprávy budou odstraněny."
 
@@ -15448,9 +15445,6 @@ msgstr "Restartovat terminálového démona?"
 msgid "Restart terminals"
 msgstr "Restartovat terminály"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Restartujte aplikaci, abyste používali nejnovější verzi {appName}u."
-
 msgid "Restart workspace"
 msgstr "Restartovat pracovní prostor"
 
@@ -19849,9 +19843,6 @@ msgstr "Pro úpravu konfigurace pracovního prostoru aktualizujte Paradev na tom
 
 msgid "Update payment method"
 msgstr "Aktualizovat způsob platby"
-
-msgid "Update ready"
-msgstr "Aktualizace je připravena"
 
 msgid "Update Required"
 msgstr "Vyžadována aktualizace"

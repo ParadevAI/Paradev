@@ -10172,9 +10172,6 @@ msgstr "2026 sonu"
 msgid "Latency"
 msgstr "Gecikme"
 
-msgid "Later"
-msgstr "Daha sonra"
-
 msgid "Later messages are removed."
 msgstr "Sonraki mesajlar kaldırılacak."
 
@@ -15448,9 +15445,6 @@ msgstr "Terminal daemon'u yeniden başlatılsın mı?"
 msgid "Restart terminals"
 msgstr "Terminalleri yeniden başlat"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "{appName}'in en son sürümünü kullanmak için yeniden başlatın."
-
 msgid "Restart workspace"
 msgstr "Çalışma alanını yeniden başlat"
 
@@ -19849,9 +19843,6 @@ msgstr "Çalışma alanı yapılandırmasını düzenlemek için bu ana bilgisay
 
 msgid "Update payment method"
 msgstr "Ödeme yöntemini güncelle"
-
-msgid "Update ready"
-msgstr "Güncelleme hazır"
 
 msgid "Update Required"
 msgstr "Güncelleme gerekli"

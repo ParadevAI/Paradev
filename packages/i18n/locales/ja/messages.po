@@ -10172,9 +10172,6 @@ msgstr "2026年後半"
 msgid "Latency"
 msgstr "レイテンシ"
 
-msgid "Later"
-msgstr "後で"
-
 msgid "Later messages are removed."
 msgstr "以降のメッセージは削除されます。"
 
@@ -15448,9 +15445,6 @@ msgstr "ターミナルデーモンを再起動しますか?"
 msgid "Restart terminals"
 msgstr "ターミナルを再起動"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "再起動すると最新バージョンの {appName} を使用できます。"
-
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
 
@@ -19849,9 +19843,6 @@ msgstr "ワークスペースの設定を編集するには、このホストの
 
 msgid "Update payment method"
 msgstr "支払い方法を更新"
-
-msgid "Update ready"
-msgstr "アップデートの準備ができました"
 
 msgid "Update Required"
 msgstr "アップデートが必要です"
