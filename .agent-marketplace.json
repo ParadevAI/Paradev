@@ -176,6 +176,16 @@
 			"category": "development",
 			"source": "./plugins/vercel",
 			"version": "1.0.2"
+		},
+		{
+			"name": "resend",
+			"description": "Send and debug email with Resend: emails, domains, contacts, broadcasts, and inboxes.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/resend",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

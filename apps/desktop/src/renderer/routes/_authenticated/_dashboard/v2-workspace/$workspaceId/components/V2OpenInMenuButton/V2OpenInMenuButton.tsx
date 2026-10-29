@@ -14,16 +14,19 @@ import { HotkeyLabel } from "renderer/hotkeys";
 import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
 
 interface V2OpenInMenuButtonProps {
-	worktreePath: string;
-	branch: string;
+	path: string;
+	branch?: string;
 	/** Null for project-less "session" workspaces (no per-project default app). */
 	projectId: string | null;
+	/** Bind the open-in and copy-path hotkeys to this path. Defaults to true. */
+	hotkeys?: boolean;
 }
 
 export function V2OpenInMenuButton({
-	worktreePath,
+	path,
 	branch,
 	projectId,
+	hotkeys = true,
 }: V2OpenInMenuButtonProps) {
 	const { t } = useLingui();
 	const {
@@ -36,7 +39,7 @@ export function V2OpenInMenuButton({
 		openInDefaultApp,
 		openInOtherApp,
 		copyWorktreePath,
-	} = useWorkspaceOpenIn({ worktreePath, projectId });
+	} = useWorkspaceOpenIn({ worktreePath: path, projectId, hotkeys });
 
 	return (
 		<div className="flex items-center no-drag">
@@ -88,13 +91,17 @@ export function V2OpenInMenuButton({
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom" sideOffset={6}>
-					{currentApp ? (
+					{currentApp && hotkeys ? (
 						<HotkeyLabel
 							label={t({
 								message: `Open in ${currentApp.displayLabel ?? currentApp.label}`,
 							})}
 							id="OPEN_IN_APP"
 						/>
+					) : currentApp ? (
+						t({
+							message: `Open in ${currentApp.displayLabel ?? currentApp.label}`,
+						})
 					) : (
 						<Trans>Select an editor from the dropdown</Trans>
 					)}

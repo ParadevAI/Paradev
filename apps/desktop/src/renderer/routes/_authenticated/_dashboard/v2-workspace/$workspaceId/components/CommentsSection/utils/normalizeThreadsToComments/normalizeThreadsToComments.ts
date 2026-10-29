@@ -1,19 +1,8 @@
-import type { PullRequestReviewThread } from "@superset/shared/pull-request-threads";
+import type { PullRequestThreads } from "@superset/shared/pull-request-github";
 import type { NormalizedComment } from "../../types";
 
-interface ThreadsData {
-	reviewThreads: PullRequestReviewThread[];
-	conversationComments?: {
-		id: number;
-		user: { login: string; avatarUrl: string };
-		body: string;
-		createdAt: string;
-		htmlUrl: string;
-	}[];
-}
-
 export function normalizeThreadsToComments(
-	data: ThreadsData,
+	data: Pick<PullRequestThreads, "reviewThreads" | "conversationComments">,
 	prUrl?: string,
 ): NormalizedComment[] {
 	const comments: NormalizedComment[] = [];
@@ -42,7 +31,7 @@ export function normalizeThreadsToComments(
 		}
 	}
 
-	for (const c of data.conversationComments ?? []) {
+	for (const c of data.conversationComments) {
 		comments.push({
 			id: String(c.id),
 			authorLogin: c.user.login,

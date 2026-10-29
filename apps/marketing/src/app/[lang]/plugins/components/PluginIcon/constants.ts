@@ -4,6 +4,7 @@ import {
 	SiLinear,
 	SiNotion,
 	SiPosthog,
+	SiResend,
 	SiSentry,
 	SiVercel,
 } from "react-icons/si";
@@ -28,6 +29,7 @@ export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	linear: { icon: SiLinear },
 	notion: { icon: SiNotion },
 	posthog: { icon: SiPosthog },
+	resend: { icon: SiResend },
 	sentry: { icon: SiSentry },
 	superhuman: { icon: SuperhumanIcon },
 	vercel: { icon: SiVercel },

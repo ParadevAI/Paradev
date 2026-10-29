@@ -112,6 +112,10 @@ const COMPANY_LINKS: FooterLink[] = [
 		label: <Trans>Careers</Trans>,
 	},
 	{
+		href: "/press",
+		label: <Trans>Press</Trans>,
+	},
+	{
 		href: "/media",
 		label: <Trans>Media kit</Trans>,
 	},

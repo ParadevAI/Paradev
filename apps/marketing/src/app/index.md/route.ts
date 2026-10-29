@@ -68,7 +68,7 @@ export async function GET() {
 		]),
 		`## Contact`,
 		"",
-		`- Support: support${COMPANY.EMAIL_DOMAIN}`,
+		`- Support: ${COMPANY.SUPPORT_EMAIL}`,
 		`- Team: ${COMPANY.TEAM_EMAIL}`,
 		`- [Discord](${COMPANY.DISCORD_URL})`,
 		`- [X](${COMPANY.X_URL})`,

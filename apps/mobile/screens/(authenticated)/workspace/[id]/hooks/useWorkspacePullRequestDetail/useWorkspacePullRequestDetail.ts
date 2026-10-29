@@ -16,7 +16,7 @@ import type {
 
 const DETAIL_REFETCH_MS = 20_000;
 
-export function getPullRequestDetailQueryKey(
+function getPullRequestDetailQueryKey(
 	owner: string | null,
 	repo: string | null,
 	pullNumber: number | null,

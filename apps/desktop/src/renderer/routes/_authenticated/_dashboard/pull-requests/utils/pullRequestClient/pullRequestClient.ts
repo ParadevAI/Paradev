@@ -34,19 +34,19 @@ export function canActOnPullRequest(target: PullRequestTarget): boolean {
 	return Boolean(target.repoFullName);
 }
 
-export function pullRequestDiffQueryKey(target: PullRequestTarget) {
+export function pullRequestDiffQueryKey(target: PullRequestTarget | null) {
 	return [
 		"pull-request-diff",
-		target.repoFullName?.toLowerCase() ?? null,
-		target.prNumber,
+		target?.repoFullName?.toLowerCase() ?? null,
+		target?.prNumber ?? null,
 	] as const;
 }
 
-export function pullRequestThreadsQueryKey(target: PullRequestTarget) {
+export function pullRequestThreadsQueryKey(target: PullRequestTarget | null) {
 	return [
 		"pull-request-threads",
-		target.repoFullName?.toLowerCase() ?? null,
-		target.prNumber,
+		target?.repoFullName?.toLowerCase() ?? null,
+		target?.prNumber ?? null,
 	] as const;
 }
 

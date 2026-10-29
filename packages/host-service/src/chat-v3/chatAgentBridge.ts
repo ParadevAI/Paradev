@@ -60,6 +60,8 @@ function sameTasks(
 				task.id === prior[index]?.id &&
 				task.name === prior[index]?.name &&
 				task.canStop === prior[index]?.canStop &&
+				task.canBackground === prior[index]?.canBackground &&
+				task.subagentStatus === prior[index]?.subagentStatus &&
 				(!withDetail || task.detail === prior[index]?.detail),
 		)
 	);

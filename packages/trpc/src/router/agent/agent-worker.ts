@@ -10,6 +10,7 @@ import {
 	TURN_TOKEN_TTL_SECONDS,
 } from "../../lib/agent-turn/turn-token";
 import { workerProcedure } from "../../trpc";
+import { announceAgentChanged } from "./agents-changed";
 import { resolveTurnHost } from "./turn-host";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
@@ -146,12 +147,18 @@ export const agentWorkerRouter = {
 						sql`cardinality(${agentTurns.steerPromptIds}) = ${steersConsumed}`,
 					),
 				)
-				.returning({ sessionId: agentTurns.sessionId });
+				.returning({
+					sessionId: agentTurns.sessionId,
+					agentId: agentTurns.agentId,
+					organizationId: agentTurns.organizationId,
+				});
 			if (!settled) {
 				const [turn] = await db
 					.select({
 						status: agentTurns.status,
 						sessionId: agentTurns.sessionId,
+						agentId: agentTurns.agentId,
+						organizationId: agentTurns.organizationId,
 					})
 					.from(agentTurns)
 					.where(eq(agentTurns.id, turnId))
@@ -163,6 +170,10 @@ export const agentWorkerRouter = {
 						message: "STEER_PENDING: a newer steer joined the turn.",
 					});
 				}
+				announceAgentChanged({
+					id: turn.agentId,
+					organizationId: turn.organizationId,
+				});
 				return {
 					settled: true,
 					sessionStore: await sessionStoreFor(turn.sessionId),
@@ -172,6 +183,10 @@ export const agentWorkerRouter = {
 				.update(agentSessions)
 				.set({ lastActivityAt: now })
 				.where(eq(agentSessions.id, settled.sessionId));
+			announceAgentChanged({
+				id: settled.agentId,
+				organizationId: settled.organizationId,
+			});
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),

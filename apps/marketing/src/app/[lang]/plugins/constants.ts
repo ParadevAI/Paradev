@@ -106,6 +106,11 @@ export const CATALOG: {
 				displayName: "Vercel",
 				description: msg({ message: "Read deployment and build logs" }),
 			},
+			{
+				name: "resend",
+				displayName: "Resend",
+				description: msg({ message: "Send email and debug delivery" }),
+			},
 		],
 	},
 	{
