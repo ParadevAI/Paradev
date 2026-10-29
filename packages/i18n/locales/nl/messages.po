@@ -4019,6 +4019,12 @@ msgstr "Kies een bovenliggende map"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Kies een project bij GitHub-issues voordat je een issue opent."
 
+msgid "Choose a project to search its issues"
+msgstr "Kies een project om in de issues ervan te zoeken"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Kies een project om in de pull requests ervan te zoeken"
+
 msgid "Choose a section."
 msgstr "Kies een onderdeel."
 

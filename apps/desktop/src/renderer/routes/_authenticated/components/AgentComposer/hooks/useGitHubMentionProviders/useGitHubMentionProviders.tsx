@@ -48,9 +48,9 @@ export function useGitHubMentionProviders(
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
 	return useMemo(() => {
-		if (!repo) return [];
-		const { projectId, hostUrl } = repo;
-		const client = () => getHostServiceClientByUrl(hostUrl);
+		// Without a repository the rows stay, so people see where linking lives.
+		const client = () =>
+			repo ? getHostServiceClientByUrl(repo.hostUrl) : null;
 		const issueEntry = (issue: LinkedIssue): ComposerMentionEntry => ({
 			id: issue.url ?? issue.slug,
 			label: issue.slug,
@@ -93,14 +93,18 @@ export function useGitHubMentionProviders(
 				},
 				source: {
 					kind: "search",
-					emptyState: t({ message: "No matching issues" }),
+					emptyState: repo
+						? t({ message: "No matching issues" })
+						: t({ message: "Choose a project to search its issues" }),
 					search: async (query, _signal, options) => {
 						// A pasted issue link resolves to that one issue.
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-issue") return [];
+						const host = client();
+						if (!repo || !host) return [];
 						const { issues } =
-							await client().workspaceCreation.searchGitHubIssues.query({
-								projectId,
+							await host.workspaceCreation.searchGitHubIssues.query({
+								projectId: repo.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
 								includeClosed:
@@ -136,13 +140,17 @@ export function useGitHubMentionProviders(
 				},
 				source: {
 					kind: "search",
-					emptyState: t({ message: "No matching pull requests" }),
+					emptyState: repo
+						? t({ message: "No matching pull requests" })
+						: t({ message: "Choose a project to search its pull requests" }),
 					search: async (query, _signal, options) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-pr") return [];
+						const host = client();
+						if (!repo || !host) return [];
 						const { pullRequests } =
-							await client().workspaceCreation.searchPullRequests.query({
-								projectId,
+							await host.workspaceCreation.searchPullRequests.query({
+								projectId: repo.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
 								includeClosed:

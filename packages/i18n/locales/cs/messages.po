@@ -4019,6 +4019,12 @@ msgstr "Vyberte nadřazený adresář"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Než otevřete issue, vyberte projekt v sekci GitHub issues."
 
+msgid "Choose a project to search its issues"
+msgstr "Vyberte projekt pro hledání v jeho issues"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Vyberte projekt pro hledání v jeho pull requestech"
+
 msgid "Choose a section."
 msgstr "Vyberte sekci."
 

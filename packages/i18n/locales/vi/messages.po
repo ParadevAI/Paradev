@@ -4019,6 +4019,12 @@ msgstr "Chọn một thư mục cha"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Chọn một dự án trong mục Issue GitHub trước khi mở một issue."
 
+msgid "Choose a project to search its issues"
+msgstr "Chọn một dự án để tìm issue của dự án đó"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Chọn một dự án để tìm pull request của dự án đó"
+
 msgid "Choose a section."
 msgstr "Chọn một mục."
 

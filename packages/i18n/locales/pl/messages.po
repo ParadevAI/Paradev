@@ -4019,6 +4019,12 @@ msgstr "Wybierz katalog nadrzędny"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Wybierz projekt w Zgłoszeniach GitHub, zanim otworzysz zgłoszenie."
 
+msgid "Choose a project to search its issues"
+msgstr "Wybierz projekt, aby szukać w jego zgłoszeniach"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Wybierz projekt, aby szukać w jego pull requestach"
+
 msgid "Choose a section."
 msgstr "Wybierz sekcję."
 

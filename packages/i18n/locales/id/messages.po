@@ -4019,6 +4019,12 @@ msgstr "Pilih direktori induk"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Pilih proyek dari issue GitHub sebelum membuka sebuah issue."
 
+msgid "Choose a project to search its issues"
+msgstr "Pilih proyek untuk mencari issue-nya"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Pilih proyek untuk mencari pull request-nya"
+
 msgid "Choose a section."
 msgstr "Pilih sebuah bagian."
 

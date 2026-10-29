@@ -4019,6 +4019,12 @@ msgstr "Übergeordnetes Verzeichnis wählen"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Wähle unter GitHub-Issues ein Projekt, bevor du ein Issue öffnest."
 
+msgid "Choose a project to search its issues"
+msgstr "Wähle ein Projekt, um seine Issues zu durchsuchen"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Wähle ein Projekt, um seine Pull Requests zu durchsuchen"
+
 msgid "Choose a section."
 msgstr "Wähle einen Bereich."
 

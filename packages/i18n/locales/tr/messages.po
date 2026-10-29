@@ -4019,6 +4019,12 @@ msgstr "Bir üst dizin seçin"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Bir issue açmadan önce GitHub issue'ları bölümünden bir proje seçin."
 
+msgid "Choose a project to search its issues"
+msgstr "Issue'larında aramak için bir proje seçin"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Pull request'lerinde aramak için bir proje seçin"
+
 msgid "Choose a section."
 msgstr "Bir bölüm seçin."
 

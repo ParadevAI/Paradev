@@ -4019,6 +4019,12 @@ msgstr "Выберите родительскую папку"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Выберите проект в разделе задач GitHub, прежде чем открывать задачу."
 
+msgid "Choose a project to search its issues"
+msgstr "Выберите проект, чтобы искать по его задачам"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Выберите проект, чтобы искать по его пул-реквестам"
+
 msgid "Choose a section."
 msgstr "Выберите раздел."
 

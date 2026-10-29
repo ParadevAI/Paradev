@@ -4019,6 +4019,12 @@ msgstr "选择父目录"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "打开议题前，请先在GitHub议题中选择一个项目。"
 
+msgid "Choose a project to search its issues"
+msgstr "选择一个项目以搜索其议题"
+
+msgid "Choose a project to search its pull requests"
+msgstr "选择一个项目以搜索其拉取请求"
+
 msgid "Choose a section."
 msgstr "选择一个分区。"
 

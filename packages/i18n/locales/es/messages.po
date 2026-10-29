@@ -4019,6 +4019,12 @@ msgstr "Elige un directorio padre"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Elige un proyecto en Issues de GitHub antes de abrir un issue."
 
+msgid "Choose a project to search its issues"
+msgstr "Elige un proyecto para buscar en sus issues"
+
+msgid "Choose a project to search its pull requests"
+msgstr "Elige un proyecto para buscar en sus pull requests"
+
 msgid "Choose a section."
 msgstr "Elige una sección."
 
