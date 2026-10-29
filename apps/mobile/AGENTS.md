@@ -84,7 +84,9 @@ export default function AuthenticatedLayout() {
 - **Hermes ships a partial `Intl`.** `lib/intl-polyfills` lists what is missing and what is
   polyfilled. A `@superset/i18n/format` helper that reaches for an API outside that list throws, and
   no mobile screen has an error boundary, so the throw takes the screen down. Add the polyfill, its
-  per-locale data, and a case in the polyfill test.
+  per-locale data, and a case in the polyfill test. Android's Hermes also lacks `zh-CN`/`zh-TW` in
+  `NumberFormat`/`DateTimeFormat` and formats them as `en-US`; `scriptSubtagFallback.android.ts`
+  passes the script-qualified tag instead.
 - **Pending and failed are not answers.** A query with no data yet has not said "offline" or
   "empty". Keep loading while it is pending and say you could not check when it failed; Home once
   painted "is offline" on every cold start because presence defaulted to `false`.

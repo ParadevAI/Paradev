@@ -90,7 +90,7 @@ export default ({ config }: ConfigContext) => ({
 	android: {
 		adaptiveIcon: {
 			foregroundImage: "./assets/adaptive-icon.png",
-			backgroundColor: "#ffffff",
+			backgroundColor: "#151110",
 		},
 		package: "sh.superset.mobile",
 		predictiveBackGestureEnabled: false,
@@ -138,7 +138,12 @@ export default ({ config }: ConfigContext) => ({
 		],
 		[
 			"expo-localization",
-			{ supportedLocales: { ios: [...SUPPORTED_LOCALES] } },
+			{
+				supportedLocales: {
+					ios: [...SUPPORTED_LOCALES],
+					android: [...SUPPORTED_LOCALES],
+				},
+			},
 		],
 		"expo-apple-authentication",
 		[
