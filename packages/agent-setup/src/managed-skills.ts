@@ -237,6 +237,20 @@ function claudeSkillTrees(
 }
 
 /**
+ * `npx skills add` links `~/.claude/skills/superset` at a plain skill in
+ * `~/.agents/skills`, which takes the directory the managed plugin needs. A
+ * link to a plugin (a checkout someone develops in) is left alone.
+ */
+function isLinkedPlainSkill(target: string): boolean {
+	try {
+		if (!fs.lstatSync(target).isSymbolicLink()) return false;
+	} catch {
+		return false;
+	}
+	return !fs.existsSync(path.join(target, ".claude-plugin", "plugin.json"));
+}
+
+/**
  * Provisions the bundled plugin, plus every installed plugin's skills, as one
  * Claude Code skills-directory plugin inside one Claude config dir —
  * `~/.claude` for the default account, or a profile dir whose own `skills/`
@@ -251,8 +265,15 @@ async function provisionClaudePlugin(
 ): Promise<void> {
 	const target = path.join(claudeDir, "skills", BUNDLED_SOURCE_NAME);
 	const sentinel = path.join(target, MANAGED_SENTINEL_NAME);
-	if (fs.existsSync(target) && !fs.existsSync(sentinel)) {
-		console.log(`[agent-setup] Skipping user-owned plugin dir at ${target}`);
+	if (isLinkedPlainSkill(target)) {
+		await rm(target);
+		console.log(
+			`[agent-setup] Replaced the linked superset skill at ${target} with the managed plugin`,
+		);
+	} else if (fs.existsSync(target) && !fs.existsSync(sentinel)) {
+		console.warn(
+			`[agent-setup] Skipping user-owned plugin dir at ${target}; Claude gets no superset:* skills`,
+		);
 		return;
 	}
 	const unreadable = pluginSources

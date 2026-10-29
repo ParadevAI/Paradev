@@ -5,7 +5,7 @@ const WEB = "https://app.superset.sh";
 
 describe("setupEnvironmentId", () => {
 	it("finds the environment a setup prompt links", () => {
-		const prompt = `Use the superset:environment skill to set up the cloud environment ${WEB}/environments/e1`;
+		const prompt = `Use the superset:environment skill to set up the cloud environment ${WEB}/environments/e1\n\nIf that skill is not available, stop and tell me.`;
 		expect(setupEnvironmentId(prompt, WEB)).toBe("e1");
 	});
 

@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
 	existsSync,
+	lstatSync,
 	mkdirSync,
 	readFileSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import os from "node:os";
@@ -241,6 +243,37 @@ describe("createManagedSkills", () => {
 		);
 		expect(existsSync(path.join(claudePlugin, "skills"))).toBe(false);
 		expect(readFileSync(userSkill, "utf-8")).toBe("my own skill\n");
+	});
+
+	it("replaces a skills-CLI link in the plugin dir and keeps what it pointed at", async () => {
+		const linkedSkill = path.join(agentsSkills, "superset");
+		mkdirSync(linkedSkill, { recursive: true });
+		writeFileSync(path.join(linkedSkill, "SKILL.md"), skillMd("superset"));
+		mkdirSync(claudeSkills, { recursive: true });
+		symlinkSync(linkedSkill, claudePlugin);
+
+		await run();
+
+		expect(lstatSync(claudePlugin).isSymbolicLink()).toBe(false);
+		expect(
+			existsSync(path.join(claudePlugin, "skills", "feedback", "SKILL.md")),
+		).toBe(true);
+		expect(readFileSync(path.join(linkedSkill, "SKILL.md"), "utf-8")).toBe(
+			skillMd("superset"),
+		);
+	});
+
+	it("leaves a linked plugin checkout in the plugin dir alone", async () => {
+		const checkout = path.join(TEST_ROOT, "checkout");
+		mkdirSync(path.join(checkout, ".claude-plugin"), { recursive: true });
+		writeFileSync(path.join(checkout, ".claude-plugin", "plugin.json"), "{}");
+		mkdirSync(claudeSkills, { recursive: true });
+		symlinkSync(checkout, claudePlugin);
+
+		await run();
+
+		expect(lstatSync(claudePlugin).isSymbolicLink()).toBe(true);
+		expect(existsSync(path.join(checkout, "skills"))).toBe(false);
 	});
 
 	it("reaps stale managed dirs from earlier versions but keeps user dirs", async () => {
