@@ -455,8 +455,8 @@ exactly that shape whenever a loaded directory comes back from the host as a
 non-directory (a dangling symlink, or a directory replaced by a file between
 listings) while a row beneath it is still selected; the throw leaves the
 controller half-reset (store swapped, subscription dropped, projection stale)
-until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 carries
-the same code.
+until the next refresh. Reproduced against 1.0.0-beta.5; 1.0.0-beta.6 still
+carries the same code.
 
 **What it changes** (`dist/path-store/src/canonical.js`): one line in
 `findNodeIdBySegments` — return null when the node reached so far is not a
@@ -479,40 +479,6 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 **Removing:** delete the patch, the `patchedDependencies` entry and the guard
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
-
-## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
-
-**Why:** every Changes pane mount leaked its whole diff view. `CodeView`
-creates one `VirtualizedFileDiff` per file, and each subscribes to the shared
-worker pool's `themeSubscribers` set. `CodeView.cleanUp` (through `reset`)
-only cleans the items in the current render range, so the others stay in that
-set with a reference back to their `CodeView` and its DOM. Measured in the dev
-desktop: 50 switches between the Changes and Pull request tabs left 26
-`CodeView`s, about 160k detached DOM nodes and 860 theme subscribers alive
-after both tabs were closed. 1.6.1 fixes it upstream: `reset` cleans every
-discarded item.
-
-**What it changes** (`dist/components/CodeView.js`): one line in `reset` —
-clean up every item, not only the rendered ones, before the list is dropped.
-
-**Guard test:** `apps/desktop/src/pierre-diffs-reset-patch.test.ts`.
-
-**Regenerating after a version bump** (~2 min):
-
-```bash
-bun patch @pierre/diffs@<new-version>
-# in node_modules/@pierre/diffs/dist/components/CodeView.js, in reset(), add
-# `for (const item of this.items) item.instance.cleanUp();` after
-# this.cleanAllRenderedItems()
-bun patch --commit 'node_modules/@pierre/diffs'
-# keep only the CodeView.js hunk; bun also writes deletions for the package's
-# bundled dist/node_modules typings
-bun test apps/desktop/src/pierre-diffs-reset-patch.test.ts
-```
-
-**Removing:** delete the patch, the `patchedDependencies` entry and the guard
-test when moving to @pierre/diffs 1.6.1 or later, which cleans every item in
-`reset`.
 
 ## expo-observe (`expo-observe@<version>.patch`)
 
