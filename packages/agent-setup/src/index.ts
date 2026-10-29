@@ -110,7 +110,7 @@ export {
 	createManagedSkills,
 	type PluginSkillSource,
 } from "./managed-skills";
-export { getBinDir, resolveSupersetHomeDir } from "./paths";
+export { getBinDir, resolveAppHomeDir } from "./paths";
 export {
 	assertSafePluginSegment,
 	isSafePluginSegment,

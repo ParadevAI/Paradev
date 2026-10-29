@@ -12,7 +12,7 @@ import {
 	syncManagedMcpServers,
 	toJsonMcpServerValue,
 } from "./managed-mcp-servers";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 
 export interface McpReconcileReport {
 	agent: "claude" | "codex" | "pdev";
@@ -117,7 +117,7 @@ export function reconcileMcpServers(
 	options: SyncManagedMcpServersOptions = {},
 ): McpReconcileReport[] {
 	const homeDir = options.homeDir ?? os.homedir();
-	const supersetHomeDir = options.supersetHomeDir ?? resolveSupersetHomeDir();
+	const supersetHomeDir = options.supersetHomeDir ?? resolveAppHomeDir();
 	const scoped = getDesiredMcpServersByAgent(desired, options);
 
 	const stale: Record<(typeof AGENTS)[number], string[]> = {

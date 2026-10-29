@@ -156,7 +156,7 @@ dispatch_to_host() {
   HOOK_ACCEPTED="0"
   HOOK_DELIVERED_2XX="0"
   HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"
-  for MANIFEST_FILE in "${SUPERSET_HOME_DIR:-$HOME/.superset}"/host/*/manifest.json; do
+  for MANIFEST_FILE in "${SUPERSET_HOME_DIR:-$HOME/{{APP_HOME_DIR_NAME}}}"/host/*/manifest.json; do
     [ -f "$MANIFEST_FILE" ] || continue
     MANIFEST_ENDPOINT=$(grep -oE '"endpoint"[[:space:]]*:[[:space:]]*"[^"]*"' "$MANIFEST_FILE" | head -1 | grep -oE '"[^"]*"$' | tr -d '"')
     [ -n "$MANIFEST_ENDPOINT" ] || continue

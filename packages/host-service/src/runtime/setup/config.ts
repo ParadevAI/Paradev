@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join, resolve } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	type ConfigError,
 	fromV1Json,
@@ -18,7 +18,6 @@ import {
 const PROJECT_SUPERSET_DIR_NAME = ".superset";
 const CONFIG_FILE_NAME = "config.json";
 const LOCAL_CONFIG_FILE_NAME = "config.local.json";
-const SUPERSET_DIR_NAME = ".superset";
 const PROJECTS_DIR_NAME = "projects";
 
 export interface SetupConfig {
@@ -185,16 +184,16 @@ export function getProjectConfigPath(repoPath: string): string {
 /**
  * Candidate user-override files, highest priority first: keyed by the
  * project's repo path mirrored under the projects dir (e.g.
- * `~/.superset/projects/Users/me/work/app/config.json` — discoverable
+ * `<app home>/projects/Users/me/work/app/config.json` — discoverable
  * without looking up an ID), then by project id (legacy). The first
  * candidate that parses wins.
  */
 function getUserOverridePaths(args: {
 	repoPath: string;
 	projectId: string;
-	homeDir: string;
+	appHomeDir: string;
 }): string[] {
-	const projectsDir = join(args.homeDir, SUPERSET_DIR_NAME, PROJECTS_DIR_NAME);
+	const projectsDir = join(args.appHomeDir, PROJECTS_DIR_NAME);
 	const paths = [join(projectsDir, args.repoPath, CONFIG_FILE_NAME)];
 	if (!args.projectId.includes("/") && !args.projectId.includes("\\")) {
 		paths.push(join(projectsDir, args.projectId, CONFIG_FILE_NAME));
@@ -213,7 +212,7 @@ function getLocalOverlayPath(repoPath: string): string {
  *   1. <repoPath>/.superset/config.json      — canonical project config
  *   2. <worktreePath>/.superset/config.json  — workspace/branch override
  *      (only when a worktree is in scope: setup at create, teardown at delete)
- *   3. ~/.superset/projects/<repoPath>/config.json — per-machine user
+ *   3. <app home>/projects/<repoPath>/config.json — per-machine user
  *      override (falls back to the legacy <project-id> key)
  *
  * Then a local overlay with before/after/replace semantics: the worktree's
@@ -226,8 +225,7 @@ export function loadSetupConfig(args: {
 	projectId: string;
 	/** Workspace worktree; when set, its config overrides the main repo's. */
 	worktreePath?: string;
-	/** Override $HOME for tests. Defaults to `os.homedir()`. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): SetupConfig | null {
 	const projectConfig = readSetupConfigAt(getProjectConfigPath(args.repoPath));
 	const worktreeConfig = args.worktreePath
@@ -238,7 +236,7 @@ export function loadSetupConfig(args: {
 	for (const overridePath of getUserOverridePaths({
 		repoPath: args.repoPath,
 		projectId: args.projectId,
-		homeDir: args.homeDir ?? homedir(),
+		appHomeDir: args.appHomeDir ?? resolveAppHomeDir(),
 	})) {
 		userConfig = readSetupConfigAt(overridePath);
 		if (userConfig) break;
@@ -284,8 +282,7 @@ export function loadProjectConfig(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath?: string;
-	/** Override $HOME for tests. Defaults to `os.homedir()`. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): ProjectConfigLoad | null {
 	const toml = loadTomlConfig(args);
 	if (toml?.kind === "invalid") return toml;
@@ -369,7 +366,7 @@ export function invalidConfigCommand(
 export function hasProjectConfig(args: {
 	repoPath: string;
 	projectId: string;
-	homeDir?: string;
+	appHomeDir?: string;
 }): boolean {
 	if (findTomlConfigPath(args)) return true;
 	return hasConfiguredScripts(loadSetupConfig(args));
@@ -391,7 +388,7 @@ export function describeProjectConfigSources(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath?: string;
-	homeDir?: string;
+	appHomeDir?: string;
 }): { format: "toml" | "json" | "none"; legacySources: LegacyConfigSource[] } {
 	if (findTomlConfigPath(args)) return { format: "toml", legacySources: [] };
 
@@ -418,9 +415,11 @@ export function describeProjectConfigSources(args: {
 			sources.add("before_after");
 		}
 	}
-	const homeDir = args.homeDir ?? homedir();
+	const appHomeDir = args.appHomeDir ?? resolveAppHomeDir();
 	if (
-		getUserOverridePaths({ ...args, homeDir }).some((path) => existsSync(path))
+		getUserOverridePaths({ ...args, appHomeDir }).some((path) =>
+			existsSync(path),
+		)
 	) {
 		sources.add("user_projects_override");
 	}

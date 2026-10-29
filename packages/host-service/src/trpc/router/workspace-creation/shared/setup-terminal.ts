@@ -113,8 +113,7 @@ export function resolveInitialCommand(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath?: string;
-	/** Override $HOME for tests. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
 	if (!config) return null;

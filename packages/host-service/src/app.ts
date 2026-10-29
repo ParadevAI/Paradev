@@ -1,8 +1,8 @@
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
@@ -322,10 +322,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	pageWatch.subscribeToTerminalEvents(eventBus);
 
 	const agentJobs = new AgentJobRunner({
-		rootDir: join(
-			process.env.SUPERSET_HOME_DIR?.trim() || join(homedir(), ".superset"),
-			"agent-jobs",
-		),
+		rootDir: join(resolveAppHomeDir(), "agent-jobs"),
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
 	});
 

@@ -10,8 +10,11 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import {
+	isDefaultAppHomeDir,
+	resolveAppHomeDir,
+} from "@superset/agent-setup/paths";
 
 export interface PtyDaemonManifest {
 	pid: number;
@@ -53,11 +56,7 @@ export function assertIsolatedDaemonNamespaceInTests(
 	env: NodeJS.ProcessEnv = process.env,
 ): void {
 	if (!isTestRunnerContext(env)) return;
-	const home = env.SUPERSET_HOME_DIR;
-	const defaultHome = join(homedir(), ".superset");
-	// Resolve before comparing: a trailing-slash or relative alias of the
-	// default home must not slip past the guard.
-	if (!home || resolve(home) === resolve(defaultHome)) {
+	if (isDefaultAppHomeDir(env.SUPERSET_HOME_DIR)) {
 		throw new Error(
 			"refusing to touch the default ~/.superset daemon namespace from a " +
 				"test: set SUPERSET_HOME_DIR to an isolated temp dir (and " +
@@ -69,7 +68,7 @@ export function assertIsolatedDaemonNamespaceInTests(
 
 function supersetHomeDir(): string {
 	assertIsolatedDaemonNamespaceInTests();
-	return process.env.SUPERSET_HOME_DIR || join(homedir(), ".superset");
+	return resolveAppHomeDir();
 }
 
 export function ptyDaemonManifestDir(organizationId: string): string {
