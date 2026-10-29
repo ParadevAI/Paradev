@@ -1,4 +1,4 @@
-import type { UserMessage } from "@superset/chat/protocol";
+import type { UserContent, UserMessage } from "@superset/chat/protocol";
 
 export type DrawerQueue = {
 	prompts: UserMessage[];
@@ -7,6 +7,7 @@ export type DrawerQueue = {
 	remove: (itemId: string) => Promise<void>;
 	resume: () => Promise<void>;
 	steer: (itemId: string) => Promise<void>;
+	update: (itemId: string, content: UserContent[]) => Promise<void>;
 };
 
 export type DrawerExit = "composer" | "history";

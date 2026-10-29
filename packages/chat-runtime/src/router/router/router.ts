@@ -21,6 +21,7 @@ import {
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
 	undoTurnFilesInputSchema,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { initTRPC, TRPCError } from "@trpc/server";
@@ -124,6 +125,12 @@ export function createChatRouter(
 			.input(queuedPromptInputSchema)
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.steerQueuedPrompt(input)),
+			),
+
+		updateQueuedPrompt: t.procedure
+			.input(updateQueuedPromptInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.updateQueuedPrompt(input)),
 			),
 
 		resumeQueue: t.procedure

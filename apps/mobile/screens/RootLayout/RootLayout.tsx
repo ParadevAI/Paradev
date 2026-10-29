@@ -127,7 +127,7 @@ export function RootLayout() {
 											<Stack.Screen name="account-pending-deletion" />
 										</Stack.Protected>
 										<Stack.Protected guard={!session}>
-											<Stack.Screen name="(auth)" />
+											<Stack.Screen name="(auth)/sign-in" />
 										</Stack.Protected>
 									</Stack>
 								</VersionGate>

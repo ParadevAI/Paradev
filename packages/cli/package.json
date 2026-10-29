@@ -29,14 +29,14 @@
 		"drizzle-orm": "0.45.2",
 		"ink": "7.0.1",
 		"mime-types": "3.0.2",
-		"react": "19.2.3",
+		"react": "19.3.0",
 		"superjson": "2.2.6",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/mime-types": "3.0.1",
-		"@types/react": "19.2.14",
+		"@types/react": "19.3.0",
 		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}

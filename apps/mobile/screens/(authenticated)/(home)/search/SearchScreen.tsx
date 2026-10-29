@@ -227,7 +227,7 @@ export function SearchScreen() {
 								/>
 							)}
 						</Text>
-					) : null
+					) : undefined
 				}
 				renderItem={({ item: workspace }) => {
 					const projectName = workspace.projectId

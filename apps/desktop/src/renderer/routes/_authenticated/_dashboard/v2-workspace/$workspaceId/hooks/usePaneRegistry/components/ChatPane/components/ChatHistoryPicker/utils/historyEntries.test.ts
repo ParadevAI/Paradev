@@ -14,6 +14,7 @@ function saved(overrides: Partial<SavedSession> = {}): SavedSession {
 		title: "Saved chat",
 		queuedCount: 0,
 		updatedAt: 1000,
+		closedAt: null,
 		live: false,
 		terminalId: null,
 		...overrides,

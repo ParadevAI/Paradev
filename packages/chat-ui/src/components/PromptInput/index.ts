@@ -1,7 +1,9 @@
 export {
 	type ComposerActionContext,
 	type ComposerChip,
-	type ComposerChipMatch,
+	type ComposerDraft,
+	type ComposerDraftSegment,
+	type ComposerMentionBrowse,
 	type ComposerMentionEntry,
 	type ComposerMentionProvider,
 	type ComposerMentionSource,
@@ -13,7 +15,9 @@ export {
 	type PromptInputDictation,
 	type PromptInputDictationError,
 	type PromptInputHandle,
+	type PromptInputLocalFiles,
 	type PromptInputProps,
 	type PromptInputSubmitPayload,
 } from "./PromptInput";
 export { DictationError } from "./utils/dictationError";
+export { draftText } from "./utils/draftSegments";

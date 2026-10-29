@@ -5,6 +5,7 @@ import {
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
 	launchConfigSelections,
+	type OutboxEntry,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
@@ -22,6 +23,7 @@ import {
 } from "@superset/chat/react";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { MessageScroller } from "@superset/chat-ui/MessageScroller";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
 import type { ReactNode } from "react";
@@ -187,33 +189,45 @@ export function SessionView({
 	const paneRef = useRef<HTMLDivElement>(null);
 	const { outbox, discardPrompt } = session;
 	const openDraftKey = useRef(draftKey);
-	const restoreText = useCallback(
-		(text: string, originKey: string) => {
+	const restoreDraft = useCallback(
+		(draft: ComposerDraft, originKey: string) => {
 			if (originKey !== openDraftKey.current) {
-				prependToDraft(originKey, [text], originKey === draftKey);
+				prependToDraft(originKey, [draft], originKey === draftKey);
 				return;
 			}
-			composerRef.current?.appendText(text);
+			composerRef.current?.restoreDraft(draft);
 			composerRef.current?.focus();
 		},
 		[draftKey],
 	);
+	const sentDrafts = useRef(new Map<string, ComposerDraft>());
+	const draftOf = useCallback(
+		(entry: OutboxEntry): ComposerDraft =>
+			sentDrafts.current.get(entry.clientId) ?? {
+				segments: [{ type: "text", text: contentText(entry.content) }],
+				attachments: [],
+			},
+		[],
+	);
 	useEffect(() => {
-		const failed = outbox.filter(
-			(entry) =>
-				entry.state === "failed" &&
-				entry.content.every((part) => part.type === "text"),
-		);
+		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			restoreText(contentText(entry.content), draftKey);
+			restoreDraft(draftOf(entry), draftKey);
+			sentDrafts.current.delete(entry.clientId);
 		}
 		toast.error(
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
-	}, [outbox, discardPrompt, restoreText, draftKey, t]);
-	useRestoreUnsentPrompts(draftKey, outbox);
+	}, [outbox, discardPrompt, restoreDraft, draftOf, draftKey, t]);
+	useEffect(() => {
+		const live = new Set(outbox.map((entry) => entry.clientId));
+		for (const clientId of sentDrafts.current.keys()) {
+			if (!live.has(clientId)) sentDrafts.current.delete(clientId);
+		}
+	}, [outbox]);
+	useRestoreUnsentPrompts(draftKey, outbox, draftOf);
 	const timeline = useTimeline(session.snapshot, { nestChildItems: true });
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
@@ -336,10 +350,6 @@ export function SessionView({
 		(exit: DrawerExit) => composerRef.current?.returnFocus(exit === "history"),
 		[],
 	);
-	const appendToComposer = useCallback(
-		(text: string) => composerRef.current?.appendText(text),
-		[],
-	);
 	const enterDrawer = useCallback(
 		(options: { actionableOnly: boolean }) =>
 			drawerRef.current?.focusLast(options) ?? false,
@@ -434,15 +444,27 @@ export function SessionView({
 	);
 	const holdPrompt = held?.onQueue;
 	const onAnswerFailed = useCallback(
-		(content: UserContent[]) => {
-			restoreText(contentText(content), draftKey);
+		(draft: ComposerDraft) => {
+			restoreDraft(draft, draftKey);
 			toast.error(
 				t({
 					message: "Couldn't send your message. It's back in the composer.",
 				}),
 			);
 		},
-		[restoreText, draftKey, t],
+		[restoreDraft, draftKey, t],
+	);
+	const sendKeepingDraft = useCallback(
+		(
+			content: UserContent[],
+			options: { expectedTurnId: string } | undefined,
+			draft: ComposerDraft,
+		) => {
+			const entry = sendPrompt(content, options);
+			sentDrafts.current.set(entry.clientId, draft);
+			return entry;
+		},
+		[sendPrompt],
 	);
 	const onSend = useMainSend({
 		approvals,
@@ -452,7 +474,7 @@ export function SessionView({
 		onUserPrompt,
 		respondToApproval,
 		runningTurnId,
-		sendPrompt,
+		sendPrompt: sendKeepingDraft,
 	});
 	const {
 		focusedId: focusedSubagentId,
@@ -470,8 +492,14 @@ export function SessionView({
 	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
-			restoreText(contentText(content), originKey),
-		[restoreText],
+			restoreDraft(
+				{
+					segments: [{ type: "text", text: contentText(content) }],
+					attachments: [],
+				},
+				originKey,
+			),
+		[restoreDraft],
 	);
 	const onStopTask = useCallback(
 		(taskId: string) =>
@@ -533,6 +561,7 @@ export function SessionView({
 			remove: session.removeQueuedPrompt,
 			resume: session.resumeQueue,
 			steer: session.steerQueuedPrompt,
+			update: session.updateQueuedPrompt,
 		}),
 		[
 			queuedPrompts,
@@ -541,6 +570,7 @@ export function SessionView({
 			session.removeQueuedPrompt,
 			session.resumeQueue,
 			session.steerQueuedPrompt,
+			session.updateQueuedPrompt,
 		],
 	);
 
@@ -673,7 +703,6 @@ export function SessionView({
 					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
 				)}
 				<WorkDrawer
-					onAppendToComposer={appendToComposer}
 					onExit={returnToComposer}
 					paneRef={paneRef}
 					queue={drawerQueue}
@@ -700,7 +729,6 @@ export function SessionView({
 					onEnterDrawer={enterDrawer}
 					onSend={subagent.onSend}
 					target={subagent.target}
-					canQueue={composerQueue !== undefined}
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}

@@ -1,0 +1,161 @@
+import { useLingui } from "@lingui/react/macro";
+import type {
+	ComposerMentionEntry,
+	ComposerMentionProvider,
+} from "@superset/chat-ui/PromptInput";
+import { cn } from "@superset/ui/utils";
+import { useMemo } from "react";
+import { GoIssueClosed, GoIssueOpened } from "react-icons/go";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import {
+	PULL_REQUEST_COLOR,
+	PULL_REQUEST_ICON,
+} from "renderer/routes/_authenticated/_dashboard/utils/toPullRequestDisplayState";
+import type {
+	LinkedIssue,
+	LinkedPR,
+} from "renderer/stores/new-workspace-draft";
+import {
+	linkedIssueChip,
+	linkedPrChip,
+	linkedRefFromText,
+} from "../../utils/linkedContextChips";
+
+const MAX_RESULTS = 20;
+
+export type GitHubRepo = { projectId: string; hostUrl: string };
+
+const PullRequestIcon = PULL_REQUEST_ICON.open;
+
+function normalizePrState(state: string, isDraft: boolean): string {
+	const normalized = state.toLowerCase();
+	return isDraft && normalized === "open" ? "draft" : normalized;
+}
+
+function prState(pr: LinkedPR) {
+	return pr.state === "draft" || pr.state === "merged" || pr.state === "closed"
+		? pr.state
+		: "open";
+}
+
+export function useGitHubMentionProviders(
+	repo: GitHubRepo | null,
+): ComposerMentionProvider[] {
+	const { t } = useLingui();
+	const isDark = useIsDarkTheme();
+	return useMemo(() => {
+		const client = () =>
+			repo ? getHostServiceClientByUrl(repo.hostUrl) : null;
+		const issueEntry = (issue: LinkedIssue): ComposerMentionEntry => ({
+			id: issue.url ?? issue.slug,
+			label: issue.slug,
+			description: issue.title,
+			icon:
+				issue.state === "closed" ? (
+					<GoIssueClosed className="size-4 text-purple-500" />
+				) : (
+					<GoIssueOpened className="size-4 text-emerald-500" />
+				),
+			select: (ctx) => ctx.insertChip(linkedIssueChip(issue, isDark)),
+		});
+		const prEntry = (pr: LinkedPR): ComposerMentionEntry => {
+			const Icon = PULL_REQUEST_ICON[prState(pr)];
+			return {
+				id: pr.url,
+				label: `#${pr.prNumber}`,
+				description: pr.title,
+				icon: (
+					<Icon
+						className={cn("size-4", PULL_REQUEST_COLOR[prState(pr)])}
+						strokeWidth={1.75}
+					/>
+				),
+				select: (ctx) => ctx.insertChip(linkedPrChip(pr)),
+			};
+		};
+		return [
+			{
+				id: "github-issues",
+				title: t({ message: "GitHub issues" }),
+				priority: 4,
+				icon: <GoIssueOpened className="size-4" />,
+				browse: {
+					label: t({ message: "GitHub issues" }),
+					placeholder: t({ message: "Search issues…" }),
+				},
+				source: {
+					kind: "search",
+					emptyState: repo
+						? t({ message: "No matching issues" })
+						: t({ message: "Choose a project to search its issues" }),
+					search: async (query) => {
+						const ref = linkedRefFromText(query);
+						if (ref && ref.kind !== "github-issue") return [];
+						const host = client();
+						if (!repo || !host) return [];
+						const { issues } =
+							await host.workspaceCreation.searchGitHubIssues.query({
+								projectId: repo.projectId,
+								query: ref ? String(ref.number) : query || undefined,
+								limit: MAX_RESULTS,
+								includeClosed: query !== "",
+							});
+						return issues
+							.filter((issue) => !ref || issue.issueNumber === ref.number)
+							.map((issue) =>
+								issueEntry({
+									slug: `#${issue.issueNumber}`,
+									title: issue.title,
+									source: "github",
+									url: issue.url,
+									number: issue.issueNumber,
+									state:
+										issue.state.toLowerCase() === "closed" ? "closed" : "open",
+								}),
+							);
+					},
+				},
+			},
+			{
+				id: "pull-requests",
+				title: t({ message: "Pull requests" }),
+				priority: 5,
+				icon: <PullRequestIcon className="size-4" strokeWidth={1.75} />,
+				browse: {
+					label: t({ message: "Pull requests" }),
+					placeholder: t({ message: "Search pull requests…" }),
+				},
+				source: {
+					kind: "search",
+					emptyState: repo
+						? t({ message: "No matching pull requests" })
+						: t({ message: "Choose a project to search its pull requests" }),
+					search: async (query) => {
+						const ref = linkedRefFromText(query);
+						if (ref && ref.kind !== "github-pr") return [];
+						const host = client();
+						if (!repo || !host) return [];
+						const { pullRequests } =
+							await host.workspaceCreation.searchPullRequests.query({
+								projectId: repo.projectId,
+								query: ref ? String(ref.number) : query || undefined,
+								limit: MAX_RESULTS,
+								includeClosed: query !== "",
+							});
+						return pullRequests
+							.filter((pr) => !ref || pr.prNumber === ref.number)
+							.map((pr) =>
+								prEntry({
+									prNumber: pr.prNumber,
+									title: pr.title,
+									url: pr.url,
+									state: normalizePrState(pr.state, pr.isDraft),
+								}),
+							);
+					},
+				},
+			},
+		];
+	}, [isDark, repo, t]);
+}

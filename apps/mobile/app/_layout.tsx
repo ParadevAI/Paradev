@@ -4,11 +4,16 @@ import "@/lib/intl-polyfills";
 import "../global.css";
 
 import * as Sentry from "@sentry/react-native";
+import { enableLegacyHeaderAppearance } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { initSentry } from "@/lib/sentry";
 import { RootLayout } from "@/screens/RootLayout";
 
 initSentry();
+
+// expo-router 58 lays every screen out under a transparent Liquid Glass bar
+// and leaves the inset to each screen; ours expect content below the header.
+enableLegacyHeaderAppearance();
 
 // Held here, before the first render, or expo-router hides it on
 // navigation-ready. RootLayout decides when to let it go; this timer only

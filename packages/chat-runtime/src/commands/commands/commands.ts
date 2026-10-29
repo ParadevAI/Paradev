@@ -55,7 +55,9 @@ import {
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
 	type UndoTurnFilesInput,
+	type UpdateQueuedPromptInput,
 	undoTurnFilesInputSchema,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import { z } from "zod";
 import type {
@@ -228,6 +230,7 @@ export type ChatCommands = {
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
+	updateQueuedPrompt(input: UpdateQueuedPromptInput): void;
 	resumeQueue(input: ResumeQueueInput): void;
 	cancelTurn(input: CancelTurnInput): void;
 	stopBackgroundTask(input: StopBackgroundTaskInput): Promise<boolean>;
@@ -515,6 +518,16 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 		},
 
+		updateQueuedPrompt(input) {
+			const parsed: UpdateQueuedPromptInput =
+				updateQueuedPromptInputSchema.parse(input);
+			options.dedupe.run(`updateQueuedPrompt:${parsed.commandId}`, () => {
+				options.live
+					.require(parsed.sessionId)
+					.updateQueued(parsed.itemId, parsed.content);
+			});
+		},
+
 		resumeQueue(input) {
 			const parsed: ResumeQueueInput = resumeQueueInputSchema.parse(input);
 			options.dedupe.run(`resumeQueue:${parsed.commandId}`, () => {
@@ -699,6 +712,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
 			const wasLive = options.live.get(parsed.sessionId) !== null;
+			options.sessions.markClosed(parsed.sessionId);
 			replays.delete(parsed.sessionId);
 			subagentItems.forget(parsed.sessionId);
 			try {

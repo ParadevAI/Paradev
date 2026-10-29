@@ -125,6 +125,9 @@ jobs:
           AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
           AGENT_TURN_SIGNING_SECRET: ${{ secrets.AGENT_TURN_SIGNING_SECRET }}
           AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+          TEMPORAL_NAMESPACE: ${{ secrets.TEMPORAL_NAMESPACE }}
+          TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_API_KEY }}
           CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -213,6 +216,9 @@ jobs:
             --env AGENT_WORKER_SECRET=$AGENT_WORKER_SECRET \
             --env AGENT_TURN_SIGNING_SECRET=$AGENT_TURN_SIGNING_SECRET \
             --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
+            --env TEMPORAL_ADDRESS=$TEMPORAL_ADDRESS \
+            --env TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE \
+            --env TEMPORAL_API_KEY=$TEMPORAL_API_KEY \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
@@ -562,6 +568,94 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bunx wrangler deploy
+
+  agent-worker-changes:
+    name: Detect Agent Worker Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      worker: ${{ steps.filter.outputs.worker }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            worker:
+              - 'apps/agent-worker/**'
+              - 'packages/agent-harness/**'
+              - 'packages/chat-runtime/src/harness/acp/rpcClient/**'
+              - '.github/workflows/deploy-production.yml'
+
+  # A rollout restarts the worker; turns it was running resume on the new one.
+  deploy-agent-worker:
+    name: Deploy Agent Worker to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: read
+    needs: [agent-worker-changes, deploy-api]
+    if: >-
+      !cancelled() && needs.deploy-api.result == 'success' && (
+        github.event_name == 'workflow_dispatch'
+        || needs.agent-worker-changes.result != 'success'
+        || needs.agent-worker-changes.outputs.worker == 'true'
+      )
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Skip until Temporal is configured
+        id: configured
+        env:
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+        run: |
+          if [ -z "$TEMPORAL_ADDRESS" ]; then
+            echo "::notice::TEMPORAL_ADDRESS is not set; the agent worker is not deployed."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Bun
+        if: steps.configured.outputs.ready == 'true'
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        if: steps.configured.outputs.ready == 'true'
+        run: bun install --frozen --ignore-scripts
+
+      - name: Build
+        if: steps.configured.outputs.ready == 'true'
+        working-directory: apps/agent-worker
+        run: bun run build
+
+      - name: Deploy Worker with its secrets
+        if: steps.configured.outputs.ready == 'true'
+        working-directory: apps/agent-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+          TEMPORAL_NAMESPACE: ${{ secrets.TEMPORAL_NAMESPACE }}
+          TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_API_KEY }}
+        run: |
+          set -euo pipefail
+          secrets="$(mktemp)"
+          trap 'rm -f "$secrets"' EXIT
+          jq -n '{AGENT_WORKER_SECRET: env.AGENT_WORKER_SECRET, TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE, TEMPORAL_API_KEY: env.TEMPORAL_API_KEY} | with_entries(select(.value != null and .value != ""))' > "$secrets"
+          bunx wrangler deploy --secrets-file "$secrets"
 
   realtime-changes:
     name: Detect Realtime Changes
