@@ -138,6 +138,34 @@ async function autumnPlanFor(organizationId: string): Promise<{
 const notifiedFamilyKey = (organizationId: string) =>
 	`billing:notified-family:${organizationId}`;
 
+// Puts the previous family back only if no newer sync has recorded another one.
+const RESTORE_FAMILY_SCRIPT = `
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+  if ARGV[2] == "" then return redis.call("DEL", KEYS[1]) end
+  return redis.call("SET", KEYS[1], ARGV[2])
+end
+return 0`;
+
+/** Records the family under the sync lock so overlapping syncs see changes in order. */
+async function recordFamily(
+	organizationId: string,
+	family: string,
+): Promise<{ ok: true; previous: string | null } | { ok: false }> {
+	try {
+		const previous = await billingRedis.getset<string>(
+			notifiedFamilyKey(organizationId),
+			family,
+		);
+		return { ok: true, previous };
+	} catch (error) {
+		console.error(
+			`[billing/projection] ${organizationId} plan family write failed`,
+			error,
+		);
+		return { ok: false };
+	}
+}
+
 /**
  * Rewrites an organization's `subscriptions` rows: the tier from Autumn's
  * access features, the Stripe ids and periods from the Stripe subscription
@@ -151,54 +179,57 @@ export async function syncOrganizationSubscription(
 	const stripeCustomerId = await resolveStripeCustomerId(organizationId);
 	if (!stripeCustomerId) return;
 
-	let paidPlanId: string | null = null;
-	const changes = await dbWs.transaction(async (tx) => {
-		await tx.execute(
-			sql`select pg_advisory_xact_lock(hashtextextended(${`billing-sync:${organizationId}`}, 0))`,
-		);
-		const [autumnPlan, listed] = await Promise.all([
-			autumnPlanFor(organizationId),
-			stripeClient.subscriptions.list({
-				customer: stripeCustomerId,
-				status: "all",
-				limit: RECENT_STRIPE_SUBSCRIPTIONS,
-			}),
-		]);
-		const seatSubscriptions = listed.data.filter(holdsSeats);
-		const payingRows = await tx.query.subscriptions.findMany({
-			where: and(
-				eq(subscriptions.referenceId, organizationId),
-				inArray(subscriptions.status, [...ACTIVE_SUBSCRIPTION_STATUSES]),
-			),
-			columns: { stripeSubscriptionId: true },
-		});
-		paidPlanId = autumnPlan.paidPlanId;
-		const written = [];
-		for (const [index, stripeSubscription] of seatSubscriptions.entries()) {
-			const { previous, row } = await writeRow(tx, {
-				organizationId,
-				stripeSubscription,
-				autumnTier: autumnPlan.tier,
-				isLatest: index === 0,
-			});
-			if (!row) continue;
-			const organizationAlreadyPaying = payingRows.some(
-				(paying) => paying.stripeSubscriptionId !== stripeSubscription.id,
+	const { changes, catalog, plan, recorded } = await dbWs.transaction(
+		async (tx) => {
+			await tx.execute(
+				sql`select pg_advisory_xact_lock(hashtextextended(${`billing-sync:${organizationId}`}, 0))`,
 			);
-			written.push({
-				previous,
-				row,
-				stripeSubscription,
-				organizationAlreadyPaying,
+			const [autumnPlan, listed] = await Promise.all([
+				autumnPlanFor(organizationId),
+				stripeClient.subscriptions.list({
+					customer: stripeCustomerId,
+					status: "all",
+					limit: RECENT_STRIPE_SUBSCRIPTIONS,
+				}),
+			]);
+			const seatSubscriptions = listed.data.filter(holdsSeats);
+			const payingRows = await tx.query.subscriptions.findMany({
+				where: and(
+					eq(subscriptions.referenceId, organizationId),
+					inArray(subscriptions.status, [...ACTIVE_SUBSCRIPTION_STATUSES]),
+				),
+				columns: { stripeSubscriptionId: true },
 			});
-		}
-		return written;
-	});
+			const catalog = autumnPlan.paidPlanId
+				? planCatalogFromAutumn(await catalogAutumnPlans().catch(() => []))
+				: [];
+			const plan = emailPlanFor(catalog, autumnPlan.paidPlanId);
+			const written = [];
+			for (const [index, stripeSubscription] of seatSubscriptions.entries()) {
+				const { previous, row } = await writeRow(tx, {
+					organizationId,
+					stripeSubscription,
+					autumnTier: autumnPlan.tier,
+					isLatest: index === 0,
+				});
+				if (!row) continue;
+				const organizationAlreadyPaying = payingRows.some(
+					(paying) => paying.stripeSubscriptionId !== stripeSubscription.id,
+				);
+				written.push({
+					previous,
+					row,
+					stripeSubscription,
+					organizationAlreadyPaying,
+				});
+			}
+			const recorded = plan
+				? await recordFamily(organizationId, plan.family)
+				: ({ ok: false } as const);
+			return { changes: written, catalog, plan, recorded };
+		},
+	);
 
-	const catalog = paidPlanId
-		? planCatalogFromAutumn(await catalogAutumnPlans().catch(() => []))
-		: [];
-	const plan = emailPlanFor(catalog, paidPlanId);
 	let startedNoticeSent = false;
 	for (const {
 		previous,
@@ -230,28 +261,28 @@ export async function syncOrganizationSubscription(
 	}
 
 	const latest = changes[0];
-	if (!plan || !latest) return;
-	let previousFamily: string | null;
-	try {
-		previousFamily = await billingRedis.getset<string>(
-			notifiedFamilyKey(organizationId),
-			plan.family,
-		);
-	} catch (error) {
-		console.error(
-			`[billing/projection] ${organizationId} plan family read failed`,
-			error,
-		);
-		return;
-	}
-	const upgradedFromFamily = upgradedFrom(catalog, previousFamily, plan);
-	if (upgradedFromFamily && !startedNoticeSent) {
-		await notifyPlanUpgraded({
-			subscription: latest.row,
-			stripeSubscription: latest.stripeSubscription,
-			plan,
-			previousFamily: upgradedFromFamily,
-		});
+	if (!plan || !latest || !recorded.ok || startedNoticeSent) return;
+	const upgradedFromFamily = upgradedFrom(catalog, recorded.previous, plan);
+	if (!upgradedFromFamily) return;
+	const sent = await notifyPlanUpgraded({
+		subscription: latest.row,
+		stripeSubscription: latest.stripeSubscription,
+		plan,
+		previousFamily: upgradedFromFamily,
+	});
+	if (!sent) {
+		await billingRedis
+			.eval(
+				RESTORE_FAMILY_SCRIPT,
+				[notifiedFamilyKey(organizationId)],
+				[plan.family, recorded.previous ?? ""],
+			)
+			.catch((error) =>
+				console.error(
+					`[billing/projection] ${organizationId} plan family restore failed`,
+					error,
+				),
+			);
 	}
 }
 

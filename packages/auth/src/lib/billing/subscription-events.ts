@@ -106,15 +106,15 @@ export async function notifyPlanUpgraded({
 	stripeSubscription: Stripe.Subscription;
 	plan: EmailPlan;
 	previousFamily: PlanFamily;
-}): Promise<void> {
+}): Promise<boolean> {
 	try {
 		const org = await db.query.organizations.findFirst({
 			where: eq(authSchema.organizations.id, subscription.referenceId),
 		});
-		if (!org) return;
+		if (!org) return true;
 		const owners = await getOrganizationOwners(subscription.referenceId);
 		const { billingInterval, amount } = seatPrice(stripeSubscription);
-		await resend.batch.send(
+		const { error } = await resend.batch.send(
 			owners.map((owner) => ({
 				from: NOREPLY_FROM,
 				to: owner.email,
@@ -132,11 +132,14 @@ export async function notifyPlanUpgraded({
 				}),
 			})),
 		);
+		if (error) throw new Error(error.message);
+		return true;
 	} catch (error) {
 		console.error(
 			`[billing/plan-upgraded] ${subscription.referenceId} upgrade notice failed`,
 			error,
 		);
+		return false;
 	}
 }
 
