@@ -657,9 +657,13 @@ suite("agent access against a migrated PostgreSQL", () => {
 					turn.promptId === dropped?.id ||
 					turn.steerPromptIds.includes(dropped?.id ?? ""),
 			).length;
-		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client);
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
 		expect(await reached()).toBe(1);
-		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client);
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
 		expect(await reached()).toBe(1);
 	});
 
@@ -670,7 +674,9 @@ suite("agent access against a migrated PostgreSQL", () => {
 			.set({ startedAt: minutesAgo(10) })
 			.where(eq(schema.agentTurns.id, turn.id));
 		const { reconcileDevs } = await import("./reconcile");
-		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client);
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
 		const turns = await turnsOf(agent.id);
 		expect(turns.find((row) => row.id === turn.id)).toMatchObject({
 			status: "failed",
@@ -681,6 +687,21 @@ suite("agent access against a migrated PostgreSQL", () => {
 		).toBe(true);
 	});
 
+	test("the reconciler settles a lost turn older than an hour without sending it again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(120) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
+		const turns = await turnsOf(agent.id);
+		expect(turns).toHaveLength(1);
+		expect(turns[0]).toMatchObject({ status: "failed", errorCode: "lost" });
+	});
+
 	test("the reconciler terminates a session workflow whose workflow task keeps failing", async () => {
 		const { turn } = await agentWithChannel(admin);
 		await db
@@ -689,7 +710,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 			.where(eq(schema.agentTurns.id, turn.id));
 		const { reconcileDevs } = await import("./reconcile");
 		const temporal = fakeTemporal({ status: "RUNNING", failedTasks: 5 });
-		await reconcileDevs(temporal.client);
+		await reconcileDevs(temporal.client, { organizationId: orgId });
 		expect(temporal.terminated).toContain(`session/${turn.sessionId}`);
 		const [row] = await turnsOf(turn.agentId);
 		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });

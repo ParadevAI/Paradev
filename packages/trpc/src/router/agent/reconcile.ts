@@ -30,10 +30,11 @@ export interface ReconcileReport {
  * a DM or mention that never became a turn is sent again; a session
  * workflow whose workflow task keeps failing is terminated; and a turn the
  * database says is running but its workflow is not is settled as lost, its
- * messages are sent again, and a task's parent hears about it.
+ * messages are sent again if it is recent, and a task's parent hears about it.
  */
 export async function reconcileDevs(
 	temporal: Client,
+	{ organizationId }: { organizationId?: string } = {},
 ): Promise<ReconcileReport> {
 	const report: ReconcileReport = { redelivered: 0, terminated: 0, lost: 0 };
 	const count = (fix: ReconcileFix, details: Record<string, unknown>) => {
@@ -46,7 +47,7 @@ export async function reconcileDevs(
 		});
 	};
 
-	for (const message of await undeliveredMessages()) {
+	for (const message of await undeliveredMessages(organizationId)) {
 		await startTurnsForMessage(
 			{ id: message.channelId, kind: message.channelKind },
 			message,
@@ -55,7 +56,7 @@ export async function reconcileDevs(
 		count("redelivered", { messageId: message.id });
 	}
 
-	for (const turn of await staleRunningTurns()) {
+	for (const turn of await staleRunningTurns(organizationId)) {
 		const workflow = temporal.workflow.getHandle(
 			sessionWorkflowId(turn.sessionId),
 		);
@@ -66,7 +67,7 @@ export async function reconcileDevs(
 		}
 		if (state === "healthy") continue;
 		if (await settleLost(turn.id)) {
-			await sendAgain(turn);
+			if (turn.recent) await sendAgain(turn);
 			await afterTaskTurn(turn.id);
 			count("lost", { turnId: turn.id, sessionId: turn.sessionId });
 		}
@@ -74,7 +75,7 @@ export async function reconcileDevs(
 	return report;
 }
 
-async function undeliveredMessages() {
+async function undeliveredMessages(organizationId: string | undefined) {
 	const { rows } = await db.execute<{
 		id: string;
 		channelId: string;
@@ -95,6 +96,7 @@ async function undeliveredMessages() {
 		where m.created_at between now() - ${DELIVERY_WINDOW}::interval and now() - ${DELIVERY_GRACE}::interval
 			and m.deleted_at is null and m.subtype is null
 			and (c.kind = 'dm' or a.id = any(m.mentioned_ids))
+			${organizationId ? sql`and c.organization_id = ${organizationId}` : sql``}
 			and not exists (
 				select 1 from agent_turns t
 				where t.agent_id = a.id
@@ -105,7 +107,7 @@ async function undeliveredMessages() {
 	return rows;
 }
 
-function staleRunningTurns() {
+function staleRunningTurns(organizationId: string | undefined) {
 	return db
 		.select({
 			id: agentTurns.id,
@@ -114,11 +116,15 @@ function staleRunningTurns() {
 			reason: agentTurns.reason,
 			promptId: agentTurns.promptId,
 			steerPromptIds: agentTurns.steerPromptIds,
+			recent: sql<boolean>`${agentTurns.startedAt} > now() - ${DELIVERY_WINDOW}::interval`,
 		})
 		.from(agentTurns)
 		.where(
 			and(
 				eq(agentTurns.status, "running"),
+				organizationId
+					? eq(agentTurns.organizationId, organizationId)
+					: undefined,
 				sql`${agentTurns.startedAt} < now() - ${TURN_GRACE}::interval`,
 			),
 		)
