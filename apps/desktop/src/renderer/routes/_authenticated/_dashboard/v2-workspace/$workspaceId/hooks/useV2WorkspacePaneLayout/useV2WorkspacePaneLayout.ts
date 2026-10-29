@@ -1,17 +1,19 @@
-import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
+import type { WorkspaceState } from "@superset/panes";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect, useMemo, useRef } from "react";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { registerV2PaneLayoutStore } from "renderer/stores/v2-pane-layout-stores";
+import {
+	type PaneLayoutSlot,
+	registerV2PaneLayoutStore,
+} from "renderer/stores/v2-pane-layout-stores";
 import {
 	applyRememberedV2PaneSelection,
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
 import type { PaneViewerData } from "../../types";
-import { getPaneKey } from "../../utils/getPaneKey";
-import { placeInTabs } from "./utils/placeInTabs";
+import { createPaneLayoutStore } from "./utils/createPaneLayoutStore";
 import {
 	getSharedPaneLayoutSnapshot,
 	preserveLocalPaneSelection,
@@ -26,8 +28,6 @@ const EMPTY_STATE: WorkspaceState<PaneViewerData> = {
 function getSnapshot(state: WorkspaceState<PaneViewerData>): string {
 	return getSharedPaneLayoutSnapshot(state);
 }
-
-export type PaneLayoutSlot = "paneLayout" | "rightPaneLayout";
 
 export function useV2WorkspacePaneLayout({
 	slot = "paneLayout",
@@ -61,11 +61,7 @@ export function useV2WorkspacePaneLayout({
 		return {
 			workspaceId,
 			seededSnapshot: getSnapshot(seededLayout),
-			store: createWorkspaceStore<PaneViewerData>({
-				initialState: seededLayout,
-				getPaneKey,
-				...(slot === "rightPaneLayout" ? { placePane: placeInTabs } : {}),
-			}),
+			store: createPaneLayoutStore(slot, seededLayout),
 		};
 	}, [collections, workspaceId, slot, selectionKey]);
 	const { store } = workspaceRuntime;
@@ -125,10 +121,10 @@ export function useV2WorkspacePaneLayout({
 			);
 	}, [persistedPaneLayout, store, isLayoutReady]);
 
-	useEffect(() => {
-		if (slot !== "paneLayout") return;
-		return registerV2PaneLayoutStore(workspaceId, store);
-	}, [store, workspaceId, slot]);
+	useEffect(
+		() => registerV2PaneLayoutStore(workspaceId, store, slot),
+		[store, workspaceId, slot],
+	);
 
 	useEffect(() => {
 		const unsubscribe = store.subscribe((nextStore) => {
