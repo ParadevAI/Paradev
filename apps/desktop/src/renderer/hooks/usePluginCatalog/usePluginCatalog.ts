@@ -60,14 +60,16 @@ function toCatalogPlugin(
 	};
 }
 
-/** Changes arrive as realtime nudges; this only bounds how long a missed one can go unseen. */
-const PLUGIN_CATALOG_STALE_MS = 30 * 60_000;
+/** Changes arrive as realtime nudges; a window focus after this long also refetches, in case one was missed. */
+const PLUGIN_CATALOG_STALE_MS = 5 * 60_000;
+
+export const INCLUDE_ORGANIZATION = { includeOrganization: true };
 
 export function usePluginCatalog() {
 	const { data: session } = authClient.useSession();
 	const userId = session?.user?.id ?? null;
 
-	const query = cloudTrpc.plugins.list.useQuery(undefined, {
+	const query = cloudTrpc.plugins.list.useQuery(INCLUDE_ORGANIZATION, {
 		enabled: Boolean(userId),
 		staleTime: PLUGIN_CATALOG_STALE_MS,
 		refetchOnWindowFocus: true,

@@ -2562,9 +2562,6 @@ msgstr "Thợ lắp ráp ẩn danh"
 msgid "another device"
 msgstr "thiết bị khác"
 
-msgid "Another repository..."
-msgstr "Kho lưu trữ khác..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Trả lời các câu hỏi trong terminal bên dưới, chẳng hạn mật khẩu."
 
@@ -4885,6 +4882,10 @@ msgstr "Kết nối để thao tác với pull request dưới tên của bạn 
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Kết nối tài khoản {pluginLabel} của bạn, sau đó tải lại trang này."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Kết nối tài khoản GitHub của bạn để thêm kho; việc đồng bộ đọc kho bằng tài khoản của bạn"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Kết nối tài khoản GitHub của bạn để tải pull request này dưới tên của bạn."
@@ -15082,8 +15083,8 @@ msgstr "Gỡ {label}?"
 msgid "Remove {name}"
 msgstr "Xóa {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn và khỏi mọi thành viên đã cài."
 
 msgid "Remove attachment"
 msgstr "Xóa tệp đính kèm"
@@ -16448,9 +16449,6 @@ msgstr "Chọn một dự án để xem pull request."
 msgid "Select a pull request to preview it here."
 msgstr "Chọn một pull request để xem trước ở đây."
 
-msgid "Select a repository"
-msgstr "Chọn một repository"
-
 msgid "Select a team"
 msgstr "Chọn một nhóm"
 
@@ -16777,6 +16775,9 @@ msgstr "Thiết lập dự án này cho Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Thiết lập tổ chức của bạn để bắt đầu"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Đặt lại một plugin đã cài thành Khả dụng thì mọi người vẫn giữ bản của mình; sau đó họ có thể gỡ. Không khả dụng sẽ gỡ nó."
 
 msgid "Setting saved"
 msgstr "Đã lưu cài đặt"
@@ -18106,6 +18107,9 @@ msgstr "Đã đồng bộ {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Đang đồng bộ..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Đồng bộ dưới tên @{syncsAs}"
 
 msgid "System"
 msgstr "Hệ thống"

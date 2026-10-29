@@ -2562,9 +2562,6 @@ msgstr "Anonieme Assembleur"
 msgid "another device"
 msgstr "een ander apparaat"
 
-msgid "Another repository..."
-msgstr "Een andere repository..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantwoord vragen in de terminal hieronder, zoals een wachtwoord."
 
@@ -4885,6 +4882,10 @@ msgstr "Koppel om pull requests met je eigen account te beheren in plaats van vi
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Verbind je {pluginLabel}-account en laad deze pagina daarna opnieuw."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Koppel je GitHub-account om een repository toe te voegen; synchronisaties lezen hem met jouw account"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Koppel je GitHub-account om deze pull request met je eigen account te laden."
@@ -15082,8 +15083,8 @@ msgstr "{label} verwijderen?"
 msgid "Remove {name}"
 msgstr "{name} verwijderen"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie verwijderd."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie en bij elk lid dat ze heeft geïnstalleerd verwijderd."
 
 msgid "Remove attachment"
 msgstr "Bijlage verwijderen"
@@ -16448,9 +16449,6 @@ msgstr "Kies een project om pull requests te zien."
 msgid "Select a pull request to preview it here."
 msgstr "Kies een pull request om hem hier te bekijken."
 
-msgid "Select a repository"
-msgstr "Selecteer een repository"
-
 msgid "Select a team"
 msgstr "Kies een team"
 
@@ -16777,6 +16775,9 @@ msgstr "Dit project instellen voor Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Stel je organisatie in om te beginnen"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Zet je een geïnstalleerde plugin terug op Beschikbaar, dan houdt iedereen zijn kopie en kan die daarna verwijderen. Niet beschikbaar verwijdert hem."
 
 msgid "Setting saved"
 msgstr "Instelling opgeslagen"
@@ -18106,6 +18107,9 @@ msgstr "Gesynchroniseerd {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Synchroniseren..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Synchroniseert als @{syncsAs}"
 
 msgid "System"
 msgstr "Systeem"

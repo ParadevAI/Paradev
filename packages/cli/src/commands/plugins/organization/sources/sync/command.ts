@@ -4,7 +4,7 @@ import { resolveSource } from "../../../../../lib/plugins/organization-sources";
 
 export default command({
 	sandbox: false,
-	description: "Sync a source now instead of waiting for the daily sync",
+	description: "Sync a source with its repository now",
 	args: [positional("source").required().desc("Source id or owner/name")],
 	run: async ({ ctx, args }) => {
 		const source = await resolveSource(ctx.api, args.source as string);

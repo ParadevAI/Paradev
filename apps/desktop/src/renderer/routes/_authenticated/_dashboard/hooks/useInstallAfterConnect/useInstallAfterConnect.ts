@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { INCLUDE_ORGANIZATION } from "renderer/hooks/usePluginCatalog";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePluginMutations } from "../usePluginMutations";
 
@@ -13,7 +14,7 @@ export function useInstallAfterConnect() {
 			if (inFlight.current.has(pluginName)) return;
 			inFlight.current.add(pluginName);
 			try {
-				const rows = await utils.plugins.list.fetch(undefined, {
+				const rows = await utils.plugins.list.fetch(INCLUDE_ORGANIZATION, {
 					staleTime: 0,
 				});
 				const row = rows.find((entry) => entry.name === pluginName);

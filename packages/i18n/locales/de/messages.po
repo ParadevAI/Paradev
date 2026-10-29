@@ -2562,9 +2562,6 @@ msgstr "Anonymer Monteur"
 msgid "another device"
 msgstr "ein anderes Gerät"
 
-msgid "Another repository..."
-msgstr "Anderes Repository..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantworte Fragen im Terminal unten, zum Beispiel nach einem Passwort."
 
@@ -4885,6 +4882,10 @@ msgstr "Verbinde dich, damit Pull Requests mit deinem eigenen Konto statt über 
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Verbinde dein {pluginLabel}-Konto und lade diese Seite dann neu."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Verbinden Sie Ihr GitHub-Konto, um ein Repository hinzuzufügen; Synchronisierungen lesen es mit Ihrem Konto"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Verbinde dein GitHub-Konto, um diesen Pull Request mit deinem Konto zu laden."
@@ -15082,8 +15083,8 @@ msgstr "{label} entfernen?"
 msgid "Remove {name}"
 msgstr "{name} entfernen"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} entfernen? Alle daraus synchronisierten Plugins werden aus Ihrer Organisation entfernt."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "{repo} entfernen? Alle daraus synchronisierten Plugins werden aus Ihrer Organisation und bei allen Mitgliedern entfernt, die sie installiert haben."
 
 msgid "Remove attachment"
 msgstr "Anhang entfernen"
@@ -16448,9 +16449,6 @@ msgstr "Wähle ein Projekt, um Pull Requests zu sehen."
 msgid "Select a pull request to preview it here."
 msgstr "Wähle einen Pull Request, um ihn hier in der Vorschau zu sehen."
 
-msgid "Select a repository"
-msgstr "Repository auswählen"
-
 msgid "Select a team"
 msgstr "Team auswählen"
 
@@ -16777,6 +16775,9 @@ msgstr "Dieses Projekt für Paradev einrichten"
 
 msgid "Set up your organization to get started"
 msgstr "Richte deine Organisation ein, um loszulegen"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Wird ein installiertes Plugin wieder auf Verfügbar gesetzt, behalten alle ihre Kopie und können sie dann entfernen. Nicht verfügbar entfernt es."
 
 msgid "Setting saved"
 msgstr "Einstellung gespeichert"
@@ -18106,6 +18107,9 @@ msgstr "Synchronisiert {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Wird synchronisiert..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Synchronisiert als @{syncsAs}"
 
 msgid "System"
 msgstr "System"

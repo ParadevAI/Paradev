@@ -20,7 +20,7 @@ export default command({
 		});
 		return {
 			data: source,
-			message: `Added ${source.repo}. It syncs daily; see what it brought: superset plugins organization list`,
+			message: `Added ${source.repo}. It is syncing now; see what it brought: superset plugins organization list`,
 		};
 	},
 });

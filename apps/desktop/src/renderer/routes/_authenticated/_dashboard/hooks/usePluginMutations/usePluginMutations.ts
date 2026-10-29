@@ -6,6 +6,7 @@ import {
 } from "@superset/shared/plugins";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
+import { INCLUDE_ORGANIZATION } from "renderer/hooks/usePluginCatalog";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { posthog } from "renderer/lib/posthog";
@@ -36,7 +37,7 @@ export function usePluginMutations() {
 
 	const wasDisabled = (name: string, marketplace?: string) =>
 		utils.plugins.list
-			.getData()
+			.getData(INCLUDE_ORGANIZATION)
 			?.some(
 				(row) =>
 					row.name === name &&
@@ -105,17 +106,24 @@ export function usePluginMutations() {
 	const uninstallMutation = electronTrpc.plugins.uninstall.useMutation({
 		onSuccess: async (_data, variables) => {
 			let disconnected = 0;
+			const organizationId = variables.marketplace
+				? organizationIdOfMarketplace(variables.marketplace)
+				: null;
 			try {
 				const result = await accountUninstall.mutateAsync({
 					name: variables.name,
 					marketplace: variables.marketplace,
 				});
 				disconnected = result.disconnected;
-				const organizationId = variables.marketplace
-					? organizationIdOfMarketplace(variables.marketplace)
-					: null;
 				if (organizationId) await machineSync.mutateAsync({ organizationId });
 			} catch (error) {
+				if (organizationId) {
+					await invalidate();
+					toast.error(t({ message: "Uninstall failed" }), {
+						description: errorMessage(error),
+					});
+					return;
+				}
 				toast.warning(
 					t({
 						message: `${displayName(variables.name)} is set up on this machine, but not on your account`,

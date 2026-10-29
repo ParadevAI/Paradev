@@ -189,7 +189,7 @@ async function connectFirst({
 	inputs: string | undefined;
 	noWait: boolean;
 }): Promise<ConnectFirst> {
-	const catalog = await api.plugins.list.query();
+	const catalog = await api.plugins.list.query({ includeOrganization: true });
 	const slug = catalog.find(
 		(entry) =>
 			entry.name === name &&

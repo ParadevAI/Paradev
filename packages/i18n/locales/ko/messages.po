@@ -2562,9 +2562,6 @@ msgstr "익명의 조립공"
 msgid "another device"
 msgstr "다른 기기"
 
-msgid "Another repository..."
-msgstr "다른 저장소..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "아래 터미널에서 비밀번호 등 질문에 답하세요."
 
@@ -4885,6 +4882,10 @@ msgstr "연결하면 워크스페이스가 아닌 본인 계정으로 풀 리퀘
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} 계정을 연결한 다음 이 페이지를 새로 고치세요."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "저장소를 추가하려면 GitHub 계정을 연결하세요. 동기화는 내 계정으로 읽습니다"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "이 풀 리퀘스트를 본인 계정으로 불러오려면 GitHub 계정을 연결하세요."
@@ -15082,8 +15083,8 @@ msgstr "{label}을(를) 제거할까요?"
 msgid "Remove {name}"
 msgstr "{name} 제거"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직에서 제거됩니다."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직과 설치한 모든 구성원에게서 제거됩니다."
 
 msgid "Remove attachment"
 msgstr "첨부 파일 제거"
@@ -16448,9 +16449,6 @@ msgstr "풀 리퀘스트를 보려면 프로젝트를 선택하세요."
 msgid "Select a pull request to preview it here."
 msgstr "풀 리퀘스트를 선택하면 여기에서 미리 볼 수 있습니다."
 
-msgid "Select a repository"
-msgstr "리포지토리 선택"
-
 msgid "Select a team"
 msgstr "팀 선택"
 
@@ -16777,6 +16775,9 @@ msgstr "이 프로젝트를 Paradev에 맞게 설정하기"
 
 msgid "Set up your organization to get started"
 msgstr "조직을 설정하고 시작하세요"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "설치된 플러그인을 다시 사용 가능으로 바꾸면 모두의 사본은 그대로 남고, 이후 각자 제거할 수 있습니다. 사용 불가로 바꾸면 제거됩니다."
 
 msgid "Setting saved"
 msgstr "설정이 저장되었습니다"
@@ -18106,6 +18107,9 @@ msgstr "{syncedAgo} 동기화됨"
 
 msgid "Syncing..."
 msgstr "동기화하는 중..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "@{syncsAs}(으)로 동기화"
 
 msgid "System"
 msgstr "시스템"

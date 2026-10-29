@@ -12,11 +12,7 @@ import {
 } from "@superset/shared/plugins/bundle";
 import type { ApiClient } from "../api-client";
 import { readInstalledPlugins, writeInstalledPlugins } from "./host";
-import {
-	type InstallPluginResult,
-	recordPlugin,
-	removePlugin,
-} from "./install";
+import { type InstallPluginResult, recordPlugin } from "./install";
 
 function parseManifest(raw: Uint8Array | undefined): unknown {
 	try {
@@ -29,6 +25,7 @@ function parseManifest(raw: Uint8Array | undefined): unknown {
 export async function installOrganizationPlugin(
 	api: ApiClient,
 	name: string,
+	options: { provision?: boolean } = {},
 ): Promise<InstallPluginResult> {
 	const download = await api.plugins.organization.bundle.query({ name });
 	const bundle = Buffer.from(download.bundle, "base64");
@@ -45,13 +42,16 @@ export async function installOrganizationPlugin(
 		files,
 		executable,
 	);
-	return await recordPlugin({
-		name: download.name,
-		marketplace: download.marketplace,
-		version: download.version,
-		installPath,
-		tools: manifestHasTools(parseManifest(files.get("plugin.json"))),
-	});
+	return await recordPlugin(
+		{
+			name: download.name,
+			marketplace: download.marketplace,
+			version: download.version,
+			installPath,
+			tools: manifestHasTools(parseManifest(files.get("plugin.json"))),
+		},
+		options,
+	);
 }
 
 function dropFromLedger(
@@ -89,7 +89,11 @@ async function dropRevokedElsewhere(
 	for (const organizationId of organizationIds) {
 		const marketplace = organizationMarketplace(organizationId);
 		const wanted = new Set(
-			(await apiFor(organizationId).plugins.list.query())
+			(
+				await apiFor(organizationId).plugins.list.query({
+					includeOrganization: true,
+				})
+			)
 				.filter(
 					(plugin) => plugin.installed && plugin.marketplace === marketplace,
 				)
@@ -136,9 +140,9 @@ export async function reconcileOrganizationPlugins(
 	if (!organization) return { installed: [], removed: forgotten, failed: [] };
 	const marketplace = organizationMarketplace(organization.id);
 
-	const wanted = (await api.plugins.list.query()).filter(
-		(plugin) => plugin.installed && plugin.marketplace === marketplace,
-	);
+	const wanted = (
+		await api.plugins.list.query({ includeOrganization: true })
+	).filter((plugin) => plugin.installed && plugin.marketplace === marketplace);
 	const local = readInstalledPlugins().filter(
 		(plugin) => plugin.marketplace === marketplace,
 	);
@@ -152,16 +156,18 @@ export async function reconcileOrganizationPlugins(
 		const here = local.find((entry) => entry.name === plugin.name);
 		if (here?.installPath && here.version === plugin.latestVersion) continue;
 		try {
-			await installOrganizationPlugin(api, plugin.name);
+			await installOrganizationPlugin(api, plugin.name, { provision: false });
 			result.installed.push(plugin.name);
 		} catch {
 			result.failed.push(plugin.name);
 		}
 	}
-	for (const entry of local) {
-		if (wanted.some((plugin) => plugin.name === entry.name)) continue;
-		await removePlugin(entry.name, marketplace);
-		result.removed.push(entry.name);
-	}
+	result.removed.push(
+		...dropFromLedger(
+			(entry) =>
+				entry.marketplace === marketplace &&
+				!wanted.some((plugin) => plugin.name === entry.name),
+		),
+	);
 	return result;
 }

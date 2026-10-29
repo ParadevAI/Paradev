@@ -98,13 +98,19 @@ stub(db, {
 		},
 	}),
 	update: () => ({
-		set: (values: { installPolicy: Record<string, string> }) => ({
+		set: (values: { installPolicy: SQL }) => ({
 			where: (condition: SQL) => ({
 				returning: async () => {
 					const { params } = dialect.sqlToQuery(condition);
 					const row = plugins.find((p) => params.includes(p.name));
 					if (!row) return [];
-					row.installPolicy = values.installPolicy;
+					const patch = dialect
+						.sqlToQuery(values.installPolicy)
+						.params.find((p) => typeof p === "string" && p.startsWith("{"));
+					row.installPolicy = {
+						...row.installPolicy,
+						...JSON.parse(patch as string),
+					};
 					return [row];
 				},
 			}),
@@ -176,6 +182,20 @@ describe("organization plugins access", () => {
 		expect(names).toEqual(["p-admins", "p-everyone"]);
 	});
 
+	test("a change to one role keeps the others another admin set", async () => {
+		role = "admin";
+		await caller.organization.setPolicy({
+			name: "p-everyone",
+			policy: { owner: "installed" },
+		});
+		expect(plugins[1]?.installPolicy).toEqual({
+			member: "available",
+			admin: "available",
+			owner: "installed",
+		});
+		expect(deletedInstalls).toEqual([]);
+	});
+
 	test("a member cannot change a plugin's access", async () => {
 		await expect(
 			caller.organization.setPolicy({
@@ -193,11 +213,6 @@ describe("organization plugins access", () => {
 			policy: { admin: "available", member: "unavailable" },
 		});
 		expect(deletedInstalls).toHaveLength(1);
-		expect(deletedInstalls[0]).toEqual([
-			"id-everyone",
-			"owner-1",
-			"member-1",
-			"member-2",
-		]);
+		expect(deletedInstalls[0]).toEqual(["id-everyone", "member-1", "member-2"]);
 	});
 });

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { createHash } from "node:crypto";
 import { db } from "@superset/db/client";
 import {
 	organizationPluginSources,
@@ -22,6 +23,7 @@ const SOURCE = {
 	syncedSha: null as string | null,
 	syncedAt: null,
 	syncError: null as string | null,
+	syncProblems: [] as { name: string; reason: string }[],
 	addedByUserId: "user-1",
 };
 
@@ -32,6 +34,7 @@ interface PluginRow {
 	name: string;
 	version: string;
 	contentHash: string;
+	sourceFingerprint?: string | null;
 	removedFromSourceAt: Date | null;
 }
 
@@ -54,9 +57,7 @@ stub(realtime, {
 	},
 });
 
-stub(credentials, {
-	sourceCredentials: async () => [{ as: "admin", token: async () => "token" }],
-});
+stub(credentials, { sourceToken: async () => "token" });
 stub(r2, {
 	putObject: async ({ key, body }: { key: string; body: Uint8Array }) => {
 		objects.set(key, body);
@@ -64,6 +65,9 @@ stub(r2, {
 	getObject: async (key: string) => {
 		const body = objects.get(key);
 		return body ? new Response(body) : null;
+	},
+	deleteObjects: async (keys: string[]) => {
+		for (const key of keys) objects.delete(key);
 	},
 });
 stub(db, {
@@ -127,6 +131,15 @@ function repo(
 		...extra,
 	});
 }
+
+/** The tree listing's blob hashes, which change exactly when a file does. */
+const blobsOf = (files: Record<string, string>) =>
+	new Map(
+		Object.entries(files).map(([path, body]) => [
+			path,
+			createHash("sha1").update(body).digest("hex"),
+		]),
+	);
 
 const marketplace = (...names: string[]) =>
 	JSON.stringify({
@@ -349,6 +362,94 @@ describe("syncOrganizationPluginSource", () => {
 		);
 		expect(result?.removed).toEqual(["gone"]);
 		expect(nudges).toEqual([`${ORG}:plugins`]);
+	});
+
+	test("a new commit downloads only the plugins whose files changed", async () => {
+		const files = {
+			".agent-marketplace.json": marketplace("tools", "notes"),
+			...plugin("tools", "1.0.0"),
+			...plugin("notes", "1.0.0"),
+		};
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", files, { blobs: blobsOf(files) }),
+		);
+		reads = [];
+		const changed = { ...files, ...plugin("notes", "1.1.0", "second") };
+
+		const result = await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-2", changed, { blobs: blobsOf(changed) }),
+		);
+
+		expect(result?.synced).toEqual(["notes"]);
+		expect(result?.unchanged).toEqual(["tools"]);
+		expect(reads.some((path) => path.startsWith("plugins/tools/"))).toBe(false);
+	});
+
+	test("a lasting problem in one plugin does not re-download the others", async () => {
+		const files = {
+			".agent-marketplace.json": marketplace("tools", "notes"),
+			...plugin("tools", "1.0.0"),
+			"plugins/notes/plugin.json": JSON.stringify({ name: "other" }),
+		};
+		const first = await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", files, { blobs: blobsOf(files) }),
+		);
+		expect(sourceWrites.at(-1)?.syncError).toBeNull();
+		expect(sourceWrites.at(-1)?.syncProblems).toEqual(first?.problems);
+		source.syncedSha = "sha-1";
+		source.syncProblems = first?.problems ?? [];
+		reads = [];
+
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", files, { blobs: blobsOf(files) }),
+		);
+
+		expect(reads.some((path) => path.startsWith("plugins/tools/"))).toBe(false);
+	});
+
+	test("a replaced version's bundle is deleted from storage", async () => {
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", {
+				".agent-marketplace.json": marketplace("tools"),
+				...plugin("tools", "1.0.0"),
+			}),
+		);
+		const firstKey = [...objects.keys()][0];
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-2", {
+				".agent-marketplace.json": marketplace("tools"),
+				...plugin("tools", "1.1.0", "second"),
+			}),
+		);
+		expect(objects.has(firstKey as string)).toBe(false);
+		expect(objects.size).toBe(1);
+	});
+
+	test("an entry with no name marks nothing as gone", async () => {
+		plugins.push({
+			id: "tools",
+			organizationId: ORG,
+			sourceId: SOURCE.id,
+			name: "tools",
+			version: "1.0.0",
+			contentHash: "old",
+			removedFromSourceAt: null,
+		});
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", {
+				".agent-marketplace.json": JSON.stringify({
+					plugins: [{ source: "./plugins/tools" }],
+				}),
+			}),
+		);
+		expect(removalParams).toEqual([]);
 	});
 
 	test("a removed source is nothing to do", async () => {

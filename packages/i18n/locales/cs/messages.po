@@ -2562,9 +2562,6 @@ msgstr "Anonymní montér"
 msgid "another device"
 msgstr "jiné zařízení"
 
-msgid "Another repository..."
-msgstr "Jiný repozitář..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpovězte na dotazy v terminálu níže, například heslo."
 
@@ -4885,6 +4882,10 @@ msgstr "Připojte se, abyste s pull requesty pracovali sami za sebe, ne jako pra
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Připojte svůj účet {pluginLabel} a pak tuto stránku znovu načtěte."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Připojte svůj účet GitHub, abyste mohli přidat repozitář; synchronizace ho čte vaším účtem"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Připojte svůj účet GitHub, aby se tento pull request načetl pod vaším jménem."
@@ -15082,8 +15083,8 @@ msgstr "Odebrat {label}?"
 msgid "Remove {name}"
 msgstr "Odebrat {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Odebrat {repo}? Všechny pluginy z něj synchronizované budou z vaší organizace odebrány."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Odebrat {repo}? Všechny pluginy z něj synchronizované budou odebrány z vaší organizace i všem členům, kteří je mají nainstalované."
 
 msgid "Remove attachment"
 msgstr "Odebrat přílohu"
@@ -16448,9 +16449,6 @@ msgstr "Vyberte projekt a uvidíte pull requesty."
 msgid "Select a pull request to preview it here."
 msgstr "Vyberte pull request a zobrazí se tady jeho náhled."
 
-msgid "Select a repository"
-msgstr "Vyberte repozitář"
-
 msgid "Select a team"
 msgstr "Vyberte tým"
 
@@ -16777,6 +16775,9 @@ msgstr "Připravit tento projekt pro Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Nastavte si organizaci a můžete začít"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Když nainstalovaný plugin vrátíte na Dostupné, všem zůstane jejich kopie; pak ji mohou odebrat. Nedostupné ho odebere."
 
 msgid "Setting saved"
 msgstr "Nastavení uloženo"
@@ -18106,6 +18107,9 @@ msgstr "Synchronizováno {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Synchronizuji..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Synchronizuje se jako @{syncsAs}"
 
 msgid "System"
 msgstr "Systémový"

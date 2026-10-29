@@ -540,14 +540,24 @@ export function ledgerWithPlugin(
 	];
 }
 
+/** Records the plugin and drops the tree of the version it replaces; `provision: false` leaves re-provisioning agents to the caller. */
 export async function recordPlugin(
 	plugin: Omit<InstallPluginResult, "skills">,
+	{ provision = true }: { provision?: boolean } = {},
 ): Promise<InstallPluginResult> {
+	const ledger = readInstalledPlugins();
+	const replaced = findInstalled(ledger, plugin.name, plugin.marketplace);
 	writeInstalledPlugins(
-		ledgerWithPlugin(readInstalledPlugins(), plugin, new Date().toISOString()),
+		ledgerWithPlugin(ledger, plugin, new Date().toISOString()),
 	);
+	if (replaced?.installPath && replaced.installPath !== plugin.installPath) {
+		fs.rmSync(replaced.installPath, { recursive: true, force: true });
+	}
 
-	return { ...plugin, skills: (await syncPlugins()).skills };
+	return {
+		...plugin,
+		skills: provision ? (await syncPlugins()).skills : 0,
+	};
 }
 
 /**

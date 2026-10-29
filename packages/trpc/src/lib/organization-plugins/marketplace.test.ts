@@ -82,6 +82,22 @@ describe("repository paths", () => {
 	});
 });
 
+describe("pluginTreeFiles with nested plugins", () => {
+	test("a plugin inside another plugin's folder is not bundled with it", () => {
+		const paths = [
+			"plugins/a/skills/one/SKILL.md",
+			"plugins/a/b/plugin.json",
+			"plugins/a/b/skills/two/SKILL.md",
+		];
+		expect([
+			...pluginTreeFiles(paths, "plugins/a", [
+				"plugins/a",
+				"plugins/a/b",
+			]).values(),
+		]).toEqual(["skills/one/SKILL.md"]);
+	});
+});
+
 describe("withVersion", () => {
 	test("a generated version changes when only an executable bit changes", () => {
 		const files = new Map([["scripts/run.sh", Buffer.from("#!/bin/sh\n")]]);

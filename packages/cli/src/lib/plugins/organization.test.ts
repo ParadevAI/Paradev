@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { readInstalledPlugins, writeInstalledPlugins } from "./host";
+import { recordPlugin } from "./install";
 import {
 	forgetOrganizationPlugins,
 	reconcileOrganizationPlugins,
@@ -103,5 +104,30 @@ describe("reconcileOrganizationPlugins", () => {
 
 		expect(result.removed).toEqual(["deploy"]);
 		expect(kept()).toEqual(["superset/linear", `${STAYED}/deploy`]);
+	});
+});
+
+describe("recordPlugin", () => {
+	test("a new version replaces the old one's folder", async () => {
+		const old = path.join(home, "plugins", "cache", STAYED, "deploy");
+		const next = path.join(home, "plugins", "cache", STAYED, "deploy-1.1.0");
+		fs.mkdirSync(next, { recursive: true });
+
+		await recordPlugin(
+			{
+				name: "deploy",
+				marketplace: STAYED,
+				version: "1.1.0",
+				installPath: next,
+			},
+			{ provision: false },
+		);
+
+		expect(fs.existsSync(old)).toBe(false);
+		expect(fs.existsSync(next)).toBe(true);
+		expect(
+			readInstalledPlugins().find((entry) => entry.marketplace === STAYED)
+				?.version,
+		).toBe("1.1.0");
 	});
 });

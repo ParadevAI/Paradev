@@ -333,181 +333,192 @@ export const pluginsRouter = createTRPCRouter({
 			}),
 		),
 
-	list: protectedProcedure.query(async ({ ctx }) => {
-		const organizationId = ctx.activeOrganizationId;
-		const role = organizationId
-			? await memberRole(ctx.session.user.id, organizationId)
-			: null;
-		if (organizationId) {
-			await ensureManagedInstalls(ctx.session.user.id, organizationId);
-		}
-		const [everyInstall, live, published] = await Promise.all([
-			db
-				.select()
-				.from(pluginInstalls)
-				.where(eq(pluginInstalls.userId, ctx.session.user.id))
-				.orderBy(asc(pluginInstalls.pluginName)),
-			db
-				.select({
-					id: connections.id,
-					connector: connections.connector,
-					account: connections.externalAccountLabel,
-					user: connections.externalUserLabel,
+	list: protectedProcedure
+		.input(
+			z
+				.object({
+					/** Released clients cannot install organization plugins, so they get none unless they ask. */
+					includeOrganization: z.boolean().optional(),
 				})
-				.from(connections)
-				.where(
-					and(
-						eq(connections.connectedByUserId, ctx.session.user.id),
-						isNull(connections.disconnectedAt),
+				.optional(),
+		)
+		.query(async ({ ctx, input }) => {
+			const organizationId = input?.includeOrganization
+				? ctx.activeOrganizationId
+				: null;
+			const role = organizationId
+				? await memberRole(ctx.session.user.id, organizationId)
+				: null;
+			if (organizationId) {
+				await ensureManagedInstalls(ctx.session.user.id, organizationId);
+			}
+			const [everyInstall, live, published] = await Promise.all([
+				db
+					.select()
+					.from(pluginInstalls)
+					.where(eq(pluginInstalls.userId, ctx.session.user.id))
+					.orderBy(asc(pluginInstalls.pluginName)),
+				db
+					.select({
+						id: connections.id,
+						connector: connections.connector,
+						account: connections.externalAccountLabel,
+						user: connections.externalUserLabel,
+					})
+					.from(connections)
+					.where(
+						and(
+							eq(connections.connectedByUserId, ctx.session.user.id),
+							isNull(connections.disconnectedAt),
+						),
 					),
-				),
-			organizationId
-				? db
-						.select()
-						.from(organizationPlugins)
-						.where(
-							and(
-								eq(organizationPlugins.organizationId, organizationId),
-								accessibleTo(role),
-							),
-						)
-						.orderBy(asc(organizationPlugins.name))
-				: [],
-		]);
+				organizationId
+					? db
+							.select()
+							.from(organizationPlugins)
+							.where(
+								and(
+									eq(organizationPlugins.organizationId, organizationId),
+									accessibleTo(role),
+								),
+							)
+							.orderBy(asc(organizationPlugins.name))
+					: [],
+			]);
 
-		const publishedById = new Map(published.map((row) => [row.id, row]));
-		const installs = everyInstall.flatMap(
-			(
-				row,
-			): ((typeof everyInstall)[number] & {
-				latest?: string;
-				managed?: boolean;
-			})[] => {
-				if (!row.organizationPluginId) return [row];
-				const current = publishedById.get(row.organizationPluginId);
-				return current
-					? [
-							{
-								...row,
-								manifest: current.manifest,
-								latest: current.version,
-								managed:
-									organizationPluginAccess(
-										current.installPolicy,
-										role ?? "",
-									) === "installed",
-							},
-						]
-					: [];
-			},
-		);
-
-		const held = new Map<
-			string,
-			{ id: string; account: string | null; user: string | null }[]
-		>();
-		for (const row of live) {
-			const list = held.get(row.connector) ?? [];
-			list.push({ id: row.id, account: row.account, user: row.user });
-			held.set(row.connector, list);
-		}
-
-		const installed = installs.map((row) => {
-			const slug = installConnector(row);
-			const held_ = slug ? (held.get(slug) ?? []) : [];
-			const latest =
-				row.marketplace === FIRST_PARTY
-					? firstPartyManifest(row.pluginName)?.version
-					: row.latest;
-			return {
-				...describe(row.manifest as PluginManifest, row.marketplace),
-				connector: slug ?? null,
-				installed: true,
-				enabled: row.enabled,
-				installedAt: row.installedAt as Date | null,
-				latestVersion: latest ?? null,
-				managed: row.managed ?? false,
-				connections: held_,
-				accounts: accountLabels(held_),
-			};
-		});
-
-		const installedKeys = new Set(
-			installs.map((row) => `${row.marketplace}/${row.pluginName}`),
-		);
-
-		const claimedByOthers = new Set(
-			installs
-				.filter((row) => row.marketplace !== FIRST_PARTY)
-				.map((row) => installConnector(row))
-				.filter((slug): slug is string => slug !== undefined),
-		);
-
-		const available = Object.values(FIRST_PARTY_MANIFESTS)
-			.filter(
-				(manifest) => !installedKeys.has(`${FIRST_PARTY}/${manifest.name}`),
-			)
-			.map((manifest) => {
-				const described = describe(
-					manifest as unknown as PluginManifest,
-					FIRST_PARTY,
-				);
-				const held_ =
-					described.connector && !claimedByOthers.has(described.connector)
-						? (held.get(described.connector) ?? [])
+			const publishedById = new Map(published.map((row) => [row.id, row]));
+			const installs = everyInstall.flatMap(
+				(
+					row,
+				): ((typeof everyInstall)[number] & {
+					latest?: string;
+					managed?: boolean;
+				})[] => {
+					if (!row.organizationPluginId) return [row];
+					const current = publishedById.get(row.organizationPluginId);
+					return current
+						? [
+								{
+									...row,
+									manifest: current.manifest,
+									latest: current.version,
+									managed:
+										organizationPluginAccess(
+											current.installPolicy,
+											role ?? "",
+										) === "installed",
+								},
+							]
 						: [];
+				},
+			);
+
+			const held = new Map<
+				string,
+				{ id: string; account: string | null; user: string | null }[]
+			>();
+			for (const row of live) {
+				const list = held.get(row.connector) ?? [];
+				list.push({ id: row.id, account: row.account, user: row.user });
+				held.set(row.connector, list);
+			}
+
+			const installed = installs.map((row) => {
+				const slug = installConnector(row);
+				const held_ = slug ? (held.get(slug) ?? []) : [];
+				const latest =
+					row.marketplace === FIRST_PARTY
+						? firstPartyManifest(row.pluginName)?.version
+						: row.latest;
 				return {
-					...described,
-					installed: false,
-					enabled: false,
-					installedAt: null as Date | null,
-					latestVersion: (manifest.version as string) ?? null,
-					managed: false,
+					...describe(row.manifest as PluginManifest, row.marketplace),
+					connector: slug ?? null,
+					installed: true,
+					enabled: row.enabled,
+					installedAt: row.installedAt as Date | null,
+					latestVersion: latest ?? null,
+					managed: row.managed ?? false,
 					connections: held_,
 					accounts: accountLabels(held_),
 				};
 			});
 
-		const claimedByAnyInstall = new Set(
-			installs
-				.map((row) => installConnector(row))
-				.filter((slug): slug is string => slug !== undefined),
-		);
+			const installedKeys = new Set(
+				installs.map((row) => `${row.marketplace}/${row.pluginName}`),
+			);
 
-		const organizationAvailable = organizationId
-			? published
-					.filter(
-						(row) =>
-							!row.removedFromSourceAt &&
-							!installedKeys.has(
-								`${organizationMarketplace(organizationId)}/${row.name}`,
-							),
-					)
-					.map((row) => {
-						const described = describe(
-							row.manifest as PluginManifest,
-							organizationMarketplace(organizationId),
-						);
-						const held_ =
-							described.connector &&
-							!claimedByAnyInstall.has(described.connector)
-								? (held.get(described.connector) ?? [])
-								: [];
-						return {
-							...described,
-							installed: false,
-							enabled: false,
-							installedAt: null as Date | null,
-							latestVersion: row.version as string | null,
-							managed: false,
-							connections: held_,
-							accounts: accountLabels(held_),
-						};
-					})
-			: [];
+			const claimedByOthers = new Set(
+				installs
+					.filter((row) => row.marketplace !== FIRST_PARTY)
+					.map((row) => installConnector(row))
+					.filter((slug): slug is string => slug !== undefined),
+			);
 
-		return [...installed, ...available, ...organizationAvailable];
-	}),
+			const available = Object.values(FIRST_PARTY_MANIFESTS)
+				.filter(
+					(manifest) => !installedKeys.has(`${FIRST_PARTY}/${manifest.name}`),
+				)
+				.map((manifest) => {
+					const described = describe(
+						manifest as unknown as PluginManifest,
+						FIRST_PARTY,
+					);
+					const held_ =
+						described.connector && !claimedByOthers.has(described.connector)
+							? (held.get(described.connector) ?? [])
+							: [];
+					return {
+						...described,
+						installed: false,
+						enabled: false,
+						installedAt: null as Date | null,
+						latestVersion: (manifest.version as string) ?? null,
+						managed: false,
+						connections: held_,
+						accounts: accountLabels(held_),
+					};
+				});
+
+			const claimedByAnyInstall = new Set(
+				installs
+					.map((row) => installConnector(row))
+					.filter((slug): slug is string => slug !== undefined),
+			);
+
+			const organizationAvailable = organizationId
+				? published
+						.filter(
+							(row) =>
+								!row.removedFromSourceAt &&
+								!installedKeys.has(
+									`${organizationMarketplace(organizationId)}/${row.name}`,
+								),
+						)
+						.map((row) => {
+							const described = describe(
+								row.manifest as PluginManifest,
+								organizationMarketplace(organizationId),
+							);
+							const held_ =
+								described.connector &&
+								!claimedByAnyInstall.has(described.connector)
+									? (held.get(described.connector) ?? [])
+									: [];
+							return {
+								...described,
+								installed: false,
+								enabled: false,
+								installedAt: null as Date | null,
+								latestVersion: row.version as string | null,
+								managed: false,
+								connections: held_,
+								accounts: accountLabels(held_),
+							};
+						})
+				: [];
+
+			return [...installed, ...available, ...organizationAvailable];
+		}),
 
 	install: protectedProcedure
 		.input(

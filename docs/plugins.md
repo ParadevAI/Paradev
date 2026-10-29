@@ -146,16 +146,26 @@ Bundles go to the
 private R2 bucket; each plugin is a row in `organization_plugins` under a marketplace named
 `organization-<organization id>`. Two organizations' same-named plugins never share an install.
 
-Sync runs daily from a QStash schedule that queues one job per source, or on demand with "Sync now".
-It reads the repository with the GitHub account of the admin who added the source, while that admin
-is still an admin with GitHub connected, and then with the organization's GitHub App. A plugin that
-fails to sync keeps its last good version. A plugin that leaves the repository is marked "No longer
-in source" and is not deleted. Changed content that reuses a declared version is refused.
+Sync runs when an admin adds a source and when they click "Sync now" (or run
+`superset plugins organization sources sync`); there is no schedule. Like Codex, it reads the
+repository only with the GitHub account of the admin who added the source, while that admin is still
+an admin with GitHub connected; Settings shows it as "Syncs as @login". To take a source over,
+another admin adds the same repository again. A plugin whose files did not change, by the blob
+hashes in the tree listing, is not downloaded again. A plugin that fails to sync keeps its last good
+version, and its problem is listed on the source. A plugin that leaves the repository is marked "No
+longer in source": members who have it keep it, but it is not offered or installed anew. Changed
+content that reuses a declared version is refused. Removing a source removes its plugins from the
+organization and from every member.
 
 Each plugin has an access policy per role (owner, admin, member): `unavailable`, `available` or
 `installed`. A new plugin is available to owners and admins only. `installed` gives every member of
-the role an install that they can disable but not remove. Every read path checks the policy: the
-catalog, install, bundle download, the tool proxy and the cloud workspace plugin list.
+the role an install that they can disable but not remove; setting it back to `available` keeps those
+installs, and `unavailable` removes them. A policy change only touches the roles it names. Every read
+path checks the policy in the plugin's own organization: the catalog, install, bundle download, the
+tool proxy and the cloud workspace plugin list. A machine keeps the plugins of every organization the
+member belongs to, and the proxy serves them whichever organization is active. `plugins.list`
+returns organization plugins only to clients that pass `includeOrganization`, because released
+clients cannot install them.
 
 A plugin may have only skills. A plugin with tools must name a connector that has a tool server of
 its own, or give an `https` `mcp.url` that is not a private or internal address. It cannot take a

@@ -72,7 +72,7 @@ export function PluginSources() {
 		alert({
 			title: t({ message: "Remove repository" }),
 			description: t({
-				message: `Remove ${repo}? Every plugin synced from it is removed from your organization.`,
+				message: `Remove ${repo}? Every plugin synced from it is removed from your organization and from every member who has it installed.`,
 			}),
 			actions: [
 				{ label: t({ message: "Cancel" }), variant: "outline" },
@@ -128,7 +128,13 @@ export function PluginSources() {
 			) : (
 				<div className="divide-y divide-border">
 					{sources.map((source) => {
-						const errors = source.syncError?.split("\n").filter(Boolean) ?? [];
+						const errors = [
+							...(source.syncError?.split("\n").filter(Boolean) ?? []),
+							...(source.syncProblems ?? []).map(
+								(problem) => `${problem.name}: ${problem.reason}`,
+							),
+						];
+						const syncsAs = source.syncsAsGithubLogin;
 						const ref = source.ref ?? t({ message: "Default branch" });
 						const path = source.path || "/";
 						const syncedAgo = source.syncedAt
@@ -150,6 +156,12 @@ export function PluginSources() {
 											<Trans>Synced {syncedAgo}</Trans>
 										) : (
 											<Trans>Not synced yet</Trans>
+										)}
+										{syncsAs && (
+											<>
+												{" · "}
+												<Trans>Syncs as @{syncsAs}</Trans>
+											</>
 										)}
 									</div>
 									{errors.length > 0 && (

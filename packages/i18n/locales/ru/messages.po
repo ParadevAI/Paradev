@@ -2562,9 +2562,6 @@ msgstr "Анонимный сборщик"
 msgid "another device"
 msgstr "другое устройство"
 
-msgid "Another repository..."
-msgstr "Другой репозиторий..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Отвечайте на вопросы в терминале ниже, например введите пароль."
 
@@ -4885,6 +4882,10 @@ msgstr "Подключитесь, чтобы работать с пул-рекв
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Подключите аккаунт {pluginLabel}, затем перезагрузите эту страницу."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Подключите свой аккаунт GitHub, чтобы добавить репозиторий; синхронизация читает его с вашим аккаунтом"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Подключите свой аккаунт GitHub, чтобы загрузить этот пул-реквест от своего имени."
@@ -15082,8 +15083,8 @@ msgstr "Удалить {label}?"
 msgid "Remove {name}"
 msgstr "Удалить {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Удалить {repo}? Все синхронизированные из него плагины будут удалены из вашей организации."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Удалить {repo}? Все синхронизированные из него плагины будут удалены из вашей организации и у всех участников, которые их установили."
 
 msgid "Remove attachment"
 msgstr "Удалить вложение"
@@ -16448,9 +16449,6 @@ msgstr "Выберите проект, чтобы видеть пул-рекве
 msgid "Select a pull request to preview it here."
 msgstr "Выберите пул-реквест, чтобы посмотреть его здесь."
 
-msgid "Select a repository"
-msgstr "Выберите репозиторий"
-
 msgid "Select a team"
 msgstr "Выберите команду"
 
@@ -16777,6 +16775,9 @@ msgstr "Настроить этот проект под Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Настройте организацию, чтобы начать"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Если вернуть установленный плагин в «Доступен», у всех останется их копия, и её можно будет удалить. «Недоступен» удаляет его."
 
 msgid "Setting saved"
 msgstr "Настройка сохранена"
@@ -18106,6 +18107,9 @@ msgstr "Синхронизировано {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Синхронизация..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Синхронизируется как @{syncsAs}"
 
 msgid "System"
 msgstr "Системная"

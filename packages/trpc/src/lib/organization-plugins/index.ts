@@ -16,6 +16,5 @@ export {
 } from "./rules";
 export {
 	type SourceSyncResult,
-	syncAllOrganizationPluginSources,
 	syncOrganizationPluginSource,
 } from "./sync";

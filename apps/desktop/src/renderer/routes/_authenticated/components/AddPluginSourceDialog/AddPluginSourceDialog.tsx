@@ -11,21 +11,12 @@ import {
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
-const OTHER_REPOSITORY = "__other__";
-const REPOSITORY_PATTERN = /^[\w.-]+\/[\w.-]+$/;
+const REPOSITORY_PATTERN = /^(?!\.{1,2}\/)[\w.-]+\/(?!\.{1,2}$)[\w.-]+$/;
 
 interface AddPluginSourceDialogProps {
 	open: boolean;
@@ -38,36 +29,14 @@ export function AddPluginSourceDialog({
 }: AddPluginSourceDialogProps) {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
-	const organizationId = useActiveOrganizationId();
-	const [repo, setRepo] = useState("");
 	const [typedRepo, setTypedRepo] = useState("");
 	const [ref, setRef] = useState("");
 	const [path, setPath] = useState("");
 
-	const enabled = open && Boolean(organizationId);
-	const installationQuery =
-		cloudTrpc.integration.github.getInstallation.useQuery(
-			{ organizationId: organizationId ?? "" },
-			{ enabled },
-		);
-	const repositoriesQuery =
-		cloudTrpc.integration.github.listRepositories.useQuery(
-			{ organizationId: organizationId ?? "" },
-			{ enabled },
-		);
-	const repositories = [...(repositoriesQuery.data ?? [])].sort((a, b) =>
-		a.fullName.localeCompare(b.fullName),
-	);
-	const appRepositories =
-		installationQuery.isPending ||
-		repositoriesQuery.isPending ||
-		repositories.length > 0;
-	const typing = !appRepositories || repo === OTHER_REPOSITORY;
-	const chosenRepo = typing ? typedRepo.trim() : repo;
+	const chosenRepo = typedRepo.trim();
 	const repoIsValid = REPOSITORY_PATTERN.test(chosenRepo);
 
 	const reset = () => {
-		setRepo("");
 		setTypedRepo("");
 		setRef("");
 		setPath("");
@@ -130,53 +99,26 @@ export function AddPluginSourceDialog({
 						<Label htmlFor="plugin-source-repo">
 							<Trans>Repository</Trans>
 						</Label>
-						{appRepositories && (
-							<Select value={repo} onValueChange={setRepo}>
-								<SelectTrigger id="plugin-source-repo" className="w-full">
-									<SelectValue
-										placeholder={
-											repositoriesQuery.isPending
-												? t({ message: "Loading repositories..." })
-												: t({ message: "Select a repository" })
-										}
-									/>
-								</SelectTrigger>
-								<SelectContent>
-									{repositories.map((repository) => (
-										<SelectItem key={repository.id} value={repository.fullName}>
-											{repository.fullName}
-										</SelectItem>
-									))}
-									<SelectItem value={OTHER_REPOSITORY}>
-										<Trans>Another repository...</Trans>
-									</SelectItem>
-								</SelectContent>
-							</Select>
-						)}
-						{typing && (
-							<>
-								<Input
-									id={appRepositories ? undefined : "plugin-source-repo"}
-									placeholder="owner/name"
-									value={typedRepo}
-									onChange={(event) => setTypedRepo(event.target.value)}
-								/>
-								<p className="text-xs text-muted-foreground">
-									<Trans>
-										Superset reads it with your connected GitHub account.
-										Connect one in{" "}
-										<Link
-											to="/settings/integrations"
-											className="text-primary hover:underline"
-											onClick={() => onOpenChange(false)}
-										>
-											Settings › Integrations
-										</Link>{" "}
-										if you have not yet.
-									</Trans>
-								</p>
-							</>
-						)}
+						<Input
+							id="plugin-source-repo"
+							placeholder="owner/name"
+							value={typedRepo}
+							onChange={(event) => setTypedRepo(event.target.value)}
+						/>
+						<p className="text-xs text-muted-foreground">
+							<Trans>
+								Superset reads it with your connected GitHub account. Connect
+								one in{" "}
+								<Link
+									to="/settings/integrations"
+									className="text-primary hover:underline"
+									onClick={() => onOpenChange(false)}
+								>
+									Settings › Integrations
+								</Link>{" "}
+								if you have not yet.
+							</Trans>
+						</p>
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="plugin-source-ref">

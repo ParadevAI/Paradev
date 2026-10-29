@@ -2562,9 +2562,6 @@ msgstr "Anonimowy Monter"
 msgid "another device"
 msgstr "inne urządzenie"
 
-msgid "Another repository..."
-msgstr "Inne repozytorium..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpowiadaj na pytania w terminalu poniżej, na przykład podaj hasło."
 
@@ -4885,6 +4882,10 @@ msgstr "Połącz, aby działania dotyczące pull requestów były wykonywane z T
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Połącz swoje konto {pluginLabel}, a następnie odśwież tę stronę."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Połącz swoje konto GitHub, aby dodać repozytorium; synchronizacja odczytuje je Twoim kontem"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Połącz swoje konto GitHub, aby wczytać ten pull request z Twojego konta."
@@ -15082,8 +15083,8 @@ msgstr "Usunąć {label}?"
 msgid "Remove {name}"
 msgstr "Usuń {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Usunąć {repo}? Wszystkie zsynchronizowane z niego wtyczki zostaną usunięte z Twojej organizacji."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Usunąć {repo}? Wszystkie zsynchronizowane z niego wtyczki zostaną usunięte z Twojej organizacji i u każdego członka, który je zainstalował."
 
 msgid "Remove attachment"
 msgstr "Usuń załącznik"
@@ -16448,9 +16449,6 @@ msgstr "Wybierz projekt, aby zobaczyć pull requesty."
 msgid "Select a pull request to preview it here."
 msgstr "Wybierz pull request, aby zobaczyć tu podgląd."
 
-msgid "Select a repository"
-msgstr "Wybierz repozytorium"
-
 msgid "Select a team"
 msgstr "Wybierz zespół"
 
@@ -16777,6 +16775,9 @@ msgstr "Skonfiguruj ten projekt pod Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Skonfiguruj organizację, aby zacząć"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Przywrócenie zainstalowanej wtyczki do stanu Dostępna zostawia wszystkim ich kopię; mogą ją potem usunąć. Niedostępna ją usuwa."
 
 msgid "Setting saved"
 msgstr "Ustawienie zapisane"
@@ -18106,6 +18107,9 @@ msgstr "Zsynchronizowano {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Synchronizowanie..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Synchronizuje jako @{syncsAs}"
 
 msgid "System"
 msgstr "Systemowy"

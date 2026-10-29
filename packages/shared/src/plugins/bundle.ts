@@ -4,7 +4,7 @@ import { gunzipSync, gzipSync } from "node:zlib";
 export const PLUGIN_BUNDLE_MAX_BYTES = 2 * 1024 * 1024;
 export const PLUGIN_BUNDLE_MAX_UNPACKED_BYTES = 16 * 1024 * 1024;
 export const PLUGIN_BUNDLE_MAX_FILES = 500;
-const PLUGIN_BUNDLE_FORMAT = 2;
+export const PLUGIN_BUNDLE_FORMAT = 2;
 const READABLE_FORMATS = new Set([1, 2]);
 
 const EXCLUDED_DIRS = new Set([".git", "node_modules"]);

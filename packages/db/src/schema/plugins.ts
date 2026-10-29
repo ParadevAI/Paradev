@@ -106,6 +106,10 @@ export const organizationPluginSources = pgTable(
 		syncedSha: text("synced_sha"),
 		syncedAt: timestamp("synced_at"),
 		syncError: text("sync_error"),
+		syncProblems: jsonb("sync_problems")
+			.$type<{ name: string; reason: string }[]>()
+			.notNull()
+			.default([]),
 
 		addedByUserId: uuid("added_by_user_id").references(() => users.id, {
 			onDelete: "set null",
@@ -147,6 +151,8 @@ export const organizationPlugins = pgTable(
 		manifest: jsonb().notNull(),
 		/** SHA-256 of the plugin's bundle, which is also its R2 key. */
 		contentHash: text("content_hash").notNull(),
+		/** The plugin directory's git blob hashes, modes and paths; an equal one means its files did not change. */
+		sourceFingerprint: text("source_fingerprint"),
 
 		installPolicy: jsonb("install_policy")
 			.$type<OrganizationPluginPolicy>()

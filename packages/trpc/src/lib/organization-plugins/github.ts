@@ -1,5 +1,3 @@
-import { installationOctokit } from "../sandbox/clone-token";
-
 const BLOB_CONCURRENCY = 8;
 const REQUEST_TIMEOUT_MS = 15_000;
 
@@ -8,20 +6,9 @@ export interface RepositorySnapshot {
 	paths: ReadonlySet<string>;
 	executable?: ReadonlySet<string>;
 	sizes?: ReadonlyMap<string, number>;
+	/** Git blob hash by path, which changes exactly when a file's bytes do. */
+	blobs?: ReadonlyMap<string, string>;
 	read(path: string): Promise<Buffer>;
-}
-
-/** An installation token for the organization's GitHub App, scoped to the one repository. */
-export async function appInstallationToken(
-	installationId: string,
-	repo: string,
-): Promise<string> {
-	const octokit = await installationOctokit(installationId);
-	const { token } = (await octokit.auth({
-		type: "installation",
-		repositoryNames: [repo.split("/")[1] ?? repo],
-	})) as { token: string };
-	return token;
 }
 
 export async function repositorySnapshot(args: {
@@ -87,6 +74,7 @@ export async function repositorySnapshot(args: {
 		paths: new Set(blobs.keys()),
 		executable,
 		sizes,
+		blobs,
 		async read(path) {
 			const blob = blobs.get(path);
 			if (!blob) throw new Error(`${path} is not in ${args.repo}@${sha}`);

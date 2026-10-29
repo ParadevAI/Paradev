@@ -37,6 +37,8 @@ function localDir(base: string, source: string): string | null {
 }
 
 /** The plugins a marketplace file lists, each resolved to a `./` directory in the repository. Only plugins inside the repository can be synced. */
+export const UNNAMED_ENTRY = "?";
+
 export function parseMarketplace(
 	raw: unknown,
 	base: string,
@@ -58,7 +60,7 @@ export function parseMarketplace(
 		const text = (value: unknown) =>
 			typeof value === "string" && value ? value : undefined;
 		if (!name) {
-			problems.push({ name: "?", reason: "an entry has no name" });
+			problems.push({ name: UNNAMED_ENTRY, reason: "an entry has no name" });
 			continue;
 		}
 		const dir =
@@ -104,11 +106,16 @@ export function findManifestFile(
 export function pluginTreeFiles(
 	paths: Iterable<string>,
 	dir: string,
+	nestedPluginDirs: readonly string[] = [],
 ): Map<string, string> {
 	const prefix = dir ? `${dir}/` : "";
+	const nested = nestedPluginDirs
+		.filter((other) => other !== dir && other.startsWith(prefix))
+		.map((other) => `${other}/`);
 	const out = new Map<string, string>();
 	for (const path of paths) {
 		if (!path.startsWith(prefix)) continue;
+		if (nested.some((other) => path.startsWith(other))) continue;
 		const relative = path.slice(prefix.length);
 		if (relative !== "plugin.json" && isPluginTreePath(relative)) {
 			out.set(path, relative);

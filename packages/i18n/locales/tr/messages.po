@@ -2562,9 +2562,6 @@ msgstr "Anonim Montajcı"
 msgid "another device"
 msgstr "başka bir cihaz"
 
-msgid "Another repository..."
-msgstr "Başka bir depo..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Aşağıdaki terminalde parola gibi soruları yanıtla."
 
@@ -4885,6 +4882,10 @@ msgstr "Pull request'lerde çalışma alanı yerine kendi adınıza işlem yapma
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} hesabınızı bağlayın, ardından bu sayfayı yeniden yükleyin."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Depo eklemek için GitHub hesabınızı bağlayın; eşitlemeler depoyu sizin hesabınızla okur"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Bu pull request'i kendi adınıza yüklemek için GitHub hesabınızı bağlayın."
@@ -15082,8 +15083,8 @@ msgstr "{label} kaldırılsın mı?"
 msgid "Remove {name}"
 msgstr "{name} kaldır"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan kaldırılır."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan ve onları yüklemiş her üyeden kaldırılır."
 
 msgid "Remove attachment"
 msgstr "Eki kaldır"
@@ -16448,9 +16449,6 @@ msgstr "Pull request'leri görmek için bir proje seçin."
 msgid "Select a pull request to preview it here."
 msgstr "Burada önizlemek için bir pull request seçin."
 
-msgid "Select a repository"
-msgstr "Bir depo seçin"
-
 msgid "Select a team"
 msgstr "Bir takım seçin"
 
@@ -16777,6 +16775,9 @@ msgstr "Bu projeyi Paradev için kur"
 
 msgid "Set up your organization to get started"
 msgstr "Başlamak için kuruluşunuzu kurun"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Yüklü bir eklentiyi yeniden Kullanılabilir yapmak herkesin kopyasını korur; sonra kaldırabilirler. Kullanılamaz yapmak onu kaldırır."
 
 msgid "Setting saved"
 msgstr "Ayar kaydedildi"
@@ -18106,6 +18107,9 @@ msgstr "Eşitlendi: {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Eşitleniyor..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "@{syncsAs} olarak eşitlenir"
 
 msgid "System"
 msgstr "Sistem"

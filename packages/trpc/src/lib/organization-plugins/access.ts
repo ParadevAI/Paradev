@@ -59,7 +59,7 @@ export function installedFor(role: string | null): SQL {
 	return eq(sql`${organizationPlugins.installPolicy} ->> ${role}`, "installed");
 }
 
-/** Records an install for every plugin the organization installs for this member's role, so it reaches their machines and cloud workspaces like one they chose. */
+/** Records an install for every plugin the organization installs for this member's role, so it reaches their machines and cloud workspaces like one they chose. Writes only what is missing. */
 export async function ensureManagedInstalls(
 	userId: string,
 	organizationId: string,
@@ -72,13 +72,29 @@ export async function ensureManagedInstalls(
 			and(
 				eq(organizationPlugins.organizationId, organizationId),
 				installedFor(role),
+				isNull(organizationPlugins.removedFromSourceAt),
 			),
 		);
 	if (!managed.length) return;
+	const held = await db
+		.select({ organizationPluginId: pluginInstalls.organizationPluginId })
+		.from(pluginInstalls)
+		.where(
+			and(
+				eq(pluginInstalls.userId, userId),
+				inArray(
+					pluginInstalls.organizationPluginId,
+					managed.map((plugin) => plugin.id),
+				),
+			),
+		);
+	const heldIds = new Set(held.map((row) => row.organizationPluginId));
+	const missing = managed.filter((plugin) => !heldIds.has(plugin.id));
+	if (!missing.length) return;
 	await db
 		.insert(pluginInstalls)
 		.values(
-			managed.map((plugin) => ({
+			missing.map((plugin) => ({
 				userId,
 				organizationId,
 				marketplace: organizationMarketplace(organizationId),

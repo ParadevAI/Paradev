@@ -212,8 +212,9 @@ function remoteBinding(
 }
 
 export async function resolveTarget(
-	request: TargetRequest,
+	targetRequest: TargetRequest,
 ): Promise<PluginTarget> {
+	let request = targetRequest;
 	const install = await installedPlugin(
 		request.userId,
 		request.plugin,
@@ -227,14 +228,11 @@ export async function resolveTarget(
 		);
 	}
 
-	if (
-		install.organizationId &&
-		install.organizationId !== request.organizationId
-	) {
-		throw new PluginTargetError(
-			`"${request.plugin}" belongs to another organization.`,
-			404,
-		);
+	// installedPlugin checked the member's access in the plugin's own
+	// organization, so it is served whichever organization is active; its
+	// connections are looked up there too.
+	if (install.organizationId) {
+		request = { ...request, organizationId: install.organizationId };
 	}
 
 	const identity: TargetIdentity = {

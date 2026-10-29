@@ -2562,9 +2562,6 @@ msgstr "Perakit Anonim"
 msgid "another device"
 msgstr "perangkat lain"
 
-msgid "Another repository..."
-msgstr "Repositori lain..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Jawab pertanyaan di terminal di bawah, misalnya kata sandi."
 
@@ -4885,6 +4882,10 @@ msgstr "Hubungkan untuk bertindak pada pull request sebagai diri Anda, bukan seb
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Hubungkan akun {pluginLabel} Anda, lalu muat ulang halaman ini."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Hubungkan akun GitHub Anda untuk menambahkan repositori; sinkronisasi membacanya dengan akun Anda"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Hubungkan akun GitHub Anda untuk memuat pull request ini sebagai diri Anda."
@@ -15082,8 +15083,8 @@ msgstr "Hapus {label}?"
 msgid "Remove {name}"
 msgstr "Hapus {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "Hapus {repo}? Semua plugin yang disinkronkan darinya dihapus dari organisasi Anda."
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Hapus {repo}? Semua plugin yang disinkronkan darinya dihapus dari organisasi Anda dan dari setiap anggota yang memasangnya."
 
 msgid "Remove attachment"
 msgstr "Hapus lampiran"
@@ -16448,9 +16449,6 @@ msgstr "Pilih proyek untuk melihat pull request."
 msgid "Select a pull request to preview it here."
 msgstr "Pilih pull request untuk melihat pratinjaunya di sini."
 
-msgid "Select a repository"
-msgstr "Pilih repositori"
-
 msgid "Select a team"
 msgstr "Pilih sebuah tim"
 
@@ -16777,6 +16775,9 @@ msgstr "Siapkan proyek ini untuk Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Siapkan organisasi Anda untuk memulai"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Mengembalikan plugin terpasang ke Tersedia membuat semua orang tetap memiliki salinannya; mereka lalu bisa menghapusnya. Tidak tersedia akan menghapusnya."
 
 msgid "Setting saved"
 msgstr "Pengaturan disimpan"
@@ -18106,6 +18107,9 @@ msgstr "Disinkronkan {syncedAgo}"
 
 msgid "Syncing..."
 msgstr "Menyinkronkan..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Disinkronkan sebagai @{syncsAs}"
 
 msgid "System"
 msgstr "Sistem"

@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import {
+	githubUserConnections,
 	members,
 	organizationPluginSources,
 	organizationPlugins,
@@ -13,7 +14,7 @@ import {
 } from "@superset/shared/plugins";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { Client } from "@upstash/qstash";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { userError } from "../../i18n-error";
@@ -32,7 +33,6 @@ import {
 import { getObject } from "../../lib/r2";
 import { nudge } from "../../lib/realtime";
 import { protectedProcedure } from "../../trpc";
-import { findInstalledRepository } from "../integration/github/find-installed-repository";
 import { verifyOrgAdmin } from "../integration/utils";
 import { requireActiveOrgId } from "../utils/active-org";
 import { type PluginManifest, pluginConnector } from "./manifest";
@@ -81,19 +81,16 @@ async function requestSync(sourceId: string) {
 	});
 }
 
-/**
- * An admin can add only a repository they can read themselves: through their
- * connected GitHub account when they have one, as a cloud workspace checks,
- * otherwise one the organization's GitHub App is installed on.
- */
-async function reachableRepository(
-	userId: string,
-	organizationId: string,
-	repo: string,
-): Promise<string> {
+/** The repository the adding admin's GitHub account reads, which every later sync reads it with. */
+async function reachableRepository(userId: string, repo: string) {
 	const token = await githubUserTokenFor(userId);
 	if (!token) {
-		return (await findInstalledRepository(organizationId, repo)).repo.fullName;
+		throw userError({
+			code: "PRECONDITION_FAILED",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+			i18nKey: "serverError.plugins.pluginSourceNeedsGithub",
+		});
 	}
 	const [owner = "", name = ""] = repo.split("/");
 	const outOfReach = await githubRepositoriesOutOfReach({
@@ -119,11 +116,25 @@ const policySchema = z.partialRecord(
 const sourcesRouter = {
 	list: protectedProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireAdmin(ctx);
-		return db
-			.select()
+		const rows = await db
+			.select({
+				source: organizationPluginSources,
+				syncsAsGithubLogin: githubUserConnections.login,
+			})
 			.from(organizationPluginSources)
+			.leftJoin(
+				githubUserConnections,
+				eq(
+					githubUserConnections.userId,
+					organizationPluginSources.addedByUserId,
+				),
+			)
 			.where(eq(organizationPluginSources.organizationId, organizationId))
 			.orderBy(asc(organizationPluginSources.repo));
+		return rows.map(({ source, syncsAsGithubLogin }) => ({
+			...source,
+			syncsAsGithubLogin,
+		}));
 	}),
 
 	add: protectedProcedure
@@ -141,11 +152,7 @@ const sourcesRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAdmin(ctx);
-			const repo = await reachableRepository(
-				ctx.session.user.id,
-				organizationId,
-				input.repo,
-			);
+			const repo = await reachableRepository(ctx.session.user.id, input.repo);
 			const path = (input.path ?? "")
 				.split("/")
 				.filter((s) => s && s !== ".")
@@ -284,7 +291,9 @@ export const organizationPluginsRouter = {
 			const organizationId = await requireAdmin(ctx);
 			const [row] = await db
 				.update(organizationPlugins)
-				.set({ installPolicy: input.policy })
+				.set({
+					installPolicy: sql`${organizationPlugins.installPolicy} || ${JSON.stringify(input.policy)}::jsonb`,
+				})
 				.where(
 					and(
 						eq(organizationPlugins.organizationId, organizationId),
@@ -295,7 +304,8 @@ export const organizationPluginsRouter = {
 			if (!row) throw unknown(input.name);
 			const revoked = ROLE_HIERARCHY.filter(
 				(role) =>
-					organizationPluginAccess(input.policy, role) === "unavailable",
+					role in input.policy &&
+					organizationPluginAccess(row.installPolicy, role) === "unavailable",
 			);
 			const losing = revoked.length
 				? await db

@@ -7,6 +7,7 @@ CREATE TABLE "organization_plugin_sources" (
 	"synced_sha" text,
 	"synced_at" timestamp,
 	"sync_error" text,
+	"sync_problems" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"added_by_user_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -16,6 +17,7 @@ ALTER TABLE "organization_plugins" DROP CONSTRAINT "organization_plugins_uploade
 --> statement-breakpoint
 ALTER TABLE "organization_plugins" ADD COLUMN "source_id" uuid;--> statement-breakpoint
 ALTER TABLE "organization_plugins" ADD COLUMN "content_hash" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "organization_plugins" ADD COLUMN "source_fingerprint" text;--> statement-breakpoint
 ALTER TABLE "organization_plugins" ADD COLUMN "install_policy" jsonb DEFAULT '{}'::jsonb NOT NULL;--> statement-breakpoint
 ALTER TABLE "organization_plugins" ADD COLUMN "removed_from_source_at" timestamp;--> statement-breakpoint
 ALTER TABLE "organization_plugin_sources" ADD CONSTRAINT "organization_plugin_sources_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "auth"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

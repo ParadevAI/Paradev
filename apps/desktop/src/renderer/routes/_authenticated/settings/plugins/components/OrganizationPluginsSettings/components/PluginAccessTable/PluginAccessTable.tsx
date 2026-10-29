@@ -65,6 +65,10 @@ export function PluginAccessTable() {
 						Available plugins show on each role's Plugins page. Installed
 						plugins are installed for everyone in the role, who can disable but
 						not remove them.
+					</Trans>{" "}
+					<Trans>
+						Setting an installed plugin back to Available keeps everyone's copy;
+						they can then remove it. Unavailable removes it.
 					</Trans>
 				</p>
 			</div>

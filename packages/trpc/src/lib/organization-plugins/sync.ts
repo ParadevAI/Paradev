@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { db } from "@superset/db/client";
 import {
 	organizationPluginSources,
@@ -6,6 +7,7 @@ import {
 } from "@superset/db/schema";
 import { DEFAULT_ORGANIZATION_PLUGIN_POLICY } from "@superset/shared/plugins";
 import {
+	PLUGIN_BUNDLE_FORMAT,
 	PLUGIN_BUNDLE_MAX_BYTES,
 	PLUGIN_BUNDLE_MAX_FILES,
 	PLUGIN_BUNDLE_MAX_UNPACKED_BYTES,
@@ -15,9 +17,9 @@ import {
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { and, eq, isNull, notInArray } from "drizzle-orm";
-import { getObject, putObject } from "../r2";
+import { deleteObjects, getObject, putObject } from "../r2";
 import { nudge } from "../realtime";
-import { sourceCredentials } from "./credentials";
+import { sourceToken } from "./credentials";
 import { type RepositorySnapshot, readAll, repositorySnapshot } from "./github";
 import {
 	findManifestFile,
@@ -28,6 +30,7 @@ import {
 	parseMarketplace,
 	pluginTreeFiles,
 	skillsIn,
+	UNNAMED_ENTRY,
 	withVersion,
 } from "./marketplace";
 import { organizationBundleKey, readOrganizationBundle } from "./rules";
@@ -80,12 +83,44 @@ interface PluginBuild {
 	skills: ReturnType<typeof skillsIn>;
 }
 
+function pluginRepoFiles(
+	snapshot: RepositorySnapshot,
+	entry: MarketplaceEntry,
+	pluginDirs: readonly string[],
+) {
+	return {
+		manifestPath: findManifestFile(snapshot.paths, entry.dir),
+		tree: pluginTreeFiles(snapshot.paths, entry.dir, pluginDirs),
+	};
+}
+
+/** What a plugin's bundle is built from, read off the tree listing; null when the listing has no blob hashes. */
+function sourceFingerprint(
+	snapshot: RepositorySnapshot,
+	entry: MarketplaceEntry,
+	pluginDirs: readonly string[],
+): string | null {
+	if (!snapshot.blobs) return null;
+	const { manifestPath, tree } = pluginRepoFiles(snapshot, entry, pluginDirs);
+	const hash = createHash("sha256");
+	hash.update(`${PLUGIN_BUNDLE_FORMAT}\0${JSON.stringify(entry.declared)}\0`);
+	for (const path of [
+		...(manifestPath ? [manifestPath] : []),
+		...tree.keys(),
+	].sort()) {
+		hash.update(
+			`${path}\0${snapshot.blobs.get(path) ?? ""}\0${snapshot.executable?.has(path) ? "x" : "-"}\0`,
+		);
+	}
+	return hash.digest("hex");
+}
+
 async function bundleFor(
 	snapshot: RepositorySnapshot,
 	entry: MarketplaceEntry,
+	pluginDirs: readonly string[],
 ): Promise<PluginBuild> {
-	const manifestPath = findManifestFile(snapshot.paths, entry.dir);
-	const tree = pluginTreeFiles(snapshot.paths, entry.dir);
+	const { manifestPath, tree } = pluginRepoFiles(snapshot, entry, pluginDirs);
 	assertFitsInBundle(snapshot, [
 		...(manifestPath ? [manifestPath] : []),
 		...tree.keys(),
@@ -146,36 +181,18 @@ async function filesChanged(
 	return pluginTreeHash(stored) !== build.treeHash;
 }
 
-const CREDENTIAL_LABEL = {
-	admin: "the GitHub account of the admin who added it",
-	app: "the organization's GitHub App",
-} as const;
-
-async function readWithFirstCredential(
+async function readSource(
 	source: SelectOrganizationPluginSource,
 	readSnapshot: typeof repositorySnapshot,
 ): Promise<RepositorySnapshot> {
-	const credentials = await sourceCredentials(source);
-	if (!credentials.length) {
+	const token = await sourceToken(source);
+	try {
+		return await readSnapshot({ token, repo: source.repo, ref: source.ref });
+	} catch (error) {
 		throw new Error(
-			"nothing can read the repository: the admin who added it has no connected GitHub account, and the organization's GitHub App is not installed",
+			`could not read the repository with the GitHub account of the admin who added it: ${error instanceof Error ? error.message : String(error)}`,
 		);
 	}
-	const failures: string[] = [];
-	for (const credential of credentials) {
-		try {
-			return await readSnapshot({
-				token: await credential.token(),
-				repo: source.repo,
-				ref: source.ref,
-			});
-		} catch (error) {
-			failures.push(
-				`${CREDENTIAL_LABEL[credential.as]}: ${error instanceof Error ? error.message : String(error)}`,
-			);
-		}
-	}
-	throw new Error(`could not read the repository with ${failures.join("; ")}`);
 }
 
 async function syncSnapshot(
@@ -197,6 +214,8 @@ async function syncSnapshot(
 	}
 	const { entries, problems } = parseMarketplace(raw, source.path);
 	result.problems.push(...problems);
+	const pluginDirs = entries.map((entry) => entry.dir);
+	const replacedBundles: string[] = [];
 
 	const existing = await db
 		.select()
@@ -215,7 +234,18 @@ async function syncSnapshot(
 					"another source of this organization already has a plugin with this name",
 				);
 			}
-			const build = await bundleFor(snapshot, entry);
+			const fingerprint = sourceFingerprint(snapshot, entry, pluginDirs);
+			if (
+				current &&
+				fingerprint &&
+				current.sourceFingerprint === fingerprint &&
+				!current.removedFromSourceAt
+			) {
+				seen.push(entry.name);
+				result.unchanged.push(entry.name);
+				continue;
+			}
+			const build = await bundleFor(snapshot, entry, pluginDirs);
 			const { bundle, skills } = build;
 			const manifest = { ...readOrganizationBundle(bundle), skills };
 			const contentHash = pluginBundleHash(bundle);
@@ -235,6 +265,12 @@ async function syncSnapshot(
 				current?.contentHash === contentHash &&
 				!current.removedFromSourceAt
 			) {
+				if (fingerprint !== current.sourceFingerprint) {
+					await db
+						.update(organizationPlugins)
+						.set({ sourceFingerprint: fingerprint })
+						.where(eq(organizationPlugins.id, current.id));
+				}
 				result.unchanged.push(entry.name);
 				continue;
 			}
@@ -253,6 +289,7 @@ async function syncSnapshot(
 					version: manifest.version,
 					manifest,
 					contentHash,
+					sourceFingerprint: fingerprint,
 					installPolicy: DEFAULT_ORGANIZATION_PLUGIN_POLICY,
 				})
 				.onConflictDoUpdate({
@@ -264,6 +301,7 @@ async function syncSnapshot(
 						version: manifest.version,
 						manifest,
 						contentHash,
+						sourceFingerprint: fingerprint,
 						removedFromSourceAt: null,
 					},
 					setWhere: eq(organizationPlugins.sourceId, source.id),
@@ -272,6 +310,11 @@ async function syncSnapshot(
 			if (!written.length) {
 				throw new Error(
 					"another source of this organization already has a plugin with this name",
+				);
+			}
+			if (current && current.contentHash !== contentHash) {
+				replacedBundles.push(
+					organizationBundleKey(source.organizationId, current.contentHash),
 				);
 			}
 			result.synced.push(entry.name);
@@ -286,6 +329,13 @@ async function syncSnapshot(
 		}
 	}
 
+	if (replacedBundles.length) {
+		await deleteObjects(replacedBundles).catch((error) =>
+			console.warn("[organization-plugins] old bundles not deleted", error),
+		);
+	}
+	// An entry with no name could be any plugin, so nothing is marked gone.
+	if (problems.some((problem) => problem.name === UNNAMED_ENTRY)) return;
 	const removed = await db
 		.update(organizationPlugins)
 		.set({ removedFromSourceAt: new Date() })
@@ -324,22 +374,31 @@ export async function syncOrganizationPluginSource(
 	};
 
 	try {
-		const snapshot = await readWithFirstCredential(source, readSnapshot);
+		const snapshot = await readSource(source, readSnapshot);
 		result.sha = snapshot.sha;
 
-		if (source.syncedSha !== snapshot.sha || source.syncError) {
+		if (
+			source.syncedSha !== snapshot.sha ||
+			source.syncError ||
+			source.syncProblems.length
+		) {
 			await syncSnapshot(source, snapshot, result);
 		}
 	} catch (error) {
 		result.error = error instanceof Error ? error.message : String(error);
 	}
 
-	const problems = result.problems.map((p) => `${p.name}: ${p.reason}`);
 	await db
 		.update(organizationPluginSources)
 		.set({
-			...(result.error ? {} : { syncedSha: result.sha, syncedAt: new Date() }),
-			syncError: [result.error, ...problems].filter(Boolean).join("\n") || null,
+			...(result.error
+				? {}
+				: {
+						syncedSha: result.sha,
+						syncedAt: new Date(),
+						syncProblems: result.problems,
+					}),
+			syncError: result.error,
 		})
 		.where(eq(organizationPluginSources.id, source.id));
 
@@ -347,27 +406,4 @@ export async function syncOrganizationPluginSource(
 		nudge(source.organizationId, "plugins");
 	}
 	return result;
-}
-
-export async function syncAllOrganizationPluginSources(
-	enqueue: (sourceId: string) => Promise<void> = async (sourceId) => {
-		await syncOrganizationPluginSource(sourceId);
-	},
-): Promise<{
-	sources: number;
-	failed: number;
-}> {
-	const sources = await db
-		.select({ id: organizationPluginSources.id })
-		.from(organizationPluginSources);
-	let failed = 0;
-	for (const source of sources) {
-		try {
-			await enqueue(source.id);
-		} catch (error) {
-			console.error("[organization-plugins] enqueue failed", source.id, error);
-			failed++;
-		}
-	}
-	return { sources: sources.length, failed };
 }

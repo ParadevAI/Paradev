@@ -2562,9 +2562,6 @@ msgstr "匿名の組立工"
 msgid "another device"
 msgstr "別のデバイス"
 
-msgid "Another repository..."
-msgstr "別のリポジトリ..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "パスワードなど、下のターミナルでの質問に答えてください。"
 
@@ -4885,6 +4882,10 @@ msgstr "接続すると、ワークスペースではなく自分としてプル
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} アカウントを接続してから、このページを再読み込みしてください。"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "リポジトリを追加するには GitHub アカウントを接続してください。同期はあなたのアカウントで読み取ります"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "このプルリクエストを自分として読み込むには、GitHub アカウントを接続してください。"
@@ -15082,8 +15083,8 @@ msgstr "{label}を削除しますか?"
 msgid "Remove {name}"
 msgstr "{name} を削除"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて組織から削除されます。"
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて、組織からも、インストール済みのすべてのメンバーからも削除されます。"
 
 msgid "Remove attachment"
 msgstr "添付ファイルを削除"
@@ -16448,9 +16449,6 @@ msgstr "プロジェクトを選択するとプルリクエストが表示され
 msgid "Select a pull request to preview it here."
 msgstr "プルリクエストを選択するとここでプレビューできます。"
 
-msgid "Select a repository"
-msgstr "リポジトリを選択"
-
 msgid "Select a team"
 msgstr "チームを選択"
 
@@ -16777,6 +16775,9 @@ msgstr "このプロジェクトをParadev向けにセットアップ"
 
 msgid "Set up your organization to get started"
 msgstr "組織をセットアップして始めましょう"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "インストール済みのプラグインを「利用可能」に戻しても、全員のコピーは残り、各自で削除できるようになります。「利用不可」にすると削除されます。"
 
 msgid "Setting saved"
 msgstr "設定を保存しました"
@@ -18106,6 +18107,9 @@ msgstr "{syncedAgo}に同期"
 
 msgid "Syncing..."
 msgstr "同期中..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "@{syncsAs} として同期"
 
 msgid "System"
 msgstr "システム"

@@ -1033,6 +1033,12 @@ export const serverErrorMessages: Record<
 				"Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it.",
 			values: params,
 		}),
+	"serverError.plugins.pluginSourceNeedsGithub": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceNeedsGithub",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+		}),
 	"serverError.plugins.pluginSourceOutOfReach": (params) =>
 		i18n._({
 			id: "serverError.plugins.pluginSourceOutOfReach",

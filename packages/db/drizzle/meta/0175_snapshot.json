@@ -1,5 +1,5 @@
 {
-  "id": "4a33b8b5-9fdd-4619-bb8f-b3a4721b1d82",
+  "id": "fa9333a0-9c80-4aa5-a2e4-874703a681d3",
   "prevId": "20d0759a-b608-484a-a1f7-9a84673eae94",
   "version": "7",
   "dialect": "postgresql",
@@ -5259,6 +5259,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "sync_problems": {
+          "name": "sync_problems",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
         "added_by_user_id": {
           "name": "added_by_user_id",
           "type": "uuid",
@@ -5391,6 +5398,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "source_fingerprint": {
+          "name": "source_fingerprint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "install_policy": {
           "name": "install_policy",

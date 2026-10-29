@@ -1,55 +1,34 @@
 import { describe, expect, test } from "bun:test";
-import { type CredentialDeps, sourceCredentials } from "./credentials";
+import { type CredentialDeps, sourceToken } from "./credentials";
 
-const source = {
-	organizationId: "org",
-	repo: "acme/plugins",
-	addedByUserId: "alice",
-};
+const source = { organizationId: "org", addedByUserId: "alice" };
 
-function deps(overrides: Partial<CredentialDeps>): CredentialDeps {
-	return {
-		memberRole: async () => "admin",
-		userToken: async () => "alice-token",
-		installationId: async () => "42",
-		appToken: async (id, repo) => `app-${id}-${repo}`,
-		...overrides,
-	};
-}
+const deps = (overrides: Partial<CredentialDeps> = {}): CredentialDeps => ({
+	memberRole: async () => "admin",
+	userToken: async () => "alice-token",
+	...overrides,
+});
 
-async function tokens(d: CredentialDeps) {
-	const credentials = await sourceCredentials(source, d);
-	return Promise.all(
-		credentials.map(async (c) => `${c.as}:${await c.token()}`),
-	);
-}
-
-describe("sourceCredentials", () => {
-	test("the adding admin's GitHub account first, then the organization's App", async () => {
-		expect(await tokens(deps({}))).toEqual([
-			"admin:alice-token",
-			"app:app-42-acme/plugins",
-		]);
+describe("sourceToken", () => {
+	test("reads with the GitHub account of the admin who added the source", async () => {
+		expect(await sourceToken(source, deps())).toBe("alice-token");
 	});
 
-	test("only the App once the admin has left or lost the admin role", async () => {
-		expect(await tokens(deps({ memberRole: async () => null }))).toEqual([
-			"app:app-42-acme/plugins",
-		]);
-		expect(await tokens(deps({ memberRole: async () => "member" }))).toEqual([
-			"app:app-42-acme/plugins",
-		]);
+	test("an admin who left or was demoted is not read as", async () => {
+		await expect(
+			sourceToken(source, deps({ memberRole: async () => null })),
+		).rejects.toThrow(/no longer an admin; have another admin add/);
+		await expect(
+			sourceToken(source, deps({ memberRole: async () => "member" })),
+		).rejects.toThrow(/no longer an admin/);
+		await expect(
+			sourceToken({ ...source, addedByUserId: null }, deps()),
+		).rejects.toThrow(/has left/);
 	});
 
-	test("only the App when the admin has not connected GitHub", async () => {
-		expect(await tokens(deps({ userToken: async () => null }))).toEqual([
-			"app:app-42-acme/plugins",
-		]);
-	});
-
-	test("only the admin's account when the App is not installed", async () => {
-		expect(await tokens(deps({ installationId: async () => null }))).toEqual([
-			"admin:alice-token",
-		]);
+	test("an admin without GitHub connected is asked to reconnect", async () => {
+		await expect(
+			sourceToken(source, deps({ userToken: async () => null })),
+		).rejects.toThrow(/reconnect GitHub/);
 	});
 });

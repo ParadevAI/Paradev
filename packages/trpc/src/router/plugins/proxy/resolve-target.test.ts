@@ -258,7 +258,7 @@ describe("resolveTarget", () => {
 		);
 	});
 
-	test("an organization's plugin does not resolve for a caller in another organization", async () => {
+	test("a plugin of another organization the member is in resolves while this one is active", async () => {
 		install = {
 			...installed("organization-org-2", {
 				mcpUrl: "https://tools.acme.test/mcp",
@@ -266,10 +266,16 @@ describe("resolveTarget", () => {
 			organizationId: "org-2",
 		};
 
-		await resolveTarget({ ...request, marketplace: "organization-org-2" }).then(
-			() => expect.unreachable("org-1 must not reach org-2's plugin"),
-			(error: PluginTargetError) => expect(error.status).toBe(404),
-		);
+		const target = await resolveTarget({
+			...request,
+			marketplace: "organization-org-2",
+		});
+
+		expect(target).toMatchObject({
+			kind: "remote",
+			url: "https://tools.acme.test/mcp",
+			publicOnly: true,
+		});
 	});
 
 	test("a plugin from another marketplace cannot redirect a connector's credential", async () => {

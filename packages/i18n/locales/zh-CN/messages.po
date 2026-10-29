@@ -2562,9 +2562,6 @@ msgstr "匿名装配工"
 msgid "another device"
 msgstr "另一台设备"
 
-msgid "Another repository..."
-msgstr "其他仓库..."
-
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "请在下方终端中回答提问，例如输入密码。"
 
@@ -4885,6 +4882,10 @@ msgstr "连接后，将以你自己的身份而非工作区的身份处理拉取
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "连接你的 {pluginLabel} 账户，然后重新加载此页面。"
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "连接你的 GitHub 账号才能添加仓库；同步会使用你的账号读取它"
 
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "连接你的 GitHub 账户，以你自己的身份加载此拉取请求。"
@@ -15082,8 +15083,8 @@ msgstr "移除{label}？"
 msgid "Remove {name}"
 msgstr "移除 {name}"
 
-msgid "Remove {repo}? Every plugin synced from it is removed from your organization."
-msgstr "移除 {repo}？从中同步的所有插件都会从你的组织中移除。"
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "移除 {repo}？从中同步的所有插件都会从你的组织以及所有已安装的成员那里移除。"
 
 msgid "Remove attachment"
 msgstr "移除附件"
@@ -16448,9 +16449,6 @@ msgstr "选择一个项目来查看拉取请求。"
 msgid "Select a pull request to preview it here."
 msgstr "选择一个拉取请求，在这里预览。"
 
-msgid "Select a repository"
-msgstr "选择一个仓库"
-
 msgid "Select a team"
 msgstr "选择团队"
 
@@ -16777,6 +16775,9 @@ msgstr "为Paradev配置这个项目"
 
 msgid "Set up your organization to get started"
 msgstr "设置你的组织即可开始"
+
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "把已安装的插件改回“可用”后，每个人的副本仍会保留，之后可以自行移除。改为“不可用”会将其移除。"
 
 msgid "Setting saved"
 msgstr "设置已保存"
@@ -18106,6 +18107,9 @@ msgstr "上次同步：{syncedAgo}"
 
 msgid "Syncing..."
 msgstr "正在同步..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "以 @{syncsAs} 身份同步"
 
 msgid "System"
 msgstr "跟随系统"
