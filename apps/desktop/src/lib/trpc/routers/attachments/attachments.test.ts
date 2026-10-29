@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import {
-	mkdirSync,
 	mkdtempSync,
 	readFileSync,
 	rmSync,
@@ -9,7 +8,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
-import { copyLocalFileExclusive } from "./attachments";
+import { copyLocalFilesIntoWorktree } from "./attachments";
 
 const roots: string[] = [];
 
@@ -17,54 +16,39 @@ function setup() {
 	const root = mkdtempSync(join(tmpdir(), "attachments-"));
 	roots.push(root);
 	const source = join(root, "build.dmg");
-	writeFileSync(source, "new");
-	const directory = join(root, "worktree", WORKSPACE_ATTACHMENTS_DIR);
-	mkdirSync(directory, { recursive: true });
-	return { root, source, directory };
+	writeFileSync(source, "first");
+	return { root, source, worktreePath: join(root, "worktree") };
 }
 
 afterEach(() => {
-	for (const root of roots.splice(0))
+	for (const root of roots.splice(0)) {
 		rmSync(root, { recursive: true, force: true });
+	}
 });
 
-describe("copyLocalFileExclusive", () => {
-	it("copies into the attachments directory and never overwrites", async () => {
-		const { source, directory } = setup();
-		const destinationPath = join(directory, "build.dmg");
+describe("copyLocalFilesIntoWorktree", () => {
+	it("copies into a self-ignoring attachments dir and never overwrites", async () => {
+		const { source, worktreePath } = setup();
+		const directory = join(worktreePath, WORKSPACE_ATTACHMENTS_DIR);
 
 		expect(
-			await copyLocalFileExclusive({ sourcePath: source, destinationPath }),
-		).toEqual({ ok: true });
-		writeFileSync(source, "changed");
+			await copyLocalFilesIntoWorktree({ worktreePath, sourcePaths: [source] }),
+		).toEqual([`${WORKSPACE_ATTACHMENTS_DIR}/build.dmg`]);
+		writeFileSync(source, "second");
 		expect(
-			await copyLocalFileExclusive({ sourcePath: source, destinationPath }),
-		).toEqual({
-			ok: false,
-			reason: "exists",
-		});
-		expect(readFileSync(destinationPath, "utf8")).toBe("new");
+			await copyLocalFilesIntoWorktree({ worktreePath, sourcePaths: [source] }),
+		).toEqual([`${WORKSPACE_ATTACHMENTS_DIR}/build_1.dmg`]);
+
+		expect(readFileSync(join(directory, "build.dmg"), "utf8")).toBe("first");
+		expect(readFileSync(join(directory, "build_1.dmg"), "utf8")).toBe("second");
+		expect(readFileSync(join(directory, ".gitignore"), "utf8")).toBe("*\n");
 	});
 
-	it("refuses a destination outside the attachments directory", async () => {
-		const { root, source } = setup();
+	it("refuses a directory as the source before writing anything", async () => {
+		const { root, worktreePath } = setup();
 
 		await expect(
-			copyLocalFileExclusive({
-				sourcePath: source,
-				destinationPath: join(root, "out.dmg"),
-			}),
-		).rejects.toThrow(WORKSPACE_ATTACHMENTS_DIR);
-	});
-
-	it("refuses a directory as the source", async () => {
-		const { root, directory } = setup();
-
-		await expect(
-			copyLocalFileExclusive({
-				sourcePath: root,
-				destinationPath: join(directory, "x"),
-			}),
-		).rejects.toThrow("not a file");
+			copyLocalFilesIntoWorktree({ worktreePath, sourcePaths: [root] }),
+		).rejects.toThrow("Not a file");
 	});
 });
