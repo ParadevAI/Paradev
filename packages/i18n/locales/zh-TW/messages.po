@@ -4249,7 +4249,7 @@ msgid "Clone"
 msgstr "克隆"
 
 msgid "Clone a repo"
-msgstr "複製儲存庫"
+msgstr "克隆儲存庫"
 
 msgid "Clone a repository"
 msgstr "克隆儲存庫"

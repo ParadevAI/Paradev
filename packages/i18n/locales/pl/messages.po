@@ -12377,7 +12377,7 @@ msgid "Not set up on this host"
 msgstr "Nieskonfigurowany na tym hoście"
 
 msgid "Not signed in"
-msgstr "Niezalogowano"
+msgstr "Nie zalogowano"
 
 msgid "not sorted"
 msgstr "bez sortowania"
@@ -17044,7 +17044,7 @@ msgid "Sign in to get started"
 msgstr "Zaloguj się, aby zacząć"
 
 msgid "Sign in to GitHub"
-msgstr "Zaloguj się do GitHub"
+msgstr "Zaloguj się do GitHuba"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "Zaloguj się do agenta w terminalu, a potem kontynuuj."
