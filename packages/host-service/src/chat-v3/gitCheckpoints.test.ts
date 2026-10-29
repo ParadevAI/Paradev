@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -143,7 +143,7 @@ describe("createGitCheckpoints", () => {
 	const t1 = { sessionId: "s1", turnId: "t1" };
 	const allPaths = ["gone.txt", "new.txt", "tracked.txt"];
 
-	test("undoes a turn's files, leaving and listing any changed since", async () => {
+	test("undoes a turn's files, leaving and listing any changed since, also on a later read", async () => {
 		await editedTurn();
 		await writeFile(join(repo, "new.txt"), "edited by the user\n");
 		const staged = await git.raw(["diff", "--cached", "--name-only"]);
@@ -168,8 +168,24 @@ describe("createGitCheckpoints", () => {
 		);
 		expect(await git.raw(["diff", "--cached", "--name-only"])).toBe(staged);
 		expect(
-			(await checkpoints.changes({ ...t1, cwd: repo, live: false }))?.undone,
-		).toBe(true);
+			await checkpoints.changes({ ...t1, cwd: repo, live: false }),
+		).toMatchObject({ undone: true, undoSkipped: ["new.txt"] });
+	});
+
+	test("a later read lists as skipped only files Undo was asked for", async () => {
+		await editedTurn();
+		await writeFile(join(repo, "new.txt"), "edited by the user\n");
+
+		await checkpoints.undo({
+			...t1,
+			cwd: repo,
+			paths: ["gone.txt", "new.txt"],
+		});
+
+		expect(
+			(await checkpoints.changes({ ...t1, cwd: repo, live: false }))
+				?.undoSkipped,
+		).toEqual(["new.txt"]);
 	});
 
 	test("leaves alone a path whose file or folder was swapped, or that git could misread", async () => {
@@ -212,6 +228,61 @@ describe("createGitCheckpoints", () => {
 		);
 		expect(existsSync(join(repo, "config/a.json"))).toBe(false);
 	});
+
+	test("removes the folders a turn made for a file it added", async () => {
+		await startTurn("s1", "t1");
+		await mkdir(join(repo, "made/deep"), { recursive: true });
+		await writeFile(join(repo, "made/deep/x.txt"), "agent\n");
+		await checkpoints.turnSettled({ cwd: repo, sessionId: "s1", turnId: "t1" });
+
+		await checkpoints.undo({ ...t1, cwd: repo, paths: ["made/deep/x.txt"] });
+
+		expect(existsSync(join(repo, "made"))).toBe(false);
+	});
+
+	test.skipIf(statSync(tmpdir()).birthtimeMs === 0)(
+		"keeps an empty folder that was there before the turn",
+		async () => {
+			await mkdir(join(repo, "logs"));
+			await startTurn("s1", "t1");
+			await writeFile(join(repo, "logs/debug.txt"), "agent\n");
+			await checkpoints.turnSettled({
+				cwd: repo,
+				sessionId: "s1",
+				turnId: "t1",
+			});
+			const beforeRef = "refs/superset/chat-turns/s1/t1/before";
+			const before = (await git.revparse([beforeRef])).trim();
+			const takenAfterFolder = `@${Math.ceil(statSync(join(repo, "logs")).birthtimeMs / 1000) + 1} +0000`;
+			const restamped = execFileSync(
+				"git",
+				[
+					"commit-tree",
+					`${before}^{tree}`,
+					"-p",
+					(await git.revparse([`${before}^`])).trim(),
+					"-m",
+					"superset chat turn before",
+				],
+				{
+					cwd: repo,
+					env: {
+						...process.env,
+						GIT_AUTHOR_DATE: takenAfterFolder,
+						GIT_COMMITTER_DATE: takenAfterFolder,
+					},
+				},
+			)
+				.toString()
+				.trim();
+			await git.raw(["update-ref", beforeRef, restamped]);
+
+			await checkpoints.undo({ ...t1, cwd: repo, paths: ["logs/debug.txt"] });
+
+			expect(existsSync(join(repo, "logs/debug.txt"))).toBe(false);
+			expect(existsSync(join(repo, "logs"))).toBe(true);
+		},
+	);
 
 	test("puts back what the turn staged for the files it undoes", async () => {
 		await startTurn("s1", "t1");
@@ -299,6 +370,28 @@ describe("createGitCheckpoints", () => {
 		expect(await readFile(join(repo, "tracked.txt"), "utf8")).toBe(
 			"both chats\n",
 		);
+	});
+
+	test("rebuilds a snapshot index git can no longer read", async () => {
+		const snapshotIndex = join(
+			repo,
+			(
+				await git.raw(["rev-parse", "--git-path", "superset-checkpoint-index"])
+			).trim(),
+		);
+		await writeFile(snapshotIndex, "not an index");
+
+		const first = await checkpoints.capture({ cwd: repo, sessionId: "s1" });
+		const second = await checkpoints.capture({ cwd: repo, sessionId: "s1" });
+
+		expect(first).toBeString();
+		expect(second).toBeString();
+		expect(
+			execFileSync("git", ["ls-files"], {
+				cwd: repo,
+				env: { ...process.env, GIT_INDEX_FILE: snapshotIndex },
+			}).toString(),
+		).toBe("gone.txt\ntracked.txt\n");
 	});
 
 	test("sees a same-size edit made in the second the index was written", async () => {
@@ -447,6 +540,25 @@ describe("createGitCheckpoints", () => {
 		).toEqual([true, true, true, true, false]);
 	});
 
+	test("marks a turn shared when another chat's turn without a snapshot overlapped it", async () => {
+		const { checkpoints: recording, shared, tasks } = recordingCheckpoints();
+		const t1 = { cwd: "/repo", sessionId: "s1", turnId: "t1" };
+		const t2 = { cwd: "/repo", sessionId: "s2", turnId: "t2" };
+
+		await recording.capture({ cwd: "/repo", sessionId: "s1" });
+		await recording.turnStarted({ ...t1, before: "b" });
+		await recording.turnStarted({ ...t2, before: null });
+		await recording.turnSettled(t2);
+		await recording.turnSettled(t1);
+
+		expect(shared("s1", "t1")).toBe(true);
+		expect(tasks).toEqual([
+			"checkpoints/capture",
+			"checkpoints/ref",
+			"checkpoints/capture",
+		]);
+	});
+
 	test("a snapshot in a worktree waits for an Undo there to finish", async () => {
 		const { checkpoints: recording, gates, tasks } = recordingCheckpoints();
 		let finishUndo = () => {};
@@ -475,17 +587,15 @@ describe("createGitCheckpoints", () => {
 
 	test("a prompt's snapshot waits for the previous turn's, and gives up at the deadline", async () => {
 		const { checkpoints: recording, gates, tasks } = recordingCheckpoints();
+		const t1 = { cwd: "/repo", sessionId: "s1", turnId: "t1" };
+		await recording.turnStarted({ ...t1, before: "b" });
 		gates.set("checkpoints/capture", new Promise<void>(() => {}));
 
-		const settled = recording.turnSettled({
-			cwd: "/repo",
-			sessionId: "s1",
-			turnId: "t1",
-		});
+		const settled = recording.turnSettled(t1);
 		const before = await recording.capture({ cwd: "/repo", sessionId: "s1" });
 
 		expect(before).toBeNull();
-		expect(tasks).toEqual(["checkpoints/capture"]);
+		expect(tasks).toEqual(["checkpoints/ref", "checkpoints/capture"]);
 		void settled;
 	});
 

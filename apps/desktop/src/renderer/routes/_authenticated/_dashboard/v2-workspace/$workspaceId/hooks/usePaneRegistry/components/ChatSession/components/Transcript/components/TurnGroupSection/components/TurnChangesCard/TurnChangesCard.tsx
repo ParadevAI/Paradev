@@ -80,13 +80,27 @@ export function TurnChangesCard({
 		range,
 	);
 	if (changes?.undone) {
+		const skipped = changes.undoSkipped ?? [];
+		const shownOutcome: UndoOutcome | null =
+			outcome ??
+			(skipped.length > 0
+				? {
+						status: "undone",
+						restored: files.flatMap(({ place }) =>
+							place.relativePath && !skipped.includes(place.relativePath)
+								? [place.relativePath]
+								: [],
+						),
+						skipped,
+					}
+				: null);
 		return (
 			<div className="mt-1 mb-2 overflow-hidden rounded-lg border border-border/60 text-[13px]">
 				<div className="flex items-center gap-2 px-3 py-1.5 text-muted-foreground">
 					<Undo2 className="size-3.5 shrink-0" />
 					<Trans>File changes undone</Trans>
 				</div>
-				{outcome && <UndoOutcomeNotice outcome={outcome} />}
+				{shownOutcome && <UndoOutcomeNotice outcome={shownOutcome} />}
 			</div>
 		);
 	}

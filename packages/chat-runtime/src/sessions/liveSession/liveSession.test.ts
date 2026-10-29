@@ -264,7 +264,7 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
-	test("a prompt that does not ask for a snapshot goes to the agent at once", async () => {
+	test("a prompt that does not ask for a snapshot goes to the agent at once, and its turn is still reported", async () => {
 		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
 		const { calls, checkpoints } = gatedCheckpoints();
 		const runtime = createTestRuntime({ harnesses, checkpoints });
@@ -274,14 +274,43 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		const result = sendPrompt(runtime, sessionId, "hello");
+		sendPrompt(runtime, sessionId, "hello");
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+		expect(calls).toEqual(["started t1 null", "settled t1 -"]);
+		await runtime.dispose();
+	});
+
+	test("a prompt the agent turns down after its snapshot leaves the chat running", async () => {
+		const { harnesses } = fakeHarnessRegistry({ turns: [] });
+		const { release, checkpoints } = gatedCheckpoints();
+		release();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
 
 		await waitFor(
 			() =>
-				snapshotOf(runtime, sessionId).items.get(result.itemId)?.turnId ===
-				"t1",
+				snapshotOf(runtime, sessionId).items.get(result.itemId)?.item
+					.discarded === true,
 		);
-		expect(calls).toEqual([]);
+		const envelopes = journalEnvelopes(runtime, sessionId);
+		expect(sessionStatuses(envelopes)).not.toContain("dead");
+		expect(
+			envelopes.some(
+				(envelope) =>
+					envelope.event.type === "item" &&
+					envelope.event.item.kind === "notice" &&
+					envelope.event.item.text === "fake harness script exhausted",
+			),
+		).toBe(true);
 		await runtime.dispose();
 	});
 
@@ -776,6 +805,39 @@ describe("LiveSession", () => {
 				(item) => item.id,
 			),
 		).toEqual([second.itemId]);
+		await runtime.dispose();
+	});
+
+	test("a prompt the agent does not take into the turn still gets its snapshot once delivered", async () => {
+		const { harnesses } = fakeHarnessRegistry({
+			...HELD_THEN_QUICK,
+			steer: false,
+		});
+		const { calls, release, checkpoints } = gatedCheckpoints();
+		release();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first", { snapshotWorktree: true });
+		await waitForApproval(runtime, sessionId);
+		sendPrompt(runtime, sessionId, "second", { snapshotWorktree: true });
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
+
+		answerApproval(runtime, sessionId);
+		await waitFor(() => calls.includes("settled t2 -"));
+
+		expect(calls).toEqual([
+			"capture /tmp/workspace",
+			"started t1 before-sha",
+			"settled t1 -",
+			"capture /tmp/workspace",
+			"started t2 before-sha",
+			"settled t2 -",
+		]);
 		await runtime.dispose();
 	});
 

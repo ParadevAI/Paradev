@@ -185,8 +185,20 @@ async function withSnapshotIndex<T>(
 		);
 	} catch (error) {
 		if (abort?.aborted) throw error;
+		await dropIfUnreadable(repo.root, repo.snapshotIndex);
 		return withScratchIndex(repo, run, abort);
 	}
+}
+
+/** A kept index git can no longer read is seeded afresh by the next snapshot. */
+async function dropIfUnreadable(root: string, index: string): Promise<void> {
+	const readable = await gitAt(root, { GIT_INDEX_FILE: index })
+		.raw(["ls-files", "--", ":(exclude)*"])
+		.then(
+			() => true,
+			() => false,
+		);
+	if (!readable) await rm(index, { force: true });
 }
 
 async function readRef(git: SimpleGit, ref: string): Promise<string | null> {
@@ -429,6 +441,7 @@ async function markUndone(
 	git: SimpleGit,
 	base: string,
 	before: string,
+	undone: string,
 	anchors: Anchors,
 ): Promise<void> {
 	const bases = new Set([base]);
@@ -436,8 +449,47 @@ async function markUndone(
 		if (alias.before === before) bases.add(alias.base);
 	}
 	for (const each of bases) {
-		await git.raw(["update-ref", `${each}/undone`, before]);
+		await git.raw(["update-ref", `${each}/undone`, undone]);
 	}
+}
+
+/** The snapshot before the turn with the files Undo skipped as the turn left them, so they can be listed later. */
+async function undoneCommit(
+	repo: Repo,
+	before: string,
+	skipped: readonly string[],
+	result: Map<string, Entry>,
+): Promise<string> {
+	if (skipped.length === 0) return before;
+	return withScratchIndex(repo, async (scratch) => {
+		await scratch.raw(["read-tree", `${before}^{tree}`]);
+		const deleted = skipped.filter((path) => !result.has(path));
+		for (const batch of batches(deleted)) {
+			await scratch.raw(["update-index", "--force-remove", "--", ...batch]);
+		}
+		const kept = skipped.flatMap((path) => {
+			const entry = result.get(path);
+			return entry ? [`${entry.mode},${entry.oid},${path}`] : [];
+		});
+		for (const batch of batches(kept)) {
+			await scratch.raw([
+				"update-index",
+				"--add",
+				...batch.flatMap((info) => ["--cacheinfo", info]),
+			]);
+		}
+		const tree = (await scratch.raw(["write-tree"])).trim();
+		return (
+			await scratch.raw([
+				"commit-tree",
+				tree,
+				"-p",
+				before,
+				"-m",
+				"superset chat turn undone",
+			])
+		).trim();
+	});
 }
 
 export const checkpointCaptureTask = defineWorkerTask<
@@ -550,6 +602,9 @@ export const checkpointChangesTask = defineWorkerTask<
 		const files = authored
 			? diffed.filter((file) => authored.has(file.path))
 			: diffed;
+		const undoSkipped = undone
+			? await changedNames(git, ["diff", before, undone])
+			: [];
 		return {
 			root: repo.shownRoot,
 			before,
@@ -558,6 +613,7 @@ export const checkpointChangesTask = defineWorkerTask<
 			shared: message.includes(SHARED_TURN_TRAILER),
 			live: stillRunning,
 			undone: undone !== null,
+			undoSkipped,
 			committed: stillRunning
 				? []
 				: await committedPaths(
@@ -631,14 +687,28 @@ async function plainFolders(root: string, path: string): Promise<boolean> {
 	return true;
 }
 
-/** Removes the folders a removed file leaves empty, up to the repo root. */
-async function removeEmptyFolders(root: string, path: string): Promise<void> {
+/**
+ * Removes the folders a removed file leaves empty, up to the repo root, but
+ * not one made before `madeSinceMs`. A file system that records no creation
+ * time reports 0, and those folders go as git would remove them.
+ */
+async function removeEmptyFolders(
+	root: string,
+	path: string,
+	madeSinceMs: number,
+): Promise<void> {
 	for (
 		let dir = dirname(path);
 		dir !== "." && dir !== "/";
 		dir = dirname(dir)
 	) {
-		const removed = await rmdir(join(root, dir)).then(
+		const folder = join(root, dir);
+		const madeSince = await stat(folder).then(
+			({ birthtimeMs }) => birthtimeMs === 0 || birthtimeMs >= madeSinceMs,
+			() => false,
+		);
+		if (!madeSince) return;
+		const removed = await rmdir(folder).then(
 			() => true,
 			() => false,
 		);
@@ -735,9 +805,10 @@ export const checkpointUndoTask = defineWorkerTask<
 		const restored = [...removals, ...recreate];
 		await unstageTurnResult(git, restored, original, result, head);
 
+		const capturedAtMs = Number(heads.capturedAt) * 1000;
 		for (const path of removals) {
 			await rm(join(repo.root, path));
-			await removeEmptyFolders(repo.root, path);
+			await removeEmptyFolders(repo.root, path, capturedAtMs);
 		}
 		if (recreate.length > 0) {
 			await withScratchIndex(repo, async (scratch) => {
@@ -747,12 +818,21 @@ export const checkpointUndoTask = defineWorkerTask<
 				}
 			});
 		}
-		if (restored.length > 0) await markUndone(git, base, before, anchors);
 		const done = new Set(restored);
+		const skipped = changed.filter((path) => !done.has(path));
+		if (restored.length > 0) {
+			await markUndone(
+				git,
+				base,
+				before,
+				await undoneCommit(repo, before, skipped, result),
+				anchors,
+			);
+		}
 		return {
 			status: "undone",
 			restored: changed.filter((path) => done.has(path)),
-			skipped: changed.filter((path) => !done.has(path)),
+			skipped,
 		};
 	},
 });

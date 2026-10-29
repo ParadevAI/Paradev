@@ -270,6 +270,7 @@ export class LiveSession {
 				content: sent,
 				turnId: this.mintId(),
 				seq,
+				snapshotWorktree,
 			});
 			return { itemId, queued: false };
 		}
@@ -641,9 +642,9 @@ export class LiveSession {
 		if (!awaiting) return;
 		this.promptedTurns.add(turnId);
 		this.awaitingTurn = null;
-		if (awaiting.before) {
+		if (this.options.checkpoints) {
 			this.checkpointedTurns.add(turnId);
-			this.options.checkpoints?.turnStarted(turnId, awaiting.before);
+			this.options.checkpoints.turnStarted(turnId, awaiting.before ?? null);
 		}
 		this.appendDurable({
 			type: "item",
@@ -684,9 +685,33 @@ export class LiveSession {
 				try {
 					this.send(prompt);
 				} catch (error) {
-					this.fail(error);
+					this.refuse(prompt, error);
 				}
 			});
+	}
+
+	/** The agent turned down a prompt sent after its snapshot, when no caller waits on it any more. */
+	private refuse(prompt: PendingPrompt, error: unknown): void {
+		if (!prompt.item.queued) this.discard(prompt);
+		const at = this.now();
+		this.appendDurable({
+			type: "item",
+			item: {
+				id: this.mintId(),
+				kind: "notice",
+				noticeKind: "error",
+				text: error instanceof Error ? error.message : String(error),
+				startedAtMs: at,
+				completedAtMs: at,
+			},
+			turnId: prompt.turnId,
+		});
+		this.emitSession({});
+		try {
+			this.deliverNextQueued();
+		} catch (next) {
+			this.fail(next);
+		}
 	}
 
 	/** The agent started a turn of its own meanwhile; the prompt waits for it to end. */

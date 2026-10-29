@@ -35,6 +35,8 @@ export type TurnChanges = {
 	live: boolean;
 	/** Its file changes were undone. */
 	undone: boolean;
+	/** Files that Undo left alone, because they had changed again since. */
+	undoSkipped?: string[];
 	/** Files whose turn result HEAD now holds, with nothing left to commit. */
 	committed: string[];
 };
@@ -59,8 +61,10 @@ export type TurnUndoResult =
 export type ChatCheckpoints = {
 	/** Snapshots the worktree before a prompt reaches the agent; null when it cannot. */
 	capture(input: { cwd: string; sessionId: string }): Promise<string | null>;
-	/** Names the snapshot taken before the prompt that started this turn. */
-	turnStarted(input: TurnCheckpointTarget & { before: string }): Promise<void>;
+	/** A prompt started this turn; `before` is the snapshot taken for it, if any. */
+	turnStarted(
+		input: TurnCheckpointTarget & { before: string | null },
+	): Promise<void>;
 	/** `anchor` is the turn's first tool call, kept to find the turn after a resume. */
 	turnSettled(
 		input: TurnCheckpointTarget & { anchor?: TurnAnchor },
@@ -78,7 +82,7 @@ export type ChatCheckpoints = {
 /** One session's view of the checkpoints, bound to its worktree. */
 export type SessionCheckpoints = {
 	capture(): Promise<string | null>;
-	turnStarted(turnId: string, before: string): void;
+	turnStarted(turnId: string, before: string | null): void;
 	turnSettled(turnId: string, anchor?: TurnAnchor): void;
 };
 

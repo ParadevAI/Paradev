@@ -24,7 +24,7 @@ type RunTask = <TInput, TResult>(
 const runInWorker: RunTask = (task, input) =>
 	getHostWorkerPool().run(task, input);
 
-/** From the snapshot before a prompt to the turn's end; `end` is null while it runs. */
+/** From the snapshot before a prompt, or else the turn's start, to its end; `end` is null while it runs. */
 type Span = { sessionId: string; start: number; end: number | null };
 
 function turnKey(sessionId: string, turnId: string): string {
@@ -57,11 +57,11 @@ export type GitCheckpointsOptions = {
 
 /**
  * Git snapshots run in the host worker pool, off the event loop. Which chats
- * work in a worktree at once is known only here: a turn whose span, from the
- * snapshot before its prompt to its end, overlaps another chat's is marked
- * shared. Work on a worktree's snapshot index (snapshots, live reads, Undo)
- * runs one at a time, in the order asked, so a prompt's snapshot never starts
- * before the previous turn's has finished.
+ * work in a worktree at once is known only here: every prompted turn has a
+ * span, snapshotted or not, and a snapshotted turn whose span overlaps another
+ * chat's is marked shared. Work on a worktree's snapshot index (snapshots,
+ * live reads, Undo) runs one at a time, in the order asked, so a prompt's
+ * snapshot never starts before the previous turn's has finished.
  */
 export function createGitCheckpoints(
 	run: RunTask = runInWorker,
@@ -72,6 +72,7 @@ export function createGitCheckpoints(
 ): ChatCheckpoints {
 	const spansByCwd = new Map<string, Map<string, Span>>();
 	const settling = new Map<string, Promise<unknown>>();
+	const snapshotted = new Set<string>();
 	const queues = new Map<string, Promise<unknown>>();
 
 	const queued = <T>(cwd: string, work: () => Promise<T>): Promise<T> => {
@@ -124,10 +125,13 @@ export function createGitCheckpoints(
 	};
 
 	return {
-		capture: async ({ cwd, sessionId }) => {
-			const key = unstartedKey(sessionId);
-			spansIn(cwd).set(key, { sessionId, start: now(), end: null });
-			const before = await withDeadline(
+		capture: ({ cwd, sessionId }) => {
+			spansIn(cwd).set(unstartedKey(sessionId), {
+				sessionId,
+				start: now(),
+				end: null,
+			});
+			return withDeadline(
 				queued(cwd, () =>
 					run(checkpointCaptureTask, {
 						cwd,
@@ -136,23 +140,21 @@ export function createGitCheckpoints(
 					}),
 				),
 				captureTimeoutMs,
-			).catch((error: unknown) => {
-				spansIn(cwd).delete(key);
-				throw error;
-			});
-			if (!before) spansIn(cwd).delete(key);
-			return before;
+			);
 		},
 
 		turnStarted: async ({ cwd, sessionId, turnId, before }) => {
 			const spans = spansIn(cwd);
+			const key = turnKey(sessionId, turnId);
 			const unstarted = spans.get(unstartedKey(sessionId));
 			spans.delete(unstartedKey(sessionId));
-			spans.set(turnKey(sessionId, turnId), {
+			spans.set(key, {
 				sessionId,
 				start: unstarted?.start ?? now(),
 				end: null,
 			});
+			if (!before) return;
+			snapshotted.add(key);
 			await run(checkpointRefTask, {
 				cwd,
 				ref: turnRef(sessionId, turnId, "before"),
@@ -168,6 +170,7 @@ export function createGitCheckpoints(
 			spansIn(cwd).set(key, span);
 			const wasShared = overlapsOther(cwd, span, at);
 			prune(cwd, at);
+			if (!snapshotted.delete(key)) return;
 			const snapshot = queued(cwd, () =>
 				run(checkpointCaptureTask, {
 					cwd,
