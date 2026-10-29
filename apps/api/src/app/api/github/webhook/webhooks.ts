@@ -9,30 +9,12 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
-import { notifyDevOfPullRequest } from "@superset/trpc/agent-events";
 import { nudge } from "@superset/trpc/realtime";
 import { and, eq } from "drizzle-orm";
+
 import { env } from "@/env";
 
 export const webhooks = new Webhooks({ secret: env.GH_WEBHOOK_SECRET });
-
-const FAILED_CHECK = new Set([
-	"failure",
-	"timed_out",
-	"cancelled",
-	"action_required",
-]);
-
-/** A pull request a Dev's task opened: its main session hears about it. */
-async function tellDev(event: {
-	url: string;
-	deliveryId: string;
-	what: string;
-}) {
-	await notifyDevOfPullRequest(event).catch((error: unknown) =>
-		console.error("[github/webhook] couldn't tell the Dev", error),
-	);
-}
 
 webhooks.on(
 	"installation.deleted",
@@ -296,15 +278,8 @@ webhooks.on(
 
 webhooks.on(
 	"pull_request.closed",
-	async ({ id, payload }: EmitterWebhookEvent<"pull_request.closed">) => {
+	async ({ payload }: EmitterWebhookEvent<"pull_request.closed">) => {
 		const { pull_request: pr, repository } = payload;
-		await tellDev({
-			url: pr.html_url,
-			deliveryId: id,
-			what: pr.merged
-				? `Merged by ${pr.merged_by?.login ?? "someone"}.`
-				: "Closed without merging.",
-		});
 
 		const [repo] = await db
 			.select()
@@ -328,16 +303,8 @@ webhooks.on(
 
 webhooks.on(
 	"pull_request_review.submitted",
-	async ({
-		id,
-		payload,
-	}: EmitterWebhookEvent<"pull_request_review.submitted">) => {
+	async ({ payload }: EmitterWebhookEvent<"pull_request_review.submitted">) => {
 		const { review, pull_request: pr, repository } = payload;
-		await tellDev({
-			url: pr.html_url,
-			deliveryId: id,
-			what: `Review by ${review.user?.login ?? "someone"}: ${review.state.replace("_", " ")}.${review.body ? `\n${review.body}` : ""}`,
-		});
 
 		const [repo] = await db
 			.select()
@@ -405,24 +372,11 @@ webhooks.on(
 webhooks.on(
 	["check_run.created", "check_run.completed", "check_run.rerequested"],
 	async ({
-		id,
 		payload,
 	}: EmitterWebhookEvent<
 		"check_run.created" | "check_run.completed" | "check_run.rerequested"
 	>) => {
 		const { check_run: checkRun, repository } = payload;
-		if (
-			payload.action === "completed" &&
-			FAILED_CHECK.has(checkRun.conclusion ?? "")
-		) {
-			for (const pr of checkRun.pull_requests) {
-				await tellDev({
-					url: `https://github.com/${repository.full_name}/pull/${pr.number}`,
-					deliveryId: `${id}:${pr.number}`,
-					what: `Check "${checkRun.name}" ${checkRun.conclusion}.${checkRun.details_url ? ` Details: ${checkRun.details_url}` : ""}`,
-				});
-			}
-		}
 
 		const [repo] = await db
 			.select()

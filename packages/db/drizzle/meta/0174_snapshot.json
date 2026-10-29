@@ -1,6 +1,6 @@
 {
-  "id": "cde9380a-9e4c-40a0-ba9a-7184c7a54421",
-  "prevId": "c8fe2d6f-39be-418b-b3f0-6509f03bfcb6",
+  "id": "20d0759a-b608-484a-a1f7-9a84673eae94",
+  "prevId": "f34ab4d4-993e-489d-b717-5d2fdd7eca86",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -394,21 +394,6 @@
           "with": {},
           "method": "btree",
           "concurrently": false
-        },
-        "agent_sessions_pull_request_idx": {
-          "name": "agent_sessions_pull_request_idx",
-          "columns": [
-            {
-              "expression": "pull_request_url",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "with": {},
-          "method": "btree",
-          "concurrently": false
         }
       },
       "foreignKeys": {
@@ -640,6 +625,19 @@
         },
         "error_code": {
           "name": "error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "last_attempt_error": {
+          "name": "last_attempt_error",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -16290,8 +16288,7 @@
         "thread_reply",
         "channel_message",
         "task_start",
-        "task_update",
-        "github"
+        "task_update"
       ]
     },
     "public.agent_turn_status": {

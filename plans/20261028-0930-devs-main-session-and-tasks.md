@@ -8,7 +8,7 @@ Reference: This plan follows conventions from AGENTS.md and the ExecPlan templat
 
 A Dev is an agent teammate in a Paradev organization. Today each DM and each channel thread a Dev is mentioned in is its own session with its own memory, no session ever gets a machine, and the Dev's saved instructions never reach the model. So a Dev can chat but cannot do coding work, and it does not know in one thread what it is doing in another.
 
-After this change a Dev has one main session that every message reaches, wherever it was sent: its DMs, @mentions, threads it takes part in, channel messages a router decides are for it, and GitHub events on pull requests its tasks opened. The main session has no machine. It answers from what it knows and delegates any code work to task sessions. Each task session runs pdev on its own cloud box, and a reviewer task can check a writer task's pull request. Task results come back to the main session, which tells people. People always talk to the Dev, never to its tasks.
+After this change a Dev has one main session that every message reaches, wherever it was sent: its DMs, @mentions, threads it takes part in, and channel messages a router decides are for it. The main session has no machine. It answers from what it knows and delegates any code work to task sessions. Each task session runs pdev on its own cloud box, and a reviewer task can check a writer task's pull request. Task results come back to the main session, which tells people. People always talk to the Dev, never to its tasks.
 
 To see it working: in a channel, mention a Dev and ask for a code change. The Dev replies in the thread, a cloud workspace appears for the task, a pull request opens, a reviewer task reviews it, and the Dev posts the result in the thread. Ask the Dev "what are you working on?" in a DM while that runs, and it answers immediately from its work list.
 
@@ -27,7 +27,7 @@ Slack and Linear as sources need an identity rule: what in Slack or Linear means
 - [x] (2026-10-28 13:00Z) Milestone 2: Dev tools as an MCP server at `/mcp/agent`; replies with a target; main session runs with no machine and no subagents.
 - [x] (2026-10-28 15:00Z) Milestone 3: task sessions on their own boxes; writer and reviewer roles; task updates wake the main session; limit of 3 and a queue; one task per dedupe key.
 - [x] (2026-10-28 17:00Z) Milestone 4: Jev channel router choosing which Devs (if any) a channel message is for; eval set of 94 cases plus 32 held out.
-- [x] (2026-10-28 18:00Z) Milestone 5: GitHub check failures, reviews and closes on a task's pull request reach the main session.
+- [x] (2026-10-29 05:00Z) Milestone 5, changed: a writer task waits for its pull request's checks and fixes failures in its own turn. GitHub events no longer reach the Dev through the webhook (see Decision Log).
 - [ ] Milestone 6: Slack and Linear sources (after the trigger decision).
 - [x] (2026-10-28 20:50Z) End-to-end test on a local stack with real boxes (see Outcomes).
 - [ ] Before a PR: db-migrations production checklist and a trpc-compat check (listSessions gains fields; new devTools procedures).
@@ -74,6 +74,9 @@ Slack and Linear as sources need an identity rule: what in Slack or Linear means
   Rationale: additive enum change first, so a deploy never fails on old rows.
   Date/Author: 2026-10-28, Claude.
 - Decision (pending): Slack and Linear triggers.
+- Decision: no GitHub webhook path for Devs. A writer task waits for its checks with `gh pr checks --watch` and fixes failures before it reports. Reviews and merges that happen after a task's turn are not seen for now; a person tells the Dev, which forwards to the task. If that hurts, add a general way for a session to be woken when something it watches changes, not a GitHub-specific path.
+  Rationale: the webhook lookup ran for every customer's pull request events, coupling Devs to a production path; it only covered repos with the GitHub App installed; and a task's own turn already sees its CI.
+  Date/Author: 2026-10-29, Satya.
 
 ## Outcomes & Retrospective
 
@@ -132,3 +135,6 @@ Enum and column additions are additive. Starting a task is keyed by the tool cal
 ## Interfaces and Dependencies
 
 `@superset/mcp` for the MCP server; `startCloudWorkspace` for boxes; `submitPrompt` for every turn; Jev over the Vercel AI Gateway.
+
+
+Revision 2026-10-29: GitHub events removed from Devs (milestone 5 changed); a writer task waits for its own checks instead. Reason in the Decision Log: the webhook path coupled Devs to every customer's pull request events.
