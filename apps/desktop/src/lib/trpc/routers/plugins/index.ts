@@ -13,7 +13,6 @@ import {
 	setPluginEnabled,
 	setSkillEnabled,
 	syncPlugins,
-	uninstallOrganizationPlugin,
 	uninstallPlugin,
 	writeBundledSkillContent,
 } from "main/lib/plugin-installs";
@@ -107,8 +106,8 @@ export const createPluginsRouter = () => {
 		}),
 
 		uninstall: publicProcedure.input(pluginRef).mutation(({ input }) => {
+			// The renderer removes the account install, then syncs this machine.
 			if (isOrganizationPlugin(input)) {
-				uninstallOrganizationPlugin(input.name, input.marketplace);
 				return { installed: getInstalledPlugins() };
 			}
 			return { installed: uninstallPlugin(input.name) };
@@ -132,7 +131,6 @@ export const createPluginsRouter = () => {
 			organizationPluginVersions(),
 		),
 
-		/** Reconciles local skills and MCP entries, including the organization's managed plugins. */
 		sync: publicProcedure
 			.input(
 				z.object({ organizationId: z.string().min(1).optional() }).optional(),

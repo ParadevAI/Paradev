@@ -18,7 +18,6 @@ export interface SyncRequest {
 
 const stamp = (value: Date | string) => new Date(value).getTime();
 
-/** A new source with no sync and no error yet, still inside the time limit, is on its first sync. */
 export function isFirstSyncPending(source: SourceRow, now: number): boolean {
 	return (
 		source.syncedAt === null &&

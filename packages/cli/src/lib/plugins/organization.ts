@@ -1,6 +1,8 @@
+import fs from "node:fs";
 import { writePluginTree } from "@superset/agent-setup";
 import { CLIError } from "@superset/cli-framework";
 import {
+	isOrganizationMarketplace,
 	manifestHasTools,
 	organizationMarketplace,
 } from "@superset/shared/plugins";
@@ -9,7 +11,7 @@ import {
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import type { ApiClient } from "../api-client";
-import { readInstalledPlugins } from "./host";
+import { readInstalledPlugins, writeInstalledPlugins } from "./host";
 import {
 	type InstallPluginResult,
 	recordPlugin,
@@ -52,16 +54,41 @@ export async function installOrganizationPlugin(
 	});
 }
 
+/** Removes the plugins of every organization not in `keep` from this machine; the caller re-provisions agents. */
+export function forgetOrganizationPlugins(
+	keep: ReadonlySet<string> = new Set(),
+): string[] {
+	const ledger = readInstalledPlugins();
+	const gone = ledger.filter(
+		(entry) =>
+			isOrganizationMarketplace(entry.marketplace) &&
+			!keep.has(entry.marketplace),
+	);
+	if (!gone.length) return [];
+	writeInstalledPlugins(ledger.filter((entry) => !gone.includes(entry)));
+	for (const entry of gone) {
+		if (entry.installPath) {
+			fs.rmSync(entry.installPath, { recursive: true, force: true });
+		}
+	}
+	return gone.map((entry) => entry.name);
+}
+
 /**
  * Brings this machine's organization plugins in line with the account: the
  * ones the member installed or the organization installs for them land or
- * update here, and ones the member lost access to are removed.
+ * update here, and ones the member lost access to, or whose organization they
+ * left, are removed.
  */
 export async function reconcileOrganizationPlugins(
 	api: ApiClient,
 ): Promise<{ installed: string[]; removed: string[]; failed: string[] }> {
+	const memberships = await api.user.myOrganizations.query();
+	const forgotten = forgetOrganizationPlugins(
+		new Set(memberships.map((org) => organizationMarketplace(org.id))),
+	);
 	const organization = await api.user.myOrganization.query();
-	if (!organization) return { installed: [], removed: [], failed: [] };
+	if (!organization) return { installed: [], removed: forgotten, failed: [] };
 	const marketplace = organizationMarketplace(organization.id);
 
 	const wanted = (await api.plugins.list.query()).filter(
@@ -73,7 +100,7 @@ export async function reconcileOrganizationPlugins(
 
 	const result = {
 		installed: [] as string[],
-		removed: [] as string[],
+		removed: [...forgotten],
 		failed: [] as string[],
 	};
 	for (const plugin of wanted) {

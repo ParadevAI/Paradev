@@ -6,6 +6,7 @@ import {
 } from "@superset/db/schema";
 import { DEFAULT_ORGANIZATION_PLUGIN_POLICY } from "@superset/shared/plugins";
 import {
+	PLUGIN_BUNDLE_MAX_BYTES,
 	PLUGIN_BUNDLE_MAX_FILES,
 	PLUGIN_BUNDLE_MAX_UNPACKED_BYTES,
 	packPluginBundle,
@@ -60,7 +61,18 @@ function assertFitsInBundle(
 			`its files are ${bytes} bytes, too large for a plugin bundle (${PLUGIN_BUNDLE_MAX_UNPACKED_BYTES} bytes encoded)`,
 		);
 	}
+	const incompressible = repoPaths
+		.filter((path) => COMPRESSED_FILE.test(path))
+		.reduce((sum, path) => sum + (snapshot.sizes?.get(path) ?? 0), 0);
+	if (incompressible > PLUGIN_BUNDLE_MAX_BYTES) {
+		throw new Error(
+			`its images, archives and other compressed files are ${incompressible} bytes, over the ${PLUGIN_BUNDLE_MAX_BYTES} byte limit for a packed plugin`,
+		);
+	}
 }
+
+const COMPRESSED_FILE =
+	/\.(png|jpe?g|gif|webp|avif|ico|zip|gz|tgz|bz2|xz|7z|mp3|mp4|mov|webm|woff2?|pdf)$/i;
 
 interface PluginBuild {
 	bundle: Buffer;
@@ -120,7 +132,7 @@ async function bundleFor(
 	};
 }
 
-/** Whether the stored bundle holds other files than this build, read only when the version stayed the same. */
+/** Whether the stored bundle holds other files than this build, read only when the version stayed the same. A missing bundle counts as changed. */
 async function filesChanged(
 	organizationId: string,
 	contentHash: string,
@@ -129,16 +141,11 @@ async function filesChanged(
 	const object = await getObject(
 		organizationBundleKey(organizationId, contentHash),
 	);
-	if (!object) return false;
+	if (!object) return true;
 	const stored = unpackPluginBundle(Buffer.from(await object.arrayBuffer()));
 	return pluginTreeHash(stored) !== build.treeHash;
 }
 
-/**
- * Brings an organization's plugins in line with one repository source. A
- * plugin that fails keeps its last good version; one that left the
- * repository is marked, not deleted, so members keep what they installed.
- */
 const CREDENTIAL_LABEL = {
 	admin: "the GitHub account of the admin who added it",
 	app: "the organization's GitHub App",
@@ -293,6 +300,11 @@ async function syncSnapshot(
 	result.removed.push(...removed.map((row) => row.name));
 }
 
+/**
+ * Brings an organization's plugins in line with one repository source. A
+ * plugin that fails keeps its last good version; one that left the
+ * repository is marked, not deleted, so members keep what they installed.
+ */
 export async function syncOrganizationPluginSource(
 	sourceId: string,
 	readSnapshot: typeof repositorySnapshot = repositorySnapshot,

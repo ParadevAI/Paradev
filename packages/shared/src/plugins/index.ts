@@ -590,9 +590,10 @@ function proxyMcpServer(
 	name: string,
 	marketplace: string,
 	options: { headersHelper?: string },
+	key: string = name,
 ): Record<string, PluginMcpServerConfig> {
 	return {
-		[name]: {
+		[key]: {
 			type: "http",
 			url: `${SUPERSET_API_URL}/mcp/plugins/${marketplace}/${name}`,
 			...(options.headersHelper
@@ -623,6 +624,15 @@ export function desiredPluginMcpServers(
 	} = {},
 ): Record<string, PluginMcpServerConfig> {
 	const desired: Record<string, PluginMcpServerConfig> = {};
+	const organizationNames = new Map<string, number>();
+	for (const install of installed) {
+		if (install.marketplace && isOrganizationMarketplace(install.marketplace)) {
+			organizationNames.set(
+				install.name,
+				(organizationNames.get(install.name) ?? 0) + 1,
+			);
+		}
+	}
 	for (const install of installed) {
 		if (install.enabled === false) continue;
 		// This catalog is the first-party one, and the proxy URL names the
@@ -631,9 +641,13 @@ export function desiredPluginMcpServers(
 		const marketplace = install.marketplace || DEFAULT_MARKETPLACE;
 		if (isOrganizationMarketplace(marketplace)) {
 			if (install.tools === false) continue;
+			const shared = (organizationNames.get(install.name) ?? 0) > 1;
+			const key = shared
+				? `${install.name}-${organizationIdOfMarketplace(marketplace)?.slice(0, 8)}`
+				: install.name;
 			Object.assign(
 				desired,
-				proxyMcpServer(install.name, marketplace, options),
+				proxyMcpServer(install.name, marketplace, options, key),
 			);
 			continue;
 		}

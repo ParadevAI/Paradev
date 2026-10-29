@@ -246,6 +246,46 @@ describe("syncOrganizationPluginSource", () => {
 		expect(reads).toEqual([".agent-marketplace.json"]);
 	});
 
+	test("a same-version change is refused when the stored bundle is missing", async () => {
+		await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-1", {
+				".agent-marketplace.json": marketplace("tools"),
+				...plugin("tools", "1.0.0"),
+			}),
+		);
+		objects.clear();
+		const result = await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo("sha-2", {
+				".agent-marketplace.json": marketplace("tools"),
+				...plugin("tools", "1.0.0", "second"),
+			}),
+		);
+		expect(result?.problems[0]?.reason).toContain("bump the version");
+	});
+
+	test("images over the packed limit are refused before any file is read", async () => {
+		const result = await syncOrganizationPluginSource(
+			SOURCE.id,
+			repo(
+				"sha-1",
+				{
+					".agent-marketplace.json": marketplace("big"),
+					...plugin("big", "1.0.0"),
+					"plugins/big/assets/screenshot.png": "",
+				},
+				{
+					sizes: new Map([
+						["plugins/big/assets/screenshot.png", 3 * 1024 * 1024],
+					]),
+				},
+			),
+		);
+		expect(result?.problems[0]?.reason).toContain("compressed files");
+		expect(reads).toEqual([".agent-marketplace.json"]);
+	});
+
 	test("a plugin another source wrote during this sync is reported, not overwritten", async () => {
 		writtenMeanwhile.push({
 			id: "tools",

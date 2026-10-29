@@ -139,7 +139,10 @@ repository as a source (repository, ref, path). Sync reads `.agent-marketplace.j
 the same format as this repository's marketplace: each plugin's `source` is a `./` directory in the
 repository. Like Codex, it packs the whole plugin directory into a bundle, so skills can use
 `scripts/`, `assets/` and other folders next to them, and executable files stay executable. It
-leaves out `.git`, `node_modules` and `hooks/`, which Superset does not run. Bundles go to the
+leaves out `.git`, `node_modules` and `hooks/`, which Superset does not run. A plugin may have at
+most 500 files and must pack to 2 MB gzipped (16 MB unpacked); sync checks the file count, the
+unpacked size and the size of already-compressed files such as images before it downloads any.
+Bundles go to the
 private R2 bucket; each plugin is a row in `organization_plugins` under a marketplace named
 `organization-<organization id>`. Two organizations' same-named plugins never share an install.
 

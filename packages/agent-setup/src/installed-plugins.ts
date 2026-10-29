@@ -100,7 +100,6 @@ export function readInstalledVersions(
 	);
 }
 
-/** A plugin tree this machine already holds, by marketplace and name. */
 export function findInstalledTree(
 	marketplace: string,
 	name: string,

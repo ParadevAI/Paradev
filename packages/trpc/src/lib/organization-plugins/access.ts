@@ -24,7 +24,6 @@ export async function memberRole(
 	return row?.role ?? null;
 }
 
-/** Rows of `organization_plugins` this role may see and install. */
 export function accessibleTo(role: string | null): SQL {
 	if (!role) return sql`false`;
 	return inArray(sql`${organizationPlugins.installPolicy} ->> ${role}`, [

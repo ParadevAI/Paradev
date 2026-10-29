@@ -164,16 +164,6 @@ export function organizationPluginVersions(): {
 	);
 }
 
-export function uninstallOrganizationPlugin(
-	name: string,
-	marketplace: string,
-): void {
-	void queueOrganizationPluginCli(
-		["uninstall", name, "--marketplace", marketplace],
-		organizationIdOfMarketplace(marketplace),
-	).catch(() => {});
-}
-
 export function setOrganizationPluginEnabled(
 	name: string,
 	marketplace: string,
@@ -183,6 +173,10 @@ export function setOrganizationPluginEnabled(
 		[enabled ? "enable" : "disable", name, "--marketplace", marketplace],
 		organizationIdOfMarketplace(marketplace),
 	).catch(() => {});
+}
+
+export function forgetOrganizationPlugins(): Promise<void> {
+	return queueOrganizationPluginCli(["sync", "--forget-organizations"], null);
 }
 
 export function syncPlugins(organizationId?: string | null): Promise<void> {

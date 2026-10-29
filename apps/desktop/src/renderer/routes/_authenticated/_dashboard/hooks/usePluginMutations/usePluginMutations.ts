@@ -1,6 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { getPluginByName } from "@superset/shared/plugins";
+import {
+	getPluginByName,
+	organizationIdOfMarketplace,
+} from "@superset/shared/plugins";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -98,6 +101,7 @@ export function usePluginMutations() {
 			);
 		},
 	});
+	const machineSync = electronTrpc.plugins.sync.useMutation();
 	const uninstallMutation = electronTrpc.plugins.uninstall.useMutation({
 		onSuccess: async (_data, variables) => {
 			let disconnected = 0;
@@ -107,6 +111,10 @@ export function usePluginMutations() {
 					marketplace: variables.marketplace,
 				});
 				disconnected = result.disconnected;
+				const organizationId = variables.marketplace
+					? organizationIdOfMarketplace(variables.marketplace)
+					: null;
+				if (organizationId) await machineSync.mutateAsync({ organizationId });
 			} catch (error) {
 				toast.warning(
 					t({
@@ -221,6 +229,7 @@ export function usePluginMutations() {
 			installMutation.isPending ||
 			updateMutation.isPending ||
 			uninstallMutation.isPending ||
+			machineSync.isPending ||
 			machineSetEnabled.isPending ||
 			accountInstall.isPending ||
 			accountUninstall.isPending ||

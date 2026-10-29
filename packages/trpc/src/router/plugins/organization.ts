@@ -1,16 +1,19 @@
 import { db } from "@superset/db/client";
 import {
+	members,
 	organizationPluginSources,
 	organizationPlugins,
+	pluginInstalls,
 } from "@superset/db/schema";
 import { ROLE_HIERARCHY } from "@superset/shared/auth";
 import {
 	ORGANIZATION_PLUGIN_ACCESS,
 	organizationMarketplace,
+	organizationPluginAccess,
 } from "@superset/shared/plugins";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { Client } from "@upstash/qstash";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { userError } from "../../i18n-error";
@@ -127,7 +130,10 @@ const sourcesRouter = {
 			z.object({
 				repo: z
 					.string()
-					.regex(/^[\w.-]+\/[\w.-]+$/, "owner/name of a GitHub repository"),
+					.regex(
+						/^(?!\.{1,2}\/)[\w.-]+\/(?!\.{1,2}$)[\w.-]+$/,
+						"owner/name of a GitHub repository",
+					),
 				ref: z.string().min(1).optional(),
 				path: z.string().optional(),
 			}),
@@ -295,6 +301,32 @@ export const organizationPluginsRouter = {
 				)
 				.returning();
 			if (!row) throw unknown(input.name);
+			const revoked = ROLE_HIERARCHY.filter(
+				(role) =>
+					organizationPluginAccess(input.policy, role) === "unavailable",
+			);
+			const losing = revoked.length
+				? await db
+						.select({ userId: members.userId })
+						.from(members)
+						.where(
+							and(
+								eq(members.organizationId, organizationId),
+								inArray(members.role, revoked),
+							),
+						)
+				: [];
+			if (losing.length) {
+				await db.delete(pluginInstalls).where(
+					and(
+						eq(pluginInstalls.organizationPluginId, row.id),
+						inArray(
+							pluginInstalls.userId,
+							losing.map((member) => member.userId),
+						),
+					),
+				);
+			}
 			nudge(organizationId, "plugins");
 			return { name: row.name, policy: row.installPolicy };
 		}),

@@ -1,7 +1,6 @@
 import { CLIError } from "@superset/cli-framework";
 import type { ApiClient } from "../api-client";
 
-/** A source by its id or its owner/name, so a script can use either. */
 export async function resolveSource(api: ApiClient, ref: string) {
 	const sources = await api.plugins.organization.sources.list.query();
 	const matches = sources.filter(

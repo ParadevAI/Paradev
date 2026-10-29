@@ -24,7 +24,6 @@ export async function appInstallationToken(
 	return token;
 }
 
-/** One commit of a repository, read with whichever token the caller chose. */
 export async function repositorySnapshot(args: {
 	token: string;
 	repo: string;

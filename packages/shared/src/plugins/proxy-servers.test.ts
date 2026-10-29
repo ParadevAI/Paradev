@@ -71,6 +71,20 @@ describe("desiredPluginMcpServers", () => {
 		);
 	});
 
+	test("two organizations' same-named plugins get an entry each", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "deploy", marketplace: "organization-aaaaaaaa-1111" },
+			{ name: "deploy", marketplace: "organization-bbbbbbbb-2222" },
+		]);
+		expect(Object.keys(desired).sort()).toEqual([
+			"deploy-aaaaaaaa",
+			"deploy-bbbbbbbb",
+		]);
+		expect((desired["deploy-bbbbbbbb"] as { url: string }).url).toBe(
+			"https://api.superset.sh/mcp/plugins/organization-bbbbbbbb-2222/deploy",
+		);
+	});
+
 	test("an organization plugin with only skills gets no MCP entry", () => {
 		expect(
 			desiredPluginMcpServers([

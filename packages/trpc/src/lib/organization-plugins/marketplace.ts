@@ -138,7 +138,6 @@ export function withVersion(
 	return { ...manifest, version: `0.0.0-${hash.digest("hex").slice(0, 12)}` };
 }
 
-/** The skills a plugin carries, named the way its SKILL.md frontmatter names them. */
 export function skillsIn(
 	files: ReadonlyMap<string, Uint8Array>,
 ): { name: string; description: string }[] {

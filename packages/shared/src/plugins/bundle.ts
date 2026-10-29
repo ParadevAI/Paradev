@@ -7,9 +7,7 @@ export const PLUGIN_BUNDLE_MAX_FILES = 500;
 const PLUGIN_BUNDLE_FORMAT = 2;
 const READABLE_FORMATS = new Set([1, 2]);
 
-/** Folders a plugin bundle leaves out at any depth. */
 const EXCLUDED_DIRS = new Set([".git", "node_modules"]);
-/** Hooks are not run, so the plugin's top-level hooks folder is not carried. */
 const EXCLUDED_TOP_LEVEL = new Set(["hooks"]);
 const EXCLUDED_FILES = new Set([".DS_Store"]);
 
@@ -18,7 +16,6 @@ export interface PluginTree {
 	executable: Set<string>;
 }
 
-/** Whether a file at this path inside a plugin directory goes into its bundle. */
 export function isPluginTreePath(path: string): boolean {
 	const segments = path.split("/");
 	return (
