@@ -6,6 +6,7 @@ import {
 	latestSessionUsage,
 	launchConfigSelections,
 	type OutboxEntry,
+	presetForAnyHarness,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
@@ -29,6 +30,8 @@ import { toast } from "@superset/ui/sonner";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
+import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
 import type { OpenFile } from "../../../../../../types";
@@ -42,6 +45,7 @@ import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
 import { heldPromptQueue } from "../../utils/heldPromptQueue";
 import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
+import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
 import {
@@ -51,6 +55,10 @@ import {
 	type ComposerHandle,
 	prependToDraft,
 } from "../Composer";
+import type {
+	SwitchAccount,
+	SwitchableAgent,
+} from "../Composer/components/UsageLimitNotice";
 import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
 import { SetupSessionHeader } from "../SetupSessionHeader";
@@ -100,6 +108,8 @@ export function SessionView({
 	preferredModelLabel,
 	onPendingPromptsSent,
 	onFork,
+	onSwitchAccount,
+	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
 	onStartNewChat,
@@ -135,6 +145,8 @@ export function SessionView({
 	onSessionState?: (session: SessionState | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
+	onSwitchAccount?: SwitchAccount;
+	sessionAccount?: TerminalAgentBinding["account"];
 	/**
 	 * Absent when the agent cannot branch its own session. The transcript is
 	 * built here because only this view holds the timeline; a branch into
@@ -535,6 +547,35 @@ export function SessionView({
 		],
 	);
 
+	const limit = sessionState?.usageLimit;
+	const respondToUsageLimit = session.respondToUsageLimit;
+	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const usageLimit = useMemo(() => {
+		if (!limit) return undefined;
+		const preset = harness ? presetForAnyHarness(harness) : undefined;
+		const agent: SwitchableAgent | undefined =
+			preset === "claude" ? "claude" : preset === "codex" ? "codex" : undefined;
+		return {
+			limit,
+			respond: respondToUsageLimit,
+			modelLabel: limit.model
+				? modelDisplayName(limit.model, configOptions ?? [])
+				: undefined,
+			agent,
+			hostUrl,
+			sessionAccount,
+			onSwitchAccount,
+		};
+	}, [
+		limit,
+		respondToUsageLimit,
+		harness,
+		configOptions,
+		hostUrl,
+		onSwitchAccount,
+		sessionAccount,
+	]);
+
 	const heldQueued = held?.queued;
 	const heldLaunched = held?.launched;
 	const heldQueue = useMemo(
@@ -694,6 +735,7 @@ export function SessionView({
 					onFork={onFork ? forkWithTranscript : undefined}
 					canForkToWorktree={canForkToWorktree}
 					onOpenFind={focusedSubagentId ? undefined : openFind}
+					usageLimit={held ? undefined : usageLimit}
 					workspaceId={workspaceId}
 				/>
 			</ComposerDropZone>

@@ -85,6 +85,12 @@ export const acpUsageUpdateSchema = z.looseObject({
 	used: z.number().nonnegative().optional().catch(undefined),
 	size: z.number().positive().optional().catch(undefined),
 	cost: z.unknown().optional(),
+	_meta: z
+		.looseObject({
+			"_claude/rateLimit": z.unknown().optional(),
+			"_claude/model": z.unknown().optional(),
+		})
+		.optional(),
 });
 export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
 

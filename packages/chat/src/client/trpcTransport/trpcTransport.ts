@@ -7,6 +7,7 @@ type Mutation =
 	| "steerQueuedPrompt"
 	| "updateQueuedPrompt"
 	| "resumeQueue"
+	| "respondToUsageLimit"
 	| "cancelTurn"
 	| "stopBackgroundTask"
 	| "steerSubagent"
@@ -43,6 +44,7 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		steerQueuedPrompt: (input) => client.steerQueuedPrompt.mutate(input),
 		updateQueuedPrompt: (input) => client.updateQueuedPrompt.mutate(input),
 		resumeQueue: (input) => client.resumeQueue.mutate(input),
+		respondToUsageLimit: (input) => client.respondToUsageLimit.mutate(input),
 		cancelTurn: (input) => client.cancelTurn.mutate(input),
 		stopBackgroundTask: (input) => client.stopBackgroundTask.mutate(input),
 		steerSubagent: (input) => client.steerSubagent.mutate(input),

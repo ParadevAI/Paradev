@@ -13,6 +13,7 @@ import {
 	promptInputSchema,
 	queuedPromptInputSchema,
 	respondToApprovalInputSchema,
+	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
@@ -125,6 +126,12 @@ export function createChatRouter(
 			.input(resumeQueueInputSchema)
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.resumeQueue(input)),
+			),
+
+		respondToUsageLimit: t.procedure
+			.input(respondToUsageLimitInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.respondToUsageLimit(input)),
 			),
 
 		cancelTurn: t.procedure
