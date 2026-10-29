@@ -156,6 +156,7 @@ export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
 export type UseChatSessionOptions = {
 	client: SessionClient;
 	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	deltas?: readonly DeltaChannel[];
 	pageSize?: number;
 	scheduler?: FrameScheduler;
@@ -181,6 +182,7 @@ export type ChatSession = {
 	loadOlder(): Promise<boolean>;
 	removeQueuedPrompt(itemId: string): Promise<void>;
 	steerQueuedPrompt(itemId: string): Promise<void>;
+	updateQueuedPrompt(itemId: string, content: UserContent[]): Promise<void>;
 	resumeQueue(): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
@@ -209,6 +211,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const sendEnabled = options.sendEnabled ?? true;
 	const sendEnabledRef = useRef(sendEnabled);
 	sendEnabledRef.current = sendEnabled;
+	const snapshotWorktreeRef = useRef(options.snapshotWorktree === true);
+	snapshotWorktreeRef.current = options.snapshotWorktree === true;
 	const pageSize = options.pageSize;
 	const deltasKey = (options.deltas ?? DEFAULT_DELTAS).join(",");
 
@@ -253,6 +257,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 						clientId: entry.clientId,
 						content: entry.content,
 						...(entry.steer ? { steer: entry.steer } : {}),
+						...(snapshotWorktreeRef.current ? { snapshotWorktree: true } : {}),
 					});
 				},
 			}),
@@ -586,6 +591,11 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		(itemId: string) => client.steerQueuedPrompt(itemId),
 		[client],
 	);
+	const updateQueuedPrompt = useCallback(
+		(itemId: string, content: UserContent[]) =>
+			client.updateQueuedPrompt(itemId, content),
+		[client],
+	);
 
 	const resumeQueue = useCallback(() => client.resumeQueue(), [client]);
 
@@ -628,6 +638,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		loadOlder,
 		removeQueuedPrompt,
 		steerQueuedPrompt,
+		updateQueuedPrompt,
 		resumeQueue,
 		cancelTurn,
 		stopBackgroundTask,

@@ -1,11 +1,15 @@
 import { describe, expect, test } from "bun:test";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { restoreCommand } from "./restoreCommand";
 
 function composer(text: string) {
 	const input = {
 		text,
 		isEmpty: () => input.text.trim() === "",
-		appendText: (added: string) => {
+		restoreDraft: (draft: ComposerDraft) => {
+			const added = draft.segments
+				.map((segment) => (segment.type === "text" ? segment.text : ""))
+				.join("");
 			input.text = input.text ? `${input.text}\n${added}` : added;
 		},
 	};

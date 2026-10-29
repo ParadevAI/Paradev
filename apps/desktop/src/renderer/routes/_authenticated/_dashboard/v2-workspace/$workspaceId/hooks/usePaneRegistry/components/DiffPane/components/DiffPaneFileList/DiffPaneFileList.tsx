@@ -68,6 +68,10 @@ export function DiffPaneFileList({
 					focusLine: undefined,
 					focusSide: undefined,
 					focusTick: Date.now(),
+					filter:
+						data.filter && (data.filter.paths?.includes(path) ?? true)
+							? data.filter
+							: undefined,
 				} as DiffPaneData);
 			}
 			if (layout === "overlay") onClose();

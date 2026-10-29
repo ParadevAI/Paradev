@@ -197,6 +197,7 @@ export function ComparisonJsonLd({
 		publisher: {
 			"@type": "Organization",
 			name: BRAND.INTRO_NAME,
+			alternateName: BRAND.FORMER_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,

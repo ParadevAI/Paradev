@@ -2,18 +2,23 @@ import { Trans } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { LuMonitor, LuMonitorOff } from "react-icons/lu";
-import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
+import {
+	CloudGlyph,
+	type CloudGlyphState,
+} from "renderer/routes/_authenticated/components/CloudGlyph";
 import type { DashboardSidebarWorkspaceHostType } from "../../../../../../types";
 
 interface DashboardSidebarWorkspaceHostGlyphProps {
 	hostType: DashboardSidebarWorkspaceHostType;
 	hostIsOnline: boolean | null;
+	cloudState?: CloudGlyphState;
 }
 
 /** Marks where a workspace runs; this device is the default and gets nothing. */
 export function DashboardSidebarWorkspaceHostGlyph({
 	hostType,
 	hostIsOnline,
+	cloudState = "on",
 }: DashboardSidebarWorkspaceHostGlyphProps) {
 	if (hostType === "local-device") return null;
 	const isOffline = hostType === "remote-device" && hostIsOnline === false;
@@ -28,7 +33,7 @@ export function DashboardSidebarWorkspaceHostGlyph({
 					)}
 				>
 					{hostType === "cloud" ? (
-						<CloudGlyph className="size-3" />
+						<CloudGlyph className="size-3" state={cloudState} />
 					) : isOffline ? (
 						<LuMonitorOff className="size-3" strokeWidth={2} />
 					) : (
@@ -38,7 +43,11 @@ export function DashboardSidebarWorkspaceHostGlyph({
 			</TooltipTrigger>
 			<TooltipContent side="top">
 				{hostType === "cloud" ? (
-					<Trans>Cloud workspace</Trans>
+					cloudState === "connecting" ? (
+						<Trans>Cloud workspace — connecting</Trans>
+					) : (
+						<Trans>Cloud workspace</Trans>
+					)
 				) : isOffline ? (
 					<Trans>Remote workspace — device offline</Trans>
 				) : (

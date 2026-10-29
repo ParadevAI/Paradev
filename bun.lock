@@ -859,9 +859,12 @@
         "@shadcn/react": "0.2.1",
         "@superset/chat": "workspace:*",
         "@superset/i18n": "workspace:*",
+        "@superset/shared": "workspace:*",
         "@superset/ui": "workspace:*",
+        "dompurify": "3.4.16",
         "lexical": "0.41.0",
         "lucide-react": "0.563.0",
+        "pele": "1.10.0",
         "streamdown": "2.5.0",
       },
       "devDependencies": {
@@ -5713,6 +5716,8 @@
     "pe-library": ["pe-library@0.4.1", "", {}, "sha512-eRWB5LBz7PpDu4PUlwT0PhnQfTQJlDDdPa35urV4Osrm0t0AqQFGn+UIkU3klZvwJ8KPO3VbBFsXquA6p6kqZw=="],
 
     "peberminta": ["peberminta@0.9.0", "", {}, "sha512-XIxfHpEuSJbITd1H3EeQwpcZbTLHc+VVr8ANI9t5sit565tsI4/xK3KWTUFE2e6QiangUkh3B0jihzmGnNrRsQ=="],
+
+    "pele": ["pele@1.10.0", "", {}, "sha512-hDMEM+GQ01pZin8tst3PRXGeB/xFATvXBreHHtjx2glSNAQ7nHFq7EbMuNJGTbqkYgueWPboLjyUBsAudsb1qQ=="],
 
     "pg-int8": ["pg-int8@1.0.1", "", {}, "sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw=="],
 

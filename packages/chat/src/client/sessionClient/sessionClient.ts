@@ -44,6 +44,7 @@ export type PromptOptions = {
 	clientId: string;
 	commandId?: string;
 	steer?: { expectedTurnId: string };
+	snapshotWorktree?: boolean;
 };
 
 export type SessionSubscribeOptions = {
@@ -72,9 +73,23 @@ export type SessionClient = {
 	getItems(page?: GetItemsPage): Promise<ChatRouterOutputs["getItems"]>;
 	getOutline(): Promise<ChatRouterOutputs["getOutline"]>;
 	getItemBodies(itemIds: string[]): Promise<ChatRouterOutputs["getItemBodies"]>;
+	/** "unsupported" when the host predates turn snapshots. */
+	getTurnChanges(input: {
+		workspaceId: string;
+		turnId: string;
+		live?: boolean;
+		anchorItemIds?: string[];
+	}): Promise<ChatRouterOutputs["getTurnChanges"] | "unsupported">;
+	undoTurnFiles(input: {
+		workspaceId: string;
+		turnId: string;
+		paths: string[];
+		anchorItemIds?: string[];
+	}): Promise<ChatRouterOutputs["undoTurnFiles"] | "unsupported">;
 	prompt(options: PromptOptions): Promise<ChatRouterOutputs["prompt"]>;
 	removeQueuedPrompt(itemId: string): Promise<void>;
 	steerQueuedPrompt(itemId: string): Promise<void>;
+	updateQueuedPrompt(itemId: string, content: UserContent[]): Promise<void>;
 	resumeQueue(): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
@@ -120,6 +135,28 @@ export function createSessionClient(
 		getItemBodies: (itemIds) =>
 			options.transport.getItemBodies({ sessionId, itemIds, ...nested }),
 
+		getTurnChanges: async (input) => {
+			try {
+				return await options.transport.getTurnChanges({ sessionId, ...input });
+			} catch (error) {
+				if (isMissingProcedureError(error)) return "unsupported";
+				throw error;
+			}
+		},
+
+		undoTurnFiles: async (input) => {
+			try {
+				return await options.transport.undoTurnFiles({
+					commandId: mintId(),
+					sessionId,
+					...input,
+				});
+			} catch (error) {
+				if (isMissingProcedureError(error)) return "unsupported";
+				throw error;
+			}
+		},
+
 		prompt: (promptOptions) =>
 			options.transport.prompt({
 				commandId: promptOptions.commandId ?? mintId(),
@@ -127,6 +164,7 @@ export function createSessionClient(
 				clientId: promptOptions.clientId,
 				content: promptOptions.content,
 				...(promptOptions.steer ? { steer: promptOptions.steer } : {}),
+				...(promptOptions.snapshotWorktree ? { snapshotWorktree: true } : {}),
 			}),
 
 		removeQueuedPrompt: async (itemId) => {
@@ -142,6 +180,15 @@ export function createSessionClient(
 				commandId: mintId(),
 				sessionId,
 				itemId,
+			});
+		},
+
+		updateQueuedPrompt: async (itemId, content) => {
+			await options.transport.updateQueuedPrompt({
+				commandId: mintId(),
+				sessionId,
+				itemId,
+				content,
 			});
 		},
 

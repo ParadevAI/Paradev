@@ -27,6 +27,7 @@ const queue: DrawerQueue = {
 	remove: async () => {},
 	resume: async () => {},
 	steer: async () => {},
+	update: async () => {},
 };
 
 function Pane({ goBack }: { goBack: (() => void) | undefined }) {
@@ -41,7 +42,6 @@ function Pane({ goBack }: { goBack: (() => void) | undefined }) {
 		// biome-ignore lint/a11y/noStaticElementInteractions: test pane
 		<div onKeyDown={escapeBack(goBack)}>
 			<WorkDrawer
-				onAppendToComposer={() => {}}
 				onExit={(exit) => entry.returnFocus(exit === "history")}
 				queue={queue}
 				ref={drawerRef}

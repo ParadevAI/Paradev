@@ -7,11 +7,15 @@ import {
 	userMessageText,
 } from "@superset/chat/core";
 import type { Item, UserContent, UserMessage } from "@superset/chat/protocol";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { toast } from "@superset/ui/sonner";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { ComposerTarget } from "../../../Composer";
 
-type Send = (content: UserContent[], options: { steer: boolean }) => unknown;
+type Send = (
+	content: UserContent[],
+	options: { steer: boolean; draft: ComposerDraft },
+) => unknown;
 
 export type QueuedSteer = {
 	id: string;

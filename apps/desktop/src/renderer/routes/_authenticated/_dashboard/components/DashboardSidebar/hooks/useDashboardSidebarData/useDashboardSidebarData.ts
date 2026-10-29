@@ -60,6 +60,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { sidebarHostIsOnline } from "./sidebarHostIsOnline";
 import {
 	type StableDashboardSidebarProjects,
 	stabilizeDashboardSidebarProjects,
@@ -577,7 +578,9 @@ export function useDashboardSidebarData() {
 		() =>
 			rawSidebarWorkspaces.map((workspace) => ({
 				...workspace,
-				hostIsOnline: hostsByMachineId.get(workspace.hostId)?.isOnline ?? false,
+				hostIsOnline: sidebarHostIsOnline(
+					hostsByMachineId.get(workspace.hostId),
+				),
 				pendingTransaction: workspaceTransactionsById[workspace.id] ?? null,
 			})),
 		[hostsByMachineId, rawSidebarWorkspaces, workspaceTransactionsById],
