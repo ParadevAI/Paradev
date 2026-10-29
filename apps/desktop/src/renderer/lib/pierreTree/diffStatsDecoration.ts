@@ -15,8 +15,7 @@ export function diffStatsDecoration(
 	if (additions > 0)
 		parts.push({ text: `+${additions}`, color: ADDITION_COLOR });
 	// Pierre lays parts out as flex items, which collapse a plain space.
-	if (additions > 0 && deletions > 0)
-		parts.push({ text: "\u00a0", color: "" });
+	if (additions > 0 && deletions > 0) parts.push({ text: "\u00a0", color: "" });
 	if (deletions > 0)
 		parts.push({ text: `−${deletions}`, color: DELETION_COLOR });
 	return { text, parts };
