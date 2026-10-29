@@ -12507,6 +12507,9 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Offline / local-first režim"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Starší"
 

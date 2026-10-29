@@ -12507,6 +12507,9 @@ msgstr "Hors ligne"
 msgid "Offline / local-first mode"
 msgstr "Mode hors ligne / local d'abord"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Plus ancien"
 

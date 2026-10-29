@@ -12507,6 +12507,9 @@ msgstr "离线"
 msgid "Offline / local-first mode"
 msgstr "离线/本地优先模式"
 
+msgid "OK"
+msgstr "确定"
+
 msgid "Older"
 msgstr "更早"
 

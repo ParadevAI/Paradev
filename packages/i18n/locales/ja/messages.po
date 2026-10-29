@@ -12507,6 +12507,9 @@ msgstr "オフライン"
 msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "それ以前"
 

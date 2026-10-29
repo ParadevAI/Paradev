@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PortalHost } from "@rn-primitives/portal";
+import { AlertPromptHost } from "@superset/alert-prompt";
 import { CloudClientProvider } from "@superset/cloud-client";
 import { resolveLocale } from "@superset/i18n";
 import { I18nProvider } from "@superset/i18n/react";
@@ -133,6 +134,7 @@ export function RootLayout() {
 								</VersionGate>
 								<PostHogUserIdentifier />
 								<PortalHost />
+								<AlertPromptHost />
 							</ThemeProvider>
 						</I18nProvider>
 					</PostHogProvider>

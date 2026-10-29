@@ -12507,6 +12507,9 @@ msgstr "Ngoại tuyến"
 msgid "Offline / local-first mode"
 msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Cũ hơn"
 

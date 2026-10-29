@@ -12507,6 +12507,9 @@ msgstr "Çevrimdışı"
 msgid "Offline / local-first mode"
 msgstr "Çevrimdışı / yerel öncelikli mod"
 
+msgid "OK"
+msgstr "Tamam"
+
 msgid "Older"
 msgstr "Daha eski"
 

@@ -1,2 +1,6 @@
-export { prompt } from "./AlertPrompt";
-export type { Prompt, PromptOptions } from "./AlertPrompt.types";
+export { AlertPromptHost, prompt } from "./AlertPrompt";
+export type {
+	AlertPromptHostComponent,
+	Prompt,
+	PromptOptions,
+} from "./AlertPrompt.types";

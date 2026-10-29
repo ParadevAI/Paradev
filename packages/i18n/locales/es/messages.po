@@ -12507,6 +12507,9 @@ msgstr "Sin conexión"
 msgid "Offline / local-first mode"
 msgstr "Modo sin conexión / local primero"
 
+msgid "OK"
+msgstr "Aceptar"
+
 msgid "Older"
 msgstr "Más antiguo"
 
