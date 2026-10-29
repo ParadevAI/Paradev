@@ -23,10 +23,10 @@ describe("healV2UserPreferences", () => {
 	});
 
 	it("preserves stored top-level fields and fills missing ones", () => {
-		const stored = { rightSidebarOpen: false, rightSidebarWidth: 500 };
+		const stored = { showPresetsBar: false, rightPaneAreaWidth: 500 };
 		const healed = healV2UserPreferences(stored);
-		expect(healed.rightSidebarOpen).toBe(false);
-		expect(healed.rightSidebarWidth).toBe(500);
+		expect(healed.showPresetsBar).toBe(false);
+		expect(healed.rightPaneAreaWidth).toBe(500);
 		expect(healed.terminalPresetsInitialized).toBe(false);
 		expect(healed.sidebarFileLinks).toEqual(
 			DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks,
@@ -145,10 +145,10 @@ describe("healV2UserPreferences sidebarProjectSortMode", () => {
 		// heal to the default, and the rest of the row must survive.
 		const healed = healV2UserPreferences({
 			sidebarProjectSortMode: "updated",
-			rightSidebarWidth: 500,
+			rightPaneAreaWidth: 500,
 		});
 		expect(healed.sidebarProjectSortMode).toBe("manual");
-		expect(healed.rightSidebarWidth).toBe(500);
+		expect(healed.rightPaneAreaWidth).toBe(500);
 	});
 
 	it("degrades a retired mode on the write-path schema too", () => {
@@ -261,7 +261,6 @@ describe("healWorkspaceLocalState", () => {
 		expect(healed.sidebarState.tabOrder).toBe(0);
 		expect(healed.sidebarState.sectionId).toBeNull();
 		expect(healed.sidebarState.changesFilter).toEqual({ kind: "all" });
-		expect(healed.sidebarState.activeTab).toBe("changes");
 		expect(healed.sidebarState.isHidden).toBe(false);
 		expect(healed.sidebarState.pinnedAt).toBeNull();
 	});
@@ -490,46 +489,6 @@ describe("workspaceLocalStateSchema projectId nullability", () => {
 		expect(
 			workspaceLocalStateSchema.safeParse({ ...row(null), sidebarState: {} })
 				.success,
-		).toBe(false);
-	});
-});
-
-describe("workspace sidebar activeTab retirement", () => {
-	const stored = {
-		workspaceId: "11111111-1111-1111-1111-111111111111",
-		createdAt: new Date("2026-01-01T00:00:00.000Z"),
-		paneLayout: { version: 1, tabs: [], activeTabId: null },
-		sidebarState: {
-			projectId: "22222222-2222-2222-2222-222222222222",
-			activeTab: "pages",
-		},
-	};
-
-	it("prunes a row persisted on the retired pages tab back to changes", () => {
-		expect(healWorkspaceLocalState(stored).sidebarState.activeTab).toBe(
-			"changes",
-		);
-	});
-
-	it("leaves a surviving tab untouched", () => {
-		for (const tab of ["changes", "files", "review"] as const) {
-			const healed = healWorkspaceLocalState({
-				...stored,
-				sidebarState: { ...stored.sidebarState, activeTab: tab },
-			});
-			expect(healed.sidebarState.activeTab).toBe(tab);
-		}
-	});
-
-	it("rejects the retired value at the schema edge", () => {
-		expect(
-			workspaceLocalStateSchema.safeParse({
-				...stored,
-				sidebarState: {
-					projectId: stored.sidebarState.projectId,
-					activeTab: "pages",
-				},
-			}).success,
 		).toBe(false);
 	});
 });

@@ -176,13 +176,6 @@ export const workspaceRunTerminalStateSchema = z.object({
 	stopRequestedAt: z.number().optional(),
 });
 
-// "pages" is a retired tab; persisted rows on it heal to "changes" below.
-export const WORKSPACE_SIDEBAR_TABS = ["changes", "files", "review"] as const;
-
-const WORKSPACE_SIDEBAR_TAB_SCHEMA = z.enum(WORKSPACE_SIDEBAR_TABS);
-
-export type WorkspaceSidebarTab = (typeof WORKSPACE_SIDEBAR_TABS)[number];
-
 export const workspaceLocalStateSchema = z.object({
 	workspaceId: z.string().uuid(),
 	createdAt: persistedDateSchema,
@@ -198,7 +191,6 @@ export const workspaceLocalStateSchema = z.object({
 		// `${projectId}:${tag}` key (written by move-into-derived-folder).
 		sectionId: z.string().min(1).nullable().default(null),
 		changesFilter: changesFilterSchema.default({ kind: "all" }),
-		activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.default("changes"),
 		isHidden: z.boolean().default(false),
 		// Epoch ms when the user pinned this workspace to the sidebar's Pinned
 		// section; null = not pinned. Ordering is pinnedAt ascending.
@@ -266,7 +258,6 @@ const SIDEBAR_STATE_DEFAULTS = {
 	tabOrder: 0,
 	sectionId: null,
 	changesFilter: { kind: "all" },
-	activeTab: "changes",
 	isHidden: false,
 	pinnedAt: null,
 	suppressedPullRequestUrl: null,
@@ -512,9 +503,6 @@ export const v2UserPreferencesSchema = z.object({
 	portOpenAction: linkActionSchema.default(DEFAULT_PORT_OPEN_ACTION),
 	pageLinks: linkTierMapSchema.default(DEFAULT_URL_LINKS),
 	terminalPresetsInitialized: z.boolean().default(false),
-	rightSidebarOpen: z.boolean().default(true),
-	rightSidebarTab: z.enum(["changes", "files"]).default("changes"),
-	rightSidebarWidth: z.number().default(340),
 	rightPaneAreaWidth: z.number().optional(),
 	changesFileListWidth: z.number().optional(),
 	deleteLocalBranch: z.boolean().default(false),
@@ -557,9 +545,6 @@ export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
 	portOpenAction: DEFAULT_PORT_OPEN_ACTION,
 	pageLinks: DEFAULT_URL_LINKS,
 	terminalPresetsInitialized: false,
-	rightSidebarOpen: true,
-	rightSidebarTab: "changes",
-	rightSidebarWidth: 340,
 	deleteLocalBranch: false,
 	showPresetsBar: true,
 	changesViewMode: "folders",
@@ -613,9 +598,6 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		sidebarState: {
 			...SIDEBAR_STATE_DEFAULTS,
 			...sidebar,
-			activeTab: WORKSPACE_SIDEBAR_TAB_SCHEMA.catch("changes").parse(
-				sidebar.activeTab,
-			),
 		} as WorkspaceLocalStateRow["sidebarState"],
 	} as WorkspaceLocalStateRow;
 }

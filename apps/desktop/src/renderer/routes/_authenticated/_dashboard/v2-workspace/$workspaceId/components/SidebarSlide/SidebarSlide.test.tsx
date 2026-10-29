@@ -13,15 +13,10 @@ afterEach(cleanup);
 const settle = () =>
 	act(() => new Promise<void>((resolve) => setTimeout(resolve, 40)));
 
-function renderSlide(mode: SidebarSlideMode, keepMounted = false) {
+function renderSlide(mode: SidebarSlideMode) {
 	const fills: boolean[] = [];
 	const ui = (next: SidebarSlideMode) => (
-		<SidebarSlide
-			mode={next}
-			width={300}
-			keepMounted={keepMounted}
-			durationMs={1}
-		>
+		<SidebarSlide mode={next} width={300} durationMs={1}>
 			{(fill) => {
 				fills.push(fill);
 				return <div data-testid="panel">panel</div>;
@@ -53,7 +48,7 @@ describe("SidebarSlide", () => {
 
 	test("expanded takes the parent's full width in flow, from closed and from open", async () => {
 		for (const from of ["closed", "open"] as const) {
-			const slide = renderSlide(from, true);
+			const slide = renderSlide(from);
 			slide.setMode("expanded");
 			const space = slide.panel()?.parentElement?.parentElement
 				?.parentElement as HTMLElement;
@@ -69,16 +64,12 @@ describe("SidebarSlide", () => {
 		}
 	});
 
-	test("mounts the panel only once opened and unmounts it on close unless kept", async () => {
+	test("mounts the panel only once opened", () => {
 		expect(renderSlide("closed").panel()).toBeNull();
-		const slide = renderSlide("open");
-		slide.setMode("closed");
-		await settle();
-		expect(slide.panel()).toBeNull();
 	});
 
-	test("a kept panel survives close and reopen, hidden and inert while closed", async () => {
-		const slide = renderSlide("open", true);
+	test("the panel survives close and reopen, hidden and inert while closed", async () => {
+		const slide = renderSlide("open");
 		const node = slide.panel();
 		slide.setMode("closed");
 		await settle();
@@ -93,7 +84,7 @@ describe("SidebarSlide", () => {
 	});
 
 	test("settles on the last mode when toggled mid-move", async () => {
-		const slide = renderSlide("open", true);
+		const slide = renderSlide("open");
 		slide.setMode("closed");
 		slide.setMode("open");
 		slide.setMode("closed");

@@ -33,7 +33,6 @@ import {
 } from "renderer/lib/github/openPullRequestLink";
 import { clearTerminalBackgroundMarker } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
@@ -113,7 +112,7 @@ interface WorkspaceActivityMenuProps {
 	onCreateNewAgentSession: CreateNewAgentSession;
 	onFocusAgentTerminal: (terminalId: string) => void;
 	onOpenPullRequest: OpenPullRequestPane;
-	changes?: { isOpen: boolean; onToggle: () => void };
+	changes: { isOpen: boolean; onToggle: () => void };
 }
 
 export function WorkspaceActivityMenu({
@@ -128,17 +127,13 @@ export function WorkspaceActivityMenu({
 	changes,
 }: WorkspaceActivityMenuProps) {
 	const { t } = useLingui();
-	const paneAreaStyle = changes != null;
-	const { favoritePageIds } = usePageFavorites();
 	const gitStatus = useWorkspaceGitStatus();
 	const changesStats = useMemo(
 		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
 		[gitStatus.data],
 	);
 	const triggerChangesStats =
-		paneAreaStyle && changesStats && changesStats.fileCount > 0
-			? changesStats
-			: null;
+		changesStats && changesStats.fileCount > 0 ? changesStats : null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
 	const [popoverOpen, setPopoverOpen] = useState(false);
@@ -172,9 +167,7 @@ export function WorkspaceActivityMenu({
 		flowState,
 		sync: branchSync,
 		onRetry: refreshFlowState,
-	} = usePRFlowState(workspaceId, {
-		enabled: paneAreaStyle,
-	});
+	} = usePRFlowState(workspaceId);
 	const currentPr =
 		flowState.kind === "pr-exists" ||
 		flowState.kind === "busy" ||
@@ -190,7 +183,7 @@ export function WorkspaceActivityMenu({
 		workspaceId,
 		onRefresh: refreshFlowState,
 		isPrFormOpen: shipView === "pr",
-		enabled: paneAreaStyle && open,
+		enabled: open,
 		onCommitted: () => setShipView(null),
 		onPrCreated: () => setShipView(null),
 	});
@@ -306,7 +299,6 @@ export function WorkspaceActivityMenu({
 		enabled: open,
 	});
 	const pullRequests: PullRequestEntry[] =
-		changes &&
 		currentPr &&
 		!linkedPullRequests.some(
 			(pullRequest) =>
@@ -331,7 +323,6 @@ export function WorkspaceActivityMenu({
 			: linkedPullRequests;
 	const pullRequestLinkPolicy = usePullRequestLinkPolicy();
 	const isCurrentPullRequest = (pullRequest: PullRequestEntry) =>
-		changes !== undefined &&
 		currentPr !== null &&
 		pullRequest.number === currentPr.number &&
 		pullRequest.repoOwner === currentPr.repoOwner &&
@@ -400,14 +391,6 @@ export function WorkspaceActivityMenu({
 	const workspacePagesQuery = usePagesList(workspaceFilter, {
 		staleTime: 60_000,
 	});
-	// Only the pins, by id — this menu never needed the rest of the org.
-	const pinnedPagesQuery = usePagesList(
-		{ ids: favoritePageIds, limit: MENU_PAGE_LIMIT },
-		{
-			enabled: open && !paneAreaStyle && favoritePageIds.length > 0,
-			staleTime: 60_000,
-		},
-	);
 
 	// A publish from this workspace registers its agent as the page's watcher.
 	useWorkspaceEvent(
@@ -418,21 +401,13 @@ export function WorkspaceActivityMenu({
 		}, [utils, workspaceListInput]),
 	);
 
-	const { workspace, pinned, hasNew } = useMemo(
+	const { workspace, hasNew } = useMemo(
 		() =>
 			selectMenuPages({
 				workspacePages: workspacePagesQuery.items,
-				orgPages: paneAreaStyle ? [] : pinnedPagesQuery.items,
-				favoritePageIds: paneAreaStyle ? [] : favoritePageIds,
 				seenAt,
 			}),
-		[
-			workspacePagesQuery.items,
-			pinnedPagesQuery.items,
-			favoritePageIds,
-			paneAreaStyle,
-			seenAt,
-		],
+		[workspacePagesQuery.items, seenAt],
 	);
 
 	const newestPublishedAt = workspace[0]?.publishedAtMs ?? 0;
@@ -644,7 +619,7 @@ export function WorkspaceActivityMenu({
 						key="list"
 						className={cn("divide-y divide-border", VIEW_ENTER_CLASSNAME)}
 					>
-						{changes && !currentPr && (
+						{!currentPr && (
 							<section className="py-1">
 								<ActivityMenuHeader
 									title={currentWorkspace.name}
@@ -717,19 +692,6 @@ export function WorkspaceActivityMenu({
 									: emptyRow(<Trans>No pages yet</Trans>)}
 							</div>
 						</MenuGroup>
-						{pinned.length > 0 && (
-							<MenuGroup title={<Trans>Pinned</Trans>}>
-								<div>
-									{pinned.map((page) => (
-										<PagesMenuRow
-											key={page.id}
-											page={page}
-											onOpen={handleOpenPage}
-										/>
-									))}
-								</div>
-							</MenuGroup>
-						)}
 					</div>
 				)}
 			</AnimatedHeight>
@@ -748,7 +710,7 @@ export function WorkspaceActivityMenu({
 						type="button"
 						onClick={onTriggerClick}
 						aria-label={
-							changes && currentPr
+							currentPr
 								? t({
 										message: `Workspace activity, pull request #${currentPr.number}`,
 									})
@@ -766,18 +728,13 @@ export function WorkspaceActivityMenu({
 						)}
 					>
 						<ListTree className="size-3.5 shrink-0" />
-						{runningCount > 0 ? (
+						{runningCount > 0 && (
 							<>
 								<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
 								<span className="tabular-nums">{runningCount}</span>
 							</>
-						) : (
-							!paneAreaStyle &&
-							workspace.length > 0 && (
-								<span className="tabular-nums">{workspace.length}</span>
-							)
 						)}
-						{changes && currentPr && currentPrState ? (
+						{currentPr && currentPrState ? (
 							<>
 								<span className="h-3.5 w-px shrink-0 bg-border" />
 								<PRIcon state={currentPrState} className="size-3.5 shrink-0" />

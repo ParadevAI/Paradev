@@ -920,12 +920,6 @@ msgstr "{entryPath} in this workspace is already published as a page in another 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# failed} other {# failed}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} of {total} check failing"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} of {total} checks failing"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} to focus"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} checks"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} checks passing"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} of {total} check running"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} of {total} checks running"
-
 msgid "{percent} used"
 msgstr "{percent} used"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {The check passed} other {All # checks passed}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
@@ -3874,9 +3859,6 @@ msgstr "Changes"
 msgid "Changes are isolated"
 msgstr "Changes are isolated"
 
-msgid "Changes open target"
-msgstr "Changes open target"
-
 msgid "Changes requested"
 msgstr "Changes requested"
 
@@ -4081,9 +4063,6 @@ msgstr "Choose app"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Choose how files open when no preview pane exists"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Choose how the Changes view opens from the top bar"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Choose how to open file paths when Cmd+clicking in the terminal"
@@ -4329,9 +4308,6 @@ msgstr "Close all ports in this workspace"
 
 msgid "Close Browser"
 msgstr "Close Browser"
-
-msgid "Close changes"
-msgstr "Close changes"
 
 msgid "Close Chat"
 msgstr "Close Chat"
@@ -11060,9 +11036,6 @@ msgstr "Merged, but couldn't refresh PR state — try again in a moment"
 msgid "Merging PR..."
 msgstr "Merging PR..."
 
-msgid "Merging pull request"
-msgstr "Merging pull request"
-
 msgid "Merging…"
 msgstr "Merging…"
 
@@ -12826,9 +12799,6 @@ msgstr "Open Browser"
 msgid "Open browser again"
 msgstr "Open browser again"
 
-msgid "Open changes"
-msgstr "Open changes"
-
 msgid "Open Changes"
 msgstr "Open Changes"
 
@@ -13099,9 +13069,6 @@ msgstr "Open Pull Request"
 msgid "Open pull request #{0}"
 msgstr "Open pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Open pull request options"
-
 msgid "Open pull requests"
 msgstr "Open pull requests"
 
@@ -13122,9 +13089,6 @@ msgstr "Open Settings"
 
 msgid "Open sheet"
 msgstr "Open sheet"
-
-msgid "Open ship options"
-msgstr "Open ship options"
 
 msgid "Open System Settings"
 msgstr "Open System Settings"
@@ -13481,9 +13445,6 @@ msgstr "Paid work trial"
 
 msgid "Palette"
 msgstr "Palette"
-
-msgid "Pane in current tab"
-msgstr "Pane in current tab"
 
 msgid "Pane system"
 msgstr "Pane system"
@@ -19893,9 +19854,6 @@ msgstr "Updated {0}"
 msgid "Updated {date}"
 msgstr "Updated {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Updated {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Updated just now from {0}."
@@ -20787,9 +20745,6 @@ msgstr "workspace root"
 
 msgid "Workspace Run"
 msgstr "Workspace Run"
-
-msgid "Workspace run options"
-msgstr "Workspace run options"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Workspace run: {workspaceRunState}"

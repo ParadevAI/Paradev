@@ -28,7 +28,6 @@ function renderLayout(initial: SidebarSlideMode) {
 			defaultWidth={() => 300}
 			onWidthChange={() => {}}
 			onResizingChange={() => {}}
-			keepMounted
 			durationMs={1}
 			side={
 				<div data-pane-area="right">

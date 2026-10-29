@@ -4,7 +4,6 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useEffectEvent, useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
@@ -12,7 +11,6 @@ import { useVisibleSidebarWorkspaceIds } from "renderer/routes/_authenticated/ho
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import {
@@ -69,8 +67,6 @@ export function V2NotificationController() {
 	const relayUrl = useRelayUrl();
 	const visibleWorkspaceIds = useVisibleSidebarWorkspaceIds();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
-	const isRightAreaOpen = useV2UserPreferences().preferences.rightSidebarOpen;
-	const isPerWorkspaceRightArea = useRightPaneAreaEnabled() === true;
 	const allWorkspaceHosts = useMemo<WorkspaceHostRow[]>(
 		() =>
 			hostWorkspaces.map((workspace) => ({
@@ -117,15 +113,8 @@ export function V2NotificationController() {
 			getNotificationWorkspaceStatesById({
 				workspaceHosts,
 				localWorkspaceRows,
-				isRightAreaOpen,
-				isPerWorkspaceRightArea,
 			}),
-		[
-			workspaceHosts,
-			localWorkspaceRows,
-			isRightAreaOpen,
-			isPerWorkspaceRightArea,
-		],
+		[workspaceHosts, localWorkspaceRows],
 	);
 	const hostGroups = useMemo(
 		() =>
@@ -202,8 +191,6 @@ export function V2NotificationController() {
 function getNotificationWorkspaceStatesById({
 	workspaceHosts,
 	localWorkspaceRows,
-	isRightAreaOpen,
-	isPerWorkspaceRightArea,
 }: {
 	workspaceHosts: WorkspaceHostRow[];
 	localWorkspaceRows: Array<{
@@ -212,8 +199,6 @@ function getNotificationWorkspaceStatesById({
 		rightPaneLayout?: unknown;
 		rightSidebarOpen?: boolean;
 	}>;
-	isRightAreaOpen: boolean;
-	isPerWorkspaceRightArea: boolean;
 }): Map<string, HostNotificationWorkspaceState> {
 	const paneLayoutsByWorkspaceId = new Map(
 		localWorkspaceRows.map((row) => [
@@ -223,11 +208,7 @@ function getNotificationWorkspaceStatesById({
 	);
 	const rightPaneLayoutsByWorkspaceId = new Map(
 		localWorkspaceRows
-			.filter((row) =>
-				isPerWorkspaceRightArea
-					? (row.rightSidebarOpen ?? false)
-					: isRightAreaOpen,
-			)
+			.filter((row) => row.rightSidebarOpen ?? false)
 			.map((row) => [
 				row.workspaceId,
 				row.rightPaneLayout as WorkspaceState<PaneViewerData> | undefined,

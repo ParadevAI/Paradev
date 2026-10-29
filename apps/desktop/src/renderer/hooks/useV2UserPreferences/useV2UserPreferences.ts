@@ -22,8 +22,6 @@ export interface V2UserPreferencesApi {
 	setFolderLinks: (next: FolderTierMap) => void;
 	setPortOpenAction: (next: LinkAction) => void;
 	setPageLinks: (next: LinkTierMap) => void;
-	setRightSidebarOpen: (next: boolean | ((prev: boolean) => boolean)) => void;
-	setRightSidebarWidth: (next: number) => void;
 	setRightPaneAreaWidth: (next: number) => void;
 	setChangesFileListWidth: (next: number) => void;
 	setDeleteLocalBranch: (next: boolean) => void;
@@ -128,48 +126,6 @@ export function useV2UserPreferences(): V2UserPreferencesApi {
 	const setPageLinks = useCallback(
 		(next: LinkTierMap) => upsertTierMap("pageLinks", next),
 		[upsertTierMap],
-	);
-
-	const setRightSidebarOpen = useCallback(
-		(next: boolean | ((prev: boolean) => boolean)) => {
-			const existing = collections.v2UserPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
-			const prev =
-				existing?.rightSidebarOpen ??
-				DEFAULT_V2_USER_PREFERENCES.rightSidebarOpen;
-			const value = typeof next === "function" ? next(prev) : next;
-			if (!existing) {
-				collections.v2UserPreferences.insert({
-					...DEFAULT_V2_USER_PREFERENCES,
-					rightSidebarOpen: value,
-				});
-				return;
-			}
-			collections.v2UserPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
-				draft.rightSidebarOpen = value;
-			});
-		},
-		[collections],
-	);
-
-	const setRightSidebarWidth = useCallback(
-		(next: number) => {
-			const existing = collections.v2UserPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
-			if (!existing) {
-				collections.v2UserPreferences.insert({
-					...DEFAULT_V2_USER_PREFERENCES,
-					rightSidebarWidth: next,
-				});
-				return;
-			}
-			collections.v2UserPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
-				draft.rightSidebarWidth = next;
-			});
-		},
-		[collections],
 	);
 
 	const setRightPaneAreaWidth = useCallback(
@@ -386,8 +342,6 @@ export function useV2UserPreferences(): V2UserPreferencesApi {
 		setFolderLinks,
 		setPortOpenAction,
 		setPageLinks,
-		setRightSidebarOpen,
-		setRightSidebarWidth,
 		setRightPaneAreaWidth,
 		setChangesFileListWidth,
 		setDeleteLocalBranch,

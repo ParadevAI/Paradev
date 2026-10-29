@@ -11,7 +11,6 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import {
-	Circle,
 	Files,
 	FileText,
 	FolderTree,
@@ -53,10 +52,7 @@ import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notification
 import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
-import {
-	getDocument,
-	useSharedFileDocument,
-} from "../../state/fileDocumentStore";
+import { getDocument } from "../../state/fileDocumentStore";
 import {
 	type BrowserPaneData,
 	type ChatPaneData,
@@ -137,19 +133,11 @@ function FilePaneTabTitle({
 	filePath,
 	isActive,
 	pinned,
-	showDirty,
-	workspaceId,
 }: {
 	filePath: string;
 	isActive: boolean;
 	pinned: boolean;
-	showDirty: boolean;
-	workspaceId: string;
 }) {
-	const document = useSharedFileDocument({
-		workspaceId,
-		absolutePath: filePath,
-	});
 	const name = getFileName(filePath);
 	return (
 		<div
@@ -163,9 +151,6 @@ function FilePaneTabTitle({
 			<span className={cn("min-w-0 truncate", !pinned && "italic")}>
 				{name}
 			</span>
-			{showDirty && document.dirty && (
-				<Circle className="size-2 shrink-0 fill-current text-muted-foreground" />
-			)}
 		</div>
 	);
 }
@@ -183,8 +168,6 @@ interface UsePaneRegistryOptions {
 	linkedStores?: StoreApi<WorkspaceStore<PaneViewerData>>[];
 	onOpenSubagent: (data: SubagentPaneData) => void;
 	onSearch?: () => void;
-	/** File views in this store show the file tree and breadcrumb. */
-	rightStore?: StoreApi<WorkspaceStore<PaneViewerData>>;
 }
 
 export function usePaneRegistry({
@@ -196,7 +179,6 @@ export function usePaneRegistry({
 	linkedStores,
 	onOpenSubagent,
 	onSearch,
-	rightStore,
 }: UsePaneRegistryOptions): PaneRegistry<PaneViewerData> {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
@@ -298,34 +280,20 @@ export function usePaneRegistry({
 							filePath={data.filePath}
 							isActive={ctx.isActive}
 							pinned={Boolean(ctx.pane.pinned)}
-							showDirty={ctx.store !== rightStore}
-							workspaceId={workspaceId}
 						/>
 					);
 				},
-				renderPane: (ctx: RendererContext<PaneViewerData>) => {
-					const inRightPane = ctx.store === rightStore;
-					return (
-						<FileViewLayout
-							context={ctx}
-							workspaceId={workspaceId}
-							showTree={inRightPane}
-							onSearch={onSearch}
-						>
-							<FilePane
-								context={ctx}
-								workspaceId={workspaceId}
-								inRightPane={inRightPane}
-							/>
-						</FileViewLayout>
-					);
-				},
-				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
-					<FilePaneHeaderExtras
+				renderPane: (ctx: RendererContext<PaneViewerData>) => (
+					<FileViewLayout
 						context={ctx}
 						workspaceId={workspaceId}
-						inRightPane={ctx.store === rightStore}
-					/>
+						onSearch={onSearch}
+					>
+						<FilePane context={ctx} workspaceId={workspaceId} />
+					</FileViewLayout>
+				),
+				renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
+					<FilePaneHeaderExtras context={ctx} workspaceId={workspaceId} />
 				),
 				onHeaderClick: (ctx: RendererContext<PaneViewerData>) =>
 					ctx.actions.pin(),
@@ -1153,7 +1121,6 @@ export function usePaneRegistry({
 			desktopUrl,
 			chatPaneIcon,
 			onOpenSubagent,
-			rightStore,
 		],
 	);
 }

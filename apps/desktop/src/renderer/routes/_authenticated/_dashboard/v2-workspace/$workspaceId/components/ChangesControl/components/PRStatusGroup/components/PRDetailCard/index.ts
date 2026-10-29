@@ -1,1 +1,0 @@
-export { PRDetailCard } from "./PRDetailCard";

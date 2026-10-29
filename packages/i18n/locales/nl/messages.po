@@ -920,12 +920,6 @@ msgstr "{entryPath} in deze workspace is al gepubliceerd als pagina in een ander
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# mislukt} other {# mislukt}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} van {total} check mislukt"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} van {total} checks mislukt"
-
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} om te focussen"
 
@@ -1122,12 +1116,6 @@ msgstr "{passing}/{total} checks"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} checks geslaagd"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} van {total} check bezig"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} van {total} checks bezig"
-
 msgid "{percent} used"
 msgstr "{percent} gebruikt"
 
@@ -1270,9 +1258,6 @@ msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerg
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub-issue} other {GitHub-issues}}"
@@ -3874,9 +3859,6 @@ msgstr "Wijzigingen"
 msgid "Changes are isolated"
 msgstr "Wijzigingen zijn geïsoleerd"
 
-msgid "Changes open target"
-msgstr "Openingsdoel voor wijzigingen"
-
 msgid "Changes requested"
 msgstr "Wijzigingen gevraagd"
 
@@ -4081,9 +4063,6 @@ msgstr "Kies app"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Kies hoe bestanden openen als er geen previewpaneel is"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Kies hoe de weergave Wijzigingen vanuit de bovenbalk wordt geopend"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Kies hoe bestandspaden openen bij Cmd+klik in de terminal"
@@ -4329,9 +4308,6 @@ msgstr "Alle poorten in deze werkruimte sluiten"
 
 msgid "Close Browser"
 msgstr "Browser sluiten"
-
-msgid "Close changes"
-msgstr "Wijzigingen sluiten"
 
 msgid "Close Chat"
 msgstr "Chat sluiten"
@@ -11060,9 +11036,6 @@ msgstr "Gemerged, maar de PR-status kon niet worden ververst — probeer het zo 
 msgid "Merging PR..."
 msgstr "PR mergen..."
 
-msgid "Merging pull request"
-msgstr "Pull request mergen"
-
 msgid "Merging…"
 msgstr "Bezig met mergen…"
 
@@ -12826,9 +12799,6 @@ msgstr "Browser openen"
 msgid "Open browser again"
 msgstr "Browser opnieuw openen"
 
-msgid "Open changes"
-msgstr "Wijzigingen openen"
-
 msgid "Open Changes"
 msgstr "Wijzigingen openen"
 
@@ -13099,9 +13069,6 @@ msgstr "Pull request openen"
 msgid "Open pull request #{0}"
 msgstr "Pull request #{0} openen"
 
-msgid "Open pull request options"
-msgstr "Pull request-opties openen"
-
 msgid "Open pull requests"
 msgstr "Open pull requests"
 
@@ -13122,9 +13089,6 @@ msgstr "Instellingen openen"
 
 msgid "Open sheet"
 msgstr "Sheet openen"
-
-msgid "Open ship options"
-msgstr "Verzendopties openen"
 
 msgid "Open System Settings"
 msgstr "Systeeminstellingen openen"
@@ -13481,9 +13445,6 @@ msgstr "Betaalde proefweek"
 
 msgid "Palette"
 msgstr "Palet"
-
-msgid "Pane in current tab"
-msgstr "Deelvenster in huidig tabblad"
 
 msgid "Pane system"
 msgstr "Panelensysteem"
@@ -19893,9 +19854,6 @@ msgstr "Bijgewerkt {0}"
 msgid "Updated {date}"
 msgstr "Bijgewerkt {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Bijgewerkt {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Zojuist bijgewerkt vanaf {0}."
@@ -20787,9 +20745,6 @@ msgstr "root van de werkruimte"
 
 msgid "Workspace Run"
 msgstr "Werkruimte-run"
-
-msgid "Workspace run options"
-msgstr "Opties voor uitvoeren van werkruimte"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Werkruimte-run: {workspaceRunState}"
