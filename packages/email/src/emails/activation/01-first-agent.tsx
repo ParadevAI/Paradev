@@ -24,36 +24,25 @@ export function ActivationNudge1({
 				Your first agent, safely
 			</Heading>
 			<Text className="text-[15px] leading-6 text-muted m-0 mb-6">
-				The part most people don&apos;t realize: the agent never touches your
-				working tree.
+				Get the desktop app and try it on something small, like a flaky test or
+				the rename you&apos;ve been putting off.
 			</Text>
 
-			<Section className="bg-surface border border-solid border-border rounded-lg p-5 mb-6">
+			<Section className="mb-8">
+				<Button href={`${CANONICAL_URLS.MARKETING}/download${utm}`}>
+					Get the desktop app
+				</Button>
+			</Section>
+
+			<Section className="bg-surface border border-solid border-border rounded-lg p-5">
 				<Text className="text-[15px] leading-6 text-foreground m-0 mb-3">
-					<strong>Every workspace is an isolated copy of your repo</strong> on
-					its own branch. Your checkout, your uncommitted changes, your local
-					state all stay untouched.
+					<strong>The agent never touches your working tree.</strong> Every
+					workspace is an isolated copy of your repo on its own branch, and it
+					all runs locally.
 				</Text>
 				<Text className="text-[15px] leading-6 text-foreground m-0">
 					If the result is garbage, delete the workspace. Nothing happened.
 				</Text>
-			</Section>
-
-			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				And it&apos;s all local. Your code never leaves your machine unless you
-				say so.
-			</Text>
-
-			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				So take the first swing on something small: a flaky test, or the rename
-				you&apos;ve been putting off. Something you were going to do anyway this
-				week.
-			</Text>
-
-			<Section>
-				<Button href={`${CANONICAL_URLS.MARKETING}/download${utm}`}>
-					Get the desktop app
-				</Button>
 			</Section>
 		</EmailLayout>
 	);

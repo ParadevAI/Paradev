@@ -66,7 +66,7 @@ export function MemberRemovedBillingEmail({
 
 			<Text className="text-[13px] leading-5 text-muted m-0 mb-4">
 				{hasPreview
-					? `Your next invoice is ${nextInvoiceTotal} — the new plan total with ${prorationAmount} credited for the unused time on the removed seat.`
+					? `Your next invoice is ${nextInvoiceTotal}. That's the new plan total minus a credit of ${prorationAmount?.replace(/^-/, "")} for the unused time on the removed seat.`
 					: "Your next invoice includes a credit for the unused time on the removed seat, so it will differ from the plan total above."}
 			</Text>
 

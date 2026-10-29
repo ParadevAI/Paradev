@@ -46,7 +46,7 @@ export function RenewalUpcomingEmail({
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
 				<strong>{organizationName}</strong>'s annual <strong>{planName}</strong>{" "}
-				subscription renews on {formattedRenewalDate}. Nothing is due yet — this
+				subscription renews on {formattedRenewalDate}. Nothing is due yet. This
 				is a heads-up so the charge isn't a surprise.
 			</Text>
 
@@ -64,8 +64,8 @@ export function RenewalUpcomingEmail({
 				last year,{" "}
 				{isOwner ? (
 					<>
-						update it before {formattedRenewalDate} so the renewal doesn't fail
-						— open Paradev and go to <strong>Settings → Billing</strong>.
+						update it before {formattedRenewalDate} so the renewal doesn't fail.
+						Open Paradev and go to <strong>Settings → Billing</strong>.
 					</>
 				) : (
 					<>

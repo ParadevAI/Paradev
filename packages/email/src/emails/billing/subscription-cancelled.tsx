@@ -53,7 +53,7 @@ export function SubscriptionCancelledEmail({
 					<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
 						Nothing has been deleted. Open Paradev and go to{" "}
 						<strong>Settings → Billing</strong> to resubscribe with a working
-						card — {planName} turns straight back on.
+						card and {planName} turns straight back on.
 					</Text>
 				</>
 			) : (
