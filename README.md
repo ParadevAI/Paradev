@@ -2,7 +2,7 @@
 
 <img src="apps/desktop/src/resources/build/icons/icon.png" alt="Paradev app icon" width="96" height="96" />
 
-### Paradev
+### Paradev (formerly Superset)
 
 Run Claude Code, Codex, or another CLI agent with terminals, code review, and browser previews in one workspace.
 
