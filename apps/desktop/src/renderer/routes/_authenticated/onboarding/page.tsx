@@ -33,11 +33,8 @@ function OnboardingDashboardPage() {
 	const ghInstalled = ghStatus?.installed === true;
 	const ghReady = ghInstalled && ghStatus?.authenticated === true;
 
-	const version = ghStatus?.version;
 	const ghStatusLabel = ghReady
-		? version
-			? t`Connected · v${version}`
-			: t`Connected`
+		? t`Connected`
 		: ghInstalled
 			? t`Not signed in`
 			: t`Not installed`;
@@ -56,17 +53,27 @@ function OnboardingDashboardPage() {
 		<span
 			className={cn(
 				"size-1.5 rounded-full",
-				ghInstalled ? "bg-amber-500" : "bg-muted-foreground/40",
+				ghReady
+					? "bg-emerald-500"
+					: ghInstalled
+						? "bg-amber-500"
+						: "bg-muted-foreground/40",
 			)}
 		/>
 	);
 
 	return (
 		<>
-			<div className="grid grid-cols-4 gap-3">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				<OnboardingTile
 					icon={<SiGithub />}
-					label={ghInstalled ? t`Sign in to GitHub` : t`Install GitHub CLI`}
+					label={
+						ghReady
+							? "GitHub CLI"
+							: ghInstalled
+								? t`Sign in to GitHub`
+								: t`Install GitHub CLI`
+					}
 					status={
 						isPendingGh ? (
 							t`Checking…`
@@ -78,7 +85,11 @@ function OnboardingDashboardPage() {
 						)
 					}
 					onClick={
-						ghInstalled ? () => setGhDialogMode("auth") : openGitHubInstall
+						ghReady
+							? () => {}
+							: ghInstalled
+								? () => setGhDialogMode("auth")
+								: openGitHubInstall
 					}
 					disabled={isPendingGh}
 				/>

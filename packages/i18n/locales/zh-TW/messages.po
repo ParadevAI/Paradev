@@ -4896,9 +4896,6 @@ msgstr "連接。"
 msgid "Connected"
 msgstr "已連線"
 
-msgid "Connected · v{version}"
-msgstr "已連線 · v{version}"
-
 msgid "Connected {label}"
 msgstr "已連線 {label}"
 

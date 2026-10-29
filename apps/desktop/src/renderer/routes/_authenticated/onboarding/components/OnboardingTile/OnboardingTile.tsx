@@ -34,12 +34,12 @@ export function OnboardingTile({
 			<span className="flex items-start justify-between gap-2">
 				<span className="text-foreground [&_svg]:size-5">{icon}</span>
 				{status && (
-					<span className="flex items-center gap-1.5 whitespace-nowrap text-muted-foreground text-xs">
+					<span className="flex min-w-0 items-center gap-1.5 truncate whitespace-nowrap text-muted-foreground text-xs">
 						{status}
 					</span>
 				)}
 			</span>
-			<span className="truncate font-medium text-foreground text-sm">
+			<span className="line-clamp-2 font-medium text-foreground text-sm">
 				{label}
 			</span>
 		</button>

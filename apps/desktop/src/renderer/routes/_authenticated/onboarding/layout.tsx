@@ -64,17 +64,24 @@ function OnboardingFlowLayout() {
 	if (!isPending && onboardedOnArrival === null) {
 		setOnboardedOnArrival(Boolean(session?.user?.onboardedAt));
 	}
+	const [ghReadyOnArrival, setGhReadyOnArrival] = useState<boolean | null>(
+		null,
+	);
+	if (!isPendingGh && ghReadyOnArrival === null) {
+		setGhReadyOnArrival(ghReady);
+	}
 
 	if (isPending) return null;
 	if (onboardedOnArrival) {
 		return rootRedirect;
 	}
 
-	// Nothing to set up when GitHub CLI already works, so that step drops out
-	const steps = ghReady ? [PROJECT_STEP] : [SETUP_STEP, PROJECT_STEP];
+	// Nothing to set up when GitHub CLI already works, so that step drops out.
+	// Decided on arrival: signing in mid-step must not unmount its own dialog.
+	const steps = ghReadyOnArrival ? [PROJECT_STEP] : [SETUP_STEP, PROJECT_STEP];
 	if (SETUP_STEP.match(location.pathname)) {
-		if (isPendingGh) return null;
-		if (ghReady) return projectRedirect;
+		if (ghReadyOnArrival === null) return null;
+		if (ghReadyOnArrival) return projectRedirect;
 	}
 
 	const currentStepIdx = steps.findIndex((s) => s.match(location.pathname));

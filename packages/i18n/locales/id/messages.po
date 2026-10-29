@@ -4896,9 +4896,6 @@ msgstr "Hubungkan."
 msgid "Connected"
 msgstr "Terhubung"
 
-msgid "Connected · v{version}"
-msgstr "Terhubung · v{version}"
-
 msgid "Connected {label}"
 msgstr "{label} terhubung"
 

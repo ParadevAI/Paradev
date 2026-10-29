@@ -4896,9 +4896,6 @@ msgstr "接続する。"
 msgid "Connected"
 msgstr "接続済み"
 
-msgid "Connected · v{version}"
-msgstr "接続済み · v{version}"
-
 msgid "Connected {label}"
 msgstr "{label} に接続しました"
 

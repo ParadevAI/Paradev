@@ -4896,9 +4896,6 @@ msgstr "Bağlayın."
 msgid "Connected"
 msgstr "Bağlı"
 
-msgid "Connected · v{version}"
-msgstr "Bağlı · v{version}"
-
 msgid "Connected {label}"
 msgstr "{label} bağlandı"
 

@@ -4896,9 +4896,6 @@ msgstr "Collega."
 msgid "Connected"
 msgstr "Collegato"
 
-msgid "Connected · v{version}"
-msgstr "Connesso · v{version}"
-
 msgid "Connected {label}"
 msgstr "{label} connesso"
 

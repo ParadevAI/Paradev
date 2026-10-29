@@ -4896,9 +4896,6 @@ msgstr "Připojte."
 msgid "Connected"
 msgstr "Připojeno"
 
-msgid "Connected · v{version}"
-msgstr "Připojeno · v{version}"
-
 msgid "Connected {label}"
 msgstr "Připojeno {label}"
 

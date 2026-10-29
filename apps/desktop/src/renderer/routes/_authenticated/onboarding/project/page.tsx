@@ -94,14 +94,14 @@ function OnboardingProjectPage() {
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 
 	// Adding a project finishes onboarding: mark onboarded, then hand off to the
-	// dashboard's new-workspace modal pre-selected to the project just added.
+	// new-workspace screen with the project just added selected.
 	const finish = async (projectId: string) => {
 		track("onboarding_finished", { outcome: "completed" });
 		try {
 			await apiTrpcClient.user.completeOnboarding.mutate();
 			// Reactive refetch (not imperative getSession) so the layout guards'
 			// useSession() sees onboardedAt before we navigate — otherwise the
-			// _authenticated guard bounces /v2-workspaces back to /onboarding.
+			// _authenticated guard bounces /new-workspace back to /onboarding.
 			await refetchSession({ query: { disableCookieCache: true } });
 		} catch (error) {
 			console.error("[onboarding] completeOnboarding failed", error);
@@ -211,7 +211,7 @@ function OnboardingProjectPage() {
 
 	return (
 		<div className="flex flex-col gap-3">
-			<div className="grid grid-cols-4 gap-3">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				<OnboardingTile
 					icon={<LuFolderOpen />}
 					label={t`Open a folder`}

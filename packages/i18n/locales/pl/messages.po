@@ -4896,9 +4896,6 @@ msgstr "Połącz."
 msgid "Connected"
 msgstr "Połączono"
 
-msgid "Connected · v{version}"
-msgstr "Połączono · v{version}"
-
 msgid "Connected {label}"
 msgstr "Połączono {label}"
 

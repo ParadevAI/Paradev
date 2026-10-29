@@ -4896,9 +4896,6 @@ msgstr "Kết nối."
 msgid "Connected"
 msgstr "Đã kết nối"
 
-msgid "Connected · v{version}"
-msgstr "Đã kết nối · v{version}"
-
 msgid "Connected {label}"
 msgstr "Đã kết nối {label}"
 
