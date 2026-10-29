@@ -37,7 +37,7 @@ export function parseWorktreeList(raw: string): WorktreeRecord[] {
 		if (line.startsWith("worktree ")) {
 			flush();
 			current = {
-				path: line.slice("worktree ".length).trim(),
+				path: line.slice("worktree ".length).replace(/\r$/, ""),
 				head: null,
 				branch: null,
 				detached: false,

@@ -8,6 +8,7 @@ import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
 import { MentionChipNode } from "./nodes/mentionChipNode";
+import { ChipRenderProvider } from "./providers/ChipRenderProvider";
 import type { PromptInputProps } from "./types";
 import "./prompt-input.css";
 import { msg } from "@lingui/core/macro";
@@ -15,16 +16,20 @@ import { msg } from "@lingui/core/macro";
 export type {
 	ComposerActionContext,
 	ComposerChip,
-	ComposerChipMatch,
+	ComposerDraft,
+	ComposerDraftSegment,
+	ComposerMentionBrowse,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	ComposerMentionSource,
 	ComposerPanelContent,
+	ComposerPanelControls,
 	PromptInputAttachment,
 	PromptInputCommand,
 	PromptInputDictation,
 	PromptInputDictationError,
 	PromptInputHandle,
+	PromptInputLocalFiles,
 	PromptInputProps,
 	PromptInputSubmitPayload,
 } from "./types";
@@ -40,24 +45,21 @@ export function PromptInput({
 	commands,
 	dictation,
 	status = "ready",
-	submitWhileStreaming = false,
-	placement = "top",
 	toolbar,
 	toolbarEnd,
-	defaultValue,
-	findChips,
-	onChange,
+	draft,
+	onDraftChange,
 	onSubmit,
 	onStop,
-	header,
-	onAddFiles,
+	stopOnEscape = true,
 	allowEmptySubmit = false,
-	clearOnSubmit = true,
-	hideSubmit = false,
+	disabled = false,
+	pending = false,
 	autoFocus = false,
-	onMentionHighlight,
 	onAttachmentClick,
-	onChipClick,
+	chipForPaste,
+	renderChip,
+	localFiles,
 	history,
 	className,
 }: PromptInputProps) {
@@ -72,33 +74,31 @@ export function PromptInput({
 	return (
 		<div className={className}>
 			<LexicalRoot initialConfig={initialConfig}>
-				<ComposerBody
-					ref={ref}
-					placeholder={placeholder}
-					mentionProviders={mentionProviders}
-					commands={commands}
-					dictation={dictation}
-					status={status}
-					submitWhileStreaming={submitWhileStreaming}
-					placement={placement}
-					toolbar={toolbar}
-					toolbarEnd={toolbarEnd}
-					defaultValue={defaultValue}
-					findChips={findChips}
-					onChange={onChange}
-					onSubmit={onSubmit}
-					onStop={onStop}
-					header={header}
-					onAddFiles={onAddFiles}
-					allowEmptySubmit={allowEmptySubmit}
-					clearOnSubmit={clearOnSubmit}
-					hideSubmit={hideSubmit}
-					autoFocus={autoFocus}
-					onMentionHighlight={onMentionHighlight}
-					onAttachmentClick={onAttachmentClick}
-					onChipClick={onChipClick}
-					history={history}
-				/>
+				<ChipRenderProvider renderChip={renderChip}>
+					<ComposerBody
+						ref={ref}
+						placeholder={placeholder}
+						mentionProviders={mentionProviders}
+						commands={commands}
+						dictation={dictation}
+						status={status}
+						toolbar={toolbar}
+						toolbarEnd={toolbarEnd}
+						draft={draft}
+						onDraftChange={onDraftChange}
+						onSubmit={onSubmit}
+						onStop={onStop}
+						stopOnEscape={stopOnEscape}
+						allowEmptySubmit={allowEmptySubmit}
+						disabled={disabled}
+						pending={pending}
+						autoFocus={autoFocus}
+						onAttachmentClick={onAttachmentClick}
+						chipForPaste={chipForPaste}
+						localFiles={localFiles}
+						history={history}
+					/>
+				</ChipRenderProvider>
 			</LexicalRoot>
 		</div>
 	);

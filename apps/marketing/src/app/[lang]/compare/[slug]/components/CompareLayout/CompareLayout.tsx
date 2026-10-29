@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import type { ReactNode } from "react";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
@@ -9,6 +10,10 @@ import {
 	formatCompareDate,
 	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
+
+const productName = BRAND.NAME;
+const formerName = BRAND.FORMER_NAME;
+const isRenamed = BRAND.NAME !== BRAND.FORMER_NAME;
 
 interface CompareLayoutProps {
 	page: ComparisonPage;
@@ -62,6 +67,14 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 								{formattedDate}
 							</time>
 						</div>
+
+						{isRenamed && (
+							<p className="mt-2 text-sm text-muted-foreground">
+								<Trans>
+									{productName} was called {formerName} until October 2026.
+								</Trans>
+							</p>
+						)}
 					</div>
 				</div>
 
@@ -85,14 +98,14 @@ export function CompareLayout({ page, children }: CompareLayoutProps) {
 				</div>
 				<div className="max-w-3xl mx-auto px-6 py-10 text-center">
 					<p className="text-muted-foreground mb-4">
-						<Trans>Ready to try Superset?</Trans>
+						<Trans>Ready to try Paradev?</Trans>
 					</p>
 					<DownloadLink
 						source="compare"
 						properties={{ slug: page.slug }}
 						className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors border border-border rounded-md px-4 py-2"
 					>
-						<Trans>Download Superset</Trans>
+						<Trans>Download Paradev</Trans>
 					</DownloadLink>
 				</div>
 			</footer>

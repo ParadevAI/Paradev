@@ -1,4 +1,5 @@
 import { boolean, CLIError, number, string } from "@superset/cli-framework";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
@@ -14,6 +15,11 @@ export default command({
 		environment: string().desc(
 			"Environment ID a cloud workspace starts from (see: superset environments list); required when several have repositories",
 		),
+		machineSize: string()
+			.enum(...MACHINE_SIZES)
+			.desc(
+				"Machine size of a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them",
+			),
 		project: string().desc(
 			"Project ID, for a workspace on a host. Required with --local or --host unless --session",
 		),
@@ -25,14 +31,14 @@ export default command({
 			"Where the files live: `worktree` (default) checks out --branch in its own worktree; `local` uses the project's checkout as it is — no branch switch, files shared with the project's other local workspaces",
 		),
 		branch: string().desc(
-			"Git branch (required unless --pr, --task, or --checkout local is set)",
+			"Git branch the workspace works on, for a workspace on a host (required there unless --pr, --task, or --checkout local is set). A cloud workspace always gets a new branch of its own; use --base-branch",
 		),
 		pr: number().desc("PR number — checks out the verified PR head"),
 		task: string().desc(
 			"Task ID to link. When --branch is omitted, the task's provider branch name (e.g. Linear's) is used verbatim",
 		),
 		baseBranch: string().desc(
-			"Branch to fork from when `branch` does not exist (defaults to project default)",
+			"Branch to start from. On a host: used when --branch does not exist (defaults to the project default). In the cloud: the branch the workspace's new branch is cut from (defaults to the repository default)",
 		),
 		skipBranchPrefix: boolean().desc(
 			"Use --branch exactly as given instead of namespacing it under the project branch prefix",
@@ -85,6 +91,12 @@ export default command({
 			throw new CLIError(
 				"--environment applies to cloud workspaces",
 				"Drop --local/--host to create in the cloud, or drop --environment for a workspace on a host",
+			);
+		}
+		if (options.machineSize) {
+			throw new CLIError(
+				"--machine-size applies to cloud workspaces",
+				"Drop --local/--host to create in the cloud, or drop --machine-size for a workspace on a host",
 			);
 		}
 

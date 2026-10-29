@@ -10,12 +10,6 @@ export type ComposerChip = {
 	data?: unknown;
 };
 
-export type ComposerChipMatch = {
-	start: number;
-	end: number;
-	chip: ComposerChip;
-};
-
 export type ComposerActionContext = {
 	insertChip(chip: ComposerChip): void;
 	attachFiles(): void;
@@ -23,9 +17,16 @@ export type ComposerActionContext = {
 	query: string;
 };
 
+export type ComposerPanelControls = {
+	close(): void;
+};
+
 export type ComposerPanelContent = {
 	title: string;
-	render: () => ReactNode;
+	render: (controls: ComposerPanelControls) => ReactNode;
+	// Drawn without the titled frame and closed by a press outside the
+	// composer; the content owns its keyboard, including Escape.
+	bare?: boolean;
 };
 
 export type ComposerMentionEntry = {
@@ -34,10 +35,18 @@ export type ComposerMentionEntry = {
 	description?: string;
 	icon?: ReactNode;
 	keywords?: string[];
+	// Drawn in place of icon, label and description; label still drives matching.
+	row?: ReactNode;
 	// When set, selecting rewrites the query to this value and keeps the menu
 	// open (directory drilling); select() is not called.
 	completionQuery?: string;
+	opensSubmenu?: boolean;
 	select(ctx: ComposerActionContext): void | Promise<void>;
+};
+
+export type ComposerMentionBrowse = {
+	label: string;
+	placeholder: string;
 };
 
 export type ComposerMentionSource =
@@ -61,6 +70,10 @@ export type ComposerMentionProvider = {
 	id: string;
 	title: string;
 	priority: number;
+	// The character that opens this provider's menu; "@" when unset.
+	trigger?: string;
+	icon?: ReactNode;
+	browse?: ComposerMentionBrowse;
 	source: ComposerMentionSource;
 };
 
@@ -73,6 +86,8 @@ export type PromptInputCommand = {
 	rightIcon?: ReactNode;
 	group?: string;
 	searchAliases?: string[];
+	// Tab inserts this chip in place of the typed command instead of selecting.
+	completion?: ComposerChip;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -81,6 +96,23 @@ export type PromptInputAttachment = {
 	file: File;
 	// Object URL for image attachments; owned and revoked by the composer.
 	previewUrl?: string;
+	pastedText?: string;
+	sourcePath?: string;
+};
+
+export type PromptInputLocalFiles = {
+	pathOf(file: File): string | undefined;
+	reveal(path: string): void;
+};
+
+export type ComposerDraftSegment =
+	| { type: "text"; text: string }
+	| { type: "chip"; chip: ComposerChip };
+
+export type ComposerDraft = {
+	segments: ComposerDraftSegment[];
+	attachments: PromptInputAttachment[];
+	usedDictation?: boolean;
 };
 
 export type PromptInputSubmitPayload = {
@@ -88,6 +120,7 @@ export type PromptInputSubmitPayload = {
 	files: File[];
 	mentions: ComposerChip[];
 	steer: boolean;
+	draft: ComposerDraft;
 };
 
 export type PromptInputDictationError = {
@@ -112,9 +145,15 @@ export type PromptInputDictation = {
 };
 
 export type PromptInputHandle = {
-	appendText(text: string): void;
+	isEmpty(): boolean;
+	addFiles(files: File[]): void;
+	restoreDraft(draft: ComposerDraft): void;
+	insertChip(chip: ComposerChip): void;
 	openFileDialog(): void;
+	openPanel(panel: ComposerPanelContent): void;
 	focus(): void;
+	recallPreviousPrompt(): void;
+	blur(): void;
 };
 
 export type PromptInputProps = {
@@ -123,34 +162,35 @@ export type PromptInputProps = {
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
 	status?: "ready" | "streaming";
-	submitWhileStreaming?: boolean;
-	placement?: "top" | "bottom";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;
 	toolbarEnd?: ReactNode;
-	// Text to open with, read once on mount. A host that persists drafts hands
-	// back what it stored; the composer owns the editor state from then on.
-	defaultValue?: string;
-	// Plain text of the composer as it is typed, for persisting a draft.
-	onChange?: (text: string) => void;
-	// Spans of a stored draft that were chips before it was serialized, so
-	// they come back as chips. Runs on the draft as read, never on typing.
-	findChips?: (text: string) => ComposerChipMatch[];
+	draft?: ComposerDraft;
+	onDraftChange?: (draft: ComposerDraft) => void;
 	/** Returning `false` keeps the draft in the editor. */
 	onSubmit?: (
 		payload: PromptInputSubmitPayload,
 	) => false | void | Promise<void>;
 	onStop?: () => void;
-	header?: ReactNode;
-	onAddFiles?: (files: File[]) => void;
+	stopOnEscape?: boolean;
 	allowEmptySubmit?: boolean;
-	clearOnSubmit?: boolean;
-	hideSubmit?: boolean;
+	disabled?: boolean;
+	pending?: boolean;
 	autoFocus?: boolean;
-	onMentionHighlight?: (entry: ComposerMentionEntry | null) => void;
-	onAttachmentClick?: (attachment: PromptInputAttachment) => void;
-	onChipClick?: (chip: ComposerChip) => void;
+	/** The clicked pill, and every pending attachment in order. */
+	onAttachmentClick?: (
+		attachment: PromptInputAttachment,
+		attachments: readonly PromptInputAttachment[],
+	) => void;
+	/** A chip for pasted plain text, such as a link; null keeps the text. */
+	chipForPaste?: (text: string) => ComposerChip | null;
+	/**
+	 * Wraps a chip as the composer draws it, for example in a hover card.
+	 * `rendered` is the chip without its tooltip; null keeps the plain chip.
+	 */
+	renderChip?: (chip: ComposerChip, rendered: ReactNode) => ReactNode | null;
+	localFiles?: PromptInputLocalFiles;
 	history?: string[];
 	className?: string;
 };

@@ -34,6 +34,10 @@ Double-click a pane title to rename it.
 
 Drag a tab onto another tab's split drop zone to merge the source tab's panes into that layout. The source tab closes after the merge.
 
+## Close Warning
+
+Closing a terminal with a running process asks you to confirm. If you tick **Don't ask again**, turn the warning back on with **Warn before closing a running terminal** in **Settings → Terminal**.
+
 ## Right-Click Menu
 
 Right-click in the terminal for quick actions:
@@ -50,7 +54,7 @@ Copying follows Ghostty's whitespace rules: trailing spaces on each line and tra
 Agents such as Codex and Claude Code capture the mouse, so a drag selects text inside the agent instead of the terminal:
 
 - **Drag, then ⌘C** - copies what the agent highlighted. Most agents also copy as soon as you release the mouse.
-- **Option-drag, then ⌘C** - makes a normal terminal selection over the agent, using Superset's whitespace rules.
+- **Option-drag, then ⌘C** - makes a normal terminal selection over the agent, using Paradev's whitespace rules.
 
 On macOS, Ctrl+C stops the running program. It does not copy.
 
@@ -59,7 +63,7 @@ On macOS, Ctrl+C stops the running program. It does not copy.
 Hold `Cmd` (macOS) or `Ctrl` and click links in terminal output:
 - URLs open in browser
 - File paths open in the built-in file viewer by default. A location such as `src/index.ts:240:7` jumps to line 240, column 7.
-- Links to Superset Pages open in a Page pane when the click opens them in the app
+- Links to Paradev Pages open in a Page pane when the click opens them in the app
 - Configure modifier keys for URLs in **Settings → Browser → URL links**, and for file, folder, and page links in **Settings → Files & Editor**
 
 ## Environment Variables

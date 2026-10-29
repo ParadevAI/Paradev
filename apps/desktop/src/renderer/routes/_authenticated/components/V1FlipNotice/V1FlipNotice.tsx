@@ -55,8 +55,8 @@ export function V1FlipNotice() {
 
 	return (
 		<FlipNoticeCard
-			title={translate(msg({ message: "A better Superset is ready" }))}
-			body="Superset has been upgraded: faster, cleaner, and built around your projects. Everything comes along on your next launch."
+			title={translate(msg({ message: "A better Paradev is ready" }))}
+			body="Paradev has been upgraded: faster, cleaner, and built around your projects. Everything comes along on your next launch."
 			warning="Running terminal sessions won't carry over."
 			ctaLabel="Got it"
 			onDismiss={dismiss}

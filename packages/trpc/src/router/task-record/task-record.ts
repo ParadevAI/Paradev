@@ -1,6 +1,8 @@
 import { db, dbWs } from "@superset/db/client";
 import {
 	attachments,
+	channelMembers,
+	channels,
 	cloudWorkspaceActivity,
 	cloudWorkspaces,
 	taskActivity,
@@ -33,6 +35,20 @@ import {
 import { jwtProcedure, userError } from "../../trpc";
 import { visibleTo } from "../cloud-workspace/access";
 import { labelActivity, recordTaskActivity } from "../task/activity";
+
+/** A channel in a task's history, hidden when it is private and the reader is not in it. */
+function visibleChannel(
+	channel: {
+		id: string | null;
+		name: string | null;
+		visibility: "public" | "private" | null;
+		viewerIsMember: string | null;
+	} | null,
+) {
+	if (!channel?.id || !channel.name) return null;
+	if (channel.visibility === "private" && !channel.viewerIsMember) return null;
+	return { id: channel.id, name: channel.name };
+}
 
 const COMMENT_MAX_LENGTH = 20_000;
 
@@ -110,6 +126,10 @@ export const taskRecordRouter = {
 			const toStatus = alias(taskStatuses, "to_status");
 			const fromProject = alias(taskProjects, "from_project");
 			const toProject = alias(taskProjects, "to_project");
+			const fromChannel = alias(channels, "from_channel");
+			const toChannel = alias(channels, "to_channel");
+			const fromChannelMember = alias(channelMembers, "from_channel_member");
+			const toChannelMember = alias(channelMembers, "to_channel_member");
 			const changes = await db
 				.select({
 					entry: taskActivity,
@@ -150,6 +170,18 @@ export const taskRecordRouter = {
 						icon: toProject.icon,
 						color: toProject.color,
 					},
+					fromChannel: {
+						id: fromChannel.id,
+						name: fromChannel.name,
+						visibility: fromChannel.visibility,
+						viewerIsMember: fromChannelMember.actorId,
+					},
+					toChannel: {
+						id: toChannel.id,
+						name: toChannel.name,
+						visibility: toChannel.visibility,
+						viewerIsMember: toChannelMember.actorId,
+					},
 				})
 				.from(taskActivity)
 				.leftJoin(actor, eq(actor.id, taskActivity.actorUserId))
@@ -162,6 +194,22 @@ export const taskRecordRouter = {
 				.leftJoin(toStatus, eq(toStatus.id, taskActivity.toStatusId))
 				.leftJoin(fromProject, eq(fromProject.id, taskActivity.fromProjectId))
 				.leftJoin(toProject, eq(toProject.id, taskActivity.toProjectId))
+				.leftJoin(fromChannel, eq(fromChannel.id, taskActivity.fromChannelId))
+				.leftJoin(toChannel, eq(toChannel.id, taskActivity.toChannelId))
+				.leftJoin(
+					fromChannelMember,
+					and(
+						eq(fromChannelMember.channelId, taskActivity.fromChannelId),
+						eq(fromChannelMember.actorId, ctx.userId),
+					),
+				)
+				.leftJoin(
+					toChannelMember,
+					and(
+						eq(toChannelMember.channelId, taskActivity.toChannelId),
+						eq(toChannelMember.actorId, ctx.userId),
+					),
+				)
 				.where(eq(taskActivity.taskId, task.id))
 				.orderBy(asc(taskActivity.createdAt));
 
@@ -279,6 +327,13 @@ export const taskRecordRouter = {
 							? {
 									from: row.fromProject?.id ? row.fromProject : null,
 									to: row.toProject?.id ? row.toProject : null,
+								}
+							: null,
+					channel:
+						row.entry.fromChannelId !== null || row.entry.toChannelId !== null
+							? {
+									from: visibleChannel(row.fromChannel),
+									to: visibleChannel(row.toChannel),
 								}
 							: null,
 				})),

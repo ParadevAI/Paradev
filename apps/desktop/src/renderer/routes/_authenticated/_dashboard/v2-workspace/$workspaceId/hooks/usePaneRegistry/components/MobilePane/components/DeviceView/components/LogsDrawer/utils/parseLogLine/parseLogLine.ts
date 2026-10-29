@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type LogLevel = "debug" | "info" | "default" | "error" | "fault";
 
 export interface LogEntry {
@@ -16,21 +18,29 @@ const IOS_LEVELS: Record<string, LogLevel> = {
 	Fault: "fault",
 };
 
-interface IosLogEvent {
-	timestamp?: string;
-	processImagePath?: string;
-	messageType?: string;
-	eventMessage?: string;
-}
+const iosLogEventSchema = z.object({
+	timestamp: z.string().optional(),
+	processImagePath: z.string().optional(),
+	messageType: z.string().optional(),
+	eventMessage: z.string().min(1),
+});
 
-export function parseIosEvent(data: string, id: string): LogEntry | null {
-	let event: IosLogEvent;
+const androidLogBatchSchema = z.object({
+	lines: z.array(z.object({ line: z.string() })),
+});
+
+function parseJson(data: string): unknown {
 	try {
-		event = JSON.parse(data) as IosLogEvent;
+		return JSON.parse(data);
 	} catch {
 		return null;
 	}
-	if (!event.eventMessage) return null;
+}
+
+export function parseIosEvent(data: string, id: string): LogEntry | null {
+	const parsed = iosLogEventSchema.safeParse(parseJson(data));
+	if (!parsed.success) return null;
+	const event = parsed.data;
 	return {
 		id,
 		time: event.timestamp?.split(" ")[1]?.slice(0, 12) ?? "",
@@ -51,6 +61,15 @@ const ANDROID_LEVELS: Record<string, LogLevel> = {
 
 const LOGCAT_LINE =
 	/^\d\d-\d\d (\d\d:\d\d:\d\d\.\d{3})\s+\d+\s+\d+ ([VDIWEF]) (.*?)\s*: (.*)$/;
+
+export function parseAndroidBatch(
+	data: string,
+	nextId: () => string,
+): LogEntry[] {
+	const parsed = androidLogBatchSchema.safeParse(parseJson(data));
+	if (!parsed.success) return [];
+	return parsed.data.lines.map(({ line }) => parseAndroidLine(line, nextId()));
+}
 
 export function parseAndroidLine(line: string, id: string): LogEntry {
 	const match = LOGCAT_LINE.exec(line);

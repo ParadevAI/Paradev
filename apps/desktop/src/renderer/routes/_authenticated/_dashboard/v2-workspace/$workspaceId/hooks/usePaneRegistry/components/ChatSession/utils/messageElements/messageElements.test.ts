@@ -20,4 +20,30 @@ describe("messageElements", () => {
 			),
 		).toEqual(["café: look at ", "[a.ts]", " and ", "[a.ts]", " again"]);
 	});
+
+	test("sends a link chip as its plain URL, with no element", () => {
+		const url = "https://github.com/acme/widgets/pull/42";
+		const elements = elementsForChips(`See ${url} and @auth.ts`, [
+			{ label: "acme/widgets#42", serialized: url, data: { link: url } },
+			{
+				label: "auth.ts",
+				serialized: "@auth.ts",
+				data: { elementKind: "file_mention" },
+			},
+		]);
+		expect(elements.map((element) => element.label)).toEqual(["auth.ts"]);
+	});
+
+	test("keeps what the composer knew about a linked pull request", () => {
+		const url = "https://github.com/acme/widgets/pull/42";
+		const data = {
+			kind: "linked_pr",
+			pr: { prNumber: 42, title: "Fix it", url, state: "merged" },
+		};
+		const [element] = elementsForChips(`See ${url}`, [
+			{ label: "#42", serialized: url, data },
+		]);
+		expect(element?.label).toBe("#42");
+		expect(element?.data).toEqual(data);
+	});
 });

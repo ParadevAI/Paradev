@@ -4,6 +4,15 @@ import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-ev
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
+import {
+	clippingAncestorRects,
+	visibleClipPath,
+} from "./utils/visibleClipPath";
+
+/** Matches a panel drawn over the page; its browsers sit above it, below dialogs. */
+const RAISED_LAYER_SELECTOR = "[data-browser-layer=raised]";
+const RAISED_WEBVIEW_Z = "31";
+const RAISED_OVERLAY_Z = "32";
 
 export interface BrowserRuntimeState {
 	currentUrl: string;
@@ -73,6 +82,16 @@ const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 
 const ROOT_CONTAINER_ID = "browser-runtime-root";
 
+function withoutHash(url: string): string | null {
+	try {
+		const parsed = new URL(url);
+		parsed.hash = "";
+		return parsed.href;
+	} catch {
+		return null;
+	}
+}
+
 /** Page-zoom bounds and step for a browser pane (1 = 100%). */
 export const BROWSER_ZOOM = Object.freeze({ min: 0.25, max: 5, step: 0.1 });
 
@@ -123,15 +142,13 @@ export class BrowserRuntimeRegistryImpl {
 			this.installGlobalListeners();
 			return existing;
 		}
+		// Not positioned, so it forms no stacking context and each webview can
+		// be raised on its own over a panel that slides above the page.
 		const root = document.createElement("div");
 		root.id = ROOT_CONTAINER_ID;
-		root.style.position = "fixed";
-		root.style.top = "0";
-		root.style.left = "0";
 		root.style.width = "0";
 		root.style.height = "0";
 		root.style.pointerEvents = "none";
-		root.style.zIndex = "0";
 		document.body.appendChild(root);
 		this.rootContainer = root;
 		this.installGlobalListeners();
@@ -196,14 +213,47 @@ export class BrowserRuntimeRegistryImpl {
 		}
 	}
 
+	private applyShownStyle(entry: RegistryEntry): void {
+		entry.webview.style.visibility = "visible";
+		entry.webview.style.opacity = "";
+		entry.webview.style.pointerEvents = pointerPassthrough.active
+			? "none"
+			: "auto";
+		entry.overlay.style.visibility = "visible";
+	}
+
 	private updateLayout(entry: RegistryEntry) {
 		if (!entry.placeholder) return;
 		const rect = entry.placeholder.getBoundingClientRect();
+		const clipPath =
+			entry.placeholder instanceof Element
+				? visibleClipPath(rect, clippingAncestorRects(entry.placeholder))
+				: "";
+		const raised =
+			entry.placeholder instanceof Element &&
+			entry.placeholder.closest(RAISED_LAYER_SELECTOR) !== null;
+		entry.webview.style.zIndex = raised ? RAISED_WEBVIEW_Z : "";
+		entry.overlay.style.zIndex = raised ? RAISED_OVERLAY_Z : "1";
 		for (const style of [entry.webview.style, entry.overlay.style]) {
 			style.top = `${rect.top}px`;
 			style.left = `${rect.left}px`;
 			style.width = `${rect.width}px`;
 			style.height = `${rect.height}px`;
+			style.clipPath = clipPath;
+		}
+	}
+
+	// The placeholder's ResizeObserver misses moves that do not resize it, so
+	// callers run this on each frame while panes slide.
+	relayout(): void {
+		for (const [paneId, entry] of this.entries) {
+			if (!entry.placeholder || !entry.visible) continue;
+			this.updateLayout(entry);
+			if (getComputedStyle(entry.placeholder).visibility === "hidden") {
+				this.applyParkedStyle(paneId, entry);
+			} else {
+				this.applyShownStyle(entry);
+			}
 		}
 	}
 
@@ -571,9 +621,7 @@ export class BrowserRuntimeRegistryImpl {
 		entry.resizeObserver = observer;
 
 		this.updateLayout(entry);
-		entry.webview.style.visibility = "visible";
-		entry.webview.style.opacity = "";
-		entry.overlay.style.visibility = "visible";
+		this.applyShownStyle(entry);
 		this.applyPointerPassthrough(pointerPassthrough.active);
 	}
 
@@ -657,9 +705,32 @@ export class BrowserRuntimeRegistryImpl {
 		if (entry?.webview.canGoForward()) entry.webview.goForward();
 	}
 
+	focus(paneId: string): void {
+		this.entries.get(paneId)?.webview.focus();
+	}
+
 	reload(paneId: string): void {
 		const entry = this.entries.get(paneId);
 		entry?.webview.reload();
+	}
+
+	/** A visible pane that finished loading `url`, for a link preview to reuse. */
+	findOpenPage(url: string): { paneId: string; title: string } | null {
+		const target = withoutHash(url);
+		if (!target) return null;
+		for (const [paneId, entry] of this.entries) {
+			const { currentUrl, isLoading, error, pageTitle } = entry.state;
+			if (
+				entry.visible &&
+				entry.webContentsId !== null &&
+				!isLoading &&
+				!error &&
+				withoutHash(currentUrl) === target
+			) {
+				return { paneId, title: pageTitle };
+			}
+		}
+		return null;
 	}
 
 	getState(paneId: string): BrowserRuntimeState {

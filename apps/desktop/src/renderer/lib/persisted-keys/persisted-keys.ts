@@ -18,6 +18,8 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "v2-terminal-presets-migrated-", match: "prefix" },
 	// Replaced by v2-notifications-v1
 	{ key: "notification-center-store", match: "exact" },
+	// Right pane area opt-out; the right pane area is on for everyone
+	{ key: "right-pane-area", match: "exact" },
 	// Workspace details moved into the workspace item (#5392)
 	{ key: "workspace-details-store", match: "exact" },
 	// Replaced by the v2 onboarding setup flow (#4080)
@@ -48,6 +50,11 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "last-active-v2-workspace", match: "exact" },
 	// v1/v2 surface toggle; v2 is always on
 	{ key: "v2-local-override-v2", match: "exact" },
+	// New-sidebar experiment toggle; the new sidebar is always on
+	{ key: "new-dashboard-sidebar", match: "exact" },
+	// File explorer and search dialog zustand stores had no consumers
+	{ key: "file-explorer-store", match: "exact" },
+	{ key: "search-dialog-store", match: "exact" },
 ];
 
 function matchesDeadKey(key: string): boolean {

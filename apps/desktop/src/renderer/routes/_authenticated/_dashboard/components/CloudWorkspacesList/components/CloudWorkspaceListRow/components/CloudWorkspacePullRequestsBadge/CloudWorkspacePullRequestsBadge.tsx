@@ -54,7 +54,7 @@ export function CloudWorkspacePullRequestsBadge({
 				className="w-80 p-1 pt-2"
 				onClick={(event) => event.stopPropagation()}
 			>
-				<CloudSection title={<Trans>Pull requests</Trans>}>
+				<CloudSection title={<Trans>Pull requests</Trans>} scrollable>
 					{pullRequests.map((pullRequest) => (
 						<CloudPullRequestRow
 							key={pullRequest.url}

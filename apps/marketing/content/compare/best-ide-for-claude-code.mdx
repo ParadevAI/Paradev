@@ -1,6 +1,6 @@
 ---
 title: "Best IDE for Claude Code in 2026: Where to Run It"
-description: "The best places to run Claude Code in 2026, from the terminal and VS Code to JetBrains, Zed, Conductor, and Superset for parallel worktree sessions."
+description: "The best places to run Claude Code in 2026, from the terminal and VS Code to JetBrains, Zed, Conductor, and Paradev for parallel worktree sessions."
 date: 2026-07-13
 lastUpdated: 2026-10-08
 type: "roundup"
@@ -30,7 +30,7 @@ This guide covers both, from the simplest terminal setup to a full parallel-agen
 
 | Where you run Claude Code | Best for | Parallel sessions on one repo? | Main tradeoff |
 |---|---|---|---|
-| **Superset** | Running many Claude Code sessions at once | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
+| **Paradev** | Running many Claude Code sessions at once | Git worktrees for local branch-based workspaces | Not a single-file editor experience |
 | **Terminal (CLI)** | The most complete, scriptable Claude Code | Manual (tmux + worktrees yourself) | You manage isolation and review |
 | **VS Code extension** | Editing alongside Claude Code | Limited without extra tooling | In-editor, single working copy |
 | **JetBrains extension** | JetBrains users | Limited | Tied to JetBrains IDEs |
@@ -64,25 +64,25 @@ Zed hosts Claude Code natively through the Agent Client Protocol, running it ins
 
 Conductor is a macOS app that runs Claude Code (and Codex, Cursor, and OpenCode) in parallel, each in an isolated Git worktree, with a review-and-merge and pull-request flow. It is a focused, polished way to run a few agents in parallel on a Mac. It is macOS only.
 
-For the direct comparison, see [Superset vs Conductor](/compare/superset-vs-conductor).
+For the direct comparison, see [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ### cmux
 
 cmux is a native macOS terminal built for agents. It keeps many Claude Code sessions visible in tabs and split panes with notifications, but it does not isolate what each session changes -- that is left to you. It is a great terminal for agents, not an orchestrator.
 
-For the direct comparison, see [Superset vs cmux](/compare/superset-vs-cmux).
+For the direct comparison, see [Paradev vs cmux](/compare/superset-vs-cmux).
 
-### Superset
+### Paradev
 
-Superset runs Claude Code as a first-class agent, using separate Git worktrees and terminals for new local branch-based workspaces, so multiple Claude Code sessions can work the same repository at once in separate working directories. Around that it adds a built-in diff and file editor, an in-app browser, MCP tooling, and remote and cloud workspaces. You can review inside Superset or hand off to VS Code, Cursor, JetBrains, or Xcode. For Claude Code specifically, an interrupted session resumes in the same pane with `claude --resume`, subagents appear under their parent session, the Usage tab shows quotas and token spend for each Claude Code login, and you can continue a session with another agent such as Codex. The iPhone and iPad app lets you check on sessions and review diffs away from your desk. It is the strongest fit when your goal is many Claude Code sessions in parallel, not another editor pane. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.superset.sh/workspaces).
+Paradev runs Claude Code as a first-class agent, using separate Git worktrees and terminals for new local branch-based workspaces, so multiple Claude Code sessions can work the same repository at once in separate working directories. Around that it adds a built-in diff and file editor, an in-app browser, MCP tooling, and remote and cloud workspaces. You can review inside Paradev or hand off to VS Code, Cursor, JetBrains, or Xcode. For Claude Code specifically, an interrupted session resumes in the same pane with `claude --resume`, subagents appear under their parent session, the Usage tab shows quotas and token spend for each Claude Code login, and you can continue a session with another agent such as Codex. The iPhone and iPad app lets you check on sessions and review diffs away from your desk. It is the strongest fit when your goal is many Claude Code sessions in parallel, not another editor pane. Worktrees separate working files but do not sandbox processes or prevent merge conflicts; see [workspace types](https://docs.paradev.com/workspaces).
 
-For the direct comparison, see [Superset vs Claude Code](/compare/superset-vs-claude-code).
+For the direct comparison, see [Paradev vs Claude Code](/compare/superset-vs-claude-code).
 
 ## How To Choose
 
 - For one deep task, run the Claude Code CLI in your terminal, or use the VS Code or JetBrains extension if you want to edit alongside it.
 - To host Claude Code inside a fast editor, use Zed's ACP support.
-- To run many Claude Code sessions in parallel on one repository, use a worktree-based workspace like Superset or Conductor.
+- To run many Claude Code sessions in parallel on one repository, use a worktree-based workspace like Paradev or Conductor.
 
 ## Best Picks by Use Case
 
@@ -98,13 +98,13 @@ The official extensions are the natural home if you want to keep editing in your
 
 Zed's ACP support runs Claude Code cleanly inside a fast, modern editor.
 
-### Best for parallel Claude Code sessions: Superset
+### Best for parallel Claude Code sessions: Paradev
 
-Superset gives new local branch-based workspaces separate worktrees, so many can run at once in separate working directories, with review and orchestration built in.
+Paradev gives new local branch-based workspaces separate worktrees, so many can run at once in separate working directories, with review and orchestration built in.
 
 ## Verdict
 
-If you run Claude Code one task at a time, the best IDE is whichever editor you already use: the CLI for depth, VS Code or JetBrains to edit alongside, or Zed to host it inside a fast editor. The moment you want several Claude Code sessions in parallel on the same repository, the deciding factor becomes worktree isolation and review, and a workspace like Superset is the better answer.
+If you run Claude Code one task at a time, the best IDE is whichever editor you already use: the CLI for depth, VS Code or JetBrains to edit alongside, or Zed to host it inside a fast editor. The moment you want several Claude Code sessions in parallel on the same repository, the deciding factor becomes worktree isolation and review, and a workspace like Paradev is the better answer.
 
 For the workflow details, see [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel). For the broader category, see [Best Agentic IDE in 2026](/compare/best-agentic-ide).
 
@@ -112,15 +112,15 @@ For the workflow details, see [How to Run Multiple Claude Code Agents in Paralle
 
 ### What is the best IDE for Claude Code?
 
-For a single task, the Claude Code CLI or the VS Code and JetBrains extensions are excellent. For running several sessions in parallel on one repository, a worktree-based workspace like Superset is the better fit.
+For a single task, the Claude Code CLI or the VS Code and JetBrains extensions are excellent. For running several sessions in parallel on one repository, a worktree-based workspace like Paradev is the better fit.
 
 ### Can I run Claude Code in VS Code?
 
-Yes. Claude Code has an official VS Code extension that runs it beside your code. For isolated parallel sessions, pair it with a worktree workflow or use a workspace like Superset.
+Yes. Claude Code has an official VS Code extension that runs it beside your code. For isolated parallel sessions, pair it with a worktree workflow or use a workspace like Paradev.
 
 ### How do I run multiple Claude Code sessions at once?
 
-Give each session its own Git worktree so they do not share a working directory. You can do this manually with tmux and worktrees, or automatically with a workspace like Superset or Conductor. See [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).
+Give each session its own Git worktree so they do not share a working directory. You can do this manually with tmux and worktrees, or automatically with a workspace like Paradev or Conductor. See [How to Run Multiple Claude Code Agents in Parallel](/compare/multiple-claude-code-agents-parallel).
 
 ### Does Claude Code have its own IDE?
 

@@ -1,78 +1,131 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type {
 	AvailableCommand,
 	SessionConfigOption,
+	SessionUsage,
 	UserContent,
-	UserMessage,
 } from "@superset/chat/protocol";
 import type {
+	ComposerActionContext,
 	ComposerChip,
+	ComposerDraft,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	PromptInputCommand,
 	PromptInputHandle,
 	PromptInputSubmitPayload,
 } from "@superset/chat-ui/PromptInput";
+import { formatRelativeTime } from "@superset/i18n/format";
+import { usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import {
 	memo,
-	type KeyboardEvent as ReactKeyboardEvent,
 	type Ref,
 	useCallback,
 	useEffect,
+	useId,
 	useImperativeHandle,
 	useLayoutEffect,
 	useMemo,
 	useRef,
+	useState,
 } from "react";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
+import { FileIcon, getFileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
-import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
-import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
-import { elementsForChips } from "../../utils/messageElements";
-import { type AgentSwitcher, ModelPicker } from "./components/ModelPicker";
-import { ModePicker, type SessionMode } from "./components/ModePicker";
-import { QueuedPrompts } from "./components/QueuedPrompts";
-import { useAttachmentPreview } from "./hooks/useAttachmentPreview";
 import {
-	takeRecoveredDraftText,
+	type AgentSwitcher,
+	ModelPicker,
+} from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
+import {
+	ModePicker,
+	type SessionMode,
+} from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
+import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
+import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useChatComposerStore } from "../../../../stores/chatComposerStore";
+import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
+import { useChatWiring } from "../../hooks/useSessionClient";
+import type { ChatForkTarget } from "../../types";
+import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
+import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import { mcpContextLine } from "../../utils/mcpServerChips";
+import { elementsForChips } from "../../utils/messageElements";
+import { AccountLimitNotice } from "./components/AccountLimitNotice";
+import { ContextWindowRing } from "./components/ContextWindowRing";
+import { useAppCommands } from "./hooks/useAppCommands";
+import {
+	prependToDraft,
+	takeRecoveredDraft,
 	useComposerDraft,
 } from "./hooks/useComposerDraft";
-import { useFooterTier } from "./hooks/useFooterTier";
-import { useQueueActions } from "./hooks/useQueueActions";
+import { useDrawerEntry } from "./hooks/useDrawerEntry";
+import { useLinkChips } from "./hooks/useLinkChips";
+import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
+import { useStatusDialog } from "./hooks/useStatusDialog";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
+
+export type ComposerTarget = {
+	name: string;
+	disabledReason?: string;
+	onStop?: () => void;
+};
+
+export type ComposerHandle = Pick<
+	PromptInputHandle,
+	"restoreDraft" | "addFiles" | "focus"
+> & {
+	returnFocus: (recallHistory?: boolean) => void;
+	/** Opens the model picker on this agent's models only. */
+	openModelPicker: () => void;
+};
 
 export type ComposerProps = {
 	workspaceId: string;
+	/** This chat's own session, left out of the chats it can mention. */
+	sessionId?: string;
+	presetId?: string;
 	draftKey: string;
-	inputRef?: Ref<Pick<PromptInputHandle, "appendText" | "focus">>;
+	draftPersisted?: boolean;
+	inputRef?: Ref<ComposerHandle>;
 	availableCommands: AvailableCommand[];
 	configOptions?: SessionConfigOption[];
 	onSetConfigOption?: (configId: string, value: string) => unknown;
+	onModelPickerOpenChange?: (open: boolean) => void;
 	agentSwitcher?: AgentSwitcher;
 	modes?: SessionMode[];
 	currentModeId?: string;
 	onSetMode?: (modeId: string) => void;
-	onSend: (content: UserContent[], options: { steer: boolean }) => unknown;
+	onSend: (
+		content: UserContent[],
+		options: { steer: boolean; draft: ComposerDraft },
+	) => unknown;
+	/** Opens the pane header's chat history picker, as `/resume` does. */
+	onOpenHistory?: () => void;
+	onNewChat?: () => void;
+	onFork?: (target: ChatForkTarget) => void;
+	canForkToWorktree?: boolean;
+	onOpenFind?: () => void;
 	history?: string[];
 	isActive?: boolean;
 	placeholder?: string;
 	disabled?: boolean;
 	onCancelTurn?: (() => void) | null;
-	promptQueue?: {
-		prompts: UserMessage[];
-		paused: boolean;
-		actionable: boolean;
-		remove: (itemId: string) => Promise<void>;
-		resume: () => Promise<void>;
-		steer: (itemId: string) => Promise<void>;
-	};
+	target?: ComposerTarget;
+	escapeGoesBack?: boolean;
+	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
+	sessionUsage?: SessionUsage | null;
+	turnRunning?: boolean;
+	terminalId?: string;
+	agentLabel?: string;
 };
+
+const HIDDEN_AGENT_COMMANDS = new Set(["rewind"]);
 
 /**
  * The agent's own slash commands, in the shape the composer's menu takes.
@@ -99,45 +152,113 @@ const FOCUS_HANDOFF_MS = 1000;
 let focusHandoff: { draftKey: string; at: number } | null = null;
 
 export const Composer = memo(function Composer({
+	presetId,
+	agentLabel,
 	agentSwitcher,
 	availableCommands,
+	canForkToWorktree,
 	configOptions,
+	escapeGoesBack = false,
 	currentModeId,
 	modes,
 	onSetConfigOption,
+	onModelPickerOpenChange,
 	onSetMode,
 	disabled,
 	draftKey,
+	draftPersisted = true,
 	inputRef,
 	history,
 	isActive,
 	onCancelTurn,
+	onEnterDrawer,
+	onFork,
+	onNewChat,
+	onOpenFind,
 	onSend,
+	onOpenHistory,
 	placeholder,
-	promptQueue,
+	sessionUsage,
+	target,
+	turnRunning = false,
+	terminalId,
 	workspaceId,
+	sessionId,
 }: ComposerProps) {
 	const { t } = useLingui();
+	const blocked = disabled || target?.disabledReason !== undefined;
+	const stop = target ? target.onStop : (onCancelTurn ?? undefined);
+	const name = target?.name ?? "";
 	const trpcUtils = workspaceTrpc.useUtils();
-	const cloudUtils = cloudTrpc.useUtils();
+	const { hostUrl } = useWorkspaceClient();
+	const { data: workspace } = workspaceTrpc.workspace.get.useQuery({
+		id: workspaceId,
+	});
+	const githubProviders = useGitHubMentionProviders(
+		useMemo(
+			() =>
+				workspace?.projectId && hostUrl
+					? { projectId: workspace.projectId, hostUrl }
+					: null,
+			[workspace?.projectId, hostUrl],
+		),
+	);
 	const uploadAttachments = useUploadAttachments(workspaceId);
-	const attachmentPreview = useAttachmentPreview();
-	const { storedDraft, onChange, clearDraft } = useComposerDraft(draftKey);
+	const { storedDraft, onDraftChange, clearDraft } = useComposerDraft(
+		draftKey,
+		draftPersisted,
+	);
 	const promptInputRef = useRef<PromptInputHandle>(null);
-	const queueActions = useQueueActions(promptQueue, promptInputRef);
+	const focusInput = useCallback(() => promptInputRef.current?.focus(), []);
+	const recallHistory = useCallback(
+		() => promptInputRef.current?.recallPreviousPrompt(),
+		[],
+	);
+	const drawerEntry = useDrawerEntry({
+		enterDrawer: onEnterDrawer,
+		focusComposer: focusInput,
+		recallHistory,
+	});
+	const { returnFocus } = drawerEntry;
+	const mcpPicker = useMcpServerPicker({ workspaceId, presetId });
+	const [modelPickerOpen, setModelPickerOpen] = useState(false);
+	const [agentModelsOnly, setAgentModelsOnly] = useState(false);
+	const changeModelPickerOpen = useCallback(
+		(open: boolean) => {
+			setModelPickerOpen(open);
+			if (!open) setAgentModelsOnly(false);
+			onModelPickerOpenChange?.(open);
+		},
+		[onModelPickerOpenChange],
+	);
 	useImperativeHandle(
 		inputRef,
 		() => ({
-			appendText: (text: string) => promptInputRef.current?.appendText(text),
-			focus: () => promptInputRef.current?.focus(),
+			restoreDraft: (draft: ComposerDraft) =>
+				promptInputRef.current?.restoreDraft(draft),
+			addFiles: (files: File[]) => promptInputRef.current?.addFiles(files),
+			focus: focusInput,
+			returnFocus,
+			openModelPicker: () => {
+				setAgentModelsOnly(true);
+				changeModelPickerOpen(true);
+			},
 		}),
-		[],
+		[focusInput, returnFocus, changeModelPickerOpen],
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const footerTier = useFooterTier(rootRef);
+	const composerId = useId();
 	useEffect(() => {
-		const recovered = takeRecoveredDraftText(draftKey);
-		if (recovered) promptInputRef.current?.appendText(recovered);
+		const { register, unregister } = useChatComposerStore.getState();
+		register(composerId, workspaceId, {
+			addFiles: (files) => promptInputRef.current?.addFiles(files),
+		});
+		return () => unregister(composerId);
+	}, [composerId, workspaceId]);
+	useEffect(() => {
+		const recovered = takeRecoveredDraft(draftKey);
+		if (recovered) promptInputRef.current?.restoreDraft(recovered);
 	}, [draftKey]);
 	useLayoutEffect(() => {
 		const handoff = focusHandoff;
@@ -156,6 +277,7 @@ export const Composer = memo(function Composer({
 			}
 		};
 	}, [draftKey]);
+	usePaneFocus(focusInput);
 	useHotkey("FOCUS_CHAT_INPUT", () => promptInputRef.current?.focus(), {
 		enabled: Boolean(isActive),
 	});
@@ -185,6 +307,7 @@ export const Composer = memo(function Composer({
 	}, [isActive]);
 	const searchFiles = useCallback(
 		async (query: string) => {
+			if (!query) return [];
 			const { matches } = await trpcUtils.filesystem.searchFiles.fetch({
 				workspaceId,
 				query,
@@ -196,11 +319,13 @@ export const Composer = memo(function Composer({
 					id: match.absolutePath,
 					label: match.name,
 					description: match.relativePath,
+					icon: <FileIcon className="size-4" fileName={match.name} />,
 					// The agent reads the path itself, so a mention is the path.
 					select: (ctx) =>
 						ctx.insertChip({
 							label: match.name,
 							serialized: match.relativePath,
+							iconUrl: getFileIcon(match.name, false).src,
 							data: { elementKind: "file_mention" },
 						}),
 				}),
@@ -209,26 +334,51 @@ export const Composer = memo(function Composer({
 		[trpcUtils, workspaceId],
 	);
 
-	const searchPages = useCallback(
-		async (query: string) => {
-			const { items } = await cloudUtils.page.listPaginated.fetch(
-				pagesListInput({ search: query || undefined, limit: 20 }),
-			);
-			return items.map((page): ComposerMentionEntry => {
-				const url = new URL(
-					`/page/${encodeURIComponent(page.slug)}`,
-					env.NEXT_PUBLIC_WEB_URL,
-				).toString();
-				return {
-					id: page.id,
-					label: page.title,
-					description: page.slug,
-					select: (ctx) =>
-						ctx.insertChip({ label: page.title, serialized: url }),
-				};
-			});
+	const { transport } = useChatWiring();
+	const { workspaces: hostWorkspaces } = useHostWorkspaces();
+	const otherHostOf = useCallback(
+		(chatWorkspaceId: string) => {
+			const hostOf = (id: string) =>
+				hostWorkspaces.find((workspace) => workspace.id === id)?.hostId;
+			const chatHost = hostOf(chatWorkspaceId);
+			return chatHost && chatHost !== hostOf(workspaceId) ? chatHost : null;
 		},
-		[cloudUtils],
+		[hostWorkspaces, workspaceId],
+	);
+	const isDark = useIsDarkTheme();
+	const searchChats = useCallback(
+		async (query: string) => {
+			const needle = query.trim().toLowerCase();
+			// A host older than `query` ignores it; the filter below still applies.
+			const sessions = await transport.listSessions({
+				workspaceId,
+				limit: 50,
+				...(needle ? { query: needle } : {}),
+			});
+			return sessions
+				.filter((session) => session.sessionId !== sessionId)
+				.map((session) => ({
+					session,
+					title: session.title?.trim() || t({ message: "Untitled chat" }),
+				}))
+				.filter(({ title }) => !needle || title.toLowerCase().includes(needle))
+				.sort((a, b) => b.session.updatedAt - a.session.updatedAt)
+				.map(
+					({ session, title }): ComposerMentionEntry => ({
+						id: session.sessionId,
+						label: title,
+						description: formatRelativeTime(new Date(session.updatedAt)),
+						select: (ctx) =>
+							ctx.insertChip(
+								chatReferenceChip(
+									{ workspaceId, sessionId: session.sessionId, title },
+									{ webUrl: env.NEXT_PUBLIC_WEB_URL, isDark },
+								),
+							),
+					}),
+				);
+		},
+		[transport, workspaceId, sessionId, isDark, t],
 	);
 
 	const mentionProviders = useMemo<ComposerMentionProvider[]>(
@@ -240,30 +390,114 @@ export const Composer = memo(function Composer({
 				source: {
 					kind: "search",
 					search: searchFiles,
-					emptyState: t({ message: "No matching files" }),
+					emptyState: t({ message: "Type to search files..." }),
 				},
 			},
 			{
-				id: "pages",
-				title: t({ message: "Pages" }),
-				priority: 2,
+				id: "chats",
+				title: t({ message: "Chats" }),
+				priority: 3,
 				source: {
 					kind: "search",
-					search: searchPages,
-					emptyState: t({ message: "No matching pages" }),
+					search: searchChats,
+					emptyState: t({ message: "No other chats here" }),
 				},
 			},
+			...githubProviders,
 		],
-		[searchFiles, searchPages, t],
+		[githubProviders, searchFiles, searchChats, t],
 	);
 
-	const commands = useMemo(
+	const linkChips = useLinkChips();
+	const statusDetails = useMemo(
 		() =>
-			toMenuCommands(availableCommands, {
-				commands: t({ message: "Commands" }),
-				mcp: t({ message: "MCP Server Commands" }),
+			terminalId
+				? {
+						workspaceId,
+						terminalId,
+						agentLabel,
+						configOptions: configOptions ?? [],
+						modes,
+						currentModeId,
+						usage: sessionUsage ?? null,
+					}
+				: undefined,
+		[
+			workspaceId,
+			terminalId,
+			agentLabel,
+			configOptions,
+			modes,
+			currentModeId,
+			sessionUsage,
+		],
+	);
+	const status = useStatusDialog(statusDetails);
+	const canCompact = availableCommands.some(
+		(command) => command.name === "compact",
+	);
+	const compact = useCallback(
+		() =>
+			onSend([{ type: "text", text: "/compact" }], {
+				steer: false,
+				draft: {
+					segments: [{ type: "text", text: "/compact" }],
+					attachments: [],
+				},
 			}),
-		[availableCommands, t],
+		[onSend],
+	);
+	const hasModelPicker =
+		!target &&
+		onSetConfigOption !== undefined &&
+		(configOptions?.some(
+			(option) => option.category === "model" && option.options.length > 0,
+		) === true ||
+			(agentSwitcher?.agents.length ?? 0) > 1);
+	const openModelPicker = useCallback(
+		() => changeModelPickerOpen(true),
+		[changeModelPickerOpen],
+	);
+	const openMcp = useCallback(
+		(ctx: ComposerActionContext) => mcpPicker.open.current(ctx),
+		[mcpPicker.open],
+	);
+	const appCommands = useAppCommands({
+		inputRef: promptInputRef,
+		availableCommands,
+		...(presetId ? { presetId } : {}),
+		...(configOptions ? { configOptions } : {}),
+		...(onSetConfigOption ? { onSetConfigOption } : {}),
+		...(modes ? { modes } : {}),
+		...(currentModeId ? { currentModeId } : {}),
+		...(onSetMode ? { onSetMode } : {}),
+		...(hasModelPicker ? { openModelPicker } : {}),
+		...(onNewChat ? { onNewChat } : {}),
+		...(onFork ? { onFork } : {}),
+		...(canForkToWorktree ? { canForkToWorktree } : {}),
+		...(onOpenHistory ? { onOpenHistory } : {}),
+		...(onOpenFind ? { onOpenFind } : {}),
+		...(status.available ? { openStatus: status.open } : {}),
+		...(mcpPicker.available ? { openMcp } : {}),
+		toSubagent: target !== undefined,
+	});
+	const { hiddenAgentNames, runTyped } = appCommands;
+	const commands = useMemo(
+		() => [
+			...appCommands.commands,
+			...toMenuCommands(
+				availableCommands.filter(
+					(command) =>
+						!hiddenAgentNames.has(command.name) &&
+						!HIDDEN_AGENT_COMMANDS.has(command.name),
+				),
+				{
+					commands: t({ message: "Commands" }),
+					mcp: t({ message: "MCP Server Commands" }),
+				},
+			),
+		],
+		[appCommands.commands, availableCommands, hiddenAgentNames, t],
 	);
 
 	const send = useCallback(
@@ -272,102 +506,118 @@ export const Composer = memo(function Composer({
 			files: File[],
 			mentions: ComposerChip[],
 			steer: boolean,
+			draft: ComposerDraft,
 		) => {
 			const tags = await uploadAttachments(files);
 			if (!tags) {
-				promptInputRef.current?.appendText(text);
+				const input = promptInputRef.current;
+				if (input) input.restoreDraft(draft);
+				else prependToDraft(draftKey, [draft]);
 				return;
 			}
-			const elements = elementsForChips(text.trim(), mentions);
+			const message = text.trim();
+			const elements = elementsForChips(message, mentions);
+			const mcpContext = mcpContextLine(
+				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
+			);
+			const chatContext = chatContextLine(
+				mentions,
+				env.NEXT_PUBLIC_WEB_URL,
+				otherHostOf,
+			);
 			onSend(
 				[
 					{
 						type: "text",
-						text: [text.trim(), ...tags].filter(Boolean).join("\n"),
+						text: [message, ...tags].filter(Boolean).join("\n"),
 						...(elements.length > 0 ? { elements } : {}),
 					},
+					...[mcpContext, chatContext].flatMap((context) =>
+						context
+							? [{ type: "text" as const, text: context, hidden: true }]
+							: [],
+					),
 				],
-				{ steer },
+				{ steer, draft },
 			);
 			clearDraft();
 		},
-		[onSend, uploadAttachments, clearDraft],
+		[
+			onSend,
+			uploadAttachments,
+			clearDraft,
+			draftKey,
+			mcpPicker.serverNameOf,
+			otherHostOf,
+		],
 	);
 
 	const handleSubmit = useCallback(
-		({ text, files, mentions, steer }: PromptInputSubmitPayload) => {
-			if (disabled || (text.trim() === "" && files.length === 0)) return;
+		({ text, files, mentions, steer, draft }: PromptInputSubmitPayload) => {
+			if (blocked || (text.trim() === "" && files.length === 0)) return false;
+			const typed = runTyped(text, files.length > 0);
+			if (typed === "ran") return;
+			if (typed === "kept") return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
 				name &&
+				!target &&
 				availableCommands.length > 0 &&
 				!availableCommands.some((command) => command.name === name)
 			) {
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return send(text, files, mentions, steer);
+			return send(text, files, mentions, steer, draft);
 		},
-		[availableCommands, disabled, send, t],
+		[availableCommands, blocked, runTyped, send, t, target],
 	);
-
-	const queueListRef = useRef<HTMLUListElement>(null);
-	const focusQueue = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-		if (event.key !== "Tab" || !event.shiftKey || !promptQueue?.actionable)
-			return;
-		if (
-			!(event.target instanceof HTMLElement) ||
-			!event.target.closest(".prompt-input-editor")
-		)
-			return;
-		const rows =
-			queueListRef.current?.querySelectorAll<HTMLElement>("[data-queue-row]");
-		const newest = rows?.[rows.length - 1];
-		if (!newest) return;
-		event.preventDefault();
-		event.stopPropagation();
-		newest.focus();
-	};
 
 	return (
 		<div
 			ref={rootRef}
 			className={cn(CHAT_GUTTER_CLASSNAME, "pt-1 pb-5")}
-			onKeyDownCapture={focusQueue}
+			onKeyDownCapture={drawerEntry.onKeyDownCapture}
+			onFocusCapture={() =>
+				useChatComposerStore.getState().markActive(composerId)
+			}
 		>
-			{promptQueue && (
-				<div className={CHAT_COLUMN_CLASSNAME}>
-					<QueuedPrompts
-						{...queueActions}
-						actionable={promptQueue.actionable}
-						listRef={queueListRef}
-						onExit={() => promptInputRef.current?.focus()}
-						paused={promptQueue.paused}
-						prompts={promptQueue.prompts}
-					/>
-				</div>
+			{terminalId && (
+				<AccountLimitNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					terminalId={terminalId}
+					workspaceId={workspaceId}
+				/>
 			)}
 			<AgentComposer
 				className={CHAT_COLUMN_CLASSNAME}
-				clearOnSubmit={!disabled}
 				commands={commands}
-				defaultValue={storedDraft}
+				draft={storedDraft}
+				chipForPaste={linkChips.chipForPaste}
+				renderChip={linkChips.renderChip}
 				history={history}
 				key={draftKey}
 				mentionProviders={mentionProviders}
-				onAttachmentClick={attachmentPreview.onAttachmentClick}
-				onChange={onChange}
-				onStop={onCancelTurn ?? undefined}
+				onDraftChange={onDraftChange}
+				onStop={stop}
 				onSubmit={handleSubmit}
 				ref={promptInputRef}
 				placeholder={
-					placeholder ??
-					t({ message: "Ask the agent, @mention files, run /commands" })
+					target
+						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
+						: (placeholder ??
+							t({ message: "Ask the agent, @mention files, run /commands" }))
 				}
-				status={onCancelTurn ? "streaming" : "ready"}
-				submitWhileStreaming={promptQueue !== undefined}
+				status={stop ? "streaming" : "ready"}
+				stopOnEscape={!escapeGoesBack}
 				toolbar={
-					modes && onSetMode ? (
+					target ? (
+						<span className="flex h-6 min-w-0 max-w-48 items-center rounded-md border border-border/60 px-2 font-sans text-foreground/70 text-xs">
+							<span className="min-w-0 truncate">
+								<Trans>to {name}</Trans>
+							</span>
+						</span>
+					) : modes && onSetMode ? (
 						<ModePicker
 							currentModeId={currentModeId}
 							iconOnly={footerTier >= 2}
@@ -377,18 +627,32 @@ export const Composer = memo(function Composer({
 					) : undefined
 				}
 				toolbarEnd={
-					configOptions && onSetConfigOption ? (
-						<ModelPicker
-							agentSwitcher={agentSwitcher}
-							configOptions={configOptions}
-							hideEffortLabel={footerTier >= 1}
-							hideModelLabel={footerTier >= 3}
-							onSelect={onSetConfigOption}
-						/>
-					) : undefined
+					target ? undefined : (
+						<>
+							{sessionUsage && (
+								<ContextWindowRing
+									usage={sessionUsage}
+									onCompact={canCompact ? compact : undefined}
+									compactDisabled={blocked || turnRunning}
+								/>
+							)}
+							{configOptions && onSetConfigOption && (
+								<ModelPicker
+									agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
+									configOptions={configOptions}
+									hideEffortLabel={footerTier >= 1}
+									hideModelLabel={footerTier >= 3}
+									onOpenChange={changeModelPickerOpen}
+									onSelect={onSetConfigOption}
+									open={modelPickerOpen}
+								/>
+							)}
+						</>
+					)
 				}
 			/>
-			{attachmentPreview.overlay}
+			{mcpPicker.dialog}
+			{status.dialog}
 		</div>
 	);
 });

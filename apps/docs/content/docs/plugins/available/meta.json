@@ -1,0 +1,18 @@
+{
+	"title": "Available Plugins",
+	"pages": [
+		"index",
+		"github",
+		"sentry",
+		"stripe",
+		"resend",
+		"linear",
+		"notion",
+		"granola",
+		"circleback",
+		"ynab",
+		"slack",
+		"gmail",
+		"superhuman"
+	]
+}

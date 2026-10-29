@@ -1,4 +1,6 @@
 import { Trans } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { SiLinear } from "react-icons/si";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { CloudPullRequestRow } from "renderer/routes/_authenticated/_dashboard/components/CloudPullRequestRow";
@@ -12,6 +14,7 @@ import {
 import type { CloudPullRequest } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import type { TaskProjectValue, TaskRecord } from "../../../../types";
 import { AssigneeProperty } from "./components/AssigneeProperty";
+import { ChannelProperty } from "./components/ChannelProperty";
 import { PriorityProperty } from "./components/PriorityProperty";
 import { StatusProperty } from "./components/StatusProperty";
 import { TaskWorkspaceRow } from "./components/TaskWorkspaceRow";
@@ -51,6 +54,8 @@ export function TaskRecordSide({
 	onOpenWorkspace,
 	onOpenPullRequest,
 }: TaskRecordSideProps) {
+	const channelsEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	return (
 		<aside className="space-y-4 px-3 py-[18px] text-[13px]">
 			<CloudSection title={<Trans>Properties</Trans>}>
@@ -71,6 +76,11 @@ export function TaskRecordSide({
 						onCreateProject={onCreateProject}
 					/>
 				</PropertyRow>
+				{channelsEnabled && (
+					<PropertyRow label={<Trans>Channel</Trans>}>
+						<ChannelProperty taskId={task.id} />
+					</PropertyRow>
+				)}
 				{importSource && (
 					<a
 						href={importSource.externalUrl}

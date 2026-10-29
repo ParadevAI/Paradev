@@ -26,6 +26,7 @@
 		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
+		"@superset/shared": "workspace:*",
 		"marked": "17.0.6",
 		"zod": "4.6.5"
 	},
@@ -34,15 +35,15 @@
 		"@superset/typescript": "workspace:*",
 		"@testing-library/dom": "10.4.1",
 		"@testing-library/react": "16.3.0",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/node": "24.12.0",
-		"@types/react": "19.2.14",
-		"react": "19.2.3",
-		"react-dom": "19.2.3",
+		"@types/react": "19.3.0",
+		"react": "19.3.0",
+		"react-dom": "19.3.0",
 		"typescript": "7.0.2"
 	},
 	"peerDependencies": {
-		"react": "19.2.3"
+		"react": "19.3.0"
 	},
 	"peerDependenciesMeta": {
 		"react": {

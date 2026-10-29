@@ -1,7 +1,5 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { msg, plural } from "@lingui/core/macro";
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { Button } from "@superset/ui/button";
 import {
@@ -13,95 +11,40 @@ import {
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import {
 	LuArchive,
-	LuArrowDownUp,
-	LuBot,
 	LuChevronDown,
 	LuFolder,
-	LuGitPullRequest,
+	LuGlobe,
 	LuLaptop,
 	LuList,
-	LuListFilter,
 	LuMonitor,
-	LuMonitorSmartphone,
-	LuPanelLeft,
 	LuSquareKanban,
 	LuTerminal,
 	LuUsers,
 } from "react-icons/lu";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
-import { SubmenuValue } from "renderer/routes/_authenticated/_dashboard/components/SubmenuValue";
 import { ToolbarMenuButton } from "renderer/routes/_authenticated/_dashboard/components/ToolbarMenuButton";
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
-import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
 import type {
 	V2WorkspaceCreatorOption,
 	V2WorkspaceHostOption,
 	V2WorkspaceProjectOption,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import {
-	DEVICE_FILTER_ALL_DEVICES,
-	DEVICE_FILTER_THIS_DEVICE,
 	PROJECT_FILTER_SESSIONS,
 	useV2WorkspacesFilterStore,
-	V2_WORKSPACES_AGENT_STATUS_FILTERS,
-	V2_WORKSPACES_AGENT_STATUS_LABELS,
-	V2_WORKSPACES_BOARD_LANES,
-	V2_WORKSPACES_PIN_FILTER_LABELS,
-	V2_WORKSPACES_PIN_FILTERS,
-	V2_WORKSPACES_PR_STATE_FILTERS,
-	V2_WORKSPACES_SORT_LABELS,
-	V2_WORKSPACES_SORT_MODES,
-	type V2WorkspacesAgentStatusFilter,
-	type V2WorkspacesArchivedWindow,
-	type V2WorkspacesPinFilter,
-	type V2WorkspacesPrStateFilter,
-	type V2WorkspacesSortMode,
+	WHERE_FILTER_ANYWHERE,
+	WHERE_FILTER_CLOUD,
+	WHERE_FILTER_THIS_DEVICE,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
-import { BOARD_COLUMN_LABELS } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/deriveBoardColumn";
-import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { V2WorkspaceProjectIcon } from "../V2WorkspaceProjectIcon";
 import { DeviceOptionLabel } from "./components/DeviceOptionLabel";
-
-const PR_STATE_LABELS: Record<V2WorkspacesPrStateFilter, MessageDescriptor> = {
-	open: msg({ message: "Open", context: "status" }),
-	draft: msg({
-		message: "Draft",
-	}),
-	queued: msg({
-		message: "Queued",
-	}),
-	merged: msg({
-		message: "Merged",
-	}),
-	closed: msg({
-		message: "Closed",
-	}),
-};
-
-const ARCHIVED_WINDOW_LABELS: Record<
-	V2WorkspacesArchivedWindow,
-	MessageDescriptor
-> = {
-	none: msg({
-		message: "Hidden",
-	}),
-	week: msg({
-		message: "Past week",
-	}),
-	month: msg({
-		message: "Past month",
-	}),
-	all: msg({ message: "All" }),
-};
 
 interface V2WorkspacesHeaderProps {
 	hostOptions: V2WorkspaceHostOption[];
@@ -112,6 +55,8 @@ interface V2WorkspacesHeaderProps {
 		{ hostName: string; isOnline: boolean; isLocal: boolean }
 	>;
 	projectsById: Map<string, { projectName: string; iconUrl: string | null }>;
+	/** Offers "Cloud" as a place; off when the org has no cloud workspaces. */
+	cloudEnabled: boolean;
 }
 
 export function V2WorkspacesHeader({
@@ -120,17 +65,18 @@ export function V2WorkspacesHeader({
 	creatorOptions,
 	hostsById,
 	projectsById,
+	cloudEnabled,
 }: V2WorkspacesHeaderProps) {
 	const { t } = useLingui();
 	const searchQuery = useV2WorkspacesFilterStore((state) => state.searchQuery);
 	const setSearchQuery = useV2WorkspacesFilterStore(
 		(state) => state.setSearchQuery,
 	);
-	const deviceFilter = useV2WorkspacesFilterStore(
-		(state) => state.deviceFilter,
+	const storedWhereFilter = useV2WorkspacesFilterStore(
+		(state) => state.whereFilter,
 	);
-	const setDeviceFilter = useV2WorkspacesFilterStore(
-		(state) => state.setDeviceFilter,
+	const setWhereFilter = useV2WorkspacesFilterStore(
+		(state) => state.setWhereFilter,
 	);
 	const projectFilters = useV2WorkspacesFilterStore(
 		(state) => state.projectFilters,
@@ -138,67 +84,58 @@ export function V2WorkspacesHeader({
 	const setProjectFilters = useV2WorkspacesFilterStore(
 		(state) => state.setProjectFilters,
 	);
-	const prStateFilters = useV2WorkspacesFilterStore(
-		(state) => state.prStateFilters,
-	);
-	const setPrStateFilters = useV2WorkspacesFilterStore(
-		(state) => state.setPrStateFilters,
-	);
-	const agentStatusFilters = useV2WorkspacesFilterStore(
-		(state) => state.agentStatusFilters,
-	);
-	const setAgentStatusFilters = useV2WorkspacesFilterStore(
-		(state) => state.setAgentStatusFilters,
-	);
 	const creatorFilters = useV2WorkspacesFilterStore(
 		(state) => state.creatorFilters,
 	);
 	const setCreatorFilters = useV2WorkspacesFilterStore(
 		(state) => state.setCreatorFilters,
 	);
-	const pinFilter = useV2WorkspacesFilterStore((state) => state.pinFilter);
-	const setPinFilter = useV2WorkspacesFilterStore(
-		(state) => state.setPinFilter,
+	const showArchived = useV2WorkspacesFilterStore(
+		(state) => state.showArchived,
+	);
+	const setShowArchived = useV2WorkspacesFilterStore(
+		(state) => state.setShowArchived,
 	);
 	const viewMode = useV2WorkspacesFilterStore((state) => state.viewMode);
 	const setViewMode = useV2WorkspacesFilterStore((state) => state.setViewMode);
-	const sortMode = useV2WorkspacesFilterStore((state) => state.sortMode);
-	const setSortMode = useV2WorkspacesFilterStore((state) => state.setSortMode);
-	const archivedWindow = useV2WorkspacesFilterStore(
-		(state) => state.archivedWindow,
-	);
-	const setArchivedWindow = useV2WorkspacesFilterStore(
-		(state) => state.setArchivedWindow,
-	);
-	const hiddenLanes = useV2WorkspacesFilterStore((state) => state.hiddenLanes);
-	const toggleLane = useV2WorkspacesFilterStore((state) => state.toggleLane);
 	const openNewWorkspace = useOpenNewWorkspace();
 
 	const remoteHosts = hostOptions.filter((host) => !host.isLocal);
 	const localHostName = hostOptions.find((host) => host.isLocal)?.hostName;
+	// A "Cloud" deep link in an org without cloud reads as Anywhere, which is
+	// what the rows show (useAccessibleV2Workspaces falls back the same way).
+	const whereFilter =
+		storedWhereFilter === WHERE_FILTER_CLOUD && !cloudEnabled
+			? WHERE_FILTER_ANYWHERE
+			: storedWhereFilter;
 	// The title names the actual machine ("Avi's Mac"), not the abstract
 	// "This device" — that phrasing stays in the menu where it's a choice.
-	const deviceLabel =
-		deviceFilter === DEVICE_FILTER_THIS_DEVICE
-			? (localHostName ??
-				t({
-					message: "This device",
-				}))
-			: deviceFilter === DEVICE_FILTER_ALL_DEVICES
-				? t({
-						message: "All devices",
-					})
-				: (remoteHosts.find((host) => host.hostId === deviceFilter)?.hostName ??
-					hostsById.get(deviceFilter)?.hostName ??
+	const whereLabel =
+		whereFilter === WHERE_FILTER_ANYWHERE
+			? t({ message: "Anywhere" })
+			: whereFilter === WHERE_FILTER_THIS_DEVICE
+				? (localHostName ??
 					t({
-						message: "Unknown device",
-					}));
-	const DeviceIcon =
-		deviceFilter === DEVICE_FILTER_ALL_DEVICES
-			? LuMonitorSmartphone
-			: deviceFilter === DEVICE_FILTER_THIS_DEVICE
-				? LuLaptop
-				: LuMonitor;
+						message: "This device",
+					}))
+				: whereFilter === WHERE_FILTER_CLOUD
+					? t({ message: "Cloud" })
+					: (remoteHosts.find((host) => host.hostId === whereFilter)
+							?.hostName ??
+						hostsById.get(whereFilter)?.hostName ??
+						t({
+							message: "Unknown device",
+						}));
+	const whereIcon =
+		whereFilter === WHERE_FILTER_ANYWHERE ? (
+			<LuGlobe className="size-4 text-muted-foreground" />
+		) : whereFilter === WHERE_FILTER_THIS_DEVICE ? (
+			<LuLaptop className="size-4 text-muted-foreground" />
+		) : whereFilter === WHERE_FILTER_CLOUD ? (
+			<CloudGlyph className="size-4 text-muted-foreground" />
+		) : (
+			<LuMonitor className="size-4 text-muted-foreground" />
+		);
 
 	const projectFilterOptions = [
 		...projectOptions.map((project) => ({
@@ -256,25 +193,34 @@ export function V2WorkspacesHeader({
 				null)
 			: null;
 
+	const creatorNameFor = (creator: V2WorkspaceCreatorOption) =>
+		creator.isCurrentUser
+			? t({
+					message: `${creator.name} (you)`,
+				})
+			: creator.name;
+	const singleCreator =
+		creatorFilters.length === 1
+			? creatorOptions.find((creator) => creator.userId === creatorFilters[0])
+			: undefined;
+	const creatorFilterLabel =
+		creatorFilters.length === 0
+			? t({ message: "Anyone" })
+			: creatorFilters.length === 1
+				? singleCreator
+					? creatorNameFor(singleCreator)
+					: t({ message: "1 person" })
+				: t({
+						message: plural(creatorFilters.length, {
+							one: "# person",
+							other: "# people",
+						}),
+					});
+
 	const toggleIn = (values: string[], value: string) =>
 		values.includes(value)
 			? values.filter((entry) => entry !== value)
 			: [...values, value];
-
-	// Device and project are first-class controls that show their own state;
-	// the Filter badge only counts what lives inside its menu.
-	const activeFilterCount =
-		(prStateFilters.length > 0 ? 1 : 0) +
-		(agentStatusFilters.length > 0 ? 1 : 0) +
-		(creatorFilters.length > 0 ? 1 : 0) +
-		(pinFilter !== "all" ? 1 : 0);
-
-	const clearFilters = () => {
-		setPrStateFilters([]);
-		setAgentStatusFilters([]);
-		setCreatorFilters([]);
-		setPinFilter("all");
-	};
 
 	return (
 		<div
@@ -290,29 +236,27 @@ export function V2WorkspacesHeader({
 							<Button
 								variant="ghost"
 								aria-label={t({
-									message: "Filter by device",
+									message: "Filter by where workspaces run",
 								})}
 								className="-ml-2 h-9 gap-2 px-2 text-lg font-semibold"
 							>
-								<DeviceIcon className="size-4 text-muted-foreground" />
-								<span className="min-w-0 truncate">{deviceLabel}</span>
+								{whereIcon}
+								<span className="min-w-0 truncate">{whereLabel}</span>
 								<LuChevronDown className="size-4 text-muted-foreground" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start" className="min-w-[14rem]">
 							<DropdownMenuRadioGroup
-								value={deviceFilter}
-								onValueChange={setDeviceFilter}
+								value={whereFilter}
+								onValueChange={setWhereFilter}
 							>
-								<DropdownMenuRadioItem value={DEVICE_FILTER_ALL_DEVICES}>
+								<DropdownMenuRadioItem value={WHERE_FILTER_ANYWHERE}>
 									<DeviceOptionLabel
-										icon={<LuMonitorSmartphone className="size-3.5" />}
-										label={t({
-											message: "All devices",
-										})}
+										icon={<LuGlobe className="size-3.5" />}
+										label={t({ message: "Anywhere" })}
 									/>
 								</DropdownMenuRadioItem>
-								<DropdownMenuRadioItem value={DEVICE_FILTER_THIS_DEVICE}>
+								<DropdownMenuRadioItem value={WHERE_FILTER_THIS_DEVICE}>
 									<DeviceOptionLabel
 										icon={<LuLaptop className="size-3.5" />}
 										label={
@@ -326,6 +270,14 @@ export function V2WorkspacesHeader({
 										}
 									/>
 								</DropdownMenuRadioItem>
+								{cloudEnabled ? (
+									<DropdownMenuRadioItem value={WHERE_FILTER_CLOUD}>
+										<DeviceOptionLabel
+											icon={<CloudGlyph className="size-3.5" />}
+											label={t({ message: "Cloud" })}
+										/>
+									</DropdownMenuRadioItem>
+								) : null}
 								{remoteHosts.length > 0 ? (
 									<>
 										<DropdownMenuSeparator />
@@ -435,264 +387,89 @@ export function V2WorkspacesHeader({
 						</DropdownMenuContent>
 					</DropdownMenu>
 
-					<div className="h-4 w-px shrink-0 bg-border" />
-
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
-							<ToolbarMenuButton isActive={activeFilterCount > 0}>
-								<LuListFilter className="size-3.5" />
-								{/* Narrow containers keep icon + count; the word goes. */}
-								<span className="@max-2xl:hidden">
-									<Trans>Filter</Trans>
+							<ToolbarMenuButton isActive={creatorFilters.length > 0}>
+								{singleCreator ? (
+									<Avatar className="size-4">
+										{singleCreator.image ? (
+											<AvatarImage src={singleCreator.image} />
+										) : null}
+										<AvatarFallback className="text-[9px]">
+											{singleCreator.name.slice(0, 1).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
+								) : (
+									<LuUsers className="size-3.5" />
+								)}
+								<span className="max-w-[12rem] truncate @max-2xl:max-w-20">
+									{creatorFilterLabel}
 								</span>
-								{activeFilterCount > 0 ? (
-									<span className="flex size-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
-										{activeFilterCount}
-									</span>
-								) : null}
+								<LuChevronDown className="size-3 opacity-60" />
 							</ToolbarMenuButton>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-[14rem]">
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									<span className="flex items-center gap-2">
-										<LuGitPullRequest className="size-3.5" />
-										<Trans>PR state</Trans>
+						<DropdownMenuContent
+							align="end"
+							className="max-h-[60vh] min-w-[12rem] overflow-y-auto"
+						>
+							{creatorOptions.map((creator) => (
+								<DropdownMenuCheckboxItem
+									indicator="end"
+									key={creator.userId}
+									checked={creatorFilters.includes(creator.userId)}
+									onSelect={(event) => event.preventDefault()}
+									onCheckedChange={() =>
+										setCreatorFilters(toggleIn(creatorFilters, creator.userId))
+									}
+								>
+									<span className="flex min-w-0 items-center gap-2">
+										<Avatar className="size-4">
+											{creator.image ? (
+												<AvatarImage src={creator.image} />
+											) : null}
+											<AvatarFallback className="text-[9px]">
+												{creator.name.slice(0, 1).toUpperCase()}
+											</AvatarFallback>
+										</Avatar>
+										<span className="min-w-0 flex-1 truncate">
+											{creatorNameFor(creator)}
+										</span>
 									</span>
-									{prStateFilters.length > 0 ? (
-										<SubmenuValue>
-											{prStateFilters
-												.map((state) => i18n._(PR_STATE_LABELS[state]))
-												.join(", ")}
-										</SubmenuValue>
-									) : null}
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent className="min-w-0">
-									{V2_WORKSPACES_PR_STATE_FILTERS.map((state) => (
-										<DropdownMenuCheckboxItem
-											indicator="end"
-											key={state}
-											checked={prStateFilters.includes(state)}
-											onSelect={(event) => event.preventDefault()}
-											onCheckedChange={() =>
-												setPrStateFilters(
-													toggleIn(
-														prStateFilters,
-														state,
-													) as V2WorkspacesPrStateFilter[],
-												)
-											}
-										>
-											<span className="flex items-center gap-2">
-												<PRIcon state={state} className="size-3.5" />
-												{i18n._(PR_STATE_LABELS[state])}
-											</span>
-										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									<span className="flex items-center gap-2">
-										<LuBot className="size-3.5" />
-										<Trans>Agent</Trans>
-									</span>
-									{agentStatusFilters.length > 0 ? (
-										<SubmenuValue>
-											{agentStatusFilters
-												.map((status) =>
-													i18n._(V2_WORKSPACES_AGENT_STATUS_LABELS[status]),
-												)
-												.join(", ")}
-										</SubmenuValue>
-									) : null}
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent className="min-w-0">
-									{V2_WORKSPACES_AGENT_STATUS_FILTERS.map((status) => (
-										<DropdownMenuCheckboxItem
-											indicator="end"
-											key={status}
-											checked={agentStatusFilters.includes(status)}
-											onSelect={(event) => event.preventDefault()}
-											onCheckedChange={() =>
-												setAgentStatusFilters(
-													toggleIn(
-														agentStatusFilters,
-														status,
-													) as V2WorkspacesAgentStatusFilter[],
-												)
-											}
-										>
-											{i18n._(V2_WORKSPACES_AGENT_STATUS_LABELS[status])}
-										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									<span className="flex items-center gap-2">
-										<LuUsers className="size-3.5" />
-										<Trans>Created by</Trans>
-									</span>
-									{creatorFilters.length > 0 ? (
-										<SubmenuValue>{creatorFilters.length}</SubmenuValue>
-									) : null}
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent className="max-h-[60vh] min-w-0 overflow-y-auto">
-									{creatorOptions.map((creator) => (
-										<DropdownMenuCheckboxItem
-											indicator="end"
-											key={creator.userId}
-											checked={creatorFilters.includes(creator.userId)}
-											onSelect={(event) => event.preventDefault()}
-											onCheckedChange={() =>
-												setCreatorFilters(
-													toggleIn(creatorFilters, creator.userId),
-												)
-											}
-										>
-											<span className="flex min-w-0 items-center gap-2">
-												<Avatar className="size-4">
-													{creator.image ? (
-														<AvatarImage src={creator.image} />
-													) : null}
-													<AvatarFallback className="text-[9px]">
-														{creator.name.slice(0, 1).toUpperCase()}
-													</AvatarFallback>
-												</Avatar>
-												<span className="min-w-0 flex-1 truncate">
-													{creator.isCurrentUser
-														? t({
-																message: `${creator.name} (you)`,
-															})
-														: creator.name}
-												</span>
-											</span>
-										</DropdownMenuCheckboxItem>
-									))}
-									{creatorOptions.length === 0 ? (
-										<DropdownMenuItem disabled>
-											<Trans>No known creators</Trans>
-										</DropdownMenuItem>
-									) : null}
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									<span className="flex items-center gap-2">
-										<LuPanelLeft className="size-3.5" />
-										<Trans>Sidebar</Trans>
-									</span>
-									{pinFilter !== "all" ? (
-										<SubmenuValue>
-											{i18n._(V2_WORKSPACES_PIN_FILTER_LABELS[pinFilter])}
-										</SubmenuValue>
-									) : null}
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent className="min-w-0">
-									<DropdownMenuRadioGroup
-										value={pinFilter}
-										onValueChange={(next) =>
-											setPinFilter(next as V2WorkspacesPinFilter)
-										}
-									>
-										{V2_WORKSPACES_PIN_FILTERS.map((filter) => (
-											<DropdownMenuRadioItem key={filter} value={filter}>
-												{i18n._(V2_WORKSPACES_PIN_FILTER_LABELS[filter])}
-											</DropdownMenuRadioItem>
-										))}
-									</DropdownMenuRadioGroup>
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-
-							{activeFilterCount > 0 ? (
+								</DropdownMenuCheckboxItem>
+							))}
+							{creatorOptions.length === 0 ? (
+								<DropdownMenuItem disabled>
+									<Trans>No known creators</Trans>
+								</DropdownMenuItem>
+							) : null}
+							{creatorFilters.length > 0 ? (
 								<>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem
 										className="justify-center text-xs text-muted-foreground"
-										onSelect={clearFilters}
+										onSelect={() => setCreatorFilters([])}
 									>
-										<Trans>Clear filters</Trans>
+										<Trans>Anyone</Trans>
 									</DropdownMenuItem>
 								</>
 							) : null}
 						</DropdownMenuContent>
 					</DropdownMenu>
 
-					<DropdownMenu modal={false}>
-						<DropdownMenuTrigger asChild>
-							<ToolbarMenuButton>
-								<LuArrowDownUp className="size-3.5" />
-								<span className="@max-2xl:hidden">
-									<Trans>Display</Trans>
-								</span>
-							</ToolbarMenuButton>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-[12rem]">
-							<DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-								<Trans>Sort by</Trans>
-							</DropdownMenuLabel>
-							<DropdownMenuRadioGroup
-								value={sortMode}
-								onValueChange={(next) =>
-									setSortMode(next as V2WorkspacesSortMode)
-								}
-							>
-								{V2_WORKSPACES_SORT_MODES.map((mode) => (
-									<DropdownMenuRadioItem key={mode} value={mode}>
-										{i18n._(V2_WORKSPACES_SORT_LABELS[mode])}
-									</DropdownMenuRadioItem>
-								))}
-							</DropdownMenuRadioGroup>
-							<DropdownMenuSeparator />
-							<DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-								<span className="flex items-center gap-1.5">
-									<LuArchive className="size-3" />
-									<Trans>Archived</Trans>
-								</span>
-							</DropdownMenuLabel>
-							<DropdownMenuRadioGroup
-								value={archivedWindow}
-								onValueChange={(next) =>
-									setArchivedWindow(next as V2WorkspacesArchivedWindow)
-								}
-							>
-								{(
-									Object.keys(
-										ARCHIVED_WINDOW_LABELS,
-									) as V2WorkspacesArchivedWindow[]
-								).map((window) => (
-									<DropdownMenuRadioItem key={window} value={window}>
-										{i18n._(ARCHIVED_WINDOW_LABELS[window])}
-									</DropdownMenuRadioItem>
-								))}
-							</DropdownMenuRadioGroup>
-							{viewMode === "board" && (
-								<>
-									<DropdownMenuSeparator />
-									<DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-										<Trans>Lanes</Trans>
-									</DropdownMenuLabel>
-									{V2_WORKSPACES_BOARD_LANES.map((lane) => (
-										<DropdownMenuCheckboxItem
-											key={lane}
-											checked={!hiddenLanes.includes(lane)}
-											onCheckedChange={() => toggleLane(lane)}
-											onSelect={(event) => event.preventDefault()}
-										>
-											<span className="flex items-center gap-1.5">
-												<BoardColumnIcon column={lane} className="size-3" />
-												{i18n._(BOARD_COLUMN_LABELS[lane])}
-											</span>
-										</DropdownMenuCheckboxItem>
-									))}
-								</>
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<div className="h-4 w-px shrink-0 bg-border" />
+
+					<ToolbarMenuButton
+						isActive={showArchived}
+						aria-label={t({ message: "Show archived" })}
+						aria-pressed={showArchived}
+						onClick={() => setShowArchived(!showArchived)}
+					>
+						<LuArchive className="size-3.5" />
+						{/* Narrow containers keep the icon; the words go. */}
+						<span className="@max-2xl:hidden">
+							<Trans>Show archived</Trans>
+						</span>
+					</ToolbarMenuButton>
 
 					{/* Matches TasksTopBar's TabsList treatment (borderless muted pill). */}
 					<fieldset
@@ -703,6 +480,7 @@ export function V2WorkspacesHeader({
 					>
 						<button
 							type="button"
+							aria-label={t({ message: "List" })}
 							aria-pressed={viewMode === "list"}
 							className={cn(
 								"flex h-7 items-center gap-1.5 rounded-sm px-2 text-xs transition-colors",
@@ -719,6 +497,7 @@ export function V2WorkspacesHeader({
 						</button>
 						<button
 							type="button"
+							aria-label={t({ message: "Board" })}
 							aria-pressed={viewMode === "board"}
 							className={cn(
 								"flex h-7 items-center gap-1.5 rounded-sm px-2 text-xs transition-colors",

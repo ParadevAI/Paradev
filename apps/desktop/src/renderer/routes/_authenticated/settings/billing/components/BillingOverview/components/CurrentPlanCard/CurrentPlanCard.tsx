@@ -7,30 +7,42 @@ import { PLANS, type PlanTier } from "../../../../constants";
 
 interface CurrentPlanCardProps {
 	currentPlan: PlanTier;
+	planName?: string | null;
 	onCancel?: () => void;
 	isCanceling?: boolean;
 	onRestore?: () => void;
 	isRestoring?: boolean;
 	cancelAt?: Date | null;
+	nextPlanName?: string | null;
+	switchAt?: Date | null;
 	periodEnd?: Date | null;
 	status?: string | null;
 }
 
 export function CurrentPlanCard({
 	currentPlan,
+	planName: catalogPlanName,
 	onCancel,
 	isCanceling,
 	onRestore,
 	isRestoring,
 	cancelAt,
+	nextPlanName,
+	switchAt,
 	periodEnd,
 	status,
 }: CurrentPlanCardProps) {
 	const { t } = useLingui();
 	const plan = PLANS[currentPlan];
+	const planName =
+		currentPlan === "pro" && catalogPlanName
+			? catalogPlanName
+			: i18n._(plan.name);
 	const isPaidPlan = currentPlan !== "free";
 	const isEnterprise = currentPlan === "enterprise";
 	const isCancelingAtPeriodEnd = isPaidPlan && !isEnterprise && !!cancelAt;
+	const isSwitching =
+		isPaidPlan && !isEnterprise && !!nextPlanName && !!switchAt;
 	const isPaymentFailing = isPaidPlan && isPaymentFailingStatus(status);
 
 	// While collection is failing the period end is not a renewal we can
@@ -38,42 +50,59 @@ export function CurrentPlanCard({
 	// scheduled cancellation still shows: the banner never mentions it, and it
 	// is the date the organization actually loses access.
 	const hint =
-		isPaymentFailing && !isCancelingAtPeriodEnd
-			? null
-			: isCancelingAtPeriodEnd && cancelAt
-				? t({
-						message: `Cancels ${format(new Date(cancelAt), "MMMM d, yyyy")} — downgrades to Free at the end of the billing period.`,
-					})
-				: isEnterprise
+		isSwitching && switchAt
+			? t({
+					message: `Switches to ${nextPlanName} on ${format(new Date(switchAt), "MMMM d, yyyy")}.`,
+				})
+			: isPaymentFailing && !isCancelingAtPeriodEnd
+				? null
+				: isCancelingAtPeriodEnd && cancelAt
 					? t({
-							message: "Managed by your organization admin.",
+							message: `Cancels ${format(new Date(cancelAt), "MMMM d, yyyy")} — downgrades to Free at the end of the billing period.`,
 						})
-					: isPaidPlan && periodEnd
+					: isEnterprise
 						? t({
-								message: `Renews ${format(new Date(periodEnd), "MMMM d, yyyy")}.`,
+								message: "Managed by your organization admin.",
 							})
-						: `${i18n._(plan.description)}.`;
+						: isPaidPlan && periodEnd
+							? t({
+									message: `Renews ${format(new Date(periodEnd), "MMMM d, yyyy")}.`,
+								})
+							: `${i18n._(plan.description)}.`;
+	const seatHint =
+		isPaidPlan &&
+		!isEnterprise &&
+		!isCancelingAtPeriodEnd &&
+		!isPaymentFailing &&
+		periodEnd
+			? t({
+					message: `Seats removed mid-cycle stay active until ${format(new Date(periodEnd), "MMMM d, yyyy")}.`,
+				})
+			: null;
 
 	return (
 		<div className="flex items-center justify-between gap-8 py-3">
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center gap-2">
 					<span className="text-sm font-medium">
-						<Trans>{i18n._(plan.name)} plan</Trans>
+						<Trans>{planName} plan</Trans>
 					</span>
 					{isPaidPlan && (
 						<span className="inline-flex items-center rounded-md bg-foreground px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background">
-							{i18n._(plan.name)}
+							{planName}
 						</span>
 					)}
 				</div>
 				{hint && (
 					<div className="text-xs mt-0.5 text-muted-foreground">{hint}</div>
 				)}
+				{seatHint && (
+					<div className="text-xs mt-0.5 text-muted-foreground">{seatHint}</div>
+				)}
 			</div>
 			{isPaidPlan && !isEnterprise && (
 				<div className="shrink-0">
-					{isCancelingAtPeriodEnd ? (
+					{isCancelingAtPeriodEnd || isSwitching ? (
 						<Button
 							variant="ghost"
 							size="sm"
@@ -83,6 +112,8 @@ export function CurrentPlanCard({
 						>
 							{isRestoring ? (
 								<Trans>Restoring...</Trans>
+							) : isSwitching ? (
+								<Trans>Keep {planName}</Trans>
 							) : (
 								<Trans>Restore plan</Trans>
 							)}

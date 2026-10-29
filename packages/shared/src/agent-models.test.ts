@@ -432,6 +432,20 @@ describe("buildAgentEffortArgs", () => {
 });
 
 describe("getAgentEfforts", () => {
+	it("offers agy effort only on Gemini models, which alone accept --effort", () => {
+		expect(getAgentEfforts("agy", "gemini-4-argon").map((e) => e.id)).toEqual([
+			"low",
+			"medium",
+			"high",
+		]);
+		expect(getAgentEfforts("agy", "claude-sonnet-4-6")).toEqual([]);
+		expect(getAgentEfforts("agy")).toEqual([]);
+		expect(buildAgentEffortArgs("agy", "high")).toEqual([]);
+		expect(buildAgentEffortArgs("agy", "high", "claude-sonnet-4-6")).toEqual(
+			[],
+		);
+	});
+
 	it("offers codex's top efforts only alongside the models that take them", () => {
 		expect(getAgentEfforts("codex", "gpt-5.6-sol").map((e) => e.id)).toEqual([
 			"low",
@@ -512,6 +526,35 @@ describe("getAgentEfforts", () => {
 });
 
 describe("buildAgentModelArgs with effort", () => {
+	it("offers Gemini 4 Argon and launches each supported Cursor effort", () => {
+		const model = "gemini-4-argon-high";
+		expect(
+			getAgentModelSupport("cursor-agent")?.models.find(
+				({ id }) => id === model,
+			),
+		).toEqual({ id: model, label: "Gemini 4 Argon", group: "Other" });
+		expect(buildAgentModelArgs("cursor-agent", model)).toEqual([
+			"--model",
+			model,
+		]);
+		expect(getAgentEfforts("cursor-agent", model).map(({ id }) => id)).toEqual([
+			"low",
+			"medium",
+			"high",
+		]);
+		for (const effort of ["low", "medium", "high"]) {
+			const variant = `gemini-4-argon-${effort}`;
+			expect(buildAgentModelArgs("cursor-agent", model, effort)).toEqual([
+				"--model",
+				variant,
+			]);
+			expect(buildAgentModelArgs("cursor-agent", variant)).toEqual([
+				"--model",
+				variant,
+			]);
+		}
+	});
+
 	it("swaps in the cursor-agent sibling id for the effort", () => {
 		expect(
 			buildAgentModelArgs("cursor-agent", "claude-opus-4-8-high", "low"),

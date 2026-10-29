@@ -1,6 +1,6 @@
 # Security Policy
 
-We take the security of Superset seriously. Thank you for helping keep our users safe by reporting vulnerabilities responsibly.
+We take the security of Paradev seriously. Thank you for helping keep our users safe by reporting vulnerabilities responsibly.
 
 ## Reporting a vulnerability
 
@@ -8,8 +8,8 @@ Please do not report security vulnerabilities through public GitHub issues, Disc
 
 Report privately through one of these channels:
 
-1. **GitHub private vulnerability reporting (preferred):** use the ["Report a vulnerability"](https://github.com/superset-sh/superset/security/advisories/new) button under the Security tab of this repository.
-2. **Email:** send details to [support@superset.sh](mailto:support@superset.sh) with "Security" in the subject line.
+1. **GitHub private vulnerability reporting (preferred):** use the ["Report a vulnerability"](https://github.com/paradevai/paradev/security/advisories/new) button under the Security tab of this repository.
+2. **Email:** send details to [support@paradev.com](mailto:support@paradev.com) with "Security" in the subject line.
 
 Please include as much of the following as you can:
 
@@ -30,13 +30,13 @@ We ask that you give us a reasonable window to remediate before disclosing publi
 
 In scope:
 
-- The Superset desktop app, CLI, and host service (this repository)
-- The Superset API and web app (superset.sh, app.superset.sh, relay.superset.sh)
+- The Paradev desktop app, CLI, and host service (this repository)
+- The Paradev API and web app (superset.sh, app.superset.sh, relay.superset.sh)
 
 Out of scope:
 
 - Denial of service and volumetric attacks
-- Social engineering of Superset employees or users
+- Social engineering of Paradev employees or users
 - Findings that require a compromised device or physical access
 - Third-party services we integrate with (report those to the vendor)
 

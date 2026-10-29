@@ -30,9 +30,16 @@ export const DYNAMIC_NOTIFY_PATH_MARKER = `$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_R
  * `~/.claude/settings.json`, and an agent's tool call can launch a second CLI
  * whose config fires under the terminal's agent — and the notify script uses
  * the disagreement to drop those events instead of relabeling the terminal.
+ *
+ * `eventType` sets `SUPERSET_HOOK_EVENT` for harnesses whose payload does not
+ * name the event (Antigravity); the notify script prefers it over the payload.
  */
-export function getManagedNotifyHookCommand(agentId: string): string {
-	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
+export function getManagedNotifyHookCommand(
+	agentId: string,
+	eventType?: string,
+): string {
+	const eventAssignment = eventType ? ` SUPERSET_HOOK_EVENT=${eventType}` : "";
+	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId}${eventAssignment} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
 }
 
 export const MANAGED_ARTIFACT_GUARD_RELATIVE_PATH = `hooks/${ARTIFACT_GUARD_SCRIPT_NAME}`;
@@ -171,7 +178,7 @@ fi
 }
 
 function getMissingBinaryMessage(name: string): string {
-	return `Superset: ${name} not found in PATH. Install it and ensure it is on PATH, then retry.`;
+	return `Paradev: ${name} not found in PATH. Install it and ensure it is on PATH, then retry.`;
 }
 
 export function getWrapperPath(binaryName: string): string {

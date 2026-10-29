@@ -9,6 +9,11 @@ export {
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "./api-credential";
+export {
+	type BoxHookOutcome,
+	rerunBoxStartHook,
+	runBoxArchiveHook,
+} from "./box-hooks";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
@@ -42,7 +47,6 @@ export {
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
-	IMAGE_SANDBOX_VCPUS,
 	listActiveWorkspaceSandboxes,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
@@ -58,6 +62,7 @@ export {
 	stopAndSnapshot,
 	stopSandbox,
 	stripWorkspaceIdentity,
+	topUpSandboxSession,
 	waitForStopSnapshot,
 	wakeSandbox,
 } from "./vercel";

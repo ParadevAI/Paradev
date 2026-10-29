@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import type { WorkspaceCreateSettledPayload } from "@superset/workspace-client";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback } from "react";
@@ -23,7 +24,6 @@ import type {
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { useStarNagStore } from "renderer/stores/star-nag";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
@@ -80,14 +80,6 @@ interface CreateOutcome {
 	 * the same as `true` (don't count it), never as `false`.
 	 */
 	alreadyExists?: boolean;
-}
-
-/** Older hosts don't have `workspaces.createEnqueued` yet. */
-function isMissingProcedureError(error: unknown): boolean {
-	return (
-		error instanceof TRPCClientError &&
-		/no procedure found on path/i.test(error.message)
-	);
 }
 
 /** An `AbortSignal.timeout` firing — host reachable but slow, as opposed to
@@ -421,19 +413,16 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 						deleteWorkspaceLocalState(workspaceId);
 						hostWorkspacesCache.removeWorkspace(args.hostId, workspaceId);
 					}
-					// Only genuinely new worktrees count as created — never reopened
-					// ones or project-less sessions (createSession has no
+					// Creation presets run only for genuinely new worktrees — never
+					// reopened ones or project-less sessions (createSession has no
 					// alreadyExists signal, so an undefined value here is treated as
-					// "not new").
+					// "not new"). They also skip adopting an existing worktree (the
+					// host reports that as new) and creates that opted out of setup,
+					// e.g. "Import worktrees" with "Run setup" off.
 					if (
 						result.workspace.projectId !== null &&
 						result.alreadyExists === false
 					) {
-						useStarNagStore.getState().recordWorkspaceCreated();
-						// Creation presets follow the same rule, and additionally skip
-						// adopting an existing worktree (the host reports that as new)
-						// and creates that opted out of setup, e.g. "Import worktrees"
-						// with "Run setup" off.
 						const adoptsWorktree =
 							"worktreePath" in snapshot && !!snapshot.worktreePath;
 						const skipsSetup =

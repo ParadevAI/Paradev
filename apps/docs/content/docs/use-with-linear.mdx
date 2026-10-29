@@ -1,13 +1,16 @@
 ---
 title: Linear Integration
-description: Open Linear issues as Superset workspaces with a custom script
+description: Open Linear issues as Paradev workspaces with a custom script
 ---
 
 Linear's [custom coding tool](https://linear.app/docs/open-issues-with-custom-scripts)
 feature can hand an issue off to any local command. With a small wrapper script,
-**Work on issue → Custom script** creates a Superset workspace for the issue
+**Work on issue → Custom script** creates a Paradev workspace for the issue
 (checked out on the issue's branch, with an agent already working on it) and
 opens it in the desktop app.
+
+
+To give a coding agent tools to read and update Linear issues, install the [Linear plugin](/plugins/available/linear).
 
 ## How it works
 
@@ -23,9 +26,9 @@ environment variables (`LINEAR_ISSUE_IDENTIFIER`, `LINEAR_ISSUE_BRANCH_NAME`,
 
 ## Prerequisites
 
-- The [Superset CLI](/cli/getting-started) installed and signed in
+- The [Paradev CLI](/cli/getting-started) installed and signed in
   (`superset auth login`).
-- The Superset desktop app installed (the script opens workspaces in it).
+- The Paradev desktop app installed (the script opens workspaces in it).
 - A project that's set up locally. Find its ID with:
 
 ```bash
@@ -41,7 +44,7 @@ from above:
 
 ```bash
 #!/usr/bin/env bash
-# Linear custom script -> open the issue as a Superset workspace.
+# Linear custom script -> open the issue as a Paradev workspace.
 set -euo pipefail
 
 PROJECT="<your-project-id>"
@@ -89,7 +92,7 @@ issue) even when the project has a branch prefix configured. Re-running on
 the same issue reuses the existing workspace instead of creating a duplicate.
 
 <Callout type="info">
-With the Linear integration connected, Superset does this natively: linking
+With the Linear integration connected, Paradev does this natively: linking
 an issue in the New Workspace flow (or opening a task in a workspace) uses
 Linear's branch name automatically and moves the issue to In Progress. The
 script above is for driving it from Linear's side.
@@ -129,7 +132,7 @@ your version.
    passed to the script, so pick your repo. (The script above doesn't read it,
    but Linear requires one.)
 
-Linear runs the script, and the workspace opens in Superset with the agent
+Linear runs the script, and the workspace opens in Paradev with the agent
 running on the issue.
 
 <Callout type="info">
@@ -144,7 +147,7 @@ In any macOS file dialog, press **⌘⇧.** to reveal hidden dot-folders, or
 - **A different agent.** Replace `claude` with any agent preset id (`codex`,
   `opencode`, …).
 - **Multiple repos.** The project ID is fixed in the script. To route different
-  Linear teams or projects to different Superset projects, branch on a
+  Linear teams or projects to different Paradev projects, branch on a
   `LINEAR_*` variable (for example `LINEAR_PROJECT_NAME`) and set `PROJECT`
   accordingly. The `env` array in `coding-tools.json` is an allowlist: any
   `LINEAR_*` variable you read in the script must also be added there, or it

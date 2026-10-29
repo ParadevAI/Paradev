@@ -1,5 +1,3 @@
-import { unfurlLink } from "../../../../../../../../utils/linkUnfurl";
-
 export type TextLinkPart =
 	| { kind: "text"; text: string }
 	| { kind: "link"; url: string };
@@ -56,25 +54,4 @@ export function splitTextLinks(text: string): TextLinkPart[] {
 		parts.push({ kind: "text", text: text.slice(cursor) });
 	}
 	return parts;
-}
-
-/** The first link that no pill claims and that is not the app's own. */
-export function findPreviewLink(
-	parts: readonly TextLinkPart[],
-	webUrl: string,
-): TextLinkPart | null {
-	const appOrigin = parseWebUrl(webUrl)?.origin;
-	return (
-		parts.find(
-			(part) =>
-				part.kind === "link" &&
-				parseWebUrl(part.url)?.origin !== appOrigin &&
-				unfurlLink(part.url, false, webUrl) === null,
-		) ?? null
-	);
-}
-
-export function displayHost(url: string): string {
-	const host = parseWebUrl(url)?.hostname.replace(/\.$/, "").toLowerCase();
-	return host?.replace(/^www\./, "") ?? url;
 }

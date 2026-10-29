@@ -7,7 +7,8 @@ preload = ["./scripts/test-preload.ts"]
 linker = "isolated" # Prevent hoisting from resolving `path-scurry@2` to `lru-cache@6` (missing `LRUCache`), which breaks the `@superset/desktop` postinstall native rebuild.
 exact = true
 minimumReleaseAge = 259200
-# Expo SDK 57 landed inside the 3-day window. CI installs frozen from the
+# Expo SDK 58 (expo 58.0.21, react-native 0.88.1, react-native-screens 4.30.1)
+# landed inside the 3-day window on 2026-10-28. CI installs frozen from the
 # lockfile and is unaffected, but a fresh `bun install` re-resolves and fails on
 # every one of these. Excluding them keeps the repo installable from scratch.
 # Remove once the pins age past the window — they are exact, so this list only
@@ -20,8 +21,11 @@ minimumReleaseAge = 259200
 # The ACP adapters track the protocol draft and cut releases daily, so the
 # version the registry serves is always inside the window, and so are the agent
 # SDKs they depend on. The adapter pins are exact.
-# @expo/hub-client: Expo publishes it alongside expo-device-hub, which the
-# Mobile pane pins to the matching release. Exact pin.
+# @expo/hub-client and expo-device-hub: Expo releases them together and the
+# Mobile pane tracks each release as it ships. Exact pins.
+# electron: 44.9.3 carries the October 2026 security fixes and electron#54908
+# (sessions failing every request after a Network Service restart). Exact pin;
+# remove after 2026-10-24.
 minimumReleaseAgeExcludes = [
   "@agentclientprotocol/claude-agent-acp",
   "@agentclientprotocol/codex-acp",
@@ -37,7 +41,9 @@ minimumReleaseAgeExcludes = [
   "@anthropic-ai/claude-agent-sdk-win32-x64",
   "@openai/codex",
   "@vercel/sandbox",
+  "electron",
   "@expo/hub-client",
+  "expo-device-hub",
   "@expo/ui",
   "@pierre/diffs",
   "expo",
@@ -50,6 +56,46 @@ minimumReleaseAgeExcludes = [
   "expo-linking",
   "expo-modules-core",
   "expo-router",
+  "expo-font",
+  "expo-image",
+  "expo-notifications",
+  "expo-splash-screen",
+  "expo-system-ui",
+  "expo-updates",
+  "expo-web-browser",
+  "react-native",
+  "react-native-screens",
+  "@react-native/debugger-frontend",
+  "@react-native/debugger-shell",
+  "@expo/inline-modules",
+  "@expo/prebuild-config",
+  "@expo/router-server",
+  "@react-native/babel-plugin-codegen",
+  "@react-native/dev-middleware",
+  "@react-native/js-polyfills",
+  "noxcturnal",
+  "@expo/cli",
+  "@expo/config",
+  "@expo/config-plugins",
+  "@expo/fingerprint",
+  "@expo/image-utils",
+  "@expo/local-build-cache-provider",
+  "@expo/metro-config",
+  "@expo/require-utils",
+  "@react-native/asset-utils",
+  "@react-native/codegen",
+  "@react-native/community-cli-plugin",
+  "@react-native/gradle-plugin",
+  "@react-native/normalize-colors",
+  "@react-native/virtualized-lists",
+  "babel-preset-expo",
+  "expo-dev-launcher",
+  "expo-dev-menu",
+  "expo-modules-autolinking",
+  "expo-modules-cli",
+  "expo-modules-jsi",
+  "expo-modules-macros",
+  "hermes-compiler",
   "@xterm/addon-clipboard",
   "@xterm/addon-fit",
   "@xterm/addon-image",

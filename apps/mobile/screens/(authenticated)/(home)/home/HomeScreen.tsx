@@ -1,5 +1,6 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
+import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
@@ -50,6 +51,7 @@ import {
 	type OrgPullRequest,
 	usePullRequests,
 } from "@/screens/(authenticated)/hooks/usePullRequests";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { pullRequestStatus } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import { CloudWorkspaceRow as CloudWorkspaceListRow } from "./components/CloudWorkspaceRow";
@@ -64,12 +66,10 @@ import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
 import { useAgentLiveActivity } from "./hooks/useAgentLiveActivity";
 import { useAppReviewPrompt } from "./hooks/useAppReviewPrompt";
-import {
-	cloudPullRequestRefKey,
-	useCloudPullRequests,
-} from "./hooks/useCloudPullRequests";
+import { useCloudPullRequests } from "./hooks/useCloudPullRequests";
 import { useCloudRepos } from "./hooks/useCloudRepos";
 import { useFirstPaint } from "./hooks/useFirstPaint";
+import { GRID_GAP, useHomeGrid } from "./hooks/useHomeGrid";
 import {
 	type TerminalsHost,
 	useHostsTerminals,
@@ -85,6 +85,7 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
+import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -146,6 +147,17 @@ function homeListItemKey(item: HomeListItem): string {
 	}
 }
 
+type HomeListEntry = HomeListItem | GridRow<HomeListItem>;
+
+const isGridCell = (item: HomeListItem) =>
+	item.kind === "workspace" || item.kind === "cloudRow";
+
+function homeListEntryKey(entry: HomeListEntry): string {
+	return entry.kind === "gridRow"
+		? gridRowKey(entry, homeListItemKey)
+		: homeListItemKey(entry);
+}
+
 const NOTICE_MS = 1500;
 
 export function HomeScreen() {
@@ -176,6 +188,10 @@ export function HomeScreen() {
 	const insets = useSafeAreaInsets();
 	const headerHeight = useHeaderHeight();
 	const readableInset = useReadableInset();
+	const grid = useHomeGrid();
+	const columns = grid?.columns ?? 1;
+	const cellWidth = grid?.cellWidth ?? 0;
+	const listInset = grid?.inset ?? readableInset;
 	const queryClient = useQueryClient();
 	useAppReviewPrompt();
 	const setTargetKey = useNewSessionPreferencesStore(
@@ -189,6 +205,7 @@ export function HomeScreen() {
 
 	const selectedHost = useSelectedHost();
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
+	const lastWorkspaceId = useLastWorkspaceStore((state) => state.workspaceId);
 	const {
 		workspaces,
 		isReady: workspacesReady,
@@ -493,12 +510,16 @@ export function HomeScreen() {
 		({
 			viewableItems,
 		}: {
-			viewableItems: Array<{ item: HomeListItem; isViewable: boolean }>;
+			viewableItems: Array<{ item: HomeListEntry; isViewable: boolean }>;
 		}) => {
 			setVisibleIds(
 				viewableItems
 					.filter((viewable) => viewable.isViewable)
-					.map((viewable) => viewable.item)
+					.flatMap((viewable) =>
+						viewable.item.kind === "gridRow"
+							? viewable.item.cells
+							: [viewable.item],
+					)
 					.filter((item) => item.kind === "workspace")
 					.slice(0, MAX_VISIBLE_DIFF_STATS)
 					.map((item) => item.workspace.id),
@@ -545,19 +566,14 @@ export function HomeScreen() {
 	// parsed from the PR URL (cloud repo UUIDs aren't known host-side).
 	// Cloud rows' projects come from the API instead.
 	const cloudRepos = useCloudRepos();
-	const cloudPullRequests = useCloudPullRequests(
-		useMemo(
-			() =>
-				listItems.flatMap((item) => {
-					if (item.kind !== "cloudRow") return [];
-					const repoFullName = cloudRepos.get(item.row.id);
-					return repoFullName
-						? [{ repoFullName, headBranch: item.row.branch }]
-						: [];
-				}),
-			[listItems, cloudRepos],
+	const cloudPullRequests = useCloudPullRequests({
+		active: listItems.some(
+			(item) => item.kind === "cloudRow" && item.row.status !== "deleted",
 		),
-	);
+		archived: listItems.some(
+			(item) => item.kind === "cloudRow" && item.row.status === "deleted",
+		),
+	});
 	const repoPrefixesByProject = useMemo(
 		() =>
 			new Map<string, string | null>([
@@ -571,8 +587,8 @@ export function HomeScreen() {
 		[projects],
 	);
 
-	const renderItem = useCallback(
-		({ item }: { item: HomeListItem }) => {
+	const renderListItem = useCallback(
+		(item: HomeListItem, card: boolean) => {
 			if (item.kind === "periodHeader") {
 				return <PeriodHeader label={item.label} />;
 			}
@@ -582,20 +598,12 @@ export function HomeScreen() {
 					<CloudWorkspaceListRow
 						row={item.row}
 						repoFullName={repoFullName}
-						pullRequest={
-							repoFullName
-								? cloudPullRequests.get(
-										cloudPullRequestRefKey({
-											repoFullName,
-											headBranch: item.row.branch,
-										}),
-									)
-								: undefined
-						}
+						pullRequest={cloudPullRequests.get(item.row.id)?.[0]}
 						viewerId={viewerId}
 						now={now}
 						cache={cloudCache}
 						onCopied={handleCopied}
+						card={card}
 					/>
 				);
 			}
@@ -664,6 +672,7 @@ export function HomeScreen() {
 					attention={attentionByWorkspace.get(workspace.id) ?? null}
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
 					onCopied={handleCopied}
+					card={card}
 				/>
 			);
 		},
@@ -685,6 +694,34 @@ export function HomeScreen() {
 			requestComposerFocus,
 			handleCopied,
 		],
+	);
+
+	const listEntries = useMemo(
+		() => toGridRows(listItems, columns, isGridCell),
+		[listItems, columns],
+	);
+
+	const renderItem = useCallback(
+		({ item }: { item: HomeListEntry }) => {
+			if (item.kind !== "gridRow") return renderListItem(item, false);
+			return (
+				<View
+					className="flex-row"
+					style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
+				>
+					{item.cells.map((cell) => (
+						<View
+							key={homeListItemKey(cell)}
+							className="border-border rounded-xl border"
+							style={{ width: cellWidth }}
+						>
+							{renderListItem(cell, true)}
+						</View>
+					))}
+				</View>
+			);
+		},
+		[renderListItem, cellWidth],
 	);
 
 	// The native splash is still up until hideSplash() below; nothing to draw.
@@ -712,6 +749,14 @@ export function HomeScreen() {
 
 	return (
 		<>
+			<ForwardSwipe
+				enabled={lastWorkspaceId !== null}
+				onSwipeBegin={() => {
+					if (lastWorkspaceId) {
+						router.push(`/(authenticated)/workspace/${lastWorkspaceId}`);
+					}
+				}}
+			/>
 			<OrganizationHeaderButton
 				isLoading={isLoadingOrganizations}
 				name={activeOrganization?.name}
@@ -811,11 +856,11 @@ export function HomeScreen() {
 							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
 						paddingBottom: 112,
 						paddingTop: 8,
-						paddingHorizontal: readableInset,
+						paddingHorizontal: listInset,
 					}}
-					data={listItems}
+					data={listEntries}
 					extraData={renderItem}
-					keyExtractor={homeListItemKey}
+					keyExtractor={homeListEntryKey}
 					renderItem={renderItem}
 					ListHeaderComponent={scopeBar}
 					viewabilityConfig={VIEWABILITY_CONFIG}

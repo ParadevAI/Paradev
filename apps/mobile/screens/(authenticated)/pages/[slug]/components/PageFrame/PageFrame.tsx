@@ -42,7 +42,7 @@ function sameOrigin(url: string, src: string): boolean {
 
 export const PageFrame = forwardRef<PageFrameHandle, PageFrameProps>(
 	function PageFrame({ src, insetTop, onMessage, onLoadEnd, onError }, ref) {
-		const webViewRef = useRef<WebView>(null);
+		const webViewRef = useRef<WebView<object>>(null);
 		const openLink = useOpenLink();
 
 		useImperativeHandle(ref, () => ({
@@ -67,7 +67,7 @@ export const PageFrame = forwardRef<PageFrameHandle, PageFrameProps>(
 		};
 
 		return (
-			<WebView
+			<WebView<object>
 				ref={webViewRef}
 				source={{ uri: src }}
 				style={{ flex: 1, backgroundColor: "transparent" }}

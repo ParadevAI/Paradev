@@ -1,12 +1,20 @@
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
+import { SUPPORTED_LOCALES } from "@superset/i18n";
 import {
 	createFileRoute,
 	Outlet,
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
+import { useState } from "react";
 import { Redirect } from "renderer/components/Redirect";
+import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { WindowControlsInset } from "../_dashboard/components/WindowControlsInset";
+import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
+import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
 import { OnboardingNavigation } from "./components/OnboardingNavigation";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
@@ -15,20 +23,26 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 const rootRedirect = <Redirect to="/" replace />;
 
-const STEPS = [
-	{
-		path: "/onboarding",
-		match: (p: string) => p === "/onboarding",
-		title: "Setup Superset",
-		subtitle: "Connect the tools Superset needs to get started.",
-	},
-	{
-		path: "/onboarding/project",
-		match: (p: string) => p === "/onboarding/project",
-		title: "Create or add a project",
-		subtitle: "Start from scratch, open a folder, or clone a repo.",
-	},
-] as const;
+const SETUP_STEP = {
+	path: "/onboarding",
+	match: (p: string) => p === "/onboarding",
+	title: msg({ message: "Connect GitHub" }),
+	subtitle: msg({
+		message:
+			"Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later.",
+	}),
+};
+
+const PROJECT_STEP = {
+	path: "/onboarding/project",
+	match: (p: string) => p === "/onboarding/project",
+	title: msg({ message: "Add your first project" }),
+	subtitle: msg({
+		message: "Open a folder you already work in. You can add more later.",
+	}),
+};
+
+const projectRedirect = <Redirect to="/onboarding/project" replace />;
 
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
@@ -36,62 +50,93 @@ function OnboardingFlowLayout() {
 	const isMac = platform === undefined || platform === "darwin";
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { i18n } = useLingui();
+	const { data: ghStatus, isPending: isPendingGh } =
+		electronTrpc.system.detectGhCli.useQuery();
+	const ghReady =
+		ghStatus?.installed === true && ghStatus.authenticated === true;
+
+	// Finishing flips onboardedAt while this layout is mounted. The project
+	// step navigates on its own then; a redirect here would race it.
+	const [onboardedOnArrival, setOnboardedOnArrival] = useState<boolean | null>(
+		null,
+	);
+	if (!isPending && onboardedOnArrival === null) {
+		setOnboardedOnArrival(Boolean(session?.user?.onboardedAt));
+	}
+	const [ghReadyOnArrival, setGhReadyOnArrival] = useState<boolean | null>(
+		null,
+	);
+	if (!isPendingGh && ghReadyOnArrival === null) {
+		setGhReadyOnArrival(ghReady);
+	}
 
 	if (isPending) return null;
-	if (session?.user?.onboardedAt) {
+	if (onboardedOnArrival) {
 		return rootRedirect;
 	}
 
-	const currentStepIdx = STEPS.findIndex((s) => s.match(location.pathname));
+	// Nothing to set up when GitHub CLI already works, so that step drops out.
+	// Decided on arrival: signing in mid-step must not unmount its own dialog.
+	const steps = ghReadyOnArrival ? [PROJECT_STEP] : [SETUP_STEP, PROJECT_STEP];
+	if (SETUP_STEP.match(location.pathname)) {
+		if (ghReadyOnArrival === null) return null;
+		if (ghReadyOnArrival) return projectRedirect;
+	}
+
+	const currentStepIdx = steps.findIndex((s) => s.match(location.pathname));
 	const isOnMainStep = currentStepIdx >= 0;
 	const isFirstStep = currentStepIdx === 0;
-	const currentStep = isOnMainStep ? STEPS[currentStepIdx] : null;
+	const currentStep = isOnMainStep ? steps[currentStepIdx] : null;
 
 	const handleBack = () => {
 		if (currentStepIdx <= 0) return;
-		const target = STEPS[currentStepIdx - 1];
+		const target = steps[currentStepIdx - 1];
 		if (!target) return;
 		navigate({ to: target.path });
 	};
 
-	// Step 1 advances to the project step; the project step finishes onboarding
-	// itself the moment a project is added, so it has no footer Continue.
-	const handleContinue = isFirstStep
-		? () => navigate({ to: "/onboarding/project" })
-		: null;
+	// The project step finishes onboarding itself the moment a project is
+	// added, so only the GitHub step gets a footer action
+	const handleContinue =
+		currentStep === SETUP_STEP
+			? () => navigate({ to: PROJECT_STEP.path })
+			: null;
 
 	return (
 		<div className="flex h-full w-full flex-col bg-background">
 			<div
-				className="drag h-12 w-full shrink-0"
+				className="drag flex h-12 w-full shrink-0 items-center justify-end pr-3"
 				style={{ paddingLeft: isMac ? "88px" : "16px" }}
-			/>
+			>
+				{SUPPORTED_LOCALES.length > 1 && <OnboardingLanguagePicker />}
+				<OnboardingHelpLinks />
+				<WindowControlsInset />
+			</div>
 			<div className="flex-1 overflow-auto">
 				{currentStep ? (
-					<div className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-8 pt-16 pb-6">
-						<div className="space-y-2">
-							<h1 className="text-2xl font-semibold text-foreground">
-								{currentStep.title}
-							</h1>
-							<p className="text-sm text-muted-foreground">
-								{currentStep.subtitle}
-							</p>
+					<div className="mx-auto flex min-h-full w-full max-w-[744px] flex-col px-8 pb-10">
+						<SupersetLogo className="mt-6 h-4 w-auto self-start" />
+						<div className="flex flex-1 flex-col justify-center gap-6 py-10">
+							<div>
+								<h1 className="font-medium text-foreground text-xl">
+									{i18n._(currentStep.title)}
+								</h1>
+								<p className="mt-1.5 text-muted-foreground text-sm">
+									{i18n._(currentStep.subtitle)}
+								</p>
+							</div>
+							<Outlet />
 						</div>
-						<Outlet />
+						<OnboardingNavigation
+							onBack={isFirstStep ? null : handleBack}
+							onContinue={handleContinue}
+						/>
 					</div>
 				) : (
 					<Outlet />
 				)}
 			</div>
-			{isOnMainStep && (
-				<OnboardingNavigation
-					currentStep={currentStepIdx}
-					totalSteps={STEPS.length}
-					onBack={isFirstStep ? null : handleBack}
-					onContinue={handleContinue}
-					continueLabel="Continue"
-				/>
-			)}
 		</div>
 	);
 }

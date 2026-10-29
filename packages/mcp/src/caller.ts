@@ -57,5 +57,6 @@ export function createMcpCaller(ctx: McpContext): McpCaller {
 		// gate on "is this an agent" read this.
 		agentCaller: { transport: "mcp", label: ctx.clientLabel },
 		sandboxCaller: null,
+		sandboxWorkspaceId: null,
 	});
 }

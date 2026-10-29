@@ -15,7 +15,6 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import type { FileUIPart } from "ai";
 import { ArrowUpIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { TiptapPromptEditor } from "renderer/components/TiptapPromptEditor";
 import { useSendToTerminalAgent } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useHotkeyDisplay } from "renderer/hotkeys";
@@ -26,6 +25,7 @@ import {
 	uploadPastedFiles,
 } from "../../../../utils/uploadPastedFiles";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";
+import { TiptapPromptEditor } from "./components/TiptapPromptEditor";
 import { prepareTerminalSubmission } from "./prepareTerminalSubmission";
 
 /**
@@ -173,7 +173,12 @@ function TerminalRichInputInner({
 
 			const text = prepareTerminalSubmission(message.text, attachmentPaths);
 			if (text === null) return;
-			await sendToTerminalAgent({ workspaceId, terminalId, text });
+			await sendToTerminalAgent({
+				workspaceId,
+				terminalId,
+				text,
+				submit: true,
+			});
 			terminalRuntimeRegistry.scrollToBottom(terminalId, terminalInstanceId);
 			controller.textInput.clear();
 			track("terminal_rich_input_submitted", {

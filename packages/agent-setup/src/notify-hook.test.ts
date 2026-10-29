@@ -109,7 +109,7 @@ function writeHookManifest(home: string, orgId: string, endpoint: string) {
 
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v20");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v21");
 	});
 
 	it("forwards the main session's transcript path with its identity", async () => {
@@ -135,6 +135,35 @@ describe("getNotifyScriptContent", () => {
 				},
 				transcriptPath:
 					"/Users/a/.claude/projects/-Users-a-wt/11111111-2222-4333-8444-555555555555.jsonl",
+			});
+		} finally {
+			host.stop();
+		}
+	});
+
+	it("takes Antigravity's event from its hook config and its session from conversationId", async () => {
+		const host = fakeHostService(false);
+		try {
+			const result = await runNotifyHookAsync(
+				{
+					conversationId: "a38edace-d311-4fea-8de0-1af2ea76b958",
+					lastUserInput: '{"hook_event_name":"Stop","session_id":"pasted"}',
+					modelName: "gemini-3.8-flash-high",
+				},
+				{
+					SUPERSET_AGENT_ID: "agy",
+					SUPERSET_HOOK_HARNESS: "agy",
+					SUPERSET_HOOK_EVENT: "Start",
+					SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+				},
+			);
+			expect(result.exitCode).toBe(0);
+			expect(host.requests[0]?.json).toMatchObject({
+				eventType: "Start",
+				agent: {
+					agentId: "agy",
+					sessionId: "a38edace-d311-4fea-8de0-1af2ea76b958",
+				},
 			});
 		} finally {
 			host.stop();
@@ -289,7 +318,7 @@ describe("getNotifyScriptContent", () => {
 		expect(result.stderr.toString()).toContain("[notify-hook] event=Stop");
 	});
 
-	it("exits silently outside Superset terminals even with a payload session id", () => {
+	it("exits silently outside Paradev terminals even with a payload session id", () => {
 		const result = runNotifyHook(
 			{ hook_event_name: "Stop", session_id: "foreign-session" },
 			{ SUPERSET_TERMINAL_ID: "", SUPERSET_TAB_ID: "" },
@@ -303,7 +332,7 @@ describe("getNotifyScriptContent", () => {
 		const script = readNotifyHookTemplate();
 
 		expect(script).toContain(
-			"HOOK_SESSION_ID=$(json_field session_id sessionId)",
+			"HOOK_SESSION_ID=$(json_field session_id sessionId conversationId)",
 		);
 		expect(script).toContain(
 			'dispatch_to_host "{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$AGENT_ID")\\",\\"sessionId\\":\\"$(json_escape "$SESSION_ID")\\"}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"',
@@ -421,7 +450,7 @@ describe("per-agent hook scripts dispatch to v2", () => {
 	const buildExpectedV2Payload = (agentIdVar: string) =>
 		`PAYLOAD="{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$${agentIdVar}")\\",\\"sessionId\\":\\"$(json_escape "$HOOK_SESSION_ID")\\"}}}"`;
 
-	it("cursor auto-approves permission requests before the outside-Superset bail-out", () => {
+	it("cursor auto-approves permission requests before the outside-Paradev bail-out", () => {
 		const script = readFileSync(
 			getTemplatePath("cursor-hook.template.sh"),
 			"utf-8",

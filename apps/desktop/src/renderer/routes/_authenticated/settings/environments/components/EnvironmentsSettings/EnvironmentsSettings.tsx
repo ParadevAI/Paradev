@@ -3,6 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	HiOutlineArchiveBox,
@@ -12,10 +13,8 @@ import {
 } from "react-icons/hi2";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import {
-	EnvironmentEditorDialog,
-	type EnvironmentEditorSeed,
-} from "renderer/routes/_authenticated/components/EnvironmentEditorDialog";
+import { ArchiveEnvironmentDialog } from "renderer/routes/_authenticated/components/ArchiveEnvironmentDialog";
+import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import {
 	isItemVisible,
 	SETTING_ITEM_ID,
@@ -33,12 +32,13 @@ export function EnvironmentsSettings({
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
-	const [editor, setEditor] = useState<
-		| { mode: "closed" }
-		| { mode: "create" }
-		| { mode: "edit"; seed: EnvironmentEditorSeed }
-	>({ mode: "closed" });
+	const navigate = useNavigate();
+	const [isCreating, setIsCreating] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [archiving, setArchiving] = useState<{
+		id: string;
+		name: string;
+	} | null>(null);
 	const showList = isItemVisible(
 		SETTING_ITEM_ID.ENVIRONMENTS_LIST,
 		visibleItems,
@@ -58,9 +58,17 @@ export function EnvironmentsSettings({
 		{ enabled: Boolean(organizationId) },
 	);
 
+	const { data: usage } = cloudTrpc.billing.environmentUsage.useQuery();
+	const atLimit = usage?.limit != null && usage.used >= usage.limit;
+	const used = usage?.used ?? 0;
+	const limit = usage?.limit ?? 0;
+
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
-			await utils.environment.list.invalidate();
+			await Promise.all([
+				utils.environment.list.invalidate(),
+				utils.billing.environmentUsage.invalidate(),
+			]);
 			setSelectedId(null);
 		},
 		onError: (error) => toast.error(errorMessage(error)),
@@ -91,10 +99,35 @@ export function EnvironmentsSettings({
 						</Trans>
 					</p>
 				</div>
-				<Button onClick={() => setEditor({ mode: "create" })} size="sm">
-					<HiOutlinePlus className="h-4 w-4" />
-					<Trans>New environment</Trans>
-				</Button>
+				<div className="flex shrink-0 items-center gap-3">
+					{usage?.limit === 0 ? (
+						<span className="text-xs text-muted-foreground">
+							<Trans>Your plan does not include cloud environments.</Trans>{" "}
+							<Link
+								to="/settings/billing/plans"
+								className="font-medium text-foreground underline underline-offset-4"
+							>
+								<Trans>Upgrade</Trans>
+							</Link>
+						</span>
+					) : (
+						usage?.limit != null && (
+							<span className="text-xs text-muted-foreground">
+								<Trans>
+									{used} of {limit} environments
+								</Trans>
+							</span>
+						)
+					)}
+					<Button
+						onClick={() => setIsCreating(true)}
+						size="sm"
+						disabled={atLimit}
+					>
+						<HiOutlinePlus className="h-4 w-4" />
+						<Trans>New environment</Trans>
+					</Button>
+				</div>
 			</div>
 
 			{isError ? (
@@ -149,19 +182,9 @@ export function EnvironmentsSettings({
 									aria-label={t({ message: "Edit environment" })}
 									className="h-8 w-8 text-muted-foreground"
 									onClick={() =>
-										setEditor({
-											mode: "edit",
-											seed: {
-												id: environment.id,
-												name: environment.name,
-												scope: environment.scope,
-												repositoryIds: (environment.repositories ?? []).map(
-													(repo) => repo.id,
-												),
-												hooksRepositoryId: environment.hooksRepositoryId,
-												repositoriesFrozen: environment.sourceKind !== "image",
-												region: environment.region,
-											},
+										navigate({
+											to: "/environments/$environmentId",
+											params: { environmentId: environment.id },
 										})
 									}
 									size="icon"
@@ -172,7 +195,9 @@ export function EnvironmentsSettings({
 								<Button
 									aria-label={t({ message: "Archive environment" })}
 									className="h-8 w-8 text-muted-foreground hover:text-destructive"
-									onClick={() => archive.mutate({ id: environment.id })}
+									onClick={() =>
+										setArchiving({ id: environment.id, name: environment.name })
+									}
 									size="icon"
 									variant="ghost"
 								>
@@ -191,14 +216,20 @@ export function EnvironmentsSettings({
 				</div>
 			)}
 
-			{organizationId && editor.mode !== "closed" && (
-				<EnvironmentEditorDialog
-					environment={editor.mode === "edit" ? editor.seed : undefined}
-					key={editor.mode === "edit" ? editor.seed.id : "create"}
-					onOpenChange={(open) => {
-						if (!open) setEditor({ mode: "closed" });
-					}}
-					open
+			<ArchiveEnvironmentDialog
+				environmentName={archiving?.name ?? null}
+				onConfirm={() => {
+					if (archiving) archive.mutate({ id: archiving.id });
+				}}
+				onOpenChange={(open) => {
+					if (!open) setArchiving(null);
+				}}
+			/>
+
+			{organizationId && (
+				<CreateEnvironmentFlow
+					onOpenChange={setIsCreating}
+					open={isCreating}
 					organizationId={organizationId}
 				/>
 			)}

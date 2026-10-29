@@ -1,4 +1,5 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { Button } from "@superset/ui/button";
 import {
@@ -45,12 +46,6 @@ interface PullRequestCommentThreadProps {
 	focusTick?: number;
 }
 
-// A decoupled twin of the v2-workspace DiffPane's CommentThread: same
-// visuals, but the resolve mutation is injected via a prop instead of
-// wired to that component's workspaceId-scoped git.setReviewThreadResolution
-// call, since this one's callers (the PR list/detail Code tab) browse a PR
-// directly and don't necessarily have a workspace linked to it. The reply
-// box is the shared ReviewThreadReplyComposer; only the dispatch differs.
 export function PullRequestCommentThread({
 	isResolved,
 	isOutdated,
@@ -245,6 +240,7 @@ export function PullRequestCommentThread({
 }
 
 function CommentRow({ comment }: { comment: Comment }) {
+	const { formatCompactRelativeTime } = useFormat();
 	return (
 		<li className="flex gap-2 px-3 py-2.5">
 			<Avatar className="mt-0.5 size-5 shrink-0">
@@ -265,7 +261,7 @@ function CommentRow({ comment }: { comment: Comment }) {
 							className="text-muted-foreground"
 							dateTime={new Date(comment.createdAt).toISOString()}
 						>
-							{formatRelative(comment.createdAt)}
+							{formatCompactRelativeTime(comment.createdAt)}
 						</time>
 					)}
 				</div>
@@ -275,22 +271,4 @@ function CommentRow({ comment }: { comment: Comment }) {
 			</div>
 		</li>
 	);
-}
-
-function formatRelative(ms: number): string {
-	// Floor (not round) so a 30-minute comment doesn't read "1h ago".
-	// Clamp >=0 so future-dated timestamps from clock skew aren't negative.
-	const delta = Math.max(0, Date.now() - ms);
-	const seconds = Math.floor(delta / 1000);
-	if (seconds < 60) return `${seconds}s ago`;
-	const minutes = Math.floor(seconds / 60);
-	if (minutes < 60) return `${minutes}m ago`;
-	const hours = Math.floor(minutes / 60);
-	if (hours < 24) return `${hours}h ago`;
-	const days = Math.floor(hours / 24);
-	if (days < 30) return `${days}d ago`;
-	const months = Math.floor(days / 30);
-	if (months < 12) return `${months}mo ago`;
-	const years = Math.floor(days / 365);
-	return `${years}y ago`;
 }

@@ -33,8 +33,8 @@ export async function generateMetadata({
 	}
 
 	const kind = theme.type === "dark" ? "Dark" : "Light";
-	const title = `${theme.name}: ${kind} Theme for Superset`;
-	const description = `${theme.description} Download the ${theme.name} ${kind.toLowerCase()} theme for Superset, the local-first AI coding workspace.`;
+	const title = `${theme.name}: ${kind} Theme for Paradev`;
+	const description = `${theme.description} Download the ${theme.name} ${kind.toLowerCase()} theme for Paradev, the local-first AI coding workspace.`;
 	const url = localeUrl(lang, `/marketplace/themes/${theme.slug}`);
 
 	return {
@@ -42,8 +42,8 @@ export async function generateMetadata({
 		description,
 		keywords: [
 			`${theme.name} theme`,
-			`${theme.name} superset theme`,
-			`superset ${theme.type} theme`,
+			`${theme.name} ${COMPANY.NAME} theme`,
+			`${COMPANY.NAME} ${theme.type} theme`,
 			...theme.tags,
 		],
 		alternates: localizedAlternates(lang, `/marketplace/themes/${theme.slug}`),
@@ -200,14 +200,14 @@ export default async function ThemeDetailPage({ params }: PageProps) {
 	const creativeWork = {
 		"@context": "https://schema.org",
 		"@type": "CreativeWork",
-		name: `${theme.name} Theme for Superset`,
+		name: `${theme.name} Theme for Paradev`,
 		description: theme.description,
 		url,
 		genre: `${kind} color theme`,
 		author: { "@type": "Person", name: theme.author },
 		keywords: theme.tags.join(", "),
 		isAccessibleForFree: true,
-		license: "https://github.com/superset-sh/superset",
+		license: "https://github.com/paradevai/paradev",
 	};
 
 	return (
@@ -353,7 +353,7 @@ export default async function ThemeDetailPage({ params }: PageProps) {
 
 				<section className="mt-12">
 					<h2 className="text-lg font-semibold text-foreground">
-						<Trans>How to install {name} in Superset</Trans>
+						<Trans>How to install {name} in Paradev</Trans>
 					</h2>
 					<ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
 						<li>
@@ -361,7 +361,7 @@ export default async function ThemeDetailPage({ params }: PageProps) {
 						</li>
 						<li>
 							<Trans>
-								In the Superset desktop app, open{" "}
+								In the Paradev desktop app, open{" "}
 								<span className="text-foreground">
 									Settings → Appearance → Theme
 								</span>

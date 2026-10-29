@@ -5,19 +5,24 @@ type Mutation =
 	| "prompt"
 	| "removeQueuedPrompt"
 	| "steerQueuedPrompt"
+	| "updateQueuedPrompt"
 	| "resumeQueue"
 	| "cancelTurn"
 	| "stopBackgroundTask"
+	| "steerSubagent"
+	| "backgroundSubagent"
 	| "respondToApproval"
 	| "setMode"
 	| "setConfigOption"
 	| "closeSession"
-	| "forkSession";
+	| "forkSession"
+	| "rewindSession";
 
 type Query =
 	| "getSession"
 	| "getQueue"
 	| "listSessions"
+	| "discoverSessions"
 	| "getItems"
 	| "getOutline"
 	| "getItemBodies";
@@ -36,17 +41,22 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		prompt: (input) => client.prompt.mutate(input),
 		removeQueuedPrompt: (input) => client.removeQueuedPrompt.mutate(input),
 		steerQueuedPrompt: (input) => client.steerQueuedPrompt.mutate(input),
+		updateQueuedPrompt: (input) => client.updateQueuedPrompt.mutate(input),
 		resumeQueue: (input) => client.resumeQueue.mutate(input),
 		cancelTurn: (input) => client.cancelTurn.mutate(input),
 		stopBackgroundTask: (input) => client.stopBackgroundTask.mutate(input),
+		steerSubagent: (input) => client.steerSubagent.mutate(input),
+		backgroundSubagent: (input) => client.backgroundSubagent.mutate(input),
 		respondToApproval: (input) => client.respondToApproval.mutate(input),
 		setMode: (input) => client.setMode.mutate(input),
 		setConfigOption: (input) => client.setConfigOption.mutate(input),
 		closeSession: (input) => client.closeSession.mutate(input),
 		forkSession: (input) => client.forkSession.mutate(input),
+		rewindSession: (input) => client.rewindSession.mutate(input),
 		getSession: (input) => client.getSession.query(input),
 		getQueue: (input) => client.getQueue.query(input),
 		listSessions: (input) => client.listSessions.query(input),
+		discoverSessions: (input) => client.discoverSessions.query(input),
 		getItems: (input) => client.getItems.query(input),
 		getOutline: (input) => client.getOutline.query(input),
 		getItemBodies: (input) => client.getItemBodies.query(input),

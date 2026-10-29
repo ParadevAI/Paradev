@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import type { RendererContext } from "@superset/panes";
+import { type RendererContext, usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
@@ -229,6 +229,13 @@ export function TerminalPane({
 			terminalRuntimeRegistry.detach(terminalId, terminalInstanceId);
 		};
 	}, [terminalId, terminalInstanceId]);
+
+	usePaneFocus(() => {
+		if (isRichInputOpen) return;
+		terminalRuntimeRegistry
+			.getTerminal(terminalId, terminalInstanceId)
+			?.focus();
+	});
 
 	useEffect(() => {
 		if (!ctx.isActive) return;

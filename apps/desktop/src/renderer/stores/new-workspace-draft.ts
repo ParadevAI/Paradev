@@ -1,4 +1,9 @@
+import type {
+	ComposerDraftSegment,
+	PromptInputAttachment,
+} from "@superset/chat-ui/PromptInput";
 import { create } from "zustand";
+import { useV2WorkspaceCreateDefaultsStore } from "./v2-workspace-create-defaults";
 
 export type LinkedIssue = {
 	slug: string;
@@ -21,14 +26,6 @@ export type LinkedPR = {
 
 export type BaseBranchSource = "local" | "remote-tracking";
 
-export interface DraftAttachment {
-	localId: string;
-	state: "uploading" | "ready" | "error";
-	file: { name: string; size: number; mediaType: string };
-	attachmentId?: string;
-	error?: string;
-}
-
 /** Worktree: its own checkout and branch. Local: the project's checkout as is. */
 export type WorkspaceCheckout = "worktree" | "local";
 
@@ -38,10 +35,7 @@ export interface NewWorkspaceDraft {
 	isSession: boolean;
 	hostId: string | null;
 	checkout: WorkspaceCheckout;
-	/** Cloud only. Null until picked; submit falls back to the first. */
-	environmentId: string | null;
-	/** Cloud only, for an environment without repositories of its own: primary first. */
-	prompt: string;
+	promptDraft: ComposerDraftSegment[];
 	baseBranch: string | null;
 	baseBranchSource: BaseBranchSource | null;
 	workspaceName: string;
@@ -54,10 +48,8 @@ export interface NewWorkspaceDraft {
 	 * Provider branches are created verbatim — no project branch prefix.
 	 */
 	branchNameFromProvider: boolean;
-	linkedIssues: LinkedIssue[];
-	linkedPR: LinkedPR | null;
 	selectedAgentId: string | null;
-	attachments: DraftAttachment[];
+	promptAttachments: PromptInputAttachment[];
 }
 
 interface NewWorkspaceDraftState extends NewWorkspaceDraft {
@@ -65,9 +57,6 @@ interface NewWorkspaceDraftState extends NewWorkspaceDraft {
 	updateDraft: (patch: Partial<NewWorkspaceDraft>) => void;
 	selectProject: (projectId: string) => void;
 	selectSession: () => void;
-	addAttachment: (attachment: DraftAttachment) => void;
-	updateAttachment: (localId: string, patch: Partial<DraftAttachment>) => void;
-	removeAttachment: (localId: string) => void;
 	resetDraft: () => void;
 }
 
@@ -76,9 +65,8 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		selectedProjectId: null,
 		isSession: false,
 		hostId: null,
-		checkout: "worktree",
-		environmentId: null,
-		prompt: "",
+		checkout: useV2WorkspaceCreateDefaultsStore.getState().checkout,
+		promptDraft: [],
 		baseBranch: null,
 		baseBranchSource: null,
 		workspaceName: "",
@@ -86,10 +74,8 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		branchName: "",
 		branchNameEdited: false,
 		branchNameFromProvider: false,
-		linkedIssues: [],
-		linkedPR: null,
 		selectedAgentId: null,
-		attachments: [],
+		promptAttachments: [],
 	};
 }
 
@@ -109,41 +95,14 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 			set({
 				selectedProjectId: null,
 				isSession: true,
-				linkedPR: null,
 				baseBranch: null,
 				baseBranchSource: null,
 			}),
-		addAttachment: (attachment) =>
-			set((state) => ({
-				...state,
-				attachments: [...state.attachments, attachment],
-			})),
-		updateAttachment: (localId, patch) =>
-			set((state) => ({
-				...state,
-				attachments: state.attachments.map((entry) =>
-					entry.localId === localId ? { ...entry, ...patch } : entry,
-				),
-			})),
-		removeAttachment: (localId) =>
-			set((state) => ({
-				...state,
-				attachments: state.attachments.filter(
-					(entry) => entry.localId !== localId,
-				),
-			})),
-		// set() merges, so the store's actions survive the reset.
-		// hostId is a target preference, not draft content: someone who just
-		// created in the cloud means the next one to go there too. The persisted
-		// lastHostId only re-seeds a draft once per create surface open, and the
-		// main create surface never closes, so the reset has to carry it — the
-		// alternative is a silent create on the wrong machine.
 		resetDraft: () =>
 			set((state) => ({
 				...buildInitialDraft(),
 				hostId: state.hostId,
 				checkout: state.checkout,
-				environmentId: state.environmentId,
 				resetKey: state.resetKey + 1,
 			})),
 	}),

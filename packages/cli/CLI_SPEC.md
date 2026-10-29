@@ -1,4 +1,4 @@
-# Superset CLI Specs
+# Paradev CLI Specs
 
 This file is intentionally only an index.
 

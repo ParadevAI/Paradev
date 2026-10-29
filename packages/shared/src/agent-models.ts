@@ -176,6 +176,22 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		presetId: "agy",
+		modelFlag: "--model",
+		models: [
+			// Family ids; `--effort` picks the level. The catalog is
+			// account-dependent and agy rejects ids the account lacks. Verified
+			// against `agy models` (agy 1.4.10, 2026-10-29) except Gemini 4 Argon,
+			// whose family and level ids ship in the binary but need a plan that
+			// includes it.
+			{ id: "gemini-4-argon", label: "Gemini 4 Argon" },
+			{ id: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+			{ id: "claude-opus-4-6-thinking", label: "Claude Opus 4.6" },
+			{ id: "gpt-oss-120b", label: "GPT-OSS 120B" },
+		],
+	},
+	{
 		presetId: "copilot",
 		modelFlag: "--model",
 		models: [
@@ -276,6 +292,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "gpt-5.4-medium", label: "GPT-5.4", group: CURSOR_OPENAI_GROUP },
 			{ id: "gpt-5.3-codex", label: "Codex 5.3", group: CURSOR_OPENAI_GROUP },
 			{
+				id: "gemini-4-argon-high",
+				label: "Gemini 4 Argon",
+				group: CURSOR_OTHER_GROUP,
+			},
+			{
 				id: "gemini-3.8-flash-high",
 				label: "Gemini 3.8 Flash",
 				group: CURSOR_OTHER_GROUP,
@@ -353,6 +374,17 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		],
 	},
 	{
+		presetId: "pdev",
+		modelFlag: "--model",
+		models: [
+			{ id: "pdev/auto", label: "Auto" },
+			{ id: "pdev/claude", label: "Claude" },
+			{ id: "pdev/fun", label: "Fun" },
+			{ id: "pdev/writing", label: "Writing" },
+			{ id: "pdev/free", label: "Free" },
+		],
+	},
+	{
 		presetId: "vibe",
 		modelFlag: null,
 		modelEnv: "VIBE_ACTIVE_MODEL",
@@ -408,6 +440,11 @@ export interface AgentEffortSupport {
 	 * offer an effort at all.
 	 */
 	modelVariants?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+	/**
+	 * Offer effort only next to a curated model. The agent's own default model
+	 * is unknown here and may reject the flag (agy's Claude models do).
+	 */
+	requiresModel?: boolean;
 }
 
 export interface AgentModeOption extends AgentModelOption {
@@ -523,6 +560,11 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 		["low", "medium", "high", "xhigh"],
 		{ medium: "gpt-5.3-codex" },
 	),
+	"gemini-4-argon-high": cursorEffortVariants("gemini-4-argon", [
+		"low",
+		"medium",
+		"high",
+	]),
 	"gemini-3.8-flash-high": cursorEffortVariants("gemini-3.8-flash", [
 		"low",
 		"medium",
@@ -537,6 +579,8 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 	"kimi-k3-max": cursorEffortVariants("kimi-k3", ["low", "high", "max"]),
 	"glm-5.2-high": cursorEffortVariants("glm-5.2", ["high", "max"]),
 };
+
+const AGY_EFFORT_MODELS = ["gemini-4-argon", "gemini-3.8-flash"] as const;
 
 const PI_THINKING_LEVELS: AgentModelOption[] = [
 	{ id: "off", label: "Off" },
@@ -643,6 +687,17 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 		efforts: [...PI_THINKING_LEVELS, { id: "max", label: "Max" }],
 	},
 	{
+		// Only Gemini models take `--effort`; agy rejects it on the others.
+		presetId: "agy",
+		effortFlag: "--effort",
+		requiresModel: true,
+		efforts: [
+			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
+			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
+			{ id: "high", label: "High", models: AGY_EFFORT_MODELS },
+		],
+	},
+	{
 		presetId: "copilot",
 		effortFlag: "--effort",
 		efforts: [
@@ -733,6 +788,7 @@ export function getAgentEfforts(
 	)
 		? model
 		: undefined;
+	if (support.requiresModel && !selected) return [];
 	if (support.modelVariants) {
 		const variants = selected ? support.modelVariants[selected] : undefined;
 		if (!variants) return [];

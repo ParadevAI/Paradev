@@ -1,4 +1,4 @@
 interface:
-  display_name: "Superset Setup"
-  short_description: "Make a repo Superset-ready with .superset/config.json lifecycle scripts"
-  default_prompt: "Use $superset-setup to make this repository Superset-ready and verify a workspace boots clean."
+  display_name: "Paradev Setup"
+  short_description: "Make a repo Paradev-ready with .superset/config.toml"
+  default_prompt: "Use $superset-setup to make this repository Paradev-ready and verify a workspace boots clean."

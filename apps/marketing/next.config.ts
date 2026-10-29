@@ -1,6 +1,10 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
+import { readRootDomain } from "@superset/shared/app-identity";
+import { CANONICAL_URLS } from "@superset/shared/constants";
+import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 import { buildLegacyRedirects } from "./src/lib/legacy-redirects";
@@ -21,7 +25,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 	? new URL(process.env.NEXT_PUBLIC_API_URL).origin
 	: isProduction
-		? "https://api.superset.sh"
+		? CANONICAL_URLS.API
 		: null;
 
 // Third parties this site actually loads (probed against production):
@@ -44,7 +48,7 @@ const contentSecurityPolicy = [
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
+		...withOwnDomainTwins([apiOrigin]),
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.posthog.com",
@@ -149,9 +153,8 @@ const config: NextConfig = {
 	},
 
 	async redirects() {
-		const docsUrl =
-			process.env.NEXT_PUBLIC_DOCS_URL || "https://docs.superset.sh";
-		return [
+		const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || CANONICAL_URLS.DOCS;
+		const redirects = [
 			// These URLs were advertised before discovery files were excluded
 			// from locale expansion. Keep existing inbound links working.
 			{
@@ -170,18 +173,18 @@ const config: NextConfig = {
 				permanent: true,
 			},
 			{
-				source: "/:lang(en)?/:page(join-us|career)",
+				source: "/:lang(en)?/:page(join-us|career|hiring)",
 				destination: "/careers",
 				permanent: true,
 			},
 			{
-				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career)`,
+				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career|hiring)`,
 				destination: "/:lang/careers",
 				permanent: true,
 			},
 			{
 				source: "/mcp",
-				destination: "https://api.superset.sh/mcp",
+				destination: `${CANONICAL_URLS.API}/mcp`,
 				permanent: false,
 			},
 			{
@@ -196,6 +199,10 @@ const config: NextConfig = {
 			},
 			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];
+		return withLegacyHostRedirects(redirects, {
+			rootDomain: readRootDomain(),
+			site: "marketing",
+		});
 	},
 
 	async headers() {
@@ -210,7 +217,7 @@ const config: NextConfig = {
 							'</index.md>; rel="alternate"; type="text/markdown"',
 							'</llms.txt>; rel="describedby"; type="text/plain"',
 							'</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
-							'<https://api.superset.sh/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+							`<${CANONICAL_URLS.API}/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"`,
 						].join(", "),
 					},
 				],

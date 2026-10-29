@@ -1,4 +1,5 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
+import { COMPANY } from "@superset/shared/constants";
 import { format } from "date-fns";
 import { Button, EmailLayout } from "../../components";
 
@@ -26,10 +27,6 @@ export function PaymentFailedEmail({
 
 	return (
 		<EmailLayout preview={`Payment failed for ${organizationName}`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				{isFinalAttempt ? "Final payment attempt failed" : "Payment failed"}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
@@ -58,7 +55,7 @@ export function PaymentFailedEmail({
 			)}
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
-				Common reasons for payment failure:
+				Common reasons:
 			</Text>
 
 			<Text className="text-[13px] leading-6 text-muted m-0 mb-6">
@@ -75,14 +72,11 @@ export function PaymentFailedEmail({
 			)}
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				Need help?{" "}
-				<Link
-					href="mailto:support@superset.sh"
-					className="text-muted underline"
-				>
-					Contact our support team
-				</Link>{" "}
-				and we'll get you sorted out.
+				Need help? Please{" "}
+				<Link href={COMPANY.MAIL_TO} className="text-muted underline">
+					email support
+				</Link>
+				.
 			</Text>
 		</EmailLayout>
 	);

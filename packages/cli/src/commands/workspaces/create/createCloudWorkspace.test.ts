@@ -22,3 +22,45 @@ test.each([
 	).rejects.toThrow("--checkout does not apply to a cloud workspace");
 	expect(contacted).toBe(false);
 });
+
+function recordingApi() {
+	const calls: { createInput?: Record<string, unknown> } = {};
+	const api = {
+		environment: {
+			list: {
+				query: async () => [
+					{ id: "env-1", name: "main", repositories: [{ id: "repo-1" }] },
+				],
+			},
+		},
+		cloudWorkspace: {
+			create: {
+				mutate: async (input: Record<string, unknown>) => {
+					calls.createInput = input;
+					return { id: "ws-1", branch: "main" };
+				},
+			},
+		},
+	} as unknown as ApiClient;
+	return { api, calls };
+}
+
+test("sends the chosen machine size to the cloud", async () => {
+	const { api, calls } = recordingApi();
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { machineSize: "small" },
+	});
+	expect(calls.createInput).toMatchObject({ machineSize: "small" });
+});
+
+test("sends --base-branch as the branch the cloud workspace starts from", async () => {
+	const { api, calls } = recordingApi();
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { baseBranch: "main" },
+	});
+	expect(calls.createInput).toMatchObject({ branch: "main" });
+});

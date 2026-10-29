@@ -9,6 +9,7 @@ import {
 	FeedbackReportEmail,
 	feedbackReportText,
 } from "@superset/email/emails/feedback-report";
+import { NOREPLY_FROM } from "@superset/email/sender";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -148,10 +149,10 @@ export const supportRouter = createTRPCRouter({
 
 			try {
 				const { error } = await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: SUPPORT_EMAIL,
 					replyTo: user.email,
-					subject: "Superset V1 to V2 migration issue",
+					subject: "Paradev V1 to V2 migration issue",
 					text: [
 						`User: ${userLabel}`,
 						`User ID: ${user.id}`,
@@ -289,7 +290,7 @@ export const supportRouter = createTRPCRouter({
 				// Resend reports API failures via the resolved `error` field, not by
 				// throwing — without this check a rejected email would "succeed".
 				const { error } = await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: SUPPORT_EMAIL,
 					// CC the reporter so they keep a copy and stay on the thread.
 					cc: user.email,

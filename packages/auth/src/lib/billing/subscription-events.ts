@@ -1,8 +1,11 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
 import * as authSchema from "@superset/db/schema/auth";
+import { PlanUpgradedEmail } from "@superset/email/emails/billing/plan-upgraded";
 import { SubscriptionCancelledEmail } from "@superset/email/emails/billing/subscription-cancelled";
 import { SubscriptionStartedEmail } from "@superset/email/emails/billing/subscription-started";
+import { NOREPLY_FROM } from "@superset/email/sender";
+import type { PlanFamily } from "@superset/shared/billing";
 import { Client } from "@upstash/qstash";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
@@ -15,6 +18,7 @@ import {
 } from "../../utils/billing";
 import { captureBillingEvent } from "../billing-analytics";
 import { resend } from "../resend";
+import { cloudHoursPerSeat, type EmailPlan } from "./autumn/plan-family";
 import { seatItem } from "./autumn/subscription-row";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
@@ -74,14 +78,81 @@ export function serializeCancellationDetails(
 	}
 }
 
+function seatPrice(stripeSubscription: Stripe.Subscription) {
+	const price = seatItem(stripeSubscription)?.price;
+	const billingInterval: "monthly" | "yearly" =
+		price?.recurring?.interval === "year" ? "yearly" : "monthly";
+	const pricePerSeat = price?.unit_amount ?? 0;
+	const currency = price?.currency ?? "usd";
+	return {
+		billingInterval,
+		pricePerSeat,
+		currency,
+		amount: formatPrice(pricePerSeat, currency),
+	};
+}
+
+function displayPlanName(planName: string): string {
+	return planName.charAt(0).toUpperCase() + planName.slice(1);
+}
+
+export async function notifyPlanUpgraded({
+	subscription,
+	stripeSubscription,
+	plan,
+	previousFamily,
+}: {
+	subscription: SubscriptionEventRow;
+	stripeSubscription: Stripe.Subscription;
+	plan: EmailPlan;
+	previousFamily: PlanFamily;
+}): Promise<boolean> {
+	try {
+		const org = await db.query.organizations.findFirst({
+			where: eq(authSchema.organizations.id, subscription.referenceId),
+		});
+		if (!org) return true;
+		const owners = await getOrganizationOwners(subscription.referenceId);
+		const { billingInterval, amount } = seatPrice(stripeSubscription);
+		const { error } = await resend.batch.send(
+			owners.map((owner) => ({
+				from: NOREPLY_FROM,
+				to: owner.email,
+				subject: `You're on Paradev ${plan.name}`,
+				react: PlanUpgradedEmail({
+					ownerName: owner.name,
+					organizationName: org.name,
+					planName: plan.name,
+					previousPlanName: previousFamily.name,
+					billingInterval,
+					amount,
+					seatCount: subscription.seats ?? 1,
+					cloudHoursPerSeat: plan.cloudHoursPerSeat,
+					previousCloudHoursPerSeat: cloudHoursPerSeat(previousFamily),
+				}),
+			})),
+		);
+		if (error) throw new Error(error.message);
+		return true;
+	} catch (error) {
+		console.error(
+			`[billing/plan-upgraded] ${subscription.referenceId} upgrade notice failed`,
+			error,
+		);
+		return false;
+	}
+}
+
 export async function notifySubscriptionStarted({
 	subscription,
 	stripeSubscription,
 	planName,
+	plan = null,
 }: {
 	subscription: SubscriptionEventRow;
 	stripeSubscription: Stripe.Subscription;
 	planName: string;
+	plan?: EmailPlan | null;
 }): Promise<void> {
 	await resumeGatedSyncs(subscription.referenceId);
 
@@ -103,29 +174,24 @@ export async function notifySubscriptionStarted({
 	}
 
 	const owners = await getOrganizationOwners(subscription.referenceId);
-
-	const interval = seatItem(stripeSubscription)?.price?.recurring?.interval as
-		| "month"
-		| "year"
-		| undefined;
-	const billingInterval = interval === "year" ? "yearly" : "monthly";
-
-	const pricePerSeat = seatItem(stripeSubscription)?.price?.unit_amount ?? 0;
-	const currency = seatItem(stripeSubscription)?.price?.currency ?? "usd";
-	const amount = formatPrice(pricePerSeat, currency);
+	const { billingInterval, pricePerSeat, currency, amount } =
+		seatPrice(stripeSubscription);
+	const displayName = plan?.name ?? displayPlanName(planName);
 
 	await resend.batch.send(
 		owners.map((owner) => ({
-			from: "Superset <noreply@superset.sh>",
+			from: NOREPLY_FROM,
 			to: owner.email,
-			subject: `Welcome to Superset ${planName}!`,
+			subject: `Welcome to Paradev ${displayName}!`,
 			react: SubscriptionStartedEmail({
 				ownerName: owner.name,
 				organizationName: org.name,
-				planName,
+				planName: displayName,
 				billingInterval,
 				amount,
 				seatCount: subscription.seats ?? 1,
+				previousPlanName: plan?.previousName,
+				cloudHoursPerSeat: plan?.cloudHoursPerSeat,
 			}),
 		})),
 	);
@@ -227,7 +293,7 @@ export async function notifySubscriptionCanceled({
 
 	await resend.batch.send(
 		recipients.map((recipient) => ({
-			from: "Superset <noreply@superset.sh>",
+			from: NOREPLY_FROM,
 			to: recipient.email,
 			subject: dueToPaymentFailure
 				? `Your ${subscription.plan} subscription ended`

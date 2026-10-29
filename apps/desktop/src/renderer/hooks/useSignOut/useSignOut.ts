@@ -34,7 +34,7 @@ export function useSignOut() {
 				{
 					description: t({
 						message:
-							"Superset may sign you back in after restart. Please try signing out again.",
+							"Paradev may sign you back in after restart. Please try signing out again.",
 					}),
 				},
 			);

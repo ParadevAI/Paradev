@@ -7,6 +7,7 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -32,7 +33,9 @@ interface TabItemProps<TData> {
 	onClose: () => void;
 	onCloseOthers: () => void;
 	onCloseAll: () => void;
-	onRename: (title: string | undefined) => void;
+	onRename?: (title: string | undefined) => void;
+	onClick?: () => void;
+	isPreview?: boolean;
 	icon?: ReactNode;
 	accessory?: ReactNode;
 }
@@ -49,6 +52,8 @@ export function TabItem<TData>({
 	onCloseOthers,
 	onCloseAll,
 	onRename,
+	onClick,
+	isPreview = false,
 	icon,
 	accessory,
 }: TabItemProps<TData>) {
@@ -56,6 +61,7 @@ export function TabItem<TData>({
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState("");
 	const title = useTabTitle(tab, tabs, registry);
+	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	const startEditing = () => {
 		setEditValue(title);
@@ -69,9 +75,9 @@ export function TabItem<TData>({
 	const saveEdit = () => {
 		const nextTitle = editValue.trim();
 		if (nextTitle.length === 0) {
-			onRename(undefined);
+			onRename?.(undefined);
 		} else if (nextTitle !== title) {
-			onRename(nextTitle);
+			onRename?.(nextTitle);
 		}
 		stopEditing();
 	};
@@ -130,7 +136,10 @@ export function TabItem<TData>({
 					// Select on click, not mousedown: the browser suppresses click after a
 					// drag, so starting a drag (reorder, or merging a tab into a pane) no
 					// longer switches the active tab mid-gesture.
-					onClick={() => onSelect()}
+					onClick={() => {
+						onSelect();
+						onClick?.();
+					}}
 				>
 					{isEditing ? (
 						<div className="flex h-full w-full shrink-0 items-center px-2">
@@ -159,10 +168,12 @@ export function TabItem<TData>({
 												onClose();
 											}
 										}}
-										onDoubleClick={startEditing}
+										onDoubleClick={onRename ? startEditing : undefined}
 									>
 										{icon && <span className="shrink-0">{icon}</span>}
-										<OverflowFadeText className="flex-1">
+										<OverflowFadeText
+											className={cn("flex-1", isPreview && "italic")}
+										>
 											{title}
 										</OverflowFadeText>
 									</div>
@@ -200,12 +211,16 @@ export function TabItem<TData>({
 					)}
 				</div>
 			</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItem onSelect={startEditing}>
-					<PencilIcon className="mr-2 size-4" />
-					<Trans>Rename</Trans>
-				</ContextMenuItem>
-				<ContextMenuSeparator />
+			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				{onRename && (
+					<>
+						<ContextMenuItem onSelect={() => runAfterClose(startEditing)}>
+							<PencilIcon className="mr-2 size-4" />
+							<Trans>Rename</Trans>
+						</ContextMenuItem>
+						<ContextMenuSeparator />
+					</>
+				)}
 				<ContextMenuItem onSelect={onClose}>
 					<XIcon className="mr-2 size-4" />
 					<Trans>Close</Trans>

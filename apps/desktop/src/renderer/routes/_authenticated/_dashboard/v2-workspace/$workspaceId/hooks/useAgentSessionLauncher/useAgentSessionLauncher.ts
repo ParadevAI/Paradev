@@ -20,10 +20,12 @@ import type {
 	TerminalPaneData,
 } from "../../types";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
+import { readLastChatAgent } from "../../utils/lastChatAgent";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
 	placement: "split-pane" | "new-tab";
+	besidePaneId?: string;
 	prompt: string;
 	forkSessionId?: string;
 	attachments?: Array<{ attachmentId: string; name: string; mimeType: string }>;
@@ -34,6 +36,8 @@ export interface CreateNewAgentSessionInput {
 export type CreateNewAgentSession = (
 	input: CreateNewAgentSessionInput,
 ) => Promise<{ terminalId: string } | null>;
+
+type OpenNewChat = () => Promise<{ terminalId: string } | null>;
 
 export type OpenAgentChat = (
 	input: Omit<CreateNewAgentSessionInput, "forkSessionId" | "prompt"> & {
@@ -53,10 +57,11 @@ export function useAgentSessionLauncher({
 }: UseAgentSessionLauncherOptions): {
 	createNewAgentSession: CreateNewAgentSession;
 	openAgentChat: OpenAgentChat;
+	openNewChat: OpenNewChat;
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
-	const runAgent = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
 	const appearance = useTerminalAppearance();
 	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
@@ -102,6 +107,23 @@ export function useAgentSessionLauncher({
 		[awaitAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
 	);
 
+	const openNewChat = useCallback<OpenNewChat>(async () => {
+		const configs = await queryClient
+			.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
+			.catch(() => agentConfigs ?? []);
+		const chatPresetIds = configs
+			.map((config) => config.presetId)
+			.filter((presetId) => acpHarnessForPreset(presetId));
+		const presetId = [readLastChatAgent(), "claude", ...chatPresetIds].find(
+			(candidate) => candidate && chatPresetIds.includes(candidate),
+		);
+		if (!presetId) {
+			toast.error(t({ message: "No installed agent can be opened as a chat" }));
+			return null;
+		}
+		return openAgentChat({ configId: "", presetId, placement: "new-tab" });
+	}, [queryClient, hostUrl, agentConfigs, openAgentChat, t]);
+
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
 		async (input) => {
 			if (!input.forkSessionId) {
@@ -113,7 +135,7 @@ export function useAgentSessionLauncher({
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
 				// no bind-wait race vs. the launching shell.
-				const result = await runAgent.mutateAsync({
+				const result = await runAgent({
 					workspaceId,
 					colors: terminalQueryColors(appearance.theme),
 					agent: input.configId,
@@ -146,7 +168,17 @@ export function useAgentSessionLauncher({
 					titleOverride: result.label,
 					data: { terminalId } as TerminalPaneData,
 				};
-				if (input.placement === "split-pane" && state.activeTabId) {
+				const beside = input.besidePaneId
+					? state.getPane(input.besidePaneId)
+					: null;
+				if (input.placement === "split-pane" && beside) {
+					state.splitPane({
+						tabId: beside.tabId,
+						paneId: beside.pane.id,
+						position: "right",
+						newPane: pane,
+					});
+				} else if (input.placement === "split-pane" && state.activeTabId) {
 					state.addPane({ tabId: state.activeTabId, pane });
 				} else {
 					state.addTab({ panes: [pane] });
@@ -178,5 +210,10 @@ export function useAgentSessionLauncher({
 		[store],
 	);
 
-	return { createNewAgentSession, openAgentChat, focusAgentTerminal };
+	return {
+		createNewAgentSession,
+		openAgentChat,
+		openNewChat,
+		focusAgentTerminal,
+	};
 }

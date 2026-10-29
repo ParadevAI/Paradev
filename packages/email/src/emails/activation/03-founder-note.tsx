@@ -18,23 +18,19 @@ export function ActivationNudge2({
 	return (
 		<Html>
 			<Head />
-			<Preview>quick question from a Superset founder</Preview>
+			<Preview>
+				Looks like you signed up last week but haven&apos;t started a workspace
+				yet.
+			</Preview>
 			<Body style={{ margin: 0, backgroundColor: "#FFFFFF" }}>
-				<Text style={paragraph}>Hi {userName},</Text>
+				<Text style={paragraph}>Hey {userName},</Text>
 				<Text style={paragraph}>
-					I&apos;m Kiet, one of the founders of Superset. I saw you signed up
-					last week but it doesn&apos;t look like you&apos;ve gotten a workspace
-					running yet.
+					I&apos;m Kiet, one of the founders of Paradev. Looks like you signed
+					up last week but haven&apos;t started a workspace yet.
 				</Text>
 				<Text style={paragraph}>
-					No worries at all, I&apos;m just trying to understand where people get
-					stuck. Was it the download? Setup? Not wanting to point an agent at
-					your repo yet? Just busy?
-				</Text>
-				<Text style={paragraph}>
-					Even a one-word reply helps: download, setup, trust, or busy. And if
-					you hit something broken, tell me and I&apos;ll get it fixed this
-					week.
+					Did something break? Even one word helps: download, setup, trust, or
+					busy.
 				</Text>
 				<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
 			</Body>

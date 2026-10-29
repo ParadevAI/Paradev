@@ -3,7 +3,7 @@ description: Create a task, workspace, and start an AI agent session to work on 
 allowed-tools: mcp__superset__create_task, mcp__superset__list_members, mcp__superset__list_devices, mcp__superset__list_projects, mcp__superset__create_workspace, mcp__superset__start_agent_session, Bash(git config user.email)
 ---
 
-Create a new task in Superset, spin up a workspace, and start an AI agent session to work on it.
+Create a new task in Paradev, spin up a workspace, and start an AI agent session to work on it.
 
 ## Input
 

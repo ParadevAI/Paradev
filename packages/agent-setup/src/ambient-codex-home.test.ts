@@ -41,7 +41,7 @@ describe("resolveAmbientCodexHome", () => {
 		expect(resolveAmbientCodexHome(HOME)).toBe("/home/tester/my-codex");
 	});
 
-	it("ignores Superset's own injected value", () => {
+	it("ignores Paradev's own injected value", () => {
 		// Every Superset terminal and agent launch exports the selected account
 		// as CODEX_HOME. A host-service (or any tool) started from such a
 		// terminal inherits it; trusting it would make the selected profile

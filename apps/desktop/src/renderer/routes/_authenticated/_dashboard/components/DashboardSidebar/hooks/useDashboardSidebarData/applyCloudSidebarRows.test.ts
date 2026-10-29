@@ -15,6 +15,7 @@ const builtCloud = makeWorkspace({
 	hostType: "remote-device",
 	hostIsOnline: false,
 	isPinned: true,
+	accentColor: "#3b82f6",
 });
 const cloudRow = makeWorkspace({
 	id: "c1",
@@ -58,6 +59,7 @@ describe("applyCloudSidebarRows", () => {
 			...cloudRow,
 			projectId: builtCloud.projectId,
 			isPinned: true,
+			accentColor: "#3b82f6",
 			pendingTransaction: null,
 		});
 		expect(project?.kind).toBeUndefined();

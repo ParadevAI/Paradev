@@ -37,10 +37,20 @@ export type TaskTimelineEvent = {
 			to: TaskProjectValue | null;
 	  }
 	| {
+			kind: "channel";
+			from: TaskChannelValue | null;
+			to: TaskChannelValue | null;
+	  }
+	| {
 			kind: "workspace_linked" | "workspace_unlinked";
 			workspace: { id: string; name: string };
 	  }
 );
+
+export interface TaskChannelValue {
+	id: string;
+	name: string;
+}
 
 export interface NewTaskComment {
 	body: string;

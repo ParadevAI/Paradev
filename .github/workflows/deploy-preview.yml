@@ -152,19 +152,24 @@ jobs:
           R2_PUBLIC_BUCKET: superset-public-dev
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
           USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           USERCONTENT_TOKEN_SECRET: ${{ secrets.USERCONTENT_TOKEN_SECRET_DEV }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          AGENT_TURN_SIGNING_SECRET: ${{ secrets.AGENT_TURN_SIGNING_SECRET }}
+          AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
           CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_TEMP_CLIENT_ID: ${{ secrets.GOOGLE_TEMP_CLIENT_ID }}
-          GOOGLE_TEMP_CLIENT_SECRET: ${{ secrets.GOOGLE_TEMP_CLIENT_SECRET }}
+          GOOGLE_CONNECTIONS_CLIENT_ID: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_ID }}
+          GOOGLE_CONNECTIONS_CLIENT_SECRET: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_SECRET }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           NEXT_PUBLIC_SENTRY_DSN_API: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_API }}
@@ -179,6 +184,7 @@ jobs:
           LEADERBOARD_INTERNAL_TOKEN: ${{ secrets.LEADERBOARD_INTERNAL_TOKEN }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           LINEAR_CLIENT_ID: ${{ secrets.LINEAR_CLIENT_ID }}
           LINEAR_CLIENT_SECRET: ${{ secrets.LINEAR_CLIENT_SECRET }}
           LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
@@ -229,19 +235,24 @@ jobs:
             --env R2_PUBLIC_BUCKET=$R2_PUBLIC_BUCKET \
             --env R2_ENDPOINT=$R2_ENDPOINT \
             --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
             --env STATIC_URL=$STATIC_URL \
             --env USERCONTENT_TOKEN_SECRET=$USERCONTENT_TOKEN_SECRET \
+            --env AGENT_WORKER_SECRET=$AGENT_WORKER_SECRET \
+            --env AGENT_TURN_SIGNING_SECRET=$AGENT_TURN_SIGNING_SECRET \
+            --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
             --env GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
-            --env GOOGLE_TEMP_CLIENT_ID=$GOOGLE_TEMP_CLIENT_ID \
-            --env GOOGLE_TEMP_CLIENT_SECRET=$GOOGLE_TEMP_CLIENT_SECRET \
+            --env GOOGLE_CONNECTIONS_CLIENT_ID=$GOOGLE_CONNECTIONS_CLIENT_ID \
+            --env GOOGLE_CONNECTIONS_CLIENT_SECRET=$GOOGLE_CONNECTIONS_CLIENT_SECRET \
             --env GH_CLIENT_ID=$GH_CLIENT_ID \
             --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET \
             --env NEXT_PUBLIC_SENTRY_DSN_API=$NEXT_PUBLIC_SENTRY_DSN_API \
@@ -256,6 +267,7 @@ jobs:
             --env LEADERBOARD_INTERNAL_TOKEN=$LEADERBOARD_INTERNAL_TOKEN \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env LINEAR_CLIENT_ID=$LINEAR_CLIENT_ID \
             --env LINEAR_CLIENT_SECRET=$LINEAR_CLIENT_SECRET \
             --env LINEAR_WEBHOOK_SECRET=$LINEAR_WEBHOOK_SECRET \
@@ -368,11 +380,13 @@ jobs:
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           NEXT_PUBLIC_DOCS_URL: https://${{ env.DOCS_ALIAS }}
           NEXT_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
           NEXT_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
           USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
@@ -384,6 +398,7 @@ jobs:
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
@@ -393,6 +408,7 @@ jobs:
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -403,11 +419,13 @@ jobs:
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_DOCS_URL=$NEXT_PUBLIC_DOCS_URL \
             --env NEXT_PUBLIC_RELAY_URL=$NEXT_PUBLIC_RELAY_URL \
             --env NEXT_PUBLIC_REALTIME_URL=$NEXT_PUBLIC_REALTIME_URL \
             --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
             --env STATIC_URL=$STATIC_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
@@ -418,6 +436,7 @@ jobs:
             --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
             --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
             --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
@@ -483,14 +502,8 @@ jobs:
       - name: Install Vercel CLI
         run: bun add --global vercel@$VERCEL_CLI_VERSION
 
-      # Production deploys on main write this cache; a PR only reads it.
-      - name: Restore Next.js build cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: apps/marketing/.next/cache
-          key: next-marketing-${{ github.sha }}
-          restore-keys: next-marketing-
-
+      # No .next/cache step here: a Turbopack cache from another commit
+      # shipped a stale globals.css to production (#8697)
       - name: Build and Deploy Marketing
         id: deploy
         env:
@@ -502,6 +515,7 @@ jobs:
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
@@ -512,8 +526,10 @@ jobs:
           KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
           LEADERBOARD_INTERNAL_TOKEN: ${{ secrets.LEADERBOARD_INTERNAL_TOKEN }}
+          POSTHOG_PROJECT_SECRET_KEY: ${{ secrets.POSTHOG_PROJECT_SECRET_KEY }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
@@ -522,6 +538,7 @@ jobs:
           SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
+          AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -532,6 +549,7 @@ jobs:
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
@@ -541,8 +559,10 @@ jobs:
             --env KV_REST_API_URL=$KV_REST_API_URL \
             --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
             --env LEADERBOARD_INTERNAL_TOKEN=$LEADERBOARD_INTERNAL_TOKEN \
+            --env POSTHOG_PROJECT_SECRET_KEY=$POSTHOG_PROJECT_SECRET_KEY \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
             --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
             --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
@@ -550,6 +570,7 @@ jobs:
             --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
             --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
+            --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY)
           vercel alias $VERCEL_URL ${{ env.MARKETING_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
           echo "vercel_url=$VERCEL_URL" >> $GITHUB_OUTPUT
@@ -645,6 +666,7 @@ jobs:
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_DOCS: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_DOCS }}

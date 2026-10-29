@@ -20,11 +20,14 @@ function readSavedModes(): SavedModes {
 	}
 }
 
+const NEVER_STARTING_MODES = new Set(["plan"]);
+
 export function withSavedMode(
 	saved: SavedModes,
 	presetId: string,
 	modeId: string,
 ): SavedModes {
+	if (NEVER_STARTING_MODES.has(modeId)) return saved;
 	const { [presetId]: _previous, ...rest } = saved;
 	return Object.fromEntries(
 		Object.entries({ ...rest, [presetId]: modeId }).slice(-MAX_AGENTS),

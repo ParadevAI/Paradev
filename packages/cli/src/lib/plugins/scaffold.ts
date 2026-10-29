@@ -58,6 +58,12 @@ acting, and what to do when the obvious answer is wrong.
 `;
 }
 
+function marketplaceCategory(category: string): string {
+	return category === "Developer tools"
+		? "development"
+		: category.toLowerCase();
+}
+
 export interface ScaffoldResult {
 	dir: string;
 	files: string[];
@@ -101,10 +107,11 @@ export function scaffoldPlugin(
 		files.push(relative);
 	};
 
+	const category = options.category ?? "Developer tools";
 	const extension: Record<string, unknown> = {
 		interface: {
 			displayName: display,
-			category: options.category ?? "Developer tools",
+			category,
 			icon: name,
 		},
 	};
@@ -128,25 +135,12 @@ export function scaffoldPlugin(
 		name,
 		version: "0.1.0",
 		description,
-		author: { name: ctx.marketplace.owner?.name ?? "Superset" },
+		author: { name: ctx.marketplace.owner?.name ?? "Paradev" },
 		license: "MIT",
 		extensions: { [SUPERSET_EXTENSION]: extension },
 	};
 	writeJson(path.join(dir, "plugin.json"), manifest);
 	files.push("plugin.json");
-
-	const pkg: Record<string, unknown> = {
-		name: `@superset-plugins/${name}`,
-		version: "0.1.0",
-		private: true,
-		type: "module",
-		scripts: {
-			publish: `superset plugins publish ${name}`,
-			check: `superset plugins validate plugins/${name}`,
-		},
-	};
-	writeJson(path.join(dir, "package.json"), pkg);
-	files.push("package.json");
 
 	if (options.skills) {
 		add(
@@ -158,8 +152,8 @@ export function scaffoldPlugin(
 	ctx.marketplace.plugins.push({
 		name,
 		description,
-		author: { name: ctx.marketplace.owner?.name ?? "Superset" },
-		category: (options.category ?? "development").toLowerCase(),
+		author: { name: ctx.marketplace.owner?.name ?? "Paradev" },
+		category: marketplaceCategory(category),
 		source: `./plugins/${name}`,
 	});
 	writeJson(ctx.file, ctx.marketplace);

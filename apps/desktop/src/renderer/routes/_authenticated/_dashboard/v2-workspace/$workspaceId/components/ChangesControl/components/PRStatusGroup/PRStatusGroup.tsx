@@ -12,53 +12,58 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@superset/ui/hover-card";
-import { toast } from "@superset/ui/sonner";
+import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { LuArrowUpRight } from "react-icons/lu";
 import {
 	VscChevronDown,
+	VscGitCommit,
 	VscGitMerge,
 	VscGitPullRequest,
 	VscLoading,
+	VscRepoPush,
 } from "react-icons/vsc";
+import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import {
-	type PullRequestRef,
-	pullRequestRefFromUrl,
-} from "renderer/lib/github/pullRequestRef";
+	type OpenPullRequestPane,
+	openPullRequestLink,
+} from "renderer/lib/github/openPullRequestLink";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
+import { usePullRequestActions } from "../../../../hooks/usePullRequestActions";
+import { useShipActions } from "../../../../hooks/useShipActions";
 import type { PRFlowState } from "../../../../utils/getPRFlowState";
+import { CommitForm } from "../../../CommitForm";
+import { PRStatusIndicators } from "../../../PRStatusIndicators";
 import { PRDetailCard } from "./components/PRDetailCard";
-import { PRStatusIndicators } from "./components/PRStatusIndicators";
 
 interface PRStatusGroupProps {
 	state: PRFlowState;
 	workspaceId: string;
 	onRefresh?: () => void;
 	/** Whether a Changes pane is in view — the face reads as pressed. */
-	isChangesOpen?: boolean;
+	isChangesOpen: boolean;
 	/** Accessible name for the face's toggle ("Open changes" / "Close changes"). */
-	toggleLabel?: string;
+	toggleLabel: string;
 	/**
 	 * Toggles the Changes pane — the badge's main click, since it replaced
 	 * the diff-stat pill as the control's face once a PR exists.
 	 */
-	onToggleChanges?: () => void;
+	onToggleChanges: () => void;
 	/** Opens the PR's summary pane in the workspace (the menu's "Open pull request"). */
-	onOpenPullRequest: (ref: PullRequestRef) => void;
-	paneAreaStyle?: boolean;
+	onOpenPullRequest: OpenPullRequestPane;
 }
 
 /**
  * Tab-bar PR badge — status icon + number + compact CI/review indicators,
- * with a dropdown for merge actions (open, non-draft PRs), marking a draft
- * ready for review, the PR summary pane, and a GitHub link.
- * Clicking the badge toggles the Changes pane; the PR pane lives in the
- * menu (hidden for session workspaces, since the PR
- * content query is project-scoped). Hovering surfaces a rich detail popover (title,
+ * with a dropdown for committing and pushing work the PR doesn't have yet,
+ * merge actions (open, non-draft PRs), marking a draft ready for review, the
+ * PR summary pane, and a GitHub link.
+ * Clicking the badge toggles the Changes pane. Hovering surfaces a rich detail popover (title,
  * branch, CI summary, last activity).
  *
  * Indicators are suppressed past `open`/`queued` since post-merge CI/review
@@ -68,14 +73,15 @@ export function PRStatusGroup({
 	state,
 	workspaceId,
 	onRefresh,
-	isChangesOpen = false,
+	isChangesOpen,
 	toggleLabel,
 	onToggleChanges,
 	onOpenPullRequest,
-	paneAreaStyle = false,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
+	const organizationId = useActiveOrganizationId();
+	const linkPolicy = usePullRequestLinkPolicy();
 	const isSession = workspace.type === "session";
 	const pr =
 		state.kind === "pr-exists"
@@ -84,84 +90,31 @@ export function PRStatusGroup({
 				? state.pr
 				: null;
 
-	// Triggers a GitHub→host-service-DB sync for this workspace's PR. Without
-	// this, post-merge UI state lags by up to ~30s waiting for the next
-	// background sync tick. Called after a successful merge before refetching
-	// the local query.
-	const refreshPRMutation =
-		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
-
-	const mergePRMutation = workspaceTrpc.github.mergePR.useMutation({
-		onMutate: () => {
-			const toastId = toast.loading(t({ message: "Merging PR..." }));
-			return { toastId };
-		},
-		onSuccess: async (_data, _variables, context) => {
-			toast.success(t({ message: "PR merged" }), { id: context?.toastId });
-			try {
-				await refreshPRMutation.mutateAsync({ workspaceIds: [workspaceId] });
-			} catch (error) {
-				console.warn("Failed to refresh PR state after merge", error);
-				toast.warning(
-					t({
-						message:
-							"Merged, but couldn't refresh PR state — try again in a moment",
-					}),
-				);
-			} finally {
-				onRefresh?.();
+	const target: PullRequestTarget | null = pr
+		? {
+				organizationId,
+				repoFullName: `${pr.repoOwner}/${pr.repoName}`,
+				prNumber: pr.number,
 			}
-		},
-		onError: (error, _variables, context) => {
-			toast.error(
-				t({
-					message: `Merge failed: ${error.message}`,
-				}),
-				{ id: context?.toastId },
-			);
-		},
-	});
+		: null;
+	const prActions = usePullRequestActions({ workspaceId, target, onRefresh });
 
-	const markReadyMutation =
-		workspaceTrpc.github.markPullRequestReady.useMutation({
-			onMutate: () => {
-				const toastId = toast.loading(
-					t({
-						message: "Marking ready for review...",
-					}),
-				);
-				return { toastId };
-			},
-			onSuccess: async (_data, _variables, context) => {
-				toast.success(
-					t({
-						message: "PR ready for review",
-					}),
-					{ id: context?.toastId },
-				);
-				try {
-					await refreshPRMutation.mutateAsync({ workspaceIds: [workspaceId] });
-				} catch (error) {
-					console.warn("Failed to refresh PR state after marking ready", error);
-					toast.warning(
-						t({
-							message:
-								"Marked ready, but couldn't refresh PR state — try again in a moment",
-						}),
-					);
-				} finally {
-					onRefresh?.();
-				}
-			},
-			onError: (error, _variables, context) => {
-				toast.error(
-					t({
-						message: `Ready for review failed: ${error.message}`,
-					}),
-					{ id: context?.toastId },
-				);
-			},
-		});
+	const sync = state.kind === "pr-exists" ? state.sync : null;
+	const canCommit = sync?.hasUncommitted === true;
+	const canPush = sync != null && (!sync.hasUpstream || sync.pushCount > 0);
+	const [isCommitFormOpen, setIsCommitFormOpen] = useState(false);
+	// The menu reclaims focus through its exit animation, so a popover opened
+	// from the item's click would lose focus and close. Open it once the menu
+	// has finished closing.
+	const commitRequestedRef = useRef(false);
+	const shipActions = useShipActions({
+		workspaceId,
+		onRefresh: () => onRefresh?.(),
+		isPrFormOpen: false,
+		onCommitted: () => setIsCommitFormOpen(false),
+		onPrCreated: () => {},
+		enabled: false,
+	});
 
 	const checks = useMemo(
 		() => (pr ? computeChecksRollup(pr.checks) : null),
@@ -186,30 +139,21 @@ export function PRStatusGroup({
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
-	const handleMerge = (mergeMethod: "merge" | "squash" | "rebase") => {
-		mergePRMutation.mutate({
-			owner: pr.repoOwner,
-			repo: pr.repoName,
-			pullNumber: pr.number,
-			mergeMethod,
-		});
-	};
-
-	const tint = paneAreaStyle ? NEUTRAL_TINT : stateTintClasses(linkState);
-	const menuItemClass = paneAreaStyle ? undefined : "text-xs";
-	const menuIconClass = paneAreaStyle ? "size-4" : "size-3.5";
+	const isBusy =
+		prActions.isMerging ||
+		prActions.isMarkingReady ||
+		shipActions.isCommitting ||
+		shipActions.isPushing;
+	const tint = stateTintClasses(linkState);
 
 	const badgeContent = (
 		<>
-			<PRIcon
-				state={linkState}
-				className={paneAreaStyle ? "size-3.5" : "size-4"}
-			/>
+			<PRIcon state={linkState} className="size-4" />
 			{/* The number brightens while pressed — the state tint alone moves
 			    the fill too little to read as a toggle. */}
 			<span
 				className={cn(
-					paneAreaStyle ? "text-xs tabular-nums" : "font-mono text-xs",
+					"font-mono text-xs",
 					isChangesOpen ? "text-foreground" : "text-muted-foreground",
 				)}
 			>
@@ -219,8 +163,7 @@ export function PRStatusGroup({
 		</>
 	);
 	const badgeClass = cn(
-		"flex h-full items-center outline-none transition-colors",
-		paneAreaStyle ? "gap-1.5 px-2" : "gap-1 px-1.5",
+		"flex h-full items-center gap-1 px-1.5 outline-none transition-colors",
 		tint.hover,
 		isChangesOpen && tint.pressed,
 	);
@@ -228,168 +171,184 @@ export function PRStatusGroup({
 	return (
 		// A segment of ChangesControl's split button — the parent owns the
 		// border and rounding; the state tint lives in this segment's fill.
-		<div
-			className={cn("flex items-center", tint.container)}
-			aria-busy={mergePRMutation.isPending || markReadyMutation.isPending}
+		<Popover
+			open={isCommitFormOpen}
+			onOpenChange={(open) => {
+				if (!open) setIsCommitFormOpen(false);
+			}}
 		>
-			<HoverCard openDelay={150} closeDelay={120}>
-				<HoverCardTrigger asChild>
-					{/* The face toggles the Changes pane — the badge replaced the
-					    diff-stat pill, so its click keeps that pill's job; the PR
-					    pane is one menu entry (or the hover card) away. */}
-					{onToggleChanges != null ? (
-						<button
-							type="button"
-							className={badgeClass}
-							aria-pressed={isChangesOpen}
-							// The visible text is only the PR number; name the action
-							// and keep the number so the badge is still identifiable.
-							aria-label={
-								toggleLabel ? `${toggleLabel}, #${pr.number}` : undefined
-							}
-							onClick={onToggleChanges}
-						>
-							{badgeContent}
-						</button>
-					) : (
-						<a
-							href={pr.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							className={badgeClass}
-						>
-							{badgeContent}
-						</a>
-					)}
-				</HoverCardTrigger>
-				<HoverCardContent
-					align="end"
-					sideOffset={8}
-					className="w-80 overflow-hidden p-0"
+			<PopoverAnchor asChild>
+				<div
+					className={cn("flex items-center", tint.container)}
+					aria-busy={isBusy}
 				>
-					<PRDetailCard pr={pr} checks={checks} linkState={linkState} />
-				</HoverCardContent>
-			</HoverCard>
+					<HoverCard openDelay={150} closeDelay={120}>
+						<HoverCardTrigger asChild>
+							<button
+								type="button"
+								className={badgeClass}
+								aria-pressed={isChangesOpen}
+								// The visible text is only the PR number; name the action
+								// and keep the number so the badge is still identifiable.
+								aria-label={`${toggleLabel}, #${pr.number}`}
+								onClick={onToggleChanges}
+							>
+								{badgeContent}
+							</button>
+						</HoverCardTrigger>
+						<HoverCardContent
+							align="end"
+							sideOffset={8}
+							className="w-80 overflow-hidden p-0"
+						>
+							<PRDetailCard pr={pr} checks={checks} linkState={linkState} />
+						</HoverCardContent>
+					</HoverCard>
 
-			<div className={cn("h-full w-px", tint.divider)} />
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<button
-						type="button"
-						className={cn(
-							"flex h-full items-center outline-none transition-colors",
-							paneAreaStyle ? "w-7 justify-center" : "px-1",
-							tint.hover,
-						)}
-						disabled={mergePRMutation.isPending || markReadyMutation.isPending}
-						aria-label={
-							mergePRMutation.isPending
-								? t({
-										message: "Merging pull request",
-									})
-								: t({
-										message: "Open pull request options",
-									})
-						}
-					>
-						{mergePRMutation.isPending || markReadyMutation.isPending ? (
-							<VscLoading className="size-3 animate-spin text-muted-foreground" />
-						) : (
-							<VscChevronDown className="size-3 text-muted-foreground" />
-						)}
-					</button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					align="end"
-					className={paneAreaStyle ? "w-56" : "w-44"}
-				>
-					{canMarkReady && (
-						<>
-							<DropdownMenuItem
-								className={menuItemClass}
-								disabled={markReadyMutation.isPending}
-								onClick={() =>
-									markReadyMutation.mutate({
-										owner: pr.repoOwner,
-										repo: pr.repoName,
-										pullNumber: pr.number,
-									})
+					<div className={cn("h-full w-px", tint.divider)} />
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								className={cn(
+									"flex h-full items-center outline-none transition-colors",
+									"px-1",
+									tint.hover,
+								)}
+								disabled={isBusy}
+								aria-label={
+									prActions.isMerging
+										? t({
+												message: "Merging pull request",
+											})
+										: t({
+												message: "Open pull request options",
+											})
 								}
 							>
-								<VscGitPullRequest className={menuIconClass} />
-								<Trans>Ready for review</Trans>
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-						</>
-					)}
-					{canMerge && (
-						<>
-							<DropdownMenuLabel
-								className={cn(
-									"font-normal text-muted-foreground",
-									menuItemClass,
+								{isBusy ? (
+									<VscLoading className="size-3 animate-spin text-muted-foreground" />
+								) : (
+									<VscChevronDown className="size-3 text-muted-foreground" />
 								)}
-							>
-								<Trans>Merge</Trans>
-							</DropdownMenuLabel>
-							<DropdownMenuItem
-								onClick={() => handleMerge("squash")}
-								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
-							>
-								<VscGitMerge className={menuIconClass} />
-								<Trans>Squash and merge</Trans>
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => handleMerge("merge")}
-								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
-							>
-								<VscGitMerge className={menuIconClass} />
-								<Trans>Create merge commit</Trans>
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => handleMerge("rebase")}
-								className={menuItemClass}
-								disabled={mergePRMutation.isPending}
-							>
-								<VscGitMerge className={menuIconClass} />
-								<Trans>Rebase and merge</Trans>
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-						</>
-					)}
-					{!isSession && (
-						<DropdownMenuItem
-							className={menuItemClass}
-							onClick={() => {
-								const ref = pullRequestRefFromUrl(pr.url);
-								if (ref) onOpenPullRequest(ref);
-								else window.open(pr.url, "_blank");
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-44"
+							onCloseAutoFocus={(event) => {
+								if (!commitRequestedRef.current) return;
+								commitRequestedRef.current = false;
+								event.preventDefault();
+								setIsCommitFormOpen(true);
 							}}
 						>
-							<VscGitPullRequest className={menuIconClass} />
-							<Trans>Open pull request</Trans>
-						</DropdownMenuItem>
-					)}
-					<DropdownMenuItem asChild className={menuItemClass}>
-						<a href={pr.url} target="_blank" rel="noopener noreferrer">
-							<LuArrowUpRight className={menuIconClass} />
-							<Trans>View on GitHub</Trans>
-						</a>
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
+							{(canCommit || canPush) && (
+								<>
+									{canCommit && (
+										<DropdownMenuItem
+											className="text-xs"
+											onClick={() => {
+												commitRequestedRef.current = true;
+											}}
+										>
+											<VscGitCommit className="size-3.5" />
+											<Trans>Commit</Trans>
+										</DropdownMenuItem>
+									)}
+									{canPush && (
+										<DropdownMenuItem
+											className="text-xs"
+											onClick={shipActions.push}
+										>
+											<VscRepoPush className="size-3.5" />
+											<Trans>Push</Trans>
+										</DropdownMenuItem>
+									)}
+									<DropdownMenuSeparator />
+								</>
+							)}
+							{canMarkReady && (
+								<>
+									<DropdownMenuItem
+										className="text-xs"
+										disabled={prActions.isMarkingReady}
+										onClick={prActions.markReady}
+									>
+										<VscGitPullRequest className="size-3.5" />
+										<Trans>Ready for review</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+								</>
+							)}
+							{canMerge && (
+								<>
+									<DropdownMenuLabel
+										className={cn(
+											"font-normal text-muted-foreground",
+											"text-xs",
+										)}
+									>
+										<Trans>Merge</Trans>
+									</DropdownMenuLabel>
+									<DropdownMenuItem
+										onClick={() => prActions.merge("squash")}
+										className="text-xs"
+										disabled={prActions.isMerging}
+									>
+										<VscGitMerge className="size-3.5" />
+										<Trans>Squash and merge</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => prActions.merge("merge")}
+										className="text-xs"
+										disabled={prActions.isMerging}
+									>
+										<VscGitMerge className="size-3.5" />
+										<Trans>Create merge commit</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => prActions.merge("rebase")}
+										className="text-xs"
+										disabled={prActions.isMerging}
+									>
+										<VscGitMerge className="size-3.5" />
+										<Trans>Rebase and merge</Trans>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+								</>
+							)}
+							{!isSession && (
+								<DropdownMenuItem
+									className="text-xs"
+									onClick={(event) =>
+										openPullRequestLink(
+											pr.url,
+											linkPolicy.getAction(event),
+											onOpenPullRequest,
+										)
+									}
+								>
+									<VscGitPullRequest className="size-3.5" />
+									<Trans>Open pull request</Trans>
+								</DropdownMenuItem>
+							)}
+							<DropdownMenuItem asChild className="text-xs">
+								<a href={pr.url} target="_blank" rel="noopener noreferrer">
+									<LuArrowUpRight className="size-3.5" />
+									<Trans>View on GitHub</Trans>
+								</a>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			</PopoverAnchor>
+			<PopoverContent align="end" sideOffset={8} className="w-80 p-3">
+				<CommitForm actions={shipActions} />
+			</PopoverContent>
+		</Popover>
 	);
 }
-
-const NEUTRAL_TINT = {
-	container: "",
-	hover: "hover:bg-accent/60 focus-visible:bg-accent/60",
-	pressed: "bg-accent/60",
-	divider: "bg-border/60",
-};
 
 /**
  * State-tinted styling for the PR badge segment. Mirrors the PRIcon color

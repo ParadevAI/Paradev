@@ -1,9 +1,14 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
-import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
+import {
+	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
+	supportsCloudAgentChat,
+} from "@superset/shared/cloud-agent-launch";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { acpChatEnabled } from "../../lib/acp-chat";
 import { anchorAttachments } from "../../lib/attachments";
+import { resolveMachineSize } from "../../lib/billing/plan";
 import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
@@ -15,6 +20,7 @@ import {
 	recordWorkspaceRepositories,
 	workspaceBranchName,
 } from "../../lib/sandbox";
+import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { userError } from "../../trpc";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
@@ -55,6 +61,24 @@ export async function loadUsableEnvironment(args: {
 	return environment;
 }
 
+export function machineSizeNotAvailable(name: string | undefined) {
+	return userError({
+		code: "BAD_REQUEST",
+		message: `Machine size "${name}" is not available for this organization`,
+		i18nKey: "serverError.cloudWorkspace.machineSizeNotAvailable",
+	});
+}
+
+export async function assertMachineSizeOffered(
+	organizationId: string,
+	name: string | null | undefined,
+): Promise<void> {
+	if (!name) return;
+	if (!(await resolveMachineSize(organizationId, name))) {
+		throw machineSizeNotAvailable(name);
+	}
+}
+
 /**
  * Records a cloud workspace and hands the sandbox off to a background job.
  *
@@ -81,14 +105,17 @@ export async function startCloudWorkspace(args: {
 	launch?: CloudAgentLaunch;
 	taskIds?: string[];
 	attachmentFileIds?: string[];
+	machineSize?: string;
+	beforeProvision?: (workspaceId: string) => Promise<void>;
 }) {
-	// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
-	const openAsChat =
-		args.launch?.agent === "claude"
-			? acpChatEnabled(args.userId)
-			: Promise.resolve(false);
+	const openAsChat = supportsCloudAgentChat(args.launch?.agent)
+		? acpChatEnabled(args.userId)
+		: Promise.resolve(false);
 	const environment = await loadUsableEnvironment(args);
-	await assertMayBoot(args.organizationId);
+	const size = await resolveMachineSize(args.organizationId, args.machineSize);
+	if (!size) throw machineSizeNotAvailable(args.machineSize);
+	const machineSize = size.name;
+	await assertMayBoot(args.organizationId, size.vcpus);
 
 	// A workspace is started from an environment, and the environment's
 	// repositories are its checkouts.
@@ -103,7 +130,7 @@ export async function startCloudWorkspace(args: {
 	}
 	const primary = primaryRepository(
 		repositories,
-		environment.hooksRepositoryId,
+		environment.primaryRepositoryId,
 	) as (typeof repositories)[number];
 	const branch = args.branch ?? primary.defaultBranch;
 	// A connected person's workspace acts as them on GitHub, so a
@@ -136,6 +163,7 @@ export async function startCloudWorkspace(args: {
 			id,
 			organizationId: args.organizationId,
 			name,
+			machineSize,
 			branch: workspaceBranchName({ id, name }),
 			baseBranch: branch,
 			provider: "vercel",
@@ -192,16 +220,31 @@ export async function startCloudWorkspace(args: {
 		...(args.name ? {} : { namingPrompt: args.prompt ?? "" }),
 		...(args.launch
 			? {
-					launch: (await openAsChat)
-						? { ...args.launch, surface: "chat" as const }
-						: args.launch,
+					launch: {
+						...args.launch,
+						surface: (await openAsChat) ? ("chat" as const) : undefined,
+					},
 				}
 			: {}),
 	};
 
+	pushWorkspaceAccess(row.organizationId, row.id);
+	try {
+		await args.beforeProvision?.(row.id);
+	} catch (error) {
+		await transitionCloudWorkspace({
+			id: row.id,
+			from: ["provisioning"],
+			to: "deleted",
+		});
+		throw error;
+	}
 	nudge(row.organizationId, "cloud_workspaces");
 	await queueProvision(job);
-	return row;
+	return {
+		...row,
+		initialLaunch: await describeCloudAgentLaunch(job.launch),
+	};
 }
 
 /**

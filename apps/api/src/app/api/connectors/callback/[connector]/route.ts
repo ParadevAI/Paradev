@@ -52,10 +52,13 @@ export async function GET(
 		stateInCookieOnly: method.type === "app_install",
 	});
 	if (callback instanceof Response) return callback;
-	const web = (query: string) => callback.exit(`${connectUrl}${query}`);
+	const carried = verifySignedState(callback.state, connectorStateSchema);
+	const returnUrl = carried?.plugin
+		? `${env.NEXT_PUBLIC_WEB_URL}/plugins/${encodeURIComponent(carried.plugin)}`
+		: connectUrl;
+	const web = (query: string) => callback.exit(`${returnUrl}${query}`);
 
 	try {
-		const carried = verifySignedState(callback.state, connectorStateSchema);
 		const codeVerifier = carried?.codeVerifier
 			? await decryptSecret(carried.codeVerifier)
 			: null;

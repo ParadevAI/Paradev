@@ -2,6 +2,8 @@ export type BillingRole = "owner" | "admin" | "member";
 
 export const ROUTE_ROLES = {
 	attach: ["owner"],
+	buyGbHours: ["owner"],
+	setAutoTopup: ["owner"],
 	updateSubscription: ["owner"],
 	openCustomerPortal: ["owner"],
 	previewAttach: ["owner", "admin"],
@@ -25,21 +27,15 @@ export const ADMIN_EXPAND = [
 	"balances.feature",
 ] as const;
 
-const SELF_SERVE_PLAN_IDS: ReadonlySet<string> = new Set(["pro", "pro_annual"]);
-
-export function selfServePlan(planId: string): boolean {
-	return SELF_SERVE_PLAN_IDS.has(planId);
-}
-
 export function checkoutSessionParams(args: {
-	planId: string;
+	yearly: boolean;
 	organizationId: string;
 	userId: string;
 	cancelUrl?: string;
 }): Record<string, unknown> {
 	return {
 		...(args.cancelUrl ? { cancel_url: args.cancelUrl } : {}),
-		allow_promotion_codes: !args.planId.endsWith("_annual"),
+		allow_promotion_codes: !args.yearly,
 		billing_address_collection: "required",
 		tax_id_collection: { enabled: true },
 		customer_update: { name: "auto", address: "auto" },
@@ -52,3 +48,5 @@ export function checkoutSessionParams(args: {
 		},
 	};
 }
+
+/** Auto top-ups allowed per month, so a runaway workload cannot buy without bound. */

@@ -6,7 +6,7 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { DurableEnvelope, UserMessage } from "@superset/chat/protocol";
-import { isDurableEnvelope } from "@superset/chat/protocol";
+import { isDurableEnvelope, wrapHiddenText } from "@superset/chat/protocol";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import {
@@ -117,6 +117,70 @@ describe("LiveSession", () => {
 		expect(snapshot.items.get(result.itemId)?.turnId).toBe("t1");
 		expect(snapshot.items.size).toBe(2);
 		expect(snapshot.session?.status).toBe("idle");
+		await runtime.dispose();
+	});
+
+	test("sends a hidden part to the agent but keeps it off the user message", async () => {
+		const { runtime, sessionId, adapters } =
+			startSessionWithAdapters(SINGLE_TURN);
+		const visible = { type: "text", text: "@mcp/linear list issues" } as const;
+		const hint = { type: "text", text: "MCP context", hidden: true } as const;
+		const result = runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-hint",
+			content: [visible, hint],
+		});
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		expect(adapters[0]?.prompted).toEqual([
+			[visible, { type: "text", text: wrapHiddenText("MCP context") }],
+		]);
+		const prompts = userMessages(journalEnvelopes(runtime, sessionId));
+		expect(prompts.map((prompt) => prompt.item.id)).toContain(result.itemId);
+		for (const prompt of prompts)
+			expect(prompt.item.content).toEqual([visible]);
+		await runtime.dispose();
+	});
+
+	test("says so when a prompted turn ends without showing anything", async () => {
+		const { runtime, sessionId } = startSession({
+			start: [
+				{ kind: "turn", turn: turn("t0") },
+				{
+					kind: "turn",
+					turn: turn("t0", { status: "completed", completedAtMs: 1 }),
+				},
+			],
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{
+						kind: "turn",
+						turn: turn("t1", { status: "completed", completedAtMs: 2 }),
+					},
+					{ kind: "session", session: { status: "idle" } },
+				],
+			],
+		});
+		await waitFor(
+			() => runtime.live.require(sessionId).turn?.status === "completed",
+		);
+		sendPrompt(runtime, sessionId, "hello");
+		await waitFor(() => runtime.live.require(sessionId).turn?.id === "t1");
+		await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+
+		const notices = journalEnvelopes(runtime, sessionId).flatMap((envelope) =>
+			envelope.event.type === "item" && envelope.event.item.kind === "notice"
+				? [{ turnId: envelope.event.turnId, item: envelope.event.item }]
+				: [],
+		);
+		expect(notices).toHaveLength(1);
+		expect(notices[0]).toMatchObject({
+			turnId: "t1",
+			item: { noticeKind: "error" },
+		});
 		await runtime.dispose();
 	});
 
@@ -615,6 +679,67 @@ describe("LiveSession", () => {
 			third.itemId,
 		]);
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
+		await runtime.dispose();
+	});
+
+	test("a turn reported again does not deliver the next queued prompt early", async () => {
+		const quick = (id: string, completedAtMs: number) => [
+			{ kind: "turn" as const, turn: turn(id) },
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+				delayMs: 30,
+			},
+			{
+				kind: "turn" as const,
+				turn: turn(id, { status: "completed", completedAtMs }),
+			},
+			{ kind: "session" as const, session: { status: "idle" as const } },
+		];
+		const { runtime, sessionId } = startSession({
+			turns: [quick("t1", 2), quick("t2", 4), quick("t3", 6)],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t3")?.status === "completed",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t2");
+		expect(snapshot.items.get(third.itemId)?.turnId).toBe("t3");
+		await runtime.dispose();
+	});
+
+	test("updateQueuedPrompt rewrites a queued prompt without losing its place", async () => {
+		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+
+		runtime.commands.updateQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: second.itemId,
+			content: [{ type: "text", text: "second, revised" }],
+		});
+
+		const snapshot = reduceMany(
+			emptySnapshot(),
+			journalEnvelopes(runtime, sessionId),
+		);
+		expect(snapshot.items.get(second.itemId)?.item).toMatchObject({
+			queued: true,
+			content: [{ type: "text", text: "second, revised" }],
+		});
+		expect(deriveQueuedPrompts(snapshot).map((item) => item.id)).toEqual([
+			second.itemId,
+			third.itemId,
+		]);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
 		await runtime.dispose();
 	});
 

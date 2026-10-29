@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import { buildTerminalSessionHandoffPrompt } from "@superset/shared/terminal-session-handoff";
+import { buildTerminalSessionHandoffPrompt } from "@superset/shared/session-handoff";
 import { Button } from "@superset/ui/button";
 import {
 	Dialog,
@@ -26,6 +26,12 @@ import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminal
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
+import type {
+	SurfaceForkPlacement,
+	SurfaceForkSource,
+} from "../../../../../../hooks/useSurfaceFork";
+import { useSurfaceForkSource } from "../../../../../../hooks/useSurfaceForkSource";
+import { SurfaceModeMenu } from "../../../../../SurfaceModeMenu";
 import { resolveDefaultTargetConfigId } from "./resolveDefaultTargetConfigId";
 
 type Placement = "split-pane" | "new-tab";
@@ -48,17 +54,26 @@ interface TerminalSessionHandoffMenuProps {
 		prompt: string;
 		forkSessionId?: string;
 	}) => Promise<{ terminalId: string } | null>;
+	onForkIntoOtherSurface: (
+		source: SurfaceForkSource,
+		placement: SurfaceForkPlacement,
+	) => void;
 }
 
 export function TerminalSessionHandoffMenu({
 	workspaceId,
 	terminalId,
 	onCreateNewAgentSession,
+	onForkIntoOtherSurface,
 }: TerminalSessionHandoffMenuProps) {
 	const { formatNumber } = useFormat();
 
 	const { t } = useLingui();
 	const binding = useTerminalAgentBinding(workspaceId, terminalId);
+	const surfaceFork = useSurfaceForkSource(workspaceId, {
+		kind: "terminal",
+		data: { terminalId },
+	});
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const { data: configs = [] } = useV2AgentConfigs(hostUrl);
 	const trpcUtils = workspaceTrpc.useUtils();
@@ -174,43 +189,61 @@ export function TerminalSessionHandoffMenu({
 			<Trans>Continue with another agent</Trans>
 		);
 
+	const continueItem = (
+		<DropdownMenuItem onSelect={() => openAction("handoff")}>
+			<Bot />
+			<Trans>Continue with another agent…</Trans>
+		</DropdownMenuItem>
+	);
+	const forkItem = (
+		<DropdownMenuItem disabled={!canFork} onSelect={() => openAction("fork")}>
+			<GitFork />
+			<Trans>Fork session…</Trans>
+		</DropdownMenuItem>
+	);
+
 	return (
 		<>
-			<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Continue or fork session",
-								})}
-								className="hidden rounded p-1 text-muted-foreground/60 transition-colors hover:text-muted-foreground @min-[200px]/pane-header:block"
-							>
-								<GitFork className="size-3.5" />
-							</button>
-						</DropdownMenuTrigger>
-					</TooltipTrigger>
-					<TooltipContent side="bottom">
-						<Trans>Continue or fork session</Trans>
-					</TooltipContent>
-				</Tooltip>
-				<DropdownMenuContent align="end" className="w-64">
-					<DropdownMenuItem onSelect={() => openAction("handoff")}>
-						<Bot />
-						<Trans>Continue with another agent…</Trans>
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						disabled={!canFork}
-						onSelect={() => openAction("fork")}
-					>
-						<GitFork />
-						<Trans>Fork session…</Trans>
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			{surfaceFork.enabled ? (
+				<SurfaceModeMenu
+					mode="cli"
+					source={surfaceFork.source}
+					onFork={onForkIntoOtherSurface}
+					open={menuOpen}
+					onOpenChange={setMenuOpen}
+				>
+					{forkItem}
+					{continueItem}
+				</SurfaceModeMenu>
+			) : (
+				<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<DropdownMenuTrigger asChild>
+								<button
+									type="button"
+									aria-label={t({
+										message: "Continue or fork session",
+									})}
+									className="hidden rounded p-1 text-muted-foreground/60 transition-colors hover:text-muted-foreground @min-[200px]/pane-header:block"
+								>
+									<GitFork className="size-3.5" />
+								</button>
+							</DropdownMenuTrigger>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<Trans>Continue or fork session</Trans>
+						</TooltipContent>
+					</Tooltip>
+					<DropdownMenuContent align="end" className="w-64">
+						{continueItem}
+						{forkItem}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			)}
 
 			<Dialog
+				modal
 				open={action !== null}
 				onOpenChange={(open) => {
 					if (!open && !isStarting) setAction(null);

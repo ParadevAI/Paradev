@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -15,8 +16,10 @@ import {
 	getBlogPost,
 	getRelatedPosts,
 } from "@/lib/blog";
+import { extractComparisonFaqItems } from "@/lib/compare-utils";
 import { mdxComponents } from "../components/mdx-components";
 import { BlogPostLayout } from "./components/BlogPostLayout";
+import { faqAnswerText } from "./utils/faqSocialLinks";
 
 interface PageProps {
 	params: Promise<{ slug: string }>;
@@ -37,6 +40,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 		slug,
 		relatedSlugs: post.relatedSlugs,
 	});
+	const faqItems =
+		post.faq?.map((item) => ({
+			...item,
+			answer: faqAnswerText(item.answer),
+		})) ?? extractComparisonFaqItems(post.content);
 	const { author } = post;
 
 	const url = localeUrl(lang, `/blog/${slug}`);
@@ -74,7 +82,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 					{ name: post.title, url },
 				]}
 			/>
-			{post.faq && post.faq.length > 0 && <FAQPageJsonLd items={post.faq} />}
+			{faqItems.length > 0 && <FAQPageJsonLd items={faqItems} />}
 			<BlogPostLayout post={post} toc={toc} relatedPosts={relatedPosts}>
 				<MDXRemote source={post.content} components={mdxComponents} />
 			</BlogPostLayout>
@@ -112,7 +120,7 @@ export async function generateMetadata({
 			description: post.description,
 			type: "article",
 			url,
-			siteName: COMPANY.NAME,
+			siteName: BRAND.NAME,
 			publishedTime: post.date,
 			modifiedTime: post.lastUpdated ?? post.date,
 			authors: [post.author.name],

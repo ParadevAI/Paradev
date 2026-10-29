@@ -1,4 +1,5 @@
 import { router } from "../index";
+import { agentJobsRouter } from "./agent-jobs";
 import { agentToolingRouter } from "./agent-tooling";
 import { agentsRouter } from "./agents";
 import { attachmentsRouter } from "./attachments";
@@ -19,6 +20,7 @@ import { portsRouter } from "./ports";
 import { projectRouter } from "./project";
 import { pullRequestsRouter } from "./pull-requests";
 import { sandboxRouter } from "./sandbox";
+import { sessionsRouter } from "./sessions";
 import { settingsRouter } from "./settings";
 import { systemRouter } from "./system";
 import { tagFoldersRouter } from "./tag-folders";
@@ -32,6 +34,8 @@ import { workspacesRouter } from "./workspaces";
 
 export const appRouter = router({
 	agents: agentsRouter,
+	agentJobs: agentJobsRouter,
+	sessions: sessionsRouter,
 	agentTooling: agentToolingRouter,
 	attachments: attachmentsRouter,
 	browser: browserRouter,

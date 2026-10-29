@@ -1,5 +1,5 @@
 import { createContext, forwardRef, useContext } from "react";
-import { StyleSheet, type View, type ViewProps } from "react-native";
+import { StyleSheet, type ViewInstance, type ViewProps } from "react-native";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 /** Open only around section collapse/expand commits. */
@@ -16,7 +16,7 @@ const ENTERING = FadeIn.duration(200);
  * normal scrolling; sticky headers (relative-positioned) never animate.
  */
 export const AnimatedCellContainer = forwardRef<
-	View,
+	ViewInstance,
 	ViewProps & { index?: number }
 >(function AnimatedCellContainer({ index, style, ...props }, ref) {
 	const transitions = useContext(CellTransitionsContext);

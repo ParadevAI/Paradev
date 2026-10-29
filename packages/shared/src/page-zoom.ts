@@ -10,17 +10,21 @@ export interface PageViewportZoom {
 
 export function applyPageViewportZoom(
 	element: {
+		offsetWidth: number;
+		offsetHeight: number;
 		style: { transform: string; transformOrigin: string; clipPath: string };
 	},
 	viewport: PageViewportZoom,
 ): void {
-	const { scale, x, y, width, height } = viewport;
+	const { scale } = viewport;
 	if (
-		![scale, x, y, width, height].every(Number.isFinite) ||
+		![scale, viewport.x, viewport.y, viewport.width, viewport.height].every(
+			Number.isFinite,
+		) ||
 		scale < PAGE_PINCH_ZOOM_LIMITS.min ||
 		scale > PAGE_PINCH_ZOOM_LIMITS.max ||
-		width <= 0 ||
-		height <= 0
+		viewport.width <= 0 ||
+		viewport.height <= 0
 	)
 		return;
 	if (scale === 1) {
@@ -29,6 +33,13 @@ export function applyPageViewportZoom(
 		element.style.clipPath = "";
 		return;
 	}
+	// The viewport is in page CSS pixels, which differ from the element's
+	// pixels when the page has its own zoom factor.
+	const width = element.offsetWidth;
+	const height = element.offsetHeight;
+	if (width <= 0 || height <= 0) return;
+	const x = (viewport.x * width) / viewport.width;
+	const y = (viewport.y * height) / viewport.height;
 	const left = Math.max(0, Math.min(x, width * (scale - 1)));
 	const top = Math.max(0, Math.min(y, height * (scale - 1)));
 	element.style.transformOrigin = "0 0";

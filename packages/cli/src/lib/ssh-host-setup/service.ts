@@ -16,7 +16,7 @@ interface ServiceInput {
  */
 export function systemdUnit({ binPath, organizationId }: ServiceInput): string {
 	return `[Unit]
-Description=Superset host
+Description=Paradev host
 
 [Service]
 ExecStart=${systemdWord(binPath)} start --org ${systemdWord(organizationId)}

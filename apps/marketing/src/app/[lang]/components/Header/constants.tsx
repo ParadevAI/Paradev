@@ -23,7 +23,7 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/",
 				label: <Trans>Desktop app</Trans>,
-				description: <Trans>Run any coding agent</Trans>,
+				description: <Trans>Run an army of coding agents</Trans>,
 			},
 			{
 				href: `${COMPANY.DOCS_URL}/cli/getting-started`,
@@ -55,12 +55,17 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/automations",
 				label: <Trans>Automations</Trans>,
-				description: <Trans>Agents on a schedule</Trans>,
+				description: <Trans>Agents on a schedule or trigger</Trans>,
 			},
 			{
 				href: "/browser",
 				label: <Trans>Browser</Trans>,
 				description: <Trans>Agent-driven previews</Trans>,
+			},
+			{
+				href: "/plugins",
+				label: <Trans>Plugins</Trans>,
+				description: <Trans>Connect agents to your apps</Trans>,
 			},
 			{
 				href: "/marketplace",
@@ -73,11 +78,6 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 		id: "coming-soon",
 		title: <Trans>Coming soon</Trans>,
 		links: [
-			{
-				href: "/plugins",
-				label: <Trans>Plugins</Trans>,
-				description: <Trans>Connect agents to your apps</Trans>,
-			},
 			{
 				href: "/cloud",
 				label: <Trans>Cloud</Trans>,
@@ -100,7 +100,7 @@ export const PRODUCT_FEATURED: NavFeatured = {
 	href: "/pages",
 	image: "/pages/hero-poster.webp",
 	eyebrow: <Trans>New</Trans>,
-	title: <Trans>Superset Pages</Trans>,
+	title: <Trans>Paradev Pages</Trans>,
 	description: (
 		<Trans>
 			Your agent publishes designs and reports. Your team comments, and it gets
@@ -174,7 +174,7 @@ export const RESOURCE_SECTIONS: NavSection[] = [
 			{
 				href: "/compare",
 				label: <Trans>Compare</Trans>,
-				description: <Trans>Superset next to others</Trans>,
+				description: <Trans>Paradev next to others</Trans>,
 			},
 			{
 				href: "/community",

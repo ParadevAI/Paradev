@@ -192,6 +192,7 @@ export function useDiffCommentComposer({
 					workspaceId,
 					terminalId: input.target.terminalId,
 					text,
+					submit: true,
 				});
 				clearIfStillCurrent(submitted);
 			} catch {

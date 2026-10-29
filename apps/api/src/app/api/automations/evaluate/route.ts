@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	automations,
@@ -47,6 +49,8 @@ function scheduleFromConfig(
 	return { rrule: config.rrule, dtstart, timezone: config.timezone };
 }
 
+const AUTUMN_PLAN_CONCURRENCY = 10;
+
 /**
  * The plan of each organization, for the tier gate. One query for the whole
  * batch rather than one per row; the newest paying subscription wins, as it
@@ -57,6 +61,16 @@ async function organizationPlans(
 ): Promise<Map<string, PlanTier>> {
 	const plans = new Map<string, PlanTier>();
 	if (organizationIds.length === 0) return plans;
+	if (billingUsesAutumn) {
+		for (let i = 0; i < organizationIds.length; i += AUTUMN_PLAN_CONCURRENCY) {
+			const batch = organizationIds.slice(i, i + AUTUMN_PLAN_CONCURRENCY);
+			const tiers = await Promise.all(batch.map(organizationPlanFromAutumn));
+			for (const [index, id] of batch.entries()) {
+				plans.set(id, tiers[index] ?? "free");
+			}
+		}
+		return plans;
+	}
 	const rows = await db
 		.select({
 			organizationId: subscriptions.referenceId,

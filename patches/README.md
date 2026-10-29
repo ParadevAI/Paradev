@@ -144,6 +144,13 @@ were built from):
    replaces the array. Still present on upstream master; the render-debouncer
    guard test reproduces it.
 
+6. `IModes.mouseEncoding` (also `src/browser/public/Terminal.ts` and
+   `typings/xterm.d.ts`): `terminal.modes` reports the active mouse encoding
+   (`'default' | 'sgr' | 'sgr-pixels'`), so `@xterm/addon-serialize` can
+   restore it. Backported from
+   [xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174), commit
+   `793883591` (open, not yet released). See the addon-serialize section below.
+
 **IME removal condition:** Follow-up: [Superset #7490](https://github.com/superset-sh/superset/issues/7490). Track [upstream fix #6162](https://github.com/xtermjs/xterm.js/pull/6162)
 and [upstream issue #6161](https://github.com/xtermjs/xterm.js/issues/6161).
 An upstream merge alone is not enough: wait for a published xterm version
@@ -210,13 +217,48 @@ bun patch @xterm/addon-webgl@<new-version>
 cp "$XTERM"/addons/addon-webgl/lib/addon-webgl.{js,mjs} node_modules/@xterm/addon-webgl/lib/
 cp "$XTERM"/addons/addon-webgl/<changed src files> node_modules/@xterm/addon-webgl/src/...
 bun patch --commit 'node_modules/@xterm/addon-webgl'
-bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts
+bun patch @xterm/addon-serialize@<new-version>
+(cd "$XTERM"/addons/addon-serialize && npx webpack)   # lib/addon-serialize.js
+cp "$XTERM"/addons/addon-serialize/lib/addon-serialize.{js,mjs} node_modules/@xterm/addon-serialize/lib/
+cp "$XTERM"/addons/addon-serialize/src/SerializeAddon.ts node_modules/@xterm/addon-serialize/src/
+bun patch --commit 'node_modules/@xterm/addon-serialize'
+# bun patch --commit can record a .bun-tag-* file; drop that hunk from the patch.
+bun test apps/desktop/src/xterm-flushsync-patch.test.ts apps/desktop/src/xterm-render-debouncer-patch.test.ts apps/desktop/src/xterm-ime-patch.test.ts apps/desktop/src/webgl-atlas-patch.test.ts apps/desktop/src/xterm-ligatures-patch.test.ts apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts
 ```
+
+Use a real `node_modules` from `npm ci`. A symlinked one changes webpack's
+module ids, and `lib/xterm.js` no longer matches npm.
 
 `@xterm/*` is in `minimumReleaseAgeExcludes` in `bunfig.toml`, so a beta can be
 taken the day it ships; this rebuild is the review. Every `@xterm/*` version
 moves together (sherif), and `apps/mobile` needs
 `bun run scripts/generate-terminal-html.ts`.
+
+## @xterm/addon-serialize (`@xterm%2Faddon-serialize@<version>.patch`)
+
+**Why:** `serialize()` restores mouse tracking (`?1000h`/`?1002h`/`?1003h`)
+but not the mouse encoding (`?1006h` SGR, `?1016h` SGR-pixels). The mobile
+terminal repaints a pooled session from `serialize()` when you switch tabs,
+so the display came back with the default encoding. xterm emits those
+reports through `onBinary`, and Codex, which arms SGR once at startup, stopped
+scrolling after a tab switch until the session was reopened. Claude Code
+re-arms SGR on redraw, so it hid the bug.
+
+**What it changes** (`lib/addon-serialize.js`, `lib/addon-serialize.mjs`,
+`src/SerializeAddon.ts`): the mode preamble writes `?1006h` or `?1016h` from
+`terminal.modes.mouseEncoding` (xterm hunk 6). With an unpatched xterm the
+field is undefined and nothing is written. Backported from
+[xterm.js #6174](https://github.com/xtermjs/xterm.js/pull/6174).
+
+**Guard test:** `apps/desktop/src/xterm-serialize-mouse-encoding-patch.test.ts`
+round-trips each encoding through `serialize()` into a fresh terminal.
+
+**Regenerating:** part of the xterm procedure above; both packages build from
+the same upstream commit.
+
+**Removing:** once a published xterm and addon-serialize carry #6174, drop
+this patch, xterm hunk 6, and the `patchedDependencies` entry. Keep the guard
+test.
 
 ## @xterm/addon-ligatures (`@xterm%2Faddon-ligatures@<version>.patch`)
 
@@ -358,48 +400,43 @@ port-clearing exec trampoline; keep the patched helper (or ship our own) for it.
 
 ## react-native-screens (`react-native-screens@<version>.patch`)
 
-**Why:** on iOS, a form sheet screen (`presentation: "formSheet"`) finds the
-`ScrollView` in its content on every layout pass and sizes it to the sheet's
-frame. When a sheet is replaced by a pushed screen (`router.replace` from the
-pull-requests sheet), Fabric recycles the sheet's `UIScrollView` into the new
-screen, and the dismissed sheet still gets one more layout pass *after* it has
-been invalidated: it finds that recycled scroll view down its old subview chain
-and sizes it to the sheet again. The PR screen came up with its scroll view at
-464pt (the `[0.5]` detent), everything below the fold unpainted and untappable,
-and every later screen that reused that scroll view instance did the same.
-Upstream #4091 (in 4.26.0) only removes the KVO observer in `invalidate`; the
-layout-pass path is untouched and still present on `4.28-stable` as of
-2026-09-12. Diagnosed with `NSLog` in `correctScrollViewFrame:` and
-`invalidateImpl`: the correction to 464pt logs 4ms after the sheet's
-invalidate, on the same scroll view pointer the new screen had just laid out at
-956pt.
+The form sheet scroll view fix this patch used to carry (a dismissed sheet
+resizing a recycled `UIScrollView` in the screen that replaced it) is upstream
+since 4.30 (#4651). `apps/mobile/react-native-screens-sheet-patch.test.ts` now
+checks that the installed package still has it; if a bump loses it, restore the
+early return on `_invalidated` in `applyFrameCorrectionForDescendantScrollView`
+(`ios/RNSScreen.mm`). Verify in the simulator: open a workspace with two PRs,
+tap the PR chip, tap a row, go back, reopen the sheet, tap the other row. The
+second PR must show its description and the Files row without scrolling.
 
-**What it changes** (`ios/RNSScreen.mm`): an `_invalidated` flag set in
-`invalidateImpl`; `applyFrameCorrectionForDescendantScrollView` returns early
-once it is set. Reproduced unpatched on 4.27.0 (latest stable, 2026-09-12) in
-the same flow, so bumping alone does not fix it. 4.27.0 already declares an
-`invalidated` property on `RNSScreenView` (set in `invalidateImpl`, used only
-for transition progress and header config), so a regenerated patch for 4.27+
-must not add the ivar again — only the early return is needed.
+### Interactive push
 
-**Guard test:** `apps/mobile/react-native-screens-sheet-patch.test.ts`.
+**Why:** Home's right-edge swipe returns to the last workspace, and the pushed
+screen follows the finger like the back swipe does. react-native-screens can
+only drive a *pop* interactively; UIKit asks for an interaction controller only
+when the stack returns a custom animator, and the stack returns none for a
+default push.
 
-**Regenerating after a version bump** (~2 min, plus a native rebuild to verify):
+**What it changes:** `RNSScreenStackView` gets `armInteractivePush`,
+`updateInteractivePush:` and `endInteractivePush:`, called by
+`apps/mobile/modules/forward-swipe`. The next push after `arm` (JS performs it)
+gets `RNSScreenStackAnimator` and an `RNSPercentDrivenInteractiveTransition`.
+Progress and the release that arrive before UIKit starts the transition are
+kept and applied from the new `onStart` hook. The simple-push animator starts
+paused and linear when interactive, like its pop branch. A cancelled push
+leaves UIKit's stack, and `RNSScreen` sends `onDismissed`, so JS drops the
+route. An arm with no push in 1 s expires. `arm` does not call
+`cancelTouchesInParent`: the forward-swipe module resets
+`RCTSurfaceTouchHandler` itself when its pan begins, so the row under the
+finger does not press on release. A second reset from `arm` throws
+"Inconsistency between local and UIKit touch registries".
 
-```bash
-bun patch react-native-screens@<new-version>
-# in node_modules/react-native-screens/ios/RNSScreen.mm, return early from
-# applyFrameCorrectionForDescendantScrollView when `_invalidated` is set.
-# Before 4.27.0 only: also add `BOOL _invalidated;` to the RNSScreenView ivar
-# block and set `_invalidated = YES;` first thing in invalidateImpl (4.27.0+
-# already has both; adding the ivar again fails to compile).
-bun patch --commit 'node_modules/react-native-screens'
-bun test apps/mobile/react-native-screens-sheet-patch.test.ts
-```
+**Guard test:** `apps/mobile/react-native-screens-interactive-push-patch.test.ts`.
 
-Verify in the simulator: open a workspace with two PRs, tap the PR chip, tap a
-row, go back, reopen the sheet, tap the other row. The second PR must show its
-description and the Files row without scrolling.
+**Regenerating:** re-apply the hunks in `ios/RNSScreenStack.h`,
+`ios/RNSScreenStack.mm`, `ios/RNSPercentDrivenInteractiveTransition.{h,mm}` and
+`ios/RNSScreenStackAnimator.mm`. Verify in the simulator: open a workspace, go
+back, swipe in from Home's right edge, let go past half way and short of it.
 
 ## @pierre/trees (`@pierre%2Ftrees@<version>.patch`)
 
@@ -443,6 +480,40 @@ bun test apps/desktop/src/pierre-trees-lookup-patch.test.ts
 test once @pierre/trees ships a release whose segment walk stops at a file
 node.
 
+## @pierre/diffs (`@pierre%2Fdiffs@<version>.patch`)
+
+**Why:** every Changes pane mount leaked its whole diff view. `CodeView`
+creates one `VirtualizedFileDiff` per file, and each subscribes to the shared
+worker pool's `themeSubscribers` set. `CodeView.cleanUp` (through `reset`)
+only cleans the items in the current render range, so the others stay in that
+set with a reference back to their `CodeView` and its DOM. Measured in the dev
+desktop: 50 switches between the Changes and Pull request tabs left 26
+`CodeView`s, about 160k detached DOM nodes and 860 theme subscribers alive
+after both tabs were closed. 1.6.1 fixes it upstream: `reset` cleans every
+discarded item.
+
+**What it changes** (`dist/components/CodeView.js`): one line in `reset` —
+clean up every item, not only the rendered ones, before the list is dropped.
+
+**Guard test:** `apps/desktop/src/pierre-diffs-reset-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch @pierre/diffs@<new-version>
+# in node_modules/@pierre/diffs/dist/components/CodeView.js, in reset(), add
+# `for (const item of this.items) item.instance.cleanUp();` after
+# this.cleanAllRenderedItems()
+bun patch --commit 'node_modules/@pierre/diffs'
+# keep only the CodeView.js hunk; bun also writes deletions for the package's
+# bundled dist/node_modules typings
+bun test apps/desktop/src/pierre-diffs-reset-patch.test.ts
+```
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test when moving to @pierre/diffs 1.6.1 or later, which cleans every item in
+`reset`.
+
 ## expo-observe (`expo-observe@<version>.patch`)
 
 **Why:** its podspec asks for `swift_version = '6.0'`, and the package keeps
@@ -479,3 +550,62 @@ version's files, write the diff to
 package root), update the key in `patchedDependencies`, run `bun install`, then
 `bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
 a native change: rebuild the app to see it.
+
+## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
+
+**Why:** the token endpoint rotates the refresh token on every refresh. When a
+rotated token is sent again, it treats that as theft and deletes every refresh
+and access token the user holds for that client, on every machine. Several CLI
+processes on one machine, or the CLI and a host-service, refresh at the same
+moment as a matter of course, and a client that loses a response retries it.
+Both send the rotated token again within seconds, and the user is logged out
+everywhere (GH #8426). A check in a `before` hook cannot fix this: between the
+hook's read and the provider's read, another request can rotate the token.
+
+**What it changes** (`dist/index.mjs`, `handleRefreshTokenGrant`): when the
+token was revoked less than 10 minutes ago, the request still fails with
+`invalid_grant` but the token family is kept, and the server logs a
+`[oauth-refresh-reuse-grace]` warning so a stolen-token reuse stays visible.
+Reuse after 10 minutes still deletes it. The CLI and the host-service retry a refresh with an unknown
+outcome only within 5 minutes (`REFRESH_TIMINGS.retryWindowMs` in
+`packages/shared/src/oauth-refresh.ts`), so keep that below this window. The
+guard test checks it.
+
+**Guard test:** `packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+It runs the installed provider against an in-memory database.
+
+**Regenerating after a version bump:** `bun patch @better-auth/oauth-provider`,
+make the same change in `handleRefreshTokenGrant` (keep the
+`superset-patch: refresh-reuse-grace` comment), `bun patch --commit
+'node_modules/@better-auth/oauth-provider'`, then
+`bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+
+## react-native (`react-native@<version>.patch`)
+
+**Why:** On iPhone Duo the status bar and navigation buttons sit in a column on
+one side of the window. UIKit reports it as a side safe area, but
+`ScrollView`'s `contentInsetAdjustmentBehavior` only clears the safe area along
+the scrolling axis, so list rows run under the column. The upstream fix is
+facebook/react-native#59194 (open), built on #58109
+(`experimental_onSafeAreaInsetsChange`, on `main` since 2026-10-09). Neither is
+in 0.88.
+
+**What it changes:** the iOS and shared parts of both PRs. A `View` reports its
+native safe-area insets; a `ScrollView` whose `contentInsetAdjustmentBehavior`
+is not `never` pads its content container by the insets across its scrolling
+axis, and `RCTEnhancedScrollView` stops UIKit adding the same inset again. bun
+cannot apply a patch that creates files, so the two new modules of the PRs
+(`getSafeAreaContentPadding`, `warnOnRepeatedSafeAreaInsetsChanges`) are
+inlined at the end of `ScrollView.js` and `View.js`. The native half is in
+React Native's core, so `app.config.ts` sets `buildReactNativeFromSource`.
+
+**Guard test:** `apps/mobile/react-native-safe-area-scroll-patch.test.ts`.
+
+**Removing:** delete the patch, its `patchedDependencies` entry and
+`buildReactNativeFromSource` once the React Native in use ships #59194.
+
+**Regenerating:** apply `gh pr diff 58109` and `gh pr diff 59194` (React Native
+repo, without Android, tests, rn-tester and API snapshots) to a copy of the
+package with `patch -p3`, inline the two new files as above, and write
+`git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
+before the button column.

@@ -1,6 +1,6 @@
 ---
-title: "Superset vs OpenCode (2026): Orchestrating OpenCode Across Worktrees"
-description: "Use OpenCode as your coding agent and Superset to organize parallel tasks. Compare session management, Git worktrees, review, and provider costs."
+title: "Paradev vs OpenCode (2026): Orchestrating OpenCode Across Worktrees"
+description: "Use OpenCode as your coding agent and Paradev to organize parallel tasks. Compare session management, Git worktrees, review, and provider costs."
 date: 2026-02-02
 lastUpdated: 2026-09-23
 type: "1v1"
@@ -14,25 +14,25 @@ keywords:
   - opencode vs superset
 ---
 
-**OpenCode is a coding agent; Superset organizes the workspaces where you run it.** You can use OpenCode on its own or run it inside Superset alongside other agents. For an OpenCode orchestrator, evaluate how tasks get separate working directories, how you monitor sessions, and how you review and integrate their changes.
+**OpenCode is a coding agent; Paradev organizes the workspaces where you run it.** You can use OpenCode on its own or run it inside Paradev alongside other agents. For an OpenCode orchestrator, evaluate how tasks get separate working directories, how you monitor sessions, and how you review and integrate their changes.
 
 OpenCode is not limited to one session or a terminal-only interface. Its [documentation](https://opencode.ai/docs/) describes terminal, desktop, and IDE interfaces; its [CLI reference](https://opencode.ai/docs/cli/) includes session management and a web interface.
 
-This comparison is published by Superset. It describes workflow differences, not measured code quality or a speed benchmark. Product documentation was checked on September 23, 2026.
+This comparison is published by Paradev. It describes workflow differences, not measured code quality or a speed benchmark. Product documentation was checked on September 23, 2026.
 
 ## At a glance
 
-| Question | Superset | OpenCode |
+| Question | Paradev | OpenCode |
 |---|---|---|
 | What do you use it for? | Organizing agent workspaces, terminals, review, and previews | Asking an agent to inspect code, edit files, and run commands |
-| Can they work together? | Run the installed OpenCode CLI in a workspace | Use the same provider configuration you use outside Superset |
+| Can they work together? | Run the installed OpenCode CLI in a workspace | Use the same provider configuration you use outside Paradev |
 | How do you separate parallel tasks? | Create a workspace with its own Git worktree and branch for each task | Use separate working directories for independent writers; session management alone does not establish file isolation |
 | Where do you review changes? | Workspace diffs and your usual Git/PR checks | Inspect the agent's changes and use your usual Git/PR checks |
-| What do you pay for? | A Superset plan where required, plus the agent's provider usage | Provider usage according to your configured service |
+| What do you pay for? | A Paradev plan where required, plus the agent's provider usage | Provider usage according to your configured service |
 
-## Use OpenCode in parallel with Superset
+## Use OpenCode in parallel with Paradev
 
-Start with two independent tasks, such as a documentation correction and a focused test. Create one Superset workspace per task from the same known base commit, then launch `opencode` in each workspace's terminal.
+Start with two independent tasks, such as a documentation correction and a focused test. Create one Paradev workspace per task from the same known base commit, then launch `opencode` in each workspace's terminal.
 
 Before giving either agent write access, run these commands in both terminals:
 
@@ -56,24 +56,24 @@ Use distinct ports and test data where needed. Review each diff, then integrate 
 
 Use OpenCode on its own if your existing terminal or editor and Git workflow already make tasks easy to track. Adding a workspace manager is optional.
 
-Use OpenCode with Superset if switching among tasks, tracking their branches, and reviewing separate changes is becoming the bottleneck. Start with two agents and increase concurrency only while the machine, provider allowance, and review queue can support it.
+Use OpenCode with Paradev if switching among tasks, tracking their branches, and reviewing separate changes is becoming the bottleneck. Start with two agents and increase concurrency only while the machine, provider allowance, and review queue can support it.
 
 Mix OpenCode with another CLI agent when that helps a specific task. Using the same underlying model does not establish equal code quality; compare actual patches and checks for your repository.
 
 ## Pricing and prerequisites
 
-Install and authenticate OpenCode on the host where it will run. Superset does not include arbitrary model-provider usage in its workspace plan. Check [Superset pricing](/pricing) and [OpenCode provider configuration](https://opencode.ai/docs/providers/) for your intended setup. OpenCode also documents its optional [Zen service](https://opencode.ai/docs/zen/).
+Install and authenticate OpenCode on the host where it will run. Paradev does not include arbitrary model-provider usage in its workspace plan. Check [Paradev pricing](/pricing) and [OpenCode provider configuration](https://opencode.ai/docs/providers/) for your intended setup. OpenCode also documents its optional [Zen service](https://opencode.ai/docs/zen/).
 
 ## Frequently asked questions
 
-### Is Superset an OpenCode replacement?
+### Is Paradev an OpenCode replacement?
 
-You can use them together. OpenCode performs coding work; Superset provides workspaces, persistent terminals, and review tools around those sessions.
+You can use them together. OpenCode performs coding work; Paradev provides workspaces, persistent terminals, and review tools around those sessions.
 
 ### Does opening two OpenCode sessions isolate their files?
 
 Check their working directories. Two sessions in one directory can edit the same working copy. For independent writers, use separate worktrees and branches and verify them before starting.
 
-### Does Superset prevent merge conflicts?
+### Does Paradev prevent merge conflicts?
 
 No. Separate worktrees keep active working files apart. You still need to review and integrate changes, resolve conflicts, and test the combined result.

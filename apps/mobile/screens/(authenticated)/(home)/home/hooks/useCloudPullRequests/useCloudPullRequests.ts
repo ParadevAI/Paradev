@@ -4,67 +4,59 @@ import { useMemo } from "react";
 import { useSession } from "@/lib/auth/client";
 import { apiClient } from "@/lib/trpc/client";
 
-const REFETCH_INTERVAL_MS = 30_000;
-const MAX_REFS_PER_QUERY = 500;
-
 export type CloudPullRequest =
-	RouterOutputs["integration"]["github"]["getByBranches"]["pullRequests"][number];
+	RouterOutputs["cloudWorkspace"]["pullRequests"][number];
 
-export interface CloudPullRequestRef {
-	repoFullName: string;
-	headBranch: string;
-}
-
-export function cloudPullRequestRefKey(ref: CloudPullRequestRef): string {
-	return `${ref.repoFullName.toLowerCase()}\n${ref.headBranch}`;
+function usePullRequestsQuery(
+	organizationId: string | null,
+	archived: boolean,
+	enabled: boolean,
+) {
+	return useQuery({
+		queryKey: [
+			"cloud",
+			"cloudWorkspace",
+			"pullRequests",
+			organizationId,
+			archived,
+		],
+		enabled: enabled && organizationId !== null,
+		staleTime: 30_000,
+		queryFn: () =>
+			apiClient.cloudWorkspace.pullRequests.query({
+				organizationId: organizationId as string,
+				archived,
+			}),
+	});
 }
 
 /**
- * Desktop's useCloudPullRequests: each cloud workspace's pull request, read
- * from the GitHub integration by repository and branch rather than from the
- * sandbox, so a list of them wakes nothing.
+ * Desktop's useCloudPullRequests: every pull request each cloud workspace's
+ * box linked, read from the API rather than from the sandbox, so a list of
+ * them wakes nothing. The pull_requests nudge refetches it.
  */
-export function useCloudPullRequests(
-	refs: CloudPullRequestRef[],
-): Map<string, CloudPullRequest> {
+export function useCloudPullRequests({
+	active,
+	archived,
+}: {
+	active: boolean;
+	archived: boolean;
+}): ReadonlyMap<string, CloudPullRequest[]> {
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
-
-	const stableRefs = useMemo(() => {
-		const byKey = new Map<string, CloudPullRequestRef>();
-		for (const ref of refs) byKey.set(cloudPullRequestRefKey(ref), ref);
-		return [...byKey.entries()]
-			.sort(([left], [right]) => left.localeCompare(right))
-			.map(([, ref]) => ref)
-			.slice(0, MAX_REFS_PER_QUERY);
-	}, [refs]);
-
-	const { data } = useQuery({
-		queryKey: [
-			"cloud",
-			"integration",
-			"github",
-			"getByBranches",
-			organizationId,
-			stableRefs,
-		],
-		enabled: organizationId !== null && stableRefs.length > 0,
-		refetchInterval: REFETCH_INTERVAL_MS,
-		staleTime: 10_000,
-		placeholderData: (previous, previousQuery) =>
-			previousQuery?.queryKey[4] === organizationId ? previous : undefined,
-		queryFn: () =>
-			apiClient.integration.github.getByBranches.query({
-				organizationId: organizationId as string,
-				refs: stableRefs,
-			}),
-	});
+	const activeQuery = usePullRequestsQuery(organizationId, false, active);
+	const archivedQuery = usePullRequestsQuery(organizationId, true, archived);
 
 	return useMemo(() => {
-		const byRef = new Map<string, CloudPullRequest>();
-		for (const pullRequest of data?.pullRequests ?? []) {
-			byRef.set(cloudPullRequestRefKey(pullRequest), pullRequest);
+		const byWorkspace = new Map<string, CloudPullRequest[]>();
+		for (const pullRequest of [
+			...(activeQuery.data ?? []),
+			...(archivedQuery.data ?? []),
+		]) {
+			const rows = byWorkspace.get(pullRequest.cloudWorkspaceId);
+			if (rows) rows.push(pullRequest);
+			else byWorkspace.set(pullRequest.cloudWorkspaceId, [pullRequest]);
 		}
-		return byRef;
-	}, [data]);
+		return byWorkspace;
+	}, [activeQuery.data, archivedQuery.data]);
 }

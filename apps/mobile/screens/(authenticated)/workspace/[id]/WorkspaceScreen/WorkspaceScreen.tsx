@@ -7,11 +7,17 @@ import type {
 	ComposerSessionTab,
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+	Stack,
+	useFocusEffect,
+	useLocalSearchParams,
+	useRouter,
+} from "expo-router";
 import {
 	CloudOff,
 	Plus,
@@ -20,6 +26,7 @@ import {
 } from "lucide-react-native";
 import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActivityIndicator,
 	Alert,
@@ -30,7 +37,6 @@ import {
 	Pressable,
 	View,
 } from "react-native";
-import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -60,6 +66,7 @@ import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useC
 import { useSlashCommands } from "@/screens/(authenticated)/hooks/useSlashCommands";
 import { workspaceDraftKey } from "@/screens/(authenticated)/stores/composerDraftsStore";
 import { useLastSessionTabStore } from "@/screens/(authenticated)/stores/lastSessionTabStore";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePendingWorkspaceCreatesStore } from "@/screens/(authenticated)/stores/pendingWorkspaceCreatesStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
@@ -83,6 +90,7 @@ import {
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { usePullRequestDiffstat } from "../hooks/usePullRequestDiffstat";
 import { usePullRequestIconUri } from "../hooks/usePullRequestIconUri";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
@@ -93,7 +101,6 @@ import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
-import { useComposerEdge } from "./hooks/useComposerEdge";
 
 const NOTICE_MS = 1500;
 
@@ -141,11 +148,21 @@ const STATE_BANNERS: Partial<
  */
 export function WorkspaceScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const params = useLocalSearchParams<{ id: string; tab?: string }>();
 	const id = params.id;
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const queryClient = useQueryClient();
+
+	const setLastWorkspaceId = useLastWorkspaceStore(
+		(state) => state.setWorkspaceId,
+	);
+	useFocusEffect(
+		useCallback(() => {
+			if (id) setLastWorkspaceId(id);
+		}, [id, setLastWorkspaceId]),
+	);
 
 	const {
 		workspace,
@@ -619,7 +636,7 @@ export function WorkspaceScreen() {
 	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [composerActive, setComposerActive] = useState(false);
 	const composerRef = useRef<ComposerHandle>(null);
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const [select, setSelect] = useState<TerminalSelectState>({
 		active: false,
 		hasSelection: false,
@@ -847,10 +864,6 @@ export function WorkspaceScreen() {
 		activeTerminalId !== null &&
 		host !== null &&
 		!hostCompatibility.incompatible;
-	// A chat sits level with the composer as it moves; the terminal resizes
-	// once, when the keyboard or the composer settles.
-	const chatFollowsComposer = showComposer && !voiceActive && activeIsChat;
-	const composerEdge = useComposerEdge(chatFollowsComposer);
 
 	// The host resolves its own worktree; a path here is only the signal that
 	// there is one to write into yet.
@@ -897,12 +910,18 @@ export function WorkspaceScreen() {
 	}, [pullRequests, pullRequestIconUri, t]);
 
 	const pullRequestCount = pullRequests.length;
-	const chatPullRequestLabel =
-		pullRequestCount > 0
-			? t({
+	const latestPullRequestDiffstat = usePullRequestDiffstat({
+		pullRequest: pullRequests[0],
+	});
+	const chatPullRequestChip = pullRequestStatusNow
+		? {
+				label: t({
 					message: plural(pullRequestCount, { one: "# PR", other: "# PRs" }),
-				})
-			: undefined;
+				}),
+				status: pullRequestStatusNow,
+				diffstat: latestPullRequestDiffstat,
+			}
+		: undefined;
 
 	// One PR goes straight to it; a history goes to the list. Captured by hand
 	// because the tap lands in SwiftUI, where RN autocapture cannot see it.
@@ -918,9 +937,16 @@ export function WorkspaceScreen() {
 			});
 			return;
 		}
+		const [pullRequest] = pullRequests;
 		router.push({
 			pathname: "/workspace/[id]/pull-request/[pullRequestId]",
-			params: { id, pullRequestId: String(pullRequests[0]?.prNumber ?? "") },
+			params: {
+				id,
+				pullRequestId: String(pullRequest?.prNumber ?? ""),
+				...(pullRequest
+					? { owner: pullRequest.repoOwner, repo: pullRequest.repoName }
+					: {}),
+			},
 		});
 	}, [id, pullRequests, router]);
 
@@ -1090,17 +1116,15 @@ export function WorkspaceScreen() {
 				style={{
 					// The terminal has to clear everything stacked at the bottom or its
 					// own prompt hides behind the composer.
-					marginBottom: chatFollowsComposer
-						? 0
-						: showComposer
-							? composerHeight + composerBottom
-							: composerBottom,
+					marginBottom: showComposer
+						? composerHeight + composerBottom
+						: composerBottom,
 				}}
 			>
 				{hostCompatibility.incompatible ? (
 					<WorkspacePlaceholder
 						body={t({
-							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update Superset on that machine.`,
+							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update ${appName} on that machine.`,
 						})}
 						icon={TriangleAlert}
 						onRefresh={onRefresh}
@@ -1131,20 +1155,18 @@ export function WorkspaceScreen() {
 						})}
 					/>
 				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
-					<Animated.View className="flex-1" style={composerEdge.followStyle}>
-						<ChatSessionView
-							host={host}
-							hostUrl={hostUrl}
-							key={activeTerminalId}
-							onOpenSession={openSession}
-							onOpenPullRequests={openPullRequests}
-							onTap={dismissComposer}
-							pullRequestLabel={chatPullRequestLabel}
-							ref={chatRef}
-							sessionId={activeTerminalId}
-							workspaceId={id}
-						/>
-					</Animated.View>
+					<ChatSessionView
+						host={host}
+						hostUrl={hostUrl}
+						key={activeTerminalId}
+						onOpenSession={openSession}
+						onOpenPullRequests={openPullRequests}
+						onTap={dismissComposer}
+						pullRequestChip={chatPullRequestChip}
+						ref={chatRef}
+						sessionId={activeTerminalId}
+						workspaceId={id}
+					/>
 				) : activeTerminalId && host && id ? (
 					<>
 						<TerminalWebView
@@ -1283,9 +1305,6 @@ export function WorkspaceScreen() {
 					attachmentTarget={attachmentTarget}
 					onActiveChange={setComposerActive}
 					onHeightChange={setComposerHeight}
-					onEdgeChange={
-						chatFollowsComposer ? composerEdge.onEdgeChange : undefined
-					}
 					onCopySelection={() => terminalRef.current?.copySelection()}
 					onQuickKey={handleQuickKey}
 					onSubmit={handleSubmit}

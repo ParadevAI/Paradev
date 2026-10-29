@@ -42,7 +42,7 @@ export default command({
 		if (!transcript) {
 			throw new CLIError(
 				"No transcript for that terminal",
-				"Its agent either keeps none where Superset can read it, or the terminal is not an agent's",
+				"Its agent either keeps none where Paradev can read it, or the terminal is not an agent's",
 			);
 		}
 

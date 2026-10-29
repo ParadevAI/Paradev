@@ -5,7 +5,11 @@ import {
 	createTerminalSessionInternal,
 	disposeSession,
 } from "../../terminal/terminal";
-import { resolveScript, shellSingleQuote } from "../setup/config";
+import {
+	chainPhases,
+	loadProjectConfig,
+	shellSingleQuote,
+} from "../setup/config";
 
 export { TEARDOWN_TIMEOUT_MS };
 
@@ -154,15 +158,9 @@ export async function runTeardown({
 }
 
 /**
- * Resolve the teardown command for a workspace, if any. Uses the shared
- * lifecycle-script posture (see `resolveScript`): configured `teardown`
- * commands — joined with ` && ` so a failing command short-circuits, worktree
- * config overriding the main repo's — then a `teardown.sh` script, worktree
- * first (state generated during the session must win) and main repo second
- * (gitignored scripts don't exist in worktrees).
- *
- * Returns null when no source resolves to anything runnable, which the
- * caller treats as a skipped (successful) teardown.
+ * The local `[archive]` command for a workspace, if any (a v1 project's
+ * `teardown`, or `teardown.sh`). Null means a skipped, successful archive; so
+ * does an invalid config, as archive must never block on a broken file.
  *
  * Exported for tests.
  */
@@ -173,29 +171,20 @@ export function resolveTeardownCommand(args: {
 	/** Override $HOME for tests. */
 	homeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
-	const resolved = resolveScript("teardown", args);
-	if (!resolved) return null;
-
-	const initialCommand =
-		resolved.kind === "commands"
-			? buildTeardownCommandFromShell(resolved.commands.join(" && "))
-			: buildTeardownInitialCommand(resolved.scriptPath);
-	return { initialCommand, ...(resolved.cwd && { cwd: resolved.cwd }) };
-}
-
-export function buildTeardownInitialCommand(scriptPath: string): string {
-	// `exec` replaces the user's login shell with the teardown process. That
-	// avoids shell-specific exit-status syntax like `$?`, which breaks in fish
-	// and leaves the hidden teardown terminal open until timeout.
-	return `exec bash ${shellSingleQuote(scriptPath)}`;
+	const config = loadProjectConfig(args);
+	if (config?.kind !== "ok") return null;
+	const archive = chainPhases([config.resolved.archive], args.worktreePath);
+	if (!archive) return null;
+	return {
+		initialCommand: buildTeardownCommandFromShell(archive.command),
+		...(archive.cwd && { cwd: archive.cwd }),
+	};
 }
 
 /**
- * Build the initial command for configured `teardown` commands. The joined
- * command runs via `bash -c` so multiple `&&`-chained entries execute in one
- * shell; `exec` still replaces the login shell so the hidden PTY exits with
- * the teardown status (and avoids fish `$?` breakage), matching the script
- * form above.
+ * The teardown terminal's initial command. It runs via `bash -c` so `&&`
+ * chains work in any login shell, and `exec` replaces that shell so the
+ * hidden PTY exits with the teardown status (no fish `$?` breakage).
  */
 export function buildTeardownCommandFromShell(shellCommand: string): string {
 	return `exec bash -c ${shellSingleQuote(shellCommand)}`;

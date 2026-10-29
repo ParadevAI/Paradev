@@ -57,6 +57,8 @@ export function toTaskTimeline(timeline: TaskTimeline): TaskTimelineItem[] {
 				out.push({ ...base, kind: "assignee", ...change.assignee });
 			if (change.project)
 				out.push({ ...base, kind: "project", ...change.project });
+			if (change.channel)
+				out.push({ ...base, kind: "channel", ...change.channel });
 			return out;
 		}),
 		...timeline.workspaceLinks.map(
@@ -135,7 +137,15 @@ function collapse(events: TaskTimelineEvent[]): TaskTimelineEvent[] {
 
 type FieldChange = Extract<
 	TaskTimelineEvent,
-	{ kind: "renamed" | "status" | "priority" | "assignee" | "project" }
+	{
+		kind:
+			| "renamed"
+			| "status"
+			| "priority"
+			| "assignee"
+			| "project"
+			| "channel";
+	}
 >;
 
 const isFieldChange = (event: TaskTimelineEvent): event is FieldChange =>
@@ -143,7 +153,8 @@ const isFieldChange = (event: TaskTimelineEvent): event is FieldChange =>
 	event.kind === "status" ||
 	event.kind === "priority" ||
 	event.kind === "assignee" ||
-	event.kind === "project";
+	event.kind === "project" ||
+	event.kind === "channel";
 
 function cancelsOut(event: TaskTimelineEvent): boolean {
 	switch (event.kind) {
@@ -152,6 +163,7 @@ function cancelsOut(event: TaskTimelineEvent): boolean {
 			return event.from === event.to;
 		case "status":
 		case "project":
+		case "channel":
 			return (event.from?.id ?? null) === (event.to?.id ?? null);
 		case "assignee":
 			return (event.from?.userId ?? null) === (event.to?.userId ?? null);

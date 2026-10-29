@@ -2,10 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { i18n, initI18n } from "../index";
 import {
 	formatAge,
+	formatClockTime,
 	formatCompactNumber,
 	formatCompactRelativeTime,
 	formatCurrency,
 	formatDate,
+	formatElapsed,
 	formatNumber,
 	formatPercent,
 	formatPrice,
@@ -19,6 +21,12 @@ initI18n();
 describe("format helpers (en)", () => {
 	test("active locale defaults to en", () => {
 		expect(getActiveLocale()).toBe("en");
+	});
+
+	test("formatClockTime drops the day period", () => {
+		const time = new Date(2026, 9, 26, 23, 11);
+		expect(formatClockTime(time)).toBe("11:11");
+		expect(formatClockTime(time, "de")).toBe("23:11");
 	});
 
 	test("formatNumber groups digits", () => {
@@ -128,6 +136,19 @@ describe("formatRelativeTime", () => {
 		] as const;
 		for (const [elapsed, expected] of ages) {
 			expect(formatAge(now - elapsed, now)).toBe(expected);
+		}
+	});
+
+	test("elapsed time counts seconds before it counts minutes", () => {
+		const start = new Date("2026-08-28T12:00:00Z").getTime();
+		const cases = [
+			[0, "0s"],
+			[45 * 1000, "45s"],
+			[60 * 1000, "1m"],
+			[61 * 60 * 1000, "1h"],
+		] as const;
+		for (const [elapsed, expected] of cases) {
+			expect(formatElapsed(start, start + elapsed)).toBe(expected);
 		}
 	});
 

@@ -4,11 +4,11 @@ date: 2026-05-18
 image: /changelog/automations.png
 ---
 
-Superset is now usable from a lot more places than the desktop app: a fleshed-out CLI and TypeScript SDK, a Slack agent that spins up workspaces on its own, and a mobile app heading into internal review.
+Paradev is now usable from a lot more places than the desktop app: a fleshed-out CLI and TypeScript SDK, a Slack agent that spins up workspaces on its own, and a mobile app heading into internal review.
 
 ## Automations
 
-**Automations are cron jobs for agent sessions.** Pick a project, write a prompt, set a schedule, and Superset dispatches an agent run against a fresh workspace every time it fires. The output is a live workspace you can open, review, and continue interactively.
+**Automations are cron jobs for agent sessions.** Pick a project, write a prompt, set a schedule, and Paradev dispatches an agent run against a fresh workspace every time it fires. The output is a live workspace you can open, review, and continue interactively.
 
 Typical uses:
 
@@ -52,14 +52,14 @@ superset automations run <id>
 
 `superset automations run` is also exposed via the **TypeScript SDK** and **MCP**, so you can dispatch runs from a CI job, an internal admin panel, or a Slack slash command. See the [Automations docs](https://docs.superset.sh/docs/automations) for the full surface.
 
-## Superset CLI
+## Paradev CLI
 
 The `superset` CLI grew real project and workspace commands and a cross-device login flow.
 
 **New commands:**
 
-- `superset projects create` <PRBadge url="https://github.com/superset-sh/superset/pull/4355" />: scaffold a new Superset project from your shell.
-- `superset projects setup` <PRBadge url="https://github.com/superset-sh/superset/pull/4356" />: link an existing local repo to a Superset project.
+- `superset projects create` <PRBadge url="https://github.com/superset-sh/superset/pull/4355" />: scaffold a new Paradev project from your shell.
+- `superset projects setup` <PRBadge url="https://github.com/superset-sh/superset/pull/4356" />: link an existing local repo to a Paradev project.
 - `superset workspaces open` <PRBadge url="https://github.com/superset-sh/superset/pull/4258" />: open a workspace directly from the terminal.
 - `superset auth login` <PRBadge url="https://github.com/superset-sh/superset/pull/3965" />: now uses OAuth device code + PKCE, so it works on headless servers and across devices.
 
@@ -95,20 +95,20 @@ Linux `superset start` and `superset update` are now fixed <PRBadge url="https:/
 
 ## Slack bot
 
-![Superset Slack bot spinning up a workspace and reporting back in-thread](/changelog/slack.png)
+![Paradev Slack bot spinning up a workspace and reporting back in-thread](/changelog/slack.png)
 
 `@superset` in Slack is now an actual agent, not a task-filer. Mention it in a channel or DM it from anywhere, and it can:
 
-- **Create, update, search, and triage tasks** from the conversation it's standing in, pulling assignees, statuses, and priorities from your team's Linear/Superset setup.
+- **Create, update, search, and triage tasks** from the conversation it's standing in, pulling assignees, statuses, and priorities from your team's Linear/Paradev setup.
 - **Spin up a cloud workspace and launch a coding agent** to actually do the work. For code-change requests (e.g. "@superset bump our Sentry SDK to v9 across all apps"), it now defaults to spawning a workspace and agent rather than just filing a ticket <PRBadge url="https://github.com/superset-sh/superset/pull/4660" />.
 - **Read the thread or channel history** on its own to gather context: no need to copy-paste the prior messages.
 - **Search the web with citations** when a request needs up-to-date info.
-- **Unfurl Superset task and workspace links** with rich previews when they're shared in a channel.
+- **Unfurl Paradev task and workspace links** with rich previews when they're shared in a channel.
 
 **Setting it up:**
 
 1. In the dashboard, go to **Integrations → Slack**.
-2. Click **Connect** to install the Superset Slack app into your workspace (OAuth).
+2. Click **Connect** to install the Paradev Slack app into your workspace (OAuth).
 3. Mention `@superset` in any channel, or open a DM with the bot, and describe what you want done.
 
 If Slack was already connected before this release, no action needed: proactive workspace creation is on by default.
@@ -120,7 +120,7 @@ The mobile app is in **internal review**. Core flows (workspaces list, task tria
 ## Also in this batch
 
 - **Teams as a first-class primitive** <PRBadge url="https://github.com/superset-sh/superset/pull/4403" />: assign members, workspaces, and automations to a team. Powers the Mine/Team automations split above.
-- **Terminal sessions survive app updates** <PRBadge url="https://github.com/superset-sh/superset/pull/3971" />: the PTY daemon hands off file descriptors on upgrade, so running shells stay alive when Superset auto-updates.
+- **Terminal sessions survive app updates** <PRBadge url="https://github.com/superset-sh/superset/pull/3971" />: the PTY daemon hands off file descriptors on upgrade, so running shells stay alive when Paradev auto-updates.
 - **Web terminal presets** <PRBadge url="https://github.com/superset-sh/superset/pull/4653" />: run your common commands with a single click in the web terminal, same as desktop.
 
 ## Minor updates

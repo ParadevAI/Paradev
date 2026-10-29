@@ -2,6 +2,11 @@ export type {
 	CreatePaneInput,
 	CreateTabInput,
 	CreateWorkspaceStoreOptions,
+	FocusRequest,
+	GetPaneKey,
+	OpenPaneArgs,
+	PaneOpenOptions,
+	PlacePane,
 	WorkspaceStore,
 } from "./core/store";
 export { createWorkspaceStore } from "./core/store";
@@ -34,7 +39,13 @@ export type {
 	WorkspaceInteractionState,
 	WorkspaceProps,
 } from "./react";
-export { resolveTabTitle, useTabTitle, Workspace } from "./react";
+export {
+	resolveTabTitle,
+	useIsTabVisible,
+	usePaneFocus,
+	useTabTitle,
+	Workspace,
+} from "./react";
 export type {
 	LayoutNode,
 	Pane,

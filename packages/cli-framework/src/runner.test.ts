@@ -169,3 +169,88 @@ describe("introspectCli", () => {
 		);
 	});
 });
+
+describe("CLIError with data", () => {
+	async function runFailing(json: boolean, { stdoutClosed = false } = {}) {
+		const stdout: string[] = [];
+		const stderr: string[] = [];
+		const capture =
+			(sink: string[]) =>
+			(chunk: string | Uint8Array, cb?: (error?: Error) => void) => {
+				sink.push(String(chunk));
+				cb?.();
+				return true;
+			};
+		const brokenPipe = (
+			_chunk: string | Uint8Array,
+			cb?: (error?: Error) => void,
+		) => {
+			cb?.(Object.assign(new Error("write EPIPE"), { code: "EPIPE" }));
+			return false;
+		};
+		const write = { out: process.stdout.write, err: process.stderr.write };
+		const exit = process.exit;
+		let exitCode: number | undefined;
+		process.stdout.write = (
+			stdoutClosed ? brokenPipe : capture(stdout)
+		) as never;
+		process.stderr.write = capture(stderr) as never;
+		process.exit = ((code?: number) => {
+			exitCode = code;
+		}) as never;
+		try {
+			await runArgs(["rm", json ? "--json" : "--quiet"], {
+				name: "demo",
+				version: "0.0.0",
+				globals: {
+					json: boolean().desc("As JSON"),
+					quiet: boolean().desc("Quiet"),
+				},
+				tree: {
+					groups: [],
+					commands: [
+						{
+							path: ["rm"],
+							command: cmd("Remove", {
+								run: async () => {
+									throw new CLIError("Not found: b", "Pass full ids", {
+										deleted: ["a"],
+										notFound: ["b"],
+									});
+								},
+							}),
+						},
+					],
+				},
+			});
+		} finally {
+			process.stdout.write = write.out;
+			process.stderr.write = write.err;
+			process.exit = exit;
+		}
+		return { stdout: stdout.join(""), stderr: stderr.join(""), exitCode };
+	}
+
+	it("prints the data under --json and still exits 1", async () => {
+		const result = await runFailing(true);
+		expect(JSON.parse(result.stdout)).toEqual({
+			deleted: ["a"],
+			notFound: ["b"],
+		});
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("still exits 1 when stdout is closed", async () => {
+		const result = await runFailing(true, { stdoutClosed: true });
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("prints only the error under --quiet", async () => {
+		const result = await runFailing(false);
+		expect(result.stdout).toBe("");
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+});

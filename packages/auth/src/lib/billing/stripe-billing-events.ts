@@ -3,6 +3,7 @@ import { subscriptions } from "@superset/db/schema";
 import * as authSchema from "@superset/db/schema/auth";
 import { PaymentFailedEmail } from "@superset/email/emails/billing/payment-failed";
 import { RenewalUpcomingEmail } from "@superset/email/emails/billing/renewal-upcoming";
+import { NOREPLY_FROM } from "@superset/email/sender";
 import { Client } from "@upstash/qstash";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
@@ -100,7 +101,7 @@ export async function handleStripeBillingEvent(
 
 			await resend.batch.send(
 				recipients.map((recipient) => ({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: recipient.email,
 					subject: isFinalAttempt
 						? `Final notice: payment failed for ${org.name}`
@@ -174,6 +175,7 @@ export async function handleStripeBillingEvent(
 			| undefined;
 
 		if (!stripeSubId) return;
+		if (invoice.amount_due <= 0) return;
 
 		// Matched on the Stripe id, not the organization: an organization
 		// that resubscribed has several rows and the wrong one can win.
@@ -205,7 +207,7 @@ export async function handleStripeBillingEvent(
 
 		await resend.batch.send(
 			recipients.map((recipient) => ({
-				from: "Superset <noreply@superset.sh>",
+				from: NOREPLY_FROM,
 				to: recipient.email,
 				subject: `${org.name}'s ${subscription.plan} plan renews soon`,
 				react: RenewalUpcomingEmail({
@@ -223,6 +225,7 @@ export async function handleStripeBillingEvent(
 
 	if (event.type === "invoice.paid") {
 		const invoice = event.data.object as Stripe.Invoice;
+		if (invoice.amount_paid <= 0) return;
 
 		const subscriptionDetails =
 			invoice.parent?.subscription_details ?? undefined;

@@ -65,6 +65,7 @@ export function ReportPageDialog({ slug, signedIn }: ReportPageDialogProps) {
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				setOpen(next);
@@ -86,7 +87,7 @@ export function ReportPageDialog({ slug, signedIn }: ReportPageDialogProps) {
 							</DialogTitle>
 							<DialogDescription>
 								<Trans>
-									Someone on the Superset team will review this page. We only
+									Someone on the Paradev team will review this page. We only
 									follow up if we need more from you.
 								</Trans>
 							</DialogDescription>

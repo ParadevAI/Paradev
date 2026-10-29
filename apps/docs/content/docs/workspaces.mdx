@@ -7,7 +7,7 @@ description: Isolated environments for each git branch
 
 A workspace gives a task its own directory, terminals, and ports. Local project workspaces use isolated git worktrees; cloud workspaces use separate clones. [Sessions](#sessions) use a managed scratch folder without requiring a project.
 
-<YouTubeVideo id="8PuptrsyNvM" title="Superset Workspaces" thumbnail="/images/branches.png" />
+<YouTubeVideo id="8PuptrsyNvM" title="Paradev Workspaces" thumbnail="/images/branches.png" />
 
 ## Create Workspaces
 
@@ -19,7 +19,7 @@ Press **⌘N** or click "New Workspace". Create from:
 
 In the prompt-first workspace flow, **Link pull request** lets you search by title or PR number, or paste the full PR URL to match it directly. The prompt box also keeps a searchable history of your previous prompts; click the history icon to reuse one.
 
-If you type a workspace name yourself, the branch name is derived from it (slugified to kebab-case). Otherwise the workspace opens right away as **New workspace** (or **New session**), and Superset names it in the background from your prompt and any linked GitHub issue or pull request, usually within a few seconds. The branch gets the generated name plus a short unique suffix; the worktree folder keeps the name it was created with. If the first name is vague or naming fails, Superset tries again after the agent's next reply. The branch is renamed only while it is unpushed. Renaming the workspace yourself stops automatic naming. Per-project **Naming instructions** (in project settings) steer generated names, e.g. "prefix branches with fix/ or feat/".
+If you type a workspace name yourself, the branch name is derived from it (slugified to kebab-case). Otherwise the workspace opens right away as **New workspace** (or **New session**), and Paradev names it in the background from your prompt and any linked GitHub issue or pull request, usually within a few seconds. The branch gets the generated name plus a short unique suffix; the worktree folder keeps the name it was created with. If the first name is vague or naming fails, Paradev tries again after the agent's next reply. The branch is renamed only while it is unpushed. Renaming the workspace yourself stops automatic naming. Per-project **Naming instructions** (in project settings) steer generated names, e.g. "prefix branches with fix/ or feat/".
 
 Each new branch-based workspace gets:
 - Own git branch
@@ -31,11 +31,13 @@ New local worktrees use `<worktrees path>/<project name>/<branch>` directories. 
 
 ### Cloud Workspaces
 
-Cloud workspaces run in the cloud and are available from desktop, iPhone, and iPad without keeping your own computer connected. Superset creates a new working branch from the selected base. For multiple repositories, it uses the same working branch name in each. Attach images to the initial prompt to give the agent visual context when it starts.
+Cloud workspaces run in the cloud and are available from desktop, iPhone, and iPad without keeping your own computer connected. Paradev creates a new working branch from the selected base. For multiple repositories, it uses the same working branch name in each. Attach images to the initial prompt to give the agent visual context when it starts.
+
+To set up environments and pick a machine size, see [Cloud Workspaces](/cloud-workspaces).
 
 ## Import Worktrees
 
-If you have existing git worktrees on disk, use the **Import** tab in the New Workspace modal to bring them into Superset. Click **Import all** to bulk-import all discovered worktrees at once.
+If you have existing git worktrees on disk, use the **Import** tab in the New Workspace modal to bring them into Paradev. Click **Import all** to bulk-import all discovered worktrees at once.
 
 You can also right-click a project in the sidebar and choose **Import untracked worktrees**. A confirmation dialog lists the branches and paths that will be imported; the **Run setup script** checkbox is off by default, since existing worktrees are usually already set up.
 
@@ -78,7 +80,7 @@ Toolbar controls live in two menus, shared by both layouts:
 
 ## Restore a Workspace
 
-Right-click an archived card in the **Deleted** or **Merged** lane (or an archived row in List view) and choose **Restore**. Superset re-creates the worktree at its original path on its original branch and makes the workspace live again.
+Right-click an archived card in the **Deleted** or **Merged** lane (or an archived row in List view) and choose **Restore**. Paradev re-creates the worktree at its original path on its original branch and makes the workspace live again.
 
 - Only committed work comes back; uncommitted and untracked changes were already lost when the workspace was deleted.
 - Restore fails and the workspace stays archived if the branch no longer exists locally or on the remote.
@@ -115,7 +117,7 @@ Right-click a project in the sidebar and choose **Delete Project…**, or use **
 - Choose the devices to delete it from. The dialog shows what other people have running on each device. If someone else has terminals or agents running, you type the project name to confirm.
 - Deleting stops the project's terminals and agents and archives its workspaces. Worktrees stay on disk while the project can be restored.
 - From the sidebar, **Hide from sidebar** removes the project only for you.
-- Click **Undo** in the toast, or restore the project from **Settings → Projects → Recently deleted** for 30 days. After 30 days, Superset removes the project and its clean worktrees. Worktrees with uncommitted changes and the repository folder stay on disk.
+- Click **Undo** in the toast, or restore the project from **Settings → Projects → Recently deleted** for 30 days. After 30 days, Paradev removes the project and its clean worktrees. Worktrees with uncommitted changes and the repository folder stay on disk.
 - **Delete permanently** on the Recently deleted page removes the project now.
 
 ## Use Cases

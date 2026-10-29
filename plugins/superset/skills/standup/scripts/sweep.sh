@@ -1,5 +1,5 @@
 #!/bin/bash
-# Read-only sweep of Superset state for the standup skill.
+# Read-only sweep of Paradev state for the standup skill.
 # Emits one JSON object on stdout; progress and errors go to stderr.
 # Usage: sweep.sh [--host <id>] [--max-lines <n>]
 set -u
@@ -15,7 +15,7 @@ while [ $# -gt 0 ]; do
 done
 
 if ! command -v superset >/dev/null 2>&1; then
-  echo "superset CLI not found on PATH; install with: curl -fsSL https://superset.sh/cli/install.sh | sh" >&2
+  echo "superset CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
   exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then

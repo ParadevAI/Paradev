@@ -1,7 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
+	useRef,
+} from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -10,10 +17,7 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import {
-	type CloudPullRequestRef,
-	useCloudPullRequests,
-} from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
+import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import {
 	EMPTY_CLOUD_SIDEBAR,
@@ -25,6 +29,7 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import { getVisibleSidebarWorkspaces } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useTagFolderWorkspaces } from "renderer/routes/_authenticated/providers/TagFolderWorkspacesProvider";
 import {
 	deriveTagFolders,
 	useTagFolderContext,
@@ -55,6 +60,10 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import {
+	type StableDashboardSidebarProjects,
+	stabilizeDashboardSidebarProjects,
+} from "./stabilizeDashboardSidebarProjects";
 
 // Module-level so remounting the sidebar doesn't reset the cool-down.
 const pullRequestRefreshGate = createPullRequestRefreshGate();
@@ -64,16 +73,6 @@ type PullRequestWorkspaceRow = {
 	workspaceId: string;
 	pullRequest: SidebarPullRequest;
 };
-
-function haveSameProjects(
-	left: DashboardSidebarProject[],
-	right: DashboardSidebarProject[],
-): boolean {
-	return (
-		left.length === right.length &&
-		left.every((project, index) => project === right[index])
-	);
-}
 
 function getPullRequestRowsFingerprint(
 	rows: PullRequestWorkspaceRow[],
@@ -85,12 +84,6 @@ function getPullRequestRowsFingerprint(
 				leftWorkspaceId.localeCompare(rightWorkspaceId),
 			),
 	);
-}
-
-function getDashboardSidebarProjectFingerprint(
-	project: DashboardSidebarProject,
-): string {
-	return JSON.stringify(project);
 }
 
 function useStablePullRequestsByWorkspaceId(
@@ -143,53 +136,17 @@ function useJsonStable<Value>(value: Value): Value {
 function useStableDashboardSidebarProjects(
 	projects: DashboardSidebarProject[],
 ): DashboardSidebarProject[] {
-	const previousRef = useRef<{
-		projects: DashboardSidebarProject[];
-		byId: Map<
-			string,
-			{ fingerprint: string; project: DashboardSidebarProject }
-		>;
-	} | null>(null);
-
+	const previousRef = useRef<StableDashboardSidebarProjects | null>(null);
 	return useMemo(() => {
-		const previous = previousRef.current;
-		const nextById = new Map<
-			string,
-			{ fingerprint: string; project: DashboardSidebarProject }
-		>();
-		const nextProjects = projects.map((project) => {
-			const fingerprint = getDashboardSidebarProjectFingerprint(project);
-			const previousProject = previous?.byId.get(project.id);
-			const stableProject =
-				previousProject?.fingerprint === fingerprint
-					? previousProject.project
-					: project;
-
-			nextById.set(project.id, { fingerprint, project: stableProject });
-			return stableProject;
-		});
-
-		if (previous && haveSameProjects(previous.projects, nextProjects)) {
-			previousRef.current = { projects: previous.projects, byId: nextById };
-			return previous.projects;
-		}
-
-		previousRef.current = { projects: nextProjects, byId: nextById };
-		return nextProjects;
+		previousRef.current = stabilizeDashboardSidebarProjects(
+			projects,
+			previousRef.current,
+		);
+		return previousRef.current.projects;
 	}, [projects]);
 }
 
-interface UseDashboardSidebarDataOptions {
-	/**
-	 * File cloud workspaces under their repo's project instead of leaving
-	 * them to the Cloud section.
-	 */
-	inlineCloudWorkspaces?: boolean;
-}
-
-export function useDashboardSidebarData({
-	inlineCloudWorkspaces = false,
-}: UseDashboardSidebarDataOptions = {}) {
+export function useDashboardSidebarData() {
 	const { t } = useLingui();
 	const collections = useCollections();
 	const { machineId, activeHostUrl } = useLocalHostService();
@@ -345,29 +302,7 @@ export function useDashboardSidebarData({
 		[hostWorkspaces],
 	);
 
-	// The section lane the builder consumes is the deriveTagFolders union:
-	// stored presentation rows PLUS folders that exist only because some
-	// workspace carries the tag. A folder must exist because a workspace
-	// carries the tag, not because a local row does.
 	const tagFolderContext = useTagFolderContext();
-	const sidebarSections = useMemo(
-		() =>
-			deriveTagFolders(
-				storedSidebarSections,
-				hostWorkspaces,
-				tagFolderContext,
-			).map((section) => ({
-				id: section.sectionId,
-				projectId: section.projectId,
-				name: section.name,
-				createdAt: section.createdAt,
-				isCollapsed: section.isCollapsed,
-				tabOrder: section.tabOrder,
-				color: section.color,
-				tag: section.tag,
-			})),
-		[hostWorkspaces, storedSidebarSections, tagFolderContext],
-	);
 
 	const { data: sidebarLocalStateRows = [], isReady: sidebarLocalStateReady } =
 		useLiveQuery(
@@ -402,6 +337,38 @@ export function useDashboardSidebarData({
 	const userId = session?.user?.id ?? null;
 	const { workspaces: cloudRows, isFresh: isCloudListFresh } =
 		useCloudWorkspaces();
+	// One tag source for folders and rows alike: host tags, or the API's for
+	// a cloud row (TagFolderWorkspacesProvider).
+	const { workspaces: tagFolderWorkspaces } = useTagFolderWorkspaces();
+	const tagsById = useMemo(
+		() =>
+			new Map(
+				tagFolderWorkspaces.map((workspace) => [workspace.id, workspace.tags]),
+			),
+		[tagFolderWorkspaces],
+	);
+	// The section lane the builder consumes is the deriveTagFolders union:
+	// stored presentation rows PLUS folders that exist only because some
+	// workspace carries the tag. A folder must exist because a workspace
+	// carries the tag, not because a local row does.
+	const sidebarSections = useMemo(
+		() =>
+			deriveTagFolders(
+				storedSidebarSections,
+				tagFolderWorkspaces,
+				tagFolderContext,
+			).map((section) => ({
+				id: section.sectionId,
+				projectId: section.projectId,
+				name: section.name,
+				createdAt: section.createdAt,
+				isCollapsed: section.isCollapsed,
+				tabOrder: section.tabOrder,
+				color: section.color,
+				tag: section.tag,
+			})),
+		[storedSidebarSections, tagFolderContext, tagFolderWorkspaces],
+	);
 	const cloudSidebarEntries = useCloudSidebarStore((state) =>
 		organizationId
 			? (state.byOrganization[organizationId] ?? EMPTY_CLOUD_SIDEBAR).entries
@@ -411,33 +378,18 @@ export function useDashboardSidebarData({
 		(state) => state.pruneEntries,
 	);
 	useEffect(() => {
-		if (
-			!inlineCloudWorkspaces ||
-			!organizationId ||
-			!cloudRows ||
-			!isCloudListFresh
-		) {
-			return;
-		}
+		if (!organizationId || !cloudRows || !isCloudListFresh) return;
 		pruneCloudSidebarEntries(
 			organizationId,
 			new Set(cloudRows.map((row) => row.id)),
 		);
-	}, [
-		inlineCloudWorkspaces,
-		organizationId,
-		cloudRows,
-		isCloudListFresh,
-		pruneCloudSidebarEntries,
-	]);
+	}, [organizationId, cloudRows, isCloudListFresh, pruneCloudSidebarEntries]);
 	const shownCloudRows = useMemo(
 		() =>
-			inlineCloudWorkspaces
-				? (cloudRows ?? []).filter((row) =>
-						isInCloudSidebar(row, cloudSidebarEntries[row.id], userId),
-					)
-				: [],
-		[inlineCloudWorkspaces, cloudRows, cloudSidebarEntries, userId],
+			(cloudRows ?? []).filter((row) =>
+				isInCloudSidebar(row, cloudSidebarEntries[row.id], userId),
+			),
+		[cloudRows, cloudSidebarEntries, userId],
 	);
 	const {
 		primaryRepositoryById: cloudRepoFullNameById,
@@ -477,50 +429,33 @@ export function useDashboardSidebarData({
 			),
 		[allHostWorkspaces],
 	);
-	const cloudPullRequestRefs = useMemo<CloudPullRequestRef[]>(
-		() =>
-			shownCloudRows.flatMap((row) => {
-				const repoFullName = cloudRepoFullNameById.get(row.id);
-				return repoFullName
-					? [
-							{
-								repoFullName,
-								headBranch: cloudBranchById.get(row.id) ?? row.branch,
-							},
-						]
-					: [];
-			}),
-		[shownCloudRows, cloudRepoFullNameById, cloudBranchById],
-	);
-	const { byRef: cloudPullRequestsByRef } =
-		useCloudPullRequests(cloudPullRequestRefs);
+	const { byWorkspace: cloudPullRequestsById } = useCloudPullRequests({
+		active: shownCloudRows.length > 0,
+		archived: false,
+	});
 	const cloudLayout = useMemo(
 		() =>
-			inlineCloudWorkspaces
-				? buildCloudSidebarWorkspaces({
-						cloudWorkspaces: shownCloudRows,
-						userId,
-						projects: cloudProjectTargets,
-						repoFullNameById: cloudRepoFullNameById,
-						branchById: cloudBranchById,
-						pullRequestsByRef: cloudPullRequestsByRef,
-						unknownRepoProjectName: t({ message: "Cloud" }),
-					})
-				: null,
+			buildCloudSidebarWorkspaces({
+				cloudWorkspaces: shownCloudRows,
+				userId,
+				projects: cloudProjectTargets,
+				repoFullNameById: cloudRepoFullNameById,
+				branchById: cloudBranchById,
+				pullRequestsById: cloudPullRequestsById,
+				unknownRepoProjectName: t({ message: "Cloud" }),
+			}),
 		[
-			inlineCloudWorkspaces,
 			shownCloudRows,
 			userId,
 			cloudProjectTargets,
 			cloudRepoFullNameById,
 			cloudBranchById,
-			cloudPullRequestsByRef,
+			cloudPullRequestsById,
 			t,
 		],
 	);
 	const cloudRowById = useMemo(() => {
 		const byId = new Map<string, DashboardSidebarWorkspace>();
-		if (!cloudLayout) return byId;
 		for (const rows of cloudLayout.byProjectId.values()) {
 			for (const row of rows) byId.set(row.id, row);
 		}
@@ -531,9 +466,7 @@ export function useDashboardSidebarData({
 	}, [cloudLayout]);
 	const standInProjectIds = useMemo(
 		() =>
-			new Set(
-				(cloudLayout?.repoProjects ?? []).map((repoProject) => repoProject.id),
-			),
+			new Set(cloudLayout.repoProjects.map((repoProject) => repoProject.id)),
 		[cloudLayout],
 	);
 	// Cloud rows are placed like worktrees: a row-less workspace gets a
@@ -542,7 +475,6 @@ export function useDashboardSidebarData({
 	// (stand-in to real project) without touching order or pin.
 	useEffect(() => {
 		if (
-			!inlineCloudWorkspaces ||
 			!sidebarLocalStateReady ||
 			!cloudRepositoriesReady ||
 			!hostProjectsReady
@@ -568,7 +500,6 @@ export function useDashboardSidebarData({
 			}
 		}
 	}, [
-		inlineCloudWorkspaces,
 		sidebarLocalStateReady,
 		cloudRepositoriesReady,
 		hostProjectsReady,
@@ -581,7 +512,6 @@ export function useDashboardSidebarData({
 	// the real ones here, in placement order; one seen for the first time
 	// trails until its row lands.
 	const builderProjects = useMemo(() => {
-		if (!cloudLayout) return sidebarProjects;
 		const standIns = cloudLayout.repoProjects.flatMap((repoProject) => {
 			const row = sidebarProjectRowsById.get(repoProject.id);
 			if (row?.isHidden) return [];
@@ -617,7 +547,6 @@ export function useDashboardSidebarData({
 	const rawSidebarWorkspaces = useMemo(
 		() =>
 			sidebarLocalStateRows.flatMap((localState) => {
-				// A cloud row carries no host tags; its folder is its local pointer.
 				const source =
 					hostWorkspacesById.get(localState.workspaceId) ??
 					cloudRowById.get(localState.workspaceId);
@@ -636,13 +565,13 @@ export function useDashboardSidebarData({
 						lastActivityAt: source.lastActivityAt,
 						tabOrder: localState.tabOrder,
 						sectionId: localState.sectionId,
-						tags: "tags" in source ? source.tags : null,
+						tags: tagsById.get(localState.workspaceId),
 						isHidden: localState.isHidden,
 						pinnedAt: localState.pinnedAt,
 					},
 				];
 			}),
-		[cloudRowById, hostWorkspacesById, sidebarLocalStateRows],
+		[cloudRowById, hostWorkspacesById, sidebarLocalStateRows, tagsById],
 	);
 	const rawSidebarWorkspacesWithHostStatus = useMemo(
 		() =>
@@ -779,13 +708,26 @@ export function useDashboardSidebarData({
 		return () => clearTimeout(timer);
 	}, [githubHoldUntil]);
 
+	// Every row receives this as a prop; a new identity on each data change
+	// re-rendered the whole sidebar.
+	const pullRequestRefreshInputs = useRef({
+		visibleSidebarWorkspaces,
+		pullRequestQueryTargets,
+	});
+	useLayoutEffect(() => {
+		pullRequestRefreshInputs.current = {
+			visibleSidebarWorkspaces,
+			pullRequestQueryTargets,
+		};
+	});
 	const refreshWorkspacePullRequest = useCallback(
 		async (workspaceId: string) => {
-			const workspace = visibleSidebarWorkspaces.find(
+			const inputs = pullRequestRefreshInputs.current;
+			const workspace = inputs.visibleSidebarWorkspaces.find(
 				(candidate) => candidate.id === workspaceId,
 			);
 			if (!workspace) return;
-			const target = pullRequestQueryTargets.find(
+			const target = inputs.pullRequestQueryTargets.find(
 				(candidate) => candidate.machineId === workspace.hostId,
 			);
 			if (!target?.hostUrl) return;
@@ -801,7 +743,7 @@ export function useDashboardSidebarData({
 				queryKey: getDashboardSidebarPullRequestQueryKey(target),
 			});
 		},
-		[pullRequestQueryTargets, queryClient, visibleSidebarWorkspaces],
+		[queryClient],
 	);
 
 	const pullRequestsByWorkspaceId =
@@ -848,7 +790,7 @@ export function useDashboardSidebarData({
 	// the same placement rows as a real project; the row is written on first
 	// sight so the chevron works from the start.
 	useEffect(() => {
-		if (!cloudLayout || !sidebarProjectRowsReady) return;
+		if (!sidebarProjectRowsReady) return;
 		for (const repoProject of cloudLayout.repoProjects) {
 			if (!sidebarProjectRowsById.has(repoProject.id)) {
 				ensureProjectInSidebar(repoProject.id);
@@ -863,16 +805,14 @@ export function useDashboardSidebarData({
 
 	const decoratedGroups = useMemo(
 		() =>
-			cloudLayout
-				? applyCloudSidebarRows(computedGroups, cloudRowById, standInProjectIds)
-				: computedGroups,
-		[cloudLayout, computedGroups, cloudRowById, standInProjectIds],
+			applyCloudSidebarRows(computedGroups, cloudRowById, standInProjectIds),
+		[computedGroups, cloudRowById, standInProjectIds],
 	);
 	const groups = useStableDashboardSidebarProjects(decoratedGroups);
 
 	const hiddenRepoProjects = useMemo<DashboardSidebarHiddenProject[]>(
 		() =>
-			(cloudLayout?.repoProjects ?? []).flatMap((repoProject) =>
+			cloudLayout.repoProjects.flatMap((repoProject) =>
 				sidebarProjectRowsById.get(repoProject.id)?.isHidden
 					? [
 							{
@@ -918,11 +858,8 @@ export function useDashboardSidebarData({
 		[machineId, pinnedRows, pullRequestsByWorkspaceId, builderProjects],
 	);
 	const decoratedPinnedWorkspaces = useMemo(
-		() =>
-			cloudLayout
-				? applyCloudSidebarPinnedRows(computedPinnedWorkspaces, cloudRowById)
-				: computedPinnedWorkspaces,
-		[cloudLayout, computedPinnedWorkspaces, cloudRowById],
+		() => applyCloudSidebarPinnedRows(computedPinnedWorkspaces, cloudRowById),
+		[computedPinnedWorkspaces, cloudRowById],
 	);
 	const pinnedWorkspaces = useJsonStable(decoratedPinnedWorkspaces);
 

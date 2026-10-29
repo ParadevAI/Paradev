@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="full" alt="Claude et OpenCode travaillant en parallèle dans des espaces de travail Superset avec des diffs en direct" src="../apps/marketing/public/images/readme-hero.gif" />
+<img width="full" alt="Claude et OpenCode travaillant en parallèle dans des espaces de travail Paradev avec des diffs en direct" src="../apps/marketing/public/images/readme-hero.gif" />
 
 ### Exécutez plus de 100 agents de codage en parallèle
 
@@ -14,10 +14,10 @@
 
 *Ceci est une traduction du [README anglais](../README.md), qui reste la version de référence.*
 
-[![GitHub stars](https://img.shields.io/github/stars/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/superset-sh/superset?style=flat&logo=github)](https://github.com/superset-sh/superset/releases)
+[![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
 [![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
-[![Twitter](https://img.shields.io/badge/@superset__sh-555?logo=x)](https://x.com/superset_sh)
+[![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
 <br />
@@ -27,7 +27,7 @@ Passez votre temps à livrer, pas à attendre.
 
 <br />
 
-[**Télécharger pour macOS**](https://github.com/superset-sh/superset/releases/latest) &nbsp;&bull;&nbsp; [Documentation](https://docs.superset.sh) &nbsp;&bull;&nbsp; [Changelog](https://github.com/superset-sh/superset/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+[**Télécharger pour macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Documentation](https://docs.paradev.com) &nbsp;&bull;&nbsp; [Changelog](https://github.com/paradevai/paradev/releases) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 <br />
 
@@ -36,7 +36,7 @@ Passez votre temps à livrer, pas à attendre.
 
 ## Codez 10x plus vite, sans coût de changement de contexte
 
-Superset exécute des agents de codage en ligne de commande en parallèle dans des worktrees git isolés, avec terminal, revue de code et ouverture dans l'éditeur intégrés.
+Paradev exécute des agents de codage en ligne de commande en parallèle dans des worktrees git isolés, avec terminal, revue de code et ouverture dans l'éditeur intégrés.
 
 - **Exécutez plusieurs agents simultanément** sans la surcharge du changement de contexte
 - **Isolez chaque tâche** dans son propre worktree git pour que les agents n'interfèrent pas entre eux
@@ -57,11 +57,11 @@ Attendez moins, livrez plus.
 
 Exécutez plus de 100 agents de codage à la fois, chacun dans son propre worktree git avec sa propre branche, son terminal et son environnement. Comparez les résultats et mergez le gagnant.
 
-[Docs →](https://docs.superset.sh/workspaces)
+[Docs →](https://docs.paradev.com/workspaces)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Claude diffusant une migration de facturation pendant que d'autres agents tournent dans des espaces de travail parallèles" width="100%" /></a>
+  <a href="https://docs.paradev.com/workspaces"><img src="../apps/marketing/public/images/readme/agents-working.gif" alt="Claude diffusant une migration de facturation pendant que d'autres agents tournent dans des espaces de travail parallèles" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -71,11 +71,11 @@ Exécutez plus de 100 agents de codage à la fois, chacun dans son propre worktr
 
 Suivez chaque agent depuis la barre latérale, avec indicateurs d'activité, carillons de fin de tâche et badges sur le dock quand l'un d'eux a besoin de votre attention.
 
-[Docs →](https://docs.superset.sh/agent-integration)
+[Docs →](https://docs.paradev.com/agent-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Un agent terminant sa tâche et le statut de la barre latérale passant de « en cours » à « terminé »" width="100%" /></a>
+  <a href="https://docs.paradev.com/agent-integration"><img src="../apps/marketing/public/images/readme/agent-monitoring.gif" alt="Un agent terminant sa tâche et le statut de la barre latérale passant de « en cours » à « terminé »" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -85,11 +85,11 @@ Suivez chaque agent depuis la barre latérale, avec indicateurs d'activité, car
 
 Onglets, divisions illimitées, préréglages et sessions persistantes qui survivent aux redémarrages. Appuyez sur ⌘I pour un éditeur de prompt enrichi avec édition multiligne et mentions de fichiers via @.
 
-[Docs →](https://docs.superset.sh/terminal-integration)
+[Docs →](https://docs.paradev.com/terminal-integration)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Saisie d'une relance avec une mention de fichier @ dans l'éditeur de prompt enrichi à côté d'un terminal divisé" width="100%" /></a>
+  <a href="https://docs.paradev.com/terminal-integration"><img src="../apps/marketing/public/images/readme/terminal.gif" alt="Saisie d'une relance avec une mention de fichier @ dans l'éditeur de prompt enrichi à côté d'un terminal divisé" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -99,11 +99,11 @@ Onglets, divisions illimitées, préréglages et sessions persistantes qui survi
 
 Inspectez, commentez et modifiez les changements des agents sans quitter l'app, puis faites commit et push quand c'est prêt.
 
-[Docs →](https://docs.superset.sh/diff-viewer)
+[Docs →](https://docs.paradev.com/diff-viewer)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Revue des changements d'un agent dans la visionneuse de diff" width="100%" /></a>
+  <a href="https://docs.paradev.com/diff-viewer"><img src="../apps/marketing/public/images/readme/diff-viewer.png" alt="Revue des changements d'un agent dans la visionneuse de diff" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -113,11 +113,11 @@ Inspectez, commentez et modifiez les changements des agents sans quitter l'app, 
 
 Prévisualisez les serveurs de dev en cours d'exécution dans un panneau navigateur. Les ports sont détectés par espace de travail, chaque worktree a donc son propre aperçu.
 
-[Docs →](https://docs.superset.sh/browser)
+[Docs →](https://docs.paradev.com/browser)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Navigateur intégré prévisualisant un serveur de dev avec les ports détectés" width="100%" /></a>
+  <a href="https://docs.paradev.com/browser"><img src="../apps/marketing/public/images/readme/browser-ports.png" alt="Navigateur intégré prévisualisant un serveur de dev avec les ports détectés" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -127,11 +127,11 @@ Prévisualisez les serveurs de dev en cours d'exécution dans un panneau navigat
 
 Exécutez des sessions d'agent selon un planning : triez les issues pendant la nuit, rédigez le changelog hebdomadaire, gardez les dépendances à jour.
 
-[Docs →](https://docs.superset.sh/automations)
+[Docs →](https://docs.paradev.com/automations)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Automatisations d'agents planifiées" width="100%" /></a>
+  <a href="https://docs.paradev.com/automations"><img src="../apps/marketing/public/images/readme/automations.png" alt="Automatisations d'agents planifiées" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -141,25 +141,25 @@ Exécutez des sessions d'agent selon un planning : triez les issues pendant la n
 
 Connectez une autre machine et accédez à ses espaces de travail depuis n'importe où : l'app de bureau, la CLI ou votre téléphone. Réveillez les hôtes hors ligne avec une commande personnalisée.
 
-[Docs →](https://docs.superset.sh/remote-access)
+[Docs →](https://docs.paradev.com/remote-access)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Hôtes et membres dans les paramètres de l'organisation" width="100%" /></a>
+  <a href="https://docs.paradev.com/remote-access"><img src="../apps/docs/public/images/remote-workspaces-hosts-members.png" alt="Hôtes et membres dans les paramètres de l'organisation" width="100%" /></a>
 </td>
 </tr>
 <tr>
 <td width="50%" valign="middle">
 
-### CLI Superset
+### CLI Paradev
 
-Scriptez tout depuis n'importe quel shell : créez des espaces de travail, lancez des agents, lisez leurs terminaux et gérez les automatisations avec un seul binaire. Si un agent peut exécuter une commande, il peut piloter Superset.
+Scriptez tout depuis n'importe quel shell : créez des espaces de travail, lancez des agents, lisez leurs terminaux et gérez les automatisations avec un seul binaire. Si un agent peut exécuter une commande, il peut piloter Paradev.
 
-[Docs →](https://docs.superset.sh/cli/getting-started)
+[Docs →](https://docs.paradev.com/cli/getting-started)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Création d'un espace de travail et lancement d'un agent depuis la CLI Superset" width="100%" /></a>
+  <a href="https://docs.paradev.com/cli/getting-started"><img src="../apps/marketing/public/images/readme/cli-demo.gif" alt="Création d'un espace de travail et lancement d'un agent depuis la CLI Paradev" width="100%" /></a>
 </td>
 </tr>
 <tr>
@@ -169,31 +169,31 @@ Scriptez tout depuis n'importe quel shell : créez des espaces de travail, lance
 
 Accédez à n'importe quel espace de travail, action ou paramètre depuis une seule zone de recherche.
 
-[Docs →](https://docs.superset.sh/keyboard-shortcuts)
+[Docs →](https://docs.paradev.com/keyboard-shortcuts)
 
 </td>
 <td width="50%">
-  <a href="https://docs.superset.sh/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Saisie dans la palette de commandes et filtrage en direct des actions d'espace de travail" width="100%" /></a>
+  <a href="https://docs.paradev.com/keyboard-shortcuts"><img src="../apps/marketing/public/images/readme/command-palette.gif" alt="Saisie dans la palette de commandes et filtrage en direct des actions d'espace de travail" width="100%" /></a>
 </td>
 </tr>
 </table>
 
 **Également inclus :**
 
-- **[Compétences intégrées](https://docs.superset.sh/skills)** : les agents arrivent préchargés avec les compétences `superset:*` (orchestrer des agents parallèles, planifier des automatisations, envoyer des retours, diagnostiquer des problèmes), provisionnées automatiquement au lancement
-- **[Sélecteur de modèle et agents personnalisés](https://docs.superset.sh/agent-integration)** : choisissez un modèle et un niveau de raisonnement au lancement, et ajoutez n'importe quel agent de terminal avec sa propre icône
-- **[Scripts de configuration d'espace de travail](https://docs.superset.sh/setup-teardown-scripts)** : automatisez la configuration de l'environnement, l'installation des dépendances et les serveurs de dev par espace de travail
-- **[Préréglages de terminal](https://docs.superset.sh/terminal-presets)** : enregistrez des dispositions d'agents et de shells et ouvrez-les d'une seule touche
-- **[Slack et Linear](https://docs.superset.sh/use-with-linear)** : créez des espaces de travail depuis des messages Slack ou des issues Linear
-- **[Ouvrir dans votre IDE](https://docs.superset.sh/use-with-ide)** : passation en un clic vers Cursor, VS Code ou n'importe quel éditeur
-- **[Thèmes personnalisés](https://docs.superset.sh/custom-themes)** : créez, modifiez et importez des fichiers de thème
-- **[Raccourcis clavier](https://docs.superset.sh/keyboard-shortcuts)** : chaque action est remappable via **Paramètres → Raccourcis clavier** (⌘/)
-- **[Apportez vos propres fournisseurs](https://docs.superset.sh/providers)** : connectez OpenRouter, Bedrock, Vertex ou Vercel AI Gateway
-- **Et bien plus encore** : nous livrons tous les jours, cette liste est donc perpétuellement en retard. Le [changelog](https://superset.sh/changelog) est la vraie liste des fonctionnalités.
+- **[Compétences intégrées](https://docs.paradev.com/skills)** : les agents arrivent préchargés avec les compétences `superset:*` (orchestrer des agents parallèles, planifier des automatisations, envoyer des retours, diagnostiquer des problèmes), provisionnées automatiquement au lancement
+- **[Sélecteur de modèle et agents personnalisés](https://docs.paradev.com/agent-integration)** : choisissez un modèle et un niveau de raisonnement au lancement, et ajoutez n'importe quel agent de terminal avec sa propre icône
+- **[Scripts de configuration d'espace de travail](https://docs.paradev.com/setup-teardown-scripts)** : automatisez la configuration de l'environnement, l'installation des dépendances et les serveurs de dev par espace de travail
+- **[Préréglages de terminal](https://docs.paradev.com/terminal-presets)** : enregistrez des dispositions d'agents et de shells et ouvrez-les d'une seule touche
+- **[Slack et Linear](https://docs.paradev.com/use-with-linear)** : créez des espaces de travail depuis des messages Slack ou des issues Linear
+- **[Ouvrir dans votre IDE](https://docs.paradev.com/use-with-ide)** : passation en un clic vers Cursor, VS Code ou n'importe quel éditeur
+- **[Thèmes personnalisés](https://docs.paradev.com/custom-themes)** : créez, modifiez et importez des fichiers de thème
+- **[Raccourcis clavier](https://docs.paradev.com/keyboard-shortcuts)** : chaque action est remappable via **Paramètres → Raccourcis clavier** (⌘/)
+- **[Apportez vos propres fournisseurs](https://docs.paradev.com/providers)** : connectez OpenRouter, Bedrock, Vertex ou Vercel AI Gateway
+- **Et bien plus encore** : nous livrons tous les jours, cette liste est donc perpétuellement en retard. Le [changelog](https://paradev.com/changelog) est la vraie liste des fonctionnalités.
 
 ## Agents pris en charge
 
-Superset fonctionne avec n'importe quel agent de codage en ligne de commande, notamment :
+Paradev fonctionne avec n'importe quel agent de codage en ligne de commande, notamment :
 
 | Agent | Statut |
 |:------|:-------|
@@ -220,7 +220,7 @@ Superset fonctionne avec n'importe quel agent de codage en ligne de commande, no
 | <picture><source media="(prefers-color-scheme: dark)" srcset="../packages/ui/src/assets/icons/preset-icons/polygraph-white.svg" /><img height="16" align="top" alt="Polygraph" src="../packages/ui/src/assets/icons/preset-icons/polygraph.svg" /></picture> &nbsp;[Polygraph](https://trypolygraph.com/) | Entièrement pris en charge |
 | Tout autre agent CLI | Fonctionne sans configuration |
 
-S'il tourne dans un terminal, il tourne sur Superset
+S'il tourne dans un terminal, il tourne sur Paradev
 
 Les agents obtiennent plus qu'un terminal :
 
@@ -236,17 +236,17 @@ Chaque surface parle aux mêmes espaces de travail : vous pouvez démarrer une t
 
 | Surface | Ce que vous obtenez |
 |:--------|:-------------|
-| [**App de bureau**](https://github.com/superset-sh/superset/releases/latest) | L'IDE complet : terminaux, visionneuse de diff, navigateur intégré, automatisations |
-| [**CLI**](https://docs.superset.sh/cli/getting-started) | Un seul binaire `superset` pour gérer espaces de travail, agents, terminaux et hôtes depuis n'importe quel shell |
-| [**SDK TypeScript**](https://docs.superset.sh/sdk/getting-started) | Pilotez Superset par programmation avec [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) depuis Node, Bun ou Deno |
-| [**Serveur MCP**](https://docs.superset.sh/mcp) | Laissez Claude Code, Codex, Cursor et d'autres agents créer et gérer eux-mêmes des espaces de travail |
+| [**App de bureau**](https://github.com/paradevai/paradev/releases/latest) | L'IDE complet : terminaux, visionneuse de diff, navigateur intégré, automatisations |
+| [**CLI**](https://docs.paradev.com/cli/getting-started) | Un seul binaire `superset` pour gérer espaces de travail, agents, terminaux et hôtes depuis n'importe quel shell |
+| [**SDK TypeScript**](https://docs.paradev.com/sdk/getting-started) | Pilotez Paradev par programmation avec [`@superset_sh/sdk`](https://www.npmjs.com/package/@superset_sh/sdk) depuis Node, Bun ou Deno |
+| [**Serveur MCP**](https://docs.paradev.com/mcp) | Laissez Claude Code, Codex, Cursor et d'autres agents créer et gérer eux-mêmes des espaces de travail |
 
 La CLI est fournie avec l'app de bureau, ou installez-la seule :
 
 ```bash
-curl -fsSL https://superset.sh/cli/install.sh | sh
+curl -fsSL https://paradev.com/cli/install.sh | sh
 # or
-brew install superset-sh/tap/superset
+brew install paradevai/tap/superset
 ```
 
 Une app iOS arrive bientôt pour que vous puissiez suivre vos agents depuis votre téléphone.
@@ -255,20 +255,20 @@ Une app iOS arrive bientôt pour que vous puissiez suivre vos agents depuis votr
 
 Téléchargez l'app de bureau :
 
-- **macOS** : [Apple Silicon (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/superset-sh/superset/releases/latest/download/Superset-x64.dmg)
-- **Linux** : [AppImage x64](https://github.com/superset-sh/superset/releases/latest/download/Superset-x86_64.AppImage) (expérimental ; macOS est la cible principale)
+- **macOS** : [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+- **Linux** : [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (expérimental ; macOS est la cible principale)
 - **Windows** : pas encore disponible
-- [Tous les builds](https://github.com/superset-sh/superset/releases/latest)
+- [Tous les builds](https://github.com/paradevai/paradev/releases/latest)
 
-Tout ce dont vous avez besoin est [Git](https://git-scm.com/). [gh](https://cli.github.com/) est facultatif et débloque les workflows de PR ; Superset propose de l'installer pour vous.
+Tout ce dont vous avez besoin est [Git](https://git-scm.com/). [gh](https://cli.github.com/) est facultatif et débloque les workflows de PR ; Paradev propose de l'installer pour vous.
 
 ## Développement
 
-Envie de bidouiller Superset ou de contribuer une PR ? Clonez le dépôt, ajoutez-le à
-l'app Superset installée et créez un espace de travail pour votre changement :
+Envie de bidouiller Paradev ou de contribuer une PR ? Clonez le dépôt, ajoutez-le à
+l'app Paradev installée et créez un espace de travail pour votre changement :
 
 ```bash
-git clone https://github.com/superset-sh/superset.git
+git clone https://github.com/paradevai/paradev.git
 ```
 
 Puis lancez la configuration de développement depuis le terminal de cet espace de travail :
@@ -280,19 +280,19 @@ bun run dev
 
 Exécutez `setup.local.sh` une fois dans chaque nouveau worktree. Il configure l'identité
 d'app et les ports propres à l'espace de travail pour que l'app de bureau de développement
-puisse tourner à côté de l'app Superset installée et des autres worktrees de développement.
+puisse tourner à côté de l'app Paradev installée et des autres worktrees de développement.
 
 Aucun compte Neon ni identifiant tiers n'est nécessaire. `setup.local.sh` démarre
 une pile locale Postgres + Electric via Docker et amorce un compte de dev. Connectez-vous
 avec le bouton **« Sign in as dev »** (ou `admin@local.test` / `supersetdev`).
 
-Prérequis : [Bun](https://bun.sh/) v1.4.2+ (épinglé dans `.bun-version`), `docker`, `jq` et `caddy`, que `bun dev` exécute comme proxy HTTPS local (`brew install jq caddy && caddy trust`).
+Prérequis : [Bun](https://bun.sh/) v1.4.3+ (épinglé dans `.bun-version`), `docker`, `jq` et `caddy`, que `bun dev` exécute comme proxy HTTPS local (`brew install jq caddy && caddy trust`).
 
 Voir [**DEVELOPMENT.md**](../DEVELOPMENT.md) pour le guide complet : ce que fait le script de configuration, la configuration manuelle avec de vrais services, les commandes courantes, le dépannage et comment builder l'app de bureau. Le processus de contribution est décrit dans [**CONTRIBUTING.md**](../CONTRIBUTING.md).
 
 ## Configuration
 
-Configurez les scripts de setup, de teardown et de run des espaces de travail dans `.superset/config.json`. Voir la [documentation complète](https://docs.superset.sh/setup-teardown-scripts).
+Configurez les scripts de setup, de teardown et de run des espaces de travail dans `.superset/config.json`. Voir la [documentation complète](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
@@ -302,7 +302,7 @@ Configurez les scripts de setup, de teardown et de run des espaces de travail da
 }
 ```
 
-Les raccourcis clavier sont personnalisables via **Paramètres → Raccourcis clavier** (⌘/) ; voir la [liste complète des raccourcis](https://docs.superset.sh/keyboard-shortcuts).
+Les raccourcis clavier sont personnalisables via **Paramètres → Raccourcis clavier** (⌘/) ; voir la [liste complète des raccourcis](https://docs.paradev.com/keyboard-shortcuts).
 
 ## Pile technique
 
@@ -326,20 +326,20 @@ Les raccourcis clavier sont personnalisables via **Paramètres → Raccourcis cl
 
 ## Contribuer
 
-Les contributions sont les bienvenues ! Voir [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment vous installer et ouvrir une PR. Les bugs et demandes de fonctionnalités vont dans les [issues](https://github.com/superset-sh/superset/issues).
+Les contributions sont les bienvenues ! Voir [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment vous installer et ouvrir une PR. Les bugs et demandes de fonctionnalités vont dans les [issues](https://github.com/paradevai/paradev/issues).
 
-<a href="https://github.com/superset-sh/superset/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=superset-sh/superset" />
+<a href="https://github.com/paradevai/paradev/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=paradevai/paradev" />
 </a>
 
 ## Communauté
 
-Rejoignez la communauté Superset pour obtenir de l'aide, partager vos retours et échanger avec d'autres utilisateurs :
+Rejoignez la communauté Paradev pour obtenir de l'aide, partager vos retours et échanger avec d'autres utilisateurs :
 
 - **[Discord](https://discord.gg/cZeD9WYcV7)** : discutez avec l'équipe et la communauté
-- **[Twitter](https://x.com/superset_sh)** : suivez-nous pour les mises à jour et les annonces
-- **[GitHub Issues](https://github.com/superset-sh/superset/issues)** : signalez des bugs et demandez des fonctionnalités
-- **[GitHub Discussions](https://github.com/superset-sh/superset/discussions)** : posez des questions et partagez vos idées
+- **[Twitter](https://x.com/paradevai)** : suivez-nous pour les mises à jour et les annonces
+- **[GitHub Issues](https://github.com/paradevai/paradev/issues)** : signalez des bugs et demandez des fonctionnalités
+- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)** : posez des questions et partagez vos idées
 
 ### Équipe
 
@@ -351,4 +351,4 @@ Rejoignez la communauté Superset pour obtenir de l'aide, partager vos retours e
 
 **L'app de bureau est gratuite pour toujours.** Exécuter des agents en parallèle sur votre propre machine ne nécessitera jamais de paiement. Tout ce que nous facturerons sera un service optionnel en plus.
 
-L'app entière est dans ce dépôt sous [Elastic License 2.0](../LICENSE.md) : utilisez-la, forkez-la, modifiez-la, hébergez-la vous-même pour votre équipe. La seule chose exclue est de reconditionner Superset lui-même en un service que vous vendez à d'autres.
+L'app entière est dans ce dépôt sous [Elastic License 2.0](../LICENSE.md) : utilisez-la, forkez-la, modifiez-la, hébergez-la vous-même pour votre équipe. La seule chose exclue est de reconditionner Paradev lui-même en un service que vous vendez à d'autres.

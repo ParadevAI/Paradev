@@ -1,0 +1,1 @@
+export { SlackHoverCard } from "./SlackHoverCard";

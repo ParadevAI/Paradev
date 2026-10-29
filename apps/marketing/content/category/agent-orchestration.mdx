@@ -42,7 +42,7 @@ Each unit of work gets its own working directory and branch, almost always a [Gi
 
 ### Persistent sessions
 
-Session persistence separates the agent process from the app window. In Superset, a terminal daemon owns the sessions, so restarting the app does not need to restart the agent. Persistence does not keep a sleeping or powered-off host executing work. See the [terminal daemon implementation](/blog/terminal-daemon-deep-dive).
+Session persistence separates the agent process from the app window. In Paradev, a terminal daemon owns the sessions, so restarting the app does not need to restart the agent. Persistence does not keep a sleeping or powered-off host executing work. See the [terminal daemon implementation](/blog/terminal-daemon-deep-dive).
 
 ### Status and monitoring
 
@@ -62,20 +62,20 @@ Recurring prompts on a schedule: nightly dependency bumps, morning triage of new
 
 ### Programmatic control
 
-An API for the whole loop, so scripts and other agents can create workspaces, launch agents with a prompt, read terminals, and collect results. The emerging standard here is [MCP](https://docs.superset.sh/mcp-server) (Model Context Protocol): expose orchestration as tools, and any MCP-capable agent can drive it. This is how agent-managing-agents setups work in practice, and Superset ships an MCP server, a [CLI](https://docs.superset.sh/cli/getting-started), and a [TypeScript SDK](https://docs.superset.sh/sdk/getting-started) for exactly this.
+An API for the whole loop, so scripts and other agents can create workspaces, launch agents with a prompt, read terminals, and collect results. The emerging standard here is [MCP](https://docs.paradev.com/mcp-server) (Model Context Protocol): expose orchestration as tools, and any MCP-capable agent can drive it. This is how agent-managing-agents setups work in practice, and Paradev ships an MCP server, a [CLI](https://docs.paradev.com/cli/getting-started), and a [TypeScript SDK](https://docs.paradev.com/sdk/getting-started) for exactly this.
 
 ![The superset CLI menu: agents, automations, hosts, projects, tasks, terminals, and workspaces, all scriptable from any shell](/changelog/2026-08-09-cli-browser.png)
 
-## What Superset orchestrates
+## What Paradev orchestrates
 
-Superset (superset.sh) is a source-available workspace for CLI coding agents. It is unrelated to Apache Superset, the business-intelligence product. Claude Code, Codex, and OpenCode provide the coding agents; Superset provides workspaces, terminals, review, and scheduling around them.
+Paradev (paradev.com) is a source-available workspace for CLI coding agents. It is unrelated to Apache Superset, the business-intelligence product. Claude Code, Codex, and OpenCode provide the coding agents; Paradev provides workspaces, terminals, review, and scheduling around them.
 
 | Fact | Where to verify it |
 |---|---|
-| Source-available under Elastic License 2.0, not OSI-approved open source | [Repository license](https://github.com/superset-sh/superset/blob/main/LICENSE.md) |
+| Source-available under Elastic License 2.0, not OSI-approved open source | [Repository license](https://github.com/paradevai/paradev/blob/main/LICENSE.md) |
 | macOS desktop; experimental Linux AppImage; Windows unavailable | [Downloads](/download) |
 | Free tier plus paid seats; agent-provider usage is separate | [Current plans](/pricing) |
-| Automations require Pro or Enterprise and an available target host | [Automation requirements](https://docs.superset.sh/automations) |
+| Automations require Pro or Enterprise and an available target host | [Automation requirements](https://docs.paradev.com/automations) |
 | Worktrees separate working files, not process permissions, ports, or databases | [Git worktree reference](https://git-scm.com/docs/git-worktree) |
 
 For a first scheduled task, use the [maintenance-check walkthrough](/blog/scheduled-agent-maintenance). It includes a bounded prompt and explains how to inspect the result. An automation run marked **created** means its workspace was created; inspect the agent output to know whether the checks passed.
@@ -98,7 +98,7 @@ Tools in this category split on one design question: who decomposes the work?
 
 **Coordinator-led** tools put an AI in charge of planning. [Augment Intent](/compare/superset-vs-augment-intent), for example, has a coordinator agent draft a spec, fan tasks out to implementor agents, and run a verifier over the result. You approve at checkpoints. This buys hands-off breadth on well-scoped features and costs you control over decomposition.
 
-**Developer-led** tools keep decomposition with you and make dispatch, isolation, monitoring, and review as fast as possible. Superset, [Conductor](/compare/superset-vs-conductor), and [Zed's Parallel Agents](/compare/superset-vs-zed) are in this school. It matches how senior engineers already split work, and it degrades gracefully: when a task is fuzzy, you scope it, not a planning agent.
+**Developer-led** tools keep decomposition with you and make dispatch, isolation, monitoring, and review as fast as possible. Paradev, [Conductor](/compare/superset-vs-conductor), and [Zed's Parallel Agents](/compare/superset-vs-zed) are in this school. It matches how senior engineers already split work, and it degrades gracefully: when a task is fuzzy, you scope it, not a planning agent.
 
 Neither is strictly better. Coordinator-led shines on PR-sized features with clear requirements. Developer-led wins when task boundaries need judgment: legacy code, fuzzy specs, work that touches shared modules.
 
@@ -124,11 +124,11 @@ Frameworks like LangChain or agent SDKs are for building agents and wiring them 
 
 ### Can one AI agent manage other coding agents?
 
-Yes. Expose orchestration as MCP tools and any MCP-capable agent can create workspaces, launch agents with prompts, watch their terminals, and collect diffs. Superset ships an MCP server for this, so a chat agent or a CI job can run a fleet without a human in the dispatch loop.
+Yes. Expose orchestration as MCP tools and any MCP-capable agent can create workspaces, launch agents with prompts, watch their terminals, and collect diffs. Paradev ships an MCP server for this, so a chat agent or a CI job can run a fleet without a human in the dispatch loop.
 
 ### How do scheduled agent runs work?
 
-You define a prompt, an agent, a target host, and a schedule. Superset Automations require Pro or Enterprise. If the host is offline when dispatch occurs, the run fails and the schedule advances; retry after the host is available. A created workspace is not evidence that the agent succeeded. Read its output before accepting the result.
+You define a prompt, an agent, a target host, and a schedule. Paradev Automations require Pro or Enterprise. If the host is offline when dispatch occurs, the run fails and the schedule advances; retry after the host is available. A created workspace is not evidence that the agent succeeded. Read its output before accepting the result.
 
 ### What should I look for in an agent orchestration tool?
 

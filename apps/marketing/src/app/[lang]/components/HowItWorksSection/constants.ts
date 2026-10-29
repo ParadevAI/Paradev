@@ -15,7 +15,7 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
 		}),
 		description: msg({
 			message:
-				"Describe what you need. Superset creates an isolated workspace and clean branch for the task.",
+				"Describe what you need. Paradev creates an isolated workspace and clean branch for the task.",
 		}),
 	},
 	{

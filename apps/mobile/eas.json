@@ -5,13 +5,16 @@
 	},
 	"build": {
 		"development": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"developmentClient": true,
 			"distribution": "internal",
 			"environment": "development",
 			"channel": "development",
 			"env": {
 				"MOBILE_EAS_BUILD": "1"
+			},
+			"ios": {
+				"image": "macos-tahoe-26.6-xcode-27.1"
 			}
 		},
 		"development-simulator": {
@@ -21,19 +24,23 @@
 			}
 		},
 		"preview": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"distribution": "internal",
 			"environment": "preview",
 			"channel": "preview",
 			"env": {
 				"MOBILE_EAS_BUILD": "1"
+			},
+			"ios": {
+				"image": "macos-tahoe-26.6-xcode-27.1"
 			}
 		},
 		"e2e-test": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"withoutCredentials": true,
 			"ios": {
-				"simulator": true
+				"simulator": true,
+				"image": "macos-tahoe-26.6-xcode-27.1"
 			},
 			"env": {
 				"MOBILE_EAS_BUILD": "1",
@@ -41,12 +48,15 @@
 			}
 		},
 		"production": {
-			"bun": "1.4.2",
+			"bun": "1.4.3",
 			"autoIncrement": true,
 			"environment": "production",
 			"channel": "production",
 			"env": {
 				"MOBILE_EAS_BUILD": "1"
+			},
+			"ios": {
+				"image": "macos-tahoe-26.6-xcode-27.1"
 			}
 		}
 	},

@@ -12,8 +12,11 @@ import { MemberRemovedBillingEmail } from "@superset/email/emails/billing/member
 import { OrganizationInvitationEmail } from "@superset/email/emails/team/invitation";
 import { MemberAddedEmail } from "@superset/email/emails/team/member-added";
 import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
+import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
+import { COMPANY } from "@superset/shared/constants";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
@@ -50,8 +53,12 @@ import {
 } from "./lib/billing/subscription-events";
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
-import { getActivationVariant } from "./lib/lifecycle";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
+import {
+	convertPendingShares,
+	removeInvitationShares,
+	removeMemberShares,
+} from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
 import { resend } from "./lib/resend";
 import {
@@ -118,11 +125,13 @@ export const auth = betterAuth({
 		schema: { ...authSchema, subscriptions },
 	}),
 	trustedOrigins: async (request) => [
-		env.NEXT_PUBLIC_WEB_URL,
-		env.NEXT_PUBLIC_API_URL,
-		env.NEXT_PUBLIC_MARKETING_URL,
-		env.NEXT_PUBLIC_ADMIN_URL,
-		...(env.NEXT_PUBLIC_DESKTOP_URL ? [env.NEXT_PUBLIC_DESKTOP_URL] : []),
+		...withOwnDomainTwins([
+			env.NEXT_PUBLIC_WEB_URL,
+			env.NEXT_PUBLIC_API_URL,
+			env.NEXT_PUBLIC_MARKETING_URL,
+			env.NEXT_PUBLIC_ADMIN_URL,
+			env.NEXT_PUBLIC_DESKTOP_URL,
+		]),
 		...getTrustedVercelPreviewOrigins(request?.url ?? env.NEXT_PUBLIC_API_URL),
 		...desktopDevOrigins,
 		"superset://app",
@@ -304,11 +313,8 @@ export const auth = betterAuth({
 							.where(eq(authSchema.sessions.userId, user.id));
 					}
 
-					// The welcome email is unconditional in BOTH arms. Gating it is
-					// what invalidated experiment 387868: a6beb048b changed the control
-					// condition mid-flight and the run became unreadable. The `welcome`
-					// automation sends it, because only automation sends get Resend's
-					// unsubscribe link and List-Unsubscribe headers.
+					// The `welcome` automation sends this, because only automation
+					// sends get Resend's unsubscribe link and List-Unsubscribe headers.
 					try {
 						const { error } = await resend.events.send({
 							event: "user.welcome",
@@ -323,35 +329,18 @@ export const auth = betterAuth({
 						);
 					}
 
-					// Only drip enrolment is randomised. Nothing differs between arms
-					// until the first nudge (>=23h after signup), so "not activated at
-					// 22h" stays a pre-treatment covariate and the analysis can restrict
-					// to it without selection bias. Kill switch for the nudges is still
-					// the Resend automation toggle.
-					//
-					// CAUTION: withholding this event withholds it from EVERY consumer,
-					// not just the activation drip. Safe today because activation-drip
-					// is the only automation in sync-automations.ts triggering on
-					// `user.signed_up` — but that script is create-only and Resend can
-					// hold automations it never defined, so check the live account
-					// before trusting that. A second consumer means splitting enrolment
-					// first: emit `user.signed_up` unconditionally and gate an
-					// activation-only event instead, or the control arm silently drops
-					// out of that campaign too.
-					if ((await getActivationVariant(user.id)) === "test") {
-						try {
-							const { error } = await resend.events.send({
-								event: "user.signed_up",
-								email: user.email,
-								payload: { userId: user.id, name: user.name },
-							});
-							if (error) throw new Error(error.message);
-						} catch (error) {
-							console.error(
-								`[lifecycle] Failed to emit signup event for ${user.id}:`,
-								error,
-							);
-						}
+					try {
+						const { error } = await resend.events.send({
+							event: "user.signed_up",
+							email: user.email,
+							payload: { userId: user.id, name: user.name },
+						});
+						if (error) throw new Error(error.message);
+					} catch (error) {
+						console.error(
+							`[lifecycle] Failed to emit signup event for ${user.id}:`,
+							error,
+						);
 					}
 				},
 			},
@@ -381,19 +370,27 @@ export const auth = betterAuth({
 					user: { id: string; name?: string | null; image?: string | null };
 					session: Record<string, unknown>;
 				}) => {
-					const userMemberships = await db.query.members.findMany({
-						where: eq(members.userId, user.id),
-						columns: { organizationId: true },
-					});
+					const [userMemberships, userTeams] = await Promise.all([
+						db.query.members.findMany({
+							where: eq(members.userId, user.id),
+							columns: { organizationId: true },
+						}),
+						db
+							.select({ teamId: authSchema.teamMembers.teamId })
+							.from(authSchema.teamMembers)
+							.where(eq(authSchema.teamMembers.userId, user.id)),
+					]);
 					const organizationIds = [
 						...new Set(userMemberships.map((m) => m.organizationId)),
 					];
+					const teamIds = [...new Set(userTeams.map((t) => t.teamId))];
 					// A Worker that attributes content to a person has to read
 					// who they are from the signed token; a caller-supplied name
 					// is a name they chose for someone else.
 					return {
 						sub: user.id,
 						organizationIds,
+						teamIds,
 						name: user.name ?? null,
 						image: user.image ?? null,
 					};
@@ -497,7 +494,7 @@ export const auth = betterAuth({
 				});
 
 				await resend.emails.send({
-					from: "Superset <noreply@superset.sh>",
+					from: NOREPLY_FROM,
 					to: data.email,
 					subject: `${data.inviter.user.name} invited you to join ${data.organization.name}`,
 					react: OrganizationInvitationEmail({
@@ -750,6 +747,19 @@ export const auth = betterAuth({
 				},
 
 				afterAddMember: async ({ member, user, organization }) => {
+					try {
+						await convertPendingShares({
+							organizationId: organization.id,
+							userId: member.userId,
+							email: user.email,
+						});
+					} catch (error) {
+						console.error(
+							"[org/after-add-member] Failed to convert pending shares:",
+							error,
+						);
+					}
+
 					// Linear-style: auto-add new org members to the oldest team so
 					// they aren't dropped into an empty teams view. Additional team
 					// memberships are added explicitly by admins.
@@ -775,7 +785,7 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
@@ -792,7 +802,7 @@ export const auth = betterAuth({
 
 					if (acceptedInvitation) {
 						await resend.emails.send({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: user.email,
 							subject: `You've been added to ${organization.name}`,
 							react: MemberAddedEmail({
@@ -807,7 +817,6 @@ export const auth = betterAuth({
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -819,10 +828,11 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
-					const seatsSetInAutumn =
+					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					if (!seatsSetInAutumn && itemId) {
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{
@@ -865,7 +875,7 @@ export const auth = betterAuth({
 
 					await resend.batch.send(
 						recipients.map((recipient) => ({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: recipient.email,
 							subject: `Billing update: New member added to ${organization.name}`,
 							react: MemberAddedBillingEmail({
@@ -904,8 +914,20 @@ export const auth = betterAuth({
 				},
 
 				afterRemoveMember: async ({ user, organization }) => {
+					try {
+						await removeMemberShares({
+							organizationId: organization.id,
+							userId: user.id,
+						});
+					} catch (error) {
+						console.error(
+							"[org/after-remove-member] Failed to remove shares:",
+							error,
+						);
+					}
+
 					await resend.emails.send({
-						from: "Superset <noreply@superset.sh>",
+						from: NOREPLY_FROM,
 						to: user.email,
 						subject: `You've been removed from ${organization.name}`,
 						react: MemberRemovedEmail({
@@ -918,13 +940,12 @@ export const auth = betterAuth({
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
-							eq(subscriptions.status, "active"),
+							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
 						),
 					});
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
-
 					const quantity = Math.max(
 						1,
 						await countBillableSeats(organization.id),
@@ -936,10 +957,11 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
-					const seatsSetInAutumn =
+					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					if (!seatsSetInAutumn && itemId) {
+					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
+					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
 							{
@@ -980,7 +1002,7 @@ export const auth = betterAuth({
 
 					await resend.batch.send(
 						recipients.map((recipient) => ({
-							from: "Superset <noreply@superset.sh>",
+							from: NOREPLY_FROM,
 							to: recipient.email,
 							subject: `Billing update: Member removed from ${organization.name}`,
 							react: MemberRemovedBillingEmail({
@@ -1017,6 +1039,24 @@ export const auth = betterAuth({
 						);
 					}
 				},
+
+				afterCancelInvitation: async ({ invitation }) => {
+					await removeInvitationShares(invitation.id).catch((error) =>
+						console.error(
+							"[org/after-cancel-invitation] Failed to remove shares:",
+							error,
+						),
+					);
+				},
+
+				afterRejectInvitation: async ({ invitation }) => {
+					await removeInvitationShares(invitation.id).catch((error) =>
+						console.error(
+							"[org/after-reject-invitation] Failed to remove shares:",
+							error,
+						),
+					);
+				},
 			},
 		}),
 		bearer(),
@@ -1040,6 +1080,7 @@ export const auth = betterAuth({
 				const data = await loadCustomSessionData({
 					userId,
 					activeOrganizationId: session.activeOrganizationId ?? null,
+					withPlan: !billingUsesAutumn,
 				});
 
 				const { activeOrganizationId, allMemberships, membership } =
@@ -1061,7 +1102,12 @@ export const auth = betterAuth({
 				// reached, so an "active"-only read here would strand trialing
 				// and past_due organizations on a cold start.
 				let plan: string | null = null;
-				if (activeOrganizationId === data.planOrganizationId) {
+				if (billingUsesAutumn) {
+					const tier = activeOrganizationId
+						? await organizationPlanFromAutumn(activeOrganizationId)
+						: "free";
+					plan = tier === "free" ? null : tier;
+				} else if (activeOrganizationId === data.planOrganizationId) {
 					plan = data.plan;
 				} else if (activeOrganizationId) {
 					// A concurrent request moved the session's active organization
@@ -1163,7 +1209,7 @@ export const auth = betterAuth({
 					) => {
 						if (plan.name === "enterprise") {
 							throw new Error(
-								"Enterprise subscriptions are managed by admins. Contact support@superset.sh.",
+								`Enterprise subscriptions are managed by admins. Contact ${COMPANY.SUPPORT_EMAIL}.`,
 							);
 						}
 

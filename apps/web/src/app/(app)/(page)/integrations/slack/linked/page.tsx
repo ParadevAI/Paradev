@@ -24,7 +24,7 @@ export default async function SlackLinkedPage() {
 						{i18n._(
 							msg({
 								message:
-									"Your Slack account has been linked to Superset. You can close this tab and return to Slack.",
+									"Your Slack account has been linked to Paradev. You can close this tab and return to Slack.",
 							}),
 						)}
 					</p>

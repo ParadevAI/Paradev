@@ -45,7 +45,12 @@ export function PagePane({
 		(page: { id: string; slug: string; title: string | null }) => {
 			const current = dataRef.current;
 			const title = page.title ?? undefined;
-			if (current.pageId === page.id && current.title === title) return;
+			if (
+				current.pageId === page.id &&
+				current.slug === page.slug &&
+				current.title === title
+			)
+				return;
 			onDataChangeRef.current({ slug: page.slug, pageId: page.id, title });
 		},
 		[],
