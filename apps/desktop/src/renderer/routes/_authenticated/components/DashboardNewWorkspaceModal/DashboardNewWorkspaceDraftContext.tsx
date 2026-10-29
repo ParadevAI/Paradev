@@ -11,11 +11,7 @@ import {
 } from "renderer/stores/new-workspace-draft";
 import { useShallow } from "zustand/react/shallow";
 
-export type {
-	BaseBranchSource,
-	LinkedIssue,
-	LinkedPR,
-} from "renderer/stores/new-workspace-draft";
+export type { BaseBranchSource } from "renderer/stores/new-workspace-draft";
 export type DashboardNewWorkspaceDraft = NewWorkspaceDraft;
 
 interface DraftContextValue {
@@ -58,7 +54,7 @@ export function useDashboardNewWorkspaceDraft() {
 			isSession: store.isSession,
 			hostId: store.hostId,
 			checkout: store.checkout,
-			prompt: store.prompt,
+			promptDraft: store.promptDraft,
 			baseBranch: store.baseBranch,
 			baseBranchSource: store.baseBranchSource,
 			workspaceName: store.workspaceName,
@@ -66,10 +62,8 @@ export function useDashboardNewWorkspaceDraft() {
 			branchName: store.branchName,
 			branchNameEdited: store.branchNameEdited,
 			branchNameFromProvider: store.branchNameFromProvider,
-			linkedIssues: store.linkedIssues,
-			linkedPR: store.linkedPR,
 			selectedAgentId: store.selectedAgentId,
-			attachments: store.attachments,
+			promptAttachments: store.promptAttachments,
 		})),
 	);
 	const updateDraft = useNewWorkspaceDraftStore((store) => store.updateDraft);

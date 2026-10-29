@@ -26,10 +26,11 @@ import {
 	reopenCloudChatLaunch,
 } from "../../utils/closedChatSessions";
 import { markChatSessionLive } from "../usePaneRegistry/components/ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
-import { readComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
+import { hasComposerDraft } from "../usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { PENDING_CLOUD_CHAT_TIMEOUT_MS } from "./constants";
 import { initialCloudChatPromptHash } from "./utils/initialCloudChatPrompt";
+import { latestOpenChatSessions } from "./utils/latestOpenChatSessions";
 import { unresolvedPollDelay } from "./utils/unresolvedPollDelay";
 
 type PaneStore = StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -195,7 +196,7 @@ export function useAutoAdoptChatSessions({
 				waitingSince.current.delete(pending.paneId);
 				const typed =
 					pending.data.queuedPrompts?.length ||
-					readComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
+					hasComposerDraft(`chat-v3-draft:${pending.data.draftId}`);
 				if (typed) {
 					pending.store
 						.getState()
@@ -254,17 +255,15 @@ export function useAutoAdoptChatSessions({
 			}
 		}
 
-		const toAdopt = result.sessions
+		const toAdopt = latestOpenChatSessions(result.sessions, attached)
 			.filter(
 				(session) =>
-					session.live &&
 					!result.unresolved.includes(session.sessionId) &&
 					!isChatSessionClosed(session.sessionId) &&
-					!attached.has(session.sessionId) &&
-					!(session.terminalId && attached.has(session.terminalId)) &&
 					!(session.terminalId && isChatTerminalClosed(session.terminalId)) &&
 					!(
-						typeof result.promptHashes[session.sessionId] === "string" &&
+						(!session.live ||
+							typeof result.promptHashes[session.sessionId] === "string") &&
 						waitingAgents.has(presetForAcpHarness(session.harness) ?? "")
 					) &&
 					presetForAcpHarness(session.harness),

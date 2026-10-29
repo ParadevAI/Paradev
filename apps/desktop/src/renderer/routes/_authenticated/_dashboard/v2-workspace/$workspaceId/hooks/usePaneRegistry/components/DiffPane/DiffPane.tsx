@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type {
 	CodeViewItem,
 	DiffLineAnnotation,
@@ -16,6 +16,7 @@ import {
 import { errorMessage } from "@superset/i18n/errors";
 import { type RendererContext, useIsTabVisible } from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
+import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -36,6 +37,7 @@ import type { DiffPaneData, PaneViewerData } from "../../../../types";
 import { changesPillStats } from "../../../../utils/changesPillStats";
 import {
 	type ChangesetFile,
+	type DiffRef,
 	getChangesetFileKey,
 	useChangeset,
 } from "../../../useChangeset";
@@ -122,7 +124,20 @@ export function DiffPane({
 		: "hidden";
 	const closeOverlayFileList = useCallback(() => setFileListOpen(null), []);
 
-	const ref = useSidebarDiffRef(workspaceId);
+	const sidebarRef = useSidebarDiffRef(workspaceId);
+	const filter = data.filter;
+	const range = filter?.range;
+	const ref = useMemo<DiffRef>(
+		() =>
+			range
+				? {
+						kind: "commit",
+						commitHash: range.toHash,
+						fromHash: range.fromHash,
+					}
+				: sidebarRef,
+		[range, sidebarRef],
+	);
 	const scrollStateKey = useMemo(
 		() =>
 			createPaneScrollStateKey({
@@ -137,7 +152,18 @@ export function DiffPane({
 		() => getPaneScrollState(scrollStateKey),
 		[scrollStateKey],
 	);
-	const { files: currentFiles, isLoading } = useChangeset({ workspaceId, ref });
+	const { files: changesetFiles, isLoading } = useChangeset({
+		workspaceId,
+		ref,
+	});
+	const currentFiles = useMemo(() => {
+		if (!filter?.paths) return changesetFiles;
+		const paths = new Set(filter.paths);
+		return changesetFiles.filter(
+			(file) =>
+				paths.has(file.path) || (file.oldPath && paths.has(file.oldPath)),
+		);
+	}, [changesetFiles, filter]);
 	// Every git change re-lays out the diff; a hidden tab catches up when shown.
 	const files = useHeldWhileTabHidden(currentFiles);
 	const isTabVisible = useIsTabVisible();
@@ -489,6 +515,9 @@ export function DiffPane({
 			}),
 		[files],
 	);
+	const clearFilter = useCallback(() => {
+		updateData({ ...dataRef.current, filter: undefined } as PaneViewerData);
+	}, [updateData]);
 	const titleSlot = useDiffPaneHeaderSlot(diffPaneTitleSlotId(context.pane.id));
 	const actionsSlot = useDiffPaneHeaderSlot(
 		diffPaneActionsSlotId(context.pane.id),
@@ -846,6 +875,8 @@ export function DiffPane({
 						workspaceId={workspaceId}
 						additions={totals.additions}
 						deletions={totals.deletions}
+						filter={filter}
+						onClearFilter={clearFilter}
 					/>,
 					titleSlot,
 				)}
@@ -878,12 +909,19 @@ export function DiffPane({
 				)}
 			<div className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
 				{files.length === 0 ? (
-					<div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+					<div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
 						{isLoading
 							? t({ message: "Loading…" })
-							: t({
-									message: "No changes",
-								})}
+							: filter
+								? t({ message: "None of this turn's files have changes here" })
+								: t({
+										message: "No changes",
+									})}
+						{filter && !isLoading && (
+							<Button onClick={clearFilter} size="sm" variant="outline">
+								<Trans>Show all changes</Trans>
+							</Button>
+						)}
 					</div>
 				) : (
 					<div

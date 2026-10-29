@@ -71,6 +71,17 @@ describe("ChatSessionStore", () => {
 		});
 	});
 
+	test("a new session is open, and reopening a closed one opens it again", () => {
+		expect(runtime.sessions.get("s1")?.closedAt).toBeNull();
+		runtime.sessions.markClosed("s1", 5);
+		runtime.journal.open({
+			sessionId: "s1",
+			scopeId: "w1",
+			harness: "claude-code",
+		});
+		expect(runtime.sessions.get("s1")?.closedAt).toBeNull();
+	});
+
 	test("returns null for an unknown session", () => {
 		expect(runtime.sessions.get("nope")).toBeNull();
 	});

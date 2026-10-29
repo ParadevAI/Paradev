@@ -171,7 +171,7 @@ export default ({ config }: ConfigContext) => ({
 		[
 			"expo-build-properties",
 			{
-				ios: { deploymentTarget: "26.0" },
+				ios: { deploymentTarget: "26.0", buildReactNativeFromSource: true },
 			},
 		],
 		// SDK 57 no longer autolinks config plugins; every installed plugin has

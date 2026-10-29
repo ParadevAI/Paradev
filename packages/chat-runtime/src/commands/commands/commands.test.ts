@@ -271,6 +271,26 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("a closed session stays closed, and one stopped by shutdown does not", async () => {
+		const { runtime } = newRuntime();
+		const closed = createSession(runtime);
+		const stopped = createSession(runtime);
+		await runtime.commands.closeSession({ sessionId: closed.sessionId });
+		await runtime.live.disposeAll();
+
+		const byId = new Map(
+			runtime.commands
+				.listSessions({})
+				.map((session) => [session.sessionId, session]),
+		);
+		expect(byId.get(closed.sessionId)?.closedAt).toBeNumber();
+		expect(byId.get(stopped.sessionId)).toMatchObject({
+			live: false,
+			closedAt: null,
+		});
+		await runtime.dispose();
+	});
+
 	test("getItems pages the spine backwards", async () => {
 		const { runtime } = newRuntime();
 		const created = createSession(runtime);

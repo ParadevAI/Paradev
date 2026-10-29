@@ -225,9 +225,7 @@ msgstr "{0, plural, one {云端#个结果} other {云端#个结果}}"
 msgid "{0, plural, one {# result on this host} other {# results on this host}}"
 msgstr "{0, plural, one {此主机上#个结果} other {此主机上#个结果}}"
 
-#. placeholder {0}: pullRequests.length
 #. placeholder {0}: results.length
-#. placeholder {0}: searchResults.length
 msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {#个结果} other {#个结果}}"
 
@@ -762,6 +760,9 @@ msgstr "{behindCount, plural, one {落后main #个提交，需要变基} other {
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition}/{totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {更改 · # 个文件} other {更改 · # 个文件}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {已关闭#个端口} other {已关闭#个端口}}"
 
@@ -895,9 +896,6 @@ msgstr "{days}天"
 msgid "{days}d {hours}h"
 msgstr "{days}天{hours}小时"
 
-msgid "{days}d ago"
-msgstr "{days}天前"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {剩余 # 天}}"
 
@@ -925,6 +923,12 @@ msgstr "{total}项检查中有{failing}项失败"
 
 msgid "{failing} of {total} checks failing"
 msgstr "{total}项检查中有{failing}项失败"
+
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {此工作区中有 # 个文件更改}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
@@ -962,6 +966,9 @@ msgstr "{hidden, plural, one {显示 # 条回复} other {显示 # 条回复}}"
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, other {查看另外 # 条回复}}"
 
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {再显示 # 个文件} other {再显示 # 个文件}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {再显示#个栈帧} other {再显示#个栈帧}}"
 
@@ -979,9 +986,6 @@ msgstr "{hours}小时"
 
 msgid "{hours}h {minutes}m"
 msgstr "{hours}小时{minutes}分"
-
-msgid "{hours}h ago"
-msgstr "{hours}小时前"
 
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {已将#个worktree导入为工作区} other {已将#个worktree导入为工作区}}"
@@ -1025,20 +1029,11 @@ msgstr "{minutes}分"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} 分 {rest} 秒"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}分钟前"
-
-msgid "{modKey}↵ to create"
-msgstr "{modKey}↵创建"
-
 msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
 msgstr "按月计费每用户每月 {monthlyPrice}，或按年计费 {yearlyPrice}。移动端、自动化、优先支持。"
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。"
-
-msgid "{months}mo ago"
-msgstr "{months}个月前"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
@@ -1096,6 +1091,9 @@ msgstr "{noun, select, repository {请至少指定一个仓库。} channel {请�
 
 msgid "{openCount} open"
 msgstr "{openCount}项已开启"
+
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {此工作区中还有更改：# 个文件} other {此工作区中还有更改：# 个文件}}"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} 可以以你的身份读取和更改你的 {pluginLabel} 账户中的数据，包括此页面的未来版本。它可以把读取的内容发送到其他网站。只允许你信任的页面。"
@@ -1189,8 +1187,8 @@ msgstr "在全球范围内，Netflix、Microsoft、NVIDIA、DoorDash、Wix 和 M
 msgid "{productName} raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
-msgid "{provider} logo"
-msgstr "{provider}标志"
+msgid "{productName} was called {formerName} until October 2026."
+msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
 
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
@@ -1218,11 +1216,11 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "剩余 {remaining} 个 token"
 
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
-
-msgid "{seconds}s ago"
-msgstr "{seconds}秒前"
 
 msgid "{selectedCount} selected"
 msgstr "已选择{selectedCount}项"
@@ -1351,9 +1349,6 @@ msgstr "{workspaceName}：清理失败"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每用户{yearlyTotal}，按年计费"
-
-msgid "{years}y ago"
-msgstr "{years}年前"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
@@ -1911,9 +1906,6 @@ msgstr "连接其他账号，或断开不再使用的账号。"
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "把任意机器添加为主机。笔记本休眠时工作区照常运行，你在哪儿都能查看进展。"
 
-msgid "Add attachment"
-msgstr "添加附件"
-
 msgid "Add Attachment"
 msgstr "添加附件"
 
@@ -2052,6 +2044,9 @@ msgstr "添加到工作区"
 
 msgid "Add what it does"
 msgstr "添加它的用途"
+
+msgid "Add your first project"
+msgstr "添加你的第一个项目"
 
 msgid "Add your own terminal agent to this device."
 msgstr "向此设备添加你自己的终端智能体。"
@@ -2228,9 +2223,6 @@ msgstr "AI · 对话"
 msgid "AI · Status"
 msgstr "AI · 状态"
 
-msgid "AI authentication failed. Please check your AI settings."
-msgstr "AI认证失败。请检查你的AI设置。"
-
 msgid "Alert"
 msgstr "警告"
 
@@ -2302,6 +2294,9 @@ msgstr "所有提交"
 #. placeholder {0}: members.length
 msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
 msgstr "全部{0}名成员的所有数据都将被永久删除——此操作无法撤销。"
+
+msgid "All downloads"
+msgstr "所有下载"
 
 msgid "All features, side by side"
 msgstr "所有功能逐项对比"
@@ -2740,6 +2735,9 @@ msgstr "Apple 标志"
 msgid "Application menu"
 msgstr "应用程序菜单"
 
+msgid "Applications"
+msgstr "应用程序"
+
 msgid "Applies safe dependency updates every night and lists the rest."
 msgstr "每晚应用安全的依赖更新，并列出其余的。"
 
@@ -2925,9 +2923,6 @@ msgstr "已指派"
 msgid "Assigned to me"
 msgstr "分配给我"
 
-msgid "Assigned to you"
-msgstr "分配给你"
-
 msgid "Assignee"
 msgstr "负责人"
 
@@ -3057,17 +3052,11 @@ msgstr "自动"
 msgid "Auto (system)"
 msgstr "自动（跟随系统）"
 
-msgid "Auto follows your system language. You can change it later in Settings."
-msgstr "自动模式会跟随你的系统语言。之后可以在设置中更改。"
-
 msgid "Auto Save"
 msgstr "自动保存"
 
 msgid "Auto top-up"
 msgstr "自动充值"
-
-msgid "auto-generated"
-msgstr "自动生成"
 
 msgid "Auto-run command"
 msgstr "自动运行命令"
@@ -3263,7 +3252,6 @@ msgstr "基础镜像 · 尚无检查点"
 msgid "Base URL"
 msgstr "基础URL"
 
-#. placeholder {0}: draft.linkedPR.prNumber
 #. placeholder {0}: linkedPR.prNumber
 msgid "based off PR #{0}"
 msgstr "基于PR #{0}"
@@ -3407,12 +3395,6 @@ msgstr "在新的 worktree 中分叉"
 
 msgid "Branch in this workspace"
 msgstr "在此工作区分叉"
-
-msgid "branch name"
-msgstr "分支名称"
-
-msgid "Branch name"
-msgstr "分支名称"
 
 msgid "Branch name copied"
 msgstr "已复制分支名"
@@ -3709,6 +3691,18 @@ msgstr "无法在Finder中打开远程工作区路径"
 
 msgid "Can't reach the host"
 msgstr "无法连接主机"
+
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "此工作区中有聊天正在工作，无法撤销。"
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "无法撤销：本轮期间另一个聊天在此工作区中工作过。"
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "无法撤销：自本轮以来 HEAD 已因提交、拉取或检出而移动。"
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "无法撤销：本轮的快照缺失。"
 
 msgid "Cancel"
 msgstr "取消"
@@ -4064,6 +4058,12 @@ msgstr "选择父目录"
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "打开议题前，请先在GitHub议题中选择一个项目。"
 
+msgid "Choose a project to search its issues"
+msgstr "选择一个项目以搜索其议题"
+
+msgid "Choose a project to search its pull requests"
+msgstr "选择一个项目以搜索其拉取请求"
+
 msgid "Choose a section."
 msgstr "选择一个分区。"
 
@@ -4248,12 +4248,6 @@ msgstr "如果没有自动跳转，请点击这里"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "点击“↑ update”按钮查看更新前的确认提示"
 
-msgid "Click the chip to open the issue"
-msgstr "点击打开议题"
-
-msgid "Click the chip to open the pull request"
-msgstr "点击打开拉取请求"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "点击复制会话ID（使用`claude --resume <id>`恢复）。"
 
@@ -4269,6 +4263,9 @@ msgstr "客户端"
 msgid "Clone"
 msgstr "克隆"
 
+msgid "Clone a repo"
+msgstr "克隆仓库"
+
 msgid "Clone a repository"
 msgstr "克隆仓库"
 
@@ -4280,9 +4277,6 @@ msgstr "克隆仓库"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "克隆仓库，或导入主机上已有的文件夹。"
-
-msgid "Clone, push, and create PRs."
-msgstr "克隆、推送并创建 PR。"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -4484,6 +4478,9 @@ msgstr "云端用量"
 
 msgid "Cloud workspace"
 msgstr "云端工作区"
+
+msgid "Cloud workspace — connecting"
+msgstr "云端工作区，正在连接"
 
 msgid "Cloud workspaces"
 msgstr "云工作区"
@@ -4890,9 +4887,6 @@ msgstr "连接你的GitHub仓库并同步拉取请求。跟踪整个团队的CI�
 msgid "Connect your Linear account before tracking tasks in Linear."
 msgstr "请先连接你的 Linear 账户，再在 Linear 中管理任务。"
 
-msgid "Connect your Linear account in Settings → Integrations to link Linear issues."
-msgstr "请在 设置 → 集成 中连接你的Linear账号，以关联Linear议题。"
-
 msgid "Connect your Linear account to browse, update and start work on Linear issues from Paradev."
 msgstr "连接你的Linear账号后，即可在Paradev中浏览、更新Linear议题并开始工作。"
 
@@ -5016,9 +5010,6 @@ msgstr "未获得授权同意。需要租户管理员批准。"
 
 msgid "Consider alternatives"
 msgstr "考虑其他方案"
-
-msgid "Console"
-msgstr "控制台"
 
 msgid "Constraints"
 msgstr "约束"
@@ -5160,6 +5151,9 @@ msgstr "复制智能体会话ID"
 
 msgid "Copy all"
 msgstr "全部复制"
+
+msgid "Copy as CSV"
+msgstr "复制为 CSV"
 
 msgid "Copy as Markdown"
 msgstr "复制为 Markdown"
@@ -5688,17 +5682,11 @@ msgstr "无法加载贡献者，请直接输入用户名。"
 msgid "Couldn't load earlier messages. Retry"
 msgstr "无法加载更早的消息。重试"
 
-msgid "Couldn't load issues: {msg}"
-msgstr "无法加载议题：{msg}"
-
 msgid "Couldn't load its activity"
 msgstr "无法加载其活动"
 
 msgid "Couldn't load pages"
 msgstr "无法加载页面"
-
-msgid "Couldn't load pull requests: {msg}"
-msgstr "无法加载拉取请求：{msg}"
 
 msgid "Couldn't load review comments"
 msgstr "无法加载审查评论"
@@ -5859,6 +5847,9 @@ msgstr "无法停止聊天"
 msgid "Couldn't take a screenshot"
 msgstr "无法截图"
 
+msgid "Couldn't undo the file changes."
+msgstr "无法撤销文件更改。"
+
 msgid "Couldn't unstage changes"
 msgstr "无法取消暂存更改"
 
@@ -5879,6 +5870,9 @@ msgstr "无法上传 {name}"
 
 msgid "Couldn’t verify"
 msgstr "无法确认"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "根据智能体的文件编辑统计。不包括通过 shell 命令、notebook 或 MCP 工具以及子智能体所做的更改，多次编辑的文件中同一行可能被计算两次。"
 
 msgid "CPU"
 msgstr "CPU"
@@ -5915,9 +5909,6 @@ msgstr "通过克隆仓库或本地路径来创建新项目。"
 
 msgid "Create a new task from the desktop tasks view."
 msgstr "在桌面端任务视图中创建新任务。"
-
-msgid "Create a new workspace"
-msgstr "创建新工作区"
 
 msgid "Create a project to group tasks and cloud workspaces."
 msgstr "创建项目，将任务和云工作区归到一起。"
@@ -6137,10 +6128,6 @@ msgstr "正在创建沙箱"
 
 msgid "Creating workspace"
 msgstr "正在创建工作区"
-
-#. placeholder {0}: linkedPR.prNumber
-msgid "Creating workspace from PR #{0}..."
-msgstr "正在从PR #{0}创建工作区..."
 
 msgid "Creating workspace: {name}"
 msgstr "正在创建工作区：{name}"
@@ -6509,6 +6496,10 @@ msgstr "删除工作区"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "删除工作区“{workspaceName}”？"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "已删除"
+
 msgid "Deleted"
 msgstr "已删除"
 
@@ -6715,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "页面旁的 DevTools"
+
+msgid "Diagram"
+msgstr "图表"
+
+msgid "Diagram could not be drawn"
+msgstr "无法绘制图表"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "无法绘制图表：{reason}"
 
 msgid "Dialog"
 msgstr "对话框"
@@ -6970,8 +6970,14 @@ msgstr "在<0>{0}/download</0>下载{appName}。"
 msgid "Download {name}"
 msgstr "下载{name}"
 
+msgid "Download again"
+msgstr "重新下载"
+
 msgid "Download app"
 msgstr "下载应用"
+
+msgid "Download didn't start?"
+msgstr "下载没有开始？"
 
 msgid "Download failed"
 msgstr "下载失败"
@@ -7043,6 +7049,9 @@ msgstr "草稿 PR #2841"
 
 msgid "drafted 3 support replies"
 msgstr "起草了3条支持回复"
+
+msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
+msgstr "将 <0>Paradev</0> 拖到<1>应用程序</1>文件夹"
 
 msgid "Drag to reorder"
 msgstr "拖动以重新排序"
@@ -7196,8 +7205,8 @@ msgstr "编辑名称"
 msgid "Edit on GitHub"
 msgstr "在GitHub上编辑"
 
-msgid "Edit prefix"
-msgstr "编辑前缀"
+msgid "Edit queued message"
+msgstr "编辑排队消息"
 
 msgid "Edit Run Script"
 msgstr "编辑运行脚本"
@@ -7291,6 +7300,9 @@ msgstr "空状态"
 
 msgid "Empty command"
 msgstr "空命令"
+
+msgid "Empty project"
+msgstr "空项目"
 
 msgid "Emulator"
 msgstr "模拟器"
@@ -7428,6 +7440,9 @@ msgstr "每天"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "每天 <0>上午 9:00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "自本轮以来每个文件都再次更改，因此没有撤销任何内容。"
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "每周五下午4点，根据本周合并的PR起草发布说明。"
 
@@ -7544,6 +7559,9 @@ msgstr "全部展开"
 msgid "Expand all files"
 msgstr "展开所有文件"
 
+msgid "Expand diagram"
+msgstr "放大图表"
+
 msgid "Expand file"
 msgstr "展开文件"
 
@@ -7592,9 +7610,6 @@ msgstr "探索中"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "扩展思考：{activeLabel}"
-
-msgid "external"
-msgstr "外部"
 
 msgid "External Application"
 msgstr "外部应用"
@@ -7771,9 +7786,6 @@ msgstr "创建讨论串失败"
 msgid "Failed to create workspace"
 msgstr "创建工作区失败"
 
-msgid "Failed to create workspace from PR"
-msgstr "从PR创建工作区失败"
-
 msgid "Failed to delete"
 msgstr "删除失败"
 
@@ -7892,17 +7904,8 @@ msgstr "打开新窗口失败：{0}"
 msgid "Failed to open new window: {message}"
 msgstr "打开新窗口失败：{message}"
 
-msgid "Failed to open project"
-msgstr "打开项目失败"
-
-msgid "Failed to open task"
-msgstr "打开任务失败"
-
 msgid "Failed to open the billing portal"
 msgstr "打开账单门户失败"
-
-msgid "Failed to open worktree"
-msgstr "打开worktree失败"
 
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
@@ -7910,12 +7913,6 @@ msgstr "打开失败：{0}"
 
 msgid "Failed to post reply"
 msgstr "回复发送失败"
-
-msgid "Failed to prepare agent launch"
-msgstr "准备启动智能体失败"
-
-msgid "Failed to process attachments"
-msgstr "处理附件失败"
 
 msgid "Failed to push branch"
 msgstr "推送分支失败"
@@ -8196,6 +8193,9 @@ msgstr "创建和更新 issue"
 msgid "File changed on disk"
 msgstr "磁盘上的文件已更改"
 
+msgid "File changes undone"
+msgstr "文件更改已撤销"
+
 msgid "File is too large to preview"
 msgstr "文件过大，无法预览"
 
@@ -8355,6 +8355,9 @@ msgstr "已完成 · 未读"
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用时7秒"
 
+msgid "Fit"
+msgstr "适应窗口"
+
 msgid "Fix all failing checks"
 msgstr "修复所有失败的检查"
 
@@ -8502,6 +8505,9 @@ msgstr "报告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向刚上手的个人用户"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "适用于 Apple Silicon 和 Intel 的 macOS。Linux AppImage 为实验版本。"
+
 msgid "For organizations with advanced needs"
 msgstr "面向有进阶需求的组织"
 
@@ -8646,11 +8652,23 @@ msgstr "{price}/用户/月起"
 msgid "From a hackathon project to the workspace for parallel coding agents."
 msgstr "从一个黑客松项目，到并行编程智能体的工作空间。"
 
+msgid "From a template"
+msgstr "从模板开始"
+
 msgid "From GitHub"
 msgstr "来自 GitHub"
 
 msgid "from main agent"
 msgstr "来自主智能体"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "根据本轮前后的 worktree 快照统计，因此 shell 命令所做的编辑也会计入。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在此工作，因此其中部分更改可能来自它。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在此工作，因此此列表只包含本聊天用文件工具编辑过的文件，其他更改单独列出。"
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "已隐藏front matter，切换到Markdown可编辑"
@@ -8769,6 +8787,9 @@ msgstr "获取Paradev Pro"
 msgid "Get started"
 msgstr "开始使用"
 
+msgid "Get support"
+msgstr "获取支持"
+
 msgid "Get the best out of Pro"
 msgstr "充分利用 Pro"
 
@@ -8846,6 +8867,9 @@ msgstr "GitHub 用户名..."
 
 msgid "GitHub username…"
 msgstr "GitHub用户名…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "为 Claude Code、Codex 或任何 CLI 智能体分配独立的工作空间和分支，然后在一处审阅所有改动。"
 
 msgid "Give me an example"
 msgstr "给我一个示例"
@@ -9265,6 +9289,9 @@ msgstr "等级如何计算 →"
 msgid "How to install {name} in Paradev"
 msgstr "如何在Paradev中安装{name}"
 
+msgid "How to install Paradev"
+msgstr "如何安装 Paradev"
+
 msgid "How we build it, in long form."
 msgstr "我们如何构建它，深入介绍。"
 
@@ -9279,6 +9306,9 @@ msgstr "我们的工作方式"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的智能体在云端工作区中如何登录。其他人连接各自的订阅或API密钥；在这台机器上，每个智能体继续使用它上面已有的登录。"
+
+msgid "HTML preview"
+msgstr "HTML 预览"
 
 msgid "https://"
 msgstr "https://"
@@ -9628,6 +9658,9 @@ msgstr "安装失败"
 msgid "Install GitHub App"
 msgstr "安装GitHub App"
 
+msgid "Install GitHub CLI"
+msgstr "安装 GitHub CLI"
+
 msgid "Install on your iPhone"
 msgstr "在 iPhone 上安装"
 
@@ -9676,6 +9709,9 @@ msgstr "说明"
 
 msgid "Integrations"
 msgstr "集成"
+
+msgid "Intel Mac"
+msgstr "Intel Mac"
 
 msgid "Interactive agent terminal."
 msgstr "可交互的智能体终端。"
@@ -9823,10 +9859,6 @@ msgstr "隔离"
 
 msgid "Issue"
 msgstr "议题"
-
-#. placeholder {0}: link.number
-msgid "Issue #{0}"
-msgstr "议题 #{0}"
 
 msgid "Issue archived"
 msgstr "问题已归档"
@@ -10196,9 +10228,6 @@ msgstr "2026年末"
 msgid "Latency"
 msgstr "延迟"
 
-msgid "Later"
-msgstr "稍后"
-
 msgid "Later messages are removed."
 msgstr "之后的消息将被移除。"
 
@@ -10320,6 +10349,9 @@ msgstr "与 {others} 一起离开了 {channel}。"
 msgid "left {channel}."
 msgstr "已离开 {channel}。"
 
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "本轮之后又有更改，因此未撤销：{skippedNames}"
+
 msgid "Left organization"
 msgstr "已退出组织"
 
@@ -10420,6 +10452,9 @@ msgstr "Linear集成"
 msgid "Linear is limiting requests. Try again in a few minutes."
 msgstr "Linear正在限制请求，请几分钟后重试。"
 
+msgid "Linear issues"
+msgstr "Linear议题"
+
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
 #. placeholder {1}: m.endLine
@@ -10429,9 +10464,6 @@ msgstr "第{0}–{1}行"
 
 msgid "Link"
 msgstr "链接"
-
-msgid "Link ↵"
-msgstr "关联 ↵"
 
 msgid "Link a GitHub repository on the project first to enable cloning."
 msgstr "请先为项目关联GitHub仓库才能克隆。"
@@ -10444,15 +10476,6 @@ msgstr "链接已复制"
 
 msgid "Link copied"
 msgstr "链接已复制"
-
-msgid "Link GitHub issue"
-msgstr "关联GitHub议题"
-
-msgid "Link Linear issue"
-msgstr "关联Linear议题"
-
-msgid "Link pull request"
-msgstr "关联拉取请求"
 
 msgid "Link task"
 msgstr "关联任务"
@@ -10592,9 +10615,6 @@ msgstr "正在加载分组…"
 msgid "Loading issue…"
 msgstr "正在加载议题…"
 
-msgid "Loading issues..."
-msgstr "正在加载议题..."
-
 msgid "Loading issues…"
 msgstr "正在加载议题…"
 
@@ -10618,9 +10638,6 @@ msgstr "正在加载项目…"
 
 msgid "Loading pull request…"
 msgstr "正在加载拉取请求…"
-
-msgid "Loading pull requests..."
-msgstr "正在加载拉取请求..."
 
 msgid "Loading pull requests…"
 msgstr "正在加载拉取请求…"
@@ -11192,9 +11209,6 @@ msgstr "模型上下文用量"
 msgid "Model picker scoped to the selected agent"
 msgstr "限定在所选智能体范围内的模型选择器"
 
-msgid "Model Selector"
-msgstr "模型选择器"
-
 msgid "Model volume"
 msgstr "模型用量"
 
@@ -11443,6 +11457,10 @@ msgstr "从未"
 
 msgid "Never asks before acting"
 msgstr "执行前从不询问"
+
+msgctxt "changed file badge"
+msgid "new"
+msgstr "新"
 
 msgid "New"
 msgstr "新功能"
@@ -11796,9 +11814,6 @@ msgstr "没有可用于创建拉取请求的提交"
 msgid "No comparisons yet."
 msgstr "暂无对比。"
 
-msgid "No console output"
-msgstr "没有控制台输出"
-
 msgid "No contributors found."
 msgstr "未找到贡献者。"
 
@@ -11943,6 +11958,12 @@ msgstr "无匹配项"
 msgid "No matches"
 msgstr "没有匹配项"
 
+msgid "No matching issues"
+msgstr "没有匹配的议题"
+
+msgid "No matching Linear issues"
+msgstr "没有匹配的Linear议题"
+
 msgid "No matching MCP servers"
 msgstr "没有匹配的MCP服务器"
 
@@ -11954,6 +11975,12 @@ msgstr "没有匹配的组织成员。"
 
 msgid "No matching pages"
 msgstr "没有匹配的页面"
+
+msgid "No matching pull requests"
+msgstr "没有匹配的拉取请求"
+
+msgid "No matching tasks"
+msgstr "没有匹配的任务"
 
 msgid "No MCP servers found"
 msgstr "未找到MCP服务器"
@@ -11991,14 +12018,8 @@ msgstr "没有匹配的成员"
 msgid "No one to mention"
 msgstr "没有可提及的人"
 
-msgid "No open issues found."
-msgstr "未找到打开的议题。"
-
 msgid "No open issues."
 msgstr "没有开启的议题。"
-
-msgid "No open pull requests found."
-msgstr "未找到打开的拉取请求。"
 
 msgid "No open pull requests."
 msgstr "没有打开的拉取请求。"
@@ -12175,9 +12196,6 @@ msgstr "此区间内没有星标。"
 msgid "No Stripe customer found"
 msgstr "未找到Stripe客户"
 
-msgid "No subagents yet"
-msgstr "暂无子智能体"
-
 msgid "no tags"
 msgstr "无标签"
 
@@ -12310,6 +12328,9 @@ msgstr "没有人因此改变审查方式。"
 msgid "None"
 msgstr "无"
 
+msgid "None of this turn's files have changes here"
+msgstr "本轮的文件在此处都没有更改"
+
 msgid "None selected"
 msgstr "未选择"
 
@@ -12361,6 +12382,9 @@ msgstr "不在频道中"
 msgid "Not included"
 msgstr "不包含"
 
+msgid "Not installed"
+msgstr "未安装"
+
 msgid "Not loaded"
 msgstr "未加载"
 
@@ -12393,6 +12417,9 @@ msgstr "尚未在{hostName}上设置"
 
 msgid "Not set up on this host"
 msgstr "尚未在此主机上配置"
+
+msgid "Not signed in"
+msgstr "未登录"
 
 msgid "not sorted"
 msgstr "未排序"
@@ -12427,9 +12454,6 @@ msgstr "没有需要重试的运行"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "最近30天还没有已公开的数据。待本机用量同步后，你的排名就会显示，将以<0>{handle}</0>身份公开。"
-
-msgid "Nothing running"
-msgstr "没有正在运行的内容"
 
 msgid "Nothing to fork yet. Send a message first."
 msgstr "还没有可分叉的内容。请先发送一条消息。"
@@ -12790,6 +12814,15 @@ msgstr "打开 {parentLabel}"
 msgid "Open {path} in file pane"
 msgstr "在文件面板中打开{path}"
 
+msgid "Open <0>Paradev</0> from your <1>Applications</1> folder"
+msgstr "从<1>应用程序</1>文件夹打开 <0>Paradev</0>"
+
+msgid "Open a folder"
+msgstr "打开文件夹"
+
+msgid "Open a folder you already work in. You can add more later."
+msgstr "打开你正在使用的文件夹。之后还可以添加更多项目。"
+
 msgid "Open a multiline prompt composer for the active terminal"
 msgstr "为当前终端打开多行提示词编辑器"
 
@@ -12938,9 +12971,6 @@ msgstr "在浏览器中打开"
 msgid "Open in Changes pane"
 msgstr "在“改动”面板中打开"
 
-msgid "Open in chat"
-msgstr "在聊天中打开"
-
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中打开"
 
@@ -13029,9 +13059,6 @@ msgstr "在GitHub中打开议题"
 msgid "Open issue in Linear"
 msgstr "在Linear中打开议题"
 
-msgid "Open issues"
-msgstr "打开的议题"
-
 msgid "Open leaderboard"
 msgstr "打开排行榜"
 
@@ -13088,9 +13115,6 @@ msgstr "打开项目"
 msgid "Open Projects"
 msgstr "打开项目"
 
-msgid "Open PRs"
-msgstr "打开的PR"
-
 msgid "Open pull request"
 msgstr "打开拉取请求"
 
@@ -13104,9 +13128,6 @@ msgstr "打开拉取请求#{0}"
 
 msgid "Open pull request options"
 msgstr "打开拉取请求选项"
-
-msgid "Open pull requests"
-msgstr "打开的拉取请求"
 
 msgid "Open recent"
 msgstr "打开最近使用"
@@ -13131,9 +13152,6 @@ msgstr "打开发布选项"
 
 msgid "Open System Settings"
 msgstr "打开系统设置"
-
-msgid "Open task {title}"
-msgstr "打开任务{title}"
 
 msgid "Open Terminal"
 msgstr "打开终端"
@@ -13170,6 +13188,9 @@ msgstr "打开终端并向智能体发出指令"
 
 msgid "Open the Changes pane in a new tab, or focus the existing one"
 msgstr "在新标签页中打开更改面板，或聚焦现有面板"
+
+msgid "Open the disk image from your <0>Downloads</0> folder"
+msgstr "从<0>下载</0>文件夹打开磁盘映像"
 
 msgid "Open the global command palette"
 msgstr "打开全局命令面板"
@@ -13224,9 +13245,6 @@ msgstr "打开文件夹"
 
 msgid "Opening pages"
 msgstr "打开页面"
-
-msgid "Opening worktree..."
-msgstr "正在打开worktree..."
 
 msgid "Opens beside this pane. This one keeps running."
 msgstr "在此窗格旁打开。原窗格会继续运行。"
@@ -13657,6 +13675,9 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev占用了系统RAM的{0}"
 
+msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev 使用 GitHub CLI 克隆仓库并创建拉取请求。你也可以稍后再设置。"
+
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev与同类方案对比"
 
@@ -14062,10 +14083,6 @@ msgstr "发表回复"
 msgid "PR"
 msgstr "PR"
 
-#. placeholder {0}: link.number
-msgid "PR #{0}"
-msgstr "PR #{0}"
-
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} — {1}"
@@ -14106,9 +14123,6 @@ msgstr "PR链接"
 
 msgid "PR URL must match {repoMismatch}."
 msgstr "PR的URL必须匹配{repoMismatch}。"
-
-msgid "PR URL must match {selectedRepositoryLabel}."
-msgstr "PR的URL必须匹配{selectedRepositoryLabel}。"
 
 msgid "Prediction progress"
 msgstr "预测阅读进度"
@@ -14472,9 +14486,6 @@ msgstr "通过 Paradev CLI 或 MCP 发布。"
 msgid "Publish from your own repo"
 msgstr "从你自己的仓库发布"
 
-msgid "Published"
-msgstr "发布时间"
-
 msgctxt "github release action"
 msgid "Published"
 msgstr "已发布"
@@ -14564,6 +14575,9 @@ msgstr "常见问题"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "问题、反馈、支持，或者别的什么都行。写给我们，我们会转给合适的人。"
 
+msgid "Queue message"
+msgstr "将消息加入队列"
+
 msgid "Queue paused"
 msgstr "队列已暂停"
 
@@ -14572,6 +14586,9 @@ msgstr "由于你中断了操作，队列已暂停"
 
 msgid "Queue work for agents"
 msgstr "为智能体排队安排工作"
+
+msgid "Queue; ⌘↩ to steer the running turn"
+msgstr "加入队列；按⌘↩引导当前轮次"
 
 msgid "Queued"
 msgstr "排队中"
@@ -14804,17 +14821,8 @@ msgstr "最近使用的应用"
 msgid "Recent invoices"
 msgstr "最近的账单"
 
-msgid "Recent issues"
-msgstr "最近的议题"
-
 msgid "Recent prompts"
 msgstr "最近的提示词"
-
-msgid "Recent PRs"
-msgstr "最近的PR"
-
-msgid "Recent pull requests"
-msgstr "最近的拉取请求"
 
 msgid "Recently deleted"
 msgstr "最近删除"
@@ -14902,6 +14910,9 @@ msgstr "刷新Linear议题"
 
 msgid "Refresh metrics"
 msgstr "刷新指标"
+
+msgid "Refresh pull request"
+msgstr "刷新拉取请求"
 
 msgid "Refresh pull requests"
 msgstr "刷新拉取请求"
@@ -15050,12 +15061,6 @@ msgstr "移除图片"
 
 msgid "Remove link"
 msgstr "移除链接"
-
-msgid "Remove linked issue"
-msgstr "移除关联的议题"
-
-msgid "Remove linked PR"
-msgstr "移除关联的PR"
 
 msgid "Remove member"
 msgstr "移除成员"
@@ -15478,9 +15483,6 @@ msgstr "重启终端守护进程？"
 msgid "Restart terminals"
 msgstr "重启终端"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "重新启动以使用最新版本的 {appName}。"
-
 msgid "Restart workspace"
 msgstr "重启工作区"
 
@@ -15688,6 +15690,9 @@ msgstr "在“所有运行”中查看这些运行"
 msgid "Review thread…"
 msgstr "审查讨论…"
 
+msgid "Review what this turn has changed so far"
+msgstr "查看本轮到目前为止的更改"
+
 msgid "reviewed"
 msgstr "进行了评审"
 
@@ -15841,11 +15846,11 @@ msgstr "立即运行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "按计划或事件运行、按需运行、暂停、恢复并查看日志。"
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "用 Paradev 并行运行编程智能体"
+
 msgid "Run script"
 msgstr "运行脚本"
-
-msgid "Run setup script"
-msgstr "运行设置脚本"
 
 msgid "Run setup script in each imported workspace"
 msgstr "在每个导入的工作区中运行初始化脚本"
@@ -16165,8 +16170,8 @@ msgstr "搜索历史"
 msgid "Search in {frameTitle}…"
 msgstr "在{frameTitle}中搜索…"
 
-msgid "Search issues..."
-msgstr "搜索议题..."
+msgid "Search issues…"
+msgstr "搜索议题…"
 
 msgid "Search labels..."
 msgstr "搜索标签..."
@@ -16209,9 +16214,6 @@ msgstr "搜索项目…"
 
 msgid "Search pull requests"
 msgstr "搜索拉取请求"
-
-msgid "Search pull requests..."
-msgstr "搜索拉取请求..."
 
 msgid "Search pull requests…"
 msgstr "搜索拉取请求…"
@@ -16278,12 +16280,6 @@ msgstr "搜索了tooltip的样式覆盖"
 
 msgid "Searching for Kbd usages"
 msgstr "正在搜索Kbd的使用处"
-
-msgid "Searching..."
-msgstr "正在搜索..."
-
-msgid "Searching…"
-msgstr "搜索中…"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
@@ -16362,6 +16358,9 @@ msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数�
 
 msgid "Select"
 msgstr "选择框"
+
+msgid "Select a file to view it here"
+msgstr "选择一个文件以在此处查看"
 
 msgid "Select a project"
 msgstr "请选择项目"
@@ -16849,6 +16848,9 @@ msgstr "在主页侧边栏的“拉取请求”下方显示“用量”按钮"
 msgid "Show all {count}"
 msgstr "显示全部{count}条"
 
+msgid "Show all changes"
+msgstr "显示所有更改"
+
 msgid "Show all comments"
 msgstr "显示全部评论"
 
@@ -16864,8 +16866,8 @@ msgstr "显示边框"
 msgid "Show checks"
 msgstr "显示检查"
 
-msgid "Show closed"
-msgstr "显示已关闭"
+msgid "Show code"
+msgstr "显示代码"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "在顶栏显示CPU和内存用量"
@@ -16896,6 +16898,9 @@ msgstr "显示打开过此工作区的所有人"
 
 msgid "Show fewer"
 msgstr "收起"
+
+msgid "Show fewer files"
+msgstr "显示更少文件"
 
 msgid "Show file tree"
 msgstr "显示文件树"
@@ -16929,6 +16934,9 @@ msgstr "显示上方改动之后的行"
 
 msgid "Show lines before the change below"
 msgstr "显示下方改动之前的行"
+
+msgid "Show link menu"
+msgstr "显示链接菜单"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "给我看看Linear分类自动化最近10次运行"
@@ -17051,6 +17059,9 @@ msgstr "登录以继续使用Paradev"
 
 msgid "Sign in to get started"
 msgstr "登录即可开始"
+
+msgid "Sign in to GitHub"
+msgstr "登录 GitHub"
 
 msgid "Sign in to the agent in a terminal, then continue."
 msgstr "在终端中登录智能体，然后继续。"
@@ -17258,6 +17269,9 @@ msgstr "更顺畅的上手流程"
 
 msgid "Snapshot"
 msgstr "快照"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "在每轮聊天前后为 worktree 创建快照，使该轮的卡片列出每个更改的文件（包括 shell 编辑）并可以撤销。每条提示词会先等待其快照完成。"
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "为此工作区的当前状态（包括其中安装的所有内容）创建快照。从该环境新建的工作区将从此快照开始。"
@@ -18419,6 +18433,9 @@ msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "聊天保持不变。自本轮以来被任何人编辑过的文件将保持不动并列出。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"
 
@@ -19012,6 +19029,9 @@ msgstr "这会为所有有权访问的人永久移除已保存的环境。已从
 msgid "This port is still in use"
 msgstr "此端口仍在使用中"
 
+msgid "This preview is too large to show."
+msgstr "此预览过大，无法显示。"
+
 msgid "This profile is busy right now"
 msgstr "此个人主页当前繁忙"
 
@@ -19093,6 +19113,12 @@ msgstr "这个讨论里没有可回复的评论。"
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "此讨论串尚未对智能体开放。需要先有人评论，智能体才能回复。"
 
+msgid "This turn"
+msgstr "本轮"
+
+msgid "This turn's files"
+msgstr "本轮的文件"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "此次更新仅重启了一次你的终端。新终端会在相同文件夹中打开。"
 
@@ -19165,6 +19191,9 @@ msgstr "此工作区可能已被移除，或者你不再拥有它的访问权限
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "此工作区记录仍然存在，但它的worktree文件夹已不在此主机上。终端和文件操作不可用。"
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "此工作区的主机尚不能撤销文件更改。"
 
 msgid "This workspace's host is offline"
 msgstr "此工作区的主机已离线"
@@ -19418,6 +19447,9 @@ msgstr "跟踪预算和支出"
 msgid "Track down that flaky test…"
 msgstr "揪出那个不稳定的测试…"
 
+msgid "Track file changes per turn"
+msgstr "按轮跟踪文件更改"
+
 msgid "Track tasks in"
 msgstr "任务管理位置"
 
@@ -19652,6 +19684,12 @@ msgstr "进行中"
 msgid "Undo"
 msgstr "撤销"
 
+msgid "Undo changes"
+msgstr "撤销更改"
+
+msgid "Undo the file changes in this card?"
+msgstr "撤销此卡片中的文件更改？"
+
 msgid "Undo the last archived workspace or closed chats"
 msgstr "撤销上次归档的工作区或关闭的聊天"
 
@@ -19874,9 +19912,6 @@ msgstr "请更新此主机上的 Paradev，以编辑其工作区配置。"
 msgid "Update payment method"
 msgstr "更新支付方式"
 
-msgid "Update ready"
-msgstr "更新已就绪"
-
 msgid "Update Required"
 msgstr "需要更新"
 
@@ -20089,12 +20124,6 @@ msgstr "user@example.com"
 
 msgid "user@host, ssh://user@host:2222, or an ssh config alias"
 msgstr "user@host、ssh://user@host:2222 或 ssh 配置中的别名"
-
-msgid "Using random branch name (AI generation timed out)"
-msgstr "使用随机分支名（AI生成超时）"
-
-msgid "Using random branch name (AI generation unavailable)"
-msgstr "使用随机分支名（AI生成不可用）"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId与该工作区的项目不匹配"
@@ -20752,9 +20781,6 @@ msgstr "工作区配置"
 msgid "Workspace created"
 msgstr "工作区已创建"
 
-msgid "Workspace created from PR"
-msgstr "已从PR创建工作区"
-
 msgid "Workspace details"
 msgstr "工作区详情"
 
@@ -20766,9 +20792,6 @@ msgstr "工作区布局"
 
 msgid "Workspace name"
 msgstr "工作区名称"
-
-msgid "Workspace name (optional)"
-msgstr "工作区名称（可选）"
 
 msgid "Workspace not found"
 msgstr "未找到工作区"
@@ -20835,9 +20858,6 @@ msgstr "已更新worktree位置"
 
 msgid "Worktree missing"
 msgstr "worktree缺失"
-
-msgid "Worktree opened"
-msgstr "worktree已打开"
 
 msgid "Worktree out of sync"
 msgstr "worktree不同步"
@@ -21115,9 +21135,6 @@ msgstr "你的智能体发布设计和报告。团队发表评论，智能体随
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"
 
-msgid "Your browser doesn't report which chip you have, so this is the Apple Silicon build. On an Intel Mac, <0>get the Intel build</0> instead."
-msgstr "你的浏览器未报告芯片类型，因此这是 Apple Silicon 版本。如果你使用 Intel Mac，请改为<0>获取 Intel 版本</0>。"
-
 msgid "Your changes"
 msgstr "你的更改"
 
@@ -21127,8 +21144,8 @@ msgstr "如果不保存，你的更改将会丢失。"
 msgid "Your code stays local by default, with explicit control over connected services."
 msgstr "你的代码默认留在本地，连接哪些服务由你明确决定。"
 
-msgid "Your download starts automatically. If it didn't, grab it here."
-msgstr "下载将自动开始。如果没有，请点此获取。"
+msgid "Your download starts automatically."
+msgstr "下载会自动开始。"
 
 msgid "Your email (optional)"
 msgstr "你的邮箱（选填）"

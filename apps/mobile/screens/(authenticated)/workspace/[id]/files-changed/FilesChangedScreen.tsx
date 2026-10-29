@@ -6,6 +6,7 @@ import * as Clipboard from "expo-clipboard";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FileDiff } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActionSheetIOS,
 	ActivityIndicator,
@@ -18,6 +19,10 @@ import {
 	View,
 } from "react-native";
 import { useSharedValue, withDecay } from "react-native-reanimated";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -87,6 +92,7 @@ export function FilesChangedScreen() {
 	const router = useRouter();
 	const workspaceId = id ?? null;
 	const { width: windowWidth } = useWindowDimensions();
+	const safeArea = useSafeAreaInsets();
 	const queryClient = useQueryClient();
 
 	const changeset = useWorkspaceChangeset(workspaceId);
@@ -294,7 +300,8 @@ export function FilesChangedScreen() {
 	// Horizontal pan: one shared value, per-segment clamping in HunkSegmentCell.
 	const scrollX = useSharedValue(0);
 	const maxScrollX = useSharedValue(0);
-	const codeViewportWidth = windowWidth - GUTTER_WIDTH;
+	const codeViewportWidth =
+		windowWidth - safeArea.left - safeArea.right - GUTTER_WIDTH;
 
 	const contentWidths = useMemo(() => {
 		const byPath = new Map<string, number>();
@@ -319,7 +326,7 @@ export function FilesChangedScreen() {
 	}, [contentWidths.maxOffset, maxScrollX, scrollX]);
 
 	const panStartX = useRef(0);
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create({
@@ -691,7 +698,11 @@ export function FilesChangedScreen() {
 				</Stack.Toolbar>
 			</Stack.Screen>
 			<CharWidthProbe onMeasure={setCharWidth} />
-			<View className="flex-1" {...panResponder.panHandlers}>
+			<SafeAreaView
+				edges={["left", "right"]}
+				style={{ flex: 1 }}
+				{...panResponder.panHandlers}
+			>
 				<CellTransitionsContext.Provider value={cellTransitions}>
 					<FlashList
 						ref={listRef}
@@ -722,7 +733,7 @@ export function FilesChangedScreen() {
 						}
 					/>
 				</CellTransitionsContext.Provider>
-			</View>
+			</SafeAreaView>
 			<ReviewOverlay
 				draftCount={comments.length}
 				onFinishReview={() =>

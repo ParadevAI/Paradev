@@ -21,6 +21,7 @@ import {
 	type FolderClickPolicy,
 	folderIntentLabel,
 	LinkHoverHint,
+	tierFor,
 	type UrlLinkAction,
 	useTerminalFilePolicy,
 	useTerminalFolderPolicy,
@@ -57,12 +58,14 @@ import {
 	PasteUploadLimitError,
 	uploadPastedFiles,
 } from "../../utils/uploadPastedFiles";
+import { LinkActionMenu } from "./components/LinkActionMenu";
 import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
 import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
 import { terminalContextMenuLinkStore } from "./contextMenuLinkStore";
 import { useCopyOnSelect } from "./hooks/useCopyOnSelect";
+import { useLinkActionMenu } from "./hooks/useLinkActionMenu";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalInterruptClear } from "./hooks/useTerminalInterruptClear";
 import {
@@ -95,6 +98,7 @@ export function TerminalPane({
 		onLeave: onLinkLeave,
 	} = useLinkHoverState();
 	const { hint, showHint } = useLinkClickHint();
+	const { menu: linkMenu, showLinkMenu, closeLinkMenu } = useLinkActionMenu();
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const revealInFinder = useRevealInFinder(workspaceId);
 	// The "reveal" intent falls back to Finder for folders outside the
@@ -361,7 +365,12 @@ export function TerminalPane({
 						terminalPullRequestLinkAction(event, url) ??
 						getUrlAction(event, url);
 					if (action === null) {
-						showHint(event.clientX, event.clientY);
+						if (tierFor(event, "4-tier") === "plain") {
+							event.preventDefault();
+							showLinkMenu(url, event.clientX, event.clientY);
+						} else {
+							showHint(event.clientX, event.clientY);
+						}
 						return;
 					}
 					event.preventDefault();
@@ -379,6 +388,7 @@ export function TerminalPane({
 		onLinkHover,
 		onLinkLeave,
 		showHint,
+		showLinkMenu,
 		filePolicy,
 		getUrlAction,
 		folderPolicy,
@@ -680,6 +690,19 @@ export function TerminalPane({
 				)}
 				hoverPosition={hoveredLink}
 				clickHint={hint}
+			/>
+			<LinkActionMenu
+				menu={linkMenu}
+				hasRightPane={rightPane !== null}
+				onSelect={(url, action) =>
+					runUrlLinkAction(linkActionDepsRef.current, url, action)
+				}
+				onClose={() => {
+					closeLinkMenu();
+					terminalRuntimeRegistry
+						.getTerminal(terminalId, terminalInstanceId)
+						?.focus();
+				}}
 			/>
 		</div>
 	);

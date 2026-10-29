@@ -414,3 +414,98 @@ test("a failed turn says its failure once, on the turn's own row, keeping the st
 		latest: true,
 	});
 });
+
+describe("the changed-files card", () => {
+	const edit: ToolCall = {
+		id: "edit-1",
+		kind: "tool_call",
+		title: "Edit /repo/a.ts",
+		toolKind: "edit",
+		toolName: "Edit",
+		status: "completed",
+		content: [{ type: "diff", path: "/repo/a.ts", oldText: "1", newText: "2" }],
+		startedAtMs: 3,
+	};
+	const reply = {
+		id: "reply-1",
+		kind: "agent_message" as const,
+		text: "Done.",
+		startedAtMs: 4,
+		completedAtMs: 5,
+	};
+	const later = publish("tool-later", 6);
+	const turnGroup = (
+		status: "running" | "completed" | "interrupted",
+		tools: ToolCall[],
+	): TurnGroup => ({
+		turnId: "t1",
+		turn: { id: "t1", status, startedAtMs: 2 },
+		entries: [
+			{ kind: "item", item: prompt },
+			{ kind: "tool_run", items: tools },
+			{ kind: "item", item: reply },
+			{ kind: "tool_run", items: [later] },
+		],
+	});
+	const kinds = (groups: TurnGroup[]) =>
+		transcriptRows(groups, [], new Set(), find).map((row) =>
+			row.kind === "item" ? row.item.id : row.kind,
+		);
+
+	test("sits right under the last reply of a settled turn that edited files", () => {
+		expect(kinds([turnGroup("completed", [edit])])).toEqual([
+			"item-1",
+			"working",
+			"edit-1",
+			"reply-1",
+			"changed_files",
+			"tool-later",
+		]);
+		expect(kinds([turnGroup("interrupted", [edit])])).toContain(
+			"changed_files",
+		);
+	});
+
+	test("only the newest card offers Undo, and none while a turn runs", () => {
+		const second = { ...turnGroup("completed", [edit]), turnId: "t2" };
+		const newest = (groups: TurnGroup[]) =>
+			transcriptRows(groups, [], new Set(), find).flatMap((row) =>
+				row.kind === "changed_files" ? [[row.turnId, row.newest === true]] : [],
+			);
+
+		expect(newest([turnGroup("completed", [edit]), second])).toEqual([
+			["t1", false],
+			["t2", true],
+		]);
+		expect(
+			newest([
+				turnGroup("completed", [edit]),
+				{ ...turnGroup("running", [edit]), turnId: "t3" },
+			]),
+		).toEqual([["t1", false]]);
+	});
+
+	test("waits for the turn to settle, and for an edit or a command that may have made one", () => {
+		const readOnly = (status: "completed" | "running"): TurnGroup => ({
+			turnId: "t2",
+			turn: { id: "t2", status, startedAtMs: 2 },
+			entries: [
+				{ kind: "item", item: prompt },
+				{ kind: "tool_run", items: [{ ...edit, status: "failed" }] },
+				{ kind: "item", item: reply },
+			],
+		});
+
+		expect(kinds([turnGroup("running", [edit])])).not.toContain(
+			"changed_files",
+		);
+		expect(kinds([readOnly("completed")])).not.toContain("changed_files");
+		const commandOnly = transcriptRows(
+			[turnGroup("completed", [{ ...edit, status: "failed" }])],
+			[],
+			new Set(),
+			find,
+		).find((row) => row.kind === "changed_files");
+		expect(commandOnly).toMatchObject({ files: [] });
+	});
+});

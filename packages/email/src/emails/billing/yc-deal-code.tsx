@@ -1,4 +1,4 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
 import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { EmailLayout } from "../../components";
 
@@ -13,10 +13,6 @@ export function YcDealCodeEmail({
 }: YcDealCodeEmailProps) {
 	return (
 		<EmailLayout preview="Your code for 6 months of Paradev Pro free">
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Your Paradev YC deal
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {firstName ?? "there"},
 			</Text>

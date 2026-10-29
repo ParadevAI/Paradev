@@ -22,6 +22,7 @@ import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
 import { protectedProcedure } from "../../trpc";
+import { jevChannelRouter } from "../agent/channel-routing";
 import { startTurnsForMessage } from "../agent/turns";
 import {
 	assertCanPost,
@@ -574,7 +575,12 @@ export const channelMessageRouter = {
 			const message = await enrichMessage(result.message);
 			const root = result.root ? await enrichMessage(result.root) : null;
 			await announce(access, members, message, root, ctx.session.user.name);
-			await startTurnsForMessage(access.channel, result.message, userId);
+			await startTurnsForMessage(
+				access.channel,
+				result.message,
+				userId,
+				jevChannelRouter,
+			);
 			return message;
 		}),
 

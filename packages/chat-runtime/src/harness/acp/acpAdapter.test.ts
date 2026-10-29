@@ -1758,6 +1758,51 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("keeps the agent's mark that a diff deletes its file", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call_update",
+			toolCallId: "tc-patch",
+			title: "Edit files",
+			kind: "edit",
+			status: "completed",
+			content: [
+				{
+					type: "diff",
+					path: "/repo/old.ts",
+					oldText: "gone\n",
+					newText: "",
+					_meta: { kind: "delete" },
+				},
+				{
+					type: "diff",
+					path: "/repo/kept.ts",
+					oldText: "a\n",
+					newText: "",
+					_meta: { kind: "update" },
+				},
+			],
+		});
+		await flush();
+
+		const toolCall = itemsOf(events).find((i) => i.kind === "tool_call");
+		expect(toolCall && "content" in toolCall ? toolCall.content : []).toEqual([
+			{
+				type: "diff",
+				path: "/repo/old.ts",
+				oldText: "gone\n",
+				newText: "",
+				deleted: true,
+			},
+			{ type: "diff", path: "/repo/kept.ts", oldText: "a\n", newText: "" },
+		]);
+
+		await adapter.dispose();
+	});
+
 	it("names the MCP server and tool of a Claude MCP call, and keeps them across updates", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(agent);
@@ -5385,6 +5430,34 @@ describe("AcpAdapter config options", () => {
 			sessionId: "sess-1",
 			configId: "model",
 			value: "sonnet",
+		});
+
+		await adapter.dispose();
+	});
+
+	it("applies a start model the agent lists under another spelling", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			{
+				...MODEL_OPTION,
+				options: [
+					{ value: "claude-opus-5-5", name: "Opus 5.5" },
+					{ value: "claude-haiku-4-5", name: "Haiku 4.5" },
+				],
+				currentValue: "claude-opus-5-5",
+			},
+		];
+		const { adapter } = startAdapter(agent, undefined, { modelId: "haiku" });
+		await flush();
+
+		const sent = agent.sent.find(
+			(f) => f.method === "session/set_config_option",
+		);
+		expect(sent?.params).toEqual({
+			sessionId: "sess-1",
+			configId: "model",
+			value: "claude-haiku-4-5",
 		});
 
 		await adapter.dispose();

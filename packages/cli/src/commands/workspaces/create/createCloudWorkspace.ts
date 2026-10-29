@@ -45,7 +45,6 @@ export async function createCloudWorkspace(args: {
 		["--session", options.session || undefined],
 		["--pr", options.pr],
 		["--task", options.task],
-		["--base-branch", options.baseBranch],
 		["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 		["--tag", options.tag?.length ? options.tag : undefined],
 		[
@@ -60,6 +59,13 @@ export async function createCloudWorkspace(args: {
 				"Your account creates workspaces in the cloud by default. Pass --local to create on this machine, or --host <id> for another host",
 			);
 		}
+	}
+
+	if (options.branch !== undefined) {
+		throw new CLIError(
+			"--branch does not apply to a cloud workspace",
+			"A cloud workspace always works on a new branch of its own. Pass --base-branch <name> to pick the branch it starts from",
+		);
 	}
 
 	// Same pairing rules as the host path.
@@ -95,7 +101,7 @@ export async function createCloudWorkspace(args: {
 			organizationId,
 			environmentId: environment.id,
 			...(options.name ? { name: options.name } : {}),
-			...(options.branch ? { branch: options.branch } : {}),
+			...(options.baseBranch ? { branch: options.baseBranch } : {}),
 			...(options.agent ? { agent: options.agent } : {}),
 			...(options.prompt ? { prompt: options.prompt } : {}),
 			...(options.model ? { model: options.model } : {}),

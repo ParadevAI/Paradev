@@ -15,6 +15,7 @@ import {
 	isDevAppProfileDirName,
 	workspaceDevAppProfileDirName,
 } from "@superset/shared/dev-app-profile";
+import { HTML_PREVIEW_SCHEME } from "@superset/shared/html-preview";
 import {
 	app,
 	BrowserWindow,
@@ -59,6 +60,7 @@ import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
 import { loadWebviewBrowserExtension } from "./lib/extensions";
 import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
+import { htmlPreviewProtocolHandler } from "./lib/html-preview-protocol";
 import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
@@ -452,6 +454,13 @@ protocol.registerSchemesAsPrivileged([
 			supportFetchAPI: true,
 		},
 	},
+	{
+		scheme: HTML_PREVIEW_SCHEME,
+		privileges: {
+			standard: true,
+			secure: true,
+		},
+	},
 ]);
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -546,6 +555,11 @@ if (!gotTheLock) {
 				.fromPartition("persist:superset")
 				.protocol.handle("superset-font", fontProtocolHandler);
 		}
+
+		protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
+		session
+			.fromPartition("persist:superset")
+			.protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
 
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();

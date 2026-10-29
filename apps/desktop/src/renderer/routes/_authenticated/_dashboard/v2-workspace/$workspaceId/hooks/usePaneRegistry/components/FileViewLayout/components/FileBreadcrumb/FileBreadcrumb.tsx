@@ -1,5 +1,4 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	Fragment,
@@ -99,7 +98,7 @@ export function FileBreadcrumb({
 		return () => observer.disconnect();
 	}, []);
 
-	const crumbLabel = (index: number): ReactNode =>
+	const crumbLabel = (index: number, showDot: boolean): ReactNode =>
 		index === segments.length - 1 ? (
 			<span className="flex items-center gap-1.5 text-foreground">
 				<FileIcon
@@ -107,12 +106,9 @@ export function FileBreadcrumb({
 					className="size-3.5 shrink-0"
 				/>
 				{segments[index]}
-				<span
-					className={cn(
-						"size-2 shrink-0 rounded-full bg-muted-foreground",
-						!dirty && "invisible",
-					)}
-				/>
+				{showDot && (
+					<span className="size-2 shrink-0 rounded-full bg-muted-foreground" />
+				)}
 			</span>
 		) : (
 			segments[index]
@@ -171,7 +167,7 @@ export function FileBreadcrumb({
 				<span className="px-0.5">…</span>
 				{segments.map((segment, index) => (
 					<span key={`${index}:${segment}`} className="px-0.5">
-						{crumbLabel(index)}
+						{crumbLabel(index, true)}
 					</span>
 				))}
 			</div>
@@ -202,7 +198,7 @@ export function FileBreadcrumb({
 					return (
 						<Fragment key={`${index}:${segment}`}>
 							{offset > 0 && separator}
-							{crumb(index, crumbLabel(index), treeFor(index))}
+							{crumb(index, crumbLabel(index, dirty), treeFor(index))}
 						</Fragment>
 					);
 				})}

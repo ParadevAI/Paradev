@@ -54,6 +54,7 @@ import {
 	spawnAcpTransport,
 } from "./rpcClient";
 import { messageIdOf, SessionStream } from "./sessionStream";
+import { startOptionId } from "./startOption";
 import type {
 	AcpConfigSelectOption,
 	AcpElicitationProperty,
@@ -1915,19 +1916,21 @@ export class AcpAdapter implements HarnessAdapter {
 		resumed: boolean,
 	): void {
 		const modeId = this.startModeId(startOptions, resumed);
-		for (const [category, value] of [
+		for (const [category, wanted] of [
 			["model", startOptions.modelId],
 			["mode", this.options.clientApprovalModes ? undefined : modeId],
 		] as const) {
 			const option = this.configOptions.find(
 				(entry) => entry.category === category,
 			);
-			if (
-				value &&
-				option &&
-				option.currentValue !== value &&
-				option.options.some((entry) => entry.id === value)
-			) {
+			if (!wanted || !option) continue;
+			const value =
+				category === "model"
+					? startOptionId(option.options, wanted)
+					: option.options.some((entry) => entry.id === wanted)
+						? wanted
+						: undefined;
+			if (value && option.currentValue !== value) {
 				this.setConfigOption(option.id, value);
 			}
 		}
