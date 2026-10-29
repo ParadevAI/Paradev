@@ -2192,6 +2192,10 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agen tidak dapat menjangkau alat {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 
@@ -18624,6 +18628,9 @@ msgstr "Layanan host Paradev untuk {organization} berhenti tak terduga ({cause})
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Layanan host Paradev berhenti tak terduga ({cause}) dan tidak bisa dimulai ulang otomatis."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Perubahan plugin tidak selesai dalam {seconds} detik."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Kumpulan direset setiap bulan. Penggunaan di atasnya ditagih per GB-jam sesuai tarif di setiap paket."

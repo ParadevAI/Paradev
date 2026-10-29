@@ -2192,6 +2192,10 @@ msgstr "Agent-driven previews"
 msgid "Agents"
 msgstr "Agents"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agents cannot reach {0}'s tools"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agents complete routine tickets with no mid-task intervention."
 
@@ -18624,6 +18628,9 @@ msgstr "The Paradev host service for {organization} stopped unexpectedly ({cause
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "The plugin change did not finish in {seconds} seconds."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."

@@ -2192,6 +2192,10 @@ msgstr "Aperçus pilotés par l'agent"
 msgid "Agents"
 msgstr "Agents"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Les agents ne peuvent pas accéder aux outils de {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Les agents terminent les tickets courants sans intervention en cours de tâche."
 
@@ -18624,6 +18628,9 @@ msgstr "Le service hôte Paradev pour {organization} s'est arrêté de façon in
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Le service hôte Paradev s'est arrêté de façon inattendue ({cause}) et n'a pas pu être redémarré automatiquement."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "La modification du plugin ne s'est pas terminée en {seconds} secondes."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "La réserve est remise à zéro chaque mois. L'usage au-delà est facturé par GB-heure au tarif indiqué pour chaque forfait."

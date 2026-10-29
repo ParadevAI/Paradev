@@ -1,7 +1,5 @@
-import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { promisify } from "node:util";
 import {
 	createManagedSkills,
 	mcpHeadersHelperCommand,
@@ -21,6 +19,11 @@ import log from "electron-log/main";
 import { env } from "main/env.main";
 import { resolveBundledCliPath } from "main/lib/bundled-cli";
 import { localDb } from "main/lib/local-db";
+import {
+	type PluginCliAction,
+	type PluginCliResult,
+	runPluginCli,
+} from "main/lib/plugin-cli";
 import { createSerialQueue } from "main/lib/serial-queue";
 
 /**
@@ -32,32 +35,32 @@ import { createSerialQueue } from "main/lib/serial-queue";
  * a mid-session sync was missed.
  */
 
-const execFileAsync = promisify(execFile);
-
 const pluginCliQueue = createSerialQueue();
 
-function queuePluginCli(args: string[]): Promise<void> {
-	return pluginCliQueue(() => runPluginCli(args));
+export interface PluginChangeResult extends PluginCliResult {
+	installed: InstalledPlugin[];
 }
 
-async function runPluginCli(args: string[]): Promise<void> {
-	const cli = resolveBundledCliPath();
-	if (!cli) {
-		log.warn("[plugins] no bundled CLI; skills were not provisioned");
-		return;
-	}
-
-	try {
-		await execFileAsync(cli, ["plugins", ...args, "--json"], {
-			timeout: 60_000,
-			env: { ...process.env, SUPERSET_CLI_AUDIENCE: "internal" },
-		});
-	} catch (error) {
-		log.warn(
-			`[plugins] ${args.join(" ")} failed; skills may be stale:`,
-			error instanceof Error ? error.message : error,
-		);
-	}
+/** Applies the change on disk first, so a failed one leaves no record behind. */
+async function applyPluginChange(
+	action: PluginCliAction | null,
+	name: string,
+	nextInstalled: (installed: InstalledPlugin[]) => InstalledPlugin[],
+): Promise<PluginChangeResult> {
+	let result: PluginChangeResult = { installed: [], mcpError: null };
+	await pluginCliQueue(async () => {
+		const cli = action ? resolveBundledCliPath() : null;
+		let mcpError: string | null = null;
+		if (action && cli) {
+			({ mcpError } = await runPluginCli(cli, action, name));
+		} else if (action) {
+			log.warn("[plugins] no bundled CLI; skills were not provisioned");
+		}
+		const installed = nextInstalled(getInstalledPlugins());
+		saveInstalledPlugins(installed);
+		result = { installed, mcpError };
+	});
+	return result;
 }
 
 export function getInstalledPlugins(): InstalledPlugin[] {
@@ -84,33 +87,31 @@ export function syncInstalledPluginMcpServers(): void {
 	);
 }
 
-/** Returns the updated install list; unknown plugin names return null. */
-export function installPlugin(name: string): InstalledPlugin[] | null {
+/** Unknown plugin names return null. */
+export async function installPlugin(
+	name: string,
+): Promise<PluginChangeResult | null> {
 	const plugin = getPluginByName(name);
 	if (!plugin) return null;
 
-	const installed = getInstalledPlugins();
-	const existing = installed.find((entry) => entry.name === name);
-	const record: InstalledPlugin = {
-		name: plugin.name,
-		version: plugin.version,
-		installedAt: existing?.installedAt ?? new Date().toISOString(),
-		...(existing?.enabled === false ? { enabled: false } : {}),
-	};
-	const next = existing
-		? installed.map((entry) => (entry.name === name ? record : entry))
-		: [...installed, record];
-
-	saveInstalledPlugins(next);
-	void queuePluginCli(["install", name, "--update"]);
-	return next;
+	return applyPluginChange("install", name, (installed) => {
+		const existing = installed.find((entry) => entry.name === name);
+		const record: InstalledPlugin = {
+			name: plugin.name,
+			version: plugin.version,
+			installedAt: existing?.installedAt ?? new Date().toISOString(),
+			...(existing?.enabled === false ? { enabled: false } : {}),
+		};
+		return existing
+			? installed.map((entry) => (entry.name === name ? record : entry))
+			: [...installed, record];
+	});
 }
 
-export function uninstallPlugin(name: string): InstalledPlugin[] {
-	const next = getInstalledPlugins().filter((entry) => entry.name !== name);
-	saveInstalledPlugins(next);
-	void queuePluginCli(["uninstall", name]);
-	return next;
+export function uninstallPlugin(name: string): Promise<PluginChangeResult> {
+	return applyPluginChange("uninstall", name, (installed) =>
+		installed.filter((entry) => entry.name !== name),
+	);
 }
 
 /**
@@ -189,31 +190,32 @@ export function getBundledSkillIcons(): Record<string, string> {
 export function setPluginEnabled(
 	name: string,
 	enabled: boolean,
-): InstalledPlugin[] {
-	const installed = getInstalledPlugins();
-	const hasRecord = installed.some((entry) => entry.name === name);
+): Promise<PluginChangeResult> {
 	const plugin = getPluginByName(name);
-	const next = hasRecord
-		? installed.map((entry) =>
-				entry.name === name ? { ...entry, enabled } : entry,
-			)
-		: plugin
-			? [
-					...installed,
-					{
-						name: plugin.name,
-						version: plugin.version,
-						installedAt: new Date().toISOString(),
-						enabled,
-					},
-				]
-			: installed;
-	saveInstalledPlugins(next);
 	// installed_plugins.json is the only `enabled` flag provisioning reads, and
-	// local-db is not it: without this the skills stay materialized while the
-	// MCP servers are reaped, leaving the plugin half on.
-	void queuePluginCli([enabled ? "enable" : "disable", name]);
-	return next;
+	// local-db is not it: without the CLI step the skills stay materialized
+	// while the MCP servers are reaped, leaving the plugin half on.
+	return applyPluginChange(
+		plugin ? (enabled ? "enable" : "disable") : null,
+		name,
+		(installed) => {
+			if (installed.some((entry) => entry.name === name)) {
+				return installed.map((entry) =>
+					entry.name === name ? { ...entry, enabled } : entry,
+				);
+			}
+			if (!plugin) return installed;
+			return [
+				...installed,
+				{
+					name: plugin.name,
+					version: plugin.version,
+					installedAt: new Date().toISOString(),
+					enabled,
+				},
+			];
+		},
+	);
 }
 
 export function getDisabledSkills(): string[] {

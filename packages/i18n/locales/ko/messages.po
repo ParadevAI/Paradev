@@ -2192,6 +2192,10 @@ msgstr "에이전트가 조작하는 미리보기"
 msgid "Agents"
 msgstr "에이전트"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완료합니다."
 
@@ -18624,6 +18628,9 @@ msgstr "{organization}의 Paradev 호스트 서비스가 예기치 않게 중지
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev 호스트 서비스가 예기치 않게 중지되었으며({cause}) 자동으로 다시 시작하지 못했습니다."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "플러그인 변경이 {seconds}초 안에 완료되지 않았습니다."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "풀은 매달 초기화됩니다. 초과 사용량은 각 플랜에 표시된 GB 시간당 요금으로 청구됩니다."

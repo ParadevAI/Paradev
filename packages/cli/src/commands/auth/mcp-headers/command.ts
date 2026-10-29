@@ -5,11 +5,9 @@ import { pluginMcpHeaders } from "../../../lib/plugins/mcp-client";
 export default command({
 	description:
 		"Print the auth headers for Paradev's plugin MCP endpoints (for an agent's headers helper)",
-	// Under `auth` because it has to be publicly reachable and `plugins` is
-	// not: an audience-gated group is absent, not hidden, and a command marked
-	// public inside it is pruned with its parent. An agent runs this itself and
-	// will not carry SUPERSET_CLI_AUDIENCE=internal. `auth` is also where the
-	// credential it prints comes from.
+	// An agent runs this itself and does not carry SUPERSET_CLI_AUDIENCE, so it
+	// must stay public. Under `auth` because that is where the credential it
+	// prints comes from.
 	audience: "public",
 	// Runnable but unlisted: a person never types this, an agent's headers
 	// helper does. Internal would have made it absent rather than quiet.

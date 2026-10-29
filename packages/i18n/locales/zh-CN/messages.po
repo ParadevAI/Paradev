@@ -2192,6 +2192,10 @@ msgstr "由智能体驱动的预览"
 msgid "Agents"
 msgstr "智能体"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "智能体无法访问 {0} 的工具"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "智能体无需中途干预即可完成常规工单。"
 
@@ -18624,6 +18628,9 @@ msgstr "{organization}的Paradev主机服务意外停止（{cause}），且无�
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev主机服务意外停止（{cause}），且无法自动重启。"
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "插件更改未在 {seconds} 秒内完成。"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"

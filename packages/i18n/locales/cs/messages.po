@@ -2192,6 +2192,10 @@ msgstr "Náhledy řízené agenty"
 msgid "Agents"
 msgstr "Agenti"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Agenti nemají přístup k nástrojům {0}"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Agenti dokončí rutinní tickety bez zásahu uprostřed úkolu."
 
@@ -18624,6 +18628,9 @@ msgstr "Host service Paradev pro {organization} se nečekaně zastavila ({cause}
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Host service Paradev se nečekaně zastavila ({cause}) a nešlo ji automaticky restartovat."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Změna pluginu nebyla dokončena do {seconds} sekund."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Fond se každý měsíc obnovuje. Využití nad jeho rámec se účtuje za GB-hodinu podle sazby uvedené u každého plánu."

@@ -2192,6 +2192,10 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
+#. placeholder {0}: displayName(name)
+msgid "Agents cannot reach {0}'s tools"
+msgstr "Ajanlar {0} araçlarına erişemiyor"
+
 msgid "Agents complete routine tickets with no mid-task intervention."
 msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 
@@ -18624,6 +18628,9 @@ msgstr "{organization} için Paradev host hizmeti beklenmedik şekilde durdu ({c
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Paradev host hizmeti beklenmedik şekilde durdu ({cause}) ve otomatik olarak yeniden başlatılamadı."
+
+msgid "The plugin change did not finish in {seconds} seconds."
+msgstr "Eklenti değişikliği {seconds} saniye içinde tamamlanmadı."
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Havuz her ay sıfırlanır. Havuzu aşan kullanım her planda gösterilen GB-saat ücretiyle faturalandırılır."
