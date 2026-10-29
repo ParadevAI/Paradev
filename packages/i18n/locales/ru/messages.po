@@ -6985,6 +6985,9 @@ msgstr "Не удалось скачать"
 msgid "Download for {platformName}"
 msgstr "Скачать для {platformName}"
 
+msgid "Download for Linux"
+msgstr "Скачать для Linux"
+
 msgid "Download for Mac"
 msgstr "Скачать для Mac"
 
@@ -8775,8 +8778,8 @@ msgstr "Получить ключ"
 msgid "Get more out of Paradev"
 msgstr "Выжать больше из Paradev"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Получите уведомление, когда Paradev станет доступен для Windows и Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Получите уведомление, когда Paradev станет доступен для Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Установите Paradev на Mac"

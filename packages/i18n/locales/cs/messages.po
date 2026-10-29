@@ -6985,6 +6985,9 @@ msgstr "Stažení selhalo"
 msgid "Download for {platformName}"
 msgstr "Stáhnout pro {platformName}"
 
+msgid "Download for Linux"
+msgstr "Stáhnout pro Linux"
+
 msgid "Download for Mac"
 msgstr "Stáhnout pro Mac"
 
@@ -8775,8 +8778,8 @@ msgstr "Získat klíč"
 msgid "Get more out of Paradev"
 msgstr "Využít Paradev naplno"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows a Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Získejte Paradev na svůj Mac"

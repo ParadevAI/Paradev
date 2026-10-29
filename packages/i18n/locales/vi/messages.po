@@ -6985,6 +6985,9 @@ msgstr "Tải xuống thất bại"
 msgid "Download for {platformName}"
 msgstr "Tải xuống cho {platformName}"
 
+msgid "Download for Linux"
+msgstr "Tải cho Linux"
+
 msgid "Download for Mac"
 msgstr "Tải cho Mac"
 
@@ -8775,8 +8778,8 @@ msgstr "Lấy khóa"
 msgid "Get more out of Paradev"
 msgstr "Khai thác Paradev nhiều hơn"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Nhận thông báo khi Paradev có trên Windows & Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Nhận thông báo khi Paradev có trên Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Cài Paradev trên máy Mac"

@@ -6985,6 +6985,9 @@ msgstr "다운로드 실패"
 msgid "Download for {platformName}"
 msgstr "{platformName}용 다운로드"
 
+msgid "Download for Linux"
+msgstr "Linux용 다운로드"
+
 msgid "Download for Mac"
 msgstr "Mac용 다운로드"
 
@@ -8775,8 +8778,8 @@ msgstr "키 받기"
 msgid "Get more out of Paradev"
 msgstr "Paradev 더 잘 활용하기"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Paradev를 Windows와 Linux에서 쓸 수 있게 되면 알려 드립니다."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Paradev를 Windows에서 쓸 수 있게 되면 알려 드립니다."
 
 msgid "Get Paradev on your Mac"
 msgstr "Mac에서 Paradev 사용하기"

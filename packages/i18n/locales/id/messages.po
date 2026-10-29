@@ -6985,6 +6985,9 @@ msgstr "Unduhan gagal"
 msgid "Download for {platformName}"
 msgstr "Unduh untuk {platformName}"
 
+msgid "Download for Linux"
+msgstr "Unduh untuk Linux"
+
 msgid "Download for Mac"
 msgstr "Unduh untuk Mac"
 
@@ -8775,8 +8778,8 @@ msgstr "Dapatkan kunci"
 msgid "Get more out of Paradev"
 msgstr "Manfaatkan Paradev lebih jauh"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Dapatkan pemberitahuan saat Paradev tersedia di Windows & Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Dapatkan pemberitahuan saat Paradev tersedia di Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Dapatkan Paradev di Mac Anda"
