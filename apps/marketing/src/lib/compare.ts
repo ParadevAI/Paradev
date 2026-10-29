@@ -3,7 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { slugify, type TocItem } from "./blog-utils";
 import type { ComparisonPage } from "./compare-utils";
-import { normalizeContentDate } from "./content-utils";
+import { normalizeContentDate, stripInlineMarkdown } from "./content-utils";
 
 export { type ComparisonPage, formatCompareDate } from "./compare-utils";
 
@@ -76,7 +76,7 @@ export function extractCompareToc(content: string): TocItem[] {
 		if (!hashes || !heading) continue;
 
 		const level = hashes.length;
-		const text = heading.trim();
+		const text = stripInlineMarkdown(heading);
 		const id = slugify(text);
 
 		toc.push({ id, text, level });

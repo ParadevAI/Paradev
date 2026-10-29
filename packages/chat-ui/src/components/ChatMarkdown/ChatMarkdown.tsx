@@ -1,8 +1,10 @@
+import { fenceState } from "@superset/chat/core";
 import { cn } from "@superset/ui/utils";
 import type { ComponentProps, FunctionComponent, JSX, ReactNode } from "react";
 import { createElement, memo, useMemo } from "react";
 import type { Components, ExtraProps, StreamdownProps } from "streamdown";
 import { defaultRemarkPlugins, Streamdown } from "streamdown";
+import { TABLE_CLASSNAME, TABLE_SCROLLER_CLASSNAME } from "./constants";
 
 /**
  * Streamdown's `Components` is an intersection — per-tag props on one side, an
@@ -11,7 +13,10 @@ import { defaultRemarkPlugins, Streamdown } from "streamdown";
  * to the tag. `node` is the markdown AST node, which belongs to the renderer
  * rather than to the DOM.
  */
-type RendererProps = ExtraProps & { className?: unknown; children?: ReactNode };
+export type RendererProps = ExtraProps & {
+	className?: unknown;
+	children?: ReactNode;
+};
 type MarkdownRenderer = FunctionComponent<RendererProps>;
 
 function ownClassName(className: unknown): string | null {
@@ -56,11 +61,8 @@ function Link({
 
 function Table({ node: _node, className, children, ...rest }: RendererProps) {
 	return (
-		<div className="mb-2 max-w-full overflow-x-auto">
-			<table
-				{...rest}
-				className={cn("border border-border", ownClassName(className))}
-			>
+		<div className={cn("mb-2", TABLE_SCROLLER_CLASSNAME)}>
+			<table {...rest} className={cn(TABLE_CLASSNAME, ownClassName(className))}>
 				{children}
 			</table>
 		</div>
@@ -147,6 +149,9 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 				: chatMarkdownComponents,
 		[components],
 	);
+	// Streamdown tells a code renderer its fence is still open only while
+	// the text is animating; a block that ends inside a fence is exactly that.
+	const fenceOpen = useMemo(() => fenceState(children).open, [children]);
 	const mergedRemarkPlugins = useMemo(
 		() =>
 			remarkPlugins
@@ -160,6 +165,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 		<Streamdown
 			className={cn("space-y-0 break-words", className)}
 			components={merged}
+			isAnimating={fenceOpen}
 			linkSafety={{ enabled: false }}
 			mode="streaming"
 			remarkPlugins={mergedRemarkPlugins}

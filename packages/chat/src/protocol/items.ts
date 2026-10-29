@@ -85,6 +85,8 @@ export const toolContentSchema = z.discriminatedUnion("type", [
 		path: z.string(),
 		oldText: z.string().nullable(),
 		newText: z.string(),
+		/** The agent removed the file; an empty `newText` alone can also be an emptied file. */
+		deleted: z.boolean().optional(),
 	}),
 	z.looseObject({
 		type: z.literal("terminal"),

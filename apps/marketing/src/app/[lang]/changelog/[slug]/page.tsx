@@ -6,7 +6,11 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/JsonLd";
-import { getChangelogEntries, getChangelogEntry } from "@/lib/changelog";
+import {
+	getChangelogEntries,
+	getChangelogEntry,
+	summarizeChangelogEntry,
+} from "@/lib/changelog";
 import { changelogMdxComponents } from "../components/ChangelogEntry/changelog-mdx-components";
 import { ChangelogEntryLayout } from "./components/ChangelogEntryLayout";
 
@@ -30,7 +34,7 @@ export default async function ChangelogEntryPage({ params }: PageProps) {
 		<main>
 			<ArticleJsonLd
 				title={entry.title}
-				description={entry.description}
+				description={summarizeChangelogEntry(entry)}
 				author={{ name: `${BRAND.NAME} Team` }}
 				publishedTime={new Date(entry.date).toISOString()}
 				url={url}
@@ -68,14 +72,15 @@ export async function generateMetadata({
 	}
 
 	const url = `${COMPANY.MARKETING_URL}/changelog/${slug}`;
+	const description = summarizeChangelogEntry(entry);
 
 	return {
 		title: entry.title,
-		description: entry.description,
+		description,
 		alternates: localizedAlternates(lang, `/changelog/${slug}`),
 		openGraph: {
 			title: entry.title,
-			description: entry.description,
+			description,
 			type: "article",
 			url,
 			siteName: BRAND.NAME,
@@ -84,7 +89,7 @@ export async function generateMetadata({
 		twitter: {
 			card: "summary_large_image",
 			title: entry.title,
-			description: entry.description,
+			description,
 		},
 	};
 }

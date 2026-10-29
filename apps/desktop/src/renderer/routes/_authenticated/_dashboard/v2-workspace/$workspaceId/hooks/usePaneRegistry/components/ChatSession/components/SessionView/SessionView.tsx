@@ -31,11 +31,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import {
 	ChatPaneActionsProvider,
+	type OpenDiff,
 	type OpenLink,
 	type OpenPage,
+	type TurnChangesSource,
 } from "../../providers/ChatPaneActionsProvider";
 import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
@@ -64,6 +67,7 @@ import {
 	WorkDrawer,
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
+import { LiveChangesPill } from "./components/LiveChangesPill";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
@@ -72,6 +76,7 @@ import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
+import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 
 const RESUME_FOLLOW_PX = 24;
@@ -105,6 +110,7 @@ export function SessionView({
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
+	openDiff,
 	openFile,
 	openPage,
 	openLink,
@@ -163,6 +169,7 @@ export function SessionView({
 		) => void;
 	};
 	openFile?: OpenFile;
+	openDiff?: OpenDiff;
 	openPage?: OpenPage;
 	openLink?: OpenLink;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
@@ -170,7 +177,12 @@ export function SessionView({
 	onNewChat?: () => void;
 }) {
 	const { t } = useLingui();
-	const session = useChatSession({ client, sendEnabled: held === undefined });
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
+	const session = useChatSession({
+		client,
+		sendEnabled: held === undefined,
+		snapshotWorktree,
+	});
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
 	const transcriptRef = useRef<TranscriptHandle>(null);
@@ -278,6 +290,33 @@ export function SessionView({
 	const runningTurnId = useMemo(
 		() => findRunningTurnId(session.snapshot.turns),
 		[session.snapshot.turns],
+	);
+	const liveRefreshKey = useMemo(
+		() =>
+			settledToolCalls(
+				timeline.find((group) => group.turnId === runningTurnId),
+			),
+		[timeline, runningTurnId],
+	);
+	const turnChanges = useMemo<TurnChangesSource>(
+		() => ({
+			sessionId: client.sessionId,
+			load: (turnId, live, anchorItemIds) =>
+				client.getTurnChanges({
+					workspaceId,
+					turnId,
+					live,
+					...(anchorItemIds?.length ? { anchorItemIds } : {}),
+				}),
+			undo: (turnId, paths, anchorItemIds) =>
+				client.undoTurnFiles({
+					workspaceId,
+					turnId,
+					paths,
+					...(anchorItemIds?.length ? { anchorItemIds } : {}),
+				}),
+		}),
+		[client, workspaceId],
 	);
 	const sessionUsage = useMemo(
 		() => latestSessionUsage(session.snapshot.turns),
@@ -577,6 +616,8 @@ export function SessionView({
 		<ChatPaneActionsProvider
 			editMessage={editMessage}
 			editableMessageIds={editableIds}
+			openDiff={openDiff}
+			turnChanges={turnChanges}
 			openFile={openFile}
 			openPage={openPage}
 			openLink={openLink}
@@ -657,6 +698,9 @@ export function SessionView({
 							<Trans>Starting the agent…</Trans>
 						</ConnectionNotice>
 					)
+				)}
+				{runningTurnId && !focusedSubagentId && (
+					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
 				)}
 				<WorkDrawer
 					onExit={returnToComposer}

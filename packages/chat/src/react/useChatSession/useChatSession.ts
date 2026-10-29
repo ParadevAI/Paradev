@@ -156,6 +156,7 @@ export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
 export type UseChatSessionOptions = {
 	client: SessionClient;
 	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	deltas?: readonly DeltaChannel[];
 	pageSize?: number;
 	scheduler?: FrameScheduler;
@@ -210,6 +211,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const sendEnabled = options.sendEnabled ?? true;
 	const sendEnabledRef = useRef(sendEnabled);
 	sendEnabledRef.current = sendEnabled;
+	const snapshotWorktreeRef = useRef(options.snapshotWorktree === true);
+	snapshotWorktreeRef.current = options.snapshotWorktree === true;
 	const pageSize = options.pageSize;
 	const deltasKey = (options.deltas ?? DEFAULT_DELTAS).join(",");
 
@@ -254,6 +257,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 						clientId: entry.clientId,
 						content: entry.content,
 						...(entry.steer ? { steer: entry.steer } : {}),
+						...(snapshotWorktreeRef.current ? { snapshotWorktree: true } : {}),
 					});
 				},
 			}),

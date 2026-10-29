@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} 
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} dari {totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {Perubahan · # file} other {Perubahan · # file}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {Menutup # port} other {Menutup # port}}"
 
@@ -921,6 +924,12 @@ msgstr "{failing} dari {total} check gagal"
 msgid "{failing} of {total} checks failing"
 msgstr "{failing} dari {total} check gagal"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {# file berubah di workspace ini} other {# file berubah di workspace ini}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {Mengedit # file} other {Mengedit # file}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} untuk fokus"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {Tampilkan # balasan} other {Tampilkan # balasan}}"
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, other {Lihat # balasan lagi}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {Tampilkan # file lagi} other {Tampilkan # file lagi}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Tampilkan # frame lagi} other {Tampilkan # frame lagi}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {Tentukan minimal satu repositori.} channel {T
 msgid "{openCount} open"
 msgstr "{openCount} terbuka"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {Juga berubah di workspace ini: # file} other {Juga berubah di workspace ini: # file}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} dapat membaca dan mengubah data di akun {pluginLabel} Anda atas nama Anda, termasuk di versi halaman ini yang akan datang. Halaman ini dapat mengirim apa yang dibacanya ke situs web lain. Izinkan hanya halaman yang Anda percayai."
 
@@ -1200,6 +1215,9 @@ msgstr "{received} dari {total}"
 
 msgid "{remaining} tokens left"
 msgstr "Sisa {remaining} token"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {Perubahan pada # file dibatalkan.} other {Perubahan pada # file dibatalkan.}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} dtk"
@@ -3674,6 +3692,18 @@ msgstr "Tidak bisa membuka path workspace jarak jauh di Finder"
 msgid "Can't reach the host"
 msgstr "Tidak dapat menjangkau host"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "Tidak bisa dibatalkan selagi chat di workspace ini bekerja."
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "Tidak bisa dibatalkan: chat lain bekerja di workspace ini selama giliran ini."
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "Tidak bisa dibatalkan: HEAD berpindah sejak giliran ini, karena commit, pull, atau checkout."
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "Tidak bisa dibatalkan: snapshot giliran ini hilang."
+
 msgid "Cancel"
 msgstr "Batal"
 
@@ -4449,6 +4479,9 @@ msgstr "Penggunaan cloud"
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
+msgid "Cloud workspace — connecting"
+msgstr "Workspace cloud — menghubungkan"
+
 msgid "Cloud workspaces"
 msgstr "Workspace cloud"
 
@@ -5118,6 +5151,9 @@ msgstr "Salin ID sesi agen"
 
 msgid "Copy all"
 msgstr "Salin semua"
+
+msgid "Copy as CSV"
+msgstr "Salin sebagai CSV"
 
 msgid "Copy as Markdown"
 msgstr "Salin sebagai Markdown"
@@ -5811,6 +5847,9 @@ msgstr "Tidak dapat menghentikan obrolan"
 msgid "Couldn't take a screenshot"
 msgstr "Gagal mengambil tangkapan layar"
 
+msgid "Couldn't undo the file changes."
+msgstr "Perubahan file tidak bisa dibatalkan."
+
 msgid "Couldn't unstage changes"
 msgstr "Tidak bisa meng-unstage perubahan"
 
@@ -5831,6 +5870,9 @@ msgstr "Gagal mengunggah {name}"
 
 msgid "Couldn’t verify"
 msgstr "Tidak bisa memverifikasi"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "Dihitung dari edit file oleh agen. Perubahan lewat perintah shell, alat notebook atau MCP, atau subagen tidak termasuk, dan baris di file yang diedit lebih dari sekali bisa terhitung dua kali."
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "Hapus workspace"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Hapus workspace \"{workspaceName}\"?"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "dihapus"
+
 msgid "Deleted"
 msgstr "Dihapus"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "DevTools di samping halaman"
+
+msgid "Diagram"
+msgstr "Diagram"
+
+msgid "Diagram could not be drawn"
+msgstr "Diagram tidak dapat digambar"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diagram tidak dapat digambar: {reason}"
 
 msgid "Dialog"
 msgstr "Dialog"
@@ -7393,6 +7448,9 @@ msgstr "Setiap hari"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Setiap hari pukul <0>09.00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "Semua file berubah lagi sejak giliran ini, jadi tidak ada yang dibatalkan."
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "Tiap Jumat jam 4 sore, susun draf catatan rilis dari PR yang di-merge minggu ini."
 
@@ -7508,6 +7566,9 @@ msgstr "Bentangkan semua"
 
 msgid "Expand all files"
 msgstr "Bentangkan semua file"
+
+msgid "Expand diagram"
+msgstr "Perbesar diagram"
 
 msgid "Expand file"
 msgstr "Bentangkan file"
@@ -8140,6 +8201,9 @@ msgstr "Buat dan perbarui issue"
 msgid "File changed on disk"
 msgstr "File di disk telah berubah"
 
+msgid "File changes undone"
+msgstr "Perubahan file dibatalkan"
+
 msgid "File is too large to preview"
 msgstr "File terlalu besar untuk dipratinjau"
 
@@ -8299,6 +8363,9 @@ msgstr "Selesai · belum dibaca"
 msgid "finished · worked for 7s"
 msgstr "selesai · bekerja 7 dtk"
 
+msgid "Fit"
+msgstr "Sesuaikan"
+
 msgid "Fix all failing checks"
 msgstr "Perbaiki semua check yang gagal"
 
@@ -8445,6 +8512,9 @@ msgstr "Untuk laporan bug dan permintaan fitur, jalur tercepat adalah issue GitH
 
 msgid "For individuals getting started"
 msgstr "Untuk perorangan yang baru memulai"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Untuk macOS di Apple Silicon dan Intel. Linux AppImage masih eksperimental."
 
 msgid "For organizations with advanced needs"
 msgstr "Untuk organisasi dengan kebutuhan tingkat lanjut"
@@ -8598,6 +8668,15 @@ msgstr "Dari GitHub"
 
 msgid "from main agent"
 msgstr "dari agen utama"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "Dari snapshot worktree sebelum dan sesudah giliran ini, jadi edit lewat perintah shell juga terhitung."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "Dari snapshot worktree sebelum dan sesudah giliran ini. Chat lain bekerja di sini pada saat yang sama, jadi sebagian perubahan ini mungkin milik chat itu."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "Dari snapshot worktree sebelum dan sesudah giliran ini. Chat lain bekerja di sini pada saat yang sama, jadi daftar ini hanya berisi file yang diedit chat ini dengan alat filenya. Perubahan lain dicantumkan terpisah."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter disembunyikan — beralih ke Markdown untuk mengeditnya"
@@ -8796,6 +8875,9 @@ msgstr "Nama pengguna GitHub..."
 
 msgid "GitHub username…"
 msgstr "Username GitHub…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Beri Claude Code, Codex, atau agen CLI apa pun workspace dan branch sendiri, lalu tinjau setiap perubahan di satu tempat."
 
 msgid "Give me an example"
 msgstr "Beri contoh"
@@ -9232,6 +9314,9 @@ msgstr "Cara kami bekerja"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
+
+msgid "HTML preview"
+msgstr "Pratinjau HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "keluar dari {channel} bersama {others}."
 
 msgid "left {channel}."
 msgstr "keluar dari {channel}."
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "Dibiarkan, berubah sejak giliran ini: {skippedNames}"
 
 msgid "Left organization"
 msgstr "Sudah keluar dari organisasi"
@@ -11390,6 +11478,10 @@ msgstr "Tidak pernah"
 msgid "Never asks before acting"
 msgstr "Tidak pernah bertanya dulu"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "baru"
+
 msgid "New"
 msgstr "Baru"
 
@@ -12255,6 +12347,9 @@ msgstr "Tidak ada yang mereview secara berbeda karenanya."
 
 msgid "None"
 msgstr "Tidak ada"
+
+msgid "None of this turn's files have changes here"
+msgstr "Tidak ada file giliran ini yang berubah di sini"
 
 msgid "None selected"
 msgstr "Tidak ada yang dipilih"
@@ -15623,6 +15718,9 @@ msgstr "Tinjau run ini di Semua run"
 msgid "Review thread…"
 msgstr "Thread review…"
 
+msgid "Review what this turn has changed so far"
+msgstr "Tinjau apa yang sudah diubah giliran ini"
+
 msgid "reviewed"
 msgstr "mengulas"
 
@@ -15775,6 +15873,9 @@ msgstr "Jalankan sekarang"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Jalankan sesuai jadwal atau saat ada event, sesuai permintaan, jeda, lanjutkan, dan baca log."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Jalankan agen coding paralel dengan Paradev"
 
 msgid "Run script"
 msgstr "Jalankan skrip"
@@ -16783,6 +16884,9 @@ msgstr "Tampilkan tombol Penggunaan di sidebar beranda, di bawah Pull request"
 msgid "Show all {count}"
 msgstr "Tampilkan semua {count}"
 
+msgid "Show all changes"
+msgstr "Tampilkan semua perubahan"
+
 msgid "Show all comments"
 msgstr "Tampilkan semua komentar"
 
@@ -16797,6 +16901,9 @@ msgstr "Tampilkan Batas"
 
 msgid "Show checks"
 msgstr "Tampilkan check"
+
+msgid "Show code"
+msgstr "Tampilkan kode"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Tampilkan penggunaan CPU dan memori di bilah atas"
@@ -16827,6 +16934,9 @@ msgstr "Tampilkan semua yang membuka workspace ini"
 
 msgid "Show fewer"
 msgstr "Tampilkan lebih sedikit"
+
+msgid "Show fewer files"
+msgstr "Tampilkan lebih sedikit file"
 
 msgid "Show file tree"
 msgstr "Tampilkan pohon file"
@@ -16860,6 +16970,9 @@ msgstr "Tampilkan baris setelah perubahan di atas"
 
 msgid "Show lines before the change below"
 msgstr "Tampilkan baris sebelum perubahan di bawah"
+
+msgid "Show link menu"
+msgstr "Tampilkan menu tautan"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Tunjukkan 10 run terakhir otomatisasi triase Linear saya"
@@ -17192,6 +17305,9 @@ msgstr "Onboarding yang lebih mulus"
 
 msgid "Snapshot"
 msgstr "Snapshot"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Ambil snapshot worktree sebelum dan sesudah setiap giliran chat, agar kartunya mencantumkan setiap file yang berubah, termasuk edit lewat shell, dan dapat membatalkannya. Setiap prompt menunggu snapshot-nya lebih dulu."
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Membuat snapshot workspace ini seperti sekarang, beserta semua yang terpasang di dalamnya. Workspace baru dari environment ini dimulai dari snapshot tersebut."
@@ -18353,6 +18469,9 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siapa pun, dibiarkan dan dicantumkan."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
 
@@ -18946,6 +19065,9 @@ msgstr "Ini menghapus environment tersimpan secara permanen untuk semua orang ya
 msgid "This port is still in use"
 msgstr "Port ini masih dipakai"
 
+msgid "This preview is too large to show."
+msgstr "Pratinjau ini terlalu besar untuk ditampilkan."
+
 msgid "This profile is busy right now"
 msgstr "Profil ini sedang sibuk"
 
@@ -19027,6 +19149,12 @@ msgstr "Thread ini tidak punya komentar untuk dibalas."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Thread ini belum diserahkan ke agen. Seseorang harus menyerahkannya dari halaman itu dulu."
 
+msgid "This turn"
+msgstr "Giliran ini"
+
+msgid "This turn's files"
+msgstr "File giliran ini"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "Pembaruan ini memulai ulang terminal Anda satu kali saja. Terminal baru terbuka di folder yang sama."
 
@@ -19099,6 +19227,9 @@ msgstr "Workspace ini mungkin sudah dihapus, atau Anda sudah tidak punya akses k
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Catatan workspace ini masih ada, tapi folder worktree-nya sudah tidak ada di host ini. Terminal dan aksi file tidak tersedia."
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "Host workspace ini belum bisa membatalkan perubahan file."
 
 msgid "This workspace's host is offline"
 msgstr "Host workspace ini sedang offline"
@@ -19352,6 +19483,9 @@ msgstr "Pantau anggaran dan pengeluaran"
 msgid "Track down that flaky test…"
 msgstr "Lacak tes flaky itu…"
 
+msgid "Track file changes per turn"
+msgstr "Lacak perubahan file per giliran"
+
 msgid "Track tasks in"
 msgstr "Lacak tugas di"
 
@@ -19585,6 +19719,12 @@ msgstr "Sedang berjalan"
 
 msgid "Undo"
 msgstr "Undo"
+
+msgid "Undo changes"
+msgstr "Batalkan perubahan"
+
+msgid "Undo the file changes in this card?"
+msgstr "Batalkan perubahan file di kartu ini?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Batalkan workspace terakhir yang diarsipkan atau chat yang ditutup"

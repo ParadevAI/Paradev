@@ -21,6 +21,7 @@ import type {
 	DurableEvent,
 	GetItemsInput,
 	GetSessionInput,
+	GetTurnChangesInput,
 	PromptInput,
 	QueuedPromptInput,
 	RespondToApprovalInput,
@@ -42,6 +43,7 @@ import {
 	getItemsInputSchema,
 	getOutlineInputSchema,
 	getSessionInputSchema,
+	getTurnChangesInputSchema,
 	listSessionsInputSchema,
 	promptInputSchema,
 	queuedPromptInputSchema,
@@ -52,10 +54,18 @@ import {
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
+	type UndoTurnFilesInput,
 	type UpdateQueuedPromptInput,
+	undoTurnFilesInputSchema,
 	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import { z } from "zod";
+import type {
+	ChatCheckpoints,
+	TurnAnchors,
+	TurnChanges,
+	TurnUndoResult,
+} from "../../checkpoints";
 import type { ChatDb, ChatSessionRow } from "../../db";
 import type { ChatJournal } from "../../journal";
 import type { ChatSessionStore } from "../../projection";
@@ -236,6 +246,12 @@ export type ChatCommands = {
 	): Promise<CreateSessionResult | null>;
 	rewindSession(input: RewindSessionCommandInput): Promise<CreateSessionResult>;
 	getSession(input: GetSessionInput): GetSessionResult;
+	getTurnChanges(
+		input: GetTurnChangesInput & { cwd: string },
+	): Promise<TurnChanges | null>;
+	undoTurnFiles(
+		input: UndoTurnFilesInput & { cwd: string },
+	): Promise<TurnUndoResult>;
 	getQueue(input: GetSessionInput): GetQueueResult;
 	listSessions(input: ListSessionsCommandInput): ChatSessionListEntry[];
 	discoverSessions(
@@ -261,6 +277,7 @@ export type CommandsOptions = {
 	db: ChatDb;
 	sessions: ChatSessionStore;
 	live: LiveSessionRegistry;
+	checkpoints?: ChatCheckpoints;
 	dedupe: { run<T>(commandId: string, execute: () => T): T };
 	mintSessionId?: () => string;
 	subagentItems?: SubagentItems;
@@ -269,6 +286,17 @@ export type CommandsOptions = {
 const MAX_CACHED_REPLAY_EVENTS = 20_000;
 
 export function createCommands(options: CommandsOptions): ChatCommands {
+	const turnAnchors = (
+		sessionId: string,
+		anchorItemIds: string[] | undefined,
+	): TurnAnchors => {
+		const harnessSessionId =
+			options.sessions.get(sessionId)?.harnessSessionId ?? undefined;
+		return harnessSessionId && anchorItemIds
+			? { harnessSessionId, anchorItemIds }
+			: {};
+	};
+
 	const mintSessionId = options.mintSessionId ?? randomUUID;
 	const subagentItems = options.subagentItems ?? new SubagentItems(options.db);
 
@@ -469,11 +497,10 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			return options.dedupe.run(`prompt:${parsed.commandId}`, () =>
 				options.live
 					.require(parsed.sessionId)
-					.prompt(
-						parsed.content,
-						parsed.clientId,
-						parsed.steer?.expectedTurnId,
-					),
+					.prompt(parsed.content, parsed.clientId, {
+						steerTurnId: parsed.steer?.expectedTurnId,
+						snapshotWorktree: parsed.snapshotWorktree === true,
+					}),
 			);
 		},
 
@@ -669,6 +696,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 								{ type: "text", text: parsed.prompt },
 							],
 							`rewind-${parsed.commandId}`,
+							{ snapshotWorktree: parsed.snapshotWorktree === true },
 						);
 					} catch (error) {
 						await this.closeSession({ sessionId: created.sessionId }).catch(
@@ -701,6 +729,44 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				subagentItems.forget(sessionId);
 				options.journal.announce(sessionId);
 			}
+		},
+
+		async getTurnChanges({ cwd, ...input }) {
+			const parsed = getTurnChangesInputSchema.parse(input);
+			if (!options.checkpoints) return null;
+			return options.checkpoints.changes({
+				cwd,
+				sessionId: parsed.sessionId,
+				turnId: parsed.turnId,
+				live: parsed.live === true,
+				...turnAnchors(parsed.sessionId, parsed.anchorItemIds),
+			});
+		},
+
+		undoTurnFiles({ cwd, ...input }) {
+			const parsed = undoTurnFilesInputSchema.parse(input);
+			return options.dedupe.run(`undoTurnFiles:${parsed.commandId}`, () => {
+				const checkpoints = options.checkpoints;
+				if (!checkpoints) {
+					return Promise.resolve<TurnUndoResult>({
+						status: "refused",
+						reason: "unsupported",
+					});
+				}
+				if (options.live.busyIn(cwd)) {
+					return Promise.resolve<TurnUndoResult>({
+						status: "refused",
+						reason: "busy",
+					});
+				}
+				return checkpoints.undo({
+					cwd,
+					sessionId: parsed.sessionId,
+					turnId: parsed.turnId,
+					paths: parsed.paths,
+					...turnAnchors(parsed.sessionId, parsed.anchorItemIds),
+				});
+			});
 		},
 
 		getSession(input) {

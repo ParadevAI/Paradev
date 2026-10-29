@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {# Commit hinter main, Rebase nötig} other {#
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} von {totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {Änderungen · # Datei} other {Änderungen · # Dateien}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {# Port geschlossen} other {# Ports geschlossen}}"
 
@@ -921,6 +924,12 @@ msgstr "{failing} von {total} Prüfung fehlgeschlagen"
 msgid "{failing} of {total} checks failing"
 msgstr "{failing} von {total} Prüfungen fehlgeschlagen"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {# Datei in diesem Arbeitsbereich geändert} other {# Dateien in diesem Arbeitsbereich geändert}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {# Datei bearbeitet} other {# Dateien bearbeitet}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} zum Fokussieren"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {# Antwort anzeigen} other {# Antworten anzeigen}}"
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, one {# weitere Antwort anzeigen} other {# weitere Antworten anzeigen}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {# weitere Datei anzeigen} other {# weitere Dateien anzeigen}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# weiteren Frame anzeigen} other {# weitere Frames anzeigen}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {Gib mindestens ein Repository an.} channel {G
 msgid "{openCount} open"
 msgstr "{openCount} offen"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {Auch in diesem Arbeitsbereich geändert: # Datei} other {Auch in diesem Arbeitsbereich geändert: # Dateien}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} kann in deinem Namen Daten in deinem {pluginLabel}-Konto lesen und ändern, auch in künftigen Versionen dieser Seite. Was die Seite liest, kann sie an andere Websites senden. Erlaube nur Seiten, denen du vertraust."
 
@@ -1200,6 +1215,9 @@ msgstr "{received} von {total}"
 
 msgid "{remaining} tokens left"
 msgstr "Noch {remaining} Tokens frei"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {Änderungen an # Datei rückgängig gemacht.} other {Änderungen an # Dateien rückgängig gemacht.}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} Sek."
@@ -3674,6 +3692,18 @@ msgstr "Pfade aus Remote-Arbeitsbereichen lassen sich nicht im Finder öffnen"
 msgid "Can't reach the host"
 msgstr "Host nicht erreichbar"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "Rückgängig machen geht nicht, während ein Chat in diesem Arbeitsbereich arbeitet."
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "Rückgängig machen geht nicht: Während dieses Durchlaufs hat ein anderer Chat in diesem Arbeitsbereich gearbeitet."
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "Rückgängig machen geht nicht: HEAD hat sich seit diesem Durchlauf bewegt, durch einen Commit, Pull oder Checkout."
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "Rückgängig machen geht nicht: Die Snapshots dieses Durchlaufs fehlen."
+
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -4449,6 +4479,9 @@ msgstr "Cloud-Nutzung"
 msgid "Cloud workspace"
 msgstr "Cloud-Arbeitsbereich"
 
+msgid "Cloud workspace — connecting"
+msgstr "Cloud-Arbeitsbereich — Verbindung wird hergestellt"
+
 msgid "Cloud workspaces"
 msgstr "Cloud-Arbeitsbereiche"
 
@@ -5118,6 +5151,9 @@ msgstr "Agenten-Session-ID kopieren"
 
 msgid "Copy all"
 msgstr "Alle kopieren"
+
+msgid "Copy as CSV"
+msgstr "Als CSV kopieren"
 
 msgid "Copy as Markdown"
 msgstr "Als Markdown kopieren"
@@ -5811,6 +5847,9 @@ msgstr "Chat konnte nicht gestoppt werden"
 msgid "Couldn't take a screenshot"
 msgstr "Screenshot konnte nicht erstellt werden"
 
+msgid "Couldn't undo the file changes."
+msgstr "Die Dateiänderungen konnten nicht rückgängig gemacht werden."
+
 msgid "Couldn't unstage changes"
 msgstr "Stagen konnte nicht aufgehoben werden"
 
@@ -5831,6 +5870,9 @@ msgstr "{name} konnte nicht hochgeladen werden"
 
 msgid "Couldn’t verify"
 msgstr "Nicht überprüfbar"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "Gezählt aus den Dateiänderungen des Agenten. Änderungen durch Shell-Befehle, Notebook- oder MCP-Tools und Subagenten fehlen, und in einer mehrfach bearbeiteten Datei kann eine Zeile doppelt zählen."
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "Arbeitsbereich löschen"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Arbeitsbereich \"{workspaceName}\" löschen?"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "gelöscht"
+
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "DevTools neben der Seite"
+
+msgid "Diagram"
+msgstr "Diagramm"
+
+msgid "Diagram could not be drawn"
+msgstr "Diagramm konnte nicht gezeichnet werden"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diagramm konnte nicht gezeichnet werden: {reason}"
 
 msgid "Dialog"
 msgstr "Dialog"
@@ -7393,6 +7448,9 @@ msgstr "Jeden Tag"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Jeden Tag um <0>9:00 Uhr</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "Jede Datei wurde seit diesem Durchlauf erneut geändert, daher wurde nichts rückgängig gemacht."
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "Jeden Freitag um 16 Uhr Release Notes aus den diese Woche gemergten PRs entwerfen."
 
@@ -7508,6 +7566,9 @@ msgstr "Alle ausklappen"
 
 msgid "Expand all files"
 msgstr "Alle Dateien ausklappen"
+
+msgid "Expand diagram"
+msgstr "Diagramm vergrößern"
 
 msgid "Expand file"
 msgstr "Datei ausklappen"
@@ -8140,6 +8201,9 @@ msgstr "Issues anlegen und aktualisieren"
 msgid "File changed on disk"
 msgstr "Datei auf dem Datenträger wurde geändert"
 
+msgid "File changes undone"
+msgstr "Dateiänderungen rückgängig gemacht"
+
 msgid "File is too large to preview"
 msgstr "Die Datei ist zu groß für eine Vorschau"
 
@@ -8299,6 +8363,9 @@ msgstr "Fertig · ungelesen"
 msgid "finished · worked for 7s"
 msgstr "fertig · 7 s gearbeitet"
 
+msgid "Fit"
+msgstr "Einpassen"
+
 msgid "Fix all failing checks"
 msgstr "Alle fehlgeschlagenen Prüfungen beheben"
 
@@ -8445,6 +8512,9 @@ msgstr "Für Fehlerberichte und Feature-Wünsche ist ein GitHub-Issue unter <0>{
 
 msgid "For individuals getting started"
 msgstr "Für Einzelpersonen zum Einstieg"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Für macOS auf Apple Silicon und Intel. Linux-AppImage ist experimentell."
 
 msgid "For organizations with advanced needs"
 msgstr "Für Organisationen mit erhöhten Anforderungen"
@@ -8598,6 +8668,15 @@ msgstr "Von GitHub"
 
 msgid "from main agent"
 msgstr "vom Hauptagenten"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "Aus Snapshots des Worktrees vor und nach diesem Durchlauf, daher zählen auch Änderungen durch Shell-Befehle."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "Aus Snapshots des Worktrees vor und nach diesem Durchlauf. Ein anderer Chat hat gleichzeitig hier gearbeitet, daher können einige dieser Änderungen von ihm stammen."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "Aus Snapshots des Worktrees vor und nach diesem Durchlauf. Ein anderer Chat hat gleichzeitig hier gearbeitet, daher enthält diese Liste nur die Dateien, die dieser Chat mit seinen Datei-Tools bearbeitet hat. Andere Änderungen stehen gesondert."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front Matter ausgeblendet — wechsle zu Markdown, um es zu bearbeiten"
@@ -8796,6 +8875,9 @@ msgstr "GitHub-Benutzername..."
 
 msgid "GitHub username…"
 msgstr "GitHub-Benutzername…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Gib Claude Code, Codex oder jedem CLI-Agenten einen eigenen Workspace und Branch und prüfe dann jede Änderung an einem Ort."
 
 msgid "Give me an example"
 msgstr "Gib mir ein Beispiel"
@@ -9232,6 +9314,9 @@ msgstr "Wie wir arbeiten"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Wie sich deine Agenten in Cloud-Arbeitsbereichen anmelden. Andere verbinden ihre eigenen Abos oder API-Schlüssel; auf diesem Rechner nutzt jeder Agent weiter die Anmeldung, die schon darauf liegt."
+
+msgid "HTML preview"
+msgstr "HTML-Vorschau"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "hat {channel} verlassen, ebenso wie {others}."
 
 msgid "left {channel}."
 msgstr "hat {channel} verlassen."
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "Unverändert gelassen, seit diesem Durchlauf geändert: {skippedNames}"
 
 msgid "Left organization"
 msgstr "Organisation verlassen"
@@ -11390,6 +11478,10 @@ msgstr "Nie"
 msgid "Never asks before acting"
 msgstr "Fragt nie vor dem Handeln"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "neu"
+
 msgid "New"
 msgstr "Neu"
 
@@ -12255,6 +12347,9 @@ msgstr "Niemand reviewt deswegen anders."
 
 msgid "None"
 msgstr "Keine"
+
+msgid "None of this turn's files have changes here"
+msgstr "Keine der Dateien dieses Durchlaufs hat hier Änderungen"
 
 msgid "None selected"
 msgstr "Nichts ausgewählt"
@@ -15623,6 +15718,9 @@ msgstr "Diese Ausführungen unter „Alle Ausführungen“ prüfen"
 msgid "Review thread…"
 msgstr "Review-Thread…"
 
+msgid "Review what this turn has changed so far"
+msgstr "Prüfen, was dieser Durchlauf bisher geändert hat"
+
 msgid "reviewed"
 msgstr "hat reviewt"
 
@@ -15775,6 +15873,9 @@ msgstr "Jetzt ausführen"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Nach Zeitplan oder bei Ereignissen ausführen, bei Bedarf starten, pausieren, fortsetzen und Logs lesen."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Parallele Coding-Agenten mit Paradev ausführen"
 
 msgid "Run script"
 msgstr "Skript ausführen"
@@ -16783,6 +16884,9 @@ msgstr "Eine Schaltfläche „Nutzung“ in der Seitenleiste der Startansicht un
 msgid "Show all {count}"
 msgstr "Alle {count} anzeigen"
 
+msgid "Show all changes"
+msgstr "Alle Änderungen anzeigen"
+
 msgid "Show all comments"
 msgstr "Alle Kommentare anzeigen"
 
@@ -16797,6 +16901,9 @@ msgstr "Rahmen anzeigen"
 
 msgid "Show checks"
 msgstr "Prüfungen anzeigen"
+
+msgid "Show code"
+msgstr "Code anzeigen"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "CPU- und Speichernutzung in der oberen Leiste anzeigen"
@@ -16827,6 +16934,9 @@ msgstr "Alle anzeigen, die diesen Workspace geöffnet haben"
 
 msgid "Show fewer"
 msgstr "Weniger anzeigen"
+
+msgid "Show fewer files"
+msgstr "Weniger Dateien anzeigen"
 
 msgid "Show file tree"
 msgstr "Dateibaum anzeigen"
@@ -16860,6 +16970,9 @@ msgstr "Zeilen nach der obigen Änderung anzeigen"
 
 msgid "Show lines before the change below"
 msgstr "Zeilen vor der Änderung unten anzeigen"
+
+msgid "Show link menu"
+msgstr "Linkmenü anzeigen"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Zeig mir die letzten 10 Läufe meiner Linear-Triage-Automatisierung"
@@ -17192,6 +17305,9 @@ msgstr "Reibungsloseres Onboarding"
 
 msgid "Snapshot"
 msgstr "Snapshot"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Vor und nach jedem Chat-Durchlauf einen Snapshot des Worktrees erstellen, damit seine Karte jede geänderte Datei auflistet, auch Shell-Änderungen, und sie rückgängig machen kann. Jeder Prompt wartet zuerst auf seinen Snapshot."
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Erstellt einen Snapshot dieses Arbeitsbereichs im aktuellen Zustand, mit allem, was darin installiert ist. Neue Arbeitsbereiche aus dieser Umgebung starten von diesem Snapshot."
@@ -18353,6 +18469,9 @@ msgstr "Der Button hebt sich jetzt ab. Ich habe es in deinem Bereich geprüft."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Die Änderung gilt sofort. Sie zahlen nur die Differenz für den Rest dieses Zeitraums."
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "Der Chat bleibt, wie er ist. Dateien, die seit diesem Durchlauf jemand bearbeitet hat, bleiben unverändert und werden aufgelistet."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Der Cloud-Arbeitsbereich hätte starten sollen, hat aber nicht rechtzeitig geantwortet. Der nächste Lauf versucht es erneut."
 
@@ -18946,6 +19065,9 @@ msgstr "Die gespeicherte Umgebung wird für alle mit Zugriff dauerhaft entfernt.
 msgid "This port is still in use"
 msgstr "Dieser Port ist noch in Benutzung"
 
+msgid "This preview is too large to show."
+msgstr "Diese Vorschau ist zu groß zum Anzeigen."
+
 msgid "This profile is busy right now"
 msgstr "Dieses Profil ist gerade stark ausgelastet"
 
@@ -19027,6 +19149,12 @@ msgstr "In diesem Thread gibt es keinen Kommentar zum Antworten."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Dieser Thread wurde keinem Agenten übergeben. Jemand muss ihn zuerst von der Seite aus übergeben."
 
+msgid "This turn"
+msgstr "Dieser Durchlauf"
+
+msgid "This turn's files"
+msgstr "Dateien dieses Durchlaufs"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "Dieses Update hat deine Terminals einmalig neu gestartet. Neue öffnen in denselben Ordnern."
 
@@ -19099,6 +19227,9 @@ msgstr "Dieser Arbeitsbereich wurde möglicherweise entfernt, oder du hast keine
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Dieser Arbeitsbereich-Eintrag existiert noch, aber sein Worktree-Ordner liegt nicht mehr auf diesem Host. Terminals und Dateiaktionen sind nicht verfügbar."
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "Der Host dieses Arbeitsbereichs kann Dateiänderungen noch nicht rückgängig machen."
 
 msgid "This workspace's host is offline"
 msgstr "Der Host dieses Arbeitsbereichs ist offline"
@@ -19352,6 +19483,9 @@ msgstr "Budgets und Ausgaben verfolgen"
 msgid "Track down that flaky test…"
 msgstr "Diesem flaky Test auf den Grund gehen…"
 
+msgid "Track file changes per turn"
+msgstr "Dateiänderungen pro Durchlauf verfolgen"
+
 msgid "Track tasks in"
 msgstr "Aufgabenverwaltung"
 
@@ -19585,6 +19719,12 @@ msgstr "Läuft"
 
 msgid "Undo"
 msgstr "Rückgängig"
+
+msgid "Undo changes"
+msgstr "Änderungen rückgängig machen"
+
+msgid "Undo the file changes in this card?"
+msgstr "Die Dateiänderungen in dieser Karte rückgängig machen?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Letzte Archivierung eines Arbeitsbereichs oder geschlossene Chats rückgängig machen"

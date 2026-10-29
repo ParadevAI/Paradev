@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {落後main #個提交，需要變基} other {
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition}/{totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {更改 · # 個檔案} other {更改 · # 個檔案}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {已關閉#個埠} other {已關閉#個埠}}"
 
@@ -921,6 +924,12 @@ msgstr "{total}項檢查中有{failing}項失敗"
 msgid "{failing} of {total} checks failing"
 msgstr "{total}項檢查中有{failing}項失敗"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {此工作區中有 # 個檔案更改} other {此工作區中有 # 個檔案更改}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {顯示 # 則回覆} other {顯示 # 則回覆}}"
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, other {查看另外 # 則回覆}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {再顯示 # 個檔案} other {再顯示 # 個檔案}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {再顯示#個堆疊框架} other {再顯示#個堆疊框架}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {請至少指定一個倉庫。} channel {請�
 msgid "{openCount} open"
 msgstr "{openCount}項已開啟"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {此工作區中還有更改：# 個檔案} other {此工作區中還有更改：# 個檔案}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} 可以以你的身分讀取和變更你的 {pluginLabel} 帳戶中的資料，包括此頁面的未來版本。它可以把讀取的內容傳送到其他網站。只允許你信任的頁面。"
 
@@ -1200,6 +1215,9 @@ msgstr "{received}/{total}"
 
 msgid "{remaining} tokens left"
 msgstr "剩餘 {remaining} 個 token"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
@@ -3674,6 +3692,18 @@ msgstr "無法在Finder中開啟遠端工作區路徑"
 msgid "Can't reach the host"
 msgstr "無法連線至主機"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "此工作區中有聊天正在工作，無法撤銷。"
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "無法撤銷：本輪期間另一個聊天在此工作區中工作過。"
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "無法撤銷：自本輪以來 HEAD 已因提交、拉取或簽出而移動。"
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "無法撤銷：本輪的快照遺失。"
+
 msgid "Cancel"
 msgstr "取消"
 
@@ -4449,6 +4479,9 @@ msgstr "雲端用量"
 msgid "Cloud workspace"
 msgstr "雲端工作區"
 
+msgid "Cloud workspace — connecting"
+msgstr "雲端工作區，正在連線"
+
 msgid "Cloud workspaces"
 msgstr "雲端工作區"
 
@@ -5118,6 +5151,9 @@ msgstr "複製代理程式會話ID"
 
 msgid "Copy all"
 msgstr "全部複製"
+
+msgid "Copy as CSV"
+msgstr "複製為 CSV"
 
 msgid "Copy as Markdown"
 msgstr "複製為 Markdown"
@@ -5811,6 +5847,9 @@ msgstr "無法停止聊天"
 msgid "Couldn't take a screenshot"
 msgstr "無法擷取螢幕畫面"
 
+msgid "Couldn't undo the file changes."
+msgstr "無法撤銷檔案更改。"
+
 msgid "Couldn't unstage changes"
 msgstr "無法取消暫存更改"
 
@@ -5831,6 +5870,9 @@ msgstr "無法上傳 {name}"
 
 msgid "Couldn’t verify"
 msgstr "無法確認"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "根據代理程式的檔案編輯統計。不包括透過 shell 指令、notebook 或 MCP 工具以及子代理程式所做的更改，多次編輯的檔案中同一行可能被計算兩次。"
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "刪除工作區"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "刪除工作區「{workspaceName}」？"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "已刪除"
+
 msgid "Deleted"
 msgstr "已刪除"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "頁面旁的 DevTools"
+
+msgid "Diagram"
+msgstr "圖表"
+
+msgid "Diagram could not be drawn"
+msgstr "無法繪製圖表"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "無法繪製圖表：{reason}"
 
 msgid "Dialog"
 msgstr "對話方塊"
@@ -7393,6 +7448,9 @@ msgstr "每天"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "每天 <0>上午 9:00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "自本輪以來每個檔案都再次更改，因此沒有撤銷任何內容。"
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "每週五下午4點，根據本週合併的PR起草釋出說明。"
 
@@ -7508,6 +7566,9 @@ msgstr "全部展開"
 
 msgid "Expand all files"
 msgstr "展開所有檔案"
+
+msgid "Expand diagram"
+msgstr "放大圖表"
 
 msgid "Expand file"
 msgstr "展開檔案"
@@ -8140,6 +8201,9 @@ msgstr "建立和更新 issue"
 msgid "File changed on disk"
 msgstr "磁碟上的檔案已變更"
 
+msgid "File changes undone"
+msgstr "檔案更改已撤銷"
+
 msgid "File is too large to preview"
 msgstr "檔案過大，無法預覽"
 
@@ -8299,6 +8363,9 @@ msgstr "已完成 · 未讀"
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用時7秒"
 
+msgid "Fit"
+msgstr "符合視窗"
+
 msgid "Fix all failing checks"
 msgstr "修復所有失敗的檢查"
 
@@ -8445,6 +8512,9 @@ msgstr "報告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 
 msgid "For individuals getting started"
 msgstr "面向剛上手的個人使用者"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "適用於 Apple Silicon 與 Intel 的 macOS。Linux AppImage 為實驗版本。"
 
 msgid "For organizations with advanced needs"
 msgstr "面向有進階需求的組織"
@@ -8598,6 +8668,15 @@ msgstr "來自 GitHub"
 
 msgid "from main agent"
 msgstr "來自主代理程式"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "根據本輪前後的 worktree 快照統計，因此 shell 指令所做的編輯也會計入。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "根據本輪前後的 worktree 快照統計。另一個聊天同時在此工作，因此其中部分更改可能來自它。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "根據本輪前後的 worktree 快照統計。另一個聊天同時在此工作，因此此列表只包含本聊天用檔案工具編輯過的檔案，其他更改另外列出。"
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "已隱藏front matter，切換到Markdown可編輯"
@@ -8796,6 +8875,9 @@ msgstr "GitHub 使用者名稱..."
 
 msgid "GitHub username…"
 msgstr "GitHub使用者名稱…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "為 Claude Code、Codex 或任何 CLI 代理分配獨立的工作空間與分支，然後在同一處審閱所有變更。"
 
 msgid "Give me an example"
 msgstr "給我一個範例"
@@ -9232,6 +9314,9 @@ msgstr "我們的工作方式"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的代理程式在雲端工作區中如何登入。其他人連接各自的訂閱或API金鑰；在這台機器上，每個代理程式繼續使用它上面已有的登入。"
+
+msgid "HTML preview"
+msgstr "HTML 預覽"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "與 {others} 一起離開了 {channel}。"
 
 msgid "left {channel}."
 msgstr "已離開 {channel}。"
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "本輪之後又有更改，因此未撤銷：{skippedNames}"
 
 msgid "Left organization"
 msgstr "已退出組織"
@@ -11390,6 +11478,10 @@ msgstr "從未"
 msgid "Never asks before acting"
 msgstr "執行前從不詢問"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "新"
+
 msgid "New"
 msgstr "新功能"
 
@@ -12255,6 +12347,9 @@ msgstr "沒有人因此改變審查方式。"
 
 msgid "None"
 msgstr "無"
+
+msgid "None of this turn's files have changes here"
+msgstr "本輪的檔案在此處都沒有更改"
 
 msgid "None selected"
 msgstr "未選取"
@@ -15623,6 +15718,9 @@ msgstr "在「所有執行」中檢視這些執行"
 msgid "Review thread…"
 msgstr "審查討論…"
 
+msgid "Review what this turn has changed so far"
+msgstr "查看本輪到目前為止的更改"
+
 msgid "reviewed"
 msgstr "已審查"
 
@@ -15775,6 +15873,9 @@ msgstr "立即執行"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "依計劃或事件執行、隨需執行、暫停、恢復並查看日誌。"
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "用 Paradev 平行執行程式設計代理"
 
 msgid "Run script"
 msgstr "執行指令碼"
@@ -16783,6 +16884,9 @@ msgstr "在首頁側邊欄的「拉取請求」下方顯示「用量」按鈕"
 msgid "Show all {count}"
 msgstr "顯示全部{count}條"
 
+msgid "Show all changes"
+msgstr "顯示所有更改"
+
 msgid "Show all comments"
 msgstr "顯示所有評論"
 
@@ -16797,6 +16901,9 @@ msgstr "顯示邊框"
 
 msgid "Show checks"
 msgstr "顯示檢查"
+
+msgid "Show code"
+msgstr "顯示程式碼"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "在頂欄顯示CPU和記憶體用量"
@@ -16827,6 +16934,9 @@ msgstr "顯示開啟過此工作區的所有人"
 
 msgid "Show fewer"
 msgstr "顯示較少"
+
+msgid "Show fewer files"
+msgstr "顯示較少檔案"
 
 msgid "Show file tree"
 msgstr "顯示檔案樹"
@@ -16860,6 +16970,9 @@ msgstr "顯示上方改動之後的行"
 
 msgid "Show lines before the change below"
 msgstr "顯示下方改動之前的行"
+
+msgid "Show link menu"
+msgstr "顯示連結選單"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "給我看看Linear分類自動化最近10次執行"
@@ -17192,6 +17305,9 @@ msgstr "更順暢的上手流程"
 
 msgid "Snapshot"
 msgstr "快照"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "在每輪聊天前後為 worktree 建立快照，讓該輪的卡片列出每個變更的檔案（包括 shell 編輯）並可以復原。每則提示詞會先等待其快照完成。"
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "為此工作區的目前狀態（包括其中安裝的所有內容）建立快照。從此環境新建的工作區將從該快照開始。"
@@ -18353,6 +18469,9 @@ msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "變更立即生效。您只需支付本期剩餘時間的差額。"
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保持不動並列出。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "雲端工作區應該已經啟動，但沒有及時回應。下次執行時會重試。"
 
@@ -18946,6 +19065,9 @@ msgstr "這會為所有有權存取的人永久移除已儲存的環境。已從
 msgid "This port is still in use"
 msgstr "此埠仍在使用中"
 
+msgid "This preview is too large to show."
+msgstr "此預覽過大，無法顯示。"
+
 msgid "This profile is busy right now"
 msgstr "此個人檔案目前繁忙"
 
@@ -19027,6 +19149,12 @@ msgstr "這個討論裡沒有可回覆的評論。"
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "此討論串尚未移交給代理程式。需要有人先從頁面上移交。"
 
+msgid "This turn"
+msgstr "本輪"
+
+msgid "This turn's files"
+msgstr "本輪的檔案"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "此次更新僅重新啟動了一次你的終端機。新的終端機會在相同資料夾中開啟。"
 
@@ -19099,6 +19227,9 @@ msgstr "此工作區可能已被移除，或者你不再擁有它的存取權限
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "此工作區記錄仍然存在，但它的worktree資料夾已不在此主機上。終端和檔案操作不可用。"
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "此工作區的主機尚無法撤銷檔案更改。"
 
 msgid "This workspace's host is offline"
 msgstr "此工作區的主機已離線"
@@ -19352,6 +19483,9 @@ msgstr "追蹤預算和支出"
 msgid "Track down that flaky test…"
 msgstr "揪出那個不穩定的測試…"
 
+msgid "Track file changes per turn"
+msgstr "依輪次追蹤檔案變更"
+
 msgid "Track tasks in"
 msgstr "任務管理位置"
 
@@ -19585,6 +19719,12 @@ msgstr "進行中"
 
 msgid "Undo"
 msgstr "撤銷"
+
+msgid "Undo changes"
+msgstr "撤銷更改"
+
+msgid "Undo the file changes in this card?"
+msgstr "撤銷此卡片中的檔案更改？"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "復原上次歸檔的工作區或關閉的聊天"

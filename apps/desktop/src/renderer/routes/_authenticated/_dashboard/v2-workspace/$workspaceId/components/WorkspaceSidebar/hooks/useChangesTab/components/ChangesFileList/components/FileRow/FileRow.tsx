@@ -38,6 +38,7 @@ import {
 } from "renderer/lib/clickPolicy";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
+import { PathActionsMenuItems } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/PathActionsMenuItems";
 import { StatusIndicator } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/StatusIndicator";
 import {
 	type ChangesetFile,
@@ -47,7 +48,6 @@ import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { DiffStatText } from "../../../../../../../DiffStatText";
 import { useFileDrag } from "../../hooks/useFileDrag";
 import { useStagingMutations } from "../../hooks/useStagingMutations";
-import { PathActionsMenuItems } from "../PathActionsMenuItems";
 import { StageToggleButton } from "../StageToggleButton";
 
 function splitPath(path: string): { dir: string; basename: string } {

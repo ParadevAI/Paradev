@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {mainより#コミット遅れています。�
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches}件中{branchPosition}件目"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {変更 · #件のファイル} other {変更 · #件のファイル}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {#個のポートを閉じました} other {#個のポートを閉じました}}"
 
@@ -921,6 +924,12 @@ msgstr "{total}件中{failing}件のチェックが失敗"
 msgid "{failing} of {total} checks failing"
 msgstr "{total}件中{failing}件のチェックが失敗"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {このワークスペースで変更されたファイル: #件} other {このワークスペースで変更されたファイル: #件}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}でフォーカス"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {#件の返信を表示} other {#件の返信を表
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, other {他 # 件の返信を表示}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {さらに#件のファイルを表示} other {さらに#件のファイルを表示}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {さらに#件のフレームを表示} other {さらに#件のフレームを表示}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {リポジトリを1つ以上指定してく�
 msgid "{openCount} open"
 msgstr "{openCount}件通過"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {このワークスペースで他にも変更: #件のファイル} other {このワークスペースで他にも変更: #件のファイル}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} は、あなたとして {pluginLabel} アカウントのデータを読み取り、変更できます。このページの今後のバージョンも含みます。読み取った内容を他のウェブサイトに送信できます。信頼できるページだけを許可してください。"
 
@@ -1200,6 +1215,9 @@ msgstr "{received}/{total}"
 
 msgid "{remaining} tokens left"
 msgstr "残り {remaining} トークン"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
 
 msgid "{seconds}s"
 msgstr "{seconds}秒"
@@ -3674,6 +3692,18 @@ msgstr "リモートワークスペースのパスはFinderで開けません"
 msgid "Can't reach the host"
 msgstr "ホストに接続できません"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "このワークスペースでチャットが作業中のため取り消せません。"
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "取り消せません: このターンの間に別のチャットがこのワークスペースで作業していました。"
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "取り消せません: このターンの後に、コミット、プル、チェックアウトでHEADが移動しました。"
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "取り消せません: このターンのスナップショットが見つかりません。"
+
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -4449,6 +4479,9 @@ msgstr "クラウド使用量"
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
+msgid "Cloud workspace — connecting"
+msgstr "クラウドワークスペース — 接続中"
+
 msgid "Cloud workspaces"
 msgstr "クラウドワークスペース"
 
@@ -5118,6 +5151,9 @@ msgstr "エージェントセッションIDをコピー"
 
 msgid "Copy all"
 msgstr "すべてコピー"
+
+msgid "Copy as CSV"
+msgstr "CSVとしてコピー"
 
 msgid "Copy as Markdown"
 msgstr "Markdownとしてコピー"
@@ -5811,6 +5847,9 @@ msgstr "チャットを停止できませんでした"
 msgid "Couldn't take a screenshot"
 msgstr "スクリーンショットを撮れませんでした"
 
+msgid "Couldn't undo the file changes."
+msgstr "ファイルの変更を取り消せませんでした。"
+
 msgid "Couldn't unstage changes"
 msgstr "変更をステージ解除できませんでした"
 
@@ -5831,6 +5870,9 @@ msgstr "{name} をアップロードできませんでした"
 
 msgid "Couldn’t verify"
 msgstr "確認できませんでした"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "エージェントのファイル編集から集計しています。シェルコマンド、ノートブックやMCPツール、サブエージェントによる変更は含まれず、複数回編集されたファイルでは同じ行が二重に数えられることがあります。"
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "ワークスペースを削除"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "ワークスペース「{workspaceName}」を削除しますか?"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "削除"
+
 msgid "Deleted"
 msgstr "削除済み"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "ページの横にDevTools"
+
+msgid "Diagram"
+msgstr "図"
+
+msgid "Diagram could not be drawn"
+msgstr "図を描画できませんでした"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "図を描画できませんでした：{reason}"
 
 msgid "Dialog"
 msgstr "Dialog"
@@ -7393,6 +7448,9 @@ msgstr "毎日"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "毎日 <0>午前9:00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "このターンの後にすべてのファイルが再び変更されたため、何も取り消していません。"
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "毎週金曜午後4時に、今週マージされたPRからリリースノートの下書きを作成する。"
 
@@ -7508,6 +7566,9 @@ msgstr "すべて展開"
 
 msgid "Expand all files"
 msgstr "すべてのファイルを展開"
+
+msgid "Expand diagram"
+msgstr "図を拡大"
 
 msgid "Expand file"
 msgstr "ファイルを展開"
@@ -8140,6 +8201,9 @@ msgstr "Issueの作成と更新"
 msgid "File changed on disk"
 msgstr "ディスク上のファイルが変更されました"
 
+msgid "File changes undone"
+msgstr "ファイルの変更を取り消しました"
+
 msgid "File is too large to preview"
 msgstr "ファイルが大きすぎてプレビューできません"
 
@@ -8299,6 +8363,9 @@ msgstr "完了 · 未読"
 msgid "finished · worked for 7s"
 msgstr "完了 · 7秒稼働"
 
+msgid "Fit"
+msgstr "全体表示"
+
 msgid "Fix all failing checks"
 msgstr "失敗したチェックをすべて修正"
 
@@ -8445,6 +8512,9 @@ msgstr "バグ報告や機能リクエストは、<0>{githubHandle}</0>にGitHub
 
 msgid "For individuals getting started"
 msgstr "これから始める個人向け"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
 
 msgid "For organizations with advanced needs"
 msgstr "高度な要件がある組織向け"
@@ -8598,6 +8668,15 @@ msgstr "GitHub から"
 
 msgid "from main agent"
 msgstr "メインエージェントから"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "このターンの前後のワークツリーのスナップショットから集計しているため、シェルコマンドによる編集も含まれます。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "このターンの前後のワークツリーのスナップショットから集計しています。同時に別のチャットがここで作業していたため、これらの変更の一部はそのチャットによるものかもしれません。"
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "このターンの前後のワークツリーのスナップショットから集計しています。同時に別のチャットがここで作業していたため、この一覧にはこのチャットがファイルツールで編集したファイルだけを表示します。その他の変更は別に表示されます。"
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "フロントマターは非表示です — 編集するにはMarkdownに切り替えてください"
@@ -8796,6 +8875,9 @@ msgstr "GitHubユーザー名..."
 
 msgid "GitHub username…"
 msgstr "GitHubユーザー名…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code、Codex、その他の CLI エージェントそれぞれに専用のワークスペースとブランチを用意し、すべての変更を一か所でレビューできます。"
 
 msgid "Give me an example"
 msgstr "例を挙げて"
@@ -9232,6 +9314,9 @@ msgstr "私たちの働き方"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "クラウドワークスペース内でエージェントがどうサインインするかの設定です。ほかの人は自分のサブスクリプションやAPIキーを接続します。このマシンでは、各エージェントはすでにあるログインをそのまま使い続けます。"
+
+msgid "HTML preview"
+msgstr "HTMLプレビュー"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "{others} と一緒に {channel} から退出しました。"
 
 msgid "left {channel}."
 msgstr "{channel} から退出しました。"
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "このターンの後に変更されたため、そのままにしました: {skippedNames}"
 
 msgid "Left organization"
 msgstr "組織から退出しました"
@@ -11390,6 +11478,10 @@ msgstr "未使用"
 msgid "Never asks before acting"
 msgstr "確認なしで実行"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "新規"
+
 msgid "New"
 msgstr "新着"
 
@@ -12255,6 +12347,9 @@ msgstr "それによってレビューのやり方が変わることはない。
 
 msgid "None"
 msgstr "なし"
+
+msgid "None of this turn's files have changes here"
+msgstr "このターンのファイルにはここで変更がありません"
 
 msgid "None selected"
 msgstr "未選択"
@@ -15623,6 +15718,9 @@ msgstr "「すべての実行」でこれらの実行を確認"
 msgid "Review thread…"
 msgstr "レビュースレッド…"
 
+msgid "Review what this turn has changed so far"
+msgstr "このターンでこれまでに変更された内容を確認"
+
 msgid "reviewed"
 msgstr "がレビューしました"
 
@@ -15775,6 +15873,9 @@ msgstr "今すぐ実行"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "スケジュールやイベントで実行、オンデマンド実行、一時停止、再開、ログの確認。"
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev で並列コーディングエージェントを実行"
 
 msgid "Run script"
 msgstr "スクリプトを実行"
@@ -16783,6 +16884,9 @@ msgstr "ホームのサイドバーの「プルリクエスト」の下に「使
 msgid "Show all {count}"
 msgstr "{count}件すべて表示"
 
+msgid "Show all changes"
+msgstr "すべての変更を表示"
+
 msgid "Show all comments"
 msgstr "すべてのコメントを表示"
 
@@ -16797,6 +16901,9 @@ msgstr "境界線を表示"
 
 msgid "Show checks"
 msgstr "チェックを表示"
+
+msgid "Show code"
+msgstr "コードを表示"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "トップバーにCPUとメモリ使用量を表示"
@@ -16827,6 +16934,9 @@ msgstr "このワークスペースを開いた全員を表示"
 
 msgid "Show fewer"
 msgstr "表示を減らす"
+
+msgid "Show fewer files"
+msgstr "表示するファイルを減らす"
 
 msgid "Show file tree"
 msgstr "ファイルツリーを表示"
@@ -16860,6 +16970,9 @@ msgstr "上の変更より後の行を表示"
 
 msgid "Show lines before the change below"
 msgstr "下の変更より前の行を表示"
+
+msgid "Show link menu"
+msgstr "リンクメニューを表示"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linearトリアージのオートメーションの直近10件の実行を見せて"
@@ -17192,6 +17305,9 @@ msgstr "よりスムーズなオンボーディング"
 
 msgid "Snapshot"
 msgstr "スナップショット"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "このワークスペースを、インストール済みのものも含めて現在の状態でスナップショットします。この環境から作る新しいワークスペースは、そのスナップショットから始まります。"
@@ -18353,6 +18469,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "チャットはそのまま残ります。このターンの後に誰かが編集したファイルはそのままにし、一覧に表示します。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"
 
@@ -18946,6 +19065,9 @@ msgstr "保存された環境は、アクセスできるすべてのユーザー
 msgid "This port is still in use"
 msgstr "このポートはまだ使用中です"
 
+msgid "This preview is too large to show."
+msgstr "このプレビューは大きすぎて表示できません。"
+
 msgid "This profile is busy right now"
 msgstr "このプロフィールは現在混み合っています"
 
@@ -19027,6 +19149,12 @@ msgstr "このスレッドには返信できるコメントがありません。
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "このスレッドはエージェントに公開されていません。エージェントが返信するには、まず人がコメントする必要があります。"
 
+msgid "This turn"
+msgstr "このターン"
+
+msgid "This turn's files"
+msgstr "このターンのファイル"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "このアップデートでターミナルが一度だけ再起動しました。新しいターミナルは同じフォルダで開きます。"
 
@@ -19099,6 +19227,9 @@ msgstr "このワークスペースは削除されたか、アクセス権がな
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "このワークスペースの記録は残っていますが、ワークツリーフォルダはこのホスト上にありません。ターミナルとファイル操作は利用できません。"
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "このワークスペースのホストはまだファイルの変更を取り消せません。"
 
 msgid "This workspace's host is offline"
 msgstr "このワークスペースのホストはオフラインです"
@@ -19352,6 +19483,9 @@ msgstr "予算と支出を管理"
 msgid "Track down that flaky test…"
 msgstr "不安定なテストの原因を突き止める…"
 
+msgid "Track file changes per turn"
+msgstr "ターンごとにファイルの変更を記録"
+
 msgid "Track tasks in"
 msgstr "タスクの管理先"
 
@@ -19585,6 +19719,12 @@ msgstr "進行中"
 
 msgid "Undo"
 msgstr "取り消す"
+
+msgid "Undo changes"
+msgstr "変更を取り消す"
+
+msgid "Undo the file changes in this card?"
+msgstr "このカードのファイル変更を取り消しますか？"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "直前のワークスペースのアーカイブまたはチャットのクローズを元に戻す"

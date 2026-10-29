@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {En retard de # commit sur main, rebase néces
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} sur {totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {Modifications · # fichier} other {Modifications · # fichiers}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {# port fermé} other {# ports fermés}}"
 
@@ -921,6 +924,12 @@ msgstr "{failing} vérification sur {total} en échec"
 msgid "{failing} of {total} checks failing"
 msgstr "{failing} vérifications sur {total} en échec"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {# fichier modifié dans cet espace de travail} other {# fichiers modifiés dans cet espace de travail}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {# fichier modifié} other {# fichiers modifiés}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pour activer"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {Afficher # réponse} other {Afficher # réponses}}
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, one {Afficher # réponse de plus} other {Afficher # réponses de plus}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {Afficher # fichier de plus} other {Afficher # fichiers de plus}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Afficher # frame de plus} other {Afficher # frames de plus}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {Indiquez au moins un dépôt.} channel {Indiq
 msgid "{openCount} open"
 msgstr "{openCount} ouvertes"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {Aussi modifié dans cet espace de travail : # fichier} other {Aussi modifiés dans cet espace de travail : # fichiers}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} peut lire et modifier les données de votre compte {pluginLabel} en votre nom, y compris dans les futures versions de cette page. Elle peut envoyer ce qu’elle lit à d’autres sites web. N’autorisez que les pages de confiance."
 
@@ -1200,6 +1215,9 @@ msgstr "{received} sur {total}"
 
 msgid "{remaining} tokens left"
 msgstr "{remaining} tokens restants"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {Modifications annulées sur # fichier.} other {Modifications annulées sur # fichiers.}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
@@ -3674,6 +3692,18 @@ msgstr "Impossible d'ouvrir les chemins d'un espace de travail distant dans le F
 msgid "Can't reach the host"
 msgstr "Impossible de joindre l'hôte"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "Impossible d'annuler pendant qu'un chat de cet espace de travail travaille."
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "Impossible d'annuler : un autre chat a travaillé dans cet espace de travail pendant ce tour."
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "Impossible d'annuler : HEAD a bougé depuis ce tour, par un commit, un pull ou un checkout."
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "Impossible d'annuler : les instantanés de ce tour sont manquants."
+
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -4449,6 +4479,9 @@ msgstr "Utilisation du cloud"
 msgid "Cloud workspace"
 msgstr "Espace de travail cloud"
 
+msgid "Cloud workspace — connecting"
+msgstr "Espace de travail cloud — connexion en cours"
+
 msgid "Cloud workspaces"
 msgstr "Espaces de travail cloud"
 
@@ -5118,6 +5151,9 @@ msgstr "Copier l'ID de session d'agent"
 
 msgid "Copy all"
 msgstr "Tout copier"
+
+msgid "Copy as CSV"
+msgstr "Copier en CSV"
 
 msgid "Copy as Markdown"
 msgstr "Copier au format Markdown"
@@ -5811,6 +5847,9 @@ msgstr "Impossible d'arrêter la discussion"
 msgid "Couldn't take a screenshot"
 msgstr "Impossible de faire la capture d’écran"
 
+msgid "Couldn't undo the file changes."
+msgstr "Impossible d'annuler les modifications de fichiers."
+
 msgid "Couldn't unstage changes"
 msgstr "Impossible de désindexer les modifications"
 
@@ -5831,6 +5870,9 @@ msgstr "Impossible d’envoyer {name}"
 
 msgid "Couldn’t verify"
 msgstr "Vérification impossible"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "Compté à partir des modifications de fichiers de l'agent. Les changements faits par des commandes shell, des outils de notebook ou MCP, ou des sous-agents ne sont pas inclus, et une ligne d'un fichier modifié plusieurs fois peut compter deux fois."
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "Supprimer l'espace de travail"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Supprimer l'espace de travail \"{workspaceName}\" ?"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "supprimé"
+
 msgid "Deleted"
 msgstr "Supprimés"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "DevTools à côté de la page"
+
+msgid "Diagram"
+msgstr "Diagramme"
+
+msgid "Diagram could not be drawn"
+msgstr "Le diagramme n’a pas pu être tracé"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Le diagramme n’a pas pu être tracé : {reason}"
 
 msgid "Dialog"
 msgstr "Dialog"
@@ -7393,6 +7448,9 @@ msgstr "Tous les jours"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Tous les jours à <0>9 h 00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "Chaque fichier a de nouveau changé depuis ce tour, donc rien n'a été annulé."
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "Chaque vendredi à 16 h, rédige les notes de version à partir des pull requests fusionnées cette semaine."
 
@@ -7508,6 +7566,9 @@ msgstr "Tout développer"
 
 msgid "Expand all files"
 msgstr "Développer tous les fichiers"
+
+msgid "Expand diagram"
+msgstr "Agrandir le diagramme"
 
 msgid "Expand file"
 msgstr "Développer le fichier"
@@ -8140,6 +8201,9 @@ msgstr "Créer et mettre à jour des tickets"
 msgid "File changed on disk"
 msgstr "Le fichier a changé sur le disque"
 
+msgid "File changes undone"
+msgstr "Modifications de fichiers annulées"
+
 msgid "File is too large to preview"
 msgstr "Le fichier est trop volumineux pour être prévisualisé"
 
@@ -8299,6 +8363,9 @@ msgstr "Terminé · non lu"
 msgid "finished · worked for 7s"
 msgstr "terminé · a travaillé 7 s"
 
+msgid "Fit"
+msgstr "Ajuster"
+
 msgid "Fix all failing checks"
 msgstr "Corriger toutes les vérifications en échec"
 
@@ -8445,6 +8512,9 @@ msgstr "Pour les rapports de bugs et les demandes de fonctionnalités, le plus r
 
 msgid "For individuals getting started"
 msgstr "Pour les particuliers qui débutent"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Pour macOS sur Apple Silicon et Intel. L'AppImage Linux est expérimentale."
 
 msgid "For organizations with advanced needs"
 msgstr "Pour les organisations aux besoins avancés"
@@ -8598,6 +8668,15 @@ msgstr "Depuis GitHub"
 
 msgid "from main agent"
 msgstr "de l'agent principal"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "D'après des instantanés du worktree avant et après ce tour, donc les modifications faites par des commandes shell comptent aussi."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "D'après des instantanés du worktree avant et après ce tour. Un autre chat a travaillé ici en même temps, donc certaines de ces modifications peuvent venir de lui."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "D'après des instantanés du worktree avant et après ce tour. Un autre chat a travaillé ici en même temps, donc cette liste ne contient que les fichiers que ce chat a modifiés avec ses outils de fichiers. Les autres modifications sont listées à part."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter masqué — passez en Markdown pour le modifier"
@@ -8796,6 +8875,9 @@ msgstr "Nom d’utilisateur GitHub..."
 
 msgid "GitHub username…"
 msgstr "Nom d'utilisateur GitHub…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Donnez à Claude Code, Codex ou tout agent CLI son propre workspace et sa propre branche, puis relisez chaque changement au même endroit."
 
 msgid "Give me an example"
 msgstr "Donne-moi un exemple"
@@ -9232,6 +9314,9 @@ msgstr "Comment nous travaillons"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Comment vos agents se connectent dans les espaces de travail cloud. Les autres connectent leurs propres abonnements ou clés API ; sur cette machine, chaque agent continue d'utiliser la connexion déjà en place."
+
+msgid "HTML preview"
+msgstr "Aperçu HTML"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "a quitté {channel} avec {others}."
 
 msgid "left {channel}."
 msgstr "a quitté {channel}."
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "Laissés tels quels, modifiés depuis ce tour : {skippedNames}"
 
 msgid "Left organization"
 msgstr "Organisation quittée"
@@ -11390,6 +11478,10 @@ msgstr "Jamais"
 msgid "Never asks before acting"
 msgstr "Ne demande jamais avant d'agir"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "nouveau"
+
 msgid "New"
 msgstr "Nouveau"
 
@@ -12255,6 +12347,9 @@ msgstr "Personne ne relit différemment pour autant."
 
 msgid "None"
 msgstr "Aucun"
+
+msgid "None of this turn's files have changes here"
+msgstr "Aucun fichier de ce tour n'a de modifications ici"
 
 msgid "None selected"
 msgstr "Aucune sélection"
@@ -15623,6 +15718,9 @@ msgstr "Examiner ces exécutions dans Toutes les exécutions"
 msgid "Review thread…"
 msgstr "Fil de revue…"
 
+msgid "Review what this turn has changed so far"
+msgstr "Examiner ce que ce tour a modifié jusqu'ici"
+
 msgid "reviewed"
 msgstr "a relu"
 
@@ -15775,6 +15873,9 @@ msgstr "Exécuter maintenant"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Exécution planifiée ou sur événement, à la demande, pause, reprise et lecture des journaux."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Exécutez des agents de code en parallèle avec Paradev"
 
 msgid "Run script"
 msgstr "Exécuter le script"
@@ -16783,6 +16884,9 @@ msgstr "Afficher un bouton Utilisation dans la barre latérale d'accueil, sous P
 msgid "Show all {count}"
 msgstr "Afficher les {count}"
 
+msgid "Show all changes"
+msgstr "Afficher toutes les modifications"
+
 msgid "Show all comments"
 msgstr "Afficher tous les commentaires"
 
@@ -16797,6 +16901,9 @@ msgstr "Afficher les bordures"
 
 msgid "Show checks"
 msgstr "Afficher les vérifications"
+
+msgid "Show code"
+msgstr "Afficher le code"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Afficher l'utilisation du processeur et de la mémoire dans la barre supérieure"
@@ -16827,6 +16934,9 @@ msgstr "Afficher toutes les personnes ayant ouvert cet espace de travail"
 
 msgid "Show fewer"
 msgstr "Afficher moins"
+
+msgid "Show fewer files"
+msgstr "Afficher moins de fichiers"
 
 msgid "Show file tree"
 msgstr "Afficher l'arborescence des fichiers"
@@ -16860,6 +16970,9 @@ msgstr "Afficher les lignes après le changement ci-dessus"
 
 msgid "Show lines before the change below"
 msgstr "Afficher les lignes précédant la modification ci-dessous"
+
+msgid "Show link menu"
+msgstr "Afficher le menu du lien"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Montre-moi les 10 dernières exécutions de mon automatisation de tri Linear"
@@ -17192,6 +17305,9 @@ msgstr "Prise en main plus fluide"
 
 msgid "Snapshot"
 msgstr "Instantané"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Prend un instantané du worktree avant et après chaque tour du chat, pour que sa carte liste chaque fichier modifié, y compris les modifications faites dans le shell, et puisse les annuler. Chaque prompt attend d'abord son instantané."
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Prend un instantané de cet espace de travail tel qu’il est maintenant, avec tout ce qui y est installé. Les nouveaux espaces de travail de cet environnement partent de cet instantané."
@@ -18353,6 +18469,9 @@ msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Le changement s'applique tout de suite. Vous payez seulement la différence pour le reste de la période."
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui que ce soit, ne sont pas touchés et sont listés."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "L'espace de travail cloud aurait dû démarrer, mais n'a pas répondu à temps. La prochaine exécution réessaiera."
 
@@ -18946,6 +19065,9 @@ msgstr "L’environnement enregistré sera définitivement supprimé pour toutes
 msgid "This port is still in use"
 msgstr "Ce port est toujours utilisé"
 
+msgid "This preview is too large to show."
+msgstr "Cet aperçu est trop volumineux pour être affiché."
+
 msgid "This profile is busy right now"
 msgstr "Ce profil est très sollicité en ce moment"
 
@@ -19027,6 +19149,12 @@ msgstr "Ce fil ne contient aucun commentaire auquel répondre."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Ce fil n'a pas été confié à un agent. Quelqu'un doit d'abord le transmettre depuis la page."
 
+msgid "This turn"
+msgstr "Ce tour"
+
+msgid "This turn's files"
+msgstr "Fichiers de ce tour"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "Cette mise à jour a redémarré vos terminaux une seule fois. Les nouveaux s’ouvrent dans les mêmes dossiers."
 
@@ -19099,6 +19227,9 @@ msgstr "Cet espace de travail a peut-être été supprimé, ou vous n'y avez plu
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "L'enregistrement de cet espace de travail existe toujours, mais son dossier worktree n'est plus sur cet hôte. Les terminaux et les actions sur les fichiers sont indisponibles."
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "L'hôte de cet espace de travail ne peut pas encore annuler les modifications de fichiers."
 
 msgid "This workspace's host is offline"
 msgstr "L'hôte de cet espace de travail est hors ligne"
@@ -19352,6 +19483,9 @@ msgstr "Suivre les budgets et les dépenses"
 msgid "Track down that flaky test…"
 msgstr "Traque ce test instable…"
 
+msgid "Track file changes per turn"
+msgstr "Suivre les modifications de fichiers à chaque tour"
+
 msgid "Track tasks in"
 msgstr "Suivre les tâches dans"
 
@@ -19585,6 +19719,12 @@ msgstr "En cours"
 
 msgid "Undo"
 msgstr "Annuler"
+
+msgid "Undo changes"
+msgstr "Annuler les modifications"
+
+msgid "Undo the file changes in this card?"
+msgstr "Annuler les modifications de fichiers de cette carte ?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Annuler le dernier espace de travail archivé ou les chats fermés"

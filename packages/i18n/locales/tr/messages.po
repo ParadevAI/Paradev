@@ -760,6 +760,9 @@ msgstr "{behindCount, plural, one {main dalının # commit gerisinde, rebase ger
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches} içinden {branchPosition}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {Değişiklikler · # dosya} other {Değişiklikler · # dosya}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {# port kapatıldı} other {# port kapatıldı}}"
 
@@ -921,6 +924,12 @@ msgstr "{total} kontrolden {failing} tanesi başarısız"
 msgid "{failing} of {total} checks failing"
 msgstr "{total} kontrolden {failing} tanesi başarısız"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} other {Bu çalışma alanında # dosya değişti}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "Odaklanmak için {focusShortcutText}"
 
@@ -956,6 +965,9 @@ msgstr "{hidden, plural, one {# yanıtı göster} other {# yanıtı göster}}"
 
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, one {# yanıt daha göster} other {# yanıt daha göster}}"
+
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {# dosya daha göster} other {# dosya daha göster}}"
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# çerçeve daha göster} other {# çerçeve daha göster}}"
@@ -1080,6 +1092,9 @@ msgstr "{noun, select, repository {En az bir depo belirtin.} channel {En az bir 
 msgid "{openCount} open"
 msgstr "{openCount} açık"
 
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {Bu çalışma alanında ayrıca değişen: # dosya} other {Bu çalışma alanında ayrıca değişen: # dosya}}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle}, sizin adınıza {pluginLabel} hesabınızdaki verileri okuyabilir ve değiştirebilir; bu, sayfanın gelecek sürümlerini de kapsar. Okuduklarını başka web sitelerine gönderebilir. Yalnızca güvendiğiniz sayfalara izin verin."
 
@@ -1200,6 +1215,9 @@ msgstr "{total} içinden {received}"
 
 msgid "{remaining} tokens left"
 msgstr "{remaining} token kaldı"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} sn"
@@ -3674,6 +3692,18 @@ msgstr "Uzak çalışma alanı yolları Finder'da açılamaz"
 msgid "Can't reach the host"
 msgstr "Host'a ulaşılamıyor"
 
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "Bu çalışma alanında bir sohbet çalışırken geri alınamaz."
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "Geri alınamıyor: bu tur sırasında bu çalışma alanında başka bir sohbet çalıştı."
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "Geri alınamıyor: HEAD bu turdan sonra bir commit, pull veya checkout ile taşındı."
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "Geri alınamıyor: bu turun anlık görüntüleri eksik."
+
 msgid "Cancel"
 msgstr "İptal"
 
@@ -4449,6 +4479,9 @@ msgstr "Bulut kullanımı"
 msgid "Cloud workspace"
 msgstr "Bulut çalışma alanı"
 
+msgid "Cloud workspace — connecting"
+msgstr "Bulut çalışma alanı — bağlanılıyor"
+
 msgid "Cloud workspaces"
 msgstr "Bulut çalışma alanları"
 
@@ -5118,6 +5151,9 @@ msgstr "Ajan oturum kimliğini kopyala"
 
 msgid "Copy all"
 msgstr "Tümünü kopyala"
+
+msgid "Copy as CSV"
+msgstr "CSV olarak kopyala"
 
 msgid "Copy as Markdown"
 msgstr "Markdown olarak kopyala"
@@ -5811,6 +5847,9 @@ msgstr "Sohbet durdurulamadı"
 msgid "Couldn't take a screenshot"
 msgstr "Ekran görüntüsü alınamadı"
 
+msgid "Couldn't undo the file changes."
+msgstr "Dosya değişiklikleri geri alınamadı."
+
 msgid "Couldn't unstage changes"
 msgstr "Değişiklikler hazırlıktan çıkarılamadı"
 
@@ -5831,6 +5870,9 @@ msgstr "{name} yüklenemedi"
 
 msgid "Couldn’t verify"
 msgstr "Doğrulanamadı"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "Ajanın dosya düzenlemelerinden sayıldı. Kabuk komutları, notebook veya MCP araçları ya da alt ajanlarla yapılan değişiklikler dahil değildir ve birden fazla düzenlenen bir dosyada bir satır iki kez sayılabilir."
 
 msgid "CPU"
 msgstr "CPU"
@@ -6454,6 +6496,10 @@ msgstr "Çalışma alanını sil"
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "\"{workspaceName}\" çalışma alanı silinsin mi?"
 
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "silindi"
+
 msgid "Deleted"
 msgstr "Silindi"
 
@@ -6660,6 +6706,15 @@ msgstr "DevTools"
 
 msgid "DevTools beside the page"
 msgstr "DevTools sayfanın yanında"
+
+msgid "Diagram"
+msgstr "Diyagram"
+
+msgid "Diagram could not be drawn"
+msgstr "Diyagram çizilemedi"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Diyagram çizilemedi: {reason}"
 
 msgid "Dialog"
 msgstr "Pencere"
@@ -7393,6 +7448,9 @@ msgstr "Her gün"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Her gün <0>09:00</0>'da"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "Her dosya bu turdan sonra yeniden değişti, bu yüzden hiçbir şey geri alınmadı."
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "Her cuma 16.00'da bu haftanın birleştirilen PR'larından sürüm notları taslağı hazırla."
 
@@ -7508,6 +7566,9 @@ msgstr "Tümünü genişlet"
 
 msgid "Expand all files"
 msgstr "Tüm dosyaları genişlet"
+
+msgid "Expand diagram"
+msgstr "Diyagramı büyüt"
 
 msgid "Expand file"
 msgstr "Dosyayı genişlet"
@@ -8140,6 +8201,9 @@ msgstr "Issue açın ve güncelleyin"
 msgid "File changed on disk"
 msgstr "Diskteki dosya değişti"
 
+msgid "File changes undone"
+msgstr "Dosya değişiklikleri geri alındı"
+
 msgid "File is too large to preview"
 msgstr "Dosya önizlenemeyecek kadar büyük"
 
@@ -8299,6 +8363,9 @@ msgstr "Tamamlandı · okunmadı"
 msgid "finished · worked for 7s"
 msgstr "bitti · 7 sn çalıştı"
 
+msgid "Fit"
+msgstr "Sığdır"
+
 msgid "Fix all failing checks"
 msgstr "Başarısız tüm kontrolleri düzelt"
 
@@ -8445,6 +8512,9 @@ msgstr "Hata bildirimleri ve özellik istekleri için en hızlı yol <0>{githubH
 
 msgid "For individuals getting started"
 msgstr "Yeni başlayan bireyler için"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon ve Intel üzerinde macOS için. Linux AppImage deneyseldir."
 
 msgid "For organizations with advanced needs"
 msgstr "Gelişmiş ihtiyaçları olan kuruluşlar için"
@@ -8598,6 +8668,15 @@ msgstr "GitHub'dan"
 
 msgid "from main agent"
 msgstr "ana ajandan"
+
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "Bu turdan önceki ve sonraki worktree anlık görüntülerinden alındı, bu yüzden kabuk komutlarıyla yapılan değişiklikler de sayılır."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "Bu turdan önceki ve sonraki worktree anlık görüntülerinden alındı. Aynı anda burada başka bir sohbet çalıştı, bu yüzden bu değişikliklerin bir kısmı ona ait olabilir."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "Bu turdan önceki ve sonraki worktree anlık görüntülerinden alındı. Aynı anda burada başka bir sohbet çalıştı, bu yüzden bu liste yalnızca bu sohbetin dosya araçlarıyla düzenlediği dosyaları içerir. Diğer değişiklikler ayrı listelenir."
 
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter gizli — düzenlemek için Markdown'a geçin"
@@ -8796,6 +8875,9 @@ msgstr "GitHub kullanıcı adı..."
 
 msgid "GitHub username…"
 msgstr "GitHub kullanıcı adı…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code, Codex veya herhangi bir CLI ajanına kendi workspace'ini ve branch'ini verin, ardından her değişikliği tek bir yerde inceleyin."
 
 msgid "Give me an example"
 msgstr "Bana bir örnek ver"
@@ -9232,6 +9314,9 @@ msgstr "Nasıl çalışıyoruz"
 
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Ajanlarınızın bulut çalışma alanlarında nasıl oturum açtığı. Başkaları kendi aboneliklerini veya API anahtarlarını bağlar; bu makinede her ajan üzerinde zaten bulunan oturumu kullanmayı sürdürür."
+
+msgid "HTML preview"
+msgstr "HTML önizleme"
 
 msgid "https://"
 msgstr "https://"
@@ -10275,6 +10360,9 @@ msgstr "{others} ile birlikte {channel} kanalından ayrıldı."
 
 msgid "left {channel}."
 msgstr "{channel} kanalından ayrıldı."
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "Dokunulmadı, bu turdan sonra değişti: {skippedNames}"
 
 msgid "Left organization"
 msgstr "Kuruluştan ayrılındı"
@@ -11390,6 +11478,10 @@ msgstr "Hiç"
 msgid "Never asks before acting"
 msgstr "Hiç sormadan çalışır"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "yeni"
+
 msgid "New"
 msgstr "Yeni"
 
@@ -12255,6 +12347,9 @@ msgstr "Kimse bu yüzden farklı inceleme yapmaz."
 
 msgid "None"
 msgstr "Yok"
+
+msgid "None of this turn's files have changes here"
+msgstr "Bu turun dosyalarının hiçbirinde burada değişiklik yok"
 
 msgid "None selected"
 msgstr "Hiçbiri seçilmedi"
@@ -15623,6 +15718,9 @@ msgstr "Bu çalıştırmaları Tüm çalıştırmalar'da incele"
 msgid "Review thread…"
 msgstr "İnceleme konusu…"
 
+msgid "Review what this turn has changed so far"
+msgstr "Bu turun şimdiye kadar değiştirdiklerini incele"
+
 msgid "reviewed"
 msgstr "inceledi"
 
@@ -15775,6 +15873,9 @@ msgstr "Şimdi çalıştır"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
 
 msgid "Run script"
 msgstr "Betiği çalıştır"
@@ -16783,6 +16884,9 @@ msgstr "Ana sayfa kenar çubuğunda, pull request'lerin altında bir Kullanım d
 msgid "Show all {count}"
 msgstr "Tümünü göster ({count})"
 
+msgid "Show all changes"
+msgstr "Tüm değişiklikleri göster"
+
 msgid "Show all comments"
 msgstr "Tüm yorumları göster"
 
@@ -16797,6 +16901,9 @@ msgstr "Kenarlıkları Göster"
 
 msgid "Show checks"
 msgstr "Kontrolleri göster"
+
+msgid "Show code"
+msgstr "Kodu göster"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Üst çubukta CPU ve bellek kullanımını göster"
@@ -16827,6 +16934,9 @@ msgstr "Bu çalışma alanını açan herkesi göster"
 
 msgid "Show fewer"
 msgstr "Daha az göster"
+
+msgid "Show fewer files"
+msgstr "Daha az dosya göster"
 
 msgid "Show file tree"
 msgstr "Dosya ağacını göster"
@@ -16860,6 +16970,9 @@ msgstr "Yukarıdaki değişiklikten sonraki satırları göster"
 
 msgid "Show lines before the change below"
 msgstr "Aşağıdaki değişiklikten önceki satırları göster"
+
+msgid "Show link menu"
+msgstr "Bağlantı menüsünü göster"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linear sınıflandırma otomasyonumun son 10 çalıştırmasını göster"
@@ -17192,6 +17305,9 @@ msgstr "Daha akıcı ilk kurulum"
 
 msgid "Snapshot"
 msgstr "Anlık görüntü"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Bu çalışma alanının, içine kurulan her şeyle birlikte şu anki halinin anlık görüntüsünü alır. Bu ortamdan açılan yeni çalışma alanları bu anlık görüntüden başlar."
@@ -18353,6 +18469,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı ödersiniz."
 
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
@@ -18946,6 +19065,9 @@ msgstr "Bu işlem kayıtlı ortamı erişimi olan herkes için kalıcı olarak k
 msgid "This port is still in use"
 msgstr "Bu port hâlâ kullanımda"
 
+msgid "This preview is too large to show."
+msgstr "Bu önizleme gösterilemeyecek kadar büyük."
+
 msgid "This profile is busy right now"
 msgstr "Bu profil şu anda yoğun"
 
@@ -19027,6 +19149,12 @@ msgstr "Bu konuda yanıtlanacak yorum yok."
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Bu konu bir ajana devredilmedi. Önce birinin sayfadan devretmesi gerekiyor."
 
+msgid "This turn"
+msgstr "Bu tur"
+
+msgid "This turn's files"
+msgstr "Bu turun dosyaları"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "Bu güncelleme terminallerinizi yalnızca bir kez yeniden başlattı. Yenileri aynı klasörlerde açılır."
 
@@ -19099,6 +19227,9 @@ msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz o
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Bu çalışma alanı kaydı hâlâ var, ancak worktree klasörü artık bu host'ta değil. Terminaller ve dosya eylemleri kullanılamıyor."
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "Bu çalışma alanının ana makinesi henüz dosya değişikliklerini geri alamıyor."
 
 msgid "This workspace's host is offline"
 msgstr "Bu çalışma alanının host'u çevrimdışı"
@@ -19352,6 +19483,9 @@ msgstr "Bütçeleri ve harcamaları takip edin"
 msgid "Track down that flaky test…"
 msgstr "Şu kararsız testin izini sür…"
 
+msgid "Track file changes per turn"
+msgstr "Dosya değişikliklerini tur başına izle"
+
 msgid "Track tasks in"
 msgstr "Görevleri şurada takip et"
 
@@ -19585,6 +19719,12 @@ msgstr "Sürüyor"
 
 msgid "Undo"
 msgstr "Geri al"
+
+msgid "Undo changes"
+msgstr "Değişiklikleri geri al"
+
+msgid "Undo the file changes in this card?"
+msgstr "Bu karttaki dosya değişiklikleri geri alınsın mı?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Son arşivlenen çalışma alanını veya kapatılan sohbetleri geri al"
