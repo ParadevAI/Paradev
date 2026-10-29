@@ -29,7 +29,7 @@ tmux new-session -d -s superset -n stack -c "$ROOT_DIR" \
   "export NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bunx turbo run dev --filter=@superset/api --filter=@superset/web --filter=// 2>&1 | tee '$LOG_DIR/dev-stack.log'"
 if [ "$MEMORY_MB" -ge "$DESKTOP_DEV_MIN_MB" ]; then
   tmux new-window -t superset -n desktop -c "$ROOT_DIR/apps/desktop" \
-    "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
+    "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; unset SUPERSET_SANDBOX_WORKSPACE_ID; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
 else
   echo "dev-stack: ${MEMORY_MB} MB box; skipping the desktop dev build (needs ${DESKTOP_DEV_MIN_MB})"
 fi
