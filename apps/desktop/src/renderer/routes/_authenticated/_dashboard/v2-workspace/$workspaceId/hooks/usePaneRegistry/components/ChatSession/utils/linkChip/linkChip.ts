@@ -9,6 +9,9 @@ export type LinkChipData = { link: string };
 const GLOBE_ICON_URL = `data:image/svg+xml,${encodeURIComponent(
 	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
 )}`;
+const ENVIRONMENT_ICON_URL = `data:image/svg+xml,${encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7.7c0-.6-.4-1.2-.8-1.5l-6.3-3.9a1.72 1.72 0 0 0-1.7 0l-10.3 6c-.5.2-.9.8-.9 1.4v6.6c0 .5.4 1.2.8 1.5l6.3 3.9a1.72 1.72 0 0 0 1.7 0l10.3-6c.5-.3.9-1 .9-1.5Z"/><path d="M10 21.9V14L2.1 9.1"/><path d="m10 14 11.9-6.9"/><path d="M14 19.8v-8.1"/><path d="M18 17.5V9.4"/></svg>',
+)}`;
 const NOTION_ID = /-?[0-9a-f]{32}$/i;
 
 function webUrl(text: string): URL | null {
@@ -87,7 +90,9 @@ export function linkChip(
 	const iconUrl =
 		unfurl?.icon.kind === "plugin"
 			? getPluginIconUrl(unfurl.icon.name, options.isDark)
-			: undefined;
+			: unfurl?.icon.kind === "environment"
+				? ENVIRONMENT_ICON_URL
+				: undefined;
 	return {
 		label: chat ?? readableLabel(url, text) ?? unfurl?.label ?? text,
 		serialized: text,

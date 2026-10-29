@@ -103,18 +103,11 @@ export function CreateEnvironmentFlow({
 				env.NEXT_PUBLIC_WEB_URL,
 			).toString();
 			// Stays open, saying Starting…, until the session's page replaces this one.
-			await createSession(
-				setupPrompt({
-					environmentName: environment.name,
-					environmentId: environment.id,
-					url,
-				}),
-				{
-					preset: "claude",
-					preferChat: true,
-					name: t({ message: `Set up ${environment.name}` }),
-				},
-			);
+			await createSession(setupPrompt(url), {
+				preset: "claude",
+				preferChat: true,
+				name: t({ message: `Set up ${environment.name}` }),
+			});
 			onOpenChange(false);
 			onStarted?.();
 		} catch (error) {
