@@ -3,7 +3,13 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { ChevronLeftIcon } from "lucide-react";
-import { type KeyboardEvent, useEffect, useMemo, useState } from "react";
+import {
+	type KeyboardEvent,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useProviderSearch } from "../../hooks/useProviderSearch";
 import type {
 	ComposerMentionBrowse,
@@ -37,6 +43,14 @@ export function MentionSubmenu({
 	const [filters, setFilters] = useState(NO_FILTERS);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const { entries, isLoading } = useProviderSearch(provider, query, filters);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Opened from a typed "@", the editor takes focus back when it removes the
+	// "@"; focusing after that frame keeps typing in the search box.
+	useEffect(() => {
+		const frame = requestAnimationFrame(() => inputRef.current?.focus());
+		return () => cancelAnimationFrame(frame);
+	}, []);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: a new result set starts at its first row
 	useEffect(() => setSelectedIndex(0), [entries]);
@@ -122,6 +136,7 @@ export function MentionSubmenu({
 				onChange={(event) => setQuery(event.target.value)}
 				onKeyDown={onKeyDown}
 				placeholder={browse.placeholder}
+				ref={inputRef}
 				value={query}
 			/>
 			<div role="listbox" aria-label={browse.label}>
