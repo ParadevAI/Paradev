@@ -16,7 +16,7 @@ type EnvironmentListWire = {
 };
 
 /**
- * Cloud workspaces are sandboxes Superset runs for the organization, each
+ * Cloud workspaces are sandboxes Paradev runs for the organization, each
  * started from an environment whose repositories are its checkouts. The API
  * owns their records; terminals and agents run inside them (see
  * `terminals` and `agents`).

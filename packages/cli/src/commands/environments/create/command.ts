@@ -3,6 +3,7 @@ import {
 	SANDBOX_REGION_IDS,
 	type SandboxRegionId,
 } from "@superset/shared/sandbox-regions";
+import { getWebUrl } from "../../../lib/auth";
 import { command } from "../../../lib/command";
 import { environmentLimitHint } from "../../../lib/environments";
 
@@ -72,9 +73,13 @@ export default command({
 		const environment = await ctx.api.environment.get.query({
 			id: created.id,
 		});
+		const url = new URL(
+			`/environments/${environment.id}`,
+			getWebUrl(),
+		).toString();
 		return {
-			data: environment,
-			message: `Created ${environment.name} (${environment.id}) in ${environment.region}`,
+			data: { ...environment, url },
+			message: `Created ${environment.name} (${environment.id}) in ${environment.region}: ${url}`,
 		};
 	},
 });

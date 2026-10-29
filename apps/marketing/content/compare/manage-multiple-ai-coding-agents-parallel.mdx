@@ -64,7 +64,7 @@ With isolation in place, start one agent per workspace. Scope each task so it ca
 
 - **Launch any agent per workspace.** Claude Code, Codex, Cursor's agent, Antigravity CLI, Copilot CLI, Amp, OpenCode, and more are built-in agents; any other CLI agent can be added as a custom command. Each runs on your own subscription or API key, and Paradev does not proxy model calls. Paradev starts the agent's real CLI in a real terminal, so its own commands still work, such as Claude Code's `/remote-control` and `/schedule` or Codex's `/review`.
 - **Mix agents on one repository.** Give one task to Claude Code and another to Codex, or give the same task to both and keep the better result. See [How to Compare Coding Agents Side by Side](/compare/compare-coding-agents-side-by-side).
-- **Start work from outside the app.** The CLI creates a workspace and starts an agent with a prompt in one command (`superset ws create --agent claude --prompt "..."`), and the MCP server lets other agents do the same. Scheduled [automations](https://docs.superset.sh/automations) run an agent on a host you choose.
+- **Start work from outside the app.** The CLI creates a workspace and starts an agent with a prompt in one command (`superset ws create --agent claude --prompt "..."`), and the MCP server lets other agents do the same. Scheduled [automations](https://docs.paradev.com/automations) run an agent on a host you choose.
 - **Run on more than one machine.** Remote Access adds a macOS or Linux machine as a host, so long-running agents keep working when your laptop sleeps. See [Where to Run Coding Agents](/compare/where-to-run-coding-agents).
 
 ## 3. Manage Context and Task Switching
@@ -77,7 +77,7 @@ The cost of parallel agents is attention: knowing which agent needs you, and pic
 
 - **See status at a glance.** The sidebar shows which agents are working, need input, or are done, and you get a notification when an agent needs you. The Workspaces page groups every workspace by state: Needs attention, Working, Needs review, Idle, and Merged.
 - **Switch tasks, not tabs.** Each workspace keeps its own terminal, diff, and browser preview, so moving between tasks means moving between workspaces.
-- **Keep sessions running.** Terminals run in a background daemon, so agents keep running when you close or update the app, and reattach with their scrollback. See [Keep Agents Running](https://docs.superset.sh/keep-agents-running).
+- **Keep sessions running.** Terminals run in a background daemon, so agents keep running when you close or update the app, and reattach with their scrollback. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running).
 - **Resume and hand off.** Supported agents resume their session after a restart, and you can continue a session with a different agent when one gets stuck.
 - **Review each task on its own.** The Changes pane shows the workspace's diff and commits, pushes, and opens a pull request. The Pull Requests view shows CI checks and sends line comments back to the agent.
 - **Check in away from your desk.** The [iPhone and iPad app](/mobile) shows the agents running on your hosts, so you can answer one or review a diff from your phone.
@@ -97,7 +97,7 @@ Add more agents only when review keeps up. The limit is usually the time it take
 
 Yes, if most of your time goes to agent terminals instead of the editor. A workspace built for agents gives each session its own worktree, shows which agent needs you, and keeps the diff next to the terminal. You keep VS Code for the moments you want a full editor.
 
-In Paradev, each task is a workspace with its own terminals, Changes pane, and browser preview, and the sidebar shows which agents are working or waiting for input. Press **⌘O** to open the current workspace in your default editor, such as VS Code, Cursor, Zed, or a JetBrains IDE. See [IDE Integration](https://docs.superset.sh/use-with-ide).
+In Paradev, each task is a workspace with its own terminals, Changes pane, and browser preview, and the sidebar shows which agents are working or waiting for input. Press **⌘O** to open the current workspace in your default editor, such as VS Code, Cursor, Zed, or a JetBrains IDE. See [IDE Integration](https://docs.paradev.com/use-with-ide).
 
 ## Other Tools for Parallel Agents
 

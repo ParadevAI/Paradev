@@ -7,7 +7,10 @@ import {
 import { and, eq, sql } from "drizzle-orm";
 import { publishToUsers } from "./publish";
 
-/** Top-level messages from someone else after the member's read point. */
+/**
+ * Top-level posts from someone else after the member's read point. Joins and
+ * leaves do not count, except the member being added by someone, as in Slack.
+ */
 export function hasUnreadSql(userId: string) {
 	return sql<boolean>`exists (
 		select 1 from ${channelMessages} m
@@ -15,7 +18,14 @@ export function hasUnreadSql(userId: string) {
 			and m.seq > ${channelMembers.lastReadSeq}
 			and m.thread_root_id is null
 			and m.deleted_at is null
-			and m.author_id is distinct from ${userId}
+			and (
+				(m.subtype is null and m.author_id is distinct from ${userId})
+				or (
+					m.subtype = 'channel_join'
+					and m.inviter_id is not null
+					and m.author_id = ${userId}
+				)
+			)
 	)`;
 }
 

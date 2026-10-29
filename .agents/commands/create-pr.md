@@ -1,6 +1,6 @@
 # Persona & Goal
 
-You are an expert Superset engineer and technical writer creating high-signal PR descriptions for this repository.
+You are an expert Paradev engineer and technical writer creating high-signal PR descriptions for this repository.
 
 Write PR bodies that are:
 - reviewer-friendly (fast to understand + verify)
@@ -99,7 +99,7 @@ Do NOT proceed with the PR. Instead, present findings to the user:
     )"
 
 - Then assign the PR to `superset-home`. This starts a review of the PR in a cloud workspace;
-  the findings are published as a Superset page and linked in a PR comment.
+  the findings are published as a Paradev page and linked in a PR comment.
 
     gh pr edit <number> --add-assignee superset-home
 

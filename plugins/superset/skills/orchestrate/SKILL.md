@@ -5,11 +5,11 @@ argument-hint: the work to split up and coordinate
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Orchestration
+# Paradev Orchestration
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
-Coordinate terminal agents with Superset's workspace, agent, and terminal commands. Treat this as a coordinator-driven protocol: Superset provides session transport, while the coordinator owns task dependencies and completion state.
+Coordinate terminal agents with Paradev's workspace, agent, and terminal commands. Treat this as a coordinator-driven protocol: Paradev provides session transport, while the coordinator owns task dependencies and completion state.
 
 ## Establish the control surface
 
@@ -34,13 +34,13 @@ Create a compact coordinator table with these fields:
 | --- | --- |
 | Task | Stable short identifier |
 | Dependencies | Tasks that must complete first |
-| Workspace | Superset workspace ID |
+| Workspace | Paradev workspace ID |
 | Host | Host ID, or local |
 | Terminal | `sessionId` returned by `agents create` |
 | Status | `pending`, `ready`, `running`, `completed`, `blocked`, or `failed` |
 | Result | Summary, files, checks, and follow-up work |
 
-Keep this state in the coordinator's working context. Superset organization tasks are issue-tracker records, not orchestration DAG nodes; do not create or mutate them unless the user asks.
+Keep this state in the coordinator's working context. Paradev organization tasks are issue-tracker records, not orchestration DAG nodes; do not create or mutate them unless the user asks.
 
 Prefer independent tasks and shallow dependency chains. For parallel editing, give workers separate workspaces/branches. Sharing one workspace is appropriate for read-only analysis or deliberately complementary work with non-overlapping files.
 
@@ -73,7 +73,7 @@ reason: <specific blocker>
 needs: <decision, access, or dependency required>
 ```
 
-These markers are a prompt convention visible in terminal snapshots, not durable Superset events. Treat malformed or missing envelopes as unstructured output and inspect the full snapshot.
+These markers are a prompt convention visible in terminal snapshots, not durable Paradev events. Treat malformed or missing envelopes as unstructured output and inspect the full snapshot.
 
 ## Dispatch workers
 
@@ -166,13 +166,13 @@ If the user wants to take over a worker from their own shell, give them the comm
 5. Redispatch a failed task only after changing the prompt, inputs, or worker choice. Stop after repeated failures and report the blocker.
 6. Independently verify risky or overlapping changes before presenting the combined result.
 
-For isolated branches, ask each implementation worker to commit or otherwise provide an exact handoff only when that action is within the user's requested workflow. Superset does not merge worker branches automatically.
+For isolated branches, ask each implementation worker to commit or otherwise provide an exact handoff only when that action is within the user's requested workflow. Paradev does not merge worker branches automatically.
 
 ## Finish and clean up
 
 Summarize each task's outcome, workspace/branch, files changed, checks, blockers, and integration order. Distinguish worker claims from checks the coordinator independently ran.
 
-A long run usually finishes while the user is looking elsewhere. Tell them with a desktop notification; run from a Superset terminal, clicking it brings them back to the coordinator:
+A long run usually finishes while the user is looking elsewhere. Tell them with a desktop notification; run from a Paradev terminal, clicking it brings them back to the coordinator:
 
 ```bash
 superset notifications show "Parallel run finished" --body "4 done, 1 blocked" --sound

@@ -24,4 +24,6 @@ Object.assign(process.env, {
 	QSTASH_TOKEN: "qstash-token",
 	SERVER_ANTHROPIC_API_KEY: "test",
 	SLACK_SIGNING_SECRET: "test-secret",
+	YC_BOOKFACE_REWARD_ID: "yc-bookface-6mo-pro",
+	YC_DEALS_WEBHOOK_SECRET: "test-secret",
 });

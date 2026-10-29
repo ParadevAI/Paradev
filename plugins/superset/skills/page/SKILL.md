@@ -5,7 +5,7 @@ argument-hint: what the page should show, or a page id/slug to update
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Pages
+# Paradev Pages
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
@@ -89,7 +89,7 @@ wired so a pinned comment comes back to an agent that can act on it.
 
 So when the user asks for a page, or for anything a teammate will open, this
 skill is the one that runs. Reach for `Artifact` only when the user names it,
-or when there is no Superset workspace to publish into. Inside a Superset
+or when there is no Paradev workspace to publish into. Inside a Paradev
 terminal a first `Artifact` publish is denied by a hook that points back here;
 that denial is the reminder, not an error to work around. Someone who wants it
 gone entirely sets `SUPERSET_PAGES_NUDGE=off` in their terminal environment.
@@ -132,7 +132,7 @@ enforced identically in the desktop pane and the web viewer:
   tab or filter. For anything the page should remember for everyone, use
   `window.superset.storage` below.
 - **No parent access.** The viewer is a different origin, so
-  `window.parent.document` and `window.top.location` throw. Superset injects
+  `window.parent.document` and `window.top.location` throw. Paradev injects
   its own scripts for comment anchoring and for the storage API; don't build a
   `postMessage` handshake of your own on top of them.
 - **No form submission.** `form-action 'none'`: a `<form>` may exist for its
@@ -286,7 +286,7 @@ its partner as well so the pair can never come from two different themes.
 
 ### Tokens
 
-These are Superset's own palette, so a page read next to the app belongs to
+These are Paradev's own palette, so a page read next to the app belongs to
 it. Build on them rather than hardcoding colours and both themes keep working:
 
 | Token | What it is |

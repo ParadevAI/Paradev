@@ -1,5 +1,4 @@
 import type { RouterOutputs } from "@superset/trpc";
-import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { cn } from "@superset/ui/utils";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
 
@@ -30,9 +29,6 @@ export function DevRow({ dev, isActive, onClick }: DevRowProps) {
 				mood={isPaused ? "asleep" : "idle"}
 			/>
 			<span className="min-w-0 flex-1 truncate text-left">{dev.name}</span>
-			{dev.isWorking && !isPaused && (
-				<WaveSpinner className="text-foreground/80" />
-			)}
 		</button>
 	);
 }

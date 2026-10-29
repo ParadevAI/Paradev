@@ -77,7 +77,6 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_V1_MIGRATION: "experimental-v1-migration",
 	EXPERIMENTAL_INLINE_WORKSPACE_PORTS: "experimental-inline-workspace-ports",
 	EXPERIMENTAL_WORKSPACE_AGENTS: "experimental-workspace-agents",
-	EXPERIMENTAL_RIGHT_PANE_AREA: "experimental-right-pane-area",
 	EXPERIMENTAL_ACP_CHAT: "experimental-acp-chat",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
@@ -236,7 +235,6 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.EXPERIMENTAL_V1_MIGRATION]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_INLINE_WORKSPACE_PORTS]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
@@ -1483,25 +1481,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA,
-		section: "experimental",
-		title: "Right pane area",
-		description:
-			"Open files, diffs and browsers in tabs on the right, and keep the center for terminals and chats",
-		keywords: [
-			"experimental",
-			"right",
-			"pane",
-			"panes",
-			"area",
-			"sidebar",
-			"tabs",
-			"changes",
-			"toggle",
-			"switch",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
 		section: "experimental",
 		title: "Chat",
@@ -2118,15 +2097,12 @@ export function getVisibleMatchCountBySection(
 	isV2: boolean,
 	cloudWorkspaces: boolean,
 	mobileEnabled = false,
-	rightPaneAreaFlag = false,
 	acpChatFlag = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
 			(item.section !== "mobile" || mobileEnabled) &&
-			(item.id !== SETTING_ITEM_ID.EXPERIMENTAL_RIGHT_PANE_AREA ||
-				rightPaneAreaFlag) &&
 			(item.id !== SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT || acpChatFlag),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};

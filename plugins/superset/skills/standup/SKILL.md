@@ -5,7 +5,7 @@ argument-hint: optional timeframe or project
 allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh *)
 ---
 
-# Superset Standup
+# Paradev Standup
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 

@@ -76,6 +76,8 @@ export interface PaneDefinition<TData> {
 	titleSource?(pane: Pane<TData>): PaneTitleSource | undefined;
 	getIcon?(context: RendererContext<TData>): ReactNode;
 	renderTitle?(context: RendererContext<TData>): ReactNode;
+	/** Skip the pane's header row; its actions stay in the context menu. */
+	hideHeader?(context: RendererContext<TData>): boolean;
 	renderHeaderExtras?(context: RendererContext<TData>): ReactNode;
 	renderToolbar?(context: RendererContext<TData>): ReactNode;
 	onHeaderClick?(context: RendererContext<TData>): void;
@@ -89,6 +91,12 @@ export interface PaneDefinition<TData> {
 	 * hidden: pause its polling with `useIsTabVisible()`.
 	 */
 	keepAlive?: boolean;
+	/**
+	 * The pane keeps its body full width under the aside and makes room itself
+	 * with `var(--pane-aside-inset)`, so its scrollbars stay at the pane edge.
+	 * Other panes get the inset as right padding.
+	 */
+	insetsAside?: boolean;
 	paneActions?:
 		| PaneActionConfig<TData>[]
 		| ((
@@ -124,13 +132,26 @@ export interface WorkspaceProps<TData> {
 	className?: string;
 	renderTabAccessory?: (tab: Tab<TData>) => ReactNode;
 	renderTabIcon?: (tab: Tab<TData>) => ReactNode;
+	/** Shows the tab's title in italics, for a tab the next open will replace. */
+	isPreviewTab?: (tab: Tab<TData>) => boolean;
+	/** Defaults to true. When false, tabs can't be renamed. */
+	renameTabs?: boolean;
+	/** Runs when a tab is clicked, after it is selected. */
+	onTabClick?: (tab: Tab<TData>) => void;
 	renderEmptyState?: () => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
+	/** Runs when the add-tab button is clicked. Ignored when `renderAddTabMenu` is set. */
+	onAddTab?: () => void;
 	/** Rendered at the leading (left) edge of the tab bar row, before the tabs. */
 	renderTabBarLeading?: () => ReactNode;
 	/** Rendered at the trailing (right) edge of the tab bar row. */
 	renderTabBarTrailing?: () => ReactNode;
 	renderBelowTabBar?: () => ReactNode;
+	/**
+	 * Rendered over the right of the top-right pane's body, below its header.
+	 * It reserves its width by setting `--pane-aside-inset` on its parent.
+	 */
+	renderPaneAside?: () => ReactNode;
 	onBeforeClosePane?: (
 		pane: Pane<TData>,
 		tab: Tab<TData>,

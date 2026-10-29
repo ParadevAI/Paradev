@@ -3,7 +3,7 @@ description: Freshly research, add, and refresh marketing compare pages, then op
 allowed-tools: Bash, Read, Edit, Write, Grep, Glob, WebSearch
 ---
 
-Research and refresh Superset marketing comparison content using current official sources, not stale model memory.
+Research and refresh Paradev marketing comparison content using current official sources, not stale model memory.
 
 ## Input
 
@@ -29,7 +29,7 @@ Do not draft from memory. Re-verify current facts before editing.
 
 Research rules:
 - Use fresh official sources for every unstable claim:
-  - Superset: `superset.sh`, `docs.superset.sh`, Superset changelog, and relevant repo/docs files
+  - Paradev: `paradev.com`, `docs.paradev.com`, Paradev changelog, and relevant repo/docs files
   - Competitors: official docs, pricing, changelog, blog, or product pages only
 - Record concrete dates when claims depend on current product surfaces, pricing, access, or launch status
 - Prefer primary sources over summaries or third-party writeups
@@ -43,7 +43,7 @@ After research, audit existing compare pages for stale claims, including:
 - outdated product surfaces
 - pricing or plan changes
 - absolute statements that are no longer true
-- Superset being framed too narrowly when the current product includes more surface area
+- Paradev being framed too narrowly when the current product includes more surface area
 - unsupported claims that should be softened or removed
 
 If a relevant page already exists, update it in the same run instead of only creating new pages.
@@ -77,13 +77,13 @@ When creating the PR:
 - make the body explicitly enumerate:
   - new compare pages added
   - existing stale pages refreshed
-  - important Superset positioning changes added to the copy
+  - important Paradev positioning changes added to the copy
   - official sources re-verified, with dates when relevant
   - validation run
   - claims removed or softened because they were stale or unverified
 
 Good PR title examples:
-- `marketing: refresh compare pages with current Superset chat/browser/MCP positioning`
+- `marketing: refresh compare pages with current Paradev chat/browser/MCP positioning`
 - `marketing: add new compare pages and re-verify stale competitor comparisons`
 
 Avoid vague titles like:

@@ -1,20 +1,32 @@
 import { afterEach, expect, mock, test } from "bun:test";
-import { emptySnapshot } from "@superset/chat/core";
-import type { BackgroundTask } from "@superset/chat/protocol";
+import type { UserMessage } from "@superset/chat/protocol";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { useRef } from "react";
 import { useDrawerEntry } from "../../../Composer/hooks/useDrawerEntry";
-import { WorkDrawer, type WorkDrawerHandle } from "../../../WorkDrawer";
+import {
+	type DrawerQueue,
+	WorkDrawer,
+	type WorkDrawerHandle,
+} from "../../../WorkDrawer";
 import { escapeBack } from "./escapeBack";
 
 afterEach(cleanup);
 
-const shell: BackgroundTask = {
-	id: "task-1",
-	kind: "process",
-	name: "bun dev",
-	canStop: true,
+const queued: UserMessage = {
+	id: "q1",
+	kind: "user_message",
 	startedAtMs: 0,
+	queued: true,
+	content: [{ type: "text", text: "next" }],
+};
+
+const queue: DrawerQueue = {
+	prompts: [queued],
+	paused: false,
+	actionable: true,
+	remove: async () => {},
+	resume: async () => {},
+	steer: async () => {},
 };
 
 function Pane({ goBack }: { goBack: (() => void) | undefined }) {
@@ -31,12 +43,8 @@ function Pane({ goBack }: { goBack: (() => void) | undefined }) {
 			<WorkDrawer
 				onAppendToComposer={() => {}}
 				onExit={(exit) => entry.returnFocus(exit === "history")}
-				onMoveToBackground={() => {}}
-				onOpenSubagent={() => {}}
-				onStop={() => {}}
+				queue={queue}
 				ref={drawerRef}
-				snapshot={emptySnapshot()}
-				tasks={[shell]}
 			/>
 			<div onKeyDownCapture={entry.onKeyDownCapture}>
 				<div

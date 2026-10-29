@@ -411,7 +411,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		category: "Desktop",
 		status: "shipped",
 		shippedDate: "Aug 2026",
-		pr: "https://github.com/superset-sh/superset/pull/5731",
+		pr: "https://github.com/paradevai/paradev/pull/5731",
 	},
 	{
 		id: "stability-pass",

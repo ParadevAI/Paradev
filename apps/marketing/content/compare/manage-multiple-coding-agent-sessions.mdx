@@ -72,9 +72,9 @@ Agent view covers Claude Code only.
 
 The best way is one board that groups every agent by state across all repositories, with the agents that need you at the top.
 
-In **Paradev**, every workspace in the sidebar has an activity strip that shows running agents and open ports. The **Workspaces** page has Board and List views with columns for **Idle**, **Working**, **Needs attention**, **Needs review**, and **Merged**. Each row shows agent status, diff size, PR checks, and last activity. Filter by project, PR state, agent, or device to sweep many repositories at once. See [Workspaces](https://docs.superset.sh/workspaces).
+In **Paradev**, every workspace in the sidebar has an activity strip that shows running agents and open ports. The **Workspaces** page has Board and List views with columns for **Idle**, **Working**, **Needs attention**, **Needs review**, and **Merged**. Each row shows agent status, diff size, PR checks, and last activity. Filter by project, PR state, agent, or device to sweep many repositories at once. See [Workspaces](https://docs.paradev.com/workspaces).
 
-Paradev gets status from lifecycle hooks it installs into each agent's config. The hooks report when an agent starts, finishes, or waits for input. Notifications name the project, workspace, agent, and status, and include the permission question when there is one. On macOS, the dock icon shows a badge for workspaces that need you. When Claude Code or Codex spawns subagents, they appear nested under their parent session. See [Agent Status](https://docs.superset.sh/agent-status).
+Paradev gets status from lifecycle hooks it installs into each agent's config. The hooks report when an agent starts, finishes, or waits for input. Notifications name the project, workspace, agent, and status, and include the permission question when there is one. On macOS, the dock icon shows a badge for workspaces that need you. When Claude Code or Codex spawns subagents, they appear nested under their parent session. See [Agent Status](https://docs.paradev.com/agent-status).
 
 Limits: status works only for agents launched through Paradev. Claude Code reports both finished and waiting states; some agents do not emit a waiting signal yet, so you get only completion notifications for them.
 
@@ -99,7 +99,7 @@ superset ws list --local --tag auth
 
 Any tool that launches the agent's own CLI keeps your subscription, because the CLI uses your existing login. tmux, Zellij, cmux, Conductor, Orca, Nimbalyst, and Paradev all work this way.
 
-Paradev does not proxy model calls. Claude Code signs in with your Anthropic account and Codex with your ChatGPT account, as they would in any terminal. Built-in agents include Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp, Kiro, Devin, and more; see [Supported Agents](https://docs.superset.sh/agent-integration). If you route Claude Code through Bedrock, Vertex, or OpenRouter, set the environment variables per workspace in **Settings > Env**; see [Providers](https://docs.superset.sh/providers).
+Paradev does not proxy model calls. Claude Code signs in with your Anthropic account and Codex with your ChatGPT account, as they would in any terminal. Built-in agents include Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp, Kiro, Devin, and more; see [Supported Agents](https://docs.paradev.com/agent-integration). If you route Claude Code through Bedrock, Vertex, or OpenRouter, set the environment variables per workspace in **Settings > Env**; see [Providers](https://docs.paradev.com/providers).
 
 **Nimbalyst** is an open-source visual workspace for macOS, Windows, and Linux. It fully supports Claude Code and Codex, has one-click worktrees per session, and a kanban board by phase (backlog, planning, implementing, complete). It uses your existing Claude Code or Codex subscription or API key.
 
@@ -117,7 +117,7 @@ Use one worktree per task and pick the agent per task: Claude Code on a feature 
 - **Vendor apps:** the Claude Code desktop app runs parallel Claude Code sessions with Git isolation, and the Codex app in the ChatGPT desktop app runs parallel Codex chats. Each runs only its own vendor's agent, so you end up with two apps.
 - **One workspace for both:** Paradev, Conductor, Orca, or Nimbalyst run both agents side by side.
 
-In Paradev, press **⌘N**, pick the agent, and type the prompt. A session stuck on one agent can move to the other: the fork icon in the terminal header has **Continue with another agent**, which starts the new agent with up to 36,000 characters of the old session's context. See [Agent Sessions](https://docs.superset.sh/agent-sessions) and [Switching Between AI Coding Agents](/blog/switching-between-ai-coding-agents).
+In Paradev, press **⌘N**, pick the agent, and type the prompt. A session stuck on one agent can move to the other: the fork icon in the terminal header has **Continue with another agent**, which starts the new agent with up to 36,000 characters of the old session's context. See [Agent Sessions](https://docs.paradev.com/agent-sessions) and [Switching Between AI Coding Agents](/blog/switching-between-ai-coding-agents).
 
 ---
 
@@ -138,7 +138,7 @@ The main alternatives add the two things tmux lacks: per-task worktrees and a re
 
 If you want to stay in the terminal, **Claude Squad** wraps tmux and worktrees in a TUI; see [Paradev vs Claude Squad](/compare/superset-vs-claude-squad). If you want a board of tasks with diffs, **Vibe Kanban** puts agent tasks in columns; see [Paradev vs Vibe Kanban](/compare/superset-vs-vibe-kanban). For the full list, see [tmux Alternatives for AI Coding Agents](/compare/tmux-alternatives-for-ai-agents).
 
-In Paradev, review happens in the workspace: a Changes pane with diffs and per-file staging, and a pull request pane with checks and the merge menu. See [Pull Requests](https://docs.superset.sh/pull-requests).
+In Paradev, review happens in the workspace: a Changes pane with diffs and per-file staging, and a pull request pane with checks and the merge menu. See [Pull Requests](https://docs.paradev.com/pull-requests).
 
 ---
 
@@ -157,7 +157,7 @@ Name each session after its task, keep transcripts readable, and make sessions c
 - **Names:** rename a terminal session in Paradev from the session dropdown; the name sticks across restarts. In tmux, name sessions per task.
 - **Transcripts:** `superset agents read` returns the saved Claude Code or Codex conversation, including what scrolled off screen. Claude Code's `claude logs <id>` shows recent output for background sessions.
 - **Recovery:** if an agent's terminal dies from a crash or reboot, Paradev relaunches it with the agent's resume command, for example `claude --resume <session-id>`.
-- **Away from the desk:** the Paradev iPhone and iPad app shows agent sessions and diffs away from your desk (Pro plan). See [Remote Access](https://docs.superset.sh/remote-access).
+- **Away from the desk:** the Paradev iPhone and iPad app shows agent sessions and diffs away from your desk (Pro plan). See [Remote Access](https://docs.paradev.com/remote-access).
 
 ---
 

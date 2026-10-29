@@ -67,7 +67,7 @@ export function WorkspaceConfigEditor({
 			<p className="text-sm text-muted-foreground">
 				{isMissingProcedureError(files.error) ? (
 					<Trans>
-						Update Superset on this host to edit its workspace config.
+						Update Paradev on this host to edit its workspace config.
 					</Trans>
 				) : (
 					files.error.message

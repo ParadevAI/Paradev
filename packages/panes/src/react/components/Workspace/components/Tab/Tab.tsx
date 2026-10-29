@@ -12,6 +12,10 @@ import type {
 	Tab as TabType,
 } from "../../../../../types";
 import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
+import {
+	PaneAsideTargetContext,
+	topRightPaneId,
+} from "../../../../hooks/usePaneAside";
 import type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
@@ -307,18 +311,20 @@ export function Tab<TData>({
 	return (
 		// isolate contains the resize handles' z-indexes so they never paint
 		// above body-portalled overlays (dialogs, menus).
-		<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto">
-			<LayoutNodeView
-				store={store}
-				tab={tab}
-				node={tab.layout}
-				path={[]}
-				registry={registry}
-				paneActions={paneActions}
-				contextMenuActions={contextMenuActions}
-				onPaneError={onPaneError}
-				onSplitResizeDragging={onSplitResizeDragging}
-			/>
-		</div>
+		<PaneAsideTargetContext.Provider value={topRightPaneId(tab.layout)}>
+			<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto">
+				<LayoutNodeView
+					store={store}
+					tab={tab}
+					node={tab.layout}
+					path={[]}
+					registry={registry}
+					paneActions={paneActions}
+					contextMenuActions={contextMenuActions}
+					onPaneError={onPaneError}
+					onSplitResizeDragging={onSplitResizeDragging}
+				/>
+			</div>
+		</PaneAsideTargetContext.Provider>
 	);
 }

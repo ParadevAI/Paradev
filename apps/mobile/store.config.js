@@ -17,7 +17,7 @@ const reviewVideoUrl = process.env.APP_REVIEW_VIDEO_URL ?? "";
 // guidelines a reviewer is most likely to check, each under a short heading.
 const reviewNotes = [
 	"WHAT THE APP IS",
-	"Paradev Mobile is the companion app for Paradev (formerly Superset, https://superset.sh), a desktop tool where developers run AI coding agents on their own computers or in Paradev cloud workspaces. The phone app is a remote client for those sessions, in the same class as an SSH or remote desktop client: it shows agent progress, lets the user chat with an agent, review file diffs, and type into a terminal session that is running on the user's own machine. The app does not download, install, or execute any user or project code on the device: it renders data streamed from the user's host and sends keystrokes back to the remote session.",
+	"Paradev Mobile is the companion app for Paradev (formerly Superset, https://paradev.com), a desktop tool where developers run AI coding agents on their own computers or in Paradev cloud workspaces. The phone app is a remote client for those sessions, in the same class as an SSH or remote desktop client: it shows agent progress, lets the user chat with an agent, review file diffs, and type into a terminal session that is running on the user's own machine. The app does not download, install, or execute any user or project code on the device: it renders data streamed from the user's host and sends keystrokes back to the remote session.",
 	"",
 	"HOW TO REVIEW",
 	"1. On the sign-in screen tap 'Sign in with email' and use the demo account below (no two-factor prompt; the account belongs to an organization that already has a workspace with sample agent sessions, so nothing needs to be installed to see the full app).",
@@ -35,7 +35,7 @@ const reviewNotes = [
 	"Originality (4.3): This is the official mobile client for Paradev, our own product, built and operated by Superset Inc. It is not a template, a repackaged app, or a wrapper around another vendor's tool: it talks to our own API (api.superset.sh) and to the Paradev host agent that our desktop app installs (plus crash and usage reporting through Sentry and PostHog, declared in App Privacy), and the bundle identifier (sh.superset.mobile) matches our domain. The full source of this app is public in our repository at https://github.com/paradevai/paradev (apps/mobile, 13,000+ stars), alongside the desktop app it pairs with, which has been downloaded millions of times. Other apps in this category are phone front-ends for a third-party CLI; Paradev Mobile only works with Paradev accounts, workspaces, and hosts.",
 	"Permissions: Photos and camera are used only to attach images to chat messages. The microphone, and speech recognition if iOS asks for it, are used only to dictate a message, which is transcribed on the device. Each prompt appears the first time the feature is used and the app works without any of them.",
 	"",
-	"Questions: support@superset.sh, or call the contact above; we respond within the hour during US business hours.",
+	"Questions: support@paradev.com, or call the contact above; we respond within the hour during US business hours.",
 ]
 	.filter((line) => line !== null)
 	.join("\n");
@@ -67,15 +67,15 @@ module.exports = {
 					"llm",
 					"assistant",
 				],
-				marketingUrl: "https://superset.sh",
-				supportUrl: "https://superset.sh",
-				privacyPolicyUrl: "https://superset.sh/privacy",
+				marketingUrl: "https://paradev.com",
+				supportUrl: "https://paradev.com",
+				privacyPolicyUrl: "https://paradev.com/privacy",
 			},
 		},
 		review: {
 			firstName: "Satya",
 			lastName: "Patel",
-			email: "support@superset.sh",
+			email: "support@paradev.com",
 			phone: "+1 949 836 1199",
 			demoRequired: true,
 			demoUsername: process.env.APP_REVIEW_EMAIL ?? "",

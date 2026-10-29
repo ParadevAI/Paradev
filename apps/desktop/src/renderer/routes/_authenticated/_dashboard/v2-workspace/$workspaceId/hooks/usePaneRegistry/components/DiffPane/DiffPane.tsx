@@ -22,6 +22,7 @@ import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
 import {
 	createPaneScrollStateKey,
 	getPaneScrollState,
@@ -40,6 +41,7 @@ import {
 	getChangesetFileKey,
 	useChangeset,
 } from "../../../useChangeset";
+import { useLinkedPullRequest } from "../../../useLinkedPullRequest";
 import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
@@ -168,6 +170,10 @@ export function DiffPane({
 	const { viewedSet, setViewed } = useViewedFiles(workspaceId);
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const threadAnnotationsByPath = useDiffAnnotationsByPath({ workspaceId });
+	const { target: linkedPullRequest } = useLinkedPullRequest(workspaceId, {
+		enabled: false,
+	});
+	const threadActions = useReviewThreadActions(linkedPullRequest);
 	const workspaceQuery = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
@@ -820,13 +826,15 @@ export function DiffPane({
 
 			return (
 				<CommentThread
-					workspaceId={workspaceId}
-					threadId={m.threadId}
 					isResolved={m.isResolved}
 					isOutdated={m.isOutdated}
 					url={m.url}
 					comments={m.comments}
 					replyToCommentId={m.replyToCommentId}
+					onReply={threadActions.reply}
+					onSetResolved={(resolved) =>
+						threadActions.setResolved(m.threadId, resolved)
+					}
 					focusTick={
 						focused
 							? data.focusTick
@@ -852,6 +860,7 @@ export function DiffPane({
 			commentNav.navFocusTick,
 			t,
 			worktreePath,
+			threadActions,
 		],
 	);
 

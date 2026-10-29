@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import {
 	boolean,
@@ -61,13 +60,6 @@ export default command({
 				const next = bumpVersion(plugin.manifest.version, bump as "patch");
 				plugin.manifest.version = next;
 				writeJson(path.join(plugin.dir, "plugin.json"), plugin.manifest);
-
-				const pkgPath = path.join(plugin.dir, "package.json");
-				if (fs.existsSync(pkgPath)) {
-					const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-					pkg.version = next;
-					writeJson(pkgPath, pkg);
-				}
 			}
 		}
 
@@ -87,7 +79,7 @@ export default command({
 				files: r.files,
 				tag: r.tag,
 			})),
-			message: `Published ${results.map((r) => `${r.name}@${r.version}`).join(", ")}. Commit, then tag: ${results.map((r) => `git tag ${r.tag}`).join(" && ")}`,
+			message: `Published ${results.map((r) => `${r.name}@${r.version}`).join(", ")}. Commit and merge to main; CI tags ${results.map((r) => r.tag).join(", ")}.`,
 		};
 	},
 });

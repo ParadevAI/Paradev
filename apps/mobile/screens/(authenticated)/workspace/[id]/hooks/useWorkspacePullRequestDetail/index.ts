@@ -1,4 +1,1 @@
-export {
-	getPullRequestDetailQueryKey,
-	useWorkspacePullRequestDetail,
-} from "./useWorkspacePullRequestDetail";
+export { useWorkspacePullRequestDetail } from "./useWorkspacePullRequestDetail";

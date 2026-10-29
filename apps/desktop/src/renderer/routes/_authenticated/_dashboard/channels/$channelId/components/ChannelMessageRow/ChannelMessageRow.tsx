@@ -38,6 +38,7 @@ import { DevMentionChip } from "../DevMentionChip";
 import { MentionChip } from "../MentionChip";
 import { PersonAvatar } from "../PersonAvatar";
 import { PersonHoverCard } from "../PersonHoverCard";
+import { MembershipText } from "./components/MembershipText";
 import { MessageActions } from "./components/MessageActions";
 import { MessageAttachments } from "./components/MessageAttachments";
 import { type MessageEdit, MessageEditor } from "./components/MessageEditor";
@@ -59,6 +60,8 @@ interface ChannelMessageRowProps {
 	message: ChannelMessage;
 	author: ChannelPerson | null;
 	compact: boolean;
+	/** For a join or leave: the run it leads, drawn as one sentence group. */
+	rollup?: ChannelMessage[] | null;
 	now: Date;
 	currentUserId: string | null;
 	canModerate: boolean;
@@ -74,6 +77,7 @@ export function ChannelMessageRow({
 	message,
 	author,
 	compact,
+	rollup,
 	now,
 	currentUserId,
 	canModerate,
@@ -147,7 +151,7 @@ export function ChannelMessageRow({
 		message,
 		onMarkUnread,
 		follow,
-		onEdit: isOwn ? () => setEditing(true) : undefined,
+		onEdit: isOwn && !message.subtype ? () => setEditing(true) : undefined,
 		onDelete:
 			isOwn || canModerate
 				? () => remove.mutate({ messageId: message.id })
@@ -261,6 +265,11 @@ export function ChannelMessageRow({
 	]);
 
 	const dev = useMessageDev(message.authorId);
+	const channel = channels?.find((entry) => entry.id === message.channelId);
+	const devNames = useMemo(
+		() => new Map((devs ?? []).map((entry) => [entry.id, entry.name])),
+		[devs],
+	);
 	const authorName = dev?.name ?? author?.name ?? t({ message: "Unknown" });
 	const time = formatDateTime(message.createdAt, { timeStyle: "short" });
 
@@ -359,6 +368,20 @@ export function ChannelMessageRow({
 						currentUserId={currentUserId}
 						onSave={saveEdit}
 						onCancel={() => setEditing(false)}
+					/>
+				) : message.subtype ? (
+					<MembershipText
+						messages={rollup ?? [message]}
+						channelId={message.channelId}
+						channelLabel={
+							channel?.visibility === "private"
+								? channel.name
+								: `#${channel?.name ?? ""}`
+						}
+						isDev={dev !== null}
+						peopleById={peopleById}
+						devNames={devNames}
+						currentUserId={currentUserId}
 					/>
 				) : (
 					<div className="text-[15px] leading-[1.4667] [&_p]:my-0.5">

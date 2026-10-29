@@ -49,22 +49,26 @@ export function useChatWiring(): ChatWiring {
 	}, [hostUrl, getWsToken]);
 }
 
+export function createChatSessionClient(
+	sessionId: string,
+	wiring: ChatWiring,
+): SessionClient {
+	return createSessionClient({
+		sessionId,
+		transport: wiring.transport,
+		streamBaseUrl: wiring.streamBaseUrl,
+		createSocket: wiring.createSocket,
+		nestedSubagents: true,
+	});
+}
+
 export function useSessionClient(sessionId: string | null): {
 	client: SessionClient | null;
 	wiring: ChatWiring;
 } {
 	const wiring = useChatWiring();
 	const client = useMemo(
-		() =>
-			sessionId
-				? createSessionClient({
-						sessionId,
-						transport: wiring.transport,
-						streamBaseUrl: wiring.streamBaseUrl,
-						createSocket: wiring.createSocket,
-						nestedSubagents: true,
-					})
-				: null,
+		() => (sessionId ? createChatSessionClient(sessionId, wiring) : null),
 		[sessionId, wiring],
 	);
 
