@@ -737,7 +737,7 @@ export function WorkspaceActivityMenu({
 						className={cn(
 							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
 							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							open
+							floating
 								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
 								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
 						)}
