@@ -895,9 +895,6 @@ msgstr "{days}d"
 msgid "{days}d {hours}h"
 msgstr "{days}d {hours}h"
 
-msgid "{days}d ago"
-msgstr "{days}d ago"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {# day left} other {# days left}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours}h"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}h {minutes}m"
 
-msgid "{hours}h ago"
-msgstr "{hours}h ago"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes}m"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}m {rest}s"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}m ago"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ to create"
 
@@ -1036,9 +1027,6 @@ msgstr "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearl
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-
-msgid "{months}mo ago"
-msgstr "{months}mo ago"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} of your automations failed their last run"
@@ -1221,9 +1209,6 @@ msgstr "{remaining} tokens left"
 msgid "{seconds}s"
 msgstr "{seconds}s"
 
-msgid "{seconds}s ago"
-msgstr "{seconds}s ago"
-
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} selected"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: teardown failed"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per user, billed yearly"
-
-msgid "{years}y ago"
-msgstr "{years}y ago"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"

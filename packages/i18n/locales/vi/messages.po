@@ -895,9 +895,6 @@ msgstr "{days} ngày"
 msgid "{days}d {hours}h"
 msgstr "{days} ngày {hours} giờ"
 
-msgid "{days}d ago"
-msgstr "{days} ngày trước"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {Còn # ngày}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours} giờ"
 msgid "{hours}h {minutes}m"
 msgstr "{hours} giờ {minutes} phút"
 
-msgid "{hours}h ago"
-msgstr "{hours} giờ trước"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Đã nhập # worktree thành workspace} other {Đã nhập # worktree thành workspace}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes} phút"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} phút {rest} giây"
 
-msgid "{minutes}m ago"
-msgstr "{minutes} phút trước"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ để tạo"
 
@@ -1036,9 +1027,6 @@ msgstr "{monthlyPrice} mỗi người dùng/tháng khi thanh toán theo tháng, 
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hóa, hỗ trợ ưu tiên."
-
-msgid "{months}mo ago"
-msgstr "{months} tháng trước"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
@@ -1221,9 +1209,6 @@ msgstr "Còn {remaining} token"
 msgid "{seconds}s"
 msgstr "{seconds} giây"
 
-msgid "{seconds}s ago"
-msgstr "{seconds} giây trước"
-
 msgid "{selectedCount} selected"
 msgstr "Đã chọn {selectedCount}"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: teardown thất bại"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} mỗi người, thanh toán theo năm"
-
-msgid "{years}y ago"
-msgstr "{years} năm trước"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"

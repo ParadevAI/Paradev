@@ -895,9 +895,6 @@ msgstr "{days} дн."
 msgid "{days}d {hours}h"
 msgstr "{days} д. {hours} ч."
 
-msgid "{days}d ago"
-msgstr "{days} дн. назад"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {Остался # день} few {Осталось # дня} many {Осталось # дней} other {Осталось # дня}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours} ч."
 msgid "{hours}h {minutes}m"
 msgstr "{hours} ч. {minutes} мин."
 
-msgid "{hours}h ago"
-msgstr "{hours} ч. назад"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree импортирован как рабочая область} few {# worktree импортированы как рабочие области} many {# worktree импортированы как рабочие области} other {# worktree импортированы как рабочие области}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes} мин."
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} мин {rest} с"
 
-msgid "{minutes}m ago"
-msgstr "{minutes} мин. назад"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ — создать"
 
@@ -1036,9 +1027,6 @@ msgstr "{monthlyPrice} за пользователя в месяц при пом
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} за пользователя в месяц. Мобильное приложение, автоматизации, приоритетная поддержка."
-
-msgid "{months}mo ago"
-msgstr "{months} мес. назад"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваши автоматизации с ошибкой при последнем запуске: {myFailedCount}"
@@ -1221,9 +1209,6 @@ msgstr "Осталось токенов: {remaining}"
 msgid "{seconds}s"
 msgstr "{seconds} с"
 
-msgid "{seconds}s ago"
-msgstr "{seconds} с назад"
-
 msgid "{selectedCount} selected"
 msgstr "Выбрано: {selectedCount}"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: не удалось выполнить очистку"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за пользователя при годовой оплате"
-
-msgid "{years}y ago"
-msgstr "{years} г. назад"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"

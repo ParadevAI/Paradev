@@ -895,9 +895,6 @@ msgstr "{days} dni"
 msgid "{days}d {hours}h"
 msgstr "{days} d {hours} godz."
 
-msgid "{days}d ago"
-msgstr "{days} dni temu"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {Został # dzień} few {Zostały # dni} many {Zostało # dni} other {Zostało # dnia}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours} godz."
 msgid "{hours}h {minutes}m"
 msgstr "{hours} godz. {minutes} min"
 
-msgid "{hours}h ago"
-msgstr "{hours} godz. temu"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Zaimportowano # worktree jako obszar roboczy} few {Zaimportowano # worktree jako obszary robocze} many {Zaimportowano # worktree jako obszary robocze} other {Zaimportowano # worktree jako obszary robocze}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes} min"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
 
-msgid "{minutes}m ago"
-msgstr "{minutes} min temu"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵ aby utworzyć"
 
@@ -1036,9 +1027,6 @@ msgstr "{monthlyPrice} za użytkownika/mies. przy rozliczeniu miesięcznym lub {
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, priorytetowe wsparcie."
-
-msgid "{months}mo ago"
-msgstr "{months} mies. temu"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
@@ -1221,9 +1209,6 @@ msgstr "Pozostałe tokeny: {remaining}"
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
-msgid "{seconds}s ago"
-msgstr "{seconds} s temu"
-
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} zaznaczonych"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: sprzątanie nie powiodło się"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} za użytkownika, rozliczenie roczne"
-
-msgid "{years}y ago"
-msgstr "{years} lat temu"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"

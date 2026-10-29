@@ -1,6 +1,6 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
+import { useFormat } from "@superset/i18n/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { Button } from "@superset/ui/button";
 import {
@@ -22,7 +22,6 @@ import {
 import { CommentMarkdown } from "renderer/components/CommentMarkdown";
 import { ReviewThreadReplyComposer } from "renderer/routes/_authenticated/_dashboard/components/ReviewThreadReplyComposer";
 import "./comment-thread.css";
-import { msg } from "@lingui/core/macro";
 
 interface Comment {
 	id: string;
@@ -250,6 +249,7 @@ export function CommentThread({
 }
 
 function CommentRow({ comment }: { comment: Comment }) {
+	const { formatCompactRelativeTime } = useFormat();
 	return (
 		<li className="flex gap-2 px-2.5 py-2">
 			<Avatar className="mt-0.5 size-5 shrink-0">
@@ -270,7 +270,7 @@ function CommentRow({ comment }: { comment: Comment }) {
 							className="text-muted-foreground"
 							dateTime={new Date(comment.createdAt).toISOString()}
 						>
-							{formatRelative(comment.createdAt)}
+							{formatCompactRelativeTime(comment.createdAt)}
 						</time>
 					)}
 				</div>
@@ -280,57 +280,4 @@ function CommentRow({ comment }: { comment: Comment }) {
 			</div>
 		</li>
 	);
-}
-
-function formatRelative(ms: number): string {
-	// Floor (not round) so a 30-minute comment doesn't read "1h ago".
-	// Clamp >=0 so future-dated timestamps from clock skew aren't negative.
-	const delta = Math.max(0, Date.now() - ms);
-	const seconds = Math.floor(delta / 1000);
-	if (seconds < 60)
-		return i18n._({
-			...msg({
-				message: "{seconds}s ago",
-			}),
-			values: { seconds },
-		});
-	const minutes = Math.floor(seconds / 60);
-	if (minutes < 60)
-		return i18n._({
-			...msg({
-				message: "{minutes}m ago",
-			}),
-			values: { minutes },
-		});
-	const hours = Math.floor(minutes / 60);
-	if (hours < 24)
-		return i18n._({
-			...msg({
-				message: "{hours}h ago",
-			}),
-			values: { hours },
-		});
-	const days = Math.floor(hours / 24);
-	if (days < 30)
-		return i18n._({
-			...msg({
-				message: "{days}d ago",
-			}),
-			values: { days },
-		});
-	const months = Math.floor(days / 30);
-	if (months < 12)
-		return i18n._({
-			...msg({
-				message: "{months}mo ago",
-			}),
-			values: { months },
-		});
-	const years = Math.floor(days / 365);
-	return i18n._({
-		...msg({
-			message: "{years}y ago",
-		}),
-		values: { years },
-	});
 }

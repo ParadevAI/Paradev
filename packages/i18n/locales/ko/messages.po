@@ -895,9 +895,6 @@ msgstr "{days}일"
 msgid "{days}d {hours}h"
 msgstr "{days}일 {hours}시간"
 
-msgid "{days}d ago"
-msgstr "{days}일 전"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, other {#일 남음}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours}시간"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}시간 {minutes}분"
 
-msgid "{hours}h ago"
-msgstr "{hours}시간 전"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {worktree #개를 워크스페이스로 가져왔습니다} other {worktree #개를 워크스페이스로 가져왔습니다}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes}분"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}분 {rest}초"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}분 전"
-
 msgid "{modKey}↵ to create"
 msgstr "{modKey}↵로 만들기"
 
@@ -1036,9 +1027,6 @@ msgstr "월간 결제 시 사용자당 월 {monthlyPrice}, 연간 결제 시 {ye
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "사용자당 월 {monthlyPrice}. 모바일, 자동화, 우선 지원."
-
-msgid "{months}mo ago"
-msgstr "{months}개월 전"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "내 자동화 {myFailedCount}개가 마지막 실행에 실패했습니다"
@@ -1221,9 +1209,6 @@ msgstr "{remaining} 토큰 남음"
 msgid "{seconds}s"
 msgstr "{seconds}초"
 
-msgid "{seconds}s ago"
-msgstr "{seconds}초 전"
-
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}개 선택됨"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: 정리에 실패했습니다"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "사용자당 {yearlyTotal}, 연간 결제"
-
-msgid "{years}y ago"
-msgstr "{years}년 전"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"

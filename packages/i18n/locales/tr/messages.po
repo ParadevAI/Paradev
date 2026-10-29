@@ -895,9 +895,6 @@ msgstr "{days}g"
 msgid "{days}d {hours}h"
 msgstr "{days}g {hours}sa"
 
-msgid "{days}d ago"
-msgstr "{days}g önce"
-
 msgid "{daysLeft, plural, one {# day left} other {# days left}}"
 msgstr "{daysLeft, plural, one {# gün kaldı} other {# gün kaldı}}"
 
@@ -980,9 +977,6 @@ msgstr "{hours}sa"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}sa {minutes}dk"
 
-msgid "{hours}h ago"
-msgstr "{hours}sa önce"
-
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree çalışma alanı olarak içe aktarıldı} other {# worktree çalışma alanı olarak içe aktarıldı}}"
 
@@ -1025,9 +1019,6 @@ msgstr "{minutes}dk"
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} dk {rest} sn"
 
-msgid "{minutes}m ago"
-msgstr "{minutes}dk önce"
-
 msgid "{modKey}↵ to create"
 msgstr "Oluşturmak için {modKey}↵"
 
@@ -1036,9 +1027,6 @@ msgstr "Aylık faturalandırmada kullanıcı başına aylık {monthlyPrice} veya
 
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, öncelikli destek."
-
-msgid "{months}mo ago"
-msgstr "{months}ay önce"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
@@ -1221,9 +1209,6 @@ msgstr "{remaining} token kaldı"
 msgid "{seconds}s"
 msgstr "{seconds} sn"
 
-msgid "{seconds}s ago"
-msgstr "{seconds}sn önce"
-
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} seçildi"
 
@@ -1351,9 +1336,6 @@ msgstr "{workspaceName}: kapatma başarısız"
 
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "Kullanıcı başına {yearlyTotal}, yıllık faturalandırılır"
-
-msgid "{years}y ago"
-msgstr "{years}y önce"
 
 #. placeholder {0}: connection.login
 msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
