@@ -19323,7 +19323,7 @@ msgid "Track tasks in"
 msgstr "Aufgabenverwaltung"
 
 msgid "Track your brand in AI search"
-msgstr "Ihre Marke in der KI-Suche verfolgen"
+msgstr "Marke in der KI-Suche verfolgen"
 
 msgid "Tracking"
 msgstr "Erfassung"
