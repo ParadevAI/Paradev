@@ -19,7 +19,7 @@
 		"@superset/trpc": "workspace:*",
 		"@vercel/sandbox": "3.2.2",
 		"aws4fetch": "1.0.20",
-		"drizzle-orm": "0.45.2",
+		"drizzle-orm": "0.45.4",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {

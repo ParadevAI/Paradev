@@ -33,7 +33,7 @@
 		"@superset/shared": "workspace:*",
 		"@t3-oss/env-core": "0.13.11",
 		"date-fns": "4.1.0",
-		"drizzle-orm": "0.45.2",
+		"drizzle-orm": "0.45.4",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
 		"resend": "6.18.0",

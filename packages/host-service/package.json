@@ -99,7 +99,7 @@
 		"@trpc/server": "11.16.0",
 		"@xterm/headless": "6.1.0-beta.313",
 		"better-sqlite3": "12.11.1",
-		"drizzle-orm": "0.45.2",
+		"drizzle-orm": "0.45.4",
 		"entities": "7.0.1",
 		"expo-device-hub": "0.18.0",
 		"hono": "4.13.7",

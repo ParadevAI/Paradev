@@ -33,7 +33,7 @@
 		"@superset/chat": "workspace:*",
 		"@trpc/server": "11.16.0",
 		"better-sqlite3": "12.11.1",
-		"drizzle-orm": "0.45.2",
+		"drizzle-orm": "0.45.4",
 		"zod": "4.6.5"
 	},
 	"devDependencies": {

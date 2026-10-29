@@ -26,7 +26,7 @@
 		"@superset/trpc": "workspace:*",
 		"@trpc/client": "11.16.0",
 		"date-fns": "4.1.0",
-		"drizzle-orm": "0.45.2",
+		"drizzle-orm": "0.45.4",
 		"ink": "7.0.1",
 		"mime-types": "3.0.2",
 		"react": "19.2.3",
