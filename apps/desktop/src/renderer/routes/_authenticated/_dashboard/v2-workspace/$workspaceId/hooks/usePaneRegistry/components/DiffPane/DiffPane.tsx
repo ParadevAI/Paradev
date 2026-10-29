@@ -217,6 +217,8 @@ export function DiffPane({
 	const [dirtyItemIds, setDirtyItemIds] = useState<ReadonlySet<string>>(
 		new Set(),
 	);
+	const editRevisionRef = useRef(new Map<string, number>());
+	const savedRevisionRef = useRef(new Map<string, number>());
 	const pendingEditorFocusRef = useRef<{
 		itemId: string;
 		lineNumber: number;
@@ -303,7 +305,8 @@ export function DiffPane({
 
 	const saveEditedItem = useCallback(
 		async (itemId: string): Promise<boolean> => {
-			if (!dirtyItemIds.has(itemId)) return true;
+			const revision = editRevisionRef.current.get(itemId) ?? 0;
+			if (revision === (savedRevisionRef.current.get(itemId) ?? 0)) return true;
 			const editedFile = codeViewRef.current?.getEditor(itemId)?.getFile();
 			const file = getFile(itemId);
 			const worktreePath = workspaceQuery.data?.worktreePath;
@@ -347,11 +350,16 @@ export function DiffPane({
 					);
 					return false;
 				}
-				setDirtyItemIds((current) => {
-					const next = new Set(current);
-					next.delete(itemId);
-					return next;
-				});
+				const saved = savedRevisionRef.current;
+				saved.set(itemId, Math.max(saved.get(itemId) ?? 0, revision));
+				// Edits typed while the write was in flight still need a save.
+				if (editRevisionRef.current.get(itemId) === revision) {
+					setDirtyItemIds((current) => {
+						const next = new Set(current);
+						next.delete(itemId);
+						return next;
+					});
+				}
 				void utils.git.getStatus.invalidate({ workspaceId });
 				void utils.git.getDiff.invalidate({ workspaceId });
 				return true;
@@ -368,7 +376,6 @@ export function DiffPane({
 			}
 		},
 		[
-			dirtyItemIds,
 			getFile,
 			workspaceQuery.data?.worktreePath,
 			writeFile,
@@ -379,6 +386,8 @@ export function DiffPane({
 	);
 
 	const exitEditing = useCallback((itemId: string) => {
+		editRevisionRef.current.delete(itemId);
+		savedRevisionRef.current.delete(itemId);
 		setDirtyItemIds((current) => {
 			const next = new Set(current);
 			next.delete(itemId);
@@ -710,6 +719,8 @@ export function DiffPane({
 			_event: EditorChangeEvent<EditorType, DiffAnnotationMetadata, undefined>,
 			item: CodeViewItem<DiffAnnotationMetadata>,
 		) => {
+			const revisions = editRevisionRef.current;
+			revisions.set(item.id, (revisions.get(item.id) ?? 0) + 1);
 			setDirtyItemIds((current) => new Set(current).add(item.id));
 		},
 		[],

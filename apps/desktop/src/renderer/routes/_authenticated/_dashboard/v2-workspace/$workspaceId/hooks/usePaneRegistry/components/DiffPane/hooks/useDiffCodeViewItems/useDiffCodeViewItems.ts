@@ -422,8 +422,19 @@ export function useDiffCodeViewItems({
 		return map;
 	}, [patchGroups, patchQueries, parsedGroups]);
 
+	// Pierre replaces an open edit session's document when its fileDiff
+	// changes, so a refetch mid-edit (the one a save triggers) would drop
+	// text typed while the write was in flight.
+	const editingDiffsRef = useRef(new Map<string, FileDiffMetadata>());
+
 	const items = useMemo<CodeViewItem<DiffAnnotationMetadata>[]>(() => {
 		const nextItems: CodeViewItem<DiffAnnotationMetadata>[] = [];
+		const editingDiffs = editingDiffsRef.current;
+		for (const itemId of editingDiffs.keys()) {
+			if (!files.some((file) => getDiffItemId(file) === itemId)) {
+				editingDiffs.delete(itemId);
+			}
+		}
 
 		for (const file of files) {
 			const itemId = getDiffItemId(file);
@@ -439,7 +450,13 @@ export function useDiffCodeViewItems({
 				continue;
 			}
 
-			const fileDiff = diffByItemId.get(itemId);
+			const latestDiff = diffByItemId.get(itemId);
+			const fileDiff =
+				editing && latestDiff
+					? (editingDiffs.get(itemId) ?? latestDiff)
+					: latestDiff;
+			if (editing && fileDiff) editingDiffs.set(itemId, fileDiff);
+			else editingDiffs.delete(itemId);
 			if (!fileDiff) {
 				const heldBack =
 					isGeneratedDiffFile(file.path) && !requestedItemIds.has(itemId);
