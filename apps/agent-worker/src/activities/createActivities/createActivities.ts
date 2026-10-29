@@ -53,6 +53,8 @@ export interface ActivityDeps {
 	) => SessionStore;
 	workspaceContext?: (credentials: TurnCredentials) => Promise<{ cwd: string }>;
 	roomPoster?: (credentials: TurnCredentials) => RoomPoster | null;
+	/** Repairs Devs that lost a message; the API does the work. */
+	reconcile?: () => Promise<unknown>;
 	now?: () => number;
 	flushEveryMs?: number;
 	heartbeatEveryMs?: number;
@@ -173,7 +175,18 @@ export function createActivities(deps: ActivityDeps) {
 		await poster.post({ body: reply, idempotencyKey: `${ref.turnId}:reply` });
 	};
 
-	return {
+	const noteRetry = async (turnId: string, error: unknown) => {
+		if (isPermanent(error) || error instanceof CancelledFailure) return;
+		await deps.settler
+			.noteRetry?.({
+				turnId,
+				attempt: activityInfo()?.attempt ?? 1,
+				error: error instanceof Error ? error.message : String(error),
+			})
+			.catch(() => {});
+	};
+
+	const activities = {
 		async beginTurn(
 			input: TurnRef & { promptId: string; text: string },
 		): Promise<void> {
@@ -442,6 +455,21 @@ export function createActivities(deps: ActivityDeps) {
 				},
 			});
 			return { steerPending: false };
+		},
+	};
+
+	return {
+		...activities,
+		async runTurn(input: Parameters<typeof activities.runTurn>[0]) {
+			try {
+				return await activities.runTurn(input);
+			} catch (error) {
+				await noteRetry(input.turnId, error);
+				throw error;
+			}
+		},
+		async reconcileDevs(): Promise<unknown> {
+			return deps.reconcile?.() ?? null;
 		},
 	};
 }

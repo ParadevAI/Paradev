@@ -11,12 +11,15 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { agentTemporal } from "../../lib/agent-runtime";
 import {
 	signTurnToken,
 	TURN_TOKEN_TTL_SECONDS,
 } from "../../lib/agent-turn/turn-token";
+import { posthog } from "../../lib/analytics";
 import { workerProcedure } from "../../trpc";
 import { announceAgentChanged } from "./agents-changed";
+import { reconcileDevs } from "./reconcile";
 import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
 
@@ -59,6 +62,45 @@ async function replyRoomOf(messageId: string) {
 
 /** Our worker: it may only pick up turns the API created, and only while they run. */
 export const agentWorkerRouter = {
+	/** Runs from the worker on a schedule; see `reconcileDevs`. */
+	reconcile: workerProcedure.mutation(async () =>
+		reconcileDevs(await agentTemporal()),
+	),
+
+	/** A turn attempt failed and Temporal will run it again. */
+	noteRetry: workerProcedure
+		.input(
+			turnIdSchema.extend({
+				attempt: z.number().int().positive(),
+				error: z.string().max(2000),
+			}),
+		)
+		.mutation(async ({ input }) => {
+			const [turn] = await db
+				.update(agentTurns)
+				.set({ attempts: input.attempt + 1, lastAttemptError: input.error })
+				.where(
+					and(
+						eq(agentTurns.id, input.turnId),
+						eq(agentTurns.status, "running"),
+					),
+				)
+				.returning({ agentId: agentTurns.agentId, reason: agentTurns.reason });
+			if (turn) {
+				posthog.capture({
+					distinctId: turn.agentId,
+					event: "dev_turn_retried",
+					properties: {
+						turnId: input.turnId,
+						attempt: input.attempt,
+						reason: turn.reason,
+						error: input.error.slice(0, 300),
+					},
+				});
+			}
+			return { recorded: Boolean(turn) };
+		}),
+
 	turnToken: workerProcedure.input(turnIdSchema).mutation(async ({ input }) => {
 		const [turn] = await db
 			.select({

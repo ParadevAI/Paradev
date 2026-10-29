@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const databaseUrl = process.env.AGENT_ACCESS_TEST_DATABASE_URL;
 const suite = databaseUrl ? describe : describe.skip;
@@ -605,5 +605,93 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		await sendTo(admin, dm.channelId, "anyone there?");
 		expect(await turnsOf(agent.id)).toEqual([]);
+	});
+	/** A Temporal client whose session workflows all look like `description`. */
+	function fakeTemporal(description: { status: string; failedTasks?: number }) {
+		const terminated: string[] = [];
+		const client = {
+			workflow: {
+				getHandle: (workflowId: string) => ({
+					describe: async () => ({
+						status: { name: description.status },
+						raw: {
+							pendingWorkflowTask: description.failedTasks
+								? { attempt: description.failedTasks }
+								: null,
+						},
+					}),
+					query: async () => ({ turnId: null, pendingTurns: 0 }),
+					terminate: async () => {
+						terminated.push(workflowId);
+					},
+				}),
+			},
+		};
+		return { terminated, client: client as never };
+	}
+
+	const minutesAgo = (minutes: number) =>
+		new Date(Date.now() - minutes * 60_000);
+
+	test("the reconciler delivers a DM that never became a turn, once", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const [room] = await db
+			.update(schema.channels)
+			.set({ lastSeq: sql`${schema.channels.lastSeq} + 1` })
+			.where(eq(schema.channels.id, dm.channelId))
+			.returning({ seq: schema.channels.lastSeq });
+		const [dropped] = await db
+			.insert(schema.channelMessages)
+			.values({
+				channelId: dm.channelId,
+				seq: room?.seq ?? 0,
+				authorId: admin,
+				body: "did you get this?",
+				createdAt: minutesAgo(5),
+			})
+			.returning({ id: schema.channelMessages.id });
+		const { reconcileDevs } = await import("./reconcile");
+		const reached = async () =>
+			(await turnsOf(agent.id)).filter(
+				(turn) =>
+					turn.promptId === dropped?.id ||
+					turn.steerPromptIds.includes(dropped?.id ?? ""),
+			).length;
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client);
+		expect(await reached()).toBe(1);
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client);
+		expect(await reached()).toBe(1);
+	});
+
+	test("the reconciler settles a turn its workflow lost and sends its message again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client);
+		const turns = await turnsOf(agent.id);
+		expect(turns.find((row) => row.id === turn.id)).toMatchObject({
+			status: "failed",
+			errorCode: "lost",
+		});
+		expect(
+			turns.some((row) => row.promptId === `again:${turn.triggerMessageId}`),
+		).toBe(true);
+	});
+
+	test("the reconciler terminates a session workflow whose workflow task keeps failing", async () => {
+		const { turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		const temporal = fakeTemporal({ status: "RUNNING", failedTasks: 5 });
+		await reconcileDevs(temporal.client);
+		expect(temporal.terminated).toContain(`session/${turn.sessionId}`);
+		const [row] = await turnsOf(turn.agentId);
+		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });
 	});
 });

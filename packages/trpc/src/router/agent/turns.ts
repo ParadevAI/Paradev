@@ -416,6 +416,48 @@ async function deliverToMains({
 	}
 }
 
+/**
+ * Sends a channel message to a Dev's main session again, under a new prompt
+ * id, for a turn that was lost before it answered.
+ */
+export async function redeliverMessage({
+	agent,
+	messageId,
+	promptId,
+	reason,
+}: {
+	agent: SelectAgent;
+	messageId: string;
+	promptId: string;
+	reason: TurnReason;
+}): Promise<boolean> {
+	const [row] = await db
+		.select({ message: channelMessages, channel: channels, author: users.name })
+		.from(channelMessages)
+		.innerJoin(channels, eq(channels.id, channelMessages.channelId))
+		.leftJoin(users, eq(users.id, channelMessages.authorId))
+		.where(
+			and(eq(channelMessages.id, messageId), isNull(channelMessages.deletedAt)),
+		)
+		.limit(1);
+	if (!row) return false;
+	await submitPrompt({
+		agent,
+		sessionId: await ensureMainSession(agent),
+		actingUserId: row.author ? row.message.authorId : null,
+		promptId,
+		text: messageEvent({
+			channel: row.channel,
+			roomName: row.channel.name,
+			authorName: row.author ?? undefined,
+			message: row.message,
+		}),
+		reason,
+		triggerMessageId: messageId,
+	});
+	return true;
+}
+
 /** Devs that follow a thread, have written in it, or were mentioned in it. */
 async function devsInThread(
 	threadRootId: string,

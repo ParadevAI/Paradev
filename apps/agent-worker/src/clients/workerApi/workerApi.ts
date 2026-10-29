@@ -48,6 +48,7 @@ export function workerApi(options: WorkerApiOptions): {
 	credentials: CredentialsProvider;
 	settler: TurnSettler;
 	roomPoster: (credentials: TurnCredentials) => RoomPoster | null;
+	reconcile: () => Promise<unknown>;
 } {
 	const call = <T>(procedure: string, input: unknown) =>
 		trpcMutation<T>(
@@ -111,7 +112,14 @@ export function workerApi(options: WorkerApiOptions): {
 							).then((message) => ({ messageId: message.id })),
 					}
 				: null,
+		reconcile: () => call("reconcile", undefined),
 		settler: {
+			async noteRetry(input) {
+				await call("noteRetry", {
+					...input,
+					error: input.error.slice(0, 2000),
+				});
+			},
 			async settle(input: SettleTurnInput) {
 				try {
 					const { sessionStore } = await call<{

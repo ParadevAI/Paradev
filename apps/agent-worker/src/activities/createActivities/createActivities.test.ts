@@ -100,12 +100,16 @@ function setup(
 ) {
 	const memory = memoryStore();
 	const settled: SettleTurnInput[] = [];
+	const retries: Array<{ turnId: string; attempt: number; error: string }> = [];
 	const posted: Array<{ body: string; idempotencyKey: string }> = [];
 	const activities = createActivities({
 		credentials: {
 			forTurn: async () => options.credentials ?? withBox,
 		},
 		settler: {
+			async noteRetry(input) {
+				retries.push(input);
+			},
 			async settle(input) {
 				settled.push(input);
 				return {
@@ -134,7 +138,7 @@ function setup(
 		settleIdleMs: 30,
 		heartbeatEveryMs: 1_000,
 	});
-	return { activities, memory, settled, posted };
+	return { activities, memory, settled, posted, retries };
 }
 
 const turn = { sessionId: "s1", turnId: "t1" };
@@ -339,7 +343,7 @@ describe("runTurn", () => {
 		expect(pdevLog().some((e) => e.method === "session/cancel")).toBe(false);
 	});
 	test("a provider error fails the attempt for a retry; a bad request fails the turn", async () => {
-		const { activities } = setup();
+		const { activities, retries } = setup();
 		const attempt = async (text: string) => {
 			await activities.beginTurn({ ...turn, promptId: text, text });
 			const error = await new MockActivityEnvironment()
@@ -357,6 +361,9 @@ describe("runTurn", () => {
 		expect(outage.message).toBe("529 overloaded");
 		const bad = await attempt("model error: 400 invalid_request_error");
 		expect(bad.nonRetryable).toBe(true);
+		expect(retries).toEqual([
+			{ turnId: "t1", attempt: 1, error: "529 overloaded" },
+		]);
 	});
 	test("a main session gets the Dev's prompt and its tools, and no machine", async () => {
 		const { activities } = setup({

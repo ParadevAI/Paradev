@@ -45,6 +45,9 @@ function fakeActivities(
 	let settlePending = script.settleSteerPendingTimes ?? 0;
 	let modelErrors = script.modelErrors ?? 0;
 	const activities: AgentActivities = {
+		async reconcileDevs() {
+			return null;
+		},
 		async beginTurn(input) {
 			calls.push({ name: "beginTurn", input: { ...input } });
 		},

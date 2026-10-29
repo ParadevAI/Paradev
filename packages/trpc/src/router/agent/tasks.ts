@@ -4,6 +4,7 @@ import {
 	agentSessions,
 	agents,
 	agentTurns,
+	cloudWorkspaces,
 	environments,
 	type SelectAgentSession,
 } from "@superset/db/schema";
@@ -14,6 +15,8 @@ import { eventText, submitPrompt } from "./turns";
 
 /** Tasks a Dev runs at once; more wait in its queue. */
 export const MAX_RUNNING_TASKS = 3;
+const LAUNCH_ATTEMPTS = 2;
+const LAUNCH_RETRY_MS = 2_000;
 
 const PULL_REQUEST_URL = /https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d+/;
 
@@ -197,7 +200,7 @@ export async function fillSlots(
 			.returning();
 		if (!next) return { started, failed };
 		try {
-			await launchTask(next);
+			await launchWithRetry(next.id);
 			started.push(next.id);
 		} catch (error) {
 			const result = `Could not start: ${error instanceof Error ? error.message : String(error)}`;
@@ -209,6 +212,43 @@ export async function fillSlots(
 			if (next.id !== caller) await reportToParent(next.id, null);
 		}
 	}
+}
+
+async function launchWithRetry(taskId: string) {
+	for (let attempt = 1; ; attempt++) {
+		try {
+			return await launchTask(await withUsableBox(taskId));
+		} catch (error) {
+			if (attempt >= LAUNCH_ATTEMPTS) throw error;
+			await new Promise((resolve) => setTimeout(resolve, LAUNCH_RETRY_MS));
+		}
+	}
+}
+
+/** The task, without a box that failed or was deleted, so a retry makes a new one. */
+async function withUsableBox(taskId: string): Promise<SelectAgentSession> {
+	const [row] = await db
+		.select({ task: agentSessions, boxStatus: cloudWorkspaces.status })
+		.from(agentSessions)
+		.leftJoin(
+			cloudWorkspaces,
+			eq(cloudWorkspaces.id, agentSessions.cloudWorkspaceId),
+		)
+		.where(eq(agentSessions.id, taskId))
+		.limit(1);
+	if (!row) throw new Error("task is gone");
+	if (
+		row.task.cloudWorkspaceId &&
+		(row.boxStatus === "failed" || row.boxStatus === "deleted")
+	) {
+		const [cleared] = await db
+			.update(agentSessions)
+			.set({ cloudWorkspaceId: null })
+			.where(eq(agentSessions.id, taskId))
+			.returning();
+		if (cleared) return cleared;
+	}
+	return row.task;
 }
 
 async function launchTask(task: SelectAgentSession) {

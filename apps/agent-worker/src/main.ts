@@ -7,7 +7,12 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { AGENT_TASK_QUEUE } from "@superset/agent-harness/session";
 import { turnSteersQuery } from "@superset/agent-harness/session/definitions";
-import { Client, Connection } from "@temporalio/client";
+import {
+	Client,
+	Connection,
+	ScheduleAlreadyRunning,
+	ScheduleOverlapPolicy,
+} from "@temporalio/client";
 import { NativeConnection, Worker } from "@temporalio/worker";
 import { createActivities } from "./activities/createActivities";
 import { workerApi } from "./clients/workerApi";
@@ -66,6 +71,7 @@ const worker = await Worker.create({
 		credentials: api.credentials,
 		settler: api.settler,
 		roomPoster: api.roomPoster,
+		reconcile: api.reconcile,
 		pdev: {
 			command: pdevBin,
 			workRoot: process.env.AGENT_WORK_ROOT ?? join(tmpdir(), "agent-sessions"),
@@ -77,6 +83,8 @@ const worker = await Worker.create({
 	// The container host waits 15 minutes after SIGTERM; a turn still running after this resumes elsewhere.
 	shutdownGraceTime: "5 minutes",
 });
+
+await ensureReconcileSchedule(client);
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
 	process.once(signal, () => worker.shutdown());
@@ -138,4 +146,23 @@ function compareVersions(version: string, min: number[]): number {
 		if (diff !== 0) return diff;
 	}
 	return 0;
+}
+
+/** Every worker makes sure the schedule exists; the first one creates it. */
+async function ensureReconcileSchedule(client: Client) {
+	await client.schedule
+		.create({
+			scheduleId: "devs-reconcile",
+			spec: { intervals: [{ every: "1 minute" }] },
+			action: {
+				type: "startWorkflow",
+				workflowType: "devsReconcile",
+				taskQueue: AGENT_TASK_QUEUE,
+				args: [],
+			},
+			policies: { overlap: ScheduleOverlapPolicy.SKIP },
+		})
+		.catch((error: unknown) => {
+			if (!(error instanceof ScheduleAlreadyRunning)) throw error;
+		});
 }
