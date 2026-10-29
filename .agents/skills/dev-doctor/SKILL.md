@@ -42,6 +42,11 @@ The prompt says which mode: **incidents** (hourly) or **architecture** (daily). 
 Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-32416990`,
 `database_name` `neondb`. **SELECT only.** Never write to production.
 
+First check that Devs are deployed:
+`select (select count(*) from information_schema.columns where table_name = 'agent_turns' and column_name = 'attempts') as has_attempts, enum_range(null::agent_session_kind)::text as kinds, (select count(*) from agent_turns where started_at > now() - interval '1 day') as turns`.
+If `has_attempts` is 0 or `kinds` has no `main`, the Devs schema is not in production yet: skip the
+queries below, still run the PostHog and Sentry checks, and write "not deployed" in the run log.
+
 - Failed turns by cause:
   `select error_code, count(*), max(started_at) from agent_turns where status = 'failed' and started_at > now() - interval '1 day' group by 1 order by 2 desc`
 - Turns that retried:
@@ -59,7 +64,7 @@ Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-3241699
 PostHog (`exec`): count `dev_reconciler_fixed` by `fix`, and `dev_turn_retried` by `reason`, over
 the last 7 days.
 
-Sentry: `search_issues` in organization `superset-sh` for `agent-worker`, `agentWorker`, `devTools`
+Sentry: `search_issues` in organization `paradev` (region `https://us.sentry.io`) for `agent-worker`, `agentWorker`, `devTools`
 and `reconcile`, unresolved, last 7 days.
 
 ### 2. Group by cause
