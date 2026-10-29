@@ -7,7 +7,6 @@ const ROWS = [
 	{ name: "Notes", icon: "/app-icons/macos/notes.png" },
 	{ name: "Paradev", icon: "/app-icons/paradev.png", selected: true },
 	{ name: "Safari", icon: "/app-icons/macos/safari.png" },
-	{ name: "Terminal", icon: "/app-icons/terminal.png" },
 ];
 
 export function ApplicationsArt() {

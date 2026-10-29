@@ -11,6 +11,7 @@ import {
 } from "@/app/[lang]/hooks/useOS";
 import { track } from "@/lib/analytics";
 import { desktopUrlFor, shouldAutoDownload } from "../../utils/desktopUrlFor";
+import { DesktopDownloadButton } from "../DesktopDownloadButton";
 import { DockShowcase } from "../DockShowcase";
 import { DownloadFallback } from "../DownloadFallback";
 import { DownloadLinkForm } from "../DownloadLinkForm";
@@ -45,6 +46,9 @@ export function DownloadInterstitial() {
 	const showEmailLink = platform === Platform.Mobile;
 	const canAutoDownload = !showEmailLink && shouldAutoDownload(platform);
 	const showWaitlist = platform === Platform.Windows;
+	// An undetected platform gets the macOS build, so the macOS steps apply
+	const showInstallSteps =
+		isMacPlatform(platform) || platform === Platform.Unknown;
 
 	useEffect(() => {
 		if (firedRef.current) return;
@@ -112,19 +116,23 @@ export function DownloadInterstitial() {
 							<h1 className={HEADING_CLASS}>
 								<Trans>You're about to get Paradev</Trans>
 							</h1>
-							<p className="mt-3 text-muted-foreground sm:text-lg">
-								<Trans>Your download starts automatically.</Trans>
-							</p>
+							{canAutoDownload ? (
+								<p className="mt-3 text-muted-foreground sm:text-lg">
+									<Trans>Your download starts automatically.</Trans>
+								</p>
+							) : (
+								<div className="mt-6">
+									<DesktopDownloadButton />
+								</div>
+							)}
 						</div>
 					)}
 				</div>
 			</section>
-			{canAutoDownload ? (
+			{showInstallSteps || canAutoDownload ? (
 				<div className="space-y-10 pb-8">
-					{isMacPlatform(platform) || platform === Platform.Unknown ? (
-						<InstallSteps />
-					) : null}
-					<DownloadFallback />
+					{showInstallSteps ? <InstallSteps /> : null}
+					{canAutoDownload ? <DownloadFallback /> : null}
 				</div>
 			) : null}
 		</>
