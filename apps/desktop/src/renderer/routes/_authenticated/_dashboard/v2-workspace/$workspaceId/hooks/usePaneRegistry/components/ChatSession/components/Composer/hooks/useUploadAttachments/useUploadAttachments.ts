@@ -16,7 +16,11 @@ export function useUploadAttachments(workspaceId: string) {
 			try {
 				const paths = await sendAttachments(files);
 				return paths.map((path, index) =>
-					formatAttachmentTag({ path, type: files[index]?.type ?? "" }),
+					formatAttachmentTag({
+						path,
+						type: files[index]?.type ?? "",
+						name: files[index]?.name,
+					}),
 				);
 			} catch (error) {
 				toast.error(t({ message: "Couldn't attach files" }), {

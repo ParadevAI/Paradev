@@ -7,7 +7,10 @@ import type {
 	UserMessage,
 } from "@superset/chat/protocol";
 import { isImageAttachment } from "@superset/chat/protocol";
-import { parseAttachmentTags } from "../../../../utils/attachmentTags";
+import {
+	attachmentDisplayName,
+	parseAttachmentTags,
+} from "../../../../utils/attachmentTags";
 import type { TranscriptRow } from "../transcriptRows";
 
 export type GalleryImage = {
@@ -19,7 +22,12 @@ export type GalleryImage = {
 	alt?: string | undefined;
 };
 
-type ItemImage = { path: string; mimeType: string; alt?: string | undefined };
+type ItemImage = {
+	path: string;
+	mimeType: string;
+	alt?: string | undefined;
+	name?: string | undefined;
+};
 
 /** `owner` is the transcript key of the item that shows the image. */
 export function galleryImageId(owner: string, path: string): string {
@@ -32,6 +40,7 @@ function userImages(content: readonly UserContent[]): ItemImage[] {
 		.map((attachment) => ({
 			path: attachment.path,
 			mimeType: attachment.type,
+			name: attachmentDisplayName(attachment),
 		}));
 }
 
@@ -92,7 +101,7 @@ export function galleryImages(rows: readonly TranscriptRow[]): GalleryImage[] {
 					id: galleryImageId(owner, image.path),
 					path: image.path,
 					mimeType: image.mimeType,
-					filename: image.path.split("/").pop() ?? image.path,
+					filename: image.name ?? image.path.split("/").pop() ?? image.path,
 					alt: image.alt,
 				});
 			}

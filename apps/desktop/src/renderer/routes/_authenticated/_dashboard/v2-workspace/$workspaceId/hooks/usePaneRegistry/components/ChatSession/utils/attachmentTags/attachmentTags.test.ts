@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import { appendPastedText } from "@superset/chat/core";
-import { formatAttachmentTag, parseAttachmentTags } from "./attachmentTags";
+import {
+	attachmentDisplayName,
+	formatAttachmentTag,
+	parseAttachmentTags,
+} from "./attachmentTags";
 
 describe("attachmentTags", () => {
 	it("round-trips tags appended to a message and strips them from the text", () => {
@@ -55,5 +59,30 @@ describe("attachmentTags", () => {
 			],
 			pastedTexts: [paste],
 		});
+	});
+
+	it("keeps the attached name, escaped, and falls back to the file on disk without one", () => {
+		const message = [
+			formatAttachmentTag({
+				path: ".superset/attachments/Superset-arm64__21_.dmg",
+				type: "application/x-apple-diskimage",
+				name: 'Superset-arm64 (21) "final" <v2>.dmg',
+			}),
+			formatAttachmentTag({
+				path: ".superset/attachments/notes.txt",
+				type: "text/plain",
+				name: "notes.txt",
+			}),
+		].join("\n");
+
+		expect(message).toContain(
+			'name="Superset-arm64 (21) &quot;final&quot; &lt;v2&gt;.dmg"',
+		);
+		expect(message).not.toContain('name="notes.txt"');
+		const { attachments } = parseAttachmentTags(message);
+		expect(attachments.map(attachmentDisplayName)).toEqual([
+			'Superset-arm64 (21) "final" <v2>.dmg',
+			"notes.txt",
+		]);
 	});
 });
