@@ -28,15 +28,17 @@ const MIDDLE_TRUNCATE_ZOOM_CSS = `
  * with no `+/−` summary). That empty lane grows to fill the row and starves the
  * name column, so Pierre's truncation grid middle-truncates names that easily
  * fit (`CLAUDE.md` → `CLAUD…d`). Let the name column take the free space and the
- * decoration hug its own content instead. Pierre wraps this in `@layer unsafe`,
- * which overrides its `@layer base` by cascade order — no `!important` needed.
+ * decoration hug its own content instead, never shrinking: a squeezed `+19`
+ * clips to read as `−19`. Pierre wraps this in `@layer unsafe`, which overrides
+ * its `@layer base` by cascade order — no `!important` needed.
  */
 export const PIERRE_TREE_UNSAFE_CSS = `
 	[data-item-section="content"] {
 		flex: 1 1 auto;
 	}
 	[data-item-section="decoration"] {
-		flex: 0 1 auto;
+		flex: 0 0 auto;
+		white-space: nowrap;
 	}
 	${MIDDLE_TRUNCATE_ZOOM_CSS}
 `;
