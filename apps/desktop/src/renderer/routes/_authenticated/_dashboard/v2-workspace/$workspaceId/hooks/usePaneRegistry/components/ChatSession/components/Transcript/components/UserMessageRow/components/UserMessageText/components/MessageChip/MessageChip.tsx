@@ -1,10 +1,9 @@
 import { Chip } from "@superset/chat-ui/Chip";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
+import { chipLink } from "../../../../../../../../utils/linkChip";
 import { LinkHoverCard } from "../../../../../../../LinkHoverCard";
 import { LinkMenu } from "../../../../../../../LinkMenu";
-
-const WEB_URL = /^https?:\/\//i;
 
 export function MessageChip({
 	chip,
@@ -14,8 +13,7 @@ export function MessageChip({
 	link?: string | undefined;
 }) {
 	const { openLink } = useChatPaneActions();
-	const href =
-		link ?? (WEB_URL.test(chip.serialized) ? chip.serialized : undefined);
+	const href = link ?? chipLink(chip);
 	if (!href) return <Chip chip={chip} />;
 	return (
 		<LinkHoverCard link={href}>

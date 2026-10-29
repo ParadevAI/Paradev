@@ -10,6 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { act, cleanup, render } from "@testing-library/react";
 import type { TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
+import { linkedPrChip } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { ChatPaneActionsProvider } from "../../../../providers/ChatPaneActionsProvider";
 import { useLinkChips } from "./useLinkChips";
 
@@ -115,7 +116,19 @@ async function setup() {
 		});
 		await paste(value);
 	};
-	return { paste, pasteAsText, chips, text, type, chipHasPopup };
+	const chipHasHoverCard = () =>
+		view.container
+			.querySelector("[data-mention-chip]")
+			?.closest("[data-slot=hover-card-trigger]") != null;
+	return {
+		paste,
+		pasteAsText,
+		chips,
+		text,
+		type,
+		chipHasPopup,
+		chipHasHoverCard,
+	};
 }
 
 test("a pasted link becomes a named chip; other text stays text", async () => {
@@ -149,4 +162,25 @@ test("Ctrl+Shift+V pastes a link as text, and the next paste is a chip again", a
 	expect(text()).toContain("https://github.com/acme/widgets/pull/42");
 	await paste("https://github.com/acme/widgets/pull/43");
 	expect(chips()).toEqual(["acme/widgets#43"]);
+});
+
+test("a pull request picked from the @ menu gets the hover card it has once sent", async () => {
+	const { chipHasHoverCard } = await setup();
+	await act(async () => {
+		handle.current?.restoreDraft({
+			segments: [
+				{
+					type: "chip",
+					chip: linkedPrChip({
+						prNumber: 42,
+						title: "Fix login",
+						url: "https://github.com/acme/widgets/pull/42",
+						state: "open",
+					}),
+				},
+			],
+			attachments: [],
+		});
+	});
+	expect(chipHasHoverCard()).toBe(true);
 });
