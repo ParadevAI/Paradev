@@ -44,7 +44,7 @@ export function isTestRunnerContext(
 }
 
 /**
- * Tests must never resolve the REAL daemon namespace (`~/.superset`
+ * Tests must never resolve the REAL daemon namespace (`~/.paradev`
  * manifests, org-keyed sockets): a test that reads a real manifest or
  * dials a real socket can adopt, reap, or kill daemons and shells that
  * belong to running desktop instances — this has killed live dev stacks
@@ -58,7 +58,7 @@ export function assertIsolatedDaemonNamespaceInTests(
 	if (!isTestRunnerContext(env)) return;
 	if (isDefaultAppHomeDir(env.SUPERSET_HOME_DIR)) {
 		throw new Error(
-			"refusing to touch the default ~/.superset daemon namespace from a " +
+			"refusing to touch the default app home daemon namespace from a " +
 				"test: set SUPERSET_HOME_DIR to an isolated temp dir (and " +
 				"SUPERSET_PTY_DAEMON_SOCKET to a temp socket) before using the " +
 				"daemon layer.",

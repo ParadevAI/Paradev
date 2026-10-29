@@ -24,7 +24,7 @@ import { resolveAppHomeDir } from "./paths";
  * fingerprint (unlike hooks, recognized by their notify-script path):
  *
  * - Claude's `mcpServers` is a name→object map inside a user-owned file, so a
- *   sidecar ledger (`~/.superset/plugins/mcp-ledger.json`) records which keys
+ *   sidecar ledger (`~/.paradev/plugins/mcp-ledger.json`) records which keys
  *   we wrote and a hash of each value. Reap removes only keys whose current
  *   value still matches what we wrote; a user-edited entry transfers to the
  *   user. A pre-existing key we never wrote is never touched.
@@ -40,7 +40,7 @@ import { resolveAppHomeDir } from "./paths";
 export interface SyncManagedMcpServersOptions {
 	/** Override for tests. */
 	homeDir?: string;
-	/** Override for tests; production resolves ~/.superset. */
+	/** Override for tests; production resolves ~/.paradev. */
 	supersetHomeDir?: string;
 	pdevAgentDir?: string;
 }

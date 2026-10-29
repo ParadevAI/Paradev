@@ -1,8 +1,8 @@
-import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { join } from "node:path";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
@@ -41,6 +41,7 @@ import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-ro
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
 import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
@@ -146,6 +147,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	void applyLegacyHomeMove(db);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.
@@ -322,10 +324,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	pageWatch.subscribeToTerminalEvents(eventBus);
 
 	const agentJobs = new AgentJobRunner({
-		rootDir: join(
-			resolveAppHomeDir(),
-			"agent-jobs",
-		),
+		rootDir: join(resolveAppHomeDir(), "agent-jobs"),
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
 	});
 

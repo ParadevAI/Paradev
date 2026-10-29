@@ -3,7 +3,7 @@
  * Cleans up stale Launch Services registrations from deleted/invalid worktrees.
  *
  * Over time, `lsregister` accumulates entries for Electron.app bundles under
- * ~/.superset/worktrees/ that no longer exist (worktree deleted, node_modules
+ * ~/.paradev/worktrees/ that no longer exist (worktree deleted, node_modules
  * cleaned). These stale entries cause macOS to route deep links to the wrong
  * (or non-existent) Electron binary.
  */
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== "development") {
 
 const LSREGISTER =
 	"/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
-const WORKTREE_BASE = resolve(homedir(), ".superset/worktrees");
+const WORKTREE_BASE = resolve(homedir(), ".paradev", "worktrees");
 
 const currentElectronApp = resolve(
 	import.meta.dirname,

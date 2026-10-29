@@ -23,7 +23,7 @@ const [HOME, PORT, DB_PATH] = [
 	process.argv[4],
 ];
 if (!HOME || !PORT || !DB_PATH) throw new Error("usage: <home> <port> <db>");
-const SS_HOME = path.join(HOME, ".superset");
+const SS_HOME = path.join(HOME, ".paradev");
 const HOOK_URL = `http://127.0.0.1:${PORT}/trpc/notifications.hook`;
 const db = new Database(DB_PATH);
 const AGENTS = [
