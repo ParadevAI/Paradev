@@ -71,8 +71,8 @@ export const createPluginsRouter = () => {
 
 		install: publicProcedure
 			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				const installed = installPlugin(input.name);
+			.mutation(async ({ input }) => {
+				const installed = await installPlugin(input.name);
 				if (installed === null) {
 					throw new TRPCError({
 						code: "NOT_FOUND",
@@ -84,14 +84,16 @@ export const createPluginsRouter = () => {
 
 		uninstall: publicProcedure
 			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				return { installed: uninstallPlugin(input.name) };
+			.mutation(async ({ input }) => {
+				return { installed: await uninstallPlugin(input.name) };
 			}),
 
 		setEnabled: publicProcedure
 			.input(z.object({ name: z.string().min(1), enabled: z.boolean() }))
-			.mutation(({ input }) => {
-				return { installed: setPluginEnabled(input.name, input.enabled) };
+			.mutation(async ({ input }) => {
+				return {
+					installed: await setPluginEnabled(input.name, input.enabled),
+				};
 			}),
 	});
 };
