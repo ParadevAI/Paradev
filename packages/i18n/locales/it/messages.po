@@ -8505,6 +8505,9 @@ msgstr "Per segnalazioni di bug e richieste di funzioni, la via più rapida è u
 msgid "For individuals getting started"
 msgstr "Per chi inizia da solo"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Per macOS su Apple Silicon e Intel. L'AppImage per Linux è sperimentale."
+
 msgid "For organizations with advanced needs"
 msgstr "Per organizzazioni con esigenze avanzate"
 
@@ -8864,6 +8867,9 @@ msgstr "Nome utente GitHub..."
 
 msgid "GitHub username…"
 msgstr "Nome utente GitHub…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Dai a Claude Code, Codex o qualsiasi agente CLI il proprio workspace e branch, poi rivedi ogni modifica in un unico posto."
 
 msgid "Give me an example"
 msgstr "Fammi un esempio"
@@ -15839,6 +15845,9 @@ msgstr "Esegui ora"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Esegui secondo una pianificazione o con eventi, su richiesta, metti in pausa, riprendi e leggi i log."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Esegui agenti di coding in parallelo con Paradev"
 
 msgid "Run script"
 msgstr "Esegui lo script"

@@ -8505,6 +8505,9 @@ msgstr "報告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向剛上手的個人使用者"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "適用於 Apple Silicon 與 Intel 的 macOS。Linux AppImage 為實驗版本。"
+
 msgid "For organizations with advanced needs"
 msgstr "面向有進階需求的組織"
 
@@ -8864,6 +8867,9 @@ msgstr "GitHub 使用者名稱..."
 
 msgid "GitHub username…"
 msgstr "GitHub使用者名稱…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "為 Claude Code、Codex 或任何 CLI 代理分配獨立的工作空間與分支，然後在同一處審閱所有變更。"
 
 msgid "Give me an example"
 msgstr "給我一個範例"
@@ -15839,6 +15845,9 @@ msgstr "立即執行"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "依計劃或事件執行、隨需執行、暫停、恢復並查看日誌。"
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "用 Paradev 平行執行程式設計代理"
 
 msgid "Run script"
 msgstr "執行指令碼"

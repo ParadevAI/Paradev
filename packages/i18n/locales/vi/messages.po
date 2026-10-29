@@ -8505,6 +8505,9 @@ msgstr "Với báo lỗi và đề xuất tính năng, cách nhanh nhất là m�
 msgid "For individuals getting started"
 msgstr "Dành cho cá nhân mới bắt đầu"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Dành cho macOS trên Apple Silicon và Intel. Bản Linux AppImage đang thử nghiệm."
+
 msgid "For organizations with advanced needs"
 msgstr "Dành cho tổ chức có nhu cầu nâng cao"
 
@@ -8864,6 +8867,9 @@ msgstr "Tên người dùng GitHub..."
 
 msgid "GitHub username…"
 msgstr "Tên người dùng GitHub…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Cho Claude Code, Codex hoặc bất kỳ agent CLI nào một workspace và nhánh riêng, rồi xem lại mọi thay đổi ở một nơi."
 
 msgid "Give me an example"
 msgstr "Cho tôi một ví dụ"
@@ -15839,6 +15845,9 @@ msgstr "Chạy ngay"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Chạy theo lịch hoặc theo sự kiện, chạy khi cần, tạm dừng, tiếp tục và đọc log."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Chạy song song các coding agent với Paradev"
 
 msgid "Run script"
 msgstr "Chạy script"

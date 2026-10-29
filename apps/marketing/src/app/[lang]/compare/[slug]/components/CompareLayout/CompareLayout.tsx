@@ -2,15 +2,17 @@
 
 import { Trans } from "@lingui/react/macro";
 import { BRAND } from "@superset/shared/brand";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
-import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
+import { usePlatform } from "@/app/[lang]/hooks/useOS";
+import { track } from "@/lib/analytics";
 import type { TocItem } from "@/lib/blog-utils";
 import {
 	type ComparisonPage,
 	formatCompareDate,
 	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
+import { CompareDownloadCTA } from "./components/CompareDownloadCTA";
 import { TableOfContents } from "./components/TableOfContents";
 
 const productName = BRAND.NAME;
@@ -22,12 +24,34 @@ interface CompareLayoutProps {
 	page: ComparisonPage;
 	toc: TocItem[];
 	children: ReactNode;
+	faq: ReactNode;
 }
 
-export function CompareLayout({ page, toc, children }: CompareLayoutProps) {
+export function CompareLayout({
+	page,
+	toc,
+	children,
+	faq,
+}: CompareLayoutProps) {
 	const sections = toc.filter((item) => item.level === 2);
+	const { platform } = usePlatform();
 	const formattedDate = formatCompareDate(page.lastUpdated ?? page.date);
 	const pageTypeLabel = getComparisonPageTypeLabel(page.type);
+
+	const trackInlineDownloadClick = (event: MouseEvent<HTMLDivElement>) => {
+		const link = (event.target as HTMLElement).closest("a");
+		if (
+			link?.origin === window.location.origin &&
+			link.pathname === "/download"
+		) {
+			track("download_clicked", {
+				platform,
+				source: "compare",
+				slug: page.slug,
+				placement: "inline",
+			});
+		}
+	};
 
 	return (
 		<article className="relative min-h-screen">
@@ -63,6 +87,10 @@ export function CompareLayout({ page, toc, children }: CompareLayoutProps) {
 							</p>
 						)}
 
+						<div className="mb-8">
+							<CompareDownloadCTA slug={page.slug} placement="hero" />
+						</div>
+
 						<div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
 							<span>
 								<Trans>Last updated</Trans>
@@ -95,28 +123,35 @@ export function CompareLayout({ page, toc, children }: CompareLayoutProps) {
 				{sections.length >= MIN_SECTIONS_FOR_TOC && (
 					<TableOfContents items={sections} />
 				)}
-				<div className="prose max-w-none">{children}</div>
-			</div>
+				<div
+					className="prose max-w-none"
+					onClickCapture={trackInlineDownloadClick}
+				>
+					{children}
+				</div>
 
-			{/* CTA */}
-			<aside className="relative border-t border-border">
-				<div className="max-w-3xl mx-auto px-6 relative">
-					<GridCross className="top-0 left-0" />
-					<GridCross className="top-0 right-0" />
-				</div>
-				<div className="max-w-3xl mx-auto px-6 py-10 text-center">
-					<p className="text-muted-foreground mb-4">
-						<Trans>Ready to try Paradev?</Trans>
+				<aside className="my-12 border-y border-border py-10 text-center">
+					<h2 className="text-xl font-medium text-foreground">
+						<Trans>Run parallel coding agents with Paradev</Trans>
+					</h2>
+					<p className="mt-2 mb-6 text-muted-foreground">
+						<Trans>
+							Give Claude Code, Codex, or any CLI agent its own workspace and
+							branch, then review every change in one place.
+						</Trans>
 					</p>
-					<DownloadLink
-						source="compare"
-						properties={{ slug: page.slug }}
-						className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors border border-border rounded-md px-4 py-2"
+					<CompareDownloadCTA slug={page.slug} placement="verdict" />
+				</aside>
+
+				{faq && (
+					<div
+						className="prose max-w-none"
+						onClickCapture={trackInlineDownloadClick}
 					>
-						<Trans>Download Paradev</Trans>
-					</DownloadLink>
-				</div>
-			</aside>
+						{faq}
+					</div>
+				)}
+			</div>
 		</article>
 	);
 }

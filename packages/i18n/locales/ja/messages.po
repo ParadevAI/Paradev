@@ -8505,6 +8505,9 @@ msgstr "バグ報告や機能リクエストは、<0>{githubHandle}</0>にGitHub
 msgid "For individuals getting started"
 msgstr "これから始める個人向け"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
+
 msgid "For organizations with advanced needs"
 msgstr "高度な要件がある組織向け"
 
@@ -8864,6 +8867,9 @@ msgstr "GitHubユーザー名..."
 
 msgid "GitHub username…"
 msgstr "GitHubユーザー名…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code、Codex、その他の CLI エージェントそれぞれに専用のワークスペースとブランチを用意し、すべての変更を一か所でレビューできます。"
 
 msgid "Give me an example"
 msgstr "例を挙げて"
@@ -15839,6 +15845,9 @@ msgstr "今すぐ実行"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "スケジュールやイベントで実行、オンデマンド実行、一時停止、再開、ログの確認。"
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev で並列コーディングエージェントを実行"
 
 msgid "Run script"
 msgstr "スクリプトを実行"

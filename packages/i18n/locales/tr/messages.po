@@ -8505,6 +8505,9 @@ msgstr "Hata bildirimleri ve özellik istekleri için en hızlı yol <0>{githubH
 msgid "For individuals getting started"
 msgstr "Yeni başlayan bireyler için"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon ve Intel üzerinde macOS için. Linux AppImage deneyseldir."
+
 msgid "For organizations with advanced needs"
 msgstr "Gelişmiş ihtiyaçları olan kuruluşlar için"
 
@@ -8864,6 +8867,9 @@ msgstr "GitHub kullanıcı adı..."
 
 msgid "GitHub username…"
 msgstr "GitHub kullanıcı adı…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code, Codex veya herhangi bir CLI ajanına kendi workspace'ini ve branch'ini verin, ardından her değişikliği tek bir yerde inceleyin."
 
 msgid "Give me an example"
 msgstr "Bana bir örnek ver"
@@ -15839,6 +15845,9 @@ msgstr "Şimdi çalıştır"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
 
 msgid "Run script"
 msgstr "Betiği çalıştır"
