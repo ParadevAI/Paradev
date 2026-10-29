@@ -163,7 +163,9 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 	}
 	if (workItem) {
 		return (
-			<GithubWorkItemHoverCard link={workItem}>{link}</GithubWorkItemHoverCard>
+			<GithubWorkItemHoverCard link={workItem} url={href}>
+				{link}
+			</GithubWorkItemHoverCard>
 		);
 	}
 	if (websitePreview) {

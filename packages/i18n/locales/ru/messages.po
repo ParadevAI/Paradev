@@ -4203,12 +4203,6 @@ msgstr "Нажмите здесь, если переход не произошё
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Нажмите «↑ update», чтобы увидеть подтверждение перед обновлением"
 
-msgid "Click the chip to open the issue"
-msgstr "Нажмите на чип, чтобы открыть задачу"
-
-msgid "Click the chip to open the pull request"
-msgstr "Нажмите на чип, чтобы открыть пул-реквест"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Нажмите, чтобы скопировать ID сессии (возобновление: `claude --resume <id>`)."
 

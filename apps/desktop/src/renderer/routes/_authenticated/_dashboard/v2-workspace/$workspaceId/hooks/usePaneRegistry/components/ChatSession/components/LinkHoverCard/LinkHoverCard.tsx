@@ -14,17 +14,15 @@ const WEB_URL = env.NEXT_PUBLIC_WEB_URL;
  */
 export function LinkHoverCard({
 	link,
-	openHint,
 	children,
 }: {
 	link: string;
-	openHint?: boolean;
 	children: ReactNode;
 }) {
 	const workItem = parseGithubWorkItemUrl(link);
 	if (workItem) {
 		return (
-			<GithubWorkItemHoverCard link={workItem} openHint={openHint}>
+			<GithubWorkItemHoverCard link={workItem} url={link}>
 				{children}
 			</GithubWorkItemHoverCard>
 		);

@@ -4203,12 +4203,6 @@ msgstr "Clique aqui se não for redirecionado"
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Clique em “↑ update” para ver a confirmação antes da atualização"
 
-msgid "Click the chip to open the issue"
-msgstr "Clique na etiqueta para abrir a issue"
-
-msgid "Click the chip to open the pull request"
-msgstr "Clique na etiqueta para abrir o pull request"
-
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Clique para copiar o ID da sessão (retome com `claude --resume <id>`)."
 

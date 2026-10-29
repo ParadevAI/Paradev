@@ -22,7 +22,7 @@ export function MessageChip({
 		link ?? (WEB_URL.test(chip.serialized) ? chip.serialized : undefined);
 	if (!href) return <Chip chip={chip} />;
 	return (
-		<LinkHoverCard link={href} openHint>
+		<LinkHoverCard link={href}>
 			<LinkMenu href={href}>
 				<a
 					className="no-underline outline-none focus-visible:ring-2 focus-visible:ring-ring/60"

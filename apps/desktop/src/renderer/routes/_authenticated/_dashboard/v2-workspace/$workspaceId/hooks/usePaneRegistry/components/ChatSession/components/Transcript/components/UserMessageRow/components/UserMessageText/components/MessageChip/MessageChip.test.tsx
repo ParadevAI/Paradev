@@ -3,6 +3,7 @@ import type { AppRouter } from "@superset/host-service/trpc";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
@@ -78,6 +79,7 @@ function renderChip(
 
 test("a pull request chip looks as the composer drew it and asks for details only when the pointer or focus arrives", async () => {
 	const { asked, chip } = renderChip(() => ITEM);
+	await act(async () => {});
 	expect(chip.textContent).toBe("superset-sh/superset#8329");
 	expect(chip.getAttribute("href")).toBe(URL_PR);
 	expect(chip.querySelector(".prompt-input-chip img")).not.toBeNull();
@@ -143,4 +145,19 @@ test("right-clicking closes the card, and copying the link leaves it closed", as
 		if (original) Object.defineProperty(navigator, "clipboard", original);
 		else Reflect.deleteProperty(navigator, "clipboard");
 	}
+});
+
+test("the card links to the pasted URL, and opening it closes the card", async () => {
+	const files = `${URL_PR}/files`;
+	const openLink = mock<OpenLink>(() => true);
+	renderChip(() => ITEM, files, openLink);
+	screen.getByRole("link").focus();
+	const title = await screen.findByText("feat(chat): load whole sessions");
+	expect(title.closest("a")?.getAttribute("href")).toBe(files);
+
+	fireEvent.click(screen.getByText("Open on GitHub"));
+	expect(openLink.mock.calls.map(([href]) => href)).toEqual([files]);
+	await waitFor(() =>
+		expect(screen.queryByText("feat(chat): load whole sessions")).toBeNull(),
+	);
 });
