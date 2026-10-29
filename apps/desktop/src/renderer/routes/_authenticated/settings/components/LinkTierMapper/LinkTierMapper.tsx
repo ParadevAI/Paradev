@@ -17,7 +17,6 @@ import {
 	type Surface,
 } from "renderer/lib/clickPolicy";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 type SlotValue = LinkAction | "none";
@@ -51,7 +50,6 @@ export function LinkTierMapper({
 	surface,
 }: LinkTierMapperProps) {
 	const searchQuery = useSettingsSearchQuery();
-	const isRightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
 	const pick = useCallback(
 		(tier: LinkTier, nextSlot: SlotValue) => {
 			const nextAction = fromSlot(nextSlot);
@@ -73,10 +71,7 @@ export function LinkTierMapper({
 				{TIERS.map((tier) => {
 					const id = `${idPrefix}-${tier}`;
 					const actions: LinkAction[] =
-						surface === "url" &&
-						(isRightPaneAreaEnabled || value[tier] === "rightPane")
-							? [...ACTIONS, "rightPane"]
-							: ACTIONS;
+						surface === "url" ? [...ACTIONS, "rightPane"] : ACTIONS;
 					return (
 						<div
 							key={tier}

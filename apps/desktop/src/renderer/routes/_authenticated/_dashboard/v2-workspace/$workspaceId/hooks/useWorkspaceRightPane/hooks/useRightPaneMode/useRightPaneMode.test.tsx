@@ -9,14 +9,8 @@ const { useRightPaneMode } = await import("./useRightPaneMode");
 
 afterEach(cleanup);
 
-function renderMode({
-	isOpen,
-	canExpand = true,
-}: {
-	isOpen: boolean;
-	canExpand?: boolean;
-}) {
-	const props = { workspaceId: "ws-1", isOpen, canExpand };
+function renderMode({ isOpen }: { isOpen: boolean }) {
+	const props = { workspaceId: "ws-1", isOpen };
 	const hook = renderHook(
 		(current: typeof props) =>
 			useRightPaneMode({
@@ -80,11 +74,5 @@ describe("useRightPaneMode", () => {
 		expect(pane.mode()).toBe("open");
 		pane.switchWorkspace("ws-1");
 		expect(pane.mode()).toBe("expanded");
-	});
-
-	test("never expands when expanding is not allowed", () => {
-		const pane = renderMode({ isOpen: true, canExpand: false });
-		pane.toggle();
-		expect(pane.mode()).toBe("open");
 	});
 });

@@ -30,7 +30,6 @@ interface WorkspaceSplitLayoutProps {
 	onWidthChange: (width: number) => void;
 	onResizingChange: (isResizing: boolean) => void;
 	onLayoutFrame?: () => void;
-	keepMounted: boolean;
 	durationMs?: number;
 	side: ReactNode;
 	children: ReactNode;
@@ -46,7 +45,6 @@ export function WorkspaceSplitLayout({
 	onWidthChange,
 	onResizingChange,
 	onLayoutFrame,
-	keepMounted,
 	durationMs,
 	side,
 	children,
@@ -102,7 +100,6 @@ export function WorkspaceSplitLayout({
 				mode={mode}
 				width={clamped.width}
 				onLayoutFrame={onLayoutFrame}
-				keepMounted={keepMounted}
 				durationMs={durationMs}
 			>
 				{(fill) => (

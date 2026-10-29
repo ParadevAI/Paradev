@@ -280,22 +280,10 @@ export function useWorkspaceHotkeys({
 
 	const splitWithViewerPane = useCallback(
 		(newPane: CreatePaneInput<PaneViewerData>) => {
-			if (viewer.store !== store) {
-				viewer.reveal();
-				viewer.store.getState().openPane({ pane: newPane });
-				return;
-			}
-			const state = store.getState();
-			const active = state.getActivePane();
-			if (!active) return;
-			state.splitPane({
-				tabId: active.tabId,
-				paneId: active.pane.id,
-				position: "right",
-				newPane,
-			});
+			viewer.reveal();
+			viewer.store.getState().openPane({ pane: newPane });
 		},
-		[store, viewer],
+		[viewer],
 	);
 
 	useHotkey(

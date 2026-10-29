@@ -21,7 +21,6 @@ const TREE_TOGGLE_MS = 200;
 interface FileViewLayoutProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
-	showTree: boolean;
 	onSearch?: () => void;
 	children?: ReactNode;
 }
@@ -29,7 +28,6 @@ interface FileViewLayoutProps {
 export function FileViewLayout({
 	context,
 	workspaceId,
-	showTree,
 	onSearch,
 	children,
 }: FileViewLayoutProps) {
@@ -61,7 +59,7 @@ export function FileViewLayout({
 	const tabHasTreePane =
 		context.pane.kind !== "files" &&
 		Object.values(context.tab.panes).some((pane) => pane.kind === "files");
-	if (!showTree || tabHasTreePane) return children;
+	if (tabHasTreePane) return children;
 
 	const panelTransition =
 		animating && "transition-[flex-grow] duration-200 ease-out";

@@ -957,12 +957,6 @@ msgstr "Bu çalışma alanındaki {entryPath} başka bir organizasyonda zaten sa
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# başarısız} other {# başarısız}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{total} kontrolden {failing} tanesi başarısız"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{total} kontrolden {failing} tanesi başarısız"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} other {Bu çalışma alanında # dosya değişti}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total} kontrol"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} kontrol geçiyor"
 
-msgid "{pending} of {total} check running"
-msgstr "{total} kontrolden {pending} tanesi çalışıyor"
-
-msgid "{pending} of {total} checks running"
-msgstr "{total} kontrolden {pending} tanesi çalışıyor"
-
 msgid "{percent} used"
 msgstr "{percent} kullanıldı"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
@@ -3966,9 +3951,6 @@ msgstr "Değişiklik günlüğü"
 msgid "Changes"
 msgstr "Değişiklikler"
 
-msgid "Changes open target"
-msgstr "Değişiklikleri açma hedefi"
-
 msgid "Changes requested"
 msgstr "Değişiklik istendi"
 
@@ -4179,9 +4161,6 @@ msgstr "Uygulama seç"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Önizleme bölmesi yokken dosyaların nasıl açılacağını seçin"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Değişiklikler görünümünün üst çubuktan nasıl açılacağını seçin"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Terminalde Cmd+tıkladığınızda dosya yollarının nasıl açılacağını seçin"
@@ -4427,9 +4406,6 @@ msgstr "Bu çalışma alanındaki tüm portları kapat"
 
 msgid "Close Browser"
 msgstr "Tarayıcıyı kapat"
-
-msgid "Close changes"
-msgstr "Değişiklikleri kapat"
 
 msgid "Close Chat"
 msgstr "Sohbeti kapat"
@@ -11354,9 +11330,6 @@ msgstr "Birleştirildi, ancak PR durumu yenilenemedi — birazdan yeniden deneyi
 msgid "Merging PR..."
 msgstr "PR birleştiriliyor..."
 
-msgid "Merging pull request"
-msgstr "Pull request birleştiriliyor"
-
 msgid "Merging…"
 msgstr "Birleştiriliyor…"
 
@@ -13178,9 +13151,6 @@ msgstr "Tarayıcıyı aç"
 msgid "Open browser again"
 msgstr "Tarayıcıyı yeniden aç"
 
-msgid "Open changes"
-msgstr "Değişiklikleri aç"
-
 msgid "Open Changes"
 msgstr "Değişiklikleri aç"
 
@@ -13445,9 +13415,6 @@ msgstr "Pull request aç"
 msgid "Open pull request #{0}"
 msgstr "#{0} pull request'ini aç"
 
-msgid "Open pull request options"
-msgstr "Pull request seçeneklerini aç"
-
 msgid "Open recent"
 msgstr "Son kullanılanı aç"
 
@@ -13465,9 +13432,6 @@ msgstr "Ayarları aç"
 
 msgid "Open sheet"
 msgstr "Sayfayı aç"
-
-msgid "Open ship options"
-msgstr "Gönderim seçeneklerini aç"
 
 msgid "Open System Settings"
 msgstr "Sistem Ayarları'nı aç"
@@ -13830,9 +13794,6 @@ msgstr "Ücretli deneme çalışması"
 
 msgid "Palette"
 msgstr "Palet"
-
-msgid "Pane in current tab"
-msgstr "Geçerli sekmede bölme"
 
 msgid "Pane system"
 msgstr "Bölme sistemi"
@@ -20445,9 +20406,6 @@ msgstr "{0} güncellendi"
 msgid "Updated {date}"
 msgstr "Güncelleme: {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Güncelleme {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Az önce {0} sürümünden güncellendi."
@@ -21348,9 +21306,6 @@ msgstr "çalışma alanı kökü"
 
 msgid "Workspace Run"
 msgstr "Çalışma alanı çalıştırması"
-
-msgid "Workspace run options"
-msgstr "Çalışma alanı çalıştırma seçenekleri"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Çalışma alanı çalıştırması: {workspaceRunState}"

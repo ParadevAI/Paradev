@@ -957,12 +957,6 @@ msgstr "{entryPath} trong workspace này đã được xuất bản thành một
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# thất bại} other {# thất bại}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing}/{total} check đang thất bại"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing}/{total} check đang thất bại"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# tệp đã thay đổi trong workspace này} other {# tệp đã thay đổi trong workspace này}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total} check"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} check đã qua"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending}/{total} check đang chạy"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending}/{total} check đang chạy"
-
 msgid "{percent} used"
 msgstr "Đã dùng {percent}"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, other {đã hợp nhất # PR của tác nhân}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} bị gián đoạn"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {Cả # check đều đạt} other {Cả # check đều đạt}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issue GitHub}}"
@@ -3966,9 +3951,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Thay đổi"
 
-msgid "Changes open target"
-msgstr "Vị trí mở thay đổi"
-
 msgid "Changes requested"
 msgstr "Yêu cầu thay đổi"
 
@@ -4179,9 +4161,6 @@ msgstr "Chọn ứng dụng"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Chọn cách mở tệp khi chưa có khung xem trước"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Chọn cách chế độ xem thay đổi mở từ thanh trên cùng"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Chọn cách mở đường dẫn tệp khi Cmd+nhấp trong terminal"
@@ -4427,9 +4406,6 @@ msgstr "Đóng tất cả cổng trong workspace này"
 
 msgid "Close Browser"
 msgstr "Đóng trình duyệt"
-
-msgid "Close changes"
-msgstr "Đóng thay đổi"
 
 msgid "Close Chat"
 msgstr "Đóng chat"
@@ -11354,9 +11330,6 @@ msgstr "Đã merge, nhưng không làm mới được trạng thái PR — hãy 
 msgid "Merging PR..."
 msgstr "Đang merge PR..."
 
-msgid "Merging pull request"
-msgstr "Đang merge pull request"
-
 msgid "Merging…"
 msgstr "Đang merge…"
 
@@ -13178,9 +13151,6 @@ msgstr "Mở trình duyệt"
 msgid "Open browser again"
 msgstr "Mở lại trình duyệt"
 
-msgid "Open changes"
-msgstr "Mở thay đổi"
-
 msgid "Open Changes"
 msgstr "Mở thay đổi"
 
@@ -13445,9 +13415,6 @@ msgstr "Mở pull request"
 msgid "Open pull request #{0}"
 msgstr "Mở pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Mở tùy chọn pull request"
-
 msgid "Open recent"
 msgstr "Mở gần đây"
 
@@ -13465,9 +13432,6 @@ msgstr "Mở cài đặt"
 
 msgid "Open sheet"
 msgstr "Mở sheet"
-
-msgid "Open ship options"
-msgstr "Mở tùy chọn gửi"
 
 msgid "Open System Settings"
 msgstr "Mở System Settings"
@@ -13830,9 +13794,6 @@ msgstr "Làm thử có trả lương"
 
 msgid "Palette"
 msgstr "Bảng màu"
-
-msgid "Pane in current tab"
-msgstr "Ngăn trong thẻ hiện tại"
 
 msgid "Pane system"
 msgstr "Hệ thống khung"
@@ -20445,9 +20406,6 @@ msgstr "Đã cập nhật {0}"
 msgid "Updated {date}"
 msgstr "Cập nhật {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Cập nhật {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Vừa cập nhật từ {0}."
@@ -21348,9 +21306,6 @@ msgstr "thư mục gốc workspace"
 
 msgid "Workspace Run"
 msgstr "Lệnh chạy của workspace"
-
-msgid "Workspace run options"
-msgstr "Tùy chọn chạy của workspace"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Lệnh chạy của workspace: {workspaceRunState}"

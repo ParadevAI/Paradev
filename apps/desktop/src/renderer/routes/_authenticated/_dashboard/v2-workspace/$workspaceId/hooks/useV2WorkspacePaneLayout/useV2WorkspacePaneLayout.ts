@@ -159,5 +159,5 @@ export function useV2WorkspacePaneLayout({
 		};
 	}, [collections, store, workspaceId, slot, selectionKey]);
 
-	return { store, isLayoutReady, hasRow: localWorkspaceState != null };
+	return { store, isLayoutReady };
 }

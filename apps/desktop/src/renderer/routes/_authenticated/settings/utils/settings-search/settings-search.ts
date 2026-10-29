@@ -41,7 +41,6 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_FILE_OPEN_MODE: "behavior-file-open-mode",
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
-	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
 	USAGE_IN_SIDEBAR: "usage-in-sidebar",
@@ -198,8 +197,6 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE]: "v1",
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
-	// The top-bar Changes control is a v2-only surface.
-	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
 	// The agent composers that offer dictation are v2-only.
 	[SETTING_ITEM_ID.BEHAVIOR_DICTATION]: "v2",
@@ -885,24 +882,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"design",
 			"comments",
 			"pages",
-		],
-	},
-	{
-		id: SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET,
-		section: "behavior",
-		title: "Changes open target",
-		description:
-			"Open the Changes view as a pane in the current tab or as its own tab",
-		keywords: [
-			"changes",
-			"diff",
-			"open",
-			"pane",
-			"tab",
-			"split",
-			"new tab",
-			"viewer",
-			"behavior",
 		],
 	},
 	{

@@ -11,20 +11,17 @@ import type { PaneViewerData } from "../../types";
 
 export function usePaneAreaMoveActions({
 	defaults,
-	enabled,
 	source,
 	target,
 	onMoved,
 }: {
 	defaults: ContextMenuActionConfig<PaneViewerData>[];
-	enabled: boolean;
 	source: StoreApi<WorkspaceStore<PaneViewerData>>;
 	target: StoreApi<WorkspaceStore<PaneViewerData>>;
 	onMoved?: () => void;
 }): ContextMenuActionConfig<PaneViewerData>[] {
 	const { t } = useLingui();
 	return useMemo(() => {
-		if (!enabled) return defaults;
 		return [
 			...defaults,
 			{ key: "pane-area-move-separator", type: "separator" },
@@ -38,5 +35,5 @@ export function usePaneAreaMoveActions({
 				},
 			},
 		];
-	}, [defaults, enabled, source, target, onMoved, t]);
+	}, [defaults, source, target, onMoved, t]);
 }

@@ -957,12 +957,6 @@ msgstr "{entryPath} в этом рабочем пространстве уже �
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# не пройдено} few {# не пройдено} many {# не пройдено} other {# не пройдено}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} из {total} проверки не пройдена"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} из {total} проверок не пройдены"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {В этой рабочей области изменён # файл} few {В этой рабочей области изменены # файла} many {В этой рабочей области изменены # файлов} other {В этой рабочей области изменены # файла}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total} проверок"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "Пройдено проверок: {passingChecks}/{0}"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} из {total} проверки выполняется"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} из {total} проверок выполняется"
-
 msgid "{percent} used"
 msgstr "Использовано {percent}"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, one {влит # PR агента} few {влито # P
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} прерван"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {Проверка пройдена} few {Все # проверки пройдены} many {Все # проверок пройдены} other {Все # проверки пройдены}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {задача GitHub} few {задачи GitHub} many {задач GitHub} other {задачи GitHub}}"
@@ -3966,9 +3951,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Изменения"
 
-msgid "Changes open target"
-msgstr "Куда открывать изменения"
-
 msgid "Changes requested"
 msgstr "Запрошены изменения"
 
@@ -4179,9 +4161,6 @@ msgstr "Выберите приложение"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Выберите, как открывать файлы, когда нет панели предпросмотра"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Выберите, как открывается представление изменений из верхней панели"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Выберите, как открывать пути файлов при Cmd+клике в терминале"
@@ -4427,9 +4406,6 @@ msgstr "Закрыть все порты в этой рабочей област
 
 msgid "Close Browser"
 msgstr "Закрыть браузер"
-
-msgid "Close changes"
-msgstr "Закрыть изменения"
 
 msgid "Close Chat"
 msgstr "Закрыть чат"
@@ -11354,9 +11330,6 @@ msgstr "Объединено, но не удалось обновить сост
 msgid "Merging PR..."
 msgstr "Объединение PR..."
 
-msgid "Merging pull request"
-msgstr "Объединение пул-реквеста"
-
 msgid "Merging…"
 msgstr "Объединение…"
 
@@ -13178,9 +13151,6 @@ msgstr "Открыть браузер"
 msgid "Open browser again"
 msgstr "Открыть браузер снова"
 
-msgid "Open changes"
-msgstr "Открыть изменения"
-
 msgid "Open Changes"
 msgstr "Открыть изменения"
 
@@ -13445,9 +13415,6 @@ msgstr "Открыть пул-реквест"
 msgid "Open pull request #{0}"
 msgstr "Открыть пул-реквест #{0}"
 
-msgid "Open pull request options"
-msgstr "Открыть параметры пул-реквеста"
-
 msgid "Open recent"
 msgstr "Открыть недавние"
 
@@ -13465,9 +13432,6 @@ msgstr "Открыть настройки"
 
 msgid "Open sheet"
 msgstr "Открыть панель"
-
-msgid "Open ship options"
-msgstr "Открыть параметры отправки"
 
 msgid "Open System Settings"
 msgstr "Открыть Системные настройки"
@@ -13830,9 +13794,6 @@ msgstr "Оплачиваемый пробный период"
 
 msgid "Palette"
 msgstr "Палитра"
-
-msgid "Pane in current tab"
-msgstr "Панель в текущей вкладке"
 
 msgid "Pane system"
 msgstr "Система панелей"
@@ -20445,9 +20406,6 @@ msgstr "Обновлено {0}"
 msgid "Updated {date}"
 msgstr "Обновлено {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Обновлено {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Только что обновлено с {0}."
@@ -21348,9 +21306,6 @@ msgstr "корень рабочей области"
 
 msgid "Workspace Run"
 msgstr "Запуск рабочей области"
-
-msgid "Workspace run options"
-msgstr "Параметры запуска рабочей области"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Запуск рабочей области: {workspaceRunState}"

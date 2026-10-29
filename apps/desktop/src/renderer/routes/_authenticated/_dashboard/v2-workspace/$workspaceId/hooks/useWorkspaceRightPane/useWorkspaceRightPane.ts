@@ -6,10 +6,8 @@ import { useWorkspaceRightSidebarOpen } from "./hooks/useWorkspaceRightSidebarOp
 
 export function useWorkspaceRightPane({
 	workspaceId,
-	isPaneAreaEnabled,
 }: {
 	workspaceId: string;
-	isPaneAreaEnabled: boolean;
 }) {
 	const { isOpen, setOpen } = useWorkspaceRightSidebarOpen();
 	const toggle = useCallback(() => setOpen((prev) => !prev), [setOpen]);
@@ -26,11 +24,8 @@ export function useWorkspaceRightPane({
 		workspaceId,
 		isOpen,
 		setOpen,
-		canExpand: isPaneAreaEnabled,
 	});
-	useHotkey("TOGGLE_RIGHT_PANE_FULL_SCREEN", toggleFullScreen, {
-		enabled: isPaneAreaEnabled,
-	});
+	useHotkey("TOGGLE_RIGHT_PANE_FULL_SCREEN", toggleFullScreen);
 
 	return { isOpen, setOpen, toggle, mode, toggleFullScreen };
 }

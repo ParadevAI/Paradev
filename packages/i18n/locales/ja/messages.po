@@ -957,12 +957,6 @@ msgstr "このワークスペースの {entryPath} は、別の組織のペー�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#件失敗} other {#件失敗}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{total}件中{failing}件のチェックが失敗"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{total}件中{failing}件のチェックが失敗"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {このワークスペースで変更されたファイル: #件} other {このワークスペースで変更されたファイル: #件}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total}件のチェック"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0}件のチェックが成功"
 
-msgid "{pending} of {total} check running"
-msgstr "{total}件中{pending}件のチェックが実行中"
-
-msgid "{pending} of {total} checks running"
-msgstr "{total}件中{pending}件のチェックが実行中"
-
 msgid "{percent} used"
 msgstr "{percent} 使用済み"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
@@ -3966,9 +3951,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "変更"
 
-msgid "Changes open target"
-msgstr "変更ビューの開き先"
-
 msgid "Changes requested"
 msgstr "変更リクエスト"
 
@@ -4179,9 +4161,6 @@ msgstr "アプリを選択"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "プレビューペインがないときのファイルの開き方"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "トップバーから変更ビューをどのように開くかを選択します"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "ターミナルでCmd+クリックしたときのファイルパスの開き方"
@@ -4427,9 +4406,6 @@ msgstr "このワークスペースのすべてのポートを閉じる"
 
 msgid "Close Browser"
 msgstr "ブラウザを閉じる"
-
-msgid "Close changes"
-msgstr "変更を閉じる"
 
 msgid "Close Chat"
 msgstr "チャットを閉じる"
@@ -11354,9 +11330,6 @@ msgstr "マージしましたが、PRの状態を更新できませんでした 
 msgid "Merging PR..."
 msgstr "PRをマージ中..."
 
-msgid "Merging pull request"
-msgstr "プルリクエストをマージ中"
-
 msgid "Merging…"
 msgstr "マージ中…"
 
@@ -13178,9 +13151,6 @@ msgstr "ブラウザを開く"
 msgid "Open browser again"
 msgstr "ブラウザをもう一度開く"
 
-msgid "Open changes"
-msgstr "変更を開く"
-
 msgid "Open Changes"
 msgstr "変更を開く"
 
@@ -13445,9 +13415,6 @@ msgstr "プルリクエストを開く"
 msgid "Open pull request #{0}"
 msgstr "プルリクエスト#{0}を開く"
 
-msgid "Open pull request options"
-msgstr "プルリクエストのオプションを開く"
-
 msgid "Open recent"
 msgstr "最近使った項目を開く"
 
@@ -13465,9 +13432,6 @@ msgstr "設定を開く"
 
 msgid "Open sheet"
 msgstr "シートを開く"
-
-msgid "Open ship options"
-msgstr "送信オプションを開く"
 
 msgid "Open System Settings"
 msgstr "システム設定を開く"
@@ -13830,9 +13794,6 @@ msgstr "有給ワークトライアル"
 
 msgid "Palette"
 msgstr "パレット"
-
-msgid "Pane in current tab"
-msgstr "現在のタブ内のペイン"
 
 msgid "Pane system"
 msgstr "ペインシステム"
@@ -20445,9 +20406,6 @@ msgstr "更新: {0}"
 msgid "Updated {date}"
 msgstr "{date}に更新"
 
-msgid "Updated {updatedRelative}"
-msgstr "{updatedRelative}に更新"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "{0}からたった今更新しました。"
@@ -21348,9 +21306,6 @@ msgstr "ワークスペースルート"
 
 msgid "Workspace Run"
 msgstr "ワークスペース実行"
-
-msgid "Workspace run options"
-msgstr "ワークスペースの実行オプション"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "ワークスペース実行: {workspaceRunState}"

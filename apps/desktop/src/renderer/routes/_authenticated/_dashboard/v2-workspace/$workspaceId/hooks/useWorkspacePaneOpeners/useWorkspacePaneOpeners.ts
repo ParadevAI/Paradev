@@ -1,15 +1,10 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useCallback } from "react";
-import type { V2UserPreferencesApi } from "renderer/hooks/useV2UserPreferences";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
-import { useSettings } from "renderer/stores/settings";
 import type { StoreApi } from "zustand/vanilla";
 import type {
 	BrowserPaneData,
-	CommentPaneData,
 	DiffFocusSide,
 	DiffPaneData,
 	DiffPaneFilter,
@@ -18,16 +13,8 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
-import {
-	closeVisibleChangesPane,
-	openChangesPaneInStore,
-} from "../../utils/openChangesPaneInStore";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { openPullRequestPaneInStore } from "../../utils/openPullRequestPaneInStore";
-import {
-	getWorkspaceSidebarTab,
-	setWorkspaceSidebarTab,
-} from "../../utils/setWorkspaceSidebarTab";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -37,7 +24,6 @@ export function useWorkspacePaneOpeners({
 	launcher,
 	newTabPresets,
 	executePreset,
-	setRightSidebarOpen,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	viewer: PaneTarget;
@@ -47,7 +33,6 @@ export function useWorkspacePaneOpeners({
 		preset: V2TerminalPresetRow,
 		options?: { target?: "new-tab" | "active-tab" },
 	) => void | Promise<void>;
-	setRightSidebarOpen: V2UserPreferencesApi["setRightSidebarOpen"];
 }): {
 	openDiffPane: (
 		filePath: string,
@@ -59,10 +44,6 @@ export function useWorkspacePaneOpeners({
 	) => void;
 	addTerminalTab: () => Promise<void>;
 	addBrowserTab: () => void;
-	openChangesPane: () => void;
-	/** Close the visible Changes pane, or open/focus one when none is showing. */
-	toggleChangesPane: () => void;
-	openCommentPane: (comment: CommentPaneData) => void;
 	openPagePane: (page: PagePaneData, placement: "split" | "tab") => void;
 	/** Focus or open the pane showing the workspace's linked PR summary. */
 	openPullRequestPane: OpenPullRequestPane;
@@ -181,58 +162,6 @@ export function useWorkspacePaneOpeners({
 		});
 	}, [viewer, defaultBrowserUrl]);
 
-	const openCommentPane = useCallback(
-		(comment: CommentPaneData) => {
-			viewer.reveal();
-			const state = viewer.store.getState();
-			for (const tab of state.tabs) {
-				for (const pane of Object.values(tab.panes)) {
-					if (pane.kind !== "comment") continue;
-					state.setPaneData({
-						paneId: pane.id,
-						data: comment as PaneViewerData,
-					});
-					state.setActiveTab(tab.id);
-					state.setActivePane({ tabId: tab.id, paneId: pane.id });
-					return;
-				}
-			}
-			state.addTab({
-				panes: [
-					{
-						kind: "comment",
-						data: comment as PaneViewerData,
-					},
-				],
-			});
-		},
-		[viewer],
-	);
-
-	const { workspace } = useWorkspace();
-	const collections = useCollections();
-	// The changed-files list lives in the sidebar's Changes tab, so opening
-	// Changes reveals it alongside the pane — with the sidebar closed the pane
-	// alone would have no file picker.
-	const openChangesPane = useCallback(() => {
-		setRightSidebarOpen(true);
-		setWorkspaceSidebarTab(collections, workspace.id, "changes");
-		openChangesPaneInStore(store, useSettings.getState().changesOpenTarget);
-	}, [store, setRightSidebarOpen, collections, workspace.id]);
-
-	// Opening brings the sidebar along on Changes, so closing takes it back
-	// down — unless the sidebar has since moved to Files or Review, where
-	// it's serving something else and stays.
-	const toggleChangesPane = useCallback(() => {
-		if (closeVisibleChangesPane(store)) {
-			if (getWorkspaceSidebarTab(collections, workspace.id) === "changes") {
-				setRightSidebarOpen(false);
-			}
-			return;
-		}
-		openChangesPane();
-	}, [store, openChangesPane, collections, workspace.id, setRightSidebarOpen]);
-
 	const openPagePane = useCallback(
 		(page: PagePaneData, placement: "split" | "tab") => {
 			viewer.reveal();
@@ -253,9 +182,6 @@ export function useWorkspacePaneOpeners({
 		openDiffPane,
 		addTerminalTab,
 		addBrowserTab,
-		openChangesPane,
-		toggleChangesPane,
-		openCommentPane,
 		openPagePane,
 		openPullRequestPane,
 	};

@@ -25,15 +25,9 @@ import { resolveActivePaneView } from "./registry";
 interface FilePaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
-	/** Right pane file view: room for the breadcrumb, and a click inside pins the preview. */
-	inRightPane?: boolean;
 }
 
-export function FilePane({
-	context,
-	workspaceId,
-	inRightPane = false,
-}: FilePaneProps) {
+export function FilePane({ context, workspaceId }: FilePaneProps) {
 	const data = context.pane.data as FilePaneData;
 	const { filePath } = data;
 	const isActiveTab = useStore(
@@ -168,7 +162,7 @@ export function FilePane({
 		<div
 			className="flex h-full w-full flex-col"
 			onPointerDownCapture={() => {
-				if (inRightPane && !context.pane.pinned) context.actions.pin();
+				if (!context.pane.pinned) context.actions.pin();
 			}}
 			onBlurCapture={(event) => {
 				if (!event.currentTarget.contains(event.relatedTarget as Node)) {
@@ -212,8 +206,7 @@ export function FilePane({
 			<div
 				className={cn(
 					"relative min-h-0 min-w-0 flex-1",
-					inRightPane &&
-						(activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10"),
+					activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10",
 				)}
 			>
 				<MarkdownResourceProvider

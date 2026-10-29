@@ -1,16 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Label } from "@superset/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@superset/ui/select";
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { type ChangesOpenTarget, useSettings } from "renderer/stores/settings";
+import { useSettings } from "renderer/stores/settings";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
 	isItemVisible,
@@ -31,10 +24,6 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_CONFIRM_QUIT,
 		visibleItems,
 	);
-	const showChangesOpenTarget = isItemVisible(
-		SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET,
-		visibleItems,
-	);
 	const showResourceMonitor = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR,
 		visibleItems,
@@ -49,7 +38,6 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	);
 
 	const utils = electronTrpc.useUtils();
-	const changesOpenTarget = useSettings((s) => s.changesOpenTarget);
 	const dictationEnabled = useSettings((s) => s.dictationEnabled);
 	const updateSetting = useSettings((s) => s.update);
 
@@ -139,47 +127,6 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 					SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
 					visibleItems,
 				) && <AgentSessionPlacementSetting searchQuery={searchQuery} />}
-
-				{showChangesOpenTarget && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label
-								htmlFor="changes-open-target"
-								className="text-sm font-medium"
-							>
-								<HighlightText
-									text={t({
-										message: "Changes open target",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									Choose how the Changes view opens from the top bar
-								</Trans>
-							</p>
-						</div>
-						<Select
-							value={changesOpenTarget}
-							onValueChange={(value) =>
-								updateSetting("changesOpenTarget", value as ChangesOpenTarget)
-							}
-						>
-							<SelectTrigger id="changes-open-target" className="w-[180px]">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="pane">
-									<Trans>Pane in current tab</Trans>
-								</SelectItem>
-								<SelectItem value="tab">
-									<Trans>New tab</Trans>
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				)}
 
 				{showResourceMonitor && (
 					<div className="flex items-center justify-between">

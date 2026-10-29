@@ -957,12 +957,6 @@ msgstr "此工作區中的 {entryPath} 已在其他組織中發佈為頁面。�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#項失敗} other {#項失敗}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{total}項檢查中有{failing}項失敗"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{total}項檢查中有{failing}項失敗"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {此工作區中有 # 個檔案更改} other {此工作區中有 # 個檔案更改}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total}項檢查"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0}項檢查通過"
 
-msgid "{pending} of {total} check running"
-msgstr "{total}項檢查中有{pending}項執行中"
-
-msgid "{pending} of {total} checks running"
-msgstr "{total}項檢查中有{pending}項執行中"
-
 msgid "{percent} used"
 msgstr "已使用 {percent}"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, other {已合併 # 個智慧代理 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中斷"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {#項檢查全部通過} other {#項檢查全部通過}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub議題} other {GitHub議題}}"
@@ -3966,9 +3951,6 @@ msgstr "更新日誌"
 msgid "Changes"
 msgstr "更改"
 
-msgid "Changes open target"
-msgstr "變更檢視開啟位置"
-
 msgid "Changes requested"
 msgstr "要求修改"
 
@@ -4179,9 +4161,6 @@ msgstr "選擇應用"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "選擇在沒有預覽窗格時檔案的開啟方式"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "選擇從頂欄開啟變更檢視的方式"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "選擇在終端中Cmd+點選檔案路徑時的開啟方式"
@@ -4427,9 +4406,6 @@ msgstr "關閉此工作區中的全部埠"
 
 msgid "Close Browser"
 msgstr "關閉瀏覽器"
-
-msgid "Close changes"
-msgstr "關閉更改"
 
 msgid "Close Chat"
 msgstr "關閉聊天"
@@ -11354,9 +11330,6 @@ msgstr "已合併，但無法重新整理PR狀態 — 請稍後重試"
 msgid "Merging PR..."
 msgstr "正在合併PR..."
 
-msgid "Merging pull request"
-msgstr "正在合併拉取請求"
-
 msgid "Merging…"
 msgstr "正在合併…"
 
@@ -13178,9 +13151,6 @@ msgstr "開啟瀏覽器"
 msgid "Open browser again"
 msgstr "重新開啟瀏覽器"
 
-msgid "Open changes"
-msgstr "開啟更改"
-
 msgid "Open Changes"
 msgstr "開啟更改"
 
@@ -13445,9 +13415,6 @@ msgstr "開啟拉取請求"
 msgid "Open pull request #{0}"
 msgstr "開啟拉取請求#{0}"
 
-msgid "Open pull request options"
-msgstr "開啟拉取請求選項"
-
 msgid "Open recent"
 msgstr "開啟最近使用"
 
@@ -13465,9 +13432,6 @@ msgstr "開啟設定"
 
 msgid "Open sheet"
 msgstr "開啟側邊面板"
-
-msgid "Open ship options"
-msgstr "開啟發布選項"
 
 msgid "Open System Settings"
 msgstr "開啟系統設定"
@@ -13830,9 +13794,6 @@ msgstr "有薪工作試用"
 
 msgid "Palette"
 msgstr "調色盤"
-
-msgid "Pane in current tab"
-msgstr "目前分頁中的窗格"
 
 msgid "Pane system"
 msgstr "面板系統"
@@ -20445,9 +20406,6 @@ msgstr "更新於{0}"
 msgid "Updated {date}"
 msgstr "更新於{date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "更新於{updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "剛剛從 {0} 更新。"
@@ -21348,9 +21306,6 @@ msgstr "工作區根目錄"
 
 msgid "Workspace Run"
 msgstr "工作區執行"
-
-msgid "Workspace run options"
-msgstr "工作區執行選項"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "工作區執行：{workspaceRunState}"
