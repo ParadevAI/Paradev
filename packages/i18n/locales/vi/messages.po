@@ -17309,6 +17309,9 @@ msgstr "Onboarding mượt hơn"
 msgid "Snapshot"
 msgstr "Snapshot"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Chụp ảnh worktree trước và sau mỗi lượt chat, để thẻ của lượt liệt kê mọi tệp đã thay đổi, kể cả sửa đổi bằng shell, và có thể hoàn tác chúng. Mỗi prompt sẽ chờ ảnh chụp của nó xong trước."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Chụp nhanh không gian làm việc này ở trạng thái hiện tại, cùng mọi thứ đã cài đặt. Các không gian làm việc mới từ môi trường này bắt đầu từ bản chụp đó."
 
@@ -19479,6 +19482,9 @@ msgstr "Theo dõi ngân sách và chi tiêu"
 
 msgid "Track down that flaky test…"
 msgstr "Truy ra bài test chập chờn đó…"
+
+msgid "Track file changes per turn"
+msgstr "Theo dõi thay đổi tệp theo từng lượt"
 
 msgid "Track tasks in"
 msgstr "Theo dõi công việc trong"

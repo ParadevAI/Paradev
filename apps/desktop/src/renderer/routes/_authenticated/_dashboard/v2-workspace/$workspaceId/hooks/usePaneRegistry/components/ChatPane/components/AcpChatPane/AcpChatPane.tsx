@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { SessionView } from "../../../ChatSession/components/SessionView";
@@ -121,6 +122,7 @@ export function AcpChatPane({
 	modeId?: string;
 }) {
 	const { t } = useLingui();
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
@@ -586,6 +588,7 @@ export function AcpChatPane({
 					...(handoffPrompt ? { handoffPrompt } : {}),
 					...(modelId ? { modelId } : {}),
 					...(modeId ? { modeId } : {}),
+					...(snapshotWorktree ? { snapshotWorktree: true } : {}),
 				});
 			} catch (error) {
 				// A host from before rewindSession: fall back to a fresh session
@@ -631,6 +634,7 @@ export function AcpChatPane({
 			agentLabel,
 			modelId,
 			modeId,
+			snapshotWorktree,
 		],
 	);
 	const onEditMessage = useCallback(

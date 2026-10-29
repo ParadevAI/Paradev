@@ -44,6 +44,7 @@ export type PromptOptions = {
 	clientId: string;
 	commandId?: string;
 	steer?: { expectedTurnId: string };
+	snapshotWorktree?: boolean;
 };
 
 export type SessionSubscribeOptions = {
@@ -162,6 +163,7 @@ export function createSessionClient(
 				clientId: promptOptions.clientId,
 				content: promptOptions.content,
 				...(promptOptions.steer ? { steer: promptOptions.steer } : {}),
+				...(promptOptions.snapshotWorktree ? { snapshotWorktree: true } : {}),
 			}),
 
 		removeQueuedPrompt: async (itemId) => {

@@ -494,11 +494,10 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			return options.dedupe.run(`prompt:${parsed.commandId}`, () =>
 				options.live
 					.require(parsed.sessionId)
-					.prompt(
-						parsed.content,
-						parsed.clientId,
-						parsed.steer?.expectedTurnId,
-					),
+					.prompt(parsed.content, parsed.clientId, {
+						steerTurnId: parsed.steer?.expectedTurnId,
+						snapshotWorktree: parsed.snapshotWorktree === true,
+					}),
 			);
 		},
 
@@ -684,6 +683,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 								{ type: "text", text: parsed.prompt },
 							],
 							`rewind-${parsed.commandId}`,
+							{ snapshotWorktree: parsed.snapshotWorktree === true },
 						);
 					} catch (error) {
 						await this.closeSession({ sessionId: created.sessionId }).catch(

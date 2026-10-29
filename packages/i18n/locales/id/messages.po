@@ -17309,6 +17309,9 @@ msgstr "Onboarding yang lebih mulus"
 msgid "Snapshot"
 msgstr "Snapshot"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Ambil snapshot worktree sebelum dan sesudah setiap giliran chat, agar kartunya mencantumkan setiap file yang berubah, termasuk edit lewat shell, dan dapat membatalkannya. Setiap prompt menunggu snapshot-nya lebih dulu."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Membuat snapshot workspace ini seperti sekarang, beserta semua yang terpasang di dalamnya. Workspace baru dari environment ini dimulai dari snapshot tersebut."
 
@@ -19479,6 +19482,9 @@ msgstr "Pantau anggaran dan pengeluaran"
 
 msgid "Track down that flaky test…"
 msgstr "Lacak tes flaky itu…"
+
+msgid "Track file changes per turn"
+msgstr "Lacak perubahan file per giliran"
 
 msgid "Track tasks in"
 msgstr "Lacak tugas di"

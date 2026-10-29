@@ -51,12 +51,18 @@ function startSessionWithAdapters(script: FakeHarnessScript) {
 	return { runtime, sessionId, adapters };
 }
 
-function sendPrompt(runtime: ChatRuntime, sessionId: string, text: string) {
+function sendPrompt(
+	runtime: ChatRuntime,
+	sessionId: string,
+	text: string,
+	options: { snapshotWorktree?: boolean } = {},
+) {
 	return runtime.commands.prompt({
 		commandId: randomUUID(),
 		sessionId,
 		clientId: `client-${text}`,
 		content: [{ type: "text", text }],
+		...options,
 	});
 }
 
@@ -241,7 +247,9 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		sendPrompt(runtime, sessionId, "hello");
+		sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
 
 		await waitFor(() => calls.length === 1);
 		expect(runtime.live.require(sessionId).turn).toBeNull();
@@ -256,6 +264,27 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a prompt that does not ask for a snapshot goes to the agent at once", async () => {
+		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
+		const { calls, checkpoints } = gatedCheckpoints();
+		const runtime = createTestRuntime({ harnesses, checkpoints });
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		const result = sendPrompt(runtime, sessionId, "hello");
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(result.itemId)?.turnId ===
+				"t1",
+		);
+		expect(calls).toEqual([]);
+		await runtime.dispose();
+	});
+
 	test("a prompt cancelled while the worktree is snapshotted never reaches the agent", async () => {
 		const { harnesses } = fakeHarnessRegistry(SINGLE_TURN);
 		const { calls, release, checkpoints } = gatedCheckpoints();
@@ -266,7 +295,9 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		const result = sendPrompt(runtime, sessionId, "hello");
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
 		await waitFor(() => calls.length === 1);
 
 		runtime.live.require(sessionId).cancelTurn();
@@ -511,7 +542,9 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		const result = sendPrompt(runtime, sessionId, "hello");
+		const result = sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
 		await waitFor(
 			() => runtime.live.require(sessionId).turn?.id === "agent-turn",
 		);
@@ -555,8 +588,12 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		sendPrompt(runtime, sessionId, "first");
-		sendPrompt(runtime, sessionId, "second");
+		sendPrompt(runtime, sessionId, "first", {
+			snapshotWorktree: true,
+		});
+		sendPrompt(runtime, sessionId, "second", {
+			snapshotWorktree: true,
+		});
 		await waitFor(() => {
 			const current = runtime.live.require(sessionId).turn;
 			return current?.id === "agent-turn" && current.status === "completed";
@@ -585,7 +622,9 @@ describe("LiveSession", () => {
 			harness: FAKE_HARNESS,
 			cwd: "/tmp/workspace",
 		});
-		sendPrompt(runtime, sessionId, "hello");
+		sendPrompt(runtime, sessionId, "hello", {
+			snapshotWorktree: true,
+		});
 		await waitFor(
 			() => runtime.live.require(sessionId).turn?.status === "running",
 		);

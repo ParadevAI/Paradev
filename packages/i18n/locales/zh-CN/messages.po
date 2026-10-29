@@ -17309,6 +17309,9 @@ msgstr "更顺畅的上手流程"
 msgid "Snapshot"
 msgstr "快照"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "在每轮聊天前后为 worktree 创建快照，使该轮的卡片列出每个更改的文件（包括 shell 编辑）并可以撤销。每条提示词会先等待其快照完成。"
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "为此工作区的当前状态（包括其中安装的所有内容）创建快照。从该环境新建的工作区将从此快照开始。"
 
@@ -19479,6 +19482,9 @@ msgstr "跟踪预算和支出"
 
 msgid "Track down that flaky test…"
 msgstr "揪出那个不稳定的测试…"
+
+msgid "Track file changes per turn"
+msgstr "按轮跟踪文件更改"
 
 msgid "Track tasks in"
 msgstr "任务管理位置"

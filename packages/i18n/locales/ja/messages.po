@@ -17309,6 +17309,9 @@ msgstr "よりスムーズなオンボーディング"
 msgid "Snapshot"
 msgstr "スナップショット"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "このワークスペースを、インストール済みのものも含めて現在の状態でスナップショットします。この環境から作る新しいワークスペースは、そのスナップショットから始まります。"
 
@@ -19479,6 +19482,9 @@ msgstr "予算と支出を管理"
 
 msgid "Track down that flaky test…"
 msgstr "不安定なテストの原因を突き止める…"
+
+msgid "Track file changes per turn"
+msgstr "ターンごとにファイルの変更を記録"
 
 msgid "Track tasks in"
 msgstr "タスクの管理先"

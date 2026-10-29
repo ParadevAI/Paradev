@@ -17309,6 +17309,9 @@ msgstr "Reibungsloseres Onboarding"
 msgid "Snapshot"
 msgstr "Snapshot"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Vor und nach jedem Chat-Durchlauf einen Snapshot des Worktrees erstellen, damit seine Karte jede geänderte Datei auflistet, auch Shell-Änderungen, und sie rückgängig machen kann. Jeder Prompt wartet zuerst auf seinen Snapshot."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Erstellt einen Snapshot dieses Arbeitsbereichs im aktuellen Zustand, mit allem, was darin installiert ist. Neue Arbeitsbereiche aus dieser Umgebung starten von diesem Snapshot."
 
@@ -19479,6 +19482,9 @@ msgstr "Budgets und Ausgaben verfolgen"
 
 msgid "Track down that flaky test…"
 msgstr "Diesem flaky Test auf den Grund gehen…"
+
+msgid "Track file changes per turn"
+msgstr "Dateiänderungen pro Durchlauf verfolgen"
 
 msgid "Track tasks in"
 msgstr "Aufgabenverwaltung"

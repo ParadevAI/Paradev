@@ -17309,6 +17309,9 @@ msgstr "Daha akıcı ilk kurulum"
 msgid "Snapshot"
 msgstr "Anlık görüntü"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Bu çalışma alanının, içine kurulan her şeyle birlikte şu anki halinin anlık görüntüsünü alır. Bu ortamdan açılan yeni çalışma alanları bu anlık görüntüden başlar."
 
@@ -19479,6 +19482,9 @@ msgstr "Bütçeleri ve harcamaları takip edin"
 
 msgid "Track down that flaky test…"
 msgstr "Şu kararsız testin izini sür…"
+
+msgid "Track file changes per turn"
+msgstr "Dosya değişikliklerini tur başına izle"
 
 msgid "Track tasks in"
 msgstr "Görevleri şurada takip et"

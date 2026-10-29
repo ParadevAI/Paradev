@@ -17309,6 +17309,9 @@ msgstr "Płynniejszy onboarding"
 msgid "Snapshot"
 msgstr "Migawka"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Rób migawkę worktree przed każdą turą czatu i po niej, aby jej karta pokazywała każdy zmieniony plik, także zmiany z powłoki, i mogła je cofnąć. Każdy prompt najpierw czeka na swoją migawkę."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Tworzy migawkę tego obszaru roboczego w obecnym stanie, ze wszystkim, co jest w nim zainstalowane. Nowe obszary robocze z tego środowiska zaczynają od tej migawki."
 
@@ -19479,6 +19482,9 @@ msgstr "Śledź budżety i wydatki"
 
 msgid "Track down that flaky test…"
 msgstr "Wytrop ten niestabilny test…"
+
+msgid "Track file changes per turn"
+msgstr "Śledź zmiany plików w każdej turze"
 
 msgid "Track tasks in"
 msgstr "Śledź zadania w"

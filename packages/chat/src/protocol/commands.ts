@@ -32,6 +32,7 @@ export const promptInputSchema = z.object({
 	clientId: z.string().min(1),
 	content: z.array(userContentSchema).min(1),
 	steer: z.object({ expectedTurnId: z.string().min(1) }).optional(),
+	snapshotWorktree: z.boolean().optional(),
 });
 export type PromptInput = z.infer<typeof promptInputSchema>;
 
@@ -131,6 +132,7 @@ export const rewindSessionInputSchema = z.object({
 	handoffPrompt: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	snapshotWorktree: z.boolean().optional(),
 });
 export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
 

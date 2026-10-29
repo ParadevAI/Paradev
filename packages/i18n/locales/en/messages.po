@@ -17309,6 +17309,9 @@ msgstr "Smoother onboarding"
 msgid "Snapshot"
 msgstr "Snapshot"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 
@@ -19479,6 +19482,9 @@ msgstr "Track budgets and spending"
 
 msgid "Track down that flaky test…"
 msgstr "Track down that flaky test…"
+
+msgid "Track file changes per turn"
+msgstr "Track file changes per turn"
 
 msgid "Track tasks in"
 msgstr "Track tasks in"

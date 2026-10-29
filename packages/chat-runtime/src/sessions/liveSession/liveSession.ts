@@ -66,6 +66,7 @@ type PendingPrompt = {
 	content: UserContent[];
 	turnId: string;
 	seq: number;
+	snapshotWorktree?: boolean;
 	/** The worktree snapshot taken just before the prompt was sent. */
 	before?: string | null;
 };
@@ -234,8 +235,9 @@ export class LiveSession {
 	prompt(
 		content: UserContent[],
 		clientId: string,
-		steerTurnId?: string,
+		options: { steerTurnId?: string; snapshotWorktree?: boolean } = {},
 	): PromptResult {
+		const { steerTurnId, snapshotWorktree } = options;
 		const itemId = this.mintId();
 		const seq = ++this.sent;
 		const shown = content.filter(
@@ -276,7 +278,7 @@ export class LiveSession {
 		};
 		const turnId = this.mintId();
 		if (queued) {
-			this.queue.push({ item, content: sent, turnId, seq });
+			this.queue.push({ item, content: sent, turnId, seq, snapshotWorktree });
 			this.appendDurable({ type: "item", item, turnId });
 			if (
 				steerTurnId &&
@@ -288,7 +290,7 @@ export class LiveSession {
 			return { itemId, queued: true };
 		}
 		this.appendDurable({ type: "item", item, turnId });
-		this.deliver({ item, content: sent, turnId, seq });
+		this.deliver({ item, content: sent, turnId, seq, snapshotWorktree });
 		return { itemId, queued: false };
 	}
 
@@ -629,7 +631,7 @@ export class LiveSession {
 
 	private deliver(prompt: PendingPrompt): void {
 		const checkpoints = this.options.checkpoints;
-		if (!checkpoints) {
+		if (!checkpoints || !prompt.snapshotWorktree) {
 			this.awaitingTurn = prompt;
 			this.send(prompt);
 			return;

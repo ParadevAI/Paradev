@@ -17309,6 +17309,9 @@ msgstr "Introdução mais fluida"
 msgid "Snapshot"
 msgstr "Snapshot"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Tira um snapshot da worktree antes e depois de cada turno do chat, para que o card liste cada arquivo alterado, incluindo edições feitas pelo shell, e possa desfazê-las. Cada prompt espera primeiro pelo seu snapshot."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Cria um snapshot deste espaço de trabalho como está agora, com tudo o que foi instalado nele. Novos espaços de trabalho deste ambiente começam a partir desse snapshot."
 
@@ -19479,6 +19482,9 @@ msgstr "Acompanhar orçamentos e gastos"
 
 msgid "Track down that flaky test…"
 msgstr "Investigue aquele teste instável…"
+
+msgid "Track file changes per turn"
+msgstr "Acompanhar alterações de arquivos por turno"
 
 msgid "Track tasks in"
 msgstr "Acompanhar tarefas em"

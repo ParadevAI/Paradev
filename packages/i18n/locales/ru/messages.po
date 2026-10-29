@@ -17309,6 +17309,9 @@ msgstr "Более гладкий онбординг"
 msgid "Snapshot"
 msgstr "Снимок"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Делать снимок worktree до и после каждого хода чата, чтобы его карточка показывала каждый изменённый файл, включая правки из оболочки, и могла их отменить. Каждый промпт сначала ждёт свой снимок."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Сохраняет снимок этого рабочего пространства в текущем состоянии со всем установленным. Новые рабочие пространства из этого окружения начинаются с этого снимка."
 
@@ -19479,6 +19482,9 @@ msgstr "Следите за бюджетами и расходами"
 
 msgid "Track down that flaky test…"
 msgstr "Найди причину нестабильного теста…"
+
+msgid "Track file changes per turn"
+msgstr "Отслеживать изменения файлов по ходам"
 
 msgid "Track tasks in"
 msgstr "Где вести задачи"

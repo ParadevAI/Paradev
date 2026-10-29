@@ -29,6 +29,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import {
 	ChatPaneActionsProvider,
@@ -174,7 +175,12 @@ export function SessionView({
 	onNewChat?: () => void;
 }) {
 	const { t } = useLingui();
-	const session = useChatSession({ client, sendEnabled: held === undefined });
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
+	const session = useChatSession({
+		client,
+		sendEnabled: held === undefined,
+		snapshotWorktree,
+	});
 	const composerRef = useRef<ComposerHandle>(null);
 	const drawerRef = useRef<WorkDrawerHandle>(null);
 	const transcriptRef = useRef<TranscriptHandle>(null);

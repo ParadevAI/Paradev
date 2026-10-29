@@ -17309,6 +17309,9 @@ msgstr "Plynulejší onboarding"
 msgid "Snapshot"
 msgstr "Snímek"
 
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Pořizovat snímek worktree před každým tahem chatu a po něm, aby jeho karta uváděla každý změněný soubor včetně změn ze shellu a dokázala je vrátit zpět. Každý prompt nejdřív počká na svůj snímek."
+
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Vytvoří snímek tohoto pracovního prostoru v aktuálním stavu se vším, co je v něm nainstalované. Nové pracovní prostory z tohoto prostředí začnou z tohoto snímku."
 
@@ -19479,6 +19482,9 @@ msgstr "Sledování rozpočtů a výdajů"
 
 msgid "Track down that flaky test…"
 msgstr "Vypátrej ten nestabilní test…"
+
+msgid "Track file changes per turn"
+msgstr "Sledovat změny souborů po každém tahu"
 
 msgid "Track tasks in"
 msgstr "Sledovat úkoly v"
