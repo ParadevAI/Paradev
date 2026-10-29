@@ -87,9 +87,25 @@ export function isDiffLanguage(language: string | null): boolean {
 }
 
 const GIT_DIFF_HEADER = /^diff --git /m;
+const UNIFIED_HEADERS = /^--- (\S+).*\n\+\+\+ (\S+)/gm;
 const UNIFIED_SIDE_PREFIX = /^[ab]\//;
 
-/** Headerless `---`/`+++` patches keep git's `a/`/`b/` prefixes in their names. */
+/**
+ * Whether every `---`/`+++` pair names its sides git's way (`a/` then `b/`,
+ * or `/dev/null`), so the prefixes are markers and not real directories.
+ */
+function usesSidePrefixes(text: string): boolean {
+	const pairs = [...text.matchAll(UNIFIED_HEADERS)];
+	return (
+		pairs.length > 0 &&
+		pairs.every(
+			([, oldPath, newPath]) =>
+				(oldPath === "/dev/null" || oldPath?.startsWith("a/")) &&
+				(newPath === "/dev/null" || newPath?.startsWith("b/")),
+		)
+	);
+}
+
 function withoutSidePrefixes(file: FileDiffMetadata): FileDiffMetadata {
 	const name = file.name.replace(UNIFIED_SIDE_PREFIX, "");
 	const prevName = file.prevName?.replace(UNIFIED_SIDE_PREFIX, "");
@@ -99,12 +115,24 @@ function withoutSidePrefixes(file: FileDiffMetadata): FileDiffMetadata {
 	return { ...file, name, prevName: undefined, type: "change" };
 }
 
-/** The files of a patch that changes at least one line, or none for other text. */
+/**
+ * The files of a patch the diff view can show in full, or none so the fence
+ * shows as code. A file without hunks is only kept when it is a pure rename:
+ * Pierre drops the `Binary files … differ` line, which would leave an empty
+ * diff.
+ */
 export function parsePatchFileDiffs(text: string): FileDiffMetadata[] {
 	try {
 		const files = parsePatchFiles(text).flatMap((patch) => patch.files);
 		if (!files.some((file) => file.hunks.length > 0)) return [];
-		return GIT_DIFF_HEADER.test(text) ? files : files.map(withoutSidePrefixes);
+		if (
+			files.some(
+				(file) => file.hunks.length === 0 && file.type !== "rename-pure",
+			)
+		)
+			return [];
+		if (GIT_DIFF_HEADER.test(text) || !usesSidePrefixes(text)) return files;
+		return files.map(withoutSidePrefixes);
 	} catch {
 		return [];
 	}

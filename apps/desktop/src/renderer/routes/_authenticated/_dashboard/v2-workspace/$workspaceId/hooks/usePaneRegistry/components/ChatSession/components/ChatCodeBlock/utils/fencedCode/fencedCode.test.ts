@@ -128,6 +128,16 @@ describe("parsePatchFileDiffs", () => {
 			"new.ts",
 		]);
 	});
+	test("keeps a real a/ directory in a headerless patch", () => {
+		const patch = "--- a/foo.ts\n+++ a/foo.ts\n@@ -1 +1 @@\n-a\n+b\n";
+		expect(parsePatchFileDiffs(patch).map((file) => file.name)).toEqual([
+			"a/foo.ts",
+		]);
+	});
+	test("shows a patch with a binary change as code", () => {
+		const patch = `diff --git a/x.ts b/x.ts\n--- a/x.ts\n+++ b/x.ts\n@@ -1 +1 @@\n-a\n+b\ndiff --git a/logo.png b/logo.png\nindex 1111111..2222222 100644\nBinary files a/logo.png and b/logo.png differ\n`;
+		expect(parsePatchFileDiffs(patch)).toEqual([]);
+	});
 	test("returns nothing for text that is not a patch", () => {
 		expect(parsePatchFileDiffs("const x = 1;")).toEqual([]);
 		expect(parsePatchFileDiffs("")).toEqual([]);
