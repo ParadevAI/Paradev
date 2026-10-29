@@ -16825,6 +16825,9 @@ msgstr "Regels na de wijziging hierboven tonen"
 msgid "Show lines before the change below"
 msgstr "Regels vóór de wijziging hieronder tonen"
 
+msgid "Show link menu"
+msgstr "Linkmenu tonen"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Laat de laatste 10 runs zien van mijn Linear-triage-automatisering"
 

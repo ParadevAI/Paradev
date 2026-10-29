@@ -16825,6 +16825,9 @@ msgstr "Zobrazit řádky za změnou výše"
 msgid "Show lines before the change below"
 msgstr "Zobrazit řádky před změnou níže"
 
+msgid "Show link menu"
+msgstr "Zobrazit nabídku odkazu"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Ukaž mi posledních 10 běhů mé automatizace na třídění v Linearu"
 

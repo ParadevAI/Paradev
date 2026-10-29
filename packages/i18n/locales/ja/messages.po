@@ -16825,6 +16825,9 @@ msgstr "上の変更より後の行を表示"
 msgid "Show lines before the change below"
 msgstr "下の変更より前の行を表示"
 
+msgid "Show link menu"
+msgstr "リンクメニューを表示"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linearトリアージのオートメーションの直近10件の実行を見せて"
 

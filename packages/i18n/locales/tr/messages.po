@@ -16825,6 +16825,9 @@ msgstr "Yukarıdaki değişiklikten sonraki satırları göster"
 msgid "Show lines before the change below"
 msgstr "Aşağıdaki değişiklikten önceki satırları göster"
 
+msgid "Show link menu"
+msgstr "Bağlantı menüsünü göster"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linear sınıflandırma otomasyonumun son 10 çalıştırmasını göster"
 

@@ -16825,6 +16825,9 @@ msgstr "위 변경 이후의 줄 보기"
 msgid "Show lines before the change below"
 msgstr "변경 앞부분의 줄을 아래에 표시"
 
+msgid "Show link menu"
+msgstr "링크 메뉴 표시"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "내 Linear 분류 자동화의 최근 실행 10건을 보여 줘"
 

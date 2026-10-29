@@ -16825,6 +16825,9 @@ msgstr "顯示上方改動之後的行"
 msgid "Show lines before the change below"
 msgstr "顯示下方改動之前的行"
 
+msgid "Show link menu"
+msgstr "顯示連結選單"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "給我看看Linear分類自動化最近10次執行"
 

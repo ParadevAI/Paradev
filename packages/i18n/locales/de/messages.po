@@ -16825,6 +16825,9 @@ msgstr "Zeilen nach der obigen Änderung anzeigen"
 msgid "Show lines before the change below"
 msgstr "Zeilen vor der Änderung unten anzeigen"
 
+msgid "Show link menu"
+msgstr "Linkmenü anzeigen"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Zeig mir die letzten 10 Läufe meiner Linear-Triage-Automatisierung"
 

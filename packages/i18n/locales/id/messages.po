@@ -16825,6 +16825,9 @@ msgstr "Tampilkan baris setelah perubahan di atas"
 msgid "Show lines before the change below"
 msgstr "Tampilkan baris sebelum perubahan di bawah"
 
+msgid "Show link menu"
+msgstr "Tampilkan menu tautan"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Tunjukkan 10 run terakhir otomatisasi triase Linear saya"
 

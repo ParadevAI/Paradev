@@ -16825,6 +16825,9 @@ msgstr "Pokaż wiersze po powyższej zmianie"
 msgid "Show lines before the change below"
 msgstr "Pokaż wiersze przed poniższą zmianą"
 
+msgid "Show link menu"
+msgstr "Pokaż menu linku"
+
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Pokaż mi 10 ostatnich uruchomień mojej automatyzacji segregacji Linear"
 
