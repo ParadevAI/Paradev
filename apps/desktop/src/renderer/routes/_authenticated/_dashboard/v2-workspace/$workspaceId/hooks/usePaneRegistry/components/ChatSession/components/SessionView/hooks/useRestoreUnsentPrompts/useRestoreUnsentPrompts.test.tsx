@@ -66,7 +66,6 @@ test("stopped-session replacement preserves unsent text without flushing on tran
 		steerSubagent: async () => "unsupported",
 		backgroundSubagent: async () => "unsupported",
 		respondToApproval: async () => {},
-		respondToUsageLimit: async () => {},
 		setMode: async () => {},
 		setConfigOption: async () => {},
 		subscribe: (options) => {

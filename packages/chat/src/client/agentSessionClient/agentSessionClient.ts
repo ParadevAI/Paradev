@@ -208,7 +208,6 @@ export function createAgentSessionClient(
 			return "unsupported" as const;
 		},
 		async respondToApproval() {},
-		async respondToUsageLimit() {},
 		async setMode() {},
 		async setConfigOption() {},
 

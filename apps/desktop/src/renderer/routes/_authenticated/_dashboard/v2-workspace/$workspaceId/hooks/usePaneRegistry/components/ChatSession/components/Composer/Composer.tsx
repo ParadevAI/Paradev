@@ -3,8 +3,6 @@ import type {
 	AvailableCommand,
 	SessionConfigOption,
 	SessionUsage,
-	UsageLimit,
-	UsageLimitAction,
 	UserContent,
 } from "@superset/chat/protocol";
 import type {
@@ -36,7 +34,6 @@ import {
 } from "react";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { env } from "renderer/env.renderer";
-import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useHotkey } from "renderer/hotkeys";
 import { FileIcon, getFileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
@@ -61,11 +58,6 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
-import {
-	type SwitchAccount,
-	type SwitchableAgent,
-	UsageLimitNotice,
-} from "./components/UsageLimitNotice";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
 	prependToDraft,
@@ -131,15 +123,6 @@ export type ComposerProps = {
 	turnRunning?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
-	usageLimit?: {
-		sessionAccount?: TerminalAgentBinding["account"];
-		limit: UsageLimit;
-		respond: (action: UsageLimitAction) => unknown;
-		modelLabel?: string | undefined;
-		agent?: SwitchableAgent | undefined;
-		hostUrl?: string | null | undefined;
-		onSwitchAccount?: SwitchAccount | undefined;
-	};
 };
 
 const HIDDEN_AGENT_COMMANDS = new Set(["rewind"]);
@@ -199,7 +182,6 @@ export const Composer = memo(function Composer({
 	target,
 	turnRunning = false,
 	terminalId,
-	usageLimit,
 	workspaceId,
 	sessionId,
 }: ComposerProps) {
@@ -600,26 +582,12 @@ export const Composer = memo(function Composer({
 				useChatComposerStore.getState().markActive(composerId)
 			}
 		>
-			{usageLimit ? (
-				<div className={CHAT_COLUMN_CLASSNAME}>
-					<UsageLimitNotice
-						agent={usageLimit.agent}
-						sessionAccount={usageLimit.sessionAccount}
-						hostUrl={usageLimit.hostUrl}
-						limit={usageLimit.limit}
-						modelLabel={usageLimit.modelLabel}
-						onRespond={usageLimit.respond}
-						onSwitchAccount={usageLimit.onSwitchAccount}
-					/>
-				</div>
-			) : (
-				terminalId && (
-					<AccountLimitNotice
-						className={CHAT_COLUMN_CLASSNAME}
-						terminalId={terminalId}
-						workspaceId={workspaceId}
-					/>
-				)
+			{terminalId && (
+				<AccountLimitNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					terminalId={terminalId}
+					workspaceId={workspaceId}
+				/>
 			)}
 			<AgentComposer
 				className={CHAT_COLUMN_CLASSNAME}

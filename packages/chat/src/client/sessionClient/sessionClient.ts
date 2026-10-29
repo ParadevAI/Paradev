@@ -3,7 +3,6 @@ import type {
 	ChatRouterOutputs,
 } from "@superset/chat-runtime";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
-import type { UsageLimitAction } from "../../protocol/commands";
 import type { Cursor } from "../../protocol/cursor";
 import type { DeltaChannel, Envelope } from "../../protocol/envelope";
 import type { Decision, UserContent } from "../../protocol/items";
@@ -78,7 +77,6 @@ export type SessionClient = {
 	steerQueuedPrompt(itemId: string): Promise<void>;
 	updateQueuedPrompt(itemId: string, content: UserContent[]): Promise<void>;
 	resumeQueue(): Promise<void>;
-	respondToUsageLimit(action: UsageLimitAction): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	steerSubagent(
@@ -159,14 +157,6 @@ export function createSessionClient(
 
 		resumeQueue: async () => {
 			await options.transport.resumeQueue({ commandId: mintId(), sessionId });
-		},
-
-		respondToUsageLimit: async (action) => {
-			await options.transport.respondToUsageLimit({
-				commandId: mintId(),
-				sessionId,
-				action,
-			});
 		},
 
 		cancelTurn: async (turnId, cancelOptions) => {

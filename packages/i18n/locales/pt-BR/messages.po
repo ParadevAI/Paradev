@@ -367,11 +367,6 @@ msgstr "{0} — dispositivo offline"
 msgid "{0} — try the Paradev tray menu > Host Service > Restart."
 msgstr "{0} — tente pelo menu da bandeja do Paradev > Serviço do host > Reiniciar."
 
-#. placeholder {0}: window.label
-#. placeholder {1}: formatPercent(window.usedPercent / 100)
-msgid "{0} · {1} used"
-msgstr "{0} · {1} usado"
-
 #. placeholder {0}: host.version
 msgid "{0} · behind"
 msgstr "{0} · desatualizado"
@@ -1564,9 +1559,6 @@ msgstr "45 arquivos · +82 −172"
 msgid "5 days"
 msgstr "5 dias"
 
-msgid "5-hour limit reached"
-msgstr "Limite de 5 horas atingido"
-
 msgid "55 call sites pass {code}"
 msgstr "55 pontos de chamada passam {code}"
 
@@ -1883,9 +1875,6 @@ msgstr "Adicione configurações de agente aqui depois, quando quiser publicá-l
 
 msgid "Add agents…"
 msgstr "Adicionar agentes…"
-
-msgid "Add an account in Usage settings"
-msgstr "Adicionar uma conta nas configurações de uso"
 
 msgid "add an agent"
 msgstr "adicionar um agente"
@@ -3703,9 +3692,6 @@ msgstr "Cancelar plano"
 msgid "Cancel reply"
 msgstr "Cancelar resposta"
 
-msgid "Cancel the automatic resume"
-msgstr "Cancelar a retomada automática"
-
 msgid "Canceled"
 msgstr "Canceladas"
 
@@ -5039,12 +5025,6 @@ msgstr "Continuar ou bifurcar a sessão"
 
 msgid "Continue the session the last run left"
 msgstr "Retomar a sessão da última execução"
-
-msgid "Continue this chat on another login"
-msgstr "Continuar este chat em outro login"
-
-msgid "Continue this chat once the limit resets"
-msgstr "Continuar este chat quando o limite for redefinido"
 
 #. placeholder {0}: connector.displayName
 msgid "Continue to {0}"
@@ -6847,9 +6827,6 @@ msgstr "Dispensar sugestão"
 msgid "Dismiss suggestions"
 msgstr "Dispensar sugestões"
 
-msgid "Dismiss the usage limit notice"
-msgstr "Dispensar o aviso de limite de uso"
-
 msgid "Dismissed"
 msgstr "foi dispensado"
 
@@ -7607,9 +7584,6 @@ msgstr "Muito alto"
 
 msgid "Extra small"
 msgstr "Extra pequeno"
-
-msgid "Extra usage limit reached"
-msgstr "Limite de uso extra atingido"
 
 msgid "Eyes"
 msgstr "Olhos"
@@ -10358,9 +10332,6 @@ msgstr "Lima"
 
 msgid "Limit access"
 msgstr "Limitar acesso"
-
-msgid "Limit has reset"
-msgstr "O limite foi redefinido"
 
 msgid "Limit to {organizationName}?"
 msgstr "Limitar a {organizationName}?"
@@ -15539,9 +15510,6 @@ msgstr "Retomar um chat"
 msgid "Resume args"
 msgstr "Argumentos de retomada"
 
-msgid "Resume at reset"
-msgstr "Retomar na redefinição"
-
 msgid "Resume automation"
 msgstr "Retomar automação"
 
@@ -15551,9 +15519,6 @@ msgstr "Retomar notificações"
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "Retomando {0}…"
-
-msgid "Resuming at reset"
-msgstr "Retomando na redefinição"
 
 msgid "Resuming the conversation…"
 msgstr "Retomando a conversa…"
@@ -17740,9 +17705,6 @@ msgstr "parado"
 msgid "Stopped"
 msgstr "Parado"
 
-msgid "Stopped by the usage limit"
-msgstr "Interrompido pelo limite de uso"
-
 msgid "Stopping the agent in {what}"
 msgstr "Parando o agente em {what}"
 
@@ -17877,9 +17839,6 @@ msgstr "Constância"
 
 msgid "Sustain · active days in 30"
 msgstr "Constância · dias ativos em 30"
-
-msgid "Switch account"
-msgstr "Trocar de conta"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Troque de agente. Mantenha seu fluxo"
@@ -19943,14 +19902,8 @@ msgstr "Uso"
 msgid "Usage is out of date"
 msgstr "Os dados de uso estão desatualizados"
 
-msgid "Usage limit reached"
-msgstr "Limite de uso atingido"
-
 msgid "Usage sections"
 msgstr "Seções de uso"
-
-msgid "Usage settings"
-msgstr "Configurações de uso"
 
 msgid "Usage unavailable."
 msgstr "Uso indisponível."
@@ -20428,17 +20381,8 @@ msgstr "Semanalmente"
 msgid "Weekly at {time}"
 msgstr "Semanalmente às {time}"
 
-msgid "Weekly limit reached"
-msgstr "Limite semanal atingido"
-
-msgid "Weekly Opus limit reached"
-msgstr "Limite semanal do Opus atingido"
-
 msgid "Weekly release notes"
 msgstr "Notas de versão semanais"
-
-msgid "Weekly Sonnet limit reached"
-msgstr "Limite semanal do Sonnet atingido"
 
 msgid "Welcome back"
 msgstr "Que bom te ver de novo"

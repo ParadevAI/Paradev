@@ -1,1 +1,0 @@
-export { closeChatForAccountSwitch } from "./closeChatForAccountSwitch";

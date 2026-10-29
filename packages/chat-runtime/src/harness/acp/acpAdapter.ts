@@ -14,7 +14,6 @@ import type {
 	ToolCall,
 	Turn,
 	TurnError,
-	UsageLimit,
 	UserContent,
 } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, isHiddenText } from "@superset/chat/protocol";
@@ -27,11 +26,6 @@ import type {
 	HarnessAdapter,
 	HarnessStartOptions,
 } from "../types";
-import {
-	type RefusedWindow,
-	refusedWindow,
-	USAGE_LIMIT_TEXT,
-} from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
 	AIR_CLIENT_META,
@@ -427,8 +421,6 @@ export class AcpAdapter implements HarnessAdapter {
 	/** Shared by `start` and native discovery so a list never spawns a second agent. */
 	private connection: Promise<void> | null = null;
 	private sessionId: string | null = null;
-	private refused: RefusedWindow = null;
-	private lastModel: string | null = null;
 	private loadingSessionId: string | null = null;
 	private cwd = process.cwd();
 	private currentTurn: Turn | null = null;
@@ -1097,7 +1089,6 @@ export class AcpAdapter implements HarnessAdapter {
 
 	private async runTurn(content: UserContent[]): Promise<void> {
 		if (!this.client || !this.sessionId) return;
-		this.refused = null;
 		const turnId = this.mintId();
 		this.emitTurn({
 			id: turnId,
@@ -1133,13 +1124,7 @@ export class AcpAdapter implements HarnessAdapter {
 		} catch (error) {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
-			const failure = this.turnError(error);
-			const limit = this.usageLimitFrom(failure.message);
-			if (limit) this.emitSession({ usageLimit: limit });
-			this.failTurn(
-				turnId,
-				limit ? { ...failure, kind: "usage_limit" } : failure,
-			);
+			this.failTurn(turnId, this.turnError(error));
 		}
 	}
 
@@ -1311,12 +1296,6 @@ export class AcpAdapter implements HarnessAdapter {
 
 		if (variant === "usage_update") {
 			const usage = acpUsageUpdateSchema.safeParse(outer.data.update);
-			if (usage.success && usage.data._meta?.["_claude/rateLimit"]) {
-				this.refused = refusedWindow(usage.data._meta["_claude/rateLimit"]);
-			}
-			if (typeof usage.data?._meta?.["_claude/model"] === "string") {
-				this.lastModel = usage.data._meta["_claude/model"];
-			}
 			if (usage.success && usage.data.cost !== undefined) this.main.flush();
 			if (
 				usage.success &&
@@ -2542,23 +2521,6 @@ export class AcpAdapter implements HarnessAdapter {
 			},
 			this.resolveTurnId(),
 		);
-	}
-
-	/**
-	 * The agent forwards Claude's `rate_limit_event` on its usage updates and
-	 * ends a refused turn with the CLI's own words. A refusal paid for by extra
-	 * usage reports nothing, and a turn that survives one is not a limit.
-	 */
-	private usageLimitFrom(message: string): UsageLimit | null {
-		const refused = this.refused;
-		this.refused = null;
-		if (!refused && !USAGE_LIMIT_TEXT.test(message)) return null;
-		return {
-			hitAtMs: this.now(),
-			...(refused?.resetsAtMs ? { resetsAtMs: refused.resetsAtMs } : {}),
-			...(refused?.window ? { window: refused.window } : {}),
-			...(this.lastModel ? { model: this.lastModel } : {}),
-		};
 	}
 
 	private emitSession(session: Partial<SessionState>): void {

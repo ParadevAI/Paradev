@@ -367,11 +367,6 @@ msgstr "{0}: dispositivo sin conexión"
 msgid "{0} — try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}: prueba con el menú de la bandeja de Paradev > Servicio de host > Reiniciar."
 
-#. placeholder {0}: window.label
-#. placeholder {1}: formatPercent(window.usedPercent / 100)
-msgid "{0} · {1} used"
-msgstr "{0} · {1} usado"
-
 #. placeholder {0}: host.version
 msgid "{0} · behind"
 msgstr "{0} · desactualizado"
@@ -1564,9 +1559,6 @@ msgstr "45 archivos · +82 −172"
 msgid "5 days"
 msgstr "5 días"
 
-msgid "5-hour limit reached"
-msgstr "Límite de 5 horas alcanzado"
-
 msgid "55 call sites pass {code}"
 msgstr "55 puntos de llamada pasan {code}"
 
@@ -1883,9 +1875,6 @@ msgstr "Añade aquí configuraciones de agente más adelante, cuando quieras pub
 
 msgid "Add agents…"
 msgstr "Añadir agentes…"
-
-msgid "Add an account in Usage settings"
-msgstr "Añadir una cuenta en los ajustes de uso"
 
 msgid "add an agent"
 msgstr "añadir un agente"
@@ -3703,9 +3692,6 @@ msgstr "Cancelar el plan"
 msgid "Cancel reply"
 msgstr "Cancelar respuesta"
 
-msgid "Cancel the automatic resume"
-msgstr "Cancelar la reanudación automática"
-
 msgid "Canceled"
 msgstr "Cancelado"
 
@@ -5039,12 +5025,6 @@ msgstr "Continuar o bifurcar la sesión"
 
 msgid "Continue the session the last run left"
 msgstr "Continuar la sesión que dejó la última ejecución"
-
-msgid "Continue this chat on another login"
-msgstr "Continuar este chat con otra cuenta"
-
-msgid "Continue this chat once the limit resets"
-msgstr "Continuar este chat cuando se restablezca el límite"
 
 #. placeholder {0}: connector.displayName
 msgid "Continue to {0}"
@@ -6847,9 +6827,6 @@ msgstr "Descartar sugerencia"
 msgid "Dismiss suggestions"
 msgstr "Descartar las sugerencias"
 
-msgid "Dismiss the usage limit notice"
-msgstr "Descartar el aviso de límite de uso"
-
 msgid "Dismissed"
 msgstr "Descartado"
 
@@ -7607,9 +7584,6 @@ msgstr "Muy alto"
 
 msgid "Extra small"
 msgstr "Muy pequeño"
-
-msgid "Extra usage limit reached"
-msgstr "Límite de uso adicional alcanzado"
 
 msgid "Eyes"
 msgstr "Ojos"
@@ -10358,9 +10332,6 @@ msgstr "Lima"
 
 msgid "Limit access"
 msgstr "Limitar acceso"
-
-msgid "Limit has reset"
-msgstr "El límite se ha restablecido"
 
 msgid "Limit to {organizationName}?"
 msgstr "¿Limitar a {organizationName}?"
@@ -15539,9 +15510,6 @@ msgstr "Reanudar un chat"
 msgid "Resume args"
 msgstr "Argumentos de reanudación"
 
-msgid "Resume at reset"
-msgstr "Reanudar al restablecerse"
-
 msgid "Resume automation"
 msgstr "Reanudar la automatización"
 
@@ -15551,9 +15519,6 @@ msgstr "Reanudar notificaciones"
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "Retomando {0}…"
-
-msgid "Resuming at reset"
-msgstr "Se reanudará al restablecerse"
 
 msgid "Resuming the conversation…"
 msgstr "Reanudando la conversación…"
@@ -17740,9 +17705,6 @@ msgstr "detenido"
 msgid "Stopped"
 msgstr "Detenido"
 
-msgid "Stopped by the usage limit"
-msgstr "Detenido por el límite de uso"
-
 msgid "Stopping the agent in {what}"
 msgstr "Deteniendo el agente en {what}"
 
@@ -17877,9 +17839,6 @@ msgstr "Constancia"
 
 msgid "Sustain · active days in 30"
 msgstr "Constancia · días activos de 30"
-
-msgid "Switch account"
-msgstr "Cambiar de cuenta"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Cambia de agente. Conserva tu flujo de trabajo"
@@ -19943,14 +19902,8 @@ msgstr "Uso"
 msgid "Usage is out of date"
 msgstr "Los datos de uso están desactualizados"
 
-msgid "Usage limit reached"
-msgstr "Límite de uso alcanzado"
-
 msgid "Usage sections"
 msgstr "Secciones de uso"
-
-msgid "Usage settings"
-msgstr "Ajustes de uso"
 
 msgid "Usage unavailable."
 msgstr "Uso no disponible."
@@ -20428,17 +20381,8 @@ msgstr "Semanal"
 msgid "Weekly at {time}"
 msgstr "Semanalmente a las {time}"
 
-msgid "Weekly limit reached"
-msgstr "Límite semanal alcanzado"
-
-msgid "Weekly Opus limit reached"
-msgstr "Límite semanal de Opus alcanzado"
-
 msgid "Weekly release notes"
 msgstr "Notas de versión semanales"
-
-msgid "Weekly Sonnet limit reached"
-msgstr "Límite semanal de Sonnet alcanzado"
 
 msgid "Welcome back"
 msgstr "Hola de nuevo"

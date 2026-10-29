@@ -60,27 +60,6 @@ export type UpdateQueuedPromptInput = z.infer<
 export const resumeQueueInputSchema = z.object(commandBaseFields);
 export type ResumeQueueInput = z.infer<typeof resumeQueueInputSchema>;
 
-/**
- * What to do about a usage limit: `resume` continues now, `dismiss` drops the
- * notice and leaves the queue as it is, and the two scheduling actions arm or
- * disarm the host continuing the session once the limit resets.
- */
-export const usageLimitActionSchema = z.enum([
-	"resume",
-	"dismiss",
-	"resume_at_reset",
-	"cancel_resume_at_reset",
-]);
-export type UsageLimitAction = z.infer<typeof usageLimitActionSchema>;
-
-export const respondToUsageLimitInputSchema = z.object({
-	...commandBaseFields,
-	action: usageLimitActionSchema,
-});
-export type RespondToUsageLimitInput = z.infer<
-	typeof respondToUsageLimitInputSchema
->;
-
 export const cancelTurnInputSchema = z.object({
 	...commandBaseFields,
 	turnId: z.string().min(1),
