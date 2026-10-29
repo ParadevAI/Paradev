@@ -33,16 +33,6 @@ test("an aside only clears the slot it still owns", () => {
 	).toBeUndefined();
 });
 
-test("pinning is per workspace", () => {
-	const { togglePinned } = useActivityPanelStore.getState();
-	togglePinned("ws-a");
-	togglePinned("ws-b");
-	togglePinned("ws-b");
-	const { pinned } = useActivityPanelStore.getState();
-	expect(pinned["ws-a"]).toBe(true);
-	expect(pinned["ws-b"]).toBeUndefined();
-});
-
 test("fits and stopped keys are tracked per call and cleared on demand", () => {
 	const { setFits, noteStopped, forgetStopped } =
 		useActivityPanelStore.getState();

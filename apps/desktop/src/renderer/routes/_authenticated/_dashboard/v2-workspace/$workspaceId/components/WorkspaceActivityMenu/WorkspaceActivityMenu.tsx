@@ -13,6 +13,7 @@ import {
 	useEffect,
 	useId,
 	useMemo,
+	useRef,
 	useState,
 	useSyncExternalStore,
 } from "react";
@@ -135,18 +136,20 @@ export function WorkspaceActivityMenu({
 			: null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
-	const panelPinned = useActivityPanelStore(
-		(state) => state.pinned[workspaceId] === true,
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const triggerRef = useRef<HTMLButtonElement>(null);
+	const anchorNode = useActivityPanelStore(
+		(state) => state.anchorNodes[workspaceId],
 	);
-	const togglePinned = useActivityPanelStore((state) => state.togglePinned);
 	const asideNode = useActivityPanelStore(
 		(state) => state.asideNodes[workspaceId],
 	);
 	const fits = useActivityPanelStore(
 		(state) => state.fits[workspaceId] === true,
 	);
-	const open = panelPinned;
-	const floating = panelPinned && !fits;
+	const floating = popoverOpen && !fits;
+	const open = fits || floating;
+	const panelId = `workspace-activity-${workspaceId}`;
 	const newPageStatusId = useId();
 	const {
 		flowState,
@@ -420,15 +423,26 @@ export function WorkspaceActivityMenu({
 		if (open) markSeen(workspaceId, newestPublishedAt);
 	}, [open, workspaceId, newestPublishedAt, markSeen]);
 
-	const togglePanel = () => {
-		togglePinned(workspaceId);
-		markSeen(workspaceId, workspace[0]?.publishedAtMs ?? 0);
-		if (!panelPinned) {
+	useEffect(() => {
+		if (fits) setPopoverOpen(false);
+	}, [fits]);
+
+	const setFloating = (next: boolean) => {
+		setPopoverOpen(next);
+		if (next) {
 			void utils.page.listPaginated.invalidate(workspaceListInput);
 			return;
 		}
 		setComposing(false);
 		setShipView(null);
+	};
+
+	const onTriggerClick = () => {
+		if (fits) {
+			document.getElementById(panelId)?.querySelector("button")?.focus();
+			return;
+		}
+		setFloating(!popoverOpen);
 	};
 
 	const handleOpenPage = (page: MenuPage, event: MouseEvent) => {
@@ -542,7 +556,7 @@ export function WorkspaceActivityMenu({
 					? `min(${PANEL_MAX_HEIGHT_PX}px, var(--radix-popover-content-available-height))`
 					: `min(${PANEL_MAX_HEIGHT_PX}px, 100%)`,
 			}}
-			id={`workspace-activity-${workspaceId}`}
+			id={panelId}
 			data-activity-panel
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {
@@ -700,91 +714,85 @@ export function WorkspaceActivityMenu({
 	);
 
 	return (
-		<Popover
-			open={floating}
-			onOpenChange={(next) => {
-				if (!next) togglePanel();
-			}}
-		>
+		<Popover open={floating} onOpenChange={setFloating}>
+			<PopoverAnchor
+				virtualRef={{ current: anchorNode ?? triggerRef.current }}
+			/>
 			<Tooltip disableHoverableContent>
 				<TooltipTrigger asChild>
-					<PopoverAnchor asChild>
-						<button
-							type="button"
-							onClick={togglePanel}
-							aria-label={
-								changes && currentPr
-									? t({
-											message: `Workspace activity, pull request #${currentPr.number}`,
-										})
-									: t({ message: "Workspace activity" })
-							}
-							aria-pressed={panelPinned}
-							aria-controls={
-								panelPinned ? `workspace-activity-${workspaceId}` : undefined
-							}
-							aria-describedby={hasNew ? newPageStatusId : undefined}
-							className={cn(
-								"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
-								"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-								panelPinned
-									? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
-									: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
-							)}
-						>
-							<ListTree className="size-3.5 shrink-0" />
-							{runningCount > 0 ? (
-								<>
-									<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-									<span className="tabular-nums">{runningCount}</span>
-								</>
-							) : (
-								!paneAreaStyle &&
-								workspace.length > 0 && (
-									<span className="tabular-nums">{workspace.length}</span>
-								)
-							)}
-							{changes && currentPr && currentPrState ? (
+					<button
+						ref={triggerRef}
+						type="button"
+						onClick={onTriggerClick}
+						aria-label={
+							changes && currentPr
+								? t({
+										message: `Workspace activity, pull request #${currentPr.number}`,
+									})
+								: t({ message: "Workspace activity" })
+						}
+						aria-expanded={open}
+						aria-controls={open ? panelId : undefined}
+						aria-describedby={hasNew ? newPageStatusId : undefined}
+						className={cn(
+							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
+							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+							open
+								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
+								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+						)}
+					>
+						<ListTree className="size-3.5 shrink-0" />
+						{runningCount > 0 ? (
+							<>
+								<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+								<span className="tabular-nums">{runningCount}</span>
+							</>
+						) : (
+							!paneAreaStyle &&
+							workspace.length > 0 && (
+								<span className="tabular-nums">{workspace.length}</span>
+							)
+						)}
+						{changes && currentPr && currentPrState ? (
+							<>
+								<span className="h-3.5 w-px shrink-0 bg-border" />
+								<PRIcon state={currentPrState} className="size-3.5 shrink-0" />
+								<span className="tabular-nums">#{currentPr.number}</span>
+								{currentPrChecks && showsChecks(currentPrState) && (
+									<PRStatusIndicators checks={currentPrChecks} />
+								)}
+							</>
+						) : (
+							triggerChangesStats && (
 								<>
 									<span className="h-3.5 w-px shrink-0 bg-border" />
-									<PRIcon
-										state={currentPrState}
-										className="size-3.5 shrink-0"
-									/>
-									<span className="tabular-nums">#{currentPr.number}</span>
-									{currentPrChecks && showsChecks(currentPrState) && (
-										<PRStatusIndicators checks={currentPrChecks} />
-									)}
-								</>
-							) : (
-								triggerChangesStats && (
-									<>
-										<span className="h-3.5 w-px shrink-0 bg-border" />
-										<GitCompareArrows className="size-3.5 shrink-0" />
-										<span className="flex items-center gap-1">
-											<ChangesStats stats={triggerChangesStats} />
-										</span>
-									</>
-								)
-							)}
-							{hasNew && (
-								<>
-									<span
-										aria-hidden="true"
-										className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
-									/>
-									<span id={newPageStatusId} className="sr-only">
-										<Trans context="badge on a page published since the menu was last opened">
-											New
-										</Trans>
+									<GitCompareArrows className="size-3.5 shrink-0" />
+									<span className="flex items-center gap-1">
+										<ChangesStats stats={triggerChangesStats} />
 									</span>
 								</>
-							)}
-						</button>
-					</PopoverAnchor>
+							)
+						)}
+						{hasNew && (
+							<>
+								<span
+									aria-hidden="true"
+									className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
+								/>
+								<span id={newPageStatusId} className="sr-only">
+									<Trans context="badge on a page published since the menu was last opened">
+										New
+									</Trans>
+								</span>
+							</>
+						)}
+					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					{panelPinned ? (
+					{fits ? (
+						<Trans>Workspace activity</Trans>
+					) : floating ? (
 						<Trans>Hide workspace activity</Trans>
 					) : (
 						<Trans>Show workspace activity</Trans>
@@ -793,7 +801,7 @@ export function WorkspaceActivityMenu({
 			</Tooltip>
 			<PopoverContent
 				align="end"
-				sideOffset={6}
+				sideOffset={0}
 				className="w-80 border-0 bg-transparent p-0 shadow-none"
 				onEscapeKeyDown={(event) => {
 					if (shipView || composing) event.preventDefault();

@@ -2,9 +2,10 @@ import { useLingui } from "@lingui/react/macro";
 import { useIsTabVisible } from "@superset/panes";
 import { useCallback, useLayoutEffect, useState } from "react";
 import {
-	MIN_CONTENT_WIDTH_PX,
+	CENTERED_CONTENT_WIDTH_PX,
 	PANEL_CONTENT_GAP_PX,
 	PANEL_EDGE_GAP_PX,
+	PANEL_TOP_GAP_PX,
 	PANEL_WIDTH_PX,
 } from "../../constants";
 import { useActivityPanelStore } from "../../stores/activityPanelStore";
@@ -12,9 +13,6 @@ import { useActivityPanelStore } from "../../stores/activityPanelStore";
 const INSET_PX = PANEL_WIDTH_PX + PANEL_EDGE_GAP_PX + PANEL_CONTENT_GAP_PX;
 
 export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
-	const pinned = useActivityPanelStore(
-		(state) => state.pinned[workspaceId] === true,
-	);
 	const { t } = useLingui();
 	const isTabVisible = useIsTabVisible();
 	const setAsideNode = useActivityPanelStore((state) => state.setAsideNode);
@@ -22,20 +20,24 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	const setFits = useActivityPanelStore((state) => state.setFits);
 	const [sentinel, setSentinel] = useState<HTMLElement | null>(null);
 	const [hasRoom, setHasRoom] = useState(false);
-	const shown = pinned && hasRoom && isTabVisible;
+	const setAnchorNode = useActivityPanelStore((state) => state.setAnchorNode);
+	const clearAnchorNode = useActivityPanelStore(
+		(state) => state.clearAnchorNode,
+	);
+	const shown = hasRoom && isTabVisible;
 
 	useLayoutEffect(() => {
 		const host = sentinel?.parentElement;
 		if (!host) return;
 		const measure = () =>
-			setHasRoom(host.clientWidth >= PANEL_WIDTH_PX + MIN_CONTENT_WIDTH_PX);
+			setHasRoom(host.clientWidth >= CENTERED_CONTENT_WIDTH_PX + 2 * INSET_PX);
 		measure();
 		const observer = new ResizeObserver(measure);
 		observer.observe(host);
 		return () => observer.disconnect();
 	}, [sentinel]);
 
-	const fits = hasRoom && isTabVisible;
+	const fits = shown;
 	useLayoutEffect(() => {
 		setFits(workspaceId, fits);
 		return () => setFits(workspaceId, false);
@@ -50,6 +52,14 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 		};
 	}, [sentinel, shown]);
 
+	const attachAnchor = useCallback(
+		(node: HTMLElement) => {
+			setAnchorNode(workspaceId, node);
+			return () => clearAnchorNode(workspaceId, node);
+		},
+		[workspaceId, setAnchorNode, clearAnchorNode],
+	);
+
 	const attach = useCallback(
 		(node: HTMLElement) => {
 			setAsideNode(workspaceId, node);
@@ -61,6 +71,18 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	return (
 		<>
 			<span aria-hidden className="hidden" ref={setSentinel} />
+			{isTabVisible && (
+				<span
+					aria-hidden
+					className="pointer-events-none invisible absolute h-0"
+					ref={attachAnchor}
+					style={{
+						top: PANEL_TOP_GAP_PX,
+						right: PANEL_EDGE_GAP_PX,
+						width: PANEL_WIDTH_PX,
+					}}
+				/>
+			)}
 			{shown && (
 				<aside
 					aria-label={t({ message: "Workspace activity" })}

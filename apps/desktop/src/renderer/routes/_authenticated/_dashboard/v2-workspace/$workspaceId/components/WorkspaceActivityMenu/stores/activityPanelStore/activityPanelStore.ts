@@ -14,7 +14,6 @@ export type FinishedSubagent = {
 const NO_FINISHED: readonly FinishedSubagent[] = [];
 
 interface ActivityPanelStore {
-	pinned: Record<string, true>;
 	finished: Record<string, readonly FinishedSubagent[]>;
 	asideNodes: Record<string, HTMLElement>;
 	fits: Record<string, true>;
@@ -24,7 +23,9 @@ interface ActivityPanelStore {
 	forgetStopped: (keys: readonly string[]) => void;
 	setAsideNode: (workspaceId: string, node: HTMLElement) => void;
 	clearAsideNode: (workspaceId: string, node: HTMLElement) => void;
-	togglePinned: (workspaceId: string) => void;
+	anchorNodes: Record<string, HTMLElement>;
+	setAnchorNode: (workspaceId: string, node: HTMLElement) => void;
+	clearAnchorNode: (workspaceId: string, node: HTMLElement) => void;
 	recordFinished: (
 		workspaceId: string,
 		entries: readonly FinishedSubagent[],
@@ -32,7 +33,6 @@ interface ActivityPanelStore {
 }
 
 export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
-	pinned: {},
 	finished: {},
 	asideNodes: {},
 	fits: {},
@@ -64,10 +64,18 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 			const { [workspaceId]: _cleared, ...asideNodes } = state.asideNodes;
 			return { asideNodes };
 		}),
-	togglePinned: (workspaceId) =>
+	anchorNodes: {},
+	setAnchorNode: (workspaceId, node) =>
+		set((state) =>
+			state.anchorNodes[workspaceId] === node
+				? state
+				: { anchorNodes: { ...state.anchorNodes, [workspaceId]: node } },
+		),
+	clearAnchorNode: (workspaceId, node) =>
 		set((state) => {
-			const { [workspaceId]: wasPinned, ...rest } = state.pinned;
-			return { pinned: wasPinned ? rest : { ...rest, [workspaceId]: true } };
+			if (state.anchorNodes[workspaceId] !== node) return state;
+			const { [workspaceId]: _cleared, ...anchorNodes } = state.anchorNodes;
+			return { anchorNodes };
 		}),
 	recordFinished: (workspaceId, entries) =>
 		set((state) => {
