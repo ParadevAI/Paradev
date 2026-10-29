@@ -43,6 +43,9 @@ mock.module(`${root}/components/PageHeader`, () => ({
 mock.module(`${root}/pull-requests/components/PullRequestListToggle`, () => ({
 	PullRequestListToggle: () => null,
 }));
+mock.module(`${root}/pull-requests/hooks/useRefreshPullRequest`, () => ({
+	useRefreshPullRequest: () => ({ refresh: () => {}, isRefreshing: false }),
+}));
 mock.module("renderer/hooks/useActiveOrganizationId", () => ({
 	useActiveOrganizationId: () => "org",
 }));

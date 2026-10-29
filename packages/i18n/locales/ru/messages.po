@@ -14844,6 +14844,9 @@ msgstr "Обновить задачи Linear"
 msgid "Refresh metrics"
 msgstr "Обновить метрики"
 
+msgid "Refresh pull request"
+msgstr "Обновить пул-реквест"
+
 msgid "Refresh pull requests"
 msgstr "Обновить пул-реквесты"
 
