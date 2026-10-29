@@ -237,17 +237,28 @@ function claudeSkillTrees(
 }
 
 /**
- * `npx skills add` links `~/.claude/skills/superset` at a plain skill in
- * `~/.agents/skills`, which takes the directory the managed plugin needs. A
- * link to a plugin (a checkout someone develops in) is left alone.
+ * `npx skills add superset-sh/superset` (our docs, May to July 2026) put a
+ * plain `superset` skill where the managed plugin needs to live: a link into
+ * `~/.agents/skills`, or a copy of its one SKILL.md. A link to a plugin (a
+ * checkout someone develops in) and any other directory are left alone.
  */
-function isLinkedPlainSkill(target: string): boolean {
+function isSkillsCliInstall(target: string): boolean {
+	let stat: fs.Stats;
 	try {
-		if (!fs.lstatSync(target).isSymbolicLink()) return false;
+		stat = fs.lstatSync(target);
 	} catch {
 		return false;
 	}
-	return !fs.existsSync(path.join(target, ".claude-plugin", "plugin.json"));
+	if (stat.isSymbolicLink()) {
+		return !fs.existsSync(path.join(target, ".claude-plugin", "plugin.json"));
+	}
+	if (!stat.isDirectory()) return false;
+	if (fs.readdirSync(target).join() !== "SKILL.md") return false;
+	const skill = fs.readFileSync(path.join(target, "SKILL.md"), "utf-8");
+	return (
+		/^name: superset$/m.test(skill) &&
+		/^allowed-tools: Bash\(superset:\*\)$/m.test(skill)
+	);
 }
 
 /**
@@ -265,10 +276,10 @@ async function provisionClaudePlugin(
 ): Promise<void> {
 	const target = path.join(claudeDir, "skills", BUNDLED_SOURCE_NAME);
 	const sentinel = path.join(target, MANAGED_SENTINEL_NAME);
-	if (isLinkedPlainSkill(target)) {
-		await rm(target);
+	if (isSkillsCliInstall(target)) {
+		await rm(target, { recursive: true });
 		console.log(
-			`[agent-setup] Replaced the linked superset skill at ${target} with the managed plugin`,
+			`[agent-setup] Replaced the skills CLI superset skill at ${target} with the managed plugin`,
 		);
 	} else if (fs.existsSync(target) && !fs.existsSync(sentinel)) {
 		console.warn(

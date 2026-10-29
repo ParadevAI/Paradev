@@ -34,6 +34,9 @@ const claudePlugin = path.join(claudeSkills, "superset");
 const agentsSkills = path.join(HOME_DIR, ".agents", "skills");
 const commandsDir = path.join(HOME_DIR, ".agents", "commands", "superset");
 
+const OLD_CLI_SKILL =
+	"---\nname: superset\ndescription: Drives the Superset CLI.\nallowed-tools: Bash(superset:*)\n---\n\n# Superset CLI\n";
+
 function skillMd(name: string): string {
 	return `---\nname: ${name}\ndescription: test ${name} skill\n---\n\n# ${name} body\n`;
 }
@@ -261,6 +264,29 @@ describe("createManagedSkills", () => {
 		expect(readFileSync(path.join(linkedSkill, "SKILL.md"), "utf-8")).toBe(
 			skillMd("superset"),
 		);
+	});
+
+	it("replaces a copied skills-CLI superset skill in the plugin dir", async () => {
+		mkdirSync(claudePlugin, { recursive: true });
+		writeFileSync(path.join(claudePlugin, "SKILL.md"), OLD_CLI_SKILL);
+
+		await run();
+
+		expect(existsSync(path.join(claudePlugin, "SKILL.md"))).toBe(false);
+		expect(
+			existsSync(path.join(claudePlugin, "skills", "feedback", "SKILL.md")),
+		).toBe(true);
+	});
+
+	it("keeps a superset skill dir that holds more than the CLI's one file", async () => {
+		mkdirSync(claudePlugin, { recursive: true });
+		writeFileSync(path.join(claudePlugin, "SKILL.md"), OLD_CLI_SKILL);
+		writeFileSync(path.join(claudePlugin, "notes.md"), "mine\n");
+
+		await run();
+
+		expect(existsSync(path.join(claudePlugin, "notes.md"))).toBe(true);
+		expect(existsSync(path.join(claudePlugin, "skills"))).toBe(false);
 	});
 
 	it("leaves a linked plugin checkout in the plugin dir alone", async () => {
