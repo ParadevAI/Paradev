@@ -217,8 +217,12 @@ export function DiffPane({
 	const [dirtyItemIds, setDirtyItemIds] = useState<ReadonlySet<string>>(
 		new Set(),
 	);
+	// One sequence across items and edit sessions, so a write that finishes
+	// after its session closed can never match a later session's revision.
+	const editSequenceRef = useRef(0);
 	const editRevisionRef = useRef(new Map<string, number>());
 	const savedRevisionRef = useRef(new Map<string, number>());
+	const saveQueueRef = useRef(new Map<string, Promise<boolean>>());
 	const pendingEditorFocusRef = useRef<{
 		itemId: string;
 		lineNumber: number;
@@ -303,10 +307,14 @@ export function DiffPane({
 	});
 	fileByItemIdRef.current = fileByItemId;
 
-	const saveEditedItem = useCallback(
+	const writeEditedItem = useCallback(
 		async (itemId: string): Promise<boolean> => {
-			const revision = editRevisionRef.current.get(itemId) ?? 0;
-			if (revision === (savedRevisionRef.current.get(itemId) ?? 0)) return true;
+			const revision = editRevisionRef.current.get(itemId);
+			if (
+				revision === undefined ||
+				revision === savedRevisionRef.current.get(itemId)
+			)
+				return true;
 			const editedFile = codeViewRef.current?.getEditor(itemId)?.getFile();
 			const file = getFile(itemId);
 			const worktreePath = workspaceQuery.data?.worktreePath;
@@ -350,8 +358,7 @@ export function DiffPane({
 					);
 					return false;
 				}
-				const saved = savedRevisionRef.current;
-				saved.set(itemId, Math.max(saved.get(itemId) ?? 0, revision));
+				savedRevisionRef.current.set(itemId, revision);
 				// Edits typed while the write was in flight still need a save.
 				if (editRevisionRef.current.get(itemId) === revision) {
 					setDirtyItemIds((current) => {
@@ -383,6 +390,22 @@ export function DiffPane({
 			utils,
 			t,
 		],
+	);
+
+	// Saves for one item run in order, so an older write can't land last.
+	const saveEditedItem = useCallback(
+		(itemId: string): Promise<boolean> => {
+			const queue = saveQueueRef.current;
+			const save = (queue.get(itemId) ?? Promise.resolve(true)).then(() =>
+				writeEditedItem(itemId),
+			);
+			queue.set(itemId, save);
+			void save.finally(() => {
+				if (queue.get(itemId) === save) queue.delete(itemId);
+			});
+			return save;
+		},
+		[writeEditedItem],
 	);
 
 	const exitEditing = useCallback((itemId: string) => {
@@ -719,8 +742,8 @@ export function DiffPane({
 			_event: EditorChangeEvent<EditorType, DiffAnnotationMetadata, undefined>,
 			item: CodeViewItem<DiffAnnotationMetadata>,
 		) => {
-			const revisions = editRevisionRef.current;
-			revisions.set(item.id, (revisions.get(item.id) ?? 0) + 1);
+			editSequenceRef.current += 1;
+			editRevisionRef.current.set(item.id, editSequenceRef.current);
 			setDirtyItemIds((current) => new Set(current).add(item.id));
 		},
 		[],
