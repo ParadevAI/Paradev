@@ -28,14 +28,14 @@ import {
 	useHostUsageQuota,
 } from "renderer/hooks/host-service/useHostUsageQuota";
 import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
-import { useSetDefaultUsageAccount } from "renderer/routes/_authenticated/settings/usage/hooks/useSetDefaultUsageAccount";
-import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
 import {
 	MENU_PANEL_CLASS,
 	MENU_ROW_CLASS,
 	PILL_CHEVRON_CLASS,
 	PILL_TRIGGER_CLASS,
-} from "../../constants";
+} from "renderer/routes/_authenticated/components/AgentComposer/constants";
+import { useSetDefaultUsageAccount } from "renderer/routes/_authenticated/settings/usage/hooks/useSetDefaultUsageAccount";
+import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
 
 const TICK_MS = 30_000;
 const CLOSE_TICK_MS = 5_000;

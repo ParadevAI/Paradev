@@ -28,6 +28,7 @@ export function CloudWorkspaceRow({
 	now,
 	cache,
 	onCopied,
+	card = false,
 }: {
 	row: CloudWorkspaceRowData;
 	repoFullName?: string;
@@ -36,6 +37,8 @@ export function CloudWorkspaceRow({
 	now: Date;
 	cache: HostWorkspacesCacheOps;
 	onCopied: () => void;
+	/** A cell of Home's wide grid rather than a row of the Cloud list. */
+	card?: boolean;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
@@ -76,7 +79,10 @@ export function CloudWorkspaceRow({
 
 	const body = (
 		<Pressable
-			className="bg-background flex-row items-center gap-3 rounded-xl py-2 pl-4 pr-3"
+			className={cn(
+				"bg-background flex-row items-center gap-3 rounded-xl pr-3",
+				card ? "py-3 pl-3" : "py-2 pl-4",
+			)}
 			onPress={() => router.push(`/(authenticated)/workspace/${row.id}`)}
 			ph-label="cloud-workspace-row"
 		>

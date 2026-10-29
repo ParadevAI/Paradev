@@ -31,5 +31,6 @@ export function heldPromptQueue(
 		remove: NOTHING,
 		resume: NOTHING,
 		steer: NOTHING,
+		update: NOTHING,
 	};
 }

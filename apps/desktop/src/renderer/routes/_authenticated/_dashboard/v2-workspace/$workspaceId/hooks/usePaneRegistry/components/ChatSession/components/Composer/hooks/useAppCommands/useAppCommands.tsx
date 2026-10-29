@@ -14,6 +14,7 @@ import { toast } from "@superset/ui/sonner";
 import { type RefObject, useCallback, useMemo, useState } from "react";
 import { useCreateAutomation } from "renderer/routes/_authenticated/_dashboard/hooks/useCreateAutomation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { fastOption } from "renderer/routes/_authenticated/components/AgentComposer/utils/toggleOption";
 import type { ChatForkTarget } from "../../../../types";
 import { commandChip } from "../../../../utils/commandChip";
 import {
@@ -25,7 +26,6 @@ import { splitInvocation } from "../../utils/commandArgs";
 import { resolveCollisions } from "../../utils/commandCollisions";
 import { PLAN_ID, type PlanSwitch, planControl } from "../../utils/planControl";
 import { restoreCommand } from "../../utils/restoreCommand";
-import { fastOption } from "../../utils/toggleOption";
 
 export type TypedCommandOutcome = "not-app" | "ran" | "kept";
 

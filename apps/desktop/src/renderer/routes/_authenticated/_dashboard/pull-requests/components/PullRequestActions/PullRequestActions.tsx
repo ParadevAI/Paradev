@@ -32,11 +32,16 @@ import {
 	Hammer,
 	Link2,
 	LoaderCircle,
+	RefreshCw,
 	SquareArrowOutUpRight,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
+import {
+	linkedContextSeed,
+	linkedPrChip,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { normalizePRState } from "renderer/screens/main/components/PRIcon";
 import {
 	type LinkedPR,
@@ -88,6 +93,8 @@ interface PullRequestActionsProps {
 	 * already the workspace's own and a second one would be a duplicate.
 	 */
 	showStartWorkspace?: boolean;
+	onRefresh?: () => void;
+	isRefreshing?: boolean;
 }
 
 function IconAction({
@@ -129,6 +136,8 @@ export function PullRequestActions({
 	data,
 	isLoading,
 	showStartWorkspace = true,
+	onRefresh,
+	isRefreshing = false,
 }: PullRequestActionsProps) {
 	const { t } = useLingui();
 	const prNumber = target?.prNumber ?? null;
@@ -232,7 +241,10 @@ export function PullRequestActions({
 		};
 		resetDraft();
 		selectProject(projectId);
-		updateDraft({ hostId, linkedPR });
+		updateDraft({
+			hostId,
+			promptDraft: linkedContextSeed([linkedPrChip(linkedPR)]),
+		});
 		openNewWorkspace(projectId);
 	};
 
@@ -285,6 +297,21 @@ export function PullRequestActions({
 
 	return (
 		<div className="flex shrink-0 items-center gap-1">
+			{onRefresh ? (
+				<IconAction
+					label={t({ message: "Refresh pull request" })}
+					onClick={onRefresh}
+					disabled={isRefreshing}
+				>
+					<RefreshCw
+						strokeWidth={1.75}
+						className={cn(
+							"size-4",
+							isRefreshing && "animate-spin motion-reduce:animate-none",
+						)}
+					/>
+				</IconAction>
+			) : null}
 			<IconAction
 				label={copyLinkLabel}
 				onClick={() => {

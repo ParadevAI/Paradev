@@ -3,8 +3,10 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { cn } from "@superset/ui/utils";
 import {
+	CircleCheck,
 	CircleDot,
-	CircleX,
+	CircleSlash,
+	ExternalLink,
 	GitCompare,
 	GitMerge,
 	GitPullRequest,
@@ -12,13 +14,20 @@ import {
 	GitPullRequestDraft,
 	type LucideIcon,
 } from "lucide-react";
+import type { MouseEvent } from "react";
+import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
+import {
+	GITHUB_WORK_ITEM_TONE_TEXT,
+	githubWorkItemTone,
+} from "../../../../utils/githubWorkItemTone";
 
 /** What `github.getWorkItem` answers, as the card reads it. */
 export type GithubWorkItemGlance = {
 	title: string;
 	state: "open" | "closed" | "merged";
 	draft: boolean;
+	stateReason: string | null;
 	summary: string;
 	author: { login: string; avatarUrl: string | null } | null;
 	baseRefName: string | null;
@@ -53,38 +62,34 @@ function statusOf(
 	label: (typeof STATE_LABELS)[keyof typeof STATE_LABELS];
 	className: string;
 } {
+	const tone = githubWorkItemTone(kind, item);
+	const className = GITHUB_WORK_ITEM_TONE_TEXT[tone];
 	if (!item) {
 		return {
 			Icon: kind === "pr" ? GitPullRequest : CircleDot,
 			label: kind === "pr" ? STATE_LABELS.pr : STATE_LABELS.issue,
-			className: "text-foreground/50",
-		};
-	}
-	if (item.draft) {
-		return {
-			Icon: GitPullRequestDraft,
-			label: STATE_LABELS.draft,
-			className: "text-foreground/50",
+			className,
 		};
 	}
 	if (item.state === "merged") {
-		return {
-			Icon: GitMerge,
-			label: STATE_LABELS.merged,
-			className: "text-violet-400/90",
-		};
+		return { Icon: GitMerge, label: STATE_LABELS.merged, className };
 	}
 	if (item.state === "closed") {
-		return {
-			Icon: kind === "pr" ? GitPullRequestClosed : CircleX,
-			label: STATE_LABELS.closed,
-			className: "text-rose-400/90",
-		};
+		const Icon =
+			kind === "pr"
+				? GitPullRequestClosed
+				: tone === "done"
+					? CircleCheck
+					: CircleSlash;
+		return { Icon, label: STATE_LABELS.closed, className };
+	}
+	if (item.draft) {
+		return { Icon: GitPullRequestDraft, label: STATE_LABELS.draft, className };
 	}
 	return {
 		Icon: kind === "pr" ? GitPullRequest : CircleDot,
 		label: STATE_LABELS.open,
-		className: "text-emerald-400/90",
+		className,
 	};
 }
 
@@ -126,13 +131,20 @@ function Avatar({
 export function GithubWorkItemCard({
 	link,
 	load,
-	openHint = false,
+	url,
+	onOpen,
 }: {
 	link: GithubWorkItemLink;
 	load: GithubWorkItemLoad;
-	openHint?: boolean;
+	url: string;
+	onOpen?: () => void;
 }) {
 	const { i18n, t } = useLingui();
+	const { openLink } = useChatPaneActions();
+	const open = (event: MouseEvent<HTMLAnchorElement>) => {
+		if (openLink?.(url, event)) event.preventDefault();
+		onOpen?.();
+	};
 	const item = load.status === "ready" ? load.item : null;
 	const status = statusOf(link.kind, item);
 	const labels = item?.labels ?? [];
@@ -168,7 +180,15 @@ export function GithubWorkItemCard({
 			{item ? (
 				<>
 					<h3 className="mt-2 line-clamp-2 font-semibold text-[13px] text-foreground leading-[1.35]">
-						{item.title}
+						<a
+							className="text-inherit no-underline outline-none hover:underline focus-visible:underline"
+							href={url}
+							onClick={open}
+							rel="noreferrer"
+							target="_blank"
+						>
+							{item.title}
+						</a>
 					</h3>
 					{item.summary && (
 						<p className="mt-1.5 line-clamp-3 text-[11px] text-foreground/55 leading-[1.45]">
@@ -262,15 +282,18 @@ export function GithubWorkItemCard({
 				</div>
 			)}
 
-			{openHint && (
-				<div className="mt-3 border-foreground/[0.07] border-t pt-2 text-[10px] text-foreground/35">
-					{link.kind === "pr" ? (
-						<Trans>Click the chip to open the pull request</Trans>
-					) : (
-						<Trans>Click the chip to open the issue</Trans>
-					)}
-				</div>
-			)}
+			<div className="mt-3 border-foreground/[0.07] border-t pt-2">
+				<a
+					className="inline-flex items-center gap-1 rounded-sm font-medium text-[11px] text-foreground/55 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
+					href={url}
+					onClick={open}
+					rel="noreferrer"
+					target="_blank"
+				>
+					<ExternalLink aria-hidden="true" className="size-3" />
+					<Trans>Open on GitHub</Trans>
+				</a>
+			</div>
 		</div>
 	);
 }

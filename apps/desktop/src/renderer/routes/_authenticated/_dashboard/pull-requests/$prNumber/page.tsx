@@ -12,6 +12,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
 import { PullRequestListToggle } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestListToggle";
 import { usePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
+import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -60,6 +61,10 @@ function PullRequestDetailPage() {
 					prNumber,
 				};
 	const commentTarget = target && canActOnPullRequest(target) ? target : null;
+	const { refresh, isRefreshing } = useRefreshPullRequest({
+		target,
+		url: detail.data?.url,
+	});
 
 	// The list pane is always visible in the split view (or reachable via the
 	// list-collapse toggle in the shared layout), so there's no "back"
@@ -87,6 +92,8 @@ function PullRequestDetailPage() {
 						hostUrl={hostUrl}
 						data={detail.data}
 						isLoading={detail.isLoading}
+						onRefresh={refresh}
+						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</PageHeader>

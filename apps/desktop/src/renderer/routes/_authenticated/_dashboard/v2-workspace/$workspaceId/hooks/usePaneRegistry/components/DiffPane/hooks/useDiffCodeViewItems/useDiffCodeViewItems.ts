@@ -20,13 +20,13 @@ import type {
 	DiffPatchScope,
 	GetDiffPatchInput,
 } from "renderer/lib/diffPatchQuery";
+import { hashString } from "renderer/routes/_authenticated/_dashboard/utils/hashString";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "../../../../../useChangeset";
 import { createGetDiffInput } from "../../utils/createGetDiffInput";
 import { isGeneratedDiffFile } from "../../utils/diffLoadingGuards";
-import { hashString } from "../../utils/hashString";
 import type {
 	DeferredDiffReason,
 	DiffAnnotationMetadata,

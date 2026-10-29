@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { PencilIcon, PinIcon, ShareIcon } from "lucide-react-native";
 import { type ReactNode, type RefObject, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useHostProjects } from "@/hooks/useHostProjects";
@@ -25,7 +26,7 @@ function CircleAction({
 	active,
 	onPress,
 }: {
-	ref?: RefObject<View | null>;
+	ref?: RefObject<ViewInstance | null>;
 	icon: ReactNode;
 	label: string;
 	active?: boolean;
@@ -93,7 +94,7 @@ export function WorkspaceActionsSheet() {
 		id ? id in state.pinnedAt : false,
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
-	const shareRef = useRef<View>(null);
+	const shareRef = useRef<ViewInstance>(null);
 
 	const isCloud = host !== null && isSandboxHost(host.machineId);
 	const project = workspace?.projectId

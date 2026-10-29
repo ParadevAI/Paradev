@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
@@ -13,7 +14,6 @@ import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dash
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { V2WorkspaceProjectIcon } from "../../../V2WorkspaceProjectIcon";
 
 interface V2WorkspacesBoardCardProps {
@@ -58,6 +58,7 @@ function BoardCardBody({
 	// reach the real <button> or right-click never opens the menu.
 } & React.ComponentPropsWithRef<"button">) {
 	const { t } = useLingui();
+	const { formatCompactRelativeTime } = useFormat();
 	const isArchived = workspace.archivedAt != null;
 	const isDone = isArchived || workspace.pr?.state === "merged";
 	const isLocalWorkspace = workspace.type === "local";
@@ -69,9 +70,8 @@ function BoardCardBody({
 	const hasDiff =
 		workspace.diffStats != null &&
 		(workspace.diffStats.additions > 0 || workspace.diffStats.deletions > 0);
-	const timeLabel = getRelativeTime(
+	const timeLabel = formatCompactRelativeTime(
 		workspace.archivedAt ?? workspaceActivityAt(workspace),
-		{ format: "compact" },
 	);
 
 	return (
