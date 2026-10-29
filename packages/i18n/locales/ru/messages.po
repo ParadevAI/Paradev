@@ -10259,9 +10259,6 @@ msgstr "Конец 2026"
 msgid "Latency"
 msgstr "Задержка"
 
-msgid "Later"
-msgstr "Позже"
-
 msgid "Later messages are removed."
 msgstr "Последующие сообщения будут удалены."
 
@@ -15584,9 +15581,6 @@ msgstr "Перезапустить демон терминала?"
 msgid "Restart terminals"
 msgstr "Перезапустить терминалы"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Перезапустите приложение, чтобы использовать последнюю версию {appName}."
-
 msgid "Restart workspace"
 msgstr "Перезапустить рабочую область"
 
@@ -16468,6 +16462,9 @@ msgstr "Посмотрите, какое место ваши последние 
 
 msgid "Select"
 msgstr "Селект"
+
+msgid "Select a file to view it here"
+msgstr "Выберите файл, чтобы просмотреть его здесь"
 
 msgid "Select a project"
 msgstr "Выберите проект"
@@ -20009,9 +20006,6 @@ msgstr "Обновите Paradev на этом хосте, чтобы измен
 
 msgid "Update payment method"
 msgstr "Обновить способ оплаты"
-
-msgid "Update ready"
-msgstr "Обновление готово"
 
 msgid "Update Required"
 msgstr "Требуется обновление"

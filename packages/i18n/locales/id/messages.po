@@ -10259,9 +10259,6 @@ msgstr "Akhir 2026"
 msgid "Latency"
 msgstr "Latensi"
 
-msgid "Later"
-msgstr "Nanti"
-
 msgid "Later messages are removed."
 msgstr "Pesan berikutnya akan dihapus."
 
@@ -15584,9 +15581,6 @@ msgstr "Mulai ulang daemon terminal?"
 msgid "Restart terminals"
 msgstr "Mulai ulang terminal"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Mulai ulang untuk menggunakan versi terbaru {appName}."
-
 msgid "Restart workspace"
 msgstr "Mulai ulang workspace"
 
@@ -16468,6 +16462,9 @@ msgstr "Lihat posisi 30 hari terakhir Anda di papan peringkat publik. Hanya juml
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Pilih file untuk melihatnya di sini"
 
 msgid "Select a project"
 msgstr "Pilih sebuah proyek"
@@ -20009,9 +20006,6 @@ msgstr "Perbarui Paradev di host ini untuk mengedit konfigurasi workspace-nya."
 
 msgid "Update payment method"
 msgstr "Perbarui metode pembayaran"
-
-msgid "Update ready"
-msgstr "Pembaruan siap"
 
 msgid "Update Required"
 msgstr "Pembaruan Diperlukan"

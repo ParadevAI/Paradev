@@ -1,5 +1,5 @@
 {
-  "id": "f57b992f-f184-4c70-8b9a-014e7ba1c2c2",
+  "id": "f34ab4d4-993e-489d-b717-5d2fdd7eca86",
   "prevId": "19af1a79-aa7f-4bbe-b300-af5a9c04a12d",
   "version": "7",
   "dialect": "postgresql",
@@ -87,6 +87,101 @@
       },
       "isRLSEnabled": false
     },
+    "public.agent_memories": {
+      "name": "agent_memories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "agent_memories_agent_idx": {
+          "name": "agent_memories_agent_idx",
+          "columns": [
+            {
+              "expression": "agent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "agent_memories_organization_id_organizations_id_fk": {
+          "name": "agent_memories_organization_id_organizations_id_fk",
+          "tableFrom": "agent_memories",
+          "tableTo": "organizations",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "agent_memories_agent_id_agents_id_fk": {
+          "name": "agent_memories_agent_id_agents_id_fk",
+          "tableFrom": "agent_memories",
+          "tableTo": "agents",
+          "columnsFrom": [
+            "agent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.agent_sessions": {
       "name": "agent_sessions",
       "schema": "",
@@ -137,6 +232,68 @@
         },
         "cloud_workspace_id": {
           "name": "cloud_workspace_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_session_id": {
+          "name": "parent_session_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "agent_task_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "task_status": {
+          "name": "task_status",
+          "type": "agent_task_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dedupe_key": {
+          "name": "dedupe_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instructions": {
+          "name": "instructions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result": {
+          "name": "result",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pull_request_url": {
+          "name": "pull_request_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "environment_id": {
+          "name": "environment_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requested_by_user_id": {
+          "name": "requested_by_user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -197,6 +354,43 @@
           ],
           "isUnique": true,
           "where": "\"agent_sessions\".\"kind\" = 'thread'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "agent_sessions_active_task_dedupe_unique": {
+          "name": "agent_sessions_active_task_dedupe_unique",
+          "columns": [
+            {
+              "expression": "agent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dedupe_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"agent_sessions\".\"dedupe_key\" is not null and \"agent_sessions\".\"task_status\" in ('queued', 'running')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "agent_sessions_parent_idx": {
+          "name": "agent_sessions_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -276,6 +470,33 @@
           "tableTo": "cloud_workspaces",
           "columnsFrom": [
             "cloud_workspace_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "agent_sessions_environment_id_environments_id_fk": {
+          "name": "agent_sessions_environment_id_environments_id_fk",
+          "tableFrom": "agent_sessions",
+          "tableTo": "environments",
+          "columnsFrom": [
+            "environment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "agent_sessions_requested_by_user_id_users_id_fk": {
+          "name": "agent_sessions_requested_by_user_id_users_id_fk",
+          "tableFrom": "agent_sessions",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "requested_by_user_id"
           ],
           "columnsTo": [
             "id"
@@ -404,6 +625,19 @@
         },
         "error_code": {
           "name": "error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "last_attempt_error": {
+          "name": "last_attempt_error",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -608,6 +842,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "main_session_id": {
+          "name": "main_session_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "default_environment_id": {
+          "name": "default_environment_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "paused_at": {
           "name": "paused_at",
           "type": "timestamp with time zone",
@@ -671,6 +917,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "agents_default_environment_id_environments_id_fk": {
+          "name": "agents_default_environment_id_environments_id_fk",
+          "tableFrom": "agents",
+          "tableTo": "environments",
+          "columnsFrom": [
+            "default_environment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "agents_created_by_user_id_users_id_fk": {
@@ -4946,146 +5205,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.organization_plugin_sources": {
-      "name": "organization_plugin_sources",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "repo": {
-          "name": "repo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ref": {
-          "name": "ref",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "path": {
-          "name": "path",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "synced_sha": {
-          "name": "synced_sha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "synced_at": {
-          "name": "synced_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sync_error": {
-          "name": "sync_error",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "added_by_user_id": {
-          "name": "added_by_user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "organization_plugin_sources_organization_repo_path_unique": {
-          "name": "organization_plugin_sources_organization_repo_path_unique",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "repo",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "path",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "organization_plugin_sources_organization_id_organizations_id_fk": {
-          "name": "organization_plugin_sources_organization_id_organizations_id_fk",
-          "tableFrom": "organization_plugin_sources",
-          "tableTo": "organizations",
-          "schemaTo": "auth",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "organization_plugin_sources_added_by_user_id_users_id_fk": {
-          "name": "organization_plugin_sources_added_by_user_id_users_id_fk",
-          "tableFrom": "organization_plugin_sources",
-          "tableTo": "users",
-          "schemaTo": "auth",
-          "columnsFrom": [
-            "added_by_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.organization_plugins": {
       "name": "organization_plugins",
       "schema": "",
@@ -5102,12 +5221,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "source_id": {
-          "name": "source_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "name": {
           "name": "name",
@@ -5127,21 +5240,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "content_hash": {
-          "name": "content_hash",
-          "type": "text",
+        "uploaded_by_user_id": {
+          "name": "uploaded_by_user_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "install_policy": {
-          "name": "install_policy",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
-        },
-        "removed_from_source_at": {
-          "name": "removed_from_source_at",
+        "published_at": {
+          "name": "published_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -5182,21 +5288,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "organization_plugins_source_idx": {
-          "name": "organization_plugins_source_idx",
-          "columns": [
-            {
-              "expression": "source_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -5214,17 +5305,18 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "organization_plugins_source_id_organization_plugin_sources_id_fk": {
-          "name": "organization_plugins_source_id_organization_plugin_sources_id_fk",
+        "organization_plugins_uploaded_by_user_id_users_id_fk": {
+          "name": "organization_plugins_uploaded_by_user_id_users_id_fk",
           "tableFrom": "organization_plugins",
-          "tableTo": "organization_plugin_sources",
+          "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": [
-            "source_id"
+            "uploaded_by_user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -16163,7 +16255,28 @@
       "schema": "public",
       "values": [
         "dm",
-        "thread"
+        "thread",
+        "main",
+        "task"
+      ]
+    },
+    "public.agent_task_role": {
+      "name": "agent_task_role",
+      "schema": "public",
+      "values": [
+        "writer",
+        "reviewer"
+      ]
+    },
+    "public.agent_task_status": {
+      "name": "agent_task_status",
+      "schema": "public",
+      "values": [
+        "queued",
+        "running",
+        "done",
+        "failed",
+        "stopped"
       ]
     },
     "public.agent_turn_reason": {
@@ -16172,7 +16285,10 @@
       "values": [
         "direct_message",
         "mention",
-        "thread_reply"
+        "thread_reply",
+        "channel_message",
+        "task_start",
+        "task_update"
       ]
     },
     "public.agent_turn_status": {
@@ -16663,7 +16779,7 @@
           "notNull": true
         }
       },
-      "definition": "\n\t\tselect 'agent'::text as subject_type, a.id::text as subject_id, 'member'::text as relation,\n\t\t\t'organization'::text as object_type, a.organization_id::text as object_id\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'channel', m.channel_id::text\n\t\tfrom public.channel_members m\n\t\tjoin public.agents a on a.id = m.actor_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t",
+      "definition": "\n\t\tselect 'agent'::text as subject_type, a.id::text as subject_id, 'member'::text as relation,\n\t\t\t'organization'::text as object_type, a.organization_id::text as object_id\n\t\tfrom public.agents a where a.archived_at is null\n\t\tunion all\n\t\tselect 'agent', a.id::text, 'member', 'channel', m.channel_id::text\n\t\tfrom public.channel_members m\n\t\tjoin public.agents a on a.id = m.actor_id and a.archived_at is null\n\t\tunion all\n\t\tselect 'organization', c.organization_id::text, 'organization', 'channel', c.id::text\n\t\tfrom public.channels c where c.archived_at is null\n\t\tunion all\n\t\tselect 'agent', s.agent_id::text, 'operator', 'cloud_workspace', s.cloud_workspace_id::text\n\t\tfrom public.agent_sessions s\n\t\tjoin public.agents a on a.id = s.agent_id and a.archived_at is null\n\t\twhere s.parent_session_id is not null and s.cloud_workspace_id is not null\n\t",
       "name": "melange_tuples",
       "schema": "authz",
       "isExisting": false,

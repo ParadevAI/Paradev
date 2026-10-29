@@ -10259,9 +10259,6 @@ msgstr "Fin 2026"
 msgid "Latency"
 msgstr "Latence"
 
-msgid "Later"
-msgstr "Plus tard"
-
 msgid "Later messages are removed."
 msgstr "Les messages suivants seront supprimés."
 
@@ -15584,9 +15581,6 @@ msgstr "Redémarrer le démon de terminal ?"
 msgid "Restart terminals"
 msgstr "Redémarrer les terminaux"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Redémarrez pour utiliser la dernière version de {appName}."
-
 msgid "Restart workspace"
 msgstr "Redémarrer l'espace de travail"
 
@@ -16468,6 +16462,9 @@ msgstr "Découvrez où se situent vos 30 derniers jours dans le classement publi
 
 msgid "Select"
 msgstr "Sélecteur"
+
+msgid "Select a file to view it here"
+msgstr "Sélectionnez un fichier pour l’afficher ici"
 
 msgid "Select a project"
 msgstr "Sélectionnez un projet"
@@ -20009,9 +20006,6 @@ msgstr "Mettez à jour Paradev sur cet hôte pour modifier la configuration de l
 
 msgid "Update payment method"
 msgstr "Mettre à jour le moyen de paiement"
-
-msgid "Update ready"
-msgstr "Mise à jour prête"
 
 msgid "Update Required"
 msgstr "Mise à jour requise"

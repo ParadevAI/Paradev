@@ -316,8 +316,11 @@ export const channelNotifyValues = ["all", "mentions", "none"] as const;
 export const channelNotifyEnum = z.enum(channelNotifyValues);
 export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
 
-/** Where a Dev works: its DM with a person, or a thread it was mentioned in. */
-export const agentSessionKindValues = ["dm", "thread"] as const;
+/**
+ * `main` is the one session every message to a Dev reaches; `task` is work it
+ * delegates, on its own box. `dm` and `thread` are retired and no longer created.
+ */
+export const agentSessionKindValues = ["dm", "thread", "main", "task"] as const;
 export const agentSessionKindEnum = z.enum(agentSessionKindValues);
 export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
 
@@ -335,9 +338,26 @@ export const agentTurnReasonValues = [
 	"direct_message",
 	"mention",
 	"thread_reply",
+	"channel_message",
+	"task_start",
+	"task_update",
 ] as const;
 export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
 export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
+export const agentTaskStatusValues = [
+	"queued",
+	"running",
+	"done",
+	"failed",
+	"stopped",
+] as const;
+export const agentTaskStatusEnum = z.enum(agentTaskStatusValues);
+export type AgentTaskStatus = z.infer<typeof agentTaskStatusEnum>;
+
+export const agentTaskRoleValues = ["writer", "reviewer"] as const;
+export const agentTaskRoleEnum = z.enum(agentTaskRoleValues);
+export type AgentTaskRole = z.infer<typeof agentTaskRoleEnum>;
+
 export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
 export const channelBroadcastEnum = z.enum(channelBroadcastValues);
 export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;

@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const databaseUrl = process.env.AGENT_ACCESS_TEST_DATABASE_URL;
 const suite = databaseUrl ? describe : describe.skip;
@@ -124,7 +124,12 @@ suite("agent access against a migrated PostgreSQL", () => {
 		const created = await db
 			.insert(schema.channels)
 			.values([
-				{ organizationId: orgId, name: "secret", visibility: "private" },
+				{
+					organizationId: orgId,
+					name: "secret",
+					visibility: "private",
+					lastSeq: 1,
+				},
 				{ organizationId: orgId, name: "other", visibility: "public" },
 			])
 			.returning({ id: schema.channels.id });
@@ -162,6 +167,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		expect(page.messages.map((message) => message.body)).toEqual([
 			"only for members",
+			"has joined the channel",
 		]);
 	});
 
@@ -232,9 +238,9 @@ suite("agent access against a migrated PostgreSQL", () => {
 			organizationId: orgId,
 			name: "Chatty",
 		});
-		const { channelId, sessionId } = await person(
-			admin,
-		).agent.openDirectMessage({ agentId: agent.id });
+		const { channelId } = await person(admin).agent.openDirectMessage({
+			agentId: agent.id,
+		});
 		expect(
 			(await person(admin).agent.openDirectMessage({ agentId: agent.id }))
 				.channelId,
@@ -246,6 +252,11 @@ suite("agent access against a migrated PostgreSQL", () => {
 			body: "hello",
 			clientId: crypto.randomUUID(),
 		});
+		const [dev] = await db
+			.select({ mainSessionId: schema.agents.mainSessionId })
+			.from(schema.agents)
+			.where(eq(schema.agents.id, agent.id));
+		const sessionId = dev?.mainSessionId ?? "";
 		const [turn] = await db
 			.select()
 			.from(schema.agentTurns)
@@ -255,11 +266,10 @@ suite("agent access against a migrated PostgreSQL", () => {
 			promptId: sent.id,
 			triggerMessageId: sent.id,
 		});
-		expect(delivered).toContainEqual({
-			kind: "start",
-			sessionId,
-			text: "hello",
-		});
+		const start = delivered.find((prompt) => prompt.sessionId === sessionId);
+		expect(start?.kind).toBe("start");
+		expect(start?.text).toContain(`reply_to="channel:${channelId}"`);
+		expect(start?.text).toContain("hello");
 		const credentials = await worker().agentWorker.turnCredentials({
 			turnId: turn?.id ?? "",
 		});
@@ -361,7 +371,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				.select({
 					reason: schema.agentTurns.reason,
 					steers: schema.agentTurns.steerPromptIds,
-					threadRootId: schema.agentSessions.threadRootId,
+					kind: schema.agentSessions.kind,
 				})
 				.from(schema.agentTurns)
 				.innerJoin(
@@ -370,7 +380,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				)
 				.where(eq(schema.agentTurns.agentId, agent.id));
 		expect(await turns()).toEqual([
-			{ reason: "mention", steers: [], threadRootId: root.id },
+			{ reason: "mention", steers: [], kind: "main" },
 		]);
 		const reply = await person(admin).channelMessage.send({
 			channelId,
@@ -379,16 +389,111 @@ suite("agent access against a migrated PostgreSQL", () => {
 			clientId: crypto.randomUUID(),
 		});
 		expect(await turns()).toEqual([
-			{ reason: "mention", steers: [reply.id], threadRootId: root.id },
+			{ reason: "mention", steers: [reply.id], kind: "main" },
 		]);
+		const toAgent = delivered.filter(
+			(prompt) =>
+				prompt.text.includes("look at this") ||
+				prompt.text.includes("and this"),
+		);
+		expect(toAgent.map((prompt) => prompt.kind)).toEqual(["start", "steer"]);
+		expect(toAgent[1]?.text).toContain(
+			`reply_to="channel:${channelId}/thread:${root.id}"`,
+		);
+	});
+
+	test("the main session replies where a message came from, and remembers", async () => {
+		const { agent, dm, token } = await agentWithChannel(admin);
+		const tools = asAgent(token).devTools;
+		const posted = await tools.reply({
+			target: `channel:${dm.channelId}`,
+			body: "on it",
+		});
+		const page = await person(admin).channelMessage.list({
+			channelId: dm.channelId,
+			limit: 50,
+		});
 		expect(
-			delivered.filter((prompt) =>
-				["@Mentioned @Outside look at this", "and this"].includes(prompt.text),
+			page.messages.find((message) => message.id === posted.messageId)
+				?.authorId,
+		).toBe(agent.id);
+		await expect(
+			tools.reply({ target: `channel:${otherChannel}`, body: "hi" }),
+		).rejects.toThrow("Channel not found");
+		await tools.remember({ content: "Satya prefers short replies" });
+		expect(
+			(await tools.recall({ query: "short" })).map((note) => note.content),
+		).toEqual(["Satya prefers short replies"]);
+		expect(await tools.listWork()).toEqual([]);
+	});
+
+	test("a task's finished turn tells its main session once, with its result and pull request", async () => {
+		const { agent, turn: mainTurn } = await agentWithChannel(admin);
+		const [task] = await db
+			.insert(schema.agentSessions)
+			.values({
+				organizationId: orgId,
+				agentId: agent.id,
+				kind: "task",
+				parentSessionId: mainTurn.sessionId,
+				title: "Fix the login 500",
+				role: "writer",
+				taskStatus: "running",
+				requestedByUserId: admin,
+			})
+			.returning();
+		if (!task) throw Error("No task");
+		const [taskTurn] = await db
+			.insert(schema.agentTurns)
+			.values({
+				organizationId: orgId,
+				agentId: agent.id,
+				sessionId: task.id,
+				reason: "task_start",
+				actingUserId: admin,
+				promptId: `task-start:${task.id}`,
+			})
+			.returning();
+		if (!taskTurn) throw Error("No task turn");
+		const { token } = await worker().agentWorker.turnToken({
+			turnId: taskTurn.id,
+		});
+		await expect(asAgent(token).devTools.listWork()).rejects.toThrow(
+			"Only a Dev's main session",
+		);
+		const settle = () =>
+			worker().agentWorker.settleTurn({
+				turnId: taskTurn.id,
+				status: "completed",
+				steersConsumed: 0,
+				reply: "Fixed. https://github.com/acme/app/pull/7",
+			});
+		await settle();
+		await settle();
+		const [after] = await db
+			.select()
+			.from(schema.agentSessions)
+			.where(eq(schema.agentSessions.id, task.id));
+		expect(after).toMatchObject({
+			taskStatus: "done",
+			pullRequestUrl: "https://github.com/acme/app/pull/7",
+			result: "Fixed. https://github.com/acme/app/pull/7",
+		});
+		const [main] = await db
+			.select({ steers: schema.agentTurns.steerPromptIds })
+			.from(schema.agentTurns)
+			.where(eq(schema.agentTurns.id, mainTurn.id));
+		expect(
+			main?.steers.filter((id) => id === `task-update:${taskTurn.id}`),
+		).toHaveLength(1);
+		expect(
+			delivered.some(
+				(prompt) =>
+					prompt.sessionId === mainTurn.sessionId &&
+					prompt.text.includes("Fix the login 500") &&
+					prompt.text.includes("pull/7"),
 			),
-		).toMatchObject([
-			{ kind: "start", text: "@Mentioned @Outside look at this" },
-			{ kind: "steer", text: "and this" },
-		]);
+		).toBe(true);
 	});
 
 	test("archiving an agent revokes it at once", async () => {
@@ -432,7 +537,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 	});
 
 	test("activity pages through turns that started at the same moment", async () => {
-		const { agent, dm } = await agentWithChannel(admin);
+		const { agent, dm, turn } = await agentWithChannel(admin);
 		const startedAt = new Date();
 		await db.insert(schema.agentTurns).values(
 			Array.from({ length: 51 }, () => ({
@@ -442,6 +547,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				status: "completed" as const,
 				reason: "direct_message" as const,
 				actingUserId: admin,
+				triggerMessageId: turn.triggerMessageId,
 				startedAt,
 			})),
 		);
@@ -466,5 +572,114 @@ suite("agent access against a migrated PostgreSQL", () => {
 		});
 		await sendTo(admin, dm.channelId, "anyone there?");
 		expect(await turnsOf(agent.id)).toEqual([]);
+	});
+	/** A Temporal client whose session workflows all look like `description`. */
+	function fakeTemporal(description: { status: string; failedTasks?: number }) {
+		const terminated: string[] = [];
+		const client = {
+			workflow: {
+				getHandle: (workflowId: string) => ({
+					describe: async () => ({
+						status: { name: description.status },
+						raw: {
+							pendingWorkflowTask: description.failedTasks
+								? { attempt: description.failedTasks }
+								: null,
+						},
+					}),
+					query: async () => ({ turnId: null, pendingTurns: 0 }),
+					terminate: async () => {
+						terminated.push(workflowId);
+					},
+				}),
+			},
+		};
+		return { terminated, client: client as never };
+	}
+
+	const minutesAgo = (minutes: number) =>
+		new Date(Date.now() - minutes * 60_000);
+
+	test("the reconciler delivers a DM that never became a turn, once", async () => {
+		const { agent, dm } = await agentWithChannel(admin);
+		const [room] = await db
+			.update(schema.channels)
+			.set({ lastSeq: sql`${schema.channels.lastSeq} + 1` })
+			.where(eq(schema.channels.id, dm.channelId))
+			.returning({ seq: schema.channels.lastSeq });
+		const [dropped] = await db
+			.insert(schema.channelMessages)
+			.values({
+				channelId: dm.channelId,
+				seq: room?.seq ?? 0,
+				authorId: admin,
+				body: "did you get this?",
+				createdAt: minutesAgo(5),
+			})
+			.returning({ id: schema.channelMessages.id });
+		const { reconcileDevs } = await import("./reconcile");
+		const reached = async () =>
+			(await turnsOf(agent.id)).filter(
+				(turn) =>
+					turn.promptId === dropped?.id ||
+					turn.steerPromptIds.includes(dropped?.id ?? ""),
+			).length;
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
+		expect(await reached()).toBe(1);
+		await reconcileDevs(fakeTemporal({ status: "RUNNING" }).client, {
+			organizationId: orgId,
+		});
+		expect(await reached()).toBe(1);
+	});
+
+	test("the reconciler settles a turn its workflow lost and sends its message again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
+		const turns = await turnsOf(agent.id);
+		expect(turns.find((row) => row.id === turn.id)).toMatchObject({
+			status: "failed",
+			errorCode: "lost",
+		});
+		expect(
+			turns.some((row) => row.promptId === `again:${turn.triggerMessageId}`),
+		).toBe(true);
+	});
+
+	test("the reconciler settles a lost turn older than an hour without sending it again", async () => {
+		const { agent, turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(120) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		await reconcileDevs(fakeTemporal({ status: "COMPLETED" }).client, {
+			organizationId: orgId,
+		});
+		const turns = await turnsOf(agent.id);
+		expect(turns).toHaveLength(1);
+		expect(turns[0]).toMatchObject({ status: "failed", errorCode: "lost" });
+	});
+
+	test("the reconciler terminates a session workflow whose workflow task keeps failing", async () => {
+		const { turn } = await agentWithChannel(admin);
+		await db
+			.update(schema.agentTurns)
+			.set({ startedAt: minutesAgo(10) })
+			.where(eq(schema.agentTurns.id, turn.id));
+		const { reconcileDevs } = await import("./reconcile");
+		const temporal = fakeTemporal({ status: "RUNNING", failedTasks: 5 });
+		await reconcileDevs(temporal.client, { organizationId: orgId });
+		expect(temporal.terminated).toContain(`session/${turn.sessionId}`);
+		const [row] = await turnsOf(turn.agentId);
+		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });
 	});
 });

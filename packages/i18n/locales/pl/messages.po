@@ -10259,9 +10259,6 @@ msgstr "Koniec 2026"
 msgid "Latency"
 msgstr "Opóźnienie"
 
-msgid "Later"
-msgstr "Później"
-
 msgid "Later messages are removed."
 msgstr "Późniejsze wiadomości zostaną usunięte."
 
@@ -15584,9 +15581,6 @@ msgstr "Zrestartować demona terminala?"
 msgid "Restart terminals"
 msgstr "Zrestartuj terminale"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Uruchom ponownie, aby korzystać z najnowszej wersji {appName}."
-
 msgid "Restart workspace"
 msgstr "Uruchom ponownie obszar roboczy"
 
@@ -16468,6 +16462,9 @@ msgstr "Zobacz, jak twoje ostatnie 30 dni wypada w publicznym rankingu. Tylko li
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Wybierz plik, aby go tutaj wyświetlić"
 
 msgid "Select a project"
 msgstr "Wybierz projekt"
@@ -20009,9 +20006,6 @@ msgstr "Zaktualizuj Paradev na tym hoście, aby edytować konfigurację obszaru 
 
 msgid "Update payment method"
 msgstr "Zaktualizuj metodę płatności"
-
-msgid "Update ready"
-msgstr "Aktualizacja gotowa"
 
 msgid "Update Required"
 msgstr "Wymagana aktualizacja"

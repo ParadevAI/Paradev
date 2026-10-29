@@ -10259,9 +10259,6 @@ msgstr "Cuối 2026"
 msgid "Latency"
 msgstr "Độ trễ"
 
-msgid "Later"
-msgstr "Để sau"
-
 msgid "Later messages are removed."
 msgstr "Các tin nhắn sau sẽ bị xóa."
 
@@ -15584,9 +15581,6 @@ msgstr "Khởi động lại daemon terminal?"
 msgid "Restart terminals"
 msgstr "Khởi động lại terminal"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "Khởi động lại để dùng phiên bản {appName} mới nhất."
-
 msgid "Restart workspace"
 msgstr "Khởi động lại workspace"
 
@@ -16468,6 +16462,9 @@ msgstr "Xem 30 ngày qua của bạn đứng ở đâu trên bảng xếp hạng
 
 msgid "Select"
 msgstr "Select"
+
+msgid "Select a file to view it here"
+msgstr "Chọn một tệp để xem tại đây"
 
 msgid "Select a project"
 msgstr "Chọn một dự án"
@@ -20009,9 +20006,6 @@ msgstr "Hãy cập nhật Paradev trên máy chủ này để chỉnh sửa cấ
 
 msgid "Update payment method"
 msgstr "Cập nhật phương thức thanh toán"
-
-msgid "Update ready"
-msgstr "Bản cập nhật đã sẵn sàng"
 
 msgid "Update Required"
 msgstr "Cần cập nhật"

@@ -10259,9 +10259,6 @@ msgstr "2026년 말"
 msgid "Latency"
 msgstr "지연 시간"
 
-msgid "Later"
-msgstr "나중에"
-
 msgid "Later messages are removed."
 msgstr "이후 메시지가 삭제됩니다."
 
@@ -15584,9 +15581,6 @@ msgstr "터미널 데몬을 다시 시작할까요?"
 msgid "Restart terminals"
 msgstr "터미널 다시 시작"
 
-msgid "Restart to use the latest version of {appName}."
-msgstr "다시 시작하면 최신 버전의 {appName}을 사용할 수 있습니다."
-
 msgid "Restart workspace"
 msgstr "워크스페이스 다시 시작"
 
@@ -16468,6 +16462,9 @@ msgstr "최근 30일 사용량이 공개 리더보드에서 어디쯤인지 확�
 
 msgid "Select"
 msgstr "선택"
+
+msgid "Select a file to view it here"
+msgstr "파일을 선택하면 여기에 표시됩니다"
 
 msgid "Select a project"
 msgstr "프로젝트를 선택하세요"
@@ -20009,9 +20006,6 @@ msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev을
 
 msgid "Update payment method"
 msgstr "결제 수단 업데이트"
-
-msgid "Update ready"
-msgstr "업데이트 준비 완료"
 
 msgid "Update Required"
 msgstr "업데이트 필요"
