@@ -9,6 +9,7 @@ import {
 import { workspaceTrpc } from "@superset/workspace-client";
 import { QueryClient } from "@tanstack/react-query";
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
@@ -74,21 +75,31 @@ async function renderText(
 			</ChatPaneActionsProvider>
 		</workspaceTrpc.Provider>,
 	);
-	await waitFor(() => {
-		expect(asked.length).toBeGreaterThan(0);
-		expect(queryClient.isFetching()).toBe(0);
-	});
-	return { asked, view };
+	const hover = async (host: string) => {
+		(view.getByText(host).closest("a") as HTMLElement).focus();
+		await waitFor(() => {
+			expect(asked.length).toBeGreaterThan(0);
+			expect(queryClient.isFetching()).toBe(0);
+		});
+	};
+	return { asked, view, hover };
 }
 
-test("a service link is a pill, the first other link its page title, the rest plain", async () => {
-	const { asked, view } = await renderText(
+test("a service link is a pill, the first other link its host and then its title on hover, the rest plain", async () => {
+	const { asked, view, hover } = await renderText(
 		`Look at ${PR} and ${DOCS}\nthen ${LATER}.`,
 		{ title: "Content · Agent Client Protocol", iconDataUrl: null },
 	);
-	const title = view.getByText("Content · Agent Client Protocol");
-	expect(title.closest("a")?.href).toBe(DOCS);
-	expect(asked).toEqual([{ url: DOCS }]);
+	await act(async () => {});
+	expect(view.getByText("agentclientprotocol.com").closest("a")?.href).toBe(
+		DOCS,
+	);
+	expect(asked).toEqual([]);
+
+	await hover("agentclientprotocol.com");
+	expect(asked).toEqual([{ url: DOCS, image: true }]);
+	const title = view.getAllByText("Content · Agent Client Protocol")[0];
+	expect(title?.closest("a")?.href).toBe(DOCS);
 	expect(view.getByText("superset-sh/superset#8329").closest("a")?.href).toBe(
 		PR,
 	);
@@ -103,7 +114,10 @@ test("right-clicking a link chip opens the link menu, not the pane's", async () 
 		title: "Content",
 		iconDataUrl: null,
 	});
-	for (const label of ["superset-sh/superset#8329", "Content"]) {
+	for (const label of [
+		"superset-sh/superset#8329",
+		"agentclientprotocol.com",
+	]) {
 		fireEvent.contextMenu(view.getByText(label));
 		expect(await screen.findByText("Copy Link")).toBeTruthy();
 		expect(screen.queryByText("Close Pane")).toBeNull();
@@ -114,11 +128,12 @@ test("right-clicking a link chip opens the link menu, not the pane's", async () 
 
 test("the chip shows the bare host when no title comes back, and opens like a link", async () => {
 	const openLink = mock<OpenLink>(() => true);
-	const { view } = await renderText(
+	const { view, hover } = await renderText(
 		`Compare with ${DOCS}`,
 		{ title: null, iconDataUrl: null },
 		openLink,
 	);
+	await hover("agentclientprotocol.com");
 	const host = view.getByText("agentclientprotocol.com");
 	expect(host.previousElementSibling?.textContent).toBe("a");
 
@@ -133,11 +148,12 @@ test("the chip shows the bare host when no title comes back, and opens like a li
 
 test("the site's icon replaces the letter when the host returns one", async () => {
 	const icon = "data:image/png;base64,iVBORw0KGgo=";
-	const { view } = await renderText(DOCS, {
+	const { view, hover } = await renderText(DOCS, {
 		title: "Content",
 		iconDataUrl: icon,
 	});
-	const box = view.getByText("Content").previousElementSibling;
+	await hover("agentclientprotocol.com");
+	const box = view.getAllByText("Content")[0]?.previousElementSibling;
 	expect(box?.querySelector("img")?.getAttribute("src")).toBe(icon);
 });
 
@@ -195,7 +211,7 @@ test("copying part of a plain URL keeps the selected substring", async () => {
 	expect(selection?.toString()).toBe("example");
 	expect(setData).not.toHaveBeenCalled();
 
-	const title = view.getByText("Documentation");
+	const title = view.getByText("agentclientprotocol.com");
 	range.setStart(title.firstChild as Text, 0);
 	selection?.removeAllRanges();
 	selection?.addRange(range);

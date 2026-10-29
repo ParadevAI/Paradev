@@ -5,15 +5,12 @@ import { displayHost } from "../../../../../../../../utils/displayHost";
 import { LinkMenu } from "../../../../../../../LinkMenu";
 import { WebsiteHoverCard } from "../../../../../../../WebsiteHoverCard";
 
+/** A link as its bare host, until a hover has loaded its title and icon. */
 export function LinkPreviewChip({ url }: { url: string }) {
-	const { openLink, workspaceId } = useChatPaneActions();
+	const { openLink } = useChatPaneActions();
 	const { data } = workspaceTrpc.linkPreview.get.useQuery(
-		{ url },
-		{
-			enabled: Boolean(workspaceId),
-			staleTime: Number.POSITIVE_INFINITY,
-			retry: false,
-		},
+		{ url, image: true },
+		{ enabled: false },
 	);
 	const [brokenIcon, setBrokenIcon] = useState<string | null>(null);
 	const host = displayHost(url);
