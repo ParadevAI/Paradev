@@ -443,6 +443,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "peec",
+		version: "1.0.0",
+		description: "Track your brand in AI search",
+		interface: { displayName: "Peec AI", category: "Data & APIs" },
+		mcpServers: {
+			peec: { type: "http", url: "https://api.peec.ai/mcp" },
+		},
+	},
+	{
 		name: "superhuman",
 		version: "1.0.0",
 		description: "Search and manage your email",

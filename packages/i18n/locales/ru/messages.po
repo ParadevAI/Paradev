@@ -19322,6 +19322,9 @@ msgstr "Найди причину нестабильного теста…"
 msgid "Track tasks in"
 msgstr "Где вести задачи"
 
+msgid "Track your brand in AI search"
+msgstr "Отслеживайте свой бренд в ИИ-поиске"
+
 msgid "Tracking"
 msgstr "Отслеживание"
 

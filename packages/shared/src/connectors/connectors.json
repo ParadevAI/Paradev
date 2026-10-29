@@ -882,6 +882,69 @@
 				}
 			]
 		},
+		"peec_mcp": {
+			"displayName": "Peec AI",
+			"icon": "peec",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.peec.ai/mcp",
+					"scopes": ["default"],
+					"identity": {
+						"mcp": "https://api.peec.ai/mcp",
+						"tool": "list_projects",
+						"account": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						},
+						"user": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "Personal access token",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Peec AI personal access token",
+							"description": "Peec AI → API Keys → Personal Access Tokens → Create",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"mcp": "https://api.peec.ai/mcp",
+						"tool": "list_projects",
+						"account": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						},
+						"user": {
+							"id": "$.rows[0][0]",
+							"label": "$.rows[0][1]"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"vercel_mcp": {
 			"displayName": "Vercel",
 			"icon": "vercel",

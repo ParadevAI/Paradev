@@ -19322,6 +19322,9 @@ msgstr "Şu kararsız testin izini sür…"
 msgid "Track tasks in"
 msgstr "Görevleri şurada takip et"
 
+msgid "Track your brand in AI search"
+msgstr "Markanızı yapay zekâ aramasında takip edin"
+
 msgid "Tracking"
 msgstr "İzleme"
 

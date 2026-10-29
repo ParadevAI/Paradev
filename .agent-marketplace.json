@@ -186,6 +186,16 @@
 			"category": "development",
 			"source": "./plugins/resend",
 			"version": "1.0.0"
+		},
+		{
+			"name": "peec",
+			"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/peec",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

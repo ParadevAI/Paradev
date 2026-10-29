@@ -19322,6 +19322,9 @@ msgstr "Localizar esa prueba inestable…"
 msgid "Track tasks in"
 msgstr "Gestionar tareas en"
 
+msgid "Track your brand in AI search"
+msgstr "Sigue tu marca en la búsqueda con IA"
+
 msgid "Tracking"
 msgstr "Seguimiento"
 

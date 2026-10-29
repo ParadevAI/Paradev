@@ -19322,6 +19322,9 @@ msgstr "揪出那個不穩定的測試…"
 msgid "Track tasks in"
 msgstr "任務管理位置"
 
+msgid "Track your brand in AI search"
+msgstr "追蹤品牌在 AI 搜尋中的表現"
+
 msgid "Tracking"
 msgstr "已追蹤"
 

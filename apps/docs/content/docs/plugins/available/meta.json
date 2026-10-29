@@ -5,6 +5,7 @@
 		"github",
 		"sentry",
 		"stripe",
+		"peec",
 		"resend",
 		"linear",
 		"notion",
