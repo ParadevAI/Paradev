@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import {
 	ResizableHandle,
@@ -32,8 +33,13 @@ export function FileViewLayout({
 	onSearch,
 	children,
 }: FileViewLayoutProps) {
-	const visible = useFileTreeVisibilityStore((state) => state.visible);
+	const filePath =
+		context.pane.kind === "file"
+			? (context.pane.data as FilePaneData).filePath
+			: undefined;
+	const storedVisible = useFileTreeVisibilityStore((state) => state.visible);
 	const setVisible = useFileTreeVisibilityStore((state) => state.setVisible);
+	const visible = filePath ? storedVisible : true;
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const treePanelRef = useRef<ImperativePanelHandle>(null);
 	const [animating, setAnimating] = useState(false);
@@ -57,10 +63,6 @@ export function FileViewLayout({
 		Object.values(context.tab.panes).some((pane) => pane.kind === "files");
 	if (!showTree || tabHasTreePane) return children;
 
-	const filePath =
-		context.pane.kind === "file"
-			? (context.pane.data as FilePaneData).filePath
-			: undefined;
 	const panelTransition =
 		animating && "transition-[flex-grow] duration-200 ease-out";
 	return (
@@ -72,7 +74,13 @@ export function FileViewLayout({
 					minSize={30}
 					className={cn(panelTransition)}
 				>
-					<div className="relative h-full min-w-0">{children}</div>
+					<div className="relative h-full min-w-0">
+						{children ?? (
+							<div className="flex h-full items-center justify-center p-4 text-center text-sm text-muted-foreground/60">
+								<Trans>Select a file to view it here</Trans>
+							</div>
+						)}
+					</div>
 				</ResizablePanel>
 				<ResizableHandle
 					className={cn("bg-transparent", !visible && "pointer-events-none")}
@@ -90,7 +98,7 @@ export function FileViewLayout({
 					defaultSize={visible ? TREE_DEFAULT_SIZE : 0}
 					minSize={20}
 					maxSize={60}
-					collapsible
+					collapsible={Boolean(filePath)}
 					collapsedSize={0}
 					onCollapse={() => setVisible(false)}
 					onExpand={() => setVisible(true)}
@@ -120,7 +128,12 @@ export function FileViewLayout({
 					}
 				/>
 			)}
-			<FileViewFloatingActions workspaceId={workspaceId} filePath={filePath} />
+			{filePath && (
+				<FileViewFloatingActions
+					workspaceId={workspaceId}
+					filePath={filePath}
+				/>
+			)}
 		</div>
 	);
 }

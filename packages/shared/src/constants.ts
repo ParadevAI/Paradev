@@ -232,6 +232,13 @@ export const FEATURE_FLAGS = {
 	 * release condition on the flag, so widening never needs a release.
 	 */
 	ACP_CHAT: "acp-chat",
+	/**
+	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
+	 * headers: a native fork of the session, opened in the other surface beside
+	 * it. Off, unloaded or offline hide them. Audience is a release condition on
+	 * the flag, in both the Production and Local Development projects.
+	 */
+	AGENT_SURFACE_FORK: "agent-surface-fork",
 	MOBILE_PANE: "mobile-pane",
 	/**
 	 * Shows the `pdev` agent: in the agent catalog, agent pickers
