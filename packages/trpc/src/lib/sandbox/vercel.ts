@@ -10,11 +10,14 @@
  * ticket-checking gate in front of every port (`access.ts`).
  */
 
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
+	SANDBOX_USER,
 	type SandboxIdentity,
 } from "@superset/shared/sandbox-contract";
 import {
@@ -558,8 +561,9 @@ export async function promoteSandboxToEnvironment(args: {
 export async function waitForStopSnapshot(
 	name: string,
 	previous: string | undefined,
+	timeoutMs = 3 * 60 * 1000,
 ): Promise<void> {
-	const deadline = Date.now() + 3 * 60 * 1000;
+	const deadline = Date.now() + timeoutMs;
 	while (Date.now() < deadline) {
 		const sandbox = await Sandbox.get({
 			...credentials(),
@@ -571,6 +575,100 @@ export async function waitForStopSnapshot(
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	}
 	throw new Error(`${name} did not snapshot in time`);
+}
+
+/** Where an environment build's box starts: the current golden, or the image. */
+export type BuildBoxSource =
+	| { kind: "fork"; golden: string }
+	| { kind: "image"; region: string };
+
+/**
+ * The box an environment build runs in. Never booted, so neither
+ * host-service nor the repository's start hook runs. Its session ends on its
+ * own if the job that drives it dies.
+ */
+export async function createBuildBox(args: {
+	name: string;
+	source: BuildBoxSource;
+	networkPolicy: NetworkPolicy;
+	organizationId: string;
+	sessionTimeoutMs: number;
+}): Promise<void> {
+	const config = {
+		...credentials(),
+		name: args.name,
+		timeout: args.sessionTimeoutMs,
+		env: {},
+		networkPolicy: args.networkPolicy,
+		persistent: true,
+		snapshotExpiration: 0,
+		keepLastSnapshots: { count: 1 },
+		tags: { kind: "environment", org: args.organizationId },
+		resources: { vcpus: GOLDEN_BOX_VCPUS },
+	};
+	if (await getSandbox(args.name)) return;
+	if (args.source.kind === "fork") {
+		await Sandbox.fork({ ...config, sourceSandbox: args.source.golden });
+		return;
+	}
+	await Sandbox.create({
+		...config,
+		image: SANDBOX_IMAGE_NAME,
+		region: args.source.region as SandboxRegion,
+	});
+}
+
+export interface BuildCommandResult {
+	exitCode: number;
+	output: string;
+	timedOut: boolean;
+}
+
+/** Runs a bash script as the box's user; the sandbox kills it at the timeout. */
+export async function runBuildCommand(args: {
+	name: string;
+	script: string;
+	env: Record<string, string>;
+	cwd?: string;
+	timeoutMs: number;
+}): Promise<BuildCommandResult> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	const started = Date.now();
+	const command = await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: ["-lc", args.script],
+		env: args.env,
+		...(args.cwd ? { cwd: args.cwd } : {}),
+		detached: true,
+		timeoutMs: args.timeoutMs,
+	});
+	const finished = await command.wait();
+	const output = `${await finished.stdout()}${await finished.stderr()}`;
+	return {
+		exitCode: finished.exitCode,
+		output,
+		timedOut: finished.exitCode !== 0 && Date.now() - started >= args.timeoutMs,
+	};
+}
+
+/** Strips workspace identity, stops, and returns once forks start from this state. */
+export async function snapshotBuildBox(args: {
+	name: string;
+	timeoutMs: number;
+}): Promise<void> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	await stripWorkspaceIdentity(sandbox);
+	const before = sandbox.currentSnapshotId;
+	await sandbox.stop();
+	await waitForStopSnapshot(args.name, before, args.timeoutMs);
 }
 
 /**

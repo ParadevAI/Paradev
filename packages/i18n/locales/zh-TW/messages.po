@@ -1599,6 +1599,9 @@ msgstr "更好用的應用程式內瀏覽器：預覽改動，點選任意元素
 msgid "A better Paradev is ready"
 msgstr "更好的 Paradev 已準備就緒"
 
+msgid "A build of this environment is already running"
+msgstr "此環境已有建置正在執行"
+
 msgid "A CDP endpoint per pane"
 msgstr "每個窗格一個 CDP 端點"
 
@@ -7444,6 +7447,9 @@ msgstr "環境"
 
 msgid "Environment archived"
 msgstr "環境已封存"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "環境建置包含在 Team 和 Ultra 方案中。請在設定的帳單中升級。"
 
 msgid "Environment not found"
 msgstr "找不到環境"
@@ -18649,6 +18655,9 @@ msgstr "排程員出現"
 msgid "The endpoint must use https."
 msgstr "端點必須使用 https。"
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "還原期間環境已變更。請再試一次。"
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "此自動化用來啟動雲端工作區的環境已被封存或沒有儲存庫。請在自動化的設定中選擇其他環境。"
 
@@ -19003,6 +19012,9 @@ msgstr "此自動化尚未有指示。請先在設定中撰寫提示，再執行
 msgid "This automation is in another organization"
 msgstr "此自動化位於其他組織"
 
+msgid "This build has no snapshot to restore"
+msgstr "此建置沒有可還原的快照"
+
 msgid "This cannot be undone."
 msgstr "此操作無法復原。"
 
@@ -19068,6 +19080,12 @@ msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其確認為已驗證。請使用你先前使用的方式登入。"
+
+msgid "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+msgstr "此環境沒有可建置的 [install]。請在其基礎分支的 .superset/config.toml 中新增。"
+
+msgid "This environment has no repositories to build"
+msgstr "此環境沒有可建置的儲存庫"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"

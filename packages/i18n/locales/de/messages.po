@@ -1599,6 +1599,9 @@ msgstr "Ein besserer In-App-Browser: Änderungen in der Vorschau ansehen und ein
 msgid "A better Paradev is ready"
 msgstr "Eine bessere Version von Paradev ist bereit"
 
+msgid "A build of this environment is already running"
+msgstr "Ein Build dieser Umgebung läuft bereits"
+
 msgid "A CDP endpoint per pane"
 msgstr "Ein CDP-Endpunkt pro Bereich"
 
@@ -7444,6 +7447,9 @@ msgstr "Umgebung"
 
 msgid "Environment archived"
 msgstr "Umgebung archiviert"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Umgebungs-Builds sind in den Plänen Team und Ultra enthalten. Upgrade unter Einstellungen, Abrechnung."
 
 msgid "Environment not found"
 msgstr "Umgebung nicht gefunden"
@@ -18649,6 +18655,9 @@ msgstr "Der Disponent tritt auf"
 msgid "The endpoint must use https."
 msgstr "Der Endpunkt muss https verwenden."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Die Umgebung hat sich während der Wiederherstellung geändert. Versuche es erneut."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Die Umgebung, aus der diese Automatisierung Cloud-Arbeitsbereiche startet, wurde archiviert oder hat keine Repositories. Wähle in den Einstellungen der Automatisierung eine andere Umgebung."
 
@@ -19003,6 +19012,9 @@ msgstr "Diese Automatisierung hat noch keine Anweisungen. Schreibe vor dem Ausf�
 msgid "This automation is in another organization"
 msgstr "Diese Automatisierung befindet sich in einer anderen Organisation"
 
+msgid "This build has no snapshot to restore"
+msgstr "Dieser Build hat keinen Snapshot zum Wiederherstellen"
+
 msgid "This cannot be undone."
 msgstr "Das lässt sich nicht rückgängig machen."
 
@@ -19068,6 +19080,12 @@ msgstr "Dieses Verzeichnis existiert nicht. Das Terminal-Skript greift auf die W
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Diese E-Mail-Adresse ist bereits mit einer anderen Anmeldemethode registriert, und der Anbieter hat sie nicht als verifiziert bestätigt. Melde dich mit der zuvor verwendeten Methode an."
+
+msgid "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+msgstr "Diese Umgebung hat kein [install] zum Bauen. Füge eines in .superset/config.toml auf ihrem Basis-Branch hinzu."
+
+msgid "This environment has no repositories to build"
+msgstr "Diese Umgebung hat keine Repositories zum Bauen"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Diese Umgebung hat keine Repositories. Erstelle in den Einstellungen eine Umgebung mit Repositories und starte den Arbeitsbereich daraus"

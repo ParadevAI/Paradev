@@ -1599,6 +1599,9 @@ msgstr "A better in-app browser: preview your changes and click any element to s
 msgid "A better Paradev is ready"
 msgstr "A better Paradev is ready"
 
+msgid "A build of this environment is already running"
+msgstr "A build of this environment is already running"
+
 msgid "A CDP endpoint per pane"
 msgstr "A CDP endpoint per pane"
 
@@ -7444,6 +7447,9 @@ msgstr "Environment"
 
 msgid "Environment archived"
 msgstr "Environment archived"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 
 msgid "Environment not found"
 msgstr "Environment not found"
@@ -18649,6 +18655,9 @@ msgstr "The dispatcher appears"
 msgid "The endpoint must use https."
 msgstr "The endpoint must use https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "The environment changed while it was being restored. Try again."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 
@@ -19003,6 +19012,9 @@ msgstr "This automation has no instructions yet. Write a prompt in its settings 
 msgid "This automation is in another organization"
 msgstr "This automation is in another organization"
 
+msgid "This build has no snapshot to restore"
+msgstr "This build has no snapshot to restore"
+
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
 
@@ -19068,6 +19080,12 @@ msgstr "This directory does not exist. The terminal script will fall back to the
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+
+msgid "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+msgstr "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+
+msgid "This environment has no repositories to build"
+msgstr "This environment has no repositories to build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"

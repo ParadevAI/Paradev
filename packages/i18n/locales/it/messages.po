@@ -1599,6 +1599,9 @@ msgstr "Un browser interno migliore: guarda l'anteprima delle tue modifiche e cl
 msgid "A better Paradev is ready"
 msgstr "Una versione migliore di Paradev è pronta"
 
+msgid "A build of this environment is already running"
+msgstr "Una build di questo ambiente è già in corso"
+
 msgid "A CDP endpoint per pane"
 msgstr "Un endpoint CDP per riquadro"
 
@@ -7444,6 +7447,9 @@ msgstr "Ambiente"
 
 msgid "Environment archived"
 msgstr "Ambiente archiviato"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Le build degli ambienti sono incluse nei piani Team e Ultra. Esegui l'upgrade in Impostazioni, Fatturazione."
 
 msgid "Environment not found"
 msgstr "Ambiente non trovato"
@@ -18649,6 +18655,9 @@ msgstr "Compare il dispatcher"
 msgid "The endpoint must use https."
 msgstr "L'endpoint deve usare https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "L'ambiente è cambiato durante il ripristino. Riprova."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "L'ambiente da cui questa automazione avvia i workspace cloud è stato archiviato o non ha repository. Scegli un altro ambiente nelle impostazioni dell'automazione."
 
@@ -19003,6 +19012,9 @@ msgstr "Questa automazione non ha ancora istruzioni. Scrivi un prompt nelle sue 
 msgid "This automation is in another organization"
 msgstr "Questa automazione si trova in un'altra organizzazione"
 
+msgid "This build has no snapshot to restore"
+msgstr "Questa build non ha uno snapshot da ripristinare"
+
 msgid "This cannot be undone."
 msgstr "L'operazione non può essere annullata."
 
@@ -19068,6 +19080,12 @@ msgstr "Questa directory non esiste. Lo script del terminale userà la radice de
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Questa email è già registrata con un altro metodo di accesso e il provider non l'ha confermata come verificata. Accedi con il metodo usato in precedenza."
+
+msgid "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+msgstr "Questo ambiente non ha un [install] da eseguire. Aggiungine uno in .superset/config.toml sul suo branch di base."
+
+msgid "This environment has no repositories to build"
+msgstr "Questo ambiente non ha repository da compilare"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Questo ambiente non ha repository. Crea un ambiente con repository nelle Impostazioni, poi avvia il workspace da lì"

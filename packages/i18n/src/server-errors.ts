@@ -466,6 +466,45 @@ export const serverErrorMessages: Record<
 				message: "Could not record environment",
 			}),
 		),
+	"serverError.environment.buildsNotIncluded": () =>
+		i18n._(
+			msg({
+				message:
+					"Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing.",
+			}),
+		),
+	"serverError.environment.noRepositoriesToBuild": () =>
+		i18n._(
+			msg({
+				message: "This environment has no repositories to build",
+			}),
+		),
+	"serverError.environment.noInstall": () =>
+		i18n._(
+			msg({
+				message:
+					"This environment has no [install] to build. Add one to .superset/config.toml on its base branch.",
+			}),
+		),
+	"serverError.environment.buildAlreadyRunning": () =>
+		i18n._(
+			msg({
+				message: "A build of this environment is already running",
+			}),
+		),
+	"serverError.environment.buildNotRestorable": () =>
+		i18n._(
+			msg({
+				message: "This build has no snapshot to restore",
+			}),
+		),
+	"serverError.environment.changedDuringRestore": () =>
+		i18n._(
+			msg({
+				message:
+					"The environment changed while it was being restored. Try again.",
+			}),
+		),
 	"serverError.task.notFound": () =>
 		i18n._(
 			msg({
