@@ -225,11 +225,10 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Shows the ACP chat pane: a chat UI that attaches to a Claude/Codex
-	 * session in the workspace over the Agent Client Protocol. UI-only: the
-	 * flag decides who sees the pane, not what the host can do. Off, unloaded,
-	 * or offline all mean "no pane" — flips take effect live. Audience is a
-	 * release condition on the flag, so widening never needs a release.
+	 * Legacy gate for the ACP chat pane, now the Chat experimental setting on
+	 * desktop and mobile. Read only by released builds and by
+	 * `cloudWorkspace.create` when a caller sends no `surface`. Remove it once
+	 * no live build reads it.
 	 */
 	ACP_CHAT: "acp-chat",
 	/**

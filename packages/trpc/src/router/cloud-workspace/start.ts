@@ -6,7 +6,6 @@ import {
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import {
@@ -103,14 +102,15 @@ export async function startCloudWorkspace(args: {
 	/** Omitted = the repo's default branch. */
 	branch?: string;
 	launch?: CloudAgentLaunch;
+	/** Opens `launch` as a chat when its agent supports one. */
+	chat?: boolean;
 	taskIds?: string[];
 	attachmentFileIds?: string[];
 	machineSize?: string;
 	beforeProvision?: (workspaceId: string) => Promise<void>;
 }) {
-	const openAsChat = supportsCloudAgentChat(args.launch?.agent)
-		? acpChatEnabled(args.userId)
-		: Promise.resolve(false);
+	const openAsChat =
+		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);
 	const size = await resolveMachineSize(args.organizationId, args.machineSize);
 	if (!size) throw machineSizeNotAvailable(args.machineSize);
@@ -222,7 +222,7 @@ export async function startCloudWorkspace(args: {
 			? {
 					launch: {
 						...args.launch,
-						surface: (await openAsChat) ? ("chat" as const) : undefined,
+						surface: openAsChat ? ("chat" as const) : undefined,
 					},
 				}
 			: {}),
