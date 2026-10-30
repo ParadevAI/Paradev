@@ -19,10 +19,12 @@ import {
 	buildSandboxClaim,
 	deleteSandbox,
 	environmentRepositoryRows,
+	installationTokenFor,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
+	readRepoHooks,
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
@@ -776,6 +778,30 @@ export const environmentRouter = {
 				if (error instanceof BuildRefused) throw buildRefusalError(error);
 				throw error;
 			}
+		}),
+
+	/** The scripts a build and a workspace run, read from the primary repository's base branch. */
+	config: jwtProcedure
+		.input(z.object({ environmentId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const repositories = await environmentRepositoryRows(environment.id);
+			const primary = primaryRepository(
+				repositories,
+				environment.primaryRepositoryId,
+			);
+			if (!primary) return { source: null, install: null, setup: null };
+			const hooks = await readRepoHooks({
+				repo: primary,
+				branch: primary.defaultBranch,
+				token: await installationTokenFor(repositories),
+			});
+			return {
+				source: { repository: primary.fullName, branch: primary.defaultBranch },
+				install: hooks?.install?.commands ?? null,
+				setup: hooks?.setup?.commands ?? null,
+			};
 		}),
 
 	builds: jwtProcedure

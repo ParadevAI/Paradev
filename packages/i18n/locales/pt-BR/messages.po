@@ -1833,6 +1833,9 @@ msgstr "ativo {lastActive}"
 msgid "Active agent sessions."
 msgstr "Sessões de agente ativas."
 
+msgid "Active build status"
+msgstr "Status do build ativo"
+
 msgid "active days"
 msgstr "dias ativos"
 
@@ -2051,6 +2054,9 @@ msgstr "Adicionar à barra lateral"
 
 msgid "Add to workspace"
 msgstr "Adicionar à área de trabalho"
+
+msgid "Add variable"
+msgstr "Adicionar variável"
 
 msgid "Add what it does"
 msgstr "Adicionar o que ele faz"
@@ -2292,6 +2298,9 @@ msgstr "Todos os responsáveis"
 msgid "All authors"
 msgstr "Todos os autores"
 
+msgid "All builds"
+msgstr "Todos os builds"
+
 msgid "All changes saved"
 msgstr "Todas as alterações salvas"
 
@@ -2313,6 +2322,9 @@ msgstr "Todos os dados serão excluídos permanentemente para os {0} membros —
 
 msgid "All downloads"
 msgstr "Todos os downloads"
+
+msgid "All environment variables ({total})"
+msgstr "Todas as variáveis de ambiente ({total})"
 
 msgid "All features, side by side"
 msgstr "Todos os recursos, lado a lado"
@@ -3269,9 +3281,6 @@ msgstr "Diretório base para as novas worktrees em {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Diretório base para as novas worktrees em {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Imagem base · nenhum checkpoint ainda"
-
 msgid "Base URL"
 msgstr "URL base"
 
@@ -3537,6 +3546,9 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Relatos de bugs"
 
+msgid "Build ID"
+msgstr "ID do build"
+
 msgid "Build in public"
 msgstr "Construir em público"
 
@@ -3546,11 +3558,27 @@ msgstr "Construa o futuro do Paradev na nuvem"
 msgid "Build your own"
 msgstr "Crie o seu"
 
+msgid "Building"
+msgstr "Fazendo build"
+
 msgid "Building the last piece of software"
 msgstr "Construindo o último software"
 
 msgid "Building the last piece of software."
 msgstr "Construindo o último software."
+
+msgid "Building with the new repositories"
+msgstr "Fazendo build com os novos repositórios"
+
+msgid "Building…"
+msgstr "Fazendo build…"
+
+msgid "Builds"
+msgstr "Builds"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Build feito {0}"
 
 msgid "Built in Paradev"
 msgstr "Construído no Paradev"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Alterações"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "As mudanças valem para novas áreas de trabalho. Um novo build começa automaticamente."
+
 msgid "Changes are isolated"
 msgstr "As mudanças ficam isoladas"
 
@@ -4046,10 +4077,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · antes da refatoração dos tooltips"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint salvo {0}"
 
 msgid "Checks"
 msgstr "Verificações"
@@ -4761,6 +4788,9 @@ msgstr "Conteúdo do arquivo de configuração"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json deve ser um objeto JSON"
+
+msgid "Configuration"
+msgstr "Configuração"
 
 msgid "Configure"
 msgstr "Configurar"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Criado"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Editar descrição"
 msgid "Edit Description"
 msgstr "Editar descrição"
 
-msgid "Edit environment"
-msgstr "Editar ambiente"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Editar arquivos sem perguntar; perguntar antes de comandos"
 
@@ -7261,6 +7287,9 @@ msgstr "Editar no GitHub"
 
 msgid "Edit queued message"
 msgstr "Editar mensagem na fila"
+
+msgid "Edit repositories"
+msgstr "Editar repositórios"
 
 msgid "Edit Run Script"
 msgstr "Editar script de execução"
@@ -7451,11 +7480,20 @@ msgstr "Ambiente arquivado"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Builds de ambientes estão incluídos nos planos Team e Ultra. Faça upgrade em Configurações, Cobrança."
 
+msgid "Environment history"
+msgstr "Histórico do ambiente"
+
 msgid "Environment not found"
 msgstr "Ambiente não encontrado"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Preparo de ambiente, testes instáveis e encanamento de credenciais, os modos de falha chatos que mataram as execuções sem supervisão em 2025, são resolvidos por engenharia, não por modelagem."
+
+msgid "Environment updated"
+msgstr "Ambiente atualizado"
+
+msgid "Environment variables"
+msgstr "Variáveis de ambiente"
 
 msgid "Environment Variables"
 msgstr "Variáveis de ambiente"
@@ -8708,6 +8746,11 @@ msgstr "de"
 msgid "From"
 msgstr "De"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "De .superset/config.toml em {0}@{1}. Altere-os lá."
+
 msgid "from {parentName}"
 msgstr "de {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "Instale o MCP do Paradev no seu cliente"
 msgid "Install plugin"
 msgstr "Instalar plugin"
 
+msgid "Install script"
+msgstr "Script de instalação"
+
 msgid "Install the desktop app"
 msgstr "Instale o app de desktop"
 
@@ -10263,6 +10309,9 @@ msgstr "Última atividade do agente {0}"
 
 msgid "Last attached"
 msgstr "Última conexão"
+
+msgid "Last build failed"
+msgstr "O último build falhou"
 
 msgid "Last day of each month"
 msgstr "Último dia de cada mês"
@@ -11829,6 +11878,12 @@ msgstr "Nenhuma automação corresponde"
 msgid "No branches found"
 msgstr "Nenhuma branch encontrada"
 
+msgid "No build yet"
+msgstr "Nenhum build ainda"
+
+msgid "No builds yet"
+msgstr "Nenhum build ainda"
+
 msgid "No changed files."
 msgstr "Nenhum arquivo alterado."
 
@@ -11939,6 +11994,9 @@ msgstr "Nenhum ambiente está vinculado a este projeto ainda."
 
 msgid "No environments available"
 msgstr "Nenhum ambiente disponível"
+
+msgid "No environments built yet"
+msgstr "Nenhum ambiente construído ainda"
 
 msgid "No environments found."
 msgstr "Nenhum ambiente encontrado."
@@ -12468,6 +12526,9 @@ msgstr "Não conectado"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Não conectado · as áreas de trabalho na nuvem fazem push como a GitHub App da sua organização"
+
+msgid "Not defined"
+msgstr "Não definido"
 
 msgid "Not demoed here"
 msgstr "Não demonstrado aqui"
@@ -14051,6 +14112,9 @@ msgstr "Escolha a pasta de worktrees do projeto em {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Escolha os repositórios que ele obtém. Um agente nesta máquina descobre o que instalar e o coloca para rodar na nuvem."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Escolha os repositórios que este ambiente baixa. Salvar inicia um novo build; as áreas de trabalho continuam partindo do atual até ele dar certo."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Escolha a pasta das worktrees em {hostName}."
 
@@ -15425,6 +15489,9 @@ msgstr "Repositórios"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repositórios acessíveis pela instalação do GitHub App."
 
+msgid "Repositories changed"
+msgstr "Repositórios alterados"
+
 msgid "Repositories refreshed"
 msgstr "Repositórios atualizados"
 
@@ -16059,6 +16126,9 @@ msgstr "Executa um comando local na sua máquina"
 msgid "Runs appear here once an automation fires."
 msgstr "As execuções aparecem aqui assim que uma automação é disparada."
 
+msgid "Runs every time a workspace starts"
+msgstr "Executa sempre que uma área de trabalho inicia"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Executa dentro do app Paradev naquele dispositivo, então atualizá-lo significa atualizar o app lá."
 
@@ -16080,6 +16150,9 @@ msgstr "Executado quando um espaço de trabalho é criado."
 msgid "Runs when a workspace is deleted."
 msgstr "Executado quando um espaço de trabalho é excluído."
 
+msgid "Runs when the environment builds"
+msgstr "Executa quando o ambiente faz build"
+
 msgid "Same version as this app."
 msgstr "Mesma versão que este app."
 
@@ -16100,6 +16173,9 @@ msgstr "Salvar e criar a área de trabalho"
 
 msgid "Save All"
 msgstr "Salvar tudo"
+
+msgid "Save and build"
+msgstr "Salvar e fazer build"
 
 msgid "Save as environment"
 msgstr "Salvar como ambiente"
@@ -16143,6 +16219,9 @@ msgstr "Salvo"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" salvo como ambiente"
+
+msgid "Saved from a workspace"
+msgstr "Salvo a partir de uma área de trabalho"
 
 msgid "Saved to Downloads"
 msgstr "Salvo em Downloads"
@@ -16727,6 +16806,9 @@ msgstr "Enviando…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Envia {0} caracteres de contexto do terminal (cerca de {1} tokens) para {2}."
 
+msgid "Sensitive"
+msgstr "Sensível"
+
 msgid "Sent"
 msgstr "Enviado"
 
@@ -16799,9 +16881,6 @@ msgstr "Sessões"
 msgid "Sessions · top {0} by cost"
 msgstr "Sessões · top {0} por custo"
 
-msgid "Set"
-msgstr "Definida"
-
 msgid "Set a notification schedule"
 msgstr "Definir um horário de notificações"
 
@@ -16821,6 +16900,9 @@ msgstr "Definir a cor do grupo"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Definir o ícone como {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Definidas em toda área de trabalho iniciada a partir deste ambiente, e durante o build."
 
 msgid "Set project…"
 msgstr "Definir projeto…"
@@ -17421,9 +17503,6 @@ msgstr "Smileys e pessoas"
 
 msgid "Smoother onboarding"
 msgstr "Introdução mais fluida"
-
-msgid "Snapshot"
-msgstr "Snapshot"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Tira um snapshot da worktree antes e depois de cada turno do chat, para que o card liste cada arquivo alterado, incluindo edições feitas pelo shell, e possa desfazê-las. Cada prompt espera primeiro pelo seu snapshot."
@@ -18744,6 +18823,9 @@ msgstr "O envio da imagem expirou — anexe-a novamente"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "A descrição do cargo muda. Quem desenvolve deixa de ser digitador com bom gosto e vira despachante com bom gosto: decompõe o trabalho, direciona para as frotas e arbitra conflitos entre agentes que mexeram no mesmo módulo."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "Os últimos 5 ambientes. Restaure um para que novas áreas de trabalho voltem a partir dele."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "As atualizações, melhorias e novidades mais recentes do Paradev."
 
@@ -18782,6 +18864,9 @@ msgstr "A maioria dos PRs de agentes mesclados precisa só de revisão, sem nenh
 
 msgid "The model declined to continue"
 msgstr "O modelo se recusou a continuar"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "As alteradas mais recentemente. Definidas em toda área de trabalho iniciada a partir deste ambiente, e durante o build."
 
 msgid "The name of your organization or team"
 msgstr "O nome da sua organização ou equipe"
@@ -19697,6 +19782,9 @@ msgstr "Acione automações a partir do Gmail."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Dispare automações a partir de mensagens de canais do Teams."
 
+msgid "Trigger new build"
+msgstr "Iniciar novo build"
+
 msgid "Trigger not found"
 msgstr "Gatilho não encontrado"
 
@@ -20086,6 +20174,9 @@ msgstr "A atualização não conseguiu preservar as sessões"
 
 msgid "Update daemon"
 msgstr "Atualizar daemon"
+
+msgid "Update environment"
+msgstr "Atualizar ambiente"
 
 msgid "Update Error"
 msgstr "Erro de atualização"

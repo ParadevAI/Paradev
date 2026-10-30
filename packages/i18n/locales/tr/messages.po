@@ -1833,6 +1833,9 @@ msgstr "{lastActive} aktif"
 msgid "Active agent sessions."
 msgstr "Etkin ajan oturumları."
 
+msgid "Active build status"
+msgstr "Etkin derlemenin durumu"
+
 msgid "active days"
 msgstr "aktif gün"
 
@@ -2051,6 +2054,9 @@ msgstr "Kenar çubuğuna ekle"
 
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
+
+msgid "Add variable"
+msgstr "Değişken ekle"
 
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
@@ -2292,6 +2298,9 @@ msgstr "Tüm atananlar"
 msgid "All authors"
 msgstr "Tüm yazarlar"
 
+msgid "All builds"
+msgstr "Tüm derlemeler"
+
 msgid "All changes saved"
 msgstr "Tüm değişiklikler kaydedildi"
 
@@ -2313,6 +2322,9 @@ msgstr "Tüm veriler {0} üyenin tamamı için kalıcı olarak silinecek — bu 
 
 msgid "All downloads"
 msgstr "Tüm indirmeler"
+
+msgid "All environment variables ({total})"
+msgstr "Tüm ortam değişkenleri ({total})"
 
 msgid "All features, side by side"
 msgstr "Tüm özellikler, yan yana"
@@ -3269,9 +3281,6 @@ msgstr "{selectedHostLabel} üzerindeki yeni worktree'ler için temel dizin"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName} üzerindeki yeni worktree'ler için temel dizin."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Temel imaj · henüz kontrol noktası yok"
-
 msgid "Base URL"
 msgstr "Temel URL"
 
@@ -3537,6 +3546,9 @@ msgstr "Böcek"
 msgid "Bug reports"
 msgstr "Hata raporları"
 
+msgid "Build ID"
+msgstr "Derleme kimliği"
+
 msgid "Build in public"
 msgstr "Herkesin gözü önünde geliştiriyoruz"
 
@@ -3546,11 +3558,27 @@ msgstr "Paradev’in buluttaki geleceğini inşa edin"
 msgid "Build your own"
 msgstr "Kendinizinkini oluşturun"
 
+msgid "Building"
+msgstr "Derleniyor"
+
 msgid "Building the last piece of software"
 msgstr "Son yazılım parçasını inşa etmek"
 
 msgid "Building the last piece of software."
 msgstr "Son yazılım parçasını inşa ediyoruz."
+
+msgid "Building with the new repositories"
+msgstr "Yeni depolarla derleniyor"
+
+msgid "Building…"
+msgstr "Derleniyor…"
+
+msgid "Builds"
+msgstr "Derlemeler"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Derlendi {0}"
 
 msgid "Built in Paradev"
 msgstr "Paradev ile geliştirildi"
@@ -3891,6 +3919,9 @@ msgstr "Değişiklik günlüğü"
 msgid "Changes"
 msgstr "Değişiklikler"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "Değişiklikler yeni çalışma alanlarına uygulanır. Yeni bir derleme otomatik olarak başlar."
+
 msgid "Changes are isolated"
 msgstr "Değişiklikler yalıtılmıştır"
 
@@ -4046,10 +4077,6 @@ msgstr "Kontrol noktası"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrol noktası · tooltip yeniden düzenlemesinden önce"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Kontrol noktası kaydedildi {0}"
 
 msgid "Checks"
 msgstr "Kontroller"
@@ -4761,6 +4788,9 @@ msgstr "Yapılandırma dosyasının içeriği"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json bir JSON nesnesi olmalıdır"
+
+msgid "Configuration"
+msgstr "Yapılandırma"
 
 msgid "Configure"
 msgstr "Yapılandır"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Oluşturuldu"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Açıklamayı düzenle"
 msgid "Edit Description"
 msgstr "Açıklamayı Düzenle"
 
-msgid "Edit environment"
-msgstr "Ortamı düzenle"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Dosyaları sormadan düzenle; komutlardan önce sor"
 
@@ -7261,6 +7287,9 @@ msgstr "GitHub'da düzenle"
 
 msgid "Edit queued message"
 msgstr "Kuyruktaki mesajı düzenle"
+
+msgid "Edit repositories"
+msgstr "Depoları düzenle"
 
 msgid "Edit Run Script"
 msgstr "Çalıştırma betiğini düzenle"
@@ -7451,11 +7480,20 @@ msgstr "Ortam arşivlendi"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Ortam derlemeleri Team ve Ultra planlarına dahildir. Ayarlar, Faturalandırma bölümünden yükseltin."
 
+msgid "Environment history"
+msgstr "Ortam geçmişi"
+
 msgid "Environment not found"
 msgstr "Ortam bulunamadı"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Ortam kurulumu, kararsız testler ve kimlik bilgisi tesisatı, yani 2025'te gözetimsiz çalıştırmaları öldüren sıkıcı hata biçimleri, modelleyerek değil mühendislikle büyük ölçüde ortadan kaldırılır."
+
+msgid "Environment updated"
+msgstr "Ortam güncellendi"
+
+msgid "Environment variables"
+msgstr "Ortam değişkenleri"
 
 msgid "Environment Variables"
 msgstr "Ortam değişkenleri"
@@ -8708,6 +8746,11 @@ msgstr "kaynak:"
 msgid "From"
 msgstr "Kaynak"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "{0}@{1} üzerindeki .superset/config.toml dosyasından. Orada değiştirin."
+
 msgid "from {parentName}"
 msgstr "{parentName} tarafından"
 
@@ -9751,6 +9794,9 @@ msgstr "Paradev MCP'yi istemcinize kurun"
 msgid "Install plugin"
 msgstr "Eklenti kur"
 
+msgid "Install script"
+msgstr "Kurulum betiği"
+
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
@@ -10263,6 +10309,9 @@ msgstr "Son ajan etkinliği {0}"
 
 msgid "Last attached"
 msgstr "Son bağlanma"
+
+msgid "Last build failed"
+msgstr "Son derleme başarısız oldu"
 
 msgid "Last day of each month"
 msgstr "Her ayın son günü"
@@ -11829,6 +11878,12 @@ msgstr "Eşleşen otomasyon yok"
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
+msgid "No build yet"
+msgstr "Henüz derleme yok"
+
+msgid "No builds yet"
+msgstr "Henüz derleme yok"
+
 msgid "No changed files."
 msgstr "Değişen dosya yok."
 
@@ -11939,6 +11994,9 @@ msgstr "Bu projeye henüz bağlı bir ortam yok."
 
 msgid "No environments available"
 msgstr "Kullanılabilir ortam yok"
+
+msgid "No environments built yet"
+msgstr "Henüz derlenmiş ortam yok"
 
 msgid "No environments found."
 msgstr "Ortam bulunamadı."
@@ -12468,6 +12526,9 @@ msgstr "Bağlı değil"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Bağlı değil · bulut çalışma alanları organizasyonunun GitHub App'i olarak push yapar"
+
+msgid "Not defined"
+msgstr "Tanımlanmadı"
 
 msgid "Not demoed here"
 msgstr "Burada gösterilmiyor"
@@ -14051,6 +14112,9 @@ msgstr "{hostName} üzerindeki proje worktree klasörünü seçin."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Alacağı depoları seçin. Bu makinedeki bir ajan neyin kurulacağını bulur ve bulutta çalıştırır."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Bu ortamın çektiği depoları seçin. Kaydetmek yeni bir derleme başlatır; çalışma alanları başarılı olana kadar mevcut olandan başlamaya devam eder."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName} üzerindeki worktree klasörünü seçin."
 
@@ -15425,6 +15489,9 @@ msgstr "Depolar"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "GitHub App kurulumu üzerinden erişilebilen depolar."
 
+msgid "Repositories changed"
+msgstr "Depolar değişti"
+
 msgid "Repositories refreshed"
 msgstr "Depolar yenilendi"
 
@@ -16059,6 +16126,9 @@ msgstr "Makinenizde yerel bir komut çalıştırır"
 msgid "Runs appear here once an automation fires."
 msgstr "Bir otomasyon tetiklendiğinde çalıştırmalar burada görünür."
 
+msgid "Runs every time a workspace starts"
+msgstr "Her çalışma alanı başladığında çalışır"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "O cihazdaki Paradev uygulamasının içinde çalışır; bu yüzden güncellemek, oradaki uygulamayı güncellemek demektir."
 
@@ -16080,6 +16150,9 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
 
+msgid "Runs when the environment builds"
+msgstr "Ortam derlenirken çalışır"
+
 msgid "Same version as this app."
 msgstr "Bu uygulamayla aynı sürüm."
 
@@ -16100,6 +16173,9 @@ msgstr "Kaydet ve çalışma alanı oluştur"
 
 msgid "Save All"
 msgstr "Tümünü kaydet"
+
+msgid "Save and build"
+msgstr "Kaydet ve derle"
 
 msgid "Save as environment"
 msgstr "Ortam olarak kaydet"
@@ -16143,6 +16219,9 @@ msgstr "Kaydedildi"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" ortam olarak kaydedildi"
+
+msgid "Saved from a workspace"
+msgstr "Bir çalışma alanından kaydedildi"
 
 msgid "Saved to Downloads"
 msgstr "İndirilenler klasörüne kaydedildi"
@@ -16727,6 +16806,9 @@ msgstr "Gönderiliyor…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "{2} ajanına {0} karakterlik terminal bağlamı (yaklaşık {1} token) gönderir."
 
+msgid "Sensitive"
+msgstr "Hassas"
+
 msgid "Sent"
 msgstr "Gönderildi"
 
@@ -16799,9 +16881,6 @@ msgstr "Oturumlar"
 msgid "Sessions · top {0} by cost"
 msgstr "Oturumlar · maliyete göre ilk {0}"
 
-msgid "Set"
-msgstr "Ayarlandı"
-
 msgid "Set a notification schedule"
 msgstr "Bildirim programı ayarla"
 
@@ -16821,6 +16900,9 @@ msgstr "Grup rengini ayarla"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Simgeyi şuna ayarla: {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Bu ortamdan başlatılan her çalışma alanında ve derleme sırasında ayarlanır."
 
 msgid "Set project…"
 msgstr "Projeyi ayarla…"
@@ -17421,9 +17503,6 @@ msgstr "Suratlar ve İnsanlar"
 
 msgid "Smoother onboarding"
 msgstr "Daha akıcı ilk kurulum"
-
-msgid "Snapshot"
-msgstr "Anlık görüntü"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
@@ -18744,6 +18823,9 @@ msgstr "Görsel yüklemesinin süresi doldu — yeniden ekleyin"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "İş tanımı değişir. Mühendisler zevk sahibi daktilocular olmayı bırakıp zevk sahibi dağıtıcılar olur: işi parçalara ayırır, filolara yönlendirir ve aynı modüle dokunan iki ajan arasındaki çakışmalara hakemlik eder."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "Son 5 ortam. Yeni çalışma alanlarının yeniden ondan başlaması için birini geri yükleyin."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Paradev'deki en son güncellemeler, iyileştirmeler ve yeni özellikler."
 
@@ -18782,6 +18864,9 @@ msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, h
 
 msgid "The model declined to continue"
 msgstr "Model devam etmeyi reddetti"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "En son değiştirilenler. Bu ortamdan başlatılan her çalışma alanında ve derleme sırasında ayarlanır."
 
 msgid "The name of your organization or team"
 msgstr "Kuruluşunuzun veya takımınızın adı"
@@ -19697,6 +19782,9 @@ msgstr "Gmail’den otomasyonları tetikleyin."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Otomasyonları Teams kanal mesajlarından tetikleyin."
 
+msgid "Trigger new build"
+msgstr "Yeni derleme başlat"
+
 msgid "Trigger not found"
 msgstr "Tetikleyici bulunamadı"
 
@@ -20086,6 +20174,9 @@ msgstr "Güncelleme oturumları koruyamadı"
 
 msgid "Update daemon"
 msgstr "Daemon'u güncelle"
+
+msgid "Update environment"
+msgstr "Ortamı güncelle"
 
 msgid "Update Error"
 msgstr "Güncelleme hatası"

@@ -1833,6 +1833,9 @@ msgstr "активность {lastActive}"
 msgid "Active agent sessions."
 msgstr "Активные сессии агентов."
 
+msgid "Active build status"
+msgstr "Статус активной сборки"
+
 msgid "active days"
 msgstr "активных дней"
 
@@ -2051,6 +2054,9 @@ msgstr "Добавить на боковую панель"
 
 msgid "Add to workspace"
 msgstr "Добавить в рабочую область"
+
+msgid "Add variable"
+msgstr "Добавить переменную"
 
 msgid "Add what it does"
 msgstr "Добавить, что он делает"
@@ -2292,6 +2298,9 @@ msgstr "Все исполнители"
 msgid "All authors"
 msgstr "Все авторы"
 
+msgid "All builds"
+msgstr "Все сборки"
+
 msgid "All changes saved"
 msgstr "Все изменения сохранены"
 
@@ -2313,6 +2322,9 @@ msgstr "Все данные будут безвозвратно удалены �
 
 msgid "All downloads"
 msgstr "Все загрузки"
+
+msgid "All environment variables ({total})"
+msgstr "Все переменные окружения ({total})"
 
 msgid "All features, side by side"
 msgstr "Все возможности рядом"
@@ -3269,9 +3281,6 @@ msgstr "Базовая папка для новых worktree на {selectedHostL
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Базовая папка для новых worktree на {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Базовый образ · контрольных точек пока нет"
-
 msgid "Base URL"
 msgstr "Базовый URL"
 
@@ -3537,6 +3546,9 @@ msgstr "Жук"
 msgid "Bug reports"
 msgstr "Отчёты о багах"
 
+msgid "Build ID"
+msgstr "ID сборки"
+
 msgid "Build in public"
 msgstr "Работаем открыто"
 
@@ -3546,11 +3558,27 @@ msgstr "Создайте будущее Paradev в облаке"
 msgid "Build your own"
 msgstr "Создайте свой"
 
+msgid "Building"
+msgstr "Идёт сборка"
+
 msgid "Building the last piece of software"
 msgstr "Строим последнюю программу"
 
 msgid "Building the last piece of software."
 msgstr "Строим последнюю программу."
+
+msgid "Building with the new repositories"
+msgstr "Идёт сборка с новыми репозиториями"
+
+msgid "Building…"
+msgstr "Идёт сборка…"
+
+msgid "Builds"
+msgstr "Сборки"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Собрано {0}"
 
 msgid "Built in Paradev"
 msgstr "Создано в Paradev"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Изменения"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "Изменения применяются к новым рабочим областям. Новая сборка запускается автоматически."
+
 msgid "Changes are isolated"
 msgstr "Изменения изолированы"
 
@@ -4046,10 +4077,6 @@ msgstr "Контрольная точка"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольная точка · до рефакторинга tooltip"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Контрольная точка сохранена {0}"
 
 msgid "Checks"
 msgstr "Проверки"
@@ -4761,6 +4788,9 @@ msgstr "Содержимое файла конфигурации"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json должен быть объектом JSON"
+
+msgid "Configuration"
+msgstr "Конфигурация"
 
 msgid "Configure"
 msgstr "Настроить"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Создан"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Изменить описание"
 msgid "Edit Description"
 msgstr "Изменить описание"
 
-msgid "Edit environment"
-msgstr "Изменить окружение"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Править файлы без вопросов; спрашивать перед командами"
 
@@ -7261,6 +7287,9 @@ msgstr "Изменить на GitHub"
 
 msgid "Edit queued message"
 msgstr "Изменить сообщение в очереди"
+
+msgid "Edit repositories"
+msgstr "Изменить репозитории"
 
 msgid "Edit Run Script"
 msgstr "Изменить скрипт запуска"
@@ -7451,11 +7480,20 @@ msgstr "Окружение архивировано"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Сборки окружений доступны в тарифах Team и Ultra. Перейдите на другой тариф в разделе Настройки, Оплата."
 
+msgid "Environment history"
+msgstr "История окружения"
+
 msgid "Environment not found"
 msgstr "Окружение не найдено"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Настройка окружения, нестабильные тесты и возня с учётными данными — скучные режимы отказа, которые убивали автономные прогоны в 2025-м, — по большей части решены инженерно, а не моделью."
+
+msgid "Environment updated"
+msgstr "Окружение обновлено"
+
+msgid "Environment variables"
+msgstr "Переменные окружения"
 
 msgid "Environment Variables"
 msgstr "Переменные окружения"
@@ -8708,6 +8746,11 @@ msgstr "от"
 msgid "From"
 msgstr "Откуда"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "Из .superset/config.toml в {0}@{1}. Меняйте их там."
+
 msgid "from {parentName}"
 msgstr "от {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "Установите Paradev MCP в своём клиенте"
 msgid "Install plugin"
 msgstr "Установить плагин"
 
+msgid "Install script"
+msgstr "Скрипт установки"
+
 msgid "Install the desktop app"
 msgstr "Установите десктопное приложение"
 
@@ -10263,6 +10309,9 @@ msgstr "Последняя активность агента {0}"
 
 msgid "Last attached"
 msgstr "Последнее подключение"
+
+msgid "Last build failed"
+msgstr "Последняя сборка не удалась"
 
 msgid "Last day of each month"
 msgstr "В последний день каждого месяца"
@@ -11829,6 +11878,12 @@ msgstr "Нет подходящих автоматизаций"
 msgid "No branches found"
 msgstr "Ветки не найдены"
 
+msgid "No build yet"
+msgstr "Сборки ещё нет"
+
+msgid "No builds yet"
+msgstr "Сборок ещё нет"
+
 msgid "No changed files."
 msgstr "Изменённых файлов нет."
 
@@ -11939,6 +11994,9 @@ msgstr "С этим проектом пока не связано ни одно 
 
 msgid "No environments available"
 msgstr "Нет доступных окружений"
+
+msgid "No environments built yet"
+msgstr "Окружения ещё не собирались"
 
 msgid "No environments found."
 msgstr "Окружения не найдены."
@@ -12468,6 +12526,9 @@ msgstr "Не подключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не подключено · облачные рабочие области пушат как GitHub App вашей организации"
+
+msgid "Not defined"
+msgstr "Не задан"
 
 msgid "Not demoed here"
 msgstr "Здесь не показано"
@@ -14051,6 +14112,9 @@ msgstr "Выберите папку worktree проекта на {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Выберите репозитории, которые оно получает. Агент на этом компьютере разберётся, что установить, и запустит всё в облаке."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Выберите репозитории, которые загружает это окружение. Сохранение запускает новую сборку; рабочие области запускаются из текущей, пока новая не завершится успешно."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Выберите папку worktree на {hostName}."
 
@@ -15425,6 +15489,9 @@ msgstr "Репозитории"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Репозитории, доступные через установку GitHub App."
 
+msgid "Repositories changed"
+msgstr "Репозитории изменены"
+
 msgid "Repositories refreshed"
 msgstr "Репозитории обновлены"
 
@@ -16059,6 +16126,9 @@ msgstr "Запускает локальную команду на вашей м�
 msgid "Runs appear here once an automation fires."
 msgstr "Запуски появятся здесь, как только сработает автоматизация."
 
+msgid "Runs every time a workspace starts"
+msgstr "Выполняется при каждом запуске рабочей области"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Работает внутри приложения Paradev на том устройстве, поэтому для обновления нужно обновить приложение там."
 
@@ -16080,6 +16150,9 @@ msgstr "Выполняется при создании рабочего прос
 msgid "Runs when a workspace is deleted."
 msgstr "Выполняется при удалении рабочего пространства."
 
+msgid "Runs when the environment builds"
+msgstr "Выполняется при сборке окружения"
+
 msgid "Same version as this app."
 msgstr "Та же версия, что и у этого приложения."
 
@@ -16100,6 +16173,9 @@ msgstr "Сохранить и создать рабочую область"
 
 msgid "Save All"
 msgstr "Сохранить всё"
+
+msgid "Save and build"
+msgstr "Сохранить и собрать"
 
 msgid "Save as environment"
 msgstr "Сохранить как окружение"
@@ -16143,6 +16219,9 @@ msgstr "Сохранено"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "«{0}» сохранено как окружение"
+
+msgid "Saved from a workspace"
+msgstr "Сохранено из рабочей области"
 
 msgid "Saved to Downloads"
 msgstr "Сохранено в «Загрузки»"
@@ -16727,6 +16806,9 @@ msgstr "Отправка…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Отправит {0} символов контекста терминала (примерно {1} токенов) агенту {2}."
 
+msgid "Sensitive"
+msgstr "Секретная"
+
 msgid "Sent"
 msgstr "Отправлено"
 
@@ -16799,9 +16881,6 @@ msgstr "Сессии"
 msgid "Sessions · top {0} by cost"
 msgstr "Сессии · топ {0} по стоимости"
 
-msgid "Set"
-msgstr "Задана"
-
 msgid "Set a notification schedule"
 msgstr "Задать расписание уведомлений"
 
@@ -16821,6 +16900,9 @@ msgstr "Задать цвет группы"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Установить иконку {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Задаются в каждой рабочей области, запущенной из этого окружения, и во время сборки."
 
 msgid "Set project…"
 msgstr "Назначить проект…"
@@ -17421,9 +17503,6 @@ msgstr "Смайлики и люди"
 
 msgid "Smoother onboarding"
 msgstr "Более гладкий онбординг"
-
-msgid "Snapshot"
-msgstr "Снимок"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Делать снимок worktree до и после каждого хода чата, чтобы его карточка показывала каждый изменённый файл, включая правки из оболочки, и могла их отменить. Каждый промпт сначала ждёт свой снимок."
@@ -18744,6 +18823,9 @@ msgstr "Срок загрузки изображения истёк — прик
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Описание работы меняется. Инженеры перестают быть машинистками со вкусом и становятся диспетчерами со вкусом: декомпозируют работу, раздают её флотам, разрешают конфликты между агентами, которые оба тронули один модуль."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "Последние 5 окружений. Восстановите одно, чтобы новые рабочие области снова запускались из него."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Последние обновления, улучшения и новые возможности Paradev."
 
@@ -18782,6 +18864,9 @@ msgstr "Большинству объединённых агентских PR н
 
 msgid "The model declined to continue"
 msgstr "Модель отказалась продолжать"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "Недавно изменённые. Задаются в каждой рабочей области, запущенной из этого окружения, и во время сборки."
 
 msgid "The name of your organization or team"
 msgstr "Название организации или команды"
@@ -19697,6 +19782,9 @@ msgstr "Запускайте автоматизации из Gmail."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Запускайте автоматизации по сообщениям в каналах Teams."
 
+msgid "Trigger new build"
+msgstr "Запустить новую сборку"
+
 msgid "Trigger not found"
 msgstr "Триггер не найден"
 
@@ -20086,6 +20174,9 @@ msgstr "Обновление не смогло сохранить сессии"
 
 msgid "Update daemon"
 msgstr "Обновить демон"
+
+msgid "Update environment"
+msgstr "Обновить окружение"
 
 msgid "Update Error"
 msgstr "Ошибка обновления"
