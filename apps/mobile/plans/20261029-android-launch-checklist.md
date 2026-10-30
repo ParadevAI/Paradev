@@ -106,7 +106,8 @@ to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). 
       Google Cloud steps above first.
 - [x] **Sign-in errors.** Done: a failed GitHub or Google sign-in shows its error (both platforms).
 - [ ] **Screens not yet checked on a device:** the Page sheets (preview, comments, share), voice
-      sheets, the PR checks/reviewers sheets, line comment, and `ValueMenu` in share-invite.
+      sheets, line comment, and `ValueMenu` in share-invite. The PR checks and reviewers sheets
+      render on Android (2026-10-30, fixture data: the local dev account has no GitHub).
 - [ ] **CI and EAS workflows.** `.eas/workflows/deploy-android.yml` builds and submits to the Play
       internal track, run by hand. It moves into `deploy.yml` after the first manual upload and once
       Android takes OTA updates (`RELEASE.md`).
@@ -115,8 +116,9 @@ to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). 
 ### Composer, after the MVP
 
 From `plans/20261029-android-composer.md`. Done: session tabs, quick keys, slash command
-suggestions. Still open: dictation (needs `SpeechRecognizer`), paste of images and files, PDF and
-document thumbnails, swipe-down to dismiss.
+suggestions, dictation (`SpeechRecognizer`), paste of images and files, PDF thumbnails, swipe-down
+to dismiss, and the quick-keys PR action. Voice mode owns the audio route on Android
+(`modules/voice-android`).
 
 ### Agent card and push
 

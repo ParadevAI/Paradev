@@ -43,13 +43,13 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 
 ## Missing after the MVP
 
-- Dictation (`onDictationError` never fires): Android `SpeechRecognizer` needs a native module.
-- Paste of images and files (`onPaste`): RN 0.88 `TextInput` has no paste event and takes text
-  only. Text paste works through the system menu. Images need a native module.
-- PDF and document thumbnails: `fileThumbnail` returns `null` for files that are not images.
-- Swipe-down on the grabber to dismiss, animated collapse, upload rings drawn as rings (the MVP draws
-  a dimmed thumbnail with a percentage).
+- Upload rings drawn as rings (the composer draws a dimmed thumbnail with a percentage) and an
+  animated collapse.
 - The quick-keys action takes its room at once; iOS animates the keys sliding over.
+- Paste through the system menu or a keyboard's image insert: RN 0.88 `TextInput` takes text only,
+  so images and files paste through the composer's own Paste control.
+- Thumbnails for documents other than PDFs that sit in the app's cache (file URIs); content URIs
+  use the provider's own preview.
 
 ## Progress
 
@@ -74,6 +74,13 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
   `ComposerCard` with a seeded thread (lift, post). The workspace screen with a live host is not
   verified: no host-service was connected.
 
+- [x] (2026-10-30) Dictation, paste, document thumbnails and swipe-down, behind seams in
+  `modules/composer/src`: `utils/dictation` (`.android.ts` on `SpeechRecognizer`, `.web.ts` on the
+  Web Speech API, `.ts` hides the mic), `hooks/useAttachmentPaste` (Android clipboard, the
+  browser's paste event), `utils/fileThumbnail` (`PdfRenderer` and the provider's preview on
+  Android). The Kotlin lives in `modules/composer-android`, an Android-only module, so iOS native
+  code and its fingerprint do not move. Verified on `Paradev_A3` (emulator-5558).
+
 ## Surprises & Discoveries
 
 - Fabric flattens a layout-only `View`. The field's wrapper had a layout-only style when expanded
@@ -87,6 +94,10 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 - `TerminalComposer` wrapped the composer in a plain `<View>` with no size. The iOS view draws in
   its own overlay, so it never mattered there; the Android overlay sized itself to that 0×0 view
   and drew nothing. The wrapper now fills the screen with `box-none`.
+- Google's recogniser reads `EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS` as an Integer and
+  ignores a Long, and ends each session after a pause; the module starts it again until stop.
+- The Android attachments sheet settled before it hid, so settling unmounted it and `hide()` was
+  rejected: Files and Photos never opened. It hides first now.
 - `android-dev.sh` reused its saved Metro port even when another worktree's Metro held it, and
   loaded that worktree's bundle. It now reuses the port only while its own Metro runs or the port
   is free.
@@ -98,4 +109,6 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 | 2026-10-29 | React Native over a Kotlin module, for the reasons in the table above. |
 | 2026-10-29 | Header chips sit inside the card, at its top, rather than floating above it. |
 | 2026-10-29 | Context menus (tab press-and-hold, mode) are one bottom sheet; Android has no SwiftUI `Menu`. |
+| 2026-10-30 | Native pieces go in a separate Android-only module (`modules/composer-android`), not `modules/composer/android`: adding `"android"` to the composer's module config would move the iOS fingerprint. |
+| 2026-10-30 | Paste of images and files is a Paste control that shows while the clipboard holds them. Reading only the clip description keeps Android's "pasted" toast for the paste itself. |
 | 2026-10-29 | Expanded means focused. The collapsed row shows a one-line label over a transparent field, rather than restyling the field, so the head of a long draft shows with an ellipsis, as on iOS. |
