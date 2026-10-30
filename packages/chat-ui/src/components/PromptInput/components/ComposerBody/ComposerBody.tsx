@@ -76,6 +76,7 @@ import type {
 	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
+	PromptInputLayout,
 	PromptInputProps,
 } from "../../types";
 import { browseRows } from "../../utils/browseRows";
@@ -98,20 +99,37 @@ import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
 
-const FOOTER_BUTTON_CLASS =
-	"flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors";
-const GHOST_FOOTER_BUTTON_CLASS = cn(
-	FOOTER_BUTTON_CLASS,
-	"cursor-pointer text-muted-foreground hover:bg-accent hover:text-foreground",
-);
-const FILLED_FOOTER_BUTTON_CLASS = cn(
-	FOOTER_BUTTON_CLASS,
-	"cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80",
-);
-const INACTIVE_SEND_BUTTON_CLASS = cn(
-	FOOTER_BUTTON_CLASS,
-	"cursor-not-allowed bg-secondary text-muted-foreground",
-);
+function footerButtonClasses(base: string, ghost: string) {
+	return {
+		base,
+		ghost: cn(base, "cursor-pointer", ghost),
+		filled: cn(
+			base,
+			"cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80",
+		),
+		inactiveSend: cn(
+			base,
+			"cursor-not-allowed bg-secondary text-muted-foreground",
+		),
+	};
+}
+
+const FOOTER_BUTTONS: Record<
+	PromptInputLayout,
+	ReturnType<typeof footerButtonClasses>
+> = {
+	stacked: footerButtonClasses(
+		"flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors",
+		"text-muted-foreground hover:bg-accent hover:text-foreground",
+	),
+	inline: footerButtonClasses(
+		"flex size-7 shrink-0 items-center justify-center rounded-full transition-colors",
+		"bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground",
+	),
+};
+
+const INLINE_CONTEXT_BUTTON_CLASS =
+	"size-7 rounded-full bg-secondary hover:bg-secondary/80 disabled:hover:bg-secondary";
 
 // Slash commands only trigger while the "/token" is the entire message.
 function matchCommandToken(text: string) {
@@ -125,7 +143,7 @@ function matchCommandToken(text: string) {
 }
 
 export type ComposerBodyProps = Required<
-	Pick<PromptInputProps, "placeholder" | "status">
+	Pick<PromptInputProps, "placeholder" | "status" | "layout">
 > &
 	Pick<
 		PromptInputProps,
@@ -185,6 +203,7 @@ function $collectChips(): ComposerChip[] {
 
 export function ComposerBody({
 	placeholder,
+	layout,
 	mentionProviders,
 	commands,
 	dictation,
@@ -916,13 +935,337 @@ export function ComposerBody({
 		commandQuery !== null ||
 		browseOpen ||
 		submenu !== null;
+	const buttons = FOOTER_BUTTONS[layout];
+	const inline = layout === "inline";
+	const dictating = dictationSession.status !== "idle";
+	const editorBlock = (
+		<div
+			className={cn(
+				inline
+					? "relative min-w-0 flex-1 py-[3px]"
+					: "relative px-4 pt-3.5 pb-1",
+				inline && dictating && "hidden",
+			)}
+		>
+			<PlainTextPlugin
+				contentEditable={
+					<ContentEditable
+						className={cn(
+							"prompt-input-editor",
+							inline && "prompt-input-editor-inline",
+						)}
+						spellCheck={false}
+					/>
+				}
+				placeholder={
+					<span
+						className={cn(
+							"pointer-events-none absolute text-sm leading-[1.625] text-muted-foreground/70",
+							inline ? "top-[3px] left-0" : "top-3.5 left-4",
+						)}
+					>
+						{placeholder}
+					</span>
+				}
+				ErrorBoundary={LexicalErrorBoundary}
+			/>
+			<HistoryPlugin />
+			<LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
+				onQueryChange={setMentionQuery}
+				onSelectOption={(option, nodeToReplace, closeMenu) =>
+					selectMentionEntry(option.entry, nodeToReplace, closeMenu)
+				}
+				options={mentionOptions}
+				triggerFn={matchTrigger}
+				commandPriority={COMMAND_PRIORITY_HIGH}
+				onClose={() => {
+					mentionMenuRef.current = null;
+					setMentionQuery(null);
+				}}
+				menuRenderFn={(
+					anchorElementRef,
+					{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
+				) => {
+					const shown = Boolean(
+						anchorElementRef.current && menuSlot && !typeaheadDismissed,
+					);
+					mentionMenuRef.current = shown
+						? {
+								option:
+									selectedIndex === null
+										? undefined
+										: mentionOptions[selectedIndex],
+								select: selectOptionAndCleanUp,
+							}
+						: null;
+					return shown && menuSlot
+						? createPortal(
+								<MentionMenu
+									sections={typeaheadSections}
+									selectedIndex={selectedIndex}
+									onHighlight={setHighlightedIndex}
+									onSelect={(entry) => {
+										const option = mentionOptions.find(
+											(candidate) => candidate.entry.id === entry.id,
+										);
+										if (option) selectOptionAndCleanUp(option);
+									}}
+								/>,
+								menuSlot,
+							)
+						: null;
+				}}
+			/>
+			<LexicalTypeaheadMenuPlugin<CommandTypeaheadOption>
+				onQueryChange={setCommandQuery}
+				onClose={() => {
+					commandMenuRef.current = null;
+				}}
+				onSelectOption={(option, nodeToReplace, closeMenu) => {
+					editor.update(() => {
+						nodeToReplace?.remove();
+						closeMenu();
+					});
+					const completion = completingRef.current
+						? option.command.completion
+						: undefined;
+					completingRef.current = false;
+					if (completion) actionContextRef.current.insertChip(completion);
+					else void option.command.onSelect(actionContextRef.current);
+				}}
+				options={commandOptions}
+				triggerFn={(text) => matchCommandToken(text)}
+				commandPriority={COMMAND_PRIORITY_HIGH}
+				menuRenderFn={(
+					anchorElementRef,
+					{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
+				) => {
+					const shown =
+						anchorElementRef.current &&
+						menuSlot &&
+						!commandDismissed &&
+						rankedCommands.length > 0;
+					commandMenuRef.current = shown
+						? {
+								option:
+									selectedIndex === null
+										? undefined
+										: commandOptions[selectedIndex],
+								select: selectOptionAndCleanUp,
+							}
+						: null;
+					return shown
+						? createPortal(
+								<CommandMenu
+									commands={rankedCommands}
+									selectedIndex={selectedIndex}
+									onHighlight={setHighlightedIndex}
+									onSelect={(command) => {
+										const option = commandOptions.find(
+											(candidate) => candidate.command.id === command.id,
+										);
+										if (option) selectOptionAndCleanUp(option);
+									}}
+								/>,
+								menuSlot,
+							)
+						: null;
+				}}
+			/>
+		</div>
+	);
+	const fileInput = (
+		<input
+			ref={fileInputRef}
+			type="file"
+			multiple
+			className="hidden"
+			onChange={(event) => {
+				if (event.target.files) addFiles(event.target.files);
+				event.target.value = "";
+			}}
+		/>
+	);
+	const dictationControls =
+		dictationSession.status === "error" ? (
+			<>
+				<span className="min-w-0 flex-1 truncate pl-1 text-sm text-muted-foreground">
+					{dictationSession.error?.message}
+				</span>
+				<button
+					type="button"
+					aria-label={t({
+						message: "Retry dictation",
+					})}
+					onClick={() => void dictationSession.retry()}
+					className={buttons.filled}
+				>
+					<RefreshCcwIcon className="size-3.5" />
+				</button>
+				<button
+					type="button"
+					aria-label={t({
+						message: "Discard recording",
+					})}
+					onClick={dictationSession.cancel}
+					className={buttons.ghost}
+				>
+					<XIcon className="size-3.5" />
+				</button>
+				<button
+					type="button"
+					aria-label={t({
+						message: "Send message",
+					})}
+					disabled
+					className={buttons.inactiveSend}
+				>
+					<ArrowUpIcon className="size-4" />
+				</button>
+			</>
+		) : dictating ? (
+			<>
+				<DictationBar
+					canvasRef={dictationSession.canvasRef}
+					seconds={dictationSession.seconds}
+					status={
+						dictationSession.status === "transcribing"
+							? "transcribing"
+							: "recording"
+					}
+				/>
+				<button
+					type="button"
+					aria-label={t({
+						message: "Stop dictation",
+					})}
+					disabled={dictationSession.status === "transcribing"}
+					onClick={() => void dictationSession.finish()}
+					className={cn(
+						buttons.filled,
+						"disabled:cursor-default disabled:opacity-50",
+					)}
+				>
+					<SquareIcon className="size-3 fill-current" />
+				</button>
+				<button
+					type="button"
+					aria-label={t({
+						message: "Send message",
+					})}
+					disabled
+					className={buttons.inactiveSend}
+				>
+					<ArrowUpIcon className="size-4" />
+				</button>
+			</>
+		) : null;
+	const sendControls = (
+		<>
+			{dictation && (
+				<button
+					type="button"
+					aria-label={t({
+						message: "Dictate",
+					})}
+					onClick={async () => {
+						setBrowseOpen(false);
+						await dictationSession.start();
+						editor.focus();
+					}}
+					className={buttons.ghost}
+				>
+					<MicIcon className="size-4" />
+				</button>
+			)}
+			{status === "streaming" && !canSend ? (
+				<button
+					type="button"
+					aria-label={t({
+						message: "Stop response",
+					})}
+					onClick={onStop}
+					className={buttons.filled}
+				>
+					<SquareIcon className="size-3 fill-current" />
+				</button>
+			) : (
+				<button
+					type="button"
+					aria-label={
+						status === "streaming"
+							? t({ message: "Queue message" })
+							: t({ message: "Send message" })
+					}
+					title={
+						status === "streaming"
+							? t({ message: "Queue; ⌘↩ to steer the running turn" })
+							: undefined
+					}
+					disabled={!canSend || disabled || pending}
+					onClick={() => submit()}
+					className={
+						canSend && !disabled && !pending
+							? cn(
+									buttons.base,
+									"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
+								)
+							: buttons.inactiveSend
+					}
+				>
+					{pending ? (
+						<LoaderCircleIcon className="size-4 animate-spin" />
+					) : (
+						<ArrowUpIcon className="size-4" />
+					)}
+				</button>
+			)}
+		</>
+	);
+	const composerBody = inline ? (
+		<div
+			className="flex items-end gap-3 px-[7px] py-[7px]"
+			data-composer-footer
+		>
+			<ContextButton
+				className={INLINE_CONTEXT_BUTTON_CLASS}
+				onClick={toggleBrowseMenu}
+				disabled={dictating}
+			/>
+			{fileInput}
+			{editorBlock}
+			{dictationControls ?? (
+				<div className="flex shrink-0 items-center gap-1.5">{sendControls}</div>
+			)}
+		</div>
+	) : (
+		<>
+			{editorBlock}
+			<div
+				className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
+				data-composer-footer
+			>
+				<ContextButton onClick={toggleBrowseMenu} disabled={dictating} />
+				{fileInput}
+				{dictationControls ?? (
+					<>
+						{toolbar}
+						<div className="flex-1" />
+						{toolbarEnd}
+						{sendControls}
+					</>
+				)}
+			</div>
+		</>
+	);
 	return (
 		<ChipRenderProvider renderChip={chipMenuOpen ? withoutTooltip : renderChip}>
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the file picker button */}
 			<div
 				ref={rootRef}
 				className={cn(
-					"relative flex flex-col rounded-2xl bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
+					"relative flex flex-col bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
+					inline ? "rounded-[22px]" : "rounded-2xl",
 				)}
 				onDragOver={(event) => {
 					if (dropZone == null && event.dataTransfer.types.includes("Files")) {
@@ -1001,7 +1344,8 @@ export function ComposerBody({
 				<div
 					aria-hidden={!dragging}
 					className={cn(
-						"pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-primary/10 transition-opacity duration-150 motion-reduce:transition-none",
+						"pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-primary/10 transition-opacity duration-150 motion-reduce:transition-none",
+						inline ? "rounded-[22px]" : "rounded-2xl",
 						dragging ? "opacity-100" : "opacity-0",
 					)}
 				>
@@ -1044,281 +1388,7 @@ export function ComposerBody({
 						)
 					}
 				/>
-				<div className="relative px-4 pt-3.5 pb-1">
-					<PlainTextPlugin
-						contentEditable={
-							<ContentEditable
-								className="prompt-input-editor"
-								spellCheck={false}
-							/>
-						}
-						placeholder={
-							<span className="pointer-events-none absolute top-3.5 left-4 text-sm leading-[1.625] text-muted-foreground/70">
-								{placeholder}
-							</span>
-						}
-						ErrorBoundary={LexicalErrorBoundary}
-					/>
-					<HistoryPlugin />
-					<LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
-						onQueryChange={setMentionQuery}
-						onSelectOption={(option, nodeToReplace, closeMenu) =>
-							selectMentionEntry(option.entry, nodeToReplace, closeMenu)
-						}
-						options={mentionOptions}
-						triggerFn={matchTrigger}
-						commandPriority={COMMAND_PRIORITY_HIGH}
-						onClose={() => {
-							mentionMenuRef.current = null;
-							setMentionQuery(null);
-						}}
-						menuRenderFn={(
-							anchorElementRef,
-							{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-						) => {
-							const shown = Boolean(
-								anchorElementRef.current && menuSlot && !typeaheadDismissed,
-							);
-							mentionMenuRef.current = shown
-								? {
-										option:
-											selectedIndex === null
-												? undefined
-												: mentionOptions[selectedIndex],
-										select: selectOptionAndCleanUp,
-									}
-								: null;
-							return shown && menuSlot
-								? createPortal(
-										<MentionMenu
-											sections={typeaheadSections}
-											selectedIndex={selectedIndex}
-											onHighlight={setHighlightedIndex}
-											onSelect={(entry) => {
-												const option = mentionOptions.find(
-													(candidate) => candidate.entry.id === entry.id,
-												);
-												if (option) selectOptionAndCleanUp(option);
-											}}
-										/>,
-										menuSlot,
-									)
-								: null;
-						}}
-					/>
-					<LexicalTypeaheadMenuPlugin<CommandTypeaheadOption>
-						onQueryChange={setCommandQuery}
-						onClose={() => {
-							commandMenuRef.current = null;
-						}}
-						onSelectOption={(option, nodeToReplace, closeMenu) => {
-							editor.update(() => {
-								nodeToReplace?.remove();
-								closeMenu();
-							});
-							const completion = completingRef.current
-								? option.command.completion
-								: undefined;
-							completingRef.current = false;
-							if (completion) actionContextRef.current.insertChip(completion);
-							else void option.command.onSelect(actionContextRef.current);
-						}}
-						options={commandOptions}
-						triggerFn={(text) => matchCommandToken(text)}
-						commandPriority={COMMAND_PRIORITY_HIGH}
-						menuRenderFn={(
-							anchorElementRef,
-							{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-						) => {
-							const shown =
-								anchorElementRef.current &&
-								menuSlot &&
-								!commandDismissed &&
-								rankedCommands.length > 0;
-							commandMenuRef.current = shown
-								? {
-										option:
-											selectedIndex === null
-												? undefined
-												: commandOptions[selectedIndex],
-										select: selectOptionAndCleanUp,
-									}
-								: null;
-							return shown
-								? createPortal(
-										<CommandMenu
-											commands={rankedCommands}
-											selectedIndex={selectedIndex}
-											onHighlight={setHighlightedIndex}
-											onSelect={(command) => {
-												const option = commandOptions.find(
-													(candidate) => candidate.command.id === command.id,
-												);
-												if (option) selectOptionAndCleanUp(option);
-											}}
-										/>,
-										menuSlot,
-									)
-								: null;
-						}}
-					/>
-				</div>
-				<div
-					className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
-					data-composer-footer
-				>
-					<ContextButton
-						onClick={toggleBrowseMenu}
-						disabled={dictationSession.status !== "idle"}
-					/>
-					<input
-						ref={fileInputRef}
-						type="file"
-						multiple
-						className="hidden"
-						onChange={(event) => {
-							if (event.target.files) addFiles(event.target.files);
-							event.target.value = "";
-						}}
-					/>
-					{dictationSession.status === "error" ? (
-						<>
-							<span className="min-w-0 flex-1 truncate pl-1 text-sm text-muted-foreground">
-								{dictationSession.error?.message}
-							</span>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Retry dictation",
-								})}
-								onClick={() => void dictationSession.retry()}
-								className={FILLED_FOOTER_BUTTON_CLASS}
-							>
-								<RefreshCcwIcon className="size-3.5" />
-							</button>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Discard recording",
-								})}
-								onClick={dictationSession.cancel}
-								className={GHOST_FOOTER_BUTTON_CLASS}
-							>
-								<XIcon className="size-3.5" />
-							</button>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Send message",
-								})}
-								disabled
-								className={INACTIVE_SEND_BUTTON_CLASS}
-							>
-								<ArrowUpIcon className="size-4" />
-							</button>
-						</>
-					) : dictationSession.status !== "idle" ? (
-						<>
-							<DictationBar
-								canvasRef={dictationSession.canvasRef}
-								seconds={dictationSession.seconds}
-								status={
-									dictationSession.status === "transcribing"
-										? "transcribing"
-										: "recording"
-								}
-							/>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Stop dictation",
-								})}
-								disabled={dictationSession.status === "transcribing"}
-								onClick={() => void dictationSession.finish()}
-								className={cn(
-									FILLED_FOOTER_BUTTON_CLASS,
-									"disabled:cursor-default disabled:opacity-50",
-								)}
-							>
-								<SquareIcon className="size-3 fill-current" />
-							</button>
-							<button
-								type="button"
-								aria-label={t({
-									message: "Send message",
-								})}
-								disabled
-								className={INACTIVE_SEND_BUTTON_CLASS}
-							>
-								<ArrowUpIcon className="size-4" />
-							</button>
-						</>
-					) : (
-						<>
-							{toolbar}
-							<div className="flex-1" />
-							{toolbarEnd}
-							{dictation && (
-								<button
-									type="button"
-									aria-label={t({
-										message: "Dictate",
-									})}
-									onClick={async () => {
-										setBrowseOpen(false);
-										await dictationSession.start();
-										editor.focus();
-									}}
-									className={GHOST_FOOTER_BUTTON_CLASS}
-								>
-									<MicIcon className="size-4" />
-								</button>
-							)}
-							{status === "streaming" && !canSend ? (
-								<button
-									type="button"
-									aria-label={t({
-										message: "Stop response",
-									})}
-									onClick={onStop}
-									className={FILLED_FOOTER_BUTTON_CLASS}
-								>
-									<SquareIcon className="size-3 fill-current" />
-								</button>
-							) : (
-								<button
-									type="button"
-									aria-label={
-										status === "streaming"
-											? t({ message: "Queue message" })
-											: t({ message: "Send message" })
-									}
-									title={
-										status === "streaming"
-											? t({ message: "Queue; ⌘↩ to steer the running turn" })
-											: undefined
-									}
-									disabled={!canSend || disabled || pending}
-									onClick={() => submit()}
-									className={
-										canSend && !disabled && !pending
-											? cn(
-													FOOTER_BUTTON_CLASS,
-													"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
-												)
-											: INACTIVE_SEND_BUTTON_CLASS
-									}
-								>
-									{pending ? (
-										<LoaderCircleIcon className="size-4 animate-spin" />
-									) : (
-										<ArrowUpIcon className="size-4" />
-									)}
-								</button>
-							)}
-						</>
-					)}
-				</div>
+				{composerBody}
 			</div>
 		</ChipRenderProvider>
 	);

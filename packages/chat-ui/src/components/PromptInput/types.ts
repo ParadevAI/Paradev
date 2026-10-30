@@ -156,9 +156,17 @@ export type PromptInputHandle = {
 	blur(): void;
 };
 
+/**
+ * `stacked` puts the toolbar on a row under the text; `inline` is a single
+ * pill with the attach button and send controls beside the text, and the
+ * toolbar slots are not rendered.
+ */
+export type PromptInputLayout = "stacked" | "inline";
+
 export type PromptInputProps = {
 	ref?: Ref<PromptInputHandle>;
 	placeholder?: string;
+	layout?: PromptInputLayout;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
 	status?: "ready" | "streaming";
