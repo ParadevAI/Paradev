@@ -252,9 +252,9 @@ const routeNobody: ChannelRouter = async () => [];
 
 /**
  * Hands a person's message to the Devs it is for, each in its main session:
- * the Dev of a DM; Devs mentioned in a channel; Devs already in the thread
- * it replies to; and, for other channel messages, the Devs the channel
- * router picks. The Dev answers in the message's thread.
+ * the Dev of a DM; Devs mentioned in a channel; and, for other channel
+ * messages, thread replies included, the Devs the channel router picks.
+ * The Dev answers in the message's thread.
  */
 export async function startTurnsForMessage(
 	channel: { id: string; kind: "channel" | "dm" },
@@ -320,17 +320,6 @@ export async function startTurnsForMessage(
 				work.set(agent.id, { agent, reason: "mention" });
 			}
 		}
-		if (message.threadRootId) {
-			const inThread = await devsInThread(
-				message.threadRootId,
-				devs.map((agent) => agent.id),
-			);
-			for (const agent of devs) {
-				if (inThread.has(agent.id) && !work.has(agent.id)) {
-					work.set(agent.id, { agent, reason: "thread_reply" });
-				}
-			}
-		}
 		const unasked = devs.filter((agent) => !work.has(agent.id));
 		if (work.size === 0 && unasked.length > 0) {
 			// Classifying waits on a model; the sender's request should not.
@@ -387,9 +376,17 @@ async function routeUnmentioned({
 		console.error("[agent-turns] channel router failed", error);
 		return [] as string[];
 	});
+	const inThread = message.threadRootId
+		? await devsInThread(message.threadRootId, picked)
+		: new Set<string>();
 	const work = unasked
 		.filter((agent) => picked.includes(agent.id))
-		.map((agent) => ({ agent, reason: "channel_message" as const }));
+		.map((agent) => ({
+			agent,
+			reason: inThread.has(agent.id)
+				? ("thread_reply" as const)
+				: ("channel_message" as const),
+		}));
 	await deliverToMains({
 		work,
 		text: messageEvent({

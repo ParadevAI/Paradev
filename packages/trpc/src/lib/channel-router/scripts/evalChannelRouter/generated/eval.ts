@@ -994,4 +994,135 @@ export const evalSet: EvalCase[] = [
 		message: m("Theo", "anyone want lunch?"),
 		expected: [],
 	}),
+	c({
+		id: "r-thread-humans-discuss",
+		kind: "followup",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+			m("Priya", "is this the same bug we saw in the welcome flow last week?"),
+		],
+		message: m("Satya", "yeah I think so, the retry queue double-fires"),
+		expected: [],
+	}),
+	c({
+		id: "r-thread-human-to-human",
+		kind: "followup",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+			m("Priya", "Satya did you see this in staging too?"),
+		],
+		message: m("Satya", "Priya yes, twice yesterday"),
+		expected: [],
+	}),
+	c({
+		id: "r-thread-opinion",
+		kind: "chatter",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+			m("Priya", "honestly we should rip out that queue"),
+		],
+		message: m("Theo", "agreed, it's been flaky forever"),
+		expected: [],
+	}),
+	c({
+		id: "r-thread-thanks",
+		kind: "chatter",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+			m("Ticket", "PR is up: #9201, checks pass."),
+		],
+		message: m("Satya", "thanks!"),
+		expected: [],
+	}),
+	c({
+		id: "r-thread-info-for-dev",
+		kind: "followup",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+		],
+		message: m(
+			"Priya",
+			"fyi it only happens when the user signs up with Google",
+		),
+		expected: ["ticket"],
+	}),
+	c({
+		id: "r-thread-status",
+		kind: "followup",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+		],
+		message: m("Satya", "any update on this?"),
+		expected: ["ticket"],
+	}),
+	c({
+		id: "r-thread-redirect",
+		kind: "followup",
+		channel: "roster",
+		recent: [
+			m(
+				"Satya",
+				"Ticket can you grab SUPER-412, the onboarding email sends twice",
+			),
+			m(
+				"Ticket",
+				"On it. Started a task for SUPER-412; I'll post the PR here.",
+			),
+			m("Priya", "is this the same bug as last week?"),
+			m("Satya", "yeah probably"),
+		],
+		message: m(
+			"Satya",
+			"Ticket also check the welcome flow while you're in there",
+		),
+		expected: ["ticket"],
+	}),
 ];

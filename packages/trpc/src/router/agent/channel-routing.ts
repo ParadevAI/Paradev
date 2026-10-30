@@ -66,6 +66,7 @@ async function recentMessages(messageId: string): Promise<RouterMessage[]> {
 				eq(channelMessages.channelId, message.channelId),
 				lt(channelMessages.createdAt, message.createdAt),
 				isNull(channelMessages.deletedAt),
+				isNull(channelMessages.subtype),
 				message.threadRootId
 					? or(
 							eq(channelMessages.threadRootId, message.threadRootId),
