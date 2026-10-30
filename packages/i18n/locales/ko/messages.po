@@ -18834,6 +18834,9 @@ msgstr "Paradev를 Windows와 Linux로 확장하고 있습니다. 이메일을 �
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "데스크톱 앱은 macOS에서 실행되며 실험적인 Linux AppImage가 있습니다. Windows는 아직 지원하지 않습니다. 데스크톱 앱 외에 CLI, TypeScript SDK, MCP 서버가 있어 스크립트, 터미널, 다른 에이전트에서 Paradev를 조작할 수 있습니다. App Store의 iPhone 및 iPad 앱으로 자리를 비운 동안에도 에이전트를 확인하고 diff를 검토할 수 있습니다."
 
+msgid "The Dev can't post there."
+msgstr "Dev는 그곳에 게시할 수 없습니다."
+
 msgid "The device that hosts this project is unavailable."
 msgstr "이 프로젝트를 호스팅하는 기기를 사용할 수 없습니다."
 

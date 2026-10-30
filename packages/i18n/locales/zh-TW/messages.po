@@ -18834,6 +18834,9 @@ msgstr "我們正在把Paradev帶到Windows和Linux。留下電子郵件，一�
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windows暫未提供。除了桌面應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Paradev。App Store上的iPhone和iPad應用程式讓你離開座位時也能查看代理並審閱它們的差異。"
 
+msgid "The Dev can't post there."
+msgstr "該 Dev 無法在那裡發文。"
+
 msgid "The device that hosts this project is unavailable."
 msgstr "承載這個專案的裝置不可用。"
 

@@ -901,4 +901,41 @@ suite("agent access against a migrated PostgreSQL", () => {
 			await person(admin).agentRoutine.list({ agentId: agent.id }),
 		).toEqual([]);
 	});
+
+	test("people move a routine to a channel the Dev posts in, or back to the DM", async () => {
+		const { agent, dm, turn, token } = await agentWithChannel(admin);
+		const routine = await asAgent(token).devTools.createRoutine({
+			title: "Movable",
+			prompt: "Do it.",
+			schedule: { start: inHours(3), repeat: "FREQ=DAILY", timezone: "UTC" },
+			replyTo: `channel:${dm.channelId}`,
+		});
+		await settle(turn.id);
+		const roomOf = async () =>
+			(
+				await db
+					.select({ channelId: schema.agentRoutines.channelId })
+					.from(schema.agentRoutines)
+					.where(eq(schema.agentRoutines.id, routine.id))
+			)[0]?.channelId;
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "channel", channelId: privateChannel },
+		});
+		expect(await roomOf()).toBe(privateChannel);
+		await expect(
+			person(admin).agentRoutine.update({
+				routineId: routine.id,
+				room: { kind: "channel", channelId: otherChannel },
+			}),
+		).rejects.toThrow("can't post there");
+		await person(admin).agentRoutine.update({
+			routineId: routine.id,
+			room: { kind: "dm" },
+		});
+		expect(await roomOf()).toBe(dm.channelId);
+		expect(
+			(await person(admin).agentRoutine.list({ agentId: agent.id }))[0]?.room,
+		).toMatchObject({ kind: "dm", channelId: dm.channelId });
+	});
 });

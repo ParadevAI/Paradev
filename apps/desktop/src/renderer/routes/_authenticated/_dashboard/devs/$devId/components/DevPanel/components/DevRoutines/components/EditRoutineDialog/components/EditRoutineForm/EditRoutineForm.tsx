@@ -26,6 +26,8 @@ import { SettingRow } from "./components/SettingRow";
 import { WatchRows } from "./components/WatchRows";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
+const DM_ROOM = "dm";
+const THREAD_ROOM = "thread";
 
 const cityOf = (zone: string) =>
 	(zone.split("/").pop() ?? zone).replace(/_/g, " ");
@@ -55,11 +57,20 @@ export function EditRoutineForm({
 			: null,
 	);
 	const [showAdvanced, setShowAdvanced] = useState(false);
+	const currentRoom =
+		routine.room.kind === "dm"
+			? DM_ROOM
+			: routine.room.inThread
+				? THREAD_ROOM
+				: routine.room.channelId;
+	const [room, setRoom] = useState(currentRoom);
+	const { data: dev } = cloudTrpc.agent.get.useQuery({ agentId: devId });
 	const [saved] = useState(() =>
-		JSON.stringify([title, prompt, form && scheduleFromForm(form)]),
+		JSON.stringify([title, prompt, form && scheduleFromForm(form), room]),
 	);
 	const changed =
-		JSON.stringify([title, prompt, form && scheduleFromForm(form)]) !== saved;
+		JSON.stringify([title, prompt, form && scheduleFromForm(form), room]) !==
+		saved;
 	const update = cloudTrpc.agentRoutine.update.useMutation({
 		onSuccess: () => {
 			void utils.agentRoutine.list.invalidate({ agentId: devId });
@@ -76,13 +87,35 @@ export function EditRoutineForm({
 			title,
 			prompt,
 			...(form ? { schedule: scheduleFromForm(form) } : {}),
+			...(room === currentRoom
+				? {}
+				: {
+						room:
+							room === DM_ROOM
+								? { kind: "dm" as const }
+								: { kind: "channel" as const, channelId: room },
+					}),
 		});
-	const runsIn =
-		routine.room.kind === "dm"
-			? t({ message: "Direct messages" })
-			: routine.room.inThread
-				? t({ message: `A thread in #${routine.room.name}` })
-				: `#${routine.room.name}`;
+	const roomChoices = [
+		{ value: DM_ROOM, label: t({ message: "Direct messages" }) },
+		...(routine.room.inThread
+			? [
+					{
+						value: THREAD_ROOM,
+						label: t({ message: `A thread in #${routine.room.name}` }),
+					},
+				]
+			: []),
+		...(dev?.channels ?? []).map((channel) => ({
+			value: channel.id,
+			label: `#${channel.name}`,
+		})),
+		...(routine.room.kind === "channel" &&
+		!routine.room.inThread &&
+		!dev?.channels.some((channel) => channel.id === routine.room.channelId)
+			? [{ value: routine.room.channelId, label: `#${routine.room.name}` }]
+			: []),
+	];
 	return (
 		<div className="flex flex-col gap-3">
 			<DialogHeader>
@@ -147,7 +180,22 @@ export function EditRoutineForm({
 						</div>
 					)}
 					<div className="rounded-md border border-input">
-						<SettingRow label={<Trans>Runs in</Trans>}>{runsIn}</SettingRow>
+						<SettingRow label={<Trans>Runs in</Trans>}>
+							<Select value={room} onValueChange={setRoom}>
+								<SelectTrigger className="h-7 w-auto gap-1 border-0 bg-transparent px-1 text-muted-foreground shadow-none hover:text-foreground dark:bg-transparent">
+									<span>
+										{roomChoices.find((choice) => choice.value === room)?.label}
+									</span>
+								</SelectTrigger>
+								<SelectContent align="end" className="max-h-72">
+									{roomChoices.map((choice) => (
+										<SelectItem key={choice.value} value={choice.value}>
+											{choice.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</SettingRow>
 					</div>
 				</div>
 			)}

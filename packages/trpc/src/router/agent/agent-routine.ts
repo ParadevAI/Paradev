@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import {
 	agentRoutines,
+	agents,
 	channels,
 	githubRepositories,
 	type SelectAgentRoutine,
@@ -10,10 +11,13 @@ import {
 	routineScheduleSchema,
 } from "@superset/shared/agent-routines";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
+import { loadChannelAccess } from "../channel/access";
 import { loadAgentAccess } from "./access";
+import { ensureDirectMessage } from "./direct-message";
 import {
 	assertRoutineValid,
 	fireRoutine,
@@ -22,6 +26,58 @@ import {
 } from "./routines";
 
 const routineIdSchema = z.object({ routineId: z.string().uuid() });
+
+const roomNotAllowed = () =>
+	userError({
+		code: "BAD_REQUEST",
+		message: "The Dev can't post there.",
+		i18nKey: "serverError.routine.roomNotAllowed",
+	});
+
+const canRead = (userId: string, channelId: string) =>
+	loadChannelAccess(userId, channelId).then(
+		() => true,
+		() => false,
+	);
+
+/**
+ * The room a routine's runs answer in. A channel must be one the Dev posts
+ * in, readable by both the person editing and the person it works for.
+ */
+async function roomChannel(
+	routine: SelectAgentRoutine,
+	room: { kind: "dm" } | { kind: "channel"; channelId: string },
+	editorId: string,
+): Promise<string> {
+	const [agent] = await db
+		.select()
+		.from(agents)
+		.where(eq(agents.id, routine.agentId))
+		.limit(1);
+	if (!agent) throw routineNotFound();
+	if (room.kind === "dm") {
+		return (await ensureDirectMessage(agent, routine.createdByUserId))
+			.channelId;
+	}
+	const [channel] = await db
+		.select({ organizationId: channels.organizationId, kind: channels.kind })
+		.from(channels)
+		.where(eq(channels.id, room.channelId))
+		.limit(1);
+	const { rows } = await db.execute<{ allowed: number }>(
+		sql`select authz.check_permission('agent', ${agent.id}, 'can_post', 'channel', ${room.channelId}) as allowed`,
+	);
+	if (
+		channel?.organizationId !== routine.organizationId ||
+		channel.kind !== "channel" ||
+		rows[0]?.allowed !== 1 ||
+		!(await canRead(editorId, room.channelId)) ||
+		!(await canRead(routine.createdByUserId, room.channelId))
+	) {
+		throw roomNotAllowed();
+	}
+	return room.channelId;
+}
 
 /** Its creator, or whoever can manage the Dev, may see and change a routine. */
 async function loadOwnRoutine(
@@ -115,6 +171,7 @@ export const agentRoutineRouter = {
 				lastRunAt: routine.lastRunAt,
 				createdByUserId: routine.createdByUserId,
 				room: {
+					channelId: routine.channelId,
 					kind: roomById.get(routine.channelId)?.kind ?? "channel",
 					name: roomById.get(routine.channelId)?.name ?? "",
 					inThread: routine.threadRootId !== null,
@@ -149,6 +206,16 @@ export const agentRoutineRouter = {
 				prompt: routineFieldsSchema.shape.prompt.optional(),
 				schedule: routineScheduleSchema.nullable().optional(),
 				enabled: z.boolean().optional(),
+				/** Where its runs answer: the DM with the person it works for, or a channel. */
+				room: z
+					.discriminatedUnion("kind", [
+						z.object({ kind: z.literal("dm") }),
+						z.object({
+							kind: z.literal("channel"),
+							channelId: z.string().uuid(),
+						}),
+					])
+					.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -156,7 +223,16 @@ export const agentRoutineRouter = {
 				ctx.session.user.id,
 				input.routineId,
 			);
-			const { routineId: _, ...patch } = input;
+			const { routineId: _, room, ...fields } = input;
+			const patch = {
+				...fields,
+				...(room
+					? {
+							channelId: await roomChannel(routine, room, ctx.session.user.id),
+							threadRootId: null,
+						}
+					: {}),
+			};
 			if (patch.schedule !== undefined) {
 				assertRoutineValid({
 					schedule: patch.schedule,

@@ -879,6 +879,12 @@ export const serverErrorMessages: Record<
 				message: "Workspace not found",
 			}),
 		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
 	"serverError.routine.notFound": () =>
 		i18n._(
 			msg({
