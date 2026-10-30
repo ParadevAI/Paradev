@@ -72,6 +72,7 @@ export interface BuildDeps {
 	box: BuildBox;
 	prepare(build: SelectEnvironmentBuild): Promise<BuildInputs>;
 	budgets: BuildBudgets;
+	now(): number;
 }
 
 class BuildFailure extends Error {}
@@ -149,6 +150,7 @@ export const defaultBuildDeps: BuildDeps = {
 	},
 	prepare: prepareBuild,
 	budgets: DEFAULT_BUILD_BUDGETS,
+	now: Date.now,
 };
 
 /**
@@ -164,6 +166,16 @@ export async function rebuildEnvironment(
 	const { build, environment } = loaded;
 	const name = buildBoxName(build.id);
 	const { budgets } = deps;
+	const deadline = deps.now() + budgets.jobMs;
+	const remaining = (step: string) => {
+		const left = deadline - deps.now();
+		if (left <= 0) {
+			throw new BuildFailure(
+				`The build ran out of time before ${step} (${seconds(budgets.jobMs)} seconds)`,
+			);
+		}
+		return left;
+	};
 	let boxCreated = false;
 	try {
 		const inputs = await deps.prepare(build);
@@ -183,11 +195,7 @@ export async function rebuildEnvironment(
 				source,
 				networkPolicy: inputs.networkPolicy,
 				organizationId: build.organizationId,
-				sessionTimeoutMs:
-					budgets.boxReadyMs +
-					budgets.checkoutMs +
-					budgets.installMs +
-					budgets.snapshotMs,
+				sessionTimeoutMs: budgets.jobMs,
 			}),
 			budgets.boxReadyMs,
 			`The box was not ready within ${seconds(budgets.boxReadyMs)} seconds`,
@@ -200,7 +208,7 @@ export async function rebuildEnvironment(
 				checkouts: inputs.checkouts,
 			}),
 			env: inputs.env,
-			timeoutMs: budgets.checkoutMs,
+			timeoutMs: remaining("the checkout"),
 		});
 		if (checkout.exitCode !== 0) {
 			throw new BuildFailure(
@@ -212,11 +220,11 @@ export async function rebuildEnvironment(
 			await deps.store.recordCommit(build.id, commitSha);
 		}
 
-		const primary = inputs.checkouts[0];
 		const primaryDir = sandboxCheckoutDir(
 			SANDBOX_PATHS.workspace,
-			primary?.path ?? ".",
+			inputs.checkouts[0]?.path ?? ".",
 		);
+		const installMs = Math.min(budgets.installMs, remaining("[install]"));
 		const install = await deps.box.run({
 			name,
 			script: installScript(inputs.install.commands),
@@ -224,11 +232,11 @@ export async function rebuildEnvironment(
 			cwd: inputs.install.cwd
 				? `${primaryDir}/${inputs.install.cwd}`
 				: primaryDir,
-			timeoutMs: budgets.installMs,
+			timeoutMs: installMs,
 		});
 		if (install.timedOut) {
 			throw new BuildFailure(
-				`[install] ran for more than ${seconds(budgets.installMs)} seconds and was stopped:\n${failureTail(install.output)}`,
+				`[install] ran for more than ${seconds(installMs)} seconds and was stopped:\n${failureTail(install.output)}`,
 			);
 		}
 		if (install.exitCode !== 0) {
@@ -237,10 +245,11 @@ export async function rebuildEnvironment(
 			);
 		}
 
+		const snapshotMs = remaining("the snapshot");
 		await within(
-			deps.box.snapshot({ name, timeoutMs: budgets.snapshotMs }),
-			budgets.snapshotMs,
-			`The snapshot did not finish within ${seconds(budgets.snapshotMs)} seconds`,
+			deps.box.snapshot({ name, timeoutMs: snapshotMs }),
+			snapshotMs,
+			"The snapshot did not finish before the build ran out of time",
 		);
 		const swapped = await deps.store.succeed({
 			build,

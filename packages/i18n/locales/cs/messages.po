@@ -19093,9 +19093,6 @@ msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte pro
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Snímek tohoto prostředí byl uložen z pracovního prostoru. Sestavení ze základního obrazu by zachovalo jen to, co nastaví [install]."
-
 msgid "this file"
 msgstr "tento soubor"
 

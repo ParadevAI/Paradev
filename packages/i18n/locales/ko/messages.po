@@ -19093,9 +19093,6 @@ msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 �
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "이 환경의 리포지토리는 고정되어 있습니다. 변경하려면 워크스페이스를 다시 승격하세요"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "이 환경의 스냅샷은 워크스페이스에서 저장되었습니다. 기본 이미지에서 빌드하면 [install]이 설정하는 내용만 남습니다."
-
 msgid "this file"
 msgstr "이 파일"
 

@@ -26,6 +26,7 @@ import {
 	workspaceRepositories,
 } from "../../lib/sandbox";
 import {
+	activateGolden,
 	type BuildRefusalReason,
 	BuildRefused,
 	isStale,
@@ -258,10 +259,6 @@ const BUILD_REFUSALS: Record<
 	"no-install": {
 		code: "PRECONDITION_FAILED",
 		i18nKey: "serverError.environment.noInstall",
-	},
-	"fresh-drops-workspace-setup": {
-		code: "PRECONDITION_FAILED",
-		i18nKey: "serverError.environment.freshDropsWorkspaceSetup",
 	},
 	"already-running": {
 		code: "CONFLICT",
@@ -741,10 +738,6 @@ export const environmentRouter = {
 		.input(
 			z.object({
 				environmentId: z.string().uuid(),
-				/** From the base image instead of the current golden. */
-				fresh: z.boolean().optional(),
-				/** Allows a fresh build over a golden saved from a workspace. */
-				discardWorkspaceSetup: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -755,8 +748,6 @@ export const environmentRouter = {
 					environmentId: environment.id,
 					trigger: "manual",
 					startedByUserId: ctx.userId,
-					fresh: input.fresh,
-					discardWorkspaceSetup: input.discardWorkspaceSetup,
 				});
 				return toBuildView(build, environment.sourceRef);
 			} catch (error) {
@@ -836,34 +827,15 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.buildNotRestorable",
 				});
 			}
-			const restored = await dbWs.transaction(async (tx) => {
-				const [row] = await tx
-					.update(environments)
-					.set({
-						sourceKind: "fork",
-						sourceRef: goldenRef,
-						primaryRepositoryId: build.primaryRepositoryId,
-					})
-					.where(
-						and(
-							eq(environments.id, environment.id),
-							eq(environments.sourceRef, environment.sourceRef),
-							isNull(environments.archivedAt),
-						),
-					)
-					.returning();
-				if (!row) return null;
-				await tx
-					.delete(environmentRepositories)
-					.where(eq(environmentRepositories.environmentId, environment.id));
-				await tx.insert(environmentRepositories).values(
-					build.repositoryIds.map((repositoryId) => ({
-						environmentId: environment.id,
-						repositoryId,
-					})),
-				);
-				return row;
-			});
+			const restored = await dbWs.transaction((tx) =>
+				activateGolden(tx, {
+					environmentId: environment.id,
+					previousSourceRef: environment.sourceRef,
+					goldenRef,
+					repositoryIds: build.repositoryIds,
+					primaryRepositoryId: build.primaryRepositoryId,
+				}),
+			);
 			if (!restored) {
 				throw userError({
 					code: "CONFLICT",

@@ -4,43 +4,15 @@ import {
 	checkoutScript,
 	dailyBuildsPaused,
 	failureTail,
-	freshDropsWorkspaceSetup,
 	goldensToDelete,
 	isStale,
 	STALE_BUILD_MS,
 } from "./policy";
 
 describe("buildKind", () => {
-	test("an environment with no golden builds from the image", () => {
-		expect(buildKind({ sourceKind: "image", fresh: false })).toBe("fresh");
-	});
-
-	test("a golden is forked unless fresh is asked for", () => {
-		expect(buildKind({ sourceKind: "fork", fresh: false })).toBe("incremental");
-		expect(buildKind({ sourceKind: "fork", fresh: true })).toBe("fresh");
-	});
-});
-
-describe("freshDropsWorkspaceSetup", () => {
-	test("a golden saved from a workspace, or from before builds, may hold hand setup", () => {
-		expect(
-			freshDropsWorkspaceSetup({
-				sourceKind: "fork",
-				activeTrigger: "promote",
-			}),
-		).toBe(true);
-		expect(
-			freshDropsWorkspaceSetup({ sourceKind: "fork", activeTrigger: null }),
-		).toBe(true);
-	});
-
-	test("a golden made by a build holds only the image and [install]", () => {
-		expect(
-			freshDropsWorkspaceSetup({ sourceKind: "fork", activeTrigger: "daily" }),
-		).toBe(false);
-		expect(
-			freshDropsWorkspaceSetup({ sourceKind: "image", activeTrigger: null }),
-		).toBe(false);
+	test("forks a golden, and builds from the image when there is none", () => {
+		expect(buildKind("fork")).toBe("incremental");
+		expect(buildKind("image")).toBe("fresh");
 	});
 });
 

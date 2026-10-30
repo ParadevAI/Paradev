@@ -19093,9 +19093,6 @@ msgstr "Environment này không có repository nào. Hãy tạo một environmen
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Snapshot của environment này được lưu từ một workspace. Build từ image gốc sẽ chỉ giữ lại những gì [install] thiết lập."
-
 msgid "this file"
 msgstr "tệp này"
 

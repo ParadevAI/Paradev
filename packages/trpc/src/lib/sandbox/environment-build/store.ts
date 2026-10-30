@@ -8,6 +8,50 @@ import {
 import { and, desc, eq, inArray, isNull, ne } from "drizzle-orm";
 
 type EnvironmentRow = typeof environments.$inferSelect;
+type Transaction = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
+
+/**
+ * Makes `goldenRef` the golden new workspaces fork, with the repositories it
+ * was built with. Guarded on the golden read before, so a concurrent promote,
+ * build or restore wins and this returns null.
+ */
+export async function activateGolden(
+	tx: Transaction,
+	args: {
+		environmentId: string;
+		previousSourceRef: string;
+		goldenRef: string;
+		repositoryIds: readonly string[];
+		primaryRepositoryId: string | null;
+	},
+): Promise<EnvironmentRow | null> {
+	const [row] = await tx
+		.update(environments)
+		.set({
+			sourceKind: "fork",
+			sourceRef: args.goldenRef,
+			primaryRepositoryId: args.primaryRepositoryId,
+		})
+		.where(
+			and(
+				eq(environments.id, args.environmentId),
+				eq(environments.sourceRef, args.previousSourceRef),
+				isNull(environments.archivedAt),
+			),
+		)
+		.returning();
+	if (!row) return null;
+	await tx
+		.delete(environmentRepositories)
+		.where(eq(environmentRepositories.environmentId, args.environmentId));
+	await tx.insert(environmentRepositories).values(
+		args.repositoryIds.map((repositoryId) => ({
+			environmentId: args.environmentId,
+			repositoryId,
+		})),
+	);
+	return row;
+}
 
 export interface BuildStore {
 	load(buildId: string): Promise<{
@@ -60,32 +104,14 @@ export const buildStore: BuildStore = {
 
 	async succeed({ build, previousSourceRef, goldenRef }) {
 		return dbWs.transaction(async (tx) => {
-			const [swapped] = await tx
-				.update(environments)
-				.set({
-					sourceKind: "fork",
-					sourceRef: goldenRef,
-					primaryRepositoryId: build.primaryRepositoryId,
-				})
-				.where(
-					and(
-						eq(environments.id, build.environmentId),
-						eq(environments.sourceRef, previousSourceRef),
-						isNull(environments.archivedAt),
-					),
-				)
-				.returning({ id: environments.id });
-			if (!swapped) return false;
-			// The golden baked these checkouts; a fork must ask for the same.
-			await tx
-				.delete(environmentRepositories)
-				.where(eq(environmentRepositories.environmentId, build.environmentId));
-			await tx.insert(environmentRepositories).values(
-				build.repositoryIds.map((repositoryId) => ({
-					environmentId: build.environmentId,
-					repositoryId,
-				})),
-			);
+			const activated = await activateGolden(tx, {
+				environmentId: build.environmentId,
+				previousSourceRef,
+				goldenRef,
+				repositoryIds: build.repositoryIds,
+				primaryRepositoryId: build.primaryRepositoryId,
+			});
+			if (!activated) return false;
 			await tx
 				.update(environmentBuilds)
 				.set({ status: "succeeded", goldenRef, finishedAt: new Date() })

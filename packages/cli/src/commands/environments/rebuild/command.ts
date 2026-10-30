@@ -8,12 +8,6 @@ export default command({
 		"Build an environment's snapshot again from [install] on its base branch; new workspaces keep starting from the current one until it succeeds",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
-		fresh: boolean().desc(
-			"Build from the base image instead of the current snapshot",
-		),
-		discardWorkspaceSetup: boolean().desc(
-			"With --fresh, build over a snapshot saved from a workspace, keeping only what [install] sets up",
-		),
 		wait: boolean().desc("Wait for the build to finish; exit 1 if it fails"),
 	},
 	run: async ({ ctx, args, options }) => {
@@ -28,8 +22,6 @@ export default command({
 		);
 		const build = await ctx.api.environment.rebuild.mutate({
 			environmentId: id,
-			fresh: options.fresh,
-			discardWorkspaceSetup: options.discardWorkspaceSetup,
 		});
 		if (!options.wait) {
 			return {

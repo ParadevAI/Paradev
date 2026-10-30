@@ -19093,9 +19093,6 @@ msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ard
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Bu ortamın anlık görüntüsü bir çalışma alanından kaydedildi. Temel görüntüden yapılan bir derleme yalnızca [install] ile kurulanları korur."
-
 msgid "this file"
 msgstr "bu dosya"
 

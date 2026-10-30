@@ -19093,9 +19093,6 @@ msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "De repositories van deze omgeving liggen vast; promoveer opnieuw een werkruimte om ze te wijzigen"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "De snapshot van deze omgeving is opgeslagen vanuit een werkruimte. Een build vanaf de basisimage zou alleen behouden wat [install] instelt."
-
 msgid "this file"
 msgstr "dit bestand"
 

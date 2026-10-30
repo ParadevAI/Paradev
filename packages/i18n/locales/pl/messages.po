@@ -19093,9 +19093,6 @@ msgstr "To środowisko nie ma repozytoriów. Utwórz w Ustawieniach środowisko 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozytoria tego środowiska są ustalone; aby je zmienić, ponownie awansuj obszar roboczy"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Migawka tego środowiska została zapisana z obszaru roboczego. Kompilacja z obrazu bazowego zachowałaby tylko to, co konfiguruje [install]."
-
 msgid "this file"
 msgstr "ten plik"
 

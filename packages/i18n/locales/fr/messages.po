@@ -19093,9 +19093,6 @@ msgstr "Cet environnement n'a aucun dépôt. Créez un environnement avec des d�
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Les dépôts de cet environnement sont figés ; promouvez à nouveau un espace de travail pour les modifier"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "L'instantané de cet environnement a été enregistré depuis un espace de travail. Une compilation depuis l'image de base ne garderait que ce que [install] met en place."
-
 msgid "this file"
 msgstr "ce fichier"
 

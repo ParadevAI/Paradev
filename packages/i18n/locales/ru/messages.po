@@ -19093,9 +19093,6 @@ msgstr "В этом окружении нет репозиториев. Созд
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозитории этого окружения зафиксированы; чтобы изменить их, снова повысьте рабочую область"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Снимок этого окружения был сохранён из рабочей области. Сборка из базового образа сохранит только то, что настраивает [install]."
-
 msgid "this file"
 msgstr "этот файл"
 

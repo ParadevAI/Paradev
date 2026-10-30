@@ -19093,9 +19093,6 @@ msgstr "Questo ambiente non ha repository. Crea un ambiente con repository nelle
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "I repository di questo ambiente sono fissi; promuovi di nuovo un workspace per cambiarli"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Lo snapshot di questo ambiente è stato salvato da un workspace. Una build dall'immagine di base manterrebbe solo ciò che configura [install]."
-
 msgid "this file"
 msgstr "questo file"
 

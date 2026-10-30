@@ -19093,9 +19093,6 @@ msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repos
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "Snapshot environment ini disimpan dari workspace. Build dari image dasar hanya akan menyimpan apa yang disiapkan oleh [install]."
-
 msgid "this file"
 msgstr "file ini"
 

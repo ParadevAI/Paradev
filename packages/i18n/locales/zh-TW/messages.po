@@ -19093,9 +19093,6 @@ msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此環境的儲存庫已固定；請再次提升一個工作區以變更它們"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "此環境的快照是從工作區儲存的。從基礎映像建置只會保留 [install] 設定的內容。"
-
 msgid "this file"
 msgstr "該檔案"
 

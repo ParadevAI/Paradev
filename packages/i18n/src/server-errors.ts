@@ -486,13 +486,6 @@ export const serverErrorMessages: Record<
 					"This environment has no [install] to build. Add one to .superset/config.toml on its base branch.",
 			}),
 		),
-	"serverError.environment.freshDropsWorkspaceSetup": () =>
-		i18n._(
-			msg({
-				message:
-					"This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up.",
-			}),
-		),
 	"serverError.environment.buildAlreadyRunning": () =>
 		i18n._(
 			msg({

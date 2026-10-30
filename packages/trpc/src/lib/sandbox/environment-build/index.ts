@@ -18,3 +18,4 @@ export {
 	organizationMayBuild,
 	startEnvironmentBuild,
 } from "./start";
+export { activateGolden } from "./store";

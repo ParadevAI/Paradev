@@ -1,7 +1,6 @@
 import type {
 	EnvironmentBuildKind,
 	EnvironmentBuildStatus,
-	EnvironmentBuildTrigger,
 } from "@superset/db/schema";
 import { sandboxCheckoutDir } from "@superset/shared/sandbox-contract";
 
@@ -10,39 +9,22 @@ export const STALE_BUILD_MS = 10 * 60 * 1000;
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 const FAILURE_TAIL_LINES = 40;
 
+/** The job may run 300 s; checkout and snapshot get what is left before `jobMs`. */
 export interface BuildBudgets {
 	boxReadyMs: number;
-	checkoutMs: number;
 	installMs: number;
-	snapshotMs: number;
+	jobMs: number;
 }
 
 export const DEFAULT_BUILD_BUDGETS: BuildBudgets = {
 	boxReadyMs: 45_000,
-	checkoutMs: 30_000,
 	installMs: 180_000,
-	snapshotMs: 70_000,
+	jobMs: 285_000,
 };
 
 /** An environment without a golden can only be built from the image. */
-export function buildKind(args: {
-	sourceKind: "image" | "fork";
-	fresh: boolean;
-}): EnvironmentBuildKind {
-	return args.sourceKind === "image" || args.fresh ? "fresh" : "incremental";
-}
-
-/**
- * A golden saved from a workspace may hold setup done by hand that
- * `[install]` does not repeat, which a build from the image would drop. A
- * fork with no build recorded predates builds, so it was saved that way too.
- */
-export function freshDropsWorkspaceSetup(args: {
-	sourceKind: "image" | "fork";
-	activeTrigger: EnvironmentBuildTrigger | null;
-}): boolean {
-	if (args.sourceKind === "image") return false;
-	return args.activeTrigger === null || args.activeTrigger === "promote";
+export function buildKind(sourceKind: "image" | "fork"): EnvironmentBuildKind {
+	return sourceKind === "image" ? "fresh" : "incremental";
 }
 
 /** A running build whose job died never finishes on its own. */

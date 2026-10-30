@@ -19093,9 +19093,6 @@ msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此环境的仓库已固定；请再次提升一个工作区以更改它们"
 
-msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
-msgstr "此环境的快照是从工作区保存的。从基础镜像构建只会保留 [install] 设置的内容。"
-
 msgid "this file"
 msgstr "该文件"
 

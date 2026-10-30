@@ -52,6 +52,7 @@ let calls: string[];
 let swapAllowed: boolean;
 let installResult: BuildCommandResult;
 let inputs: BuildInputs;
+let clock: number;
 
 const ok = (output = ""): BuildCommandResult => ({
 	exitCode: 0,
@@ -61,12 +62,8 @@ const ok = (output = ""): BuildCommandResult => ({
 
 function deps(): BuildDeps {
 	return {
-		budgets: {
-			boxReadyMs: 50,
-			checkoutMs: 50,
-			installMs: 50,
-			snapshotMs: 50,
-		},
+		budgets: { boxReadyMs: 50, installMs: 50, jobMs: 60_000 },
+		now: () => clock,
 		prepare: async () => inputs,
 		store: {
 			load: async () => ({ build, environment }),
@@ -113,6 +110,7 @@ function deps(): BuildDeps {
 
 beforeEach(() => {
 	build = makeBuild();
+	clock = 0;
 	history = [];
 	calls = [];
 	swapAllowed = true;
@@ -192,6 +190,22 @@ describe("rebuildEnvironment", () => {
 		slow.box.create = () => new Promise(() => {});
 		await rebuildEnvironment({ buildId: BUILD_ID }, slow);
 		expect(build.error).toBe("The box was not ready within 0 seconds");
+	});
+
+	test("an [install] that uses up the job's time fails before the snapshot", async () => {
+		installResult = ok();
+		const late = deps();
+		const run = late.box.run;
+		late.box.run = async (args) => {
+			const result = await run(args);
+			if (!args.script.includes("rev-parse")) clock = 60_000;
+			return result;
+		};
+		await rebuildEnvironment({ buildId: BUILD_ID }, late);
+		expect(build.error).toBe(
+			"The build ran out of time before the snapshot (60 seconds)",
+		);
+		expect(calls).not.toContain("snapshot");
 	});
 
 	test("an environment that moved meanwhile keeps its golden", async () => {

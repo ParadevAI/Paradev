@@ -17,7 +17,7 @@ import {
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
 import { buildBoxName, rebuildEnvironment } from "./environment-build";
-import { buildKind, freshDropsWorkspaceSetup, STALE_BUILD_MS } from "./policy";
+import { buildKind, STALE_BUILD_MS } from "./policy";
 
 export const BUILD_JOB_PATH = "/api/environments/build";
 
@@ -26,7 +26,6 @@ export type BuildRefusalReason =
 	| "not-paid"
 	| "no-repositories"
 	| "no-install"
-	| "fresh-drops-workspace-setup"
 	| "already-running";
 
 export class BuildRefused extends Error {
@@ -89,8 +88,6 @@ export async function startEnvironmentBuild(args: {
 	environmentId: string;
 	trigger: Exclude<EnvironmentBuildTrigger, "promote">;
 	startedByUserId?: string | null;
-	fresh?: boolean;
-	discardWorkspaceSetup?: boolean;
 	repositoryIds?: readonly string[];
 	primaryRepositoryId?: string;
 }): Promise<SelectEnvironmentBuild> {
@@ -139,30 +136,7 @@ export async function startEnvironmentBuild(args: {
 		);
 	}
 
-	const kind = buildKind({
-		sourceKind: environment.sourceKind,
-		fresh: args.fresh ?? false,
-	});
-	if (kind === "fresh" && !args.discardWorkspaceSetup) {
-		const active = await db.query.environmentBuilds.findFirst({
-			where: and(
-				eq(environmentBuilds.environmentId, environment.id),
-				eq(environmentBuilds.goldenRef, environment.sourceRef),
-			),
-			columns: { trigger: true },
-		});
-		if (
-			freshDropsWorkspaceSetup({
-				sourceKind: environment.sourceKind,
-				activeTrigger: active?.trigger ?? null,
-			})
-		) {
-			throw new BuildRefused(
-				"fresh-drops-workspace-setup",
-				"This environment's snapshot was saved from a workspace. A build from the base image keeps only what [install] sets up; pass --discard-workspace-setup if that is everything it needs",
-			);
-		}
-	}
+	const kind = buildKind(environment.sourceKind);
 
 	let build: SelectEnvironmentBuild | undefined;
 	try {
