@@ -475,6 +475,9 @@ export function computeChecksStatus(
 			hasFailure = true;
 		} else if (
 			status === "PENDING" ||
+			// A stale run never produced a verdict of its own, so it is not a
+			// success; the newer run in the rollup carries the verdict.
+			status === "STALE" ||
 			status === "" ||
 			status === null ||
 			status === undefined

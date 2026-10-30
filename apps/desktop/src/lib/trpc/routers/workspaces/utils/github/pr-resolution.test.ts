@@ -52,6 +52,16 @@ describe("computeChecksStatus", () => {
 		).toBe("failure");
 	});
 
+	test("a rollup of only stale checks is pending, not success", () => {
+		expect(computeChecksStatus([conclusion("STALE")])).toBe("pending");
+	});
+
+	test("a stale check beside a success is pending", () => {
+		expect(computeChecksStatus([state("SUCCESS"), conclusion("STALE")])).toBe(
+			"pending",
+		);
+	});
+
 	test("all success is success", () => {
 		expect(computeChecksStatus([state("SUCCESS"), state("SUCCESS")])).toBe(
 			"success",
