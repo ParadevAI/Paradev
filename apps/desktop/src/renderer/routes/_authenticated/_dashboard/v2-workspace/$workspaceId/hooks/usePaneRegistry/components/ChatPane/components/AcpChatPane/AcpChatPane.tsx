@@ -18,11 +18,13 @@ import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTermina
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
+	OpenDiff,
 	OpenLink,
 	OpenPage,
 } from "../../../ChatSession/providers/ChatPaneActionsProvider";
@@ -68,6 +70,7 @@ export function AcpChatPane({
 	onSessionInfo,
 	onPendingPromptsSent,
 	onQueuePrompt,
+	onOpenDiff,
 	onRestoreQueuedPrompts,
 	onOpenFile,
 	onOpenPage,
@@ -106,6 +109,7 @@ export function AcpChatPane({
 	onModeChange?: (modeId: string) => void;
 	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
 	onOpenFile?: OpenFile;
+	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
@@ -121,6 +125,7 @@ export function AcpChatPane({
 	modeId?: string;
 }) {
 	const { t } = useLingui();
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
@@ -625,6 +630,7 @@ export function AcpChatPane({
 					...(handoffPrompt ? { handoffPrompt } : {}),
 					...(modelId ? { modelId } : {}),
 					...(modeId ? { modeId } : {}),
+					...(snapshotWorktree ? { snapshotWorktree: true } : {}),
 				});
 			} catch (error) {
 				// A host from before rewindSession: fall back to a fresh session
@@ -670,6 +676,7 @@ export function AcpChatPane({
 			agentLabel,
 			modelId,
 			modeId,
+			snapshotWorktree,
 		],
 	);
 	const onEditMessage = useCallback(
@@ -758,6 +765,7 @@ export function AcpChatPane({
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
 			onSwitchAccount={switchAccount}
 			sessionAccount={sessionAccount}
+			openDiff={onOpenDiff}
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}

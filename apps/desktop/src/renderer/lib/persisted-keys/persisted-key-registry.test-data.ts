@@ -148,6 +148,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
 	["src/renderer/stores/acp-chat.ts", ["acp-chat"]],
+	["src/renderer/stores/chat-turn-snapshots.ts", ["chat-turn-snapshots"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
 		["usage-last-section-v1"],

@@ -25,7 +25,7 @@ import { useOrgPresenceStore } from "renderer/stores/org-presence";
 
 /**
  * One socket per window to the realtime Worker. The API sends a nudge after
- * it writes hosts, cloud workspaces, pull requests or automation runs: a kind refetches the matching query,
+ * it writes hosts, cloud workspaces, pull requests, automation runs or organization plugins: a kind refetches the matching query,
  * a patch is applied to the cache without one, which is why neither polls.
  * A reopen refetches everything once, since nudges sent while the socket
  * was down are gone. Rendered inside the providers: the subscription needs
@@ -67,6 +67,10 @@ export function RealtimeNudges() {
 							undefined,
 							options,
 						);
+						break;
+					case "plugins":
+						void utils.plugins.list.invalidate(undefined, options);
+						void utils.plugins.organization.invalidate(undefined, options);
 						break;
 					case "automation_runs":
 						void utils.automation.latestRuns.invalidate(undefined, options);

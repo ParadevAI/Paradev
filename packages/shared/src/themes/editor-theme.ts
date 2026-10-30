@@ -1,5 +1,10 @@
 import { wcagContrast } from "culori";
-import { type EditorTheme, getTerminalColors, type Theme } from "./types";
+import {
+	type EditorSyntaxColors,
+	type EditorTheme,
+	getTerminalColors,
+	type Theme,
+} from "./types";
 import { withAlpha } from "./utils";
 
 /* Some themes use terminal brightBlack as a surface tone (kintsugi #2a221a on
@@ -27,13 +32,26 @@ function deriveCommentColor(theme: Theme): string {
 		: brightBlack;
 }
 
+/** Roles that inherit from a base role unless the theme sets them. */
+type ExtendedSyntaxRole =
+	| "operator"
+	| "punctuation"
+	| "property"
+	| "parameter"
+	| "heading"
+	| "link";
+
 /**
  * Get editor colors from a theme, falling back to a derived palette if not defined.
  */
 export function getEditorTheme(theme: Theme): EditorTheme {
 	const terminal = theme.terminal;
 	const fallbackTerminal = getTerminalColors(theme);
-	const derived: EditorTheme = {
+	const derived: {
+		colors: EditorTheme["colors"];
+		syntax: Omit<EditorSyntaxColors, ExtendedSyntaxRole> &
+			Partial<Pick<EditorSyntaxColors, ExtendedSyntaxRole>>;
+	} = {
 		colors: {
 			background: theme.ui.background,
 			foreground: theme.ui.foreground,
@@ -95,18 +113,17 @@ export function getEditorTheme(theme: Theme): EditorTheme {
 		},
 	};
 
-	if (!theme.editor) {
-		return derived;
-	}
-
+	const syntax = { ...derived.syntax, ...theme.editor?.syntax };
 	return {
-		colors: {
-			...derived.colors,
-			...theme.editor.colors,
-		},
+		colors: { ...derived.colors, ...theme.editor?.colors },
 		syntax: {
-			...derived.syntax,
-			...theme.editor.syntax,
+			...syntax,
+			operator: syntax.operator ?? syntax.keyword,
+			punctuation: syntax.punctuation ?? syntax.plainText,
+			property: syntax.property ?? syntax.variableName,
+			parameter: syntax.parameter ?? syntax.variableName,
+			heading: syntax.heading ?? syntax.keyword,
+			link: syntax.link ?? syntax.functionCall,
 		},
 	};
 }

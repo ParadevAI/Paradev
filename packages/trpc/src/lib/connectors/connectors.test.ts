@@ -350,6 +350,56 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org-cold-bar", label: "Tegon" });
 	});
 
+	test("peec_mcp reads the first project from a columnar result", async () => {
+		const projects = {
+			columns: ["id", "name", "status"],
+			rows: [["or_7499a251", "Tegon", "ACTIVE"]],
+			rowCount: 1,
+		};
+		const calls: { method?: string; name?: string; auth: string | null }[] = [];
+		globalThis.fetch = (async (_url: string, init: RequestInit) => {
+			const body = init.body
+				? (JSON.parse(String(init.body)) as {
+						id?: number;
+						method?: string;
+						params?: { name?: string };
+					})
+				: {};
+			calls.push({
+				method: body.method,
+				name: body.params?.name,
+				auth: new Headers(init.headers).get("Authorization"),
+			});
+			if (init.method === "DELETE") return new Response(null, { status: 204 });
+			if (body.id === undefined) return new Response(null, { status: 202 });
+			const result =
+				body.method === "tools/call"
+					? { content: [{ type: "text", text: JSON.stringify(projects) }] }
+					: { protocolVersion: "2025-06-18" };
+			return new Response(
+				JSON.stringify({ jsonrpc: "2.0", id: body.id, result }),
+				{
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}) as unknown as typeof fetch;
+
+		const identity = await probeIdentity(
+			"peec_mcp",
+			connectorMethod(requireConnector("peec_mcp")),
+			"peec-test",
+		);
+
+		expect(calls[2]).toEqual({
+			method: "tools/call",
+			name: "list_projects",
+			auth: "Bearer peec-test",
+		});
+		expect(identity.account).toEqual({ id: "or_7499a251", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "or_7499a251", label: "Tegon" });
+	});
+
 	test("posthog_mcp asks the authorization server's userinfo endpoint", async () => {
 		const calls = respond({ sub: "user_01", email: "h@tegon.ai" });
 

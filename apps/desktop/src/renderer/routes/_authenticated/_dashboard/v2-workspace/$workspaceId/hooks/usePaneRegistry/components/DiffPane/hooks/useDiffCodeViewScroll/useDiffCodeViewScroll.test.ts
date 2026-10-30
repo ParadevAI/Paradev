@@ -24,7 +24,7 @@ describe("useDiffCodeViewScroll", () => {
 			current: {
 				scrollTo,
 				getInstance: () => ({ getTopForItem: () => 400 }),
-			} as unknown as CodeViewHandle<DiffAnnotationMetadata>,
+			} as unknown as CodeViewHandle<DiffAnnotationMetadata, undefined>,
 		};
 		renderHook(() =>
 			useDiffCodeViewScroll({

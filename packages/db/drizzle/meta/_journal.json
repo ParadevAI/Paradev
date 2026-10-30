@@ -1226,6 +1226,13 @@
       "when": 1793294677035,
       "tag": "0174_authz_cloud_workspace_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 175,
+      "version": "7",
+      "when": 1793316840789,
+      "tag": "0175_organization_plugin_sources",
+      "breakpoints": true
     }
   ]
 }

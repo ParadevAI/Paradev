@@ -7,6 +7,8 @@ const UPSTREAM_TIMEOUT_MS = 120_000;
 export interface UpstreamTarget {
 	url: string;
 	headers: Record<string, string>;
+	/** Set for a URL an untrusted manifest chose; the connection may only reach public addresses. */
+	publicOnly?: boolean;
 }
 
 export interface UpstreamSession {
@@ -21,7 +23,9 @@ export async function upstreamClient(
 	const transport = new StreamableHTTPClientTransport(new URL(target.url), {
 		requestInit: { headers: target.headers },
 		fetch: (url, init) =>
-			credentialFetch(String(url), init ?? {}, "mcp", UPSTREAM_TIMEOUT_MS),
+			credentialFetch(String(url), init ?? {}, "mcp", UPSTREAM_TIMEOUT_MS, {
+				publicOnly: target.publicOnly,
+			}),
 	});
 	await client.connect(transport);
 

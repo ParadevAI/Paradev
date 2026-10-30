@@ -55,8 +55,8 @@ describe("parsePatchGroup", () => {
 		);
 
 		expect(after.byPath.get("a.ts")).toBe(before.byPath.get("a.ts"));
-		expect(after.byPath.get("a.ts")?.cacheKey).toBe(
-			`${buildContentKey("group", FILE_A)}-0-0`,
+		expect(after.byPath.get("a.ts")?.cacheKey).toContain(
+			buildContentKey("group", FILE_A),
 		);
 		expect(after.byPath.get("b.ts")).not.toBe(before.byPath.get("b.ts"));
 		expect(after.byPath.get("b.ts")?.cacheKey).not.toBe(

@@ -179,6 +179,14 @@ export function createAgentSessionClient(
 			return { ok: true, items: [] };
 		},
 
+		async getTurnChanges() {
+			return "unsupported" as const;
+		},
+
+		async undoTurnFiles() {
+			return "unsupported" as const;
+		},
+
 		async prompt(prompt): Promise<ChatRouterOutputs["prompt"]> {
 			if (prompt.content.some((part) => part.type !== "text")) {
 				throw new Error("Agent sessions take text only for now.");

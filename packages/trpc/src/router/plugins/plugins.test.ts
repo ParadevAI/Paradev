@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
-import { connections, pluginInstalls } from "@superset/db/schema";
+import { connections, members, pluginInstalls } from "@superset/db/schema";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
@@ -14,6 +14,8 @@ interface InstallRow {
 	marketplace: string;
 	pluginName: string;
 	manifest: unknown;
+	organizationId?: string;
+	policy?: Record<string, string>;
 }
 
 interface ConnectionRow {
@@ -52,7 +54,11 @@ stub(pluginConnections, {
 stub(db, {
 	select: () => ({
 		from: (table: unknown) => ({
+			leftJoin() {
+				return this;
+			},
 			where: (condition: SQL) => {
+				if (table === members) return rows([{ role: "member" }]);
 				if (table === connections) {
 					return rows(
 						live
@@ -202,6 +208,19 @@ describe("plugins.uninstall", () => {
 
 		expect(result.disconnected).toBe(0);
 		expect(live[0]?.disconnectedAt).toBe(null);
+	});
+});
+
+describe("plugins.uninstall of an organization install", () => {
+	test("is refused when the organization installs it for the member's role", async () => {
+		installs = [
+			install({ organizationId: "org-1", policy: { member: "installed" } }),
+		];
+
+		await expect(caller.plugins.uninstall({ name: "notion" })).rejects.toThrow(
+			/cannot be uninstalled/,
+		);
+		expect(installs).toHaveLength(1);
 	});
 });
 

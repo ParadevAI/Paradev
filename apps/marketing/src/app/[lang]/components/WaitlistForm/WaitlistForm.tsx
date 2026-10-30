@@ -41,9 +41,7 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 					<Trans>You're on the list!</Trans>
 				</h2>
 				<p className="text-sm text-muted-foreground">
-					<Trans>
-						We'll notify you when Windows &amp; Linux support is ready.
-					</Trans>
+					<Trans>We'll notify you when Windows support is ready.</Trans>
 				</p>
 			</div>
 		);

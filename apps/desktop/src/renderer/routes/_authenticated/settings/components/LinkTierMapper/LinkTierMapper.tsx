@@ -98,7 +98,11 @@ export function LinkTierMapper({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="none">
-										<Trans>Do nothing</Trans>
+										{surface === "url" && tier === "plain" ? (
+											<Trans>Show link menu</Trans>
+										) : (
+											<Trans>Do nothing</Trans>
+										)}
 									</SelectItem>
 									{actions.map((action) => (
 										<SelectItem key={action} value={action}>

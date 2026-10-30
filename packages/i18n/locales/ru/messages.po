@@ -414,6 +414,7 @@ msgstr "{0} создал(а) этот канал {created}."
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Разработчиков в рейтинге по использованию агентов: {0}. Ваши последние 30 дней уже учтены — просто скрыты. Только количество токенов и названия моделей, без имён репозиториев, путей к файлам и промптов."
 
+#. placeholder {0}: displayName(name)
 #. placeholder {0}: variables.name
 msgid "{0} disabled"
 msgstr "{0} отключён"
@@ -765,6 +766,9 @@ msgstr "{behindCount, plural, one {Отстаёт от main на # коммит,
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} из {totalBranches}"
 
+msgid "{changedCount, plural, one {Changes · # file} other {Changes · # files}}"
+msgstr "{changedCount, plural, one {Изменения · # файл} few {Изменения · # файла} many {Изменения · # файлов} other {Изменения · # файла}}"
+
 msgid "{closedCount, plural, one {Closed # port} other {Closed # ports}}"
 msgstr "{closedCount, plural, one {Закрыт # порт} few {Закрыто # порта} many {Закрыто # портов} other {Закрыто # порта}}"
 
@@ -926,6 +930,12 @@ msgstr "{failing} из {total} проверки не пройдена"
 msgid "{failing} of {total} checks failing"
 msgstr "{failing} из {total} проверок не пройдены"
 
+msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
+msgstr "{fileCount, plural, one {В этой рабочей области изменён # файл} few {В этой рабочей области изменены # файла} many {В этой рабочей области изменены # файлов} other {В этой рабочей области изменены # файла}}"
+
+msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
+msgstr "{fileCount, plural, one {Изменён # файл} few {Изменено # файла} many {Изменено # файлов} other {Изменено # файла}}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} — фокус"
 
@@ -962,6 +972,9 @@ msgstr "{hidden, plural, one {Показать # ответ} few {Показат
 msgid "{hidden, plural, one {View # more reply} other {View # more replies}}"
 msgstr "{hidden, plural, one {Показать ещё # ответ} few {Показать ещё # ответа} many {Показать ещё # ответов} other {Показать ещё # ответа}}"
 
+msgid "{hiddenCount, plural, one {Show # more file} other {Show # more files}}"
+msgstr "{hiddenCount, plural, one {Показать ещё # файл} few {Показать ещё # файла} many {Показать ещё # файлов} other {Показать ещё # файла}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Показать ещё # кадр} few {Показать ещё # кадра} many {Показать ещё # кадров} other {Показать ещё # кадра}}"
 
@@ -991,6 +1004,9 @@ msgstr "{kind} · автор {author}"
 
 msgid "{kindLabel} theme"
 msgstr "{kindLabel} тема"
+
+msgid "{label} access to {pluginName}"
+msgstr "Доступ роли {label} к {pluginName}"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -1084,6 +1100,9 @@ msgstr "{noun, select, repository {Укажите хотя бы один реп�
 
 msgid "{openCount} open"
 msgstr "{openCount} открыто"
+
+msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
+msgstr "{othersCount, plural, one {Также изменён в этой рабочей области: # файл} few {Также изменены в этой рабочей области: # файла} many {Также изменены в этой рабочей области: # файлов} other {Также изменены в этой рабочей области: # файла}}"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} может от вашего имени читать и изменять данные в вашем аккаунте {pluginLabel}, в том числе в будущих версиях этой страницы. Прочитанное она может отправить на другие сайты. Разрешайте только страницам, которым доверяете."
@@ -1205,6 +1224,9 @@ msgstr "{received} из {total}"
 
 msgid "{remaining} tokens left"
 msgstr "Осталось токенов: {remaining}"
+
+msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
+msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
 
 msgid "{seconds}s"
 msgstr "{seconds} с"
@@ -1981,6 +2003,9 @@ msgstr "Добавьте промпт, например: найди падени
 msgid "Add reaction…"
 msgstr "Добавить реакцию…"
 
+msgid "Add repository"
+msgstr "Добавить репозиторий"
+
 msgid "Add script"
 msgstr "Добавить скрипт"
 
@@ -2044,6 +2069,9 @@ msgstr "Добавьте первый проект"
 msgid "Add your own terminal agent to this device."
 msgstr "Добавьте своего терминального агента на это устройство."
 
+msgid "Added {added}"
+msgstr "Добавлено: {added}"
+
 msgid "Added {added} files to {where}"
 msgstr "В {where} добавлено файлов: {added}"
 
@@ -2062,6 +2090,9 @@ msgstr "Добавлено в поле ввода агента"
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Чтобы добавлять людей в {organizationName}, нужен платный тариф. Тарифом вашей организации управляет её владелец на {0}."
+
+msgid "Adding..."
+msgstr "Добавление..."
 
 msgid "Address Comments with Agent"
 msgstr "Разобрать комментарии агентом"
@@ -3123,6 +3154,13 @@ msgstr "Автономный конвейер от тикета до PR"
 msgid "Available"
 msgstr "Свободен"
 
+msgctxt "plugin access"
+msgid "Available"
+msgstr "Доступен"
+
+msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
+msgstr "Доступные плагины показываются на странице «Плагины» каждой роли. Установленные плагины устанавливаются всем в роли; их можно отключить, но нельзя удалить."
+
 msgid "Available when the agent is idle."
 msgstr "Доступно, когда агент простаивает."
 
@@ -3397,6 +3435,9 @@ msgstr "Имя ветки недоступно"
 
 msgid "Branch names cannot end with a space."
 msgstr "Имена веток не могут заканчиваться пробелом."
+
+msgid "Branch or tag (optional)"
+msgstr "Ветка или тег (необязательно)"
 
 msgid "Branch prefix"
 msgstr "Префикс ветки"
@@ -3684,6 +3725,18 @@ msgstr "Пути удалённых рабочих областей нельзя
 
 msgid "Can't reach the host"
 msgstr "Не удаётся связаться с хостом"
+
+msgid "Can't undo while a chat in this workspace is working."
+msgstr "Нельзя отменить, пока чат в этой рабочей области работает."
+
+msgid "Can't undo: another chat worked in this workspace during this turn."
+msgstr "Нельзя отменить: во время этого хода в этой рабочей области работал другой чат."
+
+msgid "Can't undo: HEAD moved since this turn, by a commit, pull or checkout."
+msgstr "Нельзя отменить: HEAD сдвинулся после этого хода из-за коммита, pull или checkout."
+
+msgid "Can't undo: this turn's snapshots are missing."
+msgstr "Нельзя отменить: снимки этого хода отсутствуют."
 
 msgid "Cancel"
 msgstr "Отмена"
@@ -4463,6 +4516,9 @@ msgstr "Использование облака"
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
+msgid "Cloud workspace — connecting"
+msgstr "Облачная рабочая область — подключение"
+
 msgid "Cloud workspaces"
 msgstr "Облачные рабочие области"
 
@@ -4859,6 +4915,10 @@ msgstr "Подключитесь, чтобы работать с пул-рекв
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Подключите аккаунт {pluginLabel}, затем перезагрузите эту страницу."
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceNeedsGithub"
+msgstr "Подключите свой аккаунт GitHub, чтобы добавить репозиторий; синхронизация читает его с вашим аккаунтом"
+
 msgid "Connect your GitHub account to load this pull request as you."
 msgstr "Подключите свой аккаунт GitHub, чтобы загрузить этот пул-реквест от своего имени."
 
@@ -5139,6 +5199,9 @@ msgstr "Скопировать ID сессии агента"
 msgid "Copy all"
 msgstr "Скопировать всё"
 
+msgid "Copy as CSV"
+msgstr "Копировать как CSV"
+
 msgid "Copy as Markdown"
 msgstr "Копировать как Markdown"
 
@@ -5305,6 +5368,9 @@ msgstr "Ваши затраты: $0"
 msgid "Could not add agent"
 msgstr "Не удалось добавить агента"
 
+msgid "Could not add repository"
+msgstr "Не удалось добавить репозиторий"
+
 msgid "Could not answer the agent"
 msgstr "Не удалось ответить агенту"
 
@@ -5322,6 +5388,9 @@ msgstr "Не удалось сменить режим"
 
 msgid "Could not change the shared version"
 msgstr "Не удалось изменить общедоступную версию"
+
+msgid "Could not change who gets this plugin"
+msgstr "Не удалось изменить, кто получает этот плагин"
 
 msgid "Could not change who has access"
 msgstr "Не удалось изменить, у кого есть доступ"
@@ -5364,6 +5433,9 @@ msgstr "Не удалось удалить файл"
 
 msgid "Could not delete this page"
 msgstr "Не удалось удалить эту страницу"
+
+msgid "Could not disable plugin"
+msgstr "Не удалось отключить плагин"
 
 msgid "Could not disconnect."
 msgstr "Не удалось отключить."
@@ -5483,6 +5555,9 @@ msgstr "Не удалось сохранить окружение"
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
 
+msgid "Could not remove repository"
+msgstr "Не удалось удалить репозиторий"
+
 msgid "Could not rename the session"
 msgstr "Не удалось переименовать сессию"
 
@@ -5551,6 +5626,9 @@ msgstr "Не удалось прекратить отслеживание"
 
 msgid "Could not submit prompt. Try again."
 msgstr "Не удалось отправить промпт. Повторите."
+
+msgid "Could not sync"
+msgstr "Не удалось синхронизировать"
 
 msgid "Could not take a screenshot"
 msgstr "Не удалось сделать скриншот"
@@ -5831,6 +5909,9 @@ msgstr "Не удалось остановить чат"
 msgid "Couldn't take a screenshot"
 msgstr "Не удалось сделать снимок экрана"
 
+msgid "Couldn't undo the file changes."
+msgstr "Не удалось отменить изменения файлов."
+
 msgid "Couldn't unstage changes"
 msgstr "Не удалось снять индексацию"
 
@@ -5851,6 +5932,9 @@ msgstr "Не удалось загрузить {name}"
 
 msgid "Couldn’t verify"
 msgstr "Не удалось проверить"
+
+msgid "Counted from the agent's file edits. Changes made by shell commands, notebook or MCP tools, or subagents are not included, and a file edited more than once can count a line twice."
+msgstr "Подсчитано по правкам файлов агентом. Изменения через команды оболочки, инструменты notebook или MCP и субагентов не учитываются, а в файле, изменённом несколько раз, строка может быть посчитана дважды."
 
 msgid "CPU"
 msgstr "CPU"
@@ -6319,6 +6403,9 @@ msgstr "По умолчанию ({fallback})"
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "База по умолчанию для новых рабочих пространств. Можно изменить при создании каждого пространства."
 
+msgid "Default branch"
+msgstr "Ветка по умолчанию"
+
 msgid "Default effort"
 msgstr "Уровень усилий по умолчанию"
 
@@ -6473,6 +6560,10 @@ msgstr "Удалить рабочую область"
 
 msgid "Delete workspace \"{workspaceName}\"?"
 msgstr "Удалить рабочую область «{workspaceName}»?"
+
+msgctxt "changed file badge"
+msgid "deleted"
+msgstr "удалён"
 
 msgid "Deleted"
 msgstr "Удалено"
@@ -6681,6 +6772,15 @@ msgstr "DevTools"
 msgid "DevTools beside the page"
 msgstr "DevTools рядом со страницей"
 
+msgid "Diagram"
+msgstr "Диаграмма"
+
+msgid "Diagram could not be drawn"
+msgstr "Не удалось построить диаграмму"
+
+msgid "Diagram could not be drawn: {reason}"
+msgstr "Не удалось построить диаграмму: {reason}"
+
 msgid "Dialog"
 msgstr "Диалог"
 
@@ -6728,6 +6828,9 @@ msgstr "Прямой режим"
 
 msgid "Directory"
 msgstr "Папка"
+
+msgid "Disable"
+msgstr "Отключить"
 
 msgid "Disable skill"
 msgstr "Отключить навык"
@@ -6952,6 +7055,9 @@ msgstr "Не удалось скачать"
 
 msgid "Download for {platformName}"
 msgstr "Скачать для {platformName}"
+
+msgid "Download for Linux"
+msgstr "Скачать для Linux"
 
 msgid "Download for Mac"
 msgstr "Скачать для Mac"
@@ -7416,6 +7522,9 @@ msgstr "Каждый день"
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "Каждый день в <0>9:00</0>"
 
+msgid "Every file changed again since this turn, so nothing was undone."
+msgstr "Все файлы изменились снова после этого хода, поэтому ничего не отменено."
+
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "Каждую пятницу в 16:00 готовь черновик release notes по объединённым за неделю PR."
 
@@ -7531,6 +7640,9 @@ msgstr "Развернуть всё"
 
 msgid "Expand all files"
 msgstr "Развернуть все файлы"
+
+msgid "Expand diagram"
+msgstr "Развернуть диаграмму"
 
 msgid "Expand file"
 msgstr "Развернуть файл"
@@ -8166,6 +8278,9 @@ msgstr "Создание и обновление задач"
 msgid "File changed on disk"
 msgstr "Файл на диске изменён"
 
+msgid "File changes undone"
+msgstr "Изменения файлов отменены"
+
 msgid "File is too large to preview"
 msgstr "Файл слишком большой для предпросмотра"
 
@@ -8325,6 +8440,9 @@ msgstr "Завершено · не прочитано"
 msgid "finished · worked for 7s"
 msgstr "завершил · работал 7 с"
 
+msgid "Fit"
+msgstr "По размеру"
+
 msgid "Fix all failing checks"
 msgstr "Починить все упавшие проверки"
 
@@ -8471,6 +8589,9 @@ msgstr "Для сообщений об ошибках и запросов фун
 
 msgid "For individuals getting started"
 msgstr "Для тех, кто начинает в одиночку"
+
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Для macOS на Apple Silicon и Intel. Linux AppImage — экспериментальная версия."
 
 msgid "For organizations with advanced needs"
 msgstr "Для организаций с повышенными требованиями"
@@ -8625,6 +8746,15 @@ msgstr "Из GitHub"
 msgid "from main agent"
 msgstr "от основного агента"
 
+msgid "From snapshots of the worktree before and after this turn, so edits made by shell commands count too."
+msgstr "По снимкам worktree до и после этого хода, поэтому учитываются и правки через команды оболочки."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so some of these changes may be its own."
+msgstr "По снимкам worktree до и после этого хода. Одновременно здесь работал другой чат, поэтому часть этих изменений может принадлежать ему."
+
+msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
+msgstr "По снимкам worktree до и после этого хода. Одновременно здесь работал другой чат, поэтому в этом списке только файлы, которые этот чат изменил своими инструментами для файлов. Остальные изменения показаны отдельно."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter скрыт — переключитесь на Markdown, чтобы его изменить"
 
@@ -8730,8 +8860,8 @@ msgstr "Получить ключ"
 msgid "Get more out of Paradev"
 msgstr "Выжать больше из Paradev"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Получите уведомление, когда Paradev станет доступен для Windows и Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Получите уведомление, когда Paradev станет доступен для Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Установите Paradev на Mac"
@@ -8805,6 +8935,9 @@ msgstr "Достигнут лимит запросов GitHub"
 msgid "GitHub refused the merge"
 msgstr "GitHub отклонил слияние"
 
+msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
+msgstr "Репозитории GitHub с файлом маркетплейса плагинов. Superset синхронизирует их плагины в вашу организацию."
+
 msgid "GitHub sign-in needed"
 msgstr "Требуется вход в GitHub"
 
@@ -8823,11 +8956,17 @@ msgstr "Имя пользователя GitHub..."
 msgid "GitHub username…"
 msgstr "Имя пользователя GitHub…"
 
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Дайте Claude Code, Codex или любому CLI-агенту свой workspace и ветку, а затем проверяйте все изменения в одном месте."
+
 msgid "Give me an example"
 msgstr "Приведи пример"
 
 msgid "Give your key a descriptive name to remember where it's used."
 msgstr "Дайте ключу понятное название, чтобы помнить, где он используется."
+
+msgid "Give your organization its own plugins from a GitHub repository. You choose who gets each one."
+msgstr "Добавьте своей организации собственные плагины из репозитория GitHub. Вы выбираете, кто получит каждый из них."
 
 msgid "Globe"
 msgstr "Глобус"
@@ -9259,6 +9398,9 @@ msgstr "Как мы работаем"
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Как ваши агенты входят внутри облачных рабочих областей. Другие подключают свои подписки или ключи API; на этой машине каждый агент продолжает использовать вход, который уже на ней есть."
 
+msgid "HTML preview"
+msgstr "Предпросмотр HTML"
+
 msgid "https://"
 msgstr "https://"
 
@@ -9641,6 +9783,13 @@ msgstr "Устанавливайте, авторизуйте и ограничи
 msgid "Install."
 msgstr "Установите."
 
+msgctxt "plugin access"
+msgid "Installed"
+msgstr "Установлен"
+
+msgid "Installed by your organization"
+msgstr "Установлено вашей организацией"
+
 msgid "Installed on {appAccountLogin}"
 msgstr "Установлено в {appAccountLogin}"
 
@@ -9884,6 +10033,9 @@ msgstr "Подключённые аккаунты были отключены."
 
 msgid "Its own branch and copy of the files"
 msgstr "Собственная ветка и собственная копия файлов"
+
+msgid "Its plugins appear when the sync finishes."
+msgstr "Его плагины появятся после завершения синхронизации."
 
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
@@ -10301,6 +10453,9 @@ msgstr "покинул(а) {channel}, как и {others}."
 
 msgid "left {channel}."
 msgstr "покинул(а) {channel}."
+
+msgid "Left alone, changed since this turn: {skippedNames}"
+msgstr "Не тронуты, изменены после этого хода: {skippedNames}"
 
 msgid "Left organization"
 msgstr "Организация покинута"
@@ -11419,6 +11574,10 @@ msgstr "Никогда"
 msgid "Never asks before acting"
 msgstr "Никогда не спрашивает"
 
+msgctxt "changed file badge"
+msgid "new"
+msgstr "новый"
+
 msgid "New"
 msgstr "Новое"
 
@@ -11909,6 +12068,9 @@ msgstr "Строк лога пока нет"
 msgid "no logins"
 msgstr "нет логинов"
 
+msgid "No longer in source"
+msgstr "Больше нет в источнике"
+
 msgid "No match"
 msgstr "Нет совпадений"
 
@@ -12018,6 +12180,9 @@ msgstr "Плагинов пока нет."
 msgid "No plugins match \"{0}\""
 msgstr "Нет плагинов по запросу «{0}»"
 
+msgid "No plugins yet. Add a repository to sync them."
+msgstr "Плагинов пока нет. Добавьте репозиторий, чтобы синхронизировать их."
+
 msgid "No posts yet."
 msgstr "Постов пока нет."
 
@@ -12098,6 +12263,9 @@ msgstr "Репозитории не найдены."
 
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Репозитории не найдены. Убедитесь, что у вашего GitHub App есть доступ к репозиториям."
+
+msgid "No repositories yet."
+msgstr "Репозиториев пока нет."
 
 msgid "No results"
 msgstr "Ничего не найдено"
@@ -12285,6 +12453,9 @@ msgstr "Из-за этого никто не проверяет код инач�
 msgid "None"
 msgstr "Нет"
 
+msgid "None of this turn's files have changes here"
+msgstr "Ни в одном из файлов этого хода здесь нет изменений"
+
 msgid "None selected"
 msgstr "Ничего не выбрано"
 
@@ -12377,6 +12548,9 @@ msgstr "Вход не выполнен"
 
 msgid "not sorted"
 msgstr "без сортировки"
+
+msgid "Not synced yet"
+msgstr "Ещё не синхронизировано"
 
 msgctxt "agent status"
 msgid "Not updating"
@@ -12646,6 +12820,9 @@ msgstr "Изменить этого агента может только его 
 
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Только на этом компьютере: игнорируется git и применяется к каждому worktree этого репозитория. Любой заданный здесь ключ заменяет общий."
+
+msgid "Only organization owners and admins can manage plugins."
+msgstr "Управлять плагинами могут только владельцы и администраторы организации."
 
 msgid "Only organization owners can modify these settings."
 msgstr "Изменять эти настройки могут только владельцы организации."
@@ -13281,6 +13458,9 @@ msgstr "Организация не найдена"
 msgid "Organization not found."
 msgstr "Организация не найдена."
 
+msgid "Organization plugins"
+msgstr "Плагины организации"
+
 msgid "Organization slug"
 msgstr "Slug организации"
 
@@ -13708,6 +13888,9 @@ msgstr "Вставьте это в Paradev CLI:"
 msgid "Path"
 msgstr "Путь"
 
+msgid "Path (optional)"
+msgstr "Путь (необязательно)"
+
 msgid "Path copied"
 msgstr "Путь скопирован"
 
@@ -13858,6 +14041,9 @@ msgstr "Выберите расположение проекта"
 msgid "Pick a reason"
 msgstr "Выберите причину"
 
+msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
+msgstr "Выберите репозиторий с файлом маркетплейса плагинов. Superset синхронизирует его плагины сейчас и при каждой следующей синхронизации."
+
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Выберите звук или добавьте свой. Поддерживаются .mp3, .wav и .ogg."
 
@@ -13980,6 +14166,9 @@ msgstr "Выберите организацию"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Попробуйте ещё раз или перезапустите Paradev на этом устройстве."
+
+msgid "Plugin"
+msgstr "Плагин"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.noApiKeyAuth"
@@ -14855,6 +15044,9 @@ msgstr "Уменьшение движения"
 msgid "Reduce Transparency"
 msgstr "Понижение прозрачности"
 
+msgid "Ref {ref} · Path {path}"
+msgstr "Ref {ref} · Путь {path}"
+
 msgid "Referenced, not demoed"
 msgstr "Упомянуто, не показано"
 
@@ -14985,6 +15177,7 @@ msgid "Remove"
 msgstr "Удалить"
 
 #. placeholder {0}: member.name
+#. placeholder {0}: source.repo
 msgid "Remove {0}"
 msgstr "Удалить {0}"
 
@@ -14996,6 +15189,9 @@ msgstr "Удалить {label}?"
 
 msgid "Remove {name}"
 msgstr "Удалить {name}"
+
+msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
+msgstr "Удалить {repo}? Все синхронизированные из него плагины будут удалены из вашей организации и у всех участников, которые их установили."
 
 msgid "Remove attachment"
 msgstr "Удалить вложение"
@@ -15044,6 +15240,9 @@ msgstr "Отвязать PR"
 
 msgid "Remove queued message"
 msgstr "Удалить сообщение из очереди"
+
+msgid "Remove repository"
+msgstr "Удалить репозиторий"
 
 msgid "Remove script"
 msgstr "Удалить скрипт"
@@ -15260,6 +15459,12 @@ msgstr "Репозитории: {label}"
 
 msgid "Repository"
 msgstr "Репозиторий"
+
+msgid "Repository removed"
+msgstr "Репозиторий удалён"
+
+msgid "Repository root"
+msgstr "Корень репозитория"
 
 msgid "Repository URL or path"
 msgstr "URL или путь репозитория"
@@ -15658,6 +15863,9 @@ msgstr "Просмотреть эти запуски в разделе «Все 
 msgid "Review thread…"
 msgstr "Ветка обсуждения ревью…"
 
+msgid "Review what this turn has changed so far"
+msgstr "Посмотреть, что этот ход уже изменил"
+
 msgid "reviewed"
 msgstr "провёл(а) ревью"
 
@@ -15810,6 +16018,9 @@ msgstr "Запустить сейчас"
 
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск по расписанию или по событиям, запуск по требованию, пауза, возобновление и чтение логов."
+
+msgid "Run parallel coding agents with Paradev"
+msgstr "Запускайте параллельных агентов для кода в Paradev"
 
 msgid "Run script"
 msgstr "Запустить скрипт"
@@ -16674,6 +16885,9 @@ msgstr "Настроить этот проект под Paradev"
 msgid "Set up your organization to get started"
 msgstr "Настройте организацию, чтобы начать"
 
+msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
+msgstr "Если вернуть установленный плагин в «Доступен», у всех останется их копия, и её можно будет удалить. «Недоступен» удаляет его."
+
 msgid "Setting saved"
 msgstr "Настройка сохранена"
 
@@ -16818,6 +17032,9 @@ msgstr "Показывать кнопку «Использование» в бо
 msgid "Show all {count}"
 msgstr "Показать все {count}"
 
+msgid "Show all changes"
+msgstr "Показать все изменения"
+
 msgid "Show all comments"
 msgstr "Показать все комментарии"
 
@@ -16832,6 +17049,9 @@ msgstr "Показывать границы"
 
 msgid "Show checks"
 msgstr "Показать проверки"
+
+msgid "Show code"
+msgstr "Показать код"
 
 msgid "Show CPU and memory usage in the top bar"
 msgstr "Показывать загрузку CPU и памяти в верхней панели"
@@ -16862,6 +17082,9 @@ msgstr "Показать всех, кто открывал это рабочее
 
 msgid "Show fewer"
 msgstr "Показать меньше"
+
+msgid "Show fewer files"
+msgstr "Показать меньше файлов"
 
 msgid "Show file tree"
 msgstr "Показать дерево файлов"
@@ -16895,6 +17118,9 @@ msgstr "Показать строки после изменения выше"
 
 msgid "Show lines before the change below"
 msgstr "Показать строки перед изменением ниже"
+
+msgid "Show link menu"
+msgstr "Показать меню ссылки"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Покажи последние 10 запусков моей автоматизации разбора Linear"
@@ -17227,6 +17453,9 @@ msgstr "Более гладкий онбординг"
 
 msgid "Snapshot"
 msgstr "Снимок"
+
+msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
+msgstr "Делать снимок worktree до и после каждого хода чата, чтобы его карточка показывала каждый изменённый файл, включая правки из оболочки, и могла их отменить. Каждый промпт сначала ждёт свой снимок."
 
 msgid "Snapshots this workspace as it is now, with everything installed in it. New workspaces from the environment start from that snapshot."
 msgstr "Сохраняет снимок этого рабочего пространства в текущем состоянии со всем установленным. Новые рабочие пространства из этого окружения начинаются с этого снимка."
@@ -17854,6 +18083,9 @@ msgstr "Superset теперь называется Paradev. А ещё мы пр�
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile вышел на iPhone"
 
+msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Superset читает его через подключённый аккаунт GitHub. Если вы ещё не подключили аккаунт, сделайте это в разделе <0>Настройки › Интеграции</0>."
+
 msgid "Supervised"
 msgstr "Под присмотром"
 
@@ -17988,14 +18220,26 @@ msgstr "Двусторонняя синхронизация задач с Linear
 msgid "Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues."
 msgstr "Двусторонняя синхронизация задач с Linear. Создавайте задачи в Paradev — они появятся в Linear, или импортируйте существующие задачи Linear."
 
+msgid "Sync now"
+msgstr "Синхронизировать сейчас"
+
+msgid "Sync plugins from your GitHub repositories and choose who can install them."
+msgstr "Синхронизируйте плагины из своих репозиториев GitHub и выберите, кто может их устанавливать."
+
 msgid "Sync Repositories"
 msgstr "Синхронизировать репозитории"
 
 msgid "Sync started"
 msgstr "Синхронизация запущена"
 
+msgid "Synced {syncedAgo}"
+msgstr "Синхронизировано {syncedAgo}"
+
 msgid "Syncing..."
 msgstr "Синхронизация..."
+
+msgid "Syncs as @{syncsAs}"
+msgstr "Синхронизируется как @{syncsAs}"
 
 msgid "System"
 msgstr "Системная"
@@ -18337,6 +18581,10 @@ msgstr "Эта машина больше недоступна"
 msgid "That name isn't allowed."
 msgstr "Такое имя недопустимо."
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.unknownPluginSource"
+msgstr "Такого источника плагинов не существует"
+
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "Этот запуск пропускается и не повторяется. Запустите его позже кнопкой «Запустить сейчас»."
 
@@ -18393,6 +18641,9 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
+
+msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
+msgstr "Чат остаётся как есть. Файлы, которые кто-либо изменил после этого хода, не трогаются и перечисляются."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Облачная рабочая область должна была запуститься, но не ответила вовремя. Следующий запуск попробует снова."
@@ -18465,6 +18716,9 @@ msgstr "Первые команды на F4"
 
 msgid "The first teams, small ones, ship majority-agent code without reading every line, and their defect rates hold. Nothing mystical behind it: review layers, canaries, fast rollback, and a habit of writing specifications instead of code."
 msgstr "Первые команды, небольшие, выпускают код, написанный преимущественно агентами, не читая каждую строку, и их уровень дефектов держится. Ничего мистического: слои ревью, канареечные выкладки, быстрый откат и привычка писать спецификации вместо кода."
+
+msgid "The folder that holds the marketplace file, if it is not at the root."
+msgstr "Папка с файлом маркетплейса, если он не в корне."
 
 msgid "The following folders are not git repositories. Would you like to initialize them?"
 msgstr "Следующие папки не являются git-репозиториями. Инициализировать их?"
@@ -18602,6 +18856,10 @@ msgstr "Служба хоста Paradev для {organization} неожиданн
 
 msgid "The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically."
 msgstr "Служба хоста Paradev неожиданно остановилась ({cause}), и её не удалось перезапустить автоматически."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourcePathOutside"
+msgstr "Путь должен оставаться внутри репозитория"
 
 msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
 msgstr "Пул обновляется каждый месяц. Использование сверх него оплачивается за ГБ-час по ставке, указанной в каждом тарифе."
@@ -18987,6 +19245,9 @@ msgstr "Сохранённое окружение будет навсегда у
 msgid "This port is still in use"
 msgstr "Этот порт ещё используется"
 
+msgid "This preview is too large to show."
+msgstr "Этот предпросмотр слишком велик для показа."
+
 msgid "This profile is busy right now"
 msgstr "Этот профиль сейчас перегружен"
 
@@ -19068,6 +19329,12 @@ msgstr "В этой ветке нет комментария, на которы�
 msgid "This thread is not open to agents. A person has to comment on it before an agent can reply."
 msgstr "Эта ветка не передана агенту. Сначала кто-то должен передать её со страницы."
 
+msgid "This turn"
+msgstr "Этот ход"
+
+msgid "This turn's files"
+msgstr "Файлы этого хода"
+
 msgid "This update restarted your terminals once. New ones open in the same folders."
 msgstr "Это обновление однократно перезапустило ваши терминалы. Новые открываются в тех же папках."
 
@@ -19140,6 +19407,9 @@ msgstr "Возможно, эта рабочая область удалена и
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Запись об этой рабочей области ещё существует, но её папки worktree больше нет на этом хосте. Терминалы и действия с файлами недоступны."
+
+msgid "This workspace's host can't undo file changes yet."
+msgstr "Хост этой рабочей области пока не умеет отменять изменения файлов."
 
 msgid "This workspace's host is offline"
 msgstr "Хост этой рабочей области офлайн"
@@ -19393,8 +19663,14 @@ msgstr "Следите за бюджетами и расходами"
 msgid "Track down that flaky test…"
 msgstr "Найди причину нестабильного теста…"
 
+msgid "Track file changes per turn"
+msgstr "Отслеживать изменения файлов по ходам"
+
 msgid "Track tasks in"
 msgstr "Где вести задачи"
+
+msgid "Track your brand in AI search"
+msgstr "Отслеживайте свой бренд в ИИ-поиске"
 
 msgid "Tracking"
 msgstr "Отслеживание"
@@ -19603,6 +19879,10 @@ msgstr "Автономные прогоны от 8 часов и дольше у
 msgid "Unavailable"
 msgstr "Недоступно"
 
+msgctxt "plugin access"
+msgid "Unavailable"
+msgstr "Недоступен"
+
 msgid "Uncached input"
 msgstr "Некешированный ввод"
 
@@ -19626,6 +19906,12 @@ msgstr "Идёт"
 
 msgid "Undo"
 msgstr "Отменить"
+
+msgid "Undo changes"
+msgstr "Отменить изменения"
+
+msgid "Undo the file changes in this card?"
+msgstr "Отменить изменения файлов в этой карточке?"
 
 msgid "Undo the last archived workspace or closed chats"
 msgstr "Отменить последнюю архивацию рабочей области или закрытие чатов"
@@ -20359,8 +20645,8 @@ msgstr "Мы напишем вам, когда Paradev для Android будет
 msgid "We'll get back to you shortly."
 msgstr "Скоро ответим."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Мы сообщим, когда поддержка Windows и Linux будет готова."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Мы сообщим, когда поддержка Windows будет готова."
 
 msgid "We'll only use this to send your download link."
 msgstr "Используем адрес только для отправки ссылки на скачивание."
@@ -21119,6 +21405,10 @@ msgstr "Ваш аккаунт GitHub"
 msgid "Your GitHub account cannot reach a repository in this environment"
 msgstr "Ваша учётная запись GitHub не может получить доступ к репозиторию этого окружения"
 
+#. js-lingui-explicit-id
+msgid "serverError.plugins.pluginSourceOutOfReach"
+msgstr "Ваша учётная запись GitHub не может прочитать {repo}"
+
 msgid "Your GitHub link comes from the account you signed in with, so it shows as verified and cannot be edited here."
 msgstr "Ссылка на GitHub берётся из аккаунта, через который вы вошли, поэтому она отмечена как подтверждённая и не редактируется здесь."
 
@@ -21131,6 +21421,9 @@ msgstr "Ваше имя"
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "Ваше имя <0>(если возьмём ваш промпт, укажем вас в changelog)</0>"
 
+msgid "Your organization"
+msgstr "Ваша организация"
+
 msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
 msgstr "Ваша организация достигла лимита использования облака. Увеличьте лимит или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы запустить эту рабочую область."
 
@@ -21140,6 +21433,13 @@ msgstr "Ваша организация достигла лимита окруж
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Ваша организация достигла лимита в {reachedLimit} окружений. Архивируйте одно, чтобы освободить место."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.managedByOrganization"
+msgstr "Ваша организация устанавливает {plugin} для вас, поэтому его нельзя удалить. Его можно отключить."
+
+msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
+msgstr "Ваша организация устанавливает этот плагин для вас. Его можно отключить, но нельзя удалить."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."

@@ -3,8 +3,6 @@ import type {
 	ContextMenuAnchorRect,
 	FileTreeDropResult,
 	FileTreeRenameEvent,
-	FileTreeRowDecoration,
-	FileTreeRowDecorationContext,
 	ContextMenuItem as PierreContextMenuItem,
 	ContextMenuOpenContext as PierreContextMenuOpenContext,
 } from "@pierre/trees";
@@ -58,7 +56,6 @@ import { buildPierreGitStatus } from "./utils/buildPierreGitStatus";
 import { stripTrailingSlash, toAbs } from "./utils/treePath";
 
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: FILE_EXPLORER_ROW_HEIGHT,
 	levelIndent: FILE_EXPLORER_INDENT,
 	withSearchChrome: true,
 });
@@ -120,11 +117,6 @@ export function FilesTab({
 		onMove(_event: FileTreeDropResult) {},
 		onMoveError(_message: string) {},
 		onRenameError(_message: string) {},
-		renderRowDecoration(
-			_ctx: FileTreeRowDecorationContext,
-		): FileTreeRowDecoration | null {
-			return null;
-		},
 	});
 
 	const { model } = usePierreFileTree({
@@ -145,7 +137,6 @@ export function FilesTab({
 		itemHeight: FILE_EXPLORER_ROW_HEIGHT,
 		overscan: FILE_EXPLORER_OVERSCAN,
 		stickyFolders: true,
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
 	});
 
 	const bridge = useFilesTabBridge({ model, workspaceId, rootPath });
@@ -273,11 +264,6 @@ export function FilesTab({
 	handlersRef.current.onRenameError = (message) => handleRenameError(message);
 	handlersRef.current.onMove = (event) => void handleMove(event);
 	handlersRef.current.onMoveError = (message) => toast.error(message);
-	// No-op: Pierre's setGitStatus already renders its own per-row status
-	// indicator (and tints the row text), so a custom decoration here would
-	// duplicate it. Kept the wiring in place in case we want to layer
-	// something Pierre doesn't show (e.g. lock icons, debug markers).
-	handlersRef.current.renderRowDecoration = () => null;
 
 	// Hint tooltip uses ShadowClickHint to anchor a single shadcn Tooltip
 	// over the hovered row's bounding rect — Pierre owns the row DOM inside

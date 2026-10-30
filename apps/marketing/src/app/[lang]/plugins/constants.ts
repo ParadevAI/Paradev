@@ -141,6 +141,11 @@ export const CATALOG: {
 				displayName: "Exa",
 				description: msg({ message: "Search the web" }),
 			},
+			{
+				name: "peec",
+				displayName: "Peec AI",
+				description: msg({ message: "Track your brand in AI search" }),
+			},
 		],
 	},
 ];
