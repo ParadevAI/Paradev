@@ -18,7 +18,7 @@
 	},
 	"description": "Superset Monorepo",
 	"homepage": "https://superset.sh",
-	"license": "Elastic-2.0",
+	"license": "MIT",
 	"packageManager": "bun@1.4.3",
 	"private": true,
 	"scripts": {
