@@ -284,19 +284,10 @@ export function useDiffCodeViewItems({
 					],
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
-				try {
-					const { patch, truncated } =
-						await trpcClient.git.getDiffPatch.query(input);
-					// An older host has no `truncated` and does not ignore
-					// whitespace either.
-					const whitespaceFiltered =
-						input.ignoreWhitespace === true && truncated === false;
-					return { kind: "patch", patch, whitespaceFiltered, ...requested };
-				} catch (error) {
-					if (!isMissingProcedureError(error)) throw error;
-					// Older host-service (a remote host or cloud sandbox that
-					// hasn't been updated): fetch each file's contents the way
-					// the pane used to, so the changeset still renders.
+				// Older host-service (a remote host or cloud sandbox that
+				// hasn't been updated): fetch each file's contents the way
+				// the pane used to, so the changeset still renders.
+				const fetchFiles = async (): Promise<PatchGroupResult> => {
 					const files: Extract<PatchGroupResult, { kind: "files" }>["files"] =
 						[];
 					const queue = [...members];
@@ -325,7 +316,28 @@ export function useDiffCodeViewItems({
 						whitespaceFiltered: input.ignoreWhitespace === true,
 						...requested,
 					};
+				};
+				let response: Awaited<
+					ReturnType<typeof trpcClient.git.getDiffPatch.query>
+				>;
+				try {
+					response = await trpcClient.git.getDiffPatch.query(input);
+				} catch (error) {
+					if (!isMissingProcedureError(error)) throw error;
+					return fetchFiles();
 				}
+				// A host without `truncated` drops `ignoreWhitespace` and returns
+				// the full patch.
+				if (input.ignoreWhitespace && response.truncated === undefined) {
+					return fetchFiles();
+				}
+				return {
+					kind: "patch",
+					patch: response.patch,
+					whitespaceFiltered:
+						input.ignoreWhitespace === true && response.truncated === false,
+					...requested,
+				};
 			},
 			staleTime: Number.POSITIVE_INFINITY,
 			enabled,

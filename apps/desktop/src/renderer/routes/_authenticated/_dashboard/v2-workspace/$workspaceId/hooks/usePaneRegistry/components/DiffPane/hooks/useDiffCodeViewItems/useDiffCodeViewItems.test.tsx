@@ -35,6 +35,15 @@ const getDiffPatch = mock(async (input: { category: string }) => {
 	}
 	return { patch: patchByCategory.get(input.category) ?? "" };
 });
+/** What the fake host answers `git.getDiff` with, per path. */
+const contentsByPath = new Map<string, { old: string; new: string }>();
+const getDiff = mock(async (input: { path: string }) => {
+	const contents = contentsByPath.get(input.path);
+	return {
+		oldFile: { name: input.path, contents: contents?.old ?? "" },
+		newFile: { name: input.path, contents: contents?.new ?? "" },
+	};
+});
 let releaseHeldRequest: () => void = () => {};
 
 const { act, cleanup, renderHook, waitFor } = await import(
@@ -46,10 +55,15 @@ const { QueryClient, QueryClientProvider } = await import(
 const { observable } = await import("@trpc/server/observable");
 const { workspaceTrpc } = await import("@superset/workspace-client");
 const { useDiffCodeViewItems } = await import("./useDiffCodeViewItems");
+const { useSettings } = await import("renderer/stores/settings");
 
 const hostLink: TRPCLink<AppRouter> = () => (call) =>
 	observable((observer) => {
-		void getDiffPatch(call.op.input as { category: string }).then((data) => {
+		const response =
+			call.op.path === "git.getDiff"
+				? getDiff(call.op.input as { path: string })
+				: getDiffPatch(call.op.input as { category: string });
+		void response.then((data) => {
 			observer.next({ result: { data } });
 			observer.complete();
 		});
@@ -167,7 +181,10 @@ function renderItems(files: ChangesetFile[]) {
 beforeEach(() => {
 	patchByCategory.clear();
 	getDiffPatch.mockClear();
+	contentsByPath.clear();
+	getDiff.mockClear();
 	holdNextRequest = null;
+	useSettings.setState({ ignoreWhitespace: false });
 });
 
 afterEach(cleanup);
@@ -375,5 +392,32 @@ describe("useDiffCodeViewItems", () => {
 		});
 		expect(client.getQueryCache().getAll()).toHaveLength(1);
 		expect(diffItem(result.current.items, "a.ts").version).toBe(a.version);
+	});
+
+	test("with whitespace ignored, a host that returns no `truncated` falls back to per-file diffs", async () => {
+		useSettings.setState({ ignoreWhitespace: true });
+		patchByCategory.set("unstaged", FILE_A + FILE_B);
+		contentsByPath.set("a.ts", {
+			old: "if (a) {\nb();\n}\n",
+			new: "if (a) {\n  b();\n}\n",
+		});
+		contentsByPath.set("b.ts", {
+			old: "const b = 1;\n",
+			new: "const b = 1;\nconst added = 2;\n",
+		});
+		const { client, result } = renderItems([
+			unstagedFile("a.ts"),
+			unstagedFile("b.ts"),
+		]);
+		await waitFor(() => expect(client.isFetching()).toBe(0));
+
+		expect(getDiffPatch.mock.calls[0]?.[0]).toMatchObject({
+			ignoreWhitespace: true,
+		});
+		expect(getDiff).toHaveBeenCalledTimes(2);
+		expect(diffItem(result.current.items, "b.ts").fileDiff.hunks).toHaveLength(
+			1,
+		);
+		expect(() => diffItem(result.current.items, "a.ts")).toThrow();
 	});
 });
