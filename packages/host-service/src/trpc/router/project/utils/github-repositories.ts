@@ -1,6 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { type ExecGh, execGh } from "../../workspace-creation/utils/exec-gh";
+import {
+	type ExecGh,
+	execGh,
+	GH_CALL_TIMEOUT_MS,
+} from "../../workspace-creation/utils/exec-gh";
+
+const LISTING_BUDGET_MS = 20_000;
 
 const githubRepositorySchema = z.object({
 	full_name: z.string(),
@@ -15,11 +21,74 @@ export function parseGitHubRepositories(raw: unknown) {
 	}));
 }
 
-export async function listGitHubRepositories(runGh: ExecGh = execGh) {
+interface ListingDeadline {
+	budgetMs?: number;
+	now?: () => number;
+}
+
+function listingDeadlineError(budgetMs: number) {
+	return new TRPCError({
+		code: "TIMEOUT",
+		message: `Listing GitHub repositories took longer than ${Math.round(budgetMs / 1000)}s. Try again.`,
+	});
+}
+
+function isGhTimeout(error: unknown) {
+	const failure = error as {
+		code?: string | number;
+		killed?: boolean;
+		signal?: string;
+	};
+	return (
+		failure?.killed === true &&
+		failure.signal === "SIGTERM" &&
+		failure.code == null
+	);
+}
+
+function withListingDeadline(
+	runGh: ExecGh,
+	budgetMs: number,
+	now: () => number,
+): ExecGh {
+	const deadline = now() + budgetMs;
+	return async (args, options) => {
+		const remaining = deadline - now();
+		if (remaining <= 0) throw listingDeadlineError(budgetMs);
+		const timeout = Math.min(options?.timeout ?? GH_CALL_TIMEOUT_MS, remaining);
+		const call = runGh(args, { ...options, timeout }).catch((error) => {
+			// A kill by the remaining budget is the listing's own deadline, not
+			// a slow page, so report the budget instead of the `gh` command line.
+			if (timeout === remaining && isGhTimeout(error)) {
+				throw listingDeadlineError(budgetMs);
+			}
+			throw error;
+		});
+		// `gh` starts its own timer only after the login-shell environment
+		// lookup, so the walk needs a timer to bound the whole call.
+		const expiry = Promise.withResolvers<never>();
+		const timer = setTimeout(
+			() => expiry.reject(listingDeadlineError(budgetMs)),
+			remaining,
+		);
+		call.catch(() => {});
+		try {
+			return await Promise.race([call, expiry.promise]);
+		} finally {
+			clearTimeout(timer);
+		}
+	};
+}
+
+export async function listGitHubRepositories(
+	runGh: ExecGh = execGh,
+	{ budgetMs = LISTING_BUDGET_MS, now = Date.now }: ListingDeadline = {},
+) {
 	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
+	const runBoundedGh = withListingDeadline(runGh, budgetMs, now);
 	try {
 		for (let page = 1; ; page++) {
-			const raw = await runGh([
+			const raw = await runBoundedGh([
 				"api",
 				"--method",
 				"GET",
@@ -40,11 +109,10 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 			if (entries.length < 100) return repositories;
 		}
 	} catch (error) {
+		if (error instanceof TRPCError) throw error;
 		const failure = error instanceof Error ? error : new Error(String(error));
-		const { code, killed, signal, stderr } = failure as Error & {
+		const { code, stderr } = failure as Error & {
 			code?: string | number;
-			killed?: boolean;
-			signal?: string;
 			stderr?: string;
 		};
 		const authenticationRequired =
@@ -52,7 +120,7 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 		throw new TRPCError({
 			code: authenticationRequired
 				? "PRECONDITION_FAILED"
-				: killed && signal === "SIGTERM" && code == null
+				: isGhTimeout(error)
 					? "TIMEOUT"
 					: "BAD_GATEWAY",
 			message: authenticationRequired
