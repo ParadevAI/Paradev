@@ -371,6 +371,36 @@ export function applyPaneLayoutOp(
 			return done(keepSelection(areas, next), paneId, tab.id);
 		}
 
+		case "openFile": {
+			const { area, tab } = locatePane(areas, op.paneId);
+			const paneId = createPaneId();
+			const next = inArea(area, (store) =>
+				store.splitPane({
+					tabId: tab.id,
+					paneId: op.paneId,
+					position: SPLIT_POSITIONS[op.direction],
+					newPane: {
+						id: paneId,
+						kind: "file",
+						data: {
+							filePath: op.filePath,
+							mode: "editor",
+							...(op.line || op.column
+								? {
+										pendingPosition: {
+											line: op.line ?? 1,
+											column: op.column,
+										},
+										viewId: "code",
+									}
+								: {}),
+						},
+					},
+				}),
+			);
+			return done(keepSelection(areas, next), paneId, tab.id);
+		}
+
 		case "resize": {
 			const { area, tab } = locatePane(areas, op.paneId);
 			const path = findPanePath(tab.layout, op.paneId);
