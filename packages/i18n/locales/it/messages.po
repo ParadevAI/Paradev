@@ -19094,6 +19094,9 @@ msgstr "Il team"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "L'invito al team è scaduto oppure non esiste. Chiedi un nuovo link al proprietario del team o controlla che l'URL sia corretto."
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "Il terminale nasconde ciò che incolli. Premi Invio per inviare."
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "Il titolo compare ovunque questa pagina sia elencata e nell'anteprima del suo link."
 

@@ -9,12 +9,15 @@ import {
 	disposeRuntime,
 } from "renderer/lib/terminal/terminal-runtime";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { createCommandTerminalKeyEventHandler } from "./utils/createCommandTerminalKeyEventHandler";
 import { installCommandTerminalLinks } from "./utils/installCommandTerminalLinks";
 
 interface CommandTerminalProps {
 	command: string;
 	onExit: (exitCode: number | null) => void;
 	onOutput?: (data: string) => void;
+	/** Receives what the user types or pastes, before it reaches the pty. */
+	onInput?: (data: string) => void;
 	/** Receives a writer for sending input to the pty (queued until it exists). */
 	onWriterReady?: (write: (data: string) => void) => void;
 }
@@ -23,6 +26,7 @@ export function CommandTerminal({
 	command,
 	onExit,
 	onOutput,
+	onInput,
 	onWriterReady,
 }: CommandTerminalProps) {
 	const appearance = useTerminalAppearance();
@@ -33,6 +37,8 @@ export function CommandTerminal({
 	onExitRef.current = onExit;
 	const onOutputRef = useRef(onOutput);
 	onOutputRef.current = onOutput;
+	const onInputRef = useRef(onInput);
+	onInputRef.current = onInput;
 	const onWriterReadyRef = useRef(onWriterReady);
 	onWriterReadyRef.current = onWriterReady;
 	const commandRef = useRef(command);
@@ -44,6 +50,9 @@ export function CommandTerminal({
 
 		const paneId = `command-terminal-${crypto.randomUUID()}`;
 		const runtime = createRuntime(paneId, appearanceRef.current);
+		runtime.terminal.attachCustomKeyEventHandler(
+			createCommandTerminalKeyEventHandler(runtime.terminal),
+		);
 		const disposeLinks = installCommandTerminalLinks(
 			runtime.terminal,
 			(url) => {
@@ -65,11 +74,13 @@ export function CommandTerminal({
 
 		// The dialog animates in, so the container often lacks final dimensions
 		// at mount and the initial fit measures wrong. Refit once the dialog has
-		// settled, then push the corrected size to the PTY.
+		// settled, then push the corrected size to the PTY and keep focus in the
+		// terminal so a paste lands there.
 		const refit = () => {
 			if (!containerRef.current) return;
 			runtime.fitAddon.fit();
 			syncSize();
+			if (!container.contains(document.activeElement)) runtime.terminal.focus();
 		};
 		const refitTimers = [
 			window.setTimeout(refit, 100),
@@ -98,7 +109,10 @@ export function CommandTerminal({
 			}
 			void electronTrpcClient.terminal.write.mutate({ paneId, data });
 		};
-		const inputDisposable = runtime.terminal.onData(writeToPty);
+		const inputDisposable = runtime.terminal.onData((data) => {
+			onInputRef.current?.(data);
+			writeToPty(data);
+		});
 		onWriterReadyRef.current?.(writeToPty);
 
 		const subscription = electronTrpcClient.terminal.stream.subscribe(paneId, {
