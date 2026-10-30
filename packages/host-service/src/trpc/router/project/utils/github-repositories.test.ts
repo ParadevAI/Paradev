@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, jest, test } from "bun:test";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { ExecGh } from "../../workspace-creation/utils/exec-gh";
@@ -54,6 +54,66 @@ test("loads every page in order, including an empty final page", async () => {
 	expect(
 		calls.map((args) => args.find((arg) => arg.startsWith("page="))),
 	).toEqual(["page=1", "page=2", "page=3"]);
+});
+
+test("fails with a clear timeout when the whole listing exceeds its budget", async () => {
+	let clock = 0;
+	const timeouts: Array<number | undefined> = [];
+	const error = await listGitHubRepositories(
+		async (_args, options) => {
+			timeouts.push(options?.timeout);
+			clock += 9_000;
+			const page = timeouts.length;
+			if (page > 3) return [];
+			return Array.from({ length: 100 }, (_, index) => ({
+				full_name: `owner/repo-${page * 100 + index}`,
+				clone_url: `https://github.com/owner/repo-${page * 100 + index}.git`,
+			}));
+		},
+		{ budgetMs: 20_000, now: () => clock },
+	).catch((failure: unknown) => failure);
+
+	expect(error).toMatchObject({ code: "TIMEOUT" });
+	expect((error as Error).message).toContain("longer than 20s");
+	expect(timeouts).toEqual([10_000, 10_000, 2_000]);
+});
+
+test("reports the overall budget when a page is killed by the remaining time", async () => {
+	let clock = 0;
+	const error = await listGitHubRepositories(
+		async (_args, options) => {
+			clock += options?.timeout ?? 0;
+			throw Object.assign(new Error("Command failed"), {
+				killed: true,
+				signal: "SIGTERM",
+				code: null,
+			});
+		},
+		{ budgetMs: 5_000, now: () => clock },
+	).catch((failure: unknown) => failure);
+
+	expect(error).toMatchObject({ code: "TIMEOUT" });
+	expect((error as Error).message).toContain("longer than 5s");
+});
+
+test("cuts a call that answers after the budget", async () => {
+	jest.useFakeTimers();
+	const answer = Promise.withResolvers<unknown>();
+	try {
+		const pending = listGitHubRepositories(() => answer.promise, {
+			budgetMs: 100,
+			now: () => 0,
+		}).catch((failure: unknown) => failure);
+
+		jest.advanceTimersByTime(100);
+
+		const error = await pending;
+		expect(error).toMatchObject({ code: "TIMEOUT" });
+		expect((error as Error).message).toContain("took longer than");
+	} finally {
+		answer.resolve([]);
+		jest.useRealTimers();
+	}
 });
 
 test("rejects invalid clone URLs on later pages instead of returning partial results", async () => {
