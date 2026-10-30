@@ -13,8 +13,7 @@ import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 import { LuChevronsUpDown, LuGithub } from "react-icons/lu";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { RepositoryListEmpty } from "./components/RepositoryListEmpty";
-import { RepositoryListError } from "./components/RepositoryListError";
+import { RepositoryListStatus } from "./components/RepositoryListStatus";
 import { useGitHubRepositories } from "./hooks/useGitHubRepositories";
 import { fetchRepositoryPage } from "./utils/fetchRepositoryPage";
 
@@ -83,11 +82,8 @@ export function GitHubRepositoryPicker({
 						/>
 						<CommandList className="max-h-64">
 							<CommandEmpty>
-								{error ? null : (
-									<RepositoryListEmpty
-										isLoading={isLoading}
-										isLoadingMore={isLoadingMore}
-									/>
+								{isLoading || isLoadingMore || error ? null : (
+									<Trans>No matches</Trans>
 								)}
 							</CommandEmpty>
 							<CommandGroup>
@@ -114,9 +110,12 @@ export function GitHubRepositoryPicker({
 								})}
 							</CommandGroup>
 						</CommandList>
-						{error ? (
-							<RepositoryListError message={error.message} onRetry={retry} />
-						) : null}
+						<RepositoryListStatus
+							error={error}
+							isLoading={isLoading}
+							isLoadingMore={isLoadingMore}
+							onRetry={retry}
+						/>
 					</Command>
 				</PopoverContent>
 			</Popover>

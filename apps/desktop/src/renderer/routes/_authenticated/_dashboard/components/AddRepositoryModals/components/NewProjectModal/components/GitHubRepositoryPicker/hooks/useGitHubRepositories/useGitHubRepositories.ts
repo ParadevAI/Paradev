@@ -30,7 +30,11 @@ export function useGitHubRepositories(
 		isLoadingMore: isFetchingNextPage,
 		error: query.isError ? query.error : null,
 		retry: () => {
-			void fetchNextPage();
+			if (query.isFetchNextPageError) {
+				void fetchNextPage();
+			} else {
+				void query.refetch();
+			}
 		},
 	};
 }

@@ -118,6 +118,82 @@ describe("useGitHubRepositories", () => {
 		expect(requested).toEqual([1, 2, 2]);
 	});
 
+	test("refetches when the first page failed", async () => {
+		let failures = 1;
+		const requested: number[] = [];
+		const fetchPage = (pageNumber: number) => {
+			requested.push(pageNumber);
+			if (failures-- > 0) {
+				return Promise.reject(new Error("gh failed"));
+			}
+			return Promise.resolve(page(0, 100, false));
+		};
+
+		const { result } = renderHook(
+			() => useGitHubRepositories("http://host", fetchPage, true),
+			{
+				wrapper: wrapper(
+					new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+				),
+			},
+		);
+
+		await waitFor(() =>
+			expect(result.current.error?.message).toBe("gh failed"),
+		);
+
+		await act(async () => {
+			result.current.retry();
+		});
+
+		await waitFor(() => expect(result.current.repositories).toHaveLength(100));
+		expect(result.current.error).toBeNull();
+		expect(requested).toEqual([1, 1]);
+	});
+
+	test("refetches after a background refresh fails", async () => {
+		let fail = false;
+		const requested: Array<number | undefined> = [];
+		const fetchPage = (pageNumber: number) => {
+			requested.push(pageNumber);
+			if (pageNumber !== 1 && pageNumber !== 2) {
+				return Promise.reject(new Error(`unexpected page ${pageNumber}`));
+			}
+			if (fail) return Promise.reject(new Error("gh failed"));
+			return Promise.resolve(
+				pageNumber === 1 ? page(0, 100, true) : page(100, 50, false),
+			);
+		};
+		const client = new QueryClient({
+			defaultOptions: { queries: { retry: false } },
+		});
+		const { result } = renderHook(
+			() => useGitHubRepositories("http://host", fetchPage, true),
+			{ wrapper: wrapper(client) },
+		);
+
+		await waitFor(() => expect(result.current.repositories).toHaveLength(150));
+
+		fail = true;
+		await act(async () => {
+			await client.refetchQueries({
+				queryKey: ["github-repositories", "http://host"],
+			});
+		});
+		await waitFor(() =>
+			expect(result.current.error?.message).toBe("gh failed"),
+		);
+
+		fail = false;
+		await act(async () => {
+			result.current.retry();
+		});
+
+		await waitFor(() => expect(result.current.error).toBeNull());
+		expect(result.current.repositories).toHaveLength(150);
+		expect(requested).toEqual([1, 2, 1, 1, 2]);
+	});
+
 	test("stops requesting pages once the picker is closed", async () => {
 		const requested: number[] = [];
 		const secondPage = Promise.withResolvers<GitHubRepositoryPage>();
