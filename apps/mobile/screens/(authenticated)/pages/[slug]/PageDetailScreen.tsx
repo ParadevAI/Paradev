@@ -25,7 +25,7 @@ import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
-import { toolbarIcon } from "@/lib/navigation";
+import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { usePageQuery } from "../hooks/usePages";
@@ -74,6 +74,7 @@ export function PageDetailScreen({
 		scrollY?: string;
 	}>();
 	const headerHeight = useHeaderHeight();
+	const frameTop = contentScrollsUnderHeader ? headerHeight : 0;
 	const access = usePageAccessQuery(slug);
 	// Optimistic while loading: the server refuses a view-only reader's comment either way.
 	const canComment = access.data?.canComment ?? true;
@@ -349,7 +350,7 @@ export function PageDetailScreen({
 					<PageFrame
 						ref={frameRef}
 						src={viewUrl}
-						insetTop={headerHeight}
+						insetTop={frameTop}
 						onMessage={onFrameMessage}
 						onLoadEnd={() => {
 							setLoadedSrc(viewUrl);
@@ -360,7 +361,7 @@ export function PageDetailScreen({
 
 					<View
 						className="absolute inset-x-0 bottom-0 overflow-hidden"
-						style={{ top: headerHeight }}
+						style={{ top: frameTop }}
 						pointerEvents="box-none"
 					>
 						{unresolvedThreads.map((thread) => {
