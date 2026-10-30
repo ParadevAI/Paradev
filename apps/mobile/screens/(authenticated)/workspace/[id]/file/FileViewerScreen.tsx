@@ -12,6 +12,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { toolbarIcon } from "@/lib/navigation";
 import {
 	anchorOf,
 	ToolbarAnchor,
@@ -77,7 +78,7 @@ export function FileViewerScreen() {
 				</Stack.Title>
 				<Stack.Toolbar placement="right">
 					<Stack.Toolbar.Menu
-						icon="ellipsis"
+						icon={toolbarIcon("more")}
 						accessibilityLabel={t({
 							message: "File actions",
 						})}

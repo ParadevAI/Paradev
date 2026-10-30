@@ -25,6 +25,7 @@ import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
+import { toolbarIcon } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { usePageQuery } from "../hooks/usePages";
@@ -261,7 +262,7 @@ export function PageDetailScreen({
 			<Stack.Toolbar placement="right">
 				{presentation === "sheet" ? (
 					<Stack.Toolbar.Button
-						icon="arrow.up.left.and.arrow.down.right"
+						icon={toolbarIcon("expand")}
 						accessibilityLabel={t({ message: "Open full screen" })}
 						onPress={() => {
 							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -274,7 +275,7 @@ export function PageDetailScreen({
 				) : null}
 				{canComment ? (
 					<Stack.Toolbar.Button
-						icon={commentMode ? "viewfinder.circle.fill" : "viewfinder"}
+						icon={toolbarIcon(commentMode ? "commentModeOn" : "commentMode")}
 						accessibilityLabel={
 							commentMode
 								? t({ message: "Leave comment mode" })
@@ -288,7 +289,7 @@ export function PageDetailScreen({
 					/>
 				) : null}
 				<Stack.Toolbar.Button
-					icon="bubble.left.and.bubble.right"
+					icon={toolbarIcon("comments")}
 					accessibilityLabel={t({ message: "Show all comments" })}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -300,7 +301,7 @@ export function PageDetailScreen({
 					}}
 				/>
 				<Stack.Toolbar.Button
-					icon="square.and.arrow.up"
+					icon={toolbarIcon("share")}
 					accessibilityLabel={t({ message: "Share this page" })}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

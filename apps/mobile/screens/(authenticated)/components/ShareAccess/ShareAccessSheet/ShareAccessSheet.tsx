@@ -14,6 +14,7 @@ import { type ReactNode, useState } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { toolbarIcon } from "@/lib/navigation";
 import type { GeneralAccess } from "../types";
 import { granteeRefOf } from "../utils/granteeRefOf";
 import { GeneralAccessRow } from "./components/GeneralAccessRow";
@@ -90,7 +91,7 @@ export function ShareAccessSheet({
 			<Stack.Toolbar placement="right">
 				<Stack.Toolbar.Button
 					accessibilityLabel={t({ message: "Done" })}
-					icon="checkmark"
+					icon={toolbarIcon("confirm")}
 					onPress={() => router.back()}
 				/>
 			</Stack.Toolbar>

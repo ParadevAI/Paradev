@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
+import { toolbarIcon } from "@/lib/navigation";
 
 // Native bottom toolbar bar buttons: UIKit owns sizing/placement, matching
 // the header buttons' glass. A custom Toolbar.View capsule (for a GitHub-style
@@ -31,7 +32,7 @@ export function ReviewOverlay({
 					: t({ message: "Send to chat" })}
 			</Stack.Toolbar.Button>
 			<Stack.Toolbar.Button
-				icon="text.line.first.and.arrowtriangle.forward"
+				icon={toolbarIcon("jumpToFile")}
 				accessibilityLabel={t({
 					message: "Jump to file",
 				})}

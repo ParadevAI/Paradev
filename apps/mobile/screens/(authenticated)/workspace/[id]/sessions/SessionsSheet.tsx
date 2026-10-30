@@ -11,6 +11,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { toolbarIcon } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	getHostTerminalsQueryKey,
@@ -142,7 +143,7 @@ export function SessionsSheet() {
 			{acpChat ? (
 				<Stack.Toolbar placement="right">
 					<Stack.Toolbar.Button
-						icon="plus"
+						icon={toolbarIcon("add")}
 						accessibilityLabel={t({
 							message: "New session",
 						})}

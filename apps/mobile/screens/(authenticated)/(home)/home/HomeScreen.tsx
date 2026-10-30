@@ -40,7 +40,7 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
-import { contentScrollsUnderHeader } from "@/lib/navigation";
+import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
@@ -791,7 +791,7 @@ export function HomeScreen() {
 				<Stack.Toolbar placement="right">
 					{voiceEnabled ? (
 						<Stack.Toolbar.Button
-							icon="waveform"
+							icon={toolbarIcon("voice")}
 							accessibilityLabel={t({ message: "Start voice mode" })}
 							onPress={() => {
 								void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -808,7 +808,7 @@ export function HomeScreen() {
 					) : null}
 					<Stack.Toolbar.Button
 						hidden={Boolean(selectedHost && hostOffline)}
-						icon="magnifyingglass"
+						icon={toolbarIcon("search")}
 						accessibilityLabel={t({
 							message: "Search workspaces",
 						})}

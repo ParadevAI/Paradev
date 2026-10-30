@@ -50,7 +50,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
-import { contentScrollsUnderHeader } from "@/lib/navigation";
+import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
@@ -1014,12 +1014,12 @@ export function WorkspaceScreen() {
 					{acpChat ? (
 						<Stack.Toolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}
-							icon="rectangle.stack"
+							icon={toolbarIcon("sessions")}
 							onPress={openSessions}
 						/>
 					) : null}
 					<Stack.Toolbar.Menu
-						icon="ellipsis"
+						icon={toolbarIcon("more")}
 						accessibilityLabel={t({ message: "Workspace actions" })}
 					>
 						<Stack.Toolbar.MenuAction icon="info.circle" onPress={openActions}>

@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { RefreshControl, useWindowDimensions, View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { toolbarIcon } from "@/lib/navigation";
 import { PageRow } from "./components/PageRow";
 import { type OrgPage, usePagesQuery } from "./hooks/usePages";
 import { type PageScope, usePagesFilterStore } from "./stores/pagesFilterStore";
@@ -57,11 +58,7 @@ export function PagesScreen() {
 		<>
 			<Stack.Toolbar placement="right">
 				<Stack.Toolbar.Menu
-					icon={
-						scope === "all"
-							? "line.3.horizontal.decrease"
-							: "line.3.horizontal.decrease.circle.fill"
-					}
+					icon={toolbarIcon(scope === "all" ? "filter" : "filterActive")}
 					accessibilityLabel={t({ message: "Filter pages" })}
 				>
 					{scopeOptions.map((option) => (

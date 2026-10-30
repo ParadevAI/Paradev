@@ -5,3 +5,4 @@ export type { GlassHeaderOptions } from "./glassHeaderOptions.types";
 export { sheetDetents, titledScreenOptions } from "./navigation";
 export { sheetHeaderOptions } from "./sheetHeaderOptions";
 export type { SheetHeaderOptions } from "./sheetHeaderOptions.types";
+export { toolbarIcon } from "./toolbarIcon";

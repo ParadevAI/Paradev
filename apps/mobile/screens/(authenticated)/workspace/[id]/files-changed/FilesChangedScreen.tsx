@@ -30,6 +30,7 @@ import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { toolbarIcon } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	anchorOf,
@@ -667,7 +668,7 @@ export function FilesChangedScreen() {
 				</Stack.Title>
 				<Stack.Toolbar placement="right">
 					<Stack.Toolbar.Menu
-						icon="ellipsis"
+						icon={toolbarIcon("more")}
 						accessibilityLabel={t({
 							message: "More actions",
 						})}

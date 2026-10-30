@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import type { ScrollViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
+import { toolbarIcon } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { isVoiceActive, useVoiceStore } from "@/lib/voice/voiceStore";
@@ -46,7 +47,7 @@ export function VoiceSheet() {
 			<Stack.Toolbar placement="right">
 				<Stack.Toolbar.Button
 					accessibilityLabel={t({ message: "Voice settings" })}
-					icon="slider.horizontal.3"
+					icon={toolbarIcon("voiceSettings")}
 					onPress={() => router.push("/(authenticated)/voice/settings")}
 				/>
 			</Stack.Toolbar>
@@ -79,7 +80,7 @@ export function VoiceSheet() {
 				<Stack.Toolbar.Spacer />
 				<Stack.Toolbar.Button
 					accessibilityLabel={t({ message: "End voice session" })}
-					icon="stop.fill"
+					icon={toolbarIcon("stop")}
 					variant="prominent"
 					tintColor="#ef4444"
 					onPress={() => {
