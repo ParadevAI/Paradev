@@ -82,7 +82,10 @@ function shiftIntoViewport(d: string): string {
 		}
 		const arity = ARITY[command.toUpperCase()];
 		if (!arity) throw new Error(`unsupported path command ${command}`);
-		const absolute = command === command.toUpperCase();
+		// A path's first moveto is absolute even when written as `m`.
+		const absolute =
+			command === command.toUpperCase() ||
+			(command === "m" && out.length === 1);
 		const values = tokens
 			.slice(index, index + arity.count)
 			.map((value, position) =>
