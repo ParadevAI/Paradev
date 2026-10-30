@@ -945,6 +945,75 @@
 				}
 			]
 		},
+		"sazabi_mcp": {
+			"displayName": "Sazabi",
+			"icon": "sazabi",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.sazabi.com/mcp",
+					"scopes": ["openid", "profile", "email", "offline_access", "mcp"],
+					"identity": {
+						"url": "https://api.platform.sazabi.com/api/auth/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				},
+				{
+					"type": "api_key",
+					"label": "Secret key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Sazabi secret key",
+							"description": "Sazabi \u2192 Settings \u2192 Secret keys \u2192 Create. A key scoped to one project limits the agent to that project.",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.sazabi.com/v1/me",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.organization.id",
+							"label": "$.organization.name"
+						},
+						"user": {
+							"id": "$.organization.id",
+							"label": "$.keyName"
+						}
+					},
+					"bind": {
+						"headers": {
+							"X-Sazabi-Secret-Key": "${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"vercel_mcp": {
 			"displayName": "Vercel",
 			"icon": "vercel",

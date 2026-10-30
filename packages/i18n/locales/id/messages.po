@@ -9966,6 +9966,9 @@ msgstr "Permintaan Tidak Valid"
 msgid "Invalid state parameter. Please try again."
 msgstr "Parameter state tidak valid. Silakan coba lagi."
 
+msgid "Investigate production logs and issues"
+msgstr "Selidiki log dan masalah produksi"
+
 msgid "Invitation canceled"
 msgstr "Undangan dibatalkan"
 

@@ -9966,6 +9966,9 @@ msgstr "無效請求"
 msgid "Invalid state parameter. Please try again."
 msgstr "state引數無效。請重試。"
 
+msgid "Investigate production logs and issues"
+msgstr "調查正式環境日誌與問題"
+
 msgid "Invitation canceled"
 msgstr "邀請已取消"
 

@@ -9966,6 +9966,9 @@ msgstr "Некорректный запрос"
 msgid "Invalid state parameter. Please try again."
 msgstr "Некорректный параметр state. Попробуйте ещё раз."
 
+msgid "Investigate production logs and issues"
+msgstr "Исследуйте логи и проблемы в продакшене"
+
 msgid "Invitation canceled"
 msgstr "Приглашение отменено"
 

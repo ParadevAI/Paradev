@@ -9966,6 +9966,9 @@ msgstr "無効なリクエスト"
 msgid "Invalid state parameter. Please try again."
 msgstr "stateパラメーターが無効です。もう一度お試しください。"
 
+msgid "Investigate production logs and issues"
+msgstr "本番環境のログと問題を調査"
+
 msgid "Invitation canceled"
 msgstr "招待をキャンセルしました"
 

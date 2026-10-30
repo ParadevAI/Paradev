@@ -9966,6 +9966,9 @@ msgstr "Richiesta non valida"
 msgid "Invalid state parameter. Please try again."
 msgstr "Parametro di stato non valido. Riprova."
 
+msgid "Investigate production logs and issues"
+msgstr "Indaga su log e problemi in produzione"
+
 msgid "Invitation canceled"
 msgstr "Invito annullato"
 

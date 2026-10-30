@@ -32,6 +32,7 @@ import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
 import { AutumnIcon } from "./components/AutumnIcon";
 import { PeecIcon } from "./components/PeecIcon";
 import { ResendIcon } from "./components/ResendIcon";
+import { SazabiIcon } from "./components/SazabiIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 /**
@@ -68,6 +69,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	sentry: { icon: SiSentry },
 	posthog: { icon: SiPosthog },
 	resend: { icon: ResendIcon },
+	sazabi: { icon: SazabiIcon, color: "#FF0027" },
 	linear: { icon: SiLinear },
 	supabase: { icon: SiSupabase, color: "#3ECF8E" },
 	context7: { icon: LuBookOpen },

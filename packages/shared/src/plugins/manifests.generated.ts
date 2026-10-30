@@ -819,6 +819,53 @@ export const FIRST_PARTY_MANIFESTS = {
 			}
 		]
 	} as const,
+	"sazabi": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "sazabi",
+		"version": "1.0.0",
+		"description": "Investigate production with Sazabi: ask questions about your logs and traces, find open issues, and check a deploy before you call it done.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"sazabi",
+			"logs",
+			"observability",
+			"opentelemetry",
+			"debugging",
+			"incidents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Sazabi",
+					"category": "Developer tools",
+					"icon": "sazabi"
+				},
+				"connector": {
+					"slug": "sazabi_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.sazabi.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "investigate-production",
+				"description": "Find out what is actually happening in production from Sazabi's logs, traces and issues before touching code — ask the logs a precise question, read the lines behind the answer, and separate the symptom from its cause. Use when the user reports a production error, a slow or failing endpoint, a customer complaint, an alert, or asks what is broken, what changed, or why something stopped working."
+			},
+			{
+				"name": "verify-a-deploy",
+				"description": "Check in Sazabi that a change you shipped works in production before you call the task done — compare error rates and new kinds of log lines before and after the deploy, confirm the fixed error stopped, and catch regressions early. Use after merging or deploying a fix or feature, when the user asks whether a deploy is healthy, did the fix work, or is it safe to move on."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

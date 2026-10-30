@@ -9966,6 +9966,9 @@ msgstr "잘못된 요청"
 msgid "Invalid state parameter. Please try again."
 msgstr "state 매개변수가 올바르지 않습니다. 다시 시도해 주세요."
 
+msgid "Investigate production logs and issues"
+msgstr "프로덕션 로그와 이슈 조사"
+
 msgid "Invitation canceled"
 msgstr "초대를 취소했습니다"
 

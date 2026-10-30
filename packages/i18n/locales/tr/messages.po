@@ -9966,6 +9966,9 @@ msgstr "Geçersiz istek"
 msgid "Invalid state parameter. Please try again."
 msgstr "Geçersiz state parametresi. Lütfen yeniden deneyin."
 
+msgid "Investigate production logs and issues"
+msgstr "Canlı ortam loglarını ve sorunlarını inceleyin"
+
 msgid "Invitation canceled"
 msgstr "Davet iptal edildi"
 

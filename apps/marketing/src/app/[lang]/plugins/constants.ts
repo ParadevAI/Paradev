@@ -111,6 +111,11 @@ export const CATALOG: {
 				displayName: "Resend",
 				description: msg({ message: "Send email and debug delivery" }),
 			},
+			{
+				name: "sazabi",
+				displayName: "Sazabi",
+				description: msg({ message: "Investigate production logs and issues" }),
+			},
 		],
 	},
 	{

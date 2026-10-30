@@ -9966,6 +9966,9 @@ msgstr "无效请求"
 msgid "Invalid state parameter. Please try again."
 msgstr "state参数无效。请重试。"
 
+msgid "Investigate production logs and issues"
+msgstr "调查生产环境日志和问题"
+
 msgid "Invitation canceled"
 msgstr "邀请已取消"
 

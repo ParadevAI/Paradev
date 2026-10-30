@@ -9966,6 +9966,9 @@ msgstr "Neplatný požadavek"
 msgid "Invalid state parameter. Please try again."
 msgstr "Neplatný parametr state. Zkuste to prosím znovu."
 
+msgid "Investigate production logs and issues"
+msgstr "Prošetřujte produkční logy a problémy"
+
 msgid "Invitation canceled"
 msgstr "Pozvánka zrušena"
 

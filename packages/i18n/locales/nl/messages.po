@@ -9966,6 +9966,9 @@ msgstr "Ongeldig verzoek"
 msgid "Invalid state parameter. Please try again."
 msgstr "Ongeldige state-parameter. Probeer het opnieuw."
 
+msgid "Investigate production logs and issues"
+msgstr "Onderzoek productielogs en issues"
+
 msgid "Invitation canceled"
 msgstr "Uitnodiging geannuleerd"
 

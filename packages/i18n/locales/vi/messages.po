@@ -9966,6 +9966,9 @@ msgstr "Yêu cầu không hợp lệ"
 msgid "Invalid state parameter. Please try again."
 msgstr "Tham số state không hợp lệ. Vui lòng thử lại."
 
+msgid "Investigate production logs and issues"
+msgstr "Điều tra log và sự cố production"
+
 msgid "Invitation canceled"
 msgstr "Đã hủy lời mời"
 
