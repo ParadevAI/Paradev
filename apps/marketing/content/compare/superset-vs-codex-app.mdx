@@ -1,108 +1,130 @@
 ---
-title: "Paradev vs Codex App (2026): Agent-Agnostic Workspace vs OpenAI's Coding Surface"
-description: "Compare Paradev and the OpenAI Codex app for parallel AI coding. See how an agent-agnostic worktree workspace differs from Codex inside the ChatGPT desktop app."
+title: "Paradev vs Codex App (2026): Codex Plus Every Other Agent, or OpenAI's Coding Surface"
+description: "Compare Paradev and the OpenAI Codex app in the ChatGPT desktop app for parallel AI coding: worktrees, scheduled tasks, phone control, platforms, and pricing, checked against OpenAI's docs."
 date: 2026-07-13
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-29
 type: "1v1"
 competitors:
   - codex-app
 keywords:
   - superset vs codex app
+  - paradev vs codex app
   - codex app alternative
   - codex app
   - openai codex app
-  - codex worktrees
+  - codex app worktrees
+  - codex app remote control
   - codex cloud agents
 ---
 
-Codex is OpenAI's coding agent, offered as one product across a terminal CLI, IDE extensions, a cloud service, and -- since July 2026 -- a dedicated coding surface inside the unified ChatGPT desktop app on macOS and Windows. The Codex app now runs parallel chats in local Git worktrees as well as cloud task environments, and since OpenAI's DevDay on September 29, 2026, you can drive Codex on your computer from the ChatGPT iOS app, which makes it a closer comparison to Paradev than it used to be. The remaining difference is the biggest one: Codex runs OpenAI's agent; Paradev runs all of them.
+Choose Paradev (formerly Superset) if you want Codex as one of several agents, next to Claude Code, OpenCode, or Cursor Agent, each in its own Git worktree. Choose the Codex app if you only use Codex and want it bundled with ChatGPT. The Codex app is now part of the [ChatGPT desktop app](https://learn.chatgpt.com/docs/app): it runs parallel Codex chats in local worktrees, schedules tasks, and lets you control a Mac or Windows computer from ChatGPT on iOS or Android. The biggest difference is simple: the Codex app runs OpenAI's agent; Paradev runs all of them.
 
-For the terminal-focused comparison, see [Paradev vs Codex CLI](/compare/superset-vs-codex).
+**Our recommendation: choose Paradev if you run more than one agent, or want the same worktrees, review, and automations whichever agent you pick.** Stay with the Codex app if you are standardized on OpenAI.
+
+[Download Paradev](/download) to run Codex in a workspace, or see [Best Codex App Alternatives](/compare/codex-app-alternative) for other options. For the terminal comparison, see [Paradev vs Codex CLI](/compare/superset-vs-codex). Codex facts were checked against OpenAI's documentation and changelog on October 29, 2026.
 
 ---
 
-## At a Glance
+## The Short Version
 
 | | **Paradev** | **Codex App** |
 |---|---|---|
-| **Category** | Local-first agent orchestration workspace | OpenAI's coding surface in the ChatGPT desktop app |
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, and browser | Runs parallel Codex chats in local worktrees plus cloud task environments |
-| **Agent support** | Any CLI agent (Claude Code, Codex, Antigravity CLI, Cursor's agent, Copilot CLI, Amp, OpenCode, and more) | OpenAI Codex (GPT-6.1 Sol and the GPT-6 family) |
-| **Isolation** | Automatic local Git worktrees for local branch-based workspaces | Worktree mode per chat (Codex-managed checkouts) or per-task cloud environments |
-| **Where code runs** | Your local machine, any macOS or Linux host you add through Remote Access, or a cloud workspace | Your machine, SSH hosts, or OpenAI-managed cloud environments |
-| **Platforms** | Desktop (macOS; experimental Linux AppImage; Windows unavailable), iPhone and iPad app, CLI, MCP server | macOS and Windows desktop (Linux in preview), CLI, IDE extensions, web, ChatGPT iOS app |
-| **Scheduling** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot | Scheduled tasks on background worktrees or in cloud |
-| **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Included with all ChatGPT plans (Free and up); usage scales by tier |
-| **License** | Source-available (ELv2) | Proprietary (Codex CLI is open source) |
+| **Category** | Desktop workspace for CLI coding agents | OpenAI's coding surface in the ChatGPT desktop app |
+| **Agents** | Any CLI agent: Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, and more | OpenAI Codex, with models such as GPT-6.1 Sol and GPT-6.1 Terra |
+| **Isolation** | Git worktree and branch for each local branch-based workspace | Local or Worktree chats; Codex Cloud runs tasks in cloud environments |
+| **Where code runs** | Your machine, any macOS or Linux host you add through Remote Access, or a cloud workspace | Your machine, SSH hosts, or OpenAI's cloud |
+| **Mobile** | iPhone and iPad app for your hosts and cloud workspaces (Pro) | ChatGPT on iOS or Android controls a Mac or Windows host |
+| **Scheduling** | Automations on a schedule or from GitHub, Slack, Linear, Sentry, and other events | Scheduled tasks in your project or on a background worktree; Team Tasks in the cloud |
+| **Platforms** | macOS; experimental Linux AppImage; Windows unavailable; CLI; MCP server | ChatGPT desktop app on macOS and Windows, Linux in preview; CLI; IDE extensions; web |
+| **Pricing** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Included in ChatGPT Free, Go, Plus, Pro, Business, Edu, and Enterprise |
+| **License** | Source-available (ELv2) | Proprietary (the Codex CLI is open source) |
 
----
+## Why Look for a Codex App Alternative?
 
-## What Is Paradev?
+- **You run more than one agent.** You want Claude Code or OpenCode beside Codex, or two agents on the same task.
+- **You do not want to tie your workflow to one vendor.** In Paradev, worktrees, review, and automations stay the same when you change agents.
+- **You want plain worktrees.** OpenAI's docs say handoff works with app-managed worktrees, not ones you create yourself. Paradev's worktrees are ordinary checkouts any tool can enter.
+- **You want a Linux host.** Codex phone control supports Mac and Windows hosts. Paradev's mobile app reaches any macOS or Linux host you add.
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access, and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+## Paradev and the Codex App, Side by Side
 
-## What Is the Codex App?
+### Paradev
 
-Codex is OpenAI's agentic coding system, delivered as one product with a shared account, configuration, and usage limits: a terminal CLI, IDE extensions for VS Code, JetBrains, and Xcode, a cloud agent, and a web experience. In July 2026, the standalone Codex desktop app merged into the unified ChatGPT desktop app, where Codex is a dedicated coding surface you can set as the default view, available on every ChatGPT plan including Free. On desktop, each chat started in Worktree mode gets its own Codex-managed local checkout, so multiple chats work the same project in parallel without interference, and Handoff moves a chat between local, worktree, and remote execution. Cloud tasks still run in per-task OpenAI-managed environments, scheduled tasks can run on background worktrees or in the cloud, and code review spans inline diff editing, PR side panels, and multi-repository review. Current models are GPT-6.1 Sol, the default since October 2026, and the GPT-6 family (Sol, Luna, Astra). At DevDay on September 29, 2026, OpenAI added reusable cloud environments, Code Review in the desktop app with automatic first-pass reviews, and remote connections: pair the ChatGPT iOS app with a Mac or Windows computer running the desktop app to start, steer, and review Codex tasks there from your phone. A Linux desktop app has been in preview since August 2026.
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Amp, and other agents in their own Git worktrees with persistent terminal sessions, on your own subscriptions and keys. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with checks and review threads, a file editor, an in-app browser with Design Mode, port management, and an MCP server. It runs on machines you own through Remote Access and in cloud workspaces, and automations start agent sessions on a schedule or from an event. You can open any workspace in VS Code, Cursor, JetBrains, Zed, or Xcode. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Source-available under Elastic License 2.0 (ELv2).
+
+### The Codex App
+
+Codex is OpenAI's coding agent, offered as a CLI, IDE extensions, Codex Cloud, and a desktop app. The desktop app is now part of the ChatGPT desktop app, where you switch between ChatGPT and Codex. Codex chats run in Local mode, in your project folder, or in Worktree mode, where each chat gets a [Git worktree created from your checkout](https://learn.chatgpt.com/docs/environments/git-worktrees) so several tasks can run in one project without interfering. Handoff moves a chat between Local and Worktree. [Scheduled tasks](https://learn.chatgpt.com/docs/automations) run in your project or on a dedicated background worktree, and Team Tasks run in the cloud. [Remote connections](https://learn.chatgpt.com/docs/remote-connections) let you control a Mac or Windows host from ChatGPT on iOS or Android, continue chats from another desktop, and work on projects over SSH. On October 14, 2026, OpenAI retired GPT-5.5 in Codex for ChatGPT sign-ins in favor of GPT-6.1 Sol, and on October 26 added GPT-6.1 Terra.
 
 ## Key Differences
 
-### One Vendor's Suite vs Agent-Agnostic
+### One Vendor's Agent vs Any Agent
 
-This is now the core difference. The Codex app runs OpenAI's Codex agent on OpenAI's models. Paradev is agent-agnostic: it runs Codex itself as one of many agents, alongside Claude Code, OpenCode, Cursor, Gemini, and others, all in the same workspace -- fan one task across different agents and compare results, or pick the best agent per job. If you want to standardize on OpenAI's stack, the Codex app is cohesive and deeply integrated with ChatGPT. If you want to mix agents or avoid tying your workflow to one vendor, that is exactly what Paradev is built for.
+The Codex app runs OpenAI's Codex agent on OpenAI's models. Paradev runs Codex as one of many agents, alongside Claude Code, OpenCode, Cursor Agent, Gemini CLI, and others, in the same workspace. Give one task to two agents and compare the results, or pick the best agent for each job. If you want to standardize on OpenAI, the Codex app is cohesive and tied into ChatGPT.
 
-### Worktrees on Both Sides Now
+### Worktrees on Both Sides
 
-Earlier versions of this comparison could say "local worktrees vs cloud environments." That is no longer accurate: the Codex desktop app runs parallel chats in Codex-managed local worktrees, keeps a rolling set of recent ones, and can hand sessions off between machines. Paradev's worktree model remains broader in one specific way -- worktrees are ordinary checkouts of your repo that any agent, terminal, or editor can enter, with persistent terminal sessions, an in-app browser, and port management attached, rather than checkouts managed around a single vendor's chats.
+Both run parallel work in local Git worktrees. The Codex app manages its worktrees around Codex chats, and handoff works only with the worktrees it manages. Paradev's worktrees are ordinary checkouts of your repository that any agent, terminal, or editor can enter, with persistent terminals, an in-app browser, and port management attached, and Paradev can import worktrees you already have.
 
 ### Mobile and Remote Machines
 
-Both now reach your own machine from a phone. Codex pairs the ChatGPT iOS app with a Mac or Windows computer running the desktop app, and Handoff moves a chat to a worktree on another host. Paradev's iPhone and iPad app connects to cloud workspaces and to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not just Codex.
+Both reach your own machine from a phone. Codex pairs ChatGPT on iOS or Android with a Mac or Windows computer running the desktop app, which must be awake and online. Paradev's iPhone and iPad app connects to cloud workspaces and to any macOS or Linux host you add through Remote Access, with terminals and diff review for any agent running there, not only Codex.
 
-### Review and Environment
+### Scheduling and Automation
 
-With Codex cloud tasks, you configure the environment once and review returned diffs and logs; on desktop, review happens in the app's diff and PR panels. With Paradev, each agent runs in your existing checkout as a worktree, so the environment is whatever your machine already has -- private services, local databases, real dependencies -- and you review in the built-in diff editor or jump into your own IDE. Teams with complex local setups or offline constraints tend to prefer keeping the loop local; Codex's cloud tasks remain a strong fire-and-forget option for Codex, and Paradev's cloud workspaces also keep running without your own computer connected.
+Codex scheduled tasks run a prompt on a schedule in your project or a background worktree. Paradev automations start an agent session on a host you choose, on a schedule or from an event such as a GitHub pull request, a Slack message, a Linear issue, or a Sentry issue, with run history for your team.
 
 ### Pricing Model
 
-Codex is included with every ChatGPT plan, from Free up through Plus, Pro, Business, and Enterprise, with usage limits that scale by tier. Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces, and you bring your own agent providers -- including OpenAI -- so model spend stays with those providers.
+Codex is included in every ChatGPT plan: Free, Go ($8), Plus ($20), Pro (from $100), Business ($20 per user per month billed yearly), Edu, and Enterprise, with usage that scales by plan. Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces. You bring your own agent providers, including OpenAI, so model spend stays with them.
 
----
-
-## Which Should You Choose?
+## How To Choose
 
 **Choose Paradev if you:**
 
 - Run more than one agent, or want to avoid locking into a single vendor
 - Want worktrees that are plain checkouts any tool can enter, with terminals and a browser attached
-- Need your real local environment, private services, or offline work
-- Want orchestration, automations, and review for a mixed-agent fleet in one workspace
+- Want agents on a Linux host, or on any machine you own, reachable from your phone
+- Want event-triggered automations and review for a mixed-agent fleet in one workspace
 
 **Choose the Codex App if you:**
 
-- Are standardized on OpenAI and want a cohesive Codex + ChatGPT experience
-- Like Codex cloud tasks that run in OpenAI-managed environments
-- Already pay for a ChatGPT plan (or want to start free) with Codex bundled in
-- Want scheduled tasks and code review inside OpenAI's own surfaces
+- Are standardized on OpenAI and want Codex and ChatGPT in one app
+- Want Codex Cloud tasks in OpenAI-managed environments
+- Already pay for a ChatGPT plan, or want to start free, with Codex included
+- Want to control your computer from ChatGPT on Android as well as iOS
 
-**Verdict:** The Codex app has become a genuinely strong parallel-coding environment -- local worktrees, scheduled tasks, and cloud delegation, bundled with every ChatGPT plan. What it cannot be is neutral: it runs one vendor's agent. Paradev is the better fit if you want Codex as one option among many, running on your own machines or in cloud workspaces, with agent-agnostic orchestration, review, and automations around the whole fleet.
+## Verdict
 
----
+The Codex app is a strong parallel-coding environment: local worktrees, scheduled tasks, cloud tasks, and phone control, included in every ChatGPT plan. What it cannot be is neutral: it runs one vendor's agent. Paradev is the better fit if you want Codex as one option among many, on your own machines or in cloud workspaces, with the same orchestration, review, and automations for every agent.
+
+## What To Try First
+
+- **Bring Codex:** launch the Codex CLI in a Paradev workspace with your ChatGPT account.
+- **Add a second agent:** give the same task to Claude Code in another workspace and compare the diffs.
+- **Review in place:** inspect each diff and open a PR from the Changes pane.
+- **Leave your desk:** continue the task from the [iPhone app](/blog/claude-code-codex-iphone).
+
+[Download Paradev](/download), then see the [best IDE for Codex](/compare/best-ide-for-codex) guide.
 
 ## Frequently Asked Questions
 
 ### Is the Codex app still a separate desktop app?
 
-No. In July 2026 the standalone Codex app merged into the unified ChatGPT desktop app on macOS and Windows, where Codex is a dedicated coding surface you can set as your default view. The previous ChatGPT app was renamed ChatGPT Classic.
+No. OpenAI's docs describe the Codex app as part of the ChatGPT desktop app, a single workspace where you switch between ChatGPT and Codex.
 
 ### Does the Codex app use Git worktrees?
 
-Yes, as of 2026. Chats started in Worktree mode get their own Codex-managed local checkout, and parallel chats can work the same project without interference. Cloud tasks still run in OpenAI-managed per-task environments. Paradev's worktrees are ordinary repo checkouts usable by any agent or tool, not just one vendor's chats.
+Yes. Chats in Worktree mode get a Git worktree created from your local checkout, so several tasks can run in one project without interfering. Handoff moves a chat between Local and Worktree, and works only with the worktrees the app manages.
+
+### Can I control the Codex app from my phone?
+
+Yes. OpenAI's remote connections docs say you can control a host running the ChatGPT desktop app on macOS or Windows from ChatGPT on iOS or Android. The host must be awake, online, and signed in to the same account.
 
 ### Can Paradev run Codex?
 
-Yes. Paradev is agent-agnostic and runs the Codex CLI as one of many agents, each in its own worktree, alongside Claude Code, Antigravity CLI, Cursor's agent, OpenCode, and others. Its model picker includes GPT-6.1 Sol and the GPT-6 family.
+Yes. Paradev runs the Codex CLI as one of many agents, each in its own worktree, alongside Claude Code, Antigravity, Cursor Agent, OpenCode, and others, with a model and reasoning-effort picker for Codex.
 
 ### Which is cheaper?
 
-It depends on usage. Codex is bundled with all ChatGPT plans, including a free tier, with usage limits that scale by plan. Paradev has a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces, and you pay OpenAI directly for model usage.
+It depends on usage. Codex is included in every ChatGPT plan, including Free, with usage limits that scale by plan. Paradev has a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:team}}) and Ultra ({{price:ultra}}) plans with cloud workspaces, and you pay OpenAI directly for model usage.
