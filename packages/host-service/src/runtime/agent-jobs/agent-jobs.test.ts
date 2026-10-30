@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { AgentJobRunner, jobIdForCall } from "./agent-jobs";
@@ -182,5 +188,35 @@ describe("AgentJobRunner", () => {
 		const later = newRunner(() => Date.now() + 25 * 60 * 60 * 1000);
 		await later.sweep();
 		expect(() => later.get("s1", job.jobId)).toThrow();
+	});
+
+	it("a job the sweep cannot delete does not stop it deleting the others", async () => {
+		const finishedJob = async (sessionId: string) => {
+			const job = runner.start({
+				callId: `${sessionId}:call_8`,
+				sessionId,
+				workspaceId: "w1",
+				cwd,
+				command: "true",
+			});
+			await waitForEnd(sessionId, job.jobId);
+			return job;
+		};
+		const stuck = await finishedJob("s1");
+		const other = await finishedJob("s2");
+		const stuckLog = join(root, "not-removable");
+		mkdirSync(join(stuckLog, "inside"), { recursive: true });
+		const stuckMeta = join(root, "agent-jobs", "s1", `${stuck.jobId}.json`);
+		writeFileSync(
+			stuckMeta,
+			JSON.stringify({
+				...JSON.parse(readFileSync(stuckMeta, "utf8")),
+				logPath: stuckLog,
+			}),
+		);
+
+		const later = newRunner(() => Date.now() + 25 * 60 * 60 * 1000);
+		await later.sweep();
+		expect(() => later.get("s2", other.jobId)).toThrow();
 	});
 });
