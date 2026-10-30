@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { computeChecksStatus } from "./pr-resolution";
+import { computeChecksStatus, parseChecks } from "./pr-resolution";
 import type { GHPRResponse } from "./types";
 
 type CheckContext = NonNullable<GHPRResponse["statusCheckRollup"]>[number];
@@ -43,9 +43,32 @@ describe("computeChecksStatus", () => {
 		);
 	});
 
+	test("a check run that failed to start is a failure", () => {
+		expect(computeChecksStatus([conclusion("STARTUP_FAILURE")])).toBe(
+			"failure",
+		);
+		expect(
+			computeChecksStatus([state("SUCCESS"), conclusion("STARTUP_FAILURE")]),
+		).toBe("failure");
+	});
+
 	test("all success is success", () => {
 		expect(computeChecksStatus([state("SUCCESS"), state("SUCCESS")])).toBe(
 			"success",
 		);
+	});
+});
+
+describe("parseChecks", () => {
+	test("a check run that failed to start is a failure", () => {
+		expect(parseChecks([conclusion("STARTUP_FAILURE")])).toEqual([
+			{ name: "Unknown check", status: "failure", url: undefined },
+		]);
+	});
+
+	test("a stale check run stays pending", () => {
+		expect(parseChecks([conclusion("STALE")])).toEqual([
+			{ name: "Unknown check", status: "pending", url: undefined },
+		]);
 	});
 });

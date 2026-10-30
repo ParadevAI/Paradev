@@ -15,6 +15,8 @@ export const GHCheckContextSchema = z.object({
 			"TIMED_OUT",
 			"ACTION_REQUIRED",
 			"NEUTRAL",
+			"STARTUP_FAILURE",
+			"STALE",
 			"", // Can be empty string when in progress
 		])
 		.optional(),

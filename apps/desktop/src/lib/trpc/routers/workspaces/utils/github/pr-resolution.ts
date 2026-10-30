@@ -414,7 +414,9 @@ function mapReviewDecision(
 	return "pending";
 }
 
-function parseChecks(rollup: GHPRResponse["statusCheckRollup"]): CheckItem[] {
+export function parseChecks(
+	rollup: GHPRResponse["statusCheckRollup"],
+): CheckItem[] {
 	if (!rollup || rollup.length === 0) {
 		return [];
 	}
@@ -432,7 +434,8 @@ function parseChecks(rollup: GHPRResponse["statusCheckRollup"]): CheckItem[] {
 		} else if (
 			rawStatus === "FAILURE" ||
 			rawStatus === "ERROR" ||
-			rawStatus === "TIMED_OUT"
+			rawStatus === "TIMED_OUT" ||
+			rawStatus === "STARTUP_FAILURE"
 		) {
 			status = "failure";
 		} else if (rawStatus === "SKIPPED" || rawStatus === "NEUTRAL") {
@@ -464,6 +467,7 @@ export function computeChecksStatus(
 			status === "FAILURE" ||
 			status === "ERROR" ||
 			status === "TIMED_OUT" ||
+			status === "STARTUP_FAILURE" ||
 			// A cancelled run never produced a real verdict — treat it as a
 			// failure rather than falling through to "success".
 			status === "CANCELLED"
