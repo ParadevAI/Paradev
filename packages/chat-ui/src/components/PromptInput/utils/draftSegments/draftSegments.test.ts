@@ -130,6 +130,23 @@ describe("draft segments", () => {
 		expect(prompt).toBe("- one\n\ntwo");
 	});
 
+	test("a saved state this build cannot read loads from its markdown", () => {
+		const unknown = {
+			type: "editor",
+			state: {
+				root: {
+					type: "root",
+					children: [{ type: "from-a-newer-build", version: 1 }],
+				},
+			},
+			text: "- kept",
+		} as unknown as ComposerDraftSegment;
+		const broken = { type: "editor" } as unknown as ComposerDraftSegment;
+		expect(append([unknown]).prompt).toBe("- kept");
+		expect(append([broken]).prompt).toBe("");
+		expect(draftChips([broken])).toEqual([]);
+	});
+
 	test("an empty editor has no draft", () => {
 		expect(append([]).draft).toEqual([]);
 		expect(append([{ type: "text", text: "- " }]).draft).toEqual([]);

@@ -775,7 +775,7 @@ export function ComposerBody({
 					editor.update(() => $insertChipAtSelection(chip));
 					return true;
 				}
-				if (isFromThisComposer(event.clipboardData)) return false;
+				if (!asText && isFromThisComposer(event.clipboardData)) return false;
 				const text = normalizePastedText(raw);
 				event.preventDefault();
 				if (isLargePaste(text)) {

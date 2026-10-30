@@ -168,6 +168,21 @@ function $importMarkdown(markdown: string): LexicalNode[] {
 	return $getRoot().getChildren();
 }
 
+/** A saved state this build cannot read, such as one from a newer build, loads from its markdown. */
+function $importEditorSegment(
+	segment: Extract<ComposerDraftSegment, { type: "editor" }>,
+): LexicalNode[] {
+	try {
+		return segment.state.root.children.map((child) =>
+			$parseSerializedNode(child),
+		);
+	} catch {
+		return $importMarkdown(
+			typeof segment.text === "string" ? segment.text : "",
+		);
+	}
+}
+
 /**
  * Appends the segments after the editor's content, replacing it when it is
  * empty. Text and editor segments are blocks, a blank line apart; a chip goes
@@ -193,9 +208,7 @@ export function $appendDraftSegments(
 		const imported =
 			segment.type === "text"
 				? $importMarkdown(segment.text)
-				: segment.state.root.children.map((child) =>
-						$parseSerializedNode(child),
-					);
+				: $importEditorSegment(segment);
 		if (imported.length === 0) continue;
 		if (blocks.length > 0) blocks.push($createParagraphNode());
 		blocks.push(...imported);
@@ -218,7 +231,10 @@ export function draftChips(
 ): ComposerChip[] {
 	return segments.flatMap((segment) => {
 		if (segment.type === "chip") return [segment.chip];
-		if (segment.type === "editor") return chipsIn(segment.state.root);
+		if (segment.type === "editor") {
+			const root = segment.state?.root;
+			return root ? chipsIn(root) : [];
+		}
 		return [];
 	});
 }
