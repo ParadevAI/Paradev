@@ -13212,6 +13212,9 @@ msgstr "在新分頁中開啟更改面板，或聚焦現有面板"
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "從<0>下載項目</0>資料夾開啟磁碟映像檔"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "開啟檔案以檢視完整內容或進行編輯。"
+
 msgid "Open the global command palette"
 msgstr "開啟全域性命令面板"
 
@@ -19386,6 +19389,9 @@ msgstr "每次會話的 Token，近 30 天"
 
 msgid "Tokens stay off your machine"
 msgstr "權杖不會留在你的裝置上"
+
+msgid "Too large to expand"
+msgstr "檔案過大，無法展開"
 
 msgid "Too many dictations. Try again later."
 msgstr "語音輸入次數過多，請稍後再試。"

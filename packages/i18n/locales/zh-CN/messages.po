@@ -13212,6 +13212,9 @@ msgstr "在新标签页中打开更改面板，或聚焦现有面板"
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "从<0>下载</0>文件夹打开磁盘映像"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "打开文件以查看全部内容或进行编辑。"
+
 msgid "Open the global command palette"
 msgstr "打开全局命令面板"
 
@@ -19386,6 +19389,9 @@ msgstr "每次会话的 Token，近 30 天"
 
 msgid "Tokens stay off your machine"
 msgstr "令牌不会留在你的设备上"
+
+msgid "Too large to expand"
+msgstr "文件过大，无法展开"
 
 msgid "Too many dictations. Try again later."
 msgstr "语音输入次数过多，请稍后再试。"

@@ -13212,6 +13212,9 @@ msgstr "Opent het wijzigingenpaneel in een nieuw tabblad, of focust het bestaand
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Open de schijfkopie vanuit je map <0>Downloads</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Open het bestand om het volledig te zien of te bewerken."
+
 msgid "Open the global command palette"
 msgstr "Het globale opdrachtenpalet openen"
 
@@ -19386,6 +19389,9 @@ msgstr "tokens per sessie, laatste 30 dagen"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokens blijven van je machine af"
+
+msgid "Too large to expand"
+msgstr "Te groot om uit te vouwen"
 
 msgid "Too many dictations. Try again later."
 msgstr "Te veel dicteeropdrachten. Probeer het later opnieuw."

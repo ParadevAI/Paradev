@@ -13212,6 +13212,9 @@ msgstr "Mở bảng thay đổi trong tab mới, hoặc chuyển tiêu điểm �
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Mở tệp ảnh đĩa từ thư mục <0>Tải về</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Mở tệp để xem toàn bộ hoặc chỉnh sửa."
+
 msgid "Open the global command palette"
 msgstr "Mở bảng lệnh toàn cục"
 
@@ -19386,6 +19389,9 @@ msgstr "token mỗi phiên, 30 ngày gần nhất"
 
 msgid "Tokens stay off your machine"
 msgstr "Token không nằm trên máy của bạn"
+
+msgid "Too large to expand"
+msgstr "Quá lớn để mở rộng"
 
 msgid "Too many dictations. Try again later."
 msgstr "Quá nhiều lượt đọc chính tả. Hãy thử lại sau."

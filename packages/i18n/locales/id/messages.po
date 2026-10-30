@@ -13212,6 +13212,9 @@ msgstr "Buka panel Perubahan di tab baru, atau fokuskan yang sudah ada"
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Buka image disk dari folder <0>Unduhan</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Buka file untuk melihat seluruhnya atau mengeditnya."
+
 msgid "Open the global command palette"
 msgstr "Buka command palette global"
 
@@ -19386,6 +19389,9 @@ msgstr "token per sesi, 30 hari terakhir"
 
 msgid "Tokens stay off your machine"
 msgstr "Token tidak tersimpan di mesin Anda"
+
+msgid "Too large to expand"
+msgstr "Terlalu besar untuk diperluas"
 
 msgid "Too many dictations. Try again later."
 msgstr "Terlalu banyak dikte. Coba lagi nanti."

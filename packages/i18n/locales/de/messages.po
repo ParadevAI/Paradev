@@ -13212,6 +13212,9 @@ msgstr "Öffnet den Änderungen-Bereich in einem neuen Tab oder fokussiert den b
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Öffne das Disk-Image aus deinem Ordner <0>Downloads</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Öffne die Datei, um sie vollständig zu sehen oder zu bearbeiten."
+
 msgid "Open the global command palette"
 msgstr "Die globale Befehlspalette öffnen"
 
@@ -19386,6 +19389,9 @@ msgstr "Tokens pro Sitzung, letzte 30 Tage"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokens bleiben nicht auf deiner Maschine"
+
+msgid "Too large to expand"
+msgstr "Zu groß zum Aufklappen"
 
 msgid "Too many dictations. Try again later."
 msgstr "Zu viele Diktate. Versuche es später erneut."

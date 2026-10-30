@@ -13212,6 +13212,9 @@ msgstr "Değişiklikler panelini yeni sekmede açar veya mevcut olana odaklanır
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Disk görüntüsünü <0>İndirilenler</0> klasöründen aç"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Tamamını görmek veya düzenlemek için dosyayı aç."
+
 msgid "Open the global command palette"
 msgstr "Genel komut paletini aç"
 
@@ -19386,6 +19389,9 @@ msgstr "oturum başına token, son 30 gün"
 
 msgid "Tokens stay off your machine"
 msgstr "Belirteçler makinenizde saklanmaz"
+
+msgid "Too large to expand"
+msgstr "Genişletmek için çok büyük"
 
 msgid "Too many dictations. Try again later."
 msgstr "Çok fazla sesle yazma isteği. Daha sonra yeniden deneyin."

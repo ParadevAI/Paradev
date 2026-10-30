@@ -13212,6 +13212,9 @@ msgstr "Открывает панель изменений в новой вкл�
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Откройте образ диска из папки <0>Загрузки</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Откройте файл, чтобы увидеть его целиком или отредактировать."
+
 msgid "Open the global command palette"
 msgstr "Открыть глобальную палитру команд"
 
@@ -19386,6 +19389,9 @@ msgstr "токенов за сессию, последние 30 дней"
 
 msgid "Tokens stay off your machine"
 msgstr "Токены не хранятся на вашем компьютере"
+
+msgid "Too large to expand"
+msgstr "Слишком большой, чтобы развернуть"
 
 msgid "Too many dictations. Try again later."
 msgstr "Слишком много диктовок. Повторите попытку позже."

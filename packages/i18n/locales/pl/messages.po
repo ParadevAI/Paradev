@@ -13212,6 +13212,9 @@ msgstr "Otwiera panel zmian w nowej karcie lub aktywuje istniejący"
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Otwórz obraz dysku z folderu <0>Pobrane rzeczy</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Otwórz plik, aby zobaczyć całość lub go edytować."
+
 msgid "Open the global command palette"
 msgstr "Otwórz globalną paletę poleceń"
 
@@ -19386,6 +19389,9 @@ msgstr "tokenów na sesję, ostatnie 30 dni"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokeny nie trafiają na Twój komputer"
+
+msgid "Too large to expand"
+msgstr "Za duży, aby rozwinąć"
 
 msgid "Too many dictations. Try again later."
 msgstr "Zbyt wiele dyktowań. Spróbuj ponownie później."

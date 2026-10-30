@@ -13212,6 +13212,9 @@ msgstr "변경 패널을 새 탭에서 열거나 기존 패널에 포커스합�
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "<0>다운로드</0> 폴더에서 디스크 이미지를 여세요"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "파일을 열어 전체를 보거나 편집하세요."
+
 msgid "Open the global command palette"
 msgstr "전역 명령 팔레트를 엽니다"
 
@@ -19386,6 +19389,9 @@ msgstr "세션당 토큰, 최근 30일"
 
 msgid "Tokens stay off your machine"
 msgstr "토큰은 내 머신에 남지 않습니다"
+
+msgid "Too large to expand"
+msgstr "너무 커서 펼칠 수 없음"
 
 msgid "Too many dictations. Try again later."
 msgstr "받아쓰기 요청이 너무 많습니다. 나중에 다시 시도하세요."

@@ -13212,6 +13212,9 @@ msgstr "Apre il pannello delle modifiche in una nuova scheda, o attiva quello es
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Apri l'immagine disco dalla cartella <0>Download</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Apri il file per vederlo per intero o modificarlo."
+
 msgid "Open the global command palette"
 msgstr "Apri la palette dei comandi globale"
 
@@ -19386,6 +19389,9 @@ msgstr "token per sessione, ultimi 30 giorni"
 
 msgid "Tokens stay off your machine"
 msgstr "I token non vengono salvati sulla tua macchina"
+
+msgid "Too large to expand"
+msgstr "Troppo grande da espandere"
 
 msgid "Too many dictations. Try again later."
 msgstr "Troppe dettature. Riprova più tardi."

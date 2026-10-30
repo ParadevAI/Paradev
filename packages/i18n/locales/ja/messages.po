@@ -13212,6 +13212,9 @@ msgstr "変更ペインを新しいタブで開くか、既存のペインにフ
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "<0>ダウンロード</0>フォルダからディスクイメージを開く"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "ファイルを開くと、全体を表示したり編集したりできます。"
+
 msgid "Open the global command palette"
 msgstr "グローバルコマンドパレットを開く"
 
@@ -19386,6 +19389,9 @@ msgstr "直近30日のセッションあたりトークン"
 
 msgid "Tokens stay off your machine"
 msgstr "トークンはマシンに残らない"
+
+msgid "Too large to expand"
+msgstr "大きすぎて展開できません"
 
 msgid "Too many dictations. Try again later."
 msgstr "音声入力の回数が多すぎます。しばらくしてからもう一度お試しください。"

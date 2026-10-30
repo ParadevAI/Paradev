@@ -13212,6 +13212,9 @@ msgstr "Otevře panel Změny na nové kartě, nebo zaměří existující"
 msgid "Open the disk image from your <0>Downloads</0> folder"
 msgstr "Otevřete obraz disku ze složky <0>Stažené soubory</0>"
 
+msgid "Open the file to see all of it or edit it."
+msgstr "Otevřete soubor, abyste ho viděli celý nebo ho upravili."
+
 msgid "Open the global command palette"
 msgstr "Otevřít globální paletu příkazů"
 
@@ -19386,6 +19389,9 @@ msgstr "tokenů na relaci, posledních 30 dní"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokeny zůstávají mimo váš počítač"
+
+msgid "Too large to expand"
+msgstr "Příliš velký na rozbalení"
 
 msgid "Too many dictations. Try again later."
 msgstr "Příliš mnoho diktování. Zkuste to později."
