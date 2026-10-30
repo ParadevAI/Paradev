@@ -41,6 +41,7 @@
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"push": "drizzle-kit push",
 		"migrate": "drizzle-kit migrate",
+		"migrate:local": "bun run src/migrate-local.ts",
 		"studio": "drizzle-kit studio",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},

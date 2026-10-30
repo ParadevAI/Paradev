@@ -112,9 +112,9 @@ local_db_up() {
     return 1
   fi
 
-  # Postgres health != proxy ready. migrate uses direct pg, but seed (and the
-  # app) query through the neon-http proxy, which starts + bootstraps a beat
-  # later. Probe a real query so the seed never races a cold proxy.
+  # Postgres health != proxy ready. migrate, seed and the app all query through
+  # the neon-http proxy, which starts + bootstraps a beat later. Probe a real
+  # query so they never race a cold proxy.
   echo "  Waiting for neon-proxy to serve queries on :$LOCAL_NEON_PROXY_PORT..."
   local j proxy_ready=0
   for j in $(seq 1 30); do
@@ -158,8 +158,8 @@ local_db_up() {
 
 local_migrate() {
   echo "📜 Applying database migrations..."
-  if ! bun run db:migrate; then
-    error "db:migrate failed"
+  if ! bun run db:migrate:local; then
+    error "db:migrate:local failed"
     return 1
   fi
   success "Migrations applied"

@@ -42,7 +42,7 @@ validation, and `setup.local.sh` runs everything against a local Docker stack.
 1. Copies `.env.local.example` → `.env`
 2. Allocates a per-workspace port range so multiple worktrees don't collide
 3. Brings up Postgres + neon-proxy + Redis (behind an HTTP shim, for the relay) via `docker compose` (project-scoped to this worktree)
-4. Runs `bun install` and `bun run db:migrate`
+4. Runs `bun install` and `bun run db:migrate:local`
 5. Seeds a `Local Admin` dev account via `bun run db:seed-dev`
 6. Writes a gitignored `.superset/config.local.json` overlay so subsequent worktrees automatically use this setup
 
