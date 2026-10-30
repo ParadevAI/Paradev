@@ -9,7 +9,6 @@ import {
 import { FolderGit2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
-import type { SearchBarCommands } from "react-native-screens";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
@@ -22,7 +21,6 @@ import {
 	type HostWorkspaceItem,
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
-import { useTheme } from "@/hooks/useTheme";
 import {
 	type TerminalsHost,
 	useHostsTerminals,
@@ -32,6 +30,7 @@ import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloud
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -50,9 +49,9 @@ export function SearchScreen() {
 	const router = useRouter();
 	const navigation =
 		useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
-	const theme = useTheme();
-	const searchBarRef = useRef<SearchBarCommands>(null);
+	const searchBarRef = useRef<SearchBarHandle>(null);
 	const [query, setQuery] = useState("");
+	const clearQuery = useCallback(() => setQuery(""), []);
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 	const selectedHost = useSelectedHost();
 	const cloudScope = useWorkspaceScope() === "cloud";
@@ -187,20 +186,13 @@ export function SearchScreen() {
 					onPress={() => router.back()}
 				/>
 			</Stack.Toolbar>
-			<Stack.SearchBar
+			<SearchBar
 				ref={searchBarRef}
 				placeholder={t({
 					message: "Search workspaces",
 				})}
-				placement="stacked"
-				hideWhenScrolling={false}
-				hideNavigationBar={false}
-				obscureBackground={false}
-				textColor={theme.foreground}
-				hintTextColor={theme.mutedForeground}
-				tintColor={theme.foreground}
-				onChangeText={(event) => setQuery(event.nativeEvent.text)}
-				onCancelButtonPress={() => setQuery("")}
+				onChangeText={setQuery}
+				onCancel={clearQuery}
 			/>
 			<FlatList
 				className="bg-background"
