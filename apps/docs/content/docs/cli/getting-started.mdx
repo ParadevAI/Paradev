@@ -10,9 +10,9 @@ The CLI is currently in Beta. Commands and flags are still evolving. Make sure y
 The Paradev CLI (`superset`) is a single static binary that drives the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
 and the local host server from your terminal or from CI. Scripts and other
-agents use it to dispatch coding-agent tasks: one command creates a workspace
-on its own branch and starts Claude Code, Codex, or another agent with a prompt,
-and the result waits in the app for review. See
+agents can also use it to dispatch coding-agent tasks. One command creates a
+workspace on its own branch and starts Claude Code, Codex, or another agent
+with a prompt. The result waits in the app for review. See
 [Dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent).
 `paradev` is an alias for `superset`: every install below puts both on `PATH`,
 and either name runs the same binary.
@@ -175,10 +175,12 @@ superset terminals read --workspace <workspace-id> --terminal <terminal-id> --lo
 ```
 
 Each dispatched task opens in the desktop and iPhone apps like any other
-workspace, with its diff ready to review. Output is JSON by default when an
-agent or CI runs the CLI. Another agent can do the same through the
-[Paradev MCP server](/mcp-server), and an automation with a webhook trigger
-starts a run when any service sends a POST to its URL.
+workspace, with its diff ready to review. When an agent or CI runs the CLI,
+the output is JSON by default.
+
+Another agent can do the same through the [Paradev MCP server](/mcp-server).
+An automation with a webhook trigger starts a run when any service sends a
+POST to its URL.
 
 ## Trigger an automation
 

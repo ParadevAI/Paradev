@@ -31,9 +31,9 @@ The agents' own schedulers still work inside Paradev. Paradev launches the real 
 
 Jump to the question you have:
 
-- **Nightly maintenance you review in the morning:** a Paradev automation on a daily schedule runs in its own worktree, and the diff waits in Run History. [Nightly setup](#i-want-a-coding-agent-to-run-nightly-maintenance-and-leave-changes-for-me-to-review-in-the-morning-which-tools-fit).
-- **A weekly flaky-test agent that leaves a reviewable fix:** schedule it weekly, make it reproduce the flake before it edits, and have it stop with a report when it cannot prove a fix. [Flaky-test recipe and prompt](#how-can-i-schedule-a-coding-agent-to-investigate-flaky-tests-each-week-and-leave-a-reviewable-proposed-fix).
-- **Starting runs from a CLI or another agent:** `superset ws create --agent claude --prompt "..."` or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
+- **Nightly maintenance you review in the morning:** a Paradev automation on a daily schedule runs in its own worktree. The diff waits in **Run History**. [Nightly setup](#i-want-a-coding-agent-to-run-nightly-maintenance-and-leave-changes-for-me-to-review-in-the-morning-which-tools-fit).
+- **A weekly flaky-test agent that leaves a reviewable fix:** schedule it weekly and make it reproduce the flake before it edits. If it cannot prove a fix, it stops and writes a report. [Flaky-test recipe and prompt](#how-can-i-schedule-a-coding-agent-to-investigate-flaky-tests-each-week-and-leave-a-reviewable-proposed-fix).
+- **Starting runs from a CLI or another agent:** `superset workspaces create` with `--agent claude --prompt "..."`, or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
 
 The guide also compares the options and covers failure handling.
 
@@ -61,7 +61,7 @@ Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on t
 
 ## I want a coding agent to run nightly maintenance and leave changes for me to review in the morning. Which tools fit?
 
-In Paradev, create an automation with a daily schedule, a maintenance prompt, and an agent such as Claude Code or Codex. Each night it runs in a fresh worktree on the machine you pick, and in the morning you open the run from **Run History**, review the diff, and commit or discard it. The [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe has a ready prompt.
+In Paradev, create an automation with a daily schedule, a maintenance prompt, and an agent such as Claude Code or Codex. Each night it runs in a fresh worktree on the machine you pick. In the morning, open the run from **Run History**, review the diff, and commit or discard it. The [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe has a ready prompt.
 
 Other tools fit too, as long as they run unattended and write to a branch or workspace: GitHub Actions with a headless agent, Claude Code Routines or Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, and Devin. The choice comes down to where the code needs to run.
 
