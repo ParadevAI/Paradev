@@ -3,7 +3,6 @@ import path from "node:path";
 import {
 	buildWrapperScript,
 	createWrapper,
-	getManagedNotifyHookCommand,
 	MANAGED_NOTIFY_RELATIVE_PATH,
 	removeOwnedFileIfMarked,
 	writeFileIfChanged,
@@ -48,7 +47,13 @@ export const GROK_BLOCKING_NOTIFICATION_TYPES = [
 	"elicitation_dialog",
 ] as const;
 
-const GROK_MANAGED_HOOK_COMMAND = getManagedNotifyHookCommand("grok");
+// Grok will not run a hook whose text names an unset env var (`$X`, `${X:-}`),
+// so the home dir comes in through printenv as `$1` (#8375).
+export function getGrokManagedNotifyHookCommand(): string {
+	return `sh -c '[ -n "$1" ] && [ -x "$1/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=grok "$1/${MANAGED_NOTIFY_RELATIVE_PATH}" || true' sh "$(printenv SUPERSET_HOME_DIR)"`;
+}
+
+const GROK_MANAGED_HOOK_COMMAND = getGrokManagedNotifyHookCommand();
 
 // Vendor hook configs Superset also manages. Grok replays them in compat mode;
 // their events carry Claude's or Cursor's harness id, so the notify script
