@@ -1649,6 +1649,9 @@ msgstr "マニフェストと数個のスキルファイルだけ。Paradevが�
 msgid "a message from {authorName}"
 msgstr "{authorName}からのメッセージ"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev の新しいバージョンがあります。続けるには再読み込みしてください。"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "続行するには新しいバージョンのParadevが必要です。最新バージョンに更新してください。"
 
@@ -19855,6 +19858,12 @@ msgstr "命名指示を更新"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}の命名指示を更新"
+
+msgid "Update on Google Play"
+msgstr "Google Play でアップデート"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "続けるには Google Play から Paradev をアップデートしてください。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "そのデバイスで Paradev を更新してください。アプリ内からの更新には、対応するスタンドアロンインストールとリリース済みのアプリバージョンが必要です。"

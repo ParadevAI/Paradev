@@ -1649,6 +1649,9 @@ msgstr "Manifest i kilka plików umiejętności. Paradev umieszcza wtyczkę tam,
 msgid "a message from {authorName}"
 msgstr "wiadomość od {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Dostępna jest nowa wersja Paradev. Odśwież, aby kontynuować."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Do kontynuowania wymagana jest nowa wersja Paradev. Zaktualizuj do najnowszej wersji."
 
@@ -19855,6 +19858,12 @@ msgstr "Zaktualizuj instrukcje nazewnictwa"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Zaktualizuj instrukcje nazewnictwa dla {0}"
+
+msgid "Update on Google Play"
+msgstr "Zaktualizuj w Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Zaktualizuj Paradev w Google Play, aby kontynuować."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Zaktualizuj Paradev na tym urządzeniu. Aktualizacje z poziomu aplikacji wymagają obsługiwanej samodzielnej instalacji oraz wydanej wersji aplikacji."

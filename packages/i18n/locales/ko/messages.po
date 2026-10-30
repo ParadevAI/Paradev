@@ -1649,6 +1649,9 @@ msgstr "매니페스트와 스킬 파일 몇 개면 됩니다. Paradev가 각 �
 msgid "a message from {authorName}"
 msgstr "{authorName}님의 메시지"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 새 버전이 나왔습니다. 계속하려면 새로고침하세요."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "계속하려면 새 버전의 Paradev가 필요합니다. 최신 버전으로 업데이트해 주세요."
 
@@ -19855,6 +19858,12 @@ msgstr "이름 지정 지침 업데이트"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}의 이름 지정 지침 업데이트"
+
+msgid "Update on Google Play"
+msgstr "Google Play에서 업데이트"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "계속하려면 Google Play에서 Paradev를 업데이트하세요."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."

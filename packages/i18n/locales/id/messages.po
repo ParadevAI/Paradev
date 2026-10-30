@@ -1649,6 +1649,9 @@ msgstr "Sebuah manifest dan beberapa file skill. Paradev menaruhnya di tempat se
 msgid "a message from {authorName}"
 msgstr "pesan dari {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Versi baru Paradev sudah tersedia. Muat ulang untuk melanjutkan."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Versi baru Paradev diperlukan untuk melanjutkan. Silakan perbarui ke versi terbaru."
 
@@ -19855,6 +19858,12 @@ msgstr "Perbarui instruksi penamaan"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Perbarui instruksi penamaan untuk {0}"
+
+msgid "Update on Google Play"
+msgstr "Perbarui di Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Perbarui Paradev dari Google Play untuk melanjutkan."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Paradev di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."

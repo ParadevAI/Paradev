@@ -1,13 +1,12 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Trans } from "@lingui/react/macro";
-import { COMPANY } from "@superset/shared/constants";
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
-import { openUrl } from "@/lib/open-url";
+import { appUpdate } from "./utils/appUpdate";
 
 interface UpdateRequiredScreenProps {
 	message: string;
@@ -21,6 +20,7 @@ export function UpdateRequiredScreen({
 	minimumVersion,
 }: UpdateRequiredScreenProps) {
 	const theme = useTheme();
+	const { t } = useLingui();
 
 	useEffect(() => {
 		void SplashScreen.hideAsync().catch(() => {});
@@ -40,7 +40,7 @@ export function UpdateRequiredScreen({
 					<Trans>Update Required</Trans>
 				</Text>
 				<Text className="text-center text-base text-muted-foreground">
-					{message}
+					{appUpdate.message ? t(appUpdate.message) : message}
 				</Text>
 			</View>
 
@@ -53,14 +53,8 @@ export function UpdateRequiredScreen({
 				</Text>
 			</View>
 
-			<Button
-				size="lg"
-				className="w-4/5 max-w-sm"
-				onPress={() => openUrl(COMPANY.APP_STORE_URL)}
-			>
-				<Text>
-					<Trans>Update in the App Store</Trans>
-				</Text>
+			<Button size="lg" className="w-4/5 max-w-sm" onPress={appUpdate.open}>
+				<Text>{t(appUpdate.action)}</Text>
 			</Button>
 		</View>
 	);

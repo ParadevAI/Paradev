@@ -1649,6 +1649,9 @@ msgstr "Một manifest và vài file skill. Paradev đặt nó ở nơi mỗi ag
 msgid "a message from {authorName}"
 msgstr "một tin nhắn từ {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Đã có phiên bản Paradev mới. Hãy tải lại để tiếp tục."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Cần phiên bản Paradev mới để tiếp tục. Vui lòng cập nhật lên phiên bản mới nhất."
 
@@ -19855,6 +19858,12 @@ msgstr "Cập nhật quy tắc đặt tên"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Cập nhật quy tắc đặt tên cho {0}"
+
+msgid "Update on Google Play"
+msgstr "Cập nhật trên Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Hãy cập nhật Paradev từ Google Play để tiếp tục."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Cập nhật Paradev trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."

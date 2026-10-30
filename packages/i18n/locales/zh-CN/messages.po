@@ -1649,6 +1649,9 @@ msgstr "一个清单文件加几个技能文件。Paradev 会把它放到每个�
 msgid "a message from {authorName}"
 msgstr "来自 {authorName} 的消息"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 已有新版本。请重新加载以继续。"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "需要新版本的Paradev才能继续。请更新到最新版本。"
 
@@ -19855,6 +19858,12 @@ msgstr "更新命名规则"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名规则"
+
+msgid "Update on Google Play"
+msgstr "在 Google Play 中更新"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "请从 Google Play 更新 Paradev 以继续。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "请在该设备上更新 Paradev。应用内更新需要受支持的独立安装和已发布的应用版本。"

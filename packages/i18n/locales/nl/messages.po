@@ -1649,6 +1649,9 @@ msgstr "Een manifest en een paar skill-bestanden. Paradev zet hem waar elke agen
 msgid "a message from {authorName}"
 msgstr "een bericht van {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Er is een nieuwe versie van Paradev. Laad opnieuw om door te gaan."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Er is een nieuwe versie van Paradev nodig om verder te gaan. Werk bij naar de nieuwste versie."
 
@@ -19855,6 +19858,12 @@ msgstr "Naamgevingsinstructies bijwerken"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Naamgevingsinstructies bijwerken voor {0}"
+
+msgid "Update on Google Play"
+msgstr "Bijwerken via Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Werk Paradev bij via Google Play om door te gaan."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Werk Paradev bij op dat apparaat. Updates vanuit de app vereisen een ondersteunde zelfstandige installatie en een uitgebrachte appversie."
