@@ -6,8 +6,10 @@ import { THEME } from "@/lib/theme";
 const SIDE_WIDTH = 48;
 
 /** Drag handle, title and bar items, drawn in JS where the sheet has no native bar. */
-export function SheetHeader({ options, route }: NativeStackHeaderProps) {
-	const title = options.title ?? route.name;
+export function SheetHeader({ options }: NativeStackHeaderProps) {
+	// Never the route name: it is a file path, and a sheet that sets its title
+	// once its data loads would show that path until then.
+	const title = options.title ?? "";
 	const tintColor = THEME.dark.foreground;
 	const headerTitle =
 		typeof options.headerTitle === "function" ? (
