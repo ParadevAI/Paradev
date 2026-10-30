@@ -2,7 +2,6 @@ import { Plural, useLingui } from "@lingui/react/macro";
 import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import {
 	type NativeStackNavigationProp,
-	Stack,
 	useNavigation,
 	useRouter,
 } from "expo-router";
@@ -21,6 +20,7 @@ import {
 	type HostWorkspaceItem,
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
+import { HeaderToolbar } from "@/lib/navigation";
 import {
 	type TerminalsHost,
 	useHostsTerminals,
@@ -177,15 +177,15 @@ export function SearchScreen() {
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<SearchBar
 				ref={searchBarRef}
 				placeholder={t({

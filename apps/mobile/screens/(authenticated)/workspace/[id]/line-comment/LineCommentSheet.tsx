@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useCommentComposerStore } from "../stores/commentComposerStore";
@@ -62,9 +63,9 @@ export function LineCommentSheet() {
 						: t({ message: "Add comment" }),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
@@ -73,7 +74,7 @@ export function LineCommentSheet() {
 						router.back();
 					}}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentInsetAdjustmentBehavior="automatic"

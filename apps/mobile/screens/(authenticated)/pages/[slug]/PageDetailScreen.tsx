@@ -9,12 +9,7 @@ import {
 } from "@superset/shared/page-comments-runtime";
 import { pagePresenceUrl } from "@superset/shared/page-presence";
 import * as Haptics from "expo-haptics";
-import {
-	Stack,
-	useFocusEffect,
-	useLocalSearchParams,
-	useRouter,
-} from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -25,7 +20,7 @@ import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
-import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { usePageQuery } from "../hooks/usePages";
@@ -251,19 +246,19 @@ export function PageDetailScreen({
 	return (
 		<View className="bg-background flex-1">
 			{presentation === "sheet" ? (
-				<Stack.Toolbar placement="left">
-					<Stack.Toolbar.Button
-						icon="xmark"
+				<HeaderToolbar placement="left">
+					<HeaderToolbar.Button
+						icon="close"
 						accessibilityLabel={t({ message: "Close" })}
 						onPress={() => router.back()}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			) : null}
 
-			<Stack.Toolbar placement="right">
+			<HeaderToolbar placement="right">
 				{presentation === "sheet" ? (
-					<Stack.Toolbar.Button
-						icon={toolbarIcon("expand")}
+					<HeaderToolbar.Button
+						icon="expand"
 						accessibilityLabel={t({ message: "Open full screen" })}
 						onPress={() => {
 							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -275,8 +270,8 @@ export function PageDetailScreen({
 					/>
 				) : null}
 				{canComment ? (
-					<Stack.Toolbar.Button
-						icon={toolbarIcon(commentMode ? "commentModeOn" : "commentMode")}
+					<HeaderToolbar.Button
+						icon={commentMode ? "commentModeOn" : "commentMode"}
 						accessibilityLabel={
 							commentMode
 								? t({ message: "Leave comment mode" })
@@ -289,8 +284,8 @@ export function PageDetailScreen({
 						}}
 					/>
 				) : null}
-				<Stack.Toolbar.Button
-					icon={toolbarIcon("comments")}
+				<HeaderToolbar.Button
+					icon="comments"
 					accessibilityLabel={t({ message: "Show all comments" })}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -301,8 +296,8 @@ export function PageDetailScreen({
 						});
 					}}
 				/>
-				<Stack.Toolbar.Button
-					icon={toolbarIcon("share")}
+				<HeaderToolbar.Button
+					icon="share"
 					accessibilityLabel={t({ message: "Share this page" })}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -312,7 +307,7 @@ export function PageDetailScreen({
 						});
 					}}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 
 			{page.error || offline ? (
 				<View className="flex-1 items-center justify-center px-8">

@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +15,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useNewChatTargets";
@@ -141,9 +142,9 @@ export function BranchPickerScreen() {
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+			</HeaderToolbar>
 			{/* The formSheet's content wrapper special-cases its direct subviews:
 			    it expects [header, ScrollView] and sizes the ScrollView to the
 			    remainder (react-native-screens RNSScreenContentWrapper). Any

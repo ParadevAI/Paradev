@@ -26,6 +26,7 @@ import { ScrollView } from "react-native";
 import type { SearchBarCommands } from "react-native-screens";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { ValueMenu } from "../components/ValueMenu";
 import { SuggestionRow } from "./components/SuggestionRow";
@@ -166,17 +167,17 @@ export function ShareInviteScreen({
 						: t({ message: "Invite" }),
 				}}
 			/>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
 					accessibilityLabel={
 						newPeople ? t({ message: "Invite" }) : t({ message: "Share" })
 					}
-					icon="checkmark"
+					icon="submit"
 					variant={staged.length ? "prominent" : "plain"}
 					disabled={!staged.length || busy}
 					onPress={() => void submit()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<Stack.SearchBar
 				ref={searchBarRef}
 				placeholder={t({ message: "Names, emails, or teams" })}

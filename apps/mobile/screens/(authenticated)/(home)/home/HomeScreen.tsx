@@ -40,7 +40,7 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
-import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
@@ -788,10 +788,10 @@ export function HomeScreen() {
 				}}
 			/>
 			{selectedHost && hostOffline && !voiceEnabled ? null : (
-				<Stack.Toolbar placement="right">
+				<HeaderToolbar placement="right">
 					{voiceEnabled ? (
-						<Stack.Toolbar.Button
-							icon={toolbarIcon("voice")}
+						<HeaderToolbar.Button
+							icon="voice"
 							accessibilityLabel={t({ message: "Start voice mode" })}
 							onPress={() => {
 								void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -806,9 +806,9 @@ export function HomeScreen() {
 							}}
 						/>
 					) : null}
-					<Stack.Toolbar.Button
+					<HeaderToolbar.Button
 						hidden={Boolean(selectedHost && hostOffline)}
-						icon={toolbarIcon("search")}
+						icon="search"
 						accessibilityLabel={t({
 							message: "Search workspaces",
 						})}
@@ -817,7 +817,7 @@ export function HomeScreen() {
 							router.push("/(authenticated)/(home)/search");
 						}}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			)}
 			{selectedHost && hostOffline ? (
 				<View

@@ -12,6 +12,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { useStartWorkspaceTerminal } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useStartWorkspaceTerminal";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
@@ -158,15 +159,15 @@ export function FinishReviewSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentInsetAdjustmentBehavior="automatic"

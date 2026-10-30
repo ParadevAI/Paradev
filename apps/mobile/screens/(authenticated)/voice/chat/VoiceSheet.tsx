@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import type { ScrollViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { toolbarIcon } from "@/lib/navigation";
+import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { isVoiceActive, useVoiceStore } from "@/lib/voice/voiceStore";
@@ -37,33 +37,33 @@ export function VoiceSheet() {
 			<Stack.Screen
 				options={{ title: statusLabel || t({ message: "Voice" }) }}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Close" })}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
+			</HeaderToolbar>
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Voice settings" })}
-					icon={toolbarIcon("voiceSettings")}
+					icon="voiceSettings"
 					onPress={() => router.push("/(authenticated)/voice/settings")}
 				/>
-			</Stack.Toolbar>
-			<Stack.Toolbar placement="bottom">
-				<Stack.Toolbar.Button
+			</HeaderToolbar>
+			<HeaderToolbar placement="bottom">
+				<HeaderToolbar.Button
 					accessibilityLabel={
 						muted ? t({ message: "Unmute" }) : t({ message: "Mute" })
 					}
-					icon={muted ? "mic.slash.fill" : "mic.fill"}
+					icon={muted ? "micOff" : "mic"}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 						session.toggleMute();
 					}}
 				/>
-				<Stack.Toolbar.Spacer />
-				<Stack.Toolbar.View hidesSharedBackground>
+				<HeaderToolbar.Spacer />
+				<HeaderToolbar.View hidesSharedBackground>
 					<Pressable
 						style={{ width: ORB_SIZE, height: ORB_SIZE }}
 						accessibilityRole="button"
@@ -76,11 +76,11 @@ export function VoiceSheet() {
 					>
 						<VoiceOrb status={status} size={ORB_SIZE} />
 					</Pressable>
-				</Stack.Toolbar.View>
-				<Stack.Toolbar.Spacer />
-				<Stack.Toolbar.Button
+				</HeaderToolbar.View>
+				<HeaderToolbar.Spacer />
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "End voice session" })}
-					icon={toolbarIcon("stop")}
+					icon="stop"
 					variant="prominent"
 					tintColor="#ef4444"
 					onPress={() => {
@@ -88,7 +88,7 @@ export function VoiceSheet() {
 						session.end();
 					}}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				ref={scrollRef}
 				className="bg-background flex-1"

@@ -3,7 +3,7 @@ import { acpHarnessForPreset, presetForAnyHarness } from "@superset/chat/core";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SquareTerminal } from "lucide-react-native";
 import { useFeatureFlag } from "posthog-react-native";
 import { useState } from "react";
@@ -18,6 +18,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
@@ -234,15 +235,15 @@ export function NewSessionSheet() {
 			contentContainerClassName="px-5 pb-8"
 			contentInsetAdjustmentBehavior="automatic"
 		>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			{isLoading ? <View className="items-center py-8">{spinner}</View> : null}
 			{notice ? (
 				<View className="items-center gap-3 py-8">

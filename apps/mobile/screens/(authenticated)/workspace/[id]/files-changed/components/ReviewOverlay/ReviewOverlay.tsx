@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { Stack } from "expo-router";
-import { toolbarIcon } from "@/lib/navigation";
+
+import { HeaderToolbar } from "@/lib/navigation";
 import type { ReviewOverlayComponent } from "./ReviewOverlay.types";
 
 // A bottom toolbar here holds icon buttons only and drops a text one, so the
@@ -13,10 +13,10 @@ export const ReviewOverlay: ReviewOverlayComponent = ({
 }) => {
 	const { t } = useLingui();
 	return (
-		<Stack.Toolbar placement="bottom">
+		<HeaderToolbar placement="bottom">
 			{draftCount > 0 ? (
-				<Stack.Toolbar.Button
-					icon={toolbarIcon("send")}
+				<HeaderToolbar.Button
+					icon="send"
 					tintColor="#16a34a"
 					accessibilityLabel={
 						draftCount > 1
@@ -28,13 +28,13 @@ export const ReviewOverlay: ReviewOverlayComponent = ({
 					onPress={onFinishReview}
 				/>
 			) : null}
-			<Stack.Toolbar.Button
-				icon={toolbarIcon("jumpToFile")}
+			<HeaderToolbar.Button
+				icon="jumpToFile"
 				accessibilityLabel={t({
 					message: "Jump to file",
 				})}
 				onPress={onJumpToFile}
 			/>
-		</Stack.Toolbar>
+		</HeaderToolbar>
 	);
 };

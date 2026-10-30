@@ -50,7 +50,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
-import { contentScrollsUnderHeader, toolbarIcon } from "@/lib/navigation";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
@@ -1010,81 +1010,77 @@ export function WorkspaceScreen() {
 
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
-				<Stack.Toolbar placement="right">
+				<HeaderToolbar placement="right">
 					{acpChat ? (
-						<Stack.Toolbar.Button
+						<HeaderToolbar.Button
 							accessibilityLabel={t({ message: "Manage sessions" })}
-							icon={toolbarIcon("sessions")}
+							icon="sessions"
 							onPress={openSessions}
 						/>
 					) : null}
-					<Stack.Toolbar.Menu
-						icon={toolbarIcon("more")}
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({ message: "Workspace actions" })}
 					>
-						<Stack.Toolbar.MenuAction icon="info.circle" onPress={openActions}>
+						<HeaderToolbar.MenuAction icon="info" onPress={openActions}>
 							{t({ message: "Workspace details" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="pencil"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="rename"
 							onPress={() => void renameWorkspace()}
 						>
 							{t({ message: "Rename" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon={pinned ? "pin.slash" : "pin"}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon={pinned ? "unpin" : "pin"}
 							onPress={() => id && togglePin(id)}
 						>
 							{pinned ? t({ message: "Unpin" }) : t({ message: "Pin" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="bell.badge"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="markUnread"
 							onPress={() => id && setManualUnread(id)}
 						>
 							{t({ message: "Mark as Unread" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.Menu inline>
-							<Stack.Toolbar.Menu
-								icon="doc.on.doc"
-								title={t({ message: "Copy" })}
-								accessibilityLabel={t({ message: "Copy" })}
-							>
-								<Stack.Toolbar.MenuAction
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuSection>
+							<HeaderToolbar.Submenu icon="copy" title={t({ message: "Copy" })}>
+								<HeaderToolbar.MenuAction
 									onPress={() => copyLink(handleCopied)}
 								>
 									{t({ message: "Copy link" })}
-								</Stack.Toolbar.MenuAction>
-								<Stack.Toolbar.MenuAction onPress={() => copyId(handleCopied)}>
+								</HeaderToolbar.MenuAction>
+								<HeaderToolbar.MenuAction onPress={() => copyId(handleCopied)}>
 									{t({ message: "Copy ID" })}
-								</Stack.Toolbar.MenuAction>
-							</Stack.Toolbar.Menu>
-							<Stack.Toolbar.MenuAction
-								icon="square.and.arrow.up"
+								</HeaderToolbar.MenuAction>
+							</HeaderToolbar.Submenu>
+							<HeaderToolbar.MenuAction
+								icon="share"
 								onPress={() => shareWorkspace(anchorOf(shareAnchorRef))}
 							>
 								{t({ message: "Share" })}
-							</Stack.Toolbar.MenuAction>
-						</Stack.Toolbar.Menu>
-						<Stack.Toolbar.Menu inline>
+							</HeaderToolbar.MenuAction>
+						</HeaderToolbar.MenuSection>
+						<HeaderToolbar.MenuSection>
 							{cloud ? (
-								<Stack.Toolbar.MenuAction
-									icon="archivebox"
+								<HeaderToolbar.MenuAction
+									icon="archive"
 									onPress={deleteWorkspace}
 								>
 									{t({ message: "Archive workspace" })}
-								</Stack.Toolbar.MenuAction>
+								</HeaderToolbar.MenuAction>
 							) : (
-								<Stack.Toolbar.MenuAction
-									icon="trash"
+								<HeaderToolbar.MenuAction
+									icon="delete"
 									destructive
 									onPress={deleteWorkspace}
 								>
 									{t({ message: "Delete workspace" })}
-								</Stack.Toolbar.MenuAction>
+								</HeaderToolbar.MenuAction>
 							)}
-						</Stack.Toolbar.Menu>
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+						</HeaderToolbar.MenuSection>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			) : null}
 
 			{banner && activeTerminalId && !activeIsChat ? (

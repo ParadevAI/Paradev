@@ -6,6 +6,7 @@ import { Stack, useRouter } from "expo-router";
 import { Trash2 } from "lucide-react-native";
 import { Alert, ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
+import { HeaderToolbar } from "@/lib/navigation";
 import { ListRow } from "../../ListRow";
 import { ListRowCheck } from "../../ListRowCheck";
 
@@ -41,13 +42,13 @@ export function ShareGranteeSheet({
 	return (
 		<>
 			<Stack.Screen options={{ title: name }} />
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Close" })}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentInsetAdjustmentBehavior="automatic"
