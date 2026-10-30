@@ -14,14 +14,13 @@ import {
 	getDiffViewerStyle,
 } from "renderer/screens/main/components/WorkspaceView/utils/code-theme";
 import { useSettings } from "renderer/stores/settings";
-import { useResolvedTheme, useTerminalTheme } from "renderer/stores/theme";
+import { useResolvedTheme } from "renderer/stores/theme";
 import type { DiffAnnotationMetadata } from "../useDiffAnnotations";
 
 export function useDiffCodeViewTheme() {
 	const diffStyle = useSettings((s) => s.diffStyle);
 	const expandUnchanged = useSettings((s) => s.expandUnchanged);
 	const activeTheme = useResolvedTheme();
-	const terminalTheme = useTerminalTheme();
 	const { data: fontSettings } = useQuery({
 		queryKey: FONT_SETTINGS_QUERY_KEY,
 		queryFn: () => electronTrpcClient.settings.getFontSettings.query(),
@@ -37,7 +36,6 @@ export function useDiffCodeViewTheme() {
 	const editorFontSize = Number.isFinite(parsedEditorFontSize)
 		? parsedEditorFontSize
 		: DEFAULT_CODE_EDITOR_FONT_SIZE;
-	const surfaceBg = terminalTheme?.background ?? "var(--background)";
 
 	const style = useMemo(
 		() =>
@@ -58,7 +56,7 @@ export function useDiffCodeViewTheme() {
 				fontVariantLigatures: resolveFontVariantLigatures(
 					fontSettings?.editorLigatures ?? undefined,
 				),
-				backgroundColor: surfaceBg,
+				backgroundColor: "var(--background)",
 			}) as CSSProperties,
 		[
 			activeTheme,
@@ -68,20 +66,10 @@ export function useDiffCodeViewTheme() {
 			fontSettings?.editorLigatures,
 			fontSettings?.editorLineHeight,
 			editorFontSize,
-			surfaceBg,
 		],
 	);
 
-	const additionColor =
-		activeTheme.type === "dark"
-			? "var(--color-green-400)"
-			: "var(--color-green-700)";
-	const deletionColor =
-		activeTheme.type === "dark"
-			? "var(--color-red-500)"
-			: "var(--color-red-700)";
-
-	const options = useMemo<CodeViewOptions<DiffAnnotationMetadata>>(
+	const options = useMemo<CodeViewOptions<DiffAnnotationMetadata, undefined>>(
 		() => ({
 			diffStyle,
 			expandUnchanged,
@@ -116,7 +104,6 @@ export function useDiffCodeViewTheme() {
 				[data-diffs-header='default'] {
 					container-type: inline-size;
 					container-name: diff-header;
-					justify-content: flex-start;
 				}
 				[data-diffs-header='default'] [data-header-content] {
 					flex: 0 1 auto;
@@ -129,12 +116,9 @@ export function useDiffCodeViewTheme() {
 				[data-diffs-header='default'] [data-change-icon] {
 					display: none;
 				}
-				/* Match the file header bar to the DiffSectionBar background
-				 * (bg-muted/40 flattened over the pane background) so the
-				 * pinned section strip and the file title strip read as one.
-				 * Pierre paints these with --diffs-bg (the diff surface
-				 * color); the [data-sticky] selector is needed to out-rank
-				 * Pierre's own two-attribute sticky rule. */
+				/* bg-muted/40 flattened over the pane background. The
+				 * [data-sticky] selector out-ranks Pierre's own two-attribute
+				 * sticky rule. */
 				[data-diffs-header='default'],
 				[data-diffs-header='default'][data-sticky] {
 					background-color: color-mix(
@@ -143,18 +127,12 @@ export function useDiffCodeViewTheme() {
 						var(--background)
 					);
 				}
-				[data-diffs-header='default'] [data-additions-count] {
-					color: ${additionColor};
-				}
-				[data-diffs-header='default'] [data-deletions-count] {
-					color: ${deletionColor};
-				}
 				/* Pierre sets --diffs-light-bg/--diffs-dark-bg
-				 * inline on <pre data-diff> from the Shiki theme;
+				 * inline on <pre data-diff> from the theme;
 				 * inline beats :host so we override at the pre. */
 				[data-diff] {
-					--diffs-light-bg: ${surfaceBg} !important;
-					--diffs-dark-bg: ${surfaceBg} !important;
+					--diffs-light-bg: var(--background) !important;
+					--diffs-dark-bg: var(--background) !important;
 				}
 				/* Flatten the "N unmodified lines" strip flush to
 				 * the pane edges (kills wrapper/content/expand-
@@ -171,14 +149,7 @@ export function useDiffCodeViewTheme() {
 				}
 			`,
 		}),
-		[
-			activeTheme,
-			additionColor,
-			deletionColor,
-			diffStyle,
-			expandUnchanged,
-			surfaceBg,
-		],
+		[activeTheme, diffStyle, expandUnchanged],
 	);
 
 	return { options, style };

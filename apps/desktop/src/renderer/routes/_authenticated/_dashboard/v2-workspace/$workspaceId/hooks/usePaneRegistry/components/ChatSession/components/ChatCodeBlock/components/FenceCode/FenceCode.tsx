@@ -1,4 +1,4 @@
-import { File, PatchDiff } from "@pierre/diffs/react";
+import { File, FileDiff } from "@pierre/diffs/react";
 import type { CSSProperties } from "react";
 import { useMemo } from "react";
 import {
@@ -9,7 +9,7 @@ import { useResolvedTheme } from "renderer/stores/theme";
 import {
 	type Fence,
 	isDiffLanguage,
-	isSingleFilePatch,
+	parsePatchFileDiffs,
 } from "../../utils/fencedCode";
 
 const CHAT_CODE_FONT_SIZE = 12;
@@ -31,7 +31,7 @@ const BLOCK_CSS = `
  * A fence's text, rendered by the same highlighter as the diff card and the
  * file viewer so code reads the same wherever it appears: unwrapped lines
  * that scroll sideways until asked to wrap. A fence marked `diff` that is a
- * real patch renders as one.
+ * real patch renders as one diff per file.
  */
 export function FenceCode({
 	fence,
@@ -44,8 +44,8 @@ export function FenceCode({
 }) {
 	const activeTheme = useResolvedTheme();
 	const { language, file } = fence;
-	const asPatch = useMemo(
-		() => isDiffLanguage(language) && isSingleFilePatch(text),
+	const patchFiles = useMemo(
+		() => (isDiffLanguage(language) ? parsePatchFileDiffs(text) : []),
 		[language, text],
 	);
 	const style = {
@@ -62,14 +62,19 @@ export function FenceCode({
 		disableFileHeader: true,
 		unsafeCSS: BLOCK_CSS,
 	};
-	if (asPatch) {
-		return (
-			<PatchDiff
-				options={{ ...options, diffStyle: "unified", expandUnchanged: true }}
-				patch={text}
+	if (patchFiles.length > 0) {
+		return patchFiles.map((fileDiff, index) => (
+			<FileDiff
+				key={`${index}:${fileDiff.name}`}
+				fileDiff={fileDiff}
+				options={{
+					...options,
+					diffStyle: "unified",
+					disableFileHeader: patchFiles.length === 1,
+				}}
 				style={style}
 			/>
-		);
+		));
 	}
 	return (
 		<File

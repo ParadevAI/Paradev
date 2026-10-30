@@ -7033,6 +7033,9 @@ msgstr "Stažení selhalo"
 msgid "Download for {platformName}"
 msgstr "Stáhnout pro {platformName}"
 
+msgid "Download for Linux"
+msgstr "Stáhnout pro Linux"
+
 msgid "Download for Mac"
 msgstr "Stáhnout pro Mac"
 
@@ -7276,6 +7279,10 @@ msgctxt "github release action"
 msgid "Edited"
 msgstr "Upraveno"
 
+msgctxt "shell intent"
+msgid "Edited"
+msgstr "Upraveno"
+
 msgid "Edited {ago}"
 msgstr "Upraveno {ago}"
 
@@ -7283,6 +7290,10 @@ msgid "Editing"
 msgstr "Úpravy"
 
 msgctxt "file change"
+msgid "Editing"
+msgstr "Úprava"
+
+msgctxt "shell intent"
 msgid "Editing"
 msgstr "Úprava"
 
@@ -8553,6 +8564,9 @@ msgstr "Pro hlášení chyb a náměty na funkce je nejrychlejší cestou GitHub
 msgid "For individuals getting started"
 msgstr "Pro jednotlivce, kteří začínají"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Pro macOS na Apple Silicon i Intel. Linux AppImage je experimentální."
+
 msgid "For organizations with advanced needs"
 msgstr "Pro organizace s náročnými požadavky"
 
@@ -8820,8 +8834,8 @@ msgstr "Získat klíč"
 msgid "Get more out of Paradev"
 msgstr "Využít Paradev naplno"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows a Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Získejte Paradev na svůj Mac"
@@ -8915,6 +8929,9 @@ msgstr "Uživatelské jméno GitHub..."
 
 msgid "GitHub username…"
 msgstr "GitHub uživatelské jméno…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Dejte Claude Code, Codexu nebo jakémukoli CLI agentovi vlastní workspace a větev a pak zkontrolujte každou změnu na jednom místě."
 
 msgid "Give me an example"
 msgstr "Uveď příklad"
@@ -9556,6 +9573,10 @@ msgstr "Vylepšit instrukce pro agenty"
 
 msgid "Improved diff viewer"
 msgstr "Vylepšený prohlížeč rozdílů"
+
+#. placeholder {0}: intent.path
+msgid "in {0}"
+msgstr "v {0}"
 
 msgid "in a new session"
 msgstr "v nové relaci"
@@ -10574,6 +10595,10 @@ msgstr "Vypisovat, vytvářet, upravovat a mazat pracovní prostory na hostu."
 msgid "List, get, create, update, and delete tasks; track status."
 msgstr "Vypisovat, načítat, vytvářet, upravovat a mazat úkoly; sledovat stav."
 
+msgctxt "shell intent"
+msgid "Listed"
+msgstr "Vypsáno"
+
 msgid "Listening"
 msgstr "Poslouchám"
 
@@ -10585,6 +10610,10 @@ msgstr "Naslouchá zprávám v kanálech a novým kanálům."
 
 msgid "Listening status unavailable"
 msgstr "Stav naslouchání není dostupný"
+
+msgctxt "shell intent"
+msgid "Listing"
+msgstr "Výpis"
 
 msgid "Listing sessions in {what}"
 msgstr "Vypisuji relace v {what}"
@@ -14791,6 +14820,10 @@ msgstr "Obnovování…"
 msgid "Read"
 msgstr "Přečteno"
 
+msgctxt "shell intent"
+msgid "Read"
+msgstr "Přečteno"
+
 msgid "Read and plan without changing anything"
 msgstr "Číst a plánovat bez jakýchkoli změn"
 
@@ -14841,6 +14874,10 @@ msgstr "Přečíst průvodce nastavením"
 
 msgid "Read the source and every pull request."
 msgstr "Přečtěte si zdrojový kód a každý pull request."
+
+msgctxt "shell intent"
+msgid "Reading"
+msgstr "Čtení"
 
 msgid "Reading {what}"
 msgstr "Čtu {what}"
@@ -15947,6 +15984,9 @@ msgstr "Spustit teď"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení, obnovení a čtení logů."
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "Spouštějte paralelní coding agenty s Paradev"
+
 msgid "Run script"
 msgstr "Spustit skript"
 
@@ -16373,8 +16413,16 @@ msgstr "Prohledávání poznámek ze schůzek"
 msgid "Search..."
 msgstr "Hledat..."
 
+msgctxt "shell intent"
+msgid "Searched"
+msgstr "Vyhledáno"
+
 msgid "Searched for tooltip overrides"
 msgstr "Hledány přepisy tooltipů"
+
+msgctxt "shell intent"
+msgid "Searching"
+msgstr "Hledání"
 
 msgid "Searching for Kbd usages"
 msgstr "Hledám použití Kbd"
@@ -17035,6 +17083,9 @@ msgstr "Zobrazit řádky za změnou výše"
 
 msgid "Show lines before the change below"
 msgstr "Zobrazit řádky před změnou níže"
+
+msgid "Show link menu"
+msgstr "Zobrazit nabídku odkazu"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Ukaž mi posledních 10 běhů mé automatizace na třídění v Linearu"
@@ -19577,6 +19628,9 @@ msgstr "Sledovat změny souborů po každém tahu"
 msgid "Track tasks in"
 msgstr "Sledovat úkoly v"
 
+msgid "Track your brand in AI search"
+msgstr "Sledujte svou značku ve vyhledávání s AI"
+
 msgid "Tracking"
 msgstr "Sleduji"
 
@@ -20544,8 +20598,8 @@ msgstr "Pošleme vám e-mail, až bude Paradev pro Android připraven."
 msgid "We'll get back to you shortly."
 msgstr "Brzy se vám ozveme."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Dáme vám vědět, jakmile bude podpora Windows a Linuxu hotová."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Dáme vám vědět, jakmile bude podpora Windowsu hotová."
 
 msgid "We'll only use this to send your download link."
 msgstr "Použijeme ho jen k odeslání odkazu ke stažení."
@@ -21029,12 +21083,20 @@ msgstr "Napiš dokumentaci k části, na kterou se všichni ptají…"
 msgid "Write once. Runs in every agent."
 msgstr "Napište jednou. Běží v každém agentovi."
 
+msgctxt "shell intent"
+msgid "Writing"
+msgstr "Zápis"
+
 msgid "Writing code is no longer where engineer hours go. Reading it is. Teams that adopted parallel agents in 2025 hit the wall first: ten agents can produce more diffs before lunch than a team can honestly review by Friday."
 msgstr "Psaní kódu už není to, kam jdou hodiny inženýrů. Jde do jeho čtení. Týmy, které v roce 2025 nasadily paralelní agenty, narazily první: deset agentů vyprodukuje do oběda víc diffů, než tým poctivě zreviduje do pátku."
 
 msgid "Writing file..."
 msgstr "Zapisuji soubor..."
 
+msgid "Wrote"
+msgstr "Zapsáno"
+
+msgctxt "shell intent"
 msgid "Wrote"
 msgstr "Zapsáno"
 

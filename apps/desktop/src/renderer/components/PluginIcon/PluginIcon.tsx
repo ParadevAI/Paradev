@@ -31,6 +31,7 @@ import slackIconUrl from "renderer/assets/icons/slack-icon.svg";
 import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
 import { AutumnIcon } from "./components/AutumnIcon";
+import { PeecIcon } from "./components/PeecIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 /**
@@ -63,6 +64,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	github: { icon: FaGithub },
 	superhuman: { icon: SuperhumanIcon },
 	notion: { icon: SiNotion },
+	peec: { icon: PeecIcon },
 	sentry: { icon: SiSentry },
 	posthog: { icon: SiPosthog },
 	resend: { icon: SiResend },

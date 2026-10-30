@@ -7033,6 +7033,9 @@ msgstr "ダウンロードに失敗しました"
 msgid "Download for {platformName}"
 msgstr "{platformName} 版をダウンロード"
 
+msgid "Download for Linux"
+msgstr "Linux版をダウンロード"
+
 msgid "Download for Mac"
 msgstr "Mac版をダウンロード"
 
@@ -7276,6 +7279,10 @@ msgctxt "github release action"
 msgid "Edited"
 msgstr "編集"
 
+msgctxt "shell intent"
+msgid "Edited"
+msgstr "編集済み"
+
 msgid "Edited {ago}"
 msgstr "{ago}に編集"
 
@@ -7283,6 +7290,10 @@ msgid "Editing"
 msgstr "編集"
 
 msgctxt "file change"
+msgid "Editing"
+msgstr "編集中"
+
+msgctxt "shell intent"
 msgid "Editing"
 msgstr "編集中"
 
@@ -8553,6 +8564,9 @@ msgstr "バグ報告や機能リクエストは、<0>{githubHandle}</0>にGitHub
 msgid "For individuals getting started"
 msgstr "これから始める個人向け"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
+
 msgid "For organizations with advanced needs"
 msgstr "高度な要件がある組織向け"
 
@@ -8820,8 +8834,8 @@ msgstr "キーを取得"
 msgid "Get more out of Paradev"
 msgstr "Paradevをもっと活用する"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "ParadevがWindowsとLinuxで使えるようになったらお知らせします。"
+msgid "Get notified when Paradev is available on Windows."
+msgstr "ParadevがWindowsで使えるようになったらお知らせします。"
 
 msgid "Get Paradev on your Mac"
 msgstr "MacでParadevを使う"
@@ -8915,6 +8929,9 @@ msgstr "GitHubユーザー名..."
 
 msgid "GitHub username…"
 msgstr "GitHubユーザー名…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code、Codex、その他の CLI エージェントそれぞれに専用のワークスペースとブランチを用意し、すべての変更を一か所でレビューできます。"
 
 msgid "Give me an example"
 msgstr "例を挙げて"
@@ -9556,6 +9573,10 @@ msgstr "エージェント向け指示を改善"
 
 msgid "Improved diff viewer"
 msgstr "差分ビューアの改善"
+
+#. placeholder {0}: intent.path
+msgid "in {0}"
+msgstr "{0} 内"
 
 msgid "in a new session"
 msgstr "新しいセッションで"
@@ -10574,6 +10595,10 @@ msgstr "ホスト上のワークスペースの一覧、作成、更新、削除
 msgid "List, get, create, update, and delete tasks; track status."
 msgstr "タスクの一覧、取得、作成、更新、削除と、ステータスの追跡ができます。"
 
+msgctxt "shell intent"
+msgid "Listed"
+msgstr "一覧表示済み"
+
 msgid "Listening"
 msgstr "聞き取り中"
 
@@ -10585,6 +10610,10 @@ msgstr "チャンネルメッセージと新しいチャンネルを待ち受け
 
 msgid "Listening status unavailable"
 msgstr "コメント受信状態を確認できません"
+
+msgctxt "shell intent"
+msgid "Listing"
+msgstr "一覧表示中"
 
 msgid "Listing sessions in {what}"
 msgstr "{what} のセッションを一覧中"
@@ -14791,6 +14820,10 @@ msgstr "再有効化中…"
 msgid "Read"
 msgstr "読み取り"
 
+msgctxt "shell intent"
+msgid "Read"
+msgstr "読み取り済み"
+
 msgid "Read and plan without changing anything"
 msgstr "何も変更せずに読み取りと計画のみ"
 
@@ -14841,6 +14874,10 @@ msgstr "セットアップガイドを読む"
 
 msgid "Read the source and every pull request."
 msgstr "ソースコードとすべてのプルリクエストを読む。"
+
+msgctxt "shell intent"
+msgid "Reading"
+msgstr "読み取り中"
 
 msgid "Reading {what}"
 msgstr "{what} を読み取り中"
@@ -15947,6 +15984,9 @@ msgstr "今すぐ実行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "スケジュールやイベントで実行、オンデマンド実行、一時停止、再開、ログの確認。"
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev で並列コーディングエージェントを実行"
+
 msgid "Run script"
 msgstr "スクリプトを実行"
 
@@ -16373,8 +16413,16 @@ msgstr "会議メモを検索"
 msgid "Search..."
 msgstr "検索..."
 
+msgctxt "shell intent"
+msgid "Searched"
+msgstr "検索済み"
+
 msgid "Searched for tooltip overrides"
 msgstr "tooltipのオーバーライドを検索"
+
+msgctxt "shell intent"
+msgid "Searching"
+msgstr "検索中"
 
 msgid "Searching for Kbd usages"
 msgstr "Kbdの使用箇所を検索中"
@@ -17035,6 +17083,9 @@ msgstr "上の変更より後の行を表示"
 
 msgid "Show lines before the change below"
 msgstr "下の変更より前の行を表示"
+
+msgid "Show link menu"
+msgstr "リンクメニューを表示"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linearトリアージのオートメーションの直近10件の実行を見せて"
@@ -19577,6 +19628,9 @@ msgstr "ターンごとにファイルの変更を記録"
 msgid "Track tasks in"
 msgstr "タスクの管理先"
 
+msgid "Track your brand in AI search"
+msgstr "AI検索でのブランドの露出を追跡"
+
 msgid "Tracking"
 msgstr "計測期間"
 
@@ -20544,8 +20598,8 @@ msgstr "Android 版 Paradev の準備ができたらメールでお知らせし�
 msgid "We'll get back to you shortly."
 msgstr "折り返しご連絡します。"
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "WindowsとLinuxへの対応が整い次第お知らせします。"
+msgid "We'll notify you when Windows support is ready."
+msgstr "Windowsへの対応が整い次第お知らせします。"
 
 msgid "We'll only use this to send your download link."
 msgstr "ダウンロードリンクの送信にのみ使用します。"
@@ -21029,6 +21083,10 @@ msgstr "よく質問される部分のドキュメントを書く…"
 msgid "Write once. Runs in every agent."
 msgstr "一度書けば、すべてのエージェントで動きます。"
 
+msgctxt "shell intent"
+msgid "Writing"
+msgstr "書き込み中"
+
 msgid "Writing code is no longer where engineer hours go. Reading it is. Teams that adopted parallel agents in 2025 hit the wall first: ten agents can produce more diffs before lunch than a team can honestly review by Friday."
 msgstr "エンジニアの時間はもうコードを書くことには費やされません。読むことに費やされます。2025年に並列エージェントを導入したチームが最初に壁にぶつかりました。10体のエージェントは、昼までに、チームが金曜までに正直にレビューしきれない量の差分を生み出します。"
 
@@ -21037,6 +21095,10 @@ msgstr "ファイルを書き込み中..."
 
 msgid "Wrote"
 msgstr "書き込み"
+
+msgctxt "shell intent"
+msgid "Wrote"
+msgstr "書き込み済み"
 
 msgid "X handle"
 msgstr "X ハンドル"

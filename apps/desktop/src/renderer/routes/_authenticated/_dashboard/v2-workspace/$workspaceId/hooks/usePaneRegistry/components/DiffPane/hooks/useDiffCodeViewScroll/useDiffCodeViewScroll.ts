@@ -14,7 +14,10 @@ import {
 import { shouldRestoreCachedScrollState } from "./shouldRestoreCachedScrollState";
 
 interface UseDiffCodeViewScrollOptions {
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	data: DiffPaneData;
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];

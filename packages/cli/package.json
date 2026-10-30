@@ -1,6 +1,6 @@
 {
 	"name": "@superset/cli",
-	"version": "2.0.0",
+	"version": "2.0.2",
 	"private": true,
 	"type": "module",
 	"scripts": {

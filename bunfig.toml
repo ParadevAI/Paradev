@@ -26,6 +26,8 @@ minimumReleaseAge = 259200
 # electron: 44.9.3 carries the October 2026 security fixes and electron#54908
 # (sessions failing every request after a Network Service restart). Exact pin;
 # remove after 2026-10-24.
+# @pierre/highlights: @pierre/diffs 1.6.2 pins 0.3.0 (2026-10-26). Exact pin;
+# remove after 2026-10-30.
 minimumReleaseAgeExcludes = [
   "@agentclientprotocol/claude-agent-acp",
   "@agentclientprotocol/codex-acp",
@@ -46,6 +48,7 @@ minimumReleaseAgeExcludes = [
   "expo-device-hub",
   "@expo/ui",
   "@pierre/diffs",
+  "@pierre/highlights",
   "expo",
   "expo-asset",
   "expo-constants",

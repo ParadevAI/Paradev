@@ -7,7 +7,13 @@ import type {
 	LineAnnotation,
 	FileContents as PierreFileContents,
 } from "@pierre/diffs";
-import { Editor, type EditorOptions } from "@pierre/diffs/edit";
+import {
+	Editor,
+	type EditorChangeEvent,
+	type EditorFactory,
+	type EditorOptions,
+	type EditorType,
+} from "@pierre/diffs/edit";
 import {
 	CodeView,
 	type CodeViewHandle,
@@ -19,7 +25,7 @@ import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
@@ -72,7 +78,7 @@ import {
 	isDiffContentTooLarge,
 } from "./utils/diffLoadingGuards";
 import { fileListLayout, toggledFileListOpen } from "./utils/fileListLayout";
-import { getCharacterOffsetAtClientX } from "./utils/getCharacterOffsetAtClientX";
+import { getCharacterOffsetAtPoint } from "./utils/getCharacterOffsetAtPoint";
 import {
 	diffPaneActionsSlotId,
 	diffPaneTitleSlotId,
@@ -104,6 +110,12 @@ function canEditDiffFile(
 	);
 }
 
+const createDiffEditor: EditorFactory<DiffAnnotationMetadata, undefined> = (
+	editorType,
+	options,
+	editStateKey,
+) => new Editor(editorType, options, editStateKey);
+
 export function DiffPane({
 	context,
 	workspaceId,
@@ -112,7 +124,8 @@ export function DiffPane({
 }: DiffPaneProps) {
 	const { t } = useLingui();
 	const data = context.pane.data as DiffPaneData;
-	const codeViewRef = useRef<CodeViewHandle<DiffAnnotationMetadata>>(null);
+	const codeViewRef =
+		useRef<CodeViewHandle<DiffAnnotationMetadata, undefined>>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
 
 	const showFileList = useRightPaneLinkTarget() !== null;
@@ -204,10 +217,12 @@ export function DiffPane({
 	const [dirtyItemIds, setDirtyItemIds] = useState<ReadonlySet<string>>(
 		new Set(),
 	);
-	const [editorRevisionByItemId, setEditorRevisionByItemId] = useState<
-		ReadonlyMap<string, number>
-	>(new Map());
-	const editedFilesRef = useRef(new Map<string, PierreFileContents>());
+	// One sequence across items and edit sessions, so a write that finishes
+	// after its session closed can never match a later session's revision.
+	const editSequenceRef = useRef(0);
+	const editRevisionRef = useRef(new Map<string, number>());
+	const savedRevisionRef = useRef(new Map<string, number>());
+	const saveQueueRef = useRef(new Map<string, Promise<boolean>>());
 	const pendingEditorFocusRef = useRef<{
 		itemId: string;
 		lineNumber: number;
@@ -287,15 +302,20 @@ export function DiffPane({
 		files,
 		collapsedSet,
 		editingSet,
-		editorRevisionByItemId,
 		annotationsByPath: threadAnnotationsByPath,
 		extraAnnotationsByItemId: composerAnnotationsByItemId,
 	});
 	fileByItemIdRef.current = fileByItemId;
 
-	const saveEditedItem = useCallback(
+	const writeEditedItem = useCallback(
 		async (itemId: string): Promise<boolean> => {
-			const editedFile = editedFilesRef.current.get(itemId);
+			const revision = editRevisionRef.current.get(itemId);
+			if (
+				revision === undefined ||
+				revision === savedRevisionRef.current.get(itemId)
+			)
+				return true;
+			const editedFile = codeViewRef.current?.getEditor(itemId)?.getFile();
 			const file = getFile(itemId);
 			const worktreePath = workspaceQuery.data?.worktreePath;
 			if (!editedFile) return true;
@@ -338,11 +358,15 @@ export function DiffPane({
 					);
 					return false;
 				}
-				setDirtyItemIds((current) => {
-					const next = new Set(current);
-					next.delete(itemId);
-					return next;
-				});
+				savedRevisionRef.current.set(itemId, revision);
+				// Edits typed while the write was in flight still need a save.
+				if (editRevisionRef.current.get(itemId) === revision) {
+					setDirtyItemIds((current) => {
+						const next = new Set(current);
+						next.delete(itemId);
+						return next;
+					});
+				}
 				void utils.git.getStatus.invalidate({ workspaceId });
 				void utils.git.getDiff.invalidate({ workspaceId });
 				return true;
@@ -368,8 +392,25 @@ export function DiffPane({
 		],
 	);
 
+	// Saves for one item run in order, so an older write can't land last.
+	const saveEditedItem = useCallback(
+		(itemId: string): Promise<boolean> => {
+			const queue = saveQueueRef.current;
+			const save = (queue.get(itemId) ?? Promise.resolve(true)).then(() =>
+				writeEditedItem(itemId),
+			);
+			queue.set(itemId, save);
+			void save.finally(() => {
+				if (queue.get(itemId) === save) queue.delete(itemId);
+			});
+			return save;
+		},
+		[writeEditedItem],
+	);
+
 	const exitEditing = useCallback((itemId: string) => {
-		editedFilesRef.current.delete(itemId);
+		editRevisionRef.current.delete(itemId);
+		savedRevisionRef.current.delete(itemId);
 		setDirtyItemIds((current) => {
 			const next = new Set(current);
 			next.delete(itemId);
@@ -378,25 +419,10 @@ export function DiffPane({
 		setEditingSet(new Set());
 	}, []);
 
-	const discardEditing = useCallback(
-		(itemId: string) => {
-			// Pierre retains editor documents by item id. Rotate the item's version
-			// so reopening starts from the diff contents instead of the discarded
-			// in-memory document.
-			setEditorRevisionByItemId((current) => {
-				const next = new Map(current);
-				next.set(itemId, (next.get(itemId) ?? 0) + 1);
-				return next;
-			});
-			exitEditing(itemId);
-		},
-		[exitEditing],
-	);
-
 	const requestExitEditing = useCallback(
 		(itemId: string) => {
 			if (!dirtyItemIds.has(itemId)) {
-				discardEditing(itemId);
+				exitEditing(itemId);
 				return;
 			}
 			const file = getFile(itemId);
@@ -426,7 +452,7 @@ export function DiffPane({
 							message: "Don't Save",
 						}),
 						variant: "secondary",
-						onClick: () => discardEditing(itemId),
+						onClick: () => exitEditing(itemId),
 					},
 					{
 						label: t({ message: "Cancel" }),
@@ -436,7 +462,7 @@ export function DiffPane({
 				],
 			});
 		},
-		[dirtyItemIds, discardEditing, exitEditing, getFile, saveEditedItem, t],
+		[dirtyItemIds, exitEditing, getFile, saveEditedItem, t],
 	);
 
 	const search = useDiffPaneSearch({
@@ -598,9 +624,10 @@ export function DiffPane({
 				pendingEditorFocusRef.current = {
 					itemId: itemContext.item.id,
 					lineNumber: line.lineNumber,
-					character: getCharacterOffsetAtClientX(
+					character: getCharacterOffsetAtPoint(
 						line.lineElement,
 						line.event.clientX,
+						line.event.clientY,
 					),
 				};
 				setEditingSet(new Set([getChangesetFileKey(file)]));
@@ -710,38 +737,40 @@ export function DiffPane({
 		],
 	);
 
-	const createEditor = useCallback(
-		(options: EditorOptions<DiffAnnotationMetadata>) =>
-			new Editor<DiffAnnotationMetadata>(options),
-		[],
-	);
 	const handleItemEditChange = useCallback(
 		(
+			_event: EditorChangeEvent<EditorType, DiffAnnotationMetadata, undefined>,
 			item: CodeViewItem<DiffAnnotationMetadata>,
-			editedFile: PierreFileContents,
 		) => {
-			editedFilesRef.current.set(item.id, editedFile);
+			editSequenceRef.current += 1;
+			editRevisionRef.current.set(item.id, editSequenceRef.current);
 			setDirtyItemIds((current) => new Set(current).add(item.id));
 		},
 		[],
 	);
 
-	// The activating click happens before Pierre mounts its editor. Restore that
-	// click's line intent as soon as the controlled item enters edit mode.
-	useEffect(() => {
-		const pending = pendingEditorFocusRef.current;
-		if (!pending || editingSet.size === 0) return;
-		const frame = requestAnimationFrame(() => {
-			const editor = codeViewRef.current?.getEditor(pending.itemId);
-			if (!(editor instanceof Editor)) return;
-			pendingEditorFocusRef.current = null;
-			editor.focus({
-				lineNumber: pending.lineNumber,
-				character: pending.character,
-			});
-		});
-		return () => cancelAnimationFrame(frame);
-	}, [editingSet]);
+	// The activating click happens before Pierre mounts its editor, and a
+	// partial diff only gets one after its full files load.
+	const editorOptions = useMemo<
+		Omit<
+			EditorOptions<EditorType, DiffAnnotationMetadata, undefined>,
+			"onChange"
+		>
+	>(
+		() => ({
+			onAttach(editor) {
+				const pending = pendingEditorFocusRef.current;
+				if (!pending) return;
+				if (codeViewRef.current?.getEditor(pending.itemId) !== editor) return;
+				pendingEditorFocusRef.current = null;
+				editor.focus({
+					lineNumber: pending.lineNumber,
+					character: pending.character,
+				});
+			},
+		}),
+		[],
+	);
 
 	const activeEditingItemId = items.find((item) => item.edit)?.id;
 	const handleEditorKeyDownCapture = useCallback(
@@ -768,6 +797,7 @@ export function DiffPane({
 			annotation:
 				| LineAnnotation<DiffAnnotationMetadata>
 				| DiffLineAnnotation<DiffAnnotationMetadata>,
+			_displayed: PierreFileContents | FileDiffMetadata,
 			item: CodeViewItem<DiffAnnotationMetadata>,
 		) => {
 			const m = annotation.metadata;
@@ -944,7 +974,9 @@ export function DiffPane({
 							onFindPrevious={search.findPrevious}
 							onClose={search.closeSearch}
 						/>
-						<EditProvider<DiffAnnotationMetadata> createEditor={createEditor}>
+						<EditProvider<DiffAnnotationMetadata>
+							createEditor={createDiffEditor}
+						>
 							<CodeView<DiffAnnotationMetadata>
 								ref={codeViewRef}
 								className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
@@ -957,6 +989,7 @@ export function DiffPane({
 								renderHeaderMetadata={renderHeaderMetadata}
 								renderAnnotation={renderAnnotation}
 								onItemEditChange={handleItemEditChange}
+								editorOptions={editorOptions}
 							/>
 						</EditProvider>
 					</div>

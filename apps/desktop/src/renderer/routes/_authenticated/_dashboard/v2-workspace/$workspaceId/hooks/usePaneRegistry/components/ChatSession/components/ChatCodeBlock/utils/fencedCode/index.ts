@@ -4,6 +4,6 @@ export {
 	fenceLanguage,
 	fenceText,
 	isDiffLanguage,
-	isSingleFilePatch,
 	parseFence,
+	parsePatchFileDiffs,
 } from "./fencedCode";

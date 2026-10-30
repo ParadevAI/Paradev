@@ -7033,6 +7033,9 @@ msgstr "İndirilemedi"
 msgid "Download for {platformName}"
 msgstr "{platformName} için indir"
 
+msgid "Download for Linux"
+msgstr "Linux için indir"
+
 msgid "Download for Mac"
 msgstr "Mac için indir"
 
@@ -7276,6 +7279,10 @@ msgctxt "github release action"
 msgid "Edited"
 msgstr "Düzenlendi"
 
+msgctxt "shell intent"
+msgid "Edited"
+msgstr "Düzenlendi"
+
 msgid "Edited {ago}"
 msgstr "{ago} düzenlendi"
 
@@ -7283,6 +7290,10 @@ msgid "Editing"
 msgstr "Düzenleme"
 
 msgctxt "file change"
+msgid "Editing"
+msgstr "Düzenleniyor"
+
+msgctxt "shell intent"
 msgid "Editing"
 msgstr "Düzenleniyor"
 
@@ -8553,6 +8564,9 @@ msgstr "Hata bildirimleri ve özellik istekleri için en hızlı yol <0>{githubH
 msgid "For individuals getting started"
 msgstr "Yeni başlayan bireyler için"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Apple Silicon ve Intel üzerinde macOS için. Linux AppImage deneyseldir."
+
 msgid "For organizations with advanced needs"
 msgstr "Gelişmiş ihtiyaçları olan kuruluşlar için"
 
@@ -8820,8 +8834,8 @@ msgstr "Anahtar alın"
 msgid "Get more out of Paradev"
 msgstr "Paradev'den daha fazlasını al"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Paradev, Windows ve Linux'ta kullanılabilir olduğunda haberdar olun."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Paradev, Windows'ta kullanılabilir olduğunda haberdar olun."
 
 msgid "Get Paradev on your Mac"
 msgstr "Paradev'i Mac'inize alın"
@@ -8915,6 +8929,9 @@ msgstr "GitHub kullanıcı adı..."
 
 msgid "GitHub username…"
 msgstr "GitHub kullanıcı adı…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Claude Code, Codex veya herhangi bir CLI ajanına kendi workspace'ini ve branch'ini verin, ardından her değişikliği tek bir yerde inceleyin."
 
 msgid "Give me an example"
 msgstr "Bana bir örnek ver"
@@ -9556,6 +9573,10 @@ msgstr "Ajan yönergelerini iyileştir"
 
 msgid "Improved diff viewer"
 msgstr "Geliştirilmiş fark görüntüleyici"
+
+#. placeholder {0}: intent.path
+msgid "in {0}"
+msgstr "{0} içinde"
 
 msgid "in a new session"
 msgstr "yeni bir oturumda"
@@ -10574,6 +10595,10 @@ msgstr "Bir host'taki çalışma alanlarını listeleyin, oluşturun, güncelley
 msgid "List, get, create, update, and delete tasks; track status."
 msgstr "Görevleri listeleyin, alın, oluşturun, güncelleyin ve silin; durumu izleyin."
 
+msgctxt "shell intent"
+msgid "Listed"
+msgstr "Listelendi"
+
 msgid "Listening"
 msgstr "Dinliyor"
 
@@ -10585,6 +10610,10 @@ msgstr "Kanal mesajları ve yeni kanallar dinleniyor."
 
 msgid "Listening status unavailable"
 msgstr "Dinleme durumu kullanılamıyor"
+
+msgctxt "shell intent"
+msgid "Listing"
+msgstr "Listeleniyor"
 
 msgid "Listing sessions in {what}"
 msgstr "{what} içindeki oturumlar listeleniyor"
@@ -14791,6 +14820,10 @@ msgstr "Yeniden etkinleştiriliyor…"
 msgid "Read"
 msgstr "Okundu"
 
+msgctxt "shell intent"
+msgid "Read"
+msgstr "Okundu"
+
 msgid "Read and plan without changing anything"
 msgstr "Hiçbir şeyi değiştirmeden oku ve planla"
 
@@ -14841,6 +14874,10 @@ msgstr "Kurulum rehberini okuyun"
 
 msgid "Read the source and every pull request."
 msgstr "Kaynak kodu ve her pull request'i okuyun."
+
+msgctxt "shell intent"
+msgid "Reading"
+msgstr "Okunuyor"
 
 msgid "Reading {what}"
 msgstr "{what} okunuyor"
@@ -15947,6 +15984,9 @@ msgstr "Şimdi çalıştır"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
+
 msgid "Run script"
 msgstr "Betiği çalıştır"
 
@@ -16373,8 +16413,16 @@ msgstr "Toplantı notlarınızda arayın"
 msgid "Search..."
 msgstr "Ara..."
 
+msgctxt "shell intent"
+msgid "Searched"
+msgstr "Arandı"
+
 msgid "Searched for tooltip overrides"
 msgstr "Tooltip geçersiz kılmaları arandı"
+
+msgctxt "shell intent"
+msgid "Searching"
+msgstr "Aranıyor"
 
 msgid "Searching for Kbd usages"
 msgstr "Kbd kullanımları aranıyor"
@@ -17035,6 +17083,9 @@ msgstr "Yukarıdaki değişiklikten sonraki satırları göster"
 
 msgid "Show lines before the change below"
 msgstr "Aşağıdaki değişiklikten önceki satırları göster"
+
+msgid "Show link menu"
+msgstr "Bağlantı menüsünü göster"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linear sınıflandırma otomasyonumun son 10 çalıştırmasını göster"
@@ -19577,6 +19628,9 @@ msgstr "Dosya değişikliklerini tur başına izle"
 msgid "Track tasks in"
 msgstr "Görevleri şurada takip et"
 
+msgid "Track your brand in AI search"
+msgstr "Markanızı yapay zekâ aramasında takip edin"
+
 msgid "Tracking"
 msgstr "İzleme"
 
@@ -20544,8 +20598,8 @@ msgstr "Android için Paradev hazır olduğunda size e-posta göndereceğiz."
 msgid "We'll get back to you shortly."
 msgstr "Kısa süre içinde size döneceğiz."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Windows ve Linux desteği hazır olduğunda size haber vereceğiz."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Windows desteği hazır olduğunda size haber vereceğiz."
 
 msgid "We'll only use this to send your download link."
 msgstr "Bunu yalnızca indirme bağlantınızı göndermek için kullanacağız."
@@ -21029,12 +21083,20 @@ msgstr "Herkesin sorduğu bölüm için belge yaz…"
 msgid "Write once. Runs in every agent."
 msgstr "Bir kez yazın. Her ajanda çalışır."
 
+msgctxt "shell intent"
+msgid "Writing"
+msgstr "Yazılıyor"
+
 msgid "Writing code is no longer where engineer hours go. Reading it is. Teams that adopted parallel agents in 2025 hit the wall first: ten agents can produce more diffs before lunch than a team can honestly review by Friday."
 msgstr "Mühendis saatleri artık kod yazmaya gitmiyor. Kod okumaya gidiyor. 2025'te paralel ajanları benimseyen takımlar duvara ilk çarpanlar oldu: on ajan, bir takımın cuma gününe kadar dürüstçe inceleyebileceğinden daha fazla farkı öğleden önce üretebilir."
 
 msgid "Writing file..."
 msgstr "Dosya yazılıyor..."
 
+msgid "Wrote"
+msgstr "Yazıldı"
+
+msgctxt "shell intent"
 msgid "Wrote"
 msgstr "Yazıldı"
 

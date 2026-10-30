@@ -7033,6 +7033,9 @@ msgstr "Download non riuscito"
 msgid "Download for {platformName}"
 msgstr "Scarica per {platformName}"
 
+msgid "Download for Linux"
+msgstr "Scarica per Linux"
+
 msgid "Download for Mac"
 msgstr "Scarica per Mac"
 
@@ -7276,6 +7279,10 @@ msgctxt "github release action"
 msgid "Edited"
 msgstr "Modificato"
 
+msgctxt "shell intent"
+msgid "Edited"
+msgstr "Modificato"
+
 msgid "Edited {ago}"
 msgstr "Modificato {ago}"
 
@@ -7283,6 +7290,10 @@ msgid "Editing"
 msgstr "Modifica"
 
 msgctxt "file change"
+msgid "Editing"
+msgstr "Modificando"
+
+msgctxt "shell intent"
 msgid "Editing"
 msgstr "Modificando"
 
@@ -8553,6 +8564,9 @@ msgstr "Per segnalazioni di bug e richieste di funzioni, la via più rapida è u
 msgid "For individuals getting started"
 msgstr "Per chi inizia da solo"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "Per macOS su Apple Silicon e Intel. L'AppImage per Linux è sperimentale."
+
 msgid "For organizations with advanced needs"
 msgstr "Per organizzazioni con esigenze avanzate"
 
@@ -8820,8 +8834,8 @@ msgstr "Ottieni la chiave"
 msgid "Get more out of Paradev"
 msgstr "Ottieni di più da Paradev"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Ricevi una notifica quando Paradev sarà disponibile su Windows e Linux."
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Ricevi una notifica quando Paradev sarà disponibile su Windows."
 
 msgid "Get Paradev on your Mac"
 msgstr "Ottieni Paradev sul tuo Mac"
@@ -8915,6 +8929,9 @@ msgstr "Nome utente GitHub..."
 
 msgid "GitHub username…"
 msgstr "Nome utente GitHub…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "Dai a Claude Code, Codex o qualsiasi agente CLI il proprio workspace e branch, poi rivedi ogni modifica in un unico posto."
 
 msgid "Give me an example"
 msgstr "Fammi un esempio"
@@ -9556,6 +9573,10 @@ msgstr "Migliora le istruzioni per gli agenti"
 
 msgid "Improved diff viewer"
 msgstr "Visualizzatore diff migliorato"
+
+#. placeholder {0}: intent.path
+msgid "in {0}"
+msgstr "in {0}"
 
 msgid "in a new session"
 msgstr "in una nuova sessione"
@@ -10574,6 +10595,10 @@ msgstr "Elenca, crea, aggiorna ed elimina i workspace su un host."
 msgid "List, get, create, update, and delete tasks; track status."
 msgstr "Elenca, ottieni, crea, aggiorna ed elimina i task; monitora lo stato."
 
+msgctxt "shell intent"
+msgid "Listed"
+msgstr "Elencato"
+
 msgid "Listening"
 msgstr "In ascolto"
 
@@ -10585,6 +10610,10 @@ msgstr "In ascolto dei messaggi dei canali e dei nuovi canali."
 
 msgid "Listening status unavailable"
 msgstr "Stato di ascolto non disponibile"
+
+msgctxt "shell intent"
+msgid "Listing"
+msgstr "Elencando"
 
 msgid "Listing sessions in {what}"
 msgstr "Elenco delle sessioni di {what}"
@@ -14791,6 +14820,10 @@ msgstr "Riattivazione…"
 msgid "Read"
 msgstr "Letto"
 
+msgctxt "shell intent"
+msgid "Read"
+msgstr "Letto"
+
 msgid "Read and plan without changing anything"
 msgstr "Leggi e pianifica senza modificare nulla"
 
@@ -14841,6 +14874,10 @@ msgstr "Leggi la guida alla configurazione"
 
 msgid "Read the source and every pull request."
 msgstr "Leggi il codice sorgente e ogni pull request."
+
+msgctxt "shell intent"
+msgid "Reading"
+msgstr "Leggendo"
 
 msgid "Reading {what}"
 msgstr "Lettura di {what}"
@@ -15947,6 +15984,9 @@ msgstr "Esegui ora"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Esegui secondo una pianificazione o con eventi, su richiesta, metti in pausa, riprendi e leggi i log."
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "Esegui agenti di coding in parallelo con Paradev"
+
 msgid "Run script"
 msgstr "Esegui lo script"
 
@@ -16373,8 +16413,16 @@ msgstr "Cerca nelle note delle riunioni"
 msgid "Search..."
 msgstr "Cerca..."
 
+msgctxt "shell intent"
+msgid "Searched"
+msgstr "Cercato"
+
 msgid "Searched for tooltip overrides"
 msgstr "Ricerca delle sostituzioni dei tooltip"
+
+msgctxt "shell intent"
+msgid "Searching"
+msgstr "Cercando"
 
 msgid "Searching for Kbd usages"
 msgstr "Ricerca degli usi di Kbd"
@@ -17035,6 +17083,9 @@ msgstr "Mostra le righe dopo la modifica qui sopra"
 
 msgid "Show lines before the change below"
 msgstr "Mostra le righe prima della modifica qui sotto"
+
+msgid "Show link menu"
+msgstr "Mostra menu del link"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Mostrami le ultime 10 esecuzioni della mia automazione di triage su Linear"
@@ -19577,6 +19628,9 @@ msgstr "Traccia le modifiche ai file per turno"
 msgid "Track tasks in"
 msgstr "Gestisci le attività in"
 
+msgid "Track your brand in AI search"
+msgstr "Monitora il tuo brand nella ricerca AI"
+
 msgid "Tracking"
 msgstr "Monitoraggio"
 
@@ -20544,8 +20598,8 @@ msgstr "Ti invieremo un'email quando Paradev per Android sarà pronto."
 msgid "We'll get back to you shortly."
 msgstr "Ti risponderemo a breve."
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Ti avviseremo quando il supporto per Windows e Linux sarà pronto."
+msgid "We'll notify you when Windows support is ready."
+msgstr "Ti avviseremo quando il supporto per Windows sarà pronto."
 
 msgid "We'll only use this to send your download link."
 msgstr "La useremo solo per inviarti il link di download."
@@ -21029,12 +21083,20 @@ msgstr "Scrivi la documentazione per la parte di cui tutti chiedono…"
 msgid "Write once. Runs in every agent."
 msgstr "Scrivi una volta. Funziona in ogni agente."
 
+msgctxt "shell intent"
+msgid "Writing"
+msgstr "Scrivendo"
+
 msgid "Writing code is no longer where engineer hours go. Reading it is. Teams that adopted parallel agents in 2025 hit the wall first: ten agents can produce more diffs before lunch than a team can honestly review by Friday."
 msgstr "Scrivere codice non è più dove vanno le ore degli ingegneri. Leggerlo sì. I team che hanno adottato gli agenti in parallelo nel 2025 hanno sbattuto per primi contro il muro: dieci agenti possono produrre più diff prima di pranzo di quanti un team ne possa rivedere onestamente entro venerdì."
 
 msgid "Writing file..."
 msgstr "Scrittura del file..."
 
+msgid "Wrote"
+msgstr "Scritto"
+
+msgctxt "shell intent"
 msgid "Wrote"
 msgstr "Scritto"
 

@@ -7033,6 +7033,9 @@ msgstr "下載失敗"
 msgid "Download for {platformName}"
 msgstr "下載 {platformName} 版"
 
+msgid "Download for Linux"
+msgstr "下載Linux版"
+
 msgid "Download for Mac"
 msgstr "下載Mac版"
 
@@ -7276,6 +7279,10 @@ msgctxt "github release action"
 msgid "Edited"
 msgstr "已編輯"
 
+msgctxt "shell intent"
+msgid "Edited"
+msgstr "已編輯"
+
 msgid "Edited {ago}"
 msgstr "編輯於{ago}"
 
@@ -7283,6 +7290,10 @@ msgid "Editing"
 msgstr "編輯"
 
 msgctxt "file change"
+msgid "Editing"
+msgstr "編輯中"
+
+msgctxt "shell intent"
 msgid "Editing"
 msgstr "編輯中"
 
@@ -8553,6 +8564,9 @@ msgstr "報告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向剛上手的個人使用者"
 
+msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgstr "適用於 Apple Silicon 與 Intel 的 macOS。Linux AppImage 為實驗版本。"
+
 msgid "For organizations with advanced needs"
 msgstr "面向有進階需求的組織"
 
@@ -8820,8 +8834,8 @@ msgstr "取得金鑰"
 msgid "Get more out of Paradev"
 msgstr "把Paradev用得更好"
 
-msgid "Get notified when Paradev is available on Windows & Linux."
-msgstr "Paradev支援Windows和Linux時通知我。"
+msgid "Get notified when Paradev is available on Windows."
+msgstr "Paradev支援Windows時通知我。"
 
 msgid "Get Paradev on your Mac"
 msgstr "在Mac上獲取Paradev"
@@ -8915,6 +8929,9 @@ msgstr "GitHub 使用者名稱..."
 
 msgid "GitHub username…"
 msgstr "GitHub使用者名稱…"
+
+msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
+msgstr "為 Claude Code、Codex 或任何 CLI 代理分配獨立的工作空間與分支，然後在同一處審閱所有變更。"
 
 msgid "Give me an example"
 msgstr "給我一個範例"
@@ -9556,6 +9573,10 @@ msgstr "改進代理程式說明"
 
 msgid "Improved diff viewer"
 msgstr "更好的差異檢視器"
+
+#. placeholder {0}: intent.path
+msgid "in {0}"
+msgstr "於 {0}"
 
 msgid "in a new session"
 msgstr "在新的工作階段中"
@@ -10574,6 +10595,10 @@ msgstr "列出、建立、更新和刪除主機上的工作區。"
 msgid "List, get, create, update, and delete tasks; track status."
 msgstr "列出、獲取、建立、更新和刪除任務；追蹤狀態。"
 
+msgctxt "shell intent"
+msgid "Listed"
+msgstr "已列出"
+
 msgid "Listening"
 msgstr "正在聆聽"
 
@@ -10585,6 +10610,10 @@ msgstr "正在監聽頻道訊息和新建的頻道。"
 
 msgid "Listening status unavailable"
 msgstr "無法取得監聽狀態"
+
+msgctxt "shell intent"
+msgid "Listing"
+msgstr "列出中"
 
 msgid "Listing sessions in {what}"
 msgstr "正在列出 {what} 的會話"
@@ -14791,6 +14820,10 @@ msgstr "正在重新啟用…"
 msgid "Read"
 msgstr "已讀取"
 
+msgctxt "shell intent"
+msgid "Read"
+msgstr "已讀取"
+
 msgid "Read and plan without changing anything"
 msgstr "只讀取和規劃，不做任何變更"
 
@@ -14841,6 +14874,10 @@ msgstr "閱讀設定指南"
 
 msgid "Read the source and every pull request."
 msgstr "閱讀原始碼和每一個拉取請求。"
+
+msgctxt "shell intent"
+msgid "Reading"
+msgstr "讀取中"
 
 msgid "Reading {what}"
 msgstr "正在讀取 {what}"
@@ -15947,6 +15984,9 @@ msgstr "立即執行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "依計劃或事件執行、隨需執行、暫停、恢復並查看日誌。"
 
+msgid "Run parallel coding agents with Paradev"
+msgstr "用 Paradev 平行執行程式設計代理"
+
 msgid "Run script"
 msgstr "執行指令碼"
 
@@ -16373,8 +16413,16 @@ msgstr "搜尋你的會議記錄"
 msgid "Search..."
 msgstr "搜尋..."
 
+msgctxt "shell intent"
+msgid "Searched"
+msgstr "已搜尋"
+
 msgid "Searched for tooltip overrides"
 msgstr "搜尋了tooltip的樣式覆蓋"
+
+msgctxt "shell intent"
+msgid "Searching"
+msgstr "搜尋中"
 
 msgid "Searching for Kbd usages"
 msgstr "正在搜尋Kbd的使用處"
@@ -17035,6 +17083,9 @@ msgstr "顯示上方改動之後的行"
 
 msgid "Show lines before the change below"
 msgstr "顯示下方改動之前的行"
+
+msgid "Show link menu"
+msgstr "顯示連結選單"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "給我看看Linear分類自動化最近10次執行"
@@ -19577,6 +19628,9 @@ msgstr "依輪次追蹤檔案變更"
 msgid "Track tasks in"
 msgstr "任務管理位置"
 
+msgid "Track your brand in AI search"
+msgstr "追蹤品牌在 AI 搜尋中的表現"
+
 msgid "Tracking"
 msgstr "已追蹤"
 
@@ -20544,8 +20598,8 @@ msgstr "Paradev Android 版準備就緒時，我們會寄電子郵件通知你�
 msgid "We'll get back to you shortly."
 msgstr "我們會盡快回復你。"
 
-msgid "We'll notify you when Windows & Linux support is ready."
-msgstr "Windows和Linux支援就緒時我們會通知你。"
+msgid "We'll notify you when Windows support is ready."
+msgstr "Windows支援就緒時我們會通知你。"
 
 msgid "We'll only use this to send your download link."
 msgstr "我們只會用它給你傳送下載連結。"
@@ -21029,12 +21083,20 @@ msgstr "給大家最常問的那部分寫文件…"
 msgid "Write once. Runs in every agent."
 msgstr "撰寫一次，在每個代理程式中執行。"
 
+msgctxt "shell intent"
+msgid "Writing"
+msgstr "寫入中"
+
 msgid "Writing code is no longer where engineer hours go. Reading it is. Teams that adopted parallel agents in 2025 hit the wall first: ten agents can produce more diffs before lunch than a team can honestly review by Friday."
 msgstr "工程師的時間不再花在寫程式碼上，而是花在讀程式碼上。2025年就用上並行代理程式的團隊最先撞牆：十個代理程式在午飯前產出的差異，一個團隊到週五也認真審不完。"
 
 msgid "Writing file..."
 msgstr "正在寫入檔案..."
 
+msgid "Wrote"
+msgstr "已寫入"
+
+msgctxt "shell intent"
 msgid "Wrote"
 msgstr "已寫入"
 
