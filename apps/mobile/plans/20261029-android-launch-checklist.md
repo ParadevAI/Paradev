@@ -18,11 +18,19 @@ Running the app locally needs none of this: `apps/mobile/scripts/android-dev.sh`
 
 ## 1. Accounts and keys (a person)
 
+**Status 2026-10-29:** Superset Inc.'s organization developer account exists: developer name
+"Paradev", account ID 8938663520557055179, owned by kiet@superset.sh. The website (superset.sh) is
+verified. The organization document (IRS Letter 147C) and Kiet's ID are with Google for review;
+the phone check and **Create app** unlock after Google emails kiet@superset.sh.
+
 Do Google Cloud in both projects that own a `GOOGLE_CLIENT_ID` web client: dev and production.
 
 ### Signing
 
-- [ ] **Upload keystore.** In `apps/mobile`: `eas credentials -p android`, production profile,
+- [x] **Upload keystore.** Done 2026-10-29 (EAS, default build credentials). SHA-1
+      `D1:FE:00:E3:8F:27:B5:90:28:3D:3A:D0:D5:33:ED:D0:ED:65:BA:F1`, SHA-256
+      `01:19:18:27:15:2A:D2:39:1B:FE:BC:D0:AD:A1:2D:89:28:1A:5C:42:04:EA:26:6C:0A:54:E8:47:23:E5:C1:93`.
+      Was: In `apps/mobile`: `eas credentials -p android`, production profile,
       let EAS generate the keystore. Copy its SHA-1 and SHA-256.
 - [ ] **Play Console app.** Create the app with package `sh.superset.mobile` and accept Play App
       Signing. Copy the app signing key's SHA-1 and SHA-256 from Test and release → App
@@ -30,14 +38,17 @@ Do Google Cloud in both projects that own a `GOOGLE_CLIENT_ID` web client: dev a
 
 ### Google sign-in (native, Credential Manager)
 
-- [ ] **Android OAuth clients** for `sh.superset.mobile`, one per signing key. No client secret:
+- [ ] **Android OAuth clients** for `sh.superset.mobile`, one per signing key, in project
+      `fair-scout-481221-v0` (it holds both the Web and Web Dev clients). Debug and upload-key
+      clients created 2026-10-29; the Play App Signing one waits for the Play app. No client secret:
   - Debug, dev project only (React Native's shared template keystore):
     `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`
   - Upload key SHA-1 (from the keystore step).
   - Play App Signing SHA-1 (from the Play Console step).
-- [ ] **OAuth consent screen** complete (app name, support email). Without it the account sheet
+- [x] **OAuth consent screen** (already live for web sign-in) complete (app name, support email). Without it the account sheet
       does not show.
-- [ ] **`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`** set to the project's web client ID in the EAS
+- [x] **`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`** Done 2026-10-29: production and preview use the Web
+      client, development uses Web Dev. Was: set to the project's web client ID in the EAS
       `development`, `preview` and `production` environments. Empty means Android uses the
       browser flow. Locally, copy `GOOGLE_CLIENT_ID` into it.
 
