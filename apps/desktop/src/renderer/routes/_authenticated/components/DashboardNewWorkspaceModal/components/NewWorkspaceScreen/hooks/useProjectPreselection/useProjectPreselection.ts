@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
 	WorkspaceCreateProjectChoice,
 	WorkspaceCreateTarget,
@@ -103,5 +103,11 @@ export function useProjectPreselection({
 		selectSession,
 		updateDraft,
 	]);
-	return isPending && !preSelectedSession;
+	const releasePreselection = useCallback(() => {
+		if (preSelectedProjectId) setAppliedProjectId(preSelectedProjectId);
+	}, [preSelectedProjectId]);
+	return {
+		isPending: isPending && !preSelectedSession,
+		releasePreselection,
+	};
 }

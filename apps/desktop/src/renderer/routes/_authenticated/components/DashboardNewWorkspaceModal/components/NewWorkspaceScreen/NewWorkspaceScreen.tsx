@@ -229,20 +229,21 @@ export function NewWorkspaceScreen({
 		(state) =>
 			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
 	);
-	const isProjectPreselectionPending = useProjectPreselection({
-		isOpen,
-		areProjectsReady: areProjectsReady && (!isCloudHost || !github.isLoading),
-		projects: selectableProjects,
-		preSelectedProjectId,
-		preSelectedSession,
-		selectedProjectId: draft.selectedProjectId,
-		isSession: draft.isSession,
-		target: isCloudHost ? "cloud" : "device",
-		lastChoice: lastProjectChoice,
-		selectProject,
-		selectSession,
-		updateDraft,
-	});
+	const { isPending: isProjectPreselectionPending, releasePreselection } =
+		useProjectPreselection({
+			isOpen,
+			areProjectsReady: areProjectsReady && (!isCloudHost || !github.isLoading),
+			projects: selectableProjects,
+			preSelectedProjectId,
+			preSelectedSession,
+			selectedProjectId: draft.selectedProjectId,
+			isSession: draft.isSession,
+			target: isCloudHost ? "cloud" : "device",
+			lastChoice: lastProjectChoice,
+			selectProject,
+			selectSession,
+			updateDraft,
+		});
 
 	// A project without a GitHub repository can't start in the cloud, so a
 	// handoff of one keeps everything but the host.
@@ -967,6 +968,7 @@ export function NewWorkspaceScreen({
 								}
 								onSelectProject={(selectedProjectId) => {
 									const target = isCloudHost ? "cloud" : "device";
+									releasePreselection();
 									if (selectedProjectId === null) {
 										setLastProjectChoice(target, { kind: "none" });
 										selectSession();
