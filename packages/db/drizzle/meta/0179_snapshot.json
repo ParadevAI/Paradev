@@ -1,5 +1,5 @@
 {
-  "id": "5b5c0f1b-ddf4-4fef-a5d0-d613e9eefade",
+  "id": "44daaf07-b7bd-4a7f-9ee9-0df98dd3196f",
   "prevId": "2f315a6a-b681-4dfc-955f-f3bc498bc50d",
   "version": "7",
   "dialect": "postgresql",
@@ -3050,13 +3050,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "experimental_chat": {
-          "name": "experimental_chat",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         },
         "deletion_requested_at": {
           "name": "deletion_requested_at",
@@ -16689,6 +16682,54 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_settings": {
+      "name": "user_settings",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "experimental_chat": {
+          "name": "experimental_chat",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_settings_user_id_users_id_fk": {
+          "name": "user_settings_user_id_users_id_fk",
+          "tableFrom": "user_settings",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
