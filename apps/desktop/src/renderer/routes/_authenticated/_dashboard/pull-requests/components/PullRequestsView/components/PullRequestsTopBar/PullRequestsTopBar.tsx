@@ -8,7 +8,6 @@ import { ProjectFilter } from "renderer/routes/_authenticated/_dashboard/compone
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import { PullRequestDetailToggle } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailToggle";
-import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
 import { AuthorFilter } from "./components/AuthorFilter";
 import { ReviewFilter } from "./components/ReviewFilter";
@@ -43,9 +42,6 @@ export function PullRequestsTopBar({
 	onStateFilterChange,
 }: PullRequestsTopBarProps) {
 	const { t } = useLingui();
-	const isDetailCollapsed = usePullRequestsSplitViewStore(
-		(state) => state.isDetailCollapsed,
-	);
 	const stateTabs: ReadonlyArray<{
 		value: PullRequestsStateFilter;
 		label: string;
@@ -113,7 +109,6 @@ export function PullRequestsTopBar({
 					</div>
 				}
 				end={<PullRequestDetailToggle />}
-				reservesWindowControls={isDetailCollapsed}
 			/>
 			<div className="flex items-center gap-1.5">
 				<div className="min-w-0 flex-1">

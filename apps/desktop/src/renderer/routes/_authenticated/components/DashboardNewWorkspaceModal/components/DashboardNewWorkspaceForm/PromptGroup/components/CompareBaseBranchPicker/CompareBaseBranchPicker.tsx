@@ -8,12 +8,14 @@ import {
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GoGitBranch, GoGlobe } from "react-icons/go";
-import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
+import { HiCheck } from "react-icons/hi2";
 import { LuFolderOpen } from "react-icons/lu";
 import { PLATFORM } from "renderer/hotkeys";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
+import { PILL_CHEVRON_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
 import type { BranchFilter, BranchRow } from "../../../hooks/useBranchContext";
 import {
 	FORM_PICKER_MENU_CLASS,
@@ -136,7 +138,7 @@ export function CompareBaseBranchPicker({
 					disabled={isBranchesLoading && branches.length === 0}
 					className="max-w-full"
 				>
-					<GoGitBranch className="size-3 shrink-0" />
+					<GoGitBranch className="size-3.5 shrink-0" />
 					{isBranchesLoading && branches.length === 0 ? (
 						<span className="h-2.5 w-14 rounded-sm bg-muted-foreground/15 animate-pulse" />
 					) : effectiveCompareBaseBranch ? (
@@ -148,7 +150,7 @@ export function CompareBaseBranchPicker({
 							<Trans>Select base branch…</Trans>
 						</span>
 					)}
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<ChevronDown className={PILL_CHEVRON_CLASS} />
 				</FormPickerTrigger>
 			</PopoverTrigger>
 			<PopoverContent

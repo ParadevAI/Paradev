@@ -51,7 +51,6 @@ export function DevHeader({
 	return (
 		<PageHeader
 			className="border-b border-border"
-			reservesWindowControls={!panel.isOpen}
 			start={
 				<div className="flex min-w-0 items-center gap-3">
 					<div className="flex min-w-0 items-center gap-2 px-1.5">

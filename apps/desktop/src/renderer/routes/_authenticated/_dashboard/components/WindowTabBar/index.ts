@@ -1,0 +1,1 @@
+export { WindowTabBar } from "./WindowTabBar";

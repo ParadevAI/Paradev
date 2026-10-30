@@ -10,12 +10,9 @@ import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspace
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
-import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
-import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import {
 	parseSubagentSearch,
 	readSubagentSearch,
@@ -576,10 +573,6 @@ function V2WorkspaceContent() {
 		void workspaceRun.toggleWorkspaceRun();
 	});
 
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
-	// Default to Mac while loading so window controls don't flash in.
-	const isMac = platform === undefined || platform === "darwin";
-
 	const workspaceRunButton = (
 		<V2WorkspaceRunButton
 			projectId={workspace.projectId}
@@ -597,7 +590,6 @@ function V2WorkspaceContent() {
 			run={workspaceRun}
 			isRightPaneOpen={isRightPaneOpen}
 			onToggleRightPane={toggleRightSidebar}
-			showWindowControls={!isMac}
 		/>
 	);
 
@@ -735,7 +727,6 @@ function V2WorkspaceContent() {
 									renderPaneAside={() => (
 										<ActivityPanelAside workspaceId={workspaceId} />
 									)}
-									renderTabBarLeading={() => <WindowChrome />}
 									renderTabBarTrailing={() => (
 										<div
 											className={cn(
@@ -766,7 +757,6 @@ function V2WorkspaceContent() {
 														isOpen={sidebarOpen}
 														onToggle={toggleRightSidebar}
 													/>
-													{!isMac && !sidebarOpen && <WindowControlsInset />}
 												</>
 											)}
 										</div>

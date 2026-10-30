@@ -1044,9 +1044,6 @@ msgstr "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearl
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 
-msgid "{myFailedCount} of your automations failed their last run"
-msgstr "{myFailedCount} of your automations failed their last run"
-
 msgid "{name} accounts"
 msgstr "{name} accounts"
 
@@ -3154,9 +3151,6 @@ msgstr "Automations & event triggers"
 msgid "Automations require the Pro plan."
 msgstr "Automations require the Pro plan."
 
-msgid "Automations, {myFailedCount} failing"
-msgstr "Automations, {myFailedCount} failing"
-
 msgid "Autonomous"
 msgstr "Autonomous"
 
@@ -3493,6 +3487,9 @@ msgstr "Bring a link to something you built recently."
 
 msgid "Bring Any Agent"
 msgstr "Bring Any Agent"
+
+msgid "Bring in an agent"
+msgstr "Bring in an agent"
 
 msgid "Bring over your projects"
 msgstr "Bring over your projects"
@@ -4355,6 +4352,9 @@ msgstr "Close {displayName}"
 
 msgid "Close {label} tab"
 msgstr "Close {label} tab"
+
+msgid "Close {title}"
+msgstr "Close {title}"
 
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
@@ -11705,6 +11705,12 @@ msgstr "New terminal"
 msgid "New Terminal"
 msgstr "New Terminal"
 
+msgid "New thread"
+msgstr "New thread"
+
+msgid "New thread ({newThreadShortcut})"
+msgstr "New thread ({newThreadShortcut})"
+
 msgid "New window"
 msgstr "New window"
 
@@ -11716,9 +11722,6 @@ msgstr "New workspace"
 
 msgid "New Workspace"
 msgstr "New Workspace"
-
-msgid "New Workspace ({shortcutText})"
-msgstr "New Workspace ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "New workspace in {name}"
@@ -16297,9 +16300,6 @@ msgstr "SDK & public API"
 msgid "Search"
 msgstr "Search"
 
-msgid "Search ({searchShortcutText})"
-msgstr "Search ({searchShortcutText})"
-
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Search {0} sites…"
@@ -16932,9 +16932,6 @@ msgstr "Setting up in the background..."
 
 msgid "Settings"
 msgstr "Settings"
-
-msgid "Settings ({settingsHotkey})"
-msgstr "Settings ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Settings → Remote Access → “Allow remote access to this device via relay”."
@@ -20831,9 +20828,6 @@ msgstr "What should run automatically?"
 
 msgid "What should the page show?"
 msgstr "What should the page show?"
-
-msgid "What should we build next?"
-msgstr "What should we build next?"
 
 msgid "What teams automate"
 msgstr "What teams automate"

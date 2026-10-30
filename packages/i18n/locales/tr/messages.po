@@ -1044,9 +1044,6 @@ msgstr "Aylık faturalandırmada kullanıcı başına aylık {monthlyPrice} veya
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, öncelikli destek."
 
-msgid "{myFailedCount} of your automations failed their last run"
-msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
-
 msgid "{name} accounts"
 msgstr "{name} hesapları"
 
@@ -3154,9 +3151,6 @@ msgstr "Otomasyonlar ve olay tetikleyicileri"
 msgid "Automations require the Pro plan."
 msgstr "Otomasyonlar Pro planı gerektirir."
 
-msgid "Automations, {myFailedCount} failing"
-msgstr "Otomasyonlar, {myFailedCount} başarısız"
-
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -3493,6 +3487,9 @@ msgstr "Yakın zamanda geliştirdiğiniz bir şeyin bağlantısını getirin."
 
 msgid "Bring Any Agent"
 msgstr "Hangi ajanı isterseniz getirin"
+
+msgid "Bring in an agent"
+msgstr "Bir ajan getir"
 
 msgid "Bring over your projects"
 msgstr "Projelerinizi aktarın"
@@ -4355,6 +4352,9 @@ msgstr "{displayName}'i kapat"
 
 msgid "Close {label} tab"
 msgstr "{label} sekmesini kapat"
+
+msgid "Close {title}"
+msgstr "{title} sekmesini kapat"
 
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
@@ -11705,6 +11705,12 @@ msgstr "Yeni terminal"
 msgid "New Terminal"
 msgstr "Yeni terminal"
 
+msgid "New thread"
+msgstr "Yeni konu"
+
+msgid "New thread ({newThreadShortcut})"
+msgstr "Yeni konu ({newThreadShortcut})"
+
 msgid "New window"
 msgstr "Yeni pencere"
 
@@ -11716,9 +11722,6 @@ msgstr "Yeni çalışma alanı"
 
 msgid "New Workspace"
 msgstr "Yeni çalışma alanı"
-
-msgid "New Workspace ({shortcutText})"
-msgstr "Yeni çalışma alanı ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "{name} içinde yeni çalışma alanı"
@@ -16297,9 +16300,6 @@ msgstr "SDK ve herkese açık API"
 msgid "Search"
 msgstr "Ara"
 
-msgid "Search ({searchShortcutText})"
-msgstr "Ara ({searchShortcutText})"
-
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "{0} sitede ara…"
@@ -16932,9 +16932,6 @@ msgstr "Arka planda kuruluyor..."
 
 msgid "Settings"
 msgstr "Ayarlar"
-
-msgid "Settings ({settingsHotkey})"
-msgstr "Ayarlar ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Ayarlar → Uzaktan erişim → “Bu cihaza röle üzerinden uzaktan erişime izin ver”."
@@ -20831,9 +20828,6 @@ msgstr "Ne otomatik çalışmalı?"
 
 msgid "What should the page show?"
 msgstr "Sayfa ne göstermeli?"
-
-msgid "What should we build next?"
-msgstr "Sırada ne geliştirelim?"
 
 msgid "What teams automate"
 msgstr "Ekipler neleri otomatikleştiriyor"

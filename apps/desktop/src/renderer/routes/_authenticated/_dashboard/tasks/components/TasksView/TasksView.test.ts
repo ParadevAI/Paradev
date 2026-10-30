@@ -91,10 +91,12 @@ describe("Tasks and pull requests navigation", () => {
 	});
 
 	test("renders Tasks and Pull requests as separate left-rail destinations", () => {
+		// v2's rail labels its buttons; its navigation hook owns the routes.
 		const sidebarSources = [
-			readComponent(
-				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
-			),
+			readComponent("../../../components/NavigationRail/NavigationRail.tsx") +
+				readComponent(
+					"../../../components/NavigationRail/hooks/useDashboardNavigation/useDashboardNavigation.ts",
+				),
 			readComponent(
 				"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
 			),

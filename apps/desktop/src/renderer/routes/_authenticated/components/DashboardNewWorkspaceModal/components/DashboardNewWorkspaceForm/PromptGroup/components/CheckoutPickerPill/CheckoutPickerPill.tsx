@@ -5,9 +5,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { CgLaptop } from "react-icons/cg";
-import { HiCheck, HiChevronUpDown } from "react-icons/hi2";
+import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
+import { PILL_CHEVRON_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
 import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
 import {
 	FORM_PICKER_MENU_CLASS,
@@ -48,9 +50,9 @@ export function CheckoutPickerPill({
 					}
 					disabled={disabled}
 				>
-					<Icon className="size-3 shrink-0" />
+					<Icon className="size-3.5 shrink-0" />
 					<span className="truncate">{label}</span>
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<ChevronDown className={PILL_CHEVRON_CLASS} />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent

@@ -2,7 +2,6 @@ import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { resolveProjectFilterParams } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
-import { WindowChromeScope } from "renderer/routes/_authenticated/_dashboard/components/WindowChromeScope";
 import { parsePositiveIntegerParam } from "renderer/routes/_authenticated/_dashboard/utils/parsePositiveIntegerParam";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { PullRequestListToggle } from "./components/PullRequestListToggle";
@@ -140,12 +139,10 @@ function PullRequestsLayout() {
 			)}
 			{!isDetailCollapsed && (
 				<div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
-					<WindowChromeScope enabled={isListCollapsed}>
-						{params.prNumber === undefined && (
-							<PageHeader end={<PullRequestListToggle />} />
-						)}
-						<Outlet />
-					</WindowChromeScope>
+					{params.prNumber === undefined && (
+						<PageHeader end={<PullRequestListToggle />} />
+					)}
+					<Outlet />
 				</div>
 			)}
 		</div>

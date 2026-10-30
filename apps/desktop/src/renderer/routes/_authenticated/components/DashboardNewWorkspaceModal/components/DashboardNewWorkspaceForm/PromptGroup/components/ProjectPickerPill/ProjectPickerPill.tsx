@@ -12,9 +12,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import { HiCheck, HiChevronUpDown, HiMiniPlus } from "react-icons/hi2";
+import { HiCheck, HiMiniPlus } from "react-icons/hi2";
 import {
 	LuBox,
 	LuFolderInput,
@@ -23,6 +24,7 @@ import {
 } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
+import { PILL_CHEVRON_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import {
 	useOpenEmptyProjectModal,
@@ -139,11 +141,11 @@ export function ProjectPickerPill({
 						<ProjectThumbnail
 							projectName={selectedProject.name}
 							iconUrl={selectedProject.iconUrl}
-							className="size-4"
+							className="size-3.5"
 						/>
 					)}
 					{isSessionSelected && !selectedProject && (
-						<LuBox className="size-4 shrink-0 text-muted-foreground" />
+						<LuBox className="size-3.5 shrink-0 text-muted-foreground" />
 					)}
 					<span className="truncate">
 						{selectedProject?.name ??
@@ -155,7 +157,7 @@ export function ProjectPickerPill({
 								t({ message: "Select project" })
 							))}
 					</span>
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<ChevronDown className={PILL_CHEVRON_CLASS} />
 				</FormPickerTrigger>
 			</PopoverTrigger>
 			<PopoverContent

@@ -12,7 +12,6 @@ import { type ReactNode, useEffect, useMemo } from "react";
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
-import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import type { StoreApi } from "zustand/vanilla";
@@ -100,7 +99,6 @@ export function RightPaneArea({
 						sources={getV2NotificationSourcesForTab(tab)}
 					/>
 				)}
-				renderTabBarLeading={isFullScreen ? () => <WindowChrome /> : undefined}
 				onAddTab={() => store.getState().addTab({ panes: [NEW_TAB_PANE] })}
 				renderTabBarTrailing={() => (
 					<div className="flex items-center gap-1 pr-1">

@@ -60,7 +60,6 @@ export function ChannelHeader({
 	return (
 		<PageHeader
 			className="border-b border-border"
-			reservesWindowControls={!isPanelOpen}
 			start={
 				<div className="flex min-w-0 items-center gap-3">
 					<Tooltip delayDuration={500}>

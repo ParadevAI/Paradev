@@ -1044,9 +1044,6 @@ msgstr "{monthlyPrice} per pengguna/bulan ditagih bulanan, atau {yearlyPrice} di
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan prioritas."
 
-msgid "{myFailedCount} of your automations failed their last run"
-msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
-
 msgid "{name} accounts"
 msgstr "Akun {name}"
 
@@ -3154,9 +3151,6 @@ msgstr "Otomatisasi & pemicu event"
 msgid "Automations require the Pro plan."
 msgstr "Otomatisasi memerlukan paket Pro."
 
-msgid "Automations, {myFailedCount} failing"
-msgstr "Otomatisasi, {myFailedCount} gagal"
-
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -3493,6 +3487,9 @@ msgstr "Bawa tautan ke sesuatu yang baru-baru ini Anda bangun."
 
 msgid "Bring Any Agent"
 msgstr "Bawa Agen Apa Pun"
+
+msgid "Bring in an agent"
+msgstr "Libatkan agen"
 
 msgid "Bring over your projects"
 msgstr "Impor proyek Anda"
@@ -4355,6 +4352,9 @@ msgstr "Tutup {displayName}"
 
 msgid "Close {label} tab"
 msgstr "Tutup tab {label}"
+
+msgid "Close {title}"
+msgstr "Tutup {title}"
 
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
@@ -11705,6 +11705,12 @@ msgstr "Terminal baru"
 msgid "New Terminal"
 msgstr "Terminal Baru"
 
+msgid "New thread"
+msgstr "Utas baru"
+
+msgid "New thread ({newThreadShortcut})"
+msgstr "Utas baru ({newThreadShortcut})"
+
 msgid "New window"
 msgstr "Jendela baru"
 
@@ -11716,9 +11722,6 @@ msgstr "Workspace baru"
 
 msgid "New Workspace"
 msgstr "Workspace Baru"
-
-msgid "New Workspace ({shortcutText})"
-msgstr "Workspace Baru ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
@@ -16297,9 +16300,6 @@ msgstr "SDK & API publik"
 msgid "Search"
 msgstr "Cari"
 
-msgid "Search ({searchShortcutText})"
-msgstr "Cari ({searchShortcutText})"
-
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "Cari {0} situs…"
@@ -16932,9 +16932,6 @@ msgstr "Menyiapkan di latar belakang..."
 
 msgid "Settings"
 msgstr "Pengaturan"
-
-msgid "Settings ({settingsHotkey})"
-msgstr "Pengaturan ({settingsHotkey})"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "Pengaturan → Akses Jarak Jauh → “Izinkan akses jarak jauh ke perangkat ini melalui relay”."
@@ -20831,9 +20828,6 @@ msgstr "Apa yang perlu berjalan otomatis?"
 
 msgid "What should the page show?"
 msgstr "Apa yang harus ditampilkan halaman ini?"
-
-msgid "What should we build next?"
-msgstr "Apa yang harus kita bangun berikutnya?"
 
 msgid "What teams automate"
 msgstr "Apa yang diotomatisasi tim"

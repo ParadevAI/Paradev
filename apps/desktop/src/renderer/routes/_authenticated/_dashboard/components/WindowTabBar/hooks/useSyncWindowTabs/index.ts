@@ -1,0 +1,1 @@
+export { useSyncWindowTabs } from "./useSyncWindowTabs";

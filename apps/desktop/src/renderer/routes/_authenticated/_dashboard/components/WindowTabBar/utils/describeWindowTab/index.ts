@@ -1,0 +1,1 @@
+export { describeWindowTab } from "./describeWindowTab";

@@ -36,12 +36,8 @@ import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
-import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
-import {
-	type AgentSwitcher,
-	ModelPicker,
-} from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
+import { ModelPicker } from "renderer/routes/_authenticated/components/AgentComposer/components/ModelPicker";
 import { ModePicker } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
@@ -85,10 +81,9 @@ import {
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
 import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
-import { NoAgentToggle } from "./components/NoAgentToggle";
+import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
-import { SupersetIcon } from "./components/SupersetIcon";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
@@ -595,36 +590,6 @@ export function NewWorkspaceScreen({
 		},
 		[setSelectedEffort, setSelectedModel],
 	);
-	const pendingSwitchModel = useRef<{
-		agent: WorkspaceCreateAgent;
-		model: string;
-	} | null>(null);
-	useEffect(() => {
-		const pending = pendingSwitchModel.current;
-		if (!pending || pending.agent !== selectedAgent) return;
-		pendingSwitchModel.current = null;
-		setSelectedModel(pending.model);
-	}, [selectedAgent, setSelectedModel]);
-	const agentSwitcher = useMemo<AgentSwitcher | undefined>(() => {
-		if (selectedAgent === "none") return undefined;
-		return {
-			currentPresetId: selectedAgent,
-			agents: v2Agents.map((agent) => ({
-				presetId: agent.id,
-				iconId: agent.iconId ?? agent.presetId,
-				label: agent.label,
-				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
-				).map(({ id, label }) => ({ id, label })),
-			})),
-			onSwitch: (agentId, model) => {
-				pendingSwitchModel.current = model
-					? { agent: agentId, model: model.id }
-					: null;
-				setSelectedAgent(agentId);
-			},
-		};
-	}, [selectedAgent, setSelectedAgent, v2Agents]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(
@@ -799,65 +764,54 @@ export function NewWorkspaceScreen({
 
 	// ── Render ───────────────────────────────────────────────────────
 	return (
-		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background">
-			<PageHeader
-				className="sticky top-0 z-10 w-full bg-background"
-				end={
-					<div className="flex items-center gap-0.5">
-						{selectedProject && !needsSetup && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon"
-										aria-label={t({
-											message: "Update naming instructions",
-										})}
-										className="size-7 text-muted-foreground"
-										onClick={handleGoToNamingInstructions}
-									>
-										<Settings2Icon className="size-4" />
-									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<Trans>
-										Update naming instructions for {selectedProject.name}
-									</Trans>
-								</TooltipContent>
-							</Tooltip>
-						)}
-						<PromptHistoryCommand
-							onSelect={applyPrompt}
-							tooltipLabel={t({
-								message: "Previous prompts",
-							})}
-						>
+		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
+			<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
+				{selectedProject && !needsSetup && (
+					<Tooltip>
+						<TooltipTrigger asChild>
 							<Button
 								type="button"
 								variant="ghost"
 								size="icon"
 								aria-label={t({
-									message: "Previous prompts",
+									message: "Update naming instructions",
 								})}
 								className="size-7 text-muted-foreground"
+								onClick={handleGoToNamingInstructions}
 							>
-								<HistoryIcon className="size-4" />
+								<Settings2Icon className="size-4" />
 							</Button>
-						</PromptHistoryCommand>
-					</div>
-				}
-			/>
-			<div className="flex flex-1 flex-col items-center justify-center gap-8">
-				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
-				<h1 className="text-center text-3xl font-medium text-foreground/90">
-					<Trans>What should we build next?</Trans>
-				</h1>
-				<GitHubStarPill surface="new_workspace" reserveSpace />
+						</TooltipTrigger>
+						<TooltipContent>
+							<Trans>
+								Update naming instructions for {selectedProject.name}
+							</Trans>
+						</TooltipContent>
+					</Tooltip>
+				)}
+				<PromptHistoryCommand
+					onSelect={applyPrompt}
+					tooltipLabel={t({
+						message: "Previous prompts",
+					})}
+				>
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						aria-label={t({
+							message: "Previous prompts",
+						})}
+						className="size-7 text-muted-foreground"
+					>
+						<HistoryIcon className="size-4" />
+					</Button>
+				</PromptHistoryCommand>
 			</div>
-			<div className="flex w-full flex-col items-center px-6 pb-8">
+			<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
+				<GitHubStarPill surface="new_workspace" className="mb-6" />
 				<div
-					className="relative flex w-full flex-col"
+					className="relative flex w-full flex-col gap-2.5"
 					style={{
 						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
 					}}
@@ -876,11 +830,9 @@ export function NewWorkspaceScreen({
 										duration: 0.15,
 										ease: "easeOut",
 									}}
-									// In flow, not absolute: the heading above is the flex-1
-									// spacer, so it absorbs this block's height and the composer
-									// stays put. Positioning it out of flow let tall suggestion
-									// sets overlap the heading instead.
-									className="mb-1"
+									// Out of flow, below the block: the composer is centred on
+									// the screen and must not move when the suggestions go.
+									className="absolute inset-x-0 top-full mt-3"
 								>
 									<SamplePrompts
 										prompts={samplePrompts}
@@ -892,71 +844,8 @@ export function NewWorkspaceScreen({
 								</motion.div>
 							)}
 					</AnimatePresence>
-					<AgentComposer
-						allowEmptySubmit
-						autoFocus
-						className="w-full"
-						draft={{
-							segments: draft.promptDraft,
-							attachments: draft.promptAttachments,
-						}}
-						disabled={needsSetup}
-						key={`${resetKey}-${promptSeed}-${placeholderRoll}`}
-						onDraftChange={({ segments, attachments }) =>
-							updateDraft({
-								promptDraft: segments,
-								promptAttachments: attachments,
-							})
-						}
-						onSubmit={() => {
-							handleSubmit();
-							return false;
-						}}
-						mentionProviders={githubProviders}
-						pending={isCreating}
-						placeholder={promptPlaceholder}
-						toolbar={
-							pickerModes && (
-								<ModePicker
-									currentModeId={
-										selectedMode ??
-										startModes?.defaultModeId ??
-										AGENT_DEFAULT_OPTION_ID
-									}
-									hiddenModeIds={startModes ? undefined : NO_HIDDEN_MODES}
-									modes={pickerModes}
-									onSelect={(modeId) =>
-										setSelectedMode(
-											modeId === AGENT_DEFAULT_OPTION_ID ||
-												modeId === startModes?.defaultModeId
-												? null
-												: modeId,
-										)
-									}
-								/>
-							)
-						}
-						toolbarEnd={
-							agentSwitcher && (
-								<ModelPicker
-									agentSwitcher={agentSwitcher}
-									configOptions={launchOptions}
-									onOpenChange={setModelPickerOpen}
-									onSelect={selectLaunchOption}
-									open={modelPickerOpen}
-								/>
-							)
-						}
-					/>
-					<div className="mt-2 flex items-center justify-between gap-2">
-						<div className="flex min-w-0 flex-1 items-center gap-2">
-							<DevicePicker
-								hostId={draft.hostId}
-								onSelectHostId={(next) => {
-									setLastHostId(next);
-									updateDraft({ hostId: next });
-								}}
-							/>
+					<div className="flex items-center justify-between gap-3 px-1">
+						<div className="flex min-w-0 flex-1 items-center gap-1.5">
 							<ProjectPickerPill
 								selectedProject={selectedProject}
 								projects={isCloudHost ? cloudHostProjects : projects}
@@ -1053,26 +942,88 @@ export function NewWorkspaceScreen({
 									)}
 								</>
 							)}
-							<NoAgentToggle
-								active={selectedAgent === "none"}
-								onChange={(none) =>
-									setSelectedAgent(
-										none ? "none" : (selectableAgentIds[0] ?? "none"),
-									)
-								}
+						</div>
+						<DevicePicker
+							hostId={draft.hostId}
+							onSelectHostId={(next) => {
+								setLastHostId(next);
+								updateDraft({ hostId: next });
+							}}
+						/>
+					</div>
+					<AgentComposer
+						layout="inline"
+						allowEmptySubmit
+						autoFocus
+						className="w-full"
+						draft={{
+							segments: draft.promptDraft,
+							attachments: draft.promptAttachments,
+						}}
+						disabled={needsSetup}
+						key={`${resetKey}-${promptSeed}-${placeholderRoll}`}
+						onDraftChange={({ segments, attachments }) =>
+							updateDraft({
+								promptDraft: segments,
+								promptAttachments: attachments,
+							})
+						}
+						onSubmit={() => {
+							handleSubmit();
+							return false;
+						}}
+						mentionProviders={githubProviders}
+						pending={isCreating}
+						placeholder={promptPlaceholder}
+					/>
+					<div className="flex items-center justify-between gap-3 px-1">
+						<div className="flex min-w-0 flex-1 items-center gap-1.5">
+							{pickerModes && (
+								<ModePicker
+									currentModeId={
+										selectedMode ??
+										startModes?.defaultModeId ??
+										AGENT_DEFAULT_OPTION_ID
+									}
+									hiddenModeIds={startModes ? undefined : NO_HIDDEN_MODES}
+									modes={pickerModes}
+									onSelect={(modeId) =>
+										setSelectedMode(
+											modeId === AGENT_DEFAULT_OPTION_ID ||
+												modeId === startModes?.defaultModeId
+												? null
+												: modeId,
+										)
+									}
+								/>
+							)}
+							<AgentPickerPill
+								agents={v2Agents}
+								selectedAgentId={selectedAgent}
+								onSelect={setSelectedAgent}
 							/>
 						</div>
-						{needsSetup && (
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className="h-6 px-2 text-[11px] text-amber-500 hover:text-amber-500"
-								onClick={handleGoToSetup}
-							>
-								<Trans>Set up project…</Trans>
-							</Button>
-						)}
+						<div className="flex shrink-0 items-center gap-1.5">
+							{needsSetup && (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="h-6 px-2 text-[11px] text-amber-500 hover:text-amber-500"
+									onClick={handleGoToSetup}
+								>
+									<Trans>Set up project…</Trans>
+								</Button>
+							)}
+							{selectedAgent !== "none" && (
+								<ModelPicker
+									configOptions={launchOptions}
+									onOpenChange={setModelPickerOpen}
+									onSelect={selectLaunchOption}
+									open={modelPickerOpen}
+								/>
+							)}
+						</div>
 					</div>
 					<SymmetricResizeHandles
 						currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}

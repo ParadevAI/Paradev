@@ -34,11 +34,12 @@ import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-stat
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
+import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TopBar } from "./components/TopBar";
-import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
+import { WindowTabBar } from "./components/WindowTabBar";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
@@ -102,7 +103,6 @@ function DashboardLayout() {
 	const onV1WorkspaceRoute = currentWorkspaceMatch !== false;
 	const onV2WorkspaceRoute = v2WorkspaceMatch !== false;
 	useHistoryNavigationShortcuts();
-	const showsAppTopBar = useShowsAppTopBar();
 	const versionMismatch =
 		(isV2CloudEnabled && onV1WorkspaceRoute) ||
 		(!isV2CloudEnabled && onV2WorkspaceRoute);
@@ -185,31 +185,35 @@ function DashboardLayout() {
 		},
 	);
 
-	// The collapsed rail's top strip continues the page's header row, so the
-	// panel must not draw its own full-height border: the sidebar's inner
-	// border, which stops below the strip, is the only divider.
-	const railContinuesHeaderRow = !showsAppTopBar && isWorkspaceSidebarCollapsed;
-
-	const sidebarPanel = (
-		<WorkspaceSidebarPanel
-			className={railContinuesHeaderRow ? "border-r-0" : undefined}
-		>
-			{isV2CloudEnabled ? (
-				<DashboardSidebar isCollapsed={isWorkspaceSidebarCollapsed} />
-			) : (
-				<WorkspaceSidebar
-					isCollapsed={isWorkspaceSidebarCollapsed}
-					activeProjectId={currentWorkspace?.projectId ?? null}
-					activeProjectName={currentWorkspace?.project?.name ?? null}
-				/>
-			)}
-		</WorkspaceSidebarPanel>
+	const sidebar = isV2CloudEnabled ? (
+		<DashboardSidebar isCollapsed={isWorkspaceSidebarCollapsed} />
+	) : (
+		<WorkspaceSidebar
+			isCollapsed={isWorkspaceSidebarCollapsed}
+			activeProjectId={currentWorkspace?.projectId ?? null}
+			activeProjectName={currentWorkspace?.project?.name ?? null}
+		/>
 	);
 
-	// v2 screens draw their own headers, so the sidebar always runs full
-	// height beside them; only v1 screens keep the TopBar above both.
-	const sidebarOutsideColumn =
-		!showsAppTopBar || (isV2CloudEnabled && !isWorkspaceSidebarCollapsed);
+	const content = (
+		<div className="relative flex min-h-0 min-w-0 flex-1">
+			{versionMismatch ? (
+				// A v2 user on a stale v1 workspace route has nothing to go
+				// back to, so send them somewhere actionable instead of a
+				// dead-end "pick a workspace" screen. v1 users keep the
+				// static state — /new-workspace is a v2-only surface.
+				isV2CloudEnabled ? (
+					<Redirect to="/new-workspace" replace />
+				) : (
+					<CrossVersionMismatchState />
+				)
+			) : (
+				<ContentBoundary>
+					<Outlet />
+				</ContentBoundary>
+			)}
+		</div>
+	);
 
 	return (
 		// The single ports-data provider for both layout modes. It lives up here
@@ -231,47 +235,43 @@ function DashboardLayout() {
 		>
 			<PortForwardsProvider>
 				<RemotePortForwarder />
-				<div className="flex h-full w-full overflow-hidden">
-					<CommandPaletteHost />
-					{sidebarOutsideColumn && sidebarPanel}
-					<div className="flex flex-1 flex-col min-w-0 min-h-0">
-						{showsAppTopBar && <TopBar />}
-						<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
-							{!sidebarOutsideColumn && sidebarPanel}
-							<div className="relative flex flex-1 min-h-0 min-w-0">
-								{versionMismatch ? (
-									// A v2 user on a stale v1 workspace route has nothing to go
-									// back to, so send them somewhere actionable instead of a
-									// dead-end "pick a workspace" screen. v1 users keep the
-									// static state — /new-workspace is a v2-only surface.
-									isV2CloudEnabled ? (
-										<Redirect to="/new-workspace" replace />
-									) : (
-										<CrossVersionMismatchState />
-									)
-								) : (
-									<ContentBoundary>
-										<Outlet />
-									</ContentBoundary>
-								)}
+				<CommandPaletteHost />
+				{isV2CloudEnabled ? (
+					<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+						<WindowTabBar />
+						<div className="flex min-h-0 flex-1">
+							<NavigationRail />
+							<WorkspaceSidebarPanel collapsedWidth={0} className="border-r-0">
+								{sidebar}
+							</WorkspaceSidebarPanel>
+							<div className="relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-background">
+								{content}
 							</div>
 						</div>
 					</div>
-					<AddRepositoryModals />
-					<SaveAsEnvironmentMount />
-					<RestoreCloudWorkspaceMount />
-					{deleteTarget && (
-						<DeleteWorkspaceDialog
-							workspaceId={deleteTarget.workspaceId}
-							workspaceName={deleteTarget.workspaceName}
-							workspaceType={deleteTarget.workspaceType}
-							open={true}
-							onOpenChange={(open) => {
-								if (!open) setDeleteTarget(null);
-							}}
-						/>
-					)}
-				</div>
+				) : (
+					<div className="flex h-full w-full flex-col overflow-hidden">
+						<TopBar />
+						<div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+							<WorkspaceSidebarPanel>{sidebar}</WorkspaceSidebarPanel>
+							{content}
+						</div>
+					</div>
+				)}
+				<AddRepositoryModals />
+				<SaveAsEnvironmentMount />
+				<RestoreCloudWorkspaceMount />
+				{deleteTarget && (
+					<DeleteWorkspaceDialog
+						workspaceId={deleteTarget.workspaceId}
+						workspaceName={deleteTarget.workspaceName}
+						workspaceType={deleteTarget.workspaceType}
+						open={true}
+						onOpenChange={(open) => {
+							if (!open) setDeleteTarget(null);
+						}}
+					/>
+				)}
 			</PortForwardsProvider>
 		</DashboardSidebarPortsProvider>
 	);

@@ -15,9 +15,12 @@ const getMaxWidth = () => getWorkspaceSidebarMaxWidth(window.innerWidth);
 
 export function WorkspaceSidebarPanel({
 	className,
+	/** What the panel shows while collapsed: its own icon rail, or nothing beside a separate one. */
+	collapsedWidth = COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
 	children,
 }: {
 	className?: string;
+	collapsedWidth?: number;
 	children: React.ReactNode;
 }) {
 	const width = useWorkspaceSidebarStore((s) => s.width);
@@ -27,11 +30,11 @@ export function WorkspaceSidebarPanel({
 		<ResizablePanel
 			width={
 				width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
-					? width
+					? collapsedWidth
 					: Math.min(width, maxWidth)
 			}
 			onWidthChange={(next) => setWidth(Math.min(next, maxWidth))}
-			minWidth={COLLAPSED_WORKSPACE_SIDEBAR_WIDTH}
+			minWidth={collapsedWidth}
 			maxWidth={maxWidth}
 			handleSide="right"
 			clampWidth={false}

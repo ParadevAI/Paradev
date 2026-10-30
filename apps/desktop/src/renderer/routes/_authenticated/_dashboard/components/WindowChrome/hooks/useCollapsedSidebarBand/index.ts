@@ -1,1 +1,0 @@
-export { useCollapsedSidebarBand } from "./useCollapsedSidebarBand";

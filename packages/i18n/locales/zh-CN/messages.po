@@ -1044,9 +1044,6 @@ msgstr "按月计费每用户每月 {monthlyPrice}，或按年计费 {yearlyPric
 msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。"
 
-msgid "{myFailedCount} of your automations failed their last run"
-msgstr "你有{myFailedCount}个自动化上次运行失败"
-
 msgid "{name} accounts"
 msgstr "{name} 账号"
 
@@ -3154,9 +3151,6 @@ msgstr "自动化与事件触发"
 msgid "Automations require the Pro plan."
 msgstr "自动化需要Pro套餐。"
 
-msgid "Automations, {myFailedCount} failing"
-msgstr "自动化，{myFailedCount}个失败"
-
 msgid "Autonomous"
 msgstr "自主"
 
@@ -3493,6 +3487,9 @@ msgstr "请带上你最近做的作品链接。"
 
 msgid "Bring Any Agent"
 msgstr "带上任意智能体"
+
+msgid "Bring in an agent"
+msgstr "引入智能体"
 
 msgid "Bring over your projects"
 msgstr "迁入项目"
@@ -4355,6 +4352,9 @@ msgstr "关闭{displayName}"
 
 msgid "Close {label} tab"
 msgstr "关闭 {label} 标签页"
+
+msgid "Close {title}"
+msgstr "关闭 {title}"
 
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
@@ -11705,6 +11705,12 @@ msgstr "新建终端"
 msgid "New Terminal"
 msgstr "新建终端"
 
+msgid "New thread"
+msgstr "新话题"
+
+msgid "New thread ({newThreadShortcut})"
+msgstr "新话题 ({newThreadShortcut})"
+
 msgid "New window"
 msgstr "新建窗口"
 
@@ -11716,9 +11722,6 @@ msgstr "新建工作区"
 
 msgid "New Workspace"
 msgstr "新建工作区"
-
-msgid "New Workspace ({shortcutText})"
-msgstr "新建工作区（{shortcutText}）"
 
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作区"
@@ -16297,9 +16300,6 @@ msgstr "SDK与公开API"
 msgid "Search"
 msgstr "搜索"
 
-msgid "Search ({searchShortcutText})"
-msgstr "搜索（{searchShortcutText}）"
-
 #. placeholder {0}: domains.length
 msgid "Search {0} sites…"
 msgstr "搜索{0}个站点…"
@@ -16932,9 +16932,6 @@ msgstr "正在后台配置..."
 
 msgid "Settings"
 msgstr "设置"
-
-msgid "Settings ({settingsHotkey})"
-msgstr "设置（{settingsHotkey}）"
 
 msgid "Settings → Remote Access → “Allow remote access to this device via relay”."
 msgstr "设置 → 远程访问 → “允许通过中继远程访问本设备”。"
@@ -20831,9 +20828,6 @@ msgstr "哪些事应该自动运行？"
 
 msgid "What should the page show?"
 msgstr "页面应展示什么?"
-
-msgid "What should we build next?"
-msgstr "接下来做点什么？"
 
 msgid "What teams automate"
 msgstr "团队都在自动化什么"

@@ -1,0 +1,1 @@
+export { useWindowTabTitles } from "./useWindowTabTitles";

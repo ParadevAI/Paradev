@@ -12,14 +12,15 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
+import { ChevronDown } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect } from "react";
 import {
 	HiCheck,
-	HiChevronUpDown,
 	HiOutlineComputerDesktop,
 	HiOutlineServer,
 } from "react-icons/hi2";
+import { PILL_CHEVRON_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
@@ -69,12 +70,12 @@ interface DevicePickerProps {
 
 function getSelectedIcon(hostId: string | null, machineId: string | null) {
 	if (hostId === CLOUD_HOST_ID) {
-		return <CloudGlyph className="size-4 shrink-0" />;
+		return <CloudGlyph className="size-3.5 shrink-0" />;
 	}
 	if (hostId === null || hostId === machineId) {
-		return <HiOutlineComputerDesktop className="size-4 shrink-0" />;
+		return <HiOutlineComputerDesktop className="size-3.5 shrink-0" />;
 	}
-	return <HiOutlineServer className="size-4 shrink-0" />;
+	return <HiOutlineServer className="size-3.5 shrink-0" />;
 }
 
 export function DevicePicker({
@@ -136,7 +137,7 @@ export function DevicePicker({
 					{getSelectedIcon(hostId, machineId)}
 					<span className="truncate">{selectedLabel}</span>
 					{selectedOnline !== null && <OnlineDot online={selectedOnline} />}
-					<HiChevronUpDown className="size-3 shrink-0" />
+					<ChevronDown className={PILL_CHEVRON_CLASS} />
 				</FormPickerTrigger>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent

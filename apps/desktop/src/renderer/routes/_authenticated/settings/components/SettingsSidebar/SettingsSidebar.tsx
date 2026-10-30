@@ -14,10 +14,6 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AppMenuButton } from "renderer/routes/_authenticated/_dashboard/components/AppMenuButton";
 import { NavigationControls } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls";
 import {
-	WINDOW_CONTROLS_ROW_HEIGHT,
-	WINDOW_CONTROLS_ROW_TOP,
-} from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
-import {
 	useSetSettingsSearchQuery,
 	useSettingsOriginRoute,
 	useSettingsSearchQuery,
@@ -25,6 +21,13 @@ import {
 import { COLLAPSED_WORKSPACE_SIDEBAR_WIDTH } from "renderer/stores/workspace-sidebar-state";
 import { getVisibleMatchCountBySection } from "../../utils/settings-search";
 import { GeneralSettings } from "./GeneralSettings";
+
+/**
+ * macOS draws the window buttons centered 22.75pt from the window's top edge.
+ * The controls beside them sit in a row centered on the same line.
+ */
+const WINDOW_CONTROLS_ROW_TOP = 7;
+const WINDOW_CONTROLS_ROW_HEIGHT = 32;
 
 export function SettingsSidebar() {
 	const { t } = useLingui();

@@ -1,0 +1,1 @@
+export { WindowTab } from "./WindowTab";

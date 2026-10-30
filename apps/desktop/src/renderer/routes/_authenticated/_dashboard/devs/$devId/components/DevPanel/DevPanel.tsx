@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import type { RouterOutputs } from "@superset/trpc";
 import { DevAvatar } from "renderer/routes/_authenticated/_dashboard/components/DevAvatar";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
-import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import { DevDescription } from "./components/DevDescription";
 import { DevInstructions } from "./components/DevInstructions";
 import { DevStatus } from "./components/DevStatus";
@@ -23,7 +22,6 @@ export function DevPanel({ dev, onHide, onCustomize }: DevPanelProps) {
 		<div className="flex h-full w-full min-w-0 flex-col border-l border-border bg-background">
 			<div className="flex h-12 shrink-0 items-center justify-end gap-1 border-b border-border pr-2">
 				<RightSidebarToggle isOpen onToggle={onHide} compact />
-				<WindowControlsInset />
 			</div>
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				<div className="flex flex-col gap-5 p-4">
