@@ -25,7 +25,7 @@ import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
@@ -83,6 +83,11 @@ import {
 	diffPaneActionsSlotId,
 	diffPaneTitleSlotId,
 } from "./utils/headerSlots";
+import {
+	findItemIdForDiff,
+	pruneTooLargeMarks,
+	type TooLargeMarks,
+} from "./utils/tooLargeMarks";
 
 interface CreateNewAgentSessionInput {
 	configId: string;
@@ -274,11 +279,9 @@ export function DiffPane({
 	// Pierre's callbacks read files through refs: a callback that closed over
 	// the per-refresh map would rebuild every header portal and item on each save.
 	const fileByItemIdRef = useRef<ReadonlyMap<string, ChangesetFile>>(new Map());
-	const [tooLargeItemIds, setTooLargeItemIds] = useState<ReadonlySet<string>>(
-		new Set(),
-	);
-	const tooLargeItemIdsRef = useRef(tooLargeItemIds);
-	tooLargeItemIdsRef.current = tooLargeItemIds;
+	const [tooLargeMarks, setTooLargeMarks] = useState<TooLargeMarks>(new Map());
+	const tooLargeMarksRef = useRef(tooLargeMarks);
+	tooLargeMarksRef.current = tooLargeMarks;
 	const getFile = useCallback(
 		(itemId: string) => fileByItemIdRef.current.get(itemId),
 		[],
@@ -311,6 +314,11 @@ export function DiffPane({
 		extraAnnotationsByItemId: composerAnnotationsByItemId,
 	});
 	fileByItemIdRef.current = fileByItemId;
+	const itemsRef = useRef(items);
+	itemsRef.current = items;
+	useEffect(() => {
+		setTooLargeMarks((current) => pruneTooLargeMarks(current, items));
+	}, [items]);
 
 	const writeEditedItem = useCallback(
 		async (itemId: string): Promise<boolean> => {
@@ -564,29 +572,31 @@ export function DiffPane({
 
 	// A file past the load cap can't expand or enter edit mode. Mark it, and
 	// leave the edit mode the click may have started.
-	const markTooLarge = useCallback((itemId: string) => {
-		setTooLargeItemIds((current) => new Set(current).add(itemId));
-		const file = fileByItemIdRef.current.get(itemId);
-		if (file && editingSetRef.current.has(getChangesetFileKey(file))) {
-			pendingEditorFocusRef.current = null;
-			setEditingSet(new Set());
-		}
-	}, []);
+	const markTooLarge = useCallback(
+		(itemId: string, fileDiff: FileDiffMetadata) => {
+			setTooLargeMarks((current) => new Map(current).set(itemId, fileDiff));
+			const file = fileByItemIdRef.current.get(itemId);
+			if (file && editingSetRef.current.has(getChangesetFileKey(file))) {
+				pendingEditorFocusRef.current = null;
+				setEditingSet(new Set());
+			}
+		},
+		[],
+	);
 
 	// Patches carry hunks with three lines of context; @pierre/diffs calls this
 	// when it needs the rest of a file — expanding context, or entering edit
 	// mode — so whole files only cross the wire for files somebody opens.
 	const loadDiffFiles = useCallback(
 		async (fileDiff: FileDiffMetadata) => {
+			const itemId = findItemIdForDiff(itemsRef.current, fileDiff);
 			const files = filesRef.current;
 			const file =
+				(itemId ? fileByItemIdRef.current.get(itemId) : undefined) ??
 				files.find((candidate) => candidate.path === fileDiff.name) ??
 				files.find((candidate) => candidate.path === fileDiff.prevName);
 			if (!file) throw new Error(`no changeset file for ${fileDiff.name}`);
-			const itemId = [...fileByItemIdRef.current].find(
-				([, candidate]) => candidate === file,
-			)?.[0];
-			if (itemId && tooLargeItemIdsRef.current.has(itemId)) {
+			if (itemId && tooLargeMarksRef.current.get(itemId) === fileDiff) {
 				throw new Error(`${file.path} is too large to expand`);
 			}
 			const { oldFile, newFile } = await trpcClient.git.getDiff.query(
@@ -596,7 +606,7 @@ export function DiffPane({
 				// Parsing this much text on the main thread is the freeze the
 				// pane is built to avoid; leaving the diff partial keeps the
 				// hunks we already have.
-				if (itemId) markTooLarge(itemId);
+				if (itemId) markTooLarge(itemId, fileDiff);
 				throw new Error(`${file.path} is too large to expand`);
 			}
 			const loaded: FileDiffLoadedFiles =
@@ -644,7 +654,7 @@ export function DiffPane({
 					return;
 				const file = getFile(itemContext.item.id);
 				if (!canEditDiffFile(file)) return;
-				if (tooLargeItemIdsRef.current.has(itemContext.item.id)) return;
+				if (tooLargeMarksRef.current.has(itemContext.item.id)) return;
 				pendingEditorFocusRef.current = {
 					itemId: itemContext.item.id,
 					lineNumber: line.lineNumber,
@@ -669,7 +679,8 @@ export function DiffPane({
 					!line.numberColumn &&
 					(line.annotationSide == null ||
 						line.annotationSide === "additions") &&
-					canEditDiffFile(file)
+					canEditDiffFile(file) &&
+					!tooLargeMarksRef.current.has(itemContext.item.id)
 				) {
 					line.lineElement.style.cursor = "text";
 				}
@@ -734,7 +745,7 @@ export function DiffPane({
 					onOpenFile={onOpenFile}
 					onOpenInExternalEditor={openInExternalEditor}
 					isEditing={isEditing}
-					isTooLarge={tooLargeItemIds.has(item.id)}
+					isTooLarge={tooLargeMarks.has(item.id)}
 					isDirty={dirtyItemIds.has(item.id)}
 					isSaving={writeFile.isPending}
 					onSaveEditing={
@@ -755,7 +766,7 @@ export function DiffPane({
 			onOpenFile,
 			openInExternalEditor,
 			editingSet,
-			tooLargeItemIds,
+			tooLargeMarks,
 			dirtyItemIds,
 			writeFile.isPending,
 			saveEditedItem,
