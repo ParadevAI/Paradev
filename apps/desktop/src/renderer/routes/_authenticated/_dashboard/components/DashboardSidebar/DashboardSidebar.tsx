@@ -188,6 +188,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const { activeHostUrl } = useLocalHostService();
 	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
 	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
+	// Channels and Devs belong to the rail's Chat destination; elsewhere the
+	// list is workspaces only.
+	const isChatSection =
+		!!matchRoute({ to: "/channels", fuzzy: true }) ||
+		!!matchRoute({ to: "/devs", fuzzy: true });
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.workspaces,
 	);
@@ -504,7 +509,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 												status={githubStatus}
 												isCollapsed={isCollapsed}
 											/>
-											{isChannelsEnabled && !isCollapsed && (
+											{isChannelsEnabled && isChatSection && (
 												<>
 													<DashboardSidebarChannelsSection />
 													<DashboardSidebarDevsSection />

@@ -50,7 +50,9 @@ export function useDashboardNavigation() {
 		isHomeOpen: !!matchRoute({ to: "/new-workspace" }),
 		openHome: () => navigate({ to: "/new-workspace" }),
 
-		isChannelsOpen: !!matchRoute({ to: "/channels", fuzzy: true }),
+		isChannelsOpen:
+			!!matchRoute({ to: "/channels", fuzzy: true }) ||
+			!!matchRoute({ to: "/devs", fuzzy: true }),
 		openChannels: () => navigate({ to: "/channels/threads" }),
 
 		isWorkspacesOpen: !!matchRoute({ to: "/v2-workspaces" }),
