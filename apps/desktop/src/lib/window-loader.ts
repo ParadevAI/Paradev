@@ -31,16 +31,15 @@ export function registerRoute(props: {
 		props.browserWindow.loadFile(props.htmlFile, { hash: "/" });
 	}
 
+	const { webContents } = props.browserWindow;
+
 	// Log successful loads
-	props.browserWindow.webContents.on("did-finish-load", () => {
-		console.log(
-			"[window-loader] Successfully loaded:",
-			props.browserWindow.webContents.getURL(),
-		);
+	webContents.on("did-finish-load", () => {
+		console.log("[window-loader] Successfully loaded:", webContents.getURL());
 	});
 
 	// Log and handle load failures
-	props.browserWindow.webContents.on(
+	webContents.on(
 		"did-fail-load",
 		(_event, errorCode, errorDescription, validatedURL) => {
 			console.error("[window-loader] Failed to load URL:", validatedURL);
