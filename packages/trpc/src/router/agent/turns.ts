@@ -176,13 +176,20 @@ export function eventText(event: {
 	const attrs = [
 		`from="${attr(event.from)}"`,
 		`where="${attr(event.where)}"`,
-		...(event.replyTo ? [`reply_to="${event.replyTo}"`] : []),
+		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
 	];
-	return `<message ${attrs.join(" ")}>\n${event.body}\n</message>`;
+	return `<message ${attrs.join(" ")}>\n${escapeMessageTags(event.body)}\n</message>`;
 }
 
 function attr(value: string) {
-	return value.replace(/["\n]/g, " ");
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/"/g, "&quot;")
+		.replace(/\n/g, "&#10;");
+}
+
+function escapeMessageTags(body: string) {
+	return body.replace(/<(?=\s*\/?\s*message\b)/gi, "&lt;");
 }
 
 /** The one session every message to a Dev reaches; made on first use. */
