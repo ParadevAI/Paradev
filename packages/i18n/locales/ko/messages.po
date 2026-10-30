@@ -16707,9 +16707,6 @@ msgstr "최근 30일 사용량이 공개 리더보드에서 어디쯤인지 확�
 msgid "Select"
 msgstr "선택"
 
-msgid "Select a file to view it here"
-msgstr "파일을 선택하면 여기에 표시됩니다"
-
 msgid "Select a project"
 msgstr "프로젝트를 선택하세요"
 

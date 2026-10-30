@@ -16707,9 +16707,6 @@ msgstr "Sieh, wo deine letzten 30 Tage in der öffentlichen Bestenliste landen. 
 msgid "Select"
 msgstr "Select"
 
-msgid "Select a file to view it here"
-msgstr "Wähle eine Datei aus, um sie hier anzuzeigen"
-
 msgid "Select a project"
 msgstr "Wähle ein Projekt"
 
