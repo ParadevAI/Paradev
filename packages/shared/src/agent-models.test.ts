@@ -432,6 +432,20 @@ describe("buildAgentEffortArgs", () => {
 });
 
 describe("getAgentEfforts", () => {
+	it("offers agy effort only on Gemini models, which alone accept --effort", () => {
+		expect(getAgentEfforts("agy", "gemini-4-argon").map((e) => e.id)).toEqual([
+			"low",
+			"medium",
+			"high",
+		]);
+		expect(getAgentEfforts("agy", "claude-sonnet-4-6")).toEqual([]);
+		expect(getAgentEfforts("agy")).toEqual([]);
+		expect(buildAgentEffortArgs("agy", "high")).toEqual([]);
+		expect(buildAgentEffortArgs("agy", "high", "claude-sonnet-4-6")).toEqual(
+			[],
+		);
+	});
+
 	it("offers codex's top efforts only alongside the models that take them", () => {
 		expect(getAgentEfforts("codex", "gpt-5.6-sol").map((e) => e.id)).toEqual([
 			"low",

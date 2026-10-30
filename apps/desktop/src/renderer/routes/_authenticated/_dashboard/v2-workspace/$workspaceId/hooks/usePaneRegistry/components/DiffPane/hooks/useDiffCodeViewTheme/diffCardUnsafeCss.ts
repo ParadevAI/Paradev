@@ -3,12 +3,6 @@
 // useDiffCardCodeViewTheme. Files run edge to edge; each header's top border
 // is the divider between files.
 //
-// [data-diff]'s --diffs-light-bg/--diffs-dark-bg override: the shared hook
-// sources its background from the *terminal* theme, which doesn't match the
-// app's own var(--background). Both are !important, so this wins by appearing
-// later in the concatenated string. The CodeView root gets the same fix
-// through useDiffCardCodeViewTheme's style, since unsafeCSS can't reach it.
-//
 // The header height must match DIFF_HEADER_HEIGHT, which CodeView lays items
 // out with.
 //
@@ -25,9 +19,7 @@ export function diffCardUnsafeCss(
 		border-top: 1px solid var(--border);
 		min-height: ${DIFF_HEADER_HEIGHT}px;
 		height: ${DIFF_HEADER_HEIGHT}px;
-		/* Pushes [data-metadata] (the +/- count) to the right edge instead of
-		 * leaving it flush against the filename. Overrides the shared hook's
-		 * flex-start (same selector, appended later so it wins). */
+		/* Pushes [data-metadata] (the +/- count) to the right edge. */
 		justify-content: space-between;
 		/* Pierre's own padding (0 16px) sits the collapse chevron well right
 		 * of the pane header's controls; cut to match. */
@@ -68,10 +60,6 @@ export function diffCardUnsafeCss(
 	}
 	[data-diffs-header='default'] [data-deletions-count] {
 		color: ${deletionsColor};
-	}
-	[data-diff] {
-		--diffs-light-bg: var(--background) !important;
-		--diffs-dark-bg: var(--background) !important;
 	}
 	/* The shared hook zeroes this strip's inline padding, which leaves
 	 * "N unmodified lines" touching the pane edge. Restored (same selector,

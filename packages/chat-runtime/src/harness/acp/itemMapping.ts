@@ -97,6 +97,7 @@ export function mapToolBody(
 				path: entry.path,
 				oldText: entry.oldText ?? null,
 				newText: entry.newText,
+				...(entry._meta?.kind === "delete" ? { deleted: true } : {}),
 			});
 		} else if (entry.type === "diff") {
 			const patch =

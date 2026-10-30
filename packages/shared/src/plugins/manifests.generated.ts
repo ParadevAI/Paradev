@@ -767,6 +767,58 @@ export const FIRST_PARTY_MANIFESTS = {
 			}
 		]
 	} as const,
+	"peec": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "peec",
+		"version": "1.0.0",
+		"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"peec",
+			"aeo",
+			"geo",
+			"ai-search",
+			"seo",
+			"visibility"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Peec AI",
+					"category": "Data & APIs",
+					"icon": "peec"
+				},
+				"connector": {
+					"slug": "peec_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.peec.ai/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "diagnose-ai-visibility",
+				"description": "Find out why AI search engines leave your brand out of an answer, and pick the one fix that matches the cause — read the answers and the sources they cite, map the question to your own page, then decide if the page is broken, missing, weak, or outweighed by third-party sources. Use when the user asks why ChatGPT, Gemini, Perplexity or Google AI Overviews do not mention them, which prompts they lose, what content to write next, or how to improve AI visibility."
+			},
+			{
+				"name": "work-peec-actions",
+				"description": "Work through Peec AI's recommended actions and keep the record honest — site fixes first, decline false positives with a reason, log work you shipped as completed actions on the date it shipped so Peec's Impact view measures it, and check before and after. Use when the user asks what to do next in Peec, wants to triage or clean up Peec actions, record shipped content or fixes in Peec, or see whether a change moved AI visibility."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

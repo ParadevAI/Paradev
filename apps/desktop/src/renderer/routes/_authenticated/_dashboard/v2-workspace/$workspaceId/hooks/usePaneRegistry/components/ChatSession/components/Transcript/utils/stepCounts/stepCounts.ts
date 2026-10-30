@@ -1,5 +1,10 @@
 import type { ToolCall } from "@superset/chat/protocol";
 import { changedPaths } from "../fileChange";
+import {
+	effectiveToolKind,
+	intentLocation,
+	toolCallIntent,
+} from "../shellIntent";
 
 /**
  * What a run of tool calls amounted to, by the concept a reader cares about
@@ -26,7 +31,7 @@ export function stepCounts(items: readonly ToolCall[]): StepCounts {
 	};
 	const editedPaths = new Set<string>();
 	for (const item of items) {
-		switch (item.toolKind) {
+		switch (effectiveToolKind(item)) {
 			case "execute":
 				counts.commands += 1;
 				break;
@@ -34,8 +39,12 @@ export function stepCounts(items: readonly ToolCall[]): StepCounts {
 			case "delete":
 			case "move": {
 				const paths = changedPaths(item);
-				if (paths.length === 0) counts.edits += 1;
 				for (const path of paths) editedPaths.add(path);
+				if (paths.length > 0) break;
+				const intent = toolCallIntent(item);
+				const location = intent ? intentLocation(intent) : undefined;
+				if (location) editedPaths.add(location);
+				else counts.edits += 1;
 				break;
 			}
 			case "read":

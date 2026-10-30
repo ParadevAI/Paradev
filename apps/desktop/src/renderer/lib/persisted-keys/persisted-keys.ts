@@ -52,6 +52,9 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "v2-local-override-v2", match: "exact" },
 	// New-sidebar experiment toggle; the new sidebar is always on
 	{ key: "new-dashboard-sidebar", match: "exact" },
+	// File explorer and search dialog zustand stores had no consumers
+	{ key: "file-explorer-store", match: "exact" },
+	{ key: "search-dialog-store", match: "exact" },
 ];
 
 function matchesDeadKey(key: string): boolean {

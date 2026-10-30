@@ -287,8 +287,7 @@ function sourceDir(marketplace: string, entry: MarketplaceEntry): string {
  * no such release, so the caller can fall back to the working tree.
  *
  * ls-tree plus show rather than `git archive`: it needs no tar reader, and
- * reading each blob as a Buffer keeps a bundled server byte-identical, which
- * is what its published digest is taken over.
+ * reading each blob as a Buffer keeps every file byte-identical.
  */
 async function extractTag(
 	location: string,
@@ -398,6 +397,7 @@ export interface InstallPluginResult {
 	version: string;
 	installPath: string;
 	skills: number;
+	tools?: boolean;
 }
 
 export interface InstallPluginOptions {
@@ -518,6 +518,45 @@ export async function installPlugin(
 		version,
 		installPath: target,
 		skills,
+	};
+}
+
+/** The ledger with this plugin recorded, keeping a member's choice to disable it. */
+export function ledgerWithPlugin(
+	ledger: readonly InstalledPlugin[],
+	plugin: Omit<InstallPluginResult, "skills">,
+	installedAt: string,
+): InstalledPlugin[] {
+	const existing = ledger.find(
+		(p) => p.name === plugin.name && p.marketplace === plugin.marketplace,
+	);
+	return [
+		...ledger.filter((p) => p !== existing),
+		{
+			...plugin,
+			installedAt,
+			enabled: existing?.enabled ?? true,
+		} satisfies InstalledPlugin,
+	];
+}
+
+/** Records the plugin and drops the tree of the version it replaces; `provision: false` leaves re-provisioning agents to the caller. */
+export async function recordPlugin(
+	plugin: Omit<InstallPluginResult, "skills">,
+	{ provision = true }: { provision?: boolean } = {},
+): Promise<InstallPluginResult> {
+	const ledger = readInstalledPlugins();
+	const replaced = findInstalled(ledger, plugin.name, plugin.marketplace);
+	writeInstalledPlugins(
+		ledgerWithPlugin(ledger, plugin, new Date().toISOString()),
+	);
+	if (replaced?.installPath && replaced.installPath !== plugin.installPath) {
+		fs.rmSync(replaced.installPath, { recursive: true, force: true });
+	}
+
+	return {
+		...plugin,
+		skills: provision ? (await syncPlugins()).skills : 0,
 	};
 }
 

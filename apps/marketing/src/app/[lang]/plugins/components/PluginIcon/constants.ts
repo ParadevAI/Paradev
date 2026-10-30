@@ -9,6 +9,7 @@ import {
 	SiVercel,
 } from "react-icons/si";
 import { AutumnIcon } from "./components/AutumnIcon";
+import { PeecIcon } from "./components/PeecIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 export const IMAGE_ICONS: Record<string, string> = {
@@ -28,6 +29,7 @@ export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	github: { icon: FaGithub },
 	linear: { icon: SiLinear },
 	notion: { icon: SiNotion },
+	peec: { icon: PeecIcon },
 	posthog: { icon: SiPosthog },
 	resend: { icon: SiResend },
 	sentry: { icon: SiSentry },

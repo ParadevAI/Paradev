@@ -112,15 +112,30 @@ export async function fetchCodexAccounts(): Promise<UsageAccount[]> {
 			fetchCodexAccountForHome(home, home.home === defaultHome),
 		),
 	);
-	// Dedupe by account email — one login used from several homes is one
-	// account; keep the first (default home wins).
+	return dedupeCodexAccounts(accounts.flat());
+}
+
+export interface CodexHomeAccount {
+	account: UsageAccount;
+	chatgptAccountId: string | null;
+}
+
+export function dedupeCodexAccounts(
+	accounts: CodexHomeAccount[],
+): UsageAccount[] {
 	const seen = new Set<string>();
-	return accounts.flat().filter((account) => {
-		const key = account.email ?? account.accountKey;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
+	return accounts
+		.filter(({ account, chatgptAccountId }) => {
+			// One email can hold several ChatGPT accounts: a personal plan and workspace seats.
+			const key =
+				account.email && chatgptAccountId
+					? JSON.stringify([account.email, chatgptAccountId])
+					: account.accountKey;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		})
+		.map(({ account }) => account);
 }
 
 /** What the ChatGPT usage endpoint says about one access token. */
@@ -195,7 +210,7 @@ export async function fetchCodexSubscriptionQuota(
 async function fetchCodexAccountForHome(
 	home: CodexHome,
 	isDefaultHome: boolean,
-): Promise<UsageAccount[]> {
+): Promise<CodexHomeAccount[]> {
 	const codexHome = home.home;
 	const authPath = join(codexHome, "auth.json");
 	const base = {
@@ -215,14 +230,17 @@ async function fetchCodexAccountForHome(
 	if (home.credentialKind === "api_key") {
 		return [
 			{
-				...base,
-				email: null,
-				plan: null,
-				status: "ok",
-				statusDetail:
-					"Billed per token through the OpenAI Platform — no quota windows.",
-				windows: [],
-				creditsBalance: null,
+				account: {
+					...base,
+					email: null,
+					plan: null,
+					status: "ok",
+					statusDetail:
+						"Billed per token through the OpenAI Platform — no quota windows.",
+					windows: [],
+					creditsBalance: null,
+				},
+				chatgptAccountId: null,
 			},
 		];
 	}
@@ -240,5 +258,10 @@ async function fetchCodexAccountForHome(
 		accessToken,
 		auth.tokens?.account_id,
 	);
-	return [{ ...base, ...quota }];
+	return [
+		{
+			account: { ...base, ...quota },
+			chatgptAccountId: auth.tokens?.account_id ?? null,
+		},
+	];
 }

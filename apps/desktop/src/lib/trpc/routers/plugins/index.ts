@@ -1,17 +1,38 @@
+import { isOrganizationMarketplace } from "@superset/shared/plugins";
 import { TRPCError } from "@trpc/server";
 import {
 	getBundledSkillContent,
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
+	getInstalledPlugins,
+	installOrganizationPlugin,
 	installPlugin,
+	organizationPluginVersions,
+	setOrganizationPluginEnabled,
 	setPluginEnabled,
 	setSkillEnabled,
+	syncPlugins,
 	uninstallPlugin,
 	writeBundledSkillContent,
 } from "main/lib/plugin-installs";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+
+const pluginRef = z.object({
+	name: z.string().min(1),
+	marketplace: z.string().min(1).optional(),
+});
+
+function isOrganizationPlugin(input: {
+	name: string;
+	marketplace?: string;
+}): input is { name: string; marketplace: string } {
+	return (
+		input.marketplace !== undefined &&
+		isOrganizationMarketplace(input.marketplace)
+	);
+}
 
 /**
  * Materialization only: skills, agent config, and the local install record are
@@ -69,29 +90,54 @@ export const createPluginsRouter = () => {
 				return { ok: true };
 			}),
 
-		install: publicProcedure
-			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				const installed = installPlugin(input.name);
-				if (installed === null) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: `Unknown plugin: ${input.name}`,
-					});
-				}
-				return { installed };
-			}),
+		install: publicProcedure.input(pluginRef).mutation(async ({ input }) => {
+			if (isOrganizationPlugin(input)) {
+				await installOrganizationPlugin(input.name, input.marketplace);
+				return { installed: getInstalledPlugins() };
+			}
+			const installed = installPlugin(input.name);
+			if (installed === null) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Unknown plugin: ${input.name}`,
+				});
+			}
+			return { installed };
+		}),
 
-		uninstall: publicProcedure
-			.input(z.object({ name: z.string().min(1) }))
-			.mutation(({ input }) => {
-				return { installed: uninstallPlugin(input.name) };
-			}),
+		uninstall: publicProcedure.input(pluginRef).mutation(({ input }) => {
+			// The renderer removes the account install, then syncs this machine.
+			if (isOrganizationPlugin(input)) {
+				return { installed: getInstalledPlugins() };
+			}
+			return { installed: uninstallPlugin(input.name) };
+		}),
 
 		setEnabled: publicProcedure
-			.input(z.object({ name: z.string().min(1), enabled: z.boolean() }))
+			.input(pluginRef.extend({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
+				if (isOrganizationPlugin(input)) {
+					setOrganizationPluginEnabled(
+						input.name,
+						input.marketplace,
+						input.enabled,
+					);
+					return { installed: getInstalledPlugins() };
+				}
 				return { installed: setPluginEnabled(input.name, input.enabled) };
+			}),
+
+		organizationVersions: publicProcedure.query(() =>
+			organizationPluginVersions(),
+		),
+
+		sync: publicProcedure
+			.input(
+				z.object({ organizationId: z.string().min(1).optional() }).optional(),
+			)
+			.mutation(async ({ input }) => {
+				await syncPlugins(input?.organizationId);
+				return { ok: true };
 			}),
 	});
 };

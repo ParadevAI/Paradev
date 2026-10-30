@@ -79,6 +79,24 @@ export function DownloadButton({
 		);
 	}
 
+	if (platform === Platform.Linux) {
+		return (
+			<button
+				type="button"
+				className={buttonClasses}
+				onClick={goToInterstitial}
+			>
+				<span className="hidden sm:inline">
+					<Trans>Download for Linux</Trans>
+				</span>
+				<span className="sm:hidden">
+					<Trans>Download</Trans>
+				</span>
+				{downloadIcon}
+			</button>
+		);
+	}
+
 	return (
 		<button
 			type="button"

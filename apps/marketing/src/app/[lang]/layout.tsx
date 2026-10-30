@@ -12,6 +12,7 @@ import {
 	SoftwareApplicationJsonLd,
 	WebsiteJsonLd,
 } from "@/components/JsonLd";
+import { getChangelogEntries } from "@/lib/changelog";
 import { REDDIT_PIXEL_ID } from "@/lib/constants";
 import {
 	APPLY_HEADLINE_VARIANT_SCRIPT,
@@ -147,7 +148,9 @@ export default async function RootLayout({
 					dangerouslySetInnerHTML={{ __html: HEADLINE_VARIANT_STYLE }}
 				/>
 				<OrganizationJsonLd />
-				<SoftwareApplicationJsonLd />
+				<SoftwareApplicationJsonLd
+					dateModified={getChangelogEntries()[0]?.date}
+				/>
 				<WebsiteJsonLd />
 				{/* Google tag (gtag.js) for Google Ads */}
 				<Script

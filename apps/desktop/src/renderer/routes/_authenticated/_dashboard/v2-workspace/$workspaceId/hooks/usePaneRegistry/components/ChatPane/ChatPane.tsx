@@ -2,12 +2,14 @@ import type { UserContent } from "@superset/chat/protocol";
 import type { RendererContext } from "@superset/panes";
 import { useCallback, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
+import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
 import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
@@ -18,12 +20,14 @@ import { saveChatMode } from "./utils/savedChatMode";
 
 export function ChatPane({
 	ctx,
+	onOpenDiff,
 	onOpenFile,
 	onRevealPath,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
+	onOpenDiff: OpenReviewDiff;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
@@ -41,6 +45,11 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const openDiff = useCallback<OpenDiff>(
+		(filter, path) =>
+			onOpenDiff(path ?? "", false, undefined, undefined, undefined, filter),
+		[onOpenDiff],
+	);
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
@@ -221,6 +230,7 @@ export function ChatPane({
 						...(pendingPrompt ? { pendingPrompt } : {}),
 					})
 				}
+				onOpenDiff={openDiff}
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}

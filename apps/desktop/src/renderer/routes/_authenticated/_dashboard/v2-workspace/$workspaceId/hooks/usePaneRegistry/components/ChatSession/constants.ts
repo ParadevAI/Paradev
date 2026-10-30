@@ -1,3 +1,4 @@
+import { ChatTable } from "@superset/chat-ui/ChatMarkdown";
 import { ChatCodeBlock } from "./components/ChatCodeBlock";
 import { ChatInlineCode } from "./components/ChatInlineCode";
 import { ChatLink } from "./components/ChatLink";
@@ -14,6 +15,7 @@ export const CHAT_MARKDOWN_COMPONENTS = {
 	code: ChatCodeBlock,
 	inlineCode: ChatInlineCode,
 	a: ChatLink,
+	table: ChatTable,
 };
 
 export const CHAT_REMARK_PLUGINS = [remarkLocalPathLinks];
