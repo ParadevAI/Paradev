@@ -7,6 +7,7 @@ import LiveActivity, {
 import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import type { TerminalAttention, TerminalRowData } from "../useHostTerminals";
+import { requestCardPermission } from "./utils/requestCardPermission";
 
 /**
  * Rows the Lock Screen card can actually show. Four is the measured ceiling:
@@ -79,7 +80,6 @@ export function useAgentLiveActivity({
 			}
 			return;
 		}
-		if (!LiveActivity.areActivitiesEnabled()) return;
 		// A Live Activity can only be started from the foreground —
 		// `ActivityAuthorizationError.visibility` otherwise.
 		if (AppState.currentState !== "active") return;
@@ -152,6 +152,9 @@ export function useAgentLiveActivity({
 		runId.current += 1;
 		const generation = runId.current;
 		const deliver = async () => {
+			// Asked here, not at launch: the first moment there is a card to show.
+			if (!(await requestCardPermission())) return;
+			if (generation !== runId.current) return;
 			for (const row of shown) {
 				const project = workspaceById.get(row.workspaceId)?.projectId;
 				const icon = project ? projectById.get(project) : undefined;
