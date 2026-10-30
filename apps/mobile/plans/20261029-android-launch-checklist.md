@@ -75,7 +75,9 @@ The listing lives in `apps/mobile/play-store.config.js`. Its text comes from the
 `store.config.js`, and the icon and feature graphic are in `apps/mobile/store/android/`.
 `bun apps/mobile/scripts/play-listing.ts` checks it against Play's limits.
 
-- [ ] **Phone screenshots** (2 to 8 PNGs) in `apps/mobile/store/android/phone/`. Take them from the
+- [x] **Phone screenshots** — 3 drafts taken 2026-10-29 from the review account on production
+      (Home, workspace sheet, new task). Retake the new-task shot once the Android composer's project
+      chip stops overlapping the list header. Was: (2 to 8 PNGs) in `apps/mobile/store/android/phone/`. Take them from the
       review demo account (`APP_REVIEW_EMAIL`), whose organization has sample sessions, never from
       a real account. Use `apps/mobile/scripts/android-dev.sh --shot`.
 - [ ] **Push text and images**:
@@ -86,6 +88,12 @@ The listing lives in `apps/mobile/play-store.config.js`. Its text comes from the
       target audience (18+), content rating, Data safety. Review the Data safety answers first:
       PostHog session replay, Sentry, attached photos, and voice audio sent to OpenAI.
 - [ ] **Category and tags**: Productivity; add developer tags in Play Console.
+
+**Review demo account.** `appreview@superset.sh` (team "App Review", `9617bc8e-…`) had read as
+Free since the Oct 20 Autumn cutover, so App Store and Play reviewers would only see the paywall.
+Fixed 2026-10-29: Autumn customer created and the Team plan attached with the seat price customized
+to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). The demo host
+`acme-devbox` and its sample workspaces were already there.
 
 ## 2. Engineering still missing
 
