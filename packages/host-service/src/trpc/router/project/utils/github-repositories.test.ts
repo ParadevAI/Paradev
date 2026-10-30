@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { ExecGh } from "../../workspace-creation/utils/exec-gh";
 import {
+	fetchGitHubRepositoryPage,
 	listGitHubRepositories,
 	parseGitHubRepositories,
 } from "./github-repositories";
@@ -92,6 +93,33 @@ test("a push during the walk cannot repeat a repository or drop the pushed one",
 	expect(fullNames).toHaveLength(repositories.length);
 	expect(new Set(fullNames).size).toBe(fullNames.length);
 	expect(fullNames).toContain("owner/repo-100");
+});
+
+test("a page reports whether more repositories follow", async () => {
+	const repositories = Array.from({ length: 100 }, (_, index) => ({
+		full_name: `owner/repo-${index}`,
+		clone_url: `https://github.com/owner/repo-${index}.git`,
+	}));
+	const requested: number[] = [];
+	const runGh = async (args: string[]) => {
+		requested.push(
+			Number(args.find((arg) => arg.startsWith("page="))?.slice(5)),
+		);
+		return repositories;
+	};
+
+	expect(await fetchGitHubRepositoryPage(2, runGh)).toMatchObject({
+		hasMore: true,
+		repositories: parseGitHubRepositories([repositories]),
+	});
+	expect(
+		await fetchGitHubRepositoryPage(3, async () => repositories.slice(0, 40)),
+	).toMatchObject({ hasMore: false });
+	expect(await fetchGitHubRepositoryPage(4, async () => [])).toMatchObject({
+		hasMore: false,
+		repositories: [],
+	});
+	expect(requested).toEqual([2]);
 });
 
 test("rejects invalid clone URLs on later pages instead of returning partial results", async () => {

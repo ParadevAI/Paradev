@@ -45,7 +45,10 @@ import {
 } from "./handlers";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import { getGitHubRemotes } from "./utils/git-remote";
-import { listGitHubRepositories } from "./utils/github-repositories";
+import {
+	fetchGitHubRepositoryPage,
+	listGitHubRepositories,
+} from "./utils/github-repositories";
 import { persistLocalProject } from "./utils/persist-project";
 import {
 	adoptLocalRepo,
@@ -81,6 +84,10 @@ export const projectRouter = router({
 	listGitHubRepositories: machineOnlyProcedure.query(() =>
 		listGitHubRepositories(),
 	),
+
+	listGitHubRepositoriesPage: machineOnlyProcedure
+		.input(z.object({ page: z.number().int().min(1) }))
+		.query(({ input }) => fetchGitHubRepositoryPage(input.page)),
 
 	list: protectedProcedure.query(({ ctx }) => {
 		const tagSettingsByProject = new Map<string, TagSettingSnapshot[]>();

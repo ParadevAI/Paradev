@@ -2,10 +2,24 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { type ExecGh, execGh } from "../../workspace-creation/utils/exec-gh";
 
+const PAGE_SIZE = 100;
+
 const githubRepositorySchema = z.object({
 	full_name: z.string(),
 	clone_url: z.string().url(),
 });
+
+export interface GitHubRepository {
+	fullName: string;
+	cloneUrl: string;
+}
+
+export type GitHubRepositories = GitHubRepository[];
+
+export interface GitHubRepositoryPage {
+	repositories: GitHubRepositories;
+	hasMore: boolean;
+}
 
 export function parseGitHubRepositories(raw: unknown) {
 	const pages = z.array(z.array(githubRepositorySchema)).parse(raw);
@@ -15,32 +29,31 @@ export function parseGitHubRepositories(raw: unknown) {
 	}));
 }
 
-export async function listGitHubRepositories(runGh: ExecGh = execGh) {
-	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
+export async function fetchGitHubRepositoryPage(
+	page: number,
+	runGh: ExecGh = execGh,
+): Promise<GitHubRepositoryPage> {
 	try {
-		for (let page = 1; ; page++) {
-			// Offset paging needs an order a push cannot change: `sort=updated`
-			// reorders the list between pages and repeats or drops a repository.
-			const raw = await runGh([
-				"api",
-				"--method",
-				"GET",
-				"user/repos",
-				"-f",
-				"affiliation=owner,collaborator,organization_member",
-				"-f",
-				"sort=full_name",
-				"-f",
-				"per_page=100",
-				"-f",
-				`page=${page}`,
-				"--jq",
-				"map({full_name, clone_url})",
-			]);
-			const entries = parseGitHubRepositories([raw]);
-			repositories.push(...entries);
-			if (entries.length < 100) return repositories;
-		}
+		// Offset paging needs an order a push cannot change: `sort=updated`
+		// reorders the list between pages and repeats or drops a repository.
+		const raw = await runGh([
+			"api",
+			"--method",
+			"GET",
+			"user/repos",
+			"-f",
+			"affiliation=owner,collaborator,organization_member",
+			"-f",
+			"sort=full_name",
+			"-f",
+			`per_page=${PAGE_SIZE}`,
+			"-f",
+			`page=${page}`,
+			"--jq",
+			"map({full_name, clone_url})",
+		]);
+		const repositories = parseGitHubRepositories([raw]);
+		return { repositories, hasMore: repositories.length === PAGE_SIZE };
 	} catch (error) {
 		const failure = error instanceof Error ? error : new Error(String(error));
 		const { code, killed, signal, stderr } = failure as Error & {
@@ -62,5 +75,14 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 				: failure.message,
 			cause: error,
 		});
+	}
+}
+
+export async function listGitHubRepositories(runGh: ExecGh = execGh) {
+	const repositories: GitHubRepositories = [];
+	for (let page = 1; ; page++) {
+		const result = await fetchGitHubRepositoryPage(page, runGh);
+		repositories.push(...result.repositories);
+		if (!result.hasMore) return repositories;
 	}
 }
