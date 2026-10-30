@@ -1,4 +1,5 @@
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { type NextRequest, NextResponse } from "next/server";
@@ -22,6 +23,7 @@ function getAllowedOrigins(deploymentOrigin: string) {
 			env.NEXT_PUBLIC_MARKETING_URL,
 			env.NEXT_PUBLIC_DESKTOP_URL,
 		]),
+		...parseOriginList(env.MOBILE_WEB_ORIGINS),
 		...getTrustedVercelPreviewOrigins(deploymentOrigin),
 		...desktopDevOrigins,
 	];
@@ -63,6 +65,7 @@ export const config = {
 		"/api/trpc/(.*)",
 		"/api/auth/((?!jwks$|oauth2/token$).*)",
 		"/api/desktop/version",
+		"/api/mobile/version",
 		"/api/proxy/linear-image",
 	],
 };
