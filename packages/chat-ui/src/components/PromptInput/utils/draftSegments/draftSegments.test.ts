@@ -130,7 +130,7 @@ describe("draft segments", () => {
 		expect(prompt).toBe("- one\n\ntwo");
 	});
 
-	test("a saved state this build cannot read loads from its markdown", () => {
+	test("a saved state this build cannot read is not loaded", () => {
 		const unknown = {
 			type: "editor",
 			state: {
@@ -142,7 +142,7 @@ describe("draft segments", () => {
 			text: "- kept",
 		} as unknown as ComposerDraftSegment;
 		const broken = { type: "editor" } as unknown as ComposerDraftSegment;
-		expect(append([unknown]).prompt).toBe("- kept");
+		expect(append([unknown]).prompt).toBe("");
 		expect(append([broken]).prompt).toBe("");
 		expect(draftChips([broken])).toEqual([]);
 	});

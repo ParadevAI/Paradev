@@ -168,7 +168,7 @@ function $importMarkdown(markdown: string): LexicalNode[] {
 	return $getRoot().getChildren();
 }
 
-/** A saved state this build cannot read, such as one from a newer build, loads from its markdown. */
+/** A saved state this build cannot read, corrupted or from a newer build, is not loaded. */
 function $importEditorSegment(
 	segment: Extract<ComposerDraftSegment, { type: "editor" }>,
 ): LexicalNode[] {
@@ -177,9 +177,7 @@ function $importEditorSegment(
 			$parseSerializedNode(child),
 		);
 	} catch {
-		return $importMarkdown(
-			typeof segment.text === "string" ? segment.text : "",
-		);
+		return [];
 	}
 }
 
