@@ -23,12 +23,14 @@ import {
 import { Lock, UserPlus, Users } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView } from "react-native";
-import type { SearchBarCommands } from "react-native-screens";
 import { Text } from "@/components/ui/text";
-import { useTheme } from "@/hooks/useTheme";
 import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { ValueMenu } from "../components/ValueMenu";
+import {
+	InviteSearchBar,
+	type InviteSearchBarHandle,
+} from "./components/InviteSearchBar";
 import { SuggestionRow } from "./components/SuggestionRow";
 
 interface ShareInviteScreenProps {
@@ -59,8 +61,7 @@ export function ShareInviteScreen({
 	const router = useRouter();
 	const navigation =
 		useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
-	const theme = useTheme();
-	const searchBarRef = useRef<SearchBarCommands>(null);
+	const searchBarRef = useRef<InviteSearchBarHandle>(null);
 	const [query, setQuery] = useState("");
 	const [staged, setStaged] = useState<StagedPick[]>([]);
 	const [pickRoles, setPickRoles] = useState<Record<string, string>>({});
@@ -178,23 +179,14 @@ export function ShareInviteScreen({
 					onPress={() => void submit()}
 				/>
 			</HeaderToolbar>
-			<Stack.SearchBar
+			<InviteSearchBar
 				ref={searchBarRef}
 				placeholder={t({ message: "Names, emails, or teams" })}
-				placement="stacked"
-				hideWhenScrolling={false}
-				hideNavigationBar={false}
-				obscureBackground={false}
-				autoCapitalize="none"
-				inputType="email"
-				textColor={theme.foreground}
-				hintTextColor={theme.mutedForeground}
-				tintColor={theme.foreground}
-				onChangeText={(event) => {
-					setQuery(event.nativeEvent.text);
+				onChangeText={(text) => {
+					setQuery(text);
 					setInviteError(false);
 				}}
-				onCancelButtonPress={() => setQuery("")}
+				onCancel={() => setQuery("")}
 			/>
 
 			<ScrollView
