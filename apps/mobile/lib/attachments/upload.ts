@@ -92,7 +92,9 @@ async function upload(
 				if (totalBytes <= 0) return;
 				// Held below 1 until the id is in hand: a full ring on an
 				// attachment a send would still have to wait for reads as done.
-				const fraction = Math.min(bytesSent / totalBytes, 0.99);
+				// expo-file-system types these as number, but on iOS they arrive as
+				// BigInt (native Int64), and BigInt division truncates to 0n.
+				const fraction = Math.min(Number(bytesSent) / Number(totalBytes), 0.99);
 				// The upload task already throttles itself to one report per
 				// 100ms, so this only collapses what a long transfer repeats at
 				// the same visible position — the ring is 28pt across, and half
