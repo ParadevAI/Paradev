@@ -75,7 +75,7 @@ export const COMPANY = {
 	TRUST_URL: `https://trust.${ROOT_DOMAIN}`,
 	JOIN_US_URL: `${MARKETING_URL}/careers`,
 	/** The formal YC listing; product surfaces link here. `JOIN_US_URL` is our own marketing page. */
-	CAREERS_URL: "https://www.ycombinator.com/companies/superset/jobs",
+	CAREERS_URL: "https://www.ycombinator.com/companies/paradev/jobs",
 } as const;
 
 // Staff keep their @superset.sh accounts after the root domain changes.
@@ -94,7 +94,7 @@ export const OPEN_ROLES = [
 	{
 		title: "Founding Engineer",
 		location: "San Francisco, CA",
-		url: "https://www.ycombinator.com/companies/superset/jobs/Nd9luiP-founding-engineer",
+		url: "https://www.ycombinator.com/companies/paradev/jobs/Nd9luiP-founding-engineer",
 	},
 ] as const;
 
