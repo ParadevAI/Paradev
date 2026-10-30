@@ -1,0 +1,1 @@
+export { tablesToMarkdown } from "./tablesToMarkdown";

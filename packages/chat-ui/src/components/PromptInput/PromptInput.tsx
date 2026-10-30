@@ -1,17 +1,13 @@
 "use client";
 
-import { CodeNode } from "@lexical/code";
-import { ListItemNode, ListNode } from "@lexical/list";
 import {
 	type InitialConfigType,
 	LexicalComposer as LexicalRoot,
 } from "@lexical/react/LexicalComposer";
-import { QuoteNode } from "@lexical/rich-text";
 import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
-import { PROMPT_INPUT_NAMESPACE } from "./constants";
-import { MentionChipNode } from "./nodes/mentionChipNode";
+import { COMPOSER_NODES } from "./constants";
 import { ChipRenderProvider } from "./providers/ChipRenderProvider";
 import { COMPOSER_THEME } from "./theme";
 import type { PromptInputProps } from "./types";
@@ -69,8 +65,8 @@ export function PromptInput({
 	className,
 }: PromptInputProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
-		namespace: PROMPT_INPUT_NAMESPACE,
-		nodes: [MentionChipNode, ListNode, ListItemNode, QuoteNode, CodeNode],
+		namespace: "prompt-input",
+		nodes: COMPOSER_NODES,
 		theme: COMPOSER_THEME,
 		onError: (error: Error) => {
 			throw error;

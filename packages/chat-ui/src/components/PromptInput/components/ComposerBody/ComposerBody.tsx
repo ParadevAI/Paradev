@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	$insertDataTransferForRichText,
+	setLexicalClipboardDataTransfer,
+} from "@lexical/clipboard";
 import { $isCodeNode } from "@lexical/code";
 import { ListItemNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -29,6 +33,8 @@ import {
 	COMMAND_PRIORITY_CRITICAL,
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_LOW,
+	COPY_COMMAND,
+	CUT_COMMAND,
 	DROP_COMMAND,
 	FORMAT_TEXT_COMMAND,
 	INDENT_CONTENT_COMMAND,
@@ -65,7 +71,6 @@ import {
 import { createPortal } from "react-dom";
 import { isDropHandled, markDropHandled } from "../../../../utils/handledDrops";
 import { useComposerDropZone } from "../../../ComposerDropZone";
-import { PROMPT_INPUT_NAMESPACE } from "../../constants";
 import { useDictation } from "../../hooks/useDictation";
 import {
 	type MentionSection,
@@ -89,6 +94,7 @@ import type {
 	PromptInputProps,
 } from "../../types";
 import { browseRows } from "../../utils/browseRows";
+import { $clipboardData } from "../../utils/clipboardData";
 import {
 	$appendDraftSegments,
 	$readPromptText,
@@ -99,6 +105,7 @@ import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
 import { rankCommands } from "../../utils/rankCommands";
+import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
 import {
 	CommandTypeaheadOption,
 	MentionTypeaheadOption,
@@ -177,16 +184,6 @@ function $insertChipAtSelection(chip: ComposerChip) {
 	if (!$isRangeSelection(selection)) return;
 	const chipNode = MentionChipNode.fromChip(chip);
 	selection.insertNodes([chipNode, $createTextNode(" ")]);
-}
-
-function isFromThisComposer(clipboard: DataTransfer | null): boolean {
-	const lexical = clipboard?.getData("application/x-lexical-editor");
-	if (!lexical) return false;
-	try {
-		return JSON.parse(lexical).namespace === PROMPT_INPUT_NAMESPACE;
-	} catch {
-		return false;
-	}
 }
 
 function $collectChips(): ComposerChip[] {
@@ -775,18 +772,66 @@ export function ComposerBody({
 					editor.update(() => $insertChipAtSelection(chip));
 					return true;
 				}
-				if (!asText && isFromThisComposer(event.clipboardData)) return false;
 				const text = normalizePastedText(raw);
-				event.preventDefault();
 				if (isLargePaste(text)) {
+					event.preventDefault();
 					addPastedTextRef.current(text);
 					return true;
 				}
+				const types = event.clipboardData?.types ?? [];
+				if (
+					!asText &&
+					(types.includes("text/html") ||
+						types.includes("application/x-lexical-editor"))
+				) {
+					const html = event.clipboardData?.getData("text/html") ?? "";
+					const withTables = html ? tablesToMarkdown(html) : null;
+					if (withTables === null) return false;
+					event.preventDefault();
+					const transfer = new DataTransfer();
+					transfer.setData("text/html", withTables);
+					transfer.setData("text/plain", raw);
+					const selection = $getSelection();
+					if (selection)
+						$insertDataTransferForRichText(transfer, selection, editor);
+					return true;
+				}
+				event.preventDefault();
 				const selection = $getSelection();
 				if ($isRangeSelection(selection)) selection.insertRawText(text);
 				return true;
 			},
 			COMMAND_PRIORITY_HIGH,
+		);
+		const $writeClipboard = (event: ClipboardEvent | KeyboardEvent | null) => {
+			const selection = $getSelection();
+			if (
+				!(event instanceof ClipboardEvent) ||
+				!event.clipboardData ||
+				!selection ||
+				selection.isCollapsed()
+			)
+				return false;
+			event.preventDefault();
+			setLexicalClipboardDataTransfer(event.clipboardData, $clipboardData());
+			return true;
+		};
+		const unregisterCopy = editor.registerCommand(
+			COPY_COMMAND,
+			$writeClipboard,
+			COMMAND_PRIORITY_LOW,
+		);
+		const unregisterCut = editor.registerCommand(
+			CUT_COMMAND,
+			(event) => {
+				if (!$writeClipboard(event)) return false;
+				const selection = $getSelection();
+				if ($isRangeSelection(selection)) selection.removeText();
+				else if ($isNodeSelection(selection))
+					for (const node of selection.getNodes()) node.remove();
+				return true;
+			},
+			COMMAND_PRIORITY_LOW,
 		);
 		const unregisterClick = editor.registerCommand<MouseEvent>(
 			CLICK_COMMAND,
@@ -834,6 +879,8 @@ export function ComposerBody({
 			unregisterEscape();
 			unregisterDrop();
 			unregisterPaste();
+			unregisterCopy();
+			unregisterCut();
 			unregisterKeyDown();
 			unregisterUnderline();
 			unregisterTab();

@@ -5,8 +5,10 @@ import {
 	BOLD_STAR,
 	CODE,
 	type ElementTransformer,
+	HEADING,
 	INLINE_CODE,
 	ITALIC_STAR,
+	LINK,
 	ORDERED_LIST,
 	QUOTE,
 	STRIKETHROUGH,
@@ -51,6 +53,8 @@ export const TYPED_SHORTCUTS: Transformer[] = [...TYPED_FORMATS, PIPE_QUOTE];
 /** No `_`/`__` forms: prompts are full of `__init__` and `snake_case`. */
 const FORMATS: Transformer[] = [
 	...TYPED_FORMATS,
+	HEADING,
+	LINK,
 	BOLD_ITALIC_STAR,
 	BOLD_STAR,
 	ITALIC_STAR,

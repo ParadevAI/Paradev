@@ -848,6 +848,7 @@
       "name": "@superset/chat-ui",
       "version": "0.1.0",
       "dependencies": {
+        "@lexical/clipboard": "0.41.0",
         "@lexical/code": "0.41.0",
         "@lexical/link": "0.41.0",
         "@lexical/list": "0.41.0",

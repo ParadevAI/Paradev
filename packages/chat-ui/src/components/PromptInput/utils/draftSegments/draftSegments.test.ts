@@ -1,7 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { CodeNode } from "@lexical/code";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { QuoteNode } from "@lexical/rich-text";
 import {
 	$createParagraphNode,
 	$createTextNode,
@@ -9,6 +6,7 @@ import {
 	createEditor,
 	type LexicalEditor,
 } from "lexical";
+import { COMPOSER_NODES } from "../../constants";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type { ComposerDraftSegment } from "../../types";
 import {
@@ -23,7 +21,7 @@ const chip = { label: "Linear", serialized: "@linear", data: { id: 7 } };
 
 function newEditor(): LexicalEditor {
 	return createEditor({
-		nodes: [MentionChipNode, ListNode, ListItemNode, QuoteNode, CodeNode],
+		nodes: COMPOSER_NODES,
 		onError: (error) => {
 			throw error;
 		},
@@ -58,6 +56,14 @@ describe("draft segments", () => {
 		const { prompt, text } = append([{ type: "text", text: markdown }]);
 		expect(prompt).toBe(markdown);
 		expect(text).not.toContain("- read");
+	});
+
+	test("pasted headings and links go to the agent as markdown", () => {
+		const markdown =
+			"## Install\nRead [the docs](https://example.com/docs) first.";
+		const { prompt, text } = append([{ type: "text", text: markdown }]);
+		expect(prompt).toBe(markdown);
+		expect(text).not.toContain("](");
 	});
 
 	test("prompt text that only looks like markdown is sent as typed", () => {
