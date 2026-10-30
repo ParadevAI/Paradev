@@ -21,9 +21,9 @@ keywords:
   - track coding agent work in linear
 ---
 
-To run Claude Code in parallel on Linear issues, give each issue its own Git branch and its own agent session, start them together, and let the issue keep the status and the owner. In [Paradev](https://paradev.com), open **Tasks**, switch the source to **Linear**, select the issues, and click **Run in workspace**. Paradev creates one workspace per issue on Linear's branch name, starts Claude Code (or Codex, or another CLI agent) with the issue as its prompt, and moves each issue to In Progress. Each teammate runs this on their own machine or a shared host, with their own Claude or OpenAI subscription.
+To run Claude Code in parallel on Linear issues, give each issue its own Git branch and its own agent session, start them together, and let the issue keep the status and the owner. In [Paradev](https://paradev.com), open **Tasks**, switch the source to **Linear**, and click **Add to workspace** on an issue. Paradev opens a new workspace on Linear's branch name with the issue linked to the prompt, starts Claude Code (or Codex, or another CLI agent) on it, and moves the issue to In Progress. To start a whole batch at once, loop over the issues with the `superset` CLI. Each teammate runs this on their own machine or a shared host, with their own Claude or OpenAI subscription.
 
-The main alternatives are Linear's own agent integrations (assign an issue to Codex or Cursor, which run in the vendor's cloud) and open-source bridges such as Cyrus, which runs Claude Code against issues assigned to it. The choice comes down to where the agent should run and who reviews the result.
+The main alternatives are Linear's own agent integrations (assign an issue to Codex or Cursor, which run in the vendor's cloud) and open-source bridges such as Cyrus, which runs Claude Code or another agent on issues assigned to it. The choice comes down to where the agent should run and who reviews the result.
 
 This guide is written for a team of two to ten engineers who already track work in Linear. It is published by Paradev. Details about other tools come from their own docs as of October 2026.
 
@@ -40,39 +40,42 @@ Four things, whatever tool you pick:
 
 Git worktrees cover the first two on one machine: each issue gets its own directory and branch. They do not stop two issues from touching the same files. If issue 142 and issue 143 both edit `export.ts`, the second pull request to merge has a conflict to resolve, the same as with two people. Split issues by area before you hand them out.
 
-## How do I run several Linear issues at once in Paradev?
+## How do I start Claude Code on a Linear issue in Paradev?
 
 Connect Linear once under **Integrations** (Pro plan). Then, from the desktop app:
 
-1. Open **Tasks** in the sidebar and set the source toggle to **Linear**. Filter by project, status, or assignee, for example your cycle's unstarted issues assigned to you.
-2. Check the issues you want to hand off. Keep it to issues that are small and clearly described.
-3. Click **Run in workspace**, pick the project (the repository) and the agent, such as Claude Code.
-4. Leave **Auto-run command** on to start every agent now, or turn it off to stage each command and read the prompt first.
+1. Open **Tasks** in the sidebar and set the source toggle to **Linear**. Filter by team or assignee, for example your cycle's issues assigned to you. Keep to issues that are small and clearly described.
+2. On an issue's row, or on the issue's page, click **Add to workspace**.
+3. The new workspace screen opens with the issue linked in the prompt and Linear's branch name filled in. Pick the project (the repository) and the agent, such as Claude Code, add any instructions, and create the workspace.
 
-Paradev creates one workspace per issue. Each is a Git worktree on Linear's branch name, with the agent already working and the issue text as its prompt. To change how an issue becomes a prompt, for example to add "write a test first" or "stop and ask if the issue is unclear", edit the **Task Prompt Template** for that agent under **Settings → Agents**.
+Do this for each issue you want to hand off. Each issue gets its own workspace: a Git worktree on Linear's branch name, with its own agent session. With the integration connected, linking the issue this way moves it to In Progress.
 
 The sidebar then shows one row per issue with the agent's state: working, waiting for input, or ready for review. Open a row to read the terminal, answer the agent, or review the diff in the **Changes** pane. When you are satisfied, commit, push, and open the pull request from the same pane.
 
-## Can I do it from the CLI or from Linear itself?
+## How do I start a batch of Linear issues at once?
 
-Yes, both.
-
-From the CLI, list your Linear issues and create a workspace for one:
+The Linear list in the desktop app works one issue at a time, so use the CLI for a batch. `superset tasks get` returns an issue's title, URL, branch name, and description; pass them to `superset workspaces create`, once per issue:
 
 ```bash
-superset tasks list --tracker linear --assignee-me
-superset workspaces create --local --project <project-id> \
-  --name eng-142 --task <task-id> \
-  --agent claude --prompt "Fix the export timeout described in the linked issue"
+for issue in ENG-142 ENG-143 ENG-150; do
+  json=$(superset tasks get "$issue" --tracker linear --json)
+  superset workspaces create --local --project <project-id> \
+    --name "$issue" \
+    --branch "$(jq -r .branch <<<"$json")" --skip-branch-prefix \
+    --agent claude \
+    --prompt "$(jq -r '"Work on Linear issue \(.slug): \(.title)\n\(.url)\n\n\(.description // "")"' <<<"$json")"
+done
 ```
 
-When `--branch` is omitted, `--task` uses the issue's Linear branch name as is. Use `--agent codex` for Codex. Run the command once per issue in a loop to fan out a batch.
+`superset tasks list --tracker linear --assignee-me` lists the issues to choose from. `--skip-branch-prefix` keeps Linear's exact branch name, so Linear links the pull request back to the issue. Use `--agent codex` for Codex. The script needs `jq`.
 
-From Linear, use its **custom coding tool** setting. A short wrapper script lets **Work on issue → Custom script** call `superset workspaces create` with the issue's branch and prompt, then `superset workspaces open` to show it in the desktop app. The [Linear integration docs](https://docs.paradev.com/use-with-linear) have the full script and the `~/.linear/coding-tools.json` file.
+## Can I start it from Linear itself?
+
+Yes. From Linear, use its **custom coding tool** setting. A short wrapper script lets **Work on issue → Custom script** call `superset workspaces create` with the issue's branch and prompt, then `superset workspaces open` to show it in the desktop app. The [Linear integration docs](https://docs.paradev.com/use-with-linear) have the full script and the `~/.linear/coding-tools.json` file.
 
 ## Can an agent start when an issue is assigned or labeled?
 
-Yes, with an [Automation](https://docs.paradev.com/automations) (Pro). Add a Linear trigger for an issue that is created, moves to a status, or is assigned, and scope it by team, project, label, status, or assignee. A common pattern reads "Issue moved to **Todo** in **Engineering** with label **agent**": when an issue with the `agent` label moves into Todo, the automation creates a workspace for it on the device you picked and starts the agent with your prompt plus the issue in front of it. Adding the label alone does not fire the trigger, so add it before the issue moves.
+Yes, with an [Automation](https://docs.paradev.com/automations) (Pro). Add a Linear trigger for an issue that is created, moves to a status, or is assigned, and scope it by team, project, label, or assignee. The status filter applies only to **Issue moved to**. A common pattern reads "Issue moved to **Todo** in **Engineering** with label **agent**": when an issue with the `agent` label moves into Todo, the automation creates a workspace for it on the device you picked and starts the agent with your prompt plus the issue in front of it. Adding the label alone does not fire the trigger, so add it before the issue moves.
 
 ```text
 A Linear issue is in the event above. Read it and the code it mentions.
@@ -87,7 +90,7 @@ Two limits to plan for: the target device has to be online when the event arrive
 
 Keep ownership in Linear and review in GitHub, and let Paradev connect them:
 
-- **Linear** keeps the assignee and status. With the integration connected, starting a workspace from an issue moves it to In Progress, and the branch name links the pull request back to the issue.
+- **Linear** keeps the assignee and status. With the integration connected, starting a workspace from an issue moves it to In Progress, and the branch name links the pull request back to the issue. To move issues when a pull request opens or merges, connect GitHub in Linear and set the team's pull request automations in Linear's settings.
 - **Paradev's Pull requests view** filters by *Awaiting review from you*, *Changes requested*, and *Approved review*, with each PR's checks next to its diff. Merging, closing, and commenting act on the real PR with your GitHub permissions.
 - **Workspaces** filter by who created them, so you can see a teammate's agent runs without mixing them with yours.
 
@@ -101,7 +104,7 @@ To give the agent itself tools to read and update Linear, such as posting a summ
 | [Codex in Linear](https://learn.chatgpt.com/docs/third-party/linear) | Codex cloud | Codex | Assign or mention @Codex on an issue, and it posts progress back |
 | [Cursor in Linear](https://cursor.com/docs/integrations/linear) | Cursor Cloud Agents | Cursor's agent | Teams already on Cursor; assign an issue to Cursor or mention @Cursor |
 | [Linear coding sessions](https://linear.app/docs/coding-sessions) | A secure cloud environment, per Linear's docs | Linear Agent, writing code with Claude Code or Codex | Teams that want everything to stay inside Linear; needs AI credits and a workspace admin to turn it on |
-| Cyrus | A machine you run | Claude Code | Open-source bridge that runs Claude Code on assigned issues |
+| [Cyrus](https://github.com/ceedaragents/cyrus) | A machine you run, or Cyrus's cloud | Claude Code, Codex, Cursor, Gemini, OpenCode | Open-source (Apache 2.0) bridge that works issues assigned to it, one worktree per issue |
 
 Linear's native agents need the least setup and keep the conversation on the issue. The tradeoff is that the work runs in the vendor's environment, which may not have your local services, seeded database, or VPN. Paradev runs the agent CLIs you already use on machines you control, so the agent sees what your developers see, and a person reviews the diff in the app before the pull request goes up. You can use both: assign the quick, self-contained issues to a cloud agent and run the ones that need local context in Paradev.
 
@@ -109,11 +112,11 @@ Linear's native agents need the least setup and keep the conversation on the iss
 
 ### Does Claude Code integrate with Linear?
 
-Not on its own. Claude Code reads Linear through an MCP server or a plugin. To start Claude Code from Linear issues, use a tool that bridges the two: Paradev's Tasks view and Linear triggers, Linear's coding sessions, or Cyrus.
+Not on its own. Claude Code reads Linear through an MCP server or a plugin. To start Claude Code from Linear issues, use a tool that bridges the two: Paradev's Tasks view, CLI, and Linear triggers, Linear's coding sessions, or Cyrus.
 
 ### Can several Claude Code agents work on different Linear issues at the same time?
 
-Yes. Give each issue its own worktree and branch so the agents do not edit each other's files. In Paradev, selecting several issues and clicking **Run in workspace** does this in one step. Issues that touch the same code can still conflict at merge time.
+Yes. Give each issue its own worktree and branch so the agents do not edit each other's files. In Paradev, click **Add to workspace** on each issue, or run the CLI loop above for a batch. Issues that touch the same code can still conflict at merge time.
 
 ### Do I need a Paradev seat for each teammate?
 
@@ -121,8 +124,8 @@ Each person who uses Paradev needs their own account. The Linear integration, au
 
 ### Does Paradev move Linear issues to In Progress?
 
-Yes, when the Linear integration is connected and you start a workspace from an issue. Moving the issue to In Review or Done follows Linear's own GitHub integration when the pull request opens or merges.
+Yes, when the Linear integration is connected and you start a workspace from an issue in the app. Later moves, such as to In Review or Done, come from Linear's own GitHub integration: connect GitHub in Linear and choose which status each pull request event sets for your team.
 
 ### Can I use Codex instead of Claude Code?
 
-Yes. Pick Codex in **Run in workspace**, or pass `--agent codex` to the CLI or the automation. Different issues in the same batch can use different agents.
+Yes. Pick Codex on the new workspace screen, or pass `--agent codex` to the CLI or the automation. Different issues can use different agents.

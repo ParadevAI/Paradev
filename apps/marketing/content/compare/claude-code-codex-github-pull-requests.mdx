@@ -23,7 +23,7 @@ keywords:
 
 To use Claude Code and Codex together on GitHub pull requests, check out each pull request in its own workspace, run one agent to write or fix the change and the other to review it, and read both results next to the PR's checks before you merge. In [Paradev](https://paradev.com), press **⌘N**, choose **Pull request**, and pick the PR. Paradev checks out its branch in a new workspace where you can start Claude Code, Codex, or both. The **Pull requests** view shows the same PR's description, checks, review threads, and diff, and you can select lines in the diff and send them to an agent as a comment.
 
-For work that should start without you, an [Automation](https://docs.paradev.com/automations) (Pro) runs an agent when GitHub reports an event: a review request, a failed check, or a new comment. The alternatives are GitHub Actions with the official Claude Code or Codex actions, GitHub Copilot's coding agent and code review, and Codex cloud. They run in the cloud and post back to the PR. Paradev runs the agent CLIs on your own machines, with your local environment.
+For work that should start without you, an [Automation](https://docs.paradev.com/automations) (Pro) runs an agent when GitHub reports an event: a review request, a failed check, or a new comment. The alternatives are Anthropic's Claude Code action or OpenAI's Codex action in GitHub Actions, GitHub Copilot's cloud agent and code review, and Codex code review. They run on GitHub runners or in the vendor's cloud and post back to the PR. Paradev runs the agent CLIs on your own machines, with your local environment.
 
 This guide covers a small team that already works in GitHub pull requests. It is published by Paradev. Details about other tools come from their own docs as of October 2026.
 
@@ -63,15 +63,18 @@ Create an automation with a GitHub trigger. Each one reads as a sentence you fil
 | Trigger | What it starts |
 | --- | --- |
 | **Review requested** from Me | A first review pass before you read the PR yourself |
-| **Checks completed** or **Workflow failed** | An agent that reads the failing logs and proposes a fix |
+| **Workflow failed** | An agent that reads the failing logs and proposes a fix |
 | **Changes requested** | An agent that works through the requested changes |
 | **Pull request opened** | A review of every new PR in the repository |
 
-When the event is about a pull request and the project is linked to that repository, the run's workspace checks out the PR's branch, and reuses the PR's workspace if one exists. A prompt for the review case:
+Use **Workflow failed** rather than **Checks completed** for fixes: **Checks completed** also fires when every check passes.
+
+For pull request events such as **Review requested**, **Pull request opened**, and **Changes requested**, when the project is linked to that repository, the run's workspace checks out the PR's branch and reuses the PR's workspace if one exists. Runs started by comments, checks, or workflow runs can start on a fresh branch, so tell those agents to run `gh pr checkout <number>` first. A prompt for the review case:
 
 ```text
-You were asked to review the pull request in the event above. The branch
-is checked out. Read the description and every changed file. Run the tests
+You were asked to review the pull request in the event above. If its
+branch is not checked out, run `gh pr checkout <number>`. Read the
+description and every changed file. Run the tests
 that cover the changed code. Post one review with
 `gh pr review <number> --comment --body-file review.md`: bugs first, then
 missing tests, then risky changes. Do not approve, push, or merge.
@@ -79,7 +82,7 @@ missing tests, then risky changes. Do not approve, push, or merge.
 
 Pick Claude Code for one automation and Codex for another, and both review the same PR. Things to know:
 
-- **Forks are skipped.** Pull request events from forks do not start runs, and a run never checks out a fork's branch.
+- **Forks are only partly skipped.** Pull request events from forks (opened, pushed, reviews, review comments, threads) do not start runs, and a run never checks out a fork's branch. A top-level comment on a fork's pull request can still fire **Comment added**, and checks and workflow runs from fork pull requests still fire. Filter comment triggers by people you trust.
 - **Watch for loops.** An agent's own comment can match a **Comment added** trigger. Filter that trigger by people.
 - **The device must be online.** If the target machine is asleep, the run is recorded as missed and is not retried. Use **Run now** later.
 
@@ -90,10 +93,10 @@ The [review-requested recipe](https://docs.paradev.com/recipes/review-requested-
 | Option | Where it runs | Agents | Strength | Tradeoff |
 | --- | --- | --- | --- | --- |
 | Paradev | Your machines, a shared host, or cloud workspaces (early access) | Claude Code, Codex, and other CLI agents | Local environment; review the diff before anything is pushed; both agents in one app | Desktop app on macOS (Linux AppImage experimental); a device must be online for automations |
-| GitHub Actions with the Claude Code or Codex action | GitHub runners | Claude Code or Codex | Runs on every PR with no machine to keep on | Each run starts from a clean runner; secrets and services must be set up in CI |
-| GitHub Copilot coding agent and code review | GitHub | Copilot | Built into GitHub; assign an issue or request a review from Copilot | Copilot only |
-| Codex cloud | OpenAI's cloud | Codex | Mention Codex on a PR for a review or a task | Codex only; the environment is OpenAI's |
-| CodeRabbit and similar review bots | Vendor cloud | Their own reviewer | Review comments on every PR, no setup per developer | Reviews only; they do not run your app locally |
+| [Claude Code action](https://github.com/anthropics/claude-code-action) or [Codex action](https://github.com/openai/codex-action) in GitHub Actions | Your GitHub runners | Claude Code or Codex | Runs from a workflow, for example a review when a PR opens, with no machine to keep on | Each run starts from a fresh runner; secrets and services must be set up in CI |
+| [GitHub Copilot cloud agent and code review](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) | GitHub (Actions-based or cloud environment) | Copilot | Built into GitHub: start an agent session from an issue or a failing Actions run, and request a Copilot code review on a PR | Copilot only |
+| [Codex code review](https://learn.chatgpt.com/docs/third-party/github) | OpenAI's cloud | Codex | Comment `@codex review` for a review on the PR, or `@codex` with other instructions to start a cloud chat that can push a fix; optional automatic reviews | Codex only; the environment is OpenAI's |
+| [CodeRabbit](https://docs.coderabbit.ai/) and similar review bots | Vendor service | Their own reviewer | Automated reviews on pull requests, set up once for the repository | Their own reviewer, not Claude Code or Codex |
 
 If your checks need services that only run on a developer machine or a shared box, such as a seeded database, a VPN, or a large test fixture, Paradev's local runs are the better fit. If every check already runs in CI and you want reviews on every PR with no machine to maintain, a GitHub Action or a review bot is simpler. Many teams use a review bot on every PR and keep agent fix-ups in Paradev, where a person looks at the diff before it is pushed.
 
@@ -101,15 +104,15 @@ If your checks need services that only run on a developer machine or a shared bo
 
 ### Can Claude Code fix failing CI checks on a pull request?
 
-Yes. Check out the PR in a workspace and ask Claude Code to read the failing logs with `gh run view --log-failed` and fix them. In Paradev, a **Checks completed** or **Workflow failed** trigger can start this for you.
+Yes. Check out the PR in a workspace and ask Claude Code to read the failing logs with `gh run view --log-failed` and fix them. In Paradev, a **Workflow failed** trigger can start this for you.
 
 ### Can Codex review a pull request that Claude Code wrote?
 
-Yes. Run Codex in the same workspace after Claude Code finishes and type `/review`, or set a Codex automation on **Review requested** or **Pull request opened**.
+Yes. Run Codex in the same workspace after Claude Code finishes and type `/review`, or set a Codex automation on **Review requested** or **Pull request opened**. On GitHub, a comment with `@codex review` asks Codex cloud for a review.
 
 ### Will the agent merge the pull request?
 
-Only if your prompt and permissions allow it. The prompts in this guide tell the agent to comment and not to approve, push, or merge, and branch protection rules on GitHub still apply.
+Only if your prompt and permissions allow it. The review prompt in this guide tells the agent to comment and not to approve, push, or merge. The CI-fix example tells the agent to push its fix, so remove "and push" if you want to read the diff first. Branch protection rules on GitHub still apply.
 
 ### Does the agent post comments as me?
 

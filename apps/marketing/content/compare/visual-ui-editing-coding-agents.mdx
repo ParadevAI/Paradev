@@ -93,14 +93,14 @@ A typical frontend team runs several UI tasks at once: one person tightens the p
 
 A day with it looks like this:
 
-1. **Create one workspace per UI task**, from the desktop app, from a [Linear or GitHub issue](/compare/run-claude-code-on-linear-issues), or with `superset workspaces create --local --project <id> --name pricing-table --branch ui/pricing-table --agent claude --prompt "..."`.
+1. **Create one workspace per UI task**, from the desktop app, from a [Linear issue](/compare/run-claude-code-on-linear-issues) or a GitHub issue (**Add to workspace** in [Tasks](https://docs.paradev.com/tasks)), or with `superset workspaces create --local --project <id> --name pricing-table --branch ui/pricing-table --agent claude --prompt "..."`.
 2. **Start the dev server in each workspace.** Paradev detects the listening port and lists it in the sidebar. It does not assign port ranges, so two workspaces that both start on port 3000 collide. Give each workspace its own port in a [setup script](https://docs.paradev.com/setup-teardown-scripts), and commit `.superset/ports.json` so everyone on the team sees labels such as "Frontend Dev Server" next to the port.
 3. **Click, describe, send.** Open the port in the browser pane, click **Design**, click the element, and send one change to Claude Code. With hot reload, the result shows in the same pane, so you can click the next element straight away.
 4. **Review the diff before it goes up.** The **Changes** pane shows what Claude Code edited for that task alone. Commit, push, and open the pull request from there, and watch its checks in the PR pane.
 
 Two honest limits. Worktrees keep each task's files apart, but two tasks that both edit a shared component, such as `Button.tsx`, still conflict when the second pull request merges, so split UI work by component when you can. And Design Mode is a feature of the Paradev desktop app on macOS (the Linux AppImage is experimental); teammates on Windows can review the pull request and Pages, but cannot use Design Mode yet.
 
-If the dev servers run on a shared or remote host, the desktop app forwards each port of the selected remote workspace to your machine, so the browser pane and Design Mode work on it as if it were local.
+If the dev servers run on a shared or remote host, the desktop app forwards each port of the selected remote workspace to your machine, so the browser pane and Design Mode work on it as if it were local. The host needs host-service 1.26 or newer, and if the same port is already busy on your machine, choose **Use another port**. See [ports on a remote host](https://docs.paradev.com/remote-access#ports-on-a-remote-host).
 
 ## How do I review an agent's design with my team?
 

@@ -23,7 +23,7 @@ keywords:
 
 To have a coding agent pick up new Sentry issues automatically, connect Sentry to a tool that starts an agent session when Sentry reports a new issue, and tell the agent to reproduce the error in a failing test before it changes any code. In [Paradev](https://paradev.com), that tool is an [Automation](https://docs.paradev.com/automations) (Pro) with a **Sentry → Issue created** trigger. Each new issue starts Claude Code, Codex, or another CLI agent in a fresh workspace on a machine you choose. The agent gets the issue's title, link, and event payload, and leaves a draft pull request or a written note for a person to review.
 
-Sentry also has its own agent, Seer. Its Autofix finds a root cause and can hand the code change to an external coding agent; Sentry's docs list Claude Code, Cursor Cloud Agents, and GitHub Copilot. Pick Seer when you want the analysis to happen inside Sentry. Pick a Paradev automation when you want your own agent and prompt to run against your own environment.
+Sentry also has its own agent, Seer. Its Autofix finds a root cause and can hand the fix to an external coding agent; [Sentry's docs](https://docs.sentry.io/organization/integrations/coding-agents/) list Claude, Cursor Cloud Agents, and GitHub Copilot agents. Pick Seer when you want the analysis to happen inside Sentry. Pick a Paradev automation when you want your own agent and prompt to run against your own environment.
 
 This guide is published by Paradev. Details about Sentry come from Sentry's docs as of October 2026.
 
@@ -36,17 +36,18 @@ Most new errors with a clear stack trace are small bugs: a missing null check, a
 1. **Find the code** in the stack trace.
 2. **Reproduce first.** Write a failing test that throws the same error. A test that fails before the fix and passes after it is the evidence a reviewer needs.
 3. **Stop if it cannot reproduce.** Write what it checked to a file, and do not guess at a fix.
-4. **Open a draft pull request**, linked to the Sentry issue, so CI and reviewers stay out until a person has looked.
+4. **Open a draft pull request**, linked to the Sentry issue, so a person checks it before anyone requests review or merges it. CI can still run on draft pull requests.
 
 ## How do I set it up in Paradev?
 
-1. Connect Sentry under **Integrations**.
+1. Connect Sentry under **Integrations**, and install and connect the [Sentry plugin](https://docs.paradev.com/plugins/available/sentry) so the agent can read the issue's events and stack trace.
 2. Go to **Automations → New automation**. Pick the project for the repository that the Sentry project reports from, a device that stays online, and an agent.
 3. Under **Triggers**, click **Add Trigger → Sentry → Issue created**. Pick the Sentry project and set the level to **Error** and **Fatal**, so warnings do not start runs. Press **Save**.
 4. Write the prompt:
 
 ```text
-A new Sentry issue is in the event above. Find the code in its stack trace.
+A new Sentry issue is in the event above. Use the Sentry tools to fetch
+its latest event and stack trace, then find the code in that stack trace.
 Write a failing test that reproduces the error. If you can't reproduce it,
 stop and write what you found to TRIAGE.md.
 If you can, fix it, run the test suite, and open a draft pull request with
@@ -61,12 +62,16 @@ From the CLI, list the Sentry projects the trigger can watch, then create the au
 
 ```bash
 superset automations trigger-options --group sentry
+superset hosts list
 superset automations create --name "Sentry triage" --project <project-id> \
+  --host <host-id> \
   --agent claude --prompt-file sentry-triage.md \
   --triggers '[{"config":{"kind":"sentry","event":"issue.created","projects":{"mode":"list","ids":["<sentry-project-id>"]},"level":{"mode":"list","ids":["error","fatal"]}}}]'
 ```
 
-To give the agent more context than the event payload, such as breadcrumbs, other events for the same issue, or related issues, install the [Sentry plugin](https://docs.paradev.com/plugins/available/sentry). It connects the agent to Sentry's MCP server, and Paradev keeps the Sentry credentials, so the agent and the machine never see them.
+Without `--host`, the automation runs on the machine where you type the command. Pass the ID of a host that stays online, from `superset hosts list`.
+
+The trigger's event payload describes the issue, but the stack trace, breadcrumbs, and other events for the same issue come from Sentry itself. The Sentry plugin connects the agent to Sentry's MCP server for those, and Paradev keeps the Sentry credentials, so the agent and the machine never see them.
 
 ## Which Sentry events should start a run?
 
@@ -82,7 +87,7 @@ Start narrow. A noisy Sentry project can create dozens of issues an hour, and ea
 ## What should I know before I leave it running?
 
 - **The device must be online.** Runs fire on the device you picked. If it is asleep or offline when Sentry reports the issue, the run is recorded as missed and is not retried. Use a machine that stays on, such as a Mac mini or a Linux server running `superset start --daemon`, or pick **Cloud** as the device if your account has cloud workspaces (early access).
-- **Runs can be delivered twice.** Delivery is at least once, so the "if a pull request already exists, stop" line in the prompt matters.
+- **Runs can be delivered twice.** Delivery is at least once. The "if a pull request already exists, stop" line catches most repeats, but two runs that start at the same moment can both pass it, so a duplicate pull request is still possible. Close the extra one.
 - **A created run is not a fixed bug.** The run history shows that the workspace was created, not whether the agent's fix is right. Read the test and the diff.
 - **Production data.** The event payload can include request data or user details that Sentry captured. It goes into the agent's prompt, so set Sentry's data scrubbing to match what you are willing to send to your model provider.
 
@@ -91,17 +96,17 @@ Start narrow. A noisy Sentry project can create dozens of issues an hour, and ea
 | Option | Who does the analysis | Who writes the fix | Where it runs |
 | --- | --- | --- | --- |
 | Paradev automation on Sentry issues | Your agent (Claude Code, Codex, or another CLI agent), with your prompt | The same agent | Your machine, a shared host, or a cloud workspace |
-| Sentry Seer Autofix | Seer, with Sentry's traces, logs, and profiles | Seer, or a handoff to Claude Code, Cursor Cloud Agents, or GitHub Copilot | Sentry and the chosen agent's environment |
+| [Sentry Seer Autofix](https://docs.sentry.io/product/ai-in-sentry/seer/) | Seer, with Sentry's traces, logs, and profiles | Seer, or a handoff to Claude, Cursor Cloud Agents, or GitHub Copilot agents | Sentry and the chosen agent's environment |
 | Sentry MCP server in your own agent | Your agent, when you ask it | Your agent | Wherever you run it, started by hand |
-| GitHub Copilot coding agent | Copilot, from an issue assigned to it | Copilot | GitHub |
+| [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) | Copilot, in a session started from a GitHub issue | Copilot | GitHub |
 
-Seer's strength is context: it reads the traces, logs, and profiles Sentry already has, and it can stop at a root cause for a person to act on. A Paradev automation's strength is control over the run: you choose the agent and the prompt, the run happens in a full checkout of your repository with your local tools and test setup, and the result lands in a workspace you can open, continue, or hand to a teammate. The two also combine: let Seer find the root cause in Sentry, and use a Paradev **Issue assigned** trigger to start your agent on the issues a person hands over.
+Seer's strength is context: it reads the traces, logs, and profiles Sentry already has, and adds its root cause analysis to the issue page. Pull request creation can be turned off in Seer's settings if you want a person to write the fix. A Paradev automation's strength is control over the run: you choose the agent and the prompt, the run happens in a full checkout of your repository with your local tools and test setup, and the result lands in a workspace you can open, continue, or hand to a teammate. The two also combine: let Seer find the root cause in Sentry, and use a Paradev **Issue assigned** trigger to start your agent on the issues a person hands over.
 
 ## Frequently Asked Questions
 
 ### Can Claude Code fix Sentry errors automatically?
 
-Yes, with something to start it. A Paradev automation with a Sentry **Issue created** trigger runs Claude Code on each new issue. Sentry Seer can also hand a fix to Claude Code from its Autofix flow.
+Yes, with something to start it. A Paradev automation with a Sentry **Issue created** trigger runs Claude Code on each new issue. Sentry Seer can also hand an issue to a Claude agent from its Autofix flow.
 
 ### Will the agent push a fix to production?
 
@@ -113,7 +118,7 @@ Yes. Pick Codex as the automation's agent, or pass `--agent codex` on the CLI. T
 
 ### What happens when Sentry reports the same error many times?
 
-Sentry groups repeated events into one issue, so **Issue created** fires once per issue, not per event. A duplicate delivery can still happen, which the "already exists" check in the prompt handles.
+Sentry groups repeated events into one issue, so **Issue created** fires once per issue, not per event. A duplicate delivery can still happen. The "already exists" check in the prompt stops most of them, but not two runs that start together.
 
 ### Which plan do I need?
 

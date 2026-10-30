@@ -34,7 +34,7 @@ Good candidates have a clear expected result and a small surface: "the export bu
 
 ## Option 1: mention the Paradev Slack bot
 
-Connect Slack in the dashboard under **Integrations → Slack** (OAuth). Then mention the bot in a channel or send it a DM:
+Connect Slack in the dashboard under **Integrations → Slack** (OAuth). For code changes, the bot also needs what any [cloud workspace](https://docs.paradev.com/cloud-workspaces) needs: GitHub connected in **Integrations**, with the Paradev GitHub App given access to the repository, and your agents signed in under **Settings → Agents**. Then mention the bot in a channel or send it a DM:
 
 ```text
 @superset bump our Sentry SDK to v9 across all apps and open a PR.
@@ -42,7 +42,7 @@ Connect Slack in the dashboard under **Integrations → Slack** (OAuth). Then me
 
 For a code change, the bot starts a cloud workspace, launches a coding agent there, and reports back in the thread. For a request like "file a bug and assign it to whoever owns reporting", it creates the task instead, with assignee, status, and priority from your Linear or Paradev setup. It reads the thread and the channel history on its own, so you do not paste earlier messages into the request.
 
-When thread follow-ups are on for your Slack team, replies in the thread reach the bot without another mention. `!stop` ends the current turn, and `!mute` brings back mention-only mode for that thread.
+When thread follow-ups are on for your Slack team, replies in the thread reach the bot without another mention. `!stop` ends the bot's current Slack turn, but it does not stop a coding agent the bot already started in a workspace; open that workspace to stop it. `!mute` brings back mention-only mode for that thread.
 
 Two limits: code changes from the bot run in [cloud workspaces](https://docs.paradev.com/cloud-workspaces), which are in early access and need a paid plan. And the bot's own tools for Linear and GitHub cannot delete resources, merge pull requests, or make bulk writes.
 
@@ -70,9 +70,12 @@ From the CLI, find the channel ID and create the same automation with a reaction
 ```bash
 superset automations trigger-options --group slack
 superset automations create --name "Bugs from Slack" --project <project-id> \
+  --host <host-id> \
   --agent claude --prompt-file slack-bug.md \
   --triggers '[{"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}]'
 ```
+
+Without `--host`, the automation runs on the machine where you type the command. Pass the ID of a host that stays online, from `superset hosts list`.
 
 What to know about Slack triggers:
 
