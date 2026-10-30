@@ -5,7 +5,7 @@ appId: sh.superset.mobile
 - extendedWaitUntil:
     visible: "Sign in with email \\(dev\\)"
     timeout: 15000
-  optional: true
+    optional: true
 - runFlow:
     when:
       notVisible: "Sign in with email \\(dev\\)"
