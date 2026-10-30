@@ -21,7 +21,7 @@ import {
 const MENU_LABEL_CLASS =
 	"text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70";
 
-/** Layout, grouping and ordering — everything about how rows show, not which. */
+/** Layout, grouping, ordering, and whether archived rows show at all. */
 export function V2WorkspacesDisplayMenu() {
 	const { t } = useLingui();
 	const viewMode = useV2WorkspacesFilterStore((state) => state.viewMode);
