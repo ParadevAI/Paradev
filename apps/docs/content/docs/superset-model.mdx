@@ -11,7 +11,7 @@ A project is a repo you've registered with Paradev, from a local folder or a Git
 
 ## Workspaces
 
-A workspace is an isolated [git worktree](/workspaces) on its own branch: its own directory, its own terminal sessions, its own ports. Only git-tracked files are copied in; lifecycle setup scripts handle the rest (dependencies, env files).
+A workspace is a separate [git worktree](/workspaces) on its own branch: its own directory and its own terminal sessions. Processes still share the machine's ports and network, and Paradev shows the ports each workspace opens. Only git-tracked files are copied in; lifecycle setup scripts handle the rest (dependencies, env files).
 
 Workspaces are cheap and disposable by design. Create one per task with **⌘N**, delete it when the branch merges. The workspace is where you delegate; the branch and PR are how the work comes back.
 

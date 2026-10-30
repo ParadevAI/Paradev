@@ -24,7 +24,7 @@ Paradev and Paseo both run many coding agents at once on hardware you own, each 
 
 | | **Paradev** | **Paseo** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Runs and orchestrates coding-agent CLIs on your hardware, driven from desktop, mobile, web, CLI, or API |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Runs and orchestrates coding-agent CLIs on your hardware, driven from desktop, mobile, web, CLI, or API |
 | **Category** | Local-first agent workspace with remote hosts | Self-hosted control plane: daemon plus native clients |
 | **Agent support** | Any CLI agent (Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and more), plus built-in chat | Native harnesses for Claude Code, Codex, OpenCode, and Pi; 30+ more via the Agent Client Protocol; custom providers by config |
 | **Isolation** | Git worktrees for local branch-based workspaces | Worktree per workspace, with `paseo.json` setup, teardown, and per-worktree service URLs |
@@ -39,7 +39,7 @@ Paradev and Paseo both run many coding agents at once on hardware you own, each 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, and lets you continue a session with a different agent or fork it. Around that core it adds a diff/file editor that commits, pushes, and opens PRs from the Changes pane, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel with a model picker, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and cloud workspaces run without your own computer connected. Automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work, and tasks sync with Linear and GitHub Issues. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok, Kimi Code, Mistral Vibe, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, and lets you continue a session with a different agent or fork it. Around that core it adds a diff/file editor that commits, pushes, and opens PRs from the Changes pane, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel with a model picker, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds any machine as a host so workspaces keep running when your laptop sleeps, and cloud workspaces run without your own computer connected. Automations on a schedule or event trigger, a CLI, a TypeScript SDK, and a Slack bot cover unattended work, and tasks sync with Linear and GitHub Issues. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Paseo?
 

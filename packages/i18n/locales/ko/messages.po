@@ -3510,6 +3510,9 @@ msgstr "최근에 만든 결과물의 링크를 가져오세요."
 msgid "Bring Any Agent"
 msgstr "어떤 에이전트든 데려오세요"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code, Codex, OpenCode 또는 어떤 코딩 에이전트든 하나의 워크스페이스로 가져오세요. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
+
 msgid "Bring over your projects"
 msgstr "프로젝트 가져오기"
 
@@ -3933,9 +3936,6 @@ msgstr "변경 로그"
 msgid "Changes"
 msgstr "변경"
 
-msgid "Changes are isolated"
-msgstr "변경은 격리됩니다"
-
 msgid "Changes open target"
 msgstr "변경 사항 열기 대상"
 
@@ -4186,8 +4186,8 @@ msgstr "CI 실패"
 msgid "Clarify this"
 msgstr "이것을 명확히 해 주세요"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex, OpenCode는 에이전트이고, Paradev는 그 여럿을 한꺼번에 돌리는 곳입니다. 작업마다 격리된 Git worktree가 생기므로 에이전트 열 개가 브랜치 열 개에서 동시에 작업하는 동안 한곳에서 관찰하고, 리뷰하고, 머지할 수 있습니다."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex, OpenCode는 에이전트이고, Paradev는 그 에이전트들을 한 번에 여러 개 실행하는 곳입니다. 작업마다 자체 Git 워크트리와 브랜치가 생기므로, 에이전트 열 개가 브랜치 열 개에서 동시에 작업하는 동안 한곳에서 모니터링, 리뷰, 병합할 수 있습니다."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode 등. 에이전트별 설정이 필요 없습니다."
@@ -6746,8 +6746,8 @@ msgstr "에이전트에게 맡길 작업을 설명하세요…"
 msgid "Describe the work to your agent"
 msgstr "에이전트에게 작업을 설명하세요"
 
-msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
-msgstr "필요한 것을 설명하세요. Paradev가 그 작업을 위한 격리된 워크스페이스와 깨끗한 브랜치를 만듭니다."
+msgid "Describe what you need. Paradev creates a workspace with its own worktree and branch for the task."
+msgstr "필요한 것을 설명하세요. Paradev가 그 작업을 위해 자체 워크트리와 브랜치를 가진 워크스페이스를 만듭니다."
 
 msgid "Describe what you'd like to see built…"
 msgstr "만들어졌으면 하는 것을 설명해 주세요…"
@@ -7275,8 +7275,8 @@ msgstr "예: 내 클라우드 리뷰"
 msgid "e.g. plan-budget"
 msgstr "예: plan-budget"
 
-msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
-msgstr "각 에이전트가 격리된 자체 Git worktree에서 실행됩니다. 서로의 파일을 덮어쓰지 않습니다. 준비되면 리뷰하고 머지하세요."
+msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
+msgstr "각 에이전트는 자체 Git 워크트리와 브랜치에서 작업하므로 서로의 파일을 덮어쓰지 않습니다. 준비되면 리뷰하고 병합하세요."
 
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
@@ -7296,6 +7296,9 @@ msgstr "각 세션은 중단된 지점부터 이어집니다."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "각 화면마다 타이포그래피를 따로 설정합니다. 변경 사항은 실시간 미리보기에 바로 반영됩니다."
+
+msgid "Each task on its own branch"
+msgstr "작업마다 자체 브랜치"
 
 msgid "Early 2024"
 msgstr "2024년 초"
@@ -10050,9 +10053,6 @@ msgstr "이(가) 로그인되었습니다."
 msgid "Is there a free plan?"
 msgstr "무료 플랜이 있나요?"
 
-msgid "Isolation"
-msgstr "격리"
-
 msgid "Issue"
 msgstr "이슈"
 
@@ -12538,8 +12538,8 @@ msgstr "아직 워크스페이스가 없습니다"
 msgid "No-Prompt Launch"
 msgstr "프롬프트 없는 실행"
 
-msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "아닙니다. 에이전트는 그대로 독립적이고, Paradev는 그 주위를 감싸는 오케스트레이션 계층입니다. 작업마다 격리된 Git worktree, 유지되는 세션, 차이 리뷰, 이벤트나 일정에 따라 실행되는 자동화가 제공되며 워크플로가 특정 제공사에 묶이지 않습니다."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "아니요. 에이전트는 독립적으로 유지되고, Paradev는 그 주변의 오케스트레이션 계층입니다. 작업마다 자체 Git 워크트리와 브랜치, 지속되는 세션, diff 리뷰, 이벤트나 일정에 따라 실행되는 자동화가 제공되며, 워크플로가 특정 제공업체에 묶이지 않습니다."
 
 msgid "Nobody has joined the board yet."
 msgstr "아직 순위표에 참여한 사람이 없습니다."
@@ -13860,8 +13860,8 @@ msgstr "Paradev는 소스가 공개된 소프트웨어입니다. 코드는 Elast
 msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev는 소스 공개 소프트웨어입니다. 모든 풀 리퀘스트, 리뷰, 버그가 GitHub에 공개되어 있습니다."
 
-msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Paradev는 F3에서 F4로 넘어가는 전환기를 위한 작업대입니다. 격리된 워크스페이스에서 병렬로 도는 에이전트, 실제로 감독할 수 있는 플릿, 그리고 직접 쓰지 않은 코드를 위한 리뷰 화면을 제공합니다."
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev는 F3에서 F4로 넘어가기 위한 작업대입니다. 서로 다른 브랜치에서 돌아가는 병렬 에이전트, 실제로 감독할 수 있는 에이전트 무리, 그리고 직접 쓰지 않은 코드를 위한 리뷰 화면을 제공합니다."
 
 msgid "Paradev isn't on Windows yet"
 msgstr "현재 Paradev는 Mac에서만 사용할 수 있습니다"

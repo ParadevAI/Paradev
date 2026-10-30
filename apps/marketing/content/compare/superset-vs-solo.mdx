@@ -23,7 +23,7 @@ Paradev and Solo both put your coding agents in one window, but they manage diff
 
 | | **Paradev** | **Solo** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Runs agents and your whole dev stack as supervised processes in one native window |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Runs agents and your whole dev stack as supervised processes in one native window |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Native process dashboard / terminal workspace (Tauri, "not an IDE. On purpose.") |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code, Codex, Gemini CLI, Amp, OpenCode, Aider, Goose, Copilot, Kimi, custom |
 | **Isolation** | Git worktrees for local branch-based workspaces | None -- one shared checkout ("not a git-worktree orchestrator") |
@@ -37,7 +37,7 @@ Paradev and Solo both put your coding agents in one window, but they manage diff
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Solo?
 
@@ -45,7 +45,7 @@ Solo is a native desktop terminal workspace from Aaron Francis -- "the workspace
 
 ## Key Differences
 
-### Work Isolation vs Environment Health
+### Work Separation vs Environment Health
 
 Paradev’s local branch-based workspaces separate working directories and branches, with terminals and diff review attached. Worktrees do not prevent merge conflicts or isolate shared services. Solo's unit is the process: everything runs in one shared checkout, kept healthy by supervision. Solo is upfront that parallel agents in the same project share the working tree unless you hand-create worktrees (its "linked checkouts" then share todos across them, but Solo will not create or manage the checkouts). For parallel agent coding, that is the decisive difference.
 
@@ -73,7 +73,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose Paradev if you:**
 
-- Run multiple coding agents in parallel and need them isolated in worktrees
+- Run multiple coding agents in parallel and need each one in its own worktree
 - Want diff review, PR flow, and a browser around agent work
 - Need scheduled automations, SDK/MCP surfaces, and remote/cloud workspaces
 - Ask "what did the agent change?" more than "is my dev server up?"
@@ -93,7 +93,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 ### Is Solo a Paradev alternative?
 
-Only partially -- Solo itself says it is not a git-worktree orchestrator and positions against editors and terminals, not orchestrators. It supervises processes; Paradev orchestrates isolated agent work. They overlap in "agents in one window" and complement each other beyond that.
+Only partially -- Solo itself says it is not a git-worktree orchestrator and positions against editors and terminals, not orchestrators. It supervises processes; Paradev orchestrates agent work in separate worktrees. They overlap in "agents in one window" and complement each other beyond that.
 
 ### Does Solo support Git worktrees?
 

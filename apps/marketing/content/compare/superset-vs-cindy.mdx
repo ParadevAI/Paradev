@@ -23,7 +23,7 @@ Paradev and Cindy overlap on one job -- running Claude Code and Codex sessions i
 
 | | **Paradev** | **Cindy** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | General-purpose AI agent that runs tasks locally, including parallel coding via Claude Code and Codex |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | General-purpose AI agent that runs tasks locally, including parallel coding via Claude Code and Codex |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Open-source general-purpose agent app |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code and Codex harnesses; models incl. Claude, GPT, Grok, Gemini, DeepSeek, Kimi, Qwen, local endpoints |
 | **Multi-agent** | Parallel worktree workspaces; orchestrate via CLI/MCP/SDK | Built-in planner + parallel workers + reviewer collaboration on one task |
@@ -37,7 +37,7 @@ Paradev and Cindy overlap on one job -- running Claude Code and Codex sessions i
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Cindy?
 
@@ -47,11 +47,11 @@ Cindy is an open-source (Apache-2.0) AI agent app whose tagline is "consider it 
 
 ### Developer Workspace vs General Agent
 
-Paradev is built for one audience: developers shipping code with parallel agents, so everything orbits Git -- worktrees, branches, diffs, PRs. Cindy is a general agent that does files, browsing, and connected apps, with coding as a headline use case. That makes Cindy more versatile for mixed personal automation, and Paradev deeper for engineering: local branch-based worktree isolation on real branches, persistent terminals, port management, and one-click handoff to your IDE. Cindy's change tracking (per-turn diffs with undo) is genuinely useful, but it is workspace-level capture, not branch-level Git isolation.
+Paradev is built for one audience: developers shipping code with parallel agents, so everything orbits Git -- worktrees, branches, diffs, PRs. Cindy is a general agent that does files, browsing, and connected apps, with coding as a headline use case. That makes Cindy more versatile for mixed personal automation, and Paradev deeper for engineering: a separate worktree on a real branch for each local branch-based workspace, persistent terminals, port management, and one-click handoff to your IDE. Cindy's change tracking (per-turn diffs with undo) is genuinely useful, but it is workspace-level capture, not branch-level Git separation.
 
 ### Multi-Agent Models
 
-Cindy builds team structure into a single task: a planner decomposes the work, parallel workers on different models attack it, and an independent reviewer checks the result -- all managed inside the app, shareable as a package. Paradev's parallelism is workspace-shaped: many agents on many tasks, each isolated in a worktree, orchestrated interactively or programmatically through the CLI, MCP server, and SDK. Cindy's model is compelling for one hard task; Paradev's for a portfolio of tasks moving in parallel.
+Cindy builds team structure into a single task: a planner decomposes the work, parallel workers on different models attack it, and an independent reviewer checks the result -- all managed inside the app, shareable as a package. Paradev's parallelism is workspace-shaped: many agents on many tasks, each in its own worktree, orchestrated interactively or programmatically through the CLI, MCP server, and SDK. Cindy's model is compelling for one hard task; Paradev's for a portfolio of tasks moving in parallel.
 
 ### Mobile and Messaging
 
@@ -73,7 +73,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose Paradev if you:**
 
-- Ship code and want Git-native isolation: worktree per task, branches, diffs, PRs
+- Ship code and want Git-native separation: worktree per task, branches, diffs, PRs
 - Run scheduled or unattended agent sessions through automations and an SDK
 - Want CLI and MCP surfaces plus remote and cloud workspaces
 - Need team and enterprise features
@@ -85,7 +85,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 - Want an Android app or Telegram integration today
 - Prefer Apache-2.0 open source with an optional managed-model subscription
 
-**Verdict:** Cindy is one of the fastest-moving projects in the agent space and its planner/worker/reviewer collaboration is a genuinely fresh take. But it is a general-purpose agent app with coding features, while Paradev is a purpose-built engineering workspace. For running a fleet of coding agents against real repositories with isolation, review, and automation, Paradev is the deeper tool; keep an eye on Cindy, especially if your agent needs extend beyond code.
+**Verdict:** Cindy is one of the fastest-moving projects in the agent space and its planner/worker/reviewer collaboration is a genuinely fresh take. But it is a general-purpose agent app with coding features, while Paradev is a purpose-built engineering workspace. For running a fleet of coding agents against real repositories with separate worktrees, review, and automation, Paradev is the deeper tool; keep an eye on Cindy, especially if your agent needs extend beyond code.
 
 ---
 
@@ -93,7 +93,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 ### Do Paradev and Cindy compete directly?
 
-Partially. Both run Claude Code and Codex in parallel with tracked changes. Paradev is developer-focused with Git worktree isolation per task; Cindy is a general-purpose agent app whose multi-agent coding runs happen inside its own workspace model.
+Partially. Both run Claude Code and Codex in parallel with tracked changes. Paradev is developer-focused with a Git worktree per task; Cindy is a general-purpose agent app whose multi-agent coding runs happen inside its own workspace model.
 
 ### Is Cindy open source?
 

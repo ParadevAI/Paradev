@@ -15,7 +15,7 @@ keywords:
   - ai coding agent comparison
 ---
 
-Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broader Codex product that also spans IDE extensions, a desktop app, and cloud workflows. Paradev is a local-first desktop workspace that can run multiple Codex instances, other agents, and Paradev Chat in parallel across isolated Git worktrees. The products overlap more than they used to, but they still solve different jobs: Codex is the coding suite, while Paradev is the orchestration and review layer around many agents.
+Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broader Codex product that also spans IDE extensions, a desktop app, and cloud workflows. Paradev is a local-first desktop workspace that can run multiple Codex instances, other agents, and Paradev Chat in parallel across separate Git worktrees. The products overlap more than they used to, but they still solve different jobs: Codex is the coding suite, while Paradev is the orchestration and review layer around many agents.
 
 ---
 
@@ -35,7 +35,7 @@ Codex CLI is OpenAI's terminal-based coding agent, but it now sits inside a broa
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ---
 
@@ -49,7 +49,7 @@ Codex CLI is OpenAI's open-source local terminal client for Codex. It runs on yo
 
 ### Orchestrator vs Agent Suite
 
-Codex is the agent suite: it reads code, talks to OpenAI models, and writes changes through local and cloud surfaces. Paradev is the orchestration workspace around agents: it runs many Codex sessions in parallel, each in its own isolated environment, then gives you chat, review, browser preview, and MCP-connected workflow around them. Run Codex inside Paradev to get automatic worktree isolation and parallel execution with zero manual setup.
+Codex is the agent suite: it reads code, talks to OpenAI models, and writes changes through local and cloud surfaces. Paradev is the orchestration workspace around agents: it runs many Codex sessions in parallel, each in its own Git worktree and branch, then gives you chat, review, browser preview, and MCP-connected workflow around them. Run Codex inside Paradev to get a worktree per task and parallel execution with zero manual setup.
 
 ### Codex Surfaces vs Paradev Orchestration
 
@@ -85,12 +85,12 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose Paradev + Codex CLI if you:**
 - Want to run Codex instances in parallel across separate tasks
-- Need automatic Git worktree isolation to separate working files for review
+- Need automatic Git worktrees to separate working files for review
 - Want sessions that survive crashes and app restarts
 - Plan to mix Codex with other agents (Claude Code, Aider, OpenCode) per task
 - Work on large codebases where parallel execution saves hours
 
-Paradev and Codex CLI work together naturally. Each Paradev task launches Codex in its own worktree: you get Codex's coding ability with Paradev's parallelism and isolation.
+Paradev and Codex CLI work together naturally. Each Paradev task launches Codex in its own worktree: you get Codex's coding ability with Paradev's parallelism and separate worktrees.
 
 ---
 
@@ -98,11 +98,11 @@ Paradev and Codex CLI work together naturally. Each Paradev task launches Codex 
 
 ### Is Paradev a Codex replacement?
 
-Not really. Paradev now has built-in chat, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Codex is the coding agent suite. Paradev is the layer that lets you run many Codex sessions safely or mix Codex with other agents on the same repo.
+Not really. Paradev now has built-in chat, MCP tooling, browser previews, and file review, but its core job is still coordinating agents and worktrees. Codex is the coding agent suite. Paradev is the layer that lets you run many Codex sessions in separate worktrees or mix Codex with other agents on the same repo.
 
 ### Can I run Codex in Full Auto mode inside Paradev?
 
-Yes. Each Paradev task runs Codex in its own isolated worktree. You can use any Codex mode (Suggest, Auto Edit, or Full Auto) safely, because worktree isolation means an autonomous agent can't affect your main working directory.
+Yes. Each Paradev task runs Codex in its own Git worktree and branch. You can use any Codex mode (Suggest, Auto Edit, or Full Auto), The worktree keeps the task's working files apart from your main checkout, but it does not limit where the agent's commands can read or write. A worktree is not a sandbox: the agent's commands still run on your machine, so use Codex's own sandbox modes to limit them.
 
 ### How does the Codex app compare to Paradev?
 

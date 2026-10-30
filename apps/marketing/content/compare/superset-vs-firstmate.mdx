@@ -15,7 +15,7 @@ keywords:
   - multi agent workflow
 ---
 
-Paradev and Firstmate both answer "how do I get one conversation to fan out into a crew of parallel coding agents?" -- with almost opposite ingredients. Paradev is an app: a desktop workspace with worktree isolation, diff review, automations, and remote hosts built in. Firstmate is not an app at all. It is an MIT-licensed "agent distro": a portable directory of instructions, skills, scripts, and conventions that turns a terminal agent you already run into an orchestrator that spawns and supervises crewmates in tmux windows and disposable Git worktrees.
+Paradev and Firstmate both answer "how do I get one conversation to fan out into a crew of parallel coding agents?" -- with almost opposite ingredients. Paradev is an app: a desktop workspace with a worktree per task, diff review, automations, and remote hosts built in. Firstmate is not an app at all. It is an MIT-licensed "agent distro": a portable directory of instructions, skills, scripts, and conventions that turns a terminal agent you already run into an orchestrator that spawns and supervises crewmates in tmux windows and disposable Git worktrees.
 
 ---
 
@@ -23,7 +23,7 @@ Paradev and Firstmate both answer "how do I get one conversation to fan out into
 
 | | **Paradev** | **Firstmate** |
 |---|---|---|
-| **What it is** | Desktop workspace that runs multiple AI agents in parallel with worktree isolation, chat, review, and browser | An "agent distro": instructions, skills, and scripts that make one agent orchestrate a crew |
+| **What it is** | Desktop workspace that runs multiple AI agents in parallel in separate worktrees, with chat, review, and browser | An "agent distro": instructions, skills, and scripts that make one agent orchestrate a crew |
 | **Form factor** | App (desktop, CLI, MCP server) | A cloned Git repo; nothing to install |
 | **Core model** | Workspace per task (worktree + terminals + review) | "First mate" agent spawns crewmate sessions, each in its own tmux window and worktree |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code, Codex, OpenCode, Pi, Grok, Kimi |
@@ -37,7 +37,7 @@ Paradev and Firstmate both answer "how do I get one conversation to fan out into
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on machines you own through Remote Access and in the cloud through cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Firstmate?
 
@@ -51,7 +51,7 @@ This is the whole comparison in one line: Paradev is software you run; Firstmate
 
 ### Supervision Models
 
-Both fan work out to isolated worktrees, and both let you talk to one agent that manages the rest. Firstmate's first mate supervises crewmates in tmux windows and reports back with PRs or summaries. Paradev's orchestrate skill turns Claude Code or Codex into a coordinator that starts worker agents in separate workspaces and collects their results, and every worker's terminal, diff, and status stays a click away in the app. Orchestration can also be programmatic through the CLI, MCP server, and SDK. The difference is where the crew lives: in tmux and your own tools, or in a workspace with review built in.
+Both fan work out to separate worktrees, and both let you talk to one agent that manages the rest. Firstmate's first mate supervises crewmates in tmux windows and reports back with PRs or summaries. Paradev's orchestrate skill turns Claude Code or Codex into a coordinator that starts worker agents in separate workspaces and collects their results, and every worker's terminal, diff, and status stays a click away in the app. Orchestration can also be programmatic through the CLI, MCP server, and SDK. The difference is where the crew lives: in tmux and your own tools, or in a workspace with review built in.
 
 ### Reliability Surface
 

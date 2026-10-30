@@ -14,7 +14,7 @@ keywords:
   - ai powered terminal
 ---
 
-Paradev and Warp both help developers work with AI around the command line, but they solve different problems. Warp is a modern terminal emulator with built-in AI agents. Paradev is a local-first workspace for running many coding agents in parallel, each in its own isolated Git worktree.
+Paradev and Warp both help developers work with AI around the command line, but they solve different problems. Warp is a modern terminal emulator with built-in AI agents. Paradev is a local-first workspace for running many coding agents in parallel, each in its own Git worktree and branch.
 
 ---
 
@@ -80,7 +80,7 @@ Warp's terminal features are free, and the app is now open source. AI features c
 - Prefer built-in agents that work without configuring external tools
 
 **Choose Paradev if you:**
-- Run many coding agents in parallel and need Git-level isolation between them
+- Run many coding agents in parallel and need a separate Git worktree and branch for each
 - Want full control over which agent and model you use, with no lock-in
 - Require source-available tooling with local Git worktrees
 - Already have a terminal you like and need an orchestration layer on top
@@ -101,4 +101,4 @@ No. Warp agents operate on your file system directly. If two agents modify the s
 
 ### Can I run Claude Code or Codex in both tools?
 
-Yes. Warp runs them in terminal panes alongside its built-in agents. Paradev runs them in isolated Git worktrees with parallel execution as the core workflow. For one or two agents, either works. For ten agents on ten tasks with branch isolation, Paradev is purpose-built for that.
+Yes. Warp runs them in terminal panes alongside its built-in agents. Paradev runs them in separate Git worktrees with parallel execution as the core workflow. For one or two agents, either works. For ten agents on ten tasks, each on its own branch, Paradev is purpose-built for that.

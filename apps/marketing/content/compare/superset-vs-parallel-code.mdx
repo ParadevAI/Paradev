@@ -23,7 +23,7 @@ Paradev and Parallel Code agree on the core idea: give every coding agent its ow
 
 | | **Paradev** | **Parallel Code** |
 |---|---|---|
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, plus review, automations, and orchestration APIs | Dispatches agents into worktrees with diff review and one-key merge back to main |
+| **What it does** | Runs multiple agents in parallel in separate Git worktrees, plus review, automations, and orchestration APIs | Dispatches agents into worktrees with diff review and one-key merge back to main |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Gemini, Copilot, more) | Claude Code, Codex CLI, Gemini CLI, Copilot CLI, Antigravity CLI |
 | **License** | Source-available (Elastic License 2.0), code on GitHub | Open source, MIT |
 | **Automations** | Scheduled recurring agent runs built in | Not documented |
@@ -36,7 +36,7 @@ Paradev and Parallel Code agree on the core idea: give every coding agent its ow
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ![Reviewing an agent's changes in Paradev's diff viewer before merging](/images/readme/diff-viewer.png)
 

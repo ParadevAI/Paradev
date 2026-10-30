@@ -69,9 +69,9 @@ If you use both agents, or run several sessions of either, the bottleneck become
 
 - **Choose Claude Code** if you want deep, reliable single-task coding across the broadest set of surfaces, including mobile.
 - **Choose Codex** if you are in the OpenAI ecosystem and want cloud-parallel task delegation.
-- **Run both, orchestrated by Paradev**, if you want to compare agents on the same task and run many sessions in parallel with worktree isolation.
+- **Run both, orchestrated by Paradev**, if you want to compare agents on the same task and run many sessions in parallel, each in its own worktree.
 
-**Verdict:** Claude Code and Codex are both excellent and increasingly comparable. Rather than pick one forever, many developers run both and let an agent-agnostic workspace like Paradev handle isolation, review, and parallelism across them.
+**Verdict:** Claude Code and Codex are both excellent and increasingly comparable. Rather than pick one forever, many developers run both and let an agent-agnostic workspace like Paradev handle worktrees, review, and parallelism across them.
 
 ---
 
@@ -87,7 +87,7 @@ Yes. They are separate products, and you can run both. A workspace like Paradev 
 
 ### Do Claude Code or Codex use Git worktrees?
 
-Neither natively isolates parallel tasks in local Git worktrees. Claude Code uses parallel and cloud sessions; Codex uses cloud sandboxes. For local worktree isolation, run them inside a workspace like Paradev.
+Neither natively isolates parallel tasks in local Git worktrees. Claude Code uses parallel and cloud sessions; Codex uses cloud sandboxes. For a local worktree per task, run them inside a workspace like Paradev.
 
 ### What is the difference between Codex Pro and Claude Max?
 

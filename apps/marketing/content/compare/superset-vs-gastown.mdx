@@ -15,7 +15,7 @@ keywords:
   - ai agent fleet
 ---
 
-Paradev and Gas Town both orchestrate many coding agents, but they sit at different points on the autonomy curve. Paradev is a desktop workspace: you (or your automations) launch agents into isolated worktrees, watch them, review diffs, and merge. Gas Town -- Steve Yegge's MIT-licensed orchestrator -- is an autonomous fleet: an AI "Mayor" dispatches work from a git-backed ledger to 20-30 worker agents, watchdogs recover the stuck ones, and a bisecting merge queue lands the results. One is a workspace you drive; the other is a factory you supervise.
+Paradev and Gas Town both orchestrate many coding agents, but they sit at different points on the autonomy curve. Paradev is a desktop workspace: you (or your automations) launch agents into separate worktrees, watch them, review diffs, and merge. Gas Town -- Steve Yegge's MIT-licensed orchestrator -- is an autonomous fleet: an AI "Mayor" dispatches work from a git-backed ledger to 20-30 worker agents, watchdogs recover the stuck ones, and a bisecting merge queue lands the results. One is a workspace you drive; the other is a factory you supervise.
 
 ---
 
@@ -23,7 +23,7 @@ Paradev and Gas Town both orchestrate many coding agents, but they sit at differ
 
 | | **Paradev** | **Gas Town** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Coordinates fleets of 20-30 agents with an AI coordinator, work ledger, and merge queue |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Coordinates fleets of 20-30 agents with an AI coordinator, work ledger, and merge queue |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Autonomous multi-agent orchestration system |
 | **Interface** | Desktop GUI, CLI, MCP server | CLI (`gt`) + tmux + TUI feed + local web dashboard |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Claude Code (deepest), plus Codex, Gemini, Copilot, Cursor, Amp, OpenCode, Pi, and more |
@@ -37,7 +37,7 @@ Paradev and Gas Town both orchestrate many coding agents, but they sit at differ
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Gas Town?
 
