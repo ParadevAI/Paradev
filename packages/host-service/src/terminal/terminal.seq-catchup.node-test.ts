@@ -359,6 +359,10 @@ class SeqRenderer {
 		this.ws?.send(JSON.stringify({ type: "resize", cols, rows }));
 	}
 
+	sendRepaint(): void {
+		this.ws?.send(JSON.stringify({ type: "repaint" }));
+	}
+
 	sendVisible(visible: boolean): void {
 		this.ws?.send(JSON.stringify({ type: "visible", visible }));
 	}
@@ -881,6 +885,28 @@ test(
 				"phase 6: post-restart nudge repaint must converge the visible grid",
 			);
 			console.log("PHASE 6 restart-spanning reattach: preserved + healed ✓");
+
+			// ── Phase 7: exact reattach at the same dims, then a client repaint ask
+			// A same-dims resize emits no SIGWINCH, so only the repaint message
+			// can make the TUI redraw a screen the client reshaped while detached.
+			await renderer.disconnect();
+			await renderer.connect(terminalId);
+			const synced7 = await renderer.waitSynced();
+			assert.equal(synced7.mode, "exact", "phase 7: reattach must be exact");
+			const bytesBeforeRepaint = renderer.allBinary.length;
+			const redrawnSince = () =>
+				new TextDecoder()
+					.decode(Buffer.concat(renderer.allBinary.slice(bytesBeforeRepaint)))
+					.includes("FULL-REDRAW");
+			await sleep(300);
+			assert.ok(!redrawnSince(), "phase 7: no repaint before the client asks");
+			renderer.sendRepaint();
+			await waitFor(
+				redrawnSince,
+				5_000,
+				"TUI to repaint on a client repaint ask",
+			);
+			console.log("PHASE 7 client repaint ask: full redraw ✓");
 
 			renderer.assertNoReset("whole run");
 			witness.assertNoReset("whole run");

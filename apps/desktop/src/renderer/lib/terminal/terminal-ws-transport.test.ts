@@ -17,6 +17,7 @@ import {
 	park,
 	reconnect,
 	sendColors,
+	sendResize,
 } from "./terminal-ws-transport";
 
 // The transport builds on createRelaySocket (partysocket) — reconnection,
@@ -727,6 +728,60 @@ describe("terminal-ws-transport", () => {
 		redial.open();
 		redial.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
 		expect(transport.connectionState).toBe("open");
+	});
+
+	describe("resized while parked", () => {
+		function parkWithOutput() {
+			const { transport, terminal, socket } = connectAttached();
+			socket.message(
+				JSON.stringify({ type: "synced", epoch: "e1", seq: 0, mode: "exact" }),
+			);
+			const bytes = new TextEncoder().encode("abc");
+			socket.message(
+				bytes.buffer.slice(
+					bytes.byteOffset,
+					bytes.byteOffset + bytes.byteLength,
+				),
+			);
+			park(transport);
+			return { transport, terminal };
+		}
+
+		function reattach(
+			transport: ReturnType<typeof createTransport>,
+			terminal: ReturnType<typeof createMockTerminal>,
+		) {
+			connect(transport, terminal, "ws://host/terminal/t1");
+			const redial = FakeRelaySocket.instances.at(-1);
+			if (!redial) throw new Error("expected relay socket instance");
+			redial.open();
+			redial.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+			return redial.sent.map((payload) => JSON.parse(payload) as unknown);
+		}
+
+		test("asks the host for a repaint when the size went and came back", () => {
+			const { transport, terminal } = parkWithOutput();
+
+			sendResize(transport, 101, 20);
+			sendResize(transport, 101, 27);
+
+			expect(reattach(transport, terminal)).toEqual([
+				{ type: "visible", visible: true },
+				{ type: "resize", cols: 101, rows: 27 },
+				{ type: "repaint" },
+			]);
+		});
+
+		test("asks for nothing when the size never changed", () => {
+			const { transport, terminal } = parkWithOutput();
+
+			sendResize(transport, 101, 27);
+
+			expect(reattach(transport, terminal)).toEqual([
+				{ type: "visible", visible: true },
+				{ type: "resize", cols: 101, rows: 27 },
+			]);
+		});
 	});
 
 	test("park refuses to disconnect a pre-seq host", () => {
