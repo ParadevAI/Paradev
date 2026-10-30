@@ -39,15 +39,13 @@ export function WorkspaceStateGlyph({ workspace }: WorkspaceStateGlyphProps) {
 	} else if (agentStatus === "permission") {
 		glyph = <StatusIndicator status={agentStatus} />;
 		label = getStatusTooltip(agentStatus);
+	} else if (agentStatus === "review" && workspace.archivedAt == null) {
+		glyph = <StatusIndicator status="review" />;
+		label = t({ message: "Ready for review" });
 	} else {
 		const column = deriveBoardColumn(workspace);
-		if (column === "finished") {
-			glyph = <StatusIndicator status="review" />;
-			label = getStatusTooltip("review");
-		} else {
-			glyph = <BoardColumnIcon column={column} />;
-			label = i18n._(BOARD_COLUMN_LABELS[column]);
-		}
+		glyph = <BoardColumnIcon column={column} />;
+		label = i18n._(BOARD_COLUMN_LABELS[column]);
 	}
 
 	return (
