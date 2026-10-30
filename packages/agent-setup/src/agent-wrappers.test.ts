@@ -32,6 +32,7 @@ const TEST_HOME_DIR = path.join(TEST_ROOT, "home");
 
 const originalSupersetHomeDir = process.env.SUPERSET_HOME_DIR;
 const originalHome = process.env.HOME;
+const originalDisabledSkills = process.env.SUPERSET_DISABLED_SKILLS;
 
 let managedClaudeHookCommand: string;
 let managedArtifactGuardCommand: string;
@@ -42,6 +43,7 @@ let managedMastraHookCommand: string;
 beforeAll(() => {
 	process.env.SUPERSET_HOME_DIR = TEST_SUPERSET_HOME_DIR;
 	process.env.HOME = TEST_HOME_DIR;
+	delete process.env.SUPERSET_DISABLED_SKILLS;
 	managedClaudeHookCommand = getClaudeManagedHookCommand();
 	managedArtifactGuardCommand = getManagedArtifactGuardHookCommand();
 	managedDroidHookCommand = getManagedNotifyHookCommand("droid");
@@ -59,6 +61,11 @@ afterAll(() => {
 		delete process.env.HOME;
 	} else {
 		process.env.HOME = originalHome;
+	}
+	if (originalDisabledSkills === undefined) {
+		delete process.env.SUPERSET_DISABLED_SKILLS;
+	} else {
+		process.env.SUPERSET_DISABLED_SKILLS = originalDisabledSkills;
 	}
 });
 
@@ -108,6 +115,10 @@ const {
 } = await import("./agent-wrappers");
 const { getManagedArtifactGuardHookCommand, getManagedNotifyHookCommand } =
 	await import("./agent-wrappers-common");
+const { writeSharedDisabledSkillIds } = await import("./disabled-skills");
+const { ensureClaudeManagedHooksAt } = await import(
+	"./agent-wrappers-claude-codex-opencode"
+);
 
 function requireContent(content: string | null): string {
 	if (content === null) throw new Error("Expected merged hook content");
@@ -1709,6 +1720,81 @@ describe("agent-wrappers claude settings.json", () => {
 				def.hooks.some((hook) => hook.command === "/opt/my-pretooluse.sh"),
 			),
 		).toBe(true);
+	});
+
+	it("drops the Artifact guard while the page skill is disabled, keeping notify and user hooks", () => {
+		type Settings = {
+			hooks: Record<
+				string,
+				Array<{
+					matcher?: string;
+					hooks: Array<{ type: string; command: string }>;
+				}>
+			>;
+		};
+		const claudeSettingsPath = path.join(
+			TEST_HOME_DIR,
+			".claude",
+			"settings.json",
+		);
+		const read = () =>
+			JSON.parse(readFileSync(claudeSettingsPath, "utf-8")) as Settings;
+		const guardCount = () =>
+			(read().hooks.PreToolUse ?? []).filter((def) =>
+				def.hooks.some((hook) => hook.command.includes("artifact-guard.sh")),
+			).length;
+		const userHook = {
+			matcher: "Bash",
+			hooks: [{ type: "command", command: "/opt/my-pretooluse.sh" }],
+		};
+
+		createClaudeSettingsJson([]);
+		const registered = read();
+		registered.hooks.PreToolUse.push(userHook);
+		writeFileSync(claudeSettingsPath, JSON.stringify(registered, null, 2));
+
+		createClaudeSettingsJson(["page"]);
+
+		const { PreToolUse, ...notifyEvents } = read().hooks;
+		const { PreToolUse: _, ...registeredNotifyEvents } = registered.hooks;
+		expect(PreToolUse).toEqual([userHook]);
+		expect(notifyEvents).toEqual(registeredNotifyEvents);
+
+		createClaudeSettingsJson([]);
+		expect(guardCount()).toBe(1);
+	});
+
+	it("reads the page skill's state from the shared list and SUPERSET_DISABLED_SKILLS by default", () => {
+		const hasGuard = () =>
+			requireContent(
+				getClaudeGlobalSettingsJsonContent("/tmp/.superset/hooks/notify.sh"),
+			).includes("artifact-guard.sh");
+
+		expect(hasGuard()).toBe(true);
+		writeSharedDisabledSkillIds(["superset/page"]);
+		expect(hasGuard()).toBe(false);
+		writeSharedDisabledSkillIds([]);
+		process.env.SUPERSET_DISABLED_SKILLS = "page";
+		try {
+			expect(hasGuard()).toBe(false);
+		} finally {
+			delete process.env.SUPERSET_DISABLED_SKILLS;
+		}
+	});
+
+	it("keeps the Artifact guard in a secondary Claude profile while page is disabled", () => {
+		const profileDir = path.join(TEST_ROOT, "claude-profile");
+		mkdirSync(profileDir, { recursive: true });
+		writeSharedDisabledSkillIds(["page"]);
+
+		ensureClaudeManagedHooksAt(profileDir);
+
+		const settings = JSON.parse(
+			readFileSync(path.join(profileDir, "settings.json"), "utf-8"),
+		) as { hooks: Record<string, Array<{ matcher?: string }>> };
+		expect(
+			settings.hooks.PreToolUse?.filter((def) => def.matcher === "Artifact"),
+		).toHaveLength(1);
 	});
 
 	it("preserves user hooks and non-hook settings when merging", () => {

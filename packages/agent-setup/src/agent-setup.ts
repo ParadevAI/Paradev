@@ -58,6 +58,7 @@ import {
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
 import { createArtifactGuardScript } from "./artifact-guard-hook";
+import { resolveDisabledAgentIds } from "./disabled-agent-hooks";
 import { resolveDisabledSkillIds } from "./disabled-skills";
 import { createManagedSkills } from "./managed-skills";
 import { createNotifyScript } from "./notify-hook";
@@ -276,6 +277,20 @@ export function setupSingleAgent(agentId: string): boolean {
 	runAgentActions(agentId, definition.setup, failed);
 	warnOnFailures(failed);
 	return true;
+}
+
+export function syncSkillGatedHooks(
+	options: {
+		disabledAgentIds?: readonly string[];
+		disabledSkillIds?: readonly string[];
+	} = {},
+): void {
+	if (resolveDisabledAgentIds(options.disabledAgentIds).includes("claude")) {
+		return;
+	}
+	runSetupAction("claude:createClaudeSettingsJson", () =>
+		createClaudeSettingsJson(resolveDisabledSkillIds(options.disabledSkillIds)),
+	);
 }
 
 /**

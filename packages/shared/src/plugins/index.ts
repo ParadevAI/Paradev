@@ -310,8 +310,20 @@ export const SUPERSET_MANAGED_SKILLS = [
 	{ name: "doctor", description: "Diagnose and fix Paradev problems" },
 	{ name: "feedback", description: "Report bugs and request features" },
 	{
+		name: "integrations",
+		description: "List and call the tools your connected integrations expose",
+	},
+	{
 		name: "orchestrate",
 		description: "Coordinate multiple coding agents across workspaces",
+	},
+	{
+		name: "page",
+		description: "Publish shareable Paradev pages and answer their comments",
+	},
+	{
+		name: "panes",
+		description: "Arrange the tabs and split panes of a Paradev workspace",
 	},
 	{
 		name: "plugins",

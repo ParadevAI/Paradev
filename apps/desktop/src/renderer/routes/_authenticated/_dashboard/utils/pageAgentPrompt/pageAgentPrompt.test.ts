@@ -18,4 +18,10 @@ describe("buildPageAgentPrompt", () => {
 	it("treats a blank request as no request", () => {
 		expect(buildPageAgentPrompt("   ")).toBe(buildPageAgentPrompt());
 	});
+
+	it("points at the Skills tab when the Pages skill is missing", () => {
+		expect(buildPageAgentPrompt()).toContain(
+			"ask me to turn on page in Plugins, on the Skills tab",
+		);
+	});
 });

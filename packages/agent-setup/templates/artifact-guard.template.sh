@@ -9,6 +9,9 @@ case "$SUPERSET_PAGES_NUDGE" in
   0|off|OFF|false|FALSE|no|NO) exit 0 ;;
 esac
 
+printf '%s' "$SUPERSET_DISABLED_SKILLS" | tr ',' '\n' | grep -qxE '[[:space:]]*(superset/)?page[[:space:]]*' && exit 0
+grep -qE '"(superset/)?page"' "${SUPERSET_HOME_DIR:-$HOME/.superset}/disabled-skills.json" 2>/dev/null && exit 0
+
 json_field() {
   printf '%s' "$INPUT" | grep -oE "\"$1\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -n 1 | grep -oE '"[^"]*"$' | tr -d '"'
 }
