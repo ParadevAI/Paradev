@@ -88,6 +88,9 @@ test("after the reset, an armed resume counts down to when it sends and can stil
 		onRespond,
 	});
 	expect(view.container.textContent).toContain("Limit has reset");
+	expect(view.container.querySelector("output")?.textContent).toBe(
+		"Usage limit reached",
+	);
 	fireEvent.click(view.getByText("Resuming in 25s"));
 	expect(onRespond.mock.calls).toEqual([["cancel_resume_at_reset"]]);
 });

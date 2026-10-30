@@ -128,21 +128,25 @@ export function UsageLimitNotice({
 		.join(" · ");
 
 	return (
-		<output className="flex items-center gap-3 py-2 pr-2 pl-3" data-usage-limit>
+		<div
+			className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 pr-2 pl-3"
+			data-usage-limit
+		>
 			<span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-400/15 text-amber-400">
 				<Gauge className="size-4" />
 			</span>
-			<div className="min-w-0 flex-1 font-sans">
-				<div className="truncate font-medium text-[13px] text-foreground">
+			<div className="min-w-48 flex-1 font-sans">
+				{/* Only the title is live: the countdown below ticks every second. */}
+				<output className="block truncate font-medium text-[13px] text-foreground">
 					{title ? i18n._(title) : <Trans>Usage limit reached</Trans>}
-				</div>
+				</output>
 				{detail && (
 					<div className="truncate text-[12px] text-muted-foreground">
 						{detail}
 					</div>
 				)}
 			</div>
-			<div className="flex shrink-0 items-center gap-0.5">
+			<div className="ml-auto flex min-w-0 max-w-full flex-wrap items-center justify-end gap-0.5">
 				{agent && (
 					<AccountMenu
 						accounts={accounts}
@@ -202,7 +206,7 @@ export function UsageLimitNotice({
 					<X className="size-3.5" />
 				</button>
 			</div>
-		</output>
+		</div>
 	);
 }
 
