@@ -16701,9 +16701,6 @@ msgstr "看看你最近 30 天的表現在公開排行榜上的位置。僅包�
 msgid "Select"
 msgstr "選擇框"
 
-msgid "Select a file to view it here"
-msgstr "選取檔案以在此處檢視"
-
 msgid "Select a project"
 msgstr "請選擇專案"
 

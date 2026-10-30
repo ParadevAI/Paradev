@@ -16701,9 +16701,6 @@ msgstr "Lihat posisi 30 hari terakhir Anda di papan peringkat publik. Hanya juml
 msgid "Select"
 msgstr "Select"
 
-msgid "Select a file to view it here"
-msgstr "Pilih file untuk melihatnya di sini"
-
 msgid "Select a project"
 msgstr "Pilih sebuah proyek"
 

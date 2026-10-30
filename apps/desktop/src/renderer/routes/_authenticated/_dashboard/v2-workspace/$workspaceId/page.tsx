@@ -464,6 +464,11 @@ function V2WorkspaceContent() {
 		rightStore,
 		(state) => findVisibleChangesPane(state) != null,
 	);
+	const isRightTreeOnly = useStore(rightStore, (state) => {
+		const tab = state.tabs.find((t) => t.id === state.activeTabId);
+		const panes = tab ? Object.values(tab.panes) : [];
+		return panes.length === 1 && panes[0]?.kind === "files";
+	});
 	const openRightChangesTab = useCallback(() => {
 		setRightSidebarOpen(true);
 		openChangesPaneInStore(rightStore, "tab");
@@ -641,7 +646,7 @@ function V2WorkspaceContent() {
 					<WorkspaceSplitLayout
 						mode={rightPaneMode}
 						activeAreaRef={activeAreaRef}
-						{...(isRightPaneAreaEnabled
+						{...(isRightPaneAreaEnabled && !isRightTreeOnly
 							? {
 									width: v2UserPreferences.rightPaneAreaWidth,
 									minWidth: MIN_RIGHT_PANE_AREA_WIDTH,

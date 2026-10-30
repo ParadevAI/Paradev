@@ -16701,9 +16701,6 @@ msgstr "Podívejte se, kde se vašich posledních 30 dní umístí ve veřejném
 msgid "Select"
 msgstr "Výběr"
 
-msgid "Select a file to view it here"
-msgstr "Vyberte soubor a zobrazí se zde"
-
 msgid "Select a project"
 msgstr "Vyberte projekt"
 

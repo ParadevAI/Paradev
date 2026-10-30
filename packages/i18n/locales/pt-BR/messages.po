@@ -16701,9 +16701,6 @@ msgstr "Veja em que posição seus últimos 30 dias ficam no ranking público. A
 msgid "Select"
 msgstr "Select"
 
-msgid "Select a file to view it here"
-msgstr "Selecione um arquivo para visualizá-lo aqui"
-
 msgid "Select a project"
 msgstr "Selecione um projeto"
 

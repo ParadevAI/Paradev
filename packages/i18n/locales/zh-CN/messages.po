@@ -16701,9 +16701,6 @@ msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数�
 msgid "Select"
 msgstr "选择框"
 
-msgid "Select a file to view it here"
-msgstr "选择一个文件以在此处查看"
-
 msgid "Select a project"
 msgstr "请选择项目"
 

@@ -16701,9 +16701,6 @@ msgstr "Xem 30 ngày qua của bạn đứng ở đâu trên bảng xếp hạng
 msgid "Select"
 msgstr "Select"
 
-msgid "Select a file to view it here"
-msgstr "Chọn một tệp để xem tại đây"
-
 msgid "Select a project"
 msgstr "Chọn một dự án"
 

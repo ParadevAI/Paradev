@@ -16701,9 +16701,6 @@ msgstr "Son 30 gününüzün herkese açık liderlik tablosunda nereye düştü�
 msgid "Select"
 msgstr "Seçim"
 
-msgid "Select a file to view it here"
-msgstr "Burada görüntülemek için bir dosya seçin"
-
 msgid "Select a project"
 msgstr "Bir proje seçin"
 

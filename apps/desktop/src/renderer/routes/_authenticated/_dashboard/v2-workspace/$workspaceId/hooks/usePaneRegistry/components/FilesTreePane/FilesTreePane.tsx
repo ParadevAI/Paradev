@@ -1,6 +1,6 @@
 import type { RendererContext } from "@superset/panes";
 import type { PaneViewerData } from "../../../../types";
-import { FileViewLayout } from "../FileViewLayout";
+import { FileViewTree } from "../FileViewTree";
 
 interface FilesTreePaneProps {
 	context: RendererContext<PaneViewerData>;
@@ -14,11 +14,12 @@ export function FilesTreePane({
 	onSearch,
 }: FilesTreePaneProps) {
 	return (
-		<FileViewLayout
-			context={context}
-			workspaceId={workspaceId}
-			showTree
-			onSearch={onSearch}
-		/>
+		<div className="h-full min-w-0">
+			<FileViewTree
+				context={context}
+				workspaceId={workspaceId}
+				onSearch={onSearch}
+			/>
+		</div>
 	);
 }

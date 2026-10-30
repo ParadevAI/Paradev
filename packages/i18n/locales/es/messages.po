@@ -16701,9 +16701,6 @@ msgstr "Descubre en qué puesto de la clasificación pública quedan tus último
 msgid "Select"
 msgstr "Selector"
 
-msgid "Select a file to view it here"
-msgstr "Selecciona un archivo para verlo aquí"
-
 msgid "Select a project"
 msgstr "Selecciona un proyecto"
 

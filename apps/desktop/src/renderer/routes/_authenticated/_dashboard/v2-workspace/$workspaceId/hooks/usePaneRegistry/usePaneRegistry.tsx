@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import type {
 	ContextMenuActionConfig,
+	Pane,
 	PaneRegistry,
 	RendererContext,
 	WorkspaceStore,
@@ -82,6 +83,7 @@ import {
 } from "../../utils/focusTerminalPane";
 import { openPagePaneInStore } from "../../utils/openPagePaneInStore";
 import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
+import { returnFileToTree } from "../../utils/returnFileToTree";
 import { useAgentSessionLauncher } from "../useAgentSessionLauncher";
 import type { OpenReviewDiff } from "../useReviewCommentNavigation";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
@@ -282,6 +284,72 @@ export function usePaneRegistry({
 		[workspaceId],
 	);
 
+	const confirmFileClose = useCallback(
+		(pane: Pane<PaneViewerData>): boolean | Promise<boolean> => {
+			const data = pane.data as FilePaneData;
+			const doc = getDocument(workspaceId, data.filePath);
+			if (!doc?.dirty) return true;
+			const name = getFileName(data.filePath);
+			return new Promise<boolean>((resolve) => {
+				alert({
+					onDismiss: () => resolve(false),
+					title: t({
+						message: `Do you want to save the changes you made to ${name}?`,
+					}),
+					description: t({
+						message: "Your changes will be lost if you don't save them.",
+					}),
+					actions: [
+						{
+							label: t({
+								message: "Save",
+							}),
+							onClick: async () => {
+								const doc = getDocument(workspaceId, data.filePath);
+								if (!doc) {
+									resolve(true);
+									return;
+								}
+								const result = await doc.save();
+								if (result.status !== "saved") {
+									const target = store.getState().getPane(pane.id);
+									if (target)
+										store.getState().setActivePane({
+											tabId: target.tabId,
+											paneId: pane.id,
+										});
+								}
+								// Only proceed to close if the save succeeded; otherwise
+								// leave the pane open so the user can see the conflict /
+								// error state and retry.
+								resolve(result.status === "saved");
+							},
+						},
+						{
+							label: t({
+								message: "Don't Save",
+							}),
+							variant: "secondary",
+							onClick: async () => {
+								const doc = getDocument(workspaceId, data.filePath);
+								if (doc) await doc.reload();
+								resolve(true);
+							},
+						},
+						{
+							label: t({
+								message: "Cancel",
+							}),
+							variant: "ghost",
+							onClick: () => resolve(false),
+						},
+					],
+				});
+			});
+		},
+		[workspaceId, store, t],
+	);
+
 	return useMemo<PaneRegistry<PaneViewerData>>(
 		() => ({
 			file: {
@@ -329,67 +397,9 @@ export function usePaneRegistry({
 				),
 				onHeaderClick: (ctx: RendererContext<PaneViewerData>) =>
 					ctx.actions.pin(),
-				onBeforeClose: (pane) => {
-					const data = pane.data as FilePaneData;
-					const doc = getDocument(workspaceId, data.filePath);
-					if (!doc?.dirty) return true;
-					const name = getFileName(data.filePath);
-					return new Promise<boolean>((resolve) => {
-						alert({
-							onDismiss: () => resolve(false),
-							title: t({
-								message: `Do you want to save the changes you made to ${name}?`,
-							}),
-							description: t({
-								message: "Your changes will be lost if you don't save them.",
-							}),
-							actions: [
-								{
-									label: t({
-										message: "Save",
-									}),
-									onClick: async () => {
-										const doc = getDocument(workspaceId, data.filePath);
-										if (!doc) {
-											resolve(true);
-											return;
-										}
-										const result = await doc.save();
-										if (result.status !== "saved") {
-											const target = store.getState().getPane(pane.id);
-											if (target)
-												store.getState().setActivePane({
-													tabId: target.tabId,
-													paneId: pane.id,
-												});
-										}
-										// Only proceed to close if the save succeeded; otherwise
-										// leave the pane open so the user can see the conflict /
-										// error state and retry.
-										resolve(result.status === "saved");
-									},
-								},
-								{
-									label: t({
-										message: "Don't Save",
-									}),
-									variant: "secondary",
-									onClick: async () => {
-										const doc = getDocument(workspaceId, data.filePath);
-										if (doc) await doc.reload();
-										resolve(true);
-									},
-								},
-								{
-									label: t({
-										message: "Cancel",
-									}),
-									variant: "ghost",
-									onClick: () => resolve(false),
-								},
-							],
-						});
-					});
+				onBeforeClose: async (pane) => {
+					if (!(await confirmFileClose(pane))) return false;
+					return !(rightStore && returnFileToTree(rightStore, pane.id));
 				},
 				contextMenuActions: (_ctx, defaults) =>
 					defaults.map((d) =>
@@ -1155,6 +1165,7 @@ export function usePaneRegistry({
 			chatPaneIcon,
 			onOpenSubagent,
 			rightStore,
+			confirmFileClose,
 		],
 	);
 }
