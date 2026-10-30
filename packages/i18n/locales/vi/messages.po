@@ -14727,6 +14727,9 @@ msgstr "Hàng đợi đã tạm dừng"
 msgid "Queue paused because you interrupted"
 msgstr "Hàng đợi đã tạm dừng vì bạn đã ngắt"
 
+msgid "Queue paused by the usage limit"
+msgstr "Hàng đợi đã tạm dừng do giới hạn sử dụng"
+
 msgid "Queue work for agents"
 msgstr "Xếp việc cho agent"
 
@@ -15759,6 +15762,9 @@ msgstr "Đang resume {0}…"
 
 msgid "Resuming at reset"
 msgstr "Sẽ tiếp tục khi đặt lại"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Tiếp tục sau {resumeSeconds} giây"
 
 msgid "Resuming the conversation…"
 msgstr "Đang tiếp tục cuộc trò chuyện…"

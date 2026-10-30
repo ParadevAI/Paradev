@@ -14727,6 +14727,9 @@ msgstr "Coda in pausa"
 msgid "Queue paused because you interrupted"
 msgstr "Coda in pausa perché hai interrotto"
 
+msgid "Queue paused by the usage limit"
+msgstr "Coda in pausa per il limite di utilizzo"
+
 msgid "Queue work for agents"
 msgstr "Metti in coda il lavoro per gli agenti"
 
@@ -15759,6 +15762,9 @@ msgstr "Ripresa di {0}…"
 
 msgid "Resuming at reset"
 msgstr "Ripresa al ripristino"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Ripresa tra {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Ripresa della conversazione…"

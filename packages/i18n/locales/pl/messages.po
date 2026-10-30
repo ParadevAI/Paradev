@@ -14727,6 +14727,9 @@ msgstr "Kolejka wstrzymana"
 msgid "Queue paused because you interrupted"
 msgstr "Kolejka wstrzymana, bo przerwano agenta"
 
+msgid "Queue paused by the usage limit"
+msgstr "Kolejka wstrzymana przez limit użycia"
+
 msgid "Queue work for agents"
 msgstr "Kolejkuj pracę dla agentów"
 
@@ -15759,6 +15762,9 @@ msgstr "Wznawianie {0}…"
 
 msgid "Resuming at reset"
 msgstr "Wznowienie po resecie"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Wznowienie za {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Wznawianie rozmowy…"

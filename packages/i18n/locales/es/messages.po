@@ -14727,6 +14727,9 @@ msgstr "Cola en pausa"
 msgid "Queue paused because you interrupted"
 msgstr "Cola en pausa porque interrumpiste"
 
+msgid "Queue paused by the usage limit"
+msgstr "Cola en pausa por el límite de uso"
+
 msgid "Queue work for agents"
 msgstr "Pon trabajo en cola para los agentes"
 
@@ -15759,6 +15762,9 @@ msgstr "Retomando {0}…"
 
 msgid "Resuming at reset"
 msgstr "Se reanudará al restablecerse"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Se reanuda en {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Reanudando la conversación…"

@@ -428,13 +428,21 @@ export class LiveSession {
 				return;
 			case "resume_at_reset":
 				if (limit.resetsAtMs === undefined) return;
-				this.emitSession({ usageLimit: { ...limit, resumeAtReset: true } });
+				this.emitSession({
+					usageLimit: {
+						...limit,
+						resumeAtReset: true,
+						resumesAtMs: limit.resetsAtMs + this.usageLimitGraceMs(),
+					},
+				});
 				this.armResumeTimer(limit.resetsAtMs);
 				return;
-			case "cancel_resume_at_reset":
+			case "cancel_resume_at_reset": {
 				this.clearResumeTimer();
-				this.emitSession({ usageLimit: { ...limit, resumeAtReset: false } });
+				const { resumesAtMs: _cancelled, ...rest } = limit;
+				this.emitSession({ usageLimit: { ...rest, resumeAtReset: false } });
 				return;
+			}
 		}
 	}
 
@@ -446,9 +454,13 @@ export class LiveSession {
 		}
 	}
 
+	private usageLimitGraceMs(): number {
+		return this.options.usageLimitGraceMs ?? USAGE_LIMIT_GRACE_MS;
+	}
+
 	private armResumeTimer(resetsAtMs: number): void {
 		this.clearResumeTimer();
-		const grace = this.options.usageLimitGraceMs ?? USAGE_LIMIT_GRACE_MS;
+		const grace = this.usageLimitGraceMs();
 		const wait = resetsAtMs + grace - this.now();
 		this.resumeTimer = setTimeout(
 			() => {

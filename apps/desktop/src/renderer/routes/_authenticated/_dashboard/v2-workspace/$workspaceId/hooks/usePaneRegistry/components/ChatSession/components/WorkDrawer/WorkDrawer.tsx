@@ -247,6 +247,7 @@ export function WorkDrawer({
 								queue?.paused && (
 									<QueuePausedBar
 										actionable={queue.actionable}
+										byLimit={queue.pausedByLimit === true}
 										onClear={queueActions.onClear}
 										onResume={queueActions.onResume}
 									/>

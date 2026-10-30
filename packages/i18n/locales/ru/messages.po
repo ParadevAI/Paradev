@@ -14727,6 +14727,9 @@ msgstr "Очередь приостановлена"
 msgid "Queue paused because you interrupted"
 msgstr "Очередь приостановлена, потому что вы прервали агента"
 
+msgid "Queue paused by the usage limit"
+msgstr "Очередь приостановлена лимитом использования"
+
 msgid "Queue work for agents"
 msgstr "Ставьте работу агентам в очередь"
 
@@ -15759,6 +15762,9 @@ msgstr "Возобновление {0}…"
 
 msgid "Resuming at reset"
 msgstr "Продолжится после сброса"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Продолжение через {resumeSeconds} с"
 
 msgid "Resuming the conversation…"
 msgstr "Возобновляем разговор…"

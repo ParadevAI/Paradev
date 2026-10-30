@@ -76,6 +76,22 @@ test("once the window is open, or when no reset is known, it offers to resume no
 	expect(bare.getByText("Resume")).toBeTruthy();
 });
 
+test("after the reset, an armed resume counts down to when it sends", () => {
+	const view = renderNotice({
+		limit: {
+			hitAtMs: Date.now() - HOUR_MS,
+			resetsAtMs: Date.now() - 5_000,
+			resumeAtReset: true,
+			resumesAtMs: Date.now() + 25_000,
+		},
+		onRespond: () => undefined,
+	});
+	expect(view.container.textContent).toContain(
+		"Limit has reset · Resuming in 25s",
+	);
+	expect(view.getByText("Resume")).toBeTruthy();
+});
+
 test("the account menu is only for agents whose logins the host can switch", () => {
 	const plain = renderNotice({
 		limit: { hitAtMs: Date.now() },

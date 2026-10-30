@@ -175,8 +175,10 @@ describe("LiveSession usage limit", () => {
 			await flush();
 			session.respondToUsageLimit("resume_at_reset");
 			expect(session.state.usageLimit?.resumeAtReset).toBe(true);
+			expect(session.state.usageLimit?.resumesAtMs).toBe(1_000);
 			session.respondToUsageLimit("cancel_resume_at_reset");
 			expect(session.state.usageLimit?.resumeAtReset).toBe(false);
+			expect(session.state.usageLimit?.resumesAtMs).toBeUndefined();
 			advance(1_000);
 			expect(prompt).not.toHaveBeenCalled();
 

@@ -14727,6 +14727,9 @@ msgstr "Fila pausada"
 msgid "Queue paused because you interrupted"
 msgstr "Fila pausada porque você interrompeu"
 
+msgid "Queue paused by the usage limit"
+msgstr "Fila pausada pelo limite de uso"
+
 msgid "Queue work for agents"
 msgstr "Enfileirar trabalho para os agentes"
 
@@ -15759,6 +15762,9 @@ msgstr "Retomando {0}…"
 
 msgid "Resuming at reset"
 msgstr "Retomando na redefinição"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Retomando em {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Retomando a conversa…"

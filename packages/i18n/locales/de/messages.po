@@ -14727,6 +14727,9 @@ msgstr "Warteschlange pausiert"
 msgid "Queue paused because you interrupted"
 msgstr "Warteschlange pausiert, weil du unterbrochen hast"
 
+msgid "Queue paused by the usage limit"
+msgstr "Warteschlange durch das Nutzungslimit pausiert"
+
 msgid "Queue work for agents"
 msgstr "Arbeit für Agenten einreihen"
 
@@ -15759,6 +15762,9 @@ msgstr "{0} wird fortgesetzt…"
 
 msgid "Resuming at reset"
 msgstr "Wird bei Zurücksetzung fortgesetzt"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Wird in {resumeSeconds} s fortgesetzt"
 
 msgid "Resuming the conversation…"
 msgstr "Unterhaltung wird fortgesetzt…"

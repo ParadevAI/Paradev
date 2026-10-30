@@ -14727,6 +14727,9 @@ msgstr "Kuyruk duraklatıldı"
 msgid "Queue paused because you interrupted"
 msgstr "Kesintiye uğrattığınız için kuyruk duraklatıldı"
 
+msgid "Queue paused by the usage limit"
+msgstr "Kuyruk kullanım sınırı nedeniyle duraklatıldı"
+
 msgid "Queue work for agents"
 msgstr "Ajanlar için işi kuyruğa alın"
 
@@ -15759,6 +15762,9 @@ msgstr "{0} sürdürülüyor…"
 
 msgid "Resuming at reset"
 msgstr "Sıfırlanınca devam edilecek"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "{resumeSeconds} sn içinde devam edilecek"
 
 msgid "Resuming the conversation…"
 msgstr "Sohbete devam ediliyor…"

@@ -14727,6 +14727,9 @@ msgstr "キューは一時停止中"
 msgid "Queue paused because you interrupted"
 msgstr "中断したためキューを一時停止しました"
 
+msgid "Queue paused by the usage limit"
+msgstr "使用量の上限によりキューを一時停止しました"
+
 msgid "Queue work for agents"
 msgstr "エージェントの作業をキューに入れる"
 
@@ -15759,6 +15762,9 @@ msgstr "{0}を再開中…"
 
 msgid "Resuming at reset"
 msgstr "リセット時に再開します"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "{resumeSeconds}秒後に再開します"
 
 msgid "Resuming the conversation…"
 msgstr "会話を再開しています…"

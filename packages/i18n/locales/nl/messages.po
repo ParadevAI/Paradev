@@ -14727,6 +14727,9 @@ msgstr "Wachtrij gepauzeerd"
 msgid "Queue paused because you interrupted"
 msgstr "Wachtrij gepauzeerd omdat je hebt onderbroken"
 
+msgid "Queue paused by the usage limit"
+msgstr "Wachtrij gepauzeerd door de gebruikslimiet"
+
 msgid "Queue work for agents"
 msgstr "Werk in de wachtrij zetten voor agents"
 
@@ -15759,6 +15762,9 @@ msgstr "{0} hervatten…"
 
 msgid "Resuming at reset"
 msgstr "Wordt hervat bij reset"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Wordt hervat over {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Gesprek wordt hervat…"

@@ -14727,6 +14727,9 @@ msgstr "队列已暂停"
 msgid "Queue paused because you interrupted"
 msgstr "由于你中断了操作，队列已暂停"
 
+msgid "Queue paused by the usage limit"
+msgstr "队列因使用上限已暂停"
+
 msgid "Queue work for agents"
 msgstr "为智能体排队安排工作"
 
@@ -15759,6 +15762,9 @@ msgstr "正在恢复{0}…"
 
 msgid "Resuming at reset"
 msgstr "将在重置后继续"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "{resumeSeconds} 秒后继续"
 
 msgid "Resuming the conversation…"
 msgstr "正在继续对话…"

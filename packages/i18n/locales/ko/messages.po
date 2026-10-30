@@ -14727,6 +14727,9 @@ msgstr "대기열 일시 중지됨"
 msgid "Queue paused because you interrupted"
 msgstr "중단했기 때문에 대기열이 일시 중지되었습니다"
 
+msgid "Queue paused by the usage limit"
+msgstr "사용량 한도로 대기열이 일시 중지되었습니다"
+
 msgid "Queue work for agents"
 msgstr "에이전트 작업 대기열에 추가"
 
@@ -15759,6 +15762,9 @@ msgstr "{0}을(를) 재개하는 중…"
 
 msgid "Resuming at reset"
 msgstr "초기화 시 재개 예정"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "{resumeSeconds}초 후 재개"
 
 msgid "Resuming the conversation…"
 msgstr "대화를 이어가는 중…"

@@ -39,6 +39,7 @@ import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
 
 const TICK_MS = 30_000;
 const CLOSE_TICK_MS = 5_000;
+const COUNTDOWN_TICK_MS = 1_000;
 const CLOSE_MS = 2 * 60_000;
 
 /** The provider's window names, as a reader knows them. */
@@ -85,16 +86,22 @@ export function UsageLimitNotice({
 	const [now, setNow] = useState(() => Date.now());
 	const resetsAtMs = limit.resetsAtMs;
 	const waiting = resetsAtMs !== undefined && resetsAtMs > now;
+	const resumesAtMs = limit.resumeAtReset ? limit.resumesAtMs : undefined;
+	const resuming = !waiting && resumesAtMs !== undefined && resumesAtMs > now;
 	// Near the reset the countdown is in minutes, so the tick keeps up.
 	const close = waiting && resetsAtMs - now < CLOSE_MS;
 	useEffect(() => {
-		if (!waiting) return;
+		if (!waiting && !resuming) return;
 		const timer = window.setInterval(
 			() => setNow(Date.now()),
-			close ? CLOSE_TICK_MS : TICK_MS,
+			resuming ? COUNTDOWN_TICK_MS : close ? CLOSE_TICK_MS : TICK_MS,
 		);
 		return () => window.clearInterval(timer);
-	}, [waiting, close]);
+	}, [waiting, resuming, close]);
+	const resumeSeconds =
+		resuming && resumesAtMs !== undefined
+			? Math.ceil((resumesAtMs - now) / 1000)
+			: 0;
 
 	const quota = useHostUsageQuota(agent && hostUrl ? hostUrl : null);
 	const accounts = (quota.data ?? []).filter(
@@ -114,6 +121,7 @@ export function UsageLimitNotice({
 			: waiting
 				? formatResetLabel(new Date(resetsAtMs), new Date(now))
 				: t({ message: "Limit has reset" }),
+		resuming ? t({ message: `Resuming in ${resumeSeconds}s` }) : undefined,
 	]
 		.filter((part): part is string => Boolean(part))
 		.join(" · ");

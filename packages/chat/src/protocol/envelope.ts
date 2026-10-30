@@ -69,6 +69,8 @@ export const usageLimitSchema = z.looseObject({
 	hitAtMs: z.number(),
 	resetsAtMs: z.number().optional(),
 	resumeAtReset: z.boolean().optional(),
+	/** When an armed resume will send: the reset plus the host's grace. */
+	resumesAtMs: z.number().optional(),
 	/** The provider's name for the window that closed, e.g. `five_hour`. */
 	window: z.string().optional(),
 	/** The model the refused request was for, as the provider names it. */

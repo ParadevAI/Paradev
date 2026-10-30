@@ -14727,6 +14727,9 @@ msgstr "Queue paused"
 msgid "Queue paused because you interrupted"
 msgstr "Queue paused because you interrupted"
 
+msgid "Queue paused by the usage limit"
+msgstr "Queue paused by the usage limit"
+
 msgid "Queue work for agents"
 msgstr "Queue work for agents"
 
@@ -15759,6 +15762,9 @@ msgstr "Resuming {0}…"
 
 msgid "Resuming at reset"
 msgstr "Resuming at reset"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Resuming in {resumeSeconds}s"
 
 msgid "Resuming the conversation…"
 msgstr "Resuming the conversation…"

@@ -3,6 +3,7 @@ import type { UserContent, UserMessage } from "@superset/chat/protocol";
 export type DrawerQueue = {
 	prompts: UserMessage[];
 	paused: boolean;
+	pausedByLimit?: boolean;
 	actionable: boolean;
 	remove: (itemId: string) => Promise<void>;
 	resume: () => Promise<void>;

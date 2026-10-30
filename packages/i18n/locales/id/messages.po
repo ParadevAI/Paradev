@@ -14727,6 +14727,9 @@ msgstr "Antrean dijeda"
 msgid "Queue paused because you interrupted"
 msgstr "Antrean dijeda karena Anda menginterupsi"
 
+msgid "Queue paused by the usage limit"
+msgstr "Antrean dijeda oleh batas penggunaan"
+
 msgid "Queue work for agents"
 msgstr "Antrekan pekerjaan untuk agen"
 
@@ -15759,6 +15762,9 @@ msgstr "Melanjutkan {0}…"
 
 msgid "Resuming at reset"
 msgstr "Akan dilanjutkan saat diatur ulang"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
 
 msgid "Resuming the conversation…"
 msgstr "Melanjutkan percakapan…"

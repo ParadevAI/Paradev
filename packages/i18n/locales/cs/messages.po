@@ -14727,6 +14727,9 @@ msgstr "Fronta pozastavena"
 msgid "Queue paused because you interrupted"
 msgstr "Fronta pozastavena, protože jste přerušili agenta"
 
+msgid "Queue paused by the usage limit"
+msgstr "Fronta pozastavena limitem využití"
+
 msgid "Queue work for agents"
 msgstr "Fronta práce pro agenty"
 
@@ -15759,6 +15762,9 @@ msgstr "Obnovuji {0}…"
 
 msgid "Resuming at reset"
 msgstr "Pokračuje po obnovení"
+
+msgid "Resuming in {resumeSeconds}s"
+msgstr "Pokračování za {resumeSeconds} s"
 
 msgid "Resuming the conversation…"
 msgstr "Obnovuji konverzaci…"
