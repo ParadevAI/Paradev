@@ -3192,7 +3192,7 @@ msgid "Avatar updated!"
 msgstr "아바타가 업데이트되었습니다!"
 
 msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
-msgstr "YC Demo Day의 Avi Peltz, Satya Patel, Kiet Ho"
+msgstr "YC Demo Day에 참석한 Avi Peltz, Satya Patel, Kiet Ho"
 
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"

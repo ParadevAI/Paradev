@@ -10251,7 +10251,7 @@ msgid "Keyboard Shortcuts"
 msgstr "Raccourcis clavier"
 
 msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
-msgstr "Kiet Ho, Satya Patel et Avi Peltz en présentation chez YC"
+msgstr "Kiet Ho, Satya Patel et Avi Peltz lors d’une présentation chez YC"
 
 msgid "Kill"
 msgstr "Arrêter"
