@@ -2030,9 +2030,6 @@ msgstr "Aggiungi il codice fiscale"
 msgid "Add team member..."
 msgstr "Aggiungi un membro al team..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Aggiungi test per il codice non testato più a rischio…"
-
 msgid "Add tests where they're missing"
 msgstr "Aggiungi i test che mancano"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode e altri."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude è ora in esecuzione nel workspace component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Ripulisci i TODO obsoleti…"
 
 msgid "Clear"
 msgstr "Trasparente"
@@ -6989,6 +6983,9 @@ msgstr "Mostra la barra laterale mobile."
 msgid "Do anything"
 msgstr "Fai qualsiasi cosa"
 
+msgid "Do anything in Paradev"
+msgstr "Fai qualsiasi cosa in Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Mi servono abbonamenti miei agli agenti di programmazione?"
 
@@ -7685,9 +7682,6 @@ msgstr "Sperimentale"
 
 msgid "Expired"
 msgstr "Scaduto"
-
-msgid "Explain how this repository works…"
-msgstr "Spiega come funziona questo repository…"
 
 msgid "Explain to me how this repository works"
 msgstr "Spiegami come funziona questo repository"
@@ -8409,9 +8403,6 @@ msgstr "Trova"
 
 msgid "Find a person…"
 msgstr "Cerca una persona…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Trova un piccolo bug e correggilo…"
 
 msgid "Find a team…"
 msgstr "Cerca un team…"
@@ -19696,9 +19687,6 @@ msgstr "Tieni traccia dei task sincronizzati da Linear e gestiscili. Resta al pa
 msgid "Track budgets and spending"
 msgstr "Monitora budget e spese"
 
-msgid "Track down that flaky test…"
-msgstr "Scova quel test instabile…"
-
 msgid "Track file changes per turn"
 msgstr "Traccia le modifiche ai file per turno"
 
@@ -20212,9 +20200,6 @@ msgstr "Aggiornamento…"
 
 msgid "Upgrade"
 msgstr "Passa a Pro"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Aggiorna una dipendenza e correggi ciò che si rompe…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Scrivi una risposta"
 
 msgid "Write a reply…"
 msgstr "Scrivi una risposta…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Scrivi la documentazione per la parte di cui tutti chiedono…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Scrivi una volta. Funziona in ogni agente."

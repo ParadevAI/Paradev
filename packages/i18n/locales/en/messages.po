@@ -2030,9 +2030,6 @@ msgstr "Add tax ID"
 msgid "Add team member..."
 msgstr "Add team member..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Add tests for the riskiest untested code…"
-
 msgid "Add tests where they're missing"
 msgstr "Add tests where they're missing"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, and more."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude is now running in workspace component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Clean up stale TODOs…"
 
 msgid "Clear"
 msgstr "Clear"
@@ -6989,6 +6983,9 @@ msgstr "Displays the mobile sidebar."
 msgid "Do anything"
 msgstr "Do anything"
 
+msgid "Do anything in Paradev"
+msgstr "Do anything in Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Do I need my own coding agent subscriptions?"
 
@@ -7685,9 +7682,6 @@ msgstr "Experimental"
 
 msgid "Expired"
 msgstr "Expired"
-
-msgid "Explain how this repository works…"
-msgstr "Explain how this repository works…"
 
 msgid "Explain to me how this repository works"
 msgstr "Explain to me how this repository works"
@@ -8409,9 +8403,6 @@ msgstr "Find"
 
 msgid "Find a person…"
 msgstr "Find a person…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Find a small bug and fix it…"
 
 msgid "Find a team…"
 msgstr "Find a team…"
@@ -19696,9 +19687,6 @@ msgstr "Track and manage tasks synced from Linear. Stay on top of your work with
 msgid "Track budgets and spending"
 msgstr "Track budgets and spending"
 
-msgid "Track down that flaky test…"
-msgstr "Track down that flaky test…"
-
 msgid "Track file changes per turn"
 msgstr "Track file changes per turn"
 
@@ -20212,9 +20200,6 @@ msgstr "Updating…"
 
 msgid "Upgrade"
 msgstr "Upgrade"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Upgrade a dependency and fix what breaks…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Write a reply"
 
 msgid "Write a reply…"
 msgstr "Write a reply…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Write docs for the part everyone asks about…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Write once. Runs in every agent."

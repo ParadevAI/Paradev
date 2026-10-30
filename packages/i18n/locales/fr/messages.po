@@ -2030,9 +2030,6 @@ msgstr "Ajouter un identifiant fiscal"
 msgid "Add team member..."
 msgstr "Ajouter un membre d'équipe..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Ajoute des tests pour le code non testé le plus risqué…"
-
 msgid "Add tests where they're missing"
 msgstr "Ajouter des tests là où il en manque"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, et plus encore."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude s'exécute désormais dans l'espace de travail component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Nettoie les TODO obsolètes…"
 
 msgid "Clear"
 msgstr "Transparent"
@@ -6989,6 +6983,9 @@ msgstr "Affiche la barre latérale mobile."
 msgid "Do anything"
 msgstr "Demandez ce que vous voulez"
 
+msgid "Do anything in Paradev"
+msgstr "Demandez ce que vous voulez à Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Ai-je besoin de mes propres abonnements aux agents de code ?"
 
@@ -7685,9 +7682,6 @@ msgstr "Expérimental"
 
 msgid "Expired"
 msgstr "Expiré"
-
-msgid "Explain how this repository works…"
-msgstr "Explique le fonctionnement de ce dépôt…"
 
 msgid "Explain to me how this repository works"
 msgstr "M'expliquer le fonctionnement de ce dépôt"
@@ -8409,9 +8403,6 @@ msgstr "Rechercher"
 
 msgid "Find a person…"
 msgstr "Rechercher une personne…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Trouve un petit bug et corrige-le…"
 
 msgid "Find a team…"
 msgstr "Rechercher une équipe…"
@@ -19696,9 +19687,6 @@ msgstr "Suivez et gérez les tâches synchronisées depuis Linear. Gardez le con
 msgid "Track budgets and spending"
 msgstr "Suivre les budgets et les dépenses"
 
-msgid "Track down that flaky test…"
-msgstr "Traque ce test instable…"
-
 msgid "Track file changes per turn"
 msgstr "Suivre les modifications de fichiers à chaque tour"
 
@@ -20212,9 +20200,6 @@ msgstr "Mise à jour…"
 
 msgid "Upgrade"
 msgstr "Passer à ce forfait"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Mets à jour une dépendance et corrige ce qui casse…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Écrire une réponse"
 
 msgid "Write a reply…"
 msgstr "Écrire une réponse…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Rédige la documentation de la partie sur laquelle tout le monde pose des questions…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Écrivez une fois. Fonctionne dans chaque agent."

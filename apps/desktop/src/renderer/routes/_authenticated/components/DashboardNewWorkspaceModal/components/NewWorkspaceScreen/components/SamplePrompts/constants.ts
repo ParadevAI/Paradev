@@ -118,34 +118,3 @@ export function selectSamplePrompts(
 		.slice(0, count)
 		.map((id) => SAMPLE_PROMPTS[id] as SamplePrompt);
 }
-
-/**
- * Composer ghost text: one is picked per screen-open so the empty state
- * suggests a concrete next action instead of a static question.
- */
-export const PROMPT_PLACEHOLDERS: MessageDescriptor[] = [
-	msg({
-		message: "What do you want to do?",
-	}),
-	msg({
-		message: "Find a small bug and fix it…",
-	}),
-	msg({
-		message: "Add tests for the riskiest untested code…",
-	}),
-	msg({
-		message: "Explain how this repository works…",
-	}),
-	msg({
-		message: "Track down that flaky test…",
-	}),
-	msg({
-		message: "Upgrade a dependency and fix what breaks…",
-	}),
-	msg({
-		message: "Clean up stale TODOs…",
-	}),
-	msg({
-		message: "Write docs for the part everyone asks about…",
-	}),
-];

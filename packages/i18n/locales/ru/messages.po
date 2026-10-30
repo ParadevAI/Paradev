@@ -2030,9 +2030,6 @@ msgstr "Добавить налоговый номер"
 msgid "Add team member..."
 msgstr "Добавить участника команды..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Добавь тесты для самого рискованного непокрытого кода…"
-
 msgid "Add tests where they're missing"
 msgstr "Добавить тесты там, где их нет"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode и другие."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude теперь работает в рабочей области component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Разберись со старыми TODO…"
 
 msgid "Clear"
 msgstr "Прозрачный"
@@ -6989,6 +6983,9 @@ msgstr "Показывает мобильную боковую панель."
 msgid "Do anything"
 msgstr "Сделайте что угодно"
 
+msgid "Do anything in Paradev"
+msgstr "Сделайте что угодно в Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Нужны ли мне собственные подписки на кодовых агентов?"
 
@@ -7685,9 +7682,6 @@ msgstr "Экспериментальные"
 
 msgid "Expired"
 msgstr "Истёк"
-
-msgid "Explain how this repository works…"
-msgstr "Объясни, как устроен этот репозиторий…"
 
 msgid "Explain to me how this repository works"
 msgstr "Объясни, как устроен этот репозиторий"
@@ -8409,9 +8403,6 @@ msgstr "Найти"
 
 msgid "Find a person…"
 msgstr "Найти человека…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Найди мелкий баг и исправь его…"
 
 msgid "Find a team…"
 msgstr "Найти команду…"
@@ -19696,9 +19687,6 @@ msgstr "Отслеживайте задачи, синхронизированн�
 msgid "Track budgets and spending"
 msgstr "Следите за бюджетами и расходами"
 
-msgid "Track down that flaky test…"
-msgstr "Найди причину нестабильного теста…"
-
 msgid "Track file changes per turn"
 msgstr "Отслеживать изменения файлов по ходам"
 
@@ -20212,9 +20200,6 @@ msgstr "Обновление…"
 
 msgid "Upgrade"
 msgstr "Перейти"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Обнови зависимость и почини то, что сломается…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Напишите ответ"
 
 msgid "Write a reply…"
 msgstr "Напишите ответ…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Напиши документацию по той части, о которой все спрашивают…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Напишите один раз. Работает в любом агенте."

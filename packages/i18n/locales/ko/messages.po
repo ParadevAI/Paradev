@@ -2030,9 +2030,6 @@ msgstr "세금 ID 추가"
 msgid "Add team member..."
 msgstr "팀 멤버 추가..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "테스트가 없는 가장 위험한 코드에 테스트 추가…"
-
 msgid "Add tests where they're missing"
 msgstr "빠진 테스트 추가하기"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode 등이 있습니다."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "이제 워크스페이스 component-showcase에서 Claude가 실행 중입니다."
-
-msgid "Clean up stale TODOs…"
-msgstr "오래된 TODO 정리…"
 
 msgid "Clear"
 msgstr "투명"
@@ -6989,6 +6983,9 @@ msgstr "모바일 사이드바를 표시합니다."
 msgid "Do anything"
 msgstr "무엇이든 해보세요"
 
+msgid "Do anything in Paradev"
+msgstr "Paradev에서 무엇이든 해보세요"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "코딩 에이전트 구독이 따로 필요한가요?"
 
@@ -7685,9 +7682,6 @@ msgstr "실험실"
 
 msgid "Expired"
 msgstr "만료됨"
-
-msgid "Explain how this repository works…"
-msgstr "이 리포지토리가 어떻게 동작하는지 설명…"
 
 msgid "Explain to me how this repository works"
 msgstr "이 리포지토리가 어떻게 동작하는지 설명해 줘"
@@ -8409,9 +8403,6 @@ msgstr "찾기"
 
 msgid "Find a person…"
 msgstr "사람 찾기…"
-
-msgid "Find a small bug and fix it…"
-msgstr "작은 버그를 찾아서 고치기…"
 
 msgid "Find a team…"
 msgstr "팀 찾기…"
@@ -19696,9 +19687,6 @@ msgstr "Linear에서 동기화된 작업을 추적하고 관리하세요. Parade
 msgid "Track budgets and spending"
 msgstr "예산과 지출 관리"
 
-msgid "Track down that flaky test…"
-msgstr "불안정한 테스트 추적하기…"
-
 msgid "Track file changes per turn"
 msgstr "턴별 파일 변경 추적"
 
@@ -20212,9 +20200,6 @@ msgstr "업데이트하는 중…"
 
 msgid "Upgrade"
 msgstr "업그레이드"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "의존성을 업그레이드하고 깨진 부분 고치기…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "답글 작성"
 
 msgid "Write a reply…"
 msgstr "답글 작성…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "모두가 궁금해하는 부분에 문서 작성…"
 
 msgid "Write once. Runs in every agent."
 msgstr "한 번 작성하면 모든 에이전트에서 실행됩니다."

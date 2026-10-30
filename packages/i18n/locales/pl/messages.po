@@ -2030,9 +2030,6 @@ msgstr "Dodaj NIP"
 msgid "Add team member..."
 msgstr "Dodaj członka zespołu..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Dodaj testy do najbardziej ryzykownego nieprzetestowanego kodu…"
-
 msgid "Add tests where they're missing"
 msgstr "Dodaj testy tam, gdzie ich brakuje"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode i inne."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude działa teraz w obszarze roboczym component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Uporządkuj nieaktualne TODO…"
 
 msgid "Clear"
 msgstr "Przezroczysty"
@@ -6989,6 +6983,9 @@ msgstr "Wyświetla mobilny pasek boczny."
 msgid "Do anything"
 msgstr "Zrób cokolwiek"
 
+msgid "Do anything in Paradev"
+msgstr "Zrób cokolwiek w Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Czy potrzebuję własnych subskrypcji agentów kodujących?"
 
@@ -7685,9 +7682,6 @@ msgstr "Eksperymentalne"
 
 msgid "Expired"
 msgstr "Wygasł"
-
-msgid "Explain how this repository works…"
-msgstr "Wyjaśnij, jak działa to repozytorium…"
 
 msgid "Explain to me how this repository works"
 msgstr "Wyjaśnij mi, jak działa to repozytorium"
@@ -8409,9 +8403,6 @@ msgstr "Znajdź"
 
 msgid "Find a person…"
 msgstr "Znajdź osobę…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Znajdź mały błąd i napraw go…"
 
 msgid "Find a team…"
 msgstr "Znajdź zespół…"
@@ -19696,9 +19687,6 @@ msgstr "Śledź zadania synchronizowane z Linear i zarządzaj nimi. Panuj nad pr
 msgid "Track budgets and spending"
 msgstr "Śledź budżety i wydatki"
 
-msgid "Track down that flaky test…"
-msgstr "Wytrop ten niestabilny test…"
-
 msgid "Track file changes per turn"
 msgstr "Śledź zmiany plików w każdej turze"
 
@@ -20212,9 +20200,6 @@ msgstr "Aktualizowanie…"
 
 msgid "Upgrade"
 msgstr "Podnieś plan"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Zaktualizuj zależność i napraw to, co się zepsuje…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Napisz odpowiedź"
 
 msgid "Write a reply…"
 msgstr "Napisz odpowiedź…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Napisz dokumentację części, o którą wszyscy pytają…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Napisz raz. Działa w każdym agencie."

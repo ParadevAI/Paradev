@@ -2030,9 +2030,6 @@ msgstr "新增稅號"
 msgid "Add team member..."
 msgstr "新增團隊成員..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "給風險最高又沒測試的程式碼補上測試…"
-
 msgid "Add tests where they're missing"
 msgstr "給缺測試的地方補測試"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code、Codex、Cursor、OpenCode等。"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude已在工作區component-showcase中執行。"
-
-msgid "Clean up stale TODOs…"
-msgstr "清理過期的TODO…"
 
 msgid "Clear"
 msgstr "透明"
@@ -6989,6 +6983,9 @@ msgstr "顯示行動版側邊欄。"
 msgid "Do anything"
 msgstr "做任何事"
 
+msgid "Do anything in Paradev"
+msgstr "在 Paradev 中做任何事"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "我需要自備編碼代理程式的訂閱嗎？"
 
@@ -7685,9 +7682,6 @@ msgstr "實驗功能"
 
 msgid "Expired"
 msgstr "已過期"
-
-msgid "Explain how this repository works…"
-msgstr "講講這個儲存庫是怎麼運作的…"
 
 msgid "Explain to me how this repository works"
 msgstr "講講這個儲存庫是怎麼運作的"
@@ -8409,9 +8403,6 @@ msgstr "尋找"
 
 msgid "Find a person…"
 msgstr "尋找成員…"
-
-msgid "Find a small bug and fix it…"
-msgstr "找一個小bug並修好它…"
 
 msgid "Find a team…"
 msgstr "尋找團隊…"
@@ -19696,9 +19687,6 @@ msgstr "追蹤和管理從Linear同步的任務。不用離開Paradev就能掌�
 msgid "Track budgets and spending"
 msgstr "追蹤預算和支出"
 
-msgid "Track down that flaky test…"
-msgstr "揪出那個不穩定的測試…"
-
 msgid "Track file changes per turn"
 msgstr "依輪次追蹤檔案變更"
 
@@ -20212,9 +20200,6 @@ msgstr "正在更新…"
 
 msgid "Upgrade"
 msgstr "升級"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "升級一個相依性，並修好被它弄壞的地方…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "撰寫回覆"
 
 msgid "Write a reply…"
 msgstr "寫一條回覆…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "給大家最常問的那部分寫文件…"
 
 msgid "Write once. Runs in every agent."
 msgstr "撰寫一次，在每個代理程式中執行。"

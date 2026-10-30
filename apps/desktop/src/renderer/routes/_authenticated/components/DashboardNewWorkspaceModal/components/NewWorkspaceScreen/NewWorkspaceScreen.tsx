@@ -83,7 +83,6 @@ import {
 import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
 import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
-import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useProjectPreselection } from "./hooks/useProjectPreselection";
@@ -282,30 +281,6 @@ export function NewWorkspaceScreen({
 		null,
 	);
 	const composerWidth = liveComposerWidth ?? storedComposerWidth;
-
-	// One suggestion per open. resetKey only bumps on resetDraft, so ordinary
-	// modal reopens roll their own counter; the tiptap Placeholder extension
-	// freezes its text at editor mount, so the roll also rides the editor key.
-	const [placeholderRoll, setPlaceholderRoll] = useState(0);
-	const wasOpenRef = useRef(isOpen);
-	useEffect(() => {
-		if (isOpen && !wasOpenRef.current) {
-			setPlaceholderRoll((roll) => roll + 1);
-		}
-		wasOpenRef.current = isOpen;
-	}, [isOpen]);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: re-roll per draft reset and per open
-	const promptPlaceholder = useMemo(() => {
-		const descriptor =
-			PROMPT_PLACEHOLDERS[
-				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
-			];
-		return descriptor
-			? t(descriptor)
-			: t({
-					message: "What do you want to do?",
-				});
-	}, [resetKey, placeholderRoll, t]);
 
 	const projectId = draft.selectedProjectId;
 	const selectedProject = selectableProjects.find(
@@ -961,7 +936,7 @@ export function NewWorkspaceScreen({
 							attachments: draft.promptAttachments,
 						}}
 						disabled={needsSetup}
-						key={`${resetKey}-${promptSeed}-${placeholderRoll}`}
+						key={`${resetKey}-${promptSeed}`}
 						onDraftChange={({ segments, attachments }) =>
 							updateDraft({
 								promptDraft: segments,
@@ -974,7 +949,7 @@ export function NewWorkspaceScreen({
 						}}
 						mentionProviders={githubProviders}
 						pending={isCreating}
-						placeholder={promptPlaceholder}
+						placeholder={t({ message: "Do anything in Paradev" })}
 					/>
 					<div className="flex items-center justify-between gap-3 px-1">
 						<div className="flex min-w-0 flex-1 items-center gap-1.5">

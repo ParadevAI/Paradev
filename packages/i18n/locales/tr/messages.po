@@ -2030,9 +2030,6 @@ msgstr "Vergi kimliği ekle"
 msgid "Add team member..."
 msgstr "Takım üyesi ekle..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Test edilmemiş en riskli kod için test ekle…"
-
 msgid "Add tests where they're missing"
 msgstr "Eksik olan yerlere test ekle"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode ve daha fazlası."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude artık component-showcase çalışma alanında çalışıyor."
-
-msgid "Clean up stale TODOs…"
-msgstr "Eskimiş TODO'ları temizle…"
 
 msgid "Clear"
 msgstr "Şeffaf"
@@ -6989,6 +6983,9 @@ msgstr "Mobil kenar çubuğunu gösterir."
 msgid "Do anything"
 msgstr "Ne isterseniz"
 
+msgid "Do anything in Paradev"
+msgstr "Paradev'de ne isterseniz"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Kendi kodlama ajanı aboneliklerime ihtiyacım var mı?"
 
@@ -7685,9 +7682,6 @@ msgstr "Deneysel"
 
 msgid "Expired"
 msgstr "Süresi doldu"
-
-msgid "Explain how this repository works…"
-msgstr "Bu deponun nasıl çalıştığını açıkla…"
 
 msgid "Explain to me how this repository works"
 msgstr "Bu deponun nasıl çalıştığını anlat"
@@ -8409,9 +8403,6 @@ msgstr "Bul"
 
 msgid "Find a person…"
 msgstr "Kişi bul…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Küçük bir hata bul ve düzelt…"
 
 msgid "Find a team…"
 msgstr "Takım bul…"
@@ -19696,9 +19687,6 @@ msgstr "Linear'dan eşitlenen görevleri izleyin ve yönetin. Paradev'den çıkm
 msgid "Track budgets and spending"
 msgstr "Bütçeleri ve harcamaları takip edin"
 
-msgid "Track down that flaky test…"
-msgstr "Şu kararsız testin izini sür…"
-
 msgid "Track file changes per turn"
 msgstr "Dosya değişikliklerini tur başına izle"
 
@@ -20212,9 +20200,6 @@ msgstr "Güncelleniyor…"
 
 msgid "Upgrade"
 msgstr "Yükselt"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Bir bağımlılığı yükselt ve bozulanları düzelt…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Bir yanıt yazın"
 
 msgid "Write a reply…"
 msgstr "Bir yanıt yazın…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Herkesin sorduğu bölüm için belge yaz…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Bir kez yazın. Her ajanda çalışır."

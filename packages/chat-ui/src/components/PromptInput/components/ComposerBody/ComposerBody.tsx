@@ -960,8 +960,10 @@ export function ComposerBody({
 				placeholder={
 					<span
 						className={cn(
-							"pointer-events-none absolute text-sm leading-[1.625] text-muted-foreground/70",
-							inline ? "top-[3px] left-0" : "top-3.5 left-4",
+							"pointer-events-none absolute text-sm leading-[1.625]",
+							inline
+								? "top-[3px] left-0 text-muted-foreground"
+								: "top-3.5 left-4 text-muted-foreground/70",
 						)}
 					>
 						{placeholder}
@@ -1205,12 +1207,14 @@ export function ComposerBody({
 					disabled={!canSend || disabled || pending}
 					onClick={() => submit()}
 					className={
-						canSend && !disabled && !pending
-							? cn(
-									buttons.base,
-									"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
-								)
-							: buttons.inactiveSend
+						!canSend || disabled || pending
+							? buttons.inactiveSend
+							: isEmpty && attachments.length === 0
+								? buttons.filled
+								: cn(
+										buttons.base,
+										"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
+									)
 					}
 				>
 					{pending ? (

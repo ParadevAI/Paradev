@@ -2030,9 +2030,6 @@ msgstr "Btw-nummer toevoegen"
 msgid "Add team member..."
 msgstr "Teamlid toevoegen..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Voeg tests toe voor de riskantste ongeteste code…"
-
 msgid "Add tests where they're missing"
 msgstr "Tests toevoegen waar ze ontbreken"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode en meer."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude draait nu in werkruimte component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Ruim verouderde TODO's op…"
 
 msgid "Clear"
 msgstr "Helder"
@@ -6989,6 +6983,9 @@ msgstr "Toont de mobiele zijbalk."
 msgid "Do anything"
 msgstr "Doe wat je wilt"
 
+msgid "Do anything in Paradev"
+msgstr "Doe wat je wilt in Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Heb ik eigen abonnementen op coding agents nodig?"
 
@@ -7685,9 +7682,6 @@ msgstr "Experimenteel"
 
 msgid "Expired"
 msgstr "Verlopen"
-
-msgid "Explain how this repository works…"
-msgstr "Leg uit hoe deze repository werkt…"
 
 msgid "Explain to me how this repository works"
 msgstr "Leg me uit hoe deze repository werkt"
@@ -8409,9 +8403,6 @@ msgstr "Zoeken"
 
 msgid "Find a person…"
 msgstr "Persoon zoeken…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Vind een kleine bug en fix die…"
 
 msgid "Find a team…"
 msgstr "Team zoeken…"
@@ -19696,9 +19687,6 @@ msgstr "Volg en beheer taken die vanuit Linear zijn gesynchroniseerd. Houd overz
 msgid "Track budgets and spending"
 msgstr "Houd budgetten en uitgaven bij"
 
-msgid "Track down that flaky test…"
-msgstr "Spoor die flaky test op…"
-
 msgid "Track file changes per turn"
 msgstr "Bestandswijzigingen per beurt bijhouden"
 
@@ -20212,9 +20200,6 @@ msgstr "Bijwerken…"
 
 msgid "Upgrade"
 msgstr "Upgraden"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Werk een dependency bij en fix wat er stukgaat…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Schrijf een antwoord"
 
 msgid "Write a reply…"
 msgstr "Schrijf een antwoord…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Schrijf docs voor het onderdeel waar iedereen naar vraagt…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Eén keer schrijven. Draait in elke agent."

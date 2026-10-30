@@ -2030,9 +2030,6 @@ msgstr "Tambah NPWP/tax ID"
 msgid "Add team member..."
 msgstr "Tambah anggota tim..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Tambahkan tes untuk kode paling berisiko yang belum diuji…"
-
 msgid "Add tests where they're missing"
 msgstr "Tambahkan tes yang belum ada"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, dan lainnya."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude kini berjalan di workspace component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Bereskan TODO yang basi…"
 
 msgid "Clear"
 msgstr "Bening"
@@ -6989,6 +6983,9 @@ msgstr "Menampilkan sidebar mobile."
 msgid "Do anything"
 msgstr "Lakukan apa saja"
 
+msgid "Do anything in Paradev"
+msgstr "Lakukan apa saja di Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Apakah saya perlu langganan agen coding sendiri?"
 
@@ -7685,9 +7682,6 @@ msgstr "Eksperimental"
 
 msgid "Expired"
 msgstr "Kedaluwarsa"
-
-msgid "Explain how this repository works…"
-msgstr "Jelaskan cara kerja repositori ini…"
 
 msgid "Explain to me how this repository works"
 msgstr "Jelaskan cara kerja repositori ini"
@@ -8409,9 +8403,6 @@ msgstr "Cari"
 
 msgid "Find a person…"
 msgstr "Cari orang…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Cari bug kecil dan perbaiki…"
 
 msgid "Find a team…"
 msgstr "Cari tim…"
@@ -19696,9 +19687,6 @@ msgstr "Lacak dan kelola tugas yang disinkronkan dari Linear. Kuasai pekerjaan A
 msgid "Track budgets and spending"
 msgstr "Pantau anggaran dan pengeluaran"
 
-msgid "Track down that flaky test…"
-msgstr "Lacak tes flaky itu…"
-
 msgid "Track file changes per turn"
 msgstr "Lacak perubahan file per giliran"
 
@@ -20212,9 +20200,6 @@ msgstr "Memperbarui…"
 
 msgid "Upgrade"
 msgstr "Upgrade"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Tulis balasan"
 
 msgid "Write a reply…"
 msgstr "Tulis balasan…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Tulis dokumentasi untuk bagian yang selalu ditanyakan…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Tulis sekali. Berjalan di setiap agen."

@@ -2030,9 +2030,6 @@ msgstr "Thêm mã số thuế"
 msgid "Add team member..."
 msgstr "Thêm thành viên nhóm..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Thêm test cho phần code rủi ro nhất chưa được test…"
-
 msgid "Add tests where they're missing"
 msgstr "Thêm test ở những chỗ còn thiếu"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều nữa."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude hiện đang chạy trong workspace component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Dọn các TODO cũ…"
 
 msgid "Clear"
 msgstr "Trong suốt"
@@ -6989,6 +6983,9 @@ msgstr "Hiển thị thanh bên trên di động."
 msgid "Do anything"
 msgstr "Làm bất cứ điều gì"
 
+msgid "Do anything in Paradev"
+msgstr "Làm bất cứ điều gì trong Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Tôi có cần gói đăng ký coding agent riêng không?"
 
@@ -7685,9 +7682,6 @@ msgstr "Thử nghiệm"
 
 msgid "Expired"
 msgstr "Đã hết hạn"
-
-msgid "Explain how this repository works…"
-msgstr "Giải thích repository này hoạt động thế nào…"
 
 msgid "Explain to me how this repository works"
 msgstr "Giải thích cho tôi repository này hoạt động thế nào"
@@ -8409,9 +8403,6 @@ msgstr "Tìm"
 
 msgid "Find a person…"
 msgstr "Tìm người…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Tìm một lỗi nhỏ và sửa nó…"
 
 msgid "Find a team…"
 msgstr "Tìm nhóm…"
@@ -19696,9 +19687,6 @@ msgstr "Theo dõi và quản lý tác vụ được đồng bộ từ Linear. N�
 msgid "Track budgets and spending"
 msgstr "Theo dõi ngân sách và chi tiêu"
 
-msgid "Track down that flaky test…"
-msgstr "Truy ra bài test chập chờn đó…"
-
 msgid "Track file changes per turn"
 msgstr "Theo dõi thay đổi tệp theo từng lượt"
 
@@ -20212,9 +20200,6 @@ msgstr "Đang cập nhật…"
 
 msgid "Upgrade"
 msgstr "Nâng cấp"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Viết câu trả lời"
 
 msgid "Write a reply…"
 msgstr "Viết trả lời…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Viết tài liệu cho phần ai cũng hỏi…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Viết một lần. Chạy trong mọi agent."

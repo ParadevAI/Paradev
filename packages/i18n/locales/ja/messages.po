@@ -2030,9 +2030,6 @@ msgstr "税IDを追加"
 msgid "Add team member..."
 msgstr "チームメンバーを追加..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "テストのない危険なコードにテストを追加…"
-
 msgid "Add tests where they're missing"
 msgstr "テストが不足している箇所に追加"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code、Codex、Cursor、OpenCodeなど。"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "ワークスペースcomponent-showcaseでClaudeが実行中です。"
-
-msgid "Clean up stale TODOs…"
-msgstr "古いTODOを整理…"
 
 msgid "Clear"
 msgstr "クリア"
@@ -6989,6 +6983,9 @@ msgstr "モバイルのサイドバーを表示します。"
 msgid "Do anything"
 msgstr "何でもどうぞ"
 
+msgid "Do anything in Paradev"
+msgstr "Paradev で何でもどうぞ"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "コーディングエージェントの契約は自分で用意する必要がありますか?"
 
@@ -7685,9 +7682,6 @@ msgstr "実験的機能"
 
 msgid "Expired"
 msgstr "期限切れ"
-
-msgid "Explain how this repository works…"
-msgstr "このリポジトリの仕組みを説明…"
 
 msgid "Explain to me how this repository works"
 msgstr "このリポジトリの仕組みを教えて"
@@ -8409,9 +8403,6 @@ msgstr "検索"
 
 msgid "Find a person…"
 msgstr "メンバーを検索…"
-
-msgid "Find a small bug and fix it…"
-msgstr "小さなバグを見つけて修正…"
 
 msgid "Find a team…"
 msgstr "チームを検索…"
@@ -19696,9 +19687,6 @@ msgstr "Linearから同期したタスクを追跡・管理できます。Parade
 msgid "Track budgets and spending"
 msgstr "予算と支出を管理"
 
-msgid "Track down that flaky test…"
-msgstr "不安定なテストの原因を突き止める…"
-
 msgid "Track file changes per turn"
 msgstr "ターンごとにファイルの変更を記録"
 
@@ -20212,9 +20200,6 @@ msgstr "更新中…"
 
 msgid "Upgrade"
 msgstr "アップグレード"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "依存関係を更新して壊れた箇所を直す…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "返信を書く"
 
 msgid "Write a reply…"
 msgstr "返信を入力…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "よく質問される部分のドキュメントを書く…"
 
 msgid "Write once. Runs in every agent."
 msgstr "一度書けば、すべてのエージェントで動きます。"

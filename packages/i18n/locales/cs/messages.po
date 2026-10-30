@@ -2030,9 +2030,6 @@ msgstr "Přidat DIČ"
 msgid "Add team member..."
 msgstr "Přidat člena týmu..."
 
-msgid "Add tests for the riskiest untested code…"
-msgstr "Doplň testy pro nejrizikovější netestovaný kód…"
-
 msgid "Add tests where they're missing"
 msgstr "Doplnit testy tam, kde chybí"
 
@@ -4175,9 +4172,6 @@ msgstr "Claude Code, Codex, Cursor, OpenCode a další."
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude teď běží v pracovním prostoru component-showcase."
-
-msgid "Clean up stale TODOs…"
-msgstr "Ukliď zastaralé TODO…"
 
 msgid "Clear"
 msgstr "Čirý"
@@ -6989,6 +6983,9 @@ msgstr "Zobrazí mobilní postranní panel."
 msgid "Do anything"
 msgstr "Zadejte cokoli"
 
+msgid "Do anything in Paradev"
+msgstr "Zadejte cokoli v Paradev"
+
 msgid "Do I need my own coding agent subscriptions?"
 msgstr "Potřebuji vlastní předplatné kódovacích agentů?"
 
@@ -7685,9 +7682,6 @@ msgstr "Experimentální"
 
 msgid "Expired"
 msgstr "Vypršelo"
-
-msgid "Explain how this repository works…"
-msgstr "Vysvětli, jak tento repozitář funguje…"
 
 msgid "Explain to me how this repository works"
 msgstr "Vysvětlit mi, jak tento repozitář funguje"
@@ -8409,9 +8403,6 @@ msgstr "Najít"
 
 msgid "Find a person…"
 msgstr "Najít osobu…"
-
-msgid "Find a small bug and fix it…"
-msgstr "Najdi malou chybu a oprav ji…"
 
 msgid "Find a team…"
 msgstr "Najít tým…"
@@ -19696,9 +19687,6 @@ msgstr "Sledujte a spravujte úkoly synchronizované z Linearu. Mějte práci po
 msgid "Track budgets and spending"
 msgstr "Sledování rozpočtů a výdajů"
 
-msgid "Track down that flaky test…"
-msgstr "Vypátrej ten nestabilní test…"
-
 msgid "Track file changes per turn"
 msgstr "Sledovat změny souborů po každém tahu"
 
@@ -20212,9 +20200,6 @@ msgstr "Aktualizuji…"
 
 msgid "Upgrade"
 msgstr "Přejít výš"
-
-msgid "Upgrade a dependency and fix what breaks…"
-msgstr "Aktualizuj závislost a oprav, co se rozbije…"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Upgrade on {0}"
@@ -21171,9 +21156,6 @@ msgstr "Napište odpověď"
 
 msgid "Write a reply…"
 msgstr "Napište odpověď…"
-
-msgid "Write docs for the part everyone asks about…"
-msgstr "Napiš dokumentaci k části, na kterou se všichni ptají…"
 
 msgid "Write once. Runs in every agent."
 msgstr "Napište jednou. Běží v každém agentovi."
