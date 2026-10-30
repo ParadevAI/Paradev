@@ -58,6 +58,7 @@
 		"@rn-primitives/tooltip": "1.4.0",
 		"@sentry/react-native": "8.28.0",
 		"@shikijs/core": "4.2.0",
+		"@shikijs/engine-javascript": "4.2.0",
 		"@shikijs/langs": "4.2.0",
 		"@shikijs/themes": "4.2.0",
 		"@shopify/flash-list": "2.3.2",
