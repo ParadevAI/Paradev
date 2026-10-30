@@ -1,6 +1,7 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Crypto from "expo-crypto";
 import { signIn } from "@/lib/auth/client";
+import { signInSocial } from "../signInSocial";
 
 /** Resolves without signing in when the user cancels the system sheet. */
 export async function signInWithApple(): Promise<void> {
@@ -33,7 +34,7 @@ export async function signInWithApple(): Promise<void> {
 	if (!credential.identityToken) {
 		throw new Error("Apple did not return an identity token");
 	}
-	await signIn.social({
+	await signInSocial(signIn.social, {
 		provider: "apple",
 		idToken: {
 			token: credential.identityToken,

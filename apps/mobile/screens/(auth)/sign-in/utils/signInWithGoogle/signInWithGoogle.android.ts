@@ -3,6 +3,7 @@ import * as Crypto from "expo-crypto";
 import { signIn } from "@/lib/auth/client";
 import { env } from "@/lib/env";
 import { signInInBrowser } from "../signInInBrowser";
+import { signInSocial } from "../signInSocial";
 
 /**
  * The Credential Manager account sheet. Falls back to the browser when the
@@ -22,10 +23,9 @@ export async function signInWithGoogle(): Promise<void> {
 		if (code === "ERR_NO_CREDENTIAL") return signInInBrowser("google");
 		throw err;
 	}
-	const res = await signIn.social({
+	await signInSocial(signIn.social, {
 		provider: "google",
 		idToken: { token, nonce },
 		callbackURL: "/",
 	});
-	if (res.error) throw new Error(res.error.message);
 }
