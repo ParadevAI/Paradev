@@ -19,6 +19,8 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
 	try {
 		for (let page = 1; ; page++) {
+			// Offset paging needs an order a push cannot change: `sort=updated`
+			// reorders the list between pages and repeats or drops a repository.
 			const raw = await runGh([
 				"api",
 				"--method",
@@ -27,7 +29,7 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 				"-f",
 				"affiliation=owner,collaborator,organization_member",
 				"-f",
-				"sort=updated",
+				"sort=full_name",
 				"-f",
 				"per_page=100",
 				"-f",
