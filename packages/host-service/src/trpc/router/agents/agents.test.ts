@@ -659,6 +659,31 @@ describe("buildTerminalAgentLaunch default account env", () => {
 });
 
 describe("validateAgentModelSelection", () => {
+	it("accepts a model only the agent's live catalog lists", () => {
+		const live = {
+			models: [{ id: "gpt-7-nova", label: "GPT-7 Nova" }],
+			efforts: { "gpt-7-nova": ["low", "turbo"] },
+		};
+		expect(() =>
+			validateAgentModelSelection("codex", "Codex", "gpt-7-nova"),
+		).toThrow('Unsupported model "gpt-7-nova"');
+		expect(() =>
+			validateAgentModelSelection("codex", "Codex", "gpt-7-nova", live),
+		).not.toThrow();
+		expect(() =>
+			validateAgentEffortSelection(
+				"codex",
+				"Codex",
+				"turbo",
+				"gpt-7-nova",
+				live,
+			),
+		).not.toThrow();
+		expect(() =>
+			validateAgentEffortSelection("codex", "Codex", "max", "gpt-7-nova", live),
+		).toThrow("Choose one of: low, turbo.");
+	});
+
 	it("leaves the model unset so the agent can use its own default", () => {
 		expect(() =>
 			validateAgentModelSelection("claude", "Claude", undefined),

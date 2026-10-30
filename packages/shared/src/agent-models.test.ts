@@ -3,6 +3,7 @@ import {
 	AGENT_EFFORT_SUPPORT,
 	AGENT_MODE_SUPPORT,
 	AGENT_MODEL_SUPPORT,
+	type AgentModelCatalog,
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
 	buildAgentModelArgs,
@@ -10,6 +11,7 @@ import {
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
+	getAgentModels,
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
@@ -717,5 +719,75 @@ describe("September 2026 model launches", () => {
 		for (const { models } of AGENT_MODEL_SUPPORT) {
 			expect(new Set(models.map(({ id }) => id)).size).toBe(models.length);
 		}
+	});
+});
+
+describe("live model catalog", () => {
+	const live: AgentModelCatalog = {
+		models: [
+			{ id: "gpt-7-nova", label: "GPT-7 Nova" },
+			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
+		],
+		efforts: {
+			"gpt-7-nova": ["low", "high", "turbo"],
+			"gpt-6.1-sol": ["low", "medium"],
+		},
+	};
+
+	it("replaces the curated list in pickers", () => {
+		expect(getAgentModels("codex", live).map(({ id }) => id)).toEqual([
+			"gpt-7-nova",
+			"gpt-6.1-sol",
+		]);
+		expect(getAgentModels("codex", null)).toEqual(
+			getAgentModelSupport("codex")?.models ?? [],
+		);
+		expect(getAgentModels("codex", { models: [], efforts: {} })).toEqual(
+			getAgentModelSupport("codex")?.models ?? [],
+		);
+	});
+
+	it("launches a model only the live catalog lists", () => {
+		expect(buildAgentModelArgs("codex", "gpt-7-nova")).toEqual([]);
+		expect(buildAgentModelArgs("codex", "gpt-7-nova", undefined, live)).toEqual(
+			["--model", "gpt-7-nova"],
+		);
+		// Still curated, so a pick saved before the CLI dropped it launches.
+		expect(buildAgentModelArgs("codex", "gpt-6-luna", undefined, live)).toEqual(
+			["--model", "gpt-6-luna"],
+		);
+	});
+
+	it("ignores a live catalog for presets that do not read one", () => {
+		expect(
+			isCuratedAgentModel("claude", "gpt-7-nova", {
+				models: [{ id: "gpt-7-nova", label: "x" }],
+				efforts: {},
+			}),
+		).toBe(false);
+	});
+
+	it("takes the model's efforts from the live catalog, new levels included", () => {
+		expect(getAgentEfforts("codex", "gpt-7-nova", live)).toEqual([
+			{ id: "low", label: "Low" },
+			{ id: "high", label: "High" },
+			{ id: "turbo", label: "Turbo" },
+		]);
+		expect(
+			getAgentEfforts("codex", "gpt-6.1-sol", live).map(({ id }) => id),
+		).toEqual(["low", "medium"]);
+		expect(buildAgentEffortArgs("codex", "turbo", "gpt-7-nova", live)).toEqual([
+			"-c",
+			"model_reasoning_effort=turbo",
+		]);
+		expect(buildAgentEffortArgs("codex", "ultra", "gpt-6.1-sol", live)).toEqual(
+			[],
+		);
+	});
+
+	it("falls back to curated efforts for a model the live catalog does not list", () => {
+		expect(
+			getAgentEfforts("codex", "gpt-6-luna", live).map(({ id }) => id),
+		).toEqual(["low", "medium", "high", "xhigh", "max"]);
 	});
 });
