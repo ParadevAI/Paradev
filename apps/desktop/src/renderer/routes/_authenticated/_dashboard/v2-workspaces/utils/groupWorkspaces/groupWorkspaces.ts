@@ -28,6 +28,8 @@ export const LIST_STATUS_ORDER: BoardColumnKey[] = [
 export const GROUP_KEY_SESSIONS = "__sessions__";
 export const GROUP_KEY_UNKNOWN_CREATOR = "__unknown__";
 export const GROUP_KEY_CLOUD = "__cloud__";
+/** Archived tombstones under any non-status grouping; status has its own buckets. */
+export const GROUP_KEY_ARCHIVED = "__archived__";
 
 export interface WorkspaceSection {
 	groupBy: V2WorkspacesGroupBy;
@@ -71,10 +73,13 @@ function groupKey(
 /** Section order for non-status groupings: by each section's newest row, so
  * the busiest project or person leads; the catch-all buckets go last. */
 function compareSections(a: WorkspaceSection, b: WorkspaceSection): number {
-	const catchAll = new Set([GROUP_KEY_SESSIONS, GROUP_KEY_UNKNOWN_CREATOR]);
-	const aLast = catchAll.has(a.key) ? 1 : 0;
-	const bLast = catchAll.has(b.key) ? 1 : 0;
-	if (aLast !== bLast) return aLast - bLast;
+	const rank = (key: string) =>
+		key === GROUP_KEY_ARCHIVED
+			? 2
+			: key === GROUP_KEY_SESSIONS || key === GROUP_KEY_UNKNOWN_CREATOR
+				? 1
+				: 0;
+	if (rank(a.key) !== rank(b.key)) return rank(a.key) - rank(b.key);
 	return b.latestActivityAt - a.latestActivityAt;
 }
 
@@ -90,7 +95,10 @@ export function groupWorkspaces(
 	}
 	for (const workspace of workspaces) {
 		if (workspace.archivedAt != null && !showArchived) continue;
-		const key = groupKey(workspace, groupBy);
+		const key =
+			workspace.archivedAt != null && groupBy !== "status"
+				? GROUP_KEY_ARCHIVED
+				: groupKey(workspace, groupBy);
 		const rows = byKey.get(key);
 		if (rows) rows.push(workspace);
 		else byKey.set(key, [workspace]);
@@ -112,7 +120,6 @@ export function groupWorkspaces(
 			latestActivityAt,
 		});
 	}
-	if (groupBy !== "status" && groupBy !== "none")
-		sections.sort(compareSections);
+	if (groupBy !== "status") sections.sort(compareSections);
 	return sections;
 }

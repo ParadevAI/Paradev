@@ -41,6 +41,16 @@ describe("hasLiveWorkspaceState", () => {
 		).toBe(false);
 	});
 
+	test("an archived row is never live, whatever its stale agent status", () => {
+		expect(
+			hasLiveWorkspaceState({
+				...make({ agentStatus: "working" }),
+				archivedAt: 1,
+				archiveReason: "deleted",
+			}),
+		).toBe(false);
+	});
+
 	test("idle and in-review rows show the age instead", () => {
 		expect(hasLiveWorkspaceState(make({}))).toBe(false);
 		expect(hasLiveWorkspaceState(make({ prState: "open" }))).toBe(false);

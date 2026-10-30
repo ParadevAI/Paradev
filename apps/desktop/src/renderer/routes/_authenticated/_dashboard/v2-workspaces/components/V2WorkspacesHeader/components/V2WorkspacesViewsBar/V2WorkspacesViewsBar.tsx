@@ -1,4 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@superset/ui/alert-dialog";
 import { cn } from "@superset/ui/utils";
 import { LuBookmark, LuPlus, LuX } from "react-icons/lu";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
@@ -119,18 +130,42 @@ export function V2WorkspacesViewsBar({
 				) : null}
 			</div>
 			{activeSavedView ? (
-				<button
-					type="button"
-					onClick={() => deleteView(activeSavedView.id)}
-					aria-label={t({ message: `Delete view ${activeSavedView.name}` })}
-					title={t({ message: `Delete view ${activeSavedView.name}` })}
-					className={cn(
-						VIEW_BUTTON_CLASS,
-						"-ml-0.5 border-transparent px-1.5 text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-					)}
-				>
-					<LuX className="size-3" />
-				</button>
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<button
+							type="button"
+							aria-label={t({ message: `Delete view ${activeSavedView.name}` })}
+							title={t({ message: `Delete view ${activeSavedView.name}` })}
+							className={cn(
+								VIEW_BUTTON_CLASS,
+								"-ml-0.5 border-transparent px-1.5 text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+							)}
+						>
+							<LuX className="size-3" />
+						</button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								<Trans>Delete this view?</Trans>
+							</AlertDialogTitle>
+							<AlertDialogDescription>
+								<Trans>
+									“{activeSavedView.name}” and its filters are removed. The
+									workspaces are not affected.
+								</Trans>
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>
+								<Trans>Cancel</Trans>
+							</AlertDialogCancel>
+							<AlertDialogAction onClick={() => deleteView(activeSavedView.id)}>
+								<Trans>Delete</Trans>
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			) : null}
 			<span className="flex-1" />
 			<SaveViewPopover

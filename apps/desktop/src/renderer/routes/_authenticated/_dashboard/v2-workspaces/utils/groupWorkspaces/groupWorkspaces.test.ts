@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import {
+	GROUP_KEY_ARCHIVED,
 	GROUP_KEY_CLOUD,
 	GROUP_KEY_SESSIONS,
 	GROUP_KEY_UNKNOWN_CREATOR,
@@ -169,6 +170,35 @@ describe("groupWorkspaces", () => {
 			"alpha",
 			"yankee",
 		]);
+	});
+
+	test("archived rows form their own last section outside status grouping", () => {
+		const rows = [
+			make({ archivedAt: 1, archiveReason: "merged", lastAgentEventAt: 9_000 }),
+			make({ lastAgentEventAt: 1_000 }),
+			make({
+				projectId: "project-b",
+				projectName: "Beta",
+				lastAgentEventAt: 2_000,
+			}),
+		];
+		expect(
+			groupWorkspaces(rows, {
+				...options,
+				groupBy: "none",
+				showArchived: true,
+			}).map((section) => [section.key, section.workspaces.length]),
+		).toEqual([
+			["all", 2],
+			[GROUP_KEY_ARCHIVED, 1],
+		]);
+		expect(
+			groupWorkspaces(rows, {
+				...options,
+				groupBy: "project",
+				showArchived: true,
+			}).map((section) => section.key),
+		).toEqual(["project-b", "project-a", GROUP_KEY_ARCHIVED]);
 	});
 
 	test("rows inside a section follow the chosen ordering", () => {

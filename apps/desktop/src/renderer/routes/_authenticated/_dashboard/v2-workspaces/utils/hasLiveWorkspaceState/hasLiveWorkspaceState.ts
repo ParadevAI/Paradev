@@ -12,6 +12,7 @@ type LiveStateInputs = Pick<
 /** True while something is happening or waiting; the row then shows the
  * status glyph in place of the age, as the cloud tab's trailing cell did. */
 export function hasLiveWorkspaceState(workspace: LiveStateInputs): boolean {
+	if (workspace.archivedAt != null) return false;
 	return (
 		workspace.sandboxStatus !== null ||
 		workspace.agentStatus === "working" ||

@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· {updatedAgo}에 업데이트"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "“{0}” 뷰와 해당 필터가 삭제됩니다. 워크스페이스에는 영향이 없습니다."
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\"을(를) 삭제했습니다"
@@ -6555,6 +6559,9 @@ msgstr "이 댓글을 삭제할까요?"
 
 msgid "Delete this task?"
 msgstr "이 작업을 삭제할까요?"
+
+msgid "Delete this view?"
+msgstr "이 뷰를 삭제할까요?"
 
 msgid "Delete this workspace?"
 msgstr "이 워크스페이스를 삭제할까요?"

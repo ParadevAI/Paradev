@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· actualizada {updatedAgo}"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "Se eliminarán «{0}» y sus filtros. Los espacios de trabajo no se ven afectados."
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" eliminada"
@@ -6555,6 +6559,9 @@ msgstr "¿Eliminar este comentario?"
 
 msgid "Delete this task?"
 msgstr "¿Eliminar esta tarea?"
+
+msgid "Delete this view?"
+msgstr "¿Eliminar esta vista?"
 
 msgid "Delete this workspace?"
 msgstr "¿Eliminar este espacio de trabajo?"

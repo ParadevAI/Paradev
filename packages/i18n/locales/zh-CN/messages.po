@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· 更新于{updatedAgo}"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "将删除“{0}”及其筛选条件。工作区不受影响。"
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "“{0}”已删除"
@@ -6555,6 +6559,9 @@ msgstr "删除此评论？"
 
 msgid "Delete this task?"
 msgstr "删除此任务？"
+
+msgid "Delete this view?"
+msgstr "删除此视图？"
 
 msgid "Delete this workspace?"
 msgstr "删除这个工作区？"

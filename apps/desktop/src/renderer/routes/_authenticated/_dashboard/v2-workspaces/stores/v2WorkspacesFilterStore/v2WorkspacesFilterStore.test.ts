@@ -43,17 +43,20 @@ test("defaults workspaces to the list with archived workspaces hidden", () => {
 	expect(state.activeViewId).toBe(BUILT_IN_VIEW_ALL);
 });
 
-test("reset preserves the chosen view and hides archived workspaces", () => {
+test("reset keeps the layout, lands on All and hides archived workspaces", () => {
 	useV2WorkspacesFilterStore.setState({
 		viewMode: "board",
 		showArchived: true,
 		projectFilters: ["project-a"],
 	});
+	useV2WorkspacesFilterStore.getState().applyView(BUILT_IN_VIEW_NEEDS_ME);
 
 	useV2WorkspacesFilterStore.getState().reset();
 
 	const state = useV2WorkspacesFilterStore.getState();
 	expect(state.viewMode).toBe("board");
+	expect(state.activeViewId).toBe(BUILT_IN_VIEW_ALL);
+	expect(state.statusFilters).toEqual([]);
 	expect(state.showArchived).toBe(false);
 	expect(state.projectFilters).toEqual([]);
 });

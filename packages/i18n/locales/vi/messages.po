@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· cập nhật {updatedAgo}"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "“{0}” và các bộ lọc của nó sẽ bị xóa. Workspace không bị ảnh hưởng."
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "Đã xóa \"{0}\""
@@ -6555,6 +6559,9 @@ msgstr "Xóa bình luận này?"
 
 msgid "Delete this task?"
 msgstr "Xóa tác vụ này?"
+
+msgid "Delete this view?"
+msgstr "Xóa chế độ xem này?"
 
 msgid "Delete this workspace?"
 msgstr "Xóa workspace này?"

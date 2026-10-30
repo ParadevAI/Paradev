@@ -15,6 +15,7 @@ import { useMatchRoute } from "@tanstack/react-router";
 import { type Range, useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
+	LuArchive,
 	LuChevronDown,
 	LuChevronRight,
 	LuLayers,
@@ -34,6 +35,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 import { BOARD_COLUMN_LABELS } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/deriveBoardColumn";
 import {
+	GROUP_KEY_ARCHIVED,
 	GROUP_KEY_CLOUD,
 	groupWorkspaces,
 	type WorkspaceSection,
@@ -139,7 +141,8 @@ export function V2WorkspacesList({
 					? (persistedCollapsed[collapseKey]?.isCollapsed ?? false)
 					: sessionCollapsed.has(collapseKey);
 			const isCollapsed = wantsCollapsed && !containsCurrent;
-			if (section.groupBy === "none") {
+			// Flat list: no band, except the archived tail, which keeps its own.
+			if (section.groupBy === "none" && section.key !== GROUP_KEY_ARCHIVED) {
 				for (const workspace of section.workspaces) {
 					list.push({ kind: "row", key: workspace.id, workspace });
 				}
@@ -342,6 +345,7 @@ function SectionHeader({
 
 function SectionLabel({ section }: { section: WorkspaceSection }) {
 	const { sample } = section;
+	if (section.key === GROUP_KEY_ARCHIVED) return <Trans>Archived</Trans>;
 	switch (section.groupBy) {
 		case "status":
 			return section.column
@@ -364,6 +368,9 @@ function SectionLabel({ section }: { section: WorkspaceSection }) {
 
 function SectionGlyph({ section }: { section: WorkspaceSection }) {
 	const { sample } = section;
+	if (section.key === GROUP_KEY_ARCHIVED) {
+		return <LuArchive className="size-3 text-muted-foreground/70" />;
+	}
 	switch (section.groupBy) {
 		case "status":
 			return section.column ? (

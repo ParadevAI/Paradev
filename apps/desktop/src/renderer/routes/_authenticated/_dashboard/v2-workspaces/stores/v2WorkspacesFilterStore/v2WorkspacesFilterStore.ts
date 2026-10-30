@@ -219,7 +219,7 @@ interface V2WorkspacesFilterState extends V2WorkspacesViewFilters {
 	 * false, saving nothing, once MAX_SAVED_VIEWS is reached. */
 	saveAsNewView: (name: string) => boolean;
 	deleteView: (viewId: string) => void;
-	/** Clears filters (incl. archived) — view mode persists. */
+	/** Clears filters (incl. archived) and lands on All — layout persists. */
 	reset: () => void;
 }
 
@@ -299,6 +299,7 @@ export const useV2WorkspacesFilterStore = create<V2WorkspacesFilterState>()(
 			reset: () =>
 				set({
 					searchQuery: "",
+					activeViewId: BUILT_IN_VIEW_ALL,
 					...copyFilters(EMPTY_VIEW_FILTERS),
 				}),
 		}),
