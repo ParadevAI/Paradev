@@ -67,15 +67,15 @@ Same contract, no caller changes; iOS is unchanged.
 
 ### Known gaps
 
-- **Runtime permission.** On Android 13+ `POST_NOTIFICATIONS` must be granted. Nothing in the
-  app asks today (iOS needs no permission for Live Activities), so `areActivitiesEnabled()` is
-  false until the user grants it. The push work below adds the prompt; until then, grant with
-  `adb shell pm grant sh.superset.mobile android.permission.POST_NOTIFICATIONS`.
-- **No "Not updating" text.** `staleAfterSeconds` and `staleDetail` are ignored; the shade's
-  relative time is the stale signal. A follow-up can schedule an inexact `AlarmManager` alarm at
-  `staleAfterSeconds` whose receiver re-posts the last snapshot with `staleDetail` as sub-text.
-- **One tap target.** Rows cannot each deep-link. Option: up to three actions, "Open <name>",
-  for the top rows.
+- **Runtime permission (done).** On Android 13+ `POST_NOTIFICATIONS` must be granted. Home asks
+  once, the first time a card would show (`useAgentLiveActivity/utils/requestCardPermission`);
+  a denial is remembered and the app never asks again. iOS needs no prompt.
+- **"Not updating" (done).** Each post also builds the stale form (sub-text `staleDetail`) and
+  sets an inexact `AlarmManager` alarm at `staleAfterSeconds`. `StaleCardReceiver` posts it only
+  if the card is still showing; the next post replaces the alarm.
+- **Row taps (done).** Below Android 16, or when the user turned promotion off, the expanded card
+  is a custom row layout (`DecoratedCustomViewStyle`) and each row opens its own session. A
+  promoted Live Update cannot use a custom layout, so there the top three rows become actions.
 - **Not verified on Android 16.** The local AVD is API 33, so promotion and the chip are
   compiled and gated on `SDK_INT >= 36` but have not been seen running.
 - Android 14+ lets users swipe away ongoing notifications that are not foreground services.

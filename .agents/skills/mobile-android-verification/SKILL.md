@@ -52,8 +52,9 @@ Every worktree installs the same package, `sh.superset.mobile`, so the last inst
   starts Metro with `--clear`; if you start Metro yourself, do the same.
 - **Dev auto sign-in.** `EXPO_PUBLIC_DEV_ONE_TIME_TOKEN` in `.env` signs the app in at launch even
   after `pm clear`. Blank it and restart Metro to see the sign-in screen.
-- **Notification permission.** Nothing in the app asks for `POST_NOTIFICATIONS` yet; the script
-  grants it so the agent card can show on Android 13+.
+- **Notification permission.** Home asks for `POST_NOTIFICATIONS` once, when the first agent card
+  would show, and remembers the answer. The script grants it up front; to see the prompt, run
+  `adb shell pm revoke sh.superset.mobile android.permission.POST_NOTIFICATIONS` and `pm clear`.
 - **iOS-only header items.** SF Symbol `Stack.Toolbar` buttons and `Stack.SearchBar` do not render
   on Android, and a form sheet draws no native bar there (see the sheet convention in
   `apps/mobile/AGENTS.md`). An empty header on Android is not always a regression.

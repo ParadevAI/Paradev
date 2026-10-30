@@ -3,7 +3,6 @@ package sh.superset.liveactivity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.core.app.NotificationManagerCompat
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
@@ -87,8 +86,6 @@ class LiveActivityModule : Module() {
       if (id in AgentCard.activeIds(context)) AgentCard.post(context, snapshot)
     }
 
-    AsyncFunction("endAll") {
-      NotificationManagerCompat.from(context).cancel(AgentCard.TAG, AgentCard.NOTIFICATION_ID)
-    }
+    AsyncFunction("endAll") { AgentCard.end(context) }
   }
 }
