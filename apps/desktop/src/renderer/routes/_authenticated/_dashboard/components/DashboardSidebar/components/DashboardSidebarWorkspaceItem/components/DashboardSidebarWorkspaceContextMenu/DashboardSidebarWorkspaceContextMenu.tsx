@@ -16,6 +16,7 @@ import {
 	LuArrowRightLeft,
 	LuArrowUp,
 	LuBellOff,
+	LuClipboard,
 	LuCopy,
 	LuEye,
 	LuEyeOff,
@@ -141,34 +142,41 @@ export function DashboardSidebarWorkspaceContextMenu({
 						<Trans>Rename</Trans>
 					</ContextMenuItem>
 				)}
+				{onRename && <ContextMenuSeparator />}
 				{isLocalWorkspace && (
-					<>
-						{onRename && <ContextMenuSeparator />}
-						<ContextMenuItem onSelect={onOpenInFinder}>
-							<LuFolderOpen className="size-4 mr-2" />
-							<Trans>Open in Finder</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onCopyPath}>
-							<LuCopy className="size-4 mr-2" />
-							<Trans>Copy Path</Trans>
-						</ContextMenuItem>
-					</>
+					<ContextMenuItem onSelect={onOpenInFinder}>
+						<LuFolderOpen className="size-4 mr-2" />
+						<Trans>Open in Finder</Trans>
+					</ContextMenuItem>
 				)}
-				{!isLocalWorkspace && onRename && <ContextMenuSeparator />}
-				<ContextMenuItem onSelect={onCopyBranchName}>
-					<LuGitBranch className="size-4 mr-2" />
-					<Trans>Copy Branch Name</Trans>
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={onCopyWorkspaceId}>
-					<LuHash className="size-4 mr-2" />
-					<Trans>Copy Workspace ID</Trans>
-				</ContextMenuItem>
-				<ContextMenuItem
-					onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
-				>
-					<LuLink className="size-4 mr-2" />
-					<Trans>Copy link</Trans>
-				</ContextMenuItem>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger>
+						<LuCopy className="size-4 mr-2" />
+						<Trans>Copy</Trans>
+					</ContextMenuSubTrigger>
+					<ContextMenuSubContent>
+						<ContextMenuItem
+							onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
+						>
+							<LuLink className="size-4 mr-2" />
+							<Trans>Copy link</Trans>
+						</ContextMenuItem>
+						<ContextMenuItem onSelect={onCopyBranchName}>
+							<LuGitBranch className="size-4 mr-2" />
+							<Trans>Copy Branch Name</Trans>
+						</ContextMenuItem>
+						{isLocalWorkspace && (
+							<ContextMenuItem onSelect={onCopyPath}>
+								<LuClipboard className="size-4 mr-2" />
+								<Trans>Copy Path</Trans>
+							</ContextMenuItem>
+						)}
+						<ContextMenuItem onSelect={onCopyWorkspaceId}>
+							<LuHash className="size-4 mr-2" />
+							<Trans>Copy Workspace ID</Trans>
+						</ContextMenuItem>
+					</ContextMenuSubContent>
+				</ContextMenuSub>
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={onToggleUnread}>
 					{isUnread ? (

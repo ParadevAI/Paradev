@@ -60,6 +60,7 @@ for (const { kind, isLocalWorkspace, isCloudWorkspace } of KINDS) {
 				</QueryClientProvider>,
 			);
 			fireEvent.contextMenu(screen.getByText("workspace row"));
+			fireEvent.keyDown(await screen.findByText("Copy"), { key: "ArrowRight" });
 			fireEvent.click(await screen.findByText("Copy link"));
 			await waitFor(() =>
 				expect(writes).toEqual([
