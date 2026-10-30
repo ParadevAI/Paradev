@@ -231,6 +231,9 @@ type TerminalClientMessage =
 	// suspended in a pocket, a Wi-Fi drop the relay never sees) stops
 	// constraining the PTY size. Clients that never answer are never dropped.
 	| { type: "pong" }
+	// The client's xterm changed size while it could not tell the host, so its
+	// screen no longer matches the program's. Older hosts ignore it.
+	| { type: "repaint" }
 	| { type: "dispose" };
 
 // PTY output bytes travel as binary WebSocket frames — the renderer pipes
@@ -3826,6 +3829,12 @@ export function registerWorkspaceTerminalRoute({
 
 					if (message.type === "dispose") {
 						disposeSession(terminalId ?? "", db);
+						return;
+					}
+
+					if (message.type === "repaint") {
+						clearPendingRepaintNudge(session);
+						nudgeRepaint(session);
 						return;
 					}
 
