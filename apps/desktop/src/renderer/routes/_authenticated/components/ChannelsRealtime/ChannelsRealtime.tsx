@@ -189,6 +189,7 @@ export function ChannelsRealtime() {
 					void utils.agent.list.invalidate();
 					void utils.agent.get.invalidate({ agentId: event.agentId });
 					void utils.agent.activity.invalidate({ agentId: event.agentId });
+					void utils.agentRoutine.list.invalidate({ agentId: event.agentId });
 					break;
 				case "channel.notify": {
 					if (event.organizationId !== organizationId) break;

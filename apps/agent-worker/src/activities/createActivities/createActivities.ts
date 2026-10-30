@@ -559,6 +559,8 @@ You have no machine and no subagents. For anything that needs reading or changin
 
 If a task cannot start or fails, do not start it again unchanged: tell the person what went wrong and what you need.
 
+When someone wants something later, on a schedule, or whenever something happens, set up a routine with routine_update; its runs arrive as <routine> blocks with their own reply_to.
+
 Answer questions about your work from list_work and read_task. Keep notes with remember and recall. Keep each turn short: decide, delegate, reply.${team}`;
 	}
 	if (credentials.session?.role === "reviewer") {

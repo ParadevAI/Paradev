@@ -83,6 +83,8 @@ const persister = createAsyncStoragePersister({
 		},
 	},
 	key: "superset-rq-cache",
+	// Every cache event re-serializes the whole persisted set on the main
+	// thread, including events from queries that are never persisted.
 	throttleTime: 20_000,
 	// Query data carries Dates (tRPC's superjson transformer); plain JSON would
 	// restore them as strings.

@@ -136,6 +136,10 @@
 			"types": "./src/lib/account-purge/index.ts",
 			"default": "./src/lib/account-purge/index.ts"
 		},
+		"./agent-routines": {
+			"types": "./src/router/agent/routines.ts",
+			"default": "./src/router/agent/routines.ts"
+		},
 		"./plugins-proxy": {
 			"types": "./src/router/plugins/proxy/index.ts",
 			"default": "./src/router/plugins/proxy/index.ts"

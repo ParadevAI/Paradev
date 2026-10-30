@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { toast } from "@superset/ui/sonner";
 import { authClient } from "renderer/lib/auth-client";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { posthog } from "renderer/lib/posthog";
 
@@ -13,6 +14,7 @@ export function useSignOut() {
 	const { t } = useLingui();
 	const signOutMutation = electronTrpc.auth.signOut.useMutation();
 	const setAnalyticsUserId = electronTrpc.analytics.setUserId.useMutation();
+	const cloudUtils = cloudTrpc.useUtils();
 
 	return async () => {
 		posthog.reset();
@@ -24,6 +26,7 @@ export function useSignOut() {
 				window.setTimeout(resolve, SERVER_REVOKE_TIMEOUT_MS),
 			),
 		]);
+		void cloudUtils.userSettings.get.reset();
 		try {
 			await signOutMutation.mutateAsync();
 		} catch (error) {

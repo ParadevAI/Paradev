@@ -1,6 +1,5 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
 import {
 	FileArchiveIcon,
 	FileCode2Icon,
@@ -10,10 +9,7 @@ import {
 	Music2Icon,
 } from "lucide-react";
 import type { JSX } from "react";
-import {
-	PASTED_TEXT_ACTION_CLASS,
-	PastedTextCard,
-} from "../../../PastedTextCard";
+import { PastedTextCard } from "../../../PastedTextCard";
 import type { PromptInputAttachment } from "../../types";
 import { RemoveButton } from "./components/RemoveButton";
 import { RevealButton } from "./components/RevealButton";
@@ -21,7 +17,6 @@ import { RevealButton } from "./components/RevealButton";
 export type AttachmentPillsProps = {
 	attachments: PromptInputAttachment[];
 	onRemove: (id: string) => void;
-	onShowPastedText?: (id: string) => void;
 	onPreviewError?: (id: string) => void;
 	onReveal?: (attachment: PromptInputAttachment) => void;
 	onAttachmentClick?: (
@@ -67,7 +62,6 @@ function fileTypeIcon(mediaType: string, extension: string): JSX.Element {
 export function AttachmentPills({
 	attachments,
 	onRemove,
-	onShowPastedText,
 	onPreviewError,
 	onReveal,
 	onAttachmentClick,
@@ -82,15 +76,6 @@ export function AttachmentPills({
 							key={attachment.id}
 							text={attachment.pastedText}
 							onRemove={() => onRemove(attachment.id)}
-							action={
-								<button
-									type="button"
-									className={PASTED_TEXT_ACTION_CLASS}
-									onClick={() => onShowPastedText?.(attachment.id)}
-								>
-									<Trans>Show in text field</Trans>
-								</button>
-							}
 						/>
 					);
 				}

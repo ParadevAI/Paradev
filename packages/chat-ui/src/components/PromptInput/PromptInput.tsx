@@ -7,8 +7,9 @@ import {
 import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
-import { MentionChipNode } from "./nodes/mentionChipNode";
+import { COMPOSER_NODES } from "./constants";
 import { ChipRenderProvider } from "./providers/ChipRenderProvider";
+import { COMPOSER_THEME } from "./theme";
 import type { PromptInputProps } from "./types";
 import "./prompt-input.css";
 import { msg } from "@lingui/core/macro";
@@ -65,7 +66,8 @@ export function PromptInput({
 }: PromptInputProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
 		namespace: "prompt-input",
-		nodes: [MentionChipNode],
+		nodes: COMPOSER_NODES,
+		theme: COMPOSER_THEME,
 		onError: (error: Error) => {
 			throw error;
 		},

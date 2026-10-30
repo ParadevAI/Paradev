@@ -384,7 +384,7 @@ export function ChannelMessageRow({
 						currentUserId={currentUserId}
 					/>
 				) : (
-					<div className="text-[15px] leading-[1.4667] [&_p]:my-0.5">
+					<div className="cursor-text select-text text-[15px] leading-[1.4667] [&_p]:my-0.5">
 						{message.body && (
 							<ChatMarkdown
 								components={markdown.components}

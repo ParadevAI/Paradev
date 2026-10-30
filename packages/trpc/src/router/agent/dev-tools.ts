@@ -15,30 +15,14 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentTemporal } from "../../lib/agent-runtime";
-import { agentProcedure } from "../../trpc";
 import { channelNotFound } from "../channel/access";
 import { postAgentMessage } from "../channel/channel-message";
+import { devRoutineTools } from "./dev-routine-tools";
+import { mainProcedure } from "./main-procedure";
 import { fillSlots, startTask } from "./tasks";
-import { submitPrompt } from "./turns";
+import { parseReplyTarget, REPLY_TARGET, submitPrompt } from "./turns";
 
-const TARGET = /^channel:([0-9a-f-]{36})(?:\/thread:([0-9a-f-]{36}))?$/;
 const MAX_MEMORIES = 50;
-
-/** Only a Dev's main session delegates and speaks; its tasks report back instead. */
-const mainProcedure = agentProcedure.use(async ({ ctx, next }) => {
-	const [session] = await db
-		.select({ kind: agentSessions.kind })
-		.from(agentSessions)
-		.where(eq(agentSessions.id, ctx.agentTurn.sessionId))
-		.limit(1);
-	if (session?.kind !== "main") {
-		throw new TRPCError({
-			code: "FORBIDDEN",
-			message: "Only a Dev's main session can use this tool.",
-		});
-	}
-	return next();
-});
 
 const taskNotFound = () =>
 	new TRPCError({ code: "NOT_FOUND", message: "No such task." });
@@ -115,13 +99,14 @@ export const devToolsRouter = {
 	reply: mainProcedure
 		.input(
 			z.object({
-				target: z.string().regex(TARGET),
+				target: z.string().regex(REPLY_TARGET),
 				body: z.string().min(1).max(40_000),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const [, channelId, threadRootId] = input.target.match(TARGET) ?? [];
-			if (!channelId) throw channelNotFound();
+			const target = parseReplyTarget(input.target);
+			if (!target) throw channelNotFound();
+			const { channelId, threadRootId } = target;
 			const { rows } = await db.execute<{ allowed: number }>(
 				sql`select authz.check_permission('agent', ${ctx.agentTurn.agentId}, 'can_post', 'channel', ${channelId}) as allowed`,
 			);
@@ -144,7 +129,7 @@ export const devToolsRouter = {
 				agentId: ctx.agentTurn.agentId,
 				agentName: agent?.name ?? "",
 				body: input.body,
-				threadRootId: threadRootId ?? null,
+				threadRootId,
 			});
 			return { messageId: message.id };
 		}),
@@ -342,4 +327,6 @@ export const devToolsRouter = {
 			isDefault: row.id === agent?.defaultEnvironmentId,
 		}));
 	}),
+
+	...devRoutineTools,
 } satisfies TRPCRouterRecord;

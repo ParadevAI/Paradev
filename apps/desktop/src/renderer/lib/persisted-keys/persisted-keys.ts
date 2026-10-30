@@ -9,6 +9,8 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)
+	{ key: "acp-chat", match: "exact" },
 	// The task page's inline agent picker; Start work opens New Workspace instead
 	{ key: "lastSelectedV2TaskAgent", match: "exact" },
 	{ key: "getting-started-v1", match: "exact" },

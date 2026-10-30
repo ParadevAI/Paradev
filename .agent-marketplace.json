@@ -196,6 +196,16 @@
 			"category": "data & apis",
 			"source": "./plugins/peec",
 			"version": "1.0.0"
+		},
+		{
+			"name": "sazabi",
+			"description": "Investigate production with Sazabi: ask questions about your logs and traces, triage issues, check deploys, build dashboards, and send app and coding-agent telemetry to Sazabi.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/sazabi",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

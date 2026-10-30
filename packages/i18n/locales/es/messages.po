@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· actualizada {updatedAgo}"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "Se eliminarán «{0}» y sus filtros. Los espacios de trabajo no se ven afectados."
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" eliminada"
@@ -194,7 +198,7 @@ msgstr "{0, plural, one {# pendiente} other {# pendientes}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, one {# persona} other {# personas}}"
 
@@ -203,7 +207,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# proyecto seleccionado.} other {# proyectos seleccionados.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proyecto} other {# proyectos}}"
 
@@ -1513,9 +1516,6 @@ msgstr "1 cookie: olvidar este sitio"
 msgid "1 hr"
 msgstr "1 h"
 
-msgid "1 person"
-msgstr "1 persona"
-
 msgid "1 user"
 msgstr "1 usuario"
 
@@ -1713,6 +1713,12 @@ msgstr "Una superficie de chat rehecha para dirigir agentes: salida de herramien
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Un repositorio no está conectado a esta organización, o los repositorios provienen de instalaciones de GitHub distintas"
 
+msgid "A routine can run at most once an hour."
+msgstr "Una rutina puede ejecutarse como máximo una vez por hora."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Una rutina necesita una programación o algo que vigilar."
+
 msgid "A run for this automation is already in progress."
 msgstr "Ya hay una ejecución de esta automatización en curso."
 
@@ -1731,6 +1737,10 @@ msgstr "Una clave de tarea tiene de 1 a 5 letras o números y empieza por una le
 
 msgid "a teammate"
 msgstr "un compañero de equipo"
+
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Un hilo en #{0}"
 
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Un identificador único para la organización (generado a partir del nombre)"
@@ -1884,6 +1894,9 @@ msgstr "Añadir una descripción"
 
 msgid "Add a description…"
 msgstr "Añade una descripción…"
+
+msgid "Add a filter"
+msgstr "Añadir un filtro"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Añade un script de ejecución del ciclo de vida en la configuración del proyecto o marca un script de terminal como la ejecución del espacio de trabajo."
@@ -2866,6 +2879,9 @@ msgstr "Archivado · {0}"
 msgid "Archived {0}"
 msgstr "Archivado {0}"
 
+msgid "Archived shown"
+msgstr "Archivados visibles"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "¿Seguro que quieres eliminar este archivo? Esta acción no se puede deshacer."
 
@@ -3184,6 +3200,9 @@ msgstr "Avatar (átomo)"
 
 msgid "Avatar updated!"
 msgstr "¡Avatar actualizado!"
+
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel y Kiet Ho en el YC Demo Day"
 
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
@@ -3725,6 +3744,9 @@ msgstr "¿Puedes unificar los tooltips de toda la app?"
 
 msgid "Can’t check {hostName}"
 msgstr "No se puede comprobar {hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "No se puede contraer la sección del espacio de trabajo actual"
 
 msgid "Can't connect right now"
 msgstr "No podemos conectar ahora"
@@ -5685,6 +5707,9 @@ msgstr "No se pudo bifurcar en un nuevo worktree"
 msgid "Couldn't branch the conversation"
 msgstr "No se pudo bifurcar la conversación"
 
+msgid "Couldn't change the routine"
+msgstr "No se pudo cambiar la rutina"
+
 msgid "Couldn't check"
 msgstr "No se pudo comprobar"
 
@@ -5867,6 +5892,9 @@ msgstr "No se pudo guardar el cambio"
 msgid "Couldn't save the Dev"
 msgstr "No se pudo guardar el Dev"
 
+msgid "Couldn't save the routine"
+msgstr "No se pudo guardar la rutina"
+
 msgid "Couldn't send comment"
 msgstr "No se pudo enviar el comentario"
 
@@ -5938,6 +5966,9 @@ msgstr "No se pudo quitar el archivo de preparados"
 
 msgid "Couldn't update pull request"
 msgstr "No se pudo actualizar la pull request"
+
+msgid "Couldn't update the Chat setting"
+msgstr "No se pudo actualizar el ajuste de Chat"
 
 msgid "Couldn't update the queue"
 msgstr "No se pudo actualizar la cola"
@@ -6227,6 +6258,13 @@ msgstr "Creando…"
 msgid "Creative Manager, Valid"
 msgstr "Director creativo, Valid"
 
+msgid "Creator"
+msgstr "Creador"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Creador: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "Las credenciales permanecen en el servidor"
 
@@ -6373,6 +6411,9 @@ msgstr "Datos y APIs"
 msgid "Data display"
 msgstr "Visualización de datos"
 
+msgid "Date"
+msgstr "Fecha"
+
 msgid "Date created"
 msgstr "Fecha de creación"
 
@@ -6381,6 +6422,9 @@ msgstr "Rango de fechas"
 
 msgid "Day"
 msgstr "Día"
+
+msgid "Day of the month"
+msgstr "Día del mes"
 
 msgid "Day One"
 msgstr "Día uno"
@@ -6468,6 +6512,7 @@ msgid "Delete “{title}”?"
 msgstr "¿Eliminar “{title}”?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "¿Eliminar {0}?"
@@ -6539,6 +6584,9 @@ msgstr "Eliminar el proyecto"
 msgid "Delete Project…"
 msgstr "Eliminar el proyecto…"
 
+msgid "Delete routine"
+msgstr "Eliminar rutina"
+
 msgid "Delete script"
 msgstr "Eliminar el script"
 
@@ -6564,11 +6612,18 @@ msgstr "¿Eliminar este comentario?"
 msgid "Delete this task?"
 msgstr "¿Eliminar esta tarea?"
 
+msgid "Delete this view?"
+msgstr "¿Eliminar esta vista?"
+
 msgid "Delete this workspace?"
 msgstr "¿Eliminar este espacio de trabajo?"
 
 msgid "Delete thread"
 msgstr "Eliminar el hilo"
+
+#. placeholder {0}: activeSavedView.name
+msgid "Delete view {0}"
+msgstr "Eliminar la vista {0}"
 
 msgid "Delete without checking"
 msgstr "Eliminar sin comprobar"
@@ -6980,6 +7035,9 @@ msgstr "descartó su revisión"
 msgid "Display"
 msgstr "Visualización"
 
+msgid "Display options"
+msgstr "Opciones de visualización"
+
 msgid "Display Size"
 msgstr "Tamaño de pantalla"
 
@@ -7217,6 +7275,9 @@ msgstr "p. ej. ingenieria"
 msgid "e.g. Engineering"
 msgstr "p. ej. Ingeniería"
 
+msgid "e.g. My cloud reviews"
+msgstr "p. ej. Mis revisiones en la nube"
+
 msgid "e.g. plan-budget"
 msgstr "p. ej., plan-budget"
 
@@ -7299,6 +7360,9 @@ msgstr "Editar en GitHub"
 
 msgid "Edit queued message"
 msgstr "Editar mensaje en cola"
+
+msgid "Edit routine"
+msgstr "Editar rutina"
 
 msgid "Edit Run Script"
 msgstr "Editar el script de ejecución"
@@ -7426,6 +7490,9 @@ msgstr "Activa el acceso remoto y mantén este ordenador activo con Paradev en e
 msgid "Enable skill"
 msgstr "Activar skill"
 
+msgid "End repeat"
+msgstr "Fin de la repetición"
+
 msgid "End voice session"
 msgstr "Terminar la sesión de voz"
 
@@ -7512,6 +7579,9 @@ msgstr "esc para descartar"
 
 msgid "esc to exit"
 msgstr "esc para salir"
+
+msgid "Event"
+msgstr "Evento"
 
 msgid "Event log"
 msgstr "Registro de eventos"
@@ -8365,9 +8435,6 @@ msgstr "Filtrar por revisiones"
 msgid "Filter by state"
 msgstr "Filtrar por estado"
 
-msgid "Filter by where workspaces run"
-msgstr "Filtrar por dónde se ejecutan los espacios de trabajo"
-
 msgid "Filter by workspace: {label}"
 msgstr "Filtrar por espacio de trabajo: {label}"
 
@@ -9067,6 +9134,9 @@ msgstr "Agrupar por"
 msgid "Group new branches under a folder."
 msgstr "Agrupa las ramas nuevas dentro de una carpeta."
 
+msgid "Grouping"
+msgstr "Agrupación"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "Arquitecto de GTM y automatización con IA, Mistral AI"
 
@@ -9262,6 +9332,9 @@ msgstr "Host"
 msgid "Host ID"
 msgstr "ID del host"
 
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
+
 msgid "Host is not online"
 msgstr "El host no está en línea"
 
@@ -9334,6 +9407,9 @@ msgstr "Las horas se comparten con todo tu equipo. Se calculan con un espacio de
 
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Las horas se calculan con un espacio de trabajo estándar de {vcpus} vCPU / {memoryGb} GB. Medimos GB-horas, la memoria de la máquina por las horas que funciona, así que una máquina con el doble de memoria consume las horas el doble de rápido."
+
+msgid "Hours between runs"
+msgstr "Horas entre ejecuciones"
 
 msgid "Hover Card"
 msgstr "Tarjeta al pasar el cursor"
@@ -9634,9 +9710,6 @@ msgstr "en una sesión nueva"
 msgid "in a terminal on this host."
 msgstr "en una terminal de este host."
 
-msgid "In all projects"
-msgstr "En todos los proyectos"
-
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Paradev como su IDE principal, en empresas como Wix, DoorDash y Netflix."
 
@@ -9857,6 +9930,9 @@ msgstr "Sin conexión a Internet"
 msgid "Interrupt"
 msgstr "Interrumpir"
 
+msgid "Interval"
+msgstr "Intervalo"
+
 msgid "Intro call"
 msgstr "Llamada de presentación"
 
@@ -9892,6 +9968,9 @@ msgstr "Solicitud no válida"
 
 msgid "Invalid state parameter. Please try again."
 msgstr "Parámetro de estado no válido. Inténtalo de nuevo."
+
+msgid "Investigate production logs and issues"
+msgstr "Investiga logs e incidencias de producción"
 
 msgid "Invitation canceled"
 msgstr "Invitación cancelada"
@@ -10218,6 +10297,9 @@ msgstr "Atajos de teclado"
 msgid "Keyboard Shortcuts"
 msgstr "Atajos de teclado"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel y Avi Peltz presentando en YC"
+
 msgid "Kill"
 msgstr "Terminar"
 
@@ -10304,6 +10386,9 @@ msgstr "Última actividad"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Última actividad del agente {0}"
+
+msgid "Last agent message"
+msgstr "Último mensaje del agente"
 
 msgid "Last attached"
 msgstr "Última conexión"
@@ -11570,6 +11655,9 @@ msgstr "Necesita atención"
 msgid "Needs input"
 msgstr "Necesita entrada"
 
+msgid "Needs me"
+msgstr "Me necesita"
+
 msgid "Needs tests"
 msgstr "Necesita pruebas"
 
@@ -11704,6 +11792,9 @@ msgstr "Terminal nueva"
 
 msgid "New Terminal"
 msgstr "Nueva terminal"
+
+msgid "New view"
+msgstr "Nueva vista"
 
 msgid "New window"
 msgstr "Nueva ventana"
@@ -12725,6 +12816,9 @@ msgstr "Activado"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "en {offScopeHostName}: no se ejecutará aquí"
 
+msgid "On a date"
+msgstr "En una fecha"
+
 msgid "On focus change"
 msgstr "Al cambiar el foco"
 
@@ -13037,6 +13131,9 @@ msgstr "Abrir la configuración de administrador de ChatGPT"
 
 msgid "Open ChatGPT settings"
 msgstr "Abrir ajustes de ChatGPT"
+
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Abrir las sesiones de Claude y Codex como chats"
 
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Abre las sesiones de Claude y Codex en un panel de chat en lugar de en una terminal."
@@ -13454,6 +13551,9 @@ msgstr "Chat de orquestación"
 
 msgid "Orchestration guide"
 msgstr "Guía de orquestación"
+
+msgid "Ordering"
+msgstr "Orden"
 
 msgid "Organization"
 msgstr "Organización"
@@ -14517,6 +14617,10 @@ msgstr "Icono del proyecto"
 msgid "Project imported and selected."
 msgstr "Proyecto importado y seleccionado."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Proyecto: {0}"
+
 msgid "Project is already at that location"
 msgstr "El proyecto ya está en esa ubicación"
 
@@ -15229,6 +15333,9 @@ msgstr "¿Quitar {repo}? Todos los plugins sincronizados desde él se quitan de 
 msgid "Remove attachment"
 msgstr "Quitar adjunto"
 
+msgid "Remove filter"
+msgstr "Quitar filtro"
+
 msgid "Remove from channel"
 msgstr "Quitar del canal"
 
@@ -15408,6 +15515,12 @@ msgstr "Reabriendo…"
 
 msgid "reorder agents"
 msgstr "reordenar los agentes"
+
+msgid "Repeat"
+msgstr "Repetir"
+
+msgid "Repeat routine"
+msgstr "Repetir rutina"
 
 msgid "Replace"
 msgstr "Reemplazar"
@@ -15972,14 +16085,26 @@ msgstr "Recopilaciones"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Enruta {label} a través de un proveedor que gestionas tú, con las credenciales que tienes. Los valores guardados se entregan al agente al iniciarse."
 
+msgid "Routine not found"
+msgstr "Rutina no encontrada"
+
+msgid "Routine options"
+msgstr "Opciones de la rutina"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tickets rutinarios sin intervención a mitad de la tarea"
+
+msgid "Routines"
+msgstr "Rutinas"
 
 msgid "Row actions"
 msgstr "Acciones de la fila"
 
 msgid "Rows changed"
 msgstr "Filas modificadas"
+
+msgid "Rule"
+msgstr "Regla"
 
 msgid "Run"
 msgstr "Ejecutar"
@@ -16124,6 +16249,9 @@ msgstr "Ejecuta un comando local en tu equipo"
 msgid "Runs appear here once an automation fires."
 msgstr "Las ejecuciones aparecen aquí cuando se activa una automatización."
 
+msgid "Runs in"
+msgstr "Se ejecuta en"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Se ejecuta dentro de la app de Paradev en ese dispositivo, así que actualizarlo implica actualizar la app allí."
 
@@ -16169,6 +16297,9 @@ msgstr "Guardar todo"
 msgid "Save as environment"
 msgstr "Guardar como entorno"
 
+msgid "Save as view"
+msgstr "Guardar como vista"
+
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
@@ -16201,6 +16332,9 @@ msgstr "Guarda para obtener la URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "Ahorra hasta un {maxDiscount}"
+
+msgid "Save view"
+msgstr "Guardar vista"
 
 msgid "Saved"
 msgstr "Guardado"
@@ -17134,9 +17268,6 @@ msgstr "Mostrar en el gráfico"
 msgid "Show in folder"
 msgstr "Mostrar en la carpeta"
 
-msgid "Show in text field"
-msgstr "Mostrar en el campo de texto"
-
 msgid "Show items in all states"
 msgstr "Mostrar elementos en todos los estados"
 
@@ -17930,6 +18061,10 @@ msgstr "Estado"
 msgid "Status changed"
 msgstr "Estado modificado"
 
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Estado: {0}"
+
 msgid "Stay connected (refresh tokens)"
 msgstr "Mantener la conexión (tokens de actualización)"
 
@@ -18711,6 +18846,9 @@ msgstr "Estamos llevando Paradev a Windows y Linux. Déjanos tu correo y te avis
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "La app de escritorio funciona en macOS, con un AppImage experimental para Linux; Windows todavía no está disponible. Además de la app de escritorio hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Paradev desde scripts, terminales y otros agentes. Una app para iPhone y iPad en la App Store te permite consultar el estado de tus agentes y revisar sus diffs lejos de tu escritorio."
 
+msgid "The Dev can't post there."
+msgstr "El Dev no puede publicar allí."
+
 msgid "The device that hosts this project is unavailable."
 msgstr "El dispositivo que aloja este proyecto no está disponible."
 
@@ -19329,6 +19467,12 @@ msgstr "Esto sustituye su etiqueta, comando, argumentos, ajustes de prompt y rea
 msgid "This repository does not allow merging from here."
 msgstr "Este repositorio no permite fusionar desde aquí."
 
+msgid "This schedule has no runs left."
+msgstr "Esta programación no tiene más ejecuciones."
+
+msgid "This schedule isn't valid."
+msgstr "Esta programación no es válida."
+
 msgid "This screen doesn't exist"
 msgstr "Esta pantalla no existe"
 
@@ -19398,6 +19542,9 @@ msgstr "Esto desconectará GitHub de tu organización. La GitHub App seguirá in
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Esto terminará todas las sesiones en marcha y reiniciará el daemon de terminal. La app reiniciará las terminales con un daemon nuevo."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Esto eliminará la rutina de forma permanente y detendrá las ejecuciones futuras."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Esto eliminará este archivo de forma permanente. Esta acción no se puede deshacer."
@@ -19485,6 +19632,9 @@ msgstr "Nivel"
 
 msgid "Time"
 msgstr "Tiempo"
+
+msgid "Time zone"
+msgstr "Zona horaria"
 
 msgid "Tinted"
 msgstr "Tintado"
@@ -19992,6 +20142,9 @@ msgstr "Autor desconocido"
 msgid "Unknown command /{name}"
 msgstr "Comando desconocido /{name}"
 
+msgid "Unknown creator"
+msgstr "Creador desconocido"
+
 msgid "Unknown device"
 msgstr "Dispositivo desconocido"
 
@@ -20009,6 +20162,9 @@ msgstr "Panel desconocido"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Tipo de panel desconocido: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Persona desconocida"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -20121,6 +20277,9 @@ msgstr "A continuación"
 
 msgid "Up Next"
 msgstr "A continuación"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "Hasta {MAX_SAVED_VIEWS} vistas guardadas"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Hasta 25. Una ejecución empieza cuando salta cualquiera de ellos."
@@ -20507,6 +20666,9 @@ msgstr "Ver el log"
 
 msgid "View more"
 msgstr "Ver más"
+
+msgid "View name"
+msgstr "Nombre de la vista"
 
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
@@ -21070,9 +21232,6 @@ msgstr "Detalles del espacio de trabajo"
 msgid "Workspace ID copied"
 msgstr "ID del espacio de trabajo copiado"
 
-msgid "Workspace layout"
-msgstr "Diseño del espacio de trabajo"
-
 msgid "Workspace name"
 msgstr "Nombre del espacio de trabajo"
 
@@ -21108,6 +21267,9 @@ msgstr "Ejecución del espacio de trabajo: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Configuración del espacio de trabajo"
+
+msgid "Workspace views"
+msgstr "Vistas de espacios de trabajo"
 
 msgid "Workspace worktree not available"
 msgstr "El worktree del espacio de trabajo no está disponible"

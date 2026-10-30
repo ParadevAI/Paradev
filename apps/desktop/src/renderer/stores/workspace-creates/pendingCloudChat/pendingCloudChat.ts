@@ -32,7 +32,6 @@ export function seedPendingCloudChat({
 	workspaceId,
 	launch,
 	prompt,
-	chatEnabled,
 	modelId,
 	modeId,
 }: {
@@ -40,11 +39,10 @@ export function seedPendingCloudChat({
 	workspaceId: string;
 	launch: CloudAgentLaunchDescriptor | null | undefined;
 	prompt?: string;
-	chatEnabled: boolean;
 	modelId?: string | null;
 	modeId?: string | null;
 }): void {
-	if (!chatEnabled || launch?.surface !== "chat" || !launch.promptHash) return;
+	if (launch?.surface !== "chat" || !launch.promptHash) return;
 	const existing = collections.v2WorkspaceLocalState.get(workspaceId)
 		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
 	if (existing?.tabs.length) return;

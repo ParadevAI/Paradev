@@ -6,9 +6,10 @@ import {
 	ACCOUNT_DELETION_GRACE_DAYS,
 	COMPANY,
 } from "@superset/shared/constants";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, Switch, View } from "react-native";
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -21,10 +22,15 @@ import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
+import { apiClient } from "@/lib/trpc/client";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
+import {
+	USER_SETTINGS_QUERY_KEY,
+	useAcpChatEnabled,
+} from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
@@ -50,10 +56,23 @@ export function SettingsScreen() {
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
 	const { data: session } = useSession();
+	const queryClient = useQueryClient();
 	const { activeOrganization, activeOrganizationId } = useOrganizations();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
+	const savedAcpChatEnabled = useAcpChatEnabled();
+	const updateExperimentalChat = useMutation({
+		mutationFn: (enabled: boolean) =>
+			apiClient.userSettings.update.mutate({ experimentalChat: enabled }),
+		onSuccess: (settings) =>
+			queryClient.setQueryData(USER_SETTINGS_QUERY_KEY, settings),
+		onError: () =>
+			Alert.alert(t({ message: "Couldn't update the Chat setting" })),
+	});
+	const acpChatEnabled = updateExperimentalChat.isPending
+		? updateExperimentalChat.variables
+		: savedAcpChatEnabled;
 
 	const user = session?.user;
 	const plan = session?.session.plan;
@@ -325,6 +344,33 @@ export function SettingsScreen() {
 						})}
 						trailing={<ListRowValue value={planLabel} />}
 						onPress={handleManagePlan}
+						isLast
+					/>
+				</SettingsSection>
+
+				<SettingsSection label={t({ message: "Experimental" })}>
+					<ListRow
+						icon={
+							<Ionicons
+								name="chatbubbles-outline"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "Chat" })}
+						subtitle={t({
+							message: "Open Claude and Codex sessions as chats",
+						})}
+						trailing={
+							<Switch
+								value={acpChatEnabled}
+								disabled={updateExperimentalChat.isPending}
+								onValueChange={(enabled) =>
+									updateExperimentalChat.mutate(enabled)
+								}
+								accessibilityLabel={t({ message: "Chat" })}
+							/>
+						}
 						isLast
 					/>
 				</SettingsSection>

@@ -513,6 +513,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "sazabi",
+		version: "1.0.0",
+		description: "Investigate production logs and issues",
+		interface: { displayName: "Sazabi", category: "Developer tools" },
+		mcpServers: {
+			sazabi: { type: "http", url: "https://mcp.sazabi.com/mcp" },
+		},
+	},
+	{
 		name: "superhuman",
 		version: "1.0.0",
 		description: "Search and manage your email",

@@ -14,6 +14,7 @@ const pullRequestInput = z.object({
 	number: z.number().int().positive(),
 });
 const body = z.string().trim().min(1).max(65536);
+const MISSING_LOGIN_TTL_MS = 30_000;
 
 /**
  * Pull requests as the person at this machine, with their own GitHub login
@@ -28,7 +29,19 @@ export function createViewerGithubRouter(
 	> = new LocalGitCredentialProvider(),
 	clientFor: (token: string) => Octokit = (token) =>
 		new Octokit({ auth: token }),
+	now: () => number = () => performance.now(),
 ) {
+	// Each miss spawns `git credential fill` and `gh auth token`, and PR panes
+	// ask on every poll.
+	let missingSince: number | null = null;
+	async function isAvailable(): Promise<boolean> {
+		if (missingSince !== null && now() - missingSince < MISSING_LOGIN_TTL_MS)
+			return false;
+		const available = Boolean(await credentials.getToken("github.com"));
+		missingSince = available ? null : now();
+		return available;
+	}
+
 	async function onGithub<T>(
 		input: z.infer<typeof pullRequestInput>,
 		fallback: string,
@@ -65,7 +78,7 @@ export function createViewerGithubRouter(
 
 	return router({
 		status: publicProcedure.query(async () => ({
-			available: Boolean(await credentials.getToken("github.com")),
+			available: await isAvailable(),
 		})),
 
 		getPullRequestDetail: publicProcedure

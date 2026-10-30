@@ -730,11 +730,11 @@ describe("validateAgentEffortSelection", () => {
 			validateAgentEffortSelection("codex", "Codex", "ultra", "gpt-5.6-sol"),
 		).not.toThrow();
 		try {
-			validateAgentEffortSelection("codex", "Codex", "ultra", "gpt-5.5");
+			validateAgentEffortSelection("codex", "Codex", "ultra", "gpt-6-luna");
 			throw new Error("Expected validation to fail");
 		} catch (error) {
 			expect((error as Error).message).toBe(
-				'Unsupported reasoning effort "ultra" for Codex with model gpt-5.5. Choose one of: low, medium, high, xhigh.',
+				'Unsupported reasoning effort "ultra" for Codex with model gpt-6-luna. Choose one of: low, medium, high, xhigh, max.',
 			);
 		}
 	});

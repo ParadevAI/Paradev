@@ -5,7 +5,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { memo, type ReactNode, useEffect, useState } from "react";
-import { CgLaptop } from "react-icons/cg";
 import {
 	LuArchive,
 	LuArchiveRestore,
@@ -28,6 +27,7 @@ import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2
 import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceOwnerAvatar";
 import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/hasLiveWorkspaceState";
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
@@ -92,11 +92,10 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	workspace,
 	isCurrentRoute,
 }: V2WorkspaceRowProps) {
-	const { formatCompactRelativeTime, formatDateTime } = useFormat();
+	const { formatDateTime, formatAge } = useFormat();
 
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const isLocalWorkspace = workspace.type === "local";
 	const isCloud = workspace.hostType === "cloud";
 	const isArchived = workspace.archivedAt != null;
 	// The local device is the one running this app — it can't be offline from
@@ -126,7 +125,8 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 
 	// The visible age tracks activity (matches the sort); creation and
 	// last-agent-event details live in the tooltip.
-	const timeLabel = formatCompactRelativeTime(workspaceActivityAt(workspace));
+	const timeLabel = formatAge(workspaceActivityAt(workspace));
+	const showsLiveState = hasLiveWorkspaceState(workspace);
 	const createdAtLabel = formatDateTime(workspace.createdAt, undefined);
 	const timeTitle = [
 		creatorLabel
@@ -256,63 +256,43 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							: "hover:bg-accent/50 focus-visible:bg-accent/50",
 					)}
 				>
-					<WorkspaceStateGlyph workspace={workspace} />
-
-					{isLocalWorkspace ? (
-						<Tooltip delayDuration={300}>
-							<TooltipTrigger asChild>
-								{/* The wrapping span (not the icon itself — react-icons
-								    treats a `title` prop as an SVG <title> child, not an
-								    HTML attribute, so it can't block inheritance) carries
-								    an empty title to stop it from inheriting the row's
-								    title (PR/branch); without it, hovering this icon fires
-								    both the native tooltip and this Radix one at once. */}
-								<span title="">
-									<CgLaptop
-										className="size-3.5 shrink-0 text-muted-foreground"
-										aria-label={t({
-											message: "Local workspace",
-										})}
-									/>
-								</span>
-							</TooltipTrigger>
-							<TooltipContent side="top">
-								<Trans>Local workspace</Trans>
-							</TooltipContent>
-						</Tooltip>
-					) : null}
-
-					<WorkspaceNameMarquee
-						name={workspace.name}
-						forceActive={isFocused}
-						className={cn(
-							"min-w-0 flex-1 font-medium",
-							// Done and dead states recede so live work owns the contrast.
-							isArchived ||
-								workspace.pr?.state === "merged" ||
-								workspace.sandboxStatus === "failed"
-								? "text-muted-foreground"
-								: "text-foreground",
-						)}
-					/>
-
-					<span
-						className="flex w-32 shrink-0 items-center gap-1.5 text-xs text-muted-foreground @max-3xl:hidden"
-						title={workspace.projectName ?? t({ message: "Session" })}
-					>
-						<V2WorkspaceProjectIcon
-							projectName={workspace.projectName ?? t({ message: "Session" })}
-							iconUrl={workspace.projectIconUrl}
-							size="sm"
-							className="size-4 rounded-sm text-[9px]"
+					{/* Name and creator travel together: the avatar hugs the text
+					    instead of drifting to the far end of the flexible cell. */}
+					<span className="flex min-w-0 flex-1 items-center gap-2">
+						<WorkspaceNameMarquee
+							name={workspace.name}
+							forceActive={isFocused}
+							className={cn(
+								"min-w-0 font-medium",
+								// Done and dead states recede so live work owns the contrast.
+								isArchived ||
+									workspace.pr?.state === "merged" ||
+									workspace.sandboxStatus === "failed"
+									? "text-muted-foreground"
+									: "text-foreground",
+							)}
 						/>
-						<span className="min-w-0 truncate">
-							{workspace.projectName ?? <Trans>Session</Trans>}
-						</span>
-					</span>
-
-					<span className="flex w-4 shrink-0 items-center justify-center">
 						<WorkspaceOwnerAvatar workspace={workspace} />
+						{/* Place mark, as the old row had it: cloud, or another device
+						    (crossed out while it is offline). This device shows nothing. */}
+						{workspace.hostType !== "local-device" ? (
+							<span
+								title={whereLabel}
+								className={cn(
+									"flex shrink-0 items-center text-muted-foreground/70",
+									isDeviceOffline && "text-muted-foreground/50",
+								)}
+							>
+								{isCloud ? (
+									<CloudGlyph className="size-3.5" />
+								) : isDeviceOffline ? (
+									<LuMonitorOff className="size-3.5" strokeWidth={2} />
+								) : (
+									<LuMonitor className="size-3.5" strokeWidth={2} />
+								)}
+								<span className="sr-only">{whereLabel}</span>
+							</span>
+						) : null}
 					</span>
 
 					{workspace.pr ? (
@@ -339,9 +319,9 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							aria-label={t({
 								message: `Pull request #${workspace.pr.prNumber}, ${workspace.pr.state}`,
 							})}
-							className="flex shrink-0 items-center gap-1 rounded text-[11px] tabular-nums text-muted-foreground hover:text-foreground"
+							className="flex h-[18px] shrink-0 items-center gap-1 rounded-[6px] bg-foreground/[0.06] px-1.5 text-xs font-medium leading-4 tabular-nums text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
 						>
-							<PRIcon state={workspace.pr.state} className="size-3.5" />
+							<PRIcon state={workspace.pr.state} className="size-3" />
 							<span className="@max-2xl:hidden">#{workspace.pr.prNumber}</span>
 							<WorkspaceChecksDot
 								status={workspace.pr.checksStatus}
@@ -371,37 +351,42 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 						</span>
 					) : null}
 
-					{/* Where + age; hover swaps in the row's actions in place, so
-					    the slot keeps one width either way. */}
-					<span className="grid w-[4.5rem] shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+					<span
+						className="flex max-w-32 shrink-0 items-center gap-1.5 text-xs text-muted-foreground @max-3xl:hidden"
+						title={workspace.projectName ?? t({ message: "Session" })}
+					>
+						<V2WorkspaceProjectIcon
+							projectName={workspace.projectName ?? t({ message: "Session" })}
+							iconUrl={workspace.projectIconUrl}
+							size="sm"
+							className="size-4 rounded-sm text-[9px]"
+						/>
+						<span className="min-w-0 truncate">
+							{workspace.projectName ?? <Trans>Session</Trans>}
+						</span>
+					</span>
+
+					{/* The cloud tab's trailing cell: a live status glyph while
+					    something runs or waits, the age otherwise. Hover swaps in
+					    the row's actions in place, so the slot keeps one width. */}
+					<span className="grid w-[3.25rem] shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
 						<span
 							className={cn(
-								"flex items-center gap-1.5 text-xs text-muted-foreground",
+								"flex items-center text-xs text-muted-foreground",
 								"group-hover:invisible group-focus-within:invisible",
 								isDeviceOffline && "text-muted-foreground/60",
 							)}
 						>
-							{workspace.hostType !== "local-device" ? (
+							{showsLiveState ? (
+								<WorkspaceStateGlyph workspace={workspace} />
+							) : (
 								<span
-									title={whereLabel}
-									className="flex shrink-0 items-center text-muted-foreground/70"
+									className="whitespace-nowrap tabular-nums"
+									title={timeTitle}
 								>
-									{isCloud ? (
-										<CloudGlyph className="size-3" />
-									) : isDeviceOffline ? (
-										<LuMonitorOff className="size-3" strokeWidth={2} />
-									) : (
-										<LuMonitor className="size-3" strokeWidth={2} />
-									)}
-									<span className="sr-only">{whereLabel}</span>
+									{timeLabel}
 								</span>
-							) : null}
-							<span
-								className="whitespace-nowrap tabular-nums"
-								title={timeTitle}
-							>
-								{timeLabel}
-							</span>
+							)}
 						</span>
 						<span className="hidden items-center gap-1 group-hover:flex group-focus-within:flex">
 							{renderHoverActions(actions)}

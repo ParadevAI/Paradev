@@ -99,13 +99,23 @@ export function ThreadPane({
 	}, [canMark, pendingSeq, messageId, applyThreadRead, markReadMutate]);
 	const markNowRef = useRef(markNow);
 	markNowRef.current = markNow;
+	const returnedReadSeq =
+		!manualUnread && unread?.firstUnread && followState
+			? followState.lastReadSeq
+			: null;
+	const onReturn = () => {
+		if (returnedReadSeq !== null) setGhost(returnedReadSeq);
+		markNow();
+	};
+	const onReturnRef = useRef(onReturn);
+	onReturnRef.current = onReturn;
 	useEffect(() => {
 		if (!canMark) return;
 		const timer = setTimeout(() => markNowRef.current(), MARK_READ_DELAY_MS);
 		return () => clearTimeout(timer);
 	}, [canMark]);
 	useEffect(() => {
-		const onFocus = () => markNowRef.current();
+		const onFocus = () => onReturnRef.current();
 		window.addEventListener("focus", onFocus);
 		return () => window.removeEventListener("focus", onFocus);
 	}, []);

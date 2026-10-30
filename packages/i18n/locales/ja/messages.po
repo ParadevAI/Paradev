@@ -37,6 +37,10 @@ msgstr ".sh"
 msgid "· updated {updatedAgo}"
 msgstr "· {updatedAgo}に更新"
 
+#. placeholder {0}: activeSavedView.name
+msgid "“{0}” and its filters are removed. The workspaces are not affected."
+msgstr "「{0}」とそのフィルターが削除されます。ワークスペースには影響しません。"
+
 #. placeholder {0}: automation.name
 msgid "\"{0}\" deleted"
 msgstr "「{0}」を削除しました"
@@ -194,7 +198,7 @@ msgstr "{0, plural, one {#件保留中} other {#件保留中}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# 人}}"
 
@@ -203,7 +207,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {#件のプロジェクトを選択中。} other {#件のプロジェクトを選択中。}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェクト}}"
 
@@ -1513,9 +1516,6 @@ msgstr "1件のCookie — このサイトを削除"
 msgid "1 hr"
 msgstr "1時間"
 
-msgid "1 person"
-msgstr "1人"
-
 msgid "1 user"
 msgstr "1ユーザー"
 
@@ -1713,6 +1713,12 @@ msgstr "エージェントを操作するためのチャット画面を作り直
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "リポジトリがこの組織に接続されていないか、リポジトリが異なる GitHub インストールに属しています"
 
+msgid "A routine can run at most once an hour."
+msgstr "ルーティンは1時間に1回までしか実行できません。"
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "ルーティンにはスケジュールか監視対象が必要です。"
+
 msgid "A run for this automation is already in progress."
 msgstr "このオートメーションの実行はすでに進行中です。"
 
@@ -1731,6 +1737,10 @@ msgstr "タスクキーは英字で始まる 1〜5 文字の英数字です。"
 
 msgid "a teammate"
 msgstr "チームメンバー"
+
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "#{0} のスレッド"
 
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "組織の一意の識別子(名前から自動生成)"
@@ -1884,6 +1894,9 @@ msgstr "説明を追加"
 
 msgid "Add a description…"
 msgstr "説明を追加…"
+
+msgid "Add a filter"
+msgstr "フィルターを追加"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "プロジェクト設定でライフサイクルの実行スクリプトを追加するか、ターミナルスクリプトをワークスペース実行に指定してください。"
@@ -2866,6 +2879,9 @@ msgstr "アーカイブ済み · {0}"
 msgid "Archived {0}"
 msgstr "アーカイブ済み {0}"
 
+msgid "Archived shown"
+msgstr "アーカイブ済みを表示中"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "このファイルを削除してもよろしいですか?この操作は元に戻せません。"
 
@@ -3184,6 +3200,9 @@ msgstr "Avatar(アトム)"
 
 msgid "Avatar updated!"
 msgstr "アバターを更新しました!"
+
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "YC Demo Day での Avi Peltz、Satya Patel、Kiet Ho"
 
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
@@ -3725,6 +3744,9 @@ msgstr "アプリ全体のtooltipを統一できますか?"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}を確認できません"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "現在のワークスペースのセクションは折りたためません"
 
 msgid "Can't connect right now"
 msgstr "現在接続できません"
@@ -5685,6 +5707,9 @@ msgstr "新しい worktree へ分岐できませんでした"
 msgid "Couldn't branch the conversation"
 msgstr "会話を分岐できませんでした"
 
+msgid "Couldn't change the routine"
+msgstr "ルーティンを変更できませんでした"
+
 msgid "Couldn't check"
 msgstr "確認できませんでした"
 
@@ -5867,6 +5892,9 @@ msgstr "変更を保存できませんでした"
 msgid "Couldn't save the Dev"
 msgstr "Devを保存できませんでした"
 
+msgid "Couldn't save the routine"
+msgstr "ルーティンを保存できませんでした"
+
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 
@@ -5938,6 +5966,9 @@ msgstr "ファイルをステージ解除できませんでした"
 
 msgid "Couldn't update pull request"
 msgstr "プルリクエストを更新できませんでした"
+
+msgid "Couldn't update the Chat setting"
+msgstr "チャットの設定を更新できませんでした"
 
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
@@ -6227,6 +6258,13 @@ msgstr "作成中…"
 msgid "Creative Manager, Valid"
 msgstr "クリエイティブマネージャー、Valid"
 
+msgid "Creator"
+msgstr "作成者"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "作成者: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "認証情報はサーバー上に保持されます"
 
@@ -6373,6 +6411,9 @@ msgstr "データとAPI"
 msgid "Data display"
 msgstr "データ表示"
 
+msgid "Date"
+msgstr "日付"
+
 msgid "Date created"
 msgstr "作成日"
 
@@ -6381,6 +6422,9 @@ msgstr "期間"
 
 msgid "Day"
 msgstr "日"
+
+msgid "Day of the month"
+msgstr "日にち"
 
 msgid "Day One"
 msgstr "デイワン"
@@ -6468,6 +6512,7 @@ msgid "Delete “{title}”?"
 msgstr "「{title}」を削除しますか?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "{0}を削除しますか?"
@@ -6539,6 +6584,9 @@ msgstr "プロジェクトを削除"
 msgid "Delete Project…"
 msgstr "プロジェクトを削除…"
 
+msgid "Delete routine"
+msgstr "ルーティンを削除"
+
 msgid "Delete script"
 msgstr "スクリプトを削除"
 
@@ -6564,11 +6612,18 @@ msgstr "このコメントを削除しますか？"
 msgid "Delete this task?"
 msgstr "このタスクを削除しますか？"
 
+msgid "Delete this view?"
+msgstr "このビューを削除しますか？"
+
 msgid "Delete this workspace?"
 msgstr "このワークスペースを削除しますか?"
 
 msgid "Delete thread"
 msgstr "スレッドを削除"
+
+#. placeholder {0}: activeSavedView.name
+msgid "Delete view {0}"
+msgstr "ビュー {0} を削除"
 
 msgid "Delete without checking"
 msgstr "確認せずに削除"
@@ -6980,6 +7035,9 @@ msgstr "がレビューを取り下げました"
 msgid "Display"
 msgstr "表示"
 
+msgid "Display options"
+msgstr "表示オプション"
+
 msgid "Display Size"
 msgstr "表示サイズ"
 
@@ -7217,6 +7275,9 @@ msgstr "例: engineering"
 msgid "e.g. Engineering"
 msgstr "例: Engineering"
 
+msgid "e.g. My cloud reviews"
+msgstr "例: クラウドのレビュー"
+
 msgid "e.g. plan-budget"
 msgstr "例: plan-budget"
 
@@ -7299,6 +7360,9 @@ msgstr "GitHubで編集"
 
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
+
+msgid "Edit routine"
+msgstr "ルーティンを編集"
 
 msgid "Edit Run Script"
 msgstr "実行スクリプトを編集"
@@ -7426,6 +7490,9 @@ msgstr "リモートアクセスを有効にし、Paradevを起動したまま�
 msgid "Enable skill"
 msgstr "スキルを有効にする"
 
+msgid "End repeat"
+msgstr "繰り返しの終了"
+
 msgid "End voice session"
 msgstr "音声セッションを終了"
 
@@ -7512,6 +7579,9 @@ msgstr "escで閉じる"
 
 msgid "esc to exit"
 msgstr "escで終了"
+
+msgid "Event"
+msgstr "イベント"
 
 msgid "Event log"
 msgstr "イベントログ"
@@ -8365,9 +8435,6 @@ msgstr "レビューで絞り込む"
 msgid "Filter by state"
 msgstr "状態で絞り込む"
 
-msgid "Filter by where workspaces run"
-msgstr "ワークスペースの実行場所で絞り込む"
-
 msgid "Filter by workspace: {label}"
 msgstr "ワークスペースで絞り込み: {label}"
 
@@ -9067,6 +9134,9 @@ msgstr "グループ化"
 msgid "Group new branches under a folder."
 msgstr "新しいブランチをフォルダにまとめます。"
 
+msgid "Grouping"
+msgstr "グループ化"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM・AI自動化アーキテクト、Mistral AI"
 
@@ -9262,6 +9332,9 @@ msgstr "ホスト"
 msgid "Host ID"
 msgstr "ホストID"
 
+msgid "Host is {whereLabel}"
+msgstr "ホスト: {whereLabel}"
+
 msgid "Host is not online"
 msgstr "ホストがオンラインではありません"
 
@@ -9334,6 +9407,9 @@ msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU /
 
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "時間は標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしています。計測単位は GB 時間（マシンのメモリ × 稼働時間）なので、メモリが 2 倍のマシンは時間を 2 倍の速さで消費します。"
+
+msgid "Hours between runs"
+msgstr "実行の間隔（時間）"
 
 msgid "Hover Card"
 msgstr "Hover Card"
@@ -9634,9 +9710,6 @@ msgstr "新しいセッションで"
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
 
-msgid "In all projects"
-msgstr "すべてのプロジェクト"
-
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
 
@@ -9857,6 +9930,9 @@ msgstr "インターネットが切断されています"
 msgid "Interrupt"
 msgstr "中断"
 
+msgid "Interval"
+msgstr "間隔"
+
 msgid "Intro call"
 msgstr "カジュアル面談"
 
@@ -9892,6 +9968,9 @@ msgstr "無効なリクエスト"
 
 msgid "Invalid state parameter. Please try again."
 msgstr "stateパラメーターが無効です。もう一度お試しください。"
+
+msgid "Investigate production logs and issues"
+msgstr "本番環境のログと問題を調査"
 
 msgid "Invitation canceled"
 msgstr "招待をキャンセルしました"
@@ -10218,6 +10297,9 @@ msgstr "キーボードショートカット"
 msgid "Keyboard Shortcuts"
 msgstr "キーボードショートカット"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "YC でプレゼンする Kiet Ho、Satya Patel、Avi Peltz"
+
 msgid "Kill"
 msgstr "終了"
 
@@ -10304,6 +10386,9 @@ msgstr "最終アクティビティ"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "エージェントの最終アクティビティ {0}"
+
+msgid "Last agent message"
+msgstr "最後のエージェントメッセージ"
 
 msgid "Last attached"
 msgstr "最終接続"
@@ -11570,6 +11655,9 @@ msgstr "要対応"
 msgid "Needs input"
 msgstr "入力待ち"
 
+msgid "Needs me"
+msgstr "自分の対応が必要"
+
 msgid "Needs tests"
 msgstr "テストが必要"
 
@@ -11704,6 +11792,9 @@ msgstr "新しいターミナル"
 
 msgid "New Terminal"
 msgstr "新規ターミナル"
+
+msgid "New view"
+msgstr "新しいビュー"
 
 msgid "New window"
 msgstr "新規ウィンドウ"
@@ -12725,6 +12816,9 @@ msgstr "オン"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName}上 — ここでは実行されません"
 
+msgid "On a date"
+msgstr "指定日"
+
 msgid "On focus change"
 msgstr "フォーカス変更時"
 
@@ -13037,6 +13131,9 @@ msgstr "ChatGPT の管理者設定を開く"
 
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT の設定を開く"
+
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Claude と Codex のセッションをチャットとして開く"
 
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Claude と Codex のセッションをターミナルではなくチャットペインで開きます。"
@@ -13454,6 +13551,9 @@ msgstr "オーケストレーションチャット"
 
 msgid "Orchestration guide"
 msgstr "オーケストレーションガイド"
+
+msgid "Ordering"
+msgstr "並び順"
 
 msgid "Organization"
 msgstr "組織"
@@ -14517,6 +14617,10 @@ msgstr "プロジェクトアイコン"
 msgid "Project imported and selected."
 msgstr "プロジェクトをインポートして選択しました。"
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "プロジェクト: {0}"
+
 msgid "Project is already at that location"
 msgstr "プロジェクトはすでにその場所にあります"
 
@@ -15229,6 +15333,9 @@ msgstr "{repo} を削除しますか？このリポジトリから同期され�
 msgid "Remove attachment"
 msgstr "添付ファイルを削除"
 
+msgid "Remove filter"
+msgstr "フィルターを削除"
+
 msgid "Remove from channel"
 msgstr "チャンネルから削除"
 
@@ -15408,6 +15515,12 @@ msgstr "再オープン中…"
 
 msgid "reorder agents"
 msgstr "エージェントを並べ替える"
+
+msgid "Repeat"
+msgstr "繰り返し"
+
+msgid "Repeat routine"
+msgstr "ルーティンを繰り返す"
 
 msgid "Replace"
 msgstr "置き換える"
@@ -15972,14 +16085,26 @@ msgstr "まとめ"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "自分で運用するプロバイダーと自分が持つ認証情報を使って{label}を経由させます。保存した値は起動時にエージェントへ渡されます。"
 
+msgid "Routine not found"
+msgstr "ルーティンが見つかりません"
+
+msgid "Routine options"
+msgstr "ルーティンのオプション"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "途中の介入なしで完了する定型チケット"
+
+msgid "Routines"
+msgstr "ルーティン"
 
 msgid "Row actions"
 msgstr "行の操作"
 
 msgid "Rows changed"
 msgstr "行の変更"
+
+msgid "Rule"
+msgstr "ルール"
 
 msgid "Run"
 msgstr "実行"
@@ -16124,6 +16249,9 @@ msgstr "マシン上でローカルコマンドを実行します"
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
 
+msgid "Runs in"
+msgstr "実行場所"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "そのデバイスのParadevアプリ内で動作しているため、更新するにはそのデバイスのアプリを更新する必要があります。"
 
@@ -16169,6 +16297,9 @@ msgstr "すべて保存"
 msgid "Save as environment"
 msgstr "環境として保存"
 
+msgid "Save as view"
+msgstr "ビューとして保存"
+
 msgid "Save Changes"
 msgstr "変更を保存"
 
@@ -16201,6 +16332,9 @@ msgstr "保存するとURLが表示されます"
 
 msgid "Save up to {maxDiscount}"
 msgstr "最大{maxDiscount}お得"
+
+msgid "Save view"
+msgstr "ビューを保存"
 
 msgid "Saved"
 msgstr "保存済み"
@@ -17134,9 +17268,6 @@ msgstr "チャートに表示"
 msgid "Show in folder"
 msgstr "フォルダに表示"
 
-msgid "Show in text field"
-msgstr "テキスト欄に表示"
-
 msgid "Show items in all states"
 msgstr "すべての状態の項目を表示"
 
@@ -17930,6 +18061,10 @@ msgstr "ステータス"
 msgid "Status changed"
 msgstr "ステータス変更"
 
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "ステータス: {0}"
+
 msgid "Stay connected (refresh tokens)"
 msgstr "接続の維持(リフレッシュトークン)"
 
@@ -18711,6 +18846,9 @@ msgstr "デスクトップアプリは現在macOSとLinuxに対応していま�
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "デスクトップアプリはmacOSで動作し、Linux向けには実験的なAppImageがあります。Windowsはまだ利用できません。デスクトップアプリのほかにCLI、TypeScript SDK、MCPサーバーがあるので、スクリプトやターミナル、他のエージェントからParadevを操作できます。App StoreのiPhone・iPadアプリを使えば、デスクを離れていてもエージェントの状況を確認し、差分をレビューできます。"
 
+msgid "The Dev can't post there."
+msgstr "Dev はそこに投稿できません。"
+
 msgid "The device that hosts this project is unavailable."
 msgstr "このプロジェクトをホストするデバイスが利用できません。"
 
@@ -19329,6 +19467,12 @@ msgstr "ラベル、コマンド、引数、プロンプトと再開設定、環
 msgid "This repository does not allow merging from here."
 msgstr "このリポジトリはここからのマージを許可していません。"
 
+msgid "This schedule has no runs left."
+msgstr "このスケジュールには残りの実行がありません。"
+
+msgid "This schedule isn't valid."
+msgstr "このスケジュールは無効です。"
+
 msgid "This screen doesn't exist"
 msgstr "この画面は存在しません"
 
@@ -19398,6 +19542,9 @@ msgstr "組織からGitHubの接続を解除します。GitHub Appはインス�
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "実行中のすべてのセッションを終了し、ターミナルデーモンを再起動します。アプリは新しいデーモンでターミナルを再起動します。"
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "ルーティンは完全に削除され、今後の実行は停止します。"
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "このファイルを完全に削除します。この操作は元に戻せません。"
@@ -19485,6 +19632,9 @@ msgstr "ティア"
 
 msgid "Time"
 msgstr "時間"
+
+msgid "Time zone"
+msgstr "タイムゾーン"
 
 msgid "Tinted"
 msgstr "色合い調整"
@@ -19992,6 +20142,9 @@ msgstr "不明な作成者"
 msgid "Unknown command /{name}"
 msgstr "不明なコマンド /{name}"
 
+msgid "Unknown creator"
+msgstr "不明な作成者"
+
 msgid "Unknown device"
 msgstr "不明なデバイス"
 
@@ -20009,6 +20162,9 @@ msgstr "不明なペイン"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "不明なペインの種類: {paneKind}"
+
+msgid "Unknown person"
+msgstr "不明なユーザー"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -20121,6 +20277,9 @@ msgstr "次の実行"
 
 msgid "Up Next"
 msgstr "次に着手"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "保存できるビューは {MAX_SAVED_VIEWS} 個まで"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "最大25個です。どれか1つが発火すると実行が始まります。"
@@ -20507,6 +20666,9 @@ msgstr "ログを表示"
 
 msgid "View more"
 msgstr "もっと見る"
+
+msgid "View name"
+msgstr "ビュー名"
 
 msgid "View on GitHub"
 msgstr "GitHubで表示"
@@ -21070,9 +21232,6 @@ msgstr "ワークスペースの詳細"
 msgid "Workspace ID copied"
 msgstr "ワークスペースIDをコピーしました"
 
-msgid "Workspace layout"
-msgstr "ワークスペースのレイアウト"
-
 msgid "Workspace name"
 msgstr "ワークスペース名"
 
@@ -21108,6 +21267,9 @@ msgstr "ワークスペース実行: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "ワークスペース設定"
+
+msgid "Workspace views"
+msgstr "ワークスペースのビュー"
 
 msgid "Workspace worktree not available"
 msgstr "ワークスペースのworktreeを利用できません"
