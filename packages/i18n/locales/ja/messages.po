@@ -6562,7 +6562,7 @@ msgstr "このワークスペースを削除しますか?"
 msgid "Delete thread"
 msgstr "スレッドを削除"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "ビュー {0} を削除"
 
@@ -11567,7 +11567,7 @@ msgid "Needs input"
 msgstr "入力待ち"
 
 msgid "Needs me"
-msgstr "要対応"
+msgstr "自分の対応が必要"
 
 msgid "Needs tests"
 msgstr "テストが必要"

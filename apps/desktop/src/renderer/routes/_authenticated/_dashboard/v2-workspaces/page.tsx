@@ -2,6 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useDeferredValue, useEffect, useMemo, useRef } from "react";
 import { V2WorkspacesBoard } from "./components/V2WorkspacesBoard";
 import { V2WorkspacesHeader } from "./components/V2WorkspacesHeader";
+import {
+	VIEWS_PANEL_ID,
+	viewTabId,
+} from "./components/V2WorkspacesHeader/components/V2WorkspacesViewsBar";
 import { V2WorkspacesList } from "./components/V2WorkspacesList";
 import { useAccessibleV2Workspaces } from "./hooks/useAccessibleV2Workspaces";
 import {
@@ -229,17 +233,24 @@ function V2WorkspacesPage() {
 				projectsById={projectsById}
 				cloudEnabled={cloudEnabled}
 			/>
-			{viewMode === "board" ? (
-				<V2WorkspacesBoard
-					workspaces={deferredWorkspaces}
-					isReady={deferredIsReady}
-				/>
-			) : (
-				<V2WorkspacesList
-					workspaces={deferredWorkspaces}
-					isReady={deferredIsReady}
-				/>
-			)}
+			<div
+				role="tabpanel"
+				id={VIEWS_PANEL_ID}
+				aria-labelledby={viewTabId(activeViewId)}
+				className="flex min-h-0 flex-1 flex-col"
+			>
+				{viewMode === "board" ? (
+					<V2WorkspacesBoard
+						workspaces={deferredWorkspaces}
+						isReady={deferredIsReady}
+					/>
+				) : (
+					<V2WorkspacesList
+						workspaces={deferredWorkspaces}
+						isReady={deferredIsReady}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }

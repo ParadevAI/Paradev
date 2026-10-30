@@ -6562,7 +6562,7 @@ msgstr "이 워크스페이스를 삭제할까요?"
 msgid "Delete thread"
 msgstr "스레드 삭제"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "{0} 뷰 삭제"
 

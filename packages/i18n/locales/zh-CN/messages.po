@@ -6562,7 +6562,7 @@ msgstr "删除这个工作区？"
 msgid "Delete thread"
 msgstr "删除讨论串"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "删除视图 {0}"
 

@@ -6562,7 +6562,7 @@ msgstr "Удалить эту рабочую область?"
 msgid "Delete thread"
 msgstr "Удалить ветку"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Удалить вид {0}"
 

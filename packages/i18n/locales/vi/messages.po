@@ -6562,7 +6562,7 @@ msgstr "Xóa workspace này?"
 msgid "Delete thread"
 msgstr "Xóa luồng"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Xóa chế độ xem {0}"
 

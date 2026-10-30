@@ -6562,7 +6562,7 @@ msgstr "Delete this workspace?"
 msgid "Delete thread"
 msgstr "Delete thread"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Delete view {0}"
 

@@ -2855,7 +2855,7 @@ msgid "Archived {0}"
 msgstr "Zarchiwizowano {0}"
 
 msgid "Archived shown"
-msgstr "Zarchiwizowane pokazane"
+msgstr "Zarchiwizowane obszary robocze są widoczne"
 
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Na pewno usunąć ten plik? Tej operacji nie można cofnąć."
@@ -6562,7 +6562,7 @@ msgstr "Usunąć ten obszar roboczy?"
 msgid "Delete thread"
 msgstr "Usuń wątek"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Usuń widok {0}"
 

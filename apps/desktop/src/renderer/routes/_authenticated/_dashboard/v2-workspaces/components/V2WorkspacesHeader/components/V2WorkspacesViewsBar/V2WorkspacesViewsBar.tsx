@@ -17,6 +17,9 @@ interface V2WorkspacesViewsBarProps {
 	cloudEnabled: boolean;
 }
 
+export const VIEWS_PANEL_ID = "v2-workspaces-view-panel";
+export const viewTabId = (viewId: string) => `v2-workspaces-view-tab-${viewId}`;
+
 const VIEW_BUTTON_CLASS =
 	"flex h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-sm transition-colors";
 
@@ -58,6 +61,8 @@ export function V2WorkspacesViewsBar({
 			: []),
 	];
 
+	const activeSavedView = savedViews.find((view) => view.id === activeViewId);
+
 	const viewButton = (
 		view: { id: string; label: string },
 		isSaved: boolean,
@@ -68,14 +73,16 @@ export function V2WorkspacesViewsBar({
 				<button
 					type="button"
 					role="tab"
+					id={viewTabId(view.id)}
 					aria-selected={isActive}
+					aria-controls={VIEWS_PANEL_ID}
+					tabIndex={isActive ? 0 : -1}
 					onClick={() => applyView(view.id)}
 					className={cn(
 						VIEW_BUTTON_CLASS,
 						isActive
 							? "border-border bg-muted text-foreground"
 							: "border-transparent text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-						isSaved && isActive && "rounded-r-none border-r-0",
 					)}
 				>
 					{isSaved ? (
@@ -88,38 +95,42 @@ export function V2WorkspacesViewsBar({
 					) : null}
 					<span className="max-w-[12rem] truncate">{view.label}</span>
 				</button>
-				{isSaved && isActive ? (
-					<button
-						type="button"
-						onClick={() => deleteView(view.id)}
-						aria-label={t({ message: `Delete view ${view.label}` })}
-						className={cn(
-							VIEW_BUTTON_CLASS,
-							"rounded-l-none border-border bg-muted px-1.5 text-muted-foreground hover:text-foreground",
-						)}
-					>
-						<LuX className="size-3" />
-					</button>
-				) : null}
 			</span>
 		);
 	};
 
 	return (
-		<div
-			role="tablist"
-			aria-label={t({ message: "Workspace views" })}
-			onKeyDown={handleTablistKeyDown}
-			className="flex h-11 items-center gap-1 border-t border-border/60 px-6 overflow-x-auto hide-scrollbar"
-		>
-			{builtInViews.map((view) => viewButton(view, false))}
-			{savedViews.length > 0 ? (
-				<>
-					<span aria-hidden className="mx-1.5 h-4 w-px shrink-0 bg-border" />
-					{savedViews.map((view) =>
-						viewButton({ id: view.id, label: view.name }, true),
+		<div className="flex h-11 items-center gap-1 border-t border-border/60 px-6 overflow-x-auto hide-scrollbar">
+			{/* Only tabs live in the tablist; delete and "New view" sit beside it. */}
+			<div
+				role="tablist"
+				aria-label={t({ message: "Workspace views" })}
+				onKeyDown={handleTablistKeyDown}
+				className="flex items-center gap-1"
+			>
+				{builtInViews.map((view) => viewButton(view, false))}
+				{savedViews.length > 0 ? (
+					<>
+						<span aria-hidden className="mx-1.5 h-4 w-px shrink-0 bg-border" />
+						{savedViews.map((view) =>
+							viewButton({ id: view.id, label: view.name }, true),
+						)}
+					</>
+				) : null}
+			</div>
+			{activeSavedView ? (
+				<button
+					type="button"
+					onClick={() => deleteView(activeSavedView.id)}
+					aria-label={t({ message: `Delete view ${activeSavedView.name}` })}
+					title={t({ message: `Delete view ${activeSavedView.name}` })}
+					className={cn(
+						VIEW_BUTTON_CLASS,
+						"-ml-0.5 border-transparent px-1.5 text-muted-foreground hover:bg-accent/50 hover:text-foreground",
 					)}
-				</>
+				>
+					<LuX className="size-3" />
+				</button>
 			) : null}
 			<span className="flex-1" />
 			<SaveViewPopover

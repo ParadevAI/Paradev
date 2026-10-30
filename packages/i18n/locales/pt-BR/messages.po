@@ -6562,7 +6562,7 @@ msgstr "Excluir esta área de trabalho?"
 msgid "Delete thread"
 msgstr "Excluir thread"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Excluir visualização {0}"
 

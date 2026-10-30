@@ -6562,7 +6562,7 @@ msgstr "Supprimer cet espace de travail ?"
 msgid "Delete thread"
 msgstr "Supprimer le fil"
 
-#. placeholder {0}: view.label
+#. placeholder {0}: activeSavedView.name
 msgid "Delete view {0}"
 msgstr "Supprimer la vue {0}"
 
