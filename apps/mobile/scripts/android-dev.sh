@@ -164,7 +164,8 @@ port_free() {
 metro_port() {
 	if [ -n "${MOBILE_METRO_PORT:-}" ]; then
 		echo "$MOBILE_METRO_PORT"
-	elif [ -f "$METRO_PORT_FILE" ]; then
+	elif [ -f "$METRO_PORT_FILE" ] &&
+		{ own_metro_pid >/dev/null || port_free "$(cat "$METRO_PORT_FILE")"; }; then
 		cat "$METRO_PORT_FILE"
 	else
 		local port=8081
@@ -266,7 +267,11 @@ dev_client_url() {
 }
 
 bundle_count() {
-	grep -c "Android Bundled" "$METRO_LOG" 2>/dev/null || true
+	[ -f "$METRO_LOG" ] || {
+		echo 0
+		return
+	}
+	grep -c "Android Bundled" "$METRO_LOG" || true
 }
 
 open_app() {
