@@ -499,89 +499,101 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 								    the hooks above keep workspace shortcuts and switching alive. */}
 								{!isCollapsed && (
 									<div className="flex h-full flex-col">
-										<DashboardSidebarHeader />
+										{!isChatSection && <DashboardSidebarHeader />}
 
 										<OverflowFadeContainer
 											fadeEdges={["top", "bottom"]}
 											className="flex-1 overflow-y-auto hide-scrollbar"
 										>
-											<DashboardSidebarGithubNotice
-												status={githubStatus}
-												isCollapsed={isCollapsed}
-											/>
 											{isChannelsEnabled && isChatSection && (
 												<>
 													<DashboardSidebarChannelsSection />
 													<DashboardSidebarDevsSection />
 												</>
 											)}
-											{(isCollapsed || !workspacesListCollapsed) && (
-												<DashboardSidebarPinnedSection
-													pinnedWorkspaces={displayedPinnedWorkspaces}
-													isCollapsed={isCollapsed}
-													onWorkspaceHover={refreshWorkspacePullRequest}
-												/>
-											)}
-											<DashboardSidebarSessionsSection
-												sessionWorkspaces={displayedSessionWorkspaces}
-												isCollapsed={isCollapsed}
-												workspaceShortcutLabels={workspaceShortcutLabels}
-												onWorkspaceHover={refreshWorkspacePullRequest}
-												onDeleteSection={deleteSection}
-												onRenameSection={renameSection}
-												onToggleSectionCollapse={toggleSectionCollapsed}
-											/>
-											{!isCollapsed && (
-												<div className="mt-3 first:mt-0">
-													<DashboardSidebarBulkActions projects={orderedGroups}>
-														<DashboardSidebarWorkspacesHeader
-															sortMode={sortMode}
-															onSortModeChange={setSidebarProjectSortMode}
-															hostFilter={isCloudEnabled ? hostFilter : null}
-															onHostFilterChange={setSidebarProjectHostFilter}
-															filterQuery={projectFilterQuery}
-															onFilterQueryChange={setProjectFilterQuery}
-														/>
-													</DashboardSidebarBulkActions>
-												</div>
-											)}
-											{(isCollapsed || !workspacesListCollapsed) && (
-												<SortableContext
-													items={displayedProjectIds}
-													strategy={verticalListSortingStrategy}
-												>
-													{displayedGroups.map((project) => (
-														<SortableProjectWrapper
-															key={project.id}
-															project={project}
+											{!isChatSection && (
+												<>
+													<DashboardSidebarGithubNotice
+														status={githubStatus}
+														isCollapsed={isCollapsed}
+													/>
+													{(isCollapsed || !workspacesListCollapsed) && (
+														<DashboardSidebarPinnedSection
+															pinnedWorkspaces={displayedPinnedWorkspaces}
 															isCollapsed={isCollapsed}
-															isDragDisabled={isProjectDragDisabled}
-															workspaceShortcutLabels={workspaceShortcutLabels}
 															onWorkspaceHover={refreshWorkspacePullRequest}
-															onToggleCollapse={toggleProjectCollapsed}
 														/>
-													))}
-												</SortableContext>
+													)}
+													<DashboardSidebarSessionsSection
+														sessionWorkspaces={displayedSessionWorkspaces}
+														isCollapsed={isCollapsed}
+														workspaceShortcutLabels={workspaceShortcutLabels}
+														onWorkspaceHover={refreshWorkspacePullRequest}
+														onDeleteSection={deleteSection}
+														onRenameSection={renameSection}
+														onToggleSectionCollapse={toggleSectionCollapsed}
+													/>
+													{!isCollapsed && (
+														<div className="mt-3 first:mt-0">
+															<DashboardSidebarBulkActions
+																projects={orderedGroups}
+															>
+																<DashboardSidebarWorkspacesHeader
+																	sortMode={sortMode}
+																	onSortModeChange={setSidebarProjectSortMode}
+																	hostFilter={
+																		isCloudEnabled ? hostFilter : null
+																	}
+																	onHostFilterChange={
+																		setSidebarProjectHostFilter
+																	}
+																	filterQuery={projectFilterQuery}
+																	onFilterQueryChange={setProjectFilterQuery}
+																/>
+															</DashboardSidebarBulkActions>
+														</div>
+													)}
+													{(isCollapsed || !workspacesListCollapsed) && (
+														<SortableContext
+															items={displayedProjectIds}
+															strategy={verticalListSortingStrategy}
+														>
+															{displayedGroups.map((project) => (
+																<SortableProjectWrapper
+																	key={project.id}
+																	project={project}
+																	isCollapsed={isCollapsed}
+																	isDragDisabled={isProjectDragDisabled}
+																	workspaceShortcutLabels={
+																		workspaceShortcutLabels
+																	}
+																	onWorkspaceHover={refreshWorkspacePullRequest}
+																	onToggleCollapse={toggleProjectCollapsed}
+																/>
+															))}
+														</SortableContext>
+													)}
+													{!isCollapsed && !workspacesListCollapsed && (
+														<DashboardSidebarHiddenProjects
+															projects={hiddenProjects}
+															onShow={showHiddenProject}
+														/>
+													)}
+													{!isCollapsed &&
+														isFilterActive &&
+														displayedGroups.length === 0 && (
+															<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
+																{trimmedFilterQuery !== ""
+																	? t({
+																			message: `No projects match "${trimmedFilterQuery}"`,
+																		})
+																	: hostFilter === "cloud"
+																		? t({ message: "No cloud workspaces" })
+																		: t({ message: "No local workspaces" })}
+															</div>
+														)}
+												</>
 											)}
-											{!isCollapsed && !workspacesListCollapsed && (
-												<DashboardSidebarHiddenProjects
-													projects={hiddenProjects}
-													onShow={showHiddenProject}
-												/>
-											)}
-											{!isCollapsed &&
-												isFilterActive &&
-												displayedGroups.length === 0 && (
-													<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
-														{trimmedFilterQuery !== ""
-															? t({
-																	message: `No projects match "${trimmedFilterQuery}"`,
-																})
-															: hostFilter === "cloud"
-																? t({ message: "No cloud workspaces" })
-																: t({ message: "No local workspaces" })}
-													</div>
-												)}
 										</OverflowFadeContainer>
 										<SidebarCardSlot
 											isCollapsed={isCollapsed}
