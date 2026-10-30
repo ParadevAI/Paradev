@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Directory, File, Paths } from "expo-file-system";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import type { UseAttachmentFile } from "./useAttachmentFile.types";
 
 function extensionOf(name: string, mediaType: string): string {
 	const fromName = name.includes(".") ? name.split(".").pop() : undefined;
@@ -11,18 +12,13 @@ function extensionOf(name: string, mediaType: string): string {
  * A sent attachment as a local file, fetched from the host once. QuickLook
  * picks a renderer by extension, so the file keeps the original one.
  */
-export function useAttachmentFile({
+export const useAttachmentFile: UseAttachmentFile = ({
 	hostUrl,
 	attachmentId,
 	name,
 	mediaType,
-}: {
-	hostUrl: string | undefined;
-	attachmentId: string;
-	name: string;
-	mediaType: string;
-}) {
-	return useQuery({
+}) =>
+	useQuery({
 		queryKey: ["attachment-file", hostUrl, attachmentId],
 		enabled: hostUrl !== undefined,
 		retry: 1,
@@ -44,4 +40,3 @@ export function useAttachmentFile({
 			return file.uri;
 		},
 	});
-}
