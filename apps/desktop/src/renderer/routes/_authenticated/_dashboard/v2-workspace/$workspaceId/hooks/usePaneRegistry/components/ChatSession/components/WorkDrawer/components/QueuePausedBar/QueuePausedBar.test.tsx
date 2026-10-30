@@ -4,7 +4,7 @@ import { QueuePausedBar } from "./QueuePausedBar";
 
 afterEach(cleanup);
 
-test("a queue the usage limit paused says so and leaves resuming to the limit notice", () => {
+test("a queue the usage limit paused says so, even after its notice is dismissed", () => {
 	const view = render(
 		<QueuePausedBar
 			actionable
@@ -16,7 +16,7 @@ test("a queue the usage limit paused says so and leaves resuming to the limit no
 	expect(view.container.textContent).toContain(
 		"Queue paused by the usage limit",
 	);
-	expect(view.queryByText("Resume")).toBeNull();
+	expect(view.getByText("Resume")).toBeTruthy();
 });
 
 test("a queue the user paused offers its own resume", () => {

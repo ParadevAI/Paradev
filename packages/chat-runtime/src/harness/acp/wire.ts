@@ -90,7 +90,8 @@ export const acpUsageUpdateSchema = z.looseObject({
 			"_claude/rateLimit": z.unknown().optional(),
 			"_claude/model": z.unknown().optional(),
 		})
-		.optional(),
+		.nullish()
+		.catch(undefined),
 });
 export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
 

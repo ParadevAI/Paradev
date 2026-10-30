@@ -9,7 +9,7 @@ export function QueuePausedBar({
 	onResume,
 }: {
 	actionable: boolean;
-	/** The usage limit paused it; the limit notice carries the resume. */
+	/** The usage limit paused it, not an interruption. */
 	byLimit: boolean;
 	onClear: () => void;
 	onResume: () => void;
@@ -33,15 +33,13 @@ export function QueuePausedBar({
 					<Trans>Clear all</Trans>
 				</QueueItemAction>
 			)}
-			{!byLimit && (
-				<QueueItemAction
-					className="gap-1 px-1.5 py-0.5 font-normal text-xs opacity-100"
-					onClick={onResume}
-				>
-					<Play className="size-3.5" />
-					<Trans>Resume</Trans>
-				</QueueItemAction>
-			)}
+			<QueueItemAction
+				className="gap-1 px-1.5 py-0.5 font-normal text-xs opacity-100"
+				onClick={onResume}
+			>
+				<Play className="size-3.5" />
+				<Trans>Resume</Trans>
+			</QueueItemAction>
 		</div>
 	);
 }

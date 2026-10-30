@@ -27,5 +27,6 @@ export async function closeChatForAccountSwitch({
 	const { prompts } = await transport.getQueue({ sessionId });
 	await setAccount();
 	await transport.closeSession({ sessionId });
-	return prompts.map((prompt) => prompt.content);
+	// Older hosts send no fullContent, only the visible parts.
+	return prompts.map((prompt) => prompt.fullContent ?? prompt.content);
 }

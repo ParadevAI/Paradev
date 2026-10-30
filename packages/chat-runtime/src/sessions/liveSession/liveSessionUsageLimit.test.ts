@@ -115,6 +115,10 @@ describe("LiveSession usage limit", () => {
 		const third = sendPrompt(runtime, sessionId, "third");
 		expect(third.queued).toBe(true);
 		expect(snapshot(runtime, sessionId).session?.queuePaused).toBe(true);
+		expect(snapshot(runtime, sessionId).session?.queuePausedByLimit).toBe(true);
+		expect(snapshot(runtime, sessionId).turns.get("t1")?.error?.kind).toBe(
+			"usage_limit",
+		);
 		expect(deliveredTexts(runtime, sessionId)).toEqual(["first"]);
 		runtime.live.require(sessionId).removeQueued(third.itemId);
 
@@ -163,6 +167,7 @@ describe("LiveSession usage limit", () => {
 		const session = snapshot(runtime, sessionId).session;
 		expect(session?.usageLimit).toBeUndefined();
 		expect(session?.queuePaused).toBe(true);
+		expect(session?.queuePausedByLimit).toBe(true);
 		expect(deliveredTexts(runtime, sessionId)).toEqual(["first"]);
 		await runtime.dispose();
 	});
@@ -251,7 +256,62 @@ describe("LiveSession usage limit", () => {
 		expect(
 			snapshot(runtime, sessionId).session?.usageLimit?.resetsAtMs,
 		).toBeUndefined();
+		expect(snapshot(runtime, sessionId).turns.get("t1")?.error?.kind).toBe(
+			"usage_limit",
+		);
 		await runtime.dispose();
+	});
+
+	test("a prompt queued under the limit keeps its hidden parts for a move to another login", async () => {
+		const { runtime, sessionId } = startSession({
+			turns: [REFUSED, COMPLETED],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitFor(
+			() => snapshot(runtime, sessionId).session?.usageLimit !== undefined,
+		);
+		runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-hidden",
+			content: [
+				{ type: "text", text: "visible" },
+				{ type: "text", text: "context", hidden: true },
+			],
+		});
+		const [queued] = runtime.live.require(sessionId).queueState.prompts;
+		expect(queued?.content).toEqual([{ type: "text", text: "visible" }]);
+		expect(queued?.fullContent).toEqual([
+			{ type: "text", text: "visible" },
+			{ type: "text", text: "context", hidden: true },
+		]);
+		await runtime.dispose();
+	});
+
+	test("an agent that throws when the timed resume sends fails the session instead of the timer", async () => {
+		jest.useFakeTimers();
+		setSystemTime(0);
+		const { runtime, session, events, prompt, advance } = timerSession();
+		try {
+			await flush();
+			prompt.mockImplementation(() => {
+				throw new Error("agent gone");
+			});
+			session.respondToUsageLimit("resume_at_reset");
+			expect(() => advance(1_000)).not.toThrow();
+			const notices = journalEnvelopes(runtime, session.sessionId).flatMap(
+				({ event }) =>
+					event.type === "item" && event.item.kind === "notice"
+						? [(event.item as { text?: string }).text]
+						: [],
+			);
+			expect(notices).toContain("agent gone");
+		} finally {
+			events.close();
+			await runtime.dispose();
+			jest.useRealTimers();
+			setSystemTime();
+		}
 	});
 });
 

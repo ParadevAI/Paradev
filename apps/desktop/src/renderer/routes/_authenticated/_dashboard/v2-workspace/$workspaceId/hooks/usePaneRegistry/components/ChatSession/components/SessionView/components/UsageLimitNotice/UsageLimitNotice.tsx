@@ -40,6 +40,8 @@ import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
 const TICK_MS = 30_000;
 const CLOSE_TICK_MS = 5_000;
 const COUNTDOWN_TICK_MS = 1_000;
+const ARMED_CLASS =
+	"bg-amber-400/10 text-amber-400 hover:bg-amber-400/15 hover:text-amber-300";
 const CLOSE_MS = 2 * 60_000;
 
 /** The provider's window names, as a reader knows them. */
@@ -121,7 +123,6 @@ export function UsageLimitNotice({
 			: waiting
 				? formatResetLabel(new Date(resetsAtMs), new Date(now))
 				: t({ message: "Limit has reset" }),
-		resuming ? t({ message: `Resuming in ${resumeSeconds}s` }) : undefined,
 	]
 		.filter((part): part is string => Boolean(part))
 		.join(" · ");
@@ -152,7 +153,17 @@ export function UsageLimitNotice({
 						onSwitch={onSwitchAccount}
 					/>
 				)}
-				{!waiting ? (
+				{resuming ? (
+					<button
+						className={cn(PILL_TRIGGER_CLASS, ARMED_CLASS, "tabular-nums")}
+						onClick={() => onRespond("cancel_resume_at_reset")}
+						title={t({ message: "Cancel the automatic resume" })}
+						type="button"
+					>
+						<Clock className="size-3.5" />
+						{t({ message: `Resuming in ${resumeSeconds}s` })}
+					</button>
+				) : !waiting ? (
 					<button
 						className={PILL_TRIGGER_CLASS}
 						onClick={() => onRespond("resume")}
@@ -163,10 +174,7 @@ export function UsageLimitNotice({
 					</button>
 				) : limit.resumeAtReset ? (
 					<button
-						className={cn(
-							PILL_TRIGGER_CLASS,
-							"bg-amber-400/10 text-amber-400 hover:bg-amber-400/15 hover:text-amber-300",
-						)}
+						className={cn(PILL_TRIGGER_CLASS, ARMED_CLASS)}
 						onClick={() => onRespond("cancel_resume_at_reset")}
 						title={t({ message: "Cancel the automatic resume" })}
 						type="button"

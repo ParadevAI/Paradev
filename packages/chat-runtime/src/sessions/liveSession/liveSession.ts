@@ -61,6 +61,8 @@ export type QueueState = {
 		itemId: string;
 		clientId: string | undefined;
 		content: UserContent[];
+		/** `content` plus the hidden parts it leaves out. */
+		fullContent: UserContent[];
 		queuedAtMs: number;
 	}[];
 };
@@ -81,6 +83,8 @@ export type UnfinishedSession = {
 type PendingPrompt = {
 	item: UserMessage;
 	content: UserContent[];
+	/** The content as the caller gave it, hidden parts included. */
+	typed?: UserContent[];
 	turnId: string;
 	seq: number;
 	snapshotWorktree?: boolean;
@@ -113,6 +117,7 @@ export class LiveSession {
 	private readonly turnAnchors = new Map<string, string>();
 	private steerTarget: string | null = null;
 	private queuePaused = false;
+	private limitedTurnId: string | null = null;
 	private resumeTimer: ReturnType<typeof setTimeout> | null = null;
 	private sessionState: SessionState;
 	private currentTurn: Turn | null = null;
@@ -304,11 +309,18 @@ export class LiveSession {
 		};
 		const turnId = this.mintId();
 		if (queued) {
-			this.queue.push({ item, content: sent, turnId, seq, snapshotWorktree });
+			this.queue.push({
+				item,
+				content: sent,
+				typed: content,
+				turnId,
+				seq,
+				snapshotWorktree,
+			});
 			this.appendDurable({ type: "item", item, turnId });
 			if (limited && !this.queuePaused) {
 				this.queuePaused = true;
-				this.emitSession({ queuePaused: true });
+				this.emitSession({ queuePaused: true, queuePausedByLimit: true });
 			}
 			if (
 				steerTurnId &&
@@ -391,10 +403,11 @@ export class LiveSession {
 	get queueState(): QueueState {
 		return {
 			paused: this.queuePaused,
-			prompts: this.queue.map(({ item }) => ({
+			prompts: this.queue.map(({ item, typed }) => ({
 				itemId: item.id,
 				clientId: item.clientId,
 				content: item.content,
+				fullContent: typed ?? item.content,
 				queuedAtMs: item.startedAtMs,
 			})),
 		};
@@ -472,7 +485,11 @@ export class LiveSession {
 					this.armResumeTimer(resetsAtMs);
 					return;
 				}
-				this.resumeAfterLimit();
+				try {
+					this.resumeAfterLimit();
+				} catch (error) {
+					this.fail(error);
+				}
 			},
 			Math.min(Math.max(wait, 0), MAX_TIMER_MS),
 		);
@@ -486,8 +503,26 @@ export class LiveSession {
 
 	/** A refused turn stops the queue until someone chooses to go on. */
 	private limitReached(limit: UsageLimit): void {
-		if (this.queue.length > 0 && !this.queuePaused) this.queuePaused = true;
-		this.emitSession({ queuePaused: this.queuePaused, usageLimit: limit });
+		this.limitedTurnId = this.currentTurn?.id ?? null;
+		const pausing = this.queue.length > 0 && !this.queuePaused;
+		if (pausing) this.queuePaused = true;
+		this.emitSession({
+			queuePaused: this.queuePaused,
+			usageLimit: limit,
+			...(pausing ? { queuePausedByLimit: true } : {}),
+		});
+	}
+
+	/** A failed turn the limit refused carries the limit's kind, whichever harness reported it. */
+	private withLimitKind(turn: Turn): Turn {
+		if (turn.status !== "failed" || !turn.error) return turn;
+		if (turn.error.kind === "usage_limit") return turn;
+		const limited =
+			turn.id === this.limitedTurnId ||
+			USAGE_LIMIT_TEXT.test(turn.error.message);
+		return limited
+			? { ...turn, error: { ...turn.error, kind: "usage_limit" } }
+			: turn;
 	}
 
 	cancelTurn(turnId?: string, pauseQueue = false): void {
@@ -497,7 +532,7 @@ export class LiveSession {
 			this.discard(capturing);
 			if (pauseQueue && this.queue.length > 0 && !this.queuePaused) {
 				this.queuePaused = true;
-				this.emitSession({ queuePaused: true });
+				this.emitSession({ queuePaused: true, queuePausedByLimit: false });
 				return;
 			}
 			this.emitSession({});
@@ -510,7 +545,7 @@ export class LiveSession {
 		const waiting = this.queue.length + this.pendingSteers.length;
 		if (pauseQueue && !steering && waiting > 0 && !this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true });
+			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
 		}
 		this.options.adapter.cancelTurn();
 	}
@@ -608,7 +643,9 @@ export class LiveSession {
 				return;
 			case "turn": {
 				const previous = this.currentTurn;
-				this.currentTurn = this.afterCarriedFailure(event.turn);
+				this.currentTurn = this.withLimitKind(
+					this.afterCarriedFailure(event.turn),
+				);
 				this.appendDurable({ type: "turn", turn: this.currentTurn });
 				if (
 					previous?.id === event.turn.id &&
@@ -722,7 +759,7 @@ export class LiveSession {
 		this.queue.push(...paused.map((content) => this.queuedPrompt(content)));
 		if (!this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true });
+			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
 		}
 	}
 

@@ -9,7 +9,10 @@ import {
 import { closeChatForAccountSwitch } from "./closeChatForAccountSwitch";
 
 const prompts: UserContent[][] = [
-	[{ type: "text", text: "first queued task" }],
+	[
+		{ type: "text", text: "first queued task" },
+		{ type: "text", text: "context the user never sees", hidden: true },
+	],
 	[
 		{ type: "text", text: "second queued task" },
 		{
@@ -78,7 +81,7 @@ test("an account switch preserves the full queue before disposing the old sessio
 		}
 		expect(
 			(await transport.getQueue({ sessionId: replacement })).prompts.map(
-				(p) => p.content,
+				(p) => p.fullContent,
 			),
 		).toEqual(prompts);
 		expect(adapters).toHaveLength(2);

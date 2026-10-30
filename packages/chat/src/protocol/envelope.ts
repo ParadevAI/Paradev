@@ -97,6 +97,8 @@ export const sessionStateSchema = z.looseObject({
 	queuePaused: z.boolean().optional(),
 	queueControls: z.boolean().optional(),
 	usageLimit: usageLimitSchema.optional(),
+	/** The queue paused for a usage limit, which stays the reason after its notice is dismissed. */
+	queuePausedByLimit: z.boolean().optional(),
 	backgroundTasks: z.array(backgroundTaskSchema).optional(),
 	awaitingBackground: z.boolean().optional(),
 });

@@ -11,6 +11,7 @@ import {
 import { AIR_CLIENT_META } from "./air";
 import type { AcpImageSource } from "./imageBlocks";
 import type { AcpTransport, AcpTransportHandlers } from "./rpcClient";
+import { acpUsageUpdateSchema } from "./wire";
 
 /**
  * A scripted ACP agent: auto-responds to initialize/session_new, and for
@@ -642,6 +643,49 @@ describe("AcpAdapter", () => {
 				(event) => event.kind === "turn" && event.turn.status === "failed",
 			),
 		);
+	});
+
+	it("a v2 turn that ends in an error after a rejected window reports the limit", async () => {
+		const agent = new FakeAcpAgent();
+		agent.insertOnPrompt = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "go" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 100,
+			size: 200000,
+			_meta: {
+				"_claude/rateLimit": {
+					status: "rejected",
+					resetsAt: 1785958200,
+					rateLimitType: "five_hour",
+					isUsingOverage: false,
+				},
+			},
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "state_update",
+			state: "idle",
+			stopReason: "error",
+			error: { message: "You've hit your usage limit" },
+		});
+		await flush(20);
+		const limits = sessionsOf(events).flatMap((session) =>
+			session.usageLimit ? [session.usageLimit] : [],
+		);
+		expect(limits.at(-1)?.resetsAtMs).toBe(1785958200_000);
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(turns.at(-1)?.status).toBe("failed");
+		expect(turns.at(-1)?.error?.kind).toBe("usage_limit");
+		await adapter.dispose();
+	});
+
+	it("a usage update with a null _meta still parses", () => {
+		expect(
+			acpUsageUpdateSchema.safeParse({ used: 1, size: 2, _meta: null }).success,
+		).toBe(true);
 	});
 
 	it("a refusal the turn survived, or an allowed window, is not a limit", async () => {

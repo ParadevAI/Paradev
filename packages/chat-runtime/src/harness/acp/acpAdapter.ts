@@ -1133,13 +1133,7 @@ export class AcpAdapter implements HarnessAdapter {
 		} catch (error) {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
-			const failure = this.turnError(error);
-			const limit = this.usageLimitFrom(failure.message);
-			if (limit) this.emitSession({ usageLimit: limit });
-			this.failTurn(
-				turnId,
-				limit ? { ...failure, kind: "usage_limit" } : failure,
-			);
+			this.failRefusedTurn(turnId, this.turnError(error));
 		}
 	}
 
@@ -1180,7 +1174,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private endV2Turn(turnId: string, idle: AcpStateUpdate): void {
 		this.v2Turn = null;
 		if (idle.stopReason === "error")
-			this.failTurn(
+			this.failRefusedTurn(
 				turnId,
 				this.turnError(
 					idle.error?.message ?? "The agent stopped with an error.",
@@ -1207,6 +1201,16 @@ export class AcpAdapter implements HarnessAdapter {
 		this.cancelPendingApprovals(turnId);
 		this.emitSession({ status: this.statusAfterApprovals() });
 		this.sendCustomAnswer();
+	}
+
+	/** A failed turn, reported as a usage limit when the agent refused for usage. */
+	private failRefusedTurn(turnId: string, failure: TurnError): void {
+		const limit = this.usageLimitFrom(failure.message);
+		if (limit) this.emitSession({ usageLimit: limit });
+		this.failTurn(
+			turnId,
+			limit ? { ...failure, kind: "usage_limit" } : failure,
+		);
 	}
 
 	private failTurn(turnId: string, error: TurnError): void {

@@ -487,7 +487,8 @@ export function AcpChatPane({
 				if (!mounted.current) return;
 				setTransferredFrom(sessionId);
 				onRestoreQueuedPrompts(queued);
-				await start(harness, agentSessionId, true);
+				const restarted = await start(harness, agentSessionId, true);
+				if (!restarted && mounted.current) setTransferredFrom(null);
 			} catch (error) {
 				recoveryInFlight.current = false;
 				console.error("[acp-chat] account switch failed", error);
@@ -696,7 +697,13 @@ export function AcpChatPane({
 		/>
 	);
 
-	if (harness && sessionId && (sessionDead || sessionStopped) && !recovering) {
+	const lost = failure !== null && stored === null;
+	if (
+		harness &&
+		sessionId &&
+		(sessionDead || sessionStopped || lost) &&
+		!recovering
+	) {
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}

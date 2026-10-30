@@ -76,7 +76,8 @@ test("once the window is open, or when no reset is known, it offers to resume no
 	expect(bare.getByText("Resume")).toBeTruthy();
 });
 
-test("after the reset, an armed resume counts down to when it sends", () => {
+test("after the reset, an armed resume counts down to when it sends and can still be cancelled", () => {
+	const onRespond = mock<(action: UsageLimitAction) => void>();
 	const view = renderNotice({
 		limit: {
 			hitAtMs: Date.now() - HOUR_MS,
@@ -84,12 +85,11 @@ test("after the reset, an armed resume counts down to when it sends", () => {
 			resumeAtReset: true,
 			resumesAtMs: Date.now() + 25_000,
 		},
-		onRespond: () => undefined,
+		onRespond,
 	});
-	expect(view.container.textContent).toContain(
-		"Limit has reset · Resuming in 25s",
-	);
-	expect(view.getByText("Resume")).toBeTruthy();
+	expect(view.container.textContent).toContain("Limit has reset");
+	fireEvent.click(view.getByText("Resuming in 25s"));
+	expect(onRespond.mock.calls).toEqual([["cancel_resume_at_reset"]]);
 });
 
 test("the account menu is only for agents whose logins the host can switch", () => {

@@ -5104,7 +5104,7 @@ msgid "Continue this chat on another login"
 msgstr "Continua questa chat con un altro account"
 
 msgid "Continue this chat once the limit resets"
-msgstr "Continua questa chat quando il limite si ripristina"
+msgstr "Continua questa chat quando il limite si azzera"
 
 #. placeholder {0}: connector.displayName
 msgid "Continue to {0}"
@@ -10515,7 +10515,7 @@ msgid "Limit access"
 msgstr "Limita l’accesso"
 
 msgid "Limit has reset"
-msgstr "Il limite è stato ripristinato"
+msgstr "Il limite si è azzerato"
 
 msgid "Limit to {organizationName}?"
 msgstr "Limitare a {organizationName}?"
@@ -15748,7 +15748,7 @@ msgid "Resume args"
 msgstr "Argomenti di ripresa"
 
 msgid "Resume at reset"
-msgstr "Riprendi al ripristino"
+msgstr "Riprendi all'azzeramento"
 
 msgid "Resume automation"
 msgstr "Riprendi l'automazione"
@@ -15761,7 +15761,7 @@ msgid "Resuming {0}…"
 msgstr "Ripresa di {0}…"
 
 msgid "Resuming at reset"
-msgstr "Ripresa al ripristino"
+msgstr "Ripresa all'azzeramento"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Ripresa tra {resumeSeconds} s"

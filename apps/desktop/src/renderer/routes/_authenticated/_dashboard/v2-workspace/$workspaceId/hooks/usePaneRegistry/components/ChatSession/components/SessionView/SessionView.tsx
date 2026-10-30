@@ -570,7 +570,9 @@ export function SessionView({
 		() => ({
 			prompts: queuedPrompts,
 			paused: sessionState?.queuePaused === true,
-			pausedByLimit: sessionState?.usageLimit !== undefined,
+			pausedByLimit:
+				sessionState?.usageLimit !== undefined ||
+				sessionState?.queuePausedByLimit === true,
 			actionable: sessionState?.queueControls === true,
 			remove: session.removeQueuedPrompt,
 			resume: session.resumeQueue,
@@ -581,6 +583,7 @@ export function SessionView({
 			queuedPrompts,
 			sessionState?.queuePaused,
 			sessionState?.usageLimit,
+			sessionState?.queuePausedByLimit,
 			sessionState?.queueControls,
 			session.removeQueuedPrompt,
 			session.resumeQueue,

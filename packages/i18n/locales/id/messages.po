@@ -5104,7 +5104,7 @@ msgid "Continue this chat on another login"
 msgstr "Lanjutkan chat ini dengan login lain"
 
 msgid "Continue this chat once the limit resets"
-msgstr "Lanjutkan chat ini setelah batas diatur ulang"
+msgstr "Lanjutkan chat ini setelah batas direset"
 
 #. placeholder {0}: connector.displayName
 msgid "Continue to {0}"
@@ -10515,7 +10515,7 @@ msgid "Limit access"
 msgstr "Batasi akses"
 
 msgid "Limit has reset"
-msgstr "Batas telah diatur ulang"
+msgstr "Batas telah direset"
 
 msgid "Limit to {organizationName}?"
 msgstr "Batasi ke {organizationName}?"
@@ -15748,7 +15748,7 @@ msgid "Resume args"
 msgstr "Argumen resume"
 
 msgid "Resume at reset"
-msgstr "Lanjutkan saat diatur ulang"
+msgstr "Lanjutkan saat direset"
 
 msgid "Resume automation"
 msgstr "Lanjutkan otomatisasi"
@@ -15761,7 +15761,7 @@ msgid "Resuming {0}…"
 msgstr "Melanjutkan {0}…"
 
 msgid "Resuming at reset"
-msgstr "Akan dilanjutkan saat diatur ulang"
+msgstr "Akan dilanjutkan saat direset"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
