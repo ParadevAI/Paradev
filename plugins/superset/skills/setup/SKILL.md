@@ -63,7 +63,7 @@ When each table runs:
 
 | Table | Local | Cloud |
 |---|---|---|
-| `[install]` | before `setup`, at creation | when the environment's image is built |
+| `[install]` | before `setup`, at creation | only when the environment is built (see below), never on boot |
 | `[setup]` | once, at creation | on every boot and resume, so it must be safe to run again |
 | `[terminals.<name>]` | from the Run button; `default` ones start with it | `default` ones start on boot |
 | `[archive]` | before the worktree is removed | at archive, before the box stops; never blocks the archive |
@@ -77,6 +77,13 @@ Rules:
 - Every step gets `SUPERSET_ENV` (`local` or `cloud`), `SUPERSET_WORKSPACE_NAME` and, locally, `SUPERSET_ROOT_PATH` (the main checkout). Per-port variables are not set yet: do not rely on `SUPERSET_PORT_<NAME>`.
 - Keep `setup` idempotent and fast; put workspace-independent installs in `[install]`.
 - `[archive]` is for outside resources (a database branch, `docker compose down`). Paradev already stops processes and deletes the worktree.
+
+In the cloud, `[install]` builds the environment's snapshot, which every new cloud workspace starts from:
+
+- A build runs when someone presses Trigger new build in Settings or runs `superset environments rebuild <env>`, when the environment's repositories change, and once a day on paid plans, so the snapshot follows the base branch. A failed build keeps the previous snapshot.
+- It runs from the primary repository's root (or its `cwd`), on the base branch at its latest commit, with the environment's variables and `SUPERSET_ENV=cloud`. There is no workspace: no `SUPERSET_WORKSPACE_NAME`, no database branch, no `.env`.
+- It must finish in 3 minutes and be idempotent: a build usually runs on top of the previous snapshot.
+- Put everything a box needs that does not depend on one workspace in `[install]` or `[install.cloud]`: dependencies, runtimes (`mise use -g node@22`), CLIs, browsers (`playwright install chromium`), generated code, a seeded local test database. `[setup.cloud]` is only for per-workspace state (a database branch, `.env`), because it runs on every boot and resume.
 - Copy secrets and `.env` from the main checkout (`$SUPERSET_ROOT_PATH`) at setup time; never commit them.
 - Personal tweaks go in `.superset/config.local.toml` in the main checkout. It is gitignored, applies to every worktree, is merged over the shared file, and the cloud never reads it.
 

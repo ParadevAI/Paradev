@@ -1599,6 +1599,9 @@ msgstr "Lepší vestavěný prohlížeč: prohlédněte si své změny a kliknut
 msgid "A better Paradev is ready"
 msgstr "Lepší verze Paradev je připravena"
 
+msgid "A build of this environment is already running"
+msgstr "Sestavení tohoto prostředí už probíhá"
+
 msgid "A CDP endpoint per pane"
 msgstr "Jeden CDP endpoint na panel"
 
@@ -7444,6 +7447,9 @@ msgstr "Prostředí"
 
 msgid "Environment archived"
 msgstr "Prostředí archivováno"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
 
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
@@ -18649,6 +18655,9 @@ msgstr "Nastupuje dispečer"
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Prostředí se během obnovení změnilo. Zkuste to znovu."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní prostory, bylo archivováno nebo nemá žádné repozitáře. V nastavení automatizace vyberte jiné prostředí."
 
@@ -19003,6 +19012,9 @@ msgstr "Tato automatizace zatím nemá pokyny. Před spuštěním napište v jej
 msgid "This automation is in another organization"
 msgstr "Tato automatizace je v jiné organizaci"
 
+msgid "This build has no snapshot to restore"
+msgstr "Toto sestavení nemá snímek k obnovení"
+
 msgid "This cannot be undone."
 msgstr "Nelze vrátit zpět."
 
@@ -19069,11 +19081,20 @@ msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni p
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a poskytovatel jej nepotvrdil jako ověřený. Přihlaste se způsobem, který jste použili dříve."
 
+msgid "This environment has no [install] to build. Add one to .superset/config.toml on its base branch."
+msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do .superset/config.toml v jeho základní větvi."
+
+msgid "This environment has no repositories to build"
+msgstr "Toto prostředí nemá žádné repozitáře k sestavení"
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
+
+msgid "This environment's snapshot was saved from a workspace. A build from the base image would keep only what [install] sets up."
+msgstr "Snímek tohoto prostředí byl uložen z pracovního prostoru. Sestavení ze základního obrazu by zachovalo jen to, co nastaví [install]."
 
 msgid "this file"
 msgstr "tento soubor"
