@@ -21,6 +21,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { acpChatEnabled } from "../../lib/acp-chat";
 import { organizationMachineSizes } from "../../lib/billing/plan";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
@@ -368,6 +369,11 @@ export const cloudWorkspaceRouter = {
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
+				/**
+				 * Where `agent` opens. Omitted by builds older than the chat
+				 * experimental setting; those keep reading the `acp-chat` flag.
+				 */
+				surface: z.enum(["chat", "terminal"]).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -393,6 +399,11 @@ export const cloudWorkspaceRouter = {
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
 				machineSize: input.machineSize,
+				chat:
+					input.surface === "chat" ||
+					(!input.surface &&
+						!!input.agent &&
+						(await acpChatEnabled(ctx.userId))),
 				...(input.agent
 					? {
 							launch: {
