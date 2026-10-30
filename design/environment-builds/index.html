@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Environment builds · Superset UI review</title>
+<style>
+:root{--background:#151110;--foreground:#eae8e6;--card:#201e1c;--muted:#2a2827;--muted-foreground:#a8a5a3;--accent:#2a2827;--tertiary:#1a1716;--destructive:#cc4444;--border:#2a2827;--ring:#3a3837;--link:#58b7f0;--fill-hover:rgba(234,232,230,.07);--fill-selected:rgba(234,232,230,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:#0e0b0a;color:var(--foreground);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.page{max-width:1040px;margin:auto;padding:36px 28px 64px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:var(--muted-foreground)}
+code{font:12px ui-monospace,monospace;background:var(--muted);padding:1px 4px;border-radius:4px}
+
+/* review chrome */
+.eyebrow{font:11px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground)}
+.review h1{font-size:24px;font-weight:600;letter-spacing:-.01em;margin:8px 0 6px}
+.review>p{margin:0;color:var(--muted-foreground);max-width:720px}
+.block{margin-top:36px}
+.block>h2{font-size:16px;font-weight:600;margin:0 0 4px}
+.block>p{margin:0 0 14px;font-size:13px;color:var(--muted-foreground)}
+.issues{display:grid;grid-template-columns:1fr 1fr;gap:14px 32px;font-size:13px}
+.issues b{display:block;font-weight:600;margin-bottom:2px}
+.issues p{margin:0;color:var(--muted-foreground)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.tab{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font:13px ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.tab[aria-pressed=true]{background:var(--fill-selected);color:var(--foreground);border-color:var(--ring)}
+.window{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--background)}
+.winbar{display:flex;justify-content:space-between;height:32px;align-items:center;padding:0 14px;border-bottom:1px solid var(--border);background:var(--tertiary);font:11px ui-monospace,monospace;color:var(--muted-foreground)}
+.app{padding:24px;max-width:896px}
+.note{margin-top:10px;font-size:12px;color:var(--muted-foreground)}
+
+/* app: header */
+.back{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted-foreground);margin-bottom:16px}
+.back svg{width:16px;height:16px}
+.hdr{margin-bottom:32px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.hdr .t{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:600;line-height:1.35}
+.hdr .s{margin-top:2px;font-size:12px;color:var(--muted-foreground)}
+.badge{font-size:10px;font-weight:400;color:var(--muted-foreground);border:1px solid var(--border);border-radius:6px;padding:0 6px;line-height:18px}
+
+/* SettingsSection / SettingsRow */
+.sections>section+section{margin-top:40px}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}
+.sh h3{margin:0;font-size:16px;font-weight:600}
+.sh p{margin:2px 0 0;font-size:12px;color:var(--muted-foreground)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:10px 0}
+.row .l{font-size:14px;font-weight:500}
+.row .h{margin-top:2px;font-size:12px;color:var(--muted-foreground);max-width:52ch}
+
+/* controls */
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;font:500 13px ui-sans-serif,system-ui,sans-serif;border:1px solid var(--border);background:transparent;color:var(--foreground);white-space:nowrap;cursor:pointer}
+.btn.sm{height:28px;padding:0 10px}
+.btn.primary{background:var(--foreground);color:var(--background);border-color:var(--foreground)}
+.btn.ghost{border-color:transparent;color:var(--muted-foreground)}
+.btn.danger{color:var(--destructive);border-color:color-mix(in oklab,var(--destructive) 40%,transparent)}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn svg{width:14px;height:14px}
+.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.select{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;height:32px;width:160px;padding:0 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.select svg{width:14px;height:14px;color:var(--muted-foreground)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:6px;background:color-mix(in oklab,var(--muted) 60%,transparent);font-size:12px}
+.chip small{font-size:10px;color:var(--muted-foreground)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+.d-ok{background:#10b981}.d-err{background:var(--destructive)}.d-run{background:#60a5fa;animation:pulse 1.4s infinite}.d-off{background:color-mix(in oklab,var(--muted-foreground) 40%,transparent)}
+@keyframes pulse{50%{opacity:.3}}
+
+/* status card */
+.card{overflow:hidden;border:1px solid color-mix(in oklab,var(--border) 60%,transparent);border-radius:6px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;font-size:12px;line-height:1.6;color:color-mix(in oklab,var(--foreground) 85%,transparent)}
+.alert.err{background:color-mix(in oklab,var(--destructive) 10%,transparent);border-bottom:1px solid color-mix(in oklab,var(--destructive) 30%,transparent)}
+.alert.info{background:color-mix(in oklab,var(--muted) 45%,transparent);border-bottom:1px solid var(--border)}
+.alert svg{width:14px;height:14px;flex-shrink:0;margin-top:2px}
+.alert.err svg{color:var(--destructive)}
+.alert .act{margin-left:auto;flex-shrink:0}
+.cardrow{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px}
+.cardrow .l{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.cardrow .h{margin-top:2px;font-size:12px;color:var(--muted-foreground);max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent)}
+.stat{padding:8px 12px}
+.stat+.stat{border-left:1px solid color-mix(in oklab,var(--border) 60%,transparent)}
+.stat .k{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:color-mix(in oklab,var(--muted-foreground) 70%,transparent)}
+.stat .v{margin-top:2px;font:12px ui-monospace,monospace}
+.recipe{padding:10px 12px;font:12px/1.7 ui-monospace,monospace;white-space:pre;background:color-mix(in oklab,var(--tertiary) 60%,transparent)}
+.recipe .c{color:var(--muted-foreground)}
+a{color:var(--link);text-decoration:none}
+
+/* table */
+.table{border:1px solid var(--border);border-radius:6px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+td{overflow:hidden;text-overflow:ellipsis}
+th{height:36px;padding:0 12px;text-align:left;font-weight:500;color:var(--muted-foreground);border-bottom:1px solid var(--border)}
+td{padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .dot{margin-right:8px;vertical-align:1px}
+tr.open td{background:var(--fill-hover)}
+.log{font:11.5px/1.6 ui-monospace,monospace;color:var(--muted-foreground);white-space:pre-wrap;padding:8px 12px 10px 32px;background:color-mix(in oklab,var(--tertiary) 60%,transparent)}
+.var{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);font:12px ui-monospace,monospace}
+.var:last-child{border-bottom:0}
+.var span:last-child{color:var(--muted-foreground)}
+
+/* list page */
+.listhdr{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:24px}
+.listhdr h2{margin:0;font-size:20px;font-weight:600}
+.listhdr p{margin:4px 0 0;font-size:13px;color:var(--muted-foreground);max-width:60ch}
+.envrow{display:grid;grid-template-columns:1fr 200px 110px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.envrow:last-child{border-bottom:0}
+.envrow .n{font-size:14px;font-weight:500}
+.envrow .r{margin-top:2px;font:12px ui-monospace,monospace;color:var(--muted-foreground)}
+.envrow .st{font-size:13px;display:flex;align-items:center;gap:8px}
+.envrow .sc{font-size:12px;color:var(--muted-foreground);text-align:right}
+.ov{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:8px;background:color-mix(in oklab,var(--card) 55%,transparent)}
+.ov>div{padding:12px 16px;border-top:1px solid var(--border)}
+.ov>div:nth-child(-n+2){border-top:0}
+.ov>div:nth-child(even){border-left:1px solid var(--border)}
+.ov .k{font-size:12px;color:var(--muted-foreground)}
+.ov .val{margin-top:4px;font-size:13px;display:flex;align-items:center;gap:6px;min-height:20px}
+.ov .val .mono{font-size:12px}
+.si{width:14px;height:14px;flex-shrink:0}.si.ok{color:#10b981}.si.fail{color:var(--destructive)}.si.run{color:#60a5fa}
+.stc{display:inline-flex;align-items:center;gap:8px}
+.banner{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px}
+.banner>svg{width:16px;height:16px;flex-shrink:0}
+.banner>div{flex:1;display:flex;flex-direction:column}
+.banner b{font-weight:500}
+.banner span{font-size:12px;color:color-mix(in oklab,var(--foreground) 70%,transparent)}
+.banner.err{background:color-mix(in oklab,var(--destructive) 14%,transparent);border:1px solid color-mix(in oklab,var(--destructive) 30%,transparent)}
+.banner.err>svg{color:var(--destructive)}
+.banner.info{background:color-mix(in oklab,var(--muted) 50%,transparent);border:1px solid var(--border)}
+.btn.danger-solid{background:var(--destructive);border-color:var(--destructive);color:#fff}
+.hdr .t{font-size:20px;font-weight:600}
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding-top:96px}
+.dialog{width:480px;background:var(--background);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.dh{padding:20px 20px 16px}.dt{font-size:16px;font-weight:600;line-height:1.25}.dd{margin-top:6px;font-size:14px;line-height:1.4;color:var(--muted-foreground)}
+.db{padding:0 20px 20px;display:flex;flex-direction:column;gap:16px}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500}
+.fh{font-size:12px;font-weight:400;color:var(--muted-foreground)}
+.input{height:36px;border:1px solid var(--input,#2a2827);border-radius:6px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;font-weight:400;font-size:14px;background:color-mix(in oklab,var(--input,#2a2827) 30%,transparent)}
+.input.sel svg{width:14px;height:14px;color:var(--muted-foreground)}
+.list{border:1px solid var(--border);border-radius:6px;overflow:hidden;font-weight:400}
+.li2{display:flex;align-items:center;gap:12px;padding:10px 12px;font-size:14px;border-top:1px solid var(--border)}
+.li2:first-child{border-top:0}
+.list.ro .li2{color:var(--muted-foreground)}
+.li2 .gh{width:16px;height:16px;color:var(--muted-foreground);flex-shrink:0}
+.li2 .tag{margin-left:auto;font-size:11px;color:var(--muted-foreground)}
+.li2 .pi{width:18px;height:18px;border-radius:4px;background:#e07850;color:#151110;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.li2 .x{margin-left:auto;background:none;border:0;color:var(--muted-foreground);font-size:16px;cursor:pointer}
+.li2.add{color:var(--muted-foreground)}
+.df{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid color-mix(in oklab,var(--border) 70%,transparent);background:color-mix(in oklab,var(--muted) 20%,transparent)}
+.btn.ghost.dangertext{color:var(--destructive)}
+.ov .val>span[data-state]{display:inline-flex;align-items:center;gap:6px}
+.ov .val.col{flex-direction:column;align-items:flex-start;gap:4px}
+.ov .val.wrap{flex-wrap:wrap}
+.repo{display:inline-flex;align-items:center;gap:8px}
+.repo .gh{width:14px;height:14px;color:var(--muted-foreground)}
+.repo .tag{font-size:11px;color:var(--muted-foreground)}
+.pchip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 4px 0 6px;border-radius:6px;background:color-mix(in oklab,var(--muted) 60%,transparent);font-size:12px}
+.pchip .pi{width:14px;height:14px;border-radius:3px;background:#e07850;color:#151110;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.pchip .x{background:none;border:0;color:var(--muted-foreground);font-size:14px;line-height:1;cursor:pointer;padding:0 2px}
+.linkbtn{background:none;border:0;color:var(--muted-foreground);font:12px ui-sans-serif,system-ui,sans-serif;cursor:pointer;padding:0 4px;height:24px}
+.linkbtn:hover{color:var(--foreground)}
+.btn.icon{width:28px;padding:0;justify-content:center}
+.menu{display:none;position:absolute;right:0;top:34px;min-width:200px;padding:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:5}
+.mi{height:32px;display:flex;align-items:center;padding:0 10px;border-radius:6px;font-size:13px}
+.mi:hover{background:var(--fill-hover)}
+.mi.danger{color:var(--destructive)}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px}.crumbs .sep{color:var(--muted-foreground)}
+.panel{border:1px solid var(--border);border-radius:8px;background:color-mix(in oklab,var(--card) 55%,transparent);padding:16px;display:flex;flex-direction:column;gap:16px}
+.panel.flush{padding:0;gap:0}
+.panel.row2{gap:8px}
+.hint{font-weight:400;font-size:12px;color:var(--muted-foreground);margin-left:6px}
+.code{font:12px/1.8 ui-monospace,monospace;white-space:pre;background:var(--background);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-weight:400;color:var(--muted-foreground)}
+.code .ln{display:inline-block;width:20px;color:color-mix(in oklab,var(--muted-foreground) 50%,transparent)}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.srow .l{font-size:14px;font-weight:500}.srow .h{font-size:12px;color:var(--muted-foreground);margin-top:2px}
+.btn.xs{height:24px;padding:0 8px;font-size:12px}
+table.hist{table-layout:auto}
+.stage{display:flex;justify-content:center;padding:40px 0;background:rgba(0,0,0,.35)}
+.gha{margin-top:6px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-foreground)}.gha .gh{width:14px;height:14px}
+.cmd{border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.cmdin{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted-foreground)}
+.cmdin svg{width:16px;height:16px}
+.cmdlist{height:224px;overflow:hidden;padding:4px}
+.ci{display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:6px;font-size:14px}
+.ci:first-child{background:var(--accent)}
+.ci .gh{width:16px;height:16px;color:var(--muted-foreground);flex-shrink:0}
+.ci .ck{width:16px;height:16px}
+.cmdfoot{display:flex;justify-content:space-between;font-size:12px;color:var(--muted-foreground)}
+.cmdfoot u{color:var(--foreground);text-underline-offset:2px}
+.sheetstage{position:relative;height:520px;display:flex;justify-content:flex-end}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.sheet{position:relative;width:576px;height:100%;background:var(--background);border-left:1px solid var(--border);display:flex;flex-direction:column}
+.kvh{display:flex;gap:8px;font-size:12px;font-weight:500;color:var(--muted-foreground);margin-bottom:8px}.kvh span:not(:last-child){flex:1}
+.kv{display:flex;gap:8px;align-items:center;margin-bottom:8px}.kv .input{flex:1;font-size:13px;height:36px}
+.btn.icon.ghost{border-color:transparent;color:var(--muted-foreground)}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--muted);position:relative;display:inline-block}.toggle::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground)}
+.sheetfoot{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid var(--border)}
+</style></head>
+<body class="dark"><div class="page">
+
+<div class="review">
+<div class="eyebrow">SUPER-3017 · mockup</div>
+<h1>An environment that says how fresh it is, and lets you rebuild it</h1>
+<p>Today an environment's page cannot tell you when its snapshot was built, from which commit, or whether the daily rebuild failed. Laid out like Cursor's environment page: an Overview card, then Builds with Trigger new build.</p>
+</div>
+
+<div class="block">
+<h2>What is wrong today</h2>
+<p>Settings → Environments, and the environment page it links to.</p>
+<div class="issues">
+<div><b>Two detail screens for one environment.</b><p>A row opens a variables-only view (<code>EnvironmentSecrets</code>). The pencil opens another page (<code>EnvironmentView</code>) with the properties.</p></div>
+<div><b>"Checkpoint saved" is never stale.</b><p>It reads <code>environments.updatedAt</code>. Every nightly release moves <code>bundleSha</code>, so a September snapshot says "3 hours ago".</p></div>
+<div><b>Nothing says what builds the snapshot.</b><p>You cannot see whether the environment has an [install], so you cannot tell whether a rebuild can run.</p></div>
+<div><b>The list hides health.</b><p>Rows show a name and repositories. A failing environment looks like a healthy one until a workspace boots slowly.</p></div>
+</div>
+</div>
+
+<div class="block">
+<h2>Environment page</h2>
+<p>Pick a state:</p>
+<div class="tabs" role="group" aria-label="State">
+<button class="tab" data-tab="healthy" aria-pressed="true">Up to date</button>
+<button class="tab" data-tab="running" aria-pressed="false">Building</button>
+<button class="tab" data-tab="paused" aria-pressed="false">Paused after 3 failures</button>
+<button class="tab" data-tab="noinstall" aria-pressed="false">No [install]</button>
+<button class="tab" data-tab="image" aria-pressed="false">No build yet</button>
+<button class="tab" data-tab="menu" aria-pressed="false">More menu</button>
+</div>
+
+<div class="window" style="position:relative"><div class="winbar"><span>Settings → Environments → Hours</span><span>max-w-4xl</span></div>
+<div class="app">
+<div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Environments</div>
+<div class="hdr">
+<div class="t">Hours</div>
+<div style="display:flex;gap:8px"><button class="btn sm ghost">New workspace<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></button><button class="btn sm primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit</button><div style="position:relative"><button class="btn sm icon" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button><div class="menu" data-menu><div class="mi">Rename</div><div class="mi danger">Archive</div></div></div></div>
+</div>
+
+<div class="sections">
+<section>
+<div class="sh"><div><h3>Overview</h3></div></div>
+<div class="ov">
+<div><div class="k">Repositories</div><div class="val col"><span class="repo"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>thinkfiveable/hours<span class="tag">primary</span></span><span class="repo"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>thinkfiveable/shared</span></div></div>
+<div><div class="k">Projects</div><div class="val wrap"><span class="pchip"><span class="pi">H</span>Hours<button class="x" aria-label="Unlink Hours">×</button></span><button class="linkbtn">+ Link project</button></div></div>
+<div><div class="k">Visible to</div><div class="val">Organization</div></div>
+<div><div class="k">Active build status</div><div class="val"><span data-state="healthy"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span><span data-state="running"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span><span data-state="paused"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success · 3 days old</span><span data-state="noinstall"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span><span data-state="image"><span class="muted">—</span></span></div></div>
+<div><div class="k">Region</div><div class="val">Washington, D.C.</div></div>
+<div><div class="k">Updated</div><div class="val">Oct 29, 2026, 4:03 AM UTC</div></div>
+</div>
+</section>
+
+<section>
+<div class="sh"><div><h3>Builds</h3></div>
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn sm ghost" data-state="healthy running paused noinstall">All builds<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
+<button class="btn sm" data-state="healthy paused image">Trigger new build</button>
+<button class="btn sm" data-state="running" disabled>Building…</button>
+<button class="btn sm" data-state="noinstall" disabled title="Add [install] to .superset/config.toml">Trigger new build</button>
+</div></div>
+<div class="table"><table data-state="healthy"><thead><tr><th>Build ID</th><th>Type</th><th>Status</th><th>Started</th></tr></thead><tbody><tr><td class="mono">bld-20261029-4f2a9c1…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 29, 2026, 04:01 AM</td></tr><tr><td class="mono">bld-20261028-b81e0d4…</td><td>Manual</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 28, 2026, 03:12 PM</td></tr><tr><td class="mono">bld-20261028-b81e0d4…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 28, 2026, 04:02 AM</td></tr><tr><td class="mono">bld-20261027-77c19ae…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 27, 2026, 04:01 AM</td></tr></tbody></table><table data-state="running"><thead><tr><th>Build ID</th><th>Type</th><th>Status</th><th>Started</th></tr></thead><tbody><tr><td class="mono">bld-20261029-9c03e7a…</td><td>Manual</td><td><span class="stc"><svg class="si run spin" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-opacity=".3" stroke-width="2"/><path d="M14 8a6 6 0 0 0-6-6" stroke="currentColor" stroke-width="2"/></svg>Running</span></td><td>Oct 29, 2026, 03:24 PM</td></tr><tr><td class="mono">bld-20261029-4f2a9c1…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 29, 2026, 04:01 AM</td></tr><tr><td class="mono">bld-20261028-b81e0d4…</td><td>Manual</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 28, 2026, 03:12 PM</td></tr><tr><td class="mono">bld-20261028-b81e0d4…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 28, 2026, 04:02 AM</td></tr></tbody></table><table data-state="paused"><thead><tr><th>Build ID</th><th>Type</th><th>Status</th><th>Started</th></tr></thead><tbody><tr><td class="mono">bld-20261029-e11b7f0…</td><td>Daily</td><td><span class="stc"><svg class="si fail" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5.6 5.6 4.8 4.8m0-4.8-4.8 4.8" stroke="#151110" stroke-width="1.6"/></svg>Failure</span></td><td>Oct 29, 2026, 04:00 AM</td></tr><tr><td class="mono">bld-20261028-e11b7f0…</td><td>Daily</td><td><span class="stc"><svg class="si fail" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5.6 5.6 4.8 4.8m0-4.8-4.8 4.8" stroke="#151110" stroke-width="1.6"/></svg>Failure</span></td><td>Oct 28, 2026, 04:00 AM</td></tr><tr><td class="mono">bld-20261027-a7d2c55…</td><td>Daily</td><td><span class="stc"><svg class="si fail" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5.6 5.6 4.8 4.8m0-4.8-4.8 4.8" stroke="#151110" stroke-width="1.6"/></svg>Failure</span></td><td>Oct 27, 2026, 04:00 AM</td></tr><tr><td class="mono">bld-20261026-5be9013…</td><td>Daily</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 26, 2026, 04:01 AM</td></tr></tbody></table><table data-state="noinstall"><thead><tr><th>Build ID</th><th>Type</th><th>Status</th><th>Started</th></tr></thead><tbody><tr><td class="mono">bld-20261022-promoted…</td><td>Saved from workspace</td><td><span class="stc"><svg class="si ok" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="m5 8.2 2 2 4-4.2" stroke="#151110" stroke-width="1.6" fill="none"/></svg>Success</span></td><td>Oct 22, 2026, 11:40 AM</td></tr></tbody></table><table data-state="image"><thead><tr><th>Build ID</th><th>Type</th><th>Status</th><th>Started</th></tr></thead><tbody><tr><td colspan="4" class="muted" style="text-align:center;padding:20px 12px">No builds yet</td></tr></tbody></table></div>
+</section>
+
+<section>
+<div class="sh"><div><h3>Environment variables</h3><p>The 5 most recently changed. Set on every workspace started from this environment, and while it builds.</p></div><div style="display:flex;gap:8px;align-items:center"><button class="btn sm ghost">All environment variables (12)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></button><button class="btn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add variable</button></div></div>
+<div class="table"><div class="var"><span>SENTRY_DSN</span><span>••••••••</span></div><div class="var"><span>NODE_OPTIONS</span><span>--max-old-space-size=8192</span></div><div class="var"><span>NEXT_PUBLIC_API_URL</span><span>https://api.staging.fiveable.me</span></div><div class="var"><span>OPENAI_API_KEY</span><span>••••••••</span></div><div class="var"><span>MONGO_URL</span><span>••••••••</span></div></div>
+</section>
+</div>
+</div>
+</div>
+</div>
+
+<div class="block">
+<h2>Edit page</h2>
+<p>Opened by Edit on the environment page.</p>
+<div class="window"><div class="winbar"><span>Settings → Environments → Hours → Edit</span><span>max-w-4xl</span></div>
+<div class="app">
+<div class="hdr"><div class="crumbs"><span class="muted">Environments</span><span class="sep">›</span><span class="muted">Hours</span><span class="sep">›</span><span>Edit</span></div><div style="display:flex;gap:8px"><button class="btn sm primary">Update environment</button><button class="btn sm icon" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div></div>
+<div class="t" style="font-size:20px;font-weight:600;margin:-12px 0 28px">Hours</div>
+<div class="sections">
+
+<section>
+<div class="sh"><div><h3>Configuration</h3></div></div>
+<div class="panel">
+<label class="fl">Name<div class="input">Hours</div></label>
+<label class="fl">Visible to<div class="input sel" style="width:220px">Organization<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div></label>
+<div class="fl"><span>Install script <span class="hint">From [install] in .superset/config.toml on main</span></span><div class="code"><span class="ln">1</span>mise use -g node@22
+<span class="ln">2</span>pnpm install --frozen-lockfile
+<span class="ln">3</span>pnpm exec playwright install chromium
+<span class="ln">4</span>./scripts/seed-test-db.sh</div></div>
+<div class="fl"><span>Setup script <span class="hint">From [setup] · runs every time a workspace starts</span></span><div class="code"><span class="ln">1</span>./scripts/setup.cloud.sh</div></div>
+<a href="#" style="font-size:13px">Edit .superset/config.toml in project settings</a>
+</div>
+</section>
+
+<section>
+<div class="sh"><div><h3>Repositories</h3><p>Changes apply to new workspaces. A new build starts automatically.</p></div></div>
+<div class="panel row2"><span class="repo"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>thinkfiveable/hours<span class="tag">primary</span></span><span class="repo"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>thinkfiveable/shared</span><div><button class="btn sm">Edit</button></div></div>
+</section>
+
+<section>
+<div class="sh"><div><h3>Variables</h3><p>Set on every workspace started from this environment, and while it builds.</p></div><div style="display:flex;gap:8px;align-items:center"><button class="btn sm ghost">All variables (12)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></button><button class="btn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add variable</button></div></div>
+<div class="table"><div class="var"><span>DATABASE_URL</span><span>••••••••</span></div><div class="var"><span>MONGO_URL</span><span>••••••••</span></div><div class="var"><span>NEXT_PUBLIC_API_URL</span><span>https://api.staging.fiveable.me</span></div><div class="var"><span>NODE_OPTIONS</span><span>--max-old-space-size=8192</span></div><div class="var"><span>OPENAI_API_KEY</span><span>••••••••</span></div></div>
+</section>
+
+<section>
+<div class="sh"><div><h3>Environment history</h3><p>The last 5 environments. Restore one to start new workspaces from it again.</p></div></div>
+<div class="table"><table class="hist"><tbody><tr><td>Oct 29, 04:03 AM</td><td class="mono muted">main @ 4f2a9c1</td><td style="text-align:right"><span class="badge">Current</span></td></tr><tr><td>Oct 28, 03:15 PM</td><td class="mono muted">main @ b81e0d4</td><td style="text-align:right"><button class="btn xs">Restore</button></td></tr><tr><td>Oct 28, 04:04 AM</td><td class="mono muted">main @ b81e0d4</td><td style="text-align:right"><button class="btn xs">Restore</button></td></tr><tr><td>Oct 27, 11:20 AM</td><td class="mono muted">main @ 77c19ae</td><td style="text-align:right"><button class="btn xs">Restore</button></td></tr><tr><td>Oct 22, 11:40 AM</td><td class="mono muted">Saved from a workspace</td><td style="text-align:right"><button class="btn xs">Restore</button></td></tr></tbody></table></div>
+</section>
+
+</div></div></div>
+</div>
+
+<div class="block">
+<h2>Edit repositories</h2>
+<p>Repositories → Edit opens the picker from New environment (<code>PickRepositoriesStep</code>), then <code>ChoosePrimaryStep</code> when more than one is picked.</p>
+<div class="window stage"><div class="dialog">
+<div class="dh"><div class="dt">Edit repositories</div><div class="dd">Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds.</div><div class="gha"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>Connected to GitHub as satyapatel</div></div>
+<div class="db" style="gap:8px"><span style="font-size:12px;font-weight:500">Repositories</span>
+<div class="cmd"><div class="cmdin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-5-5"/></svg>Search repositories...</div><div class="cmdlist"><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/hours</span><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/shared</span><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/design-system</span><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/api</span></div><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/mobile</span></div><div class="ci"><svg class="gh" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg><span style="flex:1">thinkfiveable/marketing-site</span></div></div></div>
+<div class="cmdfoot"><span>Missing a repository? <u>Configure access</u></span><span>↻ Refresh</span></div></div>
+<div class="df"><span style="flex:1"></span><button class="btn sm ghost">Cancel</button><button class="btn sm primary">Continue</button></div>
+</div></div>
+</div>
+
+<div class="block">
+<h2>Add variable</h2>
+<p>Add variable, on either page and on All variables, opens the existing side sheet (<code>AddSecretSheet</code>).</p>
+<div class="window sheetstage"><div class="dim"></div><div class="sheet">
+<div style="padding:24px 24px 16px"><div class="dt">Add Environment Variable</div><div class="dd">Add one or more environment variables. You can also drag and drop a .env file.</div></div>
+<div style="padding:0 24px;flex:1">
+<div class="kvh"><span>Key</span><span>Value</span><span style="width:32px"></span></div>
+<div class="kv"><div class="input mono">SENTRY_DSN</div><div class="input mono">https://3f1c…@sentry.io/42</div><button class="btn sm icon ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div>
+<div class="kv"><div class="input mono muted">CLIENT_KEY...</div><div class="input"></div><span style="width:28px"></span></div>
+<button class="btn sm ghost" style="margin-top:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add another</button>
+<div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px"><span class="toggle"></span><span class="muted">Sensitive</span></div>
+</div>
+<div class="sheetfoot"><div style="display:flex;align-items:center;gap:12px"><button class="btn sm">Import .env</button><span class="muted" style="font-size:12px">or paste .env contents in Key input</span></div><button class="btn sm primary">Save</button></div>
+</div></div>
+</div>
+
+<div class="block">
+<h2>All variables</h2>
+<p>The full list, the existing <code>EnvironmentVariablesList</code>: search, sort, edit a row, and the same Add variable sheet.</p>
+<div class="window"><div class="winbar"><span>Settings → Environments → Hours → Variables</span><span>max-w-4xl</span></div>
+<div class="app">
+<div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Hours</div>
+<div class="hdr"><div><div class="t">Variables</div><div class="s">Set on every workspace started from this environment, and while it builds.</div></div><button class="btn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add variable</button></div>
+<div style="display:flex;gap:12px;margin-bottom:12px"><div class="input" style="flex:1;justify-content:flex-start;gap:8px;color:var(--muted-foreground)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-5-5"/></svg>Search variables</div><div class="input sel" style="width:180px">Name A–Z<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div></div>
+<div class="table"><div class="var"><span>DATABASE_URL</span><span>••••••••</span></div><div class="var"><span>MONGO_URL</span><span>••••••••</span></div><div class="var"><span>NEXT_PUBLIC_API_URL</span><span>https://api.staging.fiveable.me</span></div><div class="var"><span>NODE_OPTIONS</span><span>--max-old-space-size=8192</span></div><div class="var"><span>OPENAI_API_KEY</span><span>••••••••</span></div><div class="var"><span>PLAYWRIGHT_BROWSERS_PATH</span><span>/home/ubuntu/.cache/ms-playwright</span></div><div class="var"><span>REDIS_URL</span><span>••••••••</span></div><div class="var"><span>SENTRY_DSN</span><span>••••••••</span></div></div>
+</div></div>
+</div>
+
+<div class="block">
+<h2>Environments list</h2>
+<p>Each row shows the state of its last build.</p>
+<div class="window"><div class="winbar"><span>Settings → Environments</span><span>max-w-4xl</span></div>
+<div class="app">
+<div class="listhdr"><div><h2>Environments</h2><p>The starting point a cloud workspace boots from. Each one rebuilds daily from its base branch.</p></div><div style="display:flex;gap:12px;align-items:center"><span class="muted" style="font-size:12px">3 of 5 environments</span><button class="btn sm primary">+ New environment</button></div></div>
+<div>
+<div class="envrow"><div><div class="n">Hours</div><div class="r">thinkfiveable/hours, thinkfiveable/shared</div></div><div class="st"><span class="dot d-ok"></span>Built 3 hours ago</div><div class="sc">Organization</div></div>
+<div class="envrow"><div><div class="n">Hours (perf)</div><div class="r">thinkfiveable/hours</div></div><div class="st"><span class="dot d-err"></span>Paused · 3 failures</div><div class="sc">Organization</div></div>
+<div class="envrow"><div><div class="n">Satya's scratch</div><div class="r">thinkfiveable/hours</div></div><div class="st"><span class="dot d-off"></span>No [install]</div><div class="sc">Only you</div></div>
+</div>
+</div></div>
+</div>
+
+</div>
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+function show(name){
+ document.querySelectorAll('[data-menu]').forEach(el=>{el.style.display=name==='menu'?'block':'none'});
+ const view=name==='menu'?'healthy':name;
+ tabs.forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.tab===name)));
+ document.querySelectorAll('[data-state]').forEach(el=>{el.style.display=el.dataset.state.split(' ').includes(view)?'':'none'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.tab)));
+show(new URLSearchParams(location.search).get('state')||'healthy');
+</script>
+</body></html>
