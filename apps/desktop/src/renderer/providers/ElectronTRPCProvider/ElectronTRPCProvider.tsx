@@ -83,6 +83,7 @@ const persister = createAsyncStoragePersister({
 		},
 	},
 	key: "superset-rq-cache",
+	throttleTime: 20_000,
 	// Query data carries Dates (tRPC's superjson transformer); plain JSON would
 	// restore them as strings.
 	serialize: superjson.stringify,
