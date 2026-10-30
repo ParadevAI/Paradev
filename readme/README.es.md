@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -321,7 +321,7 @@ Los atajos de teclado se pueden personalizar en **Configuración → Atajos de t
 
 ## Privado por defecto
 
-- **Código fuente disponible**: todo el código está en GitHub bajo la Elastic License 2.0 (ELv2).
+- **Código abierto**: todo el código está en GitHub bajo la licencia MIT.
 - **Conexiones explícitas**: tú eliges qué agentes, proveedores e integraciones conectar.
 
 ## Contribuir
@@ -351,4 +351,4 @@ Los atajos de teclado se pueden personalizar en **Configuración → Atajos de t
 
 **La app de escritorio es gratis para siempre.** Ejecutar agentes en paralelo en tu propia máquina nunca requerirá pago. Todo lo que cobremos será un servicio opcional adicional.
 
-Toda la app está en este repositorio bajo la [Elastic License 2.0](../LICENSE.md): úsala, haz un fork, modifícala, autoalójala para tu equipo. Lo único que queda fuera es reempaquetar el propio Paradev como un servicio que vendas a terceros.
+Toda la app está en este repositorio bajo la [licencia MIT](../LICENSE.md): úsala, haz un fork, modifícala, autoalójala y redistribúyela.
