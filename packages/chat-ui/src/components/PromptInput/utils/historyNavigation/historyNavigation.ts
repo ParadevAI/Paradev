@@ -72,8 +72,8 @@ export function registerHistoryNavigation(
 		event?.preventDefault();
 		index = next;
 		if (next !== null) {
-			recalled = history[next] ?? "";
-			$replaceText(recalled);
+			$replaceText(history[next] ?? "");
+			recalled = draftText($readDraftSegments());
 			return true;
 		}
 		recalled = "";

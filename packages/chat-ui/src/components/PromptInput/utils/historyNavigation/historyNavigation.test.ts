@@ -153,4 +153,13 @@ describe("registerHistoryNavigation", () => {
 		await press(editor, "up");
 		expect(read(editor).text).toBe("first");
 	});
+
+	it("walks past a prompt whose markdown reads back differently", async () => {
+		const editor = setup(["first", "  - a"]);
+		await setContent(editor, () => {}, "end");
+
+		await press(editor, "up");
+		await press(editor, "up");
+		expect(read(editor).text).toBe("first");
+	});
 });

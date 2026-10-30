@@ -72,6 +72,12 @@ describe("draft segments", () => {
 		expect(draftText(read)).toBe("**word **next");
 	});
 
+	test("entities the user typed are sent as typed", () => {
+		expect(draftText([{ type: "text", text: "use &#60; or &#9999999;" }])).toBe(
+			"use &#60; or &#9999999;",
+		);
+	});
+
 	test("appending keeps the existing content first", () => {
 		const { read } = editorWith(
 			[{ type: "text", text: "- one" }],

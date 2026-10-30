@@ -138,14 +138,21 @@ export function $appendDraftSegments(
 	root.selectEnd();
 }
 
-/** Formatted text keeps its edge spaces as `&#32;` in markdown; the agent gets the space. */
+const NUMERIC_ENTITY = /&#(\d{1,7});/g;
+
+/** Lexical writes the edge whitespace of formatted text as entities such as `&#32;`. */
+function decodeWhitespaceEntity(entity: string, code: string): string {
+	const point = Number(code);
+	if (point > 0x10ffff) return entity;
+	const character = String.fromCodePoint(point);
+	return /\s/.test(character) ? character : entity;
+}
+
 export function draftText(segments: readonly ComposerDraftSegment[]): string {
 	return segments
 		.map((segment) =>
 			segment.type === "text"
-				? segment.text.replace(/&#(\d+);/g, (_, code) =>
-						String.fromCodePoint(Number(code)),
-					)
+				? segment.text.replace(NUMERIC_ENTITY, decodeWhitespaceEntity)
 				: segment.chip.serialized,
 		)
 		.join("");
