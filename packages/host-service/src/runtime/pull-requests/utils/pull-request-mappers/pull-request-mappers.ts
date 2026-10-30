@@ -1,4 +1,10 @@
 import type {
+	PullRequestCheck,
+	PullRequestCheckStatus,
+	PullRequestChecksStatus,
+} from "@superset/shared/pull-request";
+import { checkRunStatus } from "@superset/shared/pull-request-checks";
+import type {
 	GitHubCheckContextNode,
 	GitHubPullRequestNode,
 	GitHubPullRequestReviewDecision,
@@ -15,14 +21,8 @@ export type ReviewDecision =
 	| "changes_requested"
 	| "pending"
 	| null;
-export type ChecksStatus = "success" | "failure" | "pending" | "none";
-type CheckStatus = "success" | "failure" | "pending" | "skipped" | "cancelled";
-
-export interface PullRequestCheck {
-	name: string;
-	status: CheckStatus;
-	url: string | null;
-}
+export type ChecksStatus = PullRequestChecksStatus;
+export type { PullRequestCheck };
 
 export function mapPullRequestState(
 	state: GitHubPullRequestNode["state"],
@@ -56,7 +56,7 @@ export function parseCheckContexts(
 			if (node.__typename === "CheckRun") {
 				return {
 					name: node.name,
-					status: mapCheckRunStatus(node.status, node.conclusion),
+					status: checkRunStatus(node.status, node.conclusion),
 					url: node.detailsUrl,
 					recency: getCheckRunRecency(node),
 				};
@@ -86,21 +86,6 @@ export function parseCheckContexts(
 	return [...dedupedChecks.values()].map(
 		({ recency: _recency, ...check }) => check,
 	);
-}
-
-export function computeChecksStatus(checks: PullRequestCheck[]): ChecksStatus {
-	if (checks.length === 0) return "none";
-	// A cancelled run never produced a real verdict — treat it as a failure
-	// rather than falling through to "success".
-	if (
-		checks.some(
-			(check) => check.status === "failure" || check.status === "cancelled",
-		)
-	) {
-		return "failure";
-	}
-	if (checks.some((check) => check.status === "pending")) return "pending";
-	return "success";
 }
 
 export function coercePullRequestState(value: string | null): PullRequestState {
@@ -153,31 +138,7 @@ export function parseChecksJson(value: string | null): PullRequestCheck[] {
 	}
 }
 
-function mapCheckRunStatus(
-	status: string,
-	conclusion: string | null,
-): CheckStatus {
-	if (status !== "COMPLETED") return "pending";
-
-	switch (conclusion) {
-		case "SUCCESS":
-			return "success";
-		case "FAILURE":
-		case "TIMED_OUT":
-		case "ACTION_REQUIRED":
-		case "STARTUP_FAILURE":
-			return "failure";
-		case "CANCELLED":
-			return "cancelled";
-		case "SKIPPED":
-		case "NEUTRAL":
-			return "skipped";
-		default:
-			return "pending";
-	}
-}
-
-function mapStatusContextState(state: string): CheckStatus {
+function mapStatusContextState(state: string): PullRequestCheckStatus {
 	switch (state) {
 		case "SUCCESS":
 			return "success";

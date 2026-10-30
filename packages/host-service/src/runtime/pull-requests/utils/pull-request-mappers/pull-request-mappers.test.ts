@@ -2,9 +2,7 @@ import { describe, expect, test } from "bun:test";
 import type { GitHubCheckContextNode } from "../github-query";
 import {
 	coercePullRequestState,
-	computeChecksStatus,
 	mapPullRequestState,
-	type PullRequestCheck,
 	parseCheckContexts,
 } from "./pull-request-mappers";
 
@@ -39,55 +37,6 @@ describe("coercePullRequestState", () => {
 	});
 });
 
-function check(status: PullRequestCheck["status"]): PullRequestCheck {
-	return { name: status, status, url: null };
-}
-
-describe("computeChecksStatus", () => {
-	test("no checks is none", () => {
-		expect(computeChecksStatus([])).toBe("none");
-	});
-
-	test("a cancelled check is a failure, not a success", () => {
-		expect(computeChecksStatus([check("cancelled")])).toBe("failure");
-		expect(computeChecksStatus([check("success"), check("cancelled")])).toBe(
-			"failure",
-		);
-	});
-
-	test("failure beats pending and cancelled", () => {
-		expect(
-			computeChecksStatus([
-				check("pending"),
-				check("cancelled"),
-				check("failure"),
-			]),
-		).toBe("failure");
-	});
-
-	test("cancelled beats pending even with no explicit failure present", () => {
-		expect(computeChecksStatus([check("pending"), check("cancelled")])).toBe(
-			"failure",
-		);
-	});
-
-	test("pending beats success and skipped", () => {
-		expect(
-			computeChecksStatus([
-				check("success"),
-				check("skipped"),
-				check("pending"),
-			]),
-		).toBe("pending");
-	});
-
-	test("all success (or skipped) is success", () => {
-		expect(computeChecksStatus([check("success"), check("skipped")])).toBe(
-			"success",
-		);
-	});
-});
-
 function checkRun(conclusion: string | null): GitHubCheckContextNode {
 	return {
 		__typename: "CheckRun",
@@ -106,11 +55,5 @@ describe("parseCheckContexts", () => {
 		expect(parseCheckContexts([checkRun("STARTUP_FAILURE")])).toEqual([
 			{ name: "build", status: "failure", url: null },
 		]);
-	});
-
-	test("a completed run that failed to start fails the aggregate", () => {
-		expect(
-			computeChecksStatus(parseCheckContexts([checkRun("STARTUP_FAILURE")])),
-		).toBe("failure");
 	});
 });
