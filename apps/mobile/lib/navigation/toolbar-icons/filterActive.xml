@@ -3,5 +3,5 @@
     android:height="24dp"
     android:viewportWidth="960"
     android:viewportHeight="960">
-  <path android:fillColor="#FFFFFFFF" android:pathData="M 440 800 q -17 0 -28.5 -11.5 T 400 760 v -240 L 168 224 q -15 -20 -4.5 -42 t 36.5 -22 h 560 q 26 0 36.5 22 t -4.5 42 L 560 520 v 240 q 0 17 -11.5 28.5 T 520 800 h -80 Z m 40 -308 198 -252 H 282 l 198 252 Z m 0 0 Z"/>
+  <path android:fillColor="#FFFFFFFF" android:pathData="M 440 800 q -17 0 -28.5 -11.5 T 400 760 v -240 L 168 224 q -15 -20 -4.5 -42 t 36.5 -22 h 560 q 26 0 36.5 22 t -4.5 42 L 560 520 v 240 q 0 17 -11.5 28.5 T 520 800 h -80 Z"/>
 </vector>

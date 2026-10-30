@@ -13,6 +13,7 @@ export type ToolbarIconName =
 	| "jumpToFile"
 	| "more"
 	| "search"
+	| "send"
 	| "sessions"
 	| "share"
 	| "stop"

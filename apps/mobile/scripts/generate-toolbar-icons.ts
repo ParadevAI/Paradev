@@ -10,18 +10,20 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ToolbarIconName } from "../lib/navigation/toolbarIcon.types";
 
+// `fill1` for an "on" state, as the iOS side uses a `.fill` symbol there.
 const MATERIAL_SYMBOL: Record<ToolbarIconName, string> = {
 	add: "add",
 	comments: "forum",
 	commentMode: "center_focus_weak",
-	commentModeOn: "center_focus_strong",
+	commentModeOn: "center_focus_strong/fill1",
 	confirm: "check",
 	expand: "open_in_full",
 	filter: "filter_list",
-	filterActive: "filter_alt",
+	filterActive: "filter_alt/fill1",
 	jumpToFile: "find_in_page",
 	more: "more_horiz",
 	search: "search",
+	send: "send",
 	sessions: "stacks",
 	share: "ios_share",
 	stop: "stop",
@@ -84,7 +86,8 @@ function shiftIntoViewport(d: string): string {
 }
 
 async function fetchPaths(symbol: string): Promise<string[]> {
-	const url = `https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/${symbol}/default/24px.svg`;
+	const [name, style = "default"] = symbol.split("/");
+	const url = `https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/${name}/${style}/24px.svg`;
 	const response = await fetch(url);
 	if (!response.ok) throw new Error(`${symbol}: ${response.status} ${url}`);
 	const svg = await response.text();
@@ -110,6 +113,4 @@ for (const [name, symbol] of Object.entries(MATERIAL_SYMBOL)) {
 		vectorDrawable(await fetchPaths(symbol)),
 	);
 }
-console.log(
-	`Wrote ${Object.keys(MATERIAL_SYMBOL).length} icons to ${outDir}`,
-);
+console.log(`Wrote ${Object.keys(MATERIAL_SYMBOL).length} icons to ${outDir}`);

@@ -18,6 +18,7 @@ const DRAWABLE: Record<ToolbarIconName, ToolbarIconSource> = {
 	jumpToFile: require("./toolbar-icons/jumpToFile.xml"),
 	more: require("./toolbar-icons/more.xml"),
 	search: require("./toolbar-icons/search.xml"),
+	send: require("./toolbar-icons/send.xml"),
 	sessions: require("./toolbar-icons/sessions.xml"),
 	share: require("./toolbar-icons/share.xml"),
 	stop: require("./toolbar-icons/stop.xml"),

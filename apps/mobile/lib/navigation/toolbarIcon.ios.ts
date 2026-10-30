@@ -16,6 +16,7 @@ const SF_SYMBOL: Record<ToolbarIconName, ToolbarIconSource> = {
 	jumpToFile: "text.line.first.and.arrowtriangle.forward",
 	more: "ellipsis",
 	search: "magnifyingglass",
+	send: "paperplane",
 	sessions: "rectangle.stack",
 	share: "square.and.arrow.up",
 	stop: "stop.fill",
