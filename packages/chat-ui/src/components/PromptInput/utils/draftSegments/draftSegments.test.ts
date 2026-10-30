@@ -2,101 +2,144 @@ import { describe, expect, test } from "bun:test";
 import { CodeNode } from "@lexical/code";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { QuoteNode } from "@lexical/rich-text";
-import { $getRoot, createEditor } from "lexical";
+import {
+	$createParagraphNode,
+	$createTextNode,
+	$getRoot,
+	createEditor,
+	type LexicalEditor,
+} from "lexical";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import type { ComposerDraftSegment } from "../../types";
 import {
 	$appendDraftSegments,
-	$readDraftSegments,
+	$readPromptText,
+	draftChips,
+	draftOf,
 	draftText,
-	promptText,
 } from "./draftSegments";
 
 const chip = { label: "Linear", serialized: "@linear", data: { id: 7 } };
 
-function editorWith(...drafts: ComposerDraftSegment[][]) {
-	const editor = createEditor({
+function newEditor(): LexicalEditor {
+	return createEditor({
 		nodes: [MentionChipNode, ListNode, ListItemNode, QuoteNode, CodeNode],
 		onError: (error) => {
 			throw error;
 		},
 	});
-	let read: ComposerDraftSegment[] = [];
-	let text = "";
-	editor.update(
-		() => {
-			for (const draft of drafts) $appendDraftSegments(draft);
-			read = $readDraftSegments();
-			text = $getRoot().getTextContent();
-		},
-		{ discrete: true },
-	);
-	return { read, text };
 }
 
-describe("draft segments", () => {
-	test("text, chips and line breaks survive a round trip", () => {
-		const segments: ComposerDraftSegment[] = [
-			{ type: "text", text: "fix " },
-			{ type: "chip", chip },
-			{ type: "text", text: " now\nplease" },
-		];
-		expect(editorWith(segments).read).toEqual(segments);
+function load(editor: LexicalEditor, update: () => void) {
+	editor.update(update, { discrete: true });
+	return {
+		draft: draftOf(editor.getEditorState()),
+		prompt: editor.getEditorState().read($readPromptText),
+		text: editor.getEditorState().read(() => $getRoot().getTextContent()),
+	};
+}
+
+const append = (...drafts: ComposerDraftSegment[][]) =>
+	load(newEditor(), () => {
+		for (const draft of drafts) $appendDraftSegments(draft);
 	});
 
-	test("lists, formats and code blocks survive a round trip", () => {
-		const segments: ComposerDraftSegment[] = [
-			{ type: "text", text: "Plan:\n- read **the** " },
-			{ type: "chip", chip },
-			{
-				type: "text",
-				text: " issue\n    - then *fix* it\n1. ship\n> careful\n```\nconst a = 1;\n```",
-			},
-		];
-		const { read, text } = editorWith(segments);
-		expect(read).toEqual(segments);
+describe("draft segments", () => {
+	test("a chip seed loads inline, ready to type after", () => {
+		const { prompt, draft, text } = append([{ type: "chip", chip }]);
+		expect(prompt).toBe("@linear");
+		expect(text).toBe("@linear ");
+		expect(draftChips(draft)).toEqual([chip]);
+	});
+
+	test("markdown lists, formats and code load as blocks", () => {
+		const markdown =
+			"Plan:\n- read **the** issue\n    - then *fix* it\n1. ship\n> careful\n```\nconst a = 1;\n```";
+		const { prompt, text } = append([{ type: "text", text: markdown }]);
+		expect(prompt).toBe(markdown);
 		expect(text).not.toContain("- read");
 	});
 
-	test("prompt text that only looks like markdown stays literal", () => {
-		const segments: ComposerDraftSegment[] = [
-			{ type: "text", text: "call __init__ with *args, ~/src/a_b.py" },
-		];
-		const { read, text } = editorWith(segments);
-		expect(text).toBe(draftText(segments));
-		expect(read).toEqual(segments);
+	test("prompt text that only looks like markdown is sent as typed", () => {
+		const typed = "call __init__ with *args, ~/src/a_b.py and &#60; &#9999999;";
+		const { prompt, text } = append([{ type: "text", text: typed }]);
+		expect(prompt).toBe(typed);
+		expect(text).toBe(typed);
 	});
 
-	test("a formatted edge space reaches the agent as a space", () => {
-		const { read } = editorWith([{ type: "text", text: "**word&#32;**next" }]);
-		expect(draftText(read)).toBe("**word **next");
+	test("the composer's draft reloads exactly, formatting included", () => {
+		const first = load(newEditor(), () => {
+			const paragraph = $createParagraphNode().append(
+				$createTextNode("é"),
+				$createTextNode("x ").toggleFormat("italic"),
+				$createTextNode("y"),
+				MentionChipNode.fromChip(chip),
+			);
+			$getRoot().clear().append(paragraph);
+		});
+		const second = append(first.draft);
+		expect(second.draft).toEqual(first.draft);
+		expect(first.prompt).toBe("é*x* y@linear");
+		expect(draftChips(first.draft)).toEqual([chip]);
 	});
 
-	test("entities the user typed are sent as typed", () => {
-		expect(draftText([{ type: "text", text: "use &#60; or &#9999999;" }])).toBe(
-			"use &#60; or &#9999999;",
-		);
+	test("formatted edge spaces go outside the markers", () => {
+		const { prompt } = load(newEditor(), () => {
+			$getRoot()
+				.clear()
+				.append(
+					$createParagraphNode().append(
+						$createTextNode("word ").toggleFormat("bold"),
+						$createTextNode("next"),
+						$createTextNode(" ").toggleFormat("italic"),
+						$createTextNode("end"),
+					),
+				);
+		});
+		expect(prompt).toBe("**word** next end");
 	});
 
-	test("appending keeps the existing content first", () => {
-		const { read } = editorWith(
-			[{ type: "text", text: "- one" }],
-			[{ type: "text", text: "two" }],
-		);
-		expect(draftText(read)).toBe("- one\ntwo");
-	});
-
-	test("an empty editor reads as no segments", () => {
-		expect(editorWith([]).read).toEqual([]);
+	test("formatted whitespace next to the same format keeps its markers balanced", () => {
+		const prompt = (...parts: [string, boolean][]) =>
+			load(newEditor(), () => {
+				const nodes = parts.map(([text, bold]) => {
+					const node = $createTextNode(text);
+					return bold ? node.toggleFormat("bold") : node;
+				});
+				$getRoot()
+					.clear()
+					.append($createParagraphNode().append(...nodes));
+			}).prompt;
+		expect(prompt(["a", true], [" ", true], ["b", false])).toBe("**a** b");
+		expect(prompt(["a", false], [" ", true], ["b", true])).toBe("a **b**");
+		expect(prompt(["a", true], [" ", true], ["b", true])).toBe("**a b**");
 	});
 
 	test("the prompt drops empty bullets and blank lines at its ends", () => {
-		expect(promptText([{ type: "text", text: "-" }])).toBe("");
-		expect(promptText([{ type: "text", text: "\n- a\n- b\n- \n1. \n>" }])).toBe(
-			"- a\n- b",
+		expect(append([{ type: "text", text: "-" }]).prompt).toBe("");
+		expect(
+			append([{ type: "text", text: "\n- a\n- b\n- \n1. \n>" }]).prompt,
+		).toBe("- a\n- b");
+	});
+
+	test("appending keeps the existing content first", () => {
+		const editor = newEditor();
+		load(editor, () => $appendDraftSegments([{ type: "text", text: "- one" }]));
+		const draft = draftOf(editor.getEditorState());
+		const { prompt } = append(draft, [{ type: "text", text: "two" }]);
+		expect(prompt).toBe("- one\n\ntwo");
+	});
+
+	test("an empty editor has no draft", () => {
+		expect(append([]).draft).toEqual([]);
+		expect(append([{ type: "text", text: "- " }]).draft).toEqual([]);
+	});
+
+	test("draft text reads every kind of segment", () => {
+		const { draft } = append([{ type: "text", text: "- a" }]);
+		expect(draftText([{ type: "chip", chip }, ...draft])).toBe(
+			"@linear \n\n- a",
 		);
-		expect(promptText([{ type: "text", text: "- a\n-\n- b" }])).toBe(
-			"- a\n-\n- b",
-		);
+		expect(draftText([...draft, { type: "text", text: "b" }])).toBe("- a\n\nb");
 	});
 });

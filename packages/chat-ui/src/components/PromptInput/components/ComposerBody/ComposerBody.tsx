@@ -91,8 +91,8 @@ import type {
 import { browseRows } from "../../utils/browseRows";
 import {
 	$appendDraftSegments,
-	$readDraftSegments,
-	promptText,
+	$readPromptText,
+	draftOf,
 	TYPED_SHORTCUTS,
 } from "../../utils/draftSegments";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
@@ -366,7 +366,7 @@ export function ComposerBody({
 		() =>
 			editor.registerUpdateListener(({ editorState }) => {
 				onDraftChangeRef.current?.({
-					segments: editorState.read($readDraftSegments),
+					segments: draftOf(editorState),
 					attachments: attachmentsRef.current,
 					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				});
@@ -375,7 +375,7 @@ export function ComposerBody({
 	);
 	useEffect(() => {
 		onDraftChangeRef.current?.({
-			segments: editor.getEditorState().read($readDraftSegments),
+			segments: draftOf(editor.getEditorState()),
 			attachments,
 			...(usedDictationRef.current ? { usedDictation: true } : {}),
 		});
@@ -595,11 +595,12 @@ export function ComposerBody({
 
 	const submit = ({ steer = false }: { steer?: boolean } = {}) => {
 		if (stateRef.current.disabled || stateRef.current.pending) return;
-		const { mentions, segments } = editor.getEditorState().read(() => ({
+		const editorState = editor.getEditorState();
+		const { mentions, text } = editorState.read(() => ({
 			mentions: $collectChips(),
-			segments: $readDraftSegments(),
+			text: $readPromptText(),
 		}));
-		const text = promptText(segments);
+		const segments = draftOf(editorState);
 		const sent = stateRef.current.attachments;
 		const files = sent.map((attachment) => attachment.file);
 		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {

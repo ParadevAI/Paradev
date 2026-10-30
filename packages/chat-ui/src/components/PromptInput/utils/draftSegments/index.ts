@@ -1,7 +1,8 @@
 export {
 	$appendDraftSegments,
-	$readDraftSegments,
+	$readPromptText,
+	draftChips,
+	draftOf,
 	draftText,
-	promptText,
 	TYPED_SHORTCUTS,
 } from "./draftSegments";

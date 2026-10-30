@@ -11,11 +11,7 @@ import {
 	type LexicalNode,
 	type RangeSelection,
 } from "lexical";
-import {
-	$appendDraftSegments,
-	$readDraftSegments,
-	draftText,
-} from "../draftSegments";
+import { $appendDraftSegments, $readPromptText } from "../draftSegments";
 
 function $isCaretAtStart(selection: RangeSelection): boolean {
 	if (selection.anchor.offset !== 0) return false;
@@ -51,7 +47,7 @@ export function registerHistoryNavigation(
 			return false;
 		const selection = $getSelection();
 		if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
-		const text = draftText($readDraftSegments());
+		const text = $readPromptText();
 
 		let next: number | null;
 		if (index === null) {
@@ -73,7 +69,7 @@ export function registerHistoryNavigation(
 		index = next;
 		if (next !== null) {
 			$replaceText(history[next] ?? "");
-			recalled = draftText($readDraftSegments());
+			recalled = $readPromptText();
 			return true;
 		}
 		recalled = "";

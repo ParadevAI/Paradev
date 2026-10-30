@@ -1,3 +1,4 @@
+import type { SerializedEditorState } from "lexical";
 import type { ReactNode, Ref } from "react";
 
 export type ComposerChip = {
@@ -105,9 +106,14 @@ export type PromptInputLocalFiles = {
 	reveal(path: string): void;
 };
 
+/**
+ * `text` is markdown. The composer saves itself as one `editor` segment: its
+ * Lexical state, and the markdown the agent would receive.
+ */
 export type ComposerDraftSegment =
 	| { type: "text"; text: string }
-	| { type: "chip"; chip: ComposerChip };
+	| { type: "chip"; chip: ComposerChip }
+	| { type: "editor"; state: SerializedEditorState; text: string };
 
 export type ComposerDraft = {
 	segments: ComposerDraftSegment[];
