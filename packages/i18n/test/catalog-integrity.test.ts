@@ -55,25 +55,63 @@ const icu = (t: string) =>
 		.sort()
 		.join();
 
+const ICU_HEAD = /\{\s*\w+\s*,\s*(plural|select|selectordinal)\b/y;
+
+// Balanced, unlike stripIcu: a branch ending in `{name}}` must not end the block.
+function outsideIcu(t: string): string {
+	let out = "";
+	let i = 0;
+	while (i < t.length) {
+		ICU_HEAD.lastIndex = i;
+		if (!ICU_HEAD.test(t)) {
+			out += t[i++];
+			continue;
+		}
+		for (let depth = 0; i < t.length; i++) {
+			if (t[i] === "{") depth++;
+			else if (t[i] === "}" && --depth === 0) break;
+		}
+		i++;
+	}
+	return out;
+}
+
+const strayBraces = (t: string) =>
+	/[{}]/.test(outsideIcu(t).replace(/\{[A-Za-z0-9_]+\}/g, ""));
+
 function integrityError(source: string, translation: string): string | null {
 	for (const name of placeholders(source)) {
 		if (!placeholders(translation).has(name)) return `missing {${name}}`;
 	}
 	if (tags(source) !== tags(translation)) return "tag markers differ";
 	if (icu(source) !== icu(translation)) return "ICU structure differs";
+	if (strayBraces(translation) && !strayBraces(source))
+		return "braces the source does not have";
 	return null;
 }
+
+const readCatalog = (locale: string) =>
+	parsePo(readFileSync(join(LOCALES_DIR, locale, "messages.po"), "utf8"));
+
+// An explicit-id message keeps its English in the source catalog's msgstr.
+const english = new Map(
+	readCatalog(SOURCE_LOCALE).map((entry) => [
+		entry.msgid,
+		entry.msgstr || entry.msgid,
+	]),
+);
 
 describe("catalog integrity", () => {
 	for (const locale of SUPPORTED_LOCALES) {
 		if (locale === SOURCE_LOCALE) continue;
 		test(`${locale} keeps placeholders, tags, and ICU shape`, () => {
-			const broken = parsePo(
-				readFileSync(join(LOCALES_DIR, locale, "messages.po"), "utf8"),
-			)
+			const broken = readCatalog(locale)
 				.filter((entry) => entry.msgstr !== "")
 				.flatMap((entry) => {
-					const problem = integrityError(entry.msgid, entry.msgstr);
+					const problem = integrityError(
+						english.get(entry.msgid) ?? entry.msgid,
+						entry.msgstr,
+					);
 					return problem
 						? [`${JSON.stringify(entry.msgid.slice(0, 70))}: ${problem}`]
 						: [];
@@ -81,4 +119,22 @@ describe("catalog integrity", () => {
 			expect(broken).toEqual([]);
 		});
 	}
+
+	test("rejects a locale dict dump and a dropped placeholder, keeps a nested plural", () => {
+		expect(
+			integrityError(
+				"Hello {name}",
+				'{"en": "Hello {name}", "fr": "Bonjour {name}"}',
+			),
+		).toBe("braces the source does not have");
+		expect(integrityError("Saved to {path}", "Збережено")).toBe(
+			"missing {path}",
+		);
+		expect(
+			integrityError(
+				"{count, plural, one {# file in {name}} other {# files in {name}}}",
+				"{count, plural, one {# файл у {name}} few {# файли у {name}} many {# файлів у {name}} other {# файлу у {name}}}",
+			),
+		).toBeNull();
+	});
 });
