@@ -308,8 +308,10 @@ local_write_config_overlay() {
   local overlay='{"setup":["./.superset/setup.local.sh"],"teardown":["./.superset/teardown.local.sh"]}'
   local merged
   if [ -f "$path" ]; then
-    merged="$(jq --argjson overlay "$overlay" '. * $overlay' "$path")" || {
-      error "$path is not valid JSON"
+    merged="$(jq -s --argjson overlay "$overlay" \
+      'if length == 1 and (.[0] | type) == "object" then .[0] * $overlay else error("not one JSON object") end' \
+      "$path")" || {
+      error "$path must contain exactly one JSON object"
       return 1
     }
   else
@@ -328,7 +330,11 @@ local_setup_main() {
   echo ""
 
   local_ensure_env || step_failed "Prepare .env"
-  local_check_dependencies || step_failed "Check dependencies"
+  if ! local_check_dependencies; then
+    step_failed "Check dependencies"
+    print_summary "Local setup"
+    return
+  fi
   step_install_dependencies || step_failed "Install dependencies"
   local_allocate_ports || step_failed "Allocate ports"
   local_write_env || step_failed "Write workspace .env"
