@@ -1,8 +1,8 @@
-export {
-	type TerminalConnectionState,
-	type TerminalControlMessage,
-	type TerminalHost,
-	type TerminalSelectState,
-	TerminalWebView,
-	type TerminalWebViewHandle,
-} from "./TerminalWebView";
+export { TerminalWebView } from "./TerminalWebView";
+export type {
+	TerminalConnectionState,
+	TerminalControlMessage,
+	TerminalHost,
+	TerminalSelectState,
+	TerminalWebViewHandle,
+} from "./TerminalWebView.types";
