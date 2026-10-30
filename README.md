@@ -14,6 +14,28 @@ Run Claude Code, Codex, or another CLI agent with terminals, code review, and br
 
 </div>
 
+## What is Paradev?
+
+Paradev is a desktop app for running CLI coding agents in parallel. Each task gets its own Git worktree, branch, and terminals, so Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, or any other CLI agent can work on several tasks in one repository at the same time.
+
+Paradev is for developers who already use a coding agent in the terminal and want to run more than one task at once, without juggling terminal tabs and branches by hand.
+
+A single agent CLI runs one session in one terminal, and an editor is built around one checkout. Paradev adds the workspace around the agents:
+
+- **One worktree per task**: agents work in separate copies of the repository, on separate branches
+- **Review in the app**: a Changes pane to review, commit, push, and open pull requests, and a pull request pane with checks, review threads, and merge
+- **In-app browser**: preview each workspace's dev server, with ports detected per workspace
+- **Agent status**: the sidebar shows which agent is working, done, or waiting on you
+- **Beyond one machine**: remote hosts, an iPhone and iPad app, and automations that start agents on a schedule or from an event (Pro plan)
+
+Paradev is not a coding agent itself. You bring your own agent subscriptions and API keys, and Paradev does not proxy model calls.
+
+**Platforms**: macOS (Apple Silicon and Intel). Linux as an experimental x64 AppImage. Windows is not yet available.
+
+**Formerly Superset**: Paradev was previously named Superset, and the CLI command is still `superset`. It is unrelated to Apache Superset, the business intelligence tool.
+
+**Paradev vs. alternatives**: [Cursor](https://paradev.com/compare/cursor-alternative) · [Codex app](https://paradev.com/compare/codex-app-alternative) · [Conductor](https://paradev.com/compare/conductor-alternative)
+
 ### Documentation for agents
 
 The docs are available as [a Markdown index](https://docs.paradev.com/llms.txt) linking to individual pages, or [one full-text file](https://docs.paradev.com/llms-full.txt).
