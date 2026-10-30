@@ -6578,6 +6578,9 @@ msgstr "Delete project"
 msgid "Delete Project…"
 msgstr "Delete Project…"
 
+msgid "Delete routine"
+msgstr "Delete routine"
+
 msgid "Delete script"
 msgstr "Delete script"
 
@@ -10097,9 +10100,6 @@ msgstr "It may be asleep"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "It may have been deleted, or it belongs to another organization."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "It stops for good. Its past runs stay in the chat."
 
 msgid "It will open once the connection is back."
 msgstr "It will open once the connection is back."
@@ -19527,6 +19527,9 @@ msgstr "This will disconnect GitHub from your organization. The GitHub App will 
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "This will permanently delete the routine and stop future runs."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "This will permanently delete this file. This action cannot be undone."

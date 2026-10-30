@@ -6578,6 +6578,9 @@ msgstr "Project verwijderen"
 msgid "Delete Project…"
 msgstr "Project verwijderen…"
 
+msgid "Delete routine"
+msgstr "Routine verwijderen"
+
 msgid "Delete script"
 msgstr "Script verwijderen"
 
@@ -10097,9 +10100,6 @@ msgstr "Hij staat mogelijk in sluimerstand"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mogelijk is die verwijderd, of hoort die bij een andere organisatie."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Hij stopt voorgoed. Eerdere uitvoeringen blijven in de chat."
 
 msgid "It will open once the connection is back."
 msgstr "De pagina opent zodra de verbinding terug is."
@@ -19527,6 +19527,9 @@ msgstr "Hiermee wordt GitHub losgekoppeld van je organisatie. De GitHub App blij
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Hiermee worden alle draaiende sessies beëindigd en wordt de terminal-daemon opnieuw gestart. De app start terminals opnieuw met een verse daemon."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "De routine wordt definitief verwijderd en toekomstige uitvoeringen stoppen."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Hiermee wordt dit bestand definitief verwijderd. Dit kan niet ongedaan worden gemaakt."

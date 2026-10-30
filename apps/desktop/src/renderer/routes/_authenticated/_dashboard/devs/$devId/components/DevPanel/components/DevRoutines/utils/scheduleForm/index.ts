@@ -6,4 +6,5 @@ export {
 	scheduleFromForm,
 	WEEKDAYS,
 	type Weekday,
+	zonedInstant,
 } from "./scheduleForm";

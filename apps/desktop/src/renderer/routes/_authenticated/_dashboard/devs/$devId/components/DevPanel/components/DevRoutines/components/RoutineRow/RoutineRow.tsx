@@ -8,9 +8,18 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
 import { useState } from "react";
-import { LuBell, LuClock, LuEllipsis, LuHash } from "react-icons/lu";
+import {
+	LuBell,
+	LuCirclePause,
+	LuCirclePlay,
+	LuClock,
+	LuEllipsis,
+	LuHash,
+	LuPencil,
+	LuRotateCw,
+	LuTrash2,
+} from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
 import { PanelRow } from "../../../PanelRow";
@@ -56,14 +65,10 @@ export function RoutineRow({ devId, routine, onEdit }: RoutineRowProps) {
 				}}
 				className="cursor-pointer"
 				icon={icon}
-				label={
-					<span className={cn(!routine.enabled && "text-muted-foreground")}>
-						{routine.title}
-					</span>
-				}
+				label={routine.title}
 				trailing={
 					<>
-						<span className="group-hover:hidden group-focus-within:hidden">
+						<span className="group-hover:hidden group-focus-within:hidden group-has-[[data-state=open]]:hidden">
 							{routineSummary(routine, {
 								paused: t({ message: "Paused" }),
 								monitoring: t({ message: "Monitoring" }),
@@ -94,17 +99,25 @@ export function RoutineRow({ devId, routine, onEdit }: RoutineRowProps) {
 									}
 								>
 									{routine.enabled ? (
-										<Trans>Pause</Trans>
+										<>
+											<LuCirclePause className="size-4" />
+											<Trans>Pause</Trans>
+										</>
 									) : (
-										<Trans>Resume</Trans>
+										<>
+											<LuCirclePlay className="size-4" />
+											<Trans>Resume</Trans>
+										</>
 									)}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onSelect={() => runNow.mutate({ routineId: routine.id })}
 								>
+									<LuRotateCw className="size-4" />
 									<Trans>Run now</Trans>
 								</DropdownMenuItem>
 								<DropdownMenuItem onSelect={onEdit}>
+									<LuPencil className="size-4" />
 									<Trans>Edit</Trans>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
@@ -112,6 +125,7 @@ export function RoutineRow({ devId, routine, onEdit }: RoutineRowProps) {
 									variant="destructive"
 									onSelect={() => setDeleting(true)}
 								>
+									<LuTrash2 className="size-4" />
 									<Trans>Delete</Trans>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -124,9 +138,10 @@ export function RoutineRow({ devId, routine, onEdit }: RoutineRowProps) {
 				onOpenChange={setDeleting}
 				title={t({ message: `Delete ${routine.title}?` })}
 				description={t({
-					message: "It stops for good. Its past runs stay in the chat.",
+					message:
+						"This will permanently delete the routine and stop future runs.",
 				})}
-				confirmLabel={t({ message: "Delete" })}
+				confirmLabel={t({ message: "Delete routine" })}
 				onConfirm={() => remove.mutate({ routineId: routine.id })}
 			/>
 		</>

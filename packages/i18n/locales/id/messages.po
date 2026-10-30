@@ -6578,6 +6578,9 @@ msgstr "Hapus proyek"
 msgid "Delete Project…"
 msgstr "Hapus proyek…"
 
+msgid "Delete routine"
+msgstr "Hapus rutinitas"
+
 msgid "Delete script"
 msgstr "Hapus skrip"
 
@@ -10097,9 +10100,6 @@ msgstr "Mungkin sedang tidur"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mungkin sudah dihapus, atau milik organisasi lain."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Rutinitas berhenti untuk selamanya. Eksekusi sebelumnya tetap ada di obrolan."
 
 msgid "It will open once the connection is back."
 msgstr "Akan terbuka saat koneksi kembali."
@@ -19527,6 +19527,9 @@ msgstr "Ini akan memutuskan GitHub dari organisasi Anda. GitHub App tetap terpas
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Ini akan mematikan semua sesi yang berjalan dan memulai ulang daemon terminal. Aplikasi akan menjalankan ulang terminal dengan daemon yang baru."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Rutinitas akan dihapus permanen dan eksekusi berikutnya dihentikan."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Ini akan menghapus file ini secara permanen. Tindakan ini tidak bisa dibatalkan."

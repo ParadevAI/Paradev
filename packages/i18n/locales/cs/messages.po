@@ -6578,6 +6578,9 @@ msgstr "Smazat projekt"
 msgid "Delete Project…"
 msgstr "Smazat projekt…"
 
+msgid "Delete routine"
+msgstr "Smazat rutinu"
+
 msgid "Delete script"
 msgstr "Smazat skript"
 
@@ -10097,9 +10100,6 @@ msgstr "Možná je uspaný"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mohla být smazána nebo patří jiné organizaci."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Natrvalo se zastaví. Dřívější spuštění zůstanou v chatu."
 
 msgid "It will open once the connection is back."
 msgstr "Otevře se, jakmile se připojení vrátí."
@@ -19527,6 +19527,9 @@ msgstr "Tímto odpojíte GitHub od své organizace. GitHub App zůstane nainstal
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Tímto se ukončí všechny běžící relace a restartuje terminálový démon. Aplikace terminály spustí znovu s čerstvým démonem."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Rutina se trvale smaže a další spuštění se zastaví."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Tímto se soubor trvale smaže. Tuto akci nelze vrátit zpět."

@@ -6578,6 +6578,9 @@ msgstr "Projeyi sil"
 msgid "Delete Project…"
 msgstr "Projeyi sil…"
 
+msgid "Delete routine"
+msgstr "Rutini sil"
+
 msgid "Delete script"
 msgstr "Betiği sil"
 
@@ -10097,9 +10100,6 @@ msgstr "Uykuda olabilir"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Silinmiş olabilir veya başka bir kuruluşa ait olabilir."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Kalıcı olarak durur. Geçmiş çalıştırmalar sohbette kalır."
 
 msgid "It will open once the connection is back."
 msgstr "Bağlantı geri geldiğinde açılacak."
@@ -19527,6 +19527,9 @@ msgstr "Bu işlem GitHub bağlantısını kuruluşunuzdan kaldırır. GitHub App
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Bu işlem çalışan tüm oturumları sonlandırır ve terminal daemon'unu yeniden başlatır. Uygulama, terminalleri yeni bir daemon ile yeniden başlatır."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Rutin kalıcı olarak silinir ve gelecekteki çalıştırmalar durdurulur."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Bu işlem, bu dosyayı kalıcı olarak siler. Bu işlem geri alınamaz."

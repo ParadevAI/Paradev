@@ -6578,6 +6578,9 @@ msgstr "Elimina il progetto"
 msgid "Delete Project…"
 msgstr "Elimina il progetto…"
 
+msgid "Delete routine"
+msgstr "Elimina routine"
+
 msgid "Delete script"
 msgstr "Elimina lo script"
 
@@ -10097,9 +10100,6 @@ msgstr "Potrebbe essere in stop"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Potrebbe essere stata eliminata oppure appartiene a un'altra organizzazione."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Si ferma per sempre. Le esecuzioni passate restano nella chat."
 
 msgid "It will open once the connection is back."
 msgstr "Si aprirà al ritorno della connessione."
@@ -19527,6 +19527,9 @@ msgstr "Questo scollegherà GitHub dalla tua organizzazione. La GitHub App reste
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Questo terminerà tutte le sessioni in esecuzione e riavvierà il daemon del terminale. L'app riavvierà i terminali con un daemon nuovo."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "La routine verrà eliminata definitivamente e le esecuzioni future verranno interrotte."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Questo eliminerà definitivamente questo file. L'operazione non può essere annullata."

@@ -6578,6 +6578,9 @@ msgstr "프로젝트 삭제"
 msgid "Delete Project…"
 msgstr "프로젝트 삭제…"
 
+msgid "Delete routine"
+msgstr "루틴 삭제"
+
 msgid "Delete script"
 msgstr "스크립트 삭제"
 
@@ -10097,9 +10100,6 @@ msgstr "절전 모드일 수 있습니다"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "삭제되었거나 다른 조직에 속한 페이지일 수 있습니다."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "영구적으로 중지됩니다. 지난 실행은 채팅에 남습니다."
 
 msgid "It will open once the connection is back."
 msgstr "연결이 복구되면 열립니다."
@@ -19527,6 +19527,9 @@ msgstr "조직에서 GitHub 연결을 해제합니다. GitHub App은 설치된 �
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "실행 중인 모든 세션을 종료하고 터미널 데몬을 다시 시작합니다. 앱은 새 데몬으로 터미널을 다시 시작합니다."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "루틴이 영구적으로 삭제되고 이후 실행이 중지됩니다."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "이 파일을 영구히 삭제합니다. 되돌릴 수 없습니다."

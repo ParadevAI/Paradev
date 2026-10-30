@@ -15,6 +15,7 @@ import {
 	WEEKDAYS,
 	type Weekday,
 } from "../../../../../../utils/scheduleForm";
+import { clockLabel, timeChoices } from "../../../../../../utils/zoneLabels";
 import { SettingRow } from "../SettingRow";
 
 const EVERY: RepeatEvery[] = [
@@ -156,12 +157,21 @@ export function ScheduleFields({ form, onChange }: ScheduleFieldsProps) {
 			)}
 			{!custom && (
 				<SettingRow label={<Trans>Time</Trans>}>
-					<Input
-						type="time"
+					<Select
 						value={form.time}
-						onChange={(event) => onChange({ time: event.target.value })}
-						className={FIELD}
-					/>
+						onValueChange={(time) => onChange({ time })}
+					>
+						<SelectTrigger className={TRIGGER}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent align="end" className="max-h-72">
+							{timeChoices(form.time).map((time) => (
+								<SelectItem key={time} value={time}>
+									{clockLabel(time, form.date, form.timezone)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</SettingRow>
 			)}
 			{form.repeat && !custom && (

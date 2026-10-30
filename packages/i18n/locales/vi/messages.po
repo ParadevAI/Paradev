@@ -6578,6 +6578,9 @@ msgstr "Xóa dự án"
 msgid "Delete Project…"
 msgstr "Xóa dự án…"
 
+msgid "Delete routine"
+msgstr "Xóa quy trình"
+
 msgid "Delete script"
 msgstr "Xóa script"
 
@@ -10097,9 +10100,6 @@ msgstr "Máy có thể đang ngủ"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Có thể nó đã bị xóa, hoặc thuộc về một tổ chức khác."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Quy trình dừng hẳn. Các lần chạy trước vẫn ở trong cuộc trò chuyện."
 
 msgid "It will open once the connection is back."
 msgstr "Trang sẽ mở khi có kết nối trở lại."
@@ -19527,6 +19527,9 @@ msgstr "Thao tác này sẽ ngắt kết nối GitHub khỏi tổ chức của b
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Thao tác này sẽ kết thúc mọi phiên đang chạy và khởi động lại daemon terminal. Ứng dụng sẽ khởi động lại các terminal với một daemon mới."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Quy trình sẽ bị xóa vĩnh viễn và các lần chạy sau sẽ dừng."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Thao tác này sẽ xóa vĩnh viễn tệp này. Không thể hoàn tác."

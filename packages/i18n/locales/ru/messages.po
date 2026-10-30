@@ -6578,6 +6578,9 @@ msgstr "Удалить проект"
 msgid "Delete Project…"
 msgstr "Удалить проект…"
 
+msgid "Delete routine"
+msgstr "Удалить рутину"
+
 msgid "Delete script"
 msgstr "Удалить скрипт"
 
@@ -10097,9 +10100,6 @@ msgstr "Возможно, компьютер в режиме сна"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Возможно, она удалена или принадлежит другой организации."
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "Она остановится навсегда. Прошлые запуски останутся в чате."
 
 msgid "It will open once the connection is back."
 msgstr "Страница откроется, когда связь вернётся."
@@ -19527,6 +19527,9 @@ msgstr "Это отключит GitHub от вашей организации. G
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Это завершит все работающие сессии и перезапустит демон терминала. Приложение перезапустит терминалы с новым демоном."
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "Рутина будет удалена навсегда, а будущие запуски остановлены."
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "Это безвозвратно удалит этот файл. Действие нельзя отменить."

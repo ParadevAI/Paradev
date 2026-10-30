@@ -8,7 +8,6 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue,
 } from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
 import { Textarea } from "@superset/ui/textarea";
@@ -21,11 +20,15 @@ import {
 	type ScheduleForm,
 	scheduleFromForm,
 } from "../../../../utils/scheduleForm";
+import { zoneName } from "../../../../utils/zoneLabels";
 import { ScheduleFields } from "./components/ScheduleFields";
 import { SettingRow } from "./components/SettingRow";
 import { WatchRows } from "./components/WatchRows";
 
 const TIME_ZONES = Intl.supportedValuesOf("timeZone");
+
+const cityOf = (zone: string) =>
+	(zone.split("/").pop() ?? zone).replace(/_/g, " ");
 
 interface EditRoutineFormProps {
 	devId: string;
@@ -52,6 +55,11 @@ export function EditRoutineForm({
 			: null,
 	);
 	const [showAdvanced, setShowAdvanced] = useState(false);
+	const [saved] = useState(() =>
+		JSON.stringify([title, prompt, form && scheduleFromForm(form)]),
+	);
+	const changed =
+		JSON.stringify([title, prompt, form && scheduleFromForm(form)]) !== saved;
 	const update = cloudTrpc.agentRoutine.update.useMutation({
 		onSuccess: () => {
 			void utils.agentRoutine.list.invalidate({ agentId: devId });
@@ -116,27 +124,31 @@ export function EditRoutineForm({
 				)}
 			</button>
 			{showAdvanced && (
-				<div className="flex flex-col rounded-md border border-input">
+				<div className="flex flex-col gap-3">
 					{form && (
-						<SettingRow label={<Trans>Time zone</Trans>}>
-							<Select
-								value={form.timezone}
-								onValueChange={(timezone) => setForm({ ...form, timezone })}
-							>
-								<SelectTrigger className="h-7 w-auto gap-1 border-0 bg-transparent px-1 text-muted-foreground shadow-none hover:text-foreground dark:bg-transparent">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent align="end" className="max-h-72">
-									{TIME_ZONES.map((zone) => (
-										<SelectItem key={zone} value={zone}>
-											{zone}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</SettingRow>
+						<div className="rounded-md border border-input">
+							<SettingRow label={<Trans>Time zone</Trans>}>
+								<Select
+									value={form.timezone}
+									onValueChange={(timezone) => setForm({ ...form, timezone })}
+								>
+									<SelectTrigger className="h-7 w-auto gap-1 border-0 bg-transparent px-1 text-muted-foreground shadow-none hover:text-foreground dark:bg-transparent">
+										<span>{zoneName(form.timezone)}</span>
+									</SelectTrigger>
+									<SelectContent align="end" className="max-h-72">
+										{TIME_ZONES.map((zone) => (
+											<SelectItem key={zone} value={zone}>
+												{zoneName(zone)} ({cityOf(zone)})
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</SettingRow>
+						</div>
 					)}
-					<SettingRow label={<Trans>Runs in</Trans>}>{runsIn}</SettingRow>
+					<div className="rounded-md border border-input">
+						<SettingRow label={<Trans>Runs in</Trans>}>{runsIn}</SettingRow>
+					</div>
 				</div>
 			)}
 			<div className="flex justify-end gap-2 pt-1">
@@ -150,7 +162,9 @@ export function EditRoutineForm({
 					{routine.enabled ? <Trans>Pause</Trans> : <Trans>Resume</Trans>}
 				</Button>
 				<Button
-					disabled={update.isPending || !title.trim() || !prompt.trim()}
+					disabled={
+						update.isPending || !changed || !title.trim() || !prompt.trim()
+					}
 					onClick={save}
 				>
 					<Trans>Save</Trans>

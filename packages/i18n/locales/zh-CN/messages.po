@@ -6578,6 +6578,9 @@ msgstr "删除项目"
 msgid "Delete Project…"
 msgstr "删除项目…"
 
+msgid "Delete routine"
+msgstr "删除例行任务"
+
 msgid "Delete script"
 msgstr "删除脚本"
 
@@ -10097,9 +10100,6 @@ msgstr "设备可能处于睡眠状态"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被删除，或属于另一个组织。"
-
-msgid "It stops for good. Its past runs stay in the chat."
-msgstr "它会永久停止。过去的运行会保留在聊天中。"
 
 msgid "It will open once the connection is back."
 msgstr "网络恢复后会自动打开。"
@@ -19527,6 +19527,9 @@ msgstr "这会断开GitHub与你组织的连接。GitHub App仍会保持安装�
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "这将终止所有运行中的会话并重启终端守护进程。应用会用全新的守护进程重启终端。"
+
+msgid "This will permanently delete the routine and stop future runs."
+msgstr "这将永久删除该例行任务，并停止之后的运行。"
 
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "这将永久删除此文件。此操作无法撤销。"

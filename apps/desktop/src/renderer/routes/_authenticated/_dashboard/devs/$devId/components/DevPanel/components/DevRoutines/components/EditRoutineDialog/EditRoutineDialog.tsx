@@ -15,7 +15,7 @@ export function EditRoutineDialog({
 }: EditRoutineDialogProps) {
 	return (
 		<Dialog open={routine !== null} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="sm:max-w-[540px]">
+			<DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-[540px]">
 				{routine && (
 					<EditRoutineForm
 						key={routine.id}
