@@ -10,7 +10,6 @@ import {
 	SiLinear,
 	SiNotion,
 	SiPosthog,
-	SiResend,
 	SiSentry,
 	SiSupabase,
 	SiVercel,
@@ -32,6 +31,7 @@ import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
 import { AutumnIcon } from "./components/AutumnIcon";
 import { PeecIcon } from "./components/PeecIcon";
+import { ResendIcon } from "./components/ResendIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
 
 /**
@@ -67,7 +67,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	peec: { icon: PeecIcon },
 	sentry: { icon: SiSentry },
 	posthog: { icon: SiPosthog },
-	resend: { icon: SiResend },
+	resend: { icon: ResendIcon },
 	linear: { icon: SiLinear },
 	supabase: { icon: SiSupabase, color: "#3ECF8E" },
 	context7: { icon: LuBookOpen },
