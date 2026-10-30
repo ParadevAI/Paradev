@@ -1,49 +1,15 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Modal, Pressable, View } from "react-native";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import type {
-	AlertPromptHostComponent,
-	Prompt,
-	PromptOptions,
-} from "./AlertPrompt.types";
+import type { AlertPromptHostComponent, Prompt } from "./AlertPrompt.types";
+import { enqueuePrompt, settlePrompt, usePendingPrompt } from "./promptQueue";
 
-interface PendingPrompt {
-	options: PromptOptions;
-	resolve: (value: string | null) => void;
-}
-
-const queue: PendingPrompt[] = [];
-const listeners = new Set<() => void>();
-
-function subscribe(listener: () => void) {
-	listeners.add(listener);
-	return () => {
-		listeners.delete(listener);
-	};
-}
-
-function emit() {
-	for (const listener of listeners) listener();
-}
-
-const current = () => queue[0];
-
-function settle(value: string | null) {
-	const pending = queue.shift();
-	pending?.resolve(value);
-	emit();
-}
-
-export const prompt: Prompt = (options) =>
-	new Promise((resolve) => {
-		queue.push({ options, resolve });
-		emit();
-	});
+export const prompt: Prompt = enqueuePrompt;
 
 export const AlertPromptHost: AlertPromptHostComponent = () => {
-	const pending = useSyncExternalStore(subscribe, current, current);
+	const pending = usePendingPrompt();
 	const { t } = useLingui();
 	const [value, setValue] = useState("");
 
@@ -53,8 +19,8 @@ export const AlertPromptHost: AlertPromptHostComponent = () => {
 
 	if (!pending) return null;
 	const { options } = pending;
-	const cancel = () => settle(null);
-	const confirm = () => settle(value);
+	const cancel = () => settlePrompt(null);
+	const confirm = () => settlePrompt(value);
 
 	return (
 		<Modal
