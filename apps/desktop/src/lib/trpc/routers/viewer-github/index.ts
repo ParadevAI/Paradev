@@ -29,7 +29,7 @@ export function createViewerGithubRouter(
 	> = new LocalGitCredentialProvider(),
 	clientFor: (token: string) => Octokit = (token) =>
 		new Octokit({ auth: token }),
-	now: () => number = Date.now,
+	now: () => number = () => performance.now(),
 ) {
 	// Each miss spawns `git credential fill` and `gh auth token`, and PR panes
 	// ask on every poll.
