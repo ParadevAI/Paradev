@@ -21829,3 +21829,30 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "无法打开 {name}"
+
+msgid "Could not remove {name}"
+msgstr "无法移除 {name}"
+
+msgid "Could not update {name}"
+msgstr "无法更新 {name}"
+
+msgid "Extensions"
+msgstr "扩展程序"
+
+msgid "Get extensions"
+msgstr "获取扩展程序"
+
+msgid "Pin {name}"
+msgstr "固定 {name}"
+
+msgid "Remove {name}?"
+msgstr "移除 {name}？"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "该扩展程序及其本地数据将从此浏览器中删除。"
+
+msgid "Unpin {name}"
+msgstr "取消固定 {name}"

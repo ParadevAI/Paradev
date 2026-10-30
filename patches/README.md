@@ -611,3 +611,30 @@ repo, without Android, tests, rn-tester and API snapshots) to a copy of the
 package with `patch -p3`, inline the two new files as above, and write
 `git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
 before the button column.
+
+## electron-chrome-web-store (`electron-chrome-web-store@<version>.patch`)
+
+**Why:** the package reads the CRX3 header and checks that the declared
+extension ID matches a public key, but never verifies a signature, and it
+unpacks CRX2 files with no check at all. HTTPS to Google is then the only guard
+on code that runs in every page of the browser pane. Installs and updates
+download, parse and unpack in one internal call chain (`downloadExtensionFromURL`
+→ `parseCrx` → `unpackCrx`), so no option or hook of the package can see the
+bytes in between.
+
+**What it changes** (`dist/cjs/browser/index.js`, `dist/esm/browser/index.mjs`
+and the types): `parseCrx`, the one function every install and update passes
+through, first calls a verifier set with the new `setCrxVerifier` export, and
+refuses every CRX while none is set. It also exports the existing
+`downloadExtensionFromURL`, so a test can serve a CRX from a local server. The
+verifier is `apps/desktop/src/main/lib/browser/extension-host/crx3.ts`.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/web-store.test.ts`.
+It downloads a real Web Store CRX, the same bytes with one flipped byte, and an
+unsigned CRX2 through the installed package, and checks that only the first
+reaches disk. Without the patch its imports do not exist and typecheck fails.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-web-store`
+(without `CI=1` it runs the native rebuild), make the same change in `parseCrx`
+and both export lists of both bundles, `CI=1 bun patch --commit
+'node_modules/electron-chrome-web-store'`, then run the guard test.

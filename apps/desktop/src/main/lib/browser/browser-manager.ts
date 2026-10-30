@@ -130,7 +130,7 @@ function protocolOf(url: string): string | null {
 	}
 }
 
-function isAllowedGuestUrl(url: string): boolean {
+export function isAllowedGuestUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && ALLOWED_GUEST_SCHEMES.has(protocol);
 }
@@ -334,6 +334,7 @@ class BrowserManager extends EventEmitter {
 		// Tell subscribers when a live wake dies with the pane, so the renderer
 		// doesn't keep a stale pane id in its exemption set.
 		if (this.agentWakes.delete(paneId)) this.emitAgentActive();
+		this.emit("pane-unregistered", { paneId });
 	}
 
 	/**
@@ -455,6 +456,16 @@ class BrowserManager extends EventEmitter {
 	 */
 	requestOpen(request: BrowserOpenRequest): void {
 		this.emit("open-request", request);
+	}
+
+	/** Open `url` in a new pane beside `paneId`, as a `target="_blank"` link in it does. */
+	openInNewPane(paneId: string, url: string): void {
+		this.emit(`new-window:${paneId}`, url);
+	}
+
+	/** Close the pane, as Cmd+W in it does. */
+	requestClose(paneId: string): void {
+		this.emit(`close-pane:${paneId}`);
 	}
 
 	/**
@@ -1035,7 +1046,7 @@ class BrowserManager extends EventEmitter {
 				overrideBrowserWindowOptions: popupWindowOptions(),
 			};
 		}
-		this.emit(`new-window:${paneId}`, details.url);
+		this.openInNewPane(paneId, details.url);
 		return { action: "deny" };
 	}
 
@@ -1246,7 +1257,7 @@ class BrowserManager extends EventEmitter {
 				const key = input.key.toLowerCase();
 				if (key === "w") {
 					event.preventDefault();
-					this.emit(`close-pane:${paneId}`);
+					this.requestClose(paneId);
 					return;
 				}
 				if (key === "r") {
@@ -1311,6 +1322,7 @@ class BrowserManager extends EventEmitter {
 				}
 				if (cancelled || gen !== generation) return;
 				this.emit(`pane-focus:${paneId}`);
+				this.emit("pane-focused", { paneId });
 			}
 		};
 		const rearm = (): void => {

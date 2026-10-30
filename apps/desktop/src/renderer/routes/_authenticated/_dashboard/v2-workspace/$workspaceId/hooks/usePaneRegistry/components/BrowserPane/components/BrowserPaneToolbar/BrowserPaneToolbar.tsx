@@ -3,7 +3,11 @@ import type { RendererContext } from "@superset/panes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { SquareDashedMousePointer } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import {
+	PinnedExtensionButtons,
+	useBrowserExtensions,
+} from "renderer/components/BrowserExtensions";
 import { OpenBrowserPageInAppButton } from "renderer/components/OpenBrowserPageInAppButton";
 import type { PaneViewerData } from "../../../../../../types";
 import { browserRuntimeRegistry } from "../../browserRuntimeRegistry";
@@ -27,6 +31,8 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 	const state = useBrowserState(paneId);
 	const designMode = useDesignModeState(paneId);
 	const deviceToolbar = useDeviceToolbarState(paneId);
+	const extensions = useBrowserExtensions(paneId);
+	const pinnedExtensionsRef = useRef<HTMLDivElement>(null);
 
 	const handleToggleDesignMode = useCallback(() => {
 		designModeStore.toggle(paneId);
@@ -68,6 +74,11 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 				onNavigate={handleNavigate}
 			/>
 			<div className="flex shrink-0 items-center gap-1 pr-1.5">
+				<PinnedExtensionButtons
+					ref={pinnedExtensionsRef}
+					paneId={paneId}
+					extensions={extensions}
+				/>
 				<OpenBrowserPageInAppButton
 					currentUrl={state.currentUrl}
 					onOpenInPane={(newPane) =>
@@ -117,6 +128,8 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 					onToggleDeviceToolbar={() => deviceToolbarStore.toggle(paneId)}
 					onOpenFindBar={() => findBarStore.open(paneId)}
 					onNavigateToUrl={handleNavigate}
+					extensions={extensions}
+					pinnedExtensionsRef={pinnedExtensionsRef}
 				/>
 				{ctx.headerActions}
 			</div>

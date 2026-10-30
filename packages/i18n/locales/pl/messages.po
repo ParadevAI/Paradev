@@ -21829,3 +21829,30 @@ msgstr "Pomniejsz"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Nie udało się otworzyć {name}"
+
+msgid "Could not remove {name}"
+msgstr "Nie udało się usunąć {name}"
+
+msgid "Could not update {name}"
+msgstr "Nie udało się zaktualizować {name}"
+
+msgid "Extensions"
+msgstr "Rozszerzenia"
+
+msgid "Get extensions"
+msgstr "Pobierz rozszerzenia"
+
+msgid "Pin {name}"
+msgstr "Przypnij {name}"
+
+msgid "Remove {name}?"
+msgstr "Usunąć {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Rozszerzenie i jego dane lokalne zostaną usunięte z tej przeglądarki."
+
+msgid "Unpin {name}"
+msgstr "Odepnij {name}"

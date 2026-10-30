@@ -1,0 +1,243 @@
+diff --git a/node_modules/electron-chrome-web-store/.bun-tag-31ba82eada12cdb9 b/.bun-tag-31ba82eada12cdb9
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/electron-chrome-web-store/.bun-tag-86a580be542a53c8 b/.bun-tag-86a580be542a53c8
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/chrome-web-store.preload.js b/dist/chrome-web-store.preload.js
+index 94fb2b4c5d240bc80aba0d8e72b526b12684daf9..203628ad1839a59dda486387a3eee76a1e211120 100644
+--- a/dist/chrome-web-store.preload.js
++++ b/dist/chrome-web-store.preload.js
+@@ -61,7 +61,7 @@
+     const update = () => {
+       requestAnimationFrame(() => {
+         const chromeButtons = Array.from(document.querySelectorAll("span")).filter(
+-          (node) => node.innerText.includes("Chrome")
++          (node) => node.innerText.includes("Chrome") && !node.innerText.includes(appName)
+         );
+         for (const button of chromeButtons) {
+           button.innerText = button.innerText.replace("Chrome", appName);
+diff --git a/dist/cjs/browser/index.js b/dist/cjs/browser/index.js
+index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..abd32b3fba3c00e0c84f0ace55634627ee82166b 100644
+--- a/dist/cjs/browser/index.js
++++ b/dist/cjs/browser/index.js
+@@ -31,9 +31,11 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
+ var browser_exports = {};
+ __export(browser_exports, {
+   downloadExtension: () => downloadExtension,
++  downloadExtensionFromURL: () => downloadExtensionFromURL,
+   installChromeWebStore: () => installChromeWebStore,
+   installExtension: () => installExtension,
+   loadAllExtensions: () => loadAllExtensions,
++  setCrxVerifier: () => setCrxVerifier,
+   uninstallExtension: () => uninstallExtension,
+   updateExtensions: () => updateExtensions
+ });
+@@ -1007,7 +1009,15 @@ function getExtensionCrxURL(extensionId) {
+   url.searchParams.append("prodversion", getChromeVersion());
+   return url.toString();
+ }
++var crxVerifier;
++function setCrxVerifier(verifier) {
++  crxVerifier = verifier;
++}
+ function parseCrx(buffer) {
++  if (typeof crxVerifier !== "function") {
++    throw new Error("electron-chrome-web-store: no CRX verifier is set, refusing to unpack");
++  }
++  crxVerifier(buffer);
+   const magicNumber = buffer.toString("utf8", 0, 4);
+   if (magicNumber !== "Cr24") {
+     throw new Error("Invalid CRX format");
+@@ -1373,10 +1383,20 @@ function registerWebStoreApi(webStoreState) {
+   handle(
+     "chrome.management.uninstall",
+     async (event, id, options) => {
+-      if (options?.showConfirmDialog) {
+-      }
+       try {
+-        await uninstallExtension(id, webStoreState);
++        if (webStoreState.onUninstall) {
++          const extension = webStoreState.session.extensions.getExtension(id);
++          const removed = await webStoreState.onUninstall({
++            id,
++            localizedName: extension?.name ?? id,
++            showConfirmDialog: Boolean(options?.showConfirmDialog),
++            frame: event.senderFrame,
++            browserWindow: import_electron3.BrowserWindow.fromWebContents(event.sender.hostWebContents ?? event.sender) || void 0
++          });
++          if (!removed) return Result.USER_CANCELLED;
++        } else {
++          await uninstallExtension(id, webStoreState);
++        }
+         queueMicrotask(() => {
+           event.sender.send("chrome.management.onUninstalled", id);
+         });
+@@ -1628,6 +1648,7 @@ async function installChromeWebStore(opts = {}) {
+   const autoUpdate = typeof opts.autoUpdate === "boolean" ? opts.autoUpdate : true;
+   const minimumManifestVersion = typeof opts.minimumManifestVersion === "number" ? opts.minimumManifestVersion : 3;
+   const beforeInstall = typeof opts.beforeInstall === "function" ? opts.beforeInstall : void 0;
++  const onUninstall = typeof opts.onUninstall === "function" ? opts.onUninstall : void 0;
+   const webStoreState = {
+     session,
+     extensionsPath,
+@@ -1635,7 +1656,8 @@ async function installChromeWebStore(opts = {}) {
+     allowlist: opts.allowlist ? new Set(opts.allowlist) : void 0,
+     denylist: opts.denylist ? new Set(opts.denylist) : void 0,
+     minimumManifestVersion,
+-    beforeInstall
++    beforeInstall,
++    onUninstall
+   };
+   const preloadPath = resolvePreloadPath(opts.modulePath);
+   if ("registerPreloadScript" in session) {
+@@ -1666,9 +1688,11 @@ async function installChromeWebStore(opts = {}) {
+ // Annotate the CommonJS export names for ESM import in node:
+ 0 && (module.exports = {
+   downloadExtension,
++  downloadExtensionFromURL,
+   installChromeWebStore,
+   installExtension,
+   loadAllExtensions,
++  setCrxVerifier,
+   uninstallExtension,
+   updateExtensions
+ });
+diff --git a/dist/esm/browser/index.mjs b/dist/esm/browser/index.mjs
+index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..717e3911d8f28096a496e2f809cd7e825295a5e5 100644
+--- a/dist/esm/browser/index.mjs
++++ b/dist/esm/browser/index.mjs
+@@ -284,7 +284,15 @@ function getExtensionCrxURL(extensionId) {
+   url.searchParams.append("prodversion", getChromeVersion());
+   return url.toString();
+ }
++var crxVerifier;
++function setCrxVerifier(verifier) {
++  crxVerifier = verifier;
++}
+ function parseCrx(buffer) {
++  if (typeof crxVerifier !== "function") {
++    throw new Error("electron-chrome-web-store: no CRX verifier is set, refusing to unpack");
++  }
++  crxVerifier(buffer);
+   const magicNumber = buffer.toString("utf8", 0, 4);
+   if (magicNumber !== "Cr24") {
+     throw new Error("Invalid CRX format");
+@@ -650,10 +658,20 @@ function registerWebStoreApi(webStoreState) {
+   handle(
+     "chrome.management.uninstall",
+     async (event, id, options) => {
+-      if (options?.showConfirmDialog) {
+-      }
+       try {
+-        await uninstallExtension(id, webStoreState);
++        if (webStoreState.onUninstall) {
++          const extension = webStoreState.session.extensions.getExtension(id);
++          const removed = await webStoreState.onUninstall({
++            id,
++            localizedName: extension?.name ?? id,
++            showConfirmDialog: Boolean(options?.showConfirmDialog),
++            frame: event.senderFrame,
++            browserWindow: BrowserWindow.fromWebContents(event.sender.hostWebContents ?? event.sender) || void 0
++          });
++          if (!removed) return Result.USER_CANCELLED;
++        } else {
++          await uninstallExtension(id, webStoreState);
++        }
+         queueMicrotask(() => {
+           event.sender.send("chrome.management.onUninstalled", id);
+         });
+@@ -905,6 +923,7 @@ async function installChromeWebStore(opts = {}) {
+   const autoUpdate = typeof opts.autoUpdate === "boolean" ? opts.autoUpdate : true;
+   const minimumManifestVersion = typeof opts.minimumManifestVersion === "number" ? opts.minimumManifestVersion : 3;
+   const beforeInstall = typeof opts.beforeInstall === "function" ? opts.beforeInstall : void 0;
++  const onUninstall = typeof opts.onUninstall === "function" ? opts.onUninstall : void 0;
+   const webStoreState = {
+     session,
+     extensionsPath,
+@@ -912,7 +931,8 @@ async function installChromeWebStore(opts = {}) {
+     allowlist: opts.allowlist ? new Set(opts.allowlist) : void 0,
+     denylist: opts.denylist ? new Set(opts.denylist) : void 0,
+     minimumManifestVersion,
+-    beforeInstall
++    beforeInstall,
++    onUninstall
+   };
+   const preloadPath = resolvePreloadPath(opts.modulePath);
+   if ("registerPreloadScript" in session) {
+@@ -942,9 +962,11 @@ async function installChromeWebStore(opts = {}) {
+ }
+ export {
+   downloadExtension,
++  downloadExtensionFromURL,
+   installChromeWebStore,
+   installExtension,
+   loadAllExtensions,
++  setCrxVerifier,
+   uninstallExtension,
+   updateExtensions
+ };
+diff --git a/dist/types/browser/index.d.ts b/dist/types/browser/index.d.ts
+index 895f30373eeba990a9bb4063d7c76b89bbe36988..d4b5951acef531fbdce9244da83ba68d398225d5 100644
+--- a/dist/types/browser/index.d.ts
++++ b/dist/types/browser/index.d.ts
+@@ -1,7 +1,7 @@
+ export { loadAllExtensions } from './loader';
+-export { installExtension, uninstallExtension, downloadExtension } from './installer';
++export { installExtension, uninstallExtension, downloadExtension, downloadExtensionFromURL, setCrxVerifier } from './installer';
+ export { updateExtensions } from './updater';
+-import { BeforeInstall, ExtensionId } from './types';
++import { BeforeInstall, ExtensionId, OnUninstall } from './types';
+ interface ElectronChromeWebStoreOptions {
+     /**
+      * Session to enable the Chrome Web Store in.
+@@ -53,6 +53,11 @@ interface ElectronChromeWebStoreOptions {
+      * to be taken.
+      */
+     beforeInstall?: BeforeInstall;
++    /**
++     * Replaces the removal the Web Store page asks for. Ask first when
++     * `showConfirmDialog` is set; resolve `true` once the extension is removed.
++     */
++    onUninstall?: OnUninstall;
+ }
+ /**
+  * Install Chrome Web Store support.
+diff --git a/dist/types/browser/installer.d.ts b/dist/types/browser/installer.d.ts
+index 174f9d4c3f573712c30f647c6e1493512cb82732..8ad193085f9cb80432dba7d3e761d093cb6d0e2f 100644
+--- a/dist/types/browser/installer.d.ts
++++ b/dist/types/browser/installer.d.ts
+@@ -1,3 +1,8 @@
++/**
++ * Called with every downloaded CRX before it is parsed or unpacked. It must
++ * throw to refuse the CRX. With no verifier set, every CRX is refused.
++ */
++export declare function setCrxVerifier(verifier: (crx: Buffer) => void): void;
+ export declare function downloadExtensionFromURL(url: string, extensionsDir: string, expectedExtensionId?: string): Promise<string>;
+ /**
+  * Download and unpack extension to the given extensions directory.
+diff --git a/dist/types/browser/types.d.ts b/dist/types/browser/types.d.ts
+index 3c8c4f9e92df59aa3db3550201ca9d7f8a198c6e..66659d3fee412f3ba4bda89ddef5d643143f2e46 100644
+--- a/dist/types/browser/types.d.ts
++++ b/dist/types/browser/types.d.ts
+@@ -10,6 +10,14 @@ export interface ExtensionInstallDetails {
+ export type BeforeInstall = (details: ExtensionInstallDetails) => Promise<{
+     action: 'allow' | 'deny';
+ }>;
++export interface ExtensionUninstallDetails {
++    id: string;
++    localizedName: string;
++    showConfirmDialog: boolean;
++    browserWindow?: Electron.BrowserWindow;
++    frame: Electron.WebFrameMain | null;
++}
++export type OnUninstall = (details: ExtensionUninstallDetails) => Promise<boolean>;
+ export interface WebStoreState {
+     session: Electron.Session;
+     extensionsPath: string;
+@@ -18,4 +26,5 @@ export interface WebStoreState {
+     denylist?: Set<ExtensionId>;
+     minimumManifestVersion: number;
+     beforeInstall?: BeforeInstall;
++    onUninstall?: OnUninstall;
+ }

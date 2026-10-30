@@ -21829,3 +21829,30 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Could not open {name}"
+
+msgid "Could not remove {name}"
+msgstr "Could not remove {name}"
+
+msgid "Could not update {name}"
+msgstr "Could not update {name}"
+
+msgid "Extensions"
+msgstr "Extensions"
+
+msgid "Get extensions"
+msgstr "Get extensions"
+
+msgid "Pin {name}"
+msgstr "Pin {name}"
+
+msgid "Remove {name}?"
+msgstr "Remove {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "The extension and its local data are deleted from this browser."
+
+msgid "Unpin {name}"
+msgstr "Unpin {name}"

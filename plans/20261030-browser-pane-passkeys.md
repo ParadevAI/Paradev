@@ -98,8 +98,18 @@ runs once and is safe to run again.
    alias, pane web contents registered as tabs, extension popups and new tabs mapped to pane
    operations. `electron-chrome-web-store` with the signature check, extensions stored under the
    app's user data, loaded at start, updated in the background.
-3. **Toolbar and management UI.** Extension buttons in the pane toolbar, popups, an installed
-   list with remove. Built from 2-3 variants and a designer's pick.
+3. **Toolbar and management UI.** Extensions live in the pane's More menu, in an "Extensions"
+   submenu beside "Signed-in sites" and "Downloads": each installed extension with its icon, a pin
+   toggle and a remove button, then "Get extensions" (opens the Chrome Web Store in the pane).
+   Pinned extensions show as toolbar icons left of More when the toolbar is 480 px or wider (the
+   existing `@min-[480px]/browser-toolbar` breakpoint); below that they are the first rows of More,
+   with their badge as an outline `Badge`. Toolbar icons carry the extension's badge as a
+   `CountBadge`, in the extension's own badge color when it sets one. Remove asks first in an
+   `AlertDialog` that names the extension and says its local data goes. An open toolbar button
+   uses `bg-accent text-accent-foreground`; `muted` at 50% is invisible on the light header.
+   Chosen over pinned icons always inline (at the 260 px pane minimum the URL bar shrinks to 0 px
+   and the buttons overlap by 8 px) and over a single Extensions button (badges hidden in a menu,
+   two clicks per use). The puzzle icon stays with agent plugins.
 4. **Passkey fallback (D).**
 5. **Touch ID (B)**, when the release build has a provisioning profile.
 

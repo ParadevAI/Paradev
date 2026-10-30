@@ -21829,3 +21829,30 @@ msgstr "Zoom arrière"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Impossible d’ouvrir {name}"
+
+msgid "Could not remove {name}"
+msgstr "Impossible de retirer {name}"
+
+msgid "Could not update {name}"
+msgstr "Impossible de mettre à jour {name}"
+
+msgid "Extensions"
+msgstr "Extensions"
+
+msgid "Get extensions"
+msgstr "Obtenir des extensions"
+
+msgid "Pin {name}"
+msgstr "Épingler {name}"
+
+msgid "Remove {name}?"
+msgstr "Retirer {name} ?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "L’extension et ses données locales sont supprimées de ce navigateur."
+
+msgid "Unpin {name}"
+msgstr "Désépingler {name}"

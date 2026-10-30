@@ -1,8 +1,12 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { GlobeIcon } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { TbDeviceDesktop } from "react-icons/tb";
 import type { MosaicBranch } from "react-mosaic-component";
+import {
+	PinnedExtensionButtons,
+	useBrowserExtensions,
+} from "renderer/components/BrowserExtensions";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useTabsStore } from "renderer/stores/tabs/store";
 import { BasePaneWindow, PaneToolbarActions } from "../components";
@@ -44,6 +48,8 @@ export function BrowserPane({
 	const isBlankPage = currentUrl === "about:blank";
 	const { mutate: openDevTools } =
 		electronTrpc.browser.openDevTools.useMutation();
+	const extensions = useBrowserExtensions(paneId);
+	const pinnedExtensionsRef = useRef<HTMLDivElement>(null);
 
 	const {
 		containerRef,
@@ -71,7 +77,7 @@ export function BrowserPane({
 			removePane={removePane}
 			setFocusedPane={setFocusedPane}
 			renderToolbar={(handlers) => (
-				<div className="flex h-full w-full items-center justify-between min-w-0">
+				<div className="@container/browser-toolbar flex h-full w-full items-center justify-between min-w-0">
 					<BrowserToolbar
 						currentUrl={currentUrl}
 						pageTitle={pageTitle}
@@ -91,6 +97,11 @@ export function BrowserPane({
 							onClosePane={handlers.onClosePane}
 							leadingActions={
 								<>
+									<PinnedExtensionButtons
+										ref={pinnedExtensionsRef}
+										paneId={paneId}
+										extensions={extensions}
+									/>
 									<Tooltip>
 										<TooltipTrigger asChild>
 											<button
@@ -103,7 +114,13 @@ export function BrowserPane({
 										</TooltipTrigger>
 										<TooltipContent side="bottom">Open DevTools</TooltipContent>
 									</Tooltip>
-									<BrowserOverflowMenu paneId={paneId} hasPage={!isBlankPage} />
+									<BrowserOverflowMenu
+										paneId={paneId}
+										hasPage={!isBlankPage}
+										extensions={extensions}
+										pinnedExtensionsRef={pinnedExtensionsRef}
+										onNavigate={navigateTo}
+									/>
 								</>
 							}
 						/>

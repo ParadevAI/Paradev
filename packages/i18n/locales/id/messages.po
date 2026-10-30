@@ -21829,3 +21829,30 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Tidak bisa membuka {name}"
+
+msgid "Could not remove {name}"
+msgstr "Tidak bisa menghapus {name}"
+
+msgid "Could not update {name}"
+msgstr "Tidak bisa memperbarui {name}"
+
+msgid "Extensions"
+msgstr "Ekstensi"
+
+msgid "Get extensions"
+msgstr "Dapatkan ekstensi"
+
+msgid "Pin {name}"
+msgstr "Sematkan {name}"
+
+msgid "Remove {name}?"
+msgstr "Hapus {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Ekstensi dan data lokalnya dihapus dari browser ini."
+
+msgid "Unpin {name}"
+msgstr "Lepas sematan {name}"

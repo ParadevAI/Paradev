@@ -21829,3 +21829,30 @@ msgstr "Diminuir zoom"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Não foi possível abrir {name}"
+
+msgid "Could not remove {name}"
+msgstr "Não foi possível remover {name}"
+
+msgid "Could not update {name}"
+msgstr "Não foi possível atualizar {name}"
+
+msgid "Extensions"
+msgstr "Extensões"
+
+msgid "Get extensions"
+msgstr "Obter extensões"
+
+msgid "Pin {name}"
+msgstr "Fixar {name}"
+
+msgid "Remove {name}?"
+msgstr "Remover {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "A extensão e os dados locais dela são excluídos deste navegador."
+
+msgid "Unpin {name}"
+msgstr "Desafixar {name}"

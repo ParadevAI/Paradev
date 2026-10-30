@@ -21829,3 +21829,30 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "{name}을(를) 열 수 없습니다"
+
+msgid "Could not remove {name}"
+msgstr "{name}을(를) 제거할 수 없습니다"
+
+msgid "Could not update {name}"
+msgstr "{name}을(를) 업데이트할 수 없습니다"
+
+msgid "Extensions"
+msgstr "확장 프로그램"
+
+msgid "Get extensions"
+msgstr "확장 프로그램 받기"
+
+msgid "Pin {name}"
+msgstr "{name} 고정"
+
+msgid "Remove {name}?"
+msgstr "{name}을(를) 제거할까요?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "확장 프로그램과 로컬 데이터가 이 브라우저에서 삭제됩니다."
+
+msgid "Unpin {name}"
+msgstr "{name} 고정 해제"

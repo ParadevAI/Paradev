@@ -21829,3 +21829,30 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "{name} を開けませんでした"
+
+msgid "Could not remove {name}"
+msgstr "{name} を削除できませんでした"
+
+msgid "Could not update {name}"
+msgstr "{name} を更新できませんでした"
+
+msgid "Extensions"
+msgstr "拡張機能"
+
+msgid "Get extensions"
+msgstr "拡張機能を入手"
+
+msgid "Pin {name}"
+msgstr "{name} をピン留め"
+
+msgid "Remove {name}?"
+msgstr "{name} を削除しますか?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "拡張機能とそのローカルデータがこのブラウザから削除されます。"
+
+msgid "Unpin {name}"
+msgstr "{name} のピン留めを解除"

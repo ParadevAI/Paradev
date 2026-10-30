@@ -21829,3 +21829,30 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "{name} açılamadı"
+
+msgid "Could not remove {name}"
+msgstr "{name} kaldırılamadı"
+
+msgid "Could not update {name}"
+msgstr "{name} güncellenemedi"
+
+msgid "Extensions"
+msgstr "Uzantılar"
+
+msgid "Get extensions"
+msgstr "Uzantı ekle"
+
+msgid "Pin {name}"
+msgstr "{name} sabitle"
+
+msgid "Remove {name}?"
+msgstr "{name} kaldırılsın mı?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
+
+msgid "Unpin {name}"
+msgstr "{name} sabitlemesini kaldır"

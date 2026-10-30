@@ -169,6 +169,24 @@ mock.module("electron", () => ({
 		buildFromTemplate: mock(() => ({})),
 		setApplicationMenu: mock(),
 	},
+	session: {
+		defaultSession: {},
+		fromPartition: mock(() => ({})),
+	},
+	net: {},
+	nativeImage: {
+		createFromBuffer: mock(() => ({})),
+	},
+	powerMonitor: {
+		getSystemIdleState: mock(() => "active"),
+	},
+	contextBridge: {
+		executeInMainWorld: mock(),
+		exposeInMainWorld: mock(),
+	},
+	// Named so preloads can import it. Undefined, as in the main process, so
+	// electron-log does not start its renderer bridge.
+	ipcRenderer: undefined,
 }));
 
 // =============================================================================

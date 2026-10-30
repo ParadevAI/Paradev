@@ -21829,3 +21829,30 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Kan {name} niet openen"
+
+msgid "Could not remove {name}"
+msgstr "Kan {name} niet verwijderen"
+
+msgid "Could not update {name}"
+msgstr "Kan {name} niet bijwerken"
+
+msgid "Extensions"
+msgstr "Extensies"
+
+msgid "Get extensions"
+msgstr "Extensies toevoegen"
+
+msgid "Pin {name}"
+msgstr "{name} vastzetten"
+
+msgid "Remove {name}?"
+msgstr "{name} verwijderen?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "De extensie en de lokale gegevens ervan worden uit deze browser verwijderd."
+
+msgid "Unpin {name}"
+msgstr "{name} losmaken"

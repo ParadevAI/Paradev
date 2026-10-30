@@ -9,9 +9,12 @@ import { BROWSER_PARTITION } from "shared/constants";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { createBrowserExtensionsRouter } from "./extensions";
 
 export const createBrowserRouter = () => {
 	return router({
+		extensions: createBrowserExtensionsRouter(),
+
 		register: publicProcedure
 			.input(
 				z.object({

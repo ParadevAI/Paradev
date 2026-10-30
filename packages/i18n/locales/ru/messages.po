@@ -21829,3 +21829,30 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Не удалось открыть {name}"
+
+msgid "Could not remove {name}"
+msgstr "Не удалось удалить {name}"
+
+msgid "Could not update {name}"
+msgstr "Не удалось обновить {name}"
+
+msgid "Extensions"
+msgstr "Расширения"
+
+msgid "Get extensions"
+msgstr "Добавить расширения"
+
+msgid "Pin {name}"
+msgstr "Закрепить {name}"
+
+msgid "Remove {name}?"
+msgstr "Удалить {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Расширение и его локальные данные удаляются из этого браузера."
+
+msgid "Unpin {name}"
+msgstr "Открепить {name}"

@@ -1,0 +1,1 @@
+export { ExtensionIcon } from "./ExtensionIcon";

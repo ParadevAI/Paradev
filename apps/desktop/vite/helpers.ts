@@ -1,5 +1,6 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
-import { dirname, normalize, resolve } from "node:path";
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { createRequire } from "node:module";
+import { basename, dirname, normalize, resolve } from "node:path";
 import { transformAsync } from "@babel/core";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import type { Plugin } from "vite";
@@ -68,6 +69,23 @@ const RESOURCES_TO_COPY = [
  * In preview mode, __dirname resolves relative to dist/main, so resources
  * need to be copied there for the main process to access them.
  */
+// Both packages are bundled into dist/main, and each falls back to loading its
+// preload from the bundle's own directory when node_modules is not packaged.
+const EXTENSION_PACKAGE_PRELOADS = [
+	"electron-chrome-extensions/preload",
+	"electron-chrome-web-store/preload",
+];
+
+function copyExtensionPackagePreloads(): void {
+	const requireFromApp = createRequire(resolve(__dirname, "../package.json"));
+	const mainDir = resolve(__dirname, "..", devPath, "main");
+	mkdirSync(mainDir, { recursive: true });
+	for (const specifier of EXTENSION_PACKAGE_PRELOADS) {
+		const preload = requireFromApp.resolve(specifier);
+		copyFileSync(preload, resolve(mainDir, basename(preload)));
+	}
+}
+
 export function copyResourcesPlugin(): Plugin {
 	return {
 		name: "copy-resources",
@@ -75,6 +93,7 @@ export function copyResourcesPlugin(): Plugin {
 			for (const resource of RESOURCES_TO_COPY) {
 				copyDir(resource);
 			}
+			copyExtensionPackagePreloads();
 		},
 	};
 }

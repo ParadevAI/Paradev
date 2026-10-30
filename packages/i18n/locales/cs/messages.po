@@ -21829,3 +21829,30 @@ msgstr "Oddálit"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "{name} se nepodařilo otevřít"
+
+msgid "Could not remove {name}"
+msgstr "{name} se nepodařilo odebrat"
+
+msgid "Could not update {name}"
+msgstr "{name} se nepodařilo aktualizovat"
+
+msgid "Extensions"
+msgstr "Rozšíření"
+
+msgid "Get extensions"
+msgstr "Získat rozšíření"
+
+msgid "Pin {name}"
+msgstr "Připnout {name}"
+
+msgid "Remove {name}?"
+msgstr "Odebrat {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Rozšíření a jeho místní data se z tohoto prohlížeče smažou."
+
+msgid "Unpin {name}"
+msgstr "Odepnout {name}"

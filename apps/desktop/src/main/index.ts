@@ -53,6 +53,7 @@ import {
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
+import { initBrowserExtensionHost } from "./lib/browser/extension-host";
 import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
 import {
 	installBundledCliShim,
@@ -576,6 +577,7 @@ if (!gotTheLock) {
 		sweepDevAppProfiles();
 
 		await loadWebviewBrowserExtension();
+		initBrowserExtensionHost();
 
 		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 

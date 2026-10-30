@@ -1,0 +1,1 @@
+export { BrowserExtensionsSubmenu } from "./BrowserExtensionsSubmenu";

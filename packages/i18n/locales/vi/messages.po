@@ -21829,3 +21829,30 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "Không thể mở {name}"
+
+msgid "Could not remove {name}"
+msgstr "Không thể gỡ {name}"
+
+msgid "Could not update {name}"
+msgstr "Không thể cập nhật {name}"
+
+msgid "Extensions"
+msgstr "Tiện ích mở rộng"
+
+msgid "Get extensions"
+msgstr "Tải tiện ích mở rộng"
+
+msgid "Pin {name}"
+msgstr "Ghim {name}"
+
+msgid "Remove {name}?"
+msgstr "Gỡ {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Tiện ích mở rộng và dữ liệu cục bộ của nó sẽ bị xóa khỏi trình duyệt này."
+
+msgid "Unpin {name}"
+msgstr "Bỏ ghim {name}"

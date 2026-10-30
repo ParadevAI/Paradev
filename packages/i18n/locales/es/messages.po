@@ -21829,3 +21829,30 @@ msgstr "Alejar"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Could not open {name}"
+msgstr "No se pudo abrir {name}"
+
+msgid "Could not remove {name}"
+msgstr "No se pudo quitar {name}"
+
+msgid "Could not update {name}"
+msgstr "No se pudo actualizar {name}"
+
+msgid "Extensions"
+msgstr "Extensiones"
+
+msgid "Get extensions"
+msgstr "Obtener extensiones"
+
+msgid "Pin {name}"
+msgstr "Fijar {name}"
+
+msgid "Remove {name}?"
+msgstr "¿Quitar {name}?"
+
+msgid "The extension and its local data are deleted from this browser."
+msgstr "La extensión y sus datos locales se eliminan de este navegador."
+
+msgid "Unpin {name}"
+msgstr "Desfijar {name}"
