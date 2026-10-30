@@ -38,6 +38,9 @@ import {
 	desktopNoticeCtaActionValues,
 	desktopNoticeSeverityValues,
 	desktopNoticeTriggerValues,
+	environmentBuildKindValues,
+	environmentBuildStatusValues,
+	environmentBuildTriggerValues,
 	environmentScopeValues,
 	environmentSourceKindValues,
 	integrationProviderValues,
@@ -111,6 +114,18 @@ export const environmentSourceKind = pgEnum(
 export const environmentScope = pgEnum(
 	"environment_scope",
 	environmentScopeValues,
+);
+export const environmentBuildStatus = pgEnum(
+	"environment_build_status",
+	environmentBuildStatusValues,
+);
+export const environmentBuildTrigger = pgEnum(
+	"environment_build_trigger",
+	environmentBuildTriggerValues,
+);
+export const environmentBuildKind = pgEnum(
+	"environment_build_kind",
+	environmentBuildKindValues,
 );
 export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
@@ -938,6 +953,49 @@ export const environmentSecrets = pgTable(
 		index("environment_secrets_organization_id_idx").on(table.organizationId),
 	],
 );
+
+/**
+ * One build of an environment's golden from `[install]`. The running row is
+ * the lock: at most one per environment. A succeeded row keeps its golden
+ * until retention deletes it, so it can be restored.
+ */
+export const environmentBuilds = pgTable(
+	"environment_builds",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		// No foreign keys to the auth tables: creating one locks a hot parent.
+		organizationId: uuid("organization_id").notNull(),
+		startedByUserId: uuid("started_by_user_id"),
+		status: environmentBuildStatus().notNull().default("running"),
+		trigger: environmentBuildTrigger().notNull(),
+		kind: environmentBuildKind().notNull(),
+		repositoryIds: uuid("repository_ids").array().notNull(),
+		primaryRepositoryId: uuid("primary_repository_id"),
+		baseBranch: text("base_branch"),
+		commitSha: text("commit_sha"),
+		goldenRef: text("golden_ref"),
+		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),
+		error: text(),
+		startedAt: timestamp("started_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		finishedAt: timestamp("finished_at", { withTimezone: true }),
+	},
+	(table) => [
+		index("environment_builds_environment_id_started_at_idx").on(
+			table.environmentId,
+			desc(table.startedAt),
+		),
+		uniqueIndex("environment_builds_one_running_idx")
+			.on(table.environmentId)
+			.where(sql`${table.status} = 'running'`),
+	],
+);
+
+export type SelectEnvironmentBuild = typeof environmentBuilds.$inferSelect;
 
 export const cloudWorkspaces = pgTable(
 	"cloud_workspaces",
