@@ -211,3 +211,8 @@ seed_missing_env_placeholders() {
   success "Seeded ${#missing_lines[@]} placeholder(s) into $env_file: $missing_keys"
   return 0
 }
+
+# The installed app's home.
+prod_app_home() {
+  echo "$HOME/.paradev"
+}

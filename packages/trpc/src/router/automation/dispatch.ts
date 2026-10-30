@@ -584,7 +584,7 @@ async function createWorkspaceOnHost(args: {
 	pullRequest: number | null;
 }): Promise<{ workspaceId: string }> {
 	// Session automation: no project, no branch. The host allocates a managed
-	// folder under ~/.superset/sessions and dedupes the name per run.
+	// folder under ~/.paradev/sessions and dedupes the name per run.
 	if (args.projectId === null) {
 		const result = await relayMutation<
 			{ name: string; tags?: string[] },

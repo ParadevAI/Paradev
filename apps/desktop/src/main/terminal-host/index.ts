@@ -8,8 +8,8 @@
  *
  * IPC Protocol:
  * - Uses NDJSON (newline-delimited JSON) over Unix domain socket
- * - Socket: ~/.superset/terminal-host.sock
- * - Auth token: ~/.superset/terminal-host.token
+ * - Socket: ~/.paradev/terminal-host.sock
+ * - Auth token: ~/.paradev/terminal-host.token
  */
 
 import { randomBytes } from "node:crypto";

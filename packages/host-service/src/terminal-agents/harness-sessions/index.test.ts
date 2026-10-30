@@ -11,8 +11,8 @@ import {
 import * as os from "node:os";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
+import { claudeProjectDirName } from "@superset/agent-setup/claude-project-links";
 import { hasHarnessSession } from ".";
-import { claudeProjectDirName } from "./claude";
 import { readHarnessTranscript } from "./transcript";
 
 const BUDGET = 36_000;

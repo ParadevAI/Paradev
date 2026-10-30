@@ -14,6 +14,7 @@ import {
 	SUPERSET_HOME_DIR,
 	SUPERSET_SENSITIVE_FILE_MODE,
 } from "../app-environment";
+import { applyLegacyHomeMove } from "./legacy-home-paths";
 
 const DB_PATH = join(SUPERSET_HOME_DIR, "local.db");
 
@@ -102,5 +103,7 @@ try {
 }
 
 console.log("[local-db] Migrations complete");
+
+void applyLegacyHomeMove(sqlite, localDb, SUPERSET_HOME_DIR);
 
 export type LocalDb = typeof localDb;

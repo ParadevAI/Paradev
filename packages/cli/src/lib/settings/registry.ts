@@ -150,7 +150,7 @@ export const SETTINGS: SettingDefinition[] = [
 		section: "git",
 		store: "hostService",
 		description:
-			"Directory where workspace worktrees are created (default: ~/.superset/worktrees)",
+			"Directory where workspace worktrees are created (default: ~/.paradev/worktrees)",
 		defaultValue: null,
 	},
 	// Notifications

@@ -232,13 +232,13 @@ assert_unique_ports() {
 }
 
 allocate_port_base() {
-  local alloc_file="$HOME/.superset/port-allocations.json"
-  local lock_dir="$HOME/.superset/port-allocations.lock"
+  local alloc_file="$(prod_app_home)/port-allocations.json"
+  local lock_dir="$(prod_app_home)/port-allocations.lock"
   local start=3000
   local range=20
 
   # Ensure directory and file exist
-  mkdir -p "$HOME/.superset"
+  mkdir -p "$(prod_app_home)"
   if [ ! -f "$alloc_file" ]; then
     echo '{}' > "$alloc_file"
   fi
@@ -331,7 +331,7 @@ step_write_env() {
     echo ""
     echo "# Workspace Identity"
     # Stable folder-derived identity (data dir, protocol scheme, Neon branch).
-    # The dev app reads its display title live from ~/.superset/host/*/host.db,
+    # The dev app reads its display title live from the app home's host/*/host.db,
     # so a later workspace rename never needs this file rewritten.
     write_env_var "SUPERSET_WORKSPACE_NAME" "${WORKSPACE_NAME:-$(basename "$PWD")}"
     write_env_var "SUPERSET_HOME_DIR" "$PWD/superset-dev-data"
@@ -492,7 +492,7 @@ step_setup_local_mcp() {
 step_seed_auth_token() {
   echo "🔑 Seeding auth token into superset-dev-data/..."
 
-  local source_token="$HOME/.superset/auth-token.enc"
+  local source_token="$(prod_app_home)/auth-token.enc"
   local dev_data_dir="superset-dev-data"
   local dest_token="$dev_data_dir/auth-token.enc"
 
@@ -524,7 +524,7 @@ step_seed_auth_token() {
 step_seed_host_dbs() {
   echo "🛰️  Seeding host-service DBs into superset-dev-data/host/..."
 
-  local source_root="$HOME/.superset/host"
+  local source_root="$(prod_app_home)/host"
   local dev_data_dir="superset-dev-data"
   local dest_root="$dev_data_dir/host"
   local force_overwrite="$FORCE_OVERWRITE_DATA"
@@ -614,7 +614,7 @@ step_seed_host_dbs() {
 step_seed_local_db() {
   echo "💾 Seeding local DB into superset-dev-data/..."
 
-  local source_db="$HOME/.superset/local.db"
+  local source_db="$(prod_app_home)/local.db"
   local dev_data_dir="superset-dev-data"
   local dest_db="$dev_data_dir/local.db"
   local force_overwrite="$FORCE_OVERWRITE_DATA"

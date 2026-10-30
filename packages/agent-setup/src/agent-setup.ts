@@ -77,7 +77,7 @@ interface AgentSetupDefinition {
 	/**
 	 * Removes Superset's footprint from the agent's global config when the
 	 * user disables its hook integration. Wrappers and scripts under
-	 * ~/.superset/ stay — they are Superset-owned and inert outside its
+	 * ~/.paradev/ stay — they are Superset-owned and inert outside its
 	 * terminals. Absent when the agent has no global footprint (Copilot,
 	 * OpenCode).
 	 */

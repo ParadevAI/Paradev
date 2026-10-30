@@ -1,12 +1,12 @@
 import { cpSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	CONFIG_FILE_NAME,
 	LOCAL_CONFIG_FILE_NAME,
 	PROJECT_SUPERSET_DIR_NAME,
 	PROJECTS_DIR_NAME,
 } from "shared/constants";
-import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import type { LocalSetupConfig, SetupConfig } from "shared/types";
 
 /**
@@ -166,7 +166,7 @@ export function mergeConfigs(
 
 /**
  * Resolves setup/teardown/run config with a three-tier priority:
- *   1. User override:  ~/.superset/projects/<projectId>/config.json
+ *   1. User override:  ~/.paradev/projects/<projectId>/config.json
  *   2. Worktree:       <worktreePath>/.superset/config.json
  *   3. Main repo:      <mainRepoPath>/.superset/config.json
  *
