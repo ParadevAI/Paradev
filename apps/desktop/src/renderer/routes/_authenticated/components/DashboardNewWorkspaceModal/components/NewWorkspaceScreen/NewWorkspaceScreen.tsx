@@ -85,7 +85,6 @@ import {
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
 import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
-import { NoAgentToggle } from "./components/NoAgentToggle";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
@@ -500,7 +499,7 @@ export function NewWorkspaceScreen({
 			agentStorageKey: AGENT_STORAGE_KEY,
 			defaultAgent: selectableAgentIds[0] ?? "none",
 			fallbackAgent: selectableAgentIds[0] ?? "none",
-			validAgents: ["none", ...selectableAgentIds],
+			validAgents: selectableAgentIds,
 			agentsReady: v2AgentsFetched,
 		});
 
@@ -1053,14 +1052,6 @@ export function NewWorkspaceScreen({
 									)}
 								</>
 							)}
-							<NoAgentToggle
-								active={selectedAgent === "none"}
-								onChange={(none) =>
-									setSelectedAgent(
-										none ? "none" : (selectableAgentIds[0] ?? "none"),
-									)
-								}
-							/>
 						</div>
 						{needsSetup && (
 							<Button
