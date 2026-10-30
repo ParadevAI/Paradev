@@ -92,6 +92,18 @@ def456|def|another|person|2024-01-16T14:20:00Z`;
 });
 
 describe("parseDiffNumstat", () => {
+	test("expands compact rename paths", () => {
+		const stats = parseDiffNumstat("7\t3\tsrc/{old => new}/file.ts");
+
+		expect(stats.get("src/old/file.ts")).toEqual({
+			additions: 7,
+			deletions: 3,
+			isBinary: false,
+		});
+		expect(stats.get("src/new/file.ts")).toEqual(stats.get("src/old/file.ts"));
+		expect(stats.size).toBe(2);
+	});
+
 	test("parses basic numstat output", () => {
 		const numstatOutput = `10	5	src/file1.ts
 20	3	src/file2.ts`;
