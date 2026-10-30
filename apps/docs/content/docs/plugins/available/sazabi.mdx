@@ -3,7 +3,7 @@ title: Sazabi
 description: Investigate production from your agent with Sazabi's logs, traces and issues, and check a deploy before you call it done
 ---
 
-Investigate production from your agent. Ask Sazabi questions about your logs, traces and metrics in plain language, find the issues Sazabi opened on its own, and check that a deploy did what it was meant to.
+Investigate production from your agent. Ask Sazabi questions about your logs, traces and metrics in plain language, work through the issues Sazabi opened on its own, check that a deploy did what it was meant to, and get your app's and your coding agents' telemetry into Sazabi.
 
 ## Skills
 
@@ -11,6 +11,12 @@ Investigate production from your agent. Ask Sazabi questions about your logs, tr
 |:------|:-------------|
 | `investigate-production` | Starts from known issues and past investigations, asks the logs precise questions, and reports what fails, why, and who it hits before it changes code |
 | `verify-a-deploy` | Compares the error or behavior a change targets before and after the deploy, and checks for new errors, before it calls the task done |
+| `triage-issues` | Ranks the issues Sazabi opened by impact, finds each one's cause in the repository, and proposes one fix per issue, leaving issues open until the fix ships |
+| `instrument-with-sazabi` | Adds OpenTelemetry to an app, sends logs and traces to a Sazabi intake URL kept in configuration, and confirms the first records arrive |
+| `send-agent-telemetry` | Streams Claude Code or Codex session telemetry (tool calls, model requests, tokens, cost) to Sazabi, with prompt export off unless you opt in |
+| `add-logging` | Adds structured log lines to the code path a change touches, matching the repository's logger and leaving out secrets |
+| `use-project-memory` | Reads Sazabi project memory (runbooks, past incidents) before investigating, and writes back verified findings |
+| `build-a-dashboard` | Turns a recurring question into a saved Sazabi dashboard, validates it, and checks every panel returns data |
 
 Skills are named `sazabi-<skill>`. In Claude Code they appear as `superset:sazabi-<skill>`.
 

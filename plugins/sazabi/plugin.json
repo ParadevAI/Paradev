@@ -2,7 +2,7 @@
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "sazabi",
 	"version": "1.0.0",
-	"description": "Investigate production with Sazabi: ask questions about your logs and traces, find open issues, and check a deploy before you call it done.",
+	"description": "Investigate production with Sazabi: ask questions about your logs and traces, triage issues, check deploys, build dashboards, and send app and coding-agent telemetry to Sazabi.",
 	"author": {
 		"name": "Paradev",
 		"url": "https://paradev.com"
