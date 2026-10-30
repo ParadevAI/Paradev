@@ -16,7 +16,8 @@
 #   apps/mobile/scripts/android-dev.sh --shot out.png           # screenshot the emulator
 #   apps/mobile/scripts/android-dev.sh --stop      # stop this worktree's Metro
 #
-# Env: MOBILE_AVD (default: first AVD), MOBILE_METRO_PORT (default: first free
+# Env: ANDROID_SERIAL (emulator-<port>, pins one emulator), MOBILE_AVD (default:
+# first AVD), MOBILE_METRO_PORT (default: first free
 # port from 8081), ANDROID_HOME, JAVA_HOME (must be JDK 17).
 set -euo pipefail
 
@@ -194,7 +195,13 @@ if [ "$MODE" = stop ]; then
 	exit 0
 fi
 
+# ANDROID_SERIAL=emulator-<port> pins one emulator, so parallel worktrees each
+# drive their own; MOBILE_AVD then names the AVD to boot on that port.
 device_serial() {
+	if [ -n "${ANDROID_SERIAL:-}" ]; then
+		adb devices | awk -v s="$ANDROID_SERIAL" 'NR > 1 && $1 == s && $2 == "device" { print $1 }'
+		return
+	fi
 	adb devices | awk 'NR > 1 && $2 == "device" && $1 ~ /^emulator-/ { print $1; exit }'
 }
 
@@ -211,7 +218,9 @@ boot_emulator() {
 		return 1
 	}
 	echo "==> Booting $avd" >&2
-	nohup emulator -avd "$avd" -no-snapshot-save -no-boot-anim >"$EMULATOR_LOG" 2>&1 </dev/null &
+	local port_args=()
+	[[ "${ANDROID_SERIAL:-}" =~ ^emulator-([0-9]+)$ ]] && port_args=(-port "${BASH_REMATCH[1]}")
+	nohup emulator -avd "$avd" ${port_args[@]+"${port_args[@]}"} -no-snapshot-save -no-boot-anim >"$EMULATOR_LOG" 2>&1 </dev/null &
 	for _ in $(seq 1 "$BOOT_WAIT_SECONDS"); do
 		serial="$(device_serial)"
 		if [ -n "$serial" ] && [ "$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; then
