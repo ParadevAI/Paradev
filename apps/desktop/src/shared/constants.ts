@@ -22,6 +22,10 @@ export const CONFIG_FILE_NAME = "config.json";
 export const LOCAL_CONFIG_FILE_NAME = "config.local.json";
 export const PORTS_FILE_NAME = "ports.json";
 
+// Separate sessions keep browser-pane extensions away from the app's own requests.
+export const APP_PARTITION = "persist:superset";
+export const BROWSER_PARTITION = "persist:browser";
+
 export const CONFIG_TEMPLATE = `{
   "setup": [],
   "teardown": [],

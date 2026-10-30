@@ -2,6 +2,7 @@ import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 import {
@@ -326,7 +327,7 @@ export class BrowserRuntimeRegistryImpl {
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", "persist:superset");
+		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";

@@ -5,6 +5,7 @@ import {
 	browserManager,
 } from "main/lib/browser/browser-manager";
 import { screenshotManager } from "main/lib/screenshot-manager";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
@@ -351,7 +352,7 @@ export const createBrowserRouter = () => {
 				}),
 			)
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
+				const ses = session.fromPartition(BROWSER_PARTITION);
 				switch (input.type) {
 					case "cookies":
 						await ses.clearStorageData({ storages: ["cookies"] });
@@ -393,7 +394,7 @@ export const createBrowserRouter = () => {
 		// (imported "logins" are cookies, not stored passwords).
 		getCookieDomains: publicProcedure.query(async () => {
 			const cookies = await session
-				.fromPartition("persist:superset")
+				.fromPartition(BROWSER_PARTITION)
 				.cookies.get({});
 			const domains = new Map<string, number>();
 			for (const cookie of cookies) {
@@ -409,7 +410,7 @@ export const createBrowserRouter = () => {
 		clearCookiesForDomain: publicProcedure
 			.input(z.object({ domain: z.string() }))
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
+				const ses = session.fromPartition(BROWSER_PARTITION);
 				const cookies = await ses.cookies.get({ domain: input.domain });
 				await Promise.all(
 					cookies.map((cookie) => {

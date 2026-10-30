@@ -16,7 +16,7 @@ import { resolveDevWorkspaceName } from "main/lib/dev-workspace-name";
 import { getIconPath } from "main/lib/dock-icon";
 import { localDb } from "main/lib/local-db";
 import { isExpectedRendererExit } from "main/lib/renderer-exit";
-import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
+import { APP_PARTITION, NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
 import { env } from "shared/env.shared";
 import type { AgentLifecycleEvent } from "shared/notification-types";
 import { createIPCHandler } from "trpc-electron/main";
@@ -434,7 +434,7 @@ export async function createPlatformWindow({
 			plugins: true,
 			// Isolate Electron session from system browser cookies
 			// This ensures desktop uses bearer token auth, not web cookies
-			partition: "persist:superset",
+			partition: APP_PARTITION,
 		},
 	});
 

@@ -3,6 +3,7 @@ import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { requestPaneClose } from "renderer/stores/editor-state/editorCoordinator";
 import { useTabsStore } from "renderer/stores/tabs/store";
+import { BROWSER_PARTITION } from "shared/constants";
 
 // ---------------------------------------------------------------------------
 // Module-level singletons
@@ -209,7 +210,7 @@ export function usePersistentWebview({
 			webview = document.createElement("webview") as Electron.WebviewTag;
 			const detachViewportZoom = attachBrowserViewportZoom(webview);
 			webview.addEventListener("destroyed", detachViewportZoom);
-			webview.setAttribute("partition", "persist:superset");
+			webview.setAttribute("partition", BROWSER_PARTITION);
 			webview.setAttribute("allowpopups", "");
 			webview.style.display = "flex";
 			webview.style.flex = "1";

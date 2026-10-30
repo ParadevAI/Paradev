@@ -86,8 +86,10 @@ stays in the code.
 
 On first start after the move, pane cookies copy once from `persist:superset` to
 `persist:browser`, so users stay signed in to sites. Site `localStorage` and IndexedDB do not
-move; a site that keeps its login there asks for sign-in once. The copy runs once and is safe to
-run again.
+move; a site that keeps its login there asks for sign-in once. When every cookie copied, the
+same step clears those sites (cookie domains and pane history origins, never Paradev's own
+domains) from `persist:superset`, so "Clear browsing data" reaches all pane data again. The step
+runs once and is safe to run again.
 
 ## Phases
 
