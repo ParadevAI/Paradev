@@ -19,12 +19,18 @@ export function useGitHubRepositories(
 	const { fetchNextPage, hasNextPage, isError, isFetchingNextPage } = query;
 
 	useEffect(() => {
-		if (hasNextPage && !isFetchingNextPage && !isError) void fetchNextPage();
-	}, [fetchNextPage, hasNextPage, isFetchingNextPage, isError]);
+		if (enabled && hasNextPage && !isFetchingNextPage && !isError) {
+			void fetchNextPage();
+		}
+	}, [enabled, fetchNextPage, hasNextPage, isFetchingNextPage, isError]);
 
 	return {
 		repositories: query.data?.pages.flatMap((page) => page.repositories) ?? [],
 		isLoading: query.isLoading,
+		isLoadingMore: isFetchingNextPage,
 		error: query.isError ? query.error : null,
+		retry: () => {
+			void fetchNextPage();
+		},
 	};
 }

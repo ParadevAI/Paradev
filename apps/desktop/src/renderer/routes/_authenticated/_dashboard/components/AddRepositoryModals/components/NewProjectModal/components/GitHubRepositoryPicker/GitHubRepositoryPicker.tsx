@@ -13,6 +13,8 @@ import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 import { LuChevronsUpDown, LuGithub } from "react-icons/lu";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { RepositoryListEmpty } from "./components/RepositoryListEmpty";
+import { RepositoryListError } from "./components/RepositoryListError";
 import { useGitHubRepositories } from "./hooks/useGitHubRepositories";
 import { fetchRepositoryPage } from "./utils/fetchRepositoryPage";
 
@@ -31,14 +33,15 @@ export function GitHubRepositoryPicker({
 }: GitHubRepositoryPickerProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
-	const { repositories, isLoading, error } = useGitHubRepositories(
-		hostUrl,
-		(page) => {
-			if (!hostUrl) throw new Error("No active host");
-			return fetchRepositoryPage(getHostServiceClientByUrl(hostUrl), page);
-		},
-		open && !disabled && hostUrl !== null,
-	);
+	const { repositories, isLoading, isLoadingMore, error, retry } =
+		useGitHubRepositories(
+			hostUrl,
+			(page) => {
+				if (!hostUrl) throw new Error("No active host");
+				return fetchRepositoryPage(getHostServiceClientByUrl(hostUrl), page);
+			},
+			open && !disabled && hostUrl !== null,
+		);
 
 	return (
 		<div className="flex flex-col gap-1.5">
@@ -80,12 +83,11 @@ export function GitHubRepositoryPicker({
 						/>
 						<CommandList className="max-h-64">
 							<CommandEmpty>
-								{isLoading ? (
-									<Trans>Loading repositories...</Trans>
-								) : error ? (
-									error.message
-								) : (
-									<Trans>No matches</Trans>
+								{error ? null : (
+									<RepositoryListEmpty
+										isLoading={isLoading}
+										isLoadingMore={isLoadingMore}
+									/>
 								)}
 							</CommandEmpty>
 							<CommandGroup>
@@ -112,6 +114,9 @@ export function GitHubRepositoryPicker({
 								})}
 							</CommandGroup>
 						</CommandList>
+						{error ? (
+							<RepositoryListError message={error.message} onRetry={retry} />
+						) : null}
 					</Command>
 				</PopoverContent>
 			</Popover>
