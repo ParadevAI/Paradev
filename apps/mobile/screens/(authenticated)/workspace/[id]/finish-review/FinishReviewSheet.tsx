@@ -184,6 +184,7 @@ export function FinishReviewSheet() {
 				<TextInput
 					className="border-border text-foreground mx-3 min-h-20 rounded-xl border px-3.5 py-3 text-[15px]"
 					multiline
+					textAlignVertical="top"
 					onChangeText={setMessage}
 					placeholder={t({
 						message: "Leave a summary…",

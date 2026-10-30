@@ -98,6 +98,7 @@ export function LineCommentSheet() {
 					autoFocus
 					className="border-border text-foreground mx-3 min-h-32 rounded-xl border px-3.5 py-3 text-[15px]"
 					multiline
+					textAlignVertical="top"
 					onChangeText={setBody}
 					placeholder={t({
 						message: "Leave a comment…",
