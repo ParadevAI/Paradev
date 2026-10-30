@@ -522,7 +522,7 @@ export function NewWorkspaceScreen({
 		EFFORT_STORAGE_KEY,
 		effortSupport ? selectedPresetId : null,
 	);
-	// Codex's top two efforts only exist on its GPT-5.6 models and cursor-agent
+	// Codex's top effort is missing on its Luna models and cursor-agent
 	// has a ladder for only some models, so the offered list follows the model
 	// picker and the control disappears when there is nothing to offer. A
 	// remembered effort the current model rejects stays stored but shows (and

@@ -117,8 +117,6 @@ const PINNED_GROUP = "Pinned releases";
 const CURSOR_ANTHROPIC_GROUP = "Anthropic";
 const CURSOR_OPENAI_GROUP = "OpenAI";
 const CURSOR_OTHER_GROUP = "Other";
-const CURRENT_GROUP = "Current";
-const CODEX_RETIRING_GROUP = "Retiring 2026-10-14";
 
 export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 	{
@@ -151,18 +149,16 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		presetId: "codex",
 		modelFlag: "--model",
 		models: [
-			// Availability is account-dependent; ids are verified against Codex's
-			// live catalog (`codex app-server` → `model/list`).
-			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol", group: CURRENT_GROUP },
-			{ id: "gpt-6-astra", label: "GPT-6 Astra", group: CURRENT_GROUP },
-			{ id: "gpt-6-sol", label: "GPT-6 Sol", group: CURRENT_GROUP },
-			{ id: "gpt-6-luna", label: "GPT-6 Luna", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-terra", label: "GPT-5.6 Terra", group: CURRENT_GROUP },
-			{ id: "gpt-5.6-luna", label: "GPT-5.6 Luna", group: CURRENT_GROUP },
-			// Superseded by the GPT-6 family; the header dates the retirement
-			// so it reaches the person picking rather than only this file.
-			{ id: "gpt-5.5", label: "GPT-5.5", group: CODEX_RETIRING_GROUP },
+			// Availability is account-dependent; ids and order follow Codex's
+			// live catalog (`codex app-server` → `model/list`, codex 0.162.1).
+			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
+			{ id: "gpt-6-astra", label: "GPT-6 Astra" },
+			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
+			{ id: "gpt-6-sol", label: "GPT-6 Sol" },
+			{ id: "gpt-6-luna", label: "GPT-6 Luna" },
+			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol" },
+			{ id: "gpt-5.6-terra", label: "GPT-5.6 Terra" },
+			{ id: "gpt-5.6-luna", label: "GPT-5.6 Luna" },
 		],
 	},
 	{
@@ -412,9 +408,8 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 export interface AgentEffortOption extends AgentModelOption {
 	/**
 	 * Model ids that accept this effort, when only some do. Absent means every
-	 * model the agent offers takes it. Codex's two top levels arrived with
-	 * GPT-5.6 and the models below it reject them, so the picker only offers
-	 * them next to a model that has them.
+	 * model the agent offers takes it. Codex's `ultra` is missing on its Luna
+	 * models, so the picker only offers it next to a model that has it.
 	 */
 	models?: readonly string[];
 }
@@ -632,27 +627,15 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 			{ id: "medium", label: "Medium" },
 			{ id: "high", label: "High" },
 			{ id: "xhigh", label: "xHigh" },
-			// Per-model support comes from Codex's live model catalog. GPT-6
-			// Astra and Sol support `ultra`; GPT-6 Luna supports up to `max`.
-			{
-				id: "max",
-				label: "Max",
-				models: [
-					"gpt-6.1-sol",
-					"gpt-6-astra",
-					"gpt-6-sol",
-					"gpt-6-luna",
-					"gpt-5.6-sol",
-					"gpt-5.6-terra",
-					"gpt-5.6-luna",
-				],
-			},
+			{ id: "max", label: "Max" },
+			// The Luna models stop at `max` (Codex's live model catalog).
 			{
 				id: "ultra",
 				label: "Ultra",
 				models: [
 					"gpt-6.1-sol",
 					"gpt-6-astra",
+					"gpt-6.1-terra",
 					"gpt-6-sol",
 					"gpt-5.6-sol",
 					"gpt-5.6-terra",
