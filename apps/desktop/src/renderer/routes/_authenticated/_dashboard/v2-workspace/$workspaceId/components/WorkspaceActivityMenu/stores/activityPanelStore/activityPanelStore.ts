@@ -25,9 +25,6 @@ interface ActivityPanelStore {
 	forgetStopped: (keys: readonly string[]) => void;
 	setAsideNode: (workspaceId: string, node: HTMLElement) => void;
 	clearAsideNode: (workspaceId: string, node: HTMLElement) => void;
-	anchorNodes: Record<string, HTMLElement>;
-	setAnchorNode: (workspaceId: string, node: HTMLElement) => void;
-	clearAnchorNode: (workspaceId: string, node: HTMLElement) => void;
 	recordFinished: (
 		workspaceId: string,
 		entries: readonly FinishedSubagent[],
@@ -72,19 +69,6 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 			if (state.asideNodes[workspaceId] !== node) return state;
 			const { [workspaceId]: _cleared, ...asideNodes } = state.asideNodes;
 			return { asideNodes };
-		}),
-	anchorNodes: {},
-	setAnchorNode: (workspaceId, node) =>
-		set((state) =>
-			state.anchorNodes[workspaceId] === node
-				? state
-				: { anchorNodes: { ...state.anchorNodes, [workspaceId]: node } },
-		),
-	clearAnchorNode: (workspaceId, node) =>
-		set((state) => {
-			if (state.anchorNodes[workspaceId] !== node) return state;
-			const { [workspaceId]: _cleared, ...anchorNodes } = state.anchorNodes;
-			return { anchorNodes };
 		}),
 	recordFinished: (workspaceId, entries) =>
 		set((state) => {
