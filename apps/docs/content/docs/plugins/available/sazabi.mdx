@@ -23,6 +23,6 @@ Tools come from Sazabi's own MCP server at `https://mcp.sazabi.com/mcp`. Paradev
 | Method | Details |
 |:-------|:--------|
 | OAuth 2.0 | You sign in to Sazabi in your browser. Paradev registers itself with Sazabi when you connect, so there is no app to set up first. |
-| Secret key | Paste a key from Sazabi's **Settings → Secret keys** page. Use it when you cannot sign in through a browser. A key scoped to one project limits the agent to that project. |
+| Secret key | Paste a key from Sazabi's **Settings → Secret keys** page. Use it when you cannot sign in through a browser. A key scoped to one project limits the agent to that project. Paradev keeps one Sazabi connection per organization, so connecting a second key from the same organization replaces the first. To reach several projects, use OAuth or an organization-wide key. |
 
 Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.
