@@ -3510,6 +3510,9 @@ msgstr "請帶上你最近做的作品連結。"
 msgid "Bring Any Agent"
 msgstr "帶上任意代理程式"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
+
 msgid "Bring over your projects"
 msgstr "遷入專案"
 

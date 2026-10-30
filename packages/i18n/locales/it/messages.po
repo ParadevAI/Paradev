@@ -3510,6 +3510,9 @@ msgstr "Porta il link a qualcosa che hai costruito di recente."
 msgid "Bring Any Agent"
 msgstr "Porta qualsiasi agente"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Porta Claude Code, Codex, OpenCode o qualsiasi agente di coding in un unico workspace. Esegui le attività in parallelo su branch separati e revisiona tutto in un unico posto."
+
 msgid "Bring over your projects"
 msgstr "Importa i tuoi progetti"
 

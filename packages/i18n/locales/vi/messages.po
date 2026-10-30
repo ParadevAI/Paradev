@@ -3510,6 +3510,9 @@ msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần
 msgid "Bring Any Agent"
 msgstr "Mang mọi agent về đây"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
+
 msgid "Bring over your projects"
 msgstr "Nhập các dự án của bạn"
 

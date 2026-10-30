@@ -3510,6 +3510,9 @@ msgstr "Yakın zamanda geliştirdiğiniz bir şeyin bağlantısını getirin."
 msgid "Bring Any Agent"
 msgstr "Hangi ajanı isterseniz getirin"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code, Codex, OpenCode veya herhangi bir kodlama ajanını tek bir çalışma alanında toplayın. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
+
 msgid "Bring over your projects"
 msgstr "Projelerinizi aktarın"
 
@@ -4184,7 +4187,7 @@ msgid "Clarify this"
 msgstr "Bunu netleştir"
 
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex ve OpenCode ajanlardır; Paradev ise bunların çoğunu aynı anda çalıştırdığınız yerdir. Her görev kendi Git worktree'sini ve dalını alır, böylece siz tek bir yerden izler, inceler ve birleştirirken on ajan aynı anda on dalda çalışabilir."
+msgstr "Claude Code, Codex ve OpenCode ajanlardır; Paradev ise bunların birçoğunu aynı anda çalıştırdığınız yerdir. Her görev kendi Git worktree'sini ve dalını alır, böylece siz tek bir yerden izler, inceler ve birleştirirken on ajan aynı anda on dalda çalışabilir."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode ve daha fazlası. Ajan başına kurulum yok."

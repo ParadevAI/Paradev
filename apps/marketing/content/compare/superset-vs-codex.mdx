@@ -102,7 +102,7 @@ Not really. Paradev now has built-in chat, MCP tooling, browser previews, and fi
 
 ### Can I run Codex in Full Auto mode inside Paradev?
 
-Yes. Each Paradev task runs Codex in its own Git worktree and branch. You can use any Codex mode (Suggest, Auto Edit, or Full Auto), and file edits land in that worktree, not in your main checkout. A worktree is not a sandbox: the agent's commands still run on your machine, so use Codex's own sandbox modes to limit them.
+Yes. Each Paradev task runs Codex in its own Git worktree and branch. You can use any Codex mode (Suggest, Auto Edit, or Full Auto), The worktree keeps the task's working files apart from your main checkout, but it does not limit where the agent's commands can read or write. A worktree is not a sandbox: the agent's commands still run on your machine, so use Codex's own sandbox modes to limit them.
 
 ### How does the Codex app compare to Paradev?
 

@@ -3510,6 +3510,9 @@ msgstr "最近作ったもののリンクをお持ちください。"
 msgid "Bring Any Agent"
 msgstr "どのエージェントでも"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code、Codex、OpenCode、またはあらゆるコーディングエージェントを1つのワークスペースに。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
+
 msgid "Bring over your projects"
 msgstr "プロジェクトを引き継ぐ"
 
