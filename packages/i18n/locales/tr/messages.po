@@ -9857,6 +9857,9 @@ msgstr "İnternet bağlantısı kesildi"
 msgid "Interrupt"
 msgstr "Kes"
 
+msgid "Interrupted"
+msgstr "Kesildi"
+
 msgid "Intro call"
 msgstr "Tanışma görüşmesi"
 

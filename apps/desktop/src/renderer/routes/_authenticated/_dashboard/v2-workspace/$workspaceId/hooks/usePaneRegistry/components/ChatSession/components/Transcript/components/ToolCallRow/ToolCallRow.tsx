@@ -123,7 +123,10 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 						{title}
 					</span>
 					{running && <RunningTime startedAtMs={item.startedAtMs} />}
-					<StatusWord status={item.status} />
+					<StatusWord
+						interrupted={item.interrupted === true}
+						status={item.status}
+					/>
 					{hasBody && (
 						<ChevronRight
 							className={cn(

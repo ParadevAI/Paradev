@@ -121,6 +121,29 @@ function editsUnseen(call: ToolCall): boolean {
 	return call.toolKind === "execute" || call.subagent === true;
 }
 
+function interrupted(tool: ToolCall): ToolCall {
+	return { ...tool, status: "canceled", interrupted: true };
+}
+
+/** A prompt sent into a running turn cuts off the calls still running above it. */
+function interruptRunningCalls(rows: TranscriptRow[], from: number): void {
+	for (let at = from; at < rows.length; at++) {
+		const row = rows[at];
+		if (row?.kind === "item" && row.item.kind === "tool_call") {
+			const tool = row.item as ToolCall;
+			if (tool.status === "running")
+				rows[at] = { ...row, item: interrupted(tool) };
+		}
+		if (row?.kind !== "tool_run") continue;
+		const copies = new Map<Item, ToolCall>();
+		for (const tool of row.items)
+			if (tool.status === "running") copies.set(tool, interrupted(tool));
+		if (copies.size === 0) continue;
+		row.items = row.items.map((tool) => copies.get(tool) ?? tool);
+		row.steps = row.steps.map((step) => copies.get(step) ?? step);
+	}
+}
+
 export function transcriptRows(
 	groups: readonly TurnGroup[],
 	outbox: readonly OutboxEntry[],
@@ -138,6 +161,7 @@ export function transcriptRows(
 			rows.push(row);
 			groupStart = false;
 		};
+		const groupRowsFrom = rows.length;
 		const turn = group.turn;
 		let clockPlaced = turn === null;
 		const placeClock = () => {
@@ -251,6 +275,8 @@ export function transcriptRows(
 					continue;
 				}
 				pushItem(entry.item);
+				if (entry.item.kind === "user_message")
+					interruptRunningCalls(rows, groupRowsFrom);
 				continue;
 			}
 			if (!tools) continue;

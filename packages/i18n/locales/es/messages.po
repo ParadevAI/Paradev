@@ -9857,6 +9857,9 @@ msgstr "Sin conexión a Internet"
 msgid "Interrupt"
 msgstr "Interrumpir"
 
+msgid "Interrupted"
+msgstr "Interrumpido"
+
 msgid "Intro call"
 msgstr "Llamada de presentación"
 

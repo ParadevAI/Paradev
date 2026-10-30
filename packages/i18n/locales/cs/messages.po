@@ -9857,6 +9857,9 @@ msgstr "Internet odpojen"
 msgid "Interrupt"
 msgstr "Přerušit"
 
+msgid "Interrupted"
+msgstr "Přerušeno"
+
 msgid "Intro call"
 msgstr "Úvodní hovor"
 

@@ -76,7 +76,9 @@ export const ToolRunRow = memo(function ToolRunRow({
 		collapsed && active ? steps.slice(-ACTIVE_TAIL_STEPS) : undefined;
 	const current =
 		collapsed && !tail
-			? items.find((tool) => tool.status === "running")
+			? items.find(
+					(tool) => tool.status === "running" || tool.interrupted === true,
+				)
 			: undefined;
 	const renderStep = (step: Item) => (
 		<RailStep key={step.id}>

@@ -9857,6 +9857,9 @@ msgstr "인터넷 연결 끊김"
 msgid "Interrupt"
 msgstr "중단"
 
+msgid "Interrupted"
+msgstr "중단됨"
+
 msgid "Intro call"
 msgstr "첫 통화"
 

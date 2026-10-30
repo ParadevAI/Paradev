@@ -9857,6 +9857,9 @@ msgstr "Нет подключения к интернету"
 msgid "Interrupt"
 msgstr "Прервать"
 
+msgid "Interrupted"
+msgstr "Прервано"
+
 msgid "Intro call"
 msgstr "Знакомство"
 

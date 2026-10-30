@@ -6,6 +6,11 @@ import "./storybook.css";
 
 initI18n("en");
 
+(globalThis as { electronTRPC?: unknown }).electronTRPC ??= {
+	sendMessage: () => {},
+	onMessage: () => {},
+};
+
 const preview: Preview = {
 	globalTypes: {
 		theme: {

@@ -9857,6 +9857,9 @@ msgstr "Internet disconnesso"
 msgid "Interrupt"
 msgstr "Interrompi"
 
+msgid "Interrupted"
+msgstr "Interrotto"
+
 msgid "Intro call"
 msgstr "Chiamata conoscitiva"
 

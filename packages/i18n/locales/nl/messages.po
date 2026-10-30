@@ -9857,6 +9857,9 @@ msgstr "Geen internetverbinding"
 msgid "Interrupt"
 msgstr "Onderbreken"
 
+msgid "Interrupted"
+msgstr "Onderbroken"
+
 msgid "Intro call"
 msgstr "Kennismakingsgesprek"
 

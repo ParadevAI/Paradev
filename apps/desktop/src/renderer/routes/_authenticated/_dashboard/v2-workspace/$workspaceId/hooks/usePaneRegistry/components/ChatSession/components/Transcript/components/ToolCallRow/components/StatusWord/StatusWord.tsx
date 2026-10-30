@@ -1,7 +1,13 @@
 import { Trans } from "@lingui/react/macro";
 import type { ToolCall } from "@superset/chat/protocol";
 
-export function StatusWord({ status }: { status: ToolCall["status"] }) {
+export function StatusWord({
+	interrupted,
+	status,
+}: {
+	status: ToolCall["status"];
+	interrupted?: boolean;
+}) {
 	switch (status) {
 		case "failed":
 			return (
@@ -18,7 +24,7 @@ export function StatusWord({ status }: { status: ToolCall["status"] }) {
 		case "canceled":
 			return (
 				<span className="shrink-0 font-mono text-[11px] text-muted-foreground/70 lowercase">
-					<Trans>Canceled</Trans>
+					{interrupted ? <Trans>Interrupted</Trans> : <Trans>Canceled</Trans>}
 				</span>
 			);
 		default:
