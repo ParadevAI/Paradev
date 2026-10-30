@@ -292,6 +292,9 @@ export class ClaudeAdapter implements HarnessAdapter {
 		}
 
 		this.emitApproval(approvalId, pending.toolUseId, "answered", decision);
+		if (this.approvals.size === 0 && this.translator?.currentTurnId) {
+			this.events.push({ kind: "session", session: { status: "running" } });
+		}
 		if (decision.type === "cancel") this.cancelTurn();
 	}
 
@@ -357,6 +360,10 @@ export class ClaudeAdapter implements HarnessAdapter {
 		return new Promise<PermissionResult>((settle) => {
 			this.approvals.set(approvalId, { toolUseId, input, settle });
 			this.emitApproval(approvalId, toolUseId, "pending");
+			this.events.push({
+				kind: "session",
+				session: { status: "awaiting_input" },
+			});
 		});
 	}
 

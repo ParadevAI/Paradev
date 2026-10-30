@@ -3,6 +3,7 @@ import type { AdapterEvent } from "../../types";
 import {
 	ClaudeAdapter,
 	type ClaudeQuery,
+	type ClaudeQueryOptions,
 	type ClaudeSession,
 } from "./claudeAdapter";
 
@@ -12,6 +13,7 @@ type Harness = {
 	emit: (message: unknown) => void;
 	interrupts: number;
 	aborted: () => boolean;
+	options: () => ClaudeQueryOptions | null;
 };
 
 function messageStart(id: string): unknown {
@@ -34,6 +36,7 @@ function createHarness(): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
+	let queryOptions: ClaudeQueryOptions | null = null;
 	const state = { interrupts: 0 };
 
 	const stream: ClaudeSession = {
@@ -55,6 +58,7 @@ function createHarness(): Harness {
 	};
 
 	const query: ClaudeQuery = ({ options }) => {
+		queryOptions = options;
 		options.abortController?.signal.addEventListener("abort", () => {
 			aborted = true;
 		});
@@ -77,7 +81,26 @@ function createHarness(): Harness {
 			return state.interrupts;
 		},
 		aborted: () => aborted,
+		options: () => queryOptions,
 	};
+}
+
+async function untilStatus(
+	iterator: AsyncIterator<AdapterEvent>,
+): Promise<AdapterEvent[]> {
+	const seen: AdapterEvent[] = [];
+	for (let index = 0; index < 20; index += 1) {
+		const next = await iterator.next();
+		if (next.done) throw new Error("stream ended");
+		seen.push(next.value);
+		if (next.value.kind === "session" && next.value.session.status) return seen;
+	}
+	throw new Error("no session status");
+}
+
+function lastStatus(events: AdapterEvent[]): string | undefined {
+	const last = events.at(-1);
+	return last?.kind === "session" ? last.session.status : undefined;
 }
 
 async function nextTurn(
@@ -144,6 +167,31 @@ describe("ClaudeAdapter", () => {
 		await collect();
 
 		expect(reported).toEqual(["session-1"]);
+	});
+
+	test("an open approval reports the session awaiting input until answered", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		const canUseTool = harness.options()?.canUseTool;
+		void canUseTool?.(
+			"Bash",
+			{ command: "ls" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+			},
+		);
+		const raised = await untilStatus(harness.iterator);
+		expect(lastStatus(raised)).toBe("awaiting_input");
+
+		const approval = raised.find((event) => event.kind === "item");
+		const approvalId = approval?.kind === "item" ? approval.item.id : "";
+		harness.adapter.respondToApproval(approvalId, { type: "accept" });
+		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
 	});
 
 	test("dispose aborts the underlying session", async () => {

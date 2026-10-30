@@ -1496,7 +1496,13 @@ export class AcpAdapter implements HarnessAdapter {
 		)
 			return;
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
-		if (status) this.emitSession({ status });
+		if (!status) return;
+		this.emitSession({
+			status:
+				status === "running" && this.pendingApprovals.size > 0
+					? "awaiting_input"
+					: status,
+		});
 	}
 
 	/**
