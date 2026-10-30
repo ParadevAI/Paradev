@@ -98,9 +98,9 @@ To give the agent itself tools to read and update Linear, such as posting a summ
 | Option | Where the agent runs | Agents | Good fit |
 | --- | --- | --- | --- |
 | Paradev Tasks and automations | Your machines or a shared host | Claude Code, Codex, and other CLI agents | Teams that want agents on their own machines and subscriptions, with diffs reviewed before the PR |
-| Codex in Linear | OpenAI's cloud | Codex | Assign or mention @Codex on an issue, and it posts progress back |
-| Cursor in Linear | Cursor's cloud agents | Cursor's agent | Teams already on Cursor; assign an issue to Cursor or mention @Cursor |
-| Linear coding sessions | Configured in Linear | Claude Code and Codex, per Linear's coding sessions page | Teams that want everything to stay inside Linear |
+| [Codex in Linear](https://learn.chatgpt.com/docs/third-party/linear) | Codex cloud | Codex | Assign or mention @Codex on an issue, and it posts progress back |
+| [Cursor in Linear](https://cursor.com/docs/integrations/linear) | Cursor Cloud Agents | Cursor's agent | Teams already on Cursor; assign an issue to Cursor or mention @Cursor |
+| [Linear coding sessions](https://linear.app/docs/coding-sessions) | A secure cloud environment, per Linear's docs | Linear Agent, writing code with Claude Code or Codex | Teams that want everything to stay inside Linear; needs AI credits and a workspace admin to turn it on |
 | Cyrus | A machine you run | Claude Code | Open-source bridge that runs Claude Code on assigned issues |
 
 Linear's native agents need the least setup and keep the conversation on the issue. The tradeoff is that the work runs in the vendor's environment, which may not have your local services, seeded database, or VPN. Paradev runs the agent CLIs you already use on machines you control, so the agent sees what your developers see, and a person reviews the diff in the app before the pull request goes up. You can use both: assign the quick, self-contained issues to a cloud agent and run the ones that need local context in Paradev.
