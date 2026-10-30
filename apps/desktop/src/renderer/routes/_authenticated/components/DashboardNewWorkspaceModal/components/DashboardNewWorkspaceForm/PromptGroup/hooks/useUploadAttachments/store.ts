@@ -1,4 +1,5 @@
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { fileToBase64 } from "renderer/lib/file-to-base64";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { create } from "zustand";
 
@@ -48,15 +49,6 @@ async function uploadToCloud(file: File): Promise<string> {
 	return fileId;
 }
 
-async function toBase64(file: File): Promise<string> {
-	const bytes = new Uint8Array(await file.arrayBuffer());
-	let binary = "";
-	for (let i = 0; i < bytes.length; i += 1) {
-		binary += String.fromCharCode(bytes[i]);
-	}
-	return btoa(binary);
-}
-
 function setEntry(fileId: string, hostUrl: string, state: UploadState): void {
 	useAttachmentUploadsStore.setState((s) => ({
 		entries: {
@@ -95,7 +87,7 @@ export function startUpload(hostUrl: string, file: StartUploadInput): void {
 							await getHostServiceClientByUrl(
 								hostUrl,
 							).attachments.upload.mutate({
-								data: { kind: "base64", data: await toBase64(file.file) },
+								data: { kind: "base64", data: await fileToBase64(file.file) },
 								mediaType: file.file.type,
 								originalFilename: file.file.name || undefined,
 							})
