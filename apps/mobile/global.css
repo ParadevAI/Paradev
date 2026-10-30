@@ -96,5 +96,12 @@
 @layer base {
 	textarea {
 		resize: none;
+		outline: none;
+	}
+	ul {
+		list-style: disc;
+	}
+	ol {
+		list-style: decimal;
 	}
 }
