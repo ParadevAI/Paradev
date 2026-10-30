@@ -576,7 +576,6 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		lineHeight: COMPOSER_METRICS.lineHeight,
 		padding: 0,
-		outlineWidth: 0,
 	},
 	row: {
 		flexDirection: "row",

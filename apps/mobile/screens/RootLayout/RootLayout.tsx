@@ -22,6 +22,7 @@ import { Uniwind } from "uniwind";
 import { AlertHost, installAlert } from "@/lib/alert";
 import { useSession } from "@/lib/auth/client";
 import { watchNetworkState } from "@/lib/errors";
+import { installInputModality } from "@/lib/input-modality";
 import { NAV_THEME } from "@/lib/theme";
 import { apiClient } from "@/lib/trpc/client";
 
@@ -79,6 +80,7 @@ const deviceLocale = resolveLocale(
 // "could not reach the server" — see lib/errors.
 watchNetworkState();
 installAlert();
+installInputModality();
 
 // React Query cannot see app focus on native, so without this no query ever
 // refetches on returning to the foreground — data went stale for the whole

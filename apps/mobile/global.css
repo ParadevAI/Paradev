@@ -96,6 +96,12 @@
 @layer base {
 	textarea {
 		resize: none;
+	}
+	textarea:focus-visible {
+		outline: 2px solid var(--color-ring);
+		outline-offset: 2px;
+	}
+	[data-input-modality="pointer"] textarea:focus {
 		outline: none;
 	}
 	ul {
