@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
+	appendFileSync,
 	chmodSync,
 	mkdtempSync,
 	realpathSync,
@@ -72,7 +73,13 @@ async function createPrScenario(prNumber: number): Promise<{
 }
 
 function installDirtyPostCheckoutHook(repoPath: string): void {
-	const hookPath = join(repoPath, ".git", "hooks", "post-checkout");
+	const hooksDir = join(repoPath, ".git", "hooks");
+	const hookPath = join(hooksDir, "post-checkout");
+	// A machine-wide core.hooksPath would otherwise skip this repo's hooks.
+	appendFileSync(
+		join(repoPath, ".git", "config"),
+		`[core]\n\thooksPath = ${hooksDir}\n`,
+	);
 	writeFileSync(
 		hookPath,
 		[
