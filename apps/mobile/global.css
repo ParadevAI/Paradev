@@ -92,3 +92,9 @@
 		animation: accordion-up 0.2s ease-out;
 	}
 }
+
+@layer base {
+	textarea {
+		resize: none;
+	}
+}
