@@ -63,21 +63,30 @@ export default function AuthenticatedLayout() {
 
 ## Conventions
 
-- **iOS ships; Android is a seam, not a target yet.** Every iOS-only API sits behind a typed
-  contract, picked by Metro's platform extensions, never by `Platform.OS` checks in screens:
-  - `X.types.ts` is the contract: props, handle and function types, with no SF Symbol names or
-    other iOS words in what callers pass. Screens import only the folder's `index.ts`.
-  - `X.ios.tsx` is the native binding: an Expo module in `modules/<name>/ios`, `@expo/ui/swift-ui`,
-    or an iOS-only Expo package. It is the only file that may import those.
-  - `X.tsx` is the fallback for every other platform and for `bun test`. It does nothing or
-    degrades to plain RN, and it must not crash.
-  - Both implementations annotate their exports with the contract type, so `tsc` checks the
-    `.ios` file against the same shape as the fallback that callers resolve to.
-  - To port to Android: add `X.android.tsx`, or for a module, add `android/` and `"android"` to
-    `expo-module.config.json` and rename the binding `X.native.tsx` so both platforms use it.
-  Examples: `modules/composer/src`, `ShareAccess/components/ValueMenu`,
-  `sign-in/utils/signInWithApple`. Android-only the other way round: `sign-in/utils/signInWithGoogle`
-  (`.android.ts` on `modules/google-credential`, `.ts` everywhere else).
+- **Native on every platform, React Native as the fallback.** iOS ships; Android and web build
+  from the same code. Every platform-specific API sits behind a typed contract, picked by Metro's
+  platform extensions, never by `Platform.OS` checks in screens. For each piece, use the first
+  of these that fits:
+  1. An `@expo/ui` universal component (`@expo/ui`) or community drop-in (`@expo/ui/community/menu`,
+     `/bottom-sheet`, `/picker` ...): SwiftUI on iOS, Jetpack Compose on Android, DOM on web, one
+     import. Example: `ShareAccess/components/ValueMenu/ValueMenu.android.tsx` uses `MenuView`.
+  2. Per-platform files behind one contract:
+     - `X.types.ts` is the contract: props, handle and function types, with no SF Symbol names or
+       other platform words in what callers pass. Screens import only the folder's `index.ts`.
+     - `X.ios.tsx`: an Expo module in `modules/<name>/ios`, `@expo/ui/swift-ui`, or an iOS-only
+       Expo package. It is the only file that may import those.
+     - `X.android.tsx`: `@expo/ui/jetpack-compose` or a module's `android/` code. For a module that
+       has both, add `"android"` to `expo-module.config.json` and name the binding `X.native.tsx`.
+     - `X.web.tsx`: where the browser has a better control than plain RN (a file input, CSS
+       `backdrop-filter`, the browser's WebRTC or session cookie).
+  3. `X.tsx`, the React Native fallback. Web, `bun test` and any platform without its own file
+     resolve it, so it must work: never a no-op behind something the user taps. A capability that
+     does not exist there (Live Activities, native sign-in) may be a no-op.
+  Every implementation annotates its exports with the contract type, so `tsc` checks each file
+  against the same shape. Examples: `modules/composer/src` (SwiftUI on iOS, RN composer as `.tsx`),
+  `modules/attachments-sheet` (native sheet, Compose sheet, browser file chooser),
+  `modules/alert-prompt`, `sign-in/utils/signInWithGoogle` (`.android.ts` on
+  `modules/google-credential`, browser flow everywhere else).
 - **Bottom sheets are expo-router `formSheet` routes** — `...sheetHeaderOptions` gives the native
   title and ✕ on iOS and a JS drag handle and title on Android, where a form sheet draws no native
   bar (so `Stack.SearchBar` and SF Symbol `Stack.Toolbar` buttons do not show there). The body is
