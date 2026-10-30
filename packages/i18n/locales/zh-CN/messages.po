@@ -13120,6 +13120,9 @@ msgstr "打开 ChatGPT 管理员设置"
 msgid "Open ChatGPT settings"
 msgstr "打开 ChatGPT 设置"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "以聊天形式打开 Claude 和 Codex 会话"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "在聊天窗格而不是终端中打开 Claude 和 Codex 会话。"
 

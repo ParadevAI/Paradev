@@ -1,11 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset, presetForAnyHarness } from "@superset/chat/core";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SquareTerminal } from "lucide-react-native";
-import { useFeatureFlag } from "posthog-react-native";
 import { useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 import { Button } from "@/components/ui/button";
@@ -28,6 +26,7 @@ import {
 	resolveAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
@@ -44,7 +43,7 @@ export function NewSessionSheet() {
 	const router = useRouter();
 	const theme = useTheme();
 	const queryClient = useQueryClient();
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
+	const acpChat = useAcpChatEnabled();
 	const { workspace, host, isResolving } = useWorkspaceHost(id ?? null);
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)

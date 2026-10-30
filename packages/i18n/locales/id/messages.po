@@ -13120,6 +13120,9 @@ msgstr "Buka pengaturan admin ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Buka pengaturan ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Buka sesi Claude dan Codex sebagai obrolan"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Buka sesi Claude dan Codex di panel chat, bukan di terminal."
 
