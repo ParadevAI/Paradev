@@ -56,6 +56,10 @@ local_check_dependencies() {
     for dep in "${missing[@]}"; do echo "  - $dep"; done
     return 1
   fi
+  if ! docker info &> /dev/null; then
+    error "Docker is installed but its daemon is not reachable (start Docker Desktop, or run 'colima start')"
+    return 1
+  fi
   success "All dependencies found"
   return 0
 }
@@ -300,13 +304,21 @@ PORTSJSON
 
 local_write_config_overlay() {
   echo "🔧 Writing .superset/config.local.json (untracked overlay)..."
-  cat > "$SUPERSET_SCRIPT_DIR/config.local.json" <<'CONFIGLOCAL'
-{
-  "setup": ["./.superset/setup.local.sh"],
-  "teardown": ["./.superset/teardown.local.sh"]
-}
-CONFIGLOCAL
-  success "config.local.json written — worktrees will use setup.local.sh"
+  local path="$SUPERSET_SCRIPT_DIR/config.local.json"
+  local overlay='{"setup":["./.superset/setup.local.sh"],"teardown":["./.superset/teardown.local.sh"]}'
+  local merged
+  if [ -f "$path" ]; then
+    merged="$(jq -s --argjson overlay "$overlay" \
+      'if length == 1 and (.[0] | type) == "object" then .[0] * $overlay else error("not one JSON object") end' \
+      "$path")" || {
+      error "$path must contain exactly one JSON object"
+      return 1
+    }
+  else
+    merged="$(jq -n --argjson overlay "$overlay" '$overlay')" || return 1
+  fi
+  echo "$merged" > "$path"
+  success "config.local.json written — workspaces created from now on run setup.local.sh"
   return 0
 }
 
@@ -318,15 +330,24 @@ local_setup_main() {
   echo ""
 
   local_ensure_env || step_failed "Prepare .env"
-  local_check_dependencies || step_failed "Check dependencies"
+  if ! local_check_dependencies; then
+    step_failed "Check dependencies"
+    print_summary "Local setup"
+    return
+  fi
   step_install_dependencies || step_failed "Install dependencies"
   local_allocate_ports || step_failed "Allocate ports"
   local_write_env || step_failed "Write workspace .env"
   step_seed_env_placeholders || step_failed "Seed .env placeholders"
   step_validate_env || step_failed "Validate .env"
-  local_db_up || step_failed "Start local DB stack"
-  local_migrate || step_failed "Apply migrations"
-  local_seed_dev_account || step_failed "Seed dev account"
+  if local_db_up; then
+    local_migrate || step_failed "Apply migrations"
+    local_seed_dev_account || step_failed "Seed dev account"
+  else
+    step_failed "Start local DB stack"
+    step_skipped "Apply migrations (no DB stack)"
+    step_skipped "Seed dev account (no DB stack)"
+  fi
   local_write_config_overlay || step_failed "Write config overlay"
 
   print_summary "Local setup"
