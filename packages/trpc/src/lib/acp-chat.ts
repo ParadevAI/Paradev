@@ -1,11 +1,11 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { posthog } from "./analytics";
+import { db } from "@superset/db/client";
+import { users } from "@superset/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function acpChatEnabled(userId: string): Promise<boolean> {
-	const enabled = await posthog
-		.isFeatureEnabled(FEATURE_FLAGS.ACP_CHAT, userId, {
-			sendFeatureFlagEvents: false,
-		})
-		.catch(() => undefined);
-	return enabled === true;
+	const user = await db.query.users.findFirst({
+		where: eq(users.id, userId),
+		columns: { experimentalChat: true },
+	});
+	return user?.experimentalChat === true;
 }

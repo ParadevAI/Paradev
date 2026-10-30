@@ -5964,6 +5964,9 @@ msgstr "ファイルをステージ解除できませんでした"
 msgid "Couldn't update pull request"
 msgstr "プルリクエストを更新できませんでした"
 
+msgid "Couldn't update the Chat setting"
+msgstr "チャットの設定を更新できませんでした"
+
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
 

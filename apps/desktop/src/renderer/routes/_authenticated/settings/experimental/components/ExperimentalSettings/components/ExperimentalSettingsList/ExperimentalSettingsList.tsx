@@ -4,7 +4,6 @@ import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { useAcpChatStore } from "renderer/stores/acp-chat";
 import {
 	useChatTurnSnapshotsEnabled,
 	useChatTurnSnapshotsStore,
@@ -24,6 +23,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
+import { AcpChatSetting } from "../AcpChatSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -54,7 +54,6 @@ export function ExperimentalSettingsList({
 		visibleItems,
 	);
 	const acpChatEnabled = useAcpChatEnabled();
-	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
 	const showChatTurnSnapshots =
 		acpChatEnabled &&
 		isItemVisible(
@@ -184,32 +183,7 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showAcpChat && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label htmlFor="acp-chat" className="text-sm font-medium">
-								<HighlightText
-									text={t({ message: "Chat" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Open Claude and Codex sessions in a chat pane instead of a terminal.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="acp-chat"
-							checked={acpChatEnabled}
-							onCheckedChange={setAcpChatEnabled}
-						/>
-					</div>
-				)}
+				{showAcpChat && <AcpChatSetting />}
 				{showChatTurnSnapshots && (
 					<div className="flex items-center justify-between gap-6">
 						<div className="min-w-0 flex-1 space-y-0.5">

@@ -5964,6 +5964,9 @@ msgstr "Nie udało się usunąć pliku z indeksu"
 msgid "Couldn't update pull request"
 msgstr "Nie udało się zaktualizować pull requesta"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Nie udało się zaktualizować ustawienia Chat"
+
 msgid "Couldn't update the queue"
 msgstr "Nie udało się zaktualizować kolejki"
 

@@ -5964,6 +5964,9 @@ msgstr "Không thể bỏ stage tệp"
 msgid "Couldn't update pull request"
 msgstr "Không thể cập nhật pull request"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Không thể cập nhật cài đặt Trò chuyện"
+
 msgid "Couldn't update the queue"
 msgstr "Không thể cập nhật hàng đợi"
 

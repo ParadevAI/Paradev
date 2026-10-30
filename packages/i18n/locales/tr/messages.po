@@ -5964,6 +5964,9 @@ msgstr "Dosya hazırlıktan çıkarılamadı"
 msgid "Couldn't update pull request"
 msgstr "Pull request güncellenemedi"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Sohbet ayarı güncellenemedi"
+
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
 

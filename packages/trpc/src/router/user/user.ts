@@ -117,6 +117,17 @@ export const userRouter = {
 			return { success: true };
 		}),
 
+	/** The Chat experimental setting: open new ACP agent sessions as chats. */
+	updateExperimentalChat: protectedProcedure
+		.input(z.object({ enabled: z.boolean() }))
+		.mutation(async ({ ctx, input }) => {
+			await db
+				.update(users)
+				.set({ experimentalChat: input.enabled })
+				.where(eq(users.id, ctx.session.user.id));
+			return { success: true };
+		}),
+
 	reactivateAccount: protectedProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 

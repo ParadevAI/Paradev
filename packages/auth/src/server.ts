@@ -89,6 +89,13 @@ const userOptions = {
 			input: false,
 			fieldName: "deletion_requested_at",
 		},
+		experimentalChat: {
+			type: "boolean",
+			required: false,
+			input: false,
+			defaultValue: false,
+			fieldName: "experimental_chat",
+		},
 	},
 } as const;
 

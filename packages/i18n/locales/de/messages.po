@@ -5964,6 +5964,9 @@ msgstr "Datei konnte nicht unstaged werden"
 msgid "Couldn't update pull request"
 msgstr "Pull Request konnte nicht aktualisiert werden"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Die Chat-Einstellung konnte nicht aktualisiert werden"
+
 msgid "Couldn't update the queue"
 msgstr "Warteschlange konnte nicht aktualisiert werden"
 

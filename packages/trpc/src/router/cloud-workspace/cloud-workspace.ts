@@ -369,11 +369,6 @@ export const cloudWorkspaceRouter = {
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
-				/**
-				 * Where `agent` opens. Omitted by builds older than the chat
-				 * experimental setting; those keep reading the `acp-chat` flag.
-				 */
-				surface: z.enum(["chat", "terminal"]).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -399,11 +394,7 @@ export const cloudWorkspaceRouter = {
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
 				machineSize: input.machineSize,
-				chat:
-					input.surface === "chat" ||
-					(!input.surface &&
-						!!input.agent &&
-						(await acpChatEnabled(ctx.userId))),
+				chat: !!input.agent && (await acpChatEnabled(ctx.userId)),
 				...(input.agent
 					? {
 							launch: {

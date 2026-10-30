@@ -15,7 +15,6 @@ import {
 	type TerminalRowData,
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
-import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { SessionList } from "./components/SessionList";
@@ -29,7 +28,6 @@ import { SessionList } from "./components/SessionList";
 export function SessionsSheet() {
 	const { t } = useLingui();
 	const params = useLocalSearchParams<{ id: string; active?: string }>();
-	const acpChat = useAcpChatEnabled();
 	const id = params.id;
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -138,19 +136,17 @@ export function SessionsSheet() {
 					onPress={() => router.back()}
 				/>
 			</Stack.Toolbar>
-			{acpChat ? (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
-						icon="plus"
-						accessibilityLabel={t({
-							message: "New session",
-						})}
-						onPress={() =>
-							router.replace(`/(authenticated)/workspace/${id}/new-session`)
-						}
-					/>
-				</Stack.Toolbar>
-			) : null}
+			<Stack.Toolbar placement="right">
+				<Stack.Toolbar.Button
+					icon="plus"
+					accessibilityLabel={t({
+						message: "New session",
+					})}
+					onPress={() =>
+						router.replace(`/(authenticated)/workspace/${id}/new-session`)
+					}
+				/>
+			</Stack.Toolbar>
 			<SessionList
 				rows={rows}
 				activeTerminalId={params.active ?? null}

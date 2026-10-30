@@ -1,5 +1,6 @@
-import { useAcpChatStore } from "renderer/stores/acp-chat";
+import { authClient } from "renderer/lib/auth-client";
 
 export function useAcpChatEnabled(): boolean {
-	return useAcpChatStore((state) => state.enabled);
+	const { data: session } = authClient.useSession();
+	return session?.user.experimentalChat === true;
 }

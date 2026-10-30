@@ -225,10 +225,9 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Legacy gate for the ACP chat pane, now the Chat experimental setting on
-	 * desktop and mobile. Read only by released builds and by
-	 * `cloudWorkspace.create` when a caller sends no `surface`. Remove it once
-	 * no live build reads it.
+	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
+	 * experimental setting (`users.experimental_chat`). Read only by released
+	 * desktop and mobile builds; remove it once no live build reads it.
 	 */
 	ACP_CHAT: "acp-chat",
 	/**

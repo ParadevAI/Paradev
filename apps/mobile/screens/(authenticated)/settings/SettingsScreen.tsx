@@ -6,6 +6,7 @@ import {
 	ACCOUNT_DELETION_GRACE_DAYS,
 	COMPANY,
 } from "@superset/shared/constants";
+import { useMutation } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
 import { Alert, ScrollView, Switch, View } from "react-native";
@@ -21,12 +22,13 @@ import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
+import { apiClient } from "@/lib/trpc/client";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
-import { useAcpChatStore } from "@/screens/(authenticated)/stores/acpChatStore";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
 import { usePlanName } from "./hooks/usePlanName";
@@ -50,13 +52,22 @@ export function SettingsScreen() {
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
-	const { data: session } = useSession();
+	const { data: session, refetch: refetchSession } = useSession();
 	const { activeOrganization, activeOrganizationId } = useOrganizations();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
-	const acpChatEnabled = useAcpChatStore((state) => state.enabled);
-	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
+	const savedAcpChatEnabled = useAcpChatEnabled();
+	const updateExperimentalChat = useMutation({
+		mutationFn: (enabled: boolean) =>
+			apiClient.user.updateExperimentalChat.mutate({ enabled }),
+		onSuccess: () => refetchSession({ query: { disableCookieCache: true } }),
+		onError: () =>
+			Alert.alert(t({ message: "Couldn't update the Chat setting" })),
+	});
+	const acpChatEnabled = updateExperimentalChat.isPending
+		? updateExperimentalChat.variables
+		: savedAcpChatEnabled;
 
 	const user = session?.user;
 	const plan = session?.session.plan;
@@ -348,7 +359,9 @@ export function SettingsScreen() {
 						trailing={
 							<Switch
 								value={acpChatEnabled}
-								onValueChange={setAcpChatEnabled}
+								onValueChange={(enabled) =>
+									updateExperimentalChat.mutate(enabled)
+								}
 								accessibilityLabel={t({ message: "Chat" })}
 							/>
 						}

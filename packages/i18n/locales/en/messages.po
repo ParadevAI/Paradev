@@ -5964,6 +5964,9 @@ msgstr "Couldn't unstage file"
 msgid "Couldn't update pull request"
 msgstr "Couldn't update pull request"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Couldn't update the Chat setting"
+
 msgid "Couldn't update the queue"
 msgstr "Couldn't update the queue"
 

@@ -20,13 +20,13 @@ import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import {
 	agentLaunchPresetId,
 	describeAgentLaunchPreferences,
 	resolveAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
-import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
@@ -57,7 +57,7 @@ export function NewSessionSheet() {
 	const presets = presetsQuery.data ?? [];
 	const endedChatsQuery = useQuery({
 		queryKey: ["chat-v3", "ended", hostUrl, workspace?.id],
-		enabled: acpChat && !!hostUrl && !!workspace,
+		enabled: !!hostUrl && !!workspace,
 		queryFn: async () => {
 			if (!hostUrl || !workspace) return [];
 			const rows = await getChatTransport(hostUrl).listSessions({

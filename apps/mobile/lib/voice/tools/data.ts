@@ -16,7 +16,6 @@ import {
 } from "@/lib/host-service/client";
 import { ensureSandboxAccess } from "@/lib/sandbox-access";
 import { apiClient } from "@/lib/trpc/client";
-import { useAcpChatStore } from "@/screens/(authenticated)/stores/acpChatStore";
 import { htmlToText } from "./htmlToText";
 import {
 	type VoiceData,
@@ -477,13 +476,6 @@ export function createVoiceData({
 					environmentId,
 					prompt,
 					agent,
-					...(agent
-						? {
-								surface: useAcpChatStore.getState().enabled
-									? "chat"
-									: "terminal",
-							}
-						: {}),
 				}),
 				HOST_TIMEOUT_MS * 4,
 				"The new workspace",

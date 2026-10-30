@@ -17,7 +17,7 @@ import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { isMissingProcedureError } from "@/lib/host-service/errors";
 import { posthog } from "@/lib/posthog";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
-import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import {

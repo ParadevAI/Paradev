@@ -5964,6 +5964,9 @@ msgstr "Nepodařilo se zrušit přípravu souboru"
 msgid "Couldn't update pull request"
 msgstr "Pull request se nepodařilo aktualizovat"
 
+msgid "Couldn't update the Chat setting"
+msgstr "Nastavení Chat se nepodařilo aktualizovat"
+
 msgid "Couldn't update the queue"
 msgstr "Frontu se nepodařilo aktualizovat"
 

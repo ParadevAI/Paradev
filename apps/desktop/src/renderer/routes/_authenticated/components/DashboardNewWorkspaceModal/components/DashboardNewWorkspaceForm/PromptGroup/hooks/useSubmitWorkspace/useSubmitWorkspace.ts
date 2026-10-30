@@ -195,7 +195,6 @@ export function useSubmitWorkspace(
 								model: selectedModel ?? undefined,
 								effort: selectedEffort ?? undefined,
 								mode: selectedMode ?? undefined,
-								surface: acpChatEnabled ? "chat" : "terminal",
 							}
 						: {}),
 				});
@@ -206,7 +205,6 @@ export function useSubmitWorkspace(
 						workspaceId: created.id,
 						launch: initialLaunch,
 						prompt: prompt.trim(),
-						chatEnabled: acpChatEnabled,
 						modelId: selectedModel,
 						modeId: selectedMode,
 					});
