@@ -11,6 +11,7 @@ interface CaseResult {
 	evalCase: EvalCase;
 	devIds: string[];
 	scores: Record<string, number>;
+	failed: boolean;
 	ms: number;
 }
 
@@ -38,7 +39,13 @@ async function runCase(evalCase: EvalCase, token: string): Promise<CaseResult> {
 		},
 		{ fetch, token: async () => token, timeoutMs: 10_000 },
 	);
-	return { evalCase, ...decision, ms: performance.now() - start };
+	return {
+		evalCase,
+		devIds: decision?.devIds ?? [],
+		scores: decision?.scores ?? {},
+		failed: decision === null,
+		ms: performance.now() - start,
+	};
 }
 
 async function runAll(cases: EvalCase[], token: string): Promise<CaseResult[]> {
@@ -95,6 +102,9 @@ function report(title: string, results: CaseResult[]) {
 	}
 	const latencies = results.map((result) => result.ms).sort((a, b) => a - b);
 	console.log(`cases: ${results.length} (${nobodyCases} nobody)`);
+	const failed = results.filter((result) => result.failed).length;
+	if (failed > 0)
+		console.log(`Jev gave no answer: ${failed} (scored as nobody)`);
 	console.log(
 		`precision: ${percent(truePositives / (truePositives + falsePositives || 1))}`,
 	);

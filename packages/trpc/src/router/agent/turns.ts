@@ -245,8 +245,13 @@ export interface ChannelRouterInput {
 	devs: Array<{ id: string; name: string; description: string | null }>;
 }
 
-/** Which of a channel's Devs an unmentioned message is for; none by default. */
-export type ChannelRouter = (input: ChannelRouterInput) => Promise<string[]>;
+/**
+ * Which of a channel's Devs an unmentioned message is for; none by default.
+ * Null when the router could not decide.
+ */
+export type ChannelRouter = (
+	input: ChannelRouterInput,
+) => Promise<string[] | null>;
 
 const routeNobody: ChannelRouter = async () => [];
 
@@ -374,13 +379,18 @@ async function routeUnmentioned({
 		})),
 	}).catch((error: unknown) => {
 		console.error("[agent-turns] channel router failed", error);
-		return [] as string[];
+		return null;
 	});
 	const inThread = message.threadRootId
-		? await devsInThread(message.threadRootId, picked)
+		? await devsInThread(
+				message.threadRootId,
+				unasked.map((agent) => agent.id),
+			)
 		: new Set<string>();
+	// Without an answer, a thread reply still reaches the Devs already in the thread.
+	const chosen = picked ?? [...inThread];
 	const work = unasked
-		.filter((agent) => picked.includes(agent.id))
+		.filter((agent) => chosen.includes(agent.id))
 		.map((agent) => ({
 			agent,
 			reason: inThread.has(agent.id)

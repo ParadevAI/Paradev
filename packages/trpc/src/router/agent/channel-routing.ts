@@ -29,10 +29,10 @@ export const jevChannelRouter: ChannelRouter = async ({
 	console.info("[channel-router]", {
 		channelId: channel.id,
 		messageId: message.id,
-		picked: decision.devIds,
-		scores: decision.scores,
+		picked: decision?.devIds ?? "no answer",
+		scores: decision?.scores,
 	});
-	return decision.devIds;
+	return decision?.devIds ?? null;
 };
 
 async function gatewayToken(): Promise<string> {

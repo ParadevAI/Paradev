@@ -30,6 +30,7 @@ export interface RouteDecision {
 export const JEV_URL = "https://ai-gateway.vercel.sh/typesafe/v1/systemone";
 const JEV_MODEL = "typesafe-ai/jev";
 const DEFAULT_TIMEOUT_MS = 2_000;
+const MAX_ATTEMPTS = 3;
 const MAX_RECENT = 10;
 const MAX_BODY_CHARS = 2_000;
 export const PRIMARY_THRESHOLD = 0.8;
@@ -132,26 +133,40 @@ export function decide(response: unknown, devs: RouterDev[]): RouteDecision {
 	return { devIds, scores };
 }
 
+/** Null when Jev could not answer, as opposed to answering that nobody should reply. */
 export async function routeChannelMessage(
 	input: RouteInput,
 	deps: RouteDeps,
-): Promise<RouteDecision> {
+): Promise<RouteDecision | null> {
 	if (input.devs.length === 0 || !input.message.body.trim()) {
 		return { devIds: [], scores: {} };
 	}
+	const signal = AbortSignal.timeout(deps.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+	let failure: unknown;
 	try {
-		const response = await deps.fetch(JEV_URL, {
+		const init = {
 			method: "POST",
 			headers: {
 				authorization: `Bearer ${await deps.token()}`,
 				"content-type": "application/json",
 			},
 			body: JSON.stringify(buildJevRequest(input)),
-			signal: AbortSignal.timeout(deps.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-		});
-		if (!response.ok) return { devIds: [], scores: {} };
-		return decide(await response.json(), input.devs);
-	} catch {
-		return { devIds: [], scores: {} };
+			signal,
+		};
+		for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+			try {
+				const response = await deps.fetch(JEV_URL, init);
+				if (response.ok) return decide(await response.json(), input.devs);
+				failure = `HTTP ${response.status}`;
+				if (response.status < 500) break;
+			} catch (error) {
+				failure = error;
+				if (signal.aborted) break;
+			}
+		}
+	} catch (error) {
+		failure = error;
 	}
+	console.warn("[channel-router] Jev failed", failure);
+	return null;
 }
