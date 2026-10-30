@@ -82,6 +82,7 @@ try {
 	// Best-effort; directory permissions should still protect the DB.
 }
 sqlite.pragma("journal_mode = WAL");
+sqlite.pragma("synchronous = NORMAL");
 sqlite.pragma("foreign_keys = OFF");
 sqlite.function("uuid_v4", () => randomUUID());
 sqlite.function("uuid_is_valid_v4", (value: unknown) => {
