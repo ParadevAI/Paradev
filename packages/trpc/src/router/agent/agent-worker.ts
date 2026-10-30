@@ -180,6 +180,7 @@ export const agentWorkerRouter = {
 			};
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),
+				organizationId: turn.organizationId,
 				host: access?.host ?? null,
 				model: access ? { headers: access.modelHeaders } : null,
 				room:
