@@ -38,6 +38,7 @@ export const users = authSchema.table(
 		// web SSR and async surfaces like email, which cannot see a device
 		// setting. plans/20260826-i18n-strategy.md §4.
 		locale: text("locale"),
+		experimentalChat: boolean("experimental_chat").default(false).notNull(),
 		deletionRequestedAt: timestamp("deletion_requested_at"),
 		// Set when the account is deleted. The row is kept and its PII scrubbed
 		// rather than removed, because tasks, integrations and automations belong

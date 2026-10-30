@@ -1,0 +1,1 @@
+ALTER TABLE "auth"."users" ADD COLUMN "experimental_chat" boolean DEFAULT false NOT NULL;
