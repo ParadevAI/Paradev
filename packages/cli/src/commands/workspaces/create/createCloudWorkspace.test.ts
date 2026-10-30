@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ApiClient } from "../../../lib/api-client";
-import { env } from "../../../lib/env";
+import { workspaceLinks } from "../../../lib/open-url";
 import { createCloudWorkspace } from "./createCloudWorkspace";
 
 test.each([
@@ -73,9 +73,5 @@ test("returns the cloud workspace's desktop and web links", async () => {
 		organizationId: "org",
 		options: {},
 	});
-	expect(result.data).toMatchObject({
-		id: "ws-1",
-		url: "superset://v2-workspace/ws-1",
-		webUrl: `${env.SUPERSET_WEB_URL}/workspaces/ws-1`,
-	});
+	expect(result.data).toMatchObject({ id: "ws-1", ...workspaceLinks("ws-1") });
 });

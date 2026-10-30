@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { env } from "../../../lib/env";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
 import listCommand from "./command";
 
 const HOST_WORKSPACE_ID = "b502bf30-8693-4815-be65-795035e0ce5f";
@@ -51,8 +51,7 @@ describe("workspaces list", () => {
 		const [row] = await invoke({ local: true });
 		expect(row).toMatchObject({
 			id: HOST_WORKSPACE_ID,
-			url: `superset://v2-workspace/${HOST_WORKSPACE_ID}`,
-			webUrl: `${env.SUPERSET_WEB_URL}/workspaces/${HOST_WORKSPACE_ID}`,
+			...workspaceLinks(HOST_WORKSPACE_ID),
 		});
 	});
 
@@ -61,8 +60,7 @@ describe("workspaces list", () => {
 		expect(row).toMatchObject({
 			id: CLOUD_WORKSPACE_ID,
 			status: "ready",
-			url: `superset://v2-workspace/${CLOUD_WORKSPACE_ID}`,
-			webUrl: `${env.SUPERSET_WEB_URL}/workspaces/${CLOUD_WORKSPACE_ID}`,
+			...workspaceLinks(CLOUD_WORKSPACE_ID),
 		});
 	});
 });

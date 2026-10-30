@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { env } from "../../../lib/env";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
 import getCommand from "./command";
 
 let workspaces: Array<Record<string, unknown>> = [];
@@ -106,12 +106,12 @@ describe("workspaces get", () => {
 
 	test("shows the desktop and web links, and --field prints the web one raw", async () => {
 		workspaces = [WORKSPACE];
-		const webUrl = `${env.SUPERSET_WEB_URL}/workspaces/${WORKSPACE.id}`;
+		const { url, webUrl } = workspaceLinks(WORKSPACE.id);
 		const result = (await invoke({ id: WORKSPACE.id })) as {
 			data: Record<string, unknown>;
 			message: string;
 		};
-		expect(result.data.url).toBe(`superset://v2-workspace/${WORKSPACE.id}`);
+		expect(result.data.url).toBe(url);
 		expect(result.data.webUrl).toBe(webUrl);
 		expect(result.message).toContain(webUrl);
 		const field = (await invoke({ id: WORKSPACE.id }, { field: "webUrl" })) as {

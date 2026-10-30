@@ -996,7 +996,8 @@ Open a workspace in the Paradev desktop app.
 `url` is the `superset://` deep link. `webUrl` is an HTTPS link that opens the
 same workspace in the desktop app. Use it where only HTTP(S) links are
 accepted, such as Linear or Slack. `workspaces list`, `get`, and `create`
-return both fields too.
+return both fields too. `--print` prints `url`; to print the HTTPS link, run
+`superset workspaces get <id> --field webUrl`.
 
 ```bash
 superset workspaces open ws_…

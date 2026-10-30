@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import type { MachineSize } from "@superset/shared/billing";
-import { env } from "../../../lib/env";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
 import createWorkspaceCommand from "./command";
 
 let localCreateError: Error | undefined;
@@ -16,11 +16,14 @@ withLocalHostService("org-1", {
 		createProcedure = "createLocal";
 		if (localCreateError) throw localCreateError;
 		createInput = input;
-		return { workspace: { name: "local" }, alreadyExists: false };
+		return {
+			workspace: { id: "ws-local", name: "local" },
+			alreadyExists: false,
+		};
 	},
 	"workspaces.createSession": (input) => {
 		sessionInput = input;
-		return { workspace: { name: "scratch" } };
+		return { workspace: { id: "ws-session", name: "scratch" } };
 	},
 	"workspaces.create": (input) => {
 		createProcedure = "create";
@@ -112,18 +115,25 @@ describe("workspaces create", () => {
 		expect(createInput).toBeUndefined();
 	});
 
-	test("reports the new workspace's desktop and web links", async () => {
-		const webUrl = `${env.SUPERSET_WEB_URL}/workspaces/ws-1`;
-		const result = (await invoke()) as {
-			data: Record<string, unknown>;
-			message: string;
-		};
-		expect(result.data).toMatchObject({
-			url: "superset://v2-workspace/ws-1",
-			webUrl,
+	for (const [kind, overrides, id] of [
+		["worktree", {}, "ws-1"],
+		["local checkout", { checkout: "local", branch: undefined }, "ws-local"],
+		[
+			"session",
+			{ project: undefined, branch: undefined, session: true },
+			"ws-session",
+		],
+	] as const) {
+		test(`reports the new ${kind} workspace's desktop and web links`, async () => {
+			const links = workspaceLinks(id);
+			const result = (await invoke(overrides)) as {
+				data: Record<string, unknown>;
+				message: string;
+			};
+			expect(result.data).toMatchObject(links);
+			expect(result.message.split("\n").at(-1)).toBe(links.webUrl);
 		});
-		expect(result.message.split("\n").at(-1)).toBe(webUrl);
-	});
+	}
 
 	test("forwards model to the agent launched with the workspace", async () => {
 		await invoke({
