@@ -287,35 +287,10 @@ export function useDiffCodeViewItems({
 					],
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
-				try {
-					const patches: string[] = [];
-					let length = 0;
-					let complete = true;
-					for (const batch of splitPatchInput(input)) {
-						if (length >= MAX_PATCH_LENGTH) {
-							complete = false;
-							break;
-						}
-						const { patch, truncated } =
-							await trpcClient.git.getDiffPatch.query(batch);
-						patches.push(patch);
-						length += patch.length;
-						// An older host has no `truncated` and does not ignore
-						// whitespace either.
-						if (truncated !== false) complete = false;
-					}
-					const joined = patches.join("");
-					const patch = boundPatch(joined);
-					const whitespaceFiltered =
-						input.ignoreWhitespace === true &&
-						complete &&
-						patch.length === joined.length;
-					return { kind: "patch", patch, whitespaceFiltered, ...requested };
-				} catch (error) {
-					if (!isMissingProcedureError(error)) throw error;
-					// Older host-service (a remote host or cloud sandbox that
-					// hasn't been updated): fetch each file's contents the way
-					// the pane used to, so the changeset still renders.
+				// Older host-service (a remote host or cloud sandbox that
+				// hasn't been updated): fetch each file's contents the way
+				// the pane used to, so the changeset still renders.
+				const fetchFiles = async (): Promise<PatchGroupResult> => {
 					const files: Extract<PatchGroupResult, { kind: "files" }>["files"] =
 						[];
 					const queue = [...members];
@@ -344,7 +319,44 @@ export function useDiffCodeViewItems({
 						whitespaceFiltered: input.ignoreWhitespace === true,
 						...requested,
 					};
+				};
+				const patches: string[] = [];
+				let length = 0;
+				let complete = true;
+				for (const batch of splitPatchInput(input)) {
+					if (length >= MAX_PATCH_LENGTH) {
+						complete = false;
+						break;
+					}
+					let response: Awaited<
+						ReturnType<typeof trpcClient.git.getDiffPatch.query>
+					>;
+					try {
+						response = await trpcClient.git.getDiffPatch.query(batch);
+					} catch (error) {
+						if (!isMissingProcedureError(error)) throw error;
+						return fetchFiles();
+					}
+					// A host without `truncated` drops `ignoreWhitespace` and
+					// returns the full patch.
+					if (input.ignoreWhitespace && response.truncated === undefined) {
+						return fetchFiles();
+					}
+					patches.push(response.patch);
+					length += response.patch.length;
+					if (response.truncated) complete = false;
 				}
+				const joined = patches.join("");
+				const patch = boundPatch(joined);
+				return {
+					kind: "patch",
+					patch,
+					whitespaceFiltered:
+						input.ignoreWhitespace === true &&
+						complete &&
+						patch.length === joined.length,
+					...requested,
+				};
 			},
 			staleTime: Number.POSITIVE_INFINITY,
 			enabled,
