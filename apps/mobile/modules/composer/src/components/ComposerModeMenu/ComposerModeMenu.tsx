@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import type { ComposerModeOption } from "../../Composer.types";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "../../constants";
 import { symbolIcon } from "../../utils/symbolIcon";
 import { ComposerMenuSheet } from "../ComposerMenuSheet";
-
-interface ComposerModeMenuProps {
-	options: ComposerModeOption[];
-	selectedId?: string | null;
-	onSelect?: (id: string) => void;
-}
+import type { ComposerModeMenuProps } from "./ComposerModeMenu.types";
 
 export function ComposerModeMenu({
 	options,
