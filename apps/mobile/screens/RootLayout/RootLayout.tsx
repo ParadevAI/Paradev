@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PortalHost } from "@rn-primitives/portal";
 import { AlertPromptHost } from "@superset/alert-prompt";
 import { CloudClientProvider } from "@superset/cloud-client";
@@ -29,6 +28,7 @@ Uniwind.setTheme("dark");
 import { PostHogUserIdentifier } from "./components/PostHogUserIdentifier";
 import { VersionGate } from "./components/VersionGate";
 import { PostHogProvider } from "./providers/PostHogProvider";
+import { queryCacheStorage } from "./utils/queryCacheStorage";
 
 // What Home's first paint waits on, kept so a returning launch opens on rows.
 // Full prefixes, not just queryKey[0]: ["cloud", "sandbox-access"] is a
@@ -62,7 +62,7 @@ for (const prefix of PERSISTED_QUERY_PREFIXES) {
 }
 
 const persister = createAsyncStoragePersister({
-	storage: AsyncStorage,
+	storage: queryCacheStorage,
 	key: "superset-rq-cache",
 });
 
