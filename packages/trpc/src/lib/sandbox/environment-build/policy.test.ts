@@ -1,11 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import {
 	buildKind,
+	checkoutLayoutMoves,
 	checkoutScript,
 	dailyBuildsPaused,
 	failureTail,
 	goldensToDelete,
 	isStale,
+	removedCheckoutPaths,
 	STALE_BUILD_MS,
 } from "./policy";
 
@@ -125,5 +127,65 @@ describe("failureTail", () => {
 		const tail = failureTail(`${output}\n`).split("\n");
 		expect(tail).toHaveLength(40);
 		expect(tail[0]).toBe("line 10");
+	});
+});
+
+describe("checkoutLayoutMoves", () => {
+	const web = { id: "web", owner: "acme", name: "web" };
+	const api = { id: "api", owner: "acme", name: "api" };
+	const docs = { id: "docs", owner: "acme", name: "docs" };
+	const otherWeb = { id: "other-web", owner: "other", name: "web" };
+
+	test("adding a repository beside others keeps every checkout in place", () => {
+		expect(
+			checkoutLayoutMoves({
+				current: [web, api],
+				currentPrimaryId: "web",
+				next: [web, api, docs],
+				nextPrimaryId: "web",
+			}),
+		).toBe(false);
+	});
+
+	test("a second repository moves the lone one out of the root", () => {
+		expect(
+			checkoutLayoutMoves({
+				current: [web],
+				currentPrimaryId: "web",
+				next: [web, api],
+				nextPrimaryId: "web",
+			}),
+		).toBe(true);
+	});
+
+	test("another primary, or a name clash that renames a checkout, moves it", () => {
+		expect(
+			checkoutLayoutMoves({
+				current: [web, api],
+				currentPrimaryId: "web",
+				next: [web, api],
+				nextPrimaryId: "api",
+			}),
+		).toBe(true);
+		expect(
+			checkoutLayoutMoves({
+				current: [web, api],
+				currentPrimaryId: "api",
+				next: [web, api, otherWeb],
+				nextPrimaryId: "api",
+			}),
+		).toBe(true);
+	});
+});
+
+describe("removedCheckoutPaths", () => {
+	test("names the directories of repositories that are dropped", () => {
+		const current = [
+			{ id: "web", owner: "acme", name: "web" },
+			{ id: "api", owner: "acme", name: "api" },
+		];
+		expect(removedCheckoutPaths({ current, nextIds: ["web"] })).toEqual([
+			"api",
+		]);
 	});
 });

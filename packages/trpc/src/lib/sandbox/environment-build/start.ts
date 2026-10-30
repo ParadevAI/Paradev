@@ -17,7 +17,7 @@ import {
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
 import { buildBoxName, rebuildEnvironment } from "./environment-build";
-import { buildKind, STALE_BUILD_MS } from "./policy";
+import { buildKind, checkoutLayoutMoves, STALE_BUILD_MS } from "./policy";
 
 export const BUILD_JOB_PATH = "/api/environments/build";
 
@@ -136,7 +136,16 @@ export async function startEnvironmentBuild(args: {
 		);
 	}
 
-	const kind = buildKind(environment.sourceKind);
+	const moves =
+		args.repositoryIds !== undefined &&
+		environment.sourceKind === "fork" &&
+		checkoutLayoutMoves({
+			current: await environmentRepositoryRows(environment.id),
+			currentPrimaryId: environment.primaryRepositoryId,
+			next: repositories,
+			nextPrimaryId: primary.id,
+		});
+	const kind = moves ? "fresh" : buildKind(environment.sourceKind);
 
 	let build: SelectEnvironmentBuild | undefined;
 	try {

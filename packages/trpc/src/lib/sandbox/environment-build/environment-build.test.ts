@@ -121,6 +121,7 @@ beforeEach(() => {
 		checkouts: [
 			{ url: "https://github.com/acme/web.git", branch: "main", path: "." },
 		],
+		removedPaths: [],
 		networkPolicy: "allow-all",
 		env: {},
 	};
