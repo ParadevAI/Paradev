@@ -1833,6 +1833,9 @@ msgstr "aktif {lastActive}"
 msgid "Active agent sessions."
 msgstr "Sesi agen yang aktif."
 
+msgid "Active build status"
+msgstr "Status build aktif"
+
 msgid "active days"
 msgstr "hari aktif"
 
@@ -2051,6 +2054,9 @@ msgstr "Tambahkan ke sidebar"
 
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
+
+msgid "Add variable"
+msgstr "Tambah variabel"
 
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
@@ -2292,6 +2298,9 @@ msgstr "Semua penerima tugas"
 msgid "All authors"
 msgstr "Semua penulis"
 
+msgid "All builds"
+msgstr "Semua build"
+
 msgid "All changes saved"
 msgstr "Semua perubahan tersimpan"
 
@@ -2313,6 +2322,9 @@ msgstr "Semua data akan dihapus permanen untuk seluruh {0} anggota — ini tidak
 
 msgid "All downloads"
 msgstr "Semua unduhan"
+
+msgid "All environment variables ({total})"
+msgstr "Semua variabel environment ({total})"
 
 msgid "All features, side by side"
 msgstr "Semua fitur, berdampingan"
@@ -3269,9 +3281,6 @@ msgstr "Direktori dasar untuk worktree baru di {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Direktori dasar untuk worktree baru di {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image dasar · belum ada checkpoint"
-
 msgid "Base URL"
 msgstr "URL dasar"
 
@@ -3537,6 +3546,9 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Laporan bug"
 
+msgid "Build ID"
+msgstr "ID build"
+
 msgid "Build in public"
 msgstr "Membangun secara terbuka"
 
@@ -3546,11 +3558,27 @@ msgstr "Bangun masa depan Paradev di komputasi awan"
 msgid "Build your own"
 msgstr "Buat milik Anda sendiri"
 
+msgid "Building"
+msgstr "Sedang build"
+
 msgid "Building the last piece of software"
 msgstr "Membangun perangkat lunak yang terakhir"
 
 msgid "Building the last piece of software."
 msgstr "Membangun perangkat lunak yang terakhir."
+
+msgid "Building with the new repositories"
+msgstr "Sedang build dengan repositori baru"
+
+msgid "Building…"
+msgstr "Sedang build…"
+
+msgid "Builds"
+msgstr "Build"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Di-build {0}"
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Perubahan"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "Perubahan berlaku untuk workspace baru. Build baru dimulai otomatis."
+
 msgid "Changes are isolated"
 msgstr "Perubahan terisolasi"
 
@@ -4046,10 +4077,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · sebelum refactor tooltip"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint tersimpan {0}"
 
 msgid "Checks"
 msgstr "Check"
@@ -4761,6 +4788,9 @@ msgstr "Isi file konfigurasi"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json harus berupa objek JSON"
+
+msgid "Configuration"
+msgstr "Konfigurasi"
 
 msgid "Configure"
 msgstr "Atur"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Dibuat"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Edit deskripsi"
 msgid "Edit Description"
 msgstr "Edit Deskripsi"
 
-msgid "Edit environment"
-msgstr "Edit environment"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit file tanpa bertanya; tanya sebelum perintah"
 
@@ -7261,6 +7287,9 @@ msgstr "Edit di GitHub"
 
 msgid "Edit queued message"
 msgstr "Edit pesan dalam antrean"
+
+msgid "Edit repositories"
+msgstr "Edit repositori"
 
 msgid "Edit Run Script"
 msgstr "Edit Skrip Run"
@@ -7451,11 +7480,20 @@ msgstr "Environment diarsipkan"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Build environment tersedia di paket Team dan Ultra. Tingkatkan paket di Pengaturan, Penagihan."
 
+msgid "Environment history"
+msgstr "Riwayat environment"
+
 msgid "Environment not found"
 msgstr "Environment tidak ditemukan"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Penyiapan environment, tes flaky, dan urusan kredensial — mode kegagalan membosankan yang mematikan run tanpa pengawasan pada 2025 — sebagian besar diselesaikan lewat rekayasa, bukan lewat model."
+
+msgid "Environment updated"
+msgstr "Environment diperbarui"
+
+msgid "Environment variables"
+msgstr "Variabel environment"
 
 msgid "Environment Variables"
 msgstr "Variabel Environment"
@@ -8708,6 +8746,11 @@ msgstr "dari"
 msgid "From"
 msgstr "Dari"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "Dari .superset/config.toml di {0}@{1}. Ubah di sana."
+
 msgid "from {parentName}"
 msgstr "dari {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "Pasang Paradev MCP di klien Anda"
 msgid "Install plugin"
 msgstr "Instal plugin"
 
+msgid "Install script"
+msgstr "Skrip instalasi"
+
 msgid "Install the desktop app"
 msgstr "Pasang aplikasi desktop"
 
@@ -10263,6 +10309,9 @@ msgstr "Aktivitas agen terakhir {0}"
 
 msgid "Last attached"
 msgstr "Terakhir terhubung"
+
+msgid "Last build failed"
+msgstr "Build terakhir gagal"
 
 msgid "Last day of each month"
 msgstr "Hari terakhir tiap bulan"
@@ -11829,6 +11878,12 @@ msgstr "Tidak ada otomatisasi yang cocok"
 msgid "No branches found"
 msgstr "Tidak ada branch ditemukan"
 
+msgid "No build yet"
+msgstr "Belum ada build"
+
+msgid "No builds yet"
+msgstr "Belum ada build"
+
 msgid "No changed files."
 msgstr "Tidak ada file yang berubah."
 
@@ -11939,6 +11994,9 @@ msgstr "Belum ada environment yang tertaut ke proyek ini."
 
 msgid "No environments available"
 msgstr "Tidak ada environment yang tersedia"
+
+msgid "No environments built yet"
+msgstr "Belum ada environment yang di-build"
 
 msgid "No environments found."
 msgstr "Environment tidak ditemukan."
@@ -12468,6 +12526,9 @@ msgstr "Tidak Terhubung"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Belum terhubung · workspace cloud melakukan push sebagai GitHub App organisasi Anda"
+
+msgid "Not defined"
+msgstr "Tidak ditentukan"
 
 msgid "Not demoed here"
 msgstr "Tidak didemokan di sini"
@@ -14051,6 +14112,9 @@ msgstr "Pilih folder worktree proyek di {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Pilih repositori yang diambilnya. Agen di mesin ini mencari tahu apa yang perlu dipasang dan menjalankannya di cloud."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Pilih repositori yang di-checkout environment ini. Menyimpan akan memulai build baru; workspace tetap dimulai dari yang sekarang sampai build berhasil."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Pilih folder worktree di {hostName}."
 
@@ -15425,6 +15489,9 @@ msgstr "Repositori"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repositori yang bisa diakses lewat instalasi GitHub App."
 
+msgid "Repositories changed"
+msgstr "Repositori diubah"
+
 msgid "Repositories refreshed"
 msgstr "Repositori disegarkan"
 
@@ -16059,6 +16126,9 @@ msgstr "Menjalankan perintah lokal di mesin Anda"
 msgid "Runs appear here once an automation fires."
 msgstr "Run muncul di sini setelah otomatisasi terpicu."
 
+msgid "Runs every time a workspace starts"
+msgstr "Berjalan setiap kali workspace dimulai"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Berjalan di dalam aplikasi Paradev di perangkat itu, jadi memperbaruinya berarti memperbarui aplikasi di sana."
 
@@ -16080,6 +16150,9 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
 
+msgid "Runs when the environment builds"
+msgstr "Berjalan saat environment di-build"
+
 msgid "Same version as this app."
 msgstr "Versi yang sama dengan aplikasi ini."
 
@@ -16100,6 +16173,9 @@ msgstr "Simpan & buat workspace"
 
 msgid "Save All"
 msgstr "Simpan Semua"
+
+msgid "Save and build"
+msgstr "Simpan dan build"
 
 msgid "Save as environment"
 msgstr "Simpan sebagai environment"
@@ -16143,6 +16219,9 @@ msgstr "Tersimpan"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" disimpan sebagai environment"
+
+msgid "Saved from a workspace"
+msgstr "Disimpan dari workspace"
 
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
@@ -16727,6 +16806,9 @@ msgstr "Mengirim…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Mengirim {0} karakter konteks terminal (sekitar {1} token) ke {2}."
 
+msgid "Sensitive"
+msgstr "Sensitif"
+
 msgid "Sent"
 msgstr "Dikirim"
 
@@ -16799,9 +16881,6 @@ msgstr "Sesi"
 msgid "Sessions · top {0} by cost"
 msgstr "Sesi · {0} teratas menurut biaya"
 
-msgid "Set"
-msgstr "Diatur"
-
 msgid "Set a notification schedule"
 msgstr "Atur jadwal notifikasi"
 
@@ -16821,6 +16900,9 @@ msgstr "Setel warna grup"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Setel ikon menjadi {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Diatur di setiap workspace yang dimulai dari environment ini, dan saat build."
 
 msgid "Set project…"
 msgstr "Tetapkan proyek…"
@@ -17421,9 +17503,6 @@ msgstr "Smiley & Orang"
 
 msgid "Smoother onboarding"
 msgstr "Onboarding yang lebih mulus"
-
-msgid "Snapshot"
-msgstr "Snapshot"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Ambil snapshot worktree sebelum dan sesudah setiap giliran chat, agar kartunya mencantumkan setiap file yang berubah, termasuk edit lewat shell, dan dapat membatalkannya. Setiap prompt menunggu snapshot-nya lebih dulu."
@@ -18744,6 +18823,9 @@ msgstr "Unggahan gambar kedaluwarsa — lampirkan lagi"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Deskripsi pekerjaannya bergeser. Engineer berhenti menjadi juru ketik berselera dan menjadi pengatur lalu lintas berselera: memecah pekerjaan, mengarahkannya ke armada agen, menengahi konflik antara agen yang sama-sama menyentuh modul yang sama."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "5 environment terakhir. Pulihkan salah satunya agar workspace baru kembali dimulai darinya."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Pembaruan, peningkatan, dan fitur baru terkini di Paradev."
 
@@ -18782,6 +18864,9 @@ msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan ma
 
 msgid "The model declined to continue"
 msgstr "Model menolak untuk melanjutkan"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "Yang terakhir diubah. Diatur di setiap workspace yang dimulai dari environment ini, dan saat build."
 
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
@@ -19697,6 +19782,9 @@ msgstr "Picu otomatisasi dari Gmail."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Picu otomatisasi dari pesan channel Teams."
 
+msgid "Trigger new build"
+msgstr "Mulai build baru"
+
 msgid "Trigger not found"
 msgstr "Pemicu tidak ditemukan"
 
@@ -20086,6 +20174,9 @@ msgstr "Pembaruan tidak bisa mempertahankan sesi"
 
 msgid "Update daemon"
 msgstr "Perbarui daemon"
+
+msgid "Update environment"
+msgstr "Perbarui environment"
 
 msgid "Update Error"
 msgstr "Kesalahan Pembaruan"

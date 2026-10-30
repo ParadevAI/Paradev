@@ -11,7 +11,7 @@ describe("repoHooksFromToml", () => {
 	});
 
 	test("a file without previews publishes nothing extra", () => {
-		expect(repoHooksFromToml('[setup]\nrun = "x"\n')).toEqual({});
+		expect(repoHooksFromToml('[archive]\nrun = "x"\n')).toEqual({});
 	});
 
 	test("reads [install] with its cloud override", () => {

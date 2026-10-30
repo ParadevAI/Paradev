@@ -19,6 +19,7 @@ import type { RepositoryRow } from "./repositories";
 export interface RepositoryHooks {
 	ports?: number[];
 	install?: ResolvedPhase;
+	setup?: ResolvedPhase;
 }
 
 const READ_TIMEOUT_MS = 5_000;
@@ -70,6 +71,7 @@ function repoHooksFrom(config: ProjectConfig): RepositoryHooks {
 		...(resolved.install.commands.length > 0
 			? { install: resolved.install }
 			: {}),
+		...(resolved.setup.commands.length > 0 ? { setup: resolved.setup } : {}),
 	};
 }
 

@@ -1833,6 +1833,9 @@ msgstr "hoạt động {lastActive}"
 msgid "Active agent sessions."
 msgstr "Các phiên agent đang hoạt động."
 
+msgid "Active build status"
+msgstr "Trạng thái bản build đang dùng"
+
 msgid "active days"
 msgstr "ngày hoạt động"
 
@@ -2051,6 +2054,9 @@ msgstr "Thêm vào thanh bên"
 
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
+
+msgid "Add variable"
+msgstr "Thêm biến"
 
 msgid "Add what it does"
 msgstr "Thêm việc nó làm"
@@ -2292,6 +2298,9 @@ msgstr "Tất cả người phụ trách"
 msgid "All authors"
 msgstr "Tất cả tác giả"
 
+msgid "All builds"
+msgstr "Tất cả bản build"
+
 msgid "All changes saved"
 msgstr "Đã lưu mọi thay đổi"
 
@@ -2313,6 +2322,9 @@ msgstr "Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn với cả {0} thành
 
 msgid "All downloads"
 msgstr "Tất cả bản tải xuống"
+
+msgid "All environment variables ({total})"
+msgstr "Tất cả biến môi trường ({total})"
 
 msgid "All features, side by side"
 msgstr "Toàn bộ tính năng, đặt cạnh nhau"
@@ -3269,9 +3281,6 @@ msgstr "Thư mục gốc cho worktree mới trên {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Thư mục gốc cho worktree mới trên {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image cơ sở · chưa có checkpoint"
-
 msgid "Base URL"
 msgstr "URL gốc"
 
@@ -3537,6 +3546,9 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Báo cáo lỗi"
 
+msgid "Build ID"
+msgstr "ID bản build"
+
 msgid "Build in public"
 msgstr "Xây dựng công khai"
 
@@ -3546,11 +3558,27 @@ msgstr "Xây dựng tương lai của Paradev trên đám mây"
 msgid "Build your own"
 msgstr "Tự tạo plugin"
 
+msgid "Building"
+msgstr "Đang build"
+
 msgid "Building the last piece of software"
 msgstr "Xây phần mềm cuối cùng"
 
 msgid "Building the last piece of software."
 msgstr "Xây phần mềm cuối cùng."
+
+msgid "Building with the new repositories"
+msgstr "Đang build với các repository mới"
+
+msgid "Building…"
+msgstr "Đang build…"
+
+msgid "Builds"
+msgstr "Bản build"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Đã build {0}"
 
 msgid "Built in Paradev"
 msgstr "Được xây dựng trong Paradev"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Thay đổi"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "Thay đổi áp dụng cho các workspace mới. Một bản build mới sẽ tự động bắt đầu."
+
 msgid "Changes are isolated"
 msgstr "Thay đổi được tách biệt"
 
@@ -4046,10 +4077,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · trước khi refactor tooltip"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Đã lưu checkpoint {0}"
 
 msgid "Checks"
 msgstr "Check"
@@ -4761,6 +4788,9 @@ msgstr "Nội dung tệp cấu hình"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json phải là một đối tượng JSON"
+
+msgid "Configuration"
+msgstr "Cấu hình"
 
 msgid "Configure"
 msgstr "Cấu hình"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Đã tạo"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Sửa mô tả"
 msgid "Edit Description"
 msgstr "Sửa mô tả"
 
-msgid "Edit environment"
-msgstr "Chỉnh sửa environment"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Sửa tệp không cần hỏi; hỏi trước khi chạy lệnh"
 
@@ -7261,6 +7287,9 @@ msgstr "Sửa trên GitHub"
 
 msgid "Edit queued message"
 msgstr "Sửa tin nhắn trong hàng đợi"
+
+msgid "Edit repositories"
+msgstr "Sửa repository"
 
 msgid "Edit Run Script"
 msgstr "Sửa script chạy"
@@ -7451,11 +7480,20 @@ msgstr "Đã lưu trữ environment"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Build environment có trong gói Team và Ultra. Nâng cấp trong Cài đặt, Thanh toán."
 
+msgid "Environment history"
+msgstr "Lịch sử environment"
+
 msgid "Environment not found"
 msgstr "Không tìm thấy environment"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối thông tin đăng nhập, những kiểu hỏng buồn tẻ đã giết các lần chạy không giám sát năm 2025, phần lớn được xử lý bằng kỹ thuật chứ không phải bằng mô hình."
+
+msgid "Environment updated"
+msgstr "Đã cập nhật environment"
+
+msgid "Environment variables"
+msgstr "Biến môi trường"
 
 msgid "Environment Variables"
 msgstr "Biến môi trường"
@@ -8708,6 +8746,11 @@ msgstr "từ"
 msgid "From"
 msgstr "Từ"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "Từ .superset/config.toml trên {0}@{1}. Hãy thay đổi ở đó."
+
 msgid "from {parentName}"
 msgstr "từ {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "Cài Paradev MCP vào client của bạn"
 msgid "Install plugin"
 msgstr "Cài đặt plugin"
 
+msgid "Install script"
+msgstr "Script cài đặt"
+
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
@@ -10263,6 +10309,9 @@ msgstr "Agent hoạt động gần nhất {0}"
 
 msgid "Last attached"
 msgstr "Lần gắn cuối"
+
+msgid "Last build failed"
+msgstr "Bản build gần nhất thất bại"
 
 msgid "Last day of each month"
 msgstr "Ngày cuối mỗi tháng"
@@ -11829,6 +11878,12 @@ msgstr "Không có tự động hóa nào khớp"
 msgid "No branches found"
 msgstr "Không tìm thấy nhánh nào"
 
+msgid "No build yet"
+msgstr "Chưa có bản build"
+
+msgid "No builds yet"
+msgstr "Chưa có bản build nào"
+
 msgid "No changed files."
 msgstr "Không có tệp nào thay đổi."
 
@@ -11939,6 +11994,9 @@ msgstr "Chưa có environment nào được liên kết với dự án này."
 
 msgid "No environments available"
 msgstr "Không có environment nào"
+
+msgid "No environments built yet"
+msgstr "Chưa có environment nào được build"
 
 msgid "No environments found."
 msgstr "Không tìm thấy environment nào."
@@ -12468,6 +12526,9 @@ msgstr "Chưa kết nối"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Chưa kết nối · workspace cloud push dưới danh nghĩa GitHub App của tổ chức bạn"
+
+msgid "Not defined"
+msgstr "Chưa định nghĩa"
 
 msgid "Not demoed here"
 msgstr "Không demo ở đây"
@@ -14051,6 +14112,9 @@ msgstr "Chọn thư mục worktree của dự án trên {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Chọn các repository mà nó lấy về. Một agent trên máy này sẽ tìm ra cần cài gì và chạy nó trên đám mây."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Chọn các repository mà environment này checkout. Lưu sẽ bắt đầu một bản build mới; workspace vẫn khởi động từ bản hiện tại cho đến khi bản mới thành công."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree trên {hostName}."
 
@@ -15425,6 +15489,9 @@ msgstr "Repository"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Các repository truy cập được qua bản cài đặt GitHub App."
 
+msgid "Repositories changed"
+msgstr "Đã thay đổi repository"
+
 msgid "Repositories refreshed"
 msgstr "Đã làm mới repository"
 
@@ -16059,6 +16126,9 @@ msgstr "Chạy một lệnh cục bộ trên máy bạn"
 msgid "Runs appear here once an automation fires."
 msgstr "Các lần chạy sẽ xuất hiện ở đây khi một tự động hóa được kích hoạt."
 
+msgid "Runs every time a workspace starts"
+msgstr "Chạy mỗi khi một workspace khởi động"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Chạy bên trong ứng dụng Paradev trên thiết bị đó, nên cập nhật nó nghĩa là cập nhật ứng dụng ở đó."
 
@@ -16080,6 +16150,9 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
 
+msgid "Runs when the environment builds"
+msgstr "Chạy khi environment được build"
+
 msgid "Same version as this app."
 msgstr "Cùng phiên bản với ứng dụng này."
 
@@ -16100,6 +16173,9 @@ msgstr "Lưu & tạo workspace"
 
 msgid "Save All"
 msgstr "Lưu tất cả"
+
+msgid "Save and build"
+msgstr "Lưu và build"
 
 msgid "Save as environment"
 msgstr "Lưu thành environment"
@@ -16143,6 +16219,9 @@ msgstr "Đã lưu"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "Đã lưu \"{0}\" thành một environment"
+
+msgid "Saved from a workspace"
+msgstr "Được lưu từ một workspace"
 
 msgid "Saved to Downloads"
 msgstr "Đã lưu vào Downloads"
@@ -16727,6 +16806,9 @@ msgstr "Đang gửi…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Gửi {0} ký tự ngữ cảnh terminal (khoảng {1} token) tới {2}."
 
+msgid "Sensitive"
+msgstr "Nhạy cảm"
+
 msgid "Sent"
 msgstr "Đã gửi"
 
@@ -16799,9 +16881,6 @@ msgstr "Phiên"
 msgid "Sessions · top {0} by cost"
 msgstr "Phiên · {0} phiên tốn nhiều nhất"
 
-msgid "Set"
-msgstr "Đã đặt"
-
 msgid "Set a notification schedule"
 msgstr "Đặt lịch thông báo"
 
@@ -16821,6 +16900,9 @@ msgstr "Đặt màu nhóm"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Đặt biểu tượng thành {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Được đặt trên mọi workspace khởi động từ environment này, và trong khi build."
 
 msgid "Set project…"
 msgstr "Đặt dự án…"
@@ -17421,9 +17503,6 @@ msgstr "Mặt cười & Con người"
 
 msgid "Smoother onboarding"
 msgstr "Onboarding mượt hơn"
-
-msgid "Snapshot"
-msgstr "Snapshot"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Chụp ảnh worktree trước và sau mỗi lượt chat, để thẻ của lượt liệt kê mọi tệp đã thay đổi, kể cả sửa đổi bằng shell, và có thể hoàn tác chúng. Mỗi prompt sẽ chờ ảnh chụp của nó xong trước."
@@ -18744,6 +18823,9 @@ msgstr "Lượt tải lên hình ảnh đã hết hạn — hãy đính kèm l�
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Mô tả công việc thay đổi. Kỹ sư thôi làm thợ gõ phím có gu và trở thành người điều phối có gu: chia nhỏ công việc, phân về các đội agent, phân xử xung đột giữa những agent cùng chạm vào một module."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "5 environment gần nhất. Khôi phục một bản để các workspace mới lại khởi động từ nó."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Paradev."
 
@@ -18782,6 +18864,9 @@ msgstr "Phần lớn PR của agent được merge chỉ cần review, không c�
 
 msgid "The model declined to continue"
 msgstr "Mô hình đã từ chối tiếp tục"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "Những biến thay đổi gần nhất. Được đặt trên mọi workspace khởi động từ environment này, và trong khi build."
 
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
@@ -19697,6 +19782,9 @@ msgstr "Kích hoạt tự động hóa từ Gmail."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Kích hoạt tự động hóa từ tin nhắn kênh Teams."
 
+msgid "Trigger new build"
+msgstr "Bắt đầu bản build mới"
+
 msgid "Trigger not found"
 msgstr "Không tìm thấy trigger"
 
@@ -20086,6 +20174,9 @@ msgstr "Bản cập nhật không giữ được các phiên"
 
 msgid "Update daemon"
 msgstr "Cập nhật daemon"
+
+msgid "Update environment"
+msgstr "Cập nhật environment"
 
 msgid "Update Error"
 msgstr "Lỗi cập nhật"

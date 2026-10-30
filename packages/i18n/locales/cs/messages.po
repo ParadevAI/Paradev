@@ -1833,6 +1833,9 @@ msgstr "aktivní {lastActive}"
 msgid "Active agent sessions."
 msgstr "Aktivní relace agentů."
 
+msgid "Active build status"
+msgstr "Stav aktivního sestavení"
+
 msgid "active days"
 msgstr "aktivních dní"
 
@@ -2051,6 +2054,9 @@ msgstr "Přidat do postranního panelu"
 
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
+
+msgid "Add variable"
+msgstr "Přidat proměnnou"
 
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
@@ -2292,6 +2298,9 @@ msgstr "Všichni řešitelé"
 msgid "All authors"
 msgstr "Všichni autoři"
 
+msgid "All builds"
+msgstr "Všechna sestavení"
+
 msgid "All changes saved"
 msgstr "Všechny změny uloženy"
 
@@ -2313,6 +2322,9 @@ msgstr "Všechna data budou trvale smazána pro všechny členy ({0}) — nelze 
 
 msgid "All downloads"
 msgstr "Všechna stažení"
+
+msgid "All environment variables ({total})"
+msgstr "Všechny proměnné prostředí ({total})"
 
 msgid "All features, side by side"
 msgstr "Všechny funkce vedle sebe"
@@ -3269,9 +3281,6 @@ msgstr "Základní adresář pro nové worktree na {selectedHostLabel}"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Základní adresář pro nové worktree na {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Základní obraz · zatím bez kontrolního bodu"
-
 msgid "Base URL"
 msgstr "Základní URL"
 
@@ -3537,6 +3546,9 @@ msgstr "Brouk"
 msgid "Bug reports"
 msgstr "Hlášení chyb"
 
+msgid "Build ID"
+msgstr "ID sestavení"
+
 msgid "Build in public"
 msgstr "Vyvíjíme veřejně"
 
@@ -3546,11 +3558,27 @@ msgstr "Tvořte budoucnost Paradev v cloudu"
 msgid "Build your own"
 msgstr "Vytvořte vlastní"
 
+msgid "Building"
+msgstr "Sestavuje se"
+
 msgid "Building the last piece of software"
 msgstr "Stavíme poslední kus softwaru"
 
 msgid "Building the last piece of software."
 msgstr "Stavíme poslední kus softwaru."
+
+msgid "Building with the new repositories"
+msgstr "Sestavuje se s novými repozitáři"
+
+msgid "Building…"
+msgstr "Sestavuje se…"
+
+msgid "Builds"
+msgstr "Sestavení"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "Sestaveno {0}"
 
 msgid "Built in Paradev"
 msgstr "Vytvořeno v Paradev"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Změny"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "Změny platí pro nové pracovní prostory. Nové sestavení se spustí automaticky."
+
 msgid "Changes are isolated"
 msgstr "Změny jsou izolované"
 
@@ -4046,10 +4077,6 @@ msgstr "Kontrolní bod"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrolní bod · před refaktorem tooltipů"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "Kontrolní bod uložen {0}"
 
 msgid "Checks"
 msgstr "Kontroly"
@@ -4761,6 +4788,9 @@ msgstr "Obsah konfiguračního souboru"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json musí být objekt JSON"
+
+msgid "Configuration"
+msgstr "Konfigurace"
 
 msgid "Configure"
 msgstr "Nastavit"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Vytvořeno"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "Upravit popis"
 msgid "Edit Description"
 msgstr "Upravit popis"
 
-msgid "Edit environment"
-msgstr "Upravit prostředí"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "Upravovat soubory bez ptaní; ptát se před příkazy"
 
@@ -7261,6 +7287,9 @@ msgstr "Upravit na GitHubu"
 
 msgid "Edit queued message"
 msgstr "Upravit zprávu ve frontě"
+
+msgid "Edit repositories"
+msgstr "Upravit repozitáře"
 
 msgid "Edit Run Script"
 msgstr "Upravit run skript"
@@ -7451,11 +7480,20 @@ msgstr "Prostředí archivováno"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
 
+msgid "Environment history"
+msgstr "Historie prostředí"
+
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Příprava prostředí, nestabilní testy a rozvody přihlašovacích údajů — nudné příčiny selhání, které v roce 2025 zabíjely běhy bez dozoru — se většinou vyřeší inženýrsky, ne modelem."
+
+msgid "Environment updated"
+msgstr "Prostředí aktualizováno"
+
+msgid "Environment variables"
+msgstr "Proměnné prostředí"
 
 msgid "Environment Variables"
 msgstr "Proměnné prostředí"
@@ -8708,6 +8746,11 @@ msgstr "z"
 msgid "From"
 msgstr "Z"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "Z .superset/config.toml v {0}@{1}. Změňte je tam."
+
 msgid "from {parentName}"
 msgstr "od {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "Nainstalujte Paradev MCP do svého klienta"
 msgid "Install plugin"
 msgstr "Nainstalovat plugin"
 
+msgid "Install script"
+msgstr "Instalační skript"
+
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
@@ -10263,6 +10309,9 @@ msgstr "Poslední aktivita agenta {0}"
 
 msgid "Last attached"
 msgstr "Naposledy připojeno"
+
+msgid "Last build failed"
+msgstr "Poslední sestavení selhalo"
 
 msgid "Last day of each month"
 msgstr "Poslední den v měsíci"
@@ -11829,6 +11878,12 @@ msgstr "Žádná automatizace neodpovídá"
 msgid "No branches found"
 msgstr "Nenalezeny žádné větve"
 
+msgid "No build yet"
+msgstr "Zatím žádné sestavení"
+
+msgid "No builds yet"
+msgstr "Zatím žádná sestavení"
+
 msgid "No changed files."
 msgstr "Žádné změněné soubory."
 
@@ -11939,6 +11994,9 @@ msgstr "S tímto projektem zatím není propojeno žádné prostředí."
 
 msgid "No environments available"
 msgstr "Žádná dostupná prostředí"
+
+msgid "No environments built yet"
+msgstr "Zatím nebylo sestaveno žádné prostředí"
 
 msgid "No environments found."
 msgstr "Nenalezena žádná prostředí."
@@ -12468,6 +12526,9 @@ msgstr "Nepřipojeno"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App vaší organizace"
+
+msgid "Not defined"
+msgstr "Nedefinováno"
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
@@ -14051,6 +14112,9 @@ msgstr "Vyberte složku pro worktree projektu na {hostName}."
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "Vyberte repozitáře, které si stáhne. Agent na tomto počítači zjistí, co nainstalovat, a zprovozní to v cloudu."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Vyberte repozitáře, které toto prostředí stahuje. Uložení spustí nové sestavení; pracovní prostory dál startují z aktuálního, dokud neuspěje."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Vyberte složku pro worktree na {hostName}."
 
@@ -15425,6 +15489,9 @@ msgstr "Repozitáře"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repozitáře dostupné přes instalaci GitHub App."
 
+msgid "Repositories changed"
+msgstr "Repozitáře změněny"
+
 msgid "Repositories refreshed"
 msgstr "Repozitáře obnoveny"
 
@@ -16059,6 +16126,9 @@ msgstr "Spouští lokální příkaz na vašem počítači"
 msgid "Runs appear here once an automation fires."
 msgstr "Běhy se zde objeví, jakmile se automatizace spustí."
 
+msgid "Runs every time a workspace starts"
+msgstr "Spouští se při každém startu pracovního prostoru"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Běží uvnitř aplikace Paradev na tom zařízení, takže aktualizace znamená aktualizovat tam aplikaci."
 
@@ -16080,6 +16150,9 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
 
+msgid "Runs when the environment builds"
+msgstr "Spouští se při sestavení prostředí"
+
 msgid "Same version as this app."
 msgstr "Stejná verze jako tato aplikace."
 
@@ -16100,6 +16173,9 @@ msgstr "Uložit a vytvořit pracovní prostor"
 
 msgid "Save All"
 msgstr "Uložit vše"
+
+msgid "Save and build"
+msgstr "Uložit a sestavit"
 
 msgid "Save as environment"
 msgstr "Uložit jako prostředí"
@@ -16143,6 +16219,9 @@ msgstr "Uloženo"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" uloženo jako prostředí"
+
+msgid "Saved from a workspace"
+msgstr "Uloženo z pracovního prostoru"
 
 msgid "Saved to Downloads"
 msgstr "Uloženo do Stažených souborů"
@@ -16727,6 +16806,9 @@ msgstr "Odesílám…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Odešle {0} znaků kontextu terminálu (přibližně {1} tokenů) agentovi {2}."
 
+msgid "Sensitive"
+msgstr "Citlivá"
+
 msgid "Sent"
 msgstr "Odesláno"
 
@@ -16799,9 +16881,6 @@ msgstr "Relace"
 msgid "Sessions · top {0} by cost"
 msgstr "Relace · top {0} podle nákladů"
 
-msgid "Set"
-msgstr "Nastaveno"
-
 msgid "Set a notification schedule"
 msgstr "Nastavit plán oznámení"
 
@@ -16821,6 +16900,9 @@ msgstr "Nastavit barvu skupiny"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "Nastavit ikonu na {0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "Nastaveny v každém pracovním prostoru spuštěném z tohoto prostředí a během sestavení."
 
 msgid "Set project…"
 msgstr "Nastavit projekt…"
@@ -17421,9 +17503,6 @@ msgstr "Smajlíci a lidé"
 
 msgid "Smoother onboarding"
 msgstr "Plynulejší onboarding"
-
-msgid "Snapshot"
-msgstr "Snímek"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Pořizovat snímek worktree před každým tahem chatu a po něm, aby jeho karta uváděla každý změněný soubor včetně změn ze shellu a dokázala je vrátit zpět. Každý prompt nejdřív počká na svůj snímek."
@@ -18744,6 +18823,9 @@ msgstr "Platnost nahrání obrázku vypršela — připojte ho znovu"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Popis práce se posouvá. Z inženýrů přestávají být písaři s vkusem a stávají se dispečery s vkusem: rozkládají práci, směrují ji flotilám a rozsuzují konflikty mezi agenty, kteří sáhli na stejný modul."
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "Posledních 5 prostředí. Obnovte jedno, aby z něj nové pracovní prostory znovu startovaly."
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Nejnovější aktualizace, vylepšení a nové funkce v Paradevu."
 
@@ -18782,6 +18864,9 @@ msgstr "Většina sloučených PR od agentů potřebuje jen revizi, bez jediné 
 
 msgid "The model declined to continue"
 msgstr "Model odmítl pokračovat"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "Naposledy změněné. Nastaveny v každém pracovním prostoru spuštěném z tohoto prostředí a během sestavení."
 
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
@@ -19697,6 +19782,9 @@ msgstr "Spouštějte automatizace z Gmailu."
 msgid "Trigger automations from Teams channel messages."
 msgstr "Spouštějte automatizace ze zpráv v kanálech Teams."
 
+msgid "Trigger new build"
+msgstr "Spustit nové sestavení"
+
 msgid "Trigger not found"
 msgstr "Spouštěč nenalezen"
 
@@ -20086,6 +20174,9 @@ msgstr "Aktualizace nedokázala zachovat relace"
 
 msgid "Update daemon"
 msgstr "Aktualizovat démona"
+
+msgid "Update environment"
+msgstr "Aktualizovat prostředí"
 
 msgid "Update Error"
 msgstr "Chyba aktualizace"

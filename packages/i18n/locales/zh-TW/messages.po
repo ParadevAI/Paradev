@@ -1833,6 +1833,9 @@ msgstr "{lastActive}活躍"
 msgid "Active agent sessions."
 msgstr "活躍的代理程式會話。"
 
+msgid "Active build status"
+msgstr "目前建置狀態"
+
 msgid "active days"
 msgstr "活躍天數"
 
@@ -2051,6 +2054,9 @@ msgstr "新增到側邊欄"
 
 msgid "Add to workspace"
 msgstr "新增到工作區"
+
+msgid "Add variable"
+msgstr "新增變數"
 
 msgid "Add what it does"
 msgstr "新增它的用途"
@@ -2292,6 +2298,9 @@ msgstr "全部負責人"
 msgid "All authors"
 msgstr "所有作者"
 
+msgid "All builds"
+msgstr "所有建置"
+
 msgid "All changes saved"
 msgstr "所有更改已儲存"
 
@@ -2313,6 +2322,9 @@ msgstr "全部{0}名成員的所有資料都將被永久刪除——此操作無
 
 msgid "All downloads"
 msgstr "所有下載"
+
+msgid "All environment variables ({total})"
+msgstr "所有環境變數（{total}）"
 
 msgid "All features, side by side"
 msgstr "所有功能逐項對比"
@@ -3269,9 +3281,6 @@ msgstr "{selectedHostLabel}上新建worktree的基準目錄"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}上新建worktree的基準目錄。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "基礎映像 · 尚無檢查點"
-
 msgid "Base URL"
 msgstr "基礎URL"
 
@@ -3537,6 +3546,9 @@ msgstr "蟲子"
 msgid "Bug reports"
 msgstr "Bug 回報"
 
+msgid "Build ID"
+msgstr "建置 ID"
+
 msgid "Build in public"
 msgstr "公開建構"
 
@@ -3546,11 +3558,27 @@ msgstr "共創 Paradev 的雲端未來"
 msgid "Build your own"
 msgstr "自己動手打造"
 
+msgid "Building"
+msgstr "建置中"
+
 msgid "Building the last piece of software"
 msgstr "打造最後一款軟體"
 
 msgid "Building the last piece of software."
 msgstr "打造最後一款軟體。"
+
+msgid "Building with the new repositories"
+msgstr "正在使用新的儲存庫建置"
+
+msgid "Building…"
+msgstr "建置中…"
+
+msgid "Builds"
+msgstr "建置"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "已建置 {0}"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中建構"
@@ -3891,6 +3919,9 @@ msgstr "更新日誌"
 msgid "Changes"
 msgstr "更改"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "變更將套用到新的工作區。新的建置會自動開始。"
+
 msgid "Changes are isolated"
 msgstr "改動彼此隔離"
 
@@ -4046,10 +4077,6 @@ msgstr "檢查點"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "檢查點 · tooltip重構之前"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "檢查點已儲存 {0}"
 
 msgid "Checks"
 msgstr "檢查"
@@ -4761,6 +4788,9 @@ msgstr "設定檔內容"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json 必須是 JSON 物件"
+
+msgid "Configuration"
+msgstr "設定"
 
 msgid "Configure"
 msgstr "配置"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "已建立"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "編輯說明"
 msgid "Edit Description"
 msgstr "編輯說明"
 
-msgid "Edit environment"
-msgstr "編輯環境"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "無需詢問即可編輯檔案；執行指令前詢問"
 
@@ -7261,6 +7287,9 @@ msgstr "在GitHub上編輯"
 
 msgid "Edit queued message"
 msgstr "編輯佇列中的訊息"
+
+msgid "Edit repositories"
+msgstr "編輯儲存庫"
 
 msgid "Edit Run Script"
 msgstr "編輯執行指令碼"
@@ -7451,11 +7480,20 @@ msgstr "環境已封存"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "環境建置包含在 Team 和 Ultra 方案中。請在設定的帳單中升級。"
 
+msgid "Environment history"
+msgstr "環境歷史"
+
 msgid "Environment not found"
 msgstr "找不到環境"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境搭建、不穩定的測試、憑證串聯，這些在2025年讓無人值守執行折戟的無聊失敗模式，大多是被工程手段消除的，而不是被模型消除的。"
+
+msgid "Environment updated"
+msgstr "環境已更新"
+
+msgid "Environment variables"
+msgstr "環境變數"
 
 msgid "Environment Variables"
 msgstr "環境變數"
@@ -8708,6 +8746,11 @@ msgstr "基於"
 msgid "From"
 msgstr "從"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "來自 {0}@{1} 上的 .superset/config.toml。請在那裡修改。"
+
 msgid "from {parentName}"
 msgstr "來自 {parentName}"
 
@@ -9751,6 +9794,9 @@ msgstr "在你的客戶端裡安裝Paradev MCP"
 msgid "Install plugin"
 msgstr "安裝外掛"
 
+msgid "Install script"
+msgstr "安裝指令碼"
+
 msgid "Install the desktop app"
 msgstr "安裝桌面應用程式"
 
@@ -10263,6 +10309,9 @@ msgstr "最近代理程式活動{0}"
 
 msgid "Last attached"
 msgstr "上次連線"
+
+msgid "Last build failed"
+msgstr "上次建置失敗"
 
 msgid "Last day of each month"
 msgstr "每月最後一天"
@@ -11829,6 +11878,12 @@ msgstr "沒有匹配的自動化"
 msgid "No branches found"
 msgstr "未找到分支"
 
+msgid "No build yet"
+msgstr "尚無建置"
+
+msgid "No builds yet"
+msgstr "尚無建置"
+
 msgid "No changed files."
 msgstr "沒有更改的檔案。"
 
@@ -11939,6 +11994,9 @@ msgstr "尚無環境關聯至此專案。"
 
 msgid "No environments available"
 msgstr "沒有可用的環境"
+
+msgid "No environments built yet"
+msgstr "尚未建置任何環境"
 
 msgid "No environments found."
 msgstr "找不到環境。"
@@ -12468,6 +12526,9 @@ msgstr "未連線"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
+
+msgid "Not defined"
+msgstr "未定義"
 
 msgid "Not demoed here"
 msgstr "此處未做演示"
@@ -14051,6 +14112,9 @@ msgstr "在{hostName}上選擇專案的worktree資料夾。"
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "選擇它要檢出的儲存庫。這台機器上的代理程式會判斷需要安裝什麼,並讓它在雲端執行。"
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "選擇此環境要簽出的儲存庫。儲存後會開始新的建置；在建置成功之前，工作區仍從目前版本啟動。"
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "在{hostName}上選擇worktree資料夾。"
 
@@ -15425,6 +15489,9 @@ msgstr "儲存庫"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "通過GitHub App安裝可存取的儲存庫。"
 
+msgid "Repositories changed"
+msgstr "儲存庫已變更"
+
 msgid "Repositories refreshed"
 msgstr "儲存庫已重新整理"
 
@@ -16059,6 +16126,9 @@ msgstr "在你的機器上執行本地命令"
 msgid "Runs appear here once an automation fires."
 msgstr "自動化觸發後，執行會顯示在這裡。"
 
+msgid "Runs every time a workspace starts"
+msgstr "每次工作區啟動時執行"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "在該裝置的 Paradev 應用程式內執行，因此更新它就是更新該裝置上的應用程式。"
 
@@ -16080,6 +16150,9 @@ msgstr "建立新工作區時執行。"
 msgid "Runs when a workspace is deleted."
 msgstr "刪除工作區時執行。"
 
+msgid "Runs when the environment builds"
+msgstr "建置環境時執行"
+
 msgid "Same version as this app."
 msgstr "與此應用程式版本相同。"
 
@@ -16100,6 +16173,9 @@ msgstr "儲存並建立工作區"
 
 msgid "Save All"
 msgstr "全部儲存"
+
+msgid "Save and build"
+msgstr "儲存並建置"
 
 msgid "Save as environment"
 msgstr "儲存為環境"
@@ -16143,6 +16219,9 @@ msgstr "已儲存"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "已將「{0}」儲存為環境"
+
+msgid "Saved from a workspace"
+msgstr "從工作區儲存"
 
 msgid "Saved to Downloads"
 msgstr "已儲存到「下載」資料夾"
@@ -16727,6 +16806,9 @@ msgstr "正在傳送…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "將向 {2} 傳送 {0} 個字元的終端上下文（約 {1} 個 token）。"
 
+msgid "Sensitive"
+msgstr "敏感"
+
 msgid "Sent"
 msgstr "傳送時間"
 
@@ -16799,9 +16881,6 @@ msgstr "會話"
 msgid "Sessions · top {0} by cost"
 msgstr "會話 · 按費用排名前{0}"
 
-msgid "Set"
-msgstr "已設定"
-
 msgid "Set a notification schedule"
 msgstr "設定通知時間表"
 
@@ -16821,6 +16900,9 @@ msgstr "設定群組顏色"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "將圖示設為{0}"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "設定在從此環境啟動的每個工作區中，以及建置期間。"
 
 msgid "Set project…"
 msgstr "設定專案…"
@@ -17421,9 +17503,6 @@ msgstr "表情與人物"
 
 msgid "Smoother onboarding"
 msgstr "更順暢的上手流程"
-
-msgid "Snapshot"
-msgstr "快照"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "在每輪聊天前後為 worktree 建立快照，讓該輪的卡片列出每個變更的檔案（包括 shell 編輯）並可以復原。每則提示詞會先等待其快照完成。"
@@ -18744,6 +18823,9 @@ msgstr "圖片上傳已過期 — 請重新附加"
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "崗位描述變了。工程師不再是有品味的打字員，而成了有品味的排程員：拆解工作、分派給代理程式叢集、在兩個改了同一個模組的代理程式之間做裁決。"
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "最近 5 個環境。還原其中一個，新的工作區將再次從它啟動。"
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Paradev 的最新更新、改進與新功能。"
 
@@ -18782,6 +18864,9 @@ msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改�
 
 msgid "The model declined to continue"
 msgstr "模型拒絕繼續"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "最近變更的變數。設定在從此環境啟動的每個工作區中，以及建置期間。"
 
 msgid "The name of your organization or team"
 msgstr "你的組織或團隊的名稱"
@@ -19697,6 +19782,9 @@ msgstr "從 Gmail 觸發自動化。"
 msgid "Trigger automations from Teams channel messages."
 msgstr "用Teams頻道訊息觸發自動化。"
 
+msgid "Trigger new build"
+msgstr "開始新的建置"
+
 msgid "Trigger not found"
 msgstr "未找到觸發器"
 
@@ -20086,6 +20174,9 @@ msgstr "更新無法保留會話"
 
 msgid "Update daemon"
 msgstr "更新守護程式"
+
+msgid "Update environment"
+msgstr "更新環境"
 
 msgid "Update Error"
 msgstr "更新出錯"

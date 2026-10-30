@@ -1833,6 +1833,9 @@ msgstr "{lastActive}にアクティブ"
 msgid "Active agent sessions."
 msgstr "実行中のエージェントセッション。"
 
+msgid "Active build status"
+msgstr "アクティブなビルドのステータス"
+
 msgid "active days"
 msgstr "アクティブ日数"
 
@@ -2051,6 +2054,9 @@ msgstr "サイドバーに追加"
 
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
+
+msgid "Add variable"
+msgstr "変数を追加"
 
 msgid "Add what it does"
 msgstr "役割を追加"
@@ -2292,6 +2298,9 @@ msgstr "すべての担当者"
 msgid "All authors"
 msgstr "すべての作成者"
 
+msgid "All builds"
+msgstr "すべてのビルド"
+
 msgid "All changes saved"
 msgstr "すべての変更を保存しました"
 
@@ -2313,6 +2322,9 @@ msgstr "{0}人のメンバー全員のデータが完全に削除されます �
 
 msgid "All downloads"
 msgstr "すべてのダウンロード"
+
+msgid "All environment variables ({total})"
+msgstr "すべての環境変数 ({total})"
 
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
@@ -3269,9 +3281,6 @@ msgstr "{selectedHostLabel}の新規ワークツリーのベースディレク�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}の新規ワークツリーのベースディレクトリ。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "ベースイメージ · チェックポイントはまだありません"
-
 msgid "Base URL"
 msgstr "ベースURL"
 
@@ -3537,6 +3546,9 @@ msgstr "バグ"
 msgid "Bug reports"
 msgstr "バグ報告"
 
+msgid "Build ID"
+msgstr "ビルド ID"
+
 msgid "Build in public"
 msgstr "オープンに開発"
 
@@ -3546,11 +3558,27 @@ msgstr "クラウドでParadevの未来を築く"
 msgid "Build your own"
 msgstr "自分で作る"
 
+msgid "Building"
+msgstr "ビルド中"
+
 msgid "Building the last piece of software"
 msgstr "最後のソフトウェアを作る"
 
 msgid "Building the last piece of software."
 msgstr "最後のソフトウェアを作る。"
+
+msgid "Building with the new repositories"
+msgstr "新しいリポジトリでビルド中"
+
+msgid "Building…"
+msgstr "ビルド中…"
+
+msgid "Builds"
+msgstr "ビルド"
+
+#. placeholder {0}: formatRelativeTime(new Date(build.finishedAt ?? build.startedAt))
+msgid "Built {0}"
+msgstr "ビルド済み {0}"
 
 msgid "Built in Paradev"
 msgstr "Paradevで開発"
@@ -3891,6 +3919,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "変更"
 
+msgid "Changes apply to new workspaces. A new build starts automatically."
+msgstr "変更は新しいワークスペースに適用されます。新しいビルドが自動的に開始されます。"
+
 msgid "Changes are isolated"
 msgstr "変更は分離される"
 
@@ -4046,10 +4077,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
-msgid "Checkpoint saved {0}"
-msgstr "チェックポイント保存 {0}"
 
 msgid "Checks"
 msgstr "チェック"
@@ -4761,6 +4788,9 @@ msgstr "設定ファイルの内容"
 
 msgid "config.json must be a JSON object"
 msgstr "config.json は JSON オブジェクトである必要があります"
+
+msgid "Configuration"
+msgstr "設定"
 
 msgid "Configure"
 msgstr "設定"
@@ -6090,7 +6120,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "作成"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7244,9 +7273,6 @@ msgstr "説明を編集"
 msgid "Edit Description"
 msgstr "説明を編集"
 
-msgid "Edit environment"
-msgstr "環境を編集"
-
 msgid "Edit files without asking; ask before commands"
 msgstr "ファイルは確認なしで編集し、コマンドは事前に確認"
 
@@ -7261,6 +7287,9 @@ msgstr "GitHubで編集"
 
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
+
+msgid "Edit repositories"
+msgstr "リポジトリを編集"
 
 msgid "Edit Run Script"
 msgstr "実行スクリプトを編集"
@@ -7451,11 +7480,20 @@ msgstr "環境をアーカイブしました"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "環境のビルドは Team プランと Ultra プランで利用できます。設定の請求からアップグレードしてください。"
 
+msgid "Environment history"
+msgstr "環境の履歴"
+
 msgid "Environment not found"
 msgstr "環境が見つかりません"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境構築、不安定なテスト、認証情報の受け渡し。2025年に無人実行を潰していた退屈な失敗要因は、モデルの進歩ではなくエンジニアリングでほぼ取り除かれます。"
+
+msgid "Environment updated"
+msgstr "環境を更新しました"
+
+msgid "Environment variables"
+msgstr "環境変数"
 
 msgid "Environment Variables"
 msgstr "環境変数"
@@ -8708,6 +8746,11 @@ msgstr "元:"
 msgid "From"
 msgstr "移動元"
 
+#. placeholder {0}: source.repository
+#. placeholder {1}: source.branch
+msgid "From .superset/config.toml on {0}@{1}. Change them there."
+msgstr "{0}@{1} の .superset/config.toml から読み込んでいます。変更はそちらで行ってください。"
+
 msgid "from {parentName}"
 msgstr "{parentName} から"
 
@@ -9751,6 +9794,9 @@ msgstr "クライアントにParadev MCPをインストール"
 msgid "Install plugin"
 msgstr "プラグインをインストール"
 
+msgid "Install script"
+msgstr "インストールスクリプト"
+
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
@@ -10263,6 +10309,9 @@ msgstr "エージェントの最終アクティビティ {0}"
 
 msgid "Last attached"
 msgstr "最終接続"
+
+msgid "Last build failed"
+msgstr "前回のビルドが失敗しました"
 
 msgid "Last day of each month"
 msgstr "毎月末日"
@@ -11829,6 +11878,12 @@ msgstr "一致するオートメーションがありません"
 msgid "No branches found"
 msgstr "ブランチが見つかりません"
 
+msgid "No build yet"
+msgstr "まだビルドがありません"
+
+msgid "No builds yet"
+msgstr "まだビルドがありません"
+
 msgid "No changed files."
 msgstr "変更されたファイルはありません。"
 
@@ -11939,6 +11994,9 @@ msgstr "このプロジェクトにリンクされた環境はまだありませ
 
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
+
+msgid "No environments built yet"
+msgstr "まだビルドされた環境がありません"
 
 msgid "No environments found."
 msgstr "環境が見つかりません。"
@@ -12468,6 +12526,9 @@ msgstr "未接続"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未接続 · クラウドワークスペースは組織の GitHub App としてプッシュします"
+
+msgid "Not defined"
+msgstr "未定義"
 
 msgid "Not demoed here"
 msgstr "ここではデモしていません"
@@ -14051,6 +14112,9 @@ msgstr "{hostName}のプロジェクトのワークツリーフォルダを選�
 msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
 msgstr "チェックアウトするリポジトリを選んでください。このマシン上のエージェントが必要なものを判断し、クラウドで動く状態にします。"
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "この環境がチェックアウトするリポジトリを選択します。保存すると新しいビルドが始まり、成功するまでワークスペースは現在のものから起動します。"
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}のワークツリーフォルダを選択してください。"
 
@@ -15425,6 +15489,9 @@ msgstr "リポジトリ"
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "GitHub Appのインストールからアクセスできるリポジトリです。"
 
+msgid "Repositories changed"
+msgstr "リポジトリを変更"
+
 msgid "Repositories refreshed"
 msgstr "リポジトリを更新しました"
 
@@ -16059,6 +16126,9 @@ msgstr "マシン上でローカルコマンドを実行します"
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
 
+msgid "Runs every time a workspace starts"
+msgstr "ワークスペースが起動するたびに実行"
+
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "そのデバイスのParadevアプリ内で動作しているため、更新するにはそのデバイスのアプリを更新する必要があります。"
 
@@ -16080,6 +16150,9 @@ msgstr "新しいワークスペースの作成時に実行します。"
 msgid "Runs when a workspace is deleted."
 msgstr "ワークスペースの削除時に実行します。"
 
+msgid "Runs when the environment builds"
+msgstr "環境のビルド時に実行"
+
 msgid "Same version as this app."
 msgstr "このアプリと同じバージョンです。"
 
@@ -16100,6 +16173,9 @@ msgstr "保存してワークスペースを作成"
 
 msgid "Save All"
 msgstr "すべて保存"
+
+msgid "Save and build"
+msgstr "保存してビルド"
 
 msgid "Save as environment"
 msgstr "環境として保存"
@@ -16143,6 +16219,9 @@ msgstr "保存済み"
 #. placeholder {0}: created?.name ?? name.trim()
 msgid "Saved \"{0}\" as an environment"
 msgstr "「{0}」を環境として保存しました"
+
+msgid "Saved from a workspace"
+msgstr "ワークスペースから保存"
 
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
@@ -16727,6 +16806,9 @@ msgstr "送信中…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "ターミナルのコンテキスト {0} 文字（約 {1} トークン）を {2} に送信します。"
 
+msgid "Sensitive"
+msgstr "機密"
+
 msgid "Sent"
 msgstr "送信日"
 
@@ -16799,9 +16881,6 @@ msgstr "セッション"
 msgid "Sessions · top {0} by cost"
 msgstr "セッション · コスト上位{0}件"
 
-msgid "Set"
-msgstr "設定済み"
-
 msgid "Set a notification schedule"
 msgstr "通知スケジュールを設定"
 
@@ -16821,6 +16900,9 @@ msgstr "グループの色を設定"
 #. placeholder {0}: i18n._(glyph.label)
 msgid "Set icon to {0}"
 msgstr "アイコンを{0}に設定"
+
+msgid "Set on every workspace started from this environment, and while it builds."
+msgstr "この環境から起動するすべてのワークスペースと、ビルド中に設定されます。"
 
 msgid "Set project…"
 msgstr "プロジェクトを設定…"
@@ -17421,9 +17503,6 @@ msgstr "スマイリーと人"
 
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
-
-msgid "Snapshot"
-msgstr "スナップショット"
 
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
@@ -18744,6 +18823,9 @@ msgstr "画像のアップロードの有効期限が切れました — もう�
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "職務の中身が変わります。エンジニアは審美眼のあるタイピストであることをやめ、審美眼のあるディスパッチャーになります。作業を分解し、フリートに割り振り、同じモジュールに触れたエージェント同士の衝突を裁く役です。"
 
+msgid "The last 5 environments. Restore one to start new workspaces from it again."
+msgstr "最新の 5 つの環境です。復元すると、新しいワークスペースが再びその環境から起動します。"
+
 msgid "The latest updates, improvements, and new features in Paradev."
 msgstr "Paradevの最新のアップデート、改善、新機能。"
 
@@ -18782,6 +18864,9 @@ msgstr "マージされたエージェントのPRの過半数が、レビュー�
 
 msgid "The model declined to continue"
 msgstr "モデルが続行を拒否しました"
+
+msgid "The most recently changed. Set on every workspace started from this environment, and while it builds."
+msgstr "最近変更されたもの。この環境から起動するすべてのワークスペースと、ビルド中に設定されます。"
 
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
@@ -19697,6 +19782,9 @@ msgstr "Gmail から自動化をトリガーします。"
 msgid "Trigger automations from Teams channel messages."
 msgstr "Teamsのチャンネルメッセージからオートメーションを起動します。"
 
+msgid "Trigger new build"
+msgstr "新しいビルドを開始"
+
 msgid "Trigger not found"
 msgstr "トリガーが見つかりません"
 
@@ -20086,6 +20174,9 @@ msgstr "更新でセッションを維持できませんでした"
 
 msgid "Update daemon"
 msgstr "デーモンを更新"
+
+msgid "Update environment"
+msgstr "環境を更新"
 
 msgid "Update Error"
 msgstr "アップデートエラー"
