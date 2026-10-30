@@ -9,7 +9,11 @@ The CLI is currently in Beta. Commands and flags are still evolving. Make sure y
 
 The Paradev CLI (`superset`) is a single static binary that drives the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
-and the local host server from your terminal or from CI.
+and the local host server from your terminal or from CI. Scripts and other
+agents use it to dispatch coding-agent tasks: one command creates a workspace
+on its own branch and starts Claude Code, Codex, or another agent with a prompt,
+and the result waits in the app for review. See
+[Dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent).
 `paradev` is an alias for `superset`: every install below puts both on `PATH`,
 and either name runs the same binary.
 
@@ -142,7 +146,43 @@ superset workspaces create \
   --local
 ```
 
-Trigger an automation immediately:
+## Dispatch agent tasks from a script or another agent
+
+One command creates a workspace on its own branch and starts an agent in it
+with a prompt:
+
+```bash
+superset workspaces create \
+  --project prj_… \
+  --name "flaky-tests" \
+  --branch flaky-tests \
+  --local \
+  --agent claude \
+  --prompt "Find the flaky test in CI and propose a fix. Do not merge."
+```
+
+To start another agent in a workspace that already exists:
+
+```bash
+superset agents create --workspace <workspace-id> --local --agent codex --prompt "Review the diff and list risks."
+```
+
+Check on the work and read what an agent printed:
+
+```bash
+superset workspaces list --local
+superset terminals read --workspace <workspace-id> --terminal <terminal-id> --local
+```
+
+Each dispatched task opens in the desktop and iPhone apps like any other
+workspace, with its diff ready to review. Output is JSON by default when an
+agent or CI runs the CLI. Another agent can do the same through the
+[Paradev MCP server](/mcp-server), and an automation with a webhook trigger
+starts a run when any service sends a POST to its URL.
+
+## Trigger an automation
+
+Run an automation immediately:
 
 ```bash
 superset automations list

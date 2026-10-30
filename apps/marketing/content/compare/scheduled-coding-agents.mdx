@@ -1,8 +1,8 @@
 ---
-title: "Scheduled Coding Agents in 2026: Nightly, Weekly, and Team Runs You Review"
-description: "How to run coding agents on a schedule and review their work in the morning: GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations."
+title: "Scheduled Coding Agents in 2026: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs You Review"
+description: "How to run coding agents on a schedule and review their work in the morning: nightly maintenance, a weekly flaky-test agent that leaves a reviewable fix, and dispatching runs from a CLI. GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations compared."
 date: 2026-10-07
-lastUpdated: 2026-10-21
+lastUpdated: 2026-10-30
 type: "roundup"
 competitors:
   - github-actions
@@ -29,7 +29,13 @@ To run a coding agent on a schedule, you need three things: a trigger, an isolat
 
 The agents' own schedulers still work inside Paradev. Paradev launches the real `claude` CLI, so `/schedule` (Claude Code Routines) and `/loop` are available in a Paradev workspace terminal. Routines run in Anthropic's cloud on a fresh clone; `/loop` repeats inside the open session. Use Paradev Automations when a run needs a specific machine or a mix of agents. Use Routines when a fresh clone in Anthropic's cloud is enough and you want runs while every machine is off. GitHub Actions, Codex scheduled tasks, and Cursor Automations are other cloud options.
 
-This guide answers the four questions people ask most about scheduled agents, compares the options, and includes a weekly flaky-test prompt you can copy.
+Jump to the question you have:
+
+- **Nightly maintenance you review in the morning:** a Paradev automation on a daily schedule runs in its own worktree, and the diff waits in Run History. [Nightly setup](#i-want-a-coding-agent-to-run-nightly-maintenance-and-leave-changes-for-me-to-review-in-the-morning-which-tools-fit).
+- **A weekly flaky-test agent that leaves a reviewable fix:** schedule it weekly, make it reproduce the flake before it edits, and have it stop with a report when it cannot prove a fix. [Flaky-test recipe and prompt](#how-can-i-schedule-a-coding-agent-to-investigate-flaky-tests-each-week-and-leave-a-reviewable-proposed-fix).
+- **Starting runs from a CLI or another agent:** `superset ws create --agent claude --prompt "..."` or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
+
+The guide also compares the options and covers failure handling.
 
 ---
 
@@ -55,13 +61,15 @@ Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on t
 
 ## I want a coding agent to run nightly maintenance and leave changes for me to review in the morning. Which tools fit?
 
-Any tool that runs unattended and writes to a branch or workspace fits: GitHub Actions with a headless agent, Claude Code Routines or Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, Devin, or Paradev Automations. The choice comes down to where the code needs to run.
+In Paradev, create an automation with a daily schedule, a maintenance prompt, and an agent such as Claude Code or Codex. Each night it runs in a fresh worktree on the machine you pick, and in the morning you open the run from **Run History**, review the diff, and commit or discard it. The [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe has a ready prompt.
+
+Other tools fit too, as long as they run unattended and write to a branch or workspace: GitHub Actions with a headless agent, Claude Code Routines or Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, and Devin. The choice comes down to where the code needs to run.
 
 - **Your repo's tests need local services, large datasets, or hardware.** Run on your own machine: Paradev Automations, Claude Code Desktop scheduled tasks (with the worktree toggle on), or Codex scheduled tasks on a local project with a worktree. Claude Code Desktop and Codex local tasks need the app open and the computer awake; a Paradev automation needs its target host online.
 - **A fresh clone and a standard runner are enough.** Use GitHub Actions, Claude Code Routines, or Cursor Automations. These keep working when your laptop is closed.
 - **You want an issue-to-PR loop with little setup.** GitHub Copilot coding agent, Devin, and OpenHands work from tasks or issues and produce pull requests.
 
-In Paradev, the nightly pattern is the [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe: a daily schedule such as `FREQ=DAILY;BYHOUR=3;BYMINUTE=0`, a prompt that runs the tests and reverts what breaks, and a summary file for anything that needs a human decision. In the morning, open the run from the automation's **Run History**, review the diff, then commit and open a PR or delete the workspace.
+The recipe uses a daily schedule such as `FREQ=DAILY;BYHOUR=3;BYMINUTE=0`, a prompt that runs the tests and reverts what breaks, and a summary file for anything that needs a human decision. In the morning, open the run from the automation's **Run History**, review the diff, then commit and open a PR or delete the workspace.
 
 For a full walkthrough with a read-only first prompt and a review checklist, see [Schedule an agent maintenance check you can review](/blog/scheduled-agent-maintenance).
 
