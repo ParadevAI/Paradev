@@ -752,7 +752,7 @@ superset hosts wake my-sandbox
 
 ### workspaces (alias: `ws`)
 
-Workspaces use a shared project checkout, an isolated worktree, or a project-less session folder on a host.
+Workspaces use a shared project checkout, a separate worktree and branch, or a project-less session folder on a host.
 
 **Routing:** when `--host` resolves to the local machine, the CLI calls
 the host server directly over loopback HTTP: no cloud roundtrip, works
@@ -797,7 +797,7 @@ project id when the host doesn't know the project's name.
 		{ flag: "--project <projectId>", description: "Project ID, for a workspace on a host. Required with `--local` or `--host` unless `--session` is set." },
 		{ flag: "--session", description: "Create a project-less session (a managed scratch folder) on a host. Mutually exclusive with `--project`." },
 		{ flag: "--name <name>", description: "Workspace name. Required when `--project` is set; optional for sessions." },
-		{ flag: "--checkout <local|worktree>", description: "Use the shared project checkout or an isolated worktree (default). Requires `--project`." },
+		{ flag: "--checkout <local|worktree>", description: "Use the shared project checkout or a separate worktree (default). Requires `--project`." },
 		{ flag: "--branch <branch>", description: "Workspace branch. On a host, required unless `--pr`, `--task`, or `--checkout local` is set. For a cloud workspace, the base branch (default: the repository's default branch)." },
 		{ flag: "--pr <number>", description: "Pull request number. Checks out the verified PR head." },
 		{ flag: "--task <id>", description: "Task ID to link. When `--branch` is omitted, the task's provider branch name (e.g. Linear's) is used verbatim." },

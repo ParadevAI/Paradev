@@ -142,7 +142,7 @@ Headless agent modes cover single tasks: `claude -p`, `codex exec`, `aider --mes
 
 Paradev gives you three ways in:
 
-- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
+- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates a workspace with its own worktree and branch and an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
 - **Another agent**: the `superset:orchestrate` skill, shipped to agents Paradev runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.paradev.com/orchestration).
 - **MCP and SDK**: the [MCP server](https://docs.paradev.com/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
 

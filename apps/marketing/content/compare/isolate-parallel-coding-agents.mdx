@@ -139,7 +139,7 @@ None of the worktree tools sandbox processes. If you need that, combine any of t
 
 ## Scripting it from the CLI
 
-Paradev's CLI creates an isolated workspace and starts an agent in one command, which is useful when one agent hands work to others:
+Paradev's CLI creates a workspace with its own worktree and branch and starts an agent in one command, which is useful when one agent hands work to others:
 
 ```bash
 superset workspaces create --project <project-id> --name auth-fix \

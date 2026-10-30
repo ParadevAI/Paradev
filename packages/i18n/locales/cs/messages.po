@@ -3933,9 +3933,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Změny"
 
-msgid "Changes are isolated"
-msgstr "Změny jsou izolované"
-
 msgid "Changes open target"
 msgstr "Cíl otevření změn"
 
@@ -4186,8 +4183,8 @@ msgstr "CI selhalo"
 msgid "Clarify this"
 msgstr "Vyjasni to"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex a OpenCode jsou agenti; Paradev je místo, kde jich spustíte spoustu naráz. Každý úkol dostane vlastní izolovaný git worktree, takže deset agentů může pracovat na deseti větvích současně, zatímco vy z jednoho místa sledujete, revidujete a slučujete."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex a OpenCode jsou agenti; Paradev je místo, kde jich spouštíte mnoho najednou. Každý úkol dostane vlastní Git worktree a větev, takže deset agentů může současně pracovat na deseti větvích, zatímco vy vše sledujete, kontrolujete a slučujete z jednoho místa."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode a další. Žádné nastavení pro každého agenta."
@@ -6746,8 +6743,8 @@ msgstr "Popište úkol pro agenta…"
 msgid "Describe the work to your agent"
 msgstr "Popište práci svému agentovi"
 
-msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
-msgstr "Popište, co potřebujete. Paradev pro úkol vytvoří izolovaný pracovní prostor a čistou větev."
+msgid "Describe what you need. Paradev creates a workspace with its own worktree and branch for the task."
+msgstr "Popište, co potřebujete. Paradev pro úkol vytvoří pracovní prostor s vlastním worktree a větví."
 
 msgid "Describe what you'd like to see built…"
 msgstr "Popište, co byste chtěli vidět hotové…"
@@ -7275,8 +7272,8 @@ msgstr "např. Moje cloudové kontroly"
 msgid "e.g. plan-budget"
 msgstr "např. plan-budget"
 
-msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
-msgstr "Každý agent běží ve vlastním izolovaném git worktree. Nikdo si nepřepisuje soubory. Zrevidujte a slučte práci, až budete chtít."
+msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
+msgstr "Každý agent pracuje ve vlastním Git worktree a větvi, takže si agenti navzájem nepřepisují soubory. Práci zkontrolujte a slučte, až budete připraveni."
 
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
@@ -7296,6 +7293,9 @@ msgstr "Každá relace naváže tam, kde skončila."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Každá plocha má vlastní typografii. Změny se okamžitě projeví v živých náhledech."
+
+msgid "Each task on its own branch"
+msgstr "Každý úkol na vlastní větvi"
 
 msgid "Early 2024"
 msgstr "Zač. 2024"
@@ -10050,9 +10050,6 @@ msgstr "je přihlášen."
 msgid "Is there a free plan?"
 msgstr "Existuje bezplatný tarif?"
 
-msgid "Isolation"
-msgstr "Izolace"
-
 msgid "Issue"
 msgstr "Issue"
 
@@ -12538,8 +12535,8 @@ msgstr "Zatím žádné pracovní prostory"
 msgid "No-Prompt Launch"
 msgstr "Spuštění bez promptu"
 
-msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "Ne. Vaši agenti zůstávají nezávislí; Paradev je orchestrační vrstva kolem nich. Každý úkol dostane izolovaný git worktree, trvalé relace, revizi rozdílů a automatizace spouštěné událostmi nebo podle plánu, aniž byste workflow uvázali k jednomu poskytovateli."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "Ne. Vaši agenti zůstávají nezávislí; Paradev je orchestrační vrstva kolem nich. Každý úkol dostane vlastní Git worktree a větev, trvalé relace, kontrolu diffů a automatizace, které běží při událostech nebo podle plánu, aniž by byl pracovní postup vázán na jednoho poskytovatele."
 
 msgid "Nobody has joined the board yet."
 msgstr "Do žebříčku se zatím nikdo nezapojil."
@@ -13860,8 +13857,8 @@ msgstr "Paradev je source-available: kód je veřejně na GitHubu pod licencí E
 msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev je source-available. Každý pull request, review i bug je veřejně na GitHubu."
 
-msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Paradev je pracovní stůl pro přechod z F3 na F4: paralelní agenti v izolovaných pracovních prostorech, flotily, které skutečně uhlídáte, a plocha pro revizi kódu, který jste nenapsali."
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev je pracovní stůl pro přechod z F3 na F4: paralelní agenti na samostatných větvích, flotily, které skutečně uhlídáte, a rozhraní pro kontrolu kódu, který jste nenapsali."
 
 msgid "Paradev isn't on Windows yet"
 msgstr "Paradev je zatím jen pro Mac"

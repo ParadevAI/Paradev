@@ -47,7 +47,7 @@ const inter = Inter({
 });
 
 const siteDescription =
-	"Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel, isolate changes, and review everything in one place.";
+	"Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place.";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(COMPANY.MARKETING_URL),

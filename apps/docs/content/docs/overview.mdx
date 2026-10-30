@@ -5,7 +5,7 @@ description: The 60-second version
 
 Paradev is a source-available platform for running AI coding agents in parallel, licensed under the Elastic License 2.0. It's available as a desktop IDE, an [iPhone and iPad app](/install#iphone-and-ipad), a command-line interface, and an MCP server.
 
-The core move: every task gets its own **workspace**, an isolated git worktree on its own branch. Agents work in workspaces, so three agents (or ten) can run at once without overwriting each other's files or your `main`. If two agents edit the same lines, you resolve that at merge time, like any branch. You review each result in a built-in diff viewer and integrate through ordinary branches and PRs.
+The core move: every task gets its own **workspace**, a separate git worktree on its own branch. Agents work in workspaces, so three agents (or ten) can run at once without overwriting each other's files or your `main`. If two agents edit the same lines, you resolve that at merge time, like any branch. You review each result in a built-in diff viewer and integrate through ordinary branches and PRs.
 
 <YouTubeVideo id="7jhPfMDwTUc" title="Paradev Demo" thumbnail="/images/video-thumbnail.png" />
 
@@ -19,7 +19,7 @@ Paradev is local-first: it works offline and syncs when connected. Your code nev
 
 ## What Makes It Different
 
-- **Worktree isolation, handled for you**: no manual `git worktree` bookkeeping, no stashing, no checkout whiplash
+- **Worktrees, handled for you**: no manual `git worktree` bookkeeping, no stashing, no checkout whiplash
 - **Any agent**: Claude Code, Codex, Amp, Gemini, OpenCode, Cursor Agent, and [more](/agent-integration), or the built-in chat
 - **The whole loop in one place**: terminals, diffs, commits, PRs, ports, and dev servers per workspace
 - **Automations**: agent sessions that start on a schedule or when something happens (a review request, a Sentry issue, a Slack message, a webhook), with a real workspace as the output

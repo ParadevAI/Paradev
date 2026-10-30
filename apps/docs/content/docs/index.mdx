@@ -1,10 +1,10 @@
 ---
 title: Paradev Documentation
-description: Run AI coding agents in parallel, each in its own isolated workspace
+description: Run AI coding agents in parallel, each in its own worktree and branch
 full: true
 ---
 
-Paradev gives every task its own isolated git worktree, so you can delegate to many agents at once and integrate the results through ordinary branches and PRs.
+Paradev gives every task its own git worktree and branch, so you can delegate to many agents at once and integrate the results through ordinary branches and PRs.
 
 ![The Paradev home screen: describe a task, pick an agent, go](/images/prompt-first.png)
 
@@ -29,7 +29,7 @@ Paradev gives every task its own isolated git worktree, so you can delegate to m
 
 <Cards>
 	<Card icon={<Split />} title="Race agents on one task" href="/recipes/race-agents">
-		Same prompt, multiple agents, isolated branches. Merge the best diff.
+		Same prompt, multiple agents, separate branches. Merge the best diff.
 	</Card>
 	<Card icon={<Workflow />} title="Run parallel workstreams" href="/recipes/parallel-workstreams">
 		A feature, a bugfix, and a PR review at once, without branch juggling.

@@ -1,6 +1,6 @@
 ---
 title: "How to Run and Manage Multiple AI Coding Agents in Parallel"
-description: "Run several AI coding agents at once with Git worktrees and persistent terminals: set up isolated workspaces, orchestrate the sessions, and switch tasks without losing context."
+description: "Run several AI coding agents at once with Git worktrees and persistent terminals: set up separate workspaces, orchestrate the sessions, and switch tasks without losing context."
 date: 2026-10-14
 lastUpdated: 2026-10-21
 type: "tutorial"
@@ -21,7 +21,7 @@ keywords:
 
 Running one coding agent is easy. Running four at once, on the same repository, is where most setups break down: agents overwrite each other's files, terminals pile up, and it becomes hard to tell which agent is waiting for an answer. This guide covers the workflow that keeps parallel agents manageable, in three parts:
 
-1. Set up an isolated workspace for every task
+1. Set up a separate workspace for every task
 2. Orchestrate the agent sessions
 3. Manage context and switch between tasks
 
@@ -29,7 +29,7 @@ It works with any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI
 
 ---
 
-## 1. Set Up Isolated Workspaces with Git Worktrees
+## 1. Set Up Separate Workspaces with Git Worktrees
 
 Every task needs its own working directory. Otherwise two agents edit the same files, their diffs mix together, and one agent's failing build confuses the other.
 
@@ -56,7 +56,7 @@ See [Git Worktrees for AI Coding Agents](/compare/git-worktrees-for-ai-agents) a
 
 ## 2. Orchestrate Multiple Agent Sessions
 
-With isolation in place, start one agent per workspace. Scope each task so it can be reviewed on its own: one feature, one bug, or one refactor, with a clear way to check it is done.
+With separate worktrees in place, start one agent per workspace. Scope each task so it can be reviewed on its own: one feature, one bug, or one refactor, with a clear way to check it is done.
 
 **Manually:** open a terminal in each worktree and start the agent there. Use tmux or terminal tabs to keep them running, and check each one in turn.
 

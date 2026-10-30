@@ -3933,9 +3933,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Änderungen"
 
-msgid "Changes are isolated"
-msgstr "Änderungen sind isoliert"
-
 msgid "Changes open target"
 msgstr "Öffnungsziel für Änderungen"
 
@@ -4186,8 +4183,8 @@ msgstr "CI fehlgeschlagen"
 msgid "Clarify this"
 msgstr "Das klarstellen"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex und OpenCode sind die Agenten; Paradev ist der Ort, an dem du viele davon gleichzeitig laufen lässt. Jede Aufgabe bekommt ihren eigenen isolierten Git-Worktree, sodass zehn Agenten gleichzeitig an zehn Branches arbeiten können, während du an einem Ort beobachtest, reviewst und mergest."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex und OpenCode sind die Agenten; Paradev ist der Ort, an dem du viele davon gleichzeitig ausführst. Jede Aufgabe bekommt ihren eigenen Git-Worktree und Branch, sodass zehn Agenten gleichzeitig an zehn Branches arbeiten können, während du alles an einem Ort überwachst, reviewst und mergst."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode und mehr. Keine Einrichtung pro Agent."
@@ -6746,8 +6743,8 @@ msgstr "Beschreibe die Aufgabe für den Agenten…"
 msgid "Describe the work to your agent"
 msgstr "Beschreibe deinem Agenten die Aufgabe"
 
-msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
-msgstr "Beschreibe, was du brauchst. Paradev erstellt einen isolierten Arbeitsbereich und einen sauberen Branch für die Aufgabe."
+msgid "Describe what you need. Paradev creates a workspace with its own worktree and branch for the task."
+msgstr "Beschreibe, was du brauchst. Paradev erstellt für die Aufgabe einen Workspace mit eigenem Worktree und Branch."
 
 msgid "Describe what you'd like to see built…"
 msgstr "Beschreibe, was gebaut werden soll…"
@@ -7275,8 +7272,8 @@ msgstr "z. B. Meine Cloud-Reviews"
 msgid "e.g. plan-budget"
 msgstr "z. B. plan-budget"
 
-msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
-msgstr "Jeder Agent läuft in seinem eigenen isolierten Git-Worktree. Keiner überschreibt die Dateien der anderen. Reviewe und merge die Arbeit, wenn du bereit bist."
+msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
+msgstr "Jeder Agent arbeitet in seinem eigenen Git-Worktree und Branch, sodass sich Agenten nicht gegenseitig Dateien überschreiben. Reviewe und merge die Arbeit, wenn du bereit bist."
 
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
@@ -7296,6 +7293,9 @@ msgstr "Jede Sitzung macht dort weiter, wo sie aufgehört hat."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Jede Oberfläche hat ihre eigene Typografie. Änderungen erscheinen sofort in den Live-Vorschauen."
+
+msgid "Each task on its own branch"
+msgstr "Jede Aufgabe auf ihrem eigenen Branch"
 
 msgid "Early 2024"
 msgstr "Anfang 2024"
@@ -10050,9 +10050,6 @@ msgstr "ist angemeldet."
 msgid "Is there a free plan?"
 msgstr "Gibt es einen kostenlosen Tarif?"
 
-msgid "Isolation"
-msgstr "Isolation"
-
 msgid "Issue"
 msgstr "Issue"
 
@@ -12538,8 +12535,8 @@ msgstr "Noch keine Arbeitsbereiche"
 msgid "No-Prompt Launch"
 msgstr "Start ohne Prompt"
 
-msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "Nein. Deine Agenten bleiben eigenständig; Paradev ist die Orchestrierungsschicht darum herum. Jede Aufgabe bekommt einen isolierten Git-Worktree, dauerhafte Sitzungen, Diff-Review und Automationen, die bei Ereignissen oder nach Zeitplan laufen, ohne den Workflow an einen Anbieter zu binden."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "Nein. Deine Agenten bleiben unabhängig; Paradev ist die Orchestrierungsebene um sie herum. Jede Aufgabe bekommt ihren eigenen Git-Worktree und Branch, dauerhafte Sitzungen, Diff-Review und Automationen, die bei Ereignissen oder nach Zeitplan laufen, ohne den Workflow an einen Anbieter zu binden."
 
 msgid "Nobody has joined the board yet."
 msgstr "Noch ist niemand dem Board beigetreten."
@@ -13860,8 +13857,8 @@ msgstr "Paradev ist source-available: Der Code ist auf GitHub unter der Elastic 
 msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev ist source-available. Jeder Pull Request, jedes Review und jeder Bug ist öffentlich auf GitHub."
 
-msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Paradev ist die Werkbank für den Übergang von F3 zu F4: parallele Agenten in isolierten Arbeitsbereichen, Flotten, die sich wirklich beaufsichtigen lassen, und eine Review-Oberfläche für Code, den du nicht selbst geschrieben hast."
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev ist die Werkbank für den Übergang von F3 zu F4: parallele Agenten auf getrennten Branches, Flotten, die du wirklich beaufsichtigen kannst, und eine Review-Oberfläche für Code, den du nicht selbst geschrieben hast."
 
 msgid "Paradev isn't on Windows yet"
 msgstr "Paradev gibt es vorerst nur für Mac"

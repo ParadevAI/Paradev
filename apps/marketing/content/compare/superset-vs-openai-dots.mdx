@@ -26,7 +26,7 @@ If you want GPT-6 Astra working on your code, you do not need a dot to get it: P
 
 | | **Paradev** | **OpenAI dots** |
 |---|---|---|
-| **What it does** | Runs multiple AI coding agents in parallel with Git worktree isolation, chat, review, and browser | Always-on ChatGPT agents that take on work across your apps, run scheduled tasks, and start Codex tasks |
+| **What it does** | Runs multiple AI coding agents in parallel in separate Git worktrees, with chat, review, and browser | Always-on ChatGPT agents that take on work across your apps, run scheduled tasks, and start Codex tasks |
 | **Category** | Local-first agent workspace with remote hosts and cloud workspaces | Cloud personal and work agents inside ChatGPT |
 | **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a Paradev cloud workspace | Each dot's own OpenAI cloud computer; optionally one connected personal computer (off by default) |
 | **Agent and model choice** | Any CLI agent on your own subscription or keys (Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, Copilot, Grok Build, Muse Code, Amp, and more) | GPT-6 Astra; coding work goes to Codex |
@@ -40,7 +40,7 @@ If you want GPT-6 Astra working on your code, you do not need a dot to get it: P
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, Amp, and any other CLI agent inside isolated Git worktrees with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
+Paradev is a local-first desktop workspace for AI coding agents. It launches Codex, Claude Code, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot, Grok Build, Muse Code, Amp, and any other CLI agent in separate Git worktrees and branches, with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a Pull Requests view with CI checks and line comments you can send to agents, a chat panel, an in-app browser with port detection and Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host so workspaces keep running when your laptop sleeps, and scheduled automations, a CLI, a TypeScript SDK, and a Slack bot cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Source-available under Elastic License 2.0 (ELv2), with a free tier, Pro, and an enterprise tier with SAML SSO, SCIM, audit logs, and a SOC 2 Type II report.
 
 ## What Is OpenAI dots?
 
@@ -100,7 +100,7 @@ dots are always-on ChatGPT agents, announced by OpenAI on September 29, 2026 and
 
 ### Can I use GPT-6 Astra in Paradev?
 
-Yes. Paradev runs the Codex CLI as a built-in agent, and its model picker includes GPT-6.1 Sol and GPT-6 Astra, Sol, and Luna, with Ultra effort on GPT-6 Astra. Codex runs on your ChatGPT plan in an isolated worktree, alongside Claude Code and any other CLI agent.
+Yes. Paradev runs the Codex CLI as a built-in agent, and its model picker includes GPT-6.1 Sol and GPT-6 Astra, Sol, and Luna, with Ultra effort on GPT-6 Astra. Codex runs on your ChatGPT plan in its own worktree, alongside Claude Code and any other CLI agent.
 
 ### Does a dot run on my computer?
 

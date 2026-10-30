@@ -24,7 +24,7 @@ Paradev and Claude Squad both run multiple coding agents in parallel, each in it
 | | **Paradev** | **Claude Squad** |
 |---|---|---|
 | **Category** | Desktop agent orchestration workspace | Terminal TUI for managing agents |
-| **What it does** | Runs multiple agents in parallel with worktree isolation, review, and browser | Runs multiple agent sessions in isolated worktrees via tmux |
+| **What it does** | Runs multiple agents in parallel in separate worktrees, with review and browser | Runs multiple agent sessions in isolated worktrees via tmux |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree per agent + tmux sessions |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, and more) | Agent-agnostic (Claude Code, Codex, Gemini, Aider, OpenCode, Amp, custom) |
 | **Interface** | Graphical desktop app with panes and diff review | Terminal TUI |
@@ -37,7 +37,7 @@ Paradev and Claude Squad both run multiple coding agents in parallel, each in it
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Claude Squad?
 
@@ -47,7 +47,7 @@ Claude Squad is an open-source terminal app that manages multiple AI coding agen
 
 ### Terminal TUI vs Desktop Workspace
 
-Claude Squad lives entirely in the terminal. It is fast, keyboard-driven, and pairs worktrees with tmux to keep sessions isolated. Paradev is a graphical desktop workspace: the same local branch-based worktree isolation, but with panes, a built-in diff and file editor, an in-app browser for docs and dev servers, and one-click handoff into your IDE. Which you prefer comes down to whether you want a lean terminal tool or a full workspace UI.
+Claude Squad lives entirely in the terminal. It is fast, keyboard-driven, and pairs worktrees with tmux to keep sessions isolated. Paradev is a graphical desktop workspace: the same worktree per local branch-based workspace, but with panes, a built-in diff and file editor, an in-app browser for docs and dev servers, and one-click handoff into your IDE. Which you prefer comes down to whether you want a lean terminal tool or a full workspace UI.
 
 ### Review and Extras
 
@@ -59,7 +59,7 @@ Paradev extends past the local desktop with Remote Access to your other machines
 
 ### Shared Foundation
 
-Both are agent-agnostic and both make a Git worktree per agent the unit of isolation, so the core workflow -- many agents, separate branches, review before merge -- is the same. The difference is the surface: a TUI versus a desktop workspace with more built in.
+Both are agent-agnostic and both make a Git worktree per agent the unit of separation, so the core workflow -- many agents, separate branches, review before merge -- is the same. The difference is the surface: a TUI versus a desktop workspace with more built in.
 
 ---
 

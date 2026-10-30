@@ -37,7 +37,7 @@ export async function GET() {
 		"",
 		"## Features",
 		"",
-		"- **Parallel agents**: run many coding agents side by side, each in an isolated Git worktree on its own branch.",
+		"- **Parallel agents**: run many coding agents side by side, each in its own Git worktree and branch.",
 		"- **Any CLI agent**: Claude Code, OpenAI Codex, OpenCode, and anything else that runs in a terminal.",
 		"- **Diff review**: review every change from one dashboard before merging.",
 		"- **Persistent terminals**: sessions survive app restarts.",
