@@ -21,6 +21,7 @@ import { LuBox } from "react-icons/lu";
 import { AgentSelect } from "renderer/components/AgentSelect";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
@@ -107,6 +108,7 @@ export function RunInWorkspacePopoverV2({
 		environments.find((environment) => environment.id === environmentId) ??
 		environments[0];
 	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
+	const acpChatEnabled = useAcpChatEnabled();
 	const launchHostUrl = useHostUrl(isCloud ? null : hostId);
 	const setUpProjectIds = useSelectedHostProjectIds(hostId);
 
@@ -262,6 +264,7 @@ export function RunInWorkspacePopoverV2({
 						: {
 								agent: selectedAgent,
 								prompt: synthesizeTaskPrompt(task).slice(0, 20_000),
+								surface: acpChatEnabled ? "chat" : "terminal",
 							}),
 				}),
 			),

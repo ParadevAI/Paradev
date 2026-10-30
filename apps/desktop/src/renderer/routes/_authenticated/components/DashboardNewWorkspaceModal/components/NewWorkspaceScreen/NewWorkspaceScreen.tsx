@@ -542,7 +542,7 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
-	const acpChatEnabled = useAcpChatEnabled() === "enabled";
+	const acpChatEnabled = useAcpChatEnabled();
 	const startModes = acpChatEnabled
 		? acpStartModes(selectedPresetId)
 		: undefined;

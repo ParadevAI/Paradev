@@ -65,8 +65,8 @@ export function useAutoAdoptChatSessions({
 	isLayoutReady,
 	pendingTimeoutMs = PENDING_CLOUD_CHAT_TIMEOUT_MS,
 }: UseAutoAdoptChatSessionsArgs): void {
-	const chatAvailability = useAcpChatEnabled();
-	const enabled = chatAvailability === "enabled" && isLayoutReady;
+	const acpChatEnabled = useAcpChatEnabled();
+	const enabled = acpChatEnabled && isLayoutReady;
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const queryClient = useQueryClient();
@@ -140,13 +140,13 @@ export function useAutoAdoptChatSessions({
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: tabs re-runs it when a waiting pane is restored
 	useEffect(() => {
-		if (chatAvailability !== "disabled" || !isLayoutReady) return;
+		if (acpChatEnabled || !isLayoutReady) return;
 		for (const pending of pendingPanes([store, ...linkedStores])) {
 			pending.store
 				.getState()
 				.closePane({ tabId: pending.tabId, paneId: pending.paneId });
 		}
-	}, [chatAvailability, isLayoutReady, store, linkedStores, tabs]);
+	}, [acpChatEnabled, isLayoutReady, store, linkedStores, tabs]);
 
 	useEffect(() => {
 		const result = sessionsQuery.data;

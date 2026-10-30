@@ -11,7 +11,7 @@ import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useAwaitAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
@@ -57,7 +57,7 @@ export function useSubmitWorkspace(
 	const collections = useCollections();
 	const { machineId } = useLocalHostService();
 	const activeOrganizationId = useActiveOrganizationId();
-	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
+	const acpChatEnabled = useAcpChatEnabled();
 	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
 	const utils = cloudTrpc.useUtils();
 
@@ -195,6 +195,7 @@ export function useSubmitWorkspace(
 								model: selectedModel ?? undefined,
 								effort: selectedEffort ?? undefined,
 								mode: selectedMode ?? undefined,
+								surface: acpChatEnabled ? "chat" : "terminal",
 							}
 						: {}),
 				});
@@ -205,7 +206,7 @@ export function useSubmitWorkspace(
 						workspaceId: created.id,
 						launch: initialLaunch,
 						prompt: prompt.trim(),
-						chatEnabled: await awaitAcpChatEnabled(),
+						chatEnabled: acpChatEnabled,
 						modelId: selectedModel,
 						modeId: selectedMode,
 					});
@@ -285,8 +286,8 @@ export function useSubmitWorkspace(
 
 		const openAsChat =
 			wantAgent &&
-			Boolean(acpHarnessForPreset(selectedPresetId)) &&
-			(await awaitAcpChatEnabled());
+			acpChatEnabled &&
+			Boolean(acpHarnessForPreset(selectedPresetId));
 		const agents = wantAgent
 			? [
 					{
@@ -399,7 +400,7 @@ export function useSubmitWorkspace(
 		});
 	}, [
 		activeOrganizationId,
-		awaitAcpChatEnabled,
+		acpChatEnabled,
 		selectedPresetId,
 		closeAndResetDraft,
 		collections,
