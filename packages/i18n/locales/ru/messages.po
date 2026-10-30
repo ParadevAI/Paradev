@@ -19094,6 +19094,9 @@ msgstr "Команда"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Приглашение в команду истекло или не существует. Запросите новую ссылку у владельца команды или проверьте правильность URL."
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "Терминал скрывает вставленный текст. Нажмите Enter, чтобы отправить."
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "Заголовок отображается везде, где указана эта страница, и в превью ссылки."
 

@@ -19094,6 +19094,9 @@ msgstr "팀"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "팀 초대가 만료되었거나 존재하지 않습니다. 팀 소유자에게 새 링크를 요청하거나 URL이 올바르게 입력되었는지 확인하세요."
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "터미널에는 붙여넣은 내용이 표시되지 않습니다. Enter 키를 눌러 제출하세요."
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "제목은 이 페이지가 표시되는 모든 곳과 링크 미리보기에 나타납니다."
 

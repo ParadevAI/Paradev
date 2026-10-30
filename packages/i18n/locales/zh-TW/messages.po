@@ -19094,6 +19094,9 @@ msgstr "團隊"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "該團隊邀請已過期或不存在。請向團隊擁有者索取新連結，或檢查URL是否輸入正確。"
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "終端機不會顯示你貼上的內容。按 Enter 送出。"
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "標題會顯示在此頁面列出的所有位置以及連結預覽中。"
 

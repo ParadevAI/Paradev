@@ -19094,6 +19094,9 @@ msgstr "Ekip"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Takım daveti ya süresi dolmuş ya da mevcut değil. Takım sahibinden yeni bir bağlantı isteyin veya URL'nin doğru girildiğini kontrol edin."
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "Terminal yapıştırdığınız metni gizler. Göndermek için Enter tuşuna basın."
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "Başlık, bu sayfanın listelendiği her yerde ve bağlantı önizlemesinde görünür."
 

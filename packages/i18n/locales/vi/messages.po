@@ -19094,6 +19094,9 @@ msgstr "Đội ngũ"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Lời mời vào nhóm đã hết hạn hoặc không tồn tại. Hãy xin liên kết mới từ chủ sở hữu nhóm hoặc kiểm tra lại URL xem đã nhập đúng chưa."
 
+msgid "The terminal hides what you paste. Press Enter to submit."
+msgstr "Terminal ẩn nội dung bạn dán. Nhấn Enter để gửi."
+
 msgid "The title shows everywhere this page is listed and in its link preview."
 msgstr "Tiêu đề hiển thị ở mọi nơi trang này được liệt kê và trong bản xem trước liên kết."
 

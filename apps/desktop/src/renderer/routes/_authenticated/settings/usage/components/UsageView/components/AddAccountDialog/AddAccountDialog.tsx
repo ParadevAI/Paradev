@@ -34,6 +34,7 @@ import {
 } from "../../utils/findCompletedLogin";
 import { switchSignInCommand } from "../../utils/switchSignInCommand";
 import type { ManagedAgent } from "../../utils/visibleQuotaAgents";
+import { nextHiddenInputPending } from "./utils/nextHiddenInputPending";
 
 type Agent = ManagedAgent;
 
@@ -101,6 +102,7 @@ export function AddAccountDialog({
 	const [terminalAttempt, setTerminalAttempt] = useState(0);
 	const [terminalRunning, setTerminalRunning] = useState(false);
 	const [commandSucceeded, setCommandSucceeded] = useState(false);
+	const [hiddenInputPending, setHiddenInputPending] = useState(false);
 	const agent = switchTarget?.agent ?? addAgent;
 	const billingId = useId();
 	const nameId = useId();
@@ -125,6 +127,7 @@ export function AddAccountDialog({
 			setTerminalAttempt(0);
 			setTerminalRunning(false);
 			setCommandSucceeded(false);
+			setHiddenInputPending(false);
 			setCredentialKind("subscription");
 			return;
 		}
@@ -422,13 +425,26 @@ export function AddAccountDialog({
 									<CommandTerminal
 										key={terminalAttempt}
 										command={command}
+										onInput={(data) =>
+											setHiddenInputPending((pending) =>
+												nextHiddenInputPending(pending, data),
+											)
+										}
 										onExit={(exitCode) => {
 											setTerminalRunning(false);
+											setHiddenInputPending(false);
 											setCommandSucceeded(exitCode === 0);
 											void loginsQuery.refetch();
 										}}
 									/>
 								</div>
+								{terminalRunning && hiddenInputPending && (
+									<p className="border-t bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+										<Trans>
+											The terminal hides what you paste. Press Enter to submit.
+										</Trans>
+									</p>
+								)}
 							</div>
 						)}
 						{terminalAttempt === 0 &&
@@ -474,6 +490,7 @@ export function AddAccountDialog({
 										disabled={!loginsQuery.data}
 										onClick={() => {
 											setCommandSucceeded(false);
+											setHiddenInputPending(false);
 											setTerminalRunning(true);
 											setTerminalAttempt((attempt) => attempt + 1);
 										}}
