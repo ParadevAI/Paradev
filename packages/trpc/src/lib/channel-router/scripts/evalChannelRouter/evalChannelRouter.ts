@@ -1,6 +1,9 @@
-// Usage: bun --env-file=<file with VERCEL_OIDC_TOKEN or AI_GATEWAY_API_KEY> scripts/evalChannelRouter.ts [--holdout]
-import { routeChannelMessage } from "../channelRouter";
-import { type EvalCase, evalSet, holdoutSet } from "../evalSet";
+// Usage: bun --env-file=<file with VERCEL_OIDC_TOKEN or AI_GATEWAY_API_KEY> scripts/evalChannelRouter/evalChannelRouter.ts [--holdout]
+import { routeChannelMessage } from "../../channelRouter";
+import type { EvalCase } from "./evalCase";
+import { evalSet } from "./generated/eval";
+import { holdoutSet } from "./generated/holdout";
+import { realWorldSet } from "./real-world/cases";
 
 const CONCURRENCY = 5;
 
@@ -63,7 +66,8 @@ function percent(value: number): string {
 	return `${(value * 100).toFixed(1)}%`;
 }
 
-function report(results: CaseResult[]) {
+function report(title: string, results: CaseResult[]) {
+	console.log(`\n== ${title}`);
 	let truePositives = 0;
 	let falsePositives = 0;
 	let falseNegatives = 0;
@@ -118,5 +122,10 @@ function report(results: CaseResult[]) {
 	}
 }
 
-const cases = process.argv.includes("--holdout") ? holdoutSet : evalSet;
-report(await runAll(cases, gatewayToken()));
+const sets: Record<string, EvalCase[]> = process.argv.includes("--holdout")
+	? { "generated holdout": holdoutSet }
+	: { "real-world": realWorldSet, generated: evalSet };
+const token = gatewayToken();
+for (const [title, cases] of Object.entries(sets)) {
+	report(title, await runAll(cases, token));
+}
