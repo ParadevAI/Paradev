@@ -99,27 +99,28 @@ to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). 
 
 ### Before a public release
 
-- [ ] **Query cache too large for Android storage.** A "Row too big to fit into CursorWindow" toast
-      shows: the persisted query cache is larger than one AsyncStorage row on Android.
+- [x] **Query cache too large for Android storage.** Done: Android keeps the persisted query cache
+      in a file, not one AsyncStorage row, so the "Row too big to fit into CursorWindow" toast is gone.
 - [ ] **Sign-in end to end.** GitHub and Google open their providers, but nobody has finished a
       real login and the redirect back through `superset://` on Android. Native Google needs the
       Google Cloud steps above first.
-- [ ] **Sign-in errors.** GitHub and Google ignore `res.error`, so their failures are silent (shared
-      with iOS).
+- [x] **Sign-in errors.** Done: a failed GitHub or Google sign-in shows its error (both platforms).
 - [ ] **Screens not yet checked on a device:** the Page sheets (preview, comments, share), voice
       sheets, the PR checks/reviewers sheets, line comment, and `ValueMenu` in share-invite.
-- [ ] **CI and EAS workflows.** `.eas/workflows` jobs are iOS only.
-- [ ] **Home-screen name.** Android shows `name` ("Superset"); iOS shows the brand name.
+- [ ] **CI and EAS workflows.** `.eas/workflows/deploy-android.yml` builds and submits to the Play
+      internal track, run by hand. It moves into `deploy.yml` after the first manual upload and once
+      Android takes OTA updates (`RELEASE.md`).
+- [x] **Home-screen name.** Done: `withAndroidLabel` sets the launcher label to the brand name.
 
 ### Composer, after the MVP
 
-From `plans/20261029-android-composer.md`: dictation (needs `SpeechRecognizer`), slash command
-suggestions, session tabs, quick keys and the quick-keys action, paste of images and files, PDF and
+From `plans/20261029-android-composer.md`. Done: session tabs, quick keys, slash command
+suggestions. Still open: dictation (needs `SpeechRecognizer`), paste of images and files, PDF and
 document thumbnails, swipe-down to dismiss.
 
 ### Agent card and push
 
-From `plans/20261029-android-agent-card.md`: the app never asks for notification permission (it
-belongs with push registration), "Not updating" is not shown, one tap target per card instead of
-per row, and the Android 16 Live Update features are untested (the AVD is API 33). Push is planned
-there and not implemented on either platform.
+From `plans/20261029-android-agent-card.md`. Done: the app asks for notification permission when
+the first agent card would show, a stale card says "Not updating", and each row opens its own
+session. Still open: the Android 16 Live Update features are untested (the AVD is API 33), and push
+is planned there but not implemented on either platform.
