@@ -5436,6 +5436,9 @@ msgstr "Link konnte nicht geöffnet werden"
 msgid "Could not open Photos"
 msgstr "Fotos konnte nicht geöffnet werden"
 
+msgid "Could not open this file"
+msgstr "Diese Datei konnte nicht geöffnet werden"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote

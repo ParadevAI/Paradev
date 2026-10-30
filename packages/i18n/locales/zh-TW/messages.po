@@ -5436,6 +5436,9 @@ msgstr "無法開啟連結"
 msgid "Could not open Photos"
 msgstr "無法開啟「照片」"
 
+msgid "Could not open this file"
+msgstr "無法開啟此檔案"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote

@@ -5436,6 +5436,9 @@ msgstr "링크를 열 수 없습니다"
 msgid "Could not open Photos"
 msgstr "사진 앱을 열지 못했습니다"
 
+msgid "Could not open this file"
+msgstr "이 파일을 열 수 없습니다"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote

@@ -5436,6 +5436,9 @@ msgstr "リンクを開けませんでした"
 msgid "Could not open Photos"
 msgstr "「写真」を開けませんでした"
 
+msgid "Could not open this file"
+msgstr "このファイルを開けませんでした"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
