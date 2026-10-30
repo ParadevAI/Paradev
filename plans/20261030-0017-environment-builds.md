@@ -25,7 +25,7 @@ The QStash schedule for the daily job is created by hand in the Upstash console,
 
 ## Open Questions
 
-None blocking. Reviewers should check decisions D5 (how `--fresh` is allowed for a golden saved from a workspace) and D3 (time budget) in the Decision Log.
+None blocking. Reviewers should check decision D3 (time budget) in the Decision Log.
 
 
 ## Progress
@@ -33,8 +33,10 @@ None blocking. Reviewers should check decisions D5 (how `--fresh` is allowed for
 - [x] (2026-10-29 22:30Z) Read SUPER-3017, the design doc, and the code it points at.
 - [x] (2026-10-30 00:10Z) UI agreed with the user through the mockup (13 versions on the page above).
 - [x] (2026-10-30 00:17Z) This plan written.
-- [ ] Draft PR with the plan and mockup; SUPER-3017 updated with the link.
-- [ ] Milestone 1: build records, `rebuildEnvironment`, the build job, tRPC, CLI, history and restore, setup skill docs.
+- [x] (2026-10-30 00:19Z) Draft PR with the plan and mockup (#9104); SUPER-3017 updated.
+- [x] (2026-10-30 00:23Z) Migration PR #9108 (`environment_builds`), applied on a fresh Neon branch only.
+- [x] (2026-10-30 01:00Z) Milestone 1 code in PR #9110; unit-tested. Simplified after review: no `--fresh`, two budgets and a job deadline, one `activateGolden`.
+- [ ] Milestone 1 end-to-end on a real box (needs a test repository with `[install]`).
 - [ ] Milestone 2: the daily build job.
 - [ ] Milestone 3: change an environment's repositories through a build.
 - [ ] Milestone 4: desktop Settings screens.
@@ -63,17 +65,17 @@ None blocking. Reviewers should check decisions D5 (how `--fresh` is allowed for
   Rationale: a request behind Cloudflare is cut at 100 seconds (SUPER-2518); a build takes minutes. Same shape as cloud workspace provisioning (`publishCloudWorkspaceJob` in `packages/trpc/src/router/cloud-workspace/jobs.ts`, which also runs jobs in-process when the API is local).
   Date/Author: 2026-10-30, Claude.
 
-- D3. Decision: the whole build fits in one job invocation (`maxDuration = 300`). Budgets: 45 seconds for the box to be ready, 180 seconds for `[install]`, the rest for strip, stop and snapshot. Exceeding a budget fails the build with that reason. The budgets are parameters so tests pass small values; Milestone 1 measures stop-and-snapshot on a real box and lowers the install budget if 75 seconds is not enough for it.
-  Rationale: the user preferred a hard budget to a multi-step job ("if the install doesn't run in 3m we can just call it quits"). The daily build runs on a warm disk and usually needs far less. A cold first build of a large repository may not fit; that is a known gap, and the escape later is to run `[install]` detached and let the job re-queue itself to poll, without changing any API.
-  Date/Author: 2026-10-29, Satya; numbers by Claude.
+- D3. Decision: the whole build fits in one job invocation (`maxDuration = 300`). Budgets: 45 seconds for the box to be ready, 180 seconds for `[install]`, and a 285-second deadline for the whole job that the checkout and the snapshot share. Exceeding any of them fails the build with that reason. The budgets and the clock are parameters so tests pass small values. Builds longer than this are out of scope; a durable workflow engine (Vercel Workflow, Inngest, QStash Workflows) is the way to allow them, and we choose not to, partly because long builds cost more.
+  Rationale: the user preferred a hard budget to a multi-step job ("if the install doesn't run in 3m we can just call it quits"). The daily build runs on a warm disk and usually needs far less. A cold first build of a large repository may not fit. Four separate budgets were tried first; they added up to more than 300 seconds.
+  Date/Author: 2026-10-29, Satya; numbers by Claude; revised 2026-10-30.
 
 - D4. Decision: a table `environment_builds` holds every build: its status, trigger, kind, the commit it built, the golden it made, the repositories it built, the error. A partial unique index allows one `running` build per environment, so a second request is refused by the database.
   Rationale: one table gives the job its status, the lock, the history the UI shows, and the retention list. Cursor's Builds tab, which the user showed, is the model for what a person sees.
   Date/Author: 2026-10-29, Satya and Claude.
 
-- D5. Decision: two kinds of build. *Incremental* forks the current golden; it is what the daily job and Trigger new build run. *Fresh* starts from the base image; it is the first build of an environment that has no golden, and `superset environments rebuild <env> --fresh` otherwise. A build needs `[install]` on the base branch, else it is refused ("this environment has no [install] to build"). `--fresh` is refused when the active golden was saved from a workspace, because that golden may hold setup done by hand that `[install]` does not repeat; the refusal names `--fresh --discard-workspace-setup` as the explicit way through. Fresh is not offered in the desktop UI.
-  Rationale: the ticket asks to refuse fresh unless `[install]` is the full recipe. The only state where we know it is not is a golden saved from a workspace; a golden made by builds holds only the image plus `[install]`. The user removed the "Build from scratch" button from the mockup.
-  Date/Author: 2026-10-30, Claude. Review this one.
+- D5. Decision: no `--fresh`. A build forks the current golden (*incremental*), or starts from the base image when the environment has no golden yet (*fresh*, recorded as such). A build needs `[install]` on the base branch, else it is refused ("this environment has no [install] to build").
+  Rationale: the leftovers an incremental build accumulates (git objects, ignored build output, package caches) grow the snapshot slowly but do not break builds; the user chose to skip a fresh option until snapshot size is a problem. A `--discard-workspace-setup` override was proposed and rejected.
+  Date/Author: 2026-10-30, Satya.
 
 - D6. Decision: the daily job builds every environment that is not archived, has `[install]` on its base branch, belongs to an organization whose plan tier is not `free`, has no running build, and whose last three finished builds are not all failures. A manual build that succeeds ends the pause. No change check: an unchanged environment is still built.
   Rationale: the design doc ("no change check", about $0.05 per environment per day). The pause after three failures is what Cursor appears to do (its recurring builds stopped after three failures in the user's screenshot), and avoids paying daily for a build that cannot succeed. The UI does not announce the pause; failures show in the Builds table (user: "be chill").
@@ -87,7 +89,7 @@ None blocking. Reviewers should check decisions D5 (how `--fresh` is allowed for
   Rationale: a snapshot exists only in the region where it was taken (`docs/cloud-sandbox-mismatches.md`).
   Date/Author: 2026-10-30, Claude.
 
-- D9. Decision: changing an environment's repositories starts a build (Milestone 3) instead of being refused. The new repository list is stored on the build and becomes the environment's only when the build succeeds. A change that moves the primary checkout (a different primary repository, or going between one and several repositories) needs a fresh build and follows D5.
+- D9. Decision: changing an environment's repositories starts a build (Milestone 3) instead of being refused. The new repository list is stored on the build and becomes the environment's only when the build succeeds. A change that moves the primary checkout (a different primary repository, or going between one and several repositories) builds from the base image, so it keeps only what `[install]` sets up; the Edit repositories dialog says so before saving.
   Rationale: Cursor does this ("If builds are on, a new build starts automatically"), and the user wants the New environment repository picker reused for it.
   Date/Author: 2026-10-30, Satya and Claude.
 
@@ -134,7 +136,7 @@ The build. New module `packages/trpc/src/lib/sandbox/environment-build/` (folder
 
 1. Load the build and its environment. If the build is not `running`, return (a redelivered job).
 2. Read `[install]` for the primary repository on the base branch with an installation token. None: fail with "no [install]".
-3. Create the box, named `envb-<build id, 24 hex>`: a `Sandbox.fork` of the golden for incremental, `Sandbox.create` from `SANDBOX_IMAGE_NAME` in `environments.region` for fresh. Both with `persistent: true`, `snapshotExpiration: 0`, `keepLastSnapshots: { count: 1 }`, `GOLDEN_BOX_VCPUS`, the `environment` tags, a session timeout of 6 minutes (so a job killed mid-build leaves a box that stops by itself), and the `networkPolicy` from `deriveSandboxCredentials({ workspaceId: buildId, environmentEnv, githubToken, ... })`. Must be ready within `budgets.boxReadyMs` (45 s).
+3. Create the box, named `envb-<build id, 24 hex>`: a `Sandbox.fork` of the golden for incremental, `Sandbox.create` from `SANDBOX_IMAGE_NAME` in `environments.region` for fresh. Both with `persistent: true`, `snapshotExpiration: 0`, `keepLastSnapshots: { count: 1 }`, `GOLDEN_BOX_VCPUS`, the `environment` tags, a session timeout equal to the job deadline (so a job killed mid-build leaves a box that stops by itself), and the `networkPolicy` from `deriveSandboxCredentials({ workspaceId: buildId, environmentEnv, githubToken, ... })`. Must be ready within `budgets.boxReadyMs` (45 s).
 4. For each repository (`toSandboxRepositories` on the build's repository list, branch = base branch): if the checkout exists with the right origin, `git fetch --depth 1 origin <base> && git checkout -B <base> FETCH_HEAD`; otherwise clone it, the same steps as `checkout_one` in `packages/sandbox/bundle/rootfs/usr/local/bin/superset-boot`. Run as `ubuntu`. Record the primary repository's `HEAD` as `commit_sha`.
 5. Run `[install]` with `bash -lc`, in the primary checkout (or its `cwd`), as `ubuntu`, with the `managedEnv` as environment, detached with `timeoutMs = budgets.installMs` (180 s), then wait. Non-zero exit or timeout: fail with the exit code and the last 40 lines of output in `error`.
 6. `stripWorkspaceIdentity`, stop, `waitForStopSnapshot` (give it a deadline parameter instead of its fixed 3 minutes).
@@ -149,7 +151,7 @@ Job route. `apps/api/src/app/api/environments/build/route.ts`, `maxDuration = 30
 
 tRPC, all additive:
 
-- `environment.rebuild({ environmentId, fresh?: boolean, discardWorkspaceSetup?: boolean })`: member and cloud access as other procedures, `organizationMayBuild`, `[install]` present, D5 rules for `fresh` (forced `fresh` when `sourceKind = 'image'`), insert the `running` row (a unique violation becomes `CONFLICT` "a build is already running"), queue the job, return the row.
+- `environment.rebuild({ environmentId })`: member and cloud access as other procedures, `organizationMayBuild`, `[install]` present (kind `fresh` when `sourceKind = 'image'`, else `incremental`), insert the `running` row (a unique violation becomes `CONFLICT` "a build is already running"), queue the job, return the row.
 - `environment.builds({ environmentId, cursor?, limit = 20 })`: newest first, `{ builds, nextCursor }`, cursor on `(started_at, id)`. Same paging as `automation.listOrgRuns`.
 - `environment.restore({ environmentId, buildId })`: the build must be `succeeded` with a golden not deleted; swap `sourceRef` and the repositories to that build's, guarded on the current `sourceRef`.
 - `environment.get` and `list` gain optional `latestBuild` and `activeBuild` (status, startedAt, finishedAt, commitSha) for the UI.
@@ -157,7 +159,7 @@ tRPC, all additive:
 
 User-facing server errors use `userError` with an `i18nKey`, like the rest of the router.
 
-CLI. `packages/cli/src/commands/environments/rebuild/command.ts`: `superset environments rebuild <env> [--fresh] [--discard-workspace-setup] [--wait]`; with `--wait` it polls `environment.builds` every 5 seconds and exits non-zero on failure. `superset environments builds <env>` prints the table. `superset environments restore <env> <build-id>`.
+CLI. `packages/cli/src/commands/environments/rebuild/command.ts`: `superset environments rebuild <env> [--wait]`; with `--wait` it polls `environment.builds` every 5 seconds and exits non-zero on failure. `superset environments builds <env>` prints the table. `superset environments restore <env> <build-id>`.
 
 Setup skill. Rewrite the `[install]` part of `plugins/superset/skills/setup/SKILL.md`: cloud `[install]` runs only in an environment build (manual, daily, or after a repository change), from the repository root on the base branch, with the environment's variables, never on workspace boot; it must be idempotent; everything a box needs that does not depend on one workspace (runtimes, CLIs, browsers, a seeded local test database) belongs in `[install]`/`[install.cloud]`, and `[setup.cloud]` is for per-workspace state. Then `superset plugins publish superset --bump patch` and `bun run check:plugins`.
 
@@ -169,7 +171,7 @@ Tests (bun, fast, no real waiting; budgets and clock are parameters): `[install]
 
 ### Milestone 3: change repositories through a build
 
-`environment.update` with `repositoryIds` or `primaryRepositoryId` on a `fork` environment stops refusing: it validates the repositories, inserts a build with `trigger = 'repositories'` and the new list, queues it, and returns the environment unchanged plus `pendingBuildId`. The build checks out the new list; for a removed repository it deletes its directory; if the change moves the primary checkout (D9) it must be fresh and follows D5. On success the transaction in step 7 also replaces `environment_repositories` and `primaryRepositoryId` with the build's. Run the trpc-compat skill: released clients that called `update` with repositories got `FORBIDDEN`; now they get success, which is compatible.
+`environment.update` with `repositoryIds` or `primaryRepositoryId` on a `fork` environment stops refusing: it validates the repositories, inserts a build with `trigger = 'repositories'` and the new list, queues it, and returns the environment unchanged plus `pendingBuildId`. The build checks out the new list; for a removed repository it deletes its directory; if the change moves the primary checkout (D9) it builds from the base image. On success the transaction in step 7 also replaces `environment_repositories` and `primaryRepositoryId` with the build's. Run the trpc-compat skill: released clients that called `update` with repositories got `FORBIDDEN`, and an error code is contract, so the new behaviour sits behind a new optional input (`startBuild: true`); without it `update` keeps refusing.
 
 ### Milestone 4: desktop
 
@@ -225,3 +227,5 @@ The mockup source is `design/environment-builds/index.html`; open it with `?stat
     export interface RepositoryHooks { ports?: number[]; install?: { commands: string[]; cwd?: string } | null }
 
 New dependencies: none.
+
+Revision 2026-10-30: `--fresh` and `--discard-workspace-setup` removed (user decision, D5); four time budgets replaced by two plus a job deadline (D3); Milestone 3 opts in with a new `update` input because an error code is contract; Progress updated with the PRs.
