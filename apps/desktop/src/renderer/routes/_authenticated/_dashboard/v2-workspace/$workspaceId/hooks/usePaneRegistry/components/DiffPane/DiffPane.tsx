@@ -574,6 +574,7 @@ export function DiffPane({
 	// leave the edit mode the click may have started.
 	const markTooLarge = useCallback(
 		(itemId: string, fileDiff: FileDiffMetadata) => {
+			if (findItemIdForDiff(itemsRef.current, fileDiff) !== itemId) return;
 			setTooLargeMarks((current) => new Map(current).set(itemId, fileDiff));
 			const file = fileByItemIdRef.current.get(itemId);
 			if (file && editingSetRef.current.has(getChangesetFileKey(file))) {
