@@ -427,8 +427,12 @@ suite("agent access against a migrated PostgreSQL", () => {
 		expect(await tools.listWork()).toEqual([]);
 	});
 
-	test("a task's finished turn tells its main session once, with its result and pull request", async () => {
+	test("a task session's finished turn records the task's pull request and tells its main session once", async () => {
 		const { agent, turn: mainTurn } = await agentWithChannel(admin);
+		const { task: work } = await person(admin).task.create({
+			title: "Fix the login 500",
+		});
+		if (!work) throw Error("No Paradev task");
 		const [task] = await db
 			.insert(schema.agentSessions)
 			.values({
@@ -436,7 +440,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 				agentId: agent.id,
 				kind: "task",
 				parentSessionId: mainTurn.sessionId,
-				title: "Fix the login 500",
+				taskId: work.id,
 				role: "writer",
 				taskStatus: "running",
 				requestedByUserId: admin,
@@ -474,11 +478,23 @@ suite("agent access against a migrated PostgreSQL", () => {
 			.select()
 			.from(schema.agentSessions)
 			.where(eq(schema.agentSessions.id, task.id));
-		expect(after).toMatchObject({
-			taskStatus: "done",
-			pullRequestUrl: "https://github.com/acme/app/pull/7",
-			result: "Fixed. https://github.com/acme/app/pull/7",
-		});
+		expect(after?.taskStatus).toBe("done");
+		const [recorded] = await db
+			.select({ prUrl: schema.tasks.prUrl })
+			.from(schema.tasks)
+			.where(eq(schema.tasks.id, work.id));
+		expect(recorded?.prUrl).toBe("https://github.com/acme/app/pull/7");
+		const mainToken = (
+			await worker().agentWorker.turnToken({ turnId: mainTurn.id })
+		).token;
+		expect(await asAgent(mainToken).devTools.listWork()).toMatchObject([
+			{
+				taskId: work.id,
+				title: "Fix the login 500",
+				pullRequestUrl: "https://github.com/acme/app/pull/7",
+				sessions: [{ sessionId: task.id, role: "writer", status: "done" }],
+			},
+		]);
 		const [main] = await db
 			.select({ steers: schema.agentTurns.steerPromptIds })
 			.from(schema.agentTurns)
@@ -679,7 +695,7 @@ suite("agent access against a migrated PostgreSQL", () => {
 		const temporal = fakeTemporal({ status: "RUNNING", failedTasks: 5 });
 		await reconcileDevs(temporal.client, { organizationId: orgId });
 		expect(temporal.terminated).toContain(`session/${turn.sessionId}`);
-		const [row] = await turnsOf(turn.agentId);
+		const row = (await turnsOf(turn.agentId)).find(({ id }) => id === turn.id);
 		expect(row).toMatchObject({ status: "failed", errorCode: "lost" });
 	});
 });

@@ -555,7 +555,7 @@ export function systemFor(credentials: TurnCredentials): string {
 
 Everything sent to you arrives here as <message> blocks that say who sent it, where, and reply_to. People see only what you send with the reply tool: answer each message with reply, passing its reply_to as target. A message from one of your tasks has no reply_to; tell the person who asked for the work.
 
-You have no machine and no subagents. For anything that needs reading or changing code, running commands, or opening a pull request, start a task with start_task and give it complete instructions, since it knows only what you write. When a writer task reports a pull request, start a reviewer task for it (role reviewer, reviewOfTaskId). Send review findings or CI failures back to the writer with message_task. Tell people the outcome once it is reviewed.
+You have no machine and no subagents. For anything that needs reading or changing code, running commands, or opening a pull request, start a task with start_task and give it complete instructions, since it knows only the task and what you write. Before starting new work, check list_work: to continue something, pass its taskId. When a writer reports a pull request, start a reviewer on the same task (role reviewer, its taskId). Send review findings back to the writer with message_task. Tell people the outcome once it is reviewed.
 
 If a task cannot start or fails, do not start it again unchanged: tell the person what went wrong and what you need.
 

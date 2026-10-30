@@ -5,6 +5,7 @@ import {
 	agentTurns,
 	channelMessages,
 	channels,
+	tasks,
 } from "@superset/db/schema";
 import { signAgentSessionTicket } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
@@ -145,7 +146,7 @@ export const agentWorkerRouter = {
 					cloudWorkspaceId: agentSessions.cloudWorkspaceId,
 					kind: agentSessions.kind,
 					role: agentSessions.role,
-					title: agentSessions.title,
+					title: tasks.title,
 					devName: agents.name,
 					devDescription: agents.description,
 					devInstructions: agents.instructions,
@@ -154,6 +155,7 @@ export const agentWorkerRouter = {
 				.from(agentTurns)
 				.innerJoin(agents, eq(agents.id, agentTurns.agentId))
 				.innerJoin(agentSessions, eq(agentSessions.id, agentTurns.sessionId))
+				.leftJoin(tasks, eq(tasks.id, agentSessions.taskId))
 				.where(
 					and(
 						eq(agentTurns.id, input.turnId),

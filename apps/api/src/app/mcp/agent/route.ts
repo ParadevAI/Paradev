@@ -43,7 +43,7 @@ function devToolsServer(tools: DevTools): McpServer {
 		"list_work",
 		{
 			description:
-				"Your tasks, newest first: id, title, role, status (queued, running, done, failed, stopped), pull request and a short summary.",
+				"The Paradev tasks you work on, newest first: taskId, slug (e.g. SUPER-12), title, status, pull request, a short summary of the latest report, and your sessions on each (writer or reviewer; queued, running, done, failed or stopped).",
 			inputSchema: {},
 		},
 		() => result(() => tools.listWork()),
@@ -51,7 +51,8 @@ function devToolsServer(tools: DevTools): McpServer {
 	server.registerTool(
 		"read_task",
 		{
-			description: "One task in full, including what it last reported.",
+			description:
+				"One task in full: its description, pull request, and each of your sessions on it with what it last reported.",
 			inputSchema: { taskId: z.string() },
 		},
 		(args) => result(() => tools.readTask(args)),
@@ -60,14 +61,13 @@ function devToolsServer(tools: DevTools): McpServer {
 		"start_task",
 		{
 			description:
-				"Delegate work that needs code or a machine to a task on its own box. role `writer` changes code and opens a pull request; `reviewer` reviews a writer's pull request (pass reviewOfTaskId). Give complete instructions: the task knows only what you write. dedupeKey (an issue or pull request URL) stops a second task for the same thing. The task reports back to you when it finishes.",
+				"Delegate work that needs code or a machine. It becomes a Paradev task that people can see, worked on by a session on its own box. Pass a title for new work, or the taskId of an existing task (one from list_work, or one someone assigned you) to work on that instead. role `writer` changes code and opens a pull request; `reviewer` reviews the pull request of an existing task (pass its taskId). A task has one writer at a time. Give complete instructions: the session knows only the task and what you write. It reports back to you when it finishes.",
 			inputSchema: {
-				title: z.string(),
+				taskId: z.string().optional(),
+				title: z.string().optional(),
 				instructions: z.string(),
 				role: z.enum(["writer", "reviewer"]).optional(),
 				environmentId: z.string().optional(),
-				dedupeKey: z.string().optional(),
-				reviewOfTaskId: z.string().optional(),
 			},
 		},
 		(args) => result(() => tools.startTask(args)),
@@ -76,15 +76,20 @@ function devToolsServer(tools: DevTools): McpServer {
 		"message_task",
 		{
 			description:
-				"Send a running or finished task more instructions, such as review feedback or a CI failure. It reports back again when done.",
-			inputSchema: { taskId: z.string(), text: z.string() },
+				"Send more instructions to the task's latest writer session (or reviewer, with role), such as review feedback. It reports back again when done.",
+			inputSchema: {
+				taskId: z.string(),
+				text: z.string(),
+				role: z.enum(["writer", "reviewer"]).optional(),
+			},
 		},
 		(args) => result(() => tools.messageTask(args)),
 	);
 	server.registerTool(
 		"stop_task",
 		{
-			description: "Stop a task that is no longer wanted.",
+			description:
+				"Stop your sessions on a task that is no longer wanted. The task itself stays.",
 			inputSchema: { taskId: z.string() },
 		},
 		(args) => result(() => tools.stopTask(args)),

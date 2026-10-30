@@ -5,11 +5,14 @@ import {
 	agentSessions,
 	agents,
 	agentTaskRoleEnum,
+	agentTurns,
 	channels,
 	environments,
+	taskStatuses,
+	tasks,
 } from "@superset/db/schema";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { agentProcedure } from "../../trpc";
@@ -40,20 +43,67 @@ const mainProcedure = agentProcedure.use(async ({ ctx, next }) => {
 const taskNotFound = () =>
 	new TRPCError({ code: "NOT_FOUND", message: "No such task." });
 
-async function ownTask(agentId: string, taskId: string) {
+const lastReply = sql<
+	string | null
+>`(select t.reply from ${agentTurns} t where t.session_id = ${agentSessions.id} order by t.started_at desc limit 1)`;
+
+interface WorkItem {
+	taskId: string;
+	slug: string;
+	title: string;
+	status: string;
+	pullRequestUrl: string | null;
+	summary: string | null;
+	sessions: Array<{
+		sessionId: string;
+		role: string | null;
+		status: string | null;
+	}>;
+}
+
+/** A task this Dev has worked on, and its sessions, oldest first. */
+async function devTask(
+	turn: { agentId: string; organizationId: string },
+	taskId: string,
+) {
 	const [task] = await db
-		.select()
-		.from(agentSessions)
+		.select({
+			taskId: tasks.id,
+			slug: tasks.slug,
+			title: tasks.title,
+			description: tasks.description,
+			status: taskStatuses.name,
+			pullRequestUrl: tasks.prUrl,
+		})
+		.from(tasks)
+		.innerJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
 		.where(
 			and(
-				eq(agentSessions.id, taskId),
-				eq(agentSessions.agentId, agentId),
-				eq(agentSessions.kind, "task"),
+				eq(tasks.id, taskId),
+				eq(tasks.organizationId, turn.organizationId),
+				isNull(tasks.deletedAt),
 			),
 		)
 		.limit(1);
 	if (!task) throw taskNotFound();
-	return task;
+	const sessions = await db
+		.select({
+			sessionId: agentSessions.id,
+			role: agentSessions.role,
+			status: agentSessions.taskStatus,
+			cloudWorkspaceId: agentSessions.cloudWorkspaceId,
+			reply: lastReply,
+		})
+		.from(agentSessions)
+		.where(
+			and(
+				eq(agentSessions.taskId, taskId),
+				eq(agentSessions.agentId, turn.agentId),
+			),
+		)
+		.orderBy(asc(agentSessions.createdAt));
+	if (sessions.length === 0) throw taskNotFound();
+	return { task, sessions };
 }
 
 /**
@@ -100,80 +150,98 @@ export const devToolsRouter = {
 		}),
 
 	listWork: mainProcedure.query(async ({ ctx }) => {
-		const tasks = await db
+		const rows = await db
 			.select({
-				id: agentSessions.id,
-				title: agentSessions.title,
+				taskId: tasks.id,
+				slug: tasks.slug,
+				title: tasks.title,
+				status: taskStatuses.name,
+				pullRequestUrl: tasks.prUrl,
+				sessionId: agentSessions.id,
 				role: agentSessions.role,
-				status: agentSessions.taskStatus,
-				pullRequestUrl: agentSessions.pullRequestUrl,
-				updatedAt: agentSessions.lastActivityAt,
-				result: agentSessions.result,
+				sessionStatus: agentSessions.taskStatus,
+				reply: lastReply,
 			})
 			.from(agentSessions)
+			.innerJoin(tasks, eq(tasks.id, agentSessions.taskId))
+			.innerJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
 			.where(
 				and(
 					eq(agentSessions.agentId, ctx.agentTurn.agentId),
-					eq(agentSessions.kind, "task"),
+					isNull(tasks.deletedAt),
 				),
 			)
 			.orderBy(desc(agentSessions.createdAt))
-			.limit(30);
-		return tasks.map(({ result, ...task }) => ({
-			...task,
-			summary: result ? result.slice(0, 400) : null,
-		}));
+			.limit(60);
+		const work = new Map<string, WorkItem>();
+		for (const row of rows) {
+			const item = work.get(row.taskId) ?? {
+				taskId: row.taskId,
+				slug: row.slug,
+				title: row.title,
+				status: row.status,
+				pullRequestUrl: row.pullRequestUrl,
+				summary: row.reply ? row.reply.slice(0, 400) : null,
+				sessions: [],
+			};
+			item.sessions.push({
+				sessionId: row.sessionId,
+				role: row.role,
+				status: row.sessionStatus,
+			});
+			work.set(row.taskId, item);
+		}
+		return [...work.values()].slice(0, 30);
 	}),
 
 	readTask: mainProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			const task = await ownTask(ctx.agentTurn.agentId, input.taskId);
-			return {
-				id: task.id,
-				title: task.title,
-				role: task.role,
-				status: task.taskStatus,
-				pullRequestUrl: task.pullRequestUrl,
-				cloudWorkspaceId: task.cloudWorkspaceId,
-				result: task.result,
-			};
+			const { task, sessions } = await devTask(ctx.agentTurn, input.taskId);
+			return { ...task, sessions };
 		}),
 
 	startTask: mainProcedure
 		.input(
-			z.object({
-				title: z.string().min(1).max(200),
-				instructions: z.string().min(1).max(20_000),
-				role: agentTaskRoleEnum.default("writer"),
-				environmentId: z.string().uuid().optional(),
-				dedupeKey: z.string().min(1).max(300).optional(),
-				reviewOfTaskId: z.string().uuid().optional(),
-			}),
+			z
+				.object({
+					taskId: z.string().uuid().optional(),
+					title: z.string().min(1).max(200).optional(),
+					instructions: z.string().min(1).max(20_000),
+					role: agentTaskRoleEnum.default("writer"),
+					environmentId: z.string().uuid().optional(),
+				})
+				.refine((input) => input.taskId || input.title, {
+					message:
+						"Pass a title for a new task, or the taskId of one to work on",
+				})
+				.refine((input) => input.role !== "reviewer" || input.taskId, {
+					message: "A reviewer works on an existing task: pass its taskId",
+				}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			if (input.reviewOfTaskId) {
-				await ownTask(ctx.agentTurn.agentId, input.reviewOfTaskId);
-			}
-			return startTask({
+		.mutation(async ({ ctx, input }) =>
+			startTask({
 				agentId: ctx.agentTurn.agentId,
 				organizationId: ctx.agentTurn.organizationId,
 				parentSessionId: ctx.agentTurn.sessionId,
 				requestedByUserId: ctx.agentTurn.actingUserId,
 				...input,
-			});
-		}),
+			}),
+		),
 
 	messageTask: mainProcedure
 		.input(
 			z.object({
 				taskId: z.string().uuid(),
 				text: z.string().min(1).max(20_000),
+				role: agentTaskRoleEnum.default("writer"),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const task = await ownTask(ctx.agentTurn.agentId, input.taskId);
-			if (task.taskStatus === "queued") {
+			const { sessions } = await devTask(ctx.agentTurn, input.taskId);
+			const session = sessions.filter((row) => row.role === input.role).at(-1);
+			if (!session) throw taskNotFound();
+			if (session.status === "queued") {
 				throw new TRPCError({
 					code: "PRECONDITION_FAILED",
 					message:
@@ -189,10 +257,10 @@ export const devToolsRouter = {
 			await db
 				.update(agentSessions)
 				.set({ taskStatus: "running" })
-				.where(eq(agentSessions.id, task.id));
+				.where(eq(agentSessions.id, session.sessionId));
 			const outcome = await submitPrompt({
 				agent,
-				sessionId: task.id,
+				sessionId: session.sessionId,
 				actingUserId: ctx.agentTurn.actingUserId,
 				promptId: `parent:${ctx.agentTurn.turnId}:${crypto.randomUUID()}`,
 				text: input.text,
@@ -204,16 +272,23 @@ export const devToolsRouter = {
 	stopTask: mainProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const task = await ownTask(ctx.agentTurn.agentId, input.taskId);
-			await db
-				.update(agentSessions)
-				.set({ taskStatus: "stopped" })
-				.where(eq(agentSessions.id, task.id));
-			if (task.taskStatus === "running") {
-				await interruptTurn(await agentTemporal(), task.id).catch(() => {});
+			const { sessions } = await devTask(ctx.agentTurn, input.taskId);
+			const active = sessions.filter(
+				(row) => row.status === "queued" || row.status === "running",
+			);
+			for (const session of active) {
+				await db
+					.update(agentSessions)
+					.set({ taskStatus: "stopped" })
+					.where(eq(agentSessions.id, session.sessionId));
+				if (session.status === "running") {
+					await interruptTurn(await agentTemporal(), session.sessionId).catch(
+						() => {},
+					);
+				}
 			}
 			await fillSlots(ctx.agentTurn.agentId);
-			return { stopped: true };
+			return { stopped: active.length };
 		}),
 
 	remember: mainProcedure
