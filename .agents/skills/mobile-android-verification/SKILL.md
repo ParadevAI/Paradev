@@ -67,6 +67,15 @@ Every worktree installs the same package, `sh.superset.mobile`, so the last inst
   releases an emulator it booted 60 s after its pane closes, which ends an `adb` session on it. If
   you booted the emulator yourself, the pane only shows it.
 
+- **Low memory kills the dev app.** The dev build holds about 800 MB (Hermes runs the full dev
+  bundle). An AVD that booted from a 2 GB snapshot loses the app to the low-memory killer as soon as
+  a picker or Chrome opens (`lowmemorykiller: Kill 'sh.superset.mobile'` in logcat). Check
+  `adb shell cat /proc/meminfo`; if `MemTotal` is near 2 GB, restart that AVD with
+  `emulator -avd <avd> -port <port> -memory 4096 -no-snapshot-load`.
+- **The emulator mic.** `adb emu avd hostmicon` feeds the Mac microphone to the AVD, so the
+  speech recogniser hears the room. Speech played through the Mac speakers often reaches it as
+  `NO_SPEECH_DETECTED`, and Google's recogniser needs about 5 s after the mic tap before it listens.
+
 ## Input and evidence
 
 ```bash
@@ -83,7 +92,9 @@ adb shell settings put system font_scale 1.3              # large text; reset to
 ```
 
 Maestro runs on Android too: `maestro --device emulator-5554 test <flow>`, with `JAVA_HOME` on JDK 17.
-`apps/mobile/.maestro/flows/dev-sign-in.yml` is the sign-in flow `--user` uses.
+`apps/mobile/.maestro/flows/dev-sign-in.yml` is the sign-in flow `--user` uses. Maestro 2 rejects a
+flow where `optional: true` sits beside a command (`Invalid Command Format`); put it inside the
+command's map. Check a flow with `maestro check-syntax <flow>` before running it.
 
 Reset the locale and font scale, stop Metro (`--stop`) and the services, and remove test data when
 done. Leave the emulator running if another agent is waiting for it.
