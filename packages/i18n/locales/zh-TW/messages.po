@@ -9886,6 +9886,9 @@ msgstr "網路已斷開"
 msgid "Interrupt"
 msgstr "打斷"
 
+msgid "Interrupted"
+msgstr "已中斷"
+
 msgid "Intro call"
 msgstr "初步通話"
 

@@ -9886,6 +9886,9 @@ msgstr "Internet Disconnected"
 msgid "Interrupt"
 msgstr "Interrupt"
 
+msgid "Interrupted"
+msgstr "Interrupted"
+
 msgid "Intro call"
 msgstr "Intro call"
 

@@ -9886,6 +9886,9 @@ msgstr "Internet Terputus"
 msgid "Interrupt"
 msgstr "Sela"
 
+msgid "Interrupted"
+msgstr "Terputus"
+
 msgid "Intro call"
 msgstr "Panggilan perkenalan"
 

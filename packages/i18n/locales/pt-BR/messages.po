@@ -9886,6 +9886,9 @@ msgstr "Sem internet"
 msgid "Interrupt"
 msgstr "Interromper"
 
+msgid "Interrupted"
+msgstr "Interrompido"
+
 msgid "Intro call"
 msgstr "Conversa inicial"
 

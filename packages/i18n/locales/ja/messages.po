@@ -9886,6 +9886,9 @@ msgstr "インターネットが切断されています"
 msgid "Interrupt"
 msgstr "中断"
 
+msgid "Interrupted"
+msgstr "中断済み"
+
 msgid "Intro call"
 msgstr "カジュアル面談"
 

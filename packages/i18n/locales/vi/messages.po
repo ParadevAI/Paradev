@@ -9886,6 +9886,9 @@ msgstr "Mất kết nối Internet"
 msgid "Interrupt"
 msgstr "Ngắt lời"
 
+msgid "Interrupted"
+msgstr "Đã ngắt"
+
 msgid "Intro call"
 msgstr "Cuộc gọi giới thiệu"
 

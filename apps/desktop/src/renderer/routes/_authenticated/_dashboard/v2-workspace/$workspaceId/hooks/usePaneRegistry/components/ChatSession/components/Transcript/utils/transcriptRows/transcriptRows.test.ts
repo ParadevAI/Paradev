@@ -431,6 +431,54 @@ test("a subagent's task call leaves its tool run", () => {
 	).toEqual([["r1", "r2"], "task-1", "r3"]);
 });
 
+test("a prompt sent into a running turn shows the calls still running above it as interrupted", () => {
+	const shell = (id: string, status: ToolCall["status"]): ToolCall => ({
+		id,
+		kind: "tool_call",
+		title: id,
+		toolKind: "execute",
+		toolName: "Bash",
+		status,
+		content: [],
+		startedAtMs: 3,
+	});
+	const steer: UserMessage = { ...prompt, id: "item-2", clientId: "client-2" };
+	const rows = transcriptRows(
+		[
+			{
+				turnId: "t1",
+				turn: { id: "t1", status: "running", startedAtMs: 2 },
+				entries: [
+					{ kind: "item", item: prompt },
+					{
+						kind: "tool_run",
+						items: [shell("done", "completed"), shell("live", "running")],
+					},
+					{ kind: "item", item: steer },
+				],
+			},
+		],
+		[],
+		new Set(),
+		find,
+	);
+	const run = rows.find((row) => row.kind === "tool_run");
+	expect(
+		run?.kind === "tool_run" &&
+			run.items.map(({ id, status, interrupted }) => ({
+				id,
+				status,
+				interrupted,
+			})),
+	).toEqual([
+		{ id: "done", status: "completed", interrupted: undefined },
+		{ id: "live", status: "canceled", interrupted: true },
+	]);
+	expect(run?.kind === "tool_run" && run.steps).toEqual(
+		run?.kind === "tool_run" ? run.items : [],
+	);
+});
+
 test("a failed turn says its failure once, on the turn's own row, keeping the stderr an older host put only in the notice", () => {
 	const notice = (id: string, text: string): Item => ({
 		id,

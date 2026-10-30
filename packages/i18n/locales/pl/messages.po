@@ -9886,6 +9886,9 @@ msgstr "Brak połączenia z internetem"
 msgid "Interrupt"
 msgstr "Przerwij"
 
+msgid "Interrupted"
+msgstr "Przerwano"
+
 msgid "Intro call"
 msgstr "Rozmowa wstępna"
 

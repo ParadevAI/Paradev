@@ -102,16 +102,16 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 					className="absolute inset-0 rounded focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-[-1px]"
 					disabled={!hasBody}
 				/>
-				<div className="pointer-events-none relative z-[1] flex min-w-0 flex-1 items-center gap-1.5">
+				<div className="pointer-events-none relative z-[1] flex min-w-0 flex-1 items-baseline gap-1.5">
 					{running ? (
 						<CircleDashed
-							className="size-3.5 shrink-0 animate-spin-slow text-foreground/40 motion-reduce:animate-none"
+							className="size-3.5 shrink-0 self-center animate-spin-slow text-foreground/40 motion-reduce:animate-none"
 							strokeWidth={1.75}
 						/>
 					) : (
 						plugin && (
 							<PluginIcon
-								className="size-3.5 rounded-sm"
+								className="size-3.5 self-center rounded-sm"
 								pluginName={plugin.name}
 							/>
 						)
@@ -123,11 +123,14 @@ export function ToolCallRow({ item }: { item: ToolCall }) {
 						{title}
 					</span>
 					{running && <RunningTime startedAtMs={item.startedAtMs} />}
-					<StatusWord status={item.status} />
+					<StatusWord
+						interrupted={item.interrupted === true}
+						status={item.status}
+					/>
 					{hasBody && (
 						<ChevronRight
 							className={cn(
-								"size-3 shrink-0 text-foreground/45 opacity-0 transition group-focus-within/tool:opacity-100 group-hover/tool:opacity-100",
+								"size-3 shrink-0 self-center text-foreground/45 opacity-0 transition group-focus-within/tool:opacity-100 group-hover/tool:opacity-100",
 								open && "rotate-90 opacity-100",
 							)}
 						/>
