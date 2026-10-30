@@ -8,7 +8,7 @@ import {
 } from "@superset/shared/constants";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, Switch, View } from "react-native";
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -26,6 +26,7 @@ import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
+import { useAcpChatStore } from "@/screens/(authenticated)/stores/acpChatStore";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserAvatar } from "./components/UserAvatar";
 import { usePlanName } from "./hooks/usePlanName";
@@ -54,6 +55,8 @@ export function SettingsScreen() {
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
+	const acpChatEnabled = useAcpChatStore((state) => state.enabled);
+	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
 
 	const user = session?.user;
 	const plan = session?.session.plan;
@@ -325,6 +328,30 @@ export function SettingsScreen() {
 						})}
 						trailing={<ListRowValue value={planLabel} />}
 						onPress={handleManagePlan}
+						isLast
+					/>
+				</SettingsSection>
+
+				<SettingsSection label={t({ message: "Experimental" })}>
+					<ListRow
+						icon={
+							<Ionicons
+								name="chatbubbles-outline"
+								size={20}
+								color={theme.mutedForeground}
+							/>
+						}
+						label={t({ message: "Chat" })}
+						subtitle={t({
+							message: "Open Claude and Codex sessions as chats",
+						})}
+						trailing={
+							<Switch
+								value={acpChatEnabled}
+								onValueChange={setAcpChatEnabled}
+								accessibilityLabel={t({ message: "Chat" })}
+							/>
+						}
 						isLast
 					/>
 				</SettingsSection>

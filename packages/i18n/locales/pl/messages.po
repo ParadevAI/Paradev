@@ -13038,6 +13038,9 @@ msgstr "Otwórz ustawienia administratora ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Otwórz ustawienia ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Otwieraj sesje Claude i Codex jako czaty"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Otwieraj sesje Claude i Codex w panelu czatu zamiast w terminalu."
 

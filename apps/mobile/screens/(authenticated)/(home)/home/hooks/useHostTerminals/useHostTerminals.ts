@@ -1,13 +1,12 @@
 import { presetForAnyHarness } from "@superset/chat/core";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueries } from "@tanstack/react-query";
-import { useFeatureFlag } from "posthog-react-native";
 import { useMemo } from "react";
 import { getChatTransport } from "@/lib/chat";
 import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
 import { type LiveChat, listLiveChats } from "./utils/listLiveChats";
 
@@ -133,7 +132,7 @@ export function useHostsTerminals(
 	hosts: TerminalsHost[],
 ): UseHostTerminalsResult {
 	const terminalSeenAt = useTerminalSeenStore((state) => state.terminalSeenAt);
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
+	const acpChat = useAcpChatEnabled();
 
 	const online = useMemo(
 		() =>

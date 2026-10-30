@@ -1,8 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
@@ -17,6 +15,7 @@ import {
 	type TerminalRowData,
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { SessionList } from "./components/SessionList";
@@ -30,7 +29,7 @@ import { SessionList } from "./components/SessionList";
 export function SessionsSheet() {
 	const { t } = useLingui();
 	const params = useLocalSearchParams<{ id: string; active?: string }>();
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
+	const acpChat = useAcpChatEnabled();
 	const id = params.id;
 	const router = useRouter();
 	const queryClient = useQueryClient();

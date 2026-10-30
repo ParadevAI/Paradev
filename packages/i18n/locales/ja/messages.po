@@ -13038,6 +13038,9 @@ msgstr "ChatGPT の管理者設定を開く"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT の設定を開く"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Claude と Codex のセッションをチャットとして開く"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Claude と Codex のセッションをターミナルではなくチャットペインで開きます。"
 

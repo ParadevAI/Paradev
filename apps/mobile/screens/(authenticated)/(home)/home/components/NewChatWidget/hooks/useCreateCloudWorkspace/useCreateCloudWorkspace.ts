@@ -10,6 +10,7 @@ import { useSession } from "@/lib/auth/client";
 import { errorCopy, transportFailureKind } from "@/lib/errors";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 
 interface CreateCloudWorkspaceArgs {
@@ -38,6 +39,7 @@ export function useCreateCloudWorkspace() {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { data: session } = useSession();
+	const acpChatEnabled = useAcpChatEnabled();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
 
 	return useMutation({
@@ -68,6 +70,11 @@ export function useCreateCloudWorkspace() {
 				agent: launchAgent,
 				model: launchAgent ? (model ?? undefined) : undefined,
 				effort: launchAgent ? (effort ?? undefined) : undefined,
+				surface: launchAgent
+					? acpChatEnabled
+						? "chat"
+						: "terminal"
+					: undefined,
 				// Only with an agent to hand them to.
 				...(launchAgent && attachmentFileIds.length > 0
 					? { attachmentFileIds }

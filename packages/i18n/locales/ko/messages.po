@@ -13038,6 +13038,9 @@ msgstr "ChatGPT 관리자 설정 열기"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT 설정 열기"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Claude 및 Codex 세션을 채팅으로 열기"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Claude 및 Codex 세션을 터미널 대신 채팅 패널에서 엽니다."
 

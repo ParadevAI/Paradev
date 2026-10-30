@@ -8,7 +8,6 @@ import type {
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
 import { BRAND } from "@superset/shared/brand";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
@@ -24,7 +23,6 @@ import {
 	SquareTerminal,
 	TriangleAlert,
 } from "lucide-react-native";
-import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ViewInstance } from "react-native";
 import {
@@ -64,6 +62,7 @@ import {
 import { useAgentIconUris } from "@/screens/(authenticated)/hooks/useAgentIconUris";
 import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useCreateTerminalWorkspace";
 import { useSlashCommands } from "@/screens/(authenticated)/hooks/useSlashCommands";
+import { useAcpChatEnabled } from "@/screens/(authenticated)/stores/acpChatStore";
 import { workspaceDraftKey } from "@/screens/(authenticated)/stores/composerDraftsStore";
 import { useLastSessionTabStore } from "@/screens/(authenticated)/stores/lastSessionTabStore";
 import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
@@ -497,7 +496,7 @@ export function WorkspaceScreen() {
 	);
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
 	const activeIsChat = activeRow?.kind === "chat";
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
+	const acpChat = useAcpChatEnabled();
 	const { running: chatRunning, stop: stopChat } = useActiveChat(
 		activeIsChat ? activeTerminalId : null,
 	);

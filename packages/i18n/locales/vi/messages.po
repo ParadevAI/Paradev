@@ -13038,6 +13038,9 @@ msgstr "Mở cài đặt quản trị ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Mở cài đặt ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Mở phiên Claude và Codex dưới dạng trò chuyện"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Mở phiên Claude và Codex trong một khung chat thay vì terminal."
 
