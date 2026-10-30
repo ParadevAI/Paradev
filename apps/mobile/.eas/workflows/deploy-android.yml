@@ -1,0 +1,42 @@
+name: Deploy Mobile (Android)
+
+# Manual until Play accepts API uploads (the first .aab goes up by hand) and
+# Android takes OTA updates; then these jobs move into deploy.yml. See RELEASE.md.
+on:
+  workflow_dispatch: {}
+
+defaults:
+  tools:
+    bun: 1.4.3
+
+jobs:
+  fingerprint:
+    name: Fingerprint
+    type: fingerprint
+    environment: production
+
+  get_production_build:
+    name: Find production build for this fingerprint
+    needs: [fingerprint]
+    type: get-build
+    params:
+      platform: android
+      profile: production
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      wait_for_in_progress: true
+
+  build_production:
+    name: Build production
+    needs: [get_production_build]
+    if: ${{ !needs.get_production_build.outputs.build_id }}
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  submit_to_play_internal:
+    name: Submit to Play internal track
+    needs: [build_production]
+    type: submit
+    params:
+      build_id: ${{ needs.build_production.outputs.build_id }}
