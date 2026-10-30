@@ -35,8 +35,15 @@ import {
 	showImage,
 } from "./components/ComposerImageViewer";
 import { ComposerModeMenu } from "./components/ComposerModeMenu";
+import { ComposerQuickKeys } from "./components/ComposerQuickKeys";
+import { ComposerSessionTabs } from "./components/ComposerSessionTabs";
+import { ComposerSlashSuggestions } from "./components/ComposerSlashSuggestions";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "./constants";
 import { joinDraft } from "./utils/joinDraft";
+import {
+	committedSlashDraft,
+	slashSuggestions,
+} from "./utils/slashSuggestions";
 
 const IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|heic|heif|bmp|avif)(\?|$)/i;
 
@@ -72,6 +79,11 @@ export const Composer: ComposerComponent = forwardRef<
 		selectedModeId,
 		canStop = false,
 		headerChips,
+		quickKeys,
+		quickKeysAction,
+		slashCommands,
+		sessionTabs,
+		sessionTabLabels,
 		showAttachments = true,
 		autocapitalization = "sentences",
 		compactEditor = false,
@@ -83,6 +95,14 @@ export const Composer: ComposerComponent = forwardRef<
 		onModeSelect,
 		onStop,
 		onChipPress,
+		onQuickKeyPress,
+		onSessionTabPress,
+		onSessionTabClose,
+		onSessionTabRename,
+		onSessionTabCopyId,
+		onNewSessionPress,
+		onAllSessionsPress,
+		onQuickKeysActionPress,
 		onHeightChange,
 		onDraftChange,
 		onRemoveAttachment,
@@ -137,6 +157,9 @@ export const Composer: ComposerComponent = forwardRef<
 		else onAttachmentPress?.(attachment.id);
 	};
 
+	const suggestions =
+		expanded && slashCommands ? slashSuggestions(draft, slashCommands) : null;
+
 	const editorLines = compactEditor
 		? COMPOSER_METRICS.compactEditorLines
 		: COMPOSER_METRICS.editorLines;
@@ -156,6 +179,14 @@ export const Composer: ComposerComponent = forwardRef<
 				pointerEvents="box-none"
 				style={[styles.anchor, { paddingBottom: lift }]}
 			>
+				{suggestions ? (
+					<View style={styles.suggestions}>
+						<ComposerSlashSuggestions
+							commands={suggestions}
+							onSelect={(command) => setDraft(committedSlashDraft(command))}
+						/>
+					</View>
+				) : null}
 				<View
 					pointerEvents="box-none"
 					onLayout={(event) =>
@@ -163,18 +194,39 @@ export const Composer: ComposerComponent = forwardRef<
 					}
 					style={styles.stack}
 				>
-					{expanded && headerChips && headerChips.length > 0 ? (
-						<View style={styles.chips}>
-							{headerChips.map((chip) => (
-								<MenuButton
-									key={chip.id}
-									option={chip}
-									onPress={() => onChipPress?.(chip.id)}
-								/>
-							))}
-						</View>
+					{sessionTabs && sessionTabs.length > 0 ? (
+						<ComposerSessionTabs
+							tabs={sessionTabs}
+							labels={sessionTabLabels}
+							onSelect={(id) => onSessionTabPress?.(id)}
+							onClose={(id) => onSessionTabClose?.(id)}
+							onRename={(id) => onSessionTabRename?.(id)}
+							onCopyId={(id) => onSessionTabCopyId?.(id)}
+							onNewSession={() => onNewSessionPress?.()}
+							onAllSessions={() => onAllSessionsPress?.()}
+						/>
+					) : null}
+					{(quickKeys && quickKeys.length > 0) || quickKeysAction ? (
+						<ComposerQuickKeys
+							keys={quickKeys ?? []}
+							action={quickKeysAction}
+							onPress={(id) => onQuickKeyPress?.(id)}
+							onAction={() => onQuickKeysActionPress?.()}
+						/>
 					) : null}
 					<View style={styles.card}>
+						{expanded && headerChips && headerChips.length > 0 ? (
+							<View style={styles.chips}>
+								{headerChips.map((chip) => (
+									<MenuButton
+										key={chip.id}
+										plain
+										option={chip}
+										onPress={() => onChipPress?.(chip.id)}
+									/>
+								))}
+							</View>
+						) : null}
 						{expanded && attachments.length > 0 ? (
 							<ComposerAttachmentTray
 								attachments={attachments}
@@ -338,16 +390,23 @@ function RoundButton({
 
 function MenuButton({
 	option,
+	plain = false,
 	onPress,
 }: {
 	option: ComposerMenuOption;
+	/** No fill: a header chip, which sits on the card itself. */
+	plain?: boolean;
 	onPress?: () => void;
 }) {
 	return (
 		<Pressable
 			accessibilityRole="button"
 			onPress={onPress}
-			style={({ pressed }) => [styles.menuButton, pressed && styles.pressed]}
+			style={({ pressed }) => [
+				styles.menuButton,
+				plain && styles.menuButtonPlain,
+				pressed && styles.pressed,
+			]}
 		>
 			{option.iconUri ? (
 				<Image source={{ uri: option.iconUri }} style={styles.menuIcon} />
@@ -392,14 +451,27 @@ function CollapsedThumbs({
 
 const styles = StyleSheet.create({
 	scrim: { backgroundColor: COMPOSER_COLORS.scrim },
-	anchor: { flex: 1, justifyContent: "flex-end" },
+	anchor: {
+		flex: 1,
+		justifyContent: "flex-end",
+		paddingTop: COMPOSER_METRICS.gap,
+	},
+	suggestions: {
+		flexShrink: 1,
+		paddingHorizontal: COMPOSER_METRICS.edgeInset,
+	},
 	stack: {
 		paddingHorizontal: COMPOSER_METRICS.edgeInset,
 		paddingTop: COMPOSER_METRICS.gap,
 		paddingBottom: COMPOSER_METRICS.gap,
 		gap: COMPOSER_METRICS.gap,
 	},
-	chips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+	chips: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		paddingHorizontal: COMPOSER_METRICS.edgeInset - 2,
+		paddingTop: 10,
+	},
 	card: {
 		backgroundColor: COMPOSER_COLORS.card,
 		borderColor: COMPOSER_COLORS.border,
@@ -463,6 +535,7 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		backgroundColor: COMPOSER_COLORS.control,
 	},
+	menuButtonPlain: { backgroundColor: "transparent", paddingHorizontal: 6 },
 	menuIcon: { width: 16, height: 16, borderRadius: 4 },
 	avatar: {
 		backgroundColor: COMPOSER_COLORS.border,

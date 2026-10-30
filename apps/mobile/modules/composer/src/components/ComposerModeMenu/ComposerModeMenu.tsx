@@ -1,10 +1,9 @@
-import { Check } from "lucide-react-native";
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, StyleSheet } from "react-native";
 import type { ComposerModeOption } from "../../Composer.types";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "../../constants";
 import { symbolIcon } from "../../utils/symbolIcon";
+import { ComposerMenuSheet } from "../ComposerMenuSheet";
 
 interface ComposerModeMenuProps {
 	options: ComposerModeOption[];
@@ -18,7 +17,6 @@ export function ComposerModeMenu({
 	onSelect,
 }: ComposerModeMenuProps) {
 	const [open, setOpen] = useState(false);
-	const insets = useSafeAreaInsets();
 	const selected = options.find((option) => option.id === selectedId);
 	const SelectedIcon = symbolIcon(selected?.symbol ?? options[0]?.symbol ?? "");
 
@@ -33,42 +31,17 @@ export function ComposerModeMenu({
 			>
 				<SelectedIcon color={COMPOSER_COLORS.foreground} size={18} />
 			</Pressable>
-			<Modal
-				transparent
-				animationType="fade"
+			<ComposerMenuSheet
 				visible={open}
-				onRequestClose={() => setOpen(false)}
-				statusBarTranslucent
-				navigationBarTranslucent
-			>
-				<Pressable style={styles.scrim} onPress={() => setOpen(false)}>
-					<View style={[styles.sheet, { marginBottom: insets.bottom + 12 }]}>
-						{options.map((option) => {
-							const OptionIcon = symbolIcon(option.symbol);
-							return (
-								<Pressable
-									key={option.id}
-									accessibilityRole="menuitem"
-									onPress={() => {
-										setOpen(false);
-										onSelect?.(option.id);
-									}}
-									style={({ pressed }) => [
-										styles.row,
-										pressed && styles.rowPressed,
-									]}
-								>
-									<OptionIcon color={COMPOSER_COLORS.foreground} size={18} />
-									<Text style={styles.label}>{option.label}</Text>
-									{option.id === selectedId ? (
-										<Check color={COMPOSER_COLORS.foreground} size={18} />
-									) : null}
-								</Pressable>
-							);
-						})}
-					</View>
-				</Pressable>
-			</Modal>
+				items={options.map((option) => ({
+					id: option.id,
+					label: option.label,
+					icon: symbolIcon(option.symbol),
+					checked: option.id === selectedId,
+				}))}
+				onSelect={(id) => onSelect?.(id)}
+				onClose={() => setOpen(false)}
+			/>
 		</>
 	);
 }
@@ -82,26 +55,4 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	scrim: {
-		flex: 1,
-		justifyContent: "flex-end",
-		backgroundColor: COMPOSER_COLORS.scrim,
-		paddingHorizontal: COMPOSER_METRICS.edgeInset,
-	},
-	sheet: {
-		backgroundColor: COMPOSER_COLORS.card,
-		borderColor: COMPOSER_COLORS.border,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderRadius: 16,
-		paddingVertical: 6,
-	},
-	row: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 12,
-		paddingHorizontal: 16,
-		paddingVertical: 14,
-	},
-	rowPressed: { backgroundColor: COMPOSER_COLORS.control },
-	label: { flex: 1, color: COMPOSER_COLORS.foreground, fontSize: 16 },
 });

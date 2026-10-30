@@ -44,14 +44,12 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 ## Missing after the MVP
 
 - Dictation (`onDictationError` never fires): Android `SpeechRecognizer` needs a native module.
-- Slash command suggestions (`slashCommands`).
-- Session tabs (`sessionTabs`, its callbacks and labels).
-- Quick keys and the quick-keys action (`quickKeys`, `quickKeysAction`). The lucide map exists for
-  them already.
-- Paste of images and files (`onPaste`): RN `TextInput` takes text only.
+- Paste of images and files (`onPaste`): RN 0.88 `TextInput` has no paste event and takes text
+  only. Text paste works through the system menu. Images need a native module.
 - PDF and document thumbnails: `fileThumbnail` returns `null` for files that are not images.
 - Swipe-down on the grabber to dismiss, animated collapse, upload rings drawn as rings (the MVP draws
   a dimmed thumbnail with a percentage).
+- The quick-keys action takes its room at once; iOS animates the keys sliding over.
 
 ## Progress
 
@@ -63,6 +61,18 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
   `isSending`, `canStop`/`onStop`, `clear`, `appendDraft`, the mode menu, `presentImage` and
   `fileThumbnail`. Home and the workspace screen are not verified yet: they need a signed-in session
   against a local API.
+- [x] (2026-10-29) Header chips moved into the card, so the Home project chip no longer sits over the
+  list header behind the composer.
+- [x] (2026-10-29) Session tabs (pills, attention dots, close disc, press-and-hold menu, scroll-back
+  chevron, new and all sessions), quick keys and the quick-keys action, and slash suggestions
+  (`utils/slashSuggestions`, the same matching as iOS `ComposerSlashMatching`). One bottom
+  `ComposerMenuSheet` serves the mode menu and the tab menu.
+- [x] (2026-10-29) Verified on `Paradev_A2` (emulator-5556) against the local API: Home new chat
+  (chip in the card, keyboard lift, no slash panel since Home passes no commands); the real
+  `TerminalComposer` through a temporary route with stand-in tabs, keys and commands (every
+  callback, menu, chevron, slash filter and commit, submit and clear); the Page reply bar
+  `ComposerCard` with a seeded thread (lift, post). The workspace screen with a live host is not
+  verified: no host-service was connected.
 
 ## Surprises & Discoveries
 
@@ -74,10 +84,18 @@ piece at a time, for example a `fileThumbnail` with `PdfRenderer` or dictation w
 - Back lowers the keyboard without blurring the field, so the composer blurs on `keyboardDidHide`.
 - `CI=1 expo start` turns off Metro's file watcher: a cold restart still gets the old bundle.
 - The emulator shows the soft keyboard only after the first key input; it is not an app bug.
+- `TerminalComposer` wrapped the composer in a plain `<View>` with no size. The iOS view draws in
+  its own overlay, so it never mattered there; the Android overlay sized itself to that 0×0 view
+  and drew nothing. The wrapper now fills the screen with `box-none`.
+- `android-dev.sh` reused its saved Metro port even when another worktree's Metro held it, and
+  loaded that worktree's bundle. It now reuses the port only while its own Metro runs or the port
+  is free.
 
 ## Decision Log
 
 | Date | Decision |
 |---|---|
 | 2026-10-29 | React Native over a Kotlin module, for the reasons in the table above. |
+| 2026-10-29 | Header chips sit inside the card, at its top, rather than floating above it. |
+| 2026-10-29 | Context menus (tab press-and-hold, mode) are one bottom sheet; Android has no SwiftUI `Menu`. |
 | 2026-10-29 | Expanded means focused. The collapsed row shows a one-line label over a transparent field, rather than restyling the field, so the head of a long draft shows with an ellipsis, as on iOS. |
