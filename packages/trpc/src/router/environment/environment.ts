@@ -18,6 +18,7 @@ import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import {
 	buildSandboxClaim,
 	deleteSandbox,
+	environmentRepositoryRows,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
@@ -320,6 +321,27 @@ async function latestBuilds(
 			toBuildView(build, sourceRefs.get(build.environmentId) ?? ""),
 		]),
 	);
+}
+
+async function startRepositoriesBuild(args: {
+	environmentId: string;
+	userId: string;
+	repositoryIds?: readonly string[];
+	primaryRepositoryId?: string;
+}): Promise<string> {
+	try {
+		const build = await startEnvironmentBuild({
+			environmentId: args.environmentId,
+			trigger: "repositories",
+			startedByUserId: args.userId,
+			repositoryIds: args.repositoryIds,
+			primaryRepositoryId: args.primaryRepositoryId,
+		});
+		return build.id;
+	} catch (error) {
+		if (error instanceof BuildRefused) throw buildRefusalError(error);
+		throw error;
+	}
 }
 
 const BUILD_PAGE_MAX = 100;
@@ -855,6 +877,11 @@ export const environmentRouter = {
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
 				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
+				/**
+				 * Build the environment with the new repositories instead of
+				 * refusing to change them once it has a snapshot.
+				 */
+				startBuild: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -866,18 +893,36 @@ export const environmentRouter = {
 			const changesPrimary =
 				input.primaryRepositoryId !== undefined &&
 				input.primaryRepositoryId !== current.primaryRepositoryId;
-			if (
-				(input.repositoryIds || changesPrimary) &&
-				current.sourceKind !== "image"
-			) {
-				throw userError({
-					code: "FORBIDDEN",
-					message:
-						"This environment's repositories are fixed; promote a workspace again to change them",
-					i18nKey: "serverError.environment.repositoriesFrozen",
+			const changesRepositories =
+				Boolean(input.repositoryIds) || changesPrimary;
+			let pendingBuildId: string | null = null;
+			if (changesRepositories && current.sourceKind !== "image") {
+				if (!input.startBuild) {
+					throw userError({
+						code: "FORBIDDEN",
+						message:
+							"This environment's repositories are fixed; promote a workspace again to change them",
+						i18nKey: "serverError.environment.repositoriesFrozen",
+					});
+				}
+				const repositoryIds =
+					input.repositoryIds ??
+					(await environmentRepositoryRows(current.id)).map((row) => row.id);
+				const primaryRepositoryId =
+					input.primaryRepositoryId ?? current.primaryRepositoryId;
+				if (
+					!primaryRepositoryId ||
+					!repositoryIds.includes(primaryRepositoryId)
+				) {
+					throw primaryNotIncluded();
+				}
+				pendingBuildId = await startRepositoriesBuild({
+					environmentId: current.id,
+					userId: ctx.userId,
+					repositoryIds,
+					primaryRepositoryId,
 				});
-			}
-			if (input.repositoryIds) {
+			} else if (input.repositoryIds) {
 				const primaryRepositoryId =
 					input.primaryRepositoryId ?? current.primaryRepositoryId;
 				if (!primaryRepositoryId) throw primaryNotIncluded();
@@ -907,15 +952,25 @@ export const environmentRouter = {
 					? { createdByUserId: personalOwner(current, ctx.userId) }
 					: {}),
 			};
+			if (
+				changesRepositories &&
+				current.sourceKind === "image" &&
+				input.startBuild
+			) {
+				pendingBuildId = await startRepositoriesBuild({
+					environmentId: current.id,
+					userId: ctx.userId,
+				});
+			}
 			if (Object.keys(patch).length === 0) {
-				return loadEnvironment(input.id, ctx);
+				return { ...(await loadEnvironment(input.id, ctx)), pendingBuildId };
 			}
 			const [row] = await db
 				.update(environments)
 				.set(patch)
 				.where(eq(environments.id, input.id))
 				.returning();
-			return row;
+			return row && { ...row, pendingBuildId };
 		}),
 
 	archive: jwtProcedure

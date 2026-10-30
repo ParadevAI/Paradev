@@ -2,7 +2,11 @@ import type {
 	EnvironmentBuildKind,
 	EnvironmentBuildStatus,
 } from "@superset/db/schema";
-import { sandboxCheckoutDir } from "@superset/shared/sandbox-contract";
+import {
+	SANDBOX_ROOT_CHECKOUT,
+	sandboxCheckoutDir,
+	sandboxRepositoryPath,
+} from "@superset/shared/sandbox-contract";
 
 export const KEPT_GOLDENS = 5;
 export const STALE_BUILD_MS = 10 * 60 * 1000;
@@ -25,6 +29,41 @@ export const DEFAULT_BUILD_BUDGETS: BuildBudgets = {
 /** An environment without a golden can only be built from the image. */
 export function buildKind(sourceKind: "image" | "fork"): EnvironmentBuildKind {
 	return sourceKind === "image" ? "fresh" : "incremental";
+}
+
+type CheckoutRepository = { id: string; owner: string; name: string };
+
+/**
+ * A repository change a fork cannot absorb: another primary, or a kept
+ * repository whose checkout moves (one repository sits at the root, several
+ * in subdirectories, and a name clash adds the owner).
+ */
+export function checkoutLayoutMoves(args: {
+	current: readonly CheckoutRepository[];
+	currentPrimaryId: string | null;
+	next: readonly CheckoutRepository[];
+	nextPrimaryId: string;
+}): boolean {
+	if (args.currentPrimaryId !== args.nextPrimaryId) return true;
+	return args.next.some((repository) => {
+		const before = args.current.find((row) => row.id === repository.id);
+		return (
+			before !== undefined &&
+			sandboxRepositoryPath(before, args.current) !==
+				sandboxRepositoryPath(repository, args.next)
+		);
+	});
+}
+
+/** Checkout paths of repositories the build no longer checks out. */
+export function removedCheckoutPaths(args: {
+	current: readonly CheckoutRepository[];
+	nextIds: readonly string[];
+}): string[] {
+	return args.current
+		.filter((repository) => !args.nextIds.includes(repository.id))
+		.map((repository) => sandboxRepositoryPath(repository, args.current))
+		.filter((path) => path !== SANDBOX_ROOT_CHECKOUT);
 }
 
 /** A running build whose job died never finishes on its own. */
@@ -84,8 +123,12 @@ export interface BuildCheckout {
 export function checkoutScript(args: {
 	root: string;
 	checkouts: readonly BuildCheckout[];
+	remove?: readonly string[];
 }): string {
 	const lines = ["set -euo pipefail"];
+	for (const path of args.remove ?? []) {
+		lines.push(`rm -rf ${quote(sandboxCheckoutDir(args.root, path))}`);
+	}
 	for (const checkout of args.checkouts) {
 		const dir = quote(sandboxCheckoutDir(args.root, checkout.path));
 		const url = quote(checkout.url);

@@ -11,6 +11,7 @@ import { deriveSandboxCredentials } from "../credentials";
 import { readRepoHooks } from "../repo-hooks";
 import {
 	cloneUrl,
+	environmentRepositoryRows,
 	installationTokenFor,
 	loadRepositories,
 	RepositoryError,
@@ -31,6 +32,7 @@ import {
 	failureTail,
 	goldensToDelete,
 	installScript,
+	removedCheckoutPaths,
 } from "./policy";
 import { type BuildStore, buildStore } from "./store";
 
@@ -44,6 +46,7 @@ export interface BuildInputs {
 	install: ResolvedPhase | null;
 	installSource: string;
 	checkouts: BuildCheckout[];
+	removedPaths: string[];
 	networkPolicy: NetworkPolicy;
 	env: Record<string, string>;
 }
@@ -115,9 +118,10 @@ async function prepareBuild(
 	];
 	const baseBranch = build.baseBranch ?? primary.defaultBranch;
 	const token = await installationTokenFor(ordered);
-	const [hooks, environment] = await Promise.all([
+	const [hooks, environment, current] = await Promise.all([
 		readRepoHooks({ repo: primary, branch: baseBranch, token }),
 		resolveEnvironment(build.environmentId, build.organizationId),
+		environmentRepositoryRows(build.environmentId),
 	]);
 	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
 		workspaceId: build.id,
@@ -135,6 +139,10 @@ async function prepareBuild(
 				repository.id === primary.id ? baseBranch : repository.defaultBranch,
 			path: sandboxRepositoryPath(repository, ordered),
 		})),
+		removedPaths:
+			build.kind === "incremental"
+				? removedCheckoutPaths({ current, nextIds: build.repositoryIds })
+				: [],
 		networkPolicy,
 		env: { ...managedEnv, SUPERSET_ENV: "cloud" },
 	};
@@ -206,6 +214,7 @@ export async function rebuildEnvironment(
 			script: checkoutScript({
 				root: SANDBOX_PATHS.workspace,
 				checkouts: inputs.checkouts,
+				remove: inputs.removedPaths,
 			}),
 			env: inputs.env,
 			timeoutMs: remaining("the checkout"),
