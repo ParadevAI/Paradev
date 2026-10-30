@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { SymbolButtonGlyph } from "./components/SymbolButtonGlyph";
 import { SYMBOL_ICONS } from "./constants";
 import type { SymbolButtonComponent } from "./SymbolButton.types";
 
@@ -23,14 +24,13 @@ export const SymbolButton: SymbolButtonComponent = ({
 	onSelect,
 	style,
 }) => {
-	const glyph = SYMBOL_ICONS[systemImage];
 	const content = (
-		<View
-			className="flex-1 items-center justify-center"
-			style={{ opacity: enabled ? 1 : 0.4 }}
-		>
-			{glyph ? <Icon as={glyph} size={size} color={tint} /> : null}
-		</View>
+		<SymbolButtonGlyph
+			systemImage={systemImage}
+			size={size}
+			tint={tint}
+			enabled={enabled}
+		/>
 	);
 
 	if (!items) {
