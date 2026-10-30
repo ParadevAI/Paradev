@@ -120,16 +120,10 @@ export const agentSessions = pgTable(
 		taskId: uuid("task_id").references(() => tasks.id, {
 			onDelete: "set null",
 		}),
-		title: text(),
 		role: agentTaskRole(),
 		taskStatus: agentTaskStatus("task_status"),
-		/** A task for the same issue or pull request is refused while this one is active. */
-		dedupeKey: text("dedupe_key"),
 		/** What the main session asked the task to do; sent when the task starts. */
 		instructions: text(),
-		/** The task's last reply, which its parent reads. */
-		result: text(),
-		pullRequestUrl: text("pull_request_url"),
 		environmentId: uuid("environment_id").references(() => environments.id, {
 			onDelete: "set null",
 		}),
@@ -150,11 +144,6 @@ export const agentSessions = pgTable(
 		uniqueIndex("agent_sessions_thread_unique")
 			.on(t.agentId, t.threadRootId)
 			.where(sql`${t.kind} = 'thread'`),
-		uniqueIndex("agent_sessions_active_task_dedupe_unique")
-			.on(t.agentId, t.dedupeKey)
-			.where(
-				sql`${t.dedupeKey} is not null and ${t.taskStatus} in ('queued', 'running')`,
-			),
 		index("agent_sessions_parent_idx").on(t.parentSessionId),
 		index("agent_sessions_task_idx").on(t.taskId),
 		uniqueIndex("agent_sessions_active_writer_per_task_unique")
