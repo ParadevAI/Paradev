@@ -194,7 +194,7 @@ msgstr "{0, plural, one {# pendente} other {# pendentes}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, one {# pessoa} other {# pessoas}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# projeto selecionado.} other {# projetos selecionados.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# projeto} other {# projetos}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1 cookie — esquecer este site"
 msgid "1 hr"
 msgstr "1 h"
 
-msgid "1 person"
-msgstr "1 pessoa"
-
 msgid "1 user"
 msgstr "1 usuário"
 
@@ -1850,6 +1846,9 @@ msgstr "Adicionar uma descrição"
 
 msgid "Add a description…"
 msgstr "Adicione uma descrição…"
+
+msgid "Add a filter"
+msgstr "Adicionar filtro"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Adicione um script de execução de ciclo de vida nas Configurações do projeto ou marque um script de terminal como a execução da área de trabalho."
@@ -2811,6 +2810,9 @@ msgstr "Arquivado · {0}"
 msgid "Archived {0}"
 msgstr "Arquivado {0}"
 
+msgid "Archived shown"
+msgstr "Arquivadas exibidas"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Tem certeza de que quer excluir este arquivo? Não dá para desfazer."
 
@@ -3676,6 +3678,9 @@ msgstr "Dá para padronizar os tooltips do app inteiro?"
 
 msgid "Can’t check {hostName}"
 msgstr "Não foi possível verificar {hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "Não é possível recolher a seção da área de trabalho atual"
 
 msgid "Can't connect right now"
 msgstr "Não foi possível conectar agora"
@@ -6136,6 +6141,13 @@ msgstr "Criando…"
 msgid "Creative Manager, Valid"
 msgstr "Gerente criativo, Valid"
 
+msgid "Creator"
+msgstr "Criador"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Criador: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "As credenciais ficam no servidor"
 
@@ -6475,6 +6487,10 @@ msgstr "Excluir esta área de trabalho?"
 
 msgid "Delete thread"
 msgstr "Excluir thread"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "Excluir visualização {0}"
 
 msgid "Delete without checking"
 msgstr "Excluir sem verificar"
@@ -6867,6 +6883,9 @@ msgstr "descartou a revisão"
 msgid "Display"
 msgstr "Exibição"
 
+msgid "Display options"
+msgstr "Opções de exibição"
+
 msgid "Display Size"
 msgstr "Tamanho da exibição"
 
@@ -7091,6 +7110,9 @@ msgstr "ex.: engenharia"
 
 msgid "e.g. Engineering"
 msgstr "ex.: Engenharia"
+
+msgid "e.g. My cloud reviews"
+msgstr "ex.: Minhas revisões na nuvem"
 
 msgid "e.g. plan-budget"
 msgstr "ex.: plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "Filtrar por revisões"
 msgid "Filter by state"
 msgstr "Filtrar por estado"
 
-msgid "Filter by where workspaces run"
-msgstr "Filtrar por onde as áreas de trabalho são executadas"
-
 msgid "Filter by workspace: {label}"
 msgstr "Filtrar por área de trabalho: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "Agrupar por"
 msgid "Group new branches under a folder."
 msgstr "Agrupa as novas branches em uma pasta."
 
+msgid "Grouping"
+msgstr "Agrupamento"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "Arquiteto de GTM e automação com IA, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "Host"
 
 msgid "Host ID"
 msgstr "ID do host"
+
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "O host não está online"
@@ -9460,9 +9485,6 @@ msgstr "em uma nova sessão"
 
 msgid "in a terminal on this host."
 msgstr "em um terminal neste host."
-
-msgid "In all projects"
-msgstr "Em todos os projetos"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Em poucos meses, <0>dezenas de milhares de pessoas de engenharia</0> passaram a usar o Paradev como IDE principal, em empresas como Wix, DoorDash e Netflix."
@@ -10119,6 +10141,9 @@ msgstr "Última atividade"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Última atividade do agente {0}"
+
+msgid "Last agent message"
+msgstr "Última mensagem do agente"
 
 msgid "Last attached"
 msgstr "Última conexão"
@@ -11386,6 +11411,9 @@ msgstr "Precisam de atenção"
 msgid "Needs input"
 msgstr "Precisa de resposta"
 
+msgid "Needs me"
+msgstr "Precisa de mim"
+
 msgid "Needs tests"
 msgstr "Precisa de testes"
 
@@ -11516,6 +11544,9 @@ msgstr "Novo terminal"
 
 msgid "New Terminal"
 msgstr "Novo terminal"
+
+msgid "New view"
+msgstr "Nova visualização"
 
 msgid "New window"
 msgstr "Nova janela"
@@ -13240,6 +13271,9 @@ msgstr "Chat de orquestração"
 msgid "Orchestration guide"
 msgstr "Guia de orquestração"
 
+msgid "Ordering"
+msgstr "Ordenação"
+
 msgid "Organization"
 msgstr "Organização"
 
@@ -14294,6 +14328,10 @@ msgstr "Ícone do projeto"
 msgid "Project imported and selected."
 msgstr "Projeto importado e selecionado."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Projeto: {0}"
+
 msgid "Project is already at that location"
 msgstr "O projeto já está nesse local"
 
@@ -14990,6 +15028,9 @@ msgstr "Remover {name}"
 
 msgid "Remove attachment"
 msgstr "Remover anexo"
+
+msgid "Remove filter"
+msgstr "Remover filtro"
 
 msgid "Remove from channel"
 msgstr "Remover do canal"
@@ -15916,6 +15957,9 @@ msgstr "Salvar tudo"
 msgid "Save as environment"
 msgstr "Salvar como ambiente"
 
+msgid "Save as view"
+msgstr "Salvar como visualização"
+
 msgid "Save Changes"
 msgstr "Salvar alterações"
 
@@ -15948,6 +15992,9 @@ msgstr "Salve para obter a URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "Economize até {maxDiscount}"
+
+msgid "Save view"
+msgstr "Salvar visualização"
 
 msgid "Saved"
 msgstr "Salvo"
@@ -17659,6 +17706,10 @@ msgstr "Status"
 
 msgid "Status changed"
 msgstr "Status alterado"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Status: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "Manter a conexão (refresh tokens)"
@@ -19656,6 +19707,9 @@ msgstr "Autor desconhecido"
 msgid "Unknown command /{name}"
 msgstr "Comando desconhecido /{name}"
 
+msgid "Unknown creator"
+msgstr "Criador desconhecido"
+
 msgid "Unknown device"
 msgstr "Dispositivo desconhecido"
 
@@ -19673,6 +19727,9 @@ msgstr "Painel desconhecido"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Tipo de painel desconhecido: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Pessoa desconhecida"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "A seguir"
 
 msgid "Up Next"
 msgstr "A seguir"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "Até {MAX_SAVED_VIEWS} visualizações salvas"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Até 25. Uma execução começa quando qualquer um deles dispara."
@@ -20171,6 +20231,9 @@ msgstr "Ver log"
 
 msgid "View more"
 msgstr "Ver mais"
+
+msgid "View name"
+msgstr "Nome da visualização"
 
 msgid "View on GitHub"
 msgstr "Ver no GitHub"
@@ -20722,9 +20785,6 @@ msgstr "Detalhes da área de trabalho"
 msgid "Workspace ID copied"
 msgstr "ID da área de trabalho copiado"
 
-msgid "Workspace layout"
-msgstr "Layout das áreas de trabalho"
-
 msgid "Workspace name"
 msgstr "Nome do espaço de trabalho"
 
@@ -20763,6 +20823,9 @@ msgstr "Execução da área de trabalho: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Configurações da área de trabalho"
+
+msgid "Workspace views"
+msgstr "Visualizações de áreas de trabalho"
 
 msgid "Workspace worktree not available"
 msgstr "A worktree da área de trabalho não está disponível"

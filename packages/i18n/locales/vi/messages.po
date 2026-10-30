@@ -194,7 +194,7 @@ msgstr "{0, plural, one {# đang chờ} other {# đang chờ}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# người}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {Đã chọn # dự án.} other {Đã chọn # dự án.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# dự án} other {# dự án}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1 cookie — quên trang này"
 msgid "1 hr"
 msgstr "1 giờ"
 
-msgid "1 person"
-msgstr "1 người"
-
 msgid "1 user"
 msgstr "1 người dùng"
 
@@ -1850,6 +1846,9 @@ msgstr "Thêm mô tả"
 
 msgid "Add a description…"
 msgstr "Thêm mô tả…"
+
+msgid "Add a filter"
+msgstr "Thêm bộ lọc"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Hãy thêm một script chạy vòng đời trong Cài đặt dự án hoặc đánh dấu một script terminal làm lệnh chạy của workspace."
@@ -2811,6 +2810,9 @@ msgstr "Đã lưu trữ · {0}"
 msgid "Archived {0}"
 msgstr "Đã lưu trữ {0}"
 
+msgid "Archived shown"
+msgstr "Đang hiện mục đã lưu trữ"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Bạn chắc chắn muốn xóa tệp này? Không thể hoàn tác."
 
@@ -3676,6 +3678,9 @@ msgstr "Bạn chuẩn hóa tooltip trên toàn ứng dụng được không?"
 
 msgid "Can’t check {hostName}"
 msgstr "Không thể kiểm tra {hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "Không thể thu gọn mục của workspace hiện tại"
 
 msgid "Can't connect right now"
 msgstr "Chưa thể kết nối lúc này"
@@ -6136,6 +6141,13 @@ msgstr "Đang tạo…"
 msgid "Creative Manager, Valid"
 msgstr "Quản lý sáng tạo, Valid"
 
+msgid "Creator"
+msgstr "Người tạo"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Người tạo: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "Thông tin xác thực được giữ trên máy chủ"
 
@@ -6475,6 +6487,10 @@ msgstr "Xóa workspace này?"
 
 msgid "Delete thread"
 msgstr "Xóa luồng"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "Xóa chế độ xem {0}"
 
 msgid "Delete without checking"
 msgstr "Xóa mà không kiểm tra"
@@ -6867,6 +6883,9 @@ msgstr "đã hủy review của mình"
 msgid "Display"
 msgstr "Hiển thị"
 
+msgid "Display options"
+msgstr "Tùy chọn hiển thị"
+
 msgid "Display Size"
 msgstr "Kích thước hiển thị"
 
@@ -7091,6 +7110,9 @@ msgstr "ví dụ engineering"
 
 msgid "e.g. Engineering"
 msgstr "ví dụ Engineering"
+
+msgid "e.g. My cloud reviews"
+msgstr "vd: Đánh giá cloud của tôi"
 
 msgid "e.g. plan-budget"
 msgstr "vd: plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "Lọc theo review"
 msgid "Filter by state"
 msgstr "Lọc theo trạng thái"
 
-msgid "Filter by where workspaces run"
-msgstr "Lọc theo nơi workspace chạy"
-
 msgid "Filter by workspace: {label}"
 msgstr "Lọc theo workspace: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "Nhóm theo"
 msgid "Group new branches under a folder."
 msgstr "Gom các nhánh mới vào một thư mục."
 
+msgid "Grouping"
+msgstr "Nhóm theo"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "Kiến trúc sư GTM & tự động hóa AI, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "Host"
 
 msgid "Host ID"
 msgstr "ID host"
+
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "Host không trực tuyến"
@@ -9460,9 +9485,6 @@ msgstr "trong phiên mới"
 
 msgid "in a terminal on this host."
 msgstr "trong một terminal trên host này."
-
-msgid "In all projects"
-msgstr "Trong tất cả dự án"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
@@ -10119,6 +10141,9 @@ msgstr "Hoạt động gần nhất"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Agent hoạt động gần nhất {0}"
+
+msgid "Last agent message"
+msgstr "Tin nhắn agent gần nhất"
 
 msgid "Last attached"
 msgstr "Lần gắn cuối"
@@ -11386,6 +11411,9 @@ msgstr "Cần chú ý"
 msgid "Needs input"
 msgstr "Cần nhập thêm"
 
+msgid "Needs me"
+msgstr "Cần tôi xử lý"
+
 msgid "Needs tests"
 msgstr "Cần kiểm thử"
 
@@ -11516,6 +11544,9 @@ msgstr "Terminal mới"
 
 msgid "New Terminal"
 msgstr "Terminal mới"
+
+msgid "New view"
+msgstr "Chế độ xem mới"
 
 msgid "New window"
 msgstr "Cửa sổ mới"
@@ -13240,6 +13271,9 @@ msgstr "Chat điều phối"
 msgid "Orchestration guide"
 msgstr "Hướng dẫn điều phối"
 
+msgid "Ordering"
+msgstr "Sắp xếp"
+
 msgid "Organization"
 msgstr "Tổ chức"
 
@@ -14294,6 +14328,10 @@ msgstr "Biểu tượng dự án"
 msgid "Project imported and selected."
 msgstr "Đã nhập và chọn dự án."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Dự án: {0}"
+
 msgid "Project is already at that location"
 msgstr "Dự án đã ở vị trí đó"
 
@@ -14990,6 +15028,9 @@ msgstr "Xóa {name}"
 
 msgid "Remove attachment"
 msgstr "Xóa tệp đính kèm"
+
+msgid "Remove filter"
+msgstr "Bỏ bộ lọc"
 
 msgid "Remove from channel"
 msgstr "Xóa khỏi kênh"
@@ -15916,6 +15957,9 @@ msgstr "Lưu tất cả"
 msgid "Save as environment"
 msgstr "Lưu thành environment"
 
+msgid "Save as view"
+msgstr "Lưu thành chế độ xem"
+
 msgid "Save Changes"
 msgstr "Lưu thay đổi"
 
@@ -15948,6 +15992,9 @@ msgstr "Lưu để lấy URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "Tiết kiệm đến {maxDiscount}"
+
+msgid "Save view"
+msgstr "Lưu chế độ xem"
 
 msgid "Saved"
 msgstr "Đã lưu"
@@ -17659,6 +17706,10 @@ msgstr "Trạng thái"
 
 msgid "Status changed"
 msgstr "Trạng thái thay đổi"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Trạng thái: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "Duy trì kết nối (refresh token)"
@@ -19656,6 +19707,9 @@ msgstr "Tác giả không xác định"
 msgid "Unknown command /{name}"
 msgstr "Lệnh không xác định /{name}"
 
+msgid "Unknown creator"
+msgstr "Người tạo không xác định"
+
 msgid "Unknown device"
 msgstr "Thiết bị không rõ"
 
@@ -19673,6 +19727,9 @@ msgstr "Ngăn không xác định"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Loại ngăn không xác định: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Người không xác định"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "Sắp tới"
 
 msgid "Up Next"
 msgstr "Sắp tới"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "Tối đa {MAX_SAVED_VIEWS} chế độ xem đã lưu"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Tối đa 25. Một lượt chạy bắt đầu khi bất kỳ trigger nào kích hoạt."
@@ -20171,6 +20231,9 @@ msgstr "Xem log"
 
 msgid "View more"
 msgstr "Xem thêm"
+
+msgid "View name"
+msgstr "Tên chế độ xem"
 
 msgid "View on GitHub"
 msgstr "Xem trên GitHub"
@@ -20722,9 +20785,6 @@ msgstr "Chi tiết workspace"
 msgid "Workspace ID copied"
 msgstr "Đã sao chép ID workspace"
 
-msgid "Workspace layout"
-msgstr "Bố cục workspace"
-
 msgid "Workspace name"
 msgstr "Tên không gian làm việc"
 
@@ -20763,6 +20823,9 @@ msgstr "Lệnh chạy của workspace: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Cài đặt workspace"
+
+msgid "Workspace views"
+msgstr "Chế độ xem workspace"
 
 msgid "Workspace worktree not available"
 msgstr "Worktree của workspace không khả dụng"

@@ -194,7 +194,7 @@ msgstr "{0, plural, one {# pendiente} other {# pendientes}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, one {# persona} other {# personas}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# proyecto seleccionado.} other {# proyectos seleccionados.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proyecto} other {# proyectos}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1 cookie: olvidar este sitio"
 msgid "1 hr"
 msgstr "1 h"
 
-msgid "1 person"
-msgstr "1 persona"
-
 msgid "1 user"
 msgstr "1 usuario"
 
@@ -1850,6 +1846,9 @@ msgstr "Añadir una descripción"
 
 msgid "Add a description…"
 msgstr "Añade una descripción…"
+
+msgid "Add a filter"
+msgstr "Añadir un filtro"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Añade un script de ejecución del ciclo de vida en la configuración del proyecto o marca un script de terminal como la ejecución del espacio de trabajo."
@@ -2811,6 +2810,9 @@ msgstr "Archivado · {0}"
 msgid "Archived {0}"
 msgstr "Archivado {0}"
 
+msgid "Archived shown"
+msgstr "Archivados visibles"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "¿Seguro que quieres eliminar este archivo? Esta acción no se puede deshacer."
 
@@ -3676,6 +3678,9 @@ msgstr "¿Puedes unificar los tooltips de toda la app?"
 
 msgid "Can’t check {hostName}"
 msgstr "No se puede comprobar {hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "No se puede contraer la sección del espacio de trabajo actual"
 
 msgid "Can't connect right now"
 msgstr "No podemos conectar ahora"
@@ -6136,6 +6141,13 @@ msgstr "Creando…"
 msgid "Creative Manager, Valid"
 msgstr "Director creativo, Valid"
 
+msgid "Creator"
+msgstr "Creador"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Creador: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "Las credenciales permanecen en el servidor"
 
@@ -6475,6 +6487,10 @@ msgstr "¿Eliminar este espacio de trabajo?"
 
 msgid "Delete thread"
 msgstr "Eliminar el hilo"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "Eliminar la vista {0}"
 
 msgid "Delete without checking"
 msgstr "Eliminar sin comprobar"
@@ -6867,6 +6883,9 @@ msgstr "descartó su revisión"
 msgid "Display"
 msgstr "Visualización"
 
+msgid "Display options"
+msgstr "Opciones de visualización"
+
 msgid "Display Size"
 msgstr "Tamaño de pantalla"
 
@@ -7091,6 +7110,9 @@ msgstr "p. ej. ingenieria"
 
 msgid "e.g. Engineering"
 msgstr "p. ej. Ingeniería"
+
+msgid "e.g. My cloud reviews"
+msgstr "p. ej. Mis revisiones en la nube"
 
 msgid "e.g. plan-budget"
 msgstr "p. ej., plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "Filtrar por revisiones"
 msgid "Filter by state"
 msgstr "Filtrar por estado"
 
-msgid "Filter by where workspaces run"
-msgstr "Filtrar por dónde se ejecutan los espacios de trabajo"
-
 msgid "Filter by workspace: {label}"
 msgstr "Filtrar por espacio de trabajo: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "Agrupar por"
 msgid "Group new branches under a folder."
 msgstr "Agrupa las ramas nuevas dentro de una carpeta."
 
+msgid "Grouping"
+msgstr "Agrupación"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "Arquitecto de GTM y automatización con IA, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "Host"
 
 msgid "Host ID"
 msgstr "ID del host"
+
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "El host no está en línea"
@@ -9460,9 +9485,6 @@ msgstr "en una sesión nueva"
 
 msgid "in a terminal on this host."
 msgstr "en una terminal de este host."
-
-msgid "In all projects"
-msgstr "En todos los proyectos"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Paradev como su IDE principal, en empresas como Wix, DoorDash y Netflix."
@@ -10119,6 +10141,9 @@ msgstr "Última actividad"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Última actividad del agente {0}"
+
+msgid "Last agent message"
+msgstr "Último mensaje del agente"
 
 msgid "Last attached"
 msgstr "Última conexión"
@@ -11386,6 +11411,9 @@ msgstr "Necesita atención"
 msgid "Needs input"
 msgstr "Necesita entrada"
 
+msgid "Needs me"
+msgstr "Me necesita"
+
 msgid "Needs tests"
 msgstr "Necesita pruebas"
 
@@ -11516,6 +11544,9 @@ msgstr "Terminal nueva"
 
 msgid "New Terminal"
 msgstr "Nueva terminal"
+
+msgid "New view"
+msgstr "Nueva vista"
 
 msgid "New window"
 msgstr "Nueva ventana"
@@ -13240,6 +13271,9 @@ msgstr "Chat de orquestación"
 msgid "Orchestration guide"
 msgstr "Guía de orquestación"
 
+msgid "Ordering"
+msgstr "Orden"
+
 msgid "Organization"
 msgstr "Organización"
 
@@ -14294,6 +14328,10 @@ msgstr "Icono del proyecto"
 msgid "Project imported and selected."
 msgstr "Proyecto importado y seleccionado."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Proyecto: {0}"
+
 msgid "Project is already at that location"
 msgstr "El proyecto ya está en esa ubicación"
 
@@ -14990,6 +15028,9 @@ msgstr "Quitar a {name}"
 
 msgid "Remove attachment"
 msgstr "Quitar adjunto"
+
+msgid "Remove filter"
+msgstr "Quitar filtro"
 
 msgid "Remove from channel"
 msgstr "Quitar del canal"
@@ -15916,6 +15957,9 @@ msgstr "Guardar todo"
 msgid "Save as environment"
 msgstr "Guardar como entorno"
 
+msgid "Save as view"
+msgstr "Guardar como vista"
+
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
@@ -15948,6 +15992,9 @@ msgstr "Guarda para obtener la URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "Ahorra hasta un {maxDiscount}"
+
+msgid "Save view"
+msgstr "Guardar vista"
 
 msgid "Saved"
 msgstr "Guardado"
@@ -17659,6 +17706,10 @@ msgstr "Estado"
 
 msgid "Status changed"
 msgstr "Estado modificado"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Estado: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "Mantener la conexión (tokens de actualización)"
@@ -19656,6 +19707,9 @@ msgstr "Autor desconocido"
 msgid "Unknown command /{name}"
 msgstr "Comando desconocido /{name}"
 
+msgid "Unknown creator"
+msgstr "Creador desconocido"
+
 msgid "Unknown device"
 msgstr "Dispositivo desconocido"
 
@@ -19673,6 +19727,9 @@ msgstr "Panel desconocido"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Tipo de panel desconocido: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Persona desconocida"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "A continuación"
 
 msgid "Up Next"
 msgstr "A continuación"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "Hasta {MAX_SAVED_VIEWS} vistas guardadas"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Hasta 25. Una ejecución empieza cuando salta cualquiera de ellos."
@@ -20171,6 +20231,9 @@ msgstr "Ver el log"
 
 msgid "View more"
 msgstr "Ver más"
+
+msgid "View name"
+msgstr "Nombre de la vista"
 
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
@@ -20722,9 +20785,6 @@ msgstr "Detalles del espacio de trabajo"
 msgid "Workspace ID copied"
 msgstr "ID del espacio de trabajo copiado"
 
-msgid "Workspace layout"
-msgstr "Diseño del espacio de trabajo"
-
 msgid "Workspace name"
 msgstr "Nombre del espacio de trabajo"
 
@@ -20763,6 +20823,9 @@ msgstr "Ejecución del espacio de trabajo: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Configuración del espacio de trabajo"
+
+msgid "Workspace views"
+msgstr "Vistas de espacios de trabajo"
 
 msgid "Workspace worktree not available"
 msgstr "El worktree del espacio de trabajo no está disponible"

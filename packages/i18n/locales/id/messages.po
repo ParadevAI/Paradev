@@ -194,7 +194,7 @@ msgstr "{0, plural, one {# tertunda} other {# tertunda}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# orang}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# proyek dipilih.} other {# proyek dipilih.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proyek} other {# proyek}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1 cookie — lupakan situs ini"
 msgid "1 hr"
 msgstr "1 jam"
 
-msgid "1 person"
-msgstr "1 orang"
-
 msgid "1 user"
 msgstr "1 pengguna"
 
@@ -1850,6 +1846,9 @@ msgstr "Tambahkan deskripsi"
 
 msgid "Add a description…"
 msgstr "Tambahkan deskripsi…"
+
+msgid "Add a filter"
+msgstr "Tambah filter"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Tambahkan skrip run lifecycle di Pengaturan Proyek atau tandai sebuah skrip terminal sebagai run workspace."
@@ -2811,6 +2810,9 @@ msgstr "Diarsipkan · {0}"
 msgid "Archived {0}"
 msgstr "Diarsipkan {0}"
 
+msgid "Archived shown"
+msgstr "Arsip ditampilkan"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Yakin ingin menghapus file ini? Tindakan ini tidak bisa dibatalkan."
 
@@ -3676,6 +3678,9 @@ msgstr "Bisakah kamu menyeragamkan tooltip di seluruh aplikasi?"
 
 msgid "Can’t check {hostName}"
 msgstr "Tidak dapat memeriksa {hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "Bagian workspace saat ini tidak bisa diciutkan"
 
 msgid "Can't connect right now"
 msgstr "Belum bisa terhubung"
@@ -6136,6 +6141,13 @@ msgstr "Membuat…"
 msgid "Creative Manager, Valid"
 msgstr "Manajer Kreatif, Valid"
 
+msgid "Creator"
+msgstr "Pembuat"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Pembuat: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "Kredensial tetap di server"
 
@@ -6475,6 +6487,10 @@ msgstr "Hapus workspace ini?"
 
 msgid "Delete thread"
 msgstr "Hapus thread"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "Hapus tampilan {0}"
 
 msgid "Delete without checking"
 msgstr "Hapus tanpa memeriksa"
@@ -6867,6 +6883,9 @@ msgstr "membatalkan ulasannya"
 msgid "Display"
 msgstr "Tampilan"
 
+msgid "Display options"
+msgstr "Opsi tampilan"
+
 msgid "Display Size"
 msgstr "Ukuran Tampilan"
 
@@ -7091,6 +7110,9 @@ msgstr "mis. engineering"
 
 msgid "e.g. Engineering"
 msgstr "mis. Engineering"
+
+msgid "e.g. My cloud reviews"
+msgstr "mis. Review cloud saya"
 
 msgid "e.g. plan-budget"
 msgstr "mis. plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "Filter menurut review"
 msgid "Filter by state"
 msgstr "Filter menurut status"
 
-msgid "Filter by where workspaces run"
-msgstr "Filter berdasarkan tempat workspace berjalan"
-
 msgid "Filter by workspace: {label}"
 msgstr "Filter menurut workspace: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "Kelompokkan menurut"
 msgid "Group new branches under a folder."
 msgstr "Kelompokkan branch baru di bawah satu folder."
 
+msgid "Grouping"
+msgstr "Pengelompokan"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "Arsitek GTM & Otomatisasi AI, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "Host"
 
 msgid "Host ID"
 msgstr "ID Host"
+
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "Host sedang tidak online"
@@ -9460,9 +9485,6 @@ msgstr "dalam sesi baru"
 
 msgid "in a terminal on this host."
 msgstr "di terminal pada host ini."
-
-msgid "In all projects"
-msgstr "Di semua proyek"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
@@ -10119,6 +10141,9 @@ msgstr "Aktivitas terakhir"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Aktivitas agen terakhir {0}"
+
+msgid "Last agent message"
+msgstr "Pesan agen terakhir"
 
 msgid "Last attached"
 msgstr "Terakhir terhubung"
@@ -11386,6 +11411,9 @@ msgstr "Perlu perhatian"
 msgid "Needs input"
 msgstr "Perlu input"
 
+msgid "Needs me"
+msgstr "Butuh saya"
+
 msgid "Needs tests"
 msgstr "Butuh tes"
 
@@ -11516,6 +11544,9 @@ msgstr "Terminal baru"
 
 msgid "New Terminal"
 msgstr "Terminal Baru"
+
+msgid "New view"
+msgstr "Tampilan baru"
 
 msgid "New window"
 msgstr "Jendela baru"
@@ -13240,6 +13271,9 @@ msgstr "Chat orkestrasi"
 msgid "Orchestration guide"
 msgstr "Panduan orkestrasi"
 
+msgid "Ordering"
+msgstr "Urutan"
+
 msgid "Organization"
 msgstr "Organisasi"
 
@@ -14294,6 +14328,10 @@ msgstr "Ikon proyek"
 msgid "Project imported and selected."
 msgstr "Proyek diimpor dan dipilih."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Proyek: {0}"
+
 msgid "Project is already at that location"
 msgstr "Proyek sudah berada di lokasi itu"
 
@@ -14990,6 +15028,9 @@ msgstr "Hapus {name}"
 
 msgid "Remove attachment"
 msgstr "Hapus lampiran"
+
+msgid "Remove filter"
+msgstr "Hapus filter"
 
 msgid "Remove from channel"
 msgstr "Hapus dari kanal"
@@ -15916,6 +15957,9 @@ msgstr "Simpan Semua"
 msgid "Save as environment"
 msgstr "Simpan sebagai environment"
 
+msgid "Save as view"
+msgstr "Simpan sebagai tampilan"
+
 msgid "Save Changes"
 msgstr "Simpan Perubahan"
 
@@ -15948,6 +15992,9 @@ msgstr "Simpan untuk dapat URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "Hemat hingga {maxDiscount}"
+
+msgid "Save view"
+msgstr "Simpan tampilan"
 
 msgid "Saved"
 msgstr "Tersimpan"
@@ -17659,6 +17706,10 @@ msgstr "Status"
 
 msgid "Status changed"
 msgstr "Status berubah"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Status: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "Tetap terhubung (refresh token)"
@@ -19656,6 +19707,9 @@ msgstr "Penulis tidak dikenal"
 msgid "Unknown command /{name}"
 msgstr "Perintah tidak dikenal /{name}"
 
+msgid "Unknown creator"
+msgstr "Pembuat tidak dikenal"
+
 msgid "Unknown device"
 msgstr "Perangkat tidak diketahui"
 
@@ -19673,6 +19727,9 @@ msgstr "Panel tidak dikenal"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Jenis panel tidak dikenal: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Orang tidak dikenal"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "Berikutnya"
 
 msgid "Up Next"
 msgstr "Berikutnya"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "Maksimal {MAX_SAVED_VIEWS} tampilan tersimpan"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Hingga 25. Run dimulai saat salah satunya aktif."
@@ -20171,6 +20231,9 @@ msgstr "Lihat log"
 
 msgid "View more"
 msgstr "Lihat selengkapnya"
+
+msgid "View name"
+msgstr "Nama tampilan"
 
 msgid "View on GitHub"
 msgstr "Lihat di GitHub"
@@ -20722,9 +20785,6 @@ msgstr "Detail workspace"
 msgid "Workspace ID copied"
 msgstr "ID workspace disalin"
 
-msgid "Workspace layout"
-msgstr "Tata letak workspace"
-
 msgid "Workspace name"
 msgstr "Nama workspace"
 
@@ -20763,6 +20823,9 @@ msgstr "Run workspace: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Pengaturan workspace"
+
+msgid "Workspace views"
+msgstr "Tampilan workspace"
 
 msgid "Workspace worktree not available"
 msgstr "Worktree workspace tidak tersedia"

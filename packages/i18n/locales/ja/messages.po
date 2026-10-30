@@ -194,7 +194,7 @@ msgstr "{0, plural, one {#件保留中} other {#件保留中}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# 人}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {#件のプロジェクトを選択中。} other {#件のプロジェクトを選択中。}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェクト}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1件のCookie — このサイトを削除"
 msgid "1 hr"
 msgstr "1時間"
 
-msgid "1 person"
-msgstr "1人"
-
 msgid "1 user"
 msgstr "1ユーザー"
 
@@ -1850,6 +1846,9 @@ msgstr "説明を追加"
 
 msgid "Add a description…"
 msgstr "説明を追加…"
+
+msgid "Add a filter"
+msgstr "フィルターを追加"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "プロジェクト設定でライフサイクルの実行スクリプトを追加するか、ターミナルスクリプトをワークスペース実行に指定してください。"
@@ -2811,6 +2810,9 @@ msgstr "アーカイブ済み · {0}"
 msgid "Archived {0}"
 msgstr "アーカイブ済み {0}"
 
+msgid "Archived shown"
+msgstr "アーカイブ済みを表示中"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "このファイルを削除してもよろしいですか?この操作は元に戻せません。"
 
@@ -3676,6 +3678,9 @@ msgstr "アプリ全体のtooltipを統一できますか?"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}を確認できません"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "現在のワークスペースのセクションは折りたためません"
 
 msgid "Can't connect right now"
 msgstr "現在接続できません"
@@ -6136,6 +6141,13 @@ msgstr "作成中…"
 msgid "Creative Manager, Valid"
 msgstr "クリエイティブマネージャー、Valid"
 
+msgid "Creator"
+msgstr "作成者"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "作成者: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "認証情報はサーバー上に保持されます"
 
@@ -6475,6 +6487,10 @@ msgstr "このワークスペースを削除しますか?"
 
 msgid "Delete thread"
 msgstr "スレッドを削除"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "ビュー {0} を削除"
 
 msgid "Delete without checking"
 msgstr "確認せずに削除"
@@ -6867,6 +6883,9 @@ msgstr "がレビューを取り下げました"
 msgid "Display"
 msgstr "表示"
 
+msgid "Display options"
+msgstr "表示オプション"
+
 msgid "Display Size"
 msgstr "表示サイズ"
 
@@ -7091,6 +7110,9 @@ msgstr "例: engineering"
 
 msgid "e.g. Engineering"
 msgstr "例: Engineering"
+
+msgid "e.g. My cloud reviews"
+msgstr "例: クラウドのレビュー"
 
 msgid "e.g. plan-budget"
 msgstr "例: plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "レビューで絞り込む"
 msgid "Filter by state"
 msgstr "状態で絞り込む"
 
-msgid "Filter by where workspaces run"
-msgstr "ワークスペースの実行場所で絞り込む"
-
 msgid "Filter by workspace: {label}"
 msgstr "ワークスペースで絞り込み: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "グループ化"
 msgid "Group new branches under a folder."
 msgstr "新しいブランチをフォルダにまとめます。"
 
+msgid "Grouping"
+msgstr "グループ化"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM・AI自動化アーキテクト、Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "ホスト"
 
 msgid "Host ID"
 msgstr "ホストID"
+
+msgid "Host is {whereLabel}"
+msgstr "ホスト: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "ホストがオンラインではありません"
@@ -9460,9 +9485,6 @@ msgstr "新しいセッションで"
 
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
-
-msgid "In all projects"
-msgstr "すべてのプロジェクト"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
@@ -10119,6 +10141,9 @@ msgstr "最終アクティビティ"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "エージェントの最終アクティビティ {0}"
+
+msgid "Last agent message"
+msgstr "最後のエージェントメッセージ"
 
 msgid "Last attached"
 msgstr "最終接続"
@@ -11386,6 +11411,9 @@ msgstr "要対応"
 msgid "Needs input"
 msgstr "入力待ち"
 
+msgid "Needs me"
+msgstr "要対応"
+
 msgid "Needs tests"
 msgstr "テストが必要"
 
@@ -11516,6 +11544,9 @@ msgstr "新しいターミナル"
 
 msgid "New Terminal"
 msgstr "新規ターミナル"
+
+msgid "New view"
+msgstr "新しいビュー"
 
 msgid "New window"
 msgstr "新規ウィンドウ"
@@ -13240,6 +13271,9 @@ msgstr "オーケストレーションチャット"
 msgid "Orchestration guide"
 msgstr "オーケストレーションガイド"
 
+msgid "Ordering"
+msgstr "並び順"
+
 msgid "Organization"
 msgstr "組織"
 
@@ -14294,6 +14328,10 @@ msgstr "プロジェクトアイコン"
 msgid "Project imported and selected."
 msgstr "プロジェクトをインポートして選択しました。"
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "プロジェクト: {0}"
+
 msgid "Project is already at that location"
 msgstr "プロジェクトはすでにその場所にあります"
 
@@ -14990,6 +15028,9 @@ msgstr "{name} を削除"
 
 msgid "Remove attachment"
 msgstr "添付ファイルを削除"
+
+msgid "Remove filter"
+msgstr "フィルターを削除"
 
 msgid "Remove from channel"
 msgstr "チャンネルから削除"
@@ -15916,6 +15957,9 @@ msgstr "すべて保存"
 msgid "Save as environment"
 msgstr "環境として保存"
 
+msgid "Save as view"
+msgstr "ビューとして保存"
+
 msgid "Save Changes"
 msgstr "変更を保存"
 
@@ -15948,6 +15992,9 @@ msgstr "保存するとURLが表示されます"
 
 msgid "Save up to {maxDiscount}"
 msgstr "最大{maxDiscount}お得"
+
+msgid "Save view"
+msgstr "ビューを保存"
 
 msgid "Saved"
 msgstr "保存済み"
@@ -17659,6 +17706,10 @@ msgstr "ステータス"
 
 msgid "Status changed"
 msgstr "ステータス変更"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "ステータス: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "接続の維持(リフレッシュトークン)"
@@ -19656,6 +19707,9 @@ msgstr "不明な作成者"
 msgid "Unknown command /{name}"
 msgstr "不明なコマンド /{name}"
 
+msgid "Unknown creator"
+msgstr "不明な作成者"
+
 msgid "Unknown device"
 msgstr "不明なデバイス"
 
@@ -19673,6 +19727,9 @@ msgstr "不明なペイン"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "不明なペインの種類: {paneKind}"
+
+msgid "Unknown person"
+msgstr "不明なユーザー"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "次の実行"
 
 msgid "Up Next"
 msgstr "次に着手"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "保存できるビューは {MAX_SAVED_VIEWS} 個まで"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "最大25個です。どれか1つが発火すると実行が始まります。"
@@ -20171,6 +20231,9 @@ msgstr "ログを表示"
 
 msgid "View more"
 msgstr "もっと見る"
+
+msgid "View name"
+msgstr "ビュー名"
 
 msgid "View on GitHub"
 msgstr "GitHubで表示"
@@ -20722,9 +20785,6 @@ msgstr "ワークスペースの詳細"
 msgid "Workspace ID copied"
 msgstr "ワークスペースIDをコピーしました"
 
-msgid "Workspace layout"
-msgstr "ワークスペースのレイアウト"
-
 msgid "Workspace name"
 msgstr "ワークスペース名"
 
@@ -20763,6 +20823,9 @@ msgstr "ワークスペース実行: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "ワークスペース設定"
+
+msgid "Workspace views"
+msgstr "ワークスペースのビュー"
 
 msgid "Workspace worktree not available"
 msgstr "ワークスペースのworktreeを利用できません"

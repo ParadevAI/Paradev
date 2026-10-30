@@ -194,7 +194,7 @@ msgstr "{0, plural, one {# beklemede} other {# beklemede}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, one {# kişi} other {# kişi}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {# proje seçildi.} other {# proje seçildi.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# proje} other {# proje}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1 çerez — bu siteyi unut"
 msgid "1 hr"
 msgstr "1 sa"
 
-msgid "1 person"
-msgstr "1 kişi"
-
 msgid "1 user"
 msgstr "1 kullanıcı"
 
@@ -1850,6 +1846,9 @@ msgstr "Açıklama ekle"
 
 msgid "Add a description…"
 msgstr "Açıklama ekleyin…"
+
+msgid "Add a filter"
+msgstr "Filtre ekle"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Proje Ayarları'nda bir yaşam döngüsü çalıştırma betiği ekleyin veya bir terminal betiğini çalışma alanı çalıştırması olarak işaretleyin."
@@ -2811,6 +2810,9 @@ msgstr "Arşivlendi · {0}"
 msgid "Archived {0}"
 msgstr "{0} arşivlendi"
 
+msgid "Archived shown"
+msgstr "Arşivlenenler gösteriliyor"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Bu dosyayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
 
@@ -3676,6 +3678,9 @@ msgstr "Uygulama genelindeki tooltip'leri standartlaştırabilir misin?"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName} kontrol edilemiyor"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "Geçerli çalışma alanının bölümü daraltılamaz"
 
 msgid "Can't connect right now"
 msgstr "Şu anda bağlanamıyoruz"
@@ -6136,6 +6141,13 @@ msgstr "Oluşturuluyor…"
 msgid "Creative Manager, Valid"
 msgstr "Kreatif Yönetici, Valid"
 
+msgid "Creator"
+msgstr "Oluşturan"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "Oluşturan: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "Kimlik bilgileri sunucuda kalır"
 
@@ -6475,6 +6487,10 @@ msgstr "Bu çalışma alanı silinsin mi?"
 
 msgid "Delete thread"
 msgstr "Konuyu sil"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "{0} görünümünü sil"
 
 msgid "Delete without checking"
 msgstr "Denetlemeden sil"
@@ -6867,6 +6883,9 @@ msgstr "incelemesini geri çekti"
 msgid "Display"
 msgstr "Görüntüleme"
 
+msgid "Display options"
+msgstr "Görüntüleme seçenekleri"
+
 msgid "Display Size"
 msgstr "Görüntü Boyutu"
 
@@ -7091,6 +7110,9 @@ msgstr "örn. muhendislik"
 
 msgid "e.g. Engineering"
 msgstr "örn. Mühendislik"
+
+msgid "e.g. My cloud reviews"
+msgstr "ör. Bulut incelemelerim"
 
 msgid "e.g. plan-budget"
 msgstr "ör. plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "İncelemeye göre filtrele"
 msgid "Filter by state"
 msgstr "Duruma göre filtrele"
 
-msgid "Filter by where workspaces run"
-msgstr "Çalışma alanlarının çalıştığı yere göre filtrele"
-
 msgid "Filter by workspace: {label}"
 msgstr "Çalışma alanına göre filtrele: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "Gruplama ölçütü"
 msgid "Group new branches under a folder."
 msgstr "Yeni dalları bir klasör altında toplayın."
 
+msgid "Grouping"
+msgstr "Gruplama"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM ve Yapay Zekâ Otomasyon Mimarı, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "Host"
 
 msgid "Host ID"
 msgstr "Host kimliği"
+
+msgid "Host is {whereLabel}"
+msgstr "Host: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "Host çevrimiçi değil"
@@ -9460,9 +9485,6 @@ msgstr "yeni bir oturumda"
 
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
-
-msgid "In all projects"
-msgstr "Tüm projelerde"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Paradev'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
@@ -10119,6 +10141,9 @@ msgstr "Son etkinlik"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "Son ajan etkinliği {0}"
+
+msgid "Last agent message"
+msgstr "Son ajan mesajı"
 
 msgid "Last attached"
 msgstr "Son bağlanma"
@@ -11386,6 +11411,9 @@ msgstr "İlgi bekliyor"
 msgid "Needs input"
 msgstr "Giriş gerekiyor"
 
+msgid "Needs me"
+msgstr "Bana ihtiyaç duyuyor"
+
 msgid "Needs tests"
 msgstr "Test gerekiyor"
 
@@ -11516,6 +11544,9 @@ msgstr "Yeni terminal"
 
 msgid "New Terminal"
 msgstr "Yeni terminal"
+
+msgid "New view"
+msgstr "Yeni görünüm"
 
 msgid "New window"
 msgstr "Yeni pencere"
@@ -13240,6 +13271,9 @@ msgstr "Orkestrasyon sohbeti"
 msgid "Orchestration guide"
 msgstr "Orkestrasyon rehberi"
 
+msgid "Ordering"
+msgstr "Sıralama"
+
 msgid "Organization"
 msgstr "Kuruluş"
 
@@ -14294,6 +14328,10 @@ msgstr "Proje simgesi"
 msgid "Project imported and selected."
 msgstr "Proje içe aktarıldı ve seçildi."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "Proje: {0}"
+
 msgid "Project is already at that location"
 msgstr "Proje zaten o konumda"
 
@@ -14990,6 +15028,9 @@ msgstr "{name} kaldır"
 
 msgid "Remove attachment"
 msgstr "Eki kaldır"
+
+msgid "Remove filter"
+msgstr "Filtreyi kaldır"
 
 msgid "Remove from channel"
 msgstr "Kanaldan çıkar"
@@ -15916,6 +15957,9 @@ msgstr "Tümünü kaydet"
 msgid "Save as environment"
 msgstr "Ortam olarak kaydet"
 
+msgid "Save as view"
+msgstr "Görünüm olarak kaydet"
+
 msgid "Save Changes"
 msgstr "Değişiklikleri Kaydet"
 
@@ -15948,6 +15992,9 @@ msgstr "URL için kaydedin"
 
 msgid "Save up to {maxDiscount}"
 msgstr "En fazla {maxDiscount} tasarruf"
+
+msgid "Save view"
+msgstr "Görünümü kaydet"
 
 msgid "Saved"
 msgstr "Kaydedildi"
@@ -17659,6 +17706,10 @@ msgstr "Durum"
 
 msgid "Status changed"
 msgstr "Durum değişti"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "Durum: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "Bağlı kalma (yenileme token'ları)"
@@ -19656,6 +19707,9 @@ msgstr "Bilinmeyen yazar"
 msgid "Unknown command /{name}"
 msgstr "Bilinmeyen komut /{name}"
 
+msgid "Unknown creator"
+msgstr "Bilinmeyen oluşturan"
+
 msgid "Unknown device"
 msgstr "Bilinmeyen cihaz"
 
@@ -19673,6 +19727,9 @@ msgstr "Bilinmeyen bölme"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "Bilinmeyen bölme türü: {paneKind}"
+
+msgid "Unknown person"
+msgstr "Bilinmeyen kişi"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "Sırada"
 
 msgid "Up Next"
 msgstr "Sırada"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "En fazla {MAX_SAVED_VIEWS} kayıtlı görünüm"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "En fazla 25. Herhangi biri çalıştığında bir çalıştırma başlar."
@@ -20171,6 +20231,9 @@ msgstr "Günlüğü görüntüle"
 
 msgid "View more"
 msgstr "Daha fazla göster"
+
+msgid "View name"
+msgstr "Görünüm adı"
 
 msgid "View on GitHub"
 msgstr "GitHub'da görüntüle"
@@ -20722,9 +20785,6 @@ msgstr "Çalışma alanı ayrıntıları"
 msgid "Workspace ID copied"
 msgstr "Çalışma alanı kimliği kopyalandı"
 
-msgid "Workspace layout"
-msgstr "Çalışma alanı düzeni"
-
 msgid "Workspace name"
 msgstr "Çalışma alanı adı"
 
@@ -20763,6 +20823,9 @@ msgstr "Çalışma alanı çalıştırması: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Çalışma alanı ayarları"
+
+msgid "Workspace views"
+msgstr "Çalışma alanı görünümleri"
 
 msgid "Workspace worktree not available"
 msgstr "Çalışma alanı worktree'si kullanılamıyor"

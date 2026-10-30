@@ -194,7 +194,7 @@ msgstr "{0, plural, one {#项待处理} other {#项待处理}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# 人}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {已选择#个项目。} other {已选择#个项目。}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 个项目} other {# 个项目}}"
 
@@ -1488,9 +1487,6 @@ msgstr "1个cookie——忘记此站点"
 msgid "1 hr"
 msgstr "1 小时"
 
-msgid "1 person"
-msgstr "1 人"
-
 msgid "1 user"
 msgstr "1个用户"
 
@@ -1850,6 +1846,9 @@ msgstr "添加描述"
 
 msgid "Add a description…"
 msgstr "添加描述…"
+
+msgid "Add a filter"
+msgstr "添加筛选条件"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "在项目设置中添加生命周期运行脚本，或将某个终端脚本标记为工作区运行命令。"
@@ -2811,6 +2810,9 @@ msgstr "已归档 · {0}"
 msgid "Archived {0}"
 msgstr "已归档 {0}"
 
+msgid "Archived shown"
+msgstr "已显示归档"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "确定要删除此文件吗？此操作无法撤销。"
 
@@ -3676,6 +3678,9 @@ msgstr "能把整个应用的tooltip样式统一一下吗？"
 
 msgid "Can’t check {hostName}"
 msgstr "无法检查{hostName}"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "无法折叠当前工作区所在的分组"
 
 msgid "Can't connect right now"
 msgstr "暂时无法连接"
@@ -6136,6 +6141,13 @@ msgstr "创建中…"
 msgid "Creative Manager, Valid"
 msgstr "创意经理，Valid"
 
+msgid "Creator"
+msgstr "创建者"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "创建者：{0}"
+
 msgid "Credentials stay on the server"
 msgstr "凭据保留在服务器上"
 
@@ -6475,6 +6487,10 @@ msgstr "删除这个工作区？"
 
 msgid "Delete thread"
 msgstr "删除讨论串"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "删除视图 {0}"
 
 msgid "Delete without checking"
 msgstr "不检查直接删除"
@@ -6867,6 +6883,9 @@ msgstr "撤销了评审"
 msgid "Display"
 msgstr "显示"
 
+msgid "Display options"
+msgstr "显示选项"
+
 msgid "Display Size"
 msgstr "显示大小"
 
@@ -7091,6 +7110,9 @@ msgstr "例如：engineering"
 
 msgid "e.g. Engineering"
 msgstr "例如：工程"
+
+msgid "e.g. My cloud reviews"
+msgstr "例如：我的云端评审"
 
 msgid "e.g. plan-budget"
 msgstr "例如 plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "按审查筛选"
 msgid "Filter by state"
 msgstr "按状态筛选"
 
-msgid "Filter by where workspaces run"
-msgstr "按工作区运行位置筛选"
-
 msgid "Filter by workspace: {label}"
 msgstr "按工作区筛选：{label}"
 
@@ -8907,6 +8926,9 @@ msgstr "分组方式"
 msgid "Group new branches under a folder."
 msgstr "将新分支归入一个文件夹。"
 
+msgid "Grouping"
+msgstr "分组"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM 与 AI 自动化架构师，Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "主机"
 
 msgid "Host ID"
 msgstr "主机ID"
+
+msgid "Host is {whereLabel}"
+msgstr "主机：{whereLabel}"
 
 msgid "Host is not online"
 msgstr "主机不在线"
@@ -9460,9 +9485,6 @@ msgstr "在新会话中"
 
 msgid "in a terminal on this host."
 msgstr "（在此主机的终端中）。"
-
-msgid "In all projects"
-msgstr "全部项目"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短几个月，<0>数万名工程师</0>把Paradev当作主力IDE，他们来自Wix、DoorDash、Netflix这样的公司。"
@@ -10119,6 +10141,9 @@ msgstr "最近活动"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "最近智能体活动{0}"
+
+msgid "Last agent message"
+msgstr "最近一条智能体消息"
 
 msgid "Last attached"
 msgstr "上次连接"
@@ -11386,6 +11411,9 @@ msgstr "需要处理"
 msgid "Needs input"
 msgstr "需要输入"
 
+msgid "Needs me"
+msgstr "需要我处理"
+
 msgid "Needs tests"
 msgstr "需要测试"
 
@@ -11516,6 +11544,9 @@ msgstr "新建终端"
 
 msgid "New Terminal"
 msgstr "新建终端"
+
+msgid "New view"
+msgstr "新建视图"
 
 msgid "New window"
 msgstr "新建窗口"
@@ -13240,6 +13271,9 @@ msgstr "编排聊天"
 msgid "Orchestration guide"
 msgstr "编排指南"
 
+msgid "Ordering"
+msgstr "排序"
+
 msgid "Organization"
 msgstr "组织"
 
@@ -14294,6 +14328,10 @@ msgstr "项目图标"
 msgid "Project imported and selected."
 msgstr "项目已导入并选中。"
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "项目：{0}"
+
 msgid "Project is already at that location"
 msgstr "项目已位于该位置"
 
@@ -14990,6 +15028,9 @@ msgstr "移除 {name}"
 
 msgid "Remove attachment"
 msgstr "移除附件"
+
+msgid "Remove filter"
+msgstr "移除筛选条件"
 
 msgid "Remove from channel"
 msgstr "从频道中移除"
@@ -15916,6 +15957,9 @@ msgstr "全部保存"
 msgid "Save as environment"
 msgstr "保存为环境"
 
+msgid "Save as view"
+msgstr "另存为视图"
+
 msgid "Save Changes"
 msgstr "保存更改"
 
@@ -15948,6 +15992,9 @@ msgstr "保存以获取URL"
 
 msgid "Save up to {maxDiscount}"
 msgstr "最多节省 {maxDiscount}"
+
+msgid "Save view"
+msgstr "保存视图"
 
 msgid "Saved"
 msgstr "已保存"
@@ -17659,6 +17706,10 @@ msgstr "状态"
 
 msgid "Status changed"
 msgstr "状态变更"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "状态：{0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "保持连接（刷新令牌）"
@@ -19656,6 +19707,9 @@ msgstr "未知作者"
 msgid "Unknown command /{name}"
 msgstr "未知命令 /{name}"
 
+msgid "Unknown creator"
+msgstr "未知创建者"
+
 msgid "Unknown device"
 msgstr "未知设备"
 
@@ -19673,6 +19727,9 @@ msgstr "未知窗格"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "未知的窗格类型：{paneKind}"
+
+msgid "Unknown person"
+msgstr "未知用户"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "即将运行"
 
 msgid "Up Next"
 msgstr "即将开始"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "最多保存 {MAX_SAVED_VIEWS} 个视图"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "最多 25 个。任何一个触发时都会开始运行。"
@@ -20171,6 +20231,9 @@ msgstr "查看日志"
 
 msgid "View more"
 msgstr "查看更多"
+
+msgid "View name"
+msgstr "视图名称"
 
 msgid "View on GitHub"
 msgstr "在GitHub上查看"
@@ -20722,9 +20785,6 @@ msgstr "工作区详情"
 msgid "Workspace ID copied"
 msgstr "已复制工作区ID"
 
-msgid "Workspace layout"
-msgstr "工作区布局"
-
 msgid "Workspace name"
 msgstr "工作区名称"
 
@@ -20763,6 +20823,9 @@ msgstr "工作区运行：{workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "工作区设置"
+
+msgid "Workspace views"
+msgstr "工作区视图"
 
 msgid "Workspace worktree not available"
 msgstr "工作区worktree不可用"

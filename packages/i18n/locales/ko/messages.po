@@ -194,7 +194,7 @@ msgstr "{0, plural, one {#개 대기 중} other {#개 대기 중}}"
 
 #. placeholder {0}: chosenLeads.length
 #. placeholder {0}: chosenPeople.length
-#. placeholder {0}: creatorFilters.length
+#. placeholder {0}: grantee.memberCount
 msgid "{0, plural, one {# person} other {# people}}"
 msgstr "{0, plural, other {# 명}}"
 
@@ -203,7 +203,6 @@ msgid "{0, plural, one {# project selected.} other {# projects selected.}}"
 msgstr "{0, plural, one {프로젝트 #개를 선택했습니다.} other {프로젝트 #개를 선택했습니다.}}"
 
 #. placeholder {0}: chosenProjects.length
-#. placeholder {0}: projectFilters.length
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 
@@ -1488,9 +1487,6 @@ msgstr "쿠키 1개 — 이 사이트 잊기"
 msgid "1 hr"
 msgstr "1시간"
 
-msgid "1 person"
-msgstr "1명"
-
 msgid "1 user"
 msgstr "사용자 1명"
 
@@ -1850,6 +1846,9 @@ msgstr "설명 추가"
 
 msgid "Add a description…"
 msgstr "설명 추가…"
+
+msgid "Add a filter"
+msgstr "필터 추가"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "프로젝트 설정에서 라이프사이클 실행 스크립트를 추가하거나, 터미널 스크립트를 워크스페이스 실행으로 지정하세요."
@@ -2811,6 +2810,9 @@ msgstr "보관됨 · {0}"
 msgid "Archived {0}"
 msgstr "보관됨 {0}"
 
+msgid "Archived shown"
+msgstr "보관된 항목 표시 중"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "이 파일을 삭제할까요? 되돌릴 수 없습니다."
 
@@ -3676,6 +3678,9 @@ msgstr "앱 전반의 툴팁을 표준화해 줄 수 있나요?"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}을(를) 확인할 수 없습니다"
+
+msgid "Can't collapse the current workspace's section"
+msgstr "현재 워크스페이스의 섹션은 접을 수 없습니다"
 
 msgid "Can't connect right now"
 msgstr "지금은 연결할 수 없어요"
@@ -6136,6 +6141,13 @@ msgstr "생성 중…"
 msgid "Creative Manager, Valid"
 msgstr "크리에이티브 매니저, Valid"
 
+msgid "Creator"
+msgstr "작성자"
+
+#. placeholder {0}: creatorNameFor(userId)
+msgid "Creator is {0}"
+msgstr "작성자: {0}"
+
 msgid "Credentials stay on the server"
 msgstr "자격 증명은 서버에 보관됩니다"
 
@@ -6475,6 +6487,10 @@ msgstr "이 워크스페이스를 삭제할까요?"
 
 msgid "Delete thread"
 msgstr "스레드 삭제"
+
+#. placeholder {0}: view.label
+msgid "Delete view {0}"
+msgstr "{0} 뷰 삭제"
 
 msgid "Delete without checking"
 msgstr "확인 없이 삭제"
@@ -6867,6 +6883,9 @@ msgstr "리뷰 철회함"
 msgid "Display"
 msgstr "표시"
 
+msgid "Display options"
+msgstr "표시 옵션"
+
 msgid "Display Size"
 msgstr "디스플레이 크기"
 
@@ -7091,6 +7110,9 @@ msgstr "예: engineering"
 
 msgid "e.g. Engineering"
 msgstr "예: Engineering"
+
+msgid "e.g. My cloud reviews"
+msgstr "예: 내 클라우드 리뷰"
 
 msgid "e.g. plan-budget"
 msgstr "예: plan-budget"
@@ -8238,9 +8260,6 @@ msgstr "리뷰로 필터링"
 msgid "Filter by state"
 msgstr "상태로 필터링"
 
-msgid "Filter by where workspaces run"
-msgstr "워크스페이스 실행 위치로 필터"
-
 msgid "Filter by workspace: {label}"
 msgstr "워크스페이스별 필터: {label}"
 
@@ -8907,6 +8926,9 @@ msgstr "그룹화 기준"
 msgid "Group new branches under a folder."
 msgstr "새 브랜치를 폴더 아래로 묶습니다."
 
+msgid "Grouping"
+msgstr "그룹화"
+
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM 및 AI 자동화 아키텍트, Mistral AI"
 
@@ -9101,6 +9123,9 @@ msgstr "호스트"
 
 msgid "Host ID"
 msgstr "호스트 ID"
+
+msgid "Host is {whereLabel}"
+msgstr "호스트: {whereLabel}"
 
 msgid "Host is not online"
 msgstr "호스트가 온라인이 아닙니다"
@@ -9460,9 +9485,6 @@ msgstr "새 세션에서"
 
 msgid "in a terminal on this host."
 msgstr "(이 호스트의 터미널에서)"
-
-msgid "In all projects"
-msgstr "모든 프로젝트"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Paradev를 주력 IDE로 사용하고 있습니다."
@@ -10119,6 +10141,9 @@ msgstr "마지막 활동"
 #. placeholder {0}: formatDateTime(new Date(workspace.lastAgentEventAt), undefined)
 msgid "Last agent activity {0}"
 msgstr "마지막 에이전트 활동 {0}"
+
+msgid "Last agent message"
+msgstr "마지막 에이전트 메시지"
 
 msgid "Last attached"
 msgstr "마지막 연결"
@@ -11386,6 +11411,9 @@ msgstr "확인 필요"
 msgid "Needs input"
 msgstr "입력 필요"
 
+msgid "Needs me"
+msgstr "내 확인 필요"
+
 msgid "Needs tests"
 msgstr "테스트 필요"
 
@@ -11516,6 +11544,9 @@ msgstr "새 터미널"
 
 msgid "New Terminal"
 msgstr "새 터미널"
+
+msgid "New view"
+msgstr "새 뷰"
 
 msgid "New window"
 msgstr "새 창"
@@ -13240,6 +13271,9 @@ msgstr "오케스트레이션 채팅"
 msgid "Orchestration guide"
 msgstr "오케스트레이션 가이드"
 
+msgid "Ordering"
+msgstr "정렬"
+
 msgid "Organization"
 msgstr "조직"
 
@@ -14294,6 +14328,10 @@ msgstr "프로젝트 아이콘"
 msgid "Project imported and selected."
 msgstr "프로젝트를 가져와 선택했습니다."
 
+#. placeholder {0}: projectNameFor(projectId)
+msgid "Project is {0}"
+msgstr "프로젝트: {0}"
+
 msgid "Project is already at that location"
 msgstr "프로젝트가 이미 그 위치에 있습니다"
 
@@ -14990,6 +15028,9 @@ msgstr "{name} 제거"
 
 msgid "Remove attachment"
 msgstr "첨부 파일 제거"
+
+msgid "Remove filter"
+msgstr "필터 제거"
 
 msgid "Remove from channel"
 msgstr "채널에서 제거"
@@ -15916,6 +15957,9 @@ msgstr "모두 저장"
 msgid "Save as environment"
 msgstr "환경으로 저장"
 
+msgid "Save as view"
+msgstr "뷰로 저장"
+
 msgid "Save Changes"
 msgstr "변경사항 저장"
 
@@ -15948,6 +15992,9 @@ msgstr "저장하면 URL이 생성됩니다"
 
 msgid "Save up to {maxDiscount}"
 msgstr "최대 {maxDiscount} 할인"
+
+msgid "Save view"
+msgstr "뷰 저장"
 
 msgid "Saved"
 msgstr "저장됨"
@@ -17659,6 +17706,10 @@ msgstr "상태"
 
 msgid "Status changed"
 msgstr "상태 변경됨"
+
+#. placeholder {0}: i18n._(BOARD_COLUMN_LABELS[column])
+msgid "Status is {0}"
+msgstr "상태: {0}"
 
 msgid "Stay connected (refresh tokens)"
 msgstr "연결 유지 (리프레시 토큰)"
@@ -19656,6 +19707,9 @@ msgstr "알 수 없는 작성자"
 msgid "Unknown command /{name}"
 msgstr "알 수 없는 명령 /{name}"
 
+msgid "Unknown creator"
+msgstr "알 수 없는 작성자"
+
 msgid "Unknown device"
 msgstr "알 수 없는 기기"
 
@@ -19673,6 +19727,9 @@ msgstr "알 수 없는 창"
 
 msgid "Unknown pane type: {paneKind}"
 msgstr "알 수 없는 창 유형: {paneKind}"
+
+msgid "Unknown person"
+msgstr "알 수 없는 사용자"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.unknownPlugin"
@@ -19785,6 +19842,9 @@ msgstr "다음 실행"
 
 msgid "Up Next"
 msgstr "다음 차례"
+
+msgid "Up to {MAX_SAVED_VIEWS} saved views"
+msgstr "저장된 뷰는 최대 {MAX_SAVED_VIEWS}개"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "최대 25개입니다. 그중 하나라도 실행되면 실행이 시작됩니다."
@@ -20171,6 +20231,9 @@ msgstr "로그 보기"
 
 msgid "View more"
 msgstr "더 보기"
+
+msgid "View name"
+msgstr "뷰 이름"
 
 msgid "View on GitHub"
 msgstr "GitHub에서 보기"
@@ -20722,9 +20785,6 @@ msgstr "워크스페이스 세부 정보"
 msgid "Workspace ID copied"
 msgstr "워크스페이스 ID 복사됨"
 
-msgid "Workspace layout"
-msgstr "워크스페이스 레이아웃"
-
 msgid "Workspace name"
 msgstr "워크스페이스 이름"
 
@@ -20763,6 +20823,9 @@ msgstr "워크스페이스 실행: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "워크스페이스 설정"
+
+msgid "Workspace views"
+msgstr "워크스페이스 뷰"
 
 msgid "Workspace worktree not available"
 msgstr "워크스페이스 worktree를 사용할 수 없습니다"
