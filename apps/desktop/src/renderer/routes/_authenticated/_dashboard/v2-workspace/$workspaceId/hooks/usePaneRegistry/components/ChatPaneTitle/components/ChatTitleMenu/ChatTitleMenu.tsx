@@ -29,23 +29,47 @@ export function ChatTitleMenu({
 	linkedStores,
 	onFork,
 	onSearchAll,
+	onNavigate,
 }: {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	linkedStores: StoreApi<WorkspaceStore<PaneViewerData>>[];
 	onFork: (source: SurfaceForkSource, placement: SurfaceForkPlacement) => void;
 	onSearchAll: () => void;
+	onNavigate: () => void;
 }) {
 	const { t } = useLingui();
 	const data = context.pane.data as ChatPaneData;
-	const { saved, entries, isCurrent, openChat } = useChatHistory({
-		context,
-		workspaceId,
-		linkedStores,
-		enabled: true,
-	});
+	const {
+		saved,
+		native,
+		agentSessions,
+		currentAgentSessionId,
+		entries,
+		isCurrent,
+		openChat,
+		openAgentSession,
+	} = useChatHistory({ context, workspaceId, linkedStores, enabled: true });
 	const surfaceFork = useSurfaceForkSource(workspaceId, { kind: "chat", data });
-	const recent = entries.slice(0, RECENT_CHAT_COUNT);
+	const recent = [
+		...entries.map((entry) => ({
+			key: entry.key,
+			title: entry.title || t({ message: "Untitled chat" }),
+			updatedAt: entry.updatedAt,
+			current: isCurrent(entry),
+			open: () => openChat(entry),
+		})),
+		...agentSessions.map((session) => ({
+			key: `agent:${session.sessionId}`,
+			title: session.agentName,
+			updatedAt: new Date(session.lastActivityAt).getTime(),
+			current: currentAgentSessionId === session.sessionId,
+			open: () => openAgentSession(session),
+		})),
+	]
+		.sort((a, b) => b.updatedAt - a.updatedAt)
+		.slice(0, RECENT_CHAT_COUNT);
+	const failed = saved.isError || native.isError;
 
 	return (
 		<>
@@ -60,17 +84,30 @@ export function ChatTitleMenu({
 					/>
 				</div>
 			) : null}
-			{recent.map((entry) => (
-				<DropdownMenuItem key={entry.key} onSelect={() => openChat(entry)}>
+			{failed ? (
+				<p className="px-2 py-1.5 text-xs text-muted-foreground">
+					<Trans>Some chat history could not be loaded.</Trans>
+				</p>
+			) : !saved.isPending && recent.length === 0 ? (
+				<p className="px-2 py-1.5 text-xs text-muted-foreground">
+					<Trans>No chats found</Trans>
+				</p>
+			) : null}
+			{recent.map((chat) => (
+				<DropdownMenuItem
+					key={chat.key}
+					onSelect={() => {
+						onNavigate();
+						chat.open();
+					}}
+				>
 					<span className="w-4 shrink-0">
-						{isCurrent(entry) && <Check className="size-3.5" />}
+						{chat.current && <Check className="size-3.5" />}
 					</span>
-					<span className="min-w-0 flex-1 truncate">
-						{entry.title || t({ message: "Untitled chat" })}
-					</span>
-					{entry.updatedAt > 0 ? (
+					<span className="min-w-0 flex-1 truncate">{chat.title}</span>
+					{chat.updatedAt > 0 ? (
 						<span className="shrink-0 text-xs text-muted-foreground">
-							{formatCompactRelativeTime(entry.updatedAt)}
+							{formatCompactRelativeTime(chat.updatedAt)}
 						</span>
 					) : null}
 				</DropdownMenuItem>
@@ -86,7 +123,10 @@ export function ChatTitleMenu({
 					<SurfaceForkMenuItems
 						target="cli"
 						source={surfaceFork.source}
-						onFork={onFork}
+						onFork={(source, placement) => {
+							onNavigate();
+							onFork(source, placement);
+						}}
 					/>
 				</>
 			) : null}

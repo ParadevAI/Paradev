@@ -1811,9 +1811,8 @@ msgstr "Account in attesa di eliminazione"
 msgid "Account usage"
 msgstr "Utilizzo dell’account"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Utilizzo dell’account: {0} {used} utilizzato"
+msgid "Account usage: {limit} {used} used"
+msgstr "Utilizzo dell’account: {limit} {used} utilizzato"
 
 msgid "Achievements"
 msgstr "Riconoscimenti"

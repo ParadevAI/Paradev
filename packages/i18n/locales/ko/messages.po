@@ -1811,9 +1811,8 @@ msgstr "삭제 예정 계정"
 msgid "Account usage"
 msgstr "계정 사용량"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "계정 사용량: {0} {used} 사용됨"
+msgid "Account usage: {limit} {used} used"
+msgstr "계정 사용량: {limit} {used} 사용됨"
 
 msgid "Achievements"
 msgstr "업적"

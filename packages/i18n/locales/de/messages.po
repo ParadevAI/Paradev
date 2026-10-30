@@ -1811,9 +1811,8 @@ msgstr "Konto zur Löschung vorgemerkt"
 msgid "Account usage"
 msgstr "Kontonutzung"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Kontonutzung: {0} {used} verbraucht"
+msgid "Account usage: {limit} {used} used"
+msgstr "Kontonutzung: {limit} {used} verbraucht"
 
 msgid "Achievements"
 msgstr "Auszeichnungen"

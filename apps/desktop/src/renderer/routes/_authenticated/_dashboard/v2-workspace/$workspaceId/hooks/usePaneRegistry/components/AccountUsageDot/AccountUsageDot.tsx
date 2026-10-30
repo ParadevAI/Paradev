@@ -13,8 +13,9 @@ export function AccountUsageDot({
 	const { t } = useLingui();
 	const { state, tightest } = useAccountUsage(workspaceId, terminalId);
 	if (state !== "ready" || !tightest || tightest.usedPercent < 70) return null;
+	const limit = tightest.label;
 	const used = formatPercent(tightest.usedPercent / 100);
-	const label = t({ message: `Account usage: ${tightest.label} ${used} used` });
+	const label = t({ message: `Account usage: ${limit} ${used} used` });
 	return (
 		<span
 			role="img"

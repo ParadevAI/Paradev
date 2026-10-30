@@ -1811,9 +1811,8 @@ msgstr "Account pending deletion"
 msgid "Account usage"
 msgstr "Account usage"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Account usage: {0} {used} used"
+msgid "Account usage: {limit} {used} used"
+msgstr "Account usage: {limit} {used} used"
 
 msgid "Achievements"
 msgstr "Achievements"

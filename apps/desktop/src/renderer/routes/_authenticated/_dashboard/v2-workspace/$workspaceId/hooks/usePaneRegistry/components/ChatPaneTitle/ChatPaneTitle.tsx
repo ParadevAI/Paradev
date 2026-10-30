@@ -1,10 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import type { RendererContext, WorkspaceStore } from "@superset/panes";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { ChevronDown } from "lucide-react";
 import { type ReactNode, useRef, useState } from "react";
@@ -23,6 +18,10 @@ import {
 } from "../../stores/chatSubagentStore";
 import { openChatHistory } from "../../utils/chatHistoryOpen";
 import { AccountUsageDot } from "../AccountUsageDot";
+import {
+	PaneTitleMenu,
+	type PaneTitleMenuTriggerProps,
+} from "../PaneTitleMenu";
 import { ChatHistoryPicker } from "./components/ChatHistoryPicker";
 import { ChatTitleMenu } from "./components/ChatTitleMenu";
 import { SubagentBreadcrumb } from "./components/SubagentBreadcrumb";
@@ -50,37 +49,41 @@ export function ChatPaneTitle({
 	const path = useChatSubagentStore((state) => state.paths[chatKey] ?? NO_PATH);
 	const open = useChatSubagentStore((state) => state.open);
 	const [menuOpen, setMenuOpen] = useState(false);
-	const searchRequested = useRef(false);
-	const menuLabel = t({ message: "Chat menu" });
+	const closeIntent = useRef<"search" | "navigate" | null>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
 	const usageDot = (
 		<AccountUsageDot workspaceId={workspaceId} terminalId={chatKey} />
 	);
-
-	const withMenu = (trigger: ReactNode) => (
-		<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-			<DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-			<DropdownMenuContent
-				align="start"
-				className="w-72"
-				onClick={(event) => event.stopPropagation()}
-				onCloseAutoFocus={(event) => {
-					if (!searchRequested.current) return;
-					searchRequested.current = false;
-					event.preventDefault();
-					openChatHistory(paneId);
+	const withMenu = (
+		renderTrigger: (props: PaneTitleMenuTriggerProps) => ReactNode,
+	) => (
+		<PaneTitleMenu
+			open={menuOpen}
+			onOpenChange={setMenuOpen}
+			triggerRef={triggerRef}
+			renderTrigger={renderTrigger}
+			contentClassName="w-72"
+			onCloseAutoFocus={(event) => {
+				const intent = closeIntent.current;
+				closeIntent.current = null;
+				if (intent === null) return;
+				event.preventDefault();
+				if (intent === "search") openChatHistory(paneId);
+			}}
+		>
+			<ChatTitleMenu
+				context={context}
+				workspaceId={workspaceId}
+				linkedStores={linkedStores}
+				onFork={onFork}
+				onSearchAll={() => {
+					closeIntent.current = "search";
 				}}
-			>
-				<ChatTitleMenu
-					context={context}
-					workspaceId={workspaceId}
-					linkedStores={linkedStores}
-					onFork={onFork}
-					onSearchAll={() => {
-						searchRequested.current = true;
-					}}
-				/>
-			</DropdownMenuContent>
-		</DropdownMenu>
+				onNavigate={() => {
+					closeIntent.current = "navigate";
+				}}
+			/>
+		</PaneTitleMenu>
 	);
 
 	return (
@@ -88,6 +91,7 @@ export function ChatPaneTitle({
 			context={context}
 			workspaceId={workspaceId}
 			linkedStores={linkedStores}
+			returnFocusRef={triggerRef}
 		>
 			{path.length > 0 ? (
 				<>
@@ -96,36 +100,34 @@ export function ChatPaneTitle({
 						onSelect={(id) => open(chatKey, id)}
 						path={path}
 						root={title}
-						rootMenu={withMenu(
+						rootMenu={withMenu((triggerProps) => (
 							<button
-								type="button"
-								aria-label={menuLabel}
+								{...triggerProps}
+								aria-label={t({ message: "Chat menu" })}
 								className="flex shrink-0 items-center gap-1 rounded p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 							>
 								{usageDot}
 								<ChevronDown className="size-3" />
-							</button>,
-						)}
+							</button>
+						))}
 					/>
 				</>
 			) : (
-				withMenu(
+				withMenu((triggerProps) => (
 					<button
-						type="button"
-						aria-label={menuLabel}
+						{...triggerProps}
 						title={title}
 						className={cn(
 							"flex min-w-0 items-center gap-1.5 rounded px-1 py-0.5 text-xs transition-colors hover:bg-muted hover:text-foreground",
 							context.isActive ? "text-foreground" : "text-muted-foreground",
 						)}
-						onClick={(event) => event.stopPropagation()}
 					>
 						<span className="shrink-0 text-muted-foreground">{icon}</span>
 						<span className="min-w-0 truncate">{title}</span>
 						{usageDot}
 						<ChevronDown className="size-3 shrink-0 text-muted-foreground" />
-					</button>,
-				)
+					</button>
+				))
 			)}
 		</ChatHistoryPicker>
 	);

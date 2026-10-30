@@ -1811,9 +1811,8 @@ msgstr "Account wordt verwijderd"
 msgid "Account usage"
 msgstr "Accountgebruik"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Accountgebruik: {0} {used} gebruikt"
+msgid "Account usage: {limit} {used} used"
+msgstr "Accountgebruik: {limit} {used} gebruikt"
 
 msgid "Achievements"
 msgstr "Prestaties"

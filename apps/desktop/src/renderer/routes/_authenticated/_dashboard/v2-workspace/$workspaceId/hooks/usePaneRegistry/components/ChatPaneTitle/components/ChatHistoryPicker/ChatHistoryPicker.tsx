@@ -5,7 +5,13 @@ import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { Check, LoaderCircle } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import {
+	type ReactNode,
+	type RefObject,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import type { StoreApi } from "zustand/vanilla";
 import { onOpenChatHistory } from "../../../../utils/chatHistoryOpen";
@@ -15,6 +21,7 @@ interface ChatHistoryPickerProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	linkedStores: StoreApi<WorkspaceStore<PaneViewerData>>[];
+	returnFocusRef: RefObject<HTMLElement | null>;
 	children: ReactNode;
 }
 
@@ -22,13 +29,14 @@ export function ChatHistoryPicker({
 	context,
 	workspaceId,
 	linkedStores,
+	returnFocusRef,
 	children,
 }: ChatHistoryPickerProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
+	const picked = useRef(false);
 	const paneId = context.pane.id;
-	// "Search all chats…" in the title menu and the composer's `/resume` both open this.
 	useEffect(
 		() =>
 			onOpenChatHistory(paneId, () => {
@@ -64,6 +72,14 @@ export function ChatHistoryPicker({
 				align="start"
 				className="w-80 p-2"
 				onClick={(event) => event.stopPropagation()}
+				onCloseAutoFocus={(event) => {
+					event.preventDefault();
+					if (picked.current) {
+						picked.current = false;
+						return;
+					}
+					returnFocusRef.current?.focus();
+				}}
 			>
 				<div className="pb-2 text-sm font-medium">
 					<Trans>Chat history</Trans>
@@ -115,6 +131,7 @@ export function ChatHistoryPicker({
 									key={session.sessionId}
 									className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
 									onClick={() => {
+										picked.current = true;
 										setOpen(false);
 										openAgentSession(session);
 									}}
@@ -140,6 +157,7 @@ export function ChatHistoryPicker({
 							key={entry.key}
 							className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
 							onClick={() => {
+								picked.current = true;
 								setOpen(false);
 								openChat(entry);
 							}}

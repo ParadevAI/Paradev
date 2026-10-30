@@ -1811,9 +1811,8 @@ msgstr "アカウントは削除待ちです"
 msgid "Account usage"
 msgstr "アカウントの使用状況"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "アカウントの使用状況: {0} {used} 使用済み"
+msgid "Account usage: {limit} {used} used"
+msgstr "アカウントの使用状況: {limit} {used} 使用済み"
 
 msgid "Achievements"
 msgstr "実績"

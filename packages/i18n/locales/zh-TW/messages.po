@@ -1811,9 +1811,8 @@ msgstr "帳戶待刪除"
 msgid "Account usage"
 msgstr "帳戶用量"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "帳戶用量：{0} 已使用 {used}"
+msgid "Account usage: {limit} {used} used"
+msgstr "帳戶用量：{limit} 已使用 {used}"
 
 msgid "Achievements"
 msgstr "成就"

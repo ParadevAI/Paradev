@@ -1811,9 +1811,8 @@ msgstr "Conta com exclusão pendente"
 msgid "Account usage"
 msgstr "Uso da conta"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Uso da conta: {0} {used} usado"
+msgid "Account usage: {limit} {used} used"
+msgstr "Uso da conta: {limit} {used} usado"
 
 msgid "Achievements"
 msgstr "Conquistas"

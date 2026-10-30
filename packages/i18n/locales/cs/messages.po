@@ -1811,9 +1811,8 @@ msgstr "Účet čeká na smazání"
 msgid "Account usage"
 msgstr "Využití účtu"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Využití účtu: {0} – využito {used}"
+msgid "Account usage: {limit} {used} used"
+msgstr "Využití účtu: {limit} – využito {used}"
 
 msgid "Achievements"
 msgstr "Úspěchy"

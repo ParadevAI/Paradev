@@ -1811,9 +1811,8 @@ msgstr "Hesap silinmeyi bekliyor"
 msgid "Account usage"
 msgstr "Hesap kullanımı"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Hesap kullanımı: {0} {used} kullanıldı"
+msgid "Account usage: {limit} {used} used"
+msgstr "Hesap kullanımı: {limit} {used} kullanıldı"
 
 msgid "Achievements"
 msgstr "Başarımlar"

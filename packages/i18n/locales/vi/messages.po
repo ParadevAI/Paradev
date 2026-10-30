@@ -1811,9 +1811,8 @@ msgstr "Tài khoản đang chờ xóa"
 msgid "Account usage"
 msgstr "Mức sử dụng tài khoản"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Mức sử dụng tài khoản: {0} đã dùng {used}"
+msgid "Account usage: {limit} {used} used"
+msgstr "Mức sử dụng tài khoản: {limit} đã dùng {used}"
 
 msgid "Achievements"
 msgstr "Thành tích"

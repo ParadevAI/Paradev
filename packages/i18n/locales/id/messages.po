@@ -1811,9 +1811,8 @@ msgstr "Akun menunggu penghapusan"
 msgid "Account usage"
 msgstr "Penggunaan akun"
 
-#. placeholder {0}: tightest.label
-msgid "Account usage: {0} {used} used"
-msgstr "Penggunaan akun: {0} {used} terpakai"
+msgid "Account usage: {limit} {used} used"
+msgstr "Penggunaan akun: {limit} {used} terpakai"
 
 msgid "Achievements"
 msgstr "Pencapaian"
