@@ -33,10 +33,11 @@ export function AlertHost() {
 			onRequestClose={dismiss}
 		>
 			<View className="flex-1 items-center justify-center bg-black/60 px-8">
-				<Pressable
+				<View
 					accessibilityElementsHidden
 					className="absolute inset-0"
-					onPress={dismiss}
+					onResponderRelease={dismiss}
+					onStartShouldSetResponder={() => true}
 				/>
 				<View
 					accessibilityRole="alert"
