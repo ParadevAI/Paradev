@@ -127,10 +127,7 @@ export function UsageLimitNotice({
 		.join(" · ");
 
 	return (
-		<output
-			className="mx-4 flex items-center gap-3 rounded-t-2xl border border-border/60 border-b-0 bg-muted/40 py-2 pr-2 pl-3"
-			data-usage-limit
-		>
+		<output className="flex items-center gap-3 py-2 pr-2 pl-3" data-usage-limit>
 			<span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-400/15 text-amber-400">
 				<Gauge className="size-4" />
 			</span>

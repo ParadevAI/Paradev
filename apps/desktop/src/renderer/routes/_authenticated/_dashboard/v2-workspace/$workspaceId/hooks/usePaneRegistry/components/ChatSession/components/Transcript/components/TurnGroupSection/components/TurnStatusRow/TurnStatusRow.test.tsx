@@ -104,27 +104,16 @@ test("a turn the user stopped is one quiet line", () => {
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 });
 
-test("a turn the usage limit stopped names the limit and leaves recovery to the composer", () => {
-	const actions: TurnFailureActions = {
-		blocked: false,
-		continueTask: () => {},
-		dismissed: new Set(),
-		setDismissed: () => {},
-	};
+test("a turn the usage limit stopped is one quiet line, not a failure card", () => {
 	const view = render(
-		<TurnFailureActionsProvider value={actions}>
-			<TurnStatusRow
-				error={{ message: "You've hit your usage limit", kind: "usage_limit" }}
-				latest
-				status="failed"
-				turnId="t1"
-			/>
-		</TurnFailureActionsProvider>,
+		<TurnStatusRow
+			error={{ message: "You've hit your usage limit", kind: "usage_limit" }}
+			latest
+			status="failed"
+			turnId="t1"
+		/>,
 	);
-	const card = view.container.querySelector(
-		'[data-turn-failure="usage_limit"]',
-	);
-	expect(card?.textContent).toContain("Stopped by the usage limit");
-	expect(view.queryByText("Continue")).toBeNull();
-	expect(view.queryByText("Change model")).toBeNull();
+	expect(view.container.textContent).toBe("Stopped by the usage limit");
+	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
+	expect(view.queryByText("Copy error")).toBeNull();
 });

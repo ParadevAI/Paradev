@@ -4,6 +4,7 @@ import { cn } from "@superset/ui/utils";
 import {
 	type FocusEvent,
 	type KeyboardEvent,
+	type ReactNode,
 	type Ref,
 	type RefObject,
 	useImperativeHandle,
@@ -38,11 +39,14 @@ function focusStop(stop: HTMLElement | undefined) {
 export function WorkDrawer({
 	ref,
 	queue,
+	notice,
 	paneRef,
 	onExit,
 }: {
 	ref?: Ref<WorkDrawerHandle>;
 	queue?: DrawerQueue;
+	/** A row above the queue that speaks for it, e.g. the usage limit. */
+	notice?: ReactNode;
 	paneRef?: RefObject<HTMLElement | null>;
 	onExit: (exit: DrawerExit) => void;
 }) {
@@ -120,7 +124,7 @@ export function WorkDrawer({
 		exit("composer");
 	}, [keySignature]);
 
-	if (prompts.length === 0) return null;
+	if (prompts.length === 0 && !notice) return null;
 
 	const toggle = () => {
 		const active = document.activeElement;
@@ -231,8 +235,13 @@ export function WorkDrawer({
 					onKeyDown={onKeyDown}
 					ref={rootRef}
 				>
+					{notice}
 					<div
-						className="overflow-y-auto p-1"
+						className={cn(
+							"overflow-y-auto p-1",
+							notice && "border-border/60 border-t",
+							prompts.length === 0 && "hidden",
+						)}
 						data-work-drawer-scroller
 						style={{
 							maxHeight: paneThird
@@ -244,7 +253,8 @@ export function WorkDrawer({
 							stopKey="header:queued"
 							tabbable={tabbableKey === "header:queued"}
 							banner={
-								queue?.paused && (
+								queue?.paused &&
+								!(queue.pausedByLimit && notice) && (
 									<QueuePausedBar
 										actionable={queue.actionable}
 										byLimit={queue.pausedByLimit === true}

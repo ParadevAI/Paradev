@@ -56,6 +56,29 @@ test("an empty drawer is hidden and one prompt needs no header", () => {
 	expect(rowNames(one.view)).toEqual(["next"]);
 });
 
+test("a notice heads the drawer and speaks for a queue the limit paused", () => {
+	const notice = (
+		<output data-testid="limit-notice">5-hour limit reached</output>
+	);
+	const alone = renderDrawer({ queue: queueOf([]), notice });
+	expect(alone.view.container.textContent).toBe("5-hour limit reached");
+	cleanup();
+	const { view } = renderDrawer({
+		queue: {
+			...queueOf([prompt("q1", "next")]),
+			paused: true,
+			pausedByLimit: true,
+		},
+		notice,
+	});
+	const drawer = view.container.querySelector("[data-work-drawer]");
+	expect(drawer?.firstElementChild?.getAttribute("data-testid")).toBe(
+		"limit-notice",
+	);
+	expect(view.container.textContent).not.toContain("Queue paused");
+	expect(rowNames(view)).toEqual(["next"]);
+});
+
 test("the drawer caps its height and scrolls", () => {
 	const paneRef: { current: HTMLDivElement | null } = { current: null };
 	const attachPane = (node: HTMLDivElement | null) => {

@@ -58,10 +58,6 @@ import {
 	type ComposerHandle,
 	prependToDraft,
 } from "../Composer";
-import type {
-	SwitchAccount,
-	SwitchableAgent,
-} from "../Composer/components/UsageLimitNotice";
 import { ConnectionNotice } from "../ConnectionNotice";
 import { SessionHeader } from "../SessionHeader";
 import { SetupSessionHeader } from "../SetupSessionHeader";
@@ -76,6 +72,11 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { LiveChangesPill } from "./components/LiveChangesPill";
+import {
+	type SwitchAccount,
+	type SwitchableAgent,
+	UsageLimitNotice,
+} from "./components/UsageLimitNotice";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
@@ -746,6 +747,20 @@ export function SessionView({
 					<LiveChangesPill refreshKey={liveRefreshKey} turnId={runningTurnId} />
 				)}
 				<WorkDrawer
+					notice={
+						usageLimit &&
+						!held && (
+							<UsageLimitNotice
+								agent={usageLimit.agent}
+								hostUrl={usageLimit.hostUrl}
+								limit={usageLimit.limit}
+								modelLabel={usageLimit.modelLabel}
+								onRespond={usageLimit.respond}
+								onSwitchAccount={usageLimit.onSwitchAccount}
+								sessionAccount={usageLimit.sessionAccount}
+							/>
+						)
+					}
 					onExit={returnToComposer}
 					paneRef={paneRef}
 					queue={drawerQueue}
@@ -781,7 +796,7 @@ export function SessionView({
 					onFork={onFork ? forkWithTranscript : undefined}
 					canForkToWorktree={canForkToWorktree}
 					onOpenFind={focusedSubagentId ? undefined : openFind}
-					usageLimit={held ? undefined : usageLimit}
+					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
 				/>
 			</ComposerDropZone>
