@@ -15,7 +15,7 @@ export function normalizeGitHubRepoUrl(remoteUrl: string): string | null {
 	const match = [
 		/^git@github\.com:(?<owner>[^/]+)\/(?<repo>[^/]+?)(?:\.git)?$/,
 		/^ssh:\/\/git@github\.com\/(?<owner>[^/]+)\/(?<repo>[^/]+?)(?:\.git)?$/,
-		/^https:\/\/github\.com\/(?<owner>[^/]+)\/(?<repo>[^/]+?)(?:\.git)?\/?$/,
+		/^https:\/\/(?:[^@/]+@)?github\.com\/(?<owner>[^/]+)\/(?<repo>[^/]+?)(?:\.git)?\/?$/,
 	]
 		.map((pattern) => pattern.exec(trimmedRemoteUrl))
 		.find((result) => result?.groups?.owner && result.groups.repo);
