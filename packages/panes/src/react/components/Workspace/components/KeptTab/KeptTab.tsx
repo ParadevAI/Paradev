@@ -4,7 +4,10 @@ import {
 	memo,
 	useDeferredValue,
 } from "react";
-import { TabVisibilityContext } from "../../../../hooks/useIsTabVisible";
+import {
+	TabVisibilityContext,
+	useIsTabVisible,
+} from "../../../../hooks/useIsTabVisible";
 import { Tab } from "../Tab";
 
 // Unlike display:none, this keeps the hidden tab's layout, so its resize
@@ -22,7 +25,8 @@ type KeptTabProps<TData> = ComponentProps<typeof Tab<TData>> & {
 
 function KeptTabView<TData>({ isVisible, ...tabProps }: KeptTabProps<TData>) {
 	// Panes hear about the switch in a render after the switch is painted.
-	const isPaneVisible = useDeferredValue(isVisible);
+	const isParentVisible = useIsTabVisible();
+	const isPaneVisible = useDeferredValue(isVisible) && isParentVisible;
 	return (
 		<div
 			className="absolute inset-0 flex"
