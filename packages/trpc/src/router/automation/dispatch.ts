@@ -22,6 +22,7 @@ import {
 	slugifyForBranch,
 } from "@superset/shared/workspace-launch";
 import { and, eq, sql } from "drizzle-orm";
+import { acpChatEnabled } from "../../lib/acp-chat";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
 import { runInCloud } from "./cloudDispatch";
@@ -261,6 +262,7 @@ export async function dispatchAutomation(
 					})
 				: undefined;
 
+		const chat = await acpChatEnabled(automation.ownerUserId);
 		const hostCaller = relayHostCaller({ relayUrl, hostId: routingKey, jwt });
 
 		const runAgent = (targetWorkspaceId: string) =>
@@ -268,7 +270,7 @@ export async function dispatchAutomation(
 				workspaceId: targetWorkspaceId,
 				agent: automation.agent,
 				prompt,
-				chat: true,
+				chat,
 				// Only the pinned workspace holds that session; the stale-pin
 				// recovery below branches a fresh one, which has none.
 				...(previous && targetWorkspaceId === automation.v2WorkspaceId
