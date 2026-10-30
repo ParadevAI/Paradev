@@ -830,9 +830,16 @@ export class AcpAdapter implements HarnessAdapter {
 
 	/** What `initialize` said this agent can do to a session. */
 	private supportsSessionCapability(name: string): boolean {
-		const caps = this.agentCapabilities.sessionCapabilities;
-		return Boolean(
-			caps && typeof caps === "object" && name in (caps as object),
+		const advertisedIn = (caps: unknown) =>
+			Boolean(
+				caps &&
+					typeof caps === "object" &&
+					(caps as Record<string, unknown>)[name] != null,
+			);
+		if (advertisedIn(this.agentCapabilities.sessionCapabilities)) return true;
+		return (
+			this.negotiatedVersion >= 2 &&
+			advertisedIn(this.agentCapabilities.session)
 		);
 	}
 

@@ -46,6 +46,7 @@ import {
 import { TurnFailureActionsProvider } from "../../providers/TurnFailureActionsProvider";
 import type { ChatEditRequest, ChatForkTarget } from "../../types";
 import { buildChatHandoffTranscript } from "../../utils/chatHandoffTranscript";
+import { currentModelOf } from "../../utils/currentModelOf";
 import { heldPromptQueue } from "../../utils/heldPromptQueue";
 import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
@@ -159,7 +160,13 @@ export function SessionView({
 	 * built here because only this view holds the timeline; a branch into
 	 * another worktree cannot resume the session and is told it instead.
 	 */
-	onFork?: ((target: ChatForkTarget, transcript: string) => void) | undefined;
+	onFork?:
+		| ((
+				target: ChatForkTarget,
+				transcript: string,
+				model: { id: string; label: string } | null,
+		  ) => void)
+		| undefined;
 	canForkToWorktree?: boolean;
 	onEditMessage?: (request: ChatEditRequest) => void;
 	/** Restarts the agent and sends `prompt` once it is back. */
@@ -381,6 +388,7 @@ export function SessionView({
 					snapshotRef.current,
 					agentLabel ?? "Agent",
 				),
+				currentModelOf(snapshotRef.current.session?.configOptions),
 			),
 		[onFork, agentLabel],
 	);

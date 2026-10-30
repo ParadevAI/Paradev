@@ -3,10 +3,7 @@ import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
-import {
-	buildChatRewindPrompt,
-	buildChatSessionHandoffPrompt,
-} from "@superset/shared/session-handoff";
+import { buildChatRewindPrompt } from "@superset/shared/session-handoff";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient } from "@superset/workspace-client";
@@ -41,6 +38,7 @@ import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import { handoffPromptFor } from "./utils/handoffPromptFor";
 import {
 	isChatCreateWatched,
 	sharedChatCreate,
@@ -131,7 +129,7 @@ export function AcpChatPane({
 	const { hostUrl } = useWorkspaceClient();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
-		(config) => config.id === agent?.id,
+		(config) => config.presetId === agent?.id,
 	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
@@ -264,48 +262,88 @@ export function AcpChatPane({
 		void start(harness, agentSessionId);
 	}, [sessionId, harness, agentSessionId, start]);
 
+	const branchWithHandoff = useCallback(
+		(
+			transcript: string,
+			model: { id: string; label: string } | null,
+		): boolean => {
+			if (!mounted.current || !agent || !onOpenAgentChat) return false;
+			const label = agentLabel ?? agent.id;
+			const handoffPrompt = handoffPromptFor(transcript, label);
+			if (!handoffPrompt) return false;
+			onOpenAgentChat({
+				presetId: agent.id,
+				label,
+				model:
+					model ??
+					(modelId ? { id: modelId, label: modelLabel ?? modelId } : null),
+				modeId,
+				handoffPrompt,
+			});
+			return true;
+		},
+		[agent, agentLabel, onOpenAgentChat, modeId, modelId, modelLabel],
+	);
+
 	// The agent copies the session whole — `session/fork` takes no truncation
 	// point — so where it was clicked from makes no difference to the branch.
-	const forkHere = useCallback(() => {
-		if (!sessionId) return;
-		const terminalId = crypto.randomUUID();
-		void wiring.transport
-			.forkSession({
-				commandId: crypto.randomUUID(),
-				sessionId,
-				workspaceId,
-				terminalId,
-			})
-			.then((forked) => {
-				if (forked) {
-					if (!mounted.current || !onOpenForkedChat) {
-						void wiring.transport
-							.closeSession({ sessionId: forked.sessionId })
-							.catch(() => undefined);
+	const forkHere = useCallback(
+		(transcript: string, model: { id: string; label: string } | null) => {
+			if (!sessionId) {
+				if (!branchWithHandoff(transcript, model)) {
+					toast.error(t({ message: "Couldn't branch the conversation" }));
+				}
+				return;
+			}
+			const terminalId = crypto.randomUUID();
+			void wiring.transport
+				.forkSession({
+					commandId: crypto.randomUUID(),
+					sessionId,
+					workspaceId,
+					terminalId,
+				})
+				.then((forked) => {
+					if (forked) {
+						if (!mounted.current || !onOpenForkedChat) {
+							void wiring.transport
+								.closeSession({ sessionId: forked.sessionId })
+								.catch(() => undefined);
+							return;
+						}
+						onOpenForkedChat({ sessionId: forked.sessionId, terminalId });
 						return;
 					}
-					onOpenForkedChat({ sessionId: forked.sessionId, terminalId });
-					return;
-				}
-				// The adapter declines rather than sending a `session/fork` an
-				// agent would reject, and a button that does nothing is worse
-				// than one that says why.
-				toast.error(t({ message: "This agent can't branch a conversation" }));
-			})
-			.catch((error: unknown) => {
-				console.error("[acp-chat] fork failed", error);
-				toast.error(t({ message: "Couldn't branch the conversation" }));
-			});
-	}, [wiring.transport, sessionId, workspaceId, onOpenForkedChat, t]);
+					if (branchWithHandoff(transcript, model)) return;
+					toast.error(t({ message: "This agent can't branch a conversation" }));
+				})
+				.catch((error: unknown) => {
+					console.error("[acp-chat] fork failed", error);
+					toast.error(t({ message: "Couldn't branch the conversation" }));
+				});
+		},
+		[
+			wiring.transport,
+			sessionId,
+			workspaceId,
+			onOpenForkedChat,
+			branchWithHandoff,
+			t,
+		],
+	);
 
 	// A worktree of its own cannot resume this session — the agent keys its
 	// sessions to a project directory — so that branch is a fresh chat handed
 	// the conversation. Both live under one control because the user is
 	// choosing where the work continues, not which mechanism carries it.
 	const fork = useCallback(
-		(target: ChatForkTarget, transcript: string) => {
+		(
+			target: ChatForkTarget,
+			transcript: string,
+			model: { id: string; label: string } | null,
+		) => {
 			if (target === "workspace") {
-				forkHere();
+				forkHere(transcript, model);
 				return;
 			}
 			if (!agent) return;
@@ -387,12 +425,7 @@ export function AcpChatPane({
 						(isUnrestrictedMode(currentModeId)
 							? undefined
 							: AGENT_DEFAULT_MODE),
-					handoffPrompt: transcript.trim()
-						? buildChatSessionHandoffPrompt({
-								transcript,
-								sourceAgentLabel: currentLabel,
-							})
-						: null,
+					handoffPrompt: handoffPromptFor(transcript, currentLabel),
 				};
 				const { handoffPrompt } = target;
 				if (handoffPrompt && onOpenAgentChat) {

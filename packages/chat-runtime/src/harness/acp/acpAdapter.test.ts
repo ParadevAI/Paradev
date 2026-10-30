@@ -38,6 +38,8 @@ class FakeAcpAgent {
 	chunkMeta: Record<string, unknown> | null = null;
 	/** Session capabilities advertised at initialize; both shipped agents fork. */
 	sessionCapabilities: Record<string, unknown> | null = { fork: {} };
+	/** v2 advertises session methods under `capabilities.session` instead. */
+	sessionBlock: Record<string, unknown> | null = null;
 	/** Replay history with v2's whole-message variants instead of chunks. */
 	wholeMessageReplay = false;
 	replayUpdates: Record<string, unknown>[] | null = null;
@@ -338,6 +340,7 @@ class FakeAcpAgent {
 						...(this.sessionCapabilities
 							? { sessionCapabilities: this.sessionCapabilities }
 							: {}),
+						...(this.sessionBlock ? { session: this.sessionBlock } : {}),
 					},
 				});
 			} else if (frame.method === "session/new") {
@@ -1353,6 +1356,53 @@ describe("AcpAdapter", () => {
 		expect(await second.fork()).toBeNull();
 		expect(plain.sent.map((f) => f.method)).not.toContain("session/fork");
 		await second.dispose();
+	});
+
+	it("forks an agent that advertises fork under the v2 session block", async () => {
+		const v2 = new FakeAcpAgent();
+		v2.sessionCapabilities = null;
+		v2.sessionBlock = { prompt: {}, fork: {} };
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => v2.transport(handlers),
+			now: () => 1,
+			mintId: () => "x",
+		});
+		void collect(adapter.start({ cwd: "/work" }), []);
+		await flush(40);
+		expect(await adapter.fork()).toBe("sess-forked");
+		await adapter.dispose();
+
+		const noFork = new FakeAcpAgent();
+		noFork.sessionCapabilities = null;
+		noFork.sessionBlock = { prompt: {} };
+		const second = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => noFork.transport(handlers),
+			now: () => 1,
+			mintId: () => "x",
+		});
+		void collect(second.start({ cwd: "/work" }), []);
+		await flush(40);
+		expect(await second.fork()).toBeNull();
+		await second.dispose();
+	});
+
+	it("ignores a v2 session block from an agent that negotiated v1", async () => {
+		const v1 = new FakeAcpAgent();
+		v1.protocolVersion = 1;
+		v1.sessionCapabilities = null;
+		v1.sessionBlock = { fork: {} };
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => v1.transport(handlers),
+			now: () => 1,
+			mintId: () => "x",
+		});
+		void collect(adapter.start({ cwd: "/work" }), []);
+		await flush(40);
+		expect(await adapter.fork()).toBeNull();
+		await adapter.dispose();
 	});
 
 	it("forks at a message only for an agent known to honour the cut, and resumes it quietly", async () => {
