@@ -21,7 +21,7 @@ export const SearchBar: SearchBarComponent = ({
 				<View className="bg-muted-foreground/40 h-1 w-8 self-center rounded-full" />
 				<TextInput
 					ref={inputRef}
-					className="bg-input/30 border-input text-foreground h-10 rounded-md border px-3 text-base"
+					className="bg-input/30 border-input text-foreground min-h-10 rounded-md border px-3 py-2 text-base"
 					placeholder={placeholder}
 					placeholderTextColor={theme.mutedForeground}
 					selectionColor={theme.mutedForeground}
