@@ -119,6 +119,7 @@ export {
 	writePluginTree,
 } from "./plugin-cache";
 export { mcpHeadersHelperCommand } from "./plugin-connections";
+export { PROFILE_LEDGER_NAME } from "./profile-sharing";
 export {
 	type McpReconcileReport,
 	reconcileMcpServers,

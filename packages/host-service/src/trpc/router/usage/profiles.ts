@@ -27,7 +27,10 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { homedir, platform, userInfo } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import { resolveAmbientCodexHome } from "@superset/agent-setup";
+import {
+	PROFILE_LEDGER_NAME,
+	resolveAmbientCodexHome,
+} from "@superset/agent-setup";
 
 const execFileAsync = promisify(execFile);
 
@@ -45,6 +48,9 @@ export const API_BILLING_MARKER = ".superset-api-billing";
 const MAX_MARKER_BYTES = 64;
 
 export type ProfileCredentialKind = "subscription" | "api_key";
+
+export const SIGNED_OUT_PROFILE_DETAIL =
+	"Signed out — use Switch sign-in to reconnect, or Remove to delete this profile.";
 
 export interface ClaudeProfile {
 	/** Absolute config dir path (the CLAUDE_CONFIG_DIR value's expansion). */
@@ -66,6 +72,8 @@ export interface CodexHome {
 	credentialKind: ProfileCredentialKind;
 	/** API profiles only; derived from the marker, never from auth.json. */
 	loginFingerprint: string | null;
+	/** A home Superset set up (it holds the profile ledger) whose login is gone. */
+	signedOut: boolean;
 }
 
 function tildeLabel(path: string): string {
@@ -253,7 +261,8 @@ export async function readKeychainSecrets(service: string): Promise<string[]> {
 }
 
 interface CodexAuthShape {
-	tokens?: { access_token?: string };
+	OPENAI_API_KEY?: unknown;
+	tokens?: { access_token?: string } | null;
 }
 
 /**
@@ -281,20 +290,58 @@ export async function readCodexProfileKind(
 	}
 }
 
+async function isFile(path: string): Promise<boolean> {
+	try {
+		return (await stat(path)).isFile();
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * True when Superset set the home up (it holds the profile ledger) and its
+ * auth.json is gone or holds neither a token nor a key. An auth.json that
+ * does not parse may be mid-write, so it does not count as signed out.
+ */
+async function isSignedOutCodexHome(codexHome: string): Promise<boolean> {
+	if (!(await isFile(join(codexHome, PROFILE_LEDGER_NAME)))) return false;
+	let raw: string;
+	try {
+		raw = await readFile(join(codexHome, "auth.json"), "utf-8");
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "ENOENT";
+	}
+	try {
+		const parsed: CodexAuthShape | null = JSON.parse(raw);
+		return !parsed?.tokens?.access_token && !parsed?.OPENAI_API_KEY;
+	} catch {
+		return false;
+	}
+}
+
 /**
  * Codex homes: the ambient home (`~/.codex`, or a `CODEX_HOME` the user set
  * themselves — see resolveAmbientCodexHome for why Superset's own injected
  * value is ignored) plus any `~/.codex*` dot-dir carrying an `auth.json` with
  * a token or the API-billing marker. The common multi-account convention is
- * one CODEX_HOME dir per account.
+ * one CODEX_HOME dir per account. A dot-dir Superset set up stays listed,
+ * flagged `signedOut`, after its login is gone, so it can be re-signed or
+ * removed.
  *
  * The first entry is the system default, and `fetchCodexAccounts` gives it
  * `selection: null`. It is listed even without an `auth.json` so the
  * add-account poller has a baseline to compare a fresh `codex login` against.
+ * `homeDir` overrides the home dir for tests.
  */
-export async function discoverCodexHomes(): Promise<CodexHome[]> {
-	const home = homedir();
-	const defaultHome = resolveAmbientCodexHome(home);
+export async function discoverCodexHomes(
+	homeDir?: string,
+): Promise<CodexHome[]> {
+	const home = homeDir ?? homedir();
+	// An injected home must not resolve to the machine's own CODEX_HOME.
+	const defaultHome =
+		homeDir === undefined
+			? resolveAmbientCodexHome(home)
+			: join(home, ".codex");
 	const defaultKind = (await readCodexProfileKind(defaultHome)) ?? {
 		credentialKind: "subscription" as const,
 		loginFingerprint: null,
@@ -306,6 +353,7 @@ export async function discoverCodexHomes(): Promise<CodexHome[]> {
 				home: defaultHome,
 				sourceLabel: tildeLabel(defaultHome),
 				...defaultKind,
+				signedOut: false,
 			},
 		],
 	]);
@@ -316,12 +364,22 @@ export async function discoverCodexHomes(): Promise<CodexHome[]> {
 	for (const candidate of candidates) {
 		if (homes.has(candidate)) continue;
 		const kind = await readCodexProfileKind(candidate);
-		if (!kind) continue;
-		homes.set(candidate, {
-			home: candidate,
-			sourceLabel: tildeLabel(candidate),
-			...kind,
-		});
+		if (kind) {
+			homes.set(candidate, {
+				home: candidate,
+				sourceLabel: tildeLabel(candidate),
+				...kind,
+				signedOut: false,
+			});
+		} else if (await isSignedOutCodexHome(candidate)) {
+			homes.set(candidate, {
+				home: candidate,
+				sourceLabel: tildeLabel(candidate),
+				credentialKind: "subscription",
+				loginFingerprint: null,
+				signedOut: true,
+			});
+		}
 	}
 	return [...homes.values()];
 }

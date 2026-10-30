@@ -49,6 +49,7 @@ import { RemoveAccountDialog } from "./components/RemoveAccountDialog";
 import type { RestartSessionsPrompt } from "./components/RestartSessionsDialog";
 import { RestartSessionsDialog } from "./components/RestartSessionsDialog";
 import { API_BILLING_LINKS } from "./utils/apiBilling";
+import { staleTokenDetail } from "./utils/staleTokenDetail";
 import { switchSignInCommand } from "./utils/switchSignInCommand";
 import type { ManagedAgent, QuotaAgent } from "./utils/visibleQuotaAgents";
 import { isManagedAgent, visibleQuotaAgents } from "./utils/visibleQuotaAgents";
@@ -284,11 +285,7 @@ function AccountCard({
 				</div>
 			) : account.status === "token_stale" ? (
 				<div className="mt-1.5 text-[11px] text-muted-foreground">
-					{account.agent === "opencode" ? (
-						<Trans>Refreshes when OpenCode next runs.</Trans>
-					) : (
-						<Trans>Refreshes when Claude Code next runs.</Trans>
-					)}
+					{staleTokenDetail(account.agent)}
 				</div>
 			) : expiredCommand !== null ? (
 				<div className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[11px] text-muted-foreground">

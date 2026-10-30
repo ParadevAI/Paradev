@@ -15211,6 +15211,9 @@ msgstr "Obnovit pull requesty"
 msgid "Refreshes when Claude Code next runs."
 msgstr "Obnoví se při příštím spuštění Claude Code."
 
+msgid "Refreshes when Codex next runs."
+msgstr "Obnoví se při příštím spuštění Codex."
+
 msgid "Refreshes when OpenCode next runs."
 msgstr "Obnoví se při příštím spuštění OpenCode."
 

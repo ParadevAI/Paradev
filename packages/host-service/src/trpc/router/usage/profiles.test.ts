@@ -12,6 +12,7 @@ import {
 	API_BILLING_MARKER,
 	claudeKeychainAccounts,
 	discoverClaudeProfiles,
+	discoverCodexHomes,
 	readCodexProfileKind,
 } from "./profiles";
 
@@ -156,5 +157,84 @@ describe("discoverClaudeProfiles", () => {
 			credentialKind: "subscription",
 			loginFingerprint: null,
 		});
+	});
+});
+
+describe("discoverCodexHomes", () => {
+	const PROFILE_LEDGER = ".superset-profile.json";
+
+	function codexDir(home: string, name: string, files: Record<string, string>) {
+		mkdirSync(join(home, name));
+		for (const [file, content] of Object.entries(files)) {
+			writeFileSync(join(home, name, file), content);
+		}
+		return join(home, name);
+	}
+
+	it("keeps a home Superset set up after its login is gone, as signed out", async () => {
+		const home = tempProfile();
+		const signedOut = codexDir(home, ".codex-a", { [PROFILE_LEDGER]: "{}" });
+		const emptyLogin = codexDir(home, ".codex-b", {
+			[PROFILE_LEDGER]: "{}",
+			"auth.json": JSON.stringify({ OPENAI_API_KEY: null, tokens: null }),
+		});
+		const homes = await discoverCodexHomes(home);
+		expect(homes.find((entry) => entry.home === signedOut)).toMatchObject({
+			credentialKind: "subscription",
+			loginFingerprint: null,
+			signedOut: true,
+		});
+		expect(homes.find((entry) => entry.home === emptyLogin)).toMatchObject({
+			signedOut: true,
+		});
+	});
+
+	it("keeps a home with a token as a live subscription", async () => {
+		const home = tempProfile();
+		const live = codexDir(home, ".codex-c", {
+			"auth.json": JSON.stringify({ tokens: { access_token: "test-token" } }),
+		});
+		expect(
+			(await discoverCodexHomes(home)).find((entry) => entry.home === live),
+		).toEqual({
+			home: live,
+			sourceLabel: expect.any(String),
+			credentialKind: "subscription",
+			loginFingerprint: null,
+			signedOut: false,
+		});
+	});
+
+	it("skips dirs without the ledger, and logins it cannot classify", async () => {
+		const home = tempProfile();
+		codexDir(home, ".codex-b", {});
+		// An unmarked API key and a half-written auth.json are logins, not sign-outs.
+		codexDir(home, ".codex-key", {
+			[PROFILE_LEDGER]: "{}",
+			"auth.json": JSON.stringify({ OPENAI_API_KEY: "sk-test" }),
+		});
+		codexDir(home, ".codex-partial", {
+			[PROFILE_LEDGER]: "{}",
+			"auth.json": '{"tokens": {"access_tok',
+		});
+		expect((await discoverCodexHomes(home)).map((entry) => entry.home)).toEqual(
+			[join(home, ".codex")],
+		);
+	});
+
+	it("lists the default home first, without a login and never as signed out", async () => {
+		const home = tempProfile();
+		codexDir(home, ".codex", { [PROFILE_LEDGER]: "{}" });
+		codexDir(home, ".codex-a", { [PROFILE_LEDGER]: "{}" });
+		const homes = await discoverCodexHomes(home);
+		expect(homes[0]).toMatchObject({
+			home: join(home, ".codex"),
+			credentialKind: "subscription",
+			signedOut: false,
+		});
+		expect(homes.map((entry) => entry.home)).toEqual([
+			join(home, ".codex"),
+			join(home, ".codex-a"),
+		]);
 	});
 });

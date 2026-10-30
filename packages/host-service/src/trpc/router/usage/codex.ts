@@ -1,13 +1,18 @@
 /**
  * Codex subscription quota from the ChatGPT backend `wham/usage` endpoint,
  * using the OAuth token the Codex CLI already stores in `$CODEX_HOME/auth.json`.
- * Read-only: we never refresh the token (see claude.ts for why).
+ * Read-only: we never refresh the token (see claude.ts for why). A lapsed
+ * access token is reported as `token_stale` while a refresh token remains.
  */
 
 import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { type CodexHome, discoverCodexHomes } from "./profiles";
+import {
+	type CodexHome,
+	discoverCodexHomes,
+	SIGNED_OUT_PROFILE_DETAIL,
+} from "./profiles";
 import type {
 	UsageAccount,
 	UsageAccountStatus,
@@ -17,11 +22,14 @@ import type {
 const CODEX_USAGE_URL = "https://chatgpt.com/backend-api/wham/usage";
 const FETCH_TIMEOUT_MS = 10_000;
 
+interface CodexTokens {
+	access_token?: string;
+	refresh_token?: string;
+	account_id?: string;
+}
+
 interface CodexAuthFile {
-	tokens?: {
-		access_token?: string;
-		account_id?: string;
-	};
+	tokens?: CodexTokens | null;
 }
 
 interface CodexRateLimitWindow {
@@ -102,8 +110,11 @@ function mapWindows(usage: CodexUsageResponse): UsageQuotaWindow[] {
 	return windows;
 }
 
-export async function fetchCodexAccounts(): Promise<UsageAccount[]> {
-	const homes = await discoverCodexHomes();
+/** `homeDir` overrides the home dir for tests. */
+export async function fetchCodexAccounts(
+	homeDir?: string,
+): Promise<UsageAccount[]> {
+	const homes = await discoverCodexHomes(homeDir);
 	// The first discovered home is what codex uses with no CODEX_HOME override
 	// (see discoverCodexHomes) — running on it needs no env injection.
 	const defaultHome = homes[0]?.home ?? null;
@@ -148,8 +159,36 @@ export interface CodexSubscriptionQuota {
 	creditsBalance: number | null;
 }
 
+export const CODEX_STALE_TOKEN_DETAIL = "Refreshes when Codex next runs.";
 export const CODEX_EXPIRED_TOKEN_DETAIL =
-	"Codex token expired — run `codex` to refresh it.";
+	"Sign-in expired — run `codex login`.";
+
+/** The `exp` claim of a JWT access token in ms, or null when it is unreadable. */
+function accessTokenExpiresAt(accessToken: string): number | null {
+	try {
+		const payload = accessToken.split(".")[1] ?? "";
+		const { exp } = JSON.parse(Buffer.from(payload, "base64url").toString());
+		return typeof exp === "number" && Number.isFinite(exp) ? exp * 1000 : null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Codex renews a lapsed access token from its refresh token the next time it
+ * runs, so only a lapsed token without a refresh token means the login is
+ * gone. A token whose expiry cannot be read is left to the usage endpoint.
+ */
+export function classifyCodexToken(
+	tokens: CodexTokens,
+	now = Date.now(),
+): "live" | "token_stale" | "token_expired" {
+	const expiresAt = tokens.access_token
+		? accessTokenExpiresAt(tokens.access_token)
+		: null;
+	if (expiresAt === null || expiresAt > now) return "live";
+	return tokens.refresh_token ? "token_stale" : "token_expired";
+}
 
 /**
  * Reads the subscription quota behind a ChatGPT OAuth access token. The
@@ -170,7 +209,8 @@ export async function fetchCodexSubscriptionQuota(
 			signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
 		});
 
-		if (response.status === 401 || response.status === 403) {
+		// A 403 is a refusal that a new sign-in does not clear.
+		if (response.status === 401) {
 			return {
 				...empty,
 				status: "token_expired",
@@ -245,23 +285,61 @@ async function fetchCodexAccountForHome(
 		];
 	}
 
-	let auth: CodexAuthFile;
+	let auth: CodexAuthFile | null = null;
 	try {
 		auth = JSON.parse(await readFile(authPath, "utf-8"));
 	} catch {
-		return [];
+		// No readable login; only a signed-out home still gets a card.
 	}
-	const accessToken = auth.tokens?.access_token;
-	if (!accessToken) return [];
+	const tokens = auth?.tokens;
+	const accessToken = tokens?.access_token;
+	if (!tokens || !accessToken) {
+		if (!home.signedOut) return [];
+		return [
+			{
+				account: {
+					...base,
+					email: null,
+					plan: null,
+					status: "signed_out",
+					statusDetail: SIGNED_OUT_PROFILE_DETAIL,
+					windows: [],
+					creditsBalance: null,
+				},
+				chatgptAccountId: null,
+			},
+		];
+	}
+
+	const lapsed = classifyCodexToken(tokens);
+	if (lapsed !== "live") {
+		return [
+			{
+				account: {
+					...base,
+					email: null,
+					plan: null,
+					status: lapsed,
+					statusDetail:
+						lapsed === "token_stale"
+							? CODEX_STALE_TOKEN_DETAIL
+							: CODEX_EXPIRED_TOKEN_DETAIL,
+					windows: [],
+					creditsBalance: null,
+				},
+				chatgptAccountId: tokens.account_id ?? null,
+			},
+		];
+	}
 
 	const quota = await fetchCodexSubscriptionQuota(
 		accessToken,
-		auth.tokens?.account_id,
+		tokens.account_id,
 	);
 	return [
 		{
 			account: { ...base, ...quota },
-			chatgptAccountId: auth.tokens?.account_id ?? null,
+			chatgptAccountId: tokens.account_id ?? null,
 		},
 	];
 }

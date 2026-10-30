@@ -15211,6 +15211,9 @@ msgstr "Actualiser les pull requests"
 msgid "Refreshes when Claude Code next runs."
 msgstr "Actualisé au prochain lancement de Claude Code."
 
+msgid "Refreshes when Codex next runs."
+msgstr "Actualisé au prochain lancement de Codex."
+
 msgid "Refreshes when OpenCode next runs."
 msgstr "Actualisé au prochain lancement de OpenCode."
 
