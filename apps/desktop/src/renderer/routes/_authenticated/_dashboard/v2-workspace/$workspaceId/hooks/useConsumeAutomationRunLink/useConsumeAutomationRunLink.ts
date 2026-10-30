@@ -56,14 +56,14 @@ export function useConsumeAutomationRunLink({
 				: [];
 			return chatSessionTarget({ result, sessions, sessionId, workspaceId });
 		},
-		enabled: !!sessionId && acpChat === "enabled" && isLayoutReady,
+		enabled: !!sessionId && acpChat && isLayoutReady,
 		refetchOnWindowFocus: false,
 		retry: false,
 	});
 	useEffect(() => {
-		if (!sessionId || !isLayoutReady || acpChat === "resolving") return;
+		if (!sessionId || !isLayoutReady) return;
 		if (
-			acpChat === "enabled" &&
+			acpChat &&
 			(chatQuery.isFetching || (!chatQuery.isSuccess && !chatQuery.isError))
 		)
 			return;
@@ -74,8 +74,7 @@ export function useConsumeAutomationRunLink({
 		})}`;
 		if (consumedRef.current.has(key)) return;
 		consumedRef.current.add(key);
-		const target =
-			acpChat === "enabled" && chatQuery.isSuccess ? chatQuery.data : null;
+		const target = acpChat && chatQuery.isSuccess ? chatQuery.data : null;
 		consumeSearch(target ? ["sessionId", "terminalId"] : ["sessionId"]);
 		if (target) focusChatSession({ store, linkedStores, session: target });
 	}, [

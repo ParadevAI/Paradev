@@ -152,39 +152,15 @@ describe("settings search - mobile rollout", () => {
 	});
 });
 
-describe("settings search - chat", () => {
-	it("counts the Chat switch only when its flag is on", () => {
-		expect(
-			getVisibleMatchCountBySection("acp", true, false).experimental,
-		).toBeUndefined();
-		expect(
-			getVisibleMatchCountBySection("acp", true, false, false, true)
-				.experimental,
-		).toBe(1);
-	});
-});
-
 describe("settings search - plugins visibility", () => {
 	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection(
-				"marketplace",
-				true,
-				false,
-				false,
-				false,
-				false,
-			).plugins,
+			getVisibleMatchCountBySection("marketplace", true, false, false, false)
+				.plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection(
-				"marketplace",
-				true,
-				false,
-				false,
-				false,
-				true,
-			).plugins,
+			getVisibleMatchCountBySection("marketplace", true, false, false, true)
+				.plugins,
 		).toBeGreaterThan(0);
 	});
 });

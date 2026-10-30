@@ -50,7 +50,7 @@ let creates = 0;
 const changes = new Set<() => void>();
 const connectionListeners = new Set<() => void>();
 let refs = 0;
-let chatAvailability: "enabled" | "disabled" = "enabled";
+let acpChatEnabled = true;
 type Binding = {
 	terminalId: string;
 	agentId: string;
@@ -89,7 +89,7 @@ mock.module("@superset/workspace-client", () => ({
 	useWorkspaceClient: () => ({ hostUrl }),
 }));
 mock.module("renderer/hooks/useAcpChatEnabled", () => ({
-	useAcpChatEnabled: () => chatAvailability,
+	useAcpChatEnabled: () => acpChatEnabled,
 }));
 mock.module("renderer/hooks/host-service/useWorkspaceHostUrl", () => ({
 	useWorkspaceHostUrl: () => hostUrl,
@@ -243,7 +243,7 @@ afterEach(() => {
 	reads = 0;
 	outlineReads = 0;
 	creates = 0;
-	chatAvailability = "enabled";
+	acpChatEnabled = true;
 	terminalAgents = new Map();
 	localStorage.clear();
 });
@@ -368,7 +368,7 @@ test("a launch whose stored prompt differs is held back and attached at the dead
 });
 
 test("turning agent chat off removes the waiting pane instead of leaving it stuck", async () => {
-	chatAvailability = "disabled";
+	acpChatEnabled = false;
 	const pending = await waitingPane();
 	show(pending.store, "disabled-workspace");
 	await waitFor(() => expect(pending.store.getState().tabs).toHaveLength(0));

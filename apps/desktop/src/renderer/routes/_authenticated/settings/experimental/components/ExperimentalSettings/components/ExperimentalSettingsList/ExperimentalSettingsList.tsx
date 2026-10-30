@@ -1,9 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import { useAcpChatStore } from "renderer/stores/acp-chat";
@@ -51,14 +49,14 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const acpChatFlag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
-	const showAcpChat =
-		acpChatFlag &&
-		isItemVisible(SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT, visibleItems);
-	const acpChatEnabled = useAcpChatEnabled() === "enabled";
+	const showAcpChat = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
+		visibleItems,
+	);
+	const acpChatEnabled = useAcpChatEnabled();
 	const setAcpChatEnabled = useAcpChatStore((state) => state.setEnabled);
 	const showChatTurnSnapshots =
-		acpChatFlag &&
+		acpChatEnabled &&
 		isItemVisible(
 			SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
 			visibleItems,
