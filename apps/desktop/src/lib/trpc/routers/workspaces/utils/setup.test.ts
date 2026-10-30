@@ -1,20 +1,29 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PROJECTS_DIR_NAME, SUPERSET_DIR_NAME } from "shared/constants";
+import { PROJECTS_DIR_NAME } from "shared/constants";
 import { loadSetupConfig, mergeConfigs } from "./setup";
 
 const TEST_DIR = join(tmpdir(), `superset-test-setup-${process.pid}`);
 const MAIN_REPO = join(TEST_DIR, "main-repo");
 const WORKTREE = join(TEST_DIR, "worktree");
 const PROJECT_ID = "test-project-id";
-const USER_CONFIG_DIR = join(
-	homedir(),
-	SUPERSET_DIR_NAME,
-	PROJECTS_DIR_NAME,
-	PROJECT_ID,
-);
+const TEST_APP_HOME = join(TEST_DIR, "app-home");
+const USER_CONFIG_DIR = join(TEST_APP_HOME, PROJECTS_DIR_NAME, PROJECT_ID);
+const ORIGINAL_SUPERSET_HOME_DIR = process.env.SUPERSET_HOME_DIR;
+
+beforeEach(() => {
+	process.env.SUPERSET_HOME_DIR = TEST_APP_HOME;
+});
+
+afterEach(() => {
+	if (ORIGINAL_SUPERSET_HOME_DIR === undefined) {
+		delete process.env.SUPERSET_HOME_DIR;
+	} else {
+		process.env.SUPERSET_HOME_DIR = ORIGINAL_SUPERSET_HOME_DIR;
+	}
+});
 
 describe("loadSetupConfig", () => {
 	beforeEach(() => {

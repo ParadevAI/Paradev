@@ -2,7 +2,7 @@
  * Test preload: give every test run its own Superset home.
  *
  * Production code resolves `~/.superset` from `SUPERSET_HOME_DIR` (see
- * agent-setup's resolveSupersetHomeDir and the mirror in the usage router's
+ * agent-setup's resolveAppHomeDir and the mirror in the usage router's
  * default-account.ts). A test that calls such code with the variable unset
  * writes to the developer's REAL home. That is not hypothetical: the default
  * agent-account tests wrote `$TMPDIR` into the live

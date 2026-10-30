@@ -1,13 +1,12 @@
 import { cpSync, existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import {
 	CONFIG_FILE_NAME,
 	LOCAL_CONFIG_FILE_NAME,
 	PROJECT_SUPERSET_DIR_NAME,
 	PROJECTS_DIR_NAME,
-	SUPERSET_DIR_NAME,
 } from "shared/constants";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import type { LocalSetupConfig, SetupConfig } from "shared/types";
 
 /**
@@ -199,8 +198,7 @@ export function loadSetupConfig({
 
 	if (projectId && !projectId.includes("/") && !projectId.includes("\\")) {
 		const userConfigPath = join(
-			homedir(),
-			SUPERSET_DIR_NAME,
+			resolveAppHomeDir(),
 			PROJECTS_DIR_NAME,
 			projectId,
 			CONFIG_FILE_NAME,

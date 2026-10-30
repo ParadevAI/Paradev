@@ -13,19 +13,19 @@ import {
 
 interface Sandbox {
 	repoPath: string;
-	homeDir: string;
+	appHomeDir: string;
 	cleanup: () => void;
 }
 
 function createSandbox(): Sandbox {
 	const root = mkdtempSync(join(tmpdir(), "setup-config-test-"));
 	const repoPath = join(root, "repo");
-	const homeDir = join(root, "home");
+	const appHomeDir = join(root, "home");
 	mkdirSync(repoPath, { recursive: true });
-	mkdirSync(homeDir, { recursive: true });
+	mkdirSync(appHomeDir, { recursive: true });
 	return {
 		repoPath,
-		homeDir,
+		appHomeDir,
 		cleanup: () => rmSync(root, { recursive: true, force: true }),
 	};
 }
@@ -51,21 +51,21 @@ function writeRepoLocalConfig(repoPath: string, content: string | object) {
 }
 
 function writeUserOverride(
-	homeDir: string,
+	appHomeDir: string,
 	projectId: string,
 	content: object,
 ) {
-	const dir = join(homeDir, ".superset", "projects", projectId);
+	const dir = join(appHomeDir, "projects", projectId);
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, "config.json"), JSON.stringify(content), "utf-8");
 }
 
 function writeUserOverrideByPath(
-	homeDir: string,
+	appHomeDir: string,
 	repoPath: string,
 	content: object,
 ) {
-	const dir = join(homeDir, ".superset", "projects", repoPath);
+	const dir = join(appHomeDir, "projects", repoPath);
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, "config.json"), JSON.stringify(content), "utf-8");
 }
@@ -87,7 +87,7 @@ describe("loadSetupConfig", () => {
 		return loadSetupConfig({
 			repoPath: sandbox.repoPath,
 			projectId: args.projectId ?? PROJECT_ID,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 	}
 
@@ -164,7 +164,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		// Keys the worktree doesn't define fall through to the repo config.
@@ -178,7 +178,7 @@ describe("loadSetupConfig", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
 		writeRepoConfig(worktreePath, { setup: ["from-worktree"] });
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["from-user"],
 		});
 
@@ -186,7 +186,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		expect(result?.setup).toEqual(["from-user"]);
@@ -206,7 +206,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		expect(result?.setup).toEqual(["worktree-local", "base"]);
@@ -214,7 +214,7 @@ describe("loadSetupConfig", () => {
 
 	it("resolves the user override by repo path", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverrideByPath(sandbox.homeDir, sandbox.repoPath, {
+		writeUserOverrideByPath(sandbox.appHomeDir, sandbox.repoPath, {
 			setup: ["from-path-override"],
 		});
 
@@ -224,10 +224,10 @@ describe("loadSetupConfig", () => {
 
 	it("path-keyed user override wins over the legacy id-keyed one", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverrideByPath(sandbox.homeDir, sandbox.repoPath, {
+		writeUserOverrideByPath(sandbox.appHomeDir, sandbox.repoPath, {
 			setup: ["from-path-override"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["from-id-override"],
 		});
 
@@ -240,7 +240,7 @@ describe("loadSetupConfig", () => {
 			setup: ["bun install"],
 			teardown: ["docker compose down"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["bun install --frozen-lockfile"],
 		});
 
@@ -256,7 +256,7 @@ describe("loadSetupConfig", () => {
 		// Path-traversal guard: the loader should refuse to expand the override
 		// path for a projectId that looks like a relative path.
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverride(sandbox.homeDir, "../escapee", {
+		writeUserOverride(sandbox.appHomeDir, "../escapee", {
 			setup: ["from-override"],
 		});
 		const result = load({ projectId: "../escapee" });
@@ -335,7 +335,7 @@ describe("loadSetupConfig", () => {
 		// repo provides base; user override replaces setup (per-key); local
 		// overlay's `before` then prepends to that merged result.
 		writeRepoConfig(sandbox.repoPath, { setup: ["a"] });
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, { setup: ["b"] });
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, { setup: ["b"] });
 		writeRepoLocalConfig(sandbox.repoPath, {
 			setup: { before: ["pre"] },
 		});
@@ -352,7 +352,7 @@ describe("loadSetupConfig", () => {
 			setup: ["from-repo"],
 			teardown: ["keep-me"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, { setup: [] });
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, { setup: [] });
 
 		const result = load();
 		expect(result?.setup).toEqual([]);
@@ -431,7 +431,7 @@ describe("loadProjectConfig with v1 sources", () => {
 		const config = loadProjectConfig({
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 			...(worktreePath && { worktreePath }),
 		});
 		if (config?.kind !== "ok") return null;

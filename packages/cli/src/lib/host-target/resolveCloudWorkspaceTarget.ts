@@ -6,7 +6,7 @@ import { getHostId } from "@superset/shared/host-info";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import SuperJSON from "superjson";
 import type { ApiClient } from "../api-client";
-import { getSupersetHomeDir } from "../settings/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import type {
 	HostServiceClient,
 	ResolvedHostTarget,
@@ -27,7 +27,7 @@ const TICKET_MARGIN_MS = 60_000;
 const REACH_TIMEOUT_MS = 8_000;
 
 function ticketsPath(): string {
-	return join(getSupersetHomeDir(), "cloud-workspace-tickets.json");
+	return join(resolveAppHomeDir(), "cloud-workspace-tickets.json");
 }
 
 /**

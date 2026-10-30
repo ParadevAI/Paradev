@@ -11,7 +11,7 @@ import {
 } from "@superset/shared/rotating-log";
 import type { ApiClient } from "../api-client";
 import { env, isDesktopBundled } from "../env";
-import { getSupersetHomeDir } from "../settings/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	ensureManifestDir,
 	type HostServiceManifest,
@@ -170,7 +170,7 @@ export async function spawnHostService(
 			// (host-service-coordinator.ts); without it the host's PTYs get no
 			// SUPERSET_HOME_DIR and every managed agent hook self-disables on
 			// its own guard (#6254).
-			SUPERSET_HOME_DIR: getSupersetHomeDir(),
+			SUPERSET_HOME_DIR: resolveAppHomeDir(),
 		},
 	});
 

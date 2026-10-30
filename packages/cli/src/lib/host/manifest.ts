@@ -7,7 +7,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { getSupersetHomeDir } from "../settings/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 
 /**
  * Manifest format matches the desktop app's HostServiceManifest
@@ -23,7 +23,7 @@ export interface HostServiceManifest {
 }
 
 function manifestDir(organizationId: string): string {
-	return join(getSupersetHomeDir(), "host", organizationId);
+	return join(resolveAppHomeDir(), "host", organizationId);
 }
 
 function manifestPath(organizationId: string): string {

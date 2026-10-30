@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, realpathSync } from "node:fs";
-import { homedir } from "node:os";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 import { join } from "node:path";
 
 /** Minimal readonly handle satisfied by both better-sqlite3 and bun:sqlite. */
@@ -11,7 +11,7 @@ export interface ReadonlySqlite {
 	close(): void;
 }
 
-export const DEFAULT_HOST_DB_ROOT = join(homedir(), ".superset", "host");
+export const DEFAULT_HOST_DB_ROOT = join(defaultAppHomeDir(), "host");
 
 function canonicalPath(path: string): string | undefined {
 	try {

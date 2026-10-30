@@ -5,7 +5,7 @@ import {
 	rmSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { join } from "node:path";
 import mimeTypes from "mime-types";
 
@@ -32,7 +32,7 @@ export function getAttachmentsRoot(baseDirOverride?: string): string {
 	const base =
 		envBase && envBase.length > 0
 			? envBase
-			: join(homedir(), ".superset", "host", "standalone");
+			: join(resolveAppHomeDir(), "host", "standalone");
 	return join(base, "attachments");
 }
 

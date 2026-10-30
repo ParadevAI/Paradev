@@ -1,4 +1,4 @@
-import { homedir } from "node:os";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { join } from "node:path";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
@@ -323,7 +323,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const agentJobs = new AgentJobRunner({
 		rootDir: join(
-			process.env.SUPERSET_HOME_DIR?.trim() || join(homedir(), ".superset"),
+			resolveAppHomeDir(),
 			"agent-jobs",
 		),
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),

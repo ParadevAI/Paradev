@@ -3,13 +3,13 @@ import { join } from "node:path";
 import { getHostId } from "@superset/shared/host-info";
 import type { ApiClient } from "../api-client";
 import { resolveHostFilter } from "../host-target";
-import { getSupersetHomeDir } from "../settings/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 
 const AVAILABILITY_TTL_MS = 60 * 60_000;
 const AVAILABILITY_TIMEOUT_MS = 2_000;
 
 function availabilityPath(): string {
-	return join(getSupersetHomeDir(), "cloud-availability.json");
+	return join(resolveAppHomeDir(), "cloud-availability.json");
 }
 
 /**
