@@ -16,7 +16,10 @@ import {
 } from "../../../../workspaces/local-workspace-store";
 import { setWorkspaceNamingState } from "../../../../workspaces/workspace-naming-state";
 import { protectedProcedure } from "../../../index";
-import { validateAgentLaunchOptions } from "../../agents";
+import {
+	prepareAgentModelCatalog,
+	validateAgentLaunchOptions,
+} from "../../agents";
 import { initEmptyRepo } from "../../project/utils/resolve-repo";
 import { startCommandTerminal } from "../shared/command-terminal";
 import {
@@ -73,6 +76,7 @@ export const createSession = protectedProcedure
 	.input(createSessionInputSchema)
 	.mutation(async ({ ctx, input }) => {
 		for (const launch of input.agents ?? []) {
+			await prepareAgentModelCatalog(ctx.db, launch);
 			validateAgentLaunchOptions(ctx.db, launch);
 		}
 

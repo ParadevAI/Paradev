@@ -11,7 +11,9 @@
  * options never leak onto the legacy `pi` CLI.
  *
  * The lists are hand-maintained and expected to drift with CLI releases —
- * update them here when a tool adds or retires models.
+ * update them here when a tool adds or retires models. Agents marked
+ * `liveCatalog` also get their list from the installed CLI through the host
+ * (`agents.listModels`); their curated list is the fallback.
  */
 
 export interface AgentModelOption {
@@ -62,6 +64,23 @@ export interface AgentModelSupport {
 	 */
 	modelEnv?: string;
 	models: AgentModelOption[];
+	/**
+	 * The host can read this agent's own model list (`AgentModelCatalog`), so
+	 * pickers and launch validation follow what the installed CLI offers the
+	 * signed-in account instead of only `models`.
+	 */
+	liveCatalog?: boolean;
+}
+
+/**
+ * Models and per-model efforts read from the installed agent CLI. It replaces
+ * the curated `models` for pickers and adds to them for launch validation, so
+ * a model the CLI has dropped still launches until its saved picks age out.
+ */
+export interface AgentModelCatalog {
+	models: AgentModelOption[];
+	/** Model id → effort ids that model accepts, in the agent's order. */
+	efforts: Readonly<Record<string, readonly string[]>>;
 }
 
 export interface SupersetChatModel extends AgentModelOption {
@@ -148,6 +167,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 	{
 		presetId: "codex",
 		modelFlag: "--model",
+		liveCatalog: true,
 		models: [
 			// Availability is account-dependent; ids and order follow Codex's
 			// live catalog (`codex app-server` → `model/list`, codex 0.162.1).
@@ -753,32 +773,64 @@ export function getAgentModeSupport(
 }
 
 /**
+ * The models a picker offers for the preset: the live catalog when the host
+ * read one, else the curated list.
+ */
+export function getAgentModels(
+	presetId: string,
+	catalog?: AgentModelCatalog | null,
+): AgentModelOption[] {
+	if (catalog && catalog.models.length > 0) return catalog.models;
+	return getAgentModelSupport(presetId)?.models ?? [];
+}
+
+function effortLabel(id: string): string {
+	return id.charAt(0).toUpperCase() + id.slice(1);
+}
+
+/**
  * Efforts the given preset offers for `model` — the full curated list minus
  * any option the selected model rejects. An unset model (or an id outside the
- * curated catalog, which `buildAgentModelArgs` drops so the launch runs the
- * agent's own default) keeps the full list. Presets whose effort is a sibling
- * model id (`modelVariants`) offer only that model's ladder, and nothing when
- * the model is unset or has no ladder.
+ * catalog, which `buildAgentModelArgs` drops so the launch runs the agent's
+ * own default) keeps the full list. A live catalog that lists the model's
+ * efforts decides them outright, so a new level reaches the picker without a
+ * release. Presets whose effort is a sibling model id (`modelVariants`) offer
+ * only that model's ladder, and nothing when the model is unset or has no
+ * ladder.
  */
 export function getAgentEfforts(
 	presetId: string,
 	model?: string,
+	catalog?: AgentModelCatalog | null,
 ): AgentEffortOption[] {
 	const support = getAgentEffortSupport(presetId);
 	if (!support) return [];
-	const selected = getAgentModelSupport(presetId)?.models.some(
-		(option) => option.id === model,
-	)
-		? model
-		: undefined;
+	const liveEfforts =
+		model && support.effortFlag ? catalog?.efforts[model] : undefined;
+	if (liveEfforts) {
+		return liveEfforts.map((id) => {
+			const curated = support.efforts.find((effort) => effort.id === id);
+			return { id, label: curated?.label ?? effortLabel(id) };
+		});
+	}
+	const selected =
+		model && isCuratedAgentModel(presetId, model, catalog) ? model : undefined;
 	if (support.requiresModel && !selected) return [];
 	if (support.modelVariants) {
 		const variants = selected ? support.modelVariants[selected] : undefined;
 		if (!variants) return [];
 		return support.efforts.filter((effort) => effort.id in variants);
 	}
+	const curatedSelected = getAgentModelSupport(presetId)?.models.some(
+		(option) => option.id === selected,
+	)
+		? selected
+		: undefined;
 	return support.efforts.filter(
-		(effort) => !effort.models || !selected || effort.models.includes(selected),
+		(effort) =>
+			!effort.models ||
+			!curatedSelected ||
+			effort.models.includes(curatedSelected),
 	);
 }
 
@@ -794,11 +846,12 @@ export function buildAgentEffortArgs(
 	presetId: string,
 	effort: string | undefined,
 	model?: string,
+	catalog?: AgentModelCatalog | null,
 ): string[] {
 	if (!effort) return [];
 	const support = getAgentEffortSupport(presetId);
 	if (!support?.effortFlag) return [];
-	const efforts = getAgentEfforts(presetId, model);
+	const efforts = getAgentEfforts(presetId, model, catalog);
 	if (!efforts.some((option) => option.id === effort)) return [];
 	return [support.effortFlag, `${support.effortValuePrefix ?? ""}${effort}`];
 }
@@ -818,16 +871,23 @@ export function buildAgentModeArgs(
 }
 
 /**
- * Whether `model` is an id the preset's launch accepts: a curated picker entry
- * or, for presets whose effort is a sibling model id, any of those siblings.
- * That keeps a preference saved before a sibling was folded into its family
- * (cursor-agent's old "Fable 5 xHigh" entry) launching, and lets CLI callers
- * pass any level id directly.
+ * Whether `model` is an id the preset's launch accepts: a curated picker
+ * entry, an entry of the live catalog, or, for presets whose effort is a
+ * sibling model id, any of those siblings. That keeps a preference saved
+ * before a sibling was folded into its family (cursor-agent's old "Fable 5
+ * xHigh" entry) launching, and lets CLI callers pass any level id directly.
  */
-export function isCuratedAgentModel(presetId: string, model: string): boolean {
+export function isCuratedAgentModel(
+	presetId: string,
+	model: string,
+	catalog?: AgentModelCatalog | null,
+): boolean {
 	const support = getAgentModelSupport(presetId);
 	if (!support) return false;
 	if (support.models.some((option) => option.id === model)) return true;
+	if (support.liveCatalog && catalog?.models.some((o) => o.id === model)) {
+		return true;
+	}
 	const variants = getAgentEffortSupport(presetId)?.modelVariants;
 	if (!variants) return false;
 	return Object.values(variants).some((ladder) =>
@@ -849,11 +909,12 @@ export function buildAgentModelArgs(
 	presetId: string,
 	model: string | undefined,
 	effort?: string,
+	catalog?: AgentModelCatalog | null,
 ): string[] {
 	if (!model) return [];
 	const support = getAgentModelSupport(presetId);
 	if (!support?.modelFlag) return [];
-	if (!isCuratedAgentModel(presetId, model)) return [];
+	if (!isCuratedAgentModel(presetId, model, catalog)) return [];
 	const variant = effort
 		? getAgentEffortSupport(presetId)?.modelVariants?.[model]?.[effort]
 		: undefined;

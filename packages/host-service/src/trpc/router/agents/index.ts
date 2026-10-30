@@ -6,3 +6,4 @@ export {
 	runAgentInWorkspace,
 	validateAgentLaunchOptions,
 } from "./agents";
+export { prepareAgentModelCatalog } from "./utils/model-catalog";

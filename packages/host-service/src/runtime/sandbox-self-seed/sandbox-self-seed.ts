@@ -23,6 +23,7 @@ import {
 	chatLaunchTarget,
 	runAgentInWorkspace,
 } from "../../trpc/router/agents/agents";
+import { prepareAgentModelCatalog } from "../../trpc/router/agents/utils/model-catalog";
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
@@ -363,6 +364,9 @@ export async function launchSandboxAgentOnce(
 			} catch (error) {
 				console.error("[sandbox] could not import prompt attachments", error);
 			}
+		}
+		if (surface === "chat") {
+			await prepareAgentModelCatalog(ctx.db, { agent, model });
 		}
 		const chatTarget =
 			surface === "chat"
