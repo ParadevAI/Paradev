@@ -7,7 +7,8 @@
  *   bun scripts/generate-toolbar-icons.ts
  */
 import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ToolbarIconName } from "../lib/navigation/toolbarIcon.types";
 
 // `fill1` for an "on" state, as the iOS side uses a `.fill` symbol there.
@@ -32,7 +33,10 @@ const MATERIAL_SYMBOL: Record<ToolbarIconName, string> = {
 };
 
 const SIZE = 960;
-const outDir = join(import.meta.dir, "../lib/navigation/toolbar-icons");
+const outDir = join(
+	dirname(fileURLToPath(import.meta.url)),
+	"../lib/navigation/toolbar-icons",
+);
 
 // How many numbers each command takes, and which of them are y coordinates.
 const ARITY: Record<string, { count: number; ys: number[] }> = {
