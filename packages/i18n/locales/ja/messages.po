@@ -3638,6 +3638,9 @@ msgstr "Calendar"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "この組織のCalendarとGmailのトリガーは、アカウントを再接続するまで動作しなくなります。"
 
+msgid "Camera"
+msgstr "カメラ"
+
 msgid "Camera access is not allowed"
 msgstr "カメラへのアクセスが許可されていません"
 
@@ -13819,6 +13822,9 @@ msgstr "幻のフォークリフト"
 
 msgid "Phone number"
 msgstr "電話番号"
+
+msgid "Photos"
+msgstr "写真"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "テーマ一覧から{name}を選んで適用します。"

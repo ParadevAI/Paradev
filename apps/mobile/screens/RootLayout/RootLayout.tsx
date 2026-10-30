@@ -1,5 +1,6 @@
 import { PortalHost } from "@rn-primitives/portal";
 import { AlertPromptHost } from "@superset/alert-prompt";
+import { AttachmentsSheetHost } from "@superset/attachments-sheet";
 import { CloudClientProvider } from "@superset/cloud-client";
 import { resolveLocale } from "@superset/i18n";
 import { I18nProvider } from "@superset/i18n/react";
@@ -135,6 +136,7 @@ export function RootLayout() {
 								<PostHogUserIdentifier />
 								<PortalHost />
 								<AlertPromptHost />
+								<AttachmentsSheetHost />
 							</ThemeProvider>
 						</I18nProvider>
 					</PostHogProvider>

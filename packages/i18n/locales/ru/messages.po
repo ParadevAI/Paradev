@@ -3638,6 +3638,9 @@ msgstr "Календарь"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Триггеры Календаря и Gmail в этой организации перестанут срабатывать, пока аккаунт не подключат снова."
 
+msgid "Camera"
+msgstr "Камера"
+
 msgid "Camera access is not allowed"
 msgstr "Доступ к камере запрещён"
 
@@ -13819,6 +13822,9 @@ msgstr "Призрачный погрузчик"
 
 msgid "Phone number"
 msgstr "Телефон"
+
+msgid "Photos"
+msgstr "Фото"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Выберите {name} в сетке тем, чтобы применить."

@@ -3638,6 +3638,9 @@ msgstr "Kalender"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Pemicu Calendar dan Gmail di organisasi ini akan berhenti berjalan sampai ada akun yang terhubung lagi."
 
+msgid "Camera"
+msgstr "Kamera"
+
 msgid "Camera access is not allowed"
 msgstr "Akses kamera tidak diizinkan"
 
@@ -13819,6 +13822,9 @@ msgstr "Forklift Hantu"
 
 msgid "Phone number"
 msgstr "Nomor telepon"
+
+msgid "Photos"
+msgstr "Foto"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Pilih {name} dari grid tema untuk menerapkannya."

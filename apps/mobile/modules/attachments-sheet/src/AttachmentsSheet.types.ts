@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 export type AttachmentsSheetAction = "photos" | "camera" | "files";
 
 export interface AttachmentsSheetAsset {
@@ -35,3 +37,6 @@ export type PresentAttachmentsSheet = (
 	theme: AttachmentsSheetTheme,
 	handlers: AttachmentsSheetHandlers,
 ) => Promise<boolean>;
+
+/** Mounted once at the app root; draws the sheet where no native module does. */
+export type AttachmentsSheetHostComponent = ComponentType;

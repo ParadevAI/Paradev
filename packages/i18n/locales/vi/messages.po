@@ -3638,6 +3638,9 @@ msgstr "Calendar"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Các trigger Calendar và Gmail trong tổ chức này sẽ ngừng chạy cho đến khi kết nối lại một tài khoản."
 
+msgid "Camera"
+msgstr "Máy ảnh"
+
 msgid "Camera access is not allowed"
 msgstr "Không được phép truy cập camera"
 
@@ -13819,6 +13822,9 @@ msgstr "Xe nâng bóng ma"
 
 msgid "Phone number"
 msgstr "Số điện thoại"
+
+msgid "Photos"
+msgstr "Ảnh"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Chọn {name} trong lưới chủ đề để áp dụng."

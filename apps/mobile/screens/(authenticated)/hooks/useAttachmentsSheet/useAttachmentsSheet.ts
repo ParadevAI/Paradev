@@ -95,7 +95,10 @@ export function useAttachmentsSheet(draftKey: string) {
 					// Plain dismissal, with neither assets nor a row action.
 					onDismiss: () => options?.onClosed?.(),
 				},
-			);
+			).then((presented) => {
+				// No sheet on this build: the button still opens the photo picker.
+				if (!presented) handleAction("photos");
+			});
 		},
 		[attachments, draftKey, theme, t],
 	);

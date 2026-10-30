@@ -3638,6 +3638,9 @@ msgstr "Takvim"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Bu kuruluştaki Calendar ve Gmail tetikleyicileri, yeniden bir hesap bağlanana kadar tetiklenmeyi durdurur."
 
+msgid "Camera"
+msgstr "Kamera"
+
 msgid "Camera access is not allowed"
 msgstr "Kamera erişimine izin verilmiyor"
 
@@ -13819,6 +13822,9 @@ msgstr "Hayalet Forklift"
 
 msgid "Phone number"
 msgstr "Telefon numarası"
+
+msgid "Photos"
+msgstr "Fotoğraflar"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Uygulamak için tema ızgarasından {name} temasını seçin."

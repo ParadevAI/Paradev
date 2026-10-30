@@ -3638,6 +3638,9 @@ msgstr "Agenda"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Calendar- en Gmail-triggers in deze organisatie stoppen tot er weer een account is verbonden."
 
+msgid "Camera"
+msgstr "Camera"
+
 msgid "Camera access is not allowed"
 msgstr "Toegang tot de camera is niet toegestaan"
 
@@ -13819,6 +13822,9 @@ msgstr "Fantoomheftruck"
 
 msgid "Phone number"
 msgstr "Telefoonnummer"
+
+msgid "Photos"
+msgstr "Foto's"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Kies {name} in het themaraster om het toe te passen."

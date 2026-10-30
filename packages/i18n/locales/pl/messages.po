@@ -3638,6 +3638,9 @@ msgstr "Kalendarz"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Wyzwalacze Kalendarza i Gmaila w tej organizacji przestaną działać, dopóki konto nie zostanie podłączone ponownie."
 
+msgid "Camera"
+msgstr "Aparat"
+
 msgid "Camera access is not allowed"
 msgstr "Brak zgody na dostęp do aparatu"
 
@@ -13819,6 +13822,9 @@ msgstr "Widmowy Wózek Widłowy"
 
 msgid "Phone number"
 msgstr "Numer telefonu"
+
+msgid "Photos"
+msgstr "Zdjęcia"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Wybierz {name} z siatki motywów, aby go zastosować."

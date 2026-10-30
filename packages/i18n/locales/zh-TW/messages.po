@@ -3638,6 +3638,9 @@ msgstr "日曆"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "在重新連線帳戶之前，此組織中的日曆和Gmail觸發器將停止觸發。"
 
+msgid "Camera"
+msgstr "相機"
+
 msgid "Camera access is not allowed"
 msgstr "相機存取未獲允許"
 
@@ -13819,6 +13822,9 @@ msgstr "幽靈堆高機"
 
 msgid "Phone number"
 msgstr "電話號碼"
+
+msgid "Photos"
+msgstr "照片"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "在主題網格中選擇{name}即可應用。"

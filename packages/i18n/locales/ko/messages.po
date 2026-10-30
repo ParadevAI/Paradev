@@ -3638,6 +3638,9 @@ msgstr "캘린더"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "계정을 다시 연결할 때까지 이 조직의 Calendar 및 Gmail 트리거가 실행되지 않습니다."
 
+msgid "Camera"
+msgstr "카메라"
+
 msgid "Camera access is not allowed"
 msgstr "카메라 접근이 허용되지 않았습니다"
 
@@ -13819,6 +13822,9 @@ msgstr "유령 지게차"
 
 msgid "Phone number"
 msgstr "전화번호"
+
+msgid "Photos"
+msgstr "사진"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "테마 목록에서 {name}을(를) 선택해 적용하세요."
