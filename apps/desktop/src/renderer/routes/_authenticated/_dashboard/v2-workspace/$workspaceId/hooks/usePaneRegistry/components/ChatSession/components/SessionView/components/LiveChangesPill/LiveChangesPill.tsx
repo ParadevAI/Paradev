@@ -41,9 +41,9 @@ export function LiveChangesPill({
 	return (
 		<div className={CHAT_GUTTER_CLASSNAME}>
 			<div className={CHAT_COLUMN_CLASSNAME}>
-				<div className="mx-4 mb-1.5 flex">
+				<div className="mb-1.5 flex">
 					<button
-						className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-2.5 py-0.5 text-muted-foreground text-xs transition-colors hover:text-foreground disabled:cursor-default"
+						className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-card px-2.5 py-0.5 text-muted-foreground text-xs ring-1 ring-border transition-colors hover:text-foreground disabled:cursor-default"
 						disabled={!filter || !openDiff}
 						onClick={() => filter && openDiff?.(filter)}
 						title={t({ message: "Review what this turn has changed so far" })}
