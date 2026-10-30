@@ -3,14 +3,16 @@ import { Directory, File, Paths } from "expo-file-system";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import type { UseAttachmentFile } from "./useAttachmentFile.types";
 
-function extensionOf(name: string, mediaType: string): string {
-	const fromName = name.includes(".") ? name.split(".").pop() : undefined;
-	return fromName || mediaType.split("/")[1]?.split("+")[0] || "bin";
+function fileNameOf(name: string, mediaType: string): string {
+	const cleaned = name.replace(/[/\\:]/g, "_").trim();
+	const base = /^\.*$/.test(cleaned) ? "attachment" : cleaned;
+	if (base.includes(".")) return base;
+	return `${base}.${mediaType.split("/")[1]?.split("+")[0] || "bin"}`;
 }
 
 /**
- * A sent attachment as a local file, fetched from the host once. QuickLook
- * picks a renderer by extension, so the file keeps the original one.
+ * A sent attachment as a local file, fetched from the host once. It keeps
+ * the original name: viewers pick a renderer by extension and show the name.
  */
 export const useAttachmentFile: UseAttachmentFile = ({
 	hostUrl,
@@ -25,12 +27,13 @@ export const useAttachmentFile: UseAttachmentFile = ({
 		networkMode: "always" as const,
 		queryFn: async () => {
 			if (!hostUrl) throw new Error("no host");
-			const directory = new Directory(Paths.cache, "sent-attachments");
-			directory.create({ idempotent: true });
-			const file = new File(
-				directory,
-				`${attachmentId}.${extensionOf(name, mediaType)}`,
+			const directory = new Directory(
+				Paths.cache,
+				"sent-attachments",
+				attachmentId,
 			);
+			directory.create({ idempotent: true, intermediates: true });
+			const file = new File(directory, fileNameOf(name, mediaType));
 			if (!file.exists) {
 				const { data } = await getHostServiceClientByUrl(
 					hostUrl,
