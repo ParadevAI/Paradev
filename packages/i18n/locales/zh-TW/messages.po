@@ -17188,9 +17188,6 @@ msgstr "在圖表中顯示"
 msgid "Show in folder"
 msgstr "在資料夾中顯示"
 
-msgid "Show in text field"
-msgstr "在輸入框中顯示"
-
 msgid "Show items in all states"
 msgstr "顯示所有狀態的條目"
 

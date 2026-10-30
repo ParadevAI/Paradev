@@ -17188,9 +17188,6 @@ msgstr "Show in chart"
 msgid "Show in folder"
 msgstr "Show in folder"
 
-msgid "Show in text field"
-msgstr "Show in text field"
-
 msgid "Show items in all states"
 msgstr "Show items in all states"
 

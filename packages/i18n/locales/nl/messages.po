@@ -17188,9 +17188,6 @@ msgstr "Tonen in grafiek"
 msgid "Show in folder"
 msgstr "Tonen in map"
 
-msgid "Show in text field"
-msgstr "In tekstveld tonen"
-
 msgid "Show items in all states"
 msgstr "Items in alle statussen tonen"
 

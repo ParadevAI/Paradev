@@ -17188,9 +17188,6 @@ msgstr "Pokaż na wykresie"
 msgid "Show in folder"
 msgstr "Pokaż w folderze"
 
-msgid "Show in text field"
-msgstr "Pokaż w polu tekstowym"
-
 msgid "Show items in all states"
 msgstr "Pokaż elementy we wszystkich stanach"
 

@@ -17188,9 +17188,6 @@ msgstr "Tampilkan di grafik"
 msgid "Show in folder"
 msgstr "Tampilkan di folder"
 
-msgid "Show in text field"
-msgstr "Tampilkan di kolom teks"
-
 msgid "Show items in all states"
 msgstr "Tampilkan item di semua status"
 

@@ -17188,9 +17188,6 @@ msgstr "在图表中显示"
 msgid "Show in folder"
 msgstr "在文件夹中显示"
 
-msgid "Show in text field"
-msgstr "在输入框中显示"
-
 msgid "Show items in all states"
 msgstr "显示所有状态的条目"
 

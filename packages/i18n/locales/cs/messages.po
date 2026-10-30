@@ -17188,9 +17188,6 @@ msgstr "Zobrazit v grafu"
 msgid "Show in folder"
 msgstr "Zobrazit ve složce"
 
-msgid "Show in text field"
-msgstr "Zobrazit v textovém poli"
-
 msgid "Show items in all states"
 msgstr "Zobrazit položky ve všech stavech"
 

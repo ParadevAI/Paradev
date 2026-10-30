@@ -17188,9 +17188,6 @@ msgstr "차트에 표시"
 msgid "Show in folder"
 msgstr "폴더에서 보기"
 
-msgid "Show in text field"
-msgstr "입력란에 표시"
-
 msgid "Show items in all states"
 msgstr "모든 상태의 항목 표시"
 

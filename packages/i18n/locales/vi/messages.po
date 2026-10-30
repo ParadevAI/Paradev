@@ -17188,9 +17188,6 @@ msgstr "Hiện trên biểu đồ"
 msgid "Show in folder"
 msgstr "Hiện trong thư mục"
 
-msgid "Show in text field"
-msgstr "Hiển thị trong ô nhập"
-
 msgid "Show items in all states"
 msgstr "Hiện mục ở mọi trạng thái"
 

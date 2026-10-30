@@ -17188,9 +17188,6 @@ msgstr "チャートに表示"
 msgid "Show in folder"
 msgstr "フォルダに表示"
 
-msgid "Show in text field"
-msgstr "テキスト欄に表示"
-
 msgid "Show items in all states"
 msgstr "すべての状態の項目を表示"
 

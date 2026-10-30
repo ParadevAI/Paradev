@@ -17188,9 +17188,6 @@ msgstr "Im Diagramm anzeigen"
 msgid "Show in folder"
 msgstr "Im Ordner anzeigen"
 
-msgid "Show in text field"
-msgstr "Im Textfeld anzeigen"
-
 msgid "Show items in all states"
 msgstr "Einträge in allen Status anzeigen"
 

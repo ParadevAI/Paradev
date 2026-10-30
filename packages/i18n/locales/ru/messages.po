@@ -17188,9 +17188,6 @@ msgstr "Показать на графике"
 msgid "Show in folder"
 msgstr "Показать в папке"
 
-msgid "Show in text field"
-msgstr "Показать в поле ввода"
-
 msgid "Show items in all states"
 msgstr "Показывать во всех состояниях"
 

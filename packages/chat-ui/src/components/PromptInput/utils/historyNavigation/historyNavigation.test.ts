@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { $isListNode, ListItemNode, ListNode } from "@lexical/list";
 import {
 	$createParagraphNode,
 	$createTextNode,
@@ -17,7 +18,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 function setup(history: string[]) {
 	const editor = createEditor({
 		namespace: "history-test",
-		nodes: [MentionChipNode],
+		nodes: [MentionChipNode, ListNode, ListItemNode],
 		onError: (error) => {
 			throw error;
 		},
@@ -137,5 +138,19 @@ describe("registerHistoryNavigation", () => {
 		expect(read(editor).text).toBe("second PLUS MY EDIT");
 		await press(editor, "up");
 		expect(read(editor).text).toBe("second PLUS MY EDIT");
+	});
+
+	it("recalls a markdown prompt as a list and walks on from it", async () => {
+		const editor = setup(["first", "- one\n- two"]);
+		await setContent(editor, () => {}, "end");
+
+		await press(editor, "up");
+		expect(
+			editor
+				.getEditorState()
+				.read(() => $isListNode($getRoot().getFirstChild())),
+		).toBe(true);
+		await press(editor, "up");
+		expect(read(editor).text).toBe("first");
 	});
 });
