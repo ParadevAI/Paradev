@@ -1713,6 +1713,12 @@ msgstr "Une surface de chat reconstruite pour piloter les agents : sortie d'outi
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Un dépôt n'est pas connecté à cette organisation, ou les dépôts proviennent d'installations GitHub différentes"
 
+msgid "A routine can run at most once an hour."
+msgstr "Une routine peut s'exécuter au plus une fois par heure."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Une routine a besoin d'une planification ou de quelque chose à surveiller."
+
 msgid "A run for this automation is already in progress."
 msgstr "Une exécution de cette automatisation est déjà en cours."
 
@@ -16020,6 +16026,9 @@ msgstr "Panoramas"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Faites passer {label} par un fournisseur que vous exploitez, avec les identifiants que vous détenez. Les valeurs enregistrées sont transmises à l'agent au lancement."
 
+msgid "Routine not found"
+msgstr "Routine introuvable"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tickets courants sans intervention en cours de tâche"
 
@@ -19386,6 +19395,12 @@ msgstr "Cela remplace son libellé, sa commande, ses arguments, ses paramètres 
 
 msgid "This repository does not allow merging from here."
 msgstr "Ce dépôt n'autorise pas la fusion depuis ici."
+
+msgid "This schedule has no runs left."
+msgstr "Cette planification n'a plus d'exécutions à venir."
+
+msgid "This schedule isn't valid."
+msgstr "Cette planification n'est pas valide."
 
 msgid "This screen doesn't exist"
 msgstr "Cet écran n'existe pas"

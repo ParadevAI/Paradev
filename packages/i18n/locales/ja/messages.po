@@ -1713,6 +1713,12 @@ msgstr "エージェントを操作するためのチャット画面を作り直
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "リポジトリがこの組織に接続されていないか、リポジトリが異なる GitHub インストールに属しています"
 
+msgid "A routine can run at most once an hour."
+msgstr "ルーティンは1時間に1回までしか実行できません。"
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "ルーティンにはスケジュールか監視対象が必要です。"
+
 msgid "A run for this automation is already in progress."
 msgstr "このオートメーションの実行はすでに進行中です。"
 
@@ -16020,6 +16026,9 @@ msgstr "まとめ"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "自分で運用するプロバイダーと自分が持つ認証情報を使って{label}を経由させます。保存した値は起動時にエージェントへ渡されます。"
 
+msgid "Routine not found"
+msgstr "ルーティンが見つかりません"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "途中の介入なしで完了する定型チケット"
 
@@ -19386,6 +19395,12 @@ msgstr "ラベル、コマンド、引数、プロンプトと再開設定、環
 
 msgid "This repository does not allow merging from here."
 msgstr "このリポジトリはここからのマージを許可していません。"
+
+msgid "This schedule has no runs left."
+msgstr "このスケジュールには残りの実行がありません。"
+
+msgid "This schedule isn't valid."
+msgstr "このスケジュールは無効です。"
 
 msgid "This screen doesn't exist"
 msgstr "この画面は存在しません"

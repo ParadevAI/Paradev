@@ -1713,6 +1713,12 @@ msgstr "Přestavěné chatovací rozhraní pro řízení agentů: bohatší výs
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Repozitář není připojen k této organizaci, nebo repozitáře pocházejí z různých instalací GitHubu"
 
+msgid "A routine can run at most once an hour."
+msgstr "Rutina se může spustit nejvýše jednou za hodinu."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Rutina potřebuje plán nebo něco, co bude sledovat."
+
 msgid "A run for this automation is already in progress."
 msgstr "Běh této automatizace už probíhá."
 
@@ -16020,6 +16026,9 @@ msgstr "Přehledy"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašovacími údaji, které máte. Uložené hodnoty se agentovi předají při spuštění."
 
+msgid "Routine not found"
+msgstr "Rutina nenalezena"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Rutinní tickety bez zásahu uprostřed úkolu"
 
@@ -19386,6 +19395,12 @@ msgstr "Nahradí to jeho popisek, příkaz, argumenty, nastavení promptu a pokr
 
 msgid "This repository does not allow merging from here."
 msgstr "Tento repozitář neumožňuje slučovat odsud."
+
+msgid "This schedule has no runs left."
+msgstr "Tento plán už nemá žádná další spuštění."
+
+msgid "This schedule isn't valid."
+msgstr "Tento plán není platný."
 
 msgid "This screen doesn't exist"
 msgstr "Tato obrazovka neexistuje"

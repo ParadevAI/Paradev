@@ -1713,6 +1713,12 @@ msgstr "A rebuilt chat surface for driving agents: richer tool output, smoother 
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 
+msgid "A routine can run at most once an hour."
+msgstr "A routine can run at most once an hour."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "A routine needs a schedule or something to watch."
+
 msgid "A run for this automation is already in progress."
 msgstr "A run for this automation is already in progress."
 
@@ -16020,6 +16026,9 @@ msgstr "Roundups"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 
+msgid "Routine not found"
+msgstr "Routine not found"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Routine tickets with no mid-task intervention"
 
@@ -19386,6 +19395,12 @@ msgstr "This replaces its label, command, arguments, prompt and resume settings,
 
 msgid "This repository does not allow merging from here."
 msgstr "This repository does not allow merging from here."
+
+msgid "This schedule has no runs left."
+msgstr "This schedule has no runs left."
+
+msgid "This schedule isn't valid."
+msgstr "This schedule isn't valid."
 
 msgid "This screen doesn't exist"
 msgstr "This screen doesn't exist"

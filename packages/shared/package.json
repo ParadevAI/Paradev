@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./agent-routines": {
+			"types": "./src/agent-routines.ts",
+			"default": "./src/agent-routines.ts"
+		},
 		"./project-config": {
 			"types": "./src/project-config/index.ts",
 			"default": "./src/project-config/index.ts"

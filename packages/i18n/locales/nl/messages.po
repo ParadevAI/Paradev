@@ -1713,6 +1713,12 @@ msgstr "Een herbouwd chatoppervlak om agents aan te sturen: rijkere tooluitvoer,
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Een repository is niet gekoppeld aan deze organisatie, of de repositories komen uit verschillende GitHub-installaties"
 
+msgid "A routine can run at most once an hour."
+msgstr "Een routine kan hoogstens één keer per uur draaien."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Een routine heeft een schema of iets om in de gaten te houden nodig."
+
 msgid "A run for this automation is already in progress."
 msgstr "Er loopt al een run voor deze automatisering."
 
@@ -16020,6 +16026,9 @@ msgstr "Overzichten"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Stuur {label} via een provider die je zelf draait, met de inloggegevens die jij hebt. Opgeslagen waarden gaan bij het starten naar de agent."
 
+msgid "Routine not found"
+msgstr "Routine niet gevonden"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Routinetickets zonder tussentijds ingrijpen"
 
@@ -19386,6 +19395,12 @@ msgstr "Dit vervangt het label, het commando, de argumenten, de prompt- en resum
 
 msgid "This repository does not allow merging from here."
 msgstr "Deze repository staat mergen vanaf hier niet toe."
+
+msgid "This schedule has no runs left."
+msgstr "Dit schema heeft geen uitvoeringen meer."
+
+msgid "This schedule isn't valid."
+msgstr "Dit schema is niet geldig."
 
 msgid "This screen doesn't exist"
 msgstr "Dit scherm bestaat niet"

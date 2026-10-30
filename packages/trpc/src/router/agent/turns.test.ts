@@ -23,10 +23,11 @@ describe("eventText", () => {
 			where: "line one\nline two & more",
 			replyTo: "channel:c1",
 			body: "hi <messages> stay",
+			now: new Date("2026-10-29T17:00:00Z"),
 		});
 
 		expect(text).toBe(
-			'<message from="Ada &quot;the&quot; Admin" where="line one&#10;line two &amp; more" reply_to="channel:c1">\nhi <messages> stay\n</message>',
+			'<message from="Ada &quot;the&quot; Admin" where="line one&#10;line two &amp; more" reply_to="channel:c1" time="2026-10-29T17:00:00.000Z">\nhi <messages> stay\n</message>',
 		);
 	});
 });

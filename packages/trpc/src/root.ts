@@ -4,6 +4,7 @@ import { adminRouter } from "./router/admin";
 import {
 	agentApiRouter,
 	agentRouter,
+	agentRoutineRouter,
 	agentWorkerRouter,
 	devToolsRouter,
 } from "./router/agent";
@@ -51,6 +52,7 @@ export const appRouter = createTRPCRouter({
 	admin: adminRouter,
 	agent: agentRouter,
 	agentApi: agentApiRouter,
+	agentRoutine: agentRoutineRouter,
 	agentWorker: agentWorkerRouter,
 	devTools: devToolsRouter,
 	apiKey: apiKeyRouter,

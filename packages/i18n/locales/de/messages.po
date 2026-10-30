@@ -1713,6 +1713,12 @@ msgstr "Eine neu gebaute Chat-Oberfläche zum Steuern von Agenten: reichere Tool
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Ein Repository ist nicht mit dieser Organisation verbunden, oder die Repositories stammen aus verschiedenen GitHub-Installationen"
 
+msgid "A routine can run at most once an hour."
+msgstr "Eine Routine kann höchstens einmal pro Stunde laufen."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Eine Routine braucht einen Zeitplan oder etwas, das sie beobachtet."
+
 msgid "A run for this automation is already in progress."
 msgstr "Für diese Automatisierung läuft bereits ein Durchlauf."
 
@@ -16020,6 +16026,9 @@ msgstr "Übersichten"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Leite {label} über einen Anbieter, den du selbst betreibst, mit deinen eigenen Zugangsdaten. Gespeicherte Werte werden dem Agenten beim Start übergeben."
 
+msgid "Routine not found"
+msgstr "Routine nicht gefunden"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Routine-Tickets ohne Eingriff mitten in der Aufgabe"
 
@@ -19386,6 +19395,12 @@ msgstr "Damit werden Bezeichnung, Befehl, Argumente, Prompt- und Resume-Einstell
 
 msgid "This repository does not allow merging from here."
 msgstr "Dieses Repository erlaubt kein Zusammenführen von hier aus."
+
+msgid "This schedule has no runs left."
+msgstr "Dieser Zeitplan hat keine weiteren Durchläufe."
+
+msgid "This schedule isn't valid."
+msgstr "Dieser Zeitplan ist ungültig."
 
 msgid "This screen doesn't exist"
 msgstr "Diesen Bildschirm gibt es nicht"

@@ -1713,6 +1713,12 @@ msgstr "重建的代理程式驅動聊天介面：更豐富的工具輸出、更
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "某個儲存庫未連結至此組織，或這些儲存庫來自不同的 GitHub 安裝"
 
+msgid "A routine can run at most once an hour."
+msgstr "例行任務每小時最多執行一次。"
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "例行任務需要一個計劃或要關注的內容。"
+
 msgid "A run for this automation is already in progress."
 msgstr "此自動化已有一次執行正在進行中。"
 
@@ -16020,6 +16026,9 @@ msgstr "綜合評測"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "讓{label}走你自己運行的提供商，用你手中的憑證。已儲存的值會在啟動時交給代理程式。"
 
+msgid "Routine not found"
+msgstr "找不到例行任務"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "常規工單無需中途干預"
 
@@ -19386,6 +19395,12 @@ msgstr "這會用目前內建配置替換它的名稱、命令、引數、提示
 
 msgid "This repository does not allow merging from here."
 msgstr "此儲存庫不允許從這裡合併。"
+
+msgid "This schedule has no runs left."
+msgstr "此計劃已沒有剩餘的執行。"
+
+msgid "This schedule isn't valid."
+msgstr "此計劃無效。"
 
 msgid "This screen doesn't exist"
 msgstr "此頁面不存在"

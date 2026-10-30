@@ -1713,6 +1713,12 @@ msgstr "Ajanları yönetmek için yeniden yapılmış bir sohbet yüzeyi: daha z
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Bir depo bu organizasyona bağlı değil veya depolar farklı GitHub kurulumlarından geliyor"
 
+msgid "A routine can run at most once an hour."
+msgstr "Bir rutin saatte en fazla bir kez çalışabilir."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Bir rutinin bir zamanlamaya ya da izleyeceği bir şeye ihtiyacı var."
+
 msgid "A run for this automation is already in progress."
 msgstr "Bu otomasyon için bir çalıştırma zaten sürüyor."
 
@@ -16020,6 +16026,9 @@ msgstr "Derlemeler"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "{label} ajanını kendi işlettiğiniz bir sağlayıcı üzerinden, elinizdeki kimlik bilgileriyle yönlendirin. Kaydedilen değerler başlatma sırasında ajana verilir."
 
+msgid "Routine not found"
+msgstr "Rutin bulunamadı"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Görev ortasında müdahale olmadan rutin biletler"
 
@@ -19386,6 +19395,12 @@ msgstr "Bu işlem; etiketini, komutunu, argümanlarını, istem ve sürdürme ay
 
 msgid "This repository does not allow merging from here."
 msgstr "Bu depo buradan birleştirmeye izin vermiyor."
+
+msgid "This schedule has no runs left."
+msgstr "Bu zamanlamanın kalan çalıştırması yok."
+
+msgid "This schedule isn't valid."
+msgstr "Bu zamanlama geçerli değil."
 
 msgid "This screen doesn't exist"
 msgstr "Bu ekran mevcut değil"

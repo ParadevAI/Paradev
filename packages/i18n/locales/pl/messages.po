@@ -1713,6 +1713,12 @@ msgstr "Przebudowana powierzchnia czatu do prowadzenia agentów: bogatsze wyjśc
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Repozytorium nie jest połączone z tą organizacją lub repozytoria pochodzą z różnych instalacji GitHub"
 
+msgid "A routine can run at most once an hour."
+msgstr "Rutyna może działać najwyżej raz na godzinę."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Rutyna potrzebuje harmonogramu lub czegoś do obserwowania."
+
 msgid "A run for this automation is already in progress."
 msgstr "Uruchomienie tej automatyzacji jest już w toku."
 
@@ -16020,6 +16026,9 @@ msgstr "Zestawienia"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Kieruj {label} przez dostawcę, którego sam prowadzisz, z poświadczeniami, które masz. Zapisane wartości trafiają do agenta przy starcie."
 
+msgid "Routine not found"
+msgstr "Nie znaleziono rutyny"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Rutynowe zgłoszenia bez interwencji w trakcie zadania"
 
@@ -19386,6 +19395,12 @@ msgstr "Zastąpi to jego etykietę, polecenie, argumenty, ustawienia promptu i w
 
 msgid "This repository does not allow merging from here."
 msgstr "To repozytorium nie pozwala na scalanie z tego miejsca."
+
+msgid "This schedule has no runs left."
+msgstr "Ten harmonogram nie ma już kolejnych uruchomień."
+
+msgid "This schedule isn't valid."
+msgstr "Ten harmonogram jest nieprawidłowy."
 
 msgid "This screen doesn't exist"
 msgstr "Ten ekran nie istnieje"

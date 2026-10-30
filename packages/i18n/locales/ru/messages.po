@@ -1713,6 +1713,12 @@ msgstr "Переделанная поверхность чата для упра
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Репозиторий не подключён к этой организации, либо репозитории относятся к разным установкам GitHub"
 
+msgid "A routine can run at most once an hour."
+msgstr "Рутина может запускаться не чаще одного раза в час."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Рутине нужно расписание или то, за чем следить."
+
 msgid "A run for this automation is already in progress."
 msgstr "Запуск этой автоматизации уже выполняется."
 
@@ -16020,6 +16026,9 @@ msgstr "Обзоры"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Направьте {label} через провайдера, которого держите вы, с вашими учётными данными. Сохранённые значения передаются агенту при запуске."
 
+msgid "Routine not found"
+msgstr "Рутина не найдена"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Рутинные тикеты без вмешательства по ходу задачи"
 
@@ -19386,6 +19395,12 @@ msgstr "Это заменит его название, команду, аргу�
 
 msgid "This repository does not allow merging from here."
 msgstr "Этот репозиторий не разрешает слияние отсюда."
+
+msgid "This schedule has no runs left."
+msgstr "В этом расписании больше нет запусков."
+
+msgid "This schedule isn't valid."
+msgstr "Это расписание недействительно."
 
 msgid "This screen doesn't exist"
 msgstr "Такого экрана нет"

@@ -1713,6 +1713,12 @@ msgstr "Permukaan chat yang dibangun ulang untuk mengendalikan agen: output alat
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Sebuah repositori tidak terhubung ke organisasi ini, atau repositori berasal dari instalasi GitHub yang berbeda"
 
+msgid "A routine can run at most once an hour."
+msgstr "Rutinitas dapat berjalan paling banyak sekali per jam."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Rutinitas memerlukan jadwal atau sesuatu untuk dipantau."
+
 msgid "A run for this automation is already in progress."
 msgstr "Sebuah run untuk otomatisasi ini sedang berjalan."
 
@@ -16020,6 +16026,9 @@ msgstr "Rangkuman"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kredensial yang Anda pegang. Nilai yang tersimpan diserahkan ke agen saat peluncuran."
 
+msgid "Routine not found"
+msgstr "Rutinitas tidak ditemukan"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tiket rutin tanpa intervensi di tengah tugas"
 
@@ -19386,6 +19395,12 @@ msgstr "Ini mengganti label, perintah, argumen, pengaturan prompt dan resume, va
 
 msgid "This repository does not allow merging from here."
 msgstr "Repositori ini tidak mengizinkan merge dari sini."
+
+msgid "This schedule has no runs left."
+msgstr "Jadwal ini tidak lagi memiliki eksekusi tersisa."
+
+msgid "This schedule isn't valid."
+msgstr "Jadwal ini tidak valid."
 
 msgid "This screen doesn't exist"
 msgstr "Layar ini tidak ada"

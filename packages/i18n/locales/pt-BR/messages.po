@@ -1713,6 +1713,12 @@ msgstr "Uma superfície de chat reconstruída para conduzir agentes: saída de f
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Um repositório não está conectado a esta organização, ou os repositórios vêm de instalações diferentes do GitHub"
 
+msgid "A routine can run at most once an hour."
+msgstr "Uma rotina pode ser executada no máximo uma vez por hora."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Uma rotina precisa de uma agenda ou de algo para observar."
+
 msgid "A run for this automation is already in progress."
 msgstr "Já há uma execução desta automação em andamento."
 
@@ -16020,6 +16026,9 @@ msgstr "Panoramas"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Direcione o {label} por um provedor que você mesmo opera, com as credenciais que você tem. Os valores salvos são entregues ao agente na inicialização."
 
+msgid "Routine not found"
+msgstr "Rotina não encontrada"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tickets rotineiros sem intervenção no meio da tarefa"
 
@@ -19386,6 +19395,12 @@ msgstr "Isso substitui o rótulo, comando, argumentos, configurações de prompt
 
 msgid "This repository does not allow merging from here."
 msgstr "Este repositório não permite fazer merge por aqui."
+
+msgid "This schedule has no runs left."
+msgstr "Esta agenda não tem mais execuções."
+
+msgid "This schedule isn't valid."
+msgstr "Esta agenda não é válida."
 
 msgid "This screen doesn't exist"
 msgstr "Esta tela não existe"

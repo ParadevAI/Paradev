@@ -1713,6 +1713,12 @@ msgstr "에이전트를 다루기 위해 새로 만든 채팅 화면입니다. �
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "리포지토리가 이 조직에 연결되어 있지 않거나, 리포지토리들이 서로 다른 GitHub 설치에서 왔습니다"
 
+msgid "A routine can run at most once an hour."
+msgstr "루틴은 한 시간에 최대 한 번만 실행할 수 있습니다."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "루틴에는 일정이나 지켜볼 대상이 필요합니다."
+
 msgid "A run for this automation is already in progress."
 msgstr "이 자동화의 실행이 이미 진행 중입니다."
 
@@ -16020,6 +16026,9 @@ msgstr "모아 보기"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "직접 운영하는 제공사와 보유한 자격 증명으로 {label}을(를) 경유시킵니다. 저장한 값은 실행 시 에이전트로 전달됩니다."
 
+msgid "Routine not found"
+msgstr "루틴을 찾을 수 없습니다"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "작업 중간 개입 없는 일상적인 티켓"
 
@@ -19386,6 +19395,12 @@ msgstr "레이블, 명령, 인수, 프롬프트 및 재개 설정, 환경 변수
 
 msgid "This repository does not allow merging from here."
 msgstr "이 리포지토리는 여기에서 머지하는 것을 허용하지 않습니다."
+
+msgid "This schedule has no runs left."
+msgstr "이 일정에는 남은 실행이 없습니다."
+
+msgid "This schedule isn't valid."
+msgstr "이 일정은 유효하지 않습니다."
 
 msgid "This screen doesn't exist"
 msgstr "이 화면은 존재하지 않습니다"

@@ -1713,6 +1713,12 @@ msgstr "重建的智能体驱动聊天界面：更丰富的工具输出、更顺
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "某个仓库未连接到此组织，或这些仓库来自不同的 GitHub 安装"
 
+msgid "A routine can run at most once an hour."
+msgstr "例行任务每小时最多运行一次。"
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "例行任务需要一个计划或要关注的内容。"
+
 msgid "A run for this automation is already in progress."
 msgstr "此自动化已有一次运行正在进行中。"
 
@@ -16020,6 +16026,9 @@ msgstr "综合评测"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "让{label}走你自己运行的提供商，用你手中的凭据。保存的值会在启动时交给智能体。"
 
+msgid "Routine not found"
+msgstr "未找到例行任务"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "常规工单无需中途干预"
 
@@ -19386,6 +19395,12 @@ msgstr "这会用当前内置配置替换它的名称、命令、参数、提示
 
 msgid "This repository does not allow merging from here."
 msgstr "此仓库不允许从这里合并。"
+
+msgid "This schedule has no runs left."
+msgstr "此计划已没有剩余的运行。"
+
+msgid "This schedule isn't valid."
+msgstr "此计划无效。"
 
 msgid "This screen doesn't exist"
 msgstr "此页面不存在"

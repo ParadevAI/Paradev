@@ -1713,6 +1713,12 @@ msgstr "Giao diện chat được dựng lại để điều khiển agent: outp
 msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
 msgstr "Một repository chưa được kết nối với tổ chức này, hoặc các repository đến từ những cài đặt GitHub khác nhau"
 
+msgid "A routine can run at most once an hour."
+msgstr "Một quy trình chỉ có thể chạy tối đa một lần mỗi giờ."
+
+msgid "A routine needs a schedule or something to watch."
+msgstr "Một quy trình cần có lịch hoặc thứ gì đó để theo dõi."
+
 msgid "A run for this automation is already in progress."
 msgstr "Một lần chạy của tự động hóa này đang diễn ra."
 
@@ -16020,6 +16026,9 @@ msgstr "Tổng hợp"
 msgid "Route {label} through a provider you run, with the credentials you hold. Saved values are handed to the agent at launch."
 msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, với thông tin xác thực bạn nắm giữ. Giá trị đã lưu được chuyển cho agent khi khởi chạy."
 
+msgid "Routine not found"
+msgstr "Không tìm thấy quy trình"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Ticket thường ngày không cần can thiệp giữa chừng"
 
@@ -19386,6 +19395,12 @@ msgstr "Thao tác này thay nhãn, lệnh, tham số, cài đặt prompt và res
 
 msgid "This repository does not allow merging from here."
 msgstr "Repository này không cho phép merge từ đây."
+
+msgid "This schedule has no runs left."
+msgstr "Lịch này không còn lần chạy nào."
+
+msgid "This schedule isn't valid."
+msgstr "Lịch này không hợp lệ."
 
 msgid "This screen doesn't exist"
 msgstr "Màn hình này không tồn tại"

@@ -21,6 +21,7 @@ import { posthog } from "../../lib/analytics";
 import { workerProcedure } from "../../trpc";
 import { announceAgentChanged } from "./agents-changed";
 import { reconcileDevs } from "./reconcile";
+import { fireDueRoutines } from "./routines";
 import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
 
@@ -63,10 +64,11 @@ async function replyRoomOf(messageId: string) {
 
 /** Our worker: it may only pick up turns the API created, and only while they run. */
 export const agentWorkerRouter = {
-	/** Runs from the worker on a schedule; see `reconcileDevs`. */
-	reconcile: workerProcedure.mutation(async () =>
-		reconcileDevs(await agentTemporal()),
-	),
+	/** Runs from the worker every minute: repairs Devs, then runs the routines that are due. */
+	reconcile: workerProcedure.mutation(async () => ({
+		...(await reconcileDevs(await agentTemporal())),
+		routinesRun: await fireDueRoutines(),
+	})),
 
 	/** A turn attempt failed and Temporal will run it again. */
 	noteRetry: workerProcedure

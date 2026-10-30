@@ -9,6 +9,7 @@ import {
 	channels,
 	channelThreadFollows,
 	type SelectAgent,
+	type SelectAgentRoutine,
 	users,
 } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
@@ -16,6 +17,7 @@ import { and, arrayOverlaps, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
 import { agentNotFound } from "./access";
 import { announceAgentChanged } from "./agents-changed";
+import { channelRoutinesFor, markRun, routineText } from "./routines";
 
 type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
 
@@ -33,6 +35,7 @@ interface Prompt {
 	text: string;
 	reason: TurnReason;
 	triggerMessageId?: string;
+	routineId?: string;
 }
 
 /**
@@ -87,6 +90,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 				actingUserId: prompt.actingUserId,
 				promptId,
 				triggerMessageId: prompt.triggerMessageId ?? null,
+				routineId: prompt.routineId ?? null,
 			})
 			.onConflictDoNothing()
 			.returning({ id: agentTurns.id });
@@ -156,6 +160,16 @@ async function forgetUndelivered(turn: TurnOutcome, promptId: string) {
 	}
 }
 
+export const REPLY_TARGET =
+	/^channel:([0-9a-f-]{36})(?:\/thread:([0-9a-f-]{36}))?$/;
+
+export function parseReplyTarget(
+	target: string,
+): { channelId: string; threadRootId: string | null } | null {
+	const [, channelId, threadRootId] = target.match(REPLY_TARGET) ?? [];
+	return channelId ? { channelId, threadRootId: threadRootId ?? null } : null;
+}
+
 /** Where a Dev's answer to an event goes: a channel, optionally a thread in it. */
 export function replyTarget(channelId: string, threadRootId?: string | null) {
 	return threadRootId
@@ -172,11 +186,13 @@ export function eventText(event: {
 	where: string;
 	replyTo: string | null;
 	body: string;
+	now?: Date;
 }) {
 	const attrs = [
 		`from="${attr(event.from)}"`,
 		`where="${attr(event.where)}"`,
 		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
+		`time="${(event.now ?? new Date()).toISOString()}"`,
 	];
 	return `<message ${attrs.join(" ")}>\n${escapeMessageTags(event.body)}\n</message>`;
 }
@@ -272,7 +288,28 @@ export async function startTurnsForMessage(
 				isNull(agents.pausedAt),
 			),
 		);
-	const devs = members.map((row) => row.agent);
+	const watchers =
+		channel.kind === "channel"
+			? await channelRoutinesFor(
+					channel.id,
+					message,
+					members.map((row) => row.agent.id),
+				)
+			: new Map<string, SelectAgentRoutine[]>();
+	if (watchers.size > 0) {
+		await deliverToWatchers({
+			watchers,
+			devs: members.map((row) => row.agent),
+			channel,
+			roomName: room?.name,
+			authorName: author?.name,
+			message,
+			userId,
+		});
+	}
+	const devs = members
+		.map((row) => row.agent)
+		.filter((agent) => !watchers.has(agent.id));
 	const work = new Map<string, { agent: SelectAgent; reason: TurnReason }>();
 	if (channel.kind === "dm") {
 		for (const agent of devs)
@@ -390,6 +427,65 @@ function messageEvent({
 		replyTo: replyTarget(channel.id, threadRootId),
 		body: message.body,
 	});
+}
+
+/**
+ * Devs with a routine watching this channel get the message with their
+ * routine's instructions, instead of waiting to be mentioned or routed.
+ */
+async function deliverToWatchers({
+	watchers,
+	devs,
+	channel,
+	roomName,
+	authorName,
+	message,
+	userId,
+}: {
+	watchers: Map<string, SelectAgentRoutine[]>;
+	devs: SelectAgent[];
+	channel: { id: string; kind: "channel" | "dm" };
+	roomName: string | undefined;
+	authorName: string | undefined;
+	message: { id: string; body: string; threadRootId: string | null };
+	userId: string;
+}) {
+	const event = messageEvent({ channel, roomName, authorName, message });
+	const replyTo = replyTarget(channel.id, message.threadRootId ?? message.id);
+	const now = new Date();
+	const results = await Promise.allSettled(
+		devs
+			.filter((agent) => watchers.has(agent.id))
+			.map(async (agent) => {
+				const routines = watchers.get(agent.id) ?? [];
+				return submitPrompt({
+					agent,
+					sessionId: await ensureMainSession(agent),
+					actingUserId: userId,
+					promptId: message.id,
+					text: [
+						event,
+						...routines.map((routine) =>
+							routineText(routine, { replyTo, now }),
+						),
+					].join("\n"),
+					reason: "routine",
+					triggerMessageId: message.id,
+					...(routines[0] ? { routineId: routines[0].id } : {}),
+				}).then(async (outcome) => {
+					await markRun(
+						routines.map((routine) => routine.id),
+						now,
+					);
+					return outcome;
+				});
+			}),
+	);
+	for (const result of results) {
+		if (result.status === "rejected") {
+			console.error("[agent-turns] couldn't run a routine", result.reason);
+		}
+	}
 }
 
 async function deliverToMains({
