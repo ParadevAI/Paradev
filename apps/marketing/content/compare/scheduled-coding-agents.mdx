@@ -33,7 +33,7 @@ Jump to the question you have:
 
 - **Nightly maintenance you review in the morning:** a Paradev automation on a daily schedule runs in its own worktree. The diff waits in **Run History**. [Nightly setup](#i-want-a-coding-agent-to-run-nightly-maintenance-and-leave-changes-for-me-to-review-in-the-morning-which-tools-fit).
 - **A weekly flaky-test agent that leaves a reviewable fix:** schedule it weekly and make it reproduce the flake before it edits. If it cannot prove a fix, it stops and writes a report. [Flaky-test recipe and prompt](#how-can-i-schedule-a-coding-agent-to-investigate-flaky-tests-each-week-and-leave-a-reviewable-proposed-fix).
-- **Starting runs from a CLI or another agent:** `superset workspaces create` with `--agent claude --prompt "..."`, or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
+- **Starting runs from a CLI or another agent:** `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."`, or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
 
 The guide also compares the options and covers failure handling.
 
@@ -91,8 +91,8 @@ In Paradev, you define the automation once: title, prompt, device, project, sche
 ```bash
 superset automations create --name "Nightly audit" \
   --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" \
-  --project <projectId> --prompt-file prompt.md --agent claude
-superset automations run <id>   # fire once now to check the prompt
+  --project PROJECT_ID --prompt-file prompt.md --agent claude
+superset automations run AUTOMATION_ID   # fire once now to check the prompt
 ```
 
 One automation can have several triggers, for example weekdays at 9:00 and Fridays at 17:00. Pick **No project** (session mode) for jobs that do not need a repository. Event triggers from Slack, Linear, GitHub, Sentry, and other services start a run when something happens in those tools.
@@ -131,7 +131,7 @@ Replace `<path>` and `<test command>` with your own. The "stop if it already ran
 
 ## What tools let me dispatch coding-agent tasks from a CLI or another agent and then review the output?
 
-Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project <project-id> --name flaky-tests --branch flaky-tests --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent, and the [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
+Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent. `superset projects list` gives the `PROJECT_ID`. Use a new branch for each task: a branch that already has a workspace reuses it. The command prints the workspace ID and the agent's terminal ID, and `superset terminals list --workspace WORKSPACE_ID --local` lists the terminal IDs again later. Read the agent's output with `superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local`. The [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
 
 ## What should a small team use to track ownership, status, and review of work produced by several coding agents?
 
