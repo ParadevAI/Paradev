@@ -61,13 +61,13 @@ The code is still Apache-2.0 and local workspaces still run. Common reasons to m
 
 ## How To Move From Vibe Kanban to Paradev
 
-Most of a Vibe Kanban setup carries over, because both tools run the same CLI agents in plain Git worktrees.
+Most of a Vibe Kanban setup carries over, because both tools run the same CLI agents in plain Git worktrees. Work in progress and new work take different paths: you continue unfinished work inside the worktree you import, and you start new work from a task in a new workspace.
 
 1. **Export what you have.** Use the data export in the latest Vibe Kanban version, and keep the ZIP. Its `issues.csv` is your list of open work.
 2. **Add your repository.** In Paradev, add the same local repository as a project.
-3. **Import your worktrees.** Open the **Import** tab in the New Workspace modal, or right-click the project and choose **Import untracked worktrees**. Paradev lists the Git worktrees registered in the repository, including ones Vibe Kanban created, and turns each into a workspace on its existing branch. See [Workspaces](https://docs.paradev.com/workspaces).
-4. **Bring your open issues.** Connect Linear, use GitHub issues from your repositories, or create Paradev tasks in the app or with `superset tasks create`. See [Tasks](https://docs.paradev.com/tasks).
-5. **Pick the same agent.** Choose **Run in workspace** on a task and select the agent you used before. The agent starts with the task as its prompt.
+3. **Import your worktrees.** Open the **Import** tab in the New Workspace modal, or right-click the project and choose **Import untracked worktrees**. Paradev lists the Git worktrees registered in the repository, including ones Vibe Kanban created, and turns each into a workspace on its existing branch, with its unfinished changes. See [Workspaces](https://docs.paradev.com/workspaces).
+4. **Continue work in progress.** Open an imported workspace and start the agent you used before in that workspace: open a terminal there and run the agent, or run `superset agents create --workspace <workspace-id> --agent claude --prompt "..."`. The agent works on the same branch and files. See the [CLI reference](https://docs.paradev.com/cli/cli-reference#superset-agents-create).
+5. **Start new work from your open issues.** Connect Linear, use GitHub issues from your repositories, or create Paradev tasks in the app or with `superset tasks create`. Then choose **Run in workspace** on a task and select an agent: Paradev creates a new workspace and worktree for each task, with the agent already working on the task as its prompt. **Run in workspace** does not reuse an imported worktree. See [Tasks](https://docs.paradev.com/tasks).
 6. **Watch the board.** The Workspaces page has a board with Working, Needs attention, Needs review, and Merged columns.
 
 ### Which Vibe Kanban agents run in Paradev?
@@ -121,8 +121,8 @@ Vibe Kanban still runs, and the community keeps committing to it. If you are cho
 
 ## What To Try First
 
-- **Import a worktree:** bring one Vibe Kanban worktree into Paradev and open its diff.
-- **Run a task:** choose **Run in workspace** and pick the agent you used in Vibe Kanban.
+- **Import a worktree:** bring one Vibe Kanban worktree into Paradev, open its diff, and start your agent in that workspace to finish the work.
+- **Start a new task:** choose **Run in workspace** on an open issue and pick the agent you used in Vibe Kanban.
 - **Review in place:** inspect the diff, run your checks, and open a PR from the Changes pane.
 - **Watch the board:** follow workspaces from Working to Needs review to Merged.
 
@@ -144,7 +144,7 @@ For an actively developed workspace with a task board, parallel worktrees, revie
 
 ### Can I move my Vibe Kanban worktrees to Paradev?
 
-Yes. Paradev's **Import** tab lists the Git worktrees registered in your repository, including the ones Vibe Kanban created, and turns each into a workspace on its existing branch.
+Yes. Paradev's **Import** tab lists the Git worktrees registered in your repository, including the ones Vibe Kanban created, and turns each into a workspace on its existing branch. Start your agent in that workspace to continue the unfinished work.
 
 ### What are the best tools to run Claude Code and Codex in parallel now that Vibe Kanban is sunsetting?
 
