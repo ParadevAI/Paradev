@@ -15,7 +15,7 @@ const navigate = mock(() => Promise.resolve());
 const showError = mock(() => {});
 
 mock.module("renderer/hooks/useAcpChatEnabled", () => ({
-	useAcpChatEnabled: () => false,
+	useResolveAcpChatEnabled: () => async () => false,
 }));
 mock.module("renderer/hooks/useV2AgentChoices", () => ({
 	useV2AgentChoices: () => ({ agents }),

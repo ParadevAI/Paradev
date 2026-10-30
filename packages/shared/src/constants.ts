@@ -226,7 +226,7 @@ export const FEATURE_FLAGS = {
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
 	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
-	 * experimental setting (`users.experimental_chat`). Read only by released
+	 * experimental setting (`user_settings.experimental_chat`). Read only by released
 	 * desktop and mobile builds; remove it once no live build reads it.
 	 */
 	ACP_CHAT: "acp-chat",
@@ -240,7 +240,7 @@ export const FEATURE_FLAGS = {
 	MOBILE_PANE: "mobile-pane",
 	/**
 	 * Shows the `pdev` agent: in the agent catalog, agent pickers
-	 * and, with ACP_CHAT, as a chat harness (`pdev acp`). Off, unloaded or
+	 * and, with the Chat setting on, as a chat harness (`pdev acp`). Off, unloaded or
 	 * offline all hide it. Hosts never seed it, so a user only gets it by
 	 * adding it while the flag is on.
 	 */

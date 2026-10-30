@@ -41,6 +41,7 @@ export function AcpChatSetting() {
 			<Switch
 				id="acp-chat"
 				checked={enabled}
+				disabled={updateSettings.isPending}
 				onCheckedChange={(next) =>
 					updateSettings.mutate({ experimentalChat: next })
 				}

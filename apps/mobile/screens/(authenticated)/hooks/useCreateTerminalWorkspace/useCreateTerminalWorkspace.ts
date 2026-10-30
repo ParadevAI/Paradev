@@ -17,7 +17,7 @@ import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { isMissingProcedureError } from "@/lib/host-service/errors";
 import { posthog } from "@/lib/posthog";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
-import { useAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
+import { useResolveAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import {
@@ -90,7 +90,7 @@ export function useCreateTerminalWorkspace() {
 	const startPending = usePendingWorkspaceCreatesStore((state) => state.start);
 	const failPending = usePendingWorkspaceCreatesStore((state) => state.fail);
 	const clearPending = usePendingWorkspaceCreatesStore((state) => state.clear);
-	const acpChat = useAcpChatEnabled();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const queueChatLaunch = usePendingChatLaunchStore((state) => state.queue);
 
 	return useMutation({
@@ -100,7 +100,9 @@ export function useCreateTerminalWorkspace() {
 			...input
 		}: CreateTerminalWorkspaceArgs) => {
 			const { target, baseBranch, agentId, model, effort, message } = input;
-			const chatHarness = acpChat ? acpHarnessForPreset(agentId) : undefined;
+			const chatHarness = (await resolveAcpChatEnabled())
+				? acpHarnessForPreset(agentId)
+				: undefined;
 			const workspaceId = randomUUID();
 			startPending({
 				workspaceId,

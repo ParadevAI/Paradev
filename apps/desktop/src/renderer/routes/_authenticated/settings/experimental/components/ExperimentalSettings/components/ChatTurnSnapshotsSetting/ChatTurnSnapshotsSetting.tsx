@@ -15,8 +15,6 @@ export function ChatTurnSnapshotsSetting() {
 	const acpChatEnabled = useAcpChatEnabled();
 	const enabled = useChatTurnSnapshotsEnabled();
 	const setEnabled = useChatTurnSnapshotsStore((state) => state.setEnabled);
-	if (!acpChatEnabled) return null;
-
 	return (
 		<div className="flex items-center justify-between gap-6">
 			<div className="min-w-0 flex-1 space-y-0.5">
@@ -39,6 +37,7 @@ export function ChatTurnSnapshotsSetting() {
 			<Switch
 				id="chat-turn-snapshots"
 				checked={enabled}
+				disabled={!acpChatEnabled}
 				onCheckedChange={setEnabled}
 			/>
 		</div>

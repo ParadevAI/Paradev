@@ -1,1 +1,4 @@
-export { useAcpChatEnabled } from "./useAcpChatEnabled";
+export {
+	useAcpChatEnabled,
+	useResolveAcpChatEnabled,
+} from "./useAcpChatEnabled";

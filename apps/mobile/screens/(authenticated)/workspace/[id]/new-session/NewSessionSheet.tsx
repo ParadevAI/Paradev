@@ -20,7 +20,7 @@ import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
-import { useAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
+import { useResolveAcpChatEnabled } from "@/screens/(authenticated)/hooks/useAcpChatEnabled";
 import {
 	agentLaunchPresetId,
 	describeAgentLaunchPreferences,
@@ -43,7 +43,7 @@ export function NewSessionSheet() {
 	const router = useRouter();
 	const theme = useTheme();
 	const queryClient = useQueryClient();
-	const acpChat = useAcpChatEnabled();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const { workspace, host, isResolving } = useWorkspaceHost(id ?? null);
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)
@@ -125,7 +125,7 @@ export function NewSessionSheet() {
 	const launch = async (preset: (typeof presets)[number] | null) => {
 		if (!workspace || !hostUrl || launchingKey !== null) return;
 		setLaunchingKey(preset?.presetId ?? "shell");
-		const chatHarness = acpChat
+		const chatHarness = (await resolveAcpChatEnabled())
 			? acpHarnessForPreset(preset?.presetId)
 			: undefined;
 		try {

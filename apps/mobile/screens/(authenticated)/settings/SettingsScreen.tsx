@@ -364,6 +364,7 @@ export function SettingsScreen() {
 						trailing={
 							<Switch
 								value={acpChatEnabled}
+								disabled={updateExperimentalChat.isPending}
 								onValueChange={(enabled) =>
 									updateExperimentalChat.mutate(enabled)
 								}
