@@ -1738,6 +1738,10 @@ msgstr "Ключ задач — от 1 до 5 букв или цифр, перв
 msgid "a teammate"
 msgstr "участник команды"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Ветка в #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Уникальный идентификатор организации (генерируется из названия)"
 
@@ -5700,6 +5704,9 @@ msgstr "Не удалось ответвить в новый worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Не удалось ответвить разговор"
 
+msgid "Couldn't change the routine"
+msgstr "Не удалось изменить рутину"
+
 msgid "Couldn't check"
 msgstr "Не удалось проверить"
 
@@ -5881,6 +5888,9 @@ msgstr "Не удалось сохранить изменение"
 
 msgid "Couldn't save the Dev"
 msgstr "Не удалось сохранить Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Не удалось сохранить рутину"
 
 msgid "Couldn't send comment"
 msgstr "Не удалось отправить комментарий"
@@ -6395,6 +6405,9 @@ msgstr "Данные и API"
 msgid "Data display"
 msgstr "Отображение данных"
 
+msgid "Date"
+msgstr "Дата"
+
 msgid "Date created"
 msgstr "Дате создания"
 
@@ -6403,6 +6416,9 @@ msgstr "Период"
 
 msgid "Day"
 msgstr "День"
+
+msgid "Day of the month"
+msgstr "День месяца"
 
 msgid "Day One"
 msgstr "Первый день"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Удалить «{title}»?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Удалить {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Изменить на GitHub"
 msgid "Edit queued message"
 msgstr "Изменить сообщение в очереди"
 
+msgid "Edit routine"
+msgstr "Изменить рутину"
+
 msgid "Edit Run Script"
 msgstr "Изменить скрипт запуска"
 
@@ -7461,6 +7481,9 @@ msgstr "Включите удалённый доступ и не перевод�
 msgid "Enable skill"
 msgstr "Включить навык"
 
+msgid "End repeat"
+msgstr "Окончание повторов"
+
 msgid "End voice session"
 msgstr "Завершить голосовую сессию"
 
@@ -7547,6 +7570,9 @@ msgstr "esc — закрыть"
 
 msgid "esc to exit"
 msgstr "esc — выход"
+
+msgid "Event"
+msgstr "Событие"
 
 msgid "Event log"
 msgstr "Журнал событий"
@@ -9373,6 +9399,9 @@ msgstr "Часы общие для всей команды. Они рассчи�
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Часы рассчитаны на стандартную рабочую область {vcpus} vCPU / {memoryGb} ГБ. Мы считаем ГБ-часы — объём памяти машины, умноженный на часы работы, поэтому машина с вдвое большим объёмом памяти расходует часы вдвое быстрее."
 
+msgid "Hours between runs"
+msgstr "Часов между запусками"
+
 msgid "Hover Card"
 msgstr "Карточка при наведении"
 
@@ -9892,6 +9921,9 @@ msgstr "Нет подключения к интернету"
 msgid "Interrupt"
 msgstr "Прервать"
 
+msgid "Interval"
+msgstr "Интервал"
+
 msgid "Intro call"
 msgstr "Знакомство"
 
@@ -10065,6 +10097,9 @@ msgstr "Возможно, компьютер в режиме сна"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Возможно, она удалена или принадлежит другой организации."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Она остановится навсегда. Прошлые запуски останутся в чате."
 
 msgid "It will open once the connection is back."
 msgstr "Страница откроется, когда связь вернётся."
@@ -12769,6 +12804,9 @@ msgstr "Вкл."
 msgid "on {offScopeHostName} — won't run here"
 msgstr "на {offScopeHostName} — здесь не запустится"
 
+msgid "On a date"
+msgstr "В дату"
+
 msgid "On focus change"
 msgstr "При смене фокуса"
 
@@ -15463,6 +15501,12 @@ msgstr "Повторное открытие…"
 msgid "reorder agents"
 msgstr "изменить порядок агентов"
 
+msgid "Repeat"
+msgstr "Повтор"
+
+msgid "Repeat routine"
+msgstr "Повторять рутину"
+
 msgid "Replace"
 msgstr "Заменить"
 
@@ -16029,14 +16073,23 @@ msgstr "Направьте {label} через провайдера, которо
 msgid "Routine not found"
 msgstr "Рутина не найдена"
 
+msgid "Routine options"
+msgstr "Параметры рутины"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Рутинные тикеты без вмешательства по ходу задачи"
+
+msgid "Routines"
+msgstr "Рутины"
 
 msgid "Row actions"
 msgstr "Действия со строкой"
 
 msgid "Rows changed"
 msgstr "Строки изменены"
+
+msgid "Rule"
+msgstr "Правило"
 
 msgid "Run"
 msgstr "Запустить"
@@ -16180,6 +16233,9 @@ msgstr "Запускает локальную команду на вашей м�
 
 msgid "Runs appear here once an automation fires."
 msgstr "Запуски появятся здесь, как только сработает автоматизация."
+
+msgid "Runs in"
+msgstr "Где работает"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Работает внутри приложения Paradev на том устройстве, поэтому для обновления нужно обновить приложение там."
@@ -19558,6 +19614,9 @@ msgstr "Уровень"
 
 msgid "Time"
 msgstr "Время"
+
+msgid "Time zone"
+msgstr "Часовой пояс"
 
 msgid "Tinted"
 msgstr "Тонированный"

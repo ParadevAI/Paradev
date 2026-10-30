@@ -1,11 +1,16 @@
 import { db } from "@superset/db/client";
-import { agentRoutines, type SelectAgentRoutine } from "@superset/db/schema";
+import {
+	agentRoutines,
+	channels,
+	githubRepositories,
+	type SelectAgentRoutine,
+} from "@superset/db/schema";
 import {
 	routineFieldsSchema,
 	routineScheduleSchema,
 } from "@superset/shared/agent-routines";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
 import { loadAgentAccess } from "./access";
@@ -56,18 +61,84 @@ export const agentRoutineRouter = {
 					),
 				)
 				.orderBy(desc(agentRoutines.createdAt));
+			const channelIds = [
+				...new Set(
+					rows.flatMap((routine) => [
+						routine.channelId,
+						...routine.triggers.flatMap(({ config }) =>
+							config.kind === "channel_message" ? [config.channelId] : [],
+						),
+					]),
+				),
+			];
+			const repoIds = [
+				...new Set(
+					rows.flatMap((routine) =>
+						routine.triggers.flatMap(({ config }) =>
+							config.kind === "github" && config.repositories.mode === "list"
+								? config.repositories.ids
+								: [],
+						),
+					),
+				),
+			];
+			const [rooms, repos] = await Promise.all([
+				channelIds.length
+					? db
+							.select({
+								id: channels.id,
+								name: channels.name,
+								kind: channels.kind,
+							})
+							.from(channels)
+							.where(inArray(channels.id, channelIds))
+					: [],
+				repoIds.length
+					? db
+							.select({
+								id: githubRepositories.repoId,
+								name: githubRepositories.fullName,
+							})
+							.from(githubRepositories)
+							.where(inArray(githubRepositories.repoId, repoIds))
+					: [],
+			]);
+			const roomById = new Map(rooms.map((room) => [room.id, room]));
+			const repoName = new Map(repos.map((repo) => [repo.id, repo.name]));
 			return rows.map((routine) => ({
 				id: routine.id,
 				title: routine.title,
 				prompt: routine.prompt,
 				schedule: routine.schedule,
-				triggers: routine.triggers,
 				enabled: routine.enabled,
 				nextRunAt: routine.nextRunAt,
 				lastRunAt: routine.lastRunAt,
 				createdByUserId: routine.createdByUserId,
-				channelId: routine.channelId,
-				threadRootId: routine.threadRootId,
+				room: {
+					kind: roomById.get(routine.channelId)?.kind ?? "channel",
+					name: roomById.get(routine.channelId)?.name ?? "",
+					inThread: routine.threadRootId !== null,
+				},
+				watching: routine.triggers.map(({ config }) =>
+					config.kind === "channel_message"
+						? {
+								kind: "channel" as const,
+								name: roomById.get(config.channelId)?.name ?? "",
+								includeThreadReplies: config.includeThreadReplies,
+							}
+						: {
+								kind: "event" as const,
+								provider: config.kind,
+								event: "event" in config ? config.event : null,
+								repositories:
+									config.kind === "github" &&
+									config.repositories.mode === "list"
+										? config.repositories.ids.map(
+												(id) => repoName.get(id) ?? id,
+											)
+										: [],
+							},
+				),
 			}));
 		}),
 

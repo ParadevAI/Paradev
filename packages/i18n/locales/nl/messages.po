@@ -1738,6 +1738,10 @@ msgstr "Een taaksleutel bestaat uit 1 tot 5 letters of cijfers en begint met een
 msgid "a teammate"
 msgstr "een teamgenoot"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Een thread in #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Een unieke identifier voor je organisatie (automatisch afgeleid van de naam)"
 
@@ -5700,6 +5704,9 @@ msgstr "Kon niet afsplitsen naar een nieuwe worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Kon het gesprek niet afsplitsen"
 
+msgid "Couldn't change the routine"
+msgstr "Kan de routine niet wijzigen"
+
 msgid "Couldn't check"
 msgstr "Kon niet controleren"
 
@@ -5881,6 +5888,9 @@ msgstr "Kon de wijziging niet opslaan"
 
 msgid "Couldn't save the Dev"
 msgstr "Kan de Dev niet opslaan"
+
+msgid "Couldn't save the routine"
+msgstr "Kan de routine niet opslaan"
 
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
@@ -6395,6 +6405,9 @@ msgstr "Data en API's"
 msgid "Data display"
 msgstr "Gegevensweergave"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Date created"
 msgstr "Aanmaakdatum"
 
@@ -6403,6 +6416,9 @@ msgstr "Datumbereik"
 
 msgid "Day"
 msgstr "Dag"
+
+msgid "Day of the month"
+msgstr "Dag van de maand"
 
 msgid "Day One"
 msgstr "Dag één"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "“{title}” verwijderen?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "{0} verwijderen?"
@@ -7335,6 +7352,9 @@ msgstr "Bewerken op GitHub"
 msgid "Edit queued message"
 msgstr "Bericht in wachtrij bewerken"
 
+msgid "Edit routine"
+msgstr "Routine bewerken"
+
 msgid "Edit Run Script"
 msgstr "Run-script bewerken"
 
@@ -7461,6 +7481,9 @@ msgstr "Schakel externe toegang in en houd deze computer wakker met Paradev acti
 msgid "Enable skill"
 msgstr "Skill inschakelen"
 
+msgid "End repeat"
+msgstr "Herhaling eindigt"
+
 msgid "End voice session"
 msgstr "Spraaksessie beëindigen"
 
@@ -7547,6 +7570,9 @@ msgstr "esc om te sluiten"
 
 msgid "esc to exit"
 msgstr "esc om te verlaten"
+
+msgid "Event"
+msgstr "Gebeurtenis"
 
 msgid "Event log"
 msgstr "Gebeurtenislog"
@@ -9373,6 +9399,9 @@ msgstr "De uren worden gedeeld met je hele team. Ze gaan uit van een standaard w
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "De uren gaan uit van een standaard werkruimte met {vcpus} vCPU / {memoryGb} GB. We meten GB-uren, het geheugen van de machine maal de uren dat hij draait, dus een machine met twee keer zoveel geheugen verbruikt de uren twee keer zo snel."
 
+msgid "Hours between runs"
+msgstr "Uren tussen uitvoeringen"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Geen internetverbinding"
 msgid "Interrupt"
 msgstr "Onderbreken"
 
+msgid "Interval"
+msgstr "Interval"
+
 msgid "Intro call"
 msgstr "Kennismakingsgesprek"
 
@@ -10065,6 +10097,9 @@ msgstr "Hij staat mogelijk in sluimerstand"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mogelijk is die verwijderd, of hoort die bij een andere organisatie."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Hij stopt voorgoed. Eerdere uitvoeringen blijven in de chat."
 
 msgid "It will open once the connection is back."
 msgstr "De pagina opent zodra de verbinding terug is."
@@ -12769,6 +12804,9 @@ msgstr "Aan"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "op {offScopeHostName} — draait hier niet"
 
+msgid "On a date"
+msgstr "Op een datum"
+
 msgid "On focus change"
 msgstr "Bij focuswijziging"
 
@@ -15463,6 +15501,12 @@ msgstr "Bezig met heropenen…"
 msgid "reorder agents"
 msgstr "agents herordenen"
 
+msgid "Repeat"
+msgstr "Herhalen"
+
+msgid "Repeat routine"
+msgstr "Routine herhalen"
+
 msgid "Replace"
 msgstr "Vervangen"
 
@@ -16029,14 +16073,23 @@ msgstr "Stuur {label} via een provider die je zelf draait, met de inloggegevens 
 msgid "Routine not found"
 msgstr "Routine niet gevonden"
 
+msgid "Routine options"
+msgstr "Routine-opties"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Routinetickets zonder tussentijds ingrijpen"
+
+msgid "Routines"
+msgstr "Routines"
 
 msgid "Row actions"
 msgstr "Rij-acties"
 
 msgid "Rows changed"
 msgstr "Rijen gewijzigd"
+
+msgid "Rule"
+msgstr "Regel"
 
 msgid "Run"
 msgstr "Uitvoeren"
@@ -16180,6 +16233,9 @@ msgstr "Voert een lokaal commando uit op je machine"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Runs verschijnen hier zodra een automatisering wordt geactiveerd."
+
+msgid "Runs in"
+msgstr "Draait in"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Draait in de Paradev-app op dat apparaat, dus bijwerken betekent de app daar bijwerken."
@@ -19558,6 +19614,9 @@ msgstr "Tier"
 
 msgid "Time"
 msgstr "Tijd"
+
+msgid "Time zone"
+msgstr "Tijdzone"
 
 msgid "Tinted"
 msgstr "Getint"

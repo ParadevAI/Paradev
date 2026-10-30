@@ -1738,6 +1738,10 @@ msgstr "Una chiave attività ha da 1 a 5 lettere o numeri e inizia con una lette
 msgid "a teammate"
 msgstr "un membro del team"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Un thread in #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Un identificatore univoco per la tua organizzazione (generato automaticamente dal nome)"
 
@@ -5700,6 +5704,9 @@ msgstr "Non è stato possibile diramare in un nuovo worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Non è stato possibile diramare la conversazione"
 
+msgid "Couldn't change the routine"
+msgstr "Impossibile modificare la routine"
+
 msgid "Couldn't check"
 msgstr "Impossibile verificare"
 
@@ -5881,6 +5888,9 @@ msgstr "Impossibile salvare la modifica"
 
 msgid "Couldn't save the Dev"
 msgstr "Impossibile salvare il Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Impossibile salvare la routine"
 
 msgid "Couldn't send comment"
 msgstr "Impossibile inviare il commento"
@@ -6395,6 +6405,9 @@ msgstr "Dati e API"
 msgid "Data display"
 msgstr "Visualizzazione dei dati"
 
+msgid "Date"
+msgstr "Data"
+
 msgid "Date created"
 msgstr "Data di creazione"
 
@@ -6403,6 +6416,9 @@ msgstr "Intervallo di date"
 
 msgid "Day"
 msgstr "Giorno"
+
+msgid "Day of the month"
+msgstr "Giorno del mese"
 
 msgid "Day One"
 msgstr "Giorno uno"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Eliminare “{title}”?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Eliminare {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Modifica su GitHub"
 msgid "Edit queued message"
 msgstr "Modifica il messaggio in coda"
 
+msgid "Edit routine"
+msgstr "Modifica routine"
+
 msgid "Edit Run Script"
 msgstr "Modifica lo script di esecuzione"
 
@@ -7461,6 +7481,9 @@ msgstr "Attiva l’accesso remoto e mantieni questo computer attivo con Paradev 
 msgid "Enable skill"
 msgstr "Attiva la skill"
 
+msgid "End repeat"
+msgstr "Fine ripetizione"
+
 msgid "End voice session"
 msgstr "Termina la sessione vocale"
 
@@ -7547,6 +7570,9 @@ msgstr "esc per chiudere"
 
 msgid "esc to exit"
 msgstr "esc per uscire"
+
+msgid "Event"
+msgstr "Evento"
 
 msgid "Event log"
 msgstr "Registro eventi"
@@ -9373,6 +9399,9 @@ msgstr "Le ore sono condivise con tutto il team. Si riferiscono a uno spazio di 
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Le ore si riferiscono a uno spazio di lavoro standard da {vcpus} vCPU / {memoryGb} GB. Misuriamo le GB-ore, cioè la memoria della macchina per le ore di funzionamento, quindi una macchina con il doppio della memoria consuma le ore due volte più in fretta."
 
+msgid "Hours between runs"
+msgstr "Ore tra le esecuzioni"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Internet disconnesso"
 msgid "Interrupt"
 msgstr "Interrompi"
 
+msgid "Interval"
+msgstr "Intervallo"
+
 msgid "Intro call"
 msgstr "Chiamata conoscitiva"
 
@@ -10065,6 +10097,9 @@ msgstr "Potrebbe essere in stop"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Potrebbe essere stata eliminata oppure appartiene a un'altra organizzazione."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Si ferma per sempre. Le esecuzioni passate restano nella chat."
 
 msgid "It will open once the connection is back."
 msgstr "Si aprirà al ritorno della connessione."
@@ -12769,6 +12804,9 @@ msgstr "On"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "su {offScopeHostName} — non verrà eseguita qui"
 
+msgid "On a date"
+msgstr "In una data"
+
 msgid "On focus change"
 msgstr "Al cambio di focus"
 
@@ -15463,6 +15501,12 @@ msgstr "Riapertura…"
 msgid "reorder agents"
 msgstr "riordinare gli agenti"
 
+msgid "Repeat"
+msgstr "Ripeti"
+
+msgid "Repeat routine"
+msgstr "Ripeti routine"
+
 msgid "Replace"
 msgstr "Sostituisci"
 
@@ -16029,14 +16073,23 @@ msgstr "Instrada {label} attraverso un provider gestito da te, con le credenzial
 msgid "Routine not found"
 msgstr "Routine non trovata"
 
+msgid "Routine options"
+msgstr "Opzioni della routine"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Ticket di routine senza interventi a metà task"
+
+msgid "Routines"
+msgstr "Routine"
 
 msgid "Row actions"
 msgstr "Azioni della riga"
 
 msgid "Rows changed"
 msgstr "Righe modificate"
+
+msgid "Rule"
+msgstr "Regola"
 
 msgid "Run"
 msgstr "Esegui"
@@ -16180,6 +16233,9 @@ msgstr "Esegue un comando locale sulla tua macchina"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Le esecuzioni compaiono qui non appena un'automazione si attiva."
+
+msgid "Runs in"
+msgstr "Viene eseguita in"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Viene eseguito nell'app Paradev su quel dispositivo, quindi aggiornarlo significa aggiornare l'app lì."
@@ -19558,6 +19614,9 @@ msgstr "Livello"
 
 msgid "Time"
 msgstr "Tempo"
+
+msgid "Time zone"
+msgstr "Fuso orario"
 
 msgid "Tinted"
 msgstr "Colorato"

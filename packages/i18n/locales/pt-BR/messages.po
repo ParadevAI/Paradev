@@ -1738,6 +1738,10 @@ msgstr "Uma chave de tarefa tem de 1 a 5 letras ou números e começa com uma le
 msgid "a teammate"
 msgstr "um colega de equipe"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Uma thread em #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Um identificador único para sua organização (gerado a partir do nome)"
 
@@ -5700,6 +5704,9 @@ msgstr "Não foi possível ramificar para um novo worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Não foi possível ramificar a conversa"
 
+msgid "Couldn't change the routine"
+msgstr "Não foi possível alterar a rotina"
+
 msgid "Couldn't check"
 msgstr "Não foi possível verificar"
 
@@ -5881,6 +5888,9 @@ msgstr "Não foi possível salvar a alteração"
 
 msgid "Couldn't save the Dev"
 msgstr "Não foi possível salvar o Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Não foi possível salvar a rotina"
 
 msgid "Couldn't send comment"
 msgstr "Não foi possível enviar o comentário"
@@ -6395,6 +6405,9 @@ msgstr "Dados e APIs"
 msgid "Data display"
 msgstr "Exibição de dados"
 
+msgid "Date"
+msgstr "Data"
+
 msgid "Date created"
 msgstr "Data de criação"
 
@@ -6403,6 +6416,9 @@ msgstr "Intervalo de datas"
 
 msgid "Day"
 msgstr "Dia"
+
+msgid "Day of the month"
+msgstr "Dia do mês"
 
 msgid "Day One"
 msgstr "Dia um"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Excluir “{title}”?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Excluir {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Editar no GitHub"
 msgid "Edit queued message"
 msgstr "Editar mensagem na fila"
 
+msgid "Edit routine"
+msgstr "Editar rotina"
+
 msgid "Edit Run Script"
 msgstr "Editar script de execução"
 
@@ -7461,6 +7481,9 @@ msgstr "Ative o acesso remoto e mantenha este computador ativo com o Paradev em 
 msgid "Enable skill"
 msgstr "Ativar skill"
 
+msgid "End repeat"
+msgstr "Fim da repetição"
+
 msgid "End voice session"
 msgstr "Encerrar a sessão de voz"
 
@@ -7547,6 +7570,9 @@ msgstr "esc para dispensar"
 
 msgid "esc to exit"
 msgstr "esc para sair"
+
+msgid "Event"
+msgstr "Evento"
 
 msgid "Event log"
 msgstr "Log de eventos"
@@ -9373,6 +9399,9 @@ msgstr "As horas são compartilhadas com toda a equipe. Elas consideram uma áre
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "As horas consideram uma área de trabalho padrão de {vcpus} vCPU / {memoryGb} GB. Medimos GB-horas, a memória da máquina vezes as horas em que ela roda, então uma máquina com o dobro de memória consome as horas duas vezes mais rápido."
 
+msgid "Hours between runs"
+msgstr "Horas entre execuções"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Sem internet"
 msgid "Interrupt"
 msgstr "Interromper"
 
+msgid "Interval"
+msgstr "Intervalo"
+
 msgid "Intro call"
 msgstr "Conversa inicial"
 
@@ -10065,6 +10097,9 @@ msgstr "Ele pode estar em repouso"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Ela pode ter sido excluída ou pertence a outra organização."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Ela para de vez. As execuções anteriores ficam no chat."
 
 msgid "It will open once the connection is back."
 msgstr "Ela abrirá quando a conexão voltar."
@@ -12769,6 +12804,9 @@ msgstr "Ligado"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "em {offScopeHostName} — não vai rodar aqui"
 
+msgid "On a date"
+msgstr "Em uma data"
+
 msgid "On focus change"
 msgstr "Ao alterar o foco"
 
@@ -15463,6 +15501,12 @@ msgstr "Reabrindo…"
 msgid "reorder agents"
 msgstr "reordenar os agentes"
 
+msgid "Repeat"
+msgstr "Repetir"
+
+msgid "Repeat routine"
+msgstr "Repetir rotina"
+
 msgid "Replace"
 msgstr "Substituir"
 
@@ -16029,14 +16073,23 @@ msgstr "Direcione o {label} por um provedor que você mesmo opera, com as creden
 msgid "Routine not found"
 msgstr "Rotina não encontrada"
 
+msgid "Routine options"
+msgstr "Opções da rotina"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tickets rotineiros sem intervenção no meio da tarefa"
+
+msgid "Routines"
+msgstr "Rotinas"
 
 msgid "Row actions"
 msgstr "Ações da linha"
 
 msgid "Rows changed"
 msgstr "Linhas alteradas"
+
+msgid "Rule"
+msgstr "Regra"
 
 msgid "Run"
 msgstr "Executar"
@@ -16180,6 +16233,9 @@ msgstr "Executa um comando local na sua máquina"
 
 msgid "Runs appear here once an automation fires."
 msgstr "As execuções aparecem aqui assim que uma automação é disparada."
+
+msgid "Runs in"
+msgstr "Executa em"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Executa dentro do app Paradev naquele dispositivo, então atualizá-lo significa atualizar o app lá."
@@ -19558,6 +19614,9 @@ msgstr "Plano"
 
 msgid "Time"
 msgstr "Tempo"
+
+msgid "Time zone"
+msgstr "Fuso horário"
 
 msgid "Tinted"
 msgstr "Colorido"

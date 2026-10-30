@@ -1738,6 +1738,10 @@ msgstr "Kunci tugas terdiri dari 1 hingga 5 huruf atau angka dan diawali huruf."
 msgid "a teammate"
 msgstr "rekan tim"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Utas di #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Pengenal unik untuk organisasi Anda (dibuat otomatis dari nama)"
 
@@ -5700,6 +5704,9 @@ msgstr "Tidak dapat mencabangkan ke worktree baru"
 msgid "Couldn't branch the conversation"
 msgstr "Tidak dapat mencabangkan percakapan"
 
+msgid "Couldn't change the routine"
+msgstr "Tidak dapat mengubah rutinitas"
+
 msgid "Couldn't check"
 msgstr "Tidak bisa diperiksa"
 
@@ -5881,6 +5888,9 @@ msgstr "Tidak dapat menyimpan perubahan"
 
 msgid "Couldn't save the Dev"
 msgstr "Tidak dapat menyimpan Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Tidak dapat menyimpan rutinitas"
 
 msgid "Couldn't send comment"
 msgstr "Tidak bisa mengirim komentar"
@@ -6395,6 +6405,9 @@ msgstr "Data & API"
 msgid "Data display"
 msgstr "Tampilan data"
 
+msgid "Date"
+msgstr "Tanggal"
+
 msgid "Date created"
 msgstr "Tanggal dibuat"
 
@@ -6403,6 +6416,9 @@ msgstr "Rentang tanggal"
 
 msgid "Day"
 msgstr "Hari"
+
+msgid "Day of the month"
+msgstr "Hari dalam bulan"
 
 msgid "Day One"
 msgstr "Hari pertama"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Hapus “{title}”?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Hapus {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Edit di GitHub"
 msgid "Edit queued message"
 msgstr "Edit pesan dalam antrean"
 
+msgid "Edit routine"
+msgstr "Edit rutinitas"
+
 msgid "Edit Run Script"
 msgstr "Edit Skrip Run"
 
@@ -7461,6 +7481,9 @@ msgstr "Aktifkan akses jarak jauh dan biarkan komputer ini tetap aktif dengan Pa
 msgid "Enable skill"
 msgstr "Aktifkan skill"
 
+msgid "End repeat"
+msgstr "Akhir pengulangan"
+
 msgid "End voice session"
 msgstr "Akhiri sesi suara"
 
@@ -7547,6 +7570,9 @@ msgstr "esc untuk menutup"
 
 msgid "esc to exit"
 msgstr "esc untuk keluar"
+
+msgid "Event"
+msgstr "Peristiwa"
 
 msgid "Event log"
 msgstr "Log peristiwa"
@@ -9373,6 +9399,9 @@ msgstr "Jam dibagi ke seluruh tim Anda. Jam dihitung dengan workspace standar {v
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Jam dihitung dengan workspace standar {vcpus} vCPU / {memoryGb} GB. Kami mengukur GB-jam, yaitu memori mesin dikali jam berjalannya, sehingga mesin dengan memori dua kali lipat menghabiskan jam dua kali lebih cepat."
 
+msgid "Hours between runs"
+msgstr "Jam di antara eksekusi"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Internet Terputus"
 msgid "Interrupt"
 msgstr "Sela"
 
+msgid "Interval"
+msgstr "Interval"
+
 msgid "Intro call"
 msgstr "Panggilan perkenalan"
 
@@ -10065,6 +10097,9 @@ msgstr "Mungkin sedang tidur"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mungkin sudah dihapus, atau milik organisasi lain."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Rutinitas berhenti untuk selamanya. Eksekusi sebelumnya tetap ada di obrolan."
 
 msgid "It will open once the connection is back."
 msgstr "Akan terbuka saat koneksi kembali."
@@ -12769,6 +12804,9 @@ msgstr "Nyala"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "di {offScopeHostName} — tidak akan berjalan di sini"
 
+msgid "On a date"
+msgstr "Pada tanggal"
+
 msgid "On focus change"
 msgstr "Saat fokus berubah"
 
@@ -15463,6 +15501,12 @@ msgstr "Membuka kembali…"
 msgid "reorder agents"
 msgstr "mengurutkan ulang agen"
 
+msgid "Repeat"
+msgstr "Ulangi"
+
+msgid "Repeat routine"
+msgstr "Ulangi rutinitas"
+
 msgid "Replace"
 msgstr "Ganti"
 
@@ -16029,14 +16073,23 @@ msgstr "Arahkan {label} lewat penyedia yang Anda jalankan sendiri, dengan kreden
 msgid "Routine not found"
 msgstr "Rutinitas tidak ditemukan"
 
+msgid "Routine options"
+msgstr "Opsi rutinitas"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tiket rutin tanpa intervensi di tengah tugas"
+
+msgid "Routines"
+msgstr "Rutinitas"
 
 msgid "Row actions"
 msgstr "Aksi baris"
 
 msgid "Rows changed"
 msgstr "Baris berubah"
+
+msgid "Rule"
+msgstr "Aturan"
 
 msgid "Run"
 msgstr "Jalankan"
@@ -16180,6 +16233,9 @@ msgstr "Menjalankan perintah lokal di mesin Anda"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Run muncul di sini setelah otomatisasi terpicu."
+
+msgid "Runs in"
+msgstr "Berjalan di"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Berjalan di dalam aplikasi Paradev di perangkat itu, jadi memperbaruinya berarti memperbarui aplikasi di sana."
@@ -19558,6 +19614,9 @@ msgstr "Tingkat"
 
 msgid "Time"
 msgstr "Waktu"
+
+msgid "Time zone"
+msgstr "Zona waktu"
 
 msgid "Tinted"
 msgstr "Berwarna"

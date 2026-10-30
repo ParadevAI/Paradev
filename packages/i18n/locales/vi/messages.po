@@ -1738,6 +1738,10 @@ msgstr "Khóa nhiệm vụ gồm 1 đến 5 chữ cái hoặc chữ số và b�
 msgid "a teammate"
 msgstr "một đồng đội"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Một chuỗi trong #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Định danh duy nhất cho tổ chức của bạn (tự tạo từ tên)"
 
@@ -5700,6 +5704,9 @@ msgstr "Không thể tạo nhánh sang worktree mới"
 msgid "Couldn't branch the conversation"
 msgstr "Không thể tạo nhánh hội thoại"
 
+msgid "Couldn't change the routine"
+msgstr "Không thể thay đổi quy trình"
+
 msgid "Couldn't check"
 msgstr "Không thể kiểm tra"
 
@@ -5881,6 +5888,9 @@ msgstr "Không thể lưu thay đổi"
 
 msgid "Couldn't save the Dev"
 msgstr "Không thể lưu Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Không thể lưu quy trình"
 
 msgid "Couldn't send comment"
 msgstr "Không thể gửi bình luận"
@@ -6395,6 +6405,9 @@ msgstr "Dữ liệu & API"
 msgid "Data display"
 msgstr "Hiển thị dữ liệu"
 
+msgid "Date"
+msgstr "Ngày"
+
 msgid "Date created"
 msgstr "Ngày tạo"
 
@@ -6403,6 +6416,9 @@ msgstr "Khoảng thời gian"
 
 msgid "Day"
 msgstr "Ngày"
+
+msgid "Day of the month"
+msgstr "Ngày trong tháng"
 
 msgid "Day One"
 msgstr "Ngày đầu"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Xóa “{title}”?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Xóa {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Sửa trên GitHub"
 msgid "Edit queued message"
 msgstr "Sửa tin nhắn trong hàng đợi"
 
+msgid "Edit routine"
+msgstr "Chỉnh sửa quy trình"
+
 msgid "Edit Run Script"
 msgstr "Sửa script chạy"
 
@@ -7461,6 +7481,9 @@ msgstr "Bật truy cập từ xa và giữ máy tính này hoạt động với 
 msgid "Enable skill"
 msgstr "Bật skill"
 
+msgid "End repeat"
+msgstr "Kết thúc lặp lại"
+
 msgid "End voice session"
 msgstr "Kết thúc phiên giọng nói"
 
@@ -7547,6 +7570,9 @@ msgstr "esc để đóng"
 
 msgid "esc to exit"
 msgstr "esc để thoát"
+
+msgid "Event"
+msgstr "Sự kiện"
 
 msgid "Event log"
 msgstr "Nhật ký sự kiện"
@@ -9373,6 +9399,9 @@ msgstr "Số giờ được dùng chung cho cả nhóm. Chúng được tính tr
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Số giờ được tính trên không gian làm việc tiêu chuẩn {vcpus} vCPU / {memoryGb} GB. Chúng tôi đo bằng GB-giờ, tức bộ nhớ của máy nhân với số giờ chạy, nên máy có bộ nhớ gấp đôi sẽ dùng hết giờ nhanh gấp đôi."
 
+msgid "Hours between runs"
+msgstr "Số giờ giữa các lần chạy"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Mất kết nối Internet"
 msgid "Interrupt"
 msgstr "Ngắt lời"
 
+msgid "Interval"
+msgstr "Khoảng thời gian"
+
 msgid "Intro call"
 msgstr "Cuộc gọi giới thiệu"
 
@@ -10065,6 +10097,9 @@ msgstr "Máy có thể đang ngủ"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Có thể nó đã bị xóa, hoặc thuộc về một tổ chức khác."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Quy trình dừng hẳn. Các lần chạy trước vẫn ở trong cuộc trò chuyện."
 
 msgid "It will open once the connection is back."
 msgstr "Trang sẽ mở khi có kết nối trở lại."
@@ -12769,6 +12804,9 @@ msgstr "Bật"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "trên {offScopeHostName} — sẽ không chạy ở đây"
 
+msgid "On a date"
+msgstr "Vào một ngày"
+
 msgid "On focus change"
 msgstr "Khi thay đổi tiêu điểm"
 
@@ -15463,6 +15501,12 @@ msgstr "Đang mở lại…"
 msgid "reorder agents"
 msgstr "sắp xếp lại agent"
 
+msgid "Repeat"
+msgstr "Lặp lại"
+
+msgid "Repeat routine"
+msgstr "Lặp lại quy trình"
+
 msgid "Replace"
 msgstr "Thay thế"
 
@@ -16029,14 +16073,23 @@ msgstr "Định tuyến {label} qua nhà cung cấp do bạn tự vận hành, v
 msgid "Routine not found"
 msgstr "Không tìm thấy quy trình"
 
+msgid "Routine options"
+msgstr "Tùy chọn quy trình"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Ticket thường ngày không cần can thiệp giữa chừng"
+
+msgid "Routines"
+msgstr "Quy trình"
 
 msgid "Row actions"
 msgstr "Hành động hàng"
 
 msgid "Rows changed"
 msgstr "Hàng thay đổi"
+
+msgid "Rule"
+msgstr "Quy tắc"
 
 msgid "Run"
 msgstr "Chạy"
@@ -16180,6 +16233,9 @@ msgstr "Chạy một lệnh cục bộ trên máy bạn"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Các lần chạy sẽ xuất hiện ở đây khi một tự động hóa được kích hoạt."
+
+msgid "Runs in"
+msgstr "Chạy trong"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Chạy bên trong ứng dụng Paradev trên thiết bị đó, nên cập nhật nó nghĩa là cập nhật ứng dụng ở đó."
@@ -19558,6 +19614,9 @@ msgstr "Hạng"
 
 msgid "Time"
 msgstr "Thời gian"
+
+msgid "Time zone"
+msgstr "Múi giờ"
 
 msgid "Tinted"
 msgstr "Phủ màu"

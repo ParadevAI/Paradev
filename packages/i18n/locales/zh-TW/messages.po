@@ -1738,6 +1738,10 @@ msgstr "任務鍵為 1 到 5 個字母或數字，且以字母開頭。"
 msgid "a teammate"
 msgstr "某位隊友"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "#{0} 中的一個討論串"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "組織的唯一識別符號（根據名稱自動生成）"
 
@@ -5700,6 +5704,9 @@ msgstr "無法分叉到新的 worktree"
 msgid "Couldn't branch the conversation"
 msgstr "無法分叉對話"
 
+msgid "Couldn't change the routine"
+msgstr "無法變更例行任務"
+
 msgid "Couldn't check"
 msgstr "無法檢查"
 
@@ -5881,6 +5888,9 @@ msgstr "無法儲存變更"
 
 msgid "Couldn't save the Dev"
 msgstr "無法儲存 Dev"
+
+msgid "Couldn't save the routine"
+msgstr "無法儲存例行任務"
 
 msgid "Couldn't send comment"
 msgstr "無法傳送評論"
@@ -6395,6 +6405,9 @@ msgstr "資料與 API"
 msgid "Data display"
 msgstr "資料展示"
 
+msgid "Date"
+msgstr "日期"
+
 msgid "Date created"
 msgstr "建立日期"
 
@@ -6403,6 +6416,9 @@ msgstr "日期範圍"
 
 msgid "Day"
 msgstr "按天"
+
+msgid "Day of the month"
+msgstr "每月的日期"
 
 msgid "Day One"
 msgstr "元老"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "刪除「{title}」？"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "刪除{0}？"
@@ -7335,6 +7352,9 @@ msgstr "在GitHub上編輯"
 msgid "Edit queued message"
 msgstr "編輯佇列中的訊息"
 
+msgid "Edit routine"
+msgstr "編輯例行任務"
+
 msgid "Edit Run Script"
 msgstr "編輯執行指令碼"
 
@@ -7461,6 +7481,9 @@ msgstr "啟用遠端存取，並保持這台電腦喚醒且 Paradev 持續執行
 msgid "Enable skill"
 msgstr "啟用技能"
 
+msgid "End repeat"
+msgstr "結束重複"
+
 msgid "End voice session"
 msgstr "結束語音會話"
 
@@ -7547,6 +7570,9 @@ msgstr "按esc關閉"
 
 msgid "esc to exit"
 msgstr "esc退出"
+
+msgid "Event"
+msgstr "事件"
 
 msgid "Event log"
 msgstr "事件記錄"
@@ -9373,6 +9399,9 @@ msgstr "時數由整個團隊共用。以標準 {vcpus} vCPU / {memoryGb} GB 工
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "時數以標準 {vcpus} vCPU / {memoryGb} GB 工作區計算。我們按 GB 小時計量，即機器記憶體乘以執行小時數，因此記憶體加倍的機器消耗時數也快一倍。"
 
+msgid "Hours between runs"
+msgstr "執行間隔（小時）"
+
 msgid "Hover Card"
 msgstr "懸浮卡片"
 
@@ -9892,6 +9921,9 @@ msgstr "網路已斷開"
 msgid "Interrupt"
 msgstr "打斷"
 
+msgid "Interval"
+msgstr "間隔"
+
 msgid "Intro call"
 msgstr "初步通話"
 
@@ -10065,6 +10097,9 @@ msgstr "裝置可能處於睡眠狀態"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被刪除，或屬於另一個組織。"
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "它會永久停止。過去的執行會保留在聊天中。"
 
 msgid "It will open once the connection is back."
 msgstr "網路恢復後會自動開啟。"
@@ -12769,6 +12804,9 @@ msgstr "開啟"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "在{offScopeHostName}上，不會在這裡執行"
 
+msgid "On a date"
+msgstr "指定日期"
+
 msgid "On focus change"
 msgstr "焦點變更時"
 
@@ -15463,6 +15501,12 @@ msgstr "正在重新開啟…"
 msgid "reorder agents"
 msgstr "重新排序代理程式"
 
+msgid "Repeat"
+msgstr "重複"
+
+msgid "Repeat routine"
+msgstr "重複例行任務"
+
 msgid "Replace"
 msgstr "替換"
 
@@ -16029,14 +16073,23 @@ msgstr "讓{label}走你自己運行的提供商，用你手中的憑證。已�
 msgid "Routine not found"
 msgstr "找不到例行任務"
 
+msgid "Routine options"
+msgstr "例行任務選項"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "常規工單無需中途干預"
+
+msgid "Routines"
+msgstr "例行任務"
 
 msgid "Row actions"
 msgstr "行操作"
 
 msgid "Rows changed"
 msgstr "行有變更"
+
+msgid "Rule"
+msgstr "規則"
 
 msgid "Run"
 msgstr "執行"
@@ -16180,6 +16233,9 @@ msgstr "在你的機器上執行本地命令"
 
 msgid "Runs appear here once an automation fires."
 msgstr "自動化觸發後，執行會顯示在這裡。"
+
+msgid "Runs in"
+msgstr "執行位置"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "在該裝置的 Paradev 應用程式內執行，因此更新它就是更新該裝置上的應用程式。"
@@ -19558,6 +19614,9 @@ msgstr "等級"
 
 msgid "Time"
 msgstr "時間"
+
+msgid "Time zone"
+msgstr "時區"
 
 msgid "Tinted"
 msgstr "色調"

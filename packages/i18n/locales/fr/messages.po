@@ -1738,6 +1738,10 @@ msgstr "Une clé de tâche compte 1 à 5 lettres ou chiffres et commence par une
 msgid "a teammate"
 msgstr "un coéquipier"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Un fil dans #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Un identifiant unique pour votre organisation (généré automatiquement à partir du nom)"
 
@@ -5700,6 +5704,9 @@ msgstr "Impossible de dupliquer dans un nouveau worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Impossible de dupliquer la conversation"
 
+msgid "Couldn't change the routine"
+msgstr "Impossible de modifier la routine"
+
 msgid "Couldn't check"
 msgstr "Vérification impossible"
 
@@ -5881,6 +5888,9 @@ msgstr "Impossible d’enregistrer la modification"
 
 msgid "Couldn't save the Dev"
 msgstr "Impossible d'enregistrer le Dev"
+
+msgid "Couldn't save the routine"
+msgstr "Impossible d'enregistrer la routine"
 
 msgid "Couldn't send comment"
 msgstr "Impossible d'envoyer le commentaire"
@@ -6395,6 +6405,9 @@ msgstr "Données et API"
 msgid "Data display"
 msgstr "Affichage des données"
 
+msgid "Date"
+msgstr "Date"
+
 msgid "Date created"
 msgstr "Date de création"
 
@@ -6403,6 +6416,9 @@ msgstr "Plage de dates"
 
 msgid "Day"
 msgstr "Jour"
+
+msgid "Day of the month"
+msgstr "Jour du mois"
 
 msgid "Day One"
 msgstr "Premier jour"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Supprimer « {title} » ?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Supprimer {0} ?"
@@ -7335,6 +7352,9 @@ msgstr "Modifier sur GitHub"
 msgid "Edit queued message"
 msgstr "Modifier le message en file"
 
+msgid "Edit routine"
+msgstr "Modifier la routine"
+
 msgid "Edit Run Script"
 msgstr "Modifier le script d'exécution"
 
@@ -7461,6 +7481,9 @@ msgstr "Activez l’accès à distance et gardez cet ordinateur éveillé avec P
 msgid "Enable skill"
 msgstr "Activer la compétence"
 
+msgid "End repeat"
+msgstr "Fin de la répétition"
+
 msgid "End voice session"
 msgstr "Terminer la session vocale"
 
@@ -7547,6 +7570,9 @@ msgstr "esc pour fermer"
 
 msgid "esc to exit"
 msgstr "esc pour quitter"
+
+msgid "Event"
+msgstr "Événement"
 
 msgid "Event log"
 msgstr "Journal des événements"
@@ -9373,6 +9399,9 @@ msgstr "Les heures sont partagées par toute votre équipe. Elles sont calculée
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Les heures sont calculées sur un espace de travail standard de {vcpus} vCPU / {memoryGb} Go. Nous mesurons des GB-heures, soit la mémoire de la machine multipliée par ses heures de fonctionnement : une machine avec deux fois plus de mémoire consomme donc les heures deux fois plus vite."
 
+msgid "Hours between runs"
+msgstr "Heures entre les exécutions"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Pas de connexion Internet"
 msgid "Interrupt"
 msgstr "Interrompre"
 
+msgid "Interval"
+msgstr "Intervalle"
+
 msgid "Intro call"
 msgstr "Appel de présentation"
 
@@ -10065,6 +10097,9 @@ msgstr "Il est peut-être en veille"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Elle a peut-être été supprimée, ou elle appartient à une autre organisation."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Elle s'arrête définitivement. Ses exécutions passées restent dans le chat."
 
 msgid "It will open once the connection is back."
 msgstr "La page s'ouvrira au retour de la connexion."
@@ -12769,6 +12804,9 @@ msgstr "Activée"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "sur {offScopeHostName} — ne s'exécutera pas ici"
 
+msgid "On a date"
+msgstr "À une date"
+
 msgid "On focus change"
 msgstr "Lors du changement de focus"
 
@@ -15463,6 +15501,12 @@ msgstr "Réouverture…"
 msgid "reorder agents"
 msgstr "réordonner les agents"
 
+msgid "Repeat"
+msgstr "Répéter"
+
+msgid "Repeat routine"
+msgstr "Répéter la routine"
+
 msgid "Replace"
 msgstr "Remplacer"
 
@@ -16029,14 +16073,23 @@ msgstr "Faites passer {label} par un fournisseur que vous exploitez, avec les id
 msgid "Routine not found"
 msgstr "Routine introuvable"
 
+msgid "Routine options"
+msgstr "Options de la routine"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Tickets courants sans intervention en cours de tâche"
+
+msgid "Routines"
+msgstr "Routines"
 
 msgid "Row actions"
 msgstr "Actions de la ligne"
 
 msgid "Rows changed"
 msgstr "Lignes modifiées"
+
+msgid "Rule"
+msgstr "Règle"
 
 msgid "Run"
 msgstr "Exécuter"
@@ -16180,6 +16233,9 @@ msgstr "Exécute une commande locale sur votre machine"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Les exécutions apparaissent ici dès qu'une automatisation se déclenche."
+
+msgid "Runs in"
+msgstr "S'exécute dans"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "S'exécute dans l'application Paradev de cet appareil ; le mettre à jour revient à mettre à jour l'application là-bas."
@@ -19558,6 +19614,9 @@ msgstr "Offre"
 
 msgid "Time"
 msgstr "Date"
+
+msgid "Time zone"
+msgstr "Fuseau horaire"
 
 msgid "Tinted"
 msgstr "Teinté"

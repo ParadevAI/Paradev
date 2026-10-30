@@ -1738,6 +1738,10 @@ msgstr "Klíč úkolů má 1 až 5 písmen nebo číslic a začíná písmenem."
 msgid "a teammate"
 msgstr "kolega"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "Vlákno v #{0}"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Jedinečný identifikátor vaší organizace (vygenerovaný z názvu)"
 
@@ -5700,6 +5704,9 @@ msgstr "Nepodařilo se rozvětvit do nového worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Konverzaci se nepodařilo rozvětvit"
 
+msgid "Couldn't change the routine"
+msgstr "Rutinu se nepodařilo změnit"
+
 msgid "Couldn't check"
 msgstr "Nepodařilo se ověřit"
 
@@ -5881,6 +5888,9 @@ msgstr "Změnu se nepodařilo uložit"
 
 msgid "Couldn't save the Dev"
 msgstr "Dev se nepodařilo uložit"
+
+msgid "Couldn't save the routine"
+msgstr "Rutinu se nepodařilo uložit"
 
 msgid "Couldn't send comment"
 msgstr "Nepodařilo se odeslat komentář"
@@ -6395,6 +6405,9 @@ msgstr "Data a API"
 msgid "Data display"
 msgstr "Zobrazení dat"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Date created"
 msgstr "Datum vytvoření"
 
@@ -6403,6 +6416,9 @@ msgstr "Časové období"
 
 msgid "Day"
 msgstr "Den"
+
+msgid "Day of the month"
+msgstr "Den v měsíci"
 
 msgid "Day One"
 msgstr "První den"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "Smazat „{title}“?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "Smazat {0}?"
@@ -7335,6 +7352,9 @@ msgstr "Upravit na GitHubu"
 msgid "Edit queued message"
 msgstr "Upravit zprávu ve frontě"
 
+msgid "Edit routine"
+msgstr "Upravit rutinu"
+
 msgid "Edit Run Script"
 msgstr "Upravit run skript"
 
@@ -7461,6 +7481,9 @@ msgstr "Zapněte vzdálený přístup a nechte tento počítač aktivní se spu�
 msgid "Enable skill"
 msgstr "Zapnout skill"
 
+msgid "End repeat"
+msgstr "Konec opakování"
+
 msgid "End voice session"
 msgstr "Ukončit hlasovou relaci"
 
@@ -7547,6 +7570,9 @@ msgstr "esc zavře"
 
 msgid "esc to exit"
 msgstr "esc pro ukončení"
+
+msgid "Event"
+msgstr "Událost"
 
 msgid "Event log"
 msgstr "Protokol událostí"
@@ -9373,6 +9399,9 @@ msgstr "Hodiny sdílí celý tým. Počítají se standardním pracovním prosto
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Hodiny počítají se standardním pracovním prostorem {vcpus} vCPU / {memoryGb} GB. Měříme GB-hodiny, tedy paměť stroje krát hodiny jeho běhu, takže stroj s dvojnásobnou pamětí spotřebuje hodiny dvakrát rychleji."
 
+msgid "Hours between runs"
+msgstr "Hodin mezi spuštěními"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "Internet odpojen"
 msgid "Interrupt"
 msgstr "Přerušit"
 
+msgid "Interval"
+msgstr "Interval"
+
 msgid "Intro call"
 msgstr "Úvodní hovor"
 
@@ -10065,6 +10097,9 @@ msgstr "Možná je uspaný"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mohla být smazána nebo patří jiné organizaci."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Natrvalo se zastaví. Dřívější spuštění zůstanou v chatu."
 
 msgid "It will open once the connection is back."
 msgstr "Otevře se, jakmile se připojení vrátí."
@@ -12769,6 +12804,9 @@ msgstr "Zapnuto"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "na {offScopeHostName} — tady nepoběží"
 
+msgid "On a date"
+msgstr "K datu"
+
 msgid "On focus change"
 msgstr "Při změně zaměření"
 
@@ -15463,6 +15501,12 @@ msgstr "Znovuotevírání…"
 msgid "reorder agents"
 msgstr "změnit pořadí agentů"
 
+msgid "Repeat"
+msgstr "Opakovat"
+
+msgid "Repeat routine"
+msgstr "Opakovat rutinu"
+
 msgid "Replace"
 msgstr "Nahradit"
 
@@ -16029,14 +16073,23 @@ msgstr "Veďte {label} přes poskytovatele, kterého provozujete, s přihlašova
 msgid "Routine not found"
 msgstr "Rutina nenalezena"
 
+msgid "Routine options"
+msgstr "Možnosti rutiny"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Rutinní tickety bez zásahu uprostřed úkolu"
+
+msgid "Routines"
+msgstr "Rutiny"
 
 msgid "Row actions"
 msgstr "Akce řádku"
 
 msgid "Rows changed"
 msgstr "Změněny řádky"
+
+msgid "Rule"
+msgstr "Pravidlo"
 
 msgid "Run"
 msgstr "Spustit"
@@ -16180,6 +16233,9 @@ msgstr "Spouští lokální příkaz na vašem počítači"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Běhy se zde objeví, jakmile se automatizace spustí."
+
+msgid "Runs in"
+msgstr "Běží v"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "Běží uvnitř aplikace Paradev na tom zařízení, takže aktualizace znamená aktualizovat tam aplikaci."
@@ -19558,6 +19614,9 @@ msgstr "Tarif"
 
 msgid "Time"
 msgstr "Čas"
+
+msgid "Time zone"
+msgstr "Časové pásmo"
 
 msgid "Tinted"
 msgstr "Tónovaný"

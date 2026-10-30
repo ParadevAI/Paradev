@@ -1738,6 +1738,10 @@ msgstr "タスクキーは英字で始まる 1〜5 文字の英数字です。"
 msgid "a teammate"
 msgstr "チームメンバー"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "#{0} のスレッド"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "組織の一意の識別子(名前から自動生成)"
 
@@ -5700,6 +5704,9 @@ msgstr "新しい worktree へ分岐できませんでした"
 msgid "Couldn't branch the conversation"
 msgstr "会話を分岐できませんでした"
 
+msgid "Couldn't change the routine"
+msgstr "ルーティンを変更できませんでした"
+
 msgid "Couldn't check"
 msgstr "確認できませんでした"
 
@@ -5881,6 +5888,9 @@ msgstr "変更を保存できませんでした"
 
 msgid "Couldn't save the Dev"
 msgstr "Devを保存できませんでした"
+
+msgid "Couldn't save the routine"
+msgstr "ルーティンを保存できませんでした"
 
 msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
@@ -6395,6 +6405,9 @@ msgstr "データとAPI"
 msgid "Data display"
 msgstr "データ表示"
 
+msgid "Date"
+msgstr "日付"
+
 msgid "Date created"
 msgstr "作成日"
 
@@ -6403,6 +6416,9 @@ msgstr "期間"
 
 msgid "Day"
 msgstr "日"
+
+msgid "Day of the month"
+msgstr "日にち"
 
 msgid "Day One"
 msgstr "デイワン"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "「{title}」を削除しますか?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "{0}を削除しますか?"
@@ -7335,6 +7352,9 @@ msgstr "GitHubで編集"
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
 
+msgid "Edit routine"
+msgstr "ルーティンを編集"
+
 msgid "Edit Run Script"
 msgstr "実行スクリプトを編集"
 
@@ -7461,6 +7481,9 @@ msgstr "リモートアクセスを有効にし、Paradevを起動したまま�
 msgid "Enable skill"
 msgstr "スキルを有効にする"
 
+msgid "End repeat"
+msgstr "繰り返しの終了"
+
 msgid "End voice session"
 msgstr "音声セッションを終了"
 
@@ -7547,6 +7570,9 @@ msgstr "escで閉じる"
 
 msgid "esc to exit"
 msgstr "escで終了"
+
+msgid "Event"
+msgstr "イベント"
 
 msgid "Event log"
 msgstr "イベントログ"
@@ -9373,6 +9399,9 @@ msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU /
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "時間は標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしています。計測単位は GB 時間（マシンのメモリ × 稼働時間）なので、メモリが 2 倍のマシンは時間を 2 倍の速さで消費します。"
 
+msgid "Hours between runs"
+msgstr "実行の間隔（時間）"
+
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -9892,6 +9921,9 @@ msgstr "インターネットが切断されています"
 msgid "Interrupt"
 msgstr "中断"
 
+msgid "Interval"
+msgstr "間隔"
+
 msgid "Intro call"
 msgstr "カジュアル面談"
 
@@ -10065,6 +10097,9 @@ msgstr "スリープ中かもしれません"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "削除されたか、別の組織に属している可能性があります。"
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "完全に停止します。過去の実行はチャットに残ります。"
 
 msgid "It will open once the connection is back."
 msgstr "接続が戻ると開きます。"
@@ -12769,6 +12804,9 @@ msgstr "オン"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName}上 — ここでは実行されません"
 
+msgid "On a date"
+msgstr "指定日"
+
 msgid "On focus change"
 msgstr "フォーカス変更時"
 
@@ -15463,6 +15501,12 @@ msgstr "再オープン中…"
 msgid "reorder agents"
 msgstr "エージェントを並べ替える"
 
+msgid "Repeat"
+msgstr "繰り返し"
+
+msgid "Repeat routine"
+msgstr "ルーティンを繰り返す"
+
 msgid "Replace"
 msgstr "置き換える"
 
@@ -16029,14 +16073,23 @@ msgstr "自分で運用するプロバイダーと自分が持つ認証情報を
 msgid "Routine not found"
 msgstr "ルーティンが見つかりません"
 
+msgid "Routine options"
+msgstr "ルーティンのオプション"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "途中の介入なしで完了する定型チケット"
+
+msgid "Routines"
+msgstr "ルーティン"
 
 msgid "Row actions"
 msgstr "行の操作"
 
 msgid "Rows changed"
 msgstr "行の変更"
+
+msgid "Rule"
+msgstr "ルール"
 
 msgid "Run"
 msgstr "実行"
@@ -16180,6 +16233,9 @@ msgstr "マシン上でローカルコマンドを実行します"
 
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
+
+msgid "Runs in"
+msgstr "実行場所"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "そのデバイスのParadevアプリ内で動作しているため、更新するにはそのデバイスのアプリを更新する必要があります。"
@@ -19558,6 +19614,9 @@ msgstr "ティア"
 
 msgid "Time"
 msgstr "時間"
+
+msgid "Time zone"
+msgstr "タイムゾーン"
 
 msgid "Tinted"
 msgstr "色合い調整"

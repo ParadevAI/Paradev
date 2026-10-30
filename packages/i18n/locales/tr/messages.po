@@ -1738,6 +1738,10 @@ msgstr "Görev anahtarı 1 ila 5 harf veya rakamdan oluşur ve bir harfle başla
 msgid "a teammate"
 msgstr "bir takım arkadaşı"
 
+#. placeholder {0}: routine.room.name
+msgid "A thread in #{0}"
+msgstr "#{0} içinde bir ileti dizisi"
+
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "Kuruluşunuz için benzersiz bir tanımlayıcı (addan otomatik oluşturulur)"
 
@@ -5700,6 +5704,9 @@ msgstr "Yeni bir worktree'ye çatallanamadı"
 msgid "Couldn't branch the conversation"
 msgstr "Konuşma çatallanamadı"
 
+msgid "Couldn't change the routine"
+msgstr "Rutin değiştirilemedi"
+
 msgid "Couldn't check"
 msgstr "Kontrol edilemedi"
 
@@ -5881,6 +5888,9 @@ msgstr "Değişiklik kaydedilemedi"
 
 msgid "Couldn't save the Dev"
 msgstr "Dev kaydedilemedi"
+
+msgid "Couldn't save the routine"
+msgstr "Rutin kaydedilemedi"
 
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
@@ -6395,6 +6405,9 @@ msgstr "Veri ve API'ler"
 msgid "Data display"
 msgstr "Veri gösterimi"
 
+msgid "Date"
+msgstr "Tarih"
+
 msgid "Date created"
 msgstr "Oluşturulma tarihi"
 
@@ -6403,6 +6416,9 @@ msgstr "Tarih aralığı"
 
 msgid "Day"
 msgstr "Gün"
+
+msgid "Day of the month"
+msgstr "Ayın günü"
 
 msgid "Day One"
 msgstr "Birinci gün"
@@ -6490,6 +6506,7 @@ msgid "Delete “{title}”?"
 msgstr "“{title}” silinsin mi?"
 
 #. placeholder {0}: organization.name
+#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "{0} silinsin mi?"
@@ -7335,6 +7352,9 @@ msgstr "GitHub'da düzenle"
 msgid "Edit queued message"
 msgstr "Kuyruktaki mesajı düzenle"
 
+msgid "Edit routine"
+msgstr "Rutini düzenle"
+
 msgid "Edit Run Script"
 msgstr "Çalıştırma betiğini düzenle"
 
@@ -7461,6 +7481,9 @@ msgstr "Uzaktan erişimi etkinleştirin ve Paradev çalışırken bu bilgisayar�
 msgid "Enable skill"
 msgstr "Beceriyi etkinleştir"
 
+msgid "End repeat"
+msgstr "Tekrarın sonu"
+
 msgid "End voice session"
 msgstr "Sesli oturumu bitir"
 
@@ -7547,6 +7570,9 @@ msgstr "kapatmak için esc"
 
 msgid "esc to exit"
 msgstr "çıkmak için esc"
+
+msgid "Event"
+msgstr "Olay"
 
 msgid "Event log"
 msgstr "Olay günlüğü"
@@ -9373,6 +9399,9 @@ msgstr "Saatler tüm ekibinizle paylaşılır. Standart {vcpus} vCPU / {memoryGb
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "Saatler standart {vcpus} vCPU / {memoryGb} GB çalışma alanına göre hesaplanır. GB-saat ölçüyoruz; yani makinenin belleği çarpı çalıştığı saat. Bu yüzden iki kat belleği olan bir makine saatleri iki kat hızlı tüketir."
 
+msgid "Hours between runs"
+msgstr "Çalıştırmalar arasındaki saat"
+
 msgid "Hover Card"
 msgstr "Üzerine gelme kartı"
 
@@ -9892,6 +9921,9 @@ msgstr "İnternet bağlantısı kesildi"
 msgid "Interrupt"
 msgstr "Kes"
 
+msgid "Interval"
+msgstr "Aralık"
+
 msgid "Intro call"
 msgstr "Tanışma görüşmesi"
 
@@ -10065,6 +10097,9 @@ msgstr "Uykuda olabilir"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Silinmiş olabilir veya başka bir kuruluşa ait olabilir."
+
+msgid "It stops for good. Its past runs stay in the chat."
+msgstr "Kalıcı olarak durur. Geçmiş çalıştırmalar sohbette kalır."
 
 msgid "It will open once the connection is back."
 msgstr "Bağlantı geri geldiğinde açılacak."
@@ -12769,6 +12804,9 @@ msgstr "Açık"
 msgid "on {offScopeHostName} — won't run here"
 msgstr "{offScopeHostName} üzerinde — burada çalışmaz"
 
+msgid "On a date"
+msgstr "Bir tarihte"
+
 msgid "On focus change"
 msgstr "Odak değiştiğinde"
 
@@ -15463,6 +15501,12 @@ msgstr "Yeniden açılıyor…"
 msgid "reorder agents"
 msgstr "ajanları yeniden sıralama"
 
+msgid "Repeat"
+msgstr "Tekrarla"
+
+msgid "Repeat routine"
+msgstr "Rutini tekrarla"
+
 msgid "Replace"
 msgstr "Değiştir"
 
@@ -16029,14 +16073,23 @@ msgstr "{label} ajanını kendi işlettiğiniz bir sağlayıcı üzerinden, elin
 msgid "Routine not found"
 msgstr "Rutin bulunamadı"
 
+msgid "Routine options"
+msgstr "Rutin seçenekleri"
+
 msgid "Routine tickets with no mid-task intervention"
 msgstr "Görev ortasında müdahale olmadan rutin biletler"
+
+msgid "Routines"
+msgstr "Rutinler"
 
 msgid "Row actions"
 msgstr "Satır eylemleri"
 
 msgid "Rows changed"
 msgstr "Satırlar değişti"
+
+msgid "Rule"
+msgstr "Kural"
 
 msgid "Run"
 msgstr "Çalıştır"
@@ -16180,6 +16233,9 @@ msgstr "Makinenizde yerel bir komut çalıştırır"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Bir otomasyon tetiklendiğinde çalıştırmalar burada görünür."
+
+msgid "Runs in"
+msgstr "Çalıştığı yer"
 
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "O cihazdaki Paradev uygulamasının içinde çalışır; bu yüzden güncellemek, oradaki uygulamayı güncellemek demektir."
@@ -19558,6 +19614,9 @@ msgstr "Katman"
 
 msgid "Time"
 msgstr "Zaman"
+
+msgid "Time zone"
+msgstr "Saat dilimi"
 
 msgid "Tinted"
 msgstr "Renkli"
