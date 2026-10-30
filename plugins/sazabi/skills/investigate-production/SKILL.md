@@ -13,13 +13,13 @@ and *who* it hits, backed by real log lines, before anyone edits code.
 
 ## 0. How the tools work
 
-The Sazabi MCP server lists only two tools: `search` and `execute`.
-
-- `search` finds operations. An empty query lists them. Before you call one,
-  repeat `search` with the operation's exact name as the query and
-  `includeInputSchema: true` to get its arguments.
-- `execute` runs one, as `{ name, arguments }`, with the name copied from the
-  search hit (for example `sazabi/logs.ask`).
+The Sazabi MCP server lists only two tools, `search` and `execute`. Browse
+Sazabi's operations with `search` and `namespace: "sazabi"` (an empty query
+without a namespace lists connected connectors, not Sazabi operations). Before
+calling one, repeat `search` with `namespace: "sazabi"`, the hit's full name as
+the query, and `includeInputSchema: true` to load its arguments. Then run it
+with `execute` as `{ name, arguments }`, the name copied from the hit (for
+example `sazabi/logs.ask`).
 
 Most operations work on one project. If the user did not name one and more
 than one exists, ask which, or pick the one whose name matches this repository.

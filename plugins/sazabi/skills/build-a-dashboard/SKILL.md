@@ -13,11 +13,14 @@ deploy; answer one-off questions with `sazabi/logs.ask` instead.
 
 ## 0. How the tools work
 
-The Sazabi MCP server lists only `search` and `execute`. Find an operation with
-`search`, load its arguments by searching its exact name with
-`includeInputSchema: true`, then run it with `execute` as `{ name, arguments }`.
-Dashboard operations: `sazabi/dashboards.list`, `.get`, `.validate`, `.create`,
-`.update`, `.render`, `.delete`.
+The Sazabi MCP server lists only two tools, `search` and `execute`. Browse
+Sazabi's operations with `search` and `namespace: "sazabi"` (an empty query
+without a namespace lists connected connectors, not Sazabi operations). Before
+calling one, repeat `search` with `namespace: "sazabi"`, the hit's full name as
+the query, and `includeInputSchema: true` to load its arguments. Then run it
+with `execute` as `{ name, arguments }`, the name copied from the hit (for
+example `sazabi/logs.ask`).
+Dashboard operations: `sazabi/dashboards.list`, `.get`, `.validate`, `.create`, `.update`, `.render`, `.delete`.
 
 ## 1. Check what exists
 

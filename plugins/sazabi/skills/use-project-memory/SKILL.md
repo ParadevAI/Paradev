@@ -14,11 +14,14 @@ known causes. Writing to it keeps the next person from starting over.
 
 ## 0. How the tools work
 
-The Sazabi MCP server lists only `search` and `execute`. Find an operation with
-`search`, load its arguments by searching its exact name with
-`includeInputSchema: true`, then run it with `execute` as `{ name, arguments }`.
-Memory operations: `sazabi/memory.search`, `sazabi/memory.list`,
-`sazabi/memory.create`, `sazabi/memory.update`.
+The Sazabi MCP server lists only two tools, `search` and `execute`. Browse
+Sazabi's operations with `search` and `namespace: "sazabi"` (an empty query
+without a namespace lists connected connectors, not Sazabi operations). Before
+calling one, repeat `search` with `namespace: "sazabi"`, the hit's full name as
+the query, and `includeInputSchema: true` to load its arguments. Then run it
+with `execute` as `{ name, arguments }`, the name copied from the hit (for
+example `sazabi/logs.ask`).
+Memory operations: `sazabi/memory.search`, `sazabi/memory.list`, `sazabi/memory.create`, `sazabi/memory.update`.
 
 ## 1. Read first
 
