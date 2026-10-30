@@ -9,7 +9,11 @@ The CLI is currently in Beta. Commands and flags are still evolving. Make sure y
 
 The Paradev CLI (`superset`) is a single static binary that drives the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
-and the local host server from your terminal or from CI.
+and the local host server from your terminal or from CI. Scripts and other
+agents can also use it to dispatch coding-agent tasks. One command creates a
+workspace on its own branch and starts Claude Code, Codex, or another agent
+with a prompt. The result waits in the app for review. See
+[Dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent).
 `paradev` is an alias for `superset`: every install below puts both on `PATH`,
 and either name runs the same binary.
 
@@ -106,7 +110,8 @@ never opens there.
 
 ## Run your first commands
 
-List the projects in your organization:
+List the projects on this machine. Each one has an `id`, which later
+commands take as `PROJECT_ID`:
 
 ```bash
 superset projects list
@@ -129,25 +134,87 @@ If the project already exists in your org but isn't on this machine,
 attach to it instead of creating a duplicate:
 
 ```bash
-superset projects setup <id-from-projects-list> --local --parent-dir ~/code
+superset projects setup PROJECT_ID --local --parent-dir ~/code
 ```
 
 Then create a workspace against it:
 
 ```bash
 superset workspaces create \
-  --project prj_… \
+  --project PROJECT_ID \
   --name "fix-login-bug" \
   --branch fix/login-bug \
   --local
 ```
 
-Trigger an automation immediately:
+## Dispatch agent tasks from a script or another agent
+
+One command creates a workspace on its own branch and starts an agent in it
+with a prompt. Get `PROJECT_ID` from `superset projects list`:
 
 ```bash
-superset automations list
-superset automations run aut_…
-superset automations logs aut_…
+superset workspaces create \
+  --project PROJECT_ID \
+  --name "flaky-tests-2026-10-30" \
+  --branch flaky-tests-2026-10-30 \
+  --local \
+  --agent claude \
+  --prompt "Find the flaky test in CI and propose a fix. Do not merge."
+```
+
+Give each task a branch of its own, for example with a date or a task slug.
+If the branch already has a workspace on the host, the command reuses that
+workspace (`alreadyExists: true` in the JSON output) and starts the agent in
+it, next to any agent already working there.
+
+`--local` puts the workspace on the machine that runs the command. A CI
+runner usually exits when the job ends, so from CI target a host that
+stays on with `--host HOST_ID` (see [Local vs. remote hosts](#local-vs-remote-hosts)).
+
+The JSON output has the workspace ID in `workspace.id`. For each agent,
+`agents[].ok` tells you if it started (`agents[].error` says why not), and
+`agents[].sessionId` is its terminal ID. The command can exit 0 when an
+agent fails to start, so a script should check `ok`:
+
+```bash
+superset workspaces create --project PROJECT_ID --name "flaky-tests-2026-10-30" \
+  --branch flaky-tests-2026-10-30 --local --agent claude \
+  --prompt "Find the flaky test in CI and propose a fix. Do not merge." --json \
+  | jq -e '.agents[0].ok'
+```
+
+To start another agent in a workspace that already exists:
+
+```bash
+superset agents create --workspace WORKSPACE_ID --local --agent codex --prompt "Review the diff and list risks."
+```
+
+Check on the work and read what an agent printed. `workspaces list` gives
+each `WORKSPACE_ID`, and `terminals list` gives each `TERMINAL_ID` in a
+workspace:
+
+```bash
+superset workspaces list --local
+superset terminals list --workspace WORKSPACE_ID --local
+superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local
+```
+
+Each dispatched task opens in the desktop and iPhone apps like any other
+workspace, with its diff ready to review. When an agent or CI runs the CLI,
+the output is JSON by default.
+
+Another agent can do the same through the [Paradev MCP server](/mcp-server).
+An automation with a webhook trigger starts a run when any service sends a
+POST to its URL.
+
+## Trigger an automation
+
+Run an automation immediately:
+
+```bash
+superset automations list               # each automation's id is AUTOMATION_ID
+superset automations run AUTOMATION_ID
+superset automations logs AUTOMATION_ID
 ```
 
 ## Output modes
@@ -161,7 +228,7 @@ shape of the output for scripting:
 | `--quiet` | One ID per line for arrays of objects with `id`; the ID for single objects; JSON otherwise. |
 
 ```bash
-superset tasks list --status in_progress --json | jq '.[].title'
+superset tasks list --assignee-me --json | jq '.[].title'
 superset workspaces list --quiet | xargs -L1 superset workspaces archive
 ```
 
@@ -172,22 +239,25 @@ output unless you pass `--quiet`.
 
 ## Local vs. remote hosts
 
-Commands that touch a host accept `--host <id>` to pick which host handles
-the request, or `--local` for this machine. Local-targeted calls go
+Commands that touch a host accept `--host HOST_ID` to pick which host
+handles the request, or `--local` for this machine. `superset hosts list`
+gives each `HOST_ID`. Local-targeted calls go
 straight to the host server over loopback (offline-friendly); remote
 calls route through the cloud API and the relay.
 
 ```bash
 superset hosts list
-superset workspaces list              # this machine
-superset workspaces list --host h_…  # another host
+superset workspaces list --local          # this machine
+superset workspaces list --host HOST_ID   # another host
 ```
 
-Every host-scoped command targets exactly one host. Reads
-(`workspaces list`, `projects list`) default to this machine; mutating
-host commands (`projects create`, `projects setup`, `workspaces create`)
-require an explicit `--host` or `--local`; there's no default. There is
-no org-wide listing; the desktop app is the cross-host view.
+Every host-scoped command targets exactly one host. `projects list`
+defaults to this machine. `projects create` and `projects setup` require
+`--host` or `--local`. `workspaces create`, `workspaces list`, and
+`terminals` commands default to the cloud when your account has cloud
+workspaces, and to this machine when it does not, so pass `--local` or
+`--host` in scripts to get the same host every time. There is no org-wide
+listing; the desktop app is the cross-host view.
 
 ## Where state lives
 

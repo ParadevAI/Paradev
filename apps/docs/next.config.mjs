@@ -63,6 +63,11 @@ const config = {
 				destination: "/terminal-scripts",
 				permanent: true,
 			},
+			{
+				source: "/cli",
+				destination: "/cli/getting-started",
+				permanent: true,
+			},
 			// Remote Workspaces was renamed to Remote Access.
 			{
 				source: "/remote-workspaces",

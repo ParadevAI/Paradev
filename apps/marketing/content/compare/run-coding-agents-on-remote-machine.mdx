@@ -1,8 +1,8 @@
 ---
 title: "How to Run Coding Agents on a Remote Machine or Always-On Host (2026)"
-description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, and keep them working when your laptop closes."
+description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, keep them working when your laptop closes, and review and preview their changes from your laptop."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-30
 type: "tutorial"
 competitors:
   - vs-code
@@ -26,6 +26,8 @@ keywords:
 To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. Paradev has this built in: turn on Remote Access on a macOS or Linux machine, and it becomes a host in the same app as your laptop. Each agent gets its own worktree there, and you reach its terminals, diffs, and ports from the desktop app, the CLI, or the iPhone and iPad app, with no SSH setup.
 
 The agents' own remote features still work on a Paradev host. Paradev runs the real `claude` and `codex` CLIs in real terminals, so Claude Code Remote Control (`/remote-control`) can follow a session on that host from the Claude app, and `codex cloud exec` can hand a task to Codex cloud. Use Paradev to run and track several agents across machines, and the agent's own feature when you want its app or its cloud. Other options are VS Code Remote-SSH, SSH plus tmux over Tailscale, and managed cloud agents such as Codex cloud or Cursor Cloud Agents. Pick by where you want the agent to run and how many agents you need to keep track of at once.
+
+To review and preview a remote agent's changes from your laptop in Paradev, open the remote workspace. Its **Changes** pane shows the diff from the host. The app forwards the workspace's ports, so `localhost:3000` on your laptop reaches the dev server on the host. [Review and preview details](#how-do-i-review-and-preview-an-agent-s-changes-on-a-remote-machine-from-my-laptop).
 
 This guide answers the questions developers ask most about remote, always-on, and shared setups for parallel coding agents, with the tradeoffs of each option.
 
