@@ -1,6 +1,13 @@
+import { useLingui } from "@lingui/react/macro";
 import { Image } from "expo-image";
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-import { ArrowUp, ChevronDown, Plus, Square } from "lucide-react-native";
+import {
+	ArrowUp,
+	ChevronDown,
+	ClipboardPaste,
+	Mic,
+	Plus,
+	Square,
+} from "lucide-react-native";
 import {
 	forwardRef,
 	useEffect,
@@ -10,8 +17,8 @@ import {
 } from "react";
 import {
 	ActivityIndicator,
+	Animated,
 	Keyboard,
-	PixelRatio,
 	Pressable,
 	StyleSheet,
 	Text,
@@ -26,10 +33,10 @@ import type {
 	ComposerHandle,
 	ComposerMenuOption,
 	ComposerProps,
-	FileThumbnail,
 	PresentImage,
 } from "./Composer.types";
 import { ComposerAttachmentTray } from "./components/ComposerAttachmentTray";
+import { ComposerDictationPill } from "./components/ComposerDictationPill";
 import {
 	ComposerImageViewer,
 	showImage,
@@ -39,29 +46,19 @@ import { ComposerQuickKeys } from "./components/ComposerQuickKeys";
 import { ComposerSessionTabs } from "./components/ComposerSessionTabs";
 import { ComposerSlashSuggestions } from "./components/ComposerSlashSuggestions";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "./constants";
+import { useAttachmentPaste } from "./hooks/useAttachmentPaste";
+import { useDictation } from "./hooks/useDictation";
+import { useSwipeToDismiss } from "./hooks/useSwipeToDismiss";
 import { joinDraft } from "./utils/joinDraft";
 import {
 	committedSlashDraft,
 	slashSuggestions,
 } from "./utils/slashSuggestions";
 
-const IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|heic|heif|bmp|avif)(\?|$)/i;
+export { fileThumbnail } from "./utils/fileThumbnail";
 
 export const presentImage: PresentImage = async (uri) => {
 	showImage(uri);
-};
-
-export const fileThumbnail: FileThumbnail = async (uri, side) => {
-	if (!IMAGE_EXTENSION.test(uri)) return null;
-	try {
-		const image = await ImageManipulator.manipulate(uri)
-			.resize({ width: PixelRatio.getPixelSizeForLayoutSize(side) })
-			.renderAsync();
-		const result = await image.saveAsync({ format: SaveFormat.PNG });
-		return result.uri;
-	} catch {
-		return null;
-	}
 };
 
 export const Composer: ComposerComponent = forwardRef<
@@ -90,6 +87,7 @@ export const Composer: ComposerComponent = forwardRef<
 		isSending = false,
 		onSubmit,
 		onAttachmentsPress,
+		onDictationError,
 		onModelPress,
 		onLaunchOptionPress,
 		onModeSelect,
@@ -104,6 +102,7 @@ export const Composer: ComposerComponent = forwardRef<
 		onAllSessionsPress,
 		onQuickKeysActionPress,
 		onHeightChange,
+		onPaste,
 		onDraftChange,
 		onRemoveAttachment,
 		onAttachmentPress,
@@ -111,6 +110,7 @@ export const Composer: ComposerComponent = forwardRef<
 	},
 	ref,
 ) {
+	const { t } = useLingui();
 	const inputRef = useRef<TextInputInstance>(null);
 	const [draft, setDraftState] = useState(initialDraft);
 	const [expanded, setExpanded] = useState(false);
@@ -125,6 +125,23 @@ export const Composer: ComposerComponent = forwardRef<
 
 	const draftRef = useRef(draft);
 	draftRef.current = draft;
+
+	const dictation = useDictation({
+		getDraft: () => draftRef.current,
+		setDraft,
+		onError: onDictationError,
+	});
+	const isDictating = dictation.state !== "idle";
+	const typeDraft = (text: string) => {
+		dictation.rebase(text);
+		setDraft(text);
+	};
+	const attachmentPaste = useAttachmentPaste({
+		input: inputRef,
+		active: expanded && showAttachments,
+		onPaste,
+	});
+	const swipe = useSwipeToDismiss(() => inputRef.current?.blur());
 
 	useImperativeHandle(ref, () => ({
 		clear: () => setDraft(""),
@@ -147,6 +164,7 @@ export const Composer: ComposerComponent = forwardRef<
 	const isUploading = attachments.some(
 		(item) => item.progress !== undefined && !item.failed,
 	);
+	const isBusy = isSending || isUploading;
 	const submit = () => {
 		if (!hasContent || isSending || isUploading) return;
 		onSubmit?.(draft);
@@ -214,7 +232,20 @@ export const Composer: ComposerComponent = forwardRef<
 							onAction={() => onQuickKeysActionPress?.()}
 						/>
 					) : null}
-					<View style={styles.card}>
+					<Animated.View
+						style={[styles.card, { transform: [{ translateY: swipe.offset }] }]}
+					>
+						{expanded ? (
+							<View
+								accessibilityRole="button"
+								accessibilityLabel={t({ message: "Dismiss" })}
+								onAccessibilityTap={() => inputRef.current?.blur()}
+								{...swipe.panHandlers}
+								style={styles.grabberArea}
+							>
+								<View style={styles.grabber} />
+							</View>
+						) : null}
 						{expanded && headerChips && headerChips.length > 0 ? (
 							<View style={styles.chips}>
 								{headerChips.map((chip) => (
@@ -244,7 +275,7 @@ export const Composer: ComposerComponent = forwardRef<
 							<TextInput
 								ref={inputRef}
 								value={draft}
-								onChangeText={setDraft}
+								onChangeText={typeDraft}
 								onFocus={() => setExpanded(true)}
 								onBlur={() => setExpanded(false)}
 								placeholder={placeholder}
@@ -268,8 +299,22 @@ export const Composer: ComposerComponent = forwardRef<
 						</View>
 						<View style={styles.row}>
 							{showAttachments ? (
-								<RoundButton onPress={onAttachmentsPress}>
+								<RoundButton
+									label={t({ message: "Add attachment" })}
+									onPress={onAttachmentsPress}
+								>
 									<Plus color={COMPOSER_COLORS.foreground} size={20} />
+								</RoundButton>
+							) : null}
+							{expanded && attachmentPaste.canPaste ? (
+								<RoundButton
+									label={t({ message: "Paste attachment" })}
+									onPress={attachmentPaste.paste}
+								>
+									<ClipboardPaste
+										color={COMPOSER_COLORS.foreground}
+										size={18}
+									/>
 								</RoundButton>
 							) : null}
 							{modeOptions && modeOptions.length > 0 ? (
@@ -310,12 +355,37 @@ export const Composer: ComposerComponent = forwardRef<
 									</Text>
 								</Pressable>
 							)}
-							{isSending ? (
+							{dictation.available && !isBusy ? (
+								dictation.state === "recording" ? (
+									<ComposerDictationPill
+										level={dictation.level}
+										stopLabel={t({ message: "Stop dictation" })}
+										onStop={dictation.stop}
+									/>
+								) : dictation.state === "starting" ? (
+									<View style={styles.round}>
+										<ActivityIndicator color={COMPOSER_COLORS.muted} />
+									</View>
+								) : (
+									<RoundButton
+										label={t({ message: "Dictate" })}
+										onPress={() => void dictation.start()}
+									>
+										<Mic color={COMPOSER_COLORS.foreground} size={20} />
+									</RoundButton>
+								)
+							) : null}
+							{isDictating ? null : isSending ? (
 								<View style={styles.round}>
 									<ActivityIndicator color={COMPOSER_COLORS.muted} />
 								</View>
 							) : hasContent ? (
-								<RoundButton filled disabled={isUploading} onPress={submit}>
+								<RoundButton
+									filled
+									disabled={isUploading}
+									label={t({ message: "Send" })}
+									onPress={submit}
+								>
 									<ArrowUp
 										color={COMPOSER_COLORS.card}
 										size={20}
@@ -323,7 +393,11 @@ export const Composer: ComposerComponent = forwardRef<
 									/>
 								</RoundButton>
 							) : canStop ? (
-								<RoundButton filled onPress={onStop}>
+								<RoundButton
+									filled
+									label={t({ message: "Stop" })}
+									onPress={onStop}
+								>
 									<Square
 										color={COMPOSER_COLORS.card}
 										fill={COMPOSER_COLORS.card}
@@ -332,7 +406,7 @@ export const Composer: ComposerComponent = forwardRef<
 								</RoundButton>
 							) : null}
 						</View>
-					</View>
+					</Animated.View>
 				</View>
 			</View>
 			<ComposerImageViewer />
@@ -362,11 +436,13 @@ function useKeyboardHeight(onHide: () => void) {
 
 function RoundButton({
 	children,
+	label,
 	filled = false,
 	disabled = false,
 	onPress,
 }: {
 	children: React.ReactNode;
+	label: string;
 	filled?: boolean;
 	disabled?: boolean;
 	onPress?: () => void;
@@ -374,6 +450,7 @@ function RoundButton({
 	return (
 		<Pressable
 			accessibilityRole="button"
+			accessibilityLabel={label}
 			disabled={disabled}
 			hitSlop={4}
 			onPress={onPress}
@@ -478,6 +555,13 @@ const styles = StyleSheet.create({
 		borderWidth: StyleSheet.hairlineWidth,
 		borderRadius: 26,
 		overflow: "hidden",
+	},
+	grabberArea: { alignItems: "center", paddingTop: 8, paddingBottom: 2 },
+	grabber: {
+		width: 36,
+		height: 4,
+		borderRadius: 2,
+		backgroundColor: COMPOSER_COLORS.border,
 	},
 	editor: { paddingHorizontal: COMPOSER_METRICS.edgeInset + 4, paddingTop: 12 },
 	collapsedField: {

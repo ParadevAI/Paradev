@@ -37,10 +37,7 @@ export function useDictation({
 
 	const errorMessage = (code: DictationErrorCode, heardSomething: boolean) => {
 		if (code === "permission") {
-			return t({
-				message:
-					"Microphone access is not allowed. Allow it in your device settings to dictate.",
-			});
+			return t({ message: "Allow microphone access in Settings to dictate." });
 		}
 		if (heardSomething) {
 			return t({

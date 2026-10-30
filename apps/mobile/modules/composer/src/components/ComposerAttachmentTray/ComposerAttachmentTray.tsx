@@ -1,8 +1,9 @@
 import { Image } from "expo-image";
-import { CircleAlert, FileText, X } from "lucide-react-native";
+import { CircleAlert, X } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { ComposerAttachment } from "../../Composer.types";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "../../constants";
+import { FileCardContent } from "./components/FileCardContent";
 
 interface ComposerAttachmentTrayProps {
 	attachments: ComposerAttachment[];
@@ -43,12 +44,7 @@ export function ComposerAttachmentTray({
 									style={[StyleSheet.absoluteFill, uploading && styles.dimmed]}
 								/>
 							) : (
-								<>
-									<FileText color={COMPOSER_COLORS.muted} size={20} />
-									<Text numberOfLines={2} style={styles.fileName}>
-										{attachment.name}
-									</Text>
-								</>
+								<FileCardContent uri={attachment.uri} name={attachment.name} />
 							)}
 							{uploading ? (
 								<View style={styles.badgeCenter}>
@@ -100,7 +96,6 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		padding: 8,
 	},
-	fileName: { color: COMPOSER_COLORS.muted, fontSize: 11 },
 	dimmed: { opacity: 0.4 },
 	badgeCenter: {
 		...StyleSheet.absoluteFill,
