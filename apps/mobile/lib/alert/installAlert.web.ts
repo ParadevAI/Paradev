@@ -5,7 +5,7 @@ import type { InstallAlert } from "./installAlert.types";
 // confirmation was silent in the browser.
 export const installAlert: InstallAlert = () => {
 	Alert.alert = (title, message, buttons) => {
-		const text = message ? `${title}\n\n${message}` : title;
+		const text = [title, message].filter(Boolean).join("\n\n");
 		const cancel = buttons?.find((button) => button.style === "cancel");
 		const actions = (buttons ?? []).filter((button) => button !== cancel);
 		if (!cancel && actions.length <= 1) {
