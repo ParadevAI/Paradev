@@ -1233,6 +1233,13 @@
       "when": 1793316840789,
       "tag": "0175_organization_plugin_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 176,
+      "version": "7",
+      "when": 1793323413294,
+      "tag": "0176_agent_session_task",
+      "breakpoints": true
     }
   ]
 }

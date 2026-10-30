@@ -21,7 +21,7 @@ import {
 	agentTurnReasonValues,
 	agentTurnStatusValues,
 } from "./enums";
-import { cloudWorkspaces, environments } from "./schema";
+import { cloudWorkspaces, environments, tasks } from "./schema";
 
 /**
  * A Dev: an agent that works in an organization under its own identity, as
@@ -116,6 +116,10 @@ export const agentSessions = pgTable(
 			{ onDelete: "set null" },
 		),
 		parentSessionId: uuid("parent_session_id"),
+		/** The work a task session is doing; its title, description, status and pull request live there. */
+		taskId: uuid("task_id").references(() => tasks.id, {
+			onDelete: "set null",
+		}),
 		title: text(),
 		role: agentTaskRole(),
 		taskStatus: agentTaskStatus("task_status"),
@@ -152,6 +156,12 @@ export const agentSessions = pgTable(
 				sql`${t.dedupeKey} is not null and ${t.taskStatus} in ('queued', 'running')`,
 			),
 		index("agent_sessions_parent_idx").on(t.parentSessionId),
+		index("agent_sessions_task_idx").on(t.taskId),
+		uniqueIndex("agent_sessions_active_writer_per_task_unique")
+			.on(t.taskId)
+			.where(
+				sql`${t.taskId} is not null and ${t.role} = 'writer' and ${t.taskStatus} in ('queued', 'running')`,
+			),
 	],
 );
 
