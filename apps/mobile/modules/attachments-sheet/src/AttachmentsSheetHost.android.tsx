@@ -41,9 +41,10 @@ export const AttachmentsSheetHost: AttachmentsSheetHostComponent = () => {
 		handlers.onDismiss?.();
 	};
 	// The action runs once the sheet is gone, so a picker never opens under it.
+	// Settling unmounts the sheet, so it hides first.
 	const choose = async (action: AttachmentsSheetAction) => {
+		await sheetRef.current?.hide().catch(() => {});
 		settleAttachmentsSheet();
-		await sheetRef.current?.hide();
 		handlers.onAction(action);
 	};
 
