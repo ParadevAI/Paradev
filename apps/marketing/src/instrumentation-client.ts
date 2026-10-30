@@ -10,6 +10,16 @@ import {
 	POSTHOG_PERSISTENCE_COOKIE,
 	readAssignedHeadlineVariant,
 } from "@/lib/hero-headline";
+import {
+	isChunkLoadError,
+	reloadForStaleChunk,
+} from "@/lib/stale-chunk-reload";
+
+window.addEventListener("unhandledrejection", (event) => {
+	if (isChunkLoadError(event.reason)) {
+		reloadForStaleChunk(sessionStorage, () => window.location.reload());
+	}
+});
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
