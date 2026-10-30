@@ -3191,6 +3191,9 @@ msgstr "Avatar(アトム)"
 msgid "Avatar updated!"
 msgstr "アバターを更新しました!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "YC Demo Day での Avi Peltz、Satya Patel、Kiet Ho"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "{0}を待機中"
@@ -10246,6 +10249,9 @@ msgstr "キーボードショートカット"
 
 msgid "Keyboard Shortcuts"
 msgstr "キーボードショートカット"
+
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "YC でプレゼンする Kiet Ho、Satya Patel、Avi Peltz"
 
 msgid "Kill"
 msgstr "終了"

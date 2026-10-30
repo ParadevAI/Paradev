@@ -3191,6 +3191,9 @@ msgstr "頭像（原子元件）"
 msgid "Avatar updated!"
 msgstr "頭像已更新！"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz、Satya Patel 和 Kiet Ho 在 YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "等待{0}"
@@ -10246,6 +10249,9 @@ msgstr "鍵盤快速鍵"
 
 msgid "Keyboard Shortcuts"
 msgstr "鍵盤快速鍵"
+
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho、Satya Patel 和 Avi Peltz 在 YC 演講"
 
 msgid "Kill"
 msgstr "終止"

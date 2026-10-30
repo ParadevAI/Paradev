@@ -3191,6 +3191,9 @@ msgstr "Avatar (atom)"
 msgid "Avatar updated!"
 msgstr "Đã cập nhật ảnh đại diện!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel và Kiet Ho tại YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "Đang chờ {0}"
@@ -10246,6 +10249,9 @@ msgstr "Phím tắt"
 
 msgid "Keyboard Shortcuts"
 msgstr "Phím tắt"
+
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel và Avi Peltz thuyết trình tại YC"
 
 msgid "Kill"
 msgstr "Kết thúc"

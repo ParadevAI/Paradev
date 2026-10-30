@@ -3191,6 +3191,9 @@ msgstr "Avatar (atom)"
 msgid "Avatar updated!"
 msgstr "Avatar diperbarui!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel, dan Kiet Ho di YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "Menunggu {0}"
@@ -10246,6 +10249,9 @@ msgstr "Pintasan keyboard"
 
 msgid "Keyboard Shortcuts"
 msgstr "Pintasan Keyboard"
+
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel, dan Avi Peltz presentasi di YC"
 
 msgid "Kill"
 msgstr "Matikan"

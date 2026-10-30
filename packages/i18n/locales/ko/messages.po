@@ -3191,6 +3191,9 @@ msgstr "아바타(atom)"
 msgid "Avatar updated!"
 msgstr "아바타가 업데이트되었습니다!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "YC Demo Day의 Avi Peltz, Satya Patel, Kiet Ho"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "{0} 대기 중"
@@ -10246,6 +10249,9 @@ msgstr "키보드 단축키"
 
 msgid "Keyboard Shortcuts"
 msgstr "키보드 단축키"
+
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "YC에서 발표하는 Kiet Ho, Satya Patel, Avi Peltz"
 
 msgid "Kill"
 msgstr "종료"
