@@ -2,7 +2,7 @@
 title: "How to Click an Element in Your Web App and Have a Coding Agent Change It (2026)"
 description: "Point at UI instead of describing it: screenshots, Playwright MCP, Cursor Design Mode, Orca, stagewise, and Paradev Design Mode compared."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-30
 type: "tutorial"
 competitors:
   - claude-code
@@ -21,6 +21,8 @@ keywords:
   - orca design mode
   - stagewise alternative
   - playwright mcp ui changes
+  - design mode claude code frontend team
+  - frontend team coding agents parallel ui changes
 ---
 
 To have a coding agent change the element you click, you need a browser that can pick an element and hand the agent its DOM, styles, and a screenshot, so the agent can find the source file without a paragraph of description from you. Cursor's Design Mode, Orca's Design Mode, the stagewise browser, and [Paradev](https://paradev.com)'s browser pane with Design Mode all do this. If you don't want a new tool, a screenshot pasted into Claude Code or Codex works for small changes, and a browser MCP server such as Playwright MCP lets the agent open and inspect the page itself, but in both cases you still describe the element in words.
@@ -85,6 +87,21 @@ The agent receives the element's DOM, computed styles, React component metadata,
 
 Paradev's difference is where the element goes. It works with the agent you already use (Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, and others), and the change lands in that task's worktree, so two UI experiments don't edit the same files. The same pane can be driven by the agent through `superset browser` commands or a CDP endpoint to check its own work. The tradeoffs: Paradev runs on macOS with an experimental Linux AppImage, has no Windows build, and is source-available under ELv2 rather than open source.
 
+## How does a frontend team use Design Mode with Claude Code?
+
+A typical frontend team runs several UI tasks at once: one person tightens the pricing table, another fixes the mobile nav, a third tries a new empty state. In Paradev, each task is its own workspace, a Git worktree on its own branch with its own dev server, browser pane, and Claude Code session. Design Mode then sends each click to the Claude Code session in the same workspace, so the note "make this row's spacing match the header" lands in the branch for that task.
+
+A day with it looks like this:
+
+1. **Create one workspace per UI task**, from the desktop app, from a [Linear or GitHub issue](/compare/run-claude-code-on-linear-issues), or with `superset workspaces create --local --project <id> --name pricing-table --branch ui/pricing-table --agent claude --prompt "..."`.
+2. **Start the dev server in each workspace.** Paradev detects the listening port and lists it in the sidebar. It does not assign port ranges, so two workspaces that both start on port 3000 collide. Give each workspace its own port in a [setup script](https://docs.paradev.com/setup-teardown-scripts), and commit `.superset/ports.json` so everyone on the team sees labels such as "Frontend Dev Server" next to the port.
+3. **Click, describe, send.** Open the port in the browser pane, click **Design**, click the element, and send one change to Claude Code. With hot reload, the result shows in the same pane, so you can click the next element straight away.
+4. **Review the diff before it goes up.** The **Changes** pane shows what Claude Code edited for that task alone. Commit, push, and open the pull request from there, and watch its checks in the PR pane.
+
+Two honest limits. Worktrees keep each task's files apart, but two tasks that both edit a shared component, such as `Button.tsx`, still conflict when the second pull request merges, so split UI work by component when you can. And Design Mode is a feature of the Paradev desktop app on macOS (the Linux AppImage is experimental); teammates on Windows can review the pull request and Pages, but cannot use Design Mode yet.
+
+If the dev servers run on a shared or remote host, the desktop app forwards each port of the selected remote workspace to your machine, so the browser pane and Design Mode work on it as if it were local.
+
 ## How do I review an agent's design with my team?
 
 Clicking an element covers your own feedback on a running app. When a teammate needs to review an agent-built design or mockup, Paradev [Pages](https://docs.paradev.com/pages) handles that step. An agent publishes the design as a page, teammates pin comments to the part they want changed, and the agent picks up the comments, republishes, and replies at the same link. The [Pages walkthrough](/blog/review-agent-work-with-pages) shows the loop. For code review, both Paradev and Orca let you comment on diff lines and send the comments to the agent.
@@ -117,6 +134,10 @@ Cursor's docs describe Design Mode in the browser inside Cursor's Agents Window,
 ### Does Paradev's Design Mode work on localhost?
 
 Yes. It works on any page the browser pane can load, including your local dev server. Paradev detects ports in use and opens them in the pane with one click.
+
+### Can several people on a frontend team use Design Mode on the same repository?
+
+Yes. Each person, or each task, works in its own workspace and branch, with its own dev server port, so clicks in one browser pane go to that workspace's agent only. Changes to the same component still need a merge, like any two branches.
 
 ### Is the stagewise toolbar still maintained?
 
