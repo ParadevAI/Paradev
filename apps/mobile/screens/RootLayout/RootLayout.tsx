@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Uniwind } from "uniwind";
+import { installAlert } from "@/lib/alert";
 import { useSession } from "@/lib/auth/client";
 import { watchNetworkState } from "@/lib/errors";
 import { NAV_THEME } from "@/lib/theme";
@@ -77,6 +78,7 @@ const deviceLocale = resolveLocale(
 // Lets a failed request say "no internet connection" rather than the vaguer
 // "could not reach the server" — see lib/errors.
 watchNetworkState();
+installAlert();
 
 // React Query cannot see app focus on native, so without this no query ever
 // refetches on returning to the foreground — data went stale for the whole

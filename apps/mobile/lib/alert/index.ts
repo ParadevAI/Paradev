@@ -1,0 +1,1 @@
+export { installAlert } from "./installAlert";
