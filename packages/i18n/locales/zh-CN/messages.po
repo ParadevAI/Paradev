@@ -2402,6 +2402,9 @@ msgstr "允许通过中继访问"
 msgid "Allow for session"
 msgstr "本次会话内允许"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "请在“设置”中允许访问麦克风以使用听写。"
+
 msgid "Allow microphone access to use dictation"
 msgstr "请允许麦克风访问以使用语音输入"
 
@@ -5532,6 +5535,9 @@ msgstr "无法开始结账，请重试。"
 msgid "Could not start cloud workspace provisioning"
 msgstr "无法开始配置云端工作区"
 
+msgid "Could not start dictation"
+msgstr "无法启动听写"
+
 msgid "Could not start session"
 msgstr "无法启动会话"
 
@@ -6707,11 +6713,20 @@ msgstr "语音输入"
 msgid "Dictation"
 msgstr "语音输入"
 
+msgid "Dictation is not available in this language."
+msgstr "此语言不支持听写。"
+
 msgid "Dictation is not available on this device"
 msgstr "此设备不支持语音输入"
 
 msgid "Dictation is not available right now"
 msgstr "语音输入暂时不可用"
+
+msgid "Dictation needs a network connection."
+msgstr "听写需要网络连接。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "听写已停止。目前听到的内容已在消息中。"
 
 msgid "Didn't hear back"
 msgstr "未收到响应"
@@ -13696,6 +13711,9 @@ msgstr "粘贴"
 
 msgid "Paste a link"
 msgstr "粘贴链接"
+
+msgid "Paste attachment"
+msgstr "粘贴附件"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "把它粘贴到Paradev CLI："

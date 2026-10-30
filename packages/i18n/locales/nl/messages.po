@@ -2402,6 +2402,9 @@ msgstr "Toegang via de relay toestaan"
 msgid "Allow for session"
 msgstr "Toestaan voor deze sessie"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Sta microfoontoegang toe in Instellingen om te dicteren."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Geef toegang tot de microfoon om te dicteren"
 
@@ -5532,6 +5535,9 @@ msgstr "Kon het afrekenen niet starten. Probeer het opnieuw."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Kan het provisioneren van de cloudwerkruimte niet starten"
 
+msgid "Could not start dictation"
+msgstr "Dicteren kon niet worden gestart"
+
 msgid "Could not start session"
 msgstr "Kan sessie niet starten"
 
@@ -6707,11 +6713,20 @@ msgstr "Dicteren"
 msgid "Dictation"
 msgstr "Dicteren"
 
+msgid "Dictation is not available in this language."
+msgstr "Dicteren is niet beschikbaar in deze taal."
+
 msgid "Dictation is not available on this device"
 msgstr "Dicteren is niet beschikbaar op dit apparaat"
 
 msgid "Dictation is not available right now"
 msgstr "Dicteren is nu niet beschikbaar"
+
+msgid "Dictation needs a network connection."
+msgstr "Dicteren heeft een netwerkverbinding nodig."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dicteren is gestopt. Wat tot nu toe is gehoord, staat in je bericht."
 
 msgid "Didn't hear back"
 msgstr "Geen reactie ontvangen"
@@ -13696,6 +13711,9 @@ msgstr "Plakken"
 
 msgid "Paste a link"
 msgstr "Plak een link"
+
+msgid "Paste attachment"
+msgstr "Bijlage plakken"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Plak dit in de Paradev-CLI:"

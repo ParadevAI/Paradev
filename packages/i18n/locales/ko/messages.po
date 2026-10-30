@@ -2402,6 +2402,9 @@ msgstr "릴레이를 통한 접근 허용"
 msgid "Allow for session"
 msgstr "세션 동안 허용"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "받아쓰기를 하려면 설정에서 마이크 접근을 허용하세요."
+
 msgid "Allow microphone access to use dictation"
 msgstr "받아쓰기를 사용하려면 마이크 접근을 허용하세요"
 
@@ -5532,6 +5535,9 @@ msgstr "결제를 시작할 수 없습니다. 다시 시도해 주세요."
 msgid "Could not start cloud workspace provisioning"
 msgstr "클라우드 워크스페이스 프로비저닝을 시작할 수 없습니다"
 
+msgid "Could not start dictation"
+msgstr "받아쓰기를 시작할 수 없습니다"
+
 msgid "Could not start session"
 msgstr "세션을 시작할 수 없습니다"
 
@@ -6707,11 +6713,20 @@ msgstr "받아쓰기"
 msgid "Dictation"
 msgstr "받아쓰기"
 
+msgid "Dictation is not available in this language."
+msgstr "이 언어에서는 받아쓰기를 사용할 수 없습니다."
+
 msgid "Dictation is not available on this device"
 msgstr "이 기기에서는 받아쓰기를 사용할 수 없습니다"
 
 msgid "Dictation is not available right now"
 msgstr "지금은 받아쓰기를 사용할 수 없습니다"
+
+msgid "Dictation needs a network connection."
+msgstr "받아쓰기를 사용하려면 네트워크 연결이 필요합니다."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "받아쓰기가 중지되었습니다. 지금까지 들은 내용은 메시지에 있습니다."
 
 msgid "Didn't hear back"
 msgstr "응답이 없습니다"
@@ -13696,6 +13711,9 @@ msgstr "붙여넣기"
 
 msgid "Paste a link"
 msgstr "링크 붙여넣기"
+
+msgid "Paste attachment"
+msgstr "첨부 파일 붙여넣기"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Paradev CLI에 붙여 넣으세요:"

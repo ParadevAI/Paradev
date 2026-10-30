@@ -2402,6 +2402,9 @@ msgstr "Röle üzerinden erişime izin verin"
 msgid "Allow for session"
 msgstr "Oturum boyunca izin ver"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Dikte için Ayarlar’dan mikrofon erişimine izin verin."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Sesle yazmak için mikrofon erişimine izin verin"
 
@@ -5532,6 +5535,9 @@ msgstr "Ödeme başlatılamadı. Lütfen tekrar deneyin."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Bulut çalışma alanı sağlama işlemi başlatılamadı"
 
+msgid "Could not start dictation"
+msgstr "Dikte başlatılamadı"
+
 msgid "Could not start session"
 msgstr "Oturum başlatılamadı"
 
@@ -6707,11 +6713,20 @@ msgstr "Sesle yaz"
 msgid "Dictation"
 msgstr "Sesle yazma"
 
+msgid "Dictation is not available in this language."
+msgstr "Dikte bu dilde kullanılamıyor."
+
 msgid "Dictation is not available on this device"
 msgstr "Bu cihazda sesle yazma kullanılamıyor"
 
 msgid "Dictation is not available right now"
 msgstr "Sesle yazma şu anda kullanılamıyor"
+
+msgid "Dictation needs a network connection."
+msgstr "Dikte için ağ bağlantısı gerekir."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dikte durdu. Şimdiye kadar duyulanlar mesajınızda."
 
 msgid "Didn't hear back"
 msgstr "Yanıt alınamadı"
@@ -13696,6 +13711,9 @@ msgstr "Yapıştır"
 
 msgid "Paste a link"
 msgstr "Bağlantı yapıştır"
+
+msgid "Paste attachment"
+msgstr "Eki yapıştır"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Bunu Paradev CLI'ye yapıştırın:"

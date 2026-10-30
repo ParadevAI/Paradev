@@ -2402,6 +2402,9 @@ msgstr "Zugriff über den Relay erlauben"
 msgid "Allow for session"
 msgstr "Für diese Sitzung erlauben"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Erlaube den Mikrofonzugriff in den Einstellungen, um zu diktieren."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Erlaube den Mikrofonzugriff, um zu diktieren"
 
@@ -5532,6 +5535,9 @@ msgstr "Checkout konnte nicht gestartet werden. Bitte versuche es erneut."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Bereitstellung des Cloud-Arbeitsbereichs konnte nicht gestartet werden"
 
+msgid "Could not start dictation"
+msgstr "Das Diktat konnte nicht gestartet werden"
+
 msgid "Could not start session"
 msgstr "Sitzung konnte nicht gestartet werden"
 
@@ -6707,11 +6713,20 @@ msgstr "Diktieren"
 msgid "Dictation"
 msgstr "Diktieren"
 
+msgid "Dictation is not available in this language."
+msgstr "Diktieren ist in dieser Sprache nicht verfügbar."
+
 msgid "Dictation is not available on this device"
 msgstr "Diktieren ist auf diesem Gerät nicht verfügbar"
 
 msgid "Dictation is not available right now"
 msgstr "Diktieren ist gerade nicht verfügbar"
+
+msgid "Dictation needs a network connection."
+msgstr "Diktieren braucht eine Netzwerkverbindung."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Das Diktat wurde beendet. Das bisher Gehörte steht in deiner Nachricht."
 
 msgid "Didn't hear back"
 msgstr "Keine Antwort erhalten"
@@ -13696,6 +13711,9 @@ msgstr "Einfügen"
 
 msgid "Paste a link"
 msgstr "Link einfügen"
+
+msgid "Paste attachment"
+msgstr "Anhang einfügen"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Füge das in die Paradev-CLI ein:"

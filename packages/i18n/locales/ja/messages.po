@@ -2402,6 +2402,9 @@ msgstr "リレー経由のアクセスを許可"
 msgid "Allow for session"
 msgstr "セッション中は許可"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "音声入力するには、設定でマイクへのアクセスを許可してください。"
+
 msgid "Allow microphone access to use dictation"
 msgstr "音声入力を使うにはマイクへのアクセスを許可してください"
 
@@ -5532,6 +5535,9 @@ msgstr "チェックアウトを開始できませんでした。もう一度お
 msgid "Could not start cloud workspace provisioning"
 msgstr "クラウドワークスペースのプロビジョニングを開始できませんでした"
 
+msgid "Could not start dictation"
+msgstr "音声入力を開始できませんでした"
+
 msgid "Could not start session"
 msgstr "セッションを開始できませんでした"
 
@@ -6707,11 +6713,20 @@ msgstr "音声入力"
 msgid "Dictation"
 msgstr "音声入力"
 
+msgid "Dictation is not available in this language."
+msgstr "この言語では音声入力を使用できません。"
+
 msgid "Dictation is not available on this device"
 msgstr "このデバイスでは音声入力を利用できません"
 
 msgid "Dictation is not available right now"
 msgstr "現在、音声入力は利用できません"
+
+msgid "Dictation needs a network connection."
+msgstr "音声入力にはネットワーク接続が必要です。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "音声入力が停止しました。ここまでの内容はメッセージに入っています。"
 
 msgid "Didn't hear back"
 msgstr "応答がありません"
@@ -13696,6 +13711,9 @@ msgstr "貼り付け"
 
 msgid "Paste a link"
 msgstr "リンクを貼り付け"
+
+msgid "Paste attachment"
+msgstr "添付ファイルをペースト"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "これをParadev CLIに貼り付けてください:"

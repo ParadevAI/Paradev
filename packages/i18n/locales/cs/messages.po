@@ -2402,6 +2402,9 @@ msgstr "Povolte přístup přes relay"
 msgid "Allow for session"
 msgstr "Povolit pro relaci"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Pro diktování povolte přístup k mikrofonu v Nastavení."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Pro diktování povolte přístup k mikrofonu"
 
@@ -5532,6 +5535,9 @@ msgstr "Platbu se nepodařilo zahájit. Zkuste to znovu."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Nepodařilo se spustit provisioning cloudového pracovního prostoru"
 
+msgid "Could not start dictation"
+msgstr "Diktování se nepodařilo spustit"
+
 msgid "Could not start session"
 msgstr "Relaci se nepodařilo spustit"
 
@@ -6707,11 +6713,20 @@ msgstr "Diktovat"
 msgid "Dictation"
 msgstr "Diktování"
 
+msgid "Dictation is not available in this language."
+msgstr "Diktování není v tomto jazyce k dispozici."
+
 msgid "Dictation is not available on this device"
 msgstr "Diktování není na tomto zařízení dostupné"
 
 msgid "Dictation is not available right now"
 msgstr "Diktování teď není dostupné"
+
+msgid "Dictation needs a network connection."
+msgstr "Diktování vyžaduje připojení k síti."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Diktování se zastavilo. To, co bylo dosud slyšet, je ve zprávě."
 
 msgid "Didn't hear back"
 msgstr "Bez odpovědi"
@@ -13696,6 +13711,9 @@ msgstr "Vložit"
 
 msgid "Paste a link"
 msgstr "Vložte odkaz"
+
+msgid "Paste attachment"
+msgstr "Vložit přílohu"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Vložte to do Paradev CLI:"

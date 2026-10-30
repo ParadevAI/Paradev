@@ -2402,6 +2402,9 @@ msgstr "Cho phép truy cập qua relay"
 msgid "Allow for session"
 msgstr "Cho phép trong phiên này"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Hãy cho phép truy cập micrô trong Cài đặt để đọc chính tả."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Cho phép truy cập micro để dùng đọc chính tả"
 
@@ -5532,6 +5535,9 @@ msgstr "Không thể bắt đầu thanh toán. Vui lòng thử lại."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Không thể bắt đầu cấp phát workspace trên cloud"
 
+msgid "Could not start dictation"
+msgstr "Không thể bắt đầu đọc chính tả"
+
 msgid "Could not start session"
 msgstr "Không thể bắt đầu phiên"
 
@@ -6707,11 +6713,20 @@ msgstr "Đọc chính tả"
 msgid "Dictation"
 msgstr "Đọc chính tả"
 
+msgid "Dictation is not available in this language."
+msgstr "Đọc chính tả không khả dụng cho ngôn ngữ này."
+
 msgid "Dictation is not available on this device"
 msgstr "Đọc chính tả không khả dụng trên thiết bị này"
 
 msgid "Dictation is not available right now"
 msgstr "Đọc chính tả hiện không khả dụng"
+
+msgid "Dictation needs a network connection."
+msgstr "Đọc chính tả cần kết nối mạng."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Đọc chính tả đã dừng. Nội dung nghe được đến giờ đã có trong tin nhắn."
 
 msgid "Didn't hear back"
 msgstr "Không có phản hồi"
@@ -13696,6 +13711,9 @@ msgstr "Dán"
 
 msgid "Paste a link"
 msgstr "Dán liên kết"
+
+msgid "Paste attachment"
+msgstr "Dán tệp đính kèm"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Dán mã này vào Paradev CLI:"

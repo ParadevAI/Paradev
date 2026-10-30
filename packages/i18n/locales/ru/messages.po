@@ -2402,6 +2402,9 @@ msgstr "Разрешите доступ через реле"
 msgid "Allow for session"
 msgstr "Разрешить на сессию"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Чтобы диктовать, разрешите доступ к микрофону в настройках."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Разрешите доступ к микрофону, чтобы использовать диктовку"
 
@@ -5532,6 +5535,9 @@ msgstr "Не удалось начать оформление. Попробуй�
 msgid "Could not start cloud workspace provisioning"
 msgstr "Не удалось начать создание облачной рабочей области"
 
+msgid "Could not start dictation"
+msgstr "Не удалось начать диктовку"
+
 msgid "Could not start session"
 msgstr "Не удалось запустить сессию"
 
@@ -6707,11 +6713,20 @@ msgstr "Диктовать"
 msgid "Dictation"
 msgstr "Диктовка"
 
+msgid "Dictation is not available in this language."
+msgstr "Диктовка недоступна на этом языке."
+
 msgid "Dictation is not available on this device"
 msgstr "Диктовка недоступна на этом устройстве"
 
 msgid "Dictation is not available right now"
 msgstr "Диктовка сейчас недоступна"
+
+msgid "Dictation needs a network connection."
+msgstr "Для диктовки нужно подключение к сети."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Диктовка остановлена. Всё, что было услышано, уже в сообщении."
 
 msgid "Didn't hear back"
 msgstr "Ответа не поступило"
@@ -13696,6 +13711,9 @@ msgstr "Вставить"
 
 msgid "Paste a link"
 msgstr "Вставьте ссылку"
+
+msgid "Paste attachment"
+msgstr "Вставить вложение"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставьте это в Paradev CLI:"

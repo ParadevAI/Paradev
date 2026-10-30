@@ -2402,6 +2402,9 @@ msgstr "Izinkan akses lewat relay"
 msgid "Allow for session"
 msgstr "Izinkan untuk sesi ini"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Izinkan akses mikrofon di Pengaturan untuk menggunakan dikte."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Izinkan akses mikrofon untuk memakai dikte"
 
@@ -5532,6 +5535,9 @@ msgstr "Tidak dapat memulai checkout. Coba lagi."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Tidak bisa memulai provisioning workspace cloud"
 
+msgid "Could not start dictation"
+msgstr "Tidak dapat memulai dikte"
+
 msgid "Could not start session"
 msgstr "Tidak bisa memulai sesi"
 
@@ -6707,11 +6713,20 @@ msgstr "Dikte"
 msgid "Dictation"
 msgstr "Dikte"
 
+msgid "Dictation is not available in this language."
+msgstr "Dikte tidak tersedia dalam bahasa ini."
+
 msgid "Dictation is not available on this device"
 msgstr "Dikte tidak tersedia di perangkat ini"
 
 msgid "Dictation is not available right now"
 msgstr "Dikte sedang tidak tersedia"
+
+msgid "Dictation needs a network connection."
+msgstr "Dikte memerlukan koneksi jaringan."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dikte berhenti. Yang sudah terdengar sejauh ini ada di pesan Anda."
 
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
@@ -13696,6 +13711,9 @@ msgstr "Tempel"
 
 msgid "Paste a link"
 msgstr "Tempel tautan"
+
+msgid "Paste attachment"
+msgstr "Tempel lampiran"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Tempel ini ke Paradev CLI:"
