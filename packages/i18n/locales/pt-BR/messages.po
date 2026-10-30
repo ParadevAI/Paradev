@@ -1811,6 +1811,10 @@ msgstr "Conta com exclusão pendente"
 msgid "Account usage"
 msgstr "Uso da conta"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Uso da conta: {0} {used} usado"
+
 msgid "Achievements"
 msgstr "Conquistas"
 
@@ -2201,9 +2205,6 @@ msgstr "A execução do agente falhou"
 
 msgid "Agent self-verification"
 msgstr "Autoverificação do agente"
-
-msgid "agent session ID"
-msgstr "ID da sessão do agente"
 
 msgid "Agent session started"
 msgstr "Sessão de agente iniciada"
@@ -3983,8 +3984,8 @@ msgstr "O chat está sendo refeito"
 msgid "Chat Launch"
 msgstr "Execução no chat"
 
-msgid "Chat mode"
-msgstr "Modo chat"
+msgid "Chat menu"
+msgstr "Menu do chat"
 
 msgid "Chat session not found"
 msgstr "Sessão de chat não encontrada"
@@ -4284,9 +4285,6 @@ msgstr "CLI e SDK"
 
 msgid "CLI docs"
 msgstr "Documentação da CLI"
-
-msgid "CLI mode"
-msgstr "Modo CLI"
 
 msgid "CLI reference"
 msgstr "Referência da CLI"
@@ -5121,9 +5119,6 @@ msgstr "Continuar"
 msgid "Continue in your browser"
 msgstr "Continue no seu navegador"
 
-msgid "Continue or fork session"
-msgstr "Continuar ou bifurcar a sessão"
-
 msgid "Continue the session the last run left"
 msgstr "Retomar a sessão da última execução"
 
@@ -5202,8 +5197,8 @@ msgstr "Copiado"
 msgid "Copied {0}"
 msgstr "{0} copiado"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} copiado"
+msgid "Copied agent session ID"
+msgstr "ID da sessão do agente copiado"
 
 msgid "Copied Link"
 msgstr "Link copiado"
@@ -5273,9 +5268,6 @@ msgstr "Copiar o nome do arquivo"
 
 msgid "Copy ID"
 msgstr "Copiar ID"
-
-msgid "Copy IDs"
-msgstr "Copiar IDs"
 
 msgid "Copy image"
 msgstr "Copiar imagem"
@@ -5439,6 +5431,9 @@ msgstr "Não foi possível conectar o {plugin}. Tente novamente."
 
 msgid "Could not copy the link"
 msgstr "Não foi possível copiar o link"
+
+msgid "Could not copy to the clipboard"
+msgstr "Não foi possível copiar para a área de transferência"
 
 msgid "Could not create cloud workspace"
 msgstr "Não foi possível criar a área de trabalho na nuvem"
@@ -15047,6 +15042,9 @@ msgstr "Atividade recente"
 msgid "Recent apps"
 msgstr "Apps recentes"
 
+msgid "Recent chats"
+msgstr "Chats recentes"
+
 msgid "Recent invoices"
 msgstr "Faturas recentes"
 
@@ -16363,6 +16361,9 @@ msgstr "Buscar desenvolvedor"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Busque no conteúdo dos arquivos e em todas as suas áreas de trabalho de uma vez."
+
+msgid "Search all chats…"
+msgstr "Buscar em todos os chats…"
 
 msgid "Search all emoji"
 msgstr "Pesquisar todos os emojis"
@@ -18566,9 +18567,6 @@ msgstr "Tamanho da fonte do terminal"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Tamanho da fonte do terminal quando um terminal está em foco, zoom da página em um painel de navegador, caso contrário o app inteiro"
-
-msgid "terminal ID"
-msgstr "ID do terminal"
 
 msgid "Terminal input"
 msgstr "Entrada do terminal"

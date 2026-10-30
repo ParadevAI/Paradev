@@ -1811,6 +1811,10 @@ msgstr "Аккаунт ожидает удаления"
 msgid "Account usage"
 msgstr "Использование аккаунта"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Использование аккаунта: {0} — использовано {used}"
+
 msgid "Achievements"
 msgstr "Достижения"
 
@@ -2201,9 +2205,6 @@ msgstr "Запуск агента завершился ошибкой"
 
 msgid "Agent self-verification"
 msgstr "Самопроверка агента"
-
-msgid "agent session ID"
-msgstr "ID сессии агента"
 
 msgid "Agent session started"
 msgstr "Сессия агента запущена"
@@ -3983,8 +3984,8 @@ msgstr "Чат перерабатывается"
 msgid "Chat Launch"
 msgstr "Запуск в чате"
 
-msgid "Chat mode"
-msgstr "Режим чата"
+msgid "Chat menu"
+msgstr "Меню чата"
 
 msgid "Chat session not found"
 msgstr "Сессия чата не найдена"
@@ -4284,9 +4285,6 @@ msgstr "CLI и SDK"
 
 msgid "CLI docs"
 msgstr "Документация CLI"
-
-msgid "CLI mode"
-msgstr "Режим CLI"
 
 msgid "CLI reference"
 msgstr "Справочник CLI"
@@ -5121,9 +5119,6 @@ msgstr "Продолжить"
 msgid "Continue in your browser"
 msgstr "Продолжите в браузере"
 
-msgid "Continue or fork session"
-msgstr "Продолжить или форкнуть сессию"
-
 msgid "Continue the session the last run left"
 msgstr "Продолжить сессию, оставшуюся от прошлого запуска"
 
@@ -5202,8 +5197,8 @@ msgstr "Скопировано"
 msgid "Copied {0}"
 msgstr "Скопировано {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Скопировано: {copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "ID сессии агента скопирован"
 
 msgid "Copied Link"
 msgstr "Ссылка скопирована"
@@ -5272,9 +5267,6 @@ msgid "Copy file name"
 msgstr "Скопировать имя файла"
 
 msgid "Copy ID"
-msgstr "Скопировать ID"
-
-msgid "Copy IDs"
 msgstr "Скопировать ID"
 
 msgid "Copy image"
@@ -5439,6 +5431,9 @@ msgstr "Не удалось подключить {plugin}. Попробуйте 
 
 msgid "Could not copy the link"
 msgstr "Не удалось скопировать ссылку"
+
+msgid "Could not copy to the clipboard"
+msgstr "Не удалось скопировать в буфер обмена"
 
 msgid "Could not create cloud workspace"
 msgstr "Не удалось создать облачную рабочую область"
@@ -15047,6 +15042,9 @@ msgstr "Недавняя активность"
 msgid "Recent apps"
 msgstr "Недавние приложения"
 
+msgid "Recent chats"
+msgstr "Недавние чаты"
+
 msgid "Recent invoices"
 msgstr "Недавние счета"
 
@@ -16363,6 +16361,9 @@ msgstr "Найти разработчика"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Ищите по содержимому файлов и сразу по всем своим рабочим областям."
+
+msgid "Search all chats…"
+msgstr "Поиск по всем чатам…"
 
 msgid "Search all emoji"
 msgstr "Искать все эмодзи"
@@ -18566,9 +18567,6 @@ msgstr "Размер шрифта терминала"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Размер шрифта терминала, когда терминал в фокусе, масштаб страницы в панели браузера, иначе всё приложение"
-
-msgid "terminal ID"
-msgstr "ID терминала"
 
 msgid "Terminal input"
 msgstr "Ввод в терминал"

@@ -1811,6 +1811,10 @@ msgstr "Konto oczekuje na usunięcie"
 msgid "Account usage"
 msgstr "Wykorzystanie konta"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Wykorzystanie konta: {0} – wykorzystano {used}"
+
 msgid "Achievements"
 msgstr "Osiągnięcia"
 
@@ -2201,9 +2205,6 @@ msgstr "Uruchomienie agenta nie powiodło się"
 
 msgid "Agent self-verification"
 msgstr "Samoweryfikacja agenta"
-
-msgid "agent session ID"
-msgstr "ID sesji agenta"
 
 msgid "Agent session started"
 msgstr "Sesja agenta uruchomiona"
@@ -3983,8 +3984,8 @@ msgstr "Czat jest przebudowywany"
 msgid "Chat Launch"
 msgstr "Uruchomienie czatu"
 
-msgid "Chat mode"
-msgstr "Tryb czatu"
+msgid "Chat menu"
+msgstr "Menu czatu"
 
 msgid "Chat session not found"
 msgstr "Nie znaleziono sesji czatu"
@@ -4284,9 +4285,6 @@ msgstr "CLI i SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentacja CLI"
-
-msgid "CLI mode"
-msgstr "Tryb CLI"
 
 msgid "CLI reference"
 msgstr "Dokumentacja CLI"
@@ -5121,9 +5119,6 @@ msgstr "Kontynuuj"
 msgid "Continue in your browser"
 msgstr "Kontynuuj w przeglądarce"
 
-msgid "Continue or fork session"
-msgstr "Kontynuuj lub forkuj sesję"
-
 msgid "Continue the session the last run left"
 msgstr "Kontynuuj sesję pozostawioną przez ostatnie uruchomienie"
 
@@ -5202,8 +5197,8 @@ msgstr "Skopiowano"
 msgid "Copied {0}"
 msgstr "Skopiowano {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Skopiowano {copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "Skopiowano ID sesji agenta"
 
 msgid "Copied Link"
 msgstr "Skopiowano link"
@@ -5273,9 +5268,6 @@ msgstr "Kopiuj nazwę pliku"
 
 msgid "Copy ID"
 msgstr "Kopiuj ID"
-
-msgid "Copy IDs"
-msgstr "Kopiuj identyfikatory"
 
 msgid "Copy image"
 msgstr "Kopiuj obraz"
@@ -5439,6 +5431,9 @@ msgstr "Nie udało się połączyć {plugin}. Spróbuj ponownie."
 
 msgid "Could not copy the link"
 msgstr "Nie udało się skopiować linku"
+
+msgid "Could not copy to the clipboard"
+msgstr "Nie udało się skopiować do schowka"
 
 msgid "Could not create cloud workspace"
 msgstr "Nie udało się utworzyć obszaru roboczego w chmurze"
@@ -15047,6 +15042,9 @@ msgstr "Ostatnia aktywność"
 msgid "Recent apps"
 msgstr "Ostatnie aplikacje"
 
+msgid "Recent chats"
+msgstr "Ostatnie czaty"
+
 msgid "Recent invoices"
 msgstr "Ostatnie faktury"
 
@@ -16363,6 +16361,9 @@ msgstr "Wyszukaj programistę"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Szukaj w treści plików i we wszystkich obszarach roboczych naraz."
+
+msgid "Search all chats…"
+msgstr "Szukaj we wszystkich czatach…"
 
 msgid "Search all emoji"
 msgstr "Szukaj wszystkich emoji"
@@ -18566,9 +18567,6 @@ msgstr "Rozmiar czcionki terminala"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Rozmiar czcionki terminala, gdy terminal ma fokus, powiększenie strony w panelu przeglądarki, w przeciwnym razie powiększenie całej aplikacji"
-
-msgid "terminal ID"
-msgstr "ID terminala"
 
 msgid "Terminal input"
 msgstr "Pole terminala"

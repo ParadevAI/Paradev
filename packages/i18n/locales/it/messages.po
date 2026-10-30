@@ -1811,6 +1811,10 @@ msgstr "Account in attesa di eliminazione"
 msgid "Account usage"
 msgstr "Utilizzo dell’account"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Utilizzo dell’account: {0} {used} utilizzato"
+
 msgid "Achievements"
 msgstr "Riconoscimenti"
 
@@ -2201,9 +2205,6 @@ msgstr "Esecuzione dell’agente non riuscita"
 
 msgid "Agent self-verification"
 msgstr "Auto-verifica degli agenti"
-
-msgid "agent session ID"
-msgstr "ID della sessione dell'agente"
 
 msgid "Agent session started"
 msgstr "Sessione dell'agente avviata"
@@ -3983,8 +3984,8 @@ msgstr "La chat è in fase di rifacimento"
 msgid "Chat Launch"
 msgstr "Avvio in chat"
 
-msgid "Chat mode"
-msgstr "Modalità chat"
+msgid "Chat menu"
+msgstr "Menu della chat"
 
 msgid "Chat session not found"
 msgstr "Sessione di chat non trovata"
@@ -4284,9 +4285,6 @@ msgstr "CLI e SDK"
 
 msgid "CLI docs"
 msgstr "Documentazione CLI"
-
-msgid "CLI mode"
-msgstr "Modalità CLI"
 
 msgid "CLI reference"
 msgstr "Riferimento CLI"
@@ -5121,9 +5119,6 @@ msgstr "Continua"
 msgid "Continue in your browser"
 msgstr "Continua nel browser"
 
-msgid "Continue or fork session"
-msgstr "Continua o biforca la sessione"
-
 msgid "Continue the session the last run left"
 msgstr "Continua la sessione lasciata dall'ultima esecuzione"
 
@@ -5202,8 +5197,8 @@ msgstr "Copiato"
 msgid "Copied {0}"
 msgstr "Copiato {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} copiato"
+msgid "Copied agent session ID"
+msgstr "ID della sessione dell'agente copiato"
 
 msgid "Copied Link"
 msgstr "Link copiato"
@@ -5273,9 +5268,6 @@ msgstr "Copia il nome del file"
 
 msgid "Copy ID"
 msgstr "Copia l'ID"
-
-msgid "Copy IDs"
-msgstr "Copia gli ID"
 
 msgid "Copy image"
 msgstr "Copia immagine"
@@ -5439,6 +5431,9 @@ msgstr "Impossibile connettere {plugin}. Riprova."
 
 msgid "Could not copy the link"
 msgstr "Impossibile copiare il link"
+
+msgid "Could not copy to the clipboard"
+msgstr "Impossibile copiare negli appunti"
 
 msgid "Could not create cloud workspace"
 msgstr "Impossibile creare il workspace cloud"
@@ -15047,6 +15042,9 @@ msgstr "Attività recente"
 msgid "Recent apps"
 msgstr "App recenti"
 
+msgid "Recent chats"
+msgstr "Chat recenti"
+
 msgid "Recent invoices"
 msgstr "Fatture recenti"
 
@@ -16363,6 +16361,9 @@ msgstr "Cerca uno sviluppatore"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cerca nel contenuto dei file e in tutti i tuoi workspace insieme."
+
+msgid "Search all chats…"
+msgstr "Cerca in tutte le chat…"
 
 msgid "Search all emoji"
 msgstr "Cerca tutte le emoji"
@@ -18566,9 +18567,6 @@ msgstr "Dimensione del font del terminale"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Dimensione del carattere del terminale quando un terminale ha il focus, zoom della pagina in un riquadro browser, altrimenti l'intera app"
-
-msgid "terminal ID"
-msgstr "ID del terminale"
 
 msgid "Terminal input"
 msgstr "Input del terminale"

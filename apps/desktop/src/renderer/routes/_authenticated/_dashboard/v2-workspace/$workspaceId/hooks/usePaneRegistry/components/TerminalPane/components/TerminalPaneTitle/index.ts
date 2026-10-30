@@ -1,0 +1,1 @@
+export { TerminalPaneTitle } from "./TerminalPaneTitle";

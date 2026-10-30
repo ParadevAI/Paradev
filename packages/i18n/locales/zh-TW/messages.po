@@ -1811,6 +1811,10 @@ msgstr "帳戶待刪除"
 msgid "Account usage"
 msgstr "帳戶用量"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "帳戶用量：{0} 已使用 {used}"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2201,9 +2205,6 @@ msgstr "代理程式執行失敗"
 
 msgid "Agent self-verification"
 msgstr "代理程式自我驗證"
-
-msgid "agent session ID"
-msgstr "代理程式會話ID"
 
 msgid "Agent session started"
 msgstr "代理程式會話已開始"
@@ -3983,8 +3984,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天啟動"
 
-msgid "Chat mode"
-msgstr "聊天模式"
+msgid "Chat menu"
+msgstr "聊天選單"
 
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
@@ -4284,9 +4285,6 @@ msgstr "CLI與SDK"
 
 msgid "CLI docs"
 msgstr "CLI文件"
-
-msgid "CLI mode"
-msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 參考文件"
@@ -5121,9 +5119,6 @@ msgstr "繼續"
 msgid "Continue in your browser"
 msgstr "請在瀏覽器中繼續"
 
-msgid "Continue or fork session"
-msgstr "繼續或分支會話"
-
 msgid "Continue the session the last run left"
 msgstr "繼續上次執行留下的工作階段"
 
@@ -5202,8 +5197,8 @@ msgstr "已複製"
 msgid "Copied {0}"
 msgstr "已複製{0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "已複製{copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "已複製代理程式會話ID"
 
 msgid "Copied Link"
 msgstr "已複製連結"
@@ -5272,9 +5267,6 @@ msgid "Copy file name"
 msgstr "複製檔名"
 
 msgid "Copy ID"
-msgstr "複製ID"
-
-msgid "Copy IDs"
 msgstr "複製ID"
 
 msgid "Copy image"
@@ -5439,6 +5431,9 @@ msgstr "無法連線 {plugin}。請重試。"
 
 msgid "Could not copy the link"
 msgstr "無法複製連結"
+
+msgid "Could not copy to the clipboard"
+msgstr "無法複製到剪貼簿"
 
 msgid "Could not create cloud workspace"
 msgstr "無法建立雲端工作區"
@@ -15047,6 +15042,9 @@ msgstr "最近動態"
 msgid "Recent apps"
 msgstr "最近使用的 App"
 
+msgid "Recent chats"
+msgstr "最近的聊天"
+
 msgid "Recent invoices"
 msgstr "最近的帳單"
 
@@ -16363,6 +16361,9 @@ msgstr "搜尋開發者"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜尋所有檔案內容和所有工作區。"
+
+msgid "Search all chats…"
+msgstr "搜尋所有聊天…"
 
 msgid "Search all emoji"
 msgstr "搜尋所有表情符號"
@@ -18566,9 +18567,6 @@ msgstr "終端字型大小"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "終端取得焦點時調整終端字型大小，瀏覽器窗格中調整頁面縮放，其他情況下縮放整個應用程式"
-
-msgid "terminal ID"
-msgstr "終端ID"
 
 msgid "Terminal input"
 msgstr "終端輸入"

@@ -16,7 +16,13 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { Check, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useMemo,
+	useState,
+	useSyncExternalStore,
+} from "react";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -26,7 +32,7 @@ import type {
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { TerminalPaneIcon } from "../TerminalPaneIcon";
+import { TerminalPaneIcon } from "../../../TerminalPaneIcon";
 import { RenameSessionDialog } from "./components/RenameSessionDialog";
 import {
 	getTerminalDisplayTitle,
@@ -40,6 +46,8 @@ interface TerminalSessionDropdownProps {
 	launcher: TerminalLauncher;
 	workspaceId: string;
 	onSessionRemoved: (terminalId: string) => void;
+	indicator?: ReactNode;
+	children?: ReactNode;
 }
 
 interface VisibleTerminalSession {
@@ -105,6 +113,8 @@ export function TerminalSessionDropdown({
 	launcher,
 	workspaceId,
 	onSessionRemoved,
+	indicator,
+	children,
 }: TerminalSessionDropdownProps) {
 	const { t } = useLingui();
 	const [isOpen, setIsOpen] = useState(false);
@@ -393,12 +403,17 @@ export function TerminalSessionDropdown({
 						<span className="min-w-0 flex-1 truncate text-left">
 							{triggerTitle}
 						</span>
+						{indicator}
 						{sessionsQuery.isFetching && isOpen && (
 							<LoaderCircle className="size-3 shrink-0 animate-spin" />
 						)}
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="start" className="w-96">
+				<DropdownMenuContent
+					align="start"
+					className="w-96"
+					onClick={(event) => event.stopPropagation()}
+				>
 					<DropdownMenuLabel className="flex items-center gap-2 text-xs">
 						<span className="min-w-0 flex-1 truncate">
 							<Trans>Terminal Sessions</Trans>
@@ -528,6 +543,7 @@ export function TerminalSessionDropdown({
 							</div>
 						)}
 					</div>
+					{children}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</>

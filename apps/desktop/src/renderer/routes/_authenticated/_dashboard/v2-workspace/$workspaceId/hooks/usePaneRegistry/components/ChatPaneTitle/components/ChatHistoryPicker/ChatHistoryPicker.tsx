@@ -1,45 +1,34 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
-import type { DiscoverSessionsResult } from "@superset/chat/protocol";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
 import type { RendererContext, WorkspaceStore } from "@superset/panes";
-import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import { useWorkspaceClient } from "@superset/workspace-client";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Check, History, LoaderCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import type {
-	ChatPaneData,
-	PaneViewerData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { focusAgentSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusAgentSession";
-import { focusChatSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/focusChatSession";
+import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
+import { Check, LoaderCircle } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
+import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import type { StoreApi } from "zustand/vanilla";
-import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
-import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
-import { type HistoryEntry, historyEntries } from "./utils/historyEntries";
+import { onOpenChatHistory } from "../../../../utils/chatHistoryOpen";
+import { useChatHistory } from "../../hooks/useChatHistory";
 
 interface ChatHistoryPickerProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
-	linkedStores?: StoreApi<WorkspaceStore<PaneViewerData>>[];
+	linkedStores: StoreApi<WorkspaceStore<PaneViewerData>>[];
+	children: ReactNode;
 }
 
 export function ChatHistoryPicker({
 	context,
 	workspaceId,
-	linkedStores = [],
+	linkedStores,
+	children,
 }: ChatHistoryPickerProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
-	const current = context.pane.data as ChatPaneData;
 	const paneId = context.pane.id;
-	// The composer's `/resume` opens this picker from the pane body.
+	// "Search all chats…" in the title menu and the composer's `/resume` both open this.
 	useEffect(
 		() =>
 			onOpenChatHistory(paneId, () => {
@@ -48,96 +37,31 @@ export function ChatHistoryPicker({
 			}),
 		[paneId],
 	);
-	const { hostUrl } = useWorkspaceClient();
-	const { transport } = useChatWiring();
-	const harness = acpHarnessForPreset(current.agent?.id);
-	const saved = useQuery({
-		queryKey: ["chat-v3", hostUrl, "history", workspaceId],
-		queryFn: () => transport.listSessions({ workspaceId, limit: 200 }),
-		enabled: open,
-		refetchOnWindowFocus: false,
-	});
-	const native = useInfiniteQuery({
-		queryKey: ["chat-v3", hostUrl, "discoverSessions", workspaceId, harness],
-		queryFn: ({ pageParam }) =>
-			transport
-				.discoverSessions({
-					workspaceId,
-					harness: harness ?? "",
-					...(pageParam ? { cursor: pageParam } : {}),
-				})
-				.catch((error: unknown): DiscoverSessionsResult => {
-					if (!isMissingProcedureError(error)) throw error;
-					return { supported: false, sessions: [] };
-				}),
-		initialPageParam: undefined as string | undefined,
-		getNextPageParam: (page) => page.nextCursor,
-		enabled: open && !!harness,
-		retry: false,
-		refetchOnWindowFocus: false,
-	});
-	const agentSessions = cloudTrpc.agent.listSessions.useQuery(
-		{ cloudWorkspaceId: workspaceId },
-		{ enabled: open, refetchOnWindowFocus: false, retry: false },
-	);
-	const visibleAgentSessions = (agentSessions.data ?? []).filter((session) =>
-		session.agentName.toLowerCase().includes(search.toLowerCase()),
-	);
-	const entries = historyEntries(
-		saved.data ?? [],
-		native.data?.pages.flatMap((page) => page.sessions) ?? [],
-		harness ?? "",
+	const {
+		saved,
+		native,
+		agentSessions,
+		currentAgentSessionId,
+		entries,
+		isCurrent,
+		openChat,
+		openAgentSession,
+	} = useChatHistory({ context, workspaceId, linkedStores, enabled: open });
+	const query = search.toLowerCase();
+	const visibleAgentSessions = agentSessions.filter((session) =>
+		session.agentName.toLowerCase().includes(query),
 	);
 	const visible = entries.filter((entry) =>
-		`${entry.title ?? ""} ${entry.key}`
-			.toLowerCase()
-			.includes(search.toLowerCase()),
+		`${entry.title ?? ""} ${entry.key}`.toLowerCase().includes(query),
 	);
-	const isCurrent = (entry: HistoryEntry) =>
-		(entry.sessionId !== null && entry.sessionId === current.sessionId) ||
-		(entry.presetId === current.agent?.id &&
-			entry.harnessSessionId !== undefined &&
-			entry.harnessSessionId === current.agent?.sessionId);
-
-	const openAgentSession = (session: {
-		sessionId: string;
-		agentName: string;
-	}) => {
-		setOpen(false);
-		focusAgentSession({
-			store: context.store,
-			linkedStores,
-			session: { id: session.sessionId, agentName: session.agentName },
-		});
-	};
-
-	const openChat = (entry: HistoryEntry) => {
-		setOpen(false);
-		focusChatSession({ store: context.store, linkedStores, session: entry });
-	};
 
 	return (
-		<Popover
-			open={open}
-			onOpenChange={(nextOpen) => {
-				setOpen(nextOpen);
-				if (nextOpen) setSearch("");
-			}}
-		>
-			<PopoverTrigger asChild>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="size-6"
-					aria-label={t({ message: "Chat history" })}
-					title={t({ message: "Chat history" })}
-					onClick={(event) => event.stopPropagation()}
-				>
-					<History className="size-3.5" />
-				</Button>
-			</PopoverTrigger>
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverAnchor asChild>
+				<div className="flex min-w-0 items-center gap-1.5">{children}</div>
+			</PopoverAnchor>
 			<PopoverContent
-				align="end"
+				align="start"
 				className="w-80 p-2"
 				onClick={(event) => event.stopPropagation()}
 			>
@@ -190,7 +114,10 @@ export function ChatHistoryPicker({
 									type="button"
 									key={session.sessionId}
 									className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
-									onClick={() => openAgentSession(session)}
+									onClick={() => {
+										setOpen(false);
+										openAgentSession(session);
+									}}
 								>
 									<div className="min-w-0 flex-1">
 										<div className="truncate text-sm">{session.agentName}</div>
@@ -200,7 +127,7 @@ export function ChatHistoryPicker({
 											)}
 										</div>
 									</div>
-									{current.agentSession?.id === session.sessionId ? (
+									{currentAgentSessionId === session.sessionId ? (
 										<Check className="size-3.5 shrink-0" />
 									) : null}
 								</button>
@@ -212,7 +139,10 @@ export function ChatHistoryPicker({
 							type="button"
 							key={entry.key}
 							className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
-							onClick={() => openChat(entry)}
+							onClick={() => {
+								setOpen(false);
+								openChat(entry);
+							}}
 						>
 							<div className="min-w-0 flex-1">
 								<div className="truncate text-sm">

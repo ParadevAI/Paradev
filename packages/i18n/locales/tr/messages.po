@@ -1811,6 +1811,10 @@ msgstr "Hesap silinmeyi bekliyor"
 msgid "Account usage"
 msgstr "Hesap kullanımı"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Hesap kullanımı: {0} {used} kullanıldı"
+
 msgid "Achievements"
 msgstr "Başarımlar"
 
@@ -2201,9 +2205,6 @@ msgstr "Ajan çalıştırması başarısız oldu"
 
 msgid "Agent self-verification"
 msgstr "Ajan öz doğrulaması"
-
-msgid "agent session ID"
-msgstr "ajan oturum kimliği"
 
 msgid "Agent session started"
 msgstr "Ajan oturumu başladı"
@@ -3983,8 +3984,8 @@ msgstr "Sohbet yeniden düzenleniyor"
 msgid "Chat Launch"
 msgstr "Sohbet başlatma"
 
-msgid "Chat mode"
-msgstr "Sohbet modu"
+msgid "Chat menu"
+msgstr "Sohbet menüsü"
 
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
@@ -4284,9 +4285,6 @@ msgstr "CLI ve SDK"
 
 msgid "CLI docs"
 msgstr "CLI belgeleri"
-
-msgid "CLI mode"
-msgstr "CLI modu"
 
 msgid "CLI reference"
 msgstr "CLI referansı"
@@ -5121,9 +5119,6 @@ msgstr "Devam et"
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
-msgid "Continue or fork session"
-msgstr "Oturumu sürdür veya forkla"
-
 msgid "Continue the session the last run left"
 msgstr "Son çalıştırmanın bıraktığı oturumu sürdür"
 
@@ -5202,8 +5197,8 @@ msgstr "Kopyalandı"
 msgid "Copied {0}"
 msgstr "{0} kopyalandı"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} kopyalandı"
+msgid "Copied agent session ID"
+msgstr "Ajan oturum kimliği kopyalandı"
 
 msgid "Copied Link"
 msgstr "Bağlantı kopyalandı"
@@ -5273,9 +5268,6 @@ msgstr "Dosya adını kopyala"
 
 msgid "Copy ID"
 msgstr "Kimliği kopyala"
-
-msgid "Copy IDs"
-msgstr "Kimlikleri kopyala"
 
 msgid "Copy image"
 msgstr "Görseli kopyala"
@@ -5439,6 +5431,9 @@ msgstr "{plugin} bağlanamadı. Yeniden deneyin."
 
 msgid "Could not copy the link"
 msgstr "Bağlantı kopyalanamadı"
+
+msgid "Could not copy to the clipboard"
+msgstr "Panoya kopyalanamadı"
 
 msgid "Could not create cloud workspace"
 msgstr "Bulut çalışma alanı oluşturulamadı"
@@ -15047,6 +15042,9 @@ msgstr "Son etkinlik"
 msgid "Recent apps"
 msgstr "Son uygulamalar"
 
+msgid "Recent chats"
+msgstr "Son sohbetler"
+
 msgid "Recent invoices"
 msgstr "Son faturalar"
 
@@ -16363,6 +16361,9 @@ msgstr "Geliştirici ara"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Dosya içeriklerinde ve tüm çalışma alanlarınızda aynı anda arama yapın."
+
+msgid "Search all chats…"
+msgstr "Tüm sohbetlerde ara…"
 
 msgid "Search all emoji"
 msgstr "Tüm emojilerde ara"
@@ -18566,9 +18567,6 @@ msgstr "Terminal yazı tipi boyutu"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Bir terminal odaktayken terminal yazı tipi boyutu, tarayıcı bölmesinde sayfa yakınlaştırma, aksi halde tüm uygulama"
-
-msgid "terminal ID"
-msgstr "terminal kimliği"
 
 msgid "Terminal input"
 msgstr "Terminal girişi"

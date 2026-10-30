@@ -1,0 +1,1 @@
+export { resolveDefaultTargetConfigId } from "./resolveDefaultTargetConfigId";

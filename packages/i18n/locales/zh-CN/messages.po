@@ -1811,6 +1811,10 @@ msgstr "账户待删除"
 msgid "Account usage"
 msgstr "账户用量"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "账户用量：{0} 已使用 {used}"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2201,9 +2205,6 @@ msgstr "智能体运行失败"
 
 msgid "Agent self-verification"
 msgstr "智能体自我验证"
-
-msgid "agent session ID"
-msgstr "智能体会话ID"
 
 msgid "Agent session started"
 msgstr "智能体会话已开始"
@@ -3983,8 +3984,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天启动"
 
-msgid "Chat mode"
-msgstr "聊天模式"
+msgid "Chat menu"
+msgstr "聊天菜单"
 
 msgid "Chat session not found"
 msgstr "未找到聊天会话"
@@ -4284,9 +4285,6 @@ msgstr "CLI与SDK"
 
 msgid "CLI docs"
 msgstr "CLI文档"
-
-msgid "CLI mode"
-msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 参考"
@@ -5121,9 +5119,6 @@ msgstr "继续"
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 
-msgid "Continue or fork session"
-msgstr "继续或分叉会话"
-
 msgid "Continue the session the last run left"
 msgstr "继续上次运行留下的会话"
 
@@ -5202,8 +5197,8 @@ msgstr "已复制"
 msgid "Copied {0}"
 msgstr "已复制{0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "已复制{copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "已复制智能体会话ID"
 
 msgid "Copied Link"
 msgstr "已复制链接"
@@ -5272,9 +5267,6 @@ msgid "Copy file name"
 msgstr "复制文件名"
 
 msgid "Copy ID"
-msgstr "复制ID"
-
-msgid "Copy IDs"
 msgstr "复制ID"
 
 msgid "Copy image"
@@ -5439,6 +5431,9 @@ msgstr "无法连接 {plugin}。请重试。"
 
 msgid "Could not copy the link"
 msgstr "无法复制链接"
+
+msgid "Could not copy to the clipboard"
+msgstr "无法复制到剪贴板"
 
 msgid "Could not create cloud workspace"
 msgstr "无法创建云端工作区"
@@ -15047,6 +15042,9 @@ msgstr "最近动态"
 msgid "Recent apps"
 msgstr "最近使用的应用"
 
+msgid "Recent chats"
+msgstr "最近的聊天"
+
 msgid "Recent invoices"
 msgstr "最近的账单"
 
@@ -16363,6 +16361,9 @@ msgstr "搜索开发者"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜索所有文件内容和所有工作区。"
+
+msgid "Search all chats…"
+msgstr "搜索所有聊天…"
 
 msgid "Search all emoji"
 msgstr "搜索所有表情"
@@ -18566,9 +18567,6 @@ msgstr "终端字号"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "终端获得焦点时调整终端字号，浏览器窗格中调整页面缩放，其他情况下缩放整个应用"
-
-msgid "terminal ID"
-msgstr "终端ID"
 
 msgid "Terminal input"
 msgstr "终端输入"

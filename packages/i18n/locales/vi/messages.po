@@ -1811,6 +1811,10 @@ msgstr "Tài khoản đang chờ xóa"
 msgid "Account usage"
 msgstr "Mức sử dụng tài khoản"
 
+#. placeholder {0}: tightest.label
+msgid "Account usage: {0} {used} used"
+msgstr "Mức sử dụng tài khoản: {0} đã dùng {used}"
+
 msgid "Achievements"
 msgstr "Thành tích"
 
@@ -2201,9 +2205,6 @@ msgstr "Lượt chạy của agent thất bại"
 
 msgid "Agent self-verification"
 msgstr "Agent tự kiểm chứng"
-
-msgid "agent session ID"
-msgstr "ID phiên agent"
 
 msgid "Agent session started"
 msgstr "Phiên agent đã bắt đầu"
@@ -3983,8 +3984,8 @@ msgstr "Chat đang được làm lại"
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
-msgid "Chat mode"
-msgstr "Chế độ chat"
+msgid "Chat menu"
+msgstr "Menu trò chuyện"
 
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
@@ -4284,9 +4285,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Tài liệu CLI"
-
-msgid "CLI mode"
-msgstr "Chế độ CLI"
 
 msgid "CLI reference"
 msgstr "Tài liệu tham chiếu CLI"
@@ -5121,9 +5119,6 @@ msgstr "Tiếp tục"
 msgid "Continue in your browser"
 msgstr "Tiếp tục trong trình duyệt"
 
-msgid "Continue or fork session"
-msgstr "Tiếp tục hoặc fork phiên"
-
 msgid "Continue the session the last run left"
 msgstr "Tiếp tục phiên mà lần chạy trước để lại"
 
@@ -5202,8 +5197,8 @@ msgstr "Đã sao chép"
 msgid "Copied {0}"
 msgstr "Đã sao chép {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Đã sao chép {copiedLabel}"
+msgid "Copied agent session ID"
+msgstr "Đã sao chép ID phiên agent"
 
 msgid "Copied Link"
 msgstr "Đã sao chép liên kết"
@@ -5272,9 +5267,6 @@ msgid "Copy file name"
 msgstr "Sao chép tên tệp"
 
 msgid "Copy ID"
-msgstr "Sao chép ID"
-
-msgid "Copy IDs"
 msgstr "Sao chép ID"
 
 msgid "Copy image"
@@ -5439,6 +5431,9 @@ msgstr "Không thể kết nối {plugin}. Vui lòng thử lại."
 
 msgid "Could not copy the link"
 msgstr "Không thể sao chép liên kết"
+
+msgid "Could not copy to the clipboard"
+msgstr "Không thể sao chép vào bộ nhớ tạm"
 
 msgid "Could not create cloud workspace"
 msgstr "Không thể tạo workspace trên cloud"
@@ -15047,6 +15042,9 @@ msgstr "Hoạt động gần đây"
 msgid "Recent apps"
 msgstr "Ứng dụng gần đây"
 
+msgid "Recent chats"
+msgstr "Cuộc trò chuyện gần đây"
+
 msgid "Recent invoices"
 msgstr "Hóa đơn gần đây"
 
@@ -16363,6 +16361,9 @@ msgstr "Tìm nhà phát triển"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Tìm trong nội dung tệp và trên mọi workspace cùng lúc."
+
+msgid "Search all chats…"
+msgstr "Tìm trong tất cả cuộc trò chuyện…"
 
 msgid "Search all emoji"
 msgstr "Tìm tất cả emoji"
@@ -18566,9 +18567,6 @@ msgstr "Cỡ chữ terminal"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Cỡ chữ terminal khi terminal đang được focus, thu phóng trang trong khung trình duyệt, nếu không thì toàn bộ ứng dụng"
-
-msgid "terminal ID"
-msgstr "ID terminal"
 
 msgid "Terminal input"
 msgstr "Ô nhập terminal"
