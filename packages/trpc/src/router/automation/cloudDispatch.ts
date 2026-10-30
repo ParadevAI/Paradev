@@ -11,7 +11,6 @@ import {
 } from "@superset/shared/cloud-agent-launch";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
 import {
@@ -20,6 +19,7 @@ import {
 	SandboxUnavailableError,
 	sandboxHostSecretFor,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { startCloudWorkspace } from "../cloud-workspace/start";
 import { transitionCloudWorkspace } from "../cloud-workspace/transition";
 import {

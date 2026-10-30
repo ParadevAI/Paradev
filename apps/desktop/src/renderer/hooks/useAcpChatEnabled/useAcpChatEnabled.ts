@@ -1,6 +1,6 @@
-import { authClient } from "renderer/lib/auth-client";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 export function useAcpChatEnabled(): boolean {
-	const { data: session } = authClient.useSession();
-	return session?.user.experimentalChat === true;
+	const { data } = cloudTrpc.userSettings.get.useQuery();
+	return data?.experimentalChat === true;
 }

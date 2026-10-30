@@ -21,7 +21,6 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { organizationMachineSizes } from "../../lib/billing/plan";
 import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
@@ -38,6 +37,7 @@ import {
 	sandboxExists,
 	stopAndSnapshot,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { jwtProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";

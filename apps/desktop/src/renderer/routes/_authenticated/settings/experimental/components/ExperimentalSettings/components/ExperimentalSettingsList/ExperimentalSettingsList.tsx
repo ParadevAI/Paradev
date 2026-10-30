@@ -2,12 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import {
-	useChatTurnSnapshotsEnabled,
-	useChatTurnSnapshotsStore,
-} from "renderer/stores/chat-turn-snapshots";
 import {
 	useInlineWorkspacePortsStore,
 	usePortsDisplayMode,
@@ -24,6 +19,7 @@ import {
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
 import { AcpChatSetting } from "../AcpChatSetting";
+import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -53,16 +49,9 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
 		visibleItems,
 	);
-	const acpChatEnabled = useAcpChatEnabled();
-	const showChatTurnSnapshots =
-		acpChatEnabled &&
-		isItemVisible(
-			SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
-			visibleItems,
-		);
-	const chatTurnSnapshotsEnabled = useChatTurnSnapshotsEnabled();
-	const setChatTurnSnapshotsEnabled = useChatTurnSnapshotsStore(
-		(state) => state.setEnabled,
+	const showChatTurnSnapshots = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
+		visibleItems,
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
@@ -184,35 +173,7 @@ export function ExperimentalSettingsList({
 					</div>
 				)}
 				{showAcpChat && <AcpChatSetting />}
-				{showChatTurnSnapshots && (
-					<div className="flex items-center justify-between gap-6">
-						<div className="min-w-0 flex-1 space-y-0.5">
-							<Label
-								htmlFor="chat-turn-snapshots"
-								className="text-sm font-medium"
-							>
-								<HighlightText
-									text={t({ message: "Track file changes per turn" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<HighlightText
-									text={t({
-										message:
-											"Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first.",
-									})}
-									query={searchQuery}
-								/>
-							</p>
-						</div>
-						<Switch
-							id="chat-turn-snapshots"
-							checked={chatTurnSnapshotsEnabled}
-							onCheckedChange={setChatTurnSnapshotsEnabled}
-						/>
-					</div>
-				)}
+				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
 			</div>
 		</div>

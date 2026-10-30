@@ -3,7 +3,6 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
-import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
@@ -12,15 +11,15 @@ export function AcpChatSetting() {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
 	const savedEnabled = useAcpChatEnabled();
-	const { refetch: refetchSession } = authClient.useSession();
-	const updateExperimentalChat =
-		cloudTrpc.user.updateExperimentalChat.useMutation({
-			onSuccess: () => refetchSession({ query: { disableCookieCache: true } }),
-			onError: () =>
-				toast.error(t({ message: "Couldn't update the Chat setting" })),
-		});
-	const enabled = updateExperimentalChat.isPending
-		? updateExperimentalChat.variables.enabled
+	const utils = cloudTrpc.useUtils();
+	const updateSettings = cloudTrpc.userSettings.update.useMutation({
+		onSuccess: (settings) =>
+			utils.userSettings.get.setData(undefined, settings),
+		onError: () =>
+			toast.error(t({ message: "Couldn't update the Chat setting" })),
+	});
+	const enabled = updateSettings.isPending
+		? updateSettings.variables.experimentalChat === true
 		: savedEnabled;
 
 	return (
@@ -43,7 +42,7 @@ export function AcpChatSetting() {
 				id="acp-chat"
 				checked={enabled}
 				onCheckedChange={(next) =>
-					updateExperimentalChat.mutate({ enabled: next })
+					updateSettings.mutate({ experimentalChat: next })
 				}
 			/>
 		</div>
