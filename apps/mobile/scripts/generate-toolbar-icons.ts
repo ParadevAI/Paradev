@@ -1,12 +1,13 @@
 #!/usr/bin/env bun
 /**
- * Writes the Android toolbar icons in lib/navigation/toolbar-icons/ as vector
- * drawables, from Google's Material Symbols (Apache 2.0). A `Stack.Toolbar`
- * item on Android takes only an image source, not an SF Symbol.
+ * Writes the Android toolbar icons in lib/navigation/toolbar-icons/ and the
+ * Compose menu and sheet icons in lib/menu-icons/ as vector drawables, from
+ * Google's Material Symbols (Apache 2.0). A `Stack.Toolbar` item or a Compose
+ * `Icon` on Android takes only an image source, not an SF Symbol.
  *
  *   bun scripts/generate-toolbar-icons.ts
  */
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ToolbarIconName } from "../lib/navigation/toolbarIcon.types";
@@ -32,11 +33,20 @@ const MATERIAL_SYMBOL: Record<ToolbarIconName, string> = {
 	voiceSettings: "tune",
 };
 
+const MENU_SYMBOL: Record<string, string> = {
+	camera: "photo_camera",
+	close: "close",
+	copy: "content_copy",
+	delete: "delete",
+	edit: "edit",
+	files: "folder",
+	fileComment: "add_comment",
+	photos: "photo_library",
+	viewFile: "description",
+};
+
 const SIZE = 960;
-const outDir = join(
-	dirname(fileURLToPath(import.meta.url)),
-	"../lib/navigation/toolbar-icons",
-);
+const scriptDir = dirname(fileURLToPath(import.meta.url));
 
 // How many numbers each command takes, and which of them are y coordinates.
 const ARITY: Record<string, { count: number; ys: number[] }> = {
@@ -111,10 +121,17 @@ ${paths.map((d) => `  <path android:fillColor="#FFFFFFFF" android:pathData="${d}
 `;
 }
 
-for (const [name, symbol] of Object.entries(MATERIAL_SYMBOL)) {
-	writeFileSync(
-		join(outDir, `${name}.xml`),
-		vectorDrawable(await fetchPaths(symbol)),
-	);
+for (const [dir, symbols] of [
+	["../lib/navigation/toolbar-icons", MATERIAL_SYMBOL],
+	["../lib/menu-icons", MENU_SYMBOL],
+] as const) {
+	const outDir = join(scriptDir, dir);
+	mkdirSync(outDir, { recursive: true });
+	for (const [name, symbol] of Object.entries(symbols)) {
+		writeFileSync(
+			join(outDir, `${name}.xml`),
+			vectorDrawable(await fetchPaths(symbol)),
+		);
+	}
+	console.log(`Wrote ${Object.keys(symbols).length} icons to ${outDir}`);
 }
-console.log(`Wrote ${Object.keys(MATERIAL_SYMBOL).length} icons to ${outDir}`);
