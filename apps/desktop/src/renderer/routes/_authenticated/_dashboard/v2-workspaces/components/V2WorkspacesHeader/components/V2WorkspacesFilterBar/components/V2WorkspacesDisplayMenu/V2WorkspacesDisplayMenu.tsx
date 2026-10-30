@@ -78,20 +78,28 @@ export function V2WorkspacesDisplayMenu() {
 						<Trans>Board</Trans>
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuLabel className={MENU_LABEL_CLASS}>
-					<Trans>Grouping</Trans>
-				</DropdownMenuLabel>
-				<DropdownMenuRadioGroup
-					value={groupBy}
-					onValueChange={(value) => setGroupBy(value as V2WorkspacesGroupBy)}
-				>
-					{groupings.map((option) => (
-						<DropdownMenuRadioItem key={option.value} value={option.value}>
-							{option.label}
-						</DropdownMenuRadioItem>
-					))}
-				</DropdownMenuRadioGroup>
+				{/* The board's columns are the status buckets, so it has no
+				    grouping to choose. */}
+				{viewMode === "list" ? (
+					<>
+						<DropdownMenuSeparator />
+						<DropdownMenuLabel className={MENU_LABEL_CLASS}>
+							<Trans>Grouping</Trans>
+						</DropdownMenuLabel>
+						<DropdownMenuRadioGroup
+							value={groupBy}
+							onValueChange={(value) =>
+								setGroupBy(value as V2WorkspacesGroupBy)
+							}
+						>
+							{groupings.map((option) => (
+								<DropdownMenuRadioItem key={option.value} value={option.value}>
+									{option.label}
+								</DropdownMenuRadioItem>
+							))}
+						</DropdownMenuRadioGroup>
+					</>
+				) : null}
 				<DropdownMenuSeparator />
 				<DropdownMenuLabel className={MENU_LABEL_CLASS}>
 					<Trans>Ordering</Trans>

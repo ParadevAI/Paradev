@@ -1,4 +1,5 @@
 export {
+	hydrateFiltersFromSearch,
 	parseGroupBy,
 	parseList,
 	parseOrderBy,

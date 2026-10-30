@@ -1,11 +1,13 @@
 import {
 	BUILT_IN_VIEW_ALL,
 	GROUP_BY_VALUES,
+	getViewFilters,
 	isKnownView,
 	ORDER_BY_VALUES,
 	type V2WorkspacesGroupBy,
 	type V2WorkspacesOrderBy,
 	type V2WorkspacesSavedView,
+	type V2WorkspacesViewFilters,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore";
 import {
 	BOARD_COLUMN_ORDER,
@@ -44,4 +46,50 @@ export function resolveViewId(
 	savedViews: V2WorkspacesSavedView[],
 ): string {
 	return tab && isKnownView(tab, savedViews) ? tab : BUILT_IN_VIEW_ALL;
+}
+
+interface FilterSearchParams {
+	tab?: string;
+	where?: string;
+	projects?: string;
+	creators?: string;
+	status?: string;
+	archived?: true;
+}
+
+/**
+ * Store fields a deep link pins. A `tab` starts from that view's own
+ * filters, so `?tab=working` shows the Working view and not everything;
+ * explicit params then override field by field. Without any of these
+ * params the result is empty, so a bare navigation keeps the user's state.
+ */
+export function hydrateFiltersFromSearch(
+	search: FilterSearchParams,
+	savedViews: V2WorkspacesSavedView[],
+): Partial<V2WorkspacesViewFilters & { activeViewId: string }> {
+	const hasFilterParam =
+		search.where !== undefined ||
+		search.projects !== undefined ||
+		search.creators !== undefined ||
+		search.status !== undefined ||
+		search.archived !== undefined;
+	if (search.tab === undefined && !hasFilterParam) return {};
+	const activeViewId = resolveViewId(search.tab, savedViews);
+	const base =
+		search.tab !== undefined ? getViewFilters(activeViewId, savedViews) : {};
+	return {
+		...(search.tab !== undefined && { activeViewId }),
+		...base,
+		...(search.where !== undefined && { whereFilter: search.where }),
+		...(search.projects !== undefined && {
+			projectFilters: parseList(search.projects),
+		}),
+		...(search.creators !== undefined && {
+			creatorFilters: parseList(search.creators),
+		}),
+		...(search.status !== undefined && {
+			statusFilters: parseStatusList(search.status),
+		}),
+		...(search.archived !== undefined && { showArchived: search.archived }),
+	};
 }

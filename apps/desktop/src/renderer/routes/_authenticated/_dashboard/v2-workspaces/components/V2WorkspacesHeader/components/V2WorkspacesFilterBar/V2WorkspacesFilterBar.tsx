@@ -39,9 +39,9 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useCurrentViewFilters } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useCurrentViewFilters";
 import {
-	BUILT_IN_VIEW_FILTERS,
 	EMPTY_VIEW_FILTERS,
 	getViewFilters,
+	isBuiltInView,
 	MAX_SAVED_VIEWS,
 	PROJECT_FILTER_SESSIONS,
 	sameViewFilters,
@@ -164,7 +164,7 @@ export function V2WorkspacesFilterBar({
 			: creator.name;
 	};
 
-	const isBuiltInView = activeViewId in BUILT_IN_VIEW_FILTERS;
+	const isActiveViewBuiltIn = isBuiltInView(activeViewId);
 	const isDirty = !sameViewFilters(
 		currentFilters,
 		getViewFilters(activeViewId, savedViews),
@@ -425,7 +425,7 @@ export function V2WorkspacesFilterBar({
 			<span className="ml-auto flex items-center gap-1">
 				{isDirty ? (
 					<>
-						{isBuiltInView ? (
+						{isActiveViewBuiltIn ? (
 							<SaveViewPopover
 								onSave={saveAsNewView}
 								trigger={

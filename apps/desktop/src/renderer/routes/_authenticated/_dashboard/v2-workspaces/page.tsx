@@ -15,11 +15,9 @@ import {
 } from "./stores/v2WorkspacesFilterStore";
 import { deriveBoardColumn } from "./utils/deriveBoardColumn";
 import {
+	hydrateFiltersFromSearch,
 	parseGroupBy,
-	parseList,
 	parseOrderBy,
-	parseStatusList,
-	resolveViewId,
 } from "./utils/parseWorkspacesSearch";
 
 export type V2WorkspacesSearch = {
@@ -111,26 +109,13 @@ function V2WorkspacesPage() {
 		hydratedRef.current = true;
 		useV2WorkspacesFilterStore.setState({
 			searchQuery: search.q ?? "",
-			...(search.where !== undefined && { whereFilter: search.where }),
-			...(search.projects !== undefined && {
-				projectFilters: parseList(search.projects),
-			}),
-			...(search.creators !== undefined && {
-				creatorFilters: parseList(search.creators),
-			}),
-			...(search.status !== undefined && {
-				statusFilters: parseStatusList(search.status),
-			}),
-			...(search.tab !== undefined && {
-				activeViewId: resolveViewId(
-					search.tab,
-					useV2WorkspacesFilterStore.getState().savedViews,
-				),
-			}),
+			...hydrateFiltersFromSearch(
+				search,
+				useV2WorkspacesFilterStore.getState().savedViews,
+			),
 			...(search.view !== undefined && { viewMode: search.view }),
 			...(search.group !== undefined && { groupBy: search.group }),
 			...(search.order !== undefined && { orderBy: search.order }),
-			...(search.archived !== undefined && { showArchived: search.archived }),
 		});
 	}
 
@@ -201,12 +186,17 @@ function V2WorkspacesPage() {
 		includeArchived: showArchived,
 	});
 
-	const applyView = useV2WorkspacesFilterStore((state) => state.applyView);
+	// No cloud in this org: the Cloud tab is hidden, so land on All but keep
+	// whatever filters the link carried (the host source already reads an
+	// unavailable cloud place as Anywhere).
+	const setActiveViewId = useV2WorkspacesFilterStore(
+		(state) => state.setActiveViewId,
+	);
 	useEffect(() => {
 		if (activeViewId === BUILT_IN_VIEW_CLOUD && isReady && !cloudEnabled) {
-			applyView(BUILT_IN_VIEW_ALL);
+			setActiveViewId(BUILT_IN_VIEW_ALL);
 		}
-	}, [activeViewId, isReady, cloudEnabled, applyView]);
+	}, [activeViewId, isReady, cloudEnabled, setActiveViewId]);
 
 	// Status buckets are derived per row, so they filter here rather than in
 	// the hook, which only knows about sources and identities.

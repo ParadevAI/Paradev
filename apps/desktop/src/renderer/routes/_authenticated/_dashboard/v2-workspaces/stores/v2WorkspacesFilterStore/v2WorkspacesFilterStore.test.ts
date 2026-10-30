@@ -150,6 +150,24 @@ test("applying an unknown view lands on All", () => {
 	expect(store.getState().projectFilters).toEqual([]);
 });
 
+test("inherited object names are not views", () => {
+	const store = useV2WorkspacesFilterStore;
+	expect(getViewFilters("constructor", [])).toEqual(
+		getViewFilters(BUILT_IN_VIEW_ALL, []),
+	);
+	store.getState().applyView("toString");
+	expect(store.getState().activeViewId).toBe(BUILT_IN_VIEW_ALL);
+	expect(() => store.getState().resetToView()).not.toThrow();
+});
+
+test("setActiveViewId switches the tab without touching the filters", () => {
+	const store = useV2WorkspacesFilterStore;
+	store.getState().setProjectFilters(["project-a"]);
+	store.getState().setActiveViewId(BUILT_IN_VIEW_NEEDS_ME);
+	expect(store.getState().activeViewId).toBe(BUILT_IN_VIEW_NEEDS_ME);
+	expect(store.getState().projectFilters).toEqual(["project-a"]);
+});
+
 test("sanitizeViewFilters drops unknown buckets and malformed shapes", () => {
 	expect(
 		sanitizeViewFilters({

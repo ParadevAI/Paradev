@@ -94,10 +94,12 @@ export function isKnownView(
 	viewId: string,
 	savedViews: V2WorkspacesSavedView[],
 ): boolean {
-	return (
-		viewId in BUILT_IN_VIEW_FILTERS ||
-		savedViews.some((view) => view.id === viewId)
-	);
+	return isBuiltInView(viewId) || savedViews.some((view) => view.id === viewId);
+}
+
+/** Own-property check: `?tab=constructor` must not read as a view. */
+export function isBuiltInView(viewId: string): boolean {
+	return Object.hasOwn(BUILT_IN_VIEW_FILTERS, viewId);
 }
 
 export function getViewFilters(
@@ -105,7 +107,7 @@ export function getViewFilters(
 	savedViews: V2WorkspacesSavedView[],
 ): V2WorkspacesViewFilters {
 	return (
-		BUILT_IN_VIEW_FILTERS[viewId] ??
+		(isBuiltInView(viewId) ? BUILT_IN_VIEW_FILTERS[viewId] : undefined) ??
 		savedViews.find((view) => view.id === viewId)?.filters ??
 		EMPTY_VIEW_FILTERS
 	);
@@ -207,6 +209,8 @@ interface V2WorkspacesFilterState extends V2WorkspacesViewFilters {
 	/** Switches view and replaces the filters with the view's own; an
 	 * unknown id (deleted view, another machine's link) lands on All. */
 	applyView: (viewId: string) => void;
+	/** Switches the active tab only; the current filters stay as they are. */
+	setActiveViewId: (viewId: string) => void;
 	/** Puts the current filters back to the active view's. */
 	resetToView: () => void;
 	/** Writes the current filters into the active saved view. No-op on a built-in. */
@@ -248,6 +252,12 @@ export const useV2WorkspacesFilterStore = create<V2WorkspacesFilterState>()(
 						...copyFilters(getViewFilters(resolved, state.savedViews)),
 					};
 				}),
+			setActiveViewId: (viewId) =>
+				set((state) => ({
+					activeViewId: isKnownView(viewId, state.savedViews)
+						? viewId
+						: BUILT_IN_VIEW_ALL,
+				})),
 			resetToView: () =>
 				set((state) => ({
 					...copyFilters(getViewFilters(state.activeViewId, state.savedViews)),
