@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { env } from "./env";
 
 /**
  * A cloud workspace sandbox ships `xdg-utils` and sets `DISPLAY`, so
@@ -22,6 +23,19 @@ export function desktopWorkspaceLink(
 	if (!options?.sessionId) return base;
 	const params = new URLSearchParams({ sessionId: options.sessionId });
 	return `${base}?${params.toString()}`;
+}
+
+export function workspaceLinks(workspaceId: string): {
+	url: string;
+	webUrl: string;
+} {
+	return {
+		url: desktopWorkspaceLink(workspaceId),
+		webUrl: new URL(
+			`/workspaces/${workspaceId}`,
+			env.SUPERSET_WEB_URL,
+		).toString(),
+	};
 }
 
 export function openUrl(url: string): Promise<void> {

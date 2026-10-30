@@ -23,6 +23,7 @@ import {
 	LuFolderPlus,
 	LuGitBranch,
 	LuHash,
+	LuLink,
 	LuPencil,
 	LuPin,
 	LuPinOff,
@@ -32,6 +33,7 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
@@ -102,6 +104,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { setContextMenuOpen } = useDashboardSidebarHoverActions();
+	const copyShareLink = useCopyShareLink();
 	const portGroup = useDashboardSidebarWorkspacePorts(workspaceId);
 	const { isPending: isKillingPorts, killPorts } =
 		useDashboardSidebarPortKill();
@@ -159,6 +162,12 @@ export function DashboardSidebarWorkspaceContextMenu({
 				<ContextMenuItem onSelect={onCopyWorkspaceId}>
 					<LuHash className="size-4 mr-2" />
 					<Trans>Copy Workspace ID</Trans>
+				</ContextMenuItem>
+				<ContextMenuItem
+					onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
+				>
+					<LuLink className="size-4 mr-2" />
+					<Trans>Copy link</Trans>
 				</ContextMenuItem>
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={onToggleUnread}>

@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ApiClient } from "../../../lib/api-client";
+import { env } from "../../../lib/env";
 import { createCloudWorkspace } from "./createCloudWorkspace";
 
 test.each([
@@ -63,4 +64,18 @@ test("sends --base-branch as the branch the cloud workspace starts from", async 
 		options: { baseBranch: "main" },
 	});
 	expect(calls.createInput).toMatchObject({ branch: "main" });
+});
+
+test("returns the cloud workspace's desktop and web links", async () => {
+	const { api } = recordingApi();
+	const result = await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: {},
+	});
+	expect(result.data).toMatchObject({
+		id: "ws-1",
+		url: "superset://v2-workspace/ws-1",
+		webUrl: `${env.SUPERSET_WEB_URL}/workspaces/ws-1`,
+	});
 });

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import type { MachineSize } from "@superset/shared/billing";
+import { env } from "../../../lib/env";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
 import createWorkspaceCommand from "./command";
 
@@ -24,7 +25,10 @@ withLocalHostService("org-1", {
 	"workspaces.create": (input) => {
 		createProcedure = "create";
 		createInput = input;
-		return { workspace: { name: "agent-effort" }, alreadyExists: false };
+		return {
+			workspace: { id: "ws-1", name: "agent-effort" },
+			alreadyExists: false,
+		};
 	},
 });
 
@@ -106,6 +110,19 @@ describe("workspaces create", () => {
 		await invoke({ project: undefined, branch: undefined, session: true });
 		expect(sessionInput).toMatchObject({ name: "agent-effort" });
 		expect(createInput).toBeUndefined();
+	});
+
+	test("reports the new workspace's desktop and web links", async () => {
+		const webUrl = `${env.SUPERSET_WEB_URL}/workspaces/ws-1`;
+		const result = (await invoke()) as {
+			data: Record<string, unknown>;
+			message: string;
+		};
+		expect(result.data).toMatchObject({
+			url: "superset://v2-workspace/ws-1",
+			webUrl,
+		});
+		expect(result.message.split("\n").at(-1)).toBe(webUrl);
 	});
 
 	test("forwards model to the agent launched with the workspace", async () => {

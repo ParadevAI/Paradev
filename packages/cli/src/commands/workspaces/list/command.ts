@@ -3,6 +3,7 @@ import { normalizeWorkspaceTag } from "@superset/shared/workspace-tags";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { listWorkspacesOnHost } from "../../../lib/host-workspaces";
+import { workspaceLinks } from "../../../lib/open-url";
 
 export default command({
 	description:
@@ -62,12 +63,17 @@ export default command({
 				organizationId,
 			});
 			const search = options.search?.toLowerCase();
-			return cloudWorkspaces.filter(
-				(workspace) =>
-					!search ||
-					workspace.name.toLowerCase().includes(search) ||
-					workspace.branch.toLowerCase().includes(search),
-			);
+			return cloudWorkspaces
+				.filter(
+					(workspace) =>
+						!search ||
+						workspace.name.toLowerCase().includes(search) ||
+						workspace.branch.toLowerCase().includes(search),
+				)
+				.map((workspace) => ({
+					...workspace,
+					...workspaceLinks(workspace.id),
+				}));
 		}
 
 		const { workspaces } = await listWorkspacesOnHost({
@@ -111,6 +117,7 @@ export default command({
 				// session workspaces render as "session".
 				projectName: workspace.projectName ?? workspace.projectId ?? "session",
 				tags: (workspace.tags ?? []).join(", "),
+				...workspaceLinks(workspace.id),
 			}));
 	},
 });

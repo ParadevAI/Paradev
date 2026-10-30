@@ -3,7 +3,7 @@ import type { ApiClient } from "../../../lib/api-client";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
-import { desktopWorkspaceLink, openUrl } from "../../../lib/open-url";
+import { openUrl, workspaceLinks } from "../../../lib/open-url";
 
 export default command({
 	description: "Open a workspace in the Paradev desktop app",
@@ -45,7 +45,7 @@ export default command({
 				).workspace
 			: await cloudWorkspaceRow(ctx.api, organizationId, id);
 
-		const url = desktopWorkspaceLink(workspace.id);
+		const { url, webUrl } = workspaceLinks(workspace.id);
 
 		if (!options.print) {
 			try {
@@ -59,7 +59,7 @@ export default command({
 		}
 
 		return {
-			data: { id: workspace.id, name: workspace.name, url },
+			data: { id: workspace.id, name: workspace.name, url, webUrl },
 			message: options.print
 				? url
 				: `Opening "${workspace.name}" in Paradev desktop`,

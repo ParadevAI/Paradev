@@ -3,6 +3,7 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
+import { workspaceLinks } from "../../../lib/open-url";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 import { createCloudWorkspace } from "./createCloudWorkspace";
 
@@ -236,9 +237,10 @@ export default command({
 				agents,
 				command: options.command ?? undefined,
 			});
+			const links = workspaceLinks(result.workspace.id);
 			return {
-				data: result,
-				message: `Created session "${result.workspace.name}" on host ${target.hostId}`,
+				data: { ...result, ...links },
+				message: `Created session "${result.workspace.name}" on host ${target.hostId}\n${links.webUrl}`,
 			};
 		}
 
@@ -263,11 +265,13 @@ export default command({
 			...(options.tag?.length ? { tags: options.tag } : {}),
 		});
 
+		const links = workspaceLinks(result.workspace.id);
+		const summary = result.alreadyExists
+			? `Reused existing workspace "${result.workspace.name}" on host ${target.hostId}`
+			: `Created workspace "${result.workspace.name}" on host ${target.hostId}`;
 		return {
-			data: result,
-			message: result.alreadyExists
-				? `Reused existing workspace "${result.workspace.name}" on host ${target.hostId}`
-				: `Created workspace "${result.workspace.name}" on host ${target.hostId}`,
+			data: { ...result, ...links },
+			message: `${summary}\n${links.webUrl}`,
 		};
 	},
 });

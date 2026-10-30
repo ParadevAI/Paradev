@@ -2,6 +2,7 @@ import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceTarget } from "../../../lib/host-workspaces";
+import { workspaceLinks } from "../../../lib/open-url";
 
 export default command({
 	description: "Show details for a single workspace by id",
@@ -89,6 +90,7 @@ async function cloudDetail(ctx: Ctx, organizationId: string, id: string) {
 		environmentId: row.environmentId,
 		createdByUserId: row.createdByUserId,
 		createdAt: row.createdAt,
+		...workspaceLinks(row.id),
 	};
 }
 
@@ -128,5 +130,6 @@ async function hostDetail(
 		worktreePath: workspace.worktreePath,
 		worktreeExists: workspace.worktreeExists,
 		createdAt: workspace.createdAt,
+		...workspaceLinks(workspace.id),
 	};
 }

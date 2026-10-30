@@ -3,6 +3,7 @@ import type { MachineSize } from "@superset/shared/billing";
 import { TRPCClientError } from "@trpc/client";
 import type { ApiClient } from "../../../lib/api-client";
 import { resolveCloudEnvironment } from "../../../lib/cloud-workspaces";
+import { workspaceLinks } from "../../../lib/open-url";
 
 /** What `ws create` parsed; the host-only flags are here only to be refused. */
 export interface CloudCreateOptions {
@@ -110,9 +111,10 @@ export async function createCloudWorkspace(args: {
 		})
 		.catch(rethrowWithLocationHint);
 
+	const links = workspaceLinks(row.id);
 	return {
-		data: row,
-		message: `Provisioning cloud workspace ${row.id} on branch ${row.branch} (environment: ${environment.name})`,
+		data: { ...row, ...links },
+		message: `Provisioning cloud workspace ${row.id} on branch ${row.branch} (environment: ${environment.name})\n${links.webUrl}`,
 	};
 }
 
