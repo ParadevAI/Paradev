@@ -50,7 +50,10 @@ const sage: RouterDev = {
 	description: "Customer support; drafts ticket replies, looks up accounts",
 };
 
+const ticket: RouterDev = { id: "ticket", name: "Ticket", description: null };
+
 const channels = {
+	roster: { channelName: "roster", devs: [ticket] },
 	platform: { channelName: "eng-platform", devs: [ada, rex] },
 	web: { channelName: "web", devs: [milo, ada] },
 	growth: { channelName: "growth", devs: [nova, quill] },
@@ -984,6 +987,41 @@ export const evalSet: EvalCase[] = [
 			"fyi a customer just sent a screenshot of a 502 on the billing page",
 		),
 		expected: ["rex"],
+	}),
+	c({
+		id: "r-direct-by-name",
+		kind: "direct",
+		channel: "roster",
+		message: m("Satya", "what work is open here can you tell me ticket?"),
+		expected: ["ticket"],
+	}),
+	c({
+		id: "r-direct-name-first",
+		kind: "direct",
+		channel: "roster",
+		message: m("Satya", "Ticket, what's left on the roster migration?"),
+		expected: ["ticket"],
+	}),
+	c({
+		id: "r-passing-noun",
+		kind: "passing-mention",
+		channel: "roster",
+		message: m("Priya", "i filed a ticket for that yesterday"),
+		expected: [],
+	}),
+	c({
+		id: "r-open-ask-no-area",
+		kind: "ambiguous",
+		channel: "roster",
+		message: m("Priya", "can someone pick up the onboarding ticket"),
+		expected: [],
+	}),
+	c({
+		id: "r-chatter",
+		kind: "chatter",
+		channel: "roster",
+		message: m("Theo", "anyone want lunch?"),
+		expected: [],
 	}),
 ];
 

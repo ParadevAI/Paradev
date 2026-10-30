@@ -62,8 +62,8 @@ export function buildJevRequest(input: RouteInput) {
 				type: "choice",
 				instructions: `${dev.name} is an AI teammate in #${input.channelName}. ${areaOf(dev)} Should ${dev.name} reply to \`message\`?`,
 				criteria: {
-					respond: `\`message\` asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
-					stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person, or mentions ${dev.name} only in passing, or the request belongs to another area`,
+					respond: `\`message\` speaks to ${dev.name} by name to ask for something, or asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
+					stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person other than ${dev.name}, or mentions ${dev.name} only in passing, or the request belongs to another teammate's area`,
 				},
 			},
 		]),
