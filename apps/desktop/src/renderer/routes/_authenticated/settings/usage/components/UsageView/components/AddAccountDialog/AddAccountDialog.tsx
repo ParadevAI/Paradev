@@ -184,7 +184,9 @@ export function AddAccountDialog({
 
 	const command = switchTarget
 		? switchSignInCommand(switchTarget)
-		: addAccountCommand(agent, slug, credentialKind);
+		: slug
+			? addAccountCommand(agent, slug, credentialKind)
+			: "";
 	// Codex's API login takes the key at a terminal prompt; every other flow
 	// finishes in the browser.
 	const promptsForKey =
