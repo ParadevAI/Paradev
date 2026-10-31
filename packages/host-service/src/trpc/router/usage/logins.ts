@@ -6,9 +6,9 @@ import { mapWithConcurrency } from "../git/utils/git-helpers";
 import { readClaudeLoginFingerprint, readDefaultLoginEmail } from "./claude";
 import {
 	type ClaudeProfile,
-	discoverClaudeProfiles,
 	discoverCodexHomes,
 	readCodexProfileKind,
+	scanClaudeProfiles,
 } from "./profiles";
 
 // Each read runs `security` up to a dozen times in a row (readKeychainSecrets).
@@ -35,13 +35,20 @@ export function readClaudeFingerprints(
 	);
 }
 
-async function scanLogins() {
-	const [profiles, codexHomes, claudeDefaultEmail, claudeDefaultFingerprint] =
+const loginReaders = {
+	scanClaudeProfiles,
+	discoverCodexHomes,
+	readDefaultLoginEmail,
+	readClaudeLoginFingerprint,
+};
+
+export async function scanLogins(readers = loginReaders) {
+	const [claudeScan, codexHomes, claudeDefaultEmail, claudeDefaultFingerprint] =
 		await Promise.all([
-			discoverClaudeProfiles(),
-			discoverCodexHomes(),
-			readDefaultLoginEmail(),
-			readClaudeLoginFingerprint(null),
+			readers.scanClaudeProfiles(),
+			readers.discoverCodexHomes(),
+			readers.readDefaultLoginEmail(),
+			readers.readClaudeLoginFingerprint(null),
 		]);
 	// auth.json fingerprints let the UI notice a re-login on any Codex home
 	// (its email is only knowable via the network). The first home is the
@@ -69,7 +76,12 @@ async function scanLogins() {
 	return {
 		homeDir: homedir(),
 		claudeDefaultFingerprint,
-		claude: await readClaudeFingerprints(profiles),
+		claude: await readClaudeFingerprints(
+			claudeScan.profiles,
+			readers.readClaudeLoginFingerprint,
+		),
+		// Discovery stopped at its time budget: `claude` can lack real profiles.
+		claudePartial: claudeScan.partial,
 		codex,
 		claudeDefaultEmail,
 	};
