@@ -61,6 +61,11 @@ export function AutomationGroupPicker({
 	// Radix moves between items only once one has focus, so the field hands
 	// focus to the list itself.
 	const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+		// Enter and arrows confirm IME composition (Chinese, Japanese, Korean).
+		if (event.nativeEvent.isComposing) {
+			event.stopPropagation();
+			return;
+		}
 		if (event.key === "Enter") {
 			event.preventDefault();
 			items()[0]?.click();

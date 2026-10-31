@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { selectRange } from "../../utils/selectRange";
 
 export interface RowSelectEvent {
@@ -12,6 +12,16 @@ export interface RowSelectEvent {
 export function useRowSelection(order: readonly string[]) {
 	const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
 	const [anchor, setAnchor] = useState<string | null>(null);
+
+	// Rows that leave the screen leave the selection for good, so they don't
+	// come back selected when the filter clears or the group expands.
+	useEffect(() => {
+		const shown = new Set(order);
+		setPicked((prev) => {
+			const kept = [...prev].filter((id) => shown.has(id));
+			return kept.length === prev.size ? prev : new Set(kept);
+		});
+	}, [order]);
 
 	const selected = useMemo(() => {
 		const shown = new Set(order);

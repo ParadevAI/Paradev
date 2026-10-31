@@ -278,7 +278,10 @@ function AutomationsPage() {
 			toast.error(
 				errorMessage(error, t({ message: "Failed to update automation" })),
 			),
-		onSettled: () => void utils.automation.list.invalidate(),
+		onSettled: (_data, _error, { ids }) => {
+			void utils.automation.list.invalidate();
+			for (const id of ids) void utils.automation.get.invalidate({ id });
+		},
 	});
 
 	const deleteMutation = useMutation({
