@@ -1,8 +1,8 @@
 ---
-title: "Scheduled Coding Agents in 2026: Nightly, Weekly, and Team Runs You Review"
-description: "How to run coding agents on a schedule and review their work in the morning: GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations."
+title: "Scheduled Coding Agents in 2026: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs You Review"
+description: "How to run coding agents on a schedule and review their work in the morning: nightly maintenance, a weekly flaky-test agent that leaves a reviewable fix, and dispatching runs from a CLI. GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations compared."
 date: 2026-10-07
-lastUpdated: 2026-10-21
+lastUpdated: 2026-10-30
 type: "roundup"
 competitors:
   - github-actions
@@ -29,7 +29,13 @@ To run a coding agent on a schedule, you need three things: a trigger, an isolat
 
 The agents' own schedulers still work inside Paradev. Paradev launches the real `claude` CLI, so `/schedule` (Claude Code Routines) and `/loop` are available in a Paradev workspace terminal. Routines run in Anthropic's cloud on a fresh clone; `/loop` repeats inside the open session. Use Paradev Automations when a run needs a specific machine or a mix of agents. Use Routines when a fresh clone in Anthropic's cloud is enough and you want runs while every machine is off. GitHub Actions, Codex scheduled tasks, and Cursor Automations are other cloud options.
 
-This guide answers the four questions people ask most about scheduled agents, compares the options, and includes a weekly flaky-test prompt you can copy.
+Jump to the question you have:
+
+- **Nightly maintenance you review in the morning:** a Paradev automation on a daily schedule runs in its own worktree. The diff waits in **Run History**. [Nightly setup](#i-want-a-coding-agent-to-run-nightly-maintenance-and-leave-changes-for-me-to-review-in-the-morning-which-tools-fit).
+- **A weekly flaky-test agent that leaves a reviewable fix:** schedule it weekly and make it reproduce the flake before it edits. If it cannot prove a fix, it stops and writes a report. [Flaky-test recipe and prompt](#how-can-i-schedule-a-coding-agent-to-investigate-flaky-tests-each-week-and-leave-a-reviewable-proposed-fix).
+- **Starting runs from a CLI or another agent:** `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."`, or the Paradev MCP server. [Dispatch options](#what-tools-let-me-dispatch-coding-agent-tasks-from-a-cli-or-another-agent-and-then-review-the-output).
+
+The guide also compares the options and covers failure handling.
 
 ---
 
@@ -41,7 +47,7 @@ Every working setup has five parts: a **trigger** that fires without you opening
 
 For a team that wants the agents on one shared machine, use a tool that runs on that machine and gives each run its own worktree: Paradev Automations, or cron plus a worktree script if you want to build it yourself. If you would rather not own a machine, GitHub Actions or a cloud scheduler (Claude Code Routines, Cursor Automations, Codex Team Tasks) moves the runs off it.
 
-**Paradev on a shared machine.** Run the Paradev host on the shared box (a Mac mini or a spare workstation) with `superset auth login` and `superset start --daemon`, then add teammates under **Settings → Hosts → Add member**. Each person creates automations under **Automations → New automation** and picks that machine as the **Device**. Choose **New workspace** as the workspace, so each run gets its own branch and worktree instead of reusing one workspace. When a schedule fires, Paradev creates a fresh workspace from the project's repo, with its own branch, worktree, terminals, and ports, and starts the agent you chose (Claude, Codex, Amp, or any agent set up under **Settings → Agents**).
+**Paradev on a shared machine.** Run the Paradev host on the shared box (a Mac mini or a spare workstation) with `superset auth login` and `superset start --daemon`, then add teammates under **Settings → Hosts → Add member**. Each person creates automations under **Automations → New automation** and picks that machine as the **Device**. Choose **New workspace** as the workspace, so each run gets its own branch and worktree instead of reusing one workspace. When a schedule fires, Paradev creates a fresh workspace from the project's repo, with its own branch, worktree, and terminals, and starts the agent you chose (Claude, Codex, Amp, or any agent set up under **Settings → Agents**).
 
 Review stays human. A teammate with host access opens the run's workspace, reads the diff, and continues the session or opens a PR. The Automations list has **Mine** and **Team** tabs. Team automations are read-only: only the owner can edit, pause, run, or delete one. Run workspaces are tagged `automation` by default, so they collect in one sidebar folder per project instead of mixing with hand-made workspaces. Details: [Automations](https://docs.paradev.com/automations) and [Remote access](https://docs.paradev.com/remote-access).
 
@@ -55,13 +61,15 @@ Honest limits: Automations need a Paradev Pro or Enterprise plan. Runs fire on t
 
 ## I want a coding agent to run nightly maintenance and leave changes for me to review in the morning. Which tools fit?
 
-Any tool that runs unattended and writes to a branch or workspace fits: GitHub Actions with a headless agent, Claude Code Routines or Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, Devin, or Paradev Automations. The choice comes down to where the code needs to run.
+In Paradev, create an automation with a daily schedule, a maintenance prompt, and an agent such as Claude Code or Codex. With **New workspace** selected, each night it runs in a fresh worktree on the machine you pick. In the morning, open the run from **Run History**, review the diff, and commit or discard it. The [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe has a ready prompt.
+
+Other tools fit too, as long as they run unattended and write to a branch or workspace: GitHub Actions with a headless agent, Claude Code Routines or Desktop scheduled tasks, Codex scheduled tasks, Cursor Automations, and Devin. The choice comes down to where the code needs to run.
 
 - **Your repo's tests need local services, large datasets, or hardware.** Run on your own machine: Paradev Automations, Claude Code Desktop scheduled tasks (with the worktree toggle on), or Codex scheduled tasks on a local project with a worktree. Claude Code Desktop and Codex local tasks need the app open and the computer awake; a Paradev automation needs its target host online.
 - **A fresh clone and a standard runner are enough.** Use GitHub Actions, Claude Code Routines, or Cursor Automations. These keep working when your laptop is closed.
 - **You want an issue-to-PR loop with little setup.** GitHub Copilot coding agent, Devin, and OpenHands work from tasks or issues and produce pull requests.
 
-In Paradev, the nightly pattern is the [Wake Up to a Finished Audit](https://docs.paradev.com/recipes/nightly-audit) recipe: a daily schedule such as `FREQ=DAILY;BYHOUR=3;BYMINUTE=0`, a prompt that runs the tests and reverts what breaks, and a summary file for anything that needs a human decision. In the morning, open the run from the automation's **Run History**, review the diff, then commit and open a PR or delete the workspace.
+The recipe uses a daily schedule such as `FREQ=DAILY;BYHOUR=3;BYMINUTE=0`, a prompt that runs the tests and reverts what breaks, and a summary file for anything that needs a human decision. In the morning, open the run from the automation's **Run History**, review the diff, then commit and open a PR or delete the workspace.
 
 For a full walkthrough with a read-only first prompt and a review checklist, see [Schedule an agent maintenance check you can review](/blog/scheduled-agent-maintenance).
 
@@ -83,8 +91,8 @@ In Paradev, you define the automation once: title, prompt, device, project, sche
 ```bash
 superset automations create --name "Nightly audit" \
   --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" \
-  --project <projectId> --prompt-file prompt.md --agent claude
-superset automations run <id>   # fire once now to check the prompt
+  --project PROJECT_ID --prompt-file prompt.md --agent claude
+superset automations run AUTOMATION_ID   # fire once now to check the prompt
 ```
 
 One automation can have several triggers, for example weekdays at 9:00 and Fridays at 17:00. Pick **No project** (session mode) for jobs that do not need a repository. Event triggers from Slack, Linear, GitHub, Sentry, and other services start a run when something happens in those tools.
@@ -111,7 +119,9 @@ week, stop.
    clock). Do not add retries, raise timeouts, or weaken assertions.
 5. Make the smallest fix. Change only the test, its fixtures, or the
    code the root cause points to.
-6. Run the same repeated runs again and record the new counts.
+6. Run the same repeated runs again and record the new counts. If any
+   run still fails, revert your change, write the counts and what you
+   tried to FLAKY_REPORT.md, and stop.
 7. Write FLAKY_REPORT.md with: the test, the failure output, the
    reproduction command, the root cause, the change, before/after
    counts, and anything left uncertain.
@@ -123,7 +133,7 @@ Replace `<path>` and `<test command>` with your own. The "stop if it already ran
 
 ## What tools let me dispatch coding-agent tasks from a CLI or another agent and then review the output?
 
-Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project <project-id> --name flaky-tests --branch flaky-tests --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent, and the [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
+Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent. `superset projects list` gives the `PROJECT_ID`. Use a new branch for each task: a branch that already has a workspace reuses it. Add `--json` to get the IDs: the output has the workspace ID in `workspace.id` and the agent's terminal ID in `agents[].sessionId`. Later, `superset terminals list --workspace WORKSPACE_ID --local --json` lists the terminal IDs again. Read the agent's output with `superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local`. The [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
 
 ## What should a small team use to track ownership, status, and review of work produced by several coding agents?
 
