@@ -7,6 +7,6 @@ export async function signInInBrowser(
 ): Promise<void> {
 	await signInSocial(signIn.social, {
 		provider,
-		callbackURL: `${window.location.origin}/`,
+		callbackURL: `${window.location.origin}${process.env.EXPO_BASE_URL ?? ""}/`,
 	});
 }

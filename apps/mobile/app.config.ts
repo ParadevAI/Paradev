@@ -24,6 +24,8 @@ const webUrl = new URL(
 const associatedDomains =
 	webUrl.protocol === "https:" ? [`applinks:${webUrl.hostname}`] : undefined;
 
+const webBaseUrl = process.env.MOBILE_WEB_BASE_URL;
+
 const SIGNED_BUILD_PROFILES = ["preview", "production"];
 const signedUpdates = process.env.MOBILE_SIGNED_UPDATES === "1";
 if (
@@ -99,6 +101,7 @@ export default ({ config }: ConfigContext) => ({
 		favicon: "./assets/favicon.png",
 		bundler: "metro",
 	},
+	...(webBaseUrl && { experiments: { baseUrl: webBaseUrl } }),
 	plugins: [
 		// Dark, not white: iOS 26 fills a prominent system control with the
 		// accent, so the photo picker's confirm button became a lit white disc
