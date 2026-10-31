@@ -32,11 +32,13 @@ import type {
 	DeferredDiffReason,
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
+import { boundPatch, MAX_PATCH_LENGTH } from "./boundPatch";
 import {
 	type ParsedPatchGroup,
 	type PatchGroupResult,
 	parsePatchGroup,
 } from "./parsePatchGroup";
+import { splitPatchInput } from "./splitPatchInput";
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
@@ -278,7 +280,15 @@ export function useDiffCodeViewItems({
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
 				try {
-					const { patch } = await trpcClient.git.getDiffPatch.query(input);
+					const patches: string[] = [];
+					let length = 0;
+					for (const batch of splitPatchInput(input)) {
+						if (length >= MAX_PATCH_LENGTH) break;
+						const { patch } = await trpcClient.git.getDiffPatch.query(batch);
+						patches.push(patch);
+						length += patch.length;
+					}
+					const patch = boundPatch(patches.join(""));
 					return { kind: "patch", patch, ...requested };
 				} catch (error) {
 					if (!isMissingProcedureError(error)) throw error;
