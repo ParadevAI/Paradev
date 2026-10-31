@@ -3,7 +3,7 @@ import { errorMessage } from "@superset/i18n/errors";
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
 import { toast } from "@superset/ui/sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { getTerminalAgentBindingsQueryKey } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
@@ -53,7 +53,6 @@ export function useDashboardSidebarWorkspaceItemActions({
 	const organizationId = useActiveOrganizationId();
 	const setCloudInSidebar = useCloudSidebarStore((s) => s.setInSidebar);
 	const navigate = useNavigate();
-	const matchRoute = useMatchRoute();
 	const hostService = useLocalHostService();
 	const { activeHostUrl } = hostService;
 	const { copyToClipboard } = useCopyToClipboard();
@@ -93,10 +92,14 @@ export function useDashboardSidebarWorkspaceItemActions({
 		setPendingName(null);
 	}
 
-	const isActive = !!matchRoute({
-		to: "/v2-workspace/$workspaceId",
-		params: { workspaceId },
-		fuzzy: true,
+	// A boolean selector, so a navigation re-renders only the rows whose
+	// active state flips, not every row in the sidebar.
+	const isActive = useRouterState({
+		select: (state) => {
+			const path = `/v2-workspace/${workspaceId}`;
+			const { pathname } = state.location;
+			return pathname === path || pathname.startsWith(`${path}/`);
+		},
 	});
 
 	const handleClick = () => {
