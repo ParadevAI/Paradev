@@ -1,3 +1,4 @@
+import { isTestAccountEmail } from "@superset/shared/constants";
 import { useEffect } from "react";
 import { ACTIVE_ORG_ID_KEY } from "renderer/hooks/useSignOut";
 import { authClient } from "renderer/lib/auth-client";
@@ -12,6 +13,10 @@ export function PostHogUserIdentifier() {
 
 	useEffect(() => {
 		if (!user) return;
+		if (isTestAccountEmail(user.email)) {
+			setUserId({ userId: null });
+			return;
+		}
 		const createdAt = user.createdAt
 			? new Date(user.createdAt).toISOString()
 			: undefined;
