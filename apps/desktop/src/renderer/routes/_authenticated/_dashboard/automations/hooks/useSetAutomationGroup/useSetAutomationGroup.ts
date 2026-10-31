@@ -11,6 +11,8 @@ interface SetAutomationGroupInput {
 	/** Shown in the toast when one automation moves. */
 	name?: string;
 	group: string | null;
+	/** Replaces the default toast, e.g. after deleting a group. */
+	successMessage?: string;
 }
 
 /** Moves automations to a group (null ungroups), updating the list at once. */
@@ -41,7 +43,11 @@ export function useSetAutomationGroup() {
 				);
 			}
 		},
-		onSuccess: (_result, { ids, name, group }) => {
+		onSuccess: (_result, { ids, name, group, successMessage }) => {
+			if (successMessage) {
+				toast.success(successMessage);
+				return;
+			}
 			const count = ids.length;
 			if (count === 1 && name) {
 				toast.success(

@@ -139,6 +139,10 @@ function AutomationsPage() {
 	const [pendingDelete, setPendingDelete] = useState<
 		AutomationListItem[] | null
 	>(null);
+	const [pendingGroupDelete, setPendingGroupDelete] = useState<{
+		group: string;
+		ids: string[];
+	} | null>(null);
 	const [hostOfflineRun, setHostOfflineRun] = useState<{
 		hostId: string | null;
 	} | null>(null);
@@ -1058,6 +1062,15 @@ function AutomationsPage() {
 																				)
 																		: undefined
 																}
+																onDeleteGroup={
+																	selectable && group !== null
+																		? () =>
+																				setPendingGroupDelete({
+																					group,
+																					ids: items.map((a) => a.id),
+																				})
+																		: undefined
+																}
 																drop={
 																	canDrag
 																		? { active: dropActiveFor(group) }
@@ -1164,6 +1177,47 @@ function AutomationsPage() {
 					if (!next) setHostOfflineRun(null);
 				}}
 			/>
+
+			<AlertDialog
+				open={!!pendingGroupDelete}
+				onOpenChange={(next) => {
+					if (!next) setPendingGroupDelete(null);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							<Trans>Delete group "{pendingGroupDelete?.group}"?</Trans>
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							<Plural
+								value={pendingGroupDelete?.ids.length ?? 0}
+								one="Its # automation moves to No group. The automation itself is kept."
+								other="Its # automations move to No group. The automations themselves are kept."
+							/>
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>
+							<Trans>Cancel</Trans>
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => {
+								if (!pendingGroupDelete) return;
+								const { group, ids } = pendingGroupDelete;
+								setGroup({
+									ids,
+									group: null,
+									successMessage: t({ message: `Deleted group "${group}"` }),
+								});
+								setPendingGroupDelete(null);
+							}}
+						>
+							<Trans>Delete group</Trans>
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 
 			<AlertDialog
 				open={!!pendingDelete}

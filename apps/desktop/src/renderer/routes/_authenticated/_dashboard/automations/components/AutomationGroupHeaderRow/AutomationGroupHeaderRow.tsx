@@ -1,10 +1,16 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
 import { TableCell, TableRow } from "@superset/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { LuChevronRight, LuPlus } from "react-icons/lu";
+import { LuChevronRight, LuPlus, LuTrash2 } from "react-icons/lu";
 
 interface AutomationGroupHeaderRowProps {
 	/** Null is the section of automations in no group. */
@@ -20,6 +26,8 @@ interface AutomationGroupHeaderRowProps {
 	onSelectAll?: () => void;
 	/** Accepts dragged automations; omitted when the table can't be dragged. */
 	drop?: { active: boolean };
+	/** Right-click "Delete group"; omitted where the rows can't be regrouped. */
+	onDeleteGroup?: () => void;
 }
 
 export function AutomationGroupHeaderRow({
@@ -32,6 +40,7 @@ export function AutomationGroupHeaderRow({
 	isCreating,
 	onSelectAll,
 	drop,
+	onDeleteGroup,
 }: AutomationGroupHeaderRowProps) {
 	const { t } = useLingui();
 	const { setNodeRef } = useDroppable({
@@ -39,7 +48,7 @@ export function AutomationGroupHeaderRow({
 		data: { group },
 		disabled: !drop,
 	});
-	return (
+	const row = (
 		<TableRow
 			ref={setNodeRef}
 			data-drop-active={drop?.active || undefined}
@@ -104,5 +113,18 @@ export function AutomationGroupHeaderRow({
 				</div>
 			</TableCell>
 		</TableRow>
+	);
+
+	if (!onDeleteGroup || group === null) return row;
+	return (
+		<ContextMenu>
+			<ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
+			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
+				<ContextMenuItem variant="destructive" onSelect={onDeleteGroup}>
+					<LuTrash2 className="size-4" />
+					<Trans>Delete group…</Trans>
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 }

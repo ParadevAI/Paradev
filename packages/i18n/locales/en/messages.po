@@ -333,6 +333,10 @@ msgstr "{0, plural, one {Failed to close # port} other {Failed to close # ports}
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {Linear issue} other {Linear issues}}"
@@ -6586,6 +6590,13 @@ msgstr "Delete file"
 msgid "Delete group"
 msgstr "Delete group"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Delete group \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Delete group…"
+
 msgid "Delete host"
 msgstr "Delete host"
 
@@ -6700,6 +6711,9 @@ msgstr "Deleted {name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Deleted group \"{group}\""
 
 msgid "deleted or unavailable — pick another"
 msgstr "deleted or unavailable — pick another"

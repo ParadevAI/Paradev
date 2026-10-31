@@ -333,6 +333,10 @@ msgstr "{0, plural, one {關閉#個埠失敗} other {關閉#個埠失敗}}"
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {已匯入#個工作區} other {已匯入#個工作區}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {其中 # 個自動化將移到「無群組」。自動化本身會保留。} other {其中 # 個自動化將移到「無群組」。自動化本身會保留。}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {Linear議題} other {Linear議題}}"
@@ -6586,6 +6590,13 @@ msgstr "刪除檔案"
 msgid "Delete group"
 msgstr "刪除群組"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "刪除群組「{0}」？"
+
+msgid "Delete group…"
+msgstr "刪除群組…"
+
 msgid "Delete host"
 msgstr "刪除主機"
 
@@ -6700,6 +6711,9 @@ msgstr "已刪除{name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "{deletedBy} {deletedWhen}刪除 · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "已刪除群組「{group}」"
 
 msgid "deleted or unavailable — pick another"
 msgstr "已刪除或不可用，請另選一個"

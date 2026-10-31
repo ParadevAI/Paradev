@@ -327,6 +327,10 @@ msgstr "{0, plural, one {Не вдалося закрити # порт} few {Н�
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Імпортовано # робочий простір} few {Імпортовано # робочі простори} many {Імпортовано # робочих просторів} other {Імпортовано # робочого простору}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {Її # автоматизація перейде до «Без групи». Сама автоматизація залишиться.} few {Її # автоматизації перейдуть до «Без групи». Самі автоматизації залишаться.} many {Її # автоматизацій перейдуть до «Без групи». Самі автоматизації залишаться.} other {Її # автоматизації перейдуть до «Без групи». Самі автоматизації залишаться.}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {issue з Linear} few {issues з Linear} many {issues з Linear} other {issues з Linear}}"
@@ -6580,6 +6584,13 @@ msgstr "Видалити файл"
 msgid "Delete group"
 msgstr "Видалити групу"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Видалити групу «{0}»?"
+
+msgid "Delete group…"
+msgstr "Видалити групу…"
+
 msgid "Delete host"
 msgstr "Видалити хост"
 
@@ -6694,6 +6705,9 @@ msgstr "{name} видалено"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Видалено: {deletedBy}, {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Групу «{group}» видалено"
 
 msgid "deleted or unavailable — pick another"
 msgstr "видалено або недоступно — виберіть інше"

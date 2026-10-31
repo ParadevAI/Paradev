@@ -333,6 +333,10 @@ msgstr "{0, plural, one {Chiusura di # porta non riuscita} other {Chiusura di # 
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Importato # workspace} other {Importati # workspace}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {La sua # automazione passa a «Nessun gruppo». L’automazione viene mantenuta.} other {Le sue # automazioni passano a «Nessun gruppo». Le automazioni vengono mantenute.}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
@@ -6586,6 +6590,13 @@ msgstr "Elimina il file"
 msgid "Delete group"
 msgstr "Elimina il gruppo"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Eliminare il gruppo \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Elimina gruppo…"
+
 msgid "Delete host"
 msgstr "Elimina l'host"
 
@@ -6700,6 +6711,9 @@ msgstr "{name} eliminato"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Eliminato da {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Gruppo \"{group}\" eliminato"
 
 msgid "deleted or unavailable — pick another"
 msgstr "eliminato o non disponibile — scegline un altro"

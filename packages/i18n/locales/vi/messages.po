@@ -333,6 +333,10 @@ msgstr "{0, plural, one {Không thể đóng # cổng} other {Không thể đón
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Đã nhập # workspace} other {Đã nhập # workspace}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {# tự động hóa trong nhóm sẽ chuyển sang Không có nhóm. Bản thân tự động hóa vẫn được giữ.} other {# tự động hóa trong nhóm sẽ chuyển sang Không có nhóm. Bản thân tự động hóa vẫn được giữ.}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
@@ -6586,6 +6590,13 @@ msgstr "Xóa tệp"
 msgid "Delete group"
 msgstr "Xóa nhóm"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Xóa nhóm \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Xóa nhóm…"
+
 msgid "Delete host"
 msgstr "Xóa host"
 
@@ -6700,6 +6711,9 @@ msgstr "Đã xóa {name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "{deletedBy} đã xóa {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Đã xóa nhóm \"{group}\""
 
 msgid "deleted or unavailable — pick another"
 msgstr "đã bị xóa hoặc không khả dụng — hãy chọn cái khác"

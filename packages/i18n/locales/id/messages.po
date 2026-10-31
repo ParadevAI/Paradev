@@ -333,6 +333,10 @@ msgstr "{0, plural, one {Gagal menutup # port} other {Gagal menutup # port}}"
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Mengimpor # workspace} other {Mengimpor # workspace}}"
 
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.} other {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.}}"
+
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
 msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
@@ -6586,6 +6590,13 @@ msgstr "Hapus file"
 msgid "Delete group"
 msgstr "Hapus grup"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Hapus grup \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Hapus grup…"
+
 msgid "Delete host"
 msgstr "Hapus host"
 
@@ -6700,6 +6711,9 @@ msgstr "Menghapus {name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Dihapus oleh {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Grup \"{group}\" dihapus"
 
 msgid "deleted or unavailable — pick another"
 msgstr "dihapus atau tidak tersedia — pilih yang lain"
