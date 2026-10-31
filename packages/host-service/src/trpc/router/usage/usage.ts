@@ -243,9 +243,11 @@ export const usageRouter = router({
 	/**
 	 * Deletes a secondary profile: its dir plus, for Claude on macOS, its
 	 * scoped keychain items. The system default (selection null) is never
-	 * removable, and only currently discovered profiles are accepted. A
-	 * default pointer at the removed profile is cleared so agents fall back
-	 * to the system login instead of a dead dir.
+	 * removable, and only currently discovered profiles are accepted. Only a
+	 * profile Paradev created is deleted; any other is refused with
+	 * PRECONDITION_FAILED (profile-remove.ts). A default pointer at the
+	 * removed profile is cleared so agents fall back to the system login
+	 * instead of a dead dir.
 	 */
 	removeAccount: protectedProcedure
 		.input(
