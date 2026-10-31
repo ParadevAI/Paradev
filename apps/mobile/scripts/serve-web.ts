@@ -5,25 +5,46 @@
  *
  * Run from apps/mobile: bun --env-file=../../.env scripts/serve-web.ts
  */
-import { join, normalize } from "node:path";
+import { readFile, stat } from "node:fs/promises";
+import { createServer } from "node:http";
+import { dirname, extname, join, normalize } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const staticDir = join(import.meta.dir, "../.vercel/output/static");
+const staticDir = join(
+	dirname(fileURLToPath(import.meta.url)),
+	"../.vercel/output/static",
+);
+const indexFile = join(staticDir, "agents/index.html");
 const port = Number(process.env.AGENTS_PORT ?? 3019);
+const CONTENT_TYPES: Record<string, string> = {
+	".css": "text/css; charset=utf-8",
+	".html": "text/html; charset=utf-8",
+	".ico": "image/x-icon",
+	".js": "text/javascript; charset=utf-8",
+	".json": "application/json",
+	".png": "image/png",
+	".riv": "application/octet-stream",
+	".svg": "image/svg+xml",
+	".ttf": "font/ttf",
+};
 
-Bun.serve({
-	port,
-	async fetch(request) {
-		const { pathname } = new URL(request.url);
-		if (pathname !== "/agents" && !pathname.startsWith("/agents/")) {
-			return new Response("Not found", { status: 404 });
-		}
-		const file = Bun.file(join(staticDir, normalize(pathname)));
-		if (pathname !== "/agents/" && (await file.exists())) {
-			return new Response(file);
-		}
-		return new Response(Bun.file(join(staticDir, "agents/index.html")), {
-			headers: { "content-type": "text/html; charset=utf-8" },
-		});
-	},
+async function resolveFile(pathname: string): Promise<string> {
+	const file = join(staticDir, normalize(decodeURIComponent(pathname)));
+	const info = await stat(file).catch(() => null);
+	return info?.isFile() ? file : indexFile;
+}
+
+createServer(async (request, response) => {
+	const { pathname } = new URL(request.url ?? "/", "http://localhost");
+	if (pathname !== "/agents" && !pathname.startsWith("/agents/")) {
+		response.writeHead(404).end("Not found");
+		return;
+	}
+	const file = await resolveFile(pathname);
+	response.writeHead(200, {
+		"content-type": CONTENT_TYPES[extname(file)] ?? "application/octet-stream",
+	});
+	response.end(await readFile(file));
+}).listen(port, () => {
+	console.log(`Agents web: http://localhost:${port}/agents`);
 });
-console.log(`Agents web: http://localhost:${port}/agents`);

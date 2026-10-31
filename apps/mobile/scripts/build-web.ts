@@ -6,10 +6,11 @@
  */
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const BASE_URL = "/agents";
-const mobileRoot = join(import.meta.dir, "..");
+const mobileRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const exportDir = join(mobileRoot, "dist/web");
 const outputDir = join(mobileRoot, ".vercel/output");
 
