@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
+import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { computeChecksStatus } from "@superset/shared/pull-request-checks";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
@@ -55,7 +57,6 @@ import {
 	coerceChecksStatus,
 	coercePullRequestState,
 	coerceReviewDecision,
-	computeChecksStatus,
 	mapPullRequestState,
 	mapReviewDecision,
 	type PullRequestCheck,

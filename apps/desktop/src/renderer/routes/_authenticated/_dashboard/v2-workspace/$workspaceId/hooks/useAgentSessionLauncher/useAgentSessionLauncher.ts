@@ -6,7 +6,7 @@ import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useAwaitAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import {
 	useV2AgentConfigs,
@@ -63,14 +63,14 @@ export function useAgentSessionLauncher({
 	const { t } = useLingui();
 	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
 	const appearance = useTerminalAppearance();
-	const awaitAcpChatEnabled = useAwaitAcpChatEnabled();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const queryClient = useQueryClient();
 
 	const openAgentChat = useCallback<OpenAgentChat>(
 		async (input) => {
-			if (!(await awaitAcpChatEnabled())) return null;
+			if (!(await resolveAcpChatEnabled())) return null;
 			const configs = await queryClient
 				.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
 				.catch(() => agentConfigs ?? []);
@@ -104,7 +104,7 @@ export function useAgentSessionLauncher({
 			}
 			return { terminalId };
 		},
-		[awaitAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
+		[resolveAcpChatEnabled, queryClient, hostUrl, agentConfigs, store],
 	);
 
 	const openNewChat = useCallback<OpenNewChat>(async () => {

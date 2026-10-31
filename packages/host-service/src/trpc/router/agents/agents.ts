@@ -216,8 +216,8 @@ export function validateAgentEffortSelection(
 		});
 	}
 
-	// Some efforts only exist on some of the agent's models (Codex's max and
-	// ultra need GPT-5.6; cursor-agent only has a ladder for some models),
+	// Some efforts only exist on some of the agent's models (Codex's Luna
+	// models stop at max; cursor-agent only has a ladder for some models),
 	// so the accepted set follows the selected model.
 	const efforts = getAgentEfforts(presetId, model);
 	if (efforts.length === 0) {

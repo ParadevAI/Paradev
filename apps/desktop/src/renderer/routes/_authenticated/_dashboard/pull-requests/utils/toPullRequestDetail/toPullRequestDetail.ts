@@ -1,35 +1,17 @@
 import type {
 	PullRequestCheck,
-	PullRequestCheckStatus,
-	PullRequestChecksStatus,
 	PullRequestMergeability,
 	PullRequestReviewDecision,
 } from "@superset/shared/pull-request";
+import {
+	checkRunStatus,
+	computeChecksStatus,
+} from "@superset/shared/pull-request-checks";
 import type {
 	PullRequestDetailCheck,
 	PullRequestDetailRead,
 } from "@superset/shared/pull-request-detail";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
-
-function checkStatus(check: PullRequestDetailCheck): PullRequestCheckStatus {
-	if (check.status !== "COMPLETED") return "pending";
-	switch (check.conclusion) {
-		case "SUCCESS":
-			return "success";
-		case "SKIPPED":
-		case "NEUTRAL":
-			return "skipped";
-		case "CANCELLED":
-			return "cancelled";
-		case "FAILURE":
-		case "TIMED_OUT":
-		case "ACTION_REQUIRED":
-		case "STARTUP_FAILURE":
-			return "failure";
-		default:
-			return "pending";
-	}
-}
 
 /** One row per check name; a re-run replaces the run it supersedes. */
 function toChecks(checks: PullRequestDetailCheck[]): PullRequestCheck[] {
@@ -42,17 +24,9 @@ function toChecks(checks: PullRequestDetailCheck[]): PullRequestCheck[] {
 	}
 	return [...latest.values()].map((check) => ({
 		name: check.name,
-		status: checkStatus(check),
+		status: checkRunStatus(check.status, check.conclusion),
 		url: check.detailsUrl,
 	}));
-}
-
-function checksStatus(checks: PullRequestCheck[]): PullRequestChecksStatus {
-	if (checks.length === 0) return "none";
-	if (checks.some((c) => c.status === "failure" || c.status === "cancelled"))
-		return "failure";
-	if (checks.some((c) => c.status === "pending")) return "pending";
-	return "success";
 }
 
 function reviewDecision(value: string | null): PullRequestReviewDecision {
@@ -96,7 +70,7 @@ export function toPullRequestDetail(
 		},
 		base: { ref: pr.baseBranch },
 		reviewDecision: reviewDecision(read.mergeability.reviewDecision),
-		checksStatus: checksStatus(checks),
+		checksStatus: computeChecksStatus(checks),
 		checks,
 		createdAt: activity?.createdAt ?? "",
 		updatedAt: activity?.updatedAt ?? "",

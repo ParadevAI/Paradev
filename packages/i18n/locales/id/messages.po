@@ -3201,6 +3201,9 @@ msgstr "Avatar (atom)"
 msgid "Avatar updated!"
 msgstr "Avatar diperbarui!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel, dan Kiet Ho di YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "Menunggu {0}"
@@ -3521,9 +3524,6 @@ msgstr "Impor ruang kerja Anda"
 
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Bawa proyek, workspace, dan skrip terminal v1 ke v2. Tiap item diimpor satu per satu dan bisa dicoba ulang."
-
-msgid "Bring your agents together."
-msgstr "Satukan agen-agen Anda."
 
 msgid "Bringing over your v1 projects"
 msgstr "Memindahkan proyek v1 Anda"
@@ -5963,6 +5963,9 @@ msgstr "Tidak bisa meng-unstage file"
 
 msgid "Couldn't update pull request"
 msgstr "Tidak bisa memperbarui pull request"
+
+msgid "Couldn't update the Chat setting"
+msgstr "Tidak dapat memperbarui pengaturan Chat"
 
 msgid "Couldn't update the queue"
 msgstr "Tidak dapat memperbarui antrean"
@@ -9960,6 +9963,9 @@ msgstr "Permintaan Tidak Valid"
 msgid "Invalid state parameter. Please try again."
 msgstr "Parameter state tidak valid. Silakan coba lagi."
 
+msgid "Investigate production logs and issues"
+msgstr "Selidiki log dan masalah produksi"
+
 msgid "Invitation canceled"
 msgstr "Undangan dibatalkan"
 
@@ -10285,6 +10291,9 @@ msgstr "Pintasan keyboard"
 msgid "Keyboard Shortcuts"
 msgstr "Pintasan Keyboard"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel, dan Avi Peltz presentasi di YC"
+
 msgid "Kill"
 msgstr "Matikan"
 
@@ -10556,9 +10565,6 @@ msgstr "Sudah keluar dari organisasi"
 
 msgid "Left team"
 msgstr "Sudah keluar dari tim"
-
-msgid "Legal"
-msgstr "Legal"
 
 msgid "Less"
 msgstr "Lebih sedikit"
@@ -13117,6 +13123,9 @@ msgstr "Buka pengaturan admin ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Buka pengaturan ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Buka sesi Claude dan Codex sebagai obrolan"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Buka sesi Claude dan Codex di panel chat, bukan di terminal."
 
@@ -13518,9 +13527,6 @@ msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 
 msgid "Options"
 msgstr "Opsi"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "Atau minta agen coding Anda memasang CLI Paradev."
 
 msgid "Orange"
 msgstr "Oranye"
@@ -17599,6 +17605,10 @@ msgstr "Kecil"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Kecil"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Tuntaskan backlog Anda."
 
 msgid "Smileys & People"
 msgstr "Smiley & Orang"

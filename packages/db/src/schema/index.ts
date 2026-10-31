@@ -13,4 +13,5 @@ export * from "./relations";
 export * from "./schema";
 export * from "./slack";
 export * from "./types";
+export * from "./user-settings";
 export * from "./zod";

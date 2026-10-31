@@ -1,12 +1,11 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { useFeatureFlagEnabled } from "posthog-js/react";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 /**
  * EXPERIMENT: snapshot the worktree around each ACP chat turn, for the turn's
- * changes card and its Undo. Off by default; the toggle shows only with the
- * `acp-chat` flag.
+ * changes card and its Undo. Off by default; the toggle shows only while the
+ * chat experiment is on.
  *
  * To conclude the experiment, remove: this store, moving its
  * `chat-turn-snapshots` key to `DEAD_KEYS` in `lib/persisted-keys`; its toggle
@@ -33,7 +32,7 @@ export const useChatTurnSnapshotsStore = create<ChatTurnSnapshotsState>()(
 );
 
 export function useChatTurnSnapshotsEnabled(): boolean {
-	const flag = useFeatureFlagEnabled(FEATURE_FLAGS.ACP_CHAT) === true;
+	const chatEnabled = useAcpChatEnabled();
 	const enabled = useChatTurnSnapshotsStore((state) => state.enabled);
-	return flag && enabled;
+	return chatEnabled && enabled;
 }
