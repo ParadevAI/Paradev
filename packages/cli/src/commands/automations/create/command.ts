@@ -4,6 +4,7 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import { command } from "../../../lib/command";
 import { resolveHostFilter } from "../../../lib/host-target";
 import { formatAutomationDate } from "../format";
+import { assertTriggersConnected } from "../missingConnectionError";
 import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
@@ -122,6 +123,8 @@ export default command({
 					})),
 					v2WorkspaceId: options.workspace ?? undefined,
 				};
+
+		await assertTriggersConnected(ctx.api, organizationId, triggers);
 
 		const result = await ctx.api.automation.create.mutate({
 			name: options.name,
