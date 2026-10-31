@@ -30,7 +30,11 @@ import {
 import { fetchGrokAccounts } from "./grok-quota";
 import { countAgentPrsByDay } from "./history/agent-prs";
 import { fetchOpencodeAccounts } from "./opencode-quota";
-import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
+import {
+	assertCodexHomeStillRemovable,
+	removeClaudeProfile,
+	removeCodexHome,
+} from "./profile-remove";
 import {
 	discoverClaudeProfiles,
 	discoverCodexHomes,
@@ -243,7 +247,8 @@ export const usageRouter = router({
 	/**
 	 * Deletes a secondary profile: its dir plus, for Claude on macOS, its
 	 * scoped keychain items. The system default (selection null) is never
-	 * removable, and only currently discovered profiles are accepted. A
+	 * removable, and only currently discovered profiles are accepted. A Codex
+	 * home is read again first, since the quota list can be minutes old. A
 	 * default pointer at the removed profile is cleared so agents fall back
 	 * to the system login instead of a dead dir.
 	 */
@@ -256,12 +261,12 @@ export const usageRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const accounts = await getQuota(false);
-			const known = accounts.some(
+			const listed = accounts.find(
 				(account) =>
 					account.agent === input.agent &&
 					account.selection === input.selection,
 			);
-			if (!known) {
+			if (!listed) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
 					message: `No removable ${input.agent} profile at ${input.selection}.`,
@@ -270,6 +275,7 @@ export const usageRouter = router({
 			if (input.agent === "claude") {
 				await removeClaudeProfile(input.selection);
 			} else {
+				await assertCodexHomeStillRemovable(input.selection, listed.status);
 				await removeCodexHome(input.selection);
 			}
 			const defaults = getDefaultAccountSelections(ctx.db);

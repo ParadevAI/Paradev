@@ -270,11 +270,15 @@ function AccountMenu({
 				)}
 				{accounts.map((account) => {
 					const isCurrent = account === current;
+					// A login with no credential cannot take the chat over.
+					const signedOut = account.status === "signed_out";
 					const window = tightest(account);
 					return (
 						<DropdownMenuItem
 							className={cn(MENU_ROW_CLASS, "h-auto items-center py-1.5")}
-							disabled={isCurrent || setDefault.isPending || !onSwitch}
+							disabled={
+								isCurrent || signedOut || setDefault.isPending || !onSwitch
+							}
 							key={account.accountKey}
 							onSelect={() => {
 								void onSwitch?.(() =>
@@ -293,16 +297,18 @@ function AccountMenu({
 									{account.email ?? account.sourceLabel}
 								</span>
 								<span className="block truncate text-[11px] text-muted-foreground">
-									{[
-										account.plan,
-										window
-											? t({
-													message: `${window.label} · ${formatPercent(window.usedPercent / 100)} used`,
-												})
-											: undefined,
-									]
-										.filter(Boolean)
-										.join(" · ")}
+									{signedOut
+										? t({ message: "Signed out" })
+										: [
+												account.plan,
+												window
+													? t({
+															message: `${window.label} · ${formatPercent(window.usedPercent / 100)} used`,
+														})
+													: undefined,
+											]
+												.filter(Boolean)
+												.join(" · ")}
 								</span>
 							</span>
 						</DropdownMenuItem>

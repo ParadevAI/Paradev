@@ -10,10 +10,12 @@ import {
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+	assertCodexHomeStillRemovable,
 	assertRemovableProfileDir,
 	removeClaudeProfile,
 	removeCodexHome,
 } from "./profile-remove";
+import { PROFILE_CREATED_MARKER } from "./profiles";
 
 // These guard a recursive delete — every rejection here is load-bearing.
 describe("assertRemovableProfileDir", () => {
@@ -148,6 +150,77 @@ describe("removeClaudeProfile with shared-config links", () => {
 			}
 		} finally {
 			rmSync(root, { recursive: true, force: true });
+		}
+	});
+});
+
+// Remove acts on a card from the cached quota list, which can be minutes old,
+// so the home is read again before anything is deleted.
+describe("assertCodexHomeStillRemovable", () => {
+	const roots: string[] = [];
+	afterEach(() => {
+		for (const root of roots.splice(0)) {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	/** A fake home dir holding a signed-out Codex home that Paradev created. */
+	function signedOutProfile(): { home: string; profile: string } {
+		const home = mkdtempSync(join(tmpdir(), "superset-profile-recheck-"));
+		roots.push(home);
+		const profile = join(home, ".codex-work");
+		mkdirSync(profile);
+		writeFileSync(join(profile, PROFILE_CREATED_MARKER), "codex");
+		writeFileSync(join(profile, ".superset-profile.json"), "{}");
+		return { home, profile };
+	}
+
+	function signIn(codexHome: string): void {
+		mkdirSync(codexHome, { recursive: true });
+		writeFileSync(
+			join(codexHome, "auth.json"),
+			JSON.stringify({ tokens: { access_token: "test-token" } }),
+		);
+	}
+
+	it("accepts a home shown as signed out that still holds no login", async () => {
+		const { home, profile } = signedOutProfile();
+		await expect(
+			assertCodexHomeStillRemovable(profile, "signed_out", home),
+		).resolves.toBeUndefined();
+	});
+
+	it("keeps a home shown as signed out once a login is back", async () => {
+		const { home, profile } = signedOutProfile();
+		signIn(profile);
+		await expect(
+			assertCodexHomeStillRemovable(profile, "signed_out", home),
+		).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: expect.stringContaining(profile),
+		});
+	});
+
+	it("accepts a signed-in home shown as signed in", async () => {
+		const { home, profile } = signedOutProfile();
+		signIn(profile);
+		await expect(
+			assertCodexHomeStillRemovable(profile, "ok", home),
+		).resolves.toBeUndefined();
+	});
+
+	it("refuses a home no longer discovered, and the default home", async () => {
+		const { home } = signedOutProfile();
+		// Another tool's home that it provisioned, with its login moved aside.
+		const external = join(home, ".codex-ext");
+		mkdirSync(external);
+		writeFileSync(join(external, ".superset-profile.json"), "{}");
+		const defaultHome = join(home, ".codex");
+		signIn(defaultHome);
+		for (const dir of [external, defaultHome, join(home, ".codex-gone")]) {
+			await expect(
+				assertCodexHomeStillRemovable(dir, "ok", home),
+			).rejects.toMatchObject({ code: "BAD_REQUEST" });
 		}
 	});
 });

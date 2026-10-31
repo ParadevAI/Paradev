@@ -61,9 +61,10 @@ export type UsageAccountStatus =
 	/** Credentials exist but the provider returned no usable quota data
 	 * (org-managed/education plans, endpoint changes, transient errors). */
 	| "unavailable"
-	/** A profile dir with an identity but no readable credential (logged out
-	 * or a half-finished login). Surfaced so it can be re-signed or removed;
-	 * a signed-out Codex home is undetectable (its auth.json is gone). */
+	/** A profile dir with no readable credential (logged out or a
+	 * half-finished login): a Claude profile that still names an identity, or
+	 * a Codex home Paradev created and set up. Surfaced so it can be
+	 * re-signed or removed. */
 	| "signed_out";
 
 export interface UsageQuotaWindow {

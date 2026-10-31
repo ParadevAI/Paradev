@@ -11,7 +11,9 @@ import { homedir, platform } from "node:os";
 import { join, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { resolveAmbientCodexHome } from "@superset/agent-setup";
-import { keychainServicesForConfigDir } from "./profiles";
+import { TRPCError } from "@trpc/server";
+import { discoverCodexHomes, keychainServicesForConfigDir } from "./profiles";
+import type { UsageAccountStatus } from "./types";
 
 const execFileAsync = promisify(execFile);
 
@@ -63,4 +65,32 @@ export async function removeClaudeProfile(configDir: string): Promise<void> {
 export async function removeCodexHome(home: string): Promise<void> {
 	const dir = assertRemovableProfileDir(home);
 	await rm(dir, { recursive: true, force: true });
+}
+
+/**
+ * Reads a Codex home again right before Remove deletes it. The card the user
+ * acted on comes from the cached quota list, which can be minutes old: the
+ * home must still be a discovered secondary home, and one that card showed
+ * as signed out must still hold no login. `homeDir` overrides the home dir
+ * for tests.
+ */
+export async function assertCodexHomeStillRemovable(
+	home: string,
+	listedStatus: UsageAccountStatus,
+	homeDir?: string,
+): Promise<void> {
+	const [, ...secondary] = await discoverCodexHomes(homeDir);
+	const current = secondary.find((entry) => entry.home === home);
+	if (!current) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `No removable codex profile at ${home}.`,
+		});
+	}
+	if (listedStatus === "signed_out" && !current.signedOut) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: `${home} holds a login again, so nothing was deleted. Refresh usage and try again.`,
+		});
+	}
 }

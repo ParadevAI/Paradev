@@ -15202,6 +15202,9 @@ msgstr "Обновить пул-реквесты"
 msgid "Refreshes when Claude Code next runs."
 msgstr "Обновится при следующем запуске Claude Code."
 
+msgid "Refreshes when Codex next runs."
+msgstr "Обновится при следующем запуске Codex."
+
 msgid "Refreshes when OpenCode next runs."
 msgstr "Обновится при следующем запуске OpenCode."
 

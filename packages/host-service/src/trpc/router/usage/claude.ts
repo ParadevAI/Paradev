@@ -18,6 +18,7 @@ import {
 	discoverClaudeProfiles,
 	keychainServicesForConfigDir,
 	readKeychainSecrets,
+	SIGNED_OUT_PROFILE_DETAIL,
 } from "./profiles";
 import type {
 	UsageAccount,
@@ -579,8 +580,7 @@ export async function fetchClaudeAccounts(): Promise<UsageAccount[]> {
 			email: profile.email,
 			plan: null,
 			status: "signed_out",
-			statusDetail:
-				"Signed out — use Switch sign-in to reconnect, or Remove to delete this profile.",
+			statusDetail: SIGNED_OUT_PROFILE_DETAIL,
 			windows: [],
 			creditsBalance: null,
 			extraUsage: null,

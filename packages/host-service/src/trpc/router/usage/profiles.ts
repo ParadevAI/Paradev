@@ -23,11 +23,15 @@
 
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdir, readFile, stat } from "node:fs/promises";
+import type { Stats } from "node:fs";
+import { lstat, readdir, readFile, stat } from "node:fs/promises";
 import { homedir, platform, userInfo } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import { resolveAmbientCodexHome } from "@superset/agent-setup";
+import {
+	PROFILE_LEDGER_NAME,
+	resolveAmbientCodexHome,
+} from "@superset/agent-setup";
 
 const execFileAsync = promisify(execFile);
 
@@ -42,9 +46,18 @@ const MAX_STATE_FILE_BYTES = 50 * 1024 * 1024;
  * mtime is the login fingerprint, since a re-login rewrites it.
  */
 export const API_BILLING_MARKER = ".superset-api-billing";
+/**
+ * Marks a profile dir that Paradev created, holding the agent id. A Codex
+ * home is listed as signed out only when it carries one: that card offers
+ * Remove, which deletes the whole dir.
+ */
+export const PROFILE_CREATED_MARKER = ".superset-created";
 const MAX_MARKER_BYTES = 64;
 
 export type ProfileCredentialKind = "subscription" | "api_key";
+
+export const SIGNED_OUT_PROFILE_DETAIL =
+	"Signed out — use Switch sign-in to reconnect, or Remove to delete this profile.";
 
 export interface ClaudeProfile {
 	/** Absolute config dir path (the CLAUDE_CONFIG_DIR value's expansion). */
@@ -66,6 +79,8 @@ export interface CodexHome {
 	credentialKind: ProfileCredentialKind;
 	/** API profiles only; derived from the marker, never from auth.json. */
 	loginFingerprint: string | null;
+	/** A home Paradev created and set up that holds no login. */
+	signedOut: boolean;
 }
 
 function tildeLabel(path: string): string {
@@ -136,20 +151,39 @@ async function readClaudeIdentity(
 	}
 }
 
+/** A marker file's stats, or null unless it exists and names `agent`. */
+async function readAgentMarker(
+	profileDir: string,
+	marker: string,
+	agent: "claude" | "codex",
+): Promise<Stats | null> {
+	const markerPath = join(profileDir, marker);
+	try {
+		const info = await stat(markerPath);
+		if (!info.isFile() || info.size > MAX_MARKER_BYTES) return null;
+		const content = (await readFile(markerPath, "utf-8")).trim();
+		return content === agent ? info : null;
+	} catch {
+		return null;
+	}
+}
+
 /** The marker's mtime, or null when the dir is not API-billed for `agent`. */
 export async function readApiBillingFingerprint(
 	profileDir: string,
 	agent: "claude" | "codex",
 ): Promise<string | null> {
-	const markerPath = join(profileDir, API_BILLING_MARKER);
-	try {
-		const info = await stat(markerPath);
-		if (!info.isFile() || info.size > MAX_MARKER_BYTES) return null;
-		const content = (await readFile(markerPath, "utf-8")).trim();
-		return content === agent ? `${info.mtimeMs}` : null;
-	} catch {
-		return null;
-	}
+	const marker = await readAgentMarker(profileDir, API_BILLING_MARKER, agent);
+	return marker ? `${marker.mtimeMs}` : null;
+}
+
+export async function hasProfileCreatedMarker(
+	profileDir: string,
+	agent: "claude" | "codex",
+): Promise<boolean> {
+	return (
+		(await readAgentMarker(profileDir, PROFILE_CREATED_MARKER, agent)) !== null
+	);
 }
 
 /**
@@ -281,20 +315,126 @@ export async function readCodexProfileKind(
 	}
 }
 
+async function isFile(path: string): Promise<boolean> {
+	try {
+		return (await stat(path)).isFile();
+	} catch {
+		return false;
+	}
+}
+
+/** auth.json fields that describe a login without being a credential. */
+const CODEX_AUTH_METADATA = new Set(["auth_mode", "last_refresh"]);
+
+function isBlank(value: unknown): boolean {
+	return value === null || value === undefined || value === "";
+}
+
+/**
+ * Whether a parsed auth.json holds anything Codex could sign in with. Codex
+ * keeps a login in `tokens` (a refresh token alone renews the access token),
+ * `OPENAI_API_KEY`, `personal_access_token`, `agent_identity`,
+ * `bedrock_api_key` or `bedrock_access_keys`. Any other field that is set
+ * counts as a login too, so a kind added later is never read as signed out.
+ */
+function holdsCodexLogin(auth: unknown): boolean {
+	if (typeof auth !== "object" || auth === null || Array.isArray(auth)) {
+		return true;
+	}
+	return Object.entries(auth).some(([field, value]) => {
+		if (CODEX_AUTH_METADATA.has(field) || isBlank(value)) return false;
+		if (
+			field !== "tokens" ||
+			typeof value !== "object" ||
+			Array.isArray(value)
+		) {
+			return true;
+		}
+		const tokens = value as { access_token?: unknown; refresh_token?: unknown };
+		return !isBlank(tokens.access_token) || !isBlank(tokens.refresh_token);
+	});
+}
+
+/** `cli_auth_credentials_store = …` in a Codex config.toml. */
+const CREDENTIALS_STORE_SETTING =
+	/^\s*["']?cli_auth_credentials_store["']?\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s#]*))/gm;
+
+/**
+ * True unless the home's config.toml leaves the login in auth.json. With
+ * `cli_auth_credentials_store` set to `keyring`, or to `auto` where a keyring
+ * exists, Codex saves the login in the OS keyring and deletes auth.json.
+ * Provisioning copies config.toml from the default home, so that setting can
+ * reach every profile. A config.toml that cannot be read is not trusted.
+ */
+async function mayKeepLoginOutsideAuthFile(
+	codexHome: string,
+): Promise<boolean> {
+	let config: string;
+	try {
+		config = await readFile(join(codexHome, "config.toml"), "utf-8");
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code !== "ENOENT";
+	}
+	for (const match of config.matchAll(CREDENTIALS_STORE_SETTING)) {
+		if ((match[1] ?? match[2] ?? match[3]) !== "file") return true;
+	}
+	return false;
+}
+
+/**
+ * True when Paradev created the home and set it up, and it holds no login.
+ *
+ * - Created: it carries the creation marker. Provisioning (Make default,
+ *   host boot) also writes the profile ledger into homes Paradev did not
+ *   create, so the ledger alone does not count.
+ * - Set up: it holds the ledger, which provisioning writes once a sign-in
+ *   there has completed. A home whose first sign-in is still running, or
+ *   was cancelled, stays hidden.
+ * - No login: auth.json is missing, or is a file that parses to no
+ *   credential, and config.toml keeps logins in that file. An auth.json that
+ *   is a symlink, is not a file or does not parse (it can be mid-write) is
+ *   left alone.
+ */
+async function isSignedOutCodexHome(codexHome: string): Promise<boolean> {
+	if (!(await hasProfileCreatedMarker(codexHome, "codex"))) return false;
+	if (!(await isFile(join(codexHome, PROFILE_LEDGER_NAME)))) return false;
+	if (await mayKeepLoginOutsideAuthFile(codexHome)) return false;
+	const authPath = join(codexHome, "auth.json");
+	try {
+		if (!(await lstat(authPath)).isFile()) return false;
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "ENOENT";
+	}
+	try {
+		return !holdsCodexLogin(JSON.parse(await readFile(authPath, "utf-8")));
+	} catch {
+		return false;
+	}
+}
+
 /**
  * Codex homes: the ambient home (`~/.codex`, or a `CODEX_HOME` the user set
  * themselves — see resolveAmbientCodexHome for why Superset's own injected
  * value is ignored) plus any `~/.codex*` dot-dir carrying an `auth.json` with
  * a token or the API-billing marker. The common multi-account convention is
- * one CODEX_HOME dir per account.
+ * one CODEX_HOME dir per account. A dot-dir Paradev created and set up stays
+ * listed, flagged `signedOut`, once it holds no login, so it can be signed in
+ * again or removed.
  *
  * The first entry is the system default, and `fetchCodexAccounts` gives it
  * `selection: null`. It is listed even without an `auth.json` so the
  * add-account poller has a baseline to compare a fresh `codex login` against.
+ * `homeDir` overrides the home dir for tests.
  */
-export async function discoverCodexHomes(): Promise<CodexHome[]> {
-	const home = homedir();
-	const defaultHome = resolveAmbientCodexHome(home);
+export async function discoverCodexHomes(
+	homeDir?: string,
+): Promise<CodexHome[]> {
+	const home = homeDir ?? homedir();
+	// An injected home must not resolve to the machine's own CODEX_HOME.
+	const defaultHome =
+		homeDir === undefined
+			? resolveAmbientCodexHome(home)
+			: join(home, ".codex");
 	const defaultKind = (await readCodexProfileKind(defaultHome)) ?? {
 		credentialKind: "subscription" as const,
 		loginFingerprint: null,
@@ -306,6 +446,7 @@ export async function discoverCodexHomes(): Promise<CodexHome[]> {
 				home: defaultHome,
 				sourceLabel: tildeLabel(defaultHome),
 				...defaultKind,
+				signedOut: false,
 			},
 		],
 	]);
@@ -316,12 +457,22 @@ export async function discoverCodexHomes(): Promise<CodexHome[]> {
 	for (const candidate of candidates) {
 		if (homes.has(candidate)) continue;
 		const kind = await readCodexProfileKind(candidate);
-		if (!kind) continue;
-		homes.set(candidate, {
-			home: candidate,
-			sourceLabel: tildeLabel(candidate),
-			...kind,
-		});
+		if (kind) {
+			homes.set(candidate, {
+				home: candidate,
+				sourceLabel: tildeLabel(candidate),
+				...kind,
+				signedOut: false,
+			});
+		} else if (await isSignedOutCodexHome(candidate)) {
+			homes.set(candidate, {
+				home: candidate,
+				sourceLabel: tildeLabel(candidate),
+				credentialKind: "subscription",
+				loginFingerprint: null,
+				signedOut: true,
+			});
+		}
 	}
 	return [...homes.values()];
 }
