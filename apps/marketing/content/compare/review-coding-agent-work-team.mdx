@@ -57,7 +57,7 @@ A practical shortlist:
 - **Cursor** if engineers want to stay in one editor. Cursor 2.0 runs up to eight agents in parallel, each in its own local worktree.
 - **Claude Code** as the agent, with `claude --worktree` for manual isolation, or under a workspace tool when you run more than two or three sessions.
 - **GitHub Copilot coding agent** or **Devin** if you want issue-in, pull-request-out work from an agent you assign rather than drive.
-- **Paradev** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch and terminals, and Paradev shows the ports it opens. It runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
+- **Paradev** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch and terminals, and Paradev shows the ports each workspace's processes open. It runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
 
 Run the same 10 to 20 real backlog tasks through each candidate and measure human minutes per merged PR. Worktrees separate working files. They do not sandbox processes, and they do not prevent merge conflicts between branches that touch the same files. For the setup itself, see [Git worktrees for AI coding agents](/compare/git-worktrees-for-ai-agents) and the [parallel coding agents guide](/blog/parallel-coding-agents-guide).
 
