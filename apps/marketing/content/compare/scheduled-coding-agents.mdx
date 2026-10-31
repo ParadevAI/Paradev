@@ -119,7 +119,9 @@ week, stop.
    clock). Do not add retries, raise timeouts, or weaken assertions.
 5. Make the smallest fix. Change only the test, its fixtures, or the
    code the root cause points to.
-6. Run the same repeated runs again and record the new counts.
+6. Run the same repeated runs again and record the new counts. If any
+   run still fails, revert your change, write the counts and what you
+   tried to FLAKY_REPORT.md, and stop.
 7. Write FLAKY_REPORT.md with: the test, the failure output, the
    reproduction command, the root cause, the change, before/after
    counts, and anything left uncertain.
@@ -131,7 +133,7 @@ Replace `<path>` and `<test command>` with your own. The "stop if it already ran
 
 ## What tools let me dispatch coding-agent tasks from a CLI or another agent and then review the output?
 
-Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent. `superset projects list` gives the `PROJECT_ID`. Use a new branch for each task: a branch that already has a workspace reuses it. The command prints the workspace ID and the agent's terminal ID, and `superset terminals list --workspace WORKSPACE_ID --local` lists the terminal IDs again later. Read the agent's output with `superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local`. The [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
+Headless agent CLIs (`claude -p`, `codex exec`) and GitHub Actions with `workflow_dispatch` start runs from a script. In Paradev, `superset ws create --local --project PROJECT_ID --name flaky-tests-2026-10-30 --branch flaky-tests-2026-10-30 --agent claude --prompt "..."` creates a workspace with its own branch and starts the agent. `superset projects list` gives the `PROJECT_ID`. Use a new branch for each task: a branch that already has a workspace reuses it. Add `--json` to get the IDs: the output has the workspace ID in `workspace.id` and the agent's terminal ID in `agents[].sessionId`. Later, `superset terminals list --workspace WORKSPACE_ID --local --json` lists the terminal IDs again. Read the agent's output with `superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local`. The [Paradev MCP server](https://docs.paradev.com/mcp-server) lets another agent do the same. An automation with a **Webhook triggered** trigger starts a run when any service sends a POST to its URL. Workspaces from the CLI, the MCP server, and automation runs open like any other task, ready for review. Output from headless CLIs and GitHub Actions stays in their logs and pull requests.
 
 ## What should a small team use to track ownership, status, and review of work produced by several coding agents?
 

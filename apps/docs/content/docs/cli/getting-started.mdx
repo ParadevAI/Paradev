@@ -170,6 +170,10 @@ it, next to any agent already working there.
 `--local` puts the workspace on the machine that runs the command. A CI
 runner usually exits when the job ends, so from CI target a host that
 stays on with `--host HOST_ID` (see [Local vs. remote hosts](#local-vs-remote-hosts)).
+Projects belong to a host, so use the same `--host HOST_ID` on every
+command: get `PROJECT_ID` from `superset projects list --host HOST_ID`, and
+pass `--host HOST_ID` instead of `--local` to `workspaces create`,
+`agents create`, and the `terminals` commands below.
 
 The JSON output has the workspace ID in `workspace.id`. For each agent,
 `agents[].ok` tells you if it started (`agents[].error` says why not), and
@@ -189,13 +193,14 @@ To start another agent in a workspace that already exists:
 superset agents create --workspace WORKSPACE_ID --local --agent codex --prompt "Review the diff and list risks."
 ```
 
-Check on the work and read what an agent printed. `workspaces list` gives
-each `WORKSPACE_ID`, and `terminals list` gives each `TERMINAL_ID` in a
-workspace:
+Check on the work and read what an agent printed. `workspaces list` prints
+each `WORKSPACE_ID`. `terminals list` prints only a count in a terminal, so
+use `--json` to get each `TERMINAL_ID`:
 
 ```bash
 superset workspaces list --local
-superset terminals list --workspace WORKSPACE_ID --local
+superset terminals list --workspace WORKSPACE_ID --local --json \
+  | jq -r '.sessions[].terminalId'
 superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local
 ```
 
