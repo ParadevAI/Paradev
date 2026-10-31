@@ -70,6 +70,7 @@ const {
 	buildCopilotWrapperExecLine,
 	buildWrapperScript,
 	createClaudeSettingsJson,
+	createClaudeWrapper,
 	createCodexHooksJson,
 	createCodexWrapper,
 	COPILOT_HOOK_MARKER,
@@ -919,6 +920,171 @@ exit 0
 		const signalRun = runWrapper();
 		expect(signalRun.status).toBe(129);
 		expect(existsSync(notifyCapturePath)).toBe(false);
+	});
+
+	/**
+	 * Generated codex and claude wrappers over stub CLIs that record the home
+	 * they got and their arguments, in a workspace terminal where `profile`
+	 * is the selected account for both.
+	 */
+	function setUpSelectedAccountWrappers() {
+		const realBinDir = path.join(TEST_ROOT, "real-bin");
+		const ranFile = path.join(TEST_ROOT, "real-cli-ran.txt");
+		const profile = path.join(TEST_ROOT, "selected-profile");
+		const ambient = path.join(TEST_ROOT, "codex-default");
+		mkdirSync(realBinDir, { recursive: true });
+		mkdirSync(profile, { recursive: true });
+		for (const [name, envVar] of [
+			["codex", "CODEX_HOME"],
+			["claude", "CLAUDE_CONFIG_DIR"],
+		]) {
+			writeFileSync(
+				path.join(realBinDir, name),
+				`#!/bin/bash\n[ -t 0 ] || superset_stdin="$(cat)"\nprintf '%s %s stdin=%s\\n' "\${${envVar}:-<unset>}" "$*" "$superset_stdin" >> "${ranFile}"\n`,
+				{ mode: 0o755 },
+			);
+		}
+		createCodexWrapper();
+		createClaudeWrapper();
+		const env: Record<string, string | undefined> = {
+			...process.env,
+			PATH: `${TEST_BIN_DIR}:${realBinDir}:${process.env.PATH || ""}`,
+			SUPERSET_TERMINAL_ID: "terminal-1",
+			CODEX_HOME: profile,
+			SUPERSET_DEFAULT_CODEX_HOME: profile,
+			SUPERSET_AMBIENT_CODEX_HOME: ambient,
+			CLAUDE_CONFIG_DIR: profile,
+			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: profile,
+		};
+		const runCli = (
+			name: string,
+			args: string[],
+			overrides: Record<string, string | undefined> = {},
+		) => {
+			const merged: Record<string, string> = {};
+			for (const [key, value] of Object.entries({ ...env, ...overrides })) {
+				if (value !== undefined) merged[key] = value;
+			}
+			return spawnSync(path.join(TEST_BIN_DIR, name), args, {
+				env: merged,
+				encoding: "utf-8",
+			});
+		};
+		const ran = () =>
+			existsSync(ranFile) ? readFileSync(ranFile, "utf-8") : "";
+		/** Runs `command` under bash on a pseudo-terminal, answering the prompt. */
+		const runOnTerminal = async (command: string, answer: string) => {
+			const decoder = new TextDecoder();
+			let output = "";
+			let answered = false;
+			let onClose: (() => void) | undefined;
+			const closed = new Promise<void>((resolve) => {
+				onClose = resolve;
+			});
+			const merged: Record<string, string> = {};
+			for (const [key, value] of Object.entries(env)) {
+				if (value !== undefined) merged[key] = value;
+			}
+			const proc = Bun.spawn(["bash", "-c", command], {
+				env: merged,
+				terminal: {
+					data(terminal, chunk) {
+						output += decoder.decode(chunk, { stream: true });
+						if (!answered && output.includes("[y/N]")) {
+							answered = true;
+							terminal.write(`${answer}\n`);
+						}
+					},
+					exit: () => onClose?.(),
+				},
+			});
+			const status = await proc.exited;
+			await closed;
+			proc.terminal?.close();
+			return { status, output };
+		};
+		return { ambient, profile, runCli, ran, runOnTerminal };
+	}
+
+	it("refuses every sign-in on the selected account without a terminal", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		for (const [name, ...args] of [
+			["codex", "login"],
+			["codex", "logout"],
+			["codex", "-c", "model=x", "login"],
+			["codex", "--enable", "hooks", "logout"],
+			["claude", "auth", "login"],
+			["claude", "auth", "logout"],
+			["claude", "--verbose", "auth", "login"],
+			["claude", "-d", "auth", "logout"],
+		]) {
+			const result = runCli(name, args);
+			expect({ name, args, status: result.status }).toEqual({
+				name,
+				args,
+				status: 2,
+			});
+			expect(result.stderr).toContain(profile);
+			expect(result.stderr).not.toContain("SUPERSET_DEFAULT_");
+			expect(result.stderr).not.toContain("env -u");
+		}
+		expect(ran()).toBe("");
+	});
+
+	it("asks before a piped API-key login on the selected account", async () => {
+		const { profile, ran, runOnTerminal } = setUpSelectedAccountWrappers();
+		// The shape of the Usage card's re-sign command for an API-billed
+		// profile: the key arrives on stdin, so only /dev/tty can answer.
+		const command = `printf '%s' sk-test | "${path.join(TEST_BIN_DIR, "codex")}" login --with-api-key`;
+		const no = await runOnTerminal(command, "n");
+		expect(no.output).toContain(profile);
+		expect(no.status).toBe(1);
+		expect(ran()).toBe("");
+		const yes = await runOnTerminal(command, "y");
+		expect(yes.status).toBe(0);
+		expect(ran()).toStartWith(`${profile} `);
+		expect(ran()).toContain(" login --with-api-key stdin=sk-test\n");
+	});
+
+	it("keeps an unset CODEX_HOME unset for a wrapped login with root options", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		mkdirSync(path.join(TEST_SUPERSET_HOME_DIR, "state"), { recursive: true });
+		writeFileSync(
+			path.join(TEST_SUPERSET_HOME_DIR, "state", "default-codex-home"),
+			profile,
+		);
+		const result = runCli("codex", ["-c", "model=x", "login"], {
+			CODEX_HOME: undefined,
+		});
+		expect(result.status).toBe(0);
+		expect(ran()).toStartWith("<unset> ");
+	});
+
+	it("runs a wrapped codex login on the system default without asking", () => {
+		const { ambient, runCli, ran } = setUpSelectedAccountWrappers();
+		const result = runCli("codex", ["login"], {
+			CODEX_HOME: ambient,
+			SUPERSET_DEFAULT_CODEX_HOME: ambient,
+		});
+		expect(result.status).toBe(0);
+		expect(ran()).toStartWith(`${ambient} `);
+	});
+
+	it("lets a wrapped codex login status read the selected account", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		for (const args of [
+			["login", "status"],
+			["-c", "model=x", "login", "status"],
+		]) {
+			const result = runCli("codex", args);
+			expect({ args, status: result.status }).toEqual({ args, status: 0 });
+		}
+		const [plain, withOption, ...rest] = ran().split("\n").filter(Boolean);
+		expect(rest).toEqual([]);
+		expect(plain).toStartWith(`${profile} `);
+		expect(plain).toContain(" login status");
+		expect(withOption).toStartWith(`${profile} `);
+		expect(withOption).toContain(" -c model=x login status");
 	});
 
 	it("creates mastracode wrapper passthrough", () => {
