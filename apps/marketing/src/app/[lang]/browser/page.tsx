@@ -2,7 +2,6 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
-import { CTASection } from "@/app/[lang]/components/CTASection";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
@@ -93,7 +92,6 @@ export default async function BrowserPage() {
 					<AgentDrive />
 				</section>
 			</main>
-			<CTASection />
 		</div>
 	);
 }
