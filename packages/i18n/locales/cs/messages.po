@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "Pohled „{0}“ a jeho filtry budou odstraněny. Pracovních prostorů se to nedotkne."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "„{0}“ smazáno"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "„{0}“ bude sloučen do {1} pomocí {2}. Odsud to nelze vrátit zpět."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "„{0}“ se přestane spouštět a její historie běhů bude odstraněna. Tuto akci nelze vrátit zpět."
-
-msgid "\"{name}\" deleted"
-msgstr "„{name}“ smazáno"
 
 msgid "\"{name}\" paused"
 msgstr "„{name}“ pozastaveno"
@@ -114,6 +112,18 @@ msgstr "{0, plural, one {# agent} few {# agenti} many {# agenta} other {# agent�
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# automatizaci se nepodařilo spustit} few {# automatizace se nepodařilo spustit} many {# automatizace se nepodařilo spustit} other {# automatizací se nepodařilo spustit}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# automatizace smazána} few {# automatizace smazány} many {# automatizace smazáno} other {# automatizací smazáno}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# automatizace pozastavena} few {# automatizace pozastaveny} many {# automatizace pozastaveno} other {# automatizací pozastaveno}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# automatizace obnovena} few {# automatizace obnoveny} many {# automatizace obnoveno} other {# automatizací obnoveno}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -291,6 +301,10 @@ msgstr "{0, plural, one {Nepodařilo se smazat # pracovní prostor} few {Nepoda�
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Vytvářím # pracovní prostor...} few {Vytvářím # pracovní prostory...} many {Vytvářím # pracovního prostoru...} other {Vytvářím # pracovních prostorů...}}"
 
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {Smazat # automatizaci?} few {Smazat # automatizace?} many {Smazat # automatizace?} other {Smazat # automatizací?}}"
+
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Smazat # pracovní prostor?} few {Smazat # pracovní prostory?} many {Smazat # pracovního prostoru?} other {Smazat # pracovních prostorů?}}"
@@ -318,6 +332,10 @@ msgstr "{0, plural, one {Nepodařilo se zavřít # port} few {Nepodařilo se zav
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Naimportován # pracovní prostor} few {Naimportovány # pracovní prostory} many {Naimportováno # pracovního prostoru} other {Naimportováno # pracovních prostorů}}"
+
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {Její # automatizace přejde do „Bez skupiny“. Samotná automatizace zůstane.} few {Její # automatizace přejdou do „Bez skupiny“. Samotné automatizace zůstanou.} many {Jejích # automatizace přejde do „Bez skupiny“. Samotné automatizace zůstanou.} other {Jejích # automatizací přejde do „Bez skupiny“. Samotné automatizace zůstanou.}}"
 
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
@@ -800,6 +818,9 @@ msgstr "Účet {connectorName}"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} cookies — zapomenout tento web"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# automatizace} few {# automatizace} many {# automatizace} other {# automatizací}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrola selhala} few {# kontroly selhaly} many {# kontroly selhalo} other {# kontrol selhalo}}"
 
@@ -863,6 +884,9 @@ msgstr "{count, plural, one {načtena # stránka} few {načteny # stránky} many
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Importovat # worktree} few {Importovat # worktree} many {Importovat # worktree} other {Importovat # worktree}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {# automatizace přesunuta do skupiny {group}} few {# automatizace přesunuty do skupiny {group}} many {# automatizace přesunuto do skupiny {group}} other {# automatizací přesunuto do skupiny {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Projekt otevřen} few {# projekty otevřeny} many {# projektu otevřeno} other {# projektů otevřeno}}"
 
@@ -871,6 +895,9 @@ msgstr "{count, plural, one {spuštěn # příkaz} few {spuštěny # příkazy} 
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {přečten # soubor} few {přečteny # soubory} many {přečteno # souboru} other {přečteno # souborů}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {# automatizace odebrána ze skupiny} few {# automatizace odebrány ze skupin} many {# automatizace odebráno ze skupin} other {# automatizací odebráno ze skupin}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Použit # zdroj} few {Použity # zdroje} many {Použito # zdroje} other {Použito # zdrojů}}"
@@ -883,6 +910,9 @@ msgstr "{count} hvězd na GitHubu"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} hostitelů používá starší službu hostitele než tato aplikace"
+
+msgid "{count} selected"
+msgstr "Vybráno: {count}"
 
 msgid "{count}/day"
 msgstr "{count}/den"
@@ -4613,6 +4643,9 @@ msgstr "Sbalit všechny soubory"
 msgid "Collapse file"
 msgstr "Sbalit soubor"
 
+msgid "Collapse group"
+msgstr "Sbalit skupinu"
+
 msgid "Collapse project"
 msgstr "Sbalit projekt"
 
@@ -6051,6 +6084,9 @@ msgstr "Vytvořit prostředí"
 msgid "Create failed: {message}"
 msgstr "Vytvoření selhalo: {message}"
 
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Vytvořit skupinu <0>„{name}“</0>"
+
 msgid "Create issue"
 msgstr "Vytvořit issue"
 
@@ -6554,6 +6590,13 @@ msgstr "Smazat soubor"
 msgid "Delete group"
 msgstr "Smazat skupinu"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Smazat skupinu „{0}“?"
+
+msgid "Delete group…"
+msgstr "Smazat skupinu…"
+
 msgid "Delete host"
 msgstr "Smazat hosta"
 
@@ -6668,6 +6711,9 @@ msgstr "{name} smazán"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Smazal(a) {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Skupina „{group}“ smazána"
 
 msgid "deleted or unavailable — pick another"
 msgstr "smazán nebo nedostupný — vyberte jiný"
@@ -7735,6 +7781,9 @@ msgstr "Zvětšit diagram"
 msgid "Expand file"
 msgstr "Rozbalit soubor"
 
+msgid "Expand group"
+msgstr "Rozbalit skupinu"
+
 msgid "Expand project"
 msgstr "Rozbalit projekt"
 
@@ -8044,6 +8093,9 @@ msgstr "Nepodařilo se načíst repozitáře. Zkuste to prosím znovu."
 
 msgid "Failed to log out. Please try again."
 msgstr "Nepodařilo se odhlásit. Zkuste to prosím znovu."
+
+msgid "Failed to move automation"
+msgstr "Automatizaci se nepodařilo přesunout"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8498,9 @@ msgstr "Filtrovat hosty..."
 
 msgid "Filter logs"
 msgstr "Filtrovat protokoly"
+
+msgid "Filter or name a group"
+msgstr "Filtrovat nebo pojmenovat skupinu"
 
 msgid "Filter pages"
 msgstr "Filtrovat stránky"
@@ -11539,11 +11594,17 @@ msgstr "Přesunout na pozadí"
 msgid "Move to group"
 msgstr "Přesunout do skupiny"
 
+msgid "Move to group…"
+msgstr "Přesunout do skupiny…"
+
 msgid "Move to Right Side"
 msgstr "Přesunout doprava"
 
 msgid "Move to Tab"
 msgstr "Přesunout na kartu"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "„{name}“ přesunuto do skupiny {group}"
 
 msgid "Multi-select"
 msgstr "Výběr více možností"
@@ -11709,6 +11770,9 @@ msgstr "Nové relace agentů"
 msgid "New automation"
 msgstr "Nová automatizace"
 
+msgid "New automation in {group}"
+msgstr "Nová automatizace ve skupině {group}"
+
 msgid "New Browser"
 msgstr "Nový prohlížeč"
 
@@ -11738,6 +11802,12 @@ msgstr "Nová skupina"
 
 msgid "New group from workspace"
 msgstr "Nová skupina z pracovního prostoru"
+
+msgid "New group name…"
+msgstr "Název nové skupiny…"
+
+msgid "New group…"
+msgstr "Nová skupina…"
 
 msgid "New issue"
 msgstr "Nová issue"
@@ -12104,6 +12174,9 @@ msgstr "Nenalezeny žádné fonty."
 
 msgid "No git remote detected"
 msgstr "Nenalezen žádný git remote"
+
+msgid "No group"
+msgstr "Bez skupiny"
 
 msgid "No grouping"
 msgstr "Bez seskupení"
@@ -15333,6 +15406,9 @@ msgstr "Odebrat z kanálu"
 msgid "Remove from favorites"
 msgstr "Odebrat z oblíbených"
 
+msgid "Remove from group"
+msgstr "Odebrat ze skupiny"
+
 msgid "Remove from Queue"
 msgstr "Odebrat z fronty"
 
@@ -15401,6 +15477,9 @@ msgstr "Odebrat pracovní prostor"
 
 msgid "Remove…"
 msgstr "Odebrat…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "„{name}“ odebráno ze skupiny"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{credential} pro {agentLabel} odstraněno."
@@ -16701,6 +16780,10 @@ msgstr "Podívejte se, kde se vašich posledních 30 dní umístí ve veřejném
 msgid "Select"
 msgstr "Výběr"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "Vybrat {0}"
+
 msgid "Select a file to view it here"
 msgstr "Vyberte soubor a zobrazí se zde"
 
@@ -16727,6 +16810,9 @@ msgstr "Začněte výběrem pracovního prostoru v postranním panelu."
 
 msgid "Select agent"
 msgstr "Vyberte agenta"
+
+msgid "Select all"
+msgstr "Vybrat vše"
 
 msgid "Select All"
 msgstr "Vybrat vše"
@@ -16841,6 +16927,9 @@ msgstr "Vybraný agent není na tomto hostu dostupný"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "Vybraný agent není terminálový agent"
+
+msgid "Selected automations"
+msgstr "Vybrané automatizace"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "Vybrané issues patří do více repozitářů. Vyberte issues z jednoho repozitáře."
@@ -19158,6 +19247,9 @@ msgstr "Tyto složky stále obsahují vaše soubory, ale do nového Paradevu se 
 msgid "These ports are still in use"
 msgstr "Tyto porty se stále používají"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "Přestanou se spouštět a jejich historie běhů bude odstraněna. Tuto akci nelze vrátit zpět."
+
 msgid "Thinking"
 msgstr "Uvažování"
 
@@ -19984,6 +20076,9 @@ msgstr "Zadejte příkaz nebo hledejte…"
 
 msgid "Type a message..."
 msgstr "Napište zprávu..."
+
+msgid "Type a name, then press Enter"
+msgstr "Zadejte název a stiskněte Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Zadejte úkol pro Claude…"

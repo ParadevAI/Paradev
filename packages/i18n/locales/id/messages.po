@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” beserta filternya akan dihapus. Workspace tidak terpengaruh."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" dihapus"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" akan di-merge ke {1} lewat {2}. Ini tidak bisa dibatalkan dari sini."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" akan berhenti berjalan dan riwayat run-nya akan dihapus. Ini tidak bisa dibatalkan."
-
-msgid "\"{name}\" deleted"
-msgstr "\"{name}\" dihapus"
 
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" dijeda"
@@ -114,6 +112,18 @@ msgstr "{0, plural, other {# agen}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# otomatisasi tidak dapat dimulai} other {# otomatisasi tidak dapat dimulai}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# otomatisasi dihapus} other {# otomatisasi dihapus}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# otomatisasi dijeda} other {# otomatisasi dijeda}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# otomatisasi dilanjutkan} other {# otomatisasi dilanjutkan}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -291,6 +301,10 @@ msgstr "{0, plural, one {Tidak bisa menghapus # workspace} other {Tidak bisa men
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Membuat # workspace...} other {Membuat # workspace...}}"
 
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {Hapus # otomatisasi?} other {Hapus # otomatisasi?}}"
+
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Hapus # workspace?} other {Hapus # workspace?}}"
@@ -318,6 +332,10 @@ msgstr "{0, plural, one {Gagal menutup # port} other {Gagal menutup # port}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Mengimpor # workspace} other {Mengimpor # workspace}}"
+
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.} other {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.}}"
 
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
@@ -800,6 +818,9 @@ msgstr "Akun {connectorName}"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} cookie — lupakan situs ini"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# otomatisasi} other {# otomatisasi}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# Check Gagal} other {# Check Gagal}}"
 
@@ -863,6 +884,9 @@ msgstr "{count, plural, one {mengambil # halaman} other {mengambil # halaman}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Impor # worktree} other {Impor # worktree}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {# otomatisasi dipindahkan ke {group}} other {# otomatisasi dipindahkan ke {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Proyek dibuka} other {# proyek dibuka}}"
 
@@ -871,6 +895,9 @@ msgstr "{count, plural, one {menjalankan # perintah} other {menjalankan # perint
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {membaca # file} other {membaca # file}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {# otomatisasi dikeluarkan dari grupnya} other {# otomatisasi dikeluarkan dari grupnya}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Memakai # sumber} other {Memakai # sumber}}"
@@ -883,6 +910,9 @@ msgstr "{count} star GitHub"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} host menjalankan layanan host yang lebih lama dari aplikasi ini"
+
+msgid "{count} selected"
+msgstr "{count} dipilih"
 
 msgid "{count}/day"
 msgstr "{count}/hari"
@@ -4613,6 +4643,9 @@ msgstr "Ciutkan semua file"
 msgid "Collapse file"
 msgstr "Ciutkan file"
 
+msgid "Collapse group"
+msgstr "Ciutkan grup"
+
 msgid "Collapse project"
 msgstr "Ciutkan proyek"
 
@@ -6051,6 +6084,9 @@ msgstr "Buat lingkungan"
 msgid "Create failed: {message}"
 msgstr "Gagal membuat: {message}"
 
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Buat grup <0>\"{name}\"</0>"
+
 msgid "Create issue"
 msgstr "Buat issue"
 
@@ -6554,6 +6590,13 @@ msgstr "Hapus file"
 msgid "Delete group"
 msgstr "Hapus grup"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Hapus grup \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Hapus grup…"
+
 msgid "Delete host"
 msgstr "Hapus host"
 
@@ -6668,6 +6711,9 @@ msgstr "Menghapus {name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Dihapus oleh {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Grup \"{group}\" dihapus"
 
 msgid "deleted or unavailable — pick another"
 msgstr "dihapus atau tidak tersedia — pilih yang lain"
@@ -7735,6 +7781,9 @@ msgstr "Perbesar diagram"
 msgid "Expand file"
 msgstr "Bentangkan file"
 
+msgid "Expand group"
+msgstr "Bentangkan grup"
+
 msgid "Expand project"
 msgstr "Bentangkan proyek"
 
@@ -8044,6 +8093,9 @@ msgstr "Gagal memuat repositori. Silakan coba lagi."
 
 msgid "Failed to log out. Please try again."
 msgstr "Gagal keluar. Silakan coba lagi."
+
+msgid "Failed to move automation"
+msgstr "Gagal memindahkan otomatisasi"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8498,9 @@ msgstr "Filter host..."
 
 msgid "Filter logs"
 msgstr "Filter log"
+
+msgid "Filter or name a group"
+msgstr "Filter atau beri nama grup"
 
 msgid "Filter pages"
 msgstr "Filter halaman"
@@ -11539,11 +11594,17 @@ msgstr "Pindahkan ke latar belakang"
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
 
+msgid "Move to group…"
+msgstr "Pindahkan ke grup…"
+
 msgid "Move to Right Side"
 msgstr "Pindahkan ke kanan"
 
 msgid "Move to Tab"
 msgstr "Pindahkan ke Tab"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "\"{name}\" dipindahkan ke {group}"
 
 msgid "Multi-select"
 msgstr "Pilih banyak"
@@ -11709,6 +11770,9 @@ msgstr "Sesi agen baru"
 msgid "New automation"
 msgstr "Otomatisasi baru"
 
+msgid "New automation in {group}"
+msgstr "Otomatisasi baru di {group}"
+
 msgid "New Browser"
 msgstr "Browser Baru"
 
@@ -11738,6 +11802,12 @@ msgstr "Grup baru"
 
 msgid "New group from workspace"
 msgstr "Grup baru dari workspace"
+
+msgid "New group name…"
+msgstr "Nama grup baru…"
+
+msgid "New group…"
+msgstr "Grup baru…"
 
 msgid "New issue"
 msgstr "Issue baru"
@@ -12104,6 +12174,9 @@ msgstr "Font tidak ditemukan."
 
 msgid "No git remote detected"
 msgstr "Tidak ada remote git yang terdeteksi"
+
+msgid "No group"
+msgstr "Tanpa grup"
 
 msgid "No grouping"
 msgstr "Tanpa pengelompokan"
@@ -15333,6 +15406,9 @@ msgstr "Hapus dari kanal"
 msgid "Remove from favorites"
 msgstr "Hapus dari favorit"
 
+msgid "Remove from group"
+msgstr "Keluarkan dari grup"
+
 msgid "Remove from Queue"
 msgstr "Keluarkan dari Antrean"
 
@@ -15401,6 +15477,9 @@ msgstr "Hapus workspace"
 
 msgid "Remove…"
 msgstr "Hapus…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "\"{name}\" dikeluarkan dari grupnya"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{credential} untuk {agentLabel} dihapus."
@@ -16701,6 +16780,10 @@ msgstr "Lihat posisi 30 hari terakhir Anda di papan peringkat publik. Hanya juml
 msgid "Select"
 msgstr "Select"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "Pilih {0}"
+
 msgid "Select a file to view it here"
 msgstr "Pilih file untuk melihatnya di sini"
 
@@ -16727,6 +16810,9 @@ msgstr "Pilih workspace dari sidebar untuk memulai."
 
 msgid "Select agent"
 msgstr "Pilih agen"
+
+msgid "Select all"
+msgstr "Pilih semua"
 
 msgid "Select All"
 msgstr "Pilih Semua"
@@ -16841,6 +16927,9 @@ msgstr "Agen yang dipilih tidak tersedia di host ini"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "Agen yang dipilih bukan agen terminal"
+
+msgid "Selected automations"
+msgstr "Otomatisasi terpilih"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "Issue yang dipilih tersebar di beberapa repositori. Pilih issue dari satu repositori untuk menjalankannya."
@@ -19158,6 +19247,9 @@ msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke 
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "Otomatisasi ini tidak akan berjalan lagi dan riwayat jalannya akan dihapus. Tindakan ini tidak dapat dibatalkan."
+
 msgid "Thinking"
 msgstr "Pemikiran"
 
@@ -19984,6 +20076,9 @@ msgstr "Ketik perintah atau cari…"
 
 msgid "Type a message..."
 msgstr "Ketik pesan..."
+
+msgid "Type a name, then press Enter"
+msgstr "Ketik nama, lalu tekan Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Ketik tugas untuk Claude…"

@@ -15,6 +15,8 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { HostOfflineRunDialog } from "../components/HostOfflineRunDialog";
+import { useSetAutomationGroup } from "../hooks/useSetAutomationGroup";
+import { listAutomationGroups } from "../utils/groupAutomations";
 import { dispatchErrorCode, runErrorHelp } from "../utils/runErrorHelp";
 import { AutomationBody } from "./components/AutomationBody";
 import { AutomationBreadcrumbBar } from "./components/AutomationBreadcrumbBar";
@@ -62,6 +64,15 @@ function AutomationDetailPage() {
 	const currentUserId = session?.user?.id;
 	const [historyOpen, setHistoryOpen] = useState(history ?? false);
 	const [hostOfflineOpen, setHostOfflineOpen] = useState(false);
+	const { setGroup } = useSetAutomationGroup();
+	const { data: allAutomations = [] } = cloudTrpc.automation.list.useQuery(
+		undefined,
+		{ staleTime: 30_000 },
+	);
+	const groups = useMemo(
+		() => listAutomationGroups(allAutomations),
+		[allAutomations],
+	);
 	const copyShareLink = useCopyShareLink();
 	const { switchOrganization } = useCollections();
 
@@ -216,6 +227,11 @@ function AutomationDetailPage() {
 			<div className="flex flex-1 flex-col overflow-hidden">
 				<AutomationDetailHeader
 					name={automation.name}
+					group={automation.group}
+					groups={groups}
+					onMoveToGroup={(group) =>
+						setGroup({ ids: [automation.id], name: automation.name, group })
+					}
 					onCopyLink={() => copyShareLink(`automations/${automation.id}`)}
 					onDelete={() => {
 						alert({

@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” and its filters are removed. The workspaces are not affected."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" deleted"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
-
-msgid "\"{name}\" deleted"
-msgstr "\"{name}\" deleted"
 
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" paused"
@@ -114,6 +112,18 @@ msgstr "{0, plural, one {# agent} other {# agents}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# automation deleted} other {# automations deleted}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# automation paused} other {# automations paused}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# automation resumed} other {# automations resumed}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -291,6 +301,10 @@ msgstr "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
 msgstr "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -318,6 +332,10 @@ msgstr "{0, plural, one {Failed to close # port} other {Failed to close # ports}
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
 msgstr "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
+
+#. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
+msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
+msgstr "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
 
 #. placeholder {0}: issues.length
 msgid "{0, plural, one {Linear issue} other {Linear issues}}"
@@ -800,6 +818,9 @@ msgstr "{connectorName} account"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} cookies — forget this site"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# automation} other {# automations}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 
@@ -863,6 +884,9 @@ msgstr "{count, plural, one {fetched # page} other {fetched # pages}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Project opened} other {# projects opened}}"
 
@@ -871,6 +895,9 @@ msgstr "{count, plural, one {ran # command} other {ran # commands}}"
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {read # file} other {read # files}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Used # source} other {Used # sources}}"
@@ -883,6 +910,9 @@ msgstr "{count} GitHub stars"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} hosts run an older host service than this app"
+
+msgid "{count} selected"
+msgstr "{count} selected"
 
 msgid "{count}/day"
 msgstr "{count}/day"
@@ -4613,6 +4643,9 @@ msgstr "Collapse all files"
 msgid "Collapse file"
 msgstr "Collapse file"
 
+msgid "Collapse group"
+msgstr "Collapse group"
+
 msgid "Collapse project"
 msgstr "Collapse project"
 
@@ -6051,6 +6084,9 @@ msgstr "Create environment"
 msgid "Create failed: {message}"
 msgstr "Create failed: {message}"
 
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Create group <0>\"{name}\"</0>"
+
 msgid "Create issue"
 msgstr "Create issue"
 
@@ -6554,6 +6590,13 @@ msgstr "Delete file"
 msgid "Delete group"
 msgstr "Delete group"
 
+#. placeholder {0}: pendingGroupDelete?.group
+msgid "Delete group \"{0}\"?"
+msgstr "Delete group \"{0}\"?"
+
+msgid "Delete group…"
+msgstr "Delete group…"
+
 msgid "Delete host"
 msgstr "Delete host"
 
@@ -6668,6 +6711,9 @@ msgstr "Deleted {name}"
 
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
+
+msgid "Deleted group \"{group}\""
+msgstr "Deleted group \"{group}\""
 
 msgid "deleted or unavailable — pick another"
 msgstr "deleted or unavailable — pick another"
@@ -7735,6 +7781,9 @@ msgstr "Expand diagram"
 msgid "Expand file"
 msgstr "Expand file"
 
+msgid "Expand group"
+msgstr "Expand group"
+
 msgid "Expand project"
 msgstr "Expand project"
 
@@ -8044,6 +8093,9 @@ msgstr "Failed to load repositories. Please try again."
 
 msgid "Failed to log out. Please try again."
 msgstr "Failed to log out. Please try again."
+
+msgid "Failed to move automation"
+msgstr "Failed to move automation"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8498,9 @@ msgstr "Filter hosts..."
 
 msgid "Filter logs"
 msgstr "Filter logs"
+
+msgid "Filter or name a group"
+msgstr "Filter or name a group"
 
 msgid "Filter pages"
 msgstr "Filter pages"
@@ -11539,11 +11594,17 @@ msgstr "Move to background"
 msgid "Move to group"
 msgstr "Move to group"
 
+msgid "Move to group…"
+msgstr "Move to group…"
+
 msgid "Move to Right Side"
 msgstr "Move to Right Side"
 
 msgid "Move to Tab"
 msgstr "Move to Tab"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "Moved \"{name}\" to {group}"
 
 msgid "Multi-select"
 msgstr "Multi-select"
@@ -11709,6 +11770,9 @@ msgstr "New agent sessions"
 msgid "New automation"
 msgstr "New automation"
 
+msgid "New automation in {group}"
+msgstr "New automation in {group}"
+
 msgid "New Browser"
 msgstr "New Browser"
 
@@ -11738,6 +11802,12 @@ msgstr "New group"
 
 msgid "New group from workspace"
 msgstr "New group from workspace"
+
+msgid "New group name…"
+msgstr "New group name…"
+
+msgid "New group…"
+msgstr "New group…"
 
 msgid "New issue"
 msgstr "New issue"
@@ -12104,6 +12174,9 @@ msgstr "No fonts found."
 
 msgid "No git remote detected"
 msgstr "No git remote detected"
+
+msgid "No group"
+msgstr "No group"
 
 msgid "No grouping"
 msgstr "No grouping"
@@ -15333,6 +15406,9 @@ msgstr "Remove from channel"
 msgid "Remove from favorites"
 msgstr "Remove from favorites"
 
+msgid "Remove from group"
+msgstr "Remove from group"
+
 msgid "Remove from Queue"
 msgstr "Remove from Queue"
 
@@ -15401,6 +15477,9 @@ msgstr "Remove workspace"
 
 msgid "Remove…"
 msgstr "Remove…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "Removed \"{name}\" from its group"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "Removed {credential} for {agentLabel}."
@@ -16701,6 +16780,10 @@ msgstr "See where your last 30 days land on the public leaderboard. Token counts
 msgid "Select"
 msgstr "Select"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "Select {0}"
+
 msgid "Select a file to view it here"
 msgstr "Select a file to view it here"
 
@@ -16727,6 +16810,9 @@ msgstr "Select a workspace from the sidebar to get started."
 
 msgid "Select agent"
 msgstr "Select agent"
+
+msgid "Select all"
+msgstr "Select all"
 
 msgid "Select All"
 msgstr "Select All"
@@ -16841,6 +16927,9 @@ msgstr "Selected agent is not available on this host"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "Selected agent isn't a terminal agent"
+
+msgid "Selected automations"
+msgstr "Selected automations"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "Selected issues span multiple repositories. Select issues from a single repository to run them."
@@ -19158,6 +19247,9 @@ msgstr "These folders still have your files, but they did not come over to the n
 msgid "These ports are still in use"
 msgstr "These ports are still in use"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "They will stop firing and their run history will be removed. This can't be undone."
+
 msgid "Thinking"
 msgstr "Thinking"
 
@@ -19984,6 +20076,9 @@ msgstr "Type a command or search…"
 
 msgid "Type a message..."
 msgstr "Type a message..."
+
+msgid "Type a name, then press Enter"
+msgstr "Type a name, then press Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Type a task for Claude…"

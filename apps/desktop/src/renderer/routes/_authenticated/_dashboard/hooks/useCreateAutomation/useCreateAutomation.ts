@@ -24,6 +24,7 @@ export type AutomationDraft = {
 	agent?: string;
 	projectId?: string | null;
 	rrule?: string;
+	group?: string | null;
 };
 
 /**
@@ -62,6 +63,7 @@ export function useCreateAutomation(): {
 				agent: portableAgentValue(agentChoices, choice),
 				targetHostId: machineId ?? null,
 				v2ProjectId: draft.projectId ?? null,
+				...(draft.group ? { group: draft.group } : {}),
 				...(draft.rrule
 					? { rrule: draft.rrule, timezone: DEFAULT_TIMEZONE }
 					: { triggers: [] }),

@@ -37,11 +37,27 @@ function parsePo(text: string): Entry[] {
 	return entries;
 }
 
-const stripIcu = (t: string) =>
-	t.replace(
-		/\{\s*\w+\s*,\s*(plural|select|selectordinal)\b[\s\S]*?\}\s*\}/g,
-		"",
-	);
+// Removes each plural/select block whole. Counts braces, since a branch can
+// end in a nested placeholder: `one {Moved # to {group}} other {…}`.
+function stripIcu(t: string): string {
+	let out = "";
+	let from = 0;
+	for (const match of t.matchAll(
+		/\{\s*\w+\s*,\s*(plural|select|selectordinal)\b/g,
+	)) {
+		const start = match.index ?? 0;
+		if (start < from) continue;
+		let depth = 0;
+		let end = start;
+		for (; end < t.length; end++) {
+			if (t[end] === "{") depth++;
+			else if (t[end] === "}" && --depth === 0) break;
+		}
+		out += t.slice(from, start);
+		from = end + 1;
+	}
+	return out + t.slice(from);
+}
 const placeholders = (t: string) =>
 	new Set([...stripIcu(t).matchAll(/\{([A-Za-z0-9_]+)\}/g)].map((m) => m[1]));
 const tags = (t: string) =>
