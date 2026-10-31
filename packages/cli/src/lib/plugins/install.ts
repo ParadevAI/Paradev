@@ -404,29 +404,64 @@ export interface InstallPluginOptions {
 	update?: boolean;
 }
 
+/**
+ * Fetches each GitHub marketplace again. A clone is made once and is otherwise
+ * never fetched, so a plugin added after it was made is missing from it.
+ */
+export async function refreshMarketplaces(marketplace?: string): Promise<void> {
+	const known = readKnownMarketplaces();
+	for (const [name, entry] of Object.entries(known)) {
+		if (marketplace && name !== marketplace) continue;
+		if (entry.source.kind !== "github") continue;
+		await installMarketplace(entry.source, { name });
+	}
+}
+
+export async function findAvailablePlugin(
+	name: string,
+	marketplace?: string,
+	refresh: typeof refreshMarketplaces = refreshMarketplaces,
+): Promise<AvailablePlugin> {
+	const findCandidates = () =>
+		listAvailable().filter(
+			(a) =>
+				a.entry.name === name &&
+				(!marketplace || a.marketplace === marketplace),
+		);
+	let candidates = findCandidates();
+	let refreshError: string | undefined;
+	if (candidates.length === 0) {
+		try {
+			await refresh(marketplace);
+		} catch (error) {
+			refreshError = error instanceof Error ? error.message : String(error);
+		}
+		candidates = findCandidates();
+	}
+
+	const [found, ...others] = candidates;
+	if (!found) {
+		throw new CLIError(
+			`No plugin "${name}" in any installed marketplace. Run: superset plugins list --available`,
+			refreshError
+				? `The marketplace could not be updated: ${refreshError}`
+				: undefined,
+		);
+	}
+	if (others.length) {
+		throw new CLIError(
+			`"${name}" exists in ${candidates.map((c) => c.marketplace).join(", ")}. Disambiguate with ${name}@<marketplace>.`,
+		);
+	}
+	return found;
+}
+
 export async function installPlugin(
 	name: string,
 	marketplace?: string,
 	options: InstallPluginOptions = {},
 ): Promise<InstallPluginResult> {
-	const candidates = listAvailable().filter(
-		(a) =>
-			a.entry.name === name && (!marketplace || a.marketplace === marketplace),
-	);
-
-	if (candidates.length === 0) {
-		throw new CLIError(
-			`No plugin "${name}" in any installed marketplace. Run: superset plugins list --available`,
-		);
-	}
-	if (candidates.length > 1) {
-		throw new CLIError(
-			`"${name}" exists in ${candidates.map((c) => c.marketplace).join(", ")}. Disambiguate with ${name}@<marketplace>.`,
-		);
-	}
-
-	const found = candidates[0];
-	if (!found) throw new CLIError(`No plugin "${name}".`);
+	const found = await findAvailablePlugin(name, marketplace);
 	const { entry } = found;
 	const dir = sourceDir(found.marketplace, entry);
 

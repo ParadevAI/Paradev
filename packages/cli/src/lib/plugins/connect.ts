@@ -1,11 +1,52 @@
 import { CLIError } from "@superset/cli-framework";
 import type { RouterOutputs } from "@superset/trpc";
 import { getApiUrl } from "../config";
+import { findInstalled, type InstalledPlugin } from "./host";
 import { type AuthInputSpec, missingInputsError } from "./inputs";
 
 type AuthMethod = RouterOutputs["connectors"]["get"]["methods"][number];
 
 export type PluginCommand = "install" | "connect";
+
+interface CatalogEntry {
+	name: string;
+	marketplace: string;
+	installed: boolean;
+	connector: string | null;
+}
+
+/**
+ * A connection belongs to the account, so a plugin installed there counts even
+ * when this machine's ledger never recorded it. That is the state `plugins
+ * list` reports.
+ */
+export function findConnectTarget<T extends CatalogEntry>(
+	catalog: readonly T[],
+	ledger: InstalledPlugin[],
+	name: string,
+	marketplace?: string,
+): { marketplace: string; connector: string | null } | undefined {
+	const local = findInstalled(ledger, name, marketplace);
+	const matches = catalog.filter(
+		(entry) =>
+			entry.name === name &&
+			(!marketplace || entry.marketplace === marketplace) &&
+			(entry.installed || entry.marketplace === local?.marketplace),
+	);
+	if (matches.length > 1) {
+		throw new CLIError(
+			`"${name}" is installed from ${matches.map((entry) => entry.marketplace).join(", ")}.`,
+			`Name one with --marketplace <name>, or ${name}@<marketplace>.`,
+		);
+	}
+	const match = matches[0];
+	if (match) {
+		return { marketplace: match.marketplace, connector: match.connector };
+	}
+	return local
+		? { marketplace: local.marketplace, connector: null }
+		: undefined;
+}
 
 export function chooseAuthMethod({
 	command,
