@@ -58,7 +58,7 @@ export default command({
 					...(area ? { area } : {}),
 				}),
 			);
-			if (area) {
+			if (area === "sidebar") {
 				requireSidebar(
 					result.layout,
 					`${paneId} moved to new tab ${result.tabId} in its own area`,

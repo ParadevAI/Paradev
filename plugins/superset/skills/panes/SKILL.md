@@ -108,8 +108,8 @@ Behavior to rely on:
   a new tab) and returns its `paneId`. Pass `--background` to add the tab
   without showing the sidebar or changing its active tab, for example to
   set up tabs while the user works.
-- `PATH` may be relative to the workspace or absolute. `open file` needs a file
-  that exists; `open changes PATH` needs a path inside the workspace and points
+- `PATH` may be relative to the workspace or absolute, and must be inside the
+  workspace. `open file` needs a file that exists; `open changes PATH` points
   the open Changes tab at it rather than adding a second one.
 - `sidebar show` without `--full-screen` returns a full-screen sidebar to its
   width. Hiding the sidebar keeps its tabs; the app hides it by itself when its

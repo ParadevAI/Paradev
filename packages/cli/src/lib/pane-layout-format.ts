@@ -59,14 +59,15 @@ function sidebarState(sidebar: PaneLayoutSidebar): string {
 }
 
 export function formatLayout(layout: PaneLayoutSnapshot): string {
-	const main =
-		layout.tabs.length === 0
-			? ["No panes open in this workspace."]
-			: formatTabs(layout.tabs);
 	const { sidebar } = layout;
-	if (!sidebar) return main.join("\n");
+	if (!sidebar) {
+		return layout.tabs.length === 0
+			? "No panes open in this workspace."
+			: formatTabs(layout.tabs).join("\n");
+	}
 	return [
-		...(layout.tabs.length === 0 ? main : ["Main", ...main]),
+		"Main",
+		...(layout.tabs.length === 0 ? ["No tabs."] : formatTabs(layout.tabs)),
 		"",
 		`Sidebar (${sidebarState(sidebar)})`,
 		...(sidebar.tabs.length === 0 ? ["No tabs."] : formatTabs(sidebar.tabs)),

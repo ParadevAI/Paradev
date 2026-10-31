@@ -1,43 +1,66 @@
-import { statSync } from "node:fs";
-import { isAbsolute, normalize, relative, resolve } from "node:path";
+import { realpathSync, statSync } from "node:fs";
+import { isAbsolute, normalize, relative, resolve, sep } from "node:path";
 import { TRPCError } from "@trpc/server";
 
-function isFile(path: string): boolean {
+function realFile(path: string): string | null {
 	try {
-		return statSync(path).isFile();
+		const real = realpathSync(path);
+		return statSync(real).isFile() ? real : null;
 	} catch {
-		return false;
+		return null;
 	}
+}
+
+function realDir(path: string): string {
+	try {
+		return realpathSync(path);
+	} catch {
+		return path;
+	}
+}
+
+function isInside(root: string, path: string): boolean {
+	return (
+		path === root || path.startsWith(root.endsWith(sep) ? root : root + sep)
+	);
 }
 
 /**
  * The editor takes an absolute path and Changes a path relative to the
- * worktree; an agent may pass either form.
+ * worktree; an agent may pass either form. Both must stay inside the
+ * worktree, after symlinks are followed.
  */
 export function resolveOpenPath(
 	tool: "file" | "changes",
 	path: string,
 	worktreePath: string,
-	fileExists: (path: string) => boolean = isFile,
+	fs: {
+		realFile: (path: string) => string | null;
+		realDir: (path: string) => string;
+	} = {
+		realFile,
+		realDir,
+	},
 ): string {
+	const outside = new TRPCError({
+		code: "BAD_REQUEST",
+		message: `${path} is outside this workspace`,
+	});
 	if (tool === "file") {
-		const absolute = isAbsolute(path) ? path : resolve(worktreePath, path);
-		if (!fileExists(absolute)) {
+		const candidate = isAbsolute(path) ? path : resolve(worktreePath, path);
+		const real = fs.realFile(candidate);
+		if (!real) {
 			throw new TRPCError({
 				code: "NOT_FOUND",
 				message: `No file ${path} in this workspace`,
 			});
 		}
-		return absolute;
+		if (!isInside(fs.realDir(worktreePath), real)) throw outside;
+		return real;
 	}
 	const relativePath = normalize(
 		isAbsolute(path) ? relative(worktreePath, path) : path,
 	);
-	if (relativePath.startsWith("..") || isAbsolute(relativePath)) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: `${path} is outside this workspace, so it has no changes to show`,
-		});
-	}
+	if (relativePath.startsWith("..") || isAbsolute(relativePath)) throw outside;
 	return relativePath;
 }
