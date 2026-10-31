@@ -1116,6 +1116,9 @@ msgstr "{name} a commencé à travailler"
 msgid "{name} stopped"
 msgstr "{name} s'est arrêté"
 
+msgid "{name} wants more access"
+msgstr "{name} demande plus d'accès"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name} : {hours} heures ({gbHours} GB-heures) par siège"
 
@@ -1916,6 +1919,9 @@ msgstr "Ajouter un compte {0}"
 msgid "Add {0} to workspace"
 msgstr "Ajouter {0} à un espace de travail"
 
+msgid "Add {localizedName}?"
+msgstr "Ajouter {localizedName} ?"
+
 msgid "Add a comment…"
 msgstr "Ajouter un commentaire…"
 
@@ -1993,6 +1999,9 @@ msgstr "Ajouter une description"
 
 msgid "Add description..."
 msgstr "Ajouter une description..."
+
+msgid "Add extension"
+msgstr "Ajouter l'extension"
 
 msgid "Add file comment"
 msgstr "Ajouter un commentaire de fichier"
@@ -3957,6 +3966,9 @@ msgstr "Passer au mensuel"
 msgid "Change worktree location"
 msgstr "Changer l'emplacement des worktrees"
 
+msgid "Change your privacy-related settings"
+msgstr "Modifier vos paramètres de confidentialité"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Taux d'échec des changements égal ou inférieur au niveau de référence de l'ère humaine pendant deux trimestres consécutifs."
 
@@ -4785,6 +4797,9 @@ msgstr "Engagé, démarrage imminent."
 msgid "Common questions"
 msgstr "Questions fréquentes"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Communiquer avec les applications natives coopérantes"
+
 msgid "Communication"
 msgstr "Communication"
 
@@ -5559,6 +5574,9 @@ msgstr "Impossible de charger vos machines"
 msgid "Could not mark ready"
 msgstr "Impossible de marquer comme prête"
 
+msgid "Could not open {name}"
+msgstr "Impossible d’ouvrir {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Impossible d'ouvrir la facturation. Veuillez réessayer."
 
@@ -5621,6 +5639,9 @@ msgstr "Impossible d'enregistrer l'espace de travail cloud"
 
 msgid "Could not record environment"
 msgstr "Impossible d'enregistrer l'environnement"
+
+msgid "Could not remove {name}"
+msgstr "Impossible de retirer {name}"
 
 msgid "Could not remove access"
 msgstr "Impossible de retirer l’accès"
@@ -5705,6 +5726,9 @@ msgstr "Impossible de prendre une capture d'écran"
 
 msgid "Could not undo"
 msgstr "Impossible d’annuler"
+
+msgid "Could not update {name}"
+msgstr "Impossible de mettre à jour {name}"
 
 msgid "Could not update plugin"
 msgstr "Impossible de mettre à jour le plugin"
@@ -7078,6 +7102,9 @@ msgstr "a rejeté sa relecture"
 msgid "Display"
 msgstr "Affichage"
 
+msgid "Display notifications"
+msgstr "Afficher des notifications"
+
 msgid "Display options"
 msgstr "Options d’affichage"
 
@@ -7829,6 +7856,9 @@ msgstr "À l'étude"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Réflexion étendue : {activeLabel}"
+
+msgid "Extensions"
+msgstr "Extensions"
 
 msgid "External Application"
 msgstr "Application externe"
@@ -8991,6 +9021,9 @@ msgstr "Obtenir une clé API"
 msgid "Get channel details"
 msgstr "Voir les détails du canal"
 
+msgid "Get extensions"
+msgstr "Obtenir des extensions"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Contactez l'équipe {companyName}."
 
@@ -10147,8 +10180,14 @@ msgstr "L'URL de l'issue doit correspondre à {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "Elle peut :"
+
 msgid "It can't be brought back."
 msgstr "Il ne pourra pas être restauré."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "Cette opération copie les cookies de votre profil « {profileName} » dans un panneau de navigateur ouvert par l'agent. L'agent peut alors agir sur les sites où vous êtes connecté."
 
 msgid "It keeps the title from your prompt."
 msgstr "Le titre issu de votre prompt est conservé."
@@ -10315,6 +10354,9 @@ msgstr "Conserver {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Conserver {planName}"
+
+msgid "Keep current version"
+msgstr "Garder la version actuelle"
 
 msgid "Keep docs fresh"
 msgstr "Garder la documentation à jour"
@@ -10629,6 +10671,9 @@ msgstr "Moins"
 
 msgid "less than a minute ago"
 msgstr "il y a moins d'une minute"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Autoriser un agent à utiliser vos connexions {browserName} ?"
 
 msgid "Let the agent drive."
 msgstr "Laissez l'agent piloter."
@@ -11134,6 +11179,9 @@ msgstr "Gérer l’utilisation"
 
 msgid "Manage your account settings"
 msgstr "Gérez les paramètres de votre compte"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Gérer vos applications, extensions et thèmes"
 
 msgid "Manage your organization's branding and members."
 msgstr "Gérez l'identité visuelle et les membres de votre organisation."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Épingler"
 
+msgid "Pin {name}"
+msgstr "Épingler {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Épinglez vos retours sur une page et laissez l'agent faire la modification."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Lu"
 
+msgid "Read and change all your data on all websites"
+msgstr "Lire et modifier toutes vos données sur tous les sites"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Lire et modifier vos données sur {count} sites"
+
+msgid "Read and change your data on {site}"
+msgstr "Lire et modifier vos données sur {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Lire et planifier sans rien modifier"
 
@@ -15065,6 +15125,9 @@ msgstr "Lire et envoyer des e-mails"
 
 msgid "Read announcement"
 msgstr "Lire l’annonce"
+
+msgid "Read data you copy and paste"
+msgstr "Lire les données que vous copiez et collez"
 
 msgid "Read deployment and build logs"
 msgstr "Lire les logs de déploiement et de build"
@@ -15104,6 +15167,9 @@ msgstr "Lire le guide de configuration"
 
 msgid "Read the source and every pull request."
 msgstr "Lisez le code source et chaque pull request."
+
+msgid "Read your browsing history"
+msgstr "Lire votre historique de navigation"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "Retirer {label} ?"
 
 msgid "Remove {name}"
 msgstr "Retirer {name}"
+
+msgid "Remove {name}?"
+msgstr "Retirer {name} ?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Supprimer {repo} ? Tous les plugins synchronisés depuis ce dépôt sont retirés de votre organisation et de chaque membre qui les a installés."
@@ -18951,6 +19020,9 @@ msgstr "Le point de terminaison doit utiliser https."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "L'environnement à partir duquel cette automatisation démarre des espaces de travail cloud a été archivé ou ne contient aucun dépôt. Choisissez un autre environnement dans les paramètres de l'automatisation."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "L’extension et ses données locales sont supprimées de ce navigateur."
+
 msgid "The factory"
 msgstr "L'usine"
 
@@ -19198,6 +19270,9 @@ msgstr "Le titre apparaît partout où cette page est listée ainsi que dans son
 
 msgid "The turn failed"
 msgstr "Le tour a échoué"
+
+msgid "The update can also:"
+msgstr "La mise à jour peut aussi :"
 
 msgid "The very beginning"
 msgstr "Tout au début"
@@ -20566,6 +20641,9 @@ msgstr "Utiliser la valeur globale par défaut"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Utilisez des minuscules, des chiffres, des tirets et des tirets bas"
 
+msgid "Use more browser features: {features}"
+msgstr "Utiliser d'autres fonctionnalités du navigateur : {features}"
+
 msgid "Use Paradev on mobile"
 msgstr "Utiliser Paradev sur mobile"
 
@@ -21829,30 +21907,3 @@ msgstr "Zoom arrière"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "Impossible d’ouvrir {name}"
-
-msgid "Could not remove {name}"
-msgstr "Impossible de retirer {name}"
-
-msgid "Could not update {name}"
-msgstr "Impossible de mettre à jour {name}"
-
-msgid "Extensions"
-msgstr "Extensions"
-
-msgid "Get extensions"
-msgstr "Obtenir des extensions"
-
-msgid "Pin {name}"
-msgstr "Épingler {name}"
-
-msgid "Remove {name}?"
-msgstr "Retirer {name} ?"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "L’extension et ses données locales sont supprimées de ce navigateur."
-
-msgid "Unpin {name}"
-msgstr "Désépingler {name}"

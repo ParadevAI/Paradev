@@ -12,6 +12,7 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
 	handleTargetCommand,
@@ -508,6 +509,7 @@ class BrowserManager extends EventEmitter {
 			}
 		};
 
+		const extensionWorlds = createExtensionWorldFilter();
 		let closed = false;
 		const handleMessage = (
 			_event: Electron.Event,
@@ -515,6 +517,7 @@ class BrowserManager extends EventEmitter {
 			params: unknown,
 			sessionId?: string,
 		) => {
+			if (!extensionWorlds.shows(method, params)) return;
 			const outSessionId = tagEventSession(sessionId, flatSessionId);
 			onMessage(
 				JSON.stringify({
@@ -597,6 +600,17 @@ class BrowserManager extends EventEmitter {
 						JSON.stringify({
 							id,
 							error: { code: -32600, message: "Missing method" },
+							...(sessionId ? { sessionId } : {}),
+						}),
+					);
+					return;
+				}
+				const refusal = extensionWorlds.refusal(method, params);
+				if (refusal) {
+					onMessage(
+						JSON.stringify({
+							id,
+							error: { code: -32000, message: refusal },
 							...(sessionId ? { sessionId } : {}),
 						}),
 					);

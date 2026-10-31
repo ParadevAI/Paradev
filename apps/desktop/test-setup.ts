@@ -127,10 +127,21 @@ mock.module("electron", () => ({
 		),
 		showMessageBox: mock(() => Promise.resolve({ response: 0 })),
 	},
-	BrowserWindow: mock(() => ({
-		webContents: { send: mock() },
-		loadURL: mock(),
-		on: mock(),
+	BrowserWindow: Object.assign(
+		mock(() => ({
+			webContents: { send: mock() },
+			loadURL: mock(),
+			on: mock(),
+		})),
+		{ getFocusedWindow: mock(() => null), getAllWindows: mock(() => []) },
+	),
+	WebContentsView: mock(() => ({
+		webContents: {
+			send: mock(),
+			once: mock(),
+			loadURL: mock(() => Promise.resolve()),
+			close: mock(),
+		},
 	})),
 	ipcMain: {
 		handle: mock(),

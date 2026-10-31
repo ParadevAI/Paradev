@@ -64,11 +64,6 @@ const RESOURCES_TO_COPY = [
 	},
 ];
 
-/**
- * Copies resources to dist/ for preview/production mode.
- * In preview mode, __dirname resolves relative to dist/main, so resources
- * need to be copied there for the main process to access them.
- */
 // Both packages are bundled into dist/main, and each falls back to loading its
 // preload from the bundle's own directory when node_modules is not packaged.
 const EXTENSION_PACKAGE_PRELOADS = [
@@ -86,6 +81,11 @@ function copyExtensionPackagePreloads(): void {
 	}
 }
 
+/**
+ * Copies resources to dist/ for preview/production mode.
+ * In preview mode, __dirname resolves relative to dist/main, so resources
+ * need to be copied there for the main process to access them.
+ */
 export function copyResourcesPlugin(): Plugin {
 	return {
 		name: "copy-resources",

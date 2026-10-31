@@ -324,10 +324,11 @@ export class BrowserRuntimeRegistryImpl {
 		paneId: string,
 		initialUrl: string,
 		workspaceId: string,
+		partition: string,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", BROWSER_PARTITION);
+		webview.setAttribute("partition", partition);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";
@@ -558,11 +559,12 @@ export class BrowserRuntimeRegistryImpl {
 		url: string,
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
+		partition = BROWSER_PARTITION,
 	): RegistryEntry {
 		const existing = this.entries.get(paneId);
 		if (existing) return existing;
 		const root = this.ensureRootContainer();
-		const entry = this.createEntry(paneId, url, workspaceId);
+		const entry = this.createEntry(paneId, url, workspaceId, partition);
 		entry.onPersist = onPersist;
 		entry.lastUsedAt = ++this.useSeq;
 		// Give automation a usable viewport before this pane has ever been shown.
@@ -583,12 +585,14 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
 		onClose: () => void,
+		partition = BROWSER_PARTITION,
 	): void {
 		const entry = this.openBackground(
 			paneId,
 			initialUrl,
 			workspaceId,
 			onPersist,
+			partition,
 		);
 		// A reused pane can move between workspaces (the attach effect keys on
 		// workspaceId). Keep the registration's workspace current so main-side

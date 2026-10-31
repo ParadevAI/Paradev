@@ -1116,6 +1116,9 @@ msgstr "{name} начал работу"
 msgid "{name} stopped"
 msgstr "{name} остановлен"
 
+msgid "{name} wants more access"
+msgstr "{name} запрашивает больше доступа"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} часов ({gbHours} ГБ-часов) на место"
 
@@ -1916,6 +1919,9 @@ msgstr "Добавить аккаунт {0}"
 msgid "Add {0} to workspace"
 msgstr "Добавить {0} в рабочую область"
 
+msgid "Add {localizedName}?"
+msgstr "Добавить {localizedName}?"
+
 msgid "Add a comment…"
 msgstr "Добавьте комментарий…"
 
@@ -1993,6 +1999,9 @@ msgstr "Добавить описание"
 
 msgid "Add description..."
 msgstr "Добавьте описание..."
+
+msgid "Add extension"
+msgstr "Добавить расширение"
 
 msgid "Add file comment"
 msgstr "Добавить комментарий к файлу"
@@ -3957,6 +3966,9 @@ msgstr "Перейти на месячную"
 msgid "Change worktree location"
 msgstr "Изменить расположение worktree"
 
+msgid "Change your privacy-related settings"
+msgstr "Изменять настройки конфиденциальности"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Доля неудачных изменений на уровне человеческой эпохи или ниже два квартала подряд."
 
@@ -4785,6 +4797,9 @@ msgstr "Взяли в работу, скоро начнём."
 msgid "Common questions"
 msgstr "Частые вопросы"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Обмениваться данными с совместимыми приложениями на компьютере"
+
 msgid "Communication"
 msgstr "Коммуникация"
 
@@ -5559,6 +5574,9 @@ msgstr "Не удалось загрузить ваши машины"
 msgid "Could not mark ready"
 msgstr "Не удалось отметить готовым"
 
+msgid "Could not open {name}"
+msgstr "Не удалось открыть {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Не удалось открыть страницу оплаты. Попробуйте ещё раз."
 
@@ -5621,6 +5639,9 @@ msgstr "Не удалось записать облачную рабочую о�
 
 msgid "Could not record environment"
 msgstr "Не удалось сохранить окружение"
+
+msgid "Could not remove {name}"
+msgstr "Не удалось удалить {name}"
 
 msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
@@ -5705,6 +5726,9 @@ msgstr "Не удалось сделать скриншот"
 
 msgid "Could not undo"
 msgstr "Не удалось отменить"
+
+msgid "Could not update {name}"
+msgstr "Не удалось обновить {name}"
 
 msgid "Could not update plugin"
 msgstr "Не удалось обновить плагин"
@@ -7078,6 +7102,9 @@ msgstr "отклонил(а) своё ревью"
 msgid "Display"
 msgstr "Отображение"
 
+msgid "Display notifications"
+msgstr "Показ уведомлений"
+
 msgid "Display options"
 msgstr "Параметры отображения"
 
@@ -7829,6 +7856,9 @@ msgstr "Изучаем"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Расширенное мышление: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Расширения"
 
 msgid "External Application"
 msgstr "Внешнее приложение"
@@ -8991,6 +9021,9 @@ msgstr "Получить ключ API"
 msgid "Get channel details"
 msgstr "Открыть сведения о канале"
 
+msgid "Get extensions"
+msgstr "Добавить расширения"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Свяжитесь с командой {companyName}."
 
@@ -10147,8 +10180,14 @@ msgstr "URL задачи должен соответствовать {repoMismat
 msgid "Issue…"
 msgstr "Задача…"
 
+msgid "It can:"
+msgstr "Расширение сможет:"
+
 msgid "It can't be brought back."
 msgstr "Его нельзя будет вернуть."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "Cookie из вашего профиля «{profileName}» копируются в панель браузера, которую открыл агент. Тогда агент сможет действовать на сайтах, где вы вошли в аккаунт."
 
 msgid "It keeps the title from your prompt."
 msgstr "Останется название из вашего запроса."
@@ -10315,6 +10354,9 @@ msgstr "Оставить {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Оставить {planName}"
+
+msgid "Keep current version"
+msgstr "Оставить текущую версию"
 
 msgid "Keep docs fresh"
 msgstr "Держать документацию актуальной"
@@ -10629,6 +10671,9 @@ msgstr "Меньше"
 
 msgid "less than a minute ago"
 msgstr "меньше минуты назад"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Разрешить агенту использовать ваши входы из {browserName}?"
 
 msgid "Let the agent drive."
 msgstr "Пусть агент управляет."
@@ -11134,6 +11179,9 @@ msgstr "Управлять использованием"
 
 msgid "Manage your account settings"
 msgstr "Управление настройками аккаунта"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Управлять приложениями, расширениями и темами"
 
 msgid "Manage your organization's branding and members."
 msgstr "Управление брендингом и участниками вашей организации."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Закрепить"
 
+msgid "Pin {name}"
+msgstr "Закрепить {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Оставьте отзыв на странице, и агент внесёт изменение."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитан"
 
+msgid "Read and change all your data on all websites"
+msgstr "Просматривать и изменять все ваши данные на всех сайтах"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Просматривать и изменять ваши данные на сайтах ({count})"
+
+msgid "Read and change your data on {site}"
+msgstr "Просматривать и изменять ваши данные на {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Читать и планировать, ничего не меняя"
 
@@ -15065,6 +15125,9 @@ msgstr "Чтение и отправка писем"
 
 msgid "Read announcement"
 msgstr "Читать анонс"
+
+msgid "Read data you copy and paste"
+msgstr "Читать данные, которые вы копируете и вставляете"
 
 msgid "Read deployment and build logs"
 msgstr "Чтение логов деплоя и сборки"
@@ -15104,6 +15167,9 @@ msgstr "Читать руководство по настройке"
 
 msgid "Read the source and every pull request."
 msgstr "Читайте исходный код и каждый pull request."
+
+msgid "Read your browsing history"
+msgstr "Просматривать историю браузера"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "Удалить {label}?"
 
 msgid "Remove {name}"
 msgstr "Удалить {name}"
+
+msgid "Remove {name}?"
+msgstr "Удалить {name}?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Удалить {repo}? Все синхронизированные из него плагины будут удалены из вашей организации и у всех участников, которые их установили."
@@ -18951,6 +19020,9 @@ msgstr "Конечная точка должна использовать https.
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Окружение, из которого эта автоматизация запускает облачные рабочие области, архивировано или не содержит репозиториев. Выберите другое окружение в настройках автоматизации."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Расширение и его локальные данные удаляются из этого браузера."
+
 msgid "The factory"
 msgstr "Фабрика"
 
@@ -19198,6 +19270,9 @@ msgstr "Заголовок отображается везде, где указ�
 
 msgid "The turn failed"
 msgstr "Ход завершился ошибкой"
+
+msgid "The update can also:"
+msgstr "После обновления расширение также сможет:"
 
 msgid "The very beginning"
 msgstr "Самое начало"
@@ -20566,6 +20641,9 @@ msgstr "Использовать общий по умолчанию"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Используйте строчные буквы, цифры, дефисы и подчёркивания"
 
+msgid "Use more browser features: {features}"
+msgstr "Использовать дополнительные функции браузера: {features}"
+
 msgid "Use Paradev on mobile"
 msgstr "Используйте Paradev на телефоне"
 
@@ -21829,30 +21907,3 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "Не удалось открыть {name}"
-
-msgid "Could not remove {name}"
-msgstr "Не удалось удалить {name}"
-
-msgid "Could not update {name}"
-msgstr "Не удалось обновить {name}"
-
-msgid "Extensions"
-msgstr "Расширения"
-
-msgid "Get extensions"
-msgstr "Добавить расширения"
-
-msgid "Pin {name}"
-msgstr "Закрепить {name}"
-
-msgid "Remove {name}?"
-msgstr "Удалить {name}?"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "Расширение и его локальные данные удаляются из этого браузера."
-
-msgid "Unpin {name}"
-msgstr "Открепить {name}"

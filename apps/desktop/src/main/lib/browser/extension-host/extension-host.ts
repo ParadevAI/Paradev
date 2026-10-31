@@ -1,12 +1,7 @@
-import path from "node:path";
 import { BrowserWindow, session } from "electron";
 import { ElectronChromeExtensions } from "electron-chrome-extensions";
-import {
-	chromeUserAgent,
-	firefoxUserAgent,
-	GOOGLE_SIGN_IN_HOST,
-} from "shared/chrome-user-agent";
 import { BROWSER_PARTITION } from "shared/constants";
+import { watchWindows } from "../../window-registry/window-registry";
 import { browserManager, isAllowedGuestUrl } from "../browser-manager";
 import {
 	attachBrowserExtensions,
@@ -19,9 +14,9 @@ import {
 	openExtensionWindow,
 } from "./extension-window";
 import { serveOffscreenDocuments } from "./offscreen-documents";
+import { confirmPermissionRequest } from "./permission-request";
+import { waitForNewPane } from "./wait-for-new-pane";
 import { installBrowserWebStore } from "./web-store";
-
-const NEW_PANE_TIMEOUT_MS = 10_000;
 
 type HostTab =
 	| { kind: "pane"; paneId: string }
@@ -31,26 +26,6 @@ type TabEntry = [Electron.WebContents, BrowserWindow];
 
 function hostWindowOf(contents: Electron.WebContents): BrowserWindow | null {
 	return BrowserWindow.fromWebContents(contents.hostWebContents ?? contents);
-}
-
-function waitForNewPane(workspaceId: string | null): Promise<string> {
-	const known = new Set(browserManager.listPanes().map((pane) => pane.paneId));
-	return new Promise((resolve, reject) => {
-		const onRegistered = (event: {
-			paneId: string;
-			workspaceId: string | null;
-		}) => {
-			if (event.workspaceId !== workspaceId || known.has(event.paneId)) return;
-			clearTimeout(timer);
-			browserManager.off("pane-registered", onRegistered);
-			resolve(event.paneId);
-		};
-		const timer = setTimeout(() => {
-			browserManager.off("pane-registered", onRegistered);
-			reject(new Error("No browser pane opened for the extension's tab"));
-		}, NEW_PANE_TIMEOUT_MS);
-		browserManager.on("pane-registered", onRegistered);
-	});
 }
 
 /**
@@ -67,21 +42,6 @@ export function initBrowserExtensionHost(): void {
 
 function startExtensionHost(): void {
 	const browserSession = session.fromPartition(BROWSER_PARTITION);
-	const electronUserAgent = browserSession.getUserAgent();
-	browserSession.setUserAgent(chromeUserAgent(electronUserAgent));
-	const googleSignInUserAgent = firefoxUserAgent(electronUserAgent);
-	browserSession.webRequest.onBeforeSendHeaders(
-		{ urls: [`https://${GOOGLE_SIGN_IN_HOST}/*`] },
-		(details, callback) => {
-			const requestHeaders = Object.fromEntries(
-				Object.entries(details.requestHeaders).filter(
-					([name]) => !name.toLowerCase().startsWith("sec-ch-ua"),
-				),
-			);
-			requestHeaders["User-Agent"] = googleSignInUserAgent;
-			callback({ requestHeaders });
-		},
-	);
 	const paneTabs = new Map<string, Electron.WebContents>();
 	const extensionWindows = new Set<BrowserWindow>();
 	let activePaneId: string | null = null;
@@ -115,7 +75,7 @@ function startExtensionHost(): void {
 		const workspaceId =
 			browserManager.listPanes().find((pane) => pane.paneId === openerPaneId)
 				?.workspaceId ?? null;
-		const registered = waitForNewPane(workspaceId);
+		const registered = waitForNewPane(workspaceId, browserSession);
 		browserManager.openInNewPane(openerPaneId, url);
 		const contents = browserManager.getWebContents(await registered);
 		const window = contents && hostWindowOf(contents);
@@ -137,17 +97,6 @@ function startExtensionHost(): void {
 		return [window.webContents, window];
 	};
 
-	const shimsPreload = path.join(
-		__dirname,
-		"../preload/browser-extension-shims.js",
-	);
-	for (const type of ["frame", "service-worker"] as const) {
-		browserSession.registerPreloadScript({
-			id: `browser-extension-shims-${type}`,
-			type,
-			filePath: shimsPreload,
-		});
-	}
 	serveOffscreenDocuments(browserSession);
 
 	const extensions = new ElectronChromeExtensions({
@@ -176,7 +125,10 @@ function startExtensionHost(): void {
 				if (!window.isDestroyed()) window.close();
 			}
 		},
+		requestPermissions: confirmPermissionRequest,
 	});
+
+	watchWindows((window) => extensions.addWindow(window));
 
 	try {
 		attachBrowserExtensions({

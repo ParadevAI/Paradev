@@ -25,6 +25,9 @@ export const PORTS_FILE_NAME = "ports.json";
 // Separate sessions keep browser-pane extensions away from the app's own requests.
 export const APP_PARTITION = "persist:superset";
 export const BROWSER_PARTITION = "persist:browser";
+// Panes agents open: no Web Store extensions, so no password manager an agent can read.
+export const AGENT_BROWSER_PARTITION = "persist:browser-agent";
+export const PANE_PARTITIONS = [BROWSER_PARTITION, AGENT_BROWSER_PARTITION];
 
 export const CONFIG_TEMPLATE = `{
   "setup": [],

@@ -1116,6 +1116,9 @@ msgstr "{name} çalışmaya başladı"
 msgid "{name} stopped"
 msgstr "{name} durduruldu"
 
+msgid "{name} wants more access"
+msgstr "{name} daha fazla erişim istiyor"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: koltuk başına {hours} saat ({gbHours} GB-saat)"
 
@@ -1916,6 +1919,9 @@ msgstr "{0} hesabı ekle"
 msgid "Add {0} to workspace"
 msgstr "{0} öğesini çalışma alanına ekle"
 
+msgid "Add {localizedName}?"
+msgstr "{localizedName} eklensin mi?"
+
 msgid "Add a comment…"
 msgstr "Yorum ekle…"
 
@@ -1993,6 +1999,9 @@ msgstr "Açıklama Ekle"
 
 msgid "Add description..."
 msgstr "Açıklama ekleyin..."
+
+msgid "Add extension"
+msgstr "Uzantı ekle"
 
 msgid "Add file comment"
 msgstr "Dosya yorumu ekle"
@@ -3957,6 +3966,9 @@ msgstr "Aylığa geç"
 msgid "Change worktree location"
 msgstr "Worktree konumunu değiştir"
 
+msgid "Change your privacy-related settings"
+msgstr "Gizlilikle ilgili ayarlarınızı değiştirme"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Değişiklik hata oranı, iki ardışık çeyrek boyunca insan dönemi taban çizgisinde veya altında kalır."
 
@@ -4785,6 +4797,9 @@ msgstr "Kararlaştırıldı, yakında başlıyor."
 msgid "Common questions"
 msgstr "Sık sorulan sorular"
 
+msgid "Communicate with cooperating native applications"
+msgstr "İşbirliği yapan yerel uygulamalarla iletişim kurma"
+
 msgid "Communication"
 msgstr "İletişim"
 
@@ -5559,6 +5574,9 @@ msgstr "Makineleriniz yüklenemedi"
 msgid "Could not mark ready"
 msgstr "Hazır olarak işaretlenemedi"
 
+msgid "Could not open {name}"
+msgstr "{name} açılamadı"
+
 msgid "Could not open billing. Please try again."
 msgstr "Faturalandırma açılamadı. Lütfen tekrar deneyin."
 
@@ -5621,6 +5639,9 @@ msgstr "Bulut çalışma alanı kaydedilemedi"
 
 msgid "Could not record environment"
 msgstr "Ortam kaydedilemedi"
+
+msgid "Could not remove {name}"
+msgstr "{name} kaldırılamadı"
 
 msgid "Could not remove access"
 msgstr "Erişim kaldırılamadı"
@@ -5705,6 +5726,9 @@ msgstr "Ekran görüntüsü alınamadı"
 
 msgid "Could not undo"
 msgstr "Geri alınamadı"
+
+msgid "Could not update {name}"
+msgstr "{name} güncellenemedi"
 
 msgid "Could not update plugin"
 msgstr "Eklenti güncellenemedi"
@@ -7078,6 +7102,9 @@ msgstr "incelemesini geri çekti"
 msgid "Display"
 msgstr "Görüntüleme"
 
+msgid "Display notifications"
+msgstr "Bildirimleri görüntüleme"
+
 msgid "Display options"
 msgstr "Görüntüleme seçenekleri"
 
@@ -7829,6 +7856,9 @@ msgstr "Araştırılıyor"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Genişletilmiş düşünme: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Uzantılar"
 
 msgid "External Application"
 msgstr "Harici uygulama"
@@ -8991,6 +9021,9 @@ msgstr "API anahtarı alın"
 msgid "Get channel details"
 msgstr "Kanal ayrıntılarını gör"
 
+msgid "Get extensions"
+msgstr "Uzantı ekle"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName} ekibiyle iletişime geçin."
 
@@ -10147,8 +10180,14 @@ msgstr "Issue URL'si {repoMismatch} ile eşleşmeli."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "Şunları yapabilir:"
+
 msgid "It can't be brought back."
 msgstr "Geri getirilemez."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "\"{profileName}\" profilinizdeki çerezleri, ajanın açtığı bir tarayıcı bölmesine kopyalar. Ajan böylece oturum açtığınız sitelerde işlem yapabilir."
 
 msgid "It keeps the title from your prompt."
 msgstr "İsteminizdeki başlık korunur."
@@ -10315,6 +10354,9 @@ msgstr "{planLabel} planını koru"
 
 msgid "Keep {planName}"
 msgstr "{planName} planını koru"
+
+msgid "Keep current version"
+msgstr "Mevcut sürümü koru"
 
 msgid "Keep docs fresh"
 msgstr "Belgeleri güncel tut"
@@ -10629,6 +10671,9 @@ msgstr "Az"
 
 msgid "less than a minute ago"
 msgstr "bir dakikadan az önce"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Bir ajanın {browserName} oturumlarınızı kullanmasına izin verilsin mi?"
 
 msgid "Let the agent drive."
 msgstr "Ajan kullansın."
@@ -11134,6 +11179,9 @@ msgstr "Kullanımı yönet"
 
 msgid "Manage your account settings"
 msgstr "Hesap ayarlarınızı yönetin"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Uygulamalarınızı, uzantılarınızı ve temalarınızı yönetme"
 
 msgid "Manage your organization's branding and members."
 msgstr "Kuruluşunuzun marka görünümünü ve üyelerini yönetin."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Sabitle"
 
+msgid "Pin {name}"
+msgstr "{name} uzantısını sabitle"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Bir sayfaya geri bildirim iğneleyin, değişikliği ajan yapsın."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Okundu"
 
+msgid "Read and change all your data on all websites"
+msgstr "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme"
+
+msgid "Read and change your data on {count} websites"
+msgstr "{count} web sitesindeki verilerinizi okuma ve değiştirme"
+
+msgid "Read and change your data on {site}"
+msgstr "{site} üzerindeki verilerinizi okuma ve değiştirme"
+
 msgid "Read and plan without changing anything"
 msgstr "Hiçbir şeyi değiştirmeden oku ve planla"
 
@@ -15065,6 +15125,9 @@ msgstr "E-postaları okuyun ve gönderin"
 
 msgid "Read announcement"
 msgstr "Duyuruyu oku"
+
+msgid "Read data you copy and paste"
+msgstr "Kopyalayıp yapıştırdığınız verileri okuma"
 
 msgid "Read deployment and build logs"
 msgstr "Dağıtım ve derleme günlüklerini okuyun"
@@ -15104,6 +15167,9 @@ msgstr "Kurulum rehberini okuyun"
 
 msgid "Read the source and every pull request."
 msgstr "Kaynak kodu ve her pull request'i okuyun."
+
+msgid "Read your browsing history"
+msgstr "Tarama geçmişinizi okuma"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "{label} kaldırılsın mı?"
 
 msgid "Remove {name}"
 msgstr "{name} kaldır"
+
+msgid "Remove {name}?"
+msgstr "{name} kaldırılsın mı?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan ve onları yüklemiş her üyeden kaldırılır."
@@ -18951,6 +19020,9 @@ msgstr "Uç nokta https kullanmalıdır."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşivlendi veya hiç deposu yok. Otomasyonun ayarlarından başka bir ortam seçin."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
+
 msgid "The factory"
 msgstr "Fabrika"
 
@@ -19198,6 +19270,9 @@ msgstr "Başlık, bu sayfanın listelendiği her yerde ve bağlantı önizlemesi
 
 msgid "The turn failed"
 msgstr "Tur başarısız oldu"
+
+msgid "The update can also:"
+msgstr "Güncelleme ayrıca şunları yapabilir:"
 
 msgid "The very beginning"
 msgstr "En başı"
@@ -20566,6 +20641,9 @@ msgstr "Genel varsayılanı kullan"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Küçük harf, rakam, tire ve alt çizgi kullanın"
 
+msgid "Use more browser features: {features}"
+msgstr "Daha fazla tarayıcı özelliği kullanma: {features}"
+
 msgid "Use Paradev on mobile"
 msgstr "Paradev’i mobilde kullanın"
 
@@ -21829,30 +21907,3 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "{name} açılamadı"
-
-msgid "Could not remove {name}"
-msgstr "{name} kaldırılamadı"
-
-msgid "Could not update {name}"
-msgstr "{name} güncellenemedi"
-
-msgid "Extensions"
-msgstr "Uzantılar"
-
-msgid "Get extensions"
-msgstr "Uzantı ekle"
-
-msgid "Pin {name}"
-msgstr "{name} sabitle"
-
-msgid "Remove {name}?"
-msgstr "{name} kaldırılsın mı?"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
-
-msgid "Unpin {name}"
-msgstr "{name} sabitlemesini kaldır"

@@ -16,19 +16,19 @@ interface Shim {
 
 // A service worker's preload realm has neither `navigator` nor `location`.
 async function importInWorkerPreloadRealm(): Promise<Shim> {
-	const navigatorDescriptor = Object.getOwnPropertyDescriptor(
-		globalThis,
-		"navigator",
-	);
-	Object.defineProperty(globalThis, "navigator", {
-		value: undefined,
-		configurable: true,
+	const hidden = ["navigator", "location"].map((name) => {
+		const descriptor = Object.getOwnPropertyDescriptor(globalThis, name);
+		Object.defineProperty(globalThis, name, {
+			value: undefined,
+			configurable: true,
+		});
+		return [name, descriptor] as const;
 	});
 	try {
 		await import("./browser-extension-shims");
 	} finally {
-		if (navigatorDescriptor) {
-			Object.defineProperty(globalThis, "navigator", navigatorDescriptor);
+		for (const [name, descriptor] of hidden) {
+			if (descriptor) Object.defineProperty(globalThis, name, descriptor);
 		}
 	}
 	const calls = (contextBridge.executeInMainWorld as Mock<() => void>).mock
@@ -51,6 +51,8 @@ function runInMainWorld(
 		navigator: {
 			userAgent:
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.7977.167 Electron/44.9.3 Safari/537.36",
+			vendor: "Google Inc.",
+			userAgentData: { brands: [{ brand: "Chromium", version: "152" }] },
 		},
 		chrome: {},
 		args: [
@@ -104,7 +106,8 @@ test("Google's sign-in page sees Firefox, with no Chromium brands to cross-check
 	const google = runInMainWorld(shim, "https://accounts.google.com/v3/signin");
 	expect(google.navigator.userAgent).toContain("Firefox/154.0");
 	expect(google.navigator.userAgentData).toBeUndefined();
-	expect(
-		runInMainWorld(shim, "https://example.com/").navigator.userAgent,
-	).toContain("Electron");
+	expect(google.navigator.vendor).toBe("");
+	const website = runInMainWorld(shim, "https://example.com/").navigator;
+	expect(website.userAgent).toContain("Electron");
+	expect(website.userAgentData).toBeDefined();
 });

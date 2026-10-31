@@ -6,6 +6,7 @@ import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboar
 import type { BrowserPaneData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
+import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { openBackgroundBrowser } from "./utils/openBackgroundBrowser";
 
 interface BrowserOpenRequest {
@@ -64,6 +65,7 @@ export function useBrowserOpenRequests() {
 										},
 									);
 								},
+								AGENT_BROWSER_PARTITION,
 							);
 						} catch (err) {
 							console.error(
@@ -78,6 +80,7 @@ export function useBrowserOpenRequests() {
 							openUrl: request.url,
 							openUrlTarget: request.target,
 							openUrlRequestId: request.requestId,
+							openUrlAgent: true,
 						},
 					}).catch((err) => {
 						console.error("[useBrowserOpenRequests] navigate failed:", err);

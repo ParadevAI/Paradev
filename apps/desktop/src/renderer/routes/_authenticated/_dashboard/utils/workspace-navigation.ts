@@ -85,6 +85,7 @@ export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
 	openUrl?: string;
 	openUrlTarget?: "current-tab" | "new-tab";
 	openUrlRequestId?: string;
+	openUrlAgent?: true;
 }
 
 /**

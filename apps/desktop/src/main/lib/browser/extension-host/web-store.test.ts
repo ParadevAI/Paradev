@@ -106,3 +106,71 @@ test("the Web Store page names the app once, even when the app name contains Chr
 
 	expect(labels[0]?.innerText).toBe(`Add to ${appName}`);
 });
+
+test("only the real Web Store origin gets the store API, and updates pass the access check", () => {
+	const dist = join(
+		dirname(require.resolve("electron-chrome-web-store")),
+		"../..",
+	);
+	const preload = readFileSync(
+		join(dist, "chrome-web-store.preload.js"),
+		"utf8",
+	);
+	expect(preload).toContain(
+		'if (location.origin === "https://chromewebstore.google.com") {',
+	);
+	for (const build of ["cjs/browser/index.js", "esm/browser/index.mjs"]) {
+		const main = readFileSync(join(dist, build), "utf8");
+		expect(main).toContain("if (senderOrigin !== WEBSTORE_URL) {");
+		expect(main).not.toContain("startsWith(WEBSTORE_URL)");
+		expect(main).toContain("await beforeUpdate({ id: extensionId");
+		const update = main.slice(main.indexOf("async function updateExtension("));
+		expect(update).toContain(
+			"downloadExtensionFromURL(update.url, stagingPath, extensionId)",
+		);
+		expect(update.indexOf("await beforeUpdate(")).toBeLessThan(
+			update.indexOf("rename(stagedPath, updatePath)"),
+		);
+		const install = main.slice(
+			main.indexOf("async function installExtension("),
+		);
+		expect(install).toContain(
+			`downloadExtension(extensionId, \`\${extensionsPath}.staging\`)`,
+		);
+		expect(install.indexOf("await opts.verifyInstall(")).toBeLessThan(
+			install.indexOf("rename(stagedPath, extensionPath)"),
+		);
+	}
+});
+
+test("the Web Store page names the app only on its add and remove buttons", () => {
+	const preload = readFileSync(
+		join(
+			dirname(require.resolve("electron-chrome-web-store")),
+			"../../chrome-web-store.preload.js",
+		),
+		"utf8",
+	);
+	const start = preload.indexOf("function updateBranding");
+	const spans = ["Add to Chrome", "Remove from Chrome", "Install Chrome"].map(
+		(innerText) => ({ innerText }),
+	);
+	const updateBranding = new Function(
+		"document",
+		"requestAnimationFrame",
+		"setTimeout",
+		`${preload.slice(start, preload.indexOf("function getUAProductVersion", start))}; return updateBranding;`,
+	)(
+		{ querySelectorAll: () => spans },
+		(callback: () => void) => callback(),
+		() => {},
+	) as (appName: string) => void;
+
+	updateBranding("Superset");
+
+	expect(spans.map((span) => span.innerText)).toEqual([
+		"Add to Superset",
+		"Remove from Superset",
+		"Install Chrome",
+	]);
+});

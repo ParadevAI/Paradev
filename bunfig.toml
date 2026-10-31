@@ -23,9 +23,6 @@ minimumReleaseAge = 259200
 # SDKs they depend on. The adapter pins are exact.
 # @expo/hub-client and expo-device-hub: Expo releases them together and the
 # Mobile pane tracks each release as it ships. Exact pins.
-# electron: 44.9.3 carries the October 2026 security fixes and electron#54908
-# (sessions failing every request after a Network Service restart). Exact pin;
-# remove after 2026-10-24.
 # @pierre/highlights: @pierre/diffs 1.6.2 pins 0.3.0 (2026-10-26). Exact pin;
 # remove after 2026-10-30.
 minimumReleaseAgeExcludes = [
@@ -43,7 +40,6 @@ minimumReleaseAgeExcludes = [
   "@anthropic-ai/claude-agent-sdk-win32-x64",
   "@openai/codex",
   "@vercel/sandbox",
-  "electron",
   "@expo/hub-client",
   "expo-device-hub",
   "@expo/ui",

@@ -5,7 +5,7 @@ import { basename, extname, join } from "node:path";
 import { downloads } from "@superset/local-db";
 import { desc, eq, ne } from "drizzle-orm";
 import { app, session, shell } from "electron";
-import { APP_PARTITION, BROWSER_PARTITION } from "shared/constants";
+import { APP_PARTITION, PANE_PARTITIONS } from "shared/constants";
 import { localDb } from "../local-db";
 
 const MAX_TRACKED_DOWNLOADS = 200;
@@ -108,7 +108,7 @@ class DownloadManager extends EventEmitter {
 			});
 		};
 
-		for (const partition of [APP_PARTITION, BROWSER_PARTITION]) {
+		for (const partition of [APP_PARTITION, ...PANE_PARTITIONS]) {
 			const ses = session.fromPartition(partition);
 			ses.setDownloadPath(downloadDir);
 			ses.on("will-download", onWillDownload);

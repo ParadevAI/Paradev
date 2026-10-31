@@ -1116,6 +1116,9 @@ msgstr "{name} が作業を開始しました"
 msgid "{name} stopped"
 msgstr "{name} が停止しました"
 
+msgid "{name} wants more access"
+msgstr "{name} がより多くのアクセスを求めています"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: 1席あたり {hours} 時間（{gbHours} GB 時間）"
 
@@ -1916,6 +1919,9 @@ msgstr "{0}アカウントを追加"
 msgid "Add {0} to workspace"
 msgstr "{0} をワークスペースに追加"
 
+msgid "Add {localizedName}?"
+msgstr "{localizedName} を追加しますか？"
+
 msgid "Add a comment…"
 msgstr "コメントを追加…"
 
@@ -1993,6 +1999,9 @@ msgstr "説明を追加"
 
 msgid "Add description..."
 msgstr "説明を追加..."
+
+msgid "Add extension"
+msgstr "拡張機能を追加"
 
 msgid "Add file comment"
 msgstr "ファイルにコメントを追加"
@@ -3957,6 +3966,9 @@ msgstr "月払いに変更"
 msgid "Change worktree location"
 msgstr "ワークツリーの場所を変更"
 
+msgid "Change your privacy-related settings"
+msgstr "プライバシー関連の設定の変更"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "変更失敗率が2四半期連続で人間の時代の基準値以下に収まる。"
 
@@ -4785,6 +4797,9 @@ msgstr "着手が決まっており、まもなく開始します。"
 msgid "Common questions"
 msgstr "よくある質問"
 
+msgid "Communicate with cooperating native applications"
+msgstr "連携するネイティブ アプリケーションとの通信"
+
 msgid "Communication"
 msgstr "コミュニケーション"
 
@@ -5559,6 +5574,9 @@ msgstr "マシンを読み込めませんでした"
 msgid "Could not mark ready"
 msgstr "レビュー可能にできませんでした"
 
+msgid "Could not open {name}"
+msgstr "{name} を開けませんでした"
+
 msgid "Could not open billing. Please try again."
 msgstr "請求ページを開けませんでした。もう一度お試しください。"
 
@@ -5621,6 +5639,9 @@ msgstr "クラウドワークスペースを記録できませんでした"
 
 msgid "Could not record environment"
 msgstr "環境を保存できませんでした"
+
+msgid "Could not remove {name}"
+msgstr "{name} を削除できませんでした"
 
 msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
@@ -5705,6 +5726,9 @@ msgstr "スクリーンショットを撮れませんでした"
 
 msgid "Could not undo"
 msgstr "取り消せませんでした"
+
+msgid "Could not update {name}"
+msgstr "{name} を更新できませんでした"
 
 msgid "Could not update plugin"
 msgstr "プラグインを更新できませんでした"
@@ -7078,6 +7102,9 @@ msgstr "がレビューを取り下げました"
 msgid "Display"
 msgstr "表示"
 
+msgid "Display notifications"
+msgstr "通知の表示"
+
 msgid "Display options"
 msgstr "表示オプション"
 
@@ -7829,6 +7856,9 @@ msgstr "検討中"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "拡張思考: {activeLabel}"
+
+msgid "Extensions"
+msgstr "拡張機能"
 
 msgid "External Application"
 msgstr "外部アプリケーション"
@@ -8991,6 +9021,9 @@ msgstr "APIキーを取得"
 msgid "Get channel details"
 msgstr "チャンネルの詳細を表示"
 
+msgid "Get extensions"
+msgstr "拡張機能を入手"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName}チームにお問い合わせください。"
 
@@ -10147,8 +10180,14 @@ msgstr "IssueのURLは{repoMismatch}と一致する必要があります。"
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "次の操作を行えます:"
+
 msgid "It can't be brought back."
 msgstr "元に戻すことはできません。"
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "エージェントが開いたブラウザペインに、\"{profileName}\" プロファイルの Cookie をコピーします。エージェントはその後、あなたがログインしているサイトで操作できます。"
 
 msgid "It keeps the title from your prompt."
 msgstr "プロンプトから付けたタイトルのままになります。"
@@ -10315,6 +10354,9 @@ msgstr "{planLabel} を維持"
 
 msgid "Keep {planName}"
 msgstr "{planName} を維持"
+
+msgid "Keep current version"
+msgstr "現在のバージョンを維持"
 
 msgid "Keep docs fresh"
 msgstr "ドキュメントを最新に保つ"
@@ -10629,6 +10671,9 @@ msgstr "少ない"
 
 msgid "less than a minute ago"
 msgstr "1分未満前"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "エージェントに {browserName} のログインを使わせますか？"
 
 msgid "Let the agent drive."
 msgstr "エージェントに操作させる。"
@@ -11134,6 +11179,9 @@ msgstr "使用量を管理"
 
 msgid "Manage your account settings"
 msgstr "アカウント設定を管理"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "アプリ、拡張機能、テーマの管理"
 
 msgid "Manage your organization's branding and members."
 msgstr "組織のブランディングとメンバーを管理します。"
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "ピン留め"
 
+msgid "Pin {name}"
+msgstr "{name} をピン留め"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "ページにフィードバックを残し、変更はエージェントに任せましょう。"
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "読み取り済み"
 
+msgid "Read and change all your data on all websites"
+msgstr "すべてのウェブサイト上にある自分のすべてのデータの読み取りと変更"
+
+msgid "Read and change your data on {count} websites"
+msgstr "{count} 件のウェブサイト上にある自分のデータの読み取りと変更"
+
+msgid "Read and change your data on {site}"
+msgstr "{site} 上にある自分のデータの読み取りと変更"
+
 msgid "Read and plan without changing anything"
 msgstr "何も変更せずに読み取りと計画のみ"
 
@@ -15065,6 +15125,9 @@ msgstr "メールの閲覧と送信"
 
 msgid "Read announcement"
 msgstr "お知らせを読む"
+
+msgid "Read data you copy and paste"
+msgstr "コピーして貼り付けたデータの読み取り"
 
 msgid "Read deployment and build logs"
 msgstr "デプロイとビルドのログを確認"
@@ -15104,6 +15167,9 @@ msgstr "セットアップガイドを読む"
 
 msgid "Read the source and every pull request."
 msgstr "ソースコードとすべてのプルリクエストを読む。"
+
+msgid "Read your browsing history"
+msgstr "閲覧履歴の読み取り"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "{label}を削除しますか?"
 
 msgid "Remove {name}"
 msgstr "{name} を削除"
+
+msgid "Remove {name}?"
+msgstr "{name} を削除しますか?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて、組織からも、インストール済みのすべてのメンバーからも削除されます。"
@@ -18951,6 +19020,9 @@ msgstr "エンドポイントは https を使用する必要があります。"
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "このオートメーションがクラウドワークスペースを起動する環境が、アーカイブされたかリポジトリがありません。オートメーションの設定で別の環境を選択してください。"
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "拡張機能とそのローカルデータがこのブラウザから削除されます。"
+
 msgid "The factory"
 msgstr "工場"
 
@@ -19198,6 +19270,9 @@ msgstr "タイトルはこのページが一覧表示される場所すべてと
 
 msgid "The turn failed"
 msgstr "ターンが失敗しました"
+
+msgid "The update can also:"
+msgstr "この更新では次の操作も可能になります:"
 
 msgid "The very beginning"
 msgstr "最初"
@@ -20566,6 +20641,9 @@ msgstr "グローバルのデフォルトを使用"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "小文字、数字、ハイフン、アンダースコアを使用してください"
 
+msgid "Use more browser features: {features}"
+msgstr "ブラウザの追加機能を使用: {features}"
+
 msgid "Use Paradev on mobile"
 msgstr "モバイルでParadevを使う"
 
@@ -21829,30 +21907,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "{name} を開けませんでした"
-
-msgid "Could not remove {name}"
-msgstr "{name} を削除できませんでした"
-
-msgid "Could not update {name}"
-msgstr "{name} を更新できませんでした"
-
-msgid "Extensions"
-msgstr "拡張機能"
-
-msgid "Get extensions"
-msgstr "拡張機能を入手"
-
-msgid "Pin {name}"
-msgstr "{name} をピン留め"
-
-msgid "Remove {name}?"
-msgstr "{name} を削除しますか?"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "拡張機能とそのローカルデータがこのブラウザから削除されます。"
-
-msgid "Unpin {name}"
-msgstr "{name} のピン留めを解除"

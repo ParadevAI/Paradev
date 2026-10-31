@@ -1116,6 +1116,9 @@ msgstr "{name} 開始工作"
 msgid "{name} stopped"
 msgstr "{name} 已停止"
 
+msgid "{name} wants more access"
+msgstr "{name} 要求更多存取權限"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}：每席位 {hours} 小時（{gbHours} GB 小時）"
 
@@ -1916,6 +1919,9 @@ msgstr "新增{0}帳戶"
 msgid "Add {0} to workspace"
 msgstr "將{0}新增到工作區"
 
+msgid "Add {localizedName}?"
+msgstr "要新增「{localizedName}」嗎？"
+
 msgid "Add a comment…"
 msgstr "新增留言…"
 
@@ -1993,6 +1999,9 @@ msgstr "新增說明"
 
 msgid "Add description..."
 msgstr "新增描述..."
+
+msgid "Add extension"
+msgstr "新增擴充功能"
 
 msgid "Add file comment"
 msgstr "新增檔案評論"
@@ -3957,6 +3966,9 @@ msgstr "改為按月"
 msgid "Change worktree location"
 msgstr "更改worktree位置"
 
+msgid "Change your privacy-related settings"
+msgstr "變更你的隱私權相關設定"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "變更失敗率連續兩個季度不高於人類時代的基線。"
 
@@ -4785,6 +4797,9 @@ msgstr "已確定，很快開始。"
 msgid "Common questions"
 msgstr "常見問題"
 
+msgid "Communicate with cooperating native applications"
+msgstr "與合作的原生應用程式通訊"
+
 msgid "Communication"
 msgstr "溝通"
 
@@ -5559,6 +5574,9 @@ msgstr "無法載入你的機器"
 msgid "Could not mark ready"
 msgstr "無法標記為待審查"
 
+msgid "Could not open {name}"
+msgstr "無法開啟 {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "無法開啟帳單，請再試一次。"
 
@@ -5621,6 +5639,9 @@ msgstr "無法記錄雲端工作區"
 
 msgid "Could not record environment"
 msgstr "無法儲存環境"
+
+msgid "Could not remove {name}"
+msgstr "無法移除 {name}"
 
 msgid "Could not remove access"
 msgstr "無法移除存取權限"
@@ -5705,6 +5726,9 @@ msgstr "無法截圖"
 
 msgid "Could not undo"
 msgstr "無法撤銷"
+
+msgid "Could not update {name}"
+msgstr "無法更新 {name}"
 
 msgid "Could not update plugin"
 msgstr "無法更新外掛"
@@ -7078,6 +7102,9 @@ msgstr "撤銷了審查"
 msgid "Display"
 msgstr "顯示"
 
+msgid "Display notifications"
+msgstr "顯示通知"
+
 msgid "Display options"
 msgstr "顯示選項"
 
@@ -7829,6 +7856,9 @@ msgstr "探索中"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "擴充套件思考：{activeLabel}"
+
+msgid "Extensions"
+msgstr "擴充功能"
 
 msgid "External Application"
 msgstr "外部應用"
@@ -8991,6 +9021,9 @@ msgstr "取得API金鑰"
 msgid "Get channel details"
 msgstr "查看頻道詳細資料"
 
+msgid "Get extensions"
+msgstr "取得擴充功能"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "與 {companyName} 團隊聯繫。"
 
@@ -10147,8 +10180,14 @@ msgstr "議題URL必須匹配{repoMismatch}。"
 msgid "Issue…"
 msgstr "議題…"
 
+msgid "It can:"
+msgstr "它可以："
+
 msgid "It can't be brought back."
 msgstr "刪除後無法復原。"
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "將你的「{profileName}」設定檔中的 Cookie 複製到代理程式開啟的瀏覽器窗格中。之後代理程式可以在你已登入的網站上執行操作。"
 
 msgid "It keeps the title from your prompt."
 msgstr "將保留根據你的提示產生的標題。"
@@ -10315,6 +10354,9 @@ msgstr "保留 {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "保留 {planName}"
+
+msgid "Keep current version"
+msgstr "保留目前版本"
 
 msgid "Keep docs fresh"
 msgstr "讓文件保持最新"
@@ -10629,6 +10671,9 @@ msgstr "少"
 
 msgid "less than a minute ago"
 msgstr "不到一分鐘前"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "允許代理程式使用你的 {browserName} 登入資訊嗎？"
 
 msgid "Let the agent drive."
 msgstr "讓代理程式來操作。"
@@ -11134,6 +11179,9 @@ msgstr "管理用量"
 
 msgid "Manage your account settings"
 msgstr "管理你的帳戶設定"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "管理你的應用程式、擴充功能和主題"
 
 msgid "Manage your organization's branding and members."
 msgstr "管理組織的品牌形象和成員。"
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "固定"
 
+msgid "Pin {name}"
+msgstr "固定 {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "在頁面上留下回饋，讓代理程式完成修改。"
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "已讀取"
 
+msgid "Read and change all your data on all websites"
+msgstr "讀取及變更你在所有網站上的所有資料"
+
+msgid "Read and change your data on {count} websites"
+msgstr "讀取及變更你在 {count} 個網站上的資料"
+
+msgid "Read and change your data on {site}"
+msgstr "讀取及變更你在 {site} 上的資料"
+
 msgid "Read and plan without changing anything"
 msgstr "只讀取和規劃，不做任何變更"
 
@@ -15065,6 +15125,9 @@ msgstr "讀取和傳送郵件"
 
 msgid "Read announcement"
 msgstr "閱讀公告"
+
+msgid "Read data you copy and paste"
+msgstr "讀取你複製及貼上的資料"
 
 msgid "Read deployment and build logs"
 msgstr "查看部署和建置日誌"
@@ -15104,6 +15167,9 @@ msgstr "閱讀設定指南"
 
 msgid "Read the source and every pull request."
 msgstr "閱讀原始碼和每一個拉取請求。"
+
+msgid "Read your browsing history"
+msgstr "讀取你的瀏覽記錄"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "移除{label}？"
 
 msgid "Remove {name}"
 msgstr "移除 {name}"
+
+msgid "Remove {name}?"
+msgstr "移除 {name}？"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "要移除 {repo} 嗎？從中同步的所有外掛都會從你的組織以及所有已安裝的成員那裡移除。"
@@ -18951,6 +19020,9 @@ msgstr "端點必須使用 https。"
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "此自動化用來啟動雲端工作區的環境已被封存或沒有儲存庫。請在自動化的設定中選擇其他環境。"
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "此擴充功能及其本機資料將從這個瀏覽器中刪除。"
+
 msgid "The factory"
 msgstr "工廠"
 
@@ -19198,6 +19270,9 @@ msgstr "標題會顯示在此頁面列出的所有位置以及連結預覽中。
 
 msgid "The turn failed"
 msgstr "本輪失敗"
+
+msgid "The update can also:"
+msgstr "此更新還可以："
 
 msgid "The very beginning"
 msgstr "最開始"
@@ -20566,6 +20641,9 @@ msgstr "使用全域性預設值"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "請使用小寫字母、數字、連字號和底線"
 
+msgid "Use more browser features: {features}"
+msgstr "使用更多瀏覽器功能：{features}"
+
 msgid "Use Paradev on mobile"
 msgstr "在手機上使用 Paradev"
 
@@ -21829,30 +21907,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "無法開啟 {name}"
-
-msgid "Could not remove {name}"
-msgstr "無法移除 {name}"
-
-msgid "Could not update {name}"
-msgstr "無法更新 {name}"
-
-msgid "Extensions"
-msgstr "擴充功能"
-
-msgid "Get extensions"
-msgstr "取得擴充功能"
-
-msgid "Pin {name}"
-msgstr "固定 {name}"
-
-msgid "Remove {name}?"
-msgstr "移除 {name}？"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "此擴充功能及其本機資料將從這個瀏覽器中刪除。"
-
-msgid "Unpin {name}"
-msgstr "取消固定 {name}"

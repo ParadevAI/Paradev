@@ -405,7 +405,7 @@ function validateBrowserExtensionPreloadsBuilt(): void {
 	for (const file of [
 		"main/chrome-extension-api.preload.js",
 		"main/chrome-web-store.preload.js",
-		"preload/browser-extension-alias.js",
+		"preload/browser-extension-shims.js",
 	]) {
 		assertExists(
 			join(projectRoot, "dist", file),

@@ -1,11 +1,5 @@
-diff --git a/node_modules/electron-chrome-web-store/.bun-tag-31ba82eada12cdb9 b/.bun-tag-31ba82eada12cdb9
-new file mode 100644
-index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
-diff --git a/node_modules/electron-chrome-web-store/.bun-tag-86a580be542a53c8 b/.bun-tag-86a580be542a53c8
-new file mode 100644
-index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/dist/chrome-web-store.preload.js b/dist/chrome-web-store.preload.js
-index 94fb2b4c5d240bc80aba0d8e72b526b12684daf9..203628ad1839a59dda486387a3eee76a1e211120 100644
+index 94fb2b4c5d240bc80aba0d8e72b526b12684daf9..646314ab3b910c1b34026e5334fdb4eb7f0e029a 100644
 --- a/dist/chrome-web-store.preload.js
 +++ b/dist/chrome-web-store.preload.js
 @@ -61,7 +61,7 @@
@@ -13,12 +7,21 @@ index 94fb2b4c5d240bc80aba0d8e72b526b12684daf9..203628ad1839a59dda486387a3eee76a
        requestAnimationFrame(() => {
          const chromeButtons = Array.from(document.querySelectorAll("span")).filter(
 -          (node) => node.innerText.includes("Chrome")
-+          (node) => node.innerText.includes("Chrome") && !node.innerText.includes(appName)
++          (node) => /^(Add to|Remove from) Chrome$/.test(node.innerText.trim())
          );
          for (const button of chromeButtons) {
            button.innerText = button.innerText.replace("Chrome", appName);
+@@ -292,7 +292,7 @@
+       window.navigation.addEventListener("navigate", maybeUpdateBranding);
+     }
+   }
+-  if (location.href.startsWith("https://chromewebstore.google.com")) {
++  if (location.origin === "https://chromewebstore.google.com") {
+     log("Injecting Chrome Web Store API");
+     setupChromeWebStoreApi();
+   }
 diff --git a/dist/cjs/browser/index.js b/dist/cjs/browser/index.js
-index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..abd32b3fba3c00e0c84f0ace55634627ee82166b 100644
+index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..4705fc71d6c79a29db6006509d203d1216adf2b6 100644
 --- a/dist/cjs/browser/index.js
 +++ b/dist/cjs/browser/index.js
 @@ -31,9 +31,11 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
@@ -49,7 +52,36 @@ index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..abd32b3fba3c00e0c84f0ace55634627
    const magicNumber = buffer.toString("utf8", 0, 4);
    if (magicNumber !== "Cr24") {
      throw new Error("Invalid CRX format");
-@@ -1373,10 +1383,20 @@ function registerWebStoreApi(webStoreState) {
+@@ -1118,7 +1128,18 @@ async function installExtension(extensionId, opts = {}) {
+       opts.loadExtensionOptions
+     );
+   }
+-  const extensionPath = await downloadExtension(extensionId, extensionsPath);
++  const stagedPath = await downloadExtension(extensionId, `${extensionsPath}.staging`);
++  if (opts.verifyInstall) {
++    const manifest = JSON.parse(await fs2.promises.readFile(path3.join(stagedPath, "manifest.json"), "utf8"));
++    if (!await opts.verifyInstall({ id: extensionId, manifest })) {
++      await fs2.promises.rm(stagedPath, { recursive: true, force: true });
++      throw new Error("The downloaded extension asks for more than its install question showed.");
++    }
++  }
++  const extensionPath = path3.join(extensionsPath, extensionId, path3.basename(stagedPath));
++  await fs2.promises.mkdir(path3.dirname(extensionPath), { recursive: true });
++  await fs2.promises.rm(extensionPath, { recursive: true, force: true });
++  await fs2.promises.rename(stagedPath, extensionPath);
+   const extension = await sessionExtensions.loadExtension(extensionPath, opts.loadExtensionOptions);
+   d2("installed %s", extensionId);
+   return extension;
+@@ -1275,7 +1296,7 @@ function registerWebStoreApi(webStoreState) {
+       import_electron3.ipcMain.handle(channel, async function handleWebStoreIpc(event, ...args) {
+         d3("received %s", channel);
+         const senderOrigin = event.senderFrame?.origin;
+-        if (!senderOrigin || !senderOrigin.startsWith(WEBSTORE_URL)) {
++        if (senderOrigin !== WEBSTORE_URL) {
+           d3("ignoring webstore request from %s", senderOrigin);
+           return;
+         }
+@@ -1373,10 +1394,20 @@ function registerWebStoreApi(webStoreState) {
    handle(
      "chrome.management.uninstall",
      async (event, id, options) => {
@@ -73,25 +105,84 @@ index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..abd32b3fba3c00e0c84f0ace55634627
          queueMicrotask(() => {
            event.sender.send("chrome.management.onUninstalled", id);
          });
-@@ -1628,6 +1648,7 @@ async function installChromeWebStore(opts = {}) {
+@@ -1512,7 +1543,7 @@ async function fetchAvailableUpdates(extensions) {
+   }
+   return updates;
+ }
+-async function updateExtension(session, update) {
++async function updateExtension(session, update, beforeUpdate) {
+   const sessionExtensions = session.extensions || session;
+   const extensionId = update.id;
+   const oldExtension = update.extension;
+@@ -1529,8 +1560,20 @@ async function updateExtension(session, update) {
+     return;
+   }
+   const extensionsPath = path4.join(oldExtension.path, "..", "..");
+-  const updatePath = await downloadExtensionFromURL(update.url, extensionsPath, extensionId);
++  const stagingPath = `${extensionsPath}.staging`;
++  const stagedPath = await downloadExtensionFromURL(update.url, stagingPath, extensionId);
+   d4("downloaded update %s@%s", extensionId, update.version);
++  if (beforeUpdate) {
++    const manifest = JSON.parse(await fs3.promises.readFile(path4.join(stagedPath, "manifest.json"), "utf8"));
++    if (!await beforeUpdate({ id: extensionId, name: oldExtension.name, oldManifest: oldExtension.manifest, manifest })) {
++      d4("update %s@%s declined", extensionId, update.version);
++      await fs3.promises.rm(stagedPath, { recursive: true, force: true });
++      return;
++    }
++  }
++  const updatePath = path4.join(extensionsPath, extensionId, path4.basename(stagedPath));
++  await fs3.promises.rm(updatePath, { recursive: true, force: true });
++  await fs3.promises.rename(stagedPath, updatePath);
+   if (sessionExtensions.getExtension(extensionId)) {
+     sessionExtensions.removeExtension(extensionId);
+     await sessionExtensions.loadExtension(updatePath);
+@@ -1549,21 +1592,21 @@ async function checkForUpdates(session) {
+   }
+   return updates;
+ }
+-async function installUpdates(session, updates) {
++async function installUpdates(session, updates, beforeUpdate) {
+   d4("updating %d extension(s)", updates.length);
+   for (const update of updates) {
+     try {
+-      await updateExtension(session, update);
++      await updateExtension(session, update, beforeUpdate);
+     } catch (error) {
+       console.error(`checkForUpdates: Error updating extension ${update.id}`);
+       console.error(error);
+     }
+   }
+ }
+-async function updateExtensions(session = import_electron4.session.defaultSession) {
++async function updateExtensions(session = import_electron4.session.defaultSession, opts = {}) {
+   const updates = await checkForUpdates(session);
+   if (updates.length > 0) {
+-    await installUpdates(session, updates);
++    await installUpdates(session, updates, opts.beforeUpdate);
+   }
+ }
+ async function maybeCheckForUpdates(session) {
+@@ -1628,6 +1671,8 @@ async function installChromeWebStore(opts = {}) {
    const autoUpdate = typeof opts.autoUpdate === "boolean" ? opts.autoUpdate : true;
    const minimumManifestVersion = typeof opts.minimumManifestVersion === "number" ? opts.minimumManifestVersion : 3;
    const beforeInstall = typeof opts.beforeInstall === "function" ? opts.beforeInstall : void 0;
++  const verifyInstall = typeof opts.verifyInstall === "function" ? opts.verifyInstall : void 0;
 +  const onUninstall = typeof opts.onUninstall === "function" ? opts.onUninstall : void 0;
    const webStoreState = {
      session,
      extensionsPath,
-@@ -1635,7 +1656,8 @@ async function installChromeWebStore(opts = {}) {
+@@ -1635,7 +1680,9 @@ async function installChromeWebStore(opts = {}) {
      allowlist: opts.allowlist ? new Set(opts.allowlist) : void 0,
      denylist: opts.denylist ? new Set(opts.denylist) : void 0,
      minimumManifestVersion,
 -    beforeInstall
 +    beforeInstall,
++    verifyInstall,
 +    onUninstall
    };
    const preloadPath = resolvePreloadPath(opts.modulePath);
    if ("registerPreloadScript" in session) {
-@@ -1666,9 +1688,11 @@ async function installChromeWebStore(opts = {}) {
+@@ -1666,9 +1713,11 @@ async function installChromeWebStore(opts = {}) {
  // Annotate the CommonJS export names for ESM import in node:
  0 && (module.exports = {
    downloadExtension,
@@ -104,7 +195,7 @@ index 4580b782dcf28a2d8d9ec2f0318276365cf2b957..abd32b3fba3c00e0c84f0ace55634627
    updateExtensions
  });
 diff --git a/dist/esm/browser/index.mjs b/dist/esm/browser/index.mjs
-index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..717e3911d8f28096a496e2f809cd7e825295a5e5 100644
+index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..8741f4d8c6ddcfaac77d94e03e4c72c879c03ce8 100644
 --- a/dist/esm/browser/index.mjs
 +++ b/dist/esm/browser/index.mjs
 @@ -284,7 +284,15 @@ function getExtensionCrxURL(extensionId) {
@@ -123,7 +214,36 @@ index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..717e3911d8f28096a496e2f809cd7e82
    const magicNumber = buffer.toString("utf8", 0, 4);
    if (magicNumber !== "Cr24") {
      throw new Error("Invalid CRX format");
-@@ -650,10 +658,20 @@ function registerWebStoreApi(webStoreState) {
+@@ -395,7 +403,18 @@ async function installExtension(extensionId, opts = {}) {
+       opts.loadExtensionOptions
+     );
+   }
+-  const extensionPath = await downloadExtension(extensionId, extensionsPath);
++  const stagedPath = await downloadExtension(extensionId, `${extensionsPath}.staging`);
++  if (opts.verifyInstall) {
++    const manifest = JSON.parse(await fs2.promises.readFile(path3.join(stagedPath, "manifest.json"), "utf8"));
++    if (!await opts.verifyInstall({ id: extensionId, manifest })) {
++      await fs2.promises.rm(stagedPath, { recursive: true, force: true });
++      throw new Error("The downloaded extension asks for more than its install question showed.");
++    }
++  }
++  const extensionPath = path3.join(extensionsPath, extensionId, path3.basename(stagedPath));
++  await fs2.promises.mkdir(path3.dirname(extensionPath), { recursive: true });
++  await fs2.promises.rm(extensionPath, { recursive: true, force: true });
++  await fs2.promises.rename(stagedPath, extensionPath);
+   const extension = await sessionExtensions.loadExtension(extensionPath, opts.loadExtensionOptions);
+   d2("installed %s", extensionId);
+   return extension;
+@@ -552,7 +571,7 @@ function registerWebStoreApi(webStoreState) {
+       ipcMain.handle(channel, async function handleWebStoreIpc(event, ...args) {
+         d3("received %s", channel);
+         const senderOrigin = event.senderFrame?.origin;
+-        if (!senderOrigin || !senderOrigin.startsWith(WEBSTORE_URL)) {
++        if (senderOrigin !== WEBSTORE_URL) {
+           d3("ignoring webstore request from %s", senderOrigin);
+           return;
+         }
+@@ -650,10 +669,20 @@ function registerWebStoreApi(webStoreState) {
    handle(
      "chrome.management.uninstall",
      async (event, id, options) => {
@@ -147,25 +267,84 @@ index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..717e3911d8f28096a496e2f809cd7e82
          queueMicrotask(() => {
            event.sender.send("chrome.management.onUninstalled", id);
          });
-@@ -905,6 +923,7 @@ async function installChromeWebStore(opts = {}) {
+@@ -789,7 +818,7 @@ async function fetchAvailableUpdates(extensions) {
+   }
+   return updates;
+ }
+-async function updateExtension(session, update) {
++async function updateExtension(session, update, beforeUpdate) {
+   const sessionExtensions = session.extensions || session;
+   const extensionId = update.id;
+   const oldExtension = update.extension;
+@@ -806,8 +835,20 @@ async function updateExtension(session, update) {
+     return;
+   }
+   const extensionsPath = path4.join(oldExtension.path, "..", "..");
+-  const updatePath = await downloadExtensionFromURL(update.url, extensionsPath, extensionId);
++  const stagingPath = `${extensionsPath}.staging`;
++  const stagedPath = await downloadExtensionFromURL(update.url, stagingPath, extensionId);
+   d4("downloaded update %s@%s", extensionId, update.version);
++  if (beforeUpdate) {
++    const manifest = JSON.parse(await fs3.promises.readFile(path4.join(stagedPath, "manifest.json"), "utf8"));
++    if (!await beforeUpdate({ id: extensionId, name: oldExtension.name, oldManifest: oldExtension.manifest, manifest })) {
++      d4("update %s@%s declined", extensionId, update.version);
++      await fs3.promises.rm(stagedPath, { recursive: true, force: true });
++      return;
++    }
++  }
++  const updatePath = path4.join(extensionsPath, extensionId, path4.basename(stagedPath));
++  await fs3.promises.rm(updatePath, { recursive: true, force: true });
++  await fs3.promises.rename(stagedPath, updatePath);
+   if (sessionExtensions.getExtension(extensionId)) {
+     sessionExtensions.removeExtension(extensionId);
+     await sessionExtensions.loadExtension(updatePath);
+@@ -826,21 +867,21 @@ async function checkForUpdates(session) {
+   }
+   return updates;
+ }
+-async function installUpdates(session, updates) {
++async function installUpdates(session, updates, beforeUpdate) {
+   d4("updating %d extension(s)", updates.length);
+   for (const update of updates) {
+     try {
+-      await updateExtension(session, update);
++      await updateExtension(session, update, beforeUpdate);
+     } catch (error) {
+       console.error(`checkForUpdates: Error updating extension ${update.id}`);
+       console.error(error);
+     }
+   }
+ }
+-async function updateExtensions(session = electronSession2.defaultSession) {
++async function updateExtensions(session = electronSession2.defaultSession, opts = {}) {
+   const updates = await checkForUpdates(session);
+   if (updates.length > 0) {
+-    await installUpdates(session, updates);
++    await installUpdates(session, updates, opts.beforeUpdate);
+   }
+ }
+ async function maybeCheckForUpdates(session) {
+@@ -905,6 +946,8 @@ async function installChromeWebStore(opts = {}) {
    const autoUpdate = typeof opts.autoUpdate === "boolean" ? opts.autoUpdate : true;
    const minimumManifestVersion = typeof opts.minimumManifestVersion === "number" ? opts.minimumManifestVersion : 3;
    const beforeInstall = typeof opts.beforeInstall === "function" ? opts.beforeInstall : void 0;
++  const verifyInstall = typeof opts.verifyInstall === "function" ? opts.verifyInstall : void 0;
 +  const onUninstall = typeof opts.onUninstall === "function" ? opts.onUninstall : void 0;
    const webStoreState = {
      session,
      extensionsPath,
-@@ -912,7 +931,8 @@ async function installChromeWebStore(opts = {}) {
+@@ -912,7 +955,9 @@ async function installChromeWebStore(opts = {}) {
      allowlist: opts.allowlist ? new Set(opts.allowlist) : void 0,
      denylist: opts.denylist ? new Set(opts.denylist) : void 0,
      minimumManifestVersion,
 -    beforeInstall
 +    beforeInstall,
++    verifyInstall,
 +    onUninstall
    };
    const preloadPath = resolvePreloadPath(opts.modulePath);
    if ("registerPreloadScript" in session) {
-@@ -942,9 +962,11 @@ async function installChromeWebStore(opts = {}) {
+@@ -942,9 +987,11 @@ async function installChromeWebStore(opts = {}) {
  }
  export {
    downloadExtension,
@@ -178,23 +357,26 @@ index 85ba0e0023ea491e8d07b9a8effd01cfc89ee977..717e3911d8f28096a496e2f809cd7e82
    updateExtensions
  };
 diff --git a/dist/types/browser/index.d.ts b/dist/types/browser/index.d.ts
-index 895f30373eeba990a9bb4063d7c76b89bbe36988..d4b5951acef531fbdce9244da83ba68d398225d5 100644
+index 895f30373eeba990a9bb4063d7c76b89bbe36988..056938bbe17350cddbb1f351f7e8148ebed1353e 100644
 --- a/dist/types/browser/index.d.ts
 +++ b/dist/types/browser/index.d.ts
-@@ -1,7 +1,7 @@
+@@ -1,7 +1,8 @@
  export { loadAllExtensions } from './loader';
 -export { installExtension, uninstallExtension, downloadExtension } from './installer';
 +export { installExtension, uninstallExtension, downloadExtension, downloadExtensionFromURL, setCrxVerifier } from './installer';
  export { updateExtensions } from './updater';
 -import { BeforeInstall, ExtensionId } from './types';
++export type { BeforeUpdate, ExtensionUpdateDetails } from './updater';
 +import { BeforeInstall, ExtensionId, OnUninstall } from './types';
  interface ElectronChromeWebStoreOptions {
      /**
       * Session to enable the Chrome Web Store in.
-@@ -53,6 +53,11 @@ interface ElectronChromeWebStoreOptions {
+@@ -53,6 +54,13 @@ interface ElectronChromeWebStoreOptions {
       * to be taken.
       */
      beforeInstall?: BeforeInstall;
++    /** Checks the downloaded manifest before it reaches the loaded folder; false refuses the install. */
++    verifyInstall?: (details: { id: string; manifest: chrome.runtime.Manifest }) => Promise<boolean>;
 +    /**
 +     * Replaces the removal the Web Store page asks for. Ask first when
 +     * `showConfirmDialog` is set; resolve `true` once the extension is removed.
@@ -217,7 +399,7 @@ index 174f9d4c3f573712c30f647c6e1493512cb82732..8ad193085f9cb80432dba7d3e761d093
  /**
   * Download and unpack extension to the given extensions directory.
 diff --git a/dist/types/browser/types.d.ts b/dist/types/browser/types.d.ts
-index 3c8c4f9e92df59aa3db3550201ca9d7f8a198c6e..66659d3fee412f3ba4bda89ddef5d643143f2e46 100644
+index 3c8c4f9e92df59aa3db3550201ca9d7f8a198c6e..4490391d026484187e8800e01dc4d064f9f6546c 100644
 --- a/dist/types/browser/types.d.ts
 +++ b/dist/types/browser/types.d.ts
 @@ -10,6 +10,14 @@ export interface ExtensionInstallDetails {
@@ -235,9 +417,32 @@ index 3c8c4f9e92df59aa3db3550201ca9d7f8a198c6e..66659d3fee412f3ba4bda89ddef5d643
  export interface WebStoreState {
      session: Electron.Session;
      extensionsPath: string;
-@@ -18,4 +26,5 @@ export interface WebStoreState {
+@@ -18,4 +26,7 @@ export interface WebStoreState {
      denylist?: Set<ExtensionId>;
      minimumManifestVersion: number;
      beforeInstall?: BeforeInstall;
++    /** Checks the downloaded manifest before it reaches the loaded folder; false refuses the install. */
++    verifyInstall?: (details: { id: string; manifest: chrome.runtime.Manifest }) => Promise<boolean>;
 +    onUninstall?: OnUninstall;
  }
+diff --git a/dist/types/browser/updater.d.ts b/dist/types/browser/updater.d.ts
+index d69cbe1c84b1336b2d1d8782b0a6103aa6a55ef7..664fff0cc961c9d4e5d936ab6d52a2ee7f676c53 100644
+--- a/dist/types/browser/updater.d.ts
++++ b/dist/types/browser/updater.d.ts
+@@ -2,5 +2,15 @@ import { WebStoreState } from './types';
+ /**
+  * Check session's loaded extensions for updates and install any if available.
+  */
+-export declare function updateExtensions(session?: Electron.Session): Promise<void>;
++export interface ExtensionUpdateDetails {
++    id: string;
++    name: string;
++    oldManifest: chrome.runtime.Manifest;
++    manifest: chrome.runtime.Manifest;
++}
++/** Resolve false to keep the installed version and delete the downloaded one. */
++export type BeforeUpdate = (details: ExtensionUpdateDetails) => Promise<boolean>;
++export declare function updateExtensions(session?: Electron.Session, opts?: {
++    beforeUpdate?: BeforeUpdate;
++}): Promise<void>;
+ export declare function initUpdater(state: WebStoreState): Promise<void>;

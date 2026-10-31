@@ -55,6 +55,7 @@ import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
 import { initBrowserExtensionHost } from "./lib/browser/extension-host";
 import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
+import { preparePaneSessions } from "./lib/browser/pane-session";
 import {
 	installBundledCliShim,
 	installBundledPdevShim,
@@ -576,6 +577,7 @@ if (!gotTheLock) {
 		sweepNetworkLogs();
 		sweepDevAppProfiles();
 
+		preparePaneSessions();
 		await loadWebviewBrowserExtension();
 		initBrowserExtensionHost();
 

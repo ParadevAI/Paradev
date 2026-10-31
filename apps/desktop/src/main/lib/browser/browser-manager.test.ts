@@ -738,3 +738,85 @@ describe("deep links from guest pages", () => {
 		stop();
 	});
 });
+
+describe("CDP session and browser extensions", () => {
+	test("an agent cannot see, run code in, or debug an extension's world", async () => {
+		const wc = register("pane-extension-worlds");
+		let emit: WcListener = () => {};
+		wc.debugger.on = ((event: string, listener: WcListener) => {
+			if (event === "message") emit = listener;
+		}) as () => void;
+		const sendCommand = mock(async (_method: string, _params?: object) => ({}));
+		wc.debugger.sendCommand = sendCommand;
+		const messages: { id?: number; method?: string; error?: unknown }[] = [];
+		const session = browserManager.attachCdp(
+			"pane-extension-worlds",
+			"ws-1",
+			(raw) => messages.push(JSON.parse(raw)),
+			() => {},
+		);
+		const context = (id: number, origin: string) => ({
+			context: {
+				id,
+				origin,
+				uniqueId: `u${id}`,
+				auxData: { type: "isolated" },
+			},
+		});
+		emit(
+			{},
+			"Runtime.executionContextCreated",
+			context(1, "https://example.com"),
+		);
+		emit(
+			{},
+			"Runtime.executionContextCreated",
+			context(7, "chrome-extension://hdokiejnpimakedhajhdlcegeplioahd"),
+		);
+		emit({}, "Runtime.consoleAPICalled", {
+			type: "log",
+			args: [],
+			executionContextId: 7,
+		});
+		emit({}, "Runtime.consoleAPICalled", {
+			type: "log",
+			args: [],
+			executionContextId: 1,
+		});
+
+		const commands: [string, object][] = [
+			["Runtime.evaluate", { expression: "1", contextId: 7 }],
+			["Runtime.evaluate", { expression: "1", uniqueContextId: "u7" }],
+			[
+				"Runtime.callFunctionOn",
+				{ functionDeclaration: "()=>1", executionContextId: 7 },
+			],
+			["Debugger.enable", {}],
+			["HeapProfiler.takeHeapSnapshot", {}],
+			["Runtime.evaluate", { expression: "1", contextId: 9 }],
+			["Runtime.evaluate", { expression: "1", contextId: 1 }],
+		];
+		commands.forEach(([method, params], index) => {
+			session.send(JSON.stringify({ id: index + 1, method, params }));
+		});
+		await Promise.resolve();
+		session.detach();
+
+		expect(sendCommand.mock.calls.map((call) => call.slice(0, 2))).toEqual([
+			["Runtime.evaluate", { expression: "1", contextId: 1 }],
+		]);
+		expect(
+			messages.map((m) => m.method ?? [m.id, m.error !== undefined]),
+		).toEqual([
+			"Runtime.executionContextCreated",
+			"Runtime.consoleAPICalled",
+			[1, true],
+			[2, true],
+			[3, true],
+			[4, true],
+			[5, true],
+			[6, true],
+			[7, false],
+		]);
+	});
+});

@@ -1116,6 +1116,9 @@ msgstr "{name} started working"
 msgid "{name} stopped"
 msgstr "{name} stopped"
 
+msgid "{name} wants more access"
+msgstr "{name} wants more access"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 
@@ -1916,6 +1919,9 @@ msgstr "Add {0} account"
 msgid "Add {0} to workspace"
 msgstr "Add {0} to workspace"
 
+msgid "Add {localizedName}?"
+msgstr "Add {localizedName}?"
+
 msgid "Add a comment…"
 msgstr "Add a comment…"
 
@@ -1993,6 +1999,9 @@ msgstr "Add Description"
 
 msgid "Add description..."
 msgstr "Add description..."
+
+msgid "Add extension"
+msgstr "Add extension"
 
 msgid "Add file comment"
 msgstr "Add file comment"
@@ -3957,6 +3966,9 @@ msgstr "Change to Monthly"
 msgid "Change worktree location"
 msgstr "Change worktree location"
 
+msgid "Change your privacy-related settings"
+msgstr "Change your privacy-related settings"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 
@@ -4785,6 +4797,9 @@ msgstr "Committed, starting soon."
 msgid "Common questions"
 msgstr "Common questions"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Communicate with cooperating native applications"
+
 msgid "Communication"
 msgstr "Communication"
 
@@ -5559,6 +5574,9 @@ msgstr "Could not load your machines"
 msgid "Could not mark ready"
 msgstr "Could not mark ready"
 
+msgid "Could not open {name}"
+msgstr "Could not open {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Could not open billing. Please try again."
 
@@ -5621,6 +5639,9 @@ msgstr "Could not record cloud workspace"
 
 msgid "Could not record environment"
 msgstr "Could not record environment"
+
+msgid "Could not remove {name}"
+msgstr "Could not remove {name}"
 
 msgid "Could not remove access"
 msgstr "Could not remove access"
@@ -5705,6 +5726,9 @@ msgstr "Could not take a screenshot"
 
 msgid "Could not undo"
 msgstr "Could not undo"
+
+msgid "Could not update {name}"
+msgstr "Could not update {name}"
 
 msgid "Could not update plugin"
 msgstr "Could not update plugin"
@@ -7078,6 +7102,9 @@ msgstr "dismissed their review"
 msgid "Display"
 msgstr "Display"
 
+msgid "Display notifications"
+msgstr "Display notifications"
+
 msgid "Display options"
 msgstr "Display options"
 
@@ -7829,6 +7856,9 @@ msgstr "Exploring"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Extended thinking: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Extensions"
 
 msgid "External Application"
 msgstr "External Application"
@@ -8991,6 +9021,9 @@ msgstr "Get an API key"
 msgid "Get channel details"
 msgstr "Get channel details"
 
+msgid "Get extensions"
+msgstr "Get extensions"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Get in touch with the {companyName} team."
 
@@ -10147,8 +10180,14 @@ msgstr "Issue URL must match {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "It can:"
+
 msgid "It can't be brought back."
 msgstr "It can't be brought back."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
 
 msgid "It keeps the title from your prompt."
 msgstr "It keeps the title from your prompt."
@@ -10315,6 +10354,9 @@ msgstr "Keep {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Keep {planName}"
+
+msgid "Keep current version"
+msgstr "Keep current version"
 
 msgid "Keep docs fresh"
 msgstr "Keep docs fresh"
@@ -10629,6 +10671,9 @@ msgstr "Less"
 
 msgid "less than a minute ago"
 msgstr "less than a minute ago"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Let an agent use your {browserName} logins?"
 
 msgid "Let the agent drive."
 msgstr "Let the agent drive."
@@ -11134,6 +11179,9 @@ msgstr "Manage usage"
 
 msgid "Manage your account settings"
 msgstr "Manage your account settings"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Manage your apps, extensions, and themes"
 
 msgid "Manage your organization's branding and members."
 msgstr "Manage your organization's branding and members."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Pin"
 
+msgid "Pin {name}"
+msgstr "Pin {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Pin feedback to a page and let the agent make the change."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Read"
 
+msgid "Read and change all your data on all websites"
+msgstr "Read and change all your data on all websites"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Read and change your data on {count} websites"
+
+msgid "Read and change your data on {site}"
+msgstr "Read and change your data on {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Read and plan without changing anything"
 
@@ -15065,6 +15125,9 @@ msgstr "Read and send mail"
 
 msgid "Read announcement"
 msgstr "Read announcement"
+
+msgid "Read data you copy and paste"
+msgstr "Read data you copy and paste"
 
 msgid "Read deployment and build logs"
 msgstr "Read deployment and build logs"
@@ -15104,6 +15167,9 @@ msgstr "Read the setup guide"
 
 msgid "Read the source and every pull request."
 msgstr "Read the source and every pull request."
+
+msgid "Read your browsing history"
+msgstr "Read your browsing history"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "Remove {label}?"
 
 msgid "Remove {name}"
 msgstr "Remove {name}"
+
+msgid "Remove {name}?"
+msgstr "Remove {name}?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
@@ -18951,6 +19020,9 @@ msgstr "The endpoint must use https."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "The extension and its local data are deleted from this browser."
+
 msgid "The factory"
 msgstr "The factory"
 
@@ -19198,6 +19270,9 @@ msgstr "The title shows everywhere this page is listed and in its link preview."
 
 msgid "The turn failed"
 msgstr "The turn failed"
+
+msgid "The update can also:"
+msgstr "The update can also:"
 
 msgid "The very beginning"
 msgstr "The very beginning"
@@ -20566,6 +20641,9 @@ msgstr "Use global default"
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Use lowercase letters, numbers, dashes and underscores"
 
+msgid "Use more browser features: {features}"
+msgstr "Use more browser features: {features}"
+
 msgid "Use Paradev on mobile"
 msgstr "Use Paradev on mobile"
 
@@ -21829,30 +21907,3 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Could not open {name}"
-msgstr "Could not open {name}"
-
-msgid "Could not remove {name}"
-msgstr "Could not remove {name}"
-
-msgid "Could not update {name}"
-msgstr "Could not update {name}"
-
-msgid "Extensions"
-msgstr "Extensions"
-
-msgid "Get extensions"
-msgstr "Get extensions"
-
-msgid "Pin {name}"
-msgstr "Pin {name}"
-
-msgid "Remove {name}?"
-msgstr "Remove {name}?"
-
-msgid "The extension and its local data are deleted from this browser."
-msgstr "The extension and its local data are deleted from this browser."
-
-msgid "Unpin {name}"
-msgstr "Unpin {name}"

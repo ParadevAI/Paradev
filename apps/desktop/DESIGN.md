@@ -176,8 +176,9 @@ the badge as an outline `Badge` (`PinnedExtensionRows`).
 
 1. Light fallback in `globals.css` sets `--popover: oklch(1 0 0)` and `--accent: oklch(0.97 0 0)`.
    `light.ts` sets `popover: oklch(0.97 0 0)` and `accent: oklch(0.93 0 0)`. Dark fallback
-   `--success: #5fb37f`, `ember.ts` `#00c950`. Light fallback `--warning: oklch(0.554 0.113 86.265)`,
-   `light.ts` `#906d00`. The app flashes the fallback before hydration.
+   `--success: #5fb37f`, `ember.ts` `#00c950`. Light fallback
+   `--success: oklch(0.728863 0.211937 147.822201)`, `light.ts` `#00c950`. Light fallback
+   `--warning: oklch(0.554 0.113 86.265)`, `light.ts` `#906d00`. The app flashes the fallback before hydration.
 2. Toolbar icon buttons fill on hover (`hover:bg-muted/50`). Pane header actions in the same row do
    not (`hover:text-muted-foreground` only).
 3. A puzzle icon already means agent plugins: `PluginIcon.tsx` falls back to `LuPuzzle`, settings
