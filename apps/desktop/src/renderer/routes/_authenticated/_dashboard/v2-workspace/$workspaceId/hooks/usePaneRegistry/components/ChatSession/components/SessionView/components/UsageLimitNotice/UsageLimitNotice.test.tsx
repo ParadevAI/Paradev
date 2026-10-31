@@ -7,7 +7,7 @@ import {
 	HOST_USAGE_QUOTA_QUERY_KEY,
 	type UsageAccount,
 } from "renderer/hooks/host-service/useHostUsageQuota";
-import { UsageLimitNotice } from "./UsageLimitNotice";
+import { type SwitchAccount, UsageLimitNotice } from "./UsageLimitNotice";
 
 afterEach(cleanup);
 
@@ -174,4 +174,47 @@ test("an unknown session account is not inferred from the host default", () => {
 		[account("/profiles/next", true)],
 	);
 	expect(view.getByLabelText("Switch account").textContent).toBe("Account");
+});
+
+test("a signed-out login is listed but cannot take the chat over", async () => {
+	const onSwitchAccount = mock<SwitchAccount>(async () => undefined);
+	const codex = (selection: string | null, email: string | null) => ({
+		...account(selection, false),
+		agent: "codex" as const,
+		email,
+	});
+	const signedOut: UsageAccount = {
+		...codex("/home/dev/.codex-work", null),
+		sourceLabel: "~/.codex-work",
+		status: "signed_out",
+	};
+	const view = renderNotice(
+		{
+			limit: { hitAtMs: 1 },
+			onRespond: () => undefined,
+			agent: "codex",
+			hostUrl: null,
+			sessionAccount: {
+				agent: "codex",
+				selection: null,
+				credentialKind: "subscription",
+				identity: "captured",
+				email: "running@example.com",
+			},
+			onSwitchAccount,
+		},
+		[
+			codex(null, "running@example.com"),
+			codex("/home/dev/.codex-other", "other@example.com"),
+			signedOut,
+		],
+	);
+	fireEvent.keyDown(view.getByLabelText("Switch account"), { key: "Enter" });
+	const row = await view.findByRole("menuitem", { name: /~\/\.codex-work/ });
+	expect(row.textContent).toContain("Signed out");
+	expect(row.getAttribute("aria-disabled")).toBe("true");
+	fireEvent.click(row);
+	expect(onSwitchAccount).not.toHaveBeenCalled();
+	const other = view.getByRole("menuitem", { name: "other@example.com" });
+	expect(other.getAttribute("aria-disabled")).not.toBe("true");
 });
