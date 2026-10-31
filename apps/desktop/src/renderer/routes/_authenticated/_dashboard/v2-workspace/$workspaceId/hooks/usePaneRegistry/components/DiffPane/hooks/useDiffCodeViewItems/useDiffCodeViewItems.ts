@@ -31,6 +31,7 @@ import type {
 	DeferredDiffReason,
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
+import { boundPatch, MAX_PATCH_LENGTH } from "./boundPatch";
 import {
 	type ParsedPatchGroup,
 	type PatchGroupResult,
@@ -279,11 +280,15 @@ export function useDiffCodeViewItems({
 				};
 				try {
 					const patches: string[] = [];
+					let length = 0;
 					for (const batch of splitPatchInput(input)) {
+						if (length >= MAX_PATCH_LENGTH) break;
 						const { patch } = await trpcClient.git.getDiffPatch.query(batch);
 						patches.push(patch);
+						length += patch.length;
 					}
-					return { kind: "patch", patch: patches.join(""), ...requested };
+					const patch = boundPatch(patches.join(""));
+					return { kind: "patch", patch, ...requested };
 				} catch (error) {
 					if (!isMissingProcedureError(error)) throw error;
 					// Older host-service (a remote host or cloud sandbox that
