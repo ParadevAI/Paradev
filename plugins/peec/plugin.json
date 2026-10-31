@@ -1,0 +1,35 @@
+{
+	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+	"name": "peec",
+	"version": "1.0.0",
+	"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+	"author": {
+		"name": "Paradev",
+		"url": "https://paradev.com"
+	},
+	"homepage": "https://docs.paradev.com",
+	"repository": "https://github.com/paradevai/paradev",
+	"license": "MIT",
+	"keywords": ["peec", "aeo", "geo", "ai-search", "seo", "visibility"],
+	"extensions": {
+		"superset": {
+			"interface": {
+				"displayName": "Peec AI",
+				"category": "Data & APIs",
+				"icon": "peec"
+			},
+			"connector": {
+				"slug": "peec_mcp"
+			},
+			"bind": {
+				"headers": {
+					"Authorization": "Bearer ${config.access_token}"
+				}
+			},
+			"mcp": {
+				"type": "streamable-http",
+				"url": "https://api.peec.ai/mcp"
+			}
+		}
+	}
+}

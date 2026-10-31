@@ -4,10 +4,13 @@ import { Pause, Play, Trash2 } from "lucide-react";
 
 export function QueuePausedBar({
 	actionable,
+	byLimit,
 	onClear,
 	onResume,
 }: {
 	actionable: boolean;
+	/** The usage limit paused it, not an interruption. */
+	byLimit: boolean;
 	onClear: () => void;
 	onResume: () => void;
 }) {
@@ -15,7 +18,11 @@ export function QueuePausedBar({
 		<div className="flex items-center gap-2 border-border/60 border-b py-1.5 pr-2 pl-3 text-muted-foreground text-sm">
 			<Pause className="size-3.5 shrink-0" />
 			<span className="min-w-0 flex-1 truncate">
-				<Trans>Queue paused because you interrupted</Trans>
+				{byLimit ? (
+					<Trans>Queue paused by the usage limit</Trans>
+				) : (
+					<Trans>Queue paused because you interrupted</Trans>
+				)}
 			</span>
 			{actionable && (
 				<QueueItemAction

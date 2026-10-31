@@ -103,3 +103,17 @@ test("a turn the user stopped is one quiet line", () => {
 	expect(view.container.textContent).toBe("Stopped");
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 });
+
+test("a turn the usage limit stopped is one quiet line, not a failure card", () => {
+	const view = render(
+		<TurnStatusRow
+			error={{ message: "You've hit your usage limit", kind: "usage_limit" }}
+			latest
+			status="failed"
+			turnId="t1"
+		/>,
+	);
+	expect(view.container.textContent).toBe("Stopped by the usage limit");
+	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
+	expect(view.queryByText("Copy error")).toBeNull();
+});

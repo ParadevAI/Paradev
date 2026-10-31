@@ -30,6 +30,7 @@ export interface RouteDecision {
 export const JEV_URL = "https://ai-gateway.vercel.sh/typesafe/v1/systemone";
 const JEV_MODEL = "typesafe-ai/jev";
 const DEFAULT_TIMEOUT_MS = 2_000;
+const MAX_ATTEMPTS = 3;
 const MAX_RECENT = 10;
 const MAX_BODY_CHARS = 2_000;
 export const PRIMARY_THRESHOLD = 0.8;
@@ -62,8 +63,8 @@ export function buildJevRequest(input: RouteInput) {
 				type: "choice",
 				instructions: `${dev.name} is an AI teammate in #${input.channelName}. ${areaOf(dev)} Should ${dev.name} reply to \`message\`?`,
 				criteria: {
-					respond: `\`message\` asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
-					stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person, or mentions ${dev.name} only in passing, or the request belongs to another area`,
+					respond: `\`message\` speaks to ${dev.name} by name to ask for something, or asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
+					stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person other than ${dev.name}, or mentions ${dev.name} only in passing, or the request belongs to another teammate's area`,
 				},
 			},
 		]),
@@ -132,26 +133,40 @@ export function decide(response: unknown, devs: RouterDev[]): RouteDecision {
 	return { devIds, scores };
 }
 
+/** Null when Jev could not answer, as opposed to answering that nobody should reply. */
 export async function routeChannelMessage(
 	input: RouteInput,
 	deps: RouteDeps,
-): Promise<RouteDecision> {
+): Promise<RouteDecision | null> {
 	if (input.devs.length === 0 || !input.message.body.trim()) {
 		return { devIds: [], scores: {} };
 	}
+	const signal = AbortSignal.timeout(deps.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+	let failure: unknown;
 	try {
-		const response = await deps.fetch(JEV_URL, {
+		const init = {
 			method: "POST",
 			headers: {
 				authorization: `Bearer ${await deps.token()}`,
 				"content-type": "application/json",
 			},
 			body: JSON.stringify(buildJevRequest(input)),
-			signal: AbortSignal.timeout(deps.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-		});
-		if (!response.ok) return { devIds: [], scores: {} };
-		return decide(await response.json(), input.devs);
-	} catch {
-		return { devIds: [], scores: {} };
+			signal,
+		};
+		for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+			try {
+				const response = await deps.fetch(JEV_URL, init);
+				if (response.ok) return decide(await response.json(), input.devs);
+				failure = `HTTP ${response.status}`;
+				if (response.status < 500) break;
+			} catch (error) {
+				failure = error;
+				if (signal.aborted) break;
+			}
+		}
+	} catch (error) {
+		failure = error;
 	}
+	console.warn("[channel-router] Jev failed", failure);
+	return null;
 }

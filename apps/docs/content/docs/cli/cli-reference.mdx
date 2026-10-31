@@ -779,6 +779,8 @@ than silently falling through to the cloud.
   projectName: string;
   hostId: string;
   tags: string;   // comma-joined tag set
+  url: string;
+  webUrl: string;
 }>`}
 	humanColumns={["NAME", "BRANCH", "PROJECT", "TAGS", "ID"]}
 	quiet="workspace IDs"
@@ -813,7 +815,7 @@ project id when the host doesn't know the project's name.
 		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable." },
 		{ flag: "--tag <tag>", description: "Workspace tag. Repeatable. Each tag groups the workspace into a sidebar folder of the same name." },
 	]}
-	output={`{ workspace: Workspace; alreadyExists: boolean }`}
+	output={`{ workspace: Workspace; alreadyExists: boolean; url: string; webUrl: string }`}
 >
 Create a workspace on the target host. With `--project`, specify one of
 `--checkout local`, `--branch`, `--pr`, or `--task` (`--branch` and `--pr` are mutually
@@ -933,6 +935,8 @@ superset workspaces sleep ws_a
   worktreePath: string;
   worktreeExists: boolean;
   createdAt: Date;
+  url: string;
+  webUrl: string;
 }`}
 >
 Show details for a single workspace on its host. `--field` is handy in
@@ -984,9 +988,16 @@ superset workspaces update ws_… --clear-task
   id: string;
   name: string;
   url: string;
+  webUrl: string;
 }`}
 >
 Open a workspace in the Paradev desktop app.
+
+`url` is the `superset://` deep link. `webUrl` is an HTTPS link that opens the
+same workspace in the desktop app. Use it where only HTTP(S) links are
+accepted, such as Linear or Slack. `workspaces list`, `get`, and `create`
+return both fields too. `--print` prints `url`; to print the HTTPS link, run
+`superset workspaces get <id> --field webUrl`.
 
 ```bash
 superset workspaces open ws_…
@@ -1314,13 +1325,13 @@ The host rejects unsupported values before launching the agent.
 | --- | --- |
 | Claude | `low`, `medium`, `high`, `xhigh`, `max` |
 | Amp | `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max` |
-| Codex | `low`, `medium`, `high`, `xhigh`; `max` and `ultra` depend on the selected model |
+| Codex | `low`, `medium`, `high`, `xhigh`, `max`; `ultra` depends on the selected model |
 | Mastracode | `off`, `low`, `medium`, `high`, `xhigh` |
 | Pi | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | Copilot | `low`, `medium`, `high`, `xhigh` |
 | Antigravity | `low`, `medium`, `high`, with `--model` set to a Gemini model |
 
-GPT-6 Astra and GPT-6 Sol support `max` and `ultra`; GPT-6 Luna supports `max`.
+Every Codex model supports `ultra` except GPT-6 Luna and GPT-5.6 Luna.
 
 Other agents, including Paradev chat, currently use their own default and
 reject an explicit effort override.

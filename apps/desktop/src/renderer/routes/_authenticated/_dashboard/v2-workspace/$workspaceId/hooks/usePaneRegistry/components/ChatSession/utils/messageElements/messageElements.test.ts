@@ -33,4 +33,17 @@ describe("messageElements", () => {
 		]);
 		expect(elements.map((element) => element.label)).toEqual(["auth.ts"]);
 	});
+
+	test("keeps what the composer knew about a linked pull request", () => {
+		const url = "https://github.com/acme/widgets/pull/42";
+		const data = {
+			kind: "linked_pr",
+			pr: { prNumber: 42, title: "Fix it", url, state: "merged" },
+		};
+		const [element] = elementsForChips(`See ${url}`, [
+			{ label: "#42", serialized: url, data },
+		]);
+		expect(element?.label).toBe("#42");
+		expect(element?.data).toEqual(data);
+	});
 });

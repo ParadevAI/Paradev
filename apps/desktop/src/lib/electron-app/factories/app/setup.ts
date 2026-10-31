@@ -2,6 +2,7 @@ import { app, BrowserWindow } from "electron";
 import { env } from "main/env.main";
 import { isBrowserPanePopup } from "main/lib/browser/popup-window";
 import { loadReactDevToolsExtension } from "main/lib/extensions";
+import { leavesHtmlPreview } from "main/lib/html-preview-protocol";
 import { safeOpenExternal } from "main/lib/safe-url";
 import { PLATFORM } from "shared/constants";
 import { makeAppId } from "shared/utils";
@@ -44,6 +45,12 @@ function guardWebContents(
 		if (isSameAppDocument(contents.getURL(), url)) return;
 		event.preventDefault();
 		void safeOpenExternal(url);
+	});
+	contents.on("will-frame-navigate", (event) => {
+		if (event.isMainFrame) return;
+		if (leavesHtmlPreview(event.frame?.url ?? "", event.url)) {
+			event.preventDefault();
+		}
 	});
 }
 

@@ -53,6 +53,7 @@ import {
 import { createPortal } from "react-dom";
 import { isDropHandled, markDropHandled } from "../../../../utils/handledDrops";
 import { AttachmentPills } from "../../../PromptInput/components/AttachmentPills";
+import { CodeFencePlugin } from "../../../PromptInput/components/CodeFencePlugin";
 import { ContextButton } from "../../../PromptInput/components/ContextButton";
 import { DictationBar } from "../../../PromptInput/components/DictationBar";
 import { MentionMenu } from "../../../PromptInput/components/MentionMenu";
@@ -66,15 +67,14 @@ import type {
 	ComposerMentionEntry,
 } from "../../../PromptInput/types";
 import { $insertTranscript } from "../../../PromptInput/utils/insertTranscript";
+import { $isInCode } from "../../../PromptInput/utils/isInCode";
 import { MentionTypeaheadOption } from "../../../PromptInput/utils/typeaheadOptions";
 import { useMessageAttachments } from "../../hooks/useMessageAttachments";
 import type { MessageComposerProps } from "../../types";
-import { $isInCode } from "../../utils/isInCode";
 import {
 	$messageMarkdown,
 	MESSAGE_SHORTCUTS,
 } from "../../utils/messageMarkdown";
-import { CodeFencePlugin } from "../CodeFencePlugin";
 import { EmojiTypeahead } from "../EmojiTypeahead";
 import { FormatToolbar } from "../FormatToolbar";
 

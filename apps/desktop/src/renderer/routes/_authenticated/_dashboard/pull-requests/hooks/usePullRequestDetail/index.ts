@@ -5,6 +5,7 @@ export {
 	type PullRequestDetailCommit,
 	type PullRequestDetailCommitAuthor,
 	type PullRequestMergeability,
+	pullRequestDetailQueryKey,
 	useInvalidatePullRequestDetail,
 	usePullRequestDetail,
 } from "./usePullRequestDetail";

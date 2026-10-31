@@ -83,6 +83,9 @@ const persister = createAsyncStoragePersister({
 		},
 	},
 	key: "superset-rq-cache",
+	// Every cache event re-serializes the whole persisted set on the main
+	// thread, including events from queries that are never persisted.
+	throttleTime: 10_000,
 	// Query data carries Dates (tRPC's superjson transformer); plain JSON would
 	// restore them as strings.
 	serialize: superjson.stringify,
@@ -122,6 +125,7 @@ export function ElectronTRPCProvider({
 						dehydrateOptions: {
 							shouldDehydrateQuery: (query) => {
 								if (!defaultShouldDehydrateQuery(query)) return false;
+								if (query.meta?.persist === true) return true;
 								const head = query.queryKey[0];
 								if (typeof head === "string") {
 									return PERSIST_KEY_PREFIXES.has(head);

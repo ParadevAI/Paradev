@@ -179,6 +179,14 @@ export function createAgentSessionClient(
 			return { ok: true, items: [] };
 		},
 
+		async getTurnChanges() {
+			return "unsupported" as const;
+		},
+
+		async undoTurnFiles() {
+			return "unsupported" as const;
+		},
+
 		async prompt(prompt): Promise<ChatRouterOutputs["prompt"]> {
 			if (prompt.content.some((part) => part.type !== "text")) {
 				throw new Error("Agent sessions take text only for now.");
@@ -196,6 +204,7 @@ export function createAgentSessionClient(
 
 		async removeQueuedPrompt() {},
 		async steerQueuedPrompt() {},
+		async updateQueuedPrompt() {},
 		async resumeQueue() {},
 		async stopBackgroundTask() {
 			return false;
@@ -207,6 +216,7 @@ export function createAgentSessionClient(
 			return "unsupported" as const;
 		},
 		async respondToApproval() {},
+		async respondToUsageLimit() {},
 		async setMode() {},
 		async setConfigOption() {},
 

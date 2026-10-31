@@ -17,11 +17,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
+import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
+	OpenDiff,
 	OpenLink,
 	OpenPage,
 } from "../../../ChatSession/providers/ChatPaneActionsProvider";
@@ -30,13 +33,13 @@ import type {
 	ChatForkTarget,
 } from "../../../ChatSession/types";
 import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
-import { isUnrestrictedMode } from "../../../ChatSession/utils/isUnrestrictedMode";
 import { useForkChat } from "../../hooks/useForkChat";
 import { readSavedChatMode } from "../../utils/savedChatMode";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
+import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import {
 	isChatCreateWatched,
@@ -67,6 +70,8 @@ export function AcpChatPane({
 	onSessionInfo,
 	onPendingPromptsSent,
 	onQueuePrompt,
+	onOpenDiff,
+	onRestoreQueuedPrompts,
 	onOpenFile,
 	onOpenPage,
 	onOpenLink,
@@ -99,10 +104,12 @@ export function AcpChatPane({
 	launchPrompt?: string;
 	onPendingPromptsSent: () => void;
 	onQueuePrompt: (content: UserContent[]) => void;
+	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
 	onModeChange?: (modeId: string) => void;
 	onSessionInfo: (info: { harnessSessionId?: string; title?: string }) => void;
 	onOpenFile?: OpenFile;
+	onOpenDiff?: OpenDiff;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
@@ -118,6 +125,7 @@ export function AcpChatPane({
 	modeId?: string;
 }) {
 	const { t } = useLingui();
+	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
@@ -127,6 +135,8 @@ export function AcpChatPane({
 	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
+	const [switchingAccount, setSwitchingAccount] = useState(false);
+	const [transferredFrom, setTransferredFrom] = useState<string | null>(null);
 	const {
 		replacement,
 		hold: holdReplacement,
@@ -439,6 +449,9 @@ export function AcpChatPane({
 	// start, and a later attempt may get past either. Reopening a pane should
 	// just work, so do it.
 	const bindings = useTerminalAgentBindings(workspaceId);
+	const binding = bindings.get(terminalId);
+	const sessionAccount =
+		binding?.chatSessionId === sessionId ? binding.account : undefined;
 	const continuedInTerminal =
 		agentSessionId !== undefined &&
 		[...bindings.values()].some(
@@ -460,6 +473,40 @@ export function AcpChatPane({
 			.catch(() => undefined)
 			.then(() => start(harness, agentSessionId, true));
 	}, [harness, agentSessionId, sessionId, start, wiring.transport]);
+	const switchAccount = useCallback(
+		async (setAccount: () => Promise<unknown>) => {
+			if (!harness || !sessionId || recoveryInFlight.current) return;
+			recoveryInFlight.current = true;
+			setSwitchingAccount(true);
+			try {
+				const queued = await closeChatForAccountSwitch({
+					transport: wiring.transport,
+					sessionId,
+					setAccount,
+				});
+				if (!mounted.current) return;
+				setTransferredFrom(sessionId);
+				onRestoreQueuedPrompts(queued);
+				const restarted = await start(harness, agentSessionId, true);
+				if (!restarted && mounted.current) setTransferredFrom(null);
+			} catch (error) {
+				recoveryInFlight.current = false;
+				console.error("[acp-chat] account switch failed", error);
+				toast.error(t({ message: "Couldn't stop the chat" }));
+			} finally {
+				if (mounted.current) setSwitchingAccount(false);
+			}
+		},
+		[
+			harness,
+			sessionId,
+			wiring.transport,
+			onRestoreQueuedPrompts,
+			start,
+			agentSessionId,
+			t,
+		],
+	);
 	const continueAfterRestart = useRef<string | null>(null);
 	useEffect(() => {
 		if (continuedInTerminal) continueAfterRestart.current = null;
@@ -541,6 +588,7 @@ export function AcpChatPane({
 		t,
 	]);
 	const recovering =
+		switchingAccount ||
 		replacement !== null ||
 		(recoverable && recoveries.current < MAX_RECOVERIES);
 	useEffect(() => {
@@ -583,6 +631,7 @@ export function AcpChatPane({
 					...(handoffPrompt ? { handoffPrompt } : {}),
 					...(modelId ? { modelId } : {}),
 					...(modeId ? { modeId } : {}),
+					...(snapshotWorktree ? { snapshotWorktree: true } : {}),
 				});
 			} catch (error) {
 				// A host from before rewindSession: fall back to a fresh session
@@ -628,6 +677,7 @@ export function AcpChatPane({
 			agentLabel,
 			modelId,
 			modeId,
+			snapshotWorktree,
 		],
 	);
 	const onEditMessage = useCallback(
@@ -647,7 +697,13 @@ export function AcpChatPane({
 		/>
 	);
 
-	if (harness && sessionId && (sessionDead || sessionStopped) && !recovering) {
+	const lost = failure !== null && stored === null;
+	if (
+		harness &&
+		sessionId &&
+		(sessionDead || sessionStopped || lost) &&
+		!recovering
+	) {
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}
@@ -690,7 +746,7 @@ export function AcpChatPane({
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering || checking
+			{...(recovering || checking || transferredFrom === sessionId
 				? {
 						held: {
 							notice: <Trans>Resuming the conversation…</Trans>,
@@ -714,6 +770,9 @@ export function AcpChatPane({
 			onRestartAndContinue={harness ? restartAndContinue : undefined}
 			onStartNewChat={harness ? startNewChat : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
+			onSwitchAccount={switchAccount}
+			sessionAccount={sessionAccount}
+			openDiff={onOpenDiff}
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}

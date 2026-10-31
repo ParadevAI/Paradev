@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { cn } from "@superset/ui/utils";
 import { WrapText } from "lucide-react";
-import { FENCE_BUTTON_CLASSNAME } from "../../constants";
+import { FenceButton } from "../FenceButton";
 
 export function WrapLinesButton({
 	onChange,
@@ -11,20 +10,12 @@ export function WrapLinesButton({
 	onChange: (wrap: boolean) => void;
 }) {
 	const { t } = useLingui();
-	const label = t({ message: "Wrap lines" });
 	return (
-		<button
-			aria-label={label}
-			aria-pressed={wrap}
-			className={cn(
-				FENCE_BUTTON_CLASSNAME,
-				wrap && "bg-foreground/10 text-foreground",
-			)}
+		<FenceButton
+			icon={WrapText}
+			label={t({ message: "Wrap lines" })}
 			onClick={() => onChange(!wrap)}
-			title={label}
-			type="button"
-		>
-			<WrapText className="size-3.5" />
-		</button>
+			pressed={wrap}
+		/>
 	);
 }

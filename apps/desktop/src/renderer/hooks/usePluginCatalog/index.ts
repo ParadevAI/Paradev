@@ -2,4 +2,4 @@ export type {
 	CatalogPlugin,
 	PluginSkill,
 } from "./usePluginCatalog";
-export { usePluginCatalog } from "./usePluginCatalog";
+export { INCLUDE_ORGANIZATION, usePluginCatalog } from "./usePluginCatalog";

@@ -37,7 +37,7 @@ export type PullRequestDetail = PullRequestDetailBase &
 		capabilities: PullRequestDetailRead["capabilities"];
 	};
 
-function pullRequestDetailQueryKey(
+export function pullRequestDetailQueryKey(
 	repoFullName: string | null,
 	prNumber: number | null,
 ) {
@@ -111,7 +111,9 @@ export function usePullRequestDetail({
 		gcTime: 10 * 60_000,
 	});
 	return {
-		...query,
+		data: query.data,
+		error: query.error,
+		refetch: query.refetch,
 		...target,
 		repoFullName:
 			repoFullName ?? query.data?.repoFullName ?? target.repoFullName,

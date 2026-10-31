@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
 import getCommand from "./command";
 
 let workspaces: Array<Record<string, unknown>> = [];
@@ -101,6 +102,22 @@ describe("workspaces get", () => {
 		};
 		expect(result.message).toBe("ludicrous-candytuft");
 		expect(result.data.branch).toBe("setup");
+	});
+
+	test("shows the desktop and web links, and --field prints the web one raw", async () => {
+		workspaces = [WORKSPACE];
+		const { url, webUrl } = workspaceLinks(WORKSPACE.id);
+		const result = (await invoke({ id: WORKSPACE.id })) as {
+			data: Record<string, unknown>;
+			message: string;
+		};
+		expect(result.data.url).toBe(url);
+		expect(result.data.webUrl).toBe(webUrl);
+		expect(result.message).toContain(webUrl);
+		const field = (await invoke({ id: WORKSPACE.id }, { field: "webUrl" })) as {
+			message: string;
+		};
+		expect(field.message).toBe(webUrl);
 	});
 
 	test("--field with a null value yields an empty message", async () => {

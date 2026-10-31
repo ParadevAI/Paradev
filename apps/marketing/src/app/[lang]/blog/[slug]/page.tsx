@@ -3,6 +3,7 @@ import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import {
@@ -84,7 +85,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 			/>
 			{faqItems.length > 0 && <FAQPageJsonLd items={faqItems} />}
 			<BlogPostLayout post={post} toc={toc} relatedPosts={relatedPosts}>
-				<MDXRemote source={post.content} components={mdxComponents} />
+				<MDXRemote
+					source={post.content}
+					components={mdxComponents}
+					options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+				/>
 			</BlogPostLayout>
 		</main>
 	);

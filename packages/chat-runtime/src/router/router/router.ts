@@ -9,20 +9,25 @@ import {
 	getItemsInputSchema,
 	getOutlineInputSchema,
 	getSessionInputSchema,
+	getTurnChangesInputSchema,
 	listSessionsInputSchema,
 	promptInputSchema,
 	queuedPromptInputSchema,
 	respondToApprovalInputSchema,
+	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
 	stopBackgroundTaskInputSchema,
+	undoTurnFilesInputSchema,
+	updateQueuedPromptInputSchema,
 } from "@superset/chat/protocol";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { z } from "zod";
+import type { TurnUndoResult } from "../../checkpoints";
 import type { ChatRuntime } from "../../index";
 
 const t = initTRPC.create();
@@ -83,6 +88,15 @@ export function createChatRouter(
 		}
 	}
 
+	/** The worktree of the session's own workspace; null when the caller names another. */
+	async function sessionCwd(
+		sessionId: string,
+		workspaceId: string,
+	): Promise<string | null> {
+		const scopeId = runtime.sessions.get(sessionId)?.scopeId;
+		return scopeId === workspaceId ? options.resolveCwd(scopeId) : null;
+	}
+
 	return t.router({
 		createSession: t.procedure
 			.input(createSessionInputSchema)
@@ -114,10 +128,22 @@ export function createChatRouter(
 				guarded(() => runtime.commands.steerQueuedPrompt(input)),
 			),
 
+		updateQueuedPrompt: t.procedure
+			.input(updateQueuedPromptInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.updateQueuedPrompt(input)),
+			),
+
 		resumeQueue: t.procedure
 			.input(resumeQueueInputSchema)
 			.mutation(({ input }) =>
 				guarded(() => runtime.commands.resumeQueue(input)),
+			),
+
+		respondToUsageLimit: t.procedure
+			.input(respondToUsageLimitInputSchema)
+			.mutation(({ input }) =>
+				guarded(() => runtime.commands.respondToUsageLimit(input)),
 			),
 
 		cancelTurn: t.procedure
@@ -191,6 +217,28 @@ export function createChatRouter(
 		getSession: t.procedure
 			.input(getSessionInputSchema)
 			.query(({ input }) => runtime.commands.getSession(input)),
+
+		undoTurnFiles: t.procedure
+			.input(
+				undoTurnFilesInputSchema.extend({ workspaceId: z.string().min(1) }),
+			)
+			.mutation(async ({ input }): Promise<TurnUndoResult> => {
+				const { workspaceId, ...rest } = input;
+				const cwd = await sessionCwd(rest.sessionId, workspaceId);
+				if (!cwd) return { status: "refused", reason: "missing" };
+				return runtime.commands.undoTurnFiles({ ...rest, cwd });
+			}),
+
+		getTurnChanges: t.procedure
+			.input(
+				getTurnChangesInputSchema.extend({ workspaceId: z.string().min(1) }),
+			)
+			.query(async ({ input }) => {
+				const { workspaceId, ...rest } = input;
+				const cwd = await sessionCwd(rest.sessionId, workspaceId);
+				if (!cwd) return null;
+				return runtime.commands.getTurnChanges({ ...rest, cwd });
+			}),
 
 		getQueue: t.procedure
 			.input(getSessionInputSchema)

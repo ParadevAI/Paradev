@@ -879,6 +879,42 @@ export const serverErrorMessages: Record<
 				message: "Workspace not found",
 			}),
 		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
+	"serverError.routine.notFound": () =>
+		i18n._(
+			msg({
+				message: "Routine not found",
+			}),
+		),
+	"serverError.routine.nothingToDo": () =>
+		i18n._(
+			msg({
+				message: "A routine needs a schedule or something to watch.",
+			}),
+		),
+	"serverError.routine.invalidSchedule": () =>
+		i18n._(
+			msg({
+				message: "This schedule isn't valid.",
+			}),
+		),
+	"serverError.routine.tooFrequent": () =>
+		i18n._(
+			msg({
+				message: "A routine can run at most once an hour.",
+			}),
+		),
+	"serverError.routine.inThePast": () =>
+		i18n._(
+			msg({
+				message: "This schedule has no runs left.",
+			}),
+		),
 	"serverError.pageComment.commentNotFound": () =>
 		i18n._(
 			msg({
@@ -1025,6 +1061,35 @@ export const serverErrorMessages: Record<
 			id: "serverError.plugins.notInstalled",
 			message: "Plugin {plugin} is not installed",
 			values: params,
+		}),
+	"serverError.plugins.managedByOrganization": (params) =>
+		i18n._({
+			id: "serverError.plugins.managedByOrganization",
+			message:
+				"Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it.",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourceNeedsGithub": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceNeedsGithub",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+		}),
+	"serverError.plugins.pluginSourceOutOfReach": (params) =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceOutOfReach",
+			message: "Your GitHub account cannot read {repo}",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourcePathOutside": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourcePathOutside",
+			message: "The path must stay inside the repository",
+		}),
+	"serverError.plugins.unknownPluginSource": () =>
+		i18n._({
+			id: "serverError.plugins.unknownPluginSource",
+			message: "That plugin source does not exist",
 		}),
 	"serverError.plugins.unknownPlugin": (params) =>
 		i18n._({

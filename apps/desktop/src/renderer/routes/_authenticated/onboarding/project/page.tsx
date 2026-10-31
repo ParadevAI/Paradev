@@ -1,10 +1,10 @@
+import { useLingui } from "@lingui/react/macro";
 import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
-import { Card } from "@superset/ui/card";
 import { Input } from "@superset/ui/input";
 import { toast } from "@superset/ui/sonner";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { type FormEvent, type ReactNode, useState } from "react";
+import { type FormEvent, useState } from "react";
 import {
 	LuFolderOpen,
 	LuFolderPlus,
@@ -30,6 +30,14 @@ import { EmptyProjectModal } from "renderer/routes/_authenticated/components/Emp
 import { TemplateGalleryModal } from "renderer/routes/_authenticated/components/TemplateGalleryModal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { GhAuthDialog } from "../components/GhAuthDialog";
+import { OnboardingTile } from "../components/OnboardingTile";
+import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
+import {
+	ACQUISITION_SOURCE_EVENT,
+	type AcquisitionSourceAnswer,
+	buildAcquisitionSourceProperties,
+	EMPTY_ACQUISITION_SOURCE_ANSWER,
+} from "./utils/acquisitionSource";
 
 export const Route = createFileRoute("/_authenticated/onboarding/project/")({
 	component: OnboardingProjectPage,
@@ -67,6 +75,7 @@ function toCloneError(err: unknown): CloneError {
 }
 
 function OnboardingProjectPage() {
+	const { t } = useLingui();
 	const navigate = useNavigate();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { refetch: refetchSession } = authClient.useSession();
@@ -80,6 +89,9 @@ function OnboardingProjectPage() {
 	const [ghAuthOpen, setGhAuthOpen] = useState(false);
 	const [emptyProjectOpen, setEmptyProjectOpen] = useState(false);
 	const [templateOpen, setTemplateOpen] = useState(false);
+	const [cloneOpen, setCloneOpen] = useState(false);
+	const [acquisitionSource, setAcquisitionSource] =
+		useState<AcquisitionSourceAnswer>(EMPTY_ACQUISITION_SOURCE_ANSWER);
 
 	const folderImport = useFolderFirstImport({
 		onError: (message) => toast.error(message),
@@ -91,14 +103,19 @@ function OnboardingProjectPage() {
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 
 	// Adding a project finishes onboarding: mark onboarded, then hand off to the
-	// dashboard's new-workspace modal pre-selected to the project just added.
+	// new-workspace screen with the project just added selected.
 	const finish = async (projectId: string) => {
+		const acquisitionProperties =
+			buildAcquisitionSourceProperties(acquisitionSource);
+		if (acquisitionProperties) {
+			track(ACQUISITION_SOURCE_EVENT, acquisitionProperties);
+		}
 		track("onboarding_finished", { outcome: "completed" });
 		try {
 			await apiTrpcClient.user.completeOnboarding.mutate();
 			// Reactive refetch (not imperative getSession) so the layout guards'
 			// useSession() sees onboardedAt before we navigate — otherwise the
-			// _authenticated guard bounces /v2-workspaces back to /onboarding.
+			// _authenticated guard bounces /new-workspace back to /onboarding.
 			await refetchSession({ query: { disableCookieCache: true } });
 		} catch (error) {
 			console.error("[onboarding] completeOnboarding failed", error);
@@ -109,10 +126,8 @@ function OnboardingProjectPage() {
 		// cooldown — see useStarNagStore.isEligible().
 		showStarNagOnboardingToast();
 		if (isV2CloudEnabled) {
-			// Land on the dashboard first, then open the modal. Opening it in the
-			// same tick as navigate mounts the Dialog mid-route-transition, which
-			// thrashes Radix's ref composition into a "Maximum update depth" loop.
-			await navigate({ to: "/v2-workspaces", replace: true });
+			// Straight to the route: a hop through /v2-workspaces lets that page's
+			// own mount navigation cancel this one.
 			openNewWorkspace(projectId);
 			return;
 		}
@@ -210,111 +225,83 @@ function OnboardingProjectPage() {
 
 	return (
 		<div className="flex flex-col gap-3">
-			<Card className="flex-row items-center gap-4 p-5">
-				<ProjectIcon icon={<LuFolderPlus className="size-4.5" />} />
-				<div className="min-w-0 flex-1">
-					<p className="text-sm font-medium text-foreground">
-						Create a new project
-					</p>
-					<p className="text-xs text-muted-foreground">
-						Start from scratch in a new folder.
-					</p>
-				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => setEmptyProjectOpen(true)}
-					disabled={busy}
-				>
-					Create
-				</Button>
-			</Card>
-
-			<Card className="flex-row items-center gap-4 p-5">
-				<ProjectIcon icon={<LuFolderOpen className="size-4.5" />} />
-				<div className="min-w-0 flex-1">
-					<p className="text-sm font-medium text-foreground">Open a folder</p>
-					<p className="text-xs text-muted-foreground">
-						Choose any local directory, git repo or not.
-					</p>
-				</div>
-				<Button
-					variant="outline"
-					size="sm"
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+				<OnboardingTile
+					icon={<LuFolderOpen />}
+					label={t`Open a folder`}
 					onClick={handleOpenFolder}
 					disabled={busy}
-				>
-					Browse…
-				</Button>
-			</Card>
-
-			<Card className="gap-4 p-5">
-				<div className="flex items-center gap-4">
-					<ProjectIcon icon={<LuGitBranch className="size-4.5" />} />
-					<div className="min-w-0 flex-1">
-						<p className="text-sm font-medium text-foreground">Clone a repo</p>
-						<p className="text-xs text-muted-foreground">
-							Paste an HTTPS or SSH URL.
-						</p>
-					</div>
-				</div>
-				<form onSubmit={handleClone} className="flex items-center gap-2">
-					<Input
-						type="text"
-						placeholder="https://github.com/org/repo.git"
-						value={url}
-						onChange={(e) => {
-							setUrl(e.target.value);
-							if (cloneError) setCloneError(null);
-						}}
-						disabled={busy}
-						className="flex-1"
-					/>
-					<Button
-						type="submit"
-						disabled={!url.trim() || busy || !cloneTargetDir}
-					>
-						{busy ? "Cloning…" : "Clone"}
-					</Button>
-				</form>
-				{cloneError && (
-					<div role="alert" className="flex flex-col items-start gap-2">
-						<p className="select-text cursor-text break-words text-xs text-destructive">
-							{cloneError.message}
-						</p>
-						{cloneError.needsGhAuth && (
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => setGhAuthOpen(true)}
-							>
-								Sign in to GitHub CLI
-							</Button>
-						)}
-					</div>
-				)}
-			</Card>
-
-			<Card className="flex-row items-center gap-4 p-5">
-				<ProjectIcon icon={<LuLayoutTemplate className="size-4.5" />} />
-				<div className="min-w-0 flex-1">
-					<p className="text-sm font-medium text-foreground">
-						Start from a template
-					</p>
-					<p className="text-xs text-muted-foreground">
-						Scaffold a new project from a starter like gstack.
-					</p>
-				</div>
-				<Button
-					variant="outline"
-					size="sm"
+				/>
+				<OnboardingTile
+					icon={<LuGitBranch />}
+					label={t`Clone a repo`}
+					active={cloneOpen}
+					onClick={() => setCloneOpen((open) => !open)}
+					disabled={busy}
+				/>
+				<OnboardingTile
+					icon={<LuLayoutTemplate />}
+					label={t`From a template`}
 					onClick={() => setTemplateOpen(true)}
 					disabled={busy}
-				>
-					Browse…
-				</Button>
-			</Card>
+				/>
+				<OnboardingTile
+					icon={<LuFolderPlus />}
+					label={t`Empty project`}
+					onClick={() => setEmptyProjectOpen(true)}
+					disabled={busy}
+				/>
+			</div>
+
+			{cloneOpen && (
+				<div className="flex flex-col gap-2">
+					<form onSubmit={handleClone} className="flex items-center gap-2">
+						<Input
+							type="text"
+							autoFocus
+							placeholder="https://github.com/org/repo.git"
+							value={url}
+							onChange={(e) => {
+								setUrl(e.target.value);
+								if (cloneError) setCloneError(null);
+							}}
+							disabled={busy}
+							className="flex-1"
+						/>
+						<Button
+							type="submit"
+							disabled={!url.trim() || busy || !cloneTargetDir}
+						>
+							{busy ? t`Cloning…` : t`Clone`}
+						</Button>
+					</form>
+					{cloneError && (
+						<div role="alert" className="flex flex-col items-start gap-2">
+							<p className="select-text cursor-text break-words text-xs text-destructive">
+								{cloneError.message}
+							</p>
+							{cloneError.needsGhAuth && (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() => setGhAuthOpen(true)}
+								>
+									Sign in to GitHub CLI
+								</Button>
+							)}
+						</div>
+					)}
+				</div>
+			)}
+
+			<div className="mt-6">
+				<AcquisitionSourceRow
+					value={acquisitionSource}
+					onChange={setAcquisitionSource}
+					disabled={busy}
+				/>
+			</div>
 
 			<TemplateGalleryModal
 				open={templateOpen}
@@ -350,12 +337,4 @@ function repoNameFromUrl(url: string): string {
 		.split(/[/:]/)
 		.pop();
 	return lastSegment || "repo";
-}
-
-function ProjectIcon({ icon }: { icon: ReactNode }) {
-	return (
-		<div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-			{icon}
-		</div>
-	);
 }

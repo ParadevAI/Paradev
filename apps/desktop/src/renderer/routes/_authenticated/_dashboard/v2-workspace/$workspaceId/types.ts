@@ -47,6 +47,14 @@ export interface DevtoolsPaneData {
 
 export type DiffFocusSide = "deletions" | "additions";
 
+/** Narrows the pane to the files one chat turn changed. */
+export interface DiffPaneFilter {
+	/** Repo-relative paths; every other file is hidden. Absent, every file in `range` shows. */
+	paths?: string[];
+	/** Commits to diff instead of the workspace's scope. */
+	range?: { fromHash: string; toHash: string };
+}
+
 export interface DiffPaneData {
 	path: string;
 	changeKey?: string;
@@ -56,6 +64,7 @@ export interface DiffPaneData {
 	focusLine?: number;
 	focusSide?: DiffFocusSide;
 	focusTick?: number;
+	filter?: DiffPaneFilter;
 }
 
 export interface CommentPaneData {

@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { userMessageText } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { cn } from "@superset/ui/utils";
 import {
 	type FocusEvent,
 	type KeyboardEvent,
+	type ReactNode,
 	type Ref,
 	type RefObject,
 	useImperativeHandle,
@@ -13,7 +13,6 @@ import {
 	useState,
 } from "react";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
-import { parseAttachmentTags } from "../../utils/attachmentTags";
 import { DrawerSection } from "./components/DrawerSection";
 import { QueuedPromptRow } from "./components/QueuedPromptRow";
 import { QueuePausedBar } from "./components/QueuePausedBar";
@@ -25,10 +24,6 @@ const MAX_HEIGHT = "13.5rem";
 const STOP_SELECTOR = "[data-drawer-stop]";
 
 type Entry = { kind: "queued"; prompt: UserMessage } | { kind: "header" };
-
-const hasAttachments = (prompt: UserMessage) =>
-	prompt.content.some((content) => content.type === "attachment") ||
-	parseAttachmentTags(userMessageText(prompt)).attachments.length > 0;
 
 const stopsIn = (root: HTMLElement | null) => [
 	...(root?.querySelectorAll<HTMLElement>(STOP_SELECTOR) ?? []),
@@ -44,14 +39,15 @@ function focusStop(stop: HTMLElement | undefined) {
 export function WorkDrawer({
 	ref,
 	queue,
+	notice,
 	paneRef,
-	onAppendToComposer,
 	onExit,
 }: {
 	ref?: Ref<WorkDrawerHandle>;
 	queue?: DrawerQueue;
+	/** A row above the queue that speaks for it, e.g. the usage limit. */
+	notice?: ReactNode;
 	paneRef?: RefObject<HTMLElement | null>;
-	onAppendToComposer: (text: string) => void;
 	onExit: (exit: DrawerExit) => void;
 }) {
 	const { t } = useLingui();
@@ -60,7 +56,8 @@ export function WorkDrawer({
 	const [activeKey, setActiveKey] = useState<string | null>(null);
 	const lastFocusRef = useRef<string | null>(null);
 	const previousKeysRef = useRef<string[]>([]);
-	const queueActions = useQueueActions(queue, onAppendToComposer);
+	const queueActions = useQueueActions(queue);
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const prompts = queue?.prompts ?? [];
 	const actionableQueue = queue?.actionable === true;
 	const paneThird = usePaneThird(paneRef);
@@ -127,7 +124,7 @@ export function WorkDrawer({
 		exit("composer");
 	}, [keySignature]);
 
-	if (prompts.length === 0) return null;
+	if (prompts.length === 0 && !notice) return null;
 
 	const toggle = () => {
 		const active = document.activeElement;
@@ -199,12 +196,8 @@ export function WorkDrawer({
 				handled = entry ? remove(entry) : false;
 				break;
 			case "e":
-				handled =
-					entry?.kind === "queued" &&
-					actionableQueue &&
-					!hasAttachments(entry.prompt);
-				if (handled && entry?.kind === "queued")
-					queueActions.onEdit(entry.prompt);
+				handled = entry?.kind === "queued" && actionableQueue;
+				if (handled && entry?.kind === "queued") setEditingId(entry.prompt.id);
 				break;
 			default:
 				handled = false;
@@ -242,8 +235,13 @@ export function WorkDrawer({
 					onKeyDown={onKeyDown}
 					ref={rootRef}
 				>
+					{notice}
 					<div
-						className="overflow-y-auto p-1"
+						className={cn(
+							"overflow-y-auto p-1",
+							notice && "border-border/60 border-t",
+							prompts.length === 0 && "hidden",
+						)}
 						data-work-drawer-scroller
 						style={{
 							maxHeight: paneThird
@@ -255,9 +253,11 @@ export function WorkDrawer({
 							stopKey="header:queued"
 							tabbable={tabbableKey === "header:queued"}
 							banner={
-								queue?.paused && (
+								queue?.paused &&
+								!(queue.pausedByLimit && notice) && (
 									<QueuePausedBar
 										actionable={queue.actionable}
+										byLimit={queue.pausedByLimit === true}
 										onClear={queueActions.onClear}
 										onResume={queueActions.onResume}
 									/>
@@ -273,7 +273,12 @@ export function WorkDrawer({
 								<QueuedPromptRow
 									actionable={actionableQueue}
 									key={prompt.id}
-									onEdit={queueActions.onEdit}
+									editing={editingId === prompt.id}
+									onEdit={() => setEditingId(prompt.id)}
+									onEditEnd={(text) => {
+										setEditingId(null);
+										if (text !== null) queueActions.onUpdate(prompt, text);
+									}}
 									onRemove={queueActions.onRemove}
 									onSteer={queueActions.onSteer}
 									prompt={prompt}

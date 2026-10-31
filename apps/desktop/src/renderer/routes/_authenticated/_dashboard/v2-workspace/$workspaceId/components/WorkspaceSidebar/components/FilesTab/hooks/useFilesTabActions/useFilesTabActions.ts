@@ -11,7 +11,6 @@ import { useCallback, useContext, useEffect, useRef } from "react";
 import { canonicalizeTreePath } from "renderer/lib/pierreTree";
 import { FileDeleteContext } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore/fileDeleteContext";
 import { FileMoveContext } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore/fileMoveContext";
-import { FILE_EXPLORER_ROW_HEIGHT } from "../../constants";
 import {
 	buildCreationKey,
 	CREATION_BASE_NAME,
@@ -22,7 +21,6 @@ import type {
 	ProvisionalEvent,
 } from "../../utils/provisionalEntry";
 import { reduceProvisional } from "../../utils/provisionalEntry";
-import { scrollTreeToRow } from "../../utils/scrollTreeToRow";
 import {
 	asDirectoryHandle,
 	moveDestinationPath,
@@ -147,13 +145,7 @@ export function useFilesTabActions({
 				}
 				model.getItem(targetKey)?.select();
 				model.focusPath(rel);
-
-				scrollTreeToRow(
-					model,
-					bridge.knownPaths,
-					targetKey,
-					FILE_EXPLORER_ROW_HEIGHT,
-				);
+				model.scrollToPath(targetKey, { offset: "nearest", focus: false });
 			});
 		},
 		[model, rootPath, bridge.fetchDir, bridge.knownPaths],

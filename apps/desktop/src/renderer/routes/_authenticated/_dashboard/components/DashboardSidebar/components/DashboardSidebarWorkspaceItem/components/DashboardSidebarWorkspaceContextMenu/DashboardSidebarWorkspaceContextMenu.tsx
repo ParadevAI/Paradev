@@ -16,6 +16,7 @@ import {
 	LuArrowRightLeft,
 	LuArrowUp,
 	LuBellOff,
+	LuClipboard,
 	LuCopy,
 	LuEye,
 	LuEyeOff,
@@ -23,6 +24,7 @@ import {
 	LuFolderPlus,
 	LuGitBranch,
 	LuHash,
+	LuLink,
 	LuPencil,
 	LuPin,
 	LuPinOff,
@@ -32,6 +34,7 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
@@ -102,6 +105,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { setContextMenuOpen } = useDashboardSidebarHoverActions();
+	const copyShareLink = useCopyShareLink();
 	const portGroup = useDashboardSidebarWorkspacePorts(workspaceId);
 	const { isPending: isKillingPorts, killPorts } =
 		useDashboardSidebarPortKill();
@@ -138,28 +142,41 @@ export function DashboardSidebarWorkspaceContextMenu({
 						<Trans>Rename</Trans>
 					</ContextMenuItem>
 				)}
+				{onRename && <ContextMenuSeparator />}
 				{isLocalWorkspace && (
-					<>
-						{onRename && <ContextMenuSeparator />}
-						<ContextMenuItem onSelect={onOpenInFinder}>
-							<LuFolderOpen className="size-4 mr-2" />
-							<Trans>Open in Finder</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onCopyPath}>
-							<LuCopy className="size-4 mr-2" />
-							<Trans>Copy Path</Trans>
-						</ContextMenuItem>
-					</>
+					<ContextMenuItem onSelect={onOpenInFinder}>
+						<LuFolderOpen className="size-4 mr-2" />
+						<Trans>Open in Finder</Trans>
+					</ContextMenuItem>
 				)}
-				{!isLocalWorkspace && onRename && <ContextMenuSeparator />}
-				<ContextMenuItem onSelect={onCopyBranchName}>
-					<LuGitBranch className="size-4 mr-2" />
-					<Trans>Copy Branch Name</Trans>
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={onCopyWorkspaceId}>
-					<LuHash className="size-4 mr-2" />
-					<Trans>Copy Workspace ID</Trans>
-				</ContextMenuItem>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger>
+						<LuCopy className="size-4 mr-2" />
+						<Trans>Copy</Trans>
+					</ContextMenuSubTrigger>
+					<ContextMenuSubContent>
+						<ContextMenuItem
+							onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
+						>
+							<LuLink className="size-4 mr-2" />
+							<Trans>Copy link</Trans>
+						</ContextMenuItem>
+						<ContextMenuItem onSelect={onCopyBranchName}>
+							<LuGitBranch className="size-4 mr-2" />
+							<Trans>Copy Branch Name</Trans>
+						</ContextMenuItem>
+						{isLocalWorkspace && (
+							<ContextMenuItem onSelect={onCopyPath}>
+								<LuClipboard className="size-4 mr-2" />
+								<Trans>Copy Path</Trans>
+							</ContextMenuItem>
+						)}
+						<ContextMenuItem onSelect={onCopyWorkspaceId}>
+							<LuHash className="size-4 mr-2" />
+							<Trans>Copy Workspace ID</Trans>
+						</ContextMenuItem>
+					</ContextMenuSubContent>
+				</ContextMenuSub>
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={onToggleUnread}>
 					{isUnread ? (

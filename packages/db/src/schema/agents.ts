@@ -1,7 +1,12 @@
+import type {
+	RoutineSchedule,
+	RoutineTrigger,
+} from "@superset/shared/agent-routines";
 import type { DevAvatar } from "@superset/shared/dev-avatar";
 import { sql } from "drizzle-orm";
 import {
 	bigint,
+	boolean,
 	index,
 	integer,
 	jsonb,
@@ -21,7 +26,7 @@ import {
 	agentTurnReasonValues,
 	agentTurnStatusValues,
 } from "./enums";
-import { cloudWorkspaces, environments } from "./schema";
+import { cloudWorkspaces, environments, tasks } from "./schema";
 
 /**
  * A Dev: an agent that works in an organization under its own identity, as
@@ -116,16 +121,14 @@ export const agentSessions = pgTable(
 			{ onDelete: "set null" },
 		),
 		parentSessionId: uuid("parent_session_id"),
-		title: text(),
+		/** The work a task session is doing; its title, description, status and pull request live there. */
+		taskId: uuid("task_id").references(() => tasks.id, {
+			onDelete: "set null",
+		}),
 		role: agentTaskRole(),
 		taskStatus: agentTaskStatus("task_status"),
-		/** A task for the same issue or pull request is refused while this one is active. */
-		dedupeKey: text("dedupe_key"),
 		/** What the main session asked the task to do; sent when the task starts. */
 		instructions: text(),
-		/** The task's last reply, which its parent reads. */
-		result: text(),
-		pullRequestUrl: text("pull_request_url"),
 		environmentId: uuid("environment_id").references(() => environments.id, {
 			onDelete: "set null",
 		}),
@@ -146,16 +149,71 @@ export const agentSessions = pgTable(
 		uniqueIndex("agent_sessions_thread_unique")
 			.on(t.agentId, t.threadRootId)
 			.where(sql`${t.kind} = 'thread'`),
-		uniqueIndex("agent_sessions_active_task_dedupe_unique")
-			.on(t.agentId, t.dedupeKey)
-			.where(
-				sql`${t.dedupeKey} is not null and ${t.taskStatus} in ('queued', 'running')`,
-			),
 		index("agent_sessions_parent_idx").on(t.parentSessionId),
+		index("agent_sessions_task_idx").on(t.taskId),
+		uniqueIndex("agent_sessions_active_writer_per_task_unique")
+			.on(t.taskId)
+			.where(
+				sql`${t.taskId} is not null and ${t.role} = 'writer' and ${t.taskStatus} in ('queued', 'running')`,
+			),
 	],
 );
 
 export type SelectAgentSession = typeof agentSessions.$inferSelect;
+
+/**
+ * Something that wakes a Dev on its own: a schedule, or events it watches.
+ * A run is a turn in the Dev's main session, for the person who asked for
+ * it, answering where the routine was made; a channel message it watches is
+ * answered in that message's thread instead.
+ */
+export const agentRoutines = pgTable(
+	"agent_routines",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		agentId: uuid("agent_id")
+			.notNull()
+			.references(() => agents.id, { onDelete: "cascade" }),
+		createdByUserId: uuid("created_by_user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		channelId: uuid("channel_id")
+			.notNull()
+			.references(() => channels.id, { onDelete: "cascade" }),
+		threadRootId: uuid("thread_root_id").references(() => channelMessages.id, {
+			onDelete: "cascade",
+		}),
+		title: text().notNull(),
+		prompt: text().notNull(),
+		/** Null for a routine that only watches events. */
+		schedule: jsonb().$type<RoutineSchedule>(),
+		triggers: jsonb().$type<RoutineTrigger[]>().notNull().default([]),
+		enabled: boolean().notNull().default(true),
+		nextRunAt: timestamp("next_run_at", { withTimezone: true }),
+		lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(t) => [
+		index("agent_routines_agent_idx").on(t.agentId),
+		index("agent_routines_due_idx")
+			.on(t.nextRunAt)
+			.where(sql`${t.enabled} and ${t.nextRunAt} is not null`),
+		index("agent_routines_triggers_idx")
+			.on(t.organizationId)
+			.where(sql`${t.enabled} and jsonb_array_length(${t.triggers}) > 0`),
+	],
+);
+
+export type SelectAgentRoutine = typeof agentRoutines.$inferSelect;
 
 export interface AgentTurnToolCall {
 	name: string;
@@ -191,6 +249,9 @@ export const agentTurns = pgTable(
 			() => channelMessages.id,
 			{ onDelete: "set null" },
 		),
+		routineId: uuid("routine_id").references(() => agentRoutines.id, {
+			onDelete: "set null",
+		}),
 		startedAt: timestamp("started_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),

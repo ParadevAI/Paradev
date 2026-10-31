@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
 	type DurableEvent,
@@ -6,10 +7,13 @@ import {
 	type SessionState,
 	sessionStateSchema,
 	type Turn,
+	type UsageLimit,
+	type UsageLimitAction,
 	type UserContent,
 	type UserMessage,
 	wrapHiddenText,
 } from "@superset/chat/protocol";
+import type { SessionCheckpoints } from "../../checkpoints";
 import type {
 	AdapterEvent,
 	DiscoverNativeSessionsInput,
@@ -21,14 +25,30 @@ import type { ChatJournal } from "../../journal";
 export type LiveSessionOptions = {
 	sessionId: string;
 	scopeId: string;
+	cwd?: string;
 	harness: string;
 	terminalId?: string;
 	journal: ChatJournal;
 	publish: (envelope: Envelope) => void;
 	adapter: HarnessAdapter;
+	checkpoints?: SessionCheckpoints;
 	mintId?: () => string;
 	now?: () => number;
+	/** How long after a usage limit's reset the host waits before continuing. */
+	usageLimitGraceMs?: number;
 };
+
+/** Providers can still refuse right at the reset; give them a moment. */
+export const USAGE_LIMIT_GRACE_MS = 30_000;
+
+/** The most a timer can wait; a reset further out is re-armed when it fires. */
+const MAX_TIMER_MS = 2_147_483_647;
+
+/** Adapters that only see the refusal as an error carry its text. */
+const USAGE_LIMIT_TEXT =
+	/(?:usage|spending|monthly|weekly|daily) limit (?:reached|exceeded)|(?:quota|credits?) (?:exceeded|exhausted|depleted)|insufficient[_ ](?:quota|credits)|hit your (?:usage )?limit|credit balance is too low/i;
+
+const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
 export type PromptResult = {
 	itemId: string;
@@ -41,6 +61,8 @@ export type QueueState = {
 		itemId: string;
 		clientId: string | undefined;
 		content: UserContent[];
+		/** `content` plus the hidden parts it leaves out. */
+		fullContent: UserContent[];
 		queuedAtMs: number;
 	}[];
 };
@@ -61,8 +83,13 @@ export type UnfinishedSession = {
 type PendingPrompt = {
 	item: UserMessage;
 	content: UserContent[];
+	/** The content as the caller gave it, hidden parts included. */
+	typed?: UserContent[];
 	turnId: string;
 	seq: number;
+	snapshotWorktree?: boolean;
+	/** The worktree snapshot taken just before the prompt was sent. */
+	before?: string | null;
 };
 
 function withoutQueued(item: UserMessage): UserMessage {
@@ -85,8 +112,13 @@ export class LiveSession {
 	private steering: Promise<void> = Promise.resolve();
 	private sent = 0;
 	private awaitingTurn: PendingPrompt | null = null;
+	private capturing: PendingPrompt | null = null;
+	private readonly checkpointedTurns = new Set<string>();
+	private readonly turnAnchors = new Map<string, string>();
 	private steerTarget: string | null = null;
 	private queuePaused = false;
+	private limitedTurnId: string | null = null;
+	private resumeTimer: ReturnType<typeof setTimeout> | null = null;
 	private sessionState: SessionState;
 	private currentTurn: Turn | null = null;
 	private pump: Promise<void> | null = null;
@@ -125,6 +157,14 @@ export class LiveSession {
 		return this.options.terminalId;
 	}
 
+	get cwd(): string | undefined {
+		return this.options.cwd;
+	}
+
+	get busy(): boolean {
+		return this.isBusy();
+	}
+
 	get harness(): string {
 		return this.options.harness;
 	}
@@ -159,8 +199,9 @@ export class LiveSession {
 		const interrupted =
 			this.currentTurn?.status === "running" ||
 			(this.sessionState.backgroundTasks?.length ?? 0) > 0;
+		const inFlight = this.inFlight();
 		const prompts = [
-			...(this.awaitingTurn ? [this.awaitingTurn] : []),
+			...(inFlight ? [inFlight] : []),
 			...this.pendingSteers,
 			...(this.queuePaused ? [] : this.queue),
 		]
@@ -223,8 +264,9 @@ export class LiveSession {
 	prompt(
 		content: UserContent[],
 		clientId: string,
-		steerTurnId?: string,
+		options: { steerTurnId?: string; snapshotWorktree?: boolean } = {},
 	): PromptResult {
+		const { steerTurnId, snapshotWorktree } = options;
 		const itemId = this.mintId();
 		const seq = ++this.sent;
 		const shown = content.filter(
@@ -251,10 +293,12 @@ export class LiveSession {
 				content: sent,
 				turnId: this.mintId(),
 				seq,
+				snapshotWorktree,
 			});
 			return { itemId, queued: false };
 		}
-		const queued = this.isBusy();
+		const limited = this.sessionState.usageLimit !== undefined;
+		const queued = this.isBusy() || limited;
 		const item: UserMessage = {
 			id: itemId,
 			kind: "user_message",
@@ -265,8 +309,19 @@ export class LiveSession {
 		};
 		const turnId = this.mintId();
 		if (queued) {
-			this.queue.push({ item, content: sent, turnId, seq });
+			this.queue.push({
+				item,
+				content: sent,
+				typed: content,
+				turnId,
+				seq,
+				snapshotWorktree,
+			});
 			this.appendDurable({ type: "item", item, turnId });
+			if (limited && !this.queuePaused) {
+				this.queuePaused = true;
+				this.emitSession({ queuePaused: true, queuePausedByLimit: true });
+			}
 			if (
 				steerTurnId &&
 				this.currentTurn?.id === steerTurnId &&
@@ -277,7 +332,7 @@ export class LiveSession {
 			return { itemId, queued: true };
 		}
 		this.appendDurable({ type: "item", item, turnId });
-		this.deliver({ item, content: sent, turnId, seq });
+		this.deliver({ item, content: sent, turnId, seq, snapshotWorktree });
 		return { itemId, queued: false };
 	}
 
@@ -293,6 +348,18 @@ export class LiveSession {
 		if (this.steerTarget === itemId) this.steerTarget = null;
 		this.discard(removed);
 		this.unpauseIfEmpty();
+	}
+
+	updateQueued(itemId: string, content: UserContent[]): void {
+		const pending = this.queue[this.requireQueuedIndex(itemId)];
+		if (!pending) return;
+		pending.content = content;
+		pending.item = { ...pending.item, content };
+		this.appendDurable({
+			type: "item",
+			item: pending.item,
+			turnId: pending.turnId,
+		});
 	}
 
 	steerQueued(itemId: string): void {
@@ -325,7 +392,7 @@ export class LiveSession {
 		if (this.currentTurn?.status === "running") {
 			this.steerTarget = steered.item.id;
 			this.options.adapter.cancelTurn();
-		} else if (this.awaitingTurn) {
+		} else if (this.inFlight()) {
 			this.steerTarget = steered.item.id;
 		} else {
 			this.queue.shift();
@@ -336,32 +403,149 @@ export class LiveSession {
 	get queueState(): QueueState {
 		return {
 			paused: this.queuePaused,
-			prompts: this.queue.map(({ item }) => ({
+			prompts: this.queue.map(({ item, typed }) => ({
 				itemId: item.id,
 				clientId: item.clientId,
 				content: item.content,
+				fullContent: typed ?? item.content,
 				queuedAtMs: item.startedAtMs,
 			})),
 		};
 	}
 
 	resumeQueue(): void {
-		if (!this.queuePaused) return;
+		const limited = this.sessionState.usageLimit !== undefined;
+		if (!this.queuePaused && !limited) return;
+		this.clearResumeTimer();
 		this.queuePaused = false;
-		this.emitSession({ queuePaused: false });
-		if (this.currentTurn?.status !== "running" && !this.awaitingTurn) {
+		this.emitSession({ queuePaused: false, usageLimit: undefined });
+		if (this.currentTurn?.status !== "running" && !this.inFlight()) {
 			this.deliverNextQueued();
 		}
 	}
 
+	/**
+	 * Resuming after a limit continues the work the refusal cut short: the
+	 * next queued prompt if there is one, else a plain "Continue".
+	 */
+	respondToUsageLimit(action: UsageLimitAction): void {
+		const limit = this.sessionState.usageLimit;
+		if (this.stopped || !limit) return;
+		switch (action) {
+			case "resume":
+				this.resumeAfterLimit();
+				return;
+			case "dismiss":
+				this.clearResumeTimer();
+				this.emitSession({ usageLimit: undefined });
+				return;
+			case "resume_at_reset":
+				if (limit.resetsAtMs === undefined) return;
+				this.emitSession({
+					usageLimit: {
+						...limit,
+						resumeAtReset: true,
+						resumesAtMs: limit.resetsAtMs + this.usageLimitGraceMs(),
+					},
+				});
+				this.armResumeTimer(limit.resetsAtMs);
+				return;
+			case "cancel_resume_at_reset": {
+				this.clearResumeTimer();
+				const { resumesAtMs: _cancelled, ...rest } = limit;
+				this.emitSession({ usageLimit: { ...rest, resumeAtReset: false } });
+				return;
+			}
+		}
+	}
+
+	private resumeAfterLimit(): void {
+		const idle = this.currentTurn?.status !== "running" && !this.inFlight();
+		this.resumeQueue();
+		if (idle && this.queue.length === 0 && !this.inFlight()) {
+			this.prompt(CONTINUE, this.mintId());
+		}
+	}
+
+	private usageLimitGraceMs(): number {
+		return this.options.usageLimitGraceMs ?? USAGE_LIMIT_GRACE_MS;
+	}
+
+	private armResumeTimer(resetsAtMs: number): void {
+		this.clearResumeTimer();
+		const grace = this.usageLimitGraceMs();
+		const wait = resetsAtMs + grace - this.now();
+		this.resumeTimer = setTimeout(
+			() => {
+				this.resumeTimer = null;
+				if (this.stopped || !this.sessionState.usageLimit?.resumeAtReset) {
+					return;
+				}
+				if (this.now() < resetsAtMs + grace) {
+					this.armResumeTimer(resetsAtMs);
+					return;
+				}
+				try {
+					this.resumeAfterLimit();
+				} catch (error) {
+					this.fail(error);
+				}
+			},
+			Math.min(Math.max(wait, 0), MAX_TIMER_MS),
+		);
+	}
+
+	private clearResumeTimer(): void {
+		if (this.resumeTimer === null) return;
+		clearTimeout(this.resumeTimer);
+		this.resumeTimer = null;
+	}
+
+	/** A refused turn stops the queue until someone chooses to go on. */
+	private limitReached(limit: UsageLimit): void {
+		this.limitedTurnId = this.currentTurn?.id ?? null;
+		const pausing = this.queue.length > 0 && !this.queuePaused;
+		if (pausing) this.queuePaused = true;
+		this.emitSession({
+			queuePaused: this.queuePaused,
+			usageLimit: limit,
+			...(pausing ? { queuePausedByLimit: true } : {}),
+		});
+	}
+
+	/** A failed turn the limit refused carries the limit's kind, whichever harness reported it. */
+	private withLimitKind(turn: Turn): Turn {
+		if (turn.status !== "failed" || !turn.error) return turn;
+		if (turn.error.kind === "usage_limit") return turn;
+		const limited =
+			turn.id === this.limitedTurnId ||
+			USAGE_LIMIT_TEXT.test(turn.error.message);
+		return limited
+			? { ...turn, error: { ...turn.error, kind: "usage_limit" } }
+			: turn;
+	}
+
 	cancelTurn(turnId?: string, pauseQueue = false): void {
+		const capturing = this.capturing;
+		if (capturing && this.currentTurn?.status !== "running") {
+			this.capturing = null;
+			this.discard(capturing);
+			if (pauseQueue && this.queue.length > 0 && !this.queuePaused) {
+				this.queuePaused = true;
+				this.emitSession({ queuePaused: true, queuePausedByLimit: false });
+				return;
+			}
+			this.emitSession({});
+			this.deliverNextQueued();
+			return;
+		}
 		if (turnId && this.currentTurn && this.currentTurn.id !== turnId) return;
 		const steering =
 			this.steerTarget !== null && this.queue[0]?.item.id === this.steerTarget;
 		const waiting = this.queue.length + this.pendingSteers.length;
 		if (pauseQueue && !steering && waiting > 0 && !this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true });
+			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
 		}
 		this.options.adapter.cancelTurn();
 	}
@@ -416,6 +600,10 @@ export class LiveSession {
 	async dispose(): Promise<void> {
 		this.settleStarted(false);
 		this.stopped = true;
+		this.clearResumeTimer();
+		if (this.currentTurn?.status === "running") {
+			this.settleCheckpoint(this.currentTurn.id);
+		}
 		this.discardPending();
 		await this.options.adapter.dispose();
 		await this.pump;
@@ -429,6 +617,8 @@ export class LiveSession {
 			}
 		} finally {
 			this.settleStarted(false);
+			this.stopped = true;
+			this.clearResumeTimer();
 		}
 	}
 
@@ -438,6 +628,13 @@ export class LiveSession {
 				if (event.item.kind !== "user_message") {
 					this.turnsWithOutput.add(event.turnId);
 				}
+				if (
+					event.item.kind === "tool_call" &&
+					this.checkpointedTurns.has(event.turnId) &&
+					!this.turnAnchors.has(event.turnId)
+				) {
+					this.turnAnchors.set(event.turnId, event.item.id);
+				}
 				this.appendDurable({
 					type: "item",
 					item: event.item,
@@ -446,13 +643,21 @@ export class LiveSession {
 				return;
 			case "turn": {
 				const previous = this.currentTurn;
-				this.currentTurn = this.afterCarriedFailure(event.turn);
+				this.currentTurn = this.withLimitKind(
+					this.afterCarriedFailure(event.turn),
+				);
 				this.appendDurable({ type: "turn", turn: this.currentTurn });
 				if (
 					previous?.id === event.turn.id &&
 					previous.status === event.turn.status
 				)
 					return;
+				const limitText =
+					event.turn.status === "failed" &&
+					USAGE_LIMIT_TEXT.test(event.turn.error?.message ?? "");
+				if (limitText && !this.sessionState.usageLimit) {
+					this.limitReached({ hitAtMs: this.now() });
+				}
 				if (event.turn.status === "running") {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
@@ -462,16 +667,27 @@ export class LiveSession {
 					}
 				} else {
 					this.noteSilentTurn(event.turn);
+					this.settleCheckpoint(event.turn.id);
 					this.deliverNextQueued();
 				}
 				return;
 			}
 			case "session":
-				if (event.session.status === "dead") this.discardPending();
+				if (event.session.status === "dead") {
+					this.stopped = true;
+					this.clearResumeTimer();
+					this.discardPending();
+				}
 				if (event.session.status && event.session.status !== "starting") {
 					this.settleStarted(event.session.status !== "dead");
 				}
-				this.emitSession(event.session);
+				if (event.session.usageLimit) {
+					const { usageLimit, ...rest } = event.session;
+					this.emitSession(rest);
+					this.limitReached(usageLimit);
+				} else {
+					this.emitSession(event.session);
+				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
 				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
@@ -536,14 +752,14 @@ export class LiveSession {
 		if (status === "dead") return;
 		onReleased?.();
 		this.queue.unshift(...held.map((content) => this.queuedPrompt(content)));
-		if (this.currentTurn?.status !== "running" && !this.awaitingTurn) {
+		if (this.currentTurn?.status !== "running" && !this.inFlight()) {
 			this.deliverNextQueued();
 		}
 		if (paused.length === 0) return;
 		this.queue.push(...paused.map((content) => this.queuedPrompt(content)));
 		if (!this.queuePaused) {
 			this.queuePaused = true;
-			this.emitSession({ queuePaused: true });
+			this.emitSession({ queuePaused: true, queuePausedByLimit: false });
 		}
 	}
 
@@ -586,6 +802,10 @@ export class LiveSession {
 		if (!awaiting) return;
 		this.promptedTurns.add(turnId);
 		this.awaitingTurn = null;
+		if (this.options.checkpoints) {
+			this.checkpointedTurns.add(turnId);
+			this.options.checkpoints.turnStarted(turnId, awaiting.before ?? null);
+		}
 		this.appendDurable({
 			type: "item",
 			item: withoutQueued(awaiting.item),
@@ -593,9 +813,84 @@ export class LiveSession {
 		});
 	}
 
+	/** The prompt on its way to the agent: being snapshotted for, or sent and awaiting its turn. */
+	private inFlight(): PendingPrompt | null {
+		return this.awaitingTurn ?? this.capturing;
+	}
+
 	private deliver(prompt: PendingPrompt): void {
-		this.awaitingTurn = prompt;
-		this.send(prompt);
+		const checkpoints = this.options.checkpoints;
+		if (!checkpoints || !prompt.snapshotWorktree) {
+			this.awaitingTurn = prompt;
+			this.send(prompt);
+			return;
+		}
+		this.capturing = prompt;
+		void checkpoints
+			.capture()
+			.catch((error: unknown) => {
+				console.warn("[chat-runtime] checkpoint failed", error);
+				return null;
+			})
+			.then((before) => {
+				if (this.capturing !== prompt) return;
+				this.capturing = null;
+				if (this.stopped) return;
+				if (this.currentTurn?.status === "running") {
+					this.requeueFirst(prompt);
+					return;
+				}
+				prompt.before = before;
+				this.awaitingTurn = prompt;
+				try {
+					this.send(prompt);
+				} catch (error) {
+					this.refuse(prompt, error);
+				}
+			});
+	}
+
+	/** The agent turned down a prompt sent after its snapshot, when no caller waits on it any more. */
+	private refuse(prompt: PendingPrompt, error: unknown): void {
+		if (!prompt.item.queued) this.discard(prompt);
+		const at = this.now();
+		this.appendDurable({
+			type: "item",
+			item: {
+				id: this.mintId(),
+				kind: "notice",
+				noticeKind: "error",
+				text: error instanceof Error ? error.message : String(error),
+				startedAtMs: at,
+				completedAtMs: at,
+			},
+			turnId: prompt.turnId,
+		});
+		this.emitSession({});
+		try {
+			this.deliverNextQueued();
+		} catch (next) {
+			this.fail(next);
+		}
+	}
+
+	/** The agent started a turn of its own meanwhile; the prompt waits for it to end. */
+	private requeueFirst(prompt: PendingPrompt): void {
+		const item: UserMessage = { ...prompt.item, queued: true };
+		this.appendDurable({ type: "item", item, turnId: prompt.turnId });
+		this.queue.unshift({ ...prompt, item });
+		this.emitSession({});
+	}
+
+	private settleCheckpoint(turnId: string): void {
+		if (!this.checkpointedTurns.delete(turnId)) return;
+		const itemId = this.turnAnchors.get(turnId);
+		this.turnAnchors.delete(turnId);
+		const harnessSessionId = this.sessionState.harnessSessionId;
+		this.options.checkpoints?.turnSettled(
+			turnId,
+			itemId && harnessSessionId ? { harnessSessionId, itemId } : undefined,
+		);
 	}
 
 	private send(prompt: PendingPrompt): void {
@@ -610,7 +905,7 @@ export class LiveSession {
 
 	private steerableTurn(expectedTurnId?: string): Turn | null {
 		const turn = this.currentTurn;
-		if (turn?.status !== "running" || this.awaitingTurn) return null;
+		if (turn?.status !== "running" || this.inFlight()) return null;
 		if (expectedTurnId && expectedTurnId !== turn.id) return null;
 		return this.options.adapter.canSteer?.() ? turn : null;
 	}
@@ -650,7 +945,7 @@ export class LiveSession {
 			if (index === -1) return;
 			this.pendingSteers.splice(index, 1);
 			if (!taken) this.fallBack(prompt, selected);
-			if (this.currentTurn?.status !== "running" && !this.awaitingTurn) {
+			if (this.currentTurn?.status !== "running" && !this.inFlight()) {
 				this.deliverNextQueued();
 			}
 		});
@@ -674,6 +969,7 @@ export class LiveSession {
 	private fail(error: unknown): void {
 		this.settleStarted(false);
 		this.stopped = true;
+		this.clearResumeTimer();
 		const failedAtMs = this.now();
 		const turn = this.currentTurn;
 		if (turn?.status === "running") {
@@ -683,6 +979,7 @@ export class LiveSession {
 				completedAtMs: failedAtMs,
 			};
 			this.appendDurable({ type: "turn", turn: this.currentTurn });
+			this.settleCheckpoint(turn.id);
 		}
 		this.discardPending();
 		this.appendDurable({
@@ -709,14 +1006,16 @@ export class LiveSession {
 	}
 
 	private discardPending(): void {
+		const inFlight = this.inFlight();
 		const pending = [
-			...(this.awaitingTurn?.item.queued ? [this.awaitingTurn] : []),
+			...(inFlight?.item.queued ? [inFlight] : []),
 			...this.pendingSteers,
 			...this.queue,
 		];
 		this.queue.length = 0;
 		this.pendingSteers.length = 0;
 		this.awaitingTurn = null;
+		this.capturing = null;
 		this.steerTarget = null;
 		for (const prompt of pending) this.discard(prompt);
 	}
@@ -728,7 +1027,7 @@ export class LiveSession {
 	}
 
 	private deliverNextQueued(): void {
-		if (this.queuePaused) return;
+		if (this.queuePaused || this.inFlight()) return;
 		const next = this.queue.shift();
 		if (!next) return;
 		this.deliver(next);
@@ -762,7 +1061,7 @@ export class LiveSession {
 
 	private hasPendingWork(): boolean {
 		return (
-			(this.queue.length > 0 && !this.queuePaused) || this.awaitingTurn !== null
+			(this.queue.length > 0 && !this.queuePaused) || this.inFlight() !== null
 		);
 	}
 

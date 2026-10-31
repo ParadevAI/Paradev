@@ -1,13 +1,22 @@
 "use client";
 
+import {
+	$insertDataTransferForRichText,
+	setLexicalClipboardDataTransfer,
+} from "@lexical/clipboard";
+import { $isCodeNode } from "@lexical/code";
+import { ListItemNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
+import { $getNearestNodeOfType } from "@lexical/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { appendPastedText, parsePastedText } from "@superset/chat/core";
+import { isLargePaste, normalizePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
 import { cn } from "@superset/ui/utils";
 import {
@@ -24,7 +33,13 @@ import {
 	COMMAND_PRIORITY_CRITICAL,
 	COMMAND_PRIORITY_HIGH,
 	COMMAND_PRIORITY_LOW,
+	COPY_COMMAND,
+	CUT_COMMAND,
 	DROP_COMMAND,
+	FORMAT_TEXT_COMMAND,
+	INDENT_CONTENT_COMMAND,
+	INSERT_PARAGRAPH_COMMAND,
+	KEY_ARROW_RIGHT_COMMAND,
 	KEY_BACKSPACE_COMMAND,
 	KEY_DELETE_COMMAND,
 	KEY_DOWN_COMMAND,
@@ -32,10 +47,12 @@ import {
 	KEY_ESCAPE_COMMAND,
 	KEY_TAB_COMMAND,
 	type LexicalNode,
+	OUTDENT_CONTENT_COMMAND,
 	PASTE_COMMAND,
 } from "lexical";
 import {
 	ArrowUpIcon,
+	LoaderCircleIcon,
 	MicIcon,
 	PaperclipIcon,
 	RefreshCcwIcon,
@@ -60,7 +77,6 @@ import {
 	useMentionSources,
 } from "../../hooks/useMentionSources";
 import { useMentionTrigger } from "../../hooks/useMentionTrigger";
-import { usePastedTexts } from "../../hooks/usePastedTexts";
 import { MentionChipNode } from "../../nodes/mentionChipNode";
 import {
 	ChipRenderProvider,
@@ -69,26 +85,39 @@ import {
 import type {
 	ComposerActionContext,
 	ComposerChip,
+	ComposerDraft,
+	ComposerMentionBrowse,
 	ComposerMentionEntry,
+	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
 	PromptInputProps,
 } from "../../types";
-import { registerDraftEdit } from "../../utils/draftEdit";
+import { browseRows } from "../../utils/browseRows";
+import { $clipboardData } from "../../utils/clipboardData";
+import {
+	$appendDraftSegments,
+	$readPromptText,
+	draftOf,
+	TYPED_SHORTCUTS,
+} from "../../utils/draftSegments";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { $insertTranscript } from "../../utils/insertTranscript";
+import { $isInCode } from "../../utils/isInCode";
 import { rankCommands } from "../../utils/rankCommands";
-import { $restoreChips } from "../../utils/restoreChips";
+import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
 import {
 	CommandTypeaheadOption,
 	MentionTypeaheadOption,
 } from "../../utils/typeaheadOptions";
 import { AttachmentPills } from "../AttachmentPills";
+import { CodeFencePlugin } from "../CodeFencePlugin";
 import { CommandMenu } from "../CommandMenu";
 import { ComposerPanel } from "../ComposerPanel";
 import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
+import { MentionSubmenu } from "../MentionSubmenu";
 
 const FOOTER_BUTTON_CLASS =
 	"flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors";
@@ -117,10 +146,7 @@ function matchCommandToken(text: string) {
 }
 
 export type ComposerBodyProps = Required<
-	Pick<
-		PromptInputProps,
-		"placeholder" | "status" | "submitWhileStreaming" | "placement"
-	>
+	Pick<PromptInputProps, "placeholder" | "status">
 > &
 	Pick<
 		PromptInputProps,
@@ -129,23 +155,18 @@ export type ComposerBodyProps = Required<
 		| "dictation"
 		| "toolbar"
 		| "toolbarEnd"
-		| "defaultValue"
-		| "findChips"
-		| "onChange"
-		| "collapseLargePastes"
+		| "draft"
+		| "onDraftChange"
 		| "onSubmit"
 		| "onStop"
 		| "stopOnEscape"
-		| "onMentionHighlight"
 		| "onAttachmentClick"
-		| "onChipClick"
 		| "chipForPaste"
+		| "localFiles"
 		| "ref"
-		| "header"
-		| "onAddFiles"
 		| "allowEmptySubmit"
-		| "clearOnSubmit"
-		| "hideSubmit"
+		| "disabled"
+		| "pending"
 		| "autoFocus"
 		| "history"
 	>;
@@ -189,86 +210,59 @@ export function ComposerBody({
 	commands,
 	dictation,
 	status,
-	submitWhileStreaming,
-	placement,
 	toolbar,
 	toolbarEnd,
-	defaultValue,
-	findChips,
-	onChange,
-	collapseLargePastes,
+	draft,
+	onDraftChange,
 	onSubmit,
 	onStop,
 	stopOnEscape = true,
-	onMentionHighlight,
 	onAttachmentClick,
-	onChipClick,
 	chipForPaste,
+	localFiles,
 	ref,
-	header,
-	onAddFiles,
 	allowEmptySubmit,
-	clearOnSubmit,
-	hideSubmit,
+	disabled,
+	pending,
 	autoFocus,
 	history,
 }: ComposerBodyProps) {
 	const { t } = useLingui();
 	const [editor] = useLexicalComposerContext();
-	const onChangeRef = useRef(onChange);
-	onChangeRef.current = onChange;
-	const pasted = usePastedTexts(editor, {
-		enabled: Boolean(collapseLargePastes),
-		onCardsChange: (cards, editorText) =>
-			onChangeRef.current?.(
-				appendPastedText(
-					editorText,
-					cards.map((card) => card.text),
-				),
-			),
-	});
-	const { cardsRef } = pasted;
-	const draftText = useCallback(
-		(editorText: string) =>
-			appendPastedText(
-				editorText,
-				cardsRef.current.map((card) => card.text),
-			),
-		[cardsRef],
-	);
-	const splitPastes = useCallback(
-		(text: string) =>
-			collapseLargePastes ? parsePastedText(text) : { text, pastes: [] },
-		[collapseLargePastes],
-	);
+	const onDraftChangeRef = useRef(onDraftChange);
+	onDraftChangeRef.current = onDraftChange;
 	const focusAtEnd = useCallback(() => {
 		editor.update(() => $getRoot().selectEnd());
 		editor.focus();
 	}, [editor]);
+	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
+	const attachmentsRef = useRef(attachments);
+	attachmentsRef.current = attachments;
+	const usedDictationRef = useRef(false);
+	const addAttachments = useCallback(
+		(incoming: readonly Omit<PromptInputAttachment, "previewUrl">[]) => {
+			if (incoming.length === 0) return;
+			setAttachments((previous) => [
+				...previous,
+				...incoming.map(({ file, ...rest }) => ({
+					...rest,
+					file,
+					previewUrl:
+						file.type.startsWith("image/") || file.type.startsWith("video/")
+							? URL.createObjectURL(file)
+							: undefined,
+				})),
+			]);
+		},
+		[],
+	);
 	useImperativeHandle(
 		ref,
 		() => ({
-			appendText(message: string) {
-				const { text, pastes } = splitPastes(message);
-				pasted.restore(pastes);
-				if (!text) {
-					onChangeRef.current?.(
-						draftText(
-							editor.getEditorState().read(() => $getRoot().getTextContent()),
-						),
-					);
-					editor.focus();
-					return;
-				}
-				editor.update(() => {
-					const root = $getRoot();
-					const separator = root.getTextContent().trim() === "" ? "" : "\n";
-					root.selectEnd();
-					const selection = $getSelection();
-					if ($isRangeSelection(selection)) {
-						selection.insertRawText(`${separator}${text}`);
-					}
-				});
+			restoreDraft(restored: ComposerDraft) {
+				editor.update(() => $appendDraftSegments(restored.segments));
+				addAttachments(restored.attachments);
+				if (restored.usedDictation) usedDictationRef.current = true;
 				editor.focus();
 			},
 			isEmpty() {
@@ -276,8 +270,7 @@ export function ComposerBody({
 					editor
 						.getEditorState()
 						.read(() => $getRoot().getTextContent().trim() === "") &&
-					cardsRef.current.length === 0 &&
-					stateRef.current.attachments.length === 0
+					attachmentsRef.current.length === 0
 				);
 			},
 			addFiles(files: File[]) {
@@ -305,9 +298,8 @@ export function ComposerBody({
 				editor.blur();
 			},
 		}),
-		[cardsRef, draftText, editor, focusAtEnd, pasted.restore, splitPastes],
+		[addAttachments, editor, focusAtEnd],
 	);
-	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const [isEmpty, setIsEmpty] = useState(true);
 	const [dragging, setDragging] = useState(false);
 	const [mentionQuery, setMentionQuery] = useState<string | null>(null);
@@ -317,6 +309,9 @@ export function ComposerBody({
 	const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
 	const [browseOpen, setBrowseOpen] = useState(false);
 	const [browseIndex, setBrowseIndex] = useState(0);
+	const [submenu, setSubmenu] = useState<
+		(ComposerMentionProvider & { browse: ComposerMentionBrowse }) | null
+	>(null);
 	const [typeaheadDismissed, setTypeaheadDismissed] = useState(false);
 	const renderChip = useRenderChip();
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -324,26 +319,24 @@ export function ComposerBody({
 	// Lexical command listeners register once; this ref bridges them to live React state.
 	const stateRef = useRef({
 		attachments,
-		onChipClick,
 		onStop,
 		stopOnEscape,
 		onSubmit,
 		status,
-		submitWhileStreaming,
 		allowEmptySubmit,
-		clearOnSubmit,
+		disabled,
+		pending,
 		history,
 	});
 	stateRef.current = {
 		attachments,
-		onChipClick,
 		onStop,
 		stopOnEscape,
 		onSubmit,
 		status,
-		submitWhileStreaming,
 		allowEmptySubmit,
-		clearOnSubmit,
+		disabled,
+		pending,
 		history,
 	};
 	const historyNavigationRef = useRef<{
@@ -351,74 +344,71 @@ export function ComposerBody({
 		reset: () => void;
 	} | null>(null);
 
-	// A draft the host had stored. Read once: after mount the editor is the
-	// only writer, and re-applying would fight what is being typed.
-	const seededValue = useRef<string | null>(null);
+	const seeded = useRef(false);
 	useEffect(() => {
-		if (seededValue.current !== null) return;
-		const { text, pastes } = splitPastes(defaultValue ?? "");
-		seededValue.current = text;
-		pasted.restore(pastes);
-		if (!text) return;
-		editor.update(() => {
-			const root = $getRoot();
-			if (root.getTextContent() !== "") return;
-			root.selectEnd();
-			const selection = $getSelection();
-			if ($isRangeSelection(selection)) selection.insertText(text);
-		});
-	}, [defaultValue, editor, pasted.restore, splitPastes]);
-
-	// Chips come back once the finder can name them, which may be after the
-	// draft was read (a catalog still loading). Only the untouched draft is
-	// rewritten: once edited, even back to the same text, it is the user's.
-	const draftEdited = useRef(false);
-	useEffect(() => {
-		const seededText = seededValue.current;
-		if (!seededText) return;
-		return registerDraftEdit(editor, seededText, () => {
-			draftEdited.current = true;
-		});
-	}, [editor]);
-	useEffect(() => {
-		const seededText = seededValue.current;
-		if (!findChips || !seededText || draftEdited.current) return;
-		editor.update(() => {
-			if ($getRoot().getTextContent() !== seededText) return;
-			$restoreChips(findChips);
-		});
-	}, [editor, findChips]);
+		if (seeded.current) return;
+		seeded.current = true;
+		if (!draft) return;
+		if (draft.segments.length > 0) {
+			editor.update(() => {
+				if ($getRoot().getTextContent() !== "") return;
+				$appendDraftSegments(draft.segments);
+			});
+		}
+		addAttachments(draft.attachments);
+		if (draft.usedDictation) usedDictationRef.current = true;
+	}, [addAttachments, draft, editor]);
 
 	useEffect(
 		() =>
 			editor.registerUpdateListener(({ editorState }) => {
-				const text = editorState.read(() => $getRoot().getTextContent());
-				onChangeRef.current?.(draftText(text));
+				onDraftChangeRef.current?.({
+					segments: draftOf(editorState),
+					attachments: attachmentsRef.current,
+					...(usedDictationRef.current ? { usedDictation: true } : {}),
+				});
 			}),
-		[draftText, editor],
+		[editor],
 	);
+	useEffect(() => {
+		onDraftChangeRef.current?.({
+			segments: draftOf(editor.getEditorState()),
+			attachments,
+			...(usedDictationRef.current ? { usedDictation: true } : {}),
+		});
+	}, [attachments, editor]);
 
 	const addFiles = (files: FileList | File[]) => {
 		const incoming = Array.from(files);
 		if (incoming.length === 0) return;
-		if (onAddFiles) {
-			onAddFiles(incoming);
-			return;
-		}
-		setAttachments((previous) => [
-			...previous,
-			...incoming.map((file) => ({
+		addAttachments(
+			incoming.map((file) => {
+				const sourcePath = localFiles?.pathOf(file);
+				return {
+					id: crypto.randomUUID(),
+					file,
+					...(sourcePath ? { sourcePath } : {}),
+				};
+			}),
+		);
+	};
+	const addPastedText = (text: string) => {
+		const ordinal =
+			attachmentsRef.current.filter((entry) => entry.pastedText).length + 1;
+		addAttachments([
+			{
 				id: crypto.randomUUID(),
-				file,
-				previewUrl:
-					file.type.startsWith("image/") || file.type.startsWith("video/")
-						? URL.createObjectURL(file)
-						: undefined,
-			})),
+				file: new File([text], `pasted-${ordinal}.txt`, {
+					type: "text/plain",
+				}),
+				pastedText: text,
+			},
 		]);
 	};
 	const addFilesRef = useRef(addFiles);
 	addFilesRef.current = addFiles;
+	const addPastedTextRef = useRef(addPastedText);
+	addPastedTextRef.current = addPastedText;
 	const chipForPasteRef = useRef(chipForPaste);
 	chipForPasteRef.current = chipForPaste;
 	// Cmd/Ctrl+Shift+V pastes as text; the paste event itself carries no keys.
@@ -454,6 +444,16 @@ export function ComposerBody({
 		mentionQuery != null || browseOpen,
 		mentionQuery ?? "",
 	);
+	const openSubmenu = useCallback((provider: ComposerMentionProvider) => {
+		const { browse } = provider;
+		if (!browse) return;
+		setBrowseOpen(false);
+		setSubmenu({ ...provider, browse });
+	}, []);
+	const links = useMemo(
+		() => browseRows(activeProviders, openSubmenu),
+		[activeProviders, openSubmenu],
+	);
 	const browseSections = useMemo<MentionSection[]>(
 		() => [
 			{
@@ -469,9 +469,22 @@ export function ComposerBody({
 					},
 				],
 			},
-			...sections.filter((section) => section.entries.length > 0),
+			...(links.rows.length > 0
+				? [
+						{
+							providerId: "link",
+							title: t({ message: "Link" }),
+							isLoading: false,
+							entries: links.rows,
+						},
+					]
+				: []),
+			...sections.filter(
+				(section) =>
+					section.entries.length > 0 && !links.browsed.has(section.providerId),
+			),
 		],
-		[sections, t],
+		[links, sections, t],
 	);
 	const browseEntries = useMemo(
 		() => browseSections.flatMap((section) => section.entries),
@@ -487,12 +500,13 @@ export function ComposerBody({
 	useEffect(() => {
 		setCommandDismissed(false);
 	}, [commandQuery]);
+	const typeaheadSections = mentionQuery === "" ? browseSections : sections;
 	const mentionOptions = useMemo(
 		() =>
-			sections.flatMap((section) =>
+			typeaheadSections.flatMap((section) =>
 				section.entries.map((entry) => new MentionTypeaheadOption(entry)),
 			),
-		[sections],
+		[typeaheadSections],
 	);
 
 	const rankedCommands = useMemo(
@@ -508,6 +522,25 @@ export function ComposerBody({
 		select: (option: CommandTypeaheadOption) => void;
 	} | null>(null);
 	const completingRef = useRef(false);
+	const mentionMenuRef = useRef<{
+		option: MentionTypeaheadOption | undefined;
+		select: (option: MentionTypeaheadOption) => void;
+	} | null>(null);
+	useEffect(
+		() =>
+			editor.registerCommand<KeyboardEvent>(
+				KEY_ARROW_RIGHT_COMMAND,
+				(event) => {
+					const menu = mentionMenuRef.current;
+					if (!menu?.option?.entry.opensSubmenu) return false;
+					event.preventDefault();
+					menu.select(menu.option);
+					return true;
+				},
+				COMMAND_PRIORITY_CRITICAL,
+			),
+		[editor],
+	);
 	useEffect(
 		() =>
 			editor.registerCommand<KeyboardEvent | null>(
@@ -553,34 +586,21 @@ export function ComposerBody({
 		void entry.select(actionContextRef.current);
 	};
 
-	useEffect(() => {
-		if (mentionQuery == null) onMentionHighlight?.(null);
-	}, [mentionQuery, onMentionHighlight]);
-
 	const releaseAttachment = (attachment: PromptInputAttachment) => {
 		if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
 	};
 
 	const submit = ({ steer = false }: { steer?: boolean } = {}) => {
-		if (
-			stateRef.current.status === "streaming" &&
-			!stateRef.current.submitWhileStreaming
-		)
-			return;
-		const { text, mentions } = editor.getEditorState().read(() => ({
-			text: $getRoot().getTextContent().trim(),
+		if (stateRef.current.disabled || stateRef.current.pending) return;
+		const editorState = editor.getEditorState();
+		const { mentions, text } = editorState.read(() => ({
 			mentions: $collectChips(),
+			text: $readPromptText(),
 		}));
-		const files = stateRef.current.attachments.map(
-			(attachment) => attachment.file,
-		);
-		const pastedTexts = cardsRef.current.map((card) => card.text);
-		if (
-			!text &&
-			files.length === 0 &&
-			pastedTexts.length === 0 &&
-			!stateRef.current.allowEmptySubmit
-		) {
+		const segments = draftOf(editorState);
+		const sent = stateRef.current.attachments;
+		const files = sent.map((attachment) => attachment.file);
+		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
 			return;
 		}
 		if (
@@ -588,14 +608,17 @@ export function ComposerBody({
 				text,
 				files,
 				mentions,
-				pastedTexts,
 				steer,
+				draft: {
+					segments,
+					attachments: sent,
+					...(usedDictationRef.current ? { usedDictation: true } : {}),
+				},
 			}) === false
 		)
 			return;
 		historyNavigationRef.current?.reset();
-		if (!stateRef.current.clearOnSubmit) return;
-		pasted.clear();
+		usedDictationRef.current = false;
 		editor.update(() => $getRoot().clear());
 		setAttachments((previous) => {
 			for (const attachment of previous) releaseAttachment(attachment);
@@ -621,6 +644,7 @@ export function ComposerBody({
 		maxSeconds: dictation?.maxSeconds,
 		audioBitsPerSecond: dictation?.audioBitsPerSecond,
 		onTranscript: (text) => {
+			if (text.trim()) usedDictationRef.current = true;
 			editor.update(() => $insertTranscript(text));
 			if (isFocusUnclaimed()) editor.focus();
 		},
@@ -633,12 +657,22 @@ export function ComposerBody({
 		const unregisterEnter = editor.registerCommand<KeyboardEvent | null>(
 			KEY_ENTER_COMMAND,
 			(event) => {
-				if (event?.shiftKey || event?.isComposing || event?.keyCode === 229)
+				if (event?.isComposing || event?.keyCode === 229) return false;
+				if (event?.shiftKey) {
+					event.preventDefault();
+					editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+					return true;
+				}
+				const steer = Boolean(event?.metaKey || event?.ctrlKey);
+				const selection = $getSelection();
+				if (
+					!steer &&
+					$isRangeSelection(selection) &&
+					$isCodeNode(selection.anchor.getNode().getTopLevelElement())
+				)
 					return false;
 				event?.preventDefault();
-				submitRef.current({
-					steer: Boolean(event?.metaKey || event?.ctrlKey),
-				});
+				submitRef.current({ steer });
 				return true;
 			},
 			COMMAND_PRIORITY_LOW,
@@ -652,9 +686,11 @@ export function ComposerBody({
 			KEY_ESCAPE_COMMAND,
 			(event) => {
 				const { status, onStop, stopOnEscape } = stateRef.current;
-				if (status !== "streaming" || !onStop || !stopOnEscape) return false;
-				event?.preventDefault();
-				onStop();
+				if (status === "streaming" && onStop && stopOnEscape) {
+					event?.preventDefault();
+					onStop();
+				}
+				// Rich text would blur on Escape; the composer keeps focus.
 				return true;
 			},
 			COMMAND_PRIORITY_LOW,
@@ -674,14 +710,44 @@ export function ComposerBody({
 			},
 			COMMAND_PRIORITY_HIGH,
 		);
-		const unregisterPasteAsText = editor.registerCommand<KeyboardEvent>(
+		const unregisterKeyDown = editor.registerCommand<KeyboardEvent>(
 			KEY_DOWN_COMMAND,
 			(event) => {
-				pasteAsTextRef.current =
-					event.shiftKey &&
-					(event.metaKey || event.ctrlKey) &&
-					event.key.toLowerCase() === "v";
+				const key = event.key.toLowerCase();
+				const mod = event.metaKey || event.ctrlKey;
+				pasteAsTextRef.current = event.shiftKey && mod && key === "v";
+				// ⌘B and ⌘I format here; app hotkeys on the same keys must not also fire.
+				if (
+					mod &&
+					!event.shiftKey &&
+					!event.altKey &&
+					(key === "b" || key === "i")
+				)
+					event.stopPropagation();
 				return false;
+			},
+			COMMAND_PRIORITY_LOW,
+		);
+		const unregisterUnderline = editor.registerCommand(
+			FORMAT_TEXT_COMMAND,
+			(format) => format === "underline",
+			COMMAND_PRIORITY_HIGH,
+		);
+		const unregisterTab = editor.registerCommand<KeyboardEvent | null>(
+			KEY_TAB_COMMAND,
+			(event) => {
+				const selection = $getSelection();
+				if (
+					!$isRangeSelection(selection) ||
+					!$getNearestNodeOfType(selection.anchor.getNode(), ListItemNode)
+				)
+					return false;
+				event?.preventDefault();
+				editor.dispatchCommand(
+					event?.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND,
+					undefined,
+				);
+				return true;
 			},
 			COMMAND_PRIORITY_LOW,
 		);
@@ -697,18 +763,76 @@ export function ComposerBody({
 				}
 				const asText = pasteAsTextRef.current;
 				pasteAsTextRef.current = false;
-				const pasted = event.clipboardData?.getData("text/plain").trim();
+				const raw = event.clipboardData?.getData("text/plain") ?? "";
+				const trimmed = raw.trim();
 				const chip =
-					pasted && !asText ? chipForPasteRef.current?.(pasted) : null;
-				if (!chip) return false;
+					trimmed && !asText ? chipForPasteRef.current?.(trimmed) : null;
+				if (chip) {
+					event.preventDefault();
+					editor.update(() => $insertChipAtSelection(chip));
+					return true;
+				}
+				const text = normalizePastedText(raw);
+				if (isLargePaste(text)) {
+					event.preventDefault();
+					addPastedTextRef.current(text);
+					return true;
+				}
+				const types = event.clipboardData?.types ?? [];
+				if (
+					!asText &&
+					(types.includes("text/html") ||
+						types.includes("application/x-lexical-editor"))
+				) {
+					const html = event.clipboardData?.getData("text/html") ?? "";
+					const withTables = html ? tablesToMarkdown(html) : null;
+					if (withTables === null) return false;
+					event.preventDefault();
+					const transfer = new DataTransfer();
+					transfer.setData("text/html", withTables);
+					transfer.setData("text/plain", raw);
+					const selection = $getSelection();
+					if (selection)
+						$insertDataTransferForRichText(transfer, selection, editor);
+					return true;
+				}
 				event.preventDefault();
-				editor.update(() => $insertChipAtSelection(chip));
+				const selection = $getSelection();
+				if ($isRangeSelection(selection)) selection.insertRawText(text);
 				return true;
 			},
 			COMMAND_PRIORITY_HIGH,
 		);
-		// Chips are decorator nodes: clicks select them as a node selection (and
-		// notify the app), and Backspace/Delete remove the selected chips.
+		const $writeClipboard = (event: ClipboardEvent | KeyboardEvent | null) => {
+			const selection = $getSelection();
+			if (
+				!(event instanceof ClipboardEvent) ||
+				!event.clipboardData ||
+				!selection ||
+				selection.isCollapsed()
+			)
+				return false;
+			event.preventDefault();
+			setLexicalClipboardDataTransfer(event.clipboardData, $clipboardData());
+			return true;
+		};
+		const unregisterCopy = editor.registerCommand(
+			COPY_COMMAND,
+			$writeClipboard,
+			COMMAND_PRIORITY_LOW,
+		);
+		const unregisterCut = editor.registerCommand(
+			CUT_COMMAND,
+			(event) => {
+				if (!$writeClipboard(event)) return false;
+				const selection = $getSelection();
+				if ($isRangeSelection(selection)) selection.removeText();
+				else if ($isNodeSelection(selection))
+					for (const node of selection.getNodes()) node.remove();
+				return true;
+			},
+			COMMAND_PRIORITY_LOW,
+		);
 		const unregisterClick = editor.registerCommand<MouseEvent>(
 			CLICK_COMMAND,
 			(event) => {
@@ -721,7 +845,6 @@ export function ComposerBody({
 				const selection = $createNodeSelection();
 				selection.add(node.getKey());
 				$setSelection(selection);
-				stateRef.current.onChipClick?.(node.toChip());
 				return true;
 			},
 			COMMAND_PRIORITY_LOW,
@@ -756,7 +879,11 @@ export function ComposerBody({
 			unregisterEscape();
 			unregisterDrop();
 			unregisterPaste();
-			unregisterPasteAsText();
+			unregisterCopy();
+			unregisterCut();
+			unregisterKeyDown();
+			unregisterUnderline();
+			unregisterTab();
 			unregisterClick();
 			unregisterBackspace();
 			unregisterDelete();
@@ -764,6 +891,7 @@ export function ComposerBody({
 	}, [editor]);
 
 	const toggleBrowseMenu = () => {
+		setSubmenu(null);
 		setTypeaheadDismissed(true);
 		setBrowseIndex(0);
 		setBrowseOpen((previous) => !previous);
@@ -834,9 +962,10 @@ export function ComposerBody({
 				});
 				return;
 			}
-			if (event.key === "Enter") {
-				event.preventDefault();
+			if (event.key === "Enter" || event.key === "ArrowRight") {
 				const entry = browseEntries[browseIndex];
+				if (event.key === "ArrowRight" && !entry?.opensSubmenu) return;
+				event.preventDefault();
 				if (entry) selectBrowseEntry(entry);
 				return;
 			}
@@ -861,10 +990,12 @@ export function ComposerBody({
 					target.closest(".prompt-input-editor")
 				) {
 					setBrowseOpen(false);
+					setSubmenu(null);
 				}
 				return;
 			}
 			setBrowseOpen(false);
+			setSubmenu(null);
 			setTypeaheadDismissed(true);
 			setCommandDismissed(true);
 			setPanel((current) => (current?.bare ? null : current));
@@ -873,11 +1004,7 @@ export function ComposerBody({
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
 
-	const canSend =
-		allowEmptySubmit ||
-		!isEmpty ||
-		attachments.length > 0 ||
-		pasted.cards.length > 0;
+	const canSend = allowEmptySubmit || !isEmpty || attachments.length > 0;
 
 	useEffect(() => {
 		if (autoFocus) focusAtEnd();
@@ -886,7 +1013,10 @@ export function ComposerBody({
 	// A chip's hover card or tooltip opens above the composer, where these
 	// menus open, and would catch a click meant for the menu.
 	const chipMenuOpen =
-		mentionQuery !== null || commandQuery !== null || browseOpen;
+		mentionQuery !== null ||
+		commandQuery !== null ||
+		browseOpen ||
+		submenu !== null;
 	return (
 		<ChipRenderProvider renderChip={chipMenuOpen ? withoutTooltip : renderChip}>
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the file picker button */}
@@ -920,19 +1050,37 @@ export function ComposerBody({
 			>
 				<div
 					ref={setMenuSlot}
-					className={cn(
-						"pointer-events-none absolute inset-x-0 [&>*]:pointer-events-auto",
-						placement === "bottom" ? "top-full pt-2" : "bottom-full pb-2",
-					)}
+					className="pointer-events-none absolute inset-x-0 bottom-full pb-2 [&>*]:pointer-events-auto"
 				>
 					{browseOpen && (
 						<MentionMenu
 							sections={browseSections}
-							className="max-w-80"
 							selectedIndex={browseIndex}
 							onHighlight={setBrowseIndex}
-							onSelectionChange={onMentionHighlight}
 							onSelect={selectBrowseEntry}
+						/>
+					)}
+					{submenu && (
+						<MentionSubmenu
+							key={submenu.id}
+							provider={submenu}
+							onSelect={(entry) => {
+								setSubmenu(null);
+								editor.focus();
+								void entry.select(actionContextRef.current);
+							}}
+							onBack={() => {
+								const row = browseEntries.findIndex(
+									(entry) => entry.id === `browse:${submenu.id}`,
+								);
+								setSubmenu(null);
+								setBrowseIndex(Math.max(row, 0));
+								setBrowseOpen(true);
+							}}
+							onClose={() => {
+								setSubmenu(null);
+								editor.focus();
+							}}
 						/>
 					)}
 				</div>
@@ -940,20 +1088,13 @@ export function ComposerBody({
 					<div
 						role="dialog"
 						aria-label={panel.title}
-						className={cn(
-							"absolute inset-x-0 z-30",
-							placement === "bottom" ? "top-full pt-2" : "bottom-full pb-2",
-						)}
+						className="absolute inset-x-0 bottom-full z-30 pb-2"
 					>
 						{panel.render({ close: closePanel })}
 					</div>
 				) : (
 					panel && (
-						<ComposerPanel
-							title={panel.title}
-							placement={placement}
-							onClose={() => setPanel(null)}
-						>
+						<ComposerPanel title={panel.title} onClose={() => setPanel(null)}>
 							{panel.render({ close: closePanel })}
 						</ComposerPanel>
 					)
@@ -974,13 +1115,16 @@ export function ComposerBody({
 						<Trans>Drop to attach</Trans>
 					</span>
 				</div>
-				{header}
 				<AttachmentPills
 					attachments={attachments}
-					pastedTexts={pasted.cards}
-					onShowPastedText={pasted.showInTextField}
-					onRemovePastedText={pasted.remove}
 					onAttachmentClick={onAttachmentClick}
+					onReveal={
+						localFiles
+							? (attachment) =>
+									attachment.sourcePath &&
+									localFiles.reveal(attachment.sourcePath)
+							: undefined
+					}
 					onPreviewError={(id) =>
 						setAttachments((previous) =>
 							previous.map((entry) => {
@@ -1001,7 +1145,7 @@ export function ComposerBody({
 					}
 				/>
 				<div className="relative px-4 pt-3.5 pb-1">
-					<PlainTextPlugin
+					<RichTextPlugin
 						contentEditable={
 							<ContentEditable
 								className="prompt-input-editor"
@@ -1016,26 +1160,43 @@ export function ComposerBody({
 						ErrorBoundary={LexicalErrorBoundary}
 					/>
 					<HistoryPlugin />
+					<ListPlugin />
+					<MarkdownShortcutPlugin transformers={TYPED_SHORTCUTS} />
+					<CodeFencePlugin />
 					<LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
 						onQueryChange={setMentionQuery}
 						onSelectOption={(option, nodeToReplace, closeMenu) =>
 							selectMentionEntry(option.entry, nodeToReplace, closeMenu)
 						}
 						options={mentionOptions}
-						triggerFn={matchTrigger}
+						triggerFn={(text) => ($isInCode() ? null : matchTrigger(text))}
 						commandPriority={COMMAND_PRIORITY_HIGH}
-						onClose={() => setMentionQuery(null)}
+						onClose={() => {
+							mentionMenuRef.current = null;
+							setMentionQuery(null);
+						}}
 						menuRenderFn={(
 							anchorElementRef,
 							{ selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-						) =>
-							anchorElementRef.current && menuSlot && !typeaheadDismissed
+						) => {
+							const shown = Boolean(
+								anchorElementRef.current && menuSlot && !typeaheadDismissed,
+							);
+							mentionMenuRef.current = shown
+								? {
+										option:
+											selectedIndex === null
+												? undefined
+												: mentionOptions[selectedIndex],
+										select: selectOptionAndCleanUp,
+									}
+								: null;
+							return shown && menuSlot
 								? createPortal(
 										<MentionMenu
-											sections={sections}
+											sections={typeaheadSections}
 											selectedIndex={selectedIndex}
 											onHighlight={setHighlightedIndex}
-											onSelectionChange={onMentionHighlight}
 											onSelect={(entry) => {
 												const option = mentionOptions.find(
 													(candidate) => candidate.entry.id === entry.id,
@@ -1045,8 +1206,8 @@ export function ComposerBody({
 										/>,
 										menuSlot,
 									)
-								: null
-						}
+								: null;
+						}}
 					/>
 					<LexicalTypeaheadMenuPlugin<CommandTypeaheadOption>
 						onQueryChange={setCommandQuery}
@@ -1066,7 +1227,7 @@ export function ComposerBody({
 							else void option.command.onSelect(actionContextRef.current);
 						}}
 						options={commandOptions}
-						triggerFn={(text) => matchCommandToken(text)}
+						triggerFn={(text) => ($isInCode() ? null : matchCommandToken(text))}
 						commandPriority={COMMAND_PRIORITY_HIGH}
 						menuRenderFn={(
 							anchorElementRef,
@@ -1216,8 +1377,7 @@ export function ComposerBody({
 									<MicIcon className="size-4" />
 								</button>
 							)}
-							{hideSubmit ? null : status === "streaming" &&
-								!(submitWhileStreaming && canSend) ? (
+							{status === "streaming" && !canSend ? (
 								<button
 									type="button"
 									aria-label={t({
@@ -1231,13 +1391,20 @@ export function ComposerBody({
 							) : (
 								<button
 									type="button"
-									aria-label={t({
-										message: "Send message",
-									})}
-									disabled={!canSend}
+									aria-label={
+										status === "streaming"
+											? t({ message: "Queue message" })
+											: t({ message: "Send message" })
+									}
+									title={
+										status === "streaming"
+											? t({ message: "Queue; ⌘↩ to steer the running turn" })
+											: undefined
+									}
+									disabled={!canSend || disabled || pending}
 									onClick={() => submit()}
 									className={
-										canSend
+										canSend && !disabled && !pending
 											? cn(
 													FOOTER_BUTTON_CLASS,
 													"cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
@@ -1245,7 +1412,11 @@ export function ComposerBody({
 											: INACTIVE_SEND_BUTTON_CLASS
 									}
 								>
-									<ArrowUpIcon className="size-4" />
+									{pending ? (
+										<LoaderCircleIcon className="size-4 animate-spin" />
+									) : (
+										<ArrowUpIcon className="size-4" />
+									)}
 								</button>
 							)}
 						</>

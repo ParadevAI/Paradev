@@ -7,8 +7,9 @@ import {
 import { i18n } from "@superset/i18n";
 import { useState } from "react";
 import { ComposerBody } from "./components/ComposerBody";
-import { MentionChipNode } from "./nodes/mentionChipNode";
+import { COMPOSER_NODES } from "./constants";
 import { ChipRenderProvider } from "./providers/ChipRenderProvider";
+import { COMPOSER_THEME } from "./theme";
 import type { PromptInputProps } from "./types";
 import "./prompt-input.css";
 import { msg } from "@lingui/core/macro";
@@ -16,7 +17,9 @@ import { msg } from "@lingui/core/macro";
 export type {
 	ComposerActionContext,
 	ComposerChip,
-	ComposerChipMatch,
+	ComposerDraft,
+	ComposerDraftSegment,
+	ComposerMentionBrowse,
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 	ComposerMentionSource,
@@ -27,6 +30,7 @@ export type {
 	PromptInputDictation,
 	PromptInputDictationError,
 	PromptInputHandle,
+	PromptInputLocalFiles,
 	PromptInputProps,
 	PromptInputSubmitPayload,
 } from "./types";
@@ -42,34 +46,28 @@ export function PromptInput({
 	commands,
 	dictation,
 	status = "ready",
-	submitWhileStreaming = false,
-	placement = "top",
 	toolbar,
 	toolbarEnd,
-	defaultValue,
-	findChips,
-	onChange,
-	collapseLargePastes = false,
+	draft,
+	onDraftChange,
 	onSubmit,
 	onStop,
 	stopOnEscape = true,
-	header,
-	onAddFiles,
 	allowEmptySubmit = false,
-	clearOnSubmit = true,
-	hideSubmit = false,
+	disabled = false,
+	pending = false,
 	autoFocus = false,
-	onMentionHighlight,
 	onAttachmentClick,
-	onChipClick,
 	chipForPaste,
 	renderChip,
+	localFiles,
 	history,
 	className,
 }: PromptInputProps) {
 	const [initialConfig] = useState<InitialConfigType>(() => ({
 		namespace: "prompt-input",
-		nodes: [MentionChipNode],
+		nodes: COMPOSER_NODES,
+		theme: COMPOSER_THEME,
 		onError: (error: Error) => {
 			throw error;
 		},
@@ -86,27 +84,20 @@ export function PromptInput({
 						commands={commands}
 						dictation={dictation}
 						status={status}
-						submitWhileStreaming={submitWhileStreaming}
-						placement={placement}
 						toolbar={toolbar}
 						toolbarEnd={toolbarEnd}
-						defaultValue={defaultValue}
-						findChips={findChips}
-						onChange={onChange}
-						collapseLargePastes={collapseLargePastes}
+						draft={draft}
+						onDraftChange={onDraftChange}
 						onSubmit={onSubmit}
 						onStop={onStop}
 						stopOnEscape={stopOnEscape}
-						header={header}
-						onAddFiles={onAddFiles}
 						allowEmptySubmit={allowEmptySubmit}
-						clearOnSubmit={clearOnSubmit}
-						hideSubmit={hideSubmit}
+						disabled={disabled}
+						pending={pending}
 						autoFocus={autoFocus}
-						onMentionHighlight={onMentionHighlight}
 						onAttachmentClick={onAttachmentClick}
-						onChipClick={onChipClick}
 						chipForPaste={chipForPaste}
+						localFiles={localFiles}
 						history={history}
 					/>
 				</ChipRenderProvider>

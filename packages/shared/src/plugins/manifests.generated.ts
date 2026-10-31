@@ -767,6 +767,129 @@ export const FIRST_PARTY_MANIFESTS = {
 			}
 		]
 	} as const,
+	"peec": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "peec",
+		"version": "1.0.0",
+		"description": "Track your brand in AI search with Peec AI: visibility, cited sources, recommended actions, and AI crawler traffic.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"peec",
+			"aeo",
+			"geo",
+			"ai-search",
+			"seo",
+			"visibility"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Peec AI",
+					"category": "Data & APIs",
+					"icon": "peec"
+				},
+				"connector": {
+					"slug": "peec_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.peec.ai/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "diagnose-ai-visibility",
+				"description": "Find out why AI search engines leave your brand out of an answer, and pick the one fix that matches the cause — read the answers and the sources they cite, map the question to your own page, then decide if the page is broken, missing, weak, or outweighed by third-party sources. Use when the user asks why ChatGPT, Gemini, Perplexity or Google AI Overviews do not mention them, which prompts they lose, what content to write next, or how to improve AI visibility."
+			},
+			{
+				"name": "work-peec-actions",
+				"description": "Work through Peec AI's recommended actions and keep the record honest — site fixes first, decline false positives with a reason, log work you shipped as completed actions on the date it shipped so Peec's Impact view measures it, and check before and after. Use when the user asks what to do next in Peec, wants to triage or clean up Peec actions, record shipped content or fixes in Peec, or see whether a change moved AI visibility."
+			}
+		]
+	} as const,
+	"sazabi": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "sazabi",
+		"version": "1.0.0",
+		"description": "Investigate production with Sazabi: ask questions about your logs and traces, triage issues, check deploys, build dashboards, and send app and coding-agent telemetry to Sazabi.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"sazabi",
+			"logs",
+			"observability",
+			"opentelemetry",
+			"debugging",
+			"incidents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Sazabi",
+					"category": "Developer tools",
+					"icon": "sazabi"
+				},
+				"connector": {
+					"slug": "sazabi_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.sazabi.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "add-logging",
+				"description": "Before shipping a change, add structured log lines to the code path it touches so the next investigation has evidence — one line per decision and failure, with stable event names and the IDs needed to join requests, at the right level and without secrets. Use when writing or reviewing a feature or fix, when a bug was hard to diagnose because the logs were silent, or when the user asks to improve logging or observability in code."
+			},
+			{
+				"name": "build-a-dashboard",
+				"description": "Turn a question the user keeps asking about production (error rates, latency, signups, cost) into a saved Sazabi dashboard built from live log queries — check the fields exist, validate before saving, and confirm every panel returns data. Use when the user asks for a dashboard, a recurring view or report, or says they keep checking the same numbers."
+			},
+			{
+				"name": "instrument-with-sazabi",
+				"description": "Get an application's logs and traces into Sazabi with OpenTelemetry — pick the SDK for the runtime, export over OTLP/HTTP to a Sazabi intake URL kept in an environment variable, and prove data arrives before calling it done. Use when the user wants to connect an app or service to Sazabi, add OpenTelemetry, set up logging or tracing, or asks why Sazabi shows no data for a service."
+			},
+			{
+				"name": "investigate-production",
+				"description": "Find out what is actually happening in production from Sazabi's logs, traces and issues before touching code — ask the logs a precise question, read the lines behind the answer, and separate the symptom from its cause. Use when the user reports a production error, a slow or failing endpoint, a customer complaint, an alert, or asks what is broken, what changed, or why something stopped working."
+			},
+			{
+				"name": "send-agent-telemetry",
+				"description": "Stream coding-agent session telemetry (prompts, tool calls, model requests, tokens and cost) from Claude Code or Codex into Sazabi over OpenTelemetry, with privacy settings chosen on purpose. Use when the user wants observability for their coding agents or agent fleet, to track agent token usage or cost, to audit what agents ran, or to send agent telemetry to Sazabi."
+			},
+			{
+				"name": "triage-issues",
+				"description": "Work through the issues Sazabi opened on its own — rank them by severity and blast radius, find each one's cause in this repository with log evidence, and propose or draft one fix per issue, leaving issues open until a fix ships. Use when the user asks what is broken, what to fix first, to clean up or triage Sazabi issues, or for an on-call or morning review."
+			},
+			{
+				"name": "use-project-memory",
+				"description": "Read Sazabi project memory (how the system is laid out, what healthy looks like, runbooks, past incidents) before investigating or changing production behavior, and write back durable findings once they are verified. Use at the start of an investigation or on-call task, when the user mentions a runbook or a past incident, or after resolving something worth remembering."
+			},
+			{
+				"name": "verify-a-deploy",
+				"description": "Check in Sazabi that a change you shipped works in production before you call the task done — compare error rates and new kinds of log lines before and after the deploy, confirm the fixed error stopped, and catch regressions early. Use after merging or deploying a fix or feature, when the user asks whether a deploy is healthy, did the fix work, or is it safe to move on."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

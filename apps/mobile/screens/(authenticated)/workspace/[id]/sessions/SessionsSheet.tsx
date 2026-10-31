@@ -1,8 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
@@ -31,7 +29,6 @@ import { SessionList } from "./components/SessionList";
 export function SessionsSheet() {
 	const { t } = useLingui();
 	const params = useLocalSearchParams<{ id: string; active?: string }>();
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
 	const id = params.id;
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -140,19 +137,17 @@ export function SessionsSheet() {
 					onPress={() => router.back()}
 				/>
 			</HeaderToolbar>
-			{acpChat ? (
-				<HeaderToolbar placement="right">
-					<HeaderToolbar.Button
-						icon="add"
-						accessibilityLabel={t({
-							message: "New session",
-						})}
-						onPress={() =>
-							router.replace(`/(authenticated)/workspace/${id}/new-session`)
-						}
-					/>
-				</HeaderToolbar>
-			) : null}
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
+					icon="add"
+					accessibilityLabel={t({
+						message: "New session",
+					})}
+					onPress={() =>
+						router.replace(`/(authenticated)/workspace/${id}/new-session`)
+					}
+				/>
+			</HeaderToolbar>
 			<SessionList
 				rows={rows}
 				activeTerminalId={params.active ?? null}

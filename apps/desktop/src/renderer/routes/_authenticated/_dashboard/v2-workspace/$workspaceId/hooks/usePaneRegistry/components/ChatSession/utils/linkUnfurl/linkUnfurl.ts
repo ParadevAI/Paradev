@@ -32,6 +32,8 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)granola\.(ai|so)$/, "granola"],
 	[/(^|\.)superhuman\.com$/, "superhuman"],
 	[/(^|\.)circleback\.ai$/, "circleback"],
+	[/(^|\.)peec\.ai$/, "peec"],
+	[/(^|\.)sazabi\.com$/, "sazabi"],
 	[/(^|\.)supabase\.(com|co)$/, "supabase"],
 ];
 
