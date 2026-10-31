@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { compileMessageOrThrow } from "@lingui/message-utils/compileMessage";
 import { SUPPORTED_LOCALES } from "../src/locales";
 
 // A translation may reword anything except the parts the runtime substitutes:
@@ -55,29 +56,18 @@ const icu = (t: string) =>
 		.sort()
 		.join();
 
-const ICU_HEAD = /\{\s*\w+\s*,\s*(plural|select|selectordinal)\b/y;
-
-// Balanced, unlike stripIcu: a branch ending in `{name}}` must not end the block.
-function outsideIcu(t: string): string {
-	let out = "";
-	let i = 0;
-	while (i < t.length) {
-		ICU_HEAD.lastIndex = i;
-		if (!ICU_HEAD.test(t)) {
-			out += t[i++];
-			continue;
-		}
-		for (let depth = 0; i < t.length; i++) {
-			if (t[i] === "{") depth++;
-			else if (t[i] === "}" && --depth === 0) break;
-		}
-		i++;
+function strayBraces(t: string): boolean {
+	let found = false;
+	try {
+		compileMessageOrThrow(t, (text) => {
+			found ||= /[{}]/.test(text);
+			return text;
+		});
+	} catch {
+		return true;
 	}
-	return out;
+	return found;
 }
-
-const strayBraces = (t: string) =>
-	/[{}]/.test(outsideIcu(t).replace(/\{[A-Za-z0-9_]+\}/g, ""));
 
 function integrityError(source: string, translation: string): string | null {
 	for (const name of placeholders(source)) {
@@ -132,7 +122,16 @@ describe("catalog integrity", () => {
 			),
 		).toBe("missing {name}");
 		expect(
-			outsideIcu("a {count, plural, one {# in {name}} other {# in {name}}} b"),
-		).toBe("a  b");
+			integrityError(
+				"{count, plural, one {# in {name}} other {# in {name}}}",
+				'{count, plural, one {{"en": "# in {name}"}} other {# у {name}}}',
+			),
+		).toBe("braces the source does not have");
+		expect(
+			integrityError(
+				"{count, plural, one {# file} other {# files}}",
+				"{count, plural, one {# файл} other {# файлів}",
+			),
+		).toBe("braces the source does not have");
 	});
 });
