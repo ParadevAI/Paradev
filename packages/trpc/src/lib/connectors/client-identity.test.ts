@@ -156,6 +156,22 @@ describe("an issued grant", () => {
 		expect(registrations).toHaveLength(0);
 	});
 
+	test("one from before client ids were recorded never moves to a newer client", async () => {
+		rows = [
+			client({ clientSecretExpiresAt: new Date(0) }),
+			client({ clientId: "scoped-client", scopes: SCOPES }),
+		];
+		await expect(resolve({ issuedTo: null })).rejects.toBeInstanceOf(
+			ForgottenClientError,
+		);
+
+		rows = [client({ clientId: "scoped-client", scopes: SCOPES })];
+		await expect(resolve({ issuedTo: null })).rejects.toBeInstanceOf(
+			ForgottenClientError,
+		);
+		expect(registrations).toHaveLength(0);
+	});
+
 	test("whose client is gone is not handed another one", async () => {
 		rows = [client({ clientId: "scoped-client", scopes: SCOPES })];
 

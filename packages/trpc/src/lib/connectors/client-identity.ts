@@ -80,7 +80,7 @@ function unexpired(row: StoredClientRow): boolean {
 async function storedClient(
 	issuer: string,
 	redirectUri: string,
-	pick: { clientId: string } | { coveringScopes: string[] } | { oldest: true },
+	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
 	const rows = await db
 		.select()
@@ -96,8 +96,13 @@ async function storedClient(
 	const row =
 		"clientId" in pick
 			? rows.find((candidate) => candidate.clientId === pick.clientId)
-			: "oldest" in pick
-				? rows.find(unexpired)
+			: "legacy" in pick
+				? // A grant from before client ids were recorded was issued to the row
+					// from before scopes were. Moving it to a newer client only earns
+					// invalid_client, which would then forget that newer, healthy client.
+					rows.find(
+						(candidate) => candidate.scopes === null && unexpired(candidate),
+					)
 				: // A row from before scopes were recorded covers none, so a connector
 					// asking for any scope registers afresh rather than reuse a client
 					// the server may reject them for.
@@ -255,11 +260,18 @@ export async function resolveClientIdentity(
 	}
 
 	const scopes = method.scopes ?? [];
-	const existing = await storedClient(
-		server.issuer,
-		redirectUri,
-		"newGrant" in client ? { coveringScopes: scopes } : { oldest: true },
-	);
+	if (!("newGrant" in client)) {
+		// Registering here would hand the grant a client its tokens were never issued to.
+		const legacy = await storedClient(server.issuer, redirectUri, {
+			legacy: true,
+		});
+		if (!legacy) throw new ForgottenClientError(server.issuer, "(unrecorded)");
+		return legacy;
+	}
+
+	const existing = await storedClient(server.issuer, redirectUri, {
+		coveringScopes: scopes,
+	});
 	if (existing) return existing;
 
 	const key = `${server.issuer}\n${redirectUri}\n${scopes.join(" ")}`;
