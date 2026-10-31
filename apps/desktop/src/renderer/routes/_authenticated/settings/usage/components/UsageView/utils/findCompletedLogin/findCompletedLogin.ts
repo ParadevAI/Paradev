@@ -48,5 +48,21 @@ export function findCompletedLogin({
 		return null;
 	if (!commandSucceeded && after.fingerprint === before?.fingerprint)
 		return null;
+	// A profile left out of a partial scan may have been signed in all along.
+	if (
+		!commandSucceeded &&
+		!before &&
+		agent === "claude" &&
+		baseline.claudePartial
+	)
+		return null;
 	return { selection, label: after.label, credentialKind };
+}
+
+/** A partial Claude scan's baseline gives way to the first complete poll. */
+export function nextBaseline(
+	baseline: UsageLogins,
+	current: UsageLogins,
+): UsageLogins {
+	return baseline.claudePartial && !current.claudePartial ? current : baseline;
 }
