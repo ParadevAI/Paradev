@@ -3525,9 +3525,6 @@ msgstr "遷入工作區"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "將v1的專案、工作區和終端指令碼遷移到v2。每一項單獨匯入，可以重試。"
 
-msgid "Bring your agents together."
-msgstr "把你的代理程式聚到一起。"
-
 msgid "Bringing over your v1 projects"
 msgstr "正在移轉你的 v1 專案"
 
@@ -10572,9 +10569,6 @@ msgstr "已退出組織"
 msgid "Left team"
 msgstr "已退出團隊"
 
-msgid "Legal"
-msgstr "法律"
-
 msgid "Less"
 msgstr "少"
 
@@ -13530,9 +13524,6 @@ msgstr "選填。幫助我們了解哪些管道有效。"
 
 msgid "Options"
 msgstr "選項"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "或者讓你的編碼代理程式安裝Paradev CLI。"
 
 msgid "Orange"
 msgstr "橙色"
@@ -17611,6 +17602,10 @@ msgstr "小"
 msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "清空你的待辦清單。"
 
 msgid "Smileys & People"
 msgstr "表情與人物"

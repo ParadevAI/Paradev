@@ -3525,9 +3525,6 @@ msgstr "작업 공간 가져오기"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1의 프로젝트, 워크스페이스, 터미널 스크립트를 v2로 가져옵니다. 항목별로 개별 가져오며 다시 시도할 수 있습니다."
 
-msgid "Bring your agents together."
-msgstr "에이전트를 한곳에 모으세요."
-
 msgid "Bringing over your v1 projects"
 msgstr "v1 프로젝트를 옮기는 중"
 
@@ -10572,9 +10569,6 @@ msgstr "조직에서 나갔습니다"
 msgid "Left team"
 msgstr "팀에서 나갔습니다"
 
-msgid "Legal"
-msgstr "법적 고지"
-
 msgid "Less"
 msgstr "적음"
 
@@ -13530,9 +13524,6 @@ msgstr "선택 사항입니다. 무엇이 효과적인지 파악하는 데 도�
 
 msgid "Options"
 msgstr "옵션"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "또는 코딩 에이전트에게 Paradev CLI를 설치해 달라고 하세요."
 
 msgid "Orange"
 msgstr "주황"
@@ -17611,6 +17602,10 @@ msgstr "작음"
 msgctxt "machine size"
 msgid "Small"
 msgstr "소형"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "백로그를 한 번에 해치우세요."
 
 msgid "Smileys & People"
 msgstr "스마일리 및 사람"

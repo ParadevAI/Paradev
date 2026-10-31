@@ -3525,9 +3525,6 @@ msgstr "Çalışma alanlarınızı aktarın"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1 projelerini, çalışma alanlarını ve terminal betiklerini v2'ye taşıyın. Her öğe ayrı ayrı aktarılır ve yeniden denenebilir."
 
-msgid "Bring your agents together."
-msgstr "Ajanlarınızı bir araya getirin."
-
 msgid "Bringing over your v1 projects"
 msgstr "v1 projeleriniz aktarılıyor"
 
@@ -10572,9 +10569,6 @@ msgstr "Kuruluştan ayrılındı"
 msgid "Left team"
 msgstr "Takımdan ayrılındı"
 
-msgid "Legal"
-msgstr "Yasal"
-
 msgid "Less"
 msgstr "Az"
 
@@ -13530,9 +13524,6 @@ msgstr "İsteğe bağlı. Neyin işe yaradığını anlamamıza yardımcı olur.
 
 msgid "Options"
 msgstr "Seçenekler"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "Ya da kodlama ajanınızdan Paradev CLI'yi kurmasını isteyin."
 
 msgid "Orange"
 msgstr "Turuncu"
@@ -17611,6 +17602,10 @@ msgstr "Küçük"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Küçük"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Birikmiş işlerinizi eritin."
 
 msgid "Smileys & People"
 msgstr "Suratlar ve İnsanlar"

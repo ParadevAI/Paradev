@@ -3525,9 +3525,6 @@ msgstr "Nhập các không gian làm việc của bạn"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Đưa dự án, workspace và script terminal từ v1 sang v2. Mỗi mục được nhập riêng và có thể thử lại."
 
-msgid "Bring your agents together."
-msgstr "Quy tụ các agent của bạn."
-
 msgid "Bringing over your v1 projects"
 msgstr "Đang chuyển các dự án v1 của bạn"
 
@@ -10572,9 +10569,6 @@ msgstr "Đã rời tổ chức"
 msgid "Left team"
 msgstr "Đã rời nhóm"
 
-msgid "Legal"
-msgstr "Pháp lý"
-
 msgid "Less"
 msgstr "Ít"
 
@@ -13530,9 +13524,6 @@ msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 
 msgid "Options"
 msgstr "Tùy chọn"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "Hoặc bảo coding agent của bạn cài CLI Paradev."
 
 msgid "Orange"
 msgstr "Cam"
@@ -17611,6 +17602,10 @@ msgstr "Nhỏ"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Nhỏ"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Xử gọn backlog của bạn."
 
 msgid "Smileys & People"
 msgstr "Mặt cười & Con người"

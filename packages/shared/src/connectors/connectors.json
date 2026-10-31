@@ -401,6 +401,8 @@
 						"features:read",
 						"plans:read",
 						"plans:write",
+						"rewards:read",
+						"rewards:write",
 						"balances:read",
 						"billing:read",
 						"billing:write",
