@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { createWorkspaceStore } from "@superset/panes";
+import { placeInTabs } from "../../hooks/useV2WorkspacePaneLayout/utils/placeInTabs";
 import type { FilePaneData, PaneViewerData } from "../../types";
 import { openBesidePane } from "./openBesidePane";
 
@@ -12,8 +13,8 @@ function file(filePath: string) {
 	};
 }
 
-function makeStore() {
-	const store = createWorkspaceStore<PaneViewerData>();
+function makeStore(placePane?: typeof placeInTabs<PaneViewerData>) {
+	const store = createWorkspaceStore<PaneViewerData>({ placePane });
 	store.getState().addTab({ id: "t1", panes: [tree] });
 	return store;
 }
@@ -57,6 +58,19 @@ describe("openBesidePane", () => {
 		expect(
 			Object.keys(store.getState().getTab("t1")?.panes ?? {}),
 		).toHaveLength(3);
+	});
+
+	it("splits beside the anchor in a store that places panes in tabs", () => {
+		const store = makeStore(placeInTabs);
+
+		openBesidePane(store, "tree", file("/a.ts"));
+		openBesidePane(store, "tree", file("/b.ts"));
+
+		expect(store.getState().tabs).toHaveLength(1);
+		const panes = Object.values(store.getState().getTab("t1")?.panes ?? {});
+		expect(panes).toHaveLength(2);
+		const filePane = panes.find((pane) => pane.kind === "file");
+		expect((filePane?.data as FilePaneData).filePath).toBe("/b.ts");
 	});
 
 	it("opens a new tab when asked", () => {
