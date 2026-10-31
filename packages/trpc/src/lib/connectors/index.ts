@@ -6,7 +6,11 @@ import {
 } from "@superset/shared/connectors";
 import { generateCodeChallenge } from "better-auth/oauth2";
 import { credentialFetch, readPath } from "../../router/plugins/manifest";
-import { forgetClient, resolveClientIdentity } from "./client-identity";
+import {
+	type ClientFor,
+	forgetClient,
+	resolveClientIdentity,
+} from "./client-identity";
 import { discoverServer, sameIssuer } from "./discovery";
 
 const TEMPLATE = /\$\{(env|params|config)\.([\w.-]+)\}/g;
@@ -109,6 +113,7 @@ export async function resolveEndpoints(
 	slug: string,
 	method: ConnectorMethod,
 	redirectUri: string,
+	client: ClientFor,
 ): Promise<ResolvedEndpoints> {
 	if (method.type !== "oauth2")
 		throw new Error(`Connector "${slug}" is not an oauth2 method.`);
@@ -124,6 +129,7 @@ export async function resolveEndpoints(
 			server,
 			method,
 			redirectUri,
+			client,
 		);
 		return {
 			authorizationEndpoint: server.metadata.authorization_endpoint,
@@ -174,7 +180,13 @@ export interface AuthorizeTarget {
 export async function authorizeUrl(
 	slug: string,
 	method: ConnectorMethod,
-	options: { redirectUri: string; state: string; codeVerifier?: string | null },
+	options: {
+		redirectUri: string;
+		state: string;
+		codeVerifier?: string | null;
+		/** Already resolved by the caller, so the URL names the client it recorded. */
+		endpoints?: ResolvedEndpoints;
+	},
 ): Promise<AuthorizeTarget> {
 	const env = connectorEnv(slug, method);
 
@@ -189,7 +201,10 @@ export async function authorizeUrl(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? (options.endpoints ??
+				(await resolveEndpoints(slug, method, options.redirectUri, {
+					newGrant: true,
+				})))
 			: null;
 
 	const base =
@@ -243,6 +258,8 @@ export interface ConnectorTokens {
 	scopes: string[] | null;
 	stored: Record<string, unknown>;
 	raw: Record<string, unknown>;
+	/** The dynamic client the grant was issued to. */
+	clientId?: string;
 }
 
 export class IssuerMismatchError extends Error {}
@@ -280,6 +297,8 @@ export async function exchangeCode(
 		codeVerifier?: string | null;
 		params?: Record<string, string | undefined>;
 		issuer?: string | null;
+		/** The client the authorize request went out as; null when the flow did not record it. */
+		clientId: string | null;
 	},
 ): Promise<ConnectorTokens> {
 	if (method.type === "api_key")
@@ -287,7 +306,9 @@ export async function exchangeCode(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? await resolveEndpoints(slug, method, options.redirectUri, {
+					issuedTo: options.clientId,
+				})
 			: null;
 	if (endpoints)
 		assertRespondingIssuer(slug, endpoints, options.issuer ?? null);
@@ -378,6 +399,7 @@ export async function exchangeCode(
 				: null,
 		stored,
 		raw: payload,
+		...(endpoints?.issuer ? { clientId } : {}),
 	};
 }
 
