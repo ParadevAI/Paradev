@@ -5559,6 +5559,9 @@ msgstr "Impossible de charger vos machines"
 msgid "Could not mark ready"
 msgstr "Impossible de marquer comme prête"
 
+msgid "Could not open Apple's installer"
+msgstr "Impossible d'ouvrir le programme d'installation d'Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "Impossible d'ouvrir la facturation. Veuillez réessayer."
 
@@ -8568,6 +8571,9 @@ msgstr "Trouver des personnes et des Devs"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Terminez le programme d'installation d'Apple. Cette page se met à jour une fois l'installation terminée."
+
 msgid "Finish review"
 msgstr "Terminer la revue"
 
@@ -8990,6 +8996,9 @@ msgstr "Obtenir une clé API"
 
 msgid "Get channel details"
 msgstr "Voir les détails du canal"
+
+msgid "Get Git"
+msgstr "Obtenir Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Contactez l'équipe {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Installer et redémarrer"
 msgid "Install & Restart"
 msgstr "Installer et redémarrer"
 
+msgid "Install Command Line Tools"
+msgstr "Installer les Command Line Tools"
+
 msgid "Install failed"
 msgstr "Échec de l'installation"
+
+msgid "Install Git, then come back."
+msgstr "Installez Git, puis revenez ici."
 
 msgid "Install GitHub App"
 msgstr "Installer la GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "sur {offScopeHostName} — ne s'exécutera pas ici"
 msgid "On a date"
 msgstr "À une date"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Sur Mac, Git est fourni avec les Command Line Tools d'Apple."
+
 msgid "On focus change"
 msgstr "Lors du changement de focus"
 
@@ -13965,6 +13983,9 @@ msgstr "Terminal de Paradev Mobile sur iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev a besoin d'un accès complet au disque pour lire les données d'un autre navigateur. Accordez-le dans les Réglages Système, puis vérifiez à nouveau."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev a besoin de Git pour ajouter un projet."
 
 msgid "Paradev next to others"
 msgstr "Paradev face aux autres"

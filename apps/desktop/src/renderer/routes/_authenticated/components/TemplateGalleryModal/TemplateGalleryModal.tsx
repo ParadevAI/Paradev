@@ -9,6 +9,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { getDefaultProjectsDir } from "renderer/lib/defaultProjectsDir";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
@@ -49,7 +50,7 @@ export function TemplateGalleryModal({
 	const finalizeSetup = useFinalizeProjectSetup();
 	const createV1Project = useCreateV1Project();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const parentDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const parentDir = homeDir ? getDefaultProjectsDir(homeDir) : null;
 	const [cloningId, setCloningId] = useState<string | null>(null);
 
 	const handleSelect = async (template: ProjectTemplate) => {

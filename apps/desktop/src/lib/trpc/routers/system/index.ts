@@ -1,5 +1,12 @@
-import { publicProcedure, router } from "..";
-import { execWithShellEnv } from "./workspaces/utils/shell-env";
+import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
+import { promisify } from "node:util";
+import { TRPCError } from "@trpc/server";
+import { publicProcedure, router } from "../..";
+import { execWithShellEnv } from "../workspaces/utils/shell-env";
+import { detectGit } from "./detect-git";
+
+const execFileAsync = promisify(execFile);
 
 interface GhDetectResult {
 	installed: boolean;
@@ -69,10 +76,31 @@ async function detectBrew(): Promise<BrewDetectResult> {
 	}
 }
 
+async function installCommandLineTools(): Promise<void> {
+	if (process.platform !== "darwin") {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "Command Line Tools are only available on macOS.",
+		});
+	}
+	await execFileAsync("/usr/bin/xcode-select", ["--install"], {
+		timeout: 10_000,
+	});
+}
+
 export const createSystemRouter = () => {
 	return router({
 		detectGhCli: publicProcedure.query(detectGhCli),
 		detectBrew: publicProcedure.query(detectBrew),
+		detectGit: publicProcedure.query(() =>
+			detectGit({
+				platform: process.platform,
+				run: async (command, args) =>
+					(await execWithShellEnv(command, args, { timeout: 5000 })).stdout,
+				fileExists: existsSync,
+			}),
+		),
+		installCommandLineTools: publicProcedure.mutation(installCommandLineTools),
 	});
 };
 

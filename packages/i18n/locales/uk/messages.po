@@ -5553,6 +5553,9 @@ msgstr "Не вдалося завантажити ваші комп'ютери"
 msgid "Could not mark ready"
 msgstr "Не вдалося позначити як готовий"
 
+msgid "Could not open Apple's installer"
+msgstr "Не вдалося відкрити інсталятор Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "Не вдалося відкрити сторінку оплати. Спробуйте ще раз."
 
@@ -8562,6 +8565,9 @@ msgstr "Знайти людей і Devs"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Завершіть інсталяцію в інсталяторі Apple. Сторінка оновиться, коли все буде готово."
+
 msgid "Finish review"
 msgstr "Завершити рев'ю"
 
@@ -8984,6 +8990,9 @@ msgstr "Отримати ключ API"
 
 msgid "Get channel details"
 msgstr "Переглянути відомості про канал"
+
+msgid "Get Git"
+msgstr "Завантажити Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Зв'яжіться з командою {companyName}."
@@ -9893,8 +9902,14 @@ msgstr "Встановити й перезапустити"
 msgid "Install & Restart"
 msgstr "Встановити й перезапустити"
 
+msgid "Install Command Line Tools"
+msgstr "Встановити Command Line Tools"
+
 msgid "Install failed"
 msgstr "Не вдалося встановити"
+
+msgid "Install Git, then come back."
+msgstr "Встановіть Git і поверніться сюди."
 
 msgid "Install GitHub App"
 msgstr "Встановити GitHub App"
@@ -12880,6 +12895,9 @@ msgstr "на {offScopeHostName} — тут не запуститься"
 msgid "On a date"
 msgstr "У певну дату"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "На Mac Git входить до складу Command Line Tools від Apple."
+
 msgid "On focus change"
 msgstr "Під час зміни фокуса"
 
@@ -13959,6 +13977,9 @@ msgstr "Термінал Paradev Mobile на iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev потребує повного доступу до диска, щоб читати дані іншого браузера. Надайте його в Системних параметрах і перевірте знову."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev потрібен Git, щоб додати проєкт."
 
 msgid "Paradev next to others"
 msgstr "Paradev порівняно з іншими"

@@ -5559,6 +5559,9 @@ msgstr "Could not load your machines"
 msgid "Could not mark ready"
 msgstr "Could not mark ready"
 
+msgid "Could not open Apple's installer"
+msgstr "Could not open Apple's installer"
+
 msgid "Could not open billing. Please try again."
 msgstr "Could not open billing. Please try again."
 
@@ -8568,6 +8571,9 @@ msgstr "Find people and Devs"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Finish Apple's installer. This page updates when it's done."
+
 msgid "Finish review"
 msgstr "Finish review"
 
@@ -8990,6 +8996,9 @@ msgstr "Get an API key"
 
 msgid "Get channel details"
 msgstr "Get channel details"
+
+msgid "Get Git"
+msgstr "Get Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Get in touch with the {companyName} team."
@@ -9899,8 +9908,14 @@ msgstr "Install & restart"
 msgid "Install & Restart"
 msgstr "Install & Restart"
 
+msgid "Install Command Line Tools"
+msgstr "Install Command Line Tools"
+
 msgid "Install failed"
 msgstr "Install failed"
+
+msgid "Install Git, then come back."
+msgstr "Install Git, then come back."
 
 msgid "Install GitHub App"
 msgstr "Install GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "on {offScopeHostName} — won't run here"
 msgid "On a date"
 msgstr "On a date"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "On a Mac, Git comes with Apple's Command Line Tools."
+
 msgid "On focus change"
 msgstr "On focus change"
 
@@ -13965,6 +13983,9 @@ msgstr "Paradev Mobile terminal on iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev needs Git to add a project."
 
 msgid "Paradev next to others"
 msgstr "Paradev next to others"

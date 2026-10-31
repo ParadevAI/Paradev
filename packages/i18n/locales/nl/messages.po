@@ -5559,6 +5559,9 @@ msgstr "Kan je machines niet laden"
 msgid "Could not mark ready"
 msgstr "Kan niet als klaar markeren"
 
+msgid "Could not open Apple's installer"
+msgstr "Kan het installatieprogramma van Apple niet openen"
+
 msgid "Could not open billing. Please try again."
 msgstr "Kon facturering niet openen. Probeer het opnieuw."
 
@@ -8568,6 +8571,9 @@ msgstr "Mensen en Devs zoeken"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Rond het installatieprogramma van Apple af. Deze pagina wordt bijgewerkt zodra het klaar is."
+
 msgid "Finish review"
 msgstr "Review afronden"
 
@@ -8990,6 +8996,9 @@ msgstr "API-sleutel ophalen"
 
 msgid "Get channel details"
 msgstr "Kanaaldetails bekijken"
+
+msgid "Get Git"
+msgstr "Git downloaden"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Neem contact op met het team van {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Installeren en herstarten"
 msgid "Install & Restart"
 msgstr "Installeren en herstarten"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Tools installeren"
+
 msgid "Install failed"
 msgstr "Installeren mislukt"
+
+msgid "Install Git, then come back."
+msgstr "Installeer Git en kom dan terug."
 
 msgid "Install GitHub App"
 msgstr "GitHub App installeren"
@@ -12886,6 +12901,9 @@ msgstr "op {offScopeHostName} — draait hier niet"
 msgid "On a date"
 msgstr "Op een datum"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Op een Mac wordt Git geleverd met de Command Line Tools van Apple."
+
 msgid "On focus change"
 msgstr "Bij focuswijziging"
 
@@ -13965,6 +13983,9 @@ msgstr "Terminal van Paradev Mobile op iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev heeft Volledige Schijftoegang nodig om de gegevens van een andere browser te lezen. Geef die in Systeeminstellingen en controleer opnieuw."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev heeft Git nodig om een project toe te voegen."
 
 msgid "Paradev next to others"
 msgstr "Paradev naast andere tools"

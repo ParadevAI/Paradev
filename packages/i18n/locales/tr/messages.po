@@ -5559,6 +5559,9 @@ msgstr "Makineleriniz yüklenemedi"
 msgid "Could not mark ready"
 msgstr "Hazır olarak işaretlenemedi"
 
+msgid "Could not open Apple's installer"
+msgstr "Apple yükleyicisi açılamadı"
+
 msgid "Could not open billing. Please try again."
 msgstr "Faturalandırma açılamadı. Lütfen tekrar deneyin."
 
@@ -8568,6 +8571,9 @@ msgstr "Kişileri ve Dev'leri bul"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Apple yükleyicisini tamamla. İşlem bitince bu sayfa güncellenir."
+
 msgid "Finish review"
 msgstr "İncelemeyi bitir"
 
@@ -8990,6 +8996,9 @@ msgstr "API anahtarı alın"
 
 msgid "Get channel details"
 msgstr "Kanal ayrıntılarını gör"
+
+msgid "Get Git"
+msgstr "Git'i indir"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName} ekibiyle iletişime geçin."
@@ -9899,8 +9908,14 @@ msgstr "Kur ve yeniden başlat"
 msgid "Install & Restart"
 msgstr "Kur ve yeniden başlat"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Tools'u yükle"
+
 msgid "Install failed"
 msgstr "Kurulum başarısız"
+
+msgid "Install Git, then come back."
+msgstr "Git'i yükle, sonra buraya geri dön."
 
 msgid "Install GitHub App"
 msgstr "GitHub App'i kur"
@@ -12886,6 +12901,9 @@ msgstr "{offScopeHostName} üzerinde — burada çalışmaz"
 msgid "On a date"
 msgstr "Bir tarihte"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Mac'te Git, Apple'ın Command Line Tools paketiyle birlikte gelir."
+
 msgid "On focus change"
 msgstr "Odak değiştiğinde"
 
@@ -13965,6 +13983,9 @@ msgstr "iPhone'da Paradev Mobile terminali"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev'in başka bir tarayıcının verilerini okuyabilmesi için Tam Disk Erişimi gerekir. Sistem Ayarları'ndan verin, sonra yeniden denetleyin."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev'in proje eklemek için Git'e ihtiyacı var."
 
 msgid "Paradev next to others"
 msgstr "Paradev ve diğerleri"

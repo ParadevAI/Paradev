@@ -5559,6 +5559,9 @@ msgstr "No se pudieron cargar tus máquinas"
 msgid "Could not mark ready"
 msgstr "No se pudo marcar como lista"
 
+msgid "Could not open Apple's installer"
+msgstr "No se pudo abrir el instalador de Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "No se pudo abrir la facturación. Inténtalo de nuevo."
 
@@ -8568,6 +8571,9 @@ msgstr "Buscar personas y Devs"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Completa el instalador de Apple. Esta página se actualizará cuando termine."
+
 msgid "Finish review"
 msgstr "Finalizar revisión"
 
@@ -8990,6 +8996,9 @@ msgstr "Conseguir una clave de API"
 
 msgid "Get channel details"
 msgstr "Ver detalles del canal"
+
+msgid "Get Git"
+msgstr "Obtener Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Ponte en contacto con el equipo de {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Instalar y reiniciar"
 msgid "Install & Restart"
 msgstr "Instalar y reiniciar"
 
+msgid "Install Command Line Tools"
+msgstr "Instalar Command Line Tools"
+
 msgid "Install failed"
 msgstr "Error al instalar"
+
+msgid "Install Git, then come back."
+msgstr "Instala Git y luego vuelve aquí."
 
 msgid "Install GitHub App"
 msgstr "Instalar la GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "en {offScopeHostName}: no se ejecutará aquí"
 msgid "On a date"
 msgstr "En una fecha"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "En Mac, Git viene incluido en las Command Line Tools de Apple."
+
 msgid "On focus change"
 msgstr "Al cambiar el foco"
 
@@ -13965,6 +13983,9 @@ msgstr "Terminal de Paradev Mobile en iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev necesita Acceso a disco completo para leer los datos de otro navegador. Concederlo en Ajustes del Sistema y volver a comprobar."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev necesita Git para añadir un proyecto."
 
 msgid "Paradev next to others"
 msgstr "Paradev junto a otros"

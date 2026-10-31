@@ -5559,6 +5559,9 @@ msgstr "Не удалось загрузить ваши машины"
 msgid "Could not mark ready"
 msgstr "Не удалось отметить готовым"
 
+msgid "Could not open Apple's installer"
+msgstr "Не удалось открыть установщик Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "Не удалось открыть страницу оплаты. Попробуйте ещё раз."
 
@@ -8568,6 +8571,9 @@ msgstr "Найти людей и Dev"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Завершите установку в установщике Apple. Страница обновится, когда всё будет готово."
+
 msgid "Finish review"
 msgstr "Завершить ревью"
 
@@ -8990,6 +8996,9 @@ msgstr "Получить ключ API"
 
 msgid "Get channel details"
 msgstr "Открыть сведения о канале"
+
+msgid "Get Git"
+msgstr "Скачать Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Свяжитесь с командой {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Установить и перезапустить"
 msgid "Install & Restart"
 msgstr "Установить и перезапустить"
 
+msgid "Install Command Line Tools"
+msgstr "Установить Command Line Tools"
+
 msgid "Install failed"
 msgstr "Не удалось установить"
+
+msgid "Install Git, then come back."
+msgstr "Установите Git и вернитесь сюда."
 
 msgid "Install GitHub App"
 msgstr "Установить GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "на {offScopeHostName} — здесь не запустится"
 msgid "On a date"
 msgstr "В дату"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "На Mac Git входит в состав Command Line Tools от Apple."
+
 msgid "On focus change"
 msgstr "При смене фокуса"
 
@@ -13965,6 +13983,9 @@ msgstr "Терминал Paradev Mobile на iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev нужен полный доступ к диску, чтобы читать данные другого браузера. Выдайте его в Системных настройках и проверьте снова."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev нужен Git, чтобы добавить проект."
 
 msgid "Paradev next to others"
 msgstr "Paradev и другие"

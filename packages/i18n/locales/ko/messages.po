@@ -5559,6 +5559,9 @@ msgstr "머신을 불러오지 못했습니다"
 msgid "Could not mark ready"
 msgstr "준비됨으로 표시할 수 없습니다"
 
+msgid "Could not open Apple's installer"
+msgstr "Apple 설치 프로그램을 열 수 없습니다"
+
 msgid "Could not open billing. Please try again."
 msgstr "결제 페이지를 열 수 없습니다. 다시 시도해 주세요."
 
@@ -8568,6 +8571,9 @@ msgstr "사람 및 Dev 찾기"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Apple 설치 프로그램을 끝까지 진행하세요. 완료되면 이 페이지가 업데이트됩니다."
+
 msgid "Finish review"
 msgstr "리뷰 마치기"
 
@@ -8990,6 +8996,9 @@ msgstr "API 키 받기"
 
 msgid "Get channel details"
 msgstr "채널 세부정보 보기"
+
+msgid "Get Git"
+msgstr "Git 받기"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName} 팀에 문의하세요."
@@ -9899,8 +9908,14 @@ msgstr "설치 후 재시작"
 msgid "Install & Restart"
 msgstr "설치 후 재시작"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Tools 설치"
+
 msgid "Install failed"
 msgstr "설치 실패"
+
+msgid "Install Git, then come back."
+msgstr "Git을 설치한 후 이곳으로 돌아오세요."
 
 msgid "Install GitHub App"
 msgstr "GitHub App 설치"
@@ -12886,6 +12901,9 @@ msgstr "{offScopeHostName}에 있음 — 여기서는 실행되지 않습니다"
 msgid "On a date"
 msgstr "특정 날짜"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Mac에서는 Git이 Apple의 Command Line Tools에 포함되어 있습니다."
+
 msgid "On focus change"
 msgstr "포커스 변경 시"
 
@@ -13965,6 +13983,9 @@ msgstr "iPhone의 Paradev Mobile 터미널"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "다른 브라우저의 데이터를 읽으려면 Paradev에 전체 디스크 접근 권한이 필요합니다. 시스템 설정에서 권한을 허용한 다음 다시 확인하세요."
+
+msgid "Paradev needs Git to add a project."
+msgstr "프로젝트를 추가하려면 Paradev에 Git이 필요합니다."
 
 msgid "Paradev next to others"
 msgstr "다른 도구와 비교한 Paradev"

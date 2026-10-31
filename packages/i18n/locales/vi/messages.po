@@ -5559,6 +5559,9 @@ msgstr "Không thể tải danh sách máy của bạn"
 msgid "Could not mark ready"
 msgstr "Không thể đánh dấu sẵn sàng"
 
+msgid "Could not open Apple's installer"
+msgstr "Không thể mở trình cài đặt của Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "Không thể mở trang thanh toán. Vui lòng thử lại."
 
@@ -8568,6 +8571,9 @@ msgstr "Tìm người và Dev"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Hãy hoàn tất trình cài đặt của Apple. Trang này sẽ tự cập nhật khi xong."
+
 msgid "Finish review"
 msgstr "Hoàn tất review"
 
@@ -8990,6 +8996,9 @@ msgstr "Lấy khóa API"
 
 msgid "Get channel details"
 msgstr "Xem chi tiết kênh"
+
+msgid "Get Git"
+msgstr "Tải Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Liên hệ với đội ngũ {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Cài đặt & khởi động lại"
 msgid "Install & Restart"
 msgstr "Cài đặt & khởi động lại"
 
+msgid "Install Command Line Tools"
+msgstr "Cài đặt Command Line Tools"
+
 msgid "Install failed"
 msgstr "Cài đặt thất bại"
+
+msgid "Install Git, then come back."
+msgstr "Hãy cài đặt Git, rồi quay lại đây."
 
 msgid "Install GitHub App"
 msgstr "Cài GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "trên {offScopeHostName} — sẽ không chạy ở đây"
 msgid "On a date"
 msgstr "Vào một ngày"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Trên Mac, Git đi kèm với Command Line Tools của Apple."
+
 msgid "On focus change"
 msgstr "Khi thay đổi tiêu điểm"
 
@@ -13965,6 +13983,9 @@ msgstr "Terminal của Paradev Mobile trên iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev cần quyền Full Disk Access để đọc dữ liệu của trình duyệt khác. Cấp quyền trong System Settings rồi kiểm tra lại."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev cần Git để thêm dự án."
 
 msgid "Paradev next to others"
 msgstr "Paradev so với các công cụ khác"

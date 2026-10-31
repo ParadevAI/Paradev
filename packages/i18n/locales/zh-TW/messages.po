@@ -5559,6 +5559,9 @@ msgstr "無法載入你的機器"
 msgid "Could not mark ready"
 msgstr "無法標記為待審查"
 
+msgid "Could not open Apple's installer"
+msgstr "無法開啟 Apple 安裝程式"
+
 msgid "Could not open billing. Please try again."
 msgstr "無法開啟帳單，請再試一次。"
 
@@ -8568,6 +8571,9 @@ msgstr "尋找成員和 Dev"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "請完成 Apple 安裝程式。完成後此頁面會自動更新。"
+
 msgid "Finish review"
 msgstr "完成審查"
 
@@ -8990,6 +8996,9 @@ msgstr "取得API金鑰"
 
 msgid "Get channel details"
 msgstr "查看頻道詳細資料"
+
+msgid "Get Git"
+msgstr "取得 Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "與 {companyName} 團隊聯繫。"
@@ -9899,8 +9908,14 @@ msgstr "安裝並重啟"
 msgid "Install & Restart"
 msgstr "安裝並重啟"
 
+msgid "Install Command Line Tools"
+msgstr "安裝 Command Line Tools"
+
 msgid "Install failed"
 msgstr "安裝失敗"
+
+msgid "Install Git, then come back."
+msgstr "請先安裝 Git，然後回到這裡。"
 
 msgid "Install GitHub App"
 msgstr "安裝GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "在{offScopeHostName}上，不會在這裡執行"
 msgid "On a date"
 msgstr "指定日期"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "在 Mac 上，Git 隨附於 Apple 的 Command Line Tools。"
+
 msgid "On focus change"
 msgstr "焦點變更時"
 
@@ -13965,6 +13983,9 @@ msgstr "iPhone 上的 Paradev Mobile 終端"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev需要「完全磁碟存取權限」才能讀取其他瀏覽器的資料。請在系統設定中授予權限，然後重新檢查。"
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev 需要 Git 才能新增專案。"
 
 msgid "Paradev next to others"
 msgstr "Paradev 與其他工具比較"

@@ -5559,6 +5559,9 @@ msgstr "Tidak bisa memuat mesin Anda"
 msgid "Could not mark ready"
 msgstr "Tidak bisa menandai siap"
 
+msgid "Could not open Apple's installer"
+msgstr "Tidak dapat membuka penginstal Apple"
+
 msgid "Could not open billing. Please try again."
 msgstr "Tidak dapat membuka penagihan. Coba lagi."
 
@@ -8568,6 +8571,9 @@ msgstr "Cari orang dan Dev"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Selesaikan penginstal Apple. Halaman ini akan diperbarui setelah selesai."
+
 msgid "Finish review"
 msgstr "Selesaikan review"
 
@@ -8990,6 +8996,9 @@ msgstr "Dapatkan kunci API"
 
 msgid "Get channel details"
 msgstr "Lihat detail saluran"
+
+msgid "Get Git"
+msgstr "Dapatkan Git"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "Hubungi tim {companyName}."
@@ -9899,8 +9908,14 @@ msgstr "Instal & mulai ulang"
 msgid "Install & Restart"
 msgstr "Pasang & Mulai Ulang"
 
+msgid "Install Command Line Tools"
+msgstr "Instal Command Line Tools"
+
 msgid "Install failed"
 msgstr "Pemasangan gagal"
+
+msgid "Install Git, then come back."
+msgstr "Instal Git, lalu kembali ke sini."
 
 msgid "Install GitHub App"
 msgstr "Pasang GitHub App"
@@ -12886,6 +12901,9 @@ msgstr "di {offScopeHostName} — tidak akan berjalan di sini"
 msgid "On a date"
 msgstr "Pada tanggal"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Di Mac, Git disertakan dalam Command Line Tools dari Apple."
+
 msgid "On focus change"
 msgstr "Saat fokus berubah"
 
@@ -13965,6 +13983,9 @@ msgstr "Terminal Paradev Mobile di iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev butuh Full Disk Access untuk membaca data browser lain. Berikan izinnya di System Settings, lalu periksa lagi."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev memerlukan Git untuk menambahkan proyek."
 
 msgid "Paradev next to others"
 msgstr "Paradev dibanding yang lain"

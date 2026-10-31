@@ -17,6 +17,7 @@ import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWor
 import { track } from "renderer/lib/analytics";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
+import { getDefaultProjectsDir } from "renderer/lib/defaultProjectsDir";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
@@ -32,12 +33,14 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { GhAuthDialog } from "../components/GhAuthDialog";
 import { OnboardingTile } from "../components/OnboardingTile";
 import { AcquisitionSourceRow } from "./components/AcquisitionSourceRow";
+import { GitMissingNotice } from "./components/GitMissingNotice";
 import {
 	ACQUISITION_SOURCE_EVENT,
 	type AcquisitionSourceAnswer,
 	buildAcquisitionSourceProperties,
 	EMPTY_ACQUISITION_SOURCE_ANSWER,
 } from "./utils/acquisitionSource";
+import { isGitToolsMissingError } from "./utils/isGitToolsMissingError";
 
 export const Route = createFileRoute("/_authenticated/onboarding/project/")({
 	component: OnboardingProjectPage,
@@ -48,15 +51,20 @@ interface CloneError {
 	needsGhAuth: boolean;
 }
 
+const GIT_POLL_MS = 4000;
+
 const GH_AUTH_FAILURE_PATTERNS = [
 	"Repository not found",
 	"Authentication failed",
 	"could not read Username",
 ];
 
-function toCloneError(err: unknown): CloneError {
+function toCloneError(err: unknown, gitMissingMessage: string): CloneError {
 	const message = errorMessage(err, "Failed to clone repository");
 	const raw = rawErrorMessage(err);
+	if (isGitToolsMissingError(raw)) {
+		return { message: gitMissingMessage, needsGhAuth: false };
+	}
 	if (raw.includes("Permission denied (publickey)")) {
 		return {
 			message:
@@ -82,7 +90,7 @@ function OnboardingProjectPage() {
 	const { waitForHostReady } = useLocalHostService();
 	const openNewWorkspace = useOpenNewWorkspaceForLocalProject();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const cloneTargetDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const cloneTargetDir = homeDir ? getDefaultProjectsDir(homeDir) : null;
 	const [url, setUrl] = useState("");
 	const [busy, setBusy] = useState(false);
 	const [cloneError, setCloneError] = useState<CloneError | null>(null);
@@ -93,8 +101,20 @@ function OnboardingProjectPage() {
 	const [acquisitionSource, setAcquisitionSource] =
 		useState<AcquisitionSourceAnswer>(EMPTY_ACQUISITION_SOURCE_ANSWER);
 
+	const { data: gitStatus } = electronTrpc.system.detectGit.useQuery(
+		undefined,
+		{
+			refetchInterval: (query) =>
+				query.state.data?.installed === false ? GIT_POLL_MS : false,
+		},
+	);
+	const gitMissing = gitStatus?.installed === false;
+	const gitMissingMessage = `${t`Paradev needs Git to add a project.`} ${t`On a Mac, Git comes with Apple's Command Line Tools.`}`;
+	const describeFailure = (message: string) =>
+		isGitToolsMissingError(message) ? gitMissingMessage : message;
+
 	const folderImport = useFolderFirstImport({
-		onError: (message) => toast.error(message),
+		onError: (message) => toast.error(describeFailure(message)),
 	});
 	const finalizeSetup = useFinalizeProjectSetup();
 	const openProject = useOpenProject();
@@ -159,7 +179,11 @@ function OnboardingProjectPage() {
 			const project = await openProject.openFromPath(picked.path);
 			if (project) await finish(project.id);
 		} catch (err) {
-			toast.error(errorMessage(err, "Failed to open folder"));
+			toast.error(
+				isGitToolsMissingError(rawErrorMessage(err))
+					? gitMissingMessage
+					: errorMessage(err, "Failed to open folder"),
+			);
 		} finally {
 			setBusy(false);
 		}
@@ -191,7 +215,7 @@ function OnboardingProjectPage() {
 						mode: { kind: "clone", parentDir: cloneTargetDir, url: trimmed },
 					});
 				} catch (err) {
-					setCloneError(toCloneError(err));
+					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
 				finalizeSetup(activeHostUrl, created);
@@ -204,7 +228,7 @@ function OnboardingProjectPage() {
 						parentDir: cloneTargetDir,
 					});
 				} catch (err) {
-					setCloneError(toCloneError(err));
+					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
 				if (projectId) await finish(projectId);
@@ -225,35 +249,41 @@ function OnboardingProjectPage() {
 
 	return (
 		<div className="flex flex-col gap-3">
+			{gitStatus && gitMissing && (
+				<GitMissingNotice
+					needsCommandLineTools={gitStatus.needsCommandLineTools}
+					error={gitStatus.error}
+				/>
+			)}
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				<OnboardingTile
 					icon={<LuFolderOpen />}
 					label={t`Open a folder`}
 					onClick={handleOpenFolder}
-					disabled={busy}
+					disabled={busy || gitMissing}
 				/>
 				<OnboardingTile
 					icon={<LuGitBranch />}
 					label={t`Clone a repo`}
 					active={cloneOpen}
 					onClick={() => setCloneOpen((open) => !open)}
-					disabled={busy}
+					disabled={busy || gitMissing}
 				/>
 				<OnboardingTile
 					icon={<LuLayoutTemplate />}
 					label={t`From a template`}
 					onClick={() => setTemplateOpen(true)}
-					disabled={busy}
+					disabled={busy || gitMissing}
 				/>
 				<OnboardingTile
 					icon={<LuFolderPlus />}
 					label={t`Empty project`}
 					onClick={() => setEmptyProjectOpen(true)}
-					disabled={busy}
+					disabled={busy || gitMissing}
 				/>
 			</div>
 
-			{cloneOpen && (
+			{cloneOpen && !gitMissing && (
 				<div className="flex flex-col gap-2">
 					<form onSubmit={handleClone} className="flex items-center gap-2">
 						<Input
@@ -314,6 +344,11 @@ function OnboardingProjectPage() {
 			<EmptyProjectModal
 				open={emptyProjectOpen}
 				onOpenChange={setEmptyProjectOpen}
+				onError={(message) =>
+					toast.error(t`Could not create project`, {
+						description: describeFailure(message),
+					})
+				}
 				onSuccess={(result) => {
 					setEmptyProjectOpen(false);
 					finish(result.projectId);

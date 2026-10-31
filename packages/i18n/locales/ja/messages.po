@@ -5559,6 +5559,9 @@ msgstr "マシンを読み込めませんでした"
 msgid "Could not mark ready"
 msgstr "レビュー可能にできませんでした"
 
+msgid "Could not open Apple's installer"
+msgstr "Appleのインストーラを開けませんでした"
+
 msgid "Could not open billing. Please try again."
 msgstr "請求ページを開けませんでした。もう一度お試しください。"
 
@@ -8568,6 +8571,9 @@ msgstr "メンバーと Dev を検索"
 msgid "Finder"
 msgstr "Finder"
 
+msgid "Finish Apple's installer. This page updates when it's done."
+msgstr "Appleのインストーラを最後まで進めてください。完了するとこのページが更新されます。"
+
 msgid "Finish review"
 msgstr "レビューを完了"
 
@@ -8990,6 +8996,9 @@ msgstr "APIキーを取得"
 
 msgid "Get channel details"
 msgstr "チャンネルの詳細を表示"
+
+msgid "Get Git"
+msgstr "Gitを入手"
 
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName}チームにお問い合わせください。"
@@ -9899,8 +9908,14 @@ msgstr "インストールして再起動"
 msgid "Install & Restart"
 msgstr "インストールして再起動"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Toolsをインストール"
+
 msgid "Install failed"
 msgstr "インストールに失敗しました"
+
+msgid "Install Git, then come back."
+msgstr "Gitをインストールしてから、ここに戻ってきてください。"
 
 msgid "Install GitHub App"
 msgstr "GitHub Appをインストール"
@@ -12886,6 +12901,9 @@ msgstr "{offScopeHostName}上 — ここでは実行されません"
 msgid "On a date"
 msgstr "指定日"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Macでは、GitはAppleのCommand Line Toolsに含まれています。"
+
 msgid "On focus change"
 msgstr "フォーカス変更時"
 
@@ -13965,6 +13983,9 @@ msgstr "iPhone 上の Paradev Mobile のターミナル"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "他のブラウザのデータを読み取るには、Paradevにフルディスクアクセスが必要です。システム設定で許可してから再確認してください。"
+
+msgid "Paradev needs Git to add a project."
+msgstr "プロジェクトを追加するには、ParadevにGitが必要です。"
 
 msgid "Paradev next to others"
 msgstr "他ツールとParadevの比較"
