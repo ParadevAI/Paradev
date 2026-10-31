@@ -10,6 +10,7 @@ describe("getRightPaneOptions", () => {
 			"terminal",
 			"browser",
 			"diff",
+			"changes-list",
 			"files",
 			"pages-list",
 			"desktop",
@@ -34,11 +35,15 @@ describe("createRightPane", () => {
 			"terminal",
 			"browser",
 			"diff",
+			"changes-list",
 			"files",
 			"pages-list",
 			"desktop",
 			"mobile",
 		]);
+		expect(panes.find((pane) => pane.kind === "changes-list")?.data).toEqual({
+			kind: "changes-list",
+		});
 		expect(panes.find((pane) => pane.kind === "browser")?.data).toEqual({
 			url: "https://example.com",
 		});
