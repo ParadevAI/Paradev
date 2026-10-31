@@ -63,8 +63,8 @@ export type UsageAccountStatus =
 	| "unavailable"
 	/** A profile dir with no readable credential (logged out or a
 	 * half-finished login): a Claude profile that still names an identity, or
-	 * a Codex home Superset set up (it holds the profile ledger). Surfaced so
-	 * it can be re-signed or removed. */
+	 * a Codex home Paradev created and set up. Surfaced so it can be
+	 * re-signed or removed. */
 	| "signed_out";
 
 export interface UsageQuotaWindow {

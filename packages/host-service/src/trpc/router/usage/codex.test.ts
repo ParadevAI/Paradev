@@ -8,6 +8,7 @@ import {
 	fetchCodexAccounts,
 	fetchCodexSubscriptionQuota,
 } from "./codex";
+import { PROFILE_CREATED_MARKER } from "./profiles";
 import type { UsageAccount } from "./types";
 
 const NOW = Date.parse("2026-09-11T12:00:00.000Z");
@@ -187,7 +188,7 @@ describe("fetchCodexSubscriptionQuota", () => {
 		respondWith(new Response(null, { status: 403 }));
 		const quota = await fetchCodexSubscriptionQuota("token");
 		expect(quota.status).toBe("unavailable");
-		expect(quota.statusDetail).toContain("403");
+		expect(quota.statusDetail).toBe("Usage endpoint returned 403.");
 	});
 
 	it("reads the quota windows from a 200", async () => {
@@ -243,13 +244,20 @@ describe("fetchCodexAccounts", () => {
 		});
 	});
 
-	it("shows a home Superset set up whose login is gone as signed out", async () => {
+	it("shows a home Paradev created whose login is gone as signed out", async () => {
+		const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+			new Response(null, { status: 500 }),
+		);
 		const home = tempHome({
-			".codex-work": { ".superset-profile.json": "{}" },
+			".codex-work": {
+				[PROFILE_CREATED_MARKER]: "codex",
+				".superset-profile.json": "{}",
+			},
 		});
 
 		const accounts = await fetchCodexAccounts(home);
 
+		expect(fetchSpy).not.toHaveBeenCalled();
 		expect(accounts).toHaveLength(1);
 		expect(accounts[0]).toMatchObject({
 			agent: "codex",
@@ -259,5 +267,14 @@ describe("fetchCodexAccounts", () => {
 				"Signed out — use Switch sign-in to reconnect, or Remove to delete this profile.",
 			selection: join(home, ".codex-work"),
 		});
+	});
+
+	// Its card would offer Remove, which deletes the dir, and Switch sign-in.
+	it("gives no card to a provisioned home Paradev did not create once its login is gone", async () => {
+		const home = tempHome({
+			".codex-work": { ".superset-profile.json": "{}" },
+		});
+
+		expect(await fetchCodexAccounts(home)).toEqual([]);
 	});
 });
