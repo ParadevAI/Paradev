@@ -60,7 +60,7 @@ export function register(server: McpServer): void {
 			group: automationGroupInputSchema
 				.optional()
 				.describe(
-					"Group the automation is listed under in the automations table; null removes it from its group. Omit to keep the current group.",
+					"Group the automation is listed under in the automations table; null removes it from its group. Omit to keep the current group. At most 64 characters; a name matching an existing group in any case joins that group.",
 				),
 		},
 		handler: async (input, ctx) => {

@@ -413,6 +413,28 @@ export async function requireAutomationDeleteAccess(
 	});
 }
 
+/**
+ * The organization's existing spelling of a group, matched without regard to
+ * case, so "launch watch" from the CLI joins the "Launch watch" group.
+ */
+export async function resolveAutomationGroup(
+	organizationId: string,
+	group: string | null,
+): Promise<string | null> {
+	if (group === null) return null;
+	const [existing] = await db
+		.select({ group: automations.group })
+		.from(automations)
+		.where(
+			and(
+				eq(automations.organizationId, organizationId),
+				sql`lower(${automations.group}) = lower(${group})`,
+			),
+		)
+		.limit(1);
+	return existing?.group ?? group;
+}
+
 export async function getAutomationForUser(
 	userId: string,
 	organizationId: string,

@@ -70,6 +70,7 @@ import {
 	recordPromptVersion,
 	refreshScheduleNextRuns,
 	requireAutomationDeleteAccess,
+	resolveAutomationGroup,
 	scheduleSummariesFor,
 	summarizeSchedules,
 	syncScheduleTrigger,
@@ -596,7 +597,10 @@ export const automationRouter = {
 						// Every automation groups its runs out of the box; explicit
 						// tags (including []) override the default.
 						tags: input.tags ?? ["automation"],
-						group: input.group ?? null,
+						group: await resolveAutomationGroup(
+							organizationId,
+							input.group ?? null,
+						),
 					})
 					.returning();
 
@@ -713,7 +717,14 @@ export const automationRouter = {
 							? { machineSize: input.machineSize }
 							: {}),
 						tags: input.tags ?? existing.tags,
-						...(input.group !== undefined ? { group: input.group } : {}),
+						...(input.group !== undefined
+							? {
+									group: await resolveAutomationGroup(
+										organizationId,
+										input.group,
+									),
+								}
+							: {}),
 						prompt: input.prompt ?? existing.prompt,
 					})
 					.where(eq(automations.id, input.id))
@@ -814,12 +825,13 @@ export const automationRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
 
+			const group = await resolveAutomationGroup(organizationId, input.group);
 			await db
 				.update(automations)
-				.set({ group: input.group })
+				.set({ group })
 				.where(eq(automations.id, input.id));
 
-			return { id: input.id, group: input.group };
+			return { id: input.id, group };
 		}),
 
 	setPrompt: protectedProcedure

@@ -106,7 +106,7 @@ export function register(server: McpServer): void {
 			group: automationGroupInputSchema
 				.optional()
 				.describe(
-					"Group the automation is listed under in the automations table. Omit to leave it ungrouped.",
+					"Group the automation is listed under in the automations table. Omit to leave it ungrouped. At most 64 characters; a name matching an existing group in any case joins that group.",
 				),
 		},
 		handler: async (input, ctx) => {
