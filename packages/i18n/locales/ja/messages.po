@@ -4498,6 +4498,9 @@ msgstr "現在のペインを閉じる"
 msgid "Close the current tab"
 msgstr "現在のタブを閉じる"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "セットアップコマンドがエラーなしで終了したらタブを閉じます。セットアップが失敗した場合は、エラーを確認できるようにタブを開いたままにします"
+
 msgid "Close Window"
 msgstr "ウィンドウを閉じる"
 
@@ -4506,6 +4509,9 @@ msgstr "ワークスペースを閉じる"
 
 msgid "Close Workspace"
 msgstr "ワークスペースを閉じる"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "セットアップが成功したらワークスペースセットアップのタブを閉じる"
 
 msgid "Closed"
 msgstr "クローズ済み"

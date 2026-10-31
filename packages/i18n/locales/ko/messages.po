@@ -4498,6 +4498,9 @@ msgstr "현재 패널을 닫습니다"
 msgid "Close the current tab"
 msgstr "현재 탭을 닫습니다"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "설정 명령이 오류 없이 끝나면 탭을 닫습니다. 설정이 실패하면 오류를 확인할 수 있도록 탭이 열린 상태로 유지됩니다"
+
 msgid "Close Window"
 msgstr "창 닫기"
 
@@ -4506,6 +4509,9 @@ msgstr "워크스페이스 닫기"
 
 msgid "Close Workspace"
 msgstr "워크스페이스 닫기"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "설정이 성공하면 워크스페이스 설정 탭 닫기"
 
 msgid "Closed"
 msgstr "닫힘"

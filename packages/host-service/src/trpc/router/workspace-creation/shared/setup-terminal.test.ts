@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveInitialCommand } from "./setup-terminal";
+import { resolveInitialCommand, shouldCloseOnSuccess } from "./setup-terminal";
 
 const PROJECT_ID = "11111111-1111-1111-1111-111111111111";
 
@@ -169,5 +169,29 @@ describe("resolveInitialCommand", () => {
 		).toEqual({
 			initialCommand: `bash '${join(worktreePath, ".superset", "setup.sh")}'`,
 		});
+	});
+});
+
+describe("shouldCloseOnSuccess", () => {
+	it("closes when the setting is on and the desktop can edit panes", () => {
+		expect(
+			shouldCloseOnSuccess({ closeOnSuccess: true, hasPaneBridge: true }),
+		).toBe(true);
+	});
+
+	it("does not close the setup terminal when an agent is chained into it", () => {
+		expect(
+			shouldCloseOnSuccess({
+				closeOnSuccess: true,
+				chainCommand: "claude",
+				hasPaneBridge: true,
+			}),
+		).toBe(false);
+	});
+
+	it("does not close without a desktop pane bridge", () => {
+		expect(
+			shouldCloseOnSuccess({ closeOnSuccess: true, hasPaneBridge: false }),
+		).toBe(false);
 	});
 });

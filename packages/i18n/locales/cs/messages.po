@@ -4498,6 +4498,9 @@ msgstr "Zavřít aktuální panel"
 msgid "Close the current tab"
 msgstr "Zavřít aktuální kartu"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Zavře kartu, když příkazy setupu skončí bez chyb. Když setup selže, karta zůstane otevřená, abyste viděli chybu"
+
 msgid "Close Window"
 msgstr "Zavřít okno"
 
@@ -4506,6 +4509,9 @@ msgstr "Zavřít pracovní prostor"
 
 msgid "Close Workspace"
 msgstr "Zavřít pracovní prostor"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Zavřít kartu Workspace Setup po úspěšném setupu"
 
 msgid "Closed"
 msgstr "Uzavřený"

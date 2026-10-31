@@ -4498,6 +4498,9 @@ msgstr "Закрыть текущую панель"
 msgid "Close the current tab"
 msgstr "Закрыть текущую вкладку"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Закрывает вкладку, когда команды настройки завершаются без ошибок. Если настройка не удалась, вкладка остаётся открытой, чтобы вы видели ошибку"
+
 msgid "Close Window"
 msgstr "Закрыть окно"
 
@@ -4506,6 +4509,9 @@ msgstr "Закрыть рабочую область"
 
 msgid "Close Workspace"
 msgstr "Закрыть рабочую область"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Закрывать вкладку настройки рабочей области после успешной настройки"
 
 msgid "Closed"
 msgstr "Закрыт"

@@ -4498,6 +4498,9 @@ msgstr "Chiudi il pannello corrente"
 msgid "Close the current tab"
 msgstr "Chiudi la scheda corrente"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Chiude la scheda quando i comandi di configurazione terminano senza errori. Se la configurazione non riesce, la scheda resta aperta per mostrarti l'errore"
+
 msgid "Close Window"
 msgstr "Chiudi finestra"
 
@@ -4506,6 +4509,9 @@ msgstr "Chiudi il workspace"
 
 msgid "Close Workspace"
 msgstr "Chiudi workspace"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Chiudi la scheda Workspace Setup quando la configurazione riesce"
 
 msgid "Closed"
 msgstr "Chiusa"

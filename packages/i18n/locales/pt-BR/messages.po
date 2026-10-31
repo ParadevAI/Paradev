@@ -4498,6 +4498,9 @@ msgstr "Fechar o painel atual"
 msgid "Close the current tab"
 msgstr "Fechar a aba atual"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Fecha a aba quando os comandos de setup terminam sem erros. Se o setup falhar, a aba continua aberta para você ver o erro"
+
 msgid "Close Window"
 msgstr "Fechar janela"
 
@@ -4506,6 +4509,9 @@ msgstr "Fechar área de trabalho"
 
 msgid "Close Workspace"
 msgstr "Fechar área de trabalho"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Fechar a aba de Setup da área de trabalho quando o setup for concluído com sucesso"
 
 msgid "Closed"
 msgstr "Fechado"

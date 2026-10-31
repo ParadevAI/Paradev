@@ -4498,6 +4498,9 @@ msgstr "Đóng khung hiện tại"
 msgid "Close the current tab"
 msgstr "Đóng tab hiện tại"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Đóng tab khi các lệnh setup chạy xong mà không có lỗi. Nếu setup thất bại, tab vẫn mở để bạn xem lỗi"
+
 msgid "Close Window"
 msgstr "Đóng cửa sổ"
 
@@ -4506,6 +4509,9 @@ msgstr "Đóng workspace"
 
 msgid "Close Workspace"
 msgstr "Đóng workspace"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Đóng tab Workspace Setup khi setup thành công"
 
 msgid "Closed"
 msgstr "Đã đóng"
