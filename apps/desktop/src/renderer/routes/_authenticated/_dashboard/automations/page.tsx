@@ -119,11 +119,11 @@ const LAST_RUN_SORT_CYCLE: {
 	{ mode: "result", direction: "desc" },
 ];
 
+const UNGROUPED_KEY = "\u0000ungrouped";
+
 // Seeds the "Create with AI" agent session. The skill is provisioned as
 // superset:automate; mentioning it by name loads it (it isn't in the chat
 // slash-command allowlist).
-const UNGROUPED_KEY = "\u0000ungrouped";
-
 const AUTOMATION_AGENT_PROMPT =
 	"Help me create a Paradev automation. Use the superset:automate skill if it's available, otherwise the `superset` CLI (start with `superset automations --help`). Ask me what the automation should do and what should fire it — a schedule, or an event like a Slack message, GitHub pull request, or Linear issue. Confirm that, the target project, and the agent, then create the automation and trigger a first run so we can review the result together.";
 
@@ -294,7 +294,6 @@ function AutomationsPage() {
 		},
 		onSuccess: (_, targets) => {
 			setPendingDelete(null);
-			clearSelection();
 			const [only] = targets;
 			toast.success(
 				targets.length === 1 && only

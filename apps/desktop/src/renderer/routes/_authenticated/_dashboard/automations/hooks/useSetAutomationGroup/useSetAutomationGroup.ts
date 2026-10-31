@@ -28,7 +28,9 @@ export function useSetAutomationGroup() {
 			const failed = results.find((result) => result.status === "rejected");
 			if (failed) throw failed.reason;
 		},
-		onMutate: ({ ids, group }) => {
+		onMutate: async ({ ids, group }) => {
+			// A refetch already in flight would land after this and undo it.
+			await utils.automation.list.cancel();
 			const moving = new Set(ids);
 			utils.automation.list.setData(undefined, (rows) =>
 				rows?.map((row) => (moving.has(row.id) ? { ...row, group } : row)),

@@ -221,7 +221,13 @@ export function AutomationRow({
 					}}
 					onKeyDown={(event) => {
 						if (event.target !== event.currentTarget) return;
-						if (selection && (event.key === "x" || event.key === "X")) {
+						if (
+							selection &&
+							(event.key === "x" || event.key === "X") &&
+							!event.metaKey &&
+							!event.ctrlKey &&
+							!event.altKey
+						) {
 							event.preventDefault();
 							selection.onSelect({ shiftKey: event.shiftKey });
 							return;
