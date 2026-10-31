@@ -39,6 +39,8 @@ export function AutomationGroupPicker({
 }: AutomationGroupPickerProps) {
 	const { t } = useLingui();
 	const [query, setQuery] = useState("");
+	// After "New group…": the field names a group and Enter creates it.
+	const [naming, setNaming] = useState(false);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const Item = kind === "context" ? ContextMenuItem : DropdownMenuItem;
 	const Separator =
@@ -49,8 +51,22 @@ export function AutomationGroupPicker({
 	const matches = groups.filter((group) =>
 		group.toLocaleLowerCase().includes(needle),
 	);
-	const exact = groups.some((group) => group.toLocaleLowerCase() === needle);
+	const exactGroup = groups.find(
+		(group) => group.toLocaleLowerCase() === needle,
+	);
+	const exact = exactGroup !== undefined;
 	const canCreate = typed !== null && !exact;
+
+	const createItem = (name: string) => (
+		<Item onSelect={() => onMove(name)}>
+			<LuPlus className="size-4 text-muted-foreground" />
+			<span className="min-w-0 flex-1 truncate">
+				<Trans>
+					Create group <span className="font-medium">"{name}"</span>
+				</Trans>
+			</span>
+		</Item>
+	);
 
 	const items = () => [
 		...(rootRef.current?.querySelectorAll<HTMLElement>(
@@ -89,13 +105,18 @@ export function AutomationGroupPicker({
 					maxLength={AUTOMATION_GROUP_MAX_LENGTH}
 					onChange={(event) => setQuery(event.target.value)}
 					onKeyDown={onInputKeyDown}
-					placeholder={t({ message: "Move to group…" })}
+					placeholder={
+						naming
+							? t({ message: "New group name…" })
+							: t({ message: "Move to group…" })
+					}
 					aria-label={t({ message: "Filter or name a group" })}
 					className="h-7 w-full bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
 				/>
 			</div>
 			<div className="max-h-72 overflow-y-auto p-1">
-				{matches.map((group) => (
+				{naming && canCreate && typed && createItem(typed)}
+				{(naming ? (exactGroup ? [exactGroup] : []) : matches).map((group) => (
 					<Item
 						key={group}
 						onSelect={() => {
@@ -107,29 +128,33 @@ export function AutomationGroupPicker({
 						{group === currentGroup && <LuCheck className="size-4" />}
 					</Item>
 				))}
-				{canCreate && typed && (
-					<Item onSelect={() => onMove(typed)}>
-						<LuPlus className="size-4 text-muted-foreground" />
-						<span className="min-w-0 flex-1 truncate">
-							<Trans>
-								Create group <span className="font-medium">"{typed}"</span>
-							</Trans>
-						</span>
-					</Item>
-				)}
-				{matches.length === 0 && !canCreate && (
+				{!naming && canCreate && typed && createItem(typed)}
+				{naming && !typed && (
 					<p className="px-2 py-1.5 text-sm text-muted-foreground">
-						<Trans>Type a name to create a group</Trans>
+						<Trans>Type a name, then press Enter</Trans>
 					</p>
 				)}
-				{currentGroup !== null && !typed && (
+				{!naming && !typed && (
 					<>
-						<Separator />
-						<Item onSelect={() => onMove(null)}>
-							<LuFolderMinus className="size-4 text-muted-foreground" />
-							<Trans>Remove from group</Trans>
+						{groups.length > 0 && <Separator />}
+						<Item
+							onSelect={(event) => {
+								// Stay open: the field now names the new group.
+								event.preventDefault();
+								setNaming(true);
+								inputRef.current?.focus();
+							}}
+						>
+							<LuPlus className="size-4 text-muted-foreground" />
+							<Trans>New group…</Trans>
 						</Item>
 					</>
+				)}
+				{currentGroup !== null && !typed && !naming && (
+					<Item onSelect={() => onMove(null)}>
+						<LuFolderMinus className="size-4 text-muted-foreground" />
+						<Trans>Remove from group</Trans>
+					</Item>
 				)}
 			</div>
 		</div>

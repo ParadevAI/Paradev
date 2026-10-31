@@ -6080,8 +6080,8 @@ msgstr "Vytvořit prostředí"
 msgid "Create failed: {message}"
 msgstr "Vytvoření selhalo: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Vytvořit skupinu <0>„{typed}“</0>"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Vytvořit skupinu <0>„{name}“</0>"
 
 msgid "Create issue"
 msgstr "Vytvořit issue"
@@ -11788,6 +11788,12 @@ msgstr "Nová skupina"
 
 msgid "New group from workspace"
 msgstr "Nová skupina z pracovního prostoru"
+
+msgid "New group name…"
+msgstr "Název nové skupiny…"
+
+msgid "New group…"
+msgstr "Nová skupina…"
 
 msgid "New issue"
 msgstr "Nová issue"
@@ -20057,8 +20063,8 @@ msgstr "Zadejte příkaz nebo hledejte…"
 msgid "Type a message..."
 msgstr "Napište zprávu..."
 
-msgid "Type a name to create a group"
-msgstr "Zadejte název a vytvořte skupinu"
+msgid "Type a name, then press Enter"
+msgstr "Zadejte název a stiskněte Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Zadejte úkol pro Claude…"

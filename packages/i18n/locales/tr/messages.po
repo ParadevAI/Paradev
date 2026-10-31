@@ -6080,8 +6080,8 @@ msgstr "Ortam oluştur"
 msgid "Create failed: {message}"
 msgstr "Oluşturulamadı: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "<0>\"{typed}\"</0> grubunu oluştur"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "<0>\"{name}\"</0> grubunu oluştur"
 
 msgid "Create issue"
 msgstr "Issue oluştur"
@@ -11788,6 +11788,12 @@ msgstr "Yeni grup"
 
 msgid "New group from workspace"
 msgstr "Çalışma alanından yeni grup"
+
+msgid "New group name…"
+msgstr "Yeni grup adı…"
+
+msgid "New group…"
+msgstr "Yeni grup…"
 
 msgid "New issue"
 msgstr "Yeni issue"
@@ -20057,8 +20063,8 @@ msgstr "Komut yazın veya arayın…"
 msgid "Type a message..."
 msgstr "Bir mesaj yazın..."
 
-msgid "Type a name to create a group"
-msgstr "Grup oluşturmak için bir ad yazın"
+msgid "Type a name, then press Enter"
+msgstr "Bir ad yazın, ardından Enter tuşuna basın"
 
 msgid "Type a task for Claude…"
 msgstr "Claude için bir görev yazın…"

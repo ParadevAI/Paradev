@@ -6080,8 +6080,8 @@ msgstr "환경 만들기"
 msgid "Create failed: {message}"
 msgstr "생성 실패: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "그룹 <0>\"{typed}\"</0> 만들기"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "그룹 <0>\"{name}\"</0> 만들기"
 
 msgid "Create issue"
 msgstr "이슈 만들기"
@@ -11788,6 +11788,12 @@ msgstr "새 그룹"
 
 msgid "New group from workspace"
 msgstr "워크스페이스로 새 그룹 만들기"
+
+msgid "New group name…"
+msgstr "새 그룹 이름…"
+
+msgid "New group…"
+msgstr "새 그룹…"
 
 msgid "New issue"
 msgstr "새 이슈"
@@ -20057,8 +20063,8 @@ msgstr "명령을 입력하거나 검색…"
 msgid "Type a message..."
 msgstr "메시지를 입력하세요..."
 
-msgid "Type a name to create a group"
-msgstr "이름을 입력해 그룹 만들기"
+msgid "Type a name, then press Enter"
+msgstr "이름을 입력한 뒤 Enter를 누르세요"
 
 msgid "Type a task for Claude…"
 msgstr "Claude에게 맡길 작업을 입력하세요…"

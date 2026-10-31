@@ -6080,8 +6080,8 @@ msgstr "Buat lingkungan"
 msgid "Create failed: {message}"
 msgstr "Gagal membuat: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Buat grup <0>\"{typed}\"</0>"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Buat grup <0>\"{name}\"</0>"
 
 msgid "Create issue"
 msgstr "Buat issue"
@@ -11788,6 +11788,12 @@ msgstr "Grup baru"
 
 msgid "New group from workspace"
 msgstr "Grup baru dari workspace"
+
+msgid "New group name…"
+msgstr "Nama grup baru…"
+
+msgid "New group…"
+msgstr "Grup baru…"
 
 msgid "New issue"
 msgstr "Issue baru"
@@ -20057,8 +20063,8 @@ msgstr "Ketik perintah atau cari…"
 msgid "Type a message..."
 msgstr "Ketik pesan..."
 
-msgid "Type a name to create a group"
-msgstr "Ketik nama untuk membuat grup"
+msgid "Type a name, then press Enter"
+msgstr "Ketik nama, lalu tekan Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Ketik tugas untuk Claude…"

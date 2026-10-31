@@ -6080,8 +6080,8 @@ msgstr "Utwórz środowisko"
 msgid "Create failed: {message}"
 msgstr "Tworzenie nie powiodło się: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Utwórz grupę <0>„{typed}”</0>"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Utwórz grupę <0>„{name}”</0>"
 
 msgid "Create issue"
 msgstr "Utwórz zgłoszenie"
@@ -11788,6 +11788,12 @@ msgstr "Nowa grupa"
 
 msgid "New group from workspace"
 msgstr "Nowa grupa z obszaru roboczego"
+
+msgid "New group name…"
+msgstr "Nazwa nowej grupy…"
+
+msgid "New group…"
+msgstr "Nowa grupa…"
 
 msgid "New issue"
 msgstr "Nowe zgłoszenie"
@@ -20057,8 +20063,8 @@ msgstr "Wpisz polecenie lub szukaj…"
 msgid "Type a message..."
 msgstr "Wpisz wiadomość..."
 
-msgid "Type a name to create a group"
-msgstr "Wpisz nazwę, aby utworzyć grupę"
+msgid "Type a name, then press Enter"
+msgstr "Wpisz nazwę i naciśnij Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Wpisz zadanie dla Claude…"

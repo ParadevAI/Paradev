@@ -6080,8 +6080,8 @@ msgstr "Omgeving maken"
 msgid "Create failed: {message}"
 msgstr "Aanmaken mislukt: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Groep <0>\"{typed}\"</0> maken"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Groep <0>\"{name}\"</0> maken"
 
 msgid "Create issue"
 msgstr "Issue aanmaken"
@@ -11788,6 +11788,12 @@ msgstr "Nieuwe groep"
 
 msgid "New group from workspace"
 msgstr "Nieuwe groep van werkruimte"
+
+msgid "New group name…"
+msgstr "Naam van nieuwe groep…"
+
+msgid "New group…"
+msgstr "Nieuwe groep…"
 
 msgid "New issue"
 msgstr "Nieuwe issue"
@@ -20057,8 +20063,8 @@ msgstr "Typ een opdracht of zoek…"
 msgid "Type a message..."
 msgstr "Typ een bericht..."
 
-msgid "Type a name to create a group"
-msgstr "Typ een naam om een groep te maken"
+msgid "Type a name, then press Enter"
+msgstr "Typ een naam en druk op Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Typ een taak voor Claude…"

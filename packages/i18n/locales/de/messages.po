@@ -6080,8 +6080,8 @@ msgstr "Umgebung erstellen"
 msgid "Create failed: {message}"
 msgstr "Erstellen fehlgeschlagen: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Gruppe <0>„{typed}“</0> erstellen"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Gruppe <0>„{name}“</0> erstellen"
 
 msgid "Create issue"
 msgstr "Issue erstellen"
@@ -11788,6 +11788,12 @@ msgstr "Neue Gruppe"
 
 msgid "New group from workspace"
 msgstr "Neue Gruppe aus Arbeitsbereich"
+
+msgid "New group name…"
+msgstr "Name der neuen Gruppe…"
+
+msgid "New group…"
+msgstr "Neue Gruppe…"
 
 msgid "New issue"
 msgstr "Neues Issue"
@@ -20057,8 +20063,8 @@ msgstr "Befehl eingeben oder suchen…"
 msgid "Type a message..."
 msgstr "Nachricht schreiben..."
 
-msgid "Type a name to create a group"
-msgstr "Namen eingeben, um eine Gruppe zu erstellen"
+msgid "Type a name, then press Enter"
+msgstr "Namen eingeben, dann Enter drücken"
 
 msgid "Type a task for Claude…"
 msgstr "Gib Claude eine Aufgabe…"

@@ -6080,8 +6080,8 @@ msgstr "Tạo môi trường"
 msgid "Create failed: {message}"
 msgstr "Tạo thất bại: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "Tạo nhóm <0>\"{typed}\"</0>"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "Tạo nhóm <0>\"{name}\"</0>"
 
 msgid "Create issue"
 msgstr "Tạo issue"
@@ -11788,6 +11788,12 @@ msgstr "Nhóm mới"
 
 msgid "New group from workspace"
 msgstr "Nhóm mới từ workspace"
+
+msgid "New group name…"
+msgstr "Tên nhóm mới…"
+
+msgid "New group…"
+msgstr "Nhóm mới…"
 
 msgid "New issue"
 msgstr "Issue mới"
@@ -20057,8 +20063,8 @@ msgstr "Nhập lệnh hoặc tìm kiếm…"
 msgid "Type a message..."
 msgstr "Nhập tin nhắn..."
 
-msgid "Type a name to create a group"
-msgstr "Nhập tên để tạo nhóm"
+msgid "Type a name, then press Enter"
+msgstr "Nhập tên rồi nhấn Enter"
 
 msgid "Type a task for Claude…"
 msgstr "Nhập một tác vụ cho Claude…"

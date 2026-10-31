@@ -6080,8 +6080,8 @@ msgstr "環境を作成"
 msgid "Create failed: {message}"
 msgstr "作成に失敗しました: {message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "グループ<0>「{typed}」</0>を作成"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "グループ<0>「{name}」</0>を作成"
 
 msgid "Create issue"
 msgstr "Issueを作成"
@@ -11788,6 +11788,12 @@ msgstr "新規グループ"
 
 msgid "New group from workspace"
 msgstr "ワークスペースから新規グループ"
+
+msgid "New group name…"
+msgstr "新しいグループ名…"
+
+msgid "New group…"
+msgstr "新しいグループ…"
 
 msgid "New issue"
 msgstr "新規issue"
@@ -20057,8 +20063,8 @@ msgstr "コマンドを入力するか検索…"
 msgid "Type a message..."
 msgstr "メッセージを入力..."
 
-msgid "Type a name to create a group"
-msgstr "名前を入力してグループを作成"
+msgid "Type a name, then press Enter"
+msgstr "名前を入力して Enter を押す"
 
 msgid "Type a task for Claude…"
 msgstr "Claudeへのタスクを入力…"

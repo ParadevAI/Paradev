@@ -6080,8 +6080,8 @@ msgstr "创建环境"
 msgid "Create failed: {message}"
 msgstr "创建失败：{message}"
 
-msgid "Create group <0>\"{typed}\"</0>"
-msgstr "创建分组<0>“{typed}”</0>"
+msgid "Create group <0>\"{name}\"</0>"
+msgstr "创建分组<0>“{name}”</0>"
 
 msgid "Create issue"
 msgstr "创建议题"
@@ -11788,6 +11788,12 @@ msgstr "新建分组"
 
 msgid "New group from workspace"
 msgstr "以此工作区新建分组"
+
+msgid "New group name…"
+msgstr "新分组名称…"
+
+msgid "New group…"
+msgstr "新建分组…"
 
 msgid "New issue"
 msgstr "新建议题"
@@ -20057,8 +20063,8 @@ msgstr "输入命令或搜索…"
 msgid "Type a message..."
 msgstr "输入消息..."
 
-msgid "Type a name to create a group"
-msgstr "输入名称以创建分组"
+msgid "Type a name, then press Enter"
+msgstr "输入名称后按 Enter"
 
 msgid "Type a task for Claude…"
 msgstr "给Claude写个任务…"
