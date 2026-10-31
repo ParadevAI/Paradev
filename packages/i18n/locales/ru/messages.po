@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "Вид «{0}» и его фильтры будут удалены. Рабочие области не затрагиваются."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "«{0}» удалена"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "«{0}» будет объединён в {1} через {2}. Отменить отсюда нельзя."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "«{0}» перестанет срабатывать, а история её запусков будет удалена. Это нельзя отменить."
-
-msgid "\"{name}\" deleted"
-msgstr "«{name}» удалена"
 
 msgid "\"{name}\" paused"
 msgstr "«{name}» приостановлена"
@@ -114,6 +112,18 @@ msgstr "{0, plural, one {# агент} few {# агента} many {# агенто
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {Не удалось запустить # автоматизацию} few {Не удалось запустить # автоматизации} many {Не удалось запустить # автоматизаций} other {Не удалось запустить # автоматизаций}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# автоматизация удалена} few {# автоматизации удалены} many {# автоматизаций удалено} other {# автоматизации удалено}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# автоматизация приостановлена} few {# автоматизации приостановлены} many {# автоматизаций приостановлено} other {# автоматизации приостановлено}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# автоматизация возобновлена} few {# автоматизации возобновлены} many {# автоматизаций возобновлено} other {# автоматизации возобновлено}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {Не удалось удалить # рабочую о�
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {Создание # рабочей области...} few {Создание # рабочих областей...} many {Создание # рабочих областей...} other {Создание # рабочих областей...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {Удалить # автоматизацию?} few {Удалить # автоматизации?} many {Удалить # автоматизаций?} other {Удалить # автоматизации?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "Аккаунт {connectorName}"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} cookies — забыть этот сайт"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# автоматизация} few {# автоматизации} many {# автоматизаций} other {# автоматизации}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# проверка не пройдена} few {# проверки не пройдено} many {# проверок не пройдено} other {# проверки не пройдено}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {загружена # страница} few {заг�
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Импортировать # worktree} few {Импортировать # worktree} many {Импортировать # worktree} other {Импортировать # worktree}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {# автоматизация перемещена в {group}} few {# автоматизации перемещены в {group}} many {# автоматизаций перемещено в {group}} other {# автоматизации перемещено в {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Проект открыт} few {Открыто # проекта} many {Открыто # проектов} other {Открыто # проекта}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {выполнена # команда} few {выпо�
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {прочитан # файл} few {прочитано # файла} many {прочитано # файлов} other {прочитано # файла}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {# автоматизация убрана из группы} few {# автоматизации убраны из групп} many {# автоматизаций убрано из групп} other {# автоматизации убрано из групп}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Использован # источник} few {Использовано # источника} many {Использовано # источников} other {Использовано # источника}}"
@@ -883,6 +906,9 @@ msgstr "{count} звёзд на GitHub"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} хостов работают на более старой версии службы хоста, чем это приложение"
+
+msgid "{count} selected"
+msgstr "Выбрано: {count}"
 
 msgid "{count}/day"
 msgstr "{count}/день"
@@ -4613,6 +4639,9 @@ msgstr "Свернуть все файлы"
 msgid "Collapse file"
 msgstr "Свернуть файл"
 
+msgid "Collapse group"
+msgstr "Свернуть группу"
+
 msgid "Collapse project"
 msgstr "Свернуть проект"
 
@@ -6050,6 +6079,9 @@ msgstr "Создать окружение"
 
 msgid "Create failed: {message}"
 msgstr "Не удалось создать: {message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "Создать группу <0>«{typed}»</0>"
 
 msgid "Create issue"
 msgstr "Создать задачу"
@@ -7735,6 +7767,9 @@ msgstr "Развернуть диаграмму"
 msgid "Expand file"
 msgstr "Развернуть файл"
 
+msgid "Expand group"
+msgstr "Развернуть группу"
+
 msgid "Expand project"
 msgstr "Развернуть проект"
 
@@ -8044,6 +8079,9 @@ msgstr "Не удалось загрузить репозитории. Попр�
 
 msgid "Failed to log out. Please try again."
 msgstr "Не удалось выйти. Попробуйте ещё раз."
+
+msgid "Failed to move automation"
+msgstr "Не удалось переместить автоматизацию"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "Фильтр хостов..."
 
 msgid "Filter logs"
 msgstr "Фильтровать логи"
+
+msgid "Filter or name a group"
+msgstr "Найти или назвать группу"
 
 msgid "Filter pages"
 msgstr "Фильтровать страницы"
@@ -11539,11 +11580,17 @@ msgstr "Перевести в фон"
 msgid "Move to group"
 msgstr "Переместить в группу"
 
+msgid "Move to group…"
+msgstr "Переместить в группу…"
+
 msgid "Move to Right Side"
 msgstr "Переместить вправо"
 
 msgid "Move to Tab"
 msgstr "Переместить во вкладку"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "«{name}» перемещена в {group}"
 
 msgid "Multi-select"
 msgstr "Множественный выбор"
@@ -11708,6 +11755,9 @@ msgstr "Новые сеансы агентов"
 
 msgid "New automation"
 msgstr "Новая автоматизация"
+
+msgid "New automation in {group}"
+msgstr "Новая автоматизация в группе {group}"
 
 msgid "New Browser"
 msgstr "Новый браузер"
@@ -12104,6 +12154,9 @@ msgstr "Шрифты не найдены."
 
 msgid "No git remote detected"
 msgstr "Удалённый git-репозиторий не обнаружен"
+
+msgid "No group"
+msgstr "Без группы"
 
 msgid "No grouping"
 msgstr "Без группировки"
@@ -15333,6 +15386,9 @@ msgstr "Удалить из канала"
 msgid "Remove from favorites"
 msgstr "Удалить из избранного"
 
+msgid "Remove from group"
+msgstr "Убрать из группы"
+
 msgid "Remove from Queue"
 msgstr "Убрать из очереди"
 
@@ -15401,6 +15457,9 @@ msgstr "Удалить рабочую область"
 
 msgid "Remove…"
 msgstr "Удалить…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "«{name}» убрана из группы"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{credential} для {agentLabel} удалено."
@@ -16701,6 +16760,10 @@ msgstr "Посмотрите, какое место ваши последние 
 msgid "Select"
 msgstr "Селект"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "Выбрать {0}"
+
 msgid "Select a file to view it here"
 msgstr "Выберите файл, чтобы просмотреть его здесь"
 
@@ -16727,6 +16790,9 @@ msgstr "Выберите рабочую область в боковой пан�
 
 msgid "Select agent"
 msgstr "Выбрать агента"
+
+msgid "Select all"
+msgstr "Выбрать все"
 
 msgid "Select All"
 msgstr "Выделить всё"
@@ -16841,6 +16907,9 @@ msgstr "Выбранный агент недоступен на этом хос�
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "Выбранный агент не является терминальным"
+
+msgid "Selected automations"
+msgstr "Выбранные автоматизации"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "Выбранные задачи относятся к разным репозиториям. Выберите задачи из одного репозитория, чтобы запустить их."
@@ -19158,6 +19227,9 @@ msgstr "В этих папках всё ещё есть ваши файлы, н�
 msgid "These ports are still in use"
 msgstr "Эти порты ещё используются"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "Они перестанут запускаться, а история запусков будет удалена. Это действие нельзя отменить."
+
 msgid "Thinking"
 msgstr "Размышление"
 
@@ -19984,6 +20056,9 @@ msgstr "Введите команду или запрос…"
 
 msgid "Type a message..."
 msgstr "Введите сообщение..."
+
+msgid "Type a name to create a group"
+msgstr "Введите название, чтобы создать группу"
 
 msgid "Type a task for Claude…"
 msgstr "Опишите задачу для Claude…"

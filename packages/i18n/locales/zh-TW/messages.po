@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "將移除「{0}」及其篩選條件。工作區不受影響。"
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "「{0}」已刪除"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "「{0}」將通過{2}合併到{1}。在這裡無法復原。"
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "「{0}」將不再觸發，其執行歷史也會被移除。此操作無法復原。"
-
-msgid "\"{name}\" deleted"
-msgstr "「{name}」已刪除"
 
 msgid "\"{name}\" paused"
 msgstr "「{name}」已暫停"
@@ -114,6 +112,18 @@ msgstr "{0, plural, other {# 個代理}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {無法啟動 # 個自動化} other {無法啟動 # 個自動化}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {已刪除 # 個自動化} other {已刪除 # 個自動化}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {已暫停 # 個自動化} other {已暫停 # 個自動化}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {已恢復 # 個自動化} other {已恢復 # 個自動化}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {無法刪除#個工作區} other {無法刪除#個工�
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {正在建立#個工作區...} other {正在建立#個工作區...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {刪除 # 個自動化？} other {刪除 # 個自動化？}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "{connectorName} 帳號"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount}個cookie——忘記此站點"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# 個自動化} other {# 個自動化}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#項檢查失敗} other {#項檢查失敗}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {擷取了 # 個頁面} other {擷取了 # 個頁面
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {匯入#個worktree} other {匯入#個worktree}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {已將 # 個自動化移動到 {group}} other {已將 # 個自動化移動到 {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {已開啟#個專案} other {已開啟#個專案}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {執行了 # 個命令} other {執行了 # 個命令
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {讀取了 # 個檔案} other {讀取了 # 個檔案}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {已將 # 個自動化移出群組} other {已將 # 個自動化移出群組}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#個來源} other {使用了#個來源}}"
@@ -883,6 +906,9 @@ msgstr "{count}個GitHub星標"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} 台主機執行的主機服務比此應用程式舊"
+
+msgid "{count} selected"
+msgstr "已選取 {count} 個"
 
 msgid "{count}/day"
 msgstr "{count}/天"
@@ -4613,6 +4639,9 @@ msgstr "摺疊所有檔案"
 msgid "Collapse file"
 msgstr "摺疊檔案"
 
+msgid "Collapse group"
+msgstr "收合群組"
+
 msgid "Collapse project"
 msgstr "收起專案"
 
@@ -6050,6 +6079,9 @@ msgstr "建立環境"
 
 msgid "Create failed: {message}"
 msgstr "建立失敗：{message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "建立群組<0>「{typed}」</0>"
 
 msgid "Create issue"
 msgstr "建立議題"
@@ -7735,6 +7767,9 @@ msgstr "放大圖表"
 msgid "Expand file"
 msgstr "展開檔案"
 
+msgid "Expand group"
+msgstr "展開群組"
+
 msgid "Expand project"
 msgstr "展開專案"
 
@@ -8044,6 +8079,9 @@ msgstr "載入儲存庫失敗。請重試。"
 
 msgid "Failed to log out. Please try again."
 msgstr "登出失敗。請重試。"
+
+msgid "Failed to move automation"
+msgstr "無法移動自動化"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "篩選主機..."
 
 msgid "Filter logs"
 msgstr "篩選記錄"
+
+msgid "Filter or name a group"
+msgstr "篩選或命名群組"
 
 msgid "Filter pages"
 msgstr "篩選頁面"
@@ -11539,11 +11580,17 @@ msgstr "移到背景"
 msgid "Move to group"
 msgstr "移動到群組"
 
+msgid "Move to group…"
+msgstr "移動到群組…"
+
 msgid "Move to Right Side"
 msgstr "移到右側"
 
 msgid "Move to Tab"
 msgstr "移動到分頁"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "已將「{name}」移動到 {group}"
 
 msgid "Multi-select"
 msgstr "多選"
@@ -11708,6 +11755,9 @@ msgstr "新的代理程式工作階段"
 
 msgid "New automation"
 msgstr "新建自動化"
+
+msgid "New automation in {group}"
+msgstr "在 {group} 中新增自動化"
 
 msgid "New Browser"
 msgstr "新建瀏覽器"
@@ -12104,6 +12154,9 @@ msgstr "未找到字型。"
 
 msgid "No git remote detected"
 msgstr "未檢測到git遠端儲存庫"
+
+msgid "No group"
+msgstr "無群組"
 
 msgid "No grouping"
 msgstr "不分組"
@@ -15333,6 +15386,9 @@ msgstr "從頻道中移除"
 msgid "Remove from favorites"
 msgstr "從最愛移除"
 
+msgid "Remove from group"
+msgstr "移出群組"
+
 msgid "Remove from Queue"
 msgstr "移出佇列"
 
@@ -15401,6 +15457,9 @@ msgstr "移除工作區"
 
 msgid "Remove…"
 msgstr "移除…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "已將「{name}」移出群組"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "已移除{agentLabel}的{credential}。"
@@ -16701,6 +16760,10 @@ msgstr "看看你最近 30 天的表現在公開排行榜上的位置。僅包�
 msgid "Select"
 msgstr "選擇框"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "選取 {0}"
+
 msgid "Select a file to view it here"
 msgstr "選取檔案以在此處檢視"
 
@@ -16727,6 +16790,9 @@ msgstr "從側邊欄選擇一個工作區即可開始。"
 
 msgid "Select agent"
 msgstr "選擇代理程式"
+
+msgid "Select all"
+msgstr "全選"
 
 msgid "Select All"
 msgstr "全選"
@@ -16841,6 +16907,9 @@ msgstr "所選代理程式在此主機上不可用"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "所選代理程式不是終端代理程式"
+
+msgid "Selected automations"
+msgstr "已選取的自動化"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "所選議題跨越多個儲存庫。請選擇同一儲存庫中的議題後再執行。"
@@ -19158,6 +19227,9 @@ msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Pa
 msgid "These ports are still in use"
 msgstr "這些埠仍在使用中"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "它們將不再執行，其執行紀錄也會被刪除。此操作無法復原。"
+
 msgid "Thinking"
 msgstr "思考"
 
@@ -19984,6 +20056,9 @@ msgstr "輸入命令或搜尋…"
 
 msgid "Type a message..."
 msgstr "輸入訊息..."
+
+msgid "Type a name to create a group"
+msgstr "輸入名稱以建立群組"
 
 msgid "Type a task for Claude…"
 msgstr "給Claude寫個任務…"

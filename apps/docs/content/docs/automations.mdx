@@ -19,7 +19,7 @@ Typical uses:
 - **PR reviews**: review a pull request as soon as you're requested as a reviewer
 - **Bug triage**: reproduce a new Sentry issue or a report posted in #bugs
 
-The list shows 7-day health stats (Active, Created, Failed), groups enabled automations by soonest run under **Up next**, and splits into **Mine** and **Team** tabs. Team automations are read-only; only the owner can edit, pause, run, or delete one.
+The list shows 7-day run health (successful, failed, and missed runs) and splits into **Mine** and **Team** tabs. Team automations are read-only; only the owner can edit, pause, run, group, or delete one.
 
 ## Requirements
 
@@ -126,6 +126,25 @@ From the automation's detail page (**Settings** tab):
 - **Run now**: dispatches immediately. The run appears under **Run History** within seconds.
 - **Delete**: in the ⋯ overflow menu; removes the automation and its run history.
 
+## Groups
+
+Put related automations in a group to keep a long list in order. Right-click a row (or open its ⋯ menu) and pick **Move to group**. Type to filter the groups, or type a new name and press Enter to create it. The detail page's ⋯ menu has the same submenu, and its breadcrumb shows the group.
+
+Once any of your automations has a group, the list shows a section for each group, sorted by name, with **No group** last. Click a section header to collapse it, or hover it and click **+** to create an automation already in that group. Search and sorting apply inside each section.
+
+You can also drag a row onto another group's section to move it there, or onto **No group** to ungroup it. Drag one of several selected rows to move them all.
+
+A group only organizes the list. It does not change where runs go: the workspace tags under **Settings** do that.
+
+## Select Several
+
+On the **Mine** tab, **⌘-click** a row (Ctrl-click on Windows and Linux) to start selecting. Every row then shows a checkbox, and a bar at the bottom of the list can **Move to group**, **Pause**, **Resume**, or **Delete** everything selected.
+
+- **⌘-click** adds or removes one row. With a row focused, **X** does the same.
+- **Shift-click** selects every row between the last one you picked and this one.
+- **⌘-click a group header** selects the whole group, and **⌘A** selects every row on screen.
+- **Esc** clears the selection, and the checkboxes go away with it.
+
 ## Retry Failed Runs
 
 On the **Mine** tab, **Retry all** appears in the header when any of your automations' latest run failed, and re-dispatches all of them. The **Failed** stat card filters to failing automations. Hover a row you own for **Run now** to re-dispatch one.
@@ -152,6 +171,11 @@ superset automations create --name "Scratch triage" --rrule "FREQ=DAILY;BYHOUR=8
 # folder per project. --tag (repeatable) files them elsewhere; clearing the tags
 # in the editor opts out of grouping.
 superset automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt "…" --tag audits
+
+# Groups organize the automations list; they don't affect where runs go.
+superset automations update <automationId> --group "Nightly jobs"
+superset automations list --group "nightly jobs"
+superset automations update <automationId> --clear-group
 
 # Event triggers: pass the trigger set as a JSON array with --triggers or --triggers-file.
 # trigger-options lists the ids a provider's filters accept (channels, repos, teams, ...).

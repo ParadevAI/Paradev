@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” ve filtreleri kaldırılır. Çalışma alanları etkilenmez."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" silindi"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\", {2} ile {1} dalına birleştirilecek. Buradan geri alınamaz."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" artık tetiklenmeyecek ve çalıştırma geçmişi kaldırılacak. Bu geri alınamaz."
-
-msgid "\"{name}\" deleted"
-msgstr "\"{name}\" silindi"
 
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" duraklatıldı"
@@ -114,6 +112,18 @@ msgstr "{0, plural, one {# ajan} other {# ajan}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# otomasyon başlatılamadı} other {# otomasyon başlatılamadı}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# otomasyon silindi} other {# otomasyon silindi}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# otomasyon duraklatıldı} other {# otomasyon duraklatıldı}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# otomasyon devam ettirildi} other {# otomasyon devam ettirildi}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {# çalışma alanı silinemedi} other {# çalışma ala
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {# çalışma alanı oluşturuluyor...} other {# çalışma alanı oluşturuluyor...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {# otomasyon silinsin mi?} other {# otomasyon silinsin mi?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "{connectorName} hesabı"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} çerez — bu siteyi unut"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# otomasyon} other {# otomasyon}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrol başarısız} other {# kontrol başarısız}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {# sayfa alındı} other {# sayfa alındı}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# worktree'yi içe aktar} other {# worktree'yi içe aktar}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {# otomasyon {group} grubuna taşındı} other {# otomasyon {group} grubuna taşındı}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Proje açıldı} other {# proje açıldı}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {# komut çalıştırıldı} other {# komut çalış
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {# dosya okundu} other {# dosya okundu}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {# otomasyon grubundan çıkarıldı} other {# otomasyon grubundan çıkarıldı}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
@@ -883,6 +906,9 @@ msgstr "{count} GitHub yıldızı"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} ana makine bu uygulamadan daha eski bir ana makine hizmeti çalıştırıyor"
+
+msgid "{count} selected"
+msgstr "{count} seçildi"
 
 msgid "{count}/day"
 msgstr "{count}/gün"
@@ -4613,6 +4639,9 @@ msgstr "Tüm dosyaları daralt"
 msgid "Collapse file"
 msgstr "Dosyayı daralt"
 
+msgid "Collapse group"
+msgstr "Grubu daralt"
+
 msgid "Collapse project"
 msgstr "Projeyi daralt"
 
@@ -6050,6 +6079,9 @@ msgstr "Ortam oluştur"
 
 msgid "Create failed: {message}"
 msgstr "Oluşturulamadı: {message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "<0>\"{typed}\"</0> grubunu oluştur"
 
 msgid "Create issue"
 msgstr "Issue oluştur"
@@ -7735,6 +7767,9 @@ msgstr "Diyagramı büyüt"
 msgid "Expand file"
 msgstr "Dosyayı genişlet"
 
+msgid "Expand group"
+msgstr "Grubu genişlet"
+
 msgid "Expand project"
 msgstr "Projeyi genişlet"
 
@@ -8044,6 +8079,9 @@ msgstr "Depolar yüklenemedi. Lütfen yeniden deneyin."
 
 msgid "Failed to log out. Please try again."
 msgstr "Oturum kapatılamadı. Lütfen yeniden deneyin."
+
+msgid "Failed to move automation"
+msgstr "Otomasyon taşınamadı"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "Host'ları filtrele..."
 
 msgid "Filter logs"
 msgstr "Günlükleri filtrele"
+
+msgid "Filter or name a group"
+msgstr "Grup filtrele veya adlandır"
 
 msgid "Filter pages"
 msgstr "Sayfaları filtrele"
@@ -11539,11 +11580,17 @@ msgstr "Arka plana taşı"
 msgid "Move to group"
 msgstr "Gruba taşı"
 
+msgid "Move to group…"
+msgstr "Gruba taşı…"
+
 msgid "Move to Right Side"
 msgstr "Sağ tarafa taşı"
 
 msgid "Move to Tab"
 msgstr "Sekmeye taşı"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "\"{name}\", {group} grubuna taşındı"
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -11708,6 +11755,9 @@ msgstr "Yeni ajan oturumları"
 
 msgid "New automation"
 msgstr "Yeni otomasyon"
+
+msgid "New automation in {group}"
+msgstr "{group} grubunda yeni otomasyon"
 
 msgid "New Browser"
 msgstr "Yeni tarayıcı"
@@ -12104,6 +12154,9 @@ msgstr "Yazı tipi bulunamadı."
 
 msgid "No git remote detected"
 msgstr "Git remote algılanmadı"
+
+msgid "No group"
+msgstr "Grup yok"
 
 msgid "No grouping"
 msgstr "Gruplama yok"
@@ -15333,6 +15386,9 @@ msgstr "Kanaldan çıkar"
 msgid "Remove from favorites"
 msgstr "Favorilerden kaldır"
 
+msgid "Remove from group"
+msgstr "Gruptan çıkar"
+
 msgid "Remove from Queue"
 msgstr "Kuyruktan çıkar"
 
@@ -15401,6 +15457,9 @@ msgstr "Çalışma alanını kaldır"
 
 msgid "Remove…"
 msgstr "Kaldır…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "\"{name}\" grubundan çıkarıldı"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{agentLabel} için {credential} kaldırıldı."
@@ -16701,6 +16760,10 @@ msgstr "Son 30 gününüzün herkese açık liderlik tablosunda nereye düştü�
 msgid "Select"
 msgstr "Seçim"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "{0} öğesini seç"
+
 msgid "Select a file to view it here"
 msgstr "Burada görüntülemek için bir dosya seçin"
 
@@ -16727,6 +16790,9 @@ msgstr "Başlamak için kenar çubuğundan bir çalışma alanı seçin."
 
 msgid "Select agent"
 msgstr "Ajan seç"
+
+msgid "Select all"
+msgstr "Tümünü seç"
 
 msgid "Select All"
 msgstr "Tümünü seç"
@@ -16841,6 +16907,9 @@ msgstr "Seçili ajan bu host'ta kullanılamıyor"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "Seçili ajan bir terminal ajanı değil"
+
+msgid "Selected automations"
+msgstr "Seçili otomasyonlar"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "Seçili issue'lar birden fazla depoya yayılıyor. Çalıştırmak için tek bir depodan issue seçin."
@@ -19158,6 +19227,9 @@ msgstr "Bu klasörlerde hâlâ dosyalarınız var, ancak yeni Paradev'e kendili�
 msgid "These ports are still in use"
 msgstr "Bu portlar hâlâ kullanımda"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "Artık çalışmayacaklar ve çalışma geçmişleri silinecek. Bu işlem geri alınamaz."
+
 msgid "Thinking"
 msgstr "Düşünme"
 
@@ -19984,6 +20056,9 @@ msgstr "Komut yazın veya arayın…"
 
 msgid "Type a message..."
 msgstr "Bir mesaj yazın..."
+
+msgid "Type a name to create a group"
+msgstr "Grup oluşturmak için bir ad yazın"
 
 msgid "Type a task for Claude…"
 msgstr "Claude için bir görev yazın…"

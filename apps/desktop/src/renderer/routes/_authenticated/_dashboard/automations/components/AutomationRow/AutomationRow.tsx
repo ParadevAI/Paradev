@@ -1,3 +1,4 @@
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { SelectUser } from "@superset/db/schema";
@@ -11,6 +12,7 @@ import {
 } from "@superset/shared/rrule";
 import type { RouterOutputs } from "@superset/trpc";
 import { Button } from "@superset/ui/button";
+import { Checkbox } from "@superset/ui/checkbox";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -30,6 +32,7 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import type { AutomationLastRun } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import type { ProjectOption } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import type { RowSelectEvent } from "../../hooks/useRowSelection";
 import { RUN_STATUS_META } from "../../utils/runStatus";
 import { runWorkspaceSearch } from "../../utils/runWorkspaceSearch";
 import { AutomationActionsMenuItems } from "./components/AutomationActionsMenuItems";
@@ -51,8 +54,29 @@ interface AutomationRowProps {
 	canDelete: boolean;
 	/** True while a run/retry dispatch for this automation is in flight. */
 	isRetrying: boolean;
+	/** Every group in the organization, for "Move to group". */
+	groups: string[];
+	/** Indents the name under a group header, or to make room for checkboxes. */
+	indented: boolean;
+	/** Drag to another group's section. Omitted when the table isn't grouped. */
+	drag?: {
+		/** Only your own automations move. */
+		enabled: boolean;
+		/** Part of what is being dragged. */
+		dimmed: boolean;
+		/** The section under the pointer is this row's section. */
+		dropActive: boolean;
+	};
+	/** Omitted when the row can't be selected (someone else's automation). */
+	selection?: {
+		selected: boolean;
+		/** Some row is selected: checkboxes show only while selecting. */
+		active: boolean;
+		onSelect: (event: RowSelectEvent) => void;
+	};
 	onRunNow: (automation: AutomationListItem) => void;
 	onToggleEnabled: (automation: AutomationListItem) => void;
+	onMoveToGroup: (automation: AutomationListItem, group: string | null) => void;
 	onDelete: (automation: AutomationListItem) => void;
 }
 
@@ -84,8 +108,13 @@ export function AutomationRow({
 	isOwner,
 	canDelete,
 	isRetrying,
+	groups,
+	indented,
+	drag,
+	selection,
 	onRunNow,
 	onToggleEnabled,
+	onMoveToGroup,
 	onDelete,
 }: AutomationRowProps) {
 	const { formatDateTime } = useFormat();
@@ -132,14 +161,31 @@ export function AutomationRow({
 			isOwner={isOwner}
 			canDelete={canDelete}
 			enabled={automation.enabled}
+			groups={groups}
+			currentGroup={automation.group}
 			onEdit={openDetail}
 			onCopyLink={() => copyShareLink(`automations/${automation.id}`)}
 			onRunNow={() => onRunNow(automation)}
 			onToggleEnabled={() => onToggleEnabled(automation)}
 			onHistory={openHistory}
+			onMoveToGroup={(group) => onMoveToGroup(automation, group)}
 			onDelete={() => onDelete(automation)}
 		/>
 	);
+
+	const draggable = useDraggable({
+		id: automation.id,
+		disabled: !drag?.enabled,
+	});
+	const droppable = useDroppable({
+		id: `row:${automation.id}`,
+		data: { group: automation.group },
+		disabled: !drag,
+	});
+	const setRowRef = (node: HTMLTableRowElement | null) => {
+		draggable.setNodeRef(node);
+		droppable.setNodeRef(node);
+	};
 
 	const lastRunMeta = lastRun ? RUN_STATUS_META[lastRun.status] : null;
 	const lastRunClickable = !!lastRun?.workspaceId;
@@ -148,18 +194,69 @@ export function AutomationRow({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
 				<TableRow
+					ref={setRowRef}
 					tabIndex={0}
-					onClick={openDetail}
+					data-state={selection?.selected ? "selected" : undefined}
+					data-drop-active={drag?.dropActive || undefined}
+					onMouseDown={(event) => {
+						// Shift-click selects a range; keep it from selecting text.
+						if (selection && event.shiftKey) {
+							event.preventDefault();
+							return;
+						}
+						if (drag?.enabled) draggable.listeners?.onMouseDown?.(event);
+					}}
+					onTouchStart={(event) => {
+						if (drag?.enabled) draggable.listeners?.onTouchStart?.(event);
+					}}
+					onClick={(event) => {
+						if (
+							selection &&
+							(event.metaKey || event.ctrlKey || event.shiftKey)
+						) {
+							selection.onSelect({ shiftKey: event.shiftKey });
+							return;
+						}
+						openDetail();
+					}}
 					onKeyDown={(event) => {
 						if (event.target !== event.currentTarget) return;
+						if (selection && (event.key === "x" || event.key === "X")) {
+							event.preventDefault();
+							selection.onSelect({ shiftKey: event.shiftKey });
+							return;
+						}
 						if (event.key === "Enter" || event.key === " ") {
 							event.preventDefault();
 							openDetail();
 						}
 					}}
-					className="group/row h-10 cursor-pointer border-border/50 text-sm outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset"
+					className={cn(
+						"group/row h-10 cursor-pointer border-border/50 text-sm outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 data-[state=selected]:bg-accent/70 data-[drop-active]:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset",
+						drag?.dimmed && "opacity-40",
+					)}
 				>
-					<TableCell className="pl-4">
+					<TableCell
+						className={cn(
+							"relative transition-[padding] duration-150",
+							indented ? "pl-11" : "pl-4",
+						)}
+					>
+						{selection?.active && (
+							<Checkbox
+								checked={selection.selected}
+								onMouseDown={(event) => {
+									if (event.shiftKey) event.preventDefault();
+								}}
+								onClick={(event) => {
+									event.preventDefault();
+									event.stopPropagation();
+									selection.onSelect({ shiftKey: event.shiftKey });
+								}}
+								aria-label={t({ message: `Select ${automation.name}` })}
+								className="absolute inset-y-0 left-3.5 my-auto !translate-y-0 animate-in fade-in duration-150"
+							/>
+						)}
 						<span className="flex min-w-0 items-center gap-2">
 							<span
 								className={cn(

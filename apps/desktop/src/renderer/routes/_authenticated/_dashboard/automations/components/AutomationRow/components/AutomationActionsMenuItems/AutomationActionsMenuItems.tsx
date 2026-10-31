@@ -16,6 +16,7 @@ import {
 	LuPlay,
 	LuTrash2,
 } from "react-icons/lu";
+import { AutomationGroupMenuItems } from "../../../AutomationGroupMenuItems";
 
 interface AutomationActionsMenuItemsProps {
 	kind: "context" | "dropdown";
@@ -23,11 +24,14 @@ interface AutomationActionsMenuItemsProps {
 	/** Owner or organization owner: deleting runs nothing on anyone's machine. */
 	canDelete: boolean;
 	enabled: boolean;
+	groups: string[];
+	currentGroup: string | null;
 	onEdit: () => void;
 	onCopyLink: () => void;
 	onRunNow: () => void;
 	onToggleEnabled: () => void;
 	onHistory: () => void;
+	onMoveToGroup: (group: string | null) => void;
 	onDelete: () => void;
 }
 
@@ -36,11 +40,14 @@ export function AutomationActionsMenuItems({
 	isOwner,
 	canDelete,
 	enabled,
+	groups,
+	currentGroup,
 	onEdit,
 	onCopyLink,
 	onRunNow,
 	onToggleEnabled,
 	onHistory,
+	onMoveToGroup,
 	onDelete,
 }: AutomationActionsMenuItemsProps) {
 	const renderItem = ({
@@ -117,6 +124,12 @@ export function AutomationActionsMenuItems({
 							</>
 						),
 					})}
+					<AutomationGroupMenuItems
+						kind={kind}
+						groups={groups}
+						currentGroup={currentGroup}
+						onMove={onMoveToGroup}
+					/>
 				</>
 			)}
 			{canDelete && (

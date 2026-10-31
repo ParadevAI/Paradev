@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "「{0}」とそのフィルターが削除されます。ワークスペースには影響しません。"
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "「{0}」を削除しました"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "「{0}」は{2}で{1}にマージされます。ここからは元に戻せません。"
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "「{0}」は発火しなくなり、実行履歴も削除されます。この操作は元に戻せません。"
-
-msgid "\"{name}\" deleted"
-msgstr "「{name}」を削除しました"
 
 msgid "\"{name}\" paused"
 msgstr "「{name}」を一時停止しました"
@@ -114,6 +112,18 @@ msgstr "{0, plural, other {エージェント # 件}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {#件のオートメーションを開始できませんでした} other {#件のオートメーションを開始できませんでした}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {#件のオートメーションを削除しました} other {#件のオートメーションを削除しました}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {#件のオートメーションを一時停止しました} other {#件のオートメーションを一時停止しました}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {#件のオートメーションを再開しました} other {#件のオートメーションを再開しました}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {#件のワークスペースを削除できませんで
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {#件のワークスペースを作成中...} other {#件のワークスペースを作成中...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {#件のオートメーションを削除しますか？} other {#件のオートメーションを削除しますか？}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "{connectorName} アカウント"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount}件のCookie — このサイトを削除"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {#件のオートメーション} other {#件のオートメーション}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#件のチェックが失敗} other {#件のチェックが失敗}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {#件のページを取得} other {#件のページ�
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {#件のワークツリーをインポート} other {#件のワークツリーをインポート}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {#件のオートメーションを {group} へ移動しました} other {#件のオートメーションを {group} へ移動しました}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {#件のプロジェクトを開きました} other {#件のプロジェクトを開きました}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {#件のコマンドを実行} other {#件のコマ�
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {#件のファイルを読み取り} other {#件のファイルを読み取り}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {#件のオートメーションをグループから外しました} other {#件のオートメーションをグループから外しました}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {#件のソースを使用} other {#件のソースを使用}}"
@@ -883,6 +906,9 @@ msgstr "GitHubスター{count}件"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count}台のホストがこのアプリより古いホストサービスを実行しています"
+
+msgid "{count} selected"
+msgstr "{count}件を選択中"
 
 msgid "{count}/day"
 msgstr "{count}/日"
@@ -4613,6 +4639,9 @@ msgstr "すべてのファイルを折りたたむ"
 msgid "Collapse file"
 msgstr "ファイルを折りたたむ"
 
+msgid "Collapse group"
+msgstr "グループを折りたたむ"
+
 msgid "Collapse project"
 msgstr "プロジェクトを折りたたむ"
 
@@ -6050,6 +6079,9 @@ msgstr "環境を作成"
 
 msgid "Create failed: {message}"
 msgstr "作成に失敗しました: {message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "グループ<0>「{typed}」</0>を作成"
 
 msgid "Create issue"
 msgstr "Issueを作成"
@@ -7735,6 +7767,9 @@ msgstr "図を拡大"
 msgid "Expand file"
 msgstr "ファイルを展開"
 
+msgid "Expand group"
+msgstr "グループを展開"
+
 msgid "Expand project"
 msgstr "プロジェクトを展開"
 
@@ -8044,6 +8079,9 @@ msgstr "リポジトリを読み込めませんでした。もう一度お試し
 
 msgid "Failed to log out. Please try again."
 msgstr "ログアウトに失敗しました。もう一度お試しください。"
+
+msgid "Failed to move automation"
+msgstr "オートメーションを移動できませんでした"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "ホストを絞り込み..."
 
 msgid "Filter logs"
 msgstr "ログを絞り込む"
+
+msgid "Filter or name a group"
+msgstr "グループを絞り込むか名前を入力"
 
 msgid "Filter pages"
 msgstr "ページを絞り込む"
@@ -11539,11 +11580,17 @@ msgstr "バックグラウンドに移動"
 msgid "Move to group"
 msgstr "グループへ移動"
 
+msgid "Move to group…"
+msgstr "グループへ移動…"
+
 msgid "Move to Right Side"
 msgstr "右側に移動"
 
 msgid "Move to Tab"
 msgstr "タブに移動"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "「{name}」を {group} へ移動しました"
 
 msgid "Multi-select"
 msgstr "複数選択"
@@ -11708,6 +11755,9 @@ msgstr "新しいエージェントセッション"
 
 msgid "New automation"
 msgstr "新規オートメーション"
+
+msgid "New automation in {group}"
+msgstr "{group} に新しいオートメーション"
 
 msgid "New Browser"
 msgstr "新規ブラウザ"
@@ -12104,6 +12154,9 @@ msgstr "フォントが見つかりません。"
 
 msgid "No git remote detected"
 msgstr "gitリモートが検出されませんでした"
+
+msgid "No group"
+msgstr "グループなし"
 
 msgid "No grouping"
 msgstr "グループ化なし"
@@ -15333,6 +15386,9 @@ msgstr "チャンネルから削除"
 msgid "Remove from favorites"
 msgstr "お気に入りから削除"
 
+msgid "Remove from group"
+msgstr "グループから外す"
+
 msgid "Remove from Queue"
 msgstr "キューから削除"
 
@@ -15401,6 +15457,9 @@ msgstr "ワークスペースを削除"
 
 msgid "Remove…"
 msgstr "削除…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "「{name}」をグループから外しました"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{agentLabel}の{credential}を削除しました。"
@@ -16701,6 +16760,10 @@ msgstr "直近30日の実績が公開リーダーボードでどの位置にな�
 msgid "Select"
 msgstr "Select"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "{0} を選択"
+
 msgid "Select a file to view it here"
 msgstr "ファイルを選択するとここに表示されます"
 
@@ -16727,6 +16790,9 @@ msgstr "サイドバーからワークスペースを選択して始めましょ
 
 msgid "Select agent"
 msgstr "エージェントを選択"
+
+msgid "Select all"
+msgstr "すべて選択"
 
 msgid "Select All"
 msgstr "すべて選択"
@@ -16841,6 +16907,9 @@ msgstr "選択したエージェントはこのホストで利用できません
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "選択したエージェントはターミナルエージェントではありません"
+
+msgid "Selected automations"
+msgstr "選択したオートメーション"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "選択したissueが複数のリポジトリにまたがっています。実行するには単一のリポジトリのissueを選択してください。"
@@ -19158,6 +19227,9 @@ msgstr "これらのフォルダにはファイルが残っていますが、新
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "実行されなくなり、実行履歴も削除されます。この操作は取り消せません。"
+
 msgid "Thinking"
 msgstr "思考"
 
@@ -19984,6 +20056,9 @@ msgstr "コマンドを入力するか検索…"
 
 msgid "Type a message..."
 msgstr "メッセージを入力..."
+
+msgid "Type a name to create a group"
+msgstr "名前を入力してグループを作成"
 
 msgid "Type a task for Claude…"
 msgstr "Claudeへのタスクを入力…"

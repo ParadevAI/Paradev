@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "“{0}” en de bijbehorende filters worden verwijderd. De werkruimtes blijven ongewijzigd."
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "\"{0}\" verwijderd"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" wordt via {2} in {1} gemerged. Dit kan hier niet ongedaan worden gemaakt."
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "\"{0}\" wordt niet meer geactiveerd en de geschiedenis van runs wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
-
-msgid "\"{name}\" deleted"
-msgstr "\"{name}\" verwijderd"
 
 msgid "\"{name}\" paused"
 msgstr "\"{name}\" gepauzeerd"
@@ -114,6 +112,18 @@ msgstr "{0, plural, one {# agent} other {# agents}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {# automatisering kon niet worden gestart} other {# automatiseringen konden niet worden gestart}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {# automatisering verwijderd} other {# automatiseringen verwijderd}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {# automatisering gepauzeerd} other {# automatiseringen gepauzeerd}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {# automatisering hervat} other {# automatiseringen hervat}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {Kan # werkruimte niet verwijderen} other {Kan # werkrui
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {# werkruimte aanmaken...} other {# werkruimtes aanmaken...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {# automatisering verwijderen?} other {# automatiseringen verwijderen?}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "{connectorName}-account"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount} cookies — deze site vergeten"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# automatisering} other {# automatiseringen}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# check mislukt} other {# checks mislukt}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {# pagina opgehaald} other {# pagina's opgehaald}}"
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# worktree importeren} other {# worktrees importeren}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {# automatisering verplaatst naar {group}} other {# automatiseringen verplaatst naar {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {Project geopend} other {# projecten geopend}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {# opdracht uitgevoerd} other {# opdrachten uitgevoe
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {# bestand gelezen} other {# bestanden gelezen}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {# automatisering uit de groep verwijderd} other {# automatiseringen uit hun groepen verwijderd}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# bron gebruikt} other {# bronnen gebruikt}}"
@@ -883,6 +906,9 @@ msgstr "{count} GitHub-sterren"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} hosts draaien een oudere hostservice dan deze app"
+
+msgid "{count} selected"
+msgstr "{count} geselecteerd"
 
 msgid "{count}/day"
 msgstr "{count}/dag"
@@ -4613,6 +4639,9 @@ msgstr "Alle bestanden inklappen"
 msgid "Collapse file"
 msgstr "Bestand inklappen"
 
+msgid "Collapse group"
+msgstr "Groep samenvouwen"
+
 msgid "Collapse project"
 msgstr "Project inklappen"
 
@@ -6050,6 +6079,9 @@ msgstr "Omgeving maken"
 
 msgid "Create failed: {message}"
 msgstr "Aanmaken mislukt: {message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "Groep <0>\"{typed}\"</0> maken"
 
 msgid "Create issue"
 msgstr "Issue aanmaken"
@@ -7735,6 +7767,9 @@ msgstr "Diagram vergroten"
 msgid "Expand file"
 msgstr "Bestand uitklappen"
 
+msgid "Expand group"
+msgstr "Groep uitvouwen"
+
 msgid "Expand project"
 msgstr "Project uitklappen"
 
@@ -8044,6 +8079,9 @@ msgstr "Laden van repository's mislukt. Probeer het opnieuw."
 
 msgid "Failed to log out. Please try again."
 msgstr "Uitloggen mislukt. Probeer het opnieuw."
+
+msgid "Failed to move automation"
+msgstr "Automatisering kon niet worden verplaatst"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "Hosts filteren..."
 
 msgid "Filter logs"
 msgstr "Logs filteren"
+
+msgid "Filter or name a group"
+msgstr "Groep filteren of benoemen"
 
 msgid "Filter pages"
 msgstr "Pagina's filteren"
@@ -11539,11 +11580,17 @@ msgstr "Naar de achtergrond"
 msgid "Move to group"
 msgstr "Naar groep verplaatsen"
 
+msgid "Move to group…"
+msgstr "Naar groep verplaatsen…"
+
 msgid "Move to Right Side"
 msgstr "Naar rechts verplaatsen"
 
 msgid "Move to Tab"
 msgstr "Verplaatsen naar tabblad"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "\"{name}\" verplaatst naar {group}"
 
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
@@ -11708,6 +11755,9 @@ msgstr "Nieuwe agentsessies"
 
 msgid "New automation"
 msgstr "Nieuwe automatisering"
+
+msgid "New automation in {group}"
+msgstr "Nieuwe automatisering in {group}"
 
 msgid "New Browser"
 msgstr "Nieuwe browser"
@@ -12104,6 +12154,9 @@ msgstr "Geen lettertypen gevonden."
 
 msgid "No git remote detected"
 msgstr "Geen git-remote gedetecteerd"
+
+msgid "No group"
+msgstr "Geen groep"
 
 msgid "No grouping"
 msgstr "Geen groepering"
@@ -15333,6 +15386,9 @@ msgstr "Uit kanaal verwijderen"
 msgid "Remove from favorites"
 msgstr "Verwijderen uit favorieten"
 
+msgid "Remove from group"
+msgstr "Uit groep verwijderen"
+
 msgid "Remove from Queue"
 msgstr "Uit wachtrij halen"
 
@@ -15401,6 +15457,9 @@ msgstr "Werkruimte verwijderen"
 
 msgid "Remove…"
 msgstr "Verwijderen…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "\"{name}\" uit de groep verwijderd"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "{credential} voor {agentLabel} verwijderd."
@@ -16701,6 +16760,10 @@ msgstr "Bekijk waar je laatste 30 dagen staan op de publieke ranglijst. Alleen t
 msgid "Select"
 msgstr "Select"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "{0} selecteren"
+
 msgid "Select a file to view it here"
 msgstr "Selecteer een bestand om het hier te bekijken"
 
@@ -16727,6 +16790,9 @@ msgstr "Kies een werkruimte in de zijbalk om te beginnen."
 
 msgid "Select agent"
 msgstr "Agent kiezen"
+
+msgid "Select all"
+msgstr "Alles selecteren"
 
 msgid "Select All"
 msgstr "Alles selecteren"
@@ -16841,6 +16907,9 @@ msgstr "De gekozen agent is niet beschikbaar op deze host"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "De gekozen agent is geen terminalagent"
+
+msgid "Selected automations"
+msgstr "Geselecteerde automatiseringen"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "De geselecteerde issues komen uit meerdere repository's. Kies issues uit één repository om ze uit te voeren."
@@ -19158,6 +19227,9 @@ msgstr "Deze mappen bevatten nog je bestanden, maar zijn niet vanzelf naar het n
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "Ze worden niet meer uitgevoerd en hun uitvoeringsgeschiedenis wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
+
 msgid "Thinking"
 msgstr "Redenering"
 
@@ -19984,6 +20056,9 @@ msgstr "Typ een opdracht of zoek…"
 
 msgid "Type a message..."
 msgstr "Typ een bericht..."
+
+msgid "Type a name to create a group"
+msgstr "Typ een naam om een groep te maken"
 
 msgid "Type a task for Claude…"
 msgstr "Typ een taak voor Claude…"

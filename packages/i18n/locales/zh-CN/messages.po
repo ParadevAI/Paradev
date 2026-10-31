@@ -42,6 +42,7 @@ msgid "“{0}” and its filters are removed. The workspaces are not affected."
 msgstr "将删除“{0}”及其筛选条件。工作区不受影响。"
 
 #. placeholder {0}: automation.name
+#. placeholder {0}: only.name
 msgid "\"{0}\" deleted"
 msgstr "“{0}”已删除"
 
@@ -62,12 +63,9 @@ msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "“{0}”将通过{2}合并到{1}。在这里无法撤销。"
 
 #. placeholder {0}: automation.name
-#. placeholder {0}: pendingDelete.name
+#. placeholder {0}: pendingDeleteOnly.name
 msgid "\"{0}\" will stop firing and its run history will be removed. This can't be undone."
 msgstr "“{0}”将不再触发，其运行历史也会被移除。此操作无法撤销。"
-
-msgid "\"{name}\" deleted"
-msgstr "“{name}”已删除"
 
 msgid "\"{name}\" paused"
 msgstr "“{name}”已暂停"
@@ -114,6 +112,18 @@ msgstr "{0, plural, other {# 个智能体}}"
 #. placeholder {0}: rejected.length
 msgid "{0, plural, one {# automation couldn't be started} other {# automations couldn't be started}}"
 msgstr "{0, plural, one {无法启动 # 个自动化} other {无法启动 # 个自动化}}"
+
+#. placeholder {0}: targets.length
+msgid "{0, plural, one {# automation deleted} other {# automations deleted}}"
+msgstr "{0, plural, one {已删除 # 个自动化} other {已删除 # 个自动化}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation paused} other {# automations paused}}"
+msgstr "{0, plural, one {已暂停 # 个自动化} other {已暂停 # 个自动化}}"
+
+#. placeholder {0}: ids.length
+msgid "{0, plural, one {# automation resumed} other {# automations resumed}}"
+msgstr "{0, plural, one {已恢复 # 个自动化} other {已恢复 # 个自动化}}"
 
 #. placeholder {0}: workspace.diffStats.fileCount
 msgid "{0, plural, one {# changed file} other {# changed files}}"
@@ -290,6 +300,10 @@ msgstr "{0, plural, one {无法删除#个工作区} other {无法删除#个工�
 #. placeholder {0}: tasks.length
 msgid "{0, plural, one {Creating # workspace...} other {Creating # workspaces...}}"
 msgstr "{0, plural, one {正在创建#个工作区...} other {正在创建#个工作区...}}"
+
+#. placeholder {0}: pendingDelete.length
+msgid "{0, plural, one {Delete # automation?} other {Delete # automations?}}"
+msgstr "{0, plural, one {删除 # 个自动化？} other {删除 # 个自动化？}}"
 
 #. placeholder {0}: workspaces.length
 msgid "{0, plural, one {Delete # workspace?} other {Delete # workspaces?}}"
@@ -800,6 +814,9 @@ msgstr "{connectorName} 账号"
 msgid "{cookieCount} cookies — forget this site"
 msgstr "{cookieCount}个cookie——忘记此站点"
 
+msgid "{count, plural, one {# automation} other {# automations}}"
+msgstr "{count, plural, one {# 个自动化} other {# 个自动化}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#项检查失败} other {#项检查失败}}"
 
@@ -863,6 +880,9 @@ msgstr "{count, plural, one {获取了 # 个页面} other {获取了 # 个页面
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {导入#个worktree} other {导入#个worktree}}"
 
+msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
+msgstr "{count, plural, one {已将 # 个自动化移动到 {group}} other {已将 # 个自动化移动到 {group}}}"
+
 msgid "{count, plural, one {Project opened} other {# projects opened}}"
 msgstr "{count, plural, one {已打开#个项目} other {已打开#个项目}}"
 
@@ -871,6 +891,9 @@ msgstr "{count, plural, one {运行了 # 个命令} other {运行了 # 个命令
 
 msgid "{count, plural, one {read # file} other {read # files}}"
 msgstr "{count, plural, one {读取了 # 个文件} other {读取了 # 个文件}}"
+
+msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
+msgstr "{count, plural, one {已将 # 个自动化移出分组} other {已将 # 个自动化移出分组}}"
 
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
@@ -883,6 +906,9 @@ msgstr "{count}个GitHub星标"
 
 msgid "{count} hosts run an older host service than this app"
 msgstr "{count} 台主机运行的主机服务比此应用旧"
+
+msgid "{count} selected"
+msgstr "已选择 {count} 个"
 
 msgid "{count}/day"
 msgstr "{count}/天"
@@ -4613,6 +4639,9 @@ msgstr "折叠所有文件"
 msgid "Collapse file"
 msgstr "折叠文件"
 
+msgid "Collapse group"
+msgstr "折叠分组"
+
 msgid "Collapse project"
 msgstr "收起项目"
 
@@ -6050,6 +6079,9 @@ msgstr "创建环境"
 
 msgid "Create failed: {message}"
 msgstr "创建失败：{message}"
+
+msgid "Create group <0>\"{typed}\"</0>"
+msgstr "创建分组<0>“{typed}”</0>"
 
 msgid "Create issue"
 msgstr "创建议题"
@@ -7735,6 +7767,9 @@ msgstr "放大图表"
 msgid "Expand file"
 msgstr "展开文件"
 
+msgid "Expand group"
+msgstr "展开分组"
+
 msgid "Expand project"
 msgstr "展开项目"
 
@@ -8044,6 +8079,9 @@ msgstr "加载仓库失败。请重试。"
 
 msgid "Failed to log out. Please try again."
 msgstr "退出登录失败。请重试。"
+
+msgid "Failed to move automation"
+msgstr "无法移动自动化"
 
 #. placeholder {0}: error.message
 msgid "Failed to move workspace: {0}"
@@ -8446,6 +8484,9 @@ msgstr "筛选主机..."
 
 msgid "Filter logs"
 msgstr "筛选日志"
+
+msgid "Filter or name a group"
+msgstr "筛选或命名分组"
 
 msgid "Filter pages"
 msgstr "筛选页面"
@@ -11539,11 +11580,17 @@ msgstr "移到后台"
 msgid "Move to group"
 msgstr "移动到分组"
 
+msgid "Move to group…"
+msgstr "移动到分组…"
+
 msgid "Move to Right Side"
 msgstr "移到右侧"
 
 msgid "Move to Tab"
 msgstr "移动到标签页"
+
+msgid "Moved \"{name}\" to {group}"
+msgstr "已将“{name}”移动到 {group}"
 
 msgid "Multi-select"
 msgstr "多选"
@@ -11708,6 +11755,9 @@ msgstr "新智能体会话"
 
 msgid "New automation"
 msgstr "新建自动化"
+
+msgid "New automation in {group}"
+msgstr "在 {group} 中新建自动化"
 
 msgid "New Browser"
 msgstr "新建浏览器"
@@ -12104,6 +12154,9 @@ msgstr "未找到字体。"
 
 msgid "No git remote detected"
 msgstr "未检测到git远程仓库"
+
+msgid "No group"
+msgstr "无分组"
 
 msgid "No grouping"
 msgstr "不分组"
@@ -15333,6 +15386,9 @@ msgstr "从频道中移除"
 msgid "Remove from favorites"
 msgstr "从收藏中移除"
 
+msgid "Remove from group"
+msgstr "移出分组"
+
 msgid "Remove from Queue"
 msgstr "移出队列"
 
@@ -15401,6 +15457,9 @@ msgstr "移除工作区"
 
 msgid "Remove…"
 msgstr "移除…"
+
+msgid "Removed \"{name}\" from its group"
+msgstr "已将“{name}”移出分组"
 
 msgid "Removed {credential} for {agentLabel}."
 msgstr "已移除{agentLabel}的{credential}。"
@@ -16701,6 +16760,10 @@ msgstr "看看你最近30天在公开排行榜上的位置。仅包含token数�
 msgid "Select"
 msgstr "选择框"
 
+#. placeholder {0}: automation.name
+msgid "Select {0}"
+msgstr "选择 {0}"
+
 msgid "Select a file to view it here"
 msgstr "选择一个文件以在此处查看"
 
@@ -16727,6 +16790,9 @@ msgstr "从侧边栏选择一个工作区即可开始。"
 
 msgid "Select agent"
 msgstr "选择智能体"
+
+msgid "Select all"
+msgstr "全选"
 
 msgid "Select All"
 msgstr "全选"
@@ -16841,6 +16907,9 @@ msgstr "所选智能体在此主机上不可用"
 
 msgid "Selected agent isn't a terminal agent"
 msgstr "所选智能体不是终端智能体"
+
+msgid "Selected automations"
+msgstr "已选择的自动化"
 
 msgid "Selected issues span multiple repositories. Select issues from a single repository to run them."
 msgstr "所选议题跨越多个仓库。请选择同一仓库中的议题后再运行。"
@@ -19158,6 +19227,9 @@ msgstr "这些文件夹中仍有你的文件，但没有自动迁移到新版 Pa
 msgid "These ports are still in use"
 msgstr "这些端口仍在使用中"
 
+msgid "They will stop firing and their run history will be removed. This can't be undone."
+msgstr "它们将不再运行，其运行历史也会被删除。此操作无法撤销。"
+
 msgid "Thinking"
 msgstr "思考"
 
@@ -19984,6 +20056,9 @@ msgstr "输入命令或搜索…"
 
 msgid "Type a message..."
 msgstr "输入消息..."
+
+msgid "Type a name to create a group"
+msgstr "输入名称以创建分组"
 
 msgid "Type a task for Claude…"
 msgstr "给Claude写个任务…"
