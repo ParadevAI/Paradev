@@ -73,7 +73,9 @@ For pull request events such as **Review requested**, **Pull request opened**, a
 
 ```text
 You were asked to review the pull request in the event above. If its
-branch is not checked out, run `gh pr checkout <number>`. Read the
+branch is not checked out, run `gh pr checkout <number>`. If the pull
+request comes from a fork, do not check it out or run its code: review
+the diff from `gh pr diff <number>` only. Read the
 description and every changed file. Run the tests
 that cover the changed code. Post one review with
 `gh pr review <number> --comment --body-file review.md`: bugs first, then

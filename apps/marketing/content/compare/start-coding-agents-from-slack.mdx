@@ -8,7 +8,6 @@ competitors:
   - claude-code
   - codex
   - cursor
-  - devin
 keywords:
   - start coding agent from slack
   - claude code slack
@@ -42,7 +41,7 @@ Connect Slack in the dashboard under **Integrations → Slack** (OAuth). For cod
 
 For a code change, the bot starts a cloud workspace, launches a coding agent there, and reports back in the thread. For a request like "file a bug and assign it to whoever owns reporting", it creates the task instead, with assignee, status, and priority from your Linear or Paradev setup. It reads the thread and the channel history on its own, so you do not paste earlier messages into the request.
 
-When thread follow-ups are on for your Slack team, replies in the thread reach the bot without another mention. `!stop` ends the bot's current Slack turn, but it does not stop a coding agent the bot already started in a workspace; open that workspace to stop it. `!mute` brings back mention-only mode for that thread.
+Once the bot has replied in a thread, and thread follow-ups are on for your Slack team, replies in that thread reach the bot without another mention. `!stop` ends the bot's current Slack turn, but it does not stop a coding agent the bot already started in a workspace; open that workspace to stop it. `!mute` brings back mention-only mode for that thread.
 
 Two limits: code changes from the bot run in [cloud workspaces](https://docs.paradev.com/cloud-workspaces), which are in early access and need a paid plan. And the bot's own tools for Linear and GitHub cannot delete resources, merge pull requests, or make bulk writes.
 

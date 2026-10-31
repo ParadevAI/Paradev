@@ -40,7 +40,7 @@ Most new errors with a clear stack trace are small bugs: a missing null check, a
 
 ## How do I set it up in Paradev?
 
-1. Connect Sentry under **Integrations**, and install and connect the [Sentry plugin](https://docs.paradev.com/plugins/available/sentry) so the agent can read the issue's events and stack trace.
+1. Connect Sentry under **Integrations**, and install and connect the [Sentry plugin](https://docs.paradev.com/plugins/available/sentry) so the agent can read the issue's events and stack trace. Plugin tools reach Claude Code and Codex; other agents need their own Sentry MCP setup.
 2. Go to **Automations → New automation**. Pick the project for the repository that the Sentry project reports from, a device that stays online, and an agent.
 3. Under **Triggers**, click **Add Trigger → Sentry → Issue created**. Pick the Sentry project and set the level to **Error** and **Fatal**, so warnings do not start runs. Press **Save**.
 4. Write the prompt:
@@ -100,7 +100,7 @@ Start narrow. A noisy Sentry project can create dozens of issues an hour, and ea
 | Sentry MCP server in your own agent | Your agent, when you ask it | Your agent | Wherever you run it, started by hand |
 | [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent) | Copilot, in a session started from a GitHub issue | Copilot | GitHub |
 
-Seer's strength is context: it reads the traces, logs, and profiles Sentry already has, and adds its root cause analysis to the issue page. Pull request creation can be turned off in Seer's settings if you want a person to write the fix. A Paradev automation's strength is control over the run: you choose the agent and the prompt, the run happens in a full checkout of your repository with your local tools and test setup, and the result lands in a workspace you can open, continue, or hand to a teammate. The two also combine: let Seer find the root cause in Sentry, and use a Paradev **Issue assigned** trigger to start your agent on the issues a person hands over.
+Seer's strength is context: it reads the traces, logs, and profiles Sentry already has, and adds its root cause analysis to the issue page. Pull request creation can be turned off in Seer's settings if you want a person to write the fix. A Paradev automation's strength is control over the run: you choose the agent and the prompt, the run happens in a full checkout of your repository with your tools and test setup, once the host or cloud environment has them, and the result lands in a workspace you can open, continue, or hand to a teammate. The two also combine: let Seer find the root cause in Sentry, and use a Paradev **Issue assigned** trigger to start your agent on the issues a person hands over.
 
 ## Frequently Asked Questions
 
