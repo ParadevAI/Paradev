@@ -70,6 +70,7 @@ const {
 	buildCopilotWrapperExecLine,
 	buildWrapperScript,
 	createClaudeSettingsJson,
+	createClaudeWrapper,
 	createCodexHooksJson,
 	createCodexWrapper,
 	COPILOT_HOOK_MARKER,
@@ -919,6 +920,48 @@ exit 0
 		const signalRun = runWrapper();
 		expect(signalRun.status).toBe(129);
 		expect(existsSync(notifyCapturePath)).toBe(false);
+	});
+
+	it("refuses a login on the selected account without a terminal", () => {
+		const realBinDir = path.join(TEST_ROOT, "real-bin");
+		const ranFile = path.join(TEST_ROOT, "real-cli-ran.txt");
+		const profile = path.join(TEST_ROOT, "selected-profile");
+		mkdirSync(realBinDir, { recursive: true });
+		mkdirSync(profile, { recursive: true });
+		for (const name of ["codex", "claude"]) {
+			writeFileSync(
+				path.join(realBinDir, name),
+				`#!/bin/bash\nprintf '%s\\n' "$*" >> "${ranFile}"\n`,
+				{ mode: 0o755 },
+			);
+		}
+		createCodexWrapper();
+		createClaudeWrapper();
+
+		const env = {
+			...process.env,
+			PATH: `${TEST_BIN_DIR}:${realBinDir}:${process.env.PATH || ""}`,
+			SUPERSET_TERMINAL_ID: "terminal-1",
+			CODEX_HOME: profile,
+			SUPERSET_DEFAULT_CODEX_HOME: profile,
+			SUPERSET_AMBIENT_CODEX_HOME: path.join(TEST_ROOT, "codex-default"),
+			CLAUDE_CONFIG_DIR: profile,
+			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: profile,
+		};
+		const codex = spawnSync(path.join(TEST_BIN_DIR, "codex"), ["login"], {
+			env,
+			encoding: "utf-8",
+		});
+		const claude = spawnSync(
+			path.join(TEST_BIN_DIR, "claude"),
+			["auth", "login"],
+			{ env, encoding: "utf-8" },
+		);
+
+		expect([codex.status, claude.status]).toEqual([2, 2]);
+		expect(codex.stderr).toContain(profile);
+		expect(claude.stderr).toContain(profile);
+		expect(existsSync(ranFile)).toBe(false);
 	});
 
 	it("creates mastracode wrapper passthrough", () => {

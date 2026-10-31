@@ -137,6 +137,13 @@ function buildRealBinaryResolver(): string {
 `;
 }
 
+export interface DefaultAccountResolverOptions {
+	/** Holds the system-default value while a selected account is injected. */
+	ambientEnvVar?: string;
+	/** Leading words of the commands that sign in or out, e.g. "auth login". */
+	credentialCommands?: readonly string[];
+}
+
 /**
  * Shell block that re-resolves the Usage-tab default account at launch.
  * The PTY env is frozen at terminal spawn, so an account switch would
@@ -145,12 +152,16 @@ function buildRealBinaryResolver(): string {
  * only, and a value the user exported by hand — one that differs from what
  * Superset injected at spawn — always wins. A missing pointer file (older
  * host build) changes nothing; an empty one means the system default.
+ *
+ * A credential command leaves an unset value unset, and it changes the
+ * login of the selected account only after the user confirms on a terminal.
  */
 export function buildDefaultAccountResolver(
 	envVar: string,
 	pointerName: string,
-	ambientEnvVar?: string,
+	options: DefaultAccountResolverOptions = {},
 ): string {
+	const { ambientEnvVar, credentialCommands = [] } = options;
 	const pointer = `"$SUPERSET_HOME_DIR/state/${pointerName}"`;
 	const restoreSystemDefault = ambientEnvVar
 		? `if [ -n "\${${ambientEnvVar}}" ]; then
@@ -162,8 +173,19 @@ export function buildDefaultAccountResolver(
   fi`
 		: `unset ${envVar}
   unset SUPERSET_DEFAULT_${envVar}`;
-	return `if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$SUPERSET_HOME_DIR" ] \\
-  && { [ -z "\${${envVar}}" ] || [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]; } \\
+	const guardsCredentials = credentialCommands.length > 0;
+	const matchCredentialCommand = guardsCredentials
+		? buildCredentialCommandMatch(credentialCommands)
+		: "";
+	const keepUnsetForCredentials = guardsCredentials
+		? ` \\
+  && { [ -n "\${${envVar}}" ] || [ -z "$superset_credential_command" ]; }`
+		: "";
+	const guardCredentialCommand = guardsCredentials
+		? buildCredentialCommandGuard(envVar, ambientEnvVar)
+		: "";
+	return `${matchCredentialCommand}if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$SUPERSET_HOME_DIR" ] \\
+  && { [ -z "\${${envVar}}" ] || [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]; }${keepUnsetForCredentials} \\
   && [ -f ${pointer} ]; then
   superset_default_account="$(cat ${pointer} 2>/dev/null)"
   if [ -n "$superset_default_account" ] && [ -d "$superset_default_account" ]; then
@@ -173,7 +195,55 @@ export function buildDefaultAccountResolver(
     ${restoreSystemDefault}
   fi
 fi
+${guardCredentialCommand}
+`;
+}
 
+/** Sets `superset_credential_command` when the arguments start with one. */
+function buildCredentialCommandMatch(commands: readonly string[]): string {
+	const pattern = commands.map((command) => `"${command}"`).join("|");
+	return `superset_command_words=""
+for superset_arg in "$@"; do
+  case "$superset_arg" in
+    -h|--help) superset_command_words=""; break ;;
+    -*) break ;;
+  esac
+  superset_command_words="\${superset_command_words:+$superset_command_words }$superset_arg"
+done
+superset_credential_command=""
+case "$superset_command_words" in
+  ${pattern}) superset_credential_command="\${0##*/} $superset_command_words" ;;
+esac
+`;
+}
+
+function buildCredentialCommandGuard(
+	envVar: string,
+	ambientEnvVar?: string,
+): string {
+	const notSystemDefault = ambientEnvVar
+		? ` && [ "\${${envVar}}" != "\${${ambientEnvVar}}" ]`
+		: "";
+	const unsetHint = `To run it without the selected account: env -u ${envVar} %s\\n`;
+	return `if [ -n "$superset_credential_command" ] && [ -n "\${${envVar}}" ] \\
+  && [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]${notSystemDefault}; then
+  if [ -t 0 ] && [ -t 2 ]; then
+    printf 'Paradev: %s will change the login in %s, the account you made the default for new agents. Continue? [y/N] ' \\
+      "$superset_credential_command" "\${${envVar}}" >&2
+    read -r superset_reply
+    case "$superset_reply" in
+      [yY]|[yY][eE][sS]) ;;
+      *)
+        printf 'Paradev: cancelled. ${unsetHint}' "$superset_credential_command" >&2
+        exit 1
+        ;;
+    esac
+  else
+    printf 'Paradev: %s would change the login in %s, the account you made the default for new agents.\\nTo use that account, confirm in a terminal or run: SUPERSET_DEFAULT_${envVar}= ${envVar}=%q %s\\n${unsetHint}' \\
+      "$superset_credential_command" "\${${envVar}}" "\${${envVar}}" "$superset_credential_command" "$superset_credential_command" >&2
+    exit 2
+  fi
+fi
 `;
 }
 
