@@ -23,7 +23,7 @@ Paradev and Buzz both put AI agents to work alongside developers, but they answe
 
 | | **Paradev** | **Buzz** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | A shared workspace (channels, threads, repos, workflows) where humans and agents collaborate |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | A shared workspace (channels, threads, repos, workflows) where humans and agents collaborate |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Collaboration platform for human-agent teams, built on Nostr |
 | **Core unit** | Workspace (worktree + terminals + review) | Community on a relay (channels, threads, git events) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Agent-agnostic via ACP/MCP (goose, Codex, Claude Code); agents hold their own Nostr keys |
@@ -37,7 +37,7 @@ Paradev and Buzz both put AI agents to work alongside developers, but they answe
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Buzz?
 
@@ -47,7 +47,7 @@ Buzz is Block's free, open-source collaboration workspace where humans and AI ag
 
 ### Coding Environment vs Team Workspace
 
-Paradev is where the coding work happens: agents run in terminals inside isolated worktrees, you watch diffs accumulate, review, and merge. Buzz is where the team coordinates: agents and humans share channels, patches land as signed events in the room, CI posts results, and the merge decision happens next to the discussion. Buzz's own framing is replacing "chat, forges, bots, CI dashboards... and a pile of glue code" with one workspace. They are less substitutes than different layers -- but if the question is which tool runs and manages your parallel coding agents day to day, that is Paradev's job, not Buzz's.
+Paradev is where the coding work happens: agents run in terminals inside separate worktrees, you watch diffs accumulate, review, and merge. Buzz is where the team coordinates: agents and humans share channels, patches land as signed events in the room, CI posts results, and the merge decision happens next to the discussion. Buzz's own framing is replacing "chat, forges, bots, CI dashboards... and a pile of glue code" with one workspace. They are less substitutes than different layers -- but if the question is which tool runs and manages your parallel coding agents day to day, that is Paradev's job, not Buzz's.
 
 ### Isolation and Parallelism
 
@@ -73,7 +73,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 **Choose Paradev if you:**
 
-- Want to run many coding agents in parallel with worktree isolation and reviewable diffs
+- Want to run many coding agents in parallel with a worktree per task and reviewable diffs
 - Need persistent terminals, an in-app browser, and a diff editor around your agents
 - Run scheduled coding automations with an SDK and Slack integration
 - Want remote hosts on your own devices and cloud workspaces
@@ -93,7 +93,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 
 ### Is Buzz a coding-agent orchestrator like Paradev?
 
-Not primarily. Buzz is a collaboration workspace -- channels, threads, repos, and workflows shared by humans and agents. It can host headless agent coding sessions, but it does not provide per-task Git worktree isolation or embedded terminal orchestration the way Paradev does.
+Not primarily. Buzz is a collaboration workspace -- channels, threads, repos, and workflows shared by humans and agents. It can host headless agent coding sessions, but it does not provide per-task Git worktrees or embedded terminal orchestration the way Paradev does.
 
 ### Is Buzz open source?
 
@@ -105,4 +105,4 @@ There is no built-in integration, but they occupy different layers: teams could 
 
 ### Does Buzz support Claude Code and Codex?
 
-Yes. Buzz is model- and harness-agnostic: agents can be powered by Claude Code, Codex, goose, or any LLM, connected over ACP with MCP-provided tools. Paradev runs those same agents as interactive terminal sessions inside isolated worktrees.
+Yes. Buzz is model- and harness-agnostic: agents can be powered by Claude Code, Codex, goose, or any LLM, connected over ACP with MCP-provided tools. Paradev runs those same agents as interactive terminal sessions inside separate worktrees.

@@ -3513,6 +3513,9 @@ msgstr "請帶上你最近做的作品連結。"
 msgid "Bring Any Agent"
 msgstr "帶上任意代理程式"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "把 Claude Code、Codex、OpenCode 或任何程式碼代理帶進同一個工作區。在不同分支上平行執行任務，並在同一處審查所有內容。"
+
 msgid "Bring over your projects"
 msgstr "遷入專案"
 
@@ -3933,9 +3936,6 @@ msgstr "更新日誌"
 msgid "Changes"
 msgstr "更改"
 
-msgid "Changes are isolated"
-msgstr "改動彼此隔離"
-
 msgid "Changes open target"
 msgstr "變更檢視開啟位置"
 
@@ -4186,8 +4186,8 @@ msgstr "CI失敗"
 msgid "Clarify this"
 msgstr "闡明這裡"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code、Codex和OpenCode是代理程式；Paradev是你同時執行它們的地方。每個任務都有自己隔離的Git worktree，十個代理程式可以同時在十個分支上工作，而你在一處監控、審查併合併。"
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code、Codex 和 OpenCode 是代理；Paradev 是你同時執行多個代理的地方。每個任務都有自己的 Git worktree 和分支，因此十個代理可以同時在十個分支上工作，而你在同一處監控、審查與合併。"
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code、Codex、Cursor、OpenCode 等。無需為每個代理程式個別設定。"
@@ -6749,8 +6749,8 @@ msgstr "描述交給代理程式的任務…"
 msgid "Describe the work to your agent"
 msgstr "向代理描述工作內容"
 
-msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
-msgstr "描述你的需求。Paradev會為該任務建立隔離的工作區和乾淨的分支。"
+msgid "Describe what you need. Paradev creates a workspace with its own worktree and branch for the task."
+msgstr "描述你的需求。Paradev 會為該任務建立一個擁有自己 worktree 和分支的工作區。"
 
 msgid "Describe what you'd like to see built…"
 msgstr "描述你希望實現的功能…"
@@ -7278,8 +7278,8 @@ msgstr "例如：我的雲端審閱"
 msgid "e.g. plan-budget"
 msgstr "例如 plan-budget"
 
-msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
-msgstr "每個代理程式都跑在自己隔離的Git worktree裡。互不覆蓋彼此的檔案。等你準備好了再審查和合併。"
+msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
+msgstr "每個代理都在自己的 Git worktree 和分支中工作，因此不會覆寫彼此的檔案。準備好後再審查並合併。"
 
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
@@ -7299,6 +7299,9 @@ msgstr "每個會話都會從中斷處繼續。"
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "每個介面都有各自的排版設定。更改會立即體現在即時預覽中。"
+
+msgid "Each task on its own branch"
+msgstr "每個任務都有自己的分支"
 
 msgid "Early 2024"
 msgstr "2024年初"
@@ -10056,9 +10059,6 @@ msgstr "已登入。"
 msgid "Is there a free plan?"
 msgstr "有免費方案嗎？"
 
-msgid "Isolation"
-msgstr "隔離"
-
 msgid "Issue"
 msgstr "議題"
 
@@ -12544,8 +12544,8 @@ msgstr "暫無工作區"
 msgid "No-Prompt Launch"
 msgstr "無提示詞啟動"
 
-msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "不是。你的代理程式保持獨立，Paradev是圍繞它們的編排層。每個任務都有隔離的Git worktree、持久會話、差異審查，以及依事件或計劃執行的自動化，工作流不繫結任何一家提供商。"
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "不是。你的代理保持獨立；Paradev 是圍繞它們的編排層。每個任務都有自己的 Git worktree 和分支、持久工作階段、差異審查，以及依事件或排程執行的自動化，而不會把工作流程綁定在單一供應商。"
 
 msgid "Nobody has joined the board yet."
 msgstr "還沒有人加入榜單。"
@@ -13866,8 +13866,8 @@ msgstr "Paradev是原始碼可見的：程式碼在GitHub上公開，採用Elast
 msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev 原始碼可見。每個拉取請求、審查和 bug 都在 GitHub 上公開。"
 
-msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Paradev是F3到F4這段過渡期的工作臺：隔離工作區裡的並行代理程式、真正管得過來的代理程式叢集，以及一套用來審查非你所寫程式碼的介面。"
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev 是從 F3 邁向 F4 的工作台：在不同分支上平行執行的代理、真正能監督的代理群，以及用來審查非你所寫程式碼的介面。"
 
 msgid "Paradev isn't on Windows yet"
 msgstr "Paradev目前僅支援Mac"

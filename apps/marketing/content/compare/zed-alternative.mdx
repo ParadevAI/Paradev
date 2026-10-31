@@ -20,7 +20,7 @@ keywords:
   - zed vs superset
 ---
 
-Zed is a fast, open-source editor written in Rust. Its Parallel Agents feature, launched April 22, 2026, runs agent threads in a sidebar: Zed's own agent, external agents over the Agent Client Protocol, or any CLI agent in a terminal thread, with optional worktree isolation. If you want isolation for every agent by default, a view of every session's status, and scheduled runs, Paradev is built for that. It runs any CLI agent in its own Git worktree and works beside Zed or any other editor.
+Zed is a fast, open-source editor written in Rust. Its Parallel Agents feature, launched April 22, 2026, runs agent threads in a sidebar: Zed's own agent, external agents over the Agent Client Protocol, or any CLI agent in a terminal thread, with optional worktree isolation. If you want a separate worktree for every agent by default, a view of every session's status, and scheduled runs, Paradev is built for that. It runs any CLI agent in its own Git worktree and works beside Zed or any other editor.
 
 **Our recommendation: choose Paradev if you want to run many agents in parallel and keep Zed as your editor.** The alternatives below cover other preferences, including editors that replace Zed.
 
@@ -41,7 +41,7 @@ Zed is a fast, open-source editor written in Rust. Its Parallel Agents feature, 
 
 ## Why Look for a Zed Alternative?
 
-- **Isolation by default.** Zed threads share your working copy unless you start one in a new worktree. At fleet scale, one missed step puts two agents in the same checkout.
+- **Worktrees by default.** Zed threads share your working copy unless you start one in a new worktree. At fleet scale, one missed step puts two agents in the same checkout.
 - **One view of every session.** You want a board that shows which agents are working, waiting, or ready for review across projects.
 - **Automation.** Zed does not document scheduled runs or an orchestration API.
 - **Extensions.** You depend on VS Code or JetBrains extensions that Zed does not have.
@@ -86,7 +86,7 @@ See [Paradev vs Orca](/compare/superset-vs-orca).
 
 ## How To Choose
 
-- To keep Zed and run many agents in isolated worktrees with a status board, choose **Paradev**.
+- To keep Zed and run many agents in separate worktrees with a status board, choose **Paradev**.
 - For an AI editor with a larger agent platform, choose **Cursor**.
 - For the biggest extension ecosystem, choose **VS Code + GitHub Copilot**.
 - If you live in JetBrains IDEs, choose **JetBrains Air**.
@@ -95,7 +95,7 @@ See [Paradev vs Orca](/compare/superset-vs-orca).
 
 ## Verdict
 
-Zed is an excellent editor, and Parallel Agents works well for a few threads. Choose Paradev when the fleet is the unit of work: every agent isolated by default, a board of every session, review per task, and scheduled runs. Paradev and Zed work well together. For the wider landscape, see [Best IDE for AI Agents](/compare/best-ide-for-ai-agents).
+Zed is an excellent editor, and Parallel Agents works well for a few threads. Choose Paradev when the fleet is the unit of work: every agent in its own worktree by default, a board of every session, review per task, and scheduled runs. Paradev and Zed work well together. For the wider landscape, see [Best IDE for AI Agents](/compare/best-ide-for-ai-agents).
 
 ## What To Try First
 
@@ -110,7 +110,7 @@ Zed is an excellent editor, and Parallel Agents works well for a few threads. Ch
 
 ### What is the best Zed alternative?
 
-If you want to replace the editor, Cursor or VS Code with Copilot are the common choices. If you want to keep Zed and run more agents with isolation by default, Paradev is our recommendation.
+If you want to replace the editor, Cursor or VS Code with Copilot are the common choices. If you want to keep Zed and run more agents with a worktree per agent by default, Paradev is our recommendation.
 
 ### Does Zed support Git worktrees for agents?
 

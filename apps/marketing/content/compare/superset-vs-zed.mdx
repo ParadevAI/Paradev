@@ -15,7 +15,7 @@ keywords:
   - run agents in parallel zed
 ---
 
-Zed added Parallel Agents in April 2026, and it is the strongest answer yet to running multiple coding agents inside an editor: a Threads Sidebar, per-thread agent choice, and optional Git worktree isolation, all in a fast open-source editor. Paradev approaches the same problem from the other side: a dedicated workspace where isolation, session persistence, fleet monitoring, and automations are the product, not a panel. Which one fits depends on whether the editor or the fleet is the center of your workflow.
+Zed added Parallel Agents in April 2026, and it is the strongest answer yet to running multiple coding agents inside an editor: a Threads Sidebar, per-thread agent choice, and optional Git worktree isolation, all in a fast open-source editor. Paradev approaches the same problem from the other side: a dedicated workspace where per-task worktrees, session persistence, fleet monitoring, and automations are the product, not a panel. Which one fits depends on whether the editor or the fleet is the center of your workflow.
 
 ---
 
@@ -35,7 +35,7 @@ Zed added Parallel Agents in April 2026, and it is the strongest answer yet to r
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Aider, Copilot, Cursor Agent, Gemini CLI, Paradev Chat, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, scheduled automations, and an MCP server for driving everything programmatically. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ![Paradev's workspace board showing a fleet of agents triaged by status: working, needs attention, needs review, and merged](/changelog/2026-08-16-workspaces-board.png)
 
@@ -49,7 +49,7 @@ Zed is a fast, open-source, Rust-based editor, and Parallel Agents (launched Apr
 
 ## Key Differences
 
-### Isolation by Default vs Isolation on Request
+### Worktrees by Default vs Worktrees on Request
 
 This is the biggest practical difference. New local branch-based Paradev workspaces get separate worktrees and branches. That separates working files but does not prevent merge conflicts or shared-service interference. In Zed, threads share your working copy unless you deliberately start one in a new worktree, and Zed's own docs advise isolating threads that might touch the same files. Opt-in isolation is flexible for quick edits, but at fleet scale the discipline burden shifts to you: forget once, and two agents are editing the same checkout.
 
@@ -81,7 +81,7 @@ Both are free to start. Zed's Personal plan is free forever, with paid tiers ($1
 
 **Choose Paradev if you:**
 
-- Run enough concurrent agents that isolation must be automatic, not remembered
+- Run enough concurrent agents that worktrees must be automatic, not remembered
 - Want fleet-level monitoring, per-task review, and worktree lifecycle handled for you
 - Need scheduled automations or programmatic control (MCP, CLI, SDK)
 - Prefer to review in Paradev or hand off to the editor you already use
@@ -93,7 +93,7 @@ Both are free to start. Zed's Personal plan is free forever, with paid tiers ($1
 - Run a few threads at a time and are happy managing worktrees per thread yourself
 - Want hunk-level in-buffer review as your primary flow
 
-**Verdict:** Zed built the best editor-native version of parallel agents, and if the editor is your center of gravity it is an easy recommendation. Paradev is the better fit when parallel agents stop being a feature you use inside the editor and become the workflow itself: always-isolated tasks, a monitored fleet, scheduled runs, and orchestration other software can drive. The two also pair: Zed for the hands-on thread, Paradev for the fleet.
+**Verdict:** Zed built the best editor-native version of parallel agents, and if the editor is your center of gravity it is an easy recommendation. Paradev is the better fit when parallel agents stop being a feature you use inside the editor and become the workflow itself: a worktree for every task, a monitored fleet, scheduled runs, and orchestration other software can drive. The two also pair: Zed for the hands-on thread, Paradev for the fleet.
 
 ---
 

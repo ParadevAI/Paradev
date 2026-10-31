@@ -3513,6 +3513,9 @@ msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần
 msgid "Bring Any Agent"
 msgstr "Mang mọi agent về đây"
 
+msgid "Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Đưa Claude Code, Codex, OpenCode hoặc bất kỳ agent lập trình nào vào một workspace. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
+
 msgid "Bring over your projects"
 msgstr "Nhập các dự án của bạn"
 
@@ -3933,9 +3936,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Thay đổi"
 
-msgid "Changes are isolated"
-msgstr "Thay đổi được tách biệt"
-
 msgid "Changes open target"
 msgstr "Vị trí mở thay đổi"
 
@@ -4186,8 +4186,8 @@ msgstr "CI thất bại"
 msgid "Clarify this"
 msgstr "Làm rõ điều này"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex và OpenCode là các agent; Paradev là nơi bạn chạy nhiều agent cùng lúc. Mỗi tác vụ có git worktree tách biệt riêng, nên mười agent có thể làm trên mười nhánh đồng thời trong khi bạn theo dõi, review và merge từ một chỗ."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex và OpenCode là các agent; Paradev là nơi bạn chạy nhiều agent cùng lúc. Mỗi tác vụ có Git worktree và nhánh riêng, nên mười agent có thể làm việc trên mười nhánh cùng lúc trong khi bạn theo dõi, xem xét và hợp nhất từ một nơi."
 
 msgid "Claude Code, Codex, Cursor, OpenCode and more. No setup per agent."
 msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều hơn nữa. Không cần cài đặt riêng cho từng agent."
@@ -6749,8 +6749,8 @@ msgstr "Mô tả tác vụ cho agent…"
 msgid "Describe the work to your agent"
 msgstr "Mô tả công việc cho tác tử của bạn"
 
-msgid "Describe what you need. Paradev creates an isolated workspace and clean branch for the task."
-msgstr "Mô tả điều bạn cần. Paradev tạo một workspace tách biệt và một nhánh sạch cho tác vụ đó."
+msgid "Describe what you need. Paradev creates a workspace with its own worktree and branch for the task."
+msgstr "Mô tả những gì bạn cần. Paradev tạo cho tác vụ một workspace có worktree và nhánh riêng."
 
 msgid "Describe what you'd like to see built…"
 msgstr "Mô tả điều bạn muốn được xây dựng…"
@@ -7278,8 +7278,8 @@ msgstr "vd: Đánh giá cloud của tôi"
 msgid "e.g. plan-budget"
 msgstr "vd: plan-budget"
 
-msgid "Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready."
-msgstr "Mỗi agent chạy trong git worktree tách biệt của riêng nó. Không ai ghi đè tệp của nhau. Review và merge khi bạn sẵn sàng."
+msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
+msgstr "Mỗi agent làm việc trong Git worktree và nhánh riêng, nên các agent không ghi đè tệp của nhau. Xem xét và hợp nhất công việc khi bạn sẵn sàng."
 
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
@@ -7299,6 +7299,9 @@ msgstr "Mỗi phiên sẽ tiếp tục từ chỗ đang dở."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay trong phần xem trước trực tiếp."
+
+msgid "Each task on its own branch"
+msgstr "Mỗi tác vụ trên nhánh riêng"
 
 msgid "Early 2024"
 msgstr "Đầu 2024"
@@ -10056,9 +10059,6 @@ msgstr "đã đăng nhập."
 msgid "Is there a free plan?"
 msgstr "Có gói miễn phí không?"
 
-msgid "Isolation"
-msgstr "Tách biệt"
-
 msgid "Issue"
 msgstr "Issue"
 
@@ -12544,8 +12544,8 @@ msgstr "Chưa có workspace nào"
 msgid "No-Prompt Launch"
 msgstr "Khởi chạy không prompt"
 
-msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
-msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có git worktree tách biệt, phiên bền vững, review diff và các automation chạy theo sự kiện hoặc theo lịch mà không trói quy trình vào một nhà cung cấp."
+msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
+msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có Git worktree và nhánh riêng, phiên làm việc lâu dài, xem xét diff và các tự động hóa chạy theo sự kiện hoặc theo lịch, mà không ràng buộc quy trình vào một nhà cung cấp."
 
 msgid "Nobody has joined the board yet."
 msgstr "Chưa ai tham gia bảng xếp hạng."
@@ -13866,8 +13866,8 @@ msgstr "Paradev là source-available: mã nguồn công khai trên GitHub theo E
 msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev là source-available. Mọi pull request, review và bug đều công khai trên GitHub."
 
-msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
-msgstr "Paradev là bàn làm việc cho bước chuyển F3 sang F4: agent chạy song song trong các workspace tách biệt, đội agent bạn thực sự giám sát được, và một nơi để review code bạn không viết."
+msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents on separate branches, fleets you can actually supervise, and a review surface for code you did not write."
+msgstr "Paradev là bàn làm việc cho bước chuyển từ F3 sang F4: các agent chạy song song trên các nhánh riêng, những đội agent bạn thực sự giám sát được, và một giao diện xem xét cho mã bạn không tự viết."
 
 msgid "Paradev isn't on Windows yet"
 msgstr "Hiện Paradev chỉ có trên Mac"

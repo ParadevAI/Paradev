@@ -25,7 +25,7 @@ Note: Crystal's repository says it was deprecated in February 2026 and replaced 
 
 | | **Paradev** | **Crystal (now Nimbalyst)** |
 |---|---|---|
-| **What it does** | Runs multiple agents in parallel with Git worktree isolation, review, browser, and automation | Runs Claude Code and Codex sessions in parallel Git worktrees with review and Git ops |
+| **What it does** | Runs multiple agents in parallel in separate Git worktrees, with review, browser, and automation | Runs Claude Code and Codex sessions in parallel Git worktrees with review and Git ops |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Gemini, Mistral Vibe, and more) | Claude Code and Codex |
 | **Isolation** | Git worktrees for local branch-based workspaces | Git worktree per session |
 | **Review tooling** | Built-in diff/file editor; commit, push, and open PRs; PR pane with checks and review threads | In-app diff review, per-iteration commits, rebase/squash/merge |
@@ -38,7 +38,7 @@ Note: Crystal's repository says it was deprecated in February 2026 and replaced 
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces and can schedule agent sessions as automations. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Crystal?
 
@@ -97,7 +97,7 @@ Crystal has been renamed and its maintainers now direct active development to Ni
 
 ### Do both use Git worktrees?
 
-Yes. Both give each session its own Git worktree, branch, and working directory. The isolation model is the same; the products differ in agent breadth and surrounding features.
+Yes. Both give each session its own Git worktree, branch, and working directory. The worktree model is the same; the products differ in agent breadth and surrounding features.
 
 ### Can Crystal run agents other than Claude Code and Codex?
 

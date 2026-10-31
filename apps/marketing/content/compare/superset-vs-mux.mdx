@@ -15,7 +15,7 @@ keywords:
   - ai agent workspace
 ---
 
-Paradev and Mux (by Coder, the company behind the self-hosted dev-environment platform) both run parallel agent sessions in isolated workspaces from a desktop app. The structural difference decides everything downstream: Paradev orchestrates the agents you already use -- Claude Code, Codex, OpenCode, any CLI -- while Mux ships its own agent loop that talks to model APIs directly. That makes Mux a coding agent with a multiplexer around it, and Paradev a multiplexer for every agent, including the ones your team already pays for.
+Paradev and Mux (by Coder, the company behind the self-hosted dev-environment platform) both run parallel agent sessions in separate workspaces from a desktop app. The structural difference decides everything downstream: Paradev orchestrates the agents you already use -- Claude Code, Codex, OpenCode, any CLI -- while Mux ships its own agent loop that talks to model APIs directly. That makes Mux a coding agent with a multiplexer around it, and Paradev a multiplexer for every agent, including the ones your team already pays for.
 
 ---
 
@@ -23,7 +23,7 @@ Paradev and Mux (by Coder, the company behind the self-hosted dev-environment pl
 
 | | **Paradev** | **Mux** |
 |---|---|---|
-| **What it does** | Runs multiple AI agents in parallel with Git worktree isolation, chat, review, and browser | Plans and executes tasks with parallel sessions of its own agent loop |
+| **What it does** | Runs multiple AI agents in parallel in separate Git worktrees, with chat, review, and browser | Plans and executes tasks with parallel sessions of its own agent loop |
 | **Category** | Local-first agent workspace with remote/cloud hosts | Open-source "coding agent multiplexer" (desktop + self-hosted server) |
 | **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | Its own agent loop only (BYO API keys: Anthropic, OpenAI, xAI, Ollama, OpenRouter) |
 | **Subscriptions** | Reuses your Claude Max / ChatGPT plans via vendor CLIs | API-key billing (plus subsidized Mux Gateway credits) |
@@ -37,7 +37,7 @@ Paradev and Mux (by Coder, the company behind the self-hosted dev-environment pl
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs on your other machines through Remote Access and in cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
 
 ## What Is Mux?
 
@@ -85,7 +85,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 - Need dollar-budgeted headless runs and durable JS workflows
 - Want AGPL open source with a self-hosted browser/mobile-web server
 
-**Verdict:** Mux is a thoughtful, well-engineered take -- but it is structurally an agent with a multiplexer, and adopting it means adopting its loop and its billing. Paradev is the multiplexer for the agents you already trust, with the workspace, automations, and team surfaces to make a fleet of them a daily workflow. If Coder-style self-hosted governance or container isolation is the requirement, evaluate Mux; otherwise Paradev preserves your agent choices and your subscriptions.
+**Verdict:** Mux is a thoughtful, well-engineered take -- but it is structurally an agent with a multiplexer, and adopting it means adopting its loop and its billing. Paradev is the workspace for the agents you already trust, with automations and team surfaces to make a fleet of them a daily workflow. If Coder-style self-hosted governance or container isolation is the requirement, evaluate Mux; otherwise Paradev preserves your agent choices and your subscriptions.
 
 ---
 

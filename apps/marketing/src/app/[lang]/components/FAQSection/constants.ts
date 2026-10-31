@@ -21,7 +21,7 @@ export const FAQ_ITEMS: FAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own isolated Git worktree, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place.",
+				"Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place.",
 		}),
 		link: {
 			href: "/compare",
@@ -113,7 +113,7 @@ export const FAQ_ITEMS: FAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets an isolated Git worktree, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider.",
+				"No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider.",
 		}),
 	},
 ];
