@@ -105,16 +105,26 @@ export async function processDelivery({
 	// Caught per connection, and the loop runs to the end regardless: one
 	// organization's broken token or missing workflow state must not cost the
 	// other sixteen their delivery.
+	const leadByOrganization = new Map<string, string>();
+	for (const connection of subscribers) {
+		if (!leadByOrganization.has(connection.organizationId)) {
+			leadByOrganization.set(connection.organizationId, connection.id);
+		}
+	}
+	const leadIds = new Set(leadByOrganization.values());
 	const results: ConnectionResult[] = [];
 	for (const connection of subscribers) {
 		results.push(
-			await processForConnection(payload, deliveryId, connection).catch(
-				(error) => ({
-					connectionId: connection.id,
-					outcome: "failed" as const,
-					error: errorMessage(error),
-				}),
-			),
+			await processForConnection(
+				payload,
+				deliveryId,
+				connection,
+				leadIds.has(connection.id),
+			).catch((error) => ({
+				connectionId: connection.id,
+				outcome: "failed" as const,
+				error: errorMessage(error),
+			})),
 		);
 	}
 
@@ -130,6 +140,7 @@ async function processForConnection(
 	payload: LinearWebhookPayload,
 	deliveryId: string | null,
 	connection: SelectConnection,
+	leadsOrganization: boolean,
 ): Promise<ConnectionResult> {
 	// One webhookEvents row per (Linear event × Superset connection) so each
 	// tenant's processing status is independently retryable, and so a retried
@@ -163,7 +174,13 @@ async function processForConnection(
 
 	if (isEntityDelivery(payload)) {
 		try {
-			await ingest(payload, deliveryId, connection, webhookEvent.id);
+			await ingest(
+				payload,
+				deliveryId,
+				connection,
+				leadsOrganization,
+				webhookEvent.id,
+			);
 		} catch (error) {
 			console.error(
 				"[linear/process-delivery] automation event failed:",
@@ -204,6 +221,7 @@ async function ingest(
 	delivery: LinearDelivery,
 	deliveryHeader: string | null,
 	connection: SelectConnection,
+	leadsOrganization: boolean,
 	webhookEventId: string,
 ): Promise<void> {
 	const event = matchableFrom(delivery);
@@ -224,6 +242,7 @@ async function ingest(
 			event,
 			deliveryId,
 			connection,
+			leadsOrganization,
 			webhookEventId,
 		}),
 	);

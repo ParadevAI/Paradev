@@ -58,6 +58,7 @@ const ingestCalls: Array<{
 	connectionId: string | null;
 	externalEventId: string;
 	ownerUserId: string | null;
+	pinnedOnly: boolean;
 }> = [];
 stub(automationEvent, {
 	ingestAutomationEvent: mock(async (_db: unknown, delivery: never) => {
@@ -67,13 +68,14 @@ stub(automationEvent, {
 				integrationConnectionId: string | null;
 				externalEventId: string;
 			};
-			dispatch?: { ownerUserId?: string } | null;
+			dispatch?: { ownerUserId?: string; pinnedOnly?: boolean } | null;
 		};
 		if (d.skip) return { status: "skipped", reason: d.skip };
 		ingestCalls.push({
 			connectionId: d.event?.integrationConnectionId ?? null,
 			externalEventId: d.event?.externalEventId ?? "",
 			ownerUserId: d.dispatch?.ownerUserId ?? null,
+			pinnedOnly: d.dispatch?.pinnedOnly ?? false,
 		});
 		return { status: "dispatched", eventId: "e" };
 	}),
@@ -118,8 +120,22 @@ describe("one Linear delivery, two connections in the same organization", () => 
 		expect(ids.size).toBe(1);
 	});
 
-	test("narrows each dispatch to the member who owns that connection", async () => {
+	test("only the first connection fires unpinned triggers", async () => {
 		await processDelivery({ payload: DELIVERY, deliveryId: "delivery-1" });
-		expect(ingestCalls.map((c) => c.ownerUserId)).toEqual(["user-a", "user-b"]);
+		expect(ingestCalls.map((c) => c.pinnedOnly)).toEqual([false, true]);
+	});
+
+	test("never narrows to the member who connected", async () => {
+		await processDelivery({ payload: DELIVERY, deliveryId: "delivery-1" });
+		expect(ingestCalls.map((c) => c.ownerUserId)).toEqual([null, null]);
+	});
+
+	test("each organization has its own lead connection", async () => {
+		subscribers = [
+			connection("conn-a", "user-a"),
+			{ ...connection("conn-b", "user-b"), organizationId: "org-2" },
+		];
+		await processDelivery({ payload: DELIVERY, deliveryId: "delivery-1" });
+		expect(ingestCalls.map((c) => c.pinnedOnly)).toEqual([false, false]);
 	});
 });

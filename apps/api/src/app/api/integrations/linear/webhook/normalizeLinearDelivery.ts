@@ -91,8 +91,13 @@ export function normalizeLinearDelivery(params: {
 	connection: {
 		id: string;
 		organizationId: string;
-		connectedByUserId: string;
 	};
+	/**
+	 * One delivery is recorded once per connection, and each Superset
+	 * organization has one lead connection that also fires unpinned triggers.
+	 * The others fire only the triggers pinned to them, so a trigger runs once.
+	 */
+	leadsOrganization: boolean;
 	webhookEventId: string;
 }): NormalizedDelivery {
 	const { delivery, event, connection } = params;
@@ -110,6 +115,8 @@ export function normalizeLinearDelivery(params: {
 			payload: delivery,
 			webhookEventId: params.webhookEventId,
 		},
-		dispatch: { event, ownerUserId: connection.connectedByUserId },
+		dispatch: params.leadsOrganization
+			? { event }
+			: { event, pinnedOnly: true },
 	};
 }

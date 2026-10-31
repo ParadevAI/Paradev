@@ -62,6 +62,8 @@ export async function dispatchMatchingTriggers(params: {
 	 */
 	ownerUserId?: string;
 	integrationConnectionId?: string | null;
+	/** Only triggers pinned to `integrationConnectionId`; see `AutomationEventDispatchInput`. */
+	pinnedOnly?: boolean;
 }): Promise<{ matched: number; considered: number }> {
 	const { event } = params;
 
@@ -104,13 +106,18 @@ export async function dispatchMatchingTriggers(params: {
 					? eq(automations.ownerUserId, params.ownerUserId)
 					: undefined,
 				params.integrationConnectionId
-					? or(
-							isNull(automationTriggers.connectionId),
-							eq(
+					? params.pinnedOnly
+						? eq(
 								automationTriggers.connectionId,
 								params.integrationConnectionId,
-							),
-						)
+							)
+						: or(
+								isNull(automationTriggers.connectionId),
+								eq(
+									automationTriggers.connectionId,
+									params.integrationConnectionId,
+								),
+							)
 					: isNull(automationTriggers.connectionId),
 			),
 		);
