@@ -1730,6 +1730,9 @@ export const automations = pgTable(
 		// clearing the set in the editor is the opt-out.
 		tags: jsonb().$type<string[]>().notNull().default(["automation"]),
 
+		// Groups the automation in the automations list. Null = ungrouped.
+		group: text("group_name"),
+
 		// Deliver each run's prompt into the agent session the previous run
 		// left behind, rather than starting another beside it. Needs a pinned
 		// v2WorkspaceId or cloudWorkspaceId — that is where the session lives.

@@ -1268,6 +1268,13 @@
       "when": 1793475236973,
       "tag": "0180_dynamic_client_scopes",
       "breakpoints": true
+    },
+    {
+      "idx": 181,
+      "version": "7",
+      "when": 1793484147154,
+      "tag": "0181_automation_group",
+      "breakpoints": true
     }
   ]
 }
