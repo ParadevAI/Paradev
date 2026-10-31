@@ -51,6 +51,14 @@ export function safeRedirectUrl(
 	return url;
 }
 
+export function isAgentsRoute(pathname: string): boolean {
+	return matchesRouteOrChild(pathname, "/agents");
+}
+
+export function agentsRewriteUrl(url: URL, agentsUrl: string): URL {
+	return new URL(`${url.pathname}${url.search}`, agentsUrl);
+}
+
 export function isInternalRoute(pathname: string): boolean {
 	return internalRoutes.some((route) => matchesRouteOrChild(pathname, route));
 }

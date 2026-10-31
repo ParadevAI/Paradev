@@ -15,6 +15,10 @@ browser ── app.superset.sh/agents/* ── apps/web rewrite ──> AGENTS_U
 - **Headers.** apps/web sets the headers for `/agents/*` (`next.config.ts`): its own CSP, and
   `microphone=(self)` for voice and dictation. The dashboard's CSP does not change. The static
   deployment sets no CSP of its own.
+- **Two rewrites.** Next does not add `headers()` to a response it proxies from a `next.config`
+  rewrite to another origin, so pages under `/agents` are rewritten in `src/proxy.ts`, after the
+  sign-in check, where the headers do apply. The `next.config` rewrite carries the scripts, styles
+  and fonts, which the proxy's matcher skips and which need no CSP.
 - **Analytics.** Under a base path the web build sends PostHog through the dashboard's `/ingest`
   proxy (`apps/mobile/lib/posthog/utils/posthogHost`).
 - **Native builds do not change.** `MOBILE_WEB_BASE_URL` sets expo-router's `baseUrl` only

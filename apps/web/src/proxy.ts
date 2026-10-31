@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
+	agentsRewriteUrl,
+	isAgentsRoute,
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
@@ -75,6 +77,12 @@ export default async function proxy(req: NextRequest) {
 		!isStaffEmail(session.user.email)
 	) {
 		return NextResponse.redirect(new URL("/", req.url));
+	}
+
+	// next.config's rewrite proxies /agents without the headers() CSP; a rewrite from here keeps it.
+	const agentsUrl = process.env.AGENTS_URL;
+	if (agentsUrl && isAgentsRoute(pathname)) {
+		return NextResponse.rewrite(agentsRewriteUrl(req.nextUrl, agentsUrl));
 	}
 
 	return NextResponse.next();

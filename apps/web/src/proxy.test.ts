@@ -157,3 +157,34 @@ describe("proxy: signed-in visits to auth pages", () => {
 		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
 	});
 });
+
+describe("proxy: /agents", () => {
+	it("sends a signed-out visitor to sign-in with a redirect back", async () => {
+		const res = await callProxy("https://app.superset.sh/agents/workspace/abc");
+
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toBe(
+			"https://app.superset.sh/sign-in?redirect=%2Fagents%2Fworkspace%2Fabc",
+		);
+	});
+
+	it("rewrites a signed-in request to the agents deployment", async () => {
+		const previous = process.env.AGENTS_URL;
+		process.env.AGENTS_URL = "https://superset-agents.vercel.app";
+		try {
+			const res = await callProxy(
+				"https://app.superset.sh/agents/workspace/abc",
+				{
+					auth: "Bearer valid-token",
+				},
+			);
+
+			expect(res.headers.get("x-middleware-rewrite")).toBe(
+				"https://superset-agents.vercel.app/agents/workspace/abc",
+			);
+		} finally {
+			if (previous === undefined) delete process.env.AGENTS_URL;
+			else process.env.AGENTS_URL = previous;
+		}
+	});
+});
