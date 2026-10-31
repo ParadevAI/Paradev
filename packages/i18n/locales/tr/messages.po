@@ -1680,6 +1680,9 @@ msgstr "Bir manifest ve birkaç beceri dosyası. Paradev onu her ajanın baktı�
 msgid "a message from {authorName}"
 msgstr "{authorName} kişisinden bir mesaj"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev'in yeni bir sürümü çıktı. Devam etmek için yeniden yükleyin."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Devam etmek için Paradev'in yeni bir sürümü gerekiyor. Lütfen en son sürüme güncelleyin."
 
@@ -1939,6 +1942,9 @@ msgstr "Başka bir hesap bağla ya da artık kullanmadığın birini kaldır."
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Herhangi bir makineyi host olarak ekleyin. Dizüstünüz uykuya geçtiğinde çalışma alanları çalışmaya devam eder ve nerede olursanız olun durumu kontrol edebilirsiniz."
+
+msgid "Add attachment"
+msgstr "Ek ekle"
 
 msgid "Add Attachment"
 msgstr "Ek ekle"
@@ -2463,6 +2469,9 @@ msgstr "Röle üzerinden erişime izin verin"
 
 msgid "Allow for session"
 msgstr "Oturum boyunca izin ver"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Dikte için Ayarlar’dan mikrofon erişimine izin verin."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Sesle yazmak için mikrofon erişimine izin verin"
@@ -3702,6 +3711,9 @@ msgstr "Takvim"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Bu kuruluştaki Calendar ve Gmail tetikleyicileri, yeniden bir hesap bağlanana kadar tetiklenmeyi durdurur."
+
+msgid "Camera"
+msgstr "Kamera"
 
 msgid "Camera access is not allowed"
 msgstr "Kamera erişimine izin verilmiyor"
@@ -5538,6 +5550,9 @@ msgstr "Bağlantı açılamadı"
 msgid "Could not open Photos"
 msgstr "Fotoğraflar açılamadı"
 
+msgid "Could not open this file"
+msgstr "Bu dosya açılamadı"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "Ödeme başlatılamadı. Lütfen tekrar deneyin."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Bulut çalışma alanı sağlama işlemi başlatılamadı"
+
+msgid "Could not start dictation"
+msgstr "Dikte başlatılamadı"
 
 msgid "Could not start session"
 msgstr "Oturum başlatılamadı"
@@ -6863,11 +6881,20 @@ msgstr "Sesle yaz"
 msgid "Dictation"
 msgstr "Sesle yazma"
 
+msgid "Dictation is not available in this language."
+msgstr "Dikte bu dilde kullanılamıyor."
+
 msgid "Dictation is not available on this device"
 msgstr "Bu cihazda sesle yazma kullanılamıyor"
 
 msgid "Dictation is not available right now"
 msgstr "Sesle yazma şu anda kullanılamıyor"
+
+msgid "Dictation needs a network connection."
+msgstr "Dikte için ağ bağlantısı gerekir."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dikte durdu. Şimdiye kadar duyulanlar mesajınızda."
 
 msgid "Didn't hear back"
 msgstr "Yanıt alınamadı"
@@ -12801,6 +12828,9 @@ msgstr "Çevrimdışı"
 msgid "Offline / local-first mode"
 msgstr "Çevrimdışı / yerel öncelikli mod"
 
+msgid "OK"
+msgstr "Tamam"
+
 msgid "Older"
 msgstr "Daha eski"
 
@@ -14003,6 +14033,9 @@ msgstr "Yapıştır"
 msgid "Paste a link"
 msgstr "Bağlantı yapıştır"
 
+msgid "Paste attachment"
+msgstr "Eki yapıştır"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Bunu Paradev CLI'ye yapıştırın:"
 
@@ -14131,6 +14164,9 @@ msgstr "Hayalet Forklift"
 
 msgid "Phone number"
 msgstr "Telefon numarası"
+
+msgid "Photos"
+msgstr "Fotoğraflar"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Uygulamak için tema ızgarasından {name} temasını seçin."
@@ -20318,6 +20354,12 @@ msgstr "Adlandırma yönergelerini güncelle"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0} için adlandırma yönergelerini güncelle"
+
+msgid "Update on Google Play"
+msgstr "Google Play'den güncelle"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Devam etmek için Paradev'i Google Play'den güncelleyin."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Paradev’i o cihazda güncelleyin. Uygulama içinden güncelleme için desteklenen bağımsız bir kurulum ve yayımlanmış bir uygulama sürümü gerekir."

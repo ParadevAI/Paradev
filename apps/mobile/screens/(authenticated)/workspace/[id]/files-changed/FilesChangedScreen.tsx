@@ -30,6 +30,7 @@ import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	anchorOf,
@@ -665,15 +666,15 @@ export function FilesChangedScreen() {
 						)}
 					</View>
 				</Stack.Title>
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({
 							message: "More actions",
 						})}
 					>
-						<Stack.Toolbar.MenuAction
-							icon="square.and.arrow.up"
+						<HeaderToolbar.MenuAction
+							icon="share"
 							onPress={() => {
 								if (shareUrl)
 									void Share.share(
@@ -683,19 +684,19 @@ export function FilesChangedScreen() {
 							}}
 						>
 							{t({ message: "Share" })}
-						</Stack.Toolbar.MenuAction>
+						</HeaderToolbar.MenuAction>
 						{pullRequest ? (
-							<Stack.Toolbar.MenuAction
-								icon="arrow.up.right.square"
+							<HeaderToolbar.MenuAction
+								icon="openExternal"
 								onPress={() => void Linking.openURL(pullRequest.url)}
 							>
 								{t({
 									message: "Open on GitHub",
 								})}
-							</Stack.Toolbar.MenuAction>
+							</HeaderToolbar.MenuAction>
 						) : null}
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			</Stack.Screen>
 			<CharWidthProbe onMeasure={setCharWidth} />
 			<SafeAreaView

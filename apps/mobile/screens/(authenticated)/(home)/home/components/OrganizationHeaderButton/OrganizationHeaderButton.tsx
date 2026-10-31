@@ -1,6 +1,6 @@
-import { Stack } from "expo-router";
 import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
 
 export function OrganizationHeaderButton({
@@ -18,8 +18,8 @@ export function OrganizationHeaderButton({
 	// guess is wrong for everyone who belongs to more than one.
 	if (isLoading) return null;
 	return (
-		<Stack.Toolbar placement="left">
-			<Stack.Toolbar.View>
+		<HeaderToolbar placement="left">
+			<HeaderToolbar.View>
 				<Pressable
 					onPress={onPress}
 					className="flex-row items-center gap-2 py-1.5 pl-1.5 pr-3.5"
@@ -29,7 +29,7 @@ export function OrganizationHeaderButton({
 						{name ?? "Organization"}
 					</Text>
 				</Pressable>
-			</Stack.Toolbar.View>
-		</Stack.Toolbar>
+			</HeaderToolbar.View>
+		</HeaderToolbar>
 	);
 }

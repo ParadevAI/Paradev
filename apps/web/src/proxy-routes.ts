@@ -15,6 +15,7 @@ const otherPublicRoutes = [
 	"/page",
 	"/robots.txt",
 	"/.well-known/apple-app-site-association",
+	"/.well-known/assetlinks.json",
 ] as const;
 
 const publicRoutes = [...authPageRoutes, ...otherPublicRoutes] as const;

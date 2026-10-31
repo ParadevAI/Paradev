@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SquareTerminal } from "lucide-react-native";
 import { Image, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +13,7 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useTheme } from "@/hooks/useTheme";
 import { agentIconSource } from "@/lib/agent-icons";
 import { hostServiceUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
@@ -140,9 +141,9 @@ export function AgentPickerScreen() {
 				paddingBottom: insets.bottom + 8,
 			}}
 		>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+			</HeaderToolbar>
 			{isLoading ? (
 				<View className="items-center py-8">
 					<Spinner />

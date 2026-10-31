@@ -33,7 +33,6 @@ export function useGeneralAccess({
 			label: t({ message: "Only people invited" }),
 			description: t({ message: "Only the people listed above can open it" }),
 			icon: Lock,
-			systemImage: "lock",
 		},
 		org: {
 			value: "org",
@@ -42,7 +41,6 @@ export function useGeneralAccess({
 				message: `Anyone in ${organizationName} with the link can open it`,
 			}),
 			icon: Building2,
-			systemImage: "building.2",
 			organization: { name: organizationName, logo: organizationLogo },
 		},
 		everyone: {
@@ -52,7 +50,6 @@ export function useGeneralAccess({
 				message: "Anyone with the link can view it, signed in or not",
 			}),
 			icon: Globe,
-			systemImage: "globe",
 		},
 	};
 

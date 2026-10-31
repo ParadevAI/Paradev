@@ -1680,6 +1680,9 @@ msgstr "一个清单文件加几个技能文件。Paradev 会把它放到每个�
 msgid "a message from {authorName}"
 msgstr "来自 {authorName} 的消息"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 已有新版本。请重新加载以继续。"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "需要新版本的Paradev才能继续。请更新到最新版本。"
 
@@ -1939,6 +1942,9 @@ msgstr "连接其他账号，或断开不再使用的账号。"
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "把任意机器添加为主机。笔记本休眠时工作区照常运行，你在哪儿都能查看进展。"
+
+msgid "Add attachment"
+msgstr "添加附件"
 
 msgid "Add Attachment"
 msgstr "添加附件"
@@ -2463,6 +2469,9 @@ msgstr "允许通过中继访问"
 
 msgid "Allow for session"
 msgstr "本次会话内允许"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "请在“设置”中允许访问麦克风以使用听写。"
 
 msgid "Allow microphone access to use dictation"
 msgstr "请允许麦克风访问以使用语音输入"
@@ -3702,6 +3711,9 @@ msgstr "日历"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "在重新连接账户之前，此组织中的日历和Gmail触发器将停止触发。"
+
+msgid "Camera"
+msgstr "相机"
 
 msgid "Camera access is not allowed"
 msgstr "相机访问未获允许"
@@ -5538,6 +5550,9 @@ msgstr "无法打开链接"
 msgid "Could not open Photos"
 msgstr "无法打开“照片”"
 
+msgid "Could not open this file"
+msgstr "无法打开此文件"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "无法开始结账，请重试。"
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "无法开始配置云端工作区"
+
+msgid "Could not start dictation"
+msgstr "无法启动听写"
 
 msgid "Could not start session"
 msgstr "无法启动会话"
@@ -6863,11 +6881,20 @@ msgstr "语音输入"
 msgid "Dictation"
 msgstr "语音输入"
 
+msgid "Dictation is not available in this language."
+msgstr "此语言不支持听写。"
+
 msgid "Dictation is not available on this device"
 msgstr "此设备不支持语音输入"
 
 msgid "Dictation is not available right now"
 msgstr "语音输入暂时不可用"
+
+msgid "Dictation needs a network connection."
+msgstr "听写需要网络连接。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "听写已停止。目前听到的内容已在消息中。"
 
 msgid "Didn't hear back"
 msgstr "未收到响应"
@@ -12801,6 +12828,9 @@ msgstr "离线"
 msgid "Offline / local-first mode"
 msgstr "离线/本地优先模式"
 
+msgid "OK"
+msgstr "确定"
+
 msgid "Older"
 msgstr "更早"
 
@@ -14003,6 +14033,9 @@ msgstr "粘贴"
 msgid "Paste a link"
 msgstr "粘贴链接"
 
+msgid "Paste attachment"
+msgstr "粘贴附件"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "把它粘贴到Paradev CLI："
 
@@ -14131,6 +14164,9 @@ msgstr "幽灵叉车"
 
 msgid "Phone number"
 msgstr "电话号码"
+
+msgid "Photos"
+msgstr "照片"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "在主题网格中选择{name}即可应用。"
@@ -20318,6 +20354,12 @@ msgstr "更新命名规则"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名规则"
+
+msgid "Update on Google Play"
+msgstr "在 Google Play 中更新"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "请从 Google Play 更新 Paradev 以继续。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "请在该设备上更新 Paradev。应用内更新需要受支持的独立安装和已发布的应用版本。"

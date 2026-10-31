@@ -3,6 +3,7 @@ import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import type { PullRequestCheck } from "../../../../utils/pullRequest";
 import { CheckRow } from "../CheckRow";
 import { ChecksFilter } from "./components/ChecksFilter";
@@ -41,25 +42,25 @@ export function ChecksSheet({
 					headerTitle: t({ message: "Checks" }),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			{counts.failed > 0 && onFixAll ? (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Button
 						accessibilityLabel={t({
 							message: "Fix all failing checks",
 						})}
-						icon="wrench.and.screwdriver"
+						icon="fix"
 						onPress={onFixAll}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			) : null}
 			<ScrollView
 				className="bg-background flex-1"

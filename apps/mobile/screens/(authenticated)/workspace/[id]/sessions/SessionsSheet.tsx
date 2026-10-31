@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
@@ -9,6 +9,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	getHostTerminalsQueryKey,
@@ -127,18 +128,18 @@ export function SessionsSheet() {
 	// formSheet's cold mount (same trap CommitsSheet hit).
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
-					icon="plus"
+			</HeaderToolbar>
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
+					icon="add"
 					accessibilityLabel={t({
 						message: "New session",
 					})}
@@ -146,7 +147,7 @@ export function SessionsSheet() {
 						router.replace(`/(authenticated)/workspace/${id}/new-session`)
 					}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<SessionList
 				rows={rows}
 				activeTerminalId={params.active ?? null}

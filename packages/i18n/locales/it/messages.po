@@ -1680,6 +1680,9 @@ msgstr "Un manifest e qualche file di skill. Paradev lo mette dove ogni agente l
 msgid "a message from {authorName}"
 msgstr "un messaggio da {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "È disponibile una nuova versione di Paradev. Ricarica per continuare."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Per continuare è necessaria una nuova versione di Paradev. Aggiorna all'ultima versione."
 
@@ -1939,6 +1942,9 @@ msgstr "Collega un altro account o scollega quello che non usi più."
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Aggiungi qualsiasi macchina come host. I workspace continuano a girare quando il tuo portatile va in stop e puoi controllarli da dove sei."
+
+msgid "Add attachment"
+msgstr "Aggiungi un allegato"
 
 msgid "Add Attachment"
 msgstr "Aggiungi allegato"
@@ -2463,6 +2469,9 @@ msgstr "Consenti l'accesso tramite il relay"
 
 msgid "Allow for session"
 msgstr "Consenti per la sessione"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Consenti l’accesso al microfono nelle Impostazioni per dettare."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Consenti l'accesso al microfono per usare la dettatura"
@@ -3702,6 +3711,9 @@ msgstr "Calendar"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "I trigger di Calendar e Gmail in questa organizzazione smetteranno di scattare finché non verrà collegato di nuovo un account."
+
+msgid "Camera"
+msgstr "Fotocamera"
 
 msgid "Camera access is not allowed"
 msgstr "L'accesso alla fotocamera non è consentito"
@@ -5538,6 +5550,9 @@ msgstr "Impossibile aprire il link"
 msgid "Could not open Photos"
 msgstr "Impossibile aprire Foto"
 
+msgid "Could not open this file"
+msgstr "Impossibile aprire questo file"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "Impossibile avviare il checkout. Riprova."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Impossibile avviare il provisioning del workspace cloud"
+
+msgid "Could not start dictation"
+msgstr "Impossibile avviare la dettatura"
 
 msgid "Could not start session"
 msgstr "Impossibile avviare la sessione"
@@ -6863,11 +6881,20 @@ msgstr "Detta"
 msgid "Dictation"
 msgstr "Dettatura"
 
+msgid "Dictation is not available in this language."
+msgstr "La dettatura non è disponibile in questa lingua."
+
 msgid "Dictation is not available on this device"
 msgstr "La dettatura non è disponibile su questo dispositivo"
 
 msgid "Dictation is not available right now"
 msgstr "La dettatura non è disponibile al momento"
+
+msgid "Dictation needs a network connection."
+msgstr "La dettatura richiede una connessione di rete."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "La dettatura si è interrotta. Quanto ascoltato finora è nel tuo messaggio."
 
 msgid "Didn't hear back"
 msgstr "Nessuna risposta"
@@ -12801,6 +12828,9 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Modalità offline / local-first"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Più vecchi"
 
@@ -14003,6 +14033,9 @@ msgstr "Incolla"
 msgid "Paste a link"
 msgstr "Incolla un link"
 
+msgid "Paste attachment"
+msgstr "Incolla allegato"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Incolla questo nella CLI di Paradev:"
 
@@ -14131,6 +14164,9 @@ msgstr "Muletto Fantasma"
 
 msgid "Phone number"
 msgstr "Numero di telefono"
+
+msgid "Photos"
+msgstr "Foto"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Scegli {name} dalla griglia dei temi per applicarlo."
@@ -20318,6 +20354,12 @@ msgstr "Aggiorna le istruzioni di denominazione"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Aggiorna le istruzioni di denominazione per {0}"
+
+msgid "Update on Google Play"
+msgstr "Aggiorna su Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Aggiorna Paradev da Google Play per continuare."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aggiorna Paradev su quel dispositivo. Gli aggiornamenti dall’app richiedono un’installazione autonoma supportata e una versione rilasciata dell’app."

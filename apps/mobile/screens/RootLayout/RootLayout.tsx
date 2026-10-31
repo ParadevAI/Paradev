@@ -1,5 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PortalHost } from "@rn-primitives/portal";
+import { AlertPromptHost } from "@superset/alert-prompt";
+import { AttachmentsSheetHost } from "@superset/attachments-sheet";
 import { CloudClientProvider } from "@superset/cloud-client";
 import { resolveLocale } from "@superset/i18n";
 import { I18nProvider } from "@superset/i18n/react";
@@ -18,8 +19,10 @@ import { useEffect } from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Uniwind } from "uniwind";
+import { AlertHost, installAlert } from "@/lib/alert";
 import { useSession } from "@/lib/auth/client";
 import { watchNetworkState } from "@/lib/errors";
+import { installInputModality } from "@/lib/input-modality";
 import { NAV_THEME } from "@/lib/theme";
 import { apiClient } from "@/lib/trpc/client";
 
@@ -28,6 +31,7 @@ Uniwind.setTheme("dark");
 import { PostHogUserIdentifier } from "./components/PostHogUserIdentifier";
 import { VersionGate } from "./components/VersionGate";
 import { PostHogProvider } from "./providers/PostHogProvider";
+import { queryCacheStorage } from "./utils/queryCacheStorage";
 
 // What Home's first paint waits on, kept so a returning launch opens on rows.
 // Full prefixes, not just queryKey[0]: ["cloud", "sandbox-access"] is a
@@ -61,7 +65,7 @@ for (const prefix of PERSISTED_QUERY_PREFIXES) {
 }
 
 const persister = createAsyncStoragePersister({
-	storage: AsyncStorage,
+	storage: queryCacheStorage,
 	key: "superset-rq-cache",
 });
 
@@ -75,6 +79,8 @@ const deviceLocale = resolveLocale(
 // Lets a failed request say "no internet connection" rather than the vaguer
 // "could not reach the server" — see lib/errors.
 watchNetworkState();
+installAlert();
+installInputModality();
 
 // React Query cannot see app focus on native, so without this no query ever
 // refetches on returning to the foreground — data went stale for the whole
@@ -133,6 +139,9 @@ export function RootLayout() {
 								</VersionGate>
 								<PostHogUserIdentifier />
 								<PortalHost />
+								<AlertPromptHost />
+								<AlertHost />
+								<AttachmentsSheetHost />
 							</ThemeProvider>
 						</I18nProvider>
 					</PostHogProvider>

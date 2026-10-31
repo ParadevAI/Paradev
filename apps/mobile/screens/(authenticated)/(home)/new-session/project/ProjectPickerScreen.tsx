@@ -1,12 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans } from "@lingui/react/macro";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Box } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 import {
@@ -86,9 +87,9 @@ export function ProjectPickerScreen() {
 				paddingBottom: insets.bottom + 8,
 			}}
 		>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+			</HeaderToolbar>
 			{targets.length === 0 ? (
 				<Text
 					className="py-6 text-center text-sm"

@@ -1,9 +1,10 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
-import { IOS_APP } from "@superset/shared/app-identity";
+import { ANDROID_APP, IOS_APP } from "@superset/shared/app-identity";
 import { BRAND } from "@superset/shared/brand";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
+import { withAndroidLabel } from "./config-plugins/withAndroidLabel";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";
 import { withSceneLifecycle } from "./config-plugins/withSceneLifecycle";
 
@@ -21,8 +22,21 @@ if (process.env.MOBILE_EAS_BUILD !== "1") {
 const webUrl = new URL(
 	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
 );
-const associatedDomains =
-	webUrl.protocol === "https:" ? [`applinks:${webUrl.hostname}`] : undefined;
+const appLinksHost = webUrl.protocol === "https:" ? webUrl.hostname : undefined;
+const associatedDomains = appLinksHost && [`applinks:${appLinksHost}`];
+// Same paths as apple-app-site-association in apps/web.
+const appLinkIntentFilters = appLinksHost && [
+	{
+		action: "VIEW",
+		autoVerify: true,
+		data: ["/page/", "/workspaces/"].map((pathPrefix) => ({
+			scheme: "https",
+			host: appLinksHost,
+			pathPrefix,
+		})),
+		category: ["BROWSABLE", "DEFAULT"],
+	},
+];
 
 const SIGNED_BUILD_PROFILES = ["preview", "production"];
 const signedUpdates = process.env.MOBILE_SIGNED_UPDATES === "1";
@@ -90,10 +104,11 @@ export default ({ config }: ConfigContext) => ({
 	android: {
 		adaptiveIcon: {
 			foregroundImage: "./assets/adaptive-icon.png",
-			backgroundColor: "#ffffff",
+			backgroundColor: "#151110",
 		},
-		package: "sh.superset.mobile",
+		package: ANDROID_APP.PACKAGE,
 		predictiveBackGestureEnabled: false,
+		...(appLinkIntentFilters && { intentFilters: appLinkIntentFilters }),
 	},
 	web: {
 		favicon: "./assets/favicon.png",
@@ -107,6 +122,7 @@ export default ({ config }: ConfigContext) => ({
 		[withIosAccentColor, { color: "#262626" }],
 		// iOS 27 SDK: an app without the UIScene life cycle traps on launch.
 		withSceneLifecycle,
+		[withAndroidLabel, { label: BRAND.NAME }],
 		"@bacons/apple-targets",
 		"expo-router",
 		[
@@ -138,7 +154,12 @@ export default ({ config }: ConfigContext) => ({
 		],
 		[
 			"expo-localization",
-			{ supportedLocales: { ios: [...SUPPORTED_LOCALES] } },
+			{
+				supportedLocales: {
+					ios: [...SUPPORTED_LOCALES],
+					android: [...SUPPORTED_LOCALES],
+				},
+			},
 		],
 		"expo-apple-authentication",
 		[
@@ -172,6 +193,12 @@ export default ({ config }: ConfigContext) => ({
 			"expo-build-properties",
 			{
 				ios: { deploymentTarget: "26.0", buildReactNativeFromSource: true },
+				// WorkManager keeps its input mergers without members, so R8 full
+				// mode strips the constructor it reflects on and every job fails.
+				android: {
+					extraProguardRules:
+						"-keep class * extends androidx.work.InputMerger { public <init>(); }",
+				},
 			},
 		],
 		// SDK 57 no longer autolinks config plugins; every installed plugin has

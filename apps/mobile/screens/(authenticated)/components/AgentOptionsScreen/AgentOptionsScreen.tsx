@@ -6,6 +6,7 @@ import { Pressable, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { OptionRow } from "@/screens/(authenticated)/components/OptionRow";
@@ -67,9 +68,9 @@ export function AgentOptionsScreen({
 			<Stack.Screen
 				options={{ title: agentLabel || t({ message: "Model" }) }}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+			</HeaderToolbar>
 			{models !== undefined ? (
 				<>
 					<SectionLabel label={t({ message: "Model" })} />

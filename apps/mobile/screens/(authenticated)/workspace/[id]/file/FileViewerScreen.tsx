@@ -12,6 +12,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import {
 	anchorOf,
 	ToolbarAnchor,
@@ -75,31 +76,31 @@ export function FileViewerScreen() {
 						) : null}
 					</View>
 				</Stack.Title>
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({
 							message: "File actions",
 						})}
 					>
-						<Stack.Toolbar.MenuAction
-							icon="doc.on.doc"
+						<HeaderToolbar.MenuAction
+							icon="copy"
 							onPress={() => void Clipboard.setStringAsync(path ?? "")}
 						>
 							{t({
 								message: "Copy relative path",
 							})}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="doc.on.doc"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="copy"
 							onPress={() => void Clipboard.setStringAsync(fileName)}
 						>
 							{t({
 								message: "Copy file name",
 							})}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="square.and.arrow.up"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="share"
 							onPress={() =>
 								void Share.share(
 									{ message: contents },
@@ -108,9 +109,9 @@ export function FileViewerScreen() {
 							}
 						>
 							{t({ message: "Share via…" })}
-						</Stack.Toolbar.MenuAction>
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+						</HeaderToolbar.MenuAction>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			</Stack.Screen>
 			<ScrollView
 				className="bg-background flex-1"

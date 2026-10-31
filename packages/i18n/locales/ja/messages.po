@@ -1680,6 +1680,9 @@ msgstr "マニフェストと数個のスキルファイルだけ。Paradevが�
 msgid "a message from {authorName}"
 msgstr "{authorName}からのメッセージ"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev の新しいバージョンがあります。続けるには再読み込みしてください。"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "続行するには新しいバージョンのParadevが必要です。最新バージョンに更新してください。"
 
@@ -1939,6 +1942,9 @@ msgstr "別のアカウントを接続するか、使わなくなったものを
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "どんなマシンでもホストとして追加できます。ノートPCがスリープしてもワークスペースは動き続け、どこからでも様子を確認できます。"
+
+msgid "Add attachment"
+msgstr "添付ファイルを追加"
 
 msgid "Add Attachment"
 msgstr "添付ファイルを追加"
@@ -2463,6 +2469,9 @@ msgstr "リレー経由のアクセスを許可"
 
 msgid "Allow for session"
 msgstr "セッション中は許可"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "音声入力するには、設定でマイクへのアクセスを許可してください。"
 
 msgid "Allow microphone access to use dictation"
 msgstr "音声入力を使うにはマイクへのアクセスを許可してください"
@@ -3702,6 +3711,9 @@ msgstr "Calendar"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "この組織のCalendarとGmailのトリガーは、アカウントを再接続するまで動作しなくなります。"
+
+msgid "Camera"
+msgstr "カメラ"
 
 msgid "Camera access is not allowed"
 msgstr "カメラへのアクセスが許可されていません"
@@ -5538,6 +5550,9 @@ msgstr "リンクを開けませんでした"
 msgid "Could not open Photos"
 msgstr "「写真」を開けませんでした"
 
+msgid "Could not open this file"
+msgstr "このファイルを開けませんでした"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "チェックアウトを開始できませんでした。もう一度お
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "クラウドワークスペースのプロビジョニングを開始できませんでした"
+
+msgid "Could not start dictation"
+msgstr "音声入力を開始できませんでした"
 
 msgid "Could not start session"
 msgstr "セッションを開始できませんでした"
@@ -6863,11 +6881,20 @@ msgstr "音声入力"
 msgid "Dictation"
 msgstr "音声入力"
 
+msgid "Dictation is not available in this language."
+msgstr "この言語では音声入力を使用できません。"
+
 msgid "Dictation is not available on this device"
 msgstr "このデバイスでは音声入力を利用できません"
 
 msgid "Dictation is not available right now"
 msgstr "現在、音声入力は利用できません"
+
+msgid "Dictation needs a network connection."
+msgstr "音声入力にはネットワーク接続が必要です。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "音声入力が停止しました。ここまでの内容はメッセージに入っています。"
 
 msgid "Didn't hear back"
 msgstr "応答がありません"
@@ -12801,6 +12828,9 @@ msgstr "オフライン"
 msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "それ以前"
 
@@ -14003,6 +14033,9 @@ msgstr "貼り付け"
 msgid "Paste a link"
 msgstr "リンクを貼り付け"
 
+msgid "Paste attachment"
+msgstr "添付ファイルをペースト"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "これをParadev CLIに貼り付けてください:"
 
@@ -14131,6 +14164,9 @@ msgstr "幻のフォークリフト"
 
 msgid "Phone number"
 msgstr "電話番号"
+
+msgid "Photos"
+msgstr "写真"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "テーマ一覧から{name}を選んで適用します。"
@@ -20318,6 +20354,12 @@ msgstr "命名指示を更新"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}の命名指示を更新"
+
+msgid "Update on Google Play"
+msgstr "Google Play でアップデート"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "続けるには Google Play から Paradev をアップデートしてください。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "そのデバイスで Paradev を更新してください。アプリ内からの更新には、対応するスタンドアロンインストールとリリース済みのアプリバージョンが必要です。"

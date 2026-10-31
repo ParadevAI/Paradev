@@ -1,6 +1,9 @@
 # Mobile App Release Process
 
-iOS only. Builds and submissions go through EAS; the App Store listing and the
+iOS ships; Android has not shipped yet. Its build and submit lanes are in
+[Android](#android), and what it still needs is in
+[`plans/20261029-android-launch-checklist.md`](./plans/20261029-android-launch-checklist.md).
+Builds and submissions go through EAS; the App Store listing and the
 App Review notes live in [`store.config.js`](./store.config.js) and are pushed
 with `eas metadata:push`. This file is the runbook for shipping a build and for
 getting unstuck when App Review rejects or stalls it.
@@ -153,6 +156,71 @@ carries `MINIMUM_MOBILE_VERSION`; a build below it shows a full-screen
 "Update Required" with an App Store button and nothing else. Raise it only
 once the replacement build is live in the store, or that build is bricked.
 The check fails open: no answer from the server, no gate.
+
+## Android
+
+Same EAS project, same `production` build and submit profiles. Android has not
+shipped; the launch checklist tracks what is missing.
+
+### Versioning
+
+- `version` in `app.config.ts` is the Android `versionName` too. Bump it with
+  iOS; Play does not care about the number, only users see it.
+- `versionCode` is the Android build number, and it works like iOS's: EAS keeps
+  it server-side (`appVersionSource: "remote"`) and the `production` profile
+  raises it on every build (`autoIncrement: true`). Never set it by hand or in
+  `app.config.ts`; EAS writes it into the build. Read it with
+  `eas build:version:get -p android --profile production`.
+- Play rejects an upload whose `versionCode` is not higher than every code it
+  has seen on any track, and a code is spent even if the build is never
+  uploaded. A `--local` production build raises the remote counter too, so
+  gaps are normal. If a build was ever uploaded with a code EAS does not know
+  (a hand-built `.aab`), move EAS past it with `eas build:version:set -p android`.
+- The fingerprint ignores versions (`fingerprint.config.js`), so a version bump
+  does not need a new binary on Android either.
+
+### Shipping a build
+
+```bash
+cd apps/mobile
+
+# 1. Build an .aab signed with the upload key in EAS credentials.
+eas build --platform android --profile production
+
+# 2. Upload to the Play internal track as a draft. Needs the Google service
+#    account key in EAS credentials. Google refuses API uploads until the
+#    first .aab has been uploaded by hand in Play Console.
+eas submit --platform android --profile production --latest
+```
+
+`.eas/workflows/deploy-android.yml` runs the same two steps, skipping the build
+when one already matches the fingerprint. It is manual (`workflow_dispatch`)
+until the first hand upload is done and Android takes OTA updates; then its
+jobs move into `deploy.yml`. Promote from internal to production in Play
+Console.
+
+### Checking a release build without publishing
+
+```bash
+cd apps/mobile
+eas build -p android --profile production --local --output /tmp/superset.aab
+bundletool build-apks --bundle=/tmp/superset.aab --output=/tmp/superset.apks \
+  --mode=universal   # signs with the debug key; fine for an emulator
+unzip -p /tmp/superset.apks universal.apk > /tmp/superset.apk
+adb install -r /tmp/superset.apk
+```
+
+`--local` needs JDK 17 and the Android SDK, and pulls the `production` EAS
+environment and the upload keystore. It submits nothing, but it spends a
+`versionCode`. The installed app talks to production. Check
+`adb shell pm get-app-links sh.superset.mobile` for the App Links hosts.
+
+- R8 runs in full mode in release builds only. A keep rule it ignores shows up
+  at run time, not at build time: look for `NoSuchMethodException` or
+  `ClassNotFoundException` in `adb logcat` after you open each screen. Add
+  rules with `extraProguardRules` in the `expo-build-properties` entry.
+- bundletool signs the APK with the debug key, so Google sign-in falls back to
+  the browser and the App Links do not verify against `assetlinks.json`.
 
 ## When the build is rejected
 

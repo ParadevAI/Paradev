@@ -1680,6 +1680,9 @@ msgstr "Sebuah manifest dan beberapa file skill. Paradev menaruhnya di tempat se
 msgid "a message from {authorName}"
 msgstr "pesan dari {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Versi baru Paradev sudah tersedia. Muat ulang untuk melanjutkan."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Versi baru Paradev diperlukan untuk melanjutkan. Silakan perbarui ke versi terbaru."
 
@@ -1939,6 +1942,9 @@ msgstr "Hubungkan akun lain, atau putuskan yang tidak lagi kamu pakai."
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Tambahkan mesin apa pun sebagai host. Workspace tetap berjalan saat laptop Anda tidur, dan Anda bisa memeriksanya dari mana pun."
+
+msgid "Add attachment"
+msgstr "Tambah lampiran"
 
 msgid "Add Attachment"
 msgstr "Tambah Lampiran"
@@ -2463,6 +2469,9 @@ msgstr "Izinkan akses lewat relay"
 
 msgid "Allow for session"
 msgstr "Izinkan untuk sesi ini"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Izinkan akses mikrofon di Pengaturan untuk menggunakan dikte."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Izinkan akses mikrofon untuk memakai dikte"
@@ -3702,6 +3711,9 @@ msgstr "Kalender"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Pemicu Calendar dan Gmail di organisasi ini akan berhenti berjalan sampai ada akun yang terhubung lagi."
+
+msgid "Camera"
+msgstr "Kamera"
 
 msgid "Camera access is not allowed"
 msgstr "Akses kamera tidak diizinkan"
@@ -5538,6 +5550,9 @@ msgstr "Tidak bisa membuka tautan"
 msgid "Could not open Photos"
 msgstr "Tidak bisa membuka Photos"
 
+msgid "Could not open this file"
+msgstr "Tidak dapat membuka file ini"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "Tidak dapat memulai checkout. Coba lagi."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Tidak bisa memulai provisioning workspace cloud"
+
+msgid "Could not start dictation"
+msgstr "Tidak dapat memulai dikte"
 
 msgid "Could not start session"
 msgstr "Tidak bisa memulai sesi"
@@ -6863,11 +6881,20 @@ msgstr "Dikte"
 msgid "Dictation"
 msgstr "Dikte"
 
+msgid "Dictation is not available in this language."
+msgstr "Dikte tidak tersedia dalam bahasa ini."
+
 msgid "Dictation is not available on this device"
 msgstr "Dikte tidak tersedia di perangkat ini"
 
 msgid "Dictation is not available right now"
 msgstr "Dikte sedang tidak tersedia"
+
+msgid "Dictation needs a network connection."
+msgstr "Dikte memerlukan koneksi jaringan."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dikte berhenti. Yang sudah terdengar sejauh ini ada di pesan Anda."
 
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
@@ -12801,6 +12828,9 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Mode offline / local-first"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Lebih lama"
 
@@ -14003,6 +14033,9 @@ msgstr "Tempel"
 msgid "Paste a link"
 msgstr "Tempel tautan"
 
+msgid "Paste attachment"
+msgstr "Tempel lampiran"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Tempel ini ke Paradev CLI:"
 
@@ -14131,6 +14164,9 @@ msgstr "Forklift Hantu"
 
 msgid "Phone number"
 msgstr "Nomor telepon"
+
+msgid "Photos"
+msgstr "Foto"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Pilih {name} dari grid tema untuk menerapkannya."
@@ -20318,6 +20354,12 @@ msgstr "Perbarui instruksi penamaan"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Perbarui instruksi penamaan untuk {0}"
+
+msgid "Update on Google Play"
+msgstr "Perbarui di Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Perbarui Paradev dari Google Play untuk melanjutkan."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Paradev di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."

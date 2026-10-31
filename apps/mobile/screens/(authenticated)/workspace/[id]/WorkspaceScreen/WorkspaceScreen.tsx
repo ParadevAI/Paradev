@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { prompt } from "@superset/alert-prompt";
 import type {
 	ComposerHandle,
 	ComposerQuickKeysAction,
@@ -8,7 +9,7 @@ import type {
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
 import { BRAND } from "@superset/shared/brand";
-import { TitlePress } from "@superset/title-press";
+import { pressableTitle, TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import {
@@ -47,6 +48,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
@@ -691,28 +693,20 @@ export function WorkspaceScreen() {
 				Alert.alert(t({ message: "A chat takes its name from the agent." }));
 				return;
 			}
-			Alert.prompt(
-				t({
+			void prompt({
+				title: t({
 					message: "Rename session",
 				}),
-				t({
+				message: t({
 					message:
 						"Leave it empty to go back to the name the terminal reports.",
 				}),
-				[
-					{
-						text: t({ message: "Cancel" }),
-						style: "cancel",
-					},
-					{
-						text: t({ message: "Save" }),
-						onPress: (value?: string) =>
-							renameTerminal(terminalId, value ?? ""),
-					},
-				],
-				"plain-text",
-				row?.customTitle ?? "",
-			);
+				defaultValue: row?.customTitle ?? "",
+				cancelText: t({ message: "Cancel" }),
+				confirmText: t({ message: "Save" }),
+			}).then((value) => {
+				if (value !== null) renameTerminal(terminalId, value);
+			});
 		},
 		[rows, renameTerminal, t],
 	);
@@ -994,7 +988,7 @@ export function WorkspaceScreen() {
 			<Stack.Screen
 				options={{
 					...headerOptions,
-					headerTransparent: activeIsChat,
+					headerTransparent: activeIsChat && contentScrollsUnderHeader,
 					title: workspace?.name ?? cloud?.name ?? archivedCloud?.name ?? "",
 					headerTitle: notice
 						? () => (
@@ -1005,85 +999,83 @@ export function WorkspaceScreen() {
 									visibleFor={NOTICE_MS}
 								/>
 							)
-						: undefined,
+						: workspace
+							? pressableTitle(openActions)
+							: undefined,
 				}}
 			/>
 
 			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Button
 						accessibilityLabel={t({ message: "Manage sessions" })}
-						icon="rectangle.stack"
+						icon="sessions"
 						onPress={openSessions}
 					/>
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({ message: "Workspace actions" })}
 					>
-						<Stack.Toolbar.MenuAction icon="info.circle" onPress={openActions}>
+						<HeaderToolbar.MenuAction icon="info" onPress={openActions}>
 							{t({ message: "Workspace details" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="pencil"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="rename"
 							onPress={() => void renameWorkspace()}
 						>
 							{t({ message: "Rename" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon={pinned ? "pin.slash" : "pin"}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon={pinned ? "unpin" : "pin"}
 							onPress={() => id && togglePin(id)}
 						>
 							{pinned ? t({ message: "Unpin" }) : t({ message: "Pin" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="bell.badge"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="markUnread"
 							onPress={() => id && setManualUnread(id)}
 						>
 							{t({ message: "Mark as Unread" })}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.Menu inline>
-							<Stack.Toolbar.Menu
-								icon="doc.on.doc"
-								title={t({ message: "Copy" })}
-								accessibilityLabel={t({ message: "Copy" })}
-							>
-								<Stack.Toolbar.MenuAction
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuSection>
+							<HeaderToolbar.Submenu icon="copy" title={t({ message: "Copy" })}>
+								<HeaderToolbar.MenuAction
 									onPress={() => copyLink(handleCopied)}
 								>
 									{t({ message: "Copy link" })}
-								</Stack.Toolbar.MenuAction>
-								<Stack.Toolbar.MenuAction onPress={() => copyId(handleCopied)}>
+								</HeaderToolbar.MenuAction>
+								<HeaderToolbar.MenuAction onPress={() => copyId(handleCopied)}>
 									{t({ message: "Copy ID" })}
-								</Stack.Toolbar.MenuAction>
-							</Stack.Toolbar.Menu>
-							<Stack.Toolbar.MenuAction
-								icon="square.and.arrow.up"
+								</HeaderToolbar.MenuAction>
+							</HeaderToolbar.Submenu>
+							<HeaderToolbar.MenuAction
+								icon="share"
 								onPress={() => shareWorkspace(anchorOf(shareAnchorRef))}
 							>
 								{t({ message: "Share" })}
-							</Stack.Toolbar.MenuAction>
-						</Stack.Toolbar.Menu>
-						<Stack.Toolbar.Menu inline>
+							</HeaderToolbar.MenuAction>
+						</HeaderToolbar.MenuSection>
+						<HeaderToolbar.MenuSection>
 							{cloud ? (
-								<Stack.Toolbar.MenuAction
-									icon="archivebox"
+								<HeaderToolbar.MenuAction
+									icon="archive"
 									onPress={deleteWorkspace}
 								>
 									{t({ message: "Archive workspace" })}
-								</Stack.Toolbar.MenuAction>
+								</HeaderToolbar.MenuAction>
 							) : (
-								<Stack.Toolbar.MenuAction
-									icon="trash"
+								<HeaderToolbar.MenuAction
+									icon="delete"
 									destructive
 									onPress={deleteWorkspace}
 								>
 									{t({ message: "Delete workspace" })}
-								</Stack.Toolbar.MenuAction>
+								</HeaderToolbar.MenuAction>
 							)}
-						</Stack.Toolbar.Menu>
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+						</HeaderToolbar.MenuSection>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			) : null}
 
 			{banner && activeTerminalId && !activeIsChat ? (
@@ -1199,7 +1191,7 @@ export function WorkspaceScreen() {
 						    covers the viewport this would move. Always mounted — it
 						    fades itself, which it cannot do if the parent unmounts it. */}
 						<ScrollToBottomButton
-							systemName="arrow.down"
+							icon="arrowDown"
 							visible={!atBottom && !select.active}
 							onPress={() => {
 								// The tap lands in SwiftUI, where RN autocapture cannot see

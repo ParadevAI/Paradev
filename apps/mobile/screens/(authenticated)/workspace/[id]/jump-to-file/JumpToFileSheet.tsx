@@ -4,6 +4,7 @@ import { CheckCircle2, MessageSquare } from "lucide-react-native";
 import { FlatList, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { FileStatusBadge } from "../components/FileStatusBadge";
 import { useViewedFilesStore } from "../files-changed/stores/viewedFilesStore";
@@ -62,15 +63,15 @@ export function JumpToFileSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<FlatList
 				className="bg-background flex-1"
 				contentInsetAdjustmentBehavior="automatic"

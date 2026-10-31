@@ -1,10 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
@@ -29,9 +30,9 @@ export function FilterScreen() {
 
 	return (
 		<View className="bg-background flex-1 px-6">
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+			</HeaderToolbar>
 			<ListRow
 				icon={
 					<Ionicons

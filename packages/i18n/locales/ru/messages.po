@@ -1680,6 +1680,9 @@ msgstr "Манифест и несколько файлов навыков. Para
 msgid "a message from {authorName}"
 msgstr "сообщение от {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Вышла новая версия Paradev. Перезагрузите страницу, чтобы продолжить."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Чтобы продолжить, нужна новая версия Paradev. Обновитесь до последней версии."
 
@@ -1939,6 +1942,9 @@ msgstr "Подключите ещё аккаунт или отключите т�
 
 msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
 msgstr "Добавьте любую машину как хост. Рабочие области продолжают работать, когда ноутбук спит, а вы можете заглянуть откуда угодно."
+
+msgid "Add attachment"
+msgstr "Добавить вложение"
 
 msgid "Add Attachment"
 msgstr "Добавить вложение"
@@ -2463,6 +2469,9 @@ msgstr "Разрешите доступ через реле"
 
 msgid "Allow for session"
 msgstr "Разрешить на сессию"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Чтобы диктовать, разрешите доступ к микрофону в настройках."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Разрешите доступ к микрофону, чтобы использовать диктовку"
@@ -3702,6 +3711,9 @@ msgstr "Календарь"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Триггеры Календаря и Gmail в этой организации перестанут срабатывать, пока аккаунт не подключат снова."
+
+msgid "Camera"
+msgstr "Камера"
 
 msgid "Camera access is not allowed"
 msgstr "Доступ к камере запрещён"
@@ -5538,6 +5550,9 @@ msgstr "Не удалось открыть ссылку"
 msgid "Could not open Photos"
 msgstr "Не удалось открыть «Фото»"
 
+msgid "Could not open this file"
+msgstr "Не удалось открыть этот файл"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -5642,6 +5657,9 @@ msgstr "Не удалось начать оформление. Попробуй�
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Не удалось начать создание облачной рабочей области"
+
+msgid "Could not start dictation"
+msgstr "Не удалось начать диктовку"
 
 msgid "Could not start session"
 msgstr "Не удалось запустить сессию"
@@ -6863,11 +6881,20 @@ msgstr "Диктовать"
 msgid "Dictation"
 msgstr "Диктовка"
 
+msgid "Dictation is not available in this language."
+msgstr "Диктовка недоступна на этом языке."
+
 msgid "Dictation is not available on this device"
 msgstr "Диктовка недоступна на этом устройстве"
 
 msgid "Dictation is not available right now"
 msgstr "Диктовка сейчас недоступна"
+
+msgid "Dictation needs a network connection."
+msgstr "Для диктовки нужно подключение к сети."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Диктовка остановлена. Всё, что было услышано, уже в сообщении."
 
 msgid "Didn't hear back"
 msgstr "Ответа не поступило"
@@ -12801,6 +12828,9 @@ msgstr "Офлайн"
 msgid "Offline / local-first mode"
 msgstr "Офлайн / local-first режим"
 
+msgid "OK"
+msgstr "ОК"
+
 msgid "Older"
 msgstr "Ранее"
 
@@ -14003,6 +14033,9 @@ msgstr "Вставить"
 msgid "Paste a link"
 msgstr "Вставьте ссылку"
 
+msgid "Paste attachment"
+msgstr "Вставить вложение"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставьте это в Paradev CLI:"
 
@@ -14131,6 +14164,9 @@ msgstr "Призрачный погрузчик"
 
 msgid "Phone number"
 msgstr "Телефон"
+
+msgid "Photos"
+msgstr "Фото"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Выберите {name} в сетке тем, чтобы применить."
@@ -20318,6 +20354,12 @@ msgstr "Обновить правила именования"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Обновить правила именования для {0}"
+
+msgid "Update on Google Play"
+msgstr "Обновить в Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Обновите Paradev в Google Play, чтобы продолжить."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Обновите Paradev на этом устройстве. Для обновления из приложения нужны поддерживаемая автономная установка и выпущенная версия приложения."

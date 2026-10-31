@@ -1,10 +1,10 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { MAX_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
-import { File } from "expo-file-system";
 import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-input";
 import { apiClient } from "@/lib/trpc/client";
 import { useComposerDraftsStore } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import { type AttachmentFile, openAttachmentFile } from "./attachmentFile";
 import { waitForSettledUploads } from "./settle";
 
 const FALLBACK_MEDIA_TYPE = "application/octet-stream";
@@ -35,7 +35,7 @@ function nameOf(attachment: PromptInputAttachmentItem, index: number): string {
  * It reaches here only when the picker reported no size and the file could
  * not be measured until now.
  */
-function assertSendable(file: File): void {
+function assertSendable(file: AttachmentFile): void {
 	// 0 is what `size` reports for a file it cannot read, not an empty one —
 	// either way there is nothing to upload.
 	if (file.size <= 0) {
@@ -72,7 +72,7 @@ async function upload(
 	store.beginUpload(draftKey, attachment.id);
 
 	try {
-		const file = new File(attachment.uri);
+		const file = await openAttachmentFile(attachment.uri);
 		const name = nameOf(attachment, index);
 		assertSendable(file);
 
@@ -85,7 +85,6 @@ async function upload(
 
 		let reported = -1;
 		const result = await file.upload(target.url, {
-			httpMethod: "PUT",
 			headers: target.headers,
 			signal: controller.signal,
 			onProgress: ({ bytesSent, totalBytes }) => {

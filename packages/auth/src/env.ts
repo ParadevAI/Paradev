@@ -27,6 +27,7 @@ export const env = createEnv({
 		AUTUMN_SECRET_KEY: z.string().min(1),
 		QSTASH_TOKEN: z.string().min(1),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
+		MOBILE_WEB_ORIGINS: z.string().optional(),
 	},
 	clientPrefix: "NEXT_PUBLIC_",
 	client: {

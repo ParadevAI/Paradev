@@ -63,20 +63,47 @@ export default function AuthenticatedLayout() {
 
 ## Conventions
 
-- **`apps/mobile` is iOS-only.** No Android fallbacks or platform guards for iOS-only APIs, and
-  Android incompatibility isn't a blocker until Android is explicitly in scope.
-- **Bottom sheets are expo-router `formSheet` routes** — `...glassHeaderOptions` gives the native
-  title and ✕, the body is RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to
-  match ours), and the list stays the screen's only layout child or it cold-mounts at zero height.
-  Copy `PullRequestsSheet` and its route entry.
+- **Native on every platform, React Native as the fallback.** iOS ships; Android and web build
+  from the same code. Every platform-specific API sits behind a typed contract, picked by Metro's
+  platform extensions, never by `Platform.OS` checks in screens. For each piece, use the first
+  of these that fits:
+  1. An `@expo/ui` universal component (`@expo/ui`) or community drop-in (`@expo/ui/community/menu`,
+     `/bottom-sheet`, `/picker` ...): SwiftUI on iOS, Jetpack Compose on Android, DOM on web, one
+     import. Example: `ShareAccess/components/ValueMenu/ValueMenu.android.tsx` uses `MenuView`.
+  2. Per-platform files behind one contract:
+     - `X.types.ts` is the contract: props, handle and function types, with no SF Symbol names or
+       other platform words in what callers pass. Screens import only the folder's `index.ts`.
+     - `X.ios.tsx`: an Expo module in `modules/<name>/ios`, `@expo/ui/swift-ui`, or an iOS-only
+       Expo package. It is the only file that may import those.
+     - `X.android.tsx`: `@expo/ui/jetpack-compose` or a module's `android/` code. For a module that
+       has both, add `"android"` to `expo-module.config.json` and name the binding `X.native.tsx`.
+     - `X.web.tsx`: where the browser has a better control than plain RN (a file input, CSS
+       `backdrop-filter`, the browser's WebRTC or session cookie).
+  3. `X.tsx`, the React Native fallback. Web, `bun test` and any platform without its own file
+     resolve it, so it must work: never a no-op behind something the user taps. A capability that
+     does not exist there (Live Activities, native sign-in) may be a no-op.
+  Every implementation annotates its exports with the contract type, so `tsc` checks each file
+  against the same shape. Examples: `modules/composer/src` (SwiftUI on iOS, RN composer as `.tsx`),
+  `modules/attachments-sheet` (native sheet, Compose sheet, browser file chooser),
+  `modules/alert-prompt`, `sign-in/utils/signInWithGoogle` (`.android.ts` on
+  `modules/google-credential`, browser flow everywhere else).
+- **Bottom sheets are expo-router `formSheet` routes** — `...sheetHeaderOptions` gives the native
+  title and ✕ on iOS and a JS drag handle and title on Android, where a form sheet draws no native
+  bar (so `Stack.SearchBar` and SF Symbol `Stack.Toolbar` buttons do not show there). The body is
+  RN + uniwind (never `@expo/ui` SwiftUI content, which can't be themed to match ours), and the
+  list stays the screen's only layout child or it cold-mounts at zero height. Copy
+  `PullRequestsSheet` and its route entry.
 - **Hermes ships a partial `Intl`.** `lib/intl-polyfills` lists what is missing and what is
   polyfilled. A `@superset/i18n/format` helper that reaches for an API outside that list throws, and
   no mobile screen has an error boundary, so the throw takes the screen down. Add the polyfill, its
-  per-locale data, and a case in the polyfill test.
+  per-locale data, and a case in the polyfill test. Android's Hermes also lacks `zh-CN`/`zh-TW` in
+  `NumberFormat`/`DateTimeFormat` and formats them as `en-US`; `scriptSubtagFallback.android.ts`
+  passes the script-qualified tag instead.
 - **Pending and failed are not answers.** A query with no data yet has not said "offline" or
   "empty". Keep loading while it is pending and say you could not check when it failed; Home once
   painted "is offline" on every cold start because presence defaulted to `false`.
 - **Verifying in the real app:** on a machine with Xcode, `.agents/skills/mobile-sim-verification/SKILL.md`.
+  On Android, `apps/mobile/scripts/android-dev.sh` and `.agents/skills/mobile-android-verification/SKILL.md`.
   On a cloud sandbox (no local Xcode/simulator), run `apps/mobile/scripts/eas-dev.sh`; see
   `.agents/skills/mobile-eas-dev/SKILL.md`. The script encodes what was found getting the app running
   on an EAS simulator from a sandbox (2026-10-09), so nobody has to rediscover it:
