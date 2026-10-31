@@ -1821,6 +1821,9 @@ msgstr "アカウントは削除待ちです"
 msgid "Account usage"
 msgstr "アカウントの使用状況"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "アカウントの使用状況: {limit} {used} 使用済み"
+
 msgid "Achievements"
 msgstr "実績"
 
@@ -2211,9 +2214,6 @@ msgstr "エージェントの実行に失敗しました"
 
 msgid "Agent self-verification"
 msgstr "エージェントの自己検証"
-
-msgid "agent session ID"
-msgstr "エージェントセッションID"
 
 msgid "Agent session started"
 msgstr "エージェントセッションを開始しました"
@@ -3993,8 +3993,8 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
-msgid "Chat mode"
-msgstr "チャットモード"
+msgid "Chat menu"
+msgstr "チャットメニュー"
 
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
@@ -4294,9 +4294,6 @@ msgstr "CLIとSDK"
 
 msgid "CLI docs"
 msgstr "CLIドキュメント"
-
-msgid "CLI mode"
-msgstr "CLIモード"
 
 msgid "CLI reference"
 msgstr "CLIリファレンス"
@@ -5131,9 +5128,6 @@ msgstr "続行"
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 
-msgid "Continue or fork session"
-msgstr "セッションを続行またはフォーク"
-
 msgid "Continue the session the last run left"
 msgstr "前回の実行が残したセッションを継続"
 
@@ -5212,8 +5206,8 @@ msgstr "コピーしました"
 msgid "Copied {0}"
 msgstr "{0}をコピーしました"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel}をコピーしました"
+msgid "Copied agent session ID"
+msgstr "エージェントセッションIDをコピーしました"
 
 msgid "Copied Link"
 msgstr "リンクをコピーしました"
@@ -5282,9 +5276,6 @@ msgid "Copy file name"
 msgstr "ファイル名をコピー"
 
 msgid "Copy ID"
-msgstr "IDをコピー"
-
-msgid "Copy IDs"
 msgstr "IDをコピー"
 
 msgid "Copy image"
@@ -5449,6 +5440,9 @@ msgstr "{plugin} に接続できませんでした。もう一度お試しくだ
 
 msgid "Could not copy the link"
 msgstr "リンクをコピーできませんでした"
+
+msgid "Could not copy to the clipboard"
+msgstr "クリップボードにコピーできませんでした"
 
 msgid "Could not create cloud workspace"
 msgstr "クラウドワークスペースを作成できませんでした"
@@ -15097,6 +15091,9 @@ msgstr "最近のアクティビティ"
 msgid "Recent apps"
 msgstr "最近使ったアプリ"
 
+msgid "Recent chats"
+msgstr "最近のチャット"
+
 msgid "Recent invoices"
 msgstr "最近の請求書"
 
@@ -16434,6 +16431,9 @@ msgstr "開発者を検索"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "ファイルの中身も、すべてのワークスペースも、まとめて横断検索できます。"
+
+msgid "Search all chats…"
+msgstr "すべてのチャットを検索…"
 
 msgid "Search all emoji"
 msgstr "すべての絵文字を検索"
@@ -18638,9 +18638,6 @@ msgstr "ターミナルのフォントサイズ"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "ターミナルにフォーカスがあるときはターミナルのフォントサイズ、ブラウザペインではページのズーム、それ以外はアプリ全体"
-
-msgid "terminal ID"
-msgstr "ターミナルID"
 
 msgid "Terminal input"
 msgstr "ターミナル入力"

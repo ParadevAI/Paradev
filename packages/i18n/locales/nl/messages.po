@@ -1821,6 +1821,9 @@ msgstr "Account wordt verwijderd"
 msgid "Account usage"
 msgstr "Accountgebruik"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "Accountgebruik: {limit} {used} gebruikt"
+
 msgid "Achievements"
 msgstr "Prestaties"
 
@@ -2211,9 +2214,6 @@ msgstr "Agentrun mislukt"
 
 msgid "Agent self-verification"
 msgstr "Zelfverificatie door agents"
-
-msgid "agent session ID"
-msgstr "agentsessie-ID"
 
 msgid "Agent session started"
 msgstr "Agentsessie gestart"
@@ -3993,8 +3993,8 @@ msgstr "Chat wordt herbouwd"
 msgid "Chat Launch"
 msgstr "Start via chat"
 
-msgid "Chat mode"
-msgstr "Chatmodus"
+msgid "Chat menu"
+msgstr "Chatmenu"
 
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
@@ -4294,9 +4294,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-docs"
-
-msgid "CLI mode"
-msgstr "CLI-modus"
 
 msgid "CLI reference"
 msgstr "CLI-referentie"
@@ -5131,9 +5128,6 @@ msgstr "Doorgaan"
 msgid "Continue in your browser"
 msgstr "Ga verder in je browser"
 
-msgid "Continue or fork session"
-msgstr "Sessie voortzetten of forken"
-
 msgid "Continue the session the last run left"
 msgstr "Ga verder met de sessie van de vorige run"
 
@@ -5212,8 +5206,8 @@ msgstr "Gekopieerd"
 msgid "Copied {0}"
 msgstr "{0} gekopieerd"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} gekopieerd"
+msgid "Copied agent session ID"
+msgstr "Agentsessie-ID gekopieerd"
 
 msgid "Copied Link"
 msgstr "Link gekopieerd"
@@ -5283,9 +5277,6 @@ msgstr "Bestandsnaam kopiëren"
 
 msgid "Copy ID"
 msgstr "ID kopiëren"
-
-msgid "Copy IDs"
-msgstr "ID's kopiëren"
 
 msgid "Copy image"
 msgstr "Afbeelding kopiëren"
@@ -5449,6 +5440,9 @@ msgstr "Kan {plugin} niet verbinden. Probeer het opnieuw."
 
 msgid "Could not copy the link"
 msgstr "Kan de link niet kopiëren"
+
+msgid "Could not copy to the clipboard"
+msgstr "Kopiëren naar het klembord is mislukt"
 
 msgid "Could not create cloud workspace"
 msgstr "Kan cloudwerkruimte niet aanmaken"
@@ -15097,6 +15091,9 @@ msgstr "Recente activiteit"
 msgid "Recent apps"
 msgstr "Recente apps"
 
+msgid "Recent chats"
+msgstr "Recente chats"
+
 msgid "Recent invoices"
 msgstr "Recente facturen"
 
@@ -16434,6 +16431,9 @@ msgstr "Een ontwikkelaar zoeken"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Zoek door bestandsinhoud en door al je werkruimtes tegelijk."
+
+msgid "Search all chats…"
+msgstr "Alle chats doorzoeken…"
 
 msgid "Search all emoji"
 msgstr "Alle emoji doorzoeken"
@@ -18638,9 +18638,6 @@ msgstr "Tekengrootte terminal"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Tekengrootte van een terminal met focus, paginazoom in een browserpaneel, anders de hele app"
-
-msgid "terminal ID"
-msgstr "terminal-ID"
 
 msgid "Terminal input"
 msgstr "Terminalinvoer"

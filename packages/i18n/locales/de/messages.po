@@ -1821,6 +1821,9 @@ msgstr "Konto zur Löschung vorgemerkt"
 msgid "Account usage"
 msgstr "Kontonutzung"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "Kontonutzung: {limit} {used} verbraucht"
+
 msgid "Achievements"
 msgstr "Auszeichnungen"
 
@@ -2211,9 +2214,6 @@ msgstr "Agent-Lauf fehlgeschlagen"
 
 msgid "Agent self-verification"
 msgstr "Selbstverifikation der Agenten"
-
-msgid "agent session ID"
-msgstr "Agenten-Session-ID"
 
 msgid "Agent session started"
 msgstr "Agenten-Sitzung gestartet"
@@ -3993,8 +3993,8 @@ msgstr "Chat wird überarbeitet"
 msgid "Chat Launch"
 msgstr "Chat-Start"
 
-msgid "Chat mode"
-msgstr "Chat-Modus"
+msgid "Chat menu"
+msgstr "Chat-Menü"
 
 msgid "Chat session not found"
 msgstr "Chat-Sitzung nicht gefunden"
@@ -4294,9 +4294,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-Doku"
-
-msgid "CLI mode"
-msgstr "CLI-Modus"
 
 msgid "CLI reference"
 msgstr "CLI-Referenz"
@@ -5131,9 +5128,6 @@ msgstr "Weiter"
 msgid "Continue in your browser"
 msgstr "Im Browser fortfahren"
 
-msgid "Continue or fork session"
-msgstr "Sitzung fortsetzen oder forken"
-
 msgid "Continue the session the last run left"
 msgstr "Die Sitzung des letzten Laufs fortsetzen"
 
@@ -5212,8 +5206,8 @@ msgstr "Kopiert"
 msgid "Copied {0}"
 msgstr "{0} kopiert"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} kopiert"
+msgid "Copied agent session ID"
+msgstr "Agenten-Session-ID kopiert"
 
 msgid "Copied Link"
 msgstr "Link kopiert"
@@ -5283,9 +5277,6 @@ msgstr "Dateinamen kopieren"
 
 msgid "Copy ID"
 msgstr "ID kopieren"
-
-msgid "Copy IDs"
-msgstr "IDs kopieren"
 
 msgid "Copy image"
 msgstr "Bild kopieren"
@@ -5449,6 +5440,9 @@ msgstr "{plugin} konnte nicht verbunden werden. Versuchen Sie es erneut."
 
 msgid "Could not copy the link"
 msgstr "Link konnte nicht kopiert werden"
+
+msgid "Could not copy to the clipboard"
+msgstr "Kopieren in die Zwischenablage fehlgeschlagen"
 
 msgid "Could not create cloud workspace"
 msgstr "Cloud-Arbeitsbereich konnte nicht erstellt werden"
@@ -15097,6 +15091,9 @@ msgstr "Letzte Aktivität"
 msgid "Recent apps"
 msgstr "Letzte Apps"
 
+msgid "Recent chats"
+msgstr "Letzte Chats"
+
 msgid "Recent invoices"
 msgstr "Letzte Rechnungen"
 
@@ -16434,6 +16431,9 @@ msgstr "Entwickler suchen"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Über Dateiinhalte und alle deine Arbeitsbereiche auf einmal suchen."
+
+msgid "Search all chats…"
+msgstr "Alle Chats durchsuchen…"
 
 msgid "Search all emoji"
 msgstr "Alle Emojis durchsuchen"
@@ -18638,9 +18638,6 @@ msgstr "Terminal-Schriftgröße"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Schriftgröße des Terminals, wenn ein Terminal fokussiert ist, Seitenzoom in einem Browser-Bereich, sonst die ganze App"
-
-msgid "terminal ID"
-msgstr "Terminal-ID"
 
 msgid "Terminal input"
 msgstr "Terminal-Eingabe"

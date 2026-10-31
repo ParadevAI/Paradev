@@ -1821,6 +1821,9 @@ msgstr "삭제 예정 계정"
 msgid "Account usage"
 msgstr "계정 사용량"
 
+msgid "Account usage: {limit} {used} used"
+msgstr "계정 사용량: {limit} {used} 사용됨"
+
 msgid "Achievements"
 msgstr "업적"
 
@@ -2211,9 +2214,6 @@ msgstr "에이전트 실행 실패"
 
 msgid "Agent self-verification"
 msgstr "에이전트 자체 검증"
-
-msgid "agent session ID"
-msgstr "에이전트 세션 ID"
 
 msgid "Agent session started"
 msgstr "에이전트 세션을 시작했습니다"
@@ -3993,8 +3993,8 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
-msgid "Chat mode"
-msgstr "채팅 모드"
+msgid "Chat menu"
+msgstr "채팅 메뉴"
 
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
@@ -4294,9 +4294,6 @@ msgstr "CLI 및 SDK"
 
 msgid "CLI docs"
 msgstr "CLI 문서"
-
-msgid "CLI mode"
-msgstr "CLI 모드"
 
 msgid "CLI reference"
 msgstr "CLI 레퍼런스"
@@ -5131,9 +5128,6 @@ msgstr "계속"
 msgid "Continue in your browser"
 msgstr "브라우저에서 계속하세요"
 
-msgid "Continue or fork session"
-msgstr "세션 계속하기 또는 포크"
-
 msgid "Continue the session the last run left"
 msgstr "마지막 실행이 남긴 세션을 계속"
 
@@ -5212,8 +5206,8 @@ msgstr "복사됨"
 msgid "Copied {0}"
 msgstr "{0} 복사됨"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} 복사됨"
+msgid "Copied agent session ID"
+msgstr "에이전트 세션 ID 복사됨"
 
 msgid "Copied Link"
 msgstr "링크 복사됨"
@@ -5282,9 +5276,6 @@ msgid "Copy file name"
 msgstr "파일 이름 복사"
 
 msgid "Copy ID"
-msgstr "ID 복사"
-
-msgid "Copy IDs"
 msgstr "ID 복사"
 
 msgid "Copy image"
@@ -5449,6 +5440,9 @@ msgstr "{plugin}을(를) 연결하지 못했습니다. 다시 시도하세요."
 
 msgid "Could not copy the link"
 msgstr "링크를 복사할 수 없습니다"
+
+msgid "Could not copy to the clipboard"
+msgstr "클립보드에 복사할 수 없습니다"
 
 msgid "Could not create cloud workspace"
 msgstr "클라우드 워크스페이스를 만들 수 없습니다"
@@ -15097,6 +15091,9 @@ msgstr "최근 활동"
 msgid "Recent apps"
 msgstr "최근 앱"
 
+msgid "Recent chats"
+msgstr "최근 채팅"
+
 msgid "Recent invoices"
 msgstr "최근 청구서"
 
@@ -16434,6 +16431,9 @@ msgstr "개발자 검색"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "파일 내용과 모든 워크스페이스를 한 번에 검색하세요."
+
+msgid "Search all chats…"
+msgstr "모든 채팅 검색…"
 
 msgid "Search all emoji"
 msgstr "모든 이모지 검색"
@@ -18638,9 +18638,6 @@ msgstr "터미널 글꼴 크기"
 
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "터미널에 포커스가 있으면 터미널 글꼴 크기, 브라우저 패널에서는 페이지 확대/축소, 그 외에는 앱 전체"
-
-msgid "terminal ID"
-msgstr "터미널 ID"
 
 msgid "Terminal input"
 msgstr "터미널 입력"
