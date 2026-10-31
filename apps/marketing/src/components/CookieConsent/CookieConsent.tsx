@@ -40,28 +40,27 @@ export function CookieConsent() {
 					animate={{ y: 0, opacity: 1 }}
 					exit={{ y: 20, opacity: 0 }}
 					transition={{ type: "spring", damping: 25, stiffness: 300 }}
-					className="fixed bottom-4 left-4 z-50 max-w-xs rounded-lg border border-border bg-card p-4 shadow-lg"
+					className="fixed inset-x-4 bottom-4 z-50 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 shadow-lg sm:flex-row sm:items-center sm:p-4 lg:inset-x-auto lg:left-4 lg:w-72 lg:flex-col lg:items-stretch"
 				>
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground sm:flex-1">
 						<Trans>
 							We only collect analytics cookies so we can improve your
 							experience.
-						</Trans>
+						</Trans>{" "}
+						<Link
+							href="/privacy"
+							className="font-medium text-foreground underline-offset-4 hover:underline"
+						>
+							<Trans>Privacy policy</Trans>
+						</Link>
 					</p>
-					<div className="mt-3 flex flex-col items-start gap-2">
-						<Button variant="link" asChild className="px-0">
-							<Link href="/privacy">
-								<Trans>Privacy policy</Trans>
-							</Link>
+					<div className="grid grid-cols-2 gap-2 sm:shrink-0">
+						<Button variant="outline" size="sm" onClick={handleOptOut}>
+							<Trans>Opt-out</Trans>
 						</Button>
-						<div className="grid w-full grid-cols-2 gap-2">
-							<Button variant="outline" onClick={handleOptOut}>
-								<Trans>Opt-out</Trans>
-							</Button>
-							<Button variant="outline" onClick={handleAccept}>
-								<Trans>Accept</Trans>
-							</Button>
-						</div>
+						<Button variant="outline" size="sm" onClick={handleAccept}>
+							<Trans>Accept</Trans>
+						</Button>
 					</div>
 				</m.div>
 			)}
