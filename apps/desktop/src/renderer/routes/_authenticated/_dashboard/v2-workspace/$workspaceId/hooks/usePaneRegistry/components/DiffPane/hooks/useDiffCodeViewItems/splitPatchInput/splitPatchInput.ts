@@ -9,7 +9,8 @@ export const MAX_PATCH_REQUEST_PATHS = 2000;
  * the limit from both lists. A call with untracked paths only must not send an
  * empty `paths`: the host reads that as the whole category, so every call
  * would repeat the tracked diff. It sends one of its untracked paths instead,
- * which `git diff` matches with nothing.
+ * which `git diff` matches with nothing. `:(literal)` keeps a name like
+ * `[id].tsx` or `*` from matching tracked files as a glob.
  */
 export function splitPatchInput(input: GetDiffPatchInput): GetDiffPatchInput[] {
 	const paths = input.paths ?? [];
@@ -30,7 +31,8 @@ export function splitPatchInput(input: GetDiffPatchInput): GetDiffPatchInput[] {
 		const batchUntracked = untrackedPaths.slice(start, end);
 		return {
 			...input,
-			paths: batchPaths.length > 0 ? batchPaths : batchUntracked.slice(0, 1),
+			paths:
+				batchPaths.length > 0 ? batchPaths : [`:(literal)${batchUntracked[0]}`],
 			untrackedPaths: batchUntracked,
 		};
 	});

@@ -43,8 +43,13 @@ describe("splitPatchInput", () => {
 
 		expect(calls).toHaveLength(2);
 		for (const call of calls) {
-			expect(call.paths).toHaveLength(1);
-			expect(call.untrackedPaths).toContain(call.paths?.[0] as string);
+			expect(call.paths).toEqual([`:(literal)${call.untrackedPaths?.[0]}`]);
 		}
+	});
+
+	test("a glob-like untracked name is matched literally", () => {
+		const untracked = ["app/[id].tsx", "*", ...files("new", 2500)];
+		const [first] = splitPatchInput(input([], untracked));
+		expect(first?.paths).toEqual([":(literal)app/[id].tsx"]);
 	});
 });
