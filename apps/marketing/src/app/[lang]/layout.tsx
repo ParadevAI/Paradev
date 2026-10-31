@@ -55,7 +55,7 @@ const siteDescription = msg({
 
 export async function generateMetadata(): Promise<Metadata> {
 	const i18n = getI18nInstance(await initServerI18n());
-	const description = i18n._(siteDescription);
+	const description = `${BRAND.INTRO_NAME}: ${i18n._(siteDescription)}`;
 	return {
 		metadataBase: new URL(COMPANY.MARKETING_URL),
 		title: {

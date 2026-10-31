@@ -17,7 +17,7 @@
 		"typescript": "7.0.2"
 	},
 	"description": "Superset Monorepo",
-	"homepage": "https://superset.sh",
+	"homepage": "https://paradev.com",
 	"license": "Elastic-2.0",
 	"packageManager": "bun@1.4.3",
 	"private": true,

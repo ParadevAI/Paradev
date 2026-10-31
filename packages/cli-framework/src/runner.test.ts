@@ -51,7 +51,7 @@ describe("formatError", () => {
 		);
 		expect(result.message).toBe("Automations require the Pro plan.");
 		expect(result.hint).toContain("Needs the Pro plan");
-		expect(result.hint).toContain("superset.sh/pricing");
+		expect(result.hint).toContain("paradev.com/pricing");
 	});
 
 	it("names Enterprise when that is the tier", () => {
