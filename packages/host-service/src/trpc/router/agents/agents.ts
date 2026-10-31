@@ -1,6 +1,7 @@
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
+	type AgentModelCatalog,
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
 	buildAgentModelArgs,
@@ -8,6 +9,7 @@ import {
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
+	getAgentModels,
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
@@ -48,6 +50,11 @@ import { resolveAttachmentPath } from "../attachments/storage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
+import {
+	loadAgentModelCatalog,
+	peekAgentModelCatalog,
+	prepareAgentModelCatalog,
+} from "./utils/model-catalog";
 
 /**
  * Build a shell command string that runs the resolved agent config with the
@@ -177,6 +184,7 @@ export function validateAgentModelSelection(
 	presetId: string,
 	label: string,
 	model: string | undefined,
+	catalog?: AgentModelCatalog | null,
 ): void {
 	if (!model) return;
 
@@ -188,10 +196,15 @@ export function validateAgentModelSelection(
 		});
 	}
 
-	if (!isCuratedAgentModel(presetId, model)) {
+	if (!isCuratedAgentModel(presetId, model, catalog)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
-			message: `Unsupported model "${model}" for ${label}. Choose one of: ${support.models.map((option) => option.id).join(", ")}.`,
+			message: `Unsupported model "${model}" for ${label}. Choose one of: ${getAgentModels(
+				presetId,
+				catalog,
+			)
+				.map((option) => option.id)
+				.join(", ")}.`,
 		});
 	}
 }
@@ -205,6 +218,7 @@ export function validateAgentEffortSelection(
 	label: string,
 	effort: string | undefined,
 	model?: string,
+	catalog?: AgentModelCatalog | null,
 ): void {
 	if (!effort) return;
 
@@ -219,7 +233,7 @@ export function validateAgentEffortSelection(
 	// Some efforts only exist on some of the agent's models (Codex's Luna
 	// models stop at max; cursor-agent only has a ladder for some models),
 	// so the accepted set follows the selected model.
-	const efforts = getAgentEfforts(presetId, model);
+	const efforts = getAgentEfforts(presetId, model, catalog);
 	if (efforts.length === 0) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -369,12 +383,19 @@ export function validateAgentLaunchOptions(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	const catalog = peekAgentModelCatalog(config);
+	validateAgentModelSelection(
+		launchPresetId,
+		config.label,
+		input.model,
+		catalog,
+	);
 	validateAgentEffortSelection(
 		launchPresetId,
 		config.label,
 		input.effort,
 		input.model,
+		catalog,
 	);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode);
 }
@@ -403,12 +424,19 @@ export function buildTerminalAgentLaunch(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	const catalog = peekAgentModelCatalog(config);
+	validateAgentModelSelection(
+		launchPresetId,
+		config.label,
+		input.model,
+		catalog,
+	);
 	validateAgentEffortSelection(
 		launchPresetId,
 		config.label,
 		input.effort,
 		input.model,
+		catalog,
 	);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode);
 	// Ahead of the per-field validators: passing both is its own mistake, and
@@ -440,11 +468,13 @@ export function buildTerminalAgentLaunch(
 		launchPresetId,
 		input.model,
 		input.effort,
+		catalog,
 	);
 	const effortArgs = buildAgentEffortArgs(
 		launchPresetId,
 		input.effort,
 		input.model,
+		catalog,
 	);
 	const modeArgs = buildAgentModeArgs(launchPresetId, input.mode);
 	const command = buildAgentCommandString(
@@ -673,7 +703,12 @@ export function chatLaunchTarget(
 	);
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	validateAgentModelSelection(
+		launchPresetId,
+		config.label,
+		input.model,
+		peekAgentModelCatalog(config),
+	);
 	return { harness, label: config.label, attachments };
 }
 
@@ -795,6 +830,7 @@ export async function runAgentInWorkspace(
 			message: `Workspace ${input.workspaceId} not found on this host — it may have been deleted.`,
 		});
 	}
+	await prepareAgentModelCatalog(ctx.db, input);
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
 	const continued =
 		continueChatAgent(ctx, input) ?? (await continueTerminalAgent(ctx, input));
@@ -838,4 +874,30 @@ export const agentsRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => runAgentInWorkspace(ctx, input)),
+	/**
+	 * The models and efforts an agent offers, read from its installed CLI when
+	 * the agent supports that (`source: "live"`), else the curated catalog.
+	 */
+	listModels: protectedProcedure
+		.input(z.object({ agent: z.string().min(1) }))
+		.query(async ({ ctx, input }) => {
+			const config = resolveHostAgentConfig(ctx.db, input.agent);
+			if (!config) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `No host agent config matching '${input.agent}'.`,
+				});
+			}
+			const presetId = resolveAgentLaunchPresetId(
+				config.presetId,
+				config.command,
+			);
+			const catalog = await loadAgentModelCatalog(ctx.db, config);
+			return {
+				presetId,
+				source: catalog ? ("live" as const) : ("curated" as const),
+				models: getAgentModels(presetId, catalog),
+				efforts: catalog?.efforts ?? null,
+			};
+		}),
 });

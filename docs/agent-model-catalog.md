@@ -5,6 +5,28 @@ agent settings, workspace creation, and host-side CLI validation.
 `SUPERSET_CHAT_MODELS` in the same file supplies the cloud chat model list.
 Model names are provider identifiers and are not translated.
 
+## Live catalogs
+
+An agent marked `liveCatalog` in `AGENT_MODEL_SUPPORT` gets its models from
+the installed CLI. The host reads every live list once after boot, then on
+demand (`agents.listModels`). It keeps a list for 10 minutes per agent config,
+or until the CLI reports a different `--version`, and runs the read under the
+agent's launch env, so an agent pinned to another account lists that account's
+models. Pickers show
+the live list; launch validation accepts curated and live ids. When the read
+fails, or the host is older than `agents.listModels`, the curated list applies.
+
+| Agent | Source | Notes |
+| --- | --- | --- |
+| Codex | `codex app-server` → `model/list` | Ids, labels, and efforts per model; hidden models are dropped |
+| agy | `agy models` | Short vendor list, but ids carry the effort level; not wired yet |
+| cursor-agent, OpenCode, Pi | `--list-models`, `opencode models`, `--list-models` | Full catalogs with every effort and fast variant, embedding and TTS models; not usable as a picker |
+| Claude, Copilot, Gemini, Vibe | none | Curated list only |
+
+To add an agent, give it a discoverer in
+`packages/host-service/src/trpc/router/agents/utils/model-catalog/modelCatalog.ts`
+and set `liveCatalog: true`. Mobile pickers still read the curated list.
+
 ## Codex refresh: October 30, 2026
 
 Live `codex app-server` → `model/list` (codex 0.162.1) lists GPT-6.1 Sol,

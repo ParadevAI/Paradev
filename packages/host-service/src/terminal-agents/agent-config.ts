@@ -65,6 +65,16 @@ function rowToConfig(
 	};
 }
 
+/** Every agent config on this host, in display order. */
+export function listHostAgentConfigs(db: HostDb): ResolvedHostAgentConfig[] {
+	return db
+		.select()
+		.from(hostAgentConfigs)
+		.orderBy(asc(hostAgentConfigs.displayOrder))
+		.all()
+		.map(rowToConfig);
+}
+
 /**
  * Look up a HostAgentConfig by its instance id first, then fall back to the
  * lowest-`order` row matching by presetId. Preset ids are short slugs;

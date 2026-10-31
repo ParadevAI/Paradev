@@ -6,6 +6,7 @@ import {
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
+	getAgentModels,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
@@ -27,6 +28,7 @@ import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
+import { useAgentModelCatalogs } from "renderer/hooks/useAgentModelCatalogs";
 import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
@@ -508,12 +510,30 @@ export function NewWorkspaceScreen({
 		const agent = v2Agents.find((candidate) => candidate.id === selectedAgent);
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [v2Agents, selectedAgent]);
-	const modelSupport = selectedPresetId
-		? getAgentModelSupport(selectedPresetId)
-		: undefined;
+	const catalogAgents = useMemo(
+		() =>
+			v2Agents.map((agent) => ({
+				id: agent.id,
+				launchPresetId: launchPresetIdOf(agent),
+			})),
+		[v2Agents],
+	);
+	const modelCatalogs = useAgentModelCatalogs(launchHostUrl, catalogAgents);
+	const selectedCatalog = modelCatalogs[selectedAgent] ?? null;
+	const modelSupport = useMemo(() => {
+		const support = selectedPresetId
+			? getAgentModelSupport(selectedPresetId)
+			: undefined;
+		if (!support || !selectedPresetId || !selectedCatalog) return support;
+		return {
+			...support,
+			models: getAgentModels(selectedPresetId, selectedCatalog),
+		};
+	}, [selectedPresetId, selectedCatalog]);
 	const { selectedModel, setSelectedModel } = useAgentModelPreference(
 		MODEL_STORAGE_KEY,
 		modelSupport ? selectedPresetId : null,
+		selectedCatalog,
 	);
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
@@ -530,9 +550,13 @@ export function NewWorkspaceScreen({
 	const effortOptions = useMemo(
 		() =>
 			selectedPresetId
-				? getAgentEfforts(selectedPresetId, selectedModel ?? undefined)
+				? getAgentEfforts(
+						selectedPresetId,
+						selectedModel ?? undefined,
+						selectedCatalog,
+					)
 				: [],
-		[selectedPresetId, selectedModel],
+		[selectedPresetId, selectedModel, selectedCatalog],
 	);
 	const effortForLaunch = effortOptions.some(
 		(option) => option.id === selectedEffort,
@@ -613,8 +637,9 @@ export function NewWorkspaceScreen({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
-				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
+				models: getAgentModels(
+					launchPresetIdOf(agent),
+					modelCatalogs[agent.id],
 				).map(({ id, label }) => ({ id, label })),
 			})),
 			onSwitch: (agentId, model) => {
@@ -624,7 +649,7 @@ export function NewWorkspaceScreen({
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, v2Agents]);
+	}, [modelCatalogs, selectedAgent, setSelectedAgent, v2Agents]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(

@@ -60,6 +60,7 @@ import {
 } from "./terminal-agents";
 import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
 import { appRouter } from "./trpc/router";
+import { warmAgentModelCatalogs } from "./trpc/router/agents/utils/model-catalog";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
 import {
 	disposeLocalMobileDevices,
@@ -433,6 +434,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		// repair, and a slow filesystem must not delay them.
 		await provisionSelectedAccounts(db).catch((err) => {
 			console.warn("[host-service] account provisioning failed:", err);
+		});
+		// After provisioning: each read runs under the agent's account env.
+		await warmAgentModelCatalogs(db).catch((err) => {
+			console.warn("[host-service] agent model catalog warm failed:", err);
 		});
 	})();
 
