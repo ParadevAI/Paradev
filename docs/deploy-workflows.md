@@ -3,6 +3,8 @@
 Four things about `.github/workflows/` that surprised us during the 17 September 2026 outage and
 its follow-through. Migration safety itself is in `.agents/skills/db-migrations/SKILL.md`; adding
 a variable to the deploys is in `docs/environment-variables.md`.
+The agents web deploy (`deploy-agents`, the mobile web export behind apps/web's `/agents`) and its
+one-time Vercel and secret setup are in `docs/agents-web.md`.
 
 ## A piped `run:` step hides failures
 

@@ -13,6 +13,7 @@ env:
   PR_NUMBER: ${{ github.event.pull_request.number }}
   API_ALIAS: api-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   WEB_ALIAS: web-pr-${{ github.event.pull_request.number }}-superset.vercel.app
+  AGENTS_ALIAS: agents-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   MARKETING_ALIAS: marketing-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   ADMIN_ALIAS: admin-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   DOCS_ALIAS: docs-pr-${{ github.event.pull_request.number }}-superset.vercel.app
@@ -411,6 +412,7 @@ jobs:
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
           RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
+          AGENTS_URL: https://${{ env.AGENTS_ALIAS }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -420,6 +422,7 @@ jobs:
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env AGENTS_URL=$AGENTS_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
             --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
@@ -466,6 +469,70 @@ jobs:
         with:
           name: web-status
           path: web-status.env
+
+  deploy-agents:
+    name: Deploy Agents Web
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    environment:
+      name: preview
+      url: https://${{ env.WEB_ALIAS }}/agents
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: Compile translations
+        run: bun run --filter=@superset/i18n build
+
+      - name: Install Vercel CLI
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      - name: Build and Deploy Agents Web
+        working-directory: apps/mobile
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+          EXPO_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          EXPO_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
+          EXPO_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          EXPO_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          EXPO_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          EXPO_PUBLIC_SENTRY_DSN_MOBILE: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN_MOBILE }}
+          EXPO_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+        run: |
+          bun scripts/build-web.ts
+          VERCEL_URL=$(vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN)
+          vercel alias $VERCEL_URL ${{ env.AGENTS_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+
+      - name: Save agents success status
+        run: |
+          cat > agents-status.env << EOF
+          AGENTS_STATUS="✅"
+          AGENTS_LINK="<a href=\"https://${{ env.WEB_ALIAS }}/agents\">Open Preview</a>"
+          EOF
+
+      - name: Upload agents status
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: agents-status
+          path: agents-status.env
 
   deploy-marketing:
     name: Deploy Marketing
@@ -710,7 +777,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: always()
-    needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-marketing, deploy-docs]
+    needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-agents, deploy-marketing, deploy-docs]
     permissions:
       contents: read
       pull-requests: write
@@ -733,6 +800,8 @@ jobs:
           API_LINK="Failed to deploy"
           WEB_STATUS="❌"
           WEB_LINK="Failed to deploy"
+          AGENTS_STATUS="❌"
+          AGENTS_LINK="Failed to deploy"
           MARKETING_STATUS="❌"
           MARKETING_LINK="Failed to deploy"
           DOCS_STATUS="❌"
@@ -753,6 +822,10 @@ jobs:
             source web-status.env
           fi
 
+          if [[ "${{ needs.deploy-agents.result }}" == "success" ]]; then
+            source agents-status.env
+          fi
+
           if [[ "${{ needs.deploy-marketing.result }}" == "success" ]]; then
             source marketing-status.env
           fi
@@ -761,7 +834,7 @@ jobs:
             source docs-status.env
           fi
 
-          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK MARKETING_STATUS MARKETING_LINK DOCS_STATUS DOCS_LINK
+          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK AGENTS_STATUS AGENTS_LINK MARKETING_STATUS MARKETING_LINK DOCS_STATUS DOCS_LINK
           envsubst < .github/templates/preview-comment.md > final-comment.md
 
       - name: Post final deployment comment
