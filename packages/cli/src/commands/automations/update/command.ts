@@ -2,6 +2,7 @@ import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { command } from "../../../lib/command";
 import { resolveHostFilter } from "../../../lib/host-target";
+import { assertTriggersConnected } from "../missingConnectionError";
 import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
@@ -85,6 +86,12 @@ export default command({
 		}
 
 		const triggers = resolveTriggers(options);
+
+		await assertTriggersConnected(
+			ctx.api,
+			ctx.config.organizationId ?? undefined,
+			triggers,
+		);
 
 		const targetHostId = resolveHostFilter({
 			host: options.host ?? undefined,
