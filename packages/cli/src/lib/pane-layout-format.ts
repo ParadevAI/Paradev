@@ -1,5 +1,6 @@
 import type {
 	PaneLayoutNode,
+	PaneLayoutSidebar,
 	PaneLayoutSnapshot,
 	PaneLayoutTab,
 } from "@superset/shared/pane-layout-ops";
@@ -43,14 +44,32 @@ function formatNode(
 	return [`${indent}${pane ? describePane(pane) : node.paneId}`];
 }
 
+function formatTabs(tabs: PaneLayoutTab[]): string[] {
+	return tabs.flatMap((tab) => [
+		[`tab ${tab.id}`, tab.title ?? "", tab.active ? "(active)" : ""]
+			.filter(Boolean)
+			.join("\t"),
+		...formatNode(tab.layout, tab, 1),
+	]);
+}
+
+function sidebarState(sidebar: PaneLayoutSidebar): string {
+	if (!sidebar.open) return "hidden";
+	return sidebar.fullScreen ? "shown, full screen" : "shown";
+}
+
 export function formatLayout(layout: PaneLayoutSnapshot): string {
-	if (layout.tabs.length === 0) return "No panes open in this workspace.";
-	return layout.tabs
-		.flatMap((tab) => [
-			[`tab ${tab.id}`, tab.title ?? "", tab.active ? "(active)" : ""]
-				.filter(Boolean)
-				.join("\t"),
-			...formatNode(tab.layout, tab, 1),
-		])
-		.join("\n");
+	const { sidebar } = layout;
+	if (!sidebar) {
+		return layout.tabs.length === 0
+			? "No panes open in this workspace."
+			: formatTabs(layout.tabs).join("\n");
+	}
+	return [
+		"Main",
+		...(layout.tabs.length === 0 ? ["No tabs."] : formatTabs(layout.tabs)),
+		"",
+		`Sidebar (${sidebarState(sidebar)})`,
+		...(sidebar.tabs.length === 0 ? ["No tabs."] : formatTabs(sidebar.tabs)),
+	].join("\n");
 }
