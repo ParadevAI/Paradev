@@ -14,7 +14,6 @@ import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
 import { getGitAuthorName } from "../../../runtime/git/identity";
-import { resolveRef } from "../../../runtime/git/refs";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
@@ -87,6 +86,7 @@ import {
 import { resolveProjectBranchPrefix } from "../workspace-creation/utils/branch-prefix";
 import type { ExecGh } from "../workspace-creation/utils/exec-gh";
 import { listBranchNames } from "../workspace-creation/utils/list-branch-names";
+import { planBranchSource } from "../workspace-creation/utils/plan-branch-source";
 import {
 	deleteMaterializedPrBranchIfSafe,
 	type MaterializePrBranchResult,
@@ -374,43 +374,6 @@ function createOffLoopAuthorNameGetter(
 ): () => Promise<string | null> {
 	return () =>
 		getHostWorkerPool().run(gitAuthorNameTask, { worktreePath: repoPath });
-}
-
-async function planBranchSource(
-	git: GitClient,
-	branch: string,
-	baseBranch: string | undefined,
-	fetchRemoteRef?: BaseRefFetcher,
-): Promise<BranchSourcePlan> {
-	const resolved = await resolveRef(git, branch);
-
-	if (
-		resolved &&
-		(resolved.kind === "local" || resolved.kind === "remote-tracking")
-	) {
-		// `shortName`, not the input: resolveRef may have adopted an existing
-		// branch's canonical casing, and `-b <input-casing>` would mint a
-		// case-twin sharing the same loose-ref file on case-insensitive disks.
-		return {
-			branch: resolved.shortName,
-			startPoint: resolved,
-			usedExistingBranch: true,
-		};
-	}
-
-	if (resolved && resolved.kind === "tag") {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: `"${branch}" is a tag, not a branch — cannot check out into a workspace`,
-		});
-	}
-
-	const startPoint = await resolveNewBranchStartPoint(
-		git,
-		baseBranch,
-		fetchRemoteRef,
-	);
-	return { branch, startPoint, usedExistingBranch: false };
 }
 
 // Adopt any worktree git knows about, no matter where it lives —

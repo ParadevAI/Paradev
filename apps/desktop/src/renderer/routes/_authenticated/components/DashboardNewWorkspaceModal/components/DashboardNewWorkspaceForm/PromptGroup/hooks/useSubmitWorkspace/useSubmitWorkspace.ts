@@ -344,6 +344,7 @@ export function useSubmitWorkspace(
 							projectId: projectId as string,
 							name: workspaceName ?? openTarget.branchName,
 							branch: openTarget.branchName,
+							skipBranchPrefix: true,
 							baseBranch: draft.baseBranch ?? undefined,
 							...(openTarget.worktreePath
 								? { worktreePath: openTarget.worktreePath }
