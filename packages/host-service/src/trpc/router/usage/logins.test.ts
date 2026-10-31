@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import {
 	FINGERPRINT_READ_CONCURRENCY,
 	readClaudeFingerprints,
+	scanLogins,
 	shareInFlight,
 } from "./logins";
 import type { ClaudeProfile } from "./profiles";
@@ -28,6 +29,26 @@ describe("usage.logins", () => {
 		expect(usageRouter._def.procedures.logins._def.meta).toEqual({
 			timeoutMs: 15_000,
 		});
+	});
+});
+
+describe("scanLogins", () => {
+	it("says when the Claude profile scan stopped at its time budget", async () => {
+		for (const partial of [true, false]) {
+			const logins = await scanLogins({
+				scanClaudeProfiles: async () => ({
+					profiles: [profile("/profiles/a")],
+					partial,
+				}),
+				discoverCodexHomes: async () => [],
+				readDefaultLoginEmail: async () => null,
+				readClaudeLoginFingerprint: async () => null,
+			});
+			expect(logins.claude.map((login) => login.configDir)).toEqual([
+				"/profiles/a",
+			]);
+			expect(logins.claudePartial).toBe(partial);
+		}
 	});
 });
 
