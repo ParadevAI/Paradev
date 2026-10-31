@@ -8,9 +8,11 @@ Model names are provider identifiers and are not translated.
 ## Live catalogs
 
 An agent marked `liveCatalog` in `AGENT_MODEL_SUPPORT` gets its models from
-the installed CLI. The host reads the list (`agents.listModels`), keeps it for
-10 minutes per agent config, and runs the read under the agent's launch env, so
-an agent pinned to another account lists that account's models. Pickers show
+the installed CLI. The host reads every live list once after boot, then on
+demand (`agents.listModels`). It keeps a list for 10 minutes per agent config,
+or until the CLI reports a different `--version`, and runs the read under the
+agent's launch env, so an agent pinned to another account lists that account's
+models. Pickers show
 the live list; launch validation accepts curated and live ids. When the read
 fails, or the host is older than `agents.listModels`, the curated list applies.
 
