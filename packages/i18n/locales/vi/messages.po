@@ -3201,6 +3201,9 @@ msgstr "Avatar (atom)"
 msgid "Avatar updated!"
 msgstr "Đã cập nhật ảnh đại diện!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel và Kiet Ho tại YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "Đang chờ {0}"
@@ -3524,9 +3527,6 @@ msgstr "Nhập các không gian làm việc của bạn"
 
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Đưa dự án, workspace và script terminal từ v1 sang v2. Mỗi mục được nhập riêng và có thể thử lại."
-
-msgid "Bring your agents together."
-msgstr "Quy tụ các agent của bạn."
 
 msgid "Bringing over your v1 projects"
 msgstr "Đang chuyển các dự án v1 của bạn"
@@ -5963,6 +5963,9 @@ msgstr "Không thể bỏ stage tệp"
 
 msgid "Couldn't update pull request"
 msgstr "Không thể cập nhật pull request"
+
+msgid "Couldn't update the Chat setting"
+msgstr "Không thể cập nhật cài đặt Trò chuyện"
 
 msgid "Couldn't update the queue"
 msgstr "Không thể cập nhật hàng đợi"
@@ -9966,6 +9969,9 @@ msgstr "Yêu cầu không hợp lệ"
 msgid "Invalid state parameter. Please try again."
 msgstr "Tham số state không hợp lệ. Vui lòng thử lại."
 
+msgid "Investigate production logs and issues"
+msgstr "Điều tra log và sự cố production"
+
 msgid "Invitation canceled"
 msgstr "Đã hủy lời mời"
 
@@ -10288,6 +10294,9 @@ msgstr "Phím tắt"
 msgid "Keyboard Shortcuts"
 msgstr "Phím tắt"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel và Avi Peltz thuyết trình tại YC"
+
 msgid "Kill"
 msgstr "Kết thúc"
 
@@ -10559,9 +10568,6 @@ msgstr "Đã rời tổ chức"
 
 msgid "Left team"
 msgstr "Đã rời nhóm"
-
-msgid "Legal"
-msgstr "Pháp lý"
 
 msgid "Less"
 msgstr "Ít"
@@ -13120,6 +13126,9 @@ msgstr "Mở cài đặt quản trị ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Mở cài đặt ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Mở phiên Claude và Codex dưới dạng trò chuyện"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Mở phiên Claude và Codex trong một khung chat thay vì terminal."
 
@@ -13515,9 +13524,6 @@ msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 
 msgid "Options"
 msgstr "Tùy chọn"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "Hoặc bảo coding agent của bạn cài CLI Paradev."
 
 msgid "Orange"
 msgstr "Cam"
@@ -17596,6 +17602,10 @@ msgstr "Nhỏ"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Nhỏ"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Xử gọn backlog của bạn."
 
 msgid "Smileys & People"
 msgstr "Mặt cười & Con người"

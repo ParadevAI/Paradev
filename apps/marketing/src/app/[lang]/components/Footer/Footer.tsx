@@ -17,6 +17,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { m } from "framer-motion";
 import { ArrowUpRight, Check, ChevronDown, Languages } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -24,6 +25,11 @@ import { FaApple } from "react-icons/fa";
 import { track } from "@/lib/analytics";
 import { Soc2Badge } from "../Soc2Badge";
 import { SocialLinks } from "../SocialLinks";
+import { FooterBackdrop } from "./components/FooterBackdrop";
+
+const CTASection = dynamic(() =>
+	import("./components/CTASection").then((mod) => mod.CTASection),
+);
 
 function SupersetLogo() {
 	return (
@@ -192,23 +198,27 @@ export function Footer({
 	if (pathname === "/download") return null;
 
 	return (
-		<footer className="border-t border-border bg-background">
+		<footer className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-t border-border bg-background">
+			<FooterBackdrop />
+			<div className="flex flex-1 items-center">
+				<CTASection />
+			</div>
 			<m.div
 				initial={{ opacity: 0 }}
 				whileInView={{ opacity: 1 }}
 				viewport={{ once: true }}
 				transition={{ duration: 0.5 }}
-				className="max-w-7xl mx-auto px-6 sm:px-8 py-14 sm:py-20"
+				className="mx-auto w-full max-w-7xl px-6 pb-10 sm:px-8"
 			>
-				<div className="grid grid-cols-2 gap-10 md:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto] md:gap-x-16">
-					<div className="col-span-2 flex flex-col gap-6 md:col-span-1">
+				<div className="grid grid-cols-2 gap-x-10 gap-y-12 md:grid-cols-[auto_auto_auto] md:justify-between md:gap-x-16 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] xl:gap-x-20">
+					<div className="col-span-2 flex flex-col gap-6 md:col-span-3 md:flex-row md:items-center md:gap-10 lg:col-span-1 lg:flex-col lg:items-start lg:gap-6">
 						<Link
 							href="/"
-							className="inline-block text-foreground transition-colors hover:text-foreground/80"
+							className="inline-block w-max text-foreground transition-colors hover:text-foreground/80"
 						>
 							<SupersetLogo />
 						</Link>
-						<div className="-ml-2 flex items-center gap-2">
+						<div className="-ml-1 flex items-center gap-2 sm:-ml-2">
 							<SocialLinks />
 							<a
 								href={COMPANY.APP_STORE_URL}
@@ -234,19 +244,34 @@ export function Footer({
 						>
 							<Soc2Badge size={80} />
 						</a>
-						<p className="text-sm text-muted-foreground">
-							<Trans>© {year} Superset Inc.</Trans>
-						</p>
-						<FooterLanguageSwitcher locale={locale} />
 					</div>
 
-					<FooterColumn title={<Trans>Product</Trans>} links={PRODUCT_LINKS} />
+					<FooterColumn
+						title={<Trans>Product</Trans>}
+						links={PRODUCT_LINKS}
+						split
+					/>
 					<FooterColumn title={<Trans>Company</Trans>} links={COMPANY_LINKS} />
 					<FooterColumn
 						title={<Trans>Resources</Trans>}
 						links={RESOURCE_LINKS}
 					/>
-					<FooterColumn title={<Trans>Legal</Trans>} links={LEGAL_LINKS} />
+				</div>
+
+				<div className="mt-12 flex flex-col gap-4 border-t [@media(max-height:800px)]:mt-8 border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+						<p className="text-sm text-muted-foreground">
+							<Trans>© {year} Superset Inc.</Trans>
+						</p>
+						<FooterLanguageSwitcher locale={locale} />
+					</div>
+					<ul className="flex flex-wrap items-center gap-x-6 gap-y-3">
+						{LEGAL_LINKS.map((link) => (
+							<li key={link.href}>
+								<FooterLinkItem link={link} />
+							</li>
+						))}
+					</ul>
 				</div>
 			</m.div>
 		</footer>
@@ -256,14 +281,31 @@ export function Footer({
 function FooterColumn({
 	title,
 	links,
+	split = false,
 }: {
 	title: ReactNode;
 	links: FooterLink[];
+	split?: boolean;
 }) {
 	return (
-		<div className="flex flex-col gap-4">
+		<div
+			className={`flex flex-col gap-4 ${split ? "col-span-2 md:col-span-1" : ""}`}
+		>
 			<p className="text-sm font-medium text-foreground">{title}</p>
-			<ul className="flex flex-col gap-3">
+			<ul
+				className={
+					split
+						? "grid grid-flow-col grid-cols-2 gap-x-10 gap-y-2 md:gap-x-16"
+						: "flex flex-col gap-2"
+				}
+				style={
+					split
+						? {
+								gridTemplateRows: `repeat(${Math.ceil(links.length / 2)}, auto)`,
+							}
+						: undefined
+				}
+			>
 				{links.map((link) => (
 					<li key={link.href}>
 						<FooterLinkItem link={link} />

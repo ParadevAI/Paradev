@@ -420,6 +420,51 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "user_01", label: "h@tegon.ai" });
 	});
 
+	test("sazabi_mcp asks Sazabi's userinfo endpoint after OAuth", async () => {
+		const calls = respond({ sub: "usr_01", email: "h@tegon.ai" });
+
+		const identity = await probeIdentity(
+			"sazabi_mcp",
+			connectorMethod(requireConnector("sazabi_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.platform.sazabi.com/api/auth/oauth2/userinfo",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+		expect(identity.user).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+	});
+
+	test("sazabi_mcp reads a secret key's organization from /v1/me", async () => {
+		const calls = respond({
+			credentialType: "secret",
+			organization: { id: "org_01", name: "Tegon", slug: "tegon" },
+			keyName: "paradev",
+			projectId: null,
+		});
+
+		const identity = await probeIdentity(
+			"sazabi_mcp",
+			connectorMethod(requireConnector("sazabi_mcp"), "api_key"),
+			"sk-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.sazabi.com/v1/me",
+				method: "GET",
+				auth: "Bearer sk-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "org_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "org_01", label: "paradev" });
+	});
+
 	test("stripe survives an account with no name", async () => {
 		globalThis.fetch = (async (_url: string, init: RequestInit) => {
 			const body = init.body

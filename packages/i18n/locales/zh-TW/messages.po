@@ -3201,6 +3201,9 @@ msgstr "頭像（原子元件）"
 msgid "Avatar updated!"
 msgstr "頭像已更新！"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz、Satya Patel 和 Kiet Ho 在 YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "等待{0}"
@@ -3524,9 +3527,6 @@ msgstr "遷入工作區"
 
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "將v1的專案、工作區和終端指令碼遷移到v2。每一項單獨匯入，可以重試。"
-
-msgid "Bring your agents together."
-msgstr "把你的代理程式聚到一起。"
 
 msgid "Bringing over your v1 projects"
 msgstr "正在移轉你的 v1 專案"
@@ -5963,6 +5963,9 @@ msgstr "無法取消暫存檔案"
 
 msgid "Couldn't update pull request"
 msgstr "無法更新拉取請求"
+
+msgid "Couldn't update the Chat setting"
+msgstr "無法更新聊天設定"
 
 msgid "Couldn't update the queue"
 msgstr "無法更新佇列"
@@ -9966,6 +9969,9 @@ msgstr "無效請求"
 msgid "Invalid state parameter. Please try again."
 msgstr "state引數無效。請重試。"
 
+msgid "Investigate production logs and issues"
+msgstr "調查正式環境日誌與問題"
+
 msgid "Invitation canceled"
 msgstr "邀請已取消"
 
@@ -10288,6 +10294,9 @@ msgstr "鍵盤快速鍵"
 msgid "Keyboard Shortcuts"
 msgstr "鍵盤快速鍵"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho、Satya Patel 和 Avi Peltz 在 YC 演講"
+
 msgid "Kill"
 msgstr "終止"
 
@@ -10559,9 +10568,6 @@ msgstr "已退出組織"
 
 msgid "Left team"
 msgstr "已退出團隊"
-
-msgid "Legal"
-msgstr "法律"
 
 msgid "Less"
 msgstr "少"
@@ -13120,6 +13126,9 @@ msgstr "開啟 ChatGPT 管理員設定"
 msgid "Open ChatGPT settings"
 msgstr "開啟 ChatGPT 設定"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "以聊天形式開啟 Claude 和 Codex 工作階段"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "在聊天窗格而非終端機中開啟 Claude 和 Codex 工作階段。"
 
@@ -13515,9 +13524,6 @@ msgstr "選填。幫助我們了解哪些管道有效。"
 
 msgid "Options"
 msgstr "選項"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "或者讓你的編碼代理程式安裝Paradev CLI。"
 
 msgid "Orange"
 msgstr "橙色"
@@ -17596,6 +17602,10 @@ msgstr "小"
 msgctxt "machine size"
 msgid "Small"
 msgstr "小型"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "清空你的待辦清單。"
 
 msgid "Smileys & People"
 msgstr "表情與人物"

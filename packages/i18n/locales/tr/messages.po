@@ -3201,6 +3201,9 @@ msgstr "Avatar (atom)"
 msgid "Avatar updated!"
 msgstr "Avatar güncellendi!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "YC Demo Day'de Avi Peltz, Satya Patel ve Kiet Ho"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "{0} bekleniyor"
@@ -3524,9 +3527,6 @@ msgstr "Çalışma alanlarınızı aktarın"
 
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1 projelerini, çalışma alanlarını ve terminal betiklerini v2'ye taşıyın. Her öğe ayrı ayrı aktarılır ve yeniden denenebilir."
-
-msgid "Bring your agents together."
-msgstr "Ajanlarınızı bir araya getirin."
 
 msgid "Bringing over your v1 projects"
 msgstr "v1 projeleriniz aktarılıyor"
@@ -5963,6 +5963,9 @@ msgstr "Dosya hazırlıktan çıkarılamadı"
 
 msgid "Couldn't update pull request"
 msgstr "Pull request güncellenemedi"
+
+msgid "Couldn't update the Chat setting"
+msgstr "Sohbet ayarı güncellenemedi"
 
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
@@ -9966,6 +9969,9 @@ msgstr "Geçersiz istek"
 msgid "Invalid state parameter. Please try again."
 msgstr "Geçersiz state parametresi. Lütfen yeniden deneyin."
 
+msgid "Investigate production logs and issues"
+msgstr "Canlı ortam loglarını ve sorunlarını inceleyin"
+
 msgid "Invitation canceled"
 msgstr "Davet iptal edildi"
 
@@ -10288,6 +10294,9 @@ msgstr "Klavye kısayolları"
 msgid "Keyboard Shortcuts"
 msgstr "Klavye kısayolları"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "YC'de sunum yapan Kiet Ho, Satya Patel ve Avi Peltz"
+
 msgid "Kill"
 msgstr "Sonlandır"
 
@@ -10559,9 +10568,6 @@ msgstr "Kuruluştan ayrılındı"
 
 msgid "Left team"
 msgstr "Takımdan ayrılındı"
-
-msgid "Legal"
-msgstr "Yasal"
 
 msgid "Less"
 msgstr "Az"
@@ -13120,6 +13126,9 @@ msgstr "ChatGPT yönetici ayarlarını aç"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT ayarlarını aç"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Claude ve Codex oturumlarını sohbet olarak aç"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Claude ve Codex oturumlarını terminal yerine bir sohbet panelinde açın."
 
@@ -13515,9 +13524,6 @@ msgstr "İsteğe bağlı. Neyin işe yaradığını anlamamıza yardımcı olur.
 
 msgid "Options"
 msgstr "Seçenekler"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "Ya da kodlama ajanınızdan Paradev CLI'yi kurmasını isteyin."
 
 msgid "Orange"
 msgstr "Turuncu"
@@ -17596,6 +17602,10 @@ msgstr "Küçük"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Küçük"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Birikmiş işlerinizi eritin."
 
 msgid "Smileys & People"
 msgstr "Suratlar ve İnsanlar"

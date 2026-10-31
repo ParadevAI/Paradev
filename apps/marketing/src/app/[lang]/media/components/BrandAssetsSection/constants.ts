@@ -4,7 +4,7 @@ import { msg } from "@lingui/core/macro";
 export interface BrandAsset {
 	src: string;
 	fileName: string;
-	format: "PNG" | "SVG";
+	format: "PNG" | "SVG" | "JPG";
 	dimensions?: string;
 	label: MessageDescriptor;
 	previewClassName: string;
@@ -75,5 +75,28 @@ export const PRODUCT_IMAGE_ASSETS: BrandAsset[] = [
 		dimensions: "1600 × 1000",
 		label: msg({ message: "Paradev Mobile code diff on iPhone" }),
 		previewClassName: "",
+	},
+];
+
+export const FOUNDER_PHOTO_ASSETS: BrandAsset[] = [
+	{
+		src: "/media/founders/paradev-founders-demo-day.jpg",
+		fileName: "paradev-founders-demo-day.jpg",
+		format: "JPG",
+		dimensions: "3000 × 2000",
+		label: msg({
+			message: "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day",
+		}),
+		previewClassName: "bg-muted",
+	},
+	{
+		src: "/media/founders/paradev-founders-yc-talk.jpg",
+		fileName: "paradev-founders-yc-talk.jpg",
+		format: "JPG",
+		dimensions: "3000 × 2000",
+		label: msg({
+			message: "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC",
+		}),
+		previewClassName: "bg-muted",
 	},
 ];

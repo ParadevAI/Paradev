@@ -21,6 +21,7 @@ export default defineConfig({
 		"id",
 		"cs",
 		"vi",
+		"uk",
 	],
 	// Origins follow filesystem order, which differs between macOS and Linux
 	// and would dirty the CI diff.

@@ -3,7 +3,7 @@ export {
 	useTabTitle,
 	Workspace,
 } from "./components/Workspace";
-export { useIsTabVisible } from "./hooks/useIsTabVisible";
+export { TabVisibilityContext, useIsTabVisible } from "./hooks/useIsTabVisible";
 export { usePaneFocus } from "./hooks/usePaneFocus";
 export type {
 	ContextMenuActionConfig,

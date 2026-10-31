@@ -205,6 +205,10 @@
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
 		},
+		"./pull-request-checks": {
+			"types": "./src/pull-request-checks/index.ts",
+			"default": "./src/pull-request-checks/index.ts"
+		},
 		"./pull-request-threads": {
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
