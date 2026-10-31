@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { automationGroupInputSchema } from "@superset/shared/automation-group";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { z } from "zod";
 import { createMcpCaller } from "../../caller";
@@ -55,6 +56,11 @@ export function register(server: McpServer): void {
 				.optional()
 				.describe(
 					"Workspace tags applied to each run's created workspace; each tag files it into a sidebar folder of the same name. Update replaces the whole set.",
+				),
+			group: automationGroupInputSchema
+				.optional()
+				.describe(
+					"Group the automation is listed under in the automations table; null removes it from its group. Omit to keep the current group.",
 				),
 		},
 		handler: async (input, ctx) => {

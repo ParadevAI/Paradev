@@ -2242,9 +2242,10 @@ a JSON trigger set; see [Automations](/automations#triggers).
 	name="superset automations list"
 	options={[
 		{ flag: "--name <text>", description: "Case-insensitive substring filter on the automation name. Alias: -n." },
+		{ flag: "--group <name>", description: "Only automations in this group (case-insensitive)." },
 	]}
 	output="Array<Automation>"
-	humanColumns={["ID", "NAME", "AGENT", "SCHEDULE", "ENABLED", "NEXT RUN"]}
+	humanColumns={["ID", "NAME", "GROUP", "AGENT", "SCHEDULE", "ENABLED", "NEXT RUN"]}
 	quiet="automation IDs"
 >
 List automations in the active organization.
@@ -2279,6 +2280,7 @@ Use [`automations logs`](#superset-automations-logs-id) for run history.
 		{ flag: "--agent <agent>", description: "Host agent presetId, instance UUID, or 'superset' for built-in chat. Default: claude." },
 		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace." },
 		{ flag: "--tag <tag>", description: "Workspace tag applied to each run's created workspace. Repeatable. Default: automation." },
+		{ flag: "--group <name>", description: "Group the automation is listed under in the automations table. Default: none." },
 	]}
 	output="Automation"
 >
@@ -2294,7 +2296,8 @@ session workspace on the target host.
 Every run's created workspace carries the automation's tags, which group it
 into the matching sidebar folders. By default automations are tagged
 `automation`, so their runs collect in an **automation** folder per project;
-pass `--tag` to file runs elsewhere.
+pass `--tag` to file runs elsewhere. Tags file the runs; `--group` files the
+automation itself in the automations table.
 
 ```bash
 superset automations create \
@@ -2343,6 +2346,8 @@ superset automations trigger-options --group slack
 		{ flag: "--mcp-scope <a,b,c>", description: "Comma-separated MCP scope strings." },
 		{ flag: "--tag <tag>", description: "Replace the tag set applied to each run's created workspace. Repeatable." },
 		{ flag: "--clear-tags", description: "Remove every tag (runs stop grouping). Mutually exclusive with --tag." },
+		{ flag: "--group <name>", description: "Move the automation to this group in the automations table." },
+		{ flag: "--clear-group", description: "Remove the automation from its group. Mutually exclusive with --group." },
 		{ flag: "--enabled / --no-enabled", description: "Calls automation.setEnabled first." },
 	]}
 	output="Automation"

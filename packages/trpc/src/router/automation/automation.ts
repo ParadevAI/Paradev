@@ -80,6 +80,7 @@ import {
 	listRunsSchema,
 	parseRruleSchema,
 	runPayloadSchema,
+	setAutomationGroupSchema,
 	setAutomationPromptSchema,
 	updateAutomationSchema,
 } from "./schema";
@@ -595,6 +596,7 @@ export const automationRouter = {
 						// Every automation groups its runs out of the box; explicit
 						// tags (including []) override the default.
 						tags: input.tags ?? ["automation"],
+						group: input.group ?? null,
 					})
 					.returning();
 
@@ -711,6 +713,7 @@ export const automationRouter = {
 							? { machineSize: input.machineSize }
 							: {}),
 						tags: input.tags ?? existing.tags,
+						...(input.group !== undefined ? { group: input.group } : {}),
 						prompt: input.prompt ?? existing.prompt,
 					})
 					.where(eq(automations.id, input.id))
@@ -796,6 +799,20 @@ export const automationRouter = {
 				throw await automationNotFound(input.id, ctx.session.user.id);
 			}
 			return existing;
+		}),
+
+	setGroup: protectedProcedure
+		.input(setAutomationGroupSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
+
+			await db
+				.update(automations)
+				.set({ group: input.group })
+				.where(eq(automations.id, input.id));
+
+			return { id: input.id, group: input.group };
 		}),
 
 	setPrompt: protectedProcedure

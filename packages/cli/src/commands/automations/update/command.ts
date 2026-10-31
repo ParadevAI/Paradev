@@ -58,6 +58,10 @@ export default command({
 				"Replace the tag set applied to each run's created workspace. Repeatable",
 			),
 		clearTags: boolean().desc("Remove every tag from the automation"),
+		group: string().desc(
+			"Move the automation to this group in the automations table",
+		),
+		clearGroup: boolean().desc("Remove the automation from its group"),
 	},
 	run: async ({ ctx, args, options }) => {
 		const id = args.id as string;
@@ -72,6 +76,13 @@ export default command({
 		if (options.tag?.length && options.clearTags) {
 			throw new CLIError(
 				"Cannot combine --tag and --clear-tags",
+				"Pass one or the other",
+			);
+		}
+
+		if (options.group && options.clearGroup) {
+			throw new CLIError(
+				"Cannot combine --group and --clear-group",
 				"Pass one or the other",
 			);
 		}
@@ -212,6 +223,11 @@ export default command({
 				? { tags: [] }
 				: options.tag?.length
 					? { tags: options.tag }
+					: {}),
+			...(options.clearGroup
+				? { group: null }
+				: options.group
+					? { group: options.group }
 					: {}),
 			...target,
 			...cloudTarget,

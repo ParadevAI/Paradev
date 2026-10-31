@@ -504,6 +504,10 @@
 		"./missing-procedure-error": {
 			"types": "./src/missing-procedure-error.ts",
 			"default": "./src/missing-procedure-error.ts"
+		},
+		"./automation-group": {
+			"types": "./src/automation-group.ts",
+			"default": "./src/automation-group.ts"
 		}
 	},
 	"scripts": {

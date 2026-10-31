@@ -311,6 +311,7 @@ export const automationBaseColumns = {
 	cloudWorkspaceId: automations.cloudWorkspaceId,
 	environmentId: automations.environmentId,
 	tags: automations.tags,
+	group: automations.group,
 	continueAgentSession: automations.continueAgentSession,
 	machineSize: automations.machineSize,
 	enabled: automations.enabled,
