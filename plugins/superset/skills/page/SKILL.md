@@ -356,6 +356,9 @@ superset pages publish ./report/ --title "Q3 pipeline"
 spaces, so name the file well or pass the flag. `--label` is what shows in
 version history; write what changed, not "update".
 
+To show the published page to the user in the desktop app, open it in the right
+sidebar: `superset panes open pages --workspace "$SUPERSET_WORKSPACE_ID" --slug <slug>`.
+
 **Attach a workspace whenever you have one.** The CLI records the file's path
 relative to the workspace root as the page's entry path, and that path is the
 key: publish the same path again and it becomes **version 2 of the same page**
