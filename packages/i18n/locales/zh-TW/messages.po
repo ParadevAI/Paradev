@@ -5140,6 +5140,9 @@ msgstr "上下文視窗：已使用 {percent}"
 msgid "Continue"
 msgstr "繼續"
 
+msgid "Continue in browser"
+msgstr "在瀏覽器中繼續"
+
 msgid "Continue in your browser"
 msgstr "請在瀏覽器中繼續"
 

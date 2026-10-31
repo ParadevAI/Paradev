@@ -5140,6 +5140,9 @@ msgstr "Контекстное окно: использовано {percent}"
 msgid "Continue"
 msgstr "Продолжить"
 
+msgid "Continue in browser"
+msgstr "Продолжить в браузере"
+
 msgid "Continue in your browser"
 msgstr "Продолжите в браузере"
 

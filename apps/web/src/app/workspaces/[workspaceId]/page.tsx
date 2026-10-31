@@ -12,12 +12,15 @@ export default async function WorkspaceDeepLinkPage({
 	const { workspaceId } = await params;
 	const { sessionId } = await searchParams;
 	const path = `v2-workspace/${encodeURIComponent(workspaceId)}`;
+	const browserHref = `/agents/workspace/${encodeURIComponent(workspaceId)}`;
 	if (typeof sessionId !== "string" || !sessionId) {
-		return <DeepLinkRedirect path={path} />;
+		return <DeepLinkRedirect path={path} browserHref={browserHref} />;
 	}
 	const search = new URLSearchParams({
 		sessionId,
 		focusRequestId: crypto.randomUUID(),
 	});
-	return <DeepLinkRedirect path={`${path}?${search}`} />;
+	return (
+		<DeepLinkRedirect path={`${path}?${search}`} browserHref={browserHref} />
+	);
 }

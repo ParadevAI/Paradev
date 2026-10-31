@@ -5140,6 +5140,9 @@ msgstr "Kontextové okno: využito {percent}"
 msgid "Continue"
 msgstr "Pokračovat"
 
+msgid "Continue in browser"
+msgstr "Pokračovat v prohlížeči"
+
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 

@@ -5140,6 +5140,9 @@ msgstr "Kontextfenster: {percent} verbraucht"
 msgid "Continue"
 msgstr "Weiter"
 
+msgid "Continue in browser"
+msgstr "Im Browser fortfahren"
+
 msgid "Continue in your browser"
 msgstr "Im Browser fortfahren"
 

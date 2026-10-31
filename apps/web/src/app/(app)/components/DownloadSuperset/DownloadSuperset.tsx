@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { COMPANY, DOWNLOAD_URL_MAC_ARM64 } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
-import { Download } from "lucide-react";
+import { Download, Globe } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { initServerI18n } from "@/lib/i18n-server";
 import { ProductDemo } from "./components/ProductDemo";
@@ -39,6 +39,16 @@ export async function DownloadSuperset() {
 								}),
 							)}
 							<Download className="size-5" />
+						</a>
+					</Button>
+					<Button variant="outline" size="lg" className="gap-2" asChild>
+						<a href="/agents">
+							{i18n._(
+								msg({
+									message: "Open in browser",
+								}),
+							)}
+							<Globe className="size-5" />
 						</a>
 					</Button>
 					<Button variant="outline" size="lg" className="gap-2" asChild>

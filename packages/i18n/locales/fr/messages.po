@@ -5140,6 +5140,9 @@ msgstr "Fenêtre de contexte : {percent} utilisés"
 msgid "Continue"
 msgstr "Continuer"
 
+msgid "Continue in browser"
+msgstr "Continuer dans le navigateur"
+
 msgid "Continue in your browser"
 msgstr "Continuez dans votre navigateur"
 

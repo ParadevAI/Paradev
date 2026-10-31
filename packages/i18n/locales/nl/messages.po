@@ -5140,6 +5140,9 @@ msgstr "Contextvenster: {percent} gebruikt"
 msgid "Continue"
 msgstr "Doorgaan"
 
+msgid "Continue in browser"
+msgstr "Doorgaan in de browser"
+
 msgid "Continue in your browser"
 msgstr "Ga verder in je browser"
 

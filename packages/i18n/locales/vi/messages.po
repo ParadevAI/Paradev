@@ -5140,6 +5140,9 @@ msgstr "Cửa sổ ngữ cảnh: đã dùng {percent}"
 msgid "Continue"
 msgstr "Tiếp tục"
 
+msgid "Continue in browser"
+msgstr "Tiếp tục trên trình duyệt"
+
 msgid "Continue in your browser"
 msgstr "Tiếp tục trong trình duyệt"
 

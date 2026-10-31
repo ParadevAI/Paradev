@@ -5140,6 +5140,9 @@ msgstr "Jendela konteks: {percent} terpakai"
 msgid "Continue"
 msgstr "Lanjutkan"
 
+msgid "Continue in browser"
+msgstr "Lanjutkan di browser"
+
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 

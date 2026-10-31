@@ -5140,6 +5140,9 @@ msgstr "上下文窗口：已使用 {percent}"
 msgid "Continue"
 msgstr "继续"
 
+msgid "Continue in browser"
+msgstr "在浏览器中继续"
+
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 

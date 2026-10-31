@@ -5140,6 +5140,9 @@ msgstr "Janela de contexto: {percent} usado"
 msgid "Continue"
 msgstr "Continuar"
 
+msgid "Continue in browser"
+msgstr "Continuar no navegador"
+
 msgid "Continue in your browser"
 msgstr "Continue no seu navegador"
 

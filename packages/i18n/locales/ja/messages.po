@@ -5140,6 +5140,9 @@ msgstr "コンテキストウィンドウ: {percent} 使用済み"
 msgid "Continue"
 msgstr "続行"
 
+msgid "Continue in browser"
+msgstr "ブラウザで続ける"
+
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 

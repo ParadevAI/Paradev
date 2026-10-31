@@ -5140,6 +5140,9 @@ msgstr "Bağlam penceresi: {percent} kullanıldı"
 msgid "Continue"
 msgstr "Devam et"
 
+msgid "Continue in browser"
+msgstr "Tarayıcıda devam et"
+
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
