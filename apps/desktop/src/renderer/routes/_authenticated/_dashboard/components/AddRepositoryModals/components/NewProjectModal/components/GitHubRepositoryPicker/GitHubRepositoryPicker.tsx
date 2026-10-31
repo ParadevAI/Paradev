@@ -9,11 +9,13 @@ import {
 	CommandList,
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 import { LuChevronsUpDown, LuGithub } from "react-icons/lu";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { RepositoryListStatus } from "./components/RepositoryListStatus";
+import { useGitHubRepositories } from "./hooks/useGitHubRepositories";
+import { fetchRepositoryPage } from "./utils/fetchRepositoryPage";
 
 interface GitHubRepositoryPickerProps {
 	disabled: boolean;
@@ -30,18 +32,15 @@ export function GitHubRepositoryPicker({
 }: GitHubRepositoryPickerProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
-	const repositoriesQuery = useQuery({
-		queryKey: ["github-repositories", hostUrl],
-		queryFn: () => {
-			if (!hostUrl) throw new Error("No active host");
-			return getHostServiceClientByUrl(
-				hostUrl,
-			).project.listGitHubRepositories.query();
-		},
-		enabled: open && !disabled && hostUrl !== null,
-		staleTime: 60_000,
-	});
-	const repositories = repositoriesQuery.data ?? [];
+	const { repositories, isLoading, isLoadingMore, error, retry } =
+		useGitHubRepositories(
+			hostUrl,
+			(page) => {
+				if (!hostUrl) throw new Error("No active host");
+				return fetchRepositoryPage(getHostServiceClientByUrl(hostUrl), page);
+			},
+			open && !disabled && hostUrl !== null,
+		);
 
 	return (
 		<div className="flex flex-col gap-1.5">
@@ -83,11 +82,7 @@ export function GitHubRepositoryPicker({
 						/>
 						<CommandList className="max-h-64">
 							<CommandEmpty>
-								{repositoriesQuery.isLoading ? (
-									<Trans>Loading repositories...</Trans>
-								) : repositoriesQuery.isError ? (
-									repositoriesQuery.error.message
-								) : (
+								{isLoading || isLoadingMore || error ? null : (
 									<Trans>No matches</Trans>
 								)}
 							</CommandEmpty>
@@ -115,6 +110,12 @@ export function GitHubRepositoryPicker({
 								})}
 							</CommandGroup>
 						</CommandList>
+						<RepositoryListStatus
+							error={error}
+							isLoading={isLoading}
+							isLoadingMore={isLoadingMore}
+							onRetry={retry}
+						/>
 					</Command>
 				</PopoverContent>
 			</Popover>
