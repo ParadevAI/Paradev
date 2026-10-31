@@ -19,6 +19,9 @@ describe("pull-request-url", () => {
 		expect(
 			normalizeGitHubRepoUrl("https://someone:ghp_x@github.com/acme/foo.git"),
 		).toBe("https://github.com/acme/foo");
+		expect(
+			normalizeGitHubRepoUrl("https://example.com?next=@github.com/acme/foo"),
+		).toBeNull();
 	});
 
 	test("parses upstream refs with slashes in branch names", () => {

@@ -15,4 +15,14 @@ describe("parseGitHubRemote", () => {
 			});
 		}
 	});
+
+	test("rejects a GitHub host placed after the URL authority", () => {
+		for (const url of [
+			"https://example.com?next=@github.com/acme/foo.git",
+			"https://example.com#@github.com/acme/foo",
+			"https://example.com\\@github.com/acme/foo",
+		]) {
+			expect(parseGitHubRemote(url)).toBeNull();
+		}
+	});
 });
