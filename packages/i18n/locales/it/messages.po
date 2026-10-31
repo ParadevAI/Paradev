@@ -9035,9 +9035,6 @@ msgstr "Nome utente GitHub"
 msgid "GitHub username..."
 msgstr "Nome utente GitHub..."
 
-msgid "GitHub username…"
-msgstr "Nome utente GitHub…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Dai a Claude Code, Codex o qualsiasi agente CLI il proprio workspace e branch, poi rivedi ogni modifica in un unico posto."
 
@@ -13072,8 +13069,8 @@ msgstr "Apri un compositore di prompt multiriga per il terminale attivo"
 msgid "Open a new {label} chat?"
 msgstr "Aprire una nuova chat {label}?"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "Apri una pull request per vedere lo stato della revisione, i controlli e i commenti."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Apri una pull request o una richiesta di merge per vedere lo stato della revisione, i controlli e i commenti."
 
 msgid "Open actions menu"
 msgstr "Apri il menu delle azioni"
@@ -13134,6 +13131,9 @@ msgstr "Apri le sessioni di Claude e Codex in un pannello di chat invece che in 
 
 msgid "Open Command Palette"
 msgstr "Apri la palette dei comandi"
+
+msgid "Open comment on {providerName}"
+msgstr "Apri il commento su {providerName}"
 
 msgid "Open comment on GitHub"
 msgstr "Apri il commento su GitHub"
@@ -13332,6 +13332,9 @@ msgstr "Apri il menu"
 
 msgid "Open navigation"
 msgstr "Apri la navigazione"
+
+msgid "Open on {providerName}"
+msgstr "Apri su {providerName}"
 
 msgid "Open on GitHub"
 msgstr "Apri su GitHub"
@@ -20664,6 +20667,9 @@ msgstr "Mostra altro"
 
 msgid "View name"
 msgstr "Nome della vista"
+
+msgid "View on {providerName}"
+msgstr "Vedi su {providerName}"
 
 msgid "View on GitHub"
 msgstr "Vedi su GitHub"

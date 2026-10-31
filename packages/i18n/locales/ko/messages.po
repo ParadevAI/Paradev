@@ -9035,9 +9035,6 @@ msgstr "GitHub 사용자 이름"
 msgid "GitHub username..."
 msgstr "GitHub 사용자 이름..."
 
-msgid "GitHub username…"
-msgstr "GitHub 사용자 이름…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Claude Code, Codex 또는 모든 CLI 에이전트에 자체 워크스페이스와 브랜치를 주고, 모든 변경 사항을 한곳에서 검토하세요."
 
@@ -13072,8 +13069,8 @@ msgstr "활성 터미널의 여러 줄 프롬프트 작성기를 엽니다"
 msgid "Open a new {label} chat?"
 msgstr "새 {label} 채팅을 열까요?"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "리뷰 상태, 검사, 코멘트를 보려면 풀 리퀘스트를 여세요."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "풀 리퀘스트 또는 병합 요청을 열어 검토 상태, 검사 및 댓글을 확인하세요."
 
 msgid "Open actions menu"
 msgstr "작업 메뉴 열기"
@@ -13134,6 +13131,9 @@ msgstr "Claude 및 Codex 세션을 터미널 대신 채팅 패널에서 엽니�
 
 msgid "Open Command Palette"
 msgstr "명령 팔레트 열기"
+
+msgid "Open comment on {providerName}"
+msgstr "{providerName}에서 코멘트 열기"
 
 msgid "Open comment on GitHub"
 msgstr "GitHub에서 코멘트 열기"
@@ -13332,6 +13332,9 @@ msgstr "메뉴 열기"
 
 msgid "Open navigation"
 msgstr "내비게이션 열기"
+
+msgid "Open on {providerName}"
+msgstr "{providerName}에서 열기"
 
 msgid "Open on GitHub"
 msgstr "GitHub에서 열기"
@@ -20664,6 +20667,9 @@ msgstr "더 보기"
 
 msgid "View name"
 msgstr "뷰 이름"
+
+msgid "View on {providerName}"
+msgstr "{providerName}에서 보기"
 
 msgid "View on GitHub"
 msgstr "GitHub에서 보기"
