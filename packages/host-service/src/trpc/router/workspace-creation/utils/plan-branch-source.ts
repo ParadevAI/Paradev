@@ -18,7 +18,10 @@ export async function planBranchSource(
 	// Branch search answers from cached refs, so a branch pushed since the
 	// last fetch is not known yet. Fetch it before creating a new branch.
 	if (!resolved && fetchRemoteRef) {
-		const fetched = await fetchRemoteRef({ remote: "origin", branch }).then(
+		const fetched = await fetchRemoteRef({
+			remote: "origin",
+			branch: branch.replace(/^origin\//, ""),
+		}).then(
 			() => true,
 			() => false,
 		);
