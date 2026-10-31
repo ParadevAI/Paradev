@@ -8155,6 +8155,12 @@ msgstr "No se pudieron restaurar los valores predeterminados"
 msgid "Failed to resume {0}"
 msgstr "No se pudo retomar {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "No se pudo mostrar en el Explorador de archivos"
+
+msgid "Failed to reveal in File Manager"
+msgstr "No se pudo mostrar en el gestor de archivos"
+
 msgid "Failed to reveal in Finder"
 msgstr "No se pudo mostrar en Finder"
 
@@ -15938,6 +15944,12 @@ msgstr "Instrucciones reutilizables que tus agentes adoptan automáticamente"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Lanzamientos de terminal reutilizables. Haz clic en un script para editarlo o arrástralo para reordenarlo. Los comandos de preparación, ejecución y desmontaje del proyecto son scripts de ciclo de vida."
+
+msgid "Reveal in File Explorer"
+msgstr "Mostrar en el Explorador de archivos"
+
+msgid "Reveal in File Manager"
+msgstr "Mostrar en el gestor de archivos"
 
 msgid "Reveal in Finder"
 msgstr "Mostrar en Finder"

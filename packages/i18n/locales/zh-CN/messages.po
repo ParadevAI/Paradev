@@ -8155,6 +8155,12 @@ msgstr "恢复默认值失败"
 msgid "Failed to resume {0}"
 msgstr "恢复{0}失败"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "在文件资源管理器中显示失败"
+
+msgid "Failed to reveal in File Manager"
+msgstr "在文件管理器中显示失败"
+
 msgid "Failed to reveal in Finder"
 msgstr "在Finder中显示失败"
 
@@ -15938,6 +15944,12 @@ msgstr "智能体会自动读取的可复用说明"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "可复用的终端启动项。点击脚本可编辑，拖动可重新排序。项目的初始化、运行和清理命令属于生命周期脚本。"
+
+msgid "Reveal in File Explorer"
+msgstr "在文件资源管理器中显示"
+
+msgid "Reveal in File Manager"
+msgstr "在文件管理器中显示"
 
 msgid "Reveal in Finder"
 msgstr "在Finder中显示"

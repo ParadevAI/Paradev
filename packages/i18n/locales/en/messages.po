@@ -8155,6 +8155,12 @@ msgstr "Failed to restore defaults"
 msgid "Failed to resume {0}"
 msgstr "Failed to resume {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Failed to reveal in File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Failed to reveal in File Manager"
+
 msgid "Failed to reveal in Finder"
 msgstr "Failed to reveal in Finder"
 
@@ -15938,6 +15944,12 @@ msgstr "Reusable instructions your agents pick up automatically"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
+
+msgid "Reveal in File Explorer"
+msgstr "Reveal in File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Reveal in File Manager"
 
 msgid "Reveal in Finder"
 msgstr "Reveal in Finder"

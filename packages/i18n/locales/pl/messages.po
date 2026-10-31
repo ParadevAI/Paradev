@@ -8155,6 +8155,12 @@ msgstr "Nie udało się przywrócić ustawień domyślnych"
 msgid "Failed to resume {0}"
 msgstr "Nie udało się wznowić {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Nie udało się pokazać w Eksploratorze plików"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Nie udało się pokazać w menedżerze plików"
+
 msgid "Failed to reveal in Finder"
 msgstr "Nie udało się pokazać w Finderze"
 
@@ -15938,6 +15944,12 @@ msgstr "Instrukcje wielokrotnego użytku, które agenci podchwytują automatyczn
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Uruchomienia terminala wielokrotnego użytku. Kliknij skrypt, aby go edytować, lub przeciągnij, aby zmienić kolejność. Polecenia konfiguracji, uruchamiania i sprzątania projektu to skrypty cyklu życia."
+
+msgid "Reveal in File Explorer"
+msgstr "Pokaż w Eksploratorze plików"
+
+msgid "Reveal in File Manager"
+msgstr "Pokaż w menedżerze plików"
 
 msgid "Reveal in Finder"
 msgstr "Pokaż w Finderze"

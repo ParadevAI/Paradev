@@ -8155,6 +8155,12 @@ msgstr "Gagal memulihkan setelan bawaan"
 msgid "Failed to resume {0}"
 msgstr "Gagal melanjutkan {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Gagal menampilkan di File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Gagal menampilkan di pengelola file"
+
 msgid "Failed to reveal in Finder"
 msgstr "Gagal menampilkan di Finder"
 
@@ -15938,6 +15944,12 @@ msgstr "Instruksi pakai ulang yang otomatis diambil agen Anda"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau seret untuk mengurutkan ulang. Perintah setup, run, dan teardown proyek adalah skrip lifecycle."
+
+msgid "Reveal in File Explorer"
+msgstr "Tampilkan di File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Tampilkan di pengelola file"
 
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"

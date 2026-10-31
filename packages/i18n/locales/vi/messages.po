@@ -8155,6 +8155,12 @@ msgstr "Không thể khôi phục mặc định"
 msgid "Failed to resume {0}"
 msgstr "Không thể resume {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Không thể hiện trong File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Không thể hiện trong trình quản lý tệp"
+
 msgid "Failed to reveal in Finder"
 msgstr "Không thể hiện trong Finder"
 
@@ -15938,6 +15944,12 @@ msgstr "Hướng dẫn tái sử dụng mà agent của bạn tự nhận"
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Các lệnh terminal dùng lại được. Nhấp vào một script để sửa hoặc kéo để sắp xếp lại. Lệnh thiết lập, chạy và dọn dẹp của dự án là script vòng đời."
+
+msgid "Reveal in File Explorer"
+msgstr "Hiện trong File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Hiện trong trình quản lý tệp"
 
 msgid "Reveal in Finder"
 msgstr "Hiện trong Finder"

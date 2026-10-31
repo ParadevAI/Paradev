@@ -8155,6 +8155,12 @@ msgstr "Не удалось восстановить значения по ум�
 msgid "Failed to resume {0}"
 msgstr "Не удалось возобновить {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Не удалось показать в Проводнике"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Не удалось показать в файловом менеджере"
+
 msgid "Failed to reveal in Finder"
 msgstr "Не удалось показать в Finder"
 
@@ -15938,6 +15944,12 @@ msgstr "Переиспользуемые инструкции, которые а
 
 msgid "Reusable terminal launches. Click a script to edit or drag to reorder. Project setup, run, and teardown commands are lifecycle scripts."
 msgstr "Переиспользуемые запуски терминала. Нажмите на скрипт, чтобы изменить, или перетащите, чтобы изменить порядок. Команды настройки, запуска и очистки проекта — это скрипты жизненного цикла."
+
+msgid "Reveal in File Explorer"
+msgstr "Показать в Проводнике"
+
+msgid "Reveal in File Manager"
+msgstr "Показать в файловом менеджере"
 
 msgid "Reveal in Finder"
 msgstr "Показать в Finder"
