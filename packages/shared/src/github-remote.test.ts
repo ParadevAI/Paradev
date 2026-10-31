@@ -16,11 +16,13 @@ describe("parseGitHubRemote", () => {
 		}
 	});
 
-	test("rejects a GitHub host placed after the URL authority", () => {
+	test("rejects HTTPS remotes with a query, fragment, or backslash", () => {
 		for (const url of [
 			"https://example.com?next=@github.com/acme/foo.git",
 			"https://example.com#@github.com/acme/foo",
 			"https://example.com\\@github.com/acme/foo",
+			"https://github.com/acme?next/foo",
+			"https://github.com/acme/foo#bar",
 		]) {
 			expect(parseGitHubRemote(url)).toBeNull();
 		}

@@ -126,7 +126,7 @@ export function normalizeGitHubUrl(remoteUrl: string): string | null {
 	const patterns = [
 		/^git@github\.com:(?<nwo>[^/]+\/[^/]+?)(?:\.git)?$/,
 		/^ssh:\/\/git@github\.com\/(?<nwo>[^/]+\/[^/]+?)(?:\.git)?$/,
-		/^https:\/\/(?:[^@/?#\\]+@)?github\.com\/(?<nwo>[^/]+\/[^/]+?)(?:\.git)?\/?$/,
+		/^https:\/\/(?:[^@/?#\\]+@)?github\.com\/(?<nwo>[^/?#\\]+\/[^/?#\\]+?)(?:\.git)?\/?$/,
 	];
 	for (const pattern of patterns) {
 		const match = pattern.exec(trimmed);
