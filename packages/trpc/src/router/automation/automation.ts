@@ -743,7 +743,14 @@ export const automationRouter = {
 						organizationId,
 						triggers: input.triggers,
 					});
-				} else if (nextRrule && nextDtstart && nextTimezone) {
+				} else if (
+					recurrenceChanged &&
+					nextRrule &&
+					nextDtstart &&
+					nextTimezone
+				) {
+					// Rewriting through the single-schedule shape keeps only one
+					// schedule, so an edit that leaves the schedule alone skips it.
 					await syncScheduleTrigger(tx, {
 						automationId: row.id,
 						organizationId,

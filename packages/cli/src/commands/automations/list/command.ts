@@ -1,4 +1,5 @@
 import { string, table } from "@superset/cli-framework";
+import { normalizeAutomationGroup } from "@superset/shared/automation-group";
 import { command } from "../../../lib/command";
 import { formatAutomationDate } from "../format";
 
@@ -14,7 +15,7 @@ export default command({
 		const rows = await ctx.api.automation.list.query(
 			options.name ? { name: options.name } : undefined,
 		);
-		const group = options.group?.trim().toLowerCase();
+		const group = normalizeAutomationGroup(options.group)?.toLowerCase();
 		if (!group) return rows;
 		return rows.filter((row) => row.group?.toLowerCase() === group);
 	},
