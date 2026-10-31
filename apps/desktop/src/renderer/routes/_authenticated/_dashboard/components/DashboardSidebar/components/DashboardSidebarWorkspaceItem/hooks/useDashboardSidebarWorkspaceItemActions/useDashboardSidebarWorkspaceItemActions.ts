@@ -97,7 +97,11 @@ export function useDashboardSidebarWorkspaceItemActions({
 	const isActive = useRouterState({
 		select: (state) => {
 			const path = `/v2-workspace/${workspaceId}`;
-			const { pathname } = state.location;
+			// While a navigation loads, the page on screen is still the
+			// resolved one; match it, as useMatchRoute does.
+			const { pathname } = state.isLoading
+				? (state.resolvedLocation ?? state.location)
+				: state.location;
 			return pathname === path || pathname.startsWith(`${path}/`);
 		},
 	});

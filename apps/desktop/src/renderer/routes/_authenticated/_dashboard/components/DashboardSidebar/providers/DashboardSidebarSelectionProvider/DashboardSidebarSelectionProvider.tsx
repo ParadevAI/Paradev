@@ -4,6 +4,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -109,7 +110,7 @@ export function DashboardSidebarSelectionProvider({
 	// Read at click time: a dependency here would give every row a new
 	// callback, and so a re-render, on each workspace switch.
 	const activeWorkspaceIdRef = useRef(activeWorkspaceId);
-	useEffect(() => {
+	useLayoutEffect(() => {
 		activeWorkspaceIdRef.current = activeWorkspaceId;
 	}, [activeWorkspaceId]);
 	const selectWorkspaceFromEvent = useCallback(
