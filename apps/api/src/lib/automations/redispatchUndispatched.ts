@@ -79,6 +79,7 @@ export async function redispatchUndispatched(tx: SingleFlightTx): Promise<{
 				automationId: row.dispatchInput.automationId,
 				triggerId: row.dispatchInput.triggerId,
 				ownerUserId: row.dispatchInput.ownerUserId,
+				pinnedOnly: row.dispatchInput.pinnedOnly,
 				integrationConnectionId: row.integrationConnectionId,
 			});
 		} catch (error) {

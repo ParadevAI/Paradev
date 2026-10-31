@@ -19,6 +19,12 @@ export type AutomationEventDispatchInput = {
 	 * that member's automations, never fan across the org.
 	 */
 	ownerUserId?: string;
+	/**
+	 * Restricts matching to triggers pinned to the event's connection. Set when
+	 * one delivery is recorded once per connection (Linear), so an unpinned
+	 * trigger fires from one of those events only.
+	 */
+	pinnedOnly?: boolean;
 };
 
 export type LinearConfig = {
