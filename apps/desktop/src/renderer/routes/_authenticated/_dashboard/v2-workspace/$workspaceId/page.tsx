@@ -45,6 +45,7 @@ import {
 	ActivityPanelAside,
 	WorkspaceActivityMenu,
 } from "./components/WorkspaceActivityMenu";
+import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
@@ -55,8 +56,6 @@ import {
 import { WorkspaceToolbar } from "./components/WorkspaceToolbar";
 import { useAgentSessionLauncher } from "./hooks/useAgentSessionLauncher";
 import { useAutoAdoptBackgroundSessions } from "./hooks/useAutoAdoptBackgroundSessions";
-import { useAutoAdoptChatSessions } from "./hooks/useAutoAdoptChatSessions";
-import { useClearActivePaneAttention } from "./hooks/useClearActivePaneAttention";
 import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhenEmpty";
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
@@ -220,7 +219,6 @@ function V2WorkspaceContent() {
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
 	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
-	useClearActivePaneAttention({ store });
 	const rightPaneAreaFlag = useRightPaneAreaEnabled();
 	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
 	const {
@@ -237,7 +235,6 @@ function V2WorkspaceContent() {
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_PANE) === true;
 	const { store: rightStore, isLayoutReady: isRightLayoutReady } =
 		useV2WorkspacePaneLayout({ slot: "rightPaneLayout" });
-	useClearActivePaneAttention({ store: rightStore });
 	useRestoreExpandedPaneArea({
 		workspaceId,
 		centerStore: store,
@@ -354,12 +351,6 @@ function V2WorkspaceContent() {
 		resolvePresetCommands,
 	});
 	useAutoAdoptBackgroundSessions({
-		store,
-		linkedStores: linkedPaneStores,
-		workspaceId,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
-	});
-	useAutoAdoptChatSessions({
 		store,
 		linkedStores: linkedPaneStores,
 		workspaceId,
@@ -634,6 +625,13 @@ function V2WorkspaceContent() {
 
 	return (
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
+			<WorkspaceAgentEffects
+				workspaceId={workspaceId}
+				store={store}
+				rightStore={rightStore}
+				linkedStores={linkedPaneStores}
+				isLayoutReady={isLayoutReady && isRightLayoutReady}
+			/>
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
 				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout

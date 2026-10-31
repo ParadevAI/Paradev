@@ -1,4 +1,8 @@
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import {
+	type UseQueryResult,
+	useQueries,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -73,6 +77,16 @@ export interface UseHostWorkspacesResult {
 	 */
 	hostsSettled: boolean;
 	cache: HostWorkspacesCacheOps;
+}
+
+// Module-level so useQueries keeps these arrays stable across renders; a
+// new array would rebuild `workspaces` and re-render every consumer.
+function pickQueryState<TData>(results: UseQueryResult<TData>[]) {
+	return results.map(({ data, isError, isSuccess }) => ({
+		data,
+		isError,
+		isSuccess,
+	}));
 }
 
 /**
@@ -209,6 +223,7 @@ export function useHostWorkspacesSource(
 				return rows;
 			},
 		})),
+		combine: pickQueryState,
 	});
 
 	// Archived tombstones, opt-in, own query key: the shared live list (and
@@ -236,6 +251,7 @@ export function useHostWorkspacesSource(
 					.map(normalizeServedWorkspaceRow);
 			},
 		})),
+		combine: pickQueryState,
 	});
 
 	const busEverOpenedRef = useRef<Set<string>>(new Set());
@@ -457,5 +473,8 @@ export function useHostWorkspacesSource(
 		};
 	}, [targets, queryClient]);
 
-	return { workspaces, isReady, hostsSettled: knownHostsSettled, cache };
+	return useMemo(
+		() => ({ workspaces, isReady, hostsSettled: knownHostsSettled, cache }),
+		[workspaces, isReady, knownHostsSettled, cache],
+	);
 }
