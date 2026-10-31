@@ -22,9 +22,9 @@ import {
 	slugifyForBranch,
 } from "@superset/shared/workspace-launch";
 import { and, eq, sql } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { nudge } from "../../lib/realtime";
 import { fetchRelayPresence } from "../../lib/relay-presence";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { runInCloud } from "./cloudDispatch";
 import { type HostCaller, launchAgentSession } from "./hostSession";
 import {

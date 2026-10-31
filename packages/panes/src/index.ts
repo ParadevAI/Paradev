@@ -41,6 +41,7 @@ export type {
 } from "./react";
 export {
 	resolveTabTitle,
+	TabVisibilityContext,
 	useIsTabVisible,
 	usePaneFocus,
 	useTabTitle,

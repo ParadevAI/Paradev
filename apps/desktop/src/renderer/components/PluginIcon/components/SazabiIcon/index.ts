@@ -1,0 +1,1 @@
+export { SazabiIcon } from "./SazabiIcon";

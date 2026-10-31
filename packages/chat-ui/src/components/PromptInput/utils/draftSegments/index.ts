@@ -1,5 +1,8 @@
 export {
-	$insertDraftSegments,
-	$readDraftSegments,
+	$appendDraftSegments,
+	$readPromptText,
+	draftChips,
+	draftOf,
 	draftText,
+	TYPED_SHORTCUTS,
 } from "./draftSegments";

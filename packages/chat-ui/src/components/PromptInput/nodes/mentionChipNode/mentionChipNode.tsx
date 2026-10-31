@@ -51,6 +51,20 @@ export type SerializedMentionChipNode = Spread<
 	SerializedLexicalNode
 >;
 
+export function chipFromJSON(
+	serialized: SerializedMentionChipNode,
+): ComposerChip {
+	return {
+		label: serialized.label,
+		serialized: serialized.serialized,
+		brandColor: serialized.brandColor ?? undefined,
+		iconUrl: serialized.iconUrl ?? undefined,
+		...(serialized.description ? { description: serialized.description } : {}),
+		data:
+			serialized.dataJson == null ? undefined : JSON.parse(serialized.dataJson),
+	};
+}
+
 export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__label: string;
 	__serialized: string;

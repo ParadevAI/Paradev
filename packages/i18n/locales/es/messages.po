@@ -3201,6 +3201,9 @@ msgstr "Avatar (átomo)"
 msgid "Avatar updated!"
 msgstr "¡Avatar actualizado!"
 
+msgid "Avi Peltz, Satya Patel, and Kiet Ho at YC Demo Day"
+msgstr "Avi Peltz, Satya Patel y Kiet Ho en el YC Demo Day"
+
 #. placeholder {0}: requestedReviewers.join(", ")
 msgid "Awaiting {0}"
 msgstr "A la espera de {0}"
@@ -3521,9 +3524,6 @@ msgstr "Importa tus espacios de trabajo"
 
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Trae a v2 los proyectos, espacios de trabajo y scripts de terminal de v1. Cada elemento se importa por separado y se puede reintentar."
-
-msgid "Bring your agents together."
-msgstr "Reúne a todos tus agentes."
 
 msgid "Bringing over your v1 projects"
 msgstr "Trayendo tus proyectos de v1"
@@ -5963,6 +5963,9 @@ msgstr "No se pudo quitar el archivo de preparados"
 
 msgid "Couldn't update pull request"
 msgstr "No se pudo actualizar la pull request"
+
+msgid "Couldn't update the Chat setting"
+msgstr "No se pudo actualizar el ajuste de Chat"
 
 msgid "Couldn't update the queue"
 msgstr "No se pudo actualizar la cola"
@@ -9963,6 +9966,9 @@ msgstr "Solicitud no válida"
 msgid "Invalid state parameter. Please try again."
 msgstr "Parámetro de estado no válido. Inténtalo de nuevo."
 
+msgid "Investigate production logs and issues"
+msgstr "Investiga logs e incidencias de producción"
+
 msgid "Invitation canceled"
 msgstr "Invitación cancelada"
 
@@ -10288,6 +10294,9 @@ msgstr "Atajos de teclado"
 msgid "Keyboard Shortcuts"
 msgstr "Atajos de teclado"
 
+msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
+msgstr "Kiet Ho, Satya Patel y Avi Peltz presentando en YC"
+
 msgid "Kill"
 msgstr "Terminar"
 
@@ -10559,9 +10568,6 @@ msgstr "Has salido de la organización"
 
 msgid "Left team"
 msgstr "Has salido del equipo"
-
-msgid "Legal"
-msgstr "Legal"
 
 msgid "Less"
 msgstr "Menos"
@@ -13120,6 +13126,9 @@ msgstr "Abrir la configuración de administrador de ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Abrir ajustes de ChatGPT"
 
+msgid "Open Claude and Codex sessions as chats"
+msgstr "Abrir las sesiones de Claude y Codex como chats"
+
 msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
 msgstr "Abre las sesiones de Claude y Codex en un panel de chat en lugar de en una terminal."
 
@@ -13515,9 +13524,6 @@ msgstr "Opcional. Nos ayuda a saber qué funciona."
 
 msgid "Options"
 msgstr "Opciones"
-
-msgid "Or ask your coding agent to install the Paradev CLI."
-msgstr "O pídele a tu agente de código que instale la CLI de Paradev."
 
 msgid "Orange"
 msgstr "Naranja"
@@ -17253,9 +17259,6 @@ msgstr "Mostrar en el gráfico"
 msgid "Show in folder"
 msgstr "Mostrar en la carpeta"
 
-msgid "Show in text field"
-msgstr "Mostrar en el campo de texto"
-
 msgid "Show items in all states"
 msgstr "Mostrar elementos en todos los estados"
 
@@ -17599,6 +17602,10 @@ msgstr "Pequeño"
 msgctxt "machine size"
 msgid "Small"
 msgstr "Pequeña"
+
+#. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
+msgid "Smash your backlog."
+msgstr "Acaba con tu backlog."
 
 msgid "Smileys & People"
 msgstr "Emoticonos y personas"

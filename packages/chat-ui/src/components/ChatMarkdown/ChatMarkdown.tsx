@@ -133,6 +133,8 @@ export type ChatMarkdownProps = {
 	components?: Components;
 	/** Remark plugins a surface runs after Streamdown's own. */
 	remarkPlugins?: NonNullable<StreamdownProps["remarkPlugins"]>;
+	/** The text is finished, so an unclosed `*` or `**` is literal, not formatting still arriving. */
+	complete?: boolean;
 };
 
 /** One block of agent markdown, rendered the way every chat surface does. */
@@ -141,6 +143,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 	className,
 	components,
 	remarkPlugins,
+	complete = false,
 }: ChatMarkdownProps): ReactNode {
 	const merged = useMemo(
 		() =>
@@ -168,6 +171,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 			isAnimating={fenceOpen}
 			linkSafety={{ enabled: false }}
 			mode="streaming"
+			parseIncompleteMarkdown={!complete}
 			remarkPlugins={mergedRemarkPlugins}
 			remend={REMEND_OPTIONS}
 		>

@@ -66,7 +66,6 @@ import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
-import { useIsChatTabActive } from "./hooks/useIsChatTabActive";
 import { useOpenNewTabWhenRightPaneOpensEmpty } from "./hooks/useOpenNewTabWhenRightPaneOpensEmpty";
 import { usePaneAreaMoveActions } from "./hooks/usePaneAreaMoveActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
@@ -222,7 +221,6 @@ function V2WorkspaceContent() {
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
 	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
 	useClearActivePaneAttention({ store });
-	const isChatTabActive = useIsChatTabActive(store);
 	const rightPaneAreaFlag = useRightPaneAreaEnabled();
 	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
 	const {
@@ -304,7 +302,7 @@ function V2WorkspaceContent() {
 	const addChatTab = useCallback(() => {
 		void openNewChat();
 	}, [openNewChat]);
-	const onAddChat = acpChat === "enabled" ? addChatTab : undefined;
+	const onAddChat = acpChat ? addChatTab : undefined;
 	const {
 		matchedPresets,
 		newTabPresets,
@@ -571,7 +569,7 @@ function V2WorkspaceContent() {
 		isMobilePaneEnabled,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
-	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat !== "disabled" });
+	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat });
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
 	});
@@ -701,7 +699,7 @@ function V2WorkspaceContent() {
 										/>
 									)}
 									renderBelowTabBar={() =>
-										showPresetsBar && !isChatTabActive ? (
+										showPresetsBar ? (
 											<V2PresetsBar
 												matchedPresets={matchedPresets}
 												executePreset={executePreset}

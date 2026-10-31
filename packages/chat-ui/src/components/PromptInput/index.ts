@@ -20,4 +20,4 @@ export {
 	type PromptInputSubmitPayload,
 } from "./PromptInput";
 export { DictationError } from "./utils/dictationError";
-export { draftText } from "./utils/draftSegments";
+export { draftChips, draftText } from "./utils/draftSegments";

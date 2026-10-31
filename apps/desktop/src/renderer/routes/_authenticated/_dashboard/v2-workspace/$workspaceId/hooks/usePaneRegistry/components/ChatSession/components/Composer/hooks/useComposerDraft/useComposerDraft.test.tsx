@@ -41,7 +41,6 @@ test("a recovered draft survives the composer's own save on unmount", () => {
 	recoveredFirst.unmount();
 	expect(stored("chat-v3-draft:recover-a")).toEqual([
 		{ type: "text", text: "unsent message" },
-		{ type: "text", text: "\n\n" },
 		{ type: "text", text: "newer draft" },
 	]);
 
@@ -53,7 +52,6 @@ test("a recovered draft survives the composer's own save on unmount", () => {
 	prependToDraft("chat-v3-draft:recover-b", [text("unsent message")]);
 	expect(stored("chat-v3-draft:recover-b")).toEqual([
 		{ type: "text", text: "unsent message" },
-		{ type: "text", text: "\n\n" },
 		{ type: "text", text: "newer draft" },
 	]);
 });

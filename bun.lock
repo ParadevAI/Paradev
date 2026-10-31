@@ -848,6 +848,7 @@
       "name": "@superset/chat-ui",
       "version": "0.1.0",
       "dependencies": {
+        "@lexical/clipboard": "0.41.0",
         "@lexical/code": "0.41.0",
         "@lexical/link": "0.41.0",
         "@lexical/list": "0.41.0",
@@ -1152,7 +1153,9 @@
         "@superset/typescript": "workspace:*",
         "@types/bun": "1.4.3",
         "@types/react": "19.3.0",
+        "@types/react-dom": "19.2.3",
         "react": "19.3.0",
+        "react-dom": "19.3.0",
         "typescript": "7.0.2",
       },
       "peerDependencies": {

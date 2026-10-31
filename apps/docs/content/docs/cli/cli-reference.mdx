@@ -1325,13 +1325,13 @@ The host rejects unsupported values before launching the agent.
 | --- | --- |
 | Claude | `low`, `medium`, `high`, `xhigh`, `max` |
 | Amp | `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max` |
-| Codex | `low`, `medium`, `high`, `xhigh`; `max` and `ultra` depend on the selected model |
+| Codex | `low`, `medium`, `high`, `xhigh`, `max`; `ultra` depends on the selected model |
 | Mastracode | `off`, `low`, `medium`, `high`, `xhigh` |
 | Pi | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | Copilot | `low`, `medium`, `high`, `xhigh` |
 | Antigravity | `low`, `medium`, `high`, with `--model` set to a Gemini model |
 
-GPT-6 Astra and GPT-6 Sol support `max` and `ultra`; GPT-6 Luna supports `max`.
+Every Codex model supports `ultra` except GPT-6 Luna and GPT-5.6 Luna.
 
 Other agents, including Paradev chat, currently use their own default and
 reject an explicit effort override.

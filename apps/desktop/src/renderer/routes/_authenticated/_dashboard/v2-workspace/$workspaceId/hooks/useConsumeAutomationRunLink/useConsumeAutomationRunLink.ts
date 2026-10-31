@@ -2,7 +2,6 @@ import type { WorkspaceStore } from "@superset/panes";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import type { StoreApi } from "zustand/vanilla";
 import type { ConsumeSearch, PaneViewerData } from "../../types";
 import { focusChatSession } from "../../utils/focusChatSession";
@@ -35,7 +34,6 @@ export function useConsumeAutomationRunLink({
 	consumeSearch,
 }: UseConsumeAutomationRunLinkArgs): void {
 	const consumedRef = useRef<Set<string>>(new Set());
-	const acpChat = useAcpChatEnabled();
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const chatQuery = useQuery({
@@ -56,16 +54,13 @@ export function useConsumeAutomationRunLink({
 				: [];
 			return chatSessionTarget({ result, sessions, sessionId, workspaceId });
 		},
-		enabled: !!sessionId && acpChat === "enabled" && isLayoutReady,
+		enabled: !!sessionId && isLayoutReady,
 		refetchOnWindowFocus: false,
 		retry: false,
 	});
 	useEffect(() => {
-		if (!sessionId || !isLayoutReady || acpChat === "resolving") return;
-		if (
-			acpChat === "enabled" &&
-			(chatQuery.isFetching || (!chatQuery.isSuccess && !chatQuery.isError))
-		)
+		if (!sessionId || !isLayoutReady) return;
+		if (chatQuery.isFetching || (!chatQuery.isSuccess && !chatQuery.isError))
 			return;
 		const key = `${workspaceId}:${getAutomationRunLinkConsumeKey({
 			type: "chat",
@@ -74,14 +69,12 @@ export function useConsumeAutomationRunLink({
 		})}`;
 		if (consumedRef.current.has(key)) return;
 		consumedRef.current.add(key);
-		const target =
-			acpChat === "enabled" && chatQuery.isSuccess ? chatQuery.data : null;
+		const target = chatQuery.isSuccess ? chatQuery.data : null;
 		consumeSearch(target ? ["sessionId", "terminalId"] : ["sessionId"]);
 		if (target) focusChatSession({ store, linkedStores, session: target });
 	}, [
 		sessionId,
 		isLayoutReady,
-		acpChat,
 		chatQuery.isSuccess,
 		chatQuery.isError,
 		chatQuery.isFetching,
