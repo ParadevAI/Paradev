@@ -4677,11 +4677,11 @@ msgstr "Zamknij obszar roboczy"
 msgid "Close Workspace"
 msgstr "Zamknij obszar roboczy"
 
-msgid "Close your laptop"
-msgstr "Zamknij laptopa"
-
 msgid "Close Workspace Setup tab when setup succeeds"
 msgstr "Zamknij kartę Konfiguracja obszaru roboczego po udanej konfiguracji"
+
+msgid "Close your laptop"
+msgstr "Zamknij laptopa"
 
 msgid "Closed"
 msgstr "Zamknięty"
