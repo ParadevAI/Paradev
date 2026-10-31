@@ -140,8 +140,20 @@ function buildRealBinaryResolver(): string {
 export interface DefaultAccountResolverOptions {
 	/** Holds the system-default value while a selected account is injected. */
 	ambientEnvVar?: string;
-	/** Leading words of the commands that sign in or out, e.g. "auth login". */
+	/**
+	 * Commands that sign in or out, as their words: "login", "auth login".
+	 * Each word has to be a whole argument, in that order, before any `--`.
+	 * Other arguments may come before or between the words, so a root option
+	 * ahead of the subcommand (`codex -c key=value login`) still matches, and
+	 * a one-argument prompt ("auth login") does not. A launch that asks for
+	 * help (`-h`, `--help`, or `help` first) never matches.
+	 */
 	credentialCommands?: readonly string[];
+	/**
+	 * A credential command followed directly by words that make it only read
+	 * the login, e.g. "login status". Such a launch is not a credential command.
+	 */
+	readOnlyCommands?: readonly string[];
 }
 
 /**
@@ -161,7 +173,11 @@ export function buildDefaultAccountResolver(
 	pointerName: string,
 	options: DefaultAccountResolverOptions = {},
 ): string {
-	const { ambientEnvVar, credentialCommands = [] } = options;
+	const {
+		ambientEnvVar,
+		credentialCommands = [],
+		readOnlyCommands = [],
+	} = options;
 	const pointer = `"$SUPERSET_HOME_DIR/state/${pointerName}"`;
 	const restoreSystemDefault = ambientEnvVar
 		? `if [ -n "\${${ambientEnvVar}}" ]; then
@@ -175,7 +191,7 @@ export function buildDefaultAccountResolver(
   unset SUPERSET_DEFAULT_${envVar}`;
 	const guardsCredentials = credentialCommands.length > 0;
 	const matchCredentialCommand = guardsCredentials
-		? buildCredentialCommandMatch(credentialCommands)
+		? buildCredentialCommandMatch(credentialCommands, readOnlyCommands)
 		: "";
 	const keepUnsetForCredentials = guardsCredentials
 		? ` \\
@@ -199,21 +215,54 @@ ${guardCredentialCommand}
 `;
 }
 
-/** Sets `superset_credential_command` when the arguments start with one. */
-function buildCredentialCommandMatch(commands: readonly string[]): string {
-	const pattern = commands.map((command) => `"${command}"`).join("|");
-	return `superset_command_words=""
+const CREDENTIAL_COMMAND_WORD = /^[a-z]+$/;
+
+/**
+ * Sets `superset_credential_command` (e.g. "codex login") when the arguments
+ * hold one of `commands`. Each argument before `--` adds one token to
+ * `superset_command_tokens`, wrapped in spaces: a command word stays itself
+ * and anything else becomes ".". The patterns below therefore only ever
+ * match whole arguments, never text inside a prompt or an option value.
+ */
+function buildCredentialCommandMatch(
+	commands: readonly string[],
+	readOnlyCommands: readonly string[],
+): string {
+	const wordsOf = (command: string) => command.split(" ");
+	const words = [
+		...new Set([...commands, ...readOnlyCommands].flatMap(wordsOf)),
+	];
+	for (const word of words) {
+		if (!CREDENTIAL_COMMAND_WORD.test(word)) {
+			throw new Error(`Unsupported credential command word: "${word}"`);
+		}
+	}
+	const inOrder = (command: string) =>
+		`*${wordsOf(command)
+			.map((word) => `" ${word} "`)
+			.join("*")}*`;
+	const adjacent = (command: string) => `*" ${wordsOf(command).join("  ")} "*`;
+	const matches = commands.map((command) => {
+		const readOnly = readOnlyCommands
+			.filter((other) => other.startsWith(`${command} `))
+			.map((other) => `\n  ${adjacent(other)}) ;;`)
+			.join("");
+		return `case "$superset_command_tokens" in${readOnly}
+  ${inOrder(command)}) superset_credential_command="\${0##*/} ${command}" ;;
+esac`;
+	});
+	return `superset_command_tokens=""
 for superset_arg in "$@"; do
   case "$superset_arg" in
-    -h|--help) superset_command_words=""; break ;;
-    -*) break ;;
+    --) break ;;
+    -h|--help) superset_command_tokens=""; break ;;
+    ${words.join("|")}) superset_command_tokens="$superset_command_tokens $superset_arg " ;;
+    *) superset_command_tokens="$superset_command_tokens . " ;;
   esac
-  superset_command_words="\${superset_command_words:+$superset_command_words }$superset_arg"
 done
+case "$1" in help) superset_command_tokens="" ;; esac
 superset_credential_command=""
-case "$superset_command_words" in
-  ${pattern}) superset_credential_command="\${0##*/} $superset_command_words" ;;
-esac
+${matches.join("\n")}
 `;
 }
 

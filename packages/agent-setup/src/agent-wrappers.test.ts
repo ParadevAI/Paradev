@@ -922,46 +922,121 @@ exit 0
 		expect(existsSync(notifyCapturePath)).toBe(false);
 	});
 
-	it("refuses a login on the selected account without a terminal", () => {
+	/**
+	 * Generated codex and claude wrappers over stub CLIs that record the home
+	 * they got and their arguments, in a workspace terminal where `profile`
+	 * is the selected account for both.
+	 */
+	function setUpSelectedAccountWrappers() {
 		const realBinDir = path.join(TEST_ROOT, "real-bin");
 		const ranFile = path.join(TEST_ROOT, "real-cli-ran.txt");
 		const profile = path.join(TEST_ROOT, "selected-profile");
+		const ambient = path.join(TEST_ROOT, "codex-default");
 		mkdirSync(realBinDir, { recursive: true });
 		mkdirSync(profile, { recursive: true });
-		for (const name of ["codex", "claude"]) {
+		for (const [name, envVar] of [
+			["codex", "CODEX_HOME"],
+			["claude", "CLAUDE_CONFIG_DIR"],
+		]) {
 			writeFileSync(
 				path.join(realBinDir, name),
-				`#!/bin/bash\nprintf '%s\\n' "$*" >> "${ranFile}"\n`,
+				`#!/bin/bash\nprintf '%s %s\\n' "\${${envVar}:-<unset>}" "$*" >> "${ranFile}"\n`,
 				{ mode: 0o755 },
 			);
 		}
 		createCodexWrapper();
 		createClaudeWrapper();
-
-		const env = {
+		const env: Record<string, string | undefined> = {
 			...process.env,
 			PATH: `${TEST_BIN_DIR}:${realBinDir}:${process.env.PATH || ""}`,
 			SUPERSET_TERMINAL_ID: "terminal-1",
 			CODEX_HOME: profile,
 			SUPERSET_DEFAULT_CODEX_HOME: profile,
-			SUPERSET_AMBIENT_CODEX_HOME: path.join(TEST_ROOT, "codex-default"),
+			SUPERSET_AMBIENT_CODEX_HOME: ambient,
 			CLAUDE_CONFIG_DIR: profile,
 			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: profile,
 		};
-		const codex = spawnSync(path.join(TEST_BIN_DIR, "codex"), ["login"], {
-			env,
-			encoding: "utf-8",
-		});
-		const claude = spawnSync(
-			path.join(TEST_BIN_DIR, "claude"),
-			["auth", "login"],
-			{ env, encoding: "utf-8" },
-		);
+		const runCli = (
+			name: string,
+			args: string[],
+			overrides: Record<string, string | undefined> = {},
+		) => {
+			const merged: Record<string, string> = {};
+			for (const [key, value] of Object.entries({ ...env, ...overrides })) {
+				if (value !== undefined) merged[key] = value;
+			}
+			return spawnSync(path.join(TEST_BIN_DIR, name), args, {
+				env: merged,
+				encoding: "utf-8",
+			});
+		};
+		const ran = () =>
+			existsSync(ranFile) ? readFileSync(ranFile, "utf-8") : "";
+		return { ambient, profile, runCli, ran };
+	}
 
-		expect([codex.status, claude.status]).toEqual([2, 2]);
-		expect(codex.stderr).toContain(profile);
-		expect(claude.stderr).toContain(profile);
-		expect(existsSync(ranFile)).toBe(false);
+	it("refuses every sign-in on the selected account without a terminal", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		for (const [name, ...args] of [
+			["codex", "login"],
+			["codex", "logout"],
+			["codex", "-c", "model=x", "login"],
+			["codex", "--enable", "hooks", "logout"],
+			["claude", "auth", "login"],
+			["claude", "auth", "logout"],
+			["claude", "--verbose", "auth", "login"],
+			["claude", "-d", "auth", "logout"],
+		]) {
+			const result = runCli(name, args);
+			expect({ name, args, status: result.status }).toEqual({
+				name,
+				args,
+				status: 2,
+			});
+			expect(result.stderr).toContain(profile);
+		}
+		expect(ran()).toBe("");
+	});
+
+	it("keeps an unset CODEX_HOME unset for a wrapped login with root options", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		mkdirSync(path.join(TEST_SUPERSET_HOME_DIR, "state"), { recursive: true });
+		writeFileSync(
+			path.join(TEST_SUPERSET_HOME_DIR, "state", "default-codex-home"),
+			profile,
+		);
+		const result = runCli("codex", ["-c", "model=x", "login"], {
+			CODEX_HOME: undefined,
+		});
+		expect(result.status).toBe(0);
+		expect(ran()).toStartWith("<unset> ");
+	});
+
+	it("runs a wrapped codex login on the system default without asking", () => {
+		const { ambient, runCli, ran } = setUpSelectedAccountWrappers();
+		const result = runCli("codex", ["login"], {
+			CODEX_HOME: ambient,
+			SUPERSET_DEFAULT_CODEX_HOME: ambient,
+		});
+		expect(result.status).toBe(0);
+		expect(ran()).toStartWith(`${ambient} `);
+	});
+
+	it("lets a wrapped codex login status read the selected account", () => {
+		const { profile, runCli, ran } = setUpSelectedAccountWrappers();
+		for (const args of [
+			["login", "status"],
+			["-c", "model=x", "login", "status"],
+		]) {
+			const result = runCli("codex", args);
+			expect({ args, status: result.status }).toEqual({ args, status: 0 });
+		}
+		const [plain, withOption, ...rest] = ran().split("\n").filter(Boolean);
+		expect(rest).toEqual([]);
+		expect(plain).toStartWith(`${profile} `);
+		expect(plain).toContain(" login status");
+		expect(withOption).toStartWith(`${profile} `);
+		expect(withOption).toContain(" -c model=x login status");
 	});
 
 	it("creates mastracode wrapper passthrough", () => {

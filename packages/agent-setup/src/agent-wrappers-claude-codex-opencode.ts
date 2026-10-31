@@ -324,6 +324,7 @@ export function createCodexWrapper(): void {
 				{
 					ambientEnvVar: "SUPERSET_AMBIENT_CODEX_HOME",
 					credentialCommands: ["login", "logout"],
+					readOnlyCommands: ["login status"],
 				},
 			),
 		},

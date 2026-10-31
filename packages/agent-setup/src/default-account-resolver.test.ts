@@ -208,6 +208,7 @@ function codexScript(): string {
 	return `${buildDefaultAccountResolver("CODEX_HOME", "default-codex-home", {
 		ambientEnvVar: "SUPERSET_AMBIENT_CODEX_HOME",
 		credentialCommands: ["login", "logout"],
+		readOnlyCommands: ["login status"],
 	})}printf "ran with %s" "\${CODEX_HOME:-<unset>}"`;
 }
 
@@ -283,6 +284,22 @@ function codexTerminal() {
 	};
 }
 
+/** A workspace terminal spawned while `profile` was the selected Claude dir. */
+function claudeTerminal() {
+	const { home, profile } = makeHome(null);
+	writeFileSync(join(home, "state", "default-claude-config-dir"), profile);
+	return {
+		home,
+		profile,
+		env: {
+			SUPERSET_TERMINAL_ID: "t1",
+			SUPERSET_HOME_DIR: home,
+			CLAUDE_CONFIG_DIR: profile,
+			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: profile,
+		},
+	};
+}
+
 describe("buildDefaultAccountResolver credential commands", () => {
 	it("refuses codex login and logout on the selected home without a terminal", () => {
 		const { profile, env } = codexTerminal();
@@ -315,14 +332,58 @@ describe("buildDefaultAccountResolver credential commands", () => {
 		expect(result.stdout).toBe("");
 	});
 
+	it("refuses codex sign-ins with options before or after the subcommand", () => {
+		const { profile, env } = codexTerminal();
+		for (const args of [
+			["-c", "model=x", "login"],
+			["--config", "model=x", "logout"],
+			["--enable", "hooks", "logout"],
+			["-p", "work", "login"],
+			["login", "--with-api-key"],
+			// An option value that reads "status" is not `codex login status`.
+			["login", "--experimental_issuer", "status"],
+		]) {
+			const result = run(codexScript(), ["codex", ...args], env);
+			expect({ args, status: result.status }).toEqual({ args, status: 2 });
+			expect(result.stdout).toBe("");
+			expect(result.stderr).toContain(profile);
+		}
+	});
+
+	it("keeps an unset CODEX_HOME unset when root options come first", () => {
+		const { env } = codexTerminal();
+		const result = run(codexScript(), ["codex", "-c", "model=x", "login"], {
+			...env,
+			CODEX_HOME: undefined,
+		});
+		expect(result.status).toBe(0);
+		expect(result.stdout).toBe("ran with <unset>");
+	});
+
 	it("lets codex login status and help read the selected home", () => {
 		const { profile, env } = codexTerminal();
 		for (const args of [
 			["login", "status"],
+			["-c", "model=x", "login", "status"],
 			["login", "--help"],
+			["-c", "model=x", "logout", "-h"],
+			["help", "login"],
 		]) {
 			const result = run(codexScript(), ["codex", ...args], env);
-			expect(result.status).toBe(0);
+			expect({ args, status: result.status }).toEqual({ args, status: 0 });
+			expect(result.stdout).toBe(`ran with ${profile}`);
+		}
+	});
+
+	it("matches command words only as whole arguments before --", () => {
+		const { profile, env } = codexTerminal();
+		for (const args of [
+			["exec", "--", "login"],
+			["exec", "please login"],
+			["-c", "login=1"],
+		]) {
+			const result = run(codexScript(), ["codex", ...args], env);
+			expect({ args, status: result.status }).toEqual({ args, status: 0 });
 			expect(result.stdout).toBe(`ran with ${profile}`);
 		}
 	});
@@ -372,14 +433,7 @@ describe("buildDefaultAccountResolver credential commands", () => {
 	});
 
 	it("refuses claude auth login on the selected config dir, not auth status", () => {
-		const { home, profile } = makeHome(null);
-		writeFileSync(join(home, "state", "default-claude-config-dir"), profile);
-		const env = {
-			SUPERSET_TERMINAL_ID: "t1",
-			SUPERSET_HOME_DIR: home,
-			CLAUDE_CONFIG_DIR: profile,
-			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: profile,
-		};
+		const { profile, env } = claudeTerminal();
 		const login = run(claudeScript(), ["claude", "auth", "login"], env);
 		expect(login.status).toBe(2);
 		expect(login.stdout).toBe("");
@@ -387,6 +441,29 @@ describe("buildDefaultAccountResolver credential commands", () => {
 		const status = run(claudeScript(), ["claude", "auth", "status"], env);
 		expect(status.status).toBe(0);
 		expect(status.stdout).toBe(`ran with ${profile}`);
+	});
+
+	it("refuses claude auth login and logout with options before them", () => {
+		const { profile, env } = claudeTerminal();
+		for (const args of [
+			["--verbose", "auth", "login"],
+			["-d", "auth", "logout"],
+			["--settings", "/dev/null", "auth", "login", "--console"],
+		]) {
+			const result = run(claudeScript(), ["claude", ...args], env);
+			expect({ args, status: result.status }).toEqual({ args, status: 2 });
+			expect(result.stdout).toBe("");
+			expect(result.stderr).toContain(profile);
+		}
+	});
+
+	it("starts a claude chat whose one-argument prompt reads auth login", () => {
+		const { profile, env } = claudeTerminal();
+		for (const args of [["auth login"], ["-p", "auth login"]]) {
+			const result = run(claudeScript(), ["claude", ...args], env);
+			expect({ args, status: result.status }).toEqual({ args, status: 0 });
+			expect(result.stdout).toBe(`ran with ${profile}`);
+		}
 	});
 
 	it("asks on a terminal and continues only on yes", async () => {
