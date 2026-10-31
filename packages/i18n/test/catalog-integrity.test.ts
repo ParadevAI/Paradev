@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { compileMessageOrThrow } from "@lingui/message-utils/compileMessage";
 import { SUPPORTED_LOCALES } from "../src/locales";
 
 // A translation may reword anything except the parts the runtime substitutes:
@@ -55,25 +56,50 @@ const icu = (t: string) =>
 		.sort()
 		.join();
 
+function strayBraces(t: string): boolean {
+	let found = false;
+	try {
+		compileMessageOrThrow(t, (text) => {
+			found ||= /[{}]/.test(text);
+			return text;
+		});
+	} catch {
+		return true;
+	}
+	return found;
+}
+
 function integrityError(source: string, translation: string): string | null {
 	for (const name of placeholders(source)) {
 		if (!placeholders(translation).has(name)) return `missing {${name}}`;
 	}
 	if (tags(source) !== tags(translation)) return "tag markers differ";
 	if (icu(source) !== icu(translation)) return "ICU structure differs";
+	if (strayBraces(translation) && !strayBraces(source))
+		return "braces the source does not have";
 	return null;
 }
+
+const readCatalog = (locale: string) =>
+	parsePo(readFileSync(join(LOCALES_DIR, locale, "messages.po"), "utf8"));
+
+// An explicit-id message keeps its English in the source catalog's msgstr.
+const english = new Map(
+	readCatalog(SOURCE_LOCALE).map((entry) => [
+		entry.msgid,
+		entry.msgstr || entry.msgid,
+	]),
+);
+const sourceText = (msgid: string) => english.get(msgid) ?? msgid;
 
 describe("catalog integrity", () => {
 	for (const locale of SUPPORTED_LOCALES) {
 		if (locale === SOURCE_LOCALE) continue;
 		test(`${locale} keeps placeholders, tags, and ICU shape`, () => {
-			const broken = parsePo(
-				readFileSync(join(LOCALES_DIR, locale, "messages.po"), "utf8"),
-			)
+			const broken = readCatalog(locale)
 				.filter((entry) => entry.msgstr !== "")
 				.flatMap((entry) => {
-					const problem = integrityError(entry.msgid, entry.msgstr);
+					const problem = integrityError(sourceText(entry.msgid), entry.msgstr);
 					return problem
 						? [`${JSON.stringify(entry.msgid.slice(0, 70))}: ${problem}`]
 						: [];
@@ -81,4 +107,31 @@ describe("catalog integrity", () => {
 			expect(broken).toEqual([]);
 		});
 	}
+
+	test("rejects a dict dump and a dropped placeholder behind an explicit id", () => {
+		expect(
+			integrityError(
+				"Hello {name}",
+				'{"en": "Hello {name}", "fr": "Bonjour {name}"}',
+			),
+		).toBe("braces the source does not have");
+		expect(
+			integrityError(
+				sourceText("serverError.plugins.marketplaceBuiltinRemove"),
+				"Вбудований, тому його не можна видалити",
+			),
+		).toBe("missing {name}");
+		expect(
+			integrityError(
+				"{count, plural, one {# in {name}} other {# in {name}}}",
+				'{count, plural, one {{"en": "# in {name}"}} other {# у {name}}}',
+			),
+		).toBe("braces the source does not have");
+		expect(
+			integrityError(
+				"{count, plural, one {# file} other {# files}}",
+				"{count, plural, one {# файл} other {# файлів}",
+			),
+		).toBe("braces the source does not have");
+	});
 });
