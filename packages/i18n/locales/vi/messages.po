@@ -9032,9 +9032,6 @@ msgstr "Tên người dùng GitHub"
 msgid "GitHub username..."
 msgstr "Tên người dùng GitHub..."
 
-msgid "GitHub username…"
-msgstr "Tên người dùng GitHub…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Cho Claude Code, Codex hoặc bất kỳ agent CLI nào một workspace và nhánh riêng, rồi xem lại mọi thay đổi ở một nơi."
 
@@ -13066,8 +13063,8 @@ msgstr "Mở ô soạn prompt nhiều dòng cho terminal đang mở"
 msgid "Open a new {label} chat?"
 msgstr "Mở một chat {label} mới?"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "Hãy mở một pull request để xem trạng thái review, check và bình luận."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Mở yêu cầu kéo hoặc yêu cầu hợp nhất để xem trạng thái đánh giá, các kiểm tra và bình luận."
 
 msgid "Open actions menu"
 msgstr "Mở menu hành động"
@@ -13125,6 +13122,9 @@ msgstr "Mở phiên Claude và Codex trong một khung chat thay vì terminal."
 
 msgid "Open Command Palette"
 msgstr "Mở bảng lệnh"
+
+msgid "Open comment on {providerName}"
+msgstr "Mở bình luận trên {providerName}"
 
 msgid "Open comment on GitHub"
 msgstr "Mở bình luận trên GitHub"
@@ -13323,6 +13323,9 @@ msgstr "Mở menu"
 
 msgid "Open navigation"
 msgstr "Mở điều hướng"
+
+msgid "Open on {providerName}"
+msgstr "Mở trên {providerName}"
 
 msgid "Open on GitHub"
 msgstr "Mở trên GitHub"
@@ -20654,6 +20657,9 @@ msgstr "Xem thêm"
 
 msgid "View name"
 msgstr "Tên chế độ xem"
+
+msgid "View on {providerName}"
+msgstr "Xem trên {providerName}"
 
 msgid "View on GitHub"
 msgstr "Xem trên GitHub"

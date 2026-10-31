@@ -9032,9 +9032,6 @@ msgstr "GitHub uživatelské jméno"
 msgid "GitHub username..."
 msgstr "Uživatelské jméno GitHub..."
 
-msgid "GitHub username…"
-msgstr "GitHub uživatelské jméno…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Dejte Claude Code, Codexu nebo jakémukoli CLI agentovi vlastní workspace a větev a pak zkontrolujte každou změnu na jednom místě."
 
@@ -13066,8 +13063,8 @@ msgstr "Otevřít víceřádkový editor promptu pro aktivní terminál"
 msgid "Open a new {label} chat?"
 msgstr "Otevřít nový chat {label}?"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "Otevřete pull request a uvidíte stav revize, kontroly a komentáře."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Otevřete pull request nebo merge request a zobrazte stav kontroly, kontroly a komentáře."
 
 msgid "Open actions menu"
 msgstr "Otevřít nabídku akcí"
@@ -13125,6 +13122,9 @@ msgstr "Otevírejte relace Claude a Codex v panelu chatu místo terminálu."
 
 msgid "Open Command Palette"
 msgstr "Otevřít paletu příkazů"
+
+msgid "Open comment on {providerName}"
+msgstr "Otevřít komentář na {providerName}u"
 
 msgid "Open comment on GitHub"
 msgstr "Otevřít komentář na GitHubu"
@@ -13323,6 +13323,9 @@ msgstr "Otevřít nabídku"
 
 msgid "Open navigation"
 msgstr "Otevřít navigaci"
+
+msgid "Open on {providerName}"
+msgstr "Otevřít na {providerName}u"
 
 msgid "Open on GitHub"
 msgstr "Otevřít na GitHubu"
@@ -20654,6 +20657,9 @@ msgstr "Zobrazit více"
 
 msgid "View name"
 msgstr "Název pohledu"
+
+msgid "View on {providerName}"
+msgstr "Zobrazit na {providerName}u"
 
 msgid "View on GitHub"
 msgstr "Zobrazit na GitHubu"
