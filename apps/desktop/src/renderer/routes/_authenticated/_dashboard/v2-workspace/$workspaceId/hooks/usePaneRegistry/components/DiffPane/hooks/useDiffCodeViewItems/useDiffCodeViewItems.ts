@@ -21,6 +21,7 @@ import type {
 	GetDiffPatchInput,
 } from "renderer/lib/diffPatchQuery";
 import { hashString } from "renderer/routes/_authenticated/_dashboard/utils/hashString";
+import { useSettings } from "renderer/stores/settings";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
@@ -32,6 +33,7 @@ import type {
 	DiffAnnotationMetadata,
 } from "../useDiffAnnotations";
 import {
+	isWhitespaceOnly,
 	type ParsedPatchGroup,
 	type PatchGroupResult,
 	parsePatchGroup,
@@ -61,9 +63,9 @@ interface UseDiffCodeViewItemsResult {
 }
 
 /** A patch request: every file sharing a (category, baseBranch, commitHash,
- * fromHash) resolves to one `git diff`. A DiffPane's file list can mix
- * categories (staged + unstaged + against-base in one "changes" view), so
- * this is usually 1-3 groups, never one per file. */
+ * fromHash, ignoreWhitespace) resolves to one `git diff`. A DiffPane's file
+ * list can mix categories (staged + unstaged + against-base in one "changes"
+ * view), so this is usually 1-3 groups, never one per file. */
 interface PatchGroup {
 	key: string;
 	input: DiffPatchScope;
@@ -157,6 +159,7 @@ function groupKeyFor(input: DiffPatchScope): string {
 		input.baseBranch ?? "",
 		input.commitHash ?? "",
 		input.fromHash ?? "",
+		input.ignoreWhitespace ? "w" : "",
 	].join("\0");
 }
 
@@ -170,6 +173,7 @@ export function useDiffCodeViewItems({
 	extraAnnotationsByItemId,
 }: UseDiffCodeViewItemsOptions): UseDiffCodeViewItemsResult {
 	const { client: trpcClient } = workspaceTrpc.useUtils();
+	const ignoreWhitespace = useSettings((s) => s.ignoreWhitespace);
 	// Generated artifacts (lockfiles, compiled catalogs) stay collapsed behind
 	// a button: their patches are tens of thousands of hunk lines of noise,
 	// and the compiled ones are single multi-megabyte lines, which
@@ -228,7 +232,11 @@ export function useDiffCodeViewItems({
 			if (isGeneratedDiffFile(file.path) && !requestedItemIds.has(itemId)) {
 				continue;
 			}
-			const input = createGetDiffPatchInput(workspaceId, file);
+			const input = createGetDiffPatchInput(
+				workspaceId,
+				file,
+				ignoreWhitespace,
+			);
 			const key = groupKeyFor(input);
 			let group = groups.get(key);
 			if (!group) {
@@ -238,7 +246,7 @@ export function useDiffCodeViewItems({
 			group.members.push({ file, itemId });
 		}
 		return [...groups.values()];
-	}, [files, requestedItemIds, workspaceId]);
+	}, [files, ignoreWhitespace, requestedItemIds, workspaceId]);
 
 	// Layout effect: the queries below start fetching in their own passive
 	// effect, and the union has to hold this pane's members by then.
@@ -276,14 +284,10 @@ export function useDiffCodeViewItems({
 					],
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
-				try {
-					const { patch } = await trpcClient.git.getDiffPatch.query(input);
-					return { kind: "patch", patch, ...requested };
-				} catch (error) {
-					if (!isMissingProcedureError(error)) throw error;
-					// Older host-service (a remote host or cloud sandbox that
-					// hasn't been updated): fetch each file's contents the way
-					// the pane used to, so the changeset still renders.
+				// Older host-service (a remote host or cloud sandbox that
+				// hasn't been updated): fetch each file's contents the way
+				// the pane used to, so the changeset still renders.
+				const fetchFiles = async (): Promise<PatchGroupResult> => {
 					const files: Extract<PatchGroupResult, { kind: "files" }>["files"] =
 						[];
 					const queue = [...members];
@@ -306,8 +310,34 @@ export function useDiffCodeViewItems({
 						},
 					);
 					await Promise.all(workers);
-					return { kind: "files", files, ...requested };
+					return {
+						kind: "files",
+						files,
+						whitespaceFiltered: input.ignoreWhitespace === true,
+						...requested,
+					};
+				};
+				let response: Awaited<
+					ReturnType<typeof trpcClient.git.getDiffPatch.query>
+				>;
+				try {
+					response = await trpcClient.git.getDiffPatch.query(input);
+				} catch (error) {
+					if (!isMissingProcedureError(error)) throw error;
+					return fetchFiles();
 				}
+				// A host without `truncated` drops `ignoreWhitespace` and returns
+				// the full patch.
+				if (input.ignoreWhitespace && response.truncated === undefined) {
+					return fetchFiles();
+				}
+				return {
+					kind: "patch",
+					patch: response.patch,
+					whitespaceFiltered:
+						input.ignoreWhitespace === true && response.truncated === false,
+					...requested,
+				};
 			},
 			staleTime: Number.POSITIVE_INFINITY,
 			enabled,
@@ -374,7 +404,12 @@ export function useDiffCodeViewItems({
 				next.set(group.key, previous);
 				return;
 			}
-			next.set(group.key, parsePatchGroup(group.key, data, previous));
+			next.set(
+				group.key,
+				parsePatchGroup(group.key, data, previous, {
+					ignoreWhitespace: group.input.ignoreWhitespace,
+				}),
+			);
 			changed = true;
 		});
 		if (!changed && next.size === current.size) return;
@@ -414,7 +449,9 @@ export function useDiffCodeViewItems({
 				const reason: DeferredDiffReason = query?.isError
 					? "error"
 					: settled && isRequested(data, member.file)
-						? "deferred"
+						? isWhitespaceOnly(data, member.file)
+							? "whitespace-only"
+							: "deferred"
 						: "loading";
 				map.set(member.itemId, reason);
 			}
@@ -572,6 +609,7 @@ function buildPlaceholderItem(
 function createGetDiffPatchInput(
 	workspaceId: string,
 	file: ChangesetFile,
+	ignoreWhitespace: boolean,
 ): DiffPatchScope {
 	const { source } = file;
 	if (source.kind === "against-base") {
@@ -579,6 +617,7 @@ function createGetDiffPatchInput(
 			workspaceId,
 			category: "against-base",
 			baseBranch: source.baseBranch ?? undefined,
+			ignoreWhitespace,
 		};
 	}
 	if (source.kind === "commit") {
@@ -587,9 +626,10 @@ function createGetDiffPatchInput(
 			category: "commit",
 			commitHash: source.commitHash,
 			fromHash: source.fromHash,
+			ignoreWhitespace,
 		};
 	}
-	return { workspaceId, category: source.kind };
+	return { workspaceId, category: source.kind, ignoreWhitespace };
 }
 
 function getDiffItemId(file: ChangesetFile): string {

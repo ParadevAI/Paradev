@@ -6,7 +6,11 @@ import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard
 import { useSettings } from "renderer/stores/settings";
 import { useLinkedPullRequest } from "../../../../../useLinkedPullRequest";
 
-export type DeferredDiffReason = "deferred" | "loading" | "error";
+export type DeferredDiffReason =
+	| "deferred"
+	| "loading"
+	| "error"
+	| "whitespace-only";
 
 export interface DiffThreadComment {
 	id: string;

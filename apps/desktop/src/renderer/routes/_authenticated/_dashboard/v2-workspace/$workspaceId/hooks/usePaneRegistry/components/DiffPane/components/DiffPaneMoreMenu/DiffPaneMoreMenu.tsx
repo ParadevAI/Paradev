@@ -27,6 +27,7 @@ export function DiffPaneMoreMenu({
 	const diffStyle = useSettings((s) => s.diffStyle);
 	const showDiffComments = useSettings((s) => s.showDiffComments);
 	const expandUnchanged = useSettings((s) => s.expandUnchanged);
+	const ignoreWhitespace = useSettings((s) => s.ignoreWhitespace);
 	const updateSetting = useSettings((s) => s.update);
 
 	return (
@@ -69,6 +70,12 @@ export function DiffPaneMoreMenu({
 					onCheckedChange={(next) => updateSetting("expandUnchanged", next)}
 				>
 					<Trans>Show all lines</Trans>
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem
+					checked={ignoreWhitespace}
+					onCheckedChange={(next) => updateSetting("ignoreWhitespace", next)}
+				>
+					<Trans>Ignore whitespace</Trans>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onSelect={onToggleCollapseAll}>

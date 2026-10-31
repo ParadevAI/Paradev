@@ -9564,6 +9564,9 @@ msgstr "Paradevを気に入っていただけたら、GitHubスターが他の�
 msgid "Ignore @channel and @here"
 msgstr "@channel と @here を無視"
 
+msgid "Ignore whitespace"
+msgstr "空白を無視"
+
 msgid "Illegal content"
 msgstr "違法なコンテンツ"
 
@@ -13010,6 +13013,9 @@ msgstr "あなただけに表示されています"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "サイドバーから外したいだけですか？代わりに非表示にしてください。他のユーザーには影響しません。"
+
+msgid "Only whitespace changed"
+msgstr "空白のみ変更されています"
 
 msgid "Only you"
 msgstr "自分のみ"

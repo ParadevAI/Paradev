@@ -9564,6 +9564,9 @@ msgstr "Если Paradev вам нравится, звезда на GitHub по�
 msgid "Ignore @channel and @here"
 msgstr "Игнорировать @channel и @here"
 
+msgid "Ignore whitespace"
+msgstr "Игнорировать пробелы"
+
 msgid "Illegal content"
 msgstr "Незаконный контент"
 
@@ -13010,6 +13013,9 @@ msgstr "Видно только вам"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "Хотите просто убрать его из боковой панели? Скройте его. Это никого больше не затронет."
+
+msgid "Only whitespace changed"
+msgstr "Изменены только пробелы"
 
 msgid "Only you"
 msgstr "Только вы"

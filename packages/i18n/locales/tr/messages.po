@@ -9564,6 +9564,9 @@ msgstr "Paradev'den şimdiye kadar memnunsanız, bir GitHub yıldızı diğer ge
 msgid "Ignore @channel and @here"
 msgstr "@channel ve @here yoksay"
 
+msgid "Ignore whitespace"
+msgstr "Boşlukları yok say"
+
 msgid "Illegal content"
 msgstr "Yasa dışı içerik"
 
@@ -13010,6 +13013,9 @@ msgstr "Yalnızca sen görebilirsin"
 
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "Sadece kenar çubuğundan mı kaldırmak istiyorsun? Bunun yerine gizle. Başka kimse etkilenmez."
+
+msgid "Only whitespace changed"
+msgstr "Yalnızca boşluklar değişti"
 
 msgid "Only you"
 msgstr "Yalnızca siz"
