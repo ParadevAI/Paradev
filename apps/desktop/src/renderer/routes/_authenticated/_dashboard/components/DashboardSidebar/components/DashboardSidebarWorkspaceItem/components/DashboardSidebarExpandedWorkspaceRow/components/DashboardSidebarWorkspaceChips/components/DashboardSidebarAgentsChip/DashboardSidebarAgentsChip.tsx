@@ -7,8 +7,8 @@ import {
 	HoverCardTrigger,
 } from "@superset/ui/hover-card";
 import { cn } from "@superset/ui/utils";
+import { useDashboardSidebarChipHoverSuppression } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/hooks/useDashboardSidebarChipHoverSuppression";
 import { STATUS_PRIORITY } from "shared/tabs-types";
-import { useDashboardSidebarChipHoverSuppression } from "../../../../hooks/useDashboardSidebarChipHoverSuppression";
 import type { DashboardSidebarRunningAgent } from "../../hooks/useDashboardSidebarWorkspaceRunningAgents";
 import { DashboardSidebarAgentAvatar } from "./components/DashboardSidebarAgentAvatar";
 import { DashboardSidebarAgentHoverRow } from "./components/DashboardSidebarAgentHoverRow";

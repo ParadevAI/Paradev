@@ -11,11 +11,11 @@ import {
 } from "react-icons/lu";
 import type { DiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { PullRequestStatusBadge } from "renderer/routes/_authenticated/_dashboard/components/PullRequestStatusBadge";
 import type { DashboardSidebarWorkspace } from "../../../../types";
 import { ChecksList } from "./components/ChecksList";
 import { ChecksSummary } from "./components/ChecksSummary";
 import { LinkedTaskSection } from "./components/LinkedTaskSection";
-import { PullRequestStatusBadge } from "./components/PullRequestStatusBadge";
 import { ReviewStatus } from "./components/ReviewStatus";
 
 interface DashboardSidebarWorkspaceHoverCardContentProps {

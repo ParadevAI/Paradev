@@ -16,6 +16,10 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
+import {
+	type WorkspacePullRequestSummary,
+	workspacePullRequests,
+} from "renderer/lib/github/workspacePullRequests";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
@@ -73,6 +77,7 @@ type SidebarPullRequest = DashboardSidebarWorkspace["pullRequest"];
 type PullRequestWorkspaceRow = {
 	workspaceId: string;
 	pullRequest: SidebarPullRequest;
+	pullRequests?: WorkspacePullRequestSummary[];
 };
 
 function getPullRequestRowsFingerprint(
@@ -663,6 +668,7 @@ export function useDashboardSidebarData() {
 				rows.push({
 					workspaceId: row.workspaceId,
 					pullRequest: row.pullRequest,
+					pullRequests: row.pullRequests,
 				});
 			}
 		}
@@ -752,6 +758,18 @@ export function useDashboardSidebarData() {
 	const pullRequestsByWorkspaceId =
 		useStablePullRequestsByWorkspaceId(pullRequestRows);
 
+	const stablePullRequestRows = useJsonStable(pullRequestRows);
+	const associatedPullRequestsByWorkspaceId = useMemo(
+		() =>
+			new Map(
+				stablePullRequestRows.map((row) => [
+					row.workspaceId,
+					workspacePullRequests(row.pullRequest, row.pullRequests),
+				]),
+			),
+		[stablePullRequestRows],
+	);
+
 	// Pinned rows render only in the top-level Pinned section, so they are
 	// partitioned out before the per-project tree is built. PR polling targets
 	// derive from the pre-partition list above, so pinned rows keep PR status.
@@ -779,10 +797,12 @@ export function useDashboardSidebarData() {
 				visibleSidebarWorkspaces: projectRows,
 				machineId,
 				pullRequestsByWorkspaceId,
+				associatedPullRequestsByWorkspaceId,
 			}),
 		[
 			machineId,
 			pullRequestsByWorkspaceId,
+			associatedPullRequestsByWorkspaceId,
 			builderProjects,
 			sidebarSections,
 			projectRows,
@@ -844,8 +864,15 @@ export function useDashboardSidebarData() {
 				sidebarSections,
 				machineId,
 				pullRequestsByWorkspaceId,
+				associatedPullRequestsByWorkspaceId,
 			}),
-		[machineId, pullRequestsByWorkspaceId, sessionRows, sidebarSections],
+		[
+			machineId,
+			pullRequestsByWorkspaceId,
+			associatedPullRequestsByWorkspaceId,
+			sessionRows,
+			sidebarSections,
+		],
 	);
 	const sessions = useJsonStable(computedSessions);
 	const sessionWorkspaces = sessions.workspaces;
@@ -857,8 +884,15 @@ export function useDashboardSidebarData() {
 				sidebarProjects: builderProjects,
 				machineId,
 				pullRequestsByWorkspaceId,
+				associatedPullRequestsByWorkspaceId,
 			}),
-		[machineId, pinnedRows, pullRequestsByWorkspaceId, builderProjects],
+		[
+			machineId,
+			pinnedRows,
+			pullRequestsByWorkspaceId,
+			associatedPullRequestsByWorkspaceId,
+			builderProjects,
+		],
 	);
 	const decoratedPinnedWorkspaces = useMemo(
 		() => applyCloudSidebarPinnedRows(computedPinnedWorkspaces, cloudRowById),

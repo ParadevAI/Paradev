@@ -1,10 +1,13 @@
 import { describe, expect, test } from "bun:test";
+import { ConditionalGh } from "../conditional-gh";
 import {
 	fetchOpenPullRequestsFromGh,
-	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecisionFromGh,
+	fetchPullRequestsByHead,
+	fetchPullRequestsByHeadFromGh,
 	parseMergedAt,
 } from "./github-query";
 
@@ -25,6 +28,44 @@ function createExecGh(responses: unknown[]) {
 }
 
 describe("GitHub pull request REST queries", () => {
+	test("revalidates historical PR lookups through the conditional GET cache", async () => {
+		const body = {
+			number: 42,
+			title: "Historical PR",
+			html_url: "https://github.com/owner/repo/pull/42",
+			state: "closed",
+			head: {
+				ref: "old",
+				sha: "abc123",
+				repo: { name: "repo", owner: { login: "owner" } },
+			},
+		};
+		const calls: string[][] = [];
+		const gh = new ConditionalGh(async (args) => {
+			calls.push(args);
+			if (calls.length === 1) {
+				return args.includes("--include")
+					? `HTTP/2.0 200 OK\r\nEtag: "history"\r\n\r\n${JSON.stringify(body)}`
+					: body;
+			}
+			throw Object.assign(new Error("gh: HTTP 304"), {
+				code: 1,
+				stdout: "HTTP/2.0 304 Not Modified\r\n\r\n",
+			});
+		});
+		const repository = { owner: "owner", name: "repo" };
+		const first = await fetchPullRequestByNumberFromGh(gh.exec, repository, 42);
+		expect(first).toMatchObject({
+			number: 42,
+			state: "CLOSED",
+			headRefOid: "abc123",
+		});
+		expect(
+			await fetchPullRequestByNumberFromGh(gh.exec, repository, 42),
+		).toEqual(first);
+		expect(calls[1]).toContain('If-None-Match: "history"');
+	});
+
 	test("fetches only the PR matching the requested upstream head", async () => {
 		const { calls, execGh } = createExecGh([
 			[
@@ -53,26 +94,28 @@ describe("GitHub pull request REST queries", () => {
 			],
 		]);
 
-		const result = await fetchPullRequestByHeadFromGh(
+		const result = await fetchPullRequestsByHeadFromGh(
 			execGh,
 			{ owner: "superset-sh", name: "superset" },
 			{ owner: "superset-sh", repo: "superset", branch: "fix/sidebar" },
 		);
 
-		expect(result).toEqual({
-			number: 42,
-			title: "Fix sidebar",
-			url: "https://github.com/superset-sh/superset/pull/42",
-			state: "OPEN",
-			isDraft: false,
-			headRefName: "fix/sidebar",
-			headRefOid: "abc123",
-			isCrossRepository: false,
-			headRepositoryOwner: { login: "superset-sh" },
-			headRepository: { name: "superset" },
-			updatedAt: "2026-05-08T12:00:00Z",
-			mergedAt: null,
-		});
+		expect(result).toEqual([
+			{
+				number: 42,
+				title: "Fix sidebar",
+				url: "https://github.com/superset-sh/superset/pull/42",
+				state: "OPEN",
+				isDraft: false,
+				headRefName: "fix/sidebar",
+				headRefOid: "abc123",
+				isCrossRepository: false,
+				headRepositoryOwner: { login: "superset-sh" },
+				headRepository: { name: "superset" },
+				updatedAt: "2026-05-08T12:00:00Z",
+				mergedAt: null,
+			},
+		]);
 		expect(calls).toEqual([
 			{
 				args: [
@@ -89,7 +132,11 @@ describe("GitHub pull request REST queries", () => {
 					"-f",
 					"direction=desc",
 					"-f",
-					"per_page=10",
+					"per_page=100",
+					"-f",
+					"page=1",
+					"--jq",
+					expect.any(String),
 				],
 			},
 		]);
@@ -121,14 +168,14 @@ describe("GitHub pull request REST queries", () => {
 			],
 		]);
 
-		const result = await fetchPullRequestByHeadFromGh(
+		const result = await fetchPullRequestsByHeadFromGh(
 			execGh,
 			{ owner: "superset-sh", name: "superset" },
 			{ owner: "superset-sh", repo: "superset", branch: "fix/sidebar" },
 		);
 
-		expect(result?.state).toBe("MERGED");
-		expect(result?.mergedAt).toBe(Date.parse("2026-05-01T10:00:00Z"));
+		expect(result[0]?.state).toBe("MERGED");
+		expect(result[0]?.mergedAt).toBe(Date.parse("2026-05-01T10:00:00Z"));
 	});
 
 	// GitHub reports merged via a non-null merged_at, so an unparseable value
@@ -157,14 +204,14 @@ describe("GitHub pull request REST queries", () => {
 			],
 		]);
 
-		const result = await fetchPullRequestByHeadFromGh(
+		const result = await fetchPullRequestsByHeadFromGh(
 			execGh,
 			{ owner: "superset-sh", name: "superset" },
 			{ owner: "superset-sh", repo: "superset", branch: "fix/sidebar" },
 		);
 
-		expect(result?.state).toBe("MERGED");
-		expect(result?.mergedAt).toBeNull();
+		expect(result[0]?.state).toBe("MERGED");
+		expect(result[0]?.mergedAt).toBeNull();
 	});
 
 	test("filters REST head candidates by exact upstream repository", async () => {
@@ -217,15 +264,15 @@ describe("GitHub pull request REST queries", () => {
 			],
 		]);
 
-		const result = await fetchPullRequestByHeadFromGh(
+		const result = await fetchPullRequestsByHeadFromGh(
 			execGh,
 			{ owner: "superset-sh", name: "superset" },
 			{ owner: "fork-owner", repo: "fork-repo", branch: "fix/sidebar" },
 		);
 
-		expect(result?.number).toBe(42);
-		expect(result?.headRepositoryOwner?.login).toBe("Fork-Owner");
-		expect(result?.headRepository?.name).toBe("fork-repo");
+		expect(result[0]?.number).toBe(42);
+		expect(result[0]?.headRepositoryOwner?.login).toBe("Fork-Owner");
+		expect(result[0]?.headRepository?.name).toBe("fork-repo");
 	});
 
 	// The per-head candidate filter is exact on the branch: it must NOT match a
@@ -259,13 +306,13 @@ describe("GitHub pull request REST queries", () => {
 			],
 		]);
 
-		const result = await fetchPullRequestByHeadFromGh(
+		const result = await fetchPullRequestsByHeadFromGh(
 			execGh,
 			{ owner: "superset-sh", name: "superset" },
 			{ owner: "superset-sh", repo: "superset", branch: "roshvan/fix-thing" },
 		);
 
-		expect(result).toBeNull();
+		expect(result).toEqual([]);
 	});
 
 	test("sweeps open PRs sorted by most recently updated", async () => {
@@ -560,5 +607,66 @@ describe("parseMergedAt", () => {
 	test("reports no merge time for an absent merged_at", () => {
 		expect(parseMergedAt(null)).toBeNull();
 		expect(parseMergedAt("")).toBeNull();
+	});
+});
+
+describe("all PRs for one upstream head", () => {
+	const repository = { owner: "acme", name: "app" };
+	const head = { owner: "contributor", repo: "app", branch: "feature" };
+	const candidate = (number: number, branch = "feature") => ({
+		number,
+		title: `PR ${number}`,
+		html_url: `https://github.com/acme/app/pull/${number}`,
+		state: "open",
+		head: {
+			ref: branch,
+			sha: "sha",
+			repo: { name: "app", owner: { login: "contributor" } },
+		},
+		base: { repo: { full_name: "acme/app" } },
+	});
+
+	test("gh keeps every same-head PR and reads subsequent pages", async () => {
+		const { execGh, calls } = createExecGh([
+			Array.from({ length: 100 }, (_, i) => candidate(i + 1)),
+			[candidate(101), candidate(102, "Feature")],
+		]);
+		const results = await fetchPullRequestsByHeadFromGh(
+			execGh,
+			repository,
+			head,
+		);
+		expect(results.map((pr) => pr.number)).toEqual(
+			Array.from({ length: 101 }, (_, i) => i + 1),
+		);
+		expect(calls[1]?.args).toContain("page=2");
+	});
+
+	test("Octokit keeps every same-head PR and reads subsequent pages", async () => {
+		const pages: number[] = [];
+		const octokit = {
+			rest: {
+				pulls: {
+					list: async ({ page }: { page: number }) => {
+						pages.push(page);
+						return {
+							data:
+								page === 1
+									? Array.from({ length: 100 }, (_, i) => candidate(i + 1))
+									: [candidate(101), candidate(102, "Feature")],
+						};
+					},
+				},
+			},
+		};
+		const results = await fetchPullRequestsByHead(
+			octokit as never,
+			repository,
+			head,
+		);
+		expect(results.map((pr) => pr.number)).toEqual(
+			Array.from({ length: 101 }, (_, i) => i + 1),
+		);
+		expect(pages).toEqual([1, 2]);
 	});
 });

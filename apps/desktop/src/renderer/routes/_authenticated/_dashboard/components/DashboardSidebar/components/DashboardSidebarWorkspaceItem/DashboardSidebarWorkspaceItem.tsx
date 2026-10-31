@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { DashboardSidebarWorkspacePullRequestsMenu } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/components/DashboardSidebarWorkspacePullRequestsMenu";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
@@ -225,7 +226,7 @@ export function DashboardSidebarWorkspaceItem({
 				ref={rowRef}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
-				className="relative flex w-full justify-center"
+				className="relative flex w-full flex-col items-center"
 			>
 				{accentColor && (
 					<div
@@ -254,6 +255,13 @@ export function DashboardSidebarWorkspaceItem({
 							: undefined
 					}
 				/>
+				{!isPending && (
+					<DashboardSidebarWorkspacePullRequestsMenu
+						workspaceId={id}
+						pullRequests={workspace.pullRequests}
+						currentUrl={pullRequest?.url}
+					/>
+				)}
 			</div>
 		);
 

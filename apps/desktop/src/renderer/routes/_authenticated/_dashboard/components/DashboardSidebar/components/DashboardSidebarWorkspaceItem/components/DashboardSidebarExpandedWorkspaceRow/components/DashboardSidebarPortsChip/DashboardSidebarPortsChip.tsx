@@ -8,12 +8,12 @@ import {
 import { Separator } from "@superset/ui/separator";
 import { toast } from "@superset/ui/sonner";
 import { LuLoaderCircle, LuX } from "react-icons/lu";
+import { useDashboardSidebarChipHoverSuppression } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/hooks/useDashboardSidebarChipHoverSuppression";
 import { useDashboardSidebarPortKill } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortKill";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
 import { useHoverCardSafeTriangle } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useHoverCardSafeTriangle";
 import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
-import { useDashboardSidebarChipHoverSuppression } from "../../hooks/useDashboardSidebarChipHoverSuppression";
 import { DashboardSidebarPortHoverRow } from "./components/DashboardSidebarPortHoverRow";
 
 interface DashboardSidebarPortsChipProps {
