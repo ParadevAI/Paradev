@@ -15,6 +15,7 @@ export type { HostAuthProvider } from "./providers/host-auth";
 export { PskHostAuthProvider } from "./providers/host-auth";
 export { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 export type { GitCredentialProvider, GitFactory } from "./runtime/git";
+export { isGitHubUnreachableError } from "./runtime/pull-requests/utils/github-availability";
 export { startVitalsLog } from "./runtime/vitals";
 export { detachFromLaunchDirectory } from "./runtime/working-directory";
 export { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
