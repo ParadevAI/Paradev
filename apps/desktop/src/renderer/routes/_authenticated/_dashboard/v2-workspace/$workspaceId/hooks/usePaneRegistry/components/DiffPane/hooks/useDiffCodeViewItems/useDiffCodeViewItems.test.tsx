@@ -204,6 +204,35 @@ describe("useDiffCodeViewItems", () => {
 		);
 	});
 
+	test("a placeholder keeps its file object when its reason changes", async () => {
+		patchByCategory.set("unstaged", FILE_A);
+		let released = false;
+		holdNextRequest = () => {
+			released = true;
+		};
+		const { result } = renderItems([
+			unstagedFile("a.ts"),
+			unstagedFile("c.ts"),
+		]);
+		const placeholder = () => {
+			const item = result.current.items.find(
+				(candidate) => candidate.id === "diff:unstaged:c.ts",
+			);
+			if (item?.type !== "file") throw new Error("c.ts is not a placeholder");
+			return item;
+		};
+		await waitFor(() => expect(getDiffPatch).toHaveBeenCalledTimes(1));
+		const loading = placeholder();
+
+		act(() => releaseHeldRequest());
+		await waitFor(() => expect(released).toBe(true));
+		await waitFor(() =>
+			expect(placeholder().version).not.toBe(loading.version),
+		);
+
+		expect(placeholder().file).toBe(loading.file);
+	});
+
 	test("a refetch where file B is removed keeps file A", async () => {
 		patchByCategory.set("unstaged", FILE_A + FILE_B);
 		const { client, result, rerender } = renderItems([

@@ -1,6 +1,7 @@
 import type {
 	CodeViewItem,
 	DiffLineAnnotation,
+	FileContents,
 	FileDiffMetadata,
 	LineAnnotation,
 } from "@pierre/diffs";
@@ -426,10 +427,26 @@ export function useDiffCodeViewItems({
 	// changes, so a refetch mid-edit (the one a save triggers) would drop
 	// text typed while the write was in flight.
 	const editingDiffsRef = useRef(new Map<string, FileDiffMetadata>());
+	// Pierre compares files by content, so a fresh but equal object makes it
+	// lay out one file and render another, and it throws.
+	const placeholderFilesRef = useRef(new Map<string, FileContents>());
 
 	const items = useMemo<CodeViewItem<DiffAnnotationMetadata>[]>(() => {
 		const nextItems: CodeViewItem<DiffAnnotationMetadata>[] = [];
 		const editingDiffs = editingDiffsRef.current;
+		const placeholderFiles = placeholderFilesRef.current;
+		const getPlaceholderFile = (itemId: string, path: string) => {
+			const cached = placeholderFiles.get(itemId);
+			if (cached?.name === path) return cached;
+			const next = { name: path, contents: " " };
+			placeholderFiles.set(itemId, next);
+			return next;
+		};
+		for (const itemId of placeholderFiles.keys()) {
+			if (!files.some((file) => getDiffItemId(file) === itemId)) {
+				placeholderFiles.delete(itemId);
+			}
+		}
 		for (const itemId of editingDiffs.keys()) {
 			if (!files.some((file) => getDiffItemId(file) === itemId)) {
 				editingDiffs.delete(itemId);
@@ -443,9 +460,16 @@ export function useDiffCodeViewItems({
 
 			if (file.isBinary) {
 				nextItems.push(
-					buildPlaceholderItem(annotationsByPath, file, itemId, collapsed, {
-						kind: "binary-placeholder",
-					}),
+					buildPlaceholderItem(
+						annotationsByPath,
+						file,
+						getPlaceholderFile(itemId, file.path),
+						itemId,
+						collapsed,
+						{
+							kind: "binary-placeholder",
+						},
+					),
 				);
 				continue;
 			}
@@ -471,10 +495,17 @@ export function useDiffCodeViewItems({
 						? "error"
 						: groupReason;
 				nextItems.push(
-					buildPlaceholderItem(annotationsByPath, file, itemId, collapsed, {
-						kind: "deferred-placeholder",
-						reason,
-					}),
+					buildPlaceholderItem(
+						annotationsByPath,
+						file,
+						getPlaceholderFile(itemId, file.path),
+						itemId,
+						collapsed,
+						{
+							kind: "deferred-placeholder",
+							reason,
+						},
+					),
 				);
 				continue;
 			}
@@ -537,6 +568,7 @@ function buildPlaceholderItem(
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	>,
 	file: ChangesetFile,
+	placeholderFile: FileContents,
 	itemId: string,
 	collapsed: boolean,
 	placeholder: DiffAnnotationMetadata,
@@ -549,7 +581,7 @@ function buildPlaceholderItem(
 	return {
 		id: itemId,
 		type: "file",
-		file: { name: file.path, contents: " " },
+		file: placeholderFile,
 		annotations,
 		collapsed,
 		version: hashString(
