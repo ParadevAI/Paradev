@@ -33,19 +33,18 @@ async function setupClones() {
 }
 
 describe("planBranchSource", () => {
-	test("fetches a branch pushed after the last fetch instead of creating it", async () => {
+	test.each([
+		"feat/pushed",
+		"origin/feat/pushed",
+	])("fetches %s pushed after the last fetch instead of creating it", async (input) => {
 		const { pusherGit, hostGit } = await setupClones();
 		await pusherGit.checkoutLocalBranch("feat/pushed");
 		await pusherGit.raw(["commit", "--allow-empty", "-m", "work"]);
 		await pusherGit.push("origin", "feat/pushed");
 		const pushedSha = (await pusherGit.revparse(["HEAD"])).trim();
 
-		const plan = await planBranchSource(
-			hostGit,
-			"feat/pushed",
-			"main",
-			(target) =>
-				hostGit.fetch([target.remote, target.branch, "--quiet", "--no-tags"]),
+		const plan = await planBranchSource(hostGit, input, "main", (target) =>
+			hostGit.fetch([target.remote, target.branch, "--quiet", "--no-tags"]),
 		);
 
 		expect(plan.usedExistingBranch).toBe(true);
