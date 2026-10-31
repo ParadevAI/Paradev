@@ -12,6 +12,8 @@ import {
 	API_BILLING_MARKER,
 	claudeKeychainAccounts,
 	discoverClaudeProfiles,
+	isCreatedProfile,
+	PROFILE_CREATED_MARKER,
 	readCodexProfileKind,
 } from "./profiles";
 
@@ -156,5 +158,30 @@ describe("discoverClaudeProfiles", () => {
 			credentialKind: "subscription",
 			loginFingerprint: null,
 		});
+	});
+});
+
+// Remove deletes only such a profile, and Add takes a new sign-in only from
+// one, so every other dir must read as not created.
+describe("isCreatedProfile", () => {
+	it("holds for a dir whose marker names the agent", async () => {
+		const dir = tempProfile();
+		writeFileSync(join(dir, PROFILE_CREATED_MARKER), "codex");
+		expect(await isCreatedProfile("codex", dir)).toBe(true);
+	});
+
+	it("does not hold for an unmarked dir or another agent's marker", async () => {
+		const dir = tempProfile();
+		writeFileSync(join(dir, API_BILLING_MARKER), "codex");
+		expect(await isCreatedProfile("codex", dir)).toBe(false);
+		writeFileSync(join(dir, PROFILE_CREATED_MARKER), "claude");
+		expect(await isCreatedProfile("codex", dir)).toBe(false);
+	});
+
+	it("does not hold for the system default or an agent Paradev does not manage", async () => {
+		const dir = tempProfile();
+		writeFileSync(join(dir, PROFILE_CREATED_MARKER), "grok");
+		expect(await isCreatedProfile("claude", null)).toBe(false);
+		expect(await isCreatedProfile("grok", dir)).toBe(false);
 	});
 });

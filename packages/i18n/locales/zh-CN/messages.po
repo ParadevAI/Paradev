@@ -13905,6 +13905,9 @@ msgstr "iPad 上的 Paradev，显示一个拉取请求和工作区列表"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev 只获得此连接器请求的权限。你可以随时断开连接以撤销。"
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev 只会移除它创建的配置文件。"
+
 msgid "Paradev originals"
 msgstr "Paradev原创组件"
 

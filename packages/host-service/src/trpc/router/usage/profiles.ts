@@ -178,6 +178,18 @@ export async function hasProfileCreatedMarker(
 	);
 }
 
+/** Whether `selection` is a profile dir Paradev created for `agent`. The
+ * system default (null) and other agents' logins never are. */
+export async function isCreatedProfile(
+	agent: string,
+	selection: string | null,
+): Promise<boolean> {
+	if (selection === null || (agent !== "claude" && agent !== "codex")) {
+		return false;
+	}
+	return hasProfileCreatedMarker(selection, agent);
+}
+
 /**
  * Extra Claude profile dirs beyond the defaults. Default homes are excluded —
  * callers already cover `~/.claude` and `~/.config/claude`. `candidates`

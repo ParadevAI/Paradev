@@ -13905,6 +13905,9 @@ msgstr "Paradev trên iPad, hiển thị một pull request và danh sách works
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev chỉ nhận các quyền mà trình kết nối này yêu cầu. Ngắt kết nối bất cứ lúc nào để thu hồi."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev chỉ gỡ những hồ sơ do chính nó tạo."
+
 msgid "Paradev originals"
 msgstr "Thành phần riêng của Paradev"
 

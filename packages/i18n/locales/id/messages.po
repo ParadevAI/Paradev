@@ -13905,6 +13905,9 @@ msgstr "Paradev di iPad, menampilkan pull request dan daftar workspace"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev hanya menerima izin yang diminta konektor ini. Putuskan koneksi kapan saja untuk mencabutnya."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev hanya menghapus profil yang dibuatnya sendiri."
+
 msgid "Paradev originals"
 msgstr "Orisinal Paradev"
 

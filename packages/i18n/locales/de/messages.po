@@ -13905,6 +13905,9 @@ msgstr "Paradev auf dem iPad mit einem Pull Request und einer Workspace-Liste"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev erhält nur die Berechtigungen, die dieser Connector anfordert. Trennen Sie die Verbindung jederzeit, um sie zu widerrufen."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev entfernt nur Profile, die es selbst erstellt hat."
+
 msgid "Paradev originals"
 msgstr "Paradev-Originale"
 

@@ -13905,6 +13905,9 @@ msgstr "iPad의 Paradev. 풀 리퀘스트와 워크스페이스 목록이 보입
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev는 이 커넥터가 요청한 권한만 받습니다. 언제든지 연결을 해제해 취소할 수 있습니다."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev는 직접 만든 프로필만 제거합니다."
+
 msgid "Paradev originals"
 msgstr "Paradev 오리지널"
 

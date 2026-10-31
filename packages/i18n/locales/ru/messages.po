@@ -13905,6 +13905,9 @@ msgstr "Paradev на iPad: пул-реквест и список воркспе�
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev получает только те разрешения, которые запрашивает этот коннектор. Отключите его в любой момент, чтобы отозвать их."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev удаляет только профили, которые создал сам."
+
 msgid "Paradev originals"
 msgstr "Оригиналы Paradev"
 

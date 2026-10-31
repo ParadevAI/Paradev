@@ -35,6 +35,7 @@ import {
 	discoverClaudeProfiles,
 	discoverCodexHomes,
 	hasProfileCreatedMarker,
+	isCreatedProfile,
 	readCodexProfileKind,
 } from "./profiles";
 import { validateSessionAccount } from "./session-account/session-account";
@@ -118,20 +119,26 @@ export const usageRouter = router({
 	quota: queryProcedure
 		.meta({ timeoutMs: 15_000 })
 		.input(z.object({ forceRefresh: z.boolean().optional() }).optional())
-		.query(async ({ ctx, input }) => {
+		.query(async ({ ctx, input }): Promise<UsageAccount[]> => {
 			const accounts = await getQuota(input?.forceRefresh ?? false);
 			// isDefault is applied per query, not cached with the quota: changing
 			// the default must reflect immediately without re-hitting providers.
 			const defaults = getDefaultAccountSelections(ctx.db);
-			return accounts.map((account) => ({
-				...account,
-				isDefault:
-					account.agent === "claude"
-						? account.selection === defaults.claudeConfigDir
-						: account.agent === "codex"
-							? account.selection === defaults.codexHome
-							: false,
-			}));
+			return Promise.all(
+				accounts.map(async (account) => ({
+					...account,
+					isDefault:
+						account.agent === "claude"
+							? account.selection === defaults.claudeConfigDir
+							: account.agent === "codex"
+								? account.selection === defaults.codexHome
+								: false,
+					createdByParadev: await isCreatedProfile(
+						account.agent,
+						account.selection,
+					),
+				})),
+			);
 		}),
 
 	/**
