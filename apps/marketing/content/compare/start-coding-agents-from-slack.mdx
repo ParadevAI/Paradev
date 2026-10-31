@@ -1,0 +1,121 @@
+---
+title: "How to Start Coding Agents From Slack for Bug Reports and Small Fixes (2026)"
+description: "Turn a Slack bug report or request into a Claude Code or Codex run that reproduces the bug and opens a draft pull request. Paradev's Slack bot and Slack triggers, Claude Code in Slack, Codex, and Cursor compared."
+date: 2026-10-30
+lastUpdated: 2026-10-30
+type: "tutorial"
+competitors:
+  - claude-code
+  - codex
+  - cursor
+  - devin
+keywords:
+  - start coding agent from slack
+  - claude code slack
+  - slack bug report coding agent
+  - codex slack integration
+  - fix bugs reported in slack with ai
+  - slack bot that opens pull requests
+  - run coding agent from slack message
+  - slack emoji trigger coding agent
+---
+
+To start a coding agent from Slack, connect Slack to a tool that turns a message into an agent run, and have the agent post its result back as a draft pull request or a short note. [Paradev](https://paradev.com) gives a team two ways to do this. Mention the Paradev Slack bot with a request, and it can file a task or start a coding agent and report back in the thread. Or set an [Automation](https://docs.paradev.com/automations) (Pro) with a Slack trigger, such as every new message in `#bugs` or any message someone reacts to with `:bug:`, and Paradev starts Claude Code, Codex, or another CLI agent on a machine you choose.
+
+The vendor options are Claude Code in Slack, which turns an `@Claude` coding request into a Claude Code cloud session; ChatGPT in Slack, where an `@ChatGPT` mention sends repository work to a Codex Cloud task; and Cursor in Slack, where an `@Cursor` mention starts a Cursor Cloud Agent. Each of those runs one vendor's agent, in that vendor's environment by default. Paradev runs the agent you choose on your own machines, or in a cloud workspace.
+
+This guide is for a team whose bug reports and small requests already arrive in Slack. It is published by Paradev. Details about other tools come from their own docs as of October 2026.
+
+---
+
+## Which Slack messages are worth handing to an agent?
+
+Good candidates have a clear expected result and a small surface: "the export button returns 500 on reports over 10k rows", "bump the Sentry SDK to v9 across all apps", "the settings page shows the wrong timezone". Poor candidates need a product decision or a long discussion first. A simple team rule helps: a person decides which messages go to an agent, with a mention or an emoji, and the agent never merges.
+
+## Option 1: mention the Paradev Slack bot
+
+Connect Slack in the dashboard under **Integrations → Slack** (OAuth). For code changes, the bot also needs what any [cloud workspace](https://docs.paradev.com/cloud-workspaces) needs: GitHub connected in **Integrations**, with the Paradev GitHub App given access to the repository, and your agents signed in under **Settings → Agents**. Then mention the bot in a channel or send it a DM:
+
+```text
+@superset bump our Sentry SDK to v9 across all apps and open a PR.
+```
+
+For a code change, the bot starts a cloud workspace, launches a coding agent there, and reports back in the thread. For a request like "file a bug and assign it to whoever owns reporting", it creates the task instead, with assignee, status, and priority from your Linear or Paradev setup. It reads the thread and the channel history on its own, so you do not paste earlier messages into the request.
+
+When thread follow-ups are on for your Slack team, replies in the thread reach the bot without another mention. `!stop` ends the bot's current Slack turn, but it does not stop a coding agent the bot already started in a workspace; open that workspace to stop it. `!mute` brings back mention-only mode for that thread.
+
+Two limits: code changes from the bot run in [cloud workspaces](https://docs.paradev.com/cloud-workspaces), which are in early access and need a paid plan. And the bot's own tools for Linear and GitHub cannot delete resources, merge pull requests, or make bulk writes.
+
+## Option 2: a Slack trigger that runs your agent on your machine
+
+An automation with a Slack trigger runs on the device you pick, with the agent you pick, against your repository.
+
+1. Connect Slack under **Integrations**.
+2. Go to **Automations → New automation**. Pick the project, a device that stays online, and an agent such as Claude Code or Codex.
+3. Under **Triggers**, add **Slack → Message in channel** and pick `#bugs`. Optionally set the message filter to a word your team puts in reports, like `bug`. Or add **Reaction added** with an emoji like `:bug:`, so people choose which messages the agent picks up. Press **Save**. The bot joins public channels when you save; for a private channel, invite it first.
+4. Write a prompt that works from the report and stops when it should:
+
+```text
+A bug report was posted in Slack; it's in the event above. Find the code
+it's about and try to reproduce it with a test.
+If you reproduce it, fix it, run the test suite, and open a draft pull
+request with `gh pr create --draft` that quotes the report and links the
+Slack message.
+If you can't, write what you checked and what you need from the reporter
+to TRIAGE.md. Do not guess at a fix.
+```
+
+From the CLI, find the channel ID and create the same automation with a reaction trigger:
+
+```bash
+superset automations trigger-options --group slack
+superset automations create --name "Bugs from Slack" --project <project-id> \
+  --host <host-id> \
+  --agent claude --prompt-file slack-bug.md \
+  --triggers '[{"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}]'
+```
+
+Without `--host`, the automation runs on the machine where you type the command. Pass the ID of a host that stays online, from `superset hosts list`.
+
+What to know about Slack triggers:
+
+- **Top-level messages only.** Thread replies do not fire **Message in channel**, so a discussion under a report does not start more runs.
+- **No loops from the bot.** Slack triggers ignore the Paradev bot's own messages and reactions.
+- **The device must be online.** A run that fires while the machine is asleep is recorded as missed and is not retried.
+- **Replying in Slack.** The run result lives in a Paradev workspace. To have the agent answer in the thread itself, give it a Slack tool, such as the [Slack plugin](https://docs.paradev.com/plugins/available/slack).
+
+The [Slack bug report recipe](https://docs.paradev.com/recipes/slack-bug-reports) has more variations.
+
+## Which option should a team pick?
+
+| | Paradev Slack bot | Paradev Slack trigger | Claude Code in Slack | ChatGPT (Codex) in Slack | Cursor in Slack |
+| --- | --- | --- | --- | --- | --- |
+| Started by | A mention or DM | A message or emoji in channels you pick | An `@Claude` mention in a channel | An `@ChatGPT` mention in a channel | An `@Cursor` mention in a channel, or a DM |
+| Agent | A coding agent in a cloud workspace | Any CLI agent you set, such as Claude Code or Codex | Claude Code | Codex | Cursor Cloud Agent |
+| Runs on | Cloud workspace (early access) | Your machine, a shared host, or a cloud workspace | Claude Code cloud session | Codex Cloud task | Cursor's managed infrastructure by default; Team Pools on Enterprise |
+| Result | Reply in the thread | A workspace, plus a draft PR or note if the prompt asks | Status updates in the thread, then **View Session** and **Create PR** buttons | The result in the thread, with a **Follow along** link to the task | Status updates in the thread, then a notification with the PR it created |
+| Good fit | Ad hoc requests and task filing | A steady stream of reports in one channel | Pro, Max, and Ultra accounts in a Slack workspace not connected to Claude Tag | ChatGPT workspaces with Codex Cloud environments set up | Teams already on Cursor |
+
+Per Anthropic's [Claude Code in Slack docs](https://code.claude.com/docs/en/slack), it works in channels, not DMs, needs cloud sessions and a connected GitHub account, and picks the repository from the conversation. This version answers Pro, Max, and Ultra accounts; Team and Enterprise plans use Claude Tag instead. Anthropic also notes that Claude may follow directions from other messages in the context, so use it only in trusted conversations. Per OpenAI's [ChatGPT in Slack docs](https://learn.chatgpt.com/docs/third-party/slack), `@ChatGPT` replaces the earlier `@Codex` mention, and repository work needs cloud delegation and a published environment shared with the workspace. Per [Cursor's Slack docs](https://cursor.com/docs/integrations/slack), it needs a connected repository provider, a default repository, and usage-based pricing. The same caution applies to any agent that reads Slack: a Slack message is untrusted input, so keep runs on draft pull requests and keep merge rights with people.
+
+## Frequently Asked Questions
+
+### Can Claude Code run from a Slack message?
+
+Yes. Claude Code in Slack starts a Claude Code cloud session from an `@Claude` mention, for Pro, Max, and Ultra accounts. To run Claude Code on your own machine instead, use a Paradev automation with a Slack trigger and pick Claude Code as its agent.
+
+### Can a Slack emoji start a coding agent?
+
+Yes. In Paradev, a **Reaction added** trigger with an emoji such as `:bug:` starts a run for any message that gets that reaction in the channels you pick.
+
+### Does the agent reply in the Slack thread?
+
+The Paradev bot does. An automation's run lives in a Paradev workspace; give the agent a Slack tool if you want it to post in the thread too.
+
+### Can I use Codex instead of Claude Code?
+
+Yes. Set Codex as the automation's agent, or pass `--agent codex` on the CLI.
+
+### Which plan do I need?
+
+The Slack integration and automations are on Pro. Cloud workspaces need a paid plan and are in early access. See [pricing](/pricing).

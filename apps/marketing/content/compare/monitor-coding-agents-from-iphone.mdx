@@ -2,7 +2,7 @@
 title: "How to Monitor Claude Code and Codex From Your iPhone in 2026"
 description: "Check progress, answer prompts, and send follow-ups to Claude Code, Codex, and other agents from an iPhone. Remote Control, SSH and tmux, and Paradev compared."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-10-30
 type: "roundup"
 competitors:
   - claude-code
@@ -18,6 +18,8 @@ keywords:
   - send follow-up instructions to coding agent from phone
   - tailscale ssh tmux iphone
   - claude code remote control superset
+  - solo developer run coding agents from iphone
+  - start claude code task from iphone
 ---
 
 To check on coding agents from your iPhone, use [Paradev for iPhone and iPad](/mobile). It shows every agent you run in Paradev (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and while the app is open, a Lock Screen Live Activity shows which agents need you. It does not update in the background yet.
@@ -122,6 +124,23 @@ Remote Control changes the screen you use, not where the work runs. A separate w
 
 Pick Remote Control for one Claude session you are already driving. Pick a workspace app when you run several agents, mix Claude Code and Codex, or spread work across machines. The two also combine: run Claude Code in a Paradev workspace for the worktree and the cross-agent view, and turn on Remote Control for the session you want in the Claude app.
 
+## I'm a solo developer. Can I run my agents from my iPhone with only one computer?
+
+Yes, as long as that computer stays awake while you are away. Your Mac runs the agents and the iPhone is the screen. Paradev for iPhone can start work, not only watch it:
+
+1. **Start an agent from the phone.** Type a prompt in **What do you want to do?** on Home. Before you send it, pick the project, the base branch, the agent (Claude Code, Codex, or another), and the model or effort. Sending creates a workspace on the selected computer and starts the agent there.
+2. **Answer it.** A yellow dot on a workspace means an agent needs permission. Open it and reply by typing, dictating, or attaching a photo.
+3. **Review the diff.** Open the changed files, touch and hold a line to comment, then **Finish review** and send the comments to the same agent session or a new one.
+4. **Finish the pull request.** On a workspace with a PR, **Fix Checks with Agent** hands failing checks or conflicts to an agent, **Address Comments with Agent** hands it the review comments, and you can merge from the phone.
+
+What a one-computer setup needs:
+
+- **Keep the computer reachable.** Agents run in a background terminal daemon, so closing the Paradev window does not stop them. Quitting the app makes the computer unreachable from the phone until you open Paradev again, and a Mac that sleeps shows as offline. To keep a machine reachable with the app closed, run `superset start --daemon` from the standalone CLI. [Keep agents running](https://docs.paradev.com/keep-agents-running) has the details.
+- **Know the cost.** The iPhone app needs Paradev Pro and iOS 26 or later. Your agent subscriptions stay your own: Paradev does not proxy model calls.
+- **No computer at all.** If you do not want to leave a computer on, Paradev cloud workspaces run in the cloud and work from iPhone and iPad (Team and Ultra plans). They are in early access, so even on those plans your account may not show the **Cloud** option yet. Codex Cloud and Claude Code on the web are the vendor options.
+
+For a solo developer who already runs Claude Code and Codex on one Mac, this is the shortest path: no second machine, no SSH, and the same workspaces on the phone and the desktop.
+
 ## Set up Paradev on your iPhone
 
 1. On each computer, open **Settings → Remote Access** and turn on **Allow remote access to this device via relay**. This restarts the host service and interrupts running terminals, so do it before you start work. **Settings → Mobile** has the same toggle and a QR code that opens the App Store.
@@ -135,6 +154,10 @@ If the app shows **One step left**, that computer has never connected. **Offline
 ### Can I use Claude Code Remote Control inside Paradev?
 
 Yes. Paradev runs the real `claude` CLI in an interactive terminal with your own login, so `/remote-control` works in a Paradev workspace and the session appears in the Claude app. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the terminal must stay open in at least one pane. Paradev for iPhone shows the same session next to your other agents.
+
+### Can I start a new Claude Code or Codex task from my iPhone?
+
+Yes. In Paradev for iPhone, type a prompt on Home, pick the project, branch, and agent, and send it. Paradev creates a workspace on your computer and starts the agent there.
 
 ### Can I use Claude Code from my phone without an extra app?
 
