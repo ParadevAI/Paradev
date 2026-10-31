@@ -266,6 +266,17 @@ ${matches.join("\n")}
 `;
 }
 
+/**
+ * Stops a credential command that would change the selected account's login
+ * until the user confirms on a terminal. stderr has to be a terminal, so the
+ * question is seen; the answer comes from stdin, or from /dev/tty when stdin
+ * carries the CLI's own input (`printf '%s' "$KEY" | codex login
+ * --with-api-key`). Without a terminal the command does not run, and the
+ * refusal names the home but no command to run instead: in a workspace, the
+ * callers without a terminal are mostly agents' tool calls. A
+ * pseudo-terminal counts as a terminal, so an agent that drives one can
+ * still answer. After a "no", the hint points at the system default.
+ */
 function buildCredentialCommandGuard(
 	envVar: string,
 	ambientEnvVar?: string,
@@ -273,25 +284,48 @@ function buildCredentialCommandGuard(
 	const notSystemDefault = ambientEnvVar
 		? ` && [ "\${${envVar}}" != "\${${ambientEnvVar}}" ]`
 		: "";
-	const unsetHint = `To run it without the selected account: env -u ${envVar} %s\\n`;
+	const cancelled =
+		"Paradev: cancelled. To run it on the system default instead:";
+	const unsetHint = `printf '${cancelled} env -u ${envVar} %s' "\${0##*/}" >&2`;
+	const systemDefaultHint = ambientEnvVar
+		? `if [ -n "\${${ambientEnvVar}}" ]; then
+        printf '${cancelled} ${envVar}=%q %s' "\${${ambientEnvVar}}" "\${0##*/}" >&2
+      else
+        ${unsetHint}
+      fi`
+		: unsetHint;
 	return `if [ -n "$superset_credential_command" ] && [ -n "\${${envVar}}" ] \\
   && [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]${notSystemDefault}; then
-  if [ -t 0 ] && [ -t 2 ]; then
-    printf 'Paradev: %s will change the login in %s, the account you made the default for new agents. Continue? [y/N] ' \\
+  superset_reply_from=""
+  if [ -t 2 ]; then
+    if [ -t 0 ]; then
+      superset_reply_from="stdin"
+    elif (: </dev/tty) 2>/dev/null; then
+      superset_reply_from="tty"
+    fi
+  fi
+  if [ -z "$superset_reply_from" ]; then
+    printf 'Paradev: %s would change the login in %s, the account you made the default for new agents. Nothing was run: a person has to confirm this in a terminal.\\n' \\
       "$superset_credential_command" "\${${envVar}}" >&2
-    read -r superset_reply
-    case "$superset_reply" in
-      [yY]|[yY][eE][sS]) ;;
-      *)
-        printf 'Paradev: cancelled. ${unsetHint}' "$superset_credential_command" >&2
-        exit 1
-        ;;
-    esac
-  else
-    printf 'Paradev: %s would change the login in %s, the account you made the default for new agents.\\nTo use that account, confirm in a terminal or run: SUPERSET_DEFAULT_${envVar}= ${envVar}=%q %s\\n${unsetHint}' \\
-      "$superset_credential_command" "\${${envVar}}" "\${${envVar}}" "$superset_credential_command" "$superset_credential_command" >&2
     exit 2
   fi
+  printf 'Paradev: %s will change the login in %s, the account you made the default for new agents. Continue? [y/N] ' \\
+    "$superset_credential_command" "\${${envVar}}" >&2
+  superset_reply=""
+  if [ "$superset_reply_from" = "tty" ]; then
+    read -r superset_reply </dev/tty
+  else
+    read -r superset_reply
+  fi
+  case "$superset_reply" in
+    [yY]|[yY][eE][sS]) ;;
+    *)
+      ${systemDefaultHint}
+      printf ' %q' "$@" >&2
+      printf '\\n' >&2
+      exit 1
+      ;;
+  esac
 fi
 `;
 }

@@ -940,7 +940,7 @@ exit 0
 		]) {
 			writeFileSync(
 				path.join(realBinDir, name),
-				`#!/bin/bash\nprintf '%s %s\\n' "\${${envVar}:-<unset>}" "$*" >> "${ranFile}"\n`,
+				`#!/bin/bash\n[ -t 0 ] || superset_stdin="$(cat)"\nprintf '%s %s stdin=%s\\n' "\${${envVar}:-<unset>}" "$*" "$superset_stdin" >> "${ranFile}"\n`,
 				{ mode: 0o755 },
 			);
 		}
@@ -972,7 +972,38 @@ exit 0
 		};
 		const ran = () =>
 			existsSync(ranFile) ? readFileSync(ranFile, "utf-8") : "";
-		return { ambient, profile, runCli, ran };
+		/** Runs `command` under bash on a pseudo-terminal, answering the prompt. */
+		const runOnTerminal = async (command: string, answer: string) => {
+			const decoder = new TextDecoder();
+			let output = "";
+			let answered = false;
+			let onClose: (() => void) | undefined;
+			const closed = new Promise<void>((resolve) => {
+				onClose = resolve;
+			});
+			const merged: Record<string, string> = {};
+			for (const [key, value] of Object.entries(env)) {
+				if (value !== undefined) merged[key] = value;
+			}
+			const proc = Bun.spawn(["bash", "-c", command], {
+				env: merged,
+				terminal: {
+					data(terminal, chunk) {
+						output += decoder.decode(chunk, { stream: true });
+						if (!answered && output.includes("[y/N]")) {
+							answered = true;
+							terminal.write(`${answer}\n`);
+						}
+					},
+					exit: () => onClose?.(),
+				},
+			});
+			const status = await proc.exited;
+			await closed;
+			proc.terminal?.close();
+			return { status, output };
+		};
+		return { ambient, profile, runCli, ran, runOnTerminal };
 	}
 
 	it("refuses every sign-in on the selected account without a terminal", () => {
@@ -994,8 +1025,25 @@ exit 0
 				status: 2,
 			});
 			expect(result.stderr).toContain(profile);
+			expect(result.stderr).not.toContain("SUPERSET_DEFAULT_");
+			expect(result.stderr).not.toContain("env -u");
 		}
 		expect(ran()).toBe("");
+	});
+
+	it("asks before a piped API-key login on the selected account", async () => {
+		const { profile, ran, runOnTerminal } = setUpSelectedAccountWrappers();
+		// The shape of the Usage card's re-sign command for an API-billed
+		// profile: the key arrives on stdin, so only /dev/tty can answer.
+		const command = `printf '%s' sk-test | "${path.join(TEST_BIN_DIR, "codex")}" login --with-api-key`;
+		const no = await runOnTerminal(command, "n");
+		expect(no.output).toContain(profile);
+		expect(no.status).toBe(1);
+		expect(ran()).toBe("");
+		const yes = await runOnTerminal(command, "y");
+		expect(yes.status).toBe(0);
+		expect(ran()).toStartWith(`${profile} `);
+		expect(ran()).toContain(" login --with-api-key stdin=sk-test\n");
 	});
 
 	it("keeps an unset CODEX_HOME unset for a wrapped login with root options", () => {

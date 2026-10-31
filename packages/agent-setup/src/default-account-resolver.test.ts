@@ -265,6 +265,25 @@ async function runOnTerminal(
 	return { status, output };
 }
 
+/**
+ * Runs `script` on a pseudo-terminal with `input` piped into its stdin, so
+ * only stderr and /dev/tty are the terminal, and types `answer` at the prompt.
+ */
+function runPipedOnTerminal(
+	script: string,
+	argv: string[],
+	env: Record<string, string | undefined>,
+	input: string,
+	answer: string,
+): Promise<{ status: number; output: string }> {
+	return runOnTerminal(
+		`printf "%s" "$1" | bash -c "$0" "\${@:2}"`,
+		[script, input, ...argv],
+		env,
+		answer,
+	);
+}
+
 /** A workspace terminal spawned while `profile` was the selected Codex home. */
 function codexTerminal() {
 	const { home, profile } = makeHome(null);
@@ -309,10 +328,14 @@ describe("buildDefaultAccountResolver credential commands", () => {
 			expect(result.stdout).toBe("");
 			expect(result.stderr).toContain(`codex ${command}`);
 			expect(result.stderr).toContain(profile);
+			expect(result.stderr).toContain("confirm this in a terminal");
+			// Nothing a caller could run to skip the question or sign in elsewhere.
+			expect(result.stderr).not.toContain("CODEX_HOME=");
+			expect(result.stderr).not.toContain("env -u");
 		}
 	});
 
-	it("runs the override the refusal suggests", () => {
+	it("runs the override documented for scripts", () => {
 		const { profile, env } = codexTerminal();
 		const result = run(codexScript(), ["codex", "login"], {
 			...env,
@@ -438,6 +461,8 @@ describe("buildDefaultAccountResolver credential commands", () => {
 		expect(login.status).toBe(2);
 		expect(login.stdout).toBe("");
 		expect(login.stderr).toContain(profile);
+		expect(login.stderr).not.toContain("CLAUDE_CONFIG_DIR=");
+		expect(login.stderr).not.toContain("env -u");
 		const status = run(claudeScript(), ["claude", "auth", "status"], env);
 		expect(status.status).toBe(0);
 		expect(status.stdout).toBe(`ran with ${profile}`);
@@ -478,9 +503,64 @@ describe("buildDefaultAccountResolver credential commands", () => {
 		expect(prompt).toContain(profile);
 		expect(afterPrompt).toContain(`ran with ${profile}`);
 		expect(yes.status).toBe(0);
-		const no = await runOnTerminal(codexScript(), ["codex", "login"], env, "n");
+		for (const answer of ["n", ""]) {
+			const no = await runOnTerminal(
+				codexScript(),
+				["codex", "login"],
+				env,
+				answer,
+			);
+			expect({ answer, status: no.status }).toEqual({ answer, status: 1 });
+			expect(no.output).toContain("[y/N]");
+			expect(no.output).not.toContain("ran with");
+		}
+	});
+
+	it("points at the system default after a no", async () => {
+		const { ambient, env } = codexTerminal();
+		const codex = await runOnTerminal(
+			codexScript(),
+			["codex", "-c", "model=x", "login", "--device-auth"],
+			env,
+			"n",
+		);
+		expect(codex.output).toContain(
+			`CODEX_HOME=${ambient} codex -c model=x login --device-auth`,
+		);
+		const claude = await runOnTerminal(
+			claudeScript(),
+			["claude", "auth", "login", "--console"],
+			claudeTerminal().env,
+			"n",
+		);
+		expect(claude.output).toContain(
+			"env -u CLAUDE_CONFIG_DIR claude auth login --console",
+		);
+	});
+
+	it("asks on the terminal when stdin carries input for the CLI", async () => {
+		const { profile, env } = codexTerminal();
+		const script = `${codexScript()}\nprintf " stdin=%s" "$(cat)"`;
+		const argv = ["codex", "login", "--with-api-key"];
+		const yes = await runPipedOnTerminal(script, argv, env, "sk-test", "y");
+		const [prompt, afterPrompt = ""] = yes.output.split("[y/N]");
+		expect(prompt).toContain(profile);
+		expect(afterPrompt).toContain(`ran with ${profile} stdin=sk-test`);
+		expect(yes.status).toBe(0);
+		const no = await runPipedOnTerminal(script, argv, env, "sk-test", "n");
 		expect(no.output).toContain("[y/N]");
 		expect(no.output).not.toContain("ran with");
 		expect(no.status).toBe(1);
+	});
+
+	it("leaves sign-ins alone when nothing is selected", () => {
+		for (const [script, argv] of [
+			[codexScript(), ["codex", "login"]],
+			[claudeScript(), ["claude", "auth", "login"]],
+		] as const) {
+			const result = run(script, [...argv], {});
+			expect({ argv, status: result.status }).toEqual({ argv, status: 0 });
+			expect(result.stdout).toBe("ran with <unset>");
+		}
 	});
 });
