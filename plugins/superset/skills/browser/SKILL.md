@@ -72,7 +72,7 @@ open the workspace.
 
 To put the page in the right sidebar beside the user's work instead, and when
 `superset panes --help` succeeds (older CLIs lack `panes`), run
-`superset panes open browser --workspace <id> --url http://localhost:3000`
+`superset panes open browser --workspace <id> --url <url>`
 (`superset:panes`), then find the pane with
 `superset browser list --workspace <id> --json`.
 
