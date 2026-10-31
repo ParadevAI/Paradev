@@ -57,10 +57,14 @@ export async function GET(
 
 	try {
 		const redirect = redirectUriFor(slug);
-		const wantsPkce =
-			method.type === "oauth2" &&
-			(await resolveEndpoints(slug, method, redirect)).pkce;
-		const codeVerifier = wantsPkce ? createCodeVerifier() : null;
+		const endpoints =
+			method.type === "oauth2"
+				? await resolveEndpoints(slug, method, redirect, { newGrant: true })
+				: undefined;
+		const codeVerifier = endpoints?.pkce ? createCodeVerifier() : null;
+		// The callback must redeem the code as the client that asked for it, and
+		// a dynamic connector can have several registered.
+		const clientId = endpoints?.issuer ? endpoints.clientId : null;
 
 		return await beginOAuthFlow({
 			cookie: connectorStateCookie(slug),
@@ -71,6 +75,7 @@ export async function GET(
 					? { codeVerifier: await encryptSecret(codeVerifier) }
 					: {}),
 				...(returnsToPlugin ? { plugin } : {}),
+				...(clientId ? { clientId } : {}),
 			},
 			authorizeUrl: async (state) =>
 				(
@@ -78,6 +83,7 @@ export async function GET(
 						redirectUri: redirect,
 						state,
 						codeVerifier,
+						endpoints,
 					})
 				).url,
 		});

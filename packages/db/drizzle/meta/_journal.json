@@ -1261,6 +1261,13 @@
       "when": 1793392134011,
       "tag": "0179_user_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 180,
+      "version": "7",
+      "when": 1793475236973,
+      "tag": "0180_dynamic_client_scopes",
+      "breakpoints": true
     }
   ]
 }
