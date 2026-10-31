@@ -109,6 +109,8 @@ const config: Configuration = {
 	// macOS DMG installer
 	dmg: {
 		...(existsSync(dmgBackgroundPath) ? { background: dmgBackgroundPath } : {}),
+		// The mounted volume name; the default uses productName.
+		title: `${displayName} \${version}`,
 		// Explicit size — dmgbuild's auto-calc under-allocates and silently truncates
 		// the last large file above ~1.7GB of contents. `shrink: true` (default) keeps
 		// the final artifact compact.

@@ -23,6 +23,7 @@ import { createPermissionsRouter } from "./permissions";
 import { createPluginsRouter } from "./plugins";
 import { createPortForwardsRouter } from "./port-forwards";
 import { createPortsRouter } from "./ports";
+import { createPostOnboardingSetupRouter } from "./post-onboarding-setup";
 import { createProjectsRouter } from "./projects";
 import { createResourceMetricsRouter } from "./resource-metrics";
 import { createRingtoneRouter } from "./ringtone";
@@ -57,6 +58,7 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		plugins: createPluginsRouter(),
 		ports: createPortsRouter(),
 		portForwards: createPortForwardsRouter(),
+		postOnboardingSetup: createPostOnboardingSetupRouter(),
 		resourceMetrics: createResourceMetricsRouter(),
 		menu: createMenuRouter(),
 		external: createExternalRouter(),
