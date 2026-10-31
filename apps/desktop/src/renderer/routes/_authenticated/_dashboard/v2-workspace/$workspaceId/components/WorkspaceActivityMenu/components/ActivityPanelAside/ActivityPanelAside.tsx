@@ -6,7 +6,6 @@ import {
 	CENTERED_CONTENT_WIDTH_PX,
 	PANEL_CONTENT_GAP_PX,
 	PANEL_EDGE_GAP_PX,
-	PANEL_TOP_GAP_PX,
 	PANEL_WIDTH_PX,
 } from "../../constants";
 import { useActivityPanelStore } from "../../stores/activityPanelStore";
@@ -21,10 +20,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	const setFits = useActivityPanelStore((state) => state.setFits);
 	const [sentinel, setSentinel] = useState<HTMLElement | null>(null);
 	const [hasRoom, setHasRoom] = useState(false);
-	const setAnchorNode = useActivityPanelStore((state) => state.setAnchorNode);
-	const clearAnchorNode = useActivityPanelStore(
-		(state) => state.clearAnchorNode,
-	);
 	const hidden = useActivityPanelStore(
 		(state) => state.hidden[workspaceId] === true,
 	);
@@ -56,14 +51,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 		};
 	}, [sentinel, shown]);
 
-	const attachAnchor = useCallback(
-		(node: HTMLElement) => {
-			setAnchorNode(workspaceId, node);
-			return () => clearAnchorNode(workspaceId, node);
-		},
-		[workspaceId, setAnchorNode, clearAnchorNode],
-	);
-
 	const attach = useCallback(
 		(node: HTMLElement) => {
 			setAsideNode(workspaceId, node);
@@ -75,18 +62,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	return (
 		<>
 			<span aria-hidden className="hidden" ref={setSentinel} />
-			{isTabVisible && (
-				<span
-					aria-hidden
-					className="pointer-events-none invisible absolute h-0"
-					ref={attachAnchor}
-					style={{
-						top: PANEL_TOP_GAP_PX,
-						right: PANEL_EDGE_GAP_PX,
-						width: PANEL_WIDTH_PX,
-					}}
-				/>
-			)}
 			{isTabVisible && (
 				<aside
 					aria-label={t({ message: "Workspace activity" })}
