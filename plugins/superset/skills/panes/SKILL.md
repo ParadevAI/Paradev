@@ -103,7 +103,9 @@ Behavior to rely on:
   `--keep-terminal` to keep a long-running process alive in the background and
   reattach it later with `--terminal`.
 - `move` closes a tab it leaves empty. `move --to` and `swap` work across the
-  two areas; `--new-tab` keeps the pane in its own area.
+  two areas; `--new-tab` keeps the pane in its own area. Only terminals and
+  chats can go into the main area: Changes, files, browsers and Pages stay in
+  the sidebar, and a move that would put one there is refused.
 - `open` reuses a sidebar tab that already shows the same thing (a browser always gets
   a new tab) and returns its `paneId`. Pass `--background` to add the tab
   without showing the sidebar or changing its active tab, for example to

@@ -1,9 +1,8 @@
 import type { WorkspaceState } from "@superset/panes";
-import {
-	PANE_AREAS,
-	type PaneArea,
-	type PaneLayoutOp,
-	type PaneLayoutOpResult,
+import type {
+	PaneArea,
+	PaneLayoutOp,
+	PaneLayoutOpResult,
 } from "@superset/shared/pane-layout-ops";
 import { useEffect } from "react";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
@@ -118,7 +117,9 @@ function runPaneLayoutOp(
 	backgroundClosedTerminal(previous, workspaceId, op);
 
 	if (op.type !== "list") {
-		for (const area of PANE_AREAS) {
+		// Sidebar first: a non-terminal pane landing in the main area is moved to
+		// the sidebar by useRightPaneAreaLifecycle, and a later sidebar write would drop it.
+		for (const area of ["sidebar", "main"] as const) {
 			const next = outcome.areas[area];
 			if (next === previous[area]) continue;
 			const mounted = getV2PaneLayoutStore(workspaceId, SLOTS[area]);

@@ -306,28 +306,65 @@ describe("applyPaneLayoutOp", () => {
 	test("move next to a pane in the other area splits it there", () => {
 		const { areas, tabId } = applyPaneLayoutOp(fixture(), {
 			type: "move",
-			paneId: "d",
-			targetPaneId: "a",
-			direction: "right",
+			paneId: "c",
+			targetPaneId: "d",
+			direction: "down",
 		});
-		expect(tabId).toBe("tab-1");
-		expect(areas.sidebar.tabs).toHaveLength(0);
-		expect(Object.keys(areas.main.tabs[0]?.panes ?? {}).sort()).toEqual([
-			"a",
-			"b",
+		expect(tabId).toBe("side-1");
+		expect(areas.main.tabs.map((tab) => tab.id)).toEqual(["tab-1"]);
+		expect(Object.keys(areas.sidebar.tabs[0]?.panes ?? {}).sort()).toEqual([
+			"c",
 			"d",
 		]);
-		expect(areas.main.tabs[0]?.activePaneId).toBe("a");
+		expect(areas.sidebar.tabs[0]?.activePaneId).toBe("d");
 	});
 
-	test("swap exchanges panes across areas", () => {
-		const { areas } = applyPaneLayoutOp(fixture(), {
-			type: "swap",
+	test("swap exchanges terminals across areas", () => {
+		const moved = applyPaneLayoutOp(fixture(), {
+			type: "moveToNewTab",
 			paneId: "c",
-			withPaneId: "d",
+			area: "sidebar",
+		}).areas;
+		const { areas } = applyPaneLayoutOp(moved, {
+			type: "swap",
+			paneId: "a",
+			withPaneId: "c",
 		});
-		expect(areas.main.tabs[1]?.panes.d?.kind).toBe("diff");
-		expect(areas.sidebar.tabs[0]?.panes.c?.kind).toBe("terminal");
+		expect(areas.main.tabs[0]?.panes.c?.kind).toBe("terminal");
+		expect(
+			areas.sidebar.tabs.some((tab) => tab.panes.a?.kind === "terminal"),
+		).toBe(true);
+	});
+
+	test("only terminals and chats can go into the main area", () => {
+		expectError(
+			() =>
+				applyPaneLayoutOp(fixture(), {
+					type: "move",
+					paneId: "d",
+					targetPaneId: "a",
+					direction: "right",
+				}),
+			"BAD_REQUEST",
+		);
+		expectError(
+			() =>
+				applyPaneLayoutOp(fixture(), {
+					type: "moveToNewTab",
+					paneId: "d",
+					area: "main",
+				}),
+			"BAD_REQUEST",
+		);
+		expectError(
+			() =>
+				applyPaneLayoutOp(fixture(), {
+					type: "swap",
+					paneId: "c",
+					withPaneId: "d",
+				}),
+			"BAD_REQUEST",
+		);
 	});
 
 	test("open reuses a tool already in the sidebar", () => {

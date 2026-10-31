@@ -61,6 +61,12 @@ export function resolveOpenPath(
 	const relativePath = normalize(
 		isAbsolute(path) ? relative(worktreePath, path) : path,
 	);
-	if (relativePath.startsWith("..") || isAbsolute(relativePath)) throw outside;
+	if (
+		relativePath === ".." ||
+		relativePath.startsWith(`..${sep}`) ||
+		isAbsolute(relativePath)
+	) {
+		throw outside;
+	}
 	return relativePath;
 }

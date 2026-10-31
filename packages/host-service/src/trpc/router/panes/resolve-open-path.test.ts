@@ -43,11 +43,17 @@ describe("resolveOpenPath", () => {
 		expect(resolveOpenPath("changes", "./src/cart.ts", "/repo", fs)).toBe(
 			"src/cart.ts",
 		);
+		expect(resolveOpenPath("changes", "..notes.md", "/repo", fs)).toBe(
+			"..notes.md",
+		);
 	});
 
 	test("Changes rejects a path outside the worktree", () => {
 		expect(() =>
 			resolveOpenPath("changes", "/elsewhere/a.ts", "/repo", fs),
+		).toThrow("outside this workspace");
+		expect(() =>
+			resolveOpenPath("changes", "../other/a.ts", "/repo", fs),
 		).toThrow("outside this workspace");
 	});
 });
