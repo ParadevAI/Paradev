@@ -5,7 +5,7 @@ import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-en
 import { resolveConfiguredShell } from "./user-shell.ts";
 
 const SHELL_ENV_TIMEOUT_MS = 8_000;
-const CACHE_TTL_MS = 60_000;
+const CACHE_TTL_MS = 15 * 60_000;
 const DELIMITER = "__SUPERSET_SHELL_ENV__";
 const DIAGNOSTIC_OUTPUT_LIMIT = 200;
 
@@ -130,6 +130,8 @@ function truncateForDiagnostics(value: string): string {
 	return `${trimmed.slice(0, DIAGNOSTIC_OUTPUT_LIMIT)}…`;
 }
 
+let loggedRcStderr = false;
+
 function spawnCleanShellEnv(): Promise<Record<string, string>> {
 	return new Promise((resolve, reject) => {
 		const shell = resolveShellForEnv();
@@ -243,7 +245,8 @@ function spawnCleanShellEnv(): Promise<Record<string, string>> {
 			settle(() => {
 				const stdout = Buffer.concat(stdoutBuffers).toString("utf8");
 				const stderr = Buffer.concat(stderrBuffers).toString("utf8").trim();
-				if (stderr) {
+				if (stderr && !loggedRcStderr) {
+					loggedRcStderr = true;
 					console.debug("[terminal-clean-shell-env] stderr:", stderr);
 				}
 
@@ -277,20 +280,52 @@ function spawnCleanShellEnv(): Promise<Record<string, string>> {
 	});
 }
 
-let cache: Record<string, string> | null = null;
-let cacheTime = 0;
+export function createShellEnvCache(
+	resolveEnv: () => Promise<Record<string, string>>,
+	now: () => number = Date.now,
+	ttlMs = CACHE_TTL_MS,
+) {
+	let cache: Record<string, string> | null = null;
+	let cacheTime = 0;
+	let inFlight: Promise<Record<string, string>> | null = null;
 
-export async function getStrictShellEnvironment(): Promise<
-	Record<string, string>
-> {
-	if (cache && Date.now() - cacheTime < CACHE_TTL_MS) {
-		return { ...cache };
+	async function get(): Promise<Record<string, string>> {
+		if (cache && now() - cacheTime < ttlMs) {
+			return { ...cache };
+		}
+		if (!inFlight) {
+			const promise = resolveEnv().then(
+				(env) => {
+					if (inFlight === promise) {
+						cache = env;
+						cacheTime = now();
+						inFlight = null;
+					}
+					return env;
+				},
+				(error) => {
+					if (inFlight === promise) inFlight = null;
+					throw error;
+				},
+			);
+			inFlight = promise;
+		}
+		return { ...(await inFlight) };
 	}
 
-	const env = await spawnCleanShellEnv();
-	cache = env;
-	cacheTime = Date.now();
-	return { ...cache };
+	function clear(): void {
+		cache = null;
+		cacheTime = 0;
+		inFlight = null;
+	}
+
+	return { get, clear };
+}
+
+const shellEnvCache = createShellEnvCache(spawnCleanShellEnv);
+
+export function getStrictShellEnvironment(): Promise<Record<string, string>> {
+	return shellEnvCache.get();
 }
 
 /**
@@ -311,6 +346,5 @@ export async function getToolEnvironment(): Promise<Record<string, string>> {
 }
 
 export function clearStrictShellEnvCache(): void {
-	cache = null;
-	cacheTime = 0;
+	shellEnvCache.clear();
 }

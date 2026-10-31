@@ -101,6 +101,10 @@ const config: Configuration = {
 		"!**/.DS_Store",
 		"!**/node_modules/@anthropic-ai/claude-agent-sdk-*/**",
 		"!**/node_modules/@openai/codex*/**",
+		"!**/*.map",
+		"!**/*.d.ts",
+		"!**/*.d.mts",
+		"!**/*.d.cts",
 	],
 
 	// Rebuild native modules for Electron's Node.js version

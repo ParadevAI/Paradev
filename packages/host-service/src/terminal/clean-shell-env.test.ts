@@ -13,6 +13,7 @@ import {
 	augmentPathForMacOS,
 	buildMinimalEnv,
 	clearStrictShellEnvCache,
+	createShellEnvCache,
 	getStrictShellEnvironment,
 	parseEnvOutput,
 } from "./clean-shell-env.ts";
@@ -89,6 +90,52 @@ describe("augmentPathForMacOS", () => {
 		const env: Record<string, string> = { PATH: "/usr/bin" };
 		augmentPathForMacOS(env, "linux");
 		expect(env.PATH).toBe("/usr/bin");
+	});
+});
+
+describe("createShellEnvCache", () => {
+	test("concurrent callers share one spawn and each get a copy", async () => {
+		let spawns = 0;
+		const cache = createShellEnvCache(async () => {
+			spawns++;
+			return { HOME: "/x" };
+		});
+		const [a, b] = await Promise.all([cache.get(), cache.get()]);
+		expect(spawns).toBe(1);
+		expect(a).toEqual({ HOME: "/x" });
+		expect(a).not.toBe(b);
+	});
+
+	test("does not cache a failed spawn", async () => {
+		let spawns = 0;
+		const cache = createShellEnvCache(async () => {
+			spawns++;
+			if (spawns === 1) throw new Error("boom");
+			return { HOME: "/x" };
+		});
+		await expect(cache.get()).rejects.toThrow("boom");
+		expect(await cache.get()).toEqual({ HOME: "/x" });
+		expect(spawns).toBe(2);
+	});
+
+	test("spawns again after the TTL", async () => {
+		let spawns = 0;
+		let time = 0;
+		const cache = createShellEnvCache(
+			async () => {
+				spawns++;
+				return { HOME: "/x" };
+			},
+			() => time,
+			1_000,
+		);
+		await cache.get();
+		time = 999;
+		await cache.get();
+		expect(spawns).toBe(1);
+		time = 1_000;
+		await cache.get();
+		expect(spawns).toBe(2);
 	});
 });
 
