@@ -36,6 +36,7 @@ import {
 	type PatchGroupResult,
 	parsePatchGroup,
 } from "./parsePatchGroup";
+import { splitPatchInput } from "./splitPatchInput";
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
@@ -277,8 +278,12 @@ export function useDiffCodeViewItems({
 					requestedUntrackedPaths: input.untrackedPaths ?? [],
 				};
 				try {
-					const { patch } = await trpcClient.git.getDiffPatch.query(input);
-					return { kind: "patch", patch, ...requested };
+					const patches: string[] = [];
+					for (const batch of splitPatchInput(input)) {
+						const { patch } = await trpcClient.git.getDiffPatch.query(batch);
+						patches.push(patch);
+					}
+					return { kind: "patch", patch: patches.join(""), ...requested };
 				} catch (error) {
 					if (!isMissingProcedureError(error)) throw error;
 					// Older host-service (a remote host or cloud sandbox that
