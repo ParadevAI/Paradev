@@ -100,6 +100,7 @@ const english = new Map(
 		entry.msgstr || entry.msgid,
 	]),
 );
+const sourceText = (msgid: string) => english.get(msgid) ?? msgid;
 
 describe("catalog integrity", () => {
 	for (const locale of SUPPORTED_LOCALES) {
@@ -108,10 +109,7 @@ describe("catalog integrity", () => {
 			const broken = readCatalog(locale)
 				.filter((entry) => entry.msgstr !== "")
 				.flatMap((entry) => {
-					const problem = integrityError(
-						english.get(entry.msgid) ?? entry.msgid,
-						entry.msgstr,
-					);
+					const problem = integrityError(sourceText(entry.msgid), entry.msgstr);
 					return problem
 						? [`${JSON.stringify(entry.msgid.slice(0, 70))}: ${problem}`]
 						: [];
@@ -120,21 +118,21 @@ describe("catalog integrity", () => {
 		});
 	}
 
-	test("rejects a locale dict dump and a dropped placeholder, keeps a nested plural", () => {
+	test("rejects a dict dump and a dropped placeholder behind an explicit id", () => {
 		expect(
 			integrityError(
 				"Hello {name}",
 				'{"en": "Hello {name}", "fr": "Bonjour {name}"}',
 			),
 		).toBe("braces the source does not have");
-		expect(integrityError("Saved to {path}", "Збережено")).toBe(
-			"missing {path}",
-		);
 		expect(
 			integrityError(
-				"{count, plural, one {# file in {name}} other {# files in {name}}}",
-				"{count, plural, one {# файл у {name}} few {# файли у {name}} many {# файлів у {name}} other {# файлу у {name}}}",
+				sourceText("serverError.plugins.marketplaceBuiltinRemove"),
+				"Вбудований, тому його не можна видалити",
 			),
-		).toBeNull();
+		).toBe("missing {name}");
+		expect(
+			outsideIcu("a {count, plural, one {# in {name}} other {# in {name}}} b"),
+		).toBe("a  b");
 	});
 });
