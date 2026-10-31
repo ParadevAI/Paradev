@@ -19,12 +19,16 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
 	{ href: "/", label: msg({ message: "Home" }), icon: Home },
-	{
-		href: "/agents",
-		label: msg({ message: "Agents" }),
-		icon: Bot,
-		reloadDocument: true,
-	},
+	...(process.env.AGENTS_ENABLED
+		? [
+				{
+					href: "/agents",
+					label: msg({ message: "Agents" }),
+					icon: Bot,
+					reloadDocument: true,
+				},
+			]
+		: []),
 	{
 		href: "/integrations",
 		label: msg({ message: "Integrations" }),

@@ -41,16 +41,18 @@ export async function DownloadSuperset() {
 							<Download className="size-5" />
 						</a>
 					</Button>
-					<Button variant="outline" size="lg" className="gap-2" asChild>
-						<a href="/agents">
-							{i18n._(
-								msg({
-									message: "Open in browser",
-								}),
-							)}
-							<Globe className="size-5" />
-						</a>
-					</Button>
+					{process.env.AGENTS_ENABLED ? (
+						<Button variant="outline" size="lg" className="gap-2" asChild>
+							<a href="/agents">
+								{i18n._(
+									msg({
+										message: "Open in browser",
+									}),
+								)}
+								<Globe className="size-5" />
+							</a>
+						</Button>
+					) : null}
 					<Button variant="outline" size="lg" className="gap-2" asChild>
 						<a
 							href={COMPANY.GITHUB_URL}

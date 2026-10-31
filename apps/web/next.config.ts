@@ -155,6 +155,7 @@ const securityHeaders: Array<{ key: string; value: string }> = [
 
 const config: NextConfig = {
 	reactCompiler: true,
+	env: { AGENTS_ENABLED: process.env.AGENTS_URL ? "true" : "" },
 	typescript: { ignoreBuildErrors: true },
 
 	// Compiles @lingui/react/macro at build time. Version must stay in

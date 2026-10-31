@@ -24,7 +24,7 @@ export const env = createEnv({
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		SERVER_ANTHROPIC_API_KEY: z.string().min(1),
-		AGENTS_URL: z.string().url(),
+		AGENTS_URL: z.string().url().optional(),
 	},
 
 	client: {

@@ -55,8 +55,9 @@ The build inputs are `EXPO_PUBLIC_*` values taken from secrets the web deploy al
 
 ## One-time setup
 
-Do this before merging. `AGENTS_URL` is required in `apps/web/src/env.ts`, so a production web
-deploy without it fails.
+Until this is done, `/agents` stays off: without `AGENTS_URL` the dashboard hides its links and
+serves no `/agents` route, and the `deploy-agents` job skips when `VERCEL_AGENTS_PROJECT_ID` is not
+set.
 
 1. **Vercel project** in the same team as the other apps (`VERCEL_ORG_ID`):
    - Name: `superset-agents`. Its production URL is then `https://superset-agents.vercel.app`.

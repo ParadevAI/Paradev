@@ -12,7 +12,9 @@ export default async function WorkspaceDeepLinkPage({
 	const { workspaceId } = await params;
 	const { sessionId } = await searchParams;
 	const path = `v2-workspace/${encodeURIComponent(workspaceId)}`;
-	const browserHref = `/agents/workspace/${encodeURIComponent(workspaceId)}`;
+	const browserHref = process.env.AGENTS_ENABLED
+		? `/agents/workspace/${encodeURIComponent(workspaceId)}`
+		: undefined;
 	if (typeof sessionId !== "string" || !sessionId) {
 		return <DeepLinkRedirect path={path} browserHref={browserHref} />;
 	}
