@@ -99,7 +99,7 @@
     },
     "apps/desktop": {
       "name": "@superset/desktop",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.85.0",
         "@agentclientprotocol/codex-acp": "2.1.0",
@@ -890,7 +890,7 @@
     },
     "packages/cli": {
       "name": "@superset/cli",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "dependencies": {
         "@clack/prompts": "0.10.1",
         "@modelcontextprotocol/sdk": "1.31.0",
@@ -1016,7 +1016,7 @@
     },
     "packages/host-service": {
       "name": "@superset/host-service",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.85.0",
         "@agentclientprotocol/codex-acp": "2.1.0",
