@@ -20467,6 +20467,9 @@ msgstr "Für neue Agenten verwenden"
 msgid "Use global default"
 msgstr "Globalen Standard verwenden"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Verwende Buchstaben A–Z, Ziffern oder Bindestriche."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Verwende Kleinbuchstaben, Zahlen, Bindestriche und Unterstriche"
 

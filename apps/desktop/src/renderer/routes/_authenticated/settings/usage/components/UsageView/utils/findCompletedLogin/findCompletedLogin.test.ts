@@ -15,6 +15,7 @@ const profile = {
 	email: "person@example.com",
 	credentialKind: "subscription" as const,
 	fingerprint: "token-one",
+	createdByParadev: true,
 };
 const check = (
 	current: UsageLogins,
@@ -73,6 +74,26 @@ describe("findCompletedLogin", () => {
 				true,
 			),
 		).toBeNull());
+	it("does not take a login in a dir the add command did not create as a new profile", () =>
+		expect(
+			check(
+				{ ...empty, claude: [{ ...profile, createdByParadev: false }] },
+				empty,
+				true,
+				true,
+			),
+		).toBeNull());
+	it("accepts a new profile from a host that does not report who created the dir", () => {
+		const { createdByParadev: _, ...fromOlderHost } = profile;
+		expect(
+			check(
+				{ ...empty, claude: [fromOlderHost as typeof profile] },
+				empty,
+				true,
+				true,
+			)?.selection,
+		).toBe(selection);
+	});
 	it("still requires credentials after CLI success", () =>
 		expect(
 			check(
@@ -150,6 +171,7 @@ describe("findCompletedLogin", () => {
 							home: "/home/test/.codex-work",
 							credentialKind: "subscription",
 							fingerprint: null,
+							createdByParadev: true,
 						},
 					],
 				},

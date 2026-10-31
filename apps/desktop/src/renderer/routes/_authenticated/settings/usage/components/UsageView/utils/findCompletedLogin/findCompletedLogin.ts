@@ -24,7 +24,8 @@ export function findCompletedLogin({
 	current: UsageLogins;
 	commandSucceeded: boolean;
 	/** Adding a profile: a login already at `selection` in the baseline is
-	 * not the new sign-in. */
+	 * not the new sign-in, and neither is one in a dir that the add command
+	 * did not create. */
 	newProfile: boolean;
 }): FoundLogin | null {
 	const read = (logins: UsageLogins) => {
@@ -34,6 +35,7 @@ export function findCompletedLogin({
 					fingerprint: logins.claudeDefaultFingerprint,
 					label: logins.claudeDefaultEmail ?? "Claude Code",
 					credentialKind: "subscription",
+					createdByParadev: false,
 				};
 			const entry = logins.claude.find(
 				(login) => login.configDir === selection,
@@ -51,6 +53,8 @@ export function findCompletedLogin({
 	const after = read(current);
 	if (!after?.fingerprint || after.credentialKind !== credentialKind)
 		return null;
+	// Hosts older than createdByParadev leave it out.
+	if (newProfile && after.createdByParadev === false) return null;
 	if (!commandSucceeded && after.fingerprint === before?.fingerprint)
 		return null;
 	return { selection, label: after.label, credentialKind };

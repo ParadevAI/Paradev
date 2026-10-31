@@ -10,6 +10,7 @@ const logins: UsageLogins = {
 			email: "person@example.com",
 			credentialKind: "subscription",
 			fingerprint: "token-one",
+			createdByParadev: true,
 		},
 	],
 	codex: [
@@ -17,11 +18,13 @@ const logins: UsageLogins = {
 			home: "/home/test/.codex",
 			fingerprint: null,
 			credentialKind: "subscription",
+			createdByParadev: false,
 		},
 		{
 			home: "/home/test/.codex-personal",
 			fingerprint: "token-two",
 			credentialKind: "subscription",
+			createdByParadev: false,
 		},
 	],
 	claudeDefaultEmail: null,

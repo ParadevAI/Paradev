@@ -20467,6 +20467,9 @@ msgstr "Pakai untuk agen baru"
 msgid "Use global default"
 msgstr "Pakai bawaan global"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Gunakan huruf A–Z, angka, atau tanda hubung."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gunakan huruf kecil, angka, tanda hubung, dan garis bawah"
 

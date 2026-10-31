@@ -110,13 +110,25 @@ export function AddAccountDialog({
 	const slug = slugifyProfileName(name);
 	const profileDir = `~/.${agent}-${slug}`;
 
-	const loginsQuery = useHostUsageLogins(hostUrl, open && !found);
+	// Each opening polls its own logins query, so a result cached by an
+	// earlier opening never becomes this one's baseline.
+	const [opening, setOpening] = useState(0);
+	const [wasOpen, setWasOpen] = useState(open);
+	if (open !== wasOpen) {
+		setWasOpen(open);
+		if (open) setOpening((count) => count + 1);
+	}
+	const loginsQuery = useHostUsageLogins(hostUrl, open && !found, opening);
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
 	const homeTaken =
 		!switchTarget &&
 		!!loginsQuery.data &&
 		isProfileHomeTaken(loginsQuery.data, agent, slug);
-	const canSignIn = !!switchTarget || (slug !== "" && !homeTaken);
+	const nameUnusable = !switchTarget && name.trim() !== "" && slug === "";
+	// A new profile's command waits for this opening's logins, so it is never
+	// offered for a home that is already signed in.
+	const canSignIn =
+		!!switchTarget || (!!loginsQuery.data && slug !== "" && !homeTaken);
 
 	// The first poll result after opening is the baseline; anything beyond it
 	// is the sign-in we are waiting for.
@@ -139,6 +151,12 @@ export function AddAccountDialog({
 			return;
 		}
 		if (found || (terminalAttempt > 0 && !commandSucceeded)) return;
+		if (!switchTarget && !isProfileHomeTaken(logins, agent, slug)) {
+			// Nothing is signed in at the new profile's dir yet, so a login
+			// that lands there from now on is the one being added.
+			baselineRef.current = logins;
+			return;
+		}
 
 		const provisionProfile = (selection: string) => {
 			// Shares the default account's skills, plugins, MCP servers, and
@@ -364,18 +382,24 @@ export function AddAccountDialog({
 										onChange={(event) => setName(event.target.value)}
 										className="h-9 min-w-0 flex-1 text-sm"
 										placeholder="work"
-										aria-invalid={homeTaken || undefined}
-										aria-describedby={homeTaken ? nameErrorId : undefined}
+										aria-invalid={homeTaken || nameUnusable || undefined}
+										aria-describedby={
+											homeTaken || nameUnusable ? nameErrorId : undefined
+										}
 									/>
 								</div>
-								{homeTaken && (
+								{(homeTaken || nameUnusable) && (
 									<p
 										id={nameErrorId}
 										className="-mt-2 pl-26 text-xs text-destructive"
 									>
-										<Trans>
-											{profileDir} already exists. Choose another name.
-										</Trans>
+										{homeTaken ? (
+											<Trans>
+												{profileDir} already exists. Choose another name.
+											</Trans>
+										) : (
+											<Trans>Use letters A–Z, digits, or hyphens.</Trans>
+										)}
 									</p>
 								)}
 								<div className="flex items-center gap-2">

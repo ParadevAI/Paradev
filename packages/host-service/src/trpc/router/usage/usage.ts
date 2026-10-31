@@ -34,6 +34,7 @@ import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
 import {
 	discoverClaudeProfiles,
 	discoverCodexHomes,
+	hasProfileCreatedMarker,
 	readCodexProfileKind,
 } from "./profiles";
 import { validateSessionAccount } from "./session-account/session-account";
@@ -138,7 +139,8 @@ export const usageRouter = router({
 	 * while an add-account or switch-sign-in flow is pending in a terminal.
 	 * The default-slot fields let the UI notice a `/login` that re-signed the
 	 * system-default login by its credential fingerprint, including re-login
-	 * to the same account.
+	 * to the same account. createdByParadev lets Add account take a new
+	 * profile's sign-in only from a dir its own command created.
 	 */
 	logins: queryProcedure.query(async () => {
 		const [profiles, codexHomes, claudeDefaultEmail, claudeDefaultFingerprint] =
@@ -168,7 +170,12 @@ export const usageRouter = router({
 						// No readable auth.json — fingerprint stays null.
 					}
 				}
-				return { home, fingerprint, credentialKind };
+				return {
+					home,
+					fingerprint,
+					credentialKind,
+					createdByParadev: await hasProfileCreatedMarker(home, "codex"),
+				};
 			}),
 		);
 		return {
@@ -183,6 +190,10 @@ export const usageRouter = router({
 						profile.credentialKind === "api_key"
 							? profile.loginFingerprint
 							: await readClaudeLoginFingerprint(profile.configDir),
+					createdByParadev: await hasProfileCreatedMarker(
+						profile.configDir,
+						"claude",
+					),
 				})),
 			),
 			codex,

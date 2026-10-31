@@ -20467,6 +20467,9 @@ msgstr "Dùng cho agent mới"
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Hãy dùng chữ cái A–Z, chữ số hoặc dấu gạch ngang."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
 

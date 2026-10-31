@@ -20467,6 +20467,9 @@ msgstr "新規エージェントに使用"
 msgid "Use global default"
 msgstr "グローバルのデフォルトを使用"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "A–Z の英字、数字、ハイフンを使用してください。"
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "小文字、数字、ハイフン、アンダースコアを使用してください"
 

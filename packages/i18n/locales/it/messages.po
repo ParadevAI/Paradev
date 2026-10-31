@@ -20467,6 +20467,9 @@ msgstr "Usa per i nuovi agenti"
 msgid "Use global default"
 msgstr "Usa il valore predefinito globale"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Usa lettere dalla A alla Z, cifre o trattini."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Usa lettere minuscole, numeri, trattini e trattini bassi"
 

@@ -20467,6 +20467,9 @@ msgstr "Gebruiken voor nieuwe agents"
 msgid "Use global default"
 msgstr "Globale standaard gebruiken"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Gebruik letters A–Z, cijfers of koppeltekens."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gebruik kleine letters, cijfers, streepjes en underscores"
 

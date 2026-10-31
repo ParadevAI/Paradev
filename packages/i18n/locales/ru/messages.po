@@ -20467,6 +20467,9 @@ msgstr "Использовать для новых агентов"
 msgid "Use global default"
 msgstr "Использовать общий по умолчанию"
 
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Используйте латинские буквы A–Z, цифры или дефисы."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Используйте строчные буквы, цифры, дефисы и подчёркивания"
 
