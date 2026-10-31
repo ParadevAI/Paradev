@@ -137,6 +137,25 @@ function buildRealBinaryResolver(): string {
 `;
 }
 
+export interface DefaultAccountResolverOptions {
+	/** Holds the system-default value while a selected account is injected. */
+	ambientEnvVar?: string;
+	/**
+	 * Commands that sign in or out, as their words: "login", "auth login".
+	 * Each word has to be a whole argument, in that order, before any `--`.
+	 * Other arguments may come before or between the words, so a root option
+	 * ahead of the subcommand (`codex -c key=value login`) still matches, and
+	 * a one-argument prompt ("auth login") does not. A launch that asks for
+	 * help (`-h`, `--help`, or `help` first) never matches.
+	 */
+	credentialCommands?: readonly string[];
+	/**
+	 * A credential command followed directly by words that make it only read
+	 * the login, e.g. "login status". Such a launch is not a credential command.
+	 */
+	readOnlyCommands?: readonly string[];
+}
+
 /**
  * Shell block that re-resolves the Usage-tab default account at launch.
  * The PTY env is frozen at terminal spawn, so an account switch would
@@ -145,12 +164,20 @@ function buildRealBinaryResolver(): string {
  * only, and a value the user exported by hand — one that differs from what
  * Superset injected at spawn — always wins. A missing pointer file (older
  * host build) changes nothing; an empty one means the system default.
+ *
+ * A credential command leaves an unset value unset, and it changes the
+ * login of the selected account only after the user confirms on a terminal.
  */
 export function buildDefaultAccountResolver(
 	envVar: string,
 	pointerName: string,
-	ambientEnvVar?: string,
+	options: DefaultAccountResolverOptions = {},
 ): string {
+	const {
+		ambientEnvVar,
+		credentialCommands = [],
+		readOnlyCommands = [],
+	} = options;
 	const pointer = `"$SUPERSET_HOME_DIR/state/${pointerName}"`;
 	const restoreSystemDefault = ambientEnvVar
 		? `if [ -n "\${${ambientEnvVar}}" ]; then
@@ -162,8 +189,19 @@ export function buildDefaultAccountResolver(
   fi`
 		: `unset ${envVar}
   unset SUPERSET_DEFAULT_${envVar}`;
-	return `if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$SUPERSET_HOME_DIR" ] \\
-  && { [ -z "\${${envVar}}" ] || [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]; } \\
+	const guardsCredentials = credentialCommands.length > 0;
+	const matchCredentialCommand = guardsCredentials
+		? buildCredentialCommandMatch(credentialCommands, readOnlyCommands)
+		: "";
+	const keepUnsetForCredentials = guardsCredentials
+		? ` \\
+  && { [ -n "\${${envVar}}" ] || [ -z "$superset_credential_command" ]; }`
+		: "";
+	const guardCredentialCommand = guardsCredentials
+		? buildCredentialCommandGuard(envVar, ambientEnvVar)
+		: "";
+	return `${matchCredentialCommand}if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$SUPERSET_HOME_DIR" ] \\
+  && { [ -z "\${${envVar}}" ] || [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]; }${keepUnsetForCredentials} \\
   && [ -f ${pointer} ]; then
   superset_default_account="$(cat ${pointer} 2>/dev/null)"
   if [ -n "$superset_default_account" ] && [ -d "$superset_default_account" ]; then
@@ -173,7 +211,122 @@ export function buildDefaultAccountResolver(
     ${restoreSystemDefault}
   fi
 fi
+${guardCredentialCommand}
+`;
+}
 
+const CREDENTIAL_COMMAND_WORD = /^[a-z]+$/;
+
+/**
+ * Sets `superset_credential_command` (e.g. "codex login") when the arguments
+ * hold one of `commands`. Each argument before `--` adds one token to
+ * `superset_command_tokens`, wrapped in spaces: a command word stays itself
+ * and anything else becomes ".". The patterns below therefore only ever
+ * match whole arguments, never text inside a prompt or an option value.
+ */
+function buildCredentialCommandMatch(
+	commands: readonly string[],
+	readOnlyCommands: readonly string[],
+): string {
+	const wordsOf = (command: string) => command.split(" ");
+	const words = [
+		...new Set([...commands, ...readOnlyCommands].flatMap(wordsOf)),
+	];
+	for (const word of words) {
+		if (!CREDENTIAL_COMMAND_WORD.test(word)) {
+			throw new Error(`Unsupported credential command word: "${word}"`);
+		}
+	}
+	const inOrder = (command: string) =>
+		`*${wordsOf(command)
+			.map((word) => `" ${word} "`)
+			.join("*")}*`;
+	const adjacent = (command: string) => `*" ${wordsOf(command).join("  ")} "*`;
+	const matches = commands.map((command) => {
+		const readOnly = readOnlyCommands
+			.filter((other) => other.startsWith(`${command} `))
+			.map((other) => `\n  ${adjacent(other)}) ;;`)
+			.join("");
+		return `case "$superset_command_tokens" in${readOnly}
+  ${inOrder(command)}) superset_credential_command="\${0##*/} ${command}" ;;
+esac`;
+	});
+	return `superset_command_tokens=""
+for superset_arg in "$@"; do
+  case "$superset_arg" in
+    --) break ;;
+    -h|--help) superset_command_tokens=""; break ;;
+    ${words.join("|")}) superset_command_tokens="$superset_command_tokens $superset_arg " ;;
+    *) superset_command_tokens="$superset_command_tokens . " ;;
+  esac
+done
+case "$1" in help) superset_command_tokens="" ;; esac
+superset_credential_command=""
+${matches.join("\n")}
+`;
+}
+
+/**
+ * Stops a credential command that would change the selected account's login
+ * until the user confirms on a terminal. stderr has to be a terminal, so the
+ * question is seen; the answer comes from stdin, or from /dev/tty when stdin
+ * carries the CLI's own input (`printf '%s' "$KEY" | codex login
+ * --with-api-key`). Without a terminal the command does not run, and the
+ * refusal names the home but no command to run instead: in a workspace, the
+ * callers without a terminal are mostly agents' tool calls. A
+ * pseudo-terminal counts as a terminal, so an agent that drives one can
+ * still answer. After a "no", the hint points at the system default.
+ */
+function buildCredentialCommandGuard(
+	envVar: string,
+	ambientEnvVar?: string,
+): string {
+	const notSystemDefault = ambientEnvVar
+		? ` && [ "\${${envVar}}" != "\${${ambientEnvVar}}" ]`
+		: "";
+	const cancelled =
+		"Paradev: cancelled. To run it on the system default instead:";
+	const unsetHint = `printf '${cancelled} env -u ${envVar} %s' "\${0##*/}" >&2`;
+	const systemDefaultHint = ambientEnvVar
+		? `if [ -n "\${${ambientEnvVar}}" ]; then
+        printf '${cancelled} ${envVar}=%q %s' "\${${ambientEnvVar}}" "\${0##*/}" >&2
+      else
+        ${unsetHint}
+      fi`
+		: unsetHint;
+	return `if [ -n "$superset_credential_command" ] && [ -n "\${${envVar}}" ] \\
+  && [ "\${${envVar}}" = "\${SUPERSET_DEFAULT_${envVar}}" ]${notSystemDefault}; then
+  superset_reply_from=""
+  if [ -t 2 ]; then
+    if [ -t 0 ]; then
+      superset_reply_from="stdin"
+    elif (: </dev/tty) 2>/dev/null; then
+      superset_reply_from="tty"
+    fi
+  fi
+  if [ -z "$superset_reply_from" ]; then
+    printf 'Paradev: %s would change the login in %s, the account you made the default for new agents. Nothing was run: a person has to confirm this in a terminal.\\n' \\
+      "$superset_credential_command" "\${${envVar}}" >&2
+    exit 2
+  fi
+  printf 'Paradev: %s will change the login in %s, the account you made the default for new agents. Continue? [y/N] ' \\
+    "$superset_credential_command" "\${${envVar}}" >&2
+  superset_reply=""
+  if [ "$superset_reply_from" = "tty" ]; then
+    read -r superset_reply </dev/tty
+  else
+    read -r superset_reply
+  fi
+  case "$superset_reply" in
+    [yY]|[yY][eE][sS]) ;;
+    *)
+      ${systemDefaultHint}
+      printf ' %q' "$@" >&2
+      printf '\\n' >&2
+      exit 1
+      ;;
+  esac
+fi
 `;
 }
 

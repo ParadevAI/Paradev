@@ -112,7 +112,7 @@ describe("switchSignInCommand", () => {
 		);
 	});
 
-	it("marks the system-default Codex home wherever the CLI resolves it", () => {
+	it("marks the system-default Codex home, not the account a terminal injects", () => {
 		expect(
 			switchSignInCommand({
 				agent: "codex",
@@ -121,7 +121,7 @@ describe("switchSignInCommand", () => {
 			}),
 		).toContain(
 			// biome-ignore lint/suspicious/noTemplateCurlyInString: shell parameter expansion
-			'CODEX_HOME="${CODEX_HOME:-$HOME/.codex}" codex login --with-api-key && printf codex > "${CODEX_HOME:-$HOME/.codex}"/.superset-api-billing',
+			'CODEX_HOME="${SUPERSET_AMBIENT_CODEX_HOME:-${CODEX_HOME:-$HOME/.codex}}" codex login --with-api-key && printf codex > "${SUPERSET_AMBIENT_CODEX_HOME:-${CODEX_HOME:-$HOME/.codex}}"/.superset-api-billing',
 		);
 	});
 });
