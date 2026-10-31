@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useFileOpenMode } from "renderer/hooks/useFileOpenMode";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -220,6 +221,7 @@ function V2WorkspaceContent() {
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
 	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
+	const fileOpenMode = useFileOpenMode();
 	useClearActivePaneAttention({ store });
 	const rightPaneAreaFlag = useRightPaneAreaEnabled();
 	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
@@ -422,15 +424,17 @@ function V2WorkspaceContent() {
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
 		(filePath: string, openInNewTab?: boolean) => {
+			const shouldOpenInNewTab = openInNewTab ?? fileOpenMode === "new-tab";
 			if (!isRightPaneAreaEnabled) {
 				setRightSidebarOpen(true);
-				openFilePaneFromTreeClick(filePath, openInNewTab);
+				openFilePaneFromTreeClick(filePath, shouldOpenInNewTab);
 				return;
 			}
-			if (openInNewTab) openFilePaneFromTreeClick(filePath, true);
+			if (shouldOpenInNewTab) openFilePaneFromTreeClick(filePath, true);
 			else openPinnedFilePane(filePath);
 		},
 		[
+			fileOpenMode,
 			openFilePaneFromTreeClick,
 			openPinnedFilePane,
 			setRightSidebarOpen,
