@@ -198,6 +198,7 @@ local_write_env() {
   local USERCONTENT_DEV_PORT=$((BASE + 14))
   local SANDBOX_GATE_DEV_PORT=$((BASE + 15))
   local REALTIME_PORT=$((BASE + 18))
+  local AGENTS_PORT=$((BASE + 19))
 
   {
     echo ""
@@ -234,6 +235,7 @@ local_write_env() {
     write_env_var "USERCONTENT_DEV_PORT" "$USERCONTENT_DEV_PORT"
     write_env_var "SANDBOX_GATE_DEV_PORT" "$SANDBOX_GATE_DEV_PORT"
     write_env_var "REALTIME_PORT" "$REALTIME_PORT"
+    write_env_var "AGENTS_PORT" "$AGENTS_PORT"
     echo ""
     echo "# Cross-app URLs (allocated ports)"
     write_env_var "NEXT_PUBLIC_API_URL" "http://localhost:$API_PORT"
@@ -251,6 +253,7 @@ local_write_env() {
     write_env_var "SUPERSET_WEB_URL" "http://localhost:$WEB_PORT"
     write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
     write_env_var "MEDIA_URL" "http://media.usercontent.localhost:$USERCONTENT_DEV_PORT"
+    write_env_var "AGENTS_URL" "http://localhost:$AGENTS_PORT"
     # A subdomain per workspace and port, as in production: with one shared
     # origin the desktop's per-URL tickets for a workspace's two ports would
     # overwrite each other. Chromium resolves *.localhost to loopback itself.
@@ -270,7 +273,7 @@ local_write_env() {
   assert_unique_ports "$WEB_PORT" "$API_PORT" "$MARKETING_PORT" "$ADMIN_PORT" \
     "$DOCS_PORT" "$DESKTOP_VITE_PORT" "$DESKTOP_NOTIFICATIONS_PORT" "$STREAMS_PORT" \
     "$STREAMS_INTERNAL_PORT" "$CODE_INSPECTOR_PORT" "$RELAY_PORT" "$USERCONTENT_DEV_PORT" \
-    "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" "$LOCAL_PG_PORT" "$LOCAL_NEON_PROXY_PORT" \
+    "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" "$AGENTS_PORT" "$LOCAL_PG_PORT" "$LOCAL_NEON_PROXY_PORT" \
     "$LOCAL_REDIS_PORT" "$LOCAL_SRH_PORT" || return 1
 
   cat > "$SUPERSET_SCRIPT_DIR/ports.json" <<PORTSJSON
@@ -286,6 +289,7 @@ local_write_env() {
     { "port": $STREAMS_PORT, "label": "Streams" },
     { "port": $USERCONTENT_DEV_PORT, "label": "Usercontent Worker" },
     { "port": $SANDBOX_GATE_DEV_PORT, "label": "Gate Worker" },
+    { "port": $AGENTS_PORT, "label": "Agents Web" },
     { "port": $LOCAL_PG_PORT, "label": "Postgres" },
     { "port": $LOCAL_NEON_PROXY_PORT, "label": "Neon Proxy" },
     { "port": $LOCAL_REDIS_PORT, "label": "Redis" },

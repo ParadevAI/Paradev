@@ -352,7 +352,7 @@ step_write_env() {
     # Offsets: +0 web, +1 api, +2 marketing, +3 admin, +4 docs,
     #          +5 desktop vite, +6 notifications, +7 streams, +8 streams internal,
     #          +11 code inspector, +13 relay, +14 usercontent worker,
-    #          +18 realtime worker
+    #          +18 realtime worker, +19 agents web export
     # (+9, +10, +12 were Electric/Caddy/wrangler; retired, kept unassigned so
     # the surviving offsets stay stable across existing allocations)
     local BASE=$SUPERSET_PORT_BASE
@@ -371,6 +371,7 @@ step_write_env() {
     local RELAY_PORT=$((BASE + 13))
     local USERCONTENT_DEV_PORT=$((BASE + 14))
     local SANDBOX_GATE_DEV_PORT=$((BASE + 15))
+    local AGENTS_PORT=$((BASE + 19))
     local REALTIME_PORT=$((BASE + 18))
 
     echo ""
@@ -389,6 +390,7 @@ step_write_env() {
     write_env_var "RELAY_PORT" "$RELAY_PORT"
     write_env_var "USERCONTENT_DEV_PORT" "$USERCONTENT_DEV_PORT"
     write_env_var "SANDBOX_GATE_DEV_PORT" "$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_PORT" "$AGENTS_PORT"
     write_env_var "REALTIME_PORT" "$REALTIME_PORT"
     echo ""
     echo "# Cross-app URLs (overrides from root .env)"
@@ -411,6 +413,7 @@ step_write_env() {
     write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
     write_env_var "MEDIA_URL" "http://media.usercontent.localhost:$USERCONTENT_DEV_PORT"
     write_env_var "SANDBOX_GATE_ORIGIN" "http://127.0.0.1:$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_URL" "http://localhost:$AGENTS_PORT"
     echo ""
     echo "# Streams URLs (overrides from root .env)"
     write_env_var "PORT" "$STREAMS_PORT"
@@ -429,7 +432,7 @@ step_write_env() {
   assert_unique_ports "$WEB_PORT" "$API_PORT" "$MARKETING_PORT" "$ADMIN_PORT" \
     "$DOCS_PORT" "$DESKTOP_VITE_PORT" "$DESKTOP_NOTIFICATIONS_PORT" "$STREAMS_PORT" \
     "$STREAMS_INTERNAL_PORT" "$CODE_INSPECTOR_PORT" "$RELAY_PORT" "$USERCONTENT_DEV_PORT" \
-    "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" || return 1
+    "$SANDBOX_GATE_DEV_PORT" "$AGENTS_PORT" "$REALTIME_PORT" || return 1
 
   cat > "$superset_dir/ports.json" <<PORTSJSON
 {
@@ -445,6 +448,7 @@ step_write_env() {
     { "port": $STREAMS_INTERNAL_PORT, "label": "Streams Internal" },
     { "port": $USERCONTENT_DEV_PORT, "label": "Usercontent Worker" },
     { "port": $SANDBOX_GATE_DEV_PORT, "label": "Gate Worker" },
+    { "port": $AGENTS_PORT, "label": "Agents Web" },
     { "port": $CODE_INSPECTOR_PORT, "label": "Code Inspector" }
   ]
 }

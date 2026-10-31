@@ -34,24 +34,28 @@ const usercontentUrl = new URL(
 			: "http://frame.usercontent.localhost:8787"),
 );
 const usercontentFrameSource = `${usercontentUrl.protocol}//*.${usercontentUrl.host}`;
+const serviceConnectSources = withOwnDomainTwins([
+	apiOrigin,
+	...httpAndWsOrigins(process.env.RELAY_URL, "https://relay.superset.sh"),
+	...httpAndWsOrigins(
+		process.env.RELAY_BACKUP_URL,
+		"https://relay-backup.superset.sh",
+	),
+	...httpAndWsOrigins(
+		process.env.NEXT_PUBLIC_REALTIME_URL,
+		"https://realtime.superset.sh",
+	),
+]);
+const attachmentUploadSource = process.env.R2_ENDPOINT
+	? new URL(process.env.R2_ENDPOINT).origin
+	: "https://*.r2.cloudflarestorage.com";
 
 const contentSecurityPolicy = [
 	"default-src 'self'",
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		...withOwnDomainTwins([
-			apiOrigin,
-			...httpAndWsOrigins(process.env.RELAY_URL, "https://relay.superset.sh"),
-			...httpAndWsOrigins(
-				process.env.RELAY_BACKUP_URL,
-				"https://relay-backup.superset.sh",
-			),
-			...httpAndWsOrigins(
-				process.env.NEXT_PUBLIC_REALTIME_URL,
-				"https://realtime.superset.sh",
-			),
-		]),
+		...serviceConnectSources,
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.i.posthog.com",
@@ -81,6 +85,42 @@ const contentSecurityPolicy = [
 	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 	"worker-src 'self' blob:",
 ].join("; ");
+
+const agentsContentSecurityPolicy = [
+	"default-src 'self'",
+	"base-uri 'self'",
+	[
+		"connect-src 'self'",
+		...serviceConnectSources,
+		attachmentUploadSource,
+		"https://*.ingest.sentry.io",
+		"https://*.sentry.io",
+		!isProduction && "ws:",
+		!isProduction && "wss:",
+	]
+		.filter(Boolean)
+		.join(" "),
+	"font-src 'self' data:",
+	"form-action 'self'",
+	"frame-ancestors 'none'",
+	`frame-src ${usercontentFrameSource}`,
+	"img-src 'self' data: blob: https:",
+	"media-src 'self' blob:",
+	"object-src 'none'",
+	["script-src 'self' 'unsafe-inline'", !isProduction && "'unsafe-eval'"]
+		.filter(Boolean)
+		.join(" "),
+	"style-src 'self' 'unsafe-inline'",
+	"worker-src 'self' blob:",
+].join("; ");
+
+const agentsHeaders = [
+	{ key: "Content-Security-Policy", value: agentsContentSecurityPolicy },
+	{
+		key: "Permissions-Policy",
+		value: "camera=(), geolocation=(), microphone=(self)",
+	},
+];
 
 const securityHeaders: Array<{ key: string; value: string }> = [
 	...(isProduction
@@ -137,6 +177,12 @@ const config: NextConfig = {
 				source: "/ingest/decide",
 				destination: "https://us.i.posthog.com/decide",
 			},
+			...(process.env.AGENTS_URL
+				? ["/agents", "/agents/:path*"].map((source) => ({
+						source,
+						destination: `${process.env.AGENTS_URL}${source}`,
+					}))
+				: []),
 		];
 	},
 
@@ -146,6 +192,8 @@ const config: NextConfig = {
 				source: "/(.*)",
 				headers: securityHeaders,
 			},
+			{ source: "/agents", headers: agentsHeaders },
+			{ source: "/agents/:path*", headers: agentsHeaders },
 		];
 	},
 
