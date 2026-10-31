@@ -1175,14 +1175,14 @@ msgstr "사용자당 월 {price}, 좌석당 매월 클라우드 {gbHours} GB 시
 msgid "{price}/user/mo"
 msgstr "사용자당 월 {price}"
 
-msgid "{productName} (formerly {formerName}, YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(구 {formerName}, YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
+msgid "{productName} (formerly {formerName}, YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "AI 에이전트 시대를 위한 오픈 소스 IDE인 {productName}(구 {formerName}, YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
 
 msgid "{productName} (formerly {formerName})"
 msgstr "{productName}(구 {formerName})"
 
-msgid "{productName} (YC P26) is the source-available IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
-msgstr "AI 에이전트 시대를 위한 소스 공개형 IDE인 {productName}(YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
+msgid "{productName} (YC P26) is the open-source IDE for the AI agents era, where engineers run hundreds of coding agents like Claude Code and Codex in parallel."
+msgstr "AI 에이전트 시대를 위한 오픈 소스 IDE인 {productName}(YC P26)에서는 엔지니어가 Claude Code와 Codex 같은 코딩 에이전트 수백 개를 병렬로 실행합니다."
 
 msgid "{productName} for press"
 msgstr "언론을 위한 {productName}"
@@ -8861,8 +8861,8 @@ msgstr "전체 화면"
 msgid "Full self-driving"
 msgstr "완전 자율 주행"
 
-msgid "Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "전체 소스가 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있습니다. 코드를 확인하고, 감사하고, 기여하세요. 블랙박스도, 숨겨진 기능도 없습니다."
+msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
+msgstr "전체 소스가 MIT 라이선스로 GitHub에 공개되어 있습니다. 코드를 확인하고, 감사하고, 기여하세요. 블랙박스도, 숨겨진 기능도 없습니다."
 
 msgid "Funding"
 msgstr "투자 유치"
@@ -13396,6 +13396,9 @@ msgstr "시트 열기"
 msgid "Open ship options"
 msgstr "배포 옵션 열기"
 
+msgid "Open Source"
+msgstr "오픈 소스"
+
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
 
@@ -13830,8 +13833,8 @@ msgstr "원격 워크스페이스를 선택해 두면 Paradev가 그 워크스�
 msgid "Paradev GitHub App"
 msgstr "Paradev GitHub App"
 
-msgid "Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms."
-msgstr "Paradev에는 무료 플랜이 있습니다. 소스 코드는 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있어, 라이선스 조건에 따라 직접 확인하고 셀프 호스팅할 수 있습니다."
+msgid "Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it."
+msgstr "Paradev에는 무료 플랜이 있습니다. 소스 코드가 MIT 라이선스로 GitHub에 공개되어 있어 확인하고, 수정하고, 셀프 호스팅할 수 있습니다."
 
 msgid "Paradev hit an unexpected error. Reload to try again."
 msgstr "Paradev에서 예기치 않은 오류가 발생했습니다. 다시 로드해 보세요."
@@ -13860,11 +13863,8 @@ msgstr "Paradev는 Paradev로 개발됩니다. 우리가 가장 열심히 쓰는
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev는 기존 도구와 함께 쓰도록 만들었습니다. Cursor 같은 IDE로의 딥링크를 기본 지원하므로 워크스페이스와 파일을 쓰던 IDE에서 열 수 있습니다."
 
-msgid "Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool."
-msgstr "Paradev는 소스가 공개된 소프트웨어입니다. 코드는 Elastic License 2.0(ELv2)으로 GitHub에 공개되어 있어 라이선스 조건에 따라 확인하고 셀프 호스팅할 수 있지만, OSI 승인 오픈 소스는 아닙니다. Paradev는 비즈니스 인텔리전스 도구인 Apache Superset과 관련이 없습니다."
-
-msgid "Paradev is source-available. Every pull request, review and bug is public on GitHub."
-msgstr "Paradev는 소스 공개 소프트웨어입니다. 모든 풀 리퀘스트, 리뷰, 버그가 GitHub에 공개되어 있습니다."
+msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
+msgstr "Paradev는 오픈 소스입니다. 모든 풀 리퀘스트, 리뷰, 버그가 GitHub에 공개되어 있습니다."
 
 msgid "Paradev is the workbench for the F3 to F4 transition: parallel agents in isolated workspaces, fleets you can actually supervise, and a review surface for code you did not write."
 msgstr "Paradev는 F3에서 F4로 넘어가는 전환기를 위한 작업대입니다. 격리된 워크스페이스에서 병렬로 도는 에이전트, 실제로 감독할 수 있는 플릿, 그리고 직접 쓰지 않은 코드를 위한 리뷰 화면을 제공합니다."
@@ -17736,9 +17736,6 @@ msgstr "완료된 작업에 사용할 소리와 벨소리"
 msgid "Source"
 msgstr "출처"
 
-msgid "Source Available"
-msgstr "소스 공개"
-
 msgid "Source path (not an import)"
 msgstr "소스 경로 (임포트 아님)"
 
@@ -21394,6 +21391,9 @@ msgstr "네. 클라우드 워크스페이스가 있는 플랜에서는 소유자
 
 msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
 msgstr "네. Paradev는 독립 감사인과 함께 SOC 2 Type II 감사를 완료했으며, 이는 일정 기간 운영된 보안 통제를 다룹니다. trust.superset.sh에서 보고서를 요청하고 보안 문서를 확인하세요."
+
+msgid "Yes. Paradev is open source under the MIT License, and the code is public on GitHub. Paradev is unrelated to Apache Superset, the business-intelligence tool."
+msgstr "네. Paradev는 MIT 라이선스의 오픈 소스이며, 코드는 GitHub에 공개되어 있습니다. Paradev는 비즈니스 인텔리전스 도구인 Apache Superset과 관련이 없습니다."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "네. Paradev는 모델 제공사가 아니라 에이전트가 실행되는 워크스페이스입니다. Claude Code, Codex, OpenCode 등 어떤 CLI 에이전트든 가져와 모든 플랜에서 기존 계정이나 API 키를 그대로 사용하세요."

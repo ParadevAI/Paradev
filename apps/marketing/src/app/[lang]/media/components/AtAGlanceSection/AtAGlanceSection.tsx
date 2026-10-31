@@ -115,16 +115,15 @@ export function AtAGlanceSection() {
 					>
 						{isRenamed ? (
 							<Trans>
-								{productName} (formerly {formerName}, YC P26) is the
-								source-available IDE for the AI agents era, where engineers run
-								hundreds of coding agents like Claude Code and Codex in
-								parallel.
+								{productName} (formerly {formerName}, YC P26) is the open-source
+								IDE for the AI agents era, where engineers run hundreds of
+								coding agents like Claude Code and Codex in parallel.
 							</Trans>
 						) : (
 							<Trans>
-								{productName} (YC P26) is the source-available IDE for the AI
-								agents era, where engineers run hundreds of coding agents like
-								Claude Code and Codex in parallel.
+								{productName} (YC P26) is the open-source IDE for the AI agents
+								era, where engineers run hundreds of coding agents like Claude
+								Code and Codex in parallel.
 							</Trans>
 						)}
 					</p>
@@ -144,13 +143,13 @@ export function AtAGlanceSection() {
 							{isRenamed ? (
 								<Trans>
 									{productName} (formerly {formerName}, YC P26) is the
-									source-available IDE for the AI agents era, where engineers
-									run hundreds of coding agents like Claude Code and Codex in
+									open-source IDE for the AI agents era, where engineers run
+									hundreds of coding agents like Claude Code and Codex in
 									parallel.
 								</Trans>
 							) : (
 								<Trans>
-									{productName} (YC P26) is the source-available IDE for the AI
+									{productName} (YC P26) is the open-source IDE for the AI
 									agents era, where engineers run hundreds of coding agents like
 									Claude Code and Codex in parallel.
 								</Trans>
