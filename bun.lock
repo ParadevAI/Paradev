@@ -1445,6 +1445,7 @@
     "workerd",
   ],
   "patchedDependencies": {
+    "@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch",
     "react-native-screens@4.30.1": "patches/react-native-screens@4.30.1.patch",
     "expo-observe@58.0.16": "patches/expo-observe@58.0.16.patch",
     "react-native-enriched-markdown@0.6.0": "patches/react-native-enriched-markdown@0.6.0.patch",
