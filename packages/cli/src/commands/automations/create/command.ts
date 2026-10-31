@@ -64,6 +64,9 @@ export default command({
 			.desc(
 				"Workspace tag applied to each run's created workspace. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
 			),
+		group: string().desc(
+			"Group the automation is listed under in the automations table",
+		),
 	},
 	run: async ({ ctx, options }) => {
 		const prompt = options.prompt
@@ -138,6 +141,7 @@ export default command({
 			timezone: options.timezone ?? DEFAULT_TIMEZONE,
 			...(triggers ? { triggers } : {}),
 			...(options.tag?.length ? { tags: options.tag } : {}),
+			...(options.group ? { group: options.group } : {}),
 		});
 
 		const schedule = result.nextRunAt
