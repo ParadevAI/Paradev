@@ -61,4 +61,44 @@ describe("addPaneDetails", () => {
 		expect(b).toMatchObject({ terminalTitle: "zsh", agent: null });
 		expect(c).not.toHaveProperty("agent");
 	});
+
+	test("fills in sidebar terminal panes too", () => {
+		const tab = {
+			id: "side",
+			title: null,
+			active: true,
+			activePaneId: "s",
+			layout: { type: "pane" as const, paneId: "s" },
+			panes: [
+				{
+					id: "s",
+					kind: "terminal",
+					title: null,
+					terminalId: "t3",
+					active: true,
+				},
+			],
+		};
+		const result = addPaneDetails(
+			{
+				paneId: null,
+				tabId: null,
+				layout: {
+					activeTabId: null,
+					tabs: [],
+					sidebar: {
+						open: true,
+						fullScreen: false,
+						activeTabId: "side",
+						tabs: [tab],
+					},
+				},
+			},
+			{ titles: new Map([["t3", "npm test"]]), agents: new Map() },
+		);
+		expect(result.layout.sidebar?.tabs[0]?.panes[0]).toMatchObject({
+			terminalTitle: "npm test",
+			agent: null,
+		});
+	});
 });

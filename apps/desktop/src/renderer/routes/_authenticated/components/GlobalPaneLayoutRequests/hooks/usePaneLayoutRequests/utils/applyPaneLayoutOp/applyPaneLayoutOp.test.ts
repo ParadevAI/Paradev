@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import type { LayoutNode, WorkspaceState } from "@superset/panes";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { applyPaneLayoutOp, PaneLayoutOpError } from "./applyPaneLayoutOp";
+import {
+	applyPaneLayoutOp,
+	type PaneAreas,
+	PaneLayoutOpError,
+} from "./applyPaneLayoutOp";
 
 function terminal(id: string) {
 	return {
@@ -13,7 +17,7 @@ function terminal(id: string) {
 
 const leaf = (paneId: string): LayoutNode => ({ type: "pane", paneId });
 
-function fixture(): WorkspaceState<PaneViewerData> {
+function mainFixture(): WorkspaceState<PaneViewerData> {
 	return {
 		version: 1,
 		activeTabId: "tab-1",
@@ -42,6 +46,37 @@ function fixture(): WorkspaceState<PaneViewerData> {
 	};
 }
 
+const EMPTY: WorkspaceState<PaneViewerData> = {
+	version: 1,
+	activeTabId: null,
+	tabs: [],
+};
+
+function fixture(): PaneAreas {
+	return {
+		main: mainFixture(),
+		sidebar: {
+			version: 1,
+			activeTabId: "side-1",
+			tabs: [
+				{
+					id: "side-1",
+					createdAt: 3,
+					activePaneId: "d",
+					layout: leaf("d"),
+					panes: {
+						d: {
+							id: "d",
+							kind: "diff",
+							data: { path: "", collapsedFiles: [] },
+						},
+					},
+				},
+			],
+		},
+	};
+}
+
 function expectError(run: () => unknown, code: PaneLayoutOpError["code"]) {
 	try {
 		run();
@@ -55,7 +90,11 @@ function expectError(run: () => unknown, code: PaneLayoutOpError["code"]) {
 
 describe("applyPaneLayoutOp", () => {
 	test("newTab adds a terminal tab without taking focus from an open tab", () => {
-		const { state, paneId, tabId } = applyPaneLayoutOp(
+		const {
+			areas: { main: state },
+			paneId,
+			tabId,
+		} = applyPaneLayoutOp(
 			fixture(),
 			{ type: "newTab", terminalId: "t-new" },
 			() => "new",
@@ -69,8 +108,11 @@ describe("applyPaneLayoutOp", () => {
 	});
 
 	test("newTab in an empty workspace makes the new tab active", () => {
-		const { state, tabId } = applyPaneLayoutOp(
-			{ version: 1, activeTabId: null, tabs: [] },
+		const {
+			areas: { main: state },
+			tabId,
+		} = applyPaneLayoutOp(
+			{ main: EMPTY, sidebar: EMPTY },
 			{ type: "newTab", terminalId: "t-new" },
 			() => "new",
 		);
@@ -78,7 +120,11 @@ describe("applyPaneLayoutOp", () => {
 	});
 
 	test("split puts a terminal pane on the requested side and keeps focus", () => {
-		const { state, paneId, tabId } = applyPaneLayoutOp(
+		const {
+			areas: { main: state },
+			paneId,
+			tabId,
+		} = applyPaneLayoutOp(
 			fixture(),
 			{ type: "split", paneId: "b", direction: "down", terminalId: "t-new" },
 			() => "new",
@@ -107,13 +153,13 @@ describe("applyPaneLayoutOp", () => {
 			type: "resize",
 			paneId: "b",
 			ratio: 0.3,
-		}).state.tabs[0]?.layout;
+		}).areas.main.tabs[0]?.layout;
 		expect(second?.type === "split" && second.splitPercentage).toBeCloseTo(70);
 		const first = applyPaneLayoutOp(fixture(), {
 			type: "resize",
 			paneId: "a",
 			ratio: 0.3,
-		}).state.tabs[0]?.layout;
+		}).areas.main.tabs[0]?.layout;
 		expect(first?.type === "split" && first.splitPercentage).toBeCloseTo(30);
 	});
 
@@ -134,14 +180,16 @@ describe("applyPaneLayoutOp", () => {
 			type: "resize",
 			paneId: "a",
 			ratio: 0.2,
-		}).state;
-		const layout = applyPaneLayoutOp(skewed, { type: "equalize" }).state.tabs[0]
-			?.layout;
+		}).areas;
+		const layout = applyPaneLayoutOp(skewed, { type: "equalize" }).areas.main
+			.tabs[0]?.layout;
 		expect(layout?.type === "split" && layout.splitPercentage).toBe(50);
 	});
 
 	test("focus selects the pane and its tab", () => {
-		const { state } = applyPaneLayoutOp(fixture(), {
+		const {
+			areas: { main: state },
+		} = applyPaneLayoutOp(fixture(), {
 			type: "focus",
 			paneId: "c",
 		});
@@ -150,7 +198,9 @@ describe("applyPaneLayoutOp", () => {
 	});
 
 	test("close removes the pane and moves focus to a sibling", () => {
-		const { state } = applyPaneLayoutOp(fixture(), {
+		const {
+			areas: { main: state },
+		} = applyPaneLayoutOp(fixture(), {
 			type: "close",
 			paneId: "a",
 		});
@@ -159,7 +209,10 @@ describe("applyPaneLayoutOp", () => {
 	});
 
 	test("move splits the pane into another tab and removes the emptied tab", () => {
-		const { state, tabId } = applyPaneLayoutOp(fixture(), {
+		const {
+			areas: { main: state },
+			tabId,
+		} = applyPaneLayoutOp(fixture(), {
 			type: "move",
 			paneId: "c",
 			targetPaneId: "a",
@@ -172,7 +225,10 @@ describe("applyPaneLayoutOp", () => {
 	});
 
 	test("moveToNewTab gives the pane its own tab", () => {
-		const { state, tabId } = applyPaneLayoutOp(fixture(), {
+		const {
+			areas: { main: state },
+			tabId,
+		} = applyPaneLayoutOp(fixture(), {
 			type: "moveToNewTab",
 			paneId: "b",
 		});
@@ -187,7 +243,7 @@ describe("applyPaneLayoutOp", () => {
 			type: "swap",
 			paneId: "a",
 			withPaneId: "b",
-		}).state.tabs[0]?.layout;
+		}).areas.main.tabs[0]?.layout;
 		expect(within?.type === "split" && [within.first, within.second]).toEqual([
 			leaf("b"),
 			leaf("a"),
@@ -197,10 +253,15 @@ describe("applyPaneLayoutOp", () => {
 			type: "swap",
 			paneId: "a",
 			withPaneId: "c",
-		}).state;
-		expect(Object.keys(across.tabs[0]?.panes ?? {}).sort()).toEqual(["b", "c"]);
-		expect(across.tabs[1]?.layout).toEqual(leaf("a"));
-		expect(across.tabs[1]?.panes.a?.data).toEqual({ terminalId: "term-a" });
+		}).areas;
+		expect(Object.keys(across.main.tabs[0]?.panes ?? {}).sort()).toEqual([
+			"b",
+			"c",
+		]);
+		expect(across.main.tabs[1]?.layout).toEqual(leaf("a"));
+		expect(across.main.tabs[1]?.panes.a?.data).toEqual({
+			terminalId: "term-a",
+		});
 	});
 
 	test("an unknown pane is not found", () => {
@@ -208,5 +269,130 @@ describe("applyPaneLayoutOp", () => {
 			() => applyPaneLayoutOp(fixture(), { type: "focus", paneId: "nope" }),
 			"NOT_FOUND",
 		);
+	});
+
+	test("newTab with the sidebar area opens the terminal there", () => {
+		const { areas, tabId } = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", terminalId: "t-new", area: "sidebar" },
+			() => "new",
+		);
+		expect(areas.main.tabs).toHaveLength(2);
+		expect(areas.sidebar.tabs.some((tab) => tab.id === tabId)).toBe(true);
+		expect(areas.sidebar.activeTabId).toBe("side-1");
+	});
+
+	test("focus on a sidebar pane asks to show the sidebar", () => {
+		const outcome = applyPaneLayoutOp(fixture(), {
+			type: "focus",
+			paneId: "d",
+		});
+		expect(outcome.showSidebar).toBe(true);
+		expect(outcome.tabId).toBe("side-1");
+	});
+
+	test("moveToNewTab with another area moves the pane between areas", () => {
+		const { areas, tabId } = applyPaneLayoutOp(fixture(), {
+			type: "moveToNewTab",
+			paneId: "c",
+			area: "sidebar",
+		});
+		expect(areas.main.tabs.map((tab) => tab.id)).toEqual(["tab-1"]);
+		const moved = areas.sidebar.tabs.find((tab) => tab.id === tabId);
+		expect(moved?.panes.c?.data).toEqual({ terminalId: "term-c" });
+		expect(areas.sidebar.activeTabId).toBe("side-1");
+	});
+
+	test("move next to a pane in the other area splits it there", () => {
+		const { areas, tabId } = applyPaneLayoutOp(fixture(), {
+			type: "move",
+			paneId: "d",
+			targetPaneId: "a",
+			direction: "right",
+		});
+		expect(tabId).toBe("tab-1");
+		expect(areas.sidebar.tabs).toHaveLength(0);
+		expect(Object.keys(areas.main.tabs[0]?.panes ?? {}).sort()).toEqual([
+			"a",
+			"b",
+			"d",
+		]);
+		expect(areas.main.tabs[0]?.activePaneId).toBe("a");
+	});
+
+	test("swap exchanges panes across areas", () => {
+		const { areas } = applyPaneLayoutOp(fixture(), {
+			type: "swap",
+			paneId: "c",
+			withPaneId: "d",
+		});
+		expect(areas.main.tabs[1]?.panes.d?.kind).toBe("diff");
+		expect(areas.sidebar.tabs[0]?.panes.c?.kind).toBe("terminal");
+	});
+
+	test("open reuses a tool already in the sidebar", () => {
+		const outcome = applyPaneLayoutOp(fixture(), {
+			type: "open",
+			tool: "changes",
+		});
+		expect(outcome.paneId).toBe("d");
+		expect(outcome.areas.sidebar.tabs).toHaveLength(1);
+	});
+
+	test("open shows the sidebar with the new tool in front", () => {
+		const { areas, paneId, tabId, showSidebar } = applyPaneLayoutOp(
+			fixture(),
+			{ type: "open", tool: "browser", url: "http://localhost:3000" },
+			() => "web",
+		);
+		expect(paneId).toBe("web");
+		expect(showSidebar).toBe(true);
+		const tab = areas.sidebar.tabs.find((candidate) => candidate.id === tabId);
+		expect(tab?.panes.web?.data).toEqual({ url: "http://localhost:3000" });
+		expect(areas.sidebar.activeTabId).toBe(tabId);
+		expect(areas.main.activeTabId).toBe("tab-1");
+	});
+
+	test("open in the background keeps the sidebar as it is", () => {
+		const { areas, tabId, showSidebar } = applyPaneLayoutOp(
+			fixture(),
+			{ type: "open", tool: "files", background: true },
+			() => "files",
+		);
+		expect(showSidebar).toBe(false);
+		expect(areas.sidebar.tabs.some((tab) => tab.id === tabId)).toBe(true);
+		expect(areas.sidebar.activeTabId).toBe("side-1");
+	});
+
+	test("open file shows it in the editor at the requested line", () => {
+		const { areas, paneId, showSidebar } = applyPaneLayoutOp(
+			fixture(),
+			{ type: "open", tool: "file", path: "/repo/src/cart.ts", line: 9 },
+			() => "editor",
+		);
+		expect(paneId).toBe("editor");
+		expect(showSidebar).toBe(true);
+		const tab = areas.sidebar.tabs.find((candidate) => candidate.panes.editor);
+		expect(tab?.panes.editor?.data).toMatchObject({
+			filePath: "/repo/src/cart.ts",
+			mode: "editor",
+			pendingPosition: { line: 9 },
+		});
+		expect(areas.sidebar.activeTabId).toBe(tab?.id ?? "missing");
+	});
+
+	test("open changes with a path points the open Changes pane at that file", () => {
+		const { areas, paneId } = applyPaneLayoutOp(fixture(), {
+			type: "open",
+			tool: "changes",
+			path: "src/cart.ts",
+			line: 4,
+		});
+		expect(paneId).toBe("d");
+		expect(areas.sidebar.tabs).toHaveLength(1);
+		expect(areas.sidebar.tabs[0]?.panes.d?.data).toMatchObject({
+			path: "src/cart.ts",
+			focusLine: 4,
+		});
 	});
 });
