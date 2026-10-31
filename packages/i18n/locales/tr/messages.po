@@ -1202,6 +1202,9 @@ msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}, Ekim 2026'ya kadar {formerName} adını taşıyordu."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} zaten var. Lütfen başka bir ad seçin."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "iPad'de Paradev; bir pull request ve bir çalışma alanı listesi göst
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev yalnızca bu bağlayıcının istediği izinleri alır. İzinleri geri almak için istediğiniz zaman bağlantıyı kesin."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev yalnızca kendi oluşturduğu profilleri kaldırır."
+
 msgid "Paradev originals"
 msgstr "Paradev özgünleri"
 
@@ -20467,6 +20473,9 @@ msgstr "Yeni ajanlar için kullan"
 
 msgid "Use global default"
 msgstr "Genel varsayılanı kullan"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Lütfen A–Z harfleri, rakam veya kısa çizgi kullanın."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Küçük harf, rakam, tire ve alt çizgi kullanın"

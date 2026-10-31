@@ -1202,6 +1202,9 @@ msgstr "{productName} a levé un tour de table d’amorçage de 11,5 millions de
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} s'appelait {formerName} jusqu'en octobre 2026."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} existe déjà. Choisissez un autre nom."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "Paradev sur iPad, avec une pull request et une liste de workspaces"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev ne reçoit que les autorisations demandées par ce connecteur. Déconnectez-le à tout moment pour les révoquer."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev ne retire que les profils qu'il a créés."
+
 msgid "Paradev originals"
 msgstr "Originaux Paradev"
 
@@ -20467,6 +20473,9 @@ msgstr "Utiliser pour les nouveaux agents"
 
 msgid "Use global default"
 msgstr "Utiliser la valeur globale par défaut"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Utilisez des lettres de A à Z, des chiffres ou des traits d'union."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Utilisez des minuscules, des chiffres, des tirets et des tirets bas"

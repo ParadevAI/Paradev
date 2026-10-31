@@ -6,7 +6,6 @@ import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
@@ -43,6 +42,7 @@ import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
 import { LeaderboardCard } from "../LeaderboardCard";
 import { UsageHistorySection } from "../UsageHistorySection";
+import { AccountMenuItems } from "./components/AccountMenuItems";
 import type { SwitchSignInTarget } from "./components/AddAccountDialog";
 import { AddAccountDialog } from "./components/AddAccountDialog";
 import { RemoveAccountDialog } from "./components/RemoveAccountDialog";
@@ -243,16 +243,11 @@ function AccountCard({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							{onSwitchSignIn && (
-								<DropdownMenuItem onClick={onSwitchSignIn}>
-									<Trans>Switch sign-in…</Trans>
-								</DropdownMenuItem>
-							)}
-							{onRemove && (
-								<DropdownMenuItem variant="destructive" onClick={onRemove}>
-									<Trans>Remove…</Trans>
-								</DropdownMenuItem>
-							)}
+							<AccountMenuItems
+								onSwitchSignIn={onSwitchSignIn}
+								onRemove={onRemove}
+								createdByParadev={account.createdByParadev === true}
+							/>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				)}

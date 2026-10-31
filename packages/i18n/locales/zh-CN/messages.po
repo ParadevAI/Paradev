@@ -1202,6 +1202,9 @@ msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Squ
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} 已存在。请换一个名称。"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "iPad 上的 Paradev，显示一个拉取请求和工作区列表"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev 只获得此连接器请求的权限。你可以随时断开连接以撤销。"
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev 只会移除它创建的配置文件。"
+
 msgid "Paradev originals"
 msgstr "Paradev原创组件"
 
@@ -20467,6 +20473,9 @@ msgstr "用于新智能体"
 
 msgid "Use global default"
 msgstr "使用全局默认值"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "请使用字母 A–Z、数字或连字符。"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "请使用小写字母、数字、连字符和下划线"

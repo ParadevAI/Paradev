@@ -1202,6 +1202,9 @@ msgstr "{productName} は、Union Square Ventures がリードし、Y Combinator
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} は 2026 年 10 月まで {formerName} という名前でした。"
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} はすでに存在します。別の名前を選んでください。"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "iPad 上の Paradev。プルリクエストとワークスペース一�
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev はこのコネクタが要求する権限のみを受け取ります。接続を解除すればいつでも取り消せます。"
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev が削除するのは、Paradev が作成したプロファイルだけです。"
+
 msgid "Paradev originals"
 msgstr "Paradev独自コンポーネント"
 
@@ -20467,6 +20473,9 @@ msgstr "新規エージェントに使用"
 
 msgid "Use global default"
 msgstr "グローバルのデフォルトを使用"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "A–Z の英字、数字、ハイフンを使用してください。"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "小文字、数字、ハイフン、アンダースコアを使用してください"

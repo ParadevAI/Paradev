@@ -1202,6 +1202,9 @@ msgstr "{productName} získal 11,5 milionu dolarů v seed kole, které vedl fond
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se až do října 2026 jmenoval {formerName}."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} už existuje. Zvolte jiný název."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "Paradev na iPadu s pull requestem a seznamem workspaců"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev získá pouze oprávnění, o která tento konektor žádá. Kdykoli je můžete odvolat odpojením."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev odebírá jen profily, které sám vytvořil."
+
 msgid "Paradev originals"
 msgstr "Originály Paradev"
 
@@ -20467,6 +20473,9 @@ msgstr "Použít pro nové agenty"
 
 msgid "Use global default"
 msgstr "Použít globální výchozí"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Použijte písmena A–Z, číslice nebo pomlčky."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Použijte malá písmena, číslice, pomlčky a podtržítka"

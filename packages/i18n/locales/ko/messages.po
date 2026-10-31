@@ -1202,6 +1202,9 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir}이(가) 이미 있습니다. 다른 이름을 선택해 주세요."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 
@@ -13902,6 +13905,9 @@ msgstr "iPad의 Paradev. 풀 리퀘스트와 워크스페이스 목록이 보입
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev는 이 커넥터가 요청한 권한만 받습니다. 언제든지 연결을 해제해 취소할 수 있습니다."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev는 직접 만든 프로필만 제거합니다."
+
 msgid "Paradev originals"
 msgstr "Paradev 오리지널"
 
@@ -20467,6 +20473,9 @@ msgstr "새 에이전트에 사용"
 
 msgid "Use global default"
 msgstr "전역 기본값 사용"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "A–Z 영문자, 숫자, 하이픈을 사용해 주세요."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "소문자, 숫자, 하이픈, 밑줄을 사용하세요"

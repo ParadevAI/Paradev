@@ -34,6 +34,8 @@ import { removeClaudeProfile, removeCodexHome } from "./profile-remove";
 import {
 	discoverClaudeProfiles,
 	discoverCodexHomes,
+	hasProfileCreatedMarker,
+	isCreatedProfile,
 	readCodexProfileKind,
 } from "./profiles";
 import { validateSessionAccount } from "./session-account/session-account";
@@ -117,20 +119,26 @@ export const usageRouter = router({
 	quota: queryProcedure
 		.meta({ timeoutMs: 15_000 })
 		.input(z.object({ forceRefresh: z.boolean().optional() }).optional())
-		.query(async ({ ctx, input }) => {
+		.query(async ({ ctx, input }): Promise<UsageAccount[]> => {
 			const accounts = await getQuota(input?.forceRefresh ?? false);
 			// isDefault is applied per query, not cached with the quota: changing
 			// the default must reflect immediately without re-hitting providers.
 			const defaults = getDefaultAccountSelections(ctx.db);
-			return accounts.map((account) => ({
-				...account,
-				isDefault:
-					account.agent === "claude"
-						? account.selection === defaults.claudeConfigDir
-						: account.agent === "codex"
-							? account.selection === defaults.codexHome
-							: false,
-			}));
+			return Promise.all(
+				accounts.map(async (account) => ({
+					...account,
+					isDefault:
+						account.agent === "claude"
+							? account.selection === defaults.claudeConfigDir
+							: account.agent === "codex"
+								? account.selection === defaults.codexHome
+								: false,
+					createdByParadev: await isCreatedProfile(
+						account.agent,
+						account.selection,
+					),
+				})),
+			);
 		}),
 
 	/**
@@ -138,7 +146,8 @@ export const usageRouter = router({
 	 * while an add-account or switch-sign-in flow is pending in a terminal.
 	 * The default-slot fields let the UI notice a `/login` that re-signed the
 	 * system-default login by its credential fingerprint, including re-login
-	 * to the same account.
+	 * to the same account. createdByParadev lets Add account take a new
+	 * profile's sign-in only from a dir its own command created.
 	 */
 	logins: queryProcedure.query(async () => {
 		const [profiles, codexHomes, claudeDefaultEmail, claudeDefaultFingerprint] =
@@ -168,7 +177,12 @@ export const usageRouter = router({
 						// No readable auth.json — fingerprint stays null.
 					}
 				}
-				return { home, fingerprint, credentialKind };
+				return {
+					home,
+					fingerprint,
+					credentialKind,
+					createdByParadev: await hasProfileCreatedMarker(home, "codex"),
+				};
 			}),
 		);
 		return {
@@ -183,6 +197,10 @@ export const usageRouter = router({
 						profile.credentialKind === "api_key"
 							? profile.loginFingerprint
 							: await readClaudeLoginFingerprint(profile.configDir),
+					createdByParadev: await hasProfileCreatedMarker(
+						profile.configDir,
+						"claude",
+					),
 				})),
 			),
 			codex,
@@ -243,9 +261,11 @@ export const usageRouter = router({
 	/**
 	 * Deletes a secondary profile: its dir plus, for Claude on macOS, its
 	 * scoped keychain items. The system default (selection null) is never
-	 * removable, and only currently discovered profiles are accepted. A
-	 * default pointer at the removed profile is cleared so agents fall back
-	 * to the system login instead of a dead dir.
+	 * removable, and only currently discovered profiles are accepted. Only a
+	 * profile Paradev created is deleted; any other is refused with
+	 * PRECONDITION_FAILED (profile-remove.ts). A default pointer at the
+	 * removed profile is cleared so agents fall back to the system login
+	 * instead of a dead dir.
 	 */
 	removeAccount: protectedProcedure
 		.input(

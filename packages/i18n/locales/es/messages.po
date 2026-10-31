@@ -1202,6 +1202,9 @@ msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares li
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se llamaba {formerName} hasta octubre de 2026."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} ya existe. Elige otro nombre."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "Paradev en iPad, con una pull request y una lista de workspaces"
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev solo recibe los permisos que pide este conector. Desconéctalo en cualquier momento para revocarlos."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev solo quita los perfiles que creó."
+
 msgid "Paradev originals"
 msgstr "Originales de Paradev"
 
@@ -20467,6 +20473,9 @@ msgstr "Usar para los agentes nuevos"
 
 msgid "Use global default"
 msgstr "Usar el valor global predeterminado"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Usa letras de la A a la Z, números o guiones."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Usa minúsculas, números, guiones y guiones bajos"

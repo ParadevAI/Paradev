@@ -1202,6 +1202,9 @@ msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD d
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} có tên là {formerName} cho đến tháng 10 năm 2026."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} đã tồn tại. Hãy chọn tên khác."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
@@ -13902,6 +13905,9 @@ msgstr "Paradev trên iPad, hiển thị một pull request và danh sách works
 msgid "Paradev only receives the permissions this connector asks for. Disconnect at any time to revoke them."
 msgstr "Paradev chỉ nhận các quyền mà trình kết nối này yêu cầu. Ngắt kết nối bất cứ lúc nào để thu hồi."
 
+msgid "Paradev only removes profiles it created."
+msgstr "Paradev chỉ gỡ những hồ sơ do chính nó tạo."
+
 msgid "Paradev originals"
 msgstr "Thành phần riêng của Paradev"
 
@@ -20467,6 +20473,9 @@ msgstr "Dùng cho agent mới"
 
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"
+
+msgid "Use letters A–Z, digits, or hyphens."
+msgstr "Hãy dùng chữ cái A–Z, chữ số hoặc dấu gạch ngang."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
