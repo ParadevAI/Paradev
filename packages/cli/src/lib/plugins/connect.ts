@@ -33,9 +33,11 @@ export function findConnectTarget<T extends CatalogEntry>(
 			(!marketplace || entry.marketplace === marketplace) &&
 			(entry.installed || entry.marketplace === local?.marketplace),
 	);
-	if (matches.length > 1) {
+	const sources = new Set(matches.map((entry) => entry.marketplace));
+	if (local) sources.add(local.marketplace);
+	if (sources.size > 1) {
 		throw new CLIError(
-			`"${name}" is installed from ${matches.map((entry) => entry.marketplace).join(", ")}.`,
+			`"${name}" is installed from ${[...sources].join(", ")}.`,
 			`Name one with --marketplace <name>, or ${name}@<marketplace>.`,
 		);
 	}

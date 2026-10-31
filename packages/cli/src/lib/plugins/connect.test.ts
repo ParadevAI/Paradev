@@ -52,4 +52,14 @@ describe("findConnectTarget", () => {
 			),
 		).toThrow('"deploy" is installed from superset, acme.');
 	});
+
+	test("a local install from a marketplace the account does not list must be named", () => {
+		expect(() =>
+			findConnectTarget(
+				[entry("deploy", "superset", true)],
+				[ledgerEntry("deploy", "acme")],
+				"deploy",
+			),
+		).toThrow('"deploy" is installed from superset, acme.');
+	});
 });

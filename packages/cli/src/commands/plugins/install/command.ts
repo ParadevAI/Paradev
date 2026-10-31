@@ -17,9 +17,9 @@ import {
 	parseInputs,
 } from "../../../lib/plugins/inputs";
 import {
+	availablePlugins,
 	ensureDefaultMarketplace,
 	installPlugin,
-	listAvailable,
 } from "../../../lib/plugins/install";
 import { syncPluginMcpServers } from "../../../lib/plugins/mcp-servers";
 import { installOrganizationPlugin } from "../../../lib/plugins/organization";
@@ -42,7 +42,7 @@ async function organizationPlugin(
 		marketplace === ORGANIZATION ||
 		(marketplace !== undefined && isOrganizationMarketplace(marketplace));
 	if (marketplace && !named) return null;
-	if (!named && listAvailable().some((a) => a.entry.name === name)) return null;
+	if (!named && (await availablePlugins(name)).candidates.length) return null;
 
 	const plugins = await api.plugins.organization.list.query().catch((error) => {
 		if (named) throw error;
