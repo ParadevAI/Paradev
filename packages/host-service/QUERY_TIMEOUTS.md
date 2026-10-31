@@ -2,9 +2,10 @@
 
 Every host-service query procedure has a server-side timeout. If a query
 takes longer than its budget, the procedure rejects with
-`TRPCError({ code: "TIMEOUT" })`. The renderer's `QueryClient` retries
-those errors a couple of times with linear backoff, so transient slow
-ops self-recover without leaving the UI spinning forever.
+`TRPCError({ code: "TIMEOUT" })`. The `QueryClient` in
+`WorkspaceClientProvider` retries those errors a couple of times with
+linear backoff, so transient slow ops self-recover without leaving the
+UI spinning forever.
 
 ## Where it lives
 
@@ -16,7 +17,10 @@ ops self-recover without leaving the UI spinning forever.
   builder. Without `meta`, the default is 5000 ms.
 - **Client retry**: `WorkspaceClientProvider` in `packages/workspace-client`
   retries `TIMEOUT` errors up to 2 times with `300 ms × attempt` backoff.
-  Other errors keep the previous single retry.
+  Other errors keep the previous single retry. The desktop's shared
+  `QueryClient` (`ElectronTRPCProvider`) retries connection errors only
+  (`hostServiceQueryRetry`), so a `TIMEOUT` there fails at once unless
+  the hook retries it, as `useHostUsageLogins` does once.
 
 Mutations stay on `protectedProcedure` because their latency is highly
 variable (file writes, network calls) and a blanket budget would do more
@@ -54,6 +58,7 @@ tight and healthy queries time out under load.
 | `git.getStatus`, `git.getCommitFiles` | 15s | Slow on big working trees |
 | `git.listCommits`, `git.getDiff`, `git.getBranchSyncStatus`, `git.getPullRequestThreads` | 30s | Long history, big diffs, GitHub API |
 | `linkPreview.get` | 20s | A page fetch, then an icon fetch, 7s each |
+| `usage.logins` | 15s | Reads every Claude profile's Keychain items; polled while a sign-in is pending |
 
 ## What the timeout does *not* do
 
@@ -73,7 +78,9 @@ between operations.
 ## What a timeout looks like to the client
 
 `TRPCClientError` with `error.data.code === "TIMEOUT"`. The
-`WorkspaceClientProvider` retry predicate keys on this. Bespoke per-hook
-retry logic should not be necessary — if it is, the procedure's budget
-is probably wrong, or the underlying work isn't really a single query
-and should be split.
+`WorkspaceClientProvider` retry predicate keys on this, and so does
+`useHostUsageLogins`: a poll that times out leaves its scan running, and
+the retry joins that scan instead of starting a new one. Bespoke per-hook
+retry logic should not otherwise be necessary — if it is, the procedure's
+budget is probably wrong, or the underlying work isn't really a single
+query and should be split.

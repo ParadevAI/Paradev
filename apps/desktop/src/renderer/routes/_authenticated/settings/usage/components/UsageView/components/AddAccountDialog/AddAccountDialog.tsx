@@ -31,6 +31,7 @@ import type { AccountCredentialKind } from "../../utils/apiBilling";
 import {
 	type FoundLogin,
 	findCompletedLogin,
+	nextBaseline,
 } from "../../utils/findCompletedLogin";
 import { switchSignInCommand } from "../../utils/switchSignInCommand";
 import type { ManagedAgent } from "../../utils/visibleQuotaAgents";
@@ -115,8 +116,8 @@ export function AddAccountDialog({
 	const loginsQuery = useHostUsageLogins(hostUrl, open && !found);
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
 
-	// The first poll result after opening is the baseline; anything beyond it
-	// is the sign-in we are waiting for.
+	// The first poll result after opening is the baseline (see nextBaseline);
+	// anything beyond it is the sign-in we are waiting for.
 	useEffect(() => {
 		if (!open) {
 			baselineRef.current = null;
@@ -162,6 +163,8 @@ export function AddAccountDialog({
 			setFound(fresh);
 			onAccountAdded();
 			if (fresh.selection) provisionProfile(fresh.selection);
+		} else {
+			baselineRef.current = nextBaseline(baselineRef.current, logins);
 		}
 	}, [
 		open,
