@@ -20,6 +20,7 @@ const check = (
 	current: UsageLogins,
 	baseline = empty,
 	commandSucceeded = false,
+	newProfile = false,
 ) =>
 	findCompletedLogin({
 		agent: "claude",
@@ -28,6 +29,7 @@ const check = (
 		current,
 		baseline,
 		commandSucceeded,
+		newProfile,
 	});
 describe("findCompletedLogin", () => {
 	it("does not accept copied identity without credentials", () =>
@@ -58,6 +60,19 @@ describe("findCompletedLogin", () => {
 		const snapshot = { ...empty, claude: [profile] };
 		expect(check(snapshot, snapshot, true)).not.toBeNull();
 	});
+	it("accepts a new profile's first sign-in", () =>
+		expect(
+			check({ ...empty, claude: [profile] }, empty, false, true)?.selection,
+		).toBe(selection));
+	it("does not take a login that was there before as a new profile", () =>
+		expect(
+			check(
+				{ ...empty, claude: [{ ...profile, fingerprint: "token-two" }] },
+				{ ...empty, claude: [profile] },
+				true,
+				true,
+			),
+		).toBeNull());
 	it("still requires credentials after CLI success", () =>
 		expect(
 			check(
@@ -77,6 +92,7 @@ describe("findCompletedLogin", () => {
 			selection,
 			baseline: empty,
 			commandSucceeded: true,
+			newProfile: true,
 		};
 		expect(
 			findCompletedLogin({
@@ -117,6 +133,7 @@ describe("findCompletedLogin", () => {
 					claudeDefaultFingerprint: "new",
 				},
 				commandSucceeded: false,
+				newProfile: false,
 			}),
 		).not.toBeNull());
 	it("does not accept a Codex home without auth", () =>
@@ -137,6 +154,7 @@ describe("findCompletedLogin", () => {
 					],
 				},
 				commandSucceeded: true,
+				newProfile: true,
 			}),
 		).toBeNull());
 });

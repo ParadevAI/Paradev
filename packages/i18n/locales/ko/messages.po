@@ -1202,6 +1202,9 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir}이(가) 이미 있습니다. 다른 이름을 선택해 주세요."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 

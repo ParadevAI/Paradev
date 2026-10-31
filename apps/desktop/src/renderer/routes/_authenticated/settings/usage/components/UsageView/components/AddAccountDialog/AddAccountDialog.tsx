@@ -34,6 +34,11 @@ import {
 } from "../../utils/findCompletedLogin";
 import { switchSignInCommand } from "../../utils/switchSignInCommand";
 import type { ManagedAgent } from "../../utils/visibleQuotaAgents";
+import {
+	isProfileHomeTaken,
+	profileHome,
+	slugifyProfileName,
+} from "./utils/profileName";
 
 type Agent = ManagedAgent;
 
@@ -50,15 +55,6 @@ export interface SwitchSignInTarget {
 	selection: string | null;
 	/** Display name for the dialog copy ("~/.claude-2", an email, …). */
 	label: string;
-}
-
-function slugify(name: string): string {
-	return (
-		name
-			.toLowerCase()
-			.replace(/[^a-z0-9-]+/g, "-")
-			.replace(/^-+|-+$/g, "") || "work"
-	);
 }
 
 interface AddAccountDialogProps {
@@ -104,22 +100,30 @@ export function AddAccountDialog({
 	const agent = switchTarget?.agent ?? addAgent;
 	const billingId = useId();
 	const nameId = useId();
-	const [name, setName] = useState("work");
+	const nameErrorId = useId();
+	const [name, setName] = useState("");
 	const [credentialKind, setCredentialKind] =
 		useState<AccountCredentialKind>("subscription");
 	const [copied, setCopied] = useState(false);
 	const [found, setFound] = useState<FoundLogin | null>(null);
 	const baselineRef = useRef<UsageLogins | null>(null);
-	const slug = slugify(name);
+	const slug = slugifyProfileName(name);
+	const profileDir = `~/.${agent}-${slug}`;
 
 	const loginsQuery = useHostUsageLogins(hostUrl, open && !found);
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
+	const homeTaken =
+		!switchTarget &&
+		!!loginsQuery.data &&
+		isProfileHomeTaken(loginsQuery.data, agent, slug);
+	const canSignIn = !!switchTarget || (slug !== "" && !homeTaken);
 
 	// The first poll result after opening is the baseline; anything beyond it
 	// is the sign-in we are waiting for.
 	useEffect(() => {
 		if (!open) {
 			baselineRef.current = null;
+			setName("");
 			setFound(null);
 			setCopied(false);
 			setTerminalAttempt(0);
@@ -149,7 +153,7 @@ export function AddAccountDialog({
 
 		const selection = switchTarget
 			? switchTarget.selection
-			: `${logins.homeDir}/.${agent}-${slug}`;
+			: profileHome(logins.homeDir, agent, slug);
 		const fresh = findCompletedLogin({
 			agent,
 			credentialKind: switchTarget?.credentialKind ?? credentialKind,
@@ -157,6 +161,7 @@ export function AddAccountDialog({
 			baseline: baselineRef.current,
 			current: logins,
 			commandSucceeded,
+			newProfile: !switchTarget,
 		});
 		if (fresh) {
 			setFound(fresh);
@@ -357,8 +362,20 @@ export function AddAccountDialog({
 										onChange={(event) => setName(event.target.value)}
 										className="h-9 min-w-0 flex-1 text-sm"
 										placeholder="work"
+										aria-invalid={homeTaken || undefined}
+										aria-describedby={homeTaken ? nameErrorId : undefined}
 									/>
 								</div>
+								{homeTaken && (
+									<p
+										id={nameErrorId}
+										className="-mt-2 pl-26 text-xs text-destructive"
+									>
+										<Trans>
+											{profileDir} already exists. Choose another name.
+										</Trans>
+									</p>
+								)}
 								<div className="flex items-center gap-2">
 									<span className="w-24 shrink-0 text-sm text-muted-foreground">
 										<Trans>Billing</Trans>
@@ -397,7 +414,7 @@ export function AddAccountDialog({
 							</div>
 						)}
 
-						{!canRunLocally && commandDetails}
+						{!canRunLocally && canSignIn && commandDetails}
 
 						{canRunLocally && open && terminalAttempt > 0 && (
 							<div className="min-w-0 overflow-hidden rounded-lg border">
@@ -432,7 +449,7 @@ export function AddAccountDialog({
 							</div>
 						)}
 						{terminalAttempt === 0 &&
-							(!canRunLocally || loginsQuery.isError) &&
+							((!canRunLocally && canSignIn) || loginsQuery.isError) &&
 							loginStatus}
 						<div className="flex items-center justify-end gap-3 pt-1">
 							<div className="flex shrink-0 items-center gap-2">
@@ -471,7 +488,7 @@ export function AddAccountDialog({
 								{canRunLocally && !terminalRunning && (
 									<Button
 										size="sm"
-										disabled={!loginsQuery.data}
+										disabled={!loginsQuery.data || !canSignIn}
 										onClick={() => {
 											setCommandSucceeded(false);
 											setTerminalRunning(true);

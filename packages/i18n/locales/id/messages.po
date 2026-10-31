@@ -1202,6 +1202,9 @@ msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipi
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} bernama {formerName} hingga Oktober 2026."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} sudah ada. Pilih nama lain."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 

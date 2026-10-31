@@ -1202,6 +1202,9 @@ msgstr "{productName} привлёк 11,5 млн долларов в посев�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "До октября 2026 года {productName} назывался {formerName}."
 
+msgid "{profileDir} already exists. Choose another name."
+msgstr "{profileDir} уже существует. Выберите другое имя."
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 

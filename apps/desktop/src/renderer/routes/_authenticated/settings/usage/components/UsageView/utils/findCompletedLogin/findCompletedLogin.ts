@@ -15,6 +15,7 @@ export function findCompletedLogin({
 	baseline,
 	current,
 	commandSucceeded,
+	newProfile,
 }: {
 	agent: ManagedAgent;
 	credentialKind: AccountCredentialKind;
@@ -22,6 +23,9 @@ export function findCompletedLogin({
 	baseline: UsageLogins;
 	current: UsageLogins;
 	commandSucceeded: boolean;
+	/** Adding a profile: a login already at `selection` in the baseline is
+	 * not the new sign-in. */
+	newProfile: boolean;
 }): FoundLogin | null {
 	const read = (logins: UsageLogins) => {
 		if (agent === "claude") {
@@ -43,6 +47,7 @@ export function findCompletedLogin({
 		return entry && { ...entry, label: entry.home };
 	};
 	const before = read(baseline);
+	if (newProfile && before) return null;
 	const after = read(current);
 	if (!after?.fingerprint || after.credentialKind !== credentialKind)
 		return null;
