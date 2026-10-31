@@ -39,6 +39,20 @@ describe("AgentModelCatalogCache", () => {
 		expect(reads).toBe(2);
 	});
 
+	test("reads again at once when the CLI version changes", async () => {
+		const { cache } = setup();
+		let reads = 0;
+		const discover = async () => {
+			reads++;
+			return catalog;
+		};
+		await cache.load("codex", discover, "0.162.1");
+		await cache.load("codex", discover, "0.162.1");
+		expect(reads).toBe(1);
+		await cache.load("codex", discover, "0.163.0");
+		expect(reads).toBe(2);
+	});
+
 	test("keeps the last good catalog when a refresh fails", async () => {
 		const { cache, advance } = setup();
 		await cache.load("codex", async () => catalog);

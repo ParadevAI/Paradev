@@ -2,6 +2,7 @@ import type { AgentModelCatalog } from "@superset/shared/agent-models";
 
 interface Entry {
 	at: number;
+	version: string | null;
 	catalog: AgentModelCatalog | null;
 }
 
@@ -15,7 +16,8 @@ export interface AgentModelCatalogCacheOptions {
  * Live catalogs per agent config. Reads stay synchronous (`peek`) because
  * launch validation is; the async entry points `load` first. A failed read is
  * kept for a shorter time so a missing or logged-out CLI is not spawned on
- * every picker open.
+ * every picker open. A new CLI version makes the entry stale at once, so an
+ * upgrade's new models do not wait out the TTL.
  */
 export class AgentModelCatalogCache {
 	private readonly entries = new Map<string, Entry>();
@@ -36,9 +38,14 @@ export class AgentModelCatalogCache {
 	async load(
 		key: string,
 		discover: () => Promise<AgentModelCatalog>,
+		version: string | null = null,
 	): Promise<AgentModelCatalog | null> {
 		const entry = this.entries.get(key);
-		if (entry && this.now() - entry.at < this.ttlOf(entry)) {
+		if (
+			entry &&
+			entry.version === version &&
+			this.now() - entry.at < this.ttlOf(entry)
+		) {
 			return entry.catalog;
 		}
 		const pending = this.inflight.get(key);
@@ -53,7 +60,7 @@ export class AgentModelCatalogCache {
 				// A failed refresh keeps the last good catalog: the CLI being busy
 				// for a moment is no reason to fall back to the curated list.
 				const kept = catalog ?? entry?.catalog ?? null;
-				this.entries.set(key, { at: this.now(), catalog: kept });
+				this.entries.set(key, { at: this.now(), version, catalog: kept });
 				return kept;
 			})
 			.finally(() => this.inflight.delete(key));

@@ -4,10 +4,14 @@ import {
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
-import { agentCliCommand } from "../../../../../chat-v3/agentCli";
+import {
+	agentCliCommand,
+	probeAgentCliVersion,
+} from "../../../../../chat-v3/agentCli";
 import type { HostDb } from "../../../../../db";
 import {
 	agentLaunchEnv,
+	listHostAgentConfigs,
 	type ResolvedHostAgentConfig,
 	resolveHostAgentConfig,
 } from "../../../../../terminal-agents/agent-config";
@@ -63,14 +67,27 @@ export async function loadAgentModelCatalog(
 	const presetId = launchPresetIdOf(config);
 	const discover = DISCOVERERS[presetId];
 	if (!discover || !getAgentModelSupport(presetId)?.liveCatalog) return null;
-	return catalogs.load(cacheKey(config), () => {
-		const env = { ...process.env, ...agentLaunchEnv(db, config) };
-		const [executable = presetId] = config.command.trim().split(/\s+/);
-		const command = /[\\/]/.test(executable)
-			? executable
-			: agentCliCommand(executable, env);
-		return discover({ command, env });
-	});
+	const env = { ...process.env, ...agentLaunchEnv(db, config) };
+	const [executable = presetId] = config.command.trim().split(/\s+/);
+	const command = /[\\/]/.test(executable)
+		? executable
+		: agentCliCommand(executable, env);
+	const version = await probeAgentCliVersion(command, env);
+	return catalogs.load(
+		cacheKey(config),
+		() => discover({ command, env }),
+		version,
+	);
+}
+
+/**
+ * Read every live catalog on this host, one CLI at a time, so the first
+ * picker opened after boot already shows the live list.
+ */
+export async function warmAgentModelCatalogs(db: HostDb): Promise<void> {
+	for (const config of listHostAgentConfigs(db)) {
+		await loadAgentModelCatalog(db, config);
+	}
 }
 
 /**

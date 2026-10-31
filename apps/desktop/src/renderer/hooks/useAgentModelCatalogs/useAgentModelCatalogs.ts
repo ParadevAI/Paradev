@@ -61,7 +61,9 @@ export function useAgentModelCatalogs(
 			queryKey: [...AGENT_MODEL_CATALOG_QUERY_KEY, hostUrl, agent.id],
 			queryFn: () => (hostUrl ? fetchCatalog(hostUrl, agent.id) : null),
 			enabled: !!hostUrl,
-			staleTime: 5 * 60_000,
+			// The host caches the CLI read, so a refetch is cheap and an upgrade
+			// shows up on the next picker open.
+			staleTime: 30_000,
 			retry: false,
 		})),
 		combine,

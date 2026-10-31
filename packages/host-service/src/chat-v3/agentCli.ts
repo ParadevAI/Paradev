@@ -62,7 +62,7 @@ function parseVersion(output: string): string | null {
 	return output.match(/\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/)?.[0] ?? null;
 }
 
-async function probeVersion(
+export async function probeAgentCliVersion(
 	command: string,
 	env: NodeJS.ProcessEnv,
 ): Promise<string | null> {
@@ -120,7 +120,7 @@ export async function resolveAgentCli(options: {
 }): Promise<AgentCli> {
 	const env = await options.env();
 	const command = agentCliCommand(options.binary, env);
-	const found = await probeVersion(command, env);
+	const found = await probeAgentCliVersion(command, env);
 	if (!found || !meetsFloor(found, options.minVersion)) {
 		throw new Error(agentCliUnsupported({ ...options, found }));
 	}
