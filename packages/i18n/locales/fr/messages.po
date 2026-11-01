@@ -21753,6 +21753,9 @@ msgstr "Votre forfait n'inclut pas d'environnements cloud. Passez à un forfait 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Votre forfait passe à {planName} le {startDate}. Rien n'est facturé aujourd'hui."
 
+msgid "Your prompt"
+msgstr "Votre prompt"
+
 msgid "Your rank"
 msgstr "Votre rang"
 

@@ -21753,6 +21753,9 @@ msgstr "Gói của bạn không bao gồm môi trường đám mây. Nâng cấp
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Gói của bạn chuyển sang {planName} vào {startDate}. Hôm nay không bị tính phí."
 
+msgid "Your prompt"
+msgstr "Prompt của bạn"
+
 msgid "Your rank"
 msgstr "Thứ hạng của bạn"
 

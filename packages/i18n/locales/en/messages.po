@@ -21753,6 +21753,9 @@ msgstr "Your plan does not include cloud environments. Upgrade in Settings, Bill
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 
+msgid "Your prompt"
+msgstr "Your prompt"
+
 msgid "Your rank"
 msgstr "Your rank"
 

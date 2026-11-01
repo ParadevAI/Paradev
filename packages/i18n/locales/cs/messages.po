@@ -21753,6 +21753,9 @@ msgstr "Váš plán nezahrnuje cloudová prostředí. Pro vytvoření přejděte
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Váš plán se změní na {planName} dne {startDate}. Dnes se nic neúčtuje."
 
+msgid "Your prompt"
+msgstr "Váš prompt"
+
 msgid "Your rank"
 msgstr "Vaše pozice"
 
