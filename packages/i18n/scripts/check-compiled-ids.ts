@@ -26,7 +26,10 @@ function compilerApps(): string[] {
 	return readdirSync(appsDir).filter((app) => {
 		let config: string;
 		try {
-			config = readFileSync(join(appsDir, app, "next.config.ts"), "utf8");
+			config = readFileSync(
+				join(appsDir, app, "next.config.ts"),
+				"utf8",
+			).replace(/^\s*\/\/.*$/gm, "");
 		} catch {
 			return false;
 		}
@@ -111,7 +114,7 @@ function descriptors(code: string): Map<string, string> {
 async function checkApp(
 	app: string,
 	packages: Map<string, string>,
-): Promise<string[]> {
+): Promise<{ problems: string[]; files: number }> {
 	const appDir = join(REPO_ROOT, "apps", app);
 	const appRequire = createRequire(join(appDir, "package.json"));
 	const swc = appRequire("next/dist/build/swc/index.js") as SwcBindings;
@@ -152,17 +155,19 @@ async function checkApp(
 			problems.push(`${relative(REPO_ROOT, file)}\n    ${id}: ${message}`);
 		}
 	}
-	return problems;
+	return { problems, files: files.length };
 }
 
 const packages = workspacePackages();
-const problems = [
-	...new Set(
-		(
-			await Promise.all(compilerApps().map((app) => checkApp(app, packages)))
-		).flat(),
-	),
-];
+const apps = compilerApps();
+if (apps.length === 0) {
+	throw new Error(
+		"No app sets reactCompiler: true with @lingui/swc-plugin; update scripts/check-compiled-ids.ts.",
+	);
+}
+const results = await Promise.all(apps.map((app) => checkApp(app, packages)));
+const problems = [...new Set(results.flatMap((result) => result.problems))];
+const checkedFiles = results.reduce((sum, result) => sum + result.files, 0);
 if (problems.length > 0) {
 	console.error(
 		`React Compiler changes ${problems.length} Lingui message(s), so production renders the raw id:\n`,
@@ -173,4 +178,6 @@ if (problems.length > 0) {
 	);
 	process.exit(1);
 }
-console.log("React Compiler keeps every Lingui message id.");
+console.log(
+	`React Compiler keeps every Lingui message id (${checkedFiles} file builds in ${apps.join(", ")}).`,
+);
