@@ -8,7 +8,6 @@ interface SidebarSlideProps {
 	mode: SidebarSlideMode;
 	width: number;
 	onLayoutFrame?: () => void;
-	keepMounted?: boolean;
 	durationMs?: number;
 	children: (fill: boolean) => React.ReactNode;
 }
@@ -17,7 +16,6 @@ export function SidebarSlide({
 	mode,
 	width,
 	onLayoutFrame,
-	keepMounted = false,
 	durationMs = 300,
 	children,
 }: SidebarSlideProps) {
@@ -66,7 +64,6 @@ export function SidebarSlide({
 	}, [move]);
 
 	if (!hasOpened) return null;
-	if (!keepMounted && !move && settled === "closed") return null;
 
 	// Settled open lays the panel out in flow so a drag-resize sizes everything
 	// from the panel itself. The element tree stays the same in every mode, so

@@ -65,7 +65,6 @@ export function writeWorkspacePaneLayout(
 			tabOrder: getPrependTabOrder(topLevelItems),
 			sectionId: null,
 			changesFilter: { kind: "all" },
-			activeTab: "changes",
 			isHidden: false,
 		},
 		paneLayout,

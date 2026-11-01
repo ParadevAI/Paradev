@@ -957,12 +957,6 @@ msgstr "{entryPath} de cet espace de travail est déjà publié comme page dans 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# en échec} other {# en échec}}"
 
-msgid "{failing} of {total} check failing"
-msgstr "{failing} vérification sur {total} en échec"
-
-msgid "{failing} of {total} checks failing"
-msgstr "{failing} vérifications sur {total} en échec"
-
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# fichier modifié dans cet espace de travail} other {# fichiers modifiés dans cet espace de travail}}"
 
@@ -1162,12 +1156,6 @@ msgstr "{passing}/{total} vérifications"
 msgid "{passingChecks}/{0} checks passing"
 msgstr "{passingChecks}/{0} vérifications réussies"
 
-msgid "{pending} of {total} check running"
-msgstr "{pending} vérification sur {total} en cours"
-
-msgid "{pending} of {total} checks running"
-msgstr "{pending} vérifications sur {total} en cours"
-
 msgid "{percent} used"
 msgstr "{percent} utilisés"
 
@@ -1310,9 +1298,6 @@ msgstr "{threshold, plural, one {# PR d'agent fusionnée} other {# PR d'agent fu
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompu"
-
-msgid "{total, plural, one {The check passed} other {All # checks passed}}"
-msgstr "{total, plural, one {La vérification a réussi} other {Les # vérifications ont toutes réussi}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {issue GitHub} other {issues GitHub}}"
@@ -3966,9 +3951,6 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Modifications"
 
-msgid "Changes open target"
-msgstr "Cible d'ouverture des changements"
-
 msgid "Changes requested"
 msgstr "Modifications demandées"
 
@@ -4179,9 +4161,6 @@ msgstr "Choisir une application"
 
 msgid "Choose how files open when no preview pane exists"
 msgstr "Choisissez comment les fichiers s'ouvrent en l'absence de volet d'aperçu"
-
-msgid "Choose how the Changes view opens from the top bar"
-msgstr "Choisissez comment la vue des changements s'ouvre depuis la barre supérieure"
 
 msgid "Choose how to open file paths when Cmd+clicking in the terminal"
 msgstr "Choisissez comment ouvrir les chemins de fichiers lors d'un Cmd+clic dans le terminal"
@@ -4427,9 +4406,6 @@ msgstr "Fermer tous les ports de cet espace de travail"
 
 msgid "Close Browser"
 msgstr "Fermer le navigateur"
-
-msgid "Close changes"
-msgstr "Fermer les modifications"
 
 msgid "Close Chat"
 msgstr "Fermer le chat"
@@ -11354,9 +11330,6 @@ msgstr "Fusionnée, mais impossible d'actualiser l'état de la pull request — 
 msgid "Merging PR..."
 msgstr "Fusion de la pull request..."
 
-msgid "Merging pull request"
-msgstr "Fusion de la pull request"
-
 msgid "Merging…"
 msgstr "Fusion en cours…"
 
@@ -13178,9 +13151,6 @@ msgstr "Ouvrir le navigateur"
 msgid "Open browser again"
 msgstr "Rouvrir le navigateur"
 
-msgid "Open changes"
-msgstr "Ouvrir les modifications"
-
 msgid "Open Changes"
 msgstr "Ouvrir les modifications"
 
@@ -13445,9 +13415,6 @@ msgstr "Ouvrir la pull request"
 msgid "Open pull request #{0}"
 msgstr "Ouvrir la pull request #{0}"
 
-msgid "Open pull request options"
-msgstr "Ouvrir les options de la pull request"
-
 msgid "Open recent"
 msgstr "Ouvrir récent"
 
@@ -13465,9 +13432,6 @@ msgstr "Ouvrir les paramètres"
 
 msgid "Open sheet"
 msgstr "Ouvrir le panneau"
-
-msgid "Open ship options"
-msgstr "Ouvrir les options d'envoi"
 
 msgid "Open System Settings"
 msgstr "Ouvrir les Réglages Système"
@@ -13830,9 +13794,6 @@ msgstr "Mission d’essai rémunérée"
 
 msgid "Palette"
 msgstr "Palette"
-
-msgid "Pane in current tab"
-msgstr "Volet dans l'onglet actuel"
 
 msgid "Pane system"
 msgstr "Système de volets"
@@ -20445,9 +20406,6 @@ msgstr "Mis à jour {0}"
 msgid "Updated {date}"
 msgstr "Mis à jour le {date}"
 
-msgid "Updated {updatedRelative}"
-msgstr "Mis à jour {updatedRelative}"
-
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Mis à jour à l'instant depuis {0}."
@@ -21348,9 +21306,6 @@ msgstr "racine de l'espace de travail"
 
 msgid "Workspace Run"
 msgstr "Exécution de l'espace de travail"
-
-msgid "Workspace run options"
-msgstr "Options d'exécution de l'espace de travail"
 
 msgid "Workspace run: {workspaceRunState}"
 msgstr "Exécution de l'espace de travail : {workspaceRunState}"

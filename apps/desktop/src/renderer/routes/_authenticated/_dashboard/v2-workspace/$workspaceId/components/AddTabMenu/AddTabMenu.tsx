@@ -6,8 +6,7 @@ import {
 	DropdownMenuSeparator,
 } from "@superset/ui/dropdown-menu";
 import { BsTerminalPlus } from "react-icons/bs";
-import { LuGitCompareArrows, LuMessageSquare } from "react-icons/lu";
-import { TbDeviceDesktop, TbWorld } from "react-icons/tb";
+import { LuMessageSquare } from "react-icons/lu";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
 import type { RightPaneKind, RightPaneOption } from "../RightPaneNewTab";
 
@@ -15,9 +14,6 @@ interface AddTabMenuProps {
 	onAddTerminal: () => void;
 	runAfterClose: (action: () => void) => void;
 	onAddChat?: (() => void) | undefined;
-	onAddBrowser?: (() => void) | undefined;
-	onAddChanges?: (() => void) | undefined;
-	onAddDesktop?: (() => void) | undefined;
 	rightPaneOptions?: RightPaneOption[];
 	onOpenInRightPane?: (kind: RightPaneKind) => void;
 	showPresetsBar: boolean;
@@ -28,9 +24,6 @@ export function AddTabMenu({
 	onAddTerminal,
 	runAfterClose,
 	onAddChat,
-	onAddBrowser,
-	onAddChanges,
-	onAddDesktop,
 	rightPaneOptions = [],
 	onOpenInRightPane,
 	showPresetsBar,
@@ -56,33 +49,6 @@ export function AddTabMenu({
 						<Trans>Chat</Trans>
 					</span>
 					<HotkeyMenuShortcut hotkeyId="NEW_CHAT" />
-				</DropdownMenuItem>
-			)}
-			{onAddBrowser && (
-				<DropdownMenuItem className="gap-2" onClick={onAddBrowser}>
-					<TbWorld className="size-4" />
-					<span>
-						<Trans>Browser</Trans>
-					</span>
-					<HotkeyMenuShortcut hotkeyId="NEW_BROWSER" />
-				</DropdownMenuItem>
-			)}
-			{onAddChanges && (
-				<DropdownMenuItem className="gap-2" onClick={onAddChanges}>
-					<LuGitCompareArrows className="size-4" />
-					<span>
-						<Trans>Changes</Trans>
-					</span>
-					<HotkeyMenuShortcut hotkeyId="OPEN_DIFF_VIEWER" />
-				</DropdownMenuItem>
-			)}
-			{onAddDesktop && (
-				<DropdownMenuItem className="gap-2" onClick={onAddDesktop}>
-					<TbDeviceDesktop className="size-4" />
-					<span>
-						<Trans>Desktop</Trans>
-					</span>
-					<HotkeyMenuShortcut hotkeyId="SPLIT_WITH_DESKTOP" />
 				</DropdownMenuItem>
 			)}
 			{onOpenInRightPane && rightPaneOptions.length > 0 && (

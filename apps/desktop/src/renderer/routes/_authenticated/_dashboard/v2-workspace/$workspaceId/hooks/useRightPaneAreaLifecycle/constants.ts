@@ -5,11 +5,3 @@ export const CENTER_PANE_KINDS: ReadonlySet<string> = new Set([
 	"chat-v3",
 	PENDING_CLOUD_CHAT_PANE_KIND,
 ]);
-
-export const SIDEBAR_PANE_KINDS: ReadonlySet<string> = new Set([
-	"files",
-	"changes-list",
-	"diff",
-	"review",
-	"pages-list",
-]);

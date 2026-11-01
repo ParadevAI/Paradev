@@ -30,27 +30,14 @@ function toMenuPage(page: MenuPageSource, seenAt: number): MenuPage {
 
 export function selectMenuPages({
 	workspacePages,
-	orgPages,
-	favoritePageIds,
 	seenAt,
 }: {
 	workspacePages: readonly MenuPageSource[];
-	orgPages: readonly MenuPageSource[];
-	favoritePageIds: readonly string[];
 	seenAt: number;
-}): { workspace: MenuPage[]; pinned: MenuPage[]; hasNew: boolean } {
+}): { workspace: MenuPage[]; hasNew: boolean } {
 	const workspace = workspacePages
 		.map((page) => toMenuPage(page, seenAt))
 		.sort((a, b) => b.publishedAtMs - a.publishedAtMs);
 
-	const inWorkspace = new Set(workspace.map((page) => page.id));
-	const orgById = new Map(orgPages.map((page) => [page.id, page]));
-	const pinned: MenuPage[] = [];
-	for (const id of [...favoritePageIds].reverse()) {
-		const page = orgById.get(id);
-		if (!page || inWorkspace.has(id)) continue;
-		pinned.push({ ...toMenuPage(page, seenAt), isNew: false });
-	}
-
-	return { workspace, pinned, hasNew: workspace.some((page) => page.isNew) };
+	return { workspace, hasNew: workspace.some((page) => page.isNew) };
 }
