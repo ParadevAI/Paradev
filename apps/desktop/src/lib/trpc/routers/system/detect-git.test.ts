@@ -53,7 +53,8 @@ describe("detectGit on macOS", () => {
 		const { deps } = makeDeps("darwin", {
 			"/usr/bin/which git": "/usr/bin/git\n",
 			"/usr/bin/xcode-select -p": commandError("unable to get", 2),
-			"/usr/bin/pgrep -x Install Command Line Developer Tools": "812\n",
+			"/usr/bin/pgrep -f /System/Library/CoreServices/Install Command Line Developer Tools.app/":
+				"812\n",
 		});
 		const result = await detectGit(deps);
 		expect(result.needsCommandLineTools).toBe(true);
