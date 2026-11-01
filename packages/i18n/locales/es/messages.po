@@ -9469,8 +9469,8 @@ msgstr "Horas entre ejecuciones"
 msgid "Hover Card"
 msgstr "Tarjeta al pasar el cursor"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Cómo inicia sesión {label} cuando Paradev lo ejecuta por ti."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "Cómo se autentica {label} en los espacios de trabajo en la nube."
 
 msgid "How 2026 plays out"
 msgstr "Cómo se desarrolla 2026"
@@ -16186,8 +16186,8 @@ msgstr "Ejecuta \"gh auth login\" o define GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "Ejecutar {0} ahora"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Ejecuta <0>{tokenCommand}</0><1><2/></1> en un terminal y pega el token aquí."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Ejecuta <0>{tokenCommand}</0><1><2/></1> en un terminal y pega aquí el token que obtengas."
 
 msgid "Run 01"
 msgstr "Run 01"

@@ -9469,8 +9469,8 @@ msgstr "Jam di antara eksekusi"
 msgid "Hover Card"
 msgstr "Hover Card"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Cara {label} masuk saat Paradev menjalankannya untuk Anda."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "Cara {label} melakukan autentikasi di workspace cloud."
 
 msgid "How 2026 plays out"
 msgstr "Bagaimana 2026 berjalan"
@@ -16186,8 +16186,8 @@ msgstr "Jalankan \"gh auth login\" atau atur GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "Jalankan {0} sekarang"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Jalankan <0>{tokenCommand}</0><1><2/></1> di terminal lalu tempel tokennya di sini."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Jalankan <0>{tokenCommand}</0><1><2/></1> di terminal lalu tempel token yang Anda dapatkan di sini."
 
 msgid "Run 01"
 msgstr "Run 01"
