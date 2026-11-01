@@ -9,16 +9,8 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { CheckIcon, MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
-import type { BrowserExtension } from "main/lib/browser/extension-host/browser-extensions";
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { TbDots } from "react-icons/tb";
-import {
-	BrowserExtensionsSubmenu,
-	MENU_CLOSE_ANIMATION_MS,
-	PinnedExtensionRows,
-	RemoveExtensionDialog,
-	useBrowserExtensionsMenu,
-} from "renderer/components/BrowserExtensions";
 import { ImportHistoryDialog } from "renderer/components/ImportHistoryDialog";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
@@ -42,9 +34,18 @@ interface BrowserOverflowMenuProps {
 	onToggleDeviceToolbar: () => void;
 	onOpenFindBar: () => void;
 	onNavigateToUrl: (url: string) => void;
-	extensions: BrowserExtension[];
-	pinnedExtensionsRef: RefObject<HTMLElement | null>;
 }
+
+/**
+ * A Dialog opened synchronously from the same click that's dismissing
+ * something else (a DropdownMenuItem select, a toast action) gets caught by
+ * that other element's own close cycle and immediately dismisses itself (a
+ * well-known Radix issue): the closing element's exit animation (~150ms) is
+ * still running, and its eventual focus-restore reads as a focus/pointer-
+ * outside on the just-opened dialog. Waiting out the exit animation before
+ * opening the dialog avoids the race.
+ */
+const MENU_CLOSE_ANIMATION_MS = 200;
 
 function openAfterClose(setOpen: (open: boolean) => void) {
 	return () => {
@@ -61,8 +62,6 @@ export function BrowserOverflowMenu({
 	onToggleDeviceToolbar,
 	onOpenFindBar,
 	onNavigateToUrl,
-	extensions,
-	pinnedExtensionsRef,
 }: BrowserOverflowMenuProps) {
 	const { t } = useLingui();
 	const { copyToClipboard } = useCopyToClipboard();
@@ -73,8 +72,6 @@ export function BrowserOverflowMenu({
 	const [isScreenshotsOpen, setIsScreenshotsOpen] = useState(false);
 	const [isClearDataOpen, setIsClearDataOpen] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const triggerRef = useRef<HTMLButtonElement>(null);
-	const extensionsMenu = useBrowserExtensionsMenu(pinnedExtensionsRef);
 
 	// The webview swallows pointer events, so a click on the page would never
 	// reach the document listener Radix dismisses on; passing the click
@@ -161,16 +158,9 @@ export function BrowserOverflowMenu({
 
 	return (
 		<>
-			<DropdownMenu
-				open={isMenuOpen}
-				onOpenChange={(open) => {
-					setIsMenuOpen(open);
-					extensionsMenu.onMenuOpenChange(open);
-				}}
-			>
+			<DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
 				<DropdownMenuTrigger asChild>
 					<button
-						ref={triggerRef}
 						type="button"
 						className="rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
 					>
@@ -178,13 +168,6 @@ export function BrowserOverflowMenu({
 					</button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-64">
-					{extensionsMenu.pinnedInMenu && (
-						<PinnedExtensionRows
-							paneId={paneId}
-							extensions={extensions}
-							anchorRef={triggerRef}
-						/>
-					)}
 					<DropdownMenuItem onClick={onOpenFindBar} disabled={!hasPage}>
 						<Trans>Find in page</Trans>
 					</DropdownMenuItem>
@@ -288,16 +271,6 @@ export function BrowserOverflowMenu({
 						<Trans>Import cookies and passwords…</Trans>
 					</DropdownMenuItem>
 					<SignedInSitesSubmenu />
-					<BrowserExtensionsSubmenu
-						paneId={paneId}
-						extensions={extensions}
-						anchorRef={triggerRef}
-						onRemove={(extension) => {
-							setIsMenuOpen(false);
-							extensionsMenu.requestRemove(extension);
-						}}
-						onOpenUrl={onNavigateToUrl}
-					/>
 					<DropdownMenuItem onSelect={openAfterClose(setIsDownloadsOpen)}>
 						<Trans>Downloads</Trans>
 					</DropdownMenuItem>
@@ -333,11 +306,6 @@ export function BrowserOverflowMenu({
 			<ClearBrowsingDataDialog
 				open={isClearDataOpen}
 				onOpenChange={setIsClearDataOpen}
-			/>
-			<RemoveExtensionDialog
-				extension={extensionsMenu.removeTarget}
-				open={extensionsMenu.isRemoveOpen}
-				onOpenChange={extensionsMenu.setIsRemoveOpen}
 			/>
 		</>
 	);

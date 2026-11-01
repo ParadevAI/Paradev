@@ -1,9 +1,10 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { GlobeIcon } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { TbDeviceDesktop } from "react-icons/tb";
 import type { MosaicBranch } from "react-mosaic-component";
 import {
+	ExtensionsMenu,
 	PinnedExtensionButtons,
 	useBrowserExtensions,
 } from "renderer/components/BrowserExtensions";
@@ -49,7 +50,6 @@ export function BrowserPane({
 	const { mutate: openDevTools } =
 		electronTrpc.browser.openDevTools.useMutation();
 	const extensions = useBrowserExtensions(paneId);
-	const pinnedExtensionsRef = useRef<HTMLDivElement>(null);
 
 	const {
 		containerRef,
@@ -98,9 +98,14 @@ export function BrowserPane({
 							leadingActions={
 								<>
 									<PinnedExtensionButtons
-										ref={pinnedExtensionsRef}
 										paneId={paneId}
 										extensions={extensions}
+									/>
+									<ExtensionsMenu
+										paneId={paneId}
+										extensions={extensions}
+										onOpenUrl={navigateTo}
+										triggerClassName="rounded p-0.5 text-muted-foreground/60 transition-colors hover:text-muted-foreground"
 									/>
 									<Tooltip>
 										<TooltipTrigger asChild>
@@ -114,13 +119,7 @@ export function BrowserPane({
 										</TooltipTrigger>
 										<TooltipContent side="bottom">Open DevTools</TooltipContent>
 									</Tooltip>
-									<BrowserOverflowMenu
-										paneId={paneId}
-										hasPage={!isBlankPage}
-										extensions={extensions}
-										pinnedExtensionsRef={pinnedExtensionsRef}
-										onNavigate={navigateTo}
-									/>
+									<BrowserOverflowMenu paneId={paneId} hasPage={!isBlankPage} />
 								</>
 							}
 						/>
