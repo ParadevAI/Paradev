@@ -34,6 +34,7 @@ async function collections(views: WorkspaceView[] = []) {
 			list: async () => views,
 			onChange: () => () => {},
 			put: async () => {},
+			patch: async () => {},
 			remove: async () => {},
 		},
 		onTerminalKept: () => {},

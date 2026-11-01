@@ -7,7 +7,6 @@ import {
 	applyPaneLayoutOp,
 	describePaneLayout,
 	type PaneAreas,
-	PaneLayoutOpError,
 } from "shared/pane-layout";
 import {
 	emptyWorkspaceView,
@@ -62,6 +61,21 @@ export class WorkspaceViews extends EventEmitter {
 		this.emit("change", { type: "put", view } satisfies WorkspaceViewChange);
 	}
 
+	/** Replaces only the given areas, so writes to different areas never undo each other. */
+	patch(patch: {
+		workspaceId: string;
+		mainArea?: WorkspaceView["mainArea"];
+		rightPane?: WorkspaceView["rightPane"];
+	}): void {
+		const current =
+			this.get(patch.workspaceId) ?? emptyWorkspaceView(patch.workspaceId);
+		this.put({
+			...current,
+			...(patch.mainArea ? { mainArea: patch.mainArea } : {}),
+			...(patch.rightPane ? { rightPane: patch.rightPane } : {}),
+		});
+	}
+
 	remove(workspaceId: string): void {
 		this.storage.delete(workspaceId);
 		this.emit("change", {
@@ -71,14 +85,7 @@ export class WorkspaceViews extends EventEmitter {
 	}
 
 	apply(workspaceId: string, op: PaneLayoutOp): PaneLayoutOpResult {
-		const stored = this.get(workspaceId);
-		if (!stored && op.type !== "list") {
-			throw new PaneLayoutOpError(
-				"PRECONDITION_FAILED",
-				"This workspace has no pane layout in the desktop app yet. Open it there once, then retry.",
-			);
-		}
-		const current = stored ?? emptyWorkspaceView(workspaceId);
+		const current = this.get(workspaceId) ?? emptyWorkspaceView(workspaceId);
 		const previous: PaneAreas = {
 			main: getAreaLayout(current, "main"),
 			sidebar: getAreaLayout(current, "sidebar"),

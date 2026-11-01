@@ -77,11 +77,23 @@ describe("WorkspaceViews.apply", () => {
 		expect(changes).toEqual([]);
 	});
 
-	test("refuses to change a workspace the desktop has no view for", () => {
+	test("creates the view of a workspace it has not seen yet", () => {
 		const { service } = setup([]);
-		expect(() =>
-			service.apply("missing", { type: "sidebar", open: true }),
-		).toThrow("Open it there once");
+		service.apply("new", { type: "sidebar", open: true });
+		expect(service.get("new")?.rightPane.visibility).toBe("open");
+	});
+
+	test("a patch replaces only the areas it carries", () => {
+		const { service } = setup();
+		service.apply("ws", { type: "open", tool: "browser" });
+		const rightPane = service.get("ws")?.rightPane;
+
+		service.patch({
+			workspaceId: "ws",
+			mainArea: { tabs: [], activeTabId: null },
+		});
+
+		expect(service.get("ws")?.rightPane).toEqual(rightPane);
 	});
 
 	test("closing a terminal with keepTerminal reports the terminal so windows keep it backgrounded", () => {

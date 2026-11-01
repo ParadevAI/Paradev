@@ -62,14 +62,41 @@ export function updateWorkspaceView(
 	collections: ViewCollections,
 	workspaceId: string,
 	change: (view: WorkspaceView) => WorkspaceView,
+	{ create = true }: { create?: boolean } = {},
 ): void {
 	const views = collections.v2WorkspaceViews;
-	if (!views.isReady() && !views.has(workspaceId)) return;
-	const next = change(ensureWorkspaceView(collections, workspaceId));
-	collections.v2WorkspaceViews.update(workspaceId, (draft) => {
-		draft.mainArea = next.mainArea;
-		draft.rightPane = next.rightPane;
+	if (!views.has(workspaceId) && (!create || !views.isReady())) return;
+	const current = ensureWorkspaceView(collections, workspaceId);
+	const next = change(current);
+	if (
+		next.mainArea === current.mainArea &&
+		next.rightPane === current.rightPane
+	)
+		return;
+	views.update(workspaceId, (draft) => {
+		if (next.mainArea !== current.mainArea) draft.mainArea = next.mainArea;
+		if (next.rightPane !== current.rightPane) draft.rightPane = next.rightPane;
 	});
+}
+
+/** Deletes the workspace's view, waiting for the views to load from main if needed. */
+export function removeWorkspaceView(
+	collections: Pick<ViewCollections, "v2WorkspaceViews">,
+	workspaceId: string,
+	onRemoved?: (view: WorkspaceView) => void,
+): Promise<void> {
+	const views = collections.v2WorkspaceViews;
+	const remove = () => {
+		const view = views.get(workspaceId);
+		if (!view) return;
+		onRemoved?.(view);
+		views.delete(workspaceId);
+	};
+	if (views.isReady()) {
+		remove();
+		return Promise.resolve();
+	}
+	return views.stateWhenReady().then(remove);
 }
 
 /** Runs `change` now, or once the views have loaded from main. */

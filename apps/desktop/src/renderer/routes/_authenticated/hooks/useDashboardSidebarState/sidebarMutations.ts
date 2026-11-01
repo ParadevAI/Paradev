@@ -5,6 +5,7 @@ import {
 } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { getPrependTabOrder } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { removeWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 
 /**
  * Pure sidebar local-state mutations, kept free of React/Electron imports so
@@ -38,11 +39,9 @@ export function tombstoneSidebarWorkspaceRecord(
 	projectId: string | null,
 	cleanupPaneRuntimes: CleanupPaneRuntimes,
 ): void {
-	const view = collections.v2WorkspaceViews.get(workspaceId);
-	if (view) {
-		cleanupPaneRuntimes([toPaneLifecycleRow(view)]);
-		collections.v2WorkspaceViews.delete(workspaceId);
-	}
+	void removeWorkspaceView(collections, workspaceId, (view) =>
+		cleanupPaneRuntimes([toPaneLifecycleRow(view)]),
+	);
 	const existing = collections.v2WorkspaceLocalState.get(workspaceId);
 	if (!existing) {
 		collections.v2WorkspaceLocalState.insert({

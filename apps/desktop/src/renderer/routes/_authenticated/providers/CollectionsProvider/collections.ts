@@ -285,6 +285,7 @@ function getWorkspaceViewsCollection(): WorkspaceViewsCollection {
 				return () => subscription.unsubscribe();
 			},
 			put: (view) => electronTrpcClient.workspaceViews.put.mutate(view),
+			patch: (patch) => electronTrpcClient.workspaceViews.patch.mutate(patch),
 			remove: (workspaceId) =>
 				electronTrpcClient.workspaceViews.remove.mutate({ workspaceId }),
 		},

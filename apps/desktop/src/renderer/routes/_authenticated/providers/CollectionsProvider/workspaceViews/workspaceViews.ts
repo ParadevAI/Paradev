@@ -6,10 +6,17 @@ export type WorkspaceViewChange =
 	| { type: "remove"; workspaceId: string }
 	| { type: "terminal-kept"; workspaceId: string; terminalId: string };
 
+export interface WorkspaceViewPatch {
+	workspaceId: string;
+	mainArea?: WorkspaceView["mainArea"];
+	rightPane?: WorkspaceView["rightPane"];
+}
+
 export interface WorkspaceViewsClient {
 	list(): Promise<WorkspaceView[]>;
 	onChange(handler: (change: WorkspaceViewChange) => void): () => void;
 	put(view: WorkspaceView): Promise<unknown>;
+	patch(patch: WorkspaceViewPatch): Promise<unknown>;
 	remove(workspaceId: string): Promise<unknown>;
 }
 
@@ -26,9 +33,11 @@ interface SyncWriter {
 export function createWorkspaceViewsCollection({
 	client,
 	onTerminalKept,
+	retryDelayMs = 1000,
 }: {
 	client: WorkspaceViewsClient;
 	onTerminalKept: (change: { workspaceId: string; terminalId: string }) => void;
+	retryDelayMs?: number;
 }) {
 	let writer: SyncWriter | null = null;
 
@@ -68,25 +77,34 @@ export function createWorkspaceViewsCollection({
 						syncWriter.remove(change.workspaceId);
 					else onTerminalKept(change);
 				};
+				let stopped = false;
+				let retry: ReturnType<typeof setTimeout> | null = null;
 				const unsubscribe = client.onChange((change) => {
 					if (loaded) apply(change);
 					else pending.push(change);
 				});
-				client
-					.list()
-					.then((views) => {
-						for (const view of views) syncWriter.put(view);
-					})
-					.catch((error) => {
-						console.error("[workspaceViews] Initial load failed", error);
-					})
-					.finally(() => {
-						loaded = true;
-						for (const change of pending.splice(0)) apply(change);
-						markReady();
-					});
+				// Ready only after a successful load: an empty "ready" collection
+				// would make every caller create views over the ones main has.
+				const load = () => {
+					client
+						.list()
+						.then((views) => {
+							if (stopped) return;
+							for (const view of views) syncWriter.put(view);
+							loaded = true;
+							for (const change of pending.splice(0)) apply(change);
+							markReady();
+						})
+						.catch((error) => {
+							console.error("[workspaceViews] Load failed, retrying", error);
+							if (!stopped) retry = setTimeout(load, retryDelayMs);
+						});
+				};
+				load();
 
 				return () => {
+					stopped = true;
+					if (retry) clearTimeout(retry);
 					unsubscribe();
 					if (writer === syncWriter) writer = null;
 				};
@@ -100,7 +118,12 @@ export function createWorkspaceViewsCollection({
 		},
 		onUpdate: async ({ transaction }) => {
 			for (const mutation of transaction.mutations) {
-				await client.put(mutation.modified);
+				const changes = mutation.changes as Partial<WorkspaceView>;
+				await client.patch({
+					workspaceId: mutation.modified.workspaceId,
+					...(changes.mainArea ? { mainArea: changes.mainArea } : {}),
+					...(changes.rightPane ? { rightPane: changes.rightPane } : {}),
+				});
 				writer?.put(mutation.modified);
 			}
 		},

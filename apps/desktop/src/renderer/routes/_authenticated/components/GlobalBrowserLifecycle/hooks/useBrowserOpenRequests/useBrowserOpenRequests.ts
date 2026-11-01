@@ -41,11 +41,15 @@ export function useBrowserOpenRequests() {
 				request.url,
 				request.workspaceId,
 				(state) =>
-					updateWorkspaceView(collections, request.workspaceId, (view) =>
-						withPaneData(view, paneId, (data) => ({
-							...(data as BrowserPaneData),
-							...state,
-						})),
+					updateWorkspaceView(
+						collections,
+						request.workspaceId,
+						(view) =>
+							withPaneData(view, paneId, (data) => ({
+								...(data as BrowserPaneData),
+								...state,
+							})),
+						{ create: false },
 					),
 			);
 		};

@@ -26,6 +26,18 @@ export const createWorkspaceViewsRouter = () => {
 			return { success: true };
 		}),
 
+		patch: publicProcedure
+			.input(
+				workspaceViewSchema.pick({ workspaceId: true }).extend({
+					mainArea: workspaceViewSchema.shape.mainArea.optional(),
+					rightPane: workspaceViewSchema.shape.rightPane.optional(),
+				}),
+			)
+			.mutation(({ input }) => {
+				workspaceViews.patch(input);
+				return { success: true };
+			}),
+
 		remove: publicProcedure
 			.input(z.object({ workspaceId: z.string().min(1) }))
 			.mutation(({ input }) => {

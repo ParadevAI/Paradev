@@ -4,6 +4,7 @@ import { migrateLegacyWorkspaceViews } from "./workspaceViewAccess";
 import {
 	createWorkspaceViewsCollection,
 	type WorkspaceViewChange,
+	type WorkspaceViewPatch,
 	type WorkspaceViewsClient,
 } from "./workspaceViews";
 
@@ -11,6 +12,7 @@ function fakeMain(initial: WorkspaceView[]) {
 	let handler: ((change: WorkspaceViewChange) => void) | null = null;
 	let release: (views: WorkspaceView[]) => void = () => {};
 	const puts: WorkspaceView[] = [];
+	const patches: WorkspaceViewPatch[] = [];
 	const client: WorkspaceViewsClient = {
 		list: () =>
 			new Promise((resolve) => {
@@ -25,11 +27,15 @@ function fakeMain(initial: WorkspaceView[]) {
 		put: async (view) => {
 			puts.push(view);
 		},
+		patch: async (patch) => {
+			patches.push(patch);
+		},
 		remove: async () => {},
 	};
 	return {
 		client,
 		puts,
+		patches,
 		load: () => release(initial),
 		emit: (change: WorkspaceViewChange) => handler?.(change),
 	};
@@ -73,9 +79,37 @@ describe("workspace views collection", () => {
 
 		expect(collection.get("ws")?.rightPane.visibility).toBe("open");
 		await flush();
-		expect(main.puts.map((view) => view.rightPane.visibility)).toEqual([
-			"open",
+		expect(main.patches).toEqual([
+			{
+				workspaceId: "ws",
+				rightPane: expect.objectContaining({ visibility: "open" }),
+			},
 		]);
+		expect(collection.get("ws")?.rightPane.visibility).toBe("open");
+	});
+
+	test("a failed load is retried, and the views are not ready until one succeeds", async () => {
+		let attempts = 0;
+		const collection = createWorkspaceViewsCollection({
+			client: {
+				list: async () => {
+					attempts++;
+					if (attempts === 1) throw new Error("ipc down");
+					return [viewWith("ws", "open")];
+				},
+				onChange: () => () => {},
+				put: async () => {},
+				patch: async () => {},
+				remove: async () => {},
+			},
+			onTerminalKept: () => {},
+			retryDelayMs: 0,
+		});
+
+		await flush();
+		expect(collection.isReady()).toBe(false);
+		await collection.stateWhenReady();
+		expect(attempts).toBe(2);
 		expect(collection.get("ws")?.rightPane.visibility).toBe("open");
 	});
 

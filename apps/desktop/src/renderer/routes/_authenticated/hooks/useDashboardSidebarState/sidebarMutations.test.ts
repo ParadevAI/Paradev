@@ -15,6 +15,8 @@ function makeCollection<T>(getKey: (item: T) => string) {
 	const state = new Map<string, T>();
 	return {
 		state,
+		isReady: () => true,
+		has: (key: string) => state.has(key),
 		get: (key: string) => state.get(key),
 		insert: (item: T) => {
 			state.set(getKey(item), structuredClone(item));

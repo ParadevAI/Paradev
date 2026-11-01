@@ -1,6 +1,7 @@
 export {
 	ensureWorkspaceView,
 	migrateLegacyWorkspaceViews,
+	removeWorkspaceView,
 	updateWorkspaceView,
 	updateWorkspaceViewWhenReady,
 	viewFromLegacyRow,
@@ -8,6 +9,7 @@ export {
 export {
 	createWorkspaceViewsCollection,
 	type WorkspaceViewChange,
+	type WorkspaceViewPatch,
 	type WorkspaceViewsClient,
 	type WorkspaceViewsCollection,
 } from "./workspaceViews";

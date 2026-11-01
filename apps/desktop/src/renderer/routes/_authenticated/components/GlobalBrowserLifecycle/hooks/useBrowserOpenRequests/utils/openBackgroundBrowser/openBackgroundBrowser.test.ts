@@ -29,6 +29,7 @@ async function setup(view: WorkspaceView) {
 			list: async () => [view, emptyWorkspaceView("other")],
 			onChange: () => () => {},
 			put: async () => {},
+			patch: async () => {},
 			remove: async () => {},
 		},
 		onTerminalKept: () => {},

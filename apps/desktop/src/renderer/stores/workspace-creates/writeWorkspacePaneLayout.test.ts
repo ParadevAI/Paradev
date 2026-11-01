@@ -157,6 +157,7 @@ describe("writeWorkspacePaneLayout", () => {
 				list: async () => [],
 				onChange: () => () => {},
 				put: async () => {},
+				patch: async () => {},
 				remove: async () => {},
 			},
 			onTerminalKept: () => {},

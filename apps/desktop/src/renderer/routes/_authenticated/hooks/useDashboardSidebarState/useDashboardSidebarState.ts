@@ -24,6 +24,7 @@ import {
 	getPrependTabOrder,
 	isSidebarWorkspaceVisible,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { removeWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useTagFolderWorkspaces } from "renderer/routes/_authenticated/providers/TagFolderWorkspacesProvider";
@@ -48,7 +49,6 @@ import {
 	setSidebarProjectHidden,
 	tombstoneSidebarWorkspaceRecord,
 } from "./sidebarMutations";
-
 import { getNewGroupTabOrder } from "./utils/getNewGroupTabOrder";
 
 type ProjectTopLevelItem = {
@@ -1070,11 +1070,9 @@ export function useDashboardSidebarState() {
 
 	const removeWorkspaceFromSidebar = useCallback(
 		(workspaceId: string) => {
-			const view = collections.v2WorkspaceViews.get(workspaceId);
-			if (view) {
-				cleanupWorkspacePaneRuntimes([toPaneLifecycleRow(view)]);
-				collections.v2WorkspaceViews.delete(workspaceId);
-			}
+			void removeWorkspaceView(collections, workspaceId, (view) =>
+				cleanupWorkspacePaneRuntimes([toPaneLifecycleRow(view)]),
+			);
 			if (collections.v2WorkspaceLocalState.get(workspaceId)) {
 				collections.v2WorkspaceLocalState.delete(workspaceId);
 			}
