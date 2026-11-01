@@ -13,8 +13,9 @@ import { fileURLToPath } from "node:url";
 import type { ToolbarIconName } from "../lib/navigation/toolbarIcon.types";
 
 // `fill1` for an "on" state, as the iOS side uses a `.fill` symbol there.
-const MATERIAL_SYMBOL: Partial<Record<ToolbarIconName, string>> = {
+const MATERIAL_SYMBOL: Record<ToolbarIconName, string> = {
 	add: "add",
+	close: "close",
 	comments: "forum",
 	commentMode: "center_focus_weak",
 	commentModeOn: "center_focus_strong/fill1",

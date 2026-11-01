@@ -6,9 +6,9 @@ import type {
 
 // Material Symbols from scripts/generate-toolbar-icons.ts: a toolbar item here
 // takes an image source, and an item without one draws nothing.
-const DRAWABLE: Record<ToolbarIconName, ToolbarIconSource | undefined> = {
+const DRAWABLE: Record<ToolbarIconName, ToolbarIconSource> = {
 	add: require("./toolbar-icons/add.xml"),
-	close: undefined,
+	close: require("./toolbar-icons/close.xml"),
 	comments: require("./toolbar-icons/comments.xml"),
 	commentMode: require("./toolbar-icons/commentMode.xml"),
 	commentModeOn: require("./toolbar-icons/commentModeOn.xml"),
