@@ -160,11 +160,11 @@ stub(autumnClient.balances, {
 	},
 });
 
-function autumnError(status: number) {
+function autumnError(status: number, body = "") {
 	return new AutumnError(`status ${status}`, {
-		response: new Response("", { status }),
+		response: new Response(body, { status }),
 		request: new Request("https://api.useautumn.com/v1"),
-		body: "",
+		body,
 	});
 }
 
@@ -374,6 +374,20 @@ describe("settleBoot", () => {
 				finalizedThrough: expect.any(Date),
 			}),
 		);
+	});
+
+	test("a retried renewal whose lock Autumn already took keeps that lock", async () => {
+		renewalError = autumnError(
+			409,
+			'{"message":"A lock with this ID already exists","code":"lock_already_exists"}',
+		);
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(writes.at(-1)).toMatchObject({ lockSeq: 1, lockOpen: true });
+	});
+
+	test("a renewal refused for another conflict keeps the boot unsettled", async () => {
+		renewalError = autumnError(409, '{"code":"customer_already_exists"}');
+		await expect(settleBoot("boot_1")).rejects.toThrow("status 409");
 	});
 
 	test("a boot another run is settling is left alone", async () => {

@@ -125,6 +125,14 @@ async function checkOrFailOpen<T>(
 	}
 }
 
+function isLockAlreadyTaken(error: unknown): boolean {
+	return (
+		error instanceof AutumnError &&
+		error.statusCode === 409 &&
+		error.body.includes('"code":"lock_already_exists"')
+	);
+}
+
 function isUniqueViolation(error: unknown): boolean {
 	const { code, cause } = error as { code?: string; cause?: { code?: string } };
 	return code === "23505" || cause?.code === "23505";
@@ -435,17 +443,23 @@ export async function settleBoot(
 		}
 
 		const nextSeq = boot.lockSeq + 1;
-		const renewal = await autumnClient.check({
-			customerId: boot.organizationId,
-			featureId: BOX_GB_MINUTES_FEATURE_ID,
-			requiredBalance: reservation(session.memoryMb),
-			properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
-			lock: {
-				enabled: true,
-				lockId: lockIdFor(bootId, nextSeq),
-				expiresAt: Date.now() + LOCK_TTL_MS,
-			},
-		});
+		const renewal = await autumnClient
+			.check({
+				customerId: boot.organizationId,
+				featureId: BOX_GB_MINUTES_FEATURE_ID,
+				requiredBalance: reservation(session.memoryMb),
+				properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
+				lock: {
+					enabled: true,
+					lockId: lockIdFor(bootId, nextSeq),
+					expiresAt: Date.now() + LOCK_TTL_MS,
+				},
+			})
+			.catch((error) => {
+				// A refused check reserves nothing, so an existing lock was granted.
+				if (isLockAlreadyTaken(error)) return { allowed: true };
+				throw error;
+			});
 		await db
 			.update(cloudWorkspaceBoots)
 			.set({
