@@ -2112,7 +2112,7 @@ msgstr "僅在帶提示詞啟動時新增，例如<0>--</0>、<1>--prompt</1>、
 msgid "Added to agent input"
 msgstr "已加入代理程式輸入框"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "將成員加入 {organizationName} 需要付費方案。你組織的方案由其擁有者在 {0} 管理。"
 
@@ -11082,7 +11082,7 @@ msgstr "管理用於MCP伺服器存取以及Claude Desktop、Claude Code等外�
 msgid "Manage members"
 msgstr "管理成員"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "在{0}管理"
 
@@ -20418,7 +20418,7 @@ msgstr "升級"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "升級一個相依性，並修好被它弄壞的地方…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "在 {0} 升級"
 
@@ -21520,7 +21520,7 @@ msgstr "在與我們交流之前，你就能看到我們是如何工作的。"
 msgid "You can view this page but not comment on it"
 msgstr "你可以檢視此頁面，但不能評論"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "無法在應用程式內變更此訂閱。你所在組織的方案由擁有者在{0}管理。"
 

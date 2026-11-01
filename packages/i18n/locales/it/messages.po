@@ -2112,7 +2112,7 @@ msgstr "Aggiunti solo quando si avvia con un prompt — es. <0>--</0>, <1>--prom
 msgid "Added to agent input"
 msgstr "Aggiunto all'input dell'agente"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento. Il piano della tua organizzazione è gestito dal suo proprietario su {0}."
 
@@ -11082,7 +11082,7 @@ msgstr "Gestisci le chiavi per l'accesso ai server MCP e per le integrazioni est
 msgid "Manage members"
 msgstr "Gestisci i membri"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Gestisci su {0}"
 
@@ -20418,7 +20418,7 @@ msgstr "Passa a Pro"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aggiorna una dipendenza e correggi ciò che si rompe…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Esegui l'upgrade su {0}"
 
@@ -21520,7 +21520,7 @@ msgstr "Puoi vedere come lavoriamo prima di parlare con noi."
 msgid "You can view this page but not comment on it"
 msgstr "Puoi visualizzare questa pagina ma non commentarla"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Non puoi modificare questo abbonamento nell'app. Il piano della tua organizzazione è gestito dal proprietario su {0}."
 

@@ -2112,7 +2112,7 @@ msgstr "Chỉ thêm vào khi khởi chạy kèm prompt — ví dụ <0>--</0>, <
 msgid "Added to agent input"
 msgstr "Đã thêm vào ô nhập của agent"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Để thêm người vào {organizationName}, bạn cần gói trả phí. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
 
@@ -11082,7 +11082,7 @@ msgstr "Quản lý khóa để truy cập server MCP và các tích hợp bên n
 msgid "Manage members"
 msgstr "Quản lý thành viên"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Quản lý tại {0}"
 
@@ -20418,7 +20418,7 @@ msgstr "Nâng cấp"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Nâng cấp trên {0}"
 
@@ -21520,7 +21520,7 @@ msgstr "Bạn có thể xem cách chúng tôi làm việc trước khi trò chuy
 msgid "You can view this page but not comment on it"
 msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Bạn không thể thay đổi gói đăng ký này trong ứng dụng. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
 

@@ -2112,7 +2112,7 @@ msgstr "Alleen toegevoegd bij starten met een prompt — bijv. <0>--</0>, <1>--p
 msgid "Added to agent input"
 msgstr "Toegevoegd aan de invoer van de agent"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Voor het toevoegen van mensen aan {organizationName} is een betaald abonnement nodig. Het abonnement van je organisatie wordt beheerd door de eigenaar op {0}."
 
@@ -11082,7 +11082,7 @@ msgstr "Beheer sleutels voor toegang tot MCP-servers en externe integraties zoal
 msgid "Manage members"
 msgstr "Leden beheren"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Beheren op {0}"
 
@@ -20418,7 +20418,7 @@ msgstr "Upgraden"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Werk een dependency bij en fix wat er stukgaat…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Upgraden op {0}"
 
@@ -21520,7 +21520,7 @@ msgstr "Je kunt zien hoe we werken voordat je met ons praat."
 msgid "You can view this page but not comment on it"
 msgstr "Je kunt deze pagina bekijken, maar er niet op reageren"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Je kunt dit abonnement niet in de app wijzigen. Het plan van je organisatie wordt beheerd door de eigenaar op {0}."
 

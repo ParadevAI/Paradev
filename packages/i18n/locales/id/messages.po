@@ -2112,7 +2112,7 @@ msgstr "Ditambahkan hanya saat menjalankan dengan prompt — mis. <0>--</0>, <1>
 msgid "Added to agent input"
 msgstr "Ditambahkan ke input agen"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
 
@@ -11082,7 +11082,7 @@ msgstr "Kelola kunci untuk akses server MCP dan integrasi eksternal seperti Clau
 msgid "Manage members"
 msgstr "Kelola anggota"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Kelola di {0}"
 
@@ -20418,7 +20418,7 @@ msgstr "Upgrade"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Upgrade di {0}"
 
@@ -21520,7 +21520,7 @@ msgstr "Anda bisa melihat cara kami bekerja sebelum berbicara dengan kami."
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Anda tidak bisa mengubah langganan ini di aplikasi. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
 

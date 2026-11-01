@@ -2112,7 +2112,7 @@ msgstr "Добавляются только при запуске с промп�
 msgid "Added to agent input"
 msgstr "Добавлено в поле ввода агента"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Чтобы добавлять людей в {organizationName}, нужен платный тариф. Тарифом вашей организации управляет её владелец на {0}."
 
@@ -11082,7 +11082,7 @@ msgstr "Управляйте ключами для доступа к серве�
 msgid "Manage members"
 msgstr "Управление участниками"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Управлять на {0}"
 
@@ -20418,7 +20418,7 @@ msgstr "Перейти"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Обнови зависимость и почини то, что сломается…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Перейти на Pro на {0}"
 
@@ -21520,7 +21520,7 @@ msgstr "Вы можете увидеть, как мы работаем, ещё �
 msgid "You can view this page but not comment on it"
 msgstr "Вы можете просматривать эту страницу, но не комментировать её"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Изменить эту подписку в приложении нельзя. Тарифом вашей организации управляет её владелец на {0}."
 

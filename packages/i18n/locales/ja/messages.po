@@ -2112,7 +2112,7 @@ msgstr "プロンプト付きで起動するときのみ追加されます — �
 msgid "Added to agent input"
 msgstr "エージェントの入力欄に追加しました"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName} にメンバーを追加するには有料プランが必要です。組織のプランはオーナーが {0} で管理しています。"
 
@@ -11082,7 +11082,7 @@ msgstr "MCPサーバーアクセスやClaude Desktop・Claude Codeなどの外�
 msgid "Manage members"
 msgstr "メンバーを管理"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "{0}で管理"
 
@@ -20418,7 +20418,7 @@ msgstr "アップグレード"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "依存関係を更新して壊れた箇所を直す…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "{0} でアップグレード"
 
@@ -21520,7 +21520,7 @@ msgstr "話をする前に、私たちの働き方を見ることができます
 msgid "You can view this page but not comment on it"
 msgstr "このページは閲覧できますが、コメントはできません"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "このサブスクリプションはアプリでは変更できません。組織のプランは{0}でオーナーが管理しています。"
 

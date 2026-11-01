@@ -18,3 +18,8 @@ export function billingSettingsUrl(organizationId?: string | null): string {
 	if (organizationId) url.searchParams.set("organization", organizationId);
 	return url.toString();
 }
+
+/** The host the links above open, for labels that name where a button goes. */
+export function webHost(): string {
+	return new URL(env.EXPO_PUBLIC_WEB_URL).host;
+}

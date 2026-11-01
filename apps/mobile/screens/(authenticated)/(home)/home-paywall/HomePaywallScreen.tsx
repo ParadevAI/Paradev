@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -11,7 +10,7 @@ import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
 import { openUrl } from "@/lib/open-url";
-import { billingSettingsUrl } from "@/lib/web-links";
+import { billingSettingsUrl, webHost } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { OrganizationHeaderButton } from "../home/components/OrganizationHeaderButton";
 
@@ -82,7 +81,7 @@ export function HomePaywallScreen() {
 					onPress={() => openUrl(billingSettingsUrl(activeOrganizationId))}
 				>
 					<Text>
-						<Trans>Upgrade on {COMPANY.DOMAIN}</Trans>
+						<Trans>Upgrade on {webHost()}</Trans>
 					</Text>
 				</Button>
 			</View>

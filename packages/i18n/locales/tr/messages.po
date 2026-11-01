@@ -2112,7 +2112,7 @@ msgstr "Yalnızca istemle başlatılırken eklenir — örn. <0>--</0>, <1>--pro
 msgid "Added to agent input"
 msgstr "Ajan girişine eklendi"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName} kuruluşuna kişi eklemek için ücretli bir plan gerekir. Kuruluşunuzun planını sahibi {0} adresinde yönetir."
 
@@ -11082,7 +11082,7 @@ msgstr "MCP sunucusu erişimi ve Claude Desktop veya Claude Code gibi harici ent
 msgid "Manage members"
 msgstr "Üyeleri yönet"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "{0} adresinde yönet"
 
@@ -20418,7 +20418,7 @@ msgstr "Yükselt"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Bir bağımlılığı yükselt ve bozulanları düzelt…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "{0} üzerinden yükselt"
 
@@ -21520,7 +21520,7 @@ msgstr "Bizimle konuşmadan önce nasıl çalıştığımızı görebilirsiniz."
 msgid "You can view this page but not comment on it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Bu aboneliği uygulamada değiştiremezsiniz. Kuruluşunuzun planı, {0} adresinde sahibi tarafından yönetiliyor."
 

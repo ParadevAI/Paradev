@@ -2112,7 +2112,7 @@ msgstr "프롬프트와 함께 실행할 때만 추가됩니다 — 예: <0>--</
 msgid "Added to agent input"
 msgstr "에이전트 입력란에 추가됨"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName}에 사람을 추가하려면 유료 플랜이 필요합니다. 조직의 플랜은 소유자가 {0}에서 관리합니다."
 
@@ -11082,7 +11082,7 @@ msgstr "MCP 서버 접근과 Claude Desktop, Claude Code 같은 외부 연동에
 msgid "Manage members"
 msgstr "멤버 관리"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "{0}에서 관리"
 
@@ -20418,7 +20418,7 @@ msgstr "업그레이드"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "의존성을 업그레이드하고 깨진 부분 고치기…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "{0}에서 업그레이드"
 
@@ -21520,7 +21520,7 @@ msgstr "대화하기 전에 우리가 일하는 방식을 직접 볼 수 있습�
 msgid "You can view this page but not comment on it"
 msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "이 구독은 앱에서 변경할 수 없습니다. 조직의 플랜은 소유자가 {0}에서 관리합니다."
 

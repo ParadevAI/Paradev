@@ -5,7 +5,6 @@ import {
 	type OrganizationRole,
 } from "@superset/shared/auth";
 import { isPaidPlanTier } from "@superset/shared/billing";
-import { COMPANY } from "@superset/shared/constants";
 import {
 	type InviteNewMode,
 	type ShareAddRequest,
@@ -19,7 +18,7 @@ import { Alert } from "react-native";
 import { authClient, useSession } from "@/lib/auth/client";
 import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl } from "@/lib/web-links";
+import { billingSettingsUrl, webHost } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { useOrgMembers } from "@/screens/(authenticated)/hooks/useOrgMembers";
 
@@ -74,13 +73,13 @@ export function useShareDirectory() {
 		Alert.alert(
 			t({ message: "Invite people on a paid plan" }),
 			t({
-				message: `Adding people to ${organizationName} needs a paid plan. Your organization's plan is managed by its owner at ${COMPANY.DOMAIN}.`,
+				message: `Adding people to ${organizationName} needs a paid plan. Your organization's plan is managed by its owner at ${webHost()}.`,
 			}),
 			[
 				{ style: "cancel", text: t({ message: "Dismiss" }) },
 				{
 					onPress: () => openUrl(billingSettingsUrl(organizationId)),
-					text: t({ message: `Manage on ${COMPANY.DOMAIN}` }),
+					text: t({ message: `Manage on ${webHost()}` }),
 				},
 			],
 		);
