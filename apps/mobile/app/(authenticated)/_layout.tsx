@@ -6,6 +6,7 @@ import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
 import {
 	glassHeaderOptions,
+	ParentScreens,
 	screenLayout,
 	sheetDetents,
 	sheetHeaderOptions,
@@ -14,6 +15,14 @@ import {
 import { VoiceLayer } from "@/screens/(authenticated)/voice/VoiceLayer";
 
 export const unstable_settings = { anchor: "(home)" };
+
+const PARENT_SCREENS = [
+	"workspace/[id]/index",
+	"workspace/[id]/pull-request/[pullRequestId]/index",
+	"pages/index",
+	"pages/[slug]/index",
+	"settings/index",
+];
 
 const pageScreenOptions = {
 	headerShown: true,
@@ -46,7 +55,19 @@ export default function AuthenticatedLayout() {
 
 	return (
 		<View className="flex-1">
-			<Stack screenOptions={{ headerShown: false }} screenLayout={screenLayout}>
+			<Stack
+				screenOptions={{ headerShown: false }}
+				screenLayout={screenLayout}
+				layout={({ state, navigation, children }) => (
+					<ParentScreens
+						state={state}
+						navigation={navigation}
+						parents={PARENT_SCREENS}
+					>
+						{children}
+					</ParentScreens>
+				)}
+			>
 				{/* Root headers are hidden — `title` here only names routes in
 			    back-button long-press menus (otherwise raw route names leak,
 			    e.g. "(home)"). */}
