@@ -45,6 +45,7 @@ export function DiffPaneScope({
 					currentBranchName={status.currentBranch.name}
 					canRenameBranch={scope.canRenameBranch}
 					onRenameBranch={scope.renameBranch}
+					baseClassName="hidden @min-[420px]/pane-header:flex"
 				/>
 			)}
 			{filter && (
@@ -65,7 +66,7 @@ export function DiffPaneScope({
 					</button>
 				</span>
 			)}
-			<span className="ml-1 shrink-0 whitespace-nowrap text-[11px] tabular-nums">
+			<span className="ml-1 hidden shrink-0 whitespace-nowrap text-[11px] tabular-nums @min-[360px]/pane-header:inline">
 				<DiffStatText additions={additions} deletions={deletions} />
 			</span>
 		</div>
