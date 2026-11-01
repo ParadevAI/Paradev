@@ -14,6 +14,7 @@ import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboar
 import {
 	extractPaneIds,
 	type PaneLifecycleRow,
+	toPaneLifecycleRow,
 } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -253,7 +254,6 @@ function ensureSidebarWorkspaceRecord(
 			isHidden: false,
 		},
 		paneLayout: createEmptyPaneLayout(),
-		rightSidebarOpen: false,
 	});
 }
 
@@ -1070,10 +1070,14 @@ export function useDashboardSidebarState() {
 
 	const removeWorkspaceFromSidebar = useCallback(
 		(workspaceId: string) => {
-			const workspace = collections.v2WorkspaceLocalState.get(workspaceId);
-			if (!workspace) return;
-			cleanupWorkspacePaneRuntimes([workspace]);
-			collections.v2WorkspaceLocalState.delete(workspaceId);
+			const view = collections.v2WorkspaceViews.get(workspaceId);
+			if (view) {
+				cleanupWorkspacePaneRuntimes([toPaneLifecycleRow(view)]);
+				collections.v2WorkspaceViews.delete(workspaceId);
+			}
+			if (collections.v2WorkspaceLocalState.get(workspaceId)) {
+				collections.v2WorkspaceLocalState.delete(workspaceId);
+			}
 		},
 		[collections],
 	);

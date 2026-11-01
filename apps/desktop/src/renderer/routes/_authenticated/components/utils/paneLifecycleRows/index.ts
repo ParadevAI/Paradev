@@ -5,4 +5,5 @@ export {
 	getRemovedPaneLocations,
 	type PaneLifecycleRow,
 	type RemovedPaneLocation,
+	toPaneLifecycleRow,
 } from "./paneLifecycleRows";

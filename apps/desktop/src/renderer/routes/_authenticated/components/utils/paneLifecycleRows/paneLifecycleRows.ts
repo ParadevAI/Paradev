@@ -1,9 +1,18 @@
 import type { Pane, WorkspaceState } from "@superset/panes";
+import { getAreaLayout, type WorkspaceView } from "shared/workspace-views";
 
 export interface PaneLifecycleRow {
 	workspaceId: unknown;
 	paneLayout: unknown;
 	rightPaneLayout?: unknown;
+}
+
+export function toPaneLifecycleRow(view: WorkspaceView): PaneLifecycleRow {
+	return {
+		workspaceId: view.workspaceId,
+		paneLayout: getAreaLayout(view, "main"),
+		rightPaneLayout: getAreaLayout(view, "sidebar"),
+	};
 }
 
 export interface RemovedPaneLocation {

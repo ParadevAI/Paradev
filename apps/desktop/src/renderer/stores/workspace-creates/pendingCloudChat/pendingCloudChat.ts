@@ -12,6 +12,8 @@ import {
 	type PendingCloudChatPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { updateWorkspaceViewWhenReady } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
+import { getAreaLayout, withAreaLayout } from "shared/workspace-views";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
 export function pendingCloudChatPane(
@@ -43,9 +45,7 @@ export function seedPendingCloudChat({
 	modeId?: string | null;
 }): void {
 	if (launch?.surface !== "chat" || !launch.promptHash) return;
-	const existing = collections.v2WorkspaceLocalState.get(workspaceId)
-		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
-	if (existing?.tabs.length) return;
+	const { promptHash, agent } = launch;
 	writeWorkspacePaneLayout(
 		collections,
 		{ id: workspaceId, projectId: null },
@@ -53,30 +53,31 @@ export function seedPendingCloudChat({
 		[],
 	);
 	const label =
-		HOST_AGENT_PRESETS.find((preset) => preset.presetId === launch.agent)
-			?.label ?? launch.agent;
-	const store = createWorkspaceStore<PaneViewerData>({
-		initialState: existing,
-	});
-	store.getState().addTab({
-		panes: [
-			{
-				kind: PENDING_CLOUD_CHAT_PANE_KIND,
-				titleOverride: label,
-				data: {
-					draftId: crypto.randomUUID(),
-					agentId: launch.agent,
-					promptHash: launch.promptHash,
-					...(prompt ? { launchPrompt: prompt } : {}),
-					...(modelId ? { chatModelId: modelId } : {}),
-					...(modeId ? { chatModeId: modeId } : {}),
-				} satisfies PendingCloudChatPaneData,
-			},
-		],
-	});
-	const { version, tabs, activeTabId } = store.getState();
-	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-		draft.paneLayout = { version, tabs, activeTabId };
+		HOST_AGENT_PRESETS.find((preset) => preset.presetId === agent)?.label ??
+		agent;
+	void updateWorkspaceViewWhenReady(collections, workspaceId, (view) => {
+		if (view.mainArea.tabs.length > 0) return view;
+		const store = createWorkspaceStore<PaneViewerData>({
+			initialState: getAreaLayout(view, "main"),
+		});
+		store.getState().addTab({
+			panes: [
+				{
+					kind: PENDING_CLOUD_CHAT_PANE_KIND,
+					titleOverride: label,
+					data: {
+						draftId: crypto.randomUUID(),
+						agentId: agent,
+						promptHash,
+						...(prompt ? { launchPrompt: prompt } : {}),
+						...(modelId ? { chatModelId: modelId } : {}),
+						...(modeId ? { chatModeId: modeId } : {}),
+					} satisfies PendingCloudChatPaneData,
+				},
+			],
+		});
+		const { version, tabs, activeTabId } = store.getState();
+		return withAreaLayout(view, "main", { version, tabs, activeTabId });
 	});
 }
 

@@ -8,5 +8,8 @@ export {
 	type RightPaneVisibility,
 	type WorkspaceView,
 	withAreaLayout,
+	withPaneData,
+	withRightPaneFullScreenToggled,
+	withRightPaneVisibility,
 	workspaceViewSchema,
 } from "./workspaceView";

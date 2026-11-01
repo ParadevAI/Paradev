@@ -85,3 +85,74 @@ export function withAreaLayout(
 export function isRightPaneOpen(view: WorkspaceView): boolean {
 	return view.rightPane.visibility !== "closed";
 }
+
+/**
+ * Opens or closes the right pane. `fullScreen` undefined keeps the current
+ * full screen state; leaving full screen goes back to where it began.
+ */
+export function withRightPaneVisibility(
+	view: WorkspaceView,
+	request: { open: boolean; fullScreen?: boolean },
+): WorkspaceView {
+	const { rightPane } = view;
+	const isFullScreen = rightPane.visibility === "fullScreen";
+	let next: RightPaneState;
+	if (!request.open) {
+		next = { ...rightPane, visibility: "closed", fullScreenExitsTo: undefined };
+	} else if (request.fullScreen ?? isFullScreen) {
+		next = {
+			...rightPane,
+			visibility: "fullScreen",
+			fullScreenExitsTo: isFullScreen
+				? rightPane.fullScreenExitsTo
+				: rightPane.visibility === "closed"
+					? "closed"
+					: "open",
+		};
+	} else {
+		next = { ...rightPane, visibility: "open", fullScreenExitsTo: undefined };
+	}
+	return { ...view, rightPane: next };
+}
+
+export function withRightPaneFullScreenToggled(
+	view: WorkspaceView,
+): WorkspaceView {
+	if (view.rightPane.visibility !== "fullScreen") {
+		return withRightPaneVisibility(view, { open: true, fullScreen: true });
+	}
+	return withRightPaneVisibility(view, {
+		open: view.rightPane.fullScreenExitsTo !== "closed",
+		fullScreen: false,
+	});
+}
+
+/** Replaces one pane's data, in whichever area holds it. */
+export function withPaneData(
+	view: WorkspaceView,
+	paneId: string,
+	change: (data: PaneViewerData) => PaneViewerData,
+): WorkspaceView {
+	const patch = <T extends PaneAreaState>(area: T): T => {
+		if (!area.tabs.some((tab) => tab.panes[paneId])) return area;
+		return {
+			...area,
+			tabs: area.tabs.map((tab) => {
+				const pane = tab.panes[paneId];
+				if (!pane) return tab;
+				return {
+					...tab,
+					panes: {
+						...tab.panes,
+						[paneId]: { ...pane, data: change(pane.data) },
+					},
+				};
+			}),
+		};
+	};
+	return {
+		...view,
+		mainArea: patch(view.mainArea),
+		rightPane: patch(view.rightPane),
+	};
+}

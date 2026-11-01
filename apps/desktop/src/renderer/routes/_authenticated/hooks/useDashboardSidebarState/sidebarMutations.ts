@@ -1,5 +1,8 @@
 import type { WorkspaceState } from "@superset/panes";
-import type { PaneLifecycleRow } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
+import {
+	type PaneLifecycleRow,
+	toPaneLifecycleRow,
+} from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { getPrependTabOrder } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 
@@ -27,11 +30,19 @@ type CleanupPaneRuntimes = (rows: PaneLifecycleRow[]) => void;
  * would let it reappear.
  */
 export function tombstoneSidebarWorkspaceRecord(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<
+		AppCollections,
+		"v2WorkspaceLocalState" | "v2WorkspaceViews"
+	>,
 	workspaceId: string,
 	projectId: string | null,
 	cleanupPaneRuntimes: CleanupPaneRuntimes,
 ): void {
+	const view = collections.v2WorkspaceViews.get(workspaceId);
+	if (view) {
+		cleanupPaneRuntimes([toPaneLifecycleRow(view)]);
+		collections.v2WorkspaceViews.delete(workspaceId);
+	}
 	const existing = collections.v2WorkspaceLocalState.get(workspaceId);
 	if (!existing) {
 		collections.v2WorkspaceLocalState.insert({
@@ -48,7 +59,6 @@ export function tombstoneSidebarWorkspaceRecord(
 		return;
 	}
 
-	cleanupPaneRuntimes([existing]);
 	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
 		draft.sidebarState.projectId = projectId;
 		draft.sidebarState.sectionId = null;

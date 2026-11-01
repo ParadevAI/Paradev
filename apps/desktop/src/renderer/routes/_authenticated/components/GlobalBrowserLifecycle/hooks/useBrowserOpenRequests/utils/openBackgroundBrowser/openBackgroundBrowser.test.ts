@@ -1,73 +1,101 @@
 import { describe, expect, test } from "bun:test";
-import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
+import type { Tab } from "@superset/panes";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { createWorkspaceViewsCollection } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
+import { emptyWorkspaceView, type WorkspaceView } from "shared/workspace-views";
 import { openBackgroundBrowser } from "./openBackgroundBrowser";
 
-function fixture() {
-	const store = createWorkspaceStore<PaneViewerData>();
-	store.getState().addTab({
-		panes: [{ kind: "terminal", data: { terminalId: "working-terminal" } }],
-	});
-	const state = store.getState();
-	const initial: WorkspaceState<PaneViewerData> = {
-		version: 1,
-		tabs: state.tabs,
-		activeTabId: state.activeTabId,
-	};
-	const rows = new Map([
-		["agent", { paneLayout: structuredClone(initial) }],
-		["user", { paneLayout: structuredClone(initial) }],
-	]);
-	const collections = {
-		v2WorkspaceLocalState: {
-			get: (id: string) => rows.get(id),
-			update: (
-				id: string,
-				update: (row: { paneLayout: WorkspaceState<PaneViewerData> }) => void,
-			) => {
-				const row = rows.get(id);
-				if (row) update(row);
+function browserTab(id: string, pinned = false): Tab<PaneViewerData> {
+	return {
+		id: `tab-${id}`,
+		createdAt: 0,
+		activePaneId: id,
+		layout: { type: "pane", paneId: id },
+		panes: {
+			[id]: {
+				id,
+				kind: "browser",
+				pinned,
+				data: { url: "https://old.example" },
 			},
 		},
-	} as unknown as Pick<AppCollections, "v2WorkspaceLocalState">;
-	return { collections, rows, initial };
+	} as Tab<PaneViewerData>;
+}
+
+async function setup(view: WorkspaceView) {
+	const views = createWorkspaceViewsCollection({
+		client: {
+			list: async () => [view, emptyWorkspaceView("other")],
+			onChange: () => () => {},
+			put: async () => {},
+			remove: async () => {},
+		},
+		onTerminalKept: () => {},
+	});
+	await views.stateWhenReady();
+	const collections = {
+		v2WorkspaceViews: views,
+		v2WorkspaceLocalState: { get: () => undefined },
+	} as unknown as Pick<
+		AppCollections,
+		"v2WorkspaceViews" | "v2WorkspaceLocalState"
+	>;
+	let paneSeq = 0;
+	const open = (target: "current-tab" | "new-tab") =>
+		openBackgroundBrowser({
+			collections,
+			workspaceId: view.workspaceId,
+			url: "https://example.com",
+			target,
+			createPaneId: () => `browser-${++paneSeq}`,
+		});
+	return { views, open };
 }
 
 describe("openBackgroundBrowser", () => {
-	for (const target of ["current-tab", "new-tab"] as const) {
-		test(`${target} adds an addressable browser without changing existing selections or another workspace`, () => {
-			const { collections, rows, initial } = fixture();
-			const paneId = openBackgroundBrowser({
-				collections,
-				workspaceId: "agent",
-				url: "https://example.com",
-				target,
-			});
-			const layout = rows.get("agent")?.paneLayout;
-			expect(rows.get("user")?.paneLayout).toEqual(initial);
-			if (!layout) throw new Error("Missing layout");
-			expect(layout.activeTabId).toBe(initial.activeTabId);
-			expect(layout.tabs[0].activePaneId).toBe(initial.tabs[0].activePaneId);
-			const pane = layout.tabs
-				.flatMap((tab) => Object.values(tab.panes))
-				.find((pane) => pane.id === paneId);
-			expect(pane?.kind).toBe("browser");
-			expect(pane?.data).toEqual({ url: "https://example.com" });
-			expect(layout.tabs.length).toBe(target === "new-tab" ? 2 : 1);
+	test("opens the browser as the active right pane tab and opens the right pane", async () => {
+		const { views, open } = await setup(emptyWorkspaceView("ws"));
+
+		const paneId = open("new-tab");
+
+		const view = views.get("ws");
+		expect(view?.rightPane.visibility).toBe("open");
+		const active = view?.rightPane.tabs.find(
+			(tab) => tab.id === view.rightPane.activeTabId,
+		);
+		expect(active?.activePaneId).toBe(paneId);
+		expect(active?.panes[paneId]).toMatchObject({
+			kind: "browser",
+			data: { url: "https://example.com" },
 		});
-	}
-	test("successive opens return distinct panes and retain both new tabs", () => {
-		const { collections, rows } = fixture();
-		const request = {
-			collections,
-			workspaceId: "agent",
-			url: "https://example.com",
-			target: "new-tab" as const,
+		expect(view?.mainArea.tabs).toEqual([]);
+		expect(views.get("other")?.rightPane.visibility).toBe("closed");
+	});
+
+	test("current-tab replaces the unpinned right pane browser, never a pinned one", async () => {
+		const start = emptyWorkspaceView("ws");
+		start.rightPane = {
+			tabs: [browserTab("pinned", true), browserTab("loose")],
+			activeTabId: "tab-loose",
+			visibility: "closed",
 		};
-		const first = openBackgroundBrowser(request);
-		const second = openBackgroundBrowser(request);
+		const { views, open } = await setup(start);
+
+		const paneId = open("current-tab");
+
+		expect(
+			views.get("ws")?.rightPane.tabs.map((tab) => Object.keys(tab.panes)),
+		).toEqual([["pinned"], [paneId]]);
+	});
+
+	test("successive opens return distinct panes and keep both tabs", async () => {
+		const { views, open } = await setup(emptyWorkspaceView("ws"));
+
+		const first = open("new-tab");
+		const second = open("new-tab");
+
 		expect(first).not.toBe(second);
-		expect(rows.get("agent")?.paneLayout.tabs).toHaveLength(3);
+		expect(views.get("ws")?.rightPane.tabs).toHaveLength(2);
 	});
 });

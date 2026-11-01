@@ -5,7 +5,9 @@ import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard
 import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import type { BrowserPaneData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { updateWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
+import { withPaneData } from "shared/workspace-views";
 import { openBackgroundBrowser } from "./utils/openBackgroundBrowser";
 
 interface BrowserOpenRequest {
@@ -23,54 +25,41 @@ export function useBrowserOpenRequests() {
 	const collections = useCollections();
 
 	useEffect(() => {
+		const openInBackground = async (request: BrowserOpenRequest) => {
+			if (!collections.v2WorkspaceLocalState.get(request.workspaceId)) {
+				writeWorkspacePaneLayout(
+					collections,
+					{ id: request.workspaceId, projectId: request.projectId },
+					[],
+					[],
+				);
+			}
+			await collections.v2WorkspaceViews.stateWhenReady();
+			const paneId = openBackgroundBrowser({ collections, ...request });
+			browserRuntimeRegistry.openBackground(
+				paneId,
+				request.url,
+				request.workspaceId,
+				(state) =>
+					updateWorkspaceView(collections, request.workspaceId, (view) =>
+						withPaneData(view, paneId, (data) => ({
+							...(data as BrowserPaneData),
+							...state,
+						})),
+					),
+			);
+		};
 		const subscription = electronTrpcClient.browser.onOpenRequest.subscribe(
 			undefined,
 			{
 				onData: (request: BrowserOpenRequest) => {
 					if (!request.show) {
-						try {
-							if (!collections.v2WorkspaceLocalState.get(request.workspaceId)) {
-								writeWorkspacePaneLayout(
-									collections,
-									{
-										id: request.workspaceId,
-										projectId: request.projectId,
-									},
-									[],
-									[],
-								);
-							}
-							const paneId = openBackgroundBrowser({ collections, ...request });
-							browserRuntimeRegistry.openBackground(
-								paneId,
-								request.url,
-								request.workspaceId,
-								(state) => {
-									if (
-										!collections.v2WorkspaceLocalState.get(request.workspaceId)
-									)
-										return;
-									collections.v2WorkspaceLocalState.update(
-										request.workspaceId,
-										(draft) => {
-											for (const tab of draft.paneLayout.tabs) {
-												const pane = tab.panes[paneId];
-												if (pane?.kind === "browser")
-													pane.data = {
-														...(pane.data as BrowserPaneData),
-														...state,
-													};
-											}
-										},
-									);
-								},
-							);
-						} catch (err) {
+						openInBackground(request).catch((err) => {
 							console.error(
 								"[useBrowserOpenRequests] background open failed:",
 								err,
 							);
-						}
+						});
 						return;
 					}
 					navigateToV2Workspace(request.workspaceId, navigate, {

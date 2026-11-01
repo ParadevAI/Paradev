@@ -1,9 +1,8 @@
 import type { WorkspaceStore } from "@superset/panes";
 import type { ChangesOpenTarget } from "renderer/stores/settings";
-import type { StoreApi } from "zustand/vanilla";
-import type { DiffPaneData, PaneViewerData } from "../../types";
-
 import { NEW_DIFF_PANE } from "shared/pane-layout/paneKinds";
+import type { StoreApi } from "zustand/vanilla";
+import type { PaneViewerData } from "../../types";
 
 export { NEW_DIFF_PANE };
 

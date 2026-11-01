@@ -13,9 +13,9 @@ import {
 	emptyWorkspaceView,
 	getAreaLayout,
 	isRightPaneOpen,
-	type RightPaneState,
 	type WorkspaceView,
 	withAreaLayout,
+	withRightPaneVisibility,
 } from "shared/workspace-views";
 
 export interface WorkspaceViewStorage {
@@ -41,31 +41,6 @@ function keptTerminalId(areas: PaneAreas, op: PaneLayoutOp): string | null {
 		}
 	}
 	return null;
-}
-
-function withVisibility(
-	view: WorkspaceView,
-	request: { open: boolean; fullScreen?: boolean },
-): WorkspaceView {
-	const { rightPane } = view;
-	let next: RightPaneState;
-	if (!request.open) {
-		next = { ...rightPane, visibility: "closed", fullScreenExitsTo: undefined };
-	} else if (request.fullScreen) {
-		next = {
-			...rightPane,
-			visibility: "fullScreen",
-			fullScreenExitsTo:
-				rightPane.visibility === "fullScreen"
-					? rightPane.fullScreenExitsTo
-					: rightPane.visibility === "closed"
-						? "closed"
-						: "open",
-		};
-	} else {
-		next = { ...rightPane, visibility: "open", fullScreenExitsTo: undefined };
-	}
-	return { ...view, rightPane: next };
 }
 
 /** The desktop's workspace views; every write goes through here and is broadcast. */
@@ -117,9 +92,12 @@ export class WorkspaceViews extends EventEmitter {
 			}
 		}
 		if (op.type === "sidebar") {
-			next = withVisibility(next, op);
+			next = withRightPaneVisibility(next, {
+				open: op.open,
+				fullScreen: op.fullScreen ?? false,
+			});
 		} else if (outcome.showSidebar && !isRightPaneOpen(next)) {
-			next = withVisibility(next, { open: true });
+			next = withRightPaneVisibility(next, { open: true });
 		}
 		if (next !== current) this.put(next);
 

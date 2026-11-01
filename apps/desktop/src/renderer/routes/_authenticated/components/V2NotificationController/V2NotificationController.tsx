@@ -15,6 +15,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import type { AgentLifecycleEvent } from "shared/notification-types";
+import { getAreaLayout, isRightPaneOpen } from "shared/workspace-views";
 import {
 	HostNotificationSubscriber,
 	type HostNotificationWorkspaceState,
@@ -86,17 +87,19 @@ export function V2NotificationController() {
 			})),
 		[hostWorkspaces, projects],
 	);
-	const { data: allLocalWorkspaceRows = [] } = useLiveQuery(
-		(q) =>
-			q
-				.from({ v2WorkspaceLocalState: collections.v2WorkspaceLocalState })
-				.select(({ v2WorkspaceLocalState }) => ({
-					workspaceId: v2WorkspaceLocalState.workspaceId,
-					paneLayout: v2WorkspaceLocalState.paneLayout,
-					rightPaneLayout: v2WorkspaceLocalState.rightPaneLayout,
-					rightSidebarOpen: v2WorkspaceLocalState.rightSidebarOpen,
-				})),
+	const { data: views = [] } = useLiveQuery(
+		(q) => q.from({ view: collections.v2WorkspaceViews }),
 		[collections],
+	);
+	const allLocalWorkspaceRows = useMemo(
+		() =>
+			views.map((view) => ({
+				workspaceId: view.workspaceId,
+				paneLayout: getAreaLayout(view, "main"),
+				rightPaneLayout: getAreaLayout(view, "sidebar"),
+				rightSidebarOpen: isRightPaneOpen(view),
+			})),
+		[views],
 	);
 	const workspaceHosts = useMemo(
 		() =>

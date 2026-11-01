@@ -8,7 +8,6 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useRingtoneStore } from "renderer/stores/ringtone";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
-import { applyRememberedV2PaneSelection } from "renderer/stores/v2-pane-selection";
 import { getV2NativeNotificationContent } from "./notificationContent";
 import {
 	isV2NotificationTargetVisible,
@@ -24,7 +23,6 @@ interface LocalPaneLayouts {
 }
 
 function getLocalPaneLayouts({
-	workspaceId,
 	paneLayout,
 	rightPaneLayout,
 }: {
@@ -32,17 +30,7 @@ function getLocalPaneLayouts({
 	paneLayout: PaneLayout;
 	rightPaneLayout?: PaneLayout;
 }): LocalPaneLayouts {
-	return {
-		paneLayout: paneLayout
-			? applyRememberedV2PaneSelection(workspaceId, paneLayout)
-			: paneLayout,
-		rightPaneLayout: rightPaneLayout
-			? applyRememberedV2PaneSelection(
-					`${workspaceId}:rightPaneLayout`,
-					rightPaneLayout,
-				)
-			: rightPaneLayout,
-	};
+	return { paneLayout, rightPaneLayout };
 }
 
 /**

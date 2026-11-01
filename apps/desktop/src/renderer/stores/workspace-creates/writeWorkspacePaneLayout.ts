@@ -1,5 +1,3 @@
-import type { WorkspaceState } from "@superset/panes";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import type {
 	AppCollections,
 	WorkspaceCreateMutationMetadata,
@@ -8,6 +6,8 @@ import {
 	getPrependTabOrder,
 	isSidebarWorkspaceVisible,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { updateWorkspaceViewWhenReady } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
+import { getAreaLayout, withAreaLayout } from "shared/workspace-views";
 import { appendLaunchesToPaneLayout } from "./appendLaunchesToPaneLayout";
 
 type HostWorkspacesCreateResult = NonNullable<
@@ -15,8 +15,8 @@ type HostWorkspacesCreateResult = NonNullable<
 >;
 
 /**
- * Insert or update the `v2WorkspaceLocalState` row for a workspace and fold any
- * launched terminals/agents into its pane layout. Called once up-front (with no
+ * Insert the workspace's sidebar row if it has none, and fold any launched
+ * terminals/agents into its view's main area. Called once up-front (with no
  * launches) so the workspace shows in the sidebar while it syncs, then again
  * with the host-service result once the create resolves.
  */
@@ -26,22 +26,22 @@ export function writeWorkspacePaneLayout(
 	workspace: { id: string; projectId: string | null },
 	terminals: HostWorkspacesCreateResult["terminals"],
 	agents: HostWorkspacesCreateResult["agents"],
-): void {
-	const existing = collections.v2WorkspaceLocalState.get(workspace.id);
-	const paneLayout = appendLaunchesToPaneLayout({
-		existing: existing?.paneLayout as
-			| WorkspaceState<PaneViewerData>
-			| undefined,
-		terminals,
-		agents,
-	});
-
-	if (existing) {
-		collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
-			draft.paneLayout = paneLayout;
-		});
-		return;
-	}
+): Promise<void> {
+	const launched =
+		terminals.length > 0 || agents.length > 0
+			? updateWorkspaceViewWhenReady(collections, workspace.id, (view) =>
+					withAreaLayout(
+						view,
+						"main",
+						appendLaunchesToPaneLayout({
+							existing: getAreaLayout(view, "main"),
+							terminals,
+							agents,
+						}),
+					),
+				)
+			: Promise.resolve();
+	if (collections.v2WorkspaceLocalState.get(workspace.id)) return launched;
 
 	const projectId = workspace.projectId;
 	const topLevelItems = [
@@ -68,9 +68,9 @@ export function writeWorkspacePaneLayout(
 			activeTab: "changes",
 			isHidden: false,
 		},
-		paneLayout,
-		rightSidebarOpen: false,
+		paneLayout: { version: 1, tabs: [], activeTabId: null },
 		viewedFiles: [],
 		recentlyViewedFiles: [],
 	});
+	return launched;
 }
