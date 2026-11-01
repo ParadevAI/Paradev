@@ -11,6 +11,7 @@ interface Step {
 }
 
 export function InstallSteps() {
+	"use no memo";
 	const steps: Step[] = [
 		{
 			id: "open-download",

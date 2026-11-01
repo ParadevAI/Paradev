@@ -19,7 +19,9 @@ export function HeroStats() {
 	const { t } = useLingui();
 	const f3 = tallyGates("F3");
 	const f4 = tallyGates("F4");
-	const currentLevel = FACTORY_LEVELS.find((level) => level.id === "F3");
+	const currentLevel = FACTORY_LEVELS.find(
+		(candidate) => candidate.id === "F3",
+	);
 
 	return (
 		<div className="mt-8 grid grid-cols-1 sm:grid-cols-3 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border">

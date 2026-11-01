@@ -108,9 +108,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 	const total = profile.total;
 	const tokens = formatTokens(profile.allTime.tokens, locale);
 	const days = profile.dayRange ? dayCount(profile.dayRange) : 0;
-	const shareText = t({
-		message: `I'm #${rank} on the ${company} leaderboard with ${tokens} tokens of agent usage.`,
-	});
+	const shareText = t`I'm #${rank} on the ${company} leaderboard with ${tokens} tokens of agent usage.`;
 
 	const tier = profile.factory?.tier ?? 0;
 
@@ -173,20 +171,14 @@ export default async function UserProfilePage({ params }: PageProps) {
 									message: "Rank",
 								}),
 								value: `#${rank}`,
-								hint: t({
-									message: `of ${total}`,
-								}),
+								hint: t`of ${total}`,
 							},
 							{
 								label: t({
 									message: "Tracking",
 								}),
 
-								value: profile.dayRange
-									? t({
-											message: `${days}d`,
-										})
-									: "—",
+								value: profile.dayRange ? t`${days}d` : "—",
 								hint: profile.dayRange
 									? formatDayRange(profile.dayRange, locale)
 									: undefined,

@@ -10,6 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
 
 export default function SignUpPage() {
+	"use no memo";
 	const { t } = useLingui();
 	const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(false);
