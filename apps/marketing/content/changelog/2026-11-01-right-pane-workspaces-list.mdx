@@ -1,12 +1,12 @@
 ---
-title: The Right Pane for Everyone and a New Workspaces List
+title: An Improved Right Pane and a New Workspaces List
 date: 2026-11-01
 image: /changelog/2026-11-01-right-pane-hero.png
 version: 2.0.3
 highlights:
   - icon: layout
-    title: The right pane for everyone
-    description: Keep Changes, Files, Pages, a browser or a terminal open beside your agent, each in its own tab
+    title: An improved right pane
+    description: A New Tab screen with every tool, and files that open as preview tabs you can keep
   - icon: list-checks
     title: A new Workspaces list
     description: Saved views, filter chips and a Display menu to sort and group every workspace
@@ -15,13 +15,16 @@ highlights:
     description: Put automations in groups, drag them between groups, and pause or delete several at once
 ---
 
-## The Right Pane for Everyone <PRBadge url="https://github.com/superset-sh/superset/pull/9008" />
+## An Improved Right Pane <PRBadge url="https://github.com/superset-sh/superset/pull/8965" />
 
-The right pane is now on for everyone. Keep Changes, Files, Pages, a browser or a terminal open beside your agent, each in its own tab.
+The right pane keeps Changes, Files, Pages, a browser or a terminal open beside your agent, and it got easier to use.
 
-- **+** opens a New Tab screen with every tool and its hotkey, this workspace's newest pages, and its pull requests <PRBadge url="https://github.com/superset-sh/superset/pull/8965" />
-- Files open as tabs with preview and pinned states, as in an editor <PRBadge url="https://github.com/superset-sh/superset/pull/8964" />
+<Video src="/changelog/2026-11-01-right-pane.mp4" title="Opening Changes and a file in the right pane, then keeping the file's preview tab" />
+
+- **+** opens a New Tab screen with every tool and its hotkey, this workspace's newest pages, and its pull requests
+- Files open in a preview tab with an italic title. Click the tab to keep it <PRBadge url="https://github.com/superset-sh/superset/pull/8964" />
 - The main **+** menu has an **Open in right pane** section <PRBadge url="https://github.com/superset-sh/superset/pull/9019" />
+- It's on for everyone, and its switch is gone from **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/9008" />
 - Agents can open and arrange it too, with `superset panes` <PRBadge url="https://github.com/superset-sh/superset/pull/9204" />
 
 ```bash
@@ -45,11 +48,11 @@ Open **Workspaces** in the sidebar.
 
 Automations can now live in groups. Right-click an automation and choose **Move to group**, or type a new name to create one.
 
+<Video src="/changelog/2026-11-01-automation-groups.mp4" title="Selecting three automations, moving them into a new Weekly group, then dragging one more in" />
+
 - Drag a row, or a whole selection, onto another group
 - ⌘-click to select several, then move, pause, resume or delete them at once
 - From the CLI: `superset automations update <id> --group "Daily check-ins"` <PRBadge url="https://github.com/superset-sh/superset/pull/9209" />
-
-{/* TODO: add a screenshot of the grouped Automations table with demo automation names */}
 
 Open **Automations** in the sidebar. Docs: [Automations](https://docs.superset.sh/docs/automations).
 
@@ -63,7 +66,6 @@ Open **Automations** in the sidebar. Docs: [Automations](https://docs.superset.s
 - **Click a terminal link** - a plain click on a URL opens a menu to open it in the app, in your browser, or copy it <PRBadge url="https://github.com/superset-sh/superset/pull/9092" />
 - **Copy a workspace link** - right-click a workspace in the sidebar and choose **Copy link** to paste it into Linear or Slack <PRBadge url="https://github.com/superset-sh/superset/pull/9112" />
 - **Antigravity status and models** - Antigravity sessions now show their status dot and get a model and effort picker <PRBadge url="https://github.com/superset-sh/superset/pull/9070" />
-- **Up-to-date Codex models** - the Codex model list follows Codex's own catalog <PRBadge url="https://github.com/superset-sh/superset/pull/9160" />
 - **A faster app** - agent events and workspace switches no longer redraw the whole window, and hidden panes stop working on every git change <PRBadge url="https://github.com/superset-sh/superset/pull/9202" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9149" />
 - **Lighter onboarding** - fewer screens, and no setup step when the GitHub CLI is already signed in <PRBadge url="https://github.com/superset-sh/superset/pull/9074" />
 - Experimental: turn on chat in **Settings → Experimental → Chat**, now saved to your account on every device. Chat shows how full the context window is, offers Undo per turn, draws Mermaid diagrams, and waits to resume when you hit a usage limit <PRBadge url="https://github.com/superset-sh/superset/pull/9162" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8929" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8941" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9083" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9109" />
@@ -81,7 +83,4 @@ Open **Automations** in the sidebar. Docs: [Automations](https://docs.superset.s
 - The Google Calendar plugin no longer loops on Connect <PRBadge url="https://github.com/superset-sh/superset/pull/8705" />
 - A check run that failed to start now counts as failed, contributed by [@akshatcoder-hash](https://github.com/akshatcoder-hash) <PRBadge url="https://github.com/superset-sh/superset/pull/8963" />
 - Codex workspace seats that share an email are kept in usage, contributed by [@tsavo-at-pieces](https://github.com/tsavo-at-pieces) <PRBadge url="https://github.com/superset-sh/superset/pull/9059" />
-- The organization plan badge shows Team and Ultra <PRBadge url="https://github.com/superset-sh/superset/pull/9012" />
-- Clicking an edited file with no diff opens the file <PRBadge url="https://github.com/superset-sh/superset/pull/9122" />
-- Picking a project by hand unblocks the new-workspace screen <PRBadge url="https://github.com/superset-sh/superset/pull/9129" />
 - Some screens no longer show raw message ids in place of text <PRBadge url="https://github.com/superset-sh/superset/pull/9222" />
