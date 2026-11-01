@@ -74,6 +74,14 @@ test("`browser` is the patched `chrome` in extension contexts only, even from a 
 	);
 	expect(extensionPage.browser).toBe(extensionPage.chrome);
 	expect(runInMainWorld(shim, "https://example.com/").browser).toBeUndefined();
+
+	// 1Password's app assigns its own polyfill in strict mode.
+	const polyfill = {};
+	runInNewContext(
+		'"use strict"; globalThis.browser = polyfill;',
+		Object.assign(extensionPage, { polyfill }),
+	);
+	expect(extensionPage.browser).toBe(polyfill);
 });
 
 test("an extension service worker gets chrome.offscreen and Chrome's user agent; websites do not", async () => {

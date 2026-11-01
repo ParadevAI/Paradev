@@ -41,9 +41,16 @@ contextBridge.executeInMainWorld({
 		const global = globalThis as { chrome?: Record<string, unknown> };
 		// Chromium gives extension contexts their own `browser`, and
 		// electron-chrome-extensions patches only `chrome`. The webextension
-		// polyfill (1Password) calls `browser`.
+		// polyfill (1Password) calls `browser`, and may assign its own.
 		Object.defineProperty(globalThis, "browser", {
 			get: () => global.chrome,
+			set: (value: unknown) => {
+				Object.defineProperty(globalThis, "browser", {
+					value,
+					writable: true,
+					configurable: true,
+				});
+			},
 			configurable: true,
 		});
 		const chrome = global.chrome;
