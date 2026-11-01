@@ -11,16 +11,17 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, Server } from "node:http";
 import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
-import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
+import {
+	type PaneLayoutErrorCode,
+	paneLayoutRequestSchema,
+} from "@superset/shared/pane-layout-ops";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
+import { PaneLayoutOpError } from "shared/pane-layout";
 import { type WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
 import { showCliNotification } from "../notifications/show-cli-notification";
-import {
-	PaneLayoutRequestError,
-	paneLayoutRequests,
-} from "../pane-layout/pane-layout-requests";
+import { workspaceViews } from "../workspace-views";
 import { setBrowserBridgeInfo } from "./browser-bridge-info";
 import {
 	type BrowserOpenRequest,
@@ -38,6 +39,11 @@ import {
 } from "./chrome-history-import";
 
 const OPEN_PANE_TIMEOUT_MS = 15_000;
+const PANE_LAYOUT_STATUS: Record<PaneLayoutErrorCode, number> = {
+	NOT_FOUND: 404,
+	BAD_REQUEST: 400,
+	PRECONDITION_FAILED: 412,
+};
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
 
@@ -302,14 +308,15 @@ export async function startBrowserBridge(): Promise<void> {
 			res.status(400).json({ error: z.prettifyError(parsed.error) });
 			return;
 		}
-		paneLayoutRequests
-			.request(parsed.data.workspaceId, parsed.data.op)
-			.then((result) => res.json(result))
-			.catch((err) =>
-				res
-					.status(err instanceof PaneLayoutRequestError ? err.status : 500)
-					.json({ error: errorMessage(err) }),
-			);
+		try {
+			res.json(workspaceViews.apply(parsed.data.workspaceId, parsed.data.op));
+		} catch (err) {
+			res
+				.status(
+					err instanceof PaneLayoutOpError ? PANE_LAYOUT_STATUS[err.code] : 500,
+				)
+				.json({ error: errorMessage(err) });
+		}
 	});
 
 	app.post("/notify", (req, res) => {

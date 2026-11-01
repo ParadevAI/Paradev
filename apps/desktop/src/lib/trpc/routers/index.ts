@@ -18,7 +18,6 @@ import { createKeyboardLayoutRouter } from "./keyboardLayout";
 import { createMenuRouter } from "./menu";
 import { createMigrationRouter } from "./migration";
 import { createNotificationsRouter } from "./notifications";
-import { createPaneLayoutRouter } from "./pane-layout/pane-layout";
 import { createPermissionsRouter } from "./permissions";
 import { createPluginsRouter } from "./plugins";
 import { createPortForwardsRouter } from "./port-forwards";
@@ -33,6 +32,7 @@ import { createTerminalRouter } from "./terminal";
 import { createUiStateRouter } from "./ui-state";
 import { createViewerGithubRouter } from "./viewer-github";
 import { createWindowRouter } from "./window";
+import { createWorkspaceViewsRouter } from "./workspace-views";
 import { createWorkspacesRouter } from "./workspaces";
 
 export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
@@ -47,12 +47,12 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		window: createWindowRouter(),
 		projects: createProjectsRouter(getWindow),
 		workspaces: createWorkspacesRouter(),
+		workspaceViews: createWorkspaceViewsRouter(),
 		viewerGithub: createViewerGithubRouter(),
 		terminal: createTerminalRouter(),
 		changes: createChangesRouter(),
 		filesystem: createFilesystemRouter(),
 		notifications: createNotificationsRouter(getWindow),
-		paneLayout: createPaneLayoutRouter(),
 		permissions: createPermissionsRouter(),
 		plugins: createPluginsRouter(),
 		ports: createPortsRouter(),

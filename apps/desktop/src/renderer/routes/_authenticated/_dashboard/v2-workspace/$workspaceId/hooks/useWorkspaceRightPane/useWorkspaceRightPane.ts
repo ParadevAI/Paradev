@@ -1,17 +1,17 @@
 import { useCallback, useEffect } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
-import { useRightPaneMode } from "./hooks/useRightPaneMode";
+import type { SidebarSlideMode } from "../../components/SidebarSlide";
 import { useWorkspaceRightSidebarOpen } from "./hooks/useWorkspaceRightSidebarOpen";
 
 export function useWorkspaceRightPane({
-	workspaceId,
 	isPaneAreaEnabled,
 }: {
 	workspaceId: string;
 	isPaneAreaEnabled: boolean;
 }) {
-	const { isOpen, setOpen } = useWorkspaceRightSidebarOpen();
+	const { isOpen, isFullScreen, setOpen, toggleFullScreen } =
+		useWorkspaceRightSidebarOpen();
 	const toggle = useCallback(() => setOpen((prev) => !prev), [setOpen]);
 	useHotkey("TOGGLE_SIDEBAR", toggle);
 	useEffect(
@@ -21,16 +21,15 @@ export function useWorkspaceRightPane({
 			}),
 		[toggle],
 	);
-
-	const { mode, toggleFullScreen } = useRightPaneMode({
-		workspaceId,
-		isOpen,
-		setOpen,
-		canExpand: isPaneAreaEnabled,
-	});
 	useHotkey("TOGGLE_RIGHT_PANE_FULL_SCREEN", toggleFullScreen, {
 		enabled: isPaneAreaEnabled,
 	});
+
+	const mode: SidebarSlideMode = !isOpen
+		? "closed"
+		: isPaneAreaEnabled && isFullScreen
+			? "expanded"
+			: "open";
 
 	return { isOpen, setOpen, toggle, mode, toggleFullScreen };
 }

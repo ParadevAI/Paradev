@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { emptyWorkspaceView, type WorkspaceView } from "shared/workspace-views";
 import {
 	ensureSidebarProjectRecord,
 	setSidebarProjectHidden,
@@ -14,6 +15,8 @@ function makeCollection<T>(getKey: (item: T) => string) {
 	const state = new Map<string, T>();
 	return {
 		state,
+		isReady: () => true,
+		has: (key: string) => state.has(key),
 		get: (key: string) => state.get(key),
 		insert: (item: T) => {
 			state.set(getKey(item), structuredClone(item));
@@ -105,6 +108,7 @@ function makeCollections() {
 			projectId: string;
 		}>((row) => row.sectionId),
 		v2SidebarProjects: makeCollection<ProjectRow>((row) => row.projectId),
+		v2WorkspaceViews: makeCollection<WorkspaceView>((view) => view.workspaceId),
 	};
 }
 
@@ -237,7 +241,7 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		expect(cleaned).toEqual([]);
 	});
 
-	it("hides an existing row, clears its section, pin and right pane layout, and runs pane cleanup", () => {
+	it("hides an existing row, clears its section, pin and old layouts, drops its view and runs pane cleanup", () => {
 		const collections = makeCollections();
 		collections.v2WorkspaceLocalState.insert({
 			...localStateRow("ws-1", "proj-1", {
@@ -246,6 +250,7 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 			}),
 			rightPaneLayout: { version: 1, tabs: [], activeTabId: null },
 		});
+		collections.v2WorkspaceViews.insert(emptyWorkspaceView("ws-1"));
 		const cleaned: string[] = [];
 
 		tombstoneSidebarWorkspaceRecord(
@@ -262,6 +267,7 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		expect(row?.sidebarState.sectionId).toBeNull();
 		expect(row?.sidebarState.pinnedAt).toBeNull();
 		expect(row?.rightPaneLayout).toBeUndefined();
+		expect(collections.v2WorkspaceViews.get("ws-1")).toBeUndefined();
 		expect(cleaned).toEqual(["ws-1"]);
 	});
 });

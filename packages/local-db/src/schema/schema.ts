@@ -528,3 +528,19 @@ export const screenshots = sqliteTable(
 
 export type InsertScreenshot = typeof screenshots.$inferInsert;
 export type SelectScreenshot = typeof screenshots.$inferSelect;
+
+/**
+ * The desktop's view of each v2 workspace: the main area and the right pane,
+ * with their tabs and which one is active. `data` is a JSON
+ * `WorkspaceViewData`; the desktop main process is its only writer.
+ */
+export const workspaceViews = sqliteTable("workspace_views", {
+	workspaceId: text("workspace_id").primaryKey(),
+	data: text("data").notNull(),
+	updatedAt: integer("updated_at")
+		.notNull()
+		.$defaultFn(() => Date.now()),
+});
+
+export type InsertWorkspaceView = typeof workspaceViews.$inferInsert;
+export type SelectWorkspaceView = typeof workspaceViews.$inferSelect;

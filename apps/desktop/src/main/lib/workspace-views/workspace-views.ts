@@ -1,0 +1,133 @@
+import { EventEmitter } from "node:events";
+import type {
+	PaneLayoutOp,
+	PaneLayoutOpResult,
+} from "@superset/shared/pane-layout-ops";
+import {
+	applyPaneLayoutOp,
+	describePaneLayout,
+	type PaneAreas,
+} from "shared/pane-layout";
+import {
+	emptyWorkspaceView,
+	getAreaLayout,
+	isRightPaneOpen,
+	type WorkspaceView,
+	withAreaLayout,
+	withRightPaneVisibility,
+} from "shared/workspace-views";
+
+export interface WorkspaceViewStorage {
+	readAll(): WorkspaceView[];
+	read(workspaceId: string): WorkspaceView | undefined;
+	write(view: WorkspaceView): void;
+	delete(workspaceId: string): void;
+}
+
+export type WorkspaceViewChange =
+	| { type: "put"; view: WorkspaceView }
+	| { type: "remove"; workspaceId: string }
+	| { type: "terminal-kept"; workspaceId: string; terminalId: string };
+
+const PANE_AREAS = ["main", "sidebar"] as const;
+
+function keptTerminalId(areas: PaneAreas, op: PaneLayoutOp): string | null {
+	if (op.type !== "close" || !op.keepTerminal) return null;
+	for (const tab of [...areas.main.tabs, ...areas.sidebar.tabs]) {
+		const pane = tab.panes[op.paneId];
+		if (pane?.kind === "terminal") {
+			return (pane.data as { terminalId: string }).terminalId;
+		}
+	}
+	return null;
+}
+
+/** The desktop's workspace views; every write goes through here and is broadcast. */
+export class WorkspaceViews extends EventEmitter {
+	constructor(private readonly storage: WorkspaceViewStorage) {
+		super();
+	}
+
+	list(): WorkspaceView[] {
+		return this.storage.readAll();
+	}
+
+	get(workspaceId: string): WorkspaceView | undefined {
+		return this.storage.read(workspaceId);
+	}
+
+	put(view: WorkspaceView): void {
+		this.storage.write(view);
+		this.emit("change", { type: "put", view } satisfies WorkspaceViewChange);
+	}
+
+	/** Replaces only the given areas, so writes to different areas never undo each other. */
+	patch(patch: {
+		workspaceId: string;
+		mainArea?: WorkspaceView["mainArea"];
+		rightPane?: WorkspaceView["rightPane"];
+	}): void {
+		const current =
+			this.get(patch.workspaceId) ?? emptyWorkspaceView(patch.workspaceId);
+		this.put({
+			...current,
+			...(patch.mainArea ? { mainArea: patch.mainArea } : {}),
+			...(patch.rightPane ? { rightPane: patch.rightPane } : {}),
+		});
+	}
+
+	remove(workspaceId: string): void {
+		this.storage.delete(workspaceId);
+		this.emit("change", {
+			type: "remove",
+			workspaceId,
+		} satisfies WorkspaceViewChange);
+	}
+
+	apply(workspaceId: string, op: PaneLayoutOp): PaneLayoutOpResult {
+		const current = this.get(workspaceId) ?? emptyWorkspaceView(workspaceId);
+		const previous: PaneAreas = {
+			main: getAreaLayout(current, "main"),
+			sidebar: getAreaLayout(current, "sidebar"),
+		};
+		const outcome = applyPaneLayoutOp(previous, op);
+
+		let next = current;
+		for (const area of PANE_AREAS) {
+			if (outcome.areas[area] !== previous[area]) {
+				next = withAreaLayout(next, area, outcome.areas[area]);
+			}
+		}
+		if (op.type === "sidebar") {
+			next = withRightPaneVisibility(next, {
+				open: op.open,
+				fullScreen: op.fullScreen ?? false,
+			});
+		} else if (outcome.showSidebar && !isRightPaneOpen(next)) {
+			next = withRightPaneVisibility(next, { open: true });
+		}
+		if (next !== current) this.put(next);
+
+		const terminalId = keptTerminalId(previous, op);
+		if (terminalId) {
+			this.emit("change", {
+				type: "terminal-kept",
+				workspaceId,
+				terminalId,
+			} satisfies WorkspaceViewChange);
+		}
+
+		return {
+			paneId: outcome.paneId,
+			tabId: outcome.tabId,
+			layout: {
+				...describePaneLayout(outcome.areas.main),
+				sidebar: {
+					open: isRightPaneOpen(next),
+					fullScreen: next.rightPane.visibility === "fullScreen",
+					...describePaneLayout(outcome.areas.sidebar),
+				},
+			},
+		};
+	}
+}

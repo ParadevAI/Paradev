@@ -1,7 +1,11 @@
 import type { WorkspaceState } from "@superset/panes";
-import type { PaneLifecycleRow } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
+import {
+	type PaneLifecycleRow,
+	toPaneLifecycleRow,
+} from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { getPrependTabOrder } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { removeWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 
 /**
  * Pure sidebar local-state mutations, kept free of React/Electron imports so
@@ -27,11 +31,17 @@ type CleanupPaneRuntimes = (rows: PaneLifecycleRow[]) => void;
  * would let it reappear.
  */
 export function tombstoneSidebarWorkspaceRecord(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<
+		AppCollections,
+		"v2WorkspaceLocalState" | "v2WorkspaceViews"
+	>,
 	workspaceId: string,
 	projectId: string | null,
 	cleanupPaneRuntimes: CleanupPaneRuntimes,
 ): void {
+	void removeWorkspaceView(collections, workspaceId, (view) =>
+		cleanupPaneRuntimes([toPaneLifecycleRow(view)]),
+	);
 	const existing = collections.v2WorkspaceLocalState.get(workspaceId);
 	if (!existing) {
 		collections.v2WorkspaceLocalState.insert({
@@ -48,7 +58,6 @@ export function tombstoneSidebarWorkspaceRecord(
 		return;
 	}
 
-	cleanupPaneRuntimes([existing]);
 	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
 		draft.sidebarState.projectId = projectId;
 		draft.sidebarState.sectionId = null;

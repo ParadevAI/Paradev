@@ -1,3 +1,7 @@
+export {
+	connectWorkspaceStore,
+	type WorkspaceStateSource,
+} from "./core/source";
 export type {
 	CreatePaneInput,
 	CreateTabInput,

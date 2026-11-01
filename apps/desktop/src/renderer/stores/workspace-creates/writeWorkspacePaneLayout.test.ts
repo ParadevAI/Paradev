@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { createWorkspaceViewsCollection } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
 const PROJECT_ID = "11111111-1111-4111-8111-111111111111";
@@ -13,7 +14,6 @@ type LocalStateRow = {
 		sectionId: string | null;
 		isHidden: boolean;
 	};
-	rightSidebarOpen?: boolean;
 };
 
 type SectionRow = { sectionId: string; projectId: string; tabOrder: number };
@@ -151,30 +151,34 @@ describe("writeWorkspacePaneLayout", () => {
 		expect(projectOrder(PROJECT_ID)).toEqual(["zeta", "alpha"]);
 	});
 
-	it("starts a new workspace with the right sidebar closed", () => {
+	it("puts launched terminals in the workspace view's main area", async () => {
+		const v2WorkspaceViews = createWorkspaceViewsCollection({
+			client: {
+				list: async () => [],
+				onChange: () => () => {},
+				put: async () => {},
+				patch: async () => {},
+				remove: async () => {},
+			},
+			onTerminalKept: () => {},
+		});
+		await v2WorkspaceViews.stateWhenReady();
 		const { collections } = makeCollections([]);
 
-		create(collections, "beta");
+		await writeWorkspacePaneLayout(
+			{ ...collections, v2WorkspaceViews },
+			{ id: "beta", projectId: PROJECT_ID },
+			[{ terminalId: "term-1" }],
+			[],
+		);
 
-		expect(
-			collections.v2WorkspaceLocalState.get("beta")?.rightSidebarOpen,
-		).toBe(false);
-	});
-
-	it("keeps the right sidebar state of a workspace that already has a row", () => {
-		const { collections } = makeCollections([
-			{ ...draggedRow("alpha", 1), rightSidebarOpen: true },
-			draggedRow("zeta", 2),
+		const view = v2WorkspaceViews.get("beta");
+		const panes = view?.mainArea.tabs.flatMap((tab) =>
+			Object.values(tab.panes),
+		);
+		expect(panes?.map((pane) => pane.data)).toEqual([
+			expect.objectContaining({ terminalId: "term-1" }),
 		]);
-
-		create(collections, "alpha");
-		create(collections, "zeta");
-
-		expect(
-			collections.v2WorkspaceLocalState.get("alpha")?.rightSidebarOpen,
-		).toBe(true);
-		expect(
-			collections.v2WorkspaceLocalState.get("zeta")?.rightSidebarOpen,
-		).toBeUndefined();
+		expect(view?.rightPane.visibility).toBe("closed");
 	});
 });

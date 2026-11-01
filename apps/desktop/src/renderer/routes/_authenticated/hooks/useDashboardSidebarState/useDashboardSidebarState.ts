@@ -14,6 +14,7 @@ import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboar
 import {
 	extractPaneIds,
 	type PaneLifecycleRow,
+	toPaneLifecycleRow,
 } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -23,6 +24,7 @@ import {
 	getPrependTabOrder,
 	isSidebarWorkspaceVisible,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { removeWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useTagFolderWorkspaces } from "renderer/routes/_authenticated/providers/TagFolderWorkspacesProvider";
@@ -47,7 +49,6 @@ import {
 	setSidebarProjectHidden,
 	tombstoneSidebarWorkspaceRecord,
 } from "./sidebarMutations";
-
 import { getNewGroupTabOrder } from "./utils/getNewGroupTabOrder";
 
 type ProjectTopLevelItem = {
@@ -253,7 +254,6 @@ function ensureSidebarWorkspaceRecord(
 			isHidden: false,
 		},
 		paneLayout: createEmptyPaneLayout(),
-		rightSidebarOpen: false,
 	});
 }
 
@@ -1070,10 +1070,12 @@ export function useDashboardSidebarState() {
 
 	const removeWorkspaceFromSidebar = useCallback(
 		(workspaceId: string) => {
-			const workspace = collections.v2WorkspaceLocalState.get(workspaceId);
-			if (!workspace) return;
-			cleanupWorkspacePaneRuntimes([workspace]);
-			collections.v2WorkspaceLocalState.delete(workspaceId);
+			void removeWorkspaceView(collections, workspaceId, (view) =>
+				cleanupWorkspacePaneRuntimes([toPaneLifecycleRow(view)]),
+			);
+			if (collections.v2WorkspaceLocalState.get(workspaceId)) {
+				collections.v2WorkspaceLocalState.delete(workspaceId);
+			}
 		},
 		[collections],
 	);

@@ -1,1 +1,0 @@
-export { describePaneLayout } from "./describePaneLayout";

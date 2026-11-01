@@ -1,10 +1,4 @@
-import { PENDING_CLOUD_CHAT_PANE_KIND } from "../../types";
-
-export const CENTER_PANE_KINDS: ReadonlySet<string> = new Set([
-	"terminal",
-	"chat-v3",
-	PENDING_CLOUD_CHAT_PANE_KIND,
-]);
+export { CENTER_PANE_KINDS } from "shared/pane-layout/paneKinds";
 
 export const SIDEBAR_PANE_KINDS: ReadonlySet<string> = new Set([
 	"files",

@@ -1,34 +1,33 @@
-import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
+import {
+	connectWorkspaceStore,
+	createWorkspaceStore,
+	type WorkspaceState,
+} from "@superset/panes";
+import type { PaneArea } from "@superset/shared/pane-layout-ops";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import {
-	type PaneLayoutSlot,
-	registerV2PaneLayoutStore,
-} from "renderer/stores/v2-pane-layout-stores";
-import {
-	applyRememberedV2PaneSelection,
-	rememberV2PaneSelection,
-} from "renderer/stores/v2-pane-selection";
+import { ensureWorkspaceView } from "renderer/routes/_authenticated/providers/CollectionsProvider/workspaceViews";
+import { getAreaLayout } from "shared/workspace-views";
 import type { PaneViewerData } from "../../types";
 import { getPaneKey } from "../../utils/getPaneKey";
 import { placeInTabs } from "./utils/placeInTabs";
-import {
-	getSharedPaneLayoutSnapshot,
-	preserveLocalPaneSelection,
-} from "./utils/preserveLocalPaneSelection";
+import { viewAreaSource } from "./utils/viewAreaSource";
+
+export type PaneLayoutSlot = "paneLayout" | "rightPaneLayout";
+
+const AREA: Record<PaneLayoutSlot, PaneArea> = {
+	paneLayout: "main",
+	rightPaneLayout: "sidebar",
+};
 
 const EMPTY_STATE: WorkspaceState<PaneViewerData> = {
 	version: 1,
 	tabs: [],
 	activeTabId: null,
 };
-
-function getSnapshot(state: WorkspaceState<PaneViewerData>): string {
-	return getSharedPaneLayoutSnapshot(state);
-}
 
 export function useV2WorkspacePaneLayout({
 	slot = "paneLayout",
@@ -37,127 +36,40 @@ export function useV2WorkspacePaneLayout({
 } = {}) {
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const selectionKey =
-		slot === "paneLayout" ? workspaceId : `${workspaceId}:${slot}`;
 	const collections = useCollections();
-	// Keep the volatile pane store scoped to the route workspace. During fast
-	// workspace switches, live queries can briefly return stale rows; sharing
-	// the same store across that boundary lets panes from one worktree render
-	// and persist under another.
-	//
-	// Seed the store synchronously from the collection row (keyed by this
-	// workspace's id, so it can't serve a stale neighbor) instead of starting
-	// empty: an empty initial state blanks the whole tab bar for the first
-	// paint after every workspace switch, flashing its contents in one
-	// effect-cycle late.
-	const workspaceRuntime = useMemo(() => {
-		const persistedLayout =
-			(collections.v2WorkspaceLocalState.get(workspaceId)?.[slot] as
-				| WorkspaceState<PaneViewerData>
-				| undefined) ?? EMPTY_STATE;
-		const seededLayout = applyRememberedV2PaneSelection(
-			selectionKey,
-			persistedLayout,
-		);
-		return {
-			workspaceId,
-			seededSnapshot: getSnapshot(seededLayout),
-			store: createWorkspaceStore<PaneViewerData>({
-				initialState: seededLayout,
-				getPaneKey,
-				...(slot === "rightPaneLayout" ? { placePane: placeInTabs } : {}),
-			}),
-		};
-	}, [collections, workspaceId, slot, selectionKey]);
-	const { store } = workspaceRuntime;
-	const syncStateRef = useRef({
-		workspaceId,
-		lastSyncedSnapshot: workspaceRuntime.seededSnapshot,
-	});
-
-	const { data: localWorkspaceRows = [], isReady: isLayoutReady } =
-		useLiveQuery(
-			(query) =>
-				query
-					.from({ v2WorkspaceLocalState: collections.v2WorkspaceLocalState })
-					.where(({ v2WorkspaceLocalState }) =>
-						eq(v2WorkspaceLocalState.workspaceId, workspaceId),
-					),
-			[collections, workspaceId],
-		);
-	const localWorkspaceState =
-		localWorkspaceRows.find((row) => row.workspaceId === workspaceId) ?? null;
-
-	const persistedPaneLayout = useMemo(
-		() =>
-			localWorkspaceState?.workspaceId === workspaceId
-				? ((localWorkspaceState[slot] as
-						| WorkspaceState<PaneViewerData>
-						| undefined) ?? EMPTY_STATE)
-				: EMPTY_STATE,
-		[localWorkspaceState, workspaceId, slot],
-	);
-
-	useEffect(() => {
-		syncStateRef.current = {
-			workspaceId: workspaceRuntime.workspaceId,
-			lastSyncedSnapshot: workspaceRuntime.seededSnapshot,
-		};
-	}, [workspaceRuntime]);
-
-	useEffect(() => {
-		// Wait for the live query to settle for the current workspace before
-		// syncing: right after a switch it can still be resolving, in which
-		// case `persistedPaneLayout` falls back to EMPTY_STATE — applying that
-		// would blank the store that was just seeded synchronously above,
-		// reintroducing the flash this seeding was meant to fix.
-		if (!isLayoutReady) return;
-
-		const nextSnapshot = getSnapshot(persistedPaneLayout);
-		if (nextSnapshot === syncStateRef.current.lastSyncedSnapshot) {
-			return;
-		}
-
-		syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
-		store
-			.getState()
-			.replaceState((current) =>
-				preserveLocalPaneSelection(current, persistedPaneLayout),
-			);
-	}, [persistedPaneLayout, store, isLayoutReady]);
-
-	useEffect(
-		() => registerV2PaneLayoutStore(workspaceId, slot, store),
-		[store, workspaceId, slot],
-	);
-
-	useEffect(() => {
-		const unsubscribe = store.subscribe((nextStore) => {
-			const nextWorkspaceState: WorkspaceState<PaneViewerData> = {
-				version: nextStore.version,
-				tabs: nextStore.tabs,
-				activeTabId: nextStore.activeTabId,
-			};
-			rememberV2PaneSelection(selectionKey, nextWorkspaceState);
-			const nextSnapshot = getSnapshot(nextWorkspaceState);
-			if (nextSnapshot === syncStateRef.current.lastSyncedSnapshot) {
-				return;
-			}
-
-			if (!collections.v2WorkspaceLocalState.get(workspaceId)) {
-				return;
-			}
-
-			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft[slot] = nextWorkspaceState;
-			});
-			syncStateRef.current.lastSyncedSnapshot = nextSnapshot;
+	const area = AREA[slot];
+	// One store per workspace, seeded from its view: a store shared across a
+	// fast switch can render and save one worktree's panes under another, and
+	// an empty seed blanks the tab bar for a paint after every switch.
+	const store = useMemo(() => {
+		const view = collections.v2WorkspaceViews.get(workspaceId);
+		return createWorkspaceStore<PaneViewerData>({
+			initialState: view ? getAreaLayout(view, area) : EMPTY_STATE,
+			getPaneKey,
+			...(slot === "rightPaneLayout" ? { placePane: placeInTabs } : {}),
 		});
+	}, [collections, workspaceId, slot, area]);
 
-		return () => {
-			unsubscribe();
-		};
-	}, [collections, store, workspaceId, slot, selectionKey]);
+	const { data: views = [], isReady: isLayoutReady } = useLiveQuery(
+		(query) =>
+			query
+				.from({ view: collections.v2WorkspaceViews })
+				.where(({ view }) => eq(view.workspaceId, workspaceId)),
+		[collections, workspaceId],
+	);
 
-	return { store, isLayoutReady, hasRow: localWorkspaceState != null };
+	useEffect(() => {
+		if (!isLayoutReady) return;
+		ensureWorkspaceView(collections, workspaceId);
+		return connectWorkspaceStore(
+			store,
+			viewAreaSource(collections, workspaceId, area),
+		);
+	}, [collections, store, workspaceId, area, isLayoutReady]);
+
+	return {
+		store,
+		isLayoutReady,
+		hasRow: views.some((view) => view.workspaceId === workspaceId),
+	};
 }

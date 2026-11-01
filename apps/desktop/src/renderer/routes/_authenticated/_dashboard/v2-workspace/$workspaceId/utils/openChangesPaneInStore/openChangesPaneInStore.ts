@@ -1,12 +1,10 @@
 import type { WorkspaceStore } from "@superset/panes";
 import type { ChangesOpenTarget } from "renderer/stores/settings";
+import { NEW_DIFF_PANE } from "shared/pane-layout/paneKinds";
 import type { StoreApi } from "zustand/vanilla";
-import type { DiffPaneData, PaneViewerData } from "../../types";
+import type { PaneViewerData } from "../../types";
 
-export const NEW_DIFF_PANE = {
-	kind: "diff",
-	data: { path: "", collapsedFiles: [] } as DiffPaneData,
-} as const;
+export { NEW_DIFF_PANE };
 
 /**
  * Focus the workspace's Changes pane, creating one when none exists.

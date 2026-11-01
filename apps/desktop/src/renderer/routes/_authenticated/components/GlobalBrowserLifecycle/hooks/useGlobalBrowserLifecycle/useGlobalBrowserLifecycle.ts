@@ -8,6 +8,7 @@ import {
 	extractWorkspaceIds,
 	getRemovedPaneLocations,
 	type PaneLifecycleRow,
+	toPaneLifecycleRow,
 } from "../../../utils/paneLifecycleRows";
 
 /**
@@ -44,16 +45,13 @@ export function useGlobalBrowserLifecycle() {
 		new Map(),
 	);
 
-	const { data: allWorkspaceRows = [] } = useLiveQuery(
-		(query) =>
-			query.from({
-				v2WorkspaceLocalState: collections.v2WorkspaceLocalState,
-			}),
+	const { data: views = [] } = useLiveQuery(
+		(query) => query.from({ view: collections.v2WorkspaceViews }),
 		[collections],
 	);
 
 	useEffect(() => {
-		const rows = allWorkspaceRows as PaneLifecycleRow[];
+		const rows = views.map(toPaneLifecycleRow);
 		const currentBrowserLocations = extractBrowserLocations(rows);
 		const currentWorkspaceIds = extractWorkspaceIds(rows);
 		const prevBrowserLocations = prevBrowserLocationsRef.current;
@@ -92,8 +90,8 @@ export function useGlobalBrowserLifecycle() {
 
 			const timer = setTimeout(() => {
 				const freshRows = Array.from(
-					collections.v2WorkspaceLocalState.state.values(),
-				) as PaneLifecycleRow[];
+					collections.v2WorkspaceViews.state.values(),
+				).map(toPaneLifecycleRow);
 				const freshLocations = extractBrowserLocations(freshRows);
 				const freshWorkspaceIds = extractWorkspaceIds(freshRows);
 
@@ -118,7 +116,7 @@ export function useGlobalBrowserLifecycle() {
 		}
 
 		prevBrowserLocationsRef.current = currentBrowserLocations;
-	}, [allWorkspaceRows, collections]);
+	}, [views, collections]);
 
 	useEffect(() => {
 		return () => {

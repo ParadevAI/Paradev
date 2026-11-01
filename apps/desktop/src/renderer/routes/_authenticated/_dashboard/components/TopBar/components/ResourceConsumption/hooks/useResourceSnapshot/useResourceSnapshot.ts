@@ -8,6 +8,7 @@ import { logStressEvent } from "renderer/lib/performance/stress-instrumentation"
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { getVisibleSidebarWorkspaces } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { getAreaLayout } from "shared/workspace-views";
 import {
 	getResourceMonitorRefetchInterval,
 	shouldQueryResourceMonitor,
@@ -82,8 +83,11 @@ export function useResourceSnapshot(
 				.select(({ ws }) => ({
 					workspaceId: ws.workspaceId,
 					isHidden: ws.sidebarState.isHidden,
-					paneLayout: ws.paneLayout,
 				})),
+		[collections],
+	);
+	const { data: views = [] } = useLiveQuery(
+		(q) => q.from({ view: collections.v2WorkspaceViews }),
 		[collections],
 	);
 
@@ -101,8 +105,14 @@ export function useResourceSnapshot(
 	);
 
 	const terminalTitleOverrides = useMemo(
-		() => getTerminalTitleOverrides(rawSidebarWorkspaces),
-		[rawSidebarWorkspaces],
+		() =>
+			getTerminalTitleOverrides(
+				views.flatMap((view) => [
+					{ paneLayout: getAreaLayout(view, "main") },
+					{ paneLayout: getAreaLayout(view, "sidebar") },
+				]),
+			),
+		[views],
 	);
 
 	// Projects are fully local — identity comes from the host fan-out.
