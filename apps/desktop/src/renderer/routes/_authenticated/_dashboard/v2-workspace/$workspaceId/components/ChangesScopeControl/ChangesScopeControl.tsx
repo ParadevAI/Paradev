@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { cn } from "@superset/ui/utils";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { BaseBranchSelector } from "../WorkspaceSidebar/hooks/useChangesTab/components/BaseBranchSelector";
 import { CommitFilterDropdown } from "../WorkspaceSidebar/hooks/useChangesTab/components/CommitFilterDropdown";
@@ -18,6 +19,7 @@ interface ChangesScopeControlProps {
 	currentBranchName: string;
 	canRenameBranch: boolean;
 	onRenameBranch: (newName: string) => void;
+	baseClassName?: string;
 }
 
 /**
@@ -37,6 +39,7 @@ export function ChangesScopeControl({
 	currentBranchName,
 	canRenameBranch,
 	onRenameBranch,
+	baseClassName,
 }: ChangesScopeControlProps) {
 	return (
 		<>
@@ -52,7 +55,12 @@ export function ChangesScopeControl({
 			{filter.kind === "all" && (
 				// Selector as a placeholder in the message: a bare "vs" cannot
 				// precede the branch in every language.
-				<span className="flex min-w-0 items-center gap-1 whitespace-nowrap">
+				<span
+					className={cn(
+						"flex min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap",
+						baseClassName,
+					)}
+				>
 					<Trans>
 						<span className="shrink-0 text-muted-foreground/60">vs</span>{" "}
 						<BaseBranchSelector

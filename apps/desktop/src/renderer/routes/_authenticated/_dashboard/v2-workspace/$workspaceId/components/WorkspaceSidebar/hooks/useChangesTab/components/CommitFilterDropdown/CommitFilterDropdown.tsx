@@ -103,7 +103,7 @@ export function CommitFilterDropdown({
 						<PopoverAnchor asChild>
 							<button
 								type="button"
-								className="flex min-w-0 items-center gap-1 rounded px-1.5 py-0.5 font-medium text-xs hover:bg-accent"
+								className="flex min-w-0 items-center gap-1 overflow-hidden rounded px-1.5 py-0.5 font-medium text-xs hover:bg-accent"
 							>
 								{/* At rest the trigger is a category chip — "Commits N" —
 								    like the PR view's; a narrowed scope shows its value. */}

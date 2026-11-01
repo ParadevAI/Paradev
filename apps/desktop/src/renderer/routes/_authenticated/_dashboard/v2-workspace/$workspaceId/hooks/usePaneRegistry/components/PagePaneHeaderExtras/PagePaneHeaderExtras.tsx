@@ -55,6 +55,7 @@ export function PagePaneHeaderExtras({
 			{page ? (
 				<PageShareButton
 					compact
+					labelClassName="hidden @min-[360px]/pane-header:inline"
 					page={page}
 					versions={versions}
 					editable={

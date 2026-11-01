@@ -132,13 +132,24 @@ export function TabBar<TData>({
 	useLayoutEffect(() => {
 		const scroller = tabsTrackRef.current?.parentElement;
 		if (!scroller || !hasHorizontalOverflow || activeTabIndex < 0) return;
-		const next = scrollLeftToRevealTab(
-			activeTabIndex,
-			scroller.scrollLeft,
-			scroller.clientWidth,
-			TAB_BAR_FADE_WIDTH,
-		);
-		if (next !== null) scroller.scrollTo({ left: next, behavior: "smooth" });
+		const reveal = (behavior: ScrollBehavior) => {
+			const next = scrollLeftToRevealTab(
+				activeTabIndex,
+				scroller.scrollLeft,
+				scroller.clientWidth,
+				TAB_BAR_FADE_WIDTH,
+			);
+			if (next !== null) scroller.scrollTo({ left: next, behavior });
+		};
+		reveal("smooth");
+		let revealedWidth = scroller.clientWidth;
+		const observer = new ResizeObserver(() => {
+			if (scroller.clientWidth === revealedWidth) return;
+			revealedWidth = scroller.clientWidth;
+			reveal("instant");
+		});
+		observer.observe(scroller);
+		return () => observer.disconnect();
 	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);

@@ -29,6 +29,8 @@ afterEach(() => {
 	useWorkspaceSidebarStore.setState({
 		width: initialStore.width,
 		lastExpandedWidth: initialStore.lastExpandedWidth,
+		autoCollapsed: false,
+		adjustedThisSession: false,
 	});
 });
 
@@ -43,16 +45,68 @@ function renderPanel() {
 }
 
 describe("WorkspaceSidebarPanel", () => {
-	test("narrows to leave room for the right pane, re-clamped on window resize, without rewriting the saved width", async () => {
-		useWorkspaceSidebarStore.getState().setWidth(400);
+	test("folds to the rail when the window gets too narrow, and unfolds on the way back", async () => {
+		useWorkspaceSidebarStore.setState({ width: 280, lastExpandedWidth: 280 });
 		await resizeWindow(1728);
 		const shownWidth = renderPanel();
-		expect(shownWidth()).toBe("400px");
+		expect(shownWidth()).toBe("280px");
+		await resizeWindow(760);
+		expect(shownWidth()).toBe("52px");
+		await resizeWindow(1728);
+		expect(shownWidth()).toBe("280px");
+	});
+
+	test("a drag on the folded rail that changes nothing still unfolds on the way back", async () => {
+		useWorkspaceSidebarStore.setState({ width: 280, lastExpandedWidth: 280 });
+		await resizeWindow(1728);
+		const shownWidth = renderPanel();
+		await resizeWindow(760);
+		await act(() => useWorkspaceSidebarStore.getState().setWidth(40));
+		await resizeWindow(1728);
+		expect(shownWidth()).toBe("280px");
+	});
+
+	test("starts folded when the window opens too narrow", async () => {
+		useWorkspaceSidebarStore.setState({ width: 280, lastExpandedWidth: 280 });
+		await resizeWindow(700);
+		expect(renderPanel()()).toBe("52px");
+	});
+
+	test("keeps a sidebar the user folded by hand folded after the window widens", async () => {
+		useWorkspaceSidebarStore.getState().setWidth(280);
+		await resizeWindow(1728);
+		const shownWidth = renderPanel();
+		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
+		await resizeWindow(700);
+		await resizeWindow(1728);
+		expect(shownWidth()).toBe("52px");
+	});
+
+	test("a sidebar opened by hand in a narrow window leaves room for the right pane without rewriting the saved width", async () => {
+		useWorkspaceSidebarStore.setState({ width: 400, lastExpandedWidth: 400 });
+		await resizeWindow(1728);
+		const shownWidth = renderPanel();
 		await resizeWindow(560);
+		expect(shownWidth()).toBe("52px");
+		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
 		expect(shownWidth()).toBe(`${560 - 262}px`);
 		expect(useWorkspaceSidebarStore.getState().width).toBe(400);
+		await resizeWindow(620);
+		expect(shownWidth()).toBe(`${620 - 262}px`);
 		await resizeWindow(1728);
 		expect(shownWidth()).toBe("400px");
+		await resizeWindow(700);
+		expect(shownWidth()).toBe("400px");
+	});
+
+	test("stops folding for the rest of the session once the user toggles it", async () => {
+		await resizeWindow(1728);
+		useWorkspaceSidebarStore.setState({ width: 280, lastExpandedWidth: 280 });
+		const shownWidth = renderPanel();
+		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
+		await act(() => useWorkspaceSidebarStore.getState().toggleCollapsed());
+		await resizeWindow(700);
+		expect(shownWidth()).toBe("280px");
 	});
 
 	test("keeps the collapsed rail at any window width", async () => {

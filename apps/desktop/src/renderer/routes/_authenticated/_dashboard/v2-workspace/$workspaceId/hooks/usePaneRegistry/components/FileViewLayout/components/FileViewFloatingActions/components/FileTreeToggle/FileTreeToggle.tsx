@@ -4,10 +4,20 @@ import { cn } from "@superset/ui/utils";
 import { LuFolderTree } from "react-icons/lu";
 import { useFileTreeVisibilityStore } from "../../../../../../../../state/fileTreeVisibilityStore";
 
-export function FileTreeToggle() {
+interface FileTreeToggleProps {
+	visible?: boolean;
+	onToggle?: () => void;
+}
+
+export function FileTreeToggle({
+	visible: visibleOverride,
+	onToggle,
+}: FileTreeToggleProps) {
 	const { t } = useLingui();
-	const visible = useFileTreeVisibilityStore((state) => state.visible);
-	const toggle = useFileTreeVisibilityStore((state) => state.toggle);
+	const storedVisible = useFileTreeVisibilityStore((state) => state.visible);
+	const storedToggle = useFileTreeVisibilityStore((state) => state.toggle);
+	const visible = visibleOverride ?? storedVisible;
+	const toggle = onToggle ?? storedToggle;
 	const label = visible
 		? t({ message: "Hide file tree" })
 		: t({ message: "Show file tree" });

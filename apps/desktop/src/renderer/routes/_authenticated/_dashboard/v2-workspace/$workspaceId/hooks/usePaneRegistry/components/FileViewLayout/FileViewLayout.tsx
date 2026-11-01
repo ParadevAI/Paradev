@@ -6,17 +6,30 @@ import {
 	ResizablePanelGroup,
 } from "@superset/ui/resizable";
 import { cn } from "@superset/ui/utils";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import { useFileTreeVisibilityStore } from "../../../../state/fileTreeVisibilityStore";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
 import { openFileFromTree } from "../../../../utils/openFileFromTree";
+import { useElementWidth } from "../../hooks/useElementWidth";
 import { FileBreadcrumb } from "./components/FileBreadcrumb";
 import { FileViewFloatingActions } from "./components/FileViewFloatingActions";
 import { FileViewTree } from "./components/FileViewTree";
 
 const TREE_DEFAULT_SIZE = 35;
 const TREE_TOGGLE_MS = 200;
+const SIDE_BY_SIDE_MIN_WIDTH = 420;
+const NARROW_LAYOUTS: Record<"tree" | "split" | "file", number[]> = {
+	tree: [0, 100],
+	split: [50, 50],
+	file: [100, 0],
+};
 
 interface FileViewLayoutProps {
 	context: RendererContext<PaneViewerData>;
@@ -39,14 +52,51 @@ export function FileViewLayout({
 			: undefined;
 	const storedVisible = useFileTreeVisibilityStore((state) => state.visible);
 	const setVisible = useFileTreeVisibilityStore((state) => state.setVisible);
+	const narrowVisible = useFileTreeVisibilityStore(
+		(state) => state.narrowVisible,
+	);
+	const setNarrowVisible = useFileTreeVisibilityStore(
+		(state) => state.setNarrowVisible,
+	);
+	const toggleNarrow = useFileTreeVisibilityStore(
+		(state) => state.toggleNarrow,
+	);
 	const visible = filePath ? storedVisible : true;
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const treePanelRef = useRef<ImperativePanelHandle>(null);
 	const [animating, setAnimating] = useState(false);
+	const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
+	const width = useElementWidth(rootElement);
+	const isNarrow = width !== null && width < SIDE_BY_SIDE_MIN_WIDTH;
+	const narrowLayout = !isNarrow
+		? null
+		: !filePath
+			? "tree"
+			: narrowVisible
+				? "split"
+				: "file";
+	const isNarrowRef = useRef(isNarrow);
+	isNarrowRef.current = isNarrow;
+	const visibleRef = useRef(visible);
+	visibleRef.current = visible;
+
+	useLayoutEffect(() => {
+		const group = groupRef.current;
+		if (!group) return;
+		if (narrowLayout) {
+			group.setLayout(NARROW_LAYOUTS[narrowLayout]);
+		} else {
+			group.setLayout(
+				visibleRef.current
+					? [100 - TREE_DEFAULT_SIZE, TREE_DEFAULT_SIZE]
+					: [100, 0],
+			);
+		}
+	}, [narrowLayout]);
 
 	useEffect(() => {
 		const panel = treePanelRef.current;
-		if (!panel || panel.isExpanded() === visible) return;
+		if (isNarrowRef.current || !panel || panel.isExpanded() === visible) return;
 		setAnimating(true);
 		if (visible) {
 			panel.expand();
@@ -64,14 +114,21 @@ export function FileViewLayout({
 	if (!showTree || tabHasTreePane) return children;
 
 	const panelTransition =
-		animating && "transition-[flex-grow] duration-200 ease-out";
+		animating && !isNarrow && "transition-[flex-grow] duration-200 ease-out";
+	const treeFillsPane = isNarrow && !filePath;
 	return (
-		<div data-file-view className="relative h-full w-full min-w-0">
+		<div
+			ref={setRootElement}
+			data-file-view
+			className="relative h-full w-full min-w-0"
+		>
 			<ResizablePanelGroup ref={groupRef} direction="horizontal">
 				<ResizablePanel
 					id="file-view-content"
 					order={1}
-					minSize={30}
+					minSize={isNarrow ? 0 : 30}
+					collapsible={isNarrow}
+					collapsedSize={0}
 					className={cn(panelTransition)}
 				>
 					<div className="relative h-full min-w-0">
@@ -83,7 +140,11 @@ export function FileViewLayout({
 					</div>
 				</ResizablePanel>
 				<ResizableHandle
-					className={cn("bg-transparent", !visible && "pointer-events-none")}
+					className={cn(
+						"bg-transparent",
+						(isNarrow ? narrowLayout !== "split" : !visible) &&
+							"pointer-events-none",
+					)}
 					onDoubleClick={() =>
 						groupRef.current?.setLayout([
 							100 - TREE_DEFAULT_SIZE,
@@ -97,15 +158,32 @@ export function FileViewLayout({
 					ref={treePanelRef}
 					defaultSize={visible ? TREE_DEFAULT_SIZE : 0}
 					minSize={20}
-					maxSize={60}
-					collapsible={Boolean(filePath)}
+					maxSize={isNarrow ? 100 : 60}
+					collapsible={Boolean(filePath) || isNarrow}
 					collapsedSize={0}
-					onCollapse={() => setVisible(false)}
-					onExpand={() => setVisible(true)}
+					onCollapse={() => {
+						if (!isNarrowRef.current) setVisible(false);
+						else if (filePath) setNarrowVisible(false);
+					}}
+					onExpand={() => {
+						if (!isNarrowRef.current) setVisible(true);
+						else if (filePath) setNarrowVisible(true);
+					}}
 					className={cn(panelTransition)}
 				>
-					<div className="flex h-full min-w-0 flex-col pt-11">
-						<div className="min-h-0 flex-1 overflow-hidden rounded-tl-lg border-t border-l border-border/60">
+					<div
+						className={cn(
+							"flex h-full min-w-0 flex-col",
+							!treeFillsPane && "pt-11",
+						)}
+					>
+						<div
+							className={cn(
+								"min-h-0 flex-1 overflow-hidden",
+								!treeFillsPane &&
+									"rounded-tl-lg border-t border-l border-border/60",
+							)}
+						>
 							<FileViewTree
 								context={context}
 								workspaceId={workspaceId}
@@ -132,6 +210,11 @@ export function FileViewLayout({
 				<FileViewFloatingActions
 					workspaceId={workspaceId}
 					filePath={filePath}
+					treeToggle={
+						isNarrow
+							? { visible: narrowVisible, onToggle: toggleNarrow }
+							: undefined
+					}
 				/>
 			)}
 		</div>
