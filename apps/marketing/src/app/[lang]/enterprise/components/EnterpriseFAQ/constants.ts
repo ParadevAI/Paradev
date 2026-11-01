@@ -45,7 +45,7 @@ export const ENTERPRISE_FAQ_ITEMS: EnterpriseFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh.",
+				"Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.paradev.com.",
 		}),
 	},
 ];
