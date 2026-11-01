@@ -116,9 +116,9 @@ One rough edge per run. Add any new rough edges you notice to the list.
 ## Finish
 
 - Update the notebook, then write your final message: mode, what you found, what you filed (with
-  links), and anything that blocked you.
-- Last command: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"` when everything
-  worked, or `superset workspaces sleep` when a step failed, so the evidence stays.
+  links), and anything that blocked you. When a step failed, put the command, its output, and the
+  ids involved in the notebook and the final message; the workspace does not outlive the run.
+- Last command, every run: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"`.
 
 ## Rules
 
