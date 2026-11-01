@@ -9,6 +9,8 @@ export interface SearchBarProps {
 	placeholder: string;
 	onChangeText: (text: string) => void;
 	onCancel: () => void;
+	/** Return pressed in the field. */
+	onSubmit?: () => void;
 }
 
 /** The search sheet's query field, in its header. */

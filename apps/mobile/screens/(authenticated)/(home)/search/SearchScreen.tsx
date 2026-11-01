@@ -174,6 +174,10 @@ export function SearchScreen() {
 		},
 		[router],
 	);
+	const openFirst = useCallback(() => {
+		const first = results[0];
+		if (first) open(first);
+	}, [results, open]);
 
 	return (
 		<>
@@ -193,6 +197,7 @@ export function SearchScreen() {
 				})}
 				onChangeText={setQuery}
 				onCancel={clearQuery}
+				onSubmit={openFirst}
 			/>
 			<FlatList
 				className="bg-background"
@@ -227,7 +232,7 @@ export function SearchScreen() {
 						: undefined;
 					return (
 						<Pressable
-							className="flex-row items-center gap-3 px-4 py-2.5"
+							className="web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5"
 							onPress={() => open(workspace)}
 							ph-label="search-workspace-row"
 						>
