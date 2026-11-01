@@ -9,7 +9,9 @@ import {
 	localStorageCollectionOptions,
 } from "@tanstack/react-db";
 import type { inferRouterOutputs } from "@trpc/server";
+import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { reclaimTerminalStateForQuota } from "renderer/lib/terminal/terminal-buffer-gc";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { z } from "zod";
 import {
 	type DashboardSidebarProjectRow,
@@ -32,6 +34,10 @@ import { evictInactiveOrgs } from "./evictInactiveOrgs";
 import { notifyQuotaExhausted } from "./notifyQuotaExhausted";
 import { withQuotaGuard } from "./withQuotaGuard";
 import { withReadHeal } from "./withReadHeal";
+import {
+	createWorkspaceViewsCollection,
+	type WorkspaceViewsCollection,
+} from "./workspaceViews";
 
 type HostWorkspacesCreateResult =
 	inferRouterOutputs<HostServiceAppRouter>["workspaces"]["create"];
@@ -264,6 +270,30 @@ export async function preloadCollections(
 	}
 }
 
+let workspaceViewsCollection: WorkspaceViewsCollection | null = null;
+
+/** Not per org: workspace ids are unique, and main owns every workspace's view. */
+function getWorkspaceViewsCollection(): WorkspaceViewsCollection {
+	workspaceViewsCollection ??= createWorkspaceViewsCollection({
+		client: {
+			list: () => electronTrpcClient.workspaceViews.list.query(),
+			onChange: (handler) => {
+				const subscription =
+					electronTrpcClient.workspaceViews.onChange.subscribe(undefined, {
+						onData: handler,
+					});
+				return () => subscription.unsubscribe();
+			},
+			put: (view) => electronTrpcClient.workspaceViews.put.mutate(view),
+			remove: (workspaceId) =>
+				electronTrpcClient.workspaceViews.remove.mutate({ workspaceId }),
+		},
+		onTerminalKept: ({ workspaceId, terminalId }) =>
+			markTerminalForBackground(terminalId, workspaceId),
+	});
+	return workspaceViewsCollection;
+}
+
 /**
  * Get collections for an organization, creating them if needed.
  * Collections are cached per org for instant switching.
@@ -280,7 +310,10 @@ export function getCollections(organizationId: string) {
 		throw new Error(`Collections not found for org: ${organizationId}`);
 	}
 
-	return { ...orgCollections };
+	return {
+		...orgCollections,
+		v2WorkspaceViews: getWorkspaceViewsCollection(),
+	};
 }
 
 /**
