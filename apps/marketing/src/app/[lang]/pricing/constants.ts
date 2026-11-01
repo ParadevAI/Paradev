@@ -6,7 +6,7 @@ import { COMPANY } from "@superset/shared/constants";
 export interface PricingFeature {
 	id: string;
 	label: MessageDescriptor;
-	needs?: "gbHours";
+	needs?: "gbHours" | "members";
 	beta?: boolean;
 	detail?: MessageDescriptor;
 	info?: { body: MessageDescriptor; faqId: string };
@@ -192,6 +192,12 @@ const CLOUD_WORKSPACES_FEATURE: PricingFeature = {
 	},
 };
 
+const MEMBERS_FEATURE: PricingFeature = {
+	id: "members",
+	label: msg({ message: "{members}", comment: "e.g. Up to 5 members" }),
+	needs: "members",
+};
+
 const BASE_FEATURES: PricingFeature[] = [
 	{
 		id: "everythingInFree",
@@ -199,6 +205,7 @@ const BASE_FEATURES: PricingFeature[] = [
 			message: "Everything in Free",
 		}),
 	},
+	MEMBERS_FEATURE,
 	CLOUD_WORKSPACES_FEATURE,
 	{
 		id: "remoteAccess",
@@ -237,6 +244,7 @@ const STEP_UP_FEATURES: PricingFeature[] = [
 		id: "everythingInPrevious",
 		label: msg({ message: "Everything in {previousPlan}" }),
 	},
+	MEMBERS_FEATURE,
 	CLOUD_WORKSPACES_FEATURE,
 ];
 
@@ -281,6 +289,8 @@ export interface ComparisonRow {
 		enterprise: ComparisonValue | null,
 	];
 	cloud?: "gbHours" | "environments" | "overageRate" | "pack";
+	/** Read from the plan's catalog values, falling back to `values[1]`. */
+	family?: "members";
 }
 
 export interface ComparisonSection {
@@ -309,6 +319,7 @@ export const COMPARISON_SECTIONS: ComparisonSection[] = [
 					message: "Team members",
 				}),
 				values: ["1", UNLIMITED, UNLIMITED],
+				family: "members",
 			},
 			{
 				id: "workspaces",

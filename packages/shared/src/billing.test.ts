@@ -4,6 +4,7 @@ import {
 	catalogPlansFrom,
 	defaultMachineSize,
 	familyForPlan,
+	finiteSeatLimit,
 	fromAutumnRest,
 	gbHourPackPricePerGbHour,
 	gbHourPurchase,
@@ -215,6 +216,7 @@ const lineup = planCatalogFromAutumn([
 		self_serve: true,
 		family: "ultra",
 		display_order: 3,
+		max_seats: 2147483647,
 	}),
 	parentPlan("ultra_annual", "ultra_seat_annual", {
 		self_serve: true,
@@ -225,6 +227,7 @@ const lineup = planCatalogFromAutumn([
 		self_serve: true,
 		family: "pro",
 		display_order: 1,
+		max_seats: 5,
 	}),
 	parentPlan("pro_v2", "pro_seat", {
 		self_serve: true,
@@ -255,6 +258,15 @@ describe("planCatalogFromAutumn", () => {
 		expect(pro?.gbMinutesPerSeat).toBe(19200);
 		expect(pro?.overagePerGbHour).toBe(0.06);
 		expect(pro?.pack).toEqual({ gbMinutes: 1000, price: 1 });
+	});
+
+	test("a family takes its member cap from any of its plans", () => {
+		const [pro, ultra] = lineup;
+		expect(pro?.maxSeats).toBe(5);
+		expect(ultra?.maxSeats).toBe(2147483647);
+		expect(finiteSeatLimit(pro?.maxSeats)).toBe(5);
+		expect(finiteSeatLimit(ultra?.maxSeats)).toBeNull();
+		expect(finiteSeatLimit(null)).toBeNull();
 	});
 
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {

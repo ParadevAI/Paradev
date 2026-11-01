@@ -23,6 +23,7 @@ function family(
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,
+		maxSeats: null,
 	};
 }
 

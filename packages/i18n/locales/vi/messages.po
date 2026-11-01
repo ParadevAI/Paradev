@@ -899,6 +899,9 @@ msgstr "{count, plural, one {đã đọc # tệp} other {đã đọc # tệp}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {Đã xóa # tự động hóa khỏi nhóm} other {Đã xóa # tự động hóa khỏi nhóm}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, other {Tối đa # thành viên}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Đã dùng # nguồn} other {Đã dùng # nguồn}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (thiết bị này)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "Còn {remaining} token"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatsUsed}/{seatLimit} thành viên"
 
 msgid "{seconds}s"
 msgstr "{seconds} giây"
@@ -20281,6 +20291,9 @@ msgstr "Workspace không xác định"
 msgid "Unlimited"
 msgstr "Không giới hạn"
 
+msgid "Unlimited members"
+msgstr "Không giới hạn thành viên"
+
 msgid "Unlink project"
 msgstr "Hủy liên kết dự án"
 
@@ -20367,6 +20380,10 @@ msgstr "Sắp tới"
 
 msgid "Up Next"
 msgstr "Sắp tới"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "Tối đa {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "Tối đa {MAX_SAVED_VIEWS} chế độ xem đã lưu"
@@ -20477,6 +20494,9 @@ msgstr "Nâng cấp lên {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Nâng cấp lên Pro"
+
+msgid "Upgrade to Team"
+msgstr "Nâng cấp lên Team"
 
 msgid "Upgrade your plan"
 msgstr "Nâng cấp gói của bạn"
@@ -21746,6 +21766,9 @@ msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giú
 
 msgid "Your Paradev download is starting."
 msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
+
+msgid "Your plan allows {limit} members."
+msgstr "Gói của bạn cho phép {limit} thành viên."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Gói của bạn không bao gồm môi trường đám mây."

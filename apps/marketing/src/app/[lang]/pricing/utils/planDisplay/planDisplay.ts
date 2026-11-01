@@ -21,6 +21,9 @@ export function comparisonValue(
 ): ComparisonValue | null {
 	if (tier.price.kind === "fixed") return row.values[0];
 	if (tier.price.kind === "custom") return row.values[2];
+	if (row.family) {
+		return values.byFamily[tier.id]?.[row.family] ?? row.values[1];
+	}
 	if (!row.cloud) return row.values[1];
 	return values.byFamily[tier.id]?.[row.cloud] ?? null;
 }

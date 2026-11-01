@@ -899,6 +899,9 @@ msgstr "{count, plural, one {# dosya okundu} other {# dosya okundu}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# otomasyon grubundan çıkarıldı} other {# otomasyon grubundan çıkarıldı}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, one {En fazla # üye} other {En fazla # üye}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (bu cihaz)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "{remaining} token kaldı"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatLimit} üyeden {seatsUsed} tanesi"
 
 msgid "{seconds}s"
 msgstr "{seconds} sn"
@@ -20281,6 +20291,9 @@ msgstr "Bilinmeyen çalışma alanı"
 msgid "Unlimited"
 msgstr "Sınırsız"
 
+msgid "Unlimited members"
+msgstr "Sınırsız üye"
+
 msgid "Unlink project"
 msgstr "Projenin bağlantısını kaldır"
 
@@ -20367,6 +20380,10 @@ msgstr "Sırada"
 
 msgid "Up Next"
 msgstr "Sırada"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "En fazla {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "En fazla {MAX_SAVED_VIEWS} kayıtlı görünüm"
@@ -20477,6 +20494,9 @@ msgstr "{planName} planına yükselt"
 
 msgid "Upgrade to Pro"
 msgstr "Pro'ya yükselt"
+
+msgid "Upgrade to Team"
+msgstr "Team’e yükselt"
 
 msgid "Upgrade your plan"
 msgstr "Planınızı yükseltin"
@@ -21746,6 +21766,9 @@ msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlar
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
+
+msgid "Your plan allows {limit} members."
+msgstr "Planınız {limit} üyeye izin veriyor."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Planınız bulut ortamlarını içermiyor."

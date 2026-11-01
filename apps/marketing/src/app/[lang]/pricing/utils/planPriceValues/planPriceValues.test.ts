@@ -46,6 +46,25 @@ const team = { self_serve: true, family: "team", display_order: 2 };
 const ultra = { self_serve: true, family: "ultra", display_order: 3 };
 
 describe("planPriceValues", () => {
+	test("states each plan's member cap; the unlimited sentinel reads as unlimited", () => {
+		const catalog = planCatalogFromAutumn([
+			...plan("pro", 20, "month", { ...pro, max_seats: 5 }),
+			...plan("team", 60, "month", { ...team, max_seats: 2147483647 }),
+			...plan("ultra", 200, "month", { ...ultra, max_seats: 1 }),
+		]);
+		const values = planPriceValues(catalog, setupI18n({ locale: "en" }));
+		expect(values.byFamily.pro).toMatchObject({
+			members: "Up to 5",
+			membersFeature: "Up to 5 members",
+		});
+		expect(values.byFamily.team).toMatchObject({
+			members: "Unlimited",
+			membersFeature: "Unlimited members",
+		});
+		expect(values.byFamily.ultra?.membersFeature).toBe("Up to 1 member");
+		expect(featureShown({ needs: "members" }, values.byFamily.pro)).toBe(true);
+	});
+
 	test("formats each family's prices, GB-hours and hours on the standard box", () => {
 		const catalog = planCatalogFromAutumn([
 			...plan("pro", 20, "month", pro, 19200),
@@ -115,6 +134,11 @@ describe("planPriceValues", () => {
 		});
 		expect(values.byFamily.ultra).toMatchObject({ hours: "500" });
 		expect(values.packPrice).toBe("$0.06");
+		expect(values.byFamily.pro).toMatchObject({
+			members: null,
+			membersFeature: null,
+		});
+		expect(featureShown({ needs: "members" }, values.byFamily.pro)).toBe(false);
 		expect(featureShown({ needs: "gbHours" }, values.byFamily.pro)).toBe(false);
 		expect(featureShown({ needs: "gbHours" }, values.byFamily.ultra)).toBe(
 			true,

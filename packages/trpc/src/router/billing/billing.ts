@@ -90,6 +90,8 @@ const EMPTY_ACTIVE_PLAN = {
 	 * @deprecated TODO(2027-01-31): read `paymentState`.
 	 */
 	lapsed: false,
+	/** Members the organization may hold; null when there is no paid cap to show. */
+	seatLimit: null as number | null,
 };
 
 function isUnpaid(invoice: Stripe.Invoice): boolean {
@@ -161,6 +163,7 @@ export const billingRouter = {
 				billingInterval: billing.billingInterval,
 				lapsed: billing.lapsed,
 				paymentState: billing.paymentState,
+				seatLimit: billing.seatLimit ?? null,
 				billingProvider,
 			};
 		}
@@ -206,6 +209,7 @@ export const billingRouter = {
 			periodEnd: subscription.periodEnd,
 			billingInterval: subscription.billingInterval,
 			lapsed: false,
+			seatLimit: null,
 			billingProvider,
 		};
 	}),

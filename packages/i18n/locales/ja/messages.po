@@ -899,6 +899,9 @@ msgstr "{count, plural, one {#件のファイルを読み取り} other {#件の�
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {#件のオートメーションをグループから外しました} other {#件のオートメーションをグループから外しました}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, other {最大 # 人のメンバー}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {#件のソースを使用} other {#件のソースを使用}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName}（このデバイス）"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "残り {remaining} トークン"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatLimit} 人中 {seatsUsed} 人のメンバー"
 
 msgid "{seconds}s"
 msgstr "{seconds}秒"
@@ -20281,6 +20291,9 @@ msgstr "不明なワークスペース"
 msgid "Unlimited"
 msgstr "無制限"
 
+msgid "Unlimited members"
+msgstr "メンバー数無制限"
+
 msgid "Unlink project"
 msgstr "プロジェクトのリンクを解除"
 
@@ -20367,6 +20380,10 @@ msgstr "次の実行"
 
 msgid "Up Next"
 msgstr "次に着手"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "最大 {count} 人"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "保存できるビューは {MAX_SAVED_VIEWS} 個まで"
@@ -20477,6 +20494,9 @@ msgstr "{planName} にアップグレード"
 
 msgid "Upgrade to Pro"
 msgstr "Pro にアップグレード"
+
+msgid "Upgrade to Team"
+msgstr "Team にアップグレード"
 
 msgid "Upgrade your plan"
 msgstr "プランをアップグレード"
@@ -21746,6 +21766,9 @@ msgstr "あなた自身のアカウントです。組織の連携は Paradev が
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"
+
+msgid "Your plan allows {limit} members."
+msgstr "現在のプランでは {limit} 人までメンバーを追加できます。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。"

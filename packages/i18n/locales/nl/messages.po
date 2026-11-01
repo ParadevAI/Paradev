@@ -899,6 +899,9 @@ msgstr "{count, plural, one {# bestand gelezen} other {# bestanden gelezen}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automatisering uit de groep verwijderd} other {# automatiseringen uit hun groepen verwijderd}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, one {Tot # lid} other {Tot # leden}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# bron gebruikt} other {# bronnen gebruikt}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (dit apparaat)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "Nog {remaining} tokens over"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatsUsed} van {seatLimit} leden"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
@@ -20281,6 +20291,9 @@ msgstr "Onbekende werkruimte"
 msgid "Unlimited"
 msgstr "Onbeperkt"
 
+msgid "Unlimited members"
+msgstr "Onbeperkt aantal leden"
+
 msgid "Unlink project"
 msgstr "Project ontkoppelen"
 
@@ -20367,6 +20380,10 @@ msgstr "Straks aan de beurt"
 
 msgid "Up Next"
 msgstr "Hierna"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "Tot {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "Maximaal {MAX_SAVED_VIEWS} opgeslagen weergaven"
@@ -20477,6 +20494,9 @@ msgstr "Upgraden naar {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Upgraden naar Pro"
+
+msgid "Upgrade to Team"
+msgstr "Upgraden naar Team"
 
 msgid "Upgrade your plan"
 msgstr "Upgrade je abonnement"
@@ -21746,6 +21766,9 @@ msgstr "Je eigen accounts. De integraties van je organisatie geven Paradev toega
 
 msgid "Your Paradev download is starting."
 msgstr "Je Paradev-download start."
+
+msgid "Your plan allows {limit} members."
+msgstr "Je abonnement staat {limit} leden toe."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Je abonnement bevat geen cloudomgevingen."

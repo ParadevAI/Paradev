@@ -28,6 +28,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { useSeatCap } from "../../hooks/useSeatCap";
 import type { TeamMember } from "../../types";
 import { PendingInvitations } from "../PendingInvitations";
 import { MemberActions } from "./components/MemberActions";
@@ -85,6 +86,7 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 	const currentUserRole = currentMember?.role;
 
 	const { plan, activePlan } = useCurrentPlan();
+	const { limit: seatLimit, used: seatsUsed } = useSeatCap();
 	const seatPeriodEnd =
 		plan === "pro" && !activePlan?.cancelAt ? activePlan?.periodEnd : null;
 
@@ -125,14 +127,23 @@ export function MembersSettings({ visibleItems }: MembersSettingsProps) {
 					</div>
 
 					<div className="max-w-5xl space-y-4">
-						<h3 className="text-lg font-semibold">
-							<HighlightText
-								text={t({
-									message: "Team Members",
-								})}
-								query={searchQuery}
-							/>
-						</h3>
+						<div className="flex items-baseline justify-between gap-4">
+							<h3 className="text-lg font-semibold">
+								<HighlightText
+									text={t({
+										message: "Team Members",
+									})}
+									query={searchQuery}
+								/>
+							</h3>
+							{seatLimit !== null && (
+								<span className="text-xs text-muted-foreground">
+									<Trans>
+										{seatsUsed} of {seatLimit} members
+									</Trans>
+								</span>
+							)}
+						</div>
 
 						{showMembersList &&
 							(isPending && members.length === 0 ? (

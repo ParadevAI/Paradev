@@ -893,6 +893,9 @@ msgstr "{count, plural, one {прочитано # файл} few {прочита�
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# автоматизацію прибрано з групи} few {# автоматизації прибрано з груп} many {# автоматизацій прибрано з груп} other {# автоматизації прибрано з груп}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, one {До # учасника} few {До # учасників} many {До # учасників} other {До # учасника}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Використано # джерело} few {Використано # джерела} many {Використано # джерел} other {Використано # джерела}}"
 
@@ -1051,6 +1054,10 @@ msgstr "{localHostName} (цей пристрій)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1254,6 +1261,9 @@ msgstr "Залишилося токенів: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatsUsed} з {seatLimit} учасників"
 
 msgid "{seconds}s"
 msgstr "{seconds} с"
@@ -20275,6 +20285,9 @@ msgstr "Невідомий робочий простір"
 msgid "Unlimited"
 msgstr "Без обмежень"
 
+msgid "Unlimited members"
+msgstr "Необмежена кількість учасників"
+
 msgid "Unlink project"
 msgstr "Відв'язати проєкт"
 
@@ -20361,6 +20374,10 @@ msgstr "Далі"
 
 msgid "Up Next"
 msgstr "Далі"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "До {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "До {MAX_SAVED_VIEWS} збережених подань"
@@ -20471,6 +20488,9 @@ msgstr "Перейти на {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"
+
+msgid "Upgrade to Team"
+msgstr "Перейти на Team"
 
 msgid "Upgrade your plan"
 msgstr "Покращте свій тариф"
@@ -21740,6 +21760,9 @@ msgstr "Ваші власні облікові записи. Інтеграці�
 
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."
+
+msgid "Your plan allows {limit} members."
+msgstr "Ваш тариф дозволяє {limit} учасників."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Ваш тариф не передбачає хмарних середовищ."
