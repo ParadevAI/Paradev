@@ -33,7 +33,7 @@ import {
 	organization,
 } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins/jwt";
-import { and, asc, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray, ne, sql } from "drizzle-orm";
 import { billingUsesAutumn } from "./autumn";
 import { env } from "./env";
 import { acceptInvitationEndpoint } from "./lib/accept-invitation-endpoint";
@@ -42,7 +42,9 @@ import {
 	autumnBillingRoutes,
 	handleStripeBillingEvent,
 	organizationPlanFromAutumn,
+	organizationSeatLimitFromAutumn,
 	seatItem,
+	seatLimitRefusal,
 	setAutumnSeats,
 	withAutumnBilling,
 } from "./lib/billing";
@@ -539,6 +541,32 @@ export const auth = betterAuth({
 						throw new Error("Cannot invite users with this role");
 					}
 
+					if (
+						billingUsesAutumn &&
+						(await organizationPlanFromAutumn(organizationId)) !== "free"
+					) {
+						const [seatLimit, seats, [pending]] = await Promise.all([
+							organizationSeatLimitFromAutumn(organizationId),
+							countBillableSeats(organizationId),
+							db
+								.select({ count: count() })
+								.from(authSchema.invitations)
+								.where(
+									and(
+										eq(authSchema.invitations.organizationId, organizationId),
+										eq(authSchema.invitations.status, "pending"),
+										gt(authSchema.invitations.expiresAt, new Date()),
+										ne(authSchema.invitations.email, data.invitation.email),
+									),
+								),
+						]);
+						const refusal = seatLimitRefusal(
+							seatLimit,
+							seats + (pending?.count ?? 0),
+						);
+						if (refusal) throw new APIError("FORBIDDEN", { message: refusal });
+					}
+
 					if (!teamId) {
 						const oldestTeam = await db.query.teams.findFirst({
 							where: eq(authSchema.teams.organizationId, organizationId),
@@ -702,6 +730,25 @@ export const auth = betterAuth({
 				},
 
 				beforeAddMember: async ({ organization, user }) => {
+					const paying = billingUsesAutumn
+						? (await organizationPlanFromAutumn(organization.id)) !== "free"
+						: !!(await db.query.subscriptions.findFirst({
+								where: and(
+									eq(subscriptions.referenceId, organization.id),
+									eq(subscriptions.status, "active"),
+								),
+							}));
+
+					if (paying) {
+						if (!billingUsesAutumn) return;
+						const refusal = seatLimitRefusal(
+							await organizationSeatLimitFromAutumn(organization.id),
+							await countBillableSeats(organization.id),
+						);
+						if (refusal) throw new APIError("FORBIDDEN", { message: refusal });
+						return;
+					}
+
 					// Domain-allowlisted users bypass the free-plan member limit.
 					// If an admin put the user's domain in allowedDomains, they've
 					// already explicitly opted in to letting those users join.
@@ -717,17 +764,6 @@ export const auth = betterAuth({
 							return;
 						}
 					}
-
-					const paying = billingUsesAutumn
-						? (await organizationPlanFromAutumn(organization.id)) !== "free"
-						: !!(await db.query.subscriptions.findFirst({
-								where: and(
-									eq(subscriptions.referenceId, organization.id),
-									eq(subscriptions.status, "active"),
-								),
-							}));
-
-					if (paying) return;
 
 					// Not countBillableSeats: the free-plan limit is about how many
 					// people are in the organization, not how many seats we bill,

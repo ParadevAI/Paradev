@@ -17,12 +17,14 @@ export {
 	organizationEnvironmentLimitFromAutumn,
 	organizationGatedMachineSizesFromAutumn,
 	organizationPlanFromAutumn,
+	organizationSeatLimitFromAutumn,
 } from "./autumn/plan-state";
 export {
 	syncFromStripeEvent,
 	syncOrganizationSubscription,
 } from "./autumn/projection";
 export { autumnBillingRoutes } from "./autumn/routes";
+export { planSeatRefusal, seatLimitRefusal } from "./autumn/seat-limit";
 export { setAutumnSeats } from "./autumn/seats";
 export { seatItem } from "./autumn/subscription-row";
 export { withAutumnBilling } from "./legacy/stripe-routes-shim";

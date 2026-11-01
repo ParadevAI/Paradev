@@ -46,6 +46,24 @@ plan, so every change made then goes through `createSchedule`.
 Retired Pro plans keep the old path: the `seats` feature quantity, with no
 credit on a decrease.
 
+## Seat caps
+
+Every paid plan declares `max_seats` in its metadata: Pro 5, every other paid
+plan 2147483647. `max_seats` in the Autumn customer's metadata replaces the
+plan's cap, for organizations we let keep more members. Billing state exposes
+the result as `seatLimit`.
+
+The check fails closed. A paid plan without `max_seats` refuses new members, and
+so does an Autumn outage with no last-known billing state; with one, its cap is
+used. A new plan, enterprise ones included, needs `max_seats` before it is sold.
+
+- Adding a member (`beforeAddMember`) is refused at the cap. Domain auto-join
+  does not bypass it; it only bypasses the free plan's one-member limit.
+- Inviting (`beforeCreateInvitation`) counts members plus pending invitations,
+  so invitees are not told they can join a full organization.
+- `previewAttach` and `attach` refuse a plan whose cap the organization is
+  already over, which covers moving down from Team.
+
 ## Cloud access
 
 Billing state exposes `planTier`: the plan's `family` in Autumn (pro, team,

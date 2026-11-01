@@ -163,6 +163,7 @@ export const PLAN_METADATA = {
 	selfServe: "self_serve",
 	family: "family",
 	displayOrder: "display_order",
+	maxSeats: "max_seats",
 } as const;
 
 export interface CatalogPrice {
@@ -293,6 +294,13 @@ function positiveNumber(value: unknown): number | null {
 	return typeof value === "number" && Number.isFinite(value) && value > 0
 		? value
 		: null;
+}
+
+/** Members an organization may hold, from plan or customer metadata; null is unlimited. */
+export function seatLimitFrom(
+	metadata: Record<string, unknown> | null | undefined,
+): number | null {
+	return positiveNumber(metadata?.[PLAN_METADATA.maxSeats]);
 }
 
 /** The seat price a plan bills, whether seats are licenses or a feature quantity. */

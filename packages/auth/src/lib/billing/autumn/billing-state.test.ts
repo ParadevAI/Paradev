@@ -85,6 +85,7 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			planTier: "pro",
 			gatedMachineSizes: [],
 			environmentLimit: null,
+			seatLimit: null,
 		});
 	});
 
@@ -243,6 +244,48 @@ describe("environment limit", () => {
 		expect(
 			billingFromCustomer(customer({ flags: pro, subscription: {} }), NOW)
 				.environmentLimit,
+		).toBeNull();
+	});
+});
+
+describe("seat limit", () => {
+	const capped = {
+		...seatPricedPlan("month"),
+		metadata: { family: "pro", max_seats: 5 },
+	};
+
+	test("a paid plan reads its cap from plan metadata", () => {
+		expect(
+			billingFromCustomer(
+				customer({ flags: pro, subscription: { plan: capped } as never }),
+				NOW,
+			).seatLimit,
+		).toBe(5);
+	});
+
+	test("a customer override replaces the plan's cap", () => {
+		expect(
+			billingFromCustomer(
+				{
+					...customer({ flags: pro, subscription: { plan: capped } as never }),
+					metadata: { max_seats: 20 },
+				},
+				NOW,
+			).seatLimit,
+		).toBe(20);
+	});
+
+	test("a paid plan without a declared cap reads as unknown", () => {
+		expect(
+			billingFromCustomer(customer({ flags: pro, subscription: {} }), NOW)
+				.seatLimit,
+		).toBeNull();
+	});
+
+	test("a free organization has no paid cap", () => {
+		expect(
+			billingFromCustomer({ ...customer({}), metadata: { max_seats: 20 } }, NOW)
+				.seatLimit,
 		).toBeNull();
 	});
 });
