@@ -59,6 +59,7 @@ import { FileHeaderRow } from "./components/FileHeaderRow";
 import { HunkSegmentCell } from "./components/HunkSegmentCell";
 import { ReviewOverlay } from "./components/ReviewOverlay";
 import { useChangesetListItems } from "./hooks/useChangesetListItems";
+import { useHorizontalWheel } from "./hooks/useHorizontalWheel";
 import { useViewedFilesStore } from "./stores/viewedFilesStore";
 import type { LineRow, ListItem } from "./utils/buildListItems";
 import {
@@ -326,6 +327,7 @@ export function FilesChangedScreen() {
 		}
 	}, [contentWidths.maxOffset, maxScrollX, scrollX]);
 
+	const wheelRef = useHorizontalWheel({ scrollX, maxScrollX });
 	const panStartX = useRef(0);
 	const shareAnchorRef = useRef<ViewInstance>(null);
 	const panResponder = useMemo(
@@ -700,6 +702,7 @@ export function FilesChangedScreen() {
 			</Stack.Screen>
 			<CharWidthProbe onMeasure={setCharWidth} />
 			<SafeAreaView
+				ref={wheelRef}
 				edges={["left", "right"]}
 				style={{ flex: 1 }}
 				{...panResponder.panHandlers}
