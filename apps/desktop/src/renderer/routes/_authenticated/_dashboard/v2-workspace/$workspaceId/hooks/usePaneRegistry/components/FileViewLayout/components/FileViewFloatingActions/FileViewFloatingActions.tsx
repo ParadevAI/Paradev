@@ -5,14 +5,14 @@ import { FileTreeToggle } from "./components/FileTreeToggle";
 interface FileViewFloatingActionsProps {
 	workspaceId: string;
 	filePath: string;
-	showTreeToggle?: boolean;
+	treeToggle?: { visible: boolean; onToggle: () => void };
 }
 
 /** Open in and the tree toggle, in one spot whether the tree shows or not. */
 export function FileViewFloatingActions({
 	workspaceId,
 	filePath,
-	showTreeToggle = true,
+	treeToggle,
 }: FileViewFloatingActionsProps) {
 	return (
 		<div
@@ -21,7 +21,7 @@ export function FileViewFloatingActions({
 		>
 			<FileSaveButton workspaceId={workspaceId} filePath={filePath} />
 			<FileOpenInButton workspaceId={workspaceId} filePath={filePath} />
-			{showTreeToggle && <FileTreeToggle />}
+			<FileTreeToggle {...treeToggle} />
 		</div>
 	);
 }
