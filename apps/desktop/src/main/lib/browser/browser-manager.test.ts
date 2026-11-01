@@ -820,3 +820,39 @@ describe("CDP session and browser extensions", () => {
 		]);
 	});
 });
+
+describe("right-click menu", () => {
+	test("lists the items extensions add, and only for the pane they asked about", () => {
+		const { Menu } = require("electron") as typeof import("electron");
+		const build = Menu.buildFromTemplate as unknown as ReturnType<typeof mock>;
+		const popup = mock();
+		build.mockImplementation(() => ({ popup }));
+		const translate = { label: "Google Translate" } as Electron.MenuItem;
+		const asked: Electron.WebContents[] = [];
+		browserManager.setExtensionMenuItems((contents) => {
+			asked.push(contents);
+			return [translate];
+		});
+		const wc = Object.assign(register("pane-context-menu"), {
+			canGoBack: () => false,
+			canGoForward: () => false,
+		});
+		const params = {
+			linkURL: "",
+			pageURL: "https://example.com",
+			selectionText: "bonjour",
+			editFlags: { canCopy: true, canPaste: false, canSelectAll: false },
+		};
+
+		for (const listener of wc.listeners.get("context-menu") ?? []) {
+			listener({}, params);
+		}
+
+		const template = build.mock.calls.at(-1)?.[0] as unknown[];
+		expect(template).toContain(translate);
+		expect(asked).toEqual([wc as unknown as Electron.WebContents]);
+		expect(popup).toHaveBeenCalled();
+		browserManager.setExtensionMenuItems(() => []);
+		build.mockImplementation(() => ({}));
+	});
+});

@@ -244,11 +244,17 @@ function withTimeout<T>(
 	});
 }
 
+type ExtensionMenuItems = (
+	contents: Electron.WebContents,
+	params: Electron.ContextMenuParams,
+) => Electron.MenuItem[];
+
 class BrowserManager extends EventEmitter {
 	private panes = new Map<string, PaneRegistration>();
 	private consoleLogs = new Map<string, ConsoleEntry[]>();
 	private consoleListeners = new Map<string, () => void>();
 	private contextMenuListeners = new Map<string, () => void>();
+	private extensionMenuItems: ExtensionMenuItems = () => [];
 	private beforeInputListeners = new Map<string, () => void>();
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
@@ -1087,6 +1093,11 @@ class BrowserManager extends EventEmitter {
 		window.on("closed", detachGuard);
 	}
 
+	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
+	setExtensionMenuItems(items: ExtensionMenuItems): void {
+		this.extensionMenuItems = items;
+	}
+
 	private setupContextMenu(paneId: string, wc: Electron.WebContents): void {
 		const handler = (
 			_event: Electron.Event,
@@ -1094,7 +1105,10 @@ class BrowserManager extends EventEmitter {
 		) => {
 			const { linkURL, pageURL, selectionText, editFlags } = params;
 
-			const menuItems: Electron.MenuItemConstructorOptions[] = [];
+			const menuItems: (
+				| Electron.MenuItemConstructorOptions
+				| Electron.MenuItem
+			)[] = [];
 
 			if (linkURL) {
 				menuItems.push(
@@ -1168,6 +1182,11 @@ class BrowserManager extends EventEmitter {
 
 			if (selectionText || editFlags.canPaste || editFlags.canSelectAll) {
 				menuItems.push({ type: "separator" });
+			}
+
+			const extensionItems = this.extensionMenuItems(wc, params);
+			if (extensionItems.length > 0) {
+				menuItems.push(...extensionItems, { type: "separator" });
 			}
 
 			menuItems.push(

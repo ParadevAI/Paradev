@@ -129,6 +129,11 @@ function startExtensionHost(): void {
 	});
 
 	watchWindows((window) => extensions.addWindow(window));
+	browserManager.setExtensionMenuItems((contents, params) =>
+		contents.session === browserSession
+			? extensions.getContextMenuItems(contents, params)
+			: [],
+	);
 
 	try {
 		attachBrowserExtensions({
