@@ -13,7 +13,7 @@ import {
 	type ManagedTomlBlockSpec,
 	removeManagedTomlBlock,
 } from "./managed-toml-block";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 
 /**
  * Materializes the MCP servers of installed Superset plugins into agent
@@ -354,7 +354,7 @@ export function readExternallyConfiguredMcpServers(
 	options: SyncManagedMcpServersOptions = {},
 ): ExternalMcpServer[] {
 	const homeDir = options.homeDir ?? os.homedir();
-	const supersetHomeDir = options.supersetHomeDir ?? resolveSupersetHomeDir();
+	const supersetHomeDir = options.supersetHomeDir ?? resolveAppHomeDir();
 	const ledger = readLedger(supersetHomeDir);
 	const bySourceAndName = new Map<string, ExternalMcpServer>();
 
@@ -533,7 +533,7 @@ export function syncManagedMcpServers(
 	options: SyncManagedMcpServersOptions = {},
 ): void {
 	const homeDir = options.homeDir ?? os.homedir();
-	const supersetHomeDir = options.supersetHomeDir ?? resolveSupersetHomeDir();
+	const supersetHomeDir = options.supersetHomeDir ?? resolveAppHomeDir();
 	const scoped = getDesiredMcpServersByAgent(desired, options);
 	const errors: unknown[] = [];
 	const attempt = (sync: () => void) => {

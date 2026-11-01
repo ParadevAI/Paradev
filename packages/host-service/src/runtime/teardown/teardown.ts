@@ -37,8 +37,7 @@ interface RunTeardownOptions {
 	repoPath: string;
 	projectId: string;
 	timeoutMs?: number;
-	/** Override $HOME for tests. Defaults to `os.homedir()`. */
-	homeDir?: string;
+	appHomeDir?: string;
 }
 
 /**
@@ -62,13 +61,13 @@ export async function runTeardown({
 	repoPath,
 	projectId,
 	timeoutMs = TEARDOWN_TIMEOUT_MS,
-	homeDir,
+	appHomeDir,
 }: RunTeardownOptions): Promise<TeardownResult> {
 	const resolved = resolveTeardownCommand({
 		repoPath,
 		projectId,
 		worktreePath,
-		homeDir,
+		appHomeDir,
 	});
 	if (resolved === null) return { status: "skipped" };
 
@@ -168,8 +167,7 @@ export function resolveTeardownCommand(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath: string;
-	/** Override $HOME for tests. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
 	if (config?.kind !== "ok") return null;

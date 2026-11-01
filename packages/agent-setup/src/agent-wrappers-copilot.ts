@@ -6,7 +6,7 @@ import {
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getTemplatePath, getV1NotificationsPort } from "./config";
-import { getHooksDir } from "./paths";
+import { APP_HOME_DIR_NAME, getHooksDir } from "./paths";
 
 export const COPILOT_HOOK_SCRIPT_NAME = "copilot-hook.sh";
 
@@ -25,6 +25,7 @@ export function getCopilotHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", COPILOT_HOOK_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME)
 		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
 }
 
