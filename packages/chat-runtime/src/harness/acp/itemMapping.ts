@@ -20,6 +20,28 @@ const TOOL_KIND_BY_ACP: Record<string, ToolKind> = {
 	other: "other",
 };
 
+/** The Claude Code CLI writes this in place of a user turn or tool output it stopped. */
+const INTERRUPT_MARKER = /^\[Request interrupted by user(?: for tool use)?\]$/;
+
+export function isInterruptMarker(text: string): boolean {
+	return INTERRUPT_MARKER.test(text.trim());
+}
+
+export function onlyInterruptMarker(content: readonly ToolContent[]): boolean {
+	return (
+		content.length > 0 &&
+		content.every((block) =>
+			isInterruptMarker(
+				block.type === "text"
+					? block.text
+					: block.type === "terminal"
+						? block.output
+						: "",
+			),
+		)
+	);
+}
+
 export function toolKind(kind: string | undefined): ToolKind {
 	return (kind && TOOL_KIND_BY_ACP[kind]) || "other";
 }
