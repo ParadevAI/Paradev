@@ -21756,6 +21756,9 @@ msgstr "你的方案不包含雲端環境。請在設定的帳單中升級後再
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "您的方案將於 {startDate} 切換到 {planName}。今天不扣款。"
 
+msgid "Your prompt"
+msgstr "你的提示詞"
+
 msgid "Your rank"
 msgstr "你的排名"
 

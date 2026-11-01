@@ -21,6 +21,7 @@ import {
 	continuationTarget,
 	validateAgentEffortSelection,
 	validateAgentForkSelection,
+	validateAgentLaunchOptions,
 	validateAgentModelSelection,
 	validateAgentModeSelection,
 	validateAgentResumeSelection,
@@ -817,6 +818,58 @@ describe("validateAgentModeSelection", () => {
 		);
 		expect(() =>
 			validateAgentModeSelection("claude", "Claude", "plan"),
+		).toThrow("Claude does not support a launch mode override");
+	});
+});
+
+describe("validateAgentLaunchOptions", () => {
+	function seedClaude(db: HostDb) {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000d",
+				presetId: "claude",
+				label: "Claude",
+				command: "claude",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 0,
+			})
+			.run();
+	}
+
+	it("accepts a chat permission mode for a chat launch", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		for (const mode of ["default", "acceptEdits", "auto", "plan"]) {
+			expect(() =>
+				validateAgentLaunchOptions(db, {
+					agent: "claude",
+					mode,
+					surface: "chat",
+				}),
+			).not.toThrow();
+		}
+	});
+
+	it("rejects a mode the chat does not offer", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		expect(() =>
+			validateAgentLaunchOptions(db, {
+				agent: "claude",
+				mode: "review",
+				surface: "chat",
+			}),
+		).toThrow('Unsupported launch mode "review" for Claude');
+	});
+
+	it("keeps rejecting a chat mode on a terminal launch", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		expect(() =>
+			validateAgentLaunchOptions(db, { agent: "claude", mode: "auto" }),
 		).toThrow("Claude does not support a launch mode override");
 	});
 });

@@ -21756,6 +21756,9 @@ msgstr "Twój plan nie obejmuje środowisk w chmurze. Przejdź na wyższy plan w
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Twój plan zmieni się na {planName} dnia {startDate}. Dziś nic nie zostanie pobrane."
 
+msgid "Your prompt"
+msgstr "Twój prompt"
+
 msgid "Your rank"
 msgstr "Twoja pozycja"
 

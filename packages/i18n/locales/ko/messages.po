@@ -21756,6 +21756,9 @@ msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "{startDate}에 플랜이 {planName}(으)로 바뀝니다. 오늘은 결제되지 않습니다."
 
+msgid "Your prompt"
+msgstr "입력한 프롬프트"
+
 msgid "Your rank"
 msgstr "내 순위"
 

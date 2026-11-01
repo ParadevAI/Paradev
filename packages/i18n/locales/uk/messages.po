@@ -21750,6 +21750,9 @@ msgstr "Ваш тариф не передбачає хмарних середо�
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Ваш тариф зміниться на {planName} {startDate}. Сьогодні нічого не списується."
 
+msgid "Your prompt"
+msgstr "Ваш промпт"
+
 msgid "Your rank"
 msgstr "Ваше місце"
 

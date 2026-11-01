@@ -21756,6 +21756,9 @@ msgstr "Ваш тариф не включает облачные окружен�
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Ваш план перейдёт на {planName} {startDate}. Сегодня ничего не списывается."
 
+msgid "Your prompt"
+msgstr "Ваш промпт"
+
 msgid "Your rank"
 msgstr "Ваше место"
 

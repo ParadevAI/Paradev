@@ -21756,6 +21756,9 @@ msgstr "Paket Anda tidak mencakup lingkungan cloud. Tingkatkan paket di Pengatur
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Paket Anda pindah ke {planName} pada {startDate}. Tidak ada tagihan hari ini."
 
+msgid "Your prompt"
+msgstr "Prompt Anda"
+
 msgid "Your rank"
 msgstr "Peringkat Anda"
 

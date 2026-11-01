@@ -21756,6 +21756,9 @@ msgstr "ご利用のプランにはクラウド環境が含まれていません
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "{startDate} にプランが {planName} に変わります。本日の請求はありません。"
 
+msgid "Your prompt"
+msgstr "入力したプロンプト"
+
 msgid "Your rank"
 msgstr "あなたのランク"
 

@@ -21756,6 +21756,9 @@ msgstr "Tu plan no incluye entornos en la nube. Mejora tu plan en Configuración
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Tu plan cambia a {planName} el {startDate}. Hoy no se cobra nada."
 
+msgid "Your prompt"
+msgstr "Tu prompt"
+
 msgid "Your rank"
 msgstr "Tu puesto"
 
