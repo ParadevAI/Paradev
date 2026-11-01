@@ -25,9 +25,10 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { ActionSheetIOS, Alert, Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
+import { showActionSheet } from "@/lib/action-sheet";
 import {
 	type ChatHost,
 	createChatSessionClient,
@@ -207,7 +208,7 @@ export const ChatSessionView = forwardRef<
 
 	const branchFrom = useCallback(
 		(itemId: string) => {
-			ActionSheetIOS.showActionSheetWithOptions(
+			showActionSheet(
 				{
 					options: [
 						t({ message: "Branch from here" }),

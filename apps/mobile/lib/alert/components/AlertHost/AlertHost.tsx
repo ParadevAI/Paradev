@@ -43,19 +43,24 @@ export function AlertHost() {
 					accessibilityRole="alert"
 					className="bg-popover border-border w-full max-w-xs overflow-hidden rounded-3xl border"
 				>
-					<View className="gap-1.5 px-5 pb-4 pt-5">
-						<Text className="text-foreground text-center text-base font-semibold">
-							{pending.title}
-						</Text>
-						{pending.message ? (
-							<Text className="text-muted-foreground text-center text-sm">
-								{pending.message}
-							</Text>
-						) : null}
-					</View>
+					{pending.title || pending.message ? (
+						<View className="gap-1.5 px-5 pb-4 pt-5">
+							{pending.title ? (
+								<Text className="text-foreground text-center text-base font-semibold">
+									{pending.title}
+								</Text>
+							) : null}
+							{pending.message ? (
+								<Text className="text-muted-foreground text-center text-sm">
+									{pending.message}
+								</Text>
+							) : null}
+						</View>
+					) : null}
 					<View
 						className={cn(
-							"border-border border-t",
+							"border-border",
+							(pending.title || pending.message) && "border-t",
 							stacked ? "flex-col" : "flex-row",
 						)}
 					>

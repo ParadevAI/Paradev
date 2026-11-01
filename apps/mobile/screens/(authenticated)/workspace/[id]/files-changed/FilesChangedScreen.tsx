@@ -8,7 +8,6 @@ import { FileDiff } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ViewInstance } from "react-native";
 import {
-	ActionSheetIOS,
 	ActivityIndicator,
 	Alert,
 	Linking,
@@ -27,6 +26,7 @@ import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { showActionSheet } from "@/lib/action-sheet";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
@@ -377,7 +377,7 @@ export function FilesChangedScreen() {
 
 	const onCommentMenu = useCallback(
 		(comment: DraftComment, anchor: number | null) => {
-			ActionSheetIOS.showActionSheetWithOptions(
+			showActionSheet(
 				{
 					anchor: anchor ?? undefined,
 					options: [
