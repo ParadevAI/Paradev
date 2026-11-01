@@ -67,6 +67,7 @@ import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
+import { PostOnboardingPermissions } from "./components/PostOnboardingPermissions";
 import { TeardownLogsDialog } from "./components/TeardownLogsDialog";
 import { V2NotificationController } from "./components/V2NotificationController";
 import { WindowTitle } from "./components/WindowTitle";
@@ -330,6 +331,9 @@ function AuthenticatedLayout() {
 				<GlobalBrowserLifecycle />
 				<GlobalPaneLayoutRequests />
 				<FileAutoSave />
+				<PostOnboardingPermissions
+					onboarded={Boolean(session?.user?.onboardedAt)}
+				/>
 				<LocalHostServiceProvider>
 					{/* Above the workspace fan-out: it needs sandbox addresses to
 					    include them as hosts. */}
