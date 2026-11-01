@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Uniwind } from "uniwind";
+import { ActionSheetHost } from "@/lib/action-sheet";
 import { AlertHost, installAlert } from "@/lib/alert";
 import { useSession } from "@/lib/auth/client";
 import { watchNetworkState } from "@/lib/errors";
@@ -142,6 +143,7 @@ export function RootLayout() {
 								<AlertPromptHost />
 								<AlertHost />
 								<AttachmentsSheetHost />
+								<ActionSheetHost />
 							</ThemeProvider>
 						</I18nProvider>
 					</PostHogProvider>
