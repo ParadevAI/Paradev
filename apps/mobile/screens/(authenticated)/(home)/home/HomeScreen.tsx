@@ -40,6 +40,7 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
+import { listSideInset } from "@/lib/layout";
 import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
@@ -193,6 +194,7 @@ export function HomeScreen() {
 	const columns = grid?.columns ?? 1;
 	const cellWidth = grid?.cellWidth ?? 0;
 	const listInset = grid?.inset ?? readableInset;
+	const sideInset = useMemo(() => listSideInset(listInset), [listInset]);
 	const queryClient = useQueryClient();
 	useAppReviewPrompt();
 	const setTargetKey = useNewSessionPreferencesStore(
@@ -704,25 +706,28 @@ export function HomeScreen() {
 
 	const renderItem = useCallback(
 		({ item }: { item: HomeListEntry }) => {
-			if (item.kind !== "gridRow") return renderListItem(item, false);
-			return (
-				<View
-					className="flex-row"
-					style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
-				>
-					{item.cells.map((cell) => (
-						<View
-							key={homeListItemKey(cell)}
-							className="border-border rounded-xl border"
-							style={{ width: cellWidth }}
-						>
-							{renderListItem(cell, true)}
-						</View>
-					))}
-				</View>
-			);
+			const row =
+				item.kind !== "gridRow" ? (
+					renderListItem(item, false)
+				) : (
+					<View
+						className="flex-row"
+						style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
+					>
+						{item.cells.map((cell) => (
+							<View
+								key={homeListItemKey(cell)}
+								className="border-border rounded-xl border"
+								style={{ width: cellWidth }}
+							>
+								{renderListItem(cell, true)}
+							</View>
+						))}
+					</View>
+				);
+			return sideInset.row ? <View style={sideInset.row}>{row}</View> : row;
 		},
-		[renderListItem, cellWidth],
+		[renderListItem, cellWidth, sideInset.row],
 	);
 
 	// The native splash is still up until hideSplash() below; nothing to draw.
@@ -863,13 +868,19 @@ export function HomeScreen() {
 							: undefined,
 						paddingBottom: 112,
 						paddingTop: 8,
-						paddingHorizontal: listInset,
+						...sideInset.content,
 					}}
 					data={listEntries}
 					extraData={renderItem}
 					keyExtractor={homeListEntryKey}
 					renderItem={renderItem}
-					ListHeaderComponent={scopeBar}
+					ListHeaderComponent={
+						sideInset.row ? (
+							<View style={sideInset.row}>{scopeBar}</View>
+						) : (
+							scopeBar
+						)
+					}
 					viewabilityConfig={VIEWABILITY_CONFIG}
 					onViewableItemsChanged={onViewableItemsChanged}
 					refreshControl={
