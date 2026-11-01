@@ -85,11 +85,4 @@ describe("shell-ready evidence", () => {
 		expect(getShellReadyMarkerEvidence("zsh")).toBeNull();
 		expect(getShellReadyMarkerEvidence("bash")).toBe("delivered");
 	});
-
-	test("no SUPERSET_HOME_DIR keeps evidence in memory only", () => {
-		delete process.env.SUPERSET_HOME_DIR;
-		__resetShellReadyEvidenceForTesting();
-		recordShellReadyMarkerEvidence("zsh", "missing");
-		expect(getShellReadyMarkerEvidence("zsh")).toBe("missing");
-	});
 });

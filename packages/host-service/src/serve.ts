@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
 import { createApp } from "./app";
 import { getSupervisor, startDaemonBootstrap } from "./daemon";
 import { env } from "./env";
@@ -39,6 +40,13 @@ async function main(): Promise<void> {
 	console.log(
 		`[host-service] starting (org=${env.ORGANIZATION_ID}, port=${env.PORT}, NODE_ENV=${process.env.NODE_ENV ?? "unset"})`,
 	);
+
+	const appHome = moveLegacyAppHome();
+	if (appHome.move === "moved" || appHome.move === "failed") {
+		console.log(
+			`[host-service] app home: ${appHome.homeDir} (${appHome.move})`,
+		);
+	}
 
 	// Resolve the shell-env snapshot in the background — it must not block the
 	// server from listening (the login-shell probe can burn the full 8s

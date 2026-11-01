@@ -166,7 +166,7 @@ export function mergeConfigs(
 
 /**
  * Resolves setup/teardown/run config with a three-tier priority:
- *   1. User override:  ~/.superset/projects/<projectId>/config.json
+ *   1. User override:  ~/.paradev/projects/<projectId>/config.json
  *   2. Worktree:       <worktreePath>/.superset/config.json
  *   3. Main repo:      <mainRepoPath>/.superset/config.json
  *

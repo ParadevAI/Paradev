@@ -22,8 +22,8 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
 import { isAbsolute, relative, resolve, sep } from "node:path";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 import { config } from "dotenv";
 
 // override: true ensures .env values take precedence over inherited env vars
@@ -40,8 +40,8 @@ import {
 	getWorkspaceName,
 } from "../src/shared/worktree-id";
 
-const DEFAULT_WORKTREE_BASE = resolve(homedir(), ".superset/worktrees");
-const DEFAULT_PROD_DB_PATH = resolve(homedir(), ".superset/local.db");
+const DEFAULT_WORKTREE_BASE = resolve(defaultAppHomeDir(), "worktrees");
+const DEFAULT_PROD_DB_PATH = resolve(defaultAppHomeDir(), "local.db");
 
 type ResolveWorkspaceIdentityOptions = {
 	cwd?: string;

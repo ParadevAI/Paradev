@@ -1,13 +1,27 @@
 import { chmodSync, existsSync, mkdirSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
-import { SUPERSET_DIR_NAME } from "shared/constants";
+import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
+import { resolveUserHomeDir } from "@superset/agent-setup/paths";
+import { getWorkspaceName } from "shared/env.shared";
 
-const SUPERSET_HOME_DIR_ENV = "SUPERSET_HOME_DIR";
+const workspace = getWorkspaceName();
+if (workspace && !process.env.SUPERSET_HOME_DIR?.trim()) {
+	process.env.SUPERSET_HOME_DIR = join(
+		resolveUserHomeDir(),
+		`.paradev-${workspace}`,
+	);
+}
+const appHome = moveLegacyAppHome();
+if (appHome.move === "moved") {
+	console.log("[app-environment] Moved the app home to", appHome.homeDir);
+} else if (appHome.move === "failed") {
+	console.warn(
+		"[app-environment] Could not move the app home; using",
+		appHome.homeDir,
+	);
+}
 
-export const SUPERSET_HOME_DIR =
-	process.env[SUPERSET_HOME_DIR_ENV] || join(homedir(), SUPERSET_DIR_NAME);
-process.env[SUPERSET_HOME_DIR_ENV] = SUPERSET_HOME_DIR;
+export const SUPERSET_HOME_DIR = appHome.homeDir;
 
 export const SUPERSET_HOME_DIR_MODE = 0o700;
 export const SUPERSET_SENSITIVE_FILE_MODE = 0o600;
