@@ -11,7 +11,7 @@ import {
 import { findOrgMembership } from "@superset/db/utils";
 import { pickEntityColor } from "@superset/shared/entity-colors";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "../../trpc";
 import {
@@ -34,6 +34,19 @@ async function announceTasks(channelId: string) {
 	});
 }
 
+/** Reloads the task list in every channel showing one of these projects. */
+export async function announceProjectTasks(
+	projectIds: readonly (string | null | undefined)[],
+) {
+	const ids = [...new Set(projectIds.filter((id): id is string => !!id))];
+	if (!ids.length) return;
+	const rows = await db
+		.select({ id: channels.id })
+		.from(channels)
+		.where(inArray(channels.taskProjectId, ids));
+	await Promise.all(rows.map((row) => announceTasks(row.id)));
+}
+
 async function channelProjectId(channelId: string) {
 	const [row] = await db
 		.select({ projectId: channels.taskProjectId })
@@ -47,6 +60,7 @@ async function channelProjectId(channelId: string) {
 async function ensureChannelProject(channel: {
 	id: string;
 	name: string;
+	visibility: string;
 	organizationId: string;
 	taskProjectId: string | null;
 }) {
@@ -62,7 +76,10 @@ async function ensureChannelProject(channel: {
 			.insert(taskProjects)
 			.values({
 				organizationId: channel.organizationId,
-				name: channel.name.charAt(0).toUpperCase() + channel.name.slice(1),
+				name:
+					channel.visibility === "private"
+						? "Channel tasks"
+						: channel.name.charAt(0).toUpperCase() + channel.name.slice(1),
 				color: pickEntityColor(),
 			})
 			.returning({ id: taskProjects.id });
@@ -192,7 +209,7 @@ export const channelTaskRouter = {
 					],
 				);
 			}
-			await announceTasks(input.channelId);
+			await announceProjectTasks([projectId, previous?.projectId]);
 			return { added: true };
 		}),
 
@@ -225,7 +242,8 @@ export const channelTaskRouter = {
 					[{ fromProjectId: projectId, toProjectId: null }],
 				);
 			}
-			await announceTasks(input.channelId);
+			await announceProjectTasks([projectId]);
+			if (!projectId) await announceTasks(input.channelId);
 			return { removed: true };
 		}),
 } satisfies TRPCRouterRecord;
