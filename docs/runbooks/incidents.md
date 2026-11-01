@@ -4,12 +4,12 @@ How to run an incident for Paradev's hosted services, and how to keep status.par
 while it happens. Agents: `.agents/skills/incident-triage/SKILL.md` does the first pass of the
 "Where to look first" section and drafts the status message. A human posts it.
 
-## status.superset.sh
+## status.paradev.com
 
 | | |
 |---|---|
 | Provider | **incident.io** status page "Superset" (standalone page, created 24 March 2026). Confirmed 30 September 2026: the page CSP names `status-page-*-incident-io-team.vercel.app`. Nothing in this repo configures it. |
-| DNS | `superset.sh` is on Cloudflare. `status` has its own **DNS-only** CNAME to `cname.vercel-dns-016.com` (added 30 September 2026), so the page does not go through the Cloudflare proxy that relay and realtime also use. Vercel holds its own certificate for the name. To undo, delete the record; the proxied `*.superset.sh` wildcard then serves it again. |
+| DNS | Custom domain `status.paradev.com` (moved from `status.superset.sh` on 1 November 2026). `paradev.com` DNS is on Vercel: incident.io serves the page from their own Vercel account, which we allowed with the `_vercel` TXT record on `paradev.com`, and the wildcard record already points the name at Vercel. `status.superset.sh` is a proxied Cloudflare record with a 301 redirect rule to `status.paradev.com` that keeps the path and query. |
 | Components | Desktop App, Web App, General API, Integrations, Marketing Site, Remote Access (relay), Sign-in. |
 | Link in the product | `COMPANY.STATUS_URL` in `packages/shared/src/constants.ts`, used by the marketing footer, the contact page and `index.md`. |
 | Monitoring | Sentry uptime monitors (org `superset-sh`) check the web app, API, sign-in route, API health with a database check, relay, relay v2, realtime, marketing, docs and usercontent every 1 to 5 minutes. The Sentry alert "Uptime failures to incident.io" sends their failures to the incident.io alert source "Sentry uptime monitors". incident.io does not run checks itself. A person still changes the status page. |
@@ -42,7 +42,7 @@ Setup still open in incident.io (org `superset-sh`):
 - [ ] Publish the past incidents of 17 September 2026 (API outage) and 23 September 2026 (desktop workspace screens) on the status page, with their real times.
 - [ ] Each person in the rotation: set a phone number or the incident.io mobile app in your notification preferences. Without one, a page can arrive only as an email or a Slack message.
 
-To check the page again: `curl -sS https://status.superset.sh/proxy/status.superset.sh` returns
+To check the page again: `curl -sS https://status.paradev.com/proxy/status.paradev.com` returns
 the components and ongoing incidents as JSON.
 
 ## Severity
