@@ -665,6 +665,8 @@ export function PullRequestCodeTab({
 		() =>
 			({
 				...options,
+				// GitHub patches have no full file contents to expand into.
+				expandUnchanged: false,
 				enableLineSelection: canUseProject,
 				enableGutterUtility: canUseProject,
 				// Pierre gates the gutter "+" button's pointer flow behind a
