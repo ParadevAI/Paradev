@@ -423,7 +423,7 @@ export function spawnAsync(command: string, args: string[]): Promise<void> {
 			reject(new Error(message));
 		});
 
-		child.on("close", (code) => {
+		child.on("exit", (code) => {
 			if (code === 0) {
 				resolve();
 			} else {
