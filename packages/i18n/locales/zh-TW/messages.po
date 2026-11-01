@@ -9469,8 +9469,8 @@ msgstr "執行間隔（小時）"
 msgid "Hover Card"
 msgstr "懸浮卡片"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Paradev 為你執行 {label} 時它如何登入。"
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "{label} 在雲端工作區中的驗證方式。"
 
 msgid "How 2026 plays out"
 msgstr "2026年會怎麼走"
@@ -16186,8 +16186,8 @@ msgstr "執行 \"gh auth login\" 或設定 GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "立即執行{0}"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "在終端中執行<0>{tokenCommand}</0><1><2/></1>，然後把權杖貼到這裡。"
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "在終端中執行<0>{tokenCommand}</0><1><2/></1>，然後把取得的權杖貼到這裡。"
 
 msgid "Run 01"
 msgstr "Run 01"

@@ -9463,8 +9463,8 @@ msgstr "Годин між запусками"
 msgid "Hover Card"
 msgstr "Картка під час наведення"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Як {label} входить в обліковий запис, коли Paradev запускає його за вас."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "Як {label} проходить автентифікацію в хмарних робочих просторах."
 
 msgid "How 2026 plays out"
 msgstr "Як мине 2026-й"
@@ -16180,8 +16180,8 @@ msgstr "Виконайте «gh auth login» або задайте GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "Запустити {0} зараз"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Виконайте <0>{tokenCommand}</0><1><2/></1> у терміналі та вставте токен сюди."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Виконайте <0>{tokenCommand}</0><1><2/></1> у терміналі та вставте сюди отриманий токен."
 
 msgid "Run 01"
 msgstr "Запуск 01"

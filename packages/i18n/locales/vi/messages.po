@@ -9469,8 +9469,8 @@ msgstr "Số giờ giữa các lần chạy"
 msgid "Hover Card"
 msgstr "Hover Card"
 
-msgid "How {label} signs in when Paradev runs it for you."
-msgstr "Cách {label} đăng nhập khi Paradev chạy nó cho bạn."
+msgid "How {label} authenticates in cloud workspaces."
+msgstr "Cách {label} xác thực trong không gian làm việc đám mây."
 
 msgid "How 2026 plays out"
 msgstr "Năm 2026 diễn ra thế nào"
@@ -16186,8 +16186,8 @@ msgstr "Chạy \"gh auth login\" hoặc đặt GITHUB_TOKEN"
 msgid "Run {0} now"
 msgstr "Chạy {0} ngay"
 
-msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token here."
-msgstr "Chạy <0>{tokenCommand}</0><1><2/></1> trong terminal rồi dán token vào đây."
+msgid "Run <0>{tokenCommand}</0><1><2/></1> in a terminal and paste the token you get back here."
+msgstr "Chạy <0>{tokenCommand}</0><1><2/></1> trong terminal rồi dán token bạn nhận được vào đây."
 
 msgid "Run 01"
 msgstr "Run 01"
