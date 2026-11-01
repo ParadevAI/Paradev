@@ -9093,9 +9093,6 @@ msgstr "GitHub用户名"
 msgid "GitHub username..."
 msgstr "GitHub 用户名..."
 
-msgid "GitHub username…"
-msgstr "GitHub用户名…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "为 Claude Code、Codex 或任何 CLI 智能体分配独立的工作空间和分支，然后在一处审阅所有改动。"
 
@@ -13145,8 +13142,8 @@ msgstr "为当前终端打开多行提示词编辑器"
 msgid "Open a new {label} chat?"
 msgstr "打开新的 {label} 聊天？"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "打开拉取请求或合并请求以查看审查状态、检查和评论。"
 
 msgid "Open actions menu"
 msgstr "打开操作菜单"
@@ -13207,6 +13204,9 @@ msgstr "在聊天窗格而不是终端中打开 Claude 和 Codex 会话。"
 
 msgid "Open Command Palette"
 msgstr "打开命令面板"
+
+msgid "Open comment on {providerName}"
+msgstr "在{providerName}上打开评论"
 
 msgid "Open comment on GitHub"
 msgstr "在GitHub上打开评论"
@@ -13405,6 +13405,9 @@ msgstr "打开菜单"
 
 msgid "Open navigation"
 msgstr "打开导航"
+
+msgid "Open on {providerName}"
+msgstr "在{providerName}上打开"
 
 msgid "Open on GitHub"
 msgstr "在GitHub上打开"
@@ -20759,6 +20762,9 @@ msgstr "查看更多"
 
 msgid "View name"
 msgstr "视图名称"
+
+msgid "View on {providerName}"
+msgstr "在{providerName}上查看"
 
 msgid "View on GitHub"
 msgstr "在GitHub上查看"

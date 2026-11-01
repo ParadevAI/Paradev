@@ -9087,9 +9087,6 @@ msgstr "Ім'я користувача GitHub"
 msgid "GitHub username..."
 msgstr "Ім'я користувача GitHub..."
 
-msgid "GitHub username…"
-msgstr "Ім'я користувача GitHub…"
-
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Дайте Claude Code, Codex або будь-якому CLI-агенту власний робочий простір і гілку, а потім переглядайте всі зміни в одному місці."
 
@@ -13139,8 +13136,8 @@ msgstr "Відкрити багаторядковий редактор пром�
 msgid "Open a new {label} chat?"
 msgstr "Відкрити новий чат {label}?"
 
-msgid "Open a pull request to view review status, checks, and comments."
-msgstr "Відкрийте пул-реквест, щоб побачити статус рев'ю, перевірки й коментарі."
+msgid "Open a pull or merge request to view review status, checks, and comments."
+msgstr "Відкрийте pull request або merge request, щоб переглянути статус рецензування, перевірок і коментарів."
 
 msgid "Open actions menu"
 msgstr "Відкрити меню дій"
@@ -13201,6 +13198,9 @@ msgstr "Відкривати сеанси Claude і Codex на панелі ча
 
 msgid "Open Command Palette"
 msgstr "Відкрити палітру команд"
+
+msgid "Open comment on {providerName}"
+msgstr "Відкрити коментар у {providerName}"
 
 msgid "Open comment on GitHub"
 msgstr "Відкрити коментар на GitHub"
@@ -13399,6 +13399,9 @@ msgstr "Відкрити меню"
 
 msgid "Open navigation"
 msgstr "Відкрити навігацію"
+
+msgid "Open on {providerName}"
+msgstr "Відкрити у {providerName}"
 
 msgid "Open on GitHub"
 msgstr "Відкрити на GitHub"
@@ -20753,6 +20756,9 @@ msgstr "Показати більше"
 
 msgid "View name"
 msgstr "Назва подання"
+
+msgid "View on {providerName}"
+msgstr "Переглянути у {providerName}"
 
 msgid "View on GitHub"
 msgstr "Переглянути на GitHub"
