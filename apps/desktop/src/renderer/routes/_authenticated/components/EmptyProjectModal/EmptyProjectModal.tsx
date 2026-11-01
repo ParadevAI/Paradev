@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { LuFolderOpen, LuLoaderCircle } from "react-icons/lu";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { getDefaultProjectsDir } from "renderer/lib/getDefaultProjectsDir";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import {
@@ -53,7 +54,7 @@ export function EmptyProjectModal({
 
 	useEffect(() => {
 		if (parentDir || !homeDir) return;
-		setParentDir(`${homeDir}/.superset/projects`);
+		setParentDir(getDefaultProjectsDir(homeDir));
 	}, [homeDir, parentDir]);
 
 	const reset = () => {
