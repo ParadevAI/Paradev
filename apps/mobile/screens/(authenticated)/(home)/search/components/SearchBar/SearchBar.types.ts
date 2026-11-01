@@ -11,6 +11,8 @@ export interface SearchBarProps {
 	onCancel: () => void;
 	/** Return pressed in the field. */
 	onSubmit?: () => void;
+	/** Closes the sheet, where its header has no close button of its own. */
+	onClose: () => void;
 }
 
 /** The search sheet's query field, in its header. */

@@ -174,6 +174,7 @@ export function SearchScreen() {
 		},
 		[router],
 	);
+	const close = useCallback(() => router.back(), [router]);
 	const openFirst = useCallback(() => {
 		const first = results[0];
 		if (first) open(first);
@@ -187,7 +188,7 @@ export function SearchScreen() {
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					onPress={() => router.back()}
+					onPress={close}
 				/>
 			</HeaderToolbar>
 			<SearchBar
@@ -198,6 +199,7 @@ export function SearchScreen() {
 				onChangeText={setQuery}
 				onCancel={clearQuery}
 				onSubmit={openFirst}
+				onClose={close}
 			/>
 			<FlatList
 				className="bg-background"
