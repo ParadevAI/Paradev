@@ -113,6 +113,7 @@ const config: Configuration = {
 		// the last large file above ~1.7GB of contents. `shrink: true` (default) keeps
 		// the final artifact compact.
 		size: "4g",
+		artifactName: `Paradev-\${version}-\${arch}.\${ext}`,
 	},
 
 	// macOS
