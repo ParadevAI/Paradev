@@ -4207,6 +4207,9 @@ msgstr "Zvolte, kdy vás Paradev upozorní."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Vyberte, kde se otevřou agenti spuštění z komentářů, režimu návrhu a stránek Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Vyberte modely zobrazené ve výběru modelů. Ponechte vybraný alespoň jeden model."
+
 msgid "Choose your default skin tone"
 msgstr "Vyberte výchozí odstín pleti"
 
@@ -4619,6 +4622,9 @@ msgstr "Blok kódu"
 
 msgid "Code Block"
 msgstr "Blok kódu"
+
+msgid "Codex models"
+msgstr "Modely Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Nepodařilo se vypsat adresář"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Nepodařilo se načíst agenty z {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Modely Codex se nepodařilo načíst. Zkontrolujte účet agenta a zkuste to znovu v Nastavení → Příkazy agentů → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Modely Codex se nepodařilo načíst. Zkontrolujte účet agenta a obnovte seznam."
 
 msgid "Could not load environments"
 msgstr "Nepodařilo se načíst prostředí"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "„{0}“ skryto z postranního panelu"
 
+msgid "Hidden by Codex"
+msgstr "Skryto službou Codex"
+
 msgid "Hidden folders"
 msgstr "Skryté složky"
 
@@ -10859,6 +10874,9 @@ msgstr "Načítám změny..."
 msgid "Loading chat"
 msgstr "Načítání chatu"
 
+msgid "Loading Codex models…"
+msgstr "Načítání modelů Codex…"
+
 msgid "Loading comments…"
 msgstr "Načítání komentářů…"
 
@@ -12075,6 +12093,9 @@ msgstr "Těmto filtrům neodpovídají žádné cloudové pracovní prostory"
 
 msgid "No cloud workspaces yet"
 msgstr "Zatím žádné cloudové pracovní prostory"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Nejsou dostupné žádné modely Codex. Zkontrolujte účet agenta v Nastavení."
 
 msgid "No color"
 msgstr "Bez barvy"
@@ -15190,6 +15211,9 @@ msgstr "Nedávno zobrazené"
 
 msgid "Recents"
 msgstr "Nedávné"
+
+msgid "Recommended"
+msgstr "Doporučeno"
 
 msgid "Recommended size 256×256."
 msgstr "Doporučená velikost 256×256."

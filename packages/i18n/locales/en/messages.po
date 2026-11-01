@@ -4207,6 +4207,9 @@ msgstr "Choose when Paradev pings you."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Choose where agents started from comments, design mode, and Pages open."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Choose which models appear in the model picker. Keep at least one selected."
+
 msgid "Choose your default skin tone"
 msgstr "Choose your default skin tone"
 
@@ -4619,6 +4622,9 @@ msgstr "Code block"
 
 msgid "Code Block"
 msgstr "Code Block"
+
+msgid "Codex models"
+msgstr "Codex models"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Could not list directory"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Could not load agents from {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Could not load Codex models. Check the agent account, then refresh."
 
 msgid "Could not load environments"
 msgstr "Could not load environments"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Hid \"{0}\" from the sidebar"
 
+msgid "Hidden by Codex"
+msgstr "Hidden by Codex"
+
 msgid "Hidden folders"
 msgstr "Hidden folders"
 
@@ -10859,6 +10874,9 @@ msgstr "Loading changes..."
 msgid "Loading chat"
 msgstr "Loading chat"
 
+msgid "Loading Codex models…"
+msgstr "Loading Codex models…"
+
 msgid "Loading comments…"
 msgstr "Loading comments…"
 
@@ -12075,6 +12093,9 @@ msgstr "No cloud workspaces match these filters"
 
 msgid "No cloud workspaces yet"
 msgstr "No cloud workspaces yet"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "No Codex models available. Check the agent account in Settings."
 
 msgid "No color"
 msgstr "No color"
@@ -15190,6 +15211,9 @@ msgstr "Recently Viewed"
 
 msgid "Recents"
 msgstr "Recents"
+
+msgid "Recommended"
+msgstr "Recommended"
 
 msgid "Recommended size 256×256."
 msgstr "Recommended size 256×256."

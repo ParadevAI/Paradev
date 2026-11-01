@@ -4207,6 +4207,9 @@ msgstr "Pilih kapan Paradev memberi tahu Anda."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Pilih tempat membuka agen yang dimulai dari komentar, mode desain, dan Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Pilih model yang muncul di pemilih model. Tetap pilih setidaknya satu model."
+
 msgid "Choose your default skin tone"
 msgstr "Pilih warna kulit default"
 
@@ -4619,6 +4622,9 @@ msgstr "Blok kode"
 
 msgid "Code Block"
 msgstr "Blok Kode"
+
+msgid "Codex models"
+msgstr "Model Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Tidak bisa menampilkan isi direktori"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Tidak bisa memuat agen dari {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Tidak dapat memuat model Codex. Periksa akun agen dan coba lagi di Pengaturan → Perintah agen → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Tidak dapat memuat model Codex. Periksa akun agen, lalu muat ulang."
 
 msgid "Could not load environments"
 msgstr "Tidak dapat memuat environment"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" disembunyikan dari sidebar"
 
+msgid "Hidden by Codex"
+msgstr "Disembunyikan oleh Codex"
+
 msgid "Hidden folders"
 msgstr "Folder tersembunyi"
 
@@ -10859,6 +10874,9 @@ msgstr "Memuat perubahan..."
 msgid "Loading chat"
 msgstr "Memuat obrolan"
 
+msgid "Loading Codex models…"
+msgstr "Memuat model Codex…"
+
 msgid "Loading comments…"
 msgstr "Memuat komentar…"
 
@@ -12075,6 +12093,9 @@ msgstr "Tidak ada workspace cloud yang cocok dengan filter ini"
 
 msgid "No cloud workspaces yet"
 msgstr "Belum ada workspace cloud"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Tidak ada model Codex yang tersedia. Periksa akun agen di Pengaturan."
 
 msgid "No color"
 msgstr "Tanpa warna"
@@ -15190,6 +15211,9 @@ msgstr "Baru Dilihat"
 
 msgid "Recents"
 msgstr "Terbaru"
+
+msgid "Recommended"
+msgstr "Direkomendasikan"
 
 msgid "Recommended size 256×256."
 msgstr "Ukuran yang disarankan 256×256."

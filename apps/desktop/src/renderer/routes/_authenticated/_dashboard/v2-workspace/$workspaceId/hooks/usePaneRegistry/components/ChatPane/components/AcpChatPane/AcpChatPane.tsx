@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
-import { getAgentModelSupport } from "@superset/shared/agent-models";
+import { getAgentModels } from "@superset/shared/agent-models";
 import {
 	buildChatRewindPrompt,
 	buildChatSessionHandoffPrompt,
@@ -16,6 +16,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useAgentModelCatalogs } from "renderer/hooks/useAgentModelCatalogs";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
@@ -130,6 +131,19 @@ export function AcpChatPane({
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
+	const catalogAgents = useMemo(
+		() =>
+			(agentConfigs ?? []).map((config) => ({
+				id: config.id,
+				launchPresetId: config.presetId,
+			})),
+		[agentConfigs],
+	);
+	const { catalogs: modelCatalogs } = useAgentModelCatalogs(
+		hostUrl,
+		catalogAgents,
+		false,
+	);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
 	)?.label;
@@ -360,9 +374,13 @@ export function AcpChatPane({
 				label:
 					agentConfigs?.find((config) => config.presetId === presetId)?.label ??
 					presetId,
-				models: (getAgentModelSupport(presetId)?.models ?? []).map(
-					({ id, label }) => ({ id, label }),
-				),
+				models: getAgentModels(
+					presetId,
+					modelCatalogs[
+						agentConfigs?.find((config) => config.presetId === presetId)?.id ??
+							""
+					],
+				).map(({ id, label }) => ({ id, label })),
 			})),
 			onSwitch: async (
 				presetId: string,
@@ -434,6 +452,7 @@ export function AcpChatPane({
 	}, [
 		agent,
 		agentConfigs,
+		modelCatalogs,
 		onSwitchAgent,
 		onOpenAgentChat,
 		sessionId,

@@ -40,6 +40,7 @@ import {
 } from "../../index";
 import {
 	buildTerminalAgentLaunch,
+	prepareAgentModelCatalog,
 	validateAgentLaunchOptions,
 } from "../agents";
 import {
@@ -675,6 +676,7 @@ export const workspacesRouter = router({
 		})
 		.mutation(async ({ ctx, input }) => {
 			for (const launch of input.agents ?? []) {
+				await prepareAgentModelCatalog(ctx.db, launch);
 				validateAgentLaunchOptions(ctx.db, launch);
 			}
 
@@ -1446,7 +1448,7 @@ export const workspacesRouter = router({
 	 */
 	createEnqueued: protectedProcedure
 		.input(createInputSchema)
-		.mutation(({ ctx, input }) => {
+		.mutation(async ({ ctx, input }) => {
 			const workspaceId = input.id;
 			if (!workspaceId) {
 				throw new TRPCError({
@@ -1455,6 +1457,7 @@ export const workspacesRouter = router({
 				});
 			}
 			for (const launch of input.agents ?? []) {
+				await prepareAgentModelCatalog(ctx.db, launch);
 				validateAgentLaunchOptions(ctx.db, launch);
 			}
 			requireProjectRepoPath(requireLocalProject(ctx, input.projectId));

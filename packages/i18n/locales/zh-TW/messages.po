@@ -4207,6 +4207,9 @@ msgstr "選擇Paradev在什麼時候通知你。"
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "選擇從留言、設計模式和 Pages 啟動的代理程式的開啟位置。"
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "選擇要在模型選擇器中顯示的模型。請至少保留一個選項。"
+
 msgid "Choose your default skin tone"
 msgstr "選擇預設膚色"
 
@@ -4619,6 +4622,9 @@ msgstr "程式碼塊"
 
 msgid "Code Block"
 msgstr "程式碼塊"
+
+msgid "Codex models"
+msgstr "Codex 模型"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "無法列出目錄"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "無法從{0}載入代理程式"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "無法載入 Codex 模型。請檢查代理帳戶，並在設定 → 代理程式指令 → Codex 中重試。"
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "無法載入 Codex 模型。請檢查代理帳戶，然後重新整理。"
 
 msgid "Could not load environments"
 msgstr "無法載入環境"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "已從側邊欄隱藏「{0}」"
 
+msgid "Hidden by Codex"
+msgstr "Codex 已隱藏"
+
 msgid "Hidden folders"
 msgstr "已隱藏的資料夾"
 
@@ -10859,6 +10874,9 @@ msgstr "正在載入更改..."
 msgid "Loading chat"
 msgstr "正在載入聊天"
 
+msgid "Loading Codex models…"
+msgstr "正在載入 Codex 模型…"
+
 msgid "Loading comments…"
 msgstr "正在載入評論…"
 
@@ -12075,6 +12093,9 @@ msgstr "沒有符合這些篩選條件的雲端工作區"
 
 msgid "No cloud workspaces yet"
 msgstr "暫無雲端工作區"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "沒有可用的 Codex 模型。請在設定中檢查代理帳戶。"
 
 msgid "No color"
 msgstr "無顏色"
@@ -15190,6 +15211,9 @@ msgstr "最近檢視"
 
 msgid "Recents"
 msgstr "最近"
+
+msgid "Recommended"
+msgstr "推薦"
 
 msgid "Recommended size 256×256."
 msgstr "推薦尺寸256×256。"

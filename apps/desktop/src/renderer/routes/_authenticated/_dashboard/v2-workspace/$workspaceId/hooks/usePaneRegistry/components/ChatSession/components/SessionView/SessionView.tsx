@@ -12,7 +12,6 @@ import {
 import type {
 	AvailableCommand,
 	Decision,
-	SessionConfigOption,
 	SessionState,
 	UserContent,
 	UserMessage,
@@ -25,6 +24,7 @@ import {
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { MessageScroller } from "@superset/chat-ui/MessageScroller";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
+import { errorMessage } from "@superset/i18n/errors";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
 import type { ReactNode } from "react";
@@ -35,6 +35,7 @@ import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHos
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
+import { useCodexModels } from "renderer/stores/codex-models/store";
 import type { OpenFile } from "../../../../../../types";
 import {
 	ChatPaneActionsProvider,
@@ -77,6 +78,7 @@ import {
 	type SwitchableAgent,
 	UsageLimitNotice,
 } from "./components/UsageLimitNotice";
+import { useCodexPickerOptions } from "./hooks/useCodexPickerOptions";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
@@ -90,7 +92,6 @@ import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
-const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
 
 const MODEL_OPTIONS_GRACE_MS = 1000;
 
@@ -256,6 +257,7 @@ export function SessionView({
 	);
 
 	const configOptions = session.snapshot.session?.configOptions;
+	const selectedCodexModels = useCodexModels((state) => state.selectedIds);
 	const agentStatus = session.snapshot.session?.status;
 	const [modelSettled, setModelSettled] = useState(
 		preferredModelLabel === undefined,
@@ -654,6 +656,24 @@ export function SessionView({
 			sendPrompt,
 			setConfigOption,
 		});
+	const onModelReconciliationError = useCallback(
+		(error: unknown) => toast.error(errorMessage(error)),
+		[],
+	);
+	const pickerConfigOptions = useCodexPickerOptions({
+		enabled: presetId === "codex",
+		blocked:
+			!loaded ||
+			booting ||
+			held !== undefined ||
+			runningTurnId !== null ||
+			approvals.length > 0 ||
+			outbox.length > 0,
+		configOptions,
+		selectedIds: selectedCodexModels,
+		onSelect: setConfigOption,
+		onError: onModelReconciliationError,
+	});
 	const composerQueue = heldQueue ?? (held ? undefined : promptQueue);
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
 
@@ -774,7 +794,7 @@ export function SessionView({
 					sessionId={client.sessionId}
 					agentSwitcher={agentSwitcher}
 					availableCommands={sessionState?.availableCommands ?? NO_COMMANDS}
-					configOptions={sessionState?.configOptions ?? NO_CONFIG_OPTIONS}
+					configOptions={pickerConfigOptions}
 					onSetConfigOption={onSetConfigOption}
 					onModelPickerOpenChange={onModelPickerOpenChange}
 					modes={sessionState?.availableModes}

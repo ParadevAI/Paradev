@@ -4207,6 +4207,9 @@ msgstr "Escolha quando o Paradev te avisa."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Escolha onde abrir os agentes iniciados em comentários, no modo de design e no Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Escolha quais modelos aparecem no seletor. Mantenha pelo menos um selecionado."
+
 msgid "Choose your default skin tone"
 msgstr "Escolha seu tom de pele padrão"
 
@@ -4619,6 +4622,9 @@ msgstr "Bloco de código"
 
 msgid "Code Block"
 msgstr "Bloco de código"
+
+msgid "Codex models"
+msgstr "Modelos do Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Não foi possível listar o diretório"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Não foi possível carregar os agentes de {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Não foi possível carregar os modelos do Codex. Verifique a conta do agente e tente novamente em Configurações → Comandos de agente → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Não foi possível carregar os modelos do Codex. Verifique a conta do agente e atualize."
 
 msgid "Could not load environments"
 msgstr "Não foi possível carregar os ambientes"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" ocultado da barra lateral"
 
+msgid "Hidden by Codex"
+msgstr "Oculto pelo Codex"
+
 msgid "Hidden folders"
 msgstr "Pastas ocultas"
 
@@ -10859,6 +10874,9 @@ msgstr "Carregando as alterações..."
 msgid "Loading chat"
 msgstr "Carregando o chat"
 
+msgid "Loading Codex models…"
+msgstr "Carregando modelos do Codex…"
+
 msgid "Loading comments…"
 msgstr "Carregando os comentários…"
 
@@ -12075,6 +12093,9 @@ msgstr "Nenhuma área de trabalho na nuvem corresponde a esses filtros"
 
 msgid "No cloud workspaces yet"
 msgstr "Nenhuma área de trabalho na nuvem ainda"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Nenhum modelo do Codex disponível. Verifique a conta do agente nas Configurações."
 
 msgid "No color"
 msgstr "Sem cor"
@@ -15190,6 +15211,9 @@ msgstr "Vistos recentemente"
 
 msgid "Recents"
 msgstr "Recentes"
+
+msgid "Recommended"
+msgstr "Recomendado"
 
 msgid "Recommended size 256×256."
 msgstr "Tamanho recomendado: 256×256."

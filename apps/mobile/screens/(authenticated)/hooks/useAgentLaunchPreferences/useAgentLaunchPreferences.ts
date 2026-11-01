@@ -1,11 +1,16 @@
 import {
 	type AgentEffortOption,
+	type AgentModelCatalog,
 	type AgentModelOption,
+	codexPickerModels,
 	getAgentEfforts,
 	getAgentModelSupport,
+	getAgentModels,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 
 export interface AgentLaunchPreferences {
@@ -49,12 +54,15 @@ export function resolveAgentLaunchPreferences(
 	presetId: string | null,
 	modelByAgent: Record<string, string>,
 	effortByAgent: Record<string, string>,
+	catalog?: AgentModelCatalog | null,
 ): AgentLaunchPreferences {
 	if (!presetId) return NO_PREFERENCES;
-	const models = getAgentModelSupport(presetId)?.models;
+	const models = getAgentModelSupport(presetId)?.liveCatalog
+		? codexPickerModels(getAgentModels(presetId, catalog), null)
+		: getAgentModelSupport(presetId)?.models;
 	const model =
 		models?.find((option) => option.id === modelByAgent[presetId]) ?? null;
-	const efforts = getAgentEfforts(presetId, model?.id);
+	const efforts = getAgentEfforts(presetId, model?.id, catalog);
 	const effort =
 		efforts.find((option) => option.id === effortByAgent[presetId]) ?? null;
 	return { models, efforts, model, effort };
@@ -73,7 +81,23 @@ export function describeAgentLaunchPreferences({
 
 export function useAgentLaunchPreferences(
 	presetId: string | null,
+	hostUrl: string | null = null,
+	agent: string | null = presetId,
 ): AgentLaunchPreferences {
+	const { data: catalog } = useQuery({
+		queryKey: ["host-agent-model-catalog", hostUrl, agent],
+		enabled: presetId === "codex" && !!hostUrl && !!agent,
+		staleTime: 60_000,
+		refetchOnWindowFocus: "always",
+		retry: false,
+		queryFn: async () => {
+			if (!hostUrl || !agent) return null;
+			const result = await getHostServiceClientByUrl(
+				hostUrl,
+			).agents.listModels.query({ agent });
+			return { models: result.models, efforts: result.efforts ?? {} };
+		},
+	});
 	const modelByAgent = useNewSessionPreferencesStore(
 		(state) => state.modelByAgent,
 	);
@@ -81,7 +105,13 @@ export function useAgentLaunchPreferences(
 		(state) => state.effortByAgent,
 	);
 	return useMemo(
-		() => resolveAgentLaunchPreferences(presetId, modelByAgent, effortByAgent),
-		[presetId, modelByAgent, effortByAgent],
+		() =>
+			resolveAgentLaunchPreferences(
+				presetId,
+				modelByAgent,
+				effortByAgent,
+				catalog,
+			),
+		[presetId, modelByAgent, effortByAgent, catalog],
 	);
 }

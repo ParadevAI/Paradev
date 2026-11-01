@@ -4207,6 +4207,9 @@ msgstr "Wybierz, kiedy Paradev ma Cię powiadamiać."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Wybierz, gdzie otwierać agentów uruchamianych z komentarzy, trybu projektowania i Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Wybierz modele widoczne w selektorze. Pozostaw wybrany co najmniej jeden model."
+
 msgid "Choose your default skin tone"
 msgstr "Wybierz domyślny odcień skóry"
 
@@ -4619,6 +4622,9 @@ msgstr "Blok kodu"
 
 msgid "Code Block"
 msgstr "Blok kodu"
+
+msgid "Codex models"
+msgstr "Modele Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Nie udało się wylistować katalogu"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Nie udało się wczytać agentów z {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Nie udało się wczytać modeli Codex. Sprawdź konto agenta i spróbuj ponownie w Ustawienia → Polecenia agentów → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Nie udało się wczytać modeli Codex. Sprawdź konto agenta i odśwież listę."
 
 msgid "Could not load environments"
 msgstr "Nie udało się wczytać środowisk"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Ukryto „{0}” z paska bocznego"
 
+msgid "Hidden by Codex"
+msgstr "Ukryty przez Codex"
+
 msgid "Hidden folders"
 msgstr "Ukryte foldery"
 
@@ -10859,6 +10874,9 @@ msgstr "Wczytywanie zmian..."
 msgid "Loading chat"
 msgstr "Wczytywanie czatu"
 
+msgid "Loading Codex models…"
+msgstr "Wczytywanie modeli Codex…"
+
 msgid "Loading comments…"
 msgstr "Wczytywanie komentarzy…"
 
@@ -12075,6 +12093,9 @@ msgstr "Żadne obszary robocze w chmurze nie pasują do tych filtrów"
 
 msgid "No cloud workspaces yet"
 msgstr "Brak obszarów roboczych w chmurze"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Brak dostępnych modeli Codex. Sprawdź konto agenta w Ustawieniach."
 
 msgid "No color"
 msgstr "Bez koloru"
@@ -15190,6 +15211,9 @@ msgstr "Ostatnio oglądane"
 
 msgid "Recents"
 msgstr "Ostatnie"
+
+msgid "Recommended"
+msgstr "Zalecany"
 
 msgid "Recommended size 256×256."
 msgstr "Zalecany rozmiar 256×256."

@@ -4207,6 +4207,9 @@ msgstr "Paradev가 언제 알릴지 선택하세요."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "댓글, 디자인 모드 및 Pages에서 시작한 에이전트를 열 위치를 선택하세요."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "모델 선택기에 표시할 모델을 선택하세요. 하나 이상 선택해야 합니다."
+
 msgid "Choose your default skin tone"
 msgstr "기본 피부색 선택"
 
@@ -4619,6 +4622,9 @@ msgstr "코드 블록"
 
 msgid "Code Block"
 msgstr "코드 블록"
+
+msgid "Codex models"
+msgstr "Codex 모델"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "디렉터리를 나열할 수 없습니다"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0}에서 에이전트를 불러오지 못했습니다"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Codex 모델을 불러올 수 없습니다. 에이전트 계정을 확인하고 설정 → 에이전트 명령 → Codex에서 다시 시도하세요."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Codex 모델을 불러올 수 없습니다. 에이전트 계정을 확인한 후 새로고침하세요."
 
 msgid "Could not load environments"
 msgstr "환경을 불러오지 못했습니다"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\"을(를) 사이드바에서 숨겼습니다"
 
+msgid "Hidden by Codex"
+msgstr "Codex에서 숨김"
+
 msgid "Hidden folders"
 msgstr "숨긴 폴더"
 
@@ -10859,6 +10874,9 @@ msgstr "변경 사항을 불러오는 중..."
 msgid "Loading chat"
 msgstr "채팅 불러오는 중"
 
+msgid "Loading Codex models…"
+msgstr "Codex 모델 불러오는 중…"
+
 msgid "Loading comments…"
 msgstr "댓글 불러오는 중…"
 
@@ -12075,6 +12093,9 @@ msgstr "이 필터와 일치하는 클라우드 워크스페이스가 없습니�
 
 msgid "No cloud workspaces yet"
 msgstr "아직 클라우드 워크스페이스가 없습니다"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "사용 가능한 Codex 모델이 없습니다. 설정에서 에이전트 계정을 확인하세요."
 
 msgid "No color"
 msgstr "색상 없음"
@@ -15190,6 +15211,9 @@ msgstr "최근 본 항목"
 
 msgid "Recents"
 msgstr "최근 항목"
+
+msgid "Recommended"
+msgstr "권장"
 
 msgid "Recommended size 256×256."
 msgstr "권장 크기 256×256."

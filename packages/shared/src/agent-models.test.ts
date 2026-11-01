@@ -3,13 +3,16 @@ import {
 	AGENT_EFFORT_SUPPORT,
 	AGENT_MODE_SUPPORT,
 	AGENT_MODEL_SUPPORT,
+	type AgentModelCatalog,
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
 	buildAgentModelArgs,
 	buildAgentModelEnv,
+	codexPickerModels,
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
+	getAgentModels,
 	getAgentModeSupport,
 	isCuratedAgentModel,
 	resolveAgentLaunchPresetId,
@@ -47,7 +50,7 @@ describe("AGENT_MODEL_SUPPORT", () => {
 
 	it("lists at least one model per entry", () => {
 		for (const entry of AGENT_MODEL_SUPPORT) {
-			expect(entry.models.length).toBeGreaterThan(0);
+			expect(entry.models.length > 0 || entry.liveCatalog === true).toBe(true);
 		}
 	});
 });
@@ -203,24 +206,6 @@ describe("buildAgentModelArgs", () => {
 		}
 	});
 
-	it("includes every GPT-5.6 Codex model", () => {
-		for (const model of ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]) {
-			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
-		}
-	});
-
-	it("offers every GPT-6 Codex model", () => {
-		for (const model of [
-			"gpt-6.1-sol",
-			"gpt-6-astra",
-			"gpt-6.1-terra",
-			"gpt-6-sol",
-			"gpt-6-luna",
-		]) {
-			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
-		}
-	});
-
 	it("includes opus 5 and the current GPT models for the other CLIs", () => {
 		for (const model of [
 			"claude-opus-5-high",
@@ -286,7 +271,7 @@ describe("AGENT_EFFORT_SUPPORT", () => {
 
 	it("lists at least one effort per entry", () => {
 		for (const entry of AGENT_EFFORT_SUPPORT) {
-			expect(entry.efforts.length).toBeGreaterThan(0);
+			expect(entry.efforts.length > 0 || entry.presetId === "codex").toBe(true);
 		}
 	});
 
@@ -374,13 +359,6 @@ describe("buildAgentEffortArgs", () => {
 		]);
 	});
 
-	it("prefixes the value for codex config overrides", () => {
-		expect(buildAgentEffortArgs("codex", "high")).toEqual([
-			"-c",
-			"model_reasoning_effort=high",
-		]);
-	});
-
 	it("returns [] when no effort is set", () => {
 		expect(buildAgentEffortArgs("claude", undefined)).toEqual([]);
 		expect(buildAgentEffortArgs("claude", "")).toEqual([]);
@@ -400,27 +378,6 @@ describe("buildAgentEffortArgs", () => {
 			buildAgentEffortArgs("cursor-agent", "low", "claude-opus-5-high"),
 		).toEqual([]);
 	});
-
-	it("builds every GPT-6.1 Sol reasoning effort", () => {
-		const efforts = ["low", "medium", "high", "xhigh", "max", "ultra"];
-		expect(getAgentEfforts("codex", "gpt-6.1-sol").map(({ id }) => id)).toEqual(
-			efforts,
-		);
-		for (const effort of efforts) {
-			expect(buildAgentEffortArgs("codex", effort, "gpt-6.1-sol")).toEqual([
-				"-c",
-				`model_reasoning_effort=${effort}`,
-			]);
-		}
-	});
-
-	it("drops an effort the selected model does not accept", () => {
-		expect(buildAgentEffortArgs("codex", "ultra", "gpt-5.6-sol")).toEqual([
-			"-c",
-			"model_reasoning_effort=ultra",
-		]);
-		expect(buildAgentEffortArgs("codex", "ultra", "gpt-6-luna")).toEqual([]);
-	});
 });
 
 describe("getAgentEfforts", () => {
@@ -435,58 +392,6 @@ describe("getAgentEfforts", () => {
 		expect(buildAgentEffortArgs("agy", "high")).toEqual([]);
 		expect(buildAgentEffortArgs("agy", "high", "claude-sonnet-4-6")).toEqual(
 			[],
-		);
-	});
-
-	it("offers codex's top efforts only alongside the models that take them", () => {
-		expect(getAgentEfforts("codex", "gpt-5.6-sol").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-			"max",
-			"ultra",
-		]);
-		expect(getAgentEfforts("codex", "gpt-6-astra").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-			"max",
-			"ultra",
-		]);
-		expect(getAgentEfforts("codex", "gpt-6-sol").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-			"max",
-			"ultra",
-		]);
-		expect(getAgentEfforts("codex", "gpt-6-luna").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-			"max",
-		]);
-		expect(getAgentEfforts("codex", "gpt-5.6-luna").map((e) => e.id)).toEqual([
-			"low",
-			"medium",
-			"high",
-			"xhigh",
-			"max",
-		]);
-		expect(
-			getAgentEfforts("codex", "gpt-6.1-terra").map((e) => e.id),
-		).toContain("ultra");
-	});
-
-	it("keeps the full list when the model is unset or uncurated", () => {
-		// Both launch on the agent's own default model.
-		expect(getAgentEfforts("codex").map((e) => e.id)).toContain("ultra");
-		expect(getAgentEfforts("codex", "gpt-9").map((e) => e.id)).toContain(
-			"ultra",
 		);
 	});
 
@@ -648,9 +553,6 @@ describe("September 2026 model launches", () => {
 	it.each([
 		["claude", "claude-opus-5-5"],
 		["claude", "claude-sonnet-5-5"],
-		["codex", "gpt-6-astra"],
-		["codex", "gpt-6-sol"],
-		["codex", "gpt-6-luna"],
 		["copilot", "claude-opus-5.5"],
 		["copilot", "claude-fable-5.1"],
 		["copilot", "claude-sonnet-5.5"],
@@ -717,5 +619,139 @@ describe("September 2026 model launches", () => {
 		for (const { models } of AGENT_MODEL_SUPPORT) {
 			expect(new Set(models.map(({ id }) => id)).size).toBe(models.length);
 		}
+	});
+});
+
+describe("live model catalog", () => {
+	const live: AgentModelCatalog = {
+		models: [
+			{ id: "gpt-7-nova", label: "GPT-7 Nova" },
+			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
+		],
+		efforts: {
+			"gpt-7-nova": ["low", "high", "turbo"],
+			"gpt-6.1-sol": ["low", "medium"],
+		},
+	};
+
+	it("replaces the curated list in pickers", () => {
+		expect(getAgentModels("codex", live).map(({ id }) => id)).toEqual([
+			"gpt-7-nova",
+			"gpt-6.1-sol",
+		]);
+		expect(getAgentModels("codex", null)).toEqual(
+			getAgentModelSupport("codex")?.models ?? [],
+		);
+		expect(getAgentModels("codex", { models: [], efforts: {} })).toEqual(
+			getAgentModelSupport("codex")?.models ?? [],
+		);
+	});
+
+	it("launches a model only the live catalog lists", () => {
+		expect(buildAgentModelArgs("codex", "gpt-7-nova")).toEqual([]);
+		expect(buildAgentModelArgs("codex", "gpt-7-nova", undefined, live)).toEqual(
+			["--model", "gpt-7-nova"],
+		);
+		expect(buildAgentModelArgs("codex", "gpt-6-luna", undefined, live)).toEqual(
+			[],
+		);
+	});
+
+	it("ignores a live catalog for presets that do not read one", () => {
+		expect(
+			isCuratedAgentModel("claude", "gpt-7-nova", {
+				models: [{ id: "gpt-7-nova", label: "x" }],
+				efforts: {},
+			}),
+		).toBe(false);
+	});
+
+	it("takes the model's efforts from the live catalog, new levels included", () => {
+		expect(getAgentEfforts("codex", "gpt-7-nova", live)).toEqual([
+			{ id: "low", label: "Low" },
+			{ id: "high", label: "High" },
+			{ id: "turbo", label: "Turbo" },
+		]);
+		expect(
+			getAgentEfforts("codex", "gpt-6.1-sol", live).map(({ id }) => id),
+		).toEqual(["low", "medium"]);
+		expect(buildAgentEffortArgs("codex", "turbo", "gpt-7-nova", live)).toEqual([
+			"-c",
+			"model_reasoning_effort=turbo",
+		]);
+		expect(buildAgentEffortArgs("codex", "ultra", "gpt-6.1-sol", live)).toEqual(
+			[],
+		);
+	});
+
+	it("has no efforts for a model absent from the live catalog", () => {
+		expect(
+			getAgentEfforts("codex", "gpt-6-luna", live).map(({ id }) => id),
+		).toEqual([]);
+	});
+});
+
+describe("Codex picker preferences", () => {
+	const models = [
+		{ id: "hidden", label: "Hidden", hidden: true },
+		{ id: "visible", label: "Visible", hidden: false },
+		{
+			id: "recommended",
+			label: "Recommended",
+			hidden: false,
+			isDefault: true,
+			defaultReasoningEffort: "medium",
+		},
+	];
+	it("initially selects visible models and preserves catalog order for explicit choices", () => {
+		expect(codexPickerModels(models, null).map((model) => model.id)).toEqual([
+			"visible",
+			"recommended",
+		]);
+		expect(
+			codexPickerModels(models, ["recommended", "hidden"]).map(
+				(model) => model.id,
+			),
+		).toEqual(["hidden", "recommended"]);
+		expect(models[0]?.hidden).toBe(true);
+	});
+	it("omits hidden models for chat without changing the saved preference or provider metadata", () => {
+		const selectedIds = ["hidden"];
+		expect(
+			codexPickerModels(models, selectedIds, false).map((model) => model.id),
+		).toEqual(["recommended"]);
+		expect(
+			codexPickerModels(models, selectedIds, true).map((model) => model.id),
+		).toEqual(["hidden"]);
+		expect(selectedIds).toEqual(["hidden"]);
+		expect(models[0]?.hidden).toBe(true);
+	});
+
+	it("recovers a usable selection when selected models disappear or no choices remain", () => {
+		expect(
+			codexPickerModels(models, ["retired"]).map((model) => model.id),
+		).toEqual(["recommended"]);
+		expect(codexPickerModels(models, []).map((model) => model.id)).toEqual([
+			"recommended",
+		]);
+		expect(codexPickerModels([], [])).toEqual([]);
+	});
+	it("uses discovered defaults and exact identifiers for execution", () => {
+		const catalog = {
+			models,
+			efforts: { recommended: ["medium", "future-effort"] },
+		};
+		expect(
+			buildAgentEffortArgs("codex", undefined, "recommended", catalog),
+		).toEqual(["-c", "model_reasoning_effort=medium"]);
+		expect(
+			getAgentEfforts("codex", undefined, catalog).map((effort) => effort.id),
+		).toEqual(["medium", "future-effort"]);
+		expect(
+			buildAgentModelArgs("codex", "recommended", undefined, catalog),
+		).toEqual(["--model", "recommended"]);
+		expect(
+			buildAgentEffortArgs("codex", "future-effort", "recommended", catalog),
+		).toEqual(["-c", "model_reasoning_effort=future-effort"]);
 	});
 });

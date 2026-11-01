@@ -659,6 +659,31 @@ describe("buildTerminalAgentLaunch default account env", () => {
 });
 
 describe("validateAgentModelSelection", () => {
+	it("accepts a model only the agent's live catalog lists", () => {
+		const live = {
+			models: [{ id: "gpt-7-nova", label: "GPT-7 Nova" }],
+			efforts: { "gpt-7-nova": ["low", "turbo"] },
+		};
+		expect(() =>
+			validateAgentModelSelection("codex", "Codex", "gpt-7-nova"),
+		).toThrow('Unsupported model "gpt-7-nova"');
+		expect(() =>
+			validateAgentModelSelection("codex", "Codex", "gpt-7-nova", live),
+		).not.toThrow();
+		expect(() =>
+			validateAgentEffortSelection(
+				"codex",
+				"Codex",
+				"turbo",
+				"gpt-7-nova",
+				live,
+			),
+		).not.toThrow();
+		expect(() =>
+			validateAgentEffortSelection("codex", "Codex", "max", "gpt-7-nova", live),
+		).toThrow("Choose one of: low, turbo.");
+	});
+
 	it("leaves the model unset so the agent can use its own default", () => {
 		expect(() =>
 			validateAgentModelSelection("claude", "Claude", undefined),
@@ -700,43 +725,32 @@ describe("validateAgentModelSelection", () => {
 });
 
 describe("validateAgentEffortSelection", () => {
-	it("leaves the effort unset so the agent can use its own default", () => {
+	const catalog = {
+		models: [{ id: "future", label: "Future", isDefault: true }],
+		efforts: { future: ["low", "new-effort"] },
+	};
+	it("uses discovered efforts and rejects efforts outside that model's metadata", () => {
+		expect(() =>
+			validateAgentEffortSelection(
+				"codex",
+				"Codex",
+				"new-effort",
+				"future",
+				catalog,
+			),
+		).not.toThrow();
+		expect(() =>
+			validateAgentEffortSelection(
+				"codex",
+				"Codex",
+				"unknown",
+				"future",
+				catalog,
+			),
+		).toThrow("Choose one of: low, new-effort");
 		expect(() =>
 			validateAgentEffortSelection("codex", "Codex", undefined),
 		).not.toThrow();
-	});
-
-	it("accepts a supported effort for the selected agent", () => {
-		expect(() =>
-			validateAgentEffortSelection("codex", "Codex", "xhigh"),
-		).not.toThrow();
-	});
-
-	it("rejects an invalid effort with the supported values", () => {
-		try {
-			validateAgentEffortSelection("codex", "Codex", "extreme");
-			throw new Error("Expected validation to fail");
-		} catch (error) {
-			expect(error).toBeInstanceOf(TRPCError);
-			expect((error as TRPCError).code).toBe("BAD_REQUEST");
-			expect((error as Error).message).toBe(
-				'Unsupported reasoning effort "extreme" for Codex. Choose one of: low, medium, high, xhigh, max, ultra.',
-			);
-		}
-	});
-
-	it("rejects an effort the selected model does not accept", () => {
-		expect(() =>
-			validateAgentEffortSelection("codex", "Codex", "ultra", "gpt-5.6-sol"),
-		).not.toThrow();
-		try {
-			validateAgentEffortSelection("codex", "Codex", "ultra", "gpt-6-luna");
-			throw new Error("Expected validation to fail");
-		} catch (error) {
-			expect((error as Error).message).toBe(
-				'Unsupported reasoning effort "ultra" for Codex with model gpt-6-luna. Choose one of: low, medium, high, xhigh, max.',
-			);
-		}
 	});
 
 	it("rejects overrides for agents without effort support", () => {

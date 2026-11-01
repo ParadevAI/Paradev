@@ -4207,6 +4207,9 @@ msgstr "Kies wanneer Paradev je een seintje geeft."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Kies waar agents worden geopend die vanuit opmerkingen, de ontwerpmodus en Pages worden gestart."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Kies welke modellen in de modelkiezer verschijnen. Houd ten minste één model geselecteerd."
+
 msgid "Choose your default skin tone"
 msgstr "Kies je standaard huidskleur"
 
@@ -4619,6 +4622,9 @@ msgstr "Codeblok"
 
 msgid "Code Block"
 msgstr "Codeblok"
+
+msgid "Codex models"
+msgstr "Codex-modellen"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Kan map niet uitlezen"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Kan agents van {0} niet laden"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Kan Codex-modellen niet laden. Controleer het agentaccount en probeer het opnieuw via Instellingen → Agentcommando's → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Kan Codex-modellen niet laden. Controleer het agentaccount en vernieuw de lijst."
 
 msgid "Could not load environments"
 msgstr "Kan omgevingen niet laden"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" uit de zijbalk verborgen"
 
+msgid "Hidden by Codex"
+msgstr "Verborgen door Codex"
+
 msgid "Hidden folders"
 msgstr "Verborgen mappen"
 
@@ -10859,6 +10874,9 @@ msgstr "Wijzigingen laden..."
 msgid "Loading chat"
 msgstr "Chat laden"
 
+msgid "Loading Codex models…"
+msgstr "Codex-modellen laden…"
+
 msgid "Loading comments…"
 msgstr "Opmerkingen laden…"
 
@@ -12075,6 +12093,9 @@ msgstr "Geen cloudwerkruimtes komen overeen met deze filters"
 
 msgid "No cloud workspaces yet"
 msgstr "Nog geen cloudwerkruimtes"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Geen Codex-modellen beschikbaar. Controleer het agentaccount in Instellingen."
 
 msgid "No color"
 msgstr "Geen kleur"
@@ -15190,6 +15211,9 @@ msgstr "Onlangs bekeken"
 
 msgid "Recents"
 msgstr "Recent"
+
+msgid "Recommended"
+msgstr "Aanbevolen"
 
 msgid "Recommended size 256×256."
 msgstr "Aanbevolen formaat 256×256."
