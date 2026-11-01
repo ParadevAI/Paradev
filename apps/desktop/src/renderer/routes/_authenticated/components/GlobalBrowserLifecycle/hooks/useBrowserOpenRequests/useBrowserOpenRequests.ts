@@ -53,7 +53,10 @@ export function useBrowserOpenRequests() {
 									collections.v2WorkspaceLocalState.update(
 										request.workspaceId,
 										(draft) => {
-											for (const tab of draft.paneLayout.tabs) {
+											const layouts = [draft.paneLayout, draft.rightPaneLayout];
+											for (const tab of layouts.flatMap(
+												(layout) => layout?.tabs ?? [],
+											)) {
 												const pane = tab.panes[paneId];
 												if (pane?.kind === "browser")
 													pane.data = {
