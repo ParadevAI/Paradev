@@ -10752,9 +10752,6 @@ msgstr "Bu görevi bağla"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} çalışma alanına bağlandı"
 
-msgid "Linked to {projectName}"
-msgstr "{projectName} ile bağlantılı"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Henüz indirme yok"
 msgid "No emoji found"
 msgstr "Emoji bulunamadı"
 
-msgid "No environments are linked to this project yet."
-msgstr "Bu projeye henüz bağlı bir ortam yok."
-
 msgid "No environments available"
 msgstr "Kullanılabilir ortam yok"
 
 msgid "No environments found."
 msgstr "Ortam bulunamadı."
+
+msgid "No environments linked to this project."
+msgstr "Bu projeye bağlı ortam yok."
 
 msgid "No environments yet."
 msgstr "Henüz ortam yok. Bir bulut çalışma alanını üzerinden başlatmak için bir ortam oluşturun."

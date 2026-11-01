@@ -10752,9 +10752,6 @@ msgstr "Tautkan tugas ini"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} ditautkan ke workspace"
 
-msgid "Linked to {projectName}"
-msgstr "Tertaut ke {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Belum ada unduhan"
 msgid "No emoji found"
 msgstr "Emoji tidak ditemukan"
 
-msgid "No environments are linked to this project yet."
-msgstr "Belum ada environment yang tertaut ke proyek ini."
-
 msgid "No environments available"
 msgstr "Tidak ada environment yang tersedia"
 
 msgid "No environments found."
 msgstr "Environment tidak ditemukan."
+
+msgid "No environments linked to this project."
+msgstr "Tidak ada environment yang tertaut ke proyek ini."
 
 msgid "No environments yet."
 msgstr "Belum ada environment. Buat satu untuk memulai workspace cloud darinya."

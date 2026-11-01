@@ -10752,9 +10752,6 @@ msgstr "Liên kết tác vụ này"
 msgid "Linked {slug} to workspace"
 msgstr "Đã liên kết {slug} với workspace"
 
-msgid "Linked to {projectName}"
-msgstr "Đã liên kết với {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Chưa có lượt tải xuống nào"
 msgid "No emoji found"
 msgstr "Không tìm thấy emoji"
 
-msgid "No environments are linked to this project yet."
-msgstr "Chưa có environment nào được liên kết với dự án này."
-
 msgid "No environments available"
 msgstr "Không có environment nào"
 
 msgid "No environments found."
 msgstr "Không tìm thấy environment nào."
+
+msgid "No environments linked to this project."
+msgstr "Không có environment nào được liên kết với dự án này."
 
 msgid "No environments yet."
 msgstr "Chưa có environment nào. Tạo một cái để khởi động workspace cloud từ đó."

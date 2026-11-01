@@ -10752,9 +10752,6 @@ msgstr "Propojit tento úkol"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} propojeno s pracovním prostorem"
 
-msgid "Linked to {projectName}"
-msgstr "Propojeno s {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Zatím žádná stahování"
 msgid "No emoji found"
 msgstr "Žádné emoji nenalezeno"
 
-msgid "No environments are linked to this project yet."
-msgstr "S tímto projektem zatím není propojeno žádné prostředí."
-
 msgid "No environments available"
 msgstr "Žádná dostupná prostředí"
 
 msgid "No environments found."
 msgstr "Nenalezena žádná prostředí."
+
+msgid "No environments linked to this project."
+msgstr "S tímto projektem není propojeno žádné prostředí."
 
 msgid "No environments yet."
 msgstr "Zatím žádná prostředí. Vytvořte jedno a spusťte z něj cloudový pracovní prostor."

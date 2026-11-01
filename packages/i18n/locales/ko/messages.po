@@ -10752,9 +10752,6 @@ msgstr "이 작업 연결"
 msgid "Linked {slug} to workspace"
 msgstr "{slug}을(를) 워크스페이스에 연결했습니다"
 
-msgid "Linked to {projectName}"
-msgstr "{projectName}에 연결됨"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "아직 다운로드가 없습니다"
 msgid "No emoji found"
 msgstr "이모지를 찾을 수 없음"
 
-msgid "No environments are linked to this project yet."
-msgstr "이 프로젝트에 연결된 환경이 아직 없습니다."
-
 msgid "No environments available"
 msgstr "사용 가능한 환경 없음"
 
 msgid "No environments found."
 msgstr "환경을 찾을 수 없습니다."
+
+msgid "No environments linked to this project."
+msgstr "이 프로젝트에 연결된 환경이 없습니다."
 
 msgid "No environments yet."
 msgstr "아직 환경이 없습니다. 하나를 만들어 클라우드 워크스페이스를 시작하세요."

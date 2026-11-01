@@ -10752,9 +10752,6 @@ msgstr "Diese Aufgabe verknüpfen"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} mit Arbeitsbereich verknüpft"
 
-msgid "Linked to {projectName}"
-msgstr "Verknüpft mit {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Noch keine Downloads"
 msgid "No emoji found"
 msgstr "Kein Emoji gefunden"
 
-msgid "No environments are linked to this project yet."
-msgstr "Mit diesem Projekt ist noch keine Umgebung verknüpft."
-
 msgid "No environments available"
 msgstr "Keine Umgebungen verfügbar"
 
 msgid "No environments found."
 msgstr "Keine Umgebungen gefunden."
+
+msgid "No environments linked to this project."
+msgstr "Mit diesem Projekt ist keine Umgebung verknüpft."
 
 msgid "No environments yet."
 msgstr "Noch keine Umgebungen. Erstelle eine, um daraus einen Cloud-Arbeitsbereich zu starten."
