@@ -7,7 +7,7 @@ import type {
 } from "./TerminalWebView.types";
 
 const BRIDGE_SHIM =
-	"<script>window.ReactNativeWebView={postMessage:function(data){parent.postMessage({terminalBridge:data},'*')}};</script>";
+	"<script>window.ReactNativeWebView={postMessage:function(data){parent.postMessage({terminalBridge:data},'*')}};window.terminalKeyboardInput=!matchMedia('(pointer: coarse)').matches;</script>";
 
 /** The xterm.js page in an iframe; the same bridge as the native WebView. */
 export const TerminalWebView = forwardRef<
