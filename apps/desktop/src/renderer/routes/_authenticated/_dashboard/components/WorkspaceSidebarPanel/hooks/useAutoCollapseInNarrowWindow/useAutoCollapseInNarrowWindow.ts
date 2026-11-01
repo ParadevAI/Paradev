@@ -4,8 +4,8 @@ import { isWindowTooNarrowForSidebar } from "../../utils/isWindowTooNarrowForSid
 
 /**
  * Folds the sidebar to its rail when the window gets too narrow for it, and
- * unfolds it on the way back. Acts only on crossings, so a sidebar the user
- * opens or closes by hand stays that way.
+ * unfolds it on the way back. Once the user toggles or resizes the sidebar it
+ * stays where they put it for the rest of the session.
  */
 export function useAutoCollapseInNarrowWindow() {
 	useEffect(() => {

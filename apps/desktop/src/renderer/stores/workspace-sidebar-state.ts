@@ -14,6 +14,7 @@ interface WorkspaceSidebarState {
 	width: number;
 	lastExpandedWidth: number;
 	autoCollapsed: boolean;
+	adjustedThisSession: boolean;
 	// Use string[] instead of Set<string> for JSON serialization with Zustand persist
 	collapsedProjectIds: string[];
 
@@ -33,13 +34,16 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 				width: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				lastExpandedWidth: DEFAULT_WORKSPACE_SIDEBAR_WIDTH,
 				autoCollapsed: false,
+				adjustedThisSession: false,
 				collapsedProjectIds: [],
 
 				setWidth: (width) => {
 					if (width < COLLAPSE_THRESHOLD) {
+						if (get().width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
 						set({
 							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
 							autoCollapsed: false,
+							adjustedThisSession: true,
 						});
 						return;
 					}
@@ -54,6 +58,7 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 						width: clampedWidth,
 						lastExpandedWidth: clampedWidth,
 						autoCollapsed: false,
+						adjustedThisSession: true,
 					});
 				},
 
@@ -75,17 +80,24 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 						width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH;
 
 					if (isCurrentlyCollapsed) {
-						set({ width: lastExpandedWidth, autoCollapsed: false });
+						set({
+							width: lastExpandedWidth,
+							autoCollapsed: false,
+							adjustedThisSession: true,
+						});
 					} else {
 						set({
 							width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
 							autoCollapsed: false,
+							adjustedThisSession: true,
 						});
 					}
 				},
 
 				autoCollapse: () => {
-					if (get().width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
+					const { width, adjustedThisSession } = get();
+					if (adjustedThisSession) return;
+					if (width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH) return;
 					set({
 						width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
 						autoCollapsed: true,
@@ -93,8 +105,13 @@ export const useWorkspaceSidebarStore = create<WorkspaceSidebarState>()(
 				},
 
 				autoExpand: () => {
-					const { autoCollapsed, width, lastExpandedWidth } = get();
-					if (!autoCollapsed) return;
+					const {
+						autoCollapsed,
+						adjustedThisSession,
+						width,
+						lastExpandedWidth,
+					} = get();
+					if (!autoCollapsed || adjustedThisSession) return;
 					set({
 						width:
 							width === COLLAPSED_WORKSPACE_SIDEBAR_WIDTH
