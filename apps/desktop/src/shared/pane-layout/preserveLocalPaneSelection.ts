@@ -1,4 +1,4 @@
-import type { LayoutNode, WorkspaceState } from "@superset/panes";
+import type { LayoutNode, WorkspaceState } from "@superset/panes/core";
 
 function getPaneOrder(layout: LayoutNode): string[] {
 	if (layout.type === "pane") return [layout.paneId];

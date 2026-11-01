@@ -1,4 +1,4 @@
-import type { LayoutNode, Pane, WorkspaceState } from "@superset/panes";
+import type { LayoutNode, Pane, WorkspaceState } from "@superset/panes/core";
 import type {
 	PaneLayoutNode,
 	PaneLayoutPane,

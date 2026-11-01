@@ -8,16 +8,13 @@ import {
 	type Tab,
 	type WorkspaceState,
 	type WorkspaceStore,
-} from "@superset/panes";
+} from "@superset/panes/core";
 import type {
 	PaneArea,
 	PaneLayoutErrorCode,
 	PaneLayoutOp,
 	PaneSplitDirection,
 } from "@superset/shared/pane-layout-ops";
-import { DEFAULT_BROWSER_URL } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/constants";
-import { CENTER_PANE_KINDS } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRightPaneAreaLifecycle/constants";
-import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspacePaneLayout/utils/preserveLocalPaneSelection";
 import type {
 	BrowserPaneData,
 	DiffPaneData,
@@ -25,7 +22,12 @@ import type {
 	PagesListPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { NEW_DIFF_PANE } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openChangesPaneInStore";
+import {
+	CENTER_PANE_KINDS,
+	DEFAULT_BROWSER_URL,
+	NEW_DIFF_PANE,
+} from "./paneKinds";
+import { preserveLocalPaneSelection } from "./preserveLocalPaneSelection";
 
 type LayoutState = WorkspaceState<PaneViewerData>;
 

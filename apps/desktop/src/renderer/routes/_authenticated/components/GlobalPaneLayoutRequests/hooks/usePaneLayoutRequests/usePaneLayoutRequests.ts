@@ -21,10 +21,10 @@ import {
 } from "renderer/stores/v2-pane-selection";
 import {
 	applyPaneLayoutOp,
+	describePaneLayout,
 	type PaneAreas,
 	PaneLayoutOpError,
-} from "./utils/applyPaneLayoutOp";
-import { describePaneLayout } from "./utils/describePaneLayout";
+} from "shared/pane-layout";
 
 type LayoutState = WorkspaceState<PaneViewerData>;
 

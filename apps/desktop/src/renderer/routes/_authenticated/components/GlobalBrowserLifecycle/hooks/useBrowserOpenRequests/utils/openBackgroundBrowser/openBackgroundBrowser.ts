@@ -1,5 +1,5 @@
 import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
-import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspacePaneLayout/utils/preserveLocalPaneSelection";
+import { preserveLocalPaneSelection } from "shared/pane-layout";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import {
 	openUrlInV2Workspace,

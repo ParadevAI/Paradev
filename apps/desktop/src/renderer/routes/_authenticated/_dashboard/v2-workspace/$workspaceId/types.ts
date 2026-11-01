@@ -88,7 +88,7 @@ export interface PagePaneData {
 	title?: string;
 }
 
-export const PENDING_CLOUD_CHAT_PANE_KIND = "pending-cloud-chat";
+export { PENDING_CLOUD_CHAT_PANE_KIND } from "shared/pane-layout/paneKinds";
 
 export interface PendingCloudChatPaneData {
 	draftId: string;

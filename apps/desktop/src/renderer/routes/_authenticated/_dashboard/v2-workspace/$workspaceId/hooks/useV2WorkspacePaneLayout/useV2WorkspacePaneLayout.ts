@@ -18,7 +18,7 @@ import { placeInTabs } from "./utils/placeInTabs";
 import {
 	getSharedPaneLayoutSnapshot,
 	preserveLocalPaneSelection,
-} from "./utils/preserveLocalPaneSelection";
+} from "shared/pane-layout";
 
 const EMPTY_STATE: WorkspaceState<PaneViewerData> = {
 	version: 1,

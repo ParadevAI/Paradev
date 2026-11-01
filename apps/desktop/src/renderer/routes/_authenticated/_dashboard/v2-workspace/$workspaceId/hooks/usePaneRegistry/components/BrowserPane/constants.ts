@@ -1,4 +1,4 @@
-export const DEFAULT_BROWSER_URL = "about:blank";
+export { DEFAULT_BROWSER_URL } from "shared/pane-layout/paneKinds";
 
 export interface DevicePreset {
 	id: string;
