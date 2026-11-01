@@ -1,7 +1,8 @@
-import { Stack } from "expo-router";
+import { type NativeStackHeaderProps, Stack } from "expo-router";
 import { useCallback, useImperativeHandle, useRef } from "react";
 import { TextInput, type TextInputInstance, View } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { SheetHeaderSlot } from "@/lib/navigation";
 import { focusOnMount } from "./focusOnMount";
 import type { SearchBarComponent } from "./SearchBar.types";
 
@@ -18,26 +19,28 @@ export const SearchBar: SearchBarComponent = ({
 		focus: () => inputRef.current?.focus(),
 	}));
 	const header = useCallback(
-		() => (
-			<View className="bg-background gap-2 px-4 pb-2 pt-2">
-				<View className="bg-muted-foreground/40 web:hidden h-1 w-8 self-center rounded-full" />
-				<TextInput
-					ref={inputRef}
-					className="bg-input/30 border-input text-foreground min-h-10 rounded-md border px-3 py-2 text-base"
-					placeholder={placeholder}
-					placeholderTextColor={theme.mutedForeground}
-					selectionColor={theme.mutedForeground}
-					cursorColor={theme.foreground}
-					onChangeText={onChangeText}
-					autoCapitalize="none"
-					autoCorrect={false}
-					returnKeyType="search"
-					autoFocus={focusOnMount}
-					onSubmitEditing={onSubmit}
-				/>
-			</View>
+		({ options }: NativeStackHeaderProps) => (
+			<SheetHeaderSlot options={options}>
+				<View className="bg-background gap-2 px-4 pb-2 pt-2">
+					<View className="bg-muted-foreground/40 web:hidden h-1 w-8 self-center rounded-full" />
+					<TextInput
+						ref={inputRef}
+						className="bg-input/30 border-input text-foreground min-h-10 rounded-md border px-3 py-2 text-base"
+						placeholder={placeholder}
+						placeholderTextColor={theme.mutedForeground}
+						selectionColor={theme.mutedForeground}
+						cursorColor={theme.foreground}
+						onChangeText={onChangeText}
+						autoCapitalize="none"
+						autoCorrect={false}
+						returnKeyType="search"
+						autoFocus={focusOnMount}
+						onSubmitEditing={onSubmit}
+					/>
+				</View>
+			</SheetHeaderSlot>
 		),
 		[placeholder, onChangeText, onSubmit, theme],
 	);
-	return <Stack.Screen options={{ headerShown: true, header }} />;
+	return <Stack.Screen options={{ header }} />;
 };

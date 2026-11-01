@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 
 export interface ScreenLayoutProps {
 	navigation: { goBack: () => void };
+	route: { key: string; name: string; params?: object };
 	options: NativeStackNavigationOptions;
 	children: ReactElement;
 }

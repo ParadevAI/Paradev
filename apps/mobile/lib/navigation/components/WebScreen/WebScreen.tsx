@@ -2,6 +2,8 @@ import { BRAND } from "@superset/shared/brand";
 import { useIsFocused, useNavigationContainerRef } from "expo-router";
 import { useEffect } from "react";
 import type { ScreenLayoutProps } from "../../screenLayout.types";
+import { isWebSheet } from "../../utils/isWebSheet";
+import { WebSheet } from "./components/WebSheet";
 
 const DISMISSIBLE_PRESENTATIONS = new Set([
 	"modal",
@@ -13,11 +15,13 @@ const DISMISSIBLE_PRESENTATIONS = new Set([
 	"pageSheet",
 ]);
 
-const OPEN_OVERLAY = '[aria-modal="true"], [role="menu"], [role="listbox"]';
+const OPEN_OVERLAY =
+	'[aria-modal="true"]:not([data-web-sheet]), [role="menu"], [role="listbox"]';
 
-/** Names the browser tab after the screen, and lets Escape close a sheet. */
+/** Names the browser tab after the screen, lets Escape close a sheet, and draws sheet routes as dialogs. */
 export function WebScreen({
 	navigation,
+	route,
 	options,
 	children,
 }: ScreenLayoutProps) {
@@ -54,5 +58,17 @@ export function WebScreen({
 		return () => window.removeEventListener("keydown", onKeyDown, true);
 	}, [focused, dismissible, navigation]);
 
-	return children;
+	if (!isWebSheet(options)) return children;
+
+	return (
+		<WebSheet
+			routeKey={route.key}
+			title={options.title}
+			detents={options.sheetAllowedDetents}
+			focused={focused}
+			onClose={() => navigation.goBack()}
+		>
+			{children}
+		</WebSheet>
+	);
 }

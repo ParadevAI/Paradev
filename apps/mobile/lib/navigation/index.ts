@@ -1,4 +1,5 @@
 export { HeaderToolbar } from "./components/HeaderToolbar";
+export { SheetHeaderSlot } from "./components/SheetHeaderSlot";
 export { contentScrollsUnderHeader } from "./contentScrollsUnderHeader";
 export type { ContentScrollsUnderHeader } from "./contentScrollsUnderHeader.types";
 export { glassHeaderOptions } from "./glassHeaderOptions";
@@ -9,5 +10,7 @@ export { screenLayout } from "./screenLayout";
 export type { ScreenLayout } from "./screenLayout.types";
 export { sheetHeaderOptions } from "./sheetHeaderOptions";
 export type { SheetHeaderOptions } from "./sheetHeaderOptions.types";
+export { sheetScreenOptions } from "./sheetScreenOptions";
+export type { SheetScreenOptions } from "./sheetScreenOptions.types";
 export { toolbarIcon } from "./toolbarIcon";
 export type { ToolbarIconName } from "./toolbarIcon.types";

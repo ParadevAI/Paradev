@@ -2,6 +2,7 @@ import type { NativeStackHeaderProps } from "expo-router";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { THEME } from "@/lib/theme";
+import { SheetHeaderSlot } from "../SheetHeaderSlot";
 
 const SIDE_WIDTH = 48;
 
@@ -24,17 +25,19 @@ export function SheetHeader({ options }: NativeStackHeaderProps) {
 		);
 
 	return (
-		<View className="pb-2 pt-2">
-			<View className="bg-muted-foreground/40 web:hidden h-1 w-8 self-center rounded-full" />
-			<View className="min-h-11 flex-row items-center px-2">
-				<View style={{ minWidth: SIDE_WIDTH }}>
-					{options.headerLeft?.({ tintColor, canGoBack: false })}
-				</View>
-				<View className="flex-1 items-center px-2">{headerTitle}</View>
-				<View className="items-end" style={{ minWidth: SIDE_WIDTH }}>
-					{options.headerRight?.({ tintColor, canGoBack: false })}
+		<SheetHeaderSlot options={options}>
+			<View className="pb-2 pt-2">
+				<View className="bg-muted-foreground/40 web:hidden h-1 w-8 self-center rounded-full" />
+				<View className="min-h-11 flex-row items-center px-2">
+					<View style={{ minWidth: SIDE_WIDTH }}>
+						{options.headerLeft?.({ tintColor, canGoBack: false })}
+					</View>
+					<View className="flex-1 items-center px-2">{headerTitle}</View>
+					<View className="items-end" style={{ minWidth: SIDE_WIDTH }}>
+						{options.headerRight?.({ tintColor, canGoBack: false })}
+					</View>
 				</View>
 			</View>
-		</View>
+		</SheetHeaderSlot>
 	);
 }
