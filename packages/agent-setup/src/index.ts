@@ -40,6 +40,7 @@ export function setupAgentIntegrations(
 	options: {
 		disabledAgentIds?: readonly string[];
 		disabledSkillIds?: readonly string[];
+		skipUninstalledAgents?: boolean;
 	} = {},
 ): void {
 	console.log("[agent-setup] Provisioning agent integrations...");
@@ -52,7 +53,11 @@ export function setupAgentIntegrations(
 	fs.mkdirSync(getBashDir(), { recursive: true });
 	fs.mkdirSync(getOpenCodePluginDir(), { recursive: true });
 
-	setupAgentCapabilities({ disabledAgentIds, disabledSkillIds });
+	setupAgentCapabilities({
+		disabledAgentIds,
+		disabledSkillIds,
+		skipUninstalledAgents: options.skipUninstalledAgents,
+	});
 
 	runSetupAction("zsh-wrapper", createZshWrapper);
 	runSetupAction("bash-wrapper", createBashWrapper);

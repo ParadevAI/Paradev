@@ -250,6 +250,24 @@ function setupAgentIntegrationsFromSettings() {
 	setupAgentIntegrations({
 		disabledAgentIds: disabledAgentHooks,
 		disabledSkillIds: disabledSkills,
+		skipUninstalledAgents: true,
+	});
+}
+
+const AGENT_REPROVISION_MIN_INTERVAL_MS = 60_000;
+
+function reprovisionAgentIntegrationsOnFocus() {
+	let lastRunAt = Date.now();
+	app.on("browser-window-focus", () => {
+		if (!postOnboardingSetup.hasRun()) return;
+		const now = Date.now();
+		if (now - lastRunAt < AGENT_REPROVISION_MIN_INTERVAL_MS) return;
+		lastRunAt = now;
+		try {
+			setupAgentIntegrationsFromSettings();
+		} catch (error) {
+			console.error("[main] Failed to refresh agent integrations:", error);
+		}
 	});
 }
 
@@ -651,6 +669,7 @@ if (!gotTheLock) {
 		setAgentSetupTemplatesDir(path.join(__dirname, "templates"));
 		// macOS permission prompts and writes into other tools' config dirs wait
 		// for a signed-in, onboarded user.
+		reprovisionAgentIntegrationsOnFocus();
 		postOnboardingSetup.setSteps([
 			["notification-center", registerWithMacOSNotificationCenter],
 			["apple-events", requestAppleEventsAccess],

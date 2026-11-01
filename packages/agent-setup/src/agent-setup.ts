@@ -59,6 +59,7 @@ import {
 } from "./agent-wrappers";
 import { createArtifactGuardScript } from "./artifact-guard-hook";
 import { resolveDisabledSkillIds } from "./disabled-skills";
+import { isAgentInstalled } from "./installed-agents";
 import { createManagedSkills } from "./managed-skills";
 import { createNotifyScript } from "./notify-hook";
 
@@ -213,11 +214,19 @@ interface SetupAgentCapabilitiesOptions {
 	disabledAgentIds?: readonly string[];
 	/** Skills the user disabled; withheld from provisioning and reaped. */
 	disabledSkillIds?: readonly string[];
+	/**
+	 * Leave agents that are not installed untouched, so no config dir is
+	 * created for a tool the user never installed.
+	 */
+	skipUninstalledAgents?: boolean;
+	isInstalled?: (agentId: AgentSetupTargetId) => boolean;
 }
 
 export function setupAgentCapabilities({
 	disabledAgentIds = [],
 	disabledSkillIds = [],
+	skipUninstalledAgents = false,
+	isInstalled = isAgentInstalled,
 }: SetupAgentCapabilitiesOptions = {}): void {
 	const disabled = new Set(disabledAgentIds);
 	const failed: string[] = [];
@@ -239,9 +248,13 @@ export function setupAgentCapabilities({
 
 	for (const target of AGENT_SETUP_TARGETS) {
 		const definition = AGENT_SETUP_DEFINITIONS[target.id];
+		const isDisabled = disabled.has(target.id);
+		if (skipUninstalledAgents && !isDisabled && !isInstalled(target.id)) {
+			continue;
+		}
 		runAgentActions(
 			target.id,
-			disabled.has(target.id) ? definition.teardown : definition.setup,
+			isDisabled ? definition.teardown : definition.setup,
 			failed,
 		);
 	}
