@@ -1,5 +1,6 @@
 export {
 	ensureWorkspaceView,
+	migrateLegacyWorkspaceViews,
 	updateWorkspaceView,
 	updateWorkspaceViewWhenReady,
 	viewFromLegacyRow,

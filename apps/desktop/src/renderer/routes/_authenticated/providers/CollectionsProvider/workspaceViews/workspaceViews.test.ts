@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { emptyWorkspaceView, type WorkspaceView } from "shared/workspace-views";
+import { migrateLegacyWorkspaceViews } from "./workspaceViewAccess";
 import {
 	createWorkspaceViewsCollection,
 	type WorkspaceViewChange,
@@ -93,5 +94,50 @@ describe("workspace views collection", () => {
 
 		expect(kept).toEqual(["t1"]);
 		expect(collection.get("ws")).toBeUndefined();
+	});
+});
+
+describe("migrateLegacyWorkspaceViews", () => {
+	test("gives visible workspaces with a saved layout a view, and leaves the rest", async () => {
+		const main = fakeMain([viewWith("has-view", "closed")]);
+		const views = createWorkspaceViewsCollection({
+			client: main.client,
+			onTerminalKept: () => {},
+		});
+		main.load();
+		await flush();
+		const terminalTab = {
+			id: "t1",
+			createdAt: 0,
+			activePaneId: "p1",
+			layout: { type: "pane", paneId: "p1" },
+			panes: { p1: { id: "p1", kind: "terminal", data: { terminalId: "x" } } },
+		};
+		const row = (workspaceId: string, isHidden: boolean, tabs: unknown[]) => ({
+			workspaceId,
+			sidebarState: { isHidden },
+			paneLayout: { version: 1, tabs, activeTabId: tabs.length ? "t1" : null },
+			rightSidebarOpen: false,
+		});
+		const rows = [
+			row("saved", false, [terminalTab]),
+			row("empty", false, []),
+			row("hidden", true, [terminalTab]),
+			row("has-view", false, [terminalTab]),
+		];
+		const legacy = new Map(rows.map((entry) => [entry.workspaceId, entry]));
+
+		migrateLegacyWorkspaceViews({
+			v2WorkspaceViews: views,
+			v2WorkspaceLocalState: {
+				get: (id: string) => legacy.get(id),
+				state: legacy,
+			},
+		} as unknown as Parameters<typeof migrateLegacyWorkspaceViews>[0]);
+
+		expect(views.get("saved")?.mainArea.activeTabId).toBe("t1");
+		expect(views.has("empty")).toBe(false);
+		expect(views.has("hidden")).toBe(false);
+		expect(views.get("has-view")?.mainArea.tabs).toEqual([]);
 	});
 });

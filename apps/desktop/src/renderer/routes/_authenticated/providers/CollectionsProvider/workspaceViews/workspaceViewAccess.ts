@@ -8,6 +8,7 @@ interface ViewCollections {
 	v2WorkspaceViews: WorkspaceViewsCollection;
 	v2WorkspaceLocalState: {
 		get(workspaceId: string): WorkspaceLocalStateRow | undefined;
+		state: Map<string, WorkspaceLocalStateRow>;
 	};
 }
 
@@ -56,11 +57,14 @@ export function ensureWorkspaceView(
 	return view;
 }
 
+/** Applies `change` to the workspace's view. Before the views load from main, there is nothing to change yet, so it does nothing. */
 export function updateWorkspaceView(
 	collections: ViewCollections,
 	workspaceId: string,
 	change: (view: WorkspaceView) => WorkspaceView,
 ): void {
+	const views = collections.v2WorkspaceViews;
+	if (!views.isReady() && !views.has(workspaceId)) return;
 	const next = change(ensureWorkspaceView(collections, workspaceId));
 	collections.v2WorkspaceViews.update(workspaceId, (draft) => {
 		draft.mainArea = next.mainArea;
@@ -81,4 +85,24 @@ export function updateWorkspaceViewWhenReady(
 	return collections.v2WorkspaceViews
 		.stateWhenReady()
 		.then(() => updateWorkspaceView(collections, workspaceId, change));
+}
+
+/**
+ * Gives every visible workspace with a saved localStorage layout a view, so
+ * pane ops from the CLI work before the workspace is opened again. Run once
+ * the views have loaded from main.
+ */
+export function migrateLegacyWorkspaceViews(
+	collections: ViewCollections,
+): void {
+	for (const row of collections.v2WorkspaceLocalState.state.values()) {
+		if (row.sidebarState.isHidden) continue;
+		if (collections.v2WorkspaceViews.has(row.workspaceId)) continue;
+		const view = viewFromLegacyRow(row);
+		const isEmpty =
+			view.mainArea.tabs.length === 0 &&
+			view.rightPane.tabs.length === 0 &&
+			view.rightPane.visibility === "closed";
+		if (!isEmpty) collections.v2WorkspaceViews.insert(view);
+	}
 }
