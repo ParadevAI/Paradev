@@ -18,8 +18,10 @@ export interface DetectGitDeps {
 
 const APPLE_GIT_STUB_PATH = "/usr/bin/git";
 
-export const COMMAND_LINE_TOOLS_INSTALLER =
-	"Install Command Line Developer Tools";
+// macOS truncates the process name to 15 characters ("Install Command"),
+// so match the executable path instead.
+export const COMMAND_LINE_TOOLS_INSTALLER_PATH =
+	"/System/Library/CoreServices/Install Command Line Developer Tools.app/";
 
 async function runOrNull(
 	run: DetectGitDeps["run"],
@@ -64,8 +66,8 @@ export async function detectGit({
 			) {
 				// pgrep exits 1 when nothing matches, which runOrNull turns into null.
 				const installerPid = await runOrNull(run, "/usr/bin/pgrep", [
-					"-x",
-					COMMAND_LINE_TOOLS_INSTALLER,
+					"-f",
+					COMMAND_LINE_TOOLS_INSTALLER_PATH,
 				]);
 				return {
 					installed: false,

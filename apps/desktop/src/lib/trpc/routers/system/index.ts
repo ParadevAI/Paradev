@@ -4,7 +4,7 @@ import { promisify } from "node:util";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../..";
 import { execWithShellEnv } from "../workspaces/utils/shell-env";
-import { detectGit } from "./detect-git";
+import { COMMAND_LINE_TOOLS_INSTALLER_PATH, detectGit } from "./detect-git";
 
 const execFileAsync = promisify(execFile);
 
@@ -76,6 +76,32 @@ async function detectBrew(): Promise<BrewDetectResult> {
 	}
 }
 
+const COMMAND_LINE_TOOLS_INSTALLER_BUNDLE_ID =
+	"com.apple.dt.CommandLineTools.installondemand";
+
+/**
+ * Apple's installer opens behind the focused app (Paradev), where a new user
+ * never sees it. Wait for its process, then activate it. Running
+ * `xcode-select --install` again does not raise an open installer; this does.
+ */
+async function bringInstallerToFront(): Promise<void> {
+	for (let attempt = 0; attempt < 20; attempt++) {
+		try {
+			await execFileAsync("/usr/bin/pgrep", [
+				"-f",
+				COMMAND_LINE_TOOLS_INSTALLER_PATH,
+			]);
+			await execFileAsync("/usr/bin/open", [
+				"-b",
+				COMMAND_LINE_TOOLS_INSTALLER_BUNDLE_ID,
+			]);
+			return;
+		} catch {
+			await new Promise((resolve) => setTimeout(resolve, 250));
+		}
+	}
+}
+
 export type InstallCommandLineToolsResult =
 	| { status: "requested" }
 	| { status: "already-installed" };
@@ -93,6 +119,7 @@ async function installCommandLineTools(): Promise<InstallCommandLineToolsResult>
 		await execFileAsync("/usr/bin/xcode-select", ["--install"], {
 			timeout: 10_000,
 		});
+		await bringInstallerToFront();
 		return { status: "requested" };
 	} catch (error) {
 		const stderr =
