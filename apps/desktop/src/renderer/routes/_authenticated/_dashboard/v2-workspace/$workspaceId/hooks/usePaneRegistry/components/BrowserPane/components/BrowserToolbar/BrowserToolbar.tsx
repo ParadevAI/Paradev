@@ -194,14 +194,14 @@ export function BrowserToolbar({
 					type="button"
 					onClick={onGoForward}
 					disabled={!canGoForward}
-					className={`rounded-md p-1 transition-colors ${canGoForward ? "text-muted-foreground/70 hover:bg-muted/50 hover:text-foreground" : "text-muted-foreground/30 pointer-events-none"}`}
+					className={`hidden rounded-md p-1 transition-colors @min-[300px]/browser-toolbar:block ${canGoForward ? "text-muted-foreground/70 hover:bg-muted/50 hover:text-foreground" : "text-muted-foreground/30 pointer-events-none"}`}
 				>
 					<TbArrowRight className="size-3.5" />
 				</button>
 				<button
 					type="button"
 					onClick={onReload}
-					className="rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+					className="hidden rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground @min-[240px]/browser-toolbar:block"
 				>
 					{isLoading ? (
 						<TbLoader2 className="size-3.5 animate-spin" />
