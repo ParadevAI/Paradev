@@ -2811,6 +2811,13 @@ msgstr "Tampilan"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Penginstal Apple tertutup sebelum Git terpasang."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Penginstal Apple tidak terbuka: {0}"
+
 msgid "Application menu"
 msgstr "Menu aplikasi"
 
@@ -5558,9 +5565,6 @@ msgstr "Tidak bisa memuat mesin Anda"
 
 msgid "Could not mark ready"
 msgstr "Tidak bisa menandai siap"
-
-msgid "Could not open Apple's installer"
-msgstr "Tidak dapat membuka penginstal Apple"
 
 msgid "Could not open billing. Please try again."
 msgstr "Tidak dapat membuka penagihan. Coba lagi."
@@ -8571,9 +8575,6 @@ msgstr "Cari orang dan Dev"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Selesaikan penginstal Apple. Halaman ini akan diperbarui setelah selesai."
-
 msgid "Finish review"
 msgstr "Selesaikan review"
 
@@ -9773,6 +9774,9 @@ msgstr "dalam sesi baru"
 
 msgid "in a terminal on this host."
 msgstr "di terminal pada host ini."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Di jendela Apple, klik Instal. Prosesnya beberapa menit, dan halaman ini diperbarui setelah selesai."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
@@ -13710,6 +13714,9 @@ msgstr "Orang lain sedang menggunakan proyek ini. Ketik <0>{projectName}</0> unt
 msgid "Other Team Members"
 msgstr "Anggota Tim Lainnya"
 
+msgid "Other ways to get Git"
+msgstr "Cara lain mendapatkan Git"
+
 msgid "Other ways to reach us"
 msgstr "Cara lain menghubungi kami"
 
@@ -17311,6 +17318,9 @@ msgstr "Tampilkan semua komentar"
 
 msgid "Show all lines"
 msgstr "Tampilkan semua baris"
+
+msgid "Show Apple's installer"
+msgstr "Tampilkan penginstal Apple"
 
 msgid "Show archived"
 msgstr "Tampilkan yang diarsipkan"

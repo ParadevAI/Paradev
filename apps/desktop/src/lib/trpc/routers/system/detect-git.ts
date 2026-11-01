@@ -4,6 +4,8 @@ export interface GitDetectResult {
 	installed: boolean;
 	version: string | null;
 	needsCommandLineTools: boolean;
+	/** macOS: Apple's "Install Command Line Developer Tools" window is open. */
+	installerRunning: boolean;
 	error: string | null;
 }
 
@@ -16,12 +18,8 @@ export interface DetectGitDeps {
 
 const APPLE_GIT_STUB_PATH = "/usr/bin/git";
 
-const NEEDS_COMMAND_LINE_TOOLS: GitDetectResult = {
-	installed: false,
-	version: null,
-	needsCommandLineTools: true,
-	error: null,
-};
+export const COMMAND_LINE_TOOLS_INSTALLER =
+	"Install Command Line Developer Tools";
 
 async function runOrNull(
 	run: DetectGitDeps["run"],
@@ -64,7 +62,18 @@ export async function detectGit({
 				developerDir === null ||
 				!fileExists(join(developerDir, "usr", "bin", "git"))
 			) {
-				return NEEDS_COMMAND_LINE_TOOLS;
+				// pgrep exits 1 when nothing matches, which runOrNull turns into null.
+				const installerPid = await runOrNull(run, "/usr/bin/pgrep", [
+					"-x",
+					COMMAND_LINE_TOOLS_INSTALLER,
+				]);
+				return {
+					installed: false,
+					version: null,
+					needsCommandLineTools: true,
+					installerRunning: installerPid !== null,
+					error: null,
+				};
 			}
 		}
 	}
@@ -75,6 +84,7 @@ export async function detectGit({
 			installed: true,
 			version: stdout.match(/git version (\S+)/)?.[1] ?? null,
 			needsCommandLineTools: false,
+			installerRunning: false,
 			error: null,
 		};
 	} catch (error) {
@@ -82,6 +92,7 @@ export async function detectGit({
 			installed: false,
 			version: null,
 			needsCommandLineTools: false,
+			installerRunning: false,
 			error: failureReason(error),
 		};
 	}

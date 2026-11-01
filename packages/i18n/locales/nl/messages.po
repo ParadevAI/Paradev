@@ -2811,6 +2811,13 @@ msgstr "Uiterlijk"
 msgid "Apple logo"
 msgstr "Apple-logo"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Het installatieprogramma van Apple is gesloten voordat Git was geïnstalleerd."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Het installatieprogramma van Apple is niet geopend: {0}"
+
 msgid "Application menu"
 msgstr "Toepassingsmenu"
 
@@ -5558,9 +5565,6 @@ msgstr "Kan je machines niet laden"
 
 msgid "Could not mark ready"
 msgstr "Kan niet als klaar markeren"
-
-msgid "Could not open Apple's installer"
-msgstr "Kan het installatieprogramma van Apple niet openen"
 
 msgid "Could not open billing. Please try again."
 msgstr "Kon facturering niet openen. Probeer het opnieuw."
@@ -8571,9 +8575,6 @@ msgstr "Mensen en Devs zoeken"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Rond het installatieprogramma van Apple af. Deze pagina wordt bijgewerkt zodra het klaar is."
-
 msgid "Finish review"
 msgstr "Review afronden"
 
@@ -9773,6 +9774,9 @@ msgstr "in een nieuwe sessie"
 
 msgid "in a terminal on this host."
 msgstr "uit in een terminal op deze host."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Klik in het venster van Apple op Installeer. Dit duurt een paar minuten en deze pagina wordt bijgewerkt als het klaar is."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In een paar maanden tijd draaien <0>tienduizenden engineers</0> Paradev als hun belangrijkste IDE, bij bedrijven als Wix, DoorDash en Netflix."
@@ -13710,6 +13714,9 @@ msgstr "Anderen gebruiken dit project. Typ <0>{projectName}</0> om te bevestigen
 msgid "Other Team Members"
 msgstr "Andere teamleden"
 
+msgid "Other ways to get Git"
+msgstr "Andere manieren om Git te krijgen"
+
 msgid "Other ways to reach us"
 msgstr "Andere manieren om ons te bereiken"
 
@@ -17311,6 +17318,9 @@ msgstr "Alle opmerkingen tonen"
 
 msgid "Show all lines"
 msgstr "Alle regels tonen"
+
+msgid "Show Apple's installer"
+msgstr "Toon het installatieprogramma van Apple"
 
 msgid "Show archived"
 msgstr "Gearchiveerde tonen"

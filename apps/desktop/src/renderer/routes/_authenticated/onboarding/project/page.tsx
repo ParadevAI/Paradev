@@ -252,6 +252,7 @@ function OnboardingProjectPage() {
 			{gitStatus && gitMissing && (
 				<GitMissingNotice
 					needsCommandLineTools={gitStatus.needsCommandLineTools}
+					installerRunning={gitStatus.installerRunning}
 					error={gitStatus.error}
 				/>
 			)}

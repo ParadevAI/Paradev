@@ -14,6 +14,7 @@ import {
 	isPermissionDenied,
 	isUnreadable,
 } from "../../../../runtime/path-state";
+import { rethrowGitToolsMissing } from "../../git/utils/classify-git-error";
 import {
 	findMatchingRemote,
 	getGitHubRemotes,
@@ -187,7 +188,9 @@ async function gitInitMainBranch(targetPath: string): Promise<void> {
 	const git = createUserSimpleGit(targetPath);
 	try {
 		await git.init(["--initial-branch=main"]);
-	} catch {
+	} catch (err) {
+		// Retrying cannot help when git itself cannot run.
+		rethrowGitToolsMissing(err);
 		await git.init();
 	}
 }
@@ -269,6 +272,9 @@ export async function tryRevParseGitRoot(path: string): Promise<string | null> {
 	} catch (err) {
 		error = err;
 	}
+	// Without git every folder would look like a non-repo, and the caller would
+	// offer `git init` on a real repository.
+	rethrowGitToolsMissing(error);
 	const blockedPath = isPermissionDenied(error)
 		? path
 		: findUnreadableRepoAbove(path);
@@ -548,6 +554,7 @@ export async function cloneRepoInto(
 		signal?.throwIfAborted();
 	} catch (err) {
 		await rollbackTargetDir(targetPath);
+		rethrowGitToolsMissing(err);
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Failed to clone repository: ${

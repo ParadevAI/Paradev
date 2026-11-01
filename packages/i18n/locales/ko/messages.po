@@ -2811,6 +2811,13 @@ msgstr "모양"
 msgid "Apple logo"
 msgstr "Apple 로고"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Git이 설치되기 전에 Apple 설치 프로그램이 닫혔습니다."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple 설치 프로그램을 열지 못했습니다: {0}"
+
 msgid "Application menu"
 msgstr "애플리케이션 메뉴"
 
@@ -5558,9 +5565,6 @@ msgstr "머신을 불러오지 못했습니다"
 
 msgid "Could not mark ready"
 msgstr "준비됨으로 표시할 수 없습니다"
-
-msgid "Could not open Apple's installer"
-msgstr "Apple 설치 프로그램을 열 수 없습니다"
 
 msgid "Could not open billing. Please try again."
 msgstr "결제 페이지를 열 수 없습니다. 다시 시도해 주세요."
@@ -8571,9 +8575,6 @@ msgstr "사람 및 Dev 찾기"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Apple 설치 프로그램을 끝까지 진행하세요. 완료되면 이 페이지가 업데이트됩니다."
-
 msgid "Finish review"
 msgstr "리뷰 마치기"
 
@@ -9773,6 +9774,9 @@ msgstr "새 세션에서"
 
 msgid "in a terminal on this host."
 msgstr "(이 호스트의 터미널에서)"
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Apple 창에서 설치를 클릭하세요. 몇 분 정도 걸리며, 완료되면 이 페이지가 업데이트됩니다."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "몇 달 만에 <0>수만 명의 엔지니어</0>가 Wix, DoorDash, Netflix 같은 회사에서 Paradev를 주력 IDE로 사용하고 있습니다."
@@ -13710,6 +13714,9 @@ msgstr "다른 사람이 이 프로젝트를 사용 중입니다. 확인하려�
 msgid "Other Team Members"
 msgstr "다른 팀 멤버"
 
+msgid "Other ways to get Git"
+msgstr "Git을 설치하는 다른 방법"
+
 msgid "Other ways to reach us"
 msgstr "다른 문의 방법"
 
@@ -17311,6 +17318,9 @@ msgstr "모든 댓글 표시"
 
 msgid "Show all lines"
 msgstr "모든 줄 표시"
+
+msgid "Show Apple's installer"
+msgstr "Apple 설치 프로그램 보기"
 
 msgid "Show archived"
 msgstr "보관된 항목 표시"

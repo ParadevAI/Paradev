@@ -2811,6 +2811,13 @@ msgstr "Darstellung"
 msgid "Apple logo"
 msgstr "Apple-Logo"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Apples Installationsprogramm wurde geschlossen, bevor Git installiert war."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apples Installationsprogramm wurde nicht geöffnet: {0}"
+
 msgid "Application menu"
 msgstr "Anwendungsmenü"
 
@@ -5558,9 +5565,6 @@ msgstr "Deine Rechner konnten nicht geladen werden"
 
 msgid "Could not mark ready"
 msgstr "Konnte nicht als bereit markiert werden"
-
-msgid "Could not open Apple's installer"
-msgstr "Apple-Installationsprogramm konnte nicht geöffnet werden"
 
 msgid "Could not open billing. Please try again."
 msgstr "Abrechnung konnte nicht geöffnet werden. Bitte versuche es erneut."
@@ -8571,9 +8575,6 @@ msgstr "Personen und Devs finden"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Schließe das Apple-Installationsprogramm ab. Diese Seite aktualisiert sich, sobald es fertig ist."
-
 msgid "Finish review"
 msgstr "Review abschließen"
 
@@ -9773,6 +9774,9 @@ msgstr "in einer neuen Sitzung"
 
 msgid "in a terminal on this host."
 msgstr "in einem Terminal auf diesem Host aus."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Klicke in Apples Fenster auf „Installieren“. Das dauert ein paar Minuten, und diese Seite aktualisiert sich, sobald es fertig ist."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In nur wenigen Monaten nutzen <0>Zehntausende Entwickler</0> Paradev als ihre primäre IDE, in Unternehmen wie Wix, DoorDash und Netflix."
@@ -13710,6 +13714,9 @@ msgstr "Andere Personen verwenden dieses Projekt. Gib <0>{projectName}</0> ein, 
 msgid "Other Team Members"
 msgstr "Weitere Teammitglieder"
 
+msgid "Other ways to get Git"
+msgstr "Andere Wege, Git zu installieren"
+
 msgid "Other ways to reach us"
 msgstr "Weitere Wege zu uns"
 
@@ -17311,6 +17318,9 @@ msgstr "Alle Kommentare anzeigen"
 
 msgid "Show all lines"
 msgstr "Alle Zeilen anzeigen"
+
+msgid "Show Apple's installer"
+msgstr "Apples Installationsprogramm anzeigen"
 
 msgid "Show archived"
 msgstr "Archivierte anzeigen"

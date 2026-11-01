@@ -2811,6 +2811,13 @@ msgstr "外觀"
 msgid "Apple logo"
 msgstr "Apple 標誌"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Git 安裝完成前，Apple 安裝程式已關閉。"
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple 安裝程式未能開啟：{0}"
+
 msgid "Application menu"
 msgstr "應用程式選單"
 
@@ -5558,9 +5565,6 @@ msgstr "無法載入你的機器"
 
 msgid "Could not mark ready"
 msgstr "無法標記為待審查"
-
-msgid "Could not open Apple's installer"
-msgstr "無法開啟 Apple 安裝程式"
 
 msgid "Could not open billing. Please try again."
 msgstr "無法開啟帳單，請再試一次。"
@@ -8571,9 +8575,6 @@ msgstr "尋找成員和 Dev"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "請完成 Apple 安裝程式。完成後此頁面會自動更新。"
-
 msgid "Finish review"
 msgstr "完成審查"
 
@@ -9773,6 +9774,9 @@ msgstr "在新的工作階段中"
 
 msgid "in a terminal on this host."
 msgstr "（在此主機的終端中）。"
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "在 Apple 的視窗中按一下「安裝」。需要幾分鐘，完成後此頁面會自動更新。"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短幾個月，<0>數萬名工程師</0>把Paradev當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
@@ -13710,6 +13714,9 @@ msgstr "其他人正在使用此專案。輸入 <0>{projectName}</0> 以確認�
 msgid "Other Team Members"
 msgstr "其他團隊成員"
 
+msgid "Other ways to get Git"
+msgstr "取得 Git 的其他方式"
+
 msgid "Other ways to reach us"
 msgstr "其他聯絡方式"
 
@@ -17311,6 +17318,9 @@ msgstr "顯示所有評論"
 
 msgid "Show all lines"
 msgstr "顯示所有行"
+
+msgid "Show Apple's installer"
+msgstr "顯示 Apple 安裝程式"
 
 msgid "Show archived"
 msgstr "顯示已歸檔"

@@ -2811,6 +2811,13 @@ msgstr "Apariencia"
 msgid "Apple logo"
 msgstr "Logotipo de Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "El instalador de Apple se cerró antes de instalar Git."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "El instalador de Apple no se abrió: {0}"
+
 msgid "Application menu"
 msgstr "Menú de la aplicación"
 
@@ -5558,9 +5565,6 @@ msgstr "No se pudieron cargar tus máquinas"
 
 msgid "Could not mark ready"
 msgstr "No se pudo marcar como lista"
-
-msgid "Could not open Apple's installer"
-msgstr "No se pudo abrir el instalador de Apple"
 
 msgid "Could not open billing. Please try again."
 msgstr "No se pudo abrir la facturación. Inténtalo de nuevo."
@@ -8571,9 +8575,6 @@ msgstr "Buscar personas y Devs"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Completa el instalador de Apple. Esta página se actualizará cuando termine."
-
 msgid "Finish review"
 msgstr "Finalizar revisión"
 
@@ -9773,6 +9774,9 @@ msgstr "en una sesión nueva"
 
 msgid "in a terminal on this host."
 msgstr "en una terminal de este host."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "En la ventana de Apple, haz clic en Instalar. Tarda unos minutos y esta página se actualiza cuando termina."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "En solo unos meses, <0>decenas de miles de ingenieros</0> usan Paradev como su IDE principal, en empresas como Wix, DoorDash y Netflix."
@@ -13710,6 +13714,9 @@ msgstr "Otras personas están usando este proyecto. Escribe <0>{projectName}</0>
 msgid "Other Team Members"
 msgstr "Otros miembros del equipo"
 
+msgid "Other ways to get Git"
+msgstr "Otras formas de obtener Git"
+
 msgid "Other ways to reach us"
 msgstr "Otras formas de contactarnos"
 
@@ -17311,6 +17318,9 @@ msgstr "Mostrar todos los comentarios"
 
 msgid "Show all lines"
 msgstr "Mostrar todas las líneas"
+
+msgid "Show Apple's installer"
+msgstr "Mostrar el instalador de Apple"
 
 msgid "Show archived"
 msgstr "Mostrar archivados"

@@ -2811,6 +2811,13 @@ msgstr "外観"
 msgid "Apple logo"
 msgstr "Appleのロゴ"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Git がインストールされる前に Apple のインストーラが閉じられました。"
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple のインストーラを開けませんでした: {0}"
+
 msgid "Application menu"
 msgstr "アプリケーションメニュー"
 
@@ -5558,9 +5565,6 @@ msgstr "マシンを読み込めませんでした"
 
 msgid "Could not mark ready"
 msgstr "レビュー可能にできませんでした"
-
-msgid "Could not open Apple's installer"
-msgstr "Appleのインストーラを開けませんでした"
 
 msgid "Could not open billing. Please try again."
 msgstr "請求ページを開けませんでした。もう一度お試しください。"
@@ -8571,9 +8575,6 @@ msgstr "メンバーと Dev を検索"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Appleのインストーラを最後まで進めてください。完了するとこのページが更新されます。"
-
 msgid "Finish review"
 msgstr "レビューを完了"
 
@@ -9773,6 +9774,9 @@ msgstr "新しいセッションで"
 
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Apple のウインドウで「インストール」をクリックしてください。数分かかります。完了するとこのページが更新されます。"
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
@@ -13710,6 +13714,9 @@ msgstr "他のユーザーがこのプロジェクトを使用しています。
 msgid "Other Team Members"
 msgstr "他のチームメンバー"
 
+msgid "Other ways to get Git"
+msgstr "Git を入手するほかの方法"
+
 msgid "Other ways to reach us"
 msgstr "その他の連絡方法"
 
@@ -17311,6 +17318,9 @@ msgstr "すべてのコメントを表示"
 
 msgid "Show all lines"
 msgstr "すべての行を表示"
+
+msgid "Show Apple's installer"
+msgstr "Apple のインストーラを表示"
 
 msgid "Show archived"
 msgstr "アーカイブ済みを表示"

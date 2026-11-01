@@ -43,9 +43,21 @@ describe("detectGit on macOS", () => {
 			installed: false,
 			version: null,
 			needsCommandLineTools: true,
+			installerRunning: false,
 			error: null,
 		});
 		expect(calls).not.toContain("git --version");
+	});
+
+	test("reports when Apple's installer window is open", async () => {
+		const { deps } = makeDeps("darwin", {
+			"/usr/bin/which git": "/usr/bin/git\n",
+			"/usr/bin/xcode-select -p": commandError("unable to get", 2),
+			"/usr/bin/pgrep -x Install Command Line Developer Tools": "812\n",
+		});
+		const result = await detectGit(deps);
+		expect(result.needsCommandLineTools).toBe(true);
+		expect(result.installerRunning).toBe(true);
 	});
 
 	test("treats a developer directory without git as missing tools", async () => {
@@ -71,6 +83,7 @@ describe("detectGit on macOS", () => {
 			installed: true,
 			version: "2.50.1",
 			needsCommandLineTools: false,
+			installerRunning: false,
 			error: null,
 		});
 	});
@@ -101,6 +114,7 @@ describe("detectGit on macOS", () => {
 			installed: false,
 			version: null,
 			needsCommandLineTools: false,
+			installerRunning: false,
 			error: license,
 		});
 	});
@@ -123,6 +137,7 @@ describe("detectGit on other platforms", () => {
 			installed: false,
 			version: null,
 			needsCommandLineTools: false,
+			installerRunning: false,
 			error: null,
 		});
 	});

@@ -2811,6 +2811,13 @@ msgstr "Appearance"
 msgid "Apple logo"
 msgstr "Apple logo"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Apple's installer closed before Git was installed."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple's installer did not open: {0}"
+
 msgid "Application menu"
 msgstr "Application menu"
 
@@ -5558,9 +5565,6 @@ msgstr "Could not load your machines"
 
 msgid "Could not mark ready"
 msgstr "Could not mark ready"
-
-msgid "Could not open Apple's installer"
-msgstr "Could not open Apple's installer"
 
 msgid "Could not open billing. Please try again."
 msgstr "Could not open billing. Please try again."
@@ -8571,9 +8575,6 @@ msgstr "Find people and Devs"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Finish Apple's installer. This page updates when it's done."
-
 msgid "Finish review"
 msgstr "Finish review"
 
@@ -9773,6 +9774,9 @@ msgstr "in a new session"
 
 msgid "in a terminal on this host."
 msgstr "in a terminal on this host."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
@@ -13710,6 +13714,9 @@ msgstr "Other people are using this project. Type <0>{projectName}</0> to confir
 msgid "Other Team Members"
 msgstr "Other Team Members"
 
+msgid "Other ways to get Git"
+msgstr "Other ways to get Git"
+
 msgid "Other ways to reach us"
 msgstr "Other ways to reach us"
 
@@ -17311,6 +17318,9 @@ msgstr "Show all comments"
 
 msgid "Show all lines"
 msgstr "Show all lines"
+
+msgid "Show Apple's installer"
+msgstr "Show Apple's installer"
 
 msgid "Show archived"
 msgstr "Show archived"

@@ -2811,6 +2811,13 @@ msgstr "Görünüm"
 msgid "Apple logo"
 msgstr "Apple logosu"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Apple'ın yükleyicisi Git yüklenmeden kapandı."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple'ın yükleyicisi açılmadı: {0}"
+
 msgid "Application menu"
 msgstr "Uygulama menüsü"
 
@@ -5558,9 +5565,6 @@ msgstr "Makineleriniz yüklenemedi"
 
 msgid "Could not mark ready"
 msgstr "Hazır olarak işaretlenemedi"
-
-msgid "Could not open Apple's installer"
-msgstr "Apple yükleyicisi açılamadı"
 
 msgid "Could not open billing. Please try again."
 msgstr "Faturalandırma açılamadı. Lütfen tekrar deneyin."
@@ -8571,9 +8575,6 @@ msgstr "Kişileri ve Dev'leri bul"
 msgid "Finder"
 msgstr "Finder"
 
-msgid "Finish Apple's installer. This page updates when it's done."
-msgstr "Apple yükleyicisini tamamla. İşlem bitince bu sayfa güncellenir."
-
 msgid "Finish review"
 msgstr "İncelemeyi bitir"
 
@@ -9773,6 +9774,9 @@ msgstr "yeni bir oturumda"
 
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
+
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Apple'ın penceresinde Yükle'ye tıklayın. Birkaç dakika sürer ve bittiğinde bu sayfa güncellenir."
 
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Paradev'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
@@ -13710,6 +13714,9 @@ msgstr "Bu projeyi başkaları kullanıyor. Onaylamak için <0>{projectName}</0>
 msgid "Other Team Members"
 msgstr "Diğer takım üyeleri"
 
+msgid "Other ways to get Git"
+msgstr "Git'i edinmenin diğer yolları"
+
 msgid "Other ways to reach us"
 msgstr "Bize ulaşmanın diğer yolları"
 
@@ -17311,6 +17318,9 @@ msgstr "Tüm yorumları göster"
 
 msgid "Show all lines"
 msgstr "Tüm satırları göster"
+
+msgid "Show Apple's installer"
+msgstr "Apple'ın yükleyicisini göster"
 
 msgid "Show archived"
 msgstr "Arşivlenenleri göster"
