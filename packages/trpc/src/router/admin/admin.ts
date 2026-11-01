@@ -1,8 +1,7 @@
 import { auth } from "@superset/auth/server";
 import { db } from "@superset/db/client";
-import { accounts, users } from "@superset/db/schema";
-import { isTestAccountEmail } from "@superset/shared/constants";
-import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
+import { accounts } from "@superset/db/schema";
+import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -18,28 +17,6 @@ export const adminRouter = {
 		.mutation(async ({ input }) => {
 			await purgeAccount(input.userId);
 			return { success: true };
-		}),
-
-	/** Resets the scheduled production onboarding walkthrough: its account
-	 * otherwise sits in the 30-day deletion window and the next sign-in
-	 * restores it instead of signing up. Refuses any non-test address. */
-	purgeTestAccount: adminProcedure
-		.input(z.object({ email: z.string().email() }))
-		.mutation(async ({ input }) => {
-			const email = input.email.toLowerCase();
-			if (!isTestAccountEmail(email)) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "Only test-account addresses can be purged this way.",
-				});
-			}
-			const user = await db.query.users.findFirst({
-				columns: { id: true },
-				where: eq(users.email, email),
-			});
-			if (!user) return { purged: false };
-			await purgeAccount(user.id);
-			return { purged: true };
 		}),
 
 	/** Sets an email+password credential on the signed-in admin's own account
