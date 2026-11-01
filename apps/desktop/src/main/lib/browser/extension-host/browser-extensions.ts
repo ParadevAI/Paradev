@@ -277,6 +277,10 @@ export function activateBrowserExtension(
 	}
 }
 
+export function pinnedBrowserExtensionIds(): string[] {
+	return pins.pinnedIds();
+}
+
 export function setBrowserExtensionPinned(
 	extensionId: string,
 	pinned: boolean,

@@ -53,7 +53,10 @@ import {
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
-import { initBrowserExtensionHost } from "./lib/browser/extension-host";
+import {
+	initBrowserExtensionHost,
+	userExtensions,
+} from "./lib/browser/extension-host";
 import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
 import { preparePaneSessions } from "./lib/browser/pane-session";
 import {
@@ -588,7 +591,7 @@ if (!gotTheLock) {
 		// bridge endpoint/secret from its env, so a late bridge means browser
 		// control stays dark until the next respawn.
 		try {
-			await startBrowserBridge();
+			await startBrowserBridge({ extensions: userExtensions });
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}

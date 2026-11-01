@@ -48,6 +48,34 @@ const USER_PANE_ERROR =
 	"This pane is the user's own browser, with their logins and extensions. Agents can use only the panes they open.";
 
 const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
+const EXTENSION_ID = /^[a-p]{32}$/;
+const EXTENSION_INSTALL_REFUSED = "The user did not allow this extension.";
+const EXTENSION_REMOVE_REFUSED = "The user kept this extension.";
+
+export interface UserExtensionSummary {
+	id: string;
+	name: string;
+	version: string;
+}
+
+export type UserExtensionInstall =
+	| {
+			status: "installed" | "already-installed";
+			extension: UserExtensionSummary;
+	  }
+	| { status: "declined" };
+
+/**
+ * The extensions in the user's own browser. The CLI can manage them but never
+ * open, click or read them: an agent there could reach a password manager.
+ */
+export interface UserExtensions {
+	list(): (UserExtensionSummary & { pinned: boolean })[];
+	install(extensionId: string): Promise<UserExtensionInstall>;
+	/** False when the user says no. */
+	remove(extensionId: string): Promise<boolean>;
+	setPinned(extensionId: string, pinned: boolean): void;
+}
 
 // Cookies are live sign-ins, so the user says yes to each copy into an agent's pane.
 async function confirmLoginImport(
@@ -146,8 +174,10 @@ function withPane(
 
 export async function startBrowserBridge({
 	homeDir,
+	extensions,
 }: {
 	homeDir?: string;
+	extensions?: UserExtensions;
 } = {}): Promise<void> {
 	if (server) return;
 	const secret = randomBytes(32).toString("hex");
@@ -422,6 +452,80 @@ export async function startBrowserBridge({
 			})
 			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
+
+	const extensionRoute = (
+		handler: (
+			extensions: UserExtensions,
+			extensionId: string,
+			req: Request,
+			res: Response,
+		) => Promise<void>,
+	) => {
+		return (req: Request, res: Response) => {
+			if (!extensions) {
+				res.status(503).json({ error: "Browser extensions are not available" });
+				return;
+			}
+			const extensionId = req.body?.extensionId;
+			if (typeof extensionId !== "string" || !EXTENSION_ID.test(extensionId)) {
+				res
+					.status(400)
+					.json({ error: "extensionId must be a Chrome Web Store ID" });
+				return;
+			}
+			if (
+				req.path !== "/extensions/install" &&
+				!extensions.list().some((extension) => extension.id === extensionId)
+			) {
+				res
+					.status(404)
+					.json({ error: `No extension ${extensionId} is installed` });
+				return;
+			}
+			handler(extensions, extensionId, req, res).catch((err) =>
+				res.status(500).json({ error: errorMessage(err) }),
+			);
+		};
+	};
+
+	app.get("/extensions", (_req, res) => {
+		if (!extensions) {
+			res.status(503).json({ error: "Browser extensions are not available" });
+			return;
+		}
+		res.json({ extensions: extensions.list() });
+	});
+
+	app.post(
+		"/extensions/install",
+		extensionRoute(async (extensions, extensionId, _req, res) => {
+			const result = await extensions.install(extensionId);
+			if (result.status === "declined") {
+				res.status(403).json({ error: EXTENSION_INSTALL_REFUSED });
+				return;
+			}
+			res.json(result);
+		}),
+	);
+
+	app.post(
+		"/extensions/remove",
+		extensionRoute(async (extensions, extensionId, _req, res) => {
+			if (!(await extensions.remove(extensionId))) {
+				res.status(403).json({ error: EXTENSION_REMOVE_REFUSED });
+				return;
+			}
+			res.json({ ok: true });
+		}),
+	);
+
+	app.post(
+		"/extensions/pin",
+		extensionRoute(async (extensions, extensionId, req, res) => {
+			extensions.setPinned(extensionId, req.body?.pinned !== false);
+			res.json({ ok: true });
+		}),
+	);
 
 	const wss = new WebSocketServer({
 		noServer: true,
