@@ -51,6 +51,7 @@ import { useLinkedPullRequest } from "../../../useLinkedPullRequest";
 import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
+import { useElementWidth } from "../../hooks/useElementWidth";
 import { AgentCommentComposer } from "../AgentCommentComposer";
 import { BinaryDiffPreview } from "./components/BinaryDiffPreview";
 import { CommentThread } from "./components/CommentThread";
@@ -70,7 +71,6 @@ import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
 import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
 import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
-import { useElementWidth } from "./hooks/useElementWidth";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
