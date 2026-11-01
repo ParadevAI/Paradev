@@ -13987,8 +13987,8 @@ msgstr "Demo di Paradev Pagine"
 msgid "Paradev Plugins"
 msgstr "Paradev Plugin"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Paradev gira localmente sulle macchine dei tuoi sviluppatori. Non conserviamo il tuo codice né le conversazioni con l'AI, e Paradev ha completato un audit SOC 2 Type II con un revisore indipendente. Richiedi il report e consulta la nostra documentazione sulla sicurezza su trust.superset.sh."
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev gira localmente sulle macchine dei tuoi sviluppatori. Non conserviamo il tuo codice né le conversazioni con l'AI, e Paradev ha completato un audit SOC 2 Type II con un revisore indipendente. Richiedi il report e consulta la nostra documentazione sulla sicurezza su {trustHost}."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev è nato come progetto di un hackathon nel novembre 2025. Era una semplice app desktop per gestire i worktree."
@@ -21487,8 +21487,8 @@ msgstr "Sì. Il piano Free copre i singoli con 1 utente, workspace locali, l'app
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Sì. Nei piani con workspace cloud, gli owner possono acquistare qualsiasi quantità di GB-ore extra a {packPrice} per GB-ora in Impostazioni, Fatturazione. Le GB-ore acquistate sono usate dopo il pool mensile e non scadono mai, e la ricarica automatica può acquistarne altre quando stanno per finire."
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Sì. Paradev ha completato un audit SOC 2 Type II con un revisore indipendente, che copre i nostri controlli di sicurezza nel tempo. Richiedi il report e consulta la nostra documentazione sulla sicurezza su trust.superset.sh."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "Sì. Paradev ha completato un audit SOC 2 Type II con un revisore indipendente, che copre i nostri controlli di sicurezza nel tempo. Richiedi il report e consulta la nostra documentazione sulla sicurezza su {trustHost}."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Sì. Paradev è il workspace in cui girano i tuoi agenti, non un fornitore di modelli. Porta Claude Code, Codex, OpenCode o qualsiasi agente da CLI e usa i tuoi account o le tue chiavi API esistenti con qualsiasi piano."

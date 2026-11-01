@@ -13987,8 +13987,8 @@ msgstr "Paradev 페이지 데모"
 msgid "Paradev Plugins"
 msgstr "Paradev 플러그인"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.superset.sh."
-msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. trust.superset.sh에서 보고서를 요청하고 보안 문서를 확인하세요."
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
@@ -21487,8 +21487,8 @@ msgstr "네. 무료 플랜은 사용자 1명, 로컬 워크스페이스, 데스�
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "네. 클라우드 워크스페이스가 있는 플랜에서는 소유자가 설정의 결제에서 GB 시간당 {packPrice}에 추가 GB 시간을 원하는 만큼 구매할 수 있습니다. 구매한 GB 시간은 월간 풀 다음에 사용되며 만료되지 않고, 부족해지면 자동 충전으로 더 구매할 수 있습니다."
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.superset.sh."
-msgstr "네. Paradev는 독립 감사인과 함께 SOC 2 Type II 감사를 완료했으며, 이는 일정 기간 운영된 보안 통제를 다룹니다. trust.superset.sh에서 보고서를 요청하고 보안 문서를 확인하세요."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "네. Paradev는 독립 감사인과 함께 SOC 2 Type II 감사를 완료했으며, 이는 일정 기간 운영된 보안 통제를 다룹니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "네. Paradev는 모델 제공사가 아니라 에이전트가 실행되는 워크스페이스입니다. Claude Code, Codex, OpenCode 등 어떤 CLI 에이전트든 가져와 모든 플랜에서 기존 계정이나 API 키를 그대로 사용하세요."

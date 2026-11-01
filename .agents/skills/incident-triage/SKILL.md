@@ -1,6 +1,6 @@
 ---
 name: incident-triage
-description: First-pass triage of a possible production incident for Paradev's hosted services. Gathers signals (recent deploys, Sentry spikes, health checks), proposes a severity and a status.superset.sh message, then stops for human approval. Use when someone reports an outage, errors spike, or asks "is something down?".
+description: First-pass triage of a possible production incident for Paradev's hosted services. Gathers signals (recent deploys, Sentry spikes, health checks), proposes a severity and a status.paradev.com message, then stops for human approval. Use when someone reports an outage, errors spike, or asks "is something down?".
 ---
 
 # Incident triage
@@ -13,7 +13,7 @@ start.
 
 - Read-only. Do not deploy, roll back, disable workflows, change flags, resolve Sentry issues,
   or run SQL that writes.
-- Do not post to status.superset.sh, Slack, Discord, Plain, X, or any other channel. Do not declare
+- Do not post to status.paradev.com, Slack, Discord, Plain, X, or any other channel. Do not declare
   an incident. Your output is a draft in this conversation.
 - If a tool is not connected or a check fails, write "not checked" and the reason. Do not guess.
 - Use UTC times everywhere.
@@ -54,7 +54,7 @@ Run the checks that can run in parallel at the same time. Record each result wit
    Expected: relay `{"ok":true,"proto":2}` 200, realtime `{"ok":true}` 200, API
    `{"ok":true,"database":"ok"}` 200. A 503 from the API names the database state.
    Any other 5xx or a timeout is a failure.
-   Also read `https://status.superset.sh/api/v2/summary.json` to see what the page shows now.
+   Also read `https://status.paradev.com/api/v2/summary.json` to see what the page shows now.
 4. **Vercel** (if the CLI is linked): `vercel ls` for recent production deploys, and
    `vercel logs <deployment-url>` for errors around the start time.
 5. **Upstream status.** Name the upstream provider that the signals point to (Vercel, Cloudflare,
@@ -78,7 +78,7 @@ Signals
 
 Proposed severity: SEV<1|2|3> — <one-line reason from the runbook table>
 
-Proposed status.superset.sh update (<Investigating|Identified|Monitoring|Resolved>):
+Proposed status.paradev.com update (<Investigating|Identified|Monitoring|Resolved>):
 > <message from the runbook template, filled in>
 
 Suggested next steps for the lead:
