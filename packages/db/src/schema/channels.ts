@@ -25,7 +25,7 @@ import {
 	channelVisibilityValues,
 	dockBounceValues,
 } from "./enums";
-import { taskProjects, tasks } from "./schema";
+import { taskProjects } from "./schema";
 
 export const channelVisibility = pgEnum(
 	"channel_visibility",
@@ -236,23 +236,6 @@ export const channelThreadFollows = pgTable(
 
 export type SelectChannelThreadFollow =
 	typeof channelThreadFollows.$inferSelect;
-
-/** A task's channel: at most one, so adding a task to a channel moves it from any other. */
-export const channelTasks = pgTable(
-	"channel_tasks",
-	{
-		taskId: uuid("task_id")
-			.primaryKey()
-			.references(() => tasks.id, { onDelete: "cascade" }),
-		channelId: uuid("channel_id")
-			.notNull()
-			.references(() => channels.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-	},
-	(t) => [index("channel_tasks_channel_id_idx").on(t.channelId)],
-);
 
 /**
  * A person's channel notification settings, the ones Slack keeps in
