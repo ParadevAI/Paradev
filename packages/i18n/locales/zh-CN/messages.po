@@ -10752,9 +10752,6 @@ msgstr "关联此任务"
 msgid "Linked {slug} to workspace"
 msgstr "已将{slug}关联到工作区"
 
-msgid "Linked to {projectName}"
-msgstr "已关联到 {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "暂无下载"
 msgid "No emoji found"
 msgstr "未找到表情"
 
-msgid "No environments are linked to this project yet."
-msgstr "尚无环境关联到此项目。"
-
 msgid "No environments available"
 msgstr "没有可用的环境"
 
 msgid "No environments found."
 msgstr "未找到环境。"
+
+msgid "No environments linked to this project."
+msgstr "没有环境关联到此项目。"
 
 msgid "No environments yet."
 msgstr "还没有环境。创建一个，以便基于它启动云端工作区。"

@@ -10752,9 +10752,6 @@ msgstr "Vincular esta tarea"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} enlazado al espacio de trabajo"
 
-msgid "Linked to {projectName}"
-msgstr "Vinculados a {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Aún no hay descargas"
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
-msgid "No environments are linked to this project yet."
-msgstr "Todavía no hay entornos vinculados a este proyecto."
-
 msgid "No environments available"
 msgstr "No hay entornos disponibles"
 
 msgid "No environments found."
 msgstr "No se encontraron entornos."
+
+msgid "No environments linked to this project."
+msgstr "No hay entornos vinculados a este proyecto."
 
 msgid "No environments yet."
 msgstr "Aún no hay entornos. Crea uno para iniciar un espacio de trabajo en la nube a partir de él."

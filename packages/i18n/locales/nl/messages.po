@@ -10752,9 +10752,6 @@ msgstr "Deze taak koppelen"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} gekoppeld aan werkruimte"
 
-msgid "Linked to {projectName}"
-msgstr "Gekoppeld aan {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Nog geen downloads"
 msgid "No emoji found"
 msgstr "Geen emoji gevonden"
 
-msgid "No environments are linked to this project yet."
-msgstr "Er zijn nog geen omgevingen aan dit project gekoppeld."
-
 msgid "No environments available"
 msgstr "Geen omgevingen beschikbaar"
 
 msgid "No environments found."
 msgstr "Geen omgevingen gevonden."
+
+msgid "No environments linked to this project."
+msgstr "Er zijn geen omgevingen aan dit project gekoppeld."
 
 msgid "No environments yet."
 msgstr "Nog geen omgevingen. Maak er een aan om er een cloudwerkruimte vanaf te starten."

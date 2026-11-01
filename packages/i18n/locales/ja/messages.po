@@ -10752,9 +10752,6 @@ msgstr "このタスクをリンク"
 msgid "Linked {slug} to workspace"
 msgstr "{slug}をワークスペースにリンクしました"
 
-msgid "Linked to {projectName}"
-msgstr "{projectName} にリンク済み"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "ダウンロードはまだありません"
 msgid "No emoji found"
 msgstr "絵文字が見つかりません"
 
-msgid "No environments are linked to this project yet."
-msgstr "このプロジェクトにリンクされた環境はまだありません。"
-
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
 
 msgid "No environments found."
 msgstr "環境が見つかりません。"
+
+msgid "No environments linked to this project."
+msgstr "このプロジェクトにリンクされた環境はありません。"
 
 msgid "No environments yet."
 msgstr "環境はまだありません。作成すると、そこからクラウドワークスペースを起動できます。"

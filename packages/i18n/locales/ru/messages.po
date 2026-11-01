@@ -10752,9 +10752,6 @@ msgstr "Связать эту задачу"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} привязана к рабочей области"
 
-msgid "Linked to {projectName}"
-msgstr "Связаны с {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Загрузок пока нет"
 msgid "No emoji found"
 msgstr "Эмодзи не найдены"
 
-msgid "No environments are linked to this project yet."
-msgstr "С этим проектом пока не связано ни одно окружение."
-
 msgid "No environments available"
 msgstr "Нет доступных окружений"
 
 msgid "No environments found."
 msgstr "Окружения не найдены."
+
+msgid "No environments linked to this project."
+msgstr "С этим проектом не связано ни одно окружение."
 
 msgid "No environments yet."
 msgstr "Окружений пока нет. Создайте окружение, чтобы запускать из него облачную рабочую область."

@@ -10752,9 +10752,6 @@ msgstr "Połącz to zadanie"
 msgid "Linked {slug} to workspace"
 msgstr "Powiązano {slug} z obszarem roboczym"
 
-msgid "Linked to {projectName}"
-msgstr "Powiązane z {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Brak pobranych plików"
 msgid "No emoji found"
 msgstr "Nie znaleziono emoji"
 
-msgid "No environments are linked to this project yet."
-msgstr "Z tym projektem nie powiązano jeszcze żadnego środowiska."
-
 msgid "No environments available"
 msgstr "Brak dostępnych środowisk"
 
 msgid "No environments found."
 msgstr "Nie znaleziono środowisk."
+
+msgid "No environments linked to this project."
+msgstr "Z tym projektem nie powiązano żadnego środowiska."
 
 msgid "No environments yet."
 msgstr "Brak środowisk. Utwórz jedno, aby uruchamiać z niego obszar roboczy w chmurze."

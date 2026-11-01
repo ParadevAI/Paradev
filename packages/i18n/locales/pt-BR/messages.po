@@ -10752,9 +10752,6 @@ msgstr "Vincular esta tarefa"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} vinculada à área de trabalho"
 
-msgid "Linked to {projectName}"
-msgstr "Vinculados a {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "Nenhum download ainda"
 msgid "No emoji found"
 msgstr "Nenhum emoji encontrado"
 
-msgid "No environments are linked to this project yet."
-msgstr "Nenhum ambiente está vinculado a este projeto ainda."
-
 msgid "No environments available"
 msgstr "Nenhum ambiente disponível"
 
 msgid "No environments found."
 msgstr "Nenhum ambiente encontrado."
+
+msgid "No environments linked to this project."
+msgstr "Nenhum ambiente vinculado a este projeto."
 
 msgid "No environments yet."
 msgstr "Nenhum ambiente ainda. Crie um para iniciar uma área de trabalho na nuvem a partir dele."

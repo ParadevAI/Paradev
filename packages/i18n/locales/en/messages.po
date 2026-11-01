@@ -10752,9 +10752,6 @@ msgstr "Link this task"
 msgid "Linked {slug} to workspace"
 msgstr "Linked {slug} to workspace"
 
-msgid "Linked to {projectName}"
-msgstr "Linked to {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12136,14 +12133,14 @@ msgstr "No downloads yet"
 msgid "No emoji found"
 msgstr "No emoji found"
 
-msgid "No environments are linked to this project yet."
-msgstr "No environments are linked to this project yet."
-
 msgid "No environments available"
 msgstr "No environments available"
 
 msgid "No environments found."
 msgstr "No environments found."
+
+msgid "No environments linked to this project."
+msgstr "No environments linked to this project."
 
 msgid "No environments yet."
 msgstr "No environments yet."

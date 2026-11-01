@@ -10746,9 +10746,6 @@ msgstr "Прив'язати це завдання"
 msgid "Linked {slug} to workspace"
 msgstr "{slug} прив'язано до робочого простору"
 
-msgid "Linked to {projectName}"
-msgstr "Прив'язано до {projectName}"
-
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
 
@@ -12130,14 +12127,14 @@ msgstr "Завантажень ще немає"
 msgid "No emoji found"
 msgstr "Емодзі не знайдено"
 
-msgid "No environments are linked to this project yet."
-msgstr "До цього проєкту ще не прив'язано жодного середовища."
-
 msgid "No environments available"
 msgstr "Немає доступних середовищ"
 
 msgid "No environments found."
 msgstr "Середовищ не знайдено."
+
+msgid "No environments linked to this project."
+msgstr "До цього проєкту не прив'язано жодного середовища."
 
 msgid "No environments yet."
 msgstr "Середовищ ще немає."
