@@ -51,6 +51,17 @@ describe("parseGrokQuotaPayload", () => {
 		});
 	});
 
+	it("returns null when the percent is omitted and only the week start is present", () => {
+		const payload = message(
+			1,
+			message(4, [...varint(1 << 3), ...varint(1_800_000_000)]),
+		);
+		const framed = new Uint8Array([0, 0, 0, 0, payload.length, ...payload]);
+		expect(
+			parseGrokQuotaPayload(framed, new Date("2026-01-01T00:00:00Z")),
+		).toBeNull();
+	});
+
 	it("returns null when neither the percent nor the reset is present", () => {
 		const payload = message(1, message(2, varint(1 << 3)));
 		const framed = new Uint8Array([0, 0, 0, 0, payload.length, ...payload]);

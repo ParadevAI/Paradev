@@ -169,7 +169,7 @@ export function parseGrokQuotaPayload(
 		(entry) => entry.path.join(".") === "1.5.1",
 	);
 	const resetsAt = preferred?.date ?? resetCandidates[0]?.date ?? null;
-	if (percent === undefined && !resetsAt) return null;
+	if (percent === undefined && !preferred) return null;
 	return { usedPercent: Math.max(0, Math.min(100, percent ?? 0)), resetsAt };
 }
 
