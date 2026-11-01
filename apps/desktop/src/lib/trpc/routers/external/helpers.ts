@@ -428,6 +428,20 @@ export function spawnAsync(command: string, args: string[]): Promise<void> {
 				resolve();
 			} else {
 				const stderrMessage = stderr.trim();
+				// macOS `open -a` reports an uninstalled app by exit code, not ENOENT.
+				if (
+					command === "open" &&
+					stderrMessage.startsWith("Unable to find application named ")
+				) {
+					reject(
+						new TRPCError({
+							code: "PRECONDITION_FAILED",
+							message: stderrMessage,
+							cause: { kind: "APP_NOT_INSTALLED", command },
+						}),
+					);
+					return;
+				}
 				reject(
 					new Error(stderrMessage || `'${command}' exited with code ${code}`),
 				);
