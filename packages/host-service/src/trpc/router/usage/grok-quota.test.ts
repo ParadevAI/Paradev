@@ -35,4 +35,27 @@ describe("parseGrokQuotaPayload", () => {
 			resetsAt: new Date(reset * 1000),
 		});
 	});
+
+	it("reads an omitted weekly percent as 0 when the reset is present", () => {
+		const reset = 1_800_000_000;
+		const payload = message(1, [
+			...message(4, [...varint(1 << 3), ...varint(reset - 7 * 86_400)]),
+			...message(5, [...varint(1 << 3), ...varint(reset)]),
+		]);
+		const framed = new Uint8Array([0, 0, 0, 0, payload.length, ...payload]);
+		expect(
+			parseGrokQuotaPayload(framed, new Date("2026-01-01T00:00:00Z")),
+		).toEqual({
+			usedPercent: 0,
+			resetsAt: new Date(reset * 1000),
+		});
+	});
+
+	it("returns null when neither the percent nor the reset is present", () => {
+		const payload = message(1, message(2, varint(1 << 3)));
+		const framed = new Uint8Array([0, 0, 0, 0, payload.length, ...payload]);
+		expect(
+			parseGrokQuotaPayload(framed, new Date("2026-01-01T00:00:00Z")),
+		).toBeNull();
+	});
 });
