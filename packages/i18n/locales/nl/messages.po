@@ -1116,6 +1116,9 @@ msgstr "{name} is begonnen"
 msgid "{name} stopped"
 msgstr "{name} is gestopt"
 
+msgid "{name} wants more access"
+msgstr "{name} wil meer toegang"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} uur ({gbHours} GB-uren) per gebruiker"
 
@@ -1916,6 +1919,9 @@ msgstr "{0}-account toevoegen"
 msgid "Add {0} to workspace"
 msgstr "{0} toevoegen aan werkruimte"
 
+msgid "Add {localizedName}?"
+msgstr "{localizedName} toevoegen?"
+
 msgid "Add a comment…"
 msgstr "Voeg een reactie toe…"
 
@@ -1993,6 +1999,9 @@ msgstr "Beschrijving toevoegen"
 
 msgid "Add description..."
 msgstr "Beschrijving toevoegen..."
+
+msgid "Add extension"
+msgstr "Extensie toevoegen"
 
 msgid "Add file comment"
 msgstr "Opmerking bij bestand toevoegen"
@@ -3957,6 +3966,9 @@ msgstr "Overstappen naar maandelijks"
 msgid "Change worktree location"
 msgstr "Worktree-locatie wijzigen"
 
+msgid "Change your privacy-related settings"
+msgstr "Je privacyinstellingen wijzigen"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Het percentage mislukte wijzigingen ligt twee kwartalen op rij op of onder het niveau van het menselijke tijdperk."
 
@@ -4785,6 +4797,9 @@ msgstr "Toegezegd, start binnenkort."
 msgid "Common questions"
 msgstr "Veelgestelde vragen"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Communiceren met samenwerkende native apps"
+
 msgid "Communication"
 msgstr "Communicatie"
 
@@ -5559,6 +5574,9 @@ msgstr "Kan je machines niet laden"
 msgid "Could not mark ready"
 msgstr "Kan niet als klaar markeren"
 
+msgid "Could not open {name}"
+msgstr "Kan {name} niet openen"
+
 msgid "Could not open billing. Please try again."
 msgstr "Kon facturering niet openen. Probeer het opnieuw."
 
@@ -5621,6 +5639,9 @@ msgstr "Kan cloudwerkruimte niet vastleggen"
 
 msgid "Could not record environment"
 msgstr "Omgeving kon niet worden opgeslagen"
+
+msgid "Could not remove {name}"
+msgstr "Kan {name} niet verwijderen"
 
 msgid "Could not remove access"
 msgstr "Kan toegang niet verwijderen"
@@ -5705,6 +5726,9 @@ msgstr "Kan geen screenshot maken"
 
 msgid "Could not undo"
 msgstr "Ongedaan maken mislukt"
+
+msgid "Could not update {name}"
+msgstr "Kan {name} niet bijwerken"
 
 msgid "Could not update plugin"
 msgstr "Kan plugin niet bijwerken"
@@ -7078,6 +7102,9 @@ msgstr "heeft de review ingetrokken"
 msgid "Display"
 msgstr "Weergave"
 
+msgid "Display notifications"
+msgstr "Meldingen weergeven"
+
 msgid "Display options"
 msgstr "Weergaveopties"
 
@@ -7829,6 +7856,9 @@ msgstr "Verkennen"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Uitgebreid nadenken: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Extensies"
 
 msgid "External Application"
 msgstr "Externe applicatie"
@@ -8991,6 +9021,9 @@ msgstr "API-sleutel ophalen"
 msgid "Get channel details"
 msgstr "Kanaaldetails bekijken"
 
+msgid "Get extensions"
+msgstr "Extensies toevoegen"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Neem contact op met het team van {companyName}."
 
@@ -10147,8 +10180,14 @@ msgstr "Issue-URL moet overeenkomen met {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "De extensie kan:"
+
 msgid "It can't be brought back."
 msgstr "Dit kan niet ongedaan worden gemaakt."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar een browservenster dat de agent heeft geopend. De agent kan dan handelen op de sites waar je bent ingelogd."
 
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
@@ -10315,6 +10354,9 @@ msgstr "{planLabel} behouden"
 
 msgid "Keep {planName}"
 msgstr "{planName} behouden"
+
+msgid "Keep current version"
+msgstr "Huidige versie behouden"
 
 msgid "Keep docs fresh"
 msgstr "Docs actueel houden"
@@ -10629,6 +10671,9 @@ msgstr "Minder"
 
 msgid "less than a minute ago"
 msgstr "minder dan een minuut geleden"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Een agent je {browserName}-aanmeldingen laten gebruiken?"
 
 msgid "Let the agent drive."
 msgstr "Laat de agent sturen."
@@ -11134,6 +11179,9 @@ msgstr "Gebruik beheren"
 
 msgid "Manage your account settings"
 msgstr "Beheer je accountinstellingen"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Je apps, extensies en thema's beheren"
 
 msgid "Manage your organization's branding and members."
 msgstr "Beheer de branding en leden van je organisatie."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Vastzetten"
 
+msgid "Pin {name}"
+msgstr "{name} vastzetten"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Pin feedback op een pagina en laat de agent de wijziging maken."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Gelezen"
 
+msgid "Read and change all your data on all websites"
+msgstr "Al je gegevens op alle websites lezen en wijzigen"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Je gegevens op {count} websites lezen en wijzigen"
+
+msgid "Read and change your data on {site}"
+msgstr "Je gegevens op {site} lezen en wijzigen"
+
 msgid "Read and plan without changing anything"
 msgstr "Lezen en plannen zonder iets te wijzigen"
 
@@ -15065,6 +15125,9 @@ msgstr "Mail lezen en verzenden"
 
 msgid "Read announcement"
 msgstr "Aankondiging lezen"
+
+msgid "Read data you copy and paste"
+msgstr "Gegevens lezen die je kopieert en plakt"
 
 msgid "Read deployment and build logs"
 msgstr "Lees deployment- en buildlogs"
@@ -15104,6 +15167,9 @@ msgstr "Lees de installatiegids"
 
 msgid "Read the source and every pull request."
 msgstr "Lees de broncode en elke pull request."
+
+msgid "Read your browsing history"
+msgstr "Je browsegeschiedenis lezen"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "{label} verwijderen?"
 
 msgid "Remove {name}"
 msgstr "{name} verwijderen"
+
+msgid "Remove {name}?"
+msgstr "{name} verwijderen?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie en bij elk lid dat ze heeft geïnstalleerd verwijderd."
@@ -18951,6 +19020,9 @@ msgstr "Het endpoint moet https gebruiken."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "De omgeving waaruit deze automatisering cloudwerkruimtes start, is gearchiveerd of heeft geen repository's. Kies een andere omgeving in de instellingen van de automatisering."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "De extensie en de lokale gegevens ervan worden uit deze browser verwijderd."
+
 msgid "The factory"
 msgstr "De fabriek"
 
@@ -19198,6 +19270,9 @@ msgstr "De titel verschijnt overal waar deze pagina wordt vermeld en in het link
 
 msgid "The turn failed"
 msgstr "De beurt is mislukt"
+
+msgid "The update can also:"
+msgstr "De update kan ook:"
 
 msgid "The very beginning"
 msgstr "Het allereerste begin"
@@ -20565,6 +20640,9 @@ msgstr "Globale standaard gebruiken"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gebruik kleine letters, cijfers, streepjes en underscores"
+
+msgid "Use more browser features: {features}"
+msgstr "Meer browserfuncties gebruiken: {features}"
 
 msgid "Use Paradev on mobile"
 msgstr "Gebruik Paradev op je mobiel"

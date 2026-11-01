@@ -11,6 +11,7 @@ import {
 } from "main/lib/browser/chrome-history-import";
 import { hasUnreadableChromiumBrowser } from "main/lib/browser/chromium-profiles";
 import { localDb } from "main/lib/local-db";
+import { BROWSER_PARTITION } from "shared/constants";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 
@@ -18,7 +19,6 @@ import { publicProcedure, router } from "../..";
 const IMPORT_CHUNK_SIZE = 200;
 
 /** The partition the in-app browser pane (and app renderer) use. */
-const BROWSER_PARTITION = "persist:superset";
 
 export const createBrowserHistoryRouter = () => {
 	return router({

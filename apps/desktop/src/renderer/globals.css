@@ -3,6 +3,8 @@
 @import "streamdown/styles.css";
 @import "../../../../packages/ui/src/motion.css";
 
+@custom-variant dark (&:is(.dark *));
+
 @source "./**/*.{ts,tsx}";
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../../packages/chat-ui/src/**/*.{ts,tsx}";

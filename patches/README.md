@@ -611,3 +611,145 @@ repo, without Android, tests, rn-tester and API snapshots) to a copy of the
 package with `patch -p3`, inline the two new files as above, and write
 `git diff` as the patch. Verify on the folded iPhone Duo: Settings rows end
 before the button column.
+
+## electron-chrome-web-store (`electron-chrome-web-store@<version>.patch`)
+
+**Why:** the package reads the CRX3 header and checks that the declared
+extension ID matches a public key, but never verifies a signature, and it
+unpacks CRX2 files with no check at all. HTTPS to Google is then the only guard
+on code that runs in every page of the browser pane. Installs and updates
+download, parse and unpack in one internal call chain (`downloadExtensionFromURL`
+→ `parseCrx` → `unpackCrx`), so no option or hook of the package can see the
+bytes in between.
+
+**What it changes** (`dist/cjs/browser/index.js`, `dist/esm/browser/index.mjs`
+and the types): `parseCrx`, the one function every install and update passes
+through, first calls a verifier set with the new `setCrxVerifier` export, and
+refuses every CRX while none is set. It also exports the existing
+`downloadExtensionFromURL`, so a test can serve a CRX from a local server. The
+verifier is `apps/desktop/src/main/lib/browser/extension-host/crx3.ts`.
+
+Two more changes. The store page's preload swaps "Chrome" for the app name in
+every label on every pass, so a name that contains "Chrome" (a dev build's
+does) grew without end; `updateBranding` now skips a label that already holds
+the name. And the store's Remove ignored `showConfirmDialog` and deleted the
+extension at once; a new `onUninstall` option hands the removal to the app,
+which asks first and removes through its own path.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/web-store.test.ts`.
+It downloads a real Web Store CRX, the same bytes with one flipped byte, and an
+unsigned CRX2 through the installed package, and checks that only the first
+reaches disk. Without the patch its imports do not exist and typecheck fails.
+Its second test runs the installed `updateBranding` five times with an app name
+that contains "Chrome" and expects the name once.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-web-store`
+(without `CI=1` it runs the native rebuild), make the same change in `parseCrx`
+and both export lists of both bundles, `CI=1 bun patch --commit
+'node_modules/electron-chrome-web-store'`, then run the guard test.
+
+## electron-chrome-extensions (`electron-chrome-extensions@<version>.patch`)
+
+**Why:** the package checks almost no extension permissions at its API
+boundary.
+
+1. The router takes the extension ID from the IPC message and runs the handler
+   as that extension. A renderer that reaches raw IPC could then act as another
+   extension, for example LastPass, for tabs, windows, menus and toolbar
+   actions.
+2. Every extension gets each tab's `url`, `pendingUrl`, `title` and
+   `favIconUrl` from `tabs.*`, and again inside each window's `tabs` from
+   `windows.*`, whatever its permissions. The install dialog warns about
+   browsing history only for `tabs`.
+3. The preload gives every extension `chrome.cookies`. With no permission, an
+   extension could read, set and remove any site's cookies, session cookies
+   included, and `cookies.onChanged` went to all of them.
+4. Every frame navigation, with its URL, went to every extension through
+   `webNavigation.*` events, and `getFrame`/`getAllFrames` had no check.
+5. `notifications.*` and `contextMenus.*` had no permission check.
+   `permissions.request` granted without asking when the app had no prompt,
+   and its grants were never read.
+
+**What it changes** (`dist/cjs/index.js`, `dist/esm/index.mjs`):
+
+1. The router's `crx-msg`, `crx-add-listener` and `crx-remove-listener`
+   handlers derive the ID from the sender (the frame's URL, or the service
+   worker's scope) and refuse a message whose ID differs. A message with no ID
+   (the app's own UI) still passes; handlers that need an extension already
+   refuse it.
+2. One table, `extensionApiRules`, keyed by handler and event name, holds
+   Chrome's rule for the `tabs`, `windows`, `cookies`, `webNavigation`,
+   `notifications` and `contextMenus` namespaces (`ruledApiNamespaces`). A rule names the API permission it needs (`permission`), a
+   check on the call's arguments (`allowed`), and a filter for the result
+   (`result`) or for an event's arguments (`args`), run for the extension that
+   calls or listens. `onExtensionMessage` refuses the call before the handler
+   runs and filters what it returns. `sendEvent` skips a listener without the
+   permission, filters the arguments per listener, and skips it when the filter
+   returns nothing. A name in those namespaces with no rule fails closed:
+   the call throws, and the event goes to nobody.
+3. Tabs: an extension sees the four fields with `tabs`, a host permission
+   (`permissions` or `host_permissions`) that matches the tab's URL, or
+   `activeTab` on the active tab (`canSeeTabUrl`). Otherwise it gets a copy
+   without them (`tabDetailsForExtension`); the `tabDetailsCache` entry stays
+   whole. `tabs.query` matches no hidden tab on `url` or `title`, and an
+   `onUpdated` whose only changes were hidden fields is dropped.
+   `browserAction.onClicked` and `tabs.onCreated` carry the tab through the
+   same filter. `tabs.insertCSS` needs a host permission or `activeTab` for the
+   tab. Windows: each embedded tab goes through the same filter, in a copy of
+   the cached window.
+4. Cookies: every call and `onChanged` needs `cookies`. A cookie is visible
+   only with a host permission for its URL (`https` or `http` by `secure`, its
+   domain, its path), as Chrome builds it. `get` returns `null` and `getAll`
+   leaves out the others; `set` and `remove` throw without a host permission
+   for `details.url`.
+5. webNavigation: every call and event needs `webNavigation`. Notifications
+   and context menus: every call and event needs `notifications` or
+   `contextMenus`.
+6. Grants: an extension holds its manifest's `permissions` and
+   `host_permissions`, plus what `permissions.request` granted
+   (`grantedPermissions`, kept in `runtimeGrants` until the extension
+   unloads). `request` takes only what the manifest declares as required or
+   optional; a host pattern covers origins, never an API permission
+   (`originCovered`). It asks the app, refuses when the app has no prompt, and
+   sends `permissions.onAdded`. `remove` refuses a required entry. `getAll`
+   and `contains` read the same grants.
+7. `activeTab`: a click on the extension's toolbar button or one of its
+   context-menu items grants it for that tab's origin (`grantActiveTab`). It
+   ends when the tab moves to another origin or closes, and a return to the
+   origin does not bring it back.
+8. `browserAction.getState` and `browserAction.activate` are no longer IPC
+   handlers; the app calls them in the main process. `windows.create`,
+   `tabs.create` and `tabs.update` refuse `file:` and `data:` URLs, as they
+   already refused `chrome:` and `javascript:`. A native messaging host name must be a dotted
+   name, and its manifest's `name` must match it. With no window focused,
+   `windows.getCurrent` and `windows.getLastFocused` answer the newest open
+   window, and throw as in Chrome when none is open.
+
+Host patterns are matched by scheme, host and path, not by the package's
+`matchesPattern` glob, which lets `*://*.example.com/*` match any URL that
+contains `.example.com/`.
+
+**Guard test:** `apps/desktop/src/main/lib/browser/extension-host/electron-chrome-extensions-patch.test.ts`.
+It loads the router, `TabsAPI`, `WindowsAPI`, `CookiesAPI` and
+`WebNavigationAPI` from both installed bundles, with fake Electron objects. It
+runs `assertSenderIsExtension` against a popup that claims another extension's
+ID and a website that claims one. It calls handlers through
+`onExtensionMessage` and fires events through `sendEvent`, as extensions with
+no permission, `tabs`, a host permission, `activeTab`, `cookies` with and
+without a host, `webNavigation`, `notifications` and `contextMenus`, and
+through `permissions.request`. Two tests list every handler the API classes
+register and every event name their code sends, and fail when one has no rule
+in `extensionApiRules`.
+
+**Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
+In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
+`RoutingDelegate` and call it first in the three handlers; add the helpers and
+the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
+add the `canSeeTabUrl` line to the `TabsAPI.query` filter. In
+`ExtensionRouter.onExtensionMessage`, look up `extensionApiRule(handlerName)`
+before the handler runs and pass the result through `apiRule.result`; in
+`sendEvent`, look up `extensionApiRule(eventName)` and check and filter per
+listener. Then `CI=1 bun patch --commit
+'node_modules/electron-chrome-extensions'`, drop the empty `.bun-tag-*` entry
+it adds, run `bun install`, and run the guard test. A new handler or event in
+a ruled namespace fails that test until it has a rule.

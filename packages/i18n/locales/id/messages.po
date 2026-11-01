@@ -1116,6 +1116,9 @@ msgstr "{name} mulai bekerja"
 msgid "{name} stopped"
 msgstr "{name} dihentikan"
 
+msgid "{name} wants more access"
+msgstr "{name} meminta akses lebih"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} jam ({gbHours} GB-jam) per kursi"
 
@@ -1916,6 +1919,9 @@ msgstr "Tambah akun {0}"
 msgid "Add {0} to workspace"
 msgstr "Tambahkan {0} ke workspace"
 
+msgid "Add {localizedName}?"
+msgstr "Tambahkan {localizedName}?"
+
 msgid "Add a comment…"
 msgstr "Tambahkan komentar…"
 
@@ -1993,6 +1999,9 @@ msgstr "Tambahkan Deskripsi"
 
 msgid "Add description..."
 msgstr "Tambah deskripsi..."
+
+msgid "Add extension"
+msgstr "Tambahkan ekstensi"
 
 msgid "Add file comment"
 msgstr "Tambah komentar file"
@@ -3957,6 +3966,9 @@ msgstr "Ubah ke Bulanan"
 msgid "Change worktree location"
 msgstr "Ubah lokasi worktree"
 
+msgid "Change your privacy-related settings"
+msgstr "Mengubah setelan terkait privasi"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Tingkat kegagalan perubahan sama atau di bawah baseline era manusia selama dua kuartal berturut-turut."
 
@@ -4785,6 +4797,9 @@ msgstr "Sudah pasti, segera dimulai."
 msgid "Common questions"
 msgstr "Pertanyaan umum"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Berkomunikasi dengan aplikasi native yang bekerja sama"
+
 msgid "Communication"
 msgstr "Komunikasi"
 
@@ -5559,6 +5574,9 @@ msgstr "Tidak bisa memuat mesin Anda"
 msgid "Could not mark ready"
 msgstr "Tidak bisa menandai siap"
 
+msgid "Could not open {name}"
+msgstr "Tidak bisa membuka {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Tidak dapat membuka penagihan. Coba lagi."
 
@@ -5621,6 +5639,9 @@ msgstr "Tidak bisa mencatat workspace cloud"
 
 msgid "Could not record environment"
 msgstr "Tidak dapat menyimpan environment"
+
+msgid "Could not remove {name}"
+msgstr "Tidak bisa menghapus {name}"
 
 msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
@@ -5705,6 +5726,9 @@ msgstr "Tidak bisa mengambil tangkapan layar"
 
 msgid "Could not undo"
 msgstr "Tidak bisa mengurungkan"
+
+msgid "Could not update {name}"
+msgstr "Tidak bisa memperbarui {name}"
 
 msgid "Could not update plugin"
 msgstr "Tidak bisa memperbarui plugin"
@@ -7078,6 +7102,9 @@ msgstr "membatalkan ulasannya"
 msgid "Display"
 msgstr "Tampilan"
 
+msgid "Display notifications"
+msgstr "Menampilkan notifikasi"
+
 msgid "Display options"
 msgstr "Opsi tampilan"
 
@@ -7829,6 +7856,9 @@ msgstr "Sedang dijajaki"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Extended thinking: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Ekstensi"
 
 msgid "External Application"
 msgstr "Aplikasi Eksternal"
@@ -8991,6 +9021,9 @@ msgstr "Dapatkan kunci API"
 msgid "Get channel details"
 msgstr "Lihat detail saluran"
 
+msgid "Get extensions"
+msgstr "Dapatkan ekstensi"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Hubungi tim {companyName}."
 
@@ -10147,8 +10180,14 @@ msgstr "URL issue harus cocok dengan {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "Ekstensi ini dapat:"
+
 msgid "It can't be brought back."
 msgstr "Komentar ini tidak bisa dikembalikan."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "Menyalin cookie dari profil \"{profileName}\" Anda ke panel browser yang dibuka agen. Agen lalu dapat bertindak di situs tempat Anda masuk."
 
 msgid "It keeps the title from your prompt."
 msgstr "Judul dari prompt Anda tetap dipakai."
@@ -10315,6 +10354,9 @@ msgstr "Pertahankan {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Pertahankan {planName}"
+
+msgid "Keep current version"
+msgstr "Pertahankan versi saat ini"
 
 msgid "Keep docs fresh"
 msgstr "Jaga dokumentasi tetap segar"
@@ -10629,6 +10671,9 @@ msgstr "Lebih sedikit"
 
 msgid "less than a minute ago"
 msgstr "kurang dari semenit lalu"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Izinkan agen memakai login {browserName} Anda?"
 
 msgid "Let the agent drive."
 msgstr "Biarkan agen yang mengemudi."
@@ -11134,6 +11179,9 @@ msgstr "Kelola penggunaan"
 
 msgid "Manage your account settings"
 msgstr "Kelola pengaturan akun Anda"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Mengelola aplikasi, ekstensi, dan tema"
 
 msgid "Manage your organization's branding and members."
 msgstr "Kelola identitas dan anggota organisasi Anda."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Sematkan"
 
+msgid "Pin {name}"
+msgstr "Sematkan {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Sematkan masukan di halaman dan biarkan agen membuat perubahannya."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Dibaca"
 
+msgid "Read and change all your data on all websites"
+msgstr "Membaca dan mengubah semua data Anda di semua situs"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Membaca dan mengubah data Anda di {count} situs"
+
+msgid "Read and change your data on {site}"
+msgstr "Membaca dan mengubah data Anda di {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Baca dan rencanakan tanpa mengubah apa pun"
 
@@ -15065,6 +15125,9 @@ msgstr "Baca dan kirim email"
 
 msgid "Read announcement"
 msgstr "Baca pengumuman"
+
+msgid "Read data you copy and paste"
+msgstr "Membaca data yang Anda salin dan tempel"
 
 msgid "Read deployment and build logs"
 msgstr "Baca log deployment dan build"
@@ -15104,6 +15167,9 @@ msgstr "Baca panduan penyiapan"
 
 msgid "Read the source and every pull request."
 msgstr "Baca kode sumber dan setiap pull request."
+
+msgid "Read your browsing history"
+msgstr "Membaca histori penjelajahan Anda"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "Hapus {label}?"
 
 msgid "Remove {name}"
 msgstr "Hapus {name}"
+
+msgid "Remove {name}?"
+msgstr "Hapus {name}?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Hapus {repo}? Semua plugin yang disinkronkan darinya dihapus dari organisasi Anda dan dari setiap anggota yang memasangnya."
@@ -18951,6 +19020,9 @@ msgstr "Endpoint harus menggunakan https."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Environment yang digunakan otomatisasi ini untuk memulai workspace cloud telah diarsipkan atau tidak memiliki repositori. Pilih environment lain di pengaturan otomatisasi."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Ekstensi dan data lokalnya dihapus dari browser ini."
+
 msgid "The factory"
 msgstr "Pabriknya"
 
@@ -19198,6 +19270,9 @@ msgstr "Judul muncul di semua tempat halaman ini terdaftar dan di pratinjau taut
 
 msgid "The turn failed"
 msgstr "Giliran gagal"
+
+msgid "The update can also:"
+msgstr "Pembaruan ini juga dapat:"
 
 msgid "The very beginning"
 msgstr "Paling awal"
@@ -20565,6 +20640,9 @@ msgstr "Pakai bawaan global"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gunakan huruf kecil, angka, tanda hubung, dan garis bawah"
+
+msgid "Use more browser features: {features}"
+msgstr "Memakai fitur browser lainnya: {features}"
 
 msgid "Use Paradev on mobile"
 msgstr "Gunakan Paradev di ponsel"

@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `browser_pinned_extensions` text;

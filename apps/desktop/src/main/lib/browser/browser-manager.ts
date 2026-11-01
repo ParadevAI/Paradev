@@ -12,6 +12,7 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
 	handleTargetCommand,
@@ -130,7 +131,7 @@ function protocolOf(url: string): string | null {
 	}
 }
 
-function isAllowedGuestUrl(url: string): boolean {
+export function isAllowedGuestUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && ALLOWED_GUEST_SCHEMES.has(protocol);
 }
@@ -243,11 +244,17 @@ function withTimeout<T>(
 	});
 }
 
+type ExtensionMenuItems = (
+	contents: Electron.WebContents,
+	params: Electron.ContextMenuParams,
+) => Electron.MenuItem[];
+
 class BrowserManager extends EventEmitter {
 	private panes = new Map<string, PaneRegistration>();
 	private consoleLogs = new Map<string, ConsoleEntry[]>();
 	private consoleListeners = new Map<string, () => void>();
 	private contextMenuListeners = new Map<string, () => void>();
+	private extensionMenuItems: ExtensionMenuItems = () => [];
 	private beforeInputListeners = new Map<string, () => void>();
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
@@ -334,6 +341,7 @@ class BrowserManager extends EventEmitter {
 		// Tell subscribers when a live wake dies with the pane, so the renderer
 		// doesn't keep a stale pane id in its exemption set.
 		if (this.agentWakes.delete(paneId)) this.emitAgentActive();
+		this.emit("pane-unregistered", { paneId });
 	}
 
 	/**
@@ -457,6 +465,16 @@ class BrowserManager extends EventEmitter {
 		this.emit("open-request", request);
 	}
 
+	/** Open `url` in a new pane beside `paneId`, as a `target="_blank"` link in it does. */
+	openInNewPane(paneId: string, url: string): void {
+		this.emit(`new-window:${paneId}`, url);
+	}
+
+	/** Close the pane, as Cmd+W in it does. */
+	requestClose(paneId: string): void {
+		this.emit(`close-pane:${paneId}`);
+	}
+
 	/**
 	 * Attach a raw CDP session to the pane's guest webContents. One session per
 	 * pane: the platform allows a single debugger per webContents, so a second
@@ -497,6 +515,7 @@ class BrowserManager extends EventEmitter {
 			}
 		};
 
+		const extensionWorlds = createExtensionWorldFilter();
 		let closed = false;
 		const handleMessage = (
 			_event: Electron.Event,
@@ -504,6 +523,7 @@ class BrowserManager extends EventEmitter {
 			params: unknown,
 			sessionId?: string,
 		) => {
+			if (!extensionWorlds.shows(method, params)) return;
 			const outSessionId = tagEventSession(sessionId, flatSessionId);
 			onMessage(
 				JSON.stringify({
@@ -586,6 +606,17 @@ class BrowserManager extends EventEmitter {
 						JSON.stringify({
 							id,
 							error: { code: -32600, message: "Missing method" },
+							...(sessionId ? { sessionId } : {}),
+						}),
+					);
+					return;
+				}
+				const refusal = extensionWorlds.refusal(method, params);
+				if (refusal) {
+					onMessage(
+						JSON.stringify({
+							id,
+							error: { code: -32000, message: refusal },
 							...(sessionId ? { sessionId } : {}),
 						}),
 					);
@@ -1035,7 +1066,7 @@ class BrowserManager extends EventEmitter {
 				overrideBrowserWindowOptions: popupWindowOptions(),
 			};
 		}
-		this.emit(`new-window:${paneId}`, details.url);
+		this.openInNewPane(paneId, details.url);
 		return { action: "deny" };
 	}
 
@@ -1062,6 +1093,11 @@ class BrowserManager extends EventEmitter {
 		window.on("closed", detachGuard);
 	}
 
+	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
+	setExtensionMenuItems(items: ExtensionMenuItems): void {
+		this.extensionMenuItems = items;
+	}
+
 	private setupContextMenu(paneId: string, wc: Electron.WebContents): void {
 		const handler = (
 			_event: Electron.Event,
@@ -1069,7 +1105,10 @@ class BrowserManager extends EventEmitter {
 		) => {
 			const { linkURL, pageURL, selectionText, editFlags } = params;
 
-			const menuItems: Electron.MenuItemConstructorOptions[] = [];
+			const menuItems: (
+				| Electron.MenuItemConstructorOptions
+				| Electron.MenuItem
+			)[] = [];
 
 			if (linkURL) {
 				menuItems.push(
@@ -1143,6 +1182,11 @@ class BrowserManager extends EventEmitter {
 
 			if (selectionText || editFlags.canPaste || editFlags.canSelectAll) {
 				menuItems.push({ type: "separator" });
+			}
+
+			const extensionItems = this.extensionMenuItems(wc, params);
+			if (extensionItems.length > 0) {
+				menuItems.push(...extensionItems, { type: "separator" });
 			}
 
 			menuItems.push(
@@ -1246,7 +1290,7 @@ class BrowserManager extends EventEmitter {
 				const key = input.key.toLowerCase();
 				if (key === "w") {
 					event.preventDefault();
-					this.emit(`close-pane:${paneId}`);
+					this.requestClose(paneId);
 					return;
 				}
 				if (key === "r") {
@@ -1311,6 +1355,7 @@ class BrowserManager extends EventEmitter {
 				}
 				if (cancelled || gen !== generation) return;
 				this.emit(`pane-focus:${paneId}`);
+				this.emit("pane-focused", { paneId });
 			}
 		};
 		const rearm = (): void => {

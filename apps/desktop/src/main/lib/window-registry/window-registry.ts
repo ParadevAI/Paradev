@@ -30,6 +30,19 @@ const registry = new Map<number, WindowEntry>();
 // deep links, and the legacy single-window getWindow() getter.
 const focusOrder: number[] = [];
 
+const watchers = new Set<(window: BrowserWindow) => void>();
+
+function notify(
+	watcher: (window: BrowserWindow) => void,
+	window: BrowserWindow,
+): void {
+	try {
+		watcher(window);
+	} catch (error) {
+		console.error("[window-registry] A window watcher failed:", error);
+	}
+}
+
 function moveToEnd(windowId: number): void {
 	const existing = focusOrder.indexOf(windowId);
 	if (existing !== -1) {
@@ -49,6 +62,13 @@ export function registerWindow({
 }): void {
 	registry.set(window.id, { window, orgId, key });
 	moveToEnd(window.id);
+	for (const watcher of watchers) notify(watcher, window);
+}
+
+/** Calls `watcher` with every open window, then with each window registered later. */
+export function watchWindows(watcher: (window: BrowserWindow) => void): void {
+	for (const window of getAllWindows()) notify(watcher, window);
+	watchers.add(watcher);
 }
 
 /** The persisted identity of a window, or null if it is not registered. */
@@ -127,4 +147,5 @@ export function getFocusedOrLastWindow(): BrowserWindow | null {
 export function __resetForTests(): void {
 	registry.clear();
 	focusOrder.length = 0;
+	watchers.clear();
 }

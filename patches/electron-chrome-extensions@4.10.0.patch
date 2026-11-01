@@ -1,0 +1,1017 @@
+diff --git a/dist/cjs/index.js b/dist/cjs/index.js
+index a91ca8fd07194abb081e9bb35fad0060fefddf91..26e94ed908caf242b2e578afb350e6392c5ca64a 100644
+--- a/dist/cjs/index.js
++++ b/dist/cjs/index.js
+@@ -66,7 +66,7 @@ var validateExtensionUrl = (url, extension) => {
+   } catch (e) {
+     throw new Error("Invalid URL");
+   }
+-  if (url.startsWith("chrome:") || url.startsWith("javascript:")) {
++  if (/^(chrome|javascript|file|data):/.test(url)) {
+     throw new Error("Invalid URL");
+   }
+   return url;
+@@ -121,6 +121,123 @@ var matchesTitlePattern = (pattern, title) => {
+   const regexp = new RegExp(`^${pattern.split("*").map(escapePattern).join(".*")}$`);
+   return title.match(regexp);
+ };
++var TAB_URL_FIELDS = ["url", "pendingUrl", "title", "favIconUrl"];
++var hostPermissionPattern = /^(\*|[a-z][a-z0-9+.-]*):\/\/(\*|\*\.[^/*]+|[^/*]*)(\/.*)$/;
++var hostPermissionMatches = (pattern, url) => {
++  let target;
++  try {
++    target = new URL(url);
++  } catch {
++    return false;
++  }
++  if (target.protocol !== "http:" && target.protocol !== "https:") return false;
++  if (pattern === "<all_urls>") return true;
++  const parts = hostPermissionPattern.exec(pattern);
++  if (!parts) return false;
++  const [, scheme, host, pathPattern] = parts;
++  const protocol = target.protocol.slice(0, -1);
++  if (scheme === "*" ? protocol !== "http" && protocol !== "https" : scheme !== protocol) return false;
++  const hostMatches = host === "*" || host === target.host || host === target.hostname || host.startsWith("*.") && (target.hostname === host.slice(2) || target.hostname.endsWith(host.slice(1)));
++  return hostMatches && !!matchesPattern(pathPattern, target.pathname + target.search);
++};
++var runtimeGrants = /* @__PURE__ */ new Map();
++var runtimeGrantsOf = (extensionId) => runtimeGrants.get(extensionId) ?? { permissions: [], origins: [] };
++var grantedPermissions = (extension) => {
++  const manifest = extension?.manifest;
++  const runtime = runtimeGrantsOf(extension?.id);
++  return [...manifest?.permissions || [], ...manifest?.host_permissions || [], ...runtime.permissions, ...runtime.origins];
++};
++var hasHostPermission = (extension, url) => typeof url === "string" && grantedPermissions(extension).some((pattern) => typeof pattern === "string" && hostPermissionMatches(pattern, url));
++var activeTabGrants = /* @__PURE__ */ new Map();
++var urlOrigin = (url) => {
++  try {
++    return new URL(url).origin;
++  } catch {
++    return void 0;
++  }
++};
++var grantActiveTab = (extensionId, tabId, url) => {
++  const origin = urlOrigin(url);
++  if (origin && origin !== "null") activeTabGrants.set(`${extensionId}:${tabId}`, origin);
++};
++var revokeActiveTabGrants = (tabId, url) => {
++  const origin = url === void 0 ? void 0 : urlOrigin(url);
++  for (const [key, granted] of activeTabGrants) {
++    if (key.endsWith(`:${tabId}`) && granted !== origin) activeTabGrants.delete(key);
++  }
++};
++var hasActiveTabGrant = (extension, tabId, url) => {
++  if (!extension || !grantedPermissions(extension).includes("activeTab")) return false;
++  revokeActiveTabGrants(tabId, url);
++  return activeTabGrants.has(`${extension.id}:${tabId}`);
++};
++var canSeeTabUrl = (extension, tab) => {
++  const granted = grantedPermissions(extension);
++  return granted.includes("tabs") || hasActiveTabGrant(extension, tab.id, tab.url) || hasHostPermission(extension, tab.url);
++};
++var withoutTabUrlFields = (details) => {
++  const copy = { ...details };
++  for (const field of TAB_URL_FIELDS) delete copy[field];
++  return copy;
++};
++var tabDetailsForExtension = (extension, details) => details && !canSeeTabUrl(extension, details) ? withoutTabUrlFields(details) : details;
++var visibleTabs = (extension, result) => Array.isArray(result) ? result.map((details) => tabDetailsForExtension(extension, details)) : tabDetailsForExtension(extension, result);
++var visibleWindow = (extension, details) => Array.isArray(details?.tabs) ? { ...details, tabs: visibleTabs(extension, details.tabs) } : details;
++var visibleWindows = (extension, result) => Array.isArray(result) ? result.map((details) => visibleWindow(extension, details)) : visibleWindow(extension, result);
++var cookieUrl = (cookie) => `${cookie.secure ? "https" : "http"}://${String(cookie.domain || "").replace(/^\./, "")}${cookie.path || "/"}`;
++var canSeeCookie = (extension, cookie) => !!cookie && hasHostPermission(extension, cookieUrl(cookie));
++var visibleCookie = (extension, cookie) => canSeeCookie(extension, cookie) ? cookie : null;
++var urlHasHostPermission = (extension, [details]) => hasHostPermission(extension, details?.url);
++var rulesFor = (names, rule) => names.map((name) => [name, rule]);
++var extensionApiRules = /* @__PURE__ */ new Map([
++  ...rulesFor(["tabs.get", "tabs.getAllInWindow", "tabs.getCurrent", "tabs.create", "tabs.query", "tabs.update"], { result: visibleTabs }),
++  ...rulesFor(["tabs.insertCSS", "tabs.reload", "tabs.remove", "tabs.goForward", "tabs.goBack", "tabs.onRemoved", "tabs.onActivated"], {}),
++  ["tabs.onCreated", { args: (extension, [details]) => [tabDetailsForExtension(extension, details)] }],
++  ["browserAction.onClicked", { args: (extension, [details]) => [tabDetailsForExtension(extension, details)] }],
++  ["tabs.onUpdated", { args: (extension, [tabId, changeInfo, details]) => {
++    if (canSeeTabUrl(extension, details)) return [tabId, changeInfo, details];
++    const visibleChanges = withoutTabUrlFields(changeInfo);
++    return Object.keys(visibleChanges).length > 0 ? [tabId, visibleChanges, withoutTabUrlFields(details)] : void 0;
++  } }],
++  ...rulesFor(["windows.get", "windows.getCurrent", "windows.getLastFocused", "windows.getAll", "windows.create", "windows.update"], { result: visibleWindows }),
++  ...rulesFor(["windows.remove", "windows.onRemoved", "windows.onFocusChanged"], {}),
++  ...rulesFor(["windows.onCreated", "windows.onBoundsChanged"], { args: (extension, [details]) => [visibleWindow(extension, details)] }),
++  ["cookies.get", { permission: "cookies", result: visibleCookie }],
++  ["cookies.getAll", { permission: "cookies", result: (extension, cookies) => cookies.filter((cookie) => canSeeCookie(extension, cookie)) }],
++  ["cookies.set", { permission: "cookies", allowed: urlHasHostPermission, result: visibleCookie }],
++  ["cookies.remove", { permission: "cookies", allowed: urlHasHostPermission }],
++  ["cookies.getAllCookieStores", { permission: "cookies" }],
++  ["cookies.onChanged", { permission: "cookies", args: (extension, [changeInfo]) => canSeeCookie(extension, changeInfo?.cookie) ? [changeInfo] : void 0 }],
++  ...rulesFor([
++    "webNavigation.getFrame",
++    "webNavigation.getAllFrames",
++    "webNavigation.onCreatedNavigationTarget",
++    "webNavigation.onBeforeNavigate",
++    "webNavigation.onCommitted",
++    "webNavigation.onHistoryStateUpdated",
++    "webNavigation.onDOMContentLoaded",
++    "webNavigation.onCompleted"
++  ], { permission: "webNavigation" }),
++  ...rulesFor([
++    "notifications.clear",
++    "notifications.create",
++    "notifications.getAll",
++    "notifications.getPermissionLevel",
++    "notifications.update",
++    "notifications.onClicked",
++    "notifications.onClosed"
++  ], { permission: "notifications" }),
++  ...rulesFor([
++    "contextMenus.create",
++    "contextMenus.remove",
++    "contextMenus.removeAll",
++    "contextMenus.onClicked"
++  ], { permission: "contextMenus" }),
++  ...rulesFor(["permissions.onAdded", "permissions.onRemoved"], {})
++]);
++var ruledApiNamespaces = /* @__PURE__ */ new Set(["tabs", "windows", "cookies", "webNavigation", "notifications", "contextMenus"]);
++var extensionApiRule = (name) => extensionApiRules.get(name) ?? (ruledApiNamespaces.has(name.split(".")[0]) ? void 0 : {});
++var hasApiPermission = (extension, rule) => !rule.permission || grantedPermissions(extension).includes(rule.permission);
+ var getAllWindows = () => [...import_electron.BaseWindow.getAllWindows(), ...import_electron.BrowserWindow.getAllWindows()];
+ 
+ // src/browser/popup.ts
+@@ -338,6 +455,7 @@ var BrowserActionAPI = class {
+       }
+       const activeTab = this.ctx.store.getActiveTabFromWindow(window);
+       if (!activeTab) return;
++      if (!this.getPopupUrl(event.extension.id, activeTab.id)) return;
+       const [width] = window.getSize();
+       const anchorSize = 64;
+       this.activateClick({
+@@ -402,8 +520,6 @@ var BrowserActionAPI = class {
+     );
+     handle("browserAction.openPopup", this.openPopup);
+     const preloadOpts = { allowRemote: true, extensionContext: false };
+-    handle("browserAction.getState", this.getState.bind(this), preloadOpts);
+-    handle("browserAction.activate", this.activate.bind(this), preloadOpts);
+     handle(
+       "browserAction.addObserver",
+       (event) => {
+@@ -577,9 +693,12 @@ var BrowserActionAPI = class {
+       `activate [eventType: ${eventType}, extensionId: '${extensionId}', tabId: ${tabId}, senderId: ${sender?.id}]`
+     );
+     switch (eventType) {
+-      case "click":
++      case "click": {
++        const tab = tabId >= 0 ? this.ctx.store.getTabById(tabId) : this.ctx.store.getActiveTabOfCurrentWindow();
++        if (tab) grantActiveTab(extensionId, tab.id, tab.getURL());
+         this.activateClick(details);
+         break;
++      }
+       case "contextmenu":
+         this.activateContextMenu(details);
+         break;
+@@ -772,7 +891,8 @@ var _WindowsAPI = class _WindowsAPI {
+   }
+   getLastFocused(event) {
+     const win = this.ctx.store.getLastFocusedWindow();
+-    return win ? this.getWindowDetails(win) : null;
++    if (!win) throw new Error("No current window");
++    return this.getWindowDetails(win);
+   }
+   getAll(event) {
+     return Array.from(this.ctx.store.windows).map(this.getWindowDetails.bind(this));
+@@ -984,6 +1104,9 @@ var _TabsAPI = class _TabsAPI {
+   insertCSS(event, tabId, details) {
+     const tab = this.ctx.store.getTabById(tabId);
+     if (!tab) return;
++    if (!hasHostPermission(event.extension, tab.getURL()) && !hasActiveTabGrant(event.extension, tab.id, tab.getURL())) {
++      throw new Error("Cannot access contents of the page. Extension manifest must request permission to access the respective host.");
++    }
+     if (details.code) {
+       tab.insertCSS(details.code);
+     }
+@@ -992,6 +1115,7 @@ var _TabsAPI = class _TabsAPI {
+     const isSet = (value) => typeof value !== "undefined";
+     const filteredTabs = Array.from(this.ctx.store.tabs).map(this.getTabDetails.bind(this)).filter((tab) => {
+       if (!tab) return false;
++      if ((isSet(info.url) || isSet(info.title)) && !canSeeTabUrl(event.extension, tab)) return false;
+       if (isSet(info.active) && info.active !== tab.active) return false;
+       if (isSet(info.pinned) && info.pinned !== tab.pinned) return false;
+       if (isSet(info.audible) && info.audible !== tab.audible) return false;
+@@ -1083,6 +1207,7 @@ var _TabsAPI = class _TabsAPI {
+   onUpdated(tabId) {
+     const tab = this.ctx.store.getTabById(tabId);
+     if (!tab) return;
++    revokeActiveTabGrants(tab.id, tab.getURL());
+     let prevDetails;
+     if (this.ctx.store.tabDetailsCache.has(tab.id)) {
+       prevDetails = this.ctx.store.tabDetailsCache.get(tab.id);
+@@ -1118,6 +1243,7 @@ var _TabsAPI = class _TabsAPI {
+     this.ctx.router.broadcastEvent("tabs.onUpdated", tab.id, changeInfo, details);
+   }
+   onRemoved(tabId) {
++    revokeActiveTabGrants(tabId);
+     const details = this.ctx.store.tabDetailsCache.has(tabId) ? this.ctx.store.tabDetailsCache.get(tabId) : null;
+     this.ctx.store.tabDetailsCache.delete(tabId);
+     const windowId = details ? details.windowId : WindowsAPI.WINDOW_ID_NONE;
+@@ -1359,7 +1485,11 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+     );
+   }
+   getLastFocusedWindow() {
+-    return this.lastFocusedWindowId ? this.getWindowById(this.lastFocusedWindowId) : null;
++    const focused = this.lastFocusedWindowId ? this.getWindowById(this.lastFocusedWindowId) : void 0;
++    return focused ?? this.getNewestWindow() ?? null;
++  }
++  getNewestWindow() {
++    return [...this.windows].reverse().find((window) => !window.isDestroyed());
+   }
+   getCurrentWindow() {
+     return this.getLastFocusedWindow();
+@@ -1383,6 +1513,9 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+   async removeWindow(window) {
+     if (!this.windows.has(window)) return;
+     this.windows.delete(window);
++    if (this.lastFocusedWindowId === window.id) {
++      this.lastFocusedWindowId = this.getNewestWindow()?.id;
++    }
+     if (typeof this.impl.removeWindow === "function") {
+       await this.impl.removeWindow(window);
+     } else {
+@@ -1470,7 +1603,7 @@ var ExtensionStore = class extends import_node_events2.EventEmitter {
+   }
+   async requestPermissions(extension, permissions) {
+     if (typeof this.impl.requestPermissions !== "function") {
+-      return true;
++      return false;
+     }
+     const result = await this.impl.requestPermissions(extension, permissions);
+     return typeof result === "boolean" ? result : false;
+@@ -1723,6 +1856,7 @@ var ContextMenusAPI = class {
+       // TODO
+       srcUrl: params?.srcURL
+     };
++    grantActiveTab(extensionId, tab.id, tab.url);
+     this.ctx.router.sendEvent(extensionId, "contextMenus.onClicked", data, tab);
+   }
+ };
+@@ -1820,14 +1954,16 @@ async function getConfigSearchPaths(application) {
+   }
+   return searchPaths;
+ }
++var isNativeHostName = (name) => typeof name === "string" && /^[a-z0-9_]+(\.[a-z0-9_]+)*$/.test(name);
+ async function readNativeMessagingHostConfig(application) {
++  if (!isNativeHostName(application)) return;
+   const searchPaths = await getConfigSearchPaths(application);
+   d7("searching", searchPaths);
+   for (const filePath of searchPaths) {
+     try {
+       const data = await import_node_fs2.promises.readFile(filePath);
+       const config = JSON.parse(data.toString());
+-      if (isValidConfig(config)) {
++      if (isValidConfig(config) && config.name === application) {
+         d7("read config in %s", filePath, config);
+         return config;
+       } else {
+@@ -2266,11 +2402,26 @@ var getSessionFromEvent = (event) => {
+ var d8 = (0, import_debug8.default)("electron-chrome-extensions:router");
+ var DEFAULT_SESSION = "_self";
+ var gRoutingDelegate;
++var senderExtensionId = (event) => {
++  const url = event.type === "service-worker" ? event.serviceWorker?.scope : event.senderFrame?.url;
++  try {
++    const parsed = new URL(url);
++    return parsed.protocol === "chrome-extension:" ? parsed.host : void 0;
++  } catch {
++    return void 0;
++  }
++};
++var assertSenderIsExtension = (event, extensionId) => {
++  if (extensionId !== void 0 && extensionId !== senderExtensionId(event)) {
++    throw new Error(`Extension '${extensionId}' does not match the sender`);
++  }
++};
+ var RoutingDelegate = class _RoutingDelegate {
+   constructor() {
+     this.sessionMap = /* @__PURE__ */ new WeakMap();
+     this.workers = /* @__PURE__ */ new WeakSet();
+     this.onRouterMessage = async (event, extensionId, handlerName, ...args) => {
++      assertSenderIsExtension(event, extensionId);
+       d8(`received '${handlerName}'`, args);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       return observer?.onExtensionMessage(event, extensionId, handlerName, ...args);
+@@ -2282,6 +2433,7 @@ var RoutingDelegate = class _RoutingDelegate {
+       return observer?.onExtensionMessage(event, void 0, handlerName, ...args);
+     };
+     this.onAddListener = (event, extensionId, eventName) => {
++      assertSenderIsExtension(event, extensionId);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       const listener = event.type === "frame" ? {
+         type: event.type,
+@@ -2294,6 +2446,7 @@ var RoutingDelegate = class _RoutingDelegate {
+       return observer?.addListener(listener, extensionId, eventName);
+     };
+     this.onRemoveListener = (event, extensionId, eventName) => {
++      assertSenderIsExtension(event, extensionId);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       const listener = event.type === "frame" ? {
+         type: event.type,
+@@ -2469,15 +2622,25 @@ var ExtensionRouter = class {
+       throw new Error(`${handlerName} was sent from an unknown extension context`);
+     }
+     if (handler.permission) {
+-      const manifest = extension?.manifest;
+-      if (!extension || !manifest.permissions?.includes(handler.permission)) {
++      if (!extension || !grantedPermissions(extension).includes(handler.permission)) {
+         throw new Error(
+           `${handlerName} requires an extension with ${handler.permission} permissions`
+         );
+       }
+     }
++    const apiRule = extensionApiRule(handlerName);
++    if (!apiRule) {
++      throw new Error(`${handlerName} has no permission rule`);
++    }
++    if (!hasApiPermission(extension, apiRule)) {
++      throw new Error(`${handlerName} requires the ${apiRule.permission} permission`);
++    }
++    if (apiRule.allowed && !apiRule.allowed(extension, args)) {
++      throw new Error(`${handlerName} has no host permission for this URL`);
++    }
+     const extEvent = event.type === "frame" ? { type: event.type, sender: event.sender, extension } : { type: event.type, sender: event.serviceWorker, extension };
+-    const result = await handler.callback(extEvent, ...args);
++    const handlerResult = await handler.callback(extEvent, ...args);
++    const result = apiRule.result ? apiRule.result(extension, handlerResult) : handlerResult;
+     d8(`${handlerName} result: %r`, result);
+     return result;
+   }
+@@ -2506,16 +2669,23 @@ var ExtensionRouter = class {
+     if (!eventListeners || eventListeners.length === 0) {
+       return;
+     }
++    const sessionExtensions = this.session.extensions || this.session;
++    const apiRule = extensionApiRule(eventName);
++    if (!apiRule) return;
+     let sentCount = 0;
+     for (const listener of eventListeners) {
+       const { type, extensionId } = listener;
+       if (targetExtensionId && targetExtensionId !== extensionId) {
+         continue;
+       }
++      const listenerExtension = sessionExtensions.getExtension(extensionId);
++      if (!hasApiPermission(listenerExtension, apiRule)) continue;
++      const listenerArgs = apiRule.args ? apiRule.args(listenerExtension, args) : args;
++      if (!listenerArgs) continue;
+       if (type === "service-worker") {
+         const scope = `chrome-extension://${extensionId}/`;
+         this.session.serviceWorkers.startWorkerForScope(scope).then((serviceWorker) => {
+-          serviceWorker.send(ipcName, ...args);
++          serviceWorker.send(ipcName, ...listenerArgs);
+         }).catch((error) => {
+           d8("failed to send %s to %s", eventName, extensionId);
+           console.error(error);
+@@ -2525,7 +2695,7 @@ var ExtensionRouter = class {
+           console.error(`Unable to send '${eventName}' to extension host for ${extensionId}`);
+           return;
+         }
+-        listener.host.send(ipcName, ...args);
++        listener.host.send(ipcName, ...listenerArgs);
+       }
+       sentCount++;
+     }
+@@ -2568,49 +2738,62 @@ function readLoadedExtensionManifest(ctx, extension) {
+ }
+ 
+ // src/browser/api/permissions.ts
++var ALL_SITE_PATTERNS = /* @__PURE__ */ new Set(["<all_urls>", "*://*/*"]);
++var originCovered = (declared, origin) => declared === origin || (origin === "<all_urls>" || origin.includes("://")) && (ALL_SITE_PATTERNS.has(declared) || declared.endsWith("://*/*") && origin.startsWith(declared.slice(0, -3)));
++var requiredAccess = (extension) => {
++  const manifest = extension.manifest;
++  return [...manifest.permissions || [], ...manifest.host_permissions || []];
++};
++var optionalAccess = (extension) => {
++  const manifest = extension.manifest;
++  return [...manifest.optional_permissions || [], ...manifest.optional_host_permissions || []];
++};
+ var PermissionsAPI = class {
+   constructor(ctx) {
+     this.ctx = ctx;
+-    this.permissionMap = /* @__PURE__ */ new Map();
+-    this.contains = ({ extension }, permissions) => {
+-      const currentPermissions = this.permissionMap.get(extension.id);
+-      const hasPermissions = permissions.permissions ? permissions.permissions.every(
+-        (permission) => currentPermissions.permissions.includes(permission)
+-      ) : true;
+-      const hasOrigins = permissions.origins ? permissions.origins.every((origin) => currentPermissions.origins.includes(origin)) : true;
+-      return hasPermissions && hasOrigins;
++    this.contains = ({ extension }, request) => {
++      const granted = grantedPermissions(extension);
++      return [...request.permissions || [], ...request.origins || []].every(
++        (wanted) => granted.some((have) => originCovered(have, wanted))
++      );
+     };
+     this.getAll = ({ extension }) => {
+-      return this.permissionMap.get(extension.id);
++      const granted = grantedPermissions(extension);
++      return {
++        permissions: granted.filter((entry) => !entry.includes("://") && entry !== "<all_urls>"),
++        origins: granted.filter((entry) => entry.includes("://") || entry === "<all_urls>")
++      };
+     };
+-    this.remove = ({ extension }, permissions) => {
++    this.remove = ({ extension }, request) => {
++      const required = requiredAccess(extension);
++      const wanted = [...request.permissions || [], ...request.origins || []];
++      if (wanted.some((entry) => required.includes(entry))) {
++        throw new Error("You cannot remove required permissions.");
++      }
++      const runtime = runtimeGrantsOf(extension.id);
++      runtimeGrants.set(extension.id, {
++        permissions: runtime.permissions.filter((entry) => !wanted.includes(entry)),
++        origins: runtime.origins.filter((entry) => !wanted.includes(entry))
++      });
++      this.ctx.router.sendEvent(extension.id, "permissions.onRemoved", request);
+       return true;
+     };
+     this.request = async ({ extension }, request) => {
+-      const declaredPermissions = /* @__PURE__ */ new Set([
+-        ...extension.manifest.permissions || [],
+-        ...extension.manifest.optional_permissions || []
+-      ]);
+-      if (request.permissions && !request.permissions.every((p) => declaredPermissions.has(p))) {
+-        throw new Error("Permissions request includes undeclared permission");
++      const declared = [...requiredAccess(extension), ...optionalAccess(extension)];
++      const wanted = [...request.permissions || [], ...request.origins || []];
++      const undeclared = wanted.filter((entry) => !declared.some((have) => originCovered(have, entry)));
++      if (undeclared.length > 0) {
++        throw new Error(`Permissions are not declared in the manifest: ${undeclared.join(", ")}`);
+       }
++      if (this.contains({ extension }, request)) return true;
+       const granted = await this.ctx.store.requestPermissions(extension, request);
+       if (!granted) return false;
+-      const permissions = this.permissionMap.get(extension.id);
+-      if (request.origins) {
+-        for (const origin of request.origins) {
+-          if (!permissions.origins.includes(origin)) {
+-            permissions.origins.push(origin);
+-          }
+-        }
+-      }
+-      if (request.permissions) {
+-        for (const permission of request.permissions) {
+-          if (!permissions.permissions.includes(permission)) {
+-            permissions.permissions.push(permission);
+-          }
+-        }
+-      }
++      const runtime = runtimeGrantsOf(extension.id);
++      runtimeGrants.set(extension.id, {
++        permissions: [.../* @__PURE__ */ new Set([...runtime.permissions, ...request.permissions || []])],
++        origins: [.../* @__PURE__ */ new Set([...runtime.origins, ...request.origins || []])]
++      });
++      this.ctx.router.sendEvent(extension.id, "permissions.onAdded", request);
+       return true;
+     };
+     const handle = this.ctx.router.apiHandler();
+@@ -2619,19 +2802,8 @@ var PermissionsAPI = class {
+     handle("permissions.remove", this.remove);
+     handle("permissions.request", this.request);
+     const sessionExtensions = ctx.session.extensions || ctx.session;
+-    sessionExtensions.getAllExtensions().forEach((ext) => this.processExtension(ext));
+-    sessionExtensions.on("extension-loaded", (_event, extension) => {
+-      this.processExtension(extension);
+-    });
+     sessionExtensions.on("extension-unloaded", (_event, extension) => {
+-      this.permissionMap.delete(extension.id);
+-    });
+-  }
+-  processExtension(extension) {
+-    const manifest = extension.manifest;
+-    this.permissionMap.set(extension.id, {
+-      permissions: manifest.permissions || [],
+-      origins: manifest.host_permissions || []
++      runtimeGrants.delete(extension.id);
+     });
+   }
+ };
+@@ -2764,6 +2936,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends import_no
+     }
+   }
+   /** Add webContents to be tracked as a tab. */
++  /** Track a window before it has a tab, so extensions see a current window. */
++  addWindow(window) {
++    this.ctx.store.addWindow(window);
++  }
+   addTab(tab, window) {
+     this.checkWebContentsArgument(tab);
+     this.ctx.store.addTab(tab, window);
+diff --git a/dist/esm/index.mjs b/dist/esm/index.mjs
+index 43929222572e4d6875cc192aca0750da79d8ff14..152d5a68f2d3317ca76ba8534ced38c8aee009e2 100644
+--- a/dist/esm/index.mjs
++++ b/dist/esm/index.mjs
+@@ -29,7 +29,7 @@ var validateExtensionUrl = (url, extension) => {
+   } catch (e) {
+     throw new Error("Invalid URL");
+   }
+-  if (url.startsWith("chrome:") || url.startsWith("javascript:")) {
++  if (/^(chrome|javascript|file|data):/.test(url)) {
+     throw new Error("Invalid URL");
+   }
+   return url;
+@@ -84,6 +84,123 @@ var matchesTitlePattern = (pattern, title) => {
+   const regexp = new RegExp(`^${pattern.split("*").map(escapePattern).join(".*")}$`);
+   return title.match(regexp);
+ };
++var TAB_URL_FIELDS = ["url", "pendingUrl", "title", "favIconUrl"];
++var hostPermissionPattern = /^(\*|[a-z][a-z0-9+.-]*):\/\/(\*|\*\.[^/*]+|[^/*]*)(\/.*)$/;
++var hostPermissionMatches = (pattern, url) => {
++  let target;
++  try {
++    target = new URL(url);
++  } catch {
++    return false;
++  }
++  if (target.protocol !== "http:" && target.protocol !== "https:") return false;
++  if (pattern === "<all_urls>") return true;
++  const parts = hostPermissionPattern.exec(pattern);
++  if (!parts) return false;
++  const [, scheme, host, pathPattern] = parts;
++  const protocol = target.protocol.slice(0, -1);
++  if (scheme === "*" ? protocol !== "http" && protocol !== "https" : scheme !== protocol) return false;
++  const hostMatches = host === "*" || host === target.host || host === target.hostname || host.startsWith("*.") && (target.hostname === host.slice(2) || target.hostname.endsWith(host.slice(1)));
++  return hostMatches && !!matchesPattern(pathPattern, target.pathname + target.search);
++};
++var runtimeGrants = /* @__PURE__ */ new Map();
++var runtimeGrantsOf = (extensionId) => runtimeGrants.get(extensionId) ?? { permissions: [], origins: [] };
++var grantedPermissions = (extension) => {
++  const manifest = extension?.manifest;
++  const runtime = runtimeGrantsOf(extension?.id);
++  return [...manifest?.permissions || [], ...manifest?.host_permissions || [], ...runtime.permissions, ...runtime.origins];
++};
++var hasHostPermission = (extension, url) => typeof url === "string" && grantedPermissions(extension).some((pattern) => typeof pattern === "string" && hostPermissionMatches(pattern, url));
++var activeTabGrants = /* @__PURE__ */ new Map();
++var urlOrigin = (url) => {
++  try {
++    return new URL(url).origin;
++  } catch {
++    return void 0;
++  }
++};
++var grantActiveTab = (extensionId, tabId, url) => {
++  const origin = urlOrigin(url);
++  if (origin && origin !== "null") activeTabGrants.set(`${extensionId}:${tabId}`, origin);
++};
++var revokeActiveTabGrants = (tabId, url) => {
++  const origin = url === void 0 ? void 0 : urlOrigin(url);
++  for (const [key, granted] of activeTabGrants) {
++    if (key.endsWith(`:${tabId}`) && granted !== origin) activeTabGrants.delete(key);
++  }
++};
++var hasActiveTabGrant = (extension, tabId, url) => {
++  if (!extension || !grantedPermissions(extension).includes("activeTab")) return false;
++  revokeActiveTabGrants(tabId, url);
++  return activeTabGrants.has(`${extension.id}:${tabId}`);
++};
++var canSeeTabUrl = (extension, tab) => {
++  const granted = grantedPermissions(extension);
++  return granted.includes("tabs") || hasActiveTabGrant(extension, tab.id, tab.url) || hasHostPermission(extension, tab.url);
++};
++var withoutTabUrlFields = (details) => {
++  const copy = { ...details };
++  for (const field of TAB_URL_FIELDS) delete copy[field];
++  return copy;
++};
++var tabDetailsForExtension = (extension, details) => details && !canSeeTabUrl(extension, details) ? withoutTabUrlFields(details) : details;
++var visibleTabs = (extension, result) => Array.isArray(result) ? result.map((details) => tabDetailsForExtension(extension, details)) : tabDetailsForExtension(extension, result);
++var visibleWindow = (extension, details) => Array.isArray(details?.tabs) ? { ...details, tabs: visibleTabs(extension, details.tabs) } : details;
++var visibleWindows = (extension, result) => Array.isArray(result) ? result.map((details) => visibleWindow(extension, details)) : visibleWindow(extension, result);
++var cookieUrl = (cookie) => `${cookie.secure ? "https" : "http"}://${String(cookie.domain || "").replace(/^\./, "")}${cookie.path || "/"}`;
++var canSeeCookie = (extension, cookie) => !!cookie && hasHostPermission(extension, cookieUrl(cookie));
++var visibleCookie = (extension, cookie) => canSeeCookie(extension, cookie) ? cookie : null;
++var urlHasHostPermission = (extension, [details]) => hasHostPermission(extension, details?.url);
++var rulesFor = (names, rule) => names.map((name) => [name, rule]);
++var extensionApiRules = /* @__PURE__ */ new Map([
++  ...rulesFor(["tabs.get", "tabs.getAllInWindow", "tabs.getCurrent", "tabs.create", "tabs.query", "tabs.update"], { result: visibleTabs }),
++  ...rulesFor(["tabs.insertCSS", "tabs.reload", "tabs.remove", "tabs.goForward", "tabs.goBack", "tabs.onRemoved", "tabs.onActivated"], {}),
++  ["tabs.onCreated", { args: (extension, [details]) => [tabDetailsForExtension(extension, details)] }],
++  ["browserAction.onClicked", { args: (extension, [details]) => [tabDetailsForExtension(extension, details)] }],
++  ["tabs.onUpdated", { args: (extension, [tabId, changeInfo, details]) => {
++    if (canSeeTabUrl(extension, details)) return [tabId, changeInfo, details];
++    const visibleChanges = withoutTabUrlFields(changeInfo);
++    return Object.keys(visibleChanges).length > 0 ? [tabId, visibleChanges, withoutTabUrlFields(details)] : void 0;
++  } }],
++  ...rulesFor(["windows.get", "windows.getCurrent", "windows.getLastFocused", "windows.getAll", "windows.create", "windows.update"], { result: visibleWindows }),
++  ...rulesFor(["windows.remove", "windows.onRemoved", "windows.onFocusChanged"], {}),
++  ...rulesFor(["windows.onCreated", "windows.onBoundsChanged"], { args: (extension, [details]) => [visibleWindow(extension, details)] }),
++  ["cookies.get", { permission: "cookies", result: visibleCookie }],
++  ["cookies.getAll", { permission: "cookies", result: (extension, cookies) => cookies.filter((cookie) => canSeeCookie(extension, cookie)) }],
++  ["cookies.set", { permission: "cookies", allowed: urlHasHostPermission, result: visibleCookie }],
++  ["cookies.remove", { permission: "cookies", allowed: urlHasHostPermission }],
++  ["cookies.getAllCookieStores", { permission: "cookies" }],
++  ["cookies.onChanged", { permission: "cookies", args: (extension, [changeInfo]) => canSeeCookie(extension, changeInfo?.cookie) ? [changeInfo] : void 0 }],
++  ...rulesFor([
++    "webNavigation.getFrame",
++    "webNavigation.getAllFrames",
++    "webNavigation.onCreatedNavigationTarget",
++    "webNavigation.onBeforeNavigate",
++    "webNavigation.onCommitted",
++    "webNavigation.onHistoryStateUpdated",
++    "webNavigation.onDOMContentLoaded",
++    "webNavigation.onCompleted"
++  ], { permission: "webNavigation" }),
++  ...rulesFor([
++    "notifications.clear",
++    "notifications.create",
++    "notifications.getAll",
++    "notifications.getPermissionLevel",
++    "notifications.update",
++    "notifications.onClicked",
++    "notifications.onClosed"
++  ], { permission: "notifications" }),
++  ...rulesFor([
++    "contextMenus.create",
++    "contextMenus.remove",
++    "contextMenus.removeAll",
++    "contextMenus.onClicked"
++  ], { permission: "contextMenus" }),
++  ...rulesFor(["permissions.onAdded", "permissions.onRemoved"], {})
++]);
++var ruledApiNamespaces = /* @__PURE__ */ new Set(["tabs", "windows", "cookies", "webNavigation", "notifications", "contextMenus"]);
++var extensionApiRule = (name) => extensionApiRules.get(name) ?? (ruledApiNamespaces.has(name.split(".")[0]) ? void 0 : {});
++var hasApiPermission = (extension, rule) => !rule.permission || grantedPermissions(extension).includes(rule.permission);
+ var getAllWindows = () => [...BaseWindow.getAllWindows(), ...BrowserWindow.getAllWindows()];
+ 
+ // src/browser/popup.ts
+@@ -301,6 +418,7 @@ var BrowserActionAPI = class {
+       }
+       const activeTab = this.ctx.store.getActiveTabFromWindow(window);
+       if (!activeTab) return;
++      if (!this.getPopupUrl(event.extension.id, activeTab.id)) return;
+       const [width] = window.getSize();
+       const anchorSize = 64;
+       this.activateClick({
+@@ -365,8 +483,6 @@ var BrowserActionAPI = class {
+     );
+     handle("browserAction.openPopup", this.openPopup);
+     const preloadOpts = { allowRemote: true, extensionContext: false };
+-    handle("browserAction.getState", this.getState.bind(this), preloadOpts);
+-    handle("browserAction.activate", this.activate.bind(this), preloadOpts);
+     handle(
+       "browserAction.addObserver",
+       (event) => {
+@@ -540,9 +656,12 @@ var BrowserActionAPI = class {
+       `activate [eventType: ${eventType}, extensionId: '${extensionId}', tabId: ${tabId}, senderId: ${sender?.id}]`
+     );
+     switch (eventType) {
+-      case "click":
++      case "click": {
++        const tab = tabId >= 0 ? this.ctx.store.getTabById(tabId) : this.ctx.store.getActiveTabOfCurrentWindow();
++        if (tab) grantActiveTab(extensionId, tab.id, tab.getURL());
+         this.activateClick(details);
+         break;
++      }
+       case "contextmenu":
+         this.activateContextMenu(details);
+         break;
+@@ -735,7 +854,8 @@ var _WindowsAPI = class _WindowsAPI {
+   }
+   getLastFocused(event) {
+     const win = this.ctx.store.getLastFocusedWindow();
+-    return win ? this.getWindowDetails(win) : null;
++    if (!win) throw new Error("No current window");
++    return this.getWindowDetails(win);
+   }
+   getAll(event) {
+     return Array.from(this.ctx.store.windows).map(this.getWindowDetails.bind(this));
+@@ -947,6 +1067,9 @@ var _TabsAPI = class _TabsAPI {
+   insertCSS(event, tabId, details) {
+     const tab = this.ctx.store.getTabById(tabId);
+     if (!tab) return;
++    if (!hasHostPermission(event.extension, tab.getURL()) && !hasActiveTabGrant(event.extension, tab.id, tab.getURL())) {
++      throw new Error("Cannot access contents of the page. Extension manifest must request permission to access the respective host.");
++    }
+     if (details.code) {
+       tab.insertCSS(details.code);
+     }
+@@ -955,6 +1078,7 @@ var _TabsAPI = class _TabsAPI {
+     const isSet = (value) => typeof value !== "undefined";
+     const filteredTabs = Array.from(this.ctx.store.tabs).map(this.getTabDetails.bind(this)).filter((tab) => {
+       if (!tab) return false;
++      if ((isSet(info.url) || isSet(info.title)) && !canSeeTabUrl(event.extension, tab)) return false;
+       if (isSet(info.active) && info.active !== tab.active) return false;
+       if (isSet(info.pinned) && info.pinned !== tab.pinned) return false;
+       if (isSet(info.audible) && info.audible !== tab.audible) return false;
+@@ -1046,6 +1170,7 @@ var _TabsAPI = class _TabsAPI {
+   onUpdated(tabId) {
+     const tab = this.ctx.store.getTabById(tabId);
+     if (!tab) return;
++    revokeActiveTabGrants(tab.id, tab.getURL());
+     let prevDetails;
+     if (this.ctx.store.tabDetailsCache.has(tab.id)) {
+       prevDetails = this.ctx.store.tabDetailsCache.get(tab.id);
+@@ -1081,6 +1206,7 @@ var _TabsAPI = class _TabsAPI {
+     this.ctx.router.broadcastEvent("tabs.onUpdated", tab.id, changeInfo, details);
+   }
+   onRemoved(tabId) {
++    revokeActiveTabGrants(tabId);
+     const details = this.ctx.store.tabDetailsCache.has(tabId) ? this.ctx.store.tabDetailsCache.get(tabId) : null;
+     this.ctx.store.tabDetailsCache.delete(tabId);
+     const windowId = details ? details.windowId : WindowsAPI.WINDOW_ID_NONE;
+@@ -1322,7 +1448,11 @@ var ExtensionStore = class extends EventEmitter2 {
+     );
+   }
+   getLastFocusedWindow() {
+-    return this.lastFocusedWindowId ? this.getWindowById(this.lastFocusedWindowId) : null;
++    const focused = this.lastFocusedWindowId ? this.getWindowById(this.lastFocusedWindowId) : void 0;
++    return focused ?? this.getNewestWindow() ?? null;
++  }
++  getNewestWindow() {
++    return [...this.windows].reverse().find((window) => !window.isDestroyed());
+   }
+   getCurrentWindow() {
+     return this.getLastFocusedWindow();
+@@ -1346,6 +1476,9 @@ var ExtensionStore = class extends EventEmitter2 {
+   async removeWindow(window) {
+     if (!this.windows.has(window)) return;
+     this.windows.delete(window);
++    if (this.lastFocusedWindowId === window.id) {
++      this.lastFocusedWindowId = this.getNewestWindow()?.id;
++    }
+     if (typeof this.impl.removeWindow === "function") {
+       await this.impl.removeWindow(window);
+     } else {
+@@ -1433,7 +1566,7 @@ var ExtensionStore = class extends EventEmitter2 {
+   }
+   async requestPermissions(extension, permissions) {
+     if (typeof this.impl.requestPermissions !== "function") {
+-      return true;
++      return false;
+     }
+     const result = await this.impl.requestPermissions(extension, permissions);
+     return typeof result === "boolean" ? result : false;
+@@ -1686,6 +1819,7 @@ var ContextMenusAPI = class {
+       // TODO
+       srcUrl: params?.srcURL
+     };
++    grantActiveTab(extensionId, tab.id, tab.url);
+     this.ctx.router.sendEvent(extensionId, "contextMenus.onClicked", data, tab);
+   }
+ };
+@@ -1783,14 +1917,16 @@ async function getConfigSearchPaths(application) {
+   }
+   return searchPaths;
+ }
++var isNativeHostName = (name) => typeof name === "string" && /^[a-z0-9_]+(\.[a-z0-9_]+)*$/.test(name);
+ async function readNativeMessagingHostConfig(application) {
++  if (!isNativeHostName(application)) return;
+   const searchPaths = await getConfigSearchPaths(application);
+   d7("searching", searchPaths);
+   for (const filePath of searchPaths) {
+     try {
+       const data = await fs2.readFile(filePath);
+       const config = JSON.parse(data.toString());
+-      if (isValidConfig(config)) {
++      if (isValidConfig(config) && config.name === application) {
+         d7("read config in %s", filePath, config);
+         return config;
+       } else {
+@@ -2229,11 +2365,26 @@ var getSessionFromEvent = (event) => {
+ var d8 = debug8("electron-chrome-extensions:router");
+ var DEFAULT_SESSION = "_self";
+ var gRoutingDelegate;
++var senderExtensionId = (event) => {
++  const url = event.type === "service-worker" ? event.serviceWorker?.scope : event.senderFrame?.url;
++  try {
++    const parsed = new URL(url);
++    return parsed.protocol === "chrome-extension:" ? parsed.host : void 0;
++  } catch {
++    return void 0;
++  }
++};
++var assertSenderIsExtension = (event, extensionId) => {
++  if (extensionId !== void 0 && extensionId !== senderExtensionId(event)) {
++    throw new Error(`Extension '${extensionId}' does not match the sender`);
++  }
++};
+ var RoutingDelegate = class _RoutingDelegate {
+   constructor() {
+     this.sessionMap = /* @__PURE__ */ new WeakMap();
+     this.workers = /* @__PURE__ */ new WeakSet();
+     this.onRouterMessage = async (event, extensionId, handlerName, ...args) => {
++      assertSenderIsExtension(event, extensionId);
+       d8(`received '${handlerName}'`, args);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       return observer?.onExtensionMessage(event, extensionId, handlerName, ...args);
+@@ -2245,6 +2396,7 @@ var RoutingDelegate = class _RoutingDelegate {
+       return observer?.onExtensionMessage(event, void 0, handlerName, ...args);
+     };
+     this.onAddListener = (event, extensionId, eventName) => {
++      assertSenderIsExtension(event, extensionId);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       const listener = event.type === "frame" ? {
+         type: event.type,
+@@ -2257,6 +2409,7 @@ var RoutingDelegate = class _RoutingDelegate {
+       return observer?.addListener(listener, extensionId, eventName);
+     };
+     this.onRemoveListener = (event, extensionId, eventName) => {
++      assertSenderIsExtension(event, extensionId);
+       const observer = this.sessionMap.get(getSessionFromEvent(event));
+       const listener = event.type === "frame" ? {
+         type: event.type,
+@@ -2432,15 +2585,25 @@ var ExtensionRouter = class {
+       throw new Error(`${handlerName} was sent from an unknown extension context`);
+     }
+     if (handler.permission) {
+-      const manifest = extension?.manifest;
+-      if (!extension || !manifest.permissions?.includes(handler.permission)) {
++      if (!extension || !grantedPermissions(extension).includes(handler.permission)) {
+         throw new Error(
+           `${handlerName} requires an extension with ${handler.permission} permissions`
+         );
+       }
+     }
++    const apiRule = extensionApiRule(handlerName);
++    if (!apiRule) {
++      throw new Error(`${handlerName} has no permission rule`);
++    }
++    if (!hasApiPermission(extension, apiRule)) {
++      throw new Error(`${handlerName} requires the ${apiRule.permission} permission`);
++    }
++    if (apiRule.allowed && !apiRule.allowed(extension, args)) {
++      throw new Error(`${handlerName} has no host permission for this URL`);
++    }
+     const extEvent = event.type === "frame" ? { type: event.type, sender: event.sender, extension } : { type: event.type, sender: event.serviceWorker, extension };
+-    const result = await handler.callback(extEvent, ...args);
++    const handlerResult = await handler.callback(extEvent, ...args);
++    const result = apiRule.result ? apiRule.result(extension, handlerResult) : handlerResult;
+     d8(`${handlerName} result: %r`, result);
+     return result;
+   }
+@@ -2469,16 +2632,23 @@ var ExtensionRouter = class {
+     if (!eventListeners || eventListeners.length === 0) {
+       return;
+     }
++    const sessionExtensions = this.session.extensions || this.session;
++    const apiRule = extensionApiRule(eventName);
++    if (!apiRule) return;
+     let sentCount = 0;
+     for (const listener of eventListeners) {
+       const { type, extensionId } = listener;
+       if (targetExtensionId && targetExtensionId !== extensionId) {
+         continue;
+       }
++      const listenerExtension = sessionExtensions.getExtension(extensionId);
++      if (!hasApiPermission(listenerExtension, apiRule)) continue;
++      const listenerArgs = apiRule.args ? apiRule.args(listenerExtension, args) : args;
++      if (!listenerArgs) continue;
+       if (type === "service-worker") {
+         const scope = `chrome-extension://${extensionId}/`;
+         this.session.serviceWorkers.startWorkerForScope(scope).then((serviceWorker) => {
+-          serviceWorker.send(ipcName, ...args);
++          serviceWorker.send(ipcName, ...listenerArgs);
+         }).catch((error) => {
+           d8("failed to send %s to %s", eventName, extensionId);
+           console.error(error);
+@@ -2488,7 +2658,7 @@ var ExtensionRouter = class {
+           console.error(`Unable to send '${eventName}' to extension host for ${extensionId}`);
+           return;
+         }
+-        listener.host.send(ipcName, ...args);
++        listener.host.send(ipcName, ...listenerArgs);
+       }
+       sentCount++;
+     }
+@@ -2531,49 +2701,62 @@ function readLoadedExtensionManifest(ctx, extension) {
+ }
+ 
+ // src/browser/api/permissions.ts
++var ALL_SITE_PATTERNS = /* @__PURE__ */ new Set(["<all_urls>", "*://*/*"]);
++var originCovered = (declared, origin) => declared === origin || (origin === "<all_urls>" || origin.includes("://")) && (ALL_SITE_PATTERNS.has(declared) || declared.endsWith("://*/*") && origin.startsWith(declared.slice(0, -3)));
++var requiredAccess = (extension) => {
++  const manifest = extension.manifest;
++  return [...manifest.permissions || [], ...manifest.host_permissions || []];
++};
++var optionalAccess = (extension) => {
++  const manifest = extension.manifest;
++  return [...manifest.optional_permissions || [], ...manifest.optional_host_permissions || []];
++};
+ var PermissionsAPI = class {
+   constructor(ctx) {
+     this.ctx = ctx;
+-    this.permissionMap = /* @__PURE__ */ new Map();
+-    this.contains = ({ extension }, permissions) => {
+-      const currentPermissions = this.permissionMap.get(extension.id);
+-      const hasPermissions = permissions.permissions ? permissions.permissions.every(
+-        (permission) => currentPermissions.permissions.includes(permission)
+-      ) : true;
+-      const hasOrigins = permissions.origins ? permissions.origins.every((origin) => currentPermissions.origins.includes(origin)) : true;
+-      return hasPermissions && hasOrigins;
++    this.contains = ({ extension }, request) => {
++      const granted = grantedPermissions(extension);
++      return [...request.permissions || [], ...request.origins || []].every(
++        (wanted) => granted.some((have) => originCovered(have, wanted))
++      );
+     };
+     this.getAll = ({ extension }) => {
+-      return this.permissionMap.get(extension.id);
++      const granted = grantedPermissions(extension);
++      return {
++        permissions: granted.filter((entry) => !entry.includes("://") && entry !== "<all_urls>"),
++        origins: granted.filter((entry) => entry.includes("://") || entry === "<all_urls>")
++      };
+     };
+-    this.remove = ({ extension }, permissions) => {
++    this.remove = ({ extension }, request) => {
++      const required = requiredAccess(extension);
++      const wanted = [...request.permissions || [], ...request.origins || []];
++      if (wanted.some((entry) => required.includes(entry))) {
++        throw new Error("You cannot remove required permissions.");
++      }
++      const runtime = runtimeGrantsOf(extension.id);
++      runtimeGrants.set(extension.id, {
++        permissions: runtime.permissions.filter((entry) => !wanted.includes(entry)),
++        origins: runtime.origins.filter((entry) => !wanted.includes(entry))
++      });
++      this.ctx.router.sendEvent(extension.id, "permissions.onRemoved", request);
+       return true;
+     };
+     this.request = async ({ extension }, request) => {
+-      const declaredPermissions = /* @__PURE__ */ new Set([
+-        ...extension.manifest.permissions || [],
+-        ...extension.manifest.optional_permissions || []
+-      ]);
+-      if (request.permissions && !request.permissions.every((p) => declaredPermissions.has(p))) {
+-        throw new Error("Permissions request includes undeclared permission");
++      const declared = [...requiredAccess(extension), ...optionalAccess(extension)];
++      const wanted = [...request.permissions || [], ...request.origins || []];
++      const undeclared = wanted.filter((entry) => !declared.some((have) => originCovered(have, entry)));
++      if (undeclared.length > 0) {
++        throw new Error(`Permissions are not declared in the manifest: ${undeclared.join(", ")}`);
+       }
++      if (this.contains({ extension }, request)) return true;
+       const granted = await this.ctx.store.requestPermissions(extension, request);
+       if (!granted) return false;
+-      const permissions = this.permissionMap.get(extension.id);
+-      if (request.origins) {
+-        for (const origin of request.origins) {
+-          if (!permissions.origins.includes(origin)) {
+-            permissions.origins.push(origin);
+-          }
+-        }
+-      }
+-      if (request.permissions) {
+-        for (const permission of request.permissions) {
+-          if (!permissions.permissions.includes(permission)) {
+-            permissions.permissions.push(permission);
+-          }
+-        }
+-      }
++      const runtime = runtimeGrantsOf(extension.id);
++      runtimeGrants.set(extension.id, {
++        permissions: [.../* @__PURE__ */ new Set([...runtime.permissions, ...request.permissions || []])],
++        origins: [.../* @__PURE__ */ new Set([...runtime.origins, ...request.origins || []])]
++      });
++      this.ctx.router.sendEvent(extension.id, "permissions.onAdded", request);
+       return true;
+     };
+     const handle = this.ctx.router.apiHandler();
+@@ -2582,19 +2765,8 @@ var PermissionsAPI = class {
+     handle("permissions.remove", this.remove);
+     handle("permissions.request", this.request);
+     const sessionExtensions = ctx.session.extensions || ctx.session;
+-    sessionExtensions.getAllExtensions().forEach((ext) => this.processExtension(ext));
+-    sessionExtensions.on("extension-loaded", (_event, extension) => {
+-      this.processExtension(extension);
+-    });
+     sessionExtensions.on("extension-unloaded", (_event, extension) => {
+-      this.permissionMap.delete(extension.id);
+-    });
+-  }
+-  processExtension(extension) {
+-    const manifest = extension.manifest;
+-    this.permissionMap.set(extension.id, {
+-      permissions: manifest.permissions || [],
+-      origins: manifest.host_permissions || []
++      runtimeGrants.delete(extension.id);
+     });
+   }
+ };
+@@ -2727,6 +2899,10 @@ var ElectronChromeExtensions = class _ElectronChromeExtensions extends EventEmit
+     }
+   }
+   /** Add webContents to be tracked as a tab. */
++  /** Track a window before it has a tab, so extensions see a current window. */
++  addWindow(window) {
++    this.ctx.store.addWindow(window);
++  }
+   addTab(tab, window) {
+     this.checkWebContentsArgument(tab);
+     this.ctx.store.addTab(tab, window);
+diff --git a/dist/types/browser/index.d.ts b/dist/types/browser/index.d.ts
+index b5295a5e9f69736026f89d621cd70ca0329b9e4a..bb4b5522178129608529ff8cbdc78f268c7db6c7 100644
+--- a/dist/types/browser/index.d.ts
++++ b/dist/types/browser/index.d.ts
+@@ -34,6 +34,8 @@ export declare class ElectronChromeExtensions extends EventEmitter {
+     private prependPreload;
+     private checkWebContentsArgument;
+     /** Add webContents to be tracked as a tab. */
++    /** Track a window before it has a tab, so extensions see a current window. */
++    addWindow(window: Electron.BaseWindow): void;
+     addTab(tab: Electron.WebContents, window: Electron.BaseWindow): void;
+     /** Remove webContents from being tracked as a tab. */
+     removeTab(tab: Electron.WebContents): void;

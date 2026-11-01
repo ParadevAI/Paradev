@@ -7,6 +7,7 @@ import type {
 	BrowserPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import { browserRuntimeRegistry } from "../../browserRuntimeRegistry";
 import { DEFAULT_BROWSER_URL } from "../../constants";
 
@@ -39,6 +40,8 @@ export function usePersistentWebview({
 	// at first mount.
 	const attachUrlRef = useRef(paneData.url || DEFAULT_BROWSER_URL);
 	attachUrlRef.current = paneData.url || DEFAULT_BROWSER_URL;
+	const agentRef = useRef(paneData.agent);
+	agentRef.current = paneData.agent;
 
 	useEffect(() => {
 		const placeholder = placeholderRef.current;
@@ -67,6 +70,7 @@ export function usePersistentWebview({
 			() => {
 				void ctxRef.current.actions.close();
 			},
+			agentRef.current ? AGENT_BROWSER_PARTITION : BROWSER_PARTITION,
 		);
 		setOverlayContainer(browserRuntimeRegistry.getOverlayContainer(paneId));
 
@@ -83,7 +87,10 @@ export function usePersistentWebview({
 				onData: ({ url }: { url: string }) => {
 					ctxRef.current.actions.split("right", {
 						kind: "browser",
-						data: { url } as BrowserPaneData,
+						data: {
+							url,
+							...(agentRef.current && { agent: true }),
+						} as BrowserPaneData,
 					});
 				},
 			},
@@ -96,7 +103,10 @@ export function usePersistentWebview({
 						if (action === "open-in-split") {
 							ctxRef.current.actions.split("right", {
 								kind: "browser",
-								data: { url } as BrowserPaneData,
+								data: {
+									url,
+									...(agentRef.current && { agent: true }),
+								} as BrowserPaneData,
 							});
 						}
 					},

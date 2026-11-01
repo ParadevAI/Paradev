@@ -1110,6 +1110,9 @@ msgstr "{name}: роботу розпочато"
 msgid "{name} stopped"
 msgstr "{name}: зупинено"
 
+msgid "{name} wants more access"
+msgstr "{name} запитує більше доступу"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} год ({gbHours} ГБ-год) на місце"
 
@@ -1910,6 +1913,9 @@ msgstr "Додати обліковий запис {0}"
 msgid "Add {0} to workspace"
 msgstr "Додати {0} до робочого простору"
 
+msgid "Add {localizedName}?"
+msgstr "Додати {localizedName}?"
+
 msgid "Add a comment…"
 msgstr "Додайте коментар…"
 
@@ -1987,6 +1993,9 @@ msgstr "Додати опис"
 
 msgid "Add description..."
 msgstr "Додайте опис..."
+
+msgid "Add extension"
+msgstr "Додати розширення"
 
 msgid "Add file comment"
 msgstr "Додати коментар до файлу"
@@ -3951,6 +3960,9 @@ msgstr "Перейти на щомісячну оплату"
 msgid "Change worktree location"
 msgstr "Змінити розташування worktree"
 
+msgid "Change your privacy-related settings"
+msgstr "Змінювати налаштування конфіденційності"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Частка невдалих змін не вища за базовий рівень часів, коли код писали люди, два квартали поспіль."
 
@@ -4779,6 +4791,9 @@ msgstr "Взяли в роботу, скоро почнемо."
 msgid "Common questions"
 msgstr "Поширені запитання"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Обмінюватися даними з пов'язаними нативними застосунками"
+
 msgid "Communication"
 msgstr "Комунікація"
 
@@ -5553,6 +5568,9 @@ msgstr "Не вдалося завантажити ваші комп'ютери"
 msgid "Could not mark ready"
 msgstr "Не вдалося позначити як готовий"
 
+msgid "Could not open {name}"
+msgstr "Не вдалося відкрити {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Не вдалося відкрити сторінку оплати. Спробуйте ще раз."
 
@@ -5615,6 +5633,9 @@ msgstr "Не вдалося зберегти хмарний робочий пр�
 
 msgid "Could not record environment"
 msgstr "Не вдалося зберегти середовище"
+
+msgid "Could not remove {name}"
+msgstr "Не вдалося видалити {name}"
 
 msgid "Could not remove access"
 msgstr "Не вдалося скасувати доступ"
@@ -5699,6 +5720,9 @@ msgstr "Не вдалося зробити знімок екрана"
 
 msgid "Could not undo"
 msgstr "Не вдалося скасувати дію"
+
+msgid "Could not update {name}"
+msgstr "Не вдалося оновити {name}"
 
 msgid "Could not update plugin"
 msgstr "Не вдалося оновити плагін"
@@ -7072,6 +7096,9 @@ msgstr "відхилив(-ла) своє рев'ю"
 msgid "Display"
 msgstr "Відображення"
 
+msgid "Display notifications"
+msgstr "Показувати сповіщення"
+
 msgid "Display options"
 msgstr "Параметри відображення"
 
@@ -7823,6 +7850,9 @@ msgstr "Досліджуємо"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Розширене мислення: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Розширення"
 
 msgid "External Application"
 msgstr "Зовнішній застосунок"
@@ -8985,6 +9015,9 @@ msgstr "Отримати ключ API"
 msgid "Get channel details"
 msgstr "Переглянути відомості про канал"
 
+msgid "Get extensions"
+msgstr "Знайти розширення"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Зв'яжіться з командою {companyName}."
 
@@ -10141,8 +10174,14 @@ msgstr "URL issue має відповідати {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "Розширення зможе:"
+
 msgid "It can't be brought back."
 msgstr "Відновити його не вийде."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "Файли cookie з вашого профілю «{profileName}» буде скопійовано в панель браузера, яку відкрив агент. Після цього агент зможе діяти на сайтах, де ви ввійшли в обліковий запис."
 
 msgid "It keeps the title from your prompt."
 msgstr "Назва з вашого промпту залишиться."
@@ -10309,6 +10348,9 @@ msgstr "Залишити {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Залишити {planName}"
+
+msgid "Keep current version"
+msgstr "Залишити поточну версію"
 
 msgid "Keep docs fresh"
 msgstr "Підтримувати документацію актуальною"
@@ -10623,6 +10665,9 @@ msgstr "Менше"
 
 msgid "less than a minute ago"
 msgstr "менш ніж хвилину тому"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Дозволити агенту використовувати сеанси сайтів, у які ви ввійшли через {browserName}?"
 
 msgid "Let the agent drive."
 msgstr "Віддайте кермо агенту."
@@ -11128,6 +11173,9 @@ msgstr "Керувати використанням"
 
 msgid "Manage your account settings"
 msgstr "Керуйте налаштуваннями облікового запису"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Керувати вашими застосунками, розширеннями й темами"
 
 msgid "Manage your organization's branding and members."
 msgstr "Керуйте брендингом та учасниками вашої організації."
@@ -14274,6 +14322,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Закріпити"
 
+msgid "Pin {name}"
+msgstr "Закріпити {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Закріплюйте відгуки на сторінці, і агент внесе зміни."
 
@@ -15048,6 +15099,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитано"
 
+msgid "Read and change all your data on all websites"
+msgstr "Читати й змінювати всі ваші дані на всіх сайтах"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Читати й змінювати ваші дані на сайтах ({count})"
+
+msgid "Read and change your data on {site}"
+msgstr "Читати й змінювати ваші дані на {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Читати й планувати, нічого не змінюючи"
 
@@ -15059,6 +15119,9 @@ msgstr "Читати й надсилати пошту"
 
 msgid "Read announcement"
 msgstr "Прочитати оголошення"
+
+msgid "Read data you copy and paste"
+msgstr "Читати дані, які ви копіюєте та вставляєте"
 
 msgid "Read deployment and build logs"
 msgstr "Читати логи розгортань і збірок"
@@ -15098,6 +15161,9 @@ msgstr "Прочитати посібник із налаштування"
 
 msgid "Read the source and every pull request."
 msgstr "Читайте вихідний код і кожен пул-реквест."
+
+msgid "Read your browsing history"
+msgstr "Читати історію переглядів"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15384,6 +15450,9 @@ msgstr "Видалити {label}?"
 
 msgid "Remove {name}"
 msgstr "Видалити {name}"
+
+msgid "Remove {name}?"
+msgstr "Видалити {name}?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Прибрати {repo}? Усі плагіни, синхронізовані з нього, буде видалено з вашої організації та в усіх учасників, у яких їх встановлено."
@@ -18945,6 +19014,9 @@ msgstr "Ендпоінт має використовувати https."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Середовище, з якого ця автоматизація запускає хмарні робочі простори, архівовано, або в ньому немає репозиторіїв. Виберіть інше середовище в налаштуваннях автоматизації."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Розширення та його локальні дані буде видалено з цього браузера."
+
 msgid "The factory"
 msgstr "Фабрика"
 
@@ -19192,6 +19264,9 @@ msgstr "Назва показується скрізь, де є ця сторі�
 
 msgid "The turn failed"
 msgstr "Хід завершився помилкою"
+
+msgid "The update can also:"
+msgstr "Оновлення також зможе:"
 
 msgid "The very beginning"
 msgstr "Самісінький початок"
@@ -20559,6 +20634,9 @@ msgstr "Використовувати глобальне значення за 
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Використовуйте малі літери, цифри, дефіси та підкреслення"
+
+msgid "Use more browser features: {features}"
+msgstr "Використовувати більше можливостей браузера: {features}"
 
 msgid "Use Paradev on mobile"
 msgstr "Використовуйте Paradev на мобільних пристроях"

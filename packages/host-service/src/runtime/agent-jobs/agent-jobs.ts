@@ -241,20 +241,26 @@ export class AgentJobRunner {
 		setTimeout(() => signalGroup(pid, "SIGKILL"), KILL_GRACE_MS).unref();
 	}
 
+	// Every host-service process sweeps the same tree, so a sweep can lose an
+	// rm race to another one (EPERM on macOS).
 	async sweep(): Promise<void> {
 		const cutoff = this.now() - RETENTION_MS;
 		for (const session of safeReaddir(this.options.rootDir)) {
 			const dir = join(this.options.rootDir, session);
-			for (const file of safeReaddir(dir)) {
-				if (!file.endsWith(".json")) continue;
-				const meta = readJson(join(dir, file));
-				if (!meta || meta.status === "running" || !meta.endedAt) continue;
-				if (Date.parse(meta.endedAt) > cutoff) continue;
-				await rm(join(dir, file), { force: true });
-				await rm(meta.logPath, { force: true });
+			try {
+				for (const file of safeReaddir(dir)) {
+					if (!file.endsWith(".json")) continue;
+					const meta = readJson(join(dir, file));
+					if (!meta || meta.status === "running" || !meta.endedAt) continue;
+					if (Date.parse(meta.endedAt) > cutoff) continue;
+					await rm(join(dir, file), { force: true });
+					await rm(meta.logPath, { force: true });
+				}
+				if (safeReaddir(dir).length === 0)
+					await rm(dir, { recursive: true, force: true });
+			} catch (error) {
+				console.warn(`[agent-jobs] Could not clean up ${dir}:`, error);
 			}
-			if (safeReaddir(dir).length === 0)
-				await rm(dir, { recursive: true, force: true });
 		}
 	}
 

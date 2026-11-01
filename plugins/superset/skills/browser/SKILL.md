@@ -34,7 +34,7 @@ those fits and Browser Use isn't installed, offer it once ("I can hand this to
 Browser Use, which drives multi-step flows more cleanly, but it's a one-minute
 install. Want that, or should I drive the pane directly?"), then respect the
 answer for the rest of the session, and hand a pane to Browser Use only after
-the user has said yes (the pane is their signed-in session and its CDP URL
+the user has said yes (the pane can hold imported logins and its CDP URL
 carries a token). Don't offer it for a screenshot, one `eval`, or a plain read;
 the pane verbs already cover those.
 
@@ -56,6 +56,12 @@ the pane verbs already cover those.
 
 ## Find or open a pane
 
+Agents reach only the panes they open. Those panes run in their own session,
+with none of the user's browser extensions, so a password manager is never in
+reach. They hold none of the user's logins unless the user imports them
+(`import-login`, below). A pane the user opened answers 403 to every verb; `list` does
+not show it. Open your own pane instead.
+
 Every pane has a stable `paneId`, scoped to its workspace: pass the same
 `--workspace` you opened it under or the operation is rejected.
 
@@ -70,11 +76,12 @@ reuses the active browser pane. Opening needs the workspace visible in the
 desktop app (the renderer creates the pane), so if it times out, ask the user to
 open the workspace.
 
-To put the page in the right sidebar beside the user's work instead, and when
+To show the user a page in the right sidebar beside their work, and when
 `superset panes --help` succeeds (older CLIs lack `panes`), run
 `superset panes open browser --workspace <id> --url <url>`
-(`superset:panes`), then find the pane with
-`superset browser list --workspace <id> --json`.
+(`superset:panes`). That pane is the user's own: `browser list` does not show
+it and the browser verbs answer 403. To read or drive a page, open your own
+pane with `superset browser open` as above.
 
 ## Drive with the high-level verbs
 
@@ -105,8 +112,9 @@ rejected with a clear error.
 
 `import-login` copies a system browser's cookies into the pane so it's signed in
 to the sites the user already uses. It imports every cookie that profile has on
-disk, not just the one site, and panes share a profile, so say that when
-offering and run it only with the user's go-ahead. Offering it is how most
+disk, not just the one site, into the session every agent pane shares, so say that
+when offering and run it only with the user's go-ahead. The desktop app also
+asks the user to allow each import. Offering it is how most
 users discover it, so reach for it in two cases:
 
 - The user says they're already signed in somewhere ("I'm logged in on
@@ -223,8 +231,8 @@ along at their relative paths, so nothing needs inlining.
 superset pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
 ```
 
-Read every screenshot before it goes up. This browser is signed into the user's
-accounts, so a capture can hold a session token, an email address, a customer
+Read every screenshot before it goes up. An agent pane holds every login imported
+into it, so a capture can hold a session token, an email address, a customer
 name, or a dashboard that was never meant to leave the tab. New pages default
 to org-wide visibility. Crop or redact what does not belong in the report, pass
 `--visibility just_me` when the org does not need it, and confirm with the user
@@ -232,8 +240,8 @@ before publishing.
 
 ## Safety
 
-- In-app panes share one browser profile, so `eval` and CDP reach whatever the
-  user is logged into in any pane (GitHub, dashboards, …). Never read cookies,
+- Agent panes share one session, so `eval` and CDP reach every login imported
+  into it (GitHub, dashboards, …). Never read cookies,
   tokens, or credentials, exfiltrate session data, or act on authenticated
   sites beyond the task.
 - Confirm with the user before a step that submits a form, makes a purchase,

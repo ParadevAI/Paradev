@@ -1116,6 +1116,9 @@ msgstr "{name} đã bắt đầu làm việc"
 msgid "{name} stopped"
 msgstr "{name} đã dừng"
 
+msgid "{name} wants more access"
+msgstr "{name} muốn có thêm quyền truy cập"
+
 msgid "{name}: {hours} hours ({gbHours} GB-hours) per seat"
 msgstr "{name}: {hours} giờ ({gbHours} GB-giờ) mỗi người dùng"
 
@@ -1916,6 +1919,9 @@ msgstr "Thêm tài khoản {0}"
 msgid "Add {0} to workspace"
 msgstr "Thêm {0} vào workspace"
 
+msgid "Add {localizedName}?"
+msgstr "Thêm {localizedName}?"
+
 msgid "Add a comment…"
 msgstr "Thêm bình luận…"
 
@@ -1993,6 +1999,9 @@ msgstr "Thêm mô tả"
 
 msgid "Add description..."
 msgstr "Thêm mô tả..."
+
+msgid "Add extension"
+msgstr "Thêm tiện ích"
 
 msgid "Add file comment"
 msgstr "Thêm bình luận cho tệp"
@@ -3957,6 +3966,9 @@ msgstr "Chuyển sang theo tháng"
 msgid "Change worktree location"
 msgstr "Đổi vị trí worktree"
 
+msgid "Change your privacy-related settings"
+msgstr "Thay đổi các tùy chọn cài đặt liên quan đến quyền riêng tư"
+
 msgid "Change-failure rate at or below the human-era baseline for two consecutive quarters."
 msgstr "Tỷ lệ thay đổi gây lỗi bằng hoặc thấp hơn mức nền của thời con người trong hai quý liên tiếp."
 
@@ -4785,6 +4797,9 @@ msgstr "Đã cam kết, sắp bắt đầu."
 msgid "Common questions"
 msgstr "Câu hỏi thường gặp"
 
+msgid "Communicate with cooperating native applications"
+msgstr "Giao tiếp với các ứng dụng gốc phối hợp"
+
 msgid "Communication"
 msgstr "Giao tiếp"
 
@@ -5559,6 +5574,9 @@ msgstr "Không thể tải danh sách máy của bạn"
 msgid "Could not mark ready"
 msgstr "Không thể đánh dấu sẵn sàng"
 
+msgid "Could not open {name}"
+msgstr "Không thể mở {name}"
+
 msgid "Could not open billing. Please try again."
 msgstr "Không thể mở trang thanh toán. Vui lòng thử lại."
 
@@ -5621,6 +5639,9 @@ msgstr "Không thể ghi nhận workspace trên cloud"
 
 msgid "Could not record environment"
 msgstr "Không thể lưu environment"
+
+msgid "Could not remove {name}"
+msgstr "Không thể gỡ {name}"
 
 msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
@@ -5705,6 +5726,9 @@ msgstr "Không thể chụp màn hình"
 
 msgid "Could not undo"
 msgstr "Không thể hoàn tác"
+
+msgid "Could not update {name}"
+msgstr "Không thể cập nhật {name}"
 
 msgid "Could not update plugin"
 msgstr "Không thể cập nhật plugin"
@@ -7078,6 +7102,9 @@ msgstr "đã hủy review của mình"
 msgid "Display"
 msgstr "Hiển thị"
 
+msgid "Display notifications"
+msgstr "Hiển thị thông báo"
+
 msgid "Display options"
 msgstr "Tùy chọn hiển thị"
 
@@ -7829,6 +7856,9 @@ msgstr "Đang tìm hiểu"
 
 msgid "Extended thinking: {activeLabel}"
 msgstr "Suy nghĩ mở rộng: {activeLabel}"
+
+msgid "Extensions"
+msgstr "Tiện ích mở rộng"
 
 msgid "External Application"
 msgstr "Ứng dụng bên ngoài"
@@ -8991,6 +9021,9 @@ msgstr "Lấy khóa API"
 msgid "Get channel details"
 msgstr "Xem chi tiết kênh"
 
+msgid "Get extensions"
+msgstr "Tải tiện ích mở rộng"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Liên hệ với đội ngũ {companyName}."
 
@@ -10147,8 +10180,14 @@ msgstr "URL của issue phải khớp với {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can:"
+msgstr "Tiện ích có thể:"
+
 msgid "It can't be brought back."
 msgstr "Không thể khôi phục."
+
+msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
+msgstr "Sao chép cookie từ hồ sơ \"{profileName}\" của bạn vào một khung trình duyệt mà agent đã mở. Sau đó agent có thể thao tác trên các trang bạn đã đăng nhập."
 
 msgid "It keeps the title from your prompt."
 msgstr "Tiêu đề từ lời nhắc của bạn sẽ được giữ nguyên."
@@ -10315,6 +10354,9 @@ msgstr "Giữ {planLabel}"
 
 msgid "Keep {planName}"
 msgstr "Giữ {planName}"
+
+msgid "Keep current version"
+msgstr "Giữ phiên bản hiện tại"
 
 msgid "Keep docs fresh"
 msgstr "Giữ tài liệu luôn mới"
@@ -10629,6 +10671,9 @@ msgstr "Ít"
 
 msgid "less than a minute ago"
 msgstr "chưa đầy một phút trước"
+
+msgid "Let an agent use your {browserName} logins?"
+msgstr "Cho phép agent dùng thông tin đăng nhập {browserName} của bạn?"
 
 msgid "Let the agent drive."
 msgstr "Để agent điều khiển."
@@ -11134,6 +11179,9 @@ msgstr "Quản lý mức sử dụng"
 
 msgid "Manage your account settings"
 msgstr "Quản lý cài đặt tài khoản của bạn"
+
+msgid "Manage your apps, extensions, and themes"
+msgstr "Quản lý ứng dụng, tiện ích và giao diện"
 
 msgid "Manage your organization's branding and members."
 msgstr "Quản lý nhận diện thương hiệu và thành viên của tổ chức."
@@ -14280,6 +14328,9 @@ msgstr "PID"
 msgid "Pin"
 msgstr "Ghim"
 
+msgid "Pin {name}"
+msgstr "Ghim {name}"
+
 msgid "Pin feedback to a page and let the agent make the change."
 msgstr "Ghim phản hồi lên trang và để agent thực hiện thay đổi."
 
@@ -15054,6 +15105,15 @@ msgctxt "shell intent"
 msgid "Read"
 msgstr "Đã đọc"
 
+msgid "Read and change all your data on all websites"
+msgstr "Đọc và thay đổi tất cả dữ liệu của bạn trên mọi trang web"
+
+msgid "Read and change your data on {count} websites"
+msgstr "Đọc và thay đổi dữ liệu của bạn trên {count} trang web"
+
+msgid "Read and change your data on {site}"
+msgstr "Đọc và thay đổi dữ liệu của bạn trên {site}"
+
 msgid "Read and plan without changing anything"
 msgstr "Đọc và lập kế hoạch mà không thay đổi gì"
 
@@ -15065,6 +15125,9 @@ msgstr "Đọc và gửi thư"
 
 msgid "Read announcement"
 msgstr "Đọc thông báo"
+
+msgid "Read data you copy and paste"
+msgstr "Đọc dữ liệu bạn sao chép và dán"
 
 msgid "Read deployment and build logs"
 msgstr "Đọc log deployment và build"
@@ -15104,6 +15167,9 @@ msgstr "Đọc hướng dẫn thiết lập"
 
 msgid "Read the source and every pull request."
 msgstr "Đọc mã nguồn và mọi pull request."
+
+msgid "Read your browsing history"
+msgstr "Đọc lịch sử duyệt web của bạn"
 
 msgctxt "shell intent"
 msgid "Reading"
@@ -15390,6 +15456,9 @@ msgstr "Gỡ {label}?"
 
 msgid "Remove {name}"
 msgstr "Xóa {name}"
+
+msgid "Remove {name}?"
+msgstr "Gỡ {name}?"
 
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn và khỏi mọi thành viên đã cài."
@@ -18951,6 +19020,9 @@ msgstr "Endpoint phải dùng https."
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Environment mà tự động hóa này dùng để khởi động workspace cloud đã bị lưu trữ hoặc không có repository nào. Hãy chọn một environment khác trong cài đặt của tự động hóa."
 
+msgid "The extension and its local data are deleted from this browser."
+msgstr "Tiện ích mở rộng và dữ liệu cục bộ của nó sẽ bị xóa khỏi trình duyệt này."
+
 msgid "The factory"
 msgstr "Nhà máy"
 
@@ -19198,6 +19270,9 @@ msgstr "Tiêu đề hiển thị ở mọi nơi trang này được liệt kê v
 
 msgid "The turn failed"
 msgstr "Lượt thất bại"
+
+msgid "The update can also:"
+msgstr "Bản cập nhật cũng có thể:"
 
 msgid "The very beginning"
 msgstr "Từ đầu"
@@ -20565,6 +20640,9 @@ msgstr "Dùng mặc định toàn cục"
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
+
+msgid "Use more browser features: {features}"
+msgstr "Dùng thêm tính năng trình duyệt: {features}"
 
 msgid "Use Paradev on mobile"
 msgstr "Dùng Paradev trên điện thoại"
