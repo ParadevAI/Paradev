@@ -35,6 +35,7 @@ import {
 	getChatTransport,
 } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
+import { useColumnInset } from "@/lib/layout";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import type { PullRequestDiffstat } from "../../hooks/usePullRequestDiffstat";
 import { useActiveChatStore } from "../../stores/activeChatStore";
@@ -416,6 +417,7 @@ export const ChatSessionView = forwardRef<
 	);
 
 	const tapHandlers = useTapHandlers(onTap);
+	const columnInset = useColumnInset(16);
 
 	const banner =
 		session?.status === "dead"
@@ -437,9 +439,9 @@ export const ChatSessionView = forwardRef<
 			<ItemBodiesProvider requestItemBodies={chat.requestItemBodies}>
 				<View className="flex-1" {...tapHandlers}>
 					<Conversation
-						contentContainerClassName="px-4"
 						contentContainerStyle={{
 							paddingTop: headerHeight + 16 + (banner ? BANNER_SPACE : 0),
+							paddingHorizontal: columnInset,
 						}}
 						data={rows}
 						keyExtractor={(row) => row.key}
@@ -466,7 +468,8 @@ export const ChatSessionView = forwardRef<
 				</View>
 			</ItemBodiesProvider>
 			<View
-				className="absolute inset-x-0 bottom-0 gap-2 px-3 pb-2"
+				className="absolute inset-x-0 bottom-0 gap-2 pb-2"
+				style={{ paddingHorizontal: columnInset - 4 }}
 				onLayout={(event) => setDockHeight(event.nativeEvent.layout.height)}
 				pointerEvents="box-none"
 			>
