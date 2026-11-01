@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { PortalHost } from "@rn-primitives/portal";
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import {
 	Pressable,
 	useWindowDimensions,
@@ -10,6 +10,8 @@ import {
 import { cn } from "@/lib/utils";
 import { sheetHeaderHostName } from "../../../SheetHeaderSlot/hostName";
 import { sheetFrame } from "../../utils/sheetFrame";
+import { BACKDROP_FRAMES, REDUCED_MOTION, SHEET_MOTION } from "./constants";
+import { playExit } from "./utils/playExit";
 
 const FOCUSABLE =
 	'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -34,7 +36,29 @@ export function WebSheet({
 }: WebSheetProps) {
 	const { t } = useLingui();
 	const frame = sheetFrame(useWindowDimensions(), detents);
+	const sheetRef = useRef<ViewInstance>(null);
+	const backdropRef = useRef<ViewInstance>(null);
 	const cardRef = useRef<ViewInstance>(null);
+	const kindRef = useRef(frame.kind);
+	kindRef.current = frame.kind;
+
+	useLayoutEffect(() => {
+		const sheet = sheetRef.current as unknown as HTMLElement | null;
+		const backdrop = backdropRef.current as unknown as HTMLElement | null;
+		const card = cardRef.current as unknown as HTMLElement | null;
+		if (!sheet || !backdrop || !card) return;
+		backdrop.dataset.webSheetBackdrop = "";
+		sheet.style.overflow = "clip";
+		const reducedMotion = () => window.matchMedia(REDUCED_MOTION).matches;
+		if (!reducedMotion()) {
+			const motion = SHEET_MOTION[kindRef.current];
+			backdrop.animate(BACKDROP_FRAMES, motion.open);
+			card.animate(motion.frames, motion.open);
+		}
+		return () => {
+			if (!reducedMotion()) playExit(sheet, SHEET_MOTION[kindRef.current]);
+		};
+	}, []);
 
 	useEffect(() => {
 		const card = cardRef.current as unknown as HTMLElement | null;
@@ -44,7 +68,8 @@ export function WebSheet({
 			document.activeElement instanceof HTMLElement
 				? document.activeElement
 				: null;
-		if (!card.contains(document.activeElement)) card.focus();
+		if (!card.contains(document.activeElement))
+			card.focus({ preventScroll: true });
 		return () => {
 			if (opener?.isConnected) opener.focus();
 		};
@@ -85,12 +110,14 @@ export function WebSheet({
 	const dialog = frame.kind === "dialog";
 	return (
 		<View
+			ref={sheetRef}
 			className={cn(
 				"absolute inset-0 items-center",
 				dialog ? "justify-center" : "justify-end",
 			)}
 		>
 			<Pressable
+				ref={backdropRef}
 				accessibilityLabel={t({ message: "Close" })}
 				focusable={false}
 				className="absolute inset-0 cursor-default bg-black/50"
