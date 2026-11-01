@@ -25,6 +25,11 @@ import { FileViewTree } from "./components/FileViewTree";
 const TREE_DEFAULT_SIZE = 35;
 const TREE_TOGGLE_MS = 200;
 const SIDE_BY_SIDE_MIN_WIDTH = 420;
+const NARROW_LAYOUTS: Record<"tree" | "split" | "file", number[]> = {
+	tree: [0, 100],
+	split: [50, 50],
+	file: [100, 0],
+};
 
 interface FileViewLayoutProps {
 	context: RendererContext<PaneViewerData>;
@@ -47,6 +52,15 @@ export function FileViewLayout({
 			: undefined;
 	const storedVisible = useFileTreeVisibilityStore((state) => state.visible);
 	const setVisible = useFileTreeVisibilityStore((state) => state.setVisible);
+	const narrowVisible = useFileTreeVisibilityStore(
+		(state) => state.narrowVisible,
+	);
+	const setNarrowVisible = useFileTreeVisibilityStore(
+		(state) => state.setNarrowVisible,
+	);
+	const toggleNarrow = useFileTreeVisibilityStore(
+		(state) => state.toggleNarrow,
+	);
 	const visible = filePath ? storedVisible : true;
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const treePanelRef = useRef<ImperativePanelHandle>(null);
@@ -54,11 +68,13 @@ export function FileViewLayout({
 	const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
 	const width = useElementWidth(rootElement);
 	const isNarrow = width !== null && width < SIDE_BY_SIDE_MIN_WIDTH;
-	const [narrowTreeOpenFor, setNarrowTreeOpenFor] = useState<string | null>(
-		null,
-	);
-	const narrowShowsTree = !filePath || narrowTreeOpenFor === filePath;
-	const narrowLayout = isNarrow ? (narrowShowsTree ? "tree" : "file") : null;
+	const narrowLayout = !isNarrow
+		? null
+		: !filePath
+			? "tree"
+			: narrowVisible
+				? "split"
+				: "file";
 	const isNarrowRef = useRef(isNarrow);
 	isNarrowRef.current = isNarrow;
 	const visibleRef = useRef(visible);
@@ -68,7 +84,7 @@ export function FileViewLayout({
 		const group = groupRef.current;
 		if (!group) return;
 		if (narrowLayout) {
-			group.setLayout(narrowLayout === "tree" ? [0, 100] : [100, 0]);
+			group.setLayout(NARROW_LAYOUTS[narrowLayout]);
 		} else {
 			group.setLayout(
 				visibleRef.current
@@ -126,7 +142,8 @@ export function FileViewLayout({
 				<ResizableHandle
 					className={cn(
 						"bg-transparent",
-						(!visible || isNarrow) && "pointer-events-none",
+						(isNarrow ? narrowLayout !== "split" : !visible) &&
+							"pointer-events-none",
 					)}
 					onDoubleClick={() =>
 						groupRef.current?.setLayout([
@@ -146,9 +163,11 @@ export function FileViewLayout({
 					collapsedSize={0}
 					onCollapse={() => {
 						if (!isNarrowRef.current) setVisible(false);
+						else if (filePath) setNarrowVisible(false);
 					}}
 					onExpand={() => {
 						if (!isNarrowRef.current) setVisible(true);
+						else if (filePath) setNarrowVisible(true);
 					}}
 					className={cn(panelTransition)}
 				>
@@ -161,8 +180,8 @@ export function FileViewLayout({
 						<div
 							className={cn(
 								"min-h-0 flex-1 overflow-hidden",
-								!isNarrow && "rounded-tl-lg border-t border-l border-border/60",
-								isNarrow && filePath && "border-t border-border/60",
+								!treeFillsPane &&
+									"rounded-tl-lg border-t border-l border-border/60",
 							)}
 						>
 							<FileViewTree
@@ -193,11 +212,7 @@ export function FileViewLayout({
 					filePath={filePath}
 					treeToggle={
 						isNarrow
-							? {
-									visible: narrowShowsTree,
-									onToggle: () =>
-										setNarrowTreeOpenFor(narrowShowsTree ? null : filePath),
-								}
+							? { visible: narrowVisible, onToggle: toggleNarrow }
 							: undefined
 					}
 				/>
