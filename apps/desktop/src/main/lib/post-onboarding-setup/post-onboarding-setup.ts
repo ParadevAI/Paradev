@@ -3,6 +3,7 @@ export type PostOnboardingStep = readonly [label: string, run: () => void];
 export interface PostOnboardingSetup {
 	setSteps(steps: readonly PostOnboardingStep[]): void;
 	request(): void;
+	hasRun(): boolean;
 }
 
 /**
@@ -38,6 +39,9 @@ export function createPostOnboardingSetup(
 		request() {
 			requested = true;
 			runIfReady();
+		},
+		hasRun() {
+			return ran;
 		},
 	};
 }
