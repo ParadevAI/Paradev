@@ -1,6 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
-import { screenLayout, sheetScreenOptions } from "@/lib/navigation";
+import {
+	ParentScreens,
+	screenLayout,
+	sheetScreenOptions,
+} from "@/lib/navigation";
+
+const NO_PARENTS: string[] = [];
 
 export default function HomeLayout() {
 	const { t } = useLingui();
@@ -8,6 +14,16 @@ export default function HomeLayout() {
 	return (
 		<Stack
 			screenLayout={screenLayout}
+			layout={({ state, navigation, children }) => (
+				<ParentScreens
+					state={state}
+					navigation={navigation}
+					parents={NO_PARENTS}
+					root="index"
+				>
+					{children}
+				</ParentScreens>
+			)}
 			screenOptions={{
 				headerBackButtonDisplayMode: "minimal",
 				headerShadowVisible: false,

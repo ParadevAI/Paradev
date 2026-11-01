@@ -22,12 +22,17 @@ function paramsFor(parent: string, params: object | undefined) {
 	return Object.fromEntries(names.map((key) => [key, source[key]]));
 }
 
-/** Puts each route's missing parent screens below it, so back from a deep link goes up instead of to the first screen. */
+/**
+ * Puts each route's missing parent screens below it, so back from a deep link goes up instead of to the first screen.
+ * A stack that opens on another route gets its `root` screen first.
+ */
 export function withParentRoutes<Route extends PartialRoute>(
 	routes: readonly Route[],
 	parents: readonly string[],
+	root?: string,
 ): (Route | PartialRoute)[] {
-	const out: (Route | PartialRoute)[] = [];
+	const out: (Route | PartialRoute)[] =
+		root && routes[0] && routes[0].name !== root ? [{ name: root }] : [];
 	for (const route of routes) {
 		const missing: PartialRoute[] = [];
 		let parent = parentOf(route.name, parents);

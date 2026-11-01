@@ -80,4 +80,21 @@ describe("withParentRoutes", () => {
 			),
 		).toEqual(["pages/[slug]/index"]);
 	});
+
+	test("a stack that opens on a sheet gets its root screen below it", () => {
+		const routes = withParentRoutes(
+			[{ name: "search", key: "search-1" }],
+			[],
+			"index",
+		);
+		expect(routes).toEqual([
+			{ name: "index" },
+			{ name: "search", key: "search-1" },
+		]);
+	});
+
+	test("a stack that opens on its root screen is left alone", () => {
+		const routes = [{ name: "index" }, { name: "filter" }];
+		expect(withParentRoutes(routes, [], "index")).toEqual(routes);
+	});
 });
