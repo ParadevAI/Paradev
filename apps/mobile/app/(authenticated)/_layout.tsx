@@ -6,6 +6,7 @@ import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
 import {
 	glassHeaderOptions,
+	screenLayout,
 	sheetDetents,
 	sheetHeaderOptions,
 } from "@/lib/navigation";
@@ -44,7 +45,7 @@ export default function AuthenticatedLayout() {
 
 	return (
 		<View className="flex-1">
-			<Stack screenOptions={{ headerShown: false }}>
+			<Stack screenOptions={{ headerShown: false }} screenLayout={screenLayout}>
 				{/* Root headers are hidden — `title` here only names routes in
 			    back-button long-press menus (otherwise raw route names leak,
 			    e.g. "(home)"). */}

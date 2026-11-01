@@ -5,6 +5,8 @@ export { glassHeaderOptions } from "./glassHeaderOptions";
 export type { GlassHeaderOptions } from "./glassHeaderOptions.types";
 export type { MenuIconName } from "./menuIcon.types";
 export { sheetDetents, titledScreenOptions } from "./navigation";
+export { screenLayout } from "./screenLayout";
+export type { ScreenLayout } from "./screenLayout.types";
 export { sheetHeaderOptions } from "./sheetHeaderOptions";
 export type { SheetHeaderOptions } from "./sheetHeaderOptions.types";
 export { toolbarIcon } from "./toolbarIcon";

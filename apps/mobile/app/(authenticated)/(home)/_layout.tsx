@@ -1,11 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
+import { screenLayout } from "@/lib/navigation";
 
 export default function HomeLayout() {
 	const { t } = useLingui();
 
 	return (
 		<Stack
+			screenLayout={screenLayout}
 			screenOptions={{
 				headerBackButtonDisplayMode: "minimal",
 				headerShadowVisible: false,
