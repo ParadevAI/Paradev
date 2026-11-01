@@ -47,6 +47,7 @@ import { ComposerSessionTabs } from "./components/ComposerSessionTabs";
 import { ComposerSlashSuggestions } from "./components/ComposerSlashSuggestions";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "./constants";
 import { useAttachmentPaste } from "./hooks/useAttachmentPaste";
+import { useComposerKeys } from "./hooks/useComposerKeys";
 import { useDictation } from "./hooks/useDictation";
 import { useSwipeToDismiss } from "./hooks/useSwipeToDismiss";
 import { joinDraft } from "./utils/joinDraft";
@@ -169,6 +170,10 @@ export const Composer: ComposerComponent = forwardRef<
 		if (!hasContent || isSending || isUploading) return;
 		onSubmit?.(draft);
 	};
+	const onKeyPress = useComposerKeys({
+		onSubmit: submit,
+		onDismiss: () => inputRef.current?.blur(),
+	});
 
 	const openAttachment = (attachment: ComposerAttachment) => {
 		if (attachment.kind === "image") showImage(attachment.uri);
@@ -278,6 +283,7 @@ export const Composer: ComposerComponent = forwardRef<
 								onChangeText={typeDraft}
 								onFocus={() => setExpanded(true)}
 								onBlur={() => setExpanded(false)}
+								onKeyPress={onKeyPress}
 								placeholder={placeholder}
 								placeholderTextColor={COMPOSER_COLORS.muted}
 								autoCapitalize={
