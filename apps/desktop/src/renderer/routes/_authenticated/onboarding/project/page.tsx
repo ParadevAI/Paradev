@@ -18,6 +18,7 @@ import { track } from "renderer/lib/analytics";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { getDefaultProjectsDir } from "renderer/lib/getDefaultProjectsDir";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
 	useCreateV1Project,
@@ -82,7 +83,7 @@ function OnboardingProjectPage() {
 	const { waitForHostReady } = useLocalHostService();
 	const openNewWorkspace = useOpenNewWorkspaceForLocalProject();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const cloneTargetDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const cloneTargetDir = homeDir ? getDefaultProjectsDir(homeDir) : null;
 	const [url, setUrl] = useState("");
 	const [busy, setBusy] = useState(false);
 	const [cloneError, setCloneError] = useState<CloneError | null>(null);
