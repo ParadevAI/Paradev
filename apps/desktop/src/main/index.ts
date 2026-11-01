@@ -72,6 +72,7 @@ import {
 	syncInstalledPluginMcpServers,
 } from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
+import { postOnboardingSetup } from "./lib/post-onboarding-setup";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
 import { runQuitCleanup } from "./lib/quit-sequence";
 import { startResourceJournal } from "./lib/resource-metrics/resource-journal";
@@ -236,6 +237,20 @@ function registerWithMacOSNotificationCenter() {
 	setTimeout(cleanup, 1000);
 
 	registrationNotification.show();
+}
+
+function setupAgentIntegrationsFromSettings() {
+	const settingsRow = localDb.select().from(settings).get();
+	const disabledAgentHooks = settingsRow?.disabledAgentHooks ?? [];
+	const disabledSkills = settingsRow?.disabledSkills ?? [];
+	// Mirror the disable lists so CLI-launched host-services on this
+	// machine honor them instead of re-provisioning disabled agents/skills.
+	writeSharedDisabledAgentIds(disabledAgentHooks);
+	writeSharedDisabledSkillIds(disabledSkills);
+	setupAgentIntegrations({
+		disabledAgentIds: disabledAgentHooks,
+		disabledSkillIds: disabledSkills,
+	});
 }
 
 // macOS open-url can fire before the window exists (cold-start via protocol link).
@@ -510,9 +525,6 @@ if (!gotTheLock) {
 		if (getAppDisplayName() !== app.name) {
 			app.setAboutPanelOptions({ applicationName: getAppDisplayName() });
 		}
-		registerWithMacOSNotificationCenter();
-		requestAppleEventsAccess();
-		requestLocalNetworkAccess();
 
 		// Must register on both default session and the app's custom partition
 		const iconProtocolHandler = (request: Request) => {
@@ -634,29 +646,18 @@ if (!gotTheLock) {
 			},
 		);
 
-		try {
-			// The vite build copies @superset/agent-setup's templates (plus the
-			// bundled Claude plugin) next to this bundle; see vite/helpers.ts.
-			setAgentSetupTemplatesDir(path.join(__dirname, "templates"));
-			const settingsRow = localDb.select().from(settings).get();
-			const disabledAgentHooks = settingsRow?.disabledAgentHooks ?? [];
-			const disabledSkills = settingsRow?.disabledSkills ?? [];
-			// Mirror the disable lists so CLI-launched host-services on this
-			// machine honor them instead of re-provisioning disabled agents/skills.
-			writeSharedDisabledAgentIds(disabledAgentHooks);
-			writeSharedDisabledSkillIds(disabledSkills);
-			setupAgentIntegrations({
-				disabledAgentIds: disabledAgentHooks,
-				disabledSkillIds: disabledSkills,
-			});
-		} catch (error) {
-			console.error("[main] Failed to set up agent integrations:", error);
-		}
-		try {
-			syncInstalledPluginMcpServers();
-		} catch (error) {
-			console.error("[main] Failed to sync plugin MCP servers:", error);
-		}
+		// The vite build copies @superset/agent-setup's templates (plus the
+		// bundled Claude plugin) next to this bundle; see vite/helpers.ts.
+		setAgentSetupTemplatesDir(path.join(__dirname, "templates"));
+		// macOS permission prompts and writes into other tools' config dirs wait
+		// for a signed-in, onboarded user.
+		postOnboardingSetup.setSteps([
+			["notification-center", registerWithMacOSNotificationCenter],
+			["apple-events", requestAppleEventsAccess],
+			["local-network", requestLocalNetworkAccess],
+			["agent-integrations", setupAgentIntegrationsFromSettings],
+			["plugin-mcp-servers", syncInstalledPluginMcpServers],
+		]);
 		void finishPendingOrganizationForget().catch((error) =>
 			console.error("[main] Failed to remove organization plugins:", error),
 		);

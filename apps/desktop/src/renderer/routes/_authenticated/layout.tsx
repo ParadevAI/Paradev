@@ -37,6 +37,7 @@ import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/component
 import { OrganizationPluginSync } from "renderer/routes/_authenticated/components/OrganizationPluginSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
 import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
+import { PostOnboardingSetup } from "renderer/routes/_authenticated/components/PostOnboardingSetup";
 import { RealtimeNudges } from "renderer/routes/_authenticated/components/RealtimeNudges";
 import { StarNagObserver } from "renderer/routes/_authenticated/components/StarNagObserver";
 import {
@@ -127,6 +128,7 @@ function AuthenticatedLayout() {
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 
 	const isSignedIn = env.SKIP_ENV_VALIDATION || !!session?.user;
+	const isOnboarded = env.SKIP_ENV_VALIDATION || !!session?.user?.onboardedAt;
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION
 		? MOCK_ORG_ID
 		: session?.session?.activeOrganizationId;
@@ -347,7 +349,12 @@ function AuthenticatedLayout() {
 									<DockBadgeController />
 									<StarNagObserver />
 									<LeaderboardAutoPublish />
-									<OrganizationPluginSync />
+									{isOnboarded && (
+										<>
+											<PostOnboardingSetup />
+											<OrganizationPluginSync />
+										</>
+									)}
 									<RealtimeNudges />
 									<ChannelsRealtime />
 									<DaemonAutoUpdateFailureDialog />
