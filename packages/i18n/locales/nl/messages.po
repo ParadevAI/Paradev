@@ -2605,6 +2605,9 @@ msgstr "Er is een onbekende fout opgetreden"
 msgid "An update is ready to install."
 msgstr "Er staat een update klaar om te installeren."
 
+msgid "Analytics cookies"
+msgstr "Analytische cookies"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android komt eraan. Hoor het als eerste wanneer het uitkomt."
 

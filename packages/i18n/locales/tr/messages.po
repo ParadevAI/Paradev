@@ -2605,6 +2605,9 @@ msgstr "Bilinmeyen bir hata oluştu"
 msgid "An update is ready to install."
 msgstr "Yüklenmeye hazır bir güncelleme var."
 
+msgid "Analytics cookies"
+msgstr "Analiz çerezleri"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android yolda. Çıktığında ilk siz haberdar olun."
 

@@ -2605,6 +2605,9 @@ msgstr "Došlo k neznámé chybě"
 msgid "An update is ready to install."
 msgstr "Aktualizace je připravena k instalaci."
 
+msgid "Analytics cookies"
+msgstr "Analytické cookies"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android je na cestě. Dozvíte se jako první, až vyjde."
 

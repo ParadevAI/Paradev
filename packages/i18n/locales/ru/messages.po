@@ -2605,6 +2605,9 @@ msgstr "Произошла неизвестная ошибка"
 msgid "An update is ready to install."
 msgstr "Обновление готово к установке."
 
+msgid "Analytics cookies"
+msgstr "Аналитические cookie"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Версия для Android уже в работе. Узнайте о выходе первыми."
 

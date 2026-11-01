@@ -2605,6 +2605,9 @@ msgstr "Se produjo un error desconocido"
 msgid "An update is ready to install."
 msgstr "Hay una actualización lista para instalar."
 
+msgid "Analytics cookies"
+msgstr "Cookies de analítica"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android está en camino. Sé el primero en enterarte cuando salga."
 

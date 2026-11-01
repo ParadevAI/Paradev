@@ -2605,6 +2605,9 @@ msgstr "不明なエラーが発生しました"
 msgid "An update is ready to install."
 msgstr "アップデートをインストールする準備ができました。"
 
+msgid "Analytics cookies"
+msgstr "分析用 Cookie"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版を準備中です。リリース時にいち早くお知らせします。"
 

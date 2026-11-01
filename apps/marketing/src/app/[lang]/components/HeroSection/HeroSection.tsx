@@ -115,7 +115,10 @@ export function HeroSection() {
 							</p>
 						</div>
 
-						<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-6 sm:mt-8">
+						<div
+							data-cookie-banner-keep-clear
+							className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-6 sm:mt-8"
+						>
 							<DownloadButton
 								source="hero"
 								onJoinWaitlist={() => setIsWaitlistOpen(true)}

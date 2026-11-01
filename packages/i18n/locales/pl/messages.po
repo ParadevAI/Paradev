@@ -2605,6 +2605,9 @@ msgstr "Wystąpił nieznany błąd"
 msgid "An update is ready to install."
 msgstr "Aktualizacja jest gotowa do zainstalowania."
 
+msgid "Analytics cookies"
+msgstr "Analityczne pliki cookie"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android jest w drodze. Dowiedz się jako pierwszy, gdy się pojawi."
 

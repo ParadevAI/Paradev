@@ -2599,6 +2599,9 @@ msgstr "Сталася невідома помилка"
 msgid "An update is ready to install."
 msgstr "Оновлення готове до встановлення."
 
+msgid "Analytics cookies"
+msgstr "Аналітичні cookie"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Версія для Android уже на підході. Дізнайтеся про вихід першими."
 
