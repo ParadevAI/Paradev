@@ -12,6 +12,9 @@ export const Route = createFileRoute("/_authenticated/onboarding/")({
 });
 
 const PREREQ_POLL_MS = 4000;
+const GH_CLI_HOME_URL = "https://cli.github.com/";
+const GH_CLI_MACOS_PKG_URL = "https://github.com/cli/cli/releases/latest";
+const isMac = navigator.platform.toUpperCase().includes("MAC");
 
 function OnboardingDashboardPage() {
 	const { t } = useLingui();
@@ -46,7 +49,11 @@ function OnboardingDashboardPage() {
 			setGhDialogMode("install");
 			return;
 		}
-		window.open("https://cli.github.com/", "_blank", "noopener,noreferrer");
+		window.open(
+			isMac ? GH_CLI_MACOS_PKG_URL : GH_CLI_HOME_URL,
+			"_blank",
+			"noopener,noreferrer",
+		);
 	};
 
 	const statusDot = (
