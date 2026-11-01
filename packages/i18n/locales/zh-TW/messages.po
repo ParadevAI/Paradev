@@ -2811,6 +2811,13 @@ msgstr "外觀"
 msgid "Apple logo"
 msgstr "Apple 標誌"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Git 安裝完成前，Apple 安裝程式已關閉。"
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple 安裝程式未能開啟：{0}"
+
 msgid "Application menu"
 msgstr "應用程式選單"
 
@@ -8991,6 +8998,9 @@ msgstr "取得API金鑰"
 msgid "Get channel details"
 msgstr "查看頻道詳細資料"
 
+msgid "Get Git"
+msgstr "取得 Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "與 {companyName} 團隊聯繫。"
 
@@ -9765,6 +9775,9 @@ msgstr "在新的工作階段中"
 msgid "in a terminal on this host."
 msgstr "（在此主機的終端中）。"
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "在 Apple 的視窗中按一下「安裝」。需要幾分鐘，完成後此頁面會自動更新。"
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短幾個月，<0>數萬名工程師</0>把Paradev當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
 
@@ -9899,8 +9912,14 @@ msgstr "安裝並重啟"
 msgid "Install & Restart"
 msgstr "安裝並重啟"
 
+msgid "Install Command Line Tools"
+msgstr "安裝 Command Line Tools"
+
 msgid "Install failed"
 msgstr "安裝失敗"
+
+msgid "Install Git, then come back."
+msgstr "請先安裝 Git，然後回到這裡。"
 
 msgid "Install GitHub App"
 msgstr "安裝GitHub App"
@@ -12886,6 +12905,9 @@ msgstr "在{offScopeHostName}上，不會在這裡執行"
 msgid "On a date"
 msgstr "指定日期"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "在 Mac 上，Git 隨附於 Apple 的 Command Line Tools。"
+
 msgid "On focus change"
 msgstr "焦點變更時"
 
@@ -13692,6 +13714,9 @@ msgstr "其他人正在使用此專案。輸入 <0>{projectName}</0> 以確認�
 msgid "Other Team Members"
 msgstr "其他團隊成員"
 
+msgid "Other ways to get Git"
+msgstr "取得 Git 的其他方式"
+
 msgid "Other ways to reach us"
 msgstr "其他聯絡方式"
 
@@ -13965,6 +13990,9 @@ msgstr "iPhone 上的 Paradev Mobile 終端"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev需要「完全磁碟存取權限」才能讀取其他瀏覽器的資料。請在系統設定中授予權限，然後重新檢查。"
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev 需要 Git 才能新增專案。"
 
 msgid "Paradev next to others"
 msgstr "Paradev 與其他工具比較"
@@ -17290,6 +17318,9 @@ msgstr "顯示所有評論"
 
 msgid "Show all lines"
 msgstr "顯示所有行"
+
+msgid "Show Apple's installer"
+msgstr "顯示 Apple 安裝程式"
 
 msgid "Show archived"
 msgstr "顯示已歸檔"

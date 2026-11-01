@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_authenticated/onboarding/")({
 });
 
 const PREREQ_POLL_MS = 4000;
+const GH_CLI_LATEST_RELEASE_URL = "https://github.com/cli/cli/releases/latest";
 
 function OnboardingDashboardPage() {
 	const { t } = useLingui();
@@ -29,6 +30,7 @@ function OnboardingDashboardPage() {
 		isPending: isPendingGh,
 	} = electronTrpc.system.detectGhCli.useQuery(undefined, statusPolling);
 	const { data: brewStatus } = electronTrpc.system.detectBrew.useQuery();
+	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 
 	const ghInstalled = ghStatus?.installed === true;
 	const ghReady = ghInstalled && ghStatus?.authenticated === true;
@@ -46,7 +48,12 @@ function OnboardingDashboardPage() {
 			setGhDialogMode("install");
 			return;
 		}
-		window.open("https://cli.github.com/", "_blank", "noopener,noreferrer");
+		// cli.github.com leads with `brew install gh`; the release page has the .pkg.
+		const url =
+			platform === "darwin"
+				? GH_CLI_LATEST_RELEASE_URL
+				: "https://cli.github.com/";
+		window.open(url, "_blank", "noopener,noreferrer");
 	};
 
 	const statusDot = (

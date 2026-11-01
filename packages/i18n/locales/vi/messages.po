@@ -2811,6 +2811,13 @@ msgstr "Giao diện"
 msgid "Apple logo"
 msgstr "Biểu trưng Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Trình cài đặt của Apple đã đóng trước khi Git được cài."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Trình cài đặt của Apple không mở được: {0}"
+
 msgid "Application menu"
 msgstr "Menu ứng dụng"
 
@@ -8991,6 +8998,9 @@ msgstr "Lấy khóa API"
 msgid "Get channel details"
 msgstr "Xem chi tiết kênh"
 
+msgid "Get Git"
+msgstr "Tải Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Liên hệ với đội ngũ {companyName}."
 
@@ -9765,6 +9775,9 @@ msgstr "trong phiên mới"
 msgid "in a terminal on this host."
 msgstr "trong một terminal trên host này."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Trong cửa sổ của Apple, bấm Cài đặt. Quá trình mất vài phút và trang này sẽ cập nhật khi xong."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
 
@@ -9899,8 +9912,14 @@ msgstr "Cài đặt & khởi động lại"
 msgid "Install & Restart"
 msgstr "Cài đặt & khởi động lại"
 
+msgid "Install Command Line Tools"
+msgstr "Cài đặt Command Line Tools"
+
 msgid "Install failed"
 msgstr "Cài đặt thất bại"
+
+msgid "Install Git, then come back."
+msgstr "Hãy cài đặt Git, rồi quay lại đây."
 
 msgid "Install GitHub App"
 msgstr "Cài GitHub App"
@@ -12886,6 +12905,9 @@ msgstr "trên {offScopeHostName} — sẽ không chạy ở đây"
 msgid "On a date"
 msgstr "Vào một ngày"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Trên Mac, Git đi kèm với Command Line Tools của Apple."
+
 msgid "On focus change"
 msgstr "Khi thay đổi tiêu điểm"
 
@@ -13692,6 +13714,9 @@ msgstr "Người khác đang dùng dự án này. Nhập <0>{projectName}</0> đ
 msgid "Other Team Members"
 msgstr "Các thành viên khác"
 
+msgid "Other ways to get Git"
+msgstr "Cách khác để có Git"
+
 msgid "Other ways to reach us"
 msgstr "Các cách khác để liên hệ"
 
@@ -13965,6 +13990,9 @@ msgstr "Terminal của Paradev Mobile trên iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev cần quyền Full Disk Access để đọc dữ liệu của trình duyệt khác. Cấp quyền trong System Settings rồi kiểm tra lại."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev cần Git để thêm dự án."
 
 msgid "Paradev next to others"
 msgstr "Paradev so với các công cụ khác"
@@ -17290,6 +17318,9 @@ msgstr "Hiển thị tất cả bình luận"
 
 msgid "Show all lines"
 msgstr "Hiện tất cả các dòng"
+
+msgid "Show Apple's installer"
+msgstr "Hiện trình cài đặt của Apple"
 
 msgid "Show archived"
 msgstr "Hiện mục đã lưu trữ"

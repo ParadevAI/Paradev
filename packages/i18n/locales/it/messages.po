@@ -2811,6 +2811,13 @@ msgstr "Aspetto"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Il programma di installazione di Apple si è chiuso prima che Git fosse installato."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Il programma di installazione di Apple non si è aperto: {0}"
+
 msgid "Application menu"
 msgstr "Menu dell'applicazione"
 
@@ -8991,6 +8998,9 @@ msgstr "Ottieni una chiave API"
 msgid "Get channel details"
 msgstr "Vedi dettagli del canale"
 
+msgid "Get Git"
+msgstr "Scarica Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Mettiti in contatto con il team di {companyName}."
 
@@ -9765,6 +9775,9 @@ msgstr "in una nuova sessione"
 msgid "in a terminal on this host."
 msgstr "in un terminale su questo host."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Nella finestra di Apple, fai clic su Installa. Ci vogliono alcuni minuti e questa pagina si aggiorna al termine."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In pochi mesi, <0>decine di migliaia di ingegneri</0> usano Paradev come IDE principale, in aziende come Wix, DoorDash e Netflix."
 
@@ -9899,8 +9912,14 @@ msgstr "Installa e riavvia"
 msgid "Install & Restart"
 msgstr "Installa e riavvia"
 
+msgid "Install Command Line Tools"
+msgstr "Installa Command Line Tools"
+
 msgid "Install failed"
 msgstr "Installazione non riuscita"
+
+msgid "Install Git, then come back."
+msgstr "Installa Git, poi torna qui."
 
 msgid "Install GitHub App"
 msgstr "Installa la GitHub App"
@@ -12886,6 +12905,9 @@ msgstr "su {offScopeHostName} — non verrà eseguita qui"
 msgid "On a date"
 msgstr "In una data"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Su Mac, Git è incluso nei Command Line Tools di Apple."
+
 msgid "On focus change"
 msgstr "Al cambio di focus"
 
@@ -13692,6 +13714,9 @@ msgstr "Altre persone stanno usando questo progetto. Digita <0>{projectName}</0>
 msgid "Other Team Members"
 msgstr "Altri membri del team"
 
+msgid "Other ways to get Git"
+msgstr "Altri modi per ottenere Git"
+
 msgid "Other ways to reach us"
 msgstr "Altri modi per contattarci"
 
@@ -13965,6 +13990,9 @@ msgstr "Terminale di Paradev Mobile su iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev ha bisogno dell'Accesso completo al disco per leggere i dati di un altro browser. Concedilo in Impostazioni di Sistema, poi controlla di nuovo."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev ha bisogno di Git per aggiungere un progetto."
 
 msgid "Paradev next to others"
 msgstr "Paradev a confronto con gli altri"
@@ -17290,6 +17318,9 @@ msgstr "Mostra tutti i commenti"
 
 msgid "Show all lines"
 msgstr "Mostra tutte le righe"
+
+msgid "Show Apple's installer"
+msgstr "Mostra il programma di installazione di Apple"
 
 msgid "Show archived"
 msgstr "Mostra archiviati"

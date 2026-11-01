@@ -2811,6 +2811,13 @@ msgstr "Görünüm"
 msgid "Apple logo"
 msgstr "Apple logosu"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Apple'ın yükleyicisi Git yüklenmeden kapandı."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple'ın yükleyicisi açılmadı: {0}"
+
 msgid "Application menu"
 msgstr "Uygulama menüsü"
 
@@ -8991,6 +8998,9 @@ msgstr "API anahtarı alın"
 msgid "Get channel details"
 msgstr "Kanal ayrıntılarını gör"
 
+msgid "Get Git"
+msgstr "Git'i indir"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName} ekibiyle iletişime geçin."
 
@@ -9765,6 +9775,9 @@ msgstr "yeni bir oturumda"
 msgid "in a terminal on this host."
 msgstr "komutunu çalıştırın."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Apple'ın penceresinde Yükle'ye tıklayın. Birkaç dakika sürer ve bittiğinde bu sayfa güncellenir."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Paradev'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
 
@@ -9899,8 +9912,14 @@ msgstr "Kur ve yeniden başlat"
 msgid "Install & Restart"
 msgstr "Kur ve yeniden başlat"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Tools'u yükle"
+
 msgid "Install failed"
 msgstr "Kurulum başarısız"
+
+msgid "Install Git, then come back."
+msgstr "Git'i yükle, sonra buraya geri dön."
 
 msgid "Install GitHub App"
 msgstr "GitHub App'i kur"
@@ -12886,6 +12905,9 @@ msgstr "{offScopeHostName} üzerinde — burada çalışmaz"
 msgid "On a date"
 msgstr "Bir tarihte"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Mac'te Git, Apple'ın Command Line Tools paketiyle birlikte gelir."
+
 msgid "On focus change"
 msgstr "Odak değiştiğinde"
 
@@ -13692,6 +13714,9 @@ msgstr "Bu projeyi başkaları kullanıyor. Onaylamak için <0>{projectName}</0>
 msgid "Other Team Members"
 msgstr "Diğer takım üyeleri"
 
+msgid "Other ways to get Git"
+msgstr "Git'i edinmenin diğer yolları"
+
 msgid "Other ways to reach us"
 msgstr "Bize ulaşmanın diğer yolları"
 
@@ -13965,6 +13990,9 @@ msgstr "iPhone'da Paradev Mobile terminali"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev'in başka bir tarayıcının verilerini okuyabilmesi için Tam Disk Erişimi gerekir. Sistem Ayarları'ndan verin, sonra yeniden denetleyin."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev'in proje eklemek için Git'e ihtiyacı var."
 
 msgid "Paradev next to others"
 msgstr "Paradev ve diğerleri"
@@ -17290,6 +17318,9 @@ msgstr "Tüm yorumları göster"
 
 msgid "Show all lines"
 msgstr "Tüm satırları göster"
+
+msgid "Show Apple's installer"
+msgstr "Apple'ın yükleyicisini göster"
 
 msgid "Show archived"
 msgstr "Arşivlenenleri göster"

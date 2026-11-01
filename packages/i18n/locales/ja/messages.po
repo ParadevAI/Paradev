@@ -2811,6 +2811,13 @@ msgstr "外観"
 msgid "Apple logo"
 msgstr "Appleのロゴ"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Git がインストールされる前に Apple のインストーラが閉じられました。"
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Apple のインストーラを開けませんでした: {0}"
+
 msgid "Application menu"
 msgstr "アプリケーションメニュー"
 
@@ -8991,6 +8998,9 @@ msgstr "APIキーを取得"
 msgid "Get channel details"
 msgstr "チャンネルの詳細を表示"
 
+msgid "Get Git"
+msgstr "Gitを入手"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "{companyName}チームにお問い合わせください。"
 
@@ -9765,6 +9775,9 @@ msgstr "新しいセッションで"
 msgid "in a terminal on this host."
 msgstr "このホストのターミナルで実行してください。"
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Apple のウインドウで「インストール」をクリックしてください。数分かかります。完了するとこのページが更新されます。"
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
 
@@ -9899,8 +9912,14 @@ msgstr "インストールして再起動"
 msgid "Install & Restart"
 msgstr "インストールして再起動"
 
+msgid "Install Command Line Tools"
+msgstr "Command Line Toolsをインストール"
+
 msgid "Install failed"
 msgstr "インストールに失敗しました"
+
+msgid "Install Git, then come back."
+msgstr "Gitをインストールしてから、ここに戻ってきてください。"
 
 msgid "Install GitHub App"
 msgstr "GitHub Appをインストール"
@@ -12886,6 +12905,9 @@ msgstr "{offScopeHostName}上 — ここでは実行されません"
 msgid "On a date"
 msgstr "指定日"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Macでは、GitはAppleのCommand Line Toolsに含まれています。"
+
 msgid "On focus change"
 msgstr "フォーカス変更時"
 
@@ -13692,6 +13714,9 @@ msgstr "他のユーザーがこのプロジェクトを使用しています。
 msgid "Other Team Members"
 msgstr "他のチームメンバー"
 
+msgid "Other ways to get Git"
+msgstr "Git を入手するほかの方法"
+
 msgid "Other ways to reach us"
 msgstr "その他の連絡方法"
 
@@ -13965,6 +13990,9 @@ msgstr "iPhone 上の Paradev Mobile のターミナル"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "他のブラウザのデータを読み取るには、Paradevにフルディスクアクセスが必要です。システム設定で許可してから再確認してください。"
+
+msgid "Paradev needs Git to add a project."
+msgstr "プロジェクトを追加するには、ParadevにGitが必要です。"
 
 msgid "Paradev next to others"
 msgstr "他ツールとParadevの比較"
@@ -17290,6 +17318,9 @@ msgstr "すべてのコメントを表示"
 
 msgid "Show all lines"
 msgstr "すべての行を表示"
+
+msgid "Show Apple's installer"
+msgstr "Apple のインストーラを表示"
 
 msgid "Show archived"
 msgstr "アーカイブ済みを表示"

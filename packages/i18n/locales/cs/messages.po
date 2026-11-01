@@ -2811,6 +2811,13 @@ msgstr "Vzhled"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Instalátor od Applu se zavřel dřív, než se Git nainstaloval."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Instalátor od Applu se neotevřel: {0}"
+
 msgid "Application menu"
 msgstr "Nabídka aplikace"
 
@@ -8991,6 +8998,9 @@ msgstr "Získat API klíč"
 msgid "Get channel details"
 msgstr "Zobrazit podrobnosti kanálu"
 
+msgid "Get Git"
+msgstr "Stáhnout Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Spojte se s týmem {companyName}."
 
@@ -9765,6 +9775,9 @@ msgstr "v nové relaci"
 msgid "in a terminal on this host."
 msgstr "v terminálu na tomto hostu."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "V okně od Applu klikněte na Instalovat. Trvá to pár minut a tato stránka se po dokončení aktualizuje."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Za pouhých pár měsíců používají Paradev jako hlavní IDE <0>desítky tisíc inženýrů</0>, ve firmách jako Wix, DoorDash nebo Netflix."
 
@@ -9899,8 +9912,14 @@ msgstr "Nainstalovat a restartovat"
 msgid "Install & Restart"
 msgstr "Nainstalovat a restartovat"
 
+msgid "Install Command Line Tools"
+msgstr "Nainstalovat Command Line Tools"
+
 msgid "Install failed"
 msgstr "Instalace selhala"
+
+msgid "Install Git, then come back."
+msgstr "Nainstalujte Git a pak se sem vraťte."
 
 msgid "Install GitHub App"
 msgstr "Nainstalovat GitHub App"
@@ -12886,6 +12905,9 @@ msgstr "na {offScopeHostName} — tady nepoběží"
 msgid "On a date"
 msgstr "K datu"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Na Macu je Git součástí Command Line Tools od společnosti Apple."
+
 msgid "On focus change"
 msgstr "Při změně zaměření"
 
@@ -13692,6 +13714,9 @@ msgstr "Tento projekt používají další lidé. Pro potvrzení napište <0>{pr
 msgid "Other Team Members"
 msgstr "Další členové týmu"
 
+msgid "Other ways to get Git"
+msgstr "Další způsoby, jak získat Git"
+
 msgid "Other ways to reach us"
 msgstr "Další způsoby, jak nás zastihnout"
 
@@ -13965,6 +13990,9 @@ msgstr "Terminál Paradev Mobile na iPhonu"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev potřebuje Plný přístup k disku, aby mohl číst data jiného prohlížeče. Povolte ho v Nastavení systému a zkontrolujte to znovu."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev potřebuje Git, aby mohl přidat projekt."
 
 msgid "Paradev next to others"
 msgstr "Paradev vedle ostatních"
@@ -17290,6 +17318,9 @@ msgstr "Zobrazit všechny komentáře"
 
 msgid "Show all lines"
 msgstr "Zobrazit všechny řádky"
+
+msgid "Show Apple's installer"
+msgstr "Zobrazit instalátor od Applu"
 
 msgid "Show archived"
 msgstr "Zobrazit archivované"
