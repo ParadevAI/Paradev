@@ -25,7 +25,7 @@ export function SheetHeader({ options }: NativeStackHeaderProps) {
 
 	return (
 		<View className="pb-2 pt-2">
-			<View className="bg-muted-foreground/40 h-1 w-8 self-center rounded-full" />
+			<View className="bg-muted-foreground/40 web:hidden h-1 w-8 self-center rounded-full" />
 			<View className="min-h-11 flex-row items-center px-2">
 				<View style={{ minWidth: SIDE_WIDTH }}>
 					{options.headerLeft?.({ tintColor, canGoBack: false })}

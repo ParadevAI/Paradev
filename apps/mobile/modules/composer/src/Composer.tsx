@@ -460,6 +460,7 @@ function RoundButton({
 			disabled={disabled}
 			hitSlop={4}
 			onPress={onPress}
+			className="web:hover:opacity-80"
 			style={({ pressed }) => [
 				styles.round,
 				filled && styles.roundFilled,

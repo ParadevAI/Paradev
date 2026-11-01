@@ -15,6 +15,7 @@ export function QuickKey({ quickKey, onPress }: QuickKeyProps) {
 			accessibilityRole="button"
 			accessibilityLabel={quickKey.label ?? quickKey.id}
 			onPress={() => onPress(quickKey.id)}
+			className="web:hover:opacity-80"
 			style={({ pressed }) => [styles.key, pressed && styles.pressed]}
 		>
 			{Icon ? (

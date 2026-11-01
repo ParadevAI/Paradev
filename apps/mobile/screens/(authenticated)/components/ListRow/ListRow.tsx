@@ -27,7 +27,7 @@ export function ListRow({
 			disabled={!onPress}
 			// Not the row's own label: some of these are host names.
 			ph-label="list-row"
-			className="flex-row items-center gap-3 py-4"
+			className="web:hover:opacity-80 flex-row items-center gap-3 py-4"
 			style={
 				isLast
 					? undefined
