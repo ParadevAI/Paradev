@@ -46,6 +46,7 @@ import {
 } from "./air";
 import { type AcpImageSource, imageSourceOf } from "./imageBlocks";
 import { imageDimensions } from "./imageDimensions";
+import { isInterruptMarker } from "./itemMapping";
 import type {
 	AcpNotification,
 	AcpServerRequest,
@@ -1263,7 +1264,12 @@ export class AcpAdapter implements HarnessAdapter {
 					this.insertions.set(messageId, ++this.insertionSeq);
 				return;
 			}
-			if (isHiddenUserMessage(outer.data.update)) return;
+			const text = userMessageText(outer.data.update);
+			if (text !== undefined && isHiddenText(text)) return;
+			if (text !== undefined && isInterruptMarker(text)) {
+				this.markHistoryTurnInterrupted();
+				return;
+			}
 			if (this.main.openKind() !== "user_message") {
 				this.main.flush();
 				// emitTurn leaves the history turn as `currentTurn`, which
@@ -2433,6 +2439,14 @@ export class AcpAdapter implements HarnessAdapter {
 		return startedAtMs;
 	}
 
+	private markHistoryTurnInterrupted(): void {
+		const turn = this.currentTurn;
+		if (!turn || turn.id !== this.historyTurnId || turn.status !== "completed")
+			return;
+		this.main.flush();
+		this.emitTurn({ ...turn, status: "interrupted" });
+	}
+
 	private resolveTurnId(): string {
 		if (this.currentTurn) return this.currentTurn.id;
 		if (!this.historyTurnId) {
@@ -2638,16 +2652,12 @@ export function createAcpAdapter(options: AcpAdapterOptions): HarnessAdapter {
 	return new AcpAdapter(options);
 }
 
-function isHiddenUserMessage(raw: unknown): boolean {
+function userMessageText(raw: unknown): string | undefined {
 	const content = (raw as { content?: unknown } | null)?.content;
 	const block = acpContentBlockSchema.safeParse(
 		Array.isArray(content) ? content[0] : content,
 	);
-	return (
-		block.success &&
-		block.data.text !== undefined &&
-		isHiddenText(block.data.text)
-	);
+	return block.success ? block.data.text : undefined;
 }
 
 function listedSessions(response: unknown): DiscoverSessionsResult {
