@@ -2605,6 +2605,9 @@ msgstr "Đã xảy ra lỗi không xác định"
 msgid "An update is ready to install."
 msgstr "Đã có bản cập nhật sẵn sàng để cài đặt."
 
+msgid "Analytics cookies"
+msgstr "Cookie phân tích"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Bản Android đang đến. Hãy là người đầu tiên biết khi nó ra mắt."
 

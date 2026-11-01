@@ -2605,6 +2605,9 @@ msgstr "Terjadi kesalahan yang tidak diketahui"
 msgid "An update is ready to install."
 msgstr "Pembaruan siap dipasang."
 
+msgid "Analytics cookies"
+msgstr "Cookie analitik"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android sedang dalam perjalanan. Jadilah yang pertama tahu saat dirilis."
 

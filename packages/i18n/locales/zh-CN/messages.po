@@ -2605,6 +2605,9 @@ msgstr "发生未知错误"
 msgid "An update is ready to install."
 msgstr "更新已准备好安装。"
 
+msgid "Analytics cookies"
+msgstr "分析 Cookie"
+
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版即将到来。发布时第一时间通知你。"
 
