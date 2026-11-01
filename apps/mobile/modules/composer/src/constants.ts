@@ -61,4 +61,6 @@ export const COMPOSER_METRICS = {
 	tabControlSize: 28,
 	tabChevronReveal: 32,
 	slashRowHeight: 52,
+	/** `ComposerMetrics.maxWidth` on iOS. */
+	maxWidth: 720,
 } as const;

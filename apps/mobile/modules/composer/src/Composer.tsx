@@ -49,6 +49,7 @@ import { COMPOSER_COLORS, COMPOSER_METRICS } from "./constants";
 import { useAttachmentPaste } from "./hooks/useAttachmentPaste";
 import { useDictation } from "./hooks/useDictation";
 import { useSwipeToDismiss } from "./hooks/useSwipeToDismiss";
+import { clusterColumn } from "./utils/clusterColumn";
 import { composerKeyHandler } from "./utils/composerKeyHandler";
 import { joinDraft } from "./utils/joinDraft";
 import {
@@ -203,7 +204,7 @@ export const Composer: ComposerComponent = forwardRef<
 				style={[styles.anchor, { paddingBottom: lift }]}
 			>
 				{suggestions ? (
-					<View style={styles.suggestions}>
+					<View style={[styles.suggestions, clusterColumn]}>
 						<ComposerSlashSuggestions
 							commands={suggestions}
 							onSelect={(command) => setDraft(committedSlashDraft(command))}
@@ -215,7 +216,7 @@ export const Composer: ComposerComponent = forwardRef<
 					onLayout={(event) =>
 						onHeightChange?.(event.nativeEvent.layout.height)
 					}
-					style={styles.stack}
+					style={[styles.stack, clusterColumn]}
 				>
 					{sessionTabs && sessionTabs.length > 0 ? (
 						<ComposerSessionTabs
