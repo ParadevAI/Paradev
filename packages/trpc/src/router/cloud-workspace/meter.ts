@@ -125,14 +125,6 @@ async function checkOrFailOpen<T>(
 	}
 }
 
-function isLockAlreadyTaken(error: unknown): boolean {
-	return (
-		error instanceof AutumnError &&
-		error.statusCode === 409 &&
-		error.body.includes('"code":"lock_already_exists"')
-	);
-}
-
 function isUniqueViolation(error: unknown): boolean {
 	const { code, cause } = error as { code?: string; cause?: { code?: string } };
 	return code === "23505" || cause?.code === "23505";
@@ -423,9 +415,15 @@ export async function settleBoot(
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
 			user,
 		});
+		const nextSeq = boot.lockSeq + 1;
+		// Autumn answers a repeated lock id with 409, so a retry after a failed renewal needs a fresh one.
 		await db
 			.update(cloudWorkspaceBoots)
-			.set({ finalizedThrough: new Date(end), lockOpen: false })
+			.set({
+				finalizedThrough: new Date(end),
+				lockOpen: false,
+				lockSeq: nextSeq,
+			})
 			.where(eq(cloudWorkspaceBoots.id, bootId));
 
 		if (session.endedAt !== null) {
@@ -442,24 +440,17 @@ export async function settleBoot(
 			return "closed";
 		}
 
-		const nextSeq = boot.lockSeq + 1;
-		const renewal = await autumnClient
-			.check({
-				customerId: boot.organizationId,
-				featureId: BOX_GB_MINUTES_FEATURE_ID,
-				requiredBalance: reservation(session.memoryMb),
-				properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
-				lock: {
-					enabled: true,
-					lockId: lockIdFor(bootId, nextSeq),
-					expiresAt: Date.now() + LOCK_TTL_MS,
-				},
-			})
-			.catch((error) => {
-				// A refused check reserves nothing, so an existing lock was granted.
-				if (isLockAlreadyTaken(error)) return { allowed: true };
-				throw error;
-			});
+		const renewal = await autumnClient.check({
+			customerId: boot.organizationId,
+			featureId: BOX_GB_MINUTES_FEATURE_ID,
+			requiredBalance: reservation(session.memoryMb),
+			properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
+			lock: {
+				enabled: true,
+				lockId: lockIdFor(bootId, nextSeq),
+				expiresAt: Date.now() + LOCK_TTL_MS,
+			},
+		});
 		await db
 			.update(cloudWorkspaceBoots)
 			.set({
