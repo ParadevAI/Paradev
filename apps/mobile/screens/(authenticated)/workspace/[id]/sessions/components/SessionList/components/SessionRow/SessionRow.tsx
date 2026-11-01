@@ -4,6 +4,7 @@ import { GripVertical, X } from "lucide-react-native";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
 import { useReorderableDrag } from "react-native-reorderable-list";
+import { RowLink } from "@/components/RowLink";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
@@ -45,44 +46,46 @@ function SessionRowComponent({
 				active ? "bg-secondary" : "bg-transparent",
 			)}
 		>
-			<Pressable
-				accessible
-				accessibilityLabel={row.title}
-				accessibilityRole="button"
-				ph-label="session-row"
-				className="web:hover:opacity-80 h-full flex-1 flex-row items-center gap-2.5 pl-1.5 pr-3"
-				onPress={() => onSelect(row.terminalId)}
-				onLongPress={lift}
-				delayLongPress={300}
-			>
-				{/* Two ways to pick up, because the row shares its axis with the
+			<RowLink href={`/workspace/${row.workspaceId}?tab=${row.terminalId}`}>
+				<Pressable
+					accessible
+					accessibilityLabel={row.title}
+					accessibilityRole="button"
+					ph-label="session-row"
+					className="web:hover:opacity-80 h-full flex-1 flex-row items-center gap-2.5 pl-1.5 pr-3"
+					onPress={() => onSelect(row.terminalId)}
+					onLongPress={lift}
+					delayLongPress={300}
+				>
+					{/* Two ways to pick up, because the row shares its axis with the
 				    list's scroll: the grip lifts on touch, the rest of the row needs
 				    the hold so a scroll flick still scrolls. */}
-				<Pressable
-					onPressIn={lift}
-					hitSlop={10}
-					className="items-center justify-center py-2 pr-1"
-				>
-					<GripVertical
-						size={17}
+					<Pressable
+						onPressIn={lift}
+						hitSlop={10}
+						className="items-center justify-center py-2 pr-1"
+					>
+						<GripVertical
+							size={17}
+							color={theme.mutedForeground}
+							strokeWidth={2}
+						/>
+					</Pressable>
+					<AgentMark
+						agentId={row.agentId ?? ""}
+						size={18}
 						color={theme.mutedForeground}
-						strokeWidth={2}
 					/>
+					<Text className="flex-1 text-[15px]" numberOfLines={1}>
+						{row.title}
+					</Text>
+					{row.attention === "review" ? (
+						<View className="bg-green-500 size-2 rounded-full" />
+					) : row.attention ? (
+						<PingDot color={ATTENTION_COLORS[row.attention]} size={7} />
+					) : null}
 				</Pressable>
-				<AgentMark
-					agentId={row.agentId ?? ""}
-					size={18}
-					color={theme.mutedForeground}
-				/>
-				<Text className="flex-1 text-[15px]" numberOfLines={1}>
-					{row.title}
-				</Text>
-				{row.attention === "review" ? (
-					<View className="bg-green-500 size-2 rounded-full" />
-				) : row.attention ? (
-					<PingDot color={ATTENTION_COLORS[row.attention]} size={7} />
-				) : null}
-			</Pressable>
+			</RowLink>
 			{/* The ✕ sits outside the row pressable: nesting it would both merge
 			    the row into one VoiceOver element and fire select on every close. */}
 			<Pressable

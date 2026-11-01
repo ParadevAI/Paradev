@@ -8,6 +8,7 @@ import {
 import { FolderGit2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
+import { RowLink } from "@/components/RowLink";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
@@ -233,32 +234,34 @@ export function SearchScreen() {
 						? projectNamesById.get(workspace.projectId)
 						: undefined;
 					return (
-						<Pressable
-							className="web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5"
-							onPress={() => open(workspace)}
-							ph-label="search-workspace-row"
-						>
-							<View className="size-6 items-center justify-center">
-								<Icon
-									as={FolderGit2}
-									className="text-muted-foreground size-5"
-									strokeWidth={1.75}
-								/>
-							</View>
-							<View className="min-w-0 flex-1">
-								<Text className="font-semibold text-[14px]" numberOfLines={1}>
-									{workspace.name}
-								</Text>
-								<Text
-									className="text-muted-foreground text-[11.5px]"
-									numberOfLines={1}
-								>
-									{projectName
-										? `${projectName} · ${workspace.branch}`
-										: workspace.branch}
-								</Text>
-							</View>
-						</Pressable>
+						<RowLink href={`/workspace/${workspace.id}`}>
+							<Pressable
+								className="web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5"
+								onPress={() => open(workspace)}
+								ph-label="search-workspace-row"
+							>
+								<View className="size-6 items-center justify-center">
+									<Icon
+										as={FolderGit2}
+										className="text-muted-foreground size-5"
+										strokeWidth={1.75}
+									/>
+								</View>
+								<View className="min-w-0 flex-1">
+									<Text className="font-semibold text-[14px]" numberOfLines={1}>
+										{workspace.name}
+									</Text>
+									<Text
+										className="text-muted-foreground text-[11.5px]"
+										numberOfLines={1}
+									>
+										{projectName
+											? `${projectName} · ${workspace.branch}`
+											: workspace.branch}
+									</Text>
+								</View>
+							</Pressable>
+						</RowLink>
 					);
 				}}
 				ListEmptyComponent={

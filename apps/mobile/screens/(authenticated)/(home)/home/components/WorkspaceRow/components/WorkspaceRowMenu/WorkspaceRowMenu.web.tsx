@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import * as Clipboard from "expo-clipboard";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -7,6 +8,7 @@ import {
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Text } from "@/components/ui/text";
+import { appUrl } from "@/lib/app-url";
 import type { WorkspaceRowMenuProps } from "./WorkspaceRowMenu.types";
 
 export function WorkspaceRowMenu({
@@ -21,9 +23,13 @@ export function WorkspaceRowMenu({
 	onDelete,
 	onCopyId,
 	onShare,
+	link,
 	children,
 }: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
+	const url = link
+		? new URL(appUrl(link.href), window.location.href).href
+		: null;
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>{children}</ContextMenuTrigger>
@@ -58,6 +64,22 @@ export function WorkspaceRowMenu({
 					</ContextMenuItem>
 				) : null}
 				<ContextMenuSeparator />
+				{url && link ? (
+					<>
+						<ContextMenuItem
+							onPress={() => window.open(url, "_blank", "noopener")}
+						>
+							<Text>{t({ message: "Open in new tab" })}</Text>
+						</ContextMenuItem>
+						<ContextMenuItem
+							onPress={() =>
+								void Clipboard.setStringAsync(url).then(link.onCopied)
+							}
+						>
+							<Text>{t({ message: "Copy link" })}</Text>
+						</ContextMenuItem>
+					</>
+				) : null}
 				<ContextMenuItem onPress={onCopyId}>
 					<Text>{t({ message: "Copy ID" })}</Text>
 				</ContextMenuItem>
