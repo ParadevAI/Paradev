@@ -899,6 +899,9 @@ msgstr "{count, plural, one {读取了 # 个文件} other {读取了 # 个文件
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {已将 # 个自动化移出分组} other {已将 # 个自动化移出分组}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, other {最多 # 名成员}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {使用了#个来源} other {使用了#个来源}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName}（此设备）"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "剩余 {remaining} 个 token"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "已有 {seatsUsed}/{seatLimit} 名成员"
 
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
@@ -20281,6 +20291,9 @@ msgstr "未知工作区"
 msgid "Unlimited"
 msgstr "无限"
 
+msgid "Unlimited members"
+msgstr "成员数量不限"
+
 msgid "Unlink project"
 msgstr "取消关联项目"
 
@@ -20367,6 +20380,10 @@ msgstr "即将运行"
 
 msgid "Up Next"
 msgstr "即将开始"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "最多 {count} 名"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "最多保存 {MAX_SAVED_VIEWS} 个视图"
@@ -20477,6 +20494,9 @@ msgstr "升级到 {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "升级到 Pro"
+
+msgid "Upgrade to Team"
+msgstr "升级到 Team"
 
 msgid "Upgrade your plan"
 msgstr "升级你的套餐"
@@ -21746,6 +21766,9 @@ msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"
+
+msgid "Your plan allows {limit} members."
+msgstr "你的套餐最多允许 {limit} 名成员。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的套餐不包含云端环境。"

@@ -7,6 +7,7 @@ import {
 } from "@superset/i18n/format";
 import {
 	DEFAULT_MACHINE_SIZE,
+	finiteSeatLimit,
 	gbHourPackPricePerGbHour,
 	machineSpec,
 	maxYearlyDiscount,
@@ -29,6 +30,8 @@ export interface FamilyPriceSet {
 	overage: string | null;
 	overageRate: string | null;
 	environments: string | null;
+	members: string | null;
+	membersFeature: string | null;
 	pack: string | null;
 	previousName: string | null;
 }
@@ -54,6 +57,12 @@ const ALLOWANCE_ITEM = msg({
 	message: "{name}: {hours} hours ({gbHours} GB-hours) per seat",
 });
 const PACK_ITEM = msg({ message: "{price} per GB-hour" });
+const MEMBERS_UP_TO = msg({ message: "Up to {count}", context: "members" });
+const MEMBERS_UNLIMITED = msg({ message: "Unlimited" });
+const MEMBERS_FEATURE_UP_TO = msg({
+	message: "{count, plural, one {Up to # member} other {Up to # members}}",
+});
+const MEMBERS_FEATURE_UNLIMITED = msg({ message: "Unlimited members" });
 
 export function planPriceValues(
 	catalog: PlanFamily[],
@@ -75,6 +84,8 @@ export function planPriceValues(
 		i18n._({ ...PACK_ITEM, values: { price: currency(value) } });
 	const families = catalog.map((family, index): FamilyPriceSet => {
 		const hasYearlyDiscount = offersYearlyDiscount(family);
+		const memberCap = finiteSeatLimit(family.maxSeats);
+		const declared = family.maxSeats !== null;
 		return {
 			family: family.family,
 			name: family.name,
@@ -100,6 +111,19 @@ export function planPriceValues(
 					? perGbHour(family.overagePerGbHour)
 					: null,
 			environments: family.environments ? number(family.environments, 0) : null,
+			members: !declared
+				? null
+				: memberCap === null
+					? i18n._(MEMBERS_UNLIMITED)
+					: i18n._({
+							...MEMBERS_UP_TO,
+							values: { count: number(memberCap, 0) },
+						}),
+			membersFeature: !declared
+				? null
+				: memberCap === null
+					? i18n._(MEMBERS_FEATURE_UNLIMITED)
+					: i18n._({ ...MEMBERS_FEATURE_UP_TO, values: { count: memberCap } }),
 			pack: family.pack
 				? perGbHour(gbHourPackPricePerGbHour(family.pack))
 				: null,
@@ -154,6 +178,7 @@ export function featureValues(set: FamilyPriceSet | undefined) {
 		gbHours: set?.gbHours ?? "",
 		hours: set?.hours ?? "",
 		previousPlan: set?.previousName ?? "",
+		members: set?.membersFeature ?? "",
 		vcpus: standardBox.vcpus,
 		memoryGb: standardBox.memoryGb,
 	};
@@ -161,7 +186,7 @@ export function featureValues(set: FamilyPriceSet | undefined) {
 
 /** A feature that depends on cloud values shows only when the plan has them. */
 export function featureShown(
-	feature: { needs?: "gbHours" },
+	feature: { needs?: "gbHours" | "members" },
 	set: FamilyPriceSet | undefined,
 ): boolean {
 	return !feature.needs || Boolean(featureValues(set)[feature.needs]);

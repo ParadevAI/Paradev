@@ -10,6 +10,7 @@ function family(
 	seatPrice: number,
 	gbMinutesPerSeat: number | null,
 	environments: number | null,
+	maxSeats: number | null = null,
 ): PlanFamily {
 	return {
 		family: key,
@@ -22,6 +23,7 @@ function family(
 		overagePerGbHour: 0.06,
 		pack: null,
 		environments,
+		maxSeats,
 	};
 }
 
@@ -49,6 +51,28 @@ describe("comparisonValue", () => {
 			"$0.06 per GB-hour",
 			"$0.06 per GB-hour",
 			custom,
+		]);
+	});
+
+	test("the members row reads each plan's cap, and falls back when a plan has none", () => {
+		const catalog = [
+			family("pro", 20, null, null, 5),
+			family("team", 60, 72000, 5, 2147483647),
+			family("ultra", 200, 240000, 10),
+		];
+		const values = planPriceValues(catalog, setupI18n({ locale: "en" }));
+		const tiers = pricingTiers(catalog);
+		const row = COMPARISON_SECTIONS.flatMap((section) => section.rows).find(
+			(candidate) => candidate.id === "teamMembers",
+		);
+		if (!row) throw new Error("missing teamMembers row");
+		const unlimited = expect.objectContaining({ message: "Unlimited" });
+		expect(tiers.map((tier) => comparisonValue(row, tier, values))).toEqual([
+			"1",
+			"Up to 5",
+			"Unlimited",
+			unlimited,
+			unlimited,
 		]);
 	});
 });

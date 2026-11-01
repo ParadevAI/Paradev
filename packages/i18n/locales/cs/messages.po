@@ -899,6 +899,9 @@ msgstr "{count, plural, one {přečten # soubor} few {přečteny # soubory} many
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# automatizace odebrána ze skupiny} few {# automatizace odebrány ze skupin} many {# automatizace odebráno ze skupin} other {# automatizací odebráno ze skupin}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, one {Až # člen} few {Až # členové} many {Až # člena} other {Až # členů}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {Použit # zdroj} few {Použity # zdroje} many {Použito # zdroje} other {Použito # zdrojů}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (toto zařízení)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "Zbývající tokeny: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatsUsed} z {seatLimit} členů"
 
 msgid "{seconds}s"
 msgstr "{seconds} s"
@@ -20281,6 +20291,9 @@ msgstr "Neznámý pracovní prostor"
 msgid "Unlimited"
 msgstr "Neomezeně"
 
+msgid "Unlimited members"
+msgstr "Neomezený počet členů"
+
 msgid "Unlink project"
 msgstr "Zrušit propojení projektu"
 
@@ -20367,6 +20380,10 @@ msgstr "Další na řadě"
 
 msgid "Up Next"
 msgstr "Další na řadě"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "Až {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "Nejvýše {MAX_SAVED_VIEWS} uložených pohledů"
@@ -20477,6 +20494,9 @@ msgstr "Přejít na {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Přejít na Pro"
+
+msgid "Upgrade to Team"
+msgstr "Přejít na Team"
 
 msgid "Upgrade your plan"
 msgstr "Vylepšete svůj tarif"
@@ -21746,6 +21766,9 @@ msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu 
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."
+
+msgid "Your plan allows {limit} members."
+msgstr "Váš tarif umožňuje {limit} členů."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Váš plán nezahrnuje cloudová prostředí."

@@ -247,6 +247,7 @@ export interface PlanFamily {
 	overagePerGbHour: number | null;
 	pack: GbHourPack | null;
 	environments: number | null;
+	maxSeats: number | null;
 }
 
 /** A one-off purchase of cloud GB-minutes that never expires. */
@@ -301,6 +302,16 @@ export function seatLimitFrom(
 	metadata: Record<string, unknown> | null | undefined,
 ): number | null {
 	return positiveNumber(metadata?.[PLAN_METADATA.maxSeats]);
+}
+
+/** At or above this, `max_seats` means unlimited rather than a real cap. */
+export const UNLIMITED_SEATS = 1_000_000;
+
+/** The cap worth showing a person, or null when there is none to show. */
+export function finiteSeatLimit(
+	limit: number | null | undefined,
+): number | null {
+	return limit != null && limit < UNLIMITED_SEATS ? limit : null;
 }
 
 /** The seat price a plan bills, whether seats are licenses or a feature quantity. */
@@ -403,6 +414,7 @@ export function planCatalogFromAutumn(
 			overagePerGbHour: null,
 			pack: null,
 			environments: null,
+			maxSeats: null,
 		};
 		if (priced.interval === "month") {
 			family.monthly = priced;
@@ -419,6 +431,7 @@ export function planCatalogFromAutumn(
 		family.overagePerGbHour ??= overagePerGbHour(plan);
 		family.pack ??= gbHourPack(plan);
 		family.environments ??= environmentLimit(plan);
+		family.maxSeats ??= seatLimitFrom(plan.metadata);
 		families.set(key, family);
 	}
 	for (const plan of plans) {

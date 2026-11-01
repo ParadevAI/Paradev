@@ -14,6 +14,7 @@ function family(key: string, name: string, gbMinutesPerSeat: number | null) {
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,
+		maxSeats: null,
 	} satisfies PlanFamily;
 }
 

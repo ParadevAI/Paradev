@@ -899,6 +899,9 @@ msgstr "{count, plural, one {파일 #개 읽음} other {파일 #개 읽음}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {자동화 #개를 그룹에서 제거했습니다} other {자동화 #개를 그룹에서 제거했습니다}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, other {최대 #명의 멤버}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {출처 #개 사용} other {출처 #개 사용}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (이 기기)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "{remaining} 토큰 남음"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "멤버 {seatLimit}명 중 {seatsUsed}명"
 
 msgid "{seconds}s"
 msgstr "{seconds}초"
@@ -20281,6 +20291,9 @@ msgstr "알 수 없는 워크스페이스"
 msgid "Unlimited"
 msgstr "무제한"
 
+msgid "Unlimited members"
+msgstr "멤버 수 무제한"
+
 msgid "Unlink project"
 msgstr "프로젝트 연결 해제"
 
@@ -20367,6 +20380,10 @@ msgstr "다음 실행"
 
 msgid "Up Next"
 msgstr "다음 차례"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "최대 {count}명"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "저장된 뷰는 최대 {MAX_SAVED_VIEWS}개"
@@ -20477,6 +20494,9 @@ msgstr "{planName}(으)로 업그레이드"
 
 msgid "Upgrade to Pro"
 msgstr "Pro로 업그레이드"
+
+msgid "Upgrade to Team"
+msgstr "Team으로 업그레이드"
 
 msgid "Upgrade your plan"
 msgstr "플랜 업그레이드"
@@ -21746,6 +21766,9 @@ msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구�
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."
+
+msgid "Your plan allows {limit} members."
+msgstr "현재 플랜은 멤버를 {limit}명까지 허용합니다."
 
 msgid "Your plan does not include cloud environments."
 msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니다."

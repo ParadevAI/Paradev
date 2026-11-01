@@ -22,6 +22,7 @@ function family(
 		overagePerGbHour: 0.06,
 		pack: gbMinutesPerSeat ? { gbMinutes: 1000, price: 1 } : null,
 		environments,
+		maxSeats: null,
 	};
 }
 mock.module("@/app/[lang]/pricing/utils/fetchPlanCatalog", () => ({

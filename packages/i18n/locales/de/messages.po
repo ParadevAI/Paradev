@@ -899,6 +899,9 @@ msgstr "{count, plural, one {# Datei gelesen} other {# Dateien gelesen}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# Automatisierung aus ihrer Gruppe entfernt} other {# Automatisierungen aus ihren Gruppen entfernt}}"
 
+msgid "{count, plural, one {Up to # member} other {Up to # members}}"
+msgstr "{count, plural, one {Bis zu # Mitglied} other {Bis zu # Mitglieder}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# Quelle genutzt} other {# Quellen genutzt}}"
 
@@ -1057,6 +1060,10 @@ msgstr "{localHostName} (dieses Gerät)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+#. e.g. Up to 5 members
+msgid "{members}"
+msgstr "{members}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1260,6 +1267,9 @@ msgstr "Noch {remaining} Tokens frei"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Änderungen an # Datei rückgängig gemacht.} other {Änderungen an # Dateien rückgängig gemacht.}}"
+
+msgid "{seatsUsed} of {seatLimit} members"
+msgstr "{seatsUsed} von {seatLimit} Mitgliedern"
 
 msgid "{seconds}s"
 msgstr "{seconds} Sek."
@@ -20281,6 +20291,9 @@ msgstr "Unbekannter Arbeitsbereich"
 msgid "Unlimited"
 msgstr "Unbegrenzt"
 
+msgid "Unlimited members"
+msgstr "Unbegrenzt viele Mitglieder"
+
 msgid "Unlink project"
 msgstr "Projektverknüpfung aufheben"
 
@@ -20367,6 +20380,10 @@ msgstr "Als Nächstes"
 
 msgid "Up Next"
 msgstr "Als Nächstes"
+
+msgctxt "members"
+msgid "Up to {count}"
+msgstr "Bis zu {count}"
 
 msgid "Up to {MAX_SAVED_VIEWS} saved views"
 msgstr "Höchstens {MAX_SAVED_VIEWS} gespeicherte Ansichten"
@@ -20477,6 +20494,9 @@ msgstr "Auf {planName} upgraden"
 
 msgid "Upgrade to Pro"
 msgstr "Auf Pro upgraden"
+
+msgid "Upgrade to Team"
+msgstr "Auf Team upgraden"
 
 msgid "Upgrade your plan"
 msgstr "Tarif upgraden"
@@ -21746,6 +21766,9 @@ msgstr "Deine eigenen Konten. Die Integrationen deiner Organisation lassen Parad
 
 msgid "Your Paradev download is starting."
 msgstr "Dein Paradev-Download startet."
+
+msgid "Your plan allows {limit} members."
+msgstr "Ihr Plan erlaubt {limit} Mitglieder."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Dein Plan enthält keine Cloud-Umgebungen."
