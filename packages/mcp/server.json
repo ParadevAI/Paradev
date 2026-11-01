@@ -9,7 +9,7 @@
 		"subfolder": "packages/mcp"
 	},
 	"version": "0.1.0",
-	"websiteUrl": "https://superset.sh/mcp-install",
+	"websiteUrl": "https://paradev.com/mcp-install",
 	"remotes": [
 		{
 			"type": "streamable-http",

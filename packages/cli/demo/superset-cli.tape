@@ -20,7 +20,7 @@ Set Padding 22
 Set Margin 28
 Set MarginFill "#0a0a0b"
 Set BorderRadius 12
-# Paradev brand palette — burnt-orange accent on near-black (matches superset.sh)
+# Paradev brand palette — burnt-orange accent on near-black (matches paradev.com)
 Set Theme { "name": "Paradev", "background": "#101012", "foreground": "#ECECEE", "cursor": "#E8804A", "selection": "#D2561140", "black": "#1C1C1F", "red": "#D25611", "green": "#6BB37E", "yellow": "#D2A24A", "blue": "#5B9BD5", "magenta": "#C97FD6", "cyan": "#56B6C2", "white": "#C8C8CC", "brightBlack": "#6B6B72", "brightRed": "#E8804A", "brightGreen": "#86D49B", "brightYellow": "#E8C07A", "brightBlue": "#7FB3E8", "brightMagenta": "#D896E4", "brightCyan": "#86D0DB", "brightWhite": "#FFFFFF" }
 Set TypingSpeed 28ms
 Set PlaybackSpeed 1.0
@@ -128,7 +128,7 @@ Type "# Drop it into any coding agent:"
 Sleep 400ms
 Enter
 Sleep 300ms
-Type "#   npx skills add https://superset.sh"
+Type "#   npx skills add https://paradev.com"
 Sleep 700ms
 Enter
 Sleep 250ms
@@ -140,7 +140,7 @@ Type "#   /plugin install superset@superset"
 Sleep 1.4s
 Enter
 Sleep 700ms
-Type "# File it, fix it, ship it — from your terminal.   superset.sh"
+Type "# File it, fix it, ship it — from your terminal.   paradev.com"
 Sleep 1.2s
 Enter
 Sleep 3s
