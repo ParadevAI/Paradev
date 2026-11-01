@@ -18,6 +18,14 @@ describe("isGitToolsMissingError", () => {
 		).toBe(true);
 	});
 
+	test("matches host-service's plain message", () => {
+		expect(
+			isGitToolsMissingError(
+				"Git can't run because Apple's Command Line Tools aren't installed on this Mac.",
+			),
+		).toBe(true);
+	});
+
 	test("ignores ordinary git failures", () => {
 		expect(
 			isGitToolsMissingError(
