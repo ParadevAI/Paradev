@@ -1,3 +1,6 @@
+import { requestAppleEventsAccess } from "main/lib/apple-events-permission";
+import { requestLocalNetworkAccess } from "main/lib/local-network-permission";
+import { registerWithMacOSNotificationCenter } from "main/lib/notification-center-registration";
 import { publicProcedure, router } from "..";
 import {
 	getPermissionStatus,
@@ -28,6 +31,12 @@ export const createPermissionsRouter = () => {
 
 		requestAppleEvents: publicProcedure.mutation(async () => {
 			await requestAppleEvents();
+		}),
+
+		requestPostOnboardingAccess: publicProcedure.mutation(() => {
+			registerWithMacOSNotificationCenter();
+			requestAppleEventsAccess();
+			requestLocalNetworkAccess();
 		}),
 
 		requestLocalNetwork: publicProcedure.mutation(async () => {

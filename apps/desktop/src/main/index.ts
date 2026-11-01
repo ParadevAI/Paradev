@@ -16,15 +16,7 @@ import {
 	workspaceDevAppProfileDirName,
 } from "@superset/shared/dev-app-profile";
 import { HTML_PREVIEW_SCHEME } from "@superset/shared/html-preview";
-import {
-	app,
-	BrowserWindow,
-	dialog,
-	Notification,
-	net,
-	protocol,
-	session,
-} from "electron";
+import { app, BrowserWindow, dialog, net, protocol, session } from "electron";
 import { makeAppSetup } from "lib/electron-app/factories/app/setup";
 import {
 	authEvents,
@@ -34,15 +26,10 @@ import {
 } from "lib/trpc/routers/auth/utils/auth-functions";
 import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
-import {
-	DEFAULT_CONFIRM_ON_QUIT,
-	PLATFORM,
-	PROTOCOL_SCHEME,
-} from "shared/constants";
+import { DEFAULT_CONFIRM_ON_QUIT, PROTOCOL_SCHEME } from "shared/constants";
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
 import { getAppDisplayName } from "./lib/app-display-name";
 import { initAppState } from "./lib/app-state";
-import { requestAppleEventsAccess } from "./lib/apple-events-permission";
 import {
 	isInstallingUpdate,
 	isUpdateReadyToInstall,
@@ -63,7 +50,6 @@ import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
 import { htmlPreviewProtocolHandler } from "./lib/html-preview-protocol";
 import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
-import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
 
@@ -209,33 +195,6 @@ export function focusMainWindow(): void {
 		// Triggers window creation via makeAppSetup's activate handler
 		app.emit("activate");
 	}
-}
-
-function registerWithMacOSNotificationCenter() {
-	if (!PLATFORM.IS_MAC || !Notification.isSupported()) return;
-
-	const registrationNotification = new Notification({
-		title: getAppDisplayName(),
-		body: " ",
-		silent: true,
-	});
-
-	let handled = false;
-	const cleanup = () => {
-		if (handled) return;
-		handled = true;
-		registrationNotification.close();
-	};
-
-	registrationNotification.on("show", () => {
-		cleanup();
-		console.log("[notifications] Registered with Notification Center");
-	});
-
-	// Fallback timeout in case macOS doesn't fire events
-	setTimeout(cleanup, 1000);
-
-	registrationNotification.show();
 }
 
 // macOS open-url can fire before the window exists (cold-start via protocol link).
@@ -510,9 +469,6 @@ if (!gotTheLock) {
 		if (getAppDisplayName() !== app.name) {
 			app.setAboutPanelOptions({ applicationName: getAppDisplayName() });
 		}
-		registerWithMacOSNotificationCenter();
-		requestAppleEventsAccess();
-		requestLocalNetworkAccess();
 
 		// Must register on both default session and the app's custom partition
 		const iconProtocolHandler = (request: Request) => {
