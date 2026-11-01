@@ -7,6 +7,7 @@ import { workspaces } from "../../../db/schema";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../types";
 import { chatContinuationTarget, chatLaunchTarget } from "../agents/agents";
+import { prepareAgentModelCatalog } from "../agents/utils/model-catalog";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { createChatSession } from "./create-chat-session";
@@ -97,6 +98,7 @@ export async function createChatSessionInWorkspace(
 	const input = createChatSessionSchema.parse(rawInput);
 	const workspace = requireSessionWorkspace(ctx, input.workspaceId);
 	seedDefaultsIfEmpty(ctx.db);
+	await prepareAgentModelCatalog(ctx.db, input);
 	const target = chatLaunchTarget(ctx.db, {
 		workspaceId: input.workspaceId,
 		agent: input.agent,

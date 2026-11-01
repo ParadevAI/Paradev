@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HOST_USAGE_QUOTA_QUERY_KEY } from "renderer/hooks/host-service/useHostUsageQuota";
+import { AGENT_MODEL_CATALOG_QUERY_KEY } from "renderer/hooks/useAgentModelCatalogs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
 /**
@@ -21,6 +22,9 @@ export function useSetDefaultUsageAccount(hostUrl: string | null) {
 			);
 		},
 		onSuccess: () => {
+			void queryClient.resetQueries({
+				queryKey: [...AGENT_MODEL_CATALOG_QUERY_KEY, hostUrl],
+			});
 			void queryClient.invalidateQueries({
 				queryKey: [...HOST_USAGE_QUOTA_QUERY_KEY, hostUrl],
 			});

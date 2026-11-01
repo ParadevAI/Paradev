@@ -4207,6 +4207,9 @@ msgstr "Paradevから通知するタイミングを選びます。"
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "コメント、デザインモード、Pages から起動したエージェントを開く場所を選択します。"
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "モデル選択に表示するモデルを選んでください。少なくとも1つ選択してください。"
+
 msgid "Choose your default skin tone"
 msgstr "デフォルトの肌の色を選択"
 
@@ -4619,6 +4622,9 @@ msgstr "コードブロック"
 
 msgid "Code Block"
 msgstr "Code Block"
+
+msgid "Codex models"
+msgstr "Codexのモデル"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "ディレクトリを一覧表示できませんでした"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0}からエージェントを読み込めませんでした"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Codexのモデルを読み込めませんでした。エージェントのアカウントを確認し、設定 → エージェントコマンド → Codexで再試行してください。"
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Codexのモデルを読み込めませんでした。エージェントのアカウントを確認して更新してください。"
 
 msgid "Could not load environments"
 msgstr "環境を読み込めませんでした"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "「{0}」をサイドバーから非表示にしました"
 
+msgid "Hidden by Codex"
+msgstr "Codexで非表示"
+
 msgid "Hidden folders"
 msgstr "非表示のフォルダ"
 
@@ -10859,6 +10874,9 @@ msgstr "変更を読み込み中..."
 msgid "Loading chat"
 msgstr "チャットを読み込み中"
 
+msgid "Loading Codex models…"
+msgstr "Codexのモデルを読み込み中…"
+
 msgid "Loading comments…"
 msgstr "コメントを読み込み中…"
 
@@ -12075,6 +12093,9 @@ msgstr "これらのフィルターに一致するクラウドワークスペー
 
 msgid "No cloud workspaces yet"
 msgstr "クラウドワークスペースはまだありません"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "利用可能なCodexモデルがありません。設定でエージェントのアカウントを確認してください。"
 
 msgid "No color"
 msgstr "色なし"
@@ -15190,6 +15211,9 @@ msgstr "最近表示した項目"
 
 msgid "Recents"
 msgstr "最近"
+
+msgid "Recommended"
+msgstr "推奨"
 
 msgid "Recommended size 256×256."
 msgstr "推奨サイズは256×256です。"

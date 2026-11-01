@@ -195,7 +195,6 @@ export interface WorkspaceNamingAgentContext {
 // so forcing one could break naming for those users).
 const NAMING_SMALL_MODELS: Record<string, string> = {
 	claude: "haiku",
-	codex: "gpt-5.6-luna",
 	gemini: "gemini-2.5-flash",
 	vibe: "devstral-small",
 };

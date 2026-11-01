@@ -48,11 +48,19 @@ export function launchConfigOptions(input: {
 			id: LAUNCH_MODEL_OPTION_ID,
 			label: labels.model,
 			category: "model",
-			...withDefault(
-				labels.defaultModel,
-				input.modelSupport.models,
-				input.selectedModel,
-			),
+			...(input.modelSupport.liveCatalog
+				? {
+						currentValue: input.selectedModel ?? "",
+						options: input.modelSupport.models.map(({ id, label }) => ({
+							id,
+							label,
+						})),
+					}
+				: withDefault(
+						labels.defaultModel,
+						input.modelSupport.models,
+						input.selectedModel,
+					)),
 		});
 	}
 	if (input.efforts.length > 0) {

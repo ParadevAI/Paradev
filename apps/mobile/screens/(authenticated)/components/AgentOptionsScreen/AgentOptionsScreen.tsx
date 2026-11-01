@@ -22,19 +22,29 @@ export function AgentOptionsScreen({
 	groupHref,
 }: {
 	/** Where a "Pinned releases ›" row goes — this stack's group screen. */
-	groupHref: (params: { presetId: string; group: string }) => Href;
+	groupHref: (params: {
+		presetId: string;
+		group: string;
+		hostUrl?: string;
+		agent?: string;
+	}) => Href;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
-	const { presetId, agentLabel } = useLocalSearchParams<{
+	const { presetId, agentLabel, hostUrl, agent } = useLocalSearchParams<{
 		presetId?: string;
 		agentLabel?: string;
+		hostUrl?: string;
+		agent?: string;
 	}>();
 	const launchPresetId = presetId || null;
-	const { models, model, efforts, effort } =
-		useAgentLaunchPreferences(launchPresetId);
+	const { models, model, efforts, effort } = useAgentLaunchPreferences(
+		launchPresetId,
+		hostUrl ?? null,
+		agent ?? launchPresetId,
+	);
 	const setModel = useNewSessionPreferencesStore((state) => state.setModel);
 	const setEffort = useNewSessionPreferencesStore((state) => state.setEffort);
 	const { inline, groups } = splitModelCatalog(models ?? []);
@@ -93,7 +103,12 @@ export function AgentOptionsScreen({
 							key={group}
 							onPress={() =>
 								router.push(
-									groupHref({ presetId: launchPresetId ?? "", group }),
+									groupHref({
+										presetId: launchPresetId ?? "",
+										group,
+										hostUrl,
+										agent,
+									}),
 								)
 							}
 							className="flex-row items-center gap-2.5 py-2.5"

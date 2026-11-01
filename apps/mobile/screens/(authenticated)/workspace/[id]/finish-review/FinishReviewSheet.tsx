@@ -80,6 +80,8 @@ export function FinishReviewSheet() {
 	// The preset id stands in until the configs answer (see NewChatWidget).
 	const launch = useAgentLaunchPreferences(
 		agentConfig ? agentLaunchPresetId(agentConfig) : agentId,
+		host ? hostServiceUrl(host.organizationId, host.machineId) : null,
+		agentConfig?.id ?? agentId,
 	);
 
 	const terminalRows = useMemo(

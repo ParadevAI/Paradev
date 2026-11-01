@@ -4207,6 +4207,9 @@ msgstr "Chọn khi nào Paradev báo cho bạn."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, chế độ thiết kế và Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Chọn các mô hình xuất hiện trong bộ chọn. Giữ ít nhất một mô hình được chọn."
+
 msgid "Choose your default skin tone"
 msgstr "Chọn màu da mặc định"
 
@@ -4619,6 +4622,9 @@ msgstr "Khối mã"
 
 msgid "Code Block"
 msgstr "Code Block"
+
+msgid "Codex models"
+msgstr "Mô hình Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Không thể liệt kê thư mục"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Không thể tải agent từ {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Không thể tải mô hình Codex. Kiểm tra tài khoản tác nhân và thử lại trong Cài đặt → Lệnh của agent → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Không thể tải mô hình Codex. Kiểm tra tài khoản tác nhân rồi làm mới."
 
 msgid "Could not load environments"
 msgstr "Không thể tải environment"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "Đã ẩn \"{0}\" khỏi thanh bên"
 
+msgid "Hidden by Codex"
+msgstr "Ẩn bởi Codex"
+
 msgid "Hidden folders"
 msgstr "Thư mục đã ẩn"
 
@@ -10859,6 +10874,9 @@ msgstr "Đang tải thay đổi..."
 msgid "Loading chat"
 msgstr "Đang tải cuộc trò chuyện"
 
+msgid "Loading Codex models…"
+msgstr "Đang tải mô hình Codex…"
+
 msgid "Loading comments…"
 msgstr "Đang tải bình luận…"
 
@@ -12075,6 +12093,9 @@ msgstr "Không có workspace cloud nào khớp với các bộ lọc này"
 
 msgid "No cloud workspaces yet"
 msgstr "Chưa có workspace cloud nào"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Không có mô hình Codex khả dụng. Kiểm tra tài khoản tác nhân trong Cài đặt."
 
 msgid "No color"
 msgstr "Không màu"
@@ -15190,6 +15211,9 @@ msgstr "Đã xem gần đây"
 
 msgid "Recents"
 msgstr "Gần đây"
+
+msgid "Recommended"
+msgstr "Đề xuất"
 
 msgid "Recommended size 256×256."
 msgstr "Kích thước khuyến nghị 256×256."

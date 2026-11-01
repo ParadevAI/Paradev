@@ -55,6 +55,11 @@ export function spawnCodexTransport(
 	child.stderr.setEncoding("utf8");
 	child.stderr.on("data", (chunk: string) => handlers.onStderr(chunk));
 	child.on("exit", (code, signal) => handlers.onExit(code, signal));
+	child.on("error", (error) => {
+		exited = true;
+		handlers.onStderr(error.message);
+		handlers.onExit(null, null);
+	});
 
 	let exited = false;
 	child.on("close", () => {

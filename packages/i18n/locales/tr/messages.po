@@ -4207,6 +4207,9 @@ msgstr "Paradev'in sizi ne zaman uyaracağını seçin."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Yorumlardan, tasarım modundan ve Pages üzerinden başlatılan ajanların nerede açılacağını seçin."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Model seçicide görünecek modelleri seçin. En az bir modeli seçili tutun."
+
 msgid "Choose your default skin tone"
 msgstr "Varsayılan ten rengini seç"
 
@@ -4619,6 +4622,9 @@ msgstr "Kod bloğu"
 
 msgid "Code Block"
 msgstr "Kod bloğu"
+
+msgid "Codex models"
+msgstr "Codex modelleri"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5525,6 +5531,12 @@ msgstr "Dizin listelenemedi"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "{0} üzerinden ajanlar yüklenemedi"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Codex modelleri yüklenemedi. Ajan hesabını kontrol edip Ayarlar → Ajan komutları → Codex bölümünde yeniden deneyin."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Codex modelleri yüklenemedi. Ajan hesabını kontrol edip yenileyin."
 
 msgid "Could not load environments"
 msgstr "Ortamlar yüklenemedi"
@@ -9283,6 +9295,9 @@ msgstr "Henry Ford"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "\"{0}\" kenar çubuğundan gizlendi"
 
+msgid "Hidden by Codex"
+msgstr "Codex tarafından gizlendi"
+
 msgid "Hidden folders"
 msgstr "Gizli klasörler"
 
@@ -10859,6 +10874,9 @@ msgstr "Değişiklikler yükleniyor..."
 msgid "Loading chat"
 msgstr "Sohbet yükleniyor"
 
+msgid "Loading Codex models…"
+msgstr "Codex modelleri yükleniyor…"
+
 msgid "Loading comments…"
 msgstr "Yorumlar yükleniyor…"
 
@@ -12075,6 +12093,9 @@ msgstr "Bu filtrelerle eşleşen bulut çalışma alanı yok"
 
 msgid "No cloud workspaces yet"
 msgstr "Henüz bulut çalışma alanı yok"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Kullanılabilir Codex modeli yok. Ayarlar bölümünde ajan hesabını kontrol edin."
 
 msgid "No color"
 msgstr "Renk yok"
@@ -15190,6 +15211,9 @@ msgstr "Son görüntülenenler"
 
 msgid "Recents"
 msgstr "Son kullanılanlar"
+
+msgid "Recommended"
+msgstr "Önerilen"
 
 msgid "Recommended size 256×256."
 msgstr "Önerilen boyut 256×256."

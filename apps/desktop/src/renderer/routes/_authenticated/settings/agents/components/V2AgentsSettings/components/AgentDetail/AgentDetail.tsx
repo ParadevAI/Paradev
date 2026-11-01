@@ -40,6 +40,8 @@ import {
 } from "../AgentFormControls";
 import { AgentIconPicker } from "../AgentIconPicker";
 
+import { CodexModelsSection } from "./components/CodexModelsSection";
+
 interface AgentDetailProps {
 	config: HostAgentConfig;
 	description: string;
@@ -306,6 +308,9 @@ export function AgentDetail({
 					</Section>
 				) : null}
 
+				{config.presetId === "codex" && (
+					<CodexModelsSection agentId={config.id} hostUrl={activeHostUrl} />
+				)}
 				<AgentLaunchFields
 					idPrefix={config.id}
 					commandText={commandText}

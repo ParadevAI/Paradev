@@ -4201,6 +4201,9 @@ msgstr "Виберіть, коли Paradev надсилатиме вам спо�
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Виберіть, де відкриваються агенти, запущені з коментарів, режиму дизайну та Pages."
 
+msgid "Choose which models appear in the model picker. Keep at least one selected."
+msgstr "Виберіть моделі для списку вибору. Залиште вибраною хоча б одну модель."
+
 msgid "Choose your default skin tone"
 msgstr "Виберіть тон шкіри за замовчуванням"
 
@@ -4613,6 +4616,9 @@ msgstr "Блок коду"
 
 msgid "Code Block"
 msgstr "Блок коду"
+
+msgid "Codex models"
+msgstr "Моделі Codex"
 
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
@@ -5519,6 +5525,12 @@ msgstr "Не вдалося отримати вміст папки"
 #. placeholder {0}: host.name
 msgid "Could not load agents from {0}"
 msgstr "Не вдалося завантажити агентів з {0}"
+
+msgid "Could not load Codex models. Check the agent account and retry in Settings → Agent commands → Codex."
+msgstr "Не вдалося завантажити моделі Codex. Перевірте обліковий запис агента й повторіть спробу в Налаштування → Команди агентів → Codex."
+
+msgid "Could not load Codex models. Check the agent account, then refresh."
+msgstr "Не вдалося завантажити моделі Codex. Перевірте обліковий запис агента й оновіть список."
 
 msgid "Could not load environments"
 msgstr "Не вдалося завантажити середовища"
@@ -9277,6 +9289,9 @@ msgstr "Генрі Форд"
 msgid "Hid \"{0}\" from the sidebar"
 msgstr "«{0}» приховано з бічної панелі"
 
+msgid "Hidden by Codex"
+msgstr "Приховано Codex"
+
 msgid "Hidden folders"
 msgstr "Приховані папки"
 
@@ -10853,6 +10868,9 @@ msgstr "Завантаження змін..."
 msgid "Loading chat"
 msgstr "Завантаження чату"
 
+msgid "Loading Codex models…"
+msgstr "Завантаження моделей Codex…"
+
 msgid "Loading comments…"
 msgstr "Завантаження коментарів…"
 
@@ -12069,6 +12087,9 @@ msgstr "Немає хмарних робочих просторів, що від
 
 msgid "No cloud workspaces yet"
 msgstr "Хмарних робочих просторів ще немає"
+
+msgid "No Codex models available. Check the agent account in Settings."
+msgstr "Немає доступних моделей Codex. Перевірте обліковий запис агента в налаштуваннях."
 
 msgid "No color"
 msgstr "Без кольору"
@@ -15184,6 +15205,9 @@ msgstr "Нещодавно переглянуті"
 
 msgid "Recents"
 msgstr "Нещодавні"
+
+msgid "Recommended"
+msgstr "Рекомендовано"
 
 msgid "Recommended size 256×256."
 msgstr "Рекомендований розмір 256×256."

@@ -1,16 +1,40 @@
 # Agent model catalog
 
-`packages/shared/src/agent-models.ts` owns the curated launch models used by
-agent settings, workspace creation, and host-side CLI validation.
+`packages/shared/src/agent-models.ts` defines model selection and launch
+validation. Agents other than Codex use its curated catalogs.
 `SUPERSET_CHAT_MODELS` in the same file supplies the cloud chat model list.
 Model names are provider identifiers and are not translated.
 
-## Codex refresh: October 30, 2026
+## Codex discovery and picker preferences
 
-Live `codex app-server` → `model/list` (codex 0.162.1) lists GPT-6.1 Sol,
-GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, GPT-6 Luna, and GPT-5.6 Sol, Terra, and
-Luna. Added GPT-6.1 Terra and removed the retired GPT-5.5. Every model takes
-`max`; all but the two Luna models take `ultra`.
+Codex models come from the installed CLI's `app-server`, using the existing
+agent launch environment and account selection. After `initialize` and
+`initialized`, discovery reads every `model/list` page with `includeHidden: true`.
+It preserves catalog order and uses the response's `model` field for execution.
+Display names, hidden/default flags, and supported/default reasoning efforts
+come from the same response. Codex may return a bundled or cached catalog;
+appearing in it does not guarantee account entitlement.
+
+The host exposes this catalog through `agents.listModels`. Concurrent discovery
+requests share a process. Explicit model/effort launches refresh before validation;
+a bounded cache supplies that result to synchronous command builders. Discovery
+failure does not fall back to a manually maintained Codex catalog.
+
+Settings → Agent commands → Codex saves picker visibility in the desktop-local
+`codex-picker-models` preference, separately from provider-hidden metadata.
+Initial selections include visible models and the recommended default. Filtering
+preserves catalog order. If all selected models disappear, the recommended or
+first available model becomes the effective choice. The final effective choice
+cannot be deselected. Desktop catalogs refresh on focus, every minute, and after
+account changes; each host has a separate query key.
+
+The installed `codex-acp` adapter rejects provider-hidden models, so chat pickers
+exclude them even when selected in Settings. Terminal pickers can include them.
+Mobile uses discovery with its existing launch preferences; desktop visibility
+preferences do not sync to mobile. Before cloud provisioning there is no host to
+query, so Codex launches with its own default model.
+
+See the [Codex app-server documentation](https://learn.chatgpt.com/docs/app-server).
 
 ## Verification: September 26, 2026
 
@@ -40,8 +64,7 @@ Validation covers catalog discovery, exact launch arguments, supported effort
 variants, host validation, shared-package types, and strict locale compilation.
 It does not establish successful inference on every provider or account.
 Available models still depend on account access, provider configuration, and
-installed CLI version. Existing saved choices and default model behavior are
-preserved.
+installed CLI version.
 
 ## Live smoke tests: September 27, 2026
 

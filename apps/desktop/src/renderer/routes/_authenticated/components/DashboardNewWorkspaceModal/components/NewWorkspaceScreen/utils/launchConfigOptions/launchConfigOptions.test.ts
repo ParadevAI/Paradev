@@ -68,3 +68,26 @@ describe("launchConfigOptions", () => {
 		expect(launchOptionValue("opus")).toBe("opus");
 	});
 });
+
+test("a discovered catalog keeps its explicit active model and catalog order", () => {
+	const [model] = launchConfigOptions({
+		modelSupport: {
+			presetId: "codex",
+			modelFlag: "--model",
+			liveCatalog: true,
+			models: [
+				{ id: "second", label: "Second" },
+				{ id: "first", label: "First" },
+			],
+		},
+		selectedModel: "first",
+		efforts: [],
+		selectedEffort: null,
+		labels,
+	});
+	expect(model?.currentValue).toBe("first");
+	expect(model?.options.map((option) => option.id)).toEqual([
+		"second",
+		"first",
+	]);
+});
