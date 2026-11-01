@@ -1,0 +1,1 @@
+export { useAutoCollapseInNarrowWindow } from "./useAutoCollapseInNarrowWindow";
