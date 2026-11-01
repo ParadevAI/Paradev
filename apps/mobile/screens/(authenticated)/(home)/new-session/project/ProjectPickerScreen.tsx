@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Box } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
@@ -22,6 +22,7 @@ import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/
  * doesn't open this at all.
  */
 export function ProjectPickerScreen() {
+	const { t } = useLingui();
 	const router = useRouter();
 	const routeParams = useLocalSearchParams<{ selectedKey?: string }>();
 	const theme = useTheme();
@@ -88,7 +89,11 @@ export function ProjectPickerScreen() {
 			}}
 		>
 			<HeaderToolbar placement="left">
-				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
 			</HeaderToolbar>
 			{targets.length === 0 ? (
 				<Text

@@ -69,7 +69,11 @@ export function AgentOptionsScreen({
 				options={{ title: agentLabel || t({ message: "Model" }) }}
 			/>
 			<HeaderToolbar placement="left">
-				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
 			</HeaderToolbar>
 			{models !== undefined ? (
 				<>

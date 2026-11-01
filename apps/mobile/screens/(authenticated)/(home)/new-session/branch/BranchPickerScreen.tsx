@@ -143,7 +143,11 @@ export function BranchPickerScreen() {
 	return (
 		<>
 			<HeaderToolbar placement="left">
-				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
 			</HeaderToolbar>
 			{/* The formSheet's content wrapper special-cases its direct subviews:
 			    it expects [header, ScrollView] and sizes the ScrollView to the

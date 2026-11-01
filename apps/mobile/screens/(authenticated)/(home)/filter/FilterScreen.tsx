@@ -31,7 +31,11 @@ export function FilterScreen() {
 	return (
 		<View className="bg-background flex-1 px-6">
 			<HeaderToolbar placement="left">
-				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
 			</HeaderToolbar>
 			<ListRow
 				icon={

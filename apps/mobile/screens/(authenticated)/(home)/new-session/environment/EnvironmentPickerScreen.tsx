@@ -55,7 +55,11 @@ export function EnvironmentPickerScreen() {
 			}}
 		>
 			<HeaderToolbar placement="left">
-				<HeaderToolbar.Button icon="close" onPress={() => router.back()} />
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
 			</HeaderToolbar>
 			{environmentsQuery.isPending ? (
 				<View className="items-center py-8">
