@@ -76,16 +76,44 @@ async function detectBrew(): Promise<BrewDetectResult> {
 	}
 }
 
-async function installCommandLineTools(): Promise<void> {
+export type InstallCommandLineToolsResult =
+	| { status: "requested" }
+	| { status: "already-installed" };
+
+async function installCommandLineTools(): Promise<InstallCommandLineToolsResult> {
 	if (process.platform !== "darwin") {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: "Command Line Tools are only available on macOS.",
 		});
 	}
-	await execFileAsync("/usr/bin/xcode-select", ["--install"], {
-		timeout: 10_000,
-	});
+	try {
+		// Returns as soon as Apple's installer window is requested; the install
+		// itself runs in that window.
+		await execFileAsync("/usr/bin/xcode-select", ["--install"], {
+			timeout: 10_000,
+		});
+		return { status: "requested" };
+	} catch (error) {
+		const stderr =
+			error && typeof error === "object" && "stderr" in error
+				? String(error.stderr)
+				: "";
+		// "xcode-select: error: command line tools are already installed, use
+		// "Software Update" in System Settings to install updates"
+		if (/already installed/i.test(stderr)) {
+			return { status: "already-installed" };
+		}
+		const reason = stderr
+			.split("\n")
+			.map((line) => line.replace(/^xcode-select: (?:error|note): /, "").trim())
+			.find(Boolean);
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: reason ?? "xcode-select --install failed.",
+			cause: error,
+		});
+	}
 }
 
 export const createSystemRouter = () => {

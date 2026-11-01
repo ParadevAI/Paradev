@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { TRPCError } from "@trpc/server";
 import { simpleGit } from "simple-git";
-import { rethrowEnvironmentalGitError } from "./classify-git-error";
+import {
+	GIT_TOOLS_MISSING_MESSAGE,
+	rethrowEnvironmentalGitError,
+	rethrowGitToolsMissing,
+} from "./classify-git-error";
 
 function capture(error: unknown): TRPCError | null {
 	try {
@@ -635,5 +639,32 @@ describe("rethrowEnvironmentalGitError", () => {
 				),
 			),
 		).toBeNull();
+	});
+});
+
+describe("rethrowGitToolsMissing", () => {
+	const stub =
+		"Cloning into '/Users/me/Paradev/Hello-World'...\n" +
+		"xcode-select: note: No developer tools were found, requesting install.\n" +
+		"If developer tools are located at a non-default location on disk, use `sudo xcode-select --switch path/to/Xcode.app` to specify the Xcode that you wish to use for command line developer tools, and cancel the installation dialog.\n";
+
+	test("turns the stub's refusal into a plain PRECONDITION_FAILED", () => {
+		let thrown: unknown = null;
+		try {
+			rethrowGitToolsMissing(new Error(stub));
+		} catch (error) {
+			thrown = error;
+		}
+		expect(thrown).toBeInstanceOf(TRPCError);
+		expect((thrown as TRPCError).code).toBe("PRECONDITION_FAILED");
+		expect((thrown as TRPCError).message).toBe(GIT_TOOLS_MISSING_MESSAGE);
+	});
+
+	test("leaves ordinary git failures alone", () => {
+		expect(() =>
+			rethrowGitToolsMissing(
+				new Error("fatal: repository 'https://github.com/a/b/' not found"),
+			),
+		).not.toThrow();
 	});
 });

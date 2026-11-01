@@ -112,6 +112,31 @@ const PUSH_REFUSED_PATTERN = /^error: failed to push some refs to '/im;
 const PUSH_SRC_REFSPEC_UNRESOLVED_PATTERN =
 	/^error: src refspec .* does not match any$/im;
 
+export const GIT_TOOLS_MISSING_MESSAGE =
+	"Git can't run because Apple's Command Line Tools aren't installed on this Mac.";
+
+/**
+ * True when git never ran because the macOS /usr/bin/git stub refused (no
+ * Command Line Tools, a broken Xcode, or an unaccepted Xcode license).
+ */
+export function isGitToolsMissingError(error: unknown): boolean {
+	const message = error instanceof Error ? error.message : String(error);
+	return (
+		XCODE_SELECT_NO_TOOLS_PATTERN.test(message) ||
+		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(message)
+	);
+}
+
+/** Throws the plain-language PRECONDITION_FAILED for a stub refusal. */
+export function rethrowGitToolsMissing(error: unknown): void {
+	if (!isGitToolsMissingError(error)) return;
+	throw new TRPCError({
+		code: "PRECONDITION_FAILED",
+		message: GIT_TOOLS_MISSING_MESSAGE,
+		cause: { kind: "GIT_ENVIRONMENT" },
+	});
+}
+
 /**
  * Rethrows environmental git failures — the same classification
  * resolve-worktree.ts applies before git runs — and pushes git refused as

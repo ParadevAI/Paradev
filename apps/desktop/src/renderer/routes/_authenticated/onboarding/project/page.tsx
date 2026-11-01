@@ -17,7 +17,6 @@ import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWor
 import { track } from "renderer/lib/analytics";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
-import { getDefaultProjectsDir } from "renderer/lib/defaultProjectsDir";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
@@ -270,6 +269,7 @@ function OnboardingProjectPage() {
 			{gitStatus && gitMissing && (
 				<GitMissingNotice
 					needsCommandLineTools={gitStatus.needsCommandLineTools}
+					installerRunning={gitStatus.installerRunning}
 					error={gitStatus.error}
 				/>
 			)}
