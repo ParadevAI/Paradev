@@ -853,8 +853,14 @@ export function HomeScreen() {
 					keyboardDismissMode="on-drag"
 					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{
-						minHeight:
-							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
+						// Fills the screen under a transparent header; an opaque header
+						// already takes its height, so the list would scroll empty.
+						minHeight: contentScrollsUnderHeader
+							? windowHeight -
+								insets.top -
+								NAVIGATION_BAR_HEIGHT -
+								insets.bottom
+							: undefined,
 						paddingBottom: 112,
 						paddingTop: 8,
 						paddingHorizontal: listInset,
