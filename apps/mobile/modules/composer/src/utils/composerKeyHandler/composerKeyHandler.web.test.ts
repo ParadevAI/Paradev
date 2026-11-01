@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import type { TextInputKeyPressEvent } from "react-native";
-import { useComposerKeys } from "./useComposerKeys.web";
+import { composerKeyHandler } from "./composerKeyHandler.web";
 
 function press(
 	key: string,
@@ -12,7 +12,7 @@ function press(
 	const onSubmit = mock(() => {});
 	const onDismiss = mock(() => {});
 	const preventDefault = mock(() => {});
-	const handler = useComposerKeys({ onSubmit, onDismiss });
+	const handler = composerKeyHandler({ onSubmit, onDismiss });
 	handler?.({
 		key,
 		shiftKey: shift,
@@ -31,7 +31,7 @@ function press(
 
 const originalWindow = (globalThis as { window?: unknown }).window;
 
-describe("useComposerKeys on the web", () => {
+describe("composerKeyHandler on the web", () => {
 	afterEach(() => {
 		(globalThis as { window?: unknown }).window = originalWindow;
 	});

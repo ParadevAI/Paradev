@@ -1,8 +1,8 @@
 import type { KeyboardEvent } from "react";
-import type { UseComposerKeys } from "./useComposerKeys.types";
+import type { ComposerKeyHandler } from "./composerKeyHandler.types";
 
 /** Enter sends and Shift+Enter breaks the line, unless a touch keyboard is typing. */
-export const useComposerKeys: UseComposerKeys =
+export const composerKeyHandler: ComposerKeyHandler =
 	({ onSubmit, onDismiss }) =>
 	(event) => {
 		const key = event as unknown as KeyboardEvent<HTMLTextAreaElement>;

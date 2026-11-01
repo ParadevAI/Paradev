@@ -7,6 +7,6 @@ export interface ComposerKeysOptions {
 
 export type ComposerKeyPress = (event: TextInputKeyPressEvent) => void;
 
-export type UseComposerKeys = (
+export type ComposerKeyHandler = (
 	options: ComposerKeysOptions,
 ) => ComposerKeyPress | undefined;

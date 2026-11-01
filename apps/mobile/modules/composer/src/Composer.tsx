@@ -47,9 +47,9 @@ import { ComposerSessionTabs } from "./components/ComposerSessionTabs";
 import { ComposerSlashSuggestions } from "./components/ComposerSlashSuggestions";
 import { COMPOSER_COLORS, COMPOSER_METRICS } from "./constants";
 import { useAttachmentPaste } from "./hooks/useAttachmentPaste";
-import { useComposerKeys } from "./hooks/useComposerKeys";
 import { useDictation } from "./hooks/useDictation";
 import { useSwipeToDismiss } from "./hooks/useSwipeToDismiss";
+import { composerKeyHandler } from "./utils/composerKeyHandler";
 import { joinDraft } from "./utils/joinDraft";
 import {
 	committedSlashDraft,
@@ -170,7 +170,7 @@ export const Composer: ComposerComponent = forwardRef<
 		if (!hasContent || isSending || isUploading) return;
 		onSubmit?.(draft);
 	};
-	const onKeyPress = useComposerKeys({
+	const onKeyPress = composerKeyHandler({
 		onSubmit: submit,
 		onDismiss: () => inputRef.current?.blur(),
 	});
