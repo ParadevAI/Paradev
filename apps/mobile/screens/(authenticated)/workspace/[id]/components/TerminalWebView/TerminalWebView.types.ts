@@ -56,6 +56,9 @@ export interface TerminalWebViewProps {
 	/** The viewport reached or left the bottom of the scrollback — drives the
 	 *  scroll-to-bottom button, which lives outside the WebView. */
 	onScrollChange?: (atBottom: boolean) => void;
+	/** The terminal took or lost the keyboard itself. Only a terminal that
+	 *  takes typing directly reports it; the others type through the composer. */
+	onKeyboardFocusChange?: (focused: boolean) => void;
 }
 
 export type PageMessage =

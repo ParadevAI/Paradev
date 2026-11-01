@@ -634,6 +634,7 @@ export function WorkspaceScreen() {
 	const [composerHeight, setComposerHeight] = useState(0);
 	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [composerActive, setComposerActive] = useState(false);
+	const [typingInTerminal, setTypingInTerminal] = useState<string | null>(null);
 	const composerRef = useRef<ComposerHandle>(null);
 	const shareAnchorRef = useRef<ViewInstance>(null);
 	const [select, setSelect] = useState<TerminalSelectState>({
@@ -1166,6 +1167,9 @@ export function WorkspaceScreen() {
 							onSelectChange={setSelect}
 							onCopied={handleCopied}
 							onScrollChange={setAtBottom}
+							onKeyboardFocusChange={(focused) =>
+								setTypingInTerminal(focused ? activeTerminalId : null)
+							}
 							// Tap-to-dismiss without an overlay: a Pressable stacked over
 							// the WebView also ate scroll drags, so the scrollback froze
 							// whenever the keyboard was up. The page reports plain taps
@@ -1296,7 +1300,10 @@ export function WorkspaceScreen() {
 					ref={composerRef}
 					selectActive={select.active}
 					selectHasSelection={select.hasSelection}
-					hideQuickKeys={activeIsChat}
+					hideQuickKeys={
+						activeIsChat ||
+						(typingInTerminal !== null && typingInTerminal === activeTerminalId)
+					}
 					sendsAttachments={activeIsChat}
 					canStop={activeIsChat && chatRunning}
 					onStop={stopChat}
