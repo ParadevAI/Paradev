@@ -142,12 +142,10 @@ export function TabBar<TData>({
 			if (next !== null) scroller.scrollTo({ left: next, behavior });
 		};
 		reveal("smooth");
-		let isInitialCallback = true;
+		let revealedWidth = scroller.clientWidth;
 		const observer = new ResizeObserver(() => {
-			if (isInitialCallback) {
-				isInitialCallback = false;
-				return;
-			}
+			if (scroller.clientWidth === revealedWidth) return;
+			revealedWidth = scroller.clientWidth;
 			reveal("instant");
 		});
 		observer.observe(scroller);
