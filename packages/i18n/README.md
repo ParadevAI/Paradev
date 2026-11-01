@@ -82,8 +82,10 @@ page shows the raw id (for example `RaI2t2`). The compiler:
 - renames a placeholder that another variable shadows, so `{level}` becomes
   `{level_0}`.
 
-`check:i18n` builds every macro file in those apps both ways and fails when
-the ids differ. To fix a failure without changing the English, add
+`check:i18n` builds every macro file in those apps, and in the workspace
+packages they depend on, both ways. It fails when the compiled build has an id
+that the plain build does not. It skips test, spec, and story files. To fix a
+failure without changing the English, add
 `"use no memo"` to the component, use the tagged `` t`…${x}…` `` form, or rename
 the shadowing variable.
 

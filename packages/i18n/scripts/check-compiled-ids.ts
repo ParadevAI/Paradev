@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, relative, resolve } from "node:path";
 import { transformAsync } from "@babel/core";
@@ -30,11 +30,57 @@ function compilerApps(): string[] {
 		} catch {
 			return false;
 		}
-		return (
-			/reactCompiler:\s*true/.test(config) &&
-			config.includes("@lingui/swc-plugin")
-		);
+		const setting = config.match(/reactCompiler:\s*([^,\n]+)/)?.[1]?.trim();
+		if (!setting || setting === "false") return false;
+		if (setting !== "true") {
+			throw new Error(
+				`apps/${app}/next.config.ts sets reactCompiler to ${setting}; teach scripts/check-compiled-ids.ts to pass those options.`,
+			);
+		}
+		return config.includes("@lingui/swc-plugin");
 	});
+}
+
+function readManifest(dir: string): {
+	name?: string;
+	dependencies?: Record<string, string>;
+	devDependencies?: Record<string, string>;
+} {
+	return JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+}
+
+function workspacePackages(): Map<string, string> {
+	const packagesDir = join(REPO_ROOT, "packages");
+	const byName = new Map<string, string>();
+	for (const entry of readdirSync(packagesDir)) {
+		const dir = join(packagesDir, entry);
+		if (!existsSync(join(dir, "package.json"))) continue;
+		const { name } = readManifest(dir);
+		if (name) byName.set(name, dir);
+	}
+	return byName;
+}
+
+// The app's own source plus every workspace package it builds, transitively.
+function sourceRoots(appDir: string, packages: Map<string, string>): string[] {
+	const seen = new Set<string>([appDir]);
+	const queue = [appDir];
+	for (const dir of queue) {
+		const { dependencies = {}, devDependencies = {} } = readManifest(dir);
+		for (const [name, version] of Object.entries({
+			...dependencies,
+			...devDependencies,
+		})) {
+			const packageDir = packages.get(name);
+			if (!version.startsWith("workspace:") || !packageDir) continue;
+			if (seen.has(packageDir)) continue;
+			seen.add(packageDir);
+			queue.push(packageDir);
+		}
+	}
+	return [...seen]
+		.map((dir) => join(dir, "src"))
+		.filter((dir) => existsSync(dir));
 }
 
 function macroFiles(dir: string): string[] {
@@ -62,7 +108,10 @@ function descriptors(code: string): Map<string, string> {
 	return found;
 }
 
-async function checkApp(app: string): Promise<string[]> {
+async function checkApp(
+	app: string,
+	packages: Map<string, string>,
+): Promise<string[]> {
 	const appDir = join(REPO_ROOT, "apps", app);
 	const appRequire = createRequire(join(appDir, "package.json"));
 	const swc = appRequire("next/dist/build/swc/index.js") as SwcBindings;
@@ -70,7 +119,8 @@ async function checkApp(app: string): Promise<string[]> {
 	const linguiPlugin = appRequire.resolve("@lingui/swc-plugin");
 
 	const problems: string[] = [];
-	for (const file of macroFiles(join(appDir, "src"))) {
+	const files = sourceRoots(appDir, packages).flatMap(macroFiles);
+	for (const file of files) {
 		const source = readFileSync(file, "utf8");
 		const swcOptions = {
 			filename: file,
@@ -105,7 +155,14 @@ async function checkApp(app: string): Promise<string[]> {
 	return problems;
 }
 
-const problems = (await Promise.all(compilerApps().map(checkApp))).flat();
+const packages = workspacePackages();
+const problems = [
+	...new Set(
+		(
+			await Promise.all(compilerApps().map((app) => checkApp(app, packages)))
+		).flat(),
+	),
+];
 if (problems.length > 0) {
 	console.error(
 		`React Compiler changes ${problems.length} Lingui message(s), so production renders the raw id:\n`,
