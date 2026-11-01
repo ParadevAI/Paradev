@@ -13987,8 +13987,8 @@ msgstr "Paradev Sayfalar demosu"
 msgid "Paradev Plugins"
 msgstr "Paradev Eklentileri"
 
-msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at trust.paradev.com."
-msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi trust.paradev.com adresinde inceleyin."
+msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
+msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
@@ -21487,8 +21487,8 @@ msgstr "Evet. Ücretsiz plan; 1 kullanıcı, yerel çalışma alanları, masaüs
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Evet. Bulut çalışma alanı olan planlarda sahipler, Ayarlar, Faturalandırma bölümünden GB-saat başına {packPrice} fiyatla istedikleri kadar ek GB-saat satın alabilir. Satın alınan GB-saatler aylık havuzdan sonra kullanılır ve süresi dolmaz; otomatik yükleme azaldıklarında daha fazlasını satın alabilir."
 
-msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.paradev.com."
-msgstr "Evet. Paradev, güvenlik kontrollerinin zaman içindeki işleyişini kapsayan SOC 2 Type II denetimini bağımsız bir denetçiyle tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi trust.paradev.com adresinde inceleyin."
+msgid "Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}."
+msgstr "Evet. Paradev, güvenlik kontrollerinin zaman içindeki işleyişini kapsayan SOC 2 Type II denetimini bağımsız bir denetçiyle tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
 
 msgid "Yes. Paradev is the workspace your agents run in, not a model provider. Bring Claude Code, Codex, OpenCode, or any CLI agent, and use your existing accounts or API keys on every plan."
 msgstr "Evet. Paradev, ajanlarınızın çalıştığı çalışma alanıdır, bir model sağlayıcısı değil. Claude Code, Codex, OpenCode veya herhangi bir CLI ajanını getirin ve her planda mevcut hesaplarınızı ya da API anahtarlarınızı kullanın."

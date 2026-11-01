@@ -589,7 +589,7 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at trust.paradev.com.",
+				"Yes. Paradev has completed a SOC 2 Type II audit with an independent auditor, covering our security controls in operation over time. Request the report and review our security documentation at {trustHost}.",
 		}),
 	},
 	{
