@@ -38,9 +38,7 @@ export function ClickableFilePath({
 		<span
 			role="button"
 			tabIndex={0}
-			aria-label={t({
-				message: `Open ${path} in file pane`,
-			})}
+			aria-label={t`Open ${path} in file pane`}
 			className={`cursor-pointer underline-offset-2 transition-colors hover:text-foreground hover:underline ${className ?? ""}`}
 			onClick={(e) => {
 				e.stopPropagation();

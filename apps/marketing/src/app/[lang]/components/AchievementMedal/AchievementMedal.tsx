@@ -23,6 +23,7 @@ export function AchievementMedal({
 	tier,
 	awardedOn,
 }: AchievementMedalProps) {
+	"use no memo";
 	const { formatDate } = useFormat();
 
 	const { t, i18n } = useLingui();

@@ -67,6 +67,28 @@ regenerated catalogs differ from what was committed. Nothing on CI fills
 translations, so a PR with untranslated strings stays red until its author
 fills them. Never hand-edit `locales/en/messages.po`; it is derived from source.
 
+## React Compiler
+
+`apps/marketing`, `apps/web`, and `apps/api` build with React Compiler, and
+Next runs it before the Lingui SWC macro. Extraction reads the source, so the
+two can disagree: the build then asks for an id that no catalog has, and the
+page shows the raw id (for example `RaI2t2`). The compiler:
+
+- moves the first JSX element out of a `<Trans>` that has two or more of them,
+  so `<0>Paradev</0>` becomes `{t3}`;
+- moves a call such as `{formatDate(date)}` out of a `<Trans>`;
+- moves a `t({ message: \`…${x}…\` })` template, so the message becomes empty
+  (`_-Z5u4`);
+- renames a placeholder that another variable shadows, so `{level}` becomes
+  `{level_0}`.
+
+`check:i18n` builds every macro file in those apps, and in the workspace
+packages they depend on, both ways. It fails when the compiled build has an id
+that the plain build does not. It skips test, spec, and story files. To fix a
+failure without changing the English, add
+`"use no memo"` to the component, use the tagged `` t`…${x}…` `` form, or rename
+the shadowing variable.
+
 ## Client activation and formatting
 
 `initI18nAsync(locale)` loads before activating and ignores completions from older

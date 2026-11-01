@@ -34,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
+	"use no memo";
 	await initServerI18n();
 
 	// Named locals so the paragraph extracts with `{supportEmail}` /
