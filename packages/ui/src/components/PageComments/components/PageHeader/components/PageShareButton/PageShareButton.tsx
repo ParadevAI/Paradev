@@ -22,6 +22,7 @@ interface PageShareButtonProps {
 	currentUserId: string | undefined;
 	sharing: PageHeaderActions["sharing"];
 	compact?: boolean;
+	labelClassName?: string;
 }
 
 export function PageShareButton({
@@ -35,6 +36,7 @@ export function PageShareButton({
 	currentUserId,
 	sharing,
 	compact = false,
+	labelClassName,
 }: PageShareButtonProps) {
 	const { t } = useLingui();
 	const { visibility, setVisibility } = usePendingVisibility(
@@ -71,11 +73,7 @@ export function PageShareButton({
 				title={label}
 			>
 				<Share2 className="size-3.5" />
-				<span
-					className={
-						compact ? "hidden @min-[360px]/pane-header:inline" : undefined
-					}
-				>
+				<span className={labelClassName}>
 					<Trans>Share</Trans>
 				</span>
 			</Button>
