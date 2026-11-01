@@ -71,7 +71,13 @@ export function PageShareButton({
 				title={label}
 			>
 				<Share2 className="size-3.5" />
-				<Trans>Share</Trans>
+				<span
+					className={
+						compact ? "hidden @min-[360px]/pane-header:inline" : undefined
+					}
+				>
+					<Trans>Share</Trans>
+				</span>
 			</Button>
 		</PageSharePopover>
 	);
