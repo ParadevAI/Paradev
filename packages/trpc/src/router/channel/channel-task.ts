@@ -1,17 +1,18 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	channelMembers,
 	channels,
-	channelTasks,
+	taskProjects,
+	taskProjectTasks,
 	taskStatuses,
 	tasks,
 	users,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
+import { pickEntityColor } from "@superset/shared/entity-colors";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { userError } from "../../i18n-error";
 import { protectedProcedure } from "../../trpc";
 import {
 	assertTaskInOrganization,
@@ -33,22 +34,54 @@ async function announceTasks(channelId: string) {
 	});
 }
 
-async function currentChannelId(taskId: string) {
+async function channelProjectId(channelId: string) {
 	const [row] = await db
-		.select({ channelId: channelTasks.channelId })
-		.from(channelTasks)
-		.where(eq(channelTasks.taskId, taskId))
+		.select({ projectId: channels.taskProjectId })
+		.from(channels)
+		.where(eq(channels.id, channelId))
 		.limit(1);
-	return row?.channelId ?? null;
+	return row?.projectId ?? null;
+}
+
+/** The channel's project, made and named after the channel when it has none. */
+async function ensureChannelProject(channel: {
+	id: string;
+	name: string;
+	organizationId: string;
+	taskProjectId: string | null;
+}) {
+	if (channel.taskProjectId) return channel.taskProjectId;
+	return dbWs.transaction(async (tx) => {
+		const [locked] = await tx
+			.select({ projectId: channels.taskProjectId })
+			.from(channels)
+			.where(eq(channels.id, channel.id))
+			.for("update");
+		if (locked?.projectId) return locked.projectId;
+		const [project] = await tx
+			.insert(taskProjects)
+			.values({
+				organizationId: channel.organizationId,
+				name: channel.name.charAt(0).toUpperCase() + channel.name.slice(1),
+				color: pickEntityColor(),
+			})
+			.returning({ id: taskProjects.id });
+		if (!project) throw new Error("project insert returned no row");
+		await tx
+			.update(channels)
+			.set({ taskProjectId: project.id })
+			.where(eq(channels.id, channel.id));
+		return project.id;
+	});
 }
 
 export const channelTaskRouter = {
-	/** The channel a task belongs to, when the reader can see that channel. */
+	/** A channel showing the task's project, when the reader can see one. */
 	forTask: protectedProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const [row] = await db
+			const rows = await db
 				.select({
 					id: channels.id,
 					name: channels.name,
@@ -56,8 +89,11 @@ export const channelTaskRouter = {
 					organizationId: channels.organizationId,
 					isMember: channelMembers.actorId,
 				})
-				.from(channelTasks)
-				.innerJoin(channels, eq(channels.id, channelTasks.channelId))
+				.from(taskProjectTasks)
+				.innerJoin(
+					channels,
+					eq(channels.taskProjectId, taskProjectTasks.projectId),
+				)
 				.leftJoin(
 					channelMembers,
 					and(
@@ -65,23 +101,35 @@ export const channelTaskRouter = {
 						eq(channelMembers.actorId, userId),
 					),
 				)
-				.where(eq(channelTasks.taskId, input.taskId))
-				.limit(1);
+				.where(
+					and(
+						eq(taskProjectTasks.taskId, input.taskId),
+						isNull(channels.archivedAt),
+					),
+				)
+				.orderBy(asc(channels.createdAt));
+			const row = rows.find(
+				(candidate) => candidate.visibility !== "private" || candidate.isMember,
+			);
 			if (!row) return null;
 			const inOrg = await findOrgMembership({
 				userId,
 				organizationId: row.organizationId,
 			});
 			if (!inOrg) return null;
-			if (row.visibility === "private" && !row.isMember) return null;
 			return { id: row.id, name: row.name, visibility: row.visibility };
 		}),
 
-	/** The channel's tasks, newest added first. */
+	/** The tasks in the channel's project, newest added first. */
 	list: protectedProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
-			await loadChannelAccess(ctx.session.user.id, input.channelId);
+			const access = await loadChannelAccess(
+				ctx.session.user.id,
+				input.channelId,
+			);
+			const projectId = access.channel.taskProjectId;
+			if (!projectId) return [];
 			const rows = await db
 				.select({
 					...taskColumns,
@@ -89,24 +137,24 @@ export const channelTaskRouter = {
 					assigneeName: users.name,
 					assigneeImage: users.image,
 				})
-				.from(channelTasks)
-				.innerJoin(tasks, eq(tasks.id, channelTasks.taskId))
+				.from(taskProjectTasks)
+				.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
 				.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
 				.leftJoin(users, eq(users.id, tasks.assigneeId))
 				.where(
 					and(
-						eq(channelTasks.channelId, input.channelId),
+						eq(taskProjectTasks.projectId, projectId),
 						isNull(tasks.deletedAt),
 					),
 				)
-				.orderBy(desc(channelTasks.createdAt));
+				.orderBy(desc(taskProjectTasks.createdAt));
 			return rows.map((row) => ({
 				...toTaskChip(row),
 				assignee: toAssignee(row),
 			}));
 		}),
 
-	/** A task belongs to one channel; adding it here moves it from any other. */
+	/** Moves the task into the channel's project, making the project if needed. */
 	add: protectedProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -119,38 +167,36 @@ export const channelTaskRouter = {
 				input.taskId,
 				access.channel.organizationId,
 			);
-			const previous = await currentChannelId(input.taskId);
-			if (previous && previous !== input.channelId) {
-				await loadChannelAccess(ctx.session.user.id, previous).catch(() => {
-					throw userError({
-						code: "FORBIDDEN",
-						message: "This task is in a channel you can't see",
-						i18nKey: "serverError.channel.taskInHiddenChannel",
-					});
-				});
-			}
+			const projectId = await ensureChannelProject(access.channel);
+			const previous = await db.query.taskProjectTasks.findFirst({
+				where: eq(taskProjectTasks.taskId, input.taskId),
+				columns: { projectId: true },
+			});
 			await db
-				.insert(channelTasks)
-				.values({ channelId: input.channelId, taskId: input.taskId })
+				.insert(taskProjectTasks)
+				.values({ projectId, taskId: input.taskId })
 				.onConflictDoUpdate({
-					target: channelTasks.taskId,
-					set: { channelId: input.channelId, createdAt: new Date() },
+					target: taskProjectTasks.taskId,
+					set: { projectId, createdAt: new Date() },
 				});
-			if (previous !== input.channelId) {
+			if (previous?.projectId !== projectId) {
 				await recordTaskActivity(
 					db,
 					input.taskId,
 					{ kind: "user", userId: ctx.session.user.id },
-					[{ fromChannelId: previous, toChannelId: input.channelId }],
+					[
+						{
+							fromProjectId: previous?.projectId ?? null,
+							toProjectId: projectId,
+						},
+					],
 				);
 			}
 			await announceTasks(input.channelId);
-			if (previous && previous !== input.channelId) {
-				await announceTasks(previous);
-			}
 			return { added: true };
 		}),
 
+	/** Takes the task out of the channel's project. */
 	remove: protectedProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -159,21 +205,24 @@ export const channelTaskRouter = {
 				input.channelId,
 			);
 			assertCanPost(access);
-			const [removed] = await db
-				.delete(channelTasks)
-				.where(
-					and(
-						eq(channelTasks.channelId, input.channelId),
-						eq(channelTasks.taskId, input.taskId),
-					),
-				)
-				.returning({ taskId: channelTasks.taskId });
+			const projectId = await channelProjectId(input.channelId);
+			const [removed] = projectId
+				? await db
+						.delete(taskProjectTasks)
+						.where(
+							and(
+								eq(taskProjectTasks.projectId, projectId),
+								eq(taskProjectTasks.taskId, input.taskId),
+							),
+						)
+						.returning({ taskId: taskProjectTasks.taskId })
+				: [];
 			if (removed) {
 				await recordTaskActivity(
 					db,
 					input.taskId,
 					{ kind: "user", userId: ctx.session.user.id },
-					[{ fromChannelId: input.channelId, toChannelId: null }],
+					[{ fromProjectId: projectId, toProjectId: null }],
 				);
 			}
 			await announceTasks(input.channelId);

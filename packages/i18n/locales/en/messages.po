@@ -19581,9 +19581,6 @@ msgstr "This subagent can't move to the background now"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 
-msgid "This task is in a channel you can't see"
-msgstr "This task is in a channel you can't see"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "This terminal has no output to hand over yet."
 

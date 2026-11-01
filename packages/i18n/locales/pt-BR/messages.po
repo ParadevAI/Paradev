@@ -19581,9 +19581,6 @@ msgstr "Este subagente não pode ir para segundo plano agora"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Este subagente não é mais rastreado pelo host. A transcrição continua no disco, no diretório de sessão do agente."
 
-msgid "This task is in a channel you can't see"
-msgstr "Esta tarefa está em um canal que você não pode ver"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Este terminal ainda não tem saída para repassar."
 

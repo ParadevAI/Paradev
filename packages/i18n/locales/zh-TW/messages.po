@@ -19581,9 +19581,6 @@ msgstr "此子代理程式目前無法移到背景"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主機已不再追蹤此子代理程式。其逐字稿仍保留在磁碟上的代理程式工作階段目錄中。"
 
-msgid "This task is in a channel you can't see"
-msgstr "此任務位於你看不到的頻道中"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "這個終端還沒有可交接的輸出。"
 

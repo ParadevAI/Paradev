@@ -19581,9 +19581,6 @@ msgstr "Subagen ini tidak bisa dipindahkan ke latar belakang sekarang"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Subagen ini tidak lagi dilacak oleh host. Transkripnya tetap tersimpan di disk pada direktori sesi agen."
 
-msgid "This task is in a channel you can't see"
-msgstr "Tugas ini ada di saluran yang tidak dapat Anda lihat"
-
 msgid "This terminal has no output to hand over yet."
 msgstr "Terminal ini belum punya keluaran untuk diserahkan."
 
