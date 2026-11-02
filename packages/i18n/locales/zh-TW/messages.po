@@ -6478,7 +6478,7 @@ msgid "Debug"
 msgstr "除錯"
 
 msgid "Debug failed runs and rerun functions"
-msgstr "偵錯失敗的執行並重新執行函式"
+msgstr "除錯失敗的執行並重新執行函式"
 
 msgid "Debug with production stack traces"
 msgstr "用正式環境堆疊追蹤除錯"

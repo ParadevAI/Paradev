@@ -5,14 +5,6 @@ description: Search the web, scrape and crawl sites, extract structured data, an
 
 Search the web, scrape and crawl sites, extract structured data, and parse documents with Firecrawl.
 
-## Skills
-
-| Skill | What it does |
-|:------|:-------------|
-| `research-with-firecrawl` | Picks the smallest tool for the job (scrape, search, map, crawl, or agent), keeps crawls small, and cites each page it used |
-
-Skills are named `firecrawl-<skill>`. In Claude Code they appear as `superset:firecrawl-<skill>`.
-
 ## MCP Server
 
 Tools come from Firecrawl's own MCP server at `https://mcp.firecrawl.dev/v2/mcp-oauth`. Paradev proxies each call and adds your credentials. Firecrawl decides which tools the server offers, so see [Firecrawl's tools reference](https://docs.firecrawl.dev/mcp-server/tools) for the current list. Calls use your team's Firecrawl credits.
@@ -21,6 +13,6 @@ Tools come from Firecrawl's own MCP server at `https://mcp.firecrawl.dev/v2/mcp-
 
 | Method | Details |
 |:-------|:--------|
-| OAuth 2.0 | You sign in to Firecrawl in your browser and choose the team to bill. Paradev registers itself with Firecrawl when you connect, so there is no app to set up first. |
+| OAuth 2.0 | You sign in to Firecrawl in your browser and approve a team. Paradev registers itself with Firecrawl when you connect, so there is no app to set up first. |
 
 Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

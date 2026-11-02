@@ -5,14 +5,6 @@ description: Inspect tables, run SQL, apply migrations, read logs and advisors, 
 
 Inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions in your Supabase projects.
 
-## Skills
-
-| Skill | What it does |
-|:------|:-------------|
-| `change-supabase-safely` | Confirms the project, reads the schema before it writes SQL, makes schema changes as migrations, and checks the security advisors afterwards |
-
-Skills are named `supabase-<skill>`. In Claude Code they appear as `superset:supabase-<skill>`.
-
 ## MCP Server
 
 Tools come from Supabase's own MCP server at `https://mcp.supabase.com/mcp`. Paradev proxies each call and adds your credentials. Supabase decides which tools the server offers, so see [Supabase's MCP documentation](https://supabase.com/docs/guides/ai-tools/mcp) for the current list.
@@ -23,7 +15,6 @@ The tools act with your own permissions, on real projects. Connect a development
 
 | Method | Details |
 |:-------|:--------|
-| OAuth 2.0 | You sign in to Supabase in your browser and choose the organization to give access to. Paradev does not need an app to be set up first. |
-| Personal access token | Paste a token from Supabase's **Account preferences → Access Tokens** page. Use it when you cannot sign in through a browser. A token reaches every organization that your account is a member of. |
+| OAuth 2.0 | You sign in to Supabase in your browser and approve access. Paradev does not need an app to be set up first. |
 
 Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

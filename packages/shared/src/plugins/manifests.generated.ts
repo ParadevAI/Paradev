@@ -933,12 +933,7 @@ export const FIRST_PARTY_MANIFESTS = {
 				}
 			}
 		},
-		"skills": [
-			{
-				"name": "debug-inngest-runs",
-				"description": "Find out why an Inngest function failed, stalled, or never ran — locate the run from the event or function, read its trace step by step, and fix or rerun only after the cause is known. Use when the user reports a failing or stuck Inngest function, a background job that did not happen, an event that triggered nothing, or asks to rerun, cancel, or replay runs."
-			}
-		]
+		"skills": []
 	} as const,
 	"supabase": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
@@ -981,12 +976,7 @@ export const FIRST_PARTY_MANIFESTS = {
 				}
 			}
 		},
-		"skills": [
-			{
-				"name": "change-supabase-safely",
-				"description": "Inspect and change a Supabase project without surprises — pick the right project, read the schema before you write SQL, make schema changes as migrations, and check the advisors afterwards. Use when the user asks to query, change, or debug a Supabase database, add a table or column, write an RLS policy, read Supabase logs, or deploy an Edge Function."
-			}
-		]
+		"skills": []
 	} as const,
 	"firecrawl": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
@@ -1028,12 +1018,7 @@ export const FIRST_PARTY_MANIFESTS = {
 				}
 			}
 		},
-		"skills": [
-			{
-				"name": "research-with-firecrawl",
-				"description": "Get web content into the conversation with the cheapest Firecrawl tool that does the job — scrape a known URL, search when there is no URL, map before you crawl, and hand multi-source questions to the agent. Use when the user asks to read, summarize, or extract data from web pages, research a topic across sites, collect a site's docs, or parse a PDF or document."
-			}
-		]
+		"skills": []
 	} as const,
 	"wispr": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
@@ -1076,12 +1061,7 @@ export const FIRST_PARTY_MANIFESTS = {
 				}
 			}
 		},
-		"skills": [
-			{
-				"name": "find-in-wispr",
-				"description": "Answer \"what did we say or decide\" from Wispr Flow — narrow to the right meeting by date and people, read the notes before the transcript, and cite the meeting behind every claim. Use when the user asks what happened in a meeting, wants to prep for an upcoming one, or refers to a call, scratchpad note, or calendar event they captured with Wispr Flow."
-			}
-		]
+		"skills": []
 	} as const,
 } as const;
 

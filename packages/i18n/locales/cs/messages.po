@@ -9887,7 +9887,7 @@ msgid "Inspect branches and run SQL"
 msgstr "Prohlížejte branche a spouštějte SQL"
 
 msgid "Inspect tables and apply migrations"
-msgstr "Kontrola tabulek a použití migrací"
+msgstr "Kontrola tabulek a provádění migrací"
 
 #. placeholder {0}: data.targetTitle
 msgid "Inspecting {0}"
@@ -16469,7 +16469,7 @@ msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Bodování začne, jakmile žebříček uvidí dní s aktivitou: {0}."
 
 msgid "Scrape and crawl websites"
-msgstr "Stahování a procházení webů"
+msgstr "Extrakce dat a procházení webů"
 
 msgid "Screenshot copied"
 msgstr "Snímek obrazovky zkopírován"

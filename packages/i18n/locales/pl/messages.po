@@ -16469,7 +16469,7 @@ msgid "Scoring starts once the board can see {0} days of usage."
 msgstr "Punktacja rusza, gdy tablica zobaczy dni z aktywnością: {0}."
 
 msgid "Scrape and crawl websites"
-msgstr "Pobieraj i indeksuj strony internetowe"
+msgstr "Wyodrębniaj dane ze stron i przeszukuj witryny"
 
 msgid "Screenshot copied"
 msgstr "Skopiowano zrzut ekranu"

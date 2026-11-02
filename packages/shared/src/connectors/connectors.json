@@ -1149,40 +1149,6 @@
 							"Authorization": "Bearer ${config.access_token}"
 						}
 					}
-				},
-				{
-					"type": "api_key",
-					"label": "Personal access token",
-					"credential_input": "api_key",
-					"inputs": [
-						{
-							"name": "api_key",
-							"label": "Supabase personal access token",
-							"description": "Supabase \u2192 Account preferences \u2192 Access Tokens \u2192 Generate new token",
-							"required": true,
-							"secret": true
-						}
-					],
-					"identity": {
-						"url": "https://api.supabase.com/v1/organizations",
-						"method": "GET",
-						"headers": {
-							"Authorization": "Bearer ${config.access_token}"
-						},
-						"account": {
-							"id": "$[0].id",
-							"label": "$[0].name"
-						},
-						"user": {
-							"id": "$[0].id",
-							"label": "$[0].name"
-						}
-					},
-					"bind": {
-						"headers": {
-							"Authorization": "Bearer ${config.access_token}"
-						}
-					}
 				}
 			]
 		},

@@ -15165,7 +15165,7 @@ msgid "Rebase and merge"
 msgstr "Rebasen en mergen"
 
 msgid "Recall what was said in meetings"
-msgstr "Terugvinden wat er in meetings is gezegd"
+msgstr "Terugvinden wat er in vergaderingen is gezegd"
 
 msgid "Recent Activity"
 msgstr "Recente activiteit"

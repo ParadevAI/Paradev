@@ -493,18 +493,19 @@ describe("probeIdentity", () => {
 
 		const identity = await probeIdentity(
 			"supabase_mcp",
-			connectorMethod(requireConnector("supabase_mcp"), "api_key"),
-			"sbp_test",
+			connectorMethod(requireConnector("supabase_mcp")),
+			"oauth-test",
 		);
 
 		expect(calls).toEqual([
 			{
 				url: "https://api.supabase.com/v1/organizations",
 				method: "GET",
-				auth: "Bearer sbp_test",
+				auth: "Bearer oauth-test",
 			},
 		]);
 		expect(identity.account).toEqual({ id: "org_01", label: "Tegon" });
+		expect(identity.user).toEqual({ id: "org_01", label: "Tegon" });
 	});
 
 	test("firecrawl_mcp takes the team and user from the token response", async () => {

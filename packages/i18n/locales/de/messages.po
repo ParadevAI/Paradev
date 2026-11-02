@@ -6478,7 +6478,7 @@ msgid "Debug"
 msgstr "Debug"
 
 msgid "Debug failed runs and rerun functions"
-msgstr "Fehlgeschlagene Runs debuggen und Funktionen erneut ausführen"
+msgstr "Fehlgeschlagene Läufe debuggen und Funktionen erneut ausführen"
 
 msgid "Debug with production stack traces"
 msgstr "Mit Produktions-Stacktraces debuggen"
