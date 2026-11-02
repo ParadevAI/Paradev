@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 次に、そのワークスペースのターミナルから開発セットアップを実行します:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

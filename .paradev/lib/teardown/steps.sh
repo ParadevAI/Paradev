@@ -224,10 +224,10 @@ step_deallocate_port() {
 }
 
 step_remove_dev_data() {
-  local dev_data_dir="superset-dev-data"
+  local dev_data_dir="$DEV_DATA_DIR"
 
   if [ "$REMOVE_DEV_DATA" != "1" ]; then
-    step_skipped "Remove superset-dev-data (flag not set)"
+    step_skipped "Remove $dev_data_dir (flag not set)"
     return 0
   fi
 
@@ -235,7 +235,7 @@ step_remove_dev_data() {
 
   if [ ! -d "$dev_data_dir" ]; then
     warn "$dev_data_dir/ not found, skipping"
-    step_skipped "Remove superset-dev-data (not found)"
+    step_skipped "Remove $dev_data_dir (not found)"
     return 0
   fi
 

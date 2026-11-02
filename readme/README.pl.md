@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Następnie uruchom konfigurację deweloperską z terminala tego obszaru roboczego:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

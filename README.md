@@ -261,7 +261,7 @@ git clone https://github.com/paradevai/paradev.git
 Then run the development setup from that workspace terminal:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

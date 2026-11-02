@@ -214,7 +214,7 @@ describe("rewriteLegacyHomePaths", () => {
 });
 
 describe("repairGitWorktrees", () => {
-	it("points git at a moved worktree", async () => {
+	it("points git at a moved worktree past a deleted one", async () => {
 		const repo = path.join(home, "repo");
 		const git = (...args: string[]) =>
 			execFileSync("git", ["-C", repo, ...args], { encoding: "utf8" });
@@ -237,7 +237,13 @@ describe("repairGitWorktrees", () => {
 		mkdirSync(path.dirname(after));
 		renameSync(before, after);
 
-		await repairGitWorktrees([{ repoPath: repo, worktreePath: after }]);
+		await repairGitWorktrees(
+			[
+				{ repoPath: repo, worktreePath: path.join(home, "deleted", "wt") },
+				{ repoPath: repo, worktreePath: after },
+			],
+			path.join(home, "old"),
+		);
 
 		expect(git("worktree", "list", "--porcelain")).toContain(
 			`worktree ${after}`,

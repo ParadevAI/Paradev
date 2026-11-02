@@ -4,10 +4,10 @@ REMOVE_DEV_DATA=0
 
 teardown_print_usage() {
   cat <<EOT
-Usage: .superset/teardown.sh [options]
+Usage: .paradev/teardown.sh [options]
 
 Options:
-  -f, --force              Remove superset-dev-data/ in current workspace
+  -f, --force              Remove paradev-dev-data/ in current workspace
   -h, --help               Show this help message
 EOT
 }

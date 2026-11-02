@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Ardından o çalışma alanı terminalinden geliştirme kurulumunu çalıştırın:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 

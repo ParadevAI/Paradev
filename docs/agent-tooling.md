@@ -193,7 +193,7 @@ exposing them as `/superset-dev:<skill>`. Re-run after editing a skill, then
 `/reload-plugins`. In production the skills ship inside the real `superset`
 plugin, so there's no collision — this is dev-only.
 
-`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/superset-dev-data/host/*`,
+`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/paradev-dev-data/host/*`,
 then runs the dev CLI with `SUPERSET_HOME_DIR` (the dev data dir),
 `SUPERSET_ORGANIZATION_ID` (the live host's org), and a placeholder
 `SUPERSET_API_KEY` (local host commands use the manifest token, not this). Start

@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # Local-development setup. Provisions a fully self-contained, PER-WORKSPACE
-# Superset stack backed by a local Postgres container + fake credentials — no
+# Paradev stack backed by a local Postgres container + fake credentials — no
 # Neon account, no real third-party keys. Mirrors setup.sh, but replaces the
 # Neon branch with a docker-compose bundle (Postgres + neon-proxy + Redis/SRH)
 # on per-workspace allocated ports so multiple worktrees never collide.
 set -uo pipefail
 
-SUPERSET_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SUPERSET_SCRIPT_DIR/.." && pwd)"
+PARADEV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$PARADEV_SCRIPT_DIR/.." && pwd)"
 
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
+source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/setup/steps.sh" # reuse allocate_port_base + helpers
+source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh" # reuse allocate_port_base + helpers
 
 cd "$ROOT_DIR" || exit 1
 
@@ -203,7 +203,7 @@ local_write_env() {
     echo ""
     echo "# ===== Local workspace overrides (setup.local.sh) ====="
     write_env_var "SUPERSET_WORKSPACE_NAME" "${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
-    write_env_var "SUPERSET_HOME_DIR" "$PWD/superset-dev-data"
+    write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     write_env_var "SUPERSET_PORT_BASE" "$BASE"
     echo ""
     echo "# Per-workspace local DB stack (docker compose project $LOCAL_DB_PROJECT)"
@@ -273,7 +273,7 @@ local_write_env() {
     "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" "$LOCAL_PG_PORT" "$LOCAL_NEON_PROXY_PORT" \
     "$LOCAL_REDIS_PORT" "$LOCAL_SRH_PORT" || return 1
 
-  cat > "$SUPERSET_SCRIPT_DIR/ports.json" <<PORTSJSON
+  cat > "$PARADEV_SCRIPT_DIR/ports.json" <<PORTSJSON
 {
   "ports": [
     { "port": $WEB_PORT, "label": "Web" },
@@ -299,11 +299,11 @@ PORTSJSON
 }
 
 local_write_config_overlay() {
-  echo "🔧 Writing .superset/config.local.json (untracked overlay)..."
-  cat > "$SUPERSET_SCRIPT_DIR/config.local.json" <<'CONFIGLOCAL'
+  echo "🔧 Writing .paradev/config.local.json (untracked overlay)..."
+  cat > "$PARADEV_SCRIPT_DIR/config.local.json" <<'CONFIGLOCAL'
 {
-  "setup": ["./.superset/setup.local.sh"],
-  "teardown": ["./.superset/teardown.local.sh"]
+  "setup": ["./.paradev/setup.local.sh"],
+  "teardown": ["./.paradev/teardown.local.sh"]
 }
 CONFIGLOCAL
   success "config.local.json written — worktrees will use setup.local.sh"
@@ -314,7 +314,7 @@ local_setup_main() {
   FAILED_STEPS=()
   SKIPPED_STEPS=()
 
-  echo "🚀 Setting up Superset for LOCAL development..."
+  echo "🚀 Setting up Paradev for LOCAL development..."
   echo ""
 
   local_ensure_env || step_failed "Prepare .env"

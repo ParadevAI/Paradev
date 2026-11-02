@@ -6,12 +6,12 @@
 # the platform should carry a phase for.
 set -uo pipefail
 
-SUPERSET_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SUPERSET_SCRIPT_DIR/.." && pwd)"
+PARADEV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$PARADEV_SCRIPT_DIR/.." && pwd)"
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
+source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
-source "$SUPERSET_SCRIPT_DIR/lib/setup/steps.sh"
+source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh"
 cd "$ROOT_DIR" || exit 1
 
 # The environment's variables, as a file, because step_write_env copies one.
