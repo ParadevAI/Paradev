@@ -146,7 +146,7 @@ export const channelTaskRouter = {
 				.update(channels)
 				.set({
 					linearProjectId: input.linearProjectId,
-					...(input.linearProjectId ? { taskProjectId: null } : {}),
+					taskProjectId: null,
 				})
 				.where(eq(channels.id, input.channelId));
 			await announceTasks(input.channelId);
@@ -179,7 +179,7 @@ export const channelTaskRouter = {
 				.update(channels)
 				.set({
 					taskProjectId: input.projectId,
-					...(input.projectId ? { linearProjectId: null } : {}),
+					linearProjectId: null,
 				})
 				.where(eq(channels.id, input.channelId));
 			await announceTasks(input.channelId);

@@ -341,20 +341,36 @@ export async function createIssue(
 	return toIssue(data.issueCreate.issue);
 }
 
+const PROJECT_PAGE_SIZE = 100;
+const MAX_PROJECT_PAGES = 10;
+
 /** The workspace's projects that are not finished, by name. */
 export async function listProjects(
 	client: LinearClient,
 ): Promise<LinearProject[]> {
-	const data = await request<{ projects: { nodes: LinearProject[] } }>(
-		client,
-		`query SupersetLinearProjects {
-			projects(first: 100, filter: { status: { type: { nin: ["completed", "canceled"] } } }) {
-				nodes { id name icon color }
-			}
-		}`,
-		{},
-	);
-	return [...data.projects.nodes].sort((a, b) => a.name.localeCompare(b.name));
+	const projects: LinearProject[] = [];
+	let after: string | null = null;
+	for (let page = 0; page < MAX_PROJECT_PAGES; page++) {
+		const data: {
+			projects: {
+				nodes: LinearProject[];
+				pageInfo: { hasNextPage: boolean; endCursor: string | null };
+			};
+		} = await request(
+			client,
+			`query SupersetLinearProjects($first: Int!, $after: String) {
+				projects(first: $first, after: $after, filter: { status: { type: { nin: ["completed", "canceled"] } } }) {
+					nodes { id name icon color }
+					pageInfo { hasNextPage endCursor }
+				}
+			}`,
+			{ first: PROJECT_PAGE_SIZE, after },
+		);
+		projects.push(...data.projects.nodes);
+		if (!data.projects.pageInfo.hasNextPage) break;
+		after = data.projects.pageInfo.endCursor;
+	}
+	return projects.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getWorkspace(

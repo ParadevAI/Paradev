@@ -98,11 +98,7 @@ export function ChannelTasksTab({ channelId, canAdd }: ChannelTasksTabProps) {
 		<ProjectPicker
 			project={project ?? null}
 			projects={projects ?? []}
-			onSetProject={(projectId) =>
-				projectId === null && linearProjectId
-					? setLinearProject.mutate({ channelId, linearProjectId: null })
-					: setProject.mutate({ channelId, projectId })
-			}
+			onSetProject={(projectId) => setProject.mutate({ channelId, projectId })}
 			onCreateProject={setNewProjectName}
 			linearProject={linearProject}
 			linearProjects={linearProjects}
