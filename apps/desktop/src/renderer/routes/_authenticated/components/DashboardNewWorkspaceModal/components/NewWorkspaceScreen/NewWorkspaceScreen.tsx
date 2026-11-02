@@ -251,8 +251,6 @@ export function NewWorkspaceScreen({
 			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
 	);
 
-	// A link's project or session is the pick for that open; picks made on the
-	// screen afterwards replace it.
 	const appliedIntentRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (!isOpen) return;
