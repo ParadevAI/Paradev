@@ -54,9 +54,10 @@ describe("adoptDesktopInstallList", () => {
 	test("a damaged marker copies nothing rather than everything again", () => {
 		adoptDesktopInstallList(list, ledger);
 		fs.writeFileSync(ledger, JSON.stringify({ version: 1, plugins: [] }));
-		fs.writeFileSync(path.join(dir, ".desktop-list-adopted"), "{damaged");
-
-		expect(() => adoptDesktopInstallList(list, ledger)).toThrow();
+		for (const damaged of ["{damaged", JSON.stringify(["linear", 3])]) {
+			fs.writeFileSync(path.join(dir, ".desktop-list-adopted"), damaged);
+			expect(() => adoptDesktopInstallList(list, ledger)).toThrow();
+		}
 		expect(names()).toEqual([]);
 	});
 

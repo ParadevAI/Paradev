@@ -16,11 +16,13 @@ function readSeen(marker: string): Set<string> {
 		throw error;
 	}
 	const names: unknown = JSON.parse(raw);
-	if (!Array.isArray(names))
+	if (
+		!Array.isArray(names) ||
+		!names.every((name): name is string => typeof name === "string")
+	) {
 		throw new Error(`${marker} is not a list of names`);
-	return new Set(
-		names.filter((name): name is string => typeof name === "string"),
-	);
+	}
+	return new Set(names);
 }
 
 /**
