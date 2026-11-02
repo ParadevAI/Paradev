@@ -26,6 +26,7 @@ import {
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
 } from "./lib/sandbox/api-credential";
+import { tokenOrganizationIds } from "./lib/token-organizations";
 import {
 	actorOf,
 	type DevPrincipal,
@@ -240,12 +241,14 @@ async function personFromSession(ctx: TRPCContext, path: string) {
 
 	let activeOrganizationId = sessionOrgId;
 	if (headerOrgId && headerOrgId !== sessionOrgId) {
-		const membership = await db.query.members.findFirst({
-			where: and(
-				eq(members.userId, session.user.id),
-				eq(members.organizationId, headerOrgId),
-			),
-		});
+		const membership =
+			tokenOrganizationIds(session)?.includes(headerOrgId) ||
+			(await db.query.members.findFirst({
+				where: and(
+					eq(members.userId, session.user.id),
+					eq(members.organizationId, headerOrgId),
+				),
+			}));
 		if (!membership) {
 			throw notAMemberOfOrganization(headerOrgId, session.user.email);
 		}
