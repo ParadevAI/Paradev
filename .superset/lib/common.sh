@@ -214,14 +214,6 @@ seed_missing_env_placeholders() {
 
 # The installed app's home: ~/.superset until the installed app has moved it.
 DEV_DATA_DIR="paradev-dev-data"
-LEGACY_DEV_DATA_DIR="superset-dev-data"
-
-move_legacy_dev_data() {
-  if [ -d "$LEGACY_DEV_DATA_DIR" ] && [ ! -e "$DEV_DATA_DIR" ]; then
-    echo "📦 Renaming $LEGACY_DEV_DATA_DIR/ to $DEV_DATA_DIR/..."
-    mv "$LEGACY_DEV_DATA_DIR" "$DEV_DATA_DIR"
-  fi
-}
 
 prod_app_home() {
   if [ -d "$HOME/.superset" ] && [ ! -L "$HOME/.superset" ]; then

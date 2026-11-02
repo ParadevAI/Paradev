@@ -31,8 +31,6 @@ setup_main() {
     step_failed "Install dependencies"
   fi
 
-  move_legacy_dev_data
-
   # Step 4: Seed local DB into paradev-dev-data/
   if ! step_seed_local_db; then
     step_failed "Seed local DB"

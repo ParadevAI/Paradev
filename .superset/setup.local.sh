@@ -15,7 +15,6 @@ source "$SUPERSET_SCRIPT_DIR/lib/common.sh"
 source "$SUPERSET_SCRIPT_DIR/lib/setup/steps.sh" # reuse allocate_port_base + helpers
 
 cd "$ROOT_DIR" || exit 1
-move_legacy_dev_data
 
 # Must match SRH_TOKEN in docker-compose.yml.
 LOCAL_KV_TOKEN_VALUE="local_dev_token"

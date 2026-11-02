@@ -224,27 +224,26 @@ step_deallocate_port() {
 }
 
 step_remove_dev_data() {
+  local dev_data_dir="$DEV_DATA_DIR"
+
   if [ "$REMOVE_DEV_DATA" != "1" ]; then
-    step_skipped "Remove $DEV_DATA_DIR (flag not set)"
+    step_skipped "Remove $dev_data_dir (flag not set)"
     return 0
   fi
 
-  local removed=0
-  local dev_data_dir
-  for dev_data_dir in "$DEV_DATA_DIR" "$LEGACY_DEV_DATA_DIR"; do
-    [ -d "$dev_data_dir" ] || continue
-    echo "🗑️  Removing $dev_data_dir/..."
-    if ! rm -rf "$dev_data_dir"; then
-      error "Failed to remove $dev_data_dir/"
-      return 1
-    fi
-    success "Removed $dev_data_dir/"
-    removed=1
-  done
+  echo "🗑️  Removing $dev_data_dir/..."
 
-  if [ "$removed" = "0" ]; then
-    warn "$DEV_DATA_DIR/ not found, skipping"
-    step_skipped "Remove $DEV_DATA_DIR (not found)"
+  if [ ! -d "$dev_data_dir" ]; then
+    warn "$dev_data_dir/ not found, skipping"
+    step_skipped "Remove $dev_data_dir (not found)"
+    return 0
   fi
+
+  if ! rm -rf "$dev_data_dir"; then
+    error "Failed to remove $dev_data_dir/"
+    return 1
+  fi
+
+  success "Removed $dev_data_dir/"
   return 0
 }
