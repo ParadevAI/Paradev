@@ -528,3 +528,5 @@ export const screenshots = sqliteTable(
 
 export type InsertScreenshot = typeof screenshots.$inferInsert;
 export type SelectScreenshot = typeof screenshots.$inferSelect;
+
+export * from "./usage-widget-appearances";
