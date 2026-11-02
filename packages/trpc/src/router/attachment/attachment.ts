@@ -4,7 +4,7 @@ import { fileOriginalKey } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { headObject, presignedGetUrl, presignedPutUrl } from "../../lib/r2";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	createAttachmentUploadSchema,
@@ -42,7 +42,7 @@ export const attachmentRouter = {
 	 * caller claimed — `resolve` is where that is checked, since the PUT
 	 * happens without the API seeing it.
 	 */
-	createUpload: protectedProcedure
+	createUpload: personProcedure
 		.input(createAttachmentUploadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -101,7 +101,7 @@ export const attachmentRouter = {
 	 * A mutation despite reading nothing but rows: the URLs it mints are
 	 * short-lived credentials, and a query's response is cacheable.
 	 */
-	resolve: protectedProcedure
+	resolve: personProcedure
 		.input(resolveAttachmentsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);

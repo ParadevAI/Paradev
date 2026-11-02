@@ -13,7 +13,7 @@ import { pickEntityColor } from "@superset/shared/entity-colors";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { actorProcedure, protectedProcedure } from "../../trpc";
+import { actorProcedure, personProcedure } from "../../trpc";
 import {
 	assertTaskInOrganization,
 	taskColumns,
@@ -102,7 +102,7 @@ async function ensureChannelProject(channel: {
 
 export const channelTaskRouter = {
 	/** The project whose tasks the channel shows; null when it has none. */
-	project: protectedProcedure
+	project: personProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -125,7 +125,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Points the channel at a project of its organization, or at none. */
-	setProject: protectedProcedure
+	setProject: personProcedure
 		.input(channelProjectSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -155,7 +155,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** A channel showing the task's project, when the reader can see one. */
-	forTask: protectedProcedure
+	forTask: personProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -225,7 +225,7 @@ export const channelTaskRouter = {
 	}),
 
 	/** Moves the task into the channel's project, making the project if needed. */
-	add: protectedProcedure
+	add: personProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -267,7 +267,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Takes the task out of the channel's project. */
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(

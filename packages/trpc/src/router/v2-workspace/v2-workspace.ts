@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
-import { jwtProcedure, protectedProcedure, userError } from "../../trpc";
+import { jwtProcedure, personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const ACTIVATION_EVENT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -130,7 +130,7 @@ export const v2WorkspaceRouter = {
 			return { ok: true };
 		}),
 
-	setTask: protectedProcedure
+	setTask: personProcedure
 		.input(
 			z.object({
 				workspaceId: z.string().uuid(),
@@ -139,7 +139,7 @@ export const v2WorkspaceRouter = {
 		)
 		.mutation(async () => ({ success: true as const, txid: null })),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),

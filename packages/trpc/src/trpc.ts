@@ -329,7 +329,7 @@ export const actorProcedure = t.procedure
 	});
 
 /** A signed-in person only. */
-export const protectedProcedure = actorProcedure.use(({ ctx, next }) => {
+export const personProcedure = actorProcedure.use(({ ctx, next }) => {
 	const { principal, session } = ctx;
 	if (principal.kind !== "person" || !session) {
 		throw userError({
@@ -499,7 +499,7 @@ export const jwtProcedure = t.procedure
 		return next();
 	});
 
-export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+export const adminProcedure = personProcedure.use(async ({ ctx, next }) => {
 	if (!hasAdminAccess(ctx.session.user)) {
 		throw new TRPCError({
 			code: "FORBIDDEN",
