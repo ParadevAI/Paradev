@@ -121,7 +121,16 @@ function inlineMathRule(state: MarkdownItState, silent: boolean): boolean {
 
 	const latex = src.slice(state.pos + 1, end);
 	if (!isMathContent(latex)) {
-		return false;
+		// The span is text (`$5.00$`, `$ x$`). Consume it whole instead of
+		// leaving the delimiters for a later rule: otherwise the closing `$`
+		// can open a new span, and `$5.00$+$x$` renders `$+$` as math and
+		// leaves `x$` literal (#7856 review).
+		if (!silent) {
+			const token = state.push("text", "", 0);
+			token.content = src.slice(state.pos, end + 1);
+		}
+		state.pos = end + 1;
+		return true;
 	}
 
 	if (!silent) {

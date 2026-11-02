@@ -224,6 +224,17 @@ describe("math", () => {
 		}
 	});
 
+	it("keeps a price followed by math as text plus math", () => {
+		// A rejected span used to leave its closing `$` free, so `$5.00$+$x$`
+		// rendered `$+$` as math and left `x$` literal (#7856 review).
+		const editor = createEditor("$5.00$+$x$");
+		try {
+			expect(mathNodes(editor)).toEqual([{ type: "inlineMath", latex: "x" }]);
+		} finally {
+			editor.destroy();
+		}
+	});
+
 	it("leaves currency alone", () => {
 		const editor = createEditor("It costs $5 and $10 today.");
 		try {
