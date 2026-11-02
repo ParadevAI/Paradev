@@ -65,6 +65,7 @@ import type {
 	ComposerChip,
 	ComposerMentionEntry,
 } from "../../../PromptInput/types";
+import { registerInlineCodeExit } from "../../../PromptInput/utils/inlineCodeExit";
 import { $insertTranscript } from "../../../PromptInput/utils/insertTranscript";
 import { $isInCode } from "../../../PromptInput/utils/isInCode";
 import { registerTrailingParagraph } from "../../../PromptInput/utils/trailingParagraph";
@@ -401,10 +402,12 @@ export function MessageComposerBody({
 			COMMAND_PRIORITY_LOW,
 		);
 		const unregisterTrailingParagraph = registerTrailingParagraph(editor);
+		const unregisterInlineCodeExit = registerInlineCodeExit(editor);
 		return () => {
 			unregisterText();
 			unregisterEnter();
 			unregisterTrailingParagraph();
+			unregisterInlineCodeExit();
 			unregisterClick();
 			unregisterBackspace();
 			unregisterDelete();

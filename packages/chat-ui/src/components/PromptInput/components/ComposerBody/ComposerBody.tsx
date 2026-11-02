@@ -101,6 +101,7 @@ import {
 	TYPED_SHORTCUTS,
 } from "../../utils/draftSegments";
 import { registerHistoryNavigation } from "../../utils/historyNavigation";
+import { registerInlineCodeExit } from "../../utils/inlineCodeExit";
 import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
 import { rankCommands } from "../../utils/rankCommands";
@@ -676,6 +677,7 @@ export function ComposerBody({
 		);
 		historyNavigationRef.current = historyNavigation;
 		const unregisterTrailingParagraph = registerTrailingParagraph(editor);
+		const unregisterInlineCodeExit = registerInlineCodeExit(editor);
 		const unregisterEscape = editor.registerCommand<KeyboardEvent | null>(
 			KEY_ESCAPE_COMMAND,
 			(event) => {
@@ -871,6 +873,7 @@ export function ComposerBody({
 			unregisterEnter();
 			historyNavigation.unregister();
 			unregisterTrailingParagraph();
+			unregisterInlineCodeExit();
 			unregisterEscape();
 			unregisterDrop();
 			unregisterPaste();
