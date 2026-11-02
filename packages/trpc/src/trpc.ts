@@ -211,10 +211,6 @@ export const sandboxProcedure = t.procedure.use(async ({ ctx, next }) => {
 	return next({ ctx: { ...ctx, sandboxWorkspace: workspace } });
 });
 
-/**
- * The signed-in person, with the organization they act in: the session's,
- * or one they belong to named in the organization header.
- */
 async function personFromSession(ctx: TRPCContext, path: string) {
 	const { session } = ctx;
 	if (!session) {

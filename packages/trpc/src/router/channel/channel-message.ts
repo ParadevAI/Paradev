@@ -433,7 +433,6 @@ async function appendMessage(input: {
 	});
 }
 
-/** The name people see on the caller's messages and notifications. */
 async function callerName(principal: Principal, session: Session | null) {
 	if (session) return session.user.name;
 	const [agent] = await db
