@@ -122,7 +122,7 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 
 **Try it:** [<new workspace name>](<webUrl of the workspace from step 5>), started fresh from this environment.
 **Environment:** [<environment name>](<the environment link you were given>) · <private | shared with the organization>
-**Recommended box size:** `<small | medium | large | xlarge>` — <why, from how the build, tests and services ran on the setup box>. Pick it in the new-workspace screen; it is not the default.
+**Recommended box size:** `<small | medium | large | xlarge>`, because <why, from how the build, tests and services ran on the setup box>. Pick it in the new-workspace screen; it is not the default.
 
 ### What a new workspace gets
 - Installed: <toolchains and dependencies>
@@ -130,7 +130,7 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 
 ### Variables
 - Set: <names only, never values>
-- Missing: <name>, read in <file> — <who has to provide it>
+- Missing: <name> (read in <file>), to be provided by <who>
 
 ### Still to do
 - <config.toml pull request link, or "merge it so new workspaces use it">
