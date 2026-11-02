@@ -1,8 +1,8 @@
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parseStaticPortsConfig } from "@superset/port-scanner";
+import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
 
-const PROJECT_SUPERSET_DIR_NAME = ".superset";
 const PORTS_FILE_NAME = "ports.json";
 
 interface LabelCacheEntry {
@@ -12,7 +12,7 @@ interface LabelCacheEntry {
 }
 
 function getPortsPath(worktreePath: string): string {
-	return join(worktreePath, PROJECT_SUPERSET_DIR_NAME, PORTS_FILE_NAME);
+	return join(resolveProjectConfigDir(worktreePath), PORTS_FILE_NAME);
 }
 
 function isMissingPathError(error: unknown): boolean {
@@ -64,7 +64,7 @@ function safeLoadLabels(worktreePath: string): Map<number, string> | null {
 }
 
 /**
- * Read `<worktree>/.superset/ports.json` and return a `port → label` map.
+ * Read the worktree's `ports.json` and return a `port → label` map.
  * Returns null if the file is missing or malformed — this endpoint is a
  * best-effort label hint, not a validator, so parse errors are silent.
  */

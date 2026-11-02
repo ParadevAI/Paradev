@@ -133,7 +133,7 @@ export function buildTaskAgentLaunchRequest({
 	);
 	const taskPromptFileName = `task-${task.slug}.md`;
 	const command = buildFileCommandFromAgentConfig({
-		filePath: `.superset/${taskPromptFileName}`,
+		filePath: `${WORKSPACE_ATTACHMENTS_DIR}/${taskPromptFileName}`,
 		config: terminalConfig,
 	});
 

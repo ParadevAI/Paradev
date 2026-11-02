@@ -1,5 +1,8 @@
 import { parsePastedText } from "@superset/chat/core";
-import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
+import {
+	LEGACY_WORKSPACE_ATTACHMENTS_DIR,
+	WORKSPACE_ATTACHMENTS_DIR,
+} from "@superset/shared/workspace-attachments";
 
 export type AttachmentTag = { path: string; type: string };
 
@@ -8,8 +11,10 @@ const SAFE_TYPE = /^[\w.+-]+\/[\w.+-]+$/;
 const SAFE_NAME = /^[A-Za-z0-9._-]+$/;
 
 function isWorkspaceAttachmentPath(path: string): boolean {
-	const prefix = `${WORKSPACE_ATTACHMENTS_DIR}/`;
-	if (!path.startsWith(prefix)) return false;
+	const prefix = [WORKSPACE_ATTACHMENTS_DIR, LEGACY_WORKSPACE_ATTACHMENTS_DIR]
+		.map((dir) => `${dir}/`)
+		.find((dir) => path.startsWith(dir));
+	if (!prefix) return false;
 	const name = path.slice(prefix.length);
 	return SAFE_NAME.test(name) && name !== "." && name !== "..";
 }

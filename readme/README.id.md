@@ -292,13 +292,13 @@ Lihat [**DEVELOPMENT.md**](../DEVELOPMENT.md) untuk panduan lengkap: apa yang di
 
 ## Konfigurasi
 
-Konfigurasikan skrip setup, teardown, dan run workspace di `.superset/config.json`. Lihat [dokumentasi lengkap](https://docs.paradev.com/setup-teardown-scripts).
+Konfigurasikan skrip setup, teardown, dan run workspace di `.paradev/config.json`. Lihat [dokumentasi lengkap](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

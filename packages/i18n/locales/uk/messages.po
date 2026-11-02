@@ -4596,8 +4596,8 @@ msgstr "Хмарні робочі простори ігнорують цю зм�
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Для хмарних робочих просторів потрібен тариф Team або Ultra. Щоб запустити такий простір, перейдіть на вищий тариф у розділі Налаштування, Оплата."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Хмарні робочі простори відкриваються в ньому, а його .superset/config.json виконує налаштування. Інші репозиторії клонуються поруч із ним."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Хмарні робочі простори відкриваються в ньому, а його конфігурація Paradev виконує налаштування. Інші репозиторії клонуються поруч із ним."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Хмарні робочі простори перестануть запускати {agentLabel} з цими даними."
@@ -18897,8 +18897,8 @@ msgstr "Хмарний робочий простір мав запуститис
 msgid "The code expired. Start again."
 msgstr "Термін дії коду минув. Почніть знову."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Команди з .superset/config.toml, які Paradev виконує, щоб налаштувати, запустити й архівувати робочі простори цього проєкту."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Команди з config.toml репозиторію, які Paradev виконує, щоб налаштувати, запустити й архівувати робочі простори цього проєкту."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Компанія залучила $11,5 млн у seed-раунді на чолі з Union Square Ventures за участі Y Combinator і Пола Грема. TechCrunch назвав її одним із найпомітніших стартапів YC Demo Day."

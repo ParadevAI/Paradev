@@ -4602,8 +4602,8 @@ msgstr "Workspace đám mây bỏ qua biến này. Thay vào đó, các agent đ
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Không gian làm việc trên đám mây cần gói Team hoặc Ultra. Nâng cấp trong Cài đặt, Thanh toán để khởi động."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Workspace đám mây mở trên repository này, và .superset/config.json của nó chạy thiết lập. Các repository khác được lấy về bên cạnh."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Workspace đám mây mở trên repository này, và cấu hình Paradev của nó chạy thiết lập. Các repository khác được lấy về bên cạnh."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Workspace đám mây sẽ ngừng chạy {agentLabel} với thông tin này."
@@ -18903,8 +18903,8 @@ msgstr "Workspace cloud lẽ ra đã khởi động nhưng không phản hồi k
 msgid "The code expired. Start again."
 msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Các lệnh Paradev chạy để thiết lập, chạy và lưu trữ các workspace của dự án này, từ .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Các lệnh Paradev chạy để thiết lập, chạy và lưu trữ các workspace của dự án này, từ config.toml của repository."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Công ty đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn công ty là một trong những startup nổi bật tại YC Demo Day."

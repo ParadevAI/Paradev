@@ -80,7 +80,7 @@ You can do everything with plain `git worktree add`, `git worktree list`, and `g
 }
 ```
 
-Put that in `.superset/config.json`. Setup runs when a workspace is created, teardown runs when it is deleted, and `run` starts the dev server from the **Run** button in its own restartable pane. A gitignored `.superset/config.local.json` adds personal steps without editing the team's file. Bulk delete flags dirty or unpushed work before you confirm. Worktrees you already made by hand can be adopted with **Import untracked worktrees** from the project's right-click menu. The [lifecycle scripts docs](https://docs.paradev.com/setup-teardown-scripts) cover overrides and force delete.
+Put that in `.paradev/config.json`. Setup runs when a workspace is created, teardown runs when it is deleted, and `run` starts the dev server from the **Run** button in its own restartable pane. A gitignored `.paradev/config.local.json` adds personal steps without editing the team's file. Bulk delete flags dirty or unpushed work before you confirm. Worktrees you already made by hand can be adopted with **Import untracked worktrees** from the project's right-click menu. The [lifecycle scripts docs](https://docs.paradev.com/setup-teardown-scripts) cover overrides and force delete.
 
 ## How do I keep terminals, previews, and ports organized across several web-app branches?
 
@@ -94,7 +94,7 @@ Three rules fix most of it:
 
 For per-branch databases or service stacks, `docker compose -p <project-name> up -d` gives each worktree its own project name, so containers and volumes don't collide. Convert the branch name to a valid Compose name first: lowercase letters, digits, dashes, and underscores only, so `fix/auth` becomes `fix-auth`.
 
-**How Paradev handles this.** Paradev does not assign port ranges for you. It detects the ports that processes in each workspace are listening on and groups them under that workspace, both in the ports panel and as chips under the workspace row in the sidebar. From a port you can kill its process, jump to the terminal that owns it, or open it in the in-app browser pane (**⌘⇧B** opens a new browser tab). Add `.superset/ports.json` to label ports, such as "Frontend Dev Server" on 3000. Each workspace reads labels from its own worktree. See the [ports docs](https://docs.paradev.com/ports).
+**How Paradev handles this.** Paradev does not assign port ranges for you. It detects the ports that processes in each workspace are listening on and groups them under that workspace, both in the ports panel and as chips under the workspace row in the sidebar. From a port you can kill its process, jump to the terminal that owns it, or open it in the in-app browser pane (**⌘⇧B** opens a new browser tab). Add a `ports.json` next to your Paradev config (`.paradev/`, or `.superset/` in older setups) to label ports, such as "Frontend Dev Server" on 3000. Each workspace reads labels from its own worktree. See the [ports docs](https://docs.paradev.com/ports).
 
 If you want fixed ranges, reserve one in the setup script and release it in teardown. The [ports docs](https://docs.paradev.com/ports) describe this pattern using a shared allocations file, and Paradev's own repo does it in its [setup](https://github.com/paradevai/paradev/blob/main/.superset/setup.sh) and [teardown](https://github.com/paradevai/paradev/blob/main/.superset/teardown.sh) scripts. Setup scripts can read `SUPERSET_WORKSPACE_NAME` and `SUPERSET_WORKSPACE_PATH` to know which workspace they are preparing.
 
@@ -129,7 +129,7 @@ After a full reboot, terminal processes stop. Agents with a resume command come 
 | --- | --- | --- | --- | --- | --- |
 | Worktree per agent | Manual | Yes | Yes | Yes | Yes, per local workspace |
 | Any agent CLI | Yes | Claude Code only | Yes | Yes | Yes |
-| Setup and teardown hooks | Your scripts | `.worktreeinclude`, hooks | Hooks | See its docs | `.superset/config.json` |
+| Setup and teardown hooks | Your scripts | `.worktreeinclude`, hooks | Hooks | See its docs | `.paradev/config.json` |
 | Port per worktree | Your scripts | Your scripts | `hash_port` filter | Your scripts | Detects and groups ports; ranges via setup script |
 | Preview | System browser | System browser | System browser | System browser | In-app browser pane per workspace |
 | Resume agent session | Agent's own command | `--resume`, `--continue` | Agent's own command | tmux keeps it running | Auto-resume after unexpected exit |

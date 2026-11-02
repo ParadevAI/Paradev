@@ -4602,8 +4602,8 @@ msgstr "Cloudové pracovní prostory tuto proměnnou ignorují. Agenti se místo
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloudové pracovní prostory vyžadují plán Team nebo Ultra. Přejděte na vyšší plán v Nastavení, Fakturace, abyste ho mohli spustit."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "Cloudové pracovní prostory se otevírají v něm a jeho .superset/config.json spouští nastavení. Ostatní se stáhnou vedle něj."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "Cloudové pracovní prostory se otevírají v něm a jeho konfigurace Paradev spouští nastavení. Ostatní se stáhnou vedle něj."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "Cloudové workspacy s tím přestanou spouštět {agentLabel}."
@@ -18903,8 +18903,8 @@ msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Da
 msgid "The code expired. Start again."
 msgstr "Platnost kódu vypršela. Začněte znovu."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Příkazy, které Paradev spouští při přípravě, spuštění a archivaci pracovních prostorů tohoto projektu, ze souboru .superset/config.toml."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Příkazy, které Paradev spouští při přípravě, spuštění a archivaci pracovních prostorů tohoto projektu, ze souboru config.toml v repozitáři."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Společnost získala 11,5 milionu dolarů v seed kole, které vedl fond Union Square Ventures za účasti Y Combinatoru a Paula Grahama. TechCrunch ji zařadil mezi nejvýraznější startupy YC Demo Day."

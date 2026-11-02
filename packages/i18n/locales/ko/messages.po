@@ -4602,8 +4602,8 @@ msgstr "클라우드 워크스페이스는 이 변수를 무시합니다. 에이
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 시작하려면 설정의 결제에서 업그레이드하세요."
 
-msgid "Cloud workspaces open on it, and its .superset/config.json runs setup. The others are checked out beside it."
-msgstr "클라우드 워크스페이스는 이 리포지토리에서 열리며, 해당 .superset/config.json이 설정을 실행합니다. 나머지는 옆에 체크아웃됩니다."
+msgid "Cloud workspaces open on it, and its Paradev config runs setup. The others are checked out beside it."
+msgstr "클라우드 워크스페이스는 이 리포지토리에서 열리며, 해당 Paradev 구성이 셋업을 실행합니다. 나머지는 옆에 체크아웃됩니다."
 
 msgid "Cloud workspaces will stop running {agentLabel} with it."
 msgstr "클라우드 워크스페이스에서 더 이상 이것으로 {agentLabel}을(를) 실행하지 않습니다."
@@ -18903,8 +18903,8 @@ msgstr "클라우드 워크스페이스가 시작되었어야 하지만 제시�
 msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
 
-msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from .superset/config.toml."
-msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(.superset/config.toml)."
+msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
+msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."

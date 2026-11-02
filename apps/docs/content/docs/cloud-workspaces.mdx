@@ -30,11 +30,11 @@ Open **Settings → Environments** and click **New environment**. You can also p
 
 - **Name**: how the environment appears in pickers.
 - **Repositories**: one to 20 GitHub repositories. The first one is the primary.
-- **Advanced → Opens on**: the primary repository, whose `.superset/config.json` sets the workspace's [setup scripts](/setup-teardown-scripts) and ports. Shown when there is more than one repository.
+- **Advanced → Opens on**: the primary repository, whose Paradev config (`.paradev/config.json`, or an existing `.superset/config.json`) sets the workspace's [setup scripts](/setup-teardown-scripts) and ports. Shown when there is more than one repository.
 - **Advanced → Region**: where the sandboxes run. The default is the region nearest to you. You can set it only when you create the environment.
 - **Advanced → Visible to**: **Organization** (default) or **Only you**.
 
-Click **Create environment**. From **Settings → Environments** you can instead click **Set up with an agent**: it starts a cloud workspace where Claude installs what the project needs and writes its `.superset/config.json`.
+Click **Create environment**. From **Settings → Environments** you can instead click **Set up with an agent**: it starts a cloud workspace where Claude installs what the project needs and writes its `.paradev/config.json`.
 
 ### 2. Add variables
 

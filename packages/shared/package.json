@@ -12,6 +12,10 @@
 			"types": "./src/project-config/index.ts",
 			"default": "./src/project-config/index.ts"
 		},
+		"./project-config/dir": {
+			"types": "./src/project-config/dir.ts",
+			"default": "./src/project-config/dir.ts"
+		},
 		"./oauth-refresh": {
 			"types": "./src/oauth-refresh.ts",
 			"default": "./src/oauth-refresh.ts"

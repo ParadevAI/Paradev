@@ -287,13 +287,13 @@ Neon 계정이나 서드파티 자격 증명은 필요 없습니다. `setup.loca
 
 ## 구성
 
-워크스페이스의 설정, 정리, 실행 스크립트는 `.superset/config.json`에서 구성합니다. [전체 문서](https://docs.paradev.com/setup-teardown-scripts)를 참고하세요.
+워크스페이스의 설정, 정리, 실행 스크립트는 `.paradev/config.json`에서 구성합니다. [전체 문서](https://docs.paradev.com/setup-teardown-scripts)를 참고하세요.
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 

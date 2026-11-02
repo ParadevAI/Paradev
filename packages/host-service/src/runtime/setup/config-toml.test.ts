@@ -206,3 +206,31 @@ describe("hasProjectConfig and describeProjectConfigSources", () => {
 		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(false);
 	});
 });
+
+describe("config folder", () => {
+	function writeIn(folder: string, name: string, content: string) {
+		mkdirSync(join(repoPath, folder), { recursive: true });
+		writeFileSync(join(repoPath, folder, name), content, "utf-8");
+	}
+
+	it("reads config from .paradev", () => {
+		writeIn(".paradev", "config.toml", '[setup]\nrun = "echo from-paradev"\n');
+
+		expect(setupCommand({ repoPath, projectId })).toEqual({
+			command: "echo from-paradev",
+		});
+	});
+
+	it("keeps reading .superset when .paradev holds only pdev's files", () => {
+		writeIn(".paradev", "settings.json", "{}");
+		writeIn(
+			".superset",
+			"config.toml",
+			'[setup]\nrun = "echo from-superset"\n',
+		);
+
+		expect(setupCommand({ repoPath, projectId })).toEqual({
+			command: "echo from-superset",
+		});
+	});
+});

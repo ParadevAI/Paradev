@@ -8,6 +8,7 @@ import {
 	type ResolvedProjectConfig,
 	resolveProjectConfig,
 } from "@superset/shared/project-config";
+import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
 import {
 	configEnvironment,
 	findTomlConfigPath,
@@ -15,7 +16,6 @@ import {
 	loadTomlConfig,
 } from "./project-config-toml";
 
-const PROJECT_SUPERSET_DIR_NAME = ".superset";
 const CONFIG_FILE_NAME = "config.json";
 const LOCAL_CONFIG_FILE_NAME = "config.local.json";
 const PROJECTS_DIR_NAME = "projects";
@@ -178,7 +178,7 @@ function applyLocalOverlay(
 }
 
 export function getProjectConfigPath(repoPath: string): string {
-	return join(repoPath, PROJECT_SUPERSET_DIR_NAME, CONFIG_FILE_NAME);
+	return join(resolveProjectConfigDir(repoPath), CONFIG_FILE_NAME);
 }
 
 /**
@@ -202,15 +202,15 @@ function getUserOverridePaths(args: {
 }
 
 function getLocalOverlayPath(repoPath: string): string {
-	return join(repoPath, PROJECT_SUPERSET_DIR_NAME, LOCAL_CONFIG_FILE_NAME);
+	return join(resolveProjectConfigDir(repoPath), LOCAL_CONFIG_FILE_NAME);
 }
 
 /**
  * Resolve setup/teardown/run config for a v2 project. Base merge, per key,
  * later wins:
  *
- *   1. <repoPath>/.superset/config.json      — canonical project config
- *   2. <worktreePath>/.superset/config.json  — workspace/branch override
+ *   1. <repoPath>/<config dir>/config.json      — canonical project config
+ *   2. <worktreePath>/<config dir>/config.json  — workspace/branch override
  *      (only when a worktree is in scope: setup at create, teardown at delete)
  *   3. <app home>/projects/<repoPath>/config.json — per-machine user
  *      override (falls back to the legacy <project-id> key)
@@ -301,7 +301,7 @@ export function loadProjectConfig(args: {
 	};
 }
 
-/** v1 runs `.superset/<key>.sh` for a key with no commands, worktree first. */
+/** v1 runs `<config dir>/<key>.sh` for a key with no commands, worktree first. */
 function withScriptFallbacks(
 	config: SetupConfig,
 	args: { repoPath: string; worktreePath?: string },
@@ -313,7 +313,7 @@ function withScriptFallbacks(
 	for (const key of SCRIPT_KEYS) {
 		if (nonEmptyStrings(config[key]).length > 0) continue;
 		const script = roots
-			.map((root) => join(root, PROJECT_SUPERSET_DIR_NAME, `${key}.sh`))
+			.map((root) => join(resolveProjectConfigDir(root), `${key}.sh`))
 			.find((path) => existsSync(path));
 		if (script) result[key] = [`bash ${shellSingleQuote(script)}`];
 	}
@@ -428,7 +428,7 @@ export function describeProjectConfigSources(args: {
 		if (nonEmptyStrings(config?.[key]).length > 0) continue;
 		if (
 			roots.some((root) =>
-				existsSync(join(root, PROJECT_SUPERSET_DIR_NAME, `${key}.sh`)),
+				existsSync(join(resolveProjectConfigDir(root), `${key}.sh`)),
 			)
 		) {
 			sources.add("script_fallback");

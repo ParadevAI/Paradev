@@ -17,7 +17,7 @@ export default command({
 			.required()
 			.desc("Repository as owner/name. Repeatable"),
 		primaryRepo: string().desc(
-			"Repository a workspace opens on and whose .superset config runs (default: the first --repo)",
+			"Repository a workspace opens on and whose Paradev config runs (default: the first --repo)",
 		),
 		scope: string()
 			.enum("organization", "personal")
