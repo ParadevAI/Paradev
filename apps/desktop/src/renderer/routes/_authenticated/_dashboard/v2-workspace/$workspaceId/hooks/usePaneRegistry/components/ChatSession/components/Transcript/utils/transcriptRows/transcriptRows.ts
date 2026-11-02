@@ -1,4 +1,5 @@
 import {
+	isPendingApproval,
 	type OutboxEntry,
 	type TurnGroup,
 	toolRunKey,
@@ -30,6 +31,8 @@ export type TranscriptRow =
 			startedAtMs: number;
 			completedAtMs: number | undefined;
 			running: boolean;
+			/** The turn is held on a question or approval only the user can answer. */
+			waiting: boolean;
 	  }
 	| {
 			kind: "item";
@@ -105,6 +108,10 @@ function repeatedTurnFailure(
 	return { extra: text.slice(message.length).trim() };
 }
 
+function asksTheUser(entry: TurnGroup["entries"][number]): boolean {
+	return entry.kind === "item" && isPendingApproval(entry.item);
+}
+
 function withNoticeDetail(
 	error: TurnError | undefined,
 	noticeDetail: string,
@@ -150,6 +157,7 @@ export function transcriptRows(
 				startedAtMs: turn.startedAtMs,
 				completedAtMs: turn.completedAtMs,
 				running: turn.status === "running",
+				waiting: turn.status === "running" && group.entries.some(asksTheUser),
 			});
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
