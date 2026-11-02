@@ -11,7 +11,7 @@ export default command({
 	description:
 		"Create a workspace: in the cloud by default if your account has cloud workspaces, else on this machine; --local or --host picks a host",
 	options: {
-		host: string().desc("Create on this host (machineId)"),
+		host: string().desc("Create on this host (machineId), or `cloud`"),
 		local: boolean().desc("Create on this machine"),
 		environment: string().desc(
 			"Environment ID a cloud workspace starts from (see: superset environments list); required when several have repositories",

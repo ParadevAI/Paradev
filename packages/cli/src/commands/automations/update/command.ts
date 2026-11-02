@@ -8,6 +8,7 @@ import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
 	resolveCloudAutomationTarget,
+	splitCloudHost,
 } from "../resolveCloudAutomationTarget";
 import { resolveTriggers } from "../resolveTriggers";
 
@@ -28,7 +29,7 @@ export default command({
 		agent: string().desc(
 			"New host agent instance id or presetId (e.g. claude, codex, superset).",
 		),
-		host: string().desc("New target host id"),
+		host: string().desc("New target host id, or `cloud` for --cloud"),
 		local: boolean().desc("Retarget the automation to this machine"),
 		project: string().desc("New v2 project id"),
 		workspace: string().desc(
@@ -110,8 +111,10 @@ export default command({
 			triggers,
 		);
 
+		const hostFlag = splitCloudHost(options.host);
+		const cloudRequested = Boolean(options.cloud || hostFlag.cloud);
 		const targetHostId = resolveHostFilter({
-			host: options.host ?? undefined,
+			host: hostFlag.host,
 			local: options.local ?? undefined,
 		});
 
@@ -125,11 +128,13 @@ export default command({
 				options.tag?.length ||
 				options.clearTags ||
 				options.machineSize ||
-				(options.cloud && !options.environment))
+				(cloudRequested && !options.environment))
 				? await ctx.api.automation.get.query({ id })
 				: null;
 		const alreadyCloud = current?.targetHostId === CLOUD_HOST_ID;
-		const cloud = Boolean(options.cloud || options.environment || alreadyCloud);
+		const cloud = Boolean(
+			cloudRequested || options.environment || alreadyCloud,
+		);
 		if (options.machineSize && !cloud) {
 			throw new CLIError(
 				"--machine-size applies to cloud automations",
@@ -138,7 +143,7 @@ export default command({
 		}
 		if (cloud) {
 			refuseHostFlagsForCloud({
-				"--host": options.host,
+				"--host": hostFlag.host,
 				"--local": options.local,
 				"--project": options.project,
 				"--session": options.session,

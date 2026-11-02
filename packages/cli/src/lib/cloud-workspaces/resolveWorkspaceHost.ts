@@ -5,6 +5,7 @@ import { getHostId } from "@superset/shared/host-info";
 import type { ApiClient } from "../api-client";
 import { resolveHostFilter } from "../host-target";
 
+const CLOUD_HOST = "cloud";
 const AVAILABILITY_TTL_MS = 60 * 60_000;
 const AVAILABILITY_TIMEOUT_MS = 2_000;
 
@@ -14,9 +15,10 @@ function availabilityPath(): string {
 
 /**
  * The host a workspace command targets, or undefined for the cloud. `--local`
- * and `--host` always win. Without them the default is the cloud only for an
- * account that can use cloud workspaces; everyone else keeps this machine, so
- * no existing script or agent changes behaviour.
+ * and `--host` always win; `--host cloud` is the cloud, the hostId the API
+ * reports for cloud workspaces. Without them the default is the cloud only for
+ * an account that can use cloud workspaces; everyone else keeps this machine,
+ * so no existing script or agent changes behaviour.
  */
 export async function resolveWorkspaceHost(
 	flags: { host?: string | null; local?: boolean | null },
@@ -27,6 +29,7 @@ export async function resolveWorkspaceHost(
 		host: flags.host ?? undefined,
 		local: flags.local ?? undefined,
 	});
+	if (flags.host?.toLowerCase() === CLOUD_HOST) return undefined;
 	if (explicit) return explicit;
 	return (await cloudWorkspacesAvailable(api, organizationId))
 		? undefined

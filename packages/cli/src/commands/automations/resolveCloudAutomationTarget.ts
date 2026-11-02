@@ -3,6 +3,16 @@ import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import type { ApiClient } from "../../lib/api-client";
 import { resolveCloudEnvironment } from "../../lib/cloud-workspaces";
 
+/** `--host cloud` (any case) is `--cloud`: the hostId the API reports for cloud. */
+export function splitCloudHost(host: string | null | undefined): {
+	cloud: boolean;
+	host: string | undefined;
+} {
+	if (host?.toLowerCase() === CLOUD_HOST_ID)
+		return { cloud: true, host: undefined };
+	return { cloud: false, host: host ?? undefined };
+}
+
 /** The flags a cloud automation cannot take, by name, from what was parsed. */
 export function refuseHostFlagsForCloud(flags: Record<string, unknown>): void {
 	for (const [flag, value] of Object.entries(flags)) {
