@@ -1,3 +1,4 @@
+import { acpStartModes } from "@superset/chat/core";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
@@ -236,16 +237,20 @@ export function validateAgentEffortSelection(
 
 /**
  * Validate an explicit launch mode before launch. Omitting mode delegates to
- * the underlying agent's default behaviour.
+ * the underlying agent's default behaviour. A chat launch carries a chat
+ * permission mode, not a terminal launch mode.
  */
 export function validateAgentModeSelection(
 	presetId: string,
 	label: string,
 	mode: string | undefined,
+	surface?: AgentRunInput["surface"],
 ): void {
 	if (!mode) return;
 
-	const support = getAgentModeSupport(presetId);
+	const support =
+		(surface === "chat" ? acpStartModes(presetId) : undefined) ??
+		getAgentModeSupport(presetId);
 	if (!support) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -354,7 +359,7 @@ function validateForkSessionIsResolvable(
  */
 export function validateAgentLaunchOptions(
 	db: HostDb,
-	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode">,
+	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode" | "surface">,
 ): void {
 	if (!input.model && !input.effort && !input.mode) return;
 
@@ -376,7 +381,12 @@ export function validateAgentLaunchOptions(
 		input.effort,
 		input.model,
 	);
-	validateAgentModeSelection(launchPresetId, config.label, input.mode);
+	validateAgentModeSelection(
+		launchPresetId,
+		config.label,
+		input.mode,
+		input.surface,
+	);
 }
 
 /**
@@ -674,6 +684,7 @@ export function chatLaunchTarget(
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return { harness, label: config.label, attachments };
 }
 
