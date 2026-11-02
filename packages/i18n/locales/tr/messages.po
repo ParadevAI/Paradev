@@ -21753,6 +21753,9 @@ msgstr "Planınız bulut ortamlarını içermiyor. Oluşturmak için Ayarlar, Fa
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Planınız {startDate} tarihinde {planName} olarak değişir. Bugün ücret alınmaz."
 
+msgid "Your prompt"
+msgstr "İsteminiz"
+
 msgid "Your rank"
 msgstr "Sıralamanız"
 

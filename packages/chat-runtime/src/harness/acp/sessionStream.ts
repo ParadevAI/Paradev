@@ -8,6 +8,7 @@ import {
 	mapToolBody,
 	mcpServerOf,
 	messageText,
+	onlyInterruptMarker,
 	planEntryItems,
 	toolCallSettled,
 	toolKind,
@@ -350,6 +351,10 @@ export class SessionStream {
 			update.rawOutput === undefined
 				? prior?.rawOutput
 				: withoutImageData(update.rawOutput);
+		const status = update.status
+			? toolStatus(update.status)
+			: (prior?.status ?? "running");
+		const interrupted = status === "failed" && onlyInterruptMarker(content);
 		const claudeCode = update._meta?.claudeCode;
 		const mcpServer = mcpServerOf(update._meta, prior?.mcpServer);
 		const item: ToolCall = {
@@ -368,10 +373,8 @@ export class SessionStream {
 				update.kind ??
 				prior?.toolName ??
 				"tool",
-			status: update.status
-				? toolStatus(update.status)
-				: (prior?.status ?? "running"),
-			content,
+			status: interrupted ? "canceled" : status,
+			content: interrupted ? [] : content,
 			...(attachments.length > 0 ? { attachments } : {}),
 			...(locations?.length ? { locations } : {}),
 			startedAtMs: prior?.startedAtMs ?? this.options.nextStartMs(),

@@ -21753,6 +21753,9 @@ msgstr "Je abonnement bevat geen cloudomgevingen. Upgrade in Instellingen, Factu
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Je abonnement gaat op {startDate} over naar {planName}. Vandaag wordt niets afgeschreven."
 
+msgid "Your prompt"
+msgstr "Je prompt"
+
 msgid "Your rank"
 msgstr "Je positie"
 

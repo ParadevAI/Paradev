@@ -1228,6 +1228,74 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("shows a replayed Claude interrupt as a stopped turn, not a user message", async () => {
+		const agent = new FakeAcpAgent();
+		agent.replayUpdates = [
+			{
+				sessionUpdate: "user_message_chunk",
+				content: { type: "text", text: "check the campaigns routing" },
+			},
+			{
+				sessionUpdate: "agent_message_chunk",
+				content: { type: "text", text: "Reading the /campaigns code." },
+			},
+			{
+				sessionUpdate: "tool_call",
+				toolCallId: "tc-bash",
+				title: "grep -rn views",
+				kind: "execute",
+				status: "in_progress",
+			},
+			{
+				sessionUpdate: "tool_call_update",
+				toolCallId: "tc-bash",
+				status: "failed",
+				content: [
+					{
+						type: "content",
+						content: {
+							type: "text",
+							text: "[Request interrupted by user for tool use]",
+						},
+					},
+				],
+			},
+			{
+				sessionUpdate: "user_message_chunk",
+				content: { type: "text", text: "[Request interrupted by user]" },
+			},
+		];
+		let counter = 0;
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => agent.transport(handlers),
+			now: () => 1,
+			mintId: () => `id-${++counter}`,
+		});
+		const events: AdapterEvent[] = [];
+		void collect(
+			adapter.start({ cwd: "/work", resume: { harnessSessionId: "sess-1" } }),
+			events,
+		);
+		await flush(40);
+
+		const items = itemsOf(events);
+		const userTexts = items
+			.filter((item) => item.kind === "user_message")
+			.map((item) => (item.content as Array<{ text?: string }>)[0]?.text);
+		expect(userTexts).toEqual(["check the campaigns routing"]);
+
+		const tool = items.filter((item) => item.kind === "tool_call").at(-1);
+		expect(tool?.status).toBe("canceled");
+		expect(tool?.content).toEqual([]);
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(new Set(turns.map((turn) => turn.id)).size).toBe(1);
+		expect(turns.at(-1)?.status).toBe("interrupted");
+
+		await adapter.dispose();
+	});
+
 	it("opens a new session when there is no transcript to resume", async () => {
 		const agent = new FakeAcpAgent();
 		agent.loadFails = true;

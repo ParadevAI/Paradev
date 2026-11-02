@@ -21753,6 +21753,9 @@ msgstr "Il tuo piano non include ambienti cloud. Esegui l'upgrade in Impostazion
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Il tuo piano passa a {planName} il {startDate}. Oggi non viene addebitato nulla."
 
+msgid "Your prompt"
+msgstr "Il tuo prompt"
+
 msgid "Your rank"
 msgstr "La tua posizione"
 
