@@ -38,6 +38,24 @@ async function minter(headers: Headers) {
 	return sessionFromOAuthBearer(headers);
 }
 
+/** The organization an API key was made for, when the request uses one. */
+async function apiKeyOrganization(headers: Headers): Promise<string | null> {
+	const bearer = headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
+	const key =
+		headers.get("x-api-key") ??
+		(bearer?.startsWith("sk_live_") ? bearer : null);
+	if (!key) return null;
+	const result = await auth.api.verifyApiKey({ body: { key } });
+	const raw = result.key?.metadata;
+	const metadata =
+		typeof raw === "string"
+			? (JSON.parse(raw) as { organizationId?: unknown })
+			: (raw as { organizationId?: unknown } | null | undefined);
+	return typeof metadata?.organizationId === "string"
+		? metadata.organizationId
+		: null;
+}
+
 /** A token for one organization the caller belongs to. */
 export async function organizationToken(
 	req: Request,
@@ -45,6 +63,13 @@ export async function organizationToken(
 ): Promise<Response> {
 	const session = await minter(req.headers);
 	if (!session) return reply({ error: "unauthorized" }, 401);
+	const keyOrganization = await apiKeyOrganization(req.headers);
+	if (keyOrganization && keyOrganization !== organizationId) {
+		return reply(
+			{ error: `This API key is for organization ${keyOrganization}` },
+			403,
+		);
+	}
 	const user = session.user as typeof session.user & {
 		deletionRequestedAt?: Date | null;
 	};

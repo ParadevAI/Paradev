@@ -132,6 +132,7 @@ export class JwtApiAuthProvider implements ApiAuthProvider {
 				const error = new Error(`Failed to mint JWT: ${response.status}`);
 				if (
 					this.organizationId &&
+					response.status === 401 &&
 					!response.headers.has(ORGANIZATION_TOKEN_HEADER)
 				) {
 					error.name = LEGACY_API_ERROR_NAME;

@@ -3,6 +3,7 @@ import { apikeys } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { boundOrganizationId } from "../../lib/token-organizations";
 
 import { personProcedure, userError } from "../../trpc";
 
@@ -27,6 +28,13 @@ export const apiKeyRouter = {
 	create: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
+			if (boundOrganizationId(ctx.session)) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message:
+						"A token for one organization can't create API keys. Create one from the app or a signed-in CLI.",
+				});
+			}
 			const organizationId = ctx.activeOrganizationId;
 			if (!organizationId) {
 				throw userError({
