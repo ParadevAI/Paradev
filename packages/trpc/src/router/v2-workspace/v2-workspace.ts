@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
-import { isMember } from "../../lib/cloud-guards";
+import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
 import { personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
@@ -158,7 +158,7 @@ export const v2WorkspaceRouter = {
 				const now = new Date();
 				return {
 					id: input.id,
-					organizationId: ctx.activeOrganizationId ?? "",
+					organizationId: organizationOrFirst(ctx) ?? "",
 					projectId: "",
 					hostId: input.hostId ?? "",
 					name: input.name ?? "",

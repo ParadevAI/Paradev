@@ -117,6 +117,16 @@ export async function isMember(
 	);
 }
 
+/**
+ * The organization a request acts in. A bearer that names none gets its
+ * token's first, as the routes released clients call before naming one expect.
+ */
+export function organizationOrFirst(ctx: MemberContext): string | null {
+	return (
+		ctx.activeOrganizationId ?? tokenOrganizationIds(ctx.session)?.[0] ?? null
+	);
+}
+
 export async function assertMember(
 	ctx: MemberContext,
 	organizationId: string,
