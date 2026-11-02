@@ -15,7 +15,7 @@ Run the two fixers first, since they rewrite files the other checks read:
 Then run these three **in parallel** and report all results:
 
 3. `bun run typecheck` — TypeScript type checking across all packages
-4. `bun test` — Run all tests
+4. `bun run test` — Every package's suite through turbo, as CI runs it
 5. `bun run check:i18n` — Regenerates the translation catalogs and fails on missing or stale translations
 
 ## Output
