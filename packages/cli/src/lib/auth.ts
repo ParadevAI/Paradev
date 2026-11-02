@@ -123,6 +123,16 @@ function waitForCallback({
 			const state = url.searchParams.get("state");
 			const callbackError = url.searchParams.get("error");
 
+			// A callback from an earlier attempt can land on a reused loopback
+			// port. Judge the state before anything else and answer a mismatched
+			// callback without settling the wait, otherwise a stale denial ends
+			// the login that is waiting now (#6347 review).
+			if (state !== expectedState) {
+				response
+					.writeHead(400, { "Content-Type": "text/html" })
+					.end("<h1>State mismatch</h1>");
+				return;
+			}
 			if (callbackError) {
 				response
 					.writeHead(400, { "Content-Type": "text/html" })
@@ -130,18 +140,11 @@ function waitForCallback({
 				finish(new CLIError(`Authorization denied: ${callbackError}`));
 				return;
 			}
-			if (!code || !state) {
+			if (!code) {
 				response
 					.writeHead(400, { "Content-Type": "text/html" })
 					.end("<h1>Missing parameters</h1>");
-				finish(new CLIError("Callback missing code or state"));
-				return;
-			}
-			if (state !== expectedState) {
-				response
-					.writeHead(400, { "Content-Type": "text/html" })
-					.end("<h1>State mismatch</h1>");
-				finish(new CLIError("State mismatch — possible CSRF"));
+				finish(new CLIError("Callback missing code"));
 				return;
 			}
 			response

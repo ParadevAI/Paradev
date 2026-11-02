@@ -182,6 +182,87 @@ describe("login /authorize (single request)", () => {
 		await expect(loginPromise).rejects.toThrow("Login cancelled");
 	});
 
+	test("a stale error callback does not end the login that is waiting", async () => {
+		// The loopback port is reused across attempts, so a denial from an
+		// earlier attempt can arrive while a new login waits on it. Only a
+		// callback carrying this attempt's state may settle the wait (#6347).
+		const printed: string[] = [];
+		let handler: ((request: unknown, response: unknown) => void) | undefined;
+		const server = {
+			on: (
+				event: string,
+				listener: (request: unknown, response: unknown) => void,
+			) => {
+				if (event === "request") handler = listener;
+			},
+			close: () => {},
+		};
+
+		const respond = (query: string) =>
+			new Promise<{ status: number; body: string }>((resolve) => {
+				let status = 0;
+				const response = {
+					writeHead: (code: number) => {
+						status = code;
+						return response;
+					},
+					end: (body?: string) => {
+						resolve({ status, body: body ?? "" });
+						return response;
+					},
+				};
+				handler?.({ url: `/callback?${query}` }, response);
+			});
+
+		const controller = new AbortController();
+		let notifyAuthUrl!: () => void;
+		const authUrlEmitted = new Promise<void>((resolve) => {
+			notifyAuthUrl = resolve;
+		});
+		const loginPromise = login(controller.signal, {
+			bindLoopbackServer: async () => ({
+				server: server as never,
+				port: 51791,
+			}),
+			shouldOpenBrowser: () => true,
+			openBrowser: async () => {},
+			onAuthorizationUrl: (url) => {
+				printed.push(url);
+				notifyAuthUrl();
+			},
+			promptForPastedCode: () => new Promise<string>(() => {}),
+		});
+
+		await authUrlEmitted;
+		const expectedState = new URL(printed[0]!).searchParams.get("state");
+		expect(expectedState).toBeTruthy();
+
+		let settled = false;
+		void loginPromise.then(
+			() => {
+				settled = true;
+			},
+			() => {
+				settled = true;
+			},
+		);
+
+		const stale = await respond(
+			"error=access_denied&state=from-an-earlier-login",
+		);
+		expect(stale.status).toBe(400);
+		expect(stale.body).toContain("State mismatch");
+		await flushMicrotasks();
+		expect(settled).toBe(false);
+
+		// The callback that belongs to this attempt still ends the login.
+		const current = await respond(`error=access_denied&state=${expectedState}`);
+		expect(current.body).toContain("Authorization failed");
+		await expect(loginPromise).rejects.toThrow(
+			"Authorization denied: access_denied",
+		);
+	});
+
 	test("prints the paste URL and opens nothing when loopback is unavailable", async () => {
 		const opened: string[] = [];
 		const printed: string[] = [];
